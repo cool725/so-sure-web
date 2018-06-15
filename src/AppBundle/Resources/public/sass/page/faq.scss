@@ -4,3 +4,59 @@
 @import "../mixins";
 @import "../common/paletteNew";
 
+
+.faqs {
+    position: relative;
+
+    &__content {
+        h2 {
+            padding-top: 60px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid $pale-grey;
+        }
+
+        h3 {
+            position: relative;
+            margin-bottom: 0;
+            // padding-top: 30px;
+
+            a {
+                display: block;
+                color: $primary-blue;
+                padding: 15px;
+                transition: all 0.3s easeInQuart;
+
+                &:hover, &:focus {
+                    // background-color: $off-white;
+                    text-decoration: none;
+                }
+
+                &:after {
+                    font-family: FontAwesome;
+                    content: '\f106';
+                    position: absolute;
+                    top: 15px; right: 15px;
+                }
+            }
+
+            a.collapsed {
+                color: $black;
+
+                &:after {
+                    font-family: FontAwesome;
+                    content: '\f107';
+                    position: absolute;
+                    top: 15px; right: 15px;
+                }
+            }
+        }
+
+        .collapse {
+            padding: 15px;
+        }
+    }
+
+    &__sidebar {
+        position: fixed;
+    }
+}
