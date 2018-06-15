@@ -18,6 +18,10 @@
             padding-top: 60px;
             padding-bottom: 15px;
             border-bottom: 1px solid $pale-grey;
+
+            &:first-of-type {
+                padding-top: 0;
+            }
         }
 
         h3 {
@@ -85,6 +89,17 @@
     }
 
     &__sidebar {
-        position: fixed;
+        display: none;
+
+        ul {
+            li {
+                font-size: 18px;
+            }
+        }
+
+        @include breakpoint(laptop) {
+            display: block;
+            position: fixed;
+        }
     }
 }
