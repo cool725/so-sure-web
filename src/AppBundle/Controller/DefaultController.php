@@ -467,6 +467,15 @@ class DefaultController extends BaseController
     }
 
     /**
+     * @Route("/faq", name="faq")
+     * @Template
+     */
+    public function faqAction()
+    {
+        return $this->render('AppBundle:Default:faq.html.twig');
+    }
+
+    /**
      * @Route("/mobile-phone-insurance-for-your-company",
      *  name="mobile_phone_insurance_for_your_company",
      *  options={"sitemap"={"priority":"1.0","changefreq":"daily"}})

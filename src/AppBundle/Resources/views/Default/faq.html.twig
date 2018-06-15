@@ -1,0 +1,33 @@
+{% extends 'base.html.twig' %}
+
+{# Set vars #}
+{% set new_stylesheet = 1 %}
+{% set new_footer = 1 %}
+{% set homepage = 1 %}
+{% set useDropdownSearch = 1 %}
+
+{% block title %}so-sure - Frequently Asked Questions{% endblock %}
+{% block meta %}
+    <meta name="description" content="Social mobile phone insurance that's better and up to 80% cheaper when you connect with friends and don't claim. Download our app now to see how much you could save."/>
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {% stylesheets output='css/*.css'
+    'components/animate.css/animate.min.css'
+    '@AppBundle/Resources/public/sass/page/faq.scss'
+ %}<link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
+{% endblock %}
+
+{% block body %}
+
+
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {% javascripts
+    '@AppBundle/Resources/public/js/Default/faq.js'
+ %}
+    <script src="{{ asset_url }}"></script>{% endjavascripts %}
+{% endblock %}
