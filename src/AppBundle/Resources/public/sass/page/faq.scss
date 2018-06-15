@@ -5,6 +5,10 @@
 @import "../common/paletteNew";
 @import "../common/type";
 
+.navbar {
+    background-color: $white;
+}
+
 .faqs {
     position: relative;
 
@@ -24,7 +28,7 @@
             a {
                 display: block;
                 color: $primary-blue;
-                padding: 15px 0;
+                padding: 15px 40px 15px 0;
                 background-color: 0.5s ease;
 
                 &:hover {
