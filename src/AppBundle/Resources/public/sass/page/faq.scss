@@ -3,13 +3,14 @@
 @import "../common/variables";
 @import "../mixins";
 @import "../common/paletteNew";
-
+@import "../common/type";
 
 .faqs {
     position: relative;
 
     &__content {
         h2 {
+            color: $primary-blue;
             padding-top: 60px;
             padding-bottom: 15px;
             border-bottom: 1px solid $pale-grey;
@@ -18,17 +19,21 @@
         h3 {
             position: relative;
             margin-bottom: 0;
-            // padding-top: 30px;
+            font-family: $avenir-light;
 
             a {
                 display: block;
                 color: $primary-blue;
-                padding: 15px;
-                transition: all 0.3s easeInQuart;
+                padding: 15px 0;
+                background-color: 0.5s ease;
 
-                &:hover, &:focus {
-                    // background-color: $off-white;
+                &:hover {
                     text-decoration: none;
+                    color: $primary-blue;
+                }
+
+                &:focus {
+                    text-decoration: underline;
                 }
 
                 &:after {
@@ -42,6 +47,14 @@
             a.collapsed {
                 color: $black;
 
+                &:hover {
+                    color: $primary-blue;
+                }
+
+                &:focus {
+                    text-decoration: none;
+                }
+
                 &:after {
                     font-family: FontAwesome;
                     content: '\f107';
@@ -52,7 +65,18 @@
         }
 
         .collapse {
-            padding: 15px;
+            padding: 15px 0;
+            border-bottom: 1px solid $pale-grey;
+
+            p, li {
+                font-size: 17px !important;
+            }
+
+            ul {
+                > li {
+                    padding: 5px 0;
+                }
+            }
         }
     }
 
