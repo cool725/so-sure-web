@@ -26,6 +26,7 @@ class PaymentRepository extends DocumentRepository
                 'sosure',
                 'chargeback',
                 'potReward',
+                'sosurePotReward',
                 'policyDiscount',
                 'debtCollection',
                 'policyDiscountRefund',
