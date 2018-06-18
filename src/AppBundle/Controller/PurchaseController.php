@@ -1164,7 +1164,7 @@ class PurchaseController extends BaseController
      * @Route("/cancel/{id}/requested", name="purchase_cancel_requested")
      * @Template
      */
-    public function cancelRequestedAction(Request $request, $id)
+    public function cancelRequestedAction($id)
     {
         $dm = $this->getManager();
         $repo = $dm->getRepository(Policy::class);
@@ -1182,7 +1182,7 @@ class PurchaseController extends BaseController
      * @Route("/remainder/{id}", name="purchase_remainder_policy")
      * @Template
      */
-    public function purchaseRemainderPolicyAction($id)
+    public function purchaseRemainderPolicyAction(Request $request, $id)
     {
         $policyRepo = $this->getManager()->getRepository(Policy::class);
         $policy = $policyRepo->find($id);
