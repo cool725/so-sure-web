@@ -24,10 +24,11 @@
         <td width="{{ indent_width }}"></td>
         <td width="{{ text_width }}"><strong>Premium received in month</strong></td>
         {% set receivedTotal = paymentTotals.judo.received + paymentTotals.bacs.received + paymentTotals.sosure.received %}
-        {% if equal_to_two_dp(receivedTotal, paymentTotals.all.received) %}
+        {% set expectedReceived = paymentTotals.all.received - paymentTotals.chargebacks.received %}
+        {% if equal_to_two_dp(receivedTotal, expectedReceived) %}
         <td><strong>£{{ receivedTotal|number_format(2, '.', ',') }}</strong></td>
         {% else %}
-        <td class="bg-danger" title="Expect total received £{{ paymentTotals.all.received|number_format(2, '.', ',') }}"><strong>£{{ receivedTotal|number_format(2, '.', ',') }}</strong></td>
+        <td class="bg-danger" title="Expect total received £{{ expectedReceived|number_format(2, '.', ',') }}"><strong>£{{ receivedTotal|number_format(2, '.', ',') }}</strong></td>
         {% endif %}
     </tr>
     <tr class="info">
@@ -57,10 +58,11 @@
         <td width="{{ indent_width }}"></td>
         <td width="{{ text_width }}"><strong>Premium refunds in month</strong></td>
         {% set refundedTotal = paymentTotals.judo.refunded + paymentTotals.chargebacks.total + paymentTotals.bacs.refunded + paymentTotals.sosure.refunded %}
-        {% if equal_to_two_dp(refundedTotal, paymentTotals.all.refunded - paymentTotals.chargebacks.received) %}
+        {% set expectedRefunded = paymentTotals.all.refunded + paymentTotals.chargebacks.received %}
+        {% if equal_to_two_dp(refundedTotal, expectedRefunded) %}
         <td><strong>(£{{ (0 - paymentTotals.all.refunded)|number_format(2, '.', ',') }})</strong></td>
         {% else %}
-        <td class="bg-danger" title="Expect total received £{{ paymentTotals.all.refunded - paymentTotals.chargebacks.received|number_format(2, '.', ',') }}"><strong>(£{{ (0 - refundedTotal)|number_format(2, '.', ',') }})</strong></td>
+        <td class="bg-danger" title="Expect total received £{{ expectedRefunded|number_format(2, '.', ',') }}"><strong>(£{{ (0 - refundedTotal)|number_format(2, '.', ',') }})</strong></td>
         {% endif %}
     </tr>
     <tr>
