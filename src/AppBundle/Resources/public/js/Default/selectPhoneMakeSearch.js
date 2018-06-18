@@ -120,7 +120,6 @@ $(function(){
         var base_path = $(form).data('base-path');
         var path_suffix = $(form).data('path-suffix');
         var input   = $(this).find('.search-phone');
-        var loading = $(this).next('.so-sure-loading');
 
         // Fallback incase not set
         if (!base_path) {
@@ -162,8 +161,7 @@ $(function(){
         });
 
         // Stop the content flash when rendering the input
-        $(loading).fadeOut('slow');
-        $(form).fadeIn('fast');
+        $(form).css('visibility', 'visible').animate({opacity: 1}, 500);
 
         $(input).bind('typeahead:selected', function(ev, suggestion) {
             $(form).unbind('submit', sosure.selectPhoneMake.preventDefault);
@@ -257,7 +255,4 @@ $(function(){
             });
         });
     }
-
-
 });
-
