@@ -1141,7 +1141,7 @@ class PurchaseController extends BaseController
                         'We have passed your request to our policy team. You should receive a cancellation email once that is processed.'
                     );
                     // @codingStandardsIgnoreEnd
-                    return $this->redirectToRoute('homepage');
+                    return $this->redirectToRoute('purchase_cancel_requested', ['id' => $id]);
                 }
             }
         } else {
@@ -1158,6 +1158,24 @@ class PurchaseController extends BaseController
         ];
 
         return $this->render($template, $data);
+    }
+
+    /**
+     * @Route("/cancel/{id}/requested", name="purchase_cancel_requested")
+     * @Template
+     */
+    public function cancelRequestedAction($id)
+    {
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(Policy::class);
+        $policy = $repo->find($id);
+        if (!$policy) {
+            throw $this->createNotFoundException('Unable to see policy');
+        }
+
+        return [
+            'policy' => $policy,
+        ];
     }
 
     /**
