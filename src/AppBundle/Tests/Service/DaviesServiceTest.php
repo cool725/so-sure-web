@@ -1493,12 +1493,12 @@ class DaviesServiceTest extends WebTestCase
     }
 
 
-    public function testSaveClaimsRepudiatedEmailTest()
+    public function testSaveClaimsRepudiatedEmailLossTest()
     {
         $policy = static::createUserPolicy(true);
         $policy->setStatus(Policy::STATUS_UNPAID);
 
-        $policy->getUser()->setEmail(static::generateEmail('testSaveClaimsRepudiatedEmailTest', $this));
+        $policy->getUser()->setEmail(static::generateEmail('testSaveClaimsRepudiatedEmailLossTest', $this));
         $claim = new Claim();
         $claim->setNumber(rand(1, 999999));
         $claim->setType(Claim::TYPE_LOSS);
@@ -1543,22 +1543,7 @@ class DaviesServiceTest extends WebTestCase
         static::$daviesService->saveClaim($daviesClaim, false);
         $this->assertNotNull($claim->getApprovedDate());
         $this->assertEquals(new \DateTime('2016-01-01'), $claim->getApprovedDate());
-
-        // damaged should not trigger
-        $daviesClaim->lossType = DaviesClaim::TYPE_DAMAGE;
-        $claim->setType(Claim::TYPE_DAMAGE);
-        $policy->setStatus(Policy::STATUS_ACTIVE);
-        $mailer = $this->getMockBuilder('Swift_Mailer')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $mailer->expects($this->never())->method('send');
-        self::$daviesService->setMailerMailer($mailer);
-
-        static::$daviesService->saveClaim($daviesClaim, false);
-        $this->assertNotNull($claim->getApprovedDate());
-        $this->assertEquals(new \DateTime('2016-01-01'), $claim->getApprovedDate());
     }
-
 
     public function testSaveClaimsRepudiatedEmailDamageTest()
     {
