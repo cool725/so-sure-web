@@ -11,6 +11,7 @@ use AppBundle\Service\InvitationService;
 use AppBundle\Service\MailerService;
 use AppBundle\Service\RateLimitService;
 use AppBundle\Service\RequestService;
+use AppBundle\Service\ClaimsService;
 use PHPStan\Rules\Arrays\AppendedArrayItemTypeRule;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
@@ -561,6 +562,7 @@ class DefaultController extends BaseController
                     $user = $repo->findOneBy(['email' => $claimFnolEmail->getEmail()]);
 
                     if ($user === null) {
+                        // @codingStandardsIgnoreStart
                         $this->addFlash(
                             'error',
                             "Sorry, your email address could not be associated with an active policy. Please check the email address you have created your policy under and try again."
@@ -570,6 +572,7 @@ class DefaultController extends BaseController
                             /** @var ClaimsService $claimsService */
                             $claimsService = $this->get('app.claims');
                             if ($claimsService->sendUniqueLoginLink($user)) {
+                                // @codingStandardsIgnoreStart
                                 $this->addFlash(
                                     'success',
                                     "Thank you. An email with further instructions on how to proceed with your claim has been sent to your email address. Please check it now and follow the instructions to start the process."
@@ -581,6 +584,7 @@ class DefaultController extends BaseController
                                 );
                             }
                         } else {
+                            // @codingStandardsIgnoreStart
                             $this->addFlash(
                                 'error',
                                 "Sorry, your email address could not be associated with an active policy. Please check the email address you have created your policy under and try again."

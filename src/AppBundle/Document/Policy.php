@@ -1273,7 +1273,13 @@ abstract class Policy
             return $a->getRecordedDate() < $b->getRecordedDate();
         });
 
-        if (in_array($claims[0]->getStatus(), [Claim::STATUS_APPROVED, Claim::STATUS_SETTLED, Claim::STATUS_DECLINED, Claim::STATUS_PENDING_CLOSED, Claim::STATUS_WITHDRAWN])) {
+        if (in_array($claims[0]->getStatus(), [
+            Claim::STATUS_APPROVED,
+            Claim::STATUS_SETTLED,
+            Claim::STATUS_DECLINED,
+            Claim::STATUS_PENDING_CLOSED,
+            Claim::STATUS_WITHDRAWN
+        ])) {
             return null;
         }
         return $claims[0];

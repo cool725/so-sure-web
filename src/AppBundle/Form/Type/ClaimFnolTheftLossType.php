@@ -17,6 +17,7 @@ use Doctrine\ODM\MongoDB\DocumentRepository;
 use AppBundle\Document\Policy;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Claim;
+use AppBundle\Service\ClaimsService;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormEvent;
 use Doctrine\Bundle\MongoDBBundle\Form\Type\DocumentType;
@@ -30,18 +31,18 @@ class ClaimFnolTheftLossType extends AbstractType
     private $required;
  
      /**
-     * @var ClaimService
+     * @var ClaimsService
      */
-    private $claimService;
+    private $claimsService;
 
     /**
-     * @param boolean $required
-     * @param ClaimService $claimService
+     * @param boolean      $required
+     * @param ClaimsService $claimsService
      */
-    public function __construct($required, $claimService)
+    public function __construct($required, ClaimsService $claimsService)
     {
         $this->required = $required;
-        $this->claimService = $claimService;
+        $this->claimsService = $claimsService;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options)
@@ -93,7 +94,9 @@ class ClaimFnolTheftLossType extends AbstractType
             } else {
                 $form->add('proofOfUsage', FileType::class, ['required' => true]);
             }
-            if ($claim->getPolicy()->getRisk() != Policy::RISK_LEVEL_HIGH && $claim->getPolicy()->getPicSureStatus() == PhonePolicy::PICSURE_STATUS_APPROVED) {
+            if ($claim->getPolicy()->getRisk() != Policy::RISK_LEVEL_HIGH &&
+                $claim->getPolicy()->getPicSureStatus() == PhonePolicy::PICSURE_STATUS_APPROVED
+            ) {
                 $form->add('proofOfPurchase', HiddenType::class);
             } else {
                 $form->add('proofOfPurchase', FileType::class, ['required' => true]);
@@ -115,7 +118,7 @@ class ClaimFnolTheftLossType extends AbstractType
             $timestamp = $now->format('U');
 
             if ($filename = $data->getProofOfUsage()) {
-                $s3key = $this->claimService->saveFile(
+                $s3key = $this->claimsService->saveFile(
                     $filename,
                     sprintf('proof-of-usage-%s', $timestamp),
                     $data->getClaim()->getPolicy()->getUser()->getId(),
@@ -124,7 +127,7 @@ class ClaimFnolTheftLossType extends AbstractType
                 $data->setProofOfUsage($s3key);
             }
             if ($filename = $data->getProofOfBarring()) {
-                $s3key = $this->claimService->saveFile(
+                $s3key = $this->claimsService->saveFile(
                     $filename,
                     sprintf('proof-of-barring-%s', $timestamp),
                     $data->getClaim()->getPolicy()->getUser()->getId(),
@@ -133,7 +136,7 @@ class ClaimFnolTheftLossType extends AbstractType
                 $data->setProofOfBarring($s3key);
             }
             if ($filename = $data->getProofOfPurchase()) {
-                $s3key = $this->claimService->saveFile(
+                $s3key = $this->claimsService->saveFile(
                     $filename,
                     sprintf('proof-of-purchase-%s', $timestamp),
                     $data->getClaim()->getPolicy()->getUser()->getId(),

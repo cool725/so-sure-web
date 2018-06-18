@@ -1,6 +1,7 @@
 <?php
 namespace AppBundle\Service;
 
+use Predis\Client;
 use AppBundle\Repository\PhonePolicyRepository;
 use Psr\Log\LoggerInterface;
 use AppBundle\Document\Policy;
@@ -19,6 +20,8 @@ use AppBundle\Document\File\ProofOfPurchaseFile;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use League\Flysystem\MountManager;
+use League\Flysystem\AwsS3v3\AwsS3Adapter;
+use League\Flysystem\Filesystem;
 
 class ClaimsService
 {
@@ -73,7 +76,8 @@ class ClaimsService
         $this->filesystem = $filesystem;
     }
 
-    public function createClaim(ClaimFnol $claimFnol) {
+    public function createClaim(ClaimFnol $claimFnol)
+    {
         $claim = new Claim();
         
         $claim->setType($claimFnol->getType());
@@ -89,7 +93,8 @@ class ClaimsService
         return $claim;
     }
 
-    public function updateDamageDocuments(Claim $claim, ClaimFnolDamage $claimDamage) {
+    public function updateDamageDocuments(Claim $claim, ClaimFnolDamage $claimDamage)
+    {
         $claim->setTypeDetails($claimDamage->getTypeDetails());
         $claim->setTypeDetailsOther($claimDamage->getTypeDetailsOther());
         $claim->setMonthOfPurchase($claimDamage->getMonthOfPurchase());
@@ -116,7 +121,8 @@ class ClaimsService
         $this->notifyClaimSubmission($claim);
     }
 
-    public function updateTheftLossDocuments(Claim $claim, ClaimFnolTheftLoss $claimTheftLoss) {
+    public function updateTheftLossDocuments(Claim $claim, ClaimFnolTheftLoss $claimTheftLoss)
+    {
         $claim->setHasContacted($claimTheftLoss->getHasContacted());
         $claim->setContactedPlace($claimTheftLoss->getContactedPlace());
         $claim->setBlockedDate($claimTheftLoss->getBlockedDate());
@@ -326,7 +332,8 @@ class ClaimsService
         }
     }
 
-    public function notifyClaimSubmission(Claim $claim) {
+    public function notifyClaimSubmission(Claim $claim)
+    {
         $subject = sprintf(
             'New Claim from %s/%s',
             $claim->getPolicy()->getUser()->getName(),
@@ -346,7 +353,7 @@ class ClaimsService
             ['data' => $claim],
             'AppBundle:Email:claim/fnolResponse.txt.twig',
             ['data' => $claim]
-        );        
+        );
     }
 
     public function setMailerMailer($mailer)
@@ -354,7 +361,8 @@ class ClaimsService
         $this->mailer->setMailer($mailer);
     }
 
-    public function sendUniqueLoginLink(User $user) {
+    public function sendUniqueLoginLink(User $user)
+    {
         try {
             $token = md5(sprintf('%s%s', time(), $user->getEmail()));
             $this->redis->setex($token, 900, $user->getId());
@@ -363,8 +371,7 @@ class ClaimsService
                 'username' => $user->getName(),
                 'tokenUrl' => $this->routerService->generate(
                     'claim_login',
-                    ['tokenId' => $token],
-                    UrlGeneratorInterface::ABSOLUTE_URL
+                    ['tokenId' => $token]
                 ),
                 'tokenValid' => 15
             ];
@@ -393,7 +400,8 @@ class ClaimsService
         return $this->redis->get($tokenId);
     }
 
-    public function withdrawClaim(Claim $claim) {
+    public function withdrawClaim(Claim $claim)
+    {
         try {
             $claim->setStatus(Claim::STATUS_WITHDRAWN);
             $this->dm->flush();

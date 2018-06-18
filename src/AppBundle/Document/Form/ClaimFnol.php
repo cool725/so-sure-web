@@ -224,7 +224,8 @@ class ClaimFnol
         $this->where = $where;
     }
 
-    public static function getNetworks() {
+    public static function getNetworks()
+    {
         return Claim::$networks;
     }
 }

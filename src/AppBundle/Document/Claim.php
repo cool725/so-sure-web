@@ -377,7 +377,8 @@ class Claim
     protected $type;
 
     /**
-     * @Assert\Choice({"submitted", "in-review", "approved", "settled", "declined", "withdrawn", "pending-closed"}, strict=true)
+     * @Assert\Choice({"submitted", "in-review", "approved", "settled", "declined",
+     *                 "withdrawn", "pending-closed"}, strict=true)
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
@@ -1655,7 +1656,8 @@ class Claim
         throw new \Exception(sprintf('Unknown claim type %s', $type));
     }
 
-    public static function getNetworks() {
+    public static function getNetworks()
+    {
         return self::$networks;
     }
 }

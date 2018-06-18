@@ -987,7 +987,13 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         foreach ($this->getPolicies() as $policy) {
             $noOpenClaim = true;
             foreach ($policy->getClaims() as $claim) {
-                if (!in_array($claim->getStatus(), [Claim::STATUS_APPROVED, Claim::STATUS_SETTLED, Claim::STATUS_DECLINED, Claim::STATUS_PENDING_CLOSED, Claim::STATUS_WITHDRAWN])) {
+                if (!in_array($claim->getStatus(), [
+                    Claim::STATUS_APPROVED,
+                    Claim::STATUS_SETTLED,
+                    Claim::STATUS_DECLINED,
+                    Claim::STATUS_PENDING_CLOSED,
+                    Claim::STATUS_WITHDRAWN
+                ])) {
                     $noOpenClaim = false;
                     break;
                 }

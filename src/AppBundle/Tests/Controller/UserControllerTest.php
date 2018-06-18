@@ -144,8 +144,8 @@ class UserControllerTest extends BaseControllerTest
         $claim->setType(Claim::TYPE_LOSS);
         $claim->setStatus(Claim::STATUS_SETTLED);
         $claim->setNumber(rand(1, 999999));
-        $claimService = self::$container->get('app.claims');
-        $claimService->addClaim($policy, $claim);
+        $claimsService = self::$container->get('app.claims');
+        $claimsService->addClaim($policy, $claim);
 
         $this->login($email, $password, 'user/');
 

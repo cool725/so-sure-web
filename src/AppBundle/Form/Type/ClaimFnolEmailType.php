@@ -25,5 +25,4 @@ class ClaimFnolEmailType extends AbstractType
             'data_class' => 'AppBundle\Document\Form\ClaimFnolEmail',
         ));
     }
-
 }

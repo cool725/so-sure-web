@@ -14,7 +14,7 @@ use Doctrine\ODM\MongoDB\DocumentRepository;
 use AppBundle\Document\Policy;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Claim;
-use AppBundle\Service\ClaimService;
+use AppBundle\Service\ClaimsService;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormEvent;
 use Doctrine\Bundle\MongoDBBundle\Form\Type\DocumentType;
@@ -23,16 +23,16 @@ class ClaimFnolDamageType extends AbstractType
 {
 
     /**
-     * @var ClaimService
+     * @var ClaimsService
      */
-    private $claimService;
+    private $claimsService;
 
     /**
-     * @param ClaimService $claimService
+     * @param ClaimsService $claimsService
      */
-    public function __construct($claimService)
+    public function __construct(ClaimsService $claimsService)
     {
-        $this->claimService = $claimService;
+        $this->claimsService = $claimsService;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options)
@@ -95,7 +95,7 @@ class ClaimFnolDamageType extends AbstractType
             $timestamp = $now->format('U');
 
             if ($filename = $data->getProofOfUsage()) {
-                $s3key = $this->claimService->saveFile(
+                $s3key = $this->claimsService->saveFile(
                     $filename,
                     sprintf('proof-of-usage-%s', $timestamp),
                     $data->getClaim()->getPolicy()->getUser()->getId(),
@@ -104,7 +104,7 @@ class ClaimFnolDamageType extends AbstractType
                 $data->setProofOfUsage($s3key);
             }
             if ($filename = $data->getPictureOfPhone()) {
-                $s3key = $this->claimService->saveFile(
+                $s3key = $this->claimsService->saveFile(
                     $filename,
                     sprintf('picture-of-phone-%s', $timestamp),
                     $data->getClaim()->getPolicy()->getUser()->getId(),

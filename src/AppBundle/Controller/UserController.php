@@ -1447,7 +1447,6 @@ class UserController extends BaseController
             if ($request->request->has('claim_form')) {
                 $claimForm->handleRequest($request);
                 if ($claimForm->isValid()) {
-
                     $dm = $this->getManager();
                     $policyRepo = $dm->getRepository(Policy::class);
                     $policy = $policyRepo->find($claimForm->getData()->getPolicyNumber());
@@ -1508,7 +1507,12 @@ class UserController extends BaseController
 
         $data = [
             'username' => $user->getName(),
-            'phone' => $policy ? sprintf("%s %s (IMEI %s)", $policy->getPhone()->getMake(), $policy->getPhone()->getModel(), $policy->getImei()) : '',
+            'phone' => $policy ? sprintf(
+                "%s %s (IMEI %s)",
+                $policy->getPhone()->getMake(),
+                $policy->getPhone()->getModel(),
+                $policy->getImei()
+            ) : '',
             'claim_type' => $claimType,
             'policy_date' => $policy ? $policy->getStart() : '',
             'claim_form' => $claimForm->createView(),
@@ -1568,7 +1572,12 @@ class UserController extends BaseController
 
             $data = [
                 'claim' => $claim,
-                'phone' => sprintf("%s %s (%sGB)", $claim->getPolicy()->getPhone()->getMake(), $claim->getPolicy()->getPhone()->getModel(), $claim->getPolicy()->getPhone()->getMemory()),
+                'phone' => sprintf(
+                    "%s %s (%sGB)",
+                    $claim->getPolicy()->getPhone()->getMake(),
+                    $claim->getPolicy()->getPhone()->getModel(),
+                    $claim->getPolicy()->getPhone()->getMemory()
+                ),
                 'time' => $time,
             ];
             return $this->render('AppBundle:User:claimSubmitted.html.twig', $data);
@@ -1598,8 +1607,7 @@ class UserController extends BaseController
                 'claim_form' => $claimDamageForm->createView(),
             ];
             return $this->render('AppBundle:User:claimDamage.html.twig', $data);
-        }
-        elseif ($claim->getType() == Claim::TYPE_THEFT || $claim->getType() == Claim::TYPE_LOSS) {
+        } elseif ($claim->getType() == Claim::TYPE_THEFT || $claim->getType() == Claim::TYPE_LOSS) {
             $claimFnolTheftLoss = new ClaimFnolTheftLoss();
             $claimFnolTheftLoss->setClaim($claim);
 
@@ -1625,9 +1633,8 @@ class UserController extends BaseController
                 'claim_form' => $claimTheftLossForm->createView(),
             ];
             return $this->render('AppBundle:User:claimTheftLoss.html.twig', $data);
-        }
-        else {
-
+        } else {
+            return $this->redirectToRoute('claim_policy');
         }
     }
 
