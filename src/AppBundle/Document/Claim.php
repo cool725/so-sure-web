@@ -1465,7 +1465,7 @@ class Claim
         $this->contactedPlace = $contactedPlace;
     }
 
-    public function getBlockedDateh()
+    public function getBlockedDate()
     {
         return $this->blockedDate;
     }
@@ -1582,12 +1582,33 @@ class Claim
             'policyId' => $this->getPolicy()->getId(),
             'policyNumber' => $this->getPolicy()->getPolicyNumber(),
             'handler' => $this->getHandler() ? $this->getHandler()->getName() : 'unknown',
+            'phoneToReach' => $this->getPhoneToReach(),
+            'timeToReach' => $this->getTimeToReach(),
+            'typeDetails' => $this->getTypeDetails(),
+            'typeDetailsOther' => $this->getTypeDetailsOther(),
+            'monthOfPurchase' => $this->getMonthOfPurchase(),
+            'yearOfPurchase' => $this->getYearOfPurchase(),
+            'phoneStatus' => $this->getPhoneStatus(),
+            'isUnderWarranty' => $this->getIsUnderWarranty(),
+            'phoneStatus' => $this->getPhoneStatus(),
+            'hasContacted' => $this->getHasContacted(),
+            'contactedPlace' => $this->getContactedPlace() ? $this->getContactedPlace()->format(\DateTime::ATOM) : null,
+            'network' => $this->getNetwork(),
+            'blockedDate' => $this->getBlockedDate() ? $this->getBlockedDate()->format(\DateTime::ATOM) : null,
+            'reportedDate' => $this->getReportedDate() ? $this->getReportedDate()->format(\DateTime::ATOM) : null,
+            'reportType' => $this->getReportType(),
+            'policeLossReport' => $this->getPoliceLossReport(),
+            'proofOfUsages' => $phonePolicy->getProofOfUsageFiles(),
+            'proofOfBarrings' => $phonePolicy->getProofOfBarringFiles(),
+            'proofOfPurchases' => $phonePolicy->getProofOfPurchaseFiles(),
+            'damagePictures' => $phonePolicy->getDamagePictureFiles(),
             'replacementPhone' => $this->getReplacementPhone(),
             'replacementPhoneDetails' => $this->getReplacementPhoneDetails(),
             'replacementPhoneId' => $this->getReplacementPhone() ? $this->getReplacementPhone()->getId() : null,
             'replacementImei' => $this->getReplacementImei(),
             'validReplacementImei' => $this->isImei($this->getReplacementImei()),
             'recordedDate' => $this->getRecordedDate() ? $this->getRecordedDate()->format(\DateTime::ATOM) : null,
+            'submittedDate' => $this->getSubmissionDate() ? $this->getSubmissionDate()->format(\DateTime::ATOM) : null,
             'approvedDate' => $this->getApprovedDate() ? $this->getApprovedDate()->format(\DateTime::ATOM) : null,
             'lossDate' => $this->getLossDate() ? $this->getLossDate()->format(\DateTime::ATOM) : null,
             'notificationDate' => $this->getNotificationDate() ?

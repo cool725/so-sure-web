@@ -9,6 +9,8 @@ $('#claimsModal').on('show.bs.modal', function (event) {
     modal.find('#claims-detail-policy').text(claim.policyNumber);
     modal.find('#claims-detail-type').val(claim.type);
     modal.find('#claims-detail-status').text(claim.status);
+    modal.find('#claims-detail-number-to-reach').text(claim.phoneToReach);
+    modal.find('#claims-detail-time-to-reach').text(claim.timeToReach);
     modal.find('#claims-detail-initial-suspicion').text(claim.initialSuspicion);
     modal.find('#claims-detail-final-suspicion').text(claim.finalSuspicion);
     modal.find('#claims-detail-davies-status').text(claim.daviesStatus);
@@ -24,6 +26,7 @@ $('#claimsModal').on('show.bs.modal', function (event) {
     modal.find('#claims-detail-loss').text((claim.lossDate) ? moment(claim.lossDate).format('DD-MM-YYYY') : '');
     modal.find('#claims-detail-notification').text((claim.notificationDate)? moment(claim.notificationDate).format('DD-MM-YYYY') : '');
     modal.find('#claims-detail-recorded').text((claim.recordedDate) ? moment(claim.recordedDate).format('DD-MM-YYYY') : '');
+    modal.find('#claims-detail-submitted').text((claim.submittedDate) ? moment(claim.submittedDate).format('DD-MM-YYYY') : '');
     modal.find('#claims-detail-approved').val((claim.approvedDate) ? moment(claim.approvedDate).format('DD-MM-YYYY') : '');
     modal.find('#claims-detail-approved-show').text((claim.approvedDate) ? moment(claim.approvedDate).format('DD-MM-YYYY') : '');
     modal.find('#claims-detail-replacement').text(

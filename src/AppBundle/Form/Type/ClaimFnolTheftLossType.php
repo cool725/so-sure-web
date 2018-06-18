@@ -36,7 +36,7 @@ class ClaimFnolTheftLossType extends AbstractType
     private $claimsService;
 
     /**
-     * @param boolean      $required
+     * @param boolean       $required
      * @param ClaimsService $claimsService
      */
     public function __construct($required, ClaimsService $claimsService)
