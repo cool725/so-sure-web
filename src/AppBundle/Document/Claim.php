@@ -1488,12 +1488,6 @@ class Claim
         $this->policeLossReport = $policeLossReport;
     }
 
-
-
-
-
-
-
     public static function sumClaims($claims)
     {
         $data = [

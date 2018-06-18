@@ -77,7 +77,7 @@ class ClaimFnolType extends AbstractType
             $data = $event->getData();
 
             $policies = array();
-            $userPolicies = $data->getUser()->getValidPoliciesWithoutClaim(true);
+            $userPolicies = $data->getUser()->getValidPoliciesWithoutOpenedClaim(true);
             foreach ($userPolicies as $policy) {
                 $policies[$policy->getPolicyNumber()] = $policy->getId();
             }

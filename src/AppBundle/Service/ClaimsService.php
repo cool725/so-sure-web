@@ -359,6 +359,16 @@ class ClaimsService
         return $this->redis->get($tokenId);
     }
 
+    public function withdrawClaim(Claim $claim) {
+        try {
+            $claim->setStatus(Claim::STATUS_WITHDRAWN);
+            $this->dm->flush();
+            return true;
+        } catch (\InvalidArgumentException $e) {
+            return false;
+        }
+    }
+
     public function saveFile($filename, $s3filename, $userId, $extension)
     {
         /** @var Filesystem $fs */

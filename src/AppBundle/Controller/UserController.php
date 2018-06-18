@@ -1424,7 +1424,7 @@ class UserController extends BaseController
             throw $this->createNotFoundException('No active policy found');
         }
 
-        if (count($user->getValidPoliciesWithoutClaim(true)) == 0) {
+        if (count($user->getValidPoliciesWithoutOpenedClaim(true)) == 0) {
             throw $this->createNotFoundException('No active claimable policy found');
         }
 
@@ -1533,7 +1533,7 @@ class UserController extends BaseController
 
         $this->denyAccessUnlessGranted(PolicyVoter::EDIT, $policy);
 
-        $claim = $policy->getLatestClaim();
+        $claim = $policy->getLatestOpenedClaim();
 
         if ($claim === null) {
             return $this->redirectToRoute('claim_policy');
@@ -1541,8 +1541,21 @@ class UserController extends BaseController
 
         if ($claim->isSubmitted()) {
             if ($request->get('_route') == 'withdraw_claimed_policy') {
+                $claimsService = $this->get('app.claims');
+                if ($claimsService->withdrawClaim($claim)) {
+                    $this->addFlash(
+                        'success',
+                        "Your claim has been withdrawn."
+                    );
+                    return $this->redirectToRoute('user_home');
+                } else {
+                    $this->addFlash(
+                        'error',
+                        "Sorry, your claim cannot be withdrawn at the moment."
+                    );
+                }
             }
-            
+
             $now = new \DateTime();
             $time = 'in the next 3 hours';
             if ($now->format('w') > 0 && $now->format('w') < 6) {

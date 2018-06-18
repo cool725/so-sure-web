@@ -981,11 +981,18 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         return $policies;
     }
 
-    public function getValidPoliciesWithoutClaim($includeUnpaid = false)
+    public function getValidPoliciesWithoutOpenedClaim($includeUnpaid = false)
     {
         $policies = [];
         foreach ($this->getPolicies() as $policy) {
-            if (count($policy->getClaims()) == 0) {
+            $noOpenClaim = true;
+            foreach ($policy->getClaims() as $claim) {
+                if (!in_array($claim->getStatus(), [Claim::STATUS_APPROVED, Claim::STATUS_SETTLED, Claim::STATUS_DECLINED, Claim::STATUS_PENDING_CLOSED, Claim::STATUS_WITHDRAWN])) {
+                    $noOpenClaim = false;
+                    break;
+                }
+            }
+            if ($noOpenClaim) {
                 if (in_array($policy->getStatus(), [Policy::STATUS_ACTIVE])) {
                     $policies[] = $policy;
                 } elseif ($includeUnpaid && $policy->getStatus() == Policy::STATUS_UNPAID) {

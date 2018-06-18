@@ -156,7 +156,7 @@
 
                         <div id="tab-claimfnol-confirm" class="tab-pane fade in {% if active_tab == 'claimfnol-confirm' %}active{% endif %}">
                             {{ form_start(claim_confirm_form) }}
-                            <p>I, {{ username }}, certify that my Phone {{ phone }} was {{ claim_type }} after I purchased my policy on {{ policy_date|date('d M Y H:i', 'Europe/London') }}.</p>
+                            <p>I, {{ username }}, certify that my {{ phone }} was {{ claim_type }} after I purchased my policy on {{ policy_date|date('d M Y H:i', 'Europe/London') }}.</p>
 
                             <p>I acknowledge that not telling the truth would constitute insurance fraud, which is a criminal offence. I agree to this and I understand that I could be prosecuted if I were not telling the truth.</p>
 

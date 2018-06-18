@@ -1253,6 +1253,32 @@ abstract class Policy
         return $claims[0];
     }
 
+    public function getLatestOpenedClaim($requireReplacementImei = false)
+    {
+        $claims = $this->getClaims();
+        if (!is_array($claims)) {
+            $claims = $claims->getValues();
+        }
+        if ($requireReplacementImei) {
+            $claims = array_filter($claims, function ($claim) {
+                return $claim->getReplacementImei() !== null;
+            });
+        }
+        if (count($claims) == 0) {
+            return null;
+        }
+
+        // sort most recent to older
+        usort($claims, function ($a, $b) {
+            return $a->getRecordedDate() < $b->getRecordedDate();
+        });
+
+        if (in_array($claims[0]->getStatus(), [Claim::STATUS_APPROVED, Claim::STATUS_SETTLED, Claim::STATUS_DECLINED, Claim::STATUS_PENDING_CLOSED, Claim::STATUS_WITHDRAWN])) {
+            return null;
+        }
+        return $claims[0];
+    }
+
     public function addLinkedClaim(Claim $claim)
     {
         $claim->setLinkedPolicy($this);
