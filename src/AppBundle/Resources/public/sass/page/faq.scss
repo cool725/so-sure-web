@@ -101,19 +101,23 @@
 
         .nav-pills {
 
-            li {
-                a {
+            > li {
+                > a {
+                    border-left: 3px solid transparent;
+                    @include border-radius(0);
+
                     &:hover {
-                        background-color: $primary-blue;
-                        color: $white;
+                        background-color: $off-white;
+                        border-left: 3px solid $light-blue;
                     }
                 }
             }
 
             li.active {
                 a {
-                    background-color: $primary-blue;
-                    color: $white;
+                    background-color: $off-white;
+                    border-left: 3px solid $primary-blue;
+                    color: $black;
                 }
             }
         }
