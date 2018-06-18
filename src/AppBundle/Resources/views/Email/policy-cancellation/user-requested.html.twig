@@ -2,17 +2,18 @@
 {% import "AppBundle:Email:macros.html.twig" as macros %}
 {% block title %}Goodbye {{ policy.user.name }}!{% endblock %}
 {% block body %}
-	{{ macros.start_table() }}
-		<h1>
-		   <!--?xml version="1.0" encoding="UTF-8" standalone="no"?-->
-		</h1>
-		<div style="font-size: 14px; text-align: left;">
-		   <!--?xml version="1.0" encoding="UTF-8" standalone="no"?-->
-		   <div style="font-size: 14px; text-align: center;"><span style="font-family:arial,helvetica neue,helvetica,sans-serif">
-			   Sorry that you're leaving us.  This email serves as official notice that you wish to cancel your policy {{ policy.policyNumber }}, a member of the Policy Team will contact you within 1-2 working days so we can process the cancellation.<br><br>
-			   If you have any questions, please don't hesitate to
-				<a href="mailto:support@wearesosure.com?subject=I%20have%20a%20question" target="_blank"><span style="color:#3399ff">contact us</span></a>.
-		   </div>
-		</div>
-	{{ macros.end_table() }}
+    {{ macros.start_table() }}
+        <h1>
+           <!--?xml version="1.0" encoding="UTF-8" standalone="no"?-->
+        </h1>
+        <div style="font-size: 14px; text-align: left;">
+           <!--?xml version="1.0" encoding="UTF-8" standalone="no"?-->
+           <div style="font-size: 14px; text-align: center;"><span style="font-family:arial,helvetica neue,helvetica,sans-serif">
+               Sorry that you're leaving us.  This email serves as official notice that your policy {{ policy.policyNumber }} is now cancelled and no longer in effect.<br><br>
+                 No further payments will be taken from your card.<br><br>
+               If you have any questions, please don't hesitate to
+                <a href="mailto:support@wearesosure.com?subject=I%20have%20a%20question" target="_blank"><span style="color:#3399ff">contact us</span></a>.
+           </div>
+        </div>
+    {{ macros.end_table() }}
 {% endblock %}
