@@ -89,18 +89,18 @@
     }
 
     &__sidebar {
-        display: none;
+        // display: none;
 
         ul {
+            padding-bottom: 40px;
+
             li {
-                font-size: 18px;
+                // font-size: 16px;
             }
         }
-
-        @include breakpoint(laptop) {
-            display: block;
-            position: fixed;
-            padding-bottom: 30px;
-        }
     }
+}
+
+.affix-bottom {
+    position: absolute;
 }
