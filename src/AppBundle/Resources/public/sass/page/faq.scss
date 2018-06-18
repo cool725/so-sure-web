@@ -98,6 +98,25 @@
                 // font-size: 16px;
             }
         }
+
+        .nav-pills {
+
+            li {
+                a {
+                    &:hover {
+                        background-color: $primary-blue;
+                        color: $white;
+                    }
+                }
+            }
+
+            li.active {
+                a {
+                    background-color: $primary-blue;
+                    color: $white;
+                }
+            }
+        }
     }
 }
 
