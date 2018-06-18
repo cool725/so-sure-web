@@ -415,6 +415,7 @@ class AdminController extends BaseController
 
         $dm = $this->getManager();
         $s3FileRepo = $dm->getRepository(S3File::class);
+        /** @var ReportingService $reportingService */
         $reportingService = $this->get('app.reporting');
 
         return [
