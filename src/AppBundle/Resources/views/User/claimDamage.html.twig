@@ -34,14 +34,14 @@
                         <div class="col-sm-12 text-center">
                             <p>I, {{ username }} am making a claim for {{ form_widget(claim_form.typeDetails, { 'attr': {'class': 'form-control', 'placeholder': 'Please select'}}) }} <span class="help-block with-errors">{{ form_errors(claim_form.typeDetails) }}</span>.{{ form_widget(claim_form.typeDetailsOther, { 'attr': {'class': 'form-control', 'placeholder': ''}}) }}<span class="help-block with-errors">{{ form_errors(claim_form.typeDetailsOther) }}</span></p>
 
-                            <p>I bought this phone on {{ form_widget(claim_form.monthOfPurchase, { 'attr': {'class': 'form-control', 'placeholder': 'Month'}}) }}<span class="help-block with-errors">{{ form_errors(claim_form.monthOfPurchase) }}</span> {{ form_widget(claim_form.yearOfPurchase, { 'attr': {'class': 'form-control', 'placeholder': 'Year'}}) }}<span class="help-block with-errors">{{ form_errors(claim_form.yearOfPurchase) }}</span> and it was {{ form_widget(claim_form.phoneStatus, { 'attr': {'class': 'form-control', 'placeholder': 'Please select'}}) }}<span class="help-block with-errors">{{ form_errors(claim_form.phoneStatus) }}</span> and my phone {{ form_widget(claim_form.policyNumber, { 'attr': {'class': 'form-control', 'placeholder': 'Please select'}}) }}<span class="help-block with-errors">{{ form_errors(claim_form.isUnderWarranty) }}</span> under warranty.</p>
+                            <p>I bought this phone on {{ form_widget(claim_form.monthOfPurchase, { 'attr': {'class': 'form-control', 'placeholder': 'Month'}}) }}<span class="help-block with-errors">{{ form_errors(claim_form.monthOfPurchase) }}</span> {{ form_widget(claim_form.yearOfPurchase, { 'attr': {'class': 'form-control', 'placeholder': 'Year'}}) }}<span class="help-block with-errors">{{ form_errors(claim_form.yearOfPurchase) }}</span> and it was {{ form_widget(claim_form.phoneStatus, { 'attr': {'class': 'form-control', 'placeholder': 'Please select'}}) }}<span class="help-block with-errors">{{ form_errors(claim_form.phoneStatus) }}</span> and my phone {{ form_widget(claim_form.isUnderWarranty, { 'attr': {'class': 'form-control', 'placeholder': 'Please select'}}) }}<span class="help-block with-errors">{{ form_errors(claim_form.isUnderWarranty) }}</span> under warranty.</p>
 
                             <p>vPlease upload the following required documents to process your claim. Once they have been uploaded, we will call within a few hours (during business hours 9-5.30pm):</p>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-sm-12 text-center">
-                                <div class="form-group {% if form_errors(claim_form.name) %}has-error{% endif %}">
+                                <div class="form-group {% if form_errors(claim_form.proofOfUsage) %}has-error{% endif %}">
                                     <label class="h4">Proof of usage <span class="req">*</span></label>
                                     {{ form_widget(claim_form.proofOfUsage, { 'attr': {'class': 'form-control'}}) }}
                                     <div class="help-block with-errors">{{ form_errors(claim_form.proofOfUsage) }}</div>
@@ -50,7 +50,7 @@
                     </div>
                     <div class="row">
                         <div class="col-sm-12 text-center">
-                                <div class="form-group {% if form_errors(claim_form.name) %}has-error{% endif %}">
+                                <div class="form-group {% if form_errors(claim_form.pictureOfPhone) %}has-error{% endif %}">
                                     <label class="h4">Picture of damaged phone <span class="req">*</span></label>
                                     {{ form_widget(claim_form.pictureOfPhone, { 'attr': {'class': 'form-control'}}) }}
                                     <div class="help-block with-errors">{{ form_errors(claim_form.pictureOfPhone) }}</div>

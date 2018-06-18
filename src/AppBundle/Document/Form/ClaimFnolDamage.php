@@ -51,7 +51,7 @@ class ClaimFnolDamage
 
     public function getTypeDetails()
     {
-        return $this->email;
+        return $this->typeDetails;
     }
 
     public function setTypeDetails($typeDetails)
@@ -61,7 +61,7 @@ class ClaimFnolDamage
 
     public function getTypeDetailsOther()
     {
-        return $this->name;
+        return $this->typeDetailsOther;
     }
 
     public function setTypeDetailsOther($typeDetailsOther)

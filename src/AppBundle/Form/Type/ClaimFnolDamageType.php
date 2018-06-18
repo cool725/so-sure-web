@@ -48,7 +48,7 @@ class ClaimFnolDamageType extends AbstractType
                     'Other' => Claim::DAMAGE_OTHER,
                 ],
             ])
-            ->add('typeDetailsOther', TextType::class)
+            ->add('typeDetailsOther', TextType::class, ['required' => false])
             ->add('monthOfPurchase', TextType::class, ['required' => true])
             ->add('yearOfPurchase', TextType::class, ['required' => true])
             ->add('phoneStatus', ChoiceType::class, [
@@ -95,7 +95,7 @@ class ClaimFnolDamageType extends AbstractType
             $timestamp = $now->format('U');
 
             if ($filename = $data->getProofOfUsage()) {
-                $$s3key = $this->claimService->saveFile(
+                $s3key = $this->claimService->saveFile(
                     $filename,
                     sprintf('proof-of-usage-%s', $timestamp),
                     $data->getClaim()->getPolicy()->getUser()->getId(),
@@ -104,7 +104,7 @@ class ClaimFnolDamageType extends AbstractType
                 $data->setProofOfUsage($s3key);
             }
             if ($filename = $data->getPictureOfPhone()) {
-                $$s3key = $this->claimService->saveFile(
+                $s3key = $this->claimService->saveFile(
                     $filename,
                     sprintf('picture-of-phone-%s', $timestamp),
                     $data->getClaim()->getPolicy()->getUser()->getId(),

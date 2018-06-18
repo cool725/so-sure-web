@@ -7,6 +7,8 @@ use AppBundle\Document\Claim;
 use AppBundle\Document\DateTrait;
 use Symfony\Component\Validator\Constraints as Assert;
 use AppBundle\Validator\Constraints as AppAssert;
+use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
+use Symfony\Component\Serializer\Serializer;
 
 class ClaimFnol
 {
@@ -187,9 +189,14 @@ class ClaimFnol
         }
     }
     
-    public function getWhen()
+    public function getWhen($normalised = false)
     {
-        return $this->when;
+        if ($normalised) {
+            $serializer = new Serializer(array(new DateTimeNormalizer()));
+            return $serializer->normalize($this->when);
+        } else {
+            return $this->when;
+        }
     }
 
     public function setWhen($when)

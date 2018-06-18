@@ -680,7 +680,7 @@ class Claim
     }
 
     public function isSubmitted() {
-        return $this->submissionDate() != null;
+        return $this->submissionDate != null;
     }
 
     public function isWithin30Days($date)

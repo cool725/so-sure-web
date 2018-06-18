@@ -1424,6 +1424,10 @@ class UserController extends BaseController
             throw $this->createNotFoundException('No active policy found');
         }
 
+        if (count($user->getValidPoliciesWithoutClaim(true)) == 0) {
+            throw $this->createNotFoundException('No active claimable policy found');
+        }
+
         $policy = null;
         $claimFnol = new ClaimFnol();
         $claimFnolConfirm = new ClaimFnol();
@@ -1460,8 +1464,10 @@ class UserController extends BaseController
                     $current = 'claim-confirm';
                 }
             } elseif ($request->request->has('claim_confirm_form')) {
+                var_dump('Confirm CLaim');
                 $claimConfirmForm->handleRequest($request);
                 if ($claimConfirmForm->isValid()) {
+                    var_dump('Valid Confirm CLaim');
 
                     $dm = $this->getManager();
                     $policyRepo = $dm->getRepository(Policy::class);
@@ -1515,6 +1521,7 @@ class UserController extends BaseController
 
     /**
      * @Route("/claim/{policyId}", name="claimed_policy")
+     * @Route("/claim/withdraw/{policyId}", name="withdraw_claimed_policy")
      * @Template
      */
     public function claimPolicyAction(Request $request, $policyId)
@@ -1533,8 +1540,23 @@ class UserController extends BaseController
         }
 
         if ($claim->isSubmitted()) {
+            if ($request->get('_route') == 'withdraw_claimed_policy') {
+            }
+            
+            $now = new \DateTime();
+            $time = 'in the next 3 hours';
+            if ($now->format('w') > 0 && $now->format('w') < 6) {
+                if ($now->format('G') < 9 || $now->format('G') > 17) {
+                    $time = 'Tomorrow';
+                }
+            } else {
+                $time = 'Monday morning';
+            }
+
             $data = [
                 'claim' => $claim,
+                'phone' => sprintf("%s %s (%sGB)", $claim->getPolicy()->getPhone()->getMake(), $claim->getPolicy()->getPhone()->getModel(), $claim->getPolicy()->getPhone()->getMemory()),
+                'time' => $time,
             ];
             return $this->render('AppBundle:User:claimSubmitted.html.twig', $data);
         }

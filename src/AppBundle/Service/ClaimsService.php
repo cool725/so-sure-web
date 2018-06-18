@@ -106,7 +106,7 @@ class ClaimsService
             $pictureOfPhone = new DamagePictureFile();
             $pictureOfPhone->setBucket('policy.so-sure.com');
             $pictureOfPhone->setKey($claimDamage->getPictureOfPhone());
-            $claim->getPolicy()->addPolicyFile($PictureOfPhone);
+            $claim->getPolicy()->addPolicyFile($pictureOfPhone);
         }
     }
 
