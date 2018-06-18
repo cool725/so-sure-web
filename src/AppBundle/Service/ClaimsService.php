@@ -84,6 +84,7 @@ class ClaimsService
         $claim->setNetwork($claimFnol->getNetwork());
         $claim->setPhoneToReach($claimFnol->getPhone());
         $claim->setTimeToReach($claimFnol->getTimeToReach());
+        $claim->setSignature($claimFnol->getSignature());
 
         return $claim;
     }
@@ -108,6 +109,11 @@ class ClaimsService
             $pictureOfPhone->setKey($claimDamage->getPictureOfPhone());
             $claim->getPolicy()->addPolicyFile($pictureOfPhone);
         }
+        $claim->setSubmissionDate(new \DateTime());
+        $claim->setStatus(Claim::STATUS_SUBMITTED);
+        $this->dm->flush();
+
+        $this->notifyClaimSubmission($claim);
     }
 
     public function updateTheftLossDocuments(Claim $claim, ClaimFnolTheftLoss $claimTheftLoss) {
@@ -137,6 +143,11 @@ class ClaimsService
             $proofOfPurchase->setKey($claimTheftLoss->getProofOfPurchase());
             $claim->getPolicy()->addPolicyFile($proofOfPurchase);
         }
+        $claim->setSubmissionDate(new \DateTime());
+        $claim->setStatus(Claim::STATUS_SUBMITTED);
+        $this->dm->flush();
+
+        $this->notifyClaimSubmission($claim);
     }
 
     public function addClaim(Policy $policy, Claim $claim)
@@ -313,6 +324,29 @@ class ClaimsService
         } catch (\Exception $e) {
             $this->logger->error("Error in notifyPolicyShouldBeCancelled.", ['exception' => $e]);
         }
+    }
+
+    public function notifyClaimSubmission(Claim $claim) {
+        $subject = sprintf(
+            'New Claim from %s/%s',
+            $claim->getPolicy()->getUser()->getName(),
+            $claim->getPolicy()->getPolicyNumber()
+        );
+        $this->mailer->sendTemplate(
+            $subject,
+            'new-claim@wearesosure.com',
+            'AppBundle:Email:claim/fnolToClaims.html.twig',
+            ['data' => $claim]
+        );
+
+        $this->mailer->sendTemplate(
+            'Your claim with so-sure',
+            $claim->getPolicy()->getUser()->getEmail(),
+            'AppBundle:Email:claim/fnolResponse.html.twig',
+            ['data' => $claim],
+            'AppBundle:Email:claim/fnolResponse.txt.twig',
+            ['data' => $claim]
+        );        
     }
 
     public function setMailerMailer($mailer)

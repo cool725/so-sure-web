@@ -23,6 +23,7 @@ class Claim
     const TYPE_WARRANTY = 'warranty';
     const TYPE_EXTENDED_WARRANTY = 'extended-warranty';
 
+    const STATUS_SUBMITTED = 'submitted';
     const STATUS_INREVIEW = 'in-review';
     const STATUS_APPROVED = 'approved';
     const STATUS_SETTLED = 'settled';
@@ -376,7 +377,7 @@ class Claim
     protected $type;
 
     /**
-     * @Assert\Choice({"in-review", "approved", "settled", "declined", "withdrawn", "pending-closed"}, strict=true)
+     * @Assert\Choice({"submitted", "in-review", "approved", "settled", "declined", "withdrawn", "pending-closed"}, strict=true)
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
@@ -559,6 +560,14 @@ class Claim
     protected $timeToReach;
 
     /**
+     * @AppAssert\AlphanumericSpaceDot()
+     * @Assert\Length(min="1", max="100")
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
+    protected $signature;
+
+    /**
      * @Assert\Choice({"broken-screen", "water-damage", "out-of-warranty-breakdown", "other"}, strict=true)
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
@@ -679,10 +688,6 @@ class Claim
         $this->submissionDate = $submissionDate;
     }
 
-    public function isSubmitted() {
-        return $this->submissionDate != null;
-    }
-
     public function isWithin30Days($date)
     {
         $claimsDate = $this->getClosedDate();
@@ -762,6 +767,7 @@ class Claim
         }
         
         if (!in_array($status, [
+            self::STATUS_SUBMITTED,
             self::STATUS_APPROVED,
             self::STATUS_DECLINED,
             self::STATUS_INREVIEW,
@@ -800,7 +806,7 @@ class Claim
 
     public function isOpen()
     {
-        return in_array($this->getStatus(), [Claim::STATUS_APPROVED, Claim::STATUS_INREVIEW]);
+        return in_array($this->getStatus(), [Claim::STATUS_APPROVED, Claim::STATUS_SUBMITTED, Claim::STATUS_INREVIEW]);
     }
 
     public function getDaviesStatus()
@@ -1368,6 +1374,16 @@ class Claim
         $this->timeToReach = $timeToReach;
     }
 
+    public function getSignature()
+    {
+        return $this->signature;
+    }
+    
+    public function setSignature($signature)
+    {
+        $this->signature = $signature;
+    }
+
     public function getTypeDetails()
     {
         return $this->typeDetails;
@@ -1493,6 +1509,7 @@ class Claim
         $data = [
             'total' => 0,
             'approved-settled' => 0,
+            self::STATUS_SUBMITTED => 0,
             self::STATUS_INREVIEW => 0,
             self::STATUS_APPROVED => 0,
             self::STATUS_SETTLED => 0,

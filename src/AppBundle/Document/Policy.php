@@ -3924,9 +3924,9 @@ abstract class Policy
         }
 
         $text = '';
-        if ($data['in-review'] > 0) {
+        if ($data['in-review'] + $data['submitted'] > 0) {
             $text = sprintf(
-                '%s<span title="In Review" class="fa fa-question">%s</span> ',
+                '%s<span title="Submitted & In Review" class="fa fa-question">%s</span> ',
                 $text,
                 $data['in-review']
             );

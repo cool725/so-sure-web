@@ -1539,7 +1539,7 @@ class UserController extends BaseController
             return $this->redirectToRoute('claim_policy');
         }
 
-        if ($claim->isSubmitted()) {
+        if ($claim->getStatus() == Claim::STATUS_SUBMITTED) {
             if ($request->get('_route') == 'withdraw_claimed_policy') {
                 $claimsService = $this->get('app.claims');
                 if ($claimsService->withdrawClaim($claim)) {
@@ -1588,8 +1588,6 @@ class UserController extends BaseController
                     if ($claimDamageForm->isValid()) {
                         $claimsService = $this->get('app.claims');
                         $claimsService->updateDamageDocuments($claim, $claimDamageForm->getData());
-                        $claim->setSubmissionDate(new \DateTime());
-                        $dm->flush();
                         return $this->redirectToRoute('claimed_policy', ['policyId' => $policy->getId()]);
                     }
                 }
@@ -1615,8 +1613,6 @@ class UserController extends BaseController
                     if ($claimTheftLossForm->isValid()) {
                         $claimsService = $this->get('app.claims');
                         $claimsService->updateTheftLossDocuments($claim, $claimTheftLossForm->getData());
-                        $claim->setSubmissionDate(new \DateTime());
-                        $dm->flush();
                         return $this->redirectToRoute('claimed_policy', ['policyId' => $policy->getId()]);
                     }
                 }
