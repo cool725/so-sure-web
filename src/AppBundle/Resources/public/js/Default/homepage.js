@@ -54,9 +54,9 @@ $(function(){
                 var subClass = null;
 
                 if (height > position.top) {
-                    target.addClass('stuck');
+                    target.addClass('stuck animated fadeInDown');
                 } else {
-                    target.removeClass('stuck');
+                    target.removeClass('stuck animated fadeInDown');
                 }
             }
 
