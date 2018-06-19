@@ -64,7 +64,6 @@ class ClaimFnolConfirmType extends AbstractType
             $data = $event->getData();
 
             $when = $data->getWhen();
-            var_dump($when);
 
             $data->setWhen(new \DateTime($when));
         });

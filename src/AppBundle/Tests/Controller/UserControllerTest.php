@@ -10,6 +10,8 @@ use AppBundle\Document\Policy;
 use AppBundle\Document\Claim;
 use AppBundle\Document\CurrencyTrait;
 use Symfony\Component\DomCrawler\Field\ChoiceFormField;
+use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
+use Symfony\Component\Serializer\Serializer;
 
 /**
  * @group functional-net
@@ -1065,5 +1067,104 @@ class UserControllerTest extends BaseControllerTest
         $this->login($email, $password);
         $crawler = self::$client->request('GET', $welcomePage);
         self::verifyResponse(404);
+    }
+
+    public function testUserClaimDamageWithNoActivePolicy()
+    {
+        $email = self::generateEmail('testUserClaimDamageWithNoActivePolicy', $this);
+        $password = 'foo';
+        $phone = self::getRandomPhone(self::$dm);
+        $user = self::createUser(
+            self::$userManager,
+            $email,
+            $password,
+            $phone,
+            self::$dm
+        );
+        $now = new \DateTime();
+        $policy = self::initPolicy($user, self::$dm, $phone, null, true, true);
+        $policy->setStatus(Policy::STATUS_CANCELLED);
+        $policy->setStart($now);
+        self::$dm->flush();
+
+        $claimPage = self::$router->generate('claim_policy');
+        $this->login($email, $password);
+        $crawler = self::$client->request('GET', $claimPage);
+        self::verifyResponse(404);
+    }
+
+    public function testUserClaimDamage()
+    {
+        $email = self::generateEmail('testUserClaimDamage', $this);
+        $password = 'foo';
+        $phone = self::getRandomPhone(self::$dm);
+        $user = self::createUser(
+            self::$userManager,
+            $email,
+            $password,
+            $phone,
+            self::$dm
+        );
+        $now = new \DateTime();
+        $policy = self::initPolicy($user, self::$dm, $phone, null, true, true);
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        $policy->setStart($now);
+        self::$dm->flush();
+
+        $mobileNumber = self::generateRandomMobile();
+        $serializer = new Serializer(array(new DateTimeNormalizer()));
+
+        $claimPage = self::$router->generate('claim_policy');
+        $this->login($email, $password);
+        $crawler = self::$client->request('GET', $claimPage);
+        self::verifyResponse(200);
+        $form = $crawler->selectButton('claim_form[submit]')->form();
+        $form['claim_form[email]'] = $email;
+        $form['claim_form[name]'] = 'foo bar';
+        $form['claim_form[phone]'] = $mobileNumber;
+        $form['claim_form[when]'] = $serializer->normalize(
+            $now,
+            null,
+            array(DateTimeNormalizer::FORMAT_KEY => 'd/m/Y')
+        );
+        $form['claim_form[time]'] = '2 am';
+        $form['claim_form[where]'] = 'so-sure offices';
+        $form['claim_form[timeToReach]'] = '2 pm';
+        $form['claim_form[signature]'] = 'foo bar';
+        $form['claim_form[type]'] = Claim::TYPE_DAMAGE;
+        $form['claim_form[network]'] = Claim::NETWORK_O2;
+        // @codingStandardsIgnoreStart
+        $form['claim_form[message]'] = 'bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla';
+        $form['claim_form[policyNumber]'] = $policy->getId();
+        $crawler = self::$client->submit($form);
+
+        self::verifyResponse(200);
+        $this->assertContains(
+            'data-active="claimfnol-confirm"',
+            self::$client->getResponse()->getContent()
+        );
+
+        $form = $crawler->selectButton('claim_confirm_form[submit]')->form();
+        $form['claim_confirm_form[email]'] = $email;
+        $form['claim_confirm_form[name]'] = 'foo bar';
+        $form['claim_confirm_form[phone]'] = $mobileNumber;
+        $form['claim_confirm_form[when]'] = $serializer->normalize(
+            $now,
+            null,
+            array(DateTimeNormalizer::FORMAT_KEY => 'Y/m/d')
+        );
+        $form['claim_confirm_form[time]'] = '2 am';
+        $form['claim_confirm_form[where]'] = 'so-sure offices';
+        $form['claim_confirm_form[timeToReach]'] = '2 pm';
+        $form['claim_confirm_form[signature]'] = 'foo bar';
+        $form['claim_confirm_form[type]'] = Claim::TYPE_DAMAGE;
+        $form['claim_confirm_form[network]'] = Claim::NETWORK_O2;
+        // @codingStandardsIgnoreStart
+        $form['claim_confirm_form[message]'] = 'bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla';
+        $form['claim_confirm_form[policyNumber]'] = $policy->getId();
+        $crawler = self::$client->submit($form);
+
+        self::verifyResponse(302);
+        $this->assertTrue(self::$client->getResponse()->isRedirect(sprintf('/user/claim/%s', $policy->getId())));
     }
 }
