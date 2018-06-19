@@ -171,9 +171,10 @@ abstract class Payment
     protected $user;
 
     /**
-     * @MongoDB\ReferenceMany(targetDocument="AppBundle\Document\ScheduledPayment")
+     * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\ScheduledPayment", inversedBy="payment")
+     * @var ScheduledPayment
      */
-    protected $scheduledPayments;
+    protected $scheduledPayment;
 
     /**
      * @AppAssert\AlphanumericSpaceDot()
@@ -214,7 +215,6 @@ abstract class Payment
     {
         $this->created = new \DateTime();
         $this->date = new \DateTime();
-        $this->scheduledPayments = new \Doctrine\Common\Collections\ArrayCollection();
     }
 
     public function getId()
@@ -449,15 +449,21 @@ abstract class Payment
         $this->receipt = $receipt;
     }
 
-    public function getScheduledPayments()
+    /**
+     * @return ScheduledPayment
+     */
+    public function getScheduledPayment()
     {
-        return $this->scheduledPayments;
+        return $this->scheduledPayment;
     }
 
-    public function addScheduledPayment(ScheduledPayment $scheduledPayment)
+    /**
+     * @param ScheduledPayment $scheduledPayment
+     *
+     */
+    public function setScheduledPayment(ScheduledPayment $scheduledPayment)
     {
-        $scheduledPayment->setPayment($this);
-        $this->scheduledPayments[] = $scheduledPayment;
+        $this->scheduledPayment = $scheduledPayment;
     }
 
     public function setCommission()

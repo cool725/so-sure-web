@@ -4,6 +4,7 @@ namespace AppBundle\Document\Payment;
 
 use AppBundle\Document\BacsPaymentMethod;
 use AppBundle\Document\DateTrait;
+use AppBundle\Document\ScheduledPayment;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -208,6 +209,10 @@ class BacsPayment extends Payment
         /** @var BacsPaymentMethod $bacsPaymentMethod */
         $bacsPaymentMethod = $this->getPolicy()->getUser()->getPaymentMethod();
         $bacsPaymentMethod->getBankAccount()->setLastSuccessfulPaymentDate($date);
+
+        if ($this->getScheduledPayment()) {
+            $this->getScheduledPayment()->setStatus(ScheduledPayment::STATUS_SUCCESS);
+        }
     }
 
     public function reject(\DateTime $date = null)
@@ -221,6 +226,10 @@ class BacsPayment extends Payment
 
         $this->setStatus(self::STATUS_FAILURE);
         $this->setSuccess(false);
+
+        if ($this->getScheduledPayment()) {
+            $this->getScheduledPayment()->setStatus(ScheduledPayment::STATUS_FAILED);
+        }
     }
 
     public function isSuccess()
