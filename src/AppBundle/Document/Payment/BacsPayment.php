@@ -218,6 +218,10 @@ class BacsPayment extends Payment
 
     public function reject(\DateTime $date = null)
     {
+        if (!$date) {
+            $date = new \DateTime();
+        }
+
         if (!$this->canAction($date)) {
             throw new \Exception(sprintf(
                 'Attempting to action before reveral date (%s) is past',
