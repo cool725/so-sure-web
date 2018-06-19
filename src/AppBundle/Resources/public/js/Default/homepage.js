@@ -12,11 +12,6 @@ $(function(){
         });
     });
 
-    // Single MEM Option/Look Test
-    // Add test layer
-    var memOptTest = $('#select-phone-data').data('show-single-mem-opt');
-    var memory     = $('.select-phone-memory');
-
     // Offset of search from top of page
     var stickyOffset = $('#select-phone-data').offset().top;
 
