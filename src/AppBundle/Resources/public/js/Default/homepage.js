@@ -31,7 +31,7 @@ $(function(){
                         return (this.bottom = $('footer').outerHeight(true) + 1000)
                     }
                 }
-            }).on('affixed.bs.affix', function(e) {
+            }).on('affixed.bs.affix', function() {
                 // This event is fired after the element has been affixed.
 
                 // Add animation
@@ -45,33 +45,23 @@ $(function(){
             });
         // If anything else
         } else {
-            var target = $('#select-phone-data');
-            var subClass = null;
 
-            if (target.hasClass('dropdown-phone-form')) {
-                subClass = 'stuck--dropdown';
-            } else {
-                subClass = 'stuck--search';
+            var target = $('#select-phone-data');
+
+            function stuck() {
+                var height = $(window).scrollTop();
+                var position = target.position();
+                var subClass = null;
+
+                if (height > position.top) {
+                    target.addClass('stuck');
+                } else {
+                    target.removeClass('stuck');
+                }
             }
 
-            target.after('<div class="stuck '+ subClass +'" id="stuck"></div>');
-
-            var stuck = $('.stuck');
-            stuck.append(target.clone(true));
-
-            var el = $('#stuck');
-            if (el !== null) {
-                var position = target.position();
-                $(window).scroll(function(event) {
-                    var height = $(window).scrollTop();
-                    if (height > position.top) {
-                        target.css('visibility','hidden');
-                        stuck.css('display','block');
-                    } else {
-                        stuck.css('display','none');
-                        target.css('visibility','visible');
-                    }
-                });
+            if (target.length) {
+                $(window).scroll(stuck);
             }
         }
 

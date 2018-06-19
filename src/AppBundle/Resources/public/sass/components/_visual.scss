@@ -128,7 +128,6 @@
     position: fixed;
     top: 50px; left: 0;
     z-index: 999;
-    display: none;
 
     @include breakpoint(tablet) {
         top: 60px;
