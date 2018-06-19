@@ -458,6 +458,6 @@ class ClaimsService
         $fs->writeStream($key, $stream);
         fclose($stream);
 
-        return $key;
+        return sprintf("%s/%s", $this->environment, $key);
     }
 }

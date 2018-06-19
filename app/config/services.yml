@@ -330,6 +330,14 @@ services:
         tags:
             - { name: twig.extension }
 
+    app.twig.claims:
+        class: AppBundle\Service\ClaimsTwigExtension
+        arguments:
+            - "@aws.s3"
+        public: false
+        tags:
+            - { name: twig.extension }
+
     app.twig.misc:
         class: AppBundle\Service\MiscTwigExtension
         arguments:

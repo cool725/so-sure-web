@@ -1,6 +1,7 @@
 $('#claimsModal').on('show.bs.modal', function (event) {
   var button = $(event.relatedTarget) // Button that triggered the modal
   var claim = button.data('claim');
+  var documents = button.data('documents');
   var modal = $(this);
   if (claim) {
     modal.find('.modal-title').text('Claim: ' + claim.number);
@@ -16,6 +17,70 @@ $('#claimsModal').on('show.bs.modal', function (event) {
     modal.find('#claims-detail-davies-status').text(claim.daviesStatus);
     modal.find('#claims-detail-notes').text(claim.notes);
     modal.find('#claims-detail-description').text(claim.description);
+
+    modal.find('#claims-damage').hide();
+    modal.find('#claims-theftloss').hide();
+
+    if (claim.type == 'damage') {
+        modal.find('#claims-damage').show();
+        if (claim.typeDetails == 'other') {
+            modal.find('#claims-detail-type-details').text(claim.typeDetailsOther);
+        }
+        else {
+            modal.find('#claims-detail-type-details').text(claim.typeDetails);
+        }
+        modal.find('#claims-detail-bought').text(claim.monthOfPurchase+' / '+claim.yearOfPurchase);
+        modal.find('#claims-detail-phone-status').text(claim.phoneStatus);
+        modal.find('#claims-detail-warranty').text(claim.isUnderWarranty ? 'Yes' : 'No');
+
+        if (documents) {
+            var proofOfUsages = '';
+            $.each(documents.proofOfUsages, function(key, value) {
+                proofOfUsages += '<p><a href="'+value.url+'">'+value.filename+'</a></p>';
+            });
+            modal.find('#claims-detail-damage-proof-usages').html(proofOfUsages);
+
+            var damagePictures = '';
+            $.each(documents.damagePictures, function(key, value) {
+                damagePictures += '<p><a href="'+value.url+'">'+value.filename+'</a></p>';
+            });
+            modal.find('#claims-detail-pictures-phone').html(damagePictures);
+        }
+    }
+
+    if (claim.type == 'theft' || claim.type == 'loss') {
+        modal.find('#claims-theftloss').show();
+
+        modal.find('#claims-detail-contacted').text(claim.hasContacted ? claim.contactedPlace : 'N/A');
+        modal.find('#claims-detail-network').text(claim.network);
+        modal.find('#claims-detail-blocked').text((claim.blockedDate) ? moment(claim.blockedDate).format('DD-MM-YYYY') : '');
+        modal.find('#claims-detail-reported').text((claim.reportedDate) ? moment(claim.reportedDate).format('DD-MM-YYYY') : '');
+        modal.find('#claims-detail-reported-to').text(claim.reportType);
+
+        if (documents) {
+            var proofOfUsages = '';
+            $.each(documents.proofOfUsages, function(key, value) {
+                proofOfUsages += '<p><a href="'+value.url+'">'+value.filename+'</a></p>';
+            });
+            modal.find('#claims-detail-theftloss-proof-usages').html(proofOfUsages);
+
+            var proofOfBarrings = '';
+            $.each(documents.proofOfBarrings, function(key, value) {
+                proofOfBarrings += '<p><a href="'+value.url+'">'+value.filename+'</a></p>';
+            });
+            modal.find('#claims-detail-proof-barrings').html(proofOfBarrings);
+
+            var proofOfPurchases = '';
+            $.each(documents.proofOfPurchases, function(key, value) {
+                proofOfPurchases += '<p><a href="'+value.ulr+'">'+value.filename+'</a></p>';
+            });
+            modal.find('#claims-detail-proof-purchases').html(proofOfPurchases);
+        }
+
+        modal.find('#claims-detail-crime-reference').text(claim.crimeRef);
+        modal.find('#claims-detail-policy-report').text(claim.policeLossReport);
+    }
+
     modal.find('#claims-detail-replacement-imei').text(claim.replacementImei);
     if (!claim.validReplacementImei) {
         modal.find('#claims-detail-replacement-imei').html('<s>' + claim.replacementImei + '</s> <i class="fa fa-warning" title="Invalid IMEI Number (Luhn Failure)"></i>');
