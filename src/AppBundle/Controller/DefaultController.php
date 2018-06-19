@@ -515,37 +515,13 @@ class DefaultController extends BaseController
 
     /**
      * @Route("/claim", name="claim")
-     * @Route("/claim/login/{tokenId}", name="claim_login")
      * @Template
      */
-    public function claimAction(Request $request, $tokenId = null)
+    public function claimAction(Request $request)
     {
         $user = $this->getUser();
-
-        if ($request->get('_route') == 'claim_login') {
-            if (!$user && $tokenId) {
-                /** @var ClaimsService $claimsService */
-                $claimsService = $this->get('app.claims');
-                $userId = $claimsService->getUserIdFromLoginLinkToken($tokenId);
-                if (!$userId) {
-                    throw $this->createNotFoundException('Invalid link');
-                }
-
-                $dm = $this->getManager();
-                $userRepo = $dm->getRepository(User::class);
-                $user = $userRepo->find($userId);
-            }
-
-            if ($user) {
-                $this->get('fos_user.security.login_manager')->loginUser(
-                    $this->getParameter('fos_user.firewall_name'),
-                    $user
-                );
-
-                return $this->redirectToRoute('claim_policy');
-            }
-
-            throw $this->createNotFoundException('Invalid link');
+        if ($user) {
+            return $this->redirectToRoute('claim_policy');
         }
 
         $claimFnolEmail = new ClaimFnolEmail();
@@ -598,6 +574,43 @@ class DefaultController extends BaseController
         return [
             'claim_email_form' => $claimEmailForm->createView(),
         ];
+    }
+
+    /**
+     * @Route("/claim/login/{tokenId}", name="claim_login")
+     * @Template
+     */
+    public function claimLoginAction(Request $request, $tokenId = null)
+    {
+        $user = $this->getUser();
+
+        if ($user) {
+            return $this->redirectToRoute('claim_policy');
+        }
+
+        if (!$user && $tokenId) {
+            /** @var ClaimsService $claimsService */
+            $claimsService = $this->get('app.claims');
+            $userId = $claimsService->getUserIdFromLoginLinkToken($tokenId);
+            if (!$userId) {
+                throw $this->createNotFoundException('Invalid link');
+            }
+
+            $dm = $this->getManager();
+            $userRepo = $dm->getRepository(User::class);
+            $user = $userRepo->find($userId);
+
+            if ($user) {
+                $this->get('fos_user.security.login_manager')->loginUser(
+                    $this->getParameter('fos_user.firewall_name'),
+                    $user
+                );
+
+                return $this->redirectToRoute('claim_policy');
+            }
+        }
+
+        throw $this->createNotFoundException('Invalid link');
     }
 
     /**

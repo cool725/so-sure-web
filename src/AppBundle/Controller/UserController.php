@@ -1441,42 +1441,33 @@ class UserController extends BaseController
             ->createNamedBuilder('claim_confirm_form', ClaimFnolConfirmType::class, $claimFnolConfirm)
             ->getForm();
 
-        $current = 'claim';
-
         if ('POST' === $request->getMethod()) {
             if ($request->request->has('claim_form')) {
                 $claimForm->handleRequest($request);
                 if ($claimForm->isValid()) {
                     $dm = $this->getManager();
                     $policyRepo = $dm->getRepository(Policy::class);
-                    $policy = $policyRepo->find($claimForm->getData()->getPolicyNumber());
+                    $policy = $policyRepo->find($claimFnol->getPolicyNumber());
                     if (!$policy) {
                         throw $this->createNotFoundException('Policy not found');
                     }
-                    $this->denyAccessUnlessGranted(PolicyVoter::EDIT, $policy);
+                    $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
 
                     $claimFnolConfirm = clone $claimFnol;
                     $claimConfirmForm = $this->get('form.factory')
                         ->createNamedBuilder('claim_confirm_form', ClaimFnolConfirmType::class, $claimFnolConfirm)
                         ->getForm();
-
-                    $current = 'claim-confirm';
                 }
             } elseif ($request->request->has('claim_confirm_form')) {
-                var_dump('Confirm CLaim');
                 $claimConfirmForm->handleRequest($request);
                 if ($claimConfirmForm->isValid()) {
-                    var_dump('Valid Confirm CLaim');
-
                     $dm = $this->getManager();
                     $policyRepo = $dm->getRepository(Policy::class);
-                    $policy = $policyRepo->find($claimConfirmForm->getData()->getPolicyNumber());
+                    $policy = $policyRepo->find($claimFnolConfirm->getPolicyNumber());
                     if (!$policy) {
                         throw $this->createNotFoundException('Policy not found');
                     }
                     $this->denyAccessUnlessGranted(PolicyVoter::EDIT, $policy);
-
-                    var_dump($claimConfirmForm->getData());
 
                     $claimsService = $this->get('app.claims');
                     $claim = $claimsService->createClaim($claimConfirmForm->getData());
@@ -1489,22 +1480,6 @@ class UserController extends BaseController
             }
         }
 
-        $claimType = '';
-        switch ($claimForm->getData()->getType()) {
-            case 'damage':
-                $claimType = 'DAMAGED OR BROKEN DOWN';
-                break;
-            case 'loss':
-                $claimType = 'LOST';
-                break;
-            case 'theft':
-                $claimType = 'STOLEN';
-                break;
-            default:
-                $claimType = '';
-                break;
-        }
-
         $data = [
             'username' => $user->getName(),
             'phone' => $policy ? sprintf(
@@ -1513,11 +1488,11 @@ class UserController extends BaseController
                 $policy->getPhone()->getModel(),
                 $policy->getImei()
             ) : '',
-            'claim_type' => $claimType,
+            'claim_type' => $claimFnol->getTypeString(),
             'policy_date' => $policy ? $policy->getStart() : '',
             'claim_form' => $claimForm->createView(),
             'claim_confirm_form' => $claimConfirmForm->createView(),
-            'current' => $current,
+            'current' => empty($claimFnolConfirm->getEmail()) ? 'claim' : 'claim-confirm',
         ];
 
         return $this->render('AppBundle:User:claim.html.twig', $data);

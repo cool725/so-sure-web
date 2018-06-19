@@ -224,6 +224,26 @@ class ClaimFnol
         $this->where = $where;
     }
 
+    public function getTypeString()
+    {
+        $claimType = '';
+        switch ($this->type) {
+            case 'damage':
+                $claimType = 'DAMAGED OR BROKEN DOWN';
+                break;
+            case 'loss':
+                $claimType = 'LOST';
+                break;
+            case 'theft':
+                $claimType = 'STOLEN';
+                break;
+            default:
+                $claimType = '';
+                break;
+        }
+        return $claimType;
+    }
+
     public static function getNetworks()
     {
         return Claim::$networks;
