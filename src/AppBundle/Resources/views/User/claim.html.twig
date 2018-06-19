@@ -40,20 +40,6 @@
 
                             {{ form_start(claim_form, {'attr': {'data-toggle': 'validator', 'class': 'validate-form', 'id':'claim-form', 'data-client-validation': form_client_validation }}) }}
                                 <div class="row">
-                                    <div class="col-sm-12 text-center">
-                                        <div class="form-group {% if form_errors(claim_form.signature) %}has-error{% endif %}">
-                                            <p class="lead text-left">I <span class="h4">{{ username }}</span> am providing below all accurate and truthful information. I understand that failure to do so will invalidate my claim and could lead to me being prosecuted.<span class="text-blue">*</span></label></p>
-                                            {{ form_widget(claim_form.signature, { 'attr': {'placeholder': 'Type in your full name to sign this document', 'class': 'form-control'}}) }}
-                                            <div class="help-block with-errors">{{ form_errors(claim_form.signature) }}</div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-13">
-                                        <h3 class="text-center">Continue with your claim details</h3>
-                                    </div>
-                                </div>
-                                <div class="row">
                                     <div class="col-sm-6">
                                         <div class="form-group {% if form_errors(claim_form.name) %}has-error{% endif %}">
                                             <label class="h4">Fullname <span class="req">*</span></label>
@@ -70,7 +56,7 @@
                                     </div>
                                 </div>
                                 <div class="row">
-                                    <div class="col-sm-12">
+                                    <div class="col-xs-12">
                                         <div class="form-group {% if form_errors(claim_form.policyNumber) %}has-error{% endif %}">
                                             <label class="h4">Policy Number <span class="req">*</span></label>
                                             {{ form_widget(claim_form.policyNumber, { 'attr': {'class': 'form-control', 'placeholder': 'e.g. Mob/2016/40000001'}}) }}
@@ -127,7 +113,7 @@
                                     </div>
                                 </div>
                                 <div class="row">
-                                    <div class="col-sm-12">
+                                    <div class="col-xs-12">
                                         <div class="form-group {% if form_errors(claim_form.where) %}has-error{% endif %}">
                                             <label class="h4 h-nom">At a place? <span class="req">*</span></label>
                                             {{ form_widget(claim_form.where, { 'attr': {'class': 'form-control', 'placeholder': ''}}) }}
@@ -136,11 +122,25 @@
                                     </div>
                                 </div>
                                 <div class="row">
-                                    <div class="col-md-12">
+                                    <div class="col-xs-12">
                                         <div class="form-group {% if form_errors(claim_form.message) %}has-error{% endif %}">
                                             <label class="h4 h-nom">And this is, in as much detail as I remember and to the best of my knowledge, what has happened to my device: <span class="req">*</span></label>
                                             {{ form_widget(claim_form.message, { 'attr': {'class': 'form-control', 'rows': '15'}}) }}
                                             <div class="help-block with-errors">{{ form_errors(claim_form.message) }}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <h3 class="text-center">Signature</h3>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-xs-12 text-center">
+                                        <div class="form-group {% if form_errors(claim_form.signature) %}has-error{% endif %}">
+                                            <p class="lead text-left">I <span class="h4">{{ username }}</span> am providing all accurate and truthful information. I understand that failure to do so will invalidate my claim and could lead to me being prosecuted.<span class="text-blue">*</span></label></p>
+                                            {{ form_widget(claim_form.signature, { 'attr': {'placeholder': 'Type in your full name to sign this document', 'class': 'form-control'}}) }}
+                                            <div class="help-block with-errors">{{ form_errors(claim_form.signature) }}</div>
                                         </div>
                                     </div>
                                 </div>
