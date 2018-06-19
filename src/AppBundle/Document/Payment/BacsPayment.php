@@ -201,6 +201,7 @@ class BacsPayment extends Payment
             ));
         }
 
+        $this->setDate($date);
         $this->setStatus(self::STATUS_SUCCESS);
         $this->setSuccess(true);
 
@@ -224,6 +225,7 @@ class BacsPayment extends Payment
             ));
         }
 
+        $this->setDate($date);
         $this->setStatus(self::STATUS_FAILURE);
         $this->setSuccess(false);
 
