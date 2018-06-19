@@ -120,7 +120,7 @@ class UserRepository extends DocumentRepository
         $gt = $this->normalizeUkMobile($number - self::NEAR_MOBILE_NUMBER_RANGE, true);
 
         // {"mobileNumber":{"$gte":"+447781444400","$lte":"+447781444409"}}
-        $qb->field('mobileNumber' )->lte($lt)->gte($gt);
+        $qb->field('mobileNumber')->lte($lt)->gte($gt);
 
         return $qb
             ->getQuery()
