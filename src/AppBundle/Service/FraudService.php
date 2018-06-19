@@ -34,6 +34,7 @@ class FraudService
             'duplicate_postcode' => $this->getDuplicatePostcode($policy),
             'duplicate_bank_accounts' => $this->getDuplicateBankAccounts($policy),
             'network_cancellations' => count($policy->getNetworkCancellations()),
+            'near_mobile_numbers' => $this->getNearMobileNumbers($policy)
         ];
 
         $user = $policy->getUser();
@@ -46,6 +47,15 @@ class FraudService
         }
 
         return $data;
+    }
+
+    public function getNearMobileNumbers(Policy $policy)
+    {
+        $user = $policy->getUser();
+        /** @var UserRepository $userRepo */
+        $userRepo = $this->dm->getRepository(User::class);
+
+        return $userRepo->getNearMobileNumberCount($user);
     }
 
     public function getDuplicatePostcode(Policy $policy)
