@@ -201,6 +201,7 @@ class BacsPayment extends Payment
             ));
         }
 
+        $this->setDate($date);
         $this->setStatus(self::STATUS_SUCCESS);
         $this->setSuccess(true);
 
@@ -217,6 +218,10 @@ class BacsPayment extends Payment
 
     public function reject(\DateTime $date = null)
     {
+        if (!$date) {
+            $date = new \DateTime();
+        }
+
         if (!$this->canAction($date)) {
             throw new \Exception(sprintf(
                 'Attempting to action before reveral date (%s) is past',
@@ -224,6 +229,7 @@ class BacsPayment extends Payment
             ));
         }
 
+        $this->setDate($date);
         $this->setStatus(self::STATUS_FAILURE);
         $this->setSuccess(false);
 
