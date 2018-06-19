@@ -122,3 +122,19 @@
     }
 }
 
+// Stuck
+.stuck {
+    width: 100%;
+    position: fixed;
+    top: 50px; left: 0;
+    z-index: 999;
+    display: none;
+
+    @include breakpoint(tablet) {
+        top: 60px;
+    }
+
+    @include breakpoint(laptop) {
+        top: 5px;
+    }
+}

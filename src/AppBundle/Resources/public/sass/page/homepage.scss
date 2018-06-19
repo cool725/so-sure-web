@@ -1290,7 +1290,8 @@
     }
 }
 
-// Sticky Search - Using BS affix
+// Sticky Search - Using BS affix iOS only
+// Bug: https://hackernoon.com/how-to-fix-the-ios-11-input-element-in-fixed-modals-bug-aaf66c7ba3f8
 .affix {
     position: fixed;
     top: 60px; left: 0; right: 0;
@@ -1345,11 +1346,60 @@
     position: absolute;
 }
 
-// Dropdown Sticky
+// Dropdown Affix adjust for mobile - iOS
 .dropdown-phone-form.affix {
     top: 55px;
     padding-top: 15px;
     background-color: $off-white !important;
+}
+
+// Sticky Search - Using Custom 'Stuck' non iOS Android/Desktop etc.
+.stuck .search-phone-form {
+    padding: 0 10px;
+    border-color: $light-blue;
+
+    .twitter-typeahead {
+
+        .tt-hint,
+        .tt-input {
+
+            @include breakpoint(laptop) {
+                height: 38px;
+                padding: 0 0 0 50px;
+            }
+        }
+
+        &:before {
+
+            @include breakpoint(laptop) {
+                font-size: 23px;
+                top: 2px;
+            }
+        }
+
+        @include breakpoint(tablet) {
+            font-size: 18px;
+        }
+
+        .tt-menu {
+            margin-top: 1px;
+        }
+    }
+
+    @include breakpoint(tablet) {
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    @include breakpoint(laptop) {
+        height: 40px;
+    }
+}
+
+// Dropdown Stuck adjust for mobile - Android
+.stuck--dropdown {
+    padding: 15px 15px 0;
+    background-color: $off-white;
 }
 
 .speech-bubble {

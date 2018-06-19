@@ -45,7 +45,34 @@ $(function(){
             });
         // If anything else
         } else {
+            var target = $('#select-phone-data');
+            var subClass = null;
 
+            if (target.hasClass('dropdown-phone-form')) {
+                subClass = 'stuck--dropdown';
+            } else {
+                subClass = 'stuck--search';
+            }
+
+            target.after('<div class="stuck '+ subClass +'" id="stuck"></div>');
+
+            var stuck = $('.stuck');
+            stuck.append(target.clone(true));
+
+            var el = $('#stuck');
+            if (el !== null) {
+                var position = target.position();
+                $(window).scroll(function(event) {
+                    var height = $(window).scrollTop();
+                    if (height > position.top) {
+                        target.css('visibility','hidden');
+                        stuck.css('display','block');
+                    } else {
+                        stuck.css('display','none');
+                        target.css('visibility','visible');
+                    }
+                });
+            }
         }
 
     });
