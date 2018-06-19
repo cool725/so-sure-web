@@ -1357,6 +1357,7 @@
 .search-phone-form.stuck {
     padding: 0 10px;
     border-color: $light-blue;
+    z-index: 1001;
 
     .twitter-typeahead {
 
