@@ -3,7 +3,7 @@ $(function(){
 
     $('.faqs').scrollspy({
         target: '#faqs__nav',
-        offset: -100,
+        offset: 100,
     });
 
     $('#faqs__nav li a[href^="#"]').on('click', function(e) {
