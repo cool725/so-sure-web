@@ -262,7 +262,16 @@
     <tr>
         <td width="{{ indent_width }}"></td>
         <td width="{{ text_width }}"><strong>Total premium distributions</strong></td>
-        <td><strong>£{{ (paymentTotals.all.totalUnderwriter + paymentTotals.all.totalCommission)|number_format(2, '.', ',') }}</strong></td>
+        {% set reportTotal = paymentTotals.all.totalUnderwriter + paymentTotals.all.totalCommission %}
+        {% set paymentsTotal = 0 %}
+        {% if paymentTotals.salvaPaymentFile.metadata['total'] is defined %}
+        {% set paymentsTotal = paymentTotals.salvaPaymentFile.metadata['total'] %}
+        {% endif %}
+        {% if equal_to_two_dp(reportTotal, paymentsTotal) %}
+            <td><strong>£{{ reportTotal|number_format(2, '.', ',') }}</strong></td>
+        {% else %}
+            <td class="bg-danger" title="Expect total from payments £{{ paymentsTotal|number_format(2, '.', ',') }}"><strong>£{{ reportTotal|number_format(2, '.', ',') }}</strong></td>
+        {% endif %}
     </tr>
 </table>
 <h4>Net Distributions of Each Party</h4>
