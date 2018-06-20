@@ -80,7 +80,7 @@ class ClaimFnol
     protected $time;
 
     /**
-     * @Assert\Length(min="10", max="200")
+     * @Assert\Length(min="5", max="200")
      */
     protected $where;
 
@@ -113,7 +113,7 @@ class ClaimFnol
     {
         $this->signature = $signature;
     }
-    
+
     public function getPolicyNumber()
     {
         return $this->policyNumber;
@@ -138,7 +138,7 @@ class ClaimFnol
     {
         return $this->type;
     }
-    
+
     public function setType($type)
     {
         $this->type = $type;
@@ -148,17 +148,17 @@ class ClaimFnol
     {
         return $this->network;
     }
-    
+
     public function setNetwork($network)
     {
         $this->network = $network;
     }
-    
+
     public function getMessage()
     {
         return $this->message;
     }
-    
+
     public function setMessage($message)
     {
         $this->message = $message;
@@ -168,7 +168,7 @@ class ClaimFnol
     {
         return $this->timeToReach;
     }
-    
+
     public function setTimeToReach($timeToReach)
     {
         $this->timeToReach = $timeToReach;
@@ -188,7 +188,7 @@ class ClaimFnol
             $this->phone = $user->getMobileNumber();
         }
     }
-    
+
     public function getWhen($normalised = false)
     {
         if ($normalised) {
