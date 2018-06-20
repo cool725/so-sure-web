@@ -203,7 +203,7 @@ class PurchaseControllerTest extends BaseControllerTest
         sleep(1);
         $policy2 = self::initPolicy($user, self::$dm, $phone);
 
-        $this->login($user->getEmail(), 'foo', sprintf('purchase/step-policy/%s', $policy2->getId()));
+        $this->login($user->getEmail(), 'foo', 'user/invalid');
 
         $crawler = $this->setPhoneNew($phone, $policy1->getImei());
 
@@ -879,7 +879,7 @@ class PurchaseControllerTest extends BaseControllerTest
         $serialNumber = null
     ) {
         if (!$crawler) {
-            $crawler = self::$client->request('GET', '/purchase/step-policy?force_result=new');
+            $crawler = self::$client->request('GET', '/purchase/step-policy?force_result=step-3-payment-old');
         }
         //print $crawler->html();
         if ($nextButton) {
