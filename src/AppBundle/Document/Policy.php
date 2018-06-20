@@ -2006,7 +2006,7 @@ abstract class Policy
         }
     }
 
-    public function getRefundAmount($date = null)
+    public function getRefundAmount(\DateTime $date = null)
     {
         // Just in case - make sure we don't refund for non-cancelled policies
         if (!$this->isCancelled()) {
@@ -2025,13 +2025,13 @@ abstract class Policy
         // Cancellation Reason, Monthly/Annual, Claimed/NotClaimed
 
         if ($this->getCancelledReason() == Policy::CANCELLED_COOLOFF) {
-            return $this->getCooloffRefundAmount();
+            return $this->getCooloffPremiumRefund();
         } else {
-            return $this->getProratedRefundAmount($date);
+            return $this->getProratedPremiumRefund($date);
         }
     }
 
-    public function getRefundCommissionAmount($date = null)
+    public function getRefundCommissionAmount(\DateTime $date = null)
     {
         if (!$date) {
             $date = new \DateTime();
@@ -2050,13 +2050,13 @@ abstract class Policy
         // Cancellation Reason, Monthly/Annual, Claimed/NotClaimed
 
         if ($this->getCancelledReason() == Policy::CANCELLED_COOLOFF) {
-            return $this->getCooloffRefundCommissionAmount();
+            return $this->getCooloffCommissionRefund();
         } else {
-            return $this->getProratedRefundCommissionAmount($date);
+            return $this->getProratedCommissionRefund($date);
         }
     }
 
-    public function getCooloffRefundAmount()
+    public function getCooloffPremiumRefund()
     {
         $amountToRefund = 0;
         // Cooloff should refund full amount (which should be equal to the last payment except for renewals)
@@ -2077,22 +2077,22 @@ abstract class Policy
         return $amountToRefund;
     }
 
-    public function getProratedAmount($date = null)
+    public function getProratedPremium(\DateTime $date = null)
     {
         $used = $this->getPremium()->getYearlyPremiumPrice() * $this->getProrataMultiplier($date);
 
         return $this->toTwoDp($used);
     }
 
-    public function getProratedRefundAmount($date = null)
+    public function getProratedPremiumRefund(\DateTime $date = null)
     {
-        $used = $this->getProratedAmount($date);
+        $used = $this->getProratedPremium($date);
         $paid = $this->getPremiumPaid();
 
         return $this->toTwoDp($paid - $used);
     }
 
-    public function getCooloffRefundCommissionAmount()
+    public function getCooloffCommissionRefund()
     {
         $amountToRefund = 0;
         $commissionToRefund = 0;
@@ -2116,10 +2116,17 @@ abstract class Policy
         return $commissionToRefund;
     }
 
-    public function getProratedRefundCommissionAmount($date = null)
+    public function getProratedCommission(\DateTime $date = null)
     {
         // TODO: either make abstract to get the total commission, or move to a db collection
         $used = Salva::YEARLY_TOTAL_COMMISSION * $this->getProrataMultiplier($date);
+
+        return $this->toTwoDp($used);
+    }
+
+    public function getProratedCommissionRefund(\DateTime $date = null)
+    {
+        $used = $this->getProratedCommission($date);
         $paid = $this->getTotalCommissionPaid();
 
         return $this->toTwoDp($paid - $used);

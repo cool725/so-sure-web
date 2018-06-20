@@ -2444,7 +2444,7 @@ class PhonePolicyTest extends WebTestCase
         $paid = static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(null, new \DateTime('2016-02-10'));
         $this->assertEquals(
             $this->toTwoDp($paid - $used),
-            $monthlyPolicy->getProratedRefundAmount(new \DateTime('2016-02-10'))
+            $monthlyPolicy->getProratedPremiumRefund(new \DateTime('2016-02-10'))
         );
 
         $yearlyPolicy = $this->createPolicyForCancellation(
@@ -2457,7 +2457,7 @@ class PhonePolicyTest extends WebTestCase
         $paid = static::$phone->getCurrentPhonePrice()->getYearlyPremiumPrice(null, new \DateTime('2016-02-10'));
         $this->assertEquals(
             $this->toTwoDp($paid - $used),
-            $yearlyPolicy->getProratedRefundAmount(new \DateTime('2016-02-10'))
+            $yearlyPolicy->getProratedPremiumRefund(new \DateTime('2016-02-10'))
         );
     }
 
@@ -2473,7 +2473,7 @@ class PhonePolicyTest extends WebTestCase
         $paid = Salva::MONTHLY_TOTAL_COMMISSION;
         $this->assertEquals(
             $this->toTwoDp($paid - $used),
-            $monthlyPolicy->getProratedRefundCommissionAmount(new \DateTime('2016-02-10'))
+            $monthlyPolicy->getProratedCommission(new \DateTime('2016-02-10'))
         );
 
         $yearlyPolicy = $this->createPolicyForCancellation(
@@ -2486,7 +2486,7 @@ class PhonePolicyTest extends WebTestCase
         $paid = Salva::YEARLY_TOTAL_COMMISSION;
         $this->assertEquals(
             $this->toTwoDp($paid - $used),
-            $yearlyPolicy->getProratedRefundCommissionAmount(new \DateTime('2016-02-10'))
+            $yearlyPolicy->getProratedCommission(new \DateTime('2016-02-10'))
         );
     }
 
@@ -2499,11 +2499,11 @@ class PhonePolicyTest extends WebTestCase
         );
         $monthlyPolicy->cancel(SalvaPhonePolicy::CANCELLED_USER_REQUESTED, new \DateTime('2016-02-10'));
         $this->assertEquals(
-            $monthlyPolicy->getProratedRefundAmount(new \DateTime('2016-02-10')),
+            $monthlyPolicy->getProratedPremiumRefund(new \DateTime('2016-02-10')),
             $monthlyPolicy->getRefundAmount(new \DateTime('2016-02-10'))
         );
         $this->assertEquals(
-            $monthlyPolicy->getProratedRefundCommissionAmount(new \DateTime('2016-02-10')),
+            $monthlyPolicy->getProratedCommission(new \DateTime('2016-02-10')),
             $monthlyPolicy->getRefundCommissionAmount(new \DateTime('2016-02-10'))
         );
 
@@ -2514,11 +2514,11 @@ class PhonePolicyTest extends WebTestCase
         );
         $yearlyPolicy->cancel(SalvaPhonePolicy::CANCELLED_USER_REQUESTED, new \DateTime('2016-02-10'));
         $this->assertEquals(
-            $yearlyPolicy->getProratedRefundAmount(new \DateTime('2016-02-10')),
+            $yearlyPolicy->getProratedPremiumRefund(new \DateTime('2016-02-10')),
             $yearlyPolicy->getRefundAmount(new \DateTime('2016-02-10'))
         );
         $this->assertEquals(
-            $yearlyPolicy->getProratedRefundCommissionAmount(new \DateTime('2016-02-10')),
+            $yearlyPolicy->getProratedCommission(new \DateTime('2016-02-10')),
             $yearlyPolicy->getRefundCommissionAmount(new \DateTime('2016-02-10'))
         );
 
@@ -2546,11 +2546,11 @@ class PhonePolicyTest extends WebTestCase
         );
         $monthlyPolicy->cancel(SalvaPhonePolicy::CANCELLED_WRECKAGE, new \DateTime('2016-02-10'));
         $this->assertEquals(
-            $monthlyPolicy->getProratedRefundAmount(new \DateTime('2016-02-10')),
+            $monthlyPolicy->getProratedPremiumRefund(new \DateTime('2016-02-10')),
             $monthlyPolicy->getRefundAmount(new \DateTime('2016-02-10'))
         );
         $this->assertEquals(
-            $monthlyPolicy->getProratedRefundCommissionAmount(new \DateTime('2016-02-10')),
+            $monthlyPolicy->getProratedCommission(new \DateTime('2016-02-10')),
             $monthlyPolicy->getRefundCommissionAmount(new \DateTime('2016-02-10'))
         );
 
@@ -2561,11 +2561,11 @@ class PhonePolicyTest extends WebTestCase
         );
         $yearlyPolicy->cancel(SalvaPhonePolicy::CANCELLED_WRECKAGE, new \DateTime('2016-02-10'));
         $this->assertEquals(
-            $yearlyPolicy->getProratedRefundAmount(new \DateTime('2016-02-10')),
+            $yearlyPolicy->getProratedCommission(new \DateTime('2016-02-10')),
             $yearlyPolicy->getRefundAmount(new \DateTime('2016-02-10'))
         );
         $this->assertEquals(
-            $yearlyPolicy->getProratedRefundCommissionAmount(new \DateTime('2016-02-10')),
+            $yearlyPolicy->getProratedCommission(new \DateTime('2016-02-10')),
             $yearlyPolicy->getRefundCommissionAmount(new \DateTime('2016-02-10'))
         );
     }
@@ -2604,11 +2604,11 @@ class PhonePolicyTest extends WebTestCase
         );
         $monthlyPolicy->cancel(SalvaPhonePolicy::CANCELLED_DISPOSSESSION, new \DateTime('2016-02-10'));
         $this->assertEquals(
-            $monthlyPolicy->getProratedRefundAmount(new \DateTime('2016-02-10')),
+            $monthlyPolicy->getProratedPremiumRefund(new \DateTime('2016-02-10')),
             $monthlyPolicy->getRefundAmount(new \DateTime('2016-02-10'))
         );
         $this->assertEquals(
-            $monthlyPolicy->getProratedRefundCommissionAmount(new \DateTime('2016-02-10')),
+            $monthlyPolicy->getProratedCommission(new \DateTime('2016-02-10')),
             $monthlyPolicy->getRefundCommissionAmount(new \DateTime('2016-02-10'))
         );
 
@@ -2619,11 +2619,11 @@ class PhonePolicyTest extends WebTestCase
         );
         $yearlyPolicy->cancel(SalvaPhonePolicy::CANCELLED_DISPOSSESSION, new \DateTime('2016-02-10'));
         $this->assertEquals(
-            $yearlyPolicy->getProratedRefundAmount(new \DateTime('2016-02-10')),
+            $yearlyPolicy->getProratedPremiumRefund(new \DateTime('2016-02-10')),
             $yearlyPolicy->getRefundAmount(new \DateTime('2016-02-10'))
         );
         $this->assertEquals(
-            $yearlyPolicy->getProratedRefundCommissionAmount(new \DateTime('2016-02-10')),
+            $yearlyPolicy->getProratedCommission(new \DateTime('2016-02-10')),
             $yearlyPolicy->getRefundCommissionAmount(new \DateTime('2016-02-10'))
         );
     }

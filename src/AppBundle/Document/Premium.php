@@ -2,6 +2,7 @@
 
 namespace AppBundle\Document;
 
+use AppBundle\Classes\Salva;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Symfony\Component\Validator\Constraints as Assert;
 use AppBundle\Validator\Constraints as AppAssert;
@@ -225,5 +226,10 @@ abstract class Premium
         }
 
         return null;
+    }
+
+    public function getYearlyTotalCommission()
+    {
+        return Salva::YEARLY_TOTAL_COMMISSION;
     }
 }
