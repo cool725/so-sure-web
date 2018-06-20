@@ -1100,7 +1100,7 @@ class ReportingService
 
     private function getSalvaPaymentFiles(\DateTime $date)
     {
-        /** @var S3FileRepository $paymentRepo */
+        /** @var S3FileRepository $repo */
         $repo = $this->dm->getRepository(SalvaPaymentFile::class);
 
         return $repo->getAllFiles($date, 'salvaPayment');
