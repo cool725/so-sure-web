@@ -1196,6 +1196,10 @@ class UserControllerTest extends BaseControllerTest
 
         self::verifyResponse(302);
         $this->assertTrue(self::$client->getResponse()->isRedirect(sprintf('/user/claim/%s', $policy->getId())));
+
+        $updatedPolicy = $this->assertPolicyByIdExists(self::$client->getContainer(), $policy->getId());
+        $updatedClaim = $updatedPolicy->getLatestOpenedClaim();
+        $this->assertEquals(Claim::STATUS_FNOL, $updatedClaim->getStatus());
     }
 
     public function testUserClaimDamage()
@@ -1252,7 +1256,7 @@ class UserControllerTest extends BaseControllerTest
             1305630
         );
 
-        $claimPage = self::$router->generate('claimed_policy', ['policyId' => $policy->getId()]);
+        $claimPage = self::$router->generate('claimed_damage_policy', ['policyId' => $policy->getId()]);
         $this->login($email, $password);
         $crawler = self::$client->request('GET', $claimPage);
         self::verifyResponse(200);
@@ -1270,6 +1274,7 @@ class UserControllerTest extends BaseControllerTest
         self::verifyResponse(302);
         $this->assertTrue(self::$client->getResponse()->isRedirect(sprintf('/user/claim/%s', $policy->getId())));
 
+        $claimPage = self::$router->generate('claimed_policy', ['policyId' => $policy->getId()]);
         $crawler = self::$client->request('GET', $claimPage);
         self::verifyResponse(200);
 
@@ -1350,7 +1355,7 @@ class UserControllerTest extends BaseControllerTest
             17
         );
 
-        $claimPage = self::$router->generate('claimed_policy', ['policyId' => $policy->getId()]);
+        $claimPage = self::$router->generate('claimed_theftloss_policy', ['policyId' => $policy->getId()]);
         $this->login($email, $password);
         $crawler = self::$client->request('GET', $claimPage);
         self::verifyResponse(200);
@@ -1377,6 +1382,7 @@ class UserControllerTest extends BaseControllerTest
         self::verifyResponse(302);
         $this->assertTrue(self::$client->getResponse()->isRedirect(sprintf('/user/claim/%s', $policy->getId())));
 
+        $claimPage = self::$router->generate('claimed_policy', ['policyId' => $policy->getId()]);
         $crawler = self::$client->request('GET', $claimPage);
         self::verifyResponse(200);
 
@@ -1457,7 +1463,7 @@ class UserControllerTest extends BaseControllerTest
             17
         );
 
-        $claimPage = self::$router->generate('claimed_policy', ['policyId' => $policy->getId()]);
+        $claimPage = self::$router->generate('claimed_theftloss_policy', ['policyId' => $policy->getId()]);
         $this->login($email, $password);
         $crawler = self::$client->request('GET', $claimPage);
         self::verifyResponse(200);
@@ -1467,12 +1473,12 @@ class UserControllerTest extends BaseControllerTest
         $form['claim_theftloss_form[blockedDate]'] = $serializer->normalize(
             $now,
             null,
-            array(DateTimeNormalizer::FORMAT_KEY => 'Y/m/d')
+            array(DateTimeNormalizer::FORMAT_KEY => 'd/m/Y')
         );;
         $form['claim_theftloss_form[reportedDate]'] = $serializer->normalize(
             $now,
             null,
-            array(DateTimeNormalizer::FORMAT_KEY => 'Y/m/d')
+            array(DateTimeNormalizer::FORMAT_KEY => 'd/m/Y')
         );;
         $form['claim_theftloss_form[reportType]'] = Claim::REPORT_POLICE_STATION;
         $form['claim_theftloss_form[crimeReferenceNumber]'] = '1234567890';
@@ -1484,6 +1490,7 @@ class UserControllerTest extends BaseControllerTest
         self::verifyResponse(302);
         $this->assertTrue(self::$client->getResponse()->isRedirect(sprintf('/user/claim/%s', $policy->getId())));
 
+        $claimPage = self::$router->generate('claimed_policy', ['policyId' => $policy->getId()]);
         $crawler = self::$client->request('GET', $claimPage);
         self::verifyResponse(200);
 

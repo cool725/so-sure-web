@@ -1500,7 +1500,6 @@ class UserController extends BaseController
 
     /**
      * @Route("/claim/{policyId}", name="claimed_policy")
-     * @Route("/claim/withdraw/{policyId}", name="withdraw_claimed_policy")
      * @Template
      */
     public function claimPolicyAction(Request $request, $policyId)
@@ -1519,22 +1518,6 @@ class UserController extends BaseController
         }
 
         if ($claim->getStatus() == Claim::STATUS_SUBMITTED) {
-            if ($request->get('_route') == 'withdraw_claimed_policy') {
-                $claimsService = $this->get('app.claims');
-                if ($claimsService->withdrawClaim($claim)) {
-                    $this->addFlash(
-                        'success',
-                        "Your claim has been withdrawn."
-                    );
-                    return $this->redirectToRoute('user_home');
-                } else {
-                    $this->addFlash(
-                        'error',
-                        "Sorry, your claim cannot be withdrawn at the moment."
-                    );
-                }
-            }
-
             $now = new \DateTime();
             $time = 'in the next 3 hours';
             if ($now->format('w') > 0 && $now->format('w') < 6) {
@@ -1559,58 +1542,151 @@ class UserController extends BaseController
         }
 
         if ($claim->getType() == Claim::TYPE_DAMAGE) {
-            $claimFnolDamage = new ClaimFnolDamage();
-            $claimFnolDamage->setClaim($claim);
-
-            $claimDamageForm = $this->get('form.factory')
-                ->createNamedBuilder('claim_damage_form', ClaimFnolDamageType::class, $claimFnolDamage)
-                ->getForm();
-
-            if ('POST' === $request->getMethod()) {
-                if ($request->request->has('claim_damage_form')) {
-                    $claimDamageForm->handleRequest($request);
-                    if ($claimDamageForm->isValid()) {
-                        $claimsService = $this->get('app.claims');
-                        $claimsService->updateDamageDocuments($claim, $claimFnolDamage);
-                        return $this->redirectToRoute('claimed_policy', ['policyId' => $policy->getId()]);
-                    }
-                }
-            }
-
-            $data = [
-                'username' => $user->getName(),
-                'claim_form' => $claimDamageForm->createView(),
-            ];
-            return $this->render('AppBundle:User:claimDamage.html.twig', $data);
+            return $this->redirectToRoute('claimed_damage_policy', ['policyId' => $policy->getId()]);
         } elseif ($claim->getType() == Claim::TYPE_THEFT || $claim->getType() == Claim::TYPE_LOSS) {
-            $claimFnolTheftLoss = new ClaimFnolTheftLoss();
-            $claimFnolTheftLoss->setClaim($claim);
-
-            $claimTheftLossForm = $this->get('form.factory')
-                ->createNamedBuilder('claim_theftloss_form', ClaimFnolTheftLossType::class, $claimFnolTheftLoss)
-                ->getForm();
-
-            if ('POST' === $request->getMethod()) {
-                if ($request->request->has('claim_theftloss_form')) {
-                    $claimTheftLossForm->handleRequest($request);
-                    if ($claimTheftLossForm->isValid()) {
-                        $claimsService = $this->get('app.claims');
-                        $claimsService->updateTheftLossDocuments($claim, $claimFnolTheftLoss);
-                        return $this->redirectToRoute('claimed_policy', ['policyId' => $policy->getId()]);
-                    }
-                }
-            }
-
-            $data = [
-                'username' => $user->getName(),
-                'claimType' => $claim->getType(),
-                'network' => $claim->getNetwork(),
-                'claim_form' => $claimTheftLossForm->createView(),
-            ];
-            return $this->render('AppBundle:User:claimTheftLoss.html.twig', $data);
+            return $this->redirectToRoute('claimed_theftloss_policy', ['policyId' => $policy->getId()]);
         } else {
             return $this->redirectToRoute('claim_policy');
         }
+    }
+
+    /**
+     * @Route("/claim/damage/{policyId}", name="claimed_damage_policy")
+     * @Template
+     */
+    public function claimDamagePolicyAction(Request $request, $policyId)
+    {
+        $user = $this->getUser();
+        $dm = $this->getManager();
+        $policyRepo = $dm->getRepository(Policy::class);
+        $policy = $policyRepo->find($policyId);
+
+        $this->denyAccessUnlessGranted(PolicyVoter::EDIT, $policy);
+
+        $claim = $policy->getLatestOpenedClaim();
+
+        if ($claim === null) {
+            return $this->redirectToRoute('claim_policy');
+        }
+
+        if ($claim->getStatus() == Claim::STATUS_SUBMITTED && $claim->getType() != Claim::TYPE_DAMAGE) {
+            return $this->redirectToRoute('claimed_policy', ['policyId' => $policy->getId()]);
+        }
+
+        $claimFnolDamage = new ClaimFnolDamage();
+        $claimFnolDamage->setClaim($claim);
+
+        $claimDamageForm = $this->get('form.factory')
+            ->createNamedBuilder('claim_damage_form', ClaimFnolDamageType::class, $claimFnolDamage)
+            ->getForm();
+
+        if ('POST' === $request->getMethod()) {
+            if ($request->request->has('claim_damage_form')) {
+                $claimDamageForm->handleRequest($request);
+                if ($claimDamageForm->isValid()) {
+                    $claimsService = $this->get('app.claims');
+                    $claimsService->updateDamageDocuments($claim, $claimFnolDamage);
+                    return $this->redirectToRoute('claimed_policy', ['policyId' => $policy->getId()]);
+                }
+            }
+        }
+
+        $data = [
+            'username' => $user->getName(),
+            'claim_form' => $claimDamageForm->createView(),
+        ];
+        return $this->render('AppBundle:User:claimDamage.html.twig', $data);
+    }
+
+    /**
+     * @Route("/claim/theftloss/{policyId}", name="claimed_theftloss_policy")
+     * @Template
+     */
+    public function claimTheftLossPolicyAction(Request $request, $policyId)
+    {
+        $user = $this->getUser();
+        $dm = $this->getManager();
+        $policyRepo = $dm->getRepository(Policy::class);
+        $policy = $policyRepo->find($policyId);
+
+        $this->denyAccessUnlessGranted(PolicyVoter::EDIT, $policy);
+
+        $claim = $policy->getLatestOpenedClaim();
+
+        if ($claim === null) {
+            return $this->redirectToRoute('claim_policy');
+        }
+
+        if ($claim->getStatus() == Claim::STATUS_SUBMITTED &&
+            !($claim->getType() == Claim::TYPE_THEFT || $claim->getType() == Claim::TYPE_LOSS)
+        ) {
+            return $this->redirectToRoute('claimed_policy', ['policyId' => $policy->getId()]);
+        }
+
+        $claimFnolTheftLoss = new ClaimFnolTheftLoss();
+        $claimFnolTheftLoss->setClaim($claim);
+
+        $claimTheftLossForm = $this->get('form.factory')
+            ->createNamedBuilder('claim_theftloss_form', ClaimFnolTheftLossType::class, $claimFnolTheftLoss)
+            ->getForm();
+
+        if ('POST' === $request->getMethod()) {
+            if ($request->request->has('claim_theftloss_form')) {
+                $claimTheftLossForm->handleRequest($request);
+                if ($claimTheftLossForm->isValid()) {
+                    $claimsService = $this->get('app.claims');
+                    $claimsService->updateTheftLossDocuments($claim, $claimFnolTheftLoss);
+                    return $this->redirectToRoute('claimed_policy', ['policyId' => $policy->getId()]);
+                }
+            }
+        }
+
+        $data = [
+            'username' => $user->getName(),
+            'claimType' => $claim->getType(),
+            'network' => $claim->getNetwork(),
+            'claim_form' => $claimTheftLossForm->createView(),
+        ];
+        return $this->render('AppBundle:User:claimTheftLoss.html.twig', $data);
+    }
+
+    /**
+     * @Route("/claim/withdraw/{policyId}", name="withdraw_claimed_policy")
+     * @Template
+     */
+    public function claimPolicyWithdrawAction(Request $request, $policyId)
+    {
+        $user = $this->getUser();
+        $dm = $this->getManager();
+        $policyRepo = $dm->getRepository(Policy::class);
+        $policy = $policyRepo->find($policyId);
+
+        $this->denyAccessUnlessGranted(PolicyVoter::EDIT, $policy);
+
+        $claim = $policy->getLatestOpenedClaim();
+
+        if ($claim === null) {
+            return $this->redirectToRoute('claim_policy');
+        }
+
+        if ($claim->getStatus() != Claim::STATUS_SUBMITTED) {
+            return $this->redirectToRoute('claimed_policy', ['policyId' => $policy->getId()]);
+        }
+
+        $claimsService = $this->get('app.claims');
+        if ($claimsService->withdrawClaim($claim)) {
+            $this->addFlash(
+                'success',
+                "Your claim has been withdrawn."
+            );
+        } else {
+            $this->addFlash(
+                'error',
+                "Sorry, your claim cannot be withdrawn at the moment."
+            );
+        }
+
+        return $this->redirectToRoute('user_home');
     }
 
     /**
