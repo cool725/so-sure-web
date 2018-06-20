@@ -130,10 +130,14 @@
     z-index: 999;
 
     @include breakpoint(tablet) {
-        top: 60px;
+        top: 5px;
     }
 
     @include breakpoint(laptop) {
+        top: 55px;
+    }
+
+    @include breakpoint(desktop) {
         top: 5px;
     }
 }
