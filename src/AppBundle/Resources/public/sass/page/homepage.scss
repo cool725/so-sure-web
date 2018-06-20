@@ -1166,10 +1166,8 @@
 }
 
 .search-phone-form--homepage {
-    max-width: 450px;
     background-color: $white;
     padding: 0;
-    // position: relative;
     margin: 0 auto;
     z-index: 5;
 
@@ -1269,7 +1267,7 @@
 
     // search form - set width
     @include breakpoint(laptop) {
-        max-width: 550px;
+        max-width: 500px;
     }
 
     // search form - set width
@@ -1298,48 +1296,6 @@
     z-index: 999;
     padding: 0 10px;
     border-color: $light-blue;
-
-    .twitter-typeahead {
-
-        .tt-hint,
-        .tt-input {
-
-            @include breakpoint(laptop) {
-                height: 38px;
-                padding: 0 0 0 50px;
-            }
-        }
-
-        &:before {
-
-            @include breakpoint(laptop) {
-                font-size: 23px;
-                top: 2px;
-            }
-        }
-
-        @include breakpoint(tablet) {
-            font-size: 18px;
-        }
-
-        .tt-menu {
-            margin-top: 1px;
-        }
-    }
-
-    @include breakpoint(tablet) {
-        margin-left: auto;
-        margin-right: auto;
-    }
-
-    @include breakpoint(laptop) {
-        height: 40px;
-    }
-
-    @include breakpoint(desktop) {
-        top: 5px;
-        z-index: 1001;
-    }
 }
 
 .affix-bottom {
@@ -1355,9 +1311,22 @@
 
 // Sticky Search - Using Custom 'Stuck' non iOS Android/Desktop etc.
 .search-phone-form.stuck {
+    left: 50%;
     padding: 0 10px;
     border-color: $light-blue;
     z-index: 1001;
+
+    @include breakpoint(tablet) {
+        margin-left: -225px;
+    }
+
+    @include breakpoint(laptop) {
+        margin-left: -250px;
+    }
+
+    @include breakpoint(desktop) {
+        margin-left: -315px;
+    }
 
     .twitter-typeahead {
 
@@ -1386,15 +1355,6 @@
             margin-top: 1px;
         }
     }
-
-    @include breakpoint(tablet) {
-        margin-left: auto;
-        margin-right: auto;
-    }
-
-    @include breakpoint(laptop) {
-        height: 40px;
-    }
 }
 
 // Dropdown Stuck adjust for mobile - Android
@@ -1408,7 +1368,6 @@
     position: relative;
     font-size: 18px;
     margin: 50px 0;
-    // @include border-radius(20px);
 
     @include breakpoint(tablet) {
         font-size: 24px;
@@ -1427,20 +1386,10 @@
         content: open-quote;
         top: -10px; left: 50%;
         margin-left: -20px;
-
-        // @include breakpoint(tablet) {
-        //     top: 10px; left: -35px;
-        //     margin: 0;
-        // }
     }
 
     &:after {
         display: none;
         content: close-quote;
-
-        // @include breakpoint(tablet) {
-        //     display: block;
-        //     bottom: 10px; right: -35px;
-        // }
     }
 }
