@@ -89,6 +89,7 @@ class ClaimsService
         $claim->setPhoneToReach($claimFnol->getPhone());
         $claim->setTimeToReach($claimFnol->getTimeToReach());
         $claim->setSignature($claimFnol->getSignature());
+        $claim->setStatus(Claim::STATUS_FNOL);
 
         return $claim;
     }

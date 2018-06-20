@@ -1069,9 +1069,9 @@ class UserControllerTest extends BaseControllerTest
         self::verifyResponse(404);
     }
 
-    public function testUserClaimDamageWithNoActivePolicy()
+    public function testUserClaimWithNoActivePolicy()
     {
-        $email = self::generateEmail('testUserClaimDamageWithNoActivePolicy', $this);
+        $email = self::generateEmail('testUserClaimWithNoActivePolicy', $this);
         $password = 'foo';
         $phone = self::getRandomPhone(self::$dm);
         $user = self::createUser(
@@ -1093,9 +1093,38 @@ class UserControllerTest extends BaseControllerTest
         self::verifyResponse(404);
     }
 
-    public function testUserClaimDamage()
+    public function testUserClaimWithActivePolicyOpenedClaim()
     {
-        $email = self::generateEmail('testUserClaimDamage', $this);
+        $email = self::generateEmail('testUserClaimWithActivePolicyOpenedClaim', $this);
+        $password = 'foo';
+        $phone = self::getRandomPhone(self::$dm);
+        $user = self::createUser(
+            self::$userManager,
+            $email,
+            $password,
+            $phone,
+            self::$dm
+        );
+        $now = new \DateTime();
+        $policy = self::initPolicy($user, self::$dm, $phone, null, true, true);
+        $policy->setStatus(Policy::STATUS_CANCELLED);
+        $policy->setStart($now);
+
+        $claim = new Claim();
+        $claim->setStatus(Claim::STATUS_SUBMITTED);
+        $claim->setPolicy($policy);
+        $policy->addClaim($claim);
+        self::$dm->flush();
+
+        $claimPage = self::$router->generate('claim_policy');
+        $this->login($email, $password);
+        $crawler = self::$client->request('GET', $claimPage);
+        self::verifyResponse(404);
+    }
+
+    public function testUserClaimFnol()
+    {
+        $email = self::generateEmail('testUserClaimFnol', $this);
         $password = 'foo';
         $phone = self::getRandomPhone(self::$dm);
         $user = self::createUser(
@@ -1167,4 +1196,67 @@ class UserControllerTest extends BaseControllerTest
         self::verifyResponse(302);
         $this->assertTrue(self::$client->getResponse()->isRedirect(sprintf('/user/claim/%s', $policy->getId())));
     }
+
+    /*
+    public function testUserClaimDamage()
+    {
+        $email = self::generateEmail('testUserClaimDamage', $this);
+        $password = 'foo';
+        $phone = self::getRandomPhone(self::$dm);
+        $user = self::createUser(
+            self::$userManager,
+            $email,
+            $password,
+            $phone,
+            self::$dm
+        );
+        $now = new \DateTime();
+        $policy = self::initPolicy($user, self::$dm, $phone, null, true, true);
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        $policy->setStart($now);
+
+        $claim = new Claim();
+        $claim->setTime('2 am');
+        $claim->setWhere('so-sure offices');
+        $claim->setTimeToReach('2 pm');
+        $claim->setSignature('foo bar)';
+        $claim->setType(Claim::TYPE_DAMAGE);
+        $claim->setNetwork(Claim::NETWORK_O2);
+        $claim->setMessage('bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla');
+        $claim->setPolicyNumber($policy->getPolicyNumber());
+        $claim->setStatus(Claim::STATUS_FNOL);
+        $claim->setPolicy($policy);
+        $policy->addClaim($claim);
+        self::$dm->flush();
+
+        $proofOfUsage = new UploadedFile(
+            dirname(__FILE__).'/../uploads/photo.jpg',
+            'filename.jpg',
+            'image/jpeg',
+            9988
+        );
+
+        $claimPage = self::$router->generate('claimed_policy', ['policyId' => $policy->getId()]);
+        $this->login($email, $password);
+        $crawler = self::$client->request('GET', $claimPage);
+        self::verifyResponse(200);
+        $form = $crawler->selectButton('claim_damage_form[confirm]')->form();
+        $form['claim_damage_form[typeDetails]'] = Claim::DAMAGE_BROKEN_SCREEN;
+        $form['claim_damage_form[typeDetailsOther]'] = '';
+        $form['claim_damage_form[monthOfPurchase]'] = '12';
+        $form['claim_damage_form[yearOfPurchase]'] = '2018';
+        $form['claim_damage_form[phoneStatus]'] = Claim::PHONE_STATUS_NEW;
+        $form['claim_damage_form[isUnderWarranty]'] = true;
+
+        $form['claim_damage_form[timeToReach]'] = '2 pm';
+        $form['claim_damage_form[signature]'] = 'foo bar';
+        $form['claim_damage_form[type]'] = Claim::TYPE_DAMAGE;
+        $form['claim_damage_form[network]'] = Claim::NETWORK_O2;
+        $form['claim_damage_form[policyNumber]'] = $policy->getId();
+        $crawler = self::$client->submit($form);
+
+        self::verifyResponse(302);
+        $this->assertTrue(self::$client->getResponse()->isRedirect(sprintf('/user/claim/%s', $policy->getId())));
+    }
+    */ 
 }

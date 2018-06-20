@@ -23,6 +23,7 @@ class Claim
     const TYPE_WARRANTY = 'warranty';
     const TYPE_EXTENDED_WARRANTY = 'extended-warranty';
 
+    const STATUS_FNOL = 'fnol';
     const STATUS_SUBMITTED = 'submitted';
     const STATUS_INREVIEW = 'in-review';
     const STATUS_APPROVED = 'approved';
@@ -377,7 +378,7 @@ class Claim
     protected $type;
 
     /**
-     * @Assert\Choice({"submitted", "in-review", "approved", "settled", "declined",
+     * @Assert\Choice({"fnol", "submitted", "in-review", "approved", "settled", "declined",
      *                 "withdrawn", "pending-closed"}, strict=true)
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
@@ -768,6 +769,7 @@ class Claim
         }
         
         if (!in_array($status, [
+            self::STATUS_FNOL,
             self::STATUS_SUBMITTED,
             self::STATUS_APPROVED,
             self::STATUS_DECLINED,
