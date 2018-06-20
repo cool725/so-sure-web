@@ -45,6 +45,7 @@
                                             <p class="lead text-left">I <span class="h4">{{ username }}</span> am providing all accurate and truthful information. I understand that failure to do so will invalidate my claim and could lead to me being prosecuted.<span class="text-blue">*</span></label></p>
                                             {{ form_widget(claim_form.signature, { 'attr': {'placeholder': 'Type in your full name to sign this document', 'class': 'form-control'}}) }}
                                             <div class="help-block with-errors">{{ form_errors(claim_form.signature) }}</div>
+                                            <input type="hidden" value="{{ username }}" id="username_signature">
                                         </div>
                                     </div>
                                 </div>

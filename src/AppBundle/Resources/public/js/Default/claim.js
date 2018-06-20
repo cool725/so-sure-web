@@ -29,6 +29,10 @@ sosure.claim = (function() {
             focusCleanup: true,
             validClass: 'has-success',
             rules: {
+                "claim_form[signature]" : {
+                    required: true,
+                    equalTo: '#username_signature'
+                },
                 "claim_form[name]" : {
                     required: true,
                     fullName: true
@@ -59,6 +63,10 @@ sosure.claim = (function() {
                 }
             },
             messages: {
+                "claim_form[signature]" : {
+                    required: 'Please sign the declaration',
+                    equalTo: "Name doesn't match"
+                },
                 "claim_form[name]": {
                     required: 'Please enter your full name',
                     fullName: 'Please enter your first and last name'
