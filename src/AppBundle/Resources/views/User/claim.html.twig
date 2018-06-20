@@ -156,19 +156,14 @@
                         </div>
 
                         <div id="tab-claimfnol-confirm" class="tab-pane fade in {% if active_tab == 'claimfnol-confirm' %}active{% endif %}">
-                            {{ form_start(claim_confirm_form) }}
-                            <p>I, {{ username }}, certify that my {{ phone }} was {{ claim_type }} after I purchased my policy on {{ policy_date|date('d M Y H:i', 'Europe/London') }}.</p>
-
-                            <p>I acknowledge that not telling the truth would constitute insurance fraud, which is a criminal offence. I agree to this and I understand that I could be prosecuted if I were not telling the truth.</p>
-
-
-                            <div class="form-group">
-                                {{ form_widget(claim_confirm_form.submit, {'label': 'I confirm', 'attr': {'class': 'btn btn-green btn-block btn-pad'}}) }}
-
-                            </div>
-
-                            <p>If any of the information above is incorrect, please contact <a href="email:mailto@wearesosure.com">hello@wearesosure.com</a> directly</p>
-
+                            {{ form_start(claim_confirm_form, { 'attr': { 'class': 'text-center'}}) }}
+                                <p class="lead">I, {{ username }}, certify that:</p>
+                                <p class="lead"><mark>My <span class="h4">{{ phone }}</span> was <span class="h4">{{ claim_type }}</span> after I purchased my policy on <span class="h4">{{ policy_date|date('d M Y H:i', 'Europe/London') }}</span>.</mark></p>
+                                <p class="lead">I acknowledge that not telling the truth would constitute insurance fraud, which is a criminal offence. I agree to this and I understand that I could be prosecuted if I were not telling the truth.</p>
+                                <p><small>If any of the information above is incorrect, please contact <a href="email:mailto@wearesosure.com">hello@wearesosure.com</a> directly before confirming.</small></p>
+                                <div class="form-group">
+                                    {{ form_widget(claim_confirm_form.submit, {'label': 'I confirm', 'attr': {'class': 'btn btn-green btn-lg'}}) }}
+                                </div>
                             {{ form_end(claim_confirm_form) }}
                         </div>
 
