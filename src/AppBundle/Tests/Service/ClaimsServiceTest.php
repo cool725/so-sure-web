@@ -89,7 +89,7 @@ class ClaimsServiceTest extends WebTestCase
         $this->assertEquals($policy->getPhone()->getId(), $lostPhone->getPhone()->getId());
     }
 
-    public function testDuplicateClaim()
+    public function testDuplicateAddClaim()
     {
         $userA = static::createUser(
             static::$userManager,
@@ -117,6 +117,43 @@ class ClaimsServiceTest extends WebTestCase
 
         $claimB = new Claim();
         $claimB->setStatus(Claim::STATUS_INREVIEW);
+        $claimB->setType(Claim::TYPE_THEFT);
+        $claimB->setNumber($claimNumber);
+        // same policy, same number, different status allowed
+        $this->assertTrue(static::$claimsService->addClaim($policyA, $claimB));
+        // not allowed for diff policy
+        $this->assertFalse(static::$claimsService->addClaim($policyB, $claimB));
+    }
+
+    public function testDuplicateUpdateClaim()
+    {
+        $userA = static::createUser(
+            static::$userManager,
+            static::generateEmail('dup-a', $this),
+            'bar'
+        );
+        $phoneA = static::getRandomPhone(static::$dm);
+        $policyA = static::initPolicy($userA, static::$dm, $phoneA, null, true, true);
+        
+        $userB = static::createUser(
+            static::$userManager,
+            static::generateEmail('dup-b', $this),
+            'bar'
+        );
+        $phoneB = static::getRandomPhone(static::$dm);
+        $policyB = static::initPolicy($userB, static::$dm, $phoneB, null, true, true);
+
+        $claimNumber = rand(1, 999999);
+
+        $claimA = new Claim();
+        $claimA->setStatus(Claim::STATUS_SUBMITTED);
+        $claimA->setType(Claim::TYPE_THEFT);
+        $this->assertTrue(static::$claimsService->addClaim($policyA, $claimA));
+
+        $claimA->setNumber($claimNumber);
+
+        $claimB = new Claim();
+        $claimB->setStatus(Claim::STATUS_SUBMITTED);
         $claimB->setType(Claim::TYPE_THEFT);
         $claimB->setNumber($claimNumber);
         // same policy, same number, different status allowed

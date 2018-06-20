@@ -1503,4 +1503,51 @@ class UserControllerTest extends BaseControllerTest
         $updatedClaim = $updatedPolicy->getLatestOpenedClaim();
         $this->assertEquals(Claim::STATUS_SUBMITTED, $updatedClaim->getStatus());
     }
+
+    public function testUserWithdrawClaim()
+    {
+        $email = self::generateEmail('testUserWithdrawClaim', $this);
+        $password = 'foo';
+        $phone = self::getRandomPhone(self::$dm);
+        $user = self::createUser(
+            self::$userManager,
+            $email,
+            $password,
+            $phone,
+            self::$dm
+        );
+        $now = new \DateTime();
+        $policy = self::initPolicy($user, self::$dm, $phone, null, true, true);
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        $policy->setStart($now);
+
+        $claim = new Claim();
+        $claim->setIncidentDate($now);
+        $claim->setIncidentTime('2 am');
+        $claim->setLocation('so-sure offices');
+        $claim->setTimeToReach('2 pm');
+        $claim->setPhoneToReach( self::generateRandomMobile());
+        $claim->setSignature('foo bar');
+        $claim->setType(Claim::TYPE_THEFT);
+        $claim->setNetwork(Claim::NETWORK_O2);
+        $claim->setDescription('bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla');
+        $claim->setStatus(Claim::STATUS_SUBMITTED);
+        $claim->setPolicy($policy);
+        $policy->addClaim($claim);
+        self::$dm->flush();
+
+        $claimPage = self::$router->generate('withdraw_claimed_policy', ['policyId' => $policy->getId()]);
+        $this->login($email, $password);
+        $crawler = self::$client->request('GET', $claimPage);
+        self::verifyResponse(302);
+
+        $userPage = self::$router->generate('user_home');
+        $crawler = self::$client->request('GET', $userPage);
+
+        $this->expectFlashSuccess($crawler, 'Your claim has been withdrawn.');
+
+        $updatedPolicy = $this->assertPolicyByIdExists(self::$client->getContainer(), $policy->getId());
+        $updatedClaim = $updatedPolicy->getLatestClaim();
+        $this->assertEquals(Claim::STATUS_WITHDRAWN, $updatedClaim->getStatus());
+    }
 }

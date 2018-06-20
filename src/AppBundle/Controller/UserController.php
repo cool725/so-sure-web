@@ -1502,7 +1502,7 @@ class UserController extends BaseController
      * @Route("/claim/{policyId}", name="claimed_policy")
      * @Template
      */
-    public function claimPolicyAction(Request $request, $policyId)
+    public function claimPolicyAction($policyId)
     {
         $user = $this->getUser();
         $dm = $this->getManager();
@@ -1654,7 +1654,7 @@ class UserController extends BaseController
      * @Route("/claim/withdraw/{policyId}", name="withdraw_claimed_policy")
      * @Template
      */
-    public function claimPolicyWithdrawAction(Request $request, $policyId)
+    public function claimPolicyWithdrawAction($policyId)
     {
         $user = $this->getUser();
         $dm = $this->getManager();
