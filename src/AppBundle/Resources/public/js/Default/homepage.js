@@ -13,8 +13,8 @@ $(function(){
     });
 
     // Stuck, replace affix for non iOS
-    var device = navigator.userAgent.toLowerCase();
-    var agentID = device.match(/(iphone|ipod|ipad)/);
+    // var device = navigator.userAgent.toLowerCase();
+    var agentID = sosure.globals.device.match(/(iphone|ipod|ipad)/);
 
     $(window).bind('load', function() {
 

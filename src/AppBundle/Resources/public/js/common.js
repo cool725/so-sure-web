@@ -4,9 +4,14 @@ var sosure = sosure || {};
 sosure.globals = (function() {
     var self = {};
     self.device_category = null;
+    self.device = null;
 
     self.setDevice = function(device_category) {
         self.device_category = device_category;
+    }
+
+    self.setAgent = function(device) {
+        self.device = navigator.userAgent.toLowerCase();
     }
 
     self.policyTerms = function() {
@@ -30,6 +35,7 @@ sosure.globals = (function() {
 
 $(function(){
     sosure.globals.setDevice($('#ss-root').data('device-category'));
+    sosure.globals.setAgent();
 });
 
 $(function(){
