@@ -1049,6 +1049,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             'suggested_cancellation_date' => $now->add(new \DateInterval('P30D')),
             'claim_types' => Claim::$claimTypes,
             'phones' => $dm->getRepository(Phone::class)->findActive()->getQuery()->execute(),
+            'now' => new \DateTime(),
         ];
     }
 
