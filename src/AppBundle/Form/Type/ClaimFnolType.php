@@ -26,7 +26,7 @@ class ClaimFnolType extends AbstractType
      * @var boolean
      */
     private $required;
- 
+
     /**
      * @param boolean $required
      */
@@ -66,6 +66,7 @@ class ClaimFnolType extends AbstractType
                 'required' => true,
                 'placeholder' => 'My network operator is ...',
                 'choices' => Claim::$networks,
+                'preferred_choices' => ['EE', 'giffgaff', 'O2', 'Tesco Mobile', 'Three', 'Vodafone'],
             ])
             ->add('message', TextareaType::class)
             ->add('submit', SubmitType::class)
