@@ -2077,9 +2077,16 @@ abstract class Policy
         return $amountToRefund;
     }
 
-    public function getProratedRefundAmount($date = null)
+    public function getProratedAmount($date = null)
     {
         $used = $this->getPremium()->getYearlyPremiumPrice() * $this->getProrataMultiplier($date);
+
+        return $this->toTwoDp($used);
+    }
+
+    public function getProratedRefundAmount($date = null)
+    {
+        $used = $this->getProratedAmount($date);
         $paid = $this->getPremiumPaid();
 
         return $this->toTwoDp($paid - $used);
