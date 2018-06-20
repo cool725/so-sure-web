@@ -22,8 +22,11 @@
 {% elseif type is defined and type == 'homepage-sticky' %}
     {% set formID = 'search-phone-form-homepage' %}
     {% set uid    = '-1' %}
-    {% set stickySearch = true %}
 {% elseif type is defined and type == 'ebay' %}
+    {% set formID = 'search-phone-form-homepage' %}
+    {% set uid    = '-1' %}
+    {% set placeholder = 'Find your phone to get a quote' %}
+{% elseif type is defined and type == 'starling' %}
     {% set formID = 'search-phone-form-homepage' %}
     {% set uid    = '-1' %}
     {% set placeholder = 'Find your phone to get a quote' %}
@@ -46,8 +49,7 @@
 {% endif %}
 
 <div id="select-phone-data"
-     class="search-phone-form search-phone-form--homepage"
-     data-sticky-search="true">
+     class="search-phone-form search-phone-form--homepage">
 
     <form method="get"
           id="{{ formID }}{{ uid }}"
@@ -67,5 +69,5 @@
     </form>
 
     {# TODO: Move to footer #}
-    {% include 'AppBundle::Default/loadingWidget.html.twig' with { 'class': 'loading-overlay-widget--show'} %}
+    {# {% include 'AppBundle::Default/loadingWidget.html.twig' with { 'class': 'loading-overlay-widget--show'} %} #}
 </div>

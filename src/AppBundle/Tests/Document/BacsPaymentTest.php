@@ -14,6 +14,7 @@ use AppBundle\Document\PhonePrice;
 use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Document\CurrencyTrait;
+use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\User;
 
 /**
@@ -39,6 +40,22 @@ class BacsPaymentTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(new \DateTime('2018-01-01'), $bacs->getSubmittedDate());
         $this->assertEquals(new \DateTime('2018-01-03'), $bacs->getBacsCreditDate());
         $this->assertEquals(new \DateTime('2018-01-08'), $bacs->getBacsReversedDate());
+
+        $bacs = new BacsPayment();
+        $bacs->setSubmittedDate(new \DateTime('2018-02-01'));
+        $bacs->submit(new \DateTime('2018-01-01'));
+        $this->assertEquals(new \DateTime('2018-02-01'), $bacs->getDate());
+        $this->assertEquals(new \DateTime('2018-02-01'), $bacs->getSubmittedDate());
+        $this->assertEquals(new \DateTime('2018-02-05'), $bacs->getBacsCreditDate());
+        $this->assertEquals(new \DateTime('2018-02-08'), $bacs->getBacsReversedDate());
+
+        $bacs = new BacsPayment();
+        $bacs->setSubmittedDate(new \DateTime('2018-01-01'));
+        $bacs->submit(new \DateTime('2018-02-01'));
+        $this->assertEquals(new \DateTime('2018-02-01'), $bacs->getDate());
+        $this->assertEquals(new \DateTime('2018-02-01'), $bacs->getSubmittedDate());
+        $this->assertEquals(new \DateTime('2018-02-05'), $bacs->getBacsCreditDate());
+        $this->assertEquals(new \DateTime('2018-02-08'), $bacs->getBacsReversedDate());
     }
 
     public function testInProgress()
@@ -75,6 +92,9 @@ class BacsPaymentTest extends \PHPUnit\Framework\TestCase
 
     public function testApprove()
     {
+        $scheduledPayment = new ScheduledPayment();
+        $scheduledPayment->setStatus(ScheduledPayment::STATUS_PENDING);
+
         $bankAccount = new BankAccount();
         $bacs = new BacsPaymentMethod();
         $bacs->setBankAccount($bankAccount);
@@ -87,6 +107,8 @@ class BacsPaymentTest extends \PHPUnit\Framework\TestCase
         $bacs->setAmount(6);
         $bacs->submit(new \DateTime('2018-01-01'));
         $bacs->setStatus(BacsPayment::STATUS_GENERATED);
+        $bacs->setScheduledPayment($scheduledPayment);
+        $scheduledPayment->setPayment($bacs);
 
         $premium = new PhonePremium();
         $premium->setIptRate(0.12);
@@ -100,6 +122,7 @@ class BacsPaymentTest extends \PHPUnit\Framework\TestCase
 
         $this->assertEquals(Bacs::MANDATE_SUCCESS, $bacs->getStatus());
         $this->assertTrue($bacs->isSuccess());
+        $this->assertEquals(ScheduledPayment::STATUS_SUCCESS, $bacs->getScheduledPayment()->getStatus());
 
         $this->assertEquals($now, $bankAccount->getLastSuccessfulPaymentDate());
     }
@@ -128,10 +151,15 @@ class BacsPaymentTest extends \PHPUnit\Framework\TestCase
 
     public function testReject()
     {
+        $scheduledPayment = new ScheduledPayment();
+        $scheduledPayment->setStatus(ScheduledPayment::STATUS_PENDING);
+
         $bacs = new BacsPayment();
         $bacs->setAmount(6);
         $bacs->submit(new \DateTime('2018-01-01'));
         $bacs->setStatus(BacsPayment::STATUS_GENERATED);
+        $bacs->setScheduledPayment($scheduledPayment);
+        $scheduledPayment->setPayment($bacs);
 
         $policy = new PhonePolicy();
 
@@ -146,7 +174,7 @@ class BacsPaymentTest extends \PHPUnit\Framework\TestCase
 
         $this->assertEquals(Bacs::MANDATE_FAILURE, $bacs->getStatus());
         $this->assertFalse($bacs->isSuccess());
-
+        $this->assertEquals(ScheduledPayment::STATUS_FAILED, $bacs->getScheduledPayment()->getStatus());
     }
 
     /**

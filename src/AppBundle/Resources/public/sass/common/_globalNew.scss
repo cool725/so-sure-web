@@ -77,7 +77,7 @@ p {
 	margin: 0 auto;
 
 	@include breakpoint(tablet) {
-		max-width: 960px;
+		// max-width: 960px;
 		font-size: 30px;
 		line-height: 60px;
 	}
@@ -220,16 +220,6 @@ mark.mgreen {
 	/* Hide the ProdPad Got Feedback button floating at bottom of page */
 	#pp-cfp-trigger {
 	    display: none !important;
-	}
-
-	.login-box {
-		min-height: 250px;
-		max-width: 345px;
-		margin: 0 auto;
-
-		&--controls {
-			min-height: 0;
-		}
 	}
 
 // Google Maps

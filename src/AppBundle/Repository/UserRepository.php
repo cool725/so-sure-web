@@ -16,6 +16,8 @@ class UserRepository extends DocumentRepository
     use DateTrait;
     use PhoneTrait;
 
+    const NEAR_MOBILE_NUMBER_RANGE = 10;
+
     public function findUsersInRole($role)
     {
         $qb = $this->createQueryBuilder();
@@ -102,6 +104,29 @@ class UserRepository extends DocumentRepository
         }
 
         return false;
+    }
+
+    public function getNearMobileNumberCount(User $user)
+    {
+        if (!$user->getMobileNumber()) {
+            return null;
+        }
+
+        $qb = $this->createQueryBuilder();
+        $qb->field('id')->notEqual($user->getId());
+        // strip +44
+        $number = mb_substr($user->getMobileNumber(), 3);
+        $lt = $this->normalizeUkMobile($number + self::NEAR_MOBILE_NUMBER_RANGE, true);
+        $gt = $this->normalizeUkMobile($number - self::NEAR_MOBILE_NUMBER_RANGE, true);
+
+        // {"mobileNumber":{"$gte":"+447781444400","$lte":"+447781444409"}}
+        $qb->field('mobileNumber')->lte($lt)->gte($gt);
+
+        return $qb
+            ->getQuery()
+            ->execute()
+            ->count();
+
     }
 
     public function getDuplicatePostcodeCount(User $user)

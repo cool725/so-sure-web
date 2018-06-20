@@ -1,0 +1,44 @@
+{% extends 'base.html.twig' %}
+
+{# Set vars #}
+{% set new_stylesheet = 1 %}
+{% set new_footer = 1 %}
+
+{% block title %}so-sure - Better Phone Insurance{% endblock %}
+{% block meta %}
+    <meta name="description" content="Social mobile phone insurance that's better and up to 80% cheaper when you connect with friends don't claim. Download our app now to see how much you could save."/>
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {% stylesheets output='css/*.css'
+    '@AppBundle/Resources/public/sass/page/cancel.scss'
+    %}
+    <link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
+{% endblock %}
+
+{% block body %}
+
+    <section class="section--pad">
+        <div class="container text-center">
+            <div class="row">
+                <div class="col-md-8 col-md-offset-2">
+                    <img src="{{ cdn_url }}/images/mobile_mike/so-sure_mobile_mike_damage_dark.png" width="220px" class="img-center img-circle">
+                    <h1>Cancel your policy</h1>
+                    <p class="lead">Hi {{ policy.user.firstname }}, we have received your request and a member of the Policy Team will contact you within 1-2 working days so we can process the cancellation.</p>
+                    <p class="lead">If you require urgent assistance please contact us here on our live chat</p>
+                    <div class="h4">Monday-Friday 9am-5.30pm</div>
+                    <a href="mailto:support@wearesosure.com" class="btn btn-blue btn-pad open-intercom"><i class="fa fa-commenting-o" aria-hidden="true"></i> Chat to a human</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {% javascripts
+    '@AppBundle/Resources/public/js/Purchase/cancel.js' %}
+    <script src="{{ asset_url }}"></script>{% endjavascripts %}
+{% endblock %}

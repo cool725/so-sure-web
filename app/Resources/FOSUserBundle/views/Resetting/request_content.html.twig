@@ -1,15 +1,20 @@
-<form action="{{ path('fos_user_resetting_send_email') }}" method="POST" class="fos_user_resetting_request login-box" autocomplete="off">
-
-        <h1 class="h2">Need a new password? No problem.</h1>
-        <p>Just enter your email below and we'll send you link to reset it.</p>
-        <div class="form-group">
-            <input type="email" id="username" name="username" required="required" class="reset form-control input-lg" placeholder="Email Address"/>
-        </div>
-        {% if invalid_username is defined %}
-            <p class="error-text">Invalid email address</p>
-        {% endif %}
-        <div class="form-group" >
-            <input type="submit" value="Send me a link!" class="btn btn-primary btn-block" />
-        </div>
-
-</form>
+<div class="panel login__panel">
+    <div class="panel-body">
+        <h1 class="text-center h2">Reset Password</h1>
+        <p>Enter your email and we'll send you a reset link.</p>
+        <form action="{{ path('fos_user_resetting_send_email') }}" method="POST" class="fos_user_resetting_request login-box" autocomplete="off">
+            <div class="form-group">
+                <input type="email" id="username" name="username" required="required" class="reset form-control input-lg" placeholder="Email Address"/>
+            </div>
+            {% if invalid_username is defined %}
+                <p class="error-text">Invalid email address</p>
+            {% endif %}
+            <div class="form-group" >
+                <input type="submit" value="Send me a link!" class="btn btn-blue btn-pad btn-block" />
+            </div>
+            <div class="form-group">
+                <small><a href="{{ path('fos_user_security_login') }}" class="btn btn-link btn-xs">back to login</a></small>
+            </div>
+        </form>
+    </div>
+</div>

@@ -14,9 +14,12 @@ class RequestServiceTest extends WebTestCase
     use \AppBundle\Tests\UserClassTrait;
     protected static $container;
     protected static $requestService;
+    protected static $client;
 
     public static function setUpBeforeClass()
     {
+        self::$client = self::createClient();
+
          //start the symfony kernel
          $kernel = static::createKernel();
          $kernel->boot();
@@ -61,6 +64,54 @@ class RequestServiceTest extends WebTestCase
     public function testIsExcludedAnalyticsUserAgentBlank()
     {
         $this->assertFalse(self::$requestService->isExcludedAnalyticsUserAgent(''));
+    }
+
+    public function testIsExcludedPreviewPrefetch()
+    {
+        $crawler =  static::$client->request(
+            "GET",
+            "/ops/preview-prefetch"
+        );
+        $data = $this->verifyResponse(200);
+        $this->assertFalse($data['excluded']);
+
+        $crawler =  static::$client->request(
+            "GET",
+            "/ops/preview-prefetch",
+            array(),
+            array(),
+            array(
+                "HTTP_X-PURPOSE" => "preview",
+                "HTTP_X-FOO" => "bar"
+            ),
+            []
+        );
+        $data = $this->verifyResponse(200);
+        $this->assertTrue($data['excluded']);
+        $this->assertContains('preview', $data['headers']);
+        $this->assertContains('bar', $data['headers']);
+
+        $crawler =  static::$client->request(
+            "GET",
+            "/ops/preview-prefetch",
+            array(),
+            array(),
+            array(
+                "HTTP_X-MOZ" => "prefetch"
+            ),
+            []
+        );
+        $data = $this->verifyResponse(200);
+        $this->assertTrue($data['excluded']);
+        $this->assertContains('prefetch', $data['headers']);
+    }
+
+    protected function verifyResponse($statusCode)
+    {
+        $this->assertEquals($statusCode, self::$client->getResponse()->getStatusCode());
+        $data = json_decode(self::$client->getResponse()->getContent(), true);
+
+        return $data;
     }
 
     public function testIsExcludedAnalyticsUserAgentTrue()

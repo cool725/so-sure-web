@@ -15,6 +15,12 @@
     }
 }
 
+// Hide the form on load
+.select-phone-form {
+    visibility: hidden;
+    opacity: 0;
+}
+
 // Dynamic addition
 .twitter-typeahead {
     width: 100%;

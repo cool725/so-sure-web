@@ -4,6 +4,7 @@ namespace AppBundle\Document\Payment;
 
 use AppBundle\Document\BacsPaymentMethod;
 use AppBundle\Document\DateTrait;
+use AppBundle\Document\ScheduledPayment;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -145,6 +146,13 @@ class BacsPayment extends Payment
         if (!$date) {
             $date = new \DateTime();
         }
+
+        // if payment has already been scheduled for submission in the future (e.g. scheduled payment a few days in
+        // advance), then base off of that date instead
+        if ($this->getSubmittedDate() > $date) {
+            $date = $this->getSubmittedDate();
+        }
+
         $this->setDate($date);
         $this->setSubmittedDate($date);
         $this->setBacsCreditDate($this->addBusinessDays($date, self::DAYS_CREDIT));
@@ -193,6 +201,7 @@ class BacsPayment extends Payment
             ));
         }
 
+        $this->setDate($date);
         $this->setStatus(self::STATUS_SUCCESS);
         $this->setSuccess(true);
 
@@ -201,10 +210,18 @@ class BacsPayment extends Payment
         /** @var BacsPaymentMethod $bacsPaymentMethod */
         $bacsPaymentMethod = $this->getPolicy()->getUser()->getPaymentMethod();
         $bacsPaymentMethod->getBankAccount()->setLastSuccessfulPaymentDate($date);
+
+        if ($this->getScheduledPayment()) {
+            $this->getScheduledPayment()->setStatus(ScheduledPayment::STATUS_SUCCESS);
+        }
     }
 
     public function reject(\DateTime $date = null)
     {
+        if (!$date) {
+            $date = new \DateTime();
+        }
+
         if (!$this->canAction($date)) {
             throw new \Exception(sprintf(
                 'Attempting to action before reveral date (%s) is past',
@@ -212,8 +229,13 @@ class BacsPayment extends Payment
             ));
         }
 
+        $this->setDate($date);
         $this->setStatus(self::STATUS_FAILURE);
         $this->setSuccess(false);
+
+        if ($this->getScheduledPayment()) {
+            $this->getScheduledPayment()->setStatus(ScheduledPayment::STATUS_FAILED);
+        }
     }
 
     public function isSuccess()

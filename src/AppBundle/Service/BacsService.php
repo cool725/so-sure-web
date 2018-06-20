@@ -1204,6 +1204,7 @@ class BacsService
 
     public function exportPaymentsDebits($prefix, \DateTime $date, $serialNumber, &$metadata, $includeHeader = false)
     {
+        $accounts = [];
         $lines = [];
         if ($includeHeader) {
             $lines[] = $this->getHeader();
@@ -1323,12 +1324,21 @@ class BacsService
                 sprintf('"%s"', $scheduledPayment->getPolicy()->getId()),
                 sprintf('"SP-%s"', $scheduledPayment->getId()),
             ]);
+            $payment->setSubmittedDate($scheduledDate);
             $payment->setStatus(BacsPayment::STATUS_GENERATED);
             $payment->setSerialNumber($serialNumber);
             $scheduledPayment->setStatus(ScheduledPayment::STATUS_PENDING);
             if ($bankAccount->isFirstPayment()) {
                 $bankAccount->setFirstPayment(false);
             }
+            $accountData = sprintf('%s%s', $bankAccount->getSortCode(), $bankAccount->getAccountNumber());
+            if (in_array($accountData, $accounts)) {
+                $this->logger->warning(sprintf(
+                    'More than 1 payment for Policy %s is present in the bacs file',
+                    $scheduledPayment->getPolicy()->getId()
+                ));
+            }
+            $accounts[] = $accountData;
         }
 
         return $lines;

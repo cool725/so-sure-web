@@ -46,7 +46,7 @@ class SixpackService
     const EXPERIMENT_HOMEPAGE_AA_V2 = 'homepage-aa-v2';
     const EXPERIMENT_APP_SHARE_METHOD = 'app-share-method';
     const EXPERIMENT_APP_PICSURE_LOCATION = 'app-picsure-location';
-    const EXPERIMENT_STEP_3 = 'step-3-payment-new';
+    //const EXPERIMENT_STEP_3 = 'step-3-payment-new';
     const EXPERIMENT_PURCHASE_FLOW_BACS = 'purchase-flow-bacs';
     const EXPERIMENT_CPC_QUOTE_HOMEPAGE = 'cpc-quote-or-homepage';
     const EXPERIMENT_DOB = 'purchase-funnel-dob-dropdown';
@@ -68,8 +68,14 @@ class SixpackService
     // Exp 2
     const EXPERIMENT_AD_LANDING = 'ad-landing';
     // Exp 3
-
+    const EXPERIMENT_STARLING_LANDING = 'starling-landing';
     // Exp 4
+    const EXPERIMENT_PHONE_REPLACEMENT_MATCHING_ADVERT = 'phone-replacement-matching-advert';
+    // Exp 5
+
+    // Exp 6
+
+    // Exp 7
 
     const ALTERNATIVES_SHARE_MESSAGE_SIMPLE = 'simple';
     const ALTERNATIVES_APP_SHARE_METHOD_NATIVE = 'native';
@@ -85,7 +91,7 @@ class SixpackService
 
     public static $unauthExperiments = [
         self::EXPERIMENT_HOMEPAGE_AA_V2,
-        self::EXPERIMENT_STEP_3,
+        //self::EXPERIMENT_STEP_3,
         self::EXPERIMENT_PURCHASE_FLOW_BACS,
         self::EXPERIMENT_CPC_QUOTE_HOMEPAGE,
         self::EXPERIMENT_DOB,
@@ -106,8 +112,15 @@ class SixpackService
         // Exp 2
         self::EXPERIMENT_AD_LANDING,
         // Exp 3
-
+        self::EXPERIMENT_STARLING_LANDING,
         // Exp 4
+        self::EXPERIMENT_PHONE_REPLACEMENT_MATCHING_ADVERT,
+        // Exp 5
+
+        // Exp 6
+
+        // Exp 7
+
     ];
 
     public static $authExperiments = [
@@ -132,7 +145,7 @@ class SixpackService
      */
     public static $purchaseConversionSimple = [
         self::EXPERIMENT_CPC_QUOTE_HOMEPAGE,
-        self::EXPERIMENT_STEP_3,
+        //self::EXPERIMENT_STEP_3,
         self::EXPERIMENT_PURCHASE_FLOW_BACS,
         self::EXPERIMENT_72_REPLACEMENT,
         self::EXPERIMENT_PICSURE_SECTION,
@@ -146,8 +159,15 @@ class SixpackService
         // Exp 2
         self::EXPERIMENT_AD_LANDING,
         // Exp 3
-
+        self::EXPERIMENT_STARLING_LANDING,
         // Exp 4
+        self::EXPERIMENT_PHONE_REPLACEMENT_MATCHING_ADVERT,
+        // Exp 5
+
+        // Exp 6
+
+        // Exp 7
+
     ];
 
     /**
@@ -169,6 +189,13 @@ class SixpackService
         // Exp 3
 
         // Exp 4
+
+        // Exp 5
+
+        // Exp 6
+
+        // Exp 7
+
     ];
 
     /** @var LoggerInterface */
@@ -211,7 +238,8 @@ class SixpackService
         $alternatives,
         $logMixpanel = self::LOG_MIXPANEL_NONE,
         $trafficFraction = 1,
-        $clientId = null
+        $clientId = null,
+        $force = null
     ) {
         // default to first option
         $result = $alternatives[0];
@@ -237,6 +265,10 @@ class SixpackService
                 'client_id' => $clientId,
                 'traffic_fraction' => $trafficFraction,
             ];
+            if ($force) {
+                $data['force'] = $force;
+                $data['record_force'] = "true";
+            }
             $query = http_build_query($data);
             foreach ($alternatives as $alternative) {
                 $query = sprintf("%s&alternatives=%s", $query, urlencode($alternative));

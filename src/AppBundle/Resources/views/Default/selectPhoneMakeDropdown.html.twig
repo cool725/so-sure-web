@@ -19,7 +19,6 @@
 <div id="select-phone-data"
      class="dropdown-phone-form {% if memoptions is defined and memoptions == 'single-progressive-dropdown' %}dropdown-phone-form-single-mem{% endif %}"
      data-phones='{{ phones|json_encode|raw }}'
-     data-sticky-search="true"
      data-show-single-mem-opt="{% if memoptions is defined and memoptions == 'single-progressive-dropdown' %}true{% else %}false{% endif %}">
     {{ form_start(form_phone, { 'attr': { 'id': formId, 'autocomplete': 'off' }}) }}
         <div class="form-group">

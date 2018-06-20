@@ -164,7 +164,11 @@
                                         {% if moneyBackGuarantee is defined and moneyBackGuarantee == 'money-back-guarantee' %}
                                             <mark class="mgreen">14 day money back guarantee 💰🔙</mark>
                                         {% else %}
-                                            Next working day replacement or repair
+                                            {% if replacement is defined and replacement == 'seventytwo-hours' %}
+                                                Working device within 72 hours
+                                            {% else %}
+                                                Next working day replacement or repair
+                                            {% endif %}
                                         {% endif %}
                                     </li>
                                     <li><i class="fa fa-check text-blue" aria-hidden="true"></i> 24/7 live support</li>
