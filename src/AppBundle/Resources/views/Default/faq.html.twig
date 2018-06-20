@@ -5,6 +5,8 @@
 {% set new_footer = 1 %}
 {% set useDropdownSearch = 1 %}
 {% set include_emoji = 1 %}
+{% set scrollspy = 1 %}
+{% set scrollspyID = '#faqs__nav' %}
 
 {% block title %}so-sure - Frequently Asked Questions{% endblock %}
 {% block meta %}
@@ -21,7 +23,7 @@
 
 {% block body %}
 
-    <section class="section--pad faqs"  data-spy="scroll" data-target="#faqs__nav">
+    <section class="section--pad faqs">
         <div class="container">
             <div class="row">
                 <div class="col-md-9">
@@ -43,7 +45,7 @@
                             </a>
                         </h3>
                         <div class="collapse" id="who-is-so-sure">
-                            <p>We’re here because consumers deserve better when it comes to insurance.</p>
+                            <p>We're here because consumers deserve better when it comes to insurance.</p>
                             <p>When we launched so-sure in 2016, we wanted to revolutionise the industry by making insurance fairer, reliable and rewarding for honest consumers all over the world.</p>
                         </div>
 
@@ -57,7 +59,7 @@
                             </a>
                         </h3>
                         <div class="collapse" id="our-vision-and-misson">
-                            <p>Our vision is to turn the insurance industry on its head by giving our customers the service they deserve. Provide a new, revolutionary social insurance concept that is significantly cheaper for careful groups of families and friends. We’re here protecting customers when they claim and rewarding them when they don't.</p>
+                            <p>Our vision is to turn the insurance industry on its head by giving our customers the service they deserve. Provide a new, revolutionary social insurance concept that is significantly cheaper for careful groups of families and friends. We're here protecting customers when they claim and rewarding them when they don't.</p>
                             <p>Our concept is inspired by the origins of insurance. Back in the seventeenth century - when the concept of insurance was born out of the ship-owner community - insurance was how it should be. It was a time when insurance was designed around the customer, if no-one claimed, you got your money back, and if one of the ships went down, everyone chipped in.</p>
                             <p>But as the world changed, so too did the insurance industry. Companies started to care less about the customer and more about profits. And in turn, trust in insurance providers plummeted.</p>
                             <p>At so-sure, we’re on a mission to restore the essence of what insurance was – and make it even better.</p>
@@ -73,8 +75,8 @@
                             </a>
                         </h3>
                         <div class="collapse" id="how-are-you-different-from-traditional-insurance-companies">
-                            <p>Traditional insurers exist to make big fat profit margins.  They keep the money that they don't pay out on claims. This means whenever they pay a claim, the loose profit.  This is why getting your claim approved and paid is so very painful… they want to keep your money.</p>
-                            <p>So-Sure has been designed differently.  Our whole business is built around putting you, the customer first. That’s why we decline less than 3% of claims because we believe insurance should have your back when you need it and also reward you for being careful.</p>
+                            <p>Traditional insurers exist to make big fat profit margins.  They keep the money that they don't pay out on claims. This means whenever they pay a claim, the loose profit.  This is why getting your claim approved and paid is so very painful... they want to keep your money.</p>
+                            <p>So-Sure has been designed differently.  Our whole business is built around putting you, the customer first. That's why we decline less than 3% of claims because we believe insurance should have your back when you need it and also reward you for being careful.</p>
                             <p>We also treat the money you pay as your money, and we believe that people are better together, and that's why we've created insurance that’s social and gives money back when there’s no claims.</p>
                         </div>
 
@@ -88,7 +90,7 @@
                             </a>
                         </h3>
                         <div class="collapse" id="why-should-i-use-you">
-                            <p>Unlike other insurers, we’re less focused on profit, and more focused on giving customers value.  Our mission is to make insurance better and cheaper for honest people,  and that's why we’ve developed clever anti-fraud tech that makes your life easier.  Plus we’re the only insurer that gives you money back when {Link find out more}</p>
+                            <p>Unlike other insurers, we're less focused on profit, and more focused on giving customers value.  Our mission is to make insurance better and cheaper for honest people,  and that's why we've developed clever anti-fraud tech that makes your life easier. Plus we're the only insurer that gives you <a href="#social-insurance-and-reward-pot">money back</a>.</p>
                             <ul>
                                 <li>Instant cover from purchase</li>
                                 <li>Next Working Day Replacement</li>
