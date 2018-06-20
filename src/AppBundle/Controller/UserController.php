@@ -1571,7 +1571,7 @@ class UserController extends BaseController
                     $claimDamageForm->handleRequest($request);
                     if ($claimDamageForm->isValid()) {
                         $claimsService = $this->get('app.claims');
-                        $claimsService->updateDamageDocuments($claim, $claimDamageForm->getData());
+                        $claimsService->updateDamageDocuments($claim, $claimFnolDamage);
                         return $this->redirectToRoute('claimed_policy', ['policyId' => $policy->getId()]);
                     }
                 }
@@ -1595,7 +1595,7 @@ class UserController extends BaseController
                     $claimTheftLossForm->handleRequest($request);
                     if ($claimTheftLossForm->isValid()) {
                         $claimsService = $this->get('app.claims');
-                        $claimsService->updateTheftLossDocuments($claim, $claimTheftLossForm->getData());
+                        $claimsService->updateTheftLossDocuments($claim, $claimFnolTheftLoss);
                         return $this->redirectToRoute('claimed_policy', ['policyId' => $policy->getId()]);
                     }
                 }
