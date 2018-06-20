@@ -13,13 +13,11 @@ $(function(){
     });
 
     // Stuck, replace affix for non iOS
-    // var device = navigator.userAgent.toLowerCase();
-    var agentID = sosure.globals.device.match(/(iphone|ipod|ipad)/);
-
     $(window).bind('load', function() {
 
         // If iOS
-        if (agentID) {
+        if (sosure.globals.isiOS) {
+
             // Offset of search from top of page once page is loaded
             var stickyOffset = $('#select-phone-data').offset().top;
 
