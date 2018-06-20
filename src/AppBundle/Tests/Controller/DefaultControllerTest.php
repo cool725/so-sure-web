@@ -10,6 +10,7 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\User;
 use AppBundle\Document\Phone;
 use AppBundle\Document\Lead;
+use AppBundle\Document\Policy;
 use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 
 /**
@@ -291,5 +292,171 @@ class DefaultControllerTest extends BaseControllerTest
         $optout = $repo->findOneBy(['email' => mb_strtolower($email)]);
         $this->assertNotNull($optout);
         $this->assertContains(EmailOptOut::OPTOUT_CAT_INVITATIONS, $optout->getCategories());
+    }
+
+    public function testClaimAlreadyLogin()
+    {
+        $email = self::generateEmail('testClaimAlreadyLogin', $this);
+        $password = 'foo';
+        $phone = self::getRandomPhone(self::$dm);
+        $user = self::createUser(
+            self::$userManager,
+            $email,
+            $password,
+            $phone,
+            self::$dm
+        );
+
+        $claimPage = self::$router->generate('claim');
+        $this->login($email, $password);
+        $crawler = self::$client->request('GET', $claimPage);
+        self::verifyResponse(302);
+        $this->assertTrue(self::$client->getResponse()->isRedirect(sprintf('/user/claim')));
+    }
+
+    public function testClaimUserNotFound()
+    {
+        $email = self::generateEmail('testClaimUserNotFound', $this);
+        $password = 'foo';
+        $phone = self::getRandomPhone(self::$dm);
+        $user = self::createUser(
+            self::$userManager,
+            $email,
+            $password,
+            $phone,
+            self::$dm
+        );
+
+        $claimPage = self::$router->generate('claim');
+        $crawler = self::$client->request('GET', $claimPage);
+        self::verifyResponse(200);
+        $form = $crawler->selectButton('claim_email_form[submit]')->form();
+        $form['claim_email_form[email]'] = self::generateEmail('testClaimUserNotFoundRandom', $this);
+        $crawler = self::$client->submit($form);
+
+        self::verifyResponse(200);
+        // @codingStandardsIgnoreStart
+        $this->expectFlashError($crawler, 'Sorry, your email address could not be associated with an active policy. Please check the email address you have created your policy under and try again.');
+    }
+
+    public function testClaimUserNoActivePolicy()
+    {
+        $email = self::generateEmail('testClaimUserNoActivePolicy', $this);
+        $password = 'foo';
+        $phone = self::getRandomPhone(self::$dm);
+        $user = self::createUser(
+            self::$userManager,
+            $email,
+            $password,
+            $phone,
+            self::$dm
+        );
+        $now = new \DateTime();
+        $policy = self::initPolicy($user, self::$dm, $phone, null, true, true);
+        $policy->setStatus(Policy::STATUS_CANCELLED);
+        $policy->setStart($now);
+        self::$dm->flush();
+
+        $claimPage = self::$router->generate('claim');
+        $crawler = self::$client->request('GET', $claimPage);
+        self::verifyResponse(200);
+        $form = $crawler->selectButton('claim_email_form[submit]')->form();
+        $form['claim_email_form[email]'] = $email;
+        $crawler = self::$client->submit($form);
+
+        self::verifyResponse(200);
+        // @codingStandardsIgnoreStart
+        $this->expectFlashError($crawler, 'Sorry, your email address could not be associated with an active policy. Please check the email address you have created your policy under and try again.');
+    }
+
+    public function testClaimValid()
+    {
+        $email = self::generateEmail('testClaimValid', $this);
+        $password = 'foo';
+        $phone = self::getRandomPhone(self::$dm);
+        $user = self::createUser(
+            self::$userManager,
+            $email,
+            $password,
+            $phone,
+            self::$dm
+        );
+        $now = new \DateTime();
+        $policy = self::initPolicy($user, self::$dm, $phone, null, true, true);
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        $policy->setStart($now);
+        self::$dm->flush();
+
+        $claimPage = self::$router->generate('claim');
+        $crawler = self::$client->request('GET', $claimPage);
+        self::verifyResponse(200);
+        $form = $crawler->selectButton('claim_email_form[submit]')->form();
+        $form['claim_email_form[email]'] = $email;
+        $crawler = self::$client->submit($form);
+
+        self::verifyResponse(200);
+        // @codingStandardsIgnoreStart
+        $this->expectFlashSuccess($crawler, 'Thank you. An email with further instructions on how to proceed with your claim has been sent to your email address. Please check it now and follow the instructions to start the process.');
+    }
+
+    public function testClaimLoginAlreadyLogin()
+    {
+        $email = self::generateEmail('testClaimLoginAlreadyLogin', $this);
+        $password = 'foo';
+        $phone = self::getRandomPhone(self::$dm);
+        $user = self::createUser(
+            self::$userManager,
+            $email,
+            $password,
+            $phone,
+            self::$dm
+        );
+
+        $claimPage = self::$router->generate('claim_login');
+        $this->login($email, $password);
+        $crawler = self::$client->request('GET', $claimPage);
+        self::verifyResponse(302);
+        $this->assertTrue(self::$client->getResponse()->isRedirect(sprintf('/user/claim')));
+    }
+
+    public function testClaimLoginInvalid()
+    {
+        $email = self::generateEmail('testClaimLoginInvalid', $this);
+        $password = 'foo';
+        $phone = self::getRandomPhone(self::$dm);
+        $user = self::createUser(
+            self::$userManager,
+            $email,
+            $password,
+            $phone,
+            self::$dm
+        );
+
+        $claimPage = self::$router->generate('claim_login', ['tokenId' => 'foo']);
+        $crawler = self::$client->request('GET', $claimPage);
+        self::verifyResponse(404);
+    }
+
+    public function testClaimLoginValid()
+    {
+        $email = self::generateEmail('testClaimLoginValid', $this);
+        $password = 'foo';
+        $phone = self::getRandomPhone(self::$dm);
+        $user = self::createUser(
+            self::$userManager,
+            $email,
+            $password,
+            $phone,
+            self::$dm
+        );
+
+        $redis = self::$client->getContainer()->get('snc_redis.default');
+        $token = md5(sprintf('%s%s', time(), $email));
+        $redis->setex($token, 900, $user->getId());
+
+        $claimPage = self::$router->generate('claim_login', ['tokenId' => $token]);
+        $crawler = self::$client->request('GET', $claimPage);
+        self::verifyResponse(302);
+        $this->assertTrue(self::$client->getResponse()->isRedirect(sprintf('/user/claim')));
     }
 }
