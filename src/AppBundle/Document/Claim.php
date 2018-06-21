@@ -7,6 +7,11 @@ use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Component\Validator\Constraints as Assert;
 use AppBundle\Validator\Constraints as AppAssert;
 use AppBundle\Validator\Constraints\AlphanumericSpaceDotValidator;
+use AppBundle\Document\File\S3ClaimFile;
+use AppBundle\Document\File\ProofOfUsageFile;
+use AppBundle\Document\File\ProofOfBarringFile;
+use AppBundle\Document\File\ProofOfPurchaseFile;
+use AppBundle\Document\File\DamagePictureFile;
 
 /**
  * @MongoDB\Document(repositoryClass="AppBundle\Repository\ClaimRepository")
@@ -659,6 +664,14 @@ class Claim
      * @Gedmo\Versioned
      */
     protected $policeLossReport;
+
+    /**
+     * @MongoDB\ReferenceMany(
+     *  targetDocument="AppBundle\Document\File\S3ClaimFile",
+     *  cascade={"persist"}
+     * )
+     */
+    protected $files = array();
 
     public function __construct()
     {
@@ -1507,6 +1520,16 @@ class Claim
         $this->policeLossReport = $policeLossReport;
     }
 
+    public function addFile(S3ClaimFile $file)
+    {
+        $this->files[] = $file;
+    }
+
+    public function getFiles()
+    {
+        return $this->files;
+    }
+
     public static function sumClaims($claims)
     {
         $data = [
@@ -1653,6 +1676,44 @@ class Claim
         $picSureValidated = $phonePolicy->isPicSureValidated();
 
         return self::getExcessValue($this->getType(), $picSureValidated, $picSureEnabled);
+    }
+
+    public function getProofOfUsageFiles()
+    {
+        return $this->getFilesByType(ProofOfUsageFile::class);
+    }
+
+    public function getProofOfBarringFiles()
+    {
+        return $this->getFilesByType(ProofOfBarringFile::class);
+    }
+
+    public function getProofOfPurchaseFiles()
+    {
+        return $this->getFilesByType(ProofOfPurchaseFile::class);
+    }
+
+    public function getDamagePictureFiles()
+    {
+        return $this->getFilesByType(DamagePictureFile::class);
+    }
+
+    public function getFilesByType($type)
+    {
+        $files = [];
+        foreach ($this->files as $file) {
+            /** @var S3ClaimFile  $file */
+            if ($file instanceof $type) {
+                $files[] = $file;
+            }
+        }
+
+        // sort more recent to older
+        usort($files, function ($a, $b) {
+            return $a->getCreated() < $b->getCreated();
+        });
+
+        return $files;
     }
 
     public static function getExcessValue($type, $picSureValidated, $picSureEnabled)

@@ -107,13 +107,15 @@ class ClaimsService
             $proofOfUsage = new ProofOfUsageFile();
             $proofOfUsage->setBucket('policy.so-sure.com');
             $proofOfUsage->setKey($claimDamage->getProofOfUsage());
-            $claim->getPolicy()->addPolicyFile($proofOfUsage);
+            $proofOfUsage->setClaim($claim);
+            $claim->addFile($proofOfUsage);
         }
         if ($claimDamage->getPictureOfPhone()) {
             $pictureOfPhone = new DamagePictureFile();
             $pictureOfPhone->setBucket('policy.so-sure.com');
             $pictureOfPhone->setKey($claimDamage->getPictureOfPhone());
-            $claim->getPolicy()->addPolicyFile($pictureOfPhone);
+            $pictureOfPhone->setClaim($claim);
+            $claim->addFile($pictureOfPhone);
         }
         $claim->setSubmissionDate(new \DateTime());
         $claim->setStatus(Claim::STATUS_SUBMITTED);
@@ -136,19 +138,22 @@ class ClaimsService
             $proofOfUsage = new ProofOfUsageFile();
             $proofOfUsage->setBucket('policy.so-sure.com');
             $proofOfUsage->setKey($claimTheftLoss->getProofOfUsage());
-            $claim->getPolicy()->addPolicyFile($proofOfUsage);
+            $proofOfUsage->setClaim($claim);
+            $claim->addFile($proofOfUsage);
         }
 
         $proofOfBarring = new ProofOfBarringFile();
         $proofOfBarring->setBucket('policy.so-sure.com');
         $proofOfBarring->setKey($claimTheftLoss->getProofOfBarring());
-        $claim->getPolicy()->addPolicyFile($proofOfBarring);
+        $proofOfBarring->setClaim($claim);
+        $claim->addFile($proofOfBarring);
 
         if ($claimTheftLoss->getProofOfPurchase()) {
             $proofOfPurchase = new ProofOfPurchaseFile();
             $proofOfPurchase->setBucket('policy.so-sure.com');
             $proofOfPurchase->setKey($claimTheftLoss->getProofOfPurchase());
-            $claim->getPolicy()->addPolicyFile($proofOfPurchase);
+            $proofOfPurchase->setClaim($claim);
+            $claim->addFile($proofOfPurchase);
         }
         $claim->setSubmissionDate(new \DateTime());
         $claim->setStatus(Claim::STATUS_SUBMITTED);

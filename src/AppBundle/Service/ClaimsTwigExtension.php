@@ -4,6 +4,7 @@ namespace AppBundle\Service;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Psr\Log\LoggerInterface;
 use AppBundle\Document\CurrencyTrait;
+use AppBundle\Document\Claim;
 
 class ClaimsTwigExtension extends \Twig_Extension
 {
@@ -26,7 +27,7 @@ class ClaimsTwigExtension extends \Twig_Extension
     public function s3DownloadLinks($claim)
     {
         $proofOfUsages = array();
-        foreach ($claim->getPolicy()->getProofOfUsageFiles() as $file) {
+        foreach ($claim->getProofOfUsageFiles() as $file) {
             $proofOfUsages[] = array(
                 'filename' => $file->getFilename(),
                 'url' => $this->s3DownloadLink($file->getBucket(), $file->getKey())
@@ -34,7 +35,7 @@ class ClaimsTwigExtension extends \Twig_Extension
         }
 
         $proofOfBarrings = array();
-        foreach ($claim->getPolicy()->getProofOfBarringFiles() as $file) {
+        foreach ($claim->getProofOfBarringFiles() as $file) {
             $proofOfBarrings[] = array(
                 'filename' => $file->getFilename(),
                 'url' => $this->s3DownloadLink($file->getBucket(), $file->getKey())
@@ -42,7 +43,7 @@ class ClaimsTwigExtension extends \Twig_Extension
         }
 
         $proofOfPurchases = array();
-        foreach ($claim->getPolicy()->getProofOfPurchaseFiles() as $file) {
+        foreach ($claim->getProofOfPurchaseFiles() as $file) {
             $proofOfPurchases[] = array(
                 'filename' => $file->getFilename(),
                 'url' => $this->s3DownloadLink($file->getBucket(), $file->getKey())
@@ -50,7 +51,7 @@ class ClaimsTwigExtension extends \Twig_Extension
         }
 
         $damagePictures = array();
-        foreach ($claim->getPolicy()->getDamagePictureFiles() as $file) {
+        foreach ($claim->getDamagePictureFiles() as $file) {
             $damagePictures[] = array(
                 'filename' => $file->getFilename(),
                 'url' => $this->s3DownloadLink($file->getBucket(), $file->getKey())

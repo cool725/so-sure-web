@@ -9,10 +9,6 @@ use AppBundle\Validator\Constraints as AppAssert;
 use AppBundle\Exception\InvalidPremiumException;
 use AppBundle\Document\File\ImeiFile;
 use AppBundle\Document\File\PicSureFile;
-use AppBundle\Document\File\ProofOfUsageFile;
-use AppBundle\Document\File\ProofOfBarringFile;
-use AppBundle\Document\File\ProofOfPurchaseFile;
-use AppBundle\Document\File\DamagePictureFile;
 
 /**
  * @MongoDB\Document(repositoryClass="AppBundle\Repository\PhonePolicyRepository")
@@ -788,26 +784,6 @@ class PhonePolicy extends Policy
     public function getExcessValue($type)
     {
         return Claim::getExcessValue($type, $this->isPicSureValidated(), $this->isPicSurePolicy());
-    }
-
-    public function getProofOfUsageFiles()
-    {
-        return $this->getPolicyFilesByType(ProofOfUsageFile::class);
-    }
-
-    public function getProofOfBarringFiles()
-    {
-        return $this->getPolicyFilesByType(ProofOfBarringFile::class);
-    }
-
-    public function getProofOfPurchaseFiles()
-    {
-        return $this->getPolicyFilesByType(ProofOfPurchaseFile::class);
-    }
-
-    public function getDamagePictureFiles()
-    {
-        return $this->getPolicyFilesByType(DamagePictureFile::class);
     }
 
     public function toApiArray()
