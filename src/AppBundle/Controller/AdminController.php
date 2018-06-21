@@ -290,11 +290,12 @@ class AdminController extends BaseController
     public function adminAdminUsersAction()
     {
         $dm = $this->getManager();
+        /** @var UserRepository $repo */
         $repo = $dm->getRepository(User::class);
 
-        $customerServices = $repo->findUsersInRole(User::ROLE_CUSTOMER_SERVICES);
-        $employees = $repo->findUsersInRole(User::ROLE_EMPLOYEE);
-        $admins = $repo->findUsersInRole(User::ROLE_ADMIN);
+        $customerServices = $repo->findUsersInRole(User::ROLE_CUSTOMER_SERVICES)->toArray();
+        $employees = $repo->findUsersInRole(User::ROLE_EMPLOYEE)->toArray();
+        $admins = $repo->findUsersInRole(User::ROLE_ADMIN)->toArray();
 
         return [
             'users' => array_merge($customerServices, $employees, $admins),
