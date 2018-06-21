@@ -43,17 +43,6 @@
                                 <div class="col-md-6">
                                     {# Non-valid entry for autocomplete see: https://developer.mozilla.org/en-US/docs/Web/Security/Securing_your_site/Turning_off_form_autocompletion #}
                                     <h3 class="text-center">✉️ Invite via email</h3>
-{#                                     {{ form_start(email_form, {'attr': {'autocomplete': 'nope'}}) }}
-                                        <div class="form-group">
-                                            {{ form_widget(email_form.email, {'attr': {'placeholder': 'Enter their email', 'class': 'form-control'}}) }}
-                                        </div>
-                                        <div class="help-block">
-                                            <a href="#">Add another <i class="fa fa-plus-circle" aria-hidden="true"></i></a>
-                                        </div>
-                                        <div class="form-group clearfix">
-                                            {{ form_widget(email_form.submit, {'label': 'Invite friend(s)', 'attr': {'class': 'btn btn-green btn-pad btn-block'}}) }}
-                                        </div>
-                                    {{ form_end(email_form) }} #}
                                     {{ form_start(email_form, {'attr': {'autocomplete': 'nope'}}) }}
                                         <div class="form-group">
                                             {{ form_errors(email_form.email) }}
