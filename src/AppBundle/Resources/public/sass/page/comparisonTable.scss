@@ -109,6 +109,10 @@
             td {
                 padding-top: 25px !important;
                 padding-bottom: 25px !important;
+
+                small {
+                    font-size: 11px;
+                }
             }
 
             td.border-left-right {
@@ -149,6 +153,7 @@
         }
 
         li {
+            min-height: 120px;
             vertical-align: middle;
             padding: 15px;
             position: relative;
