@@ -201,14 +201,26 @@ class OpsController extends BaseController
         $unpaidPolicies = $policyRepo->findBy([
             'status' => Policy::STATUS_UNPAID,
         ]);
-        $unpaidPolicy = null;
-        foreach ($unpaidPolicies as $unpaidPolicy) {
-            /** @var Policy $unpaidPolicy */
-            if (!$unpaidPolicy->isPolicyPaidToDate() && !$unpaidPolicy->hasPolicyDiscountPresent() &&
-                count($unpaidPolicy->getUser()->getValidPolicies(true)) == 1) {
+        $unpaidPolicyBacs = null;
+        foreach ($unpaidPolicies as $unpaidPolicyBacs) {
+            /** @var Policy $unpaidPolicyBacs */
+            if (!$unpaidPolicyBacs->isPolicyPaidToDate() && !$unpaidPolicyBacs->hasPolicyDiscountPresent() &&
+                count($unpaidPolicyBacs->getUser()->getValidPolicies(true)) == 1 &&
+                $unpaidPolicyBacs->getUser()->hasBacsPaymentMethod()) {
                 break;
             } else {
-                $unpaidPolicy = null;
+                $unpaidPolicyBacs = null;
+            }
+        }
+        $unpaidPolicyJudo = null;
+        foreach ($unpaidPolicies as $unpaidPolicyJudo) {
+            /** @var Policy $unpaidPolicyJudo */
+            if (!$unpaidPolicyJudo->isPolicyPaidToDate() && !$unpaidPolicyJudo->hasPolicyDiscountPresent() &&
+                count($unpaidPolicyJudo->getUser()->getValidPolicies(true)) == 1 &&
+                $unpaidPolicyJudo->getUser()->hasJudoPaymentMethod()) {
+                break;
+            } else {
+                $unpaidPolicyJudo = null;
             }
         }
         $unpaidPolicyDiscountPolicy = $policyRepo->findOneBy([
@@ -361,7 +373,8 @@ class OpsController extends BaseController
             'picsure_approved_policy' => $picSureApprovedPolicy,
             'picsure_rejected_policy' => $picSureRejectedPolicy,
             'non_picsure_policy' => $nonPicSurePolicy,
-            'unpaid_policy' => $unpaidPolicy,
+            'unpaid_policy_bacs' => $unpaidPolicyBacs,
+            'unpaid_policy_judo' => $unpaidPolicyJudo,
             'unpaid_policydiscount_policy' => $unpaidPolicyDiscountPolicy,
             'valid_policy' => $validPolicy,
             'valid_policy_monthly' => $validPolicyMonthly,

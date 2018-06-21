@@ -154,8 +154,15 @@
                 <a href="{{ url('user_welcome') }}?_impersonate={{ valid_policy.user.email }}">User Welcome</a> <b>(auto impersonate {{ valid_policy.user.email }})</b>
             </li>
             <li>
-                {% if unpaid_policy %}
-                    <a href="{{ url('user_home') }}?_impersonate={{ unpaid_policy.user.email }}">User Unpaid Page</a> <b>(auto impersonate {{ unpaid_policy.user.email }})</b>
+                {% if unpaid_policy_bacs %}
+                    <a href="{{ url('user_home') }}?_impersonate={{ unpaid_policy_bacs.user.email }}">User Unpaid Page (Bacs)</a> <b>(auto impersonate {{ unpaid_policy_bacs.user.email }})</b>
+                {% else %}
+                    No policy unpaid available
+                {% endif %}
+            </li>
+            <li>
+                {% if unpaid_policy_judo %}
+                    <a href="{{ url('user_home') }}?_impersonate={{ unpaid_policy_judo.user.email }}">User Unpaid Page (Judo)</a> <b>(auto impersonate {{ unpaid_policy_judo.user.email }})</b>
                 {% else %}
                     No policy unpaid available
                 {% endif %}
