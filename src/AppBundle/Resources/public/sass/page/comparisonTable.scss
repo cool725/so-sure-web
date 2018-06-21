@@ -152,6 +152,9 @@
             vertical-align: middle;
             padding: 15px;
             position: relative;
+            background-color: $white;
+
+            border-bottom: 1px solid $pale-grey;
 
             &:first-of-type {
                 height: 90px;
@@ -160,7 +163,7 @@
             }
 
             &:nth-child(even) {
-                background-color: $off-white;
+                // background-color: $off-white;
             }
 
             .fa {
