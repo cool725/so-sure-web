@@ -201,15 +201,47 @@ class OpsController extends BaseController
         $unpaidPolicies = $policyRepo->findBy([
             'status' => Policy::STATUS_UNPAID,
         ]);
-        $unpaidPolicyBacs = null;
-        foreach ($unpaidPolicies as $unpaidPolicyBacs) {
-            /** @var Policy $unpaidPolicyBacs */
-            if (!$unpaidPolicyBacs->isPolicyPaidToDate() && !$unpaidPolicyBacs->hasPolicyDiscountPresent() &&
-                count($unpaidPolicyBacs->getUser()->getValidPolicies(true)) == 1 &&
-                $unpaidPolicyBacs->getUser()->hasBacsPaymentMethod()) {
+        $unpaidPolicyBacsInProgress = null;
+        foreach ($unpaidPolicies as $unpaidPolicyBacsInProgress) {
+            /** @var Policy $unpaidPolicyBacsInProgress */
+            if (!$unpaidPolicyBacsInProgress->isPolicyPaidToDate() &&
+                !$unpaidPolicyBacsInProgress->hasPolicyDiscountPresent() &&
+                count($unpaidPolicyBacsInProgress->getUser()->getValidPolicies(true)) == 1 &&
+                $unpaidPolicyBacsInProgress->getUser()->hasBacsPaymentMethod() &&
+                $unpaidPolicyBacsInProgress->getUser()->getBacsPaymentMethod()->getBankAccount()->isMandateInProgress()
+            ) {
                 break;
             } else {
-                $unpaidPolicyBacs = null;
+                $unpaidPolicyBacsInProgress = null;
+            }
+        }
+        $unpaidPolicyBacsInvalid = null;
+        foreach ($unpaidPolicies as $unpaidPolicyBacsInvalid) {
+            /** @var Policy $unpaidPolicyBacsInvalid */
+            if (!$unpaidPolicyBacsInvalid->isPolicyPaidToDate() &&
+                !$unpaidPolicyBacsInvalid->hasPolicyDiscountPresent() &&
+                count($unpaidPolicyBacsInvalid->getUser()->getValidPolicies(true)) == 1 &&
+                $unpaidPolicyBacsInvalid->getUser()->hasBacsPaymentMethod() &&
+                $unpaidPolicyBacsInvalid->getUser()->getBacsPaymentMethod()->getBankAccount()->isMandateInvalid()
+            ) {
+                break;
+            } else {
+                $unpaidPolicyBacsInvalid = null;
+            }
+        }
+        $unpaidPolicyBacsSuccess = null;
+        foreach ($unpaidPolicies as $unpaidPolicyBacsSuccess) {
+            /** @var Policy $unpaidPolicyBacsSuccess */
+            if (!$unpaidPolicyBacsSuccess->isPolicyPaidToDate() &&
+                !$unpaidPolicyBacsSuccess->hasPolicyDiscountPresent() &&
+                count($unpaidPolicyBacsSuccess->getUser()->getValidPolicies(true)) == 1 &&
+                $unpaidPolicyBacsSuccess->getUser()->hasBacsPaymentMethod() &&
+                !$unpaidPolicyBacsSuccess->getUser()->getBacsPaymentMethod()->getBankAccount()->isMandateInvalid() &&
+                !$unpaidPolicyBacsSuccess->getUser()->getBacsPaymentMethod()->getBankAccount()->isMandateInProgress()
+            ) {
+                break;
+            } else {
+                $unpaidPolicyBacsSuccess = null;
             }
         }
         $unpaidPolicyJudo = null;
@@ -373,7 +405,9 @@ class OpsController extends BaseController
             'picsure_approved_policy' => $picSureApprovedPolicy,
             'picsure_rejected_policy' => $picSureRejectedPolicy,
             'non_picsure_policy' => $nonPicSurePolicy,
-            'unpaid_policy_bacs' => $unpaidPolicyBacs,
+            'unpaid_policy_bacs_inprogress' => $unpaidPolicyBacsInProgress,
+            'unpaid_policy_bacs_invalid' => $unpaidPolicyBacsInvalid,
+            'unpaid_policy_bacs_success' => $unpaidPolicyBacsSuccess,
             'unpaid_policy_judo' => $unpaidPolicyJudo,
             'unpaid_policydiscount_policy' => $unpaidPolicyDiscountPolicy,
             'valid_policy' => $validPolicy,
