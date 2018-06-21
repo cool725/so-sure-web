@@ -149,7 +149,7 @@
         }
 
         li {
-            min-height: 120px;
+            min-height: 165px;
             vertical-align: middle;
             padding: 15px;
             position: relative;
@@ -169,6 +169,10 @@
 
             .fa {
                 margin-bottom: 5px;
+            }
+
+            @include breakpoint(mobS) {
+                min-height: 145px;
             }
         }
 
