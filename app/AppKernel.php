@@ -16,9 +16,9 @@ class AppKernel extends Kernel
                 if (mb_stripos($uuid, 'ec2') == 0) {
                     return parent::getCacheDir();
                 }
-            } elseif (file_exists('/sys/devices/virtual/dmi/id/product_uuid') ) {
-                $uuid = file_get_contents('/sys/devices/virtual/dmi/id/product_uuid');
-                if (mb_stripos($uuid, 'EC2') == 0) {
+            } elseif (file_exists('/sys/devices/virtual/dmi/id/product_name') ) {
+                $name = file_get_contents('/sys/devices/virtual/dmi/id/product_name');
+                if (in_array($name, ['c3.large','c5d.large'])) {
                     return parent::getCacheDir();
                 }
             }
