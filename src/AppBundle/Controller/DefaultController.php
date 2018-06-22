@@ -576,7 +576,7 @@ class DefaultController extends BaseController
                         // @codingStandardsIgnoreStart
                         $this->addFlash(
                             'success',
-                            "Thank you. An email with further instructions on how to proceed with your claim has been sent to your email address if you have a policy with us. Please check it now and follow the instructions to start the process.."
+                            "Thank you. An email with further instructions on how to proceed with your claim has been sent to your email address if you have a policy with us. Please check it now and follow the instructions to start the process."
                         );
                     } else {
                         if ($user->hasActivePolicy()) {
