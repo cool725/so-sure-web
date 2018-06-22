@@ -21,6 +21,12 @@
  %}<link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
 {% endblock %}
 
+{% block nav %}
+    {% if not hide_nav %}
+        {% include '::nav_new.html.twig' %}
+    {% endif %}
+{% endblock %}
+
 {% block body %}
 
     <section class="section--pad faqs">
@@ -702,7 +708,7 @@
                         {# End #}
                     </div>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-3 hidden-sm hidden-xs">
                     <div class="faqs__sidebar"
                          id="faqs__nav">
                         <ul class="list-unstyled nav nav-pills nav-stacked" role="tablist">
@@ -720,6 +726,12 @@
         </div>
     </section>
 
+{% endblock %}
+
+{% block footer %}
+    {% if not hide_footer %}
+        {% include '::footer_new.html.twig' %}
+    {% endif %}
 {% endblock %}
 
 {% block javascripts %}
