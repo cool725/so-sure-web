@@ -952,7 +952,7 @@ class PurchaseControllerTest extends BaseControllerTest
         $form = $crawler->selectButton('purchase_form[next]')->form();
         $this->assertEquals($imei, $form['purchase_form[imei]']->getValue());
         if ($serialNumber) {
-            $this->assertEquals($serialNumber, $form['purchase_form[imei]']->getValue());
+            $this->assertEquals($serialNumber, $form['purchase_form[serialNumber]']->getValue());
         }
     }
 
