@@ -19,6 +19,7 @@ use AppBundle\Classes\ApiErrorCode;
 use AppBundle\Document\JudoPaymentMethod;
 use AppBundle\Document\Invitation\EmailInvitation;
 use AppBundle\Service\ReceperioService;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 /**
  * @group functional-net
@@ -34,6 +35,13 @@ class PurchaseControllerTest extends BaseControllerTest
     const SEARCH_URL2_TEMPLATE = '/phone-insurance/%s+%sGB';
     const LOSTSTOLEN_IMEI = '351451208401216';
 
+    protected static $rootDir;
+
+    public static function setUpBeforeClass()
+    {
+        parent::setUpBeforeClass();
+        self::$rootDir = self::$container->getParameter('kernel.root_dir');
+    }
 
     public function tearDown()
     {
@@ -243,6 +251,25 @@ class PurchaseControllerTest extends BaseControllerTest
         //print $crawler->html();
         self::verifyResponse(200);
         $this->verifyPurchaseReady($crawler);
+    }
+
+    public function testPurchasePhoneNewUploadFile()
+    {
+        $phone = $this->setRandomPhone('Apple');
+
+        $crawler = $this->createPurchaseNew(
+            self::generateEmail('testPurchasePhoneNewUploadFile', $this),
+            'foo bar',
+            new \DateTime('1980-01-01')
+        );
+        self::verifyResponse(302);
+        $this->assertTrue(self::$client->getResponse()->isRedirect('/purchase/step-policy'));
+
+        $crawler = $this->setPhoneNew($phone, null, 1, true, null, null, true);
+        //print $crawler->html();
+        self::verifyResponse(200);
+        $this->verifyPurchaseReady($crawler);
+        $this->verifyImei($crawler, '355424073417084', 'C77QMB7SGRY9');
     }
 
     public function testPurchasePhoneImeiSpaceNineSixtyEightNew()
@@ -920,6 +947,15 @@ class PurchaseControllerTest extends BaseControllerTest
         $this->assertNotContains('judopay', $form->getUri());
     }
 
+    private function verifyImei(Crawler $crawler, $imei, $serialNumber = null)
+    {
+        $form = $crawler->selectButton('purchase_form[next]')->form();
+        $this->assertEquals($imei, $form['purchase_form[imei]']->getValue());
+        if ($serialNumber) {
+            $this->assertEquals($serialNumber, $form['purchase_form[imei]']->getValue());
+        }
+    }
+
     private function setPhone($phone, $imei = null, $agreed = 1)
     {
         $crawler = self::$client->request('GET', '/purchase/step-policy?force_result=original');
@@ -951,7 +987,8 @@ class PurchaseControllerTest extends BaseControllerTest
         $agreed = 1,
         $nextButton = true,
         $crawler = null,
-        $serialNumber = null
+        $serialNumber = null,
+        $useFile = false
     ) {
         if (!$crawler) {
             $crawler = self::$client->request('GET', '/purchase/step-policy?force_result=step-3-payment-old');
@@ -962,7 +999,7 @@ class PurchaseControllerTest extends BaseControllerTest
         } else {
             $form = $crawler->selectButton('purchase_form[existing]')->form();
         }
-        if (!$imei) {
+        if (!$imei && !$useFile) {
             $imei = self::generateRandomImei();
         }
         $form['purchase_form[imei]'] = $imei;
@@ -976,10 +1013,23 @@ class PurchaseControllerTest extends BaseControllerTest
         }
         if ($phone->isApple()) {
             // use a different number in case we're testing /, -, etc
-            if (!$serialNumber) {
+            if (!$serialNumber && !$useFile) {
                 $serialNumber = self::generateRandomAppleSerialNumber();
             }
             $form['purchase_form[serialNumber]'] = $serialNumber;
+        }
+        if ($useFile) {
+            $imeiFile = sprintf(
+                "%s/../src/AppBundle/Tests/Resources/iPhoneSettings.png",
+                self::$rootDir
+            );
+            $imei = new UploadedFile(
+                $imeiFile,
+                'imei.png',
+                'image/png',
+                95062
+            );
+            $form['purchase_form[file]']->upload($imei);
         }
         $crawler = self::$client->submit($form);
 
@@ -1034,9 +1084,9 @@ class PurchaseControllerTest extends BaseControllerTest
         return $crawler;
     }
 
-    private function setRandomPhone()
+    private function setRandomPhone($make = null)
     {
-        $phone = self::getRandomPhone(self::$dm);
+        $phone = self::getRandomPhone(self::$dm, $make);
         // set phone in session
         $crawler = self::$client->request(
             'GET',
