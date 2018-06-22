@@ -501,7 +501,6 @@ class DefaultController extends BaseController
             'hide_cookie_warning' => $hideCookieWarning,
             'hide_nav' => $hideNav,
             'hide_footer' => $hideFooter,
-            // 'hide_title' => $hideTitle,
         ];
         return $this->render('AppBundle:Default:faq.html.twig', $data);
     }
