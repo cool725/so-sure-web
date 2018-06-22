@@ -66,7 +66,7 @@ class ClaimFnolType extends AbstractType
                 'required' => true,
                 'placeholder' => 'My network operator is ...',
                 'choices' => Claim::$networks,
-                'preferred_choices' => ['EE', 'giffgaff', 'O2', 'Tesco Mobile', 'Three', 'Vodafone'],
+                'preferred_choices' => Claim::$preferedNetworks,
             ])
             ->add('message', TextareaType::class)
             ->add('submit', SubmitType::class)

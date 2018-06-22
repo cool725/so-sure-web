@@ -27,6 +27,7 @@ class ClaimsService
 {
 
     const S3_CLAIMS_FOLDER = 'claim-documents';
+    const LOGIN_LINK_TOKEN_EXPIRATION = 900;
 
     /** @var LoggerInterface */
     protected $logger;
@@ -399,7 +400,7 @@ class ClaimsService
     {
         try {
             $token = md5(sprintf('%s%s', time(), $user->getEmail()));
-            $this->redis->setex($token, 900, $user->getId());
+            $this->redis->setex($token, self::LOGIN_LINK_TOKEN_EXPIRATION, $user->getId());
 
             $data = [
                 'username' => $user->getName(),
@@ -407,7 +408,7 @@ class ClaimsService
                     'claim_login',
                     ['tokenId' => $token]
                 ),
-                'tokenValid' => 15
+                'tokenValid' => self::LOGIN_LINK_TOKEN_EXPIRATION/60
             ];
 
             $this->mailer->sendTemplate(

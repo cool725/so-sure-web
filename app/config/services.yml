@@ -651,6 +651,11 @@ services:
         tags:
             - { name: security.voter }
 
+    app.voter.claim:
+        class: AppBundle\Security\ClaimVoter
+        tags:
+            - { name: security.voter }
+
     app.voter.invitation:
         class: AppBundle\Security\InvitationVoter
         tags:

@@ -48,6 +48,7 @@ class ClaimSearchType extends BaseType
                     Claim::STATUS_DECLINED => Claim::STATUS_DECLINED,
                     Claim::STATUS_SETTLED => Claim::STATUS_SETTLED,
                     Claim::STATUS_PENDING_CLOSED => Claim::STATUS_PENDING_CLOSED,
+                    Claim::STATUS_FNOL => Claim::STATUS_FNOL,
                 ],
                 'data' => [Claim::STATUS_INREVIEW, Claim::STATUS_APPROVED],
             ])

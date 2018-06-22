@@ -570,13 +570,13 @@ class DefaultController extends BaseController
                 $claimEmailForm->handleRequest($request);
                 if ($claimEmailForm->isValid()) {
                     $repo = $this->getManager()->getRepository(User::class);
-                    $user = $repo->findOneBy(['email' => $claimFnolEmail->getEmail()]);
+                    $user = $repo->findOneBy(['emailCanonical' => mb_strtolower($claimFnolEmail->getEmail())]);
 
                     if ($user === null) {
                         // @codingStandardsIgnoreStart
                         $this->addFlash(
-                            'error',
-                            "Sorry, your email address could not be associated with an active policy. Please check the email address you have created your policy under and try again."
+                            'success',
+                            "Thank you. An email with further instructions on how to proceed with your claim has been sent to your email address if you have a policy with us. Please check it now and follow the instructions to start the process.."
                         );
                     } else {
                         if ($user->hasActivePolicy()) {
@@ -623,12 +623,17 @@ class DefaultController extends BaseController
             return $this->redirectToRoute('claim_policy');
         }
 
-        if (!$user && $tokenId) {
+        if ($tokenId) {
             /** @var ClaimsService $claimsService */
             $claimsService = $this->get('app.claims');
             $userId = $claimsService->getUserIdFromLoginLinkToken($tokenId);
             if (!$userId) {
-                throw $this->createNotFoundException('Invalid link');
+                // @codingStandardsIgnoreStart
+                $this->addFlash(
+                    'error',
+                    "Sorry, it looks like your link as expired. Please re-enter the email address you have created your policy under and try again."
+                );
+                return $this->redirectToRoute('claim');
             }
 
             $dm = $this->getManager();

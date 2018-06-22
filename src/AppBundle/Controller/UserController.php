@@ -5,6 +5,7 @@ namespace AppBundle\Controller;
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\Payment\BacsPayment;
 use AppBundle\Security\UserVoter;
+use AppBundle\Security\ClaimVoter;
 use AppBundle\Service\PCAService;
 use AppBundle\Service\SequenceService;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -1509,13 +1510,13 @@ class UserController extends BaseController
         $policyRepo = $dm->getRepository(Policy::class);
         $policy = $policyRepo->find($policyId);
 
-        $this->denyAccessUnlessGranted(PolicyVoter::EDIT, $policy);
-
-        $claim = $policy->getLatestOpenedClaim();
+        $claim = $policy->getLatestFnolSubmittedClaim();
 
         if ($claim === null) {
             return $this->redirectToRoute('claim_policy');
         }
+
+        $this->denyAccessUnlessGranted(ClaimVoter::EDIT, $claim);
 
         if ($claim->getStatus() == Claim::STATUS_SUBMITTED) {
             $now = new \DateTime();
@@ -1561,15 +1562,15 @@ class UserController extends BaseController
         $policyRepo = $dm->getRepository(Policy::class);
         $policy = $policyRepo->find($policyId);
 
-        $this->denyAccessUnlessGranted(PolicyVoter::EDIT, $policy);
-
-        $claim = $policy->getLatestOpenedClaim();
+        $claim = $policy->getLatestFnolClaim();
 
         if ($claim === null) {
             return $this->redirectToRoute('claim_policy');
         }
 
-        if ($claim->getStatus() == Claim::STATUS_SUBMITTED && $claim->getType() != Claim::TYPE_DAMAGE) {
+        $this->denyAccessUnlessGranted(ClaimVoter::EDIT, $claim);
+
+        if ($claim->getType() != Claim::TYPE_DAMAGE) {
             return $this->redirectToRoute('claimed_policy', ['policyId' => $policy->getId()]);
         }
 
@@ -1609,17 +1610,15 @@ class UserController extends BaseController
         $policyRepo = $dm->getRepository(Policy::class);
         $policy = $policyRepo->find($policyId);
 
-        $this->denyAccessUnlessGranted(PolicyVoter::EDIT, $policy);
-
-        $claim = $policy->getLatestOpenedClaim();
+        $claim = $policy->getLatestFnolClaim();
 
         if ($claim === null) {
             return $this->redirectToRoute('claim_policy');
         }
 
-        if ($claim->getStatus() == Claim::STATUS_SUBMITTED &&
-            !($claim->getType() == Claim::TYPE_THEFT || $claim->getType() == Claim::TYPE_LOSS)
-        ) {
+        $this->denyAccessUnlessGranted(ClaimVoter::EDIT, $claim);
+
+        if (!($claim->getType() == Claim::TYPE_THEFT || $claim->getType() == Claim::TYPE_LOSS)) {
             return $this->redirectToRoute('claimed_policy', ['policyId' => $policy->getId()]);
         }
 
@@ -1661,17 +1660,13 @@ class UserController extends BaseController
         $policyRepo = $dm->getRepository(Policy::class);
         $policy = $policyRepo->find($policyId);
 
-        $this->denyAccessUnlessGranted(PolicyVoter::EDIT, $policy);
-
-        $claim = $policy->getLatestOpenedClaim();
+        $claim = $policy->getLatestSubmittedClaim();
 
         if ($claim === null) {
             return $this->redirectToRoute('claim_policy');
         }
 
-        if ($claim->getStatus() != Claim::STATUS_SUBMITTED) {
-            return $this->redirectToRoute('claimed_policy', ['policyId' => $policy->getId()]);
-        }
+        $this->denyAccessUnlessGranted(ClaimVoter::WITHDRAW, $claim);
 
         $claimsService = $this->get('app.claims');
         if ($claimsService->withdrawClaim($claim)) {

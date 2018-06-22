@@ -1198,7 +1198,7 @@ class UserControllerTest extends BaseControllerTest
         $this->assertTrue(self::$client->getResponse()->isRedirect(sprintf('/user/claim/%s', $policy->getId())));
 
         $updatedPolicy = $this->assertPolicyByIdExists(self::$client->getContainer(), $policy->getId());
-        $updatedClaim = $updatedPolicy->getLatestOpenedClaim();
+        $updatedClaim = $updatedPolicy->getLatestClaim();
         $this->assertEquals(Claim::STATUS_FNOL, $updatedClaim->getStatus());
     }
 
@@ -1284,7 +1284,7 @@ class UserControllerTest extends BaseControllerTest
         );
 
         $updatedPolicy = $this->assertPolicyByIdExists(self::$client->getContainer(), $policy->getId());
-        $updatedClaim = $updatedPolicy->getLatestOpenedClaim();
+        $updatedClaim = $updatedPolicy->getLatestClaim();
         $this->assertEquals(Claim::STATUS_SUBMITTED, $updatedClaim->getStatus());
     }
 
@@ -1392,7 +1392,7 @@ class UserControllerTest extends BaseControllerTest
         );
 
         $updatedPolicy = $this->assertPolicyByIdExists(self::$client->getContainer(), $policy->getId());
-        $updatedClaim = $updatedPolicy->getLatestOpenedClaim();
+        $updatedClaim = $updatedPolicy->getLatestClaim();
         $this->assertEquals(Claim::STATUS_SUBMITTED, $updatedClaim->getStatus());
     }
 
@@ -1500,7 +1500,7 @@ class UserControllerTest extends BaseControllerTest
         );
 
         $updatedPolicy = $this->assertPolicyByIdExists(self::$client->getContainer(), $policy->getId());
-        $updatedClaim = $updatedPolicy->getLatestOpenedClaim();
+        $updatedClaim = $updatedPolicy->getLatestClaim();
         $this->assertEquals(Claim::STATUS_SUBMITTED, $updatedClaim->getStatus());
     }
 

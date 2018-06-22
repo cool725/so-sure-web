@@ -223,6 +223,15 @@ class Claim
         self::NETWORK_WORLDSIM => self::NETWORK_WORLDSIM
     ];
 
+    public static $preferedNetworks = [
+        self::NETWORK_EE => self::NETWORK_EE,
+        self::NETWORK_GIFFGAFF => self::NETWORK_GIFFGAFF,
+        self::NETWORK_O2 => self::NETWORK_O2,
+        self::NETWORK_TESCO_MOBILE => self::NETWORK_TESCO_MOBILE,
+        self::NETWORK_THREE => self::NETWORK_THREE,
+        self::NETWORK_VODAFONE => self::NETWORK_VODAFONE
+    ];
+
     /**
      * @MongoDB\Id(strategy="auto")
      */

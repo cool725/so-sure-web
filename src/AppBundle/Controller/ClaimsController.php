@@ -126,7 +126,7 @@ class ClaimsController extends BaseController
             throw $this->createNotFoundException('Policy not found');
         }
 
-        $claim = $policy->getLatestOpenedClaim();
+        $claim = $policy->getLatestFnolSubmittedClaim();
         if ($claim === null) {
             $claim = new Claim();
             $claim->setPolicy($policy);
