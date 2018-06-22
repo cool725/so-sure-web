@@ -605,6 +605,7 @@ class PurchaseControllerTest extends BaseControllerTest
 
         $this->login($email, 'bar');
 
+        // @codingStandardsIgnoreStart
         $crawler = self::$client->request(
             'GET',
             self::$router->generate('purchase_step_policy'),
@@ -612,6 +613,7 @@ class PurchaseControllerTest extends BaseControllerTest
             [],
             ['HTTP_User-Agent' => "Mozilla/5.0 (iPhone; CPU iPhone OS 9_1 like Mac OS X) AppleWebKit/601.1.46 (KHTML, like Gecko) Version/9.0 Mobile/13B143 Safari/601.1"]
         );
+        // @codingStandardsIgnoreEnd
         self::verifyResponse(200, null, $crawler);
         $this->assertContains('Select phone', $crawler->html());
         $this->assertContains('data-device-os="iOS"', $crawler->html());
@@ -761,6 +763,13 @@ class PurchaseControllerTest extends BaseControllerTest
 
         $phone2 = $this->setRandomPhone();
         $this->login($email, $password, 'user/');
+
+        $crawler = self::$client->request(
+            'GET',
+            self::$router->generate('quote_phone', ['id' => $phone2->getId()])
+        );
+        $crawler = self::$client->followRedirect();
+
         $this->setPhoneNew($phone2, null, 1, false);
         self::verifyResponse(302);
 
