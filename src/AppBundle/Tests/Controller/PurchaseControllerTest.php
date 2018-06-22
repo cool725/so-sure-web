@@ -545,10 +545,78 @@ class PurchaseControllerTest extends BaseControllerTest
         self::verifyResponse(302);
         $this->assertTrue(self::$client->getResponse()->isRedirect('/purchase/step-policy'));
 
+        $crawler = self::$client->request(
+            'GET',
+            self::$router->generate('purchase_step_policy')
+        );
+        self::verifyResponse(200, null, $crawler);
+        $this->assertNotContains('Select phone', $crawler->html());
+
         $crawler = $this->setPhoneNew($phone, null, 1, true, null, ReceperioService::TEST_INVALID_SERIAL);
 
         self::verifyResponse(200);
         $this->expectFlashError($crawler, 'phone model');
+    }
+
+    public function testPurchaseReviewNotIOSWithNoPhoneSession()
+    {
+        $phone = self::getRandomPhone(static::$dm, 'Apple');
+        $email = self::generateEmail('testPurchaseReviewNotIOSWithNoPhoneSession', $this);
+
+        $user = static::createUser(
+            static::$userManager,
+            $email,
+            'bar',
+            static::$dm
+        );
+        static::addAddress($user);
+        static::$dm->flush();
+
+        $this->logout();
+        self::$client->getCookieJar()->clear();
+
+        $this->login($email, 'bar');
+
+        $crawler = self::$client->request(
+            'GET',
+            self::$router->generate('purchase_step_policy')
+        );
+        self::verifyResponse(200, null, $crawler);
+        $this->assertContains('Select phone', $crawler->html());
+        $this->assertNotContains('data-device-os="iOS"', $crawler->html());
+    }
+
+    public function testPurchaseReviewIOSWithNoPhoneSession()
+    {
+        $phone = self::getRandomPhone(static::$dm, 'Apple');
+        $email = self::generateEmail('testPurchaseReviewIOSWithNoPhoneSession', $this);
+
+        $user = static::createUser(
+            static::$userManager,
+            $email,
+            'bar',
+            static::$dm
+        );
+        static::addAddress($user);
+        static::$dm->flush();
+
+        $this->logout();
+        self::$client->getCookieJar()->clear();
+
+        $this->login($email, 'bar');
+
+        // @codingStandardsIgnoreStart
+        $crawler = self::$client->request(
+            'GET',
+            self::$router->generate('purchase_step_policy'),
+            [],
+            [],
+            ['HTTP_User-Agent' => "Mozilla/5.0 (iPhone; CPU iPhone OS 9_1 like Mac OS X) AppleWebKit/601.1.46 (KHTML, like Gecko) Version/9.0 Mobile/13B143 Safari/601.1"]
+        );
+        // @codingStandardsIgnoreEnd
+        self::verifyResponse(200, null, $crawler);
+        $this->assertContains('Select phone', $crawler->html());
+        $this->assertContains('data-device-os="iOS"', $crawler->html());
     }
 
     public function testPayCC()
@@ -695,6 +763,13 @@ class PurchaseControllerTest extends BaseControllerTest
 
         $phone2 = $this->setRandomPhone();
         $this->login($email, $password, 'user/');
+
+        $crawler = self::$client->request(
+            'GET',
+            self::$router->generate('quote_phone', ['id' => $phone2->getId()])
+        );
+        $crawler = self::$client->followRedirect();
+
         $this->setPhoneNew($phone2, null, 1, false);
         self::verifyResponse(302);
 

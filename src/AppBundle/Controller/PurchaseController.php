@@ -299,6 +299,7 @@ class PurchaseController extends BaseController
     */
     public function purchaseStepPhoneReviewAction(Request $request, $id = null)
     {
+        /** @var User $user */
         $user = $this->getUser();
         if (!$user) {
             return $this->redirectToRoute('purchase');
