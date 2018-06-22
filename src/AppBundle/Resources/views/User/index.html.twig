@@ -300,45 +300,6 @@
                      data-share-text="{{ share_experiment_text }}">
                     <h4>Invite via:</h4>
                     <div id="share"></div>
-                    <div class="text-break text-grey">
-                        <div class="line"></div>OR<div class="line"></div>
-                    </div>
-                    <div class="row">
-                        <form class="col-sm-8 col-sm-offset-2">
-                            <div class="form-group">
-                                <label for="scode" class="h4">Share this link:</label>
-                                <div class="input-group">
-                                    <input name="scode" id="scode" readonly="readonly" type="text" class="form-control" value="{{ policy.standardSCode.shareLink }}">
-                                    <span class="input-group-btn">
-                                        <button class="btn btn-blue btn-pad btn-copy"
-                                                data-clipboard-target="#scode"
-                                                data-toggle="tooltip"
-                                                data-placement="bottom"
-                                                >Copy</button>
-                                    </span>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                    <div class="text-break text-grey">
-                        <div class="line"></div>OR<div class="line"></div>
-                    </div>
-                    <h4>Email an invite:</h4>
-                    <p><small>Just enter their email below and we'll do the rest..</small></p>
-                    <div class="row">
-                        {# Non-valid entry for autocomplete see: https://developer.mozilla.org/en-US/docs/Web/Security/Securing_your_site/Turning_off_form_autocompletion #}
-                        {{ form_start(email_form, {'attr': {'class': 'col-sm-8 col-sm-offset-2', 'autocomplete': 'nope'}}) }}
-                            <div class="form-group">
-                                {{ form_errors(email_form.email) }}
-                                <div class="input-group">
-                                    {{ form_widget(email_form.email, {'attr': {'placeholder': 'Enter their email', 'class': 'form-control'}}) }}
-                                    <span class="input-group-btn">
-                                        {{ form_widget(email_form.submit, {'label': 'Invite', 'attr': {'class': 'btn btn-green btn-pad'}}) }}
-                                    </span>
-                                </div>
-                            </div>
-                        {{ form_end(email_form) }}
-                    </div>
                 </div>
             </div>
         </div>
