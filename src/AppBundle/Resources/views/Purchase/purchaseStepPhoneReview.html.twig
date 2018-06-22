@@ -23,281 +23,300 @@
 
     {% include 'AppBundle::Purchase/purchaseNav.html.twig' %}
 
-    <div class="checkout--top">
-        <div class="container">
-            <h1>
-                <span class="title-top">Insurance for your</span>
-                <br class="visible-xs">
-                <div class="dropdown memory-dropdown-list title-phone text-nowrap">
-                    <a href="#"
-                       class="dropdown-toggle"
-                       type="button"
-                       id="memoryDropdownList"
-                       data-toggle="dropdown"
-                       aria-haspopup="true"
-                       aria-expanded="true">
-                        <span class="title-phone text-blue text-nowrap">
-                            {{ phone.make }} {{ phone.model }}
-                            {% if phone.memory %}
-                                {{ phone.memory }}GB
-                            {% endif %}
-                            <i class="fa fa-caret-down" aria-hidden="true"></i>
-                        </span>
-                    </a>
-                    <ul class="dropdown-menu memory-dropdown"aria-labelledby="memoryDropdownList">
-                        {% if phones | length > 1 %}
-                            <li class="dropdown-header">Select alternate model</li>
-                            {% for phone_mem in phones if phone_mem.id != phone.id %}
-                                <li>
-                                    <a href="{{ path('quote_make_model_memory', {'make': phone_mem.makeCanonical, 'model': phone_mem.encodedModelCanonical, 'memory': phone_mem.memory}) }}" class=""> {{ phone.model }} - {{ phone_mem.memory }}GB</a>
-                                </li>
-                            {% endfor %}
-                            <li role="separator" class="divider"></li>
-                        {% endif %}
-                        <li><a href="#" data-toggle="modal" data-target="#quoteModal"> I have a different phone</a></li>
-                    </ul>
-                </div>
-                <br>
-                {% if app.user.allowedMonthlyPayments %}
-                    <span class="title-price">for just <span class="text-blue">£{{ phone.currentPhonePrice.monthlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }}</span> a month</span>
-                {% else %}
-                    <span class="title-price">for just <span class="text-blue">£{{ phone.currentPhonePrice.yearlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }}</span> a year</span>
-                {% endif %}
-            </h1>
-            <ul class="list-unstyled benefits--review-mobile visible-xs">
-                <li class="h4">
-                    <i class="fa fa-check text-green" aria-hidden="true"></i> Loss</li>
-                <li class="h4">
-                    <i class="fa fa-check text-green" aria-hidden="true"></i> Theft</li>
-                <li class="h4"><i class="fa fa-check text-green" aria-hidden="true"></i> Accidental damage</li>
-                <li class="h4"><i class="fa fa-check text-green" aria-hidden="true"></i> Out of warranty breakdown</li>
-                <li class="h4"><i class="fa fa-check text-green" aria-hidden="true"></i> Worldwide coverage</li>
-                {% if moneyBackGuarantee is defined and moneyBackGuarantee == 'money-back-guarantee' %}
-                <li class="h4"><i class="fa fa-plus text-blue" aria-hidden="true"></i> 14 day money back guarantee</li>
-                {% endif %}
-            </ul>
-            <div class="benefits--review-desktop hidden-xs">
-                <div class="benefits--inner">
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <img src="{{ cdn_url }}/images/library_benefits/so-sure_cover-loss.svg" alt="Loss" title="Loss">
-                            <h4 class="h-light">Loss</h4>
-                            <p><small>Including up to £1,000 of unauthorised network charges</small></p>
-                        </div>
-                        <div class="col-sm-6">
-                            <img src="{{ cdn_url }}/images/library_benefits/so-sure_cover-theft.svg" alt="Theft" title="Theft">
-                            <h4 class="h-light">Theft</h4>
-                            <p><small>Including accessories up to £100 inc. VAT</small></p>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <img src="{{ cdn_url }}/images/library_benefits/so-sure_cover-water-damage.svg" alt="Accidental Damage" title="Accidental damage">
-                            <h4 class="h-light">Accidental damage</h4>
-                            <p><small>Including cracked screen &amp; water damage</small></p>
-                        </div>
-                        <div class="col-sm-6">
-                            <img src="{{ cdn_url }}/images/library_benefits/so-sure_cover-breakdown.svg" alt="Out of warranty breakdown" title="Out of warranty breakdown">
-                            <h4 class="h-light">Out of warranty breakdown</h4>
-                            <p><small>Including faults of mobile phone</small></p>
-                        </div>
-                    </div>
-                    <h4 class="text-center">Plus worldwide cover on trips not exceeding 90 days</h4>
-                    {% if moneyBackGuarantee is defined and moneyBackGuarantee == 'money-back-guarantee' %}
-                        <div class="h4 h-light text-center"><mark class="mgreen">Plus.. We're so-sure you'll love us, we'll give you a 14 day money back guarantee 💰🔙</mark></div>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="payment--step">
-        <div class="payment--step-inner clearfix">
-            <h4>How would you like to pay?<br>
-            <small>(Select an option below)</small></h4>
-            {% if app.user.allowedMonthlyPayments %}
-            <div class="payment--btn {% if app.user.allowedMonthlyPayments and app.user.allowedYearlyPayments %} payment--btn-two payment--btn-left {% endif %} {% if purchase_form.vars.value.amount == phone.currentPhonePrice.monthlyPremiumPrice %}payment--btn-selected{% endif %}" id="payment--monthly" data-value="{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }}">
-                <div class="payment--btn-inner {% if not app.user.allowedYearlyPayments %} payment--btn-inner-single {% endif %}">
-                    <span class="billed visible-xs">Monthly <br></span>
-                    <span class="amount">£{{ phone.currentPhonePrice.monthlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }}
-                    <span class="hidden-xs">a month</span><br></span>
-                    <small class="visible-xs">Billed on {{ billing_date|date('jS') }} of each month</small>
-                    <small class="hidden-xs">You will be billed on the {{ billing_date|date('jS') }}  of each month</small>
-                </div>
-            </div>
-            {% endif %}
-            {% if app.user.allowedMonthlyPayments and app.user.allowedYearlyPayments %}
-            <div class="payment--btn-or">
-                OR
-            </div>
-            {% endif %}
-            {% if app.user.allowedYearlyPayments %}
-            <div class="payment--btn {% if app.user.allowedMonthlyPayments and app.user.allowedYearlyPayments %} payment--btn-two payment--btn-right {% endif %} {% if purchase_form.vars.value.amount == phone.currentPhonePrice.yearlyPremiumPrice(app.user.additionalPremium) %}payment--btn-selected{% endif %}" id="payment--yearly" data-value="{{ phone.currentPhonePrice.yearlyPremiumPrice|number_format(2, '.', ',') }}">
-                <div class="payment--btn-inner {% if not app.user.allowedMonthlyPayments %} payment--btn-inner-single {% endif %}">
-                    <span class="billed visible-xs">Yearly <br></span>
-                    <span class="amount">£{{ phone.currentPhonePrice.yearlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }}
-                    <span class="hidden-xs">a year</span><br></span>
-                    <small class="visible-xs">Billed on date of purchase</small>
-                    <small class="hidden-xs">You will be billed for the year on purchase</small>
-                </div>
-            </div>
-            {% endif %}
-        </div>
-    </div>
-    <div class="checkout--step checkout--step-payment">
-        <div class="container">
-
-            {{ form_start(purchase_form, {'attr': {'data-toggle': 'validator', 'class': 'validate-form', 'data-client-validation': form_client_validation, 'autocomplete': 'off' }}) }}
-
-                <div class="form-group payment-options {% if form_errors(purchase_form.amount) %}has-error{% endif %}">
-                    {{ form_label(purchase_form.amount, 'Payment Options:', { 'label_attr': {'class': 'sr-only'} }) }}
-                    {{ form_widget(purchase_form.amount) }}
-                    <div class="help-block with-errors">{{ form_errors(purchase_form.amount) }}</div>
-                </div>
-
-                <div class="form-group {% if form_errors(purchase_form.imei) %}has-error{% endif %}">
-                    {{ form_label(purchase_form.imei, 'IMEI Number:', { 'label_attr': {'class': 'sr-only'} }) }}
-                    {{ form_widget(purchase_form.imei, {'attr':{'class':'form-control imei', 'placeholder':'IMEI Number', 'data-hj-suppress' : ''}}) }}
-                    <label class="samsung-imei">Numbers only please (no / required)</label>
-                    <div class="help-block with-errors">{{ form_errors(purchase_form.imei) }}</div>
-                    <div class="help-block text-center">
+    {% if phone %}
+        <div class="checkout--top">
+            <div class="container">
+                <h1>
+                    <span class="title-top">Insurance for your</span>
+                    <br class="visible-xs">
+                    <div class="dropdown memory-dropdown-list title-phone text-nowrap">
                         <a href="#"
-                           class="text-underline"
-                           data-toggle="modal"
-                           data-target="{% if purchase_form.serialNumber is defined %}#appleModal{% else %}#nonAppleModal{% endif %}"
-                           >Dial *#06# to show your IMEI number.</a>
+                           class="dropdown-toggle"
+                           type="button"
+                           id="memoryDropdownList"
+                           data-toggle="dropdown"
+                           aria-haspopup="true"
+                           aria-expanded="true">
+                            <span class="title-phone text-blue text-nowrap">
+                                {{ phone.make }} {{ phone.model }}
+                                {% if phone.memory %}
+                                    {{ phone.memory }}GB
+                                {% endif %}
+                                <i class="fa fa-caret-down" aria-hidden="true"></i>
+                            </span>
+                        </a>
+                        <ul class="dropdown-menu memory-dropdown"aria-labelledby="memoryDropdownList">
+                            {% if phones | length > 1 %}
+                                <li class="dropdown-header">Select alternate model</li>
+                                {% for phone_mem in phones if phone_mem.id != phone.id %}
+                                    <li>
+                                        <a href="{{ path('quote_make_model_memory', {'make': phone_mem.makeCanonical, 'model': phone_mem.encodedModelCanonical, 'memory': phone_mem.memory}) }}" class=""> {{ phone.model }} - {{ phone_mem.memory }}GB</a>
+                                    </li>
+                                {% endfor %}
+                                <li role="separator" class="divider"></li>
+                            {% endif %}
+                            <li><a href="#" data-toggle="modal" data-target="#quoteModal"> I have a different phone</a></li>
+                        </ul>
+                    </div>
+                    <br>
+                    {% if app.user.allowedMonthlyPayments %}
+                        <span class="title-price">for just <span class="text-blue">£{{ phone.currentPhonePrice.monthlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }}</span> a month</span>
+                    {% else %}
+                        <span class="title-price">for just <span class="text-blue">£{{ phone.currentPhonePrice.yearlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }}</span> a year</span>
+                    {% endif %}
+                </h1>
+                <ul class="list-unstyled benefits--review-mobile visible-xs">
+                    <li class="h4">
+                        <i class="fa fa-check text-green" aria-hidden="true"></i> Loss</li>
+                    <li class="h4">
+                        <i class="fa fa-check text-green" aria-hidden="true"></i> Theft</li>
+                    <li class="h4"><i class="fa fa-check text-green" aria-hidden="true"></i> Accidental damage</li>
+                    <li class="h4"><i class="fa fa-check text-green" aria-hidden="true"></i> Out of warranty breakdown</li>
+                    <li class="h4"><i class="fa fa-check text-green" aria-hidden="true"></i> Worldwide coverage</li>
+                    {% if moneyBackGuarantee is defined and moneyBackGuarantee == 'money-back-guarantee' %}
+                    <li class="h4"><i class="fa fa-plus text-blue" aria-hidden="true"></i> 14 day money back guarantee</li>
+                    {% endif %}
+                </ul>
+                <div class="benefits--review-desktop hidden-xs">
+                    <div class="benefits--inner">
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <img src="{{ cdn_url }}/images/library_benefits/so-sure_cover-loss.svg" alt="Loss" title="Loss">
+                                <h4 class="h-light">Loss</h4>
+                                <p><small>Including up to £1,000 of unauthorised network charges</small></p>
+                            </div>
+                            <div class="col-sm-6">
+                                <img src="{{ cdn_url }}/images/library_benefits/so-sure_cover-theft.svg" alt="Theft" title="Theft">
+                                <h4 class="h-light">Theft</h4>
+                                <p><small>Including accessories up to £100 inc. VAT</small></p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <img src="{{ cdn_url }}/images/library_benefits/so-sure_cover-water-damage.svg" alt="Accidental Damage" title="Accidental damage">
+                                <h4 class="h-light">Accidental damage</h4>
+                                <p><small>Including cracked screen &amp; water damage</small></p>
+                            </div>
+                            <div class="col-sm-6">
+                                <img src="{{ cdn_url }}/images/library_benefits/so-sure_cover-breakdown.svg" alt="Out of warranty breakdown" title="Out of warranty breakdown">
+                                <h4 class="h-light">Out of warranty breakdown</h4>
+                                <p><small>Including faults of mobile phone</small></p>
+                            </div>
+                        </div>
+                        <h4 class="text-center">Plus worldwide cover on trips not exceeding 90 days</h4>
+                        {% if moneyBackGuarantee is defined and moneyBackGuarantee == 'money-back-guarantee' %}
+                            <div class="h4 h-light text-center"><mark class="mgreen">Plus.. We're so-sure you'll love us, we'll give you a 14 day money back guarantee 💰🔙</mark></div>
+                        {% endif %}
                     </div>
                 </div>
+            </div>
+        </div>
+        <div class="payment--step">
+            <div class="payment--step-inner clearfix">
+                <h4>How would you like to pay?<br>
+                <small>(Select an option below)</small></h4>
+                {% if app.user.allowedMonthlyPayments %}
+                <div class="payment--btn {% if app.user.allowedMonthlyPayments and app.user.allowedYearlyPayments %} payment--btn-two payment--btn-left {% endif %} {% if purchase_form.vars.value.amount == phone.currentPhonePrice.monthlyPremiumPrice %}payment--btn-selected{% endif %}" id="payment--monthly" data-value="{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }}">
+                    <div class="payment--btn-inner {% if not app.user.allowedYearlyPayments %} payment--btn-inner-single {% endif %}">
+                        <span class="billed visible-xs">Monthly <br></span>
+                        <span class="amount">£{{ phone.currentPhonePrice.monthlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }}
+                        <span class="hidden-xs">a month</span><br></span>
+                        <small class="visible-xs">Billed on {{ billing_date|date('jS') }} of each month</small>
+                        <small class="hidden-xs">You will be billed on the {{ billing_date|date('jS') }}  of each month</small>
+                    </div>
+                </div>
+                {% endif %}
+                {% if app.user.allowedMonthlyPayments and app.user.allowedYearlyPayments %}
+                <div class="payment--btn-or">
+                    OR
+                </div>
+                {% endif %}
+                {% if app.user.allowedYearlyPayments %}
+                <div class="payment--btn {% if app.user.allowedMonthlyPayments and app.user.allowedYearlyPayments %} payment--btn-two payment--btn-right {% endif %} {% if purchase_form.vars.value.amount == phone.currentPhonePrice.yearlyPremiumPrice(app.user.additionalPremium) %}payment--btn-selected{% endif %}" id="payment--yearly" data-value="{{ phone.currentPhonePrice.yearlyPremiumPrice|number_format(2, '.', ',') }}">
+                    <div class="payment--btn-inner {% if not app.user.allowedMonthlyPayments %} payment--btn-inner-single {% endif %}">
+                        <span class="billed visible-xs">Yearly <br></span>
+                        <span class="amount">£{{ phone.currentPhonePrice.yearlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }}
+                        <span class="hidden-xs">a year</span><br></span>
+                        <small class="visible-xs">Billed on date of purchase</small>
+                        <small class="hidden-xs">You will be billed for the year on purchase</small>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="checkout--step checkout--step-payment">
+            <div class="container">
 
-                {% if purchase_form.serialNumber is defined %}
-                    <div class="form-group {% if form_errors(purchase_form.serialNumber) %}has-error{% endif %}">
-                        {{ form_label(purchase_form.serialNumber, 'Serial Number:', { 'label_attr': {'class': 'sr-only'} }) }}
-                        {{ form_widget(purchase_form.serialNumber, {'attr':{'class':'form-control',  'pattern': '[a-zA-Z0-9]{5,32}', 'title': 'Enter a valid serial number', 'placeholder':'Serial Number', 'data-hj-suppress' : ''}}) }}
-                        <div class="help-block with-errors">{{ form_errors(purchase_form.serialNumber) }}</div>
+                {{ form_start(purchase_form, {'attr': {'data-toggle': 'validator', 'class': 'validate-form', 'data-client-validation': form_client_validation, 'autocomplete': 'off' }}) }}
+
+                    <div class="form-group payment-options {% if form_errors(purchase_form.amount) %}has-error{% endif %}">
+                        {{ form_label(purchase_form.amount, 'Payment Options:', { 'label_attr': {'class': 'sr-only'} }) }}
+                        {{ form_widget(purchase_form.amount) }}
+                        <div class="help-block with-errors">{{ form_errors(purchase_form.amount) }}</div>
+                    </div>
+
+                    <div class="form-group {% if form_errors(purchase_form.imei) %}has-error{% endif %}">
+                        {{ form_label(purchase_form.imei, 'IMEI Number:', { 'label_attr': {'class': 'sr-only'} }) }}
+                        {{ form_widget(purchase_form.imei, {'attr':{'class':'form-control imei', 'placeholder':'IMEI Number', 'data-hj-suppress' : ''}}) }}
+                        <label class="samsung-imei">Numbers only please (no / required)</label>
+                        <div class="help-block with-errors">{{ form_errors(purchase_form.imei) }}</div>
                         <div class="help-block text-center">
                             <a href="#"
                                class="text-underline"
                                data-toggle="modal"
-                               data-target="{% if purchase_form.serialNumber is defined %}#appleModal{% else %}#nonAppleModal{% endif %}">Go to Settings > General > About.</a>
+                               data-target="{% if purchase_form.serialNumber is defined %}#appleModal{% else %}#nonAppleModal{% endif %}"
+                               >Dial *#06# to show your IMEI number.</a>
                         </div>
                     </div>
-                {% endif %}
 
-                <div class="form-group">
-                    <div class="text-break text-grey">
-                        <div class="line"></div>OR<div class="line"></div>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label class="btn btn-blue btn-block btn-pad" for="purchase_form_file">
-                        {{ form_widget(purchase_form.file, {'attr': {'style':'display:none'}}) }}
-                        <i class="fa fa-upload"></i> Upload a screenshot
-                    </label>
-                    <div class="text-center text-info" style="margin-top: 15px;" id="upload-file-info"></div>
-                </div>
-                <div class="form-group {% if form_errors(purchase_form.fileValid) %}has-error{% endif %}">
-                    <div style="display:none">
-                        {{ form_widget(purchase_form.fileValid) }}
-                    </div>
-                    <div class="help-block with-errors">{{ form_errors(purchase_form.fileValid) }}</div>
-                </div>
-
-                {% if phone.googlePlay or phone.iTunes %}
-                    <div class="text-break text-grey">
-                        <div class="line"></div>OR<div class="line"></div>
-                    </div>
-                    <p><strong class="h4">LET OUR APP DO THE HARD WORK <br></strong> sign up in minutes: automatically add the details above, validate your phone instantly to <u>reduce your excess by half</u>!</p>
-                    <div class="text-center app-links">
-                        {% if phone.googlePlay %}
-                            <a class="ga-outbound-click" data-clicklabel="PlayStore" href="{{ google_download('purchase-flow') }}" target="_blank"><img src="{{ cdn_url }}/images/purchase/app_download_purchase_android_2x.png" alt="Get it on Google Play" class="img-responsive img-responsive--center"></a>
-                        {% endif %}
-                        {% if phone.iTunes %}
-                            <a class="ga-outbound-click" data-clicklabel="iTunes" href="{{ apple_download('purchase-flow') }}" target="_blank"><img src="{{ cdn_url }}/images/purchase/app_download_purchase_app_store_2x.png" alt="Available on the AppStore" class="img-responsive img-responsive--center"></a>
-                        {% endif %}
-                    </div>
-                {% endif %}
-
-                <div class="form-group form-group-break">
-                    <a href="#"
-                       id="step--validate"
-                       class="btn btn-green btn-block btn-pad">
-                        Continue
-                    </a>
-                </div>
-                <div class="form-group">
-                    {% if app.request.get('_route') == "purchase_step_policy_id" %}
-                    <a href="{{ path('user_home') }}"
-                       class="btn btn-blue-hollow btn-block btn-pad">
-                        Back
-                    </a>
-                    {% else %}
-                    <a href="{{ path('purchase_step_personal') }}"
-                       class="btn btn-blue-hollow btn-block btn-pad">
-                        Back
-                    </a>
-                    {% endif %}
-                </div>
-                <div class="modal modal-purchase fade"
-                     id="reviewModal"
-                     tabindex="-1"
-                     role="dialog">
-                    <div class="modal-dialog" role="document">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <button type="button"
-                                        class="close"
-                                        data-dismiss="modal"
-                                        aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                </button>
-                                <h3 class="modal-title text-blue">Before you proceed! <br>Please confirm the following are correct:</h3>
+                    {% if purchase_form.serialNumber is defined %}
+                        <div class="form-group {% if form_errors(purchase_form.serialNumber) %}has-error{% endif %}">
+                            {{ form_label(purchase_form.serialNumber, 'Serial Number:', { 'label_attr': {'class': 'sr-only'} }) }}
+                            {{ form_widget(purchase_form.serialNumber, {'attr':{'class':'form-control',  'pattern': '[a-zA-Z0-9]{5,32}', 'title': 'Enter a valid serial number', 'placeholder':'Serial Number', 'data-hj-suppress' : ''}}) }}
+                            <div class="help-block with-errors">{{ form_errors(purchase_form.serialNumber) }}</div>
+                            <div class="help-block text-center">
+                                <a href="#"
+                                   class="text-underline"
+                                   data-toggle="modal"
+                                   data-target="{% if purchase_form.serialNumber is defined %}#appleModal{% else %}#nonAppleModal{% endif %}">Go to Settings > General > About.</a>
                             </div>
-                            <div class="modal-body">
-                                <div class="modal-body__review">
-                                    <ol>
-                                        <li>My phone is in full working condition and my screen is not cracked.</li>
-                                        <li>I am a resident of the United Kingdom.</li>
-                                        <li>I have read &amp; understood the
-                                            <a class="policy-doc-toggle" href="#policy-doc">so-sure policy document</a>.
-                                        </li>
-                                    </ol>
-                                    <p>Please be advised that if you confirm that the above is true and we later discover that it isn’t, your claim might get denied.</p>
-                                    <p class="text-center" style="display: none">{{ form_widget(purchase_form.agreed, {'label': ' I confirm the above is correct', 'value': 'checked'}) }}</p>
-                                    <div class="form-group">
-                                        {% if app.user.hasValidPaymentMethod and app.user.hasJudoPaymentMethod %}
-                                            {{ form_widget(purchase_form.existing, {'label': 'Pay with card on file', 'attr': {'class': 'btn btn-green btn-block btn-pad'}}) }}
-                                            {{ form_widget(purchase_form.next, {'label': 'Pay with a new card', 'attr': {'class': 'btn btn-default btn-block btn-pad'}}) }}
-                                        {% else %}
-                                            {% if purchase_form.existing is defined %}
-                                              {% do purchase_form.existing.setRendered %}
+                        </div>
+                    {% endif %}
+
+                    <div class="form-group">
+                        <div class="text-break text-grey">
+                            <div class="line"></div>OR<div class="line"></div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="btn btn-blue btn-block btn-pad" for="purchase_form_file">
+                            {{ form_widget(purchase_form.file, {'attr': {'style':'display:none'}}) }}
+                            <i class="fa fa-upload"></i> Upload a screenshot
+                        </label>
+                        <div class="text-center text-info" style="margin-top: 15px;" id="upload-file-info"></div>
+                    </div>
+                    <div class="form-group {% if form_errors(purchase_form.fileValid) %}has-error{% endif %}">
+                        <div style="display:none">
+                            {{ form_widget(purchase_form.fileValid) }}
+                        </div>
+                        <div class="help-block with-errors">{{ form_errors(purchase_form.fileValid) }}</div>
+                    </div>
+
+                    {% if phone.googlePlay or phone.iTunes %}
+                        <div class="text-break text-grey">
+                            <div class="line"></div>OR<div class="line"></div>
+                        </div>
+                        <p><strong class="h4">LET OUR APP DO THE HARD WORK <br></strong> sign up in minutes: automatically add the details above, validate your phone instantly to <u>reduce your excess by half</u>!</p>
+                        <div class="text-center app-links">
+                            {% if phone.googlePlay %}
+                                <a class="ga-outbound-click" data-clicklabel="PlayStore" href="{{ google_download('purchase-flow') }}" target="_blank"><img src="{{ cdn_url }}/images/purchase/app_download_purchase_android_2x.png" alt="Get it on Google Play" class="img-responsive img-responsive--center"></a>
+                            {% endif %}
+                            {% if phone.iTunes %}
+                                <a class="ga-outbound-click" data-clicklabel="iTunes" href="{{ apple_download('purchase-flow') }}" target="_blank"><img src="{{ cdn_url }}/images/purchase/app_download_purchase_app_store_2x.png" alt="Available on the AppStore" class="img-responsive img-responsive--center"></a>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+
+                    <div class="form-group form-group-break">
+                        <a href="#"
+                           id="step--validate"
+                           class="btn btn-green btn-block btn-pad">
+                            Continue
+                        </a>
+                    </div>
+                    <div class="form-group">
+                        {% if app.request.get('_route') == "purchase_step_policy_id" %}
+                        <a href="{{ path('user_home') }}"
+                           class="btn btn-blue-hollow btn-block btn-pad">
+                            Back
+                        </a>
+                        {% else %}
+                        <a href="{{ path('purchase_step_personal') }}"
+                           class="btn btn-blue-hollow btn-block btn-pad">
+                            Back
+                        </a>
+                        {% endif %}
+                    </div>
+                    <div class="modal modal-purchase fade"
+                         id="reviewModal"
+                         tabindex="-1"
+                         role="dialog">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button"
+                                            class="close"
+                                            data-dismiss="modal"
+                                            aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                    </button>
+                                    <h3 class="modal-title text-blue">Before you proceed! <br>Please confirm the following are correct:</h3>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="modal-body__review">
+                                        <ol>
+                                            <li>My phone is in full working condition and my screen is not cracked.</li>
+                                            <li>I am a resident of the United Kingdom.</li>
+                                            <li>I have read &amp; understood the
+                                                <a class="policy-doc-toggle" href="#policy-doc">so-sure policy document</a>.
+                                            </li>
+                                        </ol>
+                                        <p>Please be advised that if you confirm that the above is true and we later discover that it isn’t, your claim might get denied.</p>
+                                        <p class="text-center" style="display: none">{{ form_widget(purchase_form.agreed, {'label': ' I confirm the above is correct', 'value': 'checked'}) }}</p>
+                                        <div class="form-group">
+                                            {% if app.user.hasValidPaymentMethod and app.user.hasJudoPaymentMethod %}
+                                                {{ form_widget(purchase_form.existing, {'label': 'Pay with card on file', 'attr': {'class': 'btn btn-green btn-block btn-pad'}}) }}
+                                                {{ form_widget(purchase_form.next, {'label': 'Pay with a new card', 'attr': {'class': 'btn btn-default btn-block btn-pad'}}) }}
+                                            {% else %}
+                                                {% if purchase_form.existing is defined %}
+                                                  {% do purchase_form.existing.setRendered %}
+                                                {% endif %}
+                                                {{ form_widget(purchase_form.next, {'label': 'Continue to payment', 'attr': {'class': 'btn btn-green btn-block btn-pad'}}) }}
                                             {% endif %}
-                                            {{ form_widget(purchase_form.next, {'label': 'Continue to payment', 'attr': {'class': 'btn btn-green btn-block btn-pad'}}) }}
+                                        </div>
+                                        {% if payment_provider == 'judo' %}
+                                        <div class="form-group">
+                                            <p class="help-block text-center"><small>You will be taken to our payment service provider Judo Pay</small></p>
+                                        </div>
                                         {% endif %}
                                     </div>
-                                    {% if payment_provider == 'judo' %}
-                                    <div class="form-group">
-                                        <p class="help-block text-center"><small>You will be taken to our payment service provider Judo Pay</small></p>
-                                    </div>
-                                    {% endif %}
-                                </div>
-                                <div class="modal-policy-embedded" data-url="{{ url('latest_policy_terms', {'policy_key': policy_key, 'maxPotValue':  phone.getCurrentPhonePrice.maxPot, 'include': true, 'noH1': true }) }}" style="display: none;">
-                                    <div class="text-center" style="margin-bottom: 20px;">
-                                        <img src="{{ cdn_url }}/images/spinner.svg" alt="Loading..."><br>
-                                        <a href="#" id="reload-policy" class="btn btn-blue-hollow" style="display:none;"><i class="fa fa-refresh" aria-hidden="true"></i> reload</a>
+                                    <div class="modal-policy-embedded" data-url="{{ url('latest_policy_terms', {'policy_key': policy_key, 'maxPotValue':  phone.getCurrentPhonePrice.maxPot, 'include': true, 'noH1': true }) }}" style="display: none;">
+                                        <div class="text-center" style="margin-bottom: 20px;">
+                                            <img src="{{ cdn_url }}/images/spinner.svg" alt="Loading..."><br>
+                                            <a href="#" id="reload-policy" class="btn btn-blue-hollow" style="display:none;"><i class="fa fa-refresh" aria-hidden="true"></i> reload</a>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
-            {{ form_end(purchase_form) }}
+                {{ form_end(purchase_form) }}
 
-            <form action="{{ webpay_action }}" method="post" id="webpay-form">
-                <input id="Reference" name="Reference" type="hidden" value="{{ webpay_reference }}">
+                <form action="{{ webpay_action }}" method="post" id="webpay-form">
+                    <input id="Reference" name="Reference" type="hidden" value="{{ webpay_reference }}">
+                </form>
+            </div>
+        </div>
+    {% else %}
+        <div class="checkout--top">
+            <div class="container">
+                <h1 class="h2">
+                    <span class="title-phone">Please select your phone to continue with your purchase.</span>
+                </h1>
+            </div>
+        </div>
+        <div class="checkout--step">
+            <form>
+                <a href="#"
+                   class="btn btn-blue btn-block btn-pad"
+                   data-toggle="modal"
+                   data-target="#quoteModal">Select phone</a>
             </form>
         </div>
-    </div>
+    {% endif %}
+
 
 </section>
 

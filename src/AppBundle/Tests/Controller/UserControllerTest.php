@@ -475,6 +475,7 @@ class UserControllerTest extends BaseControllerTest
 
     public function testUserUnpaidPolicyPaymentDetails()
     {
+        $this->logout();
         $email = self::generateEmail('testUserUnpaidPolicyPaymentDetails', $this);
         $password = 'foo';
         $phone = self::getRandomPhone(self::$dm);
