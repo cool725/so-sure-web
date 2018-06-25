@@ -53,14 +53,14 @@
                             <div class="col-sm-6">
                                 <div class="form-group">
                                     <label for="">I reported the phone {{ claimType }} to {{ network }} and asked them to block my phone on</label>
-                                    {{ form_widget(claim_form.blockedDate, { 'attr': {'class': 'form-control', 'placeholder': 'Date (DD/MM/YYYY)'}}) }}
+                                    {{ form_widget(claim_form.blockedDate, { 'attr': {'class': 'form-control date_mask', 'placeholder': 'Date (DD/MM/YYYY)'}}) }}
                                     <span class="help-block with-errors">{{ form_errors(claim_form.blockedDate) }}</span>
                                 </div>
                             </div>
                             <div class="col-sm-6">
                                 <div class="form-group">
                                     <label for="">I reported the {{ claimType }} to the police on <br><br class="hidden-xs"></label>
-                                    {{ form_widget(claim_form.reportedDate, { 'attr': {'class': 'form-control', 'placeholder': 'Date (DD/MM/YYYY)'}}) }}
+                                    {{ form_widget(claim_form.reportedDate, { 'attr': {'class': 'form-control date_mask', 'placeholder': 'Date (DD/MM/YYYY)'}}) }}
                                     <span class="help-block with-errors">{{ form_errors(claim_form.reportedDate) }}</span>
                                 </div>
                             </div>

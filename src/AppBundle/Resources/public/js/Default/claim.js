@@ -19,9 +19,8 @@ sosure.claim = (function() {
 
     self.whenMask = function () {
         // Mask date input and add picker
-        $('#claim_form_when').mask('00/00/0000');
-        $('#claim_form_timeToReach').mask('00:00');
-        $('#claim_form_time').mask('00:00');
+        $('.date_mask').mask('00/00/0000');
+        $('.time_mask').mask('00:00');
     }
 
     self.addValidation = function() {

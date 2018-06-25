@@ -90,7 +90,7 @@
                                     <div class="col-sm-6">
                                         <div class="form-group {% if form_errors(claim_form.timeToReach) %}has-error{% endif %}">
                                             <label class="h4">Best time to call you (UK business hours) <span class="req">*</span></label>
-                                            {{ form_widget(claim_form.timeToReach, { 'attr': {'class': 'form-control', 'placeholder': '10:00'}}) }}
+                                            {{ form_widget(claim_form.timeToReach, { 'attr': {'class': 'form-control time_mask', 'placeholder': '10:00'}}) }}
                                             <div class="help-block with-errors">{{ form_errors(claim_form.timeToReach) }}</div>
                                         </div>
                                     </div>
@@ -115,14 +115,14 @@
                                     <div class="col-sm-6">
                                         <div class="form-group {% if form_errors(claim_form.when) %}has-error{% endif %}">
                                             <label class="h4">It happened on <span class="req">*</span></label>
-                                            {{ form_widget(claim_form.when, { 'attr': {'class': 'form-control', 'placeholder': 'Date (DD/MM/YYYY)'}}) }}
+                                            {{ form_widget(claim_form.when, { 'attr': {'class': 'form-control date_mask', 'placeholder': 'Date (DD/MM/YYYY)'}}) }}
                                             <div class="help-block with-errors">{{ form_errors(claim_form.when) }}</div>
                                         </div>
                                     </div>
                                     <div class="col-sm-6">
                                         <div class="form-group {% if form_errors(claim_form.time) %}has-error{% endif %}">
                                             <label class="h4">At around <span class="req">*</span></label>
-                                            {{ form_widget(claim_form.time, { 'attr': {'class': 'form-control', 'placeholder': 'As accurate as you be e.g. 10:45'}}) }}
+                                            {{ form_widget(claim_form.time, { 'attr': {'class': 'form-control time_mask', 'placeholder': 'As accurate as you be e.g. 10:45'}}) }}
                                             <div class="help-block with-errors">{{ form_errors(claim_form.time) }}</div>
                                         </div>
                                     </div>
