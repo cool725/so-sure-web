@@ -1,0 +1,27 @@
+{% for payment in indemnity if indemnity %}
+<tr>
+    <td width="10%">
+        {{ payment.status }}
+        {% if payment.success %}
+            <i class="fa fa-check text-success"></i>
+        {% elseif payment.success is null %}
+            <i class="fa fa-question"></i>
+        {% else %}
+            <i class="fa fa-minus text-danger"></i>
+        {% endif %}
+    </td>
+    <td width="20%">
+        <a href="{{ path('admin_policy', {'id': payment.policy.id}) }}">{{ payment.policy.user.name }}</a>
+    </td>
+    <td width="5%">
+        £{{ payment.amount|number_format(2, '.', ',') }}
+    </td>
+    <td width="15%">
+        {% if payment.date %}
+            {{ payment.date|date('d M Y', 'Europe/London') }}
+        {% else %}
+            -
+        {% endif %}
+    </td>
+</tr>
+{%  endfor %}

@@ -260,12 +260,17 @@
                 {% endif %}
             </div>
             <div role="tabpanel" class="tab-pane" id="payments">
+
+
+                {% include 'AppBundle::Admin/_bacs_indemnity.html.twig' %}
+
+
                 <h2>Payments</h2>
                 {% if payments|length == 0 %}
                     <p>No payments present</p>
                 {% else %}
                     {% set serial = '' %}
-                    {% for payment in payments if payment.serialNumber %}
+                        {% for payment in payments if payment.serialNumber %}
                         {% if serial != payment.serialNumber %}
                             {% if serial != '' %}</table>{% endif %}
                             <h4>
@@ -353,6 +358,8 @@
                                 </td>
                             </tr>
                         {% set serial = payment.serialNumber %}
+                    {% else %}
+                        {{ dump(payment) }}
                     {% endfor %}
                     </table>
                 {% endif %}
