@@ -4144,9 +4144,14 @@ abstract class Policy
     {
         $salva = new Salva();
         $premium = $this->getPremium();
-        $numPayments = $premium->getNumberOfMonthlyPayments($this->getTotalSuccessfulPayments($date));
-        $expectedCommission = $salva->sumBrokerFee($numPayments, $numPayments == 12);
 
+        $expectedCommission = 0;
+        if (in_array($this->getStatus(), [self::STATUS_ACTIVE, self::STATUS_UNPAID])) {
+            $numPayments = $premium->getNumberOfMonthlyPayments($this->getTotalSuccessfulUserPayments($date));
+            $expectedCommission = $salva->sumBrokerFee($numPayments, $numPayments == 12);
+        } else {
+            $expectedCommission = $this->getProratedCommission($date);
+        }
         /*
         print $numPayments . PHP_EOL;
         print $expectedCommission . PHP_EOL;
