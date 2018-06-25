@@ -1166,6 +1166,13 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         $data['hasOutstandingPicSurePolicy'] = false;
         $data['connectedWithFacebook'] = mb_strlen($this->getFacebookId()) > 0;
         $data['connectedWithGoogle'] = mb_strlen($this->getGoogleId()) > 0;
+        if ($this->hasBacsPaymentMethod()) {
+            $data['paymentMethod'] = 'bacs';
+        } elseif ($this->hasJudoPaymentMethod()) {
+                $data['paymentMethod'] = 'judo';
+        } else {
+            $data['paymentMethod'] = 'none';
+        }
         foreach ($this->getValidPolicies(true) as $policy) {
             /** @var PhonePolicy $policy */
             if (!$policy->isActive()) {
