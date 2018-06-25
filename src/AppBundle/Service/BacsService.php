@@ -1133,7 +1133,7 @@ class BacsService
         /** @var PaymentRepository $repo */
         $repo = $this->dm->getRepository(BacsPayment::class);
 
-        $credits = $repo->findBy(['status' => BacsPayment::STATUS_PENDING, 'amount' < 0]);
+        $credits = $repo->getAllPendingCredits();
 
         return count($credits) > 0;
     }
@@ -1353,7 +1353,7 @@ class BacsService
         /** @var PaymentRepository $repo */
         $repo = $this->dm->getRepository(BacsPayment::class);
 
-        $credits = $repo->findBy(['status' => BacsPayment::STATUS_PENDING, 'amount' < 0]);
+        $credits = $repo->getAllPendingCredits();
 
         $metadata['credit-amount'] = 0;
         foreach ($credits as $payment) {

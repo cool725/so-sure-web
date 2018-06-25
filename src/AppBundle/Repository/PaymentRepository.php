@@ -3,6 +3,7 @@
 namespace AppBundle\Repository;
 
 use AppBundle\Classes\SoSure;
+use AppBundle\Document\Payment\BacsPayment;
 use Doctrine\ODM\MongoDB\DocumentRepository;
 use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Document\DateTrait;
@@ -69,6 +70,15 @@ class PaymentRepository extends DocumentRepository
             ->field('date')->gte($startMonth)
             ->field('date')->lt($nextMonth)
             ->field('type')->in($type)
+            ->getQuery()
+            ->execute();
+    }
+
+    public function getAllPendingCredits()
+    {
+        return $this->createQueryBuilder()
+            ->field('status')->equals(BacsPayment::STATUS_PENDING)
+            ->field('amount')->lt(0)
             ->getQuery()
             ->execute();
     }
