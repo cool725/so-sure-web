@@ -472,7 +472,7 @@ class DefaultController extends BaseController
      */
     public function faqAction(Request $request)
     {
-        $intercomEnabled = false;
+        $intercomEnabled = true;
         $hideCookieWarning = false;
         $hideNav = false;
         $hideFooter = false;
