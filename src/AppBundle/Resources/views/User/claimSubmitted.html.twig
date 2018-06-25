@@ -27,11 +27,18 @@
             <div class="row">
                 <div class="col-md-8 col-md-offset-2">
 
-                <p>Thank you for submitting your claim for {{ claim.type }} for your {{ phone }} with IMEI {{ claim.policy.imei }}. We will get in touch with you on the {{ claim.policy.user.mobileNumber }} {{ time }}.</p>
+                    <p class="lead text-center">Thank you for submitting your claim for <span class="h4">{{ claim.type }}</span> for your <span class="h4">{{ phone }}</span> with IMEI <span class="h4">{{ claim.policy.imei }}</span>. </p>
 
-                <p class="text-center"><a href="{{ path('user_home') }}" class="btn btn-blue btn-pad ">Get back to your account</a></p>
+                    <p class="text-center">We will get in touch with you on the <span class="h4">{{ claim.policy.user.mobileNumber }}</span> {{ time }}.</p>
 
-                <p class="text-center"><a id="withdraw-claim" href="#" class="btn btn-green btn-pad " data-toggle="modal" data-target="#withdrawModal">Withdraw my claim</a></p>
+                    <ul class="list-inline text-center">
+                        <li>
+                            <a href="{{ path('user_home') }}" class="btn btn-blue btn-pad ">Get back to your account</a>
+                        </li>
+                        <li>
+                            <a id="withdraw-claim" href="#" class="btn btn-green btn-pad " data-toggle="modal" data-target="#withdrawModal">Withdraw my claim</a>
+                        </li>
+                    </ul>
 
                 </div>
             </div>
@@ -39,24 +46,20 @@
     </section>
 
     {# Page Modals #}
-
     <div class="modal fade" id="withdrawModal" tabindex="-1" role="dialog">
-      <div class="modal-dialog" role="document" style="width: 60%;">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title">Withdraw Claim</h4>
-          </div>
-          <div class="modal-body">
-            <h4>Are you sure you want to withdraw your claim?</h4>
-            <p><a href="{{ path('withdraw_claimed_policy', {'policyId': claim.policy.id}) }}" class="btn btn-red btn-pad ">Withdraw my claim</a></p>
-          </div>
-          <div class="modal-footer">
-          </div>
+        <div class="modal-dialog" role="document" style="width: 60%;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title sr-only">Withdraw Claim</h4>
+                </div>
+                <div class="modal-body text-center">
+                    <h4>Are you sure you want to withdraw your claim?</h4>
+                    <p><a href="{{ path('withdraw_claimed_policy', {'policyId': claim.policy.id}) }}" class="btn btn-red btn-pad ">Withdraw my claim</a></p>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
-
     {# End Page Modals #}
 
 {% endblock %}
