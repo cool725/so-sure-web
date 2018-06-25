@@ -211,7 +211,7 @@ class BaseImeiService
 
     public function parseOcr($results, $make)
     {
-        $noSpace = str_replace(' ', '', $results);
+        $noSpace = str_replace(array(' ', "\n"), '', $results);
         // print_r($noSpace);
         if ($make == "Apple") {
             if (preg_match('/SerialNumber([A-Z0-9]{12}).*([Il]ME[Il])(\d{15})/s', $noSpace, $matches)) {
@@ -252,7 +252,7 @@ class BaseImeiService
                     'imei' => $this->luhnGenerate($matches[2]),
                     'serialNumber' => $serialNumber,
                 ];
-            } elseif (preg_match('/(\d{15})/', str_replace("\n", '', $noSpace), $matches)) {
+            } elseif (preg_match('/(\d{15})/', $noSpace, $matches)) {
                 // might be a screenshot of *#06# rather than settings
                 if ($this->isImei($matches[1])) {
                     return [

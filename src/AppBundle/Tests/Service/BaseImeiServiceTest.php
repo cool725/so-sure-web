@@ -519,4 +519,18 @@ SEID";
         $this->assertEquals('355354080202940', $resultsCubeCombined['imei']);
         $this->assertEquals('F2NSYYVNHG04', $resultsCubeCombined['serialNumber']);
     }
+
+    public function testOcrDial()
+    {
+        $image = sprintf(
+            "%s/../src/AppBundle/Tests/Resources/imei/dial.png",
+            self::$rootDir
+        );
+
+        $results = self::$imei->ocr($image, 'Apple');
+        $this->assertNotNull($results);
+        $this->assertTrue($results['success']);
+        $this->assertEquals('359487087831380', $results['imei']);
+        $this->assertEmpty($results['serialNumber']);
+    }
 }
