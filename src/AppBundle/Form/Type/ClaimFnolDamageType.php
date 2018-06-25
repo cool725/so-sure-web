@@ -75,12 +75,12 @@ class ClaimFnolDamageType extends AbstractType
             $form = $event->getForm();
             $claim = $event->getData()->getClaim();
 
-            if ($claim->getPolicy()->getRisk() == Policy::RISK_LEVEL_LOW) {
+            if (!$claim->needProofOfUsage()) {
                 $form->add('proofOfUsage', HiddenType::class);
             } else {
                 $form->add('proofOfUsage', FileType::class, ['required' => true]);
             }
-            if ($claim->getPolicy()->getPicSureStatus() == PhonePolicy::PICSURE_STATUS_APPROVED) {
+            if (!$claim->needPictureOfPhone()) {
                 $form->add('pictureOfPhone', HiddenType::class);
             } else {
                 $form->add('pictureOfPhone', FileType::class, ['required' => true]);

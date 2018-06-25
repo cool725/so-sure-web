@@ -1645,6 +1645,8 @@ class UserController extends BaseController
             'claimType' => $claim->getType(),
             'network' => $claim->getNetwork(),
             'claim_form' => $claimTheftLossForm->createView(),
+            'proof_of_usage' => $claim->needProofOfUsage(),
+            'proof_of_purchase' => $claim->needProofOfPurchase(),
         ];
         return $this->render('AppBundle:User:claimTheftLoss.html.twig', $data);
     }

@@ -29,7 +29,7 @@ class ClaimFnolTheftLossType extends AbstractType
      * @var boolean
      */
     private $required;
- 
+
      /**
      * @var ClaimsService
      */
@@ -50,7 +50,7 @@ class ClaimFnolTheftLossType extends AbstractType
         $builder
             ->add('hasContacted', ChoiceType::class, [
                 'required' => true,
-                'placeholder' => '',
+                'placeholder' => 'Did you contact the last place you had it?',
                 'choices' => [
                     'contacted' => true,
                     'did not contact' => false,
@@ -75,7 +75,7 @@ class ClaimFnolTheftLossType extends AbstractType
             ])
             ->add('reportType', ChoiceType::class, [
                 'required' => true,
-                'placeholder' => '',
+                'placeholder' => 'Where?',
                 'choices' => [
                     'police station' => Claim::REPORT_POLICE_STATION,
                     'online' => Claim::REPORT_ONLINE,
@@ -89,14 +89,12 @@ class ClaimFnolTheftLossType extends AbstractType
             $form = $event->getForm();
             $claim = $event->getData()->getClaim();
 
-            if ($claim->getPolicy()->getRisk() == Policy::RISK_LEVEL_LOW) {
+            if (!$claim->needProofOfUsage()) {
                 $form->add('proofOfUsage', HiddenType::class);
             } else {
                 $form->add('proofOfUsage', FileType::class, ['required' => true]);
             }
-            if ($claim->getPolicy()->getRisk() != Policy::RISK_LEVEL_HIGH &&
-                $claim->getPolicy()->getPicSureStatus() == PhonePolicy::PICSURE_STATUS_APPROVED
-            ) {
+            if (!$claim->needProofOfPurchase()) {
                 $form->add('proofOfPurchase', HiddenType::class);
             } else {
                 $form->add('proofOfPurchase', FileType::class, ['required' => true]);

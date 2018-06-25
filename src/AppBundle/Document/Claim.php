@@ -789,7 +789,7 @@ class Claim
         if (!$status) {
             throw new \Exception('Status must be defined');
         }
-        
+
         if (!in_array($status, [
             self::STATUS_FNOL,
             self::STATUS_SUBMITTED,
@@ -1373,7 +1373,7 @@ class Claim
     {
         return $this->network;
     }
-    
+
     public function setNetwork($network)
     {
         $this->network = $network;
@@ -1383,7 +1383,7 @@ class Claim
     {
         return $this->phoneToReach;
     }
-    
+
     public function setPhoneToReach($phoneToReach)
     {
         $this->phoneToReach = $phoneToReach;
@@ -1393,7 +1393,7 @@ class Claim
     {
         return $this->timeToReach;
     }
-    
+
     public function setTimeToReach($timeToReach)
     {
         $this->timeToReach = $timeToReach;
@@ -1403,7 +1403,7 @@ class Claim
     {
         return $this->signature;
     }
-    
+
     public function setSignature($signature)
     {
         $this->signature = $signature;
@@ -1413,7 +1413,7 @@ class Claim
     {
         return $this->typeDetails;
     }
-    
+
     public function setTypeDetails($typeDetails)
     {
         $this->typeDetails = $typeDetails;
@@ -1423,7 +1423,7 @@ class Claim
     {
         return $this->typeDetailsOther;
     }
-    
+
     public function setTypeDetailsOther($typeDetailsOther)
     {
         $this->typeDetailsOther = $typeDetailsOther;
@@ -1433,7 +1433,7 @@ class Claim
     {
         return $this->monthOfPurchase;
     }
-    
+
     public function setMonthOfPurchase($monthOfPurchase)
     {
         $this->monthOfPurchase = $monthOfPurchase;
@@ -1443,7 +1443,7 @@ class Claim
     {
         return $this->yearOfPurchase;
     }
-    
+
     public function setYearOfPurchase($yearOfPurchase)
     {
         $this->yearOfPurchase = $yearOfPurchase;
@@ -1453,7 +1453,7 @@ class Claim
     {
         return $this->phoneStatus;
     }
-    
+
     public function setPhoneStatus($phoneStatus)
     {
         $this->phoneStatus = $phoneStatus;
@@ -1463,7 +1463,7 @@ class Claim
     {
         return $this->isUnderWarranty;
     }
-    
+
     public function setIsUnderWarranty($isUnderWarranty)
     {
         $this->isUnderWarranty = $isUnderWarranty;
@@ -1473,7 +1473,7 @@ class Claim
     {
         return $this->hasContacted;
     }
-    
+
     public function setHasContacted($hasContacted)
     {
         $this->hasContacted = $hasContacted;
@@ -1483,7 +1483,7 @@ class Claim
     {
         return $this->contactedPlace;
     }
-    
+
     public function setContactedPlace($contactedPlace)
     {
         $this->contactedPlace = $contactedPlace;
@@ -1493,7 +1493,7 @@ class Claim
     {
         return $this->blockedDate;
     }
-    
+
     public function setBlockedDate($blockedDate)
     {
         $this->blockedDate = $blockedDate;
@@ -1503,7 +1503,7 @@ class Claim
     {
         return $this->reportedDate;
     }
-    
+
     public function setReportedDate($reportedDate)
     {
         $this->reportedDate = $reportedDate;
@@ -1513,7 +1513,7 @@ class Claim
     {
         return $this->reportType;
     }
-    
+
     public function setReportType($reportType)
     {
         $this->reportType = $reportType;
@@ -1523,7 +1523,7 @@ class Claim
     {
         return $this->policeLossReport;
     }
-    
+
     public function setPoliceLossReport($policeLossReport)
     {
         $this->policeLossReport = $policeLossReport;
@@ -1723,6 +1723,18 @@ class Claim
         });
 
         return $files;
+    }
+
+    public function needProofOfUsage() {
+        return $this->policy->getRisk() != Policy::RISK_LEVEL_LOW;
+    }
+
+    public function needProofOfPurchase() {
+        return $this->getPolicy()->getRisk() == Policy::RISK_LEVEL_HIGH || $this->getPolicy()->getPicSureStatus() != PhonePolicy::PICSURE_STATUS_APPROVED;
+    }
+
+    public function needPictureOfPhone() {
+        return $this->getPolicy()->getPicSureStatus() != PhonePolicy::PICSURE_STATUS_APPROVED;
     }
 
     public static function getExcessValue($type, $picSureValidated, $picSureEnabled)
