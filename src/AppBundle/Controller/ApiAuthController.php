@@ -1043,6 +1043,9 @@ class ApiAuthController extends BaseController
             }
             $this->denyAccessUnlessGranted(PolicyVoter::EDIT, $policy);
 
+            $policyService = $this->get('app.policy');
+            $policyService->validatePermium($policy);
+
             if (isset($data['bank_account'])) {
                 throw new \Exception('gocardless is no longer supported');
             } elseif (isset($data['braintree'])) {

@@ -2091,4 +2091,11 @@ class PolicyService
             $data
         );
     }
+
+    public function validatePremium(Policy $policy)
+    {
+        if ($policy->getPhone()->getCurrentPhonePrice()->getMonthlyPremiumPrice() != $policy->getPremium()->getMonthlyPremiumPrice()) {
+
+        }
+    }
 }
