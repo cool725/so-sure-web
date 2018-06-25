@@ -252,7 +252,7 @@ class BaseImeiService
                     'imei' => $this->luhnGenerate($matches[2]),
                     'serialNumber' => $serialNumber,
                 ];
-            } elseif (preg_match('/(\d{15})/', $noSpace, $matches)) {
+            } elseif (preg_match('/(\d{15})/', str_replace("\n", '', $noSpace), $matches)) {
                 // might be a screenshot of *#06# rather than settings
                 if ($this->isImei($matches[1])) {
                     return [
