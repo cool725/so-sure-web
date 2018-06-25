@@ -372,20 +372,30 @@
                             </tr>
                             {% for file in files if file.status != 'cancelled' %}
                                 {% set debitAmount = 0 %}
+                                {% set creditAmount = 0 %}
                                 {%  if file and file.metadata %}
-                                    {% set debitAmount = file.metadata['debit-amount'] %}
+                                    {% if file.metadata['debit-amount'] is defined %}
+                                        {% set debitAmount = file.metadata['debit-amount'] %}
+                                    {% endif %}
+                                    {% if file.metadata['credit-amount'] is defined %}
+                                        {% set creditAmount = file.metadata['credit-amount'] %}
+                                    {% endif %}
                                 {% endif %}
 
                                 {% set paymentAmount = 0 %}
+                                {% set lastSubmittedPayment = {} %}
                                 {% for payment in payments if payment.serialNumber %}
                                     {% if payment.serialNumber == file.serialNumber %}
+                                        {% if lastSubmittedPayment[file.serialNumber] is not defined or lastSubmittedPayment[file.serialNumber] < payment.submittedDate %}
+                                            {% set lastSubmittedPayment = lastSubmittedPayment|merge({ (file.serialNumber): payment.submittedDate}) %}
+                                        {% endif %}
                                         {% set paymentAmount = paymentAmount + payment.amount %}
                                     {% endif %}
                                 {% endfor %}
 
                                 {% set reportAmount = 0 %}
                                 {% for inputFile in input %}
-                                    {%  if inputFile.metadata and inputFile.getFormattedSerialNumber == file.serialNumber %}
+                                    {%  if inputFile.metadata and inputFile.getFormattedSerialNumber == file.serialNumber and inputFile.metadata['debit-accepted-value'] is defined %}
                                         {% set reportAmount = reportAmount + inputFile.metadata['debit-accepted-value'] %}
                                     {% endif %}
                                 {% endfor %}
@@ -418,9 +428,11 @@
                                         {% endif %}
                                     </td>
 
-                                    {% set color = '' %}
+                                    {% set delay = false %}
                                     {% if equal_to_two_dp(debitAmount, reportAmount) and equal_to_two_dp(paymentAmount, reportAmount)  %}
                                         {% set color = 'success' %}
+                                    {% elseif lastSubmittedPayment[file.serialNumber] is defined and lastSubmittedPayment[file.serialNumber]|date > 'now'|date %}
+                                        {% set color = 'warning' %}
                                     {% else %}
                                         {% set color = 'danger' %}
                                     {% endif %}
@@ -430,6 +442,7 @@
                                         {% else %}
                                             -
                                         {% endif %}
+                                        {% if color == 'warning' %}<i class="fa fa-clock-o" title="Wait until {{  lastSubmittedPayment[file.serialNumber]|date}}"></i>{% endif %}
                                     </td>
                                 </tr>
                             {% endfor %}
