@@ -4108,7 +4108,7 @@ abstract class Policy
     {
         $salva = new Salva();
         $premium = $this->getPremium();
-        $numPayments = $premium->getNumberOfMonthlyPayments($this->getTotalSuccessfulPayments($date));
+        $numPayments = $premium->getNumberOfMonthlyPayments($this->getTotalSuccessfulUserPayments($date));
         $expectedCommission = $salva->sumBrokerFee($numPayments, $numPayments == 12);
 
         /*
