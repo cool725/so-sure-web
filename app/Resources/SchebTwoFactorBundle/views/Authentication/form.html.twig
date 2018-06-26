@@ -1,23 +1,47 @@
 {% extends '::base.html.twig' %}
+
+{# Set vars #}
+{% set exclude_remote_scripts = true %}
+{% set new_stylesheet = 1 %}
+{% set distraction_free = 1 %}
+{% set new_footer = 1 %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {% stylesheets output='css/*.css'
+    '@AppBundle/Resources/public/sass/page/login.scss'
+ %}<link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
+{% endblock %}
+
 {% block body %}
-<div class="row">
-    <div class="col-md-12 text-center">
-        
-<form class="form" action="" method="post">
-    {% for flashMessage in app.session.flashbag.get("two_factor") %}
-        <p class="error">{{ flashMessage|trans }}</p>
-    {% endfor %}
+    <div class="panel login__panel">
+        <div class="panel-body">
+            <form class="form" action="" method="post">
+                {% for flashMessage in app.session.flashbag.get("two_factor") %}
+                    <p class="error">{{ flashMessage|trans }}</p>
+                {% endfor %}
 
-    <p><label for="_auth_code">Google Auth MFA Code</label></p>
-    <p class="widget"><input id="_auth_code" type="text" autocomplete="off" name="_auth_code" /></p>
-    {% if useTrustedOption %}<p class="widget"><label for="_trusted"><input id="_trusted" type="checkbox" name="_trusted" /> Trust this computer</label></p>{% endif %}
-    <p class="submit"><input type="submit" value="Login" class="btn btn-primary" /></p>
+                <div class="form-group">
+                    <label for="_auth_code">Google Auth MFA Code</label>
+                    <input id="_auth_code" type="tel" class="form-control" autocomplete="off" name="_auth_code" />
+                </div>
 
-    {# The logout link gives the user a way out if they can't complete the second step #}
-    <p class="cancel"><a href="{{ path("_security_logout") }}">Abort login</a></p>
-</form>
+                {% if useTrustedOption %}
+                    <div class="form-group">
+                        <label for="_trusted">
+                            <input id="_trusted" type="checkbox" name="_trusted" /> Trust this computer
+                        </label>
+                    </div>
+                {% endif %}
 
+                <div class="form-group">
+                    <input type="submit" value="Login" class="btn btn-blue btn-pad" /></p>
+                </div>
+
+                <div class="form-group">
+                    <a class="btn btn-link btn-xs" href="{{ path("_security_logout") }}">Abort login</a>
+                </div>
+            </form>
+        </div>
     </div>
-</div>
-
 {% endblock %}
