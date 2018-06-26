@@ -138,7 +138,10 @@ class MixpanelCommand extends BaseCommand
      */
     private function getMixpanel()
     {
-        return $this->getContainer()->get('app.mixpanel');
+        /** @var MixpanelService $mixpanel */
+        $mixpanel = $this->getContainer()->get('app.mixpanel');
+
+        return $mixpanel;
     }
 
     private function getUser($email)
