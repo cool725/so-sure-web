@@ -308,7 +308,7 @@
                             </td>
                             <td>
                                 {% for location in policy.picsureLocations %}
-                                    [{{ location.coordinates[1]}},{{ postcode.location.coordinates[0]}}] 
+                                    [{{ location.coordinates[1]}},{{ location.coordinates[0]}}]
                                 {% endfor %}
                             </td>
                         </tr>
@@ -1153,7 +1153,7 @@
                             {{ scheduledPayment.status }}
                         </td>
                         <td>
-                            {% if scheduledPayment.payment %}
+                            {% if scheduledPayment.payment and scheduledPayment.payment.status is defined %}
                                 {{ scheduledPayment.payment.status }}
                             {% else %}
                                 -

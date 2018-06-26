@@ -4104,18 +4104,25 @@ abstract class Policy
             $this->getPromoPotValue() == $this->calculatePotValue(true);
     }
 
-    public function hasCorrectCommissionPayments(\DateTime $date = null)
+    public function getExpectedCommission(\DateTime $date = null)
     {
         $salva = new Salva();
         $premium = $this->getPremium();
 
-        $expectedCommission = 0;
+        $expectedCommission = null;
         if (in_array($this->getStatus(), [self::STATUS_ACTIVE, self::STATUS_UNPAID])) {
             $numPayments = $premium->getNumberOfMonthlyPayments($this->getTotalSuccessfulUserPayments($date));
             $expectedCommission = $salva->sumBrokerFee($numPayments, $numPayments == 12);
         } else {
             $expectedCommission = $this->getProratedCommission($date);
         }
+
+        return $expectedCommission;
+    }
+
+    public function hasCorrectCommissionPayments(\DateTime $date = null)
+    {
+        $expectedCommission = $this->getExpectedCommission($date);
         /*
         print $numPayments . PHP_EOL;
         print $expectedCommission . PHP_EOL;
