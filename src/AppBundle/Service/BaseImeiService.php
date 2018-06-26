@@ -194,6 +194,9 @@ class BaseImeiService
             }
             $imeiLine++;
         }
+        if ($imeiLine < 3) {
+            return null;
+        }
         $serialNumber = null;
         $serialLine = $lines[$imeiLine - 3];
         $serialLineData = explode(' ', $serialLine);
