@@ -1093,9 +1093,39 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         return $this->getPaymentMethod() instanceof BacsPaymentMethod;
     }
 
+    /**
+     * @return BacsPaymentMethod|null
+     */
+    public function getBacsPaymentMethod()
+    {
+        if ($this->hasBacsPaymentMethod()) {
+            /** @var BacsPaymentMethod $paymentMethod */
+            $paymentMethod = $this->getPaymentMethod();
+
+            return $paymentMethod;
+        }
+
+        return null;
+    }
+
     public function hasJudoPaymentMethod()
     {
         return $this->getPaymentMethod() instanceof JudoPaymentMethod;
+    }
+
+    /**
+     * @return JudoPaymentMethod|null
+     */
+    public function getJudoPaymentMethod()
+    {
+        if ($this->hasJudoPaymentMethod()) {
+            /** @var JudoPaymentMethod $paymentMethod */
+            $paymentMethod = $this->getPaymentMethod();
+
+            return $paymentMethod;
+        }
+
+        return null;
     }
 
     public function canUpdateBacsDetails()
@@ -1134,6 +1164,15 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         $data['renewalMonthlyPremiumWithPot'] = 0;
         $data['paymentMethod'] = $this->getPaymentMethod() ? $this->getPaymentMethod()->getType() : null;
         $data['hasOutstandingPicSurePolicy'] = false;
+        $data['connectedWithFacebook'] = mb_strlen($this->getFacebookId()) > 0;
+        $data['connectedWithGoogle'] = mb_strlen($this->getGoogleId()) > 0;
+        if ($this->hasBacsPaymentMethod()) {
+            $data['paymentMethod'] = 'bacs';
+        } elseif ($this->hasJudoPaymentMethod()) {
+                $data['paymentMethod'] = 'judo';
+        } else {
+            $data['paymentMethod'] = 'none';
+        }
         foreach ($this->getValidPolicies(true) as $policy) {
             /** @var PhonePolicy $policy */
             if (!$policy->isActive()) {

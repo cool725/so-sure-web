@@ -1,9 +1,11 @@
 <?php
 namespace AppBundle\Service;
 
+use AppBundle\Document\File\SalvaPaymentFile;
 use AppBundle\Repository\CashbackRepository;
 use AppBundle\Repository\ClaimRepository;
 use AppBundle\Repository\ConnectionRepository;
+use AppBundle\Repository\File\S3FileRepository;
 use AppBundle\Repository\Invitation\InvitationRepository;
 use AppBundle\Repository\PaymentRepository;
 use AppBundle\Repository\PhonePolicyRepository;
@@ -904,6 +906,7 @@ class ReportingService
             'policyDiscountRefunds' => Payment::sumPayments($policyDiscountRefundPayments, $isProd, PolicyDiscountRefundPayment::class),
             'totalRunRate' => $totalRunRate,
             'totalCashback' => Cashback::sumCashback($this->getCashback($date)),
+            'salvaPaymentFile' => $this->getSalvaPaymentFile($date),
         ];
         // @codingStandardsIgnoreEnd
     }
@@ -1081,6 +1084,26 @@ class ReportingService
         }
 
         return $payments;
+    }
+
+    private function getSalvaPaymentFile(\DateTime $date)
+    {
+        $files = $this->getSalvaPaymentFiles($date);
+        if ($files && count($files) > 0) {
+            foreach ($files as $file) {
+                return $file;
+            }
+        }
+
+        return null;
+    }
+
+    private function getSalvaPaymentFiles(\DateTime $date)
+    {
+        /** @var S3FileRepository $repo */
+        $repo = $this->dm->getRepository(SalvaPaymentFile::class);
+
+        return $repo->getAllFiles($date, 'salvaPayment');
     }
 
     private function arrayToString($array, $keyValueSeperator = '=', $lineSeperator = '; ')

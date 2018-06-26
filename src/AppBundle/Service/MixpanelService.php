@@ -764,6 +764,12 @@ class MixpanelService
         }
 
         $this->queuePersonProperties($userData, false, $user);
+        if ($analytics['connectedWithFacebook']) {
+            $this->queuePersonProperties(['Connected With' => 'Facebook'], false, $user, true);
+        }
+        if ($analytics['connectedWithGoogle']) {
+            $this->queuePersonProperties(['Connected With' => 'Google'], false, $user, true);
+        }
         $this->queueAttribution($user);
     }
 

@@ -4,9 +4,19 @@ var sosure = sosure || {};
 sosure.globals = (function() {
     var self = {};
     self.device_category = null;
+    self.useragent = null;
+    self.isiOS = false;
 
     self.setDevice = function(device_category) {
         self.device_category = device_category;
+    }
+
+    self.setAgent = function(useragent) {
+        self.useragent = navigator.userAgent.toLowerCase();
+        // Is iOS?
+        if (self.useragent.match(/(iphone|ipod|ipad)/)) {
+            self.isiOS = true;
+        }
     }
 
     self.policyTerms = function() {
@@ -30,6 +40,7 @@ sosure.globals = (function() {
 
 $(function(){
     sosure.globals.setDevice($('#ss-root').data('device-category'));
+    sosure.globals.setAgent();
 });
 
 $(function(){

@@ -149,54 +149,63 @@
         }
 
         li {
+            height: 165px;
             vertical-align: middle;
             padding: 15px;
             position: relative;
+            background-color: $white;
 
             &:first-of-type {
-                height: 90px;
                 line-height: 55px;
-                // padding: 30px 15px;
             }
 
-            &:nth-child(even) {
-                background-color: $off-white;
-            }
+            border-bottom: 1px solid $pale-grey;
 
             .fa {
                 margin-bottom: 5px;
+            }
+
+            @include breakpoint(mobS) {
+                height: 145px;
             }
         }
 
         li.so-sure {
             background-color: $primary-blue;
+            height: 90px
         }
 
         li.protectyourbubble {
             background-color: $protectyourbubble;
             color: $white;
+            height: 90px
         }
 
         .fa.protectyourbubble {
             color: $protectyourbubble;
+            height: 90px
         }
 
         li.loveitcoverit {
             background-color: $lightest-blue;
             color: $white;
+            height: 90px
         }
 
         .fa.loveitcoverit {
             color: $loveitcoverit;
+            height: 90px
         }
 
         li.gadgetcover {
             background-color: $gadgetcover;
             color: $white;
+            height: 90px
         }
 
         .fa.gadgetcover {
             color: $gadgetcover;
+            height: 90px
         }
     }
 }

@@ -74,10 +74,10 @@ class ValidatePolicyCommand extends BaseCommand
                 'Do not send email report if present'
             )
             ->addOption(
-                'all',
+                'unpaid',
                 null,
-                InputOption::VALUE_NONE,
-                'Show all unpaid, rather than those close to expiry'
+                InputOption::VALUE_REQUIRED,
+                'all, expiry, none'
             )
             ->addOption(
                 'resync-picsure-s3file-metadata',
@@ -106,7 +106,10 @@ class ValidatePolicyCommand extends BaseCommand
         $updatePotValue = $input->getOption('update-pot-value');
         $adjustScheduledPayments = $input->getOption('adjust-scheduled-payments');
         $skipEmail = true === $input->getOption('skip-email');
-        $all = true === $input->getOption('all');
+        $unpaid = $input->getOption('unpaid');
+        if (!in_array($unpaid, [null, 'all', 'expiry', 'none'])) {
+            throw new \Exception(sprintf('Unknown option for unpaid: %s', $unpaid));
+        }
         $resyncPicsureMetadata = true === $input->getOption('resync-picsure-s3file-metadata');
         $resyncPicsure = true === $input->getOption('resync-picsure-s3file-status');
         $validateDate = null;
@@ -160,7 +163,7 @@ class ValidatePolicyCommand extends BaseCommand
                     'validateDate' => $validateDate,
                     'adjustScheduledPayments' => $adjustScheduledPayments,
                     'updatePotValue' => $updatePotValue,
-                    'all' => true,
+                    'unpaid' => 'all',
                 ];
                 $this->validatePolicy($policy, $policies, $lines, $data);
                 if ($updatePotValue || $adjustScheduledPayments) {
@@ -185,7 +188,7 @@ class ValidatePolicyCommand extends BaseCommand
                         'validateDate' => $validateDate,
                         'adjustScheduledPayments' => false,
                         'updatePotValue' => false,
-                        'all' => $all,
+                        'unpaid' => $unpaid,
                     ];
                     $this->validatePolicy($policy, $policies, $lines, $data);
                 }
@@ -261,9 +264,8 @@ class ValidatePolicyCommand extends BaseCommand
             $closeToExpiration = $diff->days < 14 && $diff->invert == 0;
         }
         if ($policy->isPolicyPaidToDate($data['validateDate']) === false) {
-            if ($data['all'] || $closeToExpiration) {
+            if ($data['unpaid'] == 'all' || ($closeToExpiration && $data['unpaid'] == 'expiry')) {
                 $this->header($policy, $policies, $lines);
-                $data['warnClaim'] = true;
                 $lines[] = "Not Paid To Date";
                 $lines[] = sprintf(
                     'Next attempt: %s.',
@@ -299,12 +301,10 @@ class ValidatePolicyCommand extends BaseCommand
         }
         if ($policy->hasCorrectPolicyStatus($data['validateDate']) === false) {
             $this->header($policy, $policies, $lines);
-            $data['warnClaim'] = true;
             $lines[] = $this->failureStatusMessage($policy, $data['prefix'], $data['validateDate']);
         }
         if ($policy->arePolicyScheduledPaymentsCorrect() === false) {
             $this->header($policy, $policies, $lines);
-            $data['warnClaim'] = true;
             if ($data['adjustScheduledPayments']) {
                 /** @var PolicyService $policyService */
                 $policyService = $this->getContainer()->get('app.policy');
@@ -337,7 +337,6 @@ class ValidatePolicyCommand extends BaseCommand
         }
         if ($policy->hasCorrectCommissionPayments($data['validateDate']) === false) {
             $this->header($policy, $policies, $lines);
-            $data['warnClaim'] = true;
             $lines[] = $this->failureCommissionMessage($policy, $data['prefix'], $data['validateDate']);
         }
         if ($data['warnClaim'] && $policy->hasOpenClaim()) {
@@ -378,8 +377,10 @@ class ValidatePolicyCommand extends BaseCommand
     private function failureCommissionMessage($policy, $prefix, $date)
     {
         return sprintf(
-            'Unexpected commission for policy %s',
-            $policy->getPolicyNumber() ? $policy->getPolicyNumber() : $policy->getId()
+            'Unexpected commission for policy %s (Paid: %0.2f Expected: %0.2f)',
+            $policy->getPolicyNumber() ? $policy->getPolicyNumber() : $policy->getId(),
+            $policy->getTotalCommissionPaid(),
+            $policy->getExpectedCommission($date)
         );
     }
 

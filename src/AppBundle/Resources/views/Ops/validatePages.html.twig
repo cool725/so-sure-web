@@ -154,10 +154,31 @@
                 <a href="{{ url('user_welcome') }}?_impersonate={{ valid_policy.user.email }}">User Welcome</a> <b>(auto impersonate {{ valid_policy.user.email }})</b>
             </li>
             <li>
-                {% if unpaid_policy %}
-                    <a href="{{ url('user_home') }}?_impersonate={{ unpaid_policy.user.email }}">User Unpaid Page</a> <b>(auto impersonate {{ unpaid_policy.user.email }})</b>
+                {% if unpaid_policy_bacs_inprogress %}
+                    <a href="{{ url('user_home') }}?_impersonate={{ unpaid_policy_bacs_inprogress.user.email }}">User Unpaid Page (Bacs In Progress)</a> <b>(auto impersonate {{ unpaid_policy_bacs_inprogress.user.email }})</b>
                 {% else %}
-                    No policy unpaid available
+                    No policy unpaid available (bacs in progress)
+                {% endif %}
+            </li>
+            <li>
+                {% if unpaid_policy_bacs_invalid %}
+                    <a href="{{ url('user_home') }}?_impersonate={{ unpaid_policy_bacs_invalid.user.email }}">User Unpaid Page (Bacs Invalid)</a> <b>(auto impersonate {{ unpaid_policy_bacs_invalid.user.email }})</b>
+                {% else %}
+                    No policy unpaid available (bacs invalid)
+                {% endif %}
+            </li>
+            <li>
+                {% if unpaid_policy_bacs_success %}
+                    <a href="{{ url('user_home') }}?_impersonate={{ unpaid_policy_bacs_success.user.email }}">User Unpaid Page (Bacs Success)</a> <b>(auto impersonate {{ unpaid_policy_bacs_success.user.email }})</b>
+                {% else %}
+                    No policy unpaid available (bacs success)
+                {% endif %}
+            </li>
+            <li>
+                {% if unpaid_policy_judo %}
+                    <a href="{{ url('user_home') }}?_impersonate={{ unpaid_policy_judo.user.email }}">User Unpaid Page (Judo)</a> <b>(auto impersonate {{ unpaid_policy_judo.user.email }})</b>
+                {% else %}
+                    No policy unpaid available (judo)
                 {% endif %}
             </li>
             <li>

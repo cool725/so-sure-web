@@ -10,10 +10,11 @@ sosure.validaters = (function() {
 
         for (var i in text) {
             var idx = accents.indexOf(text[i]);
-            if (idx != -1)
+            if (idx != -1) {
                 textNoAccents[i] = accentsOut.substr(idx, 1);
-            else
+            } else {
                 textNoAccents[i] = text[i];
+            }
         }
 
         return textNoAccents.join('');

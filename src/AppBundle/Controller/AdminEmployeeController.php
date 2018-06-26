@@ -1049,6 +1049,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             'suggested_cancellation_date' => $now->add(new \DateInterval('P30D')),
             'claim_types' => Claim::$claimTypes,
             'phones' => $dm->getRepository(Phone::class)->findActive()->getQuery()->execute(),
+            'now' => new \DateTime(),
         ];
     }
 
@@ -2201,10 +2202,14 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             }
 
             $picsureFiles = $policy->getPolicyPicSureFiles();
-            $this->get('event_dispatcher')->dispatch(
-                PicsureEvent::EVENT_APPROVED,
-                new PicsureEvent($picsureFiles[0])
-            );
+            if (count($picsureFiles) > 0) {
+                $this->get('event_dispatcher')->dispatch(
+                    PicsureEvent::EVENT_APPROVED,
+                    new PicsureEvent($picsureFiles[0])
+                );
+            } else {
+                $this->get('logger')->error(sprintf("Missing picture file in policy %s.", $policy->getId()));
+            }
 
             return new RedirectResponse($this->generateUrl('admin_picsure'));
         } elseif ($request->get('_route') == "admin_picsure_reject") {
@@ -2239,10 +2244,14 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             }
 
             $picsureFiles = $policy->getPolicyPicSureFiles();
-            $this->get('event_dispatcher')->dispatch(
-                PicsureEvent::EVENT_REJECTED,
-                new PicsureEvent($picsureFiles[0])
-            );
+            if (count($picsureFiles) > 0) {
+                $this->get('event_dispatcher')->dispatch(
+                    PicsureEvent::EVENT_REJECTED,
+                    new PicsureEvent($picsureFiles[0])
+                );
+            } else {
+                $this->get('logger')->error(sprintf("Missing picture file in policy %s.", $policy->getId()));
+            }
 
             return new RedirectResponse($this->generateUrl('admin_picsure'));
         } elseif ($request->get('_route') == "admin_picsure_invalid") {
@@ -2253,9 +2262,9 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                 'Sorry, we need another pic-sure',
                 $policy->getUser()->getEmail(),
                 'AppBundle:Email:picsure/invalid.html.twig',
-                ['policy' => $policy],
+                ['policy' => $policy, 'additional_message' => $request->get('message')],
                 'AppBundle:Email:picsure/invalid.txt.twig',
-                ['policy' => $policy]
+                ['policy' => $policy, 'additional_message' => $request->get('message')]
             );
             try {
                 $push = $this->get('app.push');
@@ -2269,10 +2278,14 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             }
 
             $picsureFiles = $policy->getPolicyPicSureFiles();
-            $this->get('event_dispatcher')->dispatch(
-                PicsureEvent::EVENT_INVALID,
-                new PicsureEvent($picsureFiles[0])
-            );
+            if (count($picsureFiles) > 0) {
+                $this->get('event_dispatcher')->dispatch(
+                    PicsureEvent::EVENT_INVALID,
+                    new PicsureEvent($picsureFiles[0])
+                );
+            } else {
+                $this->get('logger')->error(sprintf("Missing picture file in policy %s.", $policy->getId()));
+            }
 
             return new RedirectResponse($this->generateUrl('admin_picsure'));
         }

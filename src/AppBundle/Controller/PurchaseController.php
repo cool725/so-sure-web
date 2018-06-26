@@ -299,6 +299,7 @@ class PurchaseController extends BaseController
     */
     public function purchaseStepPhoneReviewAction(Request $request, $id = null)
     {
+        /** @var User $user */
         $user = $this->getUser();
         if (!$user) {
             return $this->redirectToRoute('purchase');
@@ -1096,7 +1097,7 @@ class PurchaseController extends BaseController
 
                     // @codingStandardsIgnoreStart
                     $body = sprintf(
-                        "This is a so-sure generated message. Policy: <a href='%s'>%s/%s</a> requested a cancellation via the site as phone was damaged (%s) prior to purchase. so-sure support team: Please verify policy id match in system and directly cancel policy immediately without DPA validation. Additional comments: %s",
+                        "This is a so-sure generated message. Policy: <a href='%s'>%s/%s</a> requested a cancellation via the site as phone was damaged (%s) prior to purchase. so-sure support team: Please contact the policy holder to get their reason(s) for cancelling before action. Additional comments: %s",
                         $this->generateUrl(
                             'admin_policy',
                             ['id' => $policy->getId()],
@@ -1141,7 +1142,7 @@ class PurchaseController extends BaseController
                         'We have passed your request to our policy team. You should receive a cancellation email once that is processed.'
                     );
                     // @codingStandardsIgnoreEnd
-                    return $this->redirectToRoute('homepage');
+                    return $this->redirectToRoute('purchase_cancel_requested', ['id' => $id]);
                 }
             }
         } else {
@@ -1158,6 +1159,24 @@ class PurchaseController extends BaseController
         ];
 
         return $this->render($template, $data);
+    }
+
+    /**
+     * @Route("/cancel/{id}/requested", name="purchase_cancel_requested")
+     * @Template
+     */
+    public function cancelRequestedAction($id)
+    {
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(Policy::class);
+        $policy = $repo->find($id);
+        if (!$policy) {
+            throw $this->createNotFoundException('Unable to see policy');
+        }
+
+        return [
+            'policy' => $policy,
+        ];
     }
 
     /**
