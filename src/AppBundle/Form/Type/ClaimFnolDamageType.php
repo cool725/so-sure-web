@@ -51,9 +51,9 @@ class ClaimFnolDamageType extends AbstractType
             ->add('typeDetailsOther', TextType::class, ['required' => false])
             ->add('monthOfPurchase', ChoiceType::class, [
                 'required' => true,
-                'placeholder' => 'Month Bought',
+                'placeholder' => 'Month Bought...',
                 'choices' => [
-                    ''
+                    'January' => 'January',
                 ],
             ])
             ->add('yearOfPurchase', TextType::class, ['required' => true])
