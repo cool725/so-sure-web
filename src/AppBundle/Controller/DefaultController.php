@@ -114,12 +114,6 @@ class DefaultController extends BaseController
             ['simple-picsure', 'picsure-redesign']
         );
 
-        $homepageCopy = $this->sixpack(
-            $request,
-            SixpackService::EXPERIMENT_HOMEPAGE_NEW_COPY,
-            ['homepage-old-copy', 'homepage-new-copy']
-        );
-
         $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE);
 
         $data = array(
@@ -131,11 +125,8 @@ class DefaultController extends BaseController
             'homepageCopy'        => $homepageCopy,
         );
 
-        if ($homepageCopy == 'homepage-new-copy') {
-            $template = 'AppBundle:Default:indexHomepageCopy.html.twig';
-        } else {
-            $template = 'AppBundle:Default:index.html.twig';
-        }
+
+        $template = 'AppBundle:Default:index.html.twig';
 
         return $this->render($template, $data);
     }
