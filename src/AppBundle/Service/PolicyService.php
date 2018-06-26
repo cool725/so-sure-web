@@ -2120,12 +2120,12 @@ class PolicyService
                     }
                 }
             } else {
-                if ($policy->getPremiumPlan() == Policy::PLAN_MONTHLY) {
-                    if ($amount != $policy->getPremium()->getMonthlyPremiumPrice()) {
+                if ($policy->getPremiumPlan() == Policy::PLAN_YEARLY) {
+                    if ($amount != $policy->getPremium()->getYearlyPremiumPrice()) {
                         $phonePrices = $policy->getPhone()->getPhonePrices();
                         $date->sub(new \DateInterval('PT30M'));
                         foreach ($phonePrices as $price) {
-                            if ($price->getMonthlyPremiumPrice() == $amount &&
+                            if ($price->getYearlyPremiumPrice() == $amount &&
                                 $price->getValidFrom() <= $date &&
                                 (!$price->getValidTo() || $price->getValidto() < $date)
                             ) {
@@ -2140,11 +2140,11 @@ class PolicyService
                         }
                     }
                 } else {
-                    if ($amount != $policy->getPremium()->getYearlyPremiumPrice()) {
+                    if ($amount != $policy->getPremium()->getMonthlyPremiumPrice()) {
                         $phonePrices = $policy->getPhone()->getPhonePrices();
                         $date->sub(new \DateInterval('PT30M'));
                         foreach ($phonePrices as $price) {
-                            if ($price->getYearlyPremiumPrice() == $amount &&
+                            if ($price->getMonthlyPremiumPrice() == $amount &&
                                 $price->getValidFrom() <= $date &&
                                 (!$price->getValidTo() || $price->getValidto() < $date)
                             ) {
