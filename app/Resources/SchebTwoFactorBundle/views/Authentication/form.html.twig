@@ -14,34 +14,36 @@
 {% endblock %}
 
 {% block body %}
-    <div class="panel login__panel">
-        <div class="panel-body">
-            <form class="form" action="" method="post">
-                {% for flashMessage in app.session.flashbag.get("two_factor") %}
-                    <p class="error">{{ flashMessage|trans }}</p>
-                {% endfor %}
+    <section class="section--pad">
+        <div class="panel login__panel">
+            <div class="panel-body">
+                <form class="form text-center" action="" method="post">
+                    {% for flashMessage in app.session.flashbag.get("two_factor") %}
+                        <p class="error">{{ flashMessage|trans }}</p>
+                    {% endfor %}
 
-                <div class="form-group">
-                    <label for="_auth_code">Google Auth MFA Code</label>
-                    <input id="_auth_code" type="tel" class="form-control" autocomplete="off" name="_auth_code" />
-                </div>
-
-                {% if useTrustedOption %}
                     <div class="form-group">
-                        <label for="_trusted">
-                            <input id="_trusted" type="checkbox" name="_trusted" /> Trust this computer
-                        </label>
+                        <label for="_auth_code" class="h2">Google Auth MFA Code</label>
+                        <input id="_auth_code" type="tel" class="form-control" placeholder="Enter 2FA" autocomplete="off" name="_auth_code" />
                     </div>
-                {% endif %}
 
-                <div class="form-group">
-                    <input type="submit" value="Login" class="btn btn-blue btn-pad" /></p>
-                </div>
+                    {% if useTrustedOption %}
+                        <div class="form-group">
+                            <label for="_trusted">
+                                <input id="_trusted" type="checkbox" name="_trusted"  /> Trust this computer
+                            </label>
+                        </div>
+                    {% endif %}
 
-                <div class="form-group">
-                    <a class="btn btn-link btn-xs" href="{{ path("_security_logout") }}">Abort login</a>
-                </div>
-            </form>
+                    <div class="form-group">
+                        <input type="submit" value="Login" class="btn btn-blue btn-block btn-pad" /></p>
+                    </div>
+
+                    <div class="form-group">
+                        <a class="btn btn-link btn-xs" href="{{ path("_security_logout") }}">Abort login</a>
+                    </div>
+                </form>
+            </div>
         </div>
-    </div>
+    </section>
 {% endblock %}
