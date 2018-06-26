@@ -307,9 +307,9 @@ class BaseImeiService
 
         $ocr = (new TesseractOCR($file));
         $results = $ocr
-            ->__call('psm', 6)
-            ->__call('lang', 'eng')
-            ->__call('tessedit_ocr_engine_mode', $engine)
+            ->__call('psm', [6])
+            ->__call('lang', ['eng'])
+            ->__call('tessedit_ocr_engine_mode', [$engine])
             ->run();
 
         unlink($file);
