@@ -62,6 +62,12 @@ class ValidatePolicyCommand extends BaseCommand
                 'If policy number is present, adjust scheduled payments'
             )
             ->addOption(
+                'validate-premiums',
+                null,
+                InputOption::VALUE_NONE,
+                'adjust premiums on partial and pending policies'
+            )
+            ->addOption(
                 'create',
                 null,
                 InputOption::VALUE_NONE,
@@ -105,6 +111,7 @@ class ValidatePolicyCommand extends BaseCommand
         $create = true === $input->getOption('create');
         $updatePotValue = $input->getOption('update-pot-value');
         $adjustScheduledPayments = $input->getOption('adjust-scheduled-payments');
+        $validatePremiums = $input->getOption('validate-premiums');
         $skipEmail = true === $input->getOption('skip-email');
         $all = true === $input->getOption('all');
         $resyncPicsureMetadata = true === $input->getOption('resync-picsure-s3file-metadata');
@@ -184,6 +191,7 @@ class ValidatePolicyCommand extends BaseCommand
                         'prefix' => $prefix,
                         'validateDate' => $validateDate,
                         'adjustScheduledPayments' => false,
+                        'validate-premiums' => $validatePremiums,
                         'updatePotValue' => false,
                         'all' => $all,
                     ];
@@ -339,6 +347,12 @@ class ValidatePolicyCommand extends BaseCommand
             $this->header($policy, $policies, $lines);
             $data['warnClaim'] = true;
             $lines[] = $this->failureCommissionMessage($policy, $data['prefix'], $data['validateDate']);
+        }
+        if ($data['validate-premiums'] && (!$policy->getStatus() ||
+            in_array($policy->getStatus(), [Policy::STATUS_PENDING, Policy::STATUS_MULTIPAY_REJECTED]))) {
+            /** @var PolicyService $policyService */
+            $policyService = $this->getContainer()->get('app.policy');
+            $policyService->validatePremium($policy);
         }
         if ($data['warnClaim'] && $policy->hasOpenClaim()) {
             $this->header($policy, $policies, $lines);
