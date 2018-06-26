@@ -179,7 +179,7 @@
                                 <img src="{{ connection.linkedUser.getImageUrlFallback }}"
                                 title="{% if connection.linkedUser.id == app.user.id %}{{ connection.linkedPolicy.defaultName }}{% else %}{{ connection.linkedUser.name }}{% endif %}"
                                 alt="{{ connection.linkedUser.name }}"
-                                class="img-circle coffee-stamp {% if not policy.hasMonetaryNetworkClaim %}user-has-claimed{% endif %}"
+                                class="img-circle coffee-stamp {% if connection.linkedPolicy.hasMonetaryClaimed %}user-has-claimed{% endif %}"
                                 data-container="body"
                                 data-toggle="popover"
                                 data-trigger="hover"
