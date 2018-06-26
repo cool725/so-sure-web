@@ -30,7 +30,7 @@
 
 		   {% if errors|length > 0 %}
 		   <div style="font-size: 14px; text-align: left; margin-top: 30px;"><font face="arial, helvetica neue, helvetica, sans-serif">
-			   <h3>Errors in last import</h3>
+			   <h3>{{ errors|length }} Errors in last import</h3>
 	 		   <hr>
 			{% for claimNumber,msgs in errors %}
 				 <p>Claim: {{ claimNumber }}</p>
