@@ -2099,7 +2099,7 @@ class PolicyService
         );
     }
 
-    public function validatePremium(Policy $policy, $amount = null, $date = null)
+    public function validatePremium($policy, $amount = null, $date = null)
     {
         if (!$date) {
             $date =  new \DateTime();
@@ -2122,6 +2122,7 @@ class PolicyService
             } else {
                 if ($policy->getPremiumPlan() == Policy::PLAN_YEARLY) {
                     if ($amount != $policy->getPremium()->getYearlyPremiumPrice()) {
+                        /** @var PhonePolicy $policy */
                         $phonePrices = $policy->getPhone()->getPhonePrices();
                         $date->sub(new \DateInterval('PT30M'));
                         foreach ($phonePrices as $price) {
@@ -2141,6 +2142,7 @@ class PolicyService
                     }
                 } else {
                     if ($amount != $policy->getPremium()->getMonthlyPremiumPrice()) {
+                        /** @var AppBundle\Document\PhonePolicy $policy */
                         $phonePrices = $policy->getPhone()->getPhonePrices();
                         $date->sub(new \DateInterval('PT30M'));
                         foreach ($phonePrices as $price) {
