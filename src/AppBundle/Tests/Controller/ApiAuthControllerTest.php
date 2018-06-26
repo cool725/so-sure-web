@@ -17,6 +17,7 @@ use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\SCode;
 use AppBundle\Document\Reward;
 use AppBundle\Document\MultiPay;
+use AppBundle\Document\PhonePrice;
 use AppBundle\Classes\ApiErrorCode;
 use AppBundle\Event\UserEmailEvent;
 use AppBundle\Listener\UserListener;
@@ -1975,6 +1976,57 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $this->assertEquals(2, $lowConnectionValue);
         $this->assertEquals(1, count($policyData['premium_payments']['paid']));
         $this->assertEquals('judo', $policyData['premium_payments']['paid'][0]['type']);
+    }
+
+    public function testNewPolicyJudopayDifferentAmount()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('policy-judopay-different-amount', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
+        $data = $this->verifyResponse(200);
+
+        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $repo = $dm->getRepository(Policy::class);
+        $policy = $repo->find($data['id']);
+        $phone = $policy->getPhone();
+
+        $currentPrice = $phone->getCurrentPhonePrice();
+
+        $validFrom = new \DateTime();
+        $validFrom->sub(new \DateInterval('PT1H'));
+
+        $price = new PhonePrice();
+        $price->setGwp($phone->getCurrentPhonePrice()->getGwp()+1);
+        $price->setValidFrom($validFrom);
+        $phone->addPhonePrice($price);
+
+        $currentPrice->setValidTo($validFrom);
+
+        $dm->flush();
+
+        $judopay = self::$client->getContainer()->get('app.judopay');
+        $receiptId = $judopay->testPay(
+            $user,
+            $data['id'],
+            $price->getMonthlyPremiumPrice(),
+            self::$JUDO_TEST_CARD_NUM,
+            self::$JUDO_TEST_CARD_EXP,
+            self::$JUDO_TEST_CARD_PIN
+        );
+
+        $url = sprintf("/api/v1/auth/policy/%s/pay", $data['id']);
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['judo' => [
+            'consumer_token' => '200000',
+            'card_token' => '55779911',
+            'receipt_id' => $receiptId,
+        ]]);
+        $policyData = $this->verifyResponse(200);
+        $this->assertEquals(SalvaPhonePolicy::STATUS_ACTIVE, $policyData['status']);
+        $this->assertEquals($data['id'], $policyData['id']);
     }
 
     public function testNewPolicyJudopayExceptionPartialPolicy()
