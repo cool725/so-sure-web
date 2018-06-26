@@ -10,7 +10,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 use AppBundle\Validator\Constraints as AppAssert;
 
 /**
- * @MongoDB\Document()
+ * @MongoDB\Document(repositoryClass="AppBundle\Repository\BacsIndemnityPaymentRepository")
  * @Gedmo\Loggable
  */
 class BacsIndemnityPayment extends Payment
