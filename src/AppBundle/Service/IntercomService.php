@@ -1116,6 +1116,11 @@ class IntercomService
 
     }
 
+    public function countQueue()
+    {
+        return $this->redis->llen(self::KEY_INTERCOM_QUEUE);
+    }
+
     public function leadsMaintenance()
     {
         /** @var EmailOptOutRepository $emailOptOutRepo */
