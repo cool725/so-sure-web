@@ -40,7 +40,7 @@ class ClaimFnolDamageType extends AbstractType
         $builder
             ->add('typeDetails', ChoiceType::class, [
                 'required' => true,
-                'placeholder' => '',
+                'placeholder' => 'Choose issue...',
                 'choices' => [
                     'Broken screen' => Claim::DAMAGE_BROKEN_SCREEN,
                     'Water damage' => Claim::DAMAGE_WATER,
@@ -49,11 +49,17 @@ class ClaimFnolDamageType extends AbstractType
                 ],
             ])
             ->add('typeDetailsOther', TextType::class, ['required' => false])
-            ->add('monthOfPurchase', TextType::class, ['required' => true])
+            ->add('monthOfPurchase', ChoiceType::class, [
+                'required' => true,
+                'placeholder' => 'Month Bought',
+                'choices' => [
+                    ''
+                ],
+            ])
             ->add('yearOfPurchase', TextType::class, ['required' => true])
             ->add('phoneStatus', ChoiceType::class, [
                 'required' => true,
-                'placeholder' => '',
+                'placeholder' => 'Condition...',
                 'choices' => [
                     'New' => Claim::PHONE_STATUS_NEW,
                     'Refurbished' => Claim::PHONE_STATUS_REFURBISHED,
@@ -62,10 +68,10 @@ class ClaimFnolDamageType extends AbstractType
             ])
             ->add('isUnderWarranty', ChoiceType::class, [
                 'required' => true,
-                'placeholder' => '',
+                'placeholder' => 'Under warranty?',
                 'choices' => [
-                    'is' => true,
-                    'is not' => false
+                    'under warranty' => true,
+                    'not under warranty' => false
                 ],
             ])
             ->add('confirm', SubmitType::class)

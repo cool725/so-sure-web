@@ -163,4 +163,8 @@ $(function(){
         }
     }, 'Sorry, we require at least 5 company phones to generate a custom quote. You can purchase policies directly via our site in other cases.');
 
+    jQuery.validator.addMethod('time', function(value, element, param) {
+        return value == '' || value.match(/^([01][0-9]|2[0-3]):[0-5][0-9]$/);
+    }, 'Please Enter a valid time: hh:mm');
+
 });

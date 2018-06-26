@@ -31,13 +31,13 @@
 
                     {{ form_start(claim_form, {'attr': {'data-toggle': 'validator', 'class': 'validate-form', 'id':'claim-form', 'data-client-validation': form_client_validation }}) }}
 
-                        <p class="lead">I, <span class="h4">{{ username }}</span> am making a claim for {{ claimType }}.</p>
+                        <div class="h4 text-center">I, {{ username }} am making a claim for {{ claimType }}.</div>
 
                         <div class="row">
                             <div class="col-sm-6">
                                 <div class="form-group">
                                     <label for="">I {{ username }}</label>
-                                    {{ form_widget(claim_form.hasContacted, { 'attr': {'class': 'form-control', 'placeholder': 'Did you contact the last place you had it?'}}) }}
+                                    {{ form_widget(claim_form.hasContacted, { 'attr': {'class': 'form-control', 'placeholder': 'Contacted the last place you had it?'}}) }}
                                     <span class="help-block with-errors">{{ form_errors(claim_form.hasContacted) }}</span>
                                 </div>
                             </div>
@@ -82,7 +82,7 @@
 
                         {% if proof_of_usage is defined and proof_of_usage %}
                             <div class="row">
-                                <div class="col-xs-12">
+                                <div class="col-xs-12 text-center">
                                     <div class="form-group {% if form_errors(claim_form.proofOfUsage) %}has-error{% endif %}">
                                         <label class="h4">Proof of usage <span class="req">*</span></label>
                                         {{ form_widget(claim_form.proofOfUsage, { 'attr': {'class': 'form-control'}}) }}
@@ -93,7 +93,7 @@
                         {% endif %}
 
                         <div class="row">
-                            <div class="col-xs-12">
+                            <div class="col-xs-12 text-center">
                                 <div class="form-group {% if form_errors(claim_form.proofOfBarring) %}has-error{% endif %}">
                                     <label class="h4">Proof of barring <span class="req">*</span></label>
                                     {{ form_widget(claim_form.proofOfBarring, { 'attr': {'class': 'form-control'}}) }}
@@ -104,7 +104,7 @@
 
                         {% if proof_of_purchase is defined and proof_of_purchase %}
                             <div class="row">
-                                <div class="col-xs-12">
+                                <div class="col-xs-12 text-center">
                                     <div class="form-group {% if form_errors(claim_form.proofOfPurchase) %}has-error{% endif %}">
                                         <label class="h4">Proof of purchase <span class="req">*</span></label>
                                         {{ form_widget(claim_form.proofOfPurchase, { 'attr': {'class': 'form-control'}}) }}
@@ -116,7 +116,7 @@
 
                         {% if claimType is defined and claimType == 'loss' %}
                             <div class="row">
-                                <div class="col-xs-12">
+                                <div class="col-xs-12 text-center">
                                     <div class="form-group {% if form_errors(claim_form.policeLossReport) %}has-error{% endif %}">
                                         <label class="h4">Police loss report <span class="req">*</span></label>
                                         {{ form_widget(claim_form.policeLossReport, { 'attr': {'class': 'form-control', 'placeholder': 'Police report no.'}}) }}
@@ -129,7 +129,7 @@
                                 <div class="col-xs-12 text-center">
                                     <div class="form-group {% if form_errors(claim_form.crimeReferenceNumber) %}has-error{% endif %}">
                                         <label class="h4">Crime reference number  <span class="req">*</span></label>
-                                        {{ form_widget(claim_form.crimeReferenceNumber, { 'attr': {'class': 'form-control'}}) }}
+                                        {{ form_widget(claim_form.crimeReferenceNumber, { 'attr': {'class': 'form-control', 'placeholder': 'Crime reference no.'}}) }}
                                         <div class="help-block with-errors">{{ form_errors(claim_form.crimeReferenceNumber) }}</div>
                                     </div>
                                 </div>
@@ -137,9 +137,9 @@
                         {% endif %}
 
                         <div class="row">
-                            <div class="col-sm-12 text-center">
-                                <p>I confirm that I have attached the requested documents and that all of the above is true.</p>
+                            <div class="col-xs-12 text-center">
                                 <div class="form-group">
+                                    <div class="h4">I confirm that I have attached the requested documents and that all of the above is true.</div>
                                     {{ form_widget(claim_form.confirm, { 'label': 'Confirm', 'attr': {'class': 'btn btn-blue btn-lg'}}) }}
                                 </div>
                             </div>

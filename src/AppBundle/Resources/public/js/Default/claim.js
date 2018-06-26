@@ -48,10 +48,19 @@ sosure.claim = (function() {
                     email: true,
                     emaildomain: true
                 },
+                "claim_form[phone]" : {
+                    phoneUK: true,
+                },
+                "claim_form[timeToReach]" : {
+                    time: true,
+                },
                 "claim_form[when]" : {
                     required: true,
                     validDate: true,
                     checkDateIsValid: true
+                },
+                "claim_form[time]" : {
+                    time: true,
                 },
                 "claim_form[phone]" : {
                     required: {

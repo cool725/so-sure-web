@@ -50,7 +50,7 @@ class ClaimFnolTheftLossType extends AbstractType
         $builder
             ->add('hasContacted', ChoiceType::class, [
                 'required' => true,
-                'placeholder' => 'Did you contact the last place you had it?',
+                'placeholder' => 'Contacted the last place you had it?',
                 'choices' => [
                     'contacted' => true,
                     'did not contact' => false,
