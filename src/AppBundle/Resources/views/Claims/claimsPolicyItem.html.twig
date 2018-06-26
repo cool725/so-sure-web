@@ -1099,6 +1099,9 @@
                         </td>
                         <td>
                             {{ payment.date | date('d M Y H:i', 'Europe/London') }}
+                            {% if payment.date > now %}
+                                <i class="fa fa-warning text-danger" title="Payment is in the future"></i>
+                            {% endif %}
                         </td>
                         <td>
                             £{{ payment.amount | number_format(2, '.', ',') }}

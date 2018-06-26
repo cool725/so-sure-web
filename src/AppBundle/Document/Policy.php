@@ -515,11 +515,15 @@ abstract class Policy
      *
      * @return array
      */
-    public function getPayments()
+    public function getPayments(\DateTime $date = null)
     {
         $payments = [];
         foreach ($this->payments as $payment) {
-            if ($payment->isStandardPayment()) {
+            $excludeDate = false;
+            if ($date && $payment->getDate() > $date) {
+                $excludeDate = true;
+            }
+            if ($payment->isStandardPayment() && !$excludeDate) {
                 $payments[] = $payment;
             }
         }
@@ -2181,11 +2185,11 @@ abstract class Policy
         return $this->toTwoDp($this->getPremiumPaid() - $this->getPremiumPaid($payments));
     }
 
-    public function getPremiumPaid($payments = null)
+    public function getPremiumPaid($payments = null, \DateTime $date = null)
     {
         $paid = 0;
         if ($payments === null) {
-            $payments = $this->getPayments();
+            $payments = $this->getPayments($date);
         }
 
         foreach ($payments as $payment) {
@@ -2751,7 +2755,7 @@ abstract class Policy
         if ($this->getPremiumPlan() == self::PLAN_YEARLY) {
             if ($this->areEqualToTwoDp(0, $this->getOutstandingPremiumToDate($date))) {
                 return $this->endOfDay($this->getEnd());
-            } elseif ($this->areEqualToTwoDp(0, $this->getPremiumPaid())) {
+            } elseif ($this->areEqualToTwoDp(0, $this->getPremiumPaid(null, $date))) {
                 $thirthDays = clone $this->getStart();
                 $thirthDays = $thirthDays->add(new \DateInterval('P30D'));
 
