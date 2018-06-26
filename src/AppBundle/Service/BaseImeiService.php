@@ -12,6 +12,7 @@ use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\SalvaPhonePolicy;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use League\Flysystem\MountManager;
+use thiagoalessio\TesseractOCR\TesseractOCR;
 
 class BaseImeiService
 {
@@ -304,11 +305,11 @@ class BaseImeiService
 
         $image->save($file);
 
-        $ocr = new \TesseractOCR($file);
+        $ocr = (new TesseractOCR($file));
         $results = $ocr
-            ->psm(6) // singleBlock
-            ->lang('eng')
-            ->config('tessedit_ocr_engine_mode', $engine)
+            ->__call('psm', 6)
+            ->__call('lang', 'eng')
+            ->__call('tessedit_ocr_engine_mode', $engine)
             ->run();
 
         unlink($file);
