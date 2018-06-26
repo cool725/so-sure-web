@@ -31,6 +31,7 @@ use AppBundle\Document\SCode;
 use AppBundle\Document\IdentityLog;
 use AppBundle\Document\CurrencyTrait;
 use AppBundle\Document\DateTrait;
+use AppBundle\Document\PhonePremium;
 use AppBundle\Document\Connection\Connection;
 use AppBundle\Document\Opt\EmailOptOut;
 use AppBundle\Document\Opt\SmsOptOut;
@@ -422,6 +423,12 @@ class PolicyService
             // If policy hasn't yet been assigned a payer, default to the policy user
             if (!$policy->getPayer()) {
                 $user->addPayerPolicy($policy);
+            }
+
+            if ($policy->getLastSuccessfulUserPaymentCredit()) {
+                $this->validatePremium($policy, $policy->getLastSuccessfulUserPaymentCredit()->getAmount());
+            } else {
+                $this->validatePremium($policy);
             }
 
             if ($numPayments === null) {
@@ -2092,10 +2099,67 @@ class PolicyService
         );
     }
 
-    public function validatePremium(Policy $policy)
+    public function validatePremium(Policy $policy, $amount = null, $date = null)
     {
-        if ($policy->getPhone()->getCurrentPhonePrice()->getMonthlyPremiumPrice() != $policy->getPremium()->getMonthlyPremiumPrice()) {
-
+        if (!$date) {
+            $date =  new \DateTime();
+        }
+        if ((!$policy->getStatus() ||
+            in_array($policy->getStatus(), [Policy::STATUS_PENDING, Policy::STATUS_MULTIPAY_REJECTED]))
+        ) {
+            if (!$amount) {
+                $currentPhonePrice = $policy->getPhone()->getCurrentPhonePrice();
+                if ($currentPhonePrice->getMonthlyPremiumPrice() != $policy->getPremium()->getMonthlyPremiumPrice()) {
+                    if ($currentPhonePrice->getValidFrom() <= $date) {
+                        $newPremium = new PhonePremium();
+                        $newPremium->setGwp($currentPhonePrice->getGwp());
+                        $newPremium->setIpt($currentPhonePrice->getIpt());
+                        $newPremium->setIptRate($currentPhonePrice->getCurrentIptRate());
+                        $policy->setPremium($newPremium);
+                        $this->dm->flush();
+                    }
+                }
+            } else {
+                if ($policy->getPremiumPlan() == Policy::PLAN_MONTHLY) {
+                    if ($amount != $policy->getPremium()->getMonthlyPremiumPrice()) {
+                        $phonePrices = $policy->getPhone()->getPhonePrices();
+                        $date->sub(new \DateInterval('PT30M'));
+                        foreach ($phonePrices as $price) {
+                            if ($price->getMonthlyPremiumPrice() == $amount &&
+                                $price->getValidFrom() <= $date &&
+                                (!$price->getValidTo() || $price->getValidto() < $date)
+                            ) {
+                                $newPremium = new PhonePremium();
+                                $newPremium->setGwp($price->getGwp());
+                                $newPremium->setIpt($price->getIpt());
+                                $newPremium->setIptRate($price->getCurrentIptRate());
+                                $policy->setPremium($newPremium);
+                                $this->dm->flush();
+                                break;
+                            }
+                        }
+                    }
+                } else {
+                    if ($amount != $policy->getPremium()->getYearlyPremiumPrice()) {
+                        $phonePrices = $policy->getPhone()->getPhonePrices();
+                        $date->sub(new \DateInterval('PT30M'));
+                        foreach ($phonePrices as $price) {
+                            if ($price->getYearlyPremiumPrice() == $amount &&
+                                $price->getValidFrom() <= $date &&
+                                (!$price->getValidTo() || $price->getValidto() < $date)
+                            ) {
+                                $newPremium = new PhonePremium();
+                                $newPremium->setGwp($price->getGwp());
+                                $newPremium->setIpt($price->getIpt());
+                                $newPremium->setIptRate($price->getCurrentIptRate());
+                                $policy->setPremium($newPremium);
+                                $this->dm->flush();
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }
