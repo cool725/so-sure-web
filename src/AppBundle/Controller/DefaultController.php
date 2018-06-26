@@ -88,12 +88,6 @@ class DefaultController extends BaseController
         /** @var RequestService $requestService */
         $requestService = $this->get('app.request');
 
-        $trustpilot = $this->sixpack(
-            $request,
-            SixpackService::EXPERIMENT_TRUSTPILOT_REVIEW,
-            ['no-trustpilot', 'trustpilot']
-        );
-
         $force = null;
         $trafficFraction = '0.0000001';
         if ($request->get('_route') == 'replacement_24_landing') {
@@ -132,7 +126,6 @@ class DefaultController extends BaseController
             // Make sure to check homepage landing below too
             'replacement'         => $replacement,
             'picsure'             => $picsure,
-            'trustpilot'          => $trustpilot,
             'referral'            => $referral,
             'phone'               => $this->getQuerystringPhone($request),
             'homepageCopy'        => $homepageCopy,

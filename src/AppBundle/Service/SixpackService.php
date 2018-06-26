@@ -58,7 +58,7 @@ class SixpackService
     const EXPERIMENT_NEW_WELCOME_MODAL = 'new-welcome-modal';
     // New Exp Competitor Landing
     const EXPERIMENT_COMPETITOR_LANDING = 'competitor-landing';
-    const EXPERIMENT_TRUSTPILOT_REVIEW = 'trustpilot';
+    // const EXPERIMENT_TRUSTPILOT_REVIEW = 'trustpilot';
     // New Test Single Mem Option
     const EXPERIMENT_MEMORY_OPTIONS = 'single-progressive-dropdown';
     // New Test Money Back Guarantee
@@ -102,7 +102,7 @@ class SixpackService
         self::EXPERIMENT_EBAY_LANDING_2,
         // New Exp Competitor Landing
         self::EXPERIMENT_COMPETITOR_LANDING,
-        self::EXPERIMENT_TRUSTPILOT_REVIEW,
+        // self::EXPERIMENT_TRUSTPILOT_REVIEW,
         // New Test Single Mem Option
         self::EXPERIMENT_MEMORY_OPTIONS,
         // New Test Money Back Guarantee
@@ -177,7 +177,7 @@ class SixpackService
     public static $purchaseConversionKpi = [
         self::EXPERIMENT_HOMEPAGE_AA_V2,
         self::EXPERIMENT_DOB,
-        self::EXPERIMENT_TRUSTPILOT_REVIEW,
+        // self::EXPERIMENT_TRUSTPILOT_REVIEW,
         // New Test Single Mem Option
         self::EXPERIMENT_MEMORY_OPTIONS,
         // New Test Money Back Guarantee
