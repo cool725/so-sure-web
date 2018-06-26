@@ -382,8 +382,12 @@ class SalvaExportServiceTest extends WebTestCase
 
         $lines = $this->exportPayments($policyA->getPolicyNumber(), new \DateTime('2017-01-01'));
         //print_r($lines);
-        $this->assertEquals(1, count($lines));
-        $this->assertEquals('"-10.00"', explode(',', $lines[0])[2]);
+        $this->assertEquals(2, count($lines));
+        $dataZero = explode(',', $lines[0]);
+        $dataOne = explode(',', $lines[1]);
+        $this->assertTrue(in_array('"-10.00"', [$dataZero[2], $dataOne[2]]));
+        $this->assertTrue(in_array('"-5.00"', [$dataZero[2], $dataOne[2]]));
+        $this->assertNotEquals($dataZero[2], $dataOne[2]);
 
         /** @var Policy $updatedPolicyA */
         $updatedPolicyA = $dm->getRepository(Policy::class)->find($policyA->getId());

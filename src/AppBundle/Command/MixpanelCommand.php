@@ -2,6 +2,7 @@
 
 namespace AppBundle\Command;
 
+use AppBundle\Service\MixpanelService;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -22,7 +23,7 @@ class MixpanelCommand extends BaseCommand
             ->addArgument(
                 'action',
                 InputArgument::OPTIONAL,
-                'delete|delete-old-users|test|clear|show|sync|sync-all|data|attribution|count-users (or blank for process)'
+                'delete|delete-old-users|test|clear|show|sync|sync-all|data|attribution|count-users|count-queue (or blank for process)'
             )
             // @codingStandardsIgnoreEnd
             ->addOption(
@@ -114,6 +115,9 @@ class MixpanelCommand extends BaseCommand
         } elseif ($action == 'count-users') {
             $total = $this->getMixpanel()->getUserCount();
             $output->writeln(sprintf("%d Users", $total));
+        } elseif ($action == 'count-queue') {
+            $total = $this->getMixpanel()->countQueue();
+            $output->writeln(sprintf("%d in queue", $total));
         } elseif ($action == 'clear') {
             $this->getMixpanel()->clearQueue();
             $output->writeln(sprintf("Queue is cleared"));
@@ -128,10 +132,16 @@ class MixpanelCommand extends BaseCommand
             $output->writeln(sprintf("Processed %d Requeued: %d", $data['processed'], $data['requeued']));
         }
     }
-    
+
+    /**
+     * @return MixpanelService
+     */
     private function getMixpanel()
     {
-        return $this->getContainer()->get('app.mixpanel');
+        /** @var MixpanelService $mixpanel */
+        $mixpanel = $this->getContainer()->get('app.mixpanel');
+
+        return $mixpanel;
     }
 
     private function getUser($email)

@@ -133,12 +133,17 @@ class PurchaseStepPhoneType extends AbstractType
                         $purchase->getUser()->getId(),
                         $filename->guessExtension()
                     );
-                    $this->logger->warning(sprintf(
+                    $msg = sprintf(
                         'Failed to find imei for user: %s; picture saved in %s ; ocr: %s',
                         $purchase->getUser()->getEmail(),
                         $url,
                         $ocr['raw']
-                    ));
+                    );
+                    if (mb_strlen(trim($ocr['raw'])) > 0) {
+                        $this->logger->warning($msg);
+                    } else {
+                        $this->logger->info($msg);
+                    }
                 } else {
                     $purchase->setFileValid(true);
                     $purchase->setImei($ocr['imei']);

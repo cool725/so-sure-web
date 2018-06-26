@@ -359,6 +359,14 @@ class MonitorService
         }
     }
 
+    public function checkIntercomQueue()
+    {
+        $count = $this->intercom->countQueue();
+        if ($count > 150) {
+            throw new MonitorException(sprintf('There are %d outstanding messages in the queue', $count));
+        }
+    }
+
     public function policyTerms()
     {
         $repo = $this->dm->getRepository(PolicyTerms::class);

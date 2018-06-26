@@ -62,6 +62,18 @@ class BacsCommand extends BaseCommand
                 InputOption::VALUE_NONE,
                 'Skip sending email confirmation'
             )
+            ->addOption(
+                'only-credits',
+                null,
+                InputOption::VALUE_NONE,
+                'Only run credits'
+            )
+            ->addOption(
+                'only-debits',
+                null,
+                InputOption::VALUE_NONE,
+                'Only run debits (and mandates)'
+            )
             ->addArgument(
                 'prefix',
                 InputArgument::REQUIRED,
@@ -81,6 +93,8 @@ class BacsCommand extends BaseCommand
         $date = $input->getOption('date');
         $skipEmail = true === $input->getOption('skip-email');
         $debug = $input->getOption('debug');
+        $onlyCredits = true === $input->getOption('only-credits');
+        $onlyDebits = true === $input->getOption('only-debits');
         $prefix = $input->getArgument('prefix');
         $processingDate = null;
         if ($date) {
@@ -97,16 +111,25 @@ class BacsCommand extends BaseCommand
             $output->writeln($bacsService->getHeader());
         }
 
-        $lines = [];
-        $creditPayments = [];
-        if ($bacsService->hasMandateOrPaymentDebit($prefix, $processingDate)) {
-            $lines = $this->runMandatePaymentDebit($input, $output, $processingDate);
+        $debitPayments = [];
+        $runDebits = $bacsService->hasMandateOrPaymentDebit($prefix, $processingDate);
+        if ($onlyCredits) {
+            $runDebits = false;
         }
-        if ($bacsService->hasPaymentCredit()) {
+        if ($runDebits) {
+            $debitPayments = $this->runMandatePaymentDebit($input, $output, $processingDate);
+        }
+
+        $creditPayments = [];
+        $runCredits = $bacsService->hasPaymentCredit();
+        if ($onlyDebits) {
+            $runCredits = false;
+        }
+        if ($runCredits) {
             $creditPayments = $this->runPaymentCredits($input, $output, $processingDate);
         }
 
-        if (count($lines) == 0 && count($creditPayments) == 0) {
+        if (count($debitPayments) == 0 && count($creditPayments) == 0) {
             $skipEmail = true;
         }
 
@@ -204,7 +227,7 @@ class BacsCommand extends BaseCommand
         $skipSftp = true === $input->getOption('skip-sftp');
         $skipS3 = true === $input->getOption('skip-s3');
         $debug = $input->getOption('debug');
-        $prefix = $input->getArgument('prefix');
+        //$prefix = $input->getArgument('prefix');
 
         /** @var BacsService $bacsService */
         $bacsService = $this->getContainer()->get('app.bacs');

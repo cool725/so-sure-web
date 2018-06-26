@@ -12,6 +12,7 @@ use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\SalvaPhonePolicy;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use League\Flysystem\MountManager;
+use thiagoalessio\TesseractOCR\TesseractOCR;
 
 class BaseImeiService
 {
@@ -211,7 +212,7 @@ class BaseImeiService
 
     public function parseOcr($results, $make)
     {
-        $noSpace = str_replace(' ', '', $results);
+        $noSpace = str_replace(array(' ', "\n"), '', $results);
         // print_r($noSpace);
         if ($make == "Apple") {
             if (preg_match('/SerialNumber([A-Z0-9]{12}).*([Il]ME[Il])(\d{15})/s', $noSpace, $matches)) {
@@ -304,11 +305,11 @@ class BaseImeiService
 
         $image->save($file);
 
-        $ocr = new \TesseractOCR($file);
+        $ocr = (new TesseractOCR($file));
         $results = $ocr
-            ->psm(6) // singleBlock
-            ->lang('eng')
-            ->config('tessedit_ocr_engine_mode', $engine)
+            ->__call('psm', [6])
+            ->__call('lang', ['eng'])
+            ->__call('tessedit_ocr_engine_mode', [$engine])
             ->run();
 
         unlink($file);

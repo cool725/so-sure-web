@@ -41,7 +41,8 @@
         <a class="btn btn-success"
                 href="{{ path('admin_picsure_approve', {'id': policy.id}) }}"><i class="fa fa-check"></i> Undamaged</a>
         <a class="btn btn-warning"
-                href="{{ path('admin_picsure_invalid', {'id': policy.id}) }}"><i class="fa fa-question"></i> Invalid Photo</a>
+                data-toggle="modal" data-target="#invalidModal" data-policy-number="{{ policy.policyNumber }}"
+                data-submit="{{ path('admin_picsure_invalid', {'id': policy.id}) }}"><i class="fa fa-question"></i> Invalid Photo</a>
         <a class="btn btn-danger"
                 href="{{ path('admin_picsure_reject', {'id': policy.id}) }}"><i class="fa fa-minus"></i> Damaged</a>
         {% elseif policy.picSureStatus == 'approved' %}
@@ -111,4 +112,34 @@
         {{ pagerfanta(pager, 'twitter_bootstrap3') }}
     </div>
     {% endif %}
+
+    <div class="modal fade" id="invalidModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <form id="invalid-picsure-form" method="post">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title">Invalid pic-sure</h4>
+                    </div>
+                    <div class="modal-body">
+                        <h3>Optional additional message to send to user:</h3>
+                        <textarea type="text" class="form-control" id="message" name="message"></textarea>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-success">Invalidate pic-sure</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {% javascripts
+        '@AppBundle/Resources/public/js/AdminEmployee/picsure.js'
+    %}
+        <script src="{{ asset_url }}"></script>{% endjavascripts %}
 {% endblock %}

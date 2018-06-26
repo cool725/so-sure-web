@@ -414,6 +414,7 @@ class IntercomService
         $data['custom_attributes']['Number of Policies'] = $analytics['numberPolicies'];
         $data['custom_attributes']['Account Paid To Date'] = $analytics['accountPaidToDate'];
         $data['custom_attributes']['Account Paid To Date'] = $analytics['accountPaidToDate'];
+        $data['custom_attributes']['Payment Method'] = $analytics['paymentMethod'];
         $data['custom_attributes']['Has Outstanding pic-sure Policy'] = $analytics['hasOutstandingPicSurePolicy'];
         $data['custom_attributes']['Displayable Renewal Monthly Premium'] =
             (string) sprintf('%.2f', $this->toTwoDp($analytics['renewalMonthlyPremiumNoPot']));
@@ -1113,6 +1114,11 @@ class IntercomService
             ->setBody(implode(PHP_EOL, $lines), 'text/text');
         $this->mailer->send($message);
 
+    }
+
+    public function countQueue()
+    {
+        return $this->redis->llen(self::KEY_INTERCOM_QUEUE);
     }
 
     public function leadsMaintenance()

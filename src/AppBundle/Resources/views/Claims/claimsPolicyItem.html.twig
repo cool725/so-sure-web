@@ -114,23 +114,68 @@
                         </tr>
                         {% endif %}
                         {% if policy.isPolicy %}
+                            <tr>
+                                <td>Policy Installments</td>
+                                <td>
+                                    {% if policy.premiumPlan == 'monthly' %}
+                                        Bill every month on <span title="{{ policy.billing|date('d M Y H:i', 'Europe/London') }}">{{ policy.billing|date('jS','Europe/London') }} @ {{ policy.billing|date('H:m','Europe/London') }}</span>.
+                                        <br>
+                                    {% endif %}
+                                    {{ policy.premiumInstallmentCount }} installment(s) of £{{ policy.premiumInstallmentPrice| number_format(2, '.', ',') }}
+                                    {% if policy.hasPolicyDiscountPresent %}
+                                        <br>
+                                        £{{ policy.premium.annualDiscount|number_format(2, '.', ',')}} discount applied for
+                                        11 monthly payments of £{{ policy.premium.getAdjustedStandardMonthlyPremiumPrice|number_format(2, '.', ',')}}
+                                        & 1 final monthly payment of £{{ policy.premium.getAdjustedFinalMonthlyPremiumPrice|number_format(2, '.', ',')}}
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endif %}
+                        {% if policy.isPolicy %}
                         <tr>
                             <td>Policy Payments</td>
                             <td>
-                                {% if policy.premiumPlan == 'monthly' %}
-                                Bill every month on <span title="{{ policy.billing|date('d M Y H:i', 'Europe/London') }}">{{ policy.billing|date('jS','Europe/London') }} @ {{ policy.billing|date('H:m','Europe/London') }}</span>.
-                                {% endif %}
-                                Paid £{{ policy.premiumPaid | number_format(2, '.', ',') }} of £{{ policy.premium.yearlyPremiumPrice| number_format(2, '.', ',') }}&nbsp;
-                            (<span title="Successful payments credited to account">{{ policy.successfulPaymentCredits|length }} payment credited</span>
-                            {% if policy.failedPaymentCredits|length > 0 %}
-                            ; <i class="fa fa-warning">{{ policy.failedPaymentCredits|length }} failed charges
-                            {% endif %}
-                            )
-                            <button type="button" class="btn btn-info" data-toggle="modal" data-target="#paymentsModal"
-                                            >Payments</button>
+                                <div class="row">
+                                    <div class="col-sm-8">
+                                        Paid £{{ policy.premiumPaid | number_format(2, '.', ',') }} of £{{ policy.premium.yearlyPremiumPrice| number_format(2, '.', ',') }}&nbsp;
+                                        <br>
+                                        {% if policy.end < now %}
+                                            Premium of £{{ policy.getProratedPremium(policy.end) | number_format(2, '.', ',') }} was due on policy
+                                        {% else %}
+                                            Premium of £{{ policy.getProratedPremium() | number_format(2, '.', ',') }} due (daily calc)
+                                        {% endif %}
+                                        <br>
+                                        (
+                                        <span title="Successful payments credited to account">{{ policy.successfulPaymentCredits|length }} payment credited</span>
+                                        {% if policy.failedPaymentCredits|length > 0 %}
+                                            ; <i class="fa fa-warning"></i> {{ policy.failedPaymentCredits|length }} failed charges
+                                        {% endif %}
+                                        )
+
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <button type="button" class="btn btn-info" data-toggle="modal" data-target="#paymentsModal"
+                                        >Payments</button>
+                                    </div>
+                                </div>
+
 
                             </td>
                         </tr>
+                        {% endif %}
+                        {% if is_granted('ROLE_EMPLOYEE') and policy.isPolicy %}
+                            <tr>
+                                <td>Policy Commission</td>
+                                <td>
+                                    Received £{{ policy.getTotalCommissionPaid() | number_format(2, '.', ',') }} of £{{ policy.premium.yearlyTotalCommission| number_format(2, '.', ',') }} (coverholder + broker)
+                                    <br>
+                                    {% if policy.end < now %}
+                                        Commission of £{{ policy.getProratedCommission(policy.end) | number_format(2, '.', ',') }} was due on policy
+                                    {% else %}
+                                        Commission of £{{ policy.getProratedCommission() | number_format(2, '.', ',') }} due (daily calc) 
+                                    {% endif %}
+                                </td>
+                            </tr>
                         {% endif %}
                         {% if policy.isPolicy %}
                         <tr>
@@ -141,19 +186,6 @@
                                 {% else %}
                                     <i class="fa fa-warning text-danger" title="Policy is NOT paid to date"></i>
                                     If still unpaid, policy will be cancelled on {{ policy.policyExpirationDate | date('d M Y H:i', 'Europe/London')}}
-                                {% endif %}
-                            </td>
-                        </tr>
-                        {% endif %}
-                        {% if policy.isPolicy %}
-                        <tr>
-                            <td>Policy Installments</td>
-                            <td>
-                                {{ policy.premiumInstallmentCount }} installment(s) of £{{ policy.premiumInstallmentPrice| number_format(2, '.', ',') }}
-                                {% if policy.hasPolicyDiscountPresent %}
-                                    £{{ policy.premium.annualDiscount|number_format(2, '.', ',')}} discount applied for
-                                    11 monthly payments of £{{ policy.premium.getAdjustedStandardMonthlyPremiumPrice|number_format(2, '.', ',')}}
-                                    & 1 final monthly payment of £{{ policy.premium.getAdjustedFinalMonthlyPremiumPrice|number_format(2, '.', ',')}}
                                 {% endif %}
                             </td>
                         </tr>
@@ -276,7 +308,7 @@
                             </td>
                             <td>
                                 {% for location in policy.picsureLocations %}
-                                    [{{ location.coordinates[1]}},{{ postcode.location.coordinates[0]}}] 
+                                    [{{ location.coordinates[1]}},{{ location.coordinates[0]}}]
                                 {% endfor %}
                             </td>
                         </tr>
@@ -412,6 +444,10 @@
                     <tr>
                         <td>Other Users w/possibly same account details (for card: same last 4, type, exp date, for bacs: same details)</td>
                         <td>{{ fraud.duplicate_bank_accounts }}</td>
+                    </tr>
+                    <tr>
+                        <td>Other Users w/mobile numbers very close numerically to user</td>
+                        <td>{{ fraud.near_mobile_numbers }}</td>
                     </tr>
                     <tr>
                         <td>IMEI belonged to different user</td>
@@ -1063,6 +1099,9 @@
                         </td>
                         <td>
                             {{ payment.date | date('d M Y H:i', 'Europe/London') }}
+                            {% if payment.date > now %}
+                                <i class="fa fa-warning text-danger" title="Payment is in the future"></i>
+                            {% endif %}
                         </td>
                         <td>
                             £{{ payment.amount | number_format(2, '.', ',') }}
@@ -1117,7 +1156,7 @@
                             {{ scheduledPayment.status }}
                         </td>
                         <td>
-                            {% if scheduledPayment.payment %}
+                            {% if scheduledPayment.payment and scheduledPayment.payment.status is defined %}
                                 {{ scheduledPayment.payment.status }}
                             {% else %}
                                 -
