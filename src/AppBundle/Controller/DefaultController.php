@@ -108,12 +108,6 @@ class DefaultController extends BaseController
             $force
         );
 
-        $picsure = $this->sixpack(
-            $request,
-            SixpackService::EXPERIMENT_PICSURE_SECTION,
-            ['simple-picsure', 'picsure-redesign']
-        );
-
         $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE);
 
         $data = array(

@@ -51,7 +51,7 @@ class SixpackService
     const EXPERIMENT_CPC_QUOTE_HOMEPAGE = 'cpc-quote-or-homepage';
     const EXPERIMENT_DOB = 'purchase-funnel-dob-dropdown';
     const EXPERIMENT_72_REPLACEMENT = 'seventytwo-hours';
-    const EXPERIMENT_PICSURE_SECTION = 'picsure-redesign';
+    // const EXPERIMENT_PICSURE_SECTION = 'picsure-redesign';
     const EXPERIMENT_EBAY_LANDING = 'ebay-landing';
     const EXPERIMENT_EBAY_LANDING_1 = 'ebay-landing-1';
     const EXPERIMENT_EBAY_LANDING_2 = 'ebay-landing-2';
@@ -96,7 +96,7 @@ class SixpackService
         self::EXPERIMENT_CPC_QUOTE_HOMEPAGE,
         self::EXPERIMENT_DOB,
         self::EXPERIMENT_72_REPLACEMENT,
-        self::EXPERIMENT_PICSURE_SECTION,
+        // self::EXPERIMENT_PICSURE_SECTION,
         self::EXPERIMENT_EBAY_LANDING,
         self::EXPERIMENT_EBAY_LANDING_1,
         self::EXPERIMENT_EBAY_LANDING_2,
@@ -148,7 +148,7 @@ class SixpackService
         //self::EXPERIMENT_STEP_3,
         self::EXPERIMENT_PURCHASE_FLOW_BACS,
         self::EXPERIMENT_72_REPLACEMENT,
-        self::EXPERIMENT_PICSURE_SECTION,
+        // self::EXPERIMENT_PICSURE_SECTION,
         self::EXPERIMENT_EBAY_LANDING,
         self::EXPERIMENT_EBAY_LANDING_1,
         self::EXPERIMENT_EBAY_LANDING_2,
