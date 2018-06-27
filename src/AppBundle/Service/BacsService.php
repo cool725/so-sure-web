@@ -1042,6 +1042,14 @@ class BacsService
         return $cancellations;
     }
 
+    /**
+     * @param Policy $policy
+     * @param $notes
+     * @param null $amount
+     * @param \DateTime|null $date
+     * @return BacsPayment
+     * @throws \Exception
+     */
     public function bacsPayment(Policy $policy, $notes, $amount = null, \DateTime $date = null)
     {
         if (!$date) {
@@ -1282,6 +1290,16 @@ class BacsService
                 $rescheduled = $scheduledPayment->reschedule($scheduledDate);
                 $scheduledPayment->getPolicy()->addScheduledPayment($rescheduled);
                 $this->dm->flush(null, array('w' => 'majority', 'j' => true));
+
+                continue;
+            }
+
+            $scheduledDate
+            if ($scheduledPayment->getPolicy()->getPolicyExpirationDate() < $payment->){
+                $msg = sprintf(
+                    'Skipping payment %s as payment date is after expiration date',
+                    $scheduledPayment->getId());
+                $this->logger->error($msg);
 
                 continue;
             }
