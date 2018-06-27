@@ -6,6 +6,7 @@ use AppBundle\Document\ArrayToApiArrayTrait;
 use AppBundle\Document\BacsPaymentMethod;
 use AppBundle\Document\File\AccessPayFile;
 use AppBundle\Document\File\ReconciliationFile;
+use AppBundle\Document\Payment\BacsIndemnityPayment;
 use AppBundle\Document\Sequence;
 use AppBundle\Form\Type\BacsMandatesType;
 use AppBundle\Form\Type\UploadFileType;
@@ -453,6 +454,7 @@ class AdminController extends BaseController
         $s3FileRepo = $dm->getRepository(S3File::class);
         /** @var BacsPaymentRepository $paymentsRepo */
         $paymentsRepo = $dm->getRepository(BacsPayment::class);
+        $paymentsIndemnityRepo = $dm->getRepository(BacsIndemnityPayment::class);
         $sequenceRepo = $dm->getRepository(Sequence::class);
         /** @var Sequence $currentSequence */
         $currentSequence = $sequenceRepo->findOneBy(['name' => SequenceService::SEQUENCE_BACS_SERIAL_NUMBER]);
@@ -604,6 +606,7 @@ class AdminController extends BaseController
             'ddic' => $s3FileRepo->getAllFiles($date, 'bacsReportDdic'),
             'input' => $s3FileRepo->getAllFiles($date, 'bacsReportInput'),
             'payments' => $paymentsRepo->findPayments($date),
+            'indemnity' => $paymentsIndemnityRepo->findPayments($date),
             'uploadForm' => $uploadForm->createView(),
             'uploadDebitForm' => $uploadDebitForm->createView(),
             'uploadCreditForm' => $uploadCreditForm->createView(),

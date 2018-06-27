@@ -1,0 +1,125 @@
+// faq.scss
+
+@import "../common/variables";
+@import "../mixins";
+@import "../common/paletteNew";
+@import "../common/type";
+
+.navbar {
+    background-color: $white;
+}
+
+.faqs {
+    position: relative;
+
+    &__content {
+        h2 {
+            padding-top: 60px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid $pale-grey;
+
+            &:first-of-type {
+                padding-top: 0;
+            }
+        }
+
+        h3 {
+            position: relative;
+            margin-bottom: 0;
+            font-family: $avenir-light;
+
+            a {
+                display: block;
+                color: $primary-blue;
+                padding: 15px 40px 15px 0;
+                background-color: 0.5s ease;
+
+                &:hover {
+                    text-decoration: none;
+                    color: $primary-blue;
+                }
+
+                &:focus {
+                    text-decoration: underline;
+                }
+
+                &:after {
+                    font-family: FontAwesome;
+                    content: '\f106';
+                    position: absolute;
+                    top: 15px; right: 15px;
+                }
+            }
+
+            a.collapsed {
+                color: $black;
+
+                &:hover {
+                    color: $primary-blue;
+                }
+
+                &:focus {
+                    text-decoration: none;
+                }
+
+                &:after {
+                    font-family: FontAwesome;
+                    content: '\f107';
+                    position: absolute;
+                    top: 15px; right: 15px;
+                }
+            }
+        }
+
+        .collapse {
+            padding: 15px 0;
+            border-bottom: 1px solid $pale-grey;
+
+            p, li {
+                font-size: 17px !important;
+            }
+
+            ul {
+                > li {
+                    padding: 5px 0;
+                }
+            }
+        }
+    }
+
+    &__sidebar {
+        padding-top: 60px;
+
+        ul {
+            padding-bottom: 40px;
+        }
+
+        .nav-pills {
+
+            > li {
+                > a {
+                    border-left: 3px solid transparent;
+                    @include border-radius(0);
+
+                    &:hover {
+                        background-color: $off-white;
+                        border-left: 3px solid $light-blue;
+                    }
+                }
+            }
+
+            li.active {
+                a {
+                    font-family: $avenir-heavy ;
+                    background-color: $off-white;
+                    border-left: 3px solid $primary-blue;
+                    color: $black;
+                }
+            }
+        }
+    }
+}
+
+.affix-bottom {
+    position: absolute;
+}
