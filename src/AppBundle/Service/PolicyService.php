@@ -2122,7 +2122,7 @@ class PolicyService
             } else {
                 if ($phonePolicy->getPremiumPlan() == Policy::PLAN_YEARLY) {
                     if ($amount != $policyPremium->getYearlyPremiumPrice()) {
-                        $phonePrices = $phonePolicy->getPhone()->getRecentPhonePrices('30');
+                        $phonePrices = $phonePolicy->getPhone()->getRecentPhonePrices(30);
                         foreach ($phonePrices as $price) {
                             if ($price->getYearlyPremiumPrice() == $amount) {
                                 $newPremium = $price->createPremium();
@@ -2135,7 +2135,7 @@ class PolicyService
                     }
                 } else {
                     if ($amount != $policyPremium->getMonthlyPremiumPrice()) {
-                        $phonePrices = $phonePolicy->getPhone()->getRecentPhonePrices('30');
+                        $phonePrices = $phonePolicy->getPhone()->getRecentPhonePrices(30);
                         foreach ($phonePrices as $price) {
                             if ($price->getMonthlyPremiumPrice() == $amount) {
                                 $newPremium = $price->createPremium();

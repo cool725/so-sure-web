@@ -4714,7 +4714,7 @@ class PolicyServiceTest extends WebTestCase
     {
         $user = static::createUser(
             static::$userManager,
-            'testValidatePremiumWithoutAmount@so-sure.com',
+            static::generateEmail('testValidatePremiumWithoutAmount', $this),
             'bar',
             null,
             static::$dm
@@ -4746,13 +4746,14 @@ class PolicyServiceTest extends WebTestCase
             $price->getMonthlyPremiumPrice(),
             $updatedPolicy->getPremium()->getMonthlyPremiumPrice()
         );
+        $this->assertNull($updatedPolicy->getStatus());
     }
 
     public function testValidatePremiumAmountMonthlyInside()
     {
         $user = static::createUser(
             static::$userManager,
-            'testValidatePremiumAmountMonthlyInside@so-sure.com',
+            static::generateEmail('testValidatePremiumAmountMonthlyInside', $this),
             'bar',
             null,
             static::$dm
@@ -4797,7 +4798,7 @@ class PolicyServiceTest extends WebTestCase
     {
         $user = static::createUser(
             static::$userManager,
-            'testValidatePremiumAmountYearlyInside@so-sure.com',
+            static::generateEmail('testValidatePremiumAmountYearlyInside', $this),
             'bar',
             null,
             static::$dm
@@ -4842,7 +4843,7 @@ class PolicyServiceTest extends WebTestCase
     {
         $user = static::createUser(
             static::$userManager,
-            'testValidatePremiumAmountMonthlyOutside@so-sure.com',
+            static::generateEmail('testValidatePremiumAmountMonthlyOutside', $this),
             'bar',
             null,
             static::$dm
@@ -4887,7 +4888,7 @@ class PolicyServiceTest extends WebTestCase
     {
         $user = static::createUser(
             static::$userManager,
-            'testValidatePremiumAmountYearlyOutside@so-sure.com',
+            static::generateEmail('testValidatePremiumAmountYearlyOutside', $this),
             'bar',
             null,
             static::$dm
