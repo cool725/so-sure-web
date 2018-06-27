@@ -1978,7 +1978,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $this->assertEquals('judo', $policyData['premium_payments']['paid'][0]['type']);
     }
 
-    public function testNewPolicyJudopayDifferentAmount()
+    public function testNewPolicyWithPremiumValidation()
     {
         $user = self::createUser(
             self::$userManager,
