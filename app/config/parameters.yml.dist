@@ -122,6 +122,7 @@ parameters:
     apple_app_download:  'https://itunes.apple.com/gb/app/so-sure/id1094307449'
 
     davies_ip: 10.0.2.2
+    directgroup_ip: 10.0.2.2
     sosure_rwe_ip: 10.0.2.2
     sosure_patrick_ip: 10.0.2.2
 

@@ -73,6 +73,7 @@ security:
         - { path: ^/resetting, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/admin/, role: ROLE_EMPLOYEE }
         - { path: ^/claims/, role: ROLE_CLAIMS, ips: [ "%davies_ip%" ] }
+        - { path: ^/claims/, role: ROLE_CLAIMS, ips: [ "%directgroup_ip%" ] }
         - { path: ^/claims/, role: ROLE_CLAIMS, ips: [ "%sosure_rwe_ip%" ] }
         - { path: ^/claims/, role: ROLE_CLAIMS, ips: [ "%sosure_patrick_ip%" ] }
         - { path: ^/claims/, role: ROLE_CLAIMS, ips: [ "127.0.0.1" ] }
