@@ -693,7 +693,7 @@ class PhonePolicy extends Policy
     public function getPicSureStatusForApi()
     {
         $status = $this->getPicSureStatus();
-        if ($status == self::PICSURE_STATUS_PREAPPROVED) {
+        if (in_array($status, self::PICSURE_STATUS_PREAPPROVED, self::PICSURE_STATUS_CLAIM_APPROVED)) {
             return self::PICSURE_STATUS_APPROVED;
         }
 
