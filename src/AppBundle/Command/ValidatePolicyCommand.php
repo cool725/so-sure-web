@@ -166,6 +166,7 @@ class ValidatePolicyCommand extends BaseCommand
                     'prefix' => $prefix,
                     'validateDate' => $validateDate,
                     'adjustScheduledPayments' => $adjustScheduledPayments,
+                    'validate-premiums' => $validatePremiums,
                     'updatePotValue' => $updatePotValue,
                     'all' => true,
                 ];
@@ -352,7 +353,12 @@ class ValidatePolicyCommand extends BaseCommand
             in_array($policy->getStatus(), [Policy::STATUS_PENDING, Policy::STATUS_MULTIPAY_REJECTED]))) {
             /** @var PolicyService $policyService */
             $policyService = $this->getContainer()->get('app.policy');
-            $policyService->validatePremium($policy);
+            if ($policyService->validatePremium($policy)) {
+                $lines[] = sprintf(
+                    'WARNING!! - Policy %s has its premium updated',
+                    $policy->getPolicyNumber()
+                );
+            }
         }
         if ($data['warnClaim'] && $policy->hasOpenClaim()) {
             $this->header($policy, $policies, $lines);

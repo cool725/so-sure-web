@@ -860,6 +860,24 @@ class Phone
         return $future;
     }
 
+    public function getRecentPhonePrices($minutes)
+    {
+        $date =  new \DateTime();
+        $date->sub(new \DateInterval(sprintf('PT%sM', $minutes)));
+
+        $recent = [];
+
+        foreach ($this->getPhonePrices() as $phonePrice) {
+            if ($phonePrice->getValidFrom() >= $date ||
+                (!$phonePrice->getValidTo() || $phonePrice->getValidTo() > $date)
+            ) {
+                $recent[] = $phonePrice;
+            }
+        }
+
+        return $recent;
+    }
+
     public function isSameMake($make)
     {
         $make = mb_strtolower($make);
