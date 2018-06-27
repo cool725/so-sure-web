@@ -641,6 +641,16 @@ class DefaultController extends BaseController
             $user = $userRepo->find($userId);
 
             if ($user) {
+                if ($user->isLocked() || !$user->isEnabled()) {
+                    // @codingStandardsIgnoreStart
+                    $this->addFlash(
+                        'error',
+                        "Sorry, it looks like your user account is locked or expired. Please email support@wearesosure.com"
+                    );
+
+                    return $this->redirectToRoute('claim');
+                }
+
                 $this->get('fos_user.security.login_manager')->loginUser(
                     $this->getParameter('fos_user.firewall_name'),
                     $user
