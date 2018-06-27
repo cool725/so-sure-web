@@ -860,10 +860,10 @@ class Phone
         return $future;
     }
 
-    public function getRecentPhonePrices($minutes)
+    public function getRecentPhonePrices(int $minutes)
     {
         $date =  new \DateTime();
-        $date->sub(new \DateInterval(sprintf('PT%sM', $minutes)));
+        $date->sub(new \DateInterval(sprintf('PT%dM', $minutes)));
 
         $recent = [];
 
