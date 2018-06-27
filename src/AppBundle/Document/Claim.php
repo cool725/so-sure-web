@@ -1725,16 +1725,24 @@ class Claim
         return $files;
     }
 
-    public function needProofOfUsage() {
+    public function needProofOfUsage()
+    {
         return $this->policy->getRisk() != Policy::RISK_LEVEL_LOW;
     }
 
-    public function needProofOfPurchase() {
-        return $this->getPolicy()->getRisk() == Policy::RISK_LEVEL_HIGH || $this->getPolicy()->getPicSureStatus() != PhonePolicy::PICSURE_STATUS_APPROVED;
+    public function needProofOfPurchase()
+    {
+        /** @var PhonePolicy  $policy */
+        $policy = $this->getPolicy();
+        return $policy->getRisk() == Policy::RISK_LEVEL_HIGH ||
+        $policy->getPicSureStatus() != PhonePolicy::PICSURE_STATUS_APPROVED;
     }
 
-    public function needPictureOfPhone() {
-        return $this->getPolicy()->getPicSureStatus() != PhonePolicy::PICSURE_STATUS_APPROVED;
+    public function needPictureOfPhone()
+    {
+        /** @var PhonePolicy  $policy */
+        $policy = $this->getPolicy();
+        return $policy->getPicSureStatus() != PhonePolicy::PICSURE_STATUS_APPROVED;
     }
 
     public static function getExcessValue($type, $picSureValidated, $picSureEnabled)

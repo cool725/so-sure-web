@@ -404,7 +404,7 @@ class ClaimsService
 
             $data = [
                 'username' => $user->getName(),
-                'tokenUrl' => $this->routerService->generate(
+                'tokenUrl' => $this->routerService->generateUrl(
                     'claim_login',
                     ['tokenId' => $token]
                 ),
