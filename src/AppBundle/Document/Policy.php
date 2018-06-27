@@ -3964,11 +3964,18 @@ abstract class Policy
         }
 
         $text = '';
+        if ($data['fnol'] > 0) {
+            $text = sprintf(
+                '%s<span title="FNOL" class="fa fa-clock-o">%s</span> ',
+                $text,
+                $data['fnol']
+            );
+        }
         if ($data['in-review'] + $data['submitted'] > 0) {
             $text = sprintf(
                 '%s<span title="Submitted & In Review" class="fa fa-question">%s</span> ',
                 $text,
-                $data['in-review']
+                $data['in-review'] + $data['submitted']
             );
         }
         if ($data['approved'] + $data['settled'] > 0) {

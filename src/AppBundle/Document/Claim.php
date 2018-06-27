@@ -1544,6 +1544,7 @@ class Claim
         $data = [
             'total' => 0,
             'approved-settled' => 0,
+            self::STATUS_FNOL => 0,
             self::STATUS_SUBMITTED => 0,
             self::STATUS_INREVIEW => 0,
             self::STATUS_APPROVED => 0,
