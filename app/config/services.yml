@@ -171,6 +171,7 @@ services:
         arguments:
             - "@logger"
             - "@aws.sns"
+            - "@statsd"
 
     app.claims:
         class: AppBundle\Service\ClaimsService
