@@ -28,6 +28,7 @@
 /web/ops
 /web/cover
 /bower_components/
+/node_modules/
 web/sitemap.xml
 web/sitemap_index.xml
 VagrantfileExtra.rb
