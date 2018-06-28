@@ -526,10 +526,10 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
 
         $user->setBillingAddress($address);
         $bacs = false;
-        if ($isPaymentMethodBacs) {
-            $bacs = true;
-        } else {
+        if ($isPaymentMethodBacs === null) {
             $bacs = rand(0, 1) == 0;                        
+        } else {
+            $bacs = $isPaymentMethodBacs;
         }
         if ($bacs) {
             $bankAccount = new BankAccount();
