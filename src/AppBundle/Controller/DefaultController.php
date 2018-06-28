@@ -469,6 +469,45 @@ class DefaultController extends BaseController
     }
 
     /**
+     * @Route("/faq", name="faq")
+     * @Template
+     */
+    public function faqAction(Request $request)
+    {
+        $intercomEnabled = true;
+        $hideCookieWarning = false;
+        $hideNav = false;
+        $hideFooter = false;
+
+        $isSoSureApp = false;
+        $session = $request->getSession();
+        if ($session) {
+            if ($session->get('sosure-app') == "1") {
+                $isSoSureApp = true;
+            }
+            if ($request->headers->get('X-SOSURE-APP') == "1" || $request->get('X-SOSURE-APP') == "1") {
+                $session->set('sosure-app', 1);
+                $isSoSureApp = true;
+            }
+        }
+
+        if ($isSoSureApp) {
+            $intercomEnabled = false;
+            $hideCookieWarning = true;
+            $hideNav = true;
+            $hideFooter = true;
+        }
+
+        $data = [
+            'intercom_enabled' => $intercomEnabled,
+            'hide_cookie_warning' => $hideCookieWarning,
+            'hide_nav' => $hideNav,
+            'hide_footer' => $hideFooter,
+        ];
+        return $this->render('AppBundle:Default:faq.html.twig', $data);
+    }
+
+    /**
      * @Route("/mobile-phone-insurance-for-your-company",
      *  name="mobile_phone_insurance_for_your_company",
      *  options={"sitemap"={"priority":"1.0","changefreq":"daily"}})

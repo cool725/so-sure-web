@@ -51,6 +51,12 @@ class IntercomCommand extends BaseCommand
                 'Requeue the given user (if email param given) or all users'
             )
             ->addOption(
+                'count-queue',
+                null,
+                InputOption::VALUE_NONE,
+                'Count the queue'
+            )
+            ->addOption(
                 'convert-lead',
                 null,
                 InputOption::VALUE_REQUIRED,
@@ -102,6 +108,7 @@ class IntercomCommand extends BaseCommand
         $leadMaintenance = true === $input->getOption('lead-maintenance');
         $userMaintenance = true === $input->getOption('user-maintenance');
         $pendingInvites = true === $input->getOption('pending-invites');
+        $countQueue = true === $input->getOption('count-queue');
 
         /** @var IntercomService $intercom */
         $intercom = $this->getContainer()->get('app.intercom');
@@ -123,6 +130,9 @@ class IntercomCommand extends BaseCommand
         } elseif ($clear) {
             $intercom->clearQueue();
             $output->writeln(sprintf("Queue is cleared"));
+        } elseif ($countQueue) {
+            $count = $intercom->countQueue();
+            $output->writeln(sprintf("%d in queue", $count));
         } elseif ($show) {
             $data = $intercom->getQueueData($process);
             $output->writeln(sprintf("Queue Size: %d", count($data)));

@@ -139,7 +139,7 @@ monolog:
     channels: ['receperio']
 
 assetic:
-    bundles:        [ AppBundle, PicsureMLBundle, FOSUserBundle, TwigBundle ]
+    bundles:        [ AppBundle, PicsureMLBundle, FOSUserBundle, TwigBundle, SchebTwoFactorBundle ]
     debug:          '%kernel.debug%'
     use_controller: '%kernel.debug%'
     filters:

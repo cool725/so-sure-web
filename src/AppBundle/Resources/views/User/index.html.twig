@@ -3,6 +3,7 @@
 {# Set vars #}
 {% set new_stylesheet = 1 %}
 {% set new_footer = 1 %}
+{% set include_emoji = 1 %}
 
 {% block javascripts %}
     {{ parent() }}
@@ -31,7 +32,57 @@
         <div class="container">
 
             <div class="row">
-                <div class="col-sm-7 col-sm-push-5 col-md-8 col-md-push-4 connections-container">
+                <div class="col-sm-7 col-md-8 connections-container">
+                    {% if policy.canInvite %}
+                    <div class="share__box">
+                        <h2 class="h-nom text-center">💰 Sharing is... rewarding</h2>
+                        <p class="lead">If you and your friends take good care of your phones and don’t need to claim, we’ll give you up to 80% of your premium back at the end of your policy year.</p>
+                        <p class="lead">We've made it easy for you to get started, invite via email, share your unique sign-up link below or invite via social.</p>
+                        <div class="row share">
+                            <div class="col-md-6">
+                                {# Non-valid entry for autocomplete see: https://developer.mozilla.org/en-US/docs/Web/Security/Securing_your_site/Turning_off_form_autocompletion #}
+                                <h3 class="text-center">✉️ Invite via email</h3>
+                                {{ form_start(email_form, {'attr': {'autocomplete': 'nope'}}) }}
+                                    <div class="form-group">
+                                        {{ form_errors(email_form.email) }}
+                                        <div class="input-group">
+                                            {{ form_widget(email_form.email, {'attr': {'placeholder': 'Enter their email', 'class': 'form-control'}}) }}
+                                            <span class="input-group-btn">
+                                                {{ form_widget(email_form.submit, {'label': 'Invite', 'attr': {'class': 'btn btn-green btn-pad'}}) }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                {{ form_end(email_form) }}
+                            </div>
+                            <div class="col-md-6">
+                                <h3 class="text-center">🔗 Share this link</h3>
+                                <form>
+                                    <div class="form-group">
+                                        <div class="input-group">
+                                            <input name="scode" id="scode" readonly="readonly" type="text" class="form-control" value="{{ policy.standardSCode.shareLink }}">
+                                            <span class="input-group-btn">
+                                                <button class="btn btn-blue btn-pad btn-copy"
+                                                        data-clipboard-target="#scode"
+                                                        data-toggle="tooltip"
+                                                        data-placement="bottom"
+                                                        >Copy</button>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="col-md-12">
+                                <div id="share-connect"
+                                     class="text-center"
+                                     data-share-link="{{ policy.standardSCode.shareLink }}"
+                                     data-share-text="{{ share_experiment_text }}">
+                                    <h4>Invite via:</h4>
+                                    <div id="share"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
                     {% if policy.hasUnconnectedUserPolicies %}
                     <h3 class="text-grey-blue">Connect with your other policies</h3>
                     <div class="user-homepage--section">
@@ -128,11 +179,7 @@
                                 <img src="{{ connection.linkedUser.getImageUrlFallback }}"
                                 title="{% if connection.linkedUser.id == app.user.id %}{{ connection.linkedPolicy.defaultName }}{% else %}{{ connection.linkedUser.name }}{% endif %}"
                                 alt="{{ connection.linkedUser.name }}"
-                                class="
-                                {% if not policy.hasMonetaryClaimed and not policy.hasMonetaryNetworkClaim %}           img-circle coffee-stamp
-                                {% else %}
-                                            img-circle coffee-stamp user-has-claimed
-                                {% endif %}"
+                                class="img-circle coffee-stamp {% if connection.linkedPolicy.hasMonetaryClaimed %}user-has-claimed{% endif %}"
                                 data-container="body"
                                 data-toggle="popover"
                                 data-trigger="hover"
@@ -145,51 +192,50 @@
                                     ">
                             </li>
                             {% endfor %}
-                            {% if policy.canInvite %}
-                            <li>
-                                <a id="connect-with" href="#" data-toggle="modal" data-target="#inviteModal"><img src="{{ cdn_url }}/images/alpha/add.png" alt="Add connection" class="img-circle coffee-stamp-add"></a>
-                            </li>
-                            {% endif %}
+{#                             {% if policy.canInvite %}
+                                <li>
+                                    <a id="connect-with" href="#" data-toggle="modal" data-target="#inviteModal"><img src="{{ cdn_url }}/images/alpha/add.png" alt="Add connection" class="img-circle coffee-stamp-add"></a>
+                                </li>
+                            {% endif %} #}
                         </ul>
                     </div>
                     {% endif %}
-                    {% if policy.canInvite %}
-                    <div class="user-homepage--section">
-                        <h3 class="text-grey-blue">Add Connections</h3>
-                        <p>Want to add a connection? We've made it easy for you to do so with your very own unique sign up link. <br> Share the link or click 'Add connection' to get started.</p>
-                        {# id="add-connect" used in tests #}
-                        <p class="text-center"><a id="add-connect" href="#" class="btn btn-blue btn-pad " data-toggle="modal" data-target="#inviteModal"><i class="fa fa-plus" aria-hidden="true"></i> Add connection</a></p>
-                    </div>
-                    {% endif %}
+{#                     {% if policy.canInvite %}
+                        <div class="user-homepage--section">
+                            <h3 class="text-grey-blue">Add Connections</h3>
+                            <p>Want to add a connection? We've made it easy for you to do so with your very own unique sign up link. <br> Share the link or click 'Add connection' to get started.</p>
+                            <p class="text-center"><a id="add-connect" href="#" class="btn btn-blue btn-pad " data-toggle="modal" data-target="#inviteModal"><i class="fa fa-plus" aria-hidden="true"></i> Add connection</a></p>
+                        </div>
+                    {% endif %} #}
                 </div>
-                <div class="col-sm-5 col-sm-pull-7 col-md-4 col-md-pull-8">
+                <div class="col-sm-5 col-md-4">
                     {% if policy.canInvite %}
-                    <div id="scode-box" class="box-border-grey text-center">
-                        <h4><strong>
-                            {% if scode and scode.standard %}
-                                {{ scode.policy.user }} has invited you!
-                            {% else %}
-                                Already received an invite?
-                            {% endif %}
-                        </strong></h4>
-                        <p><small>Enter the unique 8-digit code below and we'll connect you.</small></p>
-                        {{ form_start(scode_form, {'attr': {'class': '', 'autocomplete': 'off'}}) }}
-                            <div class="form-group">
-                                {{ form_errors(scode_form.scode) }}
-                                <div class="input-group">
-                                    {{ form_widget(scode_form.scode, {'attr': {'placeholder': 'Enter code', 'class': 'form-control'}}) }}
-                                    <span class="input-group-btn">
-                                        {{ form_widget(scode_form.submit, {'label': 'Connect', 'attr': {'class': 'btn btn-green btn-pad'}}) }}
-                                    </span>
+                        <div id="scode-box" class="box-border-grey text-center">
+                            <h4><strong>
+                                {% if scode and scode.standard %}
+                                    {{ scode.policy.user }} has invited you!
+                                {% else %}
+                                    Already received an invite?
+                                {% endif %}
+                            </strong></h4>
+                            <p><small>Enter the unique 8-digit code below and we'll connect you.</small></p>
+                            {{ form_start(scode_form, {'attr': {'class': '', 'autocomplete': 'off'}}) }}
+                                <div class="form-group">
+                                    {{ form_errors(scode_form.scode) }}
+                                    <div class="input-group">
+                                        {{ form_widget(scode_form.scode, {'attr': {'placeholder': 'Enter code', 'class': 'form-control'}}) }}
+                                        <span class="input-group-btn">
+                                            {{ form_widget(scode_form.submit, {'label': 'Connect', 'attr': {'class': 'btn btn-green btn-pad'}}) }}
+                                        </span>
+                                    </div>
+                                    <div class="help-block with-errors" id="scode-form-code-err"></div>
                                 </div>
-                                <div class="help-block with-errors" id="scode-form-code-err"></div>
-                            </div>
-                        {{ form_end(scode_form) }}
-                    </div>
-                    <div id="scode-box" class="box-border-grey text-center">
-                        <h4>Your invite code</h4>
-                        <span class="h2 text-blue">{{ policy.standardSCode.code }}</span>
-                    </div>
+                            {{ form_end(scode_form) }}
+                        </div>
+{#                         <div id="scode-box" class="box-border-grey text-center">
+                            <h4>Your invite code</h4>
+                            <span class="h2 text-blue">{{ policy.standardSCode.code }}</span>
+                        </div> #}
                     {% endif %}
                     <div class="box-border-grey text-center">
                         <h4><strong>Reward Pot</strong></h4>
@@ -235,10 +281,8 @@
         </div>
     </section>
 
-
     {# Page Modals #}
-
-    <div class="modal fade"
+    {# <div class="modal fade"
          id="inviteModal"
          tabindex="-1"
          role="dialog"
@@ -261,52 +305,10 @@
                      data-share-text="{{ share_experiment_text }}">
                     <h4>Invite via:</h4>
                     <div id="share"></div>
-                    <div class="text-break text-grey">
-                        <div class="line"></div>OR<div class="line"></div>
-                    </div>
-                    <div class="row">
-                        <form class="col-sm-8 col-sm-offset-2">
-                            <div class="form-group">
-                                <label for="scode" class="h4">Share this link:</label>
-                                <div class="input-group">
-                                    <input name="scode" id="scode" readonly="readonly" type="text" class="form-control" value="{{ policy.standardSCode.shareLink }}">
-                                    <span class="input-group-btn">
-                                        <button class="btn btn-blue btn-pad btn-copy"
-                                                data-clipboard-target="#scode"
-                                                data-toggle="tooltip"
-                                                data-placement="bottom"
-                                                >Copy</button>
-                                    </span>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                    <div class="text-break text-grey">
-                        <div class="line"></div>OR<div class="line"></div>
-                    </div>
-                    <h4>Email an invite:</h4>
-                    <p><small>Just enter their email below and we'll do the rest..</small></p>
-                    <div class="row">
-                        {# Non-valid entry for autocomplete see: https://developer.mozilla.org/en-US/docs/Web/Security/Securing_your_site/Turning_off_form_autocompletion #}
-                        {{ form_start(email_form, {'attr': {'class': 'col-sm-8 col-sm-offset-2', 'autocomplete': 'nope'}}) }}
-                            <div class="form-group">
-                                {{ form_errors(email_form.email) }}
-                                <div class="input-group">
-                                    {{ form_widget(email_form.email, {'attr': {'placeholder': 'Enter their email', 'class': 'form-control'}}) }}
-                                    <span class="input-group-btn">
-                                        {{ form_widget(email_form.submit, {'label': 'Invite', 'attr': {'class': 'btn btn-green btn-pad'}}) }}
-                                    </span>
-                                </div>
-                            </div>
-                        {{ form_end(email_form) }}
-                    </div>
                 </div>
             </div>
         </div>
-    </div>
-
+    </div> #}
     {# End Page Modals #}
-
-
 
 {% endblock %}

@@ -62,3 +62,21 @@
    display: flex;
    align-items: center;
 }
+
+// Line between columns
+.col-b-b {
+
+    > [class*='col-']:before {
+       background: $grey;
+       bottom: 0;
+       content: " ";
+       left: 0;
+       position: absolute;
+       width: 1px; height: 100%;
+       top: 0;
+    }
+
+    > [class*='col-']:first-child:before {
+        display: none;
+    }
+}

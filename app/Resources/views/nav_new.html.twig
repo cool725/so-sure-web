@@ -32,6 +32,7 @@
                     {% else %}
                         <li><a href="{{ path('mobile_phone_insurance_for_your_company') }}">Company phones</a></li>
                     {% endif %}
+                    <li><a href="{{ path('faq') }}">FAQ</a></li>
                     {% if app.user is not null and app.user %}
                         {% if is_granted('ROLE_ADMIN') %}
                             <li><a href="{{ path('admin_home') }}"><i class="fa fa-home"></i> Admin</a></li>
