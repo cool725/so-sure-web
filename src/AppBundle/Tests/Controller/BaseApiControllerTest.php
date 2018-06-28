@@ -40,7 +40,7 @@ class BaseApiControllerTest extends BaseControllerTest
     /**
      *
      */
-    protected function generatePolicy($cognitoIdentityId, $user, $clearRateLimit = true, $name = null)
+    protected function generatePolicy($cognitoIdentityId, $user, $clearRateLimit = true, $name = null, $phone = null)
     {
         if ($user) {
             $this->updateUserDetails($cognitoIdentityId, $user);
@@ -59,6 +59,11 @@ class BaseApiControllerTest extends BaseControllerTest
             'rooted' => false,
             'validation_data' => $this->getValidationData($cognitoIdentityId, ['imei' => $imei]),
         ];
+        if ($phone) {
+            $phonePolicy['make'] = $phone->getMake();
+            $phonePolicy['device'] = $phone->getDevices()[0];
+            $phonePolicy['memory'] = $phone->getMemory();
+        }
         if ($name) {
             $phonePolicy['name'] = $name;
         }

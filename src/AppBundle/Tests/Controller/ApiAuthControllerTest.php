@@ -1980,13 +1980,14 @@ class ApiAuthControllerTest extends BaseApiControllerTest
 
     public function testNewPolicyWithPremiumValidation()
     {
+        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
         $user = self::createUser(
             self::$userManager,
             self::generateEmail('policy-judopay-different-amount', $this),
             'foo'
         );
         $cognitoIdentityId = $this->getAuthUser($user);
-        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user, true, null, $this->getRandomPhone($dm));
         $data = $this->verifyResponse(200);
 
         $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');

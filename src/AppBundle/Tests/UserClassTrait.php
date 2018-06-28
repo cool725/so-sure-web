@@ -143,9 +143,9 @@ trait UserClassTrait
     {
         $phoneRepo = $dm->getRepository(Phone::class);
         if ($make) {
-            $phones = $phoneRepo->findBy(['active' => true, 'make' => $make]);
+            $phones = $phoneRepo->findBy(['active' => true, 'make' => $make, 'devices' => ['$ne' => 'A0001']]);
         } else {
-            $phones = $phoneRepo->findBy(['active' => true]);
+            $phones = $phoneRepo->findBy(['active' => true, 'devices' => ['$ne' => 'A0001']]);
         }
         $phone = null;
         while ($phone == null) {
