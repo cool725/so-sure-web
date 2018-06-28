@@ -34,16 +34,22 @@ class PushService
     /** @var SnsClient  */
     protected $sns;
 
+    /** @var \Domnikl\Statsd\Client */
+    protected $statsd;
+
     /**
-     * @param LoggerInterface $logger
-     * @param SnsClient       $sns
+     * @param LoggerInterface        $logger
+     * @param SnsClient              $sns
+     * @param \Domnikl\Statsd\Client $statsd
      */
     public function __construct(
         LoggerInterface $logger,
-        SnsClient $sns
+        SnsClient $sns,
+        \Domnikl\Statsd\Client $statsd
     ) {
         $this->logger = $logger;
         $this->sns = $sns;
+        $this->statsd = $statsd;
     }
 
     public function sendToUser(
@@ -86,7 +92,8 @@ class PushService
                 ])
             ]);
         } catch (\Exception $e) {
-            $this->logger->error(sprintf('Failed to push %s to %s', $message, $arn));
+            $this->logger->info(sprintf('Failed to push %s to %s', $message, $arn));
+            $this->statsd->increment('aws.sns.failure');
 
             return false;
         }
