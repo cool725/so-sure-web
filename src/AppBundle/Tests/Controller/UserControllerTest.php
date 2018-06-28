@@ -410,7 +410,7 @@ class UserControllerTest extends BaseControllerTest
         if ($allowed) {
             $count = 1;
         }
-        $this->assertEquals($count, $crawler->evaluate('count(//a[@id="add-connect"])')[0]);
+        $this->assertEquals($count, $crawler->evaluate('count(//a[@id="shareBox"])')[0]);
     }
 
     private function validateRewardPot($crawler, $amount)
@@ -739,7 +739,7 @@ class UserControllerTest extends BaseControllerTest
 
         $this->assertFalse($policyA->isRenewed());
         $this->assertFalse($policyB->isRenewed());
-        
+
         self::connectPolicies(self::$invitationService, $policyA, $policyB, $date);
 
         $tomorrow = new \DateTime();
@@ -749,7 +749,7 @@ class UserControllerTest extends BaseControllerTest
         static::$dm->persist($renewalPolicyA);
         static::$dm->persist($renewalPolicyB);
         static::$dm->flush();
-        
+
         $this->assertEquals(10, $policyA->getPotValue());
         $this->assertEquals(10, $policyB->getPotValue());
 
@@ -805,7 +805,7 @@ class UserControllerTest extends BaseControllerTest
 
         $this->assertFalse($policyA->isRenewed());
         $this->assertFalse($policyB->isRenewed());
-        
+
         self::connectPolicies(self::$invitationService, $policyA, $policyB, $date);
         $tomorrow = new \DateTime();
         $tomorrow = $tomorrow->add(new \DateInterval('P1D'));
@@ -814,7 +814,7 @@ class UserControllerTest extends BaseControllerTest
         static::$dm->persist($renewalPolicyA);
         static::$dm->persist($renewalPolicyB);
         static::$dm->flush();
-        
+
         $this->assertEquals(10, $policyA->getPotValue());
         $this->assertEquals(10, $policyB->getPotValue());
 
