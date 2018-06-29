@@ -115,4 +115,9 @@ class BacsServiceTest extends WebTestCase
 
 
     }
+
+    public function testExportPaymentsDebits()
+    {
+
+    }
 }

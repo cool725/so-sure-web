@@ -1232,9 +1232,10 @@ class BacsService
         foreach ($scheduledPayments as $scheduledPayment) {
             /** @var ScheduledPayment $scheduledPayment */
             $scheduledDate = $this->getNextBusinessDay($scheduledPayment->getScheduled());
+            $policy = $scheduledPayment->getPolicy();
 
             /** @var BacsPaymentMethod $bacs */
-            $bacs = $scheduledPayment->getPolicy()->getUser()->getPaymentMethod();
+            $bacs = $policy->getUser()->getPaymentMethod();
 
             if (!$bacs || !$bacs->getBankAccount()) {
                 $msg = sprintf(
@@ -1274,7 +1275,7 @@ class BacsService
                 }
 
                 $rescheduled = $scheduledPayment->reschedule($scheduledDate);
-                $scheduledPayment->getPolicy()->addScheduledPayment($rescheduled);
+                $policy->addScheduledPayment($rescheduled);
                 $this->dm->flush(null, array('w' => 'majority', 'j' => true));
 
                 continue;
@@ -1288,14 +1289,15 @@ class BacsService
                 $this->logger->error($msg);
 
                 $rescheduled = $scheduledPayment->reschedule($scheduledDate);
-                $scheduledPayment->getPolicy()->addScheduledPayment($rescheduled);
+                $policy->addScheduledPayment($rescheduled);
                 $this->dm->flush(null, array('w' => 'majority', 'j' => true));
 
                 continue;
             }
 
-            $scheduledDate
-            if ($scheduledPayment->getPolicy()->getPolicyExpirationDate() < $payment->){
+            $bacsPaymentForDateCalcs = new BacsPayment();
+            $bacsPaymentForDateCalcs->submit($scheduledDate);
+            if ($policy->getPolicyExpirationDate() < $bacsPaymentForDateCalcs->getBacsReversedDate()) {
                 $msg = sprintf(
                     'Skipping payment %s as payment date is after expiration date',
                     $scheduledPayment->getId());
