@@ -1158,7 +1158,7 @@ class UserControllerTest extends BaseControllerTest
             null,
             array(DateTimeNormalizer::FORMAT_KEY => 'd/m/Y')
         );
-        $form['claim_form[time]'] = '2 am';
+        $form['claim_form[time]'] = '02:00';
         $form['claim_form[where]'] = 'so-sure offices';
         $form['claim_form[timeToReach]'] = '2 pm';
         $form['claim_form[signature]'] = 'foo bar';
@@ -1264,10 +1264,9 @@ class UserControllerTest extends BaseControllerTest
         $form = $crawler->selectButton('claim_damage_form[confirm]')->form();
         $form['claim_damage_form[typeDetails]'] = Claim::DAMAGE_BROKEN_SCREEN;
         $form['claim_damage_form[typeDetailsOther]'] = '';
-        $form['claim_damage_form[monthOfPurchase]'] = '12';
+        $form['claim_damage_form[monthOfPurchase]'] = 'December';
         $form['claim_damage_form[yearOfPurchase]'] = '2018';
         $form['claim_damage_form[phoneStatus]'] = Claim::PHONE_STATUS_NEW;
-        $form['claim_damage_form[isUnderWarranty]'] = true;
         $form['claim_damage_form[proofOfUsage]']->upload($proofOfUsage);
         $form['claim_damage_form[pictureOfPhone]']->upload($damagePicture);
         $crawler = self::$client->submit($form);
@@ -1367,12 +1366,12 @@ class UserControllerTest extends BaseControllerTest
             $now,
             null,
             array(DateTimeNormalizer::FORMAT_KEY => 'd/m/Y')
-        );;
+        );
         $form['claim_theftloss_form[reportedDate]'] = $serializer->normalize(
             $now,
             null,
             array(DateTimeNormalizer::FORMAT_KEY => 'd/m/Y')
-        );;
+        );
         $form['claim_theftloss_form[reportType]'] = Claim::REPORT_POLICE_STATION;
         $form['claim_theftloss_form[policeLossReport]'] = '1234567890';
         $form['claim_theftloss_form[proofOfUsage]']->upload($proofOfUsage);
@@ -1475,12 +1474,12 @@ class UserControllerTest extends BaseControllerTest
             $now,
             null,
             array(DateTimeNormalizer::FORMAT_KEY => 'd/m/Y')
-        );;
+        );
         $form['claim_theftloss_form[reportedDate]'] = $serializer->normalize(
             $now,
             null,
             array(DateTimeNormalizer::FORMAT_KEY => 'd/m/Y')
-        );;
+        );
         $form['claim_theftloss_form[reportType]'] = Claim::REPORT_POLICE_STATION;
         $form['claim_theftloss_form[crimeReferenceNumber]'] = '1234567890';
         $form['claim_theftloss_form[proofOfUsage]']->upload($proofOfUsage);
@@ -1505,9 +1504,88 @@ class UserControllerTest extends BaseControllerTest
         $this->assertEquals(Claim::STATUS_SUBMITTED, $updatedClaim->getStatus());
     }
 
-    public function testUserWithdrawClaim()
+    public function testUserClaimUpdate()
     {
-        $email = self::generateEmail('testUserWithdrawClaim', $this);
+        $email = self::generateEmail('testUserClaimUpdate', $this);
+        $password = 'foo';
+        $phone = self::getRandomPhone(self::$dm);
+        $user = self::createUser(
+            self::$userManager,
+            $email,
+            $password,
+            $phone,
+            self::$dm
+        );
+        $now = new \DateTime('2018-01-01');
+        $policy = self::initPolicy($user, self::$dm, $phone, null, true, true);
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        $policy->setStart($now);
+
+        $claim = new Claim();
+        $claim->setIncidentDate($now);
+        $claim->setIncidentTime('2 am');
+        $claim->setLocation('so-sure offices');
+        $claim->setTimeToReach('2 pm');
+        $claim->setPhoneToReach( self::generateRandomMobile());
+        $claim->setSignature('foo bar');
+        $claim->setType(Claim::TYPE_THEFT);
+        $claim->setNetwork(Claim::NETWORK_O2);
+        $claim->setDescription('bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla');
+        $claim->setStatus(Claim::STATUS_SUBMITTED);
+        $claim->setPolicy($policy);
+        $policy->addClaim($claim);
+        self::$dm->flush();
+
+        $serializer = new Serializer(array(new DateTimeNormalizer()));
+
+        $proofOfUsageFile = sprintf(
+            "%s/../src/AppBundle/Tests/Resources/proofOfUsage.txt",
+            self::$rootDir
+        );
+        $proofOfUsage = new UploadedFile(
+            $proofOfUsageFile,
+            'proofOfUsage.txt',
+            'text/plain',
+            14
+        );
+
+        $claimPage = self::$router->generate('claimed_policy', ['policyId' => $policy->getId()]);
+        $this->login($email, $password);
+        $crawler = self::$client->request('GET', $claimPage);
+        self::verifyResponse(200);
+
+        $form = $crawler->selectButton('claim_update_form[confirm]')->form();
+        $form['claim_update_form[when]'] = $serializer->normalize(
+            $now,
+            null,
+            array(DateTimeNormalizer::FORMAT_KEY => 'd/m/Y')
+        );
+        $form['claim_update_form[time]'] = '08:00';
+        $form['claim_update_form[proofOfUsage]']->upload($proofOfUsage);
+        $crawler = self::$client->submit($form);
+
+        self::verifyResponse(302);
+        $this->assertTrue(self::$client->getResponse()->isRedirect(sprintf('/user/claim/%s', $policy->getId())));
+
+        $claimPage = self::$router->generate('claimed_policy', ['policyId' => $policy->getId()]);
+        $crawler = self::$client->request('GET', $claimPage);
+        self::verifyResponse(200);
+
+        $this->assertContains(
+            "Thank you for submitting your claim",
+            self::$client->getResponse()->getContent()
+        );
+
+        $updatedPolicy = $this->assertPolicyByIdExists(self::$client->getContainer(), $policy->getId());
+        $updatedClaim = $updatedPolicy->getLatestClaim();
+        $this->assertEquals(Claim::STATUS_SUBMITTED, $updatedClaim->getStatus());
+        $this->assertEquals($now, $updatedClaim->getIncidentDate());
+        $this->assertEquals('08:00', $updatedClaim->getIncidentTime());
+    }
+
+    public function testUserClaimWithdraw()
+    {
+        $email = self::generateEmail('testUserClaimWithdraw', $this);
         $password = 'foo';
         $phone = self::getRandomPhone(self::$dm);
         $user = self::createUser(

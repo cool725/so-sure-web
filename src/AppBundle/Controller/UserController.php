@@ -1560,7 +1560,8 @@ class UserController extends BaseController
                 $time = 'Monday morning';
             }
 
-            $needProofOfBarring = in_array($claim->getType(), array(Claim::TYPE_THEFT, Claim::TYPE_LOSS)) && $claim->needProofOfUsage();
+            $needProofOfBarring = in_array($claim->getType(), array(Claim::TYPE_THEFT, Claim::TYPE_LOSS)) &&
+                $claim->needProofOfUsage();
             $needProofOfPurchase = in_array($claim->getType(), array(Claim::TYPE_THEFT, Claim::TYPE_LOSS)) &&
             $claim->needProofOfPurchase();
 

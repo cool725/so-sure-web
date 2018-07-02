@@ -1608,7 +1608,6 @@ class Claim
             'monthOfPurchase' => $this->getMonthOfPurchase(),
             'yearOfPurchase' => $this->getYearOfPurchase(),
             'phoneStatus' => $this->getPhoneStatus(),
-            'isUnderWarranty' => $this->getIsUnderWarranty(),
             'hasContacted' => $this->getHasContacted(),
             'contactedPlace' => $this->getContactedPlace(),
             'network' => $this->getNetwork(),

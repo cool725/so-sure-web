@@ -316,17 +316,7 @@ class DefaultControllerTest extends BaseControllerTest
 
     public function testClaimUserNotFound()
     {
-        $email = self::generateEmail('testClaimUserNotFound', $this);
-        $password = 'foo';
-        $phone = self::getRandomPhone(self::$dm);
-        $user = self::createUser(
-            self::$userManager,
-            $email,
-            $password,
-            $phone,
-            self::$dm
-        );
-
+        $this->logout();
         $claimPage = self::$router->generate('claim');
         $crawler = self::$client->request('GET', $claimPage);
         self::verifyResponse(200);
@@ -341,6 +331,7 @@ class DefaultControllerTest extends BaseControllerTest
 
     public function testClaimUserNoActivePolicy()
     {
+        $this->logout();
         $email = self::generateEmail('testClaimUserNoActivePolicy', $this);
         $password = 'foo';
         $phone = self::getRandomPhone(self::$dm);
@@ -371,6 +362,7 @@ class DefaultControllerTest extends BaseControllerTest
 
     public function testClaimValid()
     {
+        $this->logout();
         $email = self::generateEmail('testClaimValid', $this);
         $password = 'foo';
         $phone = self::getRandomPhone(self::$dm);
@@ -421,6 +413,7 @@ class DefaultControllerTest extends BaseControllerTest
 
     public function testClaimLoginInvalid()
     {
+        $this->logout();
         $email = self::generateEmail('testClaimLoginInvalid', $this);
         $password = 'foo';
         $phone = self::getRandomPhone(self::$dm);
@@ -434,7 +427,9 @@ class DefaultControllerTest extends BaseControllerTest
 
         $claimPage = self::$router->generate('claim_login', ['tokenId' => 'foo']);
         $crawler = self::$client->request('GET', $claimPage);
-        self::verifyResponse(404);
+        
+        self::verifyResponse(302);
+        $this->assertTrue(self::$client->getResponse()->isRedirect(sprintf('/claim')));
     }
 
     public function testClaimLoginValid()
