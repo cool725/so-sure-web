@@ -50,10 +50,10 @@ class ClaimFnolTheftLossType extends AbstractType
         $builder
             ->add('hasContacted', ChoiceType::class, [
                 'required' => true,
-                'placeholder' => 'Contacted the last place you had it?',
+                'placeholder' => 'Please choose..',
                 'choices' => [
-                    'contacted' => true,
-                    'did not contact' => false,
+                    'Contacted' => true,
+                    'Did not contact' => false,
                 ],
             ])
             ->add('contactedPlace', TextType::class, ['required' => true])
@@ -75,10 +75,10 @@ class ClaimFnolTheftLossType extends AbstractType
             ])
             ->add('reportType', ChoiceType::class, [
                 'required' => true,
-                'placeholder' => 'Where?',
+                'placeholder' => 'Please choose...',
                 'choices' => [
-                    'police station' => Claim::REPORT_POLICE_STATION,
-                    'online' => Claim::REPORT_ONLINE,
+                    'Police station' => Claim::REPORT_POLICE_STATION,
+                    'Online' => Claim::REPORT_ONLINE,
                 ],
             ])
             ->add('proofOfBarring', FileType::class)

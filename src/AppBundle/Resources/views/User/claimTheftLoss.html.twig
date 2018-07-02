@@ -36,14 +36,14 @@
                         <div class="row">
                             <div class="col-sm-6">
                                 <div class="form-group">
-                                    <label for="">I {{ username }}</label>
-                                    {{ form_widget(claim_form.hasContacted, { 'attr': {'class': 'form-control', 'placeholder': 'Contacted the last place you had it?'}}) }}
+                                    <label class="h4">Did you contact the last place you had it?</label>
+                                    {{ form_widget(claim_form.hasContacted, { 'attr': {'class': 'form-control', 'placeholder': 'Please choose...'}}) }}
                                     <span class="help-block with-errors">{{ form_errors(claim_form.hasContacted) }}</span>
                                 </div>
                             </div>
                             <div class="col-sm-6">
                                 <div class="form-group">
-                                     <label for="">the place where I last had my phone, which was</label> {{ form_widget(claim_form.contactedPlace, { 'attr': {'class': 'form-control', 'placeholder': 'Home, work, shop etc...'}}) }}
+                                     <label class="h4">Where did you last have your phone?</label> {{ form_widget(claim_form.contactedPlace, { 'attr': {'class': 'form-control', 'placeholder': 'Home, work, shop etc...'}}) }}
                                     <span class="help-block with-errors">{{ form_errors(claim_form.contactedPlace) }}</span>
                                 </div>
                             </div>
@@ -52,14 +52,14 @@
                         <div class="row">
                             <div class="col-sm-6">
                                 <div class="form-group">
-                                    <label for="">I reported the phone {{ claimType }} to {{ network }} and asked them to block my phone on</label>
+                                    <label class="h4">When did you report the {{ claimType }} to {{ network }} and asked them to block your phone?</label>
                                     {{ form_widget(claim_form.blockedDate, { 'attr': {'class': 'form-control date_mask', 'placeholder': 'Date (DD/MM/YYYY)'}}) }}
                                     <span class="help-block with-errors">{{ form_errors(claim_form.blockedDate) }}</span>
                                 </div>
                             </div>
                             <div class="col-sm-6">
                                 <div class="form-group">
-                                    <label for="">I reported the {{ claimType }} to the police on <br><br class="hidden-xs"></label>
+                                    <label class="h4">When did you report the {{ claimType }} to the police? </label>
                                     {{ form_widget(claim_form.reportedDate, { 'attr': {'class': 'form-control date_mask', 'placeholder': 'Date (DD/MM/YYYY)'}}) }}
                                     <span class="help-block with-errors">{{ form_errors(claim_form.reportedDate) }}</span>
                                 </div>
@@ -69,7 +69,7 @@
                         <div class="row">
                             <div class="col-sm-6">
                                 <div class="form-group">
-                                    <label for="">at the</label>
+                                    <label class="h4">Did you report the {{ claimType }} online or at the station?</label>
                                     {{ form_widget(claim_form.reportType, { 'attr': {'class': 'form-control', 'placeholder': 'Please select'}}) }}
                                     <span class="help-block with-errors">{{ form_errors(claim_form.reportType) }}</span>
                                 </div>
