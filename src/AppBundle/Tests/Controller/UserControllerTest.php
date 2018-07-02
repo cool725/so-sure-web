@@ -410,7 +410,8 @@ class UserControllerTest extends BaseControllerTest
         if ($allowed) {
             $count = 1;
         }
-        $this->assertEquals($count, $crawler->evaluate('count(//a[@id="shareBox"])')[0]);
+        //print $crawler->html();
+        $this->assertEquals($count, $crawler->evaluate('count(//div[@id="shareBox"])')[0]);
     }
 
     private function validateRewardPot($crawler, $amount)
