@@ -33,97 +33,111 @@
 
                     <ul class="list-inline text-center">
                         <li>
-                            <a href="{{ path('user_home') }}" class="btn btn-blue btn-pad ">Get back to your account</a>
+                            <a href="{{ path('user_home') }}" class="btn btn-blue-hollow btn-pad ">Get back to your account</a>
                         </li>
                         <li>
-                            <a id="withdraw-claim" href="#" class="btn btn-green btn-pad " data-toggle="modal" data-target="#withdrawModal">Withdraw my claim</a>
+                            <a id="withdraw-claim" href="#" class="btn btn-red btn-pad " data-toggle="modal" data-target="#withdrawModal">Withdraw my claim</a>
                         </li>
                     </ul>
 
                     {{ form_start(claim_form, {'attr': {'data-toggle': 'validator', 'class': 'validate-form', 'id':'claim-form', 'data-client-validation': form_client_validation }}) }}
 
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <div class="form-group {% if form_errors(claim_form.when) %}has-error{% endif %}">
-                                <label class="h4">It happened on <span class="req">*</span></label>
-                                {{ form_widget(claim_form.when, { 'attr': {'class': 'form-control date_mask', 'placeholder': 'Date (DD/MM/YYYY)'}}) }}
-                                <div class="help-block with-errors">{{ form_errors(claim_form.when) }}</div>
-                            </div>
-                        </div>
-                        <div class="col-sm-6">
-                            <div class="form-group {% if form_errors(claim_form.time) %}has-error{% endif %}">
-                                <label class="h4">At around <span class="req">*</span></label>
-                                {{ form_widget(claim_form.time, { 'attr': {'class': 'form-control'}}) }}
-                                <div class="help-block with-errors">{{ form_errors(claim_form.time) }}</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-xs-12 text-center">
-                            {% for file in claim.proofOfUsageFiles %}
-                                <p><a href="{{ s3DownloadLink(file.bucket, file.key) }}">{{ file.fileName }}</a> (Uploaded {{ file.created|date }})</p>
-                            {% endfor %}
-                            <div class="form-group {% if form_errors(claim_form.proofOfUsage) %}has-error{% endif %}">
-                                <label class="h4">Proof of usage <span class="req">*</span></label>
-                                {{ form_widget(claim_form.proofOfUsage, { 'attr': {'class': 'form-control'}}) }}
-                                <div class="help-block with-errors">{{ form_errors(claim_form.proofOfUsage) }}</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {% if picture_of_phone is defined and picture_of_phone %}
-                    <div class="row">
-                        <div class="col-xs-12 text-center">
-                            {% for file in claim.damagePictureFiles %}
-                                <p><a href="{{ s3DownloadLink(file.bucket, file.key) }}">{{ file.fileName }}</a> (Uploaded {{ file.created|date }})</p>
-                            {% endfor %}
-                            <div class="form-group {% if form_errors(claim_form.pictureOfPhone) %}has-error{% endif %}">
-                                <label class="h4">Picture of damaged phone <span class="req">*</span></label>
-                                {{ form_widget(claim_form.pictureOfPhone, { 'attr': {'class': 'form-control'}}) }}
-                                <div class="help-block with-errors">{{ form_errors(claim_form.pictureOfPhone) }}</div>
-                            </div>
-                        </div>
-                    </div>
-                    {% endif %}
-
-                    {% if proof_of_barring is defined and proof_of_barring %}
-                    <div class="row">
-                        <div class="col-xs-12 text-center">
-                            {% for file in claim.proofOfBarringFiles %}
-                                <p><a href="{{ s3DownloadLink(file.bucket, file.key) }}">{{ file.fileName }}</a> (Uploaded {{ file.created|date }})</p>
-                            {% endfor %}
-                            <div class="form-group {% if form_errors(claim_form.proofOfBarring) %}has-error{% endif %}">
-                                <label class="h4">Proof of barring <span class="req">*</span></label>
-                                {{ form_widget(claim_form.proofOfBarring, { 'attr': {'class': 'form-control'}}) }}
-                                <div class="help-block with-errors">{{ form_errors(claim_form.proofOfBarring) }}</div>
-                            </div>
-                        </div>
-                    </div>
-                    {% endif %}
-
-                    {% if proof_of_purchase is defined and proof_of_purchase %}
                         <div class="row">
-                            <div class="col-xs-12 text-center">
-                            {% for file in claim.proofOfPurchaseFiles %}
-                                <p><a href="{{ s3DownloadLink(file.bucket, file.key) }}">{{ file.fileName }}</a> (Uploaded {{ file.created|date }})</p>
-                            {% endfor %}
-                                <div class="form-group {% if form_errors(claim_form.proofOfPurchase) %}has-error{% endif %}">
-                                    <label class="h4">Proof of purchase <span class="req">*</span></label>
-                                    {{ form_widget(claim_form.proofOfPurchase, { 'attr': {'class': 'form-control'}}) }}
-                                    <div class="help-block with-errors">{{ form_errors(claim_form.proofOfPurchase) }}</div>
+                            <div class="col-sm-6">
+                                <div class="form-group {% if form_errors(claim_form.when) %}has-error{% endif %}">
+                                    <label class="h4">My phone was {{ claim.type }} on </label>
+                                    {{ form_widget(claim_form.when, { 'attr': {'class': 'form-control date_mask', 'placeholder': 'Date (DD/MM/YYYY)'}}) }}
+                                    <div class="help-block with-errors">{{ form_errors(claim_form.when) }}</div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group {% if form_errors(claim_form.time) %}has-error{% endif %}">
+                                    <label class="h4">The {{ claim.type }} occured at around</label>
+                                    {{ form_widget(claim_form.time, { 'attr': {'class': 'form-control'}}) }}
+                                    <div class="help-block with-errors">{{ form_errors(claim_form.time) }}</div>
                                 </div>
                             </div>
                         </div>
-                    {% endif %}
 
-                    <div class="row">
-                        <div class="col-xs-12 text-center">
-                            <div class="form-group">
-                                {{ form_widget(claim_form.confirm, { 'label': 'Update', 'attr': {'class': 'btn btn-blue btn-lg'}}) }}
+                        {% if proof_of_usage is defined and proof_of_usage %}
+                            <div class="row">
+                                <div class="col-xs-12 text-center">
+                                    <div class="form-group {% if form_errors(claim_form.proofOfUsage) %}has-error{% endif %}">
+                                        <label class="h4">Proof of usage</label>
+                                        {% for file in claim.proofOfUsageFiles %}
+                                            <p><a href="{{ s3DownloadLink(file.bucket, file.key) }}">{{ file.fileName }}</a> (Uploaded {{ file.created|date }})</p>
+                                        {% endfor %}
+                                        {{ form_widget(claim_form.proofOfUsage, { 'attr': {'class': 'form-control'}}) }}
+                                        <div class="help-block with-errors">{{ form_errors(claim_form.proofOfUsage) }}</div>
+                                        <div class="bg-info text-left">
+                                            <div class="panel-body">
+                                                <strong>How to get proof of usage:</strong><br>
+                                                Something....
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        {% if picture_of_phone is defined and picture_of_phone %}
+                            <div class="row">
+                                <div class="col-xs-12 text-center">
+                                        <label class="h4">Picture of damaged phone</label>
+                                        {% for file in claim.damagePictureFiles %}
+                                            <p><a href="{{ s3DownloadLink(file.bucket, file.key) }}">{{ file.fileName }}</a> (Uploaded {{ file.created|date }})</p>
+                                        {% endfor %}
+                                        <div class="form-group {% if form_errors(claim_form.pictureOfPhone) %}has-error{% endif %}">
+                                        {{ form_widget(claim_form.pictureOfPhone, { 'attr': {'class': 'form-control'}}) }}
+                                        <div class="help-block with-errors">{{ form_errors(claim_form.pictureOfPhone) }}</div>
+                                        <div class="bg-info text-left">
+                                            <div class="panel-body">
+                                                <strong>What is required:</strong><br>
+                                                Something....
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        {% if proof_of_barring is defined and proof_of_barring %}
+                            <div class="row">
+                                <div class="col-xs-12 text-center">
+                                    {% for file in claim.proofOfBarringFiles %}
+                                        <p><a href="{{ s3DownloadLink(file.bucket, file.key) }}">{{ file.fileName }}</a> (Uploaded {{ file.created|date }})</p>
+                                    {% endfor %}
+                                    <div class="form-group {% if form_errors(claim_form.proofOfBarring) %}has-error{% endif %}">
+                                        <label class="h4">Proof of barring</label>
+                                        {{ form_widget(claim_form.proofOfBarring, { 'attr': {'class': 'form-control'}}) }}
+                                        <div class="help-block with-errors">{{ form_errors(claim_form.proofOfBarring) }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        {% if proof_of_purchase is defined and proof_of_purchase %}
+                            <div class="row">
+                                <div class="col-xs-12 text-center">
+                                {% for file in claim.proofOfPurchaseFiles %}
+                                    <p><a href="{{ s3DownloadLink(file.bucket, file.key) }}">{{ file.fileName }}</a> (Uploaded {{ file.created|date }})</p>
+                                {% endfor %}
+                                    <div class="form-group {% if form_errors(claim_form.proofOfPurchase) %}has-error{% endif %}">
+                                        <label class="h4">Proof of purchase</label>
+                                        {{ form_widget(claim_form.proofOfPurchase, { 'attr': {'class': 'form-control'}}) }}
+                                        <div class="help-block with-errors">{{ form_errors(claim_form.proofOfPurchase) }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        <div class="row">
+                            <div class="col-xs-12 text-center">
+                                <div class="form-group">
+                                    {{ form_widget(claim_form.confirm, { 'label': 'Update', 'attr': {'class': 'btn btn-green btn-lg'}}) }}
+                                </div>
                             </div>
                         </div>
-                    </div>
                     {{ form_end(claim_form) }}
 
                 </div>
