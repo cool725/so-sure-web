@@ -76,7 +76,7 @@
                             </div>
                         </div>
 
-                        <div class="bg-warning">
+                        <div class="bg-info">
                             <div class="panel-body">Please upload the following required documents to process your claim. Once they have been uploaded, we will call within a few hours (during business hours 9-5.30pm).</div>
                         </div>
 
@@ -84,9 +84,15 @@
                             <div class="row">
                                 <div class="col-xs-12 text-center">
                                     <div class="form-group {% if form_errors(claim_form.proofOfUsage) %}has-error{% endif %}">
-                                        <label class="h4">Proof of usage <span class="req">*</span></label>
+                                        <label class="h4">Proof of usage</label>
                                         {{ form_widget(claim_form.proofOfUsage, { 'attr': {'class': 'form-control'}}) }}
                                         <div class="help-block with-errors">{{ form_errors(claim_form.proofOfUsage) }}</div>
+                                        <div class="bg-info text-left">
+                                            <div class="panel-body">
+                                                <strong>How to get proof of usage:</strong><br>
+                                                Something....
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -95,9 +101,15 @@
                         <div class="row">
                             <div class="col-xs-12 text-center">
                                 <div class="form-group {% if form_errors(claim_form.proofOfBarring) %}has-error{% endif %}">
-                                    <label class="h4">Proof of barring <span class="req">*</span></label>
+                                    <label class="h4">Proof of barring</label>
                                     {{ form_widget(claim_form.proofOfBarring, { 'attr': {'class': 'form-control'}}) }}
                                     <div class="help-block with-errors">{{ form_errors(claim_form.proofOfBarring) }}</div>
+                                    <div class="bg-info text-left">
+                                        <div class="panel-body">
+                                            <strong>How to get proof of barring:</strong><br>
+                                            Something....
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -106,9 +118,15 @@
                             <div class="row">
                                 <div class="col-xs-12 text-center">
                                     <div class="form-group {% if form_errors(claim_form.proofOfPurchase) %}has-error{% endif %}">
-                                        <label class="h4">Proof of purchase <span class="req">*</span></label>
+                                        <label class="h4">Proof of purchase</label>
                                         {{ form_widget(claim_form.proofOfPurchase, { 'attr': {'class': 'form-control'}}) }}
                                         <div class="help-block with-errors">{{ form_errors(claim_form.proofOfPurchase) }}</div>
+                                    </div>
+                                    <div class="bg-info text-left">
+                                        <div class="panel-body">
+                                            <strong>How to get proof of purchase:</strong><br>
+                                            Something....
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -118,9 +136,15 @@
                             <div class="row">
                                 <div class="col-xs-12 text-center">
                                     <div class="form-group {% if form_errors(claim_form.policeLossReport) %}has-error{% endif %}">
-                                        <label class="h4">Police loss report <span class="req">*</span></label>
+                                        <label class="h4">Police loss report
                                         {{ form_widget(claim_form.policeLossReport, { 'attr': {'class': 'form-control', 'placeholder': 'Police report no.'}}) }}
                                         <div class="help-block with-errors">{{ form_errors(claim_form.policeLossReport) }}</div>
+                                    </div>
+                                    <div class="bg-info text-left">
+                                        <div class="panel-body">
+                                            <strong>How to get a Police loss report:</strong><br>
+                                            Something....
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -128,9 +152,15 @@
                             <div class="row">
                                 <div class="col-xs-12 text-center">
                                     <div class="form-group {% if form_errors(claim_form.crimeReferenceNumber) %}has-error{% endif %}">
-                                        <label class="h4">Crime reference number  <span class="req">*</span></label>
+                                        <label class="h4">Crime reference number</label>
                                         {{ form_widget(claim_form.crimeReferenceNumber, { 'attr': {'class': 'form-control', 'placeholder': 'Crime reference no.'}}) }}
                                         <div class="help-block with-errors">{{ form_errors(claim_form.crimeReferenceNumber) }}</div>
+                                        <div class="bg-info text-left">
+                                            <div class="panel-body">
+                                                <strong>What is a crime reference number:</strong><br>
+                                                Something....
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
