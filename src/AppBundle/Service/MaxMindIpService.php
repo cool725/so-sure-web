@@ -15,6 +15,9 @@ class MaxMindIpService
     /** @var LoggerInterface */
     protected $logger;
 
+    /** @var \Domnikl\Statsd\Client */
+    protected $statsd;
+
     protected $cityReader;
     protected $countryReader;
 
@@ -26,7 +29,7 @@ class MaxMindIpService
      * @param string          $cityDb
      * @param string          $countryDb
      */
-    public function __construct(LoggerInterface $logger, $cityDb, $countryDb)
+    public function __construct(LoggerInterface $logger, $cityDb, $countryDb, \Domnikl\Statsd\Client $statsd)
     {
         $this->logger = $logger;
         if (file_exists($cityDb)) {
@@ -35,6 +38,8 @@ class MaxMindIpService
         if (file_exists($countryDb)) {
             $this->countryReader = new Reader($countryDb);
         }
+
+        $this->statsd = $statsd;
     }
 
     /**
@@ -120,7 +125,8 @@ class MaxMindIpService
 
         $this->find($ip, self::QUERY_COUNTRY);
         if ($identityLog->getCountry() != $this->getCountry()) {
-            $this->logger->warning(sprintf(
+            $this->statsd->increment('geoip.country');
+            $this->logger->info(sprintf(
                 '%s has a more accurate country.  Changing from %s to %s',
                 $ip,
                 $identityLog->getCountry(),

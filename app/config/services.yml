@@ -171,6 +171,7 @@ services:
         arguments:
             - "@logger"
             - "@aws.sns"
+            - "@statsd"
 
     app.claims:
         class: AppBundle\Service\ClaimsService
@@ -216,6 +217,7 @@ services:
             - "@logger"
             - "%geoip_city_db%"
             - "%geoip_country_db%"
+            - "@statsd"
 
     app.cognito.identity:
         class: AppBundle\Service\CognitoIdentityService
