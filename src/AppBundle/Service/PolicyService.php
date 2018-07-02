@@ -626,7 +626,10 @@ class PolicyService
 
         $this->snappyPdf->setOption('orientation', 'Landscape');
         $this->snappyPdf->setOption('lowquality', false);
-        $this->snappyPdf->setOption('footer-center', $policy->getPolicyTerms()->getVersion());
+        $this->snappyPdf->setOption('footer-center', sprintf(
+            '%s (Page [page] of [topage])',
+            $policy->getPolicyTerms()->getVersion()
+        ));
         $this->snappyPdf->setOption('footer-font-size', 8);
 
         $this->snappyPdf->setOption('page-size', 'A4');
