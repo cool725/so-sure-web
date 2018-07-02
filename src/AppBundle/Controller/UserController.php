@@ -32,6 +32,7 @@ use AppBundle\Document\Form\Bacs;
 use AppBundle\Document\Form\ClaimFnol;
 use AppBundle\Document\Form\ClaimFnolDamage;
 use AppBundle\Document\Form\ClaimFnolTheftLoss;
+use AppBundle\Document\Form\ClaimFnolUpdate;
 use AppBundle\Form\Type\BacsType;
 use AppBundle\Form\Type\BacsConfirmType;
 use AppBundle\Form\Type\PhoneType;
@@ -52,6 +53,7 @@ use AppBundle\Form\Type\ClaimFnolType;
 use AppBundle\Form\Type\ClaimFnolConfirmType;
 use AppBundle\Form\Type\ClaimFnolDamageType;
 use AppBundle\Form\Type\ClaimFnolTheftLossType;
+use AppBundle\Form\Type\ClaimFnolUpdateType;
 
 use AppBundle\Service\FacebookService;
 use AppBundle\Security\InvitationVoter;
@@ -1480,6 +1482,7 @@ class UserController extends BaseController
                     $claim = $claimsService->createClaim($claimConfirmForm->getData());
                     $claim->setPolicy($policy);
                     $policy->addClaim($claim);
+                    $claimsService->notifyFnolSubmission($claim);
                     $dm->flush();
 
                     return $this->redirectToRoute('claimed_policy', ['policyId' => $policy->getId()]);
@@ -1509,7 +1512,7 @@ class UserController extends BaseController
      * @Route("/claim/{policyId}", name="claimed_policy")
      * @Template
      */
-    public function claimPolicyAction($policyId)
+    public function claimPolicyAction(Request $request, $policyId)
     {
         $user = $this->getUser();
         $dm = $this->getManager();
@@ -1525,6 +1528,28 @@ class UserController extends BaseController
         $this->denyAccessUnlessGranted(ClaimVoter::EDIT, $claim);
 
         if ($claim->getStatus() == Claim::STATUS_SUBMITTED) {
+            $claimFnolUpdate = new ClaimFnolUpdate();
+            $claimFnolUpdate->setClaim($claim);
+
+            $claimUpdateForm = $this->get('form.factory')
+                ->createNamedBuilder('claim_update_form', ClaimFnolUpdateType::class, $claimFnolUpdate)
+                ->getForm();
+
+            if ('POST' === $request->getMethod()) {
+                if ($request->request->has('claim_update_form')) {
+                    $claimUpdateForm->handleRequest($request);
+                    if ($claimUpdateForm->isValid()) {
+                        $claimsService = $this->get('app.claims');
+                        $claimsService->updateDocuments($claim, $claimFnolUpdate);
+                        $this->addFlash(
+                            'success',
+                            'Your claim has been updated.'
+                        );
+                        return $this->redirectToRoute('claimed_policy', ['policyId' => $policy->getId()]);
+                    }
+                }
+            }
+
             $now = new \DateTime();
             $time = 'in the next 3 hours';
             if ($now->format('w') > 0 && $now->format('w') < 6) {
@@ -1535,6 +1560,10 @@ class UserController extends BaseController
                 $time = 'Monday morning';
             }
 
+            $needProofOfBarring = in_array($claim->getType(), array(Claim::TYPE_THEFT, Claim::TYPE_LOSS)) && $claim->needProofOfUsage();
+            $needProofOfPurchase = in_array($claim->getType(), array(Claim::TYPE_THEFT, Claim::TYPE_LOSS)) &&
+            $claim->needProofOfPurchase();
+
             $data = [
                 'claim' => $claim,
                 'phone' => sprintf(
@@ -1544,6 +1573,11 @@ class UserController extends BaseController
                     $claim->getPolicy()->getPhone()->getMemory()
                 ),
                 'time' => $time,
+                'claim_form' => $claimUpdateForm->createView(),
+                'proof_of_usage' => $claim->needProofOfUsage(),
+                'picture_of_phone' => $claim->getType() == Claim::TYPE_DAMAGE && $claim->needPictureOfPhone(),
+                'proof_of_barring' => $needProofOfBarring,
+                'proof_of_purchase' => $needProofOfPurchase,
             ];
             return $this->render('AppBundle:User:claimSubmitted.html.twig', $data);
         }
@@ -1601,6 +1635,7 @@ class UserController extends BaseController
         $data = [
             'username' => $user->getName(),
             'claim_form' => $claimDamageForm->createView(),
+            'picture_of_phone' => $claim->needPictureOfPhone(),
         ];
         return $this->render('AppBundle:User:claimDamage.html.twig', $data);
     }

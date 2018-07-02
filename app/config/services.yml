@@ -1008,6 +1008,12 @@ services:
         tags:
             - { name: form.type }
 
+    app.form.type.claimfnolupdate:
+        class: AppBundle\Form\Type\ClaimFnolUpdateType
+        arguments: ["%form_required%", "@app.claims"]
+        tags:
+            - { name: form.type }
+
     app.form.type.phonesearch:
         class: AppBundle\Form\Type\PhoneSearchType
         arguments: ["@request_stack"]

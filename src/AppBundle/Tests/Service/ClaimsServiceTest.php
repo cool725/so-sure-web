@@ -129,7 +129,7 @@ class ClaimsServiceTest extends WebTestCase
     {
         $userA = static::createUser(
             static::$userManager,
-            static::generateEmail('dup-a', $this),
+            static::generateEmail('testDuplicateUpdateClaim-a', $this),
             'bar'
         );
         $phoneA = static::getRandomPhone(static::$dm);
@@ -137,7 +137,7 @@ class ClaimsServiceTest extends WebTestCase
         
         $userB = static::createUser(
             static::$userManager,
-            static::generateEmail('dup-b', $this),
+            static::generateEmail('testDuplicateUpdateClaim-b', $this),
             'bar'
         );
         $phoneB = static::getRandomPhone(static::$dm);

@@ -13,6 +13,7 @@ use AppBundle\Document\Connection\RewardConnection;
 use AppBundle\Document\Form\ClaimFnol;
 use AppBundle\Document\Form\ClaimFnolDamage;
 use AppBundle\Document\Form\ClaimFnolTheftLoss;
+use AppBundle\Document\Form\ClaimFnolUpdate;
 use AppBundle\Document\File\ProofOfUsageFile;
 use AppBundle\Document\File\DamagePictureFile;
 use AppBundle\Document\File\ProofOfBarringFile;
@@ -160,6 +161,42 @@ class ClaimsService
         $this->dm->flush();
 
         $this->notifyClaimSubmission($claim);
+    }
+
+    public function updateDocuments(Claim $claim, ClaimFnolUpdate $claimUpdate)
+    {
+        $claim->setIncidentDate($claimUpdate->getWhen());
+        $claim->setIncidentTime($claimUpdate->getTime());
+
+        if ($claimUpdate->getProofOfUsage()) {
+            $proofOfUsage = new ProofOfUsageFile();
+            $proofOfUsage->setBucket('policy.so-sure.com');
+            $proofOfUsage->setKey($claimUpdate->getProofOfUsage());
+            $proofOfUsage->setClaim($claim);
+            $claim->addFile($proofOfUsage);
+        }
+        if ($claimUpdate->getPictureOfPhone()) {
+            $pictureOfPhone = new DamagePictureFile();
+            $pictureOfPhone->setBucket('policy.so-sure.com');
+            $pictureOfPhone->setKey($claimUpdate->getPictureOfPhone());
+            $pictureOfPhone->setClaim($claim);
+            $claim->addFile($pictureOfPhone);
+        }
+        if ($claimUpdate->getProofOfBarring()) {
+            $proofOfBarring = new ProofOfBarringFile();
+            $proofOfBarring->setBucket('policy.so-sure.com');
+            $proofOfBarring->setKey($claimUpdate->getProofOfBarring());
+            $proofOfBarring->setClaim($claim);
+            $claim->addFile($proofOfBarring);
+        }
+        if ($claimUpdate->getProofOfPurchase()) {
+            $proofOfPurchase = new ProofOfPurchaseFile();
+            $proofOfPurchase->setBucket('policy.so-sure.com');
+            $proofOfPurchase->setKey($claimUpdate->getProofOfPurchase());
+            $proofOfPurchase->setClaim($claim);
+            $claim->addFile($proofOfPurchase);
+        }
+        $this->dm->flush();
     }
 
     public function addClaim(Policy $policy, Claim $claim)
@@ -364,6 +401,18 @@ class ClaimsService
         } catch (\Exception $e) {
             $this->logger->error("Error in notifyPolicyShouldBeCancelled.", ['exception' => $e]);
         }
+    }
+
+    public function notifyFnolSubmission(Claim $claim)
+    {
+        $this->mailer->sendTemplate(
+            'Your claim with so-sure',
+            $claim->getPolicy()->getUser()->getEmail(),
+            'AppBundle:Email:claim/fnolInitialResponse.html.twig',
+            ['data' => $claim],
+            'AppBundle:Email:claim/fnolInitialResponse.txt.twig',
+            ['data' => $claim]
+        );
     }
 
     public function notifyClaimSubmission(Claim $claim)

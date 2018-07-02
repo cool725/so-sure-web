@@ -1,0 +1,26 @@
+{% extends 'AppBundle:Email:base.html.twig' %}
+{% import "AppBundle:Email:macros.html.twig" as macros %}
+{% block title %}Your claim with so-sure.{% endblock %}
+{% block body %}
+	{{ macros.start_table() }}
+	<h1>
+	   <!--?xml version="1.0" encoding="UTF-8" standalone="no"?-->
+	</h1>
+	<div style="font-size: 14px; text-align: left;">
+	   <!--?xml version="1.0" encoding="UTF-8" standalone="no"?-->
+	   <div style="font-size: 14px; text-align: center;"><span style="font-family:arial,helvetica neue,helvetica,sans-serif">
+        Hi {{ data.policy.user.name }},<br><br>
+        Sorry to hear that something has happened to your phone.
+        <br><br>
+        Unless you requested otherwise, our claims team will contact you as soon as possible during business hours.
+        <br><br>
+        Should you not hear from us in a timely manner, there may have been difficulities in reaching you
+        and we would encourage you to call 0344 856 0852 during business hours to speak with one of claims team.
+        <br><br>
+        We’re here if you have any further questions and hope to resolve this issue as fast as we can.
+        <br><br>
+        Thanks for using so-sure.
+	   </div>
+	</div>
+	{{ macros.end_table() }}
+{% endblock %}

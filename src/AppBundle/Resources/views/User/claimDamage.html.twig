@@ -89,7 +89,7 @@
                         </div>
                     </div>
 
-
+                    {% if picture_of_phone is defined and picture_of_phone %}
                     <div class="row">
                         <div class="col-xs-12 text-center">
                             <div class="form-group {% if form_errors(claim_form.pictureOfPhone) %}has-error{% endif %}">
@@ -99,6 +99,7 @@
                             </div>
                         </div>
                     </div>
+                    {% endif %}
 
                     <div class="row">
                         <div class="col-xs-12 text-center">
