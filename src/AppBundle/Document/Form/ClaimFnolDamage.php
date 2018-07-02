@@ -26,7 +26,8 @@ class ClaimFnolDamage
     protected $typeDetailsOther;
 
     /**
-     * @Assert\Range(min="1", max="12")
+     * @AppAssert\AlphanumericSpaceDot()
+     * @Assert\Length(min="4", max="200")
      */
     protected $monthOfPurchase;
 
@@ -39,11 +40,6 @@ class ClaimFnolDamage
      * @Assert\Choice({"new", "refurbished", "second-hand"}, strict=true)
      */
     protected $phoneStatus;
-
-    /**
-     * @var boolean
-     */
-    protected $isUnderWarranty;
 
     protected $proofOfUsage;
 
@@ -97,16 +93,6 @@ class ClaimFnolDamage
     public function setPhoneStatus($phoneStatus)
     {
         $this->phoneStatus = $phoneStatus;
-    }
-
-    public function getIsUnderWarranty()
-    {
-        return $this->isUnderWarranty;
-    }
-    
-    public function setIsUnderWarranty($isUnderWarranty)
-    {
-        $this->isUnderWarranty = $isUnderWarranty;
     }
 
     public function getProofOfUsage()

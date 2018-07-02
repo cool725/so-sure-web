@@ -37,6 +37,11 @@ class ClaimFnolType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        $hoursChoices = [];
+        for ($h = 0; $h < 24; $h++) {
+            $formattedTime = sprintf("%02d:00", $h);
+            $hoursChoices[$formattedTime] = $formattedTime;
+        }
         $builder
             ->add('email', EmailType::class, ['disabled' => true])
             ->add('name', TextType::class, ['disabled' => true])
@@ -49,7 +54,11 @@ class ClaimFnolType extends AbstractType
                       'year' => 'YYYY', 'month' => 'MM', 'day' => 'DD',
                   ),
             ])
-            ->add('time', TextType::class)
+            ->add('time', ChoiceType::class, [
+                'required' => true,
+                'placeholder' => 'Select',
+                'choices' => $hoursChoices,
+            ])
             ->add('where', TextType::class)
             ->add('timeToReach', TextType::class)
             ->add('signature', TextType::class)

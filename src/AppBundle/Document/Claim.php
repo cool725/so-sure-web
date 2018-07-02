@@ -599,8 +599,9 @@ class Claim
     protected $typeDetailsOther;
 
     /**
-     * @Assert\Length(min="1", max="2")
-     * @Assert\Range(min="1", max="12")
+    /**
+     * @AppAssert\AlphanumericSpaceDot()
+     * @Assert\Length(min="4", max="200")
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
@@ -620,13 +621,6 @@ class Claim
      * @Gedmo\Versioned
      */
     protected $phoneStatus;
-
-    /**
-     * @Assert\Type("bool")
-     * @MongoDB\Field(type="boolean")
-     * @Gedmo\Versioned
-     */
-    protected $isUnderWarranty;
 
     /**
      * @Assert\Type("bool")
@@ -1457,16 +1451,6 @@ class Claim
     public function setPhoneStatus($phoneStatus)
     {
         $this->phoneStatus = $phoneStatus;
-    }
-
-    public function getIsUnderWarranty()
-    {
-        return $this->isUnderWarranty;
-    }
-
-    public function setIsUnderWarranty($isUnderWarranty)
-    {
-        $this->isUnderWarranty = $isUnderWarranty;
     }
 
     public function getHasContacted()

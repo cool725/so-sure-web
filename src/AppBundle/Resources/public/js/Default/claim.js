@@ -52,7 +52,7 @@ sosure.claim = (function() {
                     phoneUK: true,
                 },
                 "claim_form[timeToReach]" : {
-                    time: true,
+                    required: true,
                 },
                 "claim_form[when]" : {
                     required: true,
@@ -60,7 +60,7 @@ sosure.claim = (function() {
                     checkDateIsValid: true
                 },
                 "claim_form[time]" : {
-                    time: true,
+                    required: true
                 },
                 "claim_form[phone]" : {
                     required: {
@@ -128,5 +128,10 @@ $(function(){
            scrollTop: $("#claim-form-container").offset().top
         });
     }
+
+    $('#claim-back').click(function() {
+        $('.tab-content').attr('data-active').value('claimfnol');
+        return false;
+    });
 
 });

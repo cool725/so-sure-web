@@ -1426,6 +1426,12 @@ class UserController extends BaseController
         }
 
         if (count($user->getValidPoliciesWithoutOpenedClaim(true)) == 0) {
+            $policies = $user->getValidPolicies();
+            foreach ($policies as $policy) {
+                if ($policy->getLatestFnolClaim()) {
+                    return $this->redirectToRoute('claimed_policy', ['policyId' => $policy->getId()]);
+                }
+            }
             throw $this->createNotFoundException('No active claimable policy found');
         }
 

@@ -54,6 +54,17 @@ class ClaimFnolDamageType extends AbstractType
                 'placeholder' => 'Month Bought...',
                 'choices' => [
                     'January' => 'January',
+                    'February' => 'February',
+                    'March' => 'March',
+                    'April' => 'April',
+                    'May' => 'May',
+                    'June' => 'June',
+                    'July' => 'July',
+                    'August' => 'August',
+                    'September' => 'September',
+                    'October' => 'October',
+                    'November' => 'November',
+                    'December' => 'December',
                 ],
             ])
             ->add('yearOfPurchase', TextType::class, ['required' => true])
@@ -64,14 +75,6 @@ class ClaimFnolDamageType extends AbstractType
                     'New' => Claim::PHONE_STATUS_NEW,
                     'Refurbished' => Claim::PHONE_STATUS_REFURBISHED,
                     'Second hand' => Claim::PHONE_STATUS_SECOND_HAND,
-                ],
-            ])
-            ->add('isUnderWarranty', ChoiceType::class, [
-                'required' => true,
-                'placeholder' => 'Under warranty?',
-                'choices' => [
-                    'under warranty' => true,
-                    'not under warranty' => false
                 ],
             ])
             ->add('confirm', SubmitType::class)

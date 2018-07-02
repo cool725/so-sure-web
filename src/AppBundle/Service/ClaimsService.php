@@ -102,7 +102,6 @@ class ClaimsService
         $claim->setMonthOfPurchase($claimDamage->getMonthOfPurchase());
         $claim->setYearOfPurchase($claimDamage->getYearOfPurchase());
         $claim->setPhoneStatus($claimDamage->getPhoneStatus());
-        $claim->setIsUnderWarranty($claimDamage->getIsUnderWarranty());
 
         if ($claimDamage->getProofOfUsage()) {
             $proofOfUsage = new ProofOfUsageFile();
