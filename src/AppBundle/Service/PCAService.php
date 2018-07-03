@@ -267,20 +267,10 @@ class PCAService
 
         if (!$results || count($results) == 0) {
             return false;
+        } else {
+            $this->redis->hset(self::REDIS_POSTCODE_KEY, $postcode, 1);
+            return true;
         }
-
-        foreach ($results as $id => $line) {
-            $items = explode(',', $line);
-            $found = $this->normalizePostcode($items[0]);
-
-            if ($postcode == $found) {
-                $this->redis->hset(self::REDIS_POSTCODE_KEY, $postcode, 1);
-
-                return true;
-            }
-        }
-
-        return false;
     }
 
     /**
