@@ -259,9 +259,10 @@ class BaseApiControllerTest extends BaseControllerTest
 
     public static function populateYearlyPostcodes()
     {
+        $pca = self::$client->getContainer()->get('app.address');
         $redis = self::$client->getContainer()->get('snc_redis.default');
         foreach (SoSure::$yearlyOnlyPostcodes as $postcode) {
-            $redis->hset(PCAService::REDIS_POSTCODE_KEY, PCAService::normalizePostcode($postcode), 1);
+            $redis->hset(PCAService::REDIS_POSTCODE_KEY, $pca->normalizePostcode($postcode), 1);
         }
     }
 }
