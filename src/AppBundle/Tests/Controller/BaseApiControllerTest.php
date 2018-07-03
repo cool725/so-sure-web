@@ -21,6 +21,7 @@ use AppBundle\Event\UserEmailEvent;
 use AppBundle\Listener\UserListener;
 use AppBundle\Service\RateLimitService;
 use AppBundle\Service\ReceperioService;
+use AppBundle\Service\PCAService;
 use AppBundle\Document\Invitation\EmailInvitation;
 use AppBundle\Classes\SoSure;
 use AppBundle\Document\Payment\PolicyDiscountPayment;
@@ -254,5 +255,13 @@ class BaseApiControllerTest extends BaseControllerTest
         $this->assertTrue($foundPolicy);
 
         return $multipay;
+    }
+
+    public static function populateYearlyPostcodes()
+    {
+        $redis = self::$client->getContainer()->get('snc_redis.default');
+        foreach (SoSure::$yearlyOnlyPostcodes as $postcode) {
+            $redis->hset(PCAService::REDIS_POSTCODE_KEY, PCAService::normalizePostcode($postcode), 1);
+        }
     }
 }

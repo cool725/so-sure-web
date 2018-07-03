@@ -91,6 +91,8 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $phoneRepo = static::$dm->getRepository(Phone::class);
         self::$expiredPhone = $phoneRepo->findOneBy(['make' => 'Apple', 'model' => 'iPhone 4']);
 
+        self::populateYearlyPostcodes();
+
         static::$dm->flush();
     }
 

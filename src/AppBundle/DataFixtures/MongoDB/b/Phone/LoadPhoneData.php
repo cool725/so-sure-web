@@ -146,6 +146,10 @@ abstract class LoadPhoneData implements ContainerAwareInterface
 
     protected function newPhoneFromRow($manager, $data, $date)
     {
+        if (!$this->container) {
+            throw new \Exception('missing container');
+        }
+
         try {
             if (!$data[0] || !$data[1]) {
                 return;
