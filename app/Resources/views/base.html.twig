@@ -11,10 +11,17 @@
         {# NOTE: Whilst we are transitioning use two different main stylesheets #}
         {% block stylesheets %}
             {% if new_stylesheet is defined and new_stylesheet == 1 %}
-                {% stylesheets output='css/*.css'
-                    '@AppBundle/Resources/public/sass/mainNew.scss'
-                %}<link rel="stylesheet" href="{{ asset_url }}">
-                {% endstylesheets %}
+                {% if ab_nav is defined and ab_nav == 1 %}
+                    {% stylesheets output='css/*.css'
+                        '@AppBundle/Resources/public/sass/mainAB.scss'
+                    %}<link rel="stylesheet" href="{{ asset_url }}">
+                    {% endstylesheets %}
+                {% else %}
+                    {% stylesheets output='css/*.css'
+                        '@AppBundle/Resources/public/sass/mainNew.scss'
+                    %}<link rel="stylesheet" href="{{ asset_url }}">
+                    {% endstylesheets %}
+                {% endif %}
             {% else %}
                 {% stylesheets output='css/*.css'
                     '@AppBundle/Resources/public/sass/main.scss'
@@ -121,7 +128,11 @@
         {# NOTE: Whilst we are transitioning use two different main stylesheets #}
         {% block nav %}
             {% if new_stylesheet is defined and new_stylesheet == 1 %}
-                {% include '::nav_new.html.twig' %}
+                {% if ab_nav is defined and ab_nav == 1 %}
+                    {% include '::nav_ab.html.twig' %}
+                {% else %}
+                    {% include '::nav_new.html.twig' %}
+                {% endif %}
             {% else %}
                 {% include '::nav.html.twig' %}
             {% endif %}

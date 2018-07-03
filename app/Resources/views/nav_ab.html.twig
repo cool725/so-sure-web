@@ -1,0 +1,62 @@
+<nav class="navbar nav-new navbar-default navbar-fixed-top">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="/">
+                <div class="so-sure-logo so-sure-logo-blue-flat"></div>
+            </a>
+            <button class="hamburger hamburger--spring-r hamburger--collapse navbar-toggle"
+                    type="button"
+                    data-toggle="collapse"
+                    data-target="#navbar"
+                    aria-expanded="false"
+                    aria-controls="navbar">
+                <span class="hamburger-box">
+                    <span class="hamburger-inner"></span>
+                </span>
+            </button>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="{{ path('about_home') }}">About us</a></li>
+                <li><a href="{{ path('claim') }}">Make a claim</a></li>
+                <li><a href="{{ path('faq') }}#social-insurance-and-reward-pot">Reward Pot</a></li>
+                <li><a href="{{ path('faq') }}#top-questions">pic-sure</a></li>
+                <li><a href="{{ path('faq') }}">FAQ</a></li>
+                <li><a href="{{ path('about_how_to_contact_so_sure') }}">Contact us</a></li>
+                <li><a href="{{ path('blog') }}">Blog</a></li>
+
+                {# Link to personal or company insurance #}
+                {% if app.request.get('_route') == 'mobile_phone_insurance_for_your_company' %}
+                    <li><a href="{{ path('homepage') }}">Personal phones</a></li>
+                {% else %}
+                    <li><a href="{{ path('mobile_phone_insurance_for_your_company') }}">Company phones</a></li>
+                {% endif %}
+                {% if app.user is not null and app.user %}
+                    {% if is_granted('ROLE_ADMIN') %}
+                        <li><a href="{{ path('admin_home') }}"><i class="fa fa-home"></i> Admin</a></li>
+                    {% elseif is_granted('ROLE_EMPLOYEE') %}
+                        <li><a href="{{ path('admin_home') }}"><i class="fa fa-home"></i> Admin</a></li>
+                    {% elseif is_granted('ROLE_CLAIMS') %}
+                        <li><a href="{{ path('claims_home') }}"><i class="fa fa-home"></i> Claims</a></li>
+                    {% else %}
+                        <li class=""><a href="{{ path('user_home') }}">Your Account</a></li>
+                    {% endif %}
+                    {% if is_granted('ROLE_PREVIOUS_ADMIN') %}
+                        <li>
+                            <span><a href="{{ path('homepage', {'_impersonate': '_exit'}) }}" class="btn navbar-btn">Exit <strong>{{ app.user.email }}</strong></a></span>
+                        </li>
+                    {% else %}
+                        <li>
+                            <span><a href="{{ path('fos_user_security_logout') }}" class="btn btn-white-hollow">Logout</a></span>
+                        </li>
+                    {% endif %}
+                {% else %}
+                    <li>
+                        <br>
+                        <span><a href="{{ path('fos_user_security_login') }}" class="btn btn-white-hollow">Login</a></span>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>

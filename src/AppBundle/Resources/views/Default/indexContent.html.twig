@@ -5,6 +5,11 @@
 {% set new_footer = 1 %}
 {% set homepage = 1 %}
 
+{# If ab content test -> use the full nav #}
+{% if ab_content is defined and ab_content == 'new-content-with-nav' %}
+    {% set ab_nav = 1 %}
+{% endif %}
+
 {% block title %}so-sure - Welcome to Social Insurance{% endblock %}
 {% block meta %}
     <meta name="description" content="Social mobile phone insurance that's better and up to 80% cheaper when you connect with friends and don't claim. Download our app now to see how much you could save."/>
