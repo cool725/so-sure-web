@@ -5121,6 +5121,8 @@ class ApiAuthControllerTest extends BaseApiControllerTest
 
     public function testUserQuoteYearlyBilling()
     {
+        self::populateYearlyPostcodes();
+        
         $user = self::createUser(
             self::$userManager,
             self::generateEmail('testUserQuoteYearlyBilling', $this),
