@@ -32,6 +32,12 @@ class AddressCommand extends ContainerAwareCommand
                 InputOption::VALUE_NONE,
                 'run full address check'
             )
+            ->addOption(
+                'validate',
+                null,
+                InputOption::VALUE_NONE,
+                'validate the postcode'
+            )
             ->addArgument(
                 'postcode',
                 InputArgument::REQUIRED,
@@ -50,16 +56,21 @@ class AddressCommand extends ContainerAwareCommand
         $postcode = $input->getArgument('postcode');
         $number = $input->getArgument('number');
         $useAddress = true === $input->getOption('address');
+        $validate = true === $input->getOption('validate');
         $id = $input->getOption('id');
         /** @var PCAService $address */
         $address = $this->getContainer()->get('app.address');
         if ($id) {
-            $addressData = $address->retreive($id);
-            $output->writeln(json_encode($addressData));
+            if ($addressData = $address->retreive($id)) {
+                $output->writeln(json_encode($addressData->toApiArray()));
+            }
         } elseif ($useAddress) {
             if ($addresses = $address->getAddress($postcode, $number)) {
                 $output->writeln(json_encode($addresses->toApiArray()));
             }
+        } elseif ($validate) {
+            $result = $address->validatePostcode($postcode, true);
+            $output->writeln(sprintf('%s validation: %s', $postcode, $result ? 'true' : 'false'));
         } else {
             $addresses = $address->find($postcode, $number);
             $output->writeln(json_encode($addresses));
