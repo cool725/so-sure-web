@@ -123,8 +123,12 @@ class DefaultController extends BaseController
             'phone'       => $this->getQuerystringPhone($request),
         );
 
-        // $template = 'AppBundle:Default:index.html.twig';
-        $template = 'AppBundle:Default:indexContent.html.twig';
+        $template = 'AppBundle:Default:index.html.twig';
+
+        // If A/B content test
+        if ($expContent == 'new-content-with-nav') {
+            $template = 'AppBundle:Default:indexContent.html.twig';
+        }
 
         return $this->render($template, $data);
     }
