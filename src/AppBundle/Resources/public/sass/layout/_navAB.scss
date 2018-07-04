@@ -35,10 +35,16 @@
     }
 }
 
+.navbar-btn {
+    margin-right: 10px;
+}
+
 .navbar-default .navbar-nav > li > span {
     text-align: center;
     display: block;
     position: relative;
+    padding-top: 10px;
+    padding-bottom: 10px;
 }
 
 .navbar-default .navbar-toggle {
