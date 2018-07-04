@@ -2,12 +2,14 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Document\BacsPaymentMethod;
 use AppBundle\Document\File\PaymentRequestUploadFile;
 use AppBundle\Document\JudoPaymentMethod;
 use AppBundle\Form\Type\AdminEmailOptOutType;
 use AppBundle\Form\Type\PaymentRequestUploadFileType;
 use AppBundle\Form\Type\UploadFileType;
 use AppBundle\Security\FOSUBUserProvider;
+use AppBundle\Service\BacsService;
 use AppBundle\Service\FraudService;
 use AppBundle\Service\JudopayService;
 use AppBundle\Service\PolicyService;
@@ -530,6 +532,10 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             ->add('monthly', SubmitType::class)
             ->add('yearly', SubmitType::class)
             ->getForm();
+        $cancelDirectDebitForm = $this->get('form.factory')
+            ->createNamedBuilder('cancel_direct_debit_form')
+            ->add('cancel', SubmitType::class)
+            ->getForm();
         $paymentRequestFile = new PaymentRequestUploadFile();
         $paymentRequestFile->setPolicy($policy);
         $runScheduledPaymentForm = $this->get('form.factory')
@@ -988,6 +994,21 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
 
                     return $this->redirectToRoute('admin_policy', ['id' => $id]);
                 }
+            } elseif ($request->request->has('cancel_direct_debit_form')) {
+                $cancelDirectDebitForm->handleRequest($request);
+                if ($cancelDirectDebitForm->isValid()) {
+                    /** @var BacsService $bacsService */
+                    $bacsService = $this->get('app.bacs');
+                    /** @var BacsPaymentMethod $bacsPaymentMethod */
+                    $bacsPaymentMethod = $policy->getPayerOrUser()->getPaymentMethod();
+                    $bacsService->queueCancelBankAccount(
+                        $bacsPaymentMethod->getBankAccount(),
+                        $policy->getPayerOrUser()->getId()
+                    );
+                    $this->addFlash('success', sprintf(
+                        'Direct Debit Cancellation has been queued.'
+                    ));
+                }
             } elseif ($request->request->has('run_scheduled_payment_form')) {
                 $runScheduledPaymentForm->handleRequest($request);
                 if ($runScheduledPaymentForm->isValid()) {
@@ -1041,6 +1062,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             'picsure_form' => $picsureForm->createView(),
             'swap_payment_plan_form' => $swapPaymentPlanForm->createView(),
             'pay_policy_form' => $payPolicyForm->createView(),
+            'cancel_direct_debit_form' => $cancelDirectDebitForm->createView(),
             'run_scheduled_payment_form' => $runScheduledPaymentForm->createView(),
             'fraud' => $checks,
             'policy_route' => 'admin_policy',
