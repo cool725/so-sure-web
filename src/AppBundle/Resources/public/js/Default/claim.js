@@ -130,7 +130,9 @@ $(function(){
     }
 
     $('#claim-back').click(function() {
-        $('.tab-content').attr('data-active').value('claimfnol');
+        $('.tab-content').data('active', 'claimfnol');
+        $('#tab-claimfnol-confirm').removeClass('active');
+        $('#tab-claimfnol').addClass('active');
         return false;
     });
 
