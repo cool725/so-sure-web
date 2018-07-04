@@ -61,8 +61,9 @@ class AddressCommand extends ContainerAwareCommand
         /** @var PCAService $address */
         $address = $this->getContainer()->get('app.address');
         if ($id) {
-            $addressData = $address->retreive($id);
-            $output->writeln(json_encode($addressData->toApiArray()));
+            if ($addressData = $address->retreive($id)) {
+                $output->writeln(json_encode($addressData->toApiArray()));
+            }
         } elseif ($useAddress) {
             if ($addresses = $address->getAddress($postcode, $number)) {
                 $output->writeln(json_encode($addresses->toApiArray()));
