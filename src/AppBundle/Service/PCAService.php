@@ -1,6 +1,7 @@
 <?php
 namespace AppBundle\Service;
 
+use AppBundle\Document\PostcodeTrait;
 use Psr\Log\LoggerInterface;
 use AppBundle\Document\Address;
 use AppBundle\Document\BankAccount;
@@ -14,6 +15,7 @@ use AppBundle\Exception\DirectDebitBankException;
 class PCAService
 {
     use BacsTrait;
+    use PostcodeTrait;
 
     const TIMEOUT = 5;
     const REDIS_POSTCODE_KEY = 'postcode';
@@ -67,11 +69,6 @@ class PCAService
         $this->apiKey = $apiKey;
         $this->environment = $environment;
         $this->redis = $redis;
-    }
-
-    public function normalizePostcode($postcode)
-    {
-        return mb_strtoupper(str_replace(' ', '', trim($postcode)));
     }
 
     /**
