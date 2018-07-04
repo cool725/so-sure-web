@@ -15,6 +15,9 @@
 	&__top {
 		text-align: center;
         margin-bottom: 25px;
+        @include breakpoint(laptop) {
+            padding-top: 100px;
+        }
 	}
 
 	&__bottom {
@@ -29,8 +32,32 @@
 		}
 	}
 
+    &__excess {
+        padding-top: 90px;
+        padding-bottom: 100px;
+        background-color: $lightest-blue;
+
+        p.so-sure-smile {
+            padding-left: 50px;
+            background-image: url('#{$cdn_url}/images/logo/so-sure-blue-smile.svg');
+            background-size: 40px 40px;
+            background-repeat: no-repeat;
+            background-position: left top;
+            margin-bottom: 40px;
+        }
+
+        p.so-sure-sad {
+            background-image: url('#{$cdn_url}/images/logo/so-sure_blue-frown.svg');
+        }
+    }
+
+    &__reward-pot {
+        // background-color: $off-white;
+    }
+
     &__save {
         background-color: $primary-blue;
+        text-align: center;
     }
 
 	// &__save {

@@ -99,7 +99,7 @@
                     </ul>
                 </div>
                 <div class="col-md-4">
-                    <img src="{{ cdn_url }}/images/press/ebay_so-sure_trustpilot.svg" alt="TrustPilot" title="TrustPilot" width="240px" class="trustpilot">
+                    <img src="{{ cdn_url }}/images/press/ebay_so-sure_trustpilot.svg" alt="TrustPilot" title="TrustPilot" width="240px" class="trustpilot img-center">
                 </div>
             </div>
         </div>
@@ -110,13 +110,76 @@
             <div class="row">
                 <h2 class="text-center">Our Excess</h2>
                 <div class="col-md-4">
-                    <p>When you validate that your phone is in good working condition via our app your excess is reduced to just <strong>£50 accidental damage/breakdown, £70 for loss and theft</strong>.</p>
+                    <p class="so-sure-smile">When you validate that your phone is in good working condition via our app your excess is reduced to just <strong>£50 accidental damage/breakdown, £70 for loss and theft</strong>.</p>
                 </div>
                 <div class="col-md-4">
-                    <p>Not only that, should you make a claim, it becomes an easier and speedier process, and we dont ask you to provide proof of purchase.</p>
+                    <p class="so-sure-smile">Not only that, should you make a claim, it becomes an easier and speedier process, and we dont ask you to provide proof of purchase.</p>
                 </div>
                 <div class="col-md-4">
-                    <p>If you do not validate your phone, your excess will be £150 and your claims process may take some more time.</p>
+                    <p class="so-sure-smile so-sure-sad">If you do not validate your phone, your excess will be £150 and your claims process may take some more time.</p>
+                </div>
+            </div>
+            <div class="row">
+                {{ form_start(buy_form_banner, {'attr':{'class':'col-sm-6 col-sm-offset-3 col-md-4 col-md-offset-4'}}) }}
+                    {{ form_widget(buy_form_banner.buy, {'label': 'Get Started', 'attr': {'class': 'btn btn-green btn-lg btn-pad btn-block'}}) }}
+                {{ form_end(buy_form_banner) }}
+            </div>
+        </div>
+    </section>
+
+
+    <section class="section--pad quote__reward-pot">
+        <div class="container">
+            <div id="loading-overlay-init" class="loading-overlay" style="display:block;"></div>
+            <div class="row">
+                <div class="col-md-8 col-md-offset-2">
+                    <h2 class="text-center">The reward pot explained</h2>
+                    <p class="text-center lead">If you and your friends take good care of your phones and don’t need to claim, we’ll give you up to 80% of your premium back at the end of your policy year.</p>
+
+                    {# Set the start friends amount #}
+                    {% set start_friends = max_connections / 2 %}
+
+                    {% set start_friends_rounded = start_friends|round() %}
+
+                    {# Set the amount of cashback #}
+                    {% set start_value = start_friends_rounded  * connection_value %}
+
+                    {# If greater than max pot, pot max is start value #}
+                    {% if start_value > max_pot %}
+                        {% set start_value = max_pot %}
+                    {% endif %}
+
+                    {# Start amount and work out monthly #}
+                    {% set start_premium = annual_premium - start_value %}
+                    {% set monthly_premium = start_premium / 12 %}
+
+                    <h4 class="text-blue text-center">
+                        Effective monthly premium after cashback:<br><small>(Cashback paid out end of policy year)</small>
+                    </h4>
+
+                    <div class="reward-slider">
+
+                        <div class="slide-me">
+                            <img src="{{ cdn_url }}/images/quote-page/so-sure_arrow-slide-me.svg" alt="">
+                        </div>
+
+                        <output for="range" class="rewardslider__output">
+                            <span id="premium" class="h3 text-white">£{{ monthly_premium|number_format(2, '.', ',') }}</span><br>
+                            <small class="text-nowrap">per month</small>
+                        </output>
+                        <input type="range"
+                               id="reward-slider"
+                               autocomplete="off"
+                               min="0"
+                               max="{{ max_connections }}"
+                               value="{{ start_friends_rounded }}"
+                               data-maxpot="{{ max_pot }}"
+                               data-connection-value="{{ connection_value }}"
+                               data-premium="{{ annual_premium }}"
+                               data-monthly-premium="{{ monthly_premium }}">
+                    </div>
+                    <h4 class="text-blue text-center">Number of connections</h4>
+                    <p class="lead text-center">Get cashback by connecting to friends. <br> Save money on your premium when you and your friends don't claim.</p>
                 </div>
             </div>
         </div>
@@ -126,13 +189,17 @@
         <section class="section--pad quote__save">
             <div class="container">
                 <div class="row">
-                    <div class="col-md-12">
+                    <div class="col-md-6 col-md-offset-3">
                         {# Save Quote #}
-                        <h3>Guarantee this price for the next 7 days</h3>
+                        <h2 class="text-white h3">Guarantee this price for the next 7 days</h2>
                         {{ form_start(lead_form, {'attr': {'class': ' quote__save'}}) }}
-                            {{ form_label(lead_form.email, 'Your email:', { 'label_attr': {'class': 'sr-only'} }) }}
-                            {{ form_widget(lead_form.email, {'attr':{'class':'form-control', 'placeholder': 'Enter your email'}}) }}
-                            {{ form_widget(lead_form.save, {'label': 'Save this quote', 'attr': {'class': 'btn btn-blue'}}) }}
+                            <div class="form-group">
+                                {{ form_label(lead_form.email, 'Your email:', { 'label_attr': {'class': 'sr-only'} }) }}
+                                {{ form_widget(lead_form.email, {'attr':{'class':'form-control', 'placeholder': 'Enter your email'}}) }}
+                            </div>
+                            <div class="form-group">
+                                {{ form_widget(lead_form.save, {'label': 'Save your quote', 'attr': {'class': 'btn btn-white-hollow btn-pad'}}) }}
+                            </div>
                         {{ form_end(lead_form) }}
                     </div>
                 </div>
@@ -140,37 +207,7 @@
         </section>
     {% endif %}
 
-{#     {% include 'AppBundle::Default/fasterClaims.html.twig' %}
-
-    {% include 'AppBundle::Default/saveMoney.html.twig' %}
-
     {% include 'AppBundle::Default/faqs.html.twig' %}
-
-    {% include 'AppBundle::Default/feedbackQuotes.html.twig' %}
-
-    {% include 'AppBundle::Default/whySoSure.html.twig' %} #}
-
-    <section class="phone-details background-blue">
-        <div class="container">
-            <h3>About the {{ phone.make }} {{ phone.model }}</h3>
-            <ul class="list-inline">
-                <li>Camera: {{ phone.camera }} MP</li>
-                <li>Size: {{ phone.getScreenPhysicalInch }}"</li>
-                <li>Screen Resolution: {{ phone.getScreenResolution }}</li>
-                <li>RAM: {{ phone.getRamDisplay }}</li>
-            </ul>
-            {% if phone.funFacts|length > 0 %}
-                <p>{{ phone.funFacts|raw }}</p>
-            {% endif %}
-            {% if phone.description|length > 0 %}
-                <p>{{ phone.description|raw }}</p>
-            {% endif %}
-        </div>
-    </section>
-
-    {# {% include 'AppBundle::Default/press.html.twig' %} #}
-
-    {# {% include 'AppBundle::Default/partnership.html.twig' %} #}
 
     {# Page Modals #}
 
