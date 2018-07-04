@@ -17,6 +17,7 @@ use AppBundle\Document\PolicyTerms;
 use AppBundle\Document\SCode;
 use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\Phone;
+use AppBundle\Document\PhonePrice;
 use AppBundle\Document\Connection\RenewalConnection;
 use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Document\Invitation\EmailInvitation;
@@ -4707,5 +4708,398 @@ class PolicyServiceTest extends WebTestCase
 
         self::$policyService->cancel($policyB, Policy::CANCELLED_UPGRADE);
         $this->assertFalse(self::$policyService->connectionReduced($connection));
+    }
+
+    public function testValidatePremiumWithoutAmount()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testValidatePremiumWithoutAmount', $this),
+            'bar',
+            null,
+            static::$dm
+        );
+        $phone = $this->getRandomPhone(static::$dm);
+        $policy = static::initPolicy($user, static::$dm, $phone);
+
+        $this->assertEquals(
+            $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
+            $policy->getPremium()->getMonthlyPremiumPrice()
+        );
+
+        $validFrom = new \DateTime();
+        $validFrom->sub(new \DateInterval('PT1H'));
+
+        $currentPrice = $phone->getCurrentPhonePrice();
+
+        $price = new PhonePrice();
+        $price->setGwp($phone->getCurrentPhonePrice()->getGwp()+1);
+        $price->setValidFrom($validFrom);
+        $phone->addPhonePrice($price);
+
+        $currentPrice->setValidTo($validFrom);
+
+        static::$policyService->validatePremium($policy);
+
+        $updatedPolicy = static::$policyRepo->find($policy->getId());
+        $this->assertEquals(
+            $price->getMonthlyPremiumPrice(),
+            $updatedPolicy->getPremium()->getMonthlyPremiumPrice()
+        );
+        $this->assertNull($updatedPolicy->getStatus());
+    }
+
+    public function testValidatePremiumAmountMonthlyInside()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testValidatePremiumAmountMonthlyInside', $this),
+            'bar',
+            null,
+            static::$dm
+        );
+        $phone = $this->getRandomPhone(static::$dm);
+        $policy = static::initPolicy($user, static::$dm, $phone);
+
+        $this->assertEquals(
+            $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
+            $policy->getPremium()->getMonthlyPremiumPrice()
+        );
+
+        $policy->setPremiumInstallments(12);
+
+        $validFrom = new \DateTime();
+        $validFrom->sub(new \DateInterval('PT10M'));
+
+        $currentPrice = $phone->getCurrentPhonePrice();
+
+        $price = new PhonePrice();
+        $price->setGwp($phone->getCurrentPhonePrice()->getGwp()+1);
+        $price->setValidFrom($validFrom);
+        $phone->addPhonePrice($price);
+
+        $currentPrice->setValidTo($validFrom);
+
+        $payment = new JudoPayment();
+        $payment->setAmount($price->getMonthlyPremiumPrice());
+        $payment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
+        $payment->setSuccess(true);
+        $policy->addPayment($payment);
+        static::$policyService->create($policy);
+
+        $updatedPolicy = static::$policyRepo->find($policy->getId());
+        $this->assertEquals(
+            $price->getMonthlyPremiumPrice(),
+            $updatedPolicy->getPremium()->getMonthlyPremiumPrice()
+        );
+    }
+
+    public function testValidatePremiumAmountYearlyInside()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testValidatePremiumAmountYearlyInside', $this),
+            'bar',
+            null,
+            static::$dm
+        );
+        $phone = $this->getRandomPhone(static::$dm);
+        $policy = static::initPolicy($user, static::$dm, $phone);
+
+        $this->assertEquals(
+            $phone->getCurrentPhonePrice()->getYearlyPremiumPrice(),
+            $policy->getPremium()->getYearlyPremiumPrice()
+        );
+
+        $policy->setPremiumInstallments(1);
+
+        $validFrom = new \DateTime();
+        $validFrom->sub(new \DateInterval('PT10M'));
+
+        $currentPrice = $phone->getCurrentPhonePrice();
+
+        $price = new PhonePrice();
+        $price->setGwp($phone->getCurrentPhonePrice()->getGwp()+1);
+        $price->setValidFrom($validFrom);
+        $phone->addPhonePrice($price);
+
+        $currentPrice->setValidTo($validFrom);
+
+        $payment = new JudoPayment();
+        $payment->setAmount($price->getYearlyPremiumPrice());
+        $payment->setTotalCommission(Salva::YEARLY_TOTAL_COMMISSION);
+        $payment->setSuccess(true);
+        $policy->addPayment($payment);
+        static::$policyService->create($policy);
+
+        $updatedPolicy = static::$policyRepo->find($policy->getId());
+        $this->assertEquals(
+            $price->getYearlyPremiumPrice(),
+            $updatedPolicy->getPremium()->getYearlyPremiumPrice()
+        );
+    }
+
+    public function testValidatePremiumAmountMonthlyOutsidePast()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testValidatePremiumAmountMonthlyOutsidePast', $this),
+            'bar',
+            null,
+            static::$dm
+        );
+        $phone = $this->getRandomPhone(static::$dm);
+        $policy = static::initPolicy($user, static::$dm, $phone);
+
+        $this->assertEquals(
+            $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
+            $policy->getPremium()->getMonthlyPremiumPrice()
+        );
+
+        $policy->setPremiumInstallments(12);
+
+        $validFrom = new \DateTime();
+        $validFrom->sub(new \DateInterval('PT1H'));
+
+        $currentPrice = $phone->getCurrentPhonePrice();
+
+        $price = new PhonePrice();
+        $price->setGwp($phone->getCurrentPhonePrice()->getGwp()+1);
+        $price->setValidFrom($validFrom);
+        $phone->addPhonePrice($price);
+
+        $currentPrice->setValidTo($validFrom);
+
+        $payment = new JudoPayment();
+        $payment->setAmount($price->getMonthlyPremiumPrice());
+        $payment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
+        $payment->setSuccess(true);
+        $policy->addPayment($payment);
+        static::$policyService->create($policy);
+
+        $updatedPolicy = static::$policyRepo->find($policy->getId());
+        $this->assertEquals(
+            $price->getMonthlyPremiumPrice(),
+            $updatedPolicy->getPremium()->getMonthlyPremiumPrice()
+        );
+    }
+
+    public function testValidatePremiumAmountYearlyOutsidePast()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testValidatePremiumAmountYearlyOutsidePast', $this),
+            'bar',
+            null,
+            static::$dm
+        );
+        $phone = $this->getRandomPhone(static::$dm);
+        $policy = static::initPolicy($user, static::$dm, $phone);
+
+        $this->assertEquals(
+            $phone->getCurrentPhonePrice()->getYearlyPremiumPrice(),
+            $policy->getPremium()->getYearlyPremiumPrice()
+        );
+
+        $policy->setPremiumInstallments(1);
+
+        $validFrom = new \DateTime();
+        $validFrom->sub(new \DateInterval('PT1H'));
+
+        $currentPrice = $phone->getCurrentPhonePrice();
+
+        $price = new PhonePrice();
+        $price->setGwp($phone->getCurrentPhonePrice()->getGwp()+1);
+        $price->setValidFrom($validFrom);
+        $phone->addPhonePrice($price);
+
+        $currentPrice->setValidTo($validFrom);
+
+        $payment = new JudoPayment();
+        $payment->setAmount($price->getYearlyPremiumPrice());
+        $payment->setTotalCommission(Salva::YEARLY_TOTAL_COMMISSION);
+        $payment->setSuccess(true);
+        $policy->addPayment($payment);
+        static::$policyService->create($policy);
+
+        $updatedPolicy = static::$policyRepo->find($policy->getId());
+        $this->assertEquals(
+            $price->getYearlyPremiumPrice(),
+            $updatedPolicy->getPremium()->getYearlyPremiumPrice()
+        );
+    }
+
+    public function testValidatePremiumAmountMonthlyOutsideFuture()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testValidatePremiumAmountMonthlyOutsideFuture', $this),
+            'bar',
+            null,
+            static::$dm
+        );
+        $phone = $this->getRandomPhone(static::$dm);
+        $policy = static::initPolicy($user, static::$dm, $phone);
+
+        $this->assertEquals(
+            $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
+            $policy->getPremium()->getMonthlyPremiumPrice()
+        );
+
+        $policy->setPremiumInstallments(12);
+
+        $validFrom = new \DateTime();
+        $validFrom->add(new \DateInterval('PT3H'));
+
+        $currentPrice = $phone->getCurrentPhonePrice();
+
+        $price = new PhonePrice();
+        $price->setGwp($phone->getCurrentPhonePrice()->getGwp()+1);
+        $price->setValidFrom($validFrom);
+        $phone->addPhonePrice($price);
+
+        $currentPrice->setValidTo($validFrom);
+
+        $payment = new JudoPayment();
+        $payment->setAmount($currentPrice->getMonthlyPremiumPrice());
+        $payment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
+        $payment->setSuccess(true);
+        $policy->addPayment($payment);
+        static::$policyService->create($policy);
+
+        $updatedPolicy = static::$policyRepo->find($policy->getId());
+        $this->assertEquals(
+            $currentPrice->getMonthlyPremiumPrice(),
+            $updatedPolicy->getPremium()->getMonthlyPremiumPrice()
+        );
+    }
+
+    public function testValidatePremiumAmountYearlyOutsideFuture()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testValidatePremiumAmountYearlyOutsideFuture', $this),
+            'bar',
+            null,
+            static::$dm
+        );
+        $phone = $this->getRandomPhone(static::$dm);
+        $policy = static::initPolicy($user, static::$dm, $phone);
+
+        $this->assertEquals(
+            $phone->getCurrentPhonePrice()->getYearlyPremiumPrice(),
+            $policy->getPremium()->getYearlyPremiumPrice()
+        );
+
+        $policy->setPremiumInstallments(1);
+
+        $validFrom = new \DateTime();
+        $validFrom->add(new \DateInterval('PT3H'));
+
+        $currentPrice = $phone->getCurrentPhonePrice();
+
+        $price = new PhonePrice();
+        $price->setGwp($phone->getCurrentPhonePrice()->getGwp()+1);
+        $price->setValidFrom($validFrom);
+        $phone->addPhonePrice($price);
+
+        $currentPrice->setValidTo($validFrom);
+
+        $payment = new JudoPayment();
+        $payment->setAmount($currentPrice->getYearlyPremiumPrice());
+        $payment->setTotalCommission(Salva::YEARLY_TOTAL_COMMISSION);
+        $payment->setSuccess(true);
+        $policy->addPayment($payment);
+        static::$policyService->create($policy);
+
+        $updatedPolicy = static::$policyRepo->find($policy->getId());
+        $this->assertEquals(
+            $currentPrice->getYearlyPremiumPrice(),
+            $updatedPolicy->getPremium()->getYearlyPremiumPrice()
+        );
+    }
+
+    /**
+     * @expectedException \Exception
+     */
+    public function testValidatePremiumDifferentAmountMonthly()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testValidatePremiumDifferentAmountMonthly', $this),
+            'bar',
+            null,
+            static::$dm
+        );
+        $phone = $this->getRandomPhone(static::$dm);
+        $policy = static::initPolicy($user, static::$dm, $phone);
+
+        $this->assertEquals(
+            $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
+            $policy->getPremium()->getMonthlyPremiumPrice()
+        );
+
+        $policy->setPremiumInstallments(12);
+
+        $validFrom = new \DateTime();
+        $validFrom->sub(new \DateInterval('PT1H'));
+
+        $currentPrice = $phone->getCurrentPhonePrice();
+
+        $price = new PhonePrice();
+        $price->setGwp($phone->getCurrentPhonePrice()->getGwp()+1);
+        $price->setValidFrom($validFrom);
+        $phone->addPhonePrice($price);
+
+        $currentPrice->setValidTo($validFrom);
+
+        $payment = new JudoPayment();
+        $payment->setAmount($price->getMonthlyPremiumPrice()+1);
+        $payment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
+        $payment->setSuccess(true);
+        $policy->addPayment($payment);
+        static::$policyService->create($policy);
+    }
+
+    /**
+     * @expectedException \Exception
+     */
+    public function testValidatePremiuDifferentAmountYearly()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testValidatePremiuDifferentAmountYearly', $this),
+            'bar',
+            null,
+            static::$dm
+        );
+        $phone = $this->getRandomPhone(static::$dm);
+        $policy = static::initPolicy($user, static::$dm, $phone);
+
+        $this->assertEquals(
+            $phone->getCurrentPhonePrice()->getYearlyPremiumPrice(),
+            $policy->getPremium()->getYearlyPremiumPrice()
+        );
+
+        $policy->setPremiumInstallments(1);
+
+        $validFrom = new \DateTime();
+        $validFrom->sub(new \DateInterval('PT1H'));
+
+        $currentPrice = $phone->getCurrentPhonePrice();
+
+        $price = new PhonePrice();
+        $price->setGwp($phone->getCurrentPhonePrice()->getGwp()+1);
+        $price->setValidFrom($validFrom);
+        $phone->addPhonePrice($price);
+
+        $currentPrice->setValidTo($validFrom);
+
+        $payment = new JudoPayment();
+        $payment->setAmount($price->getYearlyPremiumPrice()+10);
+        $payment->setTotalCommission(Salva::YEARLY_TOTAL_COMMISSION);
+        $payment->setSuccess(true);
+        $policy->addPayment($payment);
+        static::$policyService->create($policy);
     }
 }

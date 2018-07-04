@@ -31,6 +31,7 @@ use AppBundle\Document\SCode;
 use AppBundle\Document\IdentityLog;
 use AppBundle\Document\CurrencyTrait;
 use AppBundle\Document\DateTrait;
+use AppBundle\Document\PhonePremium;
 use AppBundle\Document\Connection\Connection;
 use AppBundle\Document\Opt\EmailOptOut;
 use AppBundle\Document\Opt\SmsOptOut;
@@ -422,6 +423,12 @@ class PolicyService
             // If policy hasn't yet been assigned a payer, default to the policy user
             if (!$policy->getPayer()) {
                 $user->addPayerPolicy($policy);
+            }
+
+            if ($policy->getLastSuccessfulUserPaymentCredit()) {
+                $this->validatePremium($policy, $policy->getLastSuccessfulUserPaymentCredit()->getAmount());
+            } else {
+                $this->validatePremium($policy);
             }
 
             if ($numPayments === null) {
@@ -2090,5 +2097,58 @@ class PolicyService
             $textTemplate,
             $data
         );
+    }
+
+    public function validatePremium(Policy $policy, $amount = null, \DateTime $date = null)
+    {
+        $hasUpdatedPremium = false;
+        /** @var PhonePolicy $phonePolicy */
+        $phonePolicy = $policy;
+        if (!$date) {
+            $date =  new \DateTime();
+        }
+        if ((!$phonePolicy->getStatus() ||
+            in_array($phonePolicy->getStatus(), [Policy::STATUS_PENDING, Policy::STATUS_MULTIPAY_REJECTED]))
+        ) {
+            $policyPremium = $phonePolicy->getPremium();
+            if (!$amount) {
+                $currentPhonePrice = $phonePolicy->getPhone()->getCurrentPhonePrice($date);
+                if ($currentPhonePrice->getMonthlyPremiumPrice() != $policyPremium->getMonthlyPremiumPrice()) {
+                    $newPremium = $currentPhonePrice->createPremium();
+                    $phonePolicy->setPremium($newPremium);
+                    $this->dm->flush();
+                    $hasUpdatedPremium = true;
+                }
+            } else {
+                if ($phonePolicy->getPremiumPlan() == Policy::PLAN_YEARLY) {
+                    if ($amount != $policyPremium->getYearlyPremiumPrice()) {
+                        $phonePrices = $phonePolicy->getPhone()->getRecentPhonePrices(30);
+                        foreach ($phonePrices as $price) {
+                            if ($price->getYearlyPremiumPrice() == $amount) {
+                                $newPremium = $price->createPremium();
+                                $phonePolicy->setPremium($newPremium);
+                                $this->dm->flush();
+                                $hasUpdatedPremium = true;
+                                break;
+                            }
+                        }
+                    }
+                } else {
+                    if ($amount != $policyPremium->getMonthlyPremiumPrice()) {
+                        $phonePrices = $phonePolicy->getPhone()->getRecentPhonePrices(30);
+                        foreach ($phonePrices as $price) {
+                            if ($price->getMonthlyPremiumPrice() == $amount) {
+                                $newPremium = $price->createPremium();
+                                $phonePolicy->setPremium($newPremium);
+                                $this->dm->flush();
+                                $hasUpdatedPremium = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return $hasUpdatedPremium;
     }
 }

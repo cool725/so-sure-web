@@ -146,6 +146,10 @@ abstract class LoadPhoneData implements ContainerAwareInterface
 
     protected function newPhoneFromRow($manager, $data, $date)
     {
+        if (!$this->container) {
+            throw new \Exception('missing container');
+        }
+
         try {
             if (!$data[0] || !$data[1]) {
                 return;
@@ -230,7 +234,12 @@ abstract class LoadPhoneData implements ContainerAwareInterface
             );
 
             if ($phone->shouldBeRetired() || $premium == 0) {
-                $phone->setActive(false);
+                $env = $this->container->getParameter('kernel.environment');
+                if ($env == 'test' && in_array('A0001', $phone->getDevices())) {
+                    $phone->setActive(true);
+                } else {
+                    $phone->setActive(false);
+                }
             }
 
             $manager->persist($phone);

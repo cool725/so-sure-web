@@ -21,6 +21,7 @@ use AppBundle\Event\UserEmailEvent;
 use AppBundle\Listener\UserListener;
 use AppBundle\Service\RateLimitService;
 use AppBundle\Service\ReceperioService;
+use AppBundle\Service\PCAService;
 use AppBundle\Document\Invitation\EmailInvitation;
 use AppBundle\Classes\SoSure;
 use AppBundle\Document\Payment\PolicyDiscountPayment;
@@ -40,7 +41,7 @@ class BaseApiControllerTest extends BaseControllerTest
     /**
      *
      */
-    protected function generatePolicy($cognitoIdentityId, $user, $clearRateLimit = true, $name = null)
+    protected function generatePolicy($cognitoIdentityId, $user, $clearRateLimit = true, $name = null, $phone = null)
     {
         if ($user) {
             $this->updateUserDetails($cognitoIdentityId, $user);
@@ -59,6 +60,11 @@ class BaseApiControllerTest extends BaseControllerTest
             'rooted' => false,
             'validation_data' => $this->getValidationData($cognitoIdentityId, ['imei' => $imei]),
         ];
+        if ($phone) {
+            $phonePolicy['make'] = $phone->getMake();
+            $phonePolicy['device'] = $phone->getDevices()[0];
+            $phonePolicy['memory'] = $phone->getMemory();
+        }
         if ($name) {
             $phonePolicy['name'] = $name;
         }
@@ -249,5 +255,14 @@ class BaseApiControllerTest extends BaseControllerTest
         $this->assertTrue($foundPolicy);
 
         return $multipay;
+    }
+
+    public static function populateYearlyPostcodes()
+    {
+        $pca = self::$client->getContainer()->get('app.address');
+        $redis = self::$client->getContainer()->get('snc_redis.default');
+        foreach (SoSure::$yearlyOnlyPostcodes as $postcode) {
+            $redis->hset(PCAService::REDIS_POSTCODE_KEY, $pca->normalizePostcode($postcode), 1);
+        }
     }
 }

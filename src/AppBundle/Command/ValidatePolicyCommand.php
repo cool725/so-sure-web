@@ -62,6 +62,12 @@ class ValidatePolicyCommand extends BaseCommand
                 'If policy number is present, adjust scheduled payments'
             )
             ->addOption(
+                'validate-premiums',
+                null,
+                InputOption::VALUE_NONE,
+                'adjust premiums on partial and pending policies'
+            )
+            ->addOption(
                 'create',
                 null,
                 InputOption::VALUE_NONE,
@@ -105,6 +111,7 @@ class ValidatePolicyCommand extends BaseCommand
         $create = true === $input->getOption('create');
         $updatePotValue = $input->getOption('update-pot-value');
         $adjustScheduledPayments = $input->getOption('adjust-scheduled-payments');
+        $validatePremiums = $input->getOption('validate-premiums');
         $skipEmail = true === $input->getOption('skip-email');
         $unpaid = $input->getOption('unpaid');
         if (!in_array($unpaid, [null, 'all', 'expiry', 'none'])) {
@@ -162,6 +169,7 @@ class ValidatePolicyCommand extends BaseCommand
                     'prefix' => $prefix,
                     'validateDate' => $validateDate,
                     'adjustScheduledPayments' => $adjustScheduledPayments,
+                    'validate-premiums' => $validatePremiums,
                     'updatePotValue' => $updatePotValue,
                     'unpaid' => 'all',
                 ];
@@ -187,6 +195,7 @@ class ValidatePolicyCommand extends BaseCommand
                         'prefix' => $prefix,
                         'validateDate' => $validateDate,
                         'adjustScheduledPayments' => false,
+                        'validate-premiums' => $validatePremiums,
                         'updatePotValue' => false,
                         'unpaid' => $unpaid,
                     ];
@@ -338,6 +347,17 @@ class ValidatePolicyCommand extends BaseCommand
         if ($policy->hasCorrectCommissionPayments($data['validateDate']) === false) {
             $this->header($policy, $policies, $lines);
             $lines[] = $this->failureCommissionMessage($policy, $data['prefix'], $data['validateDate']);
+        }
+        if ($data['validate-premiums'] && (!$policy->getStatus() ||
+            in_array($policy->getStatus(), [Policy::STATUS_PENDING, Policy::STATUS_MULTIPAY_REJECTED]))) {
+            /** @var PolicyService $policyService */
+            $policyService = $this->getContainer()->get('app.policy');
+            if ($policyService->validatePremium($policy)) {
+                $lines[] = sprintf(
+                    'WARNING!! - Policy %s has its premium updated',
+                    $policy->getPolicyNumber()
+                );
+            }
         }
         if ($data['warnClaim'] && $policy->hasOpenClaim()) {
             $this->header($policy, $policies, $lines);
