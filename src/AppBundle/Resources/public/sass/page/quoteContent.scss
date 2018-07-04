@@ -33,8 +33,6 @@
 	}
 
     &__excess {
-        padding-top: 90px;
-        padding-bottom: 100px;
         background-color: $lightest-blue;
 
         p.so-sure-smile {
@@ -49,6 +47,11 @@
         p.so-sure-sad {
             background-image: url('#{$cdn_url}/images/logo/so-sure_blue-frown.svg');
             fill: red;
+        }
+
+        @include breakpoint(laptop) {
+            padding-top: 90px;
+            padding-bottom: 100px;
         }
     }
 
