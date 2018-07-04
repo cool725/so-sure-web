@@ -245,7 +245,7 @@ class PCAService
      *
      * @return boolean
      */
-    public function validatePostcode($postcode)
+    public function validatePostcode($postcode, $ignoreCache = false)
     {
         $postcode = $this->normalizePostcode($postcode);
         if ($postcode == "BX11LT") {
@@ -254,7 +254,7 @@ class PCAService
             return false;
         }
 
-        if ($this->redis->hexists(self::REDIS_POSTCODE_KEY, $postcode) == 1) {
+        if (!$ignoreCache && $this->redis->hexists(self::REDIS_POSTCODE_KEY, $postcode) == 1) {
             return true;
         }
 
@@ -267,10 +267,23 @@ class PCAService
 
         if (!$results || count($results) == 0) {
             return false;
-        } else {
-            $this->redis->hset(self::REDIS_POSTCODE_KEY, $postcode, 1);
-            return true;
         }
+
+        foreach ($results as $id => $line) {
+            $items = explode(',', $line);
+            // prior to 3/7/18, find would return "postcode, address"
+            // $found = $this->normalizePostcode($items[0]);
+            // from 3/7/18, find returns "address, postcode"
+            $found = $this->normalizePostcode($items[count($items) - 1]);
+
+            if ($postcode == $found) {
+                $this->redis->hset(self::REDIS_POSTCODE_KEY, $postcode, 1);
+
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -345,7 +358,7 @@ class PCAService
 
         if (!empty($file->Rows)) {
             $data = $this->transformAddress($file->Rows->Row[0]);
-            $this->logger->info(sprintf('Address find for %s %s', $id, json_encode($data)));
+            $this->logger->info(sprintf('Address find for %s %s', $id, json_encode($data->toApiArray())));
 
             return $data;
         }
