@@ -16,21 +16,21 @@
             </button>
             {% if app.user is not null and app.user %}
                 {% if is_granted('ROLE_ADMIN') %}
-                    <a href="{{ path('admin_home') }}?nav=1" role="button" class="btn btn-default navbar-btn pull-right">Admin</a>
+                    <a href="{{ path('admin_home') }}?nav=1" role="button" class="btn btn-default navbar-btn pull-right hidden-xs">Admin</a>
                 {% elseif is_granted('ROLE_EMPLOYEE') %}
-                    <a href="{{ path('admin_home') }}?nav=1" role="button" class="btn btn-default navbar-btn pull-right">Admin</a>
+                    <a href="{{ path('admin_home') }}?nav=1" role="button" class="btn btn-default navbar-btn pull-right hidden-xs">Admin</a>
                 {% elseif is_granted('ROLE_CLAIMS') %}
-                    <a href="{{ path('claims_home') }}?nav=1" role="button" class="btn btn-default navbar-btn pull-right">Claims</a>
+                    <a href="{{ path('claims_home') }}?nav=1" role="button" class="btn btn-default navbar-btn pull-right hidden-xs">Claims</a>
                 {% else %}
-                    <a href="{{ path('user_home') }}?nav=1" role="button" class="btn btn-default navbar-btn pull-right">Your Account</a>
+                    <a href="{{ path('user_home') }}?nav=1" role="button" class="btn btn-default navbar-btn pull-right hidden-xs">Your Account</a>
                 {% endif %}
                 {% if is_granted('ROLE_PREVIOUS_ADMIN') %}
-                    <a href="{{ path('homepage', {'_impersonate': '_exit'}) }}?nav=1" role="button" class="btn btn-default navbar-btn pull-right" title="Logged in as {{ app.user.email }}">Logout</strong></a>
+                    <a href="{{ path('homepage', {'_impersonate': '_exit'}) }}?nav=1" role="button" class="btn btn-default navbar-btn pull-right hidden-xs" title="Logged in as {{ app.user.email }}">Logout</strong></a>
                 {% else %}
-                    <a href="{{ path('fos_user_security_logout') }}?nav=1" role="button" class="btn btn-default navbar-btn pull-right">Logout</a>
+                    <a href="{{ path('fos_user_security_logout') }}?nav=1" role="button" class="btn btn-default navbar-btn pull-right hidden-xs">Logout</a>
                 {% endif %}
             {% else %}
-                <a href="{{ path('fos_user_security_login') }}?nav=1" role="button" class="btn btn-default navbar-btn pull-right">Login</a>
+                <a href="{{ path('fos_user_security_login') }}?nav=1" role="button" class="btn btn-default navbar-btn pull-right hidden-xs">Login</a>
             {% endif %}
         </div>
         <div id="navbar" class="navbar-collapse collapse">
