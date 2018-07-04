@@ -14,8 +14,9 @@
 }
 
 .navbar-default .navbar-nav > li > a {
-    font-size: 14px;
+    font-size: 16px;
     color: $white;
+    text-align: center;
 
     &:hover {
         color: darken($blue, 20%);
@@ -35,9 +36,9 @@
 }
 
 .navbar-default .navbar-nav > li > span {
+    text-align: center;
     display: block;
     position: relative;
-    padding: 0 0 0 15px;
 }
 
 .navbar-default .navbar-toggle {
@@ -61,30 +62,13 @@
 }
 
 .navbar-fixed-top .navbar-collapse {
+    max-height: none !important;
+
     @include breakpoint(laptop) {
-        max-height: none !important;
         box-shadow: 0 3px 5px rgba(57, 63, 72, 0.2);
         padding-bottom: 30px;
     }
 }
-
-// @include breakpoint(laptop) {
-
-//     .navbar-default .navbar-collapse {
-//         background-color: transparent;
-//         border: none;
-//     }
-
-// }
-
-// @include breakpoint(laptop) {
-
-//     .navbar-nav > li {
-//         margin: 0 5px;
-//         padding: 0 5px;
-//     }
-
-// }
 
 .navbar-sticky {
     box-shadow: 0 3px 5px rgba(57, 63, 72, 0.2);
@@ -113,7 +97,7 @@
     background-color: transparent;
 }
 
-
+// Copied solution to make menu collapsed all the time
 @media (max-width: 2000px) {
     .navbar-header {
         float: none;

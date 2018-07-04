@@ -1,0 +1,241 @@
+{% extends 'base.html.twig' %}
+
+{# Set vars #}
+{% set new_stylesheet = 1 %}
+{% set include_emoji = 1 %}
+{% set ab_nav = 1 %}
+
+{% block title %}{{ phone.model }} Insurance - {{ phone.make }} - so-sure: Social Insurance{% endblock %}
+{% block meta %}
+    <meta name="description" content="For a small monthly fee your phone is covered for theft, loss, accidental damage and unauthorised usage."/>
+    <link rel="canonical" href="{{ url('quote_make_model', {'make': phone.makeCanonical, 'model': phone.encodedModelCanonical}) }}" />
+
+    <meta property="og:video" content="https://cdn.so-sure.com/video/explainer-subtitle-640.mp4" />
+    <meta property="og:video:secure_url" content="https://cdn.so-sure.com/video/explainer-subtitle-640.mp4" />
+    <meta property="og:video:type" content="video/mp4" />
+    <meta property="og:video:width" content="640" />
+    <meta property="og:video:height" content="360" />
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {% stylesheets output='css/*.css'
+    '@AppBundle/Resources/public/sass/page/quoteContent.scss'
+    %}
+    <link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
+{% endblock %}
+
+{% block body %}
+    <section class="section--pad quote__top">
+        <div class="container">
+            <h1>
+            {% if coming_soon %}
+                <span>Better cover for your</span>
+            {% else %}
+                <span>Insurance for your</span>
+            {% endif %}
+            {{ phone.make }} {{ phone.model }} <small>({{ phone.memory }}GB)</small><br>
+            {% if coming_soon %}
+                <span class="text-nowrap">is coming soon!</span>
+                <p><a href="mailto:hello@wearesosure.com" class="open-intercom">Tell me when</a> it's available.</p>
+                <p>
+                    <strong>£4.99 - £9.99 per month</strong><br>
+                    <small>(typical policy pricing)</small>
+                <p>
+            {% else %}
+                <span class="text-nowrap text-blue">£{{ phone_price.monthlyPremiumPrice }} per month</span>
+            {% endif %}
+            </h1>
+            {% if not coming_soon %}
+            {# CTA #}
+            <div class="quote__cta">
+                <div class="form-group">
+                    {{ form_start(buy_form) }}
+                        {{ form_widget(buy_form.buy_tablet, {'label': 'Get Started', 'attr': {'class': 'btn btn-green btn-lg btn-pad btn-block'}}) }}
+                    {{ form_end(buy_form) }}
+                </div>
+            </div>
+            {% endif %}
+
+            {% if phones | length > 1 %}
+            <a class="btn btn-link" role="button" data-toggle="collapse" href="#collapsePhones" aria-expanded="false" aria-controls="collapsePhones">Not your phone?</a>
+            <div class="collapse" id="collapsePhones">
+                <div class="btn-group" role="group">
+                    {% for phone_mem in phones %}
+                        <a {% if phone_mem.id != phone.id  %}href="{{ path('quote_make_model_memory', {'make': phone_mem.makeCanonical, 'model': phone_mem.encodedModelCanonical, 'memory': phone_mem.memory}) }}"{% else %}disabled{% endif %} class="btn {% if phone_mem.id == phone.id  %}btn-blue{% else %}btn-blue-hollow{% endif %}">{{ phone_mem.memory }}GB</a>
+                    {% endfor %}
+                </div>
+                <br>
+                <a class="btn btn-link" href="#" data-toggle="modal" data-target="#quoteModal"><u>I have a different phone</u></a>
+            </div>
+            {% else %}
+            <a href="#" class="btn btn-link" role="button" data-toggle="modal" data-target="#quoteModal"><u>I have a different phone</u></a>
+            {% endif %}
+        </div>
+    </section>
+
+    <section class="section--pad quote__bottom">
+        <div class="container">
+            <div class="row">
+               <div class="col-md-4">
+                    <h3>We always cover:</h3>
+                    <ul class="list-unstyled fa-list-bullet">
+                        <li><i class="fa fa-check text-green" aria-hidden="true"></i> Theft</li>
+                        <li><i class="fa fa-check text-green" aria-hidden="true"></i> Loss</li>
+                        <li><i class="fa fa-check text-green" aria-hidden="true"></i> Out of warranty breakdown</li>
+                        <li><i class="fa fa-check text-green" aria-hidden="true"></i> Water damage</li>
+                        <li><i class="fa fa-check text-green" aria-hidden="true"></i> Cracked screen</li>
+                        <li><i class="fa fa-check text-green" aria-hidden="true"></i> Worldwide cover</li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h3>What we offer:</h3>
+                    <ul class="list-unstyled fa-list-bullet">
+                        <li><i class="fa fa-check text-blue" aria-hidden="true"></i> Working device within 72 hours</li>
+                        <li><i class="fa fa-check text-blue" aria-hidden="true"></i> 24/7 live support</li>
+                        <li><i class="fa fa-check text-blue" aria-hidden="true"></i> Insure used phones</li>
+                        <li><i class="fa fa-check text-blue" aria-hidden="true"></i> Instant cover when you purchase your policy</li>
+                        <li><i class="fa fa-check text-blue" aria-hidden="true"></i> Up to 80% cashback every year</li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <img src="{{ cdn_url }}/images/press/ebay_so-sure_trustpilot.svg" alt="TrustPilot" title="TrustPilot" width="240px" class="trustpilot">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section--pad quote__excess">
+        <div class="container">
+            <div class="row">
+                <h2 class="text-center">Our Excess</h2>
+                <div class="col-md-4">
+                    <p>When you validate that your phone is in good working condition via our app your excess is reduced to just <strong>£50 accidental damage/breakdown, £70 for loss and theft</strong>.</p>
+                </div>
+                <div class="col-md-4">
+                    <p>Not only that, should you make a claim, it becomes an easier and speedier process, and we dont ask you to provide proof of purchase.</p>
+                </div>
+                <div class="col-md-4">
+                    <p>If you do not validate your phone, your excess will be £150 and your claims process may take some more time.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {% if feature_enabled('quote-lead') and coming_soon == false and phone.initialPrice > 0 %}
+        <section class="section--pad quote__save">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-12">
+                        {# Save Quote #}
+                        <h3>Guarantee this price for the next 7 days</h3>
+                        {{ form_start(lead_form, {'attr': {'class': ' quote__save'}}) }}
+                            {{ form_label(lead_form.email, 'Your email:', { 'label_attr': {'class': 'sr-only'} }) }}
+                            {{ form_widget(lead_form.email, {'attr':{'class':'form-control', 'placeholder': 'Enter your email'}}) }}
+                            {{ form_widget(lead_form.save, {'label': 'Save this quote', 'attr': {'class': 'btn btn-blue'}}) }}
+                        {{ form_end(lead_form) }}
+                    </div>
+                </div>
+            </div>
+        </section>
+    {% endif %}
+
+{#     {% include 'AppBundle::Default/fasterClaims.html.twig' %}
+
+    {% include 'AppBundle::Default/saveMoney.html.twig' %}
+
+    {% include 'AppBundle::Default/faqs.html.twig' %}
+
+    {% include 'AppBundle::Default/feedbackQuotes.html.twig' %}
+
+    {% include 'AppBundle::Default/whySoSure.html.twig' %} #}
+
+    <section class="phone-details background-blue">
+        <div class="container">
+            <h3>About the {{ phone.make }} {{ phone.model }}</h3>
+            <ul class="list-inline">
+                <li>Camera: {{ phone.camera }} MP</li>
+                <li>Size: {{ phone.getScreenPhysicalInch }}"</li>
+                <li>Screen Resolution: {{ phone.getScreenResolution }}</li>
+                <li>RAM: {{ phone.getRamDisplay }}</li>
+            </ul>
+            {% if phone.funFacts|length > 0 %}
+                <p>{{ phone.funFacts|raw }}</p>
+            {% endif %}
+            {% if phone.description|length > 0 %}
+                <p>{{ phone.description|raw }}</p>
+            {% endif %}
+        </div>
+    </section>
+
+    {# {% include 'AppBundle::Default/press.html.twig' %} #}
+
+    {# {% include 'AppBundle::Default/partnership.html.twig' %} #}
+
+    {# Page Modals #}
+
+    {# {% include 'AppBundle::Default/modalVideo.html.twig' %} #}
+
+    <div class="modal modal-fullscreen fade"
+         id="policy-modal"
+         tabindex="-1"
+         role="dialog"
+         aria-labelledby="So-Sure Policy Terms"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                </div>
+                <div class="modal-body modal-policy" data-url="{{ url('latest_policy_terms', {'policy_key': policy_key, 'maxPotValue':  max_pot, 'include': true, 'noH1': true }) }}">
+                    <div class="text-center" style="margin-bottom: 20px;">
+                        <img src="{{ cdn_url }}/images/spinner.svg" alt="Loading..."><br>
+                        <a href="#" id="reload-policy" class="btn btn-blue-hollow" style="display:none;"><i class="fa fa-refresh" aria-hidden="true"></i> reload</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade"
+         id="calculation-details"
+         tabindex="-1"
+         role="dialog"
+         aria-labelledby="Calculation Details"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h3>Calculation Details</h3>
+                </div>
+                <div class="modal-body">
+                    <p><strong>How we calculate this:</strong></p>
+                    <p>Prices based on data available from competitor websites, last updated on 1 February 2017.  </p>
+                    <p>Networks taken as an average of O2, Vodafone, and Three.</p>
+                    <p>High Street is Car Phone Warehouse.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% include 'AppBundle::Default/modalQuote.html.twig' with {'selectPhoneMakeType': 'other_pages'} %}
+    {# End Page Modals #}
+
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {% javascripts
+    'components/dot/doT.min.js'
+    'components/vimeo-player-js/player.min.js'
+    'components/corejs-typeahead/typeahead.bundle.min.js'
+    'components/fuse.js/fuse.min.js'
+    'components/rangeslider.js/rangeslider.min.js'
+    '@AppBundle/Resources/public/js/Default/modalVideo.js'
+    '@AppBundle/Resources/public/js/Default/sliderNew.js'
+    '@AppBundle/Resources/public/js/Default/selectPhoneMakeSearch.js'
+    '@AppBundle/Resources/public/js/Default/selectPhoneMakeDropdown.js'
+    '@AppBundle/Resources/public/js/Default/bannerSticky.js' %}
+    <script src="{{ asset_url }}"></script>{% endjavascripts %}
+{% endblock %}

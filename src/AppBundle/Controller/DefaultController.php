@@ -110,7 +110,7 @@ class DefaultController extends BaseController
 
         $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE);
 
-        $expContent = $this->sixpack(
+        $expContent = $this->getSessionSixpackTest(
             $request,
             SixpackService::EXPERIMENT_AB_NEW_CONTENT,
             ['old-content-no-nav', 'new-content-with-nav']
@@ -121,7 +121,6 @@ class DefaultController extends BaseController
             'replacement' => $replacement,
             'referral'    => $referral,
             'phone'       => $this->getQuerystringPhone($request),
-            'ab_content'  => $expContent,
         );
 
         // $template = 'AppBundle:Default:index.html.twig';

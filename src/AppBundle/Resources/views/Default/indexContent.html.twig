@@ -4,11 +4,7 @@
 {% set new_stylesheet = 1 %}
 {% set new_footer = 1 %}
 {% set homepage = 1 %}
-
-{# If ab content test -> use the full nav #}
-{% if ab_content is defined and ab_content == 'new-content-with-nav' %}
-    {% set ab_nav = 1 %}
-{% endif %}
+{% set ab_nav = 1 %}
 
 {% block title %}so-sure - Welcome to Social Insurance{% endblock %}
 {% block meta %}
