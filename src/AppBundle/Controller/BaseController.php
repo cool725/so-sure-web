@@ -754,24 +754,29 @@ abstract class BaseController extends Controller
         return $phone;
     }
 
-    protected function getSessionSixpackTest(Request $request, $experiment, $alternatives)
+    protected function getSessionSixpackTest(Request $request, $name, $options)
     {
-        $alternative = null;
-        $sessionName = sprintf('sixpack:%s', $experiment);
+        $exp = null;
+        $sessionName = sprintf('sixpack:%s', $name);
 
         $session = $request->getSession();
         if ($session) {
-            $alternative = $session->get($sessionName);
+            $exp = $session->get($sessionName);
         }
 
-        if (!$alternative) {
-            $alternative = $this->get('app.sixpack')->participate($experiment, $alternatives, true);
+        if (!$exp) {
+            $exp = $this->sixpack($request, $name, $options);
             if ($session) {
-                $session->set($sessionName, $alternative);
+                $session->set($sessionName, $exp);
             }
         }
 
-        return $alternative;
+        $override = $request->get('force');
+        if ($override && in_array($override, $options)) {
+            $exp = $override;
+        }
+
+        return $exp;
     }
 
     protected function searchPolicies(Request $request, $includeInvalidPolicies = null)
