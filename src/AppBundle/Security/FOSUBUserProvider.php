@@ -411,7 +411,7 @@ class FOSUBUserProvider extends BaseClass
             }
             // as username is tied to email for our case, delete the duplicate user
             if ($duplicate->getEmailCanonical() == $email) {
-                $this->deleteUser($duplicate);
+                $this->deleteUser($duplicate, false);
             }
         }
         $this->dm->flush();
