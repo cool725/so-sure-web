@@ -1,4 +1,4 @@
-{% extends 'base.html.twig' %}
+ {% extends 'base.html.twig' %}
 
 {# Set vars #}
 {% set new_stylesheet = 1 %}
@@ -43,50 +43,6 @@
             }|merge(app.request.query.all))) }}
         {% endif %}
         {# End Phone Search #}
-
-        <div id="hero-character_1"
-             class="homepage--hero__character">
-            <div class="homepage--hero__tooltip animated tada"
-                 data-content="Accidental damage cover, including cracked screen and water damage"></div>
-        </div>
-        <div id="hero-character_2"
-             class="homepage--hero__character">
-            <div class="homepage--hero__tooltip"
-                 data-content="Worldwide travel cover for trips not exceeding 90 days"></div>
-        </div>
-        <div id="hero-character_3_and_4"
-             class="homepage--hero__character clearfix">
-            <div class="left">
-                <div class="homepage--hero__tooltip"
-                 data-content="Refurbished and second-hand device cover, for phones up to 3 years old"></div>
-            </div>
-            <div class="right">
-                <div class="homepage--hero__tooltip"
-                 data-content="Out of warranty breakdown cover"></div>
-            </div>
-        </div>
-        <div id="hero-character_5_and_6"
-             class="homepage--hero__character clearfix">
-            <div class="left">
-                <div class="homepage--hero__tooltip"
-                 data-content="Theft and Loss cover as standard"></div>
-            </div>
-            <div class="right">
-                <div class="homepage--hero__tooltip"
-                 data-content="Unauthorised network charges cover (up to £1000 inc. VAT)"></div>
-            </div>
-        </div>
-        <div id="hero-character_7"
-             class="homepage--hero__character">
-            <div class="homepage--hero__tooltip homepage--hero__tooltip__reward"
-                 data-content="Next day phone replacement/repair or up to 80% of your money back when you and your friends don't claim"></div>
-             </div>
-        <div id="hero-character_8"
-             class="homepage--hero__character">
-            <div class="homepage--hero__tooltip"
-                 data-content="Accessories cover (up to £100 inc. VAT) for theft and loss claim">
-            </div>
-        </div>
     </section>
 
     {# Press #}
@@ -134,11 +90,10 @@
         <div class="container">
             <div class="row">
                 <div class="col-md-7 col-md-push-5">
-                    <h2 class="text-blue">We do things differently</h2>
-                    <p class="lead"><strong>so-sure aren’t like the old insurance giants who are preoccupied with profits not people – what we say is what you get.</strong></p>
-                    <p>We insure your long-time-loved devices of up to three years.</p>
-                    <p>We reward you when you’re careful and look after you when bad stuff happens. If you don’t make a claim, we could return 80% of your premium each year.</p>
-                    <p>If you make a claim, we’ll get you back up and running with a replacement between 24–72 hours.</p>
+                    <h2 class="text-blue" style="margin-bottom: 20px;">We do things differently</h2>
+                    <p>We insure devices of up to three years old.</p>
+                    <p>We reward you when you’re careful and look after you need to make a claim. If you don’t make a claim, we return up to 80% of your premium each year... <a href="{{ path('faq') }}?nav=1#social-insurance-and-reward-pot"><strong>find out more</strong></a>. </p>
+                    <p>If you make a claim, we’ll get you back up and running with a replacement phone in 24–72 hours.</p>
                 </div>
                 <div class="col-md-5 col-md-pull-7">
                     <div class="img-container">
@@ -221,7 +176,8 @@
                     <p class="lead"><strong>We give you a phone back in your hands within 24-72hrs.</strong></p>
                     <p>How? We have a proprietary technology, called <a href="#" data-toggle="modal" data-target="#modal-pic-sure"><strong>pic-sure</strong></a>, which allows us to verify the functioning of your phone when you insure it.</p>
                     <p>That means that your claim process is much quicker, your excess gets slashed in half, and you will tbe treated on the phone with compassion, not interrogation.</p>
-                    <ul class="list-inline">
+                    <ul class="list-inline text-center">
+                        <br>
                         <li>
                             <a class="ga-outbound-click" data-clicklabel="iTunes" href="{{ apple_download('homepage-picsure') }}" target="_blank" rel="noopener">
                                 <img src="{{ cdn_url }}/images/icons/app-store-original.svg" alt="Download so-sure on the App Store" /><span class="sr-only">so-sure app - Apple App Store</span>
@@ -234,7 +190,7 @@
                         </li>
                     </ul>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-4 hidden-xs">
                     <img src="{{ cdn_url }}/images/homepage/iphone_x_so-sure_app.svg" alt="" width="200px;" class="img-center">
                 </div>
             </div>
