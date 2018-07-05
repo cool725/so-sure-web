@@ -90,7 +90,7 @@
     </section>
 
     {# Press #}
-    <section class="homepage__press homepage__press_grayscale">
+    <section class="homepage__press homepage__press_grayscale background-white">
         <div class="container-fluid">
             <div class="row">
                 <div class="col-md-12 text-center">
@@ -135,12 +135,10 @@
             <div class="row">
                 <div class="col-md-7 col-md-push-5">
                     <h2 class="text-blue">We do things differently</h2>
-                    <ul class="list-unstyled">
-                        <li class="h3 h-light">so-sure aren’t like the old insurance giants who are preoccupied with profits not people – what we say is what you get.</li>
-                        <li class="h4 h-light">We insure your long-time-loved devices of up to three years.</li>
-                        <li class="h4 h-light">We reward you when you’re careful and look after you when bad stuff happens. If you don’t make a claim, we could return 80% of your premium each year.</li>
-                        <li class="h4 h-light">If you make a claim, we’ll get you back up and running with a replacement between 24–72 hours.</li>
-                    </ol>
+                    <p class="lead"><strong>so-sure aren’t like the old insurance giants who are preoccupied with profits not people – what we say is what you get.</strong></p>
+                    <p>We insure your long-time-loved devices of up to three years.</p>
+                    <p>We reward you when you’re careful and look after you when bad stuff happens. If you don’t make a claim, we could return 80% of your premium each year.</p>
+                    <p>If you make a claim, we’ll get you back up and running with a replacement between 24–72 hours.</p>
                 </div>
                 <div class="col-md-5 col-md-pull-7">
                     <div class="img-container">
@@ -221,11 +219,23 @@
                 <div class="col-md-6 col-md-offset-1">
                     <h2 class="text-blue">We're here if you need us</h2>
                     <p class="lead"><strong>We give you a phone back in your hands within 24-72hrs.</strong></p>
-                    <p>How? We have a proprietary technology, called pic-sure, which allows us to verify the functioning of your phone when you insure it.</p>
+                    <p>How? We have a proprietary technology, called <a href="#" data-toggle="modal" data-target="#modal-pic-sure"><strong>pic-sure</strong></a>, which allows us to verify the functioning of your phone when you insure it.</p>
                     <p>That means that your claim process is much quicker, your excess gets slashed in half, and you will tbe treated on the phone with compassion, not interrogation.</p>
+                    <ul class="list-inline">
+                        <li>
+                            <a class="ga-outbound-click" data-clicklabel="iTunes" href="{{ apple_download('homepage-picsure') }}" target="_blank" rel="noopener">
+                                <img src="{{ cdn_url }}/images/icons/app-store-original.svg" alt="Download so-sure on the App Store" /><span class="sr-only">so-sure app - Apple App Store</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="ga-outbound-click" data-clicklabel="PlayStore" href="{{ google_download('homepage-picsure') }}" target="_blank" rel="noopener">
+                                <img src="{{ cdn_url }}/images/icons/google-play-original.svg" alt="Get so-sure on Google Play" /><span class="sr-only">so-sure app - Google Play</span>
+                            </a>
+                        </li>
+                    </ul>
                 </div>
                 <div class="col-md-4">
-                    <img src="{{ cdn_url }}/images/homepage/pic-sure_steps_homepage_2.svg" class="img-center" width="300px">
+                    <img src="{{ cdn_url }}/images/homepage/iphone_x_so-sure_app.svg" alt="" width="200px;" class="img-center">
                 </div>
             </div>
         </div>
@@ -247,12 +257,11 @@
             <div class="row">
                 <div class="col-md-8 col-md-offset-2 text-center">
                     <h2 class="text-blue">Money Back when you dont claim</h2>
-                    <p class="lead">You can get up to 80% of your premium back at the end of your policy year when you and your friends don’t claim. Why? Our model has been built on sharing the margins with our users...</p>
+                    <p>You can get up to 80% of your premium back at the end of your policy year when you and your friends don’t claim. Why? Our model has been built on sharing the margins with our users... <a href="{{ path('faq') }}#social-insurance-and-reward-pot" class="text-blue text-underline">find out more</a></p>
+                    <br>
                     <div class="video-container">
                         <iframe id="exp-vid" src="https://player.vimeo.com/video/185840373??api=1&player_id=vimeoplayer&title=0&byline=0&portrait=0" width="800" height="450"  frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
                     </div>
-                    <br>
-                    <a href="{{ path('faq') }}#social-insurance-and-reward-pot" class="h3 text-blue text-underline">Find out more</a>
                 </div>
             </div>
         </div>
@@ -400,6 +409,42 @@
                  class="img-responsive form-rocket lozad" alt="so-sure - rocket">
         </div>
     </section>
+
+    {# Page Modals #}
+    <div class="modal fade"
+         id="modal-pic-sure"
+         tabindex="-1"
+         role="dialog"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">
+                        <i class="fa fa-times fa-lg" aria-hidden="true"></i>
+                        <span class="sr-only">Close</span>
+                    </button>
+                    <h3 class="text-center">Here pic-sure Works</h3>
+                </div>
+                <div class="modal-body">
+                    <ol class="ol--blue-counter ol--blue-counter__line">
+                        <li class="h4 h-light clearfix">
+                            <img src="{{ cdn_url }}/images/homepage/pic-sure_steps_homepage_1.svg" alt="Get covered in less than 2 minutes through our app or website"><br>
+                            <span>Get covered in less than 2 minutes through our app or website</span>
+                        </li>
+                        <li class="h4 h-light clearfix">
+                            <img src="{{ cdn_url }}/images/homepage/pic-sure_steps_homepage_2.svg" alt="Login and validate your phone with pic-sure in seconds"><br>
+                            <span>Login and validate your phone with pic-sure in seconds</span>
+                        </li>
+                        <li class="h4 h-light clearfix">
+                            <img src="{{ cdn_url }}/images/homepage/pic-sure_steps_homepage_3.svg" alt="Hooray, your excess is reduced and we know you're honest :)"><br>
+                            <span>Hooray, your excess is reduced and we know you're honest :)</span>
+                        </li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
 {% endblock %}
 
