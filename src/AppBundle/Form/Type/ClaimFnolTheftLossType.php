@@ -52,8 +52,9 @@ class ClaimFnolTheftLossType extends AbstractType
                 'required' => true,
                 'placeholder' => 'Please choose..',
                 'choices' => [
-                    'Contacted' => true,
-                    'Did not contact' => false,
+                    'Yes' => true,
+                    'No' => false,
+                    'N/A' => null,
                 ],
             ])
             ->add('contactedPlace', TextType::class, ['required' => true])

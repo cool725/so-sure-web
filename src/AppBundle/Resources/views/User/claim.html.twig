@@ -42,7 +42,7 @@
                                 <div class="row">
                                     <div class="col-xs-12 text-center">
                                         <div class="form-group {% if form_errors(claim_form.signature) %}has-error{% endif %}">
-                                            <p class="lead text-left">I <span class="h4">{{ username }}</span> am providing all accurate and truthful information. I understand that failure to do so will invalidate my claim and could lead to me being prosecuted.<span class="text-blue">*</span></label></p>
+                                            <p class="lead text-left">I <span class="h4">{{ username }}</span> am providing all accurate and truthful information. I understand that failure to do so will invalidate my claim and could lead to me being prosecuted.</label></p>
                                             {{ form_widget(claim_form.signature, { 'attr': {'placeholder': 'Type in your full name to sign this document', 'class': 'form-control'}}) }}
                                             <div class="help-block with-errors">{{ form_errors(claim_form.signature) }}</div>
                                             <input type="hidden" value="{{ username }}" id="username_signature">
@@ -90,7 +90,7 @@
                                     <div class="col-sm-6">
                                         <div class="form-group {% if form_errors(claim_form.timeToReach) %}has-error{% endif %}">
                                             <label class="h4">Best time to call you (UK business hours)</label>
-                                            {{ form_widget(claim_form.timeToReach, { 'attr': {'class': 'form-control', 'placeholder': '10:00'}}) }}
+                                            {{ form_widget(claim_form.timeToReach, { 'attr': {'class': 'form-control', 'placeholder': 'eg. 10am - 12pm, in the afternoon, etc'}}) }}
                                             <div class="help-block with-errors">{{ form_errors(claim_form.timeToReach) }}</div>
                                         </div>
                                     </div>
@@ -158,9 +158,8 @@
                         <div id="tab-claimfnol-confirm" class="tab-pane fade in {% if active_tab == 'claimfnol-confirm' %}active{% endif %}">
                             {{ form_start(claim_confirm_form, { 'attr': { 'class': 'text-center'}}) }}
                                 <p class="lead">I, {{ username }}, certify that:</p>
-                                <p class="lead"><mark>My <span class="h4">{{ phone }}</span> was <span class="h4">{{ claim_type }}</span> after I purchased my policy on <span class="h4">{{ policy_date|date('d M Y H:i', 'Europe/London') }}</span>.</mark></p>
+                                <p class="lead"><mark>My <span class="h4">{{ phone }}</span> was <span class="h4">{{ claim_type }}</span> after I purchased my policy on <span class="h4">{{ policy_date|date('d M Y', 'Europe/London') }} at {{ policy_date|date('H:i', 'Europe/London') }}</span>.</mark></p>
                                 <p class="lead">I acknowledge that not telling the truth would constitute insurance fraud, which is a criminal offence. I agree to this and I understand that I could be prosecuted if I were not telling the truth.</p>
-                                <p><small>If any of the information above is incorrect, please contact <a href="email:mailto@wearesosure.com">hello@wearesosure.com</a> directly before confirming.</small></p>
                                 <div class="form-group">
                                     <a id="claim-back" href="#" class="btn btn-blue-hollow btn-lg">Go back</a>
                                     {{ form_widget(claim_confirm_form.submit, {'label': 'I confirm', 'attr': {'class': 'btn btn-green btn-lg'}}) }}
