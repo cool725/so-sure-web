@@ -34,14 +34,17 @@
         {% block metaend %}{% endblock %}
     </head>
     <body
-        {% if distraction_free is defined and distraction_free == 1 %}
-            class="distraction-free"
+        {% if app.session.get('sixpack:new-content-with-nav') %}
+            class="content-ab"
+        {% else %}
+            {% if distraction_free is defined and distraction_free == 1 %}
+                class="distraction-free"
+            {% endif %}
         {% endif %}
         {% if scrollspy is defined and scrollspy == 1 %}
             data-spy="scroll"
             data-target="{% if scrollspyID is defined  %}{{ scrollspyID }}{% endif %}"
-        {% endif %}
-    >
+        {% endif %}>
 
         {# Google Tag Manager Data Layer #}
 
