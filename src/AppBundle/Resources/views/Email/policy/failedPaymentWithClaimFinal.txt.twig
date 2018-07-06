@@ -8,8 +8,12 @@ Your monthly payment of £{{ policy.premium.monthlyPremiumPrice }} was declined.
 
 Your policy will be cancelled in {{ policy.policyExpirationDateDays }} days if you fail to make payment.
 
-As a reminder, if you fail to make a payment, you will be billed for the remainder of your policy premium
-of £{{ policy.getRemainderOfPolicyPrice|number_format(2, '.', ',') }}.
+You received a replacement phone on {{ policy.getApprovedClaims(true, true)[0].replacementReceivedDate|date }}.
 
-To avoid cancellation, simply <a href="{{ branch_pot_url }}">open the app</a> and follow the steps on screen.
+As per so-sure terms & conditions, you are liable for the remainder of the policy year.
+
+Should you fail to update your details and your policy is then cancelled, you will be billed for the remainder of your policy premium of £{{ policy.getRemainderOfPolicyPrice|number_format(2, '.', ',') }}.
+
+To avoid cancellation, simply open the app here:
+{{ branch_pot_url }}
 {% endblock body %}

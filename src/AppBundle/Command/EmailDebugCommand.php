@@ -218,7 +218,7 @@ class EmailDebugCommand extends BaseCommand
             $policyService = $this->getContainer()->get('app.policy');
 
             return $policyService->connectionReduced($connection);
-        } elseif (in_array($template, $templates['policy']) || in_array($template, $templates['policyFailedPayment'])) {
+        } elseif (in_array($template, $templates['policy'])) {
             $dm = $this->getManager();
             /** @var PolicyRepository $repo */
             $repo = $dm->getRepository(Policy::class);
@@ -247,7 +247,7 @@ class EmailDebugCommand extends BaseCommand
                     throw new \Exception('Unable to find matching policy');
                 }
                 /** @var JudopayService $judopayService */
-                $judopayService = $this->getContainer()->get('app.judo');
+                $judopayService = $this->getContainer()->get('app.judopay');
 
                 return $judopayService->failedPaymentEmail($policy);
         } elseif (in_array($template, $templates['policyCancellation'])) {

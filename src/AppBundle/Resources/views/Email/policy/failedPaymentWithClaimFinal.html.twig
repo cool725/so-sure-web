@@ -16,8 +16,11 @@
 				<br><br>
 				To avoid cancellation, simply <a href="{{ branch_pot_url }}">open the app</a> and follow the steps on screen.
 				<br><br>
-				As a reminder, if you fail to make a payment, you will be billed for the remainder of your policy
-				   premium of £{{ policy.getRemainderOfPolicyPrice|number_format(2, '.', ',') }}.
+				You received a replacement phone on {{ policy.getApprovedClaims(true, true)[0].replacementReceivedDate|date }}.
+				<br><br>
+				As per so-sure terms & conditions, you are liable for the remainder of the policy year.
+				<br><br>
+				Should you fail to update your details and your policy is then cancelled, you will be billed for the remainder of your policy premium of £{{ policy.getRemainderOfPolicyPrice|number_format(2, '.', ',') }}.
 				<br><br>
 			    If you have any questions, please don't hesitate to <a href="mailto:support@wearesosure.com?subject=I%20have%20a%20question" target="_blank"><span style="color:#3399ff">contact us</span></a>.
 		</div>
