@@ -6,6 +6,7 @@ use AppBundle\Repository\CashbackRepository;
 use AppBundle\Repository\ConnectionRepository;
 use AppBundle\Repository\PolicyRepository;
 use AppBundle\Repository\UserRepository;
+use AppBundle\Service\JudopayService;
 use AppBundle\Service\MailerService;
 use AppBundle\Service\PolicyService;
 use AppBundle\Service\RouterService;
@@ -96,6 +97,12 @@ class EmailDebugCommand extends BaseCommand
             ],
             'policy' => [
                 'policy/new',
+            ],
+            'policyFailedPayment' => [
+                'policy/failedPayment',
+                'policy/failedPaymentFinal',
+                'policy/failedPaymentWithClaim',
+                'policy/failedPaymentWithClaimFinal',
             ],
             'policyCancellation' => [
                 'policy-cancellation/actual-fraud',
@@ -211,7 +218,7 @@ class EmailDebugCommand extends BaseCommand
             $policyService = $this->getContainer()->get('app.policy');
 
             return $policyService->connectionReduced($connection);
-        } elseif (in_array($template, $templates['policy'])) {
+        } elseif (in_array($template, $templates['policy']) || in_array($template, $templates['policyFailedPayment'])) {
             $dm = $this->getManager();
             /** @var PolicyRepository $repo */
             $repo = $dm->getRepository(Policy::class);
@@ -227,6 +234,22 @@ class EmailDebugCommand extends BaseCommand
             $policyService = $this->getContainer()->get('app.policy');
 
             return $policyService->resendPolicyEmail($policy);
+        } elseif (in_array($template, $templates['policyFailedPayment'])) {
+                $dm = $this->getManager();
+                /** @var PolicyRepository $repo */
+                $repo = $dm->getRepository(Policy::class);
+                $policies = $repo->findBy(['status' => Policy::STATUS_ACTIVE]);
+                $policy = null;
+                foreach ($policies as $policy) {
+                    break;
+                }
+                if (!$policy) {
+                    throw new \Exception('Unable to find matching policy');
+                }
+                /** @var JudopayService $judopayService */
+                $judopayService = $this->getContainer()->get('app.judo');
+
+                return $judopayService->failedPaymentEmail($policy);
         } elseif (in_array($template, $templates['policyCancellation'])) {
             $dm = $this->getManager();
             /** @var PolicyRepository $repo */

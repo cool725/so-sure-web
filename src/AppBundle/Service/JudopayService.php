@@ -1013,16 +1013,10 @@ class JudopayService
      * @param Policy    $policy
      * @param \DateTime $next
      */
-    private function failedPaymentEmail(Policy $policy, \DateTime $next = null)
+    public function failedPaymentEmail(Policy $policy, \DateTime $next = null)
     {
         $subject = sprintf('Payment failure for your so-sure policy %s', $policy->getPolicyNumber());
-        $baseTemplate = sprintf('AppBundle:Email:policy/failedPayment');
-
-        if (!$next) {
-            $subject = sprintf('Payment failure for your so-sure policy %s', $policy->getPolicyNumber());
-            $baseTemplate = sprintf('AppBundle:Email:policy/failedPaymentFinal');
-        }
-
+        $baseTemplate = $this->getBaseTemplateForFailedPayment($policy, $next);
         $htmlTemplate = sprintf("%s.html.twig", $baseTemplate);
         $textTemplate = sprintf("%s.txt.twig", $baseTemplate);
 
@@ -1035,6 +1029,25 @@ class JudopayService
             ['policy' => $policy, 'next' => $next]
         );
     }
+
+    private function getBaseTemplateForFailedPayment(Policy $policy, \DateTime $next)
+    {
+        $baseTemplate = sprintf('AppBundle:Email:policy/failedPayment');
+        if ($policy->hasMonetaryClaimed(true)) {
+            $baseTemplate = sprintf('AppBundle:Email:policy/failedPaymentWithClaim');
+
+            if (!$next) {
+                $baseTemplate = sprintf('AppBundle:Email:policy/failedPaymentWithClaimFinal');
+            }
+        } else {
+            if (!$next) {
+                $baseTemplate = sprintf('AppBundle:Email:policy/failedPaymentFinal');
+            }
+        }
+
+        return $baseTemplate;
+    }
+
 
     /**
      * @param Policy    $policy
