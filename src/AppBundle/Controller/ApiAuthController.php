@@ -1311,7 +1311,7 @@ class ApiAuthController extends BaseController
 
             $this->get('event_dispatcher')->dispatch(
                 PicsureEvent::EVENT_RECEIVED,
-                new PicsureEvent($picsure)
+                new PicsureEvent($policy, $picsure)
             );
 
             $environment = $this->getParameter('kernel.environment');
