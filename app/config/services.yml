@@ -804,6 +804,10 @@ services:
             -  { name: kernel.event_listener, event: event.claim.created, method: onClaimCreatedEvent }
             -  { name: kernel.event_listener, event: event.claim.approved, method: onClaimApprovedEvent }
             -  { name: kernel.event_listener, event: event.claim.settled, method: onClaimSettledEvent }
+            -  { name: kernel.event_listener, event: event.picsure.received, method: onPicSureReceivedEvent }
+            -  { name: kernel.event_listener, event: event.picsure.approved, method: onPicSureUndamagedEvent }
+            -  { name: kernel.event_listener, event: event.picsure.invalid, method: onPicSureInvalidEvent }
+            -  { name: kernel.event_listener, event: event.picsure.rejected, method: onPicSureDamagedEvent }
 
     app.listener.sanctions:
         class:   AppBundle\Listener\SanctionsListener

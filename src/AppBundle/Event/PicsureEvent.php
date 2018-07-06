@@ -2,6 +2,7 @@
 
 namespace AppBundle\Event;
 
+use AppBundle\Document\Policy;
 use Symfony\Component\EventDispatcher\Event;
 use AppBundle\Document\File\S3File;
 
@@ -15,9 +16,18 @@ class PicsureEvent extends Event
     /** @var S3File */
     protected $s3File;
 
-    public function __construct($s3File)
+    /** @var Policy */
+    protected $policy;
+
+    public function __construct(Policy $policy, S3File $s3File)
     {
+        $this->policy = $policy;
         $this->s3File = $s3File;
+    }
+
+    public function getPolicy()
+    {
+        return $this->policy;
     }
 
     public function getS3File()

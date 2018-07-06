@@ -2227,7 +2227,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             if (count($picsureFiles) > 0) {
                 $this->get('event_dispatcher')->dispatch(
                     PicsureEvent::EVENT_APPROVED,
-                    new PicsureEvent($picsureFiles[0])
+                    new PicsureEvent($policy, $picsureFiles[0])
                 );
             } else {
                 $this->get('logger')->error(sprintf("Missing picture file in policy %s.", $policy->getId()));
@@ -2269,7 +2269,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             if (count($picsureFiles) > 0) {
                 $this->get('event_dispatcher')->dispatch(
                     PicsureEvent::EVENT_REJECTED,
-                    new PicsureEvent($picsureFiles[0])
+                    new PicsureEvent($policy, $picsureFiles[0])
                 );
             } else {
                 $this->get('logger')->error(sprintf("Missing picture file in policy %s.", $policy->getId()));
@@ -2303,7 +2303,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             if (count($picsureFiles) > 0) {
                 $this->get('event_dispatcher')->dispatch(
                     PicsureEvent::EVENT_INVALID,
-                    new PicsureEvent($picsureFiles[0])
+                    new PicsureEvent($policy, $picsureFiles[0])
                 );
             } else {
                 $this->get('logger')->error(sprintf("Missing picture file in policy %s.", $policy->getId()));
