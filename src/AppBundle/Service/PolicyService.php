@@ -619,6 +619,10 @@ class PolicyService
             unlink($tmpFile);
         }
 
+        if (!$policy->getPolicyTerms()->getVersionNumber()) {
+            throw new \Exception('Unable to determine policy version');
+        }
+
         $template = sprintf(
             'AppBundle:Pdf:policyTermsV%d.html.twig',
             $policy->getPolicyTerms()->getVersionNumber()
@@ -626,16 +630,11 @@ class PolicyService
 
         $this->snappyPdf->setOption('orientation', 'Landscape');
         $this->snappyPdf->setOption('lowquality', false);
-        /*
         $this->snappyPdf->setOption('footer-center', sprintf(
             '%s (Page [page] of [topage])',
             $policy->getPolicyTerms()->getVersion()
         ));
-        */
-        $this->snappyPdf->setOption('footer-center', sprintf(
-            '%s',
-            $policy->getPolicyTerms()->getVersion()
-        ));
+        //$this->snappyPdf->setOption('footer-center', $policy->getPolicyTerms()->getVersion());
         $this->snappyPdf->setOption('footer-font-size', 8);
 
         $this->snappyPdf->setOption('page-size', 'A4');
