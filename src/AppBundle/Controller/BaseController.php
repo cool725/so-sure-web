@@ -424,8 +424,10 @@ abstract class BaseController extends Controller
             $qb = $qb->addAnd($qb->expr()->field($mongoField)->equals(new MongoRegex(sprintf("/.*%s.*/i", $data))));
         } elseif ($queryType == self::MONGO_QUERY_TYPE_EQUAL) {
             $qb = $qb->addAnd($qb->expr()->field($mongoField)->equals($data));
-        } elseif ($queryType == self::MONGO_QUERY_TYPE_ID && \MongoId::isValid($data)) {
-            $qb = $qb->addAnd($qb->expr()->field($mongoField)->equals(new \MongoId($data)));
+        } elseif ($queryType == self::MONGO_QUERY_TYPE_ID) {
+            if (\MongoId::isValid($data)) {
+                $qb = $qb->addAnd($qb->expr()->field($mongoField)->equals(new \MongoId($data)));
+            }
         } else {
             throw new \Exception('unknown query type');
         }
