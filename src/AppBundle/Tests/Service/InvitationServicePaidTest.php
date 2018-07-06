@@ -80,7 +80,7 @@ class InvitationServicePaidTest extends WebTestCase
         /** @var RouterService $router */
         $router = self::$container->get('app.router');
         $mailer = new MailerService(
-            \Swift_Mailer::newInstance($transport),
+            new \Swift_Mailer($transport),
             $transport,
             $templating,
             $router,
