@@ -5,6 +5,7 @@ namespace AppBundle\Form\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\ButtonType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -39,7 +40,7 @@ class ClaimFnolDamageType extends AbstractType
     {
         $builder
             ->add('typeDetails', ChoiceType::class, [
-                'required' => true,
+                'required' => false,
                 'placeholder' => 'Please choose...',
                 'choices' => [
                     'Broken screen' => Claim::DAMAGE_BROKEN_SCREEN,
@@ -50,7 +51,7 @@ class ClaimFnolDamageType extends AbstractType
             ])
             ->add('typeDetailsOther', TextType::class, ['required' => false])
             ->add('monthOfPurchase', ChoiceType::class, [
-                'required' => true,
+                'required' => false,
                 'placeholder' => 'Month Bought...',
                 'choices' => [
                     'January' => 'January',
@@ -67,9 +68,9 @@ class ClaimFnolDamageType extends AbstractType
                     'December' => 'December',
                 ],
             ])
-            ->add('yearOfPurchase', TextType::class, ['required' => true])
+            ->add('yearOfPurchase', TextType::class, ['required' => false])
             ->add('phoneStatus', ChoiceType::class, [
-                'required' => true,
+                'required' => false,
                 'placeholder' => 'Please choose...',
                 'choices' => [
                     'New' => Claim::PHONE_STATUS_NEW,
@@ -77,6 +78,8 @@ class ClaimFnolDamageType extends AbstractType
                     'Second hand' => Claim::PHONE_STATUS_SECOND_HAND,
                 ],
             ])
+            ->add('isSave', HiddenType::class)
+            ->add('save', ButtonType::class)
             ->add('confirm', SubmitType::class)
         ;
 
@@ -87,12 +90,12 @@ class ClaimFnolDamageType extends AbstractType
             if (!$claim->needProofOfUsage()) {
                 $form->add('proofOfUsage', HiddenType::class);
             } else {
-                $form->add('proofOfUsage', FileType::class, ['required' => true]);
+                $form->add('proofOfUsage', FileType::class, ['required' => false]);
             }
             if (!$claim->needPictureOfPhone()) {
                 $form->add('pictureOfPhone', HiddenType::class);
             } else {
-                $form->add('pictureOfPhone', FileType::class, ['required' => true]);
+                $form->add('pictureOfPhone', FileType::class, ['required' => false]);
             }
         });
 

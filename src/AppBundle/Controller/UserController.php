@@ -1627,15 +1627,25 @@ class UserController extends BaseController
                 $claimDamageForm->handleRequest($request);
                 if ($claimDamageForm->isValid()) {
                     $claimsService = $this->get('app.claims');
-                    $claimsService->updateDamageDocuments($claim, $claimFnolDamage);
-                    return $this->redirectToRoute('claimed_policy', ['policyId' => $policy->getId()]);
+                    if ($claimFnolDamage->getIsSave()) {
+                        $claimsService->updateDamageDocuments($claim, $claimFnolDamage);
+                        $this->addFlash(
+                            'success',
+                            'Your claim has been saved.'
+                        );
+                    } else {
+                        $claimsService->updateDamageDocuments($claim, $claimFnolDamage, true);
+                        return $this->redirectToRoute('claimed_policy', ['policyId' => $policy->getId()]);
+                    }
                 }
             }
         }
 
         $data = [
             'username' => $user->getName(),
+            'claim' => $claim,
             'claim_form' => $claimDamageForm->createView(),
+            'proof_of_usage' => $claim->needProofOfUsage(),
             'picture_of_phone' => $claim->needPictureOfPhone(),
         ];
         return $this->render('AppBundle:User:claimDamage.html.twig', $data);
@@ -1676,14 +1686,23 @@ class UserController extends BaseController
                 $claimTheftLossForm->handleRequest($request);
                 if ($claimTheftLossForm->isValid()) {
                     $claimsService = $this->get('app.claims');
-                    $claimsService->updateTheftLossDocuments($claim, $claimFnolTheftLoss);
-                    return $this->redirectToRoute('claimed_policy', ['policyId' => $policy->getId()]);
+                    if ($claimFnolTheftLoss->getIsSave()) {
+                        $claimsService->updateTheftLossDocuments($claim, $claimFnolTheftLoss);
+                        $this->addFlash(
+                            'success',
+                            'Your claim has been saved.'
+                        );
+                    } else {
+                        $claimsService->updateTheftLossDocuments($claim, $claimFnolTheftLoss, true);
+                        return $this->redirectToRoute('claimed_policy', ['policyId' => $policy->getId()]);
+                    }
                 }
             }
         }
 
         $data = [
             'username' => $user->getName(),
+            'claim' => $claim,
             'claimType' => $claim->getType(),
             'network' => $claim->getNetwork(),
             'claim_form' => $claimTheftLossForm->createView(),
