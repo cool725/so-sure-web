@@ -1013,14 +1013,21 @@ class JudopayService
      * @param Policy    $policy
      * @param \DateTime $next
      */
-    private function failedPaymentEmail(Policy $policy, \DateTime $next = null)
+    public function failedPaymentEmail(Policy $policy, \DateTime $next = null)
     {
         $subject = sprintf('Payment failure for your so-sure policy %s', $policy->getPolicyNumber());
-        $baseTemplate = sprintf('AppBundle:Email:policy/failedPayment');
+        if ($policy->hasMonetaryClaimed(true, true)) {
+            $baseTemplate = sprintf('AppBundle:Email:policy/failedPaymentWithClaim');
 
-        if (!$next) {
-            $subject = sprintf('Payment failure for your so-sure policy %s', $policy->getPolicyNumber());
-            $baseTemplate = sprintf('AppBundle:Email:policy/failedPaymentFinal');
+            if (!$next) {
+                $baseTemplate = sprintf('AppBundle:Email:policy/failedPaymentWithClaimFinal');
+            }
+        } else {
+            $baseTemplate = sprintf('AppBundle:Email:policy/failedPayment');
+
+            if (!$next) {
+                $baseTemplate = sprintf('AppBundle:Email:policy/failedPaymentFinal');
+            }
         }
 
         $htmlTemplate = sprintf("%s.html.twig", $baseTemplate);
