@@ -11,7 +11,7 @@
         {# NOTE: Whilst we are transitioning use two different main stylesheets #}
         {% block stylesheets %}
             {% if new_stylesheet is defined and new_stylesheet == 1 %}
-                {% if app is not null and app.session.isStarted and and app.session.get('sixpack:new-content-with-nav') == 'new-content-with-nav' %}
+                {% if app is not null and app.session.isStarted and app.session.get('sixpack:new-content-with-nav') == 'new-content-with-nav' %}
                     {% stylesheets output='css/*.css'
                         '@AppBundle/Resources/public/sass/mainAB.scss'
                     %}<link rel="stylesheet" href="{{ asset_url }}">
@@ -34,7 +34,7 @@
         {% block metaend %}{% endblock %}
     </head>
     <body
-        {% if app is not null and app.session.isStarted and and app.session.get('sixpack:new-content-with-nav') == 'new-content-with-nav' %}
+        {% if app is not null and app.session.isStarted and app.session.get('sixpack:new-content-with-nav') == 'new-content-with-nav' %}
             class="content-ab"
         {% else %}
             {% if distraction_free is defined and distraction_free == 1 %}
@@ -131,7 +131,7 @@
         {# NOTE: Whilst we are transitioning use two different main stylesheets #}
         {% block nav %}
             {% if new_stylesheet is defined and new_stylesheet == 1 %}
-                {% if app.session.get('sixpack:new-content-with-nav') %}
+                {% if app is not null and app.session.isStarted and app.session.get('sixpack:new-content-with-nav') == 'new-content-with-nav' %}
                     {% include '::nav_ab.html.twig' %}
                 {% else %}
                     {% include '::nav_new.html.twig' %}
