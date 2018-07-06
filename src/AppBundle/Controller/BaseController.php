@@ -425,7 +425,9 @@ abstract class BaseController extends Controller
         } elseif ($queryType == self::MONGO_QUERY_TYPE_EQUAL) {
             $qb = $qb->addAnd($qb->expr()->field($mongoField)->equals($data));
         } elseif ($queryType == self::MONGO_QUERY_TYPE_ID) {
-            $qb = $qb->addAnd($qb->expr()->field($mongoField)->equals(new \MongoId($data)));
+            if (\MongoId::isValid($data)) {
+                $qb = $qb->addAnd($qb->expr()->field($mongoField)->equals(new \MongoId($data)));
+            }
         } else {
             throw new \Exception('unknown query type');
         }

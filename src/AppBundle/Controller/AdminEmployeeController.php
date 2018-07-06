@@ -1406,7 +1406,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         if (mb_strlen($claimNumber) > 0) {
             $qb = $qb->field('number')->equals(new MongoRegex(sprintf("/.*%s.*/i", $claimNumber)));
         }
-        if (mb_strlen($claimId) > 0) {
+        if (mb_strlen($claimId) > 0 && \MongoId::isValid($claimId)) {
             $qb = $qb->field('id')->equals(new \MongoId($claimId));
         }
         $qb = $qb->sort('replacementReceivedDate', 'desc')
