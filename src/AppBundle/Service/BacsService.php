@@ -1043,9 +1043,9 @@ class BacsService
     }
 
     /**
-     * @param Policy $policy
-     * @param $notes
-     * @param null $amount
+     * @param Policy         $policy
+     * @param string         $notes
+     * @param float|null     $amount
      * @param \DateTime|null $date
      * @return BacsPayment
      * @throws \Exception
@@ -1288,6 +1288,7 @@ class BacsService
                 );
                 $this->logger->error($msg);
 
+                $scheduledPayment->setStatus(ScheduledPayment::STATUS_CANCELLED);
                 $rescheduled = $scheduledPayment->reschedule($scheduledDate);
                 $policy->addScheduledPayment($rescheduled);
                 $this->dm->flush(null, array('w' => 'majority', 'j' => true));
@@ -1300,7 +1301,8 @@ class BacsService
             if ($policy->getPolicyExpirationDate() < $bacsPaymentForDateCalcs->getBacsReversedDate()) {
                 $msg = sprintf(
                     'Skipping payment %s as payment date is after expiration date',
-                    $scheduledPayment->getId());
+                    $scheduledPayment->getId()
+                );
                 $this->logger->error($msg);
 
                 continue;

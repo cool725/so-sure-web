@@ -886,7 +886,7 @@ class JudopayService
         return $this->mailer;
     }
 
-    public function processScheduledPaymentResult($scheduledPayment, $payment, \DateTime $date = null)
+    public function processScheduledPaymentResult(ScheduledPayment $scheduledPayment, $payment, \DateTime $date = null)
     {
         if (!$date) {
             $date = new \DateTime();
