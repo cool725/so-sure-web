@@ -540,12 +540,14 @@ class DefaultController extends BaseController
                     );
                     // @codingStandardsIgnoreEnd
 
-                    $message = \Swift_Message::newInstance()
-                        ->setSubject('Company inquiry')
-                        ->setFrom('info@so-sure.com')
-                        ->setTo('sales@so-sure.com')
-                        ->setBody($body, 'text/html');
-                    $this->get('mailer')->send($message);
+                    /** @var MailerService $mailer */
+                    $mailer = $this->get('app.mailer');
+                    $mailer->send(
+                        'Company inquiry',
+                        'sales@so-sure.com',
+                        $body
+                    );
+
                     $this->addFlash(
                         'success',
                         "Thanks. We'll be in touch shortly"

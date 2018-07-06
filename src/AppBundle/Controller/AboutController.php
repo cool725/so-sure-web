@@ -2,6 +2,7 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Service\MailerService;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -120,15 +121,19 @@ class AboutController extends BaseController
                     $intercom = $this->get('app.intercom');
                     $intercom->queueMessage($contactForm->getData()['email'], $body, Lead::SOURCE_CONTACT_US);
 
-                    $message = \Swift_Message::newInstance()
-                        ->setSubject(sprintf(
-                            'Contact Request from %s',
-                            $contactForm->getData()['name']
-                        ))
-                        ->setFrom('info@so-sure.com')
-                        ->setTo('contact-us@so-sure.com')
-                        ->setBody($body, 'text/html');
-                    $this->get('mailer')->send($message);
+                    $subject = sprintf(
+                        'Contact Request from %s',
+                        $contactForm->getData()['name']
+                    );
+
+                    /** @var MailerService $mailer */
+                    $mailer = $this->get('app.mailer');
+                    $mailer->send(
+                        $subject,
+                        'contact-us@so-sure.com',
+                        $body
+                    );
+
                     $this->addFlash(
                         'success',
                         "Thanks. We'll be in touch shortly"
