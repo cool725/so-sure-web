@@ -2,6 +2,8 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Service\MailerService;
+use Egulias\EmailValidator\Validation\RFCValidation;
 use Psr\Log\LoggerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
@@ -906,7 +908,7 @@ class ApiAuthController extends BaseController
             $facebookId = $this->getDataString($data, 'facebook_id');
             try {
                 $invitation  = null;
-                if ($email && $validator->isValid($email)) {
+                if ($email && $validator->isValid($email, new RFCValidation())) {
                     $invitation = $invitationService->inviteByEmail($policy, $email, $name, $skipSend);
                 } elseif ($mobile && $this->isValidUkMobile($mobile)) {
                     $invitation = $invitationService->inviteBySms($policy, $mobile, $name, $skipSend);
@@ -1313,12 +1315,19 @@ class ApiAuthController extends BaseController
             );
 
             $environment = $this->getParameter('kernel.environment');
-            $message = \Swift_Message::newInstance()
-                ->setSubject(sprintf('New pic-sure image to process [%s]', $environment))
-                ->setFrom('tech@so-sure.com')
-                ->setTo('pic-sure@so-sure.com')
-                ->setBody('<a href="https://wearesosure.com/admin/picsure">Admin site</a>', 'text/html');
-            $this->get('mailer')->send($message);
+            $body = '<a href="https://wearesosure.com/admin/picsure">Admin site</a>';
+
+            /** @var MailerService $mailer */
+            $mailer = $this->get('app.mailer');
+            $mailer->send(
+                sprintf('New pic-sure image to process [%s]', $environment),
+                'pic-sure@so-sure.com',
+                $body,
+                null,
+                null,
+                null,
+                'tech@so-sure.com'
+            );
 
             return new JsonResponse($policy->toApiArray());
         } catch (AccessDeniedException $ade) {

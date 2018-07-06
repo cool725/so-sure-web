@@ -26,12 +26,12 @@ swiftmailer:
     default_mailer: default
     mailers:
         default:
-            transport:  "%ses_mailer_transport%"
-            host:       "%ses_mailer_host%"
-            port:       "%ses_mailer_port%"
-            username:   "%ses_mailer_user%"
-            password:   "%ses_mailer_password%"
-            encryption: "%ses_mailer_encryption%"
+            transport:  "%sparkpost_mailer_transport%"
+            host:       "%sparkpost_mailer_host%"
+            port:       "%sparkpost_mailer_port%"
+            username:   "%sparkpost_mailer_user%"
+            password:   "%sparkpost_mailer_password%"
+            encryption: "%sparkpost_mailer_encryption%"
             spool:      { type: service, id: snc_redis.swiftmailer.spool }
 
 assetic:

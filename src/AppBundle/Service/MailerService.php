@@ -140,7 +140,8 @@ class MailerService
         if (!$from) {
             $from = [$this->defaultSenderAddress => $this->defaultSenderName];
         }
-        $message = \Swift_Message::newInstance()
+        $message = new \Swift_Message();
+        $message
             ->setSubject($subject)
             ->setFrom($from)
             ->setTo($to)
