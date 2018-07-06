@@ -33,7 +33,6 @@
 	}
 
     &__excess {
-        background-color: $lightest-blue;
 
         p.so-sure-smile {
             padding-left: 50px;
@@ -55,127 +54,10 @@
         }
     }
 
-    &__reward-pot {
-        // background-color: $off-white;
-    }
-
     &__save {
         background-color: $primary-blue;
         text-align: center;
     }
 
-	// &__save {
-	// 	.form-control {
-	// 		width: 100%;
-	// 	}
-
-	// 	.btn {
-	// 		display: block;
-	// 		min-width: 100%;
-	// 	}
-
-	// 	@include breakpoint(midtablet) {
-	// 		.form-control {
-	// 			width: 300px;
-	// 		}
-
-	// 		.btn {
-	// 			display: inline;
-	// 			min-width: 0;
-	// 		}
-	// 	}
-	// }
 }
 
-.stat-banner, .phone-details  {
-	padding: 20px 15px;
-	color: $white;
-
-	h3 {
-		color: $white;
-		margin-top: 0;
-	}
-
-	ul {
-		li {
-
-			&:before {
-			  content: '\2022';
-			  margin-right: 0.5em;
-			}
-		}
-	}
-
-	@include breakpoint(tablet) {
-		text-align: center;
-	}
-}
-
-.quote--press {
-    // text-align: center;
-    h4 {
-        text-align:center;
-        margin: 0;
-    }
-
-    .press-list {
-
-        li {
-            width: 200px; height: 100px;
-            background: transparent url('#{$cdn_url}/images/homepage/press/in_the_press_sprite_fixed_width_x2.png') no-repeat;
-            background-size: 1200px;
-
-            &:nth-child(2) {
-                background-position: -200px 0;
-            }
-
-            &:nth-child(3) {
-                background-position: -400px 0;
-            }
-
-            &:nth-child(4) {
-                background-position: -600px 0;
-            }
-
-            &:nth-child(5) {
-                background-position: -800px 0;
-            }
-
-            &:nth-child(6) {
-                background-position: -1000px 0;
-            }
-        }
-
-        &--1 {
-            text-align: center;
-
-            li {
-                &:nth-child(2) {
-                    background-position: -200px 0;
-                }
-
-                &:nth-child(3) {
-                    background-position: -400px 0;
-                }
-            }
-        }
-
-        &--2 {
-            text-align: center;
-
-            li {
-                &:nth-child(1) {
-                    background-position: -600px 0;
-                }
-
-                &:nth-child(2) {
-                    background-position: -800px 0;
-                }
-            }
-        }
-    }
-}
-
-.money-back {
-    background-color: $primary-blue;
-}

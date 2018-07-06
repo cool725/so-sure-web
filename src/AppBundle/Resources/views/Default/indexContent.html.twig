@@ -1,4 +1,4 @@
- {% extends 'base.html.twig' %}
+{% extends 'base.html.twig' %}
 
 {# Set vars #}
 {% set new_stylesheet = 1 %}
@@ -14,14 +14,14 @@
     {{ parent() }}
     {% stylesheets output='css/*.css'
     'components/animate.css/animate.min.css'
-    '@AppBundle/Resources/public/sass/page/homepage.scss'
+    '@AppBundle/Resources/public/sass/page/homepageAB.scss'
  %}<link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
 {% endblock %}
 
 {% block body %}
 
     {# Hero #}
-    <section class="homepage--hero homepage--hero-background homepage--hero-background-trustpilot">
+    <section class="homepage--hero homepage--hero-background-trustpilot">
 
         <h1 class="homepage--hero-h1">Mobile insurance <br> designed for you.</h1>
         <p class="lead">A new type of phone insurance that’s reliable, rewarding and simply better.</p>
@@ -45,8 +45,20 @@
         {# End Phone Search #}
     </section>
 
+    {# What we are #}
+    <section class="section--pad homepage--who-we-are">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-10 col-md-offset-1">
+                    <h2 class="text-blue text-center">Who we are</h2>
+                    <h3 class="h-light text-center">We're a new kind of insurer – an insurer that's focused on people, not profits. We saw an opportunity to make insurance better. So that’s what we did. We provide mobile insurance that’s simple, reasonable and hassle-free, so you can get back to worrying about the big stuff.</h3>
+                </div>
+            </div>
+        </div>
+    </section>
+
     {# Press #}
-    <section class="homepage__press homepage__press_grayscale background-white">
+    <section class="homepage__press homepage__press_grayscale">
         <div class="container-fluid">
             <div class="row">
                 <div class="col-md-12 text-center">
@@ -63,110 +75,29 @@
         </div>
     </section>
 
-    {# What we are #}
-    <section class="section--pad homepage--what-is-so-sure">
+    <section class="section--pad homepage--we-do-things-differently">
         <div class="container">
             <div class="row">
-                <div class="col-md-10 col-md-offset-1">
-                    <h2 class="text-blue text-center">Who we are</h2>
-                    <p class="big-text text-center">We’re a new kind of insurer – an insurer that’s focused on people, not profits. We saw an opportunity to make insurance better. So that’s what we did. We provide mobile insurance that’s simple, reasonable and hassle-free, so you can get back to worrying about the big stuff.</p>
+                <div class="col-md-5 col-md-offset-1">
+                    <h2 class="text-blue">We do things differently</h2>
+                    <p>We insure devices of up to three years old</p>
+                    <p>We reward you when you’re careful and look after you need to make a claim. If you don’t make a claim, we return up to 80% of your premium each year... <a class="text-nowrap" href="{{ path('faq') }}?nav=1#social-insurance-and-reward-pot"><strong>find out more</strong></a></p>
+                    <p>If you make a claim, we’ll get you back up and running with a replacement phone in 24–72 hours</p>
+                </div>
+                <div class="col-md-5 col-md-offset-1">
+                    <h2 class="text-blue">We've got you covered</h2>
+                    <ul class="list-unstyled fa-list-bullet">
+                        <li><i class="fa fa-check fa-lg text-green" aria-hidden="true"></i> Loss</li>
+                        <li><i class="fa fa-check fa-lg text-green" aria-hidden="true"></i> Theft</li>
+                        <li><i class="fa fa-check fa-lg text-green" aria-hidden="true"></i> Accidental damage</li>
+                        <li><i class="fa fa-check fa-lg text-green" aria-hidden="true"></i> Out-of-warranty breakdowns</li>
+                        <li><i class="fa fa-check fa-lg text-green" aria-hidden="true"></i> Internation travel</li>
+                        <li><i class="fa fa-check fa-lg text-green" aria-hidden="true"></i> Up to 80% cashback every year</li>
+                    </ul>
                 </div>
             </div>
         </div>
     </section>
-
-    <div class="curved-background curved-background__bg-blue hidden-xs">
-        <svg preserveAspectRatio="xMinYMin meet" viewBox="0 0 2000 200" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-            <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-                <g id="Artboard" fill="#ffffff">
-                    <path d="M0,0 L2000,0 L2000,139.921588 C1890.08746,181.703317 1753.08746,201.692115 1589,199.887983 C1424.91254,198.083852 1258.91254,174.763587 1091,129.927189 C918.666667,89.9495926 740,69.9607942 555,69.9607942 C370,69.9607942 185,113.269857 0,199.887983 L0,0 Z" id="Rectangle" transform="translate(1000.000000, 100.000000) scale(-1, 1) translate(-1000.000000, -100.000000) "></path>
-                </g>
-            </g>
-        </svg>
-    </div>
-
-    {# Why we're better than the rest #}
-    <section class="section--pad homepage--why-we-are-better">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-7 col-md-push-5">
-                    <h2 class="text-blue" style="margin-bottom: 20px;">We do things differently</h2>
-                    <p>We insure devices of up to three years old.</p>
-                    <p>We reward you when you’re careful and look after you need to make a claim. If you don’t make a claim, we return up to 80% of your premium each year... <a href="{{ path('faq') }}?nav=1#social-insurance-and-reward-pot"><strong>find out more</strong></a>. </p>
-                    <p>If you make a claim, we’ll get you back up and running with a replacement phone in 24–72 hours.</p>
-                </div>
-                <div class="col-md-5 col-md-pull-7">
-                    <div class="img-container">
-                        <img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" data-src="{{ cdn_url }}/images/homepage/so-sure_balloon_better.svg"
-                             class="img-responsive img-responsive--center so-sure_homepage-balloon lozad" alt="We lift you up when something bad happens">
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <div class="curved-background hidden-xs">
-        <svg preserveAspectRatio="xMinYMin meet" viewBox="0 0 2000 200" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-            <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-                <g id="Artboard" fill="#d6ebff">
-                    <path d="M0,0 L2000,0 L2000,139.921588 C1890.08746,181.703317 1753.08746,201.692115 1589,199.887983 C1424.91254,198.083852 1258.91254,174.763587 1091,129.927189 C918.666667,89.9495926 740,69.9607942 555,69.9607942 C370,69.9607942 185,113.269857 0,199.887983 L0,0 Z" id="Rectangle" transform="translate(1000.000000, 100.000000) scale(-1, 1) translate(-1000.000000, -100.000000) "></path>
-                </g>
-            </g>
-        </svg>
-    </div>
-
-    {# Cover Details #}
-    <section class="section--pad homepage--cover-details">
-        <div class="container">
-            <h2 class="text-blue">We've got you covered</h2>
-            <div class="row">
-                <div class="col-md-10 col-md-offset-1">
-                    <div class="row">
-                        <div class="col-sm-6 col-md-4">
-                            <div class="cover-img lozad theft"
-                                 data-background-image="{{ cdn_url }}/images/homepage/whats_covered_sprite_2x.png"></div>
-                            <h4>Theft <br><small class="hidden-xs">&nbsp;</small></h4>
-                        </div>
-                         <div class="col-sm-6 col-md-4">
-                            <div class="cover-img lozad loss"
-                                 data-background-image="{{ cdn_url }}/images/homepage/whats_covered_sprite_2x.png"></div>
-                            <h4>Loss <br><small class="hidden-xs">&nbsp;</small></h4>
-                        </div>
-                      <div class="col-sm-6 col-md-4">
-                            <div class="cover-img lozad accidental-damage"
-                                 data-background-image="{{ cdn_url }}/images/homepage/whats_covered_sprite_2x.png"></div>
-                            <h4>Accidental Damage <br><small>Including cracked screen &amp; water damage </small></h4>
-                        </div>
-                        <div class="col-sm-6 col-md-4">
-                            <div class="cover-img lozad breakdown"
-                                 data-background-image="{{ cdn_url }}/images/homepage/whats_covered_sprite_2x.png"></div>
-                            <h4>Out of Warranty Breakdown <br><small class="hidden-xs">&nbsp;</small></h4>
-                        </div>
-                       <div class="col-sm-6 col-md-4">
-                            <div class="cover-img lozad charges"
-                                 data-background-image="{{ cdn_url }}/images/homepage/whats_covered_sprite_2x.png"></div>
-                            <h4>Unauthorised Network Charges <br><small >Up to the value of £1000 inc. VAT</small></h4>
-                        </div>
-                          <div class="col-sm-6 col-md-4">
-                            <div class="cover-img lozad accessories"
-                                 data-background-image="{{ cdn_url }}/images/homepage/whats_covered_sprite_2x.png"></div>
-                            <h4>Accessories <br><small>Up to the value of £100 inc. VAT for theft or loss claims</small></h4>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <div class="curved-background curved-background__off-white hidden-xs">
-        <svg preserveAspectRatio="xMinYMin meet" viewBox="0 0 2000 200" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-            <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-                <g id="Artboard" fill="#ffffff">
-                    <path d="M0,0 L2000,0 L2000,139.921588 C1890.08746,181.703317 1753.08746,201.692115 1589,199.887983 C1424.91254,198.083852 1258.91254,174.763587 1091,129.927189 C918.666667,89.9495926 740,69.9607942 555,69.9607942 C370,69.9607942 185,113.269857 0,199.887983 L0,0 Z" id="Rectangle" transform="translate(1000.000000, 100.000000) scale(-1, 1) translate(-1000.000000, -100.000000) "></path>
-                </g>
-            </g>
-        </svg>
-    </div>
 
     <section class="section--pad background-off-white">
         <div class="container">
@@ -197,20 +128,10 @@
         </div>
     </section>
 
-    <div class="curved-background hidden-xs">
-        <svg preserveAspectRatio="xMinYMin meet" viewBox="0 0 2000 200" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-            <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-                <g id="Artboard" fill="#F6F7FB">
-                    <path d="M0,0 L2000,0 L2000,139.921588 C1890.08746,181.703317 1753.08746,201.692115 1589,199.887983 C1424.91254,198.083852 1258.91254,174.763587 1091,129.927189 C918.666667,89.9495926 740,69.9607942 555,69.9607942 C370,69.9607942 185,113.269857 0,199.887983 L0,0 Z" id="Rectangle" transform="translate(1000.000000, 100.000000) scale(-1, 1) translate(-1000.000000, -100.000000) "></path>
-                </g>
-            </g>
-        </svg>
-    </div>
-
     {# Claims procss #}
     <section class="section--pad homepage--claims-process">
         <div class="container">
-            <h2 class="h1 text-blue">Our hassle-free claims process...</h2>
+            <h2 class="text-blue">Our hassle-free claims process...</h2>
             <p class="lead">When something bad happens to your phone:</p>
             <div class="row">
                 <div class="col-md-4">
@@ -232,24 +153,13 @@
         </div>
     </section>
 
-    <div class="curved-background curved-background__bg-blue hidden-xs">
-        <svg preserveAspectRatio="xMinYMin meet" viewBox="0 0 2000 200" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-            <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-                <g id="Artboard" fill="#ffffff">
-                    <path d="M0,0 L2000,0 L2000,139.921588 C1890.08746,181.703317 1753.08746,201.692115 1589,199.887983 C1424.91254,198.083852 1258.91254,174.763587 1091,129.927189 C918.666667,89.9495926 740,69.9607942 555,69.9607942 C370,69.9607942 185,113.269857 0,199.887983 L0,0 Z" id="Rectangle" transform="translate(1000.000000, 100.000000) scale(-1, 1) translate(-1000.000000, -100.000000) "></path>
-                </g>
-            </g>
-        </svg>
-    </div>
-
     {# How do the reward pot work? #}
-    <section id="reward-pot" class="section--pad homepage--how-does-the-reward-pot-work background-off-white">
+    <section id="reward-pot" class="section--pad homepage--how-does-the-reward-pot-work">
         <div class="container">
             <div class="row">
                 <div class="col-md-8 col-md-offset-2 text-center">
                     <h2 class="text-blue">Money Back when you dont claim</h2>
-                    <p>You can get up to 80% of your premium back at the end of your policy year when you and your friends don’t claim. Why? Our model has been built on sharing the margins with our users... <a href="{{ path('faq') }}#social-insurance-and-reward-pot" class="text-blue"><strong>find out more</strong></a></p>
-                    <br>
+                    <p class="lead">You can get up to 80% of your premium back at the end of your policy year when you and your friends don’t claim. Why? Our model has been built on sharing the margins with our users... <a href="{{ path('faq') }}#social-insurance-and-reward-pot" class="text-blue"><strong>find out more</strong></a></p>
                     <div class="video-container">
                         <iframe id="exp-vid" src="https://player.vimeo.com/video/185840373??api=1&player_id=vimeoplayer&title=0&byline=0&portrait=0" width="800" height="450"  frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
                     </div>
@@ -259,10 +169,10 @@
     </section>
 
     {# Comparison #}
-    <section class="section--pad homepage--we-compare-well background-off-white">
+    <section class="section--pad homepage--we-compare-well">
         <div class="container">
             <h2 class="text-center text-blue">What makes so-sure better than the rest?</h2>
-            <p class="lead text-center">Our customers love us – that’s why more than 20,000 have joined the so-sure family. <br class="hidden-xs"> But what makes so-sure better than the rest?.</p>
+            <p class="lead text-center">Our customers love us – that’s why more than 20,000 have joined the so-sure family. <br class="hidden-xs"> But what makes so-sure better than the rest?</p>
             <table class="table hidden-xs">
                 <thead>
                     <tr>
@@ -353,12 +263,53 @@
         </div>
     </section>
 
-    {% include 'AppBundle::Default/_sectionFeedback.html.twig' %}
+    {# Quotes #}
+    <section class="section--pad homepage--feedback" id="customer-feedback">
+        <div class="container">
+            <h2 class="text-blue">Our Customers Love Us</h2>
+            <div class="row">
+                <div class="col-md-4">
+                    <img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" data-src="{{ cdn_url }}/images/feedback/so-sure_feedback_honor_b.png"
+                         alt="Honor B"
+                         width="120px" class="lozad">
+                    <blockquote>
+                        <p>"Your terms and conditions are so clear and concise it makes the customer feel like you actually care about them"</p>
+                        <footer>
+                            Honor B.
+                        </footer>
+                    </blockquote>
+                </div>
+                <div class="col-md-4">
+                    <img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" data-src="{{ cdn_url }}/images/feedback/so-sure_feedback_herve_n.png"
+                         alt="Herve N"
+                         width="120px" class="lozad">
+                    <blockquote>
+                        <p>"My so-sure claim was super fast and everyone was really friendly! Based on previous phone insurance experiences, I can honestly say this truly is a revolution"</p>
+                        <footer>
+                            Herve N.
+                        </footer>
+                    </blockquote>
+                </div>
+                <div class="col-md-4">
+                    <img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" data-src="{{ cdn_url }}/images/feedback/so-sure_feedback_ted_e.png"
+                         alt="Ted E"
+                         width="120px" class="lozad">
+                    <blockquote>
+                        <p>"After the 1st year, I got 71% money back. I used it to spruce up my new apartment. Never imagined my phone insurance would pay my IKEA bill!"</p>
+                        <footer>
+                            Ted E.
+                        </footer>
+                    </blockquote>
+                </div>
+            </div>
+        </div>
+    </section>
+
 
     {# Instant Quote #}
     <section class="homepage--instant-quote">
         <div class="container">
-            <h2 class="text-center h1">Get your instant quote</h2>
+            <h2 class="text-center text-blue">Get your instant quote</h2>
             {# Phone Search #}
             {% if phone is defined and phone %}
                 {{ render(controller('AppBundle:Default:selectPhoneMakeSearch', {
@@ -371,8 +322,6 @@
                 })) }}
             {% endif %}
             {# End Phone Search #}
-            <img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" data-src="{{ cdn_url }}/images/homepage/so-sure_form_rocket.svg"
-                 class="img-responsive form-rocket lozad" alt="so-sure - rocket">
         </div>
     </section>
 
