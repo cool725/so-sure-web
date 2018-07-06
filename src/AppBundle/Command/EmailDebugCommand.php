@@ -235,21 +235,21 @@ class EmailDebugCommand extends BaseCommand
 
             return $policyService->resendPolicyEmail($policy);
         } elseif (in_array($template, $templates['policyFailedPayment'])) {
-                $dm = $this->getManager();
-                /** @var PolicyRepository $repo */
-                $repo = $dm->getRepository(Policy::class);
-                $policies = $repo->findBy(['status' => Policy::STATUS_ACTIVE]);
-                $policy = null;
-                foreach ($policies as $policy) {
-                    break;
-                }
-                if (!$policy) {
-                    throw new \Exception('Unable to find matching policy');
-                }
-                /** @var JudopayService $judopayService */
-                $judopayService = $this->getContainer()->get('app.judopay');
+            $dm = $this->getManager();
+            /** @var PolicyRepository $repo */
+            $repo = $dm->getRepository(Policy::class);
+            $policies = $repo->findBy(['status' => Policy::STATUS_ACTIVE]);
+            $policy = null;
+            foreach ($policies as $policy) {
+                break;
+            }
+            if (!$policy) {
+                throw new \Exception('Unable to find matching policy');
+            }
+            /** @var JudopayService $judopayService */
+            $judopayService = $this->getContainer()->get('app.judopay');
 
-                return $judopayService->failedPaymentEmail($policy);
+            return $judopayService->failedPaymentEmail($policy);
         } elseif (in_array($template, $templates['policyCancellation'])) {
             $dm = $this->getManager();
             /** @var PolicyRepository $repo */
