@@ -506,6 +506,12 @@ class PhoneInsuranceController extends BaseController
             ['no-money-back-guarantee', 'money-back-guarantee']
         );
 
+        $expContent = $this->getSessionSixpackTest(
+            $request,
+            SixpackService::EXPERIMENT_AB_NEW_CONTENT,
+            ['old-content-no-nav', 'new-content-with-nav']
+        );
+
         $data = array(
             'phone'            => $phone,
             'phone_price'      => $phone->getCurrentPhonePrice(),
@@ -531,12 +537,17 @@ class PhoneInsuranceController extends BaseController
             'slider_test'     => 'slide-me',
             'moneyBackGuarantee' => $moneyBackGuarantee,
             'replacement'     => $replacement,
+            'ab_content'  => $expContent,
         );
 
         // Adwords landingpage test
         if (in_array($request->get('_route'), ['insurance_make_model_memory'])) {
             return $this->render('AppBundle:PhoneInsurance:adlanding.html.twig', $data);
+        } elseif ($expContent == 'new-content-with-nav') {
+            // If A/B content test
+            return $this->render('AppBundle:PhoneInsurance:quoteContent.html.twig', $data);
         } else {
+            // Default
             return $this->render('AppBundle:PhoneInsurance:quote.html.twig', $data);
         }
     }
