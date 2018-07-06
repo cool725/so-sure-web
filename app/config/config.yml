@@ -68,6 +68,7 @@ twig:
         branch_card_url: "%branch_card_url%"
         branch_payment_details_url: "https://sosure.app.link/payment-details"
         branch_billing_date_url: "https://sosure.app.link/billing-date"
+        contact_us_url: "https://wearesosure.com/about/social-insurance/how-to-contact-so-sure"
         expected_claim_frequency: "0.2"
         consumer_payout: "17.2"
         ipt_rebate: "1.5"

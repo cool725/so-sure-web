@@ -14,13 +14,9 @@
                 <br><br>
                 Your policy will be cancelled in {{ policy.policyExpirationDateDays }} days if you fail to make payment.
 				<br><br>
-				To avoid cancellation, simply <a href="{{ branch_pot_url }}">open the app</a> and follow the steps on screen.
+				To avoid cancellation, simply <a href="{{ branch_pot_url }}">open our app</a> and follow the steps on screen, alternatively talk to us <a href="{{ contact_us_url }}">here</a> between 9am-5.30pm Monday to Friday.
 				<br><br>
-				You received a replacement phone on {{ policy.getApprovedClaims(true, true)[0].replacementReceivedDate|date }}.
-				<br><br>
-				As per so-sure terms & conditions, you are liable for the remainder of the policy year.
-				<br><br>
-				Should you fail to update your details and your policy is then cancelled, you will be billed for the remainder of your policy premium of £{{ policy.getRemainderOfPolicyPrice|number_format(2, '.', ',') }}.
+				As you have had an approved claim, and received a replacement phone on {{ policy.getApprovedClaims(true, true)[0].replacementReceivedDate|date }}, as per the so-sure terms and conditions you are liable for the remainder of the policy year.  Should you fail to make payments on your policy, it will be cancelled and you will be billed for the remainder of your policy premium of £{{ policy.getRemainderOfPolicyPrice|number_format(2, '.', ',') }}.  In the unfortunate case that you should you fail to make this payment, we will take legal action.
 				<br><br>
 			    If you have any questions, please don't hesitate to <a href="mailto:support@wearesosure.com?subject=I%20have%20a%20question" target="_blank"><span style="color:#3399ff">contact us</span></a>.
 		</div>
