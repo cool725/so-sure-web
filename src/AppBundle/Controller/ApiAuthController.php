@@ -3,6 +3,7 @@
 namespace AppBundle\Controller;
 
 use AppBundle\Service\MailerService;
+use Egulias\EmailValidator\Validation\RFCValidation;
 use Psr\Log\LoggerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
@@ -907,7 +908,7 @@ class ApiAuthController extends BaseController
             $facebookId = $this->getDataString($data, 'facebook_id');
             try {
                 $invitation  = null;
-                if ($email && $validator->isValid($email)) {
+                if ($email && $validator->isValid($email, new RFCValidation())) {
                     $invitation = $invitationService->inviteByEmail($policy, $email, $name, $skipSend);
                 } elseif ($mobile && $this->isValidUkMobile($mobile)) {
                     $invitation = $invitationService->inviteBySms($policy, $mobile, $name, $skipSend);
