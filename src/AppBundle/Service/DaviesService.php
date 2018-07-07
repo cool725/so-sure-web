@@ -621,7 +621,8 @@ class DaviesService extends S3EmailService
             $this->errors[$daviesClaim->claimNumber][] = $msg;
         }
 
-        if ($daviesClaim->isOpen() && $daviesClaim->replacementImei == $claim->getPhonePolicy()->getImei() && (
+        if ($daviesClaim->isOpen() && $claim->getPhonePolicy() &&
+            $daviesClaim->replacementImei == $claim->getPhonePolicy()->getImei() && (
             !$daviesClaim->replacementMake || !$daviesClaim->replacementModel)) {
             // @codingStandardsIgnoreStart
             $msg = sprintf(
