@@ -26,23 +26,24 @@ class SearchService
         $this->dm = $dm;
     }
 
-    public function validatePostcode($postcode)
+    public function validatePostcode($code)
     {
-        $postcode = $this->normalizePostcode($postcode);
-        if ($postcode == "BX11LT") {
+        $code = $this->normalizePostcode($code);
+        if ($code == "BX11LT") {
             return true;
-        } elseif ($postcode == "ZZ993CZ") {
+        } elseif ($code == "ZZ993CZ") {
             return false;
         }
 
         /** @var PostCodeRepository $postcodeRepo */
         $postcodeRepo = $this->dm->getRepository(PostCode::class);
 
-        if ($postcodeRepo->findOneBy(['Postcode' => $postcode]) !== null) {
-            return true;
+        $postcode = $postcodeRepo->findOneBy(['Postcode' => $code]);
+        if (!$postcode) {
+            return false;
         }
 
-        return false;
+        return true;
     }
 
     public function getPostcode($code)
