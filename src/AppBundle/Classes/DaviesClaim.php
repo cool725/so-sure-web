@@ -505,7 +505,12 @@ class DaviesClaim extends DaviesExcel
                 throw new \Exception(sprintf('Invalid replacement imei %s', $this->replacementImei));
             }
         } catch (\Exception $e) {
-            throw new \Exception(sprintf('<b>%s</b> Data Imported: <small>%s</small> Excel Record: <small>%s</small>', $e->getMessage(), json_encode($this), json_encode($data)));
+            throw new \Exception(sprintf(
+                '<b>%s</b> Data Imported: <small>%s</small> Excel Record: <small>%s</small>',
+                $e->getMessage(),
+                json_encode($this),
+                json_encode($data)
+            ));
         }
 
         return true;

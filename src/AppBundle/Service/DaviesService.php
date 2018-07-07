@@ -623,10 +623,12 @@ class DaviesService extends S3EmailService
 
         if ($daviesClaim->isOpen() && $daviesClaim->replacementImei == $claim->getPhonePolicy()->getImei() && (
             !$daviesClaim->replacementMake || !$daviesClaim->replacementModel)) {
+            // @codingStandardsIgnoreStart
             $msg = sprintf(
                 'Claim %s has a replacement imei that matches the policy but is missing a replacement make and/or model. This is likely to be a data entry mistake.',
                 $daviesClaim->claimNumber
             );
+            // @codingStandardsIgnoreEnd
             $this->errors[$daviesClaim->claimNumber][] = $msg;
         }
 
