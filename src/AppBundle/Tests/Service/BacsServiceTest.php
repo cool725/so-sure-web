@@ -7,6 +7,7 @@ use AppBundle\Document\BankAccount;
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\Policy;
 use AppBundle\Document\User;
+use AppBundle\Service\PaymentService;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
@@ -26,6 +27,8 @@ class BacsServiceTest extends WebTestCase
     protected static $xmlFile;
     protected static $bacsService;
     protected static $policyService;
+
+    /** @var PaymentService */
     protected static $paymentService;
 
     public static function setUpBeforeClass()
@@ -49,11 +52,15 @@ class BacsServiceTest extends WebTestCase
         self::$bacsService = self::$container->get('app.bacs');
         self::$userManager = self::$container->get('fos_user.user_manager');
         self::$policyService = self::$container->get('app.policy');
-        self::$paymentService = self::$container->get('app.payment');
+
+        /** @var PaymentService $paymentService */
+        $paymentService = self::$container->get('app.payment');
+        self::$paymentService = $paymentService;
     }
 
     public function tearDown()
     {
+        self::$dm->clear();
     }
 
     public function testBacsXml()
@@ -152,8 +159,6 @@ class BacsServiceTest extends WebTestCase
 
         $bacs = $this->setValidBacsPaymentMethod($policy->getUser(), null, $now);
         self::$paymentService->confirmBacs($policy, $bacs);
-        static::$dm->persist($policy);
-        static::$dm->persist($policy->getUser());
         static::$dm->flush();
 
         $oneMonth = clone $now;
@@ -213,8 +218,6 @@ class BacsServiceTest extends WebTestCase
 
         $bacs = $this->setValidBacsPaymentMethod($policy->getUser(), null, $now);
         self::$paymentService->confirmBacs($policy, $bacs);
-        static::$dm->persist($policy);
-        static::$dm->persist($policy->getUser());
         static::$dm->flush();
 
         $expire = clone $policy->getPolicyExpirationDate();

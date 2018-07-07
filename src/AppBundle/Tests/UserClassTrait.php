@@ -111,7 +111,7 @@ trait UserClassTrait
             $user->setBirthday(new \DateTime('1980-01-01'));
         }
 
-        $userManager->updateUser($user, true);
+        $userManager->updateUser($user);
         if ($dm) {
             $dm->persist($user);
         }
