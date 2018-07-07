@@ -621,13 +621,16 @@ class DaviesService extends S3EmailService
             $this->errors[$daviesClaim->claimNumber][] = $msg;
         }
 
-        if (!$claim->getReplacementPhone() && $daviesClaim->replacementMake && $daviesClaim->replacementModel &&
-            $daviesClaim->getClaimStatus() == Claim::STATUS_SETTLED) {
+        if ($daviesClaim->isOpen() && $claim->getPhonePolicy() && $daviesClaim->replacementImei &&
+            $daviesClaim->replacementImei == $claim->getPhonePolicy()->getImei() && (
+            !$daviesClaim->replacementMake || !$daviesClaim->replacementModel)) {
+            // @codingStandardsIgnoreStart
             $msg = sprintf(
-                'Claim %s is settled without a replacement phone being set. SO-SURE to set replacement phone.',
+                'Claim %s has a replacement imei that matches the policy but is missing a replacement make and/or model. This is likely to be a data entry mistake.',
                 $daviesClaim->claimNumber
             );
-            $this->sosureActions[$daviesClaim->claimNumber][] = $msg;
+            // @codingStandardsIgnoreEnd
+            $this->errors[$daviesClaim->claimNumber][] = $msg;
         }
 
         $threeMonthsAgo = new \DateTime();
@@ -678,6 +681,16 @@ class DaviesService extends S3EmailService
                 $claim->getReplacementReceivedDate()->format(\DateTime::ATOM)
             );
             $this->warnings[$daviesClaim->claimNumber][] = $msg;
+        }
+
+        // Should be in post validate in case the record fails import
+        if (!$claim->getReplacementPhone() && $claim->getReplacementPhoneDetails() &&
+            $claim->getStatus() == Claim::STATUS_SETTLED) {
+            $msg = sprintf(
+                'Claim %s is settled without a replacement phone being set. SO-SURE to set replacement phone.',
+                $daviesClaim->claimNumber
+            );
+            $this->sosureActions[$daviesClaim->claimNumber][] = $msg;
         }
     }
 
