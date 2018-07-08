@@ -1435,10 +1435,13 @@ class JudopayService
                         $failed += $line['Net'];
                         $numFailed++;
 
+                        // @codingStandardsIgnoreStart
                         $body = sprintf(
                             'Our csv export for last month included a blank transaction result for receipt %s. Please confirm the transaction was, in fact, a failure.',
                             $line['ReceiptId']
                         );
+                        // @codingStandardsIgnoreEnd
+                        
                         $this->mailer->send(
                             sprintf('Missing Transaction Result for Receipt %s', $line['ReceiptId']),
                             'developersupport@judopayments.com',
