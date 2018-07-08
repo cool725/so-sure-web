@@ -1431,6 +1431,26 @@ class JudopayService
                     } elseif ($line['TransactionResult'] == "Failed") {
                         $failed += $line['Net'];
                         $numFailed++;
+                    } elseif (mb_strlen(trim($line['TransactionResult'])) == 0) {
+                        $failed += $line['Net'];
+                        $numFailed++;
+
+                        // @codingStandardsIgnoreStart
+                        $body = sprintf(
+                            'Our csv export for last month included a blank transaction result for receipt %s. Please confirm the transaction was, in fact, a failure.',
+                            $line['ReceiptId']
+                        );
+                        // @codingStandardsIgnoreEnd
+                        
+                        $this->mailer->send(
+                            sprintf('Missing Transaction Result for Receipt %s', $line['ReceiptId']),
+                            'developersupport@judopayments.com',
+                            $body,
+                            null,
+                            null,
+                            'tech@so-sure.com',
+                            'tech@so-sure.com'
+                        );
                     } else {
                         throw new \Exception(sprintf('Unknown Transaction Result: %s', $line['TransactionResult']));
                     }
