@@ -603,6 +603,13 @@ class OpsController extends BaseController
         try {
             $postcode = new Postcode($data['postcode']);
 
+            if (!$this->get('census.search')->validatePostcode($data['postcode'])) {
+                $this->get('app.logger')->error(sprintf(
+                    'Postcode %s was found in PCA but missing from local db',
+                    $data['postcode']
+                ));
+            }
+
             return new JsonResponse(['postcode' => $postcode->normalise()]);
         } catch (\Exception $e) {
             $this->get('logger')->info(sprintf('Invalid postcode %s', json_encode($data)), ['exception' => $e]);
