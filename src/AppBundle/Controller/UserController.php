@@ -450,7 +450,6 @@ class UserController extends BaseController
         $this->addRepurchaseExpiredPolicyFlash();
         $this->addUnInitPolicyInsureFlash();
 
-
         $sixpack = $this->get('app.sixpack');
         $shareExperimentText = $sixpack->getText(
             SixpackService::EXPIRED_EXPERIMENT_SHARE_MESSAGE,
@@ -467,6 +466,7 @@ class UserController extends BaseController
             'scode' => $scode,
             'unconnected_user_policy_form' => $unconnectedUserPolicyForm->createView(),
             'share_experiment_text' => $shareExperimentText,
+            'friends' => $this->getFacebookFriends($request, $policy),
         );
     }
 
@@ -1414,8 +1414,8 @@ class UserController extends BaseController
         $facebook->init($this->getUser());
         if ($redirect = $this->ensureFacebookPermission(
             $facebook,
-            'publish_actions',
-            ['user_friends', 'email', 'publish_actions']
+            'user_friends',
+            ['user_friends', 'email']
         )) {
             return $redirect;
         }
@@ -1467,6 +1467,99 @@ class UserController extends BaseController
         $fb->post(sprintf('/me/%s:trust', $fbNamespace), [ 'profile' => $id ]);
 
         return new RedirectResponse($this->generateUrl('user_home'));
+    }
+
+    /**
+     * @Route("/invite/{policyId}/{facebookId}", name="user_invite")
+     * @Template
+     */
+    public function inviteAction(Request $request, $policyId, $facebookId)
+    {
+        $user = $this->getUser();
+        $dm = $this->getManager();
+        $policyRepo = $dm->getRepository(Policy::class);
+        $policy = $policyRepo->find($policyId);
+
+        if (!$policy) {
+            throw $this->createNotFoundException('Policy not found');
+        }
+
+        $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
+
+        $invitationService = $this->get('app.invitation');
+        // avoid sending email/sms invitations if testing
+        if ($this->getRequestBool($request, 'debug')) {
+            $invitationService->setDebug(true);
+        }
+
+        try {
+            $invitation = $invitationService->inviteByFacebookId($policy, $facebookId);
+            $this->addFlash(
+                'success',
+                sprintf('%s was invited', $invitation->getEmail())
+            );
+        } catch (SelfInviteException $e) {
+            $this->addFlash('error', 'Sorry, you are not able to invite yourself');
+        } catch (\Exception $e) {
+            $msg = sprintf('Sorry, there was an error inviting your friend');
+            $this->get('logger')->error($msg, ['exception' => $e]);
+            $this->addFlash('error', $msg);
+        }
+
+        return new RedirectResponse($this->generateUrl('user_policy', ['policyId' => $policy->getId()]));
+    }
+
+    private function getFacebookFriends($request, $policy)
+    {
+        $user = $this->getUser();
+        if ($user->getFacebookId() === null) {
+            return null;
+        }
+
+        $friends = null;
+        $facebook = $this->get('app.facebook');
+        $facebook->init($user);
+        if ($this->ensureFacebookPermission(
+            $facebook,
+            'user_friends',
+            ['user_friends', 'email']
+        ) == null) {
+            $session = $request->getSession();
+            if ($session) {
+                if (!$friends = $session->get('friends')) {
+                    $friends = array();
+                    $facebookFriends = $facebook->getAllFriends();
+                    foreach ($facebookFriends as $friend) {
+                        $isInvited = false;
+                        $isConnected = false;
+                        foreach ($policy->getSentInvitations() as $invitation) {
+                            if ($invitation->getChannel() == 'facebook' &&
+                                $friend['id'] == $invitation->getFacebookId()) {
+                                $isInvited = true;
+                                break;
+                            }
+                        }
+                        foreach ($policy->getUser()->getUnprocessedReceivedInvitations() as $invitation) {
+                            if ($invitation->getInviter()->getFacebookId() == $friend['id']) {
+                                $isInvited = true;
+                                break;
+                            }
+                        }
+                        foreach ($policy->getConnections() as $connection) {
+                            if ($connection->getLinkedUser()->getFacebookId() == $friend['id']) {
+                                $isConnected = true;
+                                break;
+                            }
+                        }
+                        if (!$isInvited && !$isConnected) {
+                            $friends[] = $friend;
+                        }
+                    }
+                    $session->set('friends', $friends);
+                }
+            }
+        }
+        return $friends;
     }
 
     /**

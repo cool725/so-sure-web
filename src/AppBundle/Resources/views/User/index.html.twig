@@ -207,6 +207,23 @@
                             <p class="text-center"><a id="add-connect" href="#" class="btn btn-blue btn-pad " data-toggle="modal" data-target="#inviteModal"><i class="fa fa-plus" aria-hidden="true"></i> Add connection</a></p>
                         </div>
                     {% endif %} #}
+
+                    {% if friends %}
+                        <div class="user-homepage--section">
+                            <h3 class="text-grey-blue">Here are the friends you can invite:</h3>
+                            <ul class="list-inline">
+                                {% for friend in friends %}
+                                    <li>
+                                        <div class="trust">
+                                        <p>{{ friend['name'] }} <a href="https://www.facebook.com/search/people/?q={{ friend['name'] }}" target="_blank"><span class="fa fa-search"></span></a></p>
+                                        <p><img class="trust-photo" src="{{ friend['picture']['url']|replace({'http:': 'https:' }) }}" /></p>
+                                        <p><a href="{{ path('user_invite', {policyId: policy.id, facebookId: friend['id']}) }}" class="btn btn-success">Invite this friend</a></p>
+                                        </div>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
                 </div>
                 <div class="col-sm-5 col-md-4">
                     {% if policy.canInvite %}

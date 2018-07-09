@@ -159,7 +159,7 @@
                             </div>
                             {# Social Logins #}
                             <div class="form-group text-center">
-                                <a href="#"
+                                <a href="{{ path('hwi_oauth_service_redirect', {'service': 'facebook' }) }}"
                                    formnovalidate="formnovalidate"
                                    class="btn btn-facebook btn-facebook-login facebook_login"
                                    {% if app.user %}disabled{% endif %}>

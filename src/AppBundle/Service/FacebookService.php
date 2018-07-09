@@ -73,7 +73,7 @@ class FacebookService
         $this->fb = new Facebook([
           'app_id' => $this->appId,
           'app_secret' => $this->secret,
-          'default_graph_version' => 'v2.12',
+          'default_graph_version' => 'v3.0',
           'default_access_token' => $token,
         ]);
 
@@ -124,7 +124,7 @@ class FacebookService
     public function getAllFriends($pictureSize = 150)
     {
         $response = $this->fb->get(sprintf(
-            '/me/taggable_friends?fields=id,name,picture.width(%d).height(%d)',
+            '/me/friends?fields=id,name,picture.width(%d).height(%d)',
             $pictureSize,
             $pictureSize
         ));
