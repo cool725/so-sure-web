@@ -387,7 +387,7 @@ class ValidatePolicyCommand extends BaseCommand
         );
     }
 
-    private function failureCommissionMessage($policy, $prefix, $date)
+    private function failureCommissionMessage(Policy $policy, $prefix, $date)
     {
         return sprintf(
             'Unexpected commission for policy %s (Paid: %0.2f Expected: %0.2f)',
