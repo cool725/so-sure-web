@@ -2282,9 +2282,13 @@ abstract class Policy
         return $this->toTwoDp($brokerCommission);
     }
 
-    public function getOutstandingPremium()
+    public function getOutstandingPremium($useAdjustedPremium = false)
     {
-        return $this->toTwoDp($this->getPremium()->getYearlyPremiumPrice() - $this->getPremiumPaid());
+        if ($useAdjustedPremium) {
+            return $this->toTwoDp($this->getPremium()->getAdjustedYearlyPremiumPrice() - $this->getPremiumPaid());
+        } else {
+            return $this->toTwoDp($this->getPremium()->getYearlyPremiumPrice() - $this->getPremiumPaid());
+        }
     }
 
     public function isInitialPayment(\DateTime $date = null)
@@ -3942,10 +3946,10 @@ abstract class Policy
         // generally would expect the outstanding premium to match the scheduled payments
         // however, if unpaid and past the point where rescheduled payments are taken, then would
         // expect the scheduled payments to be missing 1 monthly premium
-        if ($this->areEqualToTwoDp($this->getOutstandingPremium(), $totalScheduledPayments)) {
+        if ($this->areEqualToTwoDp($this->getOutstandingPremium(true), $totalScheduledPayments)) {
             return true;
         } elseif ($this->isUnpaidCloseToExpirationDate($date) && $this->areEqualToTwoDp(
-            $this->getOutstandingPremium(),
+            $this->getOutstandingPremium(true),
             $totalScheduledPayments + $this->getPremium()->getMonthlyPremiumPrice()
         )) {
             return true;
