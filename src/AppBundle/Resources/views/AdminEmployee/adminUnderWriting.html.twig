@@ -1,0 +1,43 @@
+{% extends 'admin_claims_base.html.twig' %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {% javascripts
+        '@AppBundle/Resources/public/js/Admin/month.js'
+    %}
+    <script src="{{ asset_url }}"></script>
+    {% endjavascripts %}
+{% endblock %}
+
+    {% block body %}
+    <div class="container">
+<div class="row">
+    <div class="col-md-8">
+        <h1>Underwriting Report for {{ data.start|date('M Y', 'Europe/London') }}</h1>
+    </div>
+    <form class="month-form form-inline" method="POST" autocomplete="off">
+    <div class="col-md-4">
+        <div class="form-group" style="padding-top: 15px;">
+            <div class="input-group date month" data-url="{{ path('admin_underwriting_date') }}">
+                <input name="pl" type='text' class="form-control" value="{{data.month}}-{{data.year}}" />
+                <span class="input-group-addon">
+                    <span class="fa fa-calendar"></span>
+                </span>
+            </div>
+            <div class="input-group">
+                <div class="input-group-btn">
+                    <button class="btn btn-success"><i class="fa fa-arrow-right"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+    </form>
+</div>
+
+<div class="container">
+    <h4>Web only data</h4>
+    <p>Policies: {{ data.policies }}</p>
+    <hr />
+    {% include 'AppBundle:AdminEmployee:adminUnderWritingData.html.twig' %}
+</div>
+{% endblock %}
