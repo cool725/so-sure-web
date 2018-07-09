@@ -2285,7 +2285,10 @@ abstract class Policy
     public function getOutstandingPremium($useAdjustedPremium = false)
     {
         if ($useAdjustedPremium) {
-            return $this->toTwoDp($this->getPremium()->getAdjustedYearlyPremiumPrice() - $this->getPremiumPaid());
+            return $this->toTwoDp(
+                $this->getPremium()->getAdjustedYearlyPremiumPrice() -
+                $this->getPremiumPaid($this->getSuccessfulUserPayments())
+            );
         } else {
             return $this->toTwoDp($this->getPremium()->getYearlyPremiumPrice() - $this->getPremiumPaid());
         }
