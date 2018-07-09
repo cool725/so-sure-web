@@ -3890,7 +3890,26 @@ abstract class Policy
         return ScheduledPayment::sumScheduledPaymentAmounts($scheduledPayments);
     }
 
-    public function arePolicyScheduledPaymentsCorrect()
+    public function isUnpaidCloseToExpirationDate(\DateTime $date = null)
+    {
+        if ($this->getStatus() != self::STATUS_UNPAID) {
+            return null;
+        }
+
+        if (!$date) {
+            $date = new \DateTime();
+        }
+
+        // payment on day 0
+        // reschedule on 7, 14, 21
+        // max 31-21 = 10
+        $diff = $date->diff($this->getPolicyExpirationDate());
+        $closeToExpiration = $diff->days <= 10 && $diff->invert == 0;
+
+        return $closeToExpiration;
+    }
+
+    public function arePolicyScheduledPaymentsCorrect(\DateTime $date = null)
     {
         $scheduledPayments = $this->getAllScheduledPayments(ScheduledPayment::STATUS_SCHEDULED);
 
@@ -3920,7 +3939,19 @@ abstract class Policy
         print $this->getPremiumPaid() . PHP_EOL;
         */
 
-        return $this->areEqualToTwoDp($this->getOutstandingPremium(), $totalScheduledPayments);
+        // generally would expect the outstanding premium to match the scheduled payments
+        // however, if unpaid and past the point where rescheduled payments are taken, then would
+        // expect the scheduled payments to be missing 1 monthly premium
+        if ($this->areEqualToTwoDp($this->getOutstandingPremium(), $totalScheduledPayments)) {
+            return true;
+        } elseif ($this->isUnpaidCloseToExpirationDate($date) && $this->areEqualToTwoDp(
+            $this->getOutstandingPremium(),
+            $totalScheduledPayments + $this->getPremium()->getMonthlyPremiumPrice()
+        )) {
+            return true;
+        }
+
+        return false;
     }
 
     public function getClaimsText()
@@ -4104,8 +4135,8 @@ abstract class Policy
 
     public function isPotValueCorrect()
     {
-        return $this->getPotValue() == $this->calculatePotValue() &&
-            $this->getPromoPotValue() == $this->calculatePotValue(true);
+        return $this->areEqualToTwoDp($this->getPotValue(), $this->calculatePotValue()) &&
+            $this->areEqualToTwoDp($this->getPromoPotValue(), $this->calculatePotValue(true));
     }
 
     public function getExpectedCommission(\DateTime $date = null)

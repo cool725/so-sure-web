@@ -312,7 +312,7 @@ class ValidatePolicyCommand extends BaseCommand
             $this->header($policy, $policies, $lines);
             $lines[] = $this->failureStatusMessage($policy, $data['prefix'], $data['validateDate']);
         }
-        if ($policy->arePolicyScheduledPaymentsCorrect() === false) {
+        if ($policy->arePolicyScheduledPaymentsCorrect($data['validateDate']) === false) {
             $this->header($policy, $policies, $lines);
             if ($data['adjustScheduledPayments']) {
                 /** @var PolicyService $policyService */
@@ -325,22 +325,15 @@ class ValidatePolicyCommand extends BaseCommand
                 } else {
                     $policy = $this->getManager()->merge($policy);
                     $lines[] = sprintf(
-                        'WARNING!! Failed to adjusted Incorrect scheduled payments for olicy %s',
+                        'WARNING!! Failed to adjusted Incorrect scheduled payments for policy %s',
                         $policy->getPolicyNumber()
                     );
                 }
             } else {
-                if ($closeToExpiration) {
-                    $lines[] = sprintf(
-                        'Expected Incorrect scheduled payments - within 2 weeks of cancellation date for %s',
-                        $policy->getPolicyNumber()
-                    );
-                } else {
-                    $lines[] = sprintf(
-                        'WARNING!! Incorrect scheduled payments for policy %s',
-                        $policy->getPolicyNumber()
-                    );
-                }
+                $lines[] = sprintf(
+                    'WARNING!! Incorrect scheduled payments for policy %s',
+                    $policy->getPolicyNumber()
+                );
                 $lines[] = $this->failureScheduledPaymentsMessage($policy, $data['validateDate']);
             }
         }
