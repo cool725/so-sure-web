@@ -3878,6 +3878,9 @@ abstract class Policy
 
         if ($this->isPolicyPaidToDate($date, true)) {
             return $this->getStatus() == self::STATUS_ACTIVE;
+        } elseif ($this->getUser()->hasBacsPaymentMethod() &&
+            $this->getUser()->getBacsPaymentMethod()->getBankAccount()->isMandateInProgress()) {
+            return $this->getStatus() == self::STATUS_ACTIVE;
         } else {
             return in_array($this->getStatus(), [self::STATUS_UNPAID, self::STATUS_RENEWAL]);
         }
