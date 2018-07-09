@@ -4863,4 +4863,31 @@ class PhonePolicyTest extends WebTestCase
         $policy->addPayment($bacsPayment);
         $this->assertTrue($policy->hasManualBacsPayment());
     }
+
+    public function testIsUnpaidCloseToExpirationDate()
+    {
+        $user = new User();
+        $user->setEmail(static::generateEmail('testIsUnpaidCloseToExpirationDate', $this));
+        self::$dm->persist($user);
+        self::addAddress($user);
+        $policy = new SalvaPhonePolicy();
+        $policy->init($user, self::getLatestPolicyTerms(static::$dm));
+        $policy->setPhone(self::$phone);
+        $policy->create(rand(1, 999999), null, null, rand(1, 9999));
+        $policy->setImei(rand(1, 999999));
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        $policy->setId(rand(1, 999999));
+        $policy->setPremiumInstallments(12);
+
+        $expiration = $policy->getPolicyExpirationDate();
+        $expirationTwelve = clone $expiration;
+        $expirationTwelve = $expirationTwelve->sub(new \DateInterval('P12D'));
+        $expirationTen = clone $expiration;
+        $expirationTen = $expirationTen->sub(new \DateInterval('P10D'));
+
+        $this->assertNull($policy->isUnpaidCloseToExpirationDate($expirationTwelve));
+        $policy->setStatus(Policy::STATUS_UNPAID);
+        $this->assertFalse($policy->isUnpaidCloseToExpirationDate($expirationTwelve));
+        $this->assertTrue($policy->isUnpaidCloseToExpirationDate($expirationTen));
+    }
 }
