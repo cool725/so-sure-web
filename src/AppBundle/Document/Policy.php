@@ -3876,20 +3876,23 @@ abstract class Policy
             return false;
         }
 
-        if ($this->isPolicyPaidToDate($date)) {
+        if ($this->isPolicyPaidToDate($date, true)) {
             return $this->getStatus() == self::STATUS_ACTIVE;
         } else {
             return in_array($this->getStatus(), [self::STATUS_UNPAID, self::STATUS_RENEWAL]);
         }
     }
 
-    public function isPolicyPaidToDate(\DateTime $date = null)
+    public function isPolicyPaidToDate(\DateTime $date = null, $includePendingBacs = false)
     {
         if (!$this->isPolicy()) {
             return null;
         }
 
         $totalPaid = $this->getTotalSuccessfulPayments($date, true);
+        if ($includePendingBacs) {
+            $totalPaid += $this->getPendingBacsPaymentsTotal();
+        }
         $expectedPaid = $this->getTotalExpectedPaidToDate($date);
         // print sprintf("%f =? %f", $totalPaid, $expectedPaid) . PHP_EOL;
 
@@ -3930,6 +3933,7 @@ abstract class Policy
         // All Scheduled day must match the billing day
         if ($verifyBillingDay) {
             foreach ($scheduledPayments as $scheduledPayment) {
+                /** @var ScheduledPayment $scheduledPayment */
                 if ($scheduledPayment->hasCorrectBillingDay() === false) {
                     /*
                     $diff = $scheduledPayment->getScheduled()->diff($this->getBilling());
