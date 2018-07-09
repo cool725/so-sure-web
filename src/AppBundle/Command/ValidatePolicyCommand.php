@@ -312,7 +312,7 @@ class ValidatePolicyCommand extends BaseCommand
             $this->header($policy, $policies, $lines);
             $lines[] = $this->failureStatusMessage($policy, $data['prefix'], $data['validateDate']);
         }
-        if ($policy->arePolicyScheduledPaymentsCorrect($data['validateDate']) === false) {
+        if ($policy->arePolicyScheduledPaymentsCorrect(true, $data['validateDate']) === false) {
             $this->header($policy, $policies, $lines);
             if ($data['adjustScheduledPayments']) {
                 /** @var PolicyService $policyService */
@@ -432,15 +432,17 @@ class ValidatePolicyCommand extends BaseCommand
     {
         $scheduledPayments = $policy->getAllScheduledPayments(ScheduledPayment::STATUS_SCHEDULED);
         $totalScheduledPayments = ScheduledPayment::sumScheduledPaymentAmounts($scheduledPayments);
+        $billingDayIssue = $policy->arePolicyScheduledPaymentsCorrect(false, $date);
 
         // @codingStandardsIgnoreStart
         return sprintf(
-            'Total Premium £%0.2f Payments Made £%0.2f (£%0.2f credited) Scheduled Payments £%0.2f Outstanding Premium £%0.2f',
+            'Total Premium: £%0.2f; Payments Made: £%0.2f (£%0.2f credited); Scheduled Payments: £%0.2f; Outstanding Premium: £%0.2f; Billing Day Issue: ',
             $policy->getYearlyPremiumPrice(),
             $policy->getTotalSuccessfulPayments($date),
             $policy->getPremiumPaid(),
             $totalScheduledPayments,
-            $policy->getOutstandingPremium()
+            $policy->getOutstandingPremium(),
+            $billingDayIssue ? 'Yes' : 'No'
         );
         // @codingStandardsIgnoreEnd
     }

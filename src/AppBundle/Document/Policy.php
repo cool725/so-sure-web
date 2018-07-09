@@ -3923,25 +3923,27 @@ abstract class Policy
         return $closeToExpiration;
     }
 
-    public function arePolicyScheduledPaymentsCorrect(\DateTime $date = null)
+    public function arePolicyScheduledPaymentsCorrect($verifyBillingDay = true, \DateTime $date = null)
     {
         $scheduledPayments = $this->getAllScheduledPayments(ScheduledPayment::STATUS_SCHEDULED);
 
         // All Scheduled day must match the billing day
-        foreach ($scheduledPayments as $scheduledPayment) {
-            if ($scheduledPayment->hasCorrectBillingDay() === false) {
-                /*
-                $diff = $scheduledPayment->getScheduled()->diff($this->getBilling());
-                print sprintf(
-                    "%s %s %s%s",
-                    $scheduledPayment->getScheduled()->format(\DateTime::ATOM),
-                    $this->getBilling()->format(\DateTime::ATOM),
-                    json_encode($diff),
-                    PHP_EOL
-                );
-                */
+        if ($verifyBillingDay) {
+            foreach ($scheduledPayments as $scheduledPayment) {
+                if ($scheduledPayment->hasCorrectBillingDay() === false) {
+                    /*
+                    $diff = $scheduledPayment->getScheduled()->diff($this->getBilling());
+                    print sprintf(
+                        "%s %s %s%s",
+                        $scheduledPayment->getScheduled()->format(\DateTime::ATOM),
+                        $this->getBilling()->format(\DateTime::ATOM),
+                        json_encode($diff),
+                        PHP_EOL
+                    );
+                    */
 
-                return false;
+                    return false;
+                }
             }
         }
 
