@@ -440,7 +440,7 @@ class ValidatePolicyCommand extends BaseCommand
             $policy->getTotalSuccessfulPayments($date),
             $policy->getPremiumPaid(),
             $totalScheduledPayments,
-            $policy->getOutstandingPremium(true)
+            $policy->getOutstandingPremium()
         );
         // @codingStandardsIgnoreEnd
     }

@@ -2282,16 +2282,23 @@ abstract class Policy
         return $this->toTwoDp($brokerCommission);
     }
 
-    public function getOutstandingPremium($useAdjustedPremium = false)
+    public function getOutstandingPremium()
     {
-        if ($useAdjustedPremium) {
-            return $this->toTwoDp(
-                $this->getPremium()->getAdjustedYearlyPremiumPrice() -
-                $this->getPremiumPaid($this->getSuccessfulUserPayments())
-            );
-        } else {
-            return $this->toTwoDp($this->getPremium()->getYearlyPremiumPrice() - $this->getPremiumPaid());
+        return $this->toTwoDp($this->getPremium()->getYearlyPremiumPrice() - $this->getPremiumPaid());
+    }
+
+    public function getPendingBacsPaymentsTotal()
+    {
+        $total = 0;
+        $payments = $this->getPaymentByType(BacsPayment::class);
+        foreach ($payments as $payment) {
+            /** @var BacsPayment $payment */
+            if (in_array($payment->getStatus(), [BacsPayment::STATUS_SUBMITTED, BacsPayment::STATUS_GENERATED])) {
+                $total += $payment->getAmount();
+            }
         }
+
+        return $total;
     }
 
     public function isInitialPayment(\DateTime $date = null)
@@ -3946,16 +3953,26 @@ abstract class Policy
         print $this->getPremiumPaid() . PHP_EOL;
         */
 
+        // Pending bacs payments should be thought of as successful and thereby reduce the outstanding premium
+        $outstandingPremium = $this->getOutstandingPremium() - $this->getPendingBacsPaymentsTotal();
+
         // generally would expect the outstanding premium to match the scheduled payments
         // however, if unpaid and past the point where rescheduled payments are taken, then would
         // expect the scheduled payments to be missing 1 monthly premium
-        if ($this->areEqualToTwoDp($this->getOutstandingPremium(true), $totalScheduledPayments)) {
+        if ($this->areEqualToTwoDp($outstandingPremium, $totalScheduledPayments)) {
             return true;
-        } elseif ($this->isUnpaidCloseToExpirationDate($date) && $this->areEqualToTwoDp(
-            $this->getOutstandingPremium(true),
-            $totalScheduledPayments + $this->getPremium()->getMonthlyPremiumPrice()
-        )) {
-            return true;
+        } elseif ($this->isUnpaidCloseToExpirationDate($date)) {
+            if ($this->areEqualToTwoDp(
+                $outstandingPremium,
+                $totalScheduledPayments + $this->getPremium()->getAdjustedStandardMonthlyPremiumPrice()
+            )) {
+                return true;
+            } elseif ($this->areEqualToTwoDp(
+                $outstandingPremium,
+                $totalScheduledPayments + $this->getPremium()->getAdjustedFinalMonthlyPremiumPrice()
+            )) {
+                return true;
+            }
         }
 
         return false;
