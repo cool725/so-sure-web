@@ -428,7 +428,7 @@ class ValidatePolicyCommand extends BaseCommand
         );
     }
 
-    private function failureScheduledPaymentsMessage($policy, $date)
+    private function failureScheduledPaymentsMessage(Policy $policy, $date)
     {
         $scheduledPayments = $policy->getAllScheduledPayments(ScheduledPayment::STATUS_SCHEDULED);
         $totalScheduledPayments = ScheduledPayment::sumScheduledPaymentAmounts($scheduledPayments);
@@ -440,7 +440,7 @@ class ValidatePolicyCommand extends BaseCommand
             $policy->getTotalSuccessfulPayments($date),
             $policy->getPremiumPaid(),
             $totalScheduledPayments,
-            $policy->getOutstandingPremium()
+            $policy->getOutstandingPremium(true)
         );
         // @codingStandardsIgnoreEnd
     }
