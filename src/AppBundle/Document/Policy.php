@@ -3968,9 +3968,9 @@ abstract class Policy
             )) {
                 return true;
             } elseif ($this->areEqualToTwoDp(
-                    $outstandingPremium,
-                    $totalScheduledPayments + $this->getPremium()->getAdjustedFinalMonthlyPremiumPrice()
-                )) {
+                $outstandingPremium,
+                $totalScheduledPayments + $this->getPremium()->getAdjustedFinalMonthlyPremiumPrice()
+            )) {
                 return true;
             }
         }
