@@ -2290,7 +2290,7 @@ abstract class Policy
     public function getPendingBacsPaymentsTotal()
     {
         $total = 0;
-        $payments = $this->getPaymentByType(BacsPayment::class);
+        $payments = $this->getPaymentsByType(BacsPayment::class);
         foreach ($payments as $payment) {
             /** @var BacsPayment $payment */
             if (in_array($payment->getStatus(), [BacsPayment::STATUS_SUBMITTED, BacsPayment::STATUS_GENERATED])) {
