@@ -976,8 +976,7 @@ class ReportingService
             $now = new \DateTime();
         }
         list($start, $end) = $this->getQuarterlyPLDates($date);
-        $policies = $this->getQuarterlyPolicies($start, $end);
-        $policies = $this->getQuarterlyPolicies($start, $end);
+        $policies = $this->getAllStartedPolicies($start, $end);
         $data = [
             'start' => $start,
             'end' => $end,
