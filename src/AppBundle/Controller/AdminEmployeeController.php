@@ -14,6 +14,7 @@ use AppBundle\Service\FraudService;
 use AppBundle\Service\JudopayService;
 use AppBundle\Service\PolicyService;
 use AppBundle\Service\ReceperioService;
+use AppBundle\Service\ReportingService;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -1525,6 +1526,36 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
 
         $reporting = $this->get('app.reporting');
         $report = $reporting->getQuarterlyPL($date);
+
+        return ['data' => $report];
+    }
+
+    /**
+     * @Route("/underwriting", name="admin_underwriting")
+     * @Route("/underwriting/{year}/{month}", name="admin_underwriting_date")
+     * @Template
+     */
+    public function adminUnderWritingAction(Request $request, $year = null, $month = null)
+    {
+        if ($request->get('_route') == "admin_underwriting") {
+            $now = new \DateTime();
+            $now = $now->sub(new \DateInterval('P1Y'));
+            return new RedirectResponse($this->generateUrl('admin_underwriting_date', [
+                'year' => $now->format('Y'),
+                'month' => $now->format('m'),
+            ]));
+        }
+        $date = \DateTime::createFromFormat(
+            "Y-m-d",
+            sprintf('%d-%d-01', $year, $month),
+            new \DateTimeZone(SoSure::TIMEZONE)
+        );
+
+        $data = [];
+
+        /** @var ReportingService $reporting */
+        $reporting = $this->get('app.reporting');
+        $report = $reporting->getUnderWritingReporting($date);
 
         return ['data' => $report];
     }
