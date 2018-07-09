@@ -436,7 +436,7 @@ class ValidatePolicyCommand extends BaseCommand
 
         // @codingStandardsIgnoreStart
         return sprintf(
-            'Total Premium: £%0.2f; Payments Made: £%0.2f (£%0.2f credited); Scheduled Payments: £%0.2f; Outstanding Premium: £%0.2f; Billing Day Issue: ',
+            'Total Premium: £%0.2f; Payments Made: £%0.2f (£%0.2f credited); Scheduled Payments: £%0.2f; Outstanding Premium: £%0.2f; Billing Day Issue: %s',
             $policy->getYearlyPremiumPrice(),
             $policy->getTotalSuccessfulPayments($date),
             $policy->getPremiumPaid(),
