@@ -150,7 +150,7 @@ class LloydsService
                             $paymentType = self::PAYMENT_TYPE_BACS;
                             if (preg_match('/DDIC[0-9]{3,20}/', $line['Transaction Description'], $matches)) {
                                 $bacsIndemnityRepo = $this->dm->getRepository(BacsIndemnityPayment::class);
-                                /* @var BacsIndemnityPayment $bacsIndemnity */
+                                /** @var BacsIndemnityPayment $bacsIndemnity */
                                 $bacsIndemnity = $bacsIndemnityRepo->findOneBy(['reference' => $matches[0]]);
                                 if ($bacsIndemnity) {
                                     $bacsIndemnity->setSuccess(true);
