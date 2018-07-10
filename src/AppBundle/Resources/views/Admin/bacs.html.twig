@@ -400,7 +400,7 @@
                                 {% endfor %}
 
                                 {% set reportAmount = 0 %}
-                                {% for inputFile in input %}
+                                {% for inputFile in inputIncPrevMonth %}
                                     {%  if inputFile.metadata and inputFile.getFormattedSerialNumber == file.serialNumber %}
                                         {% if inputFile.metadata['debit-accepted-value'] is defined %}
                                             {% set reportAmount = reportAmount + inputFile.metadata['debit-accepted-value'] %}

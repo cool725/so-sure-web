@@ -10,9 +10,12 @@ class S3FileRepository extends DocumentRepository
 {
     use DateTrait;
 
-    public function getAllFiles(\DateTime $date, $type = null)
+    public function getAllFiles(\DateTime $date, $type = null, $includePrevMonth = false)
     {
         $startMonth = $this->startOfMonth($date);
+        if ($includePrevMonth) {
+            $startMonth = $startMonth->sub(new \DateInterval('P1M'));
+        }
         $nextMonth = $this->endOfMonth($date);
 
         $qb = $this->createQueryBuilder()
