@@ -52,13 +52,151 @@
     </div>
 
     <ul class="nav nav-tabs nav-justified">
-        <li role="presentation" class="active"><a data-toggle="tab" href="#judo">Judo</a></li>
+        <li role="presentation" class="active"><a data-toggle="tab" href="#salva">Salva</a></li>
+        <li role="presentation"><a data-toggle="tab" href="#judo">Judo</a></li>
         <li role="presentation"><a data-toggle="tab" href="#barclays">Barclays</a></li>
         <li role="presentation"><a data-toggle="tab" href="#lloyds">Lloyds</a></li>
         <li role="presentation"><a data-toggle="tab" href="#bacs">Bacs</a></li>
     </ul>
     <div class="tab-content">
-        <div role="tabpanel" class="tab-pane active" id="judo">
+        <div role="tabpanel" class="tab-pane active" id="salva">
+            <div class="row">
+                <div class="col-md-6">
+                    <h3>Transaction Date</h3>
+                    {% set sosureTotal = 0 %}
+                    {% set salvaTotal = 0 %}
+                    {% for day in 1..days_in_month %}
+                        {% if month < 10 and day < 10 %}
+                            {% set ymd = year ~ "0" ~ month ~ "0" ~ day %}
+                        {% elseif day < 10 %}
+                            {% set ymd = year ~ month ~ "0" ~ day %}
+                        {% elseif month < 10 %}
+                            {% set ymd = year ~ "0" ~ month ~ day %}
+                        {% else %}
+                            {% set ymd = year ~ month ~ day %}
+                        {% endif %}
+                        {% if sosure['dailyTransaction'][day] is defined %}
+                            {% set sosureTotal = sosureTotal + sosure['dailyTransaction'][day] %}
+                        {% endif %}
+                        {% if salva['dailyTransaction'][ymd] is defined %}
+                            {% set salvaTotal = salvaTotal + salva['dailyTransaction'][ymd] %}
+                        {% endif %}
+                    {% endfor %}
+                    <table class="table table-striped">
+                        <tr>
+                            <th></th>
+                            <th>so-sure</th>
+                            <th>Salva</th>
+                            <th>Diff</th>
+                        </tr>
+                        <tr>
+                            <td>Month</td>
+                            {% set color = '' %}
+                            {% if equal_to_two_dp(sosure['monthlyTransaction'].total, sosureTotal) %}
+                                {% set color = 'success' %}
+                            {% else %}
+                                {% set color = 'danger' %}
+                            {% endif %}
+                            <td class="{{ color }}">
+                                £{{ sosure['monthlyTransaction'].total|number_format(2, '.', ',') }}
+                            </td>
+                            {% if equal_to_two_dp(salva['monthlyTransaction'], salvaTotal) %}
+                                {% set color = 'success' %}
+                            {% else %}
+                                {% set color = 'danger' %}
+                            {% endif %}
+                            <td class="{{ color }}">
+                                £{{ salva['monthlyTransaction']|number_format(2, '.', ',') }}
+                            </td>
+                            <td>
+                                £{{ (sosure['monthlyTransaction'].total - salva['monthlyTransaction'])|number_format(2, '.', ',') }}
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <h2>Transaction Date
+
+                        <button type="button" class="btn btn-info" data-toggle="modal" data-target="#paymentsModal"
+                        > Payment Details</button>
+                    </h2>
+                    <table class="table table-striped">
+                        <tr>
+                            <th>Day of Month</th>
+                            <th>so-sure</th>
+                            <th>Salva</th>
+                            <th>Diff</th>
+                            <th>Cumulative Diff</th>
+                        </tr>
+                        {% set cumulative = 0 %}
+                        {% for day in 1..days_in_month %}
+                            {% if month < 10 and day < 10 %}
+                                {% set ymd = year ~ "0" ~ month ~ "0" ~ day %}
+                            {% elseif day < 10 %}
+                                {% set ymd = year ~ month ~ "0" ~ day %}
+                            {% elseif month < 10 %}
+                                {% set ymd = year ~ "0" ~ month ~ day %}
+                            {% else %}
+                                {% set ymd = year ~ month ~ day %}
+                            {% endif %}
+                            {% set color = '' %}
+                            {% if sosure['dailyTransaction'][day] is defined and salva['dailyTransaction'][ymd] is defined  %}
+                                {% if equal_to_two_dp(sosure['dailyTransaction'][day], salva['dailyTransaction'][ymd]) %}
+                                    {% set color = 'success' %}
+                                {% else %}
+                                    {% set color = 'danger' %}
+                                {% endif %}
+                            {% endif %}
+                            <tr class='{{ color }}'>
+                                <td>{{ day }}</td>
+                                <td>{% if sosure['dailyTransaction'][day] is defined %}
+                                        £{{ sosure['dailyTransaction'][day]|number_format(2, '.', ',') }}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                                <td>{% if salva['dailyTransaction'][ymd] is defined %}
+                                        £{{ salva['dailyTransaction'][ymd]|number_format(2, '.', ',') }}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                                <td>{% if sosure['dailyTransaction'][day] is defined and salva['dailyTransaction'][ymd] is defined %}
+                                        {% set diff = sosure['dailyTransaction'][day] - salva['dailyTransaction'][ymd] %}
+                                        {% set cumulative = cumulative + diff %}
+                                        £{{ diff|number_format(2, '.', ',') }}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                                <td>{% if sosure['dailyTransaction'][day] is defined and salva['dailyTransaction'][ymd] is defined %}
+                                        £{{ cumulative|number_format(2, '.', ',') }}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        <tr class="background-light-grey">
+                            <td>SubTotal</td>
+                            <td>
+                                £{{ sosureTotal|number_format(2, '.', ',') }}
+                            </td>
+                            <td>
+                                £{{ salvaTotal|number_format(2, '.', ',') }}
+                            </td>
+                            <td>
+                                £{{ (sosureTotal - salvaTotal)|number_format(2, '.', ',') }}
+                            </td>
+                            <td></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div role="tabpanel" class="tab-pane" id="judo">
             <div class="row">
                 <div class="col-md-6">
                     <h3>Transaction Date</h3>
@@ -74,8 +212,8 @@
                         {% else %}
                             {% set ymd = year ~ month ~ day %}
                         {% endif %}
-                        {% if sosure['dailyTransaction'][day] is defined %}
-                            {% set sosureTotal = sosureTotal + sosure['dailyTransaction'][day] %}
+                        {% if sosure['dailyJudoTransaction'][day] is defined %}
+                            {% set sosureTotal = sosureTotal + sosure['dailyJudoTransaction'][day] %}
                         {% endif %}
                         {% if judo['dailyTransaction'][ymd] is defined %}
                             {% set judoTotal = judoTotal + judo['dailyTransaction'][ymd] %}
@@ -91,13 +229,13 @@
                         <tr>
                             <td>Month</td>
                             {% set color = '' %}
-                            {% if equal_to_two_dp(sosure['monthlyTransaction'].total, sosureTotal) %}
+                            {% if equal_to_two_dp(sosure['monthlyJudoTransaction'].total, sosureTotal) %}
                                 {% set color = 'success' %}
                             {% else %}
                                 {% set color = 'danger' %}
                             {% endif %}
                             <td class="{{ color }}">
-                                £{{ sosure['monthlyTransaction'].total|number_format(2, '.', ',') }}
+                                £{{ sosure['monthlyJudoTransaction'].total|number_format(2, '.', ',') }}
                             </td>
                             {% if equal_to_two_dp(judo['monthlyTransaction'], judoTotal) %}
                                 {% set color = 'success' %}
@@ -108,7 +246,7 @@
                                 £{{ judo['monthlyTransaction']|number_format(2, '.', ',') }}
                             </td>
                             <td>
-                                £{{ (sosure['monthlyTransaction'].total - judo['monthlyTransaction'])|number_format(2, '.', ',') }}
+                                £{{ (sosure['monthlyJudoTransaction'].total - judo['monthlyTransaction'])|number_format(2, '.', ',') }}
                             </td>
                         </tr>
                     </table>
@@ -126,7 +264,7 @@
                             <td>Month</td>
                             <td>£{{ reconciliation['monthlyTransaction']|number_format(2, '.', ',') }}</td>
                             <td>£{{ judo['monthlyTransaction']|number_format(2, '.', ',') }}</td>
-                            <td>£{{ (sosure['monthlyTransaction'].total - judo['monthlyTransaction'])|number_format(2, '.', ',') }}</td>
+                            <td>£{{ (sosure['monthlyJudoTransaction'].total - judo['monthlyTransaction'])|number_format(2, '.', ',') }}</td>
                         </tr>
                         <tr>
                             <td>Year</td>
@@ -170,8 +308,8 @@
                                 {% set ymd = year ~ month ~ day %}
                             {% endif %}
                             {% set color = '' %}
-                            {% if sosure['dailyTransaction'][day] is defined and judo['dailyTransaction'][ymd] is defined  %}
-                                {% if equal_to_two_dp(sosure['dailyTransaction'][day], judo['dailyTransaction'][ymd]) %}
+                            {% if sosure['dailyJudoTransaction'][day] is defined and judo['dailyTransaction'][ymd] is defined  %}
+                                {% if equal_to_two_dp(sosure['dailyJudoTransaction'][day], judo['dailyTransaction'][ymd]) %}
                                     {% set color = 'success' %}
                                 {% else %}
                                     {% set color = 'danger' %}
@@ -179,8 +317,8 @@
                             {% endif %}
                             <tr class='{{ color }}'>
                                 <td>{{ day }}</td>
-                                <td>{% if sosure['dailyTransaction'][day] is defined %}
-                                        £{{ sosure['dailyTransaction'][day]|number_format(2, '.', ',') }}
+                                <td>{% if sosure['dailyJudoTransaction'][day] is defined %}
+                                        £{{ sosure['dailyJudoTransaction'][day]|number_format(2, '.', ',') }}
                                     {% else %}
                                         -
                                     {% endif %}
@@ -191,15 +329,15 @@
                                         -
                                     {% endif %}
                                 </td>
-                                <td>{% if sosure['dailyTransaction'][day] is defined and judo['dailyTransaction'][ymd] is defined %}
-                                        {% set diff = sosure['dailyTransaction'][day] - judo['dailyTransaction'][ymd] %}
+                                <td>{% if sosure['dailyJudoTransaction'][day] is defined and judo['dailyTransaction'][ymd] is defined %}
+                                        {% set diff = sosure['dailyJudoTransaction'][day] - judo['dailyTransaction'][ymd] %}
                                         {% set cumulative = cumulative + diff %}
                                         £{{ diff|number_format(2, '.', ',') }}
                                     {% else %}
                                         -
                                     {% endif %}
                                 </td>
-                                <td>{% if sosure['dailyTransaction'][day] is defined and judo['dailyTransaction'][ymd] is defined %}
+                                <td>{% if sosure['dailyJudoTransaction'][day] is defined and judo['dailyTransaction'][ymd] is defined %}
                                     £{{ cumulative|number_format(2, '.', ',') }}
                                     {% else %}
                                         -
@@ -240,8 +378,8 @@
                         {% else %}
                             {% set ymd = year ~ month ~ day %}
                         {% endif %}
-                        {% if sosure['dailyShiftedTransaction'][day] is defined %}
-                            {% set sosureTotal = sosureTotal + sosure['dailyShiftedTransaction'][day] %}
+                        {% if sosure['dailyJudoShiftedTransaction'][day] is defined %}
+                            {% set sosureTotal = sosureTotal + sosure['dailyJudoShiftedTransaction'][day] %}
                         {% endif %}
                         {% if barclays['dailyTransaction'][ymd] is defined %}
                             {% set barclaysTotal = barclaysTotal + barclays['dailyTransaction'][ymd] %}
@@ -256,13 +394,13 @@
                         </tr>
                         <tr>
                             <td>Month</td>
-                            {% if equal_to_two_dp(sosure['monthlyShiftedTransaction'].total, sosureTotal) %}
+                            {% if equal_to_two_dp(sosure['monthlyJudoShiftedTransaction'].total, sosureTotal) %}
                                 {% set color = 'success' %}
                             {% else %}
                                 {% set color = 'danger' %}
                             {% endif %}
                             <td class="{{ color }}">
-                                £{{ sosure['monthlyShiftedTransaction'].total|number_format(2, '.', ',') }}
+                                £{{ sosure['monthlyJudoShiftedTransaction'].total|number_format(2, '.', ',') }}
                             </td>
                             {% if equal_to_two_dp(barclays['monthlyTransaction'], barclaysTotal) %}
                                 {% set color = 'success' %}
@@ -272,7 +410,7 @@
                             <td class="{{ color }}">
                                 £{{ barclays['monthlyTransaction']|number_format(2, '.', ',') }}
                             </td>
-                            <td>£{{ (sosure['monthlyTransaction'].total - barclays['monthlyTransaction'])|number_format(2, '.', ',') }}</td>
+                            <td>£{{ (sosure['monthlyJudoShiftedTransaction'].total - barclays['monthlyTransaction'])|number_format(2, '.', ',') }}</td>
                         </tr>
                         <tr>
                             <td>Year</td>
@@ -339,8 +477,8 @@
                                 {% set ymd = year ~ month ~ day %}
                             {% endif %}
                             {% set color = '' %}
-                            {% if sosure['dailyShiftedTransaction'][day] is defined and barclays['dailyTransaction'][ymd] is defined  %}
-                                {% if equal_to_two_dp(sosure['dailyShiftedTransaction'][day], barclays['dailyTransaction'][ymd]) %}
+                            {% if sosure['dailyJudoShiftedTransaction'][day] is defined and barclays['dailyTransaction'][ymd] is defined  %}
+                                {% if equal_to_two_dp(sosure['dailyJudoShiftedTransaction'][day], barclays['dailyTransaction'][ymd]) %}
                                     {% set color = 'success' %}
                                 {% else %}
                                     {% set color = 'danger' %}
@@ -348,8 +486,8 @@
                             {% endif %}
                             <tr class='{{ color }}'>
                                 <td>{{ day }}</td>
-                                <td>{% if sosure['dailyShiftedTransaction'][day] is defined %}
-                                        £{{ sosure['dailyShiftedTransaction'][day]|number_format(2, '.', ',') }}
+                                <td>{% if sosure['dailyJudoShiftedTransaction'][day] is defined %}
+                                        £{{ sosure['dailyJudoShiftedTransaction'][day]|number_format(2, '.', ',') }}
                                     {% else %}-
                                     {% endif %}
                                 </td>
@@ -359,15 +497,15 @@
                                         -
                                     {% endif %}
                                 </td>
-                                <td>{% if sosure['dailyShiftedTransaction'][day] is defined and barclays['dailyTransaction'][ymd] is defined %}
-                                        {% set diff = sosure['dailyShiftedTransaction'][day] - barclays['dailyTransaction'][ymd] %}
+                                <td>{% if sosure['dailyJudoShiftedTransaction'][day] is defined and barclays['dailyTransaction'][ymd] is defined %}
+                                        {% set diff = sosure['dailyJudoShiftedTransaction'][day] - barclays['dailyTransaction'][ymd] %}
                                         {% set cumulative = cumulative + diff %}
                                         £{{ diff|number_format(2, '.', ',') }}
                                     {% else %}
                                         -
                                     {% endif %}
                                 </td>
-                                <td>{% if sosure['dailyShiftedTransaction'][day] is defined and barclays['dailyTransaction'][ymd] is defined %}
+                                <td>{% if sosure['dailyJudoShiftedTransaction'][day] is defined and barclays['dailyTransaction'][ymd] is defined %}
                                         £{{ cumulative|number_format(2, '.', ',') }}
                                     {% else %}
                                         -

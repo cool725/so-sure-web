@@ -271,6 +271,7 @@ class SalvaExportService
             $date->setTimezone(new \DateTimeZone(Salva::SALVA_TIMEZONE));
         }
 
+        $dailyTransaction = [];
         $lines = [];
         $total = 0;
         $numPayments = 0;
@@ -287,6 +288,10 @@ class SalvaExportService
             $total += $data[2];
             $numPayments++;
             $lines[] = sprintf("%s", $this->formatLine($data));
+            if (!isset($dailyTransaction[$payment->getDate()->format('Ymd')])) {
+                $dailyTransaction[$payment->getDate()->format('Ymd')] = 0;
+            }
+            $dailyTransaction[$payment->getDate()->format('Ymd')] += $payment->getAmount();
         }
 
         if ($s3) {
@@ -304,6 +309,7 @@ class SalvaExportService
             $file->setDate($date);
             $file->addMetadata('total', $total);
             $file->addMetadata('numPayments', $numPayments);
+            $file->setDailyTransaction($dailyTransaction);
             $this->dm->persist($file);
             $this->dm->flush();
         }
