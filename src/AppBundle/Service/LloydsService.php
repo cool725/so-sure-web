@@ -3,6 +3,8 @@ namespace AppBundle\Service;
 
 use AppBundle\Document\File\LloydsFile;
 use AppBundle\Document\File\UploadFile;
+use AppBundle\Document\Payment\BacsIndemnityPayment;
+use AppBundle\Document\Payment\Payment;
 use Psr\Log\LoggerInterface;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use AppBundle\Document\CurrencyTrait;
@@ -143,6 +145,28 @@ class LloydsService
                         } elseif (trim($line['Transaction Description']) == 'BACS') {
                             $processedDate = \DateTime::createFromFormat("d/m/Y", $line['Transaction Date']);
                             $paymentType = self::PAYMENT_TYPE_BACS;
+                        } elseif (mb_stripos($line['Transaction Description'], 'DDICA') !== false) {
+                            $processedDate = \DateTime::createFromFormat("d/m/Y", $line['Transaction Date']);
+                            $paymentType = self::PAYMENT_TYPE_BACS;
+                            if (preg_match('/DDIC[0-9]{3,20}/', $line['Transaction Description'], $matches)) {
+                                $bacsIndemnityRepo = $this->dm->getRepository(BacsIndemnityPayment::class);
+                                /** @var BacsIndemnityPayment $bacsIndemnity */
+                                $bacsIndemnity = $bacsIndemnityRepo->findOneBy(['reference' => $matches[0]]);
+                                if ($bacsIndemnity) {
+                                    $bacsIndemnity->setSuccess(true);
+                                    $bacsIndemnity->setStatus(BacsIndemnityPayment::STATUS_REFUNDED);
+                                } else {
+                                    $this->logger->warning(sprintf(
+                                        'Failed to find bacs indemnity payment for DDIC %s',
+                                        $matches[0]
+                                    ));
+                                }
+                            } else {
+                                $this->logger->error(sprintf(
+                                    'Failed to find DDIC record in %s',
+                                    $line['Transaction Description']
+                                ));
+                            }
                         }
                     } elseif (in_array($line['Transaction Type'], [''])) {
                         // can be interest or Unpaid DD

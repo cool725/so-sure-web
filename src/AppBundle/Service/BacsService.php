@@ -588,6 +588,7 @@ class BacsService
             $reasonCode = $this->getChildNodeValue($element, 'ReasonCode');
             $reasonCodeMeaning = $this->getChildNodeValue($element, 'ReasonCodeMeaning');
             $reference = $this->getChildNodeValue($element, 'SUReference');
+            $ddicReference = $this->getChildNodeValue($element, 'PayingBankReference');
             $amount = $this->getChildNodeValue($element, 'TotalAmount');
             $results['indemnity-amount'] += $amount;
             $results['details'][] = [$reference => [$reasonCode => $reasonCodeMeaning]];
@@ -612,6 +613,8 @@ class BacsService
                 $indemnityPayment->setAmount(0 - $amount);
                 $indemnityPayment->setStatus(BacsIndemnityPayment::STATUS_RAISED);
                 $indemnityPayment->setSource(BacsIndemnityPayment::SOURCE_SYSTEM);
+                $indemnityPayment->setNotes('Direct Debit Indemnity Claim (Chargeback)');
+                $indemnityPayment->setReference($ddicReference);
                 $policy->addPayment($indemnityPayment);
                 $this->dm->persist($indemnityPayment);
             }
