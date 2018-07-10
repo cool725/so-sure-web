@@ -104,7 +104,8 @@ class MaxMindIpService
 
     public function getCoordinates()
     {
-        if (!$this->data || !$this->data->location) {
+        if (!$this->data || !$this->data->location || !$this->data->location->longitude ||
+            !$this->data->location->latitude) {
             return null;
         }
 
