@@ -11,7 +11,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
  * @MongoDB\Document(repositoryClass="AppBundle\Repository\File\JudoFileRepository")
  * @Vich\Uploadable
  */
-class JudoFile extends UploadFile
+class JudoFile extends DailyTransactionUploadFile
 {
     /**
      * NOTE: This is not a mapped field of entity metadata, just a simple property.
@@ -21,12 +21,6 @@ class JudoFile extends UploadFile
      * @var File
      */
     protected $file;
-
-    /**
-     * @MongoDB\Field(type="hash")
-     * @Gedmo\Versioned
-     */
-    protected $dailyTransaction = array();
 
     /**
      * @return string
@@ -41,20 +35,5 @@ class JudoFile extends UploadFile
             $this->getDate()->format('m'),
             $now->format('U')
         );
-    }
-
-    public function getDailyTransaction()
-    {
-        return $this->dailyTransaction;
-    }
-
-    public function setDailyTransaction($dailyTransaction)
-    {
-        $this->dailyTransaction = $dailyTransaction;
-    }
-
-    public static function combineDailyTransactions($judoFiles)
-    {
-        return self::combineFiles($judoFiles, 'getDailyTransaction');
     }
 }
