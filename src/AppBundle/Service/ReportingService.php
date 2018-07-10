@@ -951,7 +951,8 @@ class ReportingService
             $claimsCost = 0;
             $claimsReserves = 0;
             foreach ($policy->getClaims() as $claim) {
-                $claimsCost += $claim->getTotalIncurred() + $claim->getClaimHandlingFees();
+                /** @var Claim $claim */
+                $claimsCost += $claim->getIncurred();
                 $claimsReserves += $claim->getReservedValue();
             }
             $data['claimsCost'] += $claimsCost;
