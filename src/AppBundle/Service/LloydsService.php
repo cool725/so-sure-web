@@ -146,7 +146,7 @@ class LloydsService
                         } elseif (trim($line['Transaction Description']) == 'DDICA') {
                             $processedDate = \DateTime::createFromFormat("d/m/Y", $line['Transaction Date']);
                             $paymentType = self::PAYMENT_TYPE_BACS;
-                            if (preg_match('/DDIC[0-9]{3,20}/', $line['Transaction Description'], $matches) {
+                            if (preg_match('/DDIC[0-9]{3,20}/', $line['Transaction Description'], $matches)) {
                                 $this->logger->warning(sprintf(
                                     'Make sure to approve DDIC %s',
                                     $matches[1]
