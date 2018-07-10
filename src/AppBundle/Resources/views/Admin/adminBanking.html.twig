@@ -89,7 +89,6 @@
                     <table class="table table-striped">
                         <tr>
                             <th></th>
-                            <th>so-sure (tz)</th>
                             <th>so-sure</th>
                             <th>Salva</th>
                             <th>Diff</th>
@@ -102,9 +101,6 @@
                             {% else %}
                                 {% set color = 'danger' %}
                             {% endif %}
-                            <td class="{{ color }}">
-                                £{{ sosure['monthlyShiftedTransaction'].total|number_format(2, '.', ',') }}
-                            </td>
                             <td class="{{ color }}">
                                 £{{ sosure['monthlyTransaction'].total|number_format(2, '.', ',') }}
                             </td>
