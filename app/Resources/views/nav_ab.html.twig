@@ -16,48 +16,48 @@
             </button>
             {% if app.user is not null and app.user %}
                 {% if is_granted('ROLE_ADMIN') %}
-                    <a href="{{ path('admin_home') }}?nav=1" role="button" class="btn btn-default navbar-btn pull-right visible-md-inline-block">Admin</a>
+                    <a href="{{ path('admin_home') }}?nav=1" role="button" class="btn btn-default navbar-btn pull-right hidden-xs hidden-sm">Admin</a>
                 {% elseif is_granted('ROLE_EMPLOYEE') %}
-                    <a href="{{ path('admin_home') }}?nav=1" role="button" class="btn btn-default navbar-btn pull-right visible-md-inline-block">Admin</a>
+                    <a href="{{ path('admin_home') }}?nav=1" role="button" class="btn btn-default navbar-btn pull-right hidden-xs hidden-sm">Admin</a>
                 {% elseif is_granted('ROLE_CLAIMS') %}
-                    <a href="{{ path('claims_home') }}?nav=1" role="button" class="btn btn-default navbar-btn pull-right visible-md-inline-block">Claims</a>
+                    <a href="{{ path('claims_home') }}?nav=1" role="button" class="btn btn-default navbar-btn pull-right hidden-xs hidden-sm">Claims</a>
                 {% else %}
-                    <a href="{{ path('user_home') }}?nav=1" role="button" class="btn btn-default navbar-btn pull-right visible-md-inline-block">Your Account</a>
+                    <a href="{{ path('user_home') }}?nav=1" role="button" class="btn btn-default navbar-btn pull-right hidden-xs hidden-sm">Your Account</a>
                 {% endif %}
                 {% if is_granted('ROLE_PREVIOUS_ADMIN') %}
-                    <a href="{{ path('homepage', {'_impersonate': '_exit'}) }}?nav=1" role="button" class="btn btn-default navbar-btn pull-right visible-md-inline-block" title="Logged in as {{ app.user.email }}">Logout</strong></a>
+                    <a href="{{ path('homepage', {'_impersonate': '_exit'}) }}?nav=1" role="button" class="btn btn-default navbar-btn pull-right hidden-xs hidden-sm" title="Logged in as {{ app.user.email }}">Logout</strong></a>
                 {% else %}
-                    <a href="{{ path('fos_user_security_logout') }}?nav=1" role="button" class="btn btn-default navbar-btn pull-right visible-md-inline-block">Logout</a>
+                    <a href="{{ path('fos_user_security_logout') }}?nav=1" role="button" class="btn btn-default navbar-btn pull-right hidden-xs hidden-sm">Logout</a>
                 {% endif %}
             {% else %}
-                <a href="{{ path('fos_user_security_login') }}?nav=1" role="button" class="btn btn-default navbar-btn pull-right visible-md-inline-block">Login</a>
+                <a href="{{ path('fos_user_security_login') }}?nav=1" role="button" class="btn btn-default navbar-btn pull-right hidden-xs hidden-sm">Login</a>
             {% endif %}
         </div>
         <div id="navbar" class="navbar-collapse collapse">
             <ul class="nav navbar-nav navbar-right">
                 {% if app.user is not null and app.user %}
                     {% if is_granted('ROLE_ADMIN') %}
-                        <li class="visible-xs-block visible-sm-block"><span><a href="{{ path('admin_home') }}?nav=1" class="btn btn-white-hollow"><i class="fa fa-home"></i> Admin</a></span></li>
+                        <li class="hidden-md hidden-lg"><span><a href="{{ path('admin_home') }}?nav=1" class="btn btn-white-hollow"><i class="fa fa-home"></i> Admin</a></span></li>
                     {% elseif is_granted('ROLE_EMPLOYEE') %}
-                        <li class="visible-xs-block visible-sm-block"><span><a href="{{ path('admin_home') }}?nav=1" class="btn btn-white-hollow"><i class="fa fa-home"></i> Admin</a></span></li>
+                        <li class="hidden-md hidden-lg"><span><a href="{{ path('admin_home') }}?nav=1" class="btn btn-white-hollow"><i class="fa fa-home"></i> Admin</a></span></li>
                     {% elseif is_granted('ROLE_CLAIMS') %}
-                        <li class="visible-xs-block visible-sm-block"><span><a href="{{ path('claims_home') }}?nav=1" class="btn btn-white-hollow"><i class="fa fa-home"></i> Claims</a></span></li>
+                        <li class="hidden-md hidden-lg"><span><a href="{{ path('claims_home') }}?nav=1" class="btn btn-white-hollow"><i class="fa fa-home"></i> Claims</a></span></li>
                     {% else %}
-                        <li class="visible-xs-block visible-sm-block">
+                        <li class="hidden-md hidden-lg">
                             <span><a href="{{ path('user_home') }}?nav=1" class="btn btn-white-hollow">Your Account</a></span>
                         </li>
                     {% endif %}
                     {% if is_granted('ROLE_PREVIOUS_ADMIN') %}
-                        <li class="visible-xs-block visible-sm-block">
+                        <li class="hidden-md hidden-lg">
                             <span><a href="{{ path('homepage', {'_impersonate': '_exit'}) }}?nav=1" class="btn btn-white-hollow" title="Logged in as {{ app.user.email }}">Logout</a></span>
                         </li>
                     {% else %}
-                        <li class="visible-xs-block visible-sm-block">
+                        <li class="hidden-md hidden-lg">
                             <span><a href="{{ path('fos_user_security_logout') }}?nav=1" class="btn btn-white-hollow">Logout</a></span>
                         </li>
                     {% endif %}
                 {% else %}
-                    <li class="visible-xs-block visible-sm-block">
+                    <li class="hidden-md hidden-lg">
                         <span><a href="{{ path('fos_user_security_login') }}?nav=1" class="btn btn-white-hollow">Login</a></span>
                     </li>
                 {% endif %}
