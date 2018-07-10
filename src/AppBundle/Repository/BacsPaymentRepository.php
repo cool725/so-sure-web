@@ -10,7 +10,7 @@ class BacsPaymentRepository extends PaymentRepository
 {
     use DateTrait;
 
-    public function findPayments($month)
+    public function findPayments(\DateTime $month)
     {
         $startDay = $this->startOfMonth($month);
         $nextDay = $this->endOfMonth($month);
@@ -24,9 +24,11 @@ class BacsPaymentRepository extends PaymentRepository
             ->execute();
     }
 
-    public function findPaymentsIncludingNextMonth($month)
+    public function findPaymentsIncludingPreviousNextMonth(\DateTime $month)
     {
-        $startDay = $this->startOfMonth($month);
+        $previousMonth = clone $month;
+        $previousMonth = $previousMonth->sub(new \DateInterval('P1M'));
+        $startDay = $this->startOfMonth($previousMonth);
         $nextDay = $this->endOfMonth($this->endOfMonth($month));
 
         return $this->createQueryBuilder()
