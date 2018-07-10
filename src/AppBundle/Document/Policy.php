@@ -2727,7 +2727,8 @@ abstract class Policy
         }
 
         // if its an initial (not renewal) valid policy without a payment, probably it should be expired
-        if (!$this->hasPreviousPolicy() && !$this->getLastSuccessfulUserPaymentCredit()) {
+        if (!$this->hasPreviousPolicy() && !$this->getLastSuccessfulUserPaymentCredit() &&
+            !$this->getUser()->hasBacsPaymentMethod()) {
             throw new \Exception(sprintf(
                 'Policy %s does not have a success payment - should be expired?',
                 $this->getId()
