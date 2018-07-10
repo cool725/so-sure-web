@@ -278,7 +278,8 @@ class BICommand extends BaseCommand
             '"Make/Model/Memory"',
             '"Reward Pot"',
             '"Premium Paid"',
-            '"Yearly Premium"'
+            '"Yearly Premium"',
+            '"Premium Outstanding"',
         ]);
         foreach ($policies as $policy) {
             /** @var Policy $policy */
@@ -327,7 +328,8 @@ class BICommand extends BaseCommand
                 sprintf('"%s"', $policy->getPhone()->__toString()),
                 sprintf('"%0.2f"', $policy->getPotValue()),
                 sprintf('"%0.2f"', $policy->getPremiumPaid()),
-                sprintf('"%0.2f"', $policy->getPremium()->getYearlyPremiumPrice())
+                sprintf('"%0.2f"', $policy->getPremium()->getYearlyPremiumPrice()),
+                sprintf('"%0.2f"', $policy->getUnderwritingOutstandingPremium()),
             ]);
         }
         if (!$skipS3) {

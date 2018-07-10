@@ -945,8 +945,9 @@ class ReportingService
             /** @var Policy $policy */
             $data['policies']++;
             $data['premiumReceived'] += $policy->getPremiumPaid();
-            $data['premiumOutstanding'] += $policy->getOutstandingPremium();
-            $data['premiumTotal'] += $policy->getPremium()->getYearlyPremiumPrice();
+            $data['premiumOutstanding'] += $policy->getUnderwritingOutstandingPremium();
+            $data['premiumTotal'] += $this->toTwoDp($policy->getPremiumPaid() +
+                $policy->getUnderwritingOutstandingPremium());
             $claimsCost = 0;
             $claimsReserves = 0;
             foreach ($policy->getClaims() as $claim) {

@@ -2282,6 +2282,18 @@ abstract class Policy
         return $this->toTwoDp($brokerCommission);
     }
 
+    public function getUnderwritingOutstandingPremium()
+    {
+        // From Dylan:
+        // if paid , then payment accounted
+        // if not paid/paying, then it should not show as outstanding amount due (as we won't be receiving it)
+        if (in_array($this->getStatus(), [self::STATUS_ACTIVE, self::STATUS_UNPAID])) {
+            return $this->getOutstandingPremium();
+        } else {
+            return 0;
+        }
+    }
+
     public function getOutstandingPremium()
     {
         return $this->toTwoDp($this->getPremium()->getYearlyPremiumPrice() - $this->getPremiumPaid());
@@ -2727,7 +2739,8 @@ abstract class Policy
         }
 
         // if its an initial (not renewal) valid policy without a payment, probably it should be expired
-        if (!$this->hasPreviousPolicy() && !$this->getLastSuccessfulUserPaymentCredit()) {
+        if (!$this->hasPreviousPolicy() && !$this->getLastSuccessfulUserPaymentCredit() &&
+            !$this->getUser()->hasBacsPaymentMethod()) {
             throw new \Exception(sprintf(
                 'Policy %s does not have a success payment - should be expired?',
                 $this->getId()
