@@ -1,5 +1,5 @@
 {# Mobile Table #}
-<div class="row comparison__container">
+<div class="row comparison__container visible-xs-block">
     <div class="col-xs-6 left">
         <ul class="list-unstyled comparison__list comparison__list_border">
             <li class="so-sure">
@@ -38,11 +38,9 @@
              data-ride="carousel"
              data-interval="8000">
             <div class="carousel-inner" role="listbox">
-                <ul class="list-unstyled comparison__list item active">
+                <ul class="list-unstyled comparison__list comparison__list_border item active">
                     <li class="protectyourbubble clearfix">
-                        <img src="{{ cdn_url }}/images/competitor_logos/so-sure-protect-your-bubble-logo.svg"
-                             alt="Protectyourbubble"
-                             width="80px">
+                        <span class="h4 text-white">Protect your <br> bubble</span>
 
                         <a href="#carousel-comparison" data-slide="prev" class="comparison__controls comparison__controls_left"><i class="fa fa-chevron-left fa-lg text-white" aria-hidden="true"></i></a>
                         <a href="#carousel-comparison" data-slide="next" class="comparison__controls comparison__controls_right"><i class="fa fa-chevron-right fa-lg text-white" aria-hidden="true"></i></a>
@@ -68,11 +66,10 @@
                         &lt; 6 months
                     </li>
                 </ul>
-                <ul class="list-unstyled comparison__list item">
+                <ul class="list-unstyled comparison__list comparison__list_border item">
                     <li class="loveitcoverit">
-                        <img src="{{ cdn_url }}/images/competitor_logos/so-sure-love-it-cover-it-logo.svg"
-                             alt="Loveitcoverit"
-                             width="80px">
+                        <span class="h4 text-dark-blue">love it <br> cover it</span>
+
                         <a href="#carousel-comparison" data-slide="prev" class="comparison__controls comparison__controls_left"><i class="fa fa-chevron-left fa-lg text-dark-blue" aria-hidden="true"></i></a>
                         <a href="#carousel-comparison" data-slide="next" class="comparison__controls comparison__controls_right"><i class="fa fa-chevron-right fa-lg text-dark-blue" aria-hidden="true"></i></a>
                     </li>
@@ -97,11 +94,10 @@
                         &lt; 3 years
                     </li>
                 </ul>
-                <ul class="list-unstyled comparison__list item">
+                <ul class="list-unstyled comparison__list comparison__list_border item">
                     <li class="gadgetcover">
-                        <img src="{{ cdn_url }}/images/competitor_logos/so-sure-gadget-cover-logo.svg"
-                             alt="Gadget Cover"
-                             width="60px">
+                        <span class="h4 text-dark-blue">Gadget <br> Cover</span>
+
                         <a href="#carousel-comparison" data-slide="prev" class="comparison__controls comparison__controls_left"><i class="fa fa-chevron-left fa-lg text-dark-blue" aria-hidden="true"></i></a>
                         <a href="#carousel-comparison" data-slide="next" class="comparison__controls comparison__controls_right"><i class="fa fa-chevron-right fa-lg text-dark-blue" aria-hidden="true"></i></a>
                     </li>
@@ -144,20 +140,14 @@
                          alt="so-sure"
                          width="120px">
                 </th>
-                <th class="protectyourbubble text-white" width="20%">
-                    <img src="{{ cdn_url }}/images/competitor_logos/so-sure-protect-your-bubble-logo.svg"
-                         alt="Protectyourbubble"
-                         width="120px">
+                <th class="protectyourbubble text-white h4" width="20%">
+                    Protect your bubble
                 </th>
-                <th class="loveitcoverit text-white" width="20%">
-                    <img src="{{ cdn_url }}/images/competitor_logos/so-sure-love-it-cover-it-logo.svg"
-                         alt="Loveitcoverit"
-                         width="120px">
+                <th class="loveitcoverit text-dark-blue h4" width="20%">
+                    love it cover it
                 </th>
-                <th class="gadgetcover" width="20%">
-                    <img src="{{ cdn_url }}/images/competitor_logos/so-sure-gadget-cover-logo.svg"
-                         alt="Gadget Cover"
-                         width="80px">
+                <th class="gadgetcover text-dark-blue h4" width="20%">
+                    Gadget Cover
                 </th>
             </tr>
         </thead>
