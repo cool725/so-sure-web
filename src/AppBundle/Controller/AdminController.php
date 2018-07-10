@@ -607,7 +607,7 @@ class AdminController extends BaseController
             'arudds' => $s3FileRepo->getAllFiles($date, 'bacsReportArudd'),
             'ddic' => $s3FileRepo->getAllFiles($date, 'bacsReportDdic'),
             'input' => $s3FileRepo->getAllFiles($date, 'bacsReportInput'),
-            'payments' => $paymentsRepo->findPayments($date),
+            'payments' => $paymentsRepo->findPaymentsIncludingNextMonth($date),
             'indemnity' => $paymentsIndemnityRepo->findPayments($date),
             'uploadForm' => $uploadForm->createView(),
             'uploadDebitForm' => $uploadDebitForm->createView(),
