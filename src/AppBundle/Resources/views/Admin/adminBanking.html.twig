@@ -64,6 +64,7 @@
                 <div class="col-md-6">
                     <h3>Transaction Date</h3>
                     {% set sosureTotal = 0 %}
+                    {% set sosureShiftedTotal = 0 %}
                     {% set salvaTotal = 0 %}
                     {% for day in 1..days_in_month %}
                         {% if month < 10 and day < 10 %}
@@ -78,6 +79,9 @@
                         {% if sosure['dailyTransaction'][day] is defined %}
                             {% set sosureTotal = sosureTotal + sosure['dailyTransaction'][day] %}
                         {% endif %}
+                        {% if sosure['dailyShiftedTransaction'][day] is defined %}
+                            {% set sosureShiftedTotal = sosureShiftedTotal + sosure['dailyShiftedTransaction'][day] %}
+                        {% endif %}
                         {% if salva['dailyTransaction'][ymd] is defined %}
                             {% set salvaTotal = salvaTotal + salva['dailyTransaction'][ymd] %}
                         {% endif %}
@@ -85,6 +89,7 @@
                     <table class="table table-striped">
                         <tr>
                             <th></th>
+                            <th>so-sure (tz)</th>
                             <th>so-sure</th>
                             <th>Salva</th>
                             <th>Diff</th>
@@ -97,6 +102,9 @@
                             {% else %}
                                 {% set color = 'danger' %}
                             {% endif %}
+                            <td class="{{ color }}">
+                                £{{ sosure['monthlyShiftedTransaction'].total|number_format(2, '.', ',') }}
+                            </td>
                             <td class="{{ color }}">
                                 £{{ sosure['monthlyTransaction'].total|number_format(2, '.', ',') }}
                             </td>
@@ -125,6 +133,7 @@
                     <table class="table table-striped">
                         <tr>
                             <th>Day of Month</th>
+                            <th>so-sure (tz)</th>
                             <th>so-sure</th>
                             <th>Salva</th>
                             <th>Diff</th>
@@ -151,6 +160,12 @@
                             {% endif %}
                             <tr class='{{ color }}'>
                                 <td>{{ day }}</td>
+                                <td>{% if sosure['dailyShiftedTransaction'][day] is defined %}
+                                        £{{ sosure['dailyShiftedTransaction'][day]|number_format(2, '.', ',') }}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
                                 <td>{% if sosure['dailyTransaction'][day] is defined %}
                                         £{{ sosure['dailyTransaction'][day]|number_format(2, '.', ',') }}
                                     {% else %}
@@ -181,6 +196,9 @@
                         {% endfor %}
                         <tr class="background-light-grey">
                             <td>SubTotal</td>
+                            <td>
+                                £{{ sosureShiftedTotal|number_format(2, '.', ',') }}
+                            </td>
                             <td>
                                 £{{ sosureTotal|number_format(2, '.', ',') }}
                             </td>
