@@ -453,6 +453,7 @@ class AdminController extends BaseController
         $dm = $this->getManager();
         /** @var UserRepository $userRepo */
         $userRepo = $dm->getRepository(User::class);
+        /** @var S3FileRepository $s3FileRepo */
         $s3FileRepo = $dm->getRepository(S3File::class);
         /** @var BacsPaymentRepository $paymentsRepo */
         $paymentsRepo = $dm->getRepository(BacsPayment::class);
@@ -608,6 +609,7 @@ class AdminController extends BaseController
             'arudds' => $s3FileRepo->getAllFiles($date, 'bacsReportArudd'),
             'ddic' => $s3FileRepo->getAllFiles($date, 'bacsReportDdic'),
             'input' => $s3FileRepo->getAllFiles($date, 'bacsReportInput'),
+            'inputIncPrevMonth' => $s3FileRepo->getAllFiles($date, 'bacsReportInput', true),
             'payments' => $paymentsRepo->findPayments($date),
             'paymentsIncPrevNextMonth' => $paymentsRepo->findPaymentsIncludingPreviousNextMonth($date),
             'indemnity' => $paymentsIndemnityRepo->findPayments($date),
