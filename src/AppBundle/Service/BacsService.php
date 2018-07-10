@@ -515,6 +515,7 @@ class BacsService
                         $submittedPayment->getPolicy()->getStatus() == Policy::STATUS_ACTIVE) {
                         $submittedPayment->getPolicy()->setStatus(Policy::STATUS_UNPAID);
                     }
+                    // TODO: Email user
                     $results['failed-payments']++;
                     $days = $submittedPayment->getDate()->diff($originalProcessingDate);
                     $results['details'][$reference] = [$submittedPayment->getId() => $days->days];
