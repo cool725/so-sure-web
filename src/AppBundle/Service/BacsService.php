@@ -510,6 +510,12 @@ class BacsService
                 if ($submittedPayment->getPolicy()->getUser()->getId() == $user->getId()) {
                     $foundPayments++;
                     $submittedPayment->setStatus(BacsPayment::STATUS_FAILURE);
+                    // Set policy as unpaid if there's a payment failure
+                    if (!$submittedPayment->getPolicy()->isPolicyPaidToDate() &&
+                        $submittedPayment->getPolicy()->getStatus() == Policy::STATUS_ACTIVE) {
+                        $submittedPayment->getPolicy()->setStatus(Policy::STATUS_UNPAID);
+                    }
+                    // TODO: Email user
                     $results['failed-payments']++;
                     $days = $submittedPayment->getDate()->diff($originalProcessingDate);
                     $results['details'][$reference] = [$submittedPayment->getId() => $days->days];
