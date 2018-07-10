@@ -23,4 +23,18 @@ class BacsPaymentRepository extends PaymentRepository
             ->getQuery()
             ->execute();
     }
+
+    public function findPaymentsIncludingNextMonth($month)
+    {
+        $startDay = $this->startOfMonth($month);
+        $nextDay = $this->endOfMonth($this->endOfMonth($month));
+
+        return $this->createQueryBuilder()
+            ->field('date')->gte($startDay)
+            ->field('date')->lt($nextDay)
+            ->sort('date', 'desc')
+            ->sort('serialNumber', 'desc')
+            ->getQuery()
+            ->execute();
+    }
 }
