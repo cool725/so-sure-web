@@ -7,7 +7,9 @@ var _rollbarConfig = {
     },
     ignoredMessages: [
         "Script error",
-        "document.getElementsByClassName.ToString is not a function"
+        "is not a function",
+        "is not defined",
+        "Cannot read property"
     ]
 };
 // Rollbar Snippet
