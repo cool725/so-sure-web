@@ -2,6 +2,7 @@
 namespace AppBundle\Service;
 
 use AppBundle\Document\File\SalvaPaymentFile;
+use AppBundle\Document\Payment\BacsIndemnityPayment;
 use AppBundle\Repository\CashbackRepository;
 use AppBundle\Repository\ClaimRepository;
 use AppBundle\Repository\ConnectionRepository;
@@ -896,6 +897,7 @@ class ReportingService
             'sosure' => Payment::sumPayments($payments, $isProd, SoSurePayment::class),
             'chargebacks' => Payment::sumPayments($payments, $isProd, ChargebackPayment::class),
             'bacs' => Payment::sumPayments($payments, $isProd, BacsPayment::class),
+            'bacsIndemnity' => Payment::sumPayments($payments, $isProd, BacsIndemnityPayment::class),
             'potReward' => Payment::sumPayments($potRewardPayments, $isProd, PotRewardPayment::class),
             'potRewardCashback' => Payment::sumPayments($potRewardPaymentsCashback, $isProd, PotRewardPayment::class),
             'potRewardDiscount' => Payment::sumPayments($potRewardPaymentsDiscount, $isProd, PotRewardPayment::class),
