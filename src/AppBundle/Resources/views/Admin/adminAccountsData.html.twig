@@ -52,13 +52,18 @@
     </tr>
     <tr>
         <td width="{{ indent_width }}"></td>
+        <td width="{{ text_width }}">Chargebacks (bacs)</td>
+        <td>(£{{ (0 - paymentTotals.bacsIndemnity.refunded)|number_format(2, '.', ',') }})</td>
+    </tr>
+    <tr>
+        <td width="{{ indent_width }}"></td>
         <td width="{{ text_width }}">Refunded (so-sure)</td>
         <td>(£{{ (0 - paymentTotals.sosure.refunded)|number_format(2, '.', ',') }})</td>
     </tr>
     <tr>
         <td width="{{ indent_width }}"></td>
         <td width="{{ text_width }}"><strong>Premium refunds in month</strong></td>
-        {% set refundedTotal = paymentTotals.judo.refunded + paymentTotals.chargebacks.total + paymentTotals.bacs.refunded + paymentTotals.sosure.refunded %}
+        {% set refundedTotal = paymentTotals.judo.refunded + paymentTotals.chargebacks.total + paymentTotals.bacsIndemnity.refunded + paymentTotals.bacs.refunded + paymentTotals.sosure.refunded %}
         {% set expectedRefunded = paymentTotals.all.refunded + paymentTotals.chargebacks.received %}
         {% if equal_to_two_dp(refundedTotal, expectedRefunded) %}
         <td><strong>(£{{ (0 - paymentTotals.all.refunded)|number_format(2, '.', ',') }})</strong></td>
