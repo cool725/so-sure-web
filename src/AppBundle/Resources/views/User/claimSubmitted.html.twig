@@ -83,11 +83,11 @@
                         {% if picture_of_phone is defined and picture_of_phone %}
                             <div class="row">
                                 <div class="col-xs-12 text-center">
+                                    <div class="form-group {% if form_errors(claim_form.pictureOfPhone) %}has-error{% endif %}">
                                         <label class="h4">Picture of damaged phone</label>
                                         {% for file in claim.damagePictureFiles %}
                                             <p><a href="{{ s3DownloadLink(file.bucket, file.key) }}">{{ file.fileName }}</a> (Uploaded {{ file.created|date }})</p>
                                         {% endfor %}
-                                        <div class="form-group {% if form_errors(claim_form.pictureOfPhone) %}has-error{% endif %}">
                                         {{ form_widget(claim_form.pictureOfPhone, { 'attr': {'class': 'form-control'}}) }}
                                         <div class="help-block with-errors">{{ form_errors(claim_form.pictureOfPhone) }}</div>
                                         <div class="bg-info text-left">
@@ -104,11 +104,11 @@
                         {% if proof_of_barring is defined and proof_of_barring %}
                             <div class="row">
                                 <div class="col-xs-12 text-center">
-                                    {% for file in claim.proofOfBarringFiles %}
-                                        <p><a href="{{ s3DownloadLink(file.bucket, file.key) }}">{{ file.fileName }}</a> (Uploaded {{ file.created|date }})</p>
-                                    {% endfor %}
                                     <div class="form-group {% if form_errors(claim_form.proofOfBarring) %}has-error{% endif %}">
                                         <label class="h4">Proof of barring</label>
+                                        {% for file in claim.proofOfBarringFiles %}
+                                            <p><a href="{{ s3DownloadLink(file.bucket, file.key) }}">{{ file.fileName }}</a> (Uploaded {{ file.created|date }})</p>
+                                        {% endfor %}
                                         {{ form_widget(claim_form.proofOfBarring, { 'attr': {'class': 'form-control'}}) }}
                                         <div class="help-block with-errors">{{ form_errors(claim_form.proofOfBarring) }}</div>
                                     </div>
@@ -119,11 +119,11 @@
                         {% if proof_of_purchase is defined and proof_of_purchase %}
                             <div class="row">
                                 <div class="col-xs-12 text-center">
-                                {% for file in claim.proofOfPurchaseFiles %}
-                                    <p><a href="{{ s3DownloadLink(file.bucket, file.key) }}">{{ file.fileName }}</a> (Uploaded {{ file.created|date }})</p>
-                                {% endfor %}
                                     <div class="form-group {% if form_errors(claim_form.proofOfPurchase) %}has-error{% endif %}">
                                         <label class="h4">Proof of purchase</label>
+                                    {% for file in claim.proofOfPurchaseFiles %}
+                                        <p><a href="{{ s3DownloadLink(file.bucket, file.key) }}">{{ file.fileName }}</a> (Uploaded {{ file.created|date }})</p>
+                                    {% endfor %}
                                         {{ form_widget(claim_form.proofOfPurchase, { 'attr': {'class': 'form-control'}}) }}
                                         <div class="help-block with-errors">{{ form_errors(claim_form.proofOfPurchase) }}</div>
                                     </div>

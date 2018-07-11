@@ -7,6 +7,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\ButtonType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -26,22 +27,15 @@ class ClaimFnolTheftLossType extends AbstractType
 {
 
     /**
-     * @var boolean
-     */
-    private $required;
-
-     /**
      * @var ClaimsService
      */
     private $claimsService;
 
     /**
-     * @param boolean       $required
      * @param ClaimsService $claimsService
      */
-    public function __construct($required, ClaimsService $claimsService)
+    public function __construct(ClaimsService $claimsService)
     {
-        $this->required = $required;
         $this->claimsService = $claimsService;
     }
 
@@ -49,7 +43,7 @@ class ClaimFnolTheftLossType extends AbstractType
     {
         $builder
             ->add('hasContacted', ChoiceType::class, [
-                'required' => true,
+                'required' => false,
                 'placeholder' => 'Please choose..',
                 'choices' => [
                     'Yes' => true,
@@ -57,9 +51,9 @@ class ClaimFnolTheftLossType extends AbstractType
                     'N/A' => null,
                 ],
             ])
-            ->add('contactedPlace', TextType::class, ['required' => true])
+            ->add('contactedPlace', TextType::class, ['required' => false])
             ->add('blockedDate', DateType::class, [
-                  'required' => $this->required,
+                  'required' => false,
                   'format'   => 'dd/MM/yyyy',
                   'widget' => 'single_text',
                   'placeholder' => array(
@@ -67,7 +61,7 @@ class ClaimFnolTheftLossType extends AbstractType
                   ),
             ])
             ->add('reportedDate', DateType::class, [
-                  'required' => $this->required,
+                  'required' => false,
                   'format'   => 'dd/MM/yyyy',
                   'widget' => 'single_text',
                   'placeholder' => array(
@@ -75,14 +69,16 @@ class ClaimFnolTheftLossType extends AbstractType
                   ),
             ])
             ->add('reportType', ChoiceType::class, [
-                'required' => true,
+                'required' => false,
                 'placeholder' => 'Please choose...',
                 'choices' => [
                     'Police station' => Claim::REPORT_POLICE_STATION,
                     'Online' => Claim::REPORT_ONLINE,
                 ],
             ])
-            ->add('proofOfBarring', FileType::class)
+            ->add('proofOfBarring', FileType::class, ['required' => false])
+            ->add('isSave', HiddenType::class)
+            ->add('save', ButtonType::class)
             ->add('confirm', SubmitType::class)
         ;
 
@@ -93,19 +89,19 @@ class ClaimFnolTheftLossType extends AbstractType
             if (!$claim->needProofOfUsage()) {
                 $form->add('proofOfUsage', HiddenType::class);
             } else {
-                $form->add('proofOfUsage', FileType::class, ['required' => true]);
+                $form->add('proofOfUsage', FileType::class, ['required' => false]);
             }
             if (!$claim->needProofOfPurchase()) {
                 $form->add('proofOfPurchase', HiddenType::class);
             } else {
-                $form->add('proofOfPurchase', FileType::class, ['required' => true]);
+                $form->add('proofOfPurchase', FileType::class, ['required' => false]);
             }
             if ($claim->getType() == Claim::TYPE_THEFT) {
-                $form->add('crimeReferenceNumber', TextType::class, ['required' => true]);
+                $form->add('crimeReferenceNumber', TextType::class, ['required' => false]);
                 $form->add('policeLossReport', HiddenType::class);
             } else {
                 $form->add('crimeReferenceNumber', HiddenType::class);
-                $form->add('policeLossReport', TextType::class, ['required' => true]);
+                $form->add('policeLossReport', TextType::class, ['required' => false]);
             }
         });
 

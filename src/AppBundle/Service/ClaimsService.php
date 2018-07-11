@@ -96,7 +96,7 @@ class ClaimsService
         return $claim;
     }
 
-    public function updateDamageDocuments(Claim $claim, ClaimFnolDamage $claimDamage)
+    public function updateDamageDocuments(Claim $claim, ClaimFnolDamage $claimDamage, $submit = false)
     {
         $claim->setTypeDetails($claimDamage->getTypeDetails());
         $claim->setTypeDetailsOther($claimDamage->getTypeDetailsOther());
@@ -118,14 +118,16 @@ class ClaimsService
             $pictureOfPhone->setClaim($claim);
             $claim->addFile($pictureOfPhone);
         }
-        $claim->setSubmissionDate(new \DateTime());
-        $claim->setStatus(Claim::STATUS_SUBMITTED);
-        $this->dm->flush();
+        if ($submit) {
+            $claim->setSubmissionDate(new \DateTime());
+            $claim->setStatus(Claim::STATUS_SUBMITTED);
+            $this->notifyClaimSubmission($claim);
+        }
 
-        $this->notifyClaimSubmission($claim);
+        $this->dm->flush();
     }
 
-    public function updateTheftLossDocuments(Claim $claim, ClaimFnolTheftLoss $claimTheftLoss)
+    public function updateTheftLossDocuments(Claim $claim, ClaimFnolTheftLoss $claimTheftLoss, $submit = false)
     {
         $claim->setHasContacted($claimTheftLoss->getHasContacted());
         $claim->setContactedPlace($claimTheftLoss->getContactedPlace());
@@ -156,11 +158,13 @@ class ClaimsService
             $proofOfPurchase->setClaim($claim);
             $claim->addFile($proofOfPurchase);
         }
-        $claim->setSubmissionDate(new \DateTime());
-        $claim->setStatus(Claim::STATUS_SUBMITTED);
-        $this->dm->flush();
+        if ($submit) {
+            $claim->setSubmissionDate(new \DateTime());
+            $claim->setStatus(Claim::STATUS_SUBMITTED);
+            $this->notifyClaimSubmission($claim);
+        }
 
-        $this->notifyClaimSubmission($claim);
+        $this->dm->flush();
     }
 
     public function updateDocuments(Claim $claim, ClaimFnolUpdate $claimUpdate)

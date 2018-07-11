@@ -23,7 +23,7 @@ class ClaimFnolTheftLoss
 
     /**
      * @AppAssert\AlphanumericSpaceDot()
-     * @Assert\Length(min="5", max="200")
+     * @Assert\Length(min="4", max="200")
      */
     protected $contactedPlace;
 
@@ -59,6 +59,8 @@ class ClaimFnolTheftLoss
      * @Assert\Length(min="1", max="50")
      */
     protected $policeLossReport;
+
+    protected $isSave;
 
     public function getHasContacted()
     {
@@ -160,6 +162,16 @@ class ClaimFnolTheftLoss
         $this->policeLossReport = $policeLossReport;
     }
 
+    public function getIsSave()
+    {
+        return $this->isSave;
+    }
+    
+    public function setIsSave($isSave)
+    {
+        $this->isSave = $isSave;
+    }
+
     public function getClaim()
     {
         return $this->claim;
@@ -168,5 +180,12 @@ class ClaimFnolTheftLoss
     public function setClaim($claim)
     {
         $this->claim = $claim;
+        $this->hasContacted = $claim->getHasContacted();
+        $this->contactedPlace = $claim->getContactedPlace();
+        $this->blockedDate = $claim->getBlockedDate();
+        $this->reportedDate = $claim->getReportedDate();
+        $this->reportType = $claim->getReportType();
+        $this->crimeReferenceNumber = $claim->getCrimeRef();
+        $this->policeLossReport = $claim->getPoliceLossReport();
     }
 }
