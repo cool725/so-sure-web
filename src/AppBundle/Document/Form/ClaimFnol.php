@@ -185,7 +185,6 @@ class ClaimFnol
         if ($user) {
             $this->name = $user->getName();
             $this->email = $user->getEmail();
-            $this->phone = $user->getMobileNumber();
         }
     }
 

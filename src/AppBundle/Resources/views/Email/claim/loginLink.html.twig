@@ -8,11 +8,11 @@
 	</h1>
 	<div style="font-size: 14px; text-align: left;">
 	   <!--?xml version="1.0" encoding="UTF-8" standalone="no"?-->
-	   <div style="font-size: 14px; text-align: center;"><span style="font-family:arial,helvetica neue,helvetica,sans-serif">
+	   <div style="font-size: 14px; text-align: left;"><span style="font-family:arial,helvetica neue,helvetica,sans-serif">
         Hi {{ username }},<br><br>
         Please visit the following link to proceed with your claim: <a href="{{ tokenUrl }}">{{ tokenUrl }}</a>.
         <br><br>
-        Note that the link will only be valid for {{ tokenValid }} minutes.
+        Note that the link will only be valid for {{ tokenValid }} {{ tokenValidTimeframe }}.
         <br><br>
         Thanks for using so-sure.
 	   </div>

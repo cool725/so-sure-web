@@ -28,7 +28,7 @@ class ClaimsService
 {
 
     const S3_CLAIMS_FOLDER = 'claim-documents';
-    const LOGIN_LINK_TOKEN_EXPIRATION = 900;
+    const LOGIN_LINK_TOKEN_EXPIRATION = 7200; // 2 hours
 
     /** @var LoggerInterface */
     protected $logger;
@@ -460,7 +460,8 @@ class ClaimsService
                     'claim_login',
                     ['tokenId' => $token]
                 ),
-                'tokenValid' => self::LOGIN_LINK_TOKEN_EXPIRATION/60
+                'tokenValid' => self::LOGIN_LINK_TOKEN_EXPIRATION / 3600, // hours
+                'tokenValidTimeframe' => 'hours'
             ];
 
             $this->mailer->sendTemplate(
