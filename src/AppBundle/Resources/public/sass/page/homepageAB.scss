@@ -1,0 +1,742 @@
+// homepageNew.scss
+
+@import "../common/variables";
+@import "../mixins";
+@import "../common/palette";
+@import "../common/paletteNew";
+@import "../common/type";
+
+.navbar {
+    background-color: $white;
+}
+
+// TODO: Move!
+.img-responsive--center {
+    margin: 0 auto;
+}
+
+.curved-background {
+    height: 200px;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+
+    background-color: $white;
+
+    svg {
+        width: 100%;
+        position: absolute;
+        top: 0; left: 0;
+    }
+
+    &__bg-blue {
+        background-color: $lightest-blue;
+    }
+
+    &__off-white {
+        background-color: $off-white;
+    }
+}
+
+// TODO: Move!
+.ol--blue-counter {
+    list-style: none;
+    padding-bottom: 30px;
+    padding-left: 60px;
+    position: relative;
+
+    > li {
+        counter-increment: item;
+        position: relative;
+
+        &:before {
+            width: 40px; height: 40px;
+            display: inline-block;
+            content: counter(item);
+            position: absolute;
+            top: 0; left: -55px;
+            text-align: center;
+            color: $white;
+            font-family: $avenir-heavy;
+            font-size: 24px;
+            line-height: 1.8;
+
+
+            background-color: $primary-blue;
+            @include border-radius(100%);
+        }
+    }
+}
+
+.ol--blue-counter__line {
+    margin-bottom: 50px;
+
+    &:before {
+        width: 5px; height: calc(100% - 100px);
+        content: '';
+        display: block;
+        position: absolute;
+        left: 22px; top: 30px;
+        background: $off-white;
+    }
+
+    li {
+        &:before {
+            top: 30px;
+        }
+    }
+}
+
+body {
+    background-color: $off-white;
+}
+
+.homepage {
+
+    &--hero {
+        position: relative;
+        text-align: center;
+        padding-left: 15px;
+        padding-right: 15px;
+
+        // Heading
+        &-h1 {
+            color: $primary-blue;
+
+            font-size: 30px;
+            line-height: 40px;
+            margin-bottom: 10px;
+
+            @include breakpoint(tablet) {
+                font-size: 42px;
+                line-height: 50px;
+            }
+
+            @include breakpoint(desktop) {
+                font-size: 72px;
+                line-height: 80px;
+            }
+        }
+
+        // Strapline
+        p {
+            margin-bottom: 0 0 30px;
+        }
+    }
+
+    &--hero-background-trustpilot {
+        // Mobile
+        padding: 20px 15px 80px;
+        background: $white url('#{$cdn_url}/images/homepage/so-sure_homepage_hero_mobile_background.svg') no-repeat center bottom;
+        background-size: 85%;
+
+
+        @include breakpoint(mobM) {
+            padding-bottom: 100px;
+        }
+
+        @include breakpoint(mobL) {
+            padding-bottom: 120px;
+        }
+
+        // Tablet
+        @include breakpoint(tablet) {
+            padding-bottom: 340px;
+        }
+
+        @include breakpoint(laptop) {
+            padding: 100px 15px 200px;
+            // Reset background
+            background: $white;
+
+            &:after, &:before {
+                width: 100%; height: 100%;
+                content: '';
+                position: absolute;
+                z-index: 0;
+                left: 50%;
+                margin-left: -50%;
+            }
+
+            // Add the Buildings
+            &:before {
+                bottom: 0;
+                background: transparent url('#{$cdn_url}/images/homepage/so-sure_hero_background_trustpilot_right_banner.svg') no-repeat center bottom;
+                background-size: 1900px;
+            }
+
+            // Add the Clouds
+            &:after {
+                top: 0; left: 50%;
+                background: transparent url('#{$cdn_url}/images/homepage/so-sure_homepage-hero-clouds-combined.svg') repeat-x center top;
+                background-size: 100%;
+            }
+        }
+
+        // Desktop
+        @include breakpoint(desktop) {
+            padding: 120px 15px 200px;
+        }
+
+        @include breakpoint(hd) {
+            padding: 200px 15px;
+        }
+    }
+
+    &--who-we-are {
+        background-color: $white;
+    }
+
+    &__press {
+        background: $off-white;
+        position: relative;
+        z-index: 1;
+        margin: 25px 0 0;
+
+        &_defaqto {
+            width: 100px;
+        }
+
+        &_trustpilot {
+            width: 100px;
+        }
+
+        &_money {
+            width: 100px;
+        }
+
+        &_gocompare {
+            width: 100px;
+        }
+
+        &_theguardian {
+            width: 100px;
+        }
+
+        &_financialtimes {
+            width: 100px;
+        }
+
+        @include breakpoint(tablet) {
+            &_defaqto {
+                width: 140px;
+            }
+
+            &_trustpilot {
+                width: 140px;
+            }
+
+            &_money {
+                width: 140px;
+            }
+
+            &_gocompare {
+                width: 200px;
+            }
+
+            &_theguardian {
+                width: 200px;
+            }
+
+            &_financialtimes {
+                width: 200px;
+            }
+        }
+    }
+
+    &__press_grayscale {
+        img {
+            filter: gray;
+            -webkit-filter: grayscale(1);
+            filter: grayscale(1);
+            opacity: 0.5;
+
+            &:hover {
+                filter: none;
+                -webkit-filter: none;
+                filter: none;
+                opacity: 1;
+            }
+        }
+    }
+
+    &--we-do-things-differently {
+        background-color: $white;
+    }
+
+
+    &--pic-sure {
+
+        ol {
+            li {
+
+                span {
+                    display: block;
+                }
+
+                @include breakpoint(laptop) {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+
+                    span {
+                        display: inline;
+                    }
+                }
+            }
+        }
+    }
+
+    &--how-does-the-reward-pot-work {
+        background-color: $off-white;
+        position: relative;
+
+        .video-container {
+            height: 0;
+            overflow: hidden;
+            z-index: 9;
+            position: relative;
+            padding-bottom: 53.4%;
+            padding-top: 30px;
+            margin: 30px 0;
+
+            iframe {
+                width: 100%; height: 100%;
+                position: absolute;
+                top: 0; left: 0;
+            }
+
+            @include breakpoint(desktop) {
+                width: 800px; height: 450px;
+                margin: 20px auto 80px;
+                box-shadow: 0px 3px 15px rgba(0, 0, 0, 0.2);
+                padding: 0;
+
+                iframe {
+                    width: inherit; height: inherit;
+                    position: static;
+                }
+            }
+
+        }
+    }
+
+    &--claims-process {
+        background-color: $white;
+        text-align: center;
+
+        .large-no {
+            position: relative;
+            display: inline-block;
+            font-size: 128px;
+            font-family: $avenir-heavy;
+            line-height: 1;
+            color: $primary-blue;
+            margin-top: 20px;
+
+            &--arrow {
+
+                @include breakpoint(laptop) {
+                    &:after {
+                        width: 163px; height: 26px;
+                        content: '';
+                        position: absolute;
+                        right: -203px; top: 40px;
+                        background: transparent url('#{$cdn_url}/images/homepage/so-sure_arrow_right.svg') no-repeat center;
+                    }
+                }
+
+                @include breakpoint(desktop) {
+                    &:after {
+                        right: -233px;
+                    }
+                }
+            }
+        }
+
+        h4 {
+            margin: 0;
+        }
+
+        p {
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+    }
+
+    &--we-compare-well {
+        background-color: $white;
+
+        table {
+            max-width: 960px;
+            margin: 0 auto 50px;
+            box-shadow: 0 0 10px 0 $grey;
+
+            thead {
+                td {
+                    padding: 30px 15px;
+                    text-align: center;
+                    vertical-align: middle;
+                }
+            }
+
+            tr {
+                td.sosure {
+                    background-color: $white;
+                }
+
+                td.contrast {
+                    background-color: lighten($lightest-blue, 6%);
+                    opacity: 0.7;
+                }
+            }
+
+            tbody {
+
+                tr {
+                    td {
+                        padding: 25px 20px 25px 90px;
+                        border-color: darken($lightest-blue, 6%);
+                        vertical-align: middle;
+                    }
+
+
+                    td.sosure  {
+                        background-image: url('#{$cdn_url}/images/logo/so-sure-blue-smile.svg');
+                        background-size: 40px 40px;
+                        background-repeat: no-repeat;
+                        background-position: 30px center;
+                    }
+
+                    td.contrast {
+                        background-image: url('#{$cdn_url}/images/logo/so-sure_blue-frown.svg');
+                        background-size: 40px 40px;
+                        background-repeat: no-repeat;
+                        background-position: 30px center;
+                    }
+                }
+            }
+        }
+    }
+
+    &--feedback {
+        background-color: $off-white;
+        text-align: center;
+
+        h2 {
+            margin-bottom: 30px;
+        }
+
+        p {
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        img {
+            border-radius: 50%;
+            border: 15px solid $off-white;
+
+            &:hover {
+                border-color: $lightest-blue;
+            }
+        }
+    }
+
+    &--instant-quote {
+        // background-color: $off-white;
+        position: relative;
+        padding-bottom: 40px;
+
+        .form-rocket {
+            display: none;
+            width: 200px;
+            position: absolute;
+            top: 20px; right: 10%;
+            z-index: 1;
+
+            @include breakpoint(tablet) {
+                display: inline;
+            }
+
+            @include breakpoint(desktop) {
+                right: 25%;
+            }
+        }
+
+        @include breakpoint(tablet) {
+            padding-bottom: 0;
+        }
+    }
+
+}
+
+// pic-sure animation
+.pic-sure {
+    width: 300px; height: 300px;
+    margin: 0 auto;
+    position: relative;
+
+    &--mirror {
+        display: inline-block;
+        margin: 0 auto;
+    }
+
+    &--mirror-reflection {
+        position: absolute;
+        z-index: 99;
+        left: 0; top: 0;
+    }
+
+    &--phone-back {
+        position: absolute;
+        z-index: 100;
+        bottom: 30px; right: 70px;
+    }
+
+    &--phone-front {
+        position: absolute;
+        z-index: 98;
+        bottom: 80px; right: 118px;
+    }
+}
+
+// TODO: Move!
+.dropdown-phone-form--homepage {
+    max-width: 450px;
+    background-color: $white;
+    padding: 0;
+    position: relative;
+    margin: 0 auto;
+    z-index: 5;
+}
+
+.search-phone-form--homepage {
+    background-color: $white;
+    padding: 0;
+    margin: 0 auto;
+    z-index: 5;
+
+    .search-phone-text {
+        border-color: transparent;
+    }
+
+    .form-inline--homepage {
+
+        .form-group {
+            margin-bottom: 0;
+        }
+
+        @include breakpoint(desktop) {
+
+            .form-group {
+                display: inline-block;
+                vertical-align: middle;
+            }
+
+        }
+
+        .form-control {
+            vertical-align: initial;
+            border-color: transparent;
+            padding-left: 35px;
+        }
+
+        .btn {
+            font-size: 18px;
+        }
+
+    }
+
+    .twitter-typeahead {
+        z-index: 99;
+
+        .tt-hint,
+        .tt-input {
+            height: 40px;
+            padding-left: 40px;
+            margin-bottom: 10px;
+
+            @include breakpoint(laptop) {
+                height: 57px;
+                padding-left: 60px;
+                margin-bottom: 0;
+            }
+        }
+
+        &:before {
+            content: '\f002';
+            color: $light-blue;
+            font-family: FontAwesome;
+            font-size: 24px;
+            position: absolute;
+            z-index: 10;
+            left: 10px; top: 0;
+
+            @include breakpoint(laptop) {
+                font-size: 34px;
+                top: 2px;
+            }
+        }
+
+        @include breakpoint(tablet) {
+            font-size: 20px;
+        }
+    }
+
+    .tt-menu {
+        margin-top: 11px;
+
+        @include breakpoint(tablet) {
+            width: 430px;
+        }
+
+        @include breakpoint(laptop) {
+            width: 530px;
+        }
+
+        @include breakpoint(desktop) {
+            width: 630px;
+        }
+    }
+
+    .tt-suggestion {
+        font-size: 16px;
+    }
+
+    // Add style to search form - set width
+    max-width: 450px;
+    padding: 10px;
+
+    @include border-radius(4px);
+    border: 1px solid $grey;
+
+    // search form - set width
+    @include breakpoint(laptop) {
+        max-width: 500px;
+    }
+
+    // search form - set width
+    @include breakpoint(desktop) {
+        max-width: 650px;
+    }
+}
+
+// Style input on focus
+.search-phone-form--focus {
+    border-color: $primary-blue;
+
+    .twitter-typeahead {
+
+        &:before {
+            color: $primary-blue;
+        }
+    }
+}
+
+// Sticky Search - Using BS affix iOS only
+// Bug: https://hackernoon.com/how-to-fix-the-ios-11-input-element-in-fixed-modals-bug-aaf66c7ba3f8
+.affix {
+    position: fixed;
+    top: 60px; left: 0; right: 0;
+    z-index: 999;
+    padding: 0 10px;
+    border-color: $light-blue;
+}
+
+.affix-bottom {
+    position: absolute;
+}
+
+// Dropdown Affix adjust for mobile - iOS
+.dropdown-phone-form.affix {
+    top: 55px;
+    padding-top: 15px;
+    background-color: $off-white !important;
+}
+
+// Sticky Search - Using Custom 'Stuck' non iOS Android/Desktop etc.
+.search-phone-form.stuck {
+    left: 50%;
+    padding: 0 10px;
+    border-color: $light-blue;
+    z-index: 1001;
+
+    @include breakpoint(tablet) {
+        margin-left: -225px;
+    }
+
+    @include breakpoint(laptop) {
+        margin-left: -250px;
+    }
+
+    @include breakpoint(desktop) {
+        margin-left: -315px;
+    }
+
+    .twitter-typeahead {
+
+        .tt-hint,
+        .tt-input {
+
+            @include breakpoint(laptop) {
+                height: 38px;
+                padding: 0 0 0 50px;
+            }
+        }
+
+        &:before {
+
+            @include breakpoint(laptop) {
+                font-size: 23px;
+                top: 2px;
+            }
+        }
+
+        @include breakpoint(tablet) {
+            font-size: 18px;
+        }
+
+        .tt-menu {
+            margin-top: 1px;
+        }
+    }
+}
+
+// Dropdown Stuck adjust for mobile - Android
+.dropdown-phone-form.stuck {
+    padding: 15px 15px 0;
+    background-color: $off-white;
+}
+
+.speech-bubble {
+    text-align: center;
+    position: relative;
+    font-size: 18px;
+    margin: 50px 0;
+
+    @include breakpoint(tablet) {
+        font-size: 24px;
+        margin: 80px 0;
+    }
+
+    &:before, &:after {
+        font-family: serif;
+        font-size: 80px;
+        color: $grey;
+        line-height: 0;
+        position: absolute;
+    }
+
+    &:before {
+        content: open-quote;
+        top: -10px; left: 50%;
+        margin-left: -20px;
+    }
+
+    &:after {
+        display: none;
+        content: close-quote;
+    }
+}

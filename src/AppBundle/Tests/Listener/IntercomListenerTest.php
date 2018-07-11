@@ -2,6 +2,8 @@
 
 namespace AppBundle\Tests\Listener;
 
+use AppBundle\Document\File\PicSureFile;
+use AppBundle\Event\PicsureEvent;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
@@ -547,5 +549,49 @@ class IntercomListenerTest extends WebTestCase
         $data = unserialize(static::$redis->lpop(IntercomService::KEY_INTERCOM_QUEUE));
         $this->assertEquals($claim->getId(), $data['claimId']);
         $this->assertEquals(IntercomService::QUEUE_EVENT_CLAIM_SETTLED, $data['action']);
+    }
+
+    public function testIntercomQueuePicSure()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testIntercomQueuePicSure', $this),
+            'bar'
+        );
+        $policy = new PhonePolicy();
+        $policy->setUser($user);
+        $policy->setId(rand(1, 99999));
+        $s3File = new PicSureFile();
+
+        static::$redis->del(IntercomService::KEY_INTERCOM_QUEUE);
+        $this->assertEquals(0, static::$redis->llen(IntercomService::KEY_INTERCOM_QUEUE));
+
+        $listener = new IntercomListener(static::$intercomService);
+        $listener->onPicSureDamagedEvent(new PicsureEvent($policy, $s3File));
+
+        $this->assertEquals(1, static::$redis->llen(IntercomService::KEY_INTERCOM_QUEUE));
+        $data = unserialize(static::$redis->lpop(IntercomService::KEY_INTERCOM_QUEUE));
+        $this->assertEquals($user->getId(), $data['userId']);
+
+        $listener = new IntercomListener(static::$intercomService);
+        $listener->onPicSureInvalidEvent(new PicsureEvent($policy, $s3File));
+
+        $this->assertEquals(1, static::$redis->llen(IntercomService::KEY_INTERCOM_QUEUE));
+        $data = unserialize(static::$redis->lpop(IntercomService::KEY_INTERCOM_QUEUE));
+        $this->assertEquals($user->getId(), $data['userId']);
+
+        $listener = new IntercomListener(static::$intercomService);
+        $listener->onPicSureReceivedEvent(new PicsureEvent($policy, $s3File));
+
+        $this->assertEquals(1, static::$redis->llen(IntercomService::KEY_INTERCOM_QUEUE));
+        $data = unserialize(static::$redis->lpop(IntercomService::KEY_INTERCOM_QUEUE));
+        $this->assertEquals($user->getId(), $data['userId']);
+
+        $listener = new IntercomListener(static::$intercomService);
+        $listener->onPicSureUndamagedEvent(new PicsureEvent($policy, $s3File));
+
+        $this->assertEquals(1, static::$redis->llen(IntercomService::KEY_INTERCOM_QUEUE));
+        $data = unserialize(static::$redis->lpop(IntercomService::KEY_INTERCOM_QUEUE));
+        $this->assertEquals($user->getId(), $data['userId']);
     }
 }

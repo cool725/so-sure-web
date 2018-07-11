@@ -30,6 +30,9 @@ class PolicyTerms extends PolicyDocument
     // Minor tweaks for pic-sure, repair, & non-payment full recovery costs
     const VERSION_6 = 'Version 6 May 2018';
 
+    // Minor tweaks for pic-sure
+    const VERSION_7 = 'Version 7 July 2018';
+
     public static $allVersions = [
         self::VERSION_0,
         self::VERSION_1,
@@ -38,6 +41,7 @@ class PolicyTerms extends PolicyDocument
         self::VERSION_4,
         self::VERSION_5,
         self::VERSION_6,
+        self::VERSION_7,
     ];
 
     public function getVersionNumber()
@@ -59,6 +63,8 @@ class PolicyTerms extends PolicyDocument
             return '5';
         } elseif (in_array($version, [self::VERSION_6])) {
             return '6';
+        } elseif (in_array($version, [self::VERSION_7])) {
+            return '7';
         }
         return null;
     }

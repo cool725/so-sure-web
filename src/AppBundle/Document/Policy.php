@@ -2318,9 +2318,35 @@ abstract class Policy
         return $this->toTwoDp($brokerCommission);
     }
 
+    public function getUnderwritingOutstandingPremium()
+    {
+        // From Dylan:
+        // if paid , then payment accounted
+        // if not paid/paying, then it should not show as outstanding amount due (as we won't be receiving it)
+        if (in_array($this->getStatus(), [self::STATUS_ACTIVE, self::STATUS_UNPAID])) {
+            return $this->getOutstandingPremium();
+        } else {
+            return 0;
+        }
+    }
+
     public function getOutstandingPremium()
     {
         return $this->toTwoDp($this->getPremium()->getYearlyPremiumPrice() - $this->getPremiumPaid());
+    }
+
+    public function getPendingBacsPaymentsTotal()
+    {
+        $total = 0;
+        $payments = $this->getPaymentsByType(BacsPayment::class);
+        foreach ($payments as $payment) {
+            /** @var BacsPayment $payment */
+            if (in_array($payment->getStatus(), [BacsPayment::STATUS_SUBMITTED, BacsPayment::STATUS_GENERATED])) {
+                $total += $payment->getAmount();
+            }
+        }
+
+        return $total;
     }
 
     public function isInitialPayment(\DateTime $date = null)
@@ -2749,7 +2775,8 @@ abstract class Policy
         }
 
         // if its an initial (not renewal) valid policy without a payment, probably it should be expired
-        if (!$this->hasPreviousPolicy() && !$this->getLastSuccessfulUserPaymentCredit()) {
+        if (!$this->hasPreviousPolicy() && !$this->getLastSuccessfulUserPaymentCredit() &&
+            !$this->getUser()->hasBacsPaymentMethod()) {
             throw new \Exception(sprintf(
                 'Policy %s does not have a success payment - should be expired?',
                 $this->getId()
@@ -3898,20 +3925,28 @@ abstract class Policy
             return false;
         }
 
-        if ($this->isPolicyPaidToDate($date)) {
+        if ($this->isPolicyPaidToDate($date, true)) {
+            return $this->getStatus() == self::STATUS_ACTIVE;
+        } elseif ($this->getUser()->hasBacsPaymentMethod() &&
+            $this->getUser()->getBacsPaymentMethod() &&
+            $this->getUser()->getBacsPaymentMethod()->getBankAccount() &&
+            $this->getUser()->getBacsPaymentMethod()->getBankAccount()->isMandateInProgress()) {
             return $this->getStatus() == self::STATUS_ACTIVE;
         } else {
             return in_array($this->getStatus(), [self::STATUS_UNPAID, self::STATUS_RENEWAL]);
         }
     }
 
-    public function isPolicyPaidToDate(\DateTime $date = null)
+    public function isPolicyPaidToDate(\DateTime $date = null, $includePendingBacs = false)
     {
         if (!$this->isPolicy()) {
             return null;
         }
 
         $totalPaid = $this->getTotalSuccessfulPayments($date, true);
+        if ($includePendingBacs) {
+            $totalPaid += $this->getPendingBacsPaymentsTotal();
+        }
         $expectedPaid = $this->getTotalExpectedPaidToDate($date);
         // print sprintf("%f =? %f", $totalPaid, $expectedPaid) . PHP_EOL;
 
@@ -3926,25 +3961,47 @@ abstract class Policy
         return ScheduledPayment::sumScheduledPaymentAmounts($scheduledPayments);
     }
 
-    public function arePolicyScheduledPaymentsCorrect()
+    public function isUnpaidCloseToExpirationDate(\DateTime $date = null)
+    {
+        if ($this->getStatus() != self::STATUS_UNPAID) {
+            return null;
+        }
+
+        if (!$date) {
+            $date = new \DateTime();
+        }
+
+        // payment on day 0
+        // reschedule on 7, 14, 21
+        // max 31-21 = 10
+        $diff = $date->diff($this->getPolicyExpirationDate());
+        $closeToExpiration = $diff->days <= 10 && $diff->invert == 0;
+
+        return $closeToExpiration;
+    }
+
+    public function arePolicyScheduledPaymentsCorrect($verifyBillingDay = true, \DateTime $date = null)
     {
         $scheduledPayments = $this->getAllScheduledPayments(ScheduledPayment::STATUS_SCHEDULED);
 
         // All Scheduled day must match the billing day
-        foreach ($scheduledPayments as $scheduledPayment) {
-            if ($scheduledPayment->hasCorrectBillingDay() === false) {
-                /*
-                $diff = $scheduledPayment->getScheduled()->diff($this->getBilling());
-                print sprintf(
-                    "%s %s %s%s",
-                    $scheduledPayment->getScheduled()->format(\DateTime::ATOM),
-                    $this->getBilling()->format(\DateTime::ATOM),
-                    json_encode($diff),
-                    PHP_EOL
-                );
-                */
+        if ($verifyBillingDay) {
+            foreach ($scheduledPayments as $scheduledPayment) {
+                /** @var ScheduledPayment $scheduledPayment */
+                if ($scheduledPayment->hasCorrectBillingDay() === false) {
+                    /*
+                    $diff = $scheduledPayment->getScheduled()->diff($this->getBilling());
+                    print sprintf(
+                        "%s %s %s%s",
+                        $scheduledPayment->getScheduled()->format(\DateTime::ATOM),
+                        $this->getBilling()->format(\DateTime::ATOM),
+                        json_encode($diff),
+                        PHP_EOL
+                    );
+                    */
 
-                return false;
+                    return false;
+                }
             }
         }
 
@@ -3956,7 +4013,29 @@ abstract class Policy
         print $this->getPremiumPaid() . PHP_EOL;
         */
 
-        return $this->areEqualToTwoDp($this->getOutstandingPremium(), $totalScheduledPayments);
+        // Pending bacs payments should be thought of as successful and thereby reduce the outstanding premium
+        $outstandingPremium = $this->getOutstandingPremium() - $this->getPendingBacsPaymentsTotal();
+
+        // generally would expect the outstanding premium to match the scheduled payments
+        // however, if unpaid and past the point where rescheduled payments are taken, then would
+        // expect the scheduled payments to be missing 1 monthly premium
+        if ($this->areEqualToTwoDp($outstandingPremium, $totalScheduledPayments)) {
+            return true;
+        } elseif ($this->isUnpaidCloseToExpirationDate($date)) {
+            if ($this->areEqualToTwoDp(
+                $outstandingPremium,
+                $totalScheduledPayments + $this->getPremium()->getAdjustedStandardMonthlyPremiumPrice()
+            )) {
+                return true;
+            } elseif ($this->areEqualToTwoDp(
+                $outstandingPremium,
+                $totalScheduledPayments + $this->getPremium()->getAdjustedFinalMonthlyPremiumPrice()
+            )) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public function getClaimsText()
@@ -4147,8 +4226,8 @@ abstract class Policy
 
     public function isPotValueCorrect()
     {
-        return $this->getPotValue() == $this->calculatePotValue() &&
-            $this->getPromoPotValue() == $this->calculatePotValue(true);
+        return $this->areEqualToTwoDp($this->getPotValue(), $this->calculatePotValue()) &&
+            $this->areEqualToTwoDp($this->getPromoPotValue(), $this->calculatePotValue(true));
     }
 
     public function getExpectedCommission(\DateTime $date = null)

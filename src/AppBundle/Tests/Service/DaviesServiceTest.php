@@ -1385,36 +1385,39 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim->status = 'closed';
         $daviesClaim->miStatus = DaviesClaim::MISTATUS_WITHDRAWN;
         self::$daviesService->validateClaimDetails($claim, $daviesClaim);
-        $this->insureErrorExists('/previously approved, however is now withdrawn/');
-        $this->insureErrorDoesNotExist('/previously approved, however no longer appears to be/');
+        $this->insureSoSureActionExists('/previously approved, however is now withdrawn/');
+        $this->insureSoSureActionDoesNotExist('/previously approved, however no longer appears to be/');
         $this->insureErrorDoesNotExist('/the replacement data not recorded/');
         $this->insureErrorDoesNotExist('/received date/');
         $this->insureErrorDoesNotExist('/imei/');
         $this->insureErrorDoesNotExist('/phone/');
 
         self::$daviesService->clearErrors();
+        self::$daviesService->clearSoSureActions();
 
         $daviesClaim->status = 'open';
         $daviesClaim->miStatus = null;
         self::$daviesService->validateClaimDetails($claim, $daviesClaim);
-        $this->insureErrorExists('/previously approved, however no longer appears to be/');
+        $this->insureSoSureActionExists('/previously approved, however no longer appears to be/');
         $this->insureErrorDoesNotExist('/the replacement data not recorded/');
         $this->insureErrorDoesNotExist('/received date/');
         $this->insureErrorDoesNotExist('/imei/');
         $this->insureErrorDoesNotExist('/; phone/');
 
         self::$daviesService->clearErrors();
+        self::$daviesService->clearSoSureActions();
 
         $daviesClaim->replacementMake = 'Apple';
         $daviesClaim->replacementModel = 'iPhone 8';
         self::$daviesService->validateClaimDetails($claim, $daviesClaim);
-        $this->insureErrorExists('/previously approved, however no longer appears to be/');
+        $this->insureSoSureActionExists('/previously approved, however no longer appears to be/');
         $this->insureErrorDoesNotExist('/the replacement data not recorded/');
         $this->insureErrorDoesNotExist('/received date/');
         $this->insureErrorDoesNotExist('/imei/');
         $this->insureErrorDoesNotExist('/; phone/');
 
         self::$daviesService->clearErrors();
+        self::$daviesService->clearSoSureActions();
 
         $daviesClaim->replacementReceivedDate = new \DateTime();
         self::$daviesService->validateClaimDetails($claim, $daviesClaim);
@@ -1424,6 +1427,7 @@ class DaviesServiceTest extends WebTestCase
         $this->insureErrorDoesNotExist('/; phone/');
 
         self::$daviesService->clearErrors();
+        self::$daviesService->clearSoSureActions();
 
         $daviesClaim->replacementImei = '123';
         self::$daviesService->validateClaimDetails($claim, $daviesClaim);
@@ -1748,6 +1752,38 @@ class DaviesServiceTest extends WebTestCase
         }
     }
 
+    private function insureSoSureActionExists($errorRegEx)
+    {
+        $this->insureSoSureActionExistsOrNot($errorRegEx, true);
+    }
+
+    private function insureSoSureActionDoesNotExist($errorRegEx)
+    {
+        $this->insureSoSureActionExistsOrNot($errorRegEx, false);
+    }
+
+    private function insureSoSureActionExistsOrNot($errorRegEx, $exists)
+    {
+        $foundMatch = false;
+        foreach (self::$daviesService->getSoSureActions() as $error) {
+            $matches = preg_grep($errorRegEx, $error);
+            if (count($matches) > 0) {
+                $foundMatch = true;
+            }
+        }
+        if ($exists) {
+            $this->assertTrue(
+                $foundMatch,
+                sprintf('did not find %s in %s', $errorRegEx, json_encode(self::$daviesService->getSoSureActions()))
+            );
+        } else {
+            $this->assertFalse(
+                $foundMatch,
+                sprintf('found %s in %s', $errorRegEx, json_encode(self::$daviesService->getSoSureActions()))
+            );
+        }
+    }
+
     private function insureFeesExists($feesRegEx)
     {
         $this->insureFeesExistsOrNot($feesRegEx, true);
@@ -2068,7 +2104,7 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim->replacementReceivedDate = new \DateTime();
         $this->assertTrue(static::$daviesService->saveClaim($daviesClaim, false));
         $this->assertEquals(
-            2,
+            1,
             count(self::$daviesService->getErrors()[$claim->getNumber()]),
             json_encode(self::$daviesService->getErrors())
         );
@@ -2078,16 +2114,17 @@ class DaviesServiceTest extends WebTestCase
             json_encode(self::$daviesService->getWarnings())
         );
         $this->insureErrorExists('/settled without a replacement imei/');
-        $this->insureErrorExists('/settled without a replacement phone/');
+        $this->insureSoSureActionExists('/settled without a replacement phone/');
 
         self::$daviesService->clearErrors();
         self::$daviesService->clearWarnings();
         self::$daviesService->clearFees();
+        self::$daviesService->clearSoSureActions();
 
         $daviesClaim->replacementImei = $this->generateRandomImei();
         $this->assertTrue(static::$daviesService->saveClaim($daviesClaim, false));
         $this->assertEquals(
-            2,
+            1,
             count(self::$daviesService->getErrors()[$claim->getNumber()]),
             json_encode(self::$daviesService->getErrors())
         );

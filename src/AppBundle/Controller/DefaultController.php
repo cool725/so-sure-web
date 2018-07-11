@@ -112,15 +112,25 @@ class DefaultController extends BaseController
 
         $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE);
 
-        $data = array(
-            // Make sure to check homepage landing below too
-            'replacement'         => $replacement,
-            'referral'            => $referral,
-            'phone'               => $this->getQuerystringPhone($request),
+        $expContent = $this->getSessionSixpackTest(
+            $request,
+            SixpackService::EXPERIMENT_AB_NEW_CONTENT,
+            ['old-content-no-nav', 'new-content-with-nav']
         );
 
+        $data = array(
+            // Make sure to check homepage landing below too
+            'replacement' => $replacement,
+            'referral'    => $referral,
+            'phone'       => $this->getQuerystringPhone($request),
+        );
 
         $template = 'AppBundle:Default:index.html.twig';
+
+        // If A/B content test
+        if ($expContent == 'new-content-with-nav') {
+            $template = 'AppBundle:Default:indexContent.html.twig';
+        }
 
         return $this->render($template, $data);
     }
@@ -542,12 +552,14 @@ class DefaultController extends BaseController
                     );
                     // @codingStandardsIgnoreEnd
 
-                    $message = \Swift_Message::newInstance()
-                        ->setSubject('Company inquiry')
-                        ->setFrom('info@so-sure.com')
-                        ->setTo('sales@so-sure.com')
-                        ->setBody($body, 'text/html');
-                    $this->get('mailer')->send($message);
+                    /** @var MailerService $mailer */
+                    $mailer = $this->get('app.mailer');
+                    $mailer->send(
+                        'Company inquiry',
+                        'sales@so-sure.com',
+                        $body
+                    );
+
                     $this->addFlash(
                         'success',
                         "Thanks. We'll be in touch shortly"

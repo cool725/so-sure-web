@@ -12,7 +12,7 @@ use AppBundle\Document\CurrencyTrait;
  * @MongoDB\Document(repositoryClass="AppBundle\Repository\File\BarclaysFileRepository")
  * @Vich\Uploadable
  */
-class BarclaysFile extends UploadFile
+class BarclaysFile extends DailyTransactionUploadFile
 {
     use CurrencyTrait;
 
@@ -24,12 +24,6 @@ class BarclaysFile extends UploadFile
      * @var File
      */
     protected $file;
-
-    /**
-     * @MongoDB\Field(type="hash")
-     * @Gedmo\Versioned
-     */
-    protected $dailyTransaction = array();
 
     /**
      * @MongoDB\Field(type="hash")
@@ -52,16 +46,6 @@ class BarclaysFile extends UploadFile
         );
     }
 
-    public function getDailyTransaction()
-    {
-        return $this->dailyTransaction;
-    }
-
-    public function setDailyTransaction($dailyTransaction)
-    {
-        $this->dailyTransaction = $dailyTransaction;
-    }
-
     public function getDailyProcessing()
     {
         return $this->dailyProcessing;
@@ -70,11 +54,6 @@ class BarclaysFile extends UploadFile
     public function setDailyProcessing($dailyProcessing)
     {
         $this->dailyProcessing = $dailyProcessing;
-    }
-    
-    public static function combineDailyTransactions($barclayFiles)
-    {
-        return self::combineFiles($barclayFiles, 'getDailyTransaction');
     }
 
     public static function combineDailyProcessing($barclayFiles)

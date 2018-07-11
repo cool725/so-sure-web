@@ -24,7 +24,6 @@ use AppBundle\Document\ScheduledPayment;
  *      "judo"="JudoPayment",
  *      "sosure"="SoSurePayment",
  *      "bacs"="BacsPayment",
- *      "bacs"="BacsPayment",
  *      "bacsIndemnity"="BacsIndemnityPayment",
  *      "chargeback"="ChargebackPayment",
  *      "potReward"="PotRewardPayment",
@@ -70,6 +69,8 @@ abstract class Payment
             return 'sosure';
         } elseif ($this instanceof BacsPayment) {
             return 'bacs';
+        } elseif ($this instanceof BacsIndemnityPayment) {
+            return 'bacsIndemnity';
         } elseif ($this instanceof ChargebackPayment) {
             return 'chargeback';
         } elseif ($this instanceof PotRewardPayment) {

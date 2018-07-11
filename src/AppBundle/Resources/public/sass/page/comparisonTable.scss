@@ -131,6 +131,7 @@
 .comparison {
 
     &__container {
+
         .left {
             padding-right: 0;
         }
@@ -143,6 +144,7 @@
     &__list {
         text-align: center;
         margin: 0 0 25px;
+        border-left: 1px solid $pale-grey;
 
         &_border {
             border-right: 1px solid $pale-grey;
@@ -155,15 +157,7 @@
             position: relative;
             background-color: $white;
 
-            &:first-of-type {
-                line-height: 55px;
-            }
-
-            border-bottom: 1px solid $pale-grey;
-
-            .fa {
-                margin-bottom: 5px;
-            }
+            border-bottom: 2px solid $pale-grey;
 
             @include breakpoint(mobS) {
                 height: 145px;
@@ -172,7 +166,8 @@
 
         li.so-sure {
             background-color: $primary-blue;
-            height: 90px
+            height: 90px;
+            line-height: 60px;
         }
 
         li.protectyourbubble {
@@ -182,13 +177,13 @@
         }
 
         .fa.protectyourbubble {
-            color: $protectyourbubble;
+            // color: $protectyourbubble;
             height: 90px
         }
 
         li.loveitcoverit {
             background-color: $lightest-blue;
-            color: $white;
+            // color: $white;
             height: 90px
         }
 
@@ -199,12 +194,12 @@
 
         li.gadgetcover {
             background-color: $gadgetcover;
-            color: $white;
+            // color: $white;
             height: 90px
         }
 
         .fa.gadgetcover {
-            color: $gadgetcover;
+            // color: $gadgetcover;
             height: 90px
         }
     }
@@ -212,7 +207,7 @@
 
 .comparison__controls {
     position: absolute;
-    top: 20px;
+    top: 35px;
 
     &_left {
         left: 10px;

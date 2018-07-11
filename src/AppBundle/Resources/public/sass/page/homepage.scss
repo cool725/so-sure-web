@@ -32,6 +32,10 @@
     &__bg-blue {
         background-color: $lightest-blue;
     }
+
+    &__off-white {
+        background-color: $off-white;
+    }
 }
 
 // TODO: Move!
@@ -1304,7 +1308,7 @@
 
 // Dropdown Affix adjust for mobile - iOS
 .dropdown-phone-form.affix {
-    top: 55px;
+    top: 50px;
     padding-top: 15px;
     background-color: $off-white !important;
 }

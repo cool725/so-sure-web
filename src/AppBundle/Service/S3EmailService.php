@@ -44,6 +44,7 @@ abstract class S3EmailService
 
     protected $warnings = [];
     protected $errors = [];
+    protected $sosureActions = [];
 
     public function setDm($dm)
     {
@@ -98,6 +99,16 @@ abstract class S3EmailService
     public function clearErrors()
     {
         $this->errors = [];
+    }
+
+    public function getSoSureActions()
+    {
+        return $this->sosureActions;
+    }
+
+    public function clearSoSureActions()
+    {
+        $this->sosureActions = [];
     }
 
     abstract public function processExcelData($key, $data);
@@ -305,8 +316,8 @@ abstract class S3EmailService
                     $data[] = $lineObject;
                 }
             } catch (\Exception $e) {
-                $msg = sprintf("Error parsing line. Ex: %s, Line: %s", $e->getMessage(), json_encode($line));
-                $this->logger->error($msg);
+                $msg = sprintf("Unable to import claim. Error: %s, Line: %s", $e->getMessage(), json_encode($line));
+                $this->logger->info($msg);
                 $this->errors['Unknown'][] = $msg;
                 $parseErrors++;
 

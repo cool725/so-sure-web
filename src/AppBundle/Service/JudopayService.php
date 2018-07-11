@@ -886,7 +886,7 @@ class JudopayService
         return $this->mailer;
     }
 
-    public function processScheduledPaymentResult($scheduledPayment, $payment, \DateTime $date = null)
+    public function processScheduledPaymentResult(ScheduledPayment $scheduledPayment, $payment, \DateTime $date = null)
     {
         if (!$date) {
             $date = new \DateTime();
@@ -1013,14 +1013,21 @@ class JudopayService
      * @param Policy    $policy
      * @param \DateTime $next
      */
-    private function failedPaymentEmail(Policy $policy, \DateTime $next = null)
+    public function failedPaymentEmail(Policy $policy, \DateTime $next = null)
     {
         $subject = sprintf('Payment failure for your so-sure policy %s', $policy->getPolicyNumber());
-        $baseTemplate = sprintf('AppBundle:Email:policy/failedPayment');
+        if ($policy->hasMonetaryClaimed(true, true)) {
+            $baseTemplate = sprintf('AppBundle:Email:policy/failedPaymentWithClaim');
 
-        if (!$next) {
-            $subject = sprintf('Payment failure for your so-sure policy %s', $policy->getPolicyNumber());
-            $baseTemplate = sprintf('AppBundle:Email:policy/failedPaymentFinal');
+            if (!$next) {
+                $baseTemplate = sprintf('AppBundle:Email:policy/failedPaymentWithClaimFinal');
+            }
+        } else {
+            $baseTemplate = sprintf('AppBundle:Email:policy/failedPayment');
+
+            if (!$next) {
+                $baseTemplate = sprintf('AppBundle:Email:policy/failedPaymentFinal');
+            }
         }
 
         $htmlTemplate = sprintf("%s.html.twig", $baseTemplate);
@@ -1424,6 +1431,26 @@ class JudopayService
                     } elseif ($line['TransactionResult'] == "Failed") {
                         $failed += $line['Net'];
                         $numFailed++;
+                    } elseif (mb_strlen(trim($line['TransactionResult'])) == 0) {
+                        $failed += $line['Net'];
+                        $numFailed++;
+
+                        // @codingStandardsIgnoreStart
+                        $body = sprintf(
+                            'Our csv export for last month included a blank transaction result for receipt %s. Please confirm the transaction was, in fact, a failure.',
+                            $line['ReceiptId']
+                        );
+                        // @codingStandardsIgnoreEnd
+                        
+                        $this->mailer->send(
+                            sprintf('Missing Transaction Result for Receipt %s', $line['ReceiptId']),
+                            'developersupport@judopayments.com',
+                            $body,
+                            null,
+                            null,
+                            'tech@so-sure.com',
+                            'tech@so-sure.com'
+                        );
                     } else {
                         throw new \Exception(sprintf('Unknown Transaction Result: %s', $line['TransactionResult']));
                     }

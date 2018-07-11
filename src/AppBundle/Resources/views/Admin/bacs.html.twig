@@ -370,8 +370,9 @@
                     {% else %}
                         <table class="table table-striped">
                             <tr>
-                                <th width="25%">Serial Number</th>
-                                <th width="25%">Debit Amount</th>
+                                <th width="20%">Serial Number</th>
+                                <th width="15%">Debit Amount</th>
+                                <th width="15%">Credit Amount</th>
                                 <th width="25%">Payment Amount</th>
                                 <th width="25%">Bacs Report Amount</th>
                             </tr>
@@ -389,7 +390,7 @@
 
                                 {% set paymentAmount = 0 %}
                                 {% set lastSubmittedPayment = {} %}
-                                {% for payment in payments if payment.serialNumber %}
+                                {% for payment in paymentsIncPrevNextMonth if payment.serialNumber %}
                                     {% if payment.serialNumber == file.serialNumber %}
                                         {% if lastSubmittedPayment[file.serialNumber] is not defined or lastSubmittedPayment[file.serialNumber] < payment.submittedDate %}
                                             {% set lastSubmittedPayment = lastSubmittedPayment|merge({ (file.serialNumber): payment.submittedDate}) %}
@@ -399,17 +400,21 @@
                                 {% endfor %}
 
                                 {% set reportAmount = 0 %}
-                                {% for inputFile in input %}
-                                    {%  if inputFile.metadata and inputFile.getFormattedSerialNumber == file.serialNumber and inputFile.metadata['debit-accepted-value'] is defined %}
-                                        {% set reportAmount = reportAmount + inputFile.metadata['debit-accepted-value'] %}
+                                {% for inputFile in inputIncPrevMonth %}
+                                    {%  if inputFile.metadata and inputFile.getFormattedSerialNumber == file.serialNumber %}
+                                        {% if inputFile.metadata['debit-accepted-value'] is defined %}
+                                            {% set reportAmount = reportAmount + inputFile.metadata['debit-accepted-value'] %}
+                                        {% elseif inputFile.metadata['credit-accepted-value'] is defined %}
+                                            {% set reportAmount = reportAmount + inputFile.metadata['credit-accepted-value'] %}
+                                        {% endif %}
                                     {% endif %}
                                 {% endfor %}
 
                                 <tr>
-                                    <td width="25%">
+                                    <td width="20%">
                                         {{ file.serialNumber }}
                                     </td>
-                                    <td width="25%">
+                                    <td width="15%">
                                         <span title="{{ file.metadata|json_encode }}">
                                         {% if file.metadata %}
                                             {{ debitAmount|number_format(2, '.', ',') }}
@@ -418,9 +423,20 @@
                                         {% endif %}
                                         </span>
                                     </td>
+                                    <td width="15%">
+                                        <span title="{{ file.metadata|json_encode }}">
+                                        {% if file.metadata %}
+                                            {{ creditAmount|number_format(2, '.', ',') }}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                        </span>
+                                    </td>
 
                                     {% set color = '' %}
                                     {% if equal_to_two_dp(debitAmount, paymentAmount) %}
+                                        {% set color = 'success' %}
+                                    {% elseif equal_to_two_dp(creditAmount, paymentAmount) %}
                                         {% set color = 'success' %}
                                     {% else %}
                                         {% set color = 'danger' %}

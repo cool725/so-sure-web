@@ -573,13 +573,13 @@ class DaviesService extends S3EmailService
                 'Claim %s was previously approved, however is now withdrawn/declined. SO-SURE to remove approved date',
                 $daviesClaim->claimNumber
             );
-            $this->errors[$daviesClaim->claimNumber][] = $msg;
+            $this->sosureActions[$daviesClaim->claimNumber][] = $msg;
         } elseif ($claim->getApprovedDate() && !$daviesClaim->isApproved()) {
             $msg = sprintf(
                 'Claim %s was previously approved, however no longer appears to be. SO-SURE to remove approved date',
                 $daviesClaim->claimNumber
             );
-            $this->errors[$daviesClaim->claimNumber][] = $msg;
+            $this->sosureActions[$daviesClaim->claimNumber][] = $msg;
         } elseif ($claim->getApprovedDate() && $claim->getApprovedDate() <= $twoWeekAgo) {
             $items = [];
             if (!$daviesClaim->replacementReceivedDate) {
@@ -621,12 +621,15 @@ class DaviesService extends S3EmailService
             $this->errors[$daviesClaim->claimNumber][] = $msg;
         }
 
-        if (!$claim->getReplacementPhone() && $daviesClaim->replacementMake && $daviesClaim->replacementModel &&
-            $daviesClaim->getClaimStatus() == Claim::STATUS_SETTLED) {
+        if ($daviesClaim->isOpen() && $claim->getPhonePolicy() && $daviesClaim->replacementImei &&
+            $daviesClaim->replacementImei == $claim->getPhonePolicy()->getImei() && (
+            !$daviesClaim->replacementMake || !$daviesClaim->replacementModel)) {
+            // @codingStandardsIgnoreStart
             $msg = sprintf(
-                'Claim %s is settled without a replacement phone being set. SO-SURE to set replacement phone.',
+                'Claim %s has a replacement imei that matches the policy but is missing a replacement make and/or model. This is likely to be a data entry mistake.',
                 $daviesClaim->claimNumber
             );
+            // @codingStandardsIgnoreEnd
             $this->errors[$daviesClaim->claimNumber][] = $msg;
         }
 
@@ -678,6 +681,16 @@ class DaviesService extends S3EmailService
                 $claim->getReplacementReceivedDate()->format(\DateTime::ATOM)
             );
             $this->warnings[$daviesClaim->claimNumber][] = $msg;
+        }
+
+        // Should be in post validate in case the record fails import
+        if (!$claim->getReplacementPhone() && $claim->getReplacementPhoneDetails() &&
+            $claim->getStatus() == Claim::STATUS_SETTLED) {
+            $msg = sprintf(
+                'Claim %s is settled without a replacement phone being set. SO-SURE to set replacement phone.',
+                $daviesClaim->claimNumber
+            );
+            $this->sosureActions[$daviesClaim->claimNumber][] = $msg;
         }
     }
 
@@ -789,6 +802,7 @@ class DaviesService extends S3EmailService
                 'successFile' => $successFile,
                 'warnings' => $this->warnings,
                 'errors' => $this->errors,
+                'sosureActions' => $this->sosureActions,
                 'fees' => $this->fees,
                 'title' => 'Daily Claims Report',
                 'highDemandPhones' => $highDemandPhones,
@@ -822,6 +836,7 @@ class DaviesService extends S3EmailService
                     'successFile' => $successFile,
                     'errors' => $this->errors,
                     'warnings' => null,
+                    'sosureActions' => null,
                     'claims' => null,
                     'fees' => $this->fees,
                     'title' => 'Errors in So-Sure Mobile - Daily Claims Report',

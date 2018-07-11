@@ -15,6 +15,7 @@ use AppBundle\Repository\PhoneRepository;
 use AppBundle\Repository\PolicyRepository;
 use AppBundle\Security\FOSUBUserProvider;
 use AppBundle\Security\PolicyVoter;
+use AppBundle\Service\MailerService;
 use AppBundle\Service\PaymentService;
 use AppBundle\Service\PolicyService;
 use AppBundle\Service\RequestService;
@@ -245,6 +246,10 @@ class PurchaseController extends BaseController
                     // Convert point from quote
                     $this->get('app.sixpack')->convert(
                         SixpackService::EXPERIMENT_MONEY_BACK_GUARANTEE
+                    );
+
+                    $this->get('app.sixpack')->convert(
+                        SixpackService::EXPERIMENT_AB_NEW_CONTENT
                     );
 
                     if ($user->hasPartialPolicy()) {
@@ -949,13 +954,16 @@ class PurchaseController extends BaseController
         );
         // @codingStandardsIgnoreEnd
 
-        $message = \Swift_Message::newInstance()
-            ->setSubject('Remainder Payment received')
-            ->setFrom('tech@so-sure.com')
-            ->setTo('dylan@so-sure.com')
-            ->setCc('tech+ops@so-sure.com')
-            ->setBody($body, 'text/html');
-        $this->get('mailer')->send($message);
+        /** @var MailerService $mailer */
+        $mailer = $this->get('app.mailer');
+        $mailer->send(
+            'Remainder Payment received',
+            'dylan@so-sure.com',
+            $body,
+            null,
+            null,
+            'tech+ops@so-sure.com'
+        );
     }
 
     /**
@@ -1118,13 +1126,13 @@ class PurchaseController extends BaseController
                         $intercom->queueMessage($policy->getUser()->getEmail(), $body);
                     }
 
-                    $message = \Swift_Message::newInstance()
-                        ->setSubject(sprintf('Requested Policy Cancellation'))
-                        ->setFrom('info@so-sure.com')
-                        ->setTo('bcc@wearesosure.com')
-                        ->setBody($body, 'text/html');
-
-                    $this->get('mailer')->send($message);
+                    /** @var MailerService $mailer */
+                    $mailer = $this->get('app.mailer');
+                    $mailer->send(
+                        'Requested Policy Cancellation',
+                        'info@so-sure.com',
+                        $body
+                    );
 
                     $this->get('app.mixpanel')->queueTrack(
                         MixpanelService::EVENT_REQUEST_CANCEL_POLICY,

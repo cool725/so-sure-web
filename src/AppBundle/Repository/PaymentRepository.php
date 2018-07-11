@@ -24,6 +24,7 @@ class PaymentRepository extends DocumentRepository
             ->field('type')->in([
                 'judo',
                 'bacs',
+                'bacsIndemnity',
                 'sosure',
                 'chargeback',
                 'potReward',
@@ -59,7 +60,7 @@ class PaymentRepository extends DocumentRepository
         $startMonth = $this->startOfMonth($date);
         $nextMonth = $this->endOfMonth($date);
         if (!$type) {
-            $type = ['judo', 'bacs', 'sosure', 'chargeback', 'debtCollection'];
+            $type = ['judo', 'bacs', 'bacsIndemnity', 'sosure', 'chargeback', 'debtCollection'];
         } elseif (is_string($type)) {
             $type = [$type];
         }

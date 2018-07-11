@@ -14,7 +14,7 @@
            <h3>Last received daily export: {% if latestFile %}{{ latestFile.created|date('d M Y H:i', 'Europe/London') }}{% else %}Unknown{%endif%}</h3>
            <h3>Last successful daily export: {% if successFile %}{{ successFile.created|date('d M Y H:i', 'Europe/London') }}{% else %}Unknown{%endif%}</h3>
 
-		  {% if highDemandPhones is defined %}
+		   {% if highDemandPhones is defined %}
 		   <div style="font-size: 14px; text-align: left; margin-top: 30px;"><font face="arial, helvetica neue, helvetica, sans-serif">
 			   <h3>High Demand Phones</h3>
 	 		   <hr>
@@ -26,41 +26,56 @@
 					{% endfor %}
 	 		   {% endif %}
 		   </div>
-	 	  {% endif %}
+	 	   {% endif %}
+
+		   {% if sosureActions|length > 0 %}
+			   <div style="font-size: 14px; text-align: left; margin-top: 30px;"><font face="arial, helvetica neue, helvetica, sans-serif">
+					   <h3>{{ sosureActions|length }} Actions for so-sure in last import</h3>
+					   <hr>
+					   {% for claimNumber,msgs in sosureActions %}
+						   <p>Claim: {{ claimNumber }}</p>
+						   <ul>
+							   {% for msg in msgs %}
+								   <li>{{ msg }}</li>
+							   {% endfor %}
+						   </ul>
+					   {% endfor %}
+			   </div>
+		   {% endif %}
 
 		   {% if errors|length > 0 %}
 		   <div style="font-size: 14px; text-align: left; margin-top: 30px;"><font face="arial, helvetica neue, helvetica, sans-serif">
 			   <h3>{{ errors|length }} Errors in last import</h3>
 	 		   <hr>
-			{% for claimNumber,msgs in errors %}
-				 <p>Claim: {{ claimNumber }}</p>
-					 <ul>
-						 {% for msg in msgs %}
-							 <li>{{ msg }}</li>
-						 {% endfor %}
-					 </ul>
-			 {% endfor %}
+				{% for claimNumber,msgs in errors %}
+					 <p>Claim: {{ claimNumber }}</p>
+						 <ul>
+							 {% for msg in msgs %}
+								 <li>{{ msg|raw }}</li>
+							 {% endfor %}
+						 </ul>
+				 {% endfor %}
 		   </div>
 		   {% endif %}
 
 		   {% if fees|length > 0 %}
 		   <div style="font-size: 14px; text-align: left; margin-top: 30px;"><font face="arial, helvetica neue, helvetica, sans-serif">
-			   <h3>Fee Errors in last import</h3>
+			   <h3>{{ fees|length }} Fee Errors in last import</h3>
 	 		   <hr>
-			{% for claimNumber,msgs in fees %}
-				 <p>Claim: {{ claimNumber }}</p>
-					 <ul>
-						 {% for msg in msgs %}
-							 <li>{{ msg }}</li>
-						 {% endfor %}
-					 </ul>
-			 {% endfor %}
+				{% for claimNumber,msgs in fees %}
+					 <p>Claim: {{ claimNumber }}</p>
+						 <ul>
+							 {% for msg in msgs %}
+								 <li>{{ msg }}</li>
+							 {% endfor %}
+						 </ul>
+				 {% endfor %}
 		   </div>
 		   {% endif %}
 
 		   {% if warnings|length > 0 %}
 		   <div style="font-size: 14px; text-align: left; margin-top: 30px;"><font face="arial, helvetica neue, helvetica, sans-serif">
-			   <h3>Warnings in last import</h3>
+			   <h3>{{ warnings|length }} Warnings in last import</h3>
 	 		   <hr>
 			{% for claimNumber,msgs in warnings %}
 				 <p>Claim: {{ claimNumber }}</p>
@@ -73,8 +88,9 @@
 		   </div>
 		   {% endif %}
 
+v		   {% if claims|length > 0 %}
 		   <div style="font-size: 14px; text-align: left; margin-top: 30px;"><font face="arial, helvetica neue, helvetica, sans-serif">
-			   <h3>Outstanding claims</h3>
+			   <h3>{{ claims|length }} Outstanding claims</h3>
 			   <hr>
 			   {% for claim in claims %}
 					<p>
@@ -91,6 +107,7 @@
 					</ul>
 			   {% endfor %}
 		   </div>
+		   {% endif %}
 
 		</div>
 	{{ macros.end_table() }}

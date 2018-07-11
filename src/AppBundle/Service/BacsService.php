@@ -510,6 +510,12 @@ class BacsService
                 if ($submittedPayment->getPolicy()->getUser()->getId() == $user->getId()) {
                     $foundPayments++;
                     $submittedPayment->setStatus(BacsPayment::STATUS_FAILURE);
+                    // Set policy as unpaid if there's a payment failure
+                    if (!$submittedPayment->getPolicy()->isPolicyPaidToDate() &&
+                        $submittedPayment->getPolicy()->getStatus() == Policy::STATUS_ACTIVE) {
+                        $submittedPayment->getPolicy()->setStatus(Policy::STATUS_UNPAID);
+                    }
+                    // TODO: Email user
                     $results['failed-payments']++;
                     $days = $submittedPayment->getDate()->diff($originalProcessingDate);
                     $results['details'][$reference] = [$submittedPayment->getId() => $days->days];
@@ -582,6 +588,7 @@ class BacsService
             $reasonCode = $this->getChildNodeValue($element, 'ReasonCode');
             $reasonCodeMeaning = $this->getChildNodeValue($element, 'ReasonCodeMeaning');
             $reference = $this->getChildNodeValue($element, 'SUReference');
+            $ddicReference = $this->getChildNodeValue($element, 'PayingBankReference');
             $amount = $this->getChildNodeValue($element, 'TotalAmount');
             $results['indemnity-amount'] += $amount;
             $results['details'][] = [$reference => [$reasonCode => $reasonCodeMeaning]];
@@ -606,6 +613,8 @@ class BacsService
                 $indemnityPayment->setAmount(0 - $amount);
                 $indemnityPayment->setStatus(BacsIndemnityPayment::STATUS_RAISED);
                 $indemnityPayment->setSource(BacsIndemnityPayment::SOURCE_SYSTEM);
+                $indemnityPayment->setNotes('Direct Debit Indemnity Claim (Chargeback)');
+                $indemnityPayment->setReference($ddicReference);
                 $policy->addPayment($indemnityPayment);
                 $this->dm->persist($indemnityPayment);
             }
@@ -1042,6 +1051,14 @@ class BacsService
         return $cancellations;
     }
 
+    /**
+     * @param Policy         $policy
+     * @param string         $notes
+     * @param float|null     $amount
+     * @param \DateTime|null $date
+     * @return BacsPayment
+     * @throws \Exception
+     */
     public function bacsPayment(Policy $policy, $notes, $amount = null, \DateTime $date = null)
     {
         if (!$date) {
@@ -1224,9 +1241,10 @@ class BacsService
         foreach ($scheduledPayments as $scheduledPayment) {
             /** @var ScheduledPayment $scheduledPayment */
             $scheduledDate = $this->getNextBusinessDay($scheduledPayment->getScheduled());
+            $policy = $scheduledPayment->getPolicy();
 
             /** @var BacsPaymentMethod $bacs */
-            $bacs = $scheduledPayment->getPolicy()->getUser()->getPaymentMethod();
+            $bacs = $policy->getUser()->getPaymentMethod();
 
             if (!$bacs || !$bacs->getBankAccount()) {
                 $msg = sprintf(
@@ -1266,7 +1284,7 @@ class BacsService
                 }
 
                 $rescheduled = $scheduledPayment->reschedule($scheduledDate);
-                $scheduledPayment->getPolicy()->addScheduledPayment($rescheduled);
+                $policy->addScheduledPayment($rescheduled);
                 $this->dm->flush(null, array('w' => 'majority', 'j' => true));
 
                 continue;
@@ -1279,9 +1297,22 @@ class BacsService
                 );
                 $this->logger->error($msg);
 
+                $scheduledPayment->setStatus(ScheduledPayment::STATUS_CANCELLED);
                 $rescheduled = $scheduledPayment->reschedule($scheduledDate);
-                $scheduledPayment->getPolicy()->addScheduledPayment($rescheduled);
+                $policy->addScheduledPayment($rescheduled);
                 $this->dm->flush(null, array('w' => 'majority', 'j' => true));
+
+                continue;
+            }
+
+            $bacsPaymentForDateCalcs = new BacsPayment();
+            $bacsPaymentForDateCalcs->submit($scheduledDate);
+            if ($policy->getPolicyExpirationDate() < $bacsPaymentForDateCalcs->getBacsReversedDate()) {
+                $msg = sprintf(
+                    'Skipping payment %s as payment date is after expiration date',
+                    $scheduledPayment->getId()
+                );
+                $this->logger->error($msg);
 
                 continue;
             }

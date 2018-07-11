@@ -2,16 +2,19 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Document\BacsPaymentMethod;
 use AppBundle\Document\File\PaymentRequestUploadFile;
 use AppBundle\Document\JudoPaymentMethod;
 use AppBundle\Form\Type\AdminEmailOptOutType;
 use AppBundle\Form\Type\PaymentRequestUploadFileType;
 use AppBundle\Form\Type\UploadFileType;
 use AppBundle\Security\FOSUBUserProvider;
+use AppBundle\Service\BacsService;
 use AppBundle\Service\FraudService;
 use AppBundle\Service\JudopayService;
 use AppBundle\Service\PolicyService;
 use AppBundle\Service\ReceperioService;
+use AppBundle\Service\ReportingService;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -530,6 +533,10 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             ->add('monthly', SubmitType::class)
             ->add('yearly', SubmitType::class)
             ->getForm();
+        $cancelDirectDebitForm = $this->get('form.factory')
+            ->createNamedBuilder('cancel_direct_debit_form')
+            ->add('cancel', SubmitType::class)
+            ->getForm();
         $paymentRequestFile = new PaymentRequestUploadFile();
         $paymentRequestFile->setPolicy($policy);
         $runScheduledPaymentForm = $this->get('form.factory')
@@ -988,6 +995,21 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
 
                     return $this->redirectToRoute('admin_policy', ['id' => $id]);
                 }
+            } elseif ($request->request->has('cancel_direct_debit_form')) {
+                $cancelDirectDebitForm->handleRequest($request);
+                if ($cancelDirectDebitForm->isValid()) {
+                    /** @var BacsService $bacsService */
+                    $bacsService = $this->get('app.bacs');
+                    /** @var BacsPaymentMethod $bacsPaymentMethod */
+                    $bacsPaymentMethod = $policy->getPayerOrUser()->getPaymentMethod();
+                    $bacsService->queueCancelBankAccount(
+                        $bacsPaymentMethod->getBankAccount(),
+                        $policy->getPayerOrUser()->getId()
+                    );
+                    $this->addFlash('success', sprintf(
+                        'Direct Debit Cancellation has been queued.'
+                    ));
+                }
             } elseif ($request->request->has('run_scheduled_payment_form')) {
                 $runScheduledPaymentForm->handleRequest($request);
                 if ($runScheduledPaymentForm->isValid()) {
@@ -1041,6 +1063,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             'picsure_form' => $picsureForm->createView(),
             'swap_payment_plan_form' => $swapPaymentPlanForm->createView(),
             'pay_policy_form' => $payPolicyForm->createView(),
+            'cancel_direct_debit_form' => $cancelDirectDebitForm->createView(),
             'run_scheduled_payment_form' => $runScheduledPaymentForm->createView(),
             'fraud' => $checks,
             'policy_route' => 'admin_policy',
@@ -1384,7 +1407,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         if (mb_strlen($claimNumber) > 0) {
             $qb = $qb->field('number')->equals(new MongoRegex(sprintf("/.*%s.*/i", $claimNumber)));
         }
-        if (mb_strlen($claimId) > 0) {
+        if (mb_strlen($claimId) > 0 && \MongoId::isValid($claimId)) {
             $qb = $qb->field('id')->equals(new \MongoId($claimId));
         }
         $qb = $qb->sort('replacementReceivedDate', 'desc')
@@ -1503,6 +1526,36 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
 
         $reporting = $this->get('app.reporting');
         $report = $reporting->getQuarterlyPL($date);
+
+        return ['data' => $report];
+    }
+
+    /**
+     * @Route("/underwriting", name="admin_underwriting")
+     * @Route("/underwriting/{year}/{month}", name="admin_underwriting_date")
+     * @Template
+     */
+    public function adminUnderWritingAction(Request $request, $year = null, $month = null)
+    {
+        if ($request->get('_route') == "admin_underwriting") {
+            $now = new \DateTime();
+            $now = $now->sub(new \DateInterval('P1Y'));
+            return new RedirectResponse($this->generateUrl('admin_underwriting_date', [
+                'year' => $now->format('Y'),
+                'month' => $now->format('m'),
+            ]));
+        }
+        $date = \DateTime::createFromFormat(
+            "Y-m-d",
+            sprintf('%d-%d-01', $year, $month),
+            new \DateTimeZone(SoSure::TIMEZONE)
+        );
+
+        $data = [];
+
+        /** @var ReportingService $reporting */
+        $reporting = $this->get('app.reporting');
+        $report = $reporting->getUnderWritingReporting($date);
 
         return ['data' => $report];
     }
@@ -2205,7 +2258,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             if (count($picsureFiles) > 0) {
                 $this->get('event_dispatcher')->dispatch(
                     PicsureEvent::EVENT_APPROVED,
-                    new PicsureEvent($picsureFiles[0])
+                    new PicsureEvent($policy, $picsureFiles[0])
                 );
             } else {
                 $this->get('logger')->error(sprintf("Missing picture file in policy %s.", $policy->getId()));
@@ -2247,7 +2300,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             if (count($picsureFiles) > 0) {
                 $this->get('event_dispatcher')->dispatch(
                     PicsureEvent::EVENT_REJECTED,
-                    new PicsureEvent($picsureFiles[0])
+                    new PicsureEvent($policy, $picsureFiles[0])
                 );
             } else {
                 $this->get('logger')->error(sprintf("Missing picture file in policy %s.", $policy->getId()));
@@ -2281,7 +2334,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             if (count($picsureFiles) > 0) {
                 $this->get('event_dispatcher')->dispatch(
                     PicsureEvent::EVENT_INVALID,
-                    new PicsureEvent($picsureFiles[0])
+                    new PicsureEvent($policy, $picsureFiles[0])
                 );
             } else {
                 $this->get('logger')->error(sprintf("Missing picture file in policy %s.", $policy->getId()));

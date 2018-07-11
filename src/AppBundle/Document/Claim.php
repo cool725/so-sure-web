@@ -723,6 +723,18 @@ class Claim
         return $this->policy;
     }
 
+    /**
+     * @return PhonePolicy|null
+     */
+    public function getPhonePolicy()
+    {
+        if ($this->policy instanceof PhonePolicy) {
+            return $this->policy;
+        }
+
+        return null;
+    }
+
     public function setPolicy($policy)
     {
         if (!$this->getFnolRisk()) {

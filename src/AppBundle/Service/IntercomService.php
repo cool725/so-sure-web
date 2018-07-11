@@ -100,7 +100,7 @@ class IntercomService
     protected $secureAndroid;
     protected $secureIOS;
 
-    /** @var \Swift_Mailer */
+    /** @var MailerService */
     protected $mailer;
 
     /** @var RouterInterface */
@@ -114,7 +114,7 @@ class IntercomService
      * @param string          $secure
      * @param string          $secureAndroid
      * @param string          $secureIOS
-     * @param \Swift_Mailer   $mailer
+     * @param MailerService   $mailer
      * @param RouterInterface $router
      */
     public function __construct(
@@ -125,7 +125,7 @@ class IntercomService
         $secure,
         $secureAndroid,
         $secureIOS,
-        \Swift_Mailer $mailer,
+        MailerService $mailer,
         RouterInterface $router
     ) {
         $this->dm = $dm;
@@ -1107,13 +1107,12 @@ class IntercomService
 
     private function emailReport($lines)
     {
-        $message = \Swift_Message::newInstance()
-            ->setSubject('Intercom Mainteanance and Duplicate Entries')
-            ->setFrom('tech@so-sure.com')
-            ->setTo('tech+ops@so-sure.com')
-            ->setBody(implode(PHP_EOL, $lines), 'text/text');
-        $this->mailer->send($message);
-
+        $this->mailer->send(
+            'Intercom Mainteanance and Duplicate Entries',
+            'tech+ops@so-sure.com',
+            null,
+            implode(PHP_EOL, $lines)
+        );
     }
 
     public function countQueue()

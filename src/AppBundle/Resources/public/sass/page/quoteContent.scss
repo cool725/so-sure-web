@@ -1,0 +1,63 @@
+// quote.scss
+
+@import "../mixins";
+@import "../common/palette";
+@import "../common/paletteNew";
+@import "../common/type";
+@import "rewardCalculatorNew";
+
+.navbar {
+	background-color: $white;
+}
+
+.quote {
+
+	&__top {
+		text-align: center;
+        margin-bottom: 25px;
+        @include breakpoint(laptop) {
+            padding-top: 100px;
+        }
+	}
+
+	&__bottom {
+        background-color: $off-white;
+    }
+
+	&__cta {
+
+		@include breakpoint(midtablet) {
+			width: 30%;
+			margin: 0 auto;
+		}
+	}
+
+    &__excess {
+
+        p.so-sure-smile {
+            padding-left: 50px;
+            background-image: url('#{$cdn_url}/images/logo/so-sure-blue-smile.svg');
+            background-size: 40px 40px;
+            background-repeat: no-repeat;
+            background-position: left top;
+            margin-bottom: 40px;
+        }
+
+        p.so-sure-sad {
+            background-image: url('#{$cdn_url}/images/logo/so-sure_blue-frown.svg');
+            fill: red;
+        }
+
+        @include breakpoint(laptop) {
+            padding-top: 90px;
+            padding-bottom: 100px;
+        }
+    }
+
+    &__save {
+        background-color: $primary-blue;
+        text-align: center;
+    }
+
+}
+

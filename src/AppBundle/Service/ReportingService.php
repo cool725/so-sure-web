@@ -2,6 +2,7 @@
 namespace AppBundle\Service;
 
 use AppBundle\Document\File\SalvaPaymentFile;
+use AppBundle\Document\Payment\BacsIndemnityPayment;
 use AppBundle\Repository\CashbackRepository;
 use AppBundle\Repository\ClaimRepository;
 use AppBundle\Repository\ConnectionRepository;
@@ -896,6 +897,7 @@ class ReportingService
             'sosure' => Payment::sumPayments($payments, $isProd, SoSurePayment::class),
             'chargebacks' => Payment::sumPayments($payments, $isProd, ChargebackPayment::class),
             'bacs' => Payment::sumPayments($payments, $isProd, BacsPayment::class),
+            'bacsIndemnity' => Payment::sumPayments($payments, $isProd, BacsIndemnityPayment::class),
             'potReward' => Payment::sumPayments($potRewardPayments, $isProd, PotRewardPayment::class),
             'potRewardCashback' => Payment::sumPayments($potRewardPaymentsCashback, $isProd, PotRewardPayment::class),
             'potRewardDiscount' => Payment::sumPayments($potRewardPaymentsDiscount, $isProd, PotRewardPayment::class),
@@ -915,13 +917,70 @@ class ReportingService
      * @param \DateTime      $date Current date - will run report for previous year quarter
      * @param \DateTime|null $now  Optional - when is now
      */
+    public function getUnderWritingReporting(\DateTime $date, \DateTime $now = null)
+    {
+        if (!$now) {
+            $now = new \DateTime();
+        }
+        $start = $this->startOfMonth($date);
+        $end = $this->endOfMonth($date);
+        $policies = $this->getAllStartedPolicies($start, $end);
+        $data = [
+            'start' => $start,
+            'end' => $end,
+            'month' => $date->format('n'),
+            'year' => $date->format('Y'),
+            'allowed' => $now->diff($end)->y > 0,
+            'premiumReceived' => 0,
+            'premiumOutstanding' => 0,
+            'premiumTotal' => 0,
+            'claimsCost' => 0,
+            'claimsReserves' => 0,
+            'claimsTotal' => 0,
+            'lossRatioOverall' => 0,
+            'lossRatioEarned' => 0,
+            'policies' => 0,
+        ];
+        foreach ($policies as $policy) {
+            /** @var Policy $policy */
+            $data['policies']++;
+            $data['premiumReceived'] += $policy->getPremiumPaid();
+            $data['premiumOutstanding'] += $policy->getUnderwritingOutstandingPremium();
+            $data['premiumTotal'] += $this->toTwoDp($policy->getPremiumPaid() +
+                $policy->getUnderwritingOutstandingPremium());
+            $claimsCost = 0;
+            $claimsReserves = 0;
+            foreach ($policy->getClaims() as $claim) {
+                /** @var Claim $claim */
+                $claimsCost += $claim->getIncurred();
+                $claimsReserves += $claim->getReservedValue();
+            }
+            $data['claimsCost'] += $claimsCost;
+            $data['claimsReserves'] += $claimsReserves;
+            $data['claimsTotal'] += $claimsCost + $claimsReserves;
+        }
+
+        if ($data['premiumTotal'] != 0) {
+            $data['lossRatioOverall'] = $this->toTwoDp($data['claimsCost'] / $data['premiumTotal']);
+        }
+        if ($data['premiumReceived'] != 0) {
+            $data['lossRatioEarned'] = $this->toTwoDp($data['claimsCost'] / $data['premiumReceived']);
+        }
+
+        return $data;
+    }
+
+    /**
+     * @param \DateTime      $date Current date - will run report for previous year quarter
+     * @param \DateTime|null $now  Optional - when is now
+     */
     public function getQuarterlyPL(\DateTime $date, \DateTime $now = null)
     {
         if (!$now) {
             $now = new \DateTime();
         }
         list($start, $end) = $this->getQuarterlyPLDates($date);
-        $policies = $this->getQuarterlyPolicies($start, $end);
+        $policies = $this->getAllStartedPolicies($start, $end);
         $data = [
             'start' => $start,
             'end' => $end,
@@ -1049,7 +1108,7 @@ class ReportingService
         return [$start, $end];
     }
 
-    private function getQuarterlyPolicies(\DateTime $startDate, \DateTime $endDate)
+    private function getAllStartedPolicies(\DateTime $startDate, \DateTime $endDate)
     {
         /** @var PhonePolicyRepository $policyRepo */
         $policyRepo = $this->dm->getRepository(PhonePolicy::class);

@@ -4,6 +4,7 @@ namespace AppBundle\Listener;
 
 use AppBundle\Document\User;
 use AppBundle\Event\LeadEvent;
+use AppBundle\Event\PicsureEvent;
 use AppBundle\Event\UserEvent;
 use AppBundle\Event\ClaimEvent;
 use AppBundle\Event\ConnectionEvent;
@@ -157,5 +158,25 @@ class IntercomListener
     public function onClaimSettledEvent(ClaimEvent $event)
     {
         $this->intercom->queueClaim($event->getClaim(), IntercomService::QUEUE_EVENT_CLAIM_SETTLED);
+    }
+
+    public function onPicSureReceivedEvent(PicsureEvent $event)
+    {
+        $this->intercom->queue($event->getPolicy()->getUser());
+    }
+
+    public function onPicSureUndamagedEvent(PicsureEvent $event)
+    {
+        $this->intercom->queue($event->getPolicy()->getUser());
+    }
+
+    public function onPicSureInvalidEvent(PicsureEvent $event)
+    {
+        $this->intercom->queue($event->getPolicy()->getUser());
+    }
+
+    public function onPicSureDamagedEvent(PicsureEvent $event)
+    {
+        $this->intercom->queue($event->getPolicy()->getUser());
     }
 }

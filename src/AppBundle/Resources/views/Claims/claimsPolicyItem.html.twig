@@ -955,6 +955,20 @@
                     </td>
                 </tr>
                 {% endif %}
+                {% if is_granted('ROLE_CUSTOMER_SERVICES') %}
+                    {% if policy.isPolicy
+                        and policy.payerOrUser.paymentMethod
+                        and policy.payerOrUser.paymentMethod.getType == "bacs" %}
+                        <tr>
+                            <td><i class="fa fa-lock" title="Admin only"></i> Cancel Direct Debit</td>
+                            <td>
+                                {{ form_start(cancel_direct_debit_form)}}
+                                {{ form_widget(cancel_direct_debit_form.cancel, {'attr': {'class': 'btn btn-danger'}})}}
+                                {{ form_end(cancel_direct_debit_form)}}
+                            </td>
+                        </tr>
+                    {% endif %}
+                {% endif %}
             </table>
             {% if is_granted('ROLE_ADMIN') %}
             <h3>Update Policy</h3>
@@ -1055,9 +1069,12 @@
                       <th>Type</th>
                       <th>Date</th>
                       <th>Amount</th>
+                      {% if is_granted('ROLE_ADMIN') %}
+                      <th>Commission</th>
+                      {% endif %}
                       <th>Status</th>
                   </tr>
-                  {% for payment in policy.payments if payment.amount != 0 %}
+                  {% for payment in policy.payments if payment.amount != 0 or payment.totalCommission != 0 %}
                     <tr>
                         <td>
                             {% if payment.type == 'judo' %}
@@ -1106,6 +1123,11 @@
                         <td>
                             £{{ payment.amount | number_format(2, '.', ',') }}
                         </td>
+                        {% if is_granted('ROLE_ADMIN') %}
+                            <td>
+                                £{{ payment.totalCommission | number_format(2, '.', ',') }}
+                            </td>
+                        {% endif %}
                         <td>
                             {% if payment.isSuccess %}
                                 <i class="fa fa-check text-success"></i>

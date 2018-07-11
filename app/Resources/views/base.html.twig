@@ -11,10 +11,17 @@
         {# NOTE: Whilst we are transitioning use two different main stylesheets #}
         {% block stylesheets %}
             {% if new_stylesheet is defined and new_stylesheet == 1 %}
-                {% stylesheets output='css/*.css'
-                    '@AppBundle/Resources/public/sass/mainNew.scss'
-                %}<link rel="stylesheet" href="{{ asset_url }}">
-                {% endstylesheets %}
+                {% if app is not null and app.session.isStarted and app.session.get('sixpack:new-content-with-nav') == 'new-content-with-nav' %}
+                    {% stylesheets output='css/*.css'
+                        '@AppBundle/Resources/public/sass/mainAB.scss'
+                    %}<link rel="stylesheet" href="{{ asset_url }}">
+                    {% endstylesheets %}
+                {% else %}
+                    {% stylesheets output='css/*.css'
+                        '@AppBundle/Resources/public/sass/mainNew.scss'
+                    %}<link rel="stylesheet" href="{{ asset_url }}">
+                    {% endstylesheets %}
+                {% endif %}
             {% else %}
                 {% stylesheets output='css/*.css'
                     '@AppBundle/Resources/public/sass/main.scss'
@@ -27,14 +34,17 @@
         {% block metaend %}{% endblock %}
     </head>
     <body
-        {% if distraction_free is defined and distraction_free == 1 %}
-            class="distraction-free"
+        {% if app is not null and app.session.isStarted and app.session.get('sixpack:new-content-with-nav') == 'new-content-with-nav' %}
+            class="content-ab"
+        {% else %}
+            {% if distraction_free is defined and distraction_free == 1 %}
+                class="distraction-free"
+            {% endif %}
         {% endif %}
         {% if scrollspy is defined and scrollspy == 1 %}
             data-spy="scroll"
             data-target="{% if scrollspyID is defined  %}{{ scrollspyID }}{% endif %}"
-        {% endif %}
-    >
+        {% endif %}>
 
         {# Google Tag Manager Data Layer #}
 
@@ -121,7 +131,11 @@
         {# NOTE: Whilst we are transitioning use two different main stylesheets #}
         {% block nav %}
             {% if new_stylesheet is defined and new_stylesheet == 1 %}
-                {% include '::nav_new.html.twig' %}
+                {% if app is not null and app.session.isStarted and app.session.get('sixpack:new-content-with-nav') == 'new-content-with-nav' %}
+                    {% include '::nav_ab.html.twig' %}
+                {% else %}
+                    {% include '::nav_new.html.twig' %}
+                {% endif %}
             {% else %}
                 {% include '::nav.html.twig' %}
             {% endif %}

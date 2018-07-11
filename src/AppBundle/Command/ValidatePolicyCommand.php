@@ -312,7 +312,7 @@ class ValidatePolicyCommand extends BaseCommand
             $this->header($policy, $policies, $lines);
             $lines[] = $this->failureStatusMessage($policy, $data['prefix'], $data['validateDate']);
         }
-        if ($policy->arePolicyScheduledPaymentsCorrect() === false) {
+        if ($policy->arePolicyScheduledPaymentsCorrect(true, $data['validateDate']) === false) {
             $this->header($policy, $policies, $lines);
             if ($data['adjustScheduledPayments']) {
                 /** @var PolicyService $policyService */
@@ -325,22 +325,15 @@ class ValidatePolicyCommand extends BaseCommand
                 } else {
                     $policy = $this->getManager()->merge($policy);
                     $lines[] = sprintf(
-                        'WARNING!! Failed to adjusted Incorrect scheduled payments for olicy %s',
+                        'WARNING!! Failed to adjusted Incorrect scheduled payments for policy %s',
                         $policy->getPolicyNumber()
                     );
                 }
             } else {
-                if ($closeToExpiration) {
-                    $lines[] = sprintf(
-                        'Expected Incorrect scheduled payments - within 2 weeks of cancellation date for %s',
-                        $policy->getPolicyNumber()
-                    );
-                } else {
-                    $lines[] = sprintf(
-                        'WARNING!! Incorrect scheduled payments for policy %s',
-                        $policy->getPolicyNumber()
-                    );
-                }
+                $lines[] = sprintf(
+                    'WARNING!! Incorrect scheduled payments for policy %s',
+                    $policy->getPolicyNumber()
+                );
                 $lines[] = $this->failureScheduledPaymentsMessage($policy, $data['validateDate']);
             }
         }
@@ -394,7 +387,7 @@ class ValidatePolicyCommand extends BaseCommand
         );
     }
 
-    private function failureCommissionMessage($policy, $prefix, $date)
+    private function failureCommissionMessage(Policy $policy, $prefix, $date)
     {
         return sprintf(
             'Unexpected commission for policy %s (Paid: %0.2f Expected: %0.2f)',
@@ -435,19 +428,21 @@ class ValidatePolicyCommand extends BaseCommand
         );
     }
 
-    private function failureScheduledPaymentsMessage($policy, $date)
+    private function failureScheduledPaymentsMessage(Policy $policy, $date)
     {
         $scheduledPayments = $policy->getAllScheduledPayments(ScheduledPayment::STATUS_SCHEDULED);
         $totalScheduledPayments = ScheduledPayment::sumScheduledPaymentAmounts($scheduledPayments);
+        $billingDayIssue = $policy->arePolicyScheduledPaymentsCorrect(false, $date);
 
         // @codingStandardsIgnoreStart
         return sprintf(
-            'Total Premium £%0.2f Payments Made £%0.2f (£%0.2f credited) Scheduled Payments £%0.2f Outstanding Premium £%0.2f',
+            'Total Premium: £%0.2f; Payments Made: £%0.2f (£%0.2f credited); Scheduled Payments: £%0.2f; Outstanding Premium: £%0.2f; Billing Day Issue: %s',
             $policy->getYearlyPremiumPrice(),
             $policy->getTotalSuccessfulPayments($date),
             $policy->getPremiumPaid(),
             $totalScheduledPayments,
-            $policy->getOutstandingPremium()
+            $policy->getOutstandingPremium(),
+            $billingDayIssue ? 'Yes' : 'No'
         );
         // @codingStandardsIgnoreEnd
     }

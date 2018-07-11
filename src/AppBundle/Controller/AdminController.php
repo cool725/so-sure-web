@@ -6,12 +6,14 @@ use AppBundle\Document\ArrayToApiArrayTrait;
 use AppBundle\Document\BacsPaymentMethod;
 use AppBundle\Document\File\AccessPayFile;
 use AppBundle\Document\File\ReconciliationFile;
+use AppBundle\Document\File\SalvaPaymentFile;
 use AppBundle\Document\Payment\BacsIndemnityPayment;
 use AppBundle\Document\Sequence;
 use AppBundle\Form\Type\BacsMandatesType;
 use AppBundle\Form\Type\UploadFileType;
 use AppBundle\Form\Type\ReconciliationFileType;
 use AppBundle\Form\Type\SequenceType;
+use AppBundle\Repository\BacsIndemnityPaymentRepository;
 use AppBundle\Repository\BacsPaymentRepository;
 use AppBundle\Repository\File\BarclaysFileRepository;
 use AppBundle\Repository\File\BarclaysStatementFileRepository;
@@ -451,9 +453,11 @@ class AdminController extends BaseController
         $dm = $this->getManager();
         /** @var UserRepository $userRepo */
         $userRepo = $dm->getRepository(User::class);
+        /** @var S3FileRepository $s3FileRepo */
         $s3FileRepo = $dm->getRepository(S3File::class);
         /** @var BacsPaymentRepository $paymentsRepo */
         $paymentsRepo = $dm->getRepository(BacsPayment::class);
+        /** @var BacsIndemnityPaymentRepository $paymentsIndemnityRepo */
         $paymentsIndemnityRepo = $dm->getRepository(BacsIndemnityPayment::class);
         $sequenceRepo = $dm->getRepository(Sequence::class);
         /** @var Sequence $currentSequence */
@@ -605,7 +609,9 @@ class AdminController extends BaseController
             'arudds' => $s3FileRepo->getAllFiles($date, 'bacsReportArudd'),
             'ddic' => $s3FileRepo->getAllFiles($date, 'bacsReportDdic'),
             'input' => $s3FileRepo->getAllFiles($date, 'bacsReportInput'),
+            'inputIncPrevMonth' => $s3FileRepo->getAllFiles($date, 'bacsReportInput', true),
             'payments' => $paymentsRepo->findPayments($date),
+            'paymentsIncPrevNextMonth' => $paymentsRepo->findPaymentsIncludingPreviousNextMonth($date),
             'indemnity' => $paymentsIndemnityRepo->findPayments($date),
             'uploadForm' => $uploadForm->createView(),
             'uploadDebitForm' => $uploadDebitForm->createView(),
@@ -789,6 +795,8 @@ class AdminController extends BaseController
         $dm = $this->getManager();
         /** @var PaymentRepository $paymentRepo */
         $paymentRepo = $dm->getRepository(Payment::class);
+        /** @var S3FileRepository $salvaFileRepo */
+        $salvaFileRepo = $dm->getRepository(SalvaPaymentFile::class);
         /** @var JudoFileRepository $judoFileRepo */
         $judoFileRepo = $dm->getRepository(JudoFile::class);
         /** @var BarclaysStatementFileRepository $barclaysStatementFileRepo */
@@ -804,10 +812,13 @@ class AdminController extends BaseController
         $isProd = $this->isProduction();
         $tz = new \DateTimeZone(SoSure::TIMEZONE);
         $sosure = [
-            'dailyTransaction' => Payment::dailyPayments($payments, $isProd, JudoPayment::class),
-            'monthlyTransaction' => Payment::sumPayments($payments, $isProd, JudoPayment::class),
-            'dailyShiftedTransaction' => Payment::dailyPayments($payments, $isProd, JudoPayment::class, $tz),
-            'monthlyShiftedTransaction' => Payment::sumPayments($payments, $isProd, JudoPayment::class),
+            'dailyTransaction' => Payment::dailyPayments($payments, $isProd),
+            'monthlyTransaction' => Payment::sumPayments($payments, $isProd),
+            'dailyShiftedTransaction' => Payment::dailyPayments($payments, $isProd, null, $tz),
+            'dailyJudoTransaction' => Payment::dailyPayments($payments, $isProd, JudoPayment::class),
+            'monthlyJudoTransaction' => Payment::sumPayments($payments, $isProd, JudoPayment::class),
+            'dailyJudoShiftedTransaction' => Payment::dailyPayments($payments, $isProd, JudoPayment::class, $tz),
+            'monthlyJudoShiftedTransaction' => Payment::sumPayments($payments, $isProd, JudoPayment::class),
             'dailyBacsTransaction' => Payment::dailyPayments($payments, $isProd, BacsPayment::class),
             'monthlyBacsTransaction' => Payment::sumPayments($payments, $isProd, BacsPayment::class),
         ];
@@ -935,6 +946,18 @@ class AdminController extends BaseController
         $reconciliation['yearlyTransaction'] = ReconciliationFile::combineMonthlyTotal($yearlyReconcilationFiles);
         $reconciliation['allTransaction'] = ReconciliationFile::combineMonthlyTotal($allReconcilationFiles);
 
+        $monthlySalvaFiles = $salvaFileRepo->getMonthlyFiles($date);
+        $monthlyPerDaySalvaTransaction = SalvaPaymentFile::combineDailyTransactions($monthlySalvaFiles);
+
+        $salva = [
+            'dailyTransaction' => $monthlyPerDaySalvaTransaction,
+            'monthlyTransaction' => SalvaPaymentFile::totalCombinedFiles(
+                $monthlyPerDaySalvaTransaction,
+                $year,
+                $month
+            ),
+        ];
+
         $monthlyJudoFiles = $judoFileRepo->getMonthlyFiles($date);
         $monthlyPerDayJudoTransaction = JudoFile::combineDailyTransactions($monthlyJudoFiles);
 
@@ -1017,6 +1040,7 @@ class AdminController extends BaseController
             'barclays' => $barclays,
             'sosure' => $sosure,
             'reconciliation' => $reconciliation,
+            'salva' => $salva,
             'judo' => $judo,
             'judoFiles' => $monthlyJudoFiles,
             'barclaysFiles' => $monthlyBarclaysFiles,
