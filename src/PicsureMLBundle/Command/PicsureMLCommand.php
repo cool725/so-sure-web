@@ -30,6 +30,12 @@ class PicsureMLCommand extends ContainerAwareCommand
                 'Output csv of training data'
             )
             ->addOption(
+                'annotate',
+                null,
+                InputOption::VALUE_NONE,
+                'Output csv of annotation data'
+            )
+            ->addOption(
                 'versionNumber',
                 null,
                 InputOption::VALUE_REQUIRED,
@@ -42,6 +48,7 @@ class PicsureMLCommand extends ContainerAwareCommand
     {
         $sync = true === $input->getOption('sync');
         $csv = true === $input->getOption('output');
+        $annotate = true === $input->getOption('annotate');
         $version = $input->getOption('versionNumber');
         /** @var PicsureMLService $picsureMLService */
         $picsureMLService = $this->getContainer()->get('picsureml.picsureml');
@@ -61,6 +68,13 @@ class PicsureMLCommand extends ContainerAwareCommand
             } else {
                 $output->writeln(sprintf('Error: version number required'));
             }
+        } elseif ($annotate) {
+            $output->writeln(sprintf('Annotate...'));
+            $result = $picsureMLService->annotate();
+            if ($result !== true) {
+                $output->writeln($result);
+            }
+            $output->writeln(sprintf('Done'));
         }
 
     }

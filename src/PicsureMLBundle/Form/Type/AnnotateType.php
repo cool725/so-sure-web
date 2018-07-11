@@ -4,8 +4,9 @@ namespace PicsureMLBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\ButtonType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Doctrine\ODM\MongoDB\DocumentRepository;
 
@@ -18,8 +19,8 @@ class AnnotateType extends AbstractType
             ->add('y', TextType::class, ['required' => false])
             ->add('width', TextType::class, ['required' => false])
             ->add('height', TextType::class, ['required' => false])
-            ->add('previous', SubmitType::class)
-            ->add('next', SubmitType::class)
+            ->add('annotate', SubmitType::class)
+            ->add('clear', ButtonType::class)
         ;
     }
 

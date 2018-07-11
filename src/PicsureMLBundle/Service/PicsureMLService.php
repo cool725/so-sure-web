@@ -253,26 +253,13 @@ class PicsureMLService
 
         return true;
     }
-/*
-    public function sync($filesystem)
+
+    public function annotate()
     {
-        $repo = $this->dm->getRepository(Image::class);
+        $filesystem = $this->mountManager->getFilesystem('s3picsure_fs');
 
-        $contents = $filesystem->listContents('ml', true);
-        foreach ($contents as $object) {
-            if ($object['type'] == "file" && !$repo->imageExists($object['path'])) {
-                $image = new Image();
-                $image->setPath($object['path']);
-                $this->dm->persist($image);
-            }
-        }
-
-        $this->dm->flush();
-    }
-
-    public function annotate($filesystem)
-    {
-        $repo = $this->dm->getRepository(Image::class);
+        /** @var TrainingDataRepository $repo */
+        $repo = $this->picsureMLDm->getRepository(TrainingData::class);
 
         $annotations = [];
 
@@ -283,8 +270,8 @@ class PicsureMLService
         foreach ($results as $result) {
             if ($result->hasAnnotation()) {
                 $annotations[] = sprintf(
-                    "%s 1 %d %d %d %d",
-                    $result->getPath(),
+                    "%s %d %d %d %d",
+                    $result->getImagePath(),
                     $result->getX(),
                     $result->getY(),
                     $result->getWidth(),
@@ -303,11 +290,9 @@ class PicsureMLService
                 fclose($stream);
             }
         } catch (IOExceptionInterface $e) {
-            $this->logger->warning(
-                sprintf("An error occurred while writting the annotations to %s", $e->getPath()),
-                ['exception' => $e]
-            );
+            return sprintf('Error writing annotations: %s', $e->getPath());
         }
+
+        return true;
     }
-    */
 }
