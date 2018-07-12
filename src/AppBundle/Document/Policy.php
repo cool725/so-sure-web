@@ -3946,6 +3946,14 @@ abstract class Policy
 
     public function arePolicyScheduledPaymentsCorrect($verifyBillingDay = true, \DateTime $date = null)
     {
+        if (!in_array($this->getStatus(), [
+            self::STATUS_ACTIVE,
+            self::STATUS_UNPAID,
+            self::STATUS_PENDING,
+        ])) {
+            return null;
+        }
+
         $scheduledPayments = $this->getAllScheduledPayments(ScheduledPayment::STATUS_SCHEDULED);
 
         // All Scheduled day must match the billing day
