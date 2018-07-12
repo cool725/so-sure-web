@@ -143,15 +143,15 @@ class PurchaseController extends BaseController
 
         // DOB Sixpack Test
         /** @var Form $purchaseForm */
-        if ($dobExp == 'dropdowns') {
-            $purchaseForm = $this->get('form.factory')
-                ->createNamedBuilder('purchase_form', PurchaseStepPersonalAddressDropdownType::class, $purchase)
-                ->getForm();
-        } else {
-            $purchaseForm = $this->get('form.factory')
-                ->createNamedBuilder('purchase_form', PurchaseStepPersonalAddressType::class, $purchase)
-                ->getForm();
-        }
+        // if ($dobExp == 'dropdowns') {
+        //     $purchaseForm = $this->get('form.factory')
+        //         ->createNamedBuilder('purchase_form', PurchaseStepPersonalAddressDropdownType::class, $purchase)
+        //         ->getForm();
+        // } else {
+        $purchaseForm = $this->get('form.factory')
+            ->createNamedBuilder('purchase_form', PurchaseStepPersonalAddressType::class, $purchase)
+            ->getForm();
+        // }
 
         if ('POST' === $request->getMethod()) {
             if ($request->request->has('purchase_form')) {
