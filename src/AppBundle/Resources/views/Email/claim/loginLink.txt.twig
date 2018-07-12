@@ -6,9 +6,25 @@ Your link to proceed with your claim.
 ------------------------------------------------------------
 Hi {{ username }},
 
-Please visit the following link to proceed with your claim: {{ tokenUrl }}.
+Thank you for starting your claims process online, we're sorry to hear something has happened to your phone and we aim to get you back up and running in 24-72 hours.
 
-Note that the link will only be valid for {{ tokenValid }} {{ tokenValidTimeframe }}.
+Please now click on the link below to proceed to the next step in the claims process.
 
-Thanks for using so-sure.
+START MY CLAIM:
+{{ tokenUrl }}
+
+Please note this link will expire in {{ tokenValid }} {{ tokenValidTimeframe }}.
+
+You can re-reactivate the link here:
+{{ url('claim') }}
+
+Claims Process
+
+1. Entering all the information about your claim (what happened to your phone, where you were and any other relevant details)
+2. Uploading any additional documents you may need to submit (for example a Proof of Barring or Proof of Address)
+3. Finalising all the information you are going to submit is true and accurate
+4. Final submission
+
+If you have any questions regarding your claim please contact the claims team on 0344 856 0852.
+
 {% endblock body %}

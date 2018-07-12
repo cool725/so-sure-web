@@ -39,6 +39,7 @@ use AppBundle\Validator\Constraints as AppAssert;
  *      "proofOfUsage"="ProofOfUsageFile",
  *      "proofOfBarring"="ProofOfBarringFile",
  *      "proofOfPurchase"="ProofOfPurchaseFile",
+ *      "proofOfLoss"="ProofOfLossFile",
  *      "damagePicture"="DamagePictureFile"
  * })
  * @Gedmo\Loggable

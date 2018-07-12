@@ -35,45 +35,40 @@
                         <li>
                             <a href="{{ path('user_home') }}" class="btn btn-blue-hollow btn-pad ">Get back to your account</a>
                         </li>
-                        <li>
-                            <a id="withdraw-claim" href="#" class="btn btn-red btn-pad " data-toggle="modal" data-target="#withdrawModal">Withdraw my claim</a>
-                        </li>
                     </ul>
+
+                    <hr />
+                    <h2>Need to Upload Additional Documents?</h2>
+                    <div class="row">
+                        <div class="col-sm-12 bg-success">
+                            <div class="panel-body">
+                                It can happen to anyone. The network didn't give you quite the right document we need. Or perhaps the scan was missing just a tiny bit of a number that we need.
+                                Just upload another document here and we'll pass that along to the claims team to review.
+                            </div>
+                        </div>
+                    </div>
 
                     {{ form_start(claim_form, {'attr': {'data-toggle': 'validator', 'class': 'validate-form', 'id':'claim-form', 'data-client-validation': form_client_validation }}) }}
 
-                        <div class="row">
-                            <div class="col-sm-6">
-                                <div class="form-group {% if form_errors(claim_form.when) %}has-error{% endif %}">
-                                    <label class="h4">My phone was {{ claim.type }} on </label>
-                                    {{ form_widget(claim_form.when, { 'attr': {'class': 'form-control date_mask', 'placeholder': 'Date (DD/MM/YYYY)'}}) }}
-                                    <div class="help-block with-errors">{{ form_errors(claim_form.when) }}</div>
-                                </div>
-                            </div>
-                            <div class="col-sm-6">
-                                <div class="form-group {% if form_errors(claim_form.time) %}has-error{% endif %}">
-                                    <label class="h4">The {{ claim.type }} occured at around</label>
-                                    {{ form_widget(claim_form.time, { 'attr': {'class': 'form-control'}}) }}
-                                    <div class="help-block with-errors">{{ form_errors(claim_form.time) }}</div>
-                                </div>
-                            </div>
-                        </div>
-
                         {% if proof_of_usage is defined and proof_of_usage %}
+                            <div class="row" style="margin-top: 30px;">
+                                <div class="col-sm-12 bg-primary">
+                                    Proof of usage
+                                </div>
+                            </div>
                             <div class="row">
-                                <div class="col-xs-12 text-center">
-                                    <div class="form-group {% if form_errors(claim_form.proofOfUsage) %}has-error{% endif %}">
-                                        <label class="h4">Proof of usage</label>
-                                        {% for file in claim.proofOfUsageFiles %}
-                                            <p><a href="{{ s3DownloadLink(file.bucket, file.key) }}">{{ file.fileName }}</a> (Uploaded {{ file.created|date }})</p>
-                                        {% endfor %}
-                                        {{ form_widget(claim_form.proofOfUsage, { 'attr': {'class': 'form-control'}}) }}
-                                        <div class="help-block with-errors">{{ form_errors(claim_form.proofOfUsage) }}</div>
-                                        <div class="bg-info text-left">
-                                            <div class="panel-body">
-                                                <strong>How to get proof of usage:</strong><br>
-                                                Something....
+                                <div class="col-sm-12 bg-info">
+                                    <div class="panel-body">
+                                        You should request a proof of usage document from your Network Provider that has your IMEI number and the first and last time that IMEI was used on their network.
+                                        <br><br>
+                                        <div class="form-group {% if form_errors(claim_form.proofOfUsage) %}has-error{% endif %}">
+                                            {{ form_widget(claim_form.proofOfUsage, { 'attr': {'class': 'form-control'}}) }}
+                                            <div class="help-block with-errors">
+                                                <a href="#" data-toggle="modal" data-target="#usageModal">
+                                                    {{ claim.proofOfUsageFiles|length }} file(s) upload
+                                                </a>
                                             </div>
+                                            <div class="help-block with-errors">{{ form_errors(claim_form.proofOfUsage) }}</div>
                                         </div>
                                     </div>
                                 </div>
@@ -81,20 +76,24 @@
                         {% endif %}
 
                         {% if picture_of_phone is defined and picture_of_phone %}
+                            <div class="row" style="margin-top: 30px;">
+                                <div class="col-sm-12 bg-primary">
+                                    Proof of damaged phone
+                                </div>
+                            </div>
                             <div class="row">
-                                <div class="col-xs-12 text-center">
-                                    <div class="form-group {% if form_errors(claim_form.pictureOfPhone) %}has-error{% endif %}">
-                                        <label class="h4">Picture of damaged phone</label>
-                                        {% for file in claim.damagePictureFiles %}
-                                            <p><a href="{{ s3DownloadLink(file.bucket, file.key) }}">{{ file.fileName }}</a> (Uploaded {{ file.created|date }})</p>
-                                        {% endfor %}
-                                        {{ form_widget(claim_form.pictureOfPhone, { 'attr': {'class': 'form-control'}}) }}
-                                        <div class="help-block with-errors">{{ form_errors(claim_form.pictureOfPhone) }}</div>
-                                        <div class="bg-info text-left">
-                                            <div class="panel-body">
-                                                <strong>What is required:</strong><br>
-                                                Something....
+                                <div class="col-sm-12 bg-info">
+                                    <div class="panel-body">
+                                        Just take a photo of your phone that's damaged. You may need someone else's phone, or if your camera is working, using a mirror in a well lite room is fine.
+                                        <br><br>
+                                        <div class="form-group {% if form_errors(claim_form.pictureOfPhone) %}has-error{% endif %}">
+                                            {{ form_widget(claim_form.pictureOfPhone, { 'attr': {'class': 'form-control'}}) }}
+                                            <div class="help-block with-errors">
+                                                <a href="#" data-toggle="modal" data-target="#pictureModal">
+                                                    {{ claim.damagePictureFiles|length }} file(s) upload
+                                                </a>
                                             </div>
+                                            <div class="help-block with-errors">{{ form_errors(claim_form.pictureOfPhone) }}</div>
                                         </div>
                                     </div>
                                 </div>
@@ -102,39 +101,59 @@
                         {% endif %}
 
                         {% if proof_of_barring is defined and proof_of_barring %}
+                            <div class="row" style="margin-top: 30px;">
+                                <div class="col-sm-12 bg-primary">
+                                    Proof of barring
+                                </div>
+                            </div>
                             <div class="row">
-                                <div class="col-xs-12 text-center">
-                                    <div class="form-group {% if form_errors(claim_form.proofOfBarring) %}has-error{% endif %}">
-                                        <label class="h4">Proof of barring</label>
-                                        {% for file in claim.proofOfBarringFiles %}
-                                            <p><a href="{{ s3DownloadLink(file.bucket, file.key) }}">{{ file.fileName }}</a> (Uploaded {{ file.created|date }})</p>
-                                        {% endfor %}
-                                        {{ form_widget(claim_form.proofOfBarring, { 'attr': {'class': 'form-control'}}) }}
-                                        <div class="help-block with-errors">{{ form_errors(claim_form.proofOfBarring) }}</div>
+                                <div class="col-sm-12 bg-info">
+                                    <div class="panel-body">
+                                        You should request a proof of baring document from your Network Provider that has your IMEI number and when it barred.
+                                        <br><br>
+                                        <div class="form-group {% if form_errors(claim_form.proofOfBarring) %}has-error{% endif %}">
+                                            {{ form_widget(claim_form.proofOfBarring, { 'attr': {'class': 'form-control'}}) }}
+                                            <div class="help-block with-errors">
+                                                <a href="#" data-toggle="modal" data-target="#baringModal">
+                                                    {{ claim.proofOfBarringFiles|length }} file(s) upload
+                                                </a>
+                                            </div>
+                                            <div class="help-block with-errors">{{ form_errors(claim_form.proofOfBarring) }}</div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         {% endif %}
 
                         {% if proof_of_purchase is defined and proof_of_purchase %}
+                            <div class="row" style="margin-top: 30px;">
+                                <div class="col-sm-12 bg-primary">
+                                    Proof of purchase
+                                </div>
+                            </div>
                             <div class="row">
-                                <div class="col-xs-12 text-center">
-                                    <div class="form-group {% if form_errors(claim_form.proofOfPurchase) %}has-error{% endif %}">
-                                        <label class="h4">Proof of purchase</label>
-                                    {% for file in claim.proofOfPurchaseFiles %}
-                                        <p><a href="{{ s3DownloadLink(file.bucket, file.key) }}">{{ file.fileName }}</a> (Uploaded {{ file.created|date }})</p>
-                                    {% endfor %}
-                                        {{ form_widget(claim_form.proofOfPurchase, { 'attr': {'class': 'form-control'}}) }}
-                                        <div class="help-block with-errors">{{ form_errors(claim_form.proofOfPurchase) }}</div>
+                                <div class="col-sm-12 bg-info">
+                                    <div class="panel-body">
+                                        We require a proof of purchase document such as a receipt.
+                                        <br><br>
+                                        <div class="form-group {% if form_errors(claim_form.proofOfPurchase) %}has-error{% endif %}">
+                                            {{ form_widget(claim_form.proofOfPurchase, { 'attr': {'class': 'form-control'}}) }}
+                                            <div class="help-block with-errors">
+                                                <a href="#" data-toggle="modal" data-target="#purchaseModal">
+                                                    {{ claim.proofOfPurchaseFiles|length }} file(s) upload
+                                                </a>
+                                            </div>
+                                            <div class="help-block with-errors">{{ form_errors(claim_form.proofOfPurchase) }}</div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         {% endif %}
 
-                        <div class="row">
+                        <div class="row" style="margin-top: 30px;">
                             <div class="col-xs-12 text-center">
                                 <div class="form-group">
-                                    {{ form_widget(claim_form.confirm, { 'label': 'Update', 'attr': {'class': 'btn btn-green btn-lg'}}) }}
+                                    {{ form_widget(claim_form.confirm, { 'label': 'Upload & Send additional documents', 'attr': {'class': 'btn btn-green btn-lg'}}) }}
                                 </div>
                             </div>
                         </div>
@@ -146,20 +165,7 @@
     </section>
 
     {# Page Modals #}
-    <div class="modal fade" id="withdrawModal" tabindex="-1" role="dialog">
-        <div class="modal-dialog" role="document" style="width: 60%;">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title sr-only">Withdraw Claim</h4>
-                </div>
-                <div class="modal-body text-center">
-                    <h4>Are you sure you want to withdraw your claim?</h4>
-                    <p><a href="{{ path('withdraw_claimed_policy', {'policyId': claim.policy.id}) }}" class="btn btn-red btn-pad ">Withdraw my claim</a></p>
-                </div>
-            </div>
-        </div>
-    </div>
+    {% include 'AppBundle:User:claimModals.html.twig' %}
     {# End Page Modals #}
 
 {% endblock %}

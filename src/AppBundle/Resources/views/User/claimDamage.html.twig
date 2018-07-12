@@ -33,102 +33,146 @@
 
                         <div class="h4 text-center">I, {{ username }}, am making a claim for Damage.</div>
 
-                        <div class="row">
-                            <div class="col-sm-6">
-                                <div class="form-group">
-                                    <label class="h4">What is the type of damage?</label>
-                                    {{ form_widget(claim_form.typeDetails, { 'attr': {'class': 'form-control', 'placeholder': 'Please select'}}) }}
-                                    <span class="help-block with-errors">{{ form_errors(claim_form.typeDetails) }}</span>
-                                </div>
-                            </div>
-                            <div class="col-sm-6">
-                                <div class="form-group">
-                                    <label class="h4">If you choose "other", please specify</label>
-                                    {{ form_widget(claim_form.typeDetailsOther, { 'attr': {'class': 'form-control', 'placeholder': 'Keeps turning off etc...'}}) }}
-                                    <span class="help-block with-errors">{{ form_errors(claim_form.typeDetailsOther) }}</span>
-                                </div>
+                    <div class="row">
+                        <div class="col-sm-12 bg-primary">
+                            1) About your phone
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12 bg-info">
+                            <div class="panel-body">
+                                We need a bit more information about your phone.
                             </div>
                         </div>
-
-                        <div class="row">
-                            <div class="col-sm-6">
-                                <div class="form-group">
-                                    <label class="h4">Month phone purchased?</label>
-                                    {{ form_widget(claim_form.monthOfPurchase, { 'attr': {'class': 'form-control', 'placeholder': 'Month'}}) }}
-                                    <span class="help-block with-errors">{{ form_errors(claim_form.monthOfPurchase) }}</span>
-                                </div>
-                            </div>
-                            <div class="col-sm-6">
-                                <div class="form-group">
-                                    <label class="h4">Year phone purchased?</label>
-                                    {{ form_widget(claim_form.yearOfPurchase, { 'attr': {'class': 'form-control', 'placeholder': 'Year'}}) }}
-                                    <span class="help-block with-errors">{{ form_errors(claim_form.yearOfPurchase) }}</span>
-                                </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="h4">Month phone purchased?</label>
+                                {{ form_widget(claim_form.monthOfPurchase, { 'attr': {'class': 'form-control', 'placeholder': 'Month'}}) }}
+                                <span class="help-block with-errors">{{ form_errors(claim_form.monthOfPurchase) }}</span>
                             </div>
                         </div>
-
-                        <div class="row">
-                            <div class="col-sm-6">
-                                <div class="form-group">
-                                    <label class="h4">Condition of phone upon purchase?</label>
-                                    {{ form_widget(claim_form.phoneStatus, { 'attr': {'class': 'form-control', 'placeholder': 'Please select'}}) }}
-                                    <span class="help-block with-errors">{{ form_errors(claim_form.phoneStatus) }}</span>
-                                </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="h4">Year phone purchased?</label>
+                                {{ form_widget(claim_form.yearOfPurchase, { 'attr': {'class': 'form-control', 'placeholder': 'Year'}}) }}
+                                <span class="help-block with-errors">{{ form_errors(claim_form.yearOfPurchase) }}</span>
                             </div>
                         </div>
+                    </div>
 
-                        <div class="bg-info">
-                            <div class="panel-body">Please upload the following required documents to process your claim. Once they have been uploaded, we will call within a few hours (during business hours 9-5.30pm).</div>
-                        </div>
-
-                        {% if proof_of_usage is defined and proof_of_usage %}
-                            <div class="row">
-                                <div class="col-xs-12 text-center">
-                                    <div class="form-group {% if form_errors(claim_form.proofOfUsage) %}has-error{% endif %}">
-                                        <label class="h4">Proof of usage <span class="req">*</span></label>
-                                        {% for file in claim.proofOfUsageFiles %}
-                                            <p><a href="{{ s3DownloadLink(file.bucket, file.key) }}">{{ file.fileName }}</a> (Uploaded {{ file.created|date }})</p>
-                                        {% endfor %}
-                                        {{ form_widget(claim_form.proofOfUsage, { 'attr': {'class': 'form-control'}}) }}
-                                        <div class="help-block with-errors">{{ form_errors(claim_form.proofOfUsage) }}</div>
-                                        <div class="bg-info text-left">
-                                            <div class="panel-body">
-                                                <strong>How to get proof of usage:</strong><br>
-                                                Something....
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="h4">Condition of phone upon purchase?</label>
+                                {{ form_widget(claim_form.phoneStatus, { 'attr': {'class': 'form-control', 'placeholder': 'Please select'}}) }}
+                                <span class="help-block with-errors">{{ form_errors(claim_form.phoneStatus) }}</span>
                             </div>
-                        {% endif %}
+                        </div>
+                    </div>
+
+
+                    <div class="row" style="margin-top: 30px;">
+                        <div class="col-sm-12 bg-primary">
+                            2) About your damage claim
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12 bg-info">
+                            <div class="panel-body">
+                                We need a bit more information about the type of damage.
+                                {% if picture_of_phone is defined and picture_of_phone %}We also need a photo of your phone that's damaged. You may need someone else's phone, or if your camera is working, using a mirror in a well lite room is fine.{% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="h4">What is the type of damage?</label>
+                                {{ form_widget(claim_form.typeDetails, { 'attr': {'class': 'form-control', 'placeholder': 'Please select'}}) }}
+                                <span class="help-block with-errors">{{ form_errors(claim_form.typeDetails) }}</span>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="h4">If you choose "other", please specify</label>
+                                {{ form_widget(claim_form.typeDetailsOther, { 'attr': {'class': 'form-control', 'placeholder': 'Keeps turning off etc...'}}) }}
+                                <span class="help-block with-errors">{{ form_errors(claim_form.typeDetailsOther) }}</span>
+                            </div>
+                        </div>
+                    </div>
 
                         {% if picture_of_phone is defined and picture_of_phone %}
                             <div class="row">
                                 <div class="col-xs-12 text-center">
                                     <div class="form-group {% if form_errors(claim_form.pictureOfPhone) %}has-error{% endif %}">
-                                        <label class="h4">Picture of damaged phone <span class="req">*</span></label>
-                                        {% for file in claim.damagePictureFiles %}
-                                            <p><a href="{{ s3DownloadLink(file.bucket, file.key) }}">{{ file.fileName }}</a> (Uploaded {{ file.created|date }})</p>
-                                        {% endfor %}
+                                        <label class="h4">Picture of damaged phone</label>
                                         {{ form_widget(claim_form.pictureOfPhone, { 'attr': {'class': 'form-control'}}) }}
-                                        <div class="help-block with-errors">{{ form_errors(claim_form.pictureOfPhone) }}</div>
-                                        <div class="bg-info text-left">
-                                            <div class="panel-body">
-                                                <strong>What is required:</strong><br>
-                                                Something....
-                                            </div>
+                                        <div class="help-block with-errors">
+                                            <a href="#" data-toggle="modal" data-target="#pictureModal">
+                                                {{ claim.damagePictureFiles|length }} file(s) upload
+                                            </a>
                                         </div>
+                                        <div class="help-block with-errors">{{ form_errors(claim_form.pictureOfPhone) }}</div>
                                     </div>
                                 </div>
                             </div>
                         {% endif %}
 
+                    {% set sectionCount = 3 %}
+                    {% if proof_of_usage is defined and proof_of_usage %}
+                        {% set sectionCount = 4 %}
+                    <div class="row" style="margin-top: 30px;">
+                        <div class="col-sm-12 bg-primary">
+                            3) Contacting your Mobile Provider
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12 bg-info">
+                            <div class="panel-body">
+                                You'll need to call up your mobile provide and request a proof of usage document that has your IMEI number and the first and last time that IMEI was used on their network.
+                            </div>
+                        </div>
+                    </div>
+                        <div class="row">
+                            <div class="col-xs-12 text-center">
+                                <div class="form-group {% if form_errors(claim_form.proofOfUsage) %}has-error{% endif %}">
+                                    <label class="h4">Proof of usage <span class="req">*</span></label>
+                                    {% for file in claim.proofOfUsageFiles %}
+                                        <p><a href="{{ s3DownloadLink(file.bucket, file.key) }}">{{ file.fileName }}</a> (Uploaded {{ file.created|date }})</p>
+                                    {% endfor %}
+                                    {{ form_widget(claim_form.proofOfUsage, { 'attr': {'class': 'form-control'}}) }}
+                                    <div class="help-block with-errors">
+                                        <a href="#" data-toggle="modal" data-target="#usageModal">
+                                            {{ claim.proofOfUsageFiles|length }} file(s) upload
+                                        </a>
+                                    </div>
+                                    <div class="help-block with-errors">{{ form_errors(claim_form.proofOfUsage) }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+
+
+                    <div class="row" style="margin-top: 30px;">
+                        <div class="col-sm-12 bg-primary">
+                            {{ sectionCount }}) Submit your claim
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12 bg-info">
+                            <div class="panel-body">
+                                Once your claim is submitted, we aim to get back to you within 3 working hours. You can save your progress and come back at a later date if you need more time to get all of the required documents.
+                            </div>
+                        </div>
+                    </div>
                         <div class="row">
                             <div class="col-xs-12 text-center">
                                 <div class="h4">I confirm that I have attached the requested documents and that all of the above is true.</div>
                                 <div class="form-group">
-                                    {{ form_widget(claim_form.save, { 'label': 'Save', 'attr': {'class': 'btn btn-blue btn-lg'}}) }}
-                                    {{ form_widget(claim_form.confirm, { 'label': 'Confirm', 'attr': {'class': 'btn btn-green btn-lg'}}) }}
+                                    {{ form_widget(claim_form.save, { 'label': 'Save My Progress', 'attr': {'class': 'btn btn-blue btn-lg'}}) }}
+                                    {{ form_widget(claim_form.confirm, { 'label': 'Submit My Claim', 'attr': {'class': 'btn btn-green btn-lg'}}) }}
                                 </div>
                             </div>
                         </div>
@@ -139,6 +183,7 @@
     </section>
 
     {# Page Modals #}
+    {% include 'AppBundle:User:claimModals.html.twig' %}
     {# End Page Modals #}
 
 {% endblock %}

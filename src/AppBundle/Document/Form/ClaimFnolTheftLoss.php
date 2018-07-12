@@ -48,6 +48,8 @@ class ClaimFnolTheftLoss
 
     protected $proofOfPurchase;
 
+    protected $proofOfLoss;
+
     /**
      * @AppAssert\AlphanumericSpaceDot()
      * @Assert\Length(min="1", max="50")
@@ -141,7 +143,17 @@ class ClaimFnolTheftLoss
     {
         $this->proofOfPurchase = $proofOfPurchase;
     }
-    
+
+    public function getProofOfLoss()
+    {
+        return $this->proofOfLoss;
+    }
+
+    public function setProofOfLoss($proofOfLoss)
+    {
+        $this->proofOfLoss = $proofOfLoss;
+    }
+
     public function getCrimeReferenceNumber()
     {
         return $this->crimeReferenceNumber;
@@ -177,7 +189,7 @@ class ClaimFnolTheftLoss
         return $this->claim;
     }
     
-    public function setClaim($claim)
+    public function setClaim(Claim $claim)
     {
         $this->claim = $claim;
         $this->hasContacted = $claim->getHasContacted();
@@ -185,6 +197,9 @@ class ClaimFnolTheftLoss
         $this->blockedDate = $claim->getBlockedDate();
         $this->reportedDate = $claim->getReportedDate();
         $this->reportType = $claim->getReportType();
+        if (!$claim->getReportType() && $claim->getType() == Claim::TYPE_LOSS) {
+            $this->reportedType = Claim::REPORT_POLICE_STATION;
+        }
         $this->crimeReferenceNumber = $claim->getCrimeRef();
         $this->policeLossReport = $claim->getPoliceLossReport();
     }

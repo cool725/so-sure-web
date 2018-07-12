@@ -2,6 +2,7 @@
 
 namespace AppBundle\Form\Type;
 
+use AppBundle\Document\Form\ClaimFnolTheftLoss;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
@@ -68,14 +69,6 @@ class ClaimFnolTheftLossType extends AbstractType
                       'year' => 'YYYY', 'month' => 'MM', 'day' => 'DD',
                   ),
             ])
-            ->add('reportType', ChoiceType::class, [
-                'required' => false,
-                'placeholder' => 'Please choose...',
-                'choices' => [
-                    'Police station' => Claim::REPORT_POLICE_STATION,
-                    'Online' => Claim::REPORT_ONLINE,
-                ],
-            ])
             ->add('proofOfBarring', FileType::class, ['required' => false])
             ->add('isSave', HiddenType::class)
             ->add('save', ButtonType::class)
@@ -98,15 +91,25 @@ class ClaimFnolTheftLossType extends AbstractType
             }
             if ($claim->getType() == Claim::TYPE_THEFT) {
                 $form->add('crimeReferenceNumber', TextType::class, ['required' => false]);
-                $form->add('policeLossReport', HiddenType::class);
+                $form->add('proofOfLoss', HiddenType::class);
+                $form->add('reportType', HiddenType::class);
             } else {
-                $form->add('crimeReferenceNumber', HiddenType::class);
-                $form->add('policeLossReport', TextType::class, ['required' => false]);
+                $form->add('crimeReferenceNumber', TextType::class, ['required' => false]);
+                $form->add('proofOfLoss', FileType::class, ['required' => false]);
+                $form->add('reportType', ChoiceType::class, [
+                    'required' => false,
+                    'placeholder' => 'Please choose...',
+                    'choices' => [
+                        'Police station' => Claim::REPORT_POLICE_STATION,
+                        'Online' => Claim::REPORT_ONLINE,
+                    ],
+                ]);
             }
         });
 
         $builder->addEventListener(FormEvents::SUBMIT, function (FormEvent $event) {
             $form = $event->getForm();
+            /** @var ClaimFnolTheftLoss $data */
             $data = $event->getData();
 
             $now = new \DateTime();
@@ -138,6 +141,15 @@ class ClaimFnolTheftLossType extends AbstractType
                     $filename->guessExtension()
                 );
                 $data->setProofOfPurchase($s3key);
+            }
+            if ($filename = $data->getProofOfLoss()) {
+                $s3key = $this->claimsService->saveFile(
+                    $filename,
+                    sprintf('proof-of-loss-%s', $timestamp),
+                    $data->getClaim()->getPolicy()->getUser()->getId(),
+                    $filename->guessExtension()
+                );
+                $data->setProofOfLoss($s3key);
             }
         });
     }

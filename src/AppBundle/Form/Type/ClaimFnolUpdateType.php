@@ -45,25 +45,7 @@ class ClaimFnolUpdateType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $hoursChoices = [];
-        for ($h = 0; $h < 24; $h++) {
-            $formattedTime = sprintf("%02d:00", $h);
-            $hoursChoices[$formattedTime] = $formattedTime;
-        }
         $builder
-            ->add('when', DateType::class, [
-                  'required' => $this->required,
-                  'format'   => 'dd/MM/yyyy',
-                  'widget' => 'single_text',
-                  'placeholder' => array(
-                      'year' => 'YYYY', 'month' => 'MM', 'day' => 'DD',
-                  ),
-            ])
-            ->add('time', ChoiceType::class, [
-                'required' => true,
-                'placeholder' => 'Select',
-                'choices' => $hoursChoices,
-            ])
             ->add('confirm', SubmitType::class)
         ;
 

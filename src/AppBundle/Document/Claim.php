@@ -2,6 +2,7 @@
 
 namespace AppBundle\Document;
 
+use AppBundle\Document\File\ProofOfLossFile;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -1527,6 +1528,7 @@ class Claim
 
     public function addFile(S3ClaimFile $file)
     {
+        $file->setClaim($this);
         $this->files[] = $file;
     }
 
@@ -1696,6 +1698,11 @@ class Claim
     public function getProofOfPurchaseFiles()
     {
         return $this->getFilesByType(ProofOfPurchaseFile::class);
+    }
+
+    public function getProofOfLossFiles()
+    {
+        return $this->getFilesByType(ProofOfLossFile::class);
     }
 
     public function getDamagePictureFiles()

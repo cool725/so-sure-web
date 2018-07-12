@@ -1,6 +1,7 @@
 <?php
 namespace AppBundle\Service;
 
+use AppBundle\Document\File\ProofOfLossFile;
 use Predis\Client;
 use AppBundle\Repository\PhonePolicyRepository;
 use Psr\Log\LoggerInterface;
@@ -26,7 +27,7 @@ use League\Flysystem\Filesystem;
 
 class ClaimsService
 {
-
+    const S3_POLICY_BUCKET = 'policy.so-sure.com';
     const S3_CLAIMS_FOLDER = 'claim-documents';
     const LOGIN_LINK_TOKEN_EXPIRATION = 7200; // 2 hours
 
@@ -106,16 +107,14 @@ class ClaimsService
 
         if ($claimDamage->getProofOfUsage()) {
             $proofOfUsage = new ProofOfUsageFile();
-            $proofOfUsage->setBucket('policy.so-sure.com');
+            $proofOfUsage->setBucket(self::S3_POLICY_BUCKET);
             $proofOfUsage->setKey($claimDamage->getProofOfUsage());
-            $proofOfUsage->setClaim($claim);
             $claim->addFile($proofOfUsage);
         }
         if ($claimDamage->getPictureOfPhone()) {
             $pictureOfPhone = new DamagePictureFile();
-            $pictureOfPhone->setBucket('policy.so-sure.com');
+            $pictureOfPhone->setBucket(self::S3_POLICY_BUCKET);
             $pictureOfPhone->setKey($claimDamage->getPictureOfPhone());
-            $pictureOfPhone->setClaim($claim);
             $claim->addFile($pictureOfPhone);
         }
         if ($submit) {
@@ -139,25 +138,32 @@ class ClaimsService
 
         if ($claimTheftLoss->getProofOfUsage()) {
             $proofOfUsage = new ProofOfUsageFile();
-            $proofOfUsage->setBucket('policy.so-sure.com');
+            $proofOfUsage->setBucket(self::S3_POLICY_BUCKET);
             $proofOfUsage->setKey($claimTheftLoss->getProofOfUsage());
-            $proofOfUsage->setClaim($claim);
             $claim->addFile($proofOfUsage);
         }
 
-        $proofOfBarring = new ProofOfBarringFile();
-        $proofOfBarring->setBucket('policy.so-sure.com');
-        $proofOfBarring->setKey($claimTheftLoss->getProofOfBarring());
-        $proofOfBarring->setClaim($claim);
-        $claim->addFile($proofOfBarring);
+        if ($claimTheftLoss->getProofOfBarring()) {
+            $proofOfBarring = new ProofOfBarringFile();
+            $proofOfBarring->setBucket(self::S3_POLICY_BUCKET);
+            $proofOfBarring->setKey($claimTheftLoss->getProofOfBarring());
+            $claim->addFile($proofOfBarring);
+        }
 
         if ($claimTheftLoss->getProofOfPurchase()) {
             $proofOfPurchase = new ProofOfPurchaseFile();
-            $proofOfPurchase->setBucket('policy.so-sure.com');
+            $proofOfPurchase->setBucket(self::S3_POLICY_BUCKET);
             $proofOfPurchase->setKey($claimTheftLoss->getProofOfPurchase());
-            $proofOfPurchase->setClaim($claim);
             $claim->addFile($proofOfPurchase);
         }
+
+        if ($claimTheftLoss->getProofOfLoss()) {
+            $proofOfLoss = new ProofOfLossFile();
+            $proofOfLoss->setBucket(self::S3_POLICY_BUCKET);
+            $proofOfLoss->setKey($claimTheftLoss->getProofOfLoss());
+            $claim->addFile($proofOfLoss);
+        }
+
         if ($submit) {
             $claim->setSubmissionDate(new \DateTime());
             $claim->setStatus(Claim::STATUS_SUBMITTED);
@@ -169,36 +175,36 @@ class ClaimsService
 
     public function updateDocuments(Claim $claim, ClaimFnolUpdate $claimUpdate)
     {
-        $claim->setIncidentDate($claimUpdate->getWhen());
-        $claim->setIncidentTime($claimUpdate->getTime());
-
         if ($claimUpdate->getProofOfUsage()) {
             $proofOfUsage = new ProofOfUsageFile();
-            $proofOfUsage->setBucket('policy.so-sure.com');
+            $proofOfUsage->setBucket(self::S3_POLICY_BUCKET);
             $proofOfUsage->setKey($claimUpdate->getProofOfUsage());
             $proofOfUsage->setClaim($claim);
             $claim->addFile($proofOfUsage);
         }
         if ($claimUpdate->getPictureOfPhone()) {
             $pictureOfPhone = new DamagePictureFile();
-            $pictureOfPhone->setBucket('policy.so-sure.com');
+            $pictureOfPhone->setBucket(self::S3_POLICY_BUCKET);
             $pictureOfPhone->setKey($claimUpdate->getPictureOfPhone());
-            $pictureOfPhone->setClaim($claim);
             $claim->addFile($pictureOfPhone);
         }
         if ($claimUpdate->getProofOfBarring()) {
             $proofOfBarring = new ProofOfBarringFile();
-            $proofOfBarring->setBucket('policy.so-sure.com');
+            $proofOfBarring->setBucket(self::S3_POLICY_BUCKET);
             $proofOfBarring->setKey($claimUpdate->getProofOfBarring());
-            $proofOfBarring->setClaim($claim);
             $claim->addFile($proofOfBarring);
         }
         if ($claimUpdate->getProofOfPurchase()) {
             $proofOfPurchase = new ProofOfPurchaseFile();
-            $proofOfPurchase->setBucket('policy.so-sure.com');
+            $proofOfPurchase->setBucket(self::S3_POLICY_BUCKET);
             $proofOfPurchase->setKey($claimUpdate->getProofOfPurchase());
-            $proofOfPurchase->setClaim($claim);
             $claim->addFile($proofOfPurchase);
+        }
+        if ($claimUpdate->getProofOfLoss()) {
+            $proofOfLoss = new ProofOfLossFile();
+            $proofOfLoss->setBucket(self::S3_POLICY_BUCKET);
+            $proofOfLoss->setKey($claimUpdate->getProofOfLoss());
+            $claim->addFile($proofOfLoss);
         }
         $this->dm->flush();
     }

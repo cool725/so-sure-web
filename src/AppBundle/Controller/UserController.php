@@ -6,6 +6,7 @@ use AppBundle\Document\DateTrait;
 use AppBundle\Document\Payment\BacsPayment;
 use AppBundle\Security\UserVoter;
 use AppBundle\Security\ClaimVoter;
+use AppBundle\Service\ClaimsService;
 use AppBundle\Service\PCAService;
 use AppBundle\Service\SequenceService;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -1419,11 +1420,12 @@ class UserController extends BaseController
      */
     public function claimAction(Request $request)
     {
+        /** @var User $user */
         $user = $this->getUser();
 
         $this->denyAccessUnlessGranted(UserVoter::VIEW, $user);
 
-        if (!$user->hasActivePolicy()) {
+        if (!$user->hasActivePolicy() && !$user->hasUnpaidPolicy()) {
             throw $this->createNotFoundException('No active policy found');
         }
 
@@ -1528,68 +1530,89 @@ class UserController extends BaseController
         $this->denyAccessUnlessGranted(ClaimVoter::EDIT, $claim);
 
         if ($claim->getStatus() == Claim::STATUS_SUBMITTED) {
-            $claimFnolUpdate = new ClaimFnolUpdate();
-            $claimFnolUpdate->setClaim($claim);
-
-            $claimUpdateForm = $this->get('form.factory')
-                ->createNamedBuilder('claim_update_form', ClaimFnolUpdateType::class, $claimFnolUpdate)
-                ->getForm();
-
-            if ('POST' === $request->getMethod()) {
-                if ($request->request->has('claim_update_form')) {
-                    $claimUpdateForm->handleRequest($request);
-                    if ($claimUpdateForm->isValid()) {
-                        $claimsService = $this->get('app.claims');
-                        $claimsService->updateDocuments($claim, $claimFnolUpdate);
-                        $this->addFlash(
-                            'success',
-                            'Your claim has been updated.'
-                        );
-                        return $this->redirectToRoute('claimed_policy', ['policyId' => $policy->getId()]);
-                    }
-                }
-            }
-
-            $now = new \DateTime();
-            $time = 'in the next 3 hours';
-            if ($now->format('w') > 0 && $now->format('w') < 6) {
-                if ($now->format('G') < 9 || $now->format('G') > 17) {
-                    $time = 'Tomorrow';
-                }
-            } else {
-                $time = 'Monday morning';
-            }
-
-            $needProofOfBarring = in_array($claim->getType(), array(Claim::TYPE_THEFT, Claim::TYPE_LOSS)) &&
-                $claim->needProofOfUsage();
-            $needProofOfPurchase = in_array($claim->getType(), array(Claim::TYPE_THEFT, Claim::TYPE_LOSS)) &&
-            $claim->needProofOfPurchase();
-
-            $data = [
-                'claim' => $claim,
-                'phone' => sprintf(
-                    "%s %s (%sGB)",
-                    $claim->getPolicy()->getPhone()->getMake(),
-                    $claim->getPolicy()->getPhone()->getModel(),
-                    $claim->getPolicy()->getPhone()->getMemory()
-                ),
-                'time' => $time,
-                'claim_form' => $claimUpdateForm->createView(),
-                'proof_of_usage' => $claim->needProofOfUsage(),
-                'picture_of_phone' => $claim->getType() == Claim::TYPE_DAMAGE && $claim->needPictureOfPhone(),
-                'proof_of_barring' => $needProofOfBarring,
-                'proof_of_purchase' => $needProofOfPurchase,
-            ];
-            return $this->render('AppBundle:User:claimSubmitted.html.twig', $data);
-        }
-
-        if ($claim->getType() == Claim::TYPE_DAMAGE) {
+            return $this->redirectToRoute('claimed_submitted_policy', ['policyId' => $policy->getId()]);
+        } elseif ($claim->getType() == Claim::TYPE_DAMAGE) {
             return $this->redirectToRoute('claimed_damage_policy', ['policyId' => $policy->getId()]);
         } elseif ($claim->getType() == Claim::TYPE_THEFT || $claim->getType() == Claim::TYPE_LOSS) {
             return $this->redirectToRoute('claimed_theftloss_policy', ['policyId' => $policy->getId()]);
         } else {
             return $this->redirectToRoute('claim_policy');
         }
+    }
+
+    /**
+     * @Route("/claim/submitted/{policyId}", name="claimed_submitted_policy")
+     * @Template
+     */
+    public function claimSubmittedPolicyAction(Request $request, $policyId)
+    {
+        $user = $this->getUser();
+        $dm = $this->getManager();
+        $policyRepo = $dm->getRepository(Policy::class);
+        $policy = $policyRepo->find($policyId);
+
+        $claim = $policy->getLatestFnolSubmittedClaim();
+
+        if ($claim === null) {
+            return $this->redirectToRoute('claim_policy');
+        }
+
+        $this->denyAccessUnlessGranted(ClaimVoter::EDIT, $claim);
+
+        $claimFnolUpdate = new ClaimFnolUpdate();
+        $claimFnolUpdate->setClaim($claim);
+
+        $claimUpdateForm = $this->get('form.factory')
+            ->createNamedBuilder('claim_update_form', ClaimFnolUpdateType::class, $claimFnolUpdate)
+            ->getForm();
+
+        if ('POST' === $request->getMethod()) {
+            if ($request->request->has('claim_update_form')) {
+                $claimUpdateForm->handleRequest($request);
+                if ($claimUpdateForm->isValid()) {
+                    $claimsService = $this->get('app.claims');
+                    $claimsService->updateDocuments($claim, $claimFnolUpdate);
+                    $this->addFlash(
+                        'success',
+                        'Your claim has been updated.'
+                    );
+                    return $this->redirectToRoute('claimed_policy', ['policyId' => $policy->getId()]);
+                }
+            }
+        }
+
+        $now = new \DateTime();
+        $time = 'in the next 3 hours';
+        if ($now->format('w') > 0 && $now->format('w') < 6) {
+            if ($now->format('G') < 9 || $now->format('G') > 17) {
+                $time = 'Tomorrow';
+            }
+        } else {
+            $time = 'Monday morning';
+        }
+
+        $needProofOfBarring = in_array($claim->getType(), array(Claim::TYPE_THEFT, Claim::TYPE_LOSS)) &&
+            $claim->needProofOfUsage();
+        $needProofOfPurchase = in_array($claim->getType(), array(Claim::TYPE_THEFT, Claim::TYPE_LOSS)) &&
+            $claim->needProofOfPurchase();
+
+        $data = [
+            'claim' => $claim,
+            'phone' => sprintf(
+                "%s %s (%sGB)",
+                $claim->getPolicy()->getPhone()->getMake(),
+                $claim->getPolicy()->getPhone()->getModel(),
+                $claim->getPolicy()->getPhone()->getMemory()
+            ),
+            'time' => $time,
+            'claim_form' => $claimUpdateForm->createView(),
+            'proof_of_usage' => $claim->needProofOfUsage(),
+            'picture_of_phone' => $claim->getType() == Claim::TYPE_DAMAGE && $claim->needPictureOfPhone(),
+            'proof_of_barring' => $needProofOfBarring,
+            'proof_of_purchase' => $needProofOfPurchase,
+        ];
+
+        return $this->render('AppBundle:User:claimSubmitted.html.twig', $data);
     }
 
     /**
@@ -1601,6 +1624,7 @@ class UserController extends BaseController
         $user = $this->getUser();
         $dm = $this->getManager();
         $policyRepo = $dm->getRepository(Policy::class);
+        /** @var Policy $policy */
         $policy = $policyRepo->find($policyId);
 
         $claim = $policy->getLatestFnolClaim();
@@ -1685,6 +1709,7 @@ class UserController extends BaseController
             if ($request->request->has('claim_theftloss_form')) {
                 $claimTheftLossForm->handleRequest($request);
                 if ($claimTheftLossForm->isValid()) {
+                    /** @var ClaimsService $claimsService */
                     $claimsService = $this->get('app.claims');
                     if ($claimFnolTheftLoss->getIsSave()) {
                         $claimsService->updateTheftLossDocuments($claim, $claimFnolTheftLoss);
@@ -1709,42 +1734,14 @@ class UserController extends BaseController
             'proof_of_usage' => $claim->needProofOfUsage(),
             'proof_of_purchase' => $claim->needProofOfPurchase(),
         ];
-        return $this->render('AppBundle:User:claimTheftLoss.html.twig', $data);
-    }
+        if ($claim->getType() == Claim::TYPE_LOSS) {
+            return $this->render('AppBundle:User:claimLoss.html.twig', $data);
 
-    /**
-     * @Route("/claim/withdraw/{policyId}", name="withdraw_claimed_policy")
-     * @Template
-     */
-    public function claimPolicyWithdrawAction($policyId)
-    {
-        $user = $this->getUser();
-        $dm = $this->getManager();
-        $policyRepo = $dm->getRepository(Policy::class);
-        $policy = $policyRepo->find($policyId);
-
-        $claim = $policy->getLatestSubmittedClaim();
-
-        if ($claim === null) {
-            return $this->redirectToRoute('claim_policy');
-        }
-
-        $this->denyAccessUnlessGranted(ClaimVoter::WITHDRAW, $claim);
-
-        $claimsService = $this->get('app.claims');
-        if ($claimsService->withdrawClaim($claim)) {
-            $this->addFlash(
-                'success',
-                "Your claim has been withdrawn."
-            );
+        } elseif ($claim->getType() == Claim::TYPE_THEFT) {
+            return $this->render('AppBundle:User:claimTheft.html.twig', $data);
         } else {
-            $this->addFlash(
-                'error',
-                "Sorry, your claim cannot be withdrawn at the moment."
-            );
+            throw new \Exception(sprintf('Unknown claim type %s', $claim->getType()));
         }
-
-        return $this->redirectToRoute('user_home');
     }
 
     /**

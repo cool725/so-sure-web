@@ -942,6 +942,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     public function hasValidPolicy($active = true)
     {
         foreach ($this->getPolicies() as $policy) {
+            /** @var Policy $policy */
             if ($policy->isValidPolicy()) {
                 if ($active) {
                     if (in_array($policy->getStatus(), [Policy::STATUS_ACTIVE])) {

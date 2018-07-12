@@ -18,17 +18,6 @@ class ClaimFnolUpdate
      */
     protected $claim;
 
-    /**
-     * @Assert\DateTime()
-     */
-    protected $when;
-
-    /**
-     * @AppAssert\AlphanumericSpaceDot()
-     * @Assert\Length(min="4", max="100")
-     */
-    protected $time;
-
     protected $proofOfUsage;
 
     protected $pictureOfPhone;
@@ -37,30 +26,7 @@ class ClaimFnolUpdate
 
     protected $proofOfPurchase;
 
-    public function getWhen($normalised = false)
-    {
-        if ($normalised) {
-            $serializer = new Serializer(array(new DateTimeNormalizer()));
-            return $serializer->normalize($this->when);
-        } else {
-            return $this->when;
-        }
-    }
-
-    public function setWhen($when)
-    {
-        $this->when = $when;
-    }
-
-    public function getTime()
-    {
-        return $this->time;
-    }
-
-    public function setTime($time)
-    {
-        $this->time = $time;
-    }
+    protected $proofOfLoss;
 
     public function getProofOfUsage()
     {
@@ -102,6 +68,16 @@ class ClaimFnolUpdate
         $this->proofOfPurchase = $proofOfPurchase;
     }
 
+    public function getProofOfLoss()
+    {
+        return $this->proofOfLoss;
+    }
+
+    public function setProofOfLoss($proofOfLoss)
+    {
+        $this->proofOfLoss = $proofOfLoss;
+    }
+
     public function getClaim()
     {
         return $this->claim;
@@ -110,7 +86,5 @@ class ClaimFnolUpdate
     public function setClaim($claim)
     {
         $this->claim = $claim;
-        $this->when = $claim->getIncidentDate();
-        $this->time = $claim->getIncidentTime();
     }
 }
