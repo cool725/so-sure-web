@@ -135,11 +135,11 @@ class PurchaseController extends BaseController
         }
 
         // DOB Test
-        $dobExp = $this->sixpack(
-            $request,
-            SixpackService::EXPERIMENT_DOB,
-            ['single', 'dropdowns']
-        );
+        // $dobExp = $this->sixpack(
+        //     $request,
+        //     SixpackService::EXPERIMENT_DOB,
+        //     ['single', 'dropdowns']
+        // );
 
         // DOB Sixpack Test
         /** @var Form $purchaseForm */
@@ -287,7 +287,7 @@ class PurchaseController extends BaseController
             ) : null,
             // 'postcode' => $this->sixpack($request, SixpackService::EXPERIMENT_POSTCODE, ['comma', 'split', 'type']),
             'postcode' => 'comma',
-            'showDropdown' => $dobExp,
+            // 'showDropdown' => $dobExp,
             'moneyBackGuarantee' => $moneyBackGuarantee,
         );
 
@@ -342,7 +342,7 @@ class PurchaseController extends BaseController
             $policy = $user->getPartialPolicies()[0];
         }
 
-        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_DOB);
+        // $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_DOB);
 
         if ($policy) {
             if (!$phone && $policy->getPhone()) {

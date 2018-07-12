@@ -49,7 +49,7 @@ class SixpackService
     //const EXPERIMENT_STEP_3 = 'step-3-payment-new';
     const EXPERIMENT_PURCHASE_FLOW_BACS = 'purchase-flow-bacs';
     const EXPERIMENT_CPC_QUOTE_HOMEPAGE = 'cpc-quote-or-homepage';
-    const EXPERIMENT_DOB = 'purchase-funnel-dob-dropdown';
+    // const EXPERIMENT_DOB = 'purchase-funnel-dob-dropdown';
     const EXPERIMENT_72_REPLACEMENT = 'seventytwo-hours';
     // const EXPERIMENT_PICSURE_SECTION = 'picsure-redesign';
     const EXPERIMENT_EBAY_LANDING = 'ebay-landing';
@@ -94,7 +94,7 @@ class SixpackService
         //self::EXPERIMENT_STEP_3,
         self::EXPERIMENT_PURCHASE_FLOW_BACS,
         self::EXPERIMENT_CPC_QUOTE_HOMEPAGE,
-        self::EXPERIMENT_DOB,
+        // self::EXPERIMENT_DOB,
         self::EXPERIMENT_72_REPLACEMENT,
         // self::EXPERIMENT_PICSURE_SECTION,
         self::EXPERIMENT_EBAY_LANDING,
@@ -176,7 +176,7 @@ class SixpackService
      */
     public static $purchaseConversionKpi = [
         self::EXPERIMENT_HOMEPAGE_AA_V2,
-        self::EXPERIMENT_DOB,
+        // self::EXPERIMENT_DOB,
         // self::EXPERIMENT_TRUSTPILOT_REVIEW,
         // New Test Single Mem Option
         self::EXPERIMENT_MEMORY_OPTIONS,
