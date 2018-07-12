@@ -50,7 +50,7 @@ class SixpackService
     const EXPERIMENT_PURCHASE_FLOW_BACS = 'purchase-flow-bacs';
     const EXPERIMENT_CPC_QUOTE_HOMEPAGE = 'cpc-quote-or-homepage';
     // const EXPERIMENT_DOB = 'purchase-funnel-dob-dropdown';
-    const EXPERIMENT_72_REPLACEMENT = 'seventytwo-hours';
+    // const EXPERIMENT_72_REPLACEMENT = 'seventytwo-hours';
     // const EXPERIMENT_PICSURE_SECTION = 'picsure-redesign';
     const EXPERIMENT_EBAY_LANDING = 'ebay-landing';
     const EXPERIMENT_EBAY_LANDING_1 = 'ebay-landing-1';
@@ -62,7 +62,7 @@ class SixpackService
     // New Test Single Mem Option
     const EXPERIMENT_MEMORY_OPTIONS = 'single-progressive-dropdown';
     // New Test Money Back Guarantee
-    const EXPERIMENT_MONEY_BACK_GUARANTEE = 'money-back-guarantee';
+    // const EXPERIMENT_MONEY_BACK_GUARANTEE = 'money-back-guarantee';
     // Exp 1
     // const EXPERIMENT_HOMEPAGE_NEW_COPY = 'homepage-new-copy';
     // Exp 2
@@ -95,7 +95,7 @@ class SixpackService
         self::EXPERIMENT_PURCHASE_FLOW_BACS,
         self::EXPERIMENT_CPC_QUOTE_HOMEPAGE,
         // self::EXPERIMENT_DOB,
-        self::EXPERIMENT_72_REPLACEMENT,
+        // self::EXPERIMENT_72_REPLACEMENT,
         // self::EXPERIMENT_PICSURE_SECTION,
         self::EXPERIMENT_EBAY_LANDING,
         self::EXPERIMENT_EBAY_LANDING_1,
@@ -106,7 +106,7 @@ class SixpackService
         // New Test Single Mem Option
         self::EXPERIMENT_MEMORY_OPTIONS,
         // New Test Money Back Guarantee
-         self::EXPERIMENT_MONEY_BACK_GUARANTEE,
+         // self::EXPERIMENT_MONEY_BACK_GUARANTEE,
         // Exp 1
         // self::EXPERIMENT_HOMEPAGE_NEW_COPY,
         // Exp 2
@@ -147,7 +147,7 @@ class SixpackService
         self::EXPERIMENT_CPC_QUOTE_HOMEPAGE,
         //self::EXPERIMENT_STEP_3,
         self::EXPERIMENT_PURCHASE_FLOW_BACS,
-        self::EXPERIMENT_72_REPLACEMENT,
+        // self::EXPERIMENT_72_REPLACEMENT,
         // self::EXPERIMENT_PICSURE_SECTION,
         self::EXPERIMENT_EBAY_LANDING,
         self::EXPERIMENT_EBAY_LANDING_1,
@@ -181,7 +181,7 @@ class SixpackService
         // New Test Single Mem Option
         self::EXPERIMENT_MEMORY_OPTIONS,
         // New Test Money Back Guarantee
-        self::EXPERIMENT_MONEY_BACK_GUARANTEE,
+        // self::EXPERIMENT_MONEY_BACK_GUARANTEE,
         // Exp 1
         self::EXPERIMENT_AB_NEW_CONTENT,
         // Exp 2
