@@ -270,7 +270,8 @@ class PicsureMLService
         foreach ($results as $result) {
             if ($result->hasAnnotation()) {
                 $annotations[] = sprintf(
-                    "%s %d %d %d %d",
+                    "%s/%s %d %d %d %d",
+                    $result->getBucket(),
                     $result->getImagePath(),
                     $result->getX(),
                     $result->getY(),
