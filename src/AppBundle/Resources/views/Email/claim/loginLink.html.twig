@@ -10,11 +10,31 @@
 	   <!--?xml version="1.0" encoding="UTF-8" standalone="no"?-->
 	   <div style="font-size: 14px; text-align: left;"><span style="font-family:arial,helvetica neue,helvetica,sans-serif">
         Hi {{ username }},<br><br>
-        Please visit the following link to proceed with your claim: <a href="{{ tokenUrl }}">{{ tokenUrl }}</a>.
+		Thank you for starting your claims process online, we're sorry to hear something has happened to your phone and we aim to get you back up and running in 24-72 hours.
         <br><br>
-        Note that the link will only be valid for {{ tokenValid }} {{ tokenValidTimeframe }}.
+		Please now click on the link below to proceed to the next step in the claims process.
         <br><br>
-        Thanks for using so-sure.
+        {{ macros.email_button_table(tokenUrl, "START MY CLAIM", "START MY CLAIM")}}
+        <br><br>
+		Please note this link will expire in {{ tokenValid }} {{ tokenValidTimeframe }}, you can re-reactivate the link by clicking <a href="{{ url('claim') }}">here</a>.
+        <br><br>
+		Claims Process
+		<br><br>
+			   <ol>
+				   <li>
+					Entering all the information about your claim (what happened to your phone, where you were and any other relevant details)
+				   </li>
+				   <li>
+					Uploading any additional documents you may need to submit (for example a Proof of Barring or Proof of Address)
+				   </li>
+				   <li>
+					Finalising all the information you are going to submit is true and accurate
+				   </li>
+				   <li>
+					Final submission
+				   </li>
+			   </ol>
+		If you have any questions regarding your claim please contact the claims team on 0344 856 0852.
 	   </div>
 	</div>
 	{{ macros.end_table() }}
