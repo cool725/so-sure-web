@@ -55,7 +55,7 @@ class SixpackService
     const EXPERIMENT_EBAY_LANDING = 'ebay-landing';
     const EXPERIMENT_EBAY_LANDING_1 = 'ebay-landing-1';
     const EXPERIMENT_EBAY_LANDING_2 = 'ebay-landing-2';
-    const EXPERIMENT_NEW_WELCOME_MODAL = 'new-welcome-modal';
+    // const EXPERIMENT_NEW_WELCOME_MODAL = 'new-welcome-modal';
     // New Exp Competitor Landing
     const EXPERIMENT_COMPETITOR_LANDING = 'competitor-landing';
     // const EXPERIMENT_TRUSTPILOT_REVIEW = 'trustpilot';
