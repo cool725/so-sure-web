@@ -39,22 +39,22 @@ class TrainingData
     /**
      * @MongoDB\Field(type="integer", name="x")
      */
-    //protected $x;
+    protected $x;
 
     /**
      * @MongoDB\Field(type="integer", name="y")
      */
-    //protected $y;
+    protected $y;
 
     /**
      * @MongoDB\Field(type="integer", name="width")
      */
-    //protected $width;
+    protected $width;
 
     /**
      * @MongoDB\Field(type="integer", name="height")
      */
-    //protected $height;
+    protected $height;
 
     /**
      * @MongoDB\Field(type="collection", name="versions")
@@ -101,23 +101,6 @@ class TrainingData
         return $this->label != null;
     }
 
-    public function addVersion($version)
-    {
-        $this->versions[] = $version;
-    }
-
-    public function setVersions($versions)
-    {
-        $this->versions = $versions;
-    }
-
-    public function getVersions()
-    {
-        return $this->versions;
-    }
-
-    /*
-
     public function setX($x)
     {
         $this->x = $x;
@@ -157,24 +140,24 @@ class TrainingData
     {
         return $this->height;
     }
-
-    public function setAnnotation($x, $y, $width, $height)
+    
+    public function addVersion($version)
     {
-        $this->x = $x;
-        $this->y = $y;
-        $this->width = $width;
-        $this->height = $height;
+        $this->versions[] = $version;
     }
 
-    public function getAnnotation()
+    public function setVersions($versions)
     {
-        return '['.$this->x.','.$this->y.','.$this->width.','.$this->height.']';
+        $this->versions = $versions;
+    }
+
+    public function getVersions()
+    {
+        return $this->versions;
     }
 
     public function hasAnnotation()
     {
         return $this->x != null && $this->y != null && $this->width != null && $this->height != null;
     }
-
-    */
 }

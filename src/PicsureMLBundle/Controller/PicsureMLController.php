@@ -22,6 +22,7 @@ use PicsureMLBundle\Document\Form\NewVersion;
 use PicsureMLBundle\Form\Type\SearchType;
 use PicsureMLBundle\Form\Type\NewVersionType;
 use PicsureMLBundle\Form\Type\LabelType;
+use PicsureMLBundle\Form\Type\AnnotateType;
 
 /**
  * @Route("/admin")
@@ -113,14 +114,18 @@ class PicsureMLController extends BaseController
             throw $this->createNotFoundException(sprintf('Image not found %s', $id));
         }
 
-        $imagesForm = $this->get('form.factory')
+        $labelForm = $this->get('form.factory')
             ->createNamedBuilder('picsureml_label_form', LabelType::class, $image)
+            ->getForm();
+
+        $annotateForm = $this->get('form.factory')
+            ->createNamedBuilder('picsureml_annotate_form', AnnotateType::class, $image)
             ->getForm();
 
         if ('POST' === $request->getMethod()) {
             if ($request->request->has('picsureml_label_form')) {
-                $imagesForm->handleRequest($request);
-                if ($imagesForm->isValid()) {
+                $labelForm->handleRequest($request);
+                if ($labelForm->isValid()) {
                     $dm->flush();
                     if (array_key_exists('previous', $request->request->get('picsureml_label_form'))) {
                         $prevId = $repo->getPreviousImage($id);
@@ -138,12 +143,18 @@ class PicsureMLController extends BaseController
                         }
                     }
                 }
+            } elseif ($request->request->has('picsureml_annotate_form')) {
+                $annotateForm->handleRequest($request);
+                if ($annotateForm->isValid()) {
+                    $dm->flush();
+                }
             }
         }
 
         return [
             'image' => $image,
-            'picsureml_label_form' => $imagesForm->createView(),
+            'picsureml_label_form' => $labelForm->createView(),
+            'picsureml_annotate_form' => $annotateForm->createView(),
         ];
     }
 
@@ -195,42 +206,4 @@ class PicsureMLController extends BaseController
 
         return new RedirectResponse($this->generateUrl('admin_picsure'));
     }
-
-    /**
-     * @Route("/picsure-ml/sync", name="admin_picsure_ml_sync")
-     * @Method({"POST"})
-     */
-    /*
-    public function syncAction(Request $request)
-    {
-        if (!$this->isCsrfTokenValid('default', $request->get('token'))) {
-            throw new \InvalidArgumentException('Invalid csrf token');
-        }
-
-        $filesystem = $this->get('oneup_flysystem.mount_manager')->getFilesystem('s3picsure_fs');
-        $service = $this->get('picsureml.picsureml');
-        $service->sync($filesystem);
-
-        return new RedirectResponse($this->generateUrl('admin_picsure_ml'));
-    }
-    */
-
-    /**
-     * @Route("/picsure-ml/annotate", name="admin_picsure_ml_annotate")
-     * @Method({"POST"})
-     */
-    /*
-    public function annotateAction(Request $request)
-    {
-        if (!$this->isCsrfTokenValid('default', $request->get('token'))) {
-            throw new \InvalidArgumentException('Invalid csrf token');
-        }
-
-        $filesystem = $this->get('oneup_flysystem.mount_manager')->getFilesystem('s3picsure_fs');
-        $service = $this->get('picsureml.picsureml');
-        $service->annotate($filesystem);
-
-        return new RedirectResponse($this->generateUrl('admin_picsure_ml'));
-    }
-    */
 }

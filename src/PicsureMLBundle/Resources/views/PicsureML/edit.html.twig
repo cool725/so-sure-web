@@ -6,24 +6,18 @@
     {% stylesheets output='css/*.css'
         '@AppBundle/Resources/public/sass/page/picsureML.scss'
     %}<link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
-    {#
     {% stylesheets
         'components/Jcrop/Jcrop.min.css'
     %}
-    #}
-    {% stylesheets %}
     <link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
 {% endblock %}
 
 {% block javascripts %}
     {{ parent() }}
-    {#
     {% javascripts
         'components/Jcrop/Jcrop.min.js'
         '@PicsureMLBundle/Resources/public/js/picsureml/picsure-ml-annotate.js'
     %}
-    #}
-    {% javascripts %}
     <script src="{{ asset_url }}"></script>
     {% endjavascripts %}
 {% endblock %}
@@ -33,15 +27,14 @@
     <a href="{{ path('admin_picsure_ml') }}">Back to Picsure ML</a>
     <h3>Image: {{ image.imagePath }}</h3>
 
-    {{ form_start(picsureml_label_form)}}
     <div class="row">
         <div class="col-md-8">
             <div class="content-right">
-                <div class="picsure-image-edit">
+                <div id="crop-interface" class="picsure-image-edit">
                 {% if image.bucket == "policy.so-sure.com" %}
-                    <img src="{{ path('admin_picsure_ml_image_policy', {'file': image.imagePath }) }}">
+                    <img id="annotate" src="{{ path('admin_picsure_ml_image_policy', {'file': image.imagePath }) }}">
                 {% elseif image.bucket == "picsure.so-sure.com" %}
-                    <img src="{{ path('admin_picsure_ml_image_picsure', {'file': image.imagePath }) }}">
+                    <img id="annotate" src="{{ path('admin_picsure_ml_image_picsure', {'file': image.imagePath }) }}">
                 {% endif %}
                 </div>
             </div>
@@ -49,6 +42,7 @@
         <div class="col-md-4">
             <div class="content-left">
                 <div class="text-right">
+                    {{ form_start(picsureml_label_form)}}
                     <div class="form-group">
                         {{ form_widget(picsureml_label_form.previous, {'label': 'Previous', 'attr': {'class': 'btn btn-success'}}) }}
                         {{ form_widget(picsureml_label_form.save, {'label': 'Save', 'attr': {'class': 'btn btn-success'}}) }}
@@ -64,59 +58,40 @@
                         {{ form_widget(picsureml_label_form.versions) }}
                         {{ form_errors(picsureml_label_form.versions) }}
                     </div>
+                    {{ form_end(picsureml_label_form)}}
+                    <br>
+                    <h4>Annotations:</h4>
+                    {{ form_start(picsureml_annotate_form)}}
+                    <div class="form-group">
+                        {{ form_label(picsureml_annotate_form.x) }}
+                        {{ form_errors(picsureml_annotate_form.x) }}
+                        {{ form_widget(picsureml_annotate_form.x) }}
+                    </div>
+                    <div class="form-group">
+                        {{ form_label(picsureml_annotate_form.y) }}
+                        {{ form_errors(picsureml_annotate_form.y) }}
+                        {{ form_widget(picsureml_annotate_form.y) }}
+                    </div>
+                    <div class="form-group">
+                        {{ form_label(picsureml_annotate_form.width) }}
+                        {{ form_errors(picsureml_annotate_form.width) }}
+                        {{ form_widget(picsureml_annotate_form.width) }}
+                    </div>
+                    <div class="form-group">
+                        {{ form_label(picsureml_annotate_form.height) }}
+                        {{ form_errors(picsureml_annotate_form.height) }}
+                        {{ form_widget(picsureml_annotate_form.height) }}
+                    </div>
+                    <div class="form-group">
+                        {{ form_widget(picsureml_annotate_form.annotate, {'label': 'Save', 'attr': {'class': 'btn btn-success'}}) }}
+                        {{ form_widget(picsureml_annotate_form.clear, {'label': 'Clear', 'attr': {'class': 'btn btn-primary'}}) }}
+                    </div>
+                    {{ form_end(picsureml_annotate_form)}}
                 </div>
             </div>
         </div>
     </div>
 
-    {{ form_end(picsureml_label_form)}}
-    {#
-    <h3>Annotate: {{ image.path }}</h3>
-
-    {{ form_start(picsure_annotation_form)}}
-
-    <div class="row">
-        <div class="col-md-6">
-            <div class="content-right">
-                <div id="crop-interface">
-                    <img id="annotate" src="{{ path('admin_picsure_ml_image', {'file': image.key }) }}">
-                </div>
-            </div>
-        </div>
-        <div class="col-md-6">
-            <div class="content-left">
-                <div class="text-right">
-                    <div class="form-group">
-                        {{ form_label(picsure_annotation_form.x) }}
-                        {{ form_errors(picsure_annotation_form.x) }}
-                        {{ form_widget(picsure_annotation_form.x) }}
-                    </div>
-                    <div class="form-group">
-                        {{ form_label(picsure_annotation_form.y) }}
-                        {{ form_errors(picsure_annotation_form.y) }}
-                        {{ form_widget(picsure_annotation_form.y) }}
-                    </div>
-                    <div class="form-group">
-                        {{ form_label(picsure_annotation_form.width) }}
-                        {{ form_errors(picsure_annotation_form.width) }}
-                        {{ form_widget(picsure_annotation_form.width) }}
-                    </div>
-                    <div class="form-group">
-                        {{ form_label(picsure_annotation_form.height) }}
-                        {{ form_errors(picsure_annotation_form.height) }}
-                        {{ form_widget(picsure_annotation_form.height) }}
-                    </div>
-                    <div class="form-group">
-                        {{ form_widget(picsure_annotation_form.previous, {'label': 'Previous', 'attr': {'class': 'btn btn-success'}}) }}
-                        {{ form_widget(picsure_annotation_form.next, {'label': 'Next', 'attr': {'class': 'btn btn-success'}}) }}
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    {{ form_end(picsure_annotation_form)}}
-    #}
 </div>
 
 {% endblock %}
