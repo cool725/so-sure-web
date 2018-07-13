@@ -284,7 +284,7 @@ trait DateTrait
     public function getClaimResponseTime(\DateTime $date = null)
     {
         if (!$date) {
-            $date = new \DateTime('now', SoSure::TIMEZONE);
+            $date = new \DateTime('now', new \DateTimeZone(SoSure::TIMEZONE));
         }
         $time = 'in the next 3 hours';
         if (!$this->isWeekDay($date) || $this->isBankHoliday($date)) {
