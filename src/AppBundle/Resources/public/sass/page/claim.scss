@@ -76,4 +76,25 @@
         background-color: $off-white;
         text-align: center;
     }
+
+    &__form-generic {
+
+        label {
+            font-family: $avenir-heavy;
+            font-size: 16px;
+        }
+
+        label.error {
+            font-family: $avenir-book;
+        }
+
+        .form-group {
+            margin: 15px 0;
+        }
+
+        .panel {
+            margin: 40px 0 15px;
+        }
+
+    }
 }

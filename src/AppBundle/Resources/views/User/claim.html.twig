@@ -38,7 +38,7 @@
 
                         <div id="tab-claimfnol" class="tab-pane fade in {% if active_tab == 'claimfnol' %}active{% endif %}">
 
-                            {{ form_start(claim_form, {'attr': {'data-toggle': 'validator', 'class': 'validate-form', 'id':'claim-form', 'data-client-validation': form_client_validation }}) }}
+                            {{ form_start(claim_form, {'attr': {'data-toggle': 'validator', 'class': 'validate-form claim__form-generic', 'id':'claim-form', 'data-client-validation': form_client_validation }}) }}
                                 <div class="row">
                                     <div class="col-xs-12 text-center">
                                         <div class="form-group {% if form_errors(claim_form.signature) %}has-error{% endif %}">
@@ -57,14 +57,14 @@
                                 <div class="row">
                                     <div class="col-sm-6">
                                         <div class="form-group {% if form_errors(claim_form.name) %}has-error{% endif %}">
-                                            <label class="h4">Fullname</label>
+                                            <label>Fullname</label>
                                             {{ form_widget(claim_form.name, { 'attr': {'class': 'form-control', 'placeholder': 'First name Last name'}}) }}
                                             <div class="help-block with-errors">{{ form_errors(claim_form.name) }}</div>
                                         </div>
                                     </div>
                                     <div class="col-sm-6">
                                         <div class="form-group {% if form_errors(claim_form.email) %}has-error{% endif %}">
-                                            <label class="h4">Email address</label>
+                                            <label>Email address</label>
                                             {{ form_widget(claim_form.email, { 'attr': {'class': 'form-control', 'placeholder': 'Same email as your account'}}) }}
                                             <div class="help-block with-errors">{{ form_errors(claim_form.email) }}</div>
                                         </div>
@@ -73,7 +73,7 @@
                                 <div class="row">
                                     <div class="col-xs-12">
                                         <div class="form-group {% if form_errors(claim_form.policyNumber) %}has-error{% endif %}">
-                                            <label class="h4">Policy Number</label>
+                                            <label>Policy Number</label>
                                             {{ form_widget(claim_form.policyNumber, { 'attr': {'class': 'form-control', 'placeholder': 'e.g. Mob/2016/40000001'}}) }}
                                             <div class="help-block with-errors">{{ form_errors(claim_form.policyNumber) }}</div>
                                         </div>
@@ -82,14 +82,14 @@
                                 <div class="row">
                                     <div class="col-sm-6">
                                         <div class="form-group {% if form_errors(claim_form.phone) %}has-error{% endif %}">
-                                            <label class="h4">Best Phone Number To Contact You On</label>
+                                            <label>Best Phone Number To Contact You On</label>
                                             {{ form_widget(claim_form.phone, { 'attr': {'class': 'form-control', 'placeholder': 'Mobile or landline'}}) }}
-                                            <div class="help-block with-errors"><span class="text-danger">Only use your current mobile number if your phone is damaged, but able to receive calls.</span> {{ form_errors(claim_form.phone) }}</div>
+                                            <div class="help-block with-errors"><span class="text-info">Only use your current mobile number if your phone is damaged, but able to receive calls.</span> {{ form_errors(claim_form.phone) }}</div>
                                         </div>
                                     </div>
                                     <div class="col-sm-6">
                                         <div class="form-group {% if form_errors(claim_form.timeToReach) %}has-error{% endif %}">
-                                            <label class="h4">Best time to call you (UK business hours)</label>
+                                            <label>Best time to call you (UK business hours)</label>
                                             {{ form_widget(claim_form.timeToReach, { 'attr': {'class': 'form-control', 'placeholder': 'eg. 10am - 12pm, in the afternoon, etc'}}) }}
                                             <div class="help-block with-errors">{{ form_errors(claim_form.timeToReach) }}</div>
                                         </div>
@@ -98,14 +98,14 @@
                                 <div class="row">
                                     <div class="col-sm-6">
                                         <div class="form-group {% if form_errors(claim_form.type) %}has-error{% endif %}">
-                                            <label class="h4">My phone is</label>
+                                            <label>My phone is</label>
                                             {{ form_widget(claim_form.type, { 'attr': {'class': 'form-control'}}) }}
                                             <div class="help-block with-errors">{{ form_errors(claim_form.type) }}</div>
                                         </div>
                                     </div>
                                     <div class="col-sm-6">
                                         <div class="form-group {% if form_errors(claim_form.network) %}has-error{% endif %}">
-                                            <label class="h4">My network operator is</label>
+                                            <label>My network operator is</label>
                                             {{ form_widget(claim_form.network, { 'attr': {'class': 'form-control'}}) }}
                                             <div class="help-block with-errors">{{ form_errors(claim_form.network) }}</div>
                                         </div>
@@ -114,14 +114,14 @@
                                 <div class="row">
                                     <div class="col-sm-6">
                                         <div class="form-group {% if form_errors(claim_form.when) %}has-error{% endif %}">
-                                            <label class="h4">It happened on</label>
+                                            <label>It happened on</label>
                                             {{ form_widget(claim_form.when, { 'attr': {'class': 'form-control date_mask', 'placeholder': 'Date (DD/MM/YYYY)'}}) }}
                                             <div class="help-block with-errors">{{ form_errors(claim_form.when) }}</div>
                                         </div>
                                     </div>
                                     <div class="col-sm-6">
                                         <div class="form-group {% if form_errors(claim_form.time) %}has-error{% endif %}">
-                                            <label class="h4">At around</label>
+                                            <label>At around</label>
                                             {{ form_widget(claim_form.time, { 'attr': {'class': 'form-control'}}) }}
                                             <div class="help-block with-errors">{{ form_errors(claim_form.time) }}</div>
                                         </div>
@@ -130,7 +130,7 @@
                                 <div class="row">
                                     <div class="col-xs-12">
                                         <div class="form-group {% if form_errors(claim_form.where) %}has-error{% endif %}">
-                                            <label class="h4 h-nom">At a place?</label>
+                                            <label>At a place?</label>
                                             {{ form_widget(claim_form.where, { 'attr': {'class': 'form-control', 'placeholder': 'e.g home, work, out shopping etc.'}}) }}
                                             <div class="help-block with-errors">{{ form_errors(claim_form.where) }}</div>
                                         </div>
@@ -139,7 +139,7 @@
                                 <div class="row">
                                     <div class="col-xs-12">
                                         <div class="form-group {% if form_errors(claim_form.message) %}has-error{% endif %}">
-                                            <label class="h4 h-nom">And this is, in as much detail as I remember and to the best of my knowledge, what has happened to my device:</label>
+                                            <label>And this is, in as much detail as I remember and to the best of my knowledge, what has happened to my device:</label>
                                             {{ form_widget(claim_form.message, { 'attr': {'class': 'form-control', 'rows': '10'}}) }}
                                             <div class="help-block text-right" style="float: right;" id="claim-message-length"></div>
                                             <div class="help-block with-errors">{{ form_errors(claim_form.message) }}</div>
@@ -157,13 +157,15 @@
                         </div>
 
                         <div id="tab-claimfnol-confirm" class="tab-pane fade in {% if active_tab == 'claimfnol-confirm' %}active{% endif %}">
-                            {{ form_start(claim_confirm_form, { 'attr': { 'class': 'text-center'}}) }}
-                                <p class="lead">I, {{ username }}, certify that:</p>
+                            {{ form_start(claim_confirm_form, { 'attr': { 'class': 'text-center claim__form-generic'}}) }}
+                                <p class="lead text-center">I, <span class="h4">{{ username }}</span>, certify that my:</p>
                                 <p class="lead"><mark>My <span class="h4">{{ phone }}</span> was <span class="h4">{{ claim_type }}</span> after I purchased my policy on <span class="h4">{{ policy_date|date('d M Y', 'Europe/London') }} at {{ policy_date|date('H:i', 'Europe/London') }}</span>.</mark></p>
                                 <p class="lead">I acknowledge that not telling the truth would constitute insurance fraud, which is a criminal offence. I agree to this and I understand that I could be prosecuted if I were not telling the truth.</p>
                                 <div class="form-group">
-                                    <a id="claim-back" href="#" class="btn btn-blue-hollow btn-lg">Go back</a>
                                     {{ form_widget(claim_confirm_form.submit, {'label': 'I confirm', 'attr': {'class': 'btn btn-green btn-lg'}}) }}
+                                </div>
+                                <div class="form-group">
+                                    <a id="claim-back" href="#" class="btn btn-link btn-lg">Go back</a>
                                 </div>
                             {{ form_end(claim_confirm_form) }}
                         </div>
