@@ -342,6 +342,13 @@ sosure.purchaseStepAddress = (function() {
             self.toggleSearch();
             var addr = msg.Items[0];
             sosure.purchaseStepAddress.setAddress(addr);
+            $.ajax({
+                method: "POST",
+                url: "/ops/postcode",
+                contentType:"application/json; charset=utf-8",
+                dataType:"json",
+                data: JSON.stringify({ 'postcode': addr.PostalCode })
+            });
         });
     }
 
