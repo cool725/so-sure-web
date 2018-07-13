@@ -436,7 +436,10 @@ class ClaimsService
             $subject,
             'new-claim@wearesosure.com',
             'AppBundle:Email:claim/fnolToClaims.html.twig',
-            ['data' => $claim]
+            ['data' => $claim],
+            null,
+            null,
+            $claim->getAttachmentFiles()
         );
 
         $this->mailer->sendTemplate(

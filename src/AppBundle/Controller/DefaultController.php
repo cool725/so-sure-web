@@ -599,36 +599,16 @@ class DefaultController extends BaseController
                     $repo = $this->getManager()->getRepository(User::class);
                     $user = $repo->findOneBy(['emailCanonical' => mb_strtolower($claimFnolEmail->getEmail())]);
 
-                    if ($user === null) {
-                        // @codingStandardsIgnoreStart
-                        $this->addFlash(
-                            'success',
-                            "Thank you. An email with further instructions on how to proceed with your claim has been sent to your email address if you have a policy with us. Please check it now and follow the instructions to start the process."
-                        );
-                    } else {
-                        if ($user->hasActivePolicy()) {
-                            /** @var ClaimsService $claimsService */
-                            $claimsService = $this->get('app.claims');
-                            if ($claimsService->sendUniqueLoginLink($user)) {
-                                // @codingStandardsIgnoreStart
-                                $this->addFlash(
-                                    'success',
-                                    "Thank you. An email with further instructions on how to proceed with your claim has been sent to your email address. Please check it now and follow the instructions to start the process."
-                                );
-                            } else {
-                                $this->addFlash(
-                                    'error',
-                                    "Sorry, there was an error with your submission, please try again."
-                                );
-                            }
-                        } else {
-                            // @codingStandardsIgnoreStart
-                            $this->addFlash(
-                                'error',
-                                "Sorry, your email address could not be associated with an active policy. Please check the email address you have created your policy under and try again."
-                            );
-                        }
+                    if ($user) {
+                        /** @var ClaimsService $claimsService */
+                        $claimsService = $this->get('app.claims');
+                        $claimsService->sendUniqueLoginLink($user);
                     }
+                    // @codingStandardsIgnoreStart
+                    $this->addFlash(
+                        'success',
+                        "Thank you. An email with further instructions on how to proceed with your claim has been sent to your email address. Please check it now and follow the instructions to start the process."
+                    );
                 }
             }
         }

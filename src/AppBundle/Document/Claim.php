@@ -1710,6 +1710,28 @@ class Claim
         return $this->getFilesByType(DamagePictureFile::class);
     }
 
+    public function getAttachmentFiles()
+    {
+        $files = [];
+        foreach ($this->getProofOfUsageFiles() as $file) {
+            $files[] = $file;
+        }
+        foreach ($this->getProofOfBarringFiles() as $file) {
+            $files[] = $file;
+        }
+        foreach ($this->getProofOfPurchaseFiles() as $file) {
+            $files[] = $file;
+        }
+        foreach ($this->getProofOfLossFiles() as $file) {
+            $files[] = $file;
+        }
+        foreach ($this->getDamagePictureFiles() as $file) {
+            $files[] = $file;
+        }
+
+        return $files;
+    }
+
     public function getFilesByType($type)
     {
         $files = [];

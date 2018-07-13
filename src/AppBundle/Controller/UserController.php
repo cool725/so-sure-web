@@ -1549,6 +1549,7 @@ class UserController extends BaseController
         $user = $this->getUser();
         $dm = $this->getManager();
         $policyRepo = $dm->getRepository(Policy::class);
+        /** @var Policy $policy */
         $policy = $policyRepo->find($policyId);
 
         $claim = $policy->getLatestFnolSubmittedClaim();
@@ -1581,16 +1582,6 @@ class UserController extends BaseController
             }
         }
 
-        $now = new \DateTime();
-        $time = 'in the next 3 hours';
-        if ($now->format('w') > 0 && $now->format('w') < 6) {
-            if ($now->format('G') < 9 || $now->format('G') > 17) {
-                $time = 'Tomorrow';
-            }
-        } else {
-            $time = 'Monday morning';
-        }
-
         $needProofOfBarring = in_array($claim->getType(), array(Claim::TYPE_THEFT, Claim::TYPE_LOSS)) &&
             $claim->needProofOfUsage();
         $needProofOfPurchase = in_array($claim->getType(), array(Claim::TYPE_THEFT, Claim::TYPE_LOSS)) &&
@@ -1598,13 +1589,8 @@ class UserController extends BaseController
 
         $data = [
             'claim' => $claim,
-            'phone' => sprintf(
-                "%s %s (%sGB)",
-                $claim->getPolicy()->getPhone()->getMake(),
-                $claim->getPolicy()->getPhone()->getModel(),
-                $claim->getPolicy()->getPhone()->getMemory()
-            ),
-            'time' => $time,
+            'phone' => $claim->getPhonePolicy() ? $claim->getPhonePolicy()->getPhone()->__toString() : 'Unknown',
+            'time' => $this->getClaimResponseTime(),
             'claim_form' => $claimUpdateForm->createView(),
             'proof_of_usage' => $claim->needProofOfUsage(),
             'picture_of_phone' => $claim->getType() == Claim::TYPE_DAMAGE && $claim->needPictureOfPhone(),

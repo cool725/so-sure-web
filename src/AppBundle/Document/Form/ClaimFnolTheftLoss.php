@@ -198,7 +198,7 @@ class ClaimFnolTheftLoss
         $this->reportedDate = $claim->getReportedDate();
         $this->reportType = $claim->getReportType();
         if (!$claim->getReportType() && $claim->getType() == Claim::TYPE_LOSS) {
-            $this->reportedType = Claim::REPORT_POLICE_STATION;
+            $this->reportType = Claim::REPORT_POLICE_STATION;
         }
         $this->crimeReferenceNumber = $claim->getCrimeRef();
         $this->policeLossReport = $claim->getPoliceLossReport();

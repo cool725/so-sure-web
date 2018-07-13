@@ -281,6 +281,23 @@ trait DateTrait
         return $date->setTime(0, 0);
     }
 
+    public function getClaimResponseTime(\DateTime $date = null)
+    {
+        if (!$date) {
+            $date = new \DateTime('now', SoSure::TIMEZONE);
+        }
+        $time = 'in the next 3 hours';
+        if (!$this->isWeekDay($date) || $this->isBankHoliday($date)) {
+            $time = 'on the morning of the next working day';
+        } elseif ($date->format('G') < 9) {
+            $time = 'by 11am';
+        } elseif ($date->format('G') >= 16) {
+            $time = 'on the morning of the next working day';
+        }
+
+        return $time;
+    }
+
     public static function convertTimezone(\DateTime $date, \DateTimeZone $timezone)
     {
         $adjustedDate = clone $date;

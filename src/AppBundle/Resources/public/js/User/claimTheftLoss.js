@@ -16,6 +16,10 @@ sosure.claim = (function() {
         self.url = window.location.href;
     }
 
+    self.removeValidation = function () {
+        self.form.destroy();
+    }
+
     self.whenMask = function () {
         // Mask date input and add picker
         $('.date_mask').mask('00/00/0000');
@@ -98,6 +102,7 @@ $(function(){
     }
 
     $('#claim_theftloss_form_save').click(function(){
+        sosure.claim.removeValidation();
         $('#claim_theftloss_form_isSave').attr('value', '1');
         $('#claim-form').submit();
     });
