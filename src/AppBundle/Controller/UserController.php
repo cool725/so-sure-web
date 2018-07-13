@@ -1120,7 +1120,7 @@ class UserController extends BaseController
      * @Route("/welcome/{id}", name="user_welcome_policy_id")
      * @Template
      */
-    public function welcomeAction(Request $request, $id = null)
+    public function welcomeAction($id = null)
     {
         $dm = $this->getManager();
         $user = $this->getUser();
@@ -1150,13 +1150,13 @@ class UserController extends BaseController
             $dm->flush($policy);
         }
 
-        $exp = $this->sixpack(
-            $request,
-            SixpackService::EXPERIMENT_NEW_WELCOME_MODAL,
-            ['current-welcome-modal', 'new-welcome-modal'],
-            SixpackService::LOG_MIXPANEL_CONVERSION,
-            $user->getId()
-        );
+        // $exp = $this->sixpack(
+        //     $request,
+        //     SixpackService::EXPERIMENT_NEW_WELCOME_MODAL,
+        //     ['current-welcome-modal', 'new-welcome-modal'],
+        //     SixpackService::LOG_MIXPANEL_CONVERSION,
+        //     $user->getId()
+        // );
 
         $countUnprocessedInvitations = count($user->getUnprocessedReceivedInvitations());
         if ($countUnprocessedInvitations > 0) {
@@ -1176,7 +1176,7 @@ class UserController extends BaseController
             'policy_key' => $this->getParameter('policy_key'),
             'policy' => $user->getLatestPolicy(),
             'has_visited_welcome_page' => $pageVisited,
-            'user_modal_welcome' => $exp,
+            // 'user_modal_welcome' => $exp,
         );
     }
     /**

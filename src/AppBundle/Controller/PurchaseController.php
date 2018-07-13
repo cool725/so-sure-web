@@ -135,23 +135,23 @@ class PurchaseController extends BaseController
         }
 
         // DOB Test
-        $dobExp = $this->sixpack(
-            $request,
-            SixpackService::EXPERIMENT_DOB,
-            ['single', 'dropdowns']
-        );
+        // $dobExp = $this->sixpack(
+        //     $request,
+        //     SixpackService::EXPERIMENT_DOB,
+        //     ['single', 'dropdowns']
+        // );
 
         // DOB Sixpack Test
         /** @var Form $purchaseForm */
-        if ($dobExp == 'dropdowns') {
-            $purchaseForm = $this->get('form.factory')
-                ->createNamedBuilder('purchase_form', PurchaseStepPersonalAddressDropdownType::class, $purchase)
-                ->getForm();
-        } else {
-            $purchaseForm = $this->get('form.factory')
-                ->createNamedBuilder('purchase_form', PurchaseStepPersonalAddressType::class, $purchase)
-                ->getForm();
-        }
+        // if ($dobExp == 'dropdowns') {
+        //     $purchaseForm = $this->get('form.factory')
+        //         ->createNamedBuilder('purchase_form', PurchaseStepPersonalAddressDropdownType::class, $purchase)
+        //         ->getForm();
+        // } else {
+        $purchaseForm = $this->get('form.factory')
+            ->createNamedBuilder('purchase_form', PurchaseStepPersonalAddressType::class, $purchase)
+            ->getForm();
+        // }
 
         if ('POST' === $request->getMethod()) {
             if ($request->request->has('purchase_form')) {
@@ -244,9 +244,9 @@ class PurchaseController extends BaseController
                     $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_RECEIVE_DETAILS, $data);
 
                     // Convert point from quote
-                    $this->get('app.sixpack')->convert(
-                        SixpackService::EXPERIMENT_MONEY_BACK_GUARANTEE
-                    );
+                    // $this->get('app.sixpack')->convert(
+                    //     SixpackService::EXPERIMENT_MONEY_BACK_GUARANTEE
+                    // );
 
                     $this->get('app.sixpack')->convert(
                         SixpackService::EXPERIMENT_AB_NEW_CONTENT
@@ -268,11 +268,11 @@ class PurchaseController extends BaseController
         /** @var \Symfony\Component\Security\Csrf\CsrfTokenManagerInterface $csrf */
         $csrf = $this->get('security.csrf.token_manager');
 
-        $moneyBackGuarantee = $this->sixpack(
-            $request,
-            SixpackService::EXPERIMENT_MONEY_BACK_GUARANTEE,
-            ['no-money-back-guarantee', 'money-back-guarantee']
-        );
+        // $moneyBackGuarantee = $this->sixpack(
+        //     $request,
+        //     SixpackService::EXPERIMENT_MONEY_BACK_GUARANTEE,
+        //     ['no-money-back-guarantee', 'money-back-guarantee']
+        // );
 
         $data = array(
             'purchase_form' => $purchaseForm->createView(),
@@ -287,8 +287,8 @@ class PurchaseController extends BaseController
             ) : null,
             // 'postcode' => $this->sixpack($request, SixpackService::EXPERIMENT_POSTCODE, ['comma', 'split', 'type']),
             'postcode' => 'comma',
-            'showDropdown' => $dobExp,
-            'moneyBackGuarantee' => $moneyBackGuarantee,
+            // 'showDropdown' => $dobExp,
+            // 'moneyBackGuarantee' => $moneyBackGuarantee,
         );
 
         return $this->render('AppBundle:Purchase:purchaseStepPersonalAddress.html.twig', $data);
@@ -342,7 +342,7 @@ class PurchaseController extends BaseController
             $policy = $user->getPartialPolicies()[0];
         }
 
-        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_DOB);
+        // $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_DOB);
 
         if ($policy) {
             if (!$phone && $policy->getPhone()) {
@@ -592,11 +592,11 @@ class PurchaseController extends BaseController
             }
         }
 
-        $moneyBackGuarantee = $this->sixpack(
-            $request,
-            SixpackService::EXPERIMENT_MONEY_BACK_GUARANTEE,
-            ['no-money-back-guarantee', 'money-back-guarantee']
-        );
+        // $moneyBackGuarantee = $this->sixpack(
+        //     $request,
+        //     SixpackService::EXPERIMENT_MONEY_BACK_GUARANTEE,
+        //     ['no-money-back-guarantee', 'money-back-guarantee']
+        // );
 
         /** @var RequestService $requestService */
         $requestService = $this->get('app.request');
@@ -626,7 +626,7 @@ class PurchaseController extends BaseController
             ) : null,
             'billing_date' => $billingDate,
             'payment_provider' => $paymentProviderTest,
-            'moneyBackGuarantee' => $moneyBackGuarantee,
+            // 'moneyBackGuarantee' => $moneyBackGuarantee,
         );
 
         return $this->render($template, $data);
@@ -1139,10 +1139,10 @@ class PurchaseController extends BaseController
                         ['Policy Id' => $policy->getId(), 'Reason' => $reason]
                     );
 
-                    $this->get('app.sixpack')->convertByClientId(
-                        $policy->getUser()->getId(),
-                        SixpackService::EXPERIMENT_NEW_WELCOME_MODAL
-                    );
+                    // $this->get('app.sixpack')->convertByClientId(
+                    //     $policy->getUser()->getId(),
+                    //     SixpackService::EXPERIMENT_NEW_WELCOME_MODAL
+                    // );
 
                     // @codingStandardsIgnoreStart
                     $this->addFlash(

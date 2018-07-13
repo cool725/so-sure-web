@@ -121,9 +121,9 @@
 
         <h4 class="text-center">All this covered and more...</h4>
 
-        {% if moneyBackGuarantee is defined and moneyBackGuarantee == 'money-back-guarantee' %}
+{#         {% if moneyBackGuarantee is defined and moneyBackGuarantee == 'money-back-guarantee' %}
             <div class="h4 h-light text-center"><mark class="mgreen">Plus.. We're so-sure you'll love us, we'll give you a 14 day money back guarantee 💰🔙</mark></div>
-        {% endif %}
+        {% endif %} #}
 
         <div class="checkout--step">
             <div class="container">
@@ -200,7 +200,7 @@
                     </div>
 
                     <div class="form-step {% if not showDOB %}step--hide{% endif %}">
-                        {% if showDropdown is defined and showDropdown == 'dropdowns'  %}
+                        {# {% if showDropdown is defined and showDropdown == 'dropdowns'  %}
                             <div class="form-group {% if form_errors(purchase_form.birthday) %}has-error{% endif %}">
                                 {{ form_label(purchase_form.birthday, 'Date of Birth:', {'label_attr': {'class': 'text-muted'} }) }}
                                 <div id="dob-field" class="row">
@@ -231,14 +231,14 @@
                                 </div>
                                 <div class="help-block with-errors">{{ form_errors(purchase_form.birthday) }}</div>
                             </div>
-                        {% else %}
+                        {% else %} #}
                             {# Control #}
                             <div class="form-group {% if form_errors(purchase_form.birthday) %}has-error{% endif %} text-left">
                                 {{ form_label(purchase_form.birthday, 'Date of Birth:', { 'label_attr': {'class': 'sr-only'} }) }}
                                 {{ form_widget(purchase_form.birthday, {'attr':{'class': 'birthday form-control dob', 'placeholder': 'Date of birth (DD/MM/YYYY)', 'data-hj-suppress' : ''}}) }}
                                 <div class="help-block with-errors">{{ form_errors(purchase_form.birthday) }}</div>
                             </div>
-                        {% endif %}
+                        {# {% endif %} #}
                         <div class="form-group {% if form_errors(purchase_form.mobileNumber) %}has-error{% endif %}">
                             {{ form_label(purchase_form.mobileNumber, 'Mobile Number:', { 'label_attr': {'class': 'sr-only'} }) }}
                             {{ form_widget(purchase_form.mobileNumber, {'attr':{'class':'form-control', 'placeholder':'Mobile number', 'data-hj-suppress' : ''}}) }}
