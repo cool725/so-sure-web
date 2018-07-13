@@ -170,11 +170,13 @@
                                 <td>Policy Commission</td>
                                 <td>
                                     Received £{{ policy.getTotalCommissionPaid() | number_format(2, '.', ',') }} of £{{ policy.premium.yearlyTotalCommission| number_format(2, '.', ',') }} (coverholder + broker)
-                                    <br>
-                                    {% if policy.end < now %}
-                                        Commission of £{{ policy.getProratedCommission(policy.end) | number_format(2, '.', ',') }} was due on policy
-                                    {% else %}
-                                        Commission of £{{ policy.getProratedCommission() | number_format(2, '.', ',') }} due (daily calc) 
+                                    {% if policy.isPolicy and policy.start %}
+                                        <br>
+                                        {% if policy.end < now %}
+                                            Commission of £{{ policy.getProratedCommission(policy.end) | number_format(2, '.', ',') }} was due on policy
+                                        {% else %}
+                                            Commission of £{{ policy.getProratedCommission() | number_format(2, '.', ',') }} due (daily calc)
+                                        {% endif %}
                                     {% endif %}
                                 </td>
                             </tr>
