@@ -38,9 +38,10 @@
                                 <h3 class="panel-title">1. Can you find your phone?</h3>
                             </div>
                             <div class="panel-body">
-                                It sounds a bit silly. Someone just stole your phone and we're asking you if you can find it.
-                                However we have had several cases where our customers thought that someone had stolen a phone, but rather
-                                it just accidentaly slipped out of their bag and someone handed it in. We do ask that you contact the last place you can recall having your phone.
+                                We know It sounds a bit silly, because someone <strong>just stole</strong> your phone and we're asking you if you can find it.
+                                However, we have had several cases where our customers thought that someone had stolen a phone, but instead
+                                it had accidentally slipped out of their bag and some kind person handed it in.
+                                We do ask that you contact the last place you can recall having your phone to see if some kind person has had your back.
                             </div>
                         </div>
 
@@ -65,8 +66,20 @@
                                 <h3 class="panel-title">2. Contacting your Mobile Provider</h3>
                             </div>
                             <div class="panel-body">
-                                You'll need to call up your mobile provide and let them know that your phone has been stolen and request that your phone is blocked. You should request a proof of baring document from them at this point in time. This is a standard document and the network provider should be easily able to email or post this document to you.
-                                {% if proof_of_usage is defined and proof_of_usage %}You should also request a proof of usage document that has your IMEI number and the first and last time that IMEI was used on their network. {% endif %}
+                                You'll need to call up your mobile phone provider and:
+                                <ul>
+                                    <li>
+                                        Let them know your phone has been stolen and <strong>request that your phone is blocked</strong>.
+                                    </li>
+                                    <li>
+                                        Request a <strong>Proof of Barring</strong> document from them.
+                                    </li>
+                                    {% if proof_of_usage is defined and proof_of_usage %}
+                                    <li>
+                                        Request a <strong>Proof of Usage</strong> report. This is a standard document and the network provider will easily able to email or post this document to you (ask for email for a quicker claim).  This document has your IMEI number and the first and last time that IMEI was used on their network.
+                                    </li>
+                                    {% endif %}
+                                </ul>
                             </div>
                         </div>
 
@@ -111,10 +124,10 @@
 
                         <div class="panel panel-info">
                             <div class="panel-heading">
-                                <h3 class="panel-title">3. Reporting your {{ claimType }} to the authorities</h3>
+                                <h3 class="panel-title">3. Reporting your Theft to the authorities</h3>
                             </div>
                             <div class="panel-body">
-                                Although typically there is little the policy can do, occasionally, the police may stumble across your phone at a later date.
+                                Although typically there is little the police can do, occasionally, the police may stumble across your phone at a later date.  It’s good to report the theft to your local police station and receive a Crime Reference Number for your records.
                             </div>
                         </div>
 
@@ -135,7 +148,9 @@
                             </div>
                         </div>
 
+                        {% set sectionCount = 4 %}
                         {% if proof_of_purchase is defined and proof_of_purchase %}
+                            {% set sectionCount = 5 %}
                             <div class="panel panel-info">
                                 <div class="panel-heading">
                                     <h3 class="panel-title">4. Proof of purchase</h3>
