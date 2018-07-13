@@ -60,7 +60,7 @@
 
                         <div class="panel panel-info">
                             <div class="panel-heading">
-                                <h3 class="panel-title">2. Contacting your Mobile Provider</h3>
+                                <h3 class="panel-title">2. Contacting your mobile provider</h3>
                             </div>
                             <div class="panel-body">
                                 You'll need to call up your mobile provide and let them know that you've lost your phone and need the phone blocked. You should request a proof of baring document from them at this point in time. This is a standard document and the network provider should be easily able to email or post this document to you.
@@ -78,7 +78,7 @@
                             </div>
                             <div class="col-sm-6">
                                 <div class="form-group {% if form_errors(claim_form.proofOfBarring) %}has-error{% endif %}">
-                                    <label>Upload your Proof of barring document from {{ network }}</label>
+                                    <label>Upload your proof of barring document from {{ network }}</label>
                                     {{ form_widget(claim_form.proofOfBarring, { 'attr': {'class': 'form-control'}}) }}
                                     <div class="help-block with-errors">
                                         <a href="#" data-toggle="modal" data-target="#baringModal">
@@ -93,7 +93,7 @@
                             <div class="row">
                                 <div class="col-sm-6">
                                     <div class="form-group {% if form_errors(claim_form.proofOfUsage) %}has-error{% endif %}">
-                                        <label>Upload your Proof of usage document from {{ network }}</label>
+                                        <label>Upload your proof of usage document from {{ network }}</label>
                                         {{ form_widget(claim_form.proofOfUsage, { 'attr': {'class': 'form-control'}}) }}
                                         <div class="help-block with-errors">
                                             <a href="#" data-toggle="modal" data-target="#usageModal">
@@ -135,14 +135,14 @@
                         <div class="row">
                             <div class="col-sm-6">
                                 <div class="form-group {% if form_errors(claim_form.crimeReferenceNumber) %}has-error{% endif %}">
-                                    <label>Police Claim Number</label>
+                                    <label>Police claim number</label>
                                     {{ form_widget(claim_form.crimeReferenceNumber, { 'attr': {'class': 'form-control', 'placeholder': 'Police claim no.'}}) }}
                                     <div class="help-block with-errors">{{ form_errors(claim_form.crimeReferenceNumber) }}</div>
                                 </div>
                             </div>
                             <div class="col-sm-6">
                                 <div class="form-group {% if form_errors(claim_form.proofOfLoss) %}has-error{% endif %}">
-                                    <label>Upload Report My Loss Document</label>
+                                    <label>Upload 'Report My Loss' document</label>
                                     {{ form_widget(claim_form.proofOfLoss, { 'attr': {'class': 'form-control', 'placeholder': 'Crime reference no.'}}) }}
                                     <div class="help-block with-errors">
                                         <a href="#" data-toggle="modal" data-target="#lossModal">
