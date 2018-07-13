@@ -27,8 +27,8 @@ sosure.claim = (function() {
         self.form.validate({
             debug: false,
             onkeyup: false,
-            focusCleanup: true,
-            validClass: 'has-success',
+            focusCleanup: false,
+            onclick: false,
             rules: {
                 "claim_form[signature]" : {
                     required: true,
