@@ -1,6 +1,8 @@
 <?php
 namespace AppBundle\Service;
 
+use AppBundle\Document\PostcodeTrait;
+use CensusBundle\Service\SearchService;
 use Psr\Log\LoggerInterface;
 use AppBundle\Document\Address;
 use AppBundle\Document\BankAccount;
@@ -14,6 +16,7 @@ use AppBundle\Exception\DirectDebitBankException;
 class PCAService
 {
     use BacsTrait;
+    use PostcodeTrait;
 
     const TIMEOUT = 5;
     const REDIS_POSTCODE_KEY = 'postcode';
@@ -48,30 +51,31 @@ class PCAService
     /** @var \Predis\Client */
     protected $redis;
 
+    /** @var SearchService */
+    protected $searchService;
+
     /**
      * @param DocumentManager $dm
      * @param LoggerInterface $logger
      * @param string          $apiKey
      * @param string          $environment
      * @param \Predis\Client  $redis
+     * @param SearchService   $searchService
      */
     public function __construct(
         DocumentManager $dm,
         LoggerInterface $logger,
         $apiKey,
         $environment,
-        \Predis\Client $redis
+        \Predis\Client $redis,
+        SearchService $searchService
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
         $this->apiKey = $apiKey;
         $this->environment = $environment;
         $this->redis = $redis;
-    }
-
-    public function normalizePostcode($postcode)
-    {
-        return mb_strtoupper(str_replace(' ', '', trim($postcode)));
+        $this->searchService = $searchService;
     }
 
     /**
@@ -359,6 +363,13 @@ class PCAService
         if (!empty($file->Rows)) {
             $data = $this->transformAddress($file->Rows->Row[0]);
             $this->logger->info(sprintf('Address find for %s %s', $id, json_encode($data->toApiArray())));
+
+            if (!$this->searchService->validatePostcode($data->getPostcode())) {
+                $this->logger->error(sprintf(
+                    'Postcode %s was found in PCA but missing from local db',
+                    $data->getPostcode()
+                ));
+            }
 
             return $data;
         }

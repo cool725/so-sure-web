@@ -1,6 +1,7 @@
 <?php
 namespace CensusBundle\Service;
 
+use AppBundle\Document\PostcodeTrait;
 use CensusBundle\Document\Postcode;
 use CensusBundle\Document\OutputArea;
 use CensusBundle\Document\Income;
@@ -12,6 +13,8 @@ use GeoJson\Geometry\Point;
 
 class SearchService
 {
+    use PostcodeTrait;
+
     /** @var DocumentManager */
     protected $dm;
 
@@ -21,6 +24,26 @@ class SearchService
     public function __construct(DocumentManager $dm)
     {
         $this->dm = $dm;
+    }
+
+    public function validatePostcode($code)
+    {
+        $code = $this->normalizePostcode($code);
+        if ($code == "BX11LT") {
+            return true;
+        } elseif ($code == "ZZ993CZ") {
+            return false;
+        }
+
+        /** @var PostCodeRepository $postcodeRepo */
+        $postcodeRepo = $this->dm->getRepository(PostCode::class);
+
+        $postcode = $postcodeRepo->findOneBy(['Postcode' => $code]);
+        if (!$postcode) {
+            return false;
+        }
+
+        return true;
     }
 
     public function getPostcode($code)

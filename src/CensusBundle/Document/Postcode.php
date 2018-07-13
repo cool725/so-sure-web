@@ -41,6 +41,11 @@ class Postcode
         return $this->postcode;
     }
 
+    public function setPostcode($postcode)
+    {
+        $this->postcode = $postcode;
+    }
+
     public function getLocation()
     {
         return $this->location;
