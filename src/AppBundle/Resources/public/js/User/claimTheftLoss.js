@@ -16,10 +16,6 @@ sosure.claim = (function() {
         self.url = window.location.href;
     }
 
-    self.removeValidation = function () {
-        self.form.destroy();
-    }
-
     self.whenMask = function () {
         // Mask date input and add picker
         $('.date_mask').mask('00/00/0000');
@@ -32,7 +28,6 @@ sosure.claim = (function() {
             onkeyup: false,
             onclick: false,
             onfocusout: false,
-            validClass: 'has-success',
             rules: {
                 "claim_theftloss_form[hasContacted]" : {
                     required: true
@@ -90,6 +85,10 @@ sosure.claim = (function() {
         });
     }
 
+    self.removeValidation = function () {
+        form.destroy();
+    }
+
     return self;
 })();
 
@@ -102,7 +101,7 @@ $(function(){
     }
 
     $('#claim_theftloss_form_save').click(function(){
-        sosure.claim.removeValidation();
+        $('#claim-form').removeData('validator');
         $('#claim_theftloss_form_isSave').attr('value', '1');
         $('#claim-form').submit();
     });
