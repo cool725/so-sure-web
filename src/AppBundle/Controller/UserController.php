@@ -495,13 +495,13 @@ class UserController extends BaseController
             /** @var PhonePolicy $policy */
             $lines[] = [
                 sprintf('"%s"', $user->getName()),
-                sprintf('"%s"', $user->getBirthday()->format('d/m/Y')),
+                sprintf('"%s"', $user->getBirthday() ? $user->getBirthday()->format('d/m/Y') : null),
                 sprintf('"%s"', $user->getBillingAddress()),
                 sprintf('"%s"', $user->getMobileNumber()),
                 sprintf('"%s"', $policy->getPolicyNumber()),
-                sprintf('"%s"', $policy->getStart()->format('d/m/Y')),
+                sprintf('"%s"', $policy->getStart() ? $policy->getStart()->format('d/m/Y') : null),
                 sprintf('"%s"', $policy->getEnd() ? $policy->getEnd()->format('d/m/Y') : null),
-                sprintf('"%s"', $policy->getPhone()->__toString()),
+                sprintf('"%s"', $policy->getPhone() ? $policy->getPhone()->__toString() : null),
                 sprintf('"%s"', $policy->getImei()),
             ];
         }
