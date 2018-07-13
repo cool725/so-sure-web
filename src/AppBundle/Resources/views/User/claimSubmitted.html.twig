@@ -31,122 +31,112 @@
 
                     <p class="text-center">We will get in touch with you on the <span class="h4">{{ claim.policy.user.mobileNumber }}</span> {{ time }}.</p>
 
-                    <ul class="list-inline text-center">
-                        <li>
-                            <a href="{{ path('user_home') }}" class="btn btn-blue-hollow btn-pad ">Get back to your account</a>
-                        </li>
-                    </ul>
+                    <p class="text-center"><a href="{{ path('user_home') }}" class="btn btn-link btn-lg">Get back to your account</a></p>
 
-                    <hr />
+                    <hr>
+
                     <h2>Need to Upload Additional Documents?</h2>
-                    <div class="row">
-                        <div class="col-sm-12 bg-success">
-                            <div class="panel-body">
-                                It can happen to anyone. The network didn't give you quite the right document we need. Or perhaps the scan was missing just a tiny bit of a number that we need.
-                                Just upload another document here and we'll pass that along to the claims team to review.
-                            </div>
-                        </div>
-                    </div>
+                    <p class="lead">It can happen to anyone. The network didn't give you quite the right document we need. Or perhaps the scan was missing just a tiny bit of a number that we need. Just upload another document here and we'll pass that along to the claims team to review.</p>
 
-                    {{ form_start(claim_form, {'attr': {'data-toggle': 'validator', 'class': 'validate-form', 'id':'claim-form', 'data-client-validation': form_client_validation }}) }}
+                    {{ form_start(claim_form, {'attr': {'data-toggle': 'validator', 'class': 'validate-form claim__form-generic', 'id':'claim-form', 'data-client-validation': form_client_validation }}) }}
 
                         {% if proof_of_usage is defined and proof_of_usage %}
-                            <div class="row" style="margin-top: 30px;">
-                                <div class="col-sm-12 bg-primary">
-                                    Proof of usage
+
+                            <div class="panel panel-info">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title">Proof of usage</h3>
+                                </div>
+                                <div class="panel-body">
+                                    You should request a proof of usage document from your Network Provider that has your IMEI number and the first and last time that IMEI was used on their network.
                                 </div>
                             </div>
+
                             <div class="row">
-                                <div class="col-sm-12 bg-info">
-                                    <div class="panel-body">
-                                        You should request a proof of usage document from your Network Provider that has your IMEI number and the first and last time that IMEI was used on their network.
-                                        <br><br>
-                                        <div class="form-group {% if form_errors(claim_form.proofOfUsage) %}has-error{% endif %}">
-                                            {{ form_widget(claim_form.proofOfUsage, { 'attr': {'class': 'form-control'}}) }}
-                                            <div class="help-block with-errors">
-                                                <a href="#" data-toggle="modal" data-target="#usageModal">
-                                                    {{ claim.proofOfUsageFiles|length }} file(s) upload
-                                                </a>
-                                            </div>
-                                            <div class="help-block with-errors">{{ form_errors(claim_form.proofOfUsage) }}</div>
-                                        </div>
+                                <div class="form-group col-sm-6{% if form_errors(claim_form.proofOfUsage) %}has-error{% endif %}">
+                                    {{ form_widget(claim_form.proofOfUsage, { 'attr': {'class': 'form-control'}}) }}
+                                    <div class="help-block with-errors">
+                                        <a href="#" data-toggle="modal" data-target="#usageModal">
+                                            {{ claim.proofOfUsageFiles|length }} file(s) upload
+                                        </a>
                                     </div>
+                                    <div class="help-block with-errors">{{ form_errors(claim_form.proofOfUsage) }}</div>
                                 </div>
                             </div>
+
                         {% endif %}
 
                         {% if picture_of_phone is defined and picture_of_phone %}
-                            <div class="row" style="margin-top: 30px;">
-                                <div class="col-sm-12 bg-primary">
-                                    Proof of damaged phone
+
+                            <div class="panel panel-info">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title">Proof of damaged phone</h3>
+                                </div>
+                                <div class="panel-body">
+                                    Just take a photo of your phone that's damaged. You may need someone else's phone, or if your camera is working, using a mirror in a well lite room is fine.
                                 </div>
                             </div>
+
                             <div class="row">
-                                <div class="col-sm-12 bg-info">
-                                    <div class="panel-body">
-                                        Just take a photo of your phone that's damaged. You may need someone else's phone, or if your camera is working, using a mirror in a well lite room is fine.
-                                        <br><br>
-                                        <div class="form-group {% if form_errors(claim_form.pictureOfPhone) %}has-error{% endif %}">
-                                            {{ form_widget(claim_form.pictureOfPhone, { 'attr': {'class': 'form-control'}}) }}
-                                            <div class="help-block with-errors">
-                                                <a href="#" data-toggle="modal" data-target="#pictureModal">
-                                                    {{ claim.damagePictureFiles|length }} file(s) upload
-                                                </a>
-                                            </div>
-                                            <div class="help-block with-errors">{{ form_errors(claim_form.pictureOfPhone) }}</div>
-                                        </div>
+                                <div class="form-group col-sm-6 {% if form_errors(claim_form.pictureOfPhone) %}has-error{% endif %}">
+                                    {{ form_widget(claim_form.pictureOfPhone, { 'attr': {'class': 'form-control'}}) }}
+                                    <div class="help-block with-errors">
+                                        <a href="#" data-toggle="modal" data-target="#pictureModal">
+                                            {{ claim.damagePictureFiles|length }} file(s) upload
+                                        </a>
                                     </div>
+                                    <div class="help-block with-errors">{{ form_errors(claim_form.pictureOfPhone) }}</div>
                                 </div>
                             </div>
+
                         {% endif %}
 
                         {% if proof_of_barring is defined and proof_of_barring %}
-                            <div class="row" style="margin-top: 30px;">
-                                <div class="col-sm-12 bg-primary">
-                                    Proof of barring
+
+                            <div class="panel panel-info">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title">Proof of barring</h3>
+                                </div>
+                                <div class="panel-body">
+                                    You should request a proof of baring document from your Network Provider that has your IMEI number and when it barred.
                                 </div>
                             </div>
+
                             <div class="row">
-                                <div class="col-sm-12 bg-info">
-                                    <div class="panel-body">
-                                        You should request a proof of baring document from your Network Provider that has your IMEI number and when it barred.
-                                        <br><br>
-                                        <div class="form-group {% if form_errors(claim_form.proofOfBarring) %}has-error{% endif %}">
-                                            {{ form_widget(claim_form.proofOfBarring, { 'attr': {'class': 'form-control'}}) }}
-                                            <div class="help-block with-errors">
-                                                <a href="#" data-toggle="modal" data-target="#baringModal">
-                                                    {{ claim.proofOfBarringFiles|length }} file(s) upload
-                                                </a>
-                                            </div>
-                                            <div class="help-block with-errors">{{ form_errors(claim_form.proofOfBarring) }}</div>
-                                        </div>
+                                <div class="form-group col-sm-6 {% if form_errors(claim_form.proofOfBarring) %}has-error{% endif %}">
+                                    {{ form_widget(claim_form.proofOfBarring, { 'attr': {'class': 'form-control'}}) }}
+                                    <div class="help-block with-errors">
+                                        <a href="#" data-toggle="modal" data-target="#baringModal">
+                                            {{ claim.proofOfBarringFiles|length }} file(s) upload
+                                        </a>
                                     </div>
+                                    <div class="help-block with-errors">{{ form_errors(claim_form.proofOfBarring) }}</div>
                                 </div>
                             </div>
                         {% endif %}
 
                         {% if proof_of_purchase is defined and proof_of_purchase %}
-                            <div class="row" style="margin-top: 30px;">
-                                <div class="col-sm-12 bg-primary">
-                                    Proof of purchase
+
+
+                            <div class="panel panel-info">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title">Proof of purchase</h3>
+                                </div>
+                                <div class="panel-body">
+                                     We require a proof of purchase document such as a receipt.
                                 </div>
                             </div>
+
                             <div class="row">
-                                <div class="col-sm-12 bg-info">
-                                    <div class="panel-body">
-                                        We require a proof of purchase document such as a receipt.
-                                        <br><br>
-                                        <div class="form-group {% if form_errors(claim_form.proofOfPurchase) %}has-error{% endif %}">
-                                            {{ form_widget(claim_form.proofOfPurchase, { 'attr': {'class': 'form-control'}}) }}
-                                            <div class="help-block with-errors">
-                                                <a href="#" data-toggle="modal" data-target="#purchaseModal">
-                                                    {{ claim.proofOfPurchaseFiles|length }} file(s) upload
-                                                </a>
-                                            </div>
-                                            <div class="help-block with-errors">{{ form_errors(claim_form.proofOfPurchase) }}</div>
-                                        </div>
+                                <div class="form-group col-sm-6 {% if form_errors(claim_form.proofOfPurchase) %}has-error{% endif %}">
+                                    {{ form_widget(claim_form.proofOfPurchase, { 'attr': {'class': 'form-control'}}) }}
+                                    <div class="help-block with-errors">
+                                        <a href="#" data-toggle="modal" data-target="#purchaseModal">
+                                            {{ claim.proofOfPurchaseFiles|length }} file(s) upload
+                                        </a>
                                     </div>
+                                    <div class="help-block with-errors">{{ form_errors(claim_form.proofOfPurchase) }}</div>
                                 </div>
+                            </div>
                             </div>
                         {% endif %}
 
