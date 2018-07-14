@@ -48,57 +48,6 @@ set -e
 SCRIPT
 
 Vagrant.configure("2") do |config|
-  config.vm.define "dev1404", primary: false, autostart: false do |dev1404_config|
-    dev1404_config.vm.box = "ubuntu/trusty64"
-    dev1404_config.vm.network "forwarded_port", guest: 80, host: 40080 # apache sosure website
-    dev1404_config.vm.network "forwarded_port", guest: 27017, host: 47017 # mongodb
-    dev1404_config.vm.network "private_network", ip: "10.0.4.2"
-    #dev_config.vm.synced_folder ".", "/vagrant", owner: "www-data"
-    dev1404_config.vm.synced_folder ".", "/vagrant", nfs: true
-    #dev_config.vm.synced_folder ".", "/vagrant"
-    dev1404_config.ssh.forward_agent = true
-    dev1404_config.vm.provision "shell",
-    	inline: $script
-
-    dev1404_config.vm.provision "shell",
-    	inline: $github_ops,
-		privileged: false
-
-    # Patch for https://github.com/mitchellh/vagrant/issues/6793
-    dev1404_config.vm.provision "shell" do |s|
-        s.inline = '[[ ! -f $1 ]] || grep -F -q "$2" $1 || sed -i "/__main__/a \\    $2" $1'
-        s.args = ['/usr/bin/ansible-galaxy', "if sys.argv == ['/usr/bin/ansible-galaxy', '--help']: sys.argv.insert(1, 'info')"]
-    end
-	
-    dev1404_config.vm.provision "ansible_local" do |a|
-        a.playbook = "vagrant1404.yml"
-        a.provisioning_path = "/var/ops/ansible"
-        a.inventory_path = "/var/ops/ansible/vagrant_inventory"
-        a.limit = "vagrant"
-        a.install = false
-    end
-
-    dev1404_config.vm.provision "shell",
-    	inline: $deploy
-    	
-    dev1404_config.vm.provider "virtualbox" do |v|
-      v.customize ["modifyvm", :id, "--memory", 1200]
-      v.customize ["modifyvm", :id, "--cpus", 1]
-      
-      # Virtualbox has issues with symlinks - https://www.virtualbox.org/ticket/10085#comment:12
-      v.customize ["setextradata", :id, "VBoxInternal2/SharedFoldersEnableSymlinksCreate/vagrant", "1"]
-
-      # if you ever need the gui
-      # v.gui = true
-      
-      # This setting makes it so that network access from the vagrant guest is able to
-      # resolve connections using the hosts VPN connection
-      # it means we can DNS resolve internal.vpn domains
-      v.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
-      v.customize ["modifyvm", :id, "--natdnsproxy1", "on"]
-    end      
-  end
-
   config.vm.define "dev1604", primary: true, autostart: true do |dev1604_config|
 	# https://github.com/geerlingguy/packer-ubuntu-1604/issues/1
 	# edit /etc/network/interfaces and remove
@@ -157,35 +106,37 @@ Vagrant.configure("2") do |config|
     end      
   end
 
-  config.vm.define "dev_nonfs", primary: false, autostart: false do |dev1404_nonfs_config|
-    dev1404_nonfs_config.vm.box = "ubuntu/trusty64"
-    dev1404_nonfs_config.vm.network "forwarded_port", guest: 80, host: 40080 # apache sosure website
-    dev1404_nonfs_config.vm.network "forwarded_port", guest: 27017, host: 47017 # mongodb
-    dev1404_nonfs_config.vm.network "private_network", ip: "10.0.4.2"
-    dev1404_nonfs_config.vm.synced_folder ".", "/vagrant"
-    dev1404_nonfs_config.ssh.forward_agent = true
+  config.vm.define "dev1604_nonfs", primary: false, autostart: false do |dev1604_nonfs_config|
+    dev1604_nonfs_config.vm.box = "geerlingguy/ubuntu1604"
+    dev1604_nonfs_config.vm.network "forwarded_port", guest: 80, host: 40080 # apache sosure website
+    dev1604_nonfs_config.vm.network "forwarded_port", guest: 27017, host: 47017 # mongodb
+    dev1604_nonfs_config.vm.network "forwarded_port", guest: 5000, host: 5000 # sixpack
+    dev1604_nonfs_config.vm.network "forwarded_port", guest: 5001, host: 5001 # sixpack-web
+    dev1604_nonfs_config.vm.network "private_network", ip: "10.0.4.2"
+    dev1604_nonfs_config.vm.synced_folder ".", "/vagrant"
+    dev1604_nonfs_config.ssh.forward_agent = true
 
-    dev1404_nonfs_config.vm.provision "shell",
+    dev1604_nonfs_config.vm.provision "shell",
     	inline: $script
 
     # Patch for https://github.com/mitchellh/vagrant/issues/6793
-    dev1404_nonfs_config.vm.provision "shell" do |s|
+    dev1604_nonfs_config.vm.provision "shell" do |s|
         s.inline = '[[ ! -f $1 ]] || grep -F -q "$2" $1 || sed -i "/__main__/a \\    $2" $1'
         s.args = ['/usr/bin/ansible-galaxy', "if sys.argv == ['/usr/bin/ansible-galaxy', '--help']: sys.argv.insert(1, 'info')"]
     end
 
-    dev1404_nonfs_config.vm.provision "ansible_local" do |a|
-        a.playbook = "vagrant1404.yml"
+    dev1604_nonfs_config.vm.provision "ansible_local" do |a|
+        a.playbook = "vagrant1604.yml"
         a.provisioning_path = "/vagrant/ops/ansible"
         a.inventory_path = "/vagrant/ops/ansible/vagrant_inventory"
         a.limit = "vagrant"
         a.install = false
     end
 
-    dev1404_nonfs_config.vm.provision "shell",
+    dev1604_nonfs_config.vm.provision "shell",
     	inline: $deploy
 
-    dev1404_nonfs_config.vm.provider "virtualbox" do |v|
+    dev1604_nonfs_config.vm.provider "virtualbox" do |v|
       v.customize ["modifyvm", :id, "--memory", 1200]
       v.customize ["modifyvm", :id, "--cpus", 1]
       
@@ -203,9 +154,9 @@ Vagrant.configure("2") do |config|
     end      
   end
 
-  config.vm.define "ubuntu1404", autostart: false do |ubuntu1404_config|
-    ubuntu1404_config.vm.box = "ubuntu/trusty64"
-    ubuntu1404_config.ssh.forward_agent = true
+  config.vm.define "ubuntu1604", autostart: false do |ubuntu1604_config|
+    ubuntu1604_config.vm.box = "geerlingguy/ubuntu1604"
+    ubuntu1604_config.ssh.forward_agent = true
   end
 end
 
