@@ -197,7 +197,7 @@ class ClaimFnolTheftLoss
         $this->blockedDate = $claim->getBlockedDate();
         $this->reportedDate = $claim->getReportedDate();
         $this->reportType = $claim->getReportType();
-        if (!$claim->getReportType() && $claim->getType() == Claim::TYPE_LOSS) {
+        if (!$claim->getReportType() && $claim->getType() == Claim::TYPE_THEFT) {
             $this->reportType = Claim::REPORT_POLICE_STATION;
         }
         $this->crimeReferenceNumber = $claim->getCrimeRef();

@@ -121,7 +121,7 @@ sosure.claim = (function() {
         if (text_remaining < 0) {
             text_remaining = 0;
         }
-        $('#claim-message-length').html(text_remaining + ' characters remaining');
+        $('#claim-message-length').html('Minimum of 50 characters (' + text_remaining + ' remaining)');
     }
 
     return self;
