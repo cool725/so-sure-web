@@ -8,7 +8,7 @@ trait PostcodeTrait
 {
     public function normalizePostcodeForDb($code)
     {
-        return self::normalizePostcodeForDb($code);
+        return self::normalizePostcode($code);
     }
 
     public function normalizePostcodeForDisplay($code)
