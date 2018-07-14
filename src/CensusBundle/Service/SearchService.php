@@ -28,8 +28,7 @@ class SearchService
 
     public function validatePostcode($code)
     {
-        return true;
-        $code = $this->normalizePostcode($code);
+        $code = $this->normalizePostcodeForDisplay($code);
         if ($code == "BX11LT") {
             return true;
         } elseif ($code == "ZZ993CZ") {

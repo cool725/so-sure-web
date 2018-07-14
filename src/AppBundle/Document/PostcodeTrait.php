@@ -2,10 +2,19 @@
 
 namespace AppBundle\Document;
 
+use VasilDakov\Postcode\Postcode;
+
 trait PostcodeTrait
 {
-    public function normalizePostcode($postcode)
+    public function normalizePostcodeForDb($code)
     {
-        return mb_strtoupper(str_replace(' ', '', trim($postcode)));
+        return str_replace(' ', '', self::normalizePostcodeForDisplay($code));
+    }
+
+    public function normalizePostcodeForDisplay($code)
+    {
+        $postcode = new Postcode($code);
+
+        return $postcode->normalise();
     }
 }

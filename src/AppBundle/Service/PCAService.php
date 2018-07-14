@@ -173,7 +173,7 @@ class PCAService
      */
     public function getAddress($postcode, $number, User $user = null)
     {
-        $postcode = $this->normalizePostcode($postcode);
+        $postcode = $this->normalizePostcodeForDb($postcode);
 
         $redisKey = sprintf(self::REDIS_ADDRESS_KEY_FORMAT, $postcode, $number);
         if ($value = $this->redis->get($redisKey)) {
@@ -251,7 +251,7 @@ class PCAService
      */
     public function validatePostcode($postcode, $ignoreCache = false)
     {
-        $postcode = $this->normalizePostcode($postcode);
+        $postcode = $this->normalizePostcodeForDb($postcode);
         if ($postcode == "BX11LT") {
             return true;
         } elseif ($postcode == "ZZ993CZ") {
@@ -278,7 +278,7 @@ class PCAService
             // prior to 3/7/18, find would return "postcode, address"
             // $found = $this->normalizePostcode($items[0]);
             // from 3/7/18, find returns "address, postcode"
-            $found = $this->normalizePostcode($items[count($items) - 1]);
+            $found = $this->normalizePostcodeForDb($items[count($items) - 1]);
 
             if ($postcode == $found) {
                 $this->redis->hset(self::REDIS_POSTCODE_KEY, $postcode, 1);

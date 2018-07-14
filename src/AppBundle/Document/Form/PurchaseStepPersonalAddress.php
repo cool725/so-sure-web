@@ -95,6 +95,7 @@ class PurchaseStepPersonalAddress
      * @var string
      * @AppAssert\AlphanumericSpaceDot()
      * @Assert\Length(min="1", max="50")
+     * @AppAssert\Postcode()
      * @Assert\NotBlank(message="Postcode is required.")
      */
     protected $postcode;
