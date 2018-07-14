@@ -276,7 +276,7 @@ class PCAService
         foreach ($results as $id => $line) {
             $items = explode(',', $line);
             // prior to 3/7/18, find would return "postcode, address"
-            // $found = $this->normalizePostcode($items[0]);
+            // $found = $this->normalizePostcodeForDb($items[0]);
             // from 3/7/18, find returns "address, postcode"
             $found = $this->normalizePostcodeForDb($items[count($items) - 1]);
 
