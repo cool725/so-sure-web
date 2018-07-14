@@ -20,6 +20,8 @@ trait PostcodeTrait
 
     public static function normalizePostcode($code)
     {
-        return str_replace(' ', '', self::normalizePostcodeForDisplay($code));
+        $postcode = new Postcode($code);
+
+        return str_replace(' ', '', $postcode->normalise());
     }
 }
