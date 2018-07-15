@@ -13,15 +13,21 @@ trait PostcodeTrait
 
     public function normalizePostcodeForDisplay($code)
     {
-        $postcode = new Postcode($code);
-
-        return $postcode->normalise();
+        return self::normalizePostcode($code, true);
     }
 
-    public static function normalizePostcode($code)
+    public static function normalizePostcode($code, $forDisplay = false)
     {
-        $postcode = new Postcode($code);
+        try {
+            $postcode = new Postcode($code);
 
-        return str_replace(' ', '', $postcode->normalise());
+            if ($forDisplay) {
+                return $postcode->normalise();
+            } else {
+                return str_replace(' ', '', $postcode->normalise());
+            }
+        } catch (\Exception $e) {
+            return null;
+        }
     }
 }
