@@ -115,7 +115,7 @@ class ClaimFnolTheftLossType extends AbstractType
             $timestamp = $now->format('U');
 
             if ($filename = $data->getProofOfUsage()) {
-                $s3key = $this->claimsService->saveFile(
+                $s3key = $this->claimsService->uploadS3(
                     $filename,
                     sprintf('proof-of-usage-%s', $timestamp),
                     $data->getClaim()->getPolicy()->getUser()->getId(),
@@ -124,7 +124,7 @@ class ClaimFnolTheftLossType extends AbstractType
                 $data->setProofOfUsage($s3key);
             }
             if ($filename = $data->getProofOfBarring()) {
-                $s3key = $this->claimsService->saveFile(
+                $s3key = $this->claimsService->uploadS3(
                     $filename,
                     sprintf('proof-of-barring-%s', $timestamp),
                     $data->getClaim()->getPolicy()->getUser()->getId(),
@@ -133,7 +133,7 @@ class ClaimFnolTheftLossType extends AbstractType
                 $data->setProofOfBarring($s3key);
             }
             if ($filename = $data->getProofOfPurchase()) {
-                $s3key = $this->claimsService->saveFile(
+                $s3key = $this->claimsService->uploadS3(
                     $filename,
                     sprintf('proof-of-purchase-%s', $timestamp),
                     $data->getClaim()->getPolicy()->getUser()->getId(),
@@ -142,7 +142,7 @@ class ClaimFnolTheftLossType extends AbstractType
                 $data->setProofOfPurchase($s3key);
             }
             if ($filename = $data->getProofOfLoss()) {
-                $s3key = $this->claimsService->saveFile(
+                $s3key = $this->claimsService->uploadS3(
                     $filename,
                     sprintf('proof-of-loss-%s', $timestamp),
                     $data->getClaim()->getPolicy()->getUser()->getId(),

@@ -1571,6 +1571,7 @@ class UserController extends BaseController
             if ($request->request->has('claim_update_form')) {
                 $claimUpdateForm->handleRequest($request);
                 if ($claimUpdateForm->isValid()) {
+                    /** @var ClaimsService $claimsService */
                     $claimsService = $this->get('app.claims');
                     $claimsService->updateDocuments($claim, $claimFnolUpdate);
                     $this->addFlash(

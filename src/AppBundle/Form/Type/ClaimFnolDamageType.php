@@ -107,7 +107,7 @@ class ClaimFnolDamageType extends AbstractType
             $timestamp = $now->format('U');
 
             if ($filename = $data->getProofOfUsage()) {
-                $s3key = $this->claimsService->saveFile(
+                $s3key = $this->claimsService->uploadS3(
                     $filename,
                     sprintf('proof-of-usage-%s', $timestamp),
                     $data->getClaim()->getPolicy()->getUser()->getId(),
@@ -116,7 +116,7 @@ class ClaimFnolDamageType extends AbstractType
                 $data->setProofOfUsage($s3key);
             }
             if ($filename = $data->getPictureOfPhone()) {
-                $s3key = $this->claimsService->saveFile(
+                $s3key = $this->claimsService->uploadS3(
                     $filename,
                     sprintf('picture-of-phone-%s', $timestamp),
                     $data->getClaim()->getPolicy()->getUser()->getId(),

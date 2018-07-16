@@ -2,6 +2,8 @@
 namespace AppBundle\Service;
 
 use AppBundle\Document\File\ProofOfLossFile;
+use AppBundle\Document\File\S3ClaimFile;
+use AppBundle\Document\File\S3File;
 use Predis\Client;
 use AppBundle\Repository\PhonePolicyRepository;
 use Psr\Log\LoggerInterface;
@@ -175,38 +177,46 @@ class ClaimsService
 
     public function updateDocuments(Claim $claim, ClaimFnolUpdate $claimUpdate)
     {
+        $attachments = [];
         if ($claimUpdate->getProofOfUsage()) {
             $proofOfUsage = new ProofOfUsageFile();
             $proofOfUsage->setBucket(self::S3_POLICY_BUCKET);
             $proofOfUsage->setKey($claimUpdate->getProofOfUsage());
             $proofOfUsage->setClaim($claim);
             $claim->addFile($proofOfUsage);
+            $attachments[] = $proofOfUsage;
         }
         if ($claimUpdate->getPictureOfPhone()) {
             $pictureOfPhone = new DamagePictureFile();
             $pictureOfPhone->setBucket(self::S3_POLICY_BUCKET);
             $pictureOfPhone->setKey($claimUpdate->getPictureOfPhone());
             $claim->addFile($pictureOfPhone);
+            $attachments[] = $pictureOfPhone;
         }
         if ($claimUpdate->getProofOfBarring()) {
             $proofOfBarring = new ProofOfBarringFile();
             $proofOfBarring->setBucket(self::S3_POLICY_BUCKET);
             $proofOfBarring->setKey($claimUpdate->getProofOfBarring());
             $claim->addFile($proofOfBarring);
+            $attachments[] = $proofOfBarring;
         }
         if ($claimUpdate->getProofOfPurchase()) {
             $proofOfPurchase = new ProofOfPurchaseFile();
             $proofOfPurchase->setBucket(self::S3_POLICY_BUCKET);
             $proofOfPurchase->setKey($claimUpdate->getProofOfPurchase());
             $claim->addFile($proofOfPurchase);
+            $attachments[] = $proofOfPurchase;
         }
         if ($claimUpdate->getProofOfLoss()) {
             $proofOfLoss = new ProofOfLossFile();
             $proofOfLoss->setBucket(self::S3_POLICY_BUCKET);
             $proofOfLoss->setKey($claimUpdate->getProofOfLoss());
             $claim->addFile($proofOfLoss);
+            $attachments[] = $proofOfLoss;
         }
         $this->dm->flush();
+
+        $this->notifyClaimAdditionalDocuments($claim, $attachments);
     }
 
     public function addClaim(Policy $policy, Claim $claim)
@@ -425,6 +435,17 @@ class ClaimsService
         );
     }
 
+    private function downloadAttachmentFiles(Claim $claim)
+    {
+        $files = [];
+        foreach ($claim->getAttachmentFiles() as $file) {
+            /** @var S3ClaimFile $file */
+            $files[] = $this->downloadS3($file);
+        }
+
+        return $files;
+    }
+
     public function notifyClaimSubmission(Claim $claim)
     {
         $subject = sprintf(
@@ -439,7 +460,7 @@ class ClaimsService
             ['data' => $claim],
             null,
             null,
-            $claim->getAttachmentFiles()
+            $this->downloadAttachmentFiles($claim)
         );
 
         $this->mailer->sendTemplate(
@@ -449,6 +470,28 @@ class ClaimsService
             ['data' => $claim],
             'AppBundle:Email:claim/fnolResponse.txt.twig',
             ['data' => $claim]
+        );
+    }
+
+    public function notifyClaimAdditionalDocuments(Claim $claim, array $attachments)
+    {
+        $localAttachments = [];
+        foreach ($attachments as $attachment) {
+            /** @var S3ClaimFile $attachment */
+            $localAttachments[] = $this->downloadS3($attachment);
+        }
+        $subject = sprintf(
+            'Additional Documents for Policy %s',
+            $claim->getPolicy()->getPolicyNumber()
+        );
+        $this->mailer->sendTemplate(
+            $subject,
+            'update-claim@wearesosure.com',
+            'AppBundle:Email:claim/fnolToClaims.html.twig',
+            ['data' => $claim],
+            null,
+            null,
+            $localAttachments
         );
     }
 
@@ -495,18 +538,7 @@ class ClaimsService
         return $this->redis->get($tokenId);
     }
 
-    public function withdrawClaim(Claim $claim)
-    {
-        try {
-            $claim->setStatus(Claim::STATUS_WITHDRAWN);
-            $this->dm->flush();
-            return true;
-        } catch (\InvalidArgumentException $e) {
-            return false;
-        }
-    }
-
-    public function saveFile($filename, $s3filename, $userId, $extension)
+    public function uploadS3($filename, $s3filename, $userId, $extension)
     {
         /** @var Filesystem $fs */
         $fs = $this->filesystem->getFilesystem('s3policy_fs');
@@ -526,5 +558,31 @@ class ClaimsService
         fclose($stream);
 
         return sprintf("%s/%s", $this->environment, $key);
+    }
+
+    public function downloadS3(S3File $s3File)
+    {
+        $filename = $s3File->getFilename();
+        if (!$filename || mb_strlen($filename) == 0) {
+            $key = explode('/', $s3File->getKey());
+            $filename = $key[count($key) - 1];
+        }
+        $tempFile = sprintf('%s/%s', sys_get_temp_dir(), $filename);
+
+        /** @var Filesystem $fs */
+        $fs = $this->filesystem->getFilesystem('s3policy_fs');
+        /** @var AwsS3Adapter $s3Adapater */
+        $s3Adapater = $fs->getAdapter();
+
+        $key = str_replace(sprintf('%s/', $this->environment), '', $s3File->getKey());
+
+        if (!$s3Adapater->has($key)) {
+            throw $this->createNotFoundException(sprintf('URL not found %s', $key));
+        }
+
+        $contents = $s3Adapater->read($key);
+        file_put_contents($tempFile, $contents);
+
+        return $tempFile;
     }
 }

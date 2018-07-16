@@ -1,6 +1,6 @@
 Name: {{ data.policy.user.name }}
 <br>
-Policy Number: {{ data.policy.policyNumber }}
+Policy Number: <a href="{{ url('claims_policy', {'id': data.policy.id }) }}">{{ data.policy.policyNumber }}</a>
 <br>
 Email: {{ data.policy.user.email }}
 <br>

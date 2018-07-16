@@ -29,7 +29,7 @@
 
                     <p class="lead text-center">Thank you for submitting your claim for <span class="h4">{{ claim.type }}</span> for your <span class="h4">{{ phone }}</span> with IMEI <span class="h4">{{ claim.policy.imei }}</span>. </p>
 
-                    <p class="text-center">We will get in touch with you on the <span class="h4">{{ claim.policy.user.mobileNumber }}</span> {{ time }}.</p>
+                    <p class="text-center">We will make any attempt to get in touch with you on the number you provided <span class="h4">{{ claim.phoneToReach }}</span> when you requested: <span class="h4">{{ claim.timeToReach }}</span>.</p>
 
                     <p class="text-center"><a href="{{ path('user_home') }}" class="btn btn-link btn-lg">Get back to your account</a></p>
 
