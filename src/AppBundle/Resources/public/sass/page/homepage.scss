@@ -386,7 +386,7 @@
     &--hero-background-trustpilot {
         // Mobile
         padding: 20px 15px 80px;
-        background: transparent url('#{$cdn_url}/images/homepage/so-sure_homepage_hero_mobile_background.svg') no-repeat center bottom;
+        background: $white url('#{$cdn_url}/images/homepage/so-sure_homepage_hero_mobile_background.svg') no-repeat center bottom;
         background-size: 85%;
 
 
