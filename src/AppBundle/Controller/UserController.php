@@ -1514,7 +1514,7 @@ class UserController extends BaseController
      * @Route("/claim/{policyId}", name="claimed_policy")
      * @Template
      */
-    public function claimPolicyAction(Request $request, $policyId)
+    public function claimPolicyAction($policyId)
     {
         $user = $this->getUser();
         $dm = $this->getManager();
