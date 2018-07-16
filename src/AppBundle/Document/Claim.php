@@ -1759,15 +1759,14 @@ class Claim
     {
         /** @var PhonePolicy  $policy */
         $policy = $this->getPolicy();
-        return $policy->getRisk() == Policy::RISK_LEVEL_HIGH ||
-        $policy->getPicSureStatus() != PhonePolicy::PICSURE_STATUS_APPROVED;
+        return $policy->getRisk() == Policy::RISK_LEVEL_HIGH ||  !$policy->isPicSureValidated();
     }
 
     public function needPictureOfPhone()
     {
         /** @var PhonePolicy  $policy */
         $policy = $this->getPolicy();
-        return $policy->getPicSureStatus() != PhonePolicy::PICSURE_STATUS_APPROVED;
+        return !$policy->isPicSureValidated();
     }
 
     public static function getExcessValue($type, $picSureValidated, $picSureEnabled)

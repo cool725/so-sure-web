@@ -1583,20 +1583,11 @@ class UserController extends BaseController
             }
         }
 
-        $needProofOfBarring = in_array($claim->getType(), array(Claim::TYPE_THEFT, Claim::TYPE_LOSS)) &&
-            $claim->needProofOfUsage();
-        $needProofOfPurchase = in_array($claim->getType(), array(Claim::TYPE_THEFT, Claim::TYPE_LOSS)) &&
-            $claim->needProofOfPurchase();
-
         $data = [
             'claim' => $claim,
             'phone' => $claim->getPhonePolicy() ? $claim->getPhonePolicy()->getPhone()->__toString() : 'Unknown',
             'time' => $this->getClaimResponseTime(),
             'claim_form' => $claimUpdateForm->createView(),
-            'proof_of_usage' => $claim->needProofOfUsage(),
-            'picture_of_phone' => $claim->getType() == Claim::TYPE_DAMAGE && $claim->needPictureOfPhone(),
-            'proof_of_barring' => $needProofOfBarring,
-            'proof_of_purchase' => $needProofOfPurchase,
         ];
 
         return $this->render('AppBundle:User:claimSubmitted.html.twig', $data);
@@ -1656,8 +1647,6 @@ class UserController extends BaseController
             'username' => $user->getName(),
             'claim' => $claim,
             'claim_form' => $claimDamageForm->createView(),
-            'proof_of_usage' => $claim->needProofOfUsage(),
-            'picture_of_phone' => $claim->needPictureOfPhone(),
         ];
         return $this->render('AppBundle:User:claimDamage.html.twig', $data);
     }
@@ -1718,8 +1707,6 @@ class UserController extends BaseController
             'claimType' => $claim->getType(),
             'network' => $claim->getNetwork(),
             'claim_form' => $claimTheftLossForm->createView(),
-            'proof_of_usage' => $claim->needProofOfUsage(),
-            'proof_of_purchase' => $claim->needProofOfPurchase(),
         ];
         if ($claim->getType() == Claim::TYPE_LOSS) {
             return $this->render('AppBundle:User:claimLoss.html.twig', $data);

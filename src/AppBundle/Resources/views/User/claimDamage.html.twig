@@ -96,7 +96,7 @@
                             </div>
                         </div>
 
-                        {% if picture_of_phone is defined and picture_of_phone %}
+                        {% if claim_form.pictureOfPhone is defined %}
                             <div class="row">
                                 <div class="col-sm-6">
                                     <div class="form-group {% if form_errors(claim_form.pictureOfPhone) %}has-error{% endif %}">
@@ -114,7 +114,7 @@
                         {% endif %}
 
                         {% set sectionCount = 3 %}
-                        {% if proof_of_usage is defined and proof_of_usage %}
+                        {% if claim_form.proofOfUsage is defined %}
                             {% set sectionCount = 4 %}
 
                             <div class="panel panel-info">

@@ -45,7 +45,7 @@
 
                     {{ form_start(claim_form, {'attr': {'data-toggle': 'validator', 'class': 'validate-form claim__form-generic', 'id':'claim-form', 'data-client-validation': form_client_validation }}) }}
 
-                        {% if proof_of_usage is defined and proof_of_usage %}
+                        {% if claim_form.proofOfUsage is defined %}
 
                             <div class="panel panel-info">
                                 <div class="panel-heading">
@@ -70,7 +70,7 @@
 
                         {% endif %}
 
-                        {% if picture_of_phone is defined and picture_of_phone %}
+                        {% if claim_form.pictureOfPhone is defined %}
 
                             <div class="panel panel-info">
                                 <div class="panel-heading">
@@ -95,7 +95,7 @@
 
                         {% endif %}
 
-                        {% if proof_of_barring is defined and proof_of_barring %}
+                        {% if claim_form.proofOfBarring is defined %}
 
                             <div class="panel panel-info">
                                 <div class="panel-heading">
@@ -119,7 +119,7 @@
                             </div>
                         {% endif %}
 
-                        {% if proof_of_purchase is defined and proof_of_purchase %}
+                        {% if claim_form.proofOfPurchase is defined %}
 
 
                             <div class="panel panel-info">
@@ -141,7 +141,6 @@
                                     </div>
                                     <div class="help-block with-errors">{{ form_errors(claim_form.proofOfPurchase) }}</div>
                                 </div>
-                            </div>
                             </div>
                         {% endif %}
 

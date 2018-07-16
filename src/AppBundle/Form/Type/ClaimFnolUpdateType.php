@@ -2,6 +2,7 @@
 
 namespace AppBundle\Form\Type;
 
+use AppBundle\Document\Form\ClaimFnolUpdate;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -53,32 +54,27 @@ class ClaimFnolUpdateType extends AbstractType
             $form = $event->getForm();
             $claim = $event->getData()->getClaim();
 
-            if (!$claim->needProofOfUsage()) {
-                $form->add('proofOfUsage', HiddenType::class);
-            } else {
+            if ($claim->needProofOfUsage()) {
                 $form->add('proofOfUsage', FileType::class, ['required' => false]);
             }
+
             if ($claim->getType() == Claim::TYPE_DAMAGE && $claim->needPictureOfPhone()) {
                 $form->add('pictureOfPhone', FileType::class, ['required' => false]);
-            } else {
-                $form->add('pictureOfPhone', HiddenType::class);
             }
+
             if (($claim->getType() == Claim::TYPE_THEFT || $claim->getType() == Claim::TYPE_LOSS)) {
                 $form->add('proofOfBarring', FileType::class, ['required' => false]);
-            } else {
-                $form->add('proofOfBarring', HiddenType::class);
             }
             if (($claim->getType() == Claim::TYPE_THEFT || $claim->getType() == Claim::TYPE_LOSS) &&
                 $claim->needProofOfPurchase()
             ) {
                 $form->add('proofOfPurchase', FileType::class, ['required' => false]);
-            } else {
-                $form->add('proofOfPurchase', HiddenType::class);
             }
         });
 
         $builder->addEventListener(FormEvents::SUBMIT, function (FormEvent $event) {
             $form = $event->getForm();
+            /** @var ClaimFnolUpdate $data */
             $data = $event->getData();
 
             $now = new \DateTime();

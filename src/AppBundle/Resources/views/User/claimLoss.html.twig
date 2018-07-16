@@ -72,7 +72,7 @@
                                     <li>
                                         Request a <strong>Proof of Barring</strong> document from them.
                                     </li>
-                                    {% if proof_of_usage is defined and proof_of_usage %}
+                                    {% if claim_form.proofOfUsage is defined %}
                                         <li>
                                             Request a <strong>Proof of Usage</strong> document from them.  This is a standard document and the network provider will easily able to email or post this document to you (ask for email for a quicker claim).  This document has your IMEI number and the first and last time that IMEI was used on their network.
                                         </li>
@@ -102,7 +102,7 @@
                                 </div>
                             </div>
                         </div>
-                        {% if proof_of_usage is defined and proof_of_usage %}
+                        {% if claim_form.proofOfUsage is defined %}
                             <div class="row">
                                 <div class="col-sm-6">
                                     <div class="form-group {% if form_errors(claim_form.proofOfUsage) %}has-error{% endif %}">
@@ -168,7 +168,7 @@
                         </div>
 
                         {% set sectionCount = 3 %}
-                        {% if proof_of_purchase is defined and proof_of_purchase %}
+                        {% if claim_form.proofOfPurchase is defined %}
                             {% set sectionCount = 4 %}
                             <div class="panel panel-info">
                                 <div class="panel-heading">

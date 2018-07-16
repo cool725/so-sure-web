@@ -78,19 +78,14 @@ class ClaimFnolTheftLossType extends AbstractType
             $form = $event->getForm();
             $claim = $event->getData()->getClaim();
 
-            if (!$claim->needProofOfUsage()) {
-                $form->add('proofOfUsage', HiddenType::class);
-            } else {
+            if ($claim->needProofOfUsage()) {
                 $form->add('proofOfUsage', FileType::class, ['required' => false]);
             }
-            if (!$claim->needProofOfPurchase()) {
-                $form->add('proofOfPurchase', HiddenType::class);
-            } else {
+            if ($claim->needProofOfPurchase()) {
                 $form->add('proofOfPurchase', FileType::class, ['required' => false]);
             }
             if ($claim->getType() == Claim::TYPE_THEFT) {
                 $form->add('crimeReferenceNumber', TextType::class, ['required' => false]);
-                $form->add('proofOfLoss', HiddenType::class);
                 $form->add('reportType', HiddenType::class);
             } else {
                 $form->add('crimeReferenceNumber', TextType::class, ['required' => false]);
