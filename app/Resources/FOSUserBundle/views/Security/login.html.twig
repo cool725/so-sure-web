@@ -6,7 +6,18 @@
             {% if app.user is not null and app.user %}
                 <h3 class="h-light">You're logged in as:</h3>
                 <h1 class="text-center h2">{{ app.user.name }}</h1>
-                <p><a href="{{ path('fos_user_security_logout') }}" class="btn btn-blue-hollow">Logout</a></p>
+                <p>
+                    {% if is_granted('ROLE_ADMIN') %}
+                        <a href="{{ path('admin_home') }}" class="btn btn-blue-hollow"><i class="fa fa-home"></i> Admin</a>
+                    {% elseif is_granted('ROLE_EMPLOYEE') %}
+                        <a href="{{ path('admin_home') }}" class="btn btn-blue-hollow"><i class="fa fa-home"></i> Admin</a>
+                    {% elseif is_granted('ROLE_CLAIMS') %}
+                        <a href="{{ path('claims_home') }}" class="btn btn-blue-hollow"><i class="fa fa-home"></i> Claims</a>
+                    {% else %}
+                        <a href="{{ path('user_home') }}">Your Account</a>
+                    {% endif %}
+                </p>
+                <p><a href="{{ path('fos_user_security_logout') }}" class="btn btn-link">Logout</a></p>
             {% else %}
                 <h1 class="text-center h2">Welcome back!</h1>
                 {# Email Login #}
