@@ -510,6 +510,7 @@ nelmio_security:
                 - https://intercom-sheets.com
                 - https://js.intercomcdn.com
                 - https://fast.wistia.net
+                - http://widget.trustpilot.com
             script-src:
                 - 'self'
                 - 'unsafe-inline'
