@@ -1723,7 +1723,6 @@ class UserController extends BaseController
         ];
         if ($claim->getType() == Claim::TYPE_LOSS) {
             return $this->render('AppBundle:User:claimLoss.html.twig', $data);
-
         } elseif ($claim->getType() == Claim::TYPE_THEFT) {
             return $this->render('AppBundle:User:claimTheft.html.twig', $data);
         } else {
