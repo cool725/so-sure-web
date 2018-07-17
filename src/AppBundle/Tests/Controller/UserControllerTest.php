@@ -1229,57 +1229,8 @@ class UserControllerTest extends BaseControllerTest
         $this->assertTrue($claim->needProofOfUsage());
         $this->assertTrue($claim->needPictureOfPhone());
 
-        $proofOfUsageFile = sprintf(
-            "%s/../src/AppBundle/Tests/Resources/proofOfUsage.txt",
-            self::$rootDir
-        );
-        $proofOfUsage = new UploadedFile(
-            $proofOfUsageFile,
-            'proofOfUsage.txt',
-            'text/plain',
-            14
-        );
-
-        $damagePictureFile = sprintf(
-            "%s/../src/AppBundle/Tests/Resources/damagePicture.jpg",
-            self::$rootDir
-        );
-        $damagePicture = new UploadedFile(
-            $damagePictureFile,
-            'damagePicture.jpg',
-            'image/jpeg',
-            1305630
-        );
-
-        $claimPage = self::$router->generate('claimed_damage_policy', ['policyId' => $policy->getId()]);
         $this->login($email, $password);
-        $crawler = self::$client->request('GET', $claimPage);
-        self::verifyResponse(200);
-        $form = $crawler->selectButton('claim_damage_form[confirm]')->form();
-        $form['claim_damage_form[typeDetails]'] = Claim::DAMAGE_BROKEN_SCREEN;
-        $form['claim_damage_form[typeDetailsOther]'] = '';
-        $form['claim_damage_form[monthOfPurchase]'] = 'December';
-        $form['claim_damage_form[yearOfPurchase]'] = '2018';
-        $form['claim_damage_form[phoneStatus]'] = Claim::PHONE_STATUS_NEW;
-        $form['claim_damage_form[proofOfUsage]']->upload($proofOfUsage);
-        $form['claim_damage_form[pictureOfPhone]']->upload($damagePicture);
-        $crawler = self::$client->submit($form);
-
-        self::verifyResponse(302);
-        $this->assertTrue(self::$client->getResponse()->isRedirect(sprintf('/user/claim/%s', $policy->getId())));
-
-        $claimPage = self::$router->generate('claimed_submitted_policy', ['policyId' => $policy->getId()]);
-        $crawler = self::$client->request('GET', $claimPage);
-        self::verifyResponse(200);
-
-        $this->assertContains(
-            "Thank you for submitting your claim",
-            self::$client->getResponse()->getContent()
-        );
-
-        $updatedPolicy = $this->assertPolicyByIdExists(self::$client->getContainer(), $policy->getId());
-        $updatedClaim = $updatedPolicy->getLatestClaim();
-        $this->assertEquals(Claim::STATUS_SUBMITTED, $updatedClaim->getStatus());
+        $this->submitDamageForm($policy, $now, true, true);
     }
 
     public function testUserClaimDamageNoPictureOfPhone()
@@ -1306,43 +1257,55 @@ class UserControllerTest extends BaseControllerTest
         $this->assertTrue($claim->needProofOfUsage());
         $this->assertFalse($claim->needPictureOfPhone());
 
-        $proofOfUsageFile = sprintf(
-            "%s/../src/AppBundle/Tests/Resources/proofOfUsage.txt",
-            self::$rootDir
-        );
-        $proofOfUsage = new UploadedFile(
-            $proofOfUsageFile,
-            'proofOfUsage.txt',
-            'text/plain',
-            14
-        );
-
-        $claimPage = self::$router->generate('claimed_damage_policy', ['policyId' => $policy->getId()]);
         $this->login($email, $password);
-        $crawler = self::$client->request('GET', $claimPage);
-        self::verifyResponse(200);
-        $form = $crawler->selectButton('claim_damage_form[confirm]')->form();
-        $form['claim_damage_form[typeDetails]'] = Claim::DAMAGE_BROKEN_SCREEN;
-        $form['claim_damage_form[typeDetailsOther]'] = '';
-        $form['claim_damage_form[monthOfPurchase]'] = 'December';
-        $form['claim_damage_form[yearOfPurchase]'] = '2018';
-        $form['claim_damage_form[phoneStatus]'] = Claim::PHONE_STATUS_NEW;
-        $form['claim_damage_form[proofOfUsage]']->upload($proofOfUsage);
 
-        $this->assertFalse(isset($form['claim_damage_form[pictureOfPhone]']));
-        $crawler = self::$client->submit($form);
+        $this->submitDamageForm($policy, $now, true, false);
+    }
 
-        self::verifyResponse(302);
-        $this->assertTrue(self::$client->getResponse()->isRedirect(sprintf('/user/claim/%s', $policy->getId())));
-
-        $claimPage = self::$router->generate('claimed_submitted_policy', ['policyId' => $policy->getId()]);
-        $crawler = self::$client->request('GET', $claimPage);
-        self::verifyResponse(200);
-
-        $this->assertContains(
-            "Thank you for submitting your claim",
-            self::$client->getResponse()->getContent()
+    public function testUserClaimDamageNoProofOfUsage()
+    {
+        $email = self::generateEmail('testUserClaimDamageNoProofOfUsage', $this);
+        $password = 'foo';
+        $phone = self::getRandomPhone(self::$dm);
+        $user = self::createUser(
+            self::$userManager,
+            $email,
+            $password,
+            $phone,
+            self::$dm
         );
+        $now = new \DateTime();
+        $twoMonthAgo = new \DateTime();
+        $twoMonthAgo = $twoMonthAgo->sub(new \DateInterval('P2M'));
+        $policy = self::initPolicy($user, self::$dm, $phone, $twoMonthAgo, true, true);
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_APPROVED);
+
+        $email2 = self::generateEmail('testUserClaimDamageNoProofOfUsage-2', $this);
+        $user2 = self::createUser(
+            self::$userManager,
+            $email2,
+            $password,
+            $phone,
+            self::$dm
+        );
+        $now = new \DateTime();
+        $twoMonthAgo = new \DateTime();
+        $twoMonthAgo = $twoMonthAgo->sub(new \DateInterval('P2M'));
+        $policy2 = self::initPolicy($user2, self::$dm, $phone, $twoMonthAgo, true, true);
+        $policy2->setStatus(Policy::STATUS_ACTIVE);
+        $policy2->setPicSureStatus(PhonePolicy::PICSURE_STATUS_APPROVED);
+
+        self::$invitationService->connect($policy, $policy2);
+
+        $claim = $this->createClaim($policy, Claim::TYPE_DAMAGE, $now);
+
+        $this->assertFalse($claim->needProofOfUsage());
+        $this->assertFalse($claim->needPictureOfPhone());
+
+        $this->login($email, $password);
+
+        $this->submitDamageForm($policy, $now, false, false);
     }
 
     public function testUserClaimLoss()
@@ -1369,15 +1332,6 @@ class UserControllerTest extends BaseControllerTest
 
         $this->login($email, $password);
         $this->submitLossTheftForm($policy, $now, true, true);
-
-        $claimPage = self::$router->generate('claimed_submitted_policy', ['policyId' => $policy->getId()]);
-        $crawler = self::$client->request('GET', $claimPage);
-        self::verifyResponse(200);
-
-        $this->assertContains(
-            "Thank you for submitting your claim",
-            self::$client->getResponse()->getContent()
-        );
     }
 
     public function testUserClaimLossNoProofOfPurchase()
@@ -1406,6 +1360,48 @@ class UserControllerTest extends BaseControllerTest
 
         $this->login($email, $password);
         $this->submitLossTheftForm($policy, $now, true, false);
+    }
+
+    public function testUserClaimLossNoProofOfUsage()
+    {
+        $email = self::generateEmail('testUserClaimLossNoProofOfUsage', $this);
+        $password = 'foo';
+        $phone = self::getRandomPhone(self::$dm);
+        $user = self::createUser(
+            self::$userManager,
+            $email,
+            $password,
+            $phone,
+            self::$dm
+        );
+        $now = new \DateTime();
+        $twoMonthAgo = new \DateTime();
+        $twoMonthAgo = $twoMonthAgo->sub(new \DateInterval('P2M'));
+        $policy = self::initPolicy($user, self::$dm, $phone, $twoMonthAgo, true, true);
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_APPROVED);
+
+        $email2 = self::generateEmail('testUserClaimLossNoProofOfUsage2', $this);
+        $user2 = self::createUser(
+            self::$userManager,
+            $email2,
+            $password,
+            $phone,
+            self::$dm
+        );
+        $policy2 = self::initPolicy($user2, self::$dm, $phone, $twoMonthAgo, true, true);
+        $policy2->setStatus(Policy::STATUS_ACTIVE);
+        $policy2->setPicSureStatus(PhonePolicy::PICSURE_STATUS_APPROVED);
+
+        self::$invitationService->connect($policy, $policy2);
+
+        $claim = $this->createClaim($policy, Claim::TYPE_LOSS, $now);
+
+        $this->assertFalse($claim->needProofOfUsage());
+        $this->assertFalse($claim->needProofOfPurchase());
+
+        $this->login($email, $password);
+        $this->submitLossTheftForm($policy, $now, false, false);
     }
 
     public function testUserClaimTheft()
@@ -1462,6 +1458,48 @@ class UserControllerTest extends BaseControllerTest
         $this->submitLossTheftForm($policy, $now, true, false);
     }
 
+    public function testUserClaimTheftNoProofOfUsage()
+    {
+        $email = self::generateEmail('testUserClaimTheftNoProofOfUsage', $this);
+        $password = 'foo';
+        $phone = self::getRandomPhone(self::$dm);
+        $user = self::createUser(
+            self::$userManager,
+            $email,
+            $password,
+            $phone,
+            self::$dm
+        );
+        $now = new \DateTime();
+        $twoMonthAgo = new \DateTime();
+        $twoMonthAgo = $twoMonthAgo->sub(new \DateInterval('P2M'));
+        $policy = self::initPolicy($user, self::$dm, $phone, $twoMonthAgo, true, true);
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_APPROVED);
+
+        $email2 = self::generateEmail('testUserClaimTheftNoProofOfUsage2', $this);
+        $user2 = self::createUser(
+            self::$userManager,
+            $email2,
+            $password,
+            $phone,
+            self::$dm
+        );
+        $policy2 = self::initPolicy($user2, self::$dm, $phone, $twoMonthAgo, true, true);
+        $policy2->setStatus(Policy::STATUS_ACTIVE);
+        $policy2->setPicSureStatus(PhonePolicy::PICSURE_STATUS_APPROVED);
+
+        self::$invitationService->connect($policy, $policy2);
+
+        $claim = $this->createClaim($policy, Claim::TYPE_THEFT, $now);
+
+        $this->assertFalse($claim->needProofOfUsage());
+        $this->assertFalse($claim->needProofOfPurchase());
+
+        $this->login($email, $password);
+        $this->submitLossTheftForm($policy, $now, false, false);
+    }
+
     public function testUserClaimUpdateTheft()
     {
         $email = self::generateEmail('testUserClaimUpdateTheft', $this);
@@ -1488,6 +1526,194 @@ class UserControllerTest extends BaseControllerTest
         $this->submitLossTheftForm($policy, $now, true, true);
 
         $this->updateLossTheftForm($policy, $now, true, true);
+    }
+
+    public function testUserClaimUpdateTheftNoProofOfUsage()
+    {
+        $email = self::generateEmail('testUserClaimUpdateTheftNoProofOfUsage', $this);
+        $password = 'foo';
+        $phone = self::getRandomPhone(self::$dm);
+        $user = self::createUser(
+            self::$userManager,
+            $email,
+            $password,
+            $phone,
+            self::$dm
+        );
+        $now = new \DateTime();
+        $twoMonthAgo = new \DateTime();
+        $twoMonthAgo = $twoMonthAgo->sub(new \DateInterval('P2M'));
+        $policy = self::initPolicy($user, self::$dm, $phone, $twoMonthAgo, true, true);
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_APPROVED);
+
+        $email2 = self::generateEmail('testUserClaimUpdateTheftNoProofOfUsage2', $this);
+        $user2 = self::createUser(
+            self::$userManager,
+            $email2,
+            $password,
+            $phone,
+            self::$dm
+        );
+        $policy2 = self::initPolicy($user2, self::$dm, $phone, $twoMonthAgo, true, true);
+        $policy2->setStatus(Policy::STATUS_ACTIVE);
+        $policy2->setPicSureStatus(PhonePolicy::PICSURE_STATUS_APPROVED);
+
+        self::$invitationService->connect($policy, $policy2);
+
+        $claim = $this->createClaim($policy, Claim::TYPE_THEFT, $now);
+
+        $this->assertFalse($claim->needProofOfUsage());
+        $this->assertFalse($claim->needProofOfPurchase());
+
+        $this->login($email, $password);
+        $this->submitLossTheftForm($policy, $now, false, false);
+
+        $this->updateLossTheftForm($policy, $now, false, false);
+    }
+
+    public function testUserClaimUpdateLoss()
+    {
+        $email = self::generateEmail('testUserClaimUpdateLoss', $this);
+        $password = 'foo';
+        $phone = self::getRandomPhone(self::$dm);
+        $user = self::createUser(
+            self::$userManager,
+            $email,
+            $password,
+            $phone,
+            self::$dm
+        );
+        $now = new \DateTime('2018-01-01');
+        $policy = self::initPolicy($user, self::$dm, $phone, null, true, true);
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        $policy->setStart($now);
+
+        $claim = $this->createClaim($policy, Claim::TYPE_LOSS, $now);
+
+        $this->assertTrue($claim->needProofOfUsage());
+        $this->assertTrue($claim->needProofOfPurchase());
+
+        $this->login($email, $password);
+        $this->submitLossTheftForm($policy, $now, true, true);
+
+        $this->updateLossTheftForm($policy, $now, true, true);
+    }
+
+    public function testUserClaimUpdateLossNoProofOfUsage()
+    {
+        $email = self::generateEmail('testUserClaimUpdateLossNoProofOfUsage', $this);
+        $password = 'foo';
+        $phone = self::getRandomPhone(self::$dm);
+        $user = self::createUser(
+            self::$userManager,
+            $email,
+            $password,
+            $phone,
+            self::$dm
+        );
+        $now = new \DateTime();
+        $twoMonthAgo = new \DateTime();
+        $twoMonthAgo = $twoMonthAgo->sub(new \DateInterval('P2M'));
+        $policy = self::initPolicy($user, self::$dm, $phone, $twoMonthAgo, true, true);
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_APPROVED);
+
+        $email2 = self::generateEmail('testUserClaimUpdateLossNoProofOfUsage2', $this);
+        $user2 = self::createUser(
+            self::$userManager,
+            $email2,
+            $password,
+            $phone,
+            self::$dm
+        );
+        $policy2 = self::initPolicy($user2, self::$dm, $phone, $twoMonthAgo, true, true);
+        $policy2->setStatus(Policy::STATUS_ACTIVE);
+        $policy2->setPicSureStatus(PhonePolicy::PICSURE_STATUS_APPROVED);
+
+        self::$invitationService->connect($policy, $policy2);
+
+        $claim = $this->createClaim($policy, Claim::TYPE_LOSS, $now);
+
+        $this->assertFalse($claim->needProofOfUsage());
+        $this->assertFalse($claim->needProofOfPurchase());
+
+        $this->login($email, $password);
+        $this->submitLossTheftForm($policy, $now, false, false);
+
+        $this->updateLossTheftForm($policy, $now, false, false);
+    }
+
+    public function testUserClaimUpdateDamage()
+    {
+        $email = self::generateEmail('testUserClaimUpdateDamage', $this);
+        $password = 'foo';
+        $phone = self::getRandomPhone(self::$dm);
+        $user = self::createUser(
+            self::$userManager,
+            $email,
+            $password,
+            $phone,
+            self::$dm
+        );
+        $now = new \DateTime('2018-01-01');
+        $policy = self::initPolicy($user, self::$dm, $phone, null, true, true);
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        $policy->setStart($now);
+
+        $claim = $this->createClaim($policy, Claim::TYPE_DAMAGE, $now);
+
+        $this->assertTrue($claim->needProofOfUsage());
+        $this->assertTrue($claim->needProofOfPurchase());
+
+        $this->login($email, $password);
+        $this->submitDamageForm($policy, $now, true, true);
+
+        $this->updateDamageForm($policy, $now, true, true);
+    }
+
+    public function testUserClaimUpdateDamageNoProofOfUsage()
+    {
+        $email = self::generateEmail('testUserClaimUpdateDamageNoProofOfUsage', $this);
+        $password = 'foo';
+        $phone = self::getRandomPhone(self::$dm);
+        $user = self::createUser(
+            self::$userManager,
+            $email,
+            $password,
+            $phone,
+            self::$dm
+        );
+        $now = new \DateTime();
+        $twoMonthAgo = new \DateTime();
+        $twoMonthAgo = $twoMonthAgo->sub(new \DateInterval('P2M'));
+        $policy = self::initPolicy($user, self::$dm, $phone, $twoMonthAgo, true, true);
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_APPROVED);
+
+        $email2 = self::generateEmail('testUserClaimUpdateDamageNoProofOfUsage2', $this);
+        $user2 = self::createUser(
+            self::$userManager,
+            $email2,
+            $password,
+            $phone,
+            self::$dm
+        );
+        $policy2 = self::initPolicy($user2, self::$dm, $phone, $twoMonthAgo, true, true);
+        $policy2->setStatus(Policy::STATUS_ACTIVE);
+        $policy2->setPicSureStatus(PhonePolicy::PICSURE_STATUS_APPROVED);
+
+        self::$invitationService->connect($policy, $policy2);
+
+        $claim = $this->createClaim($policy, Claim::TYPE_DAMAGE, $now);
+
+        $this->assertFalse($claim->needProofOfUsage());
+        $this->assertFalse($claim->needProofOfPurchase());
+
+        $this->login($email, $password);
+        $this->submitDamageForm($policy, $now, false, false);
+
+        $this->updateDamageForm($policy, $now, false, false);
     }
 
     private function createClaim(Policy $policy, $type, \DateTime $date)
@@ -1623,6 +1849,89 @@ class UserControllerTest extends BaseControllerTest
         }
     }
 
+    private function submitDamageForm(
+        Policy $policy,
+        \DateTime $now,
+        $requireProofOfUsage,
+        $requirePicture
+    ) {
+        $serializer = new Serializer(array(new DateTimeNormalizer()));
+
+        $proofOfUsageFile = sprintf(
+            "%s/../src/AppBundle/Tests/Resources/proofOfUsage.txt",
+            self::$rootDir
+        );
+        $proofOfUsage = new UploadedFile(
+            $proofOfUsageFile,
+            'proofOfUsage.txt',
+            'text/plain',
+            14
+        );
+
+        $damagePictureFile = sprintf(
+            "%s/../src/AppBundle/Tests/Resources/damagePicture.jpg",
+            self::$rootDir
+        );
+        $damagePicture = new UploadedFile(
+            $damagePictureFile,
+            'damagePicture.jpg',
+            'image/jpeg',
+            1305630
+        );
+
+        $claimPage = self::$router->generate('claimed_damage_policy', ['policyId' => $policy->getId()]);
+        $crawler = self::$client->request('GET', $claimPage);
+        self::verifyResponse(200);
+        $form = $crawler->selectButton('claim_damage_form[confirm]')->form();
+        $form['claim_damage_form[typeDetails]'] = Claim::DAMAGE_BROKEN_SCREEN;
+        $form['claim_damage_form[typeDetailsOther]'] = '';
+        $form['claim_damage_form[monthOfPurchase]'] = 'December';
+        $form['claim_damage_form[yearOfPurchase]'] = '2018';
+        $form['claim_damage_form[phoneStatus]'] = Claim::PHONE_STATUS_NEW;
+
+        if ($requireProofOfUsage) {
+            $this->assertTrue(isset($form['claim_damage_form[proofOfUsage]']));
+            $form['claim_damage_form[proofOfUsage]']->upload($proofOfUsage);
+        } else {
+            $this->assertFalse(isset($form['claim_damage_form[proofOfUsage]']));
+        }
+        if ($requirePicture) {
+            $this->assertTrue(isset($form['claim_damage_form[pictureOfPhone]']));
+            $form['claim_damage_form[pictureOfPhone]']->upload($damagePictureFile);
+        } else {
+            $this->assertFalse(isset($form['claim_damage_form[pictureOfPhone]']));
+        }
+        $crawler = self::$client->submit($form);
+
+        self::verifyResponse(302);
+        $this->assertTrue(self::$client->getResponse()->isRedirect(sprintf('/user/claim/%s', $policy->getId())));
+
+        $claimPage = self::$router->generate('claimed_submitted_policy', ['policyId' => $policy->getId()]);
+        $crawler = self::$client->request('GET', $claimPage);
+        self::verifyResponse(200);
+
+        $this->assertContains(
+            "Thank you for submitting your claim",
+            self::$client->getResponse()->getContent()
+        );
+
+        /** @var Policy $updatedPolicy */
+        $updatedPolicy = $this->assertPolicyByIdExists(self::$client->getContainer(), $policy->getId());
+        $updatedClaim = $updatedPolicy->getLatestClaim();
+        $this->assertEquals(Claim::DAMAGE_BROKEN_SCREEN, $updatedClaim->getTypeDetails());
+
+        if ($requireProofOfUsage) {
+            $this->assertEquals(1, count($updatedClaim->getProofOfUsageFiles()));
+        } else {
+            $this->assertEquals(0, count($updatedClaim->getProofOfUsageFiles()));
+        }
+        if ($requirePicture) {
+            $this->assertEquals(1, count($updatedClaim->getDamagePictureFiles()));
+        } else {
+            $this->assertEquals(0, count($updatedClaim->getDamagePictureFiles()));
+        }
+    }
+
     private function updateLossTheftForm(
         Policy $policy,
         \DateTime $now,
@@ -1695,9 +2004,100 @@ class UserControllerTest extends BaseControllerTest
 
         $this->expectFlashSuccess($crawler, 'Your claim has been updated');
 
+        /** @var Policy $updatedPolicy */
         $updatedPolicy = $this->assertPolicyByIdExists(self::$client->getContainer(), $policy->getId());
         $updatedClaim = $updatedPolicy->getLatestClaim();
         $this->assertEquals(Claim::STATUS_SUBMITTED, $updatedClaim->getStatus());
+        $this->assertEquals(2, count($updatedClaim->getProofOfBarringFiles()));
+        if ($requireProofOfUsage) {
+            $this->assertEquals(2, count($updatedClaim->getProofOfUsageFiles()));
+        } else {
+            $this->assertEquals(0, count($updatedClaim->getProofOfUsageFiles()));
+        }
+        if ($requireProofOfPurchase) {
+            $this->assertEquals(2, count($updatedClaim->getProofOfPurchaseFiles()));
+        } else {
+            $this->assertEquals(0, count($updatedClaim->getProofOfPurchaseFiles()));
+        }
+    }
+
+    private function updateDamageForm(
+        Policy $policy,
+        \DateTime $now,
+        $requireProofOfUsage,
+        $requirePicture
+    ) {
+        $serializer = new Serializer(array(new DateTimeNormalizer()));
+
+        $proofOfUsageFile = sprintf(
+            "%s/../src/AppBundle/Tests/Resources/proofOfUsage.txt",
+            self::$rootDir
+        );
+        $proofOfUsage = new UploadedFile(
+            $proofOfUsageFile,
+            'proofOfUsage.txt',
+            'text/plain',
+            14
+        );
+
+        $damagePictureFile = sprintf(
+            "%s/../src/AppBundle/Tests/Resources/damagePicture.jpg",
+            self::$rootDir
+        );
+        $damagePicture = new UploadedFile(
+            $damagePictureFile,
+            'damagePicture.jpg',
+            'image/jpeg',
+            1305630
+        );
+
+        $claimPage = self::$router->generate('claimed_submitted_policy', ['policyId' => $policy->getId()]);
+        $crawler = self::$client->request('GET', $claimPage);
+        self::verifyResponse(200);
+
+        $form = $crawler->selectButton('claim_update_form[confirm]')->form();
+
+        if ($requireProofOfUsage) {
+            $this->assertTrue(isset($form['claim_update_form[proofOfUsage]']));
+            $form['claim_update_form[proofOfUsage]']->upload($proofOfUsage);
+        } else {
+            $this->assertFalse(isset($form['claim_update_form[proofOfUsage]']));
+        }
+        $this->assertFalse(isset($form['claim_update_form[proofOfBarring]']));
+        $this->assertFalse(isset($form['claim_update_form[proofOfPurchase]']));
+        if ($requirePicture) {
+            $this->assertTrue(isset($form['claim_update_form[pictureOfPhone]']));
+            $form['claim_update_form[pictureOfPhone]']->upload($damagePicture);
+        } else {
+            $this->assertFalse(isset($form['claim_update_form[pictureOfPhone]']));
+        }
+        $crawler = self::$client->submit($form);
+
+        self::verifyResponse(302);
+        $this->assertTrue(self::$client->getResponse()->isRedirect(sprintf('/user/claim/%s', $policy->getId())));
+
+        $claimPage = self::$router->generate('claimed_submitted_policy', ['policyId' => $policy->getId()]);
+        $crawler = self::$client->request('GET', $claimPage);
+        self::verifyResponse(200);
+
+        $this->expectFlashSuccess($crawler, 'Your claim has been updated');
+
+        /** @var Policy $updatedPolicy */
+        $updatedPolicy = $this->assertPolicyByIdExists(self::$client->getContainer(), $policy->getId());
+        $updatedClaim = $updatedPolicy->getLatestClaim();
+        $this->assertEquals(Claim::STATUS_SUBMITTED, $updatedClaim->getStatus());
+        $this->assertEquals(0, count($updatedClaim->getProofOfBarringFiles()));
+        $this->assertEquals(0, count($updatedClaim->getProofOfPurchaseFiles()));
+        if ($requireProofOfUsage) {
+            $this->assertEquals(2, count($updatedClaim->getProofOfUsageFiles()));
+        } else {
+            $this->assertEquals(0, count($updatedClaim->getProofOfUsageFiles()));
+        }
+        if ($requirePicture) {
+            $this->assertEquals(2, count($updatedClaim->getDamagePictureFiles()));
+        } else {
+            $this->assertEquals(0, count($updatedClaim->getDamagePictureFiles()));
+        }
     }
 }
 
