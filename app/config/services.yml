@@ -1008,7 +1008,7 @@ services:
 
     app.form.type.claimfnoltheftloss:
         class: AppBundle\Form\Type\ClaimFnolTheftLossType
-        arguments: ["@app.claims"]
+        arguments: ["@app.claims", "@app.imei"]
         tags:
             - { name: form.type }
 

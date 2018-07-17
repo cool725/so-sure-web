@@ -140,6 +140,16 @@
                                 </div>
                             </div>
                             <div class="col-sm-6">
+                                <div class="form-group {% if form_errors(claim_form.force) %}has-error{% endif %}">
+                                    <label>Police Force</label>
+                                    {{ form_widget(claim_form.force, { 'attr': {'class': 'form-control', 'placeholder': 'Police claim no.'}}) }}
+                                    <div class="help-block with-errors">{{ form_errors(claim_form.force) }}</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-6">
                                 <div class="form-group {% if form_errors(claim_form.crimeReferenceNumber) %}has-error{% endif %}">
                                     <label>Police Crime Reference Number</label>
                                     {{ form_widget(claim_form.crimeReferenceNumber, { 'attr': {'class': 'form-control', 'placeholder': 'Police claim no.'}}) }}

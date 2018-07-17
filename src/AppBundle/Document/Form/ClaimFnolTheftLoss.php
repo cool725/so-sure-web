@@ -60,7 +60,7 @@ class ClaimFnolTheftLoss
      * @AppAssert\AlphanumericSpaceDot()
      * @Assert\Length(min="1", max="50")
      */
-    protected $policeLossReport;
+    protected $force;
 
     protected $isSave;
 
@@ -164,14 +164,14 @@ class ClaimFnolTheftLoss
         $this->crimeReferenceNumber = $crimeReferenceNumber;
     }
 
-    public function getPoliceLossReport()
+    public function getForce()
     {
-        return $this->policeLossReport;
+        return $this->force;
     }
     
-    public function setPoliceLossReport($policeLossReport)
+    public function setForce($force)
     {
-        $this->policeLossReport = $policeLossReport;
+        $this->force = $force;
     }
 
     public function getIsSave()
@@ -201,6 +201,6 @@ class ClaimFnolTheftLoss
             $this->reportType = Claim::REPORT_POLICE_STATION;
         }
         $this->crimeReferenceNumber = $claim->getCrimeRef();
-        $this->policeLossReport = $claim->getPoliceLossReport();
+        $this->force = $claim->getForce();
     }
 }

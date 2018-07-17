@@ -662,14 +662,6 @@ class Claim
     protected $reportType;
 
     /**
-     * @AppAssert\AlphanumericSpaceDot()
-     * @Assert\Length(min="1", max="50")
-     * @MongoDB\Field(type="string")
-     * @Gedmo\Versioned
-     */
-    protected $policeLossReport;
-
-    /**
      * @MongoDB\ReferenceMany(
      *  targetDocument="AppBundle\Document\File\S3ClaimFile",
      *  cascade={"persist"}
@@ -1516,16 +1508,6 @@ class Claim
         $this->reportType = $reportType;
     }
 
-    public function getPoliceLossReport()
-    {
-        return $this->policeLossReport;
-    }
-
-    public function setPoliceLossReport($policeLossReport)
-    {
-        $this->policeLossReport = $policeLossReport;
-    }
-
     public function addFile(S3ClaimFile $file)
     {
         $file->setClaim($this);
@@ -1628,7 +1610,6 @@ class Claim
             'blockedDate' => $this->getBlockedDate() ? $this->getBlockedDate()->format(\DateTime::ATOM) : null,
             'reportedDate' => $this->getReportedDate() ? $this->getReportedDate()->format(\DateTime::ATOM) : null,
             'reportType' => $this->getReportType(),
-            'policeLossReport' => $this->getPoliceLossReport(),
             'replacementPhone' => $this->getReplacementPhone(),
             'replacementPhoneDetails' => $this->getReplacementPhoneDetails(),
             'replacementPhoneId' => $this->getReplacementPhone() ? $this->getReplacementPhone()->getId() : null,

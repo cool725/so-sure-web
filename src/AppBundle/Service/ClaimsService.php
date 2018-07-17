@@ -136,7 +136,7 @@ class ClaimsService
         $claim->setReportedDate($claimTheftLoss->getReportedDate());
         $claim->setReportType($claimTheftLoss->getReportType());
         $claim->setCrimeRef($claimTheftLoss->getCrimeReferenceNumber());
-        $claim->setPoliceLossReport($claimTheftLoss->getPoliceLossReport());
+        $claim->setForce($claimTheftLoss->getForce());
 
         if ($claimTheftLoss->getProofOfUsage()) {
             $proofOfUsage = new ProofOfUsageFile();

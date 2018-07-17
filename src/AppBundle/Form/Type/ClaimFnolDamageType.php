@@ -85,6 +85,7 @@ class ClaimFnolDamageType extends AbstractType
 
         $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
             $form = $event->getForm();
+            /** @var Claim $claim */
             $claim = $event->getData()->getClaim();
 
             if ($claim->needProofOfUsage()) {

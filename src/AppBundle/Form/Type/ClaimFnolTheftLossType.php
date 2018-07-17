@@ -3,6 +3,7 @@
 namespace AppBundle\Form\Type;
 
 use AppBundle\Document\Form\ClaimFnolTheftLoss;
+use AppBundle\Service\ReceperioService;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
@@ -33,11 +34,17 @@ class ClaimFnolTheftLossType extends AbstractType
     private $claimsService;
 
     /**
+     * @var ReceperioService
+     */
+    private $receperio;
+
+    /**
      * @param ClaimsService $claimsService
      */
-    public function __construct(ClaimsService $claimsService)
+    public function __construct(ClaimsService $claimsService, ReceperioService $receperio)
     {
         $this->claimsService = $claimsService;
+        $this->receperio = $receperio;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options)
@@ -72,6 +79,12 @@ class ClaimFnolTheftLossType extends AbstractType
             ->add('isSave', HiddenType::class)
             ->add('save', ButtonType::class)
             ->add('confirm', SubmitType::class)
+            ->add('crimeReferenceNumber', TextType::class, ['required' => false])
+            ->add('force', ChoiceType::class, [
+                'choices' => $this->receperio->getForces(),
+                'required' => false,
+                'placeholder' => 'Select a Police Force',
+            ])
         ;
 
         $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
@@ -85,10 +98,8 @@ class ClaimFnolTheftLossType extends AbstractType
                 $form->add('proofOfPurchase', FileType::class, ['required' => false]);
             }
             if ($claim->getType() == Claim::TYPE_THEFT) {
-                $form->add('crimeReferenceNumber', TextType::class, ['required' => false]);
                 $form->add('reportType', HiddenType::class);
             } else {
-                $form->add('crimeReferenceNumber', TextType::class, ['required' => false]);
                 $form->add('proofOfLoss', FileType::class, ['required' => false]);
                 $form->add('reportType', ChoiceType::class, [
                     'required' => false,
