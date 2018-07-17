@@ -577,7 +577,7 @@ class ClaimsService
         $key = str_replace(sprintf('%s/', $this->environment), '', $s3File->getKey());
 
         if (!$s3Adapater->has($key)) {
-            throw $this->createNotFoundException(sprintf('URL not found %s', $key));
+            throw new \Exception(sprintf('URL not found %s', $key));
         }
 
         $contents = $s3Adapater->read($key);
