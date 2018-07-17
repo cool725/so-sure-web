@@ -1825,7 +1825,9 @@ class UserControllerTest extends BaseControllerTest
 
         /** @var Policy $updatedPolicy */
         $updatedPolicy = $this->assertPolicyByIdExists(self::$client->getContainer(), $policy->getId());
+        /** @var Claim $updatedClaim */
         $updatedClaim = $updatedPolicy->getLatestClaim();
+        $this->assertNotNull($updatedClaim);
         $this->assertEquals(Claim::STATUS_SUBMITTED, $updatedClaim->getStatus());
         $this->assertTrue($updatedClaim->getHasContacted());
         $this->assertEquals('so-sure offices', $updatedClaim->getContactedPlace());
@@ -1917,7 +1919,9 @@ class UserControllerTest extends BaseControllerTest
 
         /** @var Policy $updatedPolicy */
         $updatedPolicy = $this->assertPolicyByIdExists(self::$client->getContainer(), $policy->getId());
+        /** @var Claim $updatedClaim */
         $updatedClaim = $updatedPolicy->getLatestClaim();
+        $this->assertNotNull($updatedClaim);
         $this->assertEquals(Claim::DAMAGE_BROKEN_SCREEN, $updatedClaim->getTypeDetails());
 
         if ($requireProofOfUsage) {
@@ -2006,7 +2010,9 @@ class UserControllerTest extends BaseControllerTest
 
         /** @var Policy $updatedPolicy */
         $updatedPolicy = $this->assertPolicyByIdExists(self::$client->getContainer(), $policy->getId());
+        /** @var Claim $updatedClaim */
         $updatedClaim = $updatedPolicy->getLatestClaim();
+        $this->assertNotNull($updatedClaim);
         $this->assertEquals(Claim::STATUS_SUBMITTED, $updatedClaim->getStatus());
         $this->assertEquals(2, count($updatedClaim->getProofOfBarringFiles()));
         if ($requireProofOfUsage) {
@@ -2084,7 +2090,9 @@ class UserControllerTest extends BaseControllerTest
 
         /** @var Policy $updatedPolicy */
         $updatedPolicy = $this->assertPolicyByIdExists(self::$client->getContainer(), $policy->getId());
+        /** @var Claim $updatedClaim */
         $updatedClaim = $updatedPolicy->getLatestClaim();
+        $this->assertNotNull($updatedClaim);
         $this->assertEquals(Claim::STATUS_SUBMITTED, $updatedClaim->getStatus());
         $this->assertEquals(0, count($updatedClaim->getProofOfBarringFiles()));
         $this->assertEquals(0, count($updatedClaim->getProofOfPurchaseFiles()));
