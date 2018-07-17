@@ -1234,6 +1234,10 @@ abstract class Policy
         return $this->claims;
     }
 
+    /**
+     * @param bool $requireReplacementImei
+     * @return Claim|null
+     */
     public function getLatestClaim($requireReplacementImei = false)
     {
         $claims = $this->getClaims();

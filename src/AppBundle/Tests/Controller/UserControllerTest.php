@@ -2,6 +2,7 @@
 
 namespace AppBundle\Tests\Controller;
 
+use AppBundle\Document\DateTrait;
 use AppBundle\Document\PhonePolicy;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\User;
@@ -24,6 +25,7 @@ class UserControllerTest extends BaseControllerTest
 {
     use \AppBundle\Tests\PhingKernelClassTrait;
     use CurrencyTrait;
+    use DateTrait;
 
     public function setUp()
     {
@@ -1566,6 +1568,7 @@ class UserControllerTest extends BaseControllerTest
             array(DateTimeNormalizer::FORMAT_KEY => 'd/m/Y')
         );
         $form['claim_theftloss_form[reportType]'] = Claim::REPORT_POLICE_STATION;
+        $form['claim_theftloss_form[force]'] = 'britishtransportpolice';
         $form['claim_theftloss_form[crimeReferenceNumber]'] = '1234567890';
         if ($requireProofOfUsage) {
             $this->assertTrue(isset($form['claim_theftloss_form[proofOfUsage]']));
@@ -1594,9 +1597,30 @@ class UserControllerTest extends BaseControllerTest
             self::$client->getResponse()->getContent()
         );
 
+        /** @var Policy $updatedPolicy */
         $updatedPolicy = $this->assertPolicyByIdExists(self::$client->getContainer(), $policy->getId());
         $updatedClaim = $updatedPolicy->getLatestClaim();
         $this->assertEquals(Claim::STATUS_SUBMITTED, $updatedClaim->getStatus());
+        $this->assertTrue($updatedClaim->getHasContacted());
+        $this->assertEquals('so-sure offices', $updatedClaim->getContactedPlace());
+        $today = $this->startOfDay($now);
+        $this->assertEquals($today, $updatedClaim->getBlockedDate());
+        $this->assertEquals($today, $updatedClaim->getReportedDate());
+        $this->assertEquals(Claim::REPORT_POLICE_STATION, $updatedClaim->getReportType());
+        $this->assertEquals('britishtransportpolice', $updatedClaim->getForce());
+        $this->assertEquals('1234567890', $updatedClaim->getCrimeRef());
+
+        $this->assertEquals(1, count($updatedClaim->getProofOfBarringFiles()));
+        if ($requireProofOfUsage) {
+            $this->assertEquals(1, count($updatedClaim->getProofOfUsageFiles()));
+        } else {
+            $this->assertEquals(0, count($updatedClaim->getProofOfUsageFiles()));
+        }
+        if ($requireProofOfPurchase) {
+            $this->assertEquals(1, count($updatedClaim->getProofOfPurchaseFiles()));
+        } else {
+            $this->assertEquals(0, count($updatedClaim->getProofOfPurchaseFiles()));
+        }
     }
 
     private function updateLossTheftForm(
