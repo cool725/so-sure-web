@@ -1609,13 +1609,14 @@ class UserController extends BaseController
 
         if ($claim === null) {
             return $this->redirectToRoute('claim_policy');
+        } elseif ($claim->getStatus() == Claim::STATUS_SUBMITTED) {
+            return $this->redirectToRoute('claimed_submitted_policy', ['policyId' => $policy->getId()]);
+        } elseif ($claim->getType() != Claim::TYPE_DAMAGE) {
+            return $this->redirectToRoute('claimed_policy', ['policyId' => $policy->getId()]);
         }
 
         $this->denyAccessUnlessGranted(ClaimVoter::EDIT, $claim);
 
-        if ($claim->getType() != Claim::TYPE_DAMAGE) {
-            return $this->redirectToRoute('claimed_policy', ['policyId' => $policy->getId()]);
-        }
 
         $claimFnolDamage = new ClaimFnolDamage();
         $claimFnolDamage->setClaim($claim);
@@ -1666,13 +1667,13 @@ class UserController extends BaseController
 
         if ($claim === null) {
             return $this->redirectToRoute('claim_policy');
+        } elseif ($claim->getStatus() == Claim::STATUS_SUBMITTED) {
+            return $this->redirectToRoute('claimed_submitted_policy', ['policyId' => $policy->getId()]);
+        } elseif (!($claim->getType() == Claim::TYPE_THEFT || $claim->getType() == Claim::TYPE_LOSS)) {
+            return $this->redirectToRoute('claimed_policy', ['policyId' => $policy->getId()]);
         }
 
         $this->denyAccessUnlessGranted(ClaimVoter::EDIT, $claim);
-
-        if (!($claim->getType() == Claim::TYPE_THEFT || $claim->getType() == Claim::TYPE_LOSS)) {
-            return $this->redirectToRoute('claimed_policy', ['policyId' => $policy->getId()]);
-        }
 
         $claimFnolTheftLoss = new ClaimFnolTheftLoss();
         $claimFnolTheftLoss->setClaim($claim);
