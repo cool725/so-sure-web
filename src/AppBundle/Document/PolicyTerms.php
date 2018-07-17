@@ -33,6 +33,9 @@ class PolicyTerms extends PolicyDocument
     // Minor tweaks for pic-sure
     const VERSION_7 = 'Version 7 July 2018';
 
+    // Minor tweaks for lawyers
+    const VERSION_8 = 'Version 8 July 2018';
+
     public static $allVersions = [
         self::VERSION_0,
         self::VERSION_1,
@@ -42,6 +45,7 @@ class PolicyTerms extends PolicyDocument
         self::VERSION_5,
         self::VERSION_6,
         self::VERSION_7,
+        self::VERSION_8,
     ];
 
     public function getVersionNumber()
@@ -65,6 +69,8 @@ class PolicyTerms extends PolicyDocument
             return '6';
         } elseif (in_array($version, [self::VERSION_7])) {
             return '7';
+        } elseif (in_array($version, [self::VERSION_8])) {
+            return '8';
         }
         return null;
     }
