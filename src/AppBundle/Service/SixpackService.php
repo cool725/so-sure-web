@@ -70,11 +70,11 @@ class SixpackService
     // Exp 3
     const EXPERIMENT_STARLING_LANDING = 'starling-landing';
     // Exp 4
-    const EXPERIMENT_PHONE_REPLACEMENT_MATCHING_ADVERT = 'phone-replacement-matching-advert';
+    // const EXPERIMENT_PHONE_REPLACEMENT_MATCHING_ADVERT = 'phone-replacement-matching-advert';
     // Exp 5
     const EXPERIMENT_AB_NEW_CONTENT = 'new-content-with-nav';
     // Exp 6
-
+    const EXPERIMENT_PHONE_REPLACEMENT = 'twentyfour-seventy-two';
     // Exp 7
 
     const ALTERNATIVES_SHARE_MESSAGE_SIMPLE = 'simple';
@@ -114,11 +114,11 @@ class SixpackService
         // Exp 3
         self::EXPERIMENT_STARLING_LANDING,
         // Exp 4
-        self::EXPERIMENT_PHONE_REPLACEMENT_MATCHING_ADVERT,
+        // self::EXPERIMENT_PHONE_REPLACEMENT_MATCHING_ADVERT,
         // Exp 5
         self::EXPERIMENT_AB_NEW_CONTENT,
         // Exp 6
-
+        self::EXPERIMENT_PHONE_REPLACEMENT,
         // Exp 7
 
     ];
@@ -161,9 +161,9 @@ class SixpackService
         // Exp 3
         self::EXPERIMENT_STARLING_LANDING,
         // Exp 4
-        self::EXPERIMENT_PHONE_REPLACEMENT_MATCHING_ADVERT,
+        // self::EXPERIMENT_PHONE_REPLACEMENT_MATCHING_ADVERT,
         // Exp 5
-
+        self::EXPERIMENT_PHONE_REPLACEMENT,
         // Exp 6
 
         // Exp 7
