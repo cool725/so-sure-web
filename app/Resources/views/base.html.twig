@@ -11,17 +11,17 @@
         {# NOTE: Whilst we are transitioning use two different main stylesheets #}
         {% block stylesheets %}
             {% if new_stylesheet is defined and new_stylesheet == 1 %}
-                {% if app is not null and app.session.isStarted and app.session.get('sixpack:new-content-with-nav') == 'new-content-with-nav' %}
+                {# {% if app is not null and app.session.isStarted and app.session.get('sixpack:new-content-with-nav') == 'new-content-with-nav' %}
                     {% stylesheets output='css/*.css'
                         '@AppBundle/Resources/public/sass/mainAB.scss'
                     %}<link rel="stylesheet" href="{{ asset_url }}">
                     {% endstylesheets %}
-                {% else %}
+                {% else %} #}
                     {% stylesheets output='css/*.css'
                         '@AppBundle/Resources/public/sass/mainNew.scss'
                     %}<link rel="stylesheet" href="{{ asset_url }}">
                     {% endstylesheets %}
-                {% endif %}
+                {# {% endif %} #}
             {% else %}
                 {% stylesheets output='css/*.css'
                     '@AppBundle/Resources/public/sass/main.scss'
