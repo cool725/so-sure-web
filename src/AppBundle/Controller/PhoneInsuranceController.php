@@ -529,9 +529,6 @@ class PhoneInsuranceController extends BaseController
         // Adwords landingpage test
         if (in_array($request->get('_route'), ['insurance_make_model_memory'])) {
             return $this->render('AppBundle:PhoneInsurance:adlanding.html.twig', $data);
-        } elseif ($expContent == 'new-content-with-nav') {
-            // If A/B content test
-            return $this->render('AppBundle:PhoneInsurance:quoteContent.html.twig', $data);
         } else {
             // Default
             return $this->render('AppBundle:PhoneInsurance:quote.html.twig', $data);
