@@ -58,11 +58,20 @@ class ClaimsTwigExtension extends \Twig_Extension
             );
         }
 
+        $others = array();
+        foreach ($claim->getOtherFiles() as $file) {
+            $others[] = array(
+                'filename' => $file->getFilename(),
+                'url' => $this->s3DownloadLink($file->getBucket(), $file->getKey())
+            );
+        }
+
         return array(
             'proofOfUsages' => $proofOfUsages,
             'proofOfBarrings' => $proofOfBarrings,
             'proofOfPurchases' => $proofOfPurchases,
             'damagePictures' => $damagePictures,
+            'others' => $others,
         );
     }
 

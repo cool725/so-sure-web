@@ -70,6 +70,8 @@ class ClaimFnolUpdateType extends AbstractType
             ) {
                 $form->add('proofOfPurchase', FileType::class, ['required' => false]);
             }
+            $form->add('other', FileType::class, ['required' => false]);
+
         });
 
         $builder->addEventListener(FormEvents::SUBMIT, function (FormEvent $event) {
@@ -115,6 +117,15 @@ class ClaimFnolUpdateType extends AbstractType
                     $filename->guessExtension()
                 );
                 $data->setProofOfPurchase($s3key);
+            }
+            if ($filename = $data->getOther()) {
+                $s3key = $this->claimsService->uploadS3(
+                    $filename,
+                    sprintf('other-%s', $timestamp),
+                    $data->getClaim()->getPolicy()->getUser()->getId(),
+                    $filename->guessExtension()
+                );
+                $data->setOther($s3key);
             }
         });
     }

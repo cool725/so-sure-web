@@ -50,6 +50,8 @@ class ClaimFnolTheftLoss
 
     protected $proofOfLoss;
 
+    protected $other;
+
     /**
      * @AppAssert\AlphanumericSpaceDot()
      * @Assert\Length(min="1", max="50")
@@ -152,6 +154,16 @@ class ClaimFnolTheftLoss
     public function setProofOfLoss($proofOfLoss)
     {
         $this->proofOfLoss = $proofOfLoss;
+    }
+
+    public function getOther()
+    {
+        return $this->other;
+    }
+    
+    public function setOther($other)
+    {
+        $this->other = $other;
     }
 
     public function getCrimeReferenceNumber()

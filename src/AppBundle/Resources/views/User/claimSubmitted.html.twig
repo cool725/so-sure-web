@@ -144,6 +144,24 @@
                             </div>
                         {% endif %}
 
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group {% if form_errors(claim_form.other) %}has-error{% endif %}">
+                                    <label>Other files <span class="req">*</span></label>
+                                    {% for file in claim.otherFiles %}
+                                        <p><a href="{{ s3DownloadLink(file.bucket, file.key) }}">{{ file.fileName }}</a> (Uploaded {{ file.created|date }})</p>
+                                    {% endfor %}
+                                    {{ form_widget(claim_form.other, { 'attr': {'class': 'form-control'}}) }}
+                                    <div class="help-block with-errors">
+                                        <a href="#" data-toggle="modal" data-target="#usageModal">
+                                            {{ claim.otherFiles|length }} file(s) upload
+                                        </a>
+                                    </div>
+                                    <div class="help-block with-errors">{{ form_errors(claim_form.other) }}</div>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="row" style="margin-top: 30px;">
                             <div class="col-xs-12 text-center">
                                 <div class="form-group">

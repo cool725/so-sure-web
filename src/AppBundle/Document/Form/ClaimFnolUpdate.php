@@ -28,6 +28,8 @@ class ClaimFnolUpdate
 
     protected $proofOfLoss;
 
+    protected $other;
+
     public function getProofOfUsage()
     {
         return $this->proofOfUsage;
@@ -76,6 +78,16 @@ class ClaimFnolUpdate
     public function setProofOfLoss($proofOfLoss)
     {
         $this->proofOfLoss = $proofOfLoss;
+    }
+
+    public function getOther()
+    {
+        return $this->other;
+    }
+    
+    public function setOther($other)
+    {
+        $this->other = $other;
     }
 
     public function getClaim()

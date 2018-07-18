@@ -13,6 +13,7 @@ use AppBundle\Document\File\ProofOfUsageFile;
 use AppBundle\Document\File\ProofOfBarringFile;
 use AppBundle\Document\File\ProofOfPurchaseFile;
 use AppBundle\Document\File\DamagePictureFile;
+use AppBundle\Document\File\OtherClaimFile;
 
 /**
  * @MongoDB\Document(repositoryClass="AppBundle\Repository\ClaimRepository")
@@ -1647,6 +1648,9 @@ class Claim
             'crimeRef' => $this->getCrimeRef(),
             'validCrimeRef' => $this->isValidCrimeRef(),
             'shippingAddress' => $this->getShippingAddress(),
+            'needProofOfUsage' => $this->needProofOfUsage(),
+            'needProofOfPurchase' => $this->needProofOfPurchase(),
+            'needPictureOfPhone' => $this->needPictureOfPhone(),
         ];
     }
 
@@ -1691,6 +1695,11 @@ class Claim
         return $this->getFilesByType(DamagePictureFile::class);
     }
 
+    public function getOtherFiles()
+    {
+        return $this->getFilesByType(OtherClaimFile::class);
+    }
+
     public function getAttachmentFiles()
     {
         $files = [];
@@ -1707,6 +1716,9 @@ class Claim
             $files[] = $file;
         }
         foreach ($this->getDamagePictureFiles() as $file) {
+            $files[] = $file;
+        }
+        foreach ($this->getOtherFiles() as $file) {
             $files[] = $file;
         }
 
