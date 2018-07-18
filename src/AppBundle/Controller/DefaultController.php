@@ -94,7 +94,7 @@ class DefaultController extends BaseController
             $force = 'next-working-day';
             $trafficFraction = 1;
         } elseif ($request->get('_route') == 'replacement_72_landing') {
-            $force = 'seventytwo-hours';
+            $force = 'twentyfour-seventy-two';
             $trafficFraction = 1;
         }
 
