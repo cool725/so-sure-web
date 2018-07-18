@@ -506,11 +506,11 @@ class PhoneInsuranceController extends BaseController
         //     ['no-money-back-guarantee', 'money-back-guarantee']
         // );
 
-        $expContent = $this->getSessionSixpackTest(
-            $request,
-            SixpackService::EXPERIMENT_AB_NEW_CONTENT,
-            ['old-content-no-nav', 'new-content-with-nav']
-        );
+        // $expContent = $this->getSessionSixpackTest(
+        //     $request,
+        //     SixpackService::EXPERIMENT_AB_NEW_CONTENT,
+        //     ['old-content-no-nav', 'new-content-with-nav']
+        // );
 
         $data = array(
             'phone'            => $phone,
@@ -537,7 +537,7 @@ class PhoneInsuranceController extends BaseController
             'slider_test'     => 'slide-me',
             // 'moneyBackGuarantee' => $moneyBackGuarantee,
             'replacement'     => $replacement,
-            'ab_content'  => $expContent,
+            // 'ab_content'  => $expContent,
         );
 
         // Adwords landingpage test

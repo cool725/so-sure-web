@@ -248,9 +248,9 @@ class PurchaseController extends BaseController
                     //     SixpackService::EXPERIMENT_MONEY_BACK_GUARANTEE
                     // );
 
-                    $this->get('app.sixpack')->convert(
-                        SixpackService::EXPERIMENT_AB_NEW_CONTENT
-                    );
+                    // $this->get('app.sixpack')->convert(
+                    //     SixpackService::EXPERIMENT_AB_NEW_CONTENT
+                    // );
 
                     if ($user->hasPartialPolicy()) {
                         return new RedirectResponse(
