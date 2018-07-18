@@ -110,11 +110,11 @@ class DefaultController extends BaseController
 
         $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE);
 
-        $expContent = $this->getSessionSixpackTest(
-            $request,
-            SixpackService::EXPERIMENT_AB_NEW_CONTENT,
-            ['old-content-no-nav', 'new-content-with-nav']
-        );
+        // $expContent = $this->getSessionSixpackTest(
+        //     $request,
+        //     SixpackService::EXPERIMENT_AB_NEW_CONTENT,
+        //     ['old-content-no-nav', 'new-content-with-nav']
+        // );
 
         $data = array(
             // Make sure to check homepage landing below too
@@ -126,9 +126,9 @@ class DefaultController extends BaseController
         $template = 'AppBundle:Default:index.html.twig';
 
         // If A/B content test
-        if ($expContent == 'new-content-with-nav') {
-            $template = 'AppBundle:Default:indexContent.html.twig';
-        }
+        // if ($expContent == 'new-content-with-nav') {
+        //     $template = 'AppBundle:Default:indexContent.html.twig';
+        // }
 
         return $this->render($template, $data);
     }
