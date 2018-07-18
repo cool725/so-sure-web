@@ -493,8 +493,8 @@ class PhoneInsuranceController extends BaseController
 
         $replacement = $this->sixpack(
             $request,
-            SixpackService::EXPERIMENT_PHONE_REPLACEMENT_MATCHING_ADVERT,
-            ['default', 'next-working-day', 'seventytwo-hours'],
+            SixpackService::EXPERIMENT_PHONE_REPLACEMENT,
+            ['default', 'next-working-day', 'twentyfour-seventy-two'],
             SixpackService::LOG_MIXPANEL_CONVERSION,
             null,
             "0.00000001"
