@@ -76,6 +76,7 @@ class SixpackService
     // Exp 6
     const EXPERIMENT_PHONE_REPLACEMENT = 'twentyfour-seventy-two';
     // Exp 7
+    const EXPERIMENT_AB_CONTENT_HOMEPAGE = 'new-homepage-copy';
 
     const ALTERNATIVES_SHARE_MESSAGE_SIMPLE = 'simple';
     const ALTERNATIVES_APP_SHARE_METHOD_NATIVE = 'native';
@@ -117,6 +118,7 @@ class SixpackService
         // self::EXPERIMENT_PHONE_REPLACEMENT_MATCHING_ADVERT,
         // Exp 5
         // self::EXPERIMENT_AB_NEW_CONTENT,
+        self::EXPERIMENT_AB_CONTENT_HOMEPAGE,
         // Exp 6
         self::EXPERIMENT_PHONE_REPLACEMENT,
         // Exp 7
@@ -165,7 +167,7 @@ class SixpackService
         // Exp 5
         self::EXPERIMENT_PHONE_REPLACEMENT,
         // Exp 6
-
+        self::EXPERIMENT_AB_CONTENT_HOMEPAGE,
         // Exp 7
 
     ];
