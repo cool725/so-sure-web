@@ -34,10 +34,6 @@ $('#claimsModal').on('show.bs.modal', function (event) {
             modal.find('#claims-detail-phone-status').text(claim.phoneStatus);
             modal.find('#claims-detail-warranty').text(claim.isUnderWarranty ? 'Yes' : 'No');
 
-            if (!claim.needPictureOfPhone) {
-                modal.find('#claims-detail-pictures-phone').hide();
-            }
-
             if (documents) {
                 if (claim.needProofOfUsage) {
                     if (documents.proofOfUsages.length > 0) {
