@@ -1,0 +1,30 @@
+; indicate this is the root of the project
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+indent_size = 4
+indent_style = space
+insert_final_newline = true
+
+[*.php]
+end_of_line = lf
+indent_size = 4
+indent_style = space
+
+[*.twig]
+indent_size = 4
+indent_style = space
+
+[*.feature]
+indent_size = 4
+indent_style = space
+
+[*.yml,*.yml.dist]
+indent_size = 4
+indent_style = space
+
+[Makefile]
+indent_size = 4
+indent_style = tab
