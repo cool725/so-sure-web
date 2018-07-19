@@ -186,13 +186,19 @@
                             </div>
                         {% endif %}
 
+                        <div class="panel panel-info">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">{{ sectionCount }}. Other files</h3>
+                            </div>
+                            <div class="panel-body">
+                                Upload any other files that will support your claim.
+                            </div>
+                        </div>
+
                         <div class="row">
                             <div class="col-sm-6">
                                 <div class="form-group {% if form_errors(claim_form.other) %}has-error{% endif %}">
-                                    <label>Other files <span class="req">*</span></label>
-                                    {% for file in claim.otherFiles %}
-                                        <p><a href="{{ s3DownloadLink(file.bucket, file.key) }}">{{ file.fileName }}</a> (Uploaded {{ file.created|date }})</p>
-                                    {% endfor %}
+                                    <label>Other files</label>
                                     {{ form_widget(claim_form.other, { 'attr': {'class': 'form-control'}}) }}
                                     <div class="help-block with-errors">
                                         <a href="#" data-toggle="modal" data-target="#usageModal">
@@ -203,6 +209,8 @@
                                 </div>
                             </div>
                         </div>
+
+                        {% set sectionCount = sectionCount+1 %}
 
                         <div class="panel panel-info">
                             <div class="panel-heading">

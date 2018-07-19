@@ -40,7 +40,8 @@ use AppBundle\Validator\Constraints as AppAssert;
  *      "proofOfBarring"="ProofOfBarringFile",
  *      "proofOfPurchase"="ProofOfPurchaseFile",
  *      "proofOfLoss"="ProofOfLossFile",
- *      "damagePicture"="DamagePictureFile"
+ *      "damagePicture"="DamagePictureFile",
+ *      "otherClaim"="OtherClaimFile"
  * })
  * @Gedmo\Loggable
  */

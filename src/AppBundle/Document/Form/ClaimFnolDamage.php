@@ -27,7 +27,7 @@ class ClaimFnolDamage
 
     /**
      * @AppAssert\AlphanumericSpaceDot()
-     * @Assert\Length(min="4", max="200")
+     * @Assert\Length(min="3", max="200")
      */
     protected $monthOfPurchase;
 

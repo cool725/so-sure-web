@@ -78,7 +78,7 @@ class ClaimFnolDamageType extends AbstractType
                     'Second hand' => Claim::PHONE_STATUS_SECOND_HAND,
                 ],
             ])
-            ->add('other', FileType::class, ['required' => false]);
+            ->add('other', FileType::class, ['required' => false])
             ->add('isSave', HiddenType::class)
             ->add('save', ButtonType::class)
             ->add('confirm', SubmitType::class)
