@@ -1,0 +1,188 @@
+redirect_quote_samsung_7_edge:
+    path: /phone-insurance/Samsung+Galaxy+S7+edge+32GB
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /phone-insurance/Samsung+Galaxy+S7+Edge+32GB
+        permanent: true
+
+redirect_homepage:
+    path: /index.html
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /
+        permanent: true
+
+redirect_terms_html:
+    path: /terms.html
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: terms
+        permanent: true
+
+redirect_jobs_html:
+    path: /jobs.html
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: careers
+        permanent: true
+redirect_launch:
+    path: /launch/{id}
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /
+        permanent: true
+
+redirect_quote:
+    path: /quote/{id}
+    requirements:
+        id: "[0-9a-f]{24,24}"
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: quote_phone
+        permanent: true
+
+redirect_quote_make_model_memory:
+    path: /quote/{make}+{model}+{memory}+insurance
+    requirements:
+        make: "[a-zA-Z]+"
+        model: "[+-.a-zA-Z0-9() ]+"
+        memory: "[0-9]+"
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: quote_make_model_memory
+        permanent: true
+
+redirect_quote_make_model:
+    path: /quote/{make}+{model}+insurance
+    requirements:
+        make: "[a-zA-Z]+"
+        model: "[+-.a-zA-Z0-9() ]+"
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: quote_make_model
+        permanent: true
+
+redirect_jobs:
+    path: /jobs
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: careers
+        permanent: true
+
+redirect_about_jobs:
+    path: /about/social-insurance/jobs
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: careers
+        permanent: true
+redirect_terms:
+    path: /terms
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: terms
+        permanent: true
+
+redirect_about_home:
+    path: /about/
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: about_home
+        permanent: true
+
+redirect_about_are_we_regulated_within_the_uk:
+    path: /about/are-we-regulated-within-the-uk
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: about_home
+        permanent: true
+
+redirect_about_social_are_we_regulated_within_the_uk:
+    path: /about/social-insurance/are-we-regulated-within-the-uk
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: about_home
+        permanent: true
+
+redirect_about_how_secure_is_so_sure:
+    path: /about/how-secure-is-so-sure
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: about_home
+        permanent: true
+
+redirect_about_social_how_secure_is_so_sure:
+    path: /about/social-insurance/how-secure-is-so-sure
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: about_home
+        permanent: true
+
+redirect_about_the_team:
+    path: /about/the-team
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: about_home
+        permanent: true
+
+redirect_about_social_the_team:
+    path: /about/social-insurance/the-team
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: about_home
+        permanent: true
+
+redirect_about_how_to_contact_so_sure:
+    path: /about/how-to-contact-so-sure
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: about_how_to_contact_so_sure
+        permanent: true
+
+redirect_about_our_mission:
+    path: /about/our-mission
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: about_home
+        permanent: true
+
+redirect_about_social_our_mission:
+    path: /about/social-insurance/our-mission
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: about_home
+        permanent: true
+
+redirect_about_why_we_re_better:
+    path: /about/why-we-re-better
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: about_home
+        permanent: true
+
+redirect_about_social_why_we_re_better:
+    path: /about/social-insurance/why-we-re-better
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: about_home
+        permanent: true
+
+redirect_about_what_is_social_insurance:
+    path: /about/what-is-social-insurance
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: about_home
+        permanent: true
+
+redirect_about_social_what_is_social_insurance:
+    path: /about/social-insurance/what-is-social-insurance
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: about_home
+        permanent: true
+
+redirect_discount_vouchers:
+    path: /discount-vouchers
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: homepage
+        permanent: true
