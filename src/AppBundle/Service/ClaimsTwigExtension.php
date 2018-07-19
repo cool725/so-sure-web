@@ -58,6 +58,14 @@ class ClaimsTwigExtension extends \Twig_Extension
             );
         }
 
+        $proofOfLosses = array();
+        foreach ($claim->getProofOfLossFiles() as $file) {
+            $proofOfLosses[] = array(
+                'filename' => $file->getFilename(),
+                'url' => $this->s3DownloadLink($file->getBucket(), $file->getKey())
+            );
+        }
+
         $others = array();
         foreach ($claim->getOtherFiles() as $file) {
             $others[] = array(
@@ -71,6 +79,7 @@ class ClaimsTwigExtension extends \Twig_Extension
             'proofOfBarrings' => $proofOfBarrings,
             'proofOfPurchases' => $proofOfPurchases,
             'damagePictures' => $damagePictures,
+            'proofOfLosses' => $proofOfLosses,
             'others' => $others,
         );
     }

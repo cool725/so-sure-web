@@ -65,11 +65,17 @@ class ClaimFnolUpdateType extends AbstractType
             if (($claim->getType() == Claim::TYPE_THEFT || $claim->getType() == Claim::TYPE_LOSS)) {
                 $form->add('proofOfBarring', FileType::class, ['required' => false]);
             }
+
             if (($claim->getType() == Claim::TYPE_THEFT || $claim->getType() == Claim::TYPE_LOSS) &&
                 $claim->needProofOfPurchase()
             ) {
                 $form->add('proofOfPurchase', FileType::class, ['required' => false]);
             }
+
+            if ($claim->getType() == Claim::TYPE_LOSS) {
+                $form->add('proofOfLoss', FileType::class, ['required' => false]);
+            }
+
             $form->add('other', FileType::class, ['required' => false]);
 
         });
@@ -117,6 +123,15 @@ class ClaimFnolUpdateType extends AbstractType
                     $filename->guessExtension()
                 );
                 $data->setProofOfPurchase($s3key);
+            }
+            if ($filename = $data->getProofOfLoss()) {
+                $s3key = $this->claimsService->uploadS3(
+                    $filename,
+                    sprintf('proof-of-loss-%s', $timestamp),
+                    $data->getClaim()->getPolicy()->getUser()->getId(),
+                    $filename->guessExtension()
+                );
+                $data->setProofOfLoss($s3key);
             }
             if ($filename = $data->getOther()) {
                 $s3key = $this->claimsService->uploadS3(

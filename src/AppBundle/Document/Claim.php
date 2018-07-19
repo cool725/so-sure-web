@@ -1752,7 +1752,7 @@ class Claim
     {
         /** @var PhonePolicy  $policy */
         $policy = $this->getPolicy();
-        return $policy->getRisk() == Policy::RISK_LEVEL_HIGH ||  !$policy->isPicSureValidated();
+        return $policy->getRisk() == Policy::RISK_LEVEL_HIGH && !$policy->isPicSureValidated();
     }
 
     public function needPictureOfPhone()

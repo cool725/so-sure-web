@@ -137,6 +137,23 @@ $('#claimsModal').on('show.bs.modal', function (event) {
                     modal.find('#claims-detail-proof-purchases').html('Not requested');
                 }
                 
+                if (claim.type == 'loss') {
+                    if (documents.proofOfLosses.length > 0) {
+                        var proofOfLosses = '';
+                        $.each(documents.proofOfLosses, function(key, value) {
+                            proofOfLosses += '<p><a href="'+value.ulr+'">'+value.filename+'</a></p>';
+                        });
+                        modal.find('#claims-detail-proof-losses').html(proofOfLosses);
+                    }
+                    else {
+                        modal.find('#claims-detail-proof-losses').html('Not uploaded yet');                        
+                    }
+                    modal.find('#claims-detail-proof-losses-container').show();
+                }
+                else {
+                    modal.find('#claims-detail-proof-losses-container').hide();
+                }
+
                 if (documents.others.length > 0) {
                     var others = '';
                     $.each(documents.others, function(key, value) {
@@ -149,8 +166,16 @@ $('#claimsModal').on('show.bs.modal', function (event) {
                 }
             }
 
-            modal.find('#claims-detail-crime-reference').text(claim.crimeRef);
-            modal.find('#claims-detail-policy-report').text(claim.policeLossReport);
+            if (claim.type == 'theft') {
+                modal.find('#claims-detail-crime-reference').text(claim.crimeRef);
+                modal.find('#claims-detail-crime-reference-container').show();
+                modal.find('#claims-detail-policy-report-container').hide();
+            }
+            else {
+                modal.find('#claims-detail-policy-report').text(claim.crimeRef);
+                modal.find('#claims-detail-crime-reference-container').hide();
+                modal.find('#claims-detail-policy-report-container').show();
+            }
         }
 
         modal.find('#claims-detail-replacement-imei').text(claim.replacementImei);

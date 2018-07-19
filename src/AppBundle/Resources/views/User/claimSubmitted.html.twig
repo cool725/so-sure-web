@@ -119,8 +119,31 @@
                             </div>
                         {% endif %}
 
-                        {% if claim_form.proofOfPurchase is defined %}
+                        {% if claim_form.proofOfLoss is defined %}
 
+                            <div class="panel panel-info">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title">Proof of loss</h3>
+                                </div>
+                                <div class="panel-body">
+                                     We require a proof of loss document.
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="form-group col-sm-6 {% if form_errors(claim_form.proofOfLoss) %}has-error{% endif %}">
+                                    {{ form_widget(claim_form.proofOfLoss, { 'attr': {'class': 'form-control'}}) }}
+                                    <div class="help-block with-errors">
+                                        <a href="#" data-toggle="modal" data-target="#purchaseModal">
+                                            {{ claim.proofOfLossFiles|length }} file(s) upload
+                                        </a>
+                                    </div>
+                                    <div class="help-block with-errors">{{ form_errors(claim_form.proofOfLoss) }}</div>
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        {% if claim_form.proofOfPurchase is defined %}
 
                             <div class="panel panel-info">
                                 <div class="panel-heading">
