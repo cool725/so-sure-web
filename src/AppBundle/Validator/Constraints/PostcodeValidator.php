@@ -2,16 +2,17 @@
 
 namespace AppBundle\Validator\Constraints;
 
+use CensusBundle\Service\SearchService;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 
 class PostcodeValidator extends ConstraintValidator
 {
-    protected $address;
+    protected $searchService;
 
-    public function __construct($address)
+    public function __construct(SearchService $searchService)
     {
-        $this->address = $address;
+        $this->searchService = $searchService;
     }
 
     public function validate($value, Constraint $constraint)
@@ -23,7 +24,7 @@ class PostcodeValidator extends ConstraintValidator
             return;
         }
 
-        if (!$this->address->validatePostcode($value)) {
+        if (!$this->searchService->validatePostcode($value)) {
             $this->context->buildViolation($postcodeConstraint->message)
                 ->setParameter('%string%', $value)
                 ->addViolation();

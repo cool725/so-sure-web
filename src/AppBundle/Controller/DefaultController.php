@@ -96,14 +96,14 @@ class DefaultController extends BaseController
             $force = 'next-working-day';
             $trafficFraction = 1;
         } elseif ($request->get('_route') == 'replacement_72_landing') {
-            $force = 'seventytwo-hours';
+            $force = 'twentyfour-seventy-two';
             $trafficFraction = 1;
         }
 
         $replacement = $this->sixpack(
             $request,
-            SixpackService::EXPERIMENT_PHONE_REPLACEMENT_MATCHING_ADVERT,
-            ['default', 'next-working-day', 'seventytwo-hours'],
+            SixpackService::EXPERIMENT_PHONE_REPLACEMENT,
+            ['default', 'next-working-day', 'twentyfour-seventy-two'],
             SixpackService::LOG_MIXPANEL_CONVERSION,
             null,
             $trafficFraction,

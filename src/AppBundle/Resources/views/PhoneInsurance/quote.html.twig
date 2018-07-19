@@ -159,14 +159,10 @@
                                 <ul class="list-unstyled fa-list-bullet">
                                     <li>
                                         <i class="fa fa-check text-blue" aria-hidden="true"></i>
-                                        {% if moneyBackGuarantee is defined and moneyBackGuarantee == 'money-back-guarantee' %}
-                                            <mark class="mgreen">14 day money back guarantee 💰🔙</mark>
+                                        {% if replacement is defined and replacement == 'twentyfour-seventy-two' %}
+                                            Working device within 24-72 hours after your claim is approved
                                         {% else %}
-                                            {% if replacement is defined and replacement == 'seventytwo-hours' %}
-                                                Working device within 72 hours
-                                            {% else %}
-                                                Next working day replacement or repair
-                                            {% endif %}
+                                            Next working day replacement or repair after your claim is approved
                                         {% endif %}
                                     </li>
                                     <li><i class="fa fa-check text-blue" aria-hidden="true"></i> 24/7 live support</li>
@@ -204,7 +200,7 @@
 
     {% include 'AppBundle::Default/feedbackQuotes.html.twig' %}
 
-    {% if moneyBackGuarantee is defined and moneyBackGuarantee == 'money-back-guarantee' %}
+{#     {% if moneyBackGuarantee is defined and moneyBackGuarantee == 'money-back-guarantee' %}
         <section class="section--pad money-back">
             <div class="container">
                 <div class="row">
@@ -215,7 +211,7 @@
                 </div>
             </div>
         </section>
-    {% endif %}
+    {% endif %} #}
 
     {% include 'AppBundle::Default/whySoSure.html.twig' %}
 

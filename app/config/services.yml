@@ -213,6 +213,7 @@ services:
             - "%pca_apikey%"
             - "%kernel.environment%"
             - "@snc_redis.default"
+            - "@census.search"
 
     app.geoip:
         class: AppBundle\Service\MaxMindIpService
@@ -1144,7 +1145,7 @@ services:
 
     app.validator.postcode:
         class: AppBundle\Validator\Constraints\PostcodeValidator
-        arguments: ["@app.address"]
+        arguments: ["@census.search"]
         tags:
             - { name: validator.constraint_validator }
 

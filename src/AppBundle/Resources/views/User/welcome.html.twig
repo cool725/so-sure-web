@@ -254,7 +254,7 @@
         </div>
     </div>
 
-    {% if user_modal_welcome is defined and user_modal_welcome == 'new-welcome-modal' %}
+    {# {% if user_modal_welcome is defined and user_modal_welcome == 'new-welcome-modal' %}
         <div class="modal modal-new fade"
              id="welcome-modal"
              tabindex="-1"
@@ -270,7 +270,6 @@
                         <h3 class="h2 text-blue text-center">Welcome to the so-sure family <br><small>You've just joined thousands of customers who trust so-sure with their phones</small></h3>
                     </div>
                     <div class="modal-body">
-                        {# <p class="lead text-center"></p> #}
                         <div class="row">
                             <div class="col-md-4">
                                 <img src="{{ cdn_url }}/images/homepage/pic-sure_steps_homepage_1.svg" class="img-center" width="120px">
@@ -293,7 +292,7 @@
                 </div>
             </div>
         </div>
-    {% else %}
+    {% else %} #}
         <div class="modal modal-new fade"
              id="welcome-modal"
              tabindex="-1"
@@ -344,7 +343,7 @@
                 </div>
             </div>
         </div>
-    {% endif %}
+    {# {% endif %} #}
     {# End Page Modals #}
 
 

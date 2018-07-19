@@ -8,6 +8,7 @@ use AppBundle\Document\PlayDevice;
 use AppBundle\Validator\Constraints\TokenValidator;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Log\LoggerInterface;
 
 // @codingStandardsIgnoreFile
 class LoadPlayDeviceData implements FixtureInterface, ContainerAwareInterface
@@ -32,10 +33,24 @@ class LoadPlayDeviceData implements FixtureInterface, ContainerAwareInterface
             "%s/../src/AppBundle/DataFixtures/supported_devices.csv",
             $this->container->getParameter('kernel.root_dir')
         );
+        $previousData = [];
         if (($handle = fopen($file, "r")) !== FALSE) {
             while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
                 if ($row > 0) {
-                    $this->newPlayDevice($manager, $data[0], $data[1], $data[2], $data[3]);
+                    $retailBranding = $this->strip($data[0], 150);
+                    $marketingName = $this->strip($data[1], 150);
+                    $device = $this->strip($data[2], 50);
+                    $model = $this->strip($data[3], 100);
+                    $combined = sprintf("%s%s%s%s", $retailBranding, $marketingName, $device, $model);
+
+                    if (!in_array($combined, $previousData)) {
+                        $this->newPlayDevice($manager, $data[0], $data[1], $data[2], $data[3]);
+                        $previousData[] = $combined;
+                    } else {
+                        /** @var LoggerInterface $logger */
+                        $logger = $this->container->get('logger');
+                        $logger->warning(sprintf("Duplicate entry for %s %s %s %s", $retailBranding, $marketingName, $device, $model));
+                    }
                 }
                 if ($row % 1000 == 0) {
                     $manager->flush();
@@ -47,6 +62,8 @@ class LoadPlayDeviceData implements FixtureInterface, ContainerAwareInterface
 
         $manager->flush();
     }
+
+
 
     private function newPlayDevice($manager, $retailBranding, $marketingName, $device, $model)
     {

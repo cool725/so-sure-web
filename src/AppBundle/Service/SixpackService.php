@@ -49,20 +49,20 @@ class SixpackService
     //const EXPERIMENT_STEP_3 = 'step-3-payment-new';
     const EXPERIMENT_PURCHASE_FLOW_BACS = 'purchase-flow-bacs';
     const EXPERIMENT_CPC_QUOTE_HOMEPAGE = 'cpc-quote-or-homepage';
-    const EXPERIMENT_DOB = 'purchase-funnel-dob-dropdown';
-    const EXPERIMENT_72_REPLACEMENT = 'seventytwo-hours';
+    // const EXPERIMENT_DOB = 'purchase-funnel-dob-dropdown';
+    // const EXPERIMENT_72_REPLACEMENT = 'seventytwo-hours';
     // const EXPERIMENT_PICSURE_SECTION = 'picsure-redesign';
     const EXPERIMENT_EBAY_LANDING = 'ebay-landing';
     const EXPERIMENT_EBAY_LANDING_1 = 'ebay-landing-1';
     const EXPERIMENT_EBAY_LANDING_2 = 'ebay-landing-2';
-    const EXPERIMENT_NEW_WELCOME_MODAL = 'new-welcome-modal';
+    // const EXPERIMENT_NEW_WELCOME_MODAL = 'new-welcome-modal';
     // New Exp Competitor Landing
     const EXPERIMENT_COMPETITOR_LANDING = 'competitor-landing';
     // const EXPERIMENT_TRUSTPILOT_REVIEW = 'trustpilot';
     // New Test Single Mem Option
     const EXPERIMENT_MEMORY_OPTIONS = 'single-progressive-dropdown';
     // New Test Money Back Guarantee
-    const EXPERIMENT_MONEY_BACK_GUARANTEE = 'money-back-guarantee';
+    // const EXPERIMENT_MONEY_BACK_GUARANTEE = 'money-back-guarantee';
     // Exp 1
     // const EXPERIMENT_HOMEPAGE_NEW_COPY = 'homepage-new-copy';
     // Exp 2
@@ -70,11 +70,11 @@ class SixpackService
     // Exp 3
     const EXPERIMENT_STARLING_LANDING = 'starling-landing';
     // Exp 4
-    const EXPERIMENT_PHONE_REPLACEMENT_MATCHING_ADVERT = 'phone-replacement-matching-advert';
+    // const EXPERIMENT_PHONE_REPLACEMENT_MATCHING_ADVERT = 'phone-replacement-matching-advert';
     // Exp 5
     const EXPERIMENT_AB_NEW_CONTENT = 'new-content-with-nav';
     // Exp 6
-
+    const EXPERIMENT_PHONE_REPLACEMENT = 'twentyfour-seventy-two';
     // Exp 7
 
     const ALTERNATIVES_SHARE_MESSAGE_SIMPLE = 'simple';
@@ -94,8 +94,8 @@ class SixpackService
         //self::EXPERIMENT_STEP_3,
         self::EXPERIMENT_PURCHASE_FLOW_BACS,
         self::EXPERIMENT_CPC_QUOTE_HOMEPAGE,
-        self::EXPERIMENT_DOB,
-        self::EXPERIMENT_72_REPLACEMENT,
+        // self::EXPERIMENT_DOB,
+        // self::EXPERIMENT_72_REPLACEMENT,
         // self::EXPERIMENT_PICSURE_SECTION,
         self::EXPERIMENT_EBAY_LANDING,
         self::EXPERIMENT_EBAY_LANDING_1,
@@ -106,7 +106,7 @@ class SixpackService
         // New Test Single Mem Option
         self::EXPERIMENT_MEMORY_OPTIONS,
         // New Test Money Back Guarantee
-         self::EXPERIMENT_MONEY_BACK_GUARANTEE,
+         // self::EXPERIMENT_MONEY_BACK_GUARANTEE,
         // Exp 1
         // self::EXPERIMENT_HOMEPAGE_NEW_COPY,
         // Exp 2
@@ -114,11 +114,11 @@ class SixpackService
         // Exp 3
         self::EXPERIMENT_STARLING_LANDING,
         // Exp 4
-        self::EXPERIMENT_PHONE_REPLACEMENT_MATCHING_ADVERT,
+        // self::EXPERIMENT_PHONE_REPLACEMENT_MATCHING_ADVERT,
         // Exp 5
         self::EXPERIMENT_AB_NEW_CONTENT,
         // Exp 6
-
+        self::EXPERIMENT_PHONE_REPLACEMENT,
         // Exp 7
 
     ];
@@ -147,7 +147,7 @@ class SixpackService
         self::EXPERIMENT_CPC_QUOTE_HOMEPAGE,
         //self::EXPERIMENT_STEP_3,
         self::EXPERIMENT_PURCHASE_FLOW_BACS,
-        self::EXPERIMENT_72_REPLACEMENT,
+        // self::EXPERIMENT_72_REPLACEMENT,
         // self::EXPERIMENT_PICSURE_SECTION,
         self::EXPERIMENT_EBAY_LANDING,
         self::EXPERIMENT_EBAY_LANDING_1,
@@ -161,9 +161,9 @@ class SixpackService
         // Exp 3
         self::EXPERIMENT_STARLING_LANDING,
         // Exp 4
-        self::EXPERIMENT_PHONE_REPLACEMENT_MATCHING_ADVERT,
+        // self::EXPERIMENT_PHONE_REPLACEMENT_MATCHING_ADVERT,
         // Exp 5
-
+        self::EXPERIMENT_PHONE_REPLACEMENT,
         // Exp 6
 
         // Exp 7
@@ -176,12 +176,12 @@ class SixpackService
      */
     public static $purchaseConversionKpi = [
         self::EXPERIMENT_HOMEPAGE_AA_V2,
-        self::EXPERIMENT_DOB,
+        // self::EXPERIMENT_DOB,
         // self::EXPERIMENT_TRUSTPILOT_REVIEW,
         // New Test Single Mem Option
         self::EXPERIMENT_MEMORY_OPTIONS,
         // New Test Money Back Guarantee
-        self::EXPERIMENT_MONEY_BACK_GUARANTEE,
+        // self::EXPERIMENT_MONEY_BACK_GUARANTEE,
         // Exp 1
         self::EXPERIMENT_AB_NEW_CONTENT,
         // Exp 2

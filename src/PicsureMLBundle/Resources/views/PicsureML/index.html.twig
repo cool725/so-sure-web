@@ -10,11 +10,6 @@
 
 {% block javascripts %}
     {{ parent() }}
-    {#
-    {% javascripts
-        '@PicsureMLBundle/Resources/public/js/picsureml/picsure-ml.js'
-    %}
-    #}
     {% javascripts %}
     <script src="{{ asset_url }}"></script>
     {% endjavascripts %}

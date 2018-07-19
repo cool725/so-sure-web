@@ -507,13 +507,13 @@ class UserController extends BaseController
             /** @var PhonePolicy $policy */
             $lines[] = [
                 sprintf('"%s"', $user->getName()),
-                sprintf('"%s"', $user->getBirthday()->format('d/m/Y')),
+                sprintf('"%s"', $user->getBirthday() ? $user->getBirthday()->format('d/m/Y') : null),
                 sprintf('"%s"', $user->getBillingAddress()),
                 sprintf('"%s"', $user->getMobileNumber()),
                 sprintf('"%s"', $policy->getPolicyNumber()),
-                sprintf('"%s"', $policy->getStart()->format('d/m/Y')),
+                sprintf('"%s"', $policy->getStart() ? $policy->getStart()->format('d/m/Y') : null),
                 sprintf('"%s"', $policy->getEnd() ? $policy->getEnd()->format('d/m/Y') : null),
-                sprintf('"%s"', $policy->getPhone()->__toString()),
+                sprintf('"%s"', $policy->getPhone() ? $policy->getPhone()->__toString() : null),
                 sprintf('"%s"', $policy->getImei()),
             ];
         }
@@ -1132,7 +1132,7 @@ class UserController extends BaseController
      * @Route("/welcome/{id}", name="user_welcome_policy_id")
      * @Template
      */
-    public function welcomeAction(Request $request, $id = null)
+    public function welcomeAction($id = null)
     {
         $dm = $this->getManager();
         $user = $this->getUser();
@@ -1162,13 +1162,13 @@ class UserController extends BaseController
             $dm->flush($policy);
         }
 
-        $exp = $this->sixpack(
-            $request,
-            SixpackService::EXPERIMENT_NEW_WELCOME_MODAL,
-            ['current-welcome-modal', 'new-welcome-modal'],
-            SixpackService::LOG_MIXPANEL_CONVERSION,
-            $user->getId()
-        );
+        // $exp = $this->sixpack(
+        //     $request,
+        //     SixpackService::EXPERIMENT_NEW_WELCOME_MODAL,
+        //     ['current-welcome-modal', 'new-welcome-modal'],
+        //     SixpackService::LOG_MIXPANEL_CONVERSION,
+        //     $user->getId()
+        // );
 
         $countUnprocessedInvitations = count($user->getUnprocessedReceivedInvitations());
         if ($countUnprocessedInvitations > 0) {
@@ -1188,7 +1188,7 @@ class UserController extends BaseController
             'policy_key' => $this->getParameter('policy_key'),
             'policy' => $user->getLatestPolicy(),
             'has_visited_welcome_page' => $pageVisited,
-            'user_modal_welcome' => $exp,
+            // 'user_modal_welcome' => $exp,
         );
     }
     /**

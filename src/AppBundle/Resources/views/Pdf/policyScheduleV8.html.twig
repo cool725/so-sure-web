@@ -1,0 +1,73 @@
+<html>
+    <head>
+        <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+    </head>
+    <body>
+        <div style="text-align: center">
+            <img src="{{ cdn_url }}/images/icons/logo-social-insurance-2x.png" width="60%" />
+            <h2>Mobile Phone Insurance Policy Schedule</h2>
+        </div>
+        <div>
+            <p>
+                {{ policy.user.name }}<br />
+                {{ policy.user.billingAddress.line1 }}<br />
+                {% if policy.user.billingAddress.line2 %}
+                    {{ policy.user.billingAddress.line2 }}<br />
+                {% endif %}
+                {% if policy.user.billingAddress.line3 %}
+                    {{ policy.user.billingAddress.line3 }}<br />
+                {% endif %}
+                {{ policy.user.billingAddress.city }} {{ policy.user.billingAddress.postcode }}<br />
+                United Kingdom
+        </div>
+        <div>
+            <p>Date of Birth: {{ policy.user.birthday|date('d M Y') }}</p>
+        </div>
+        <h4>Policy Reference</h4>
+        <div>
+            <ul>
+                <li>Policy Number: {{ policy.policyNumber }}</li>
+                <li>Date of subscription: {{ policy.start | date('d M Y H:i', 'Europe/London') }}</li>
+                <li>Mobile phone covered by insurance: {{ policy.phone.make }} {{ policy.phone.model }} [IMEI: {{ policy.imei }}{% if policy.serialNumber %} / Serial Number: {{ policy.serialNumber }}{% endif %}]</li>
+                <li>Period of cover: from {{ policy.start | date('d M Y H:i', 'Europe/London') }} to {{ policy.end|date('d M Y H:i', 'Europe/London') }}</li>
+                {% if policy.premiumPlan == 'monthly' %}
+                <li>Cost of policy: £{{ policy.premium.yearlyPremiumPrice|number_format(2, '.', ',') }}, inclusive of £{{ policy.premium.yearlyIpt|number_format(2, '.', ',') }} Insurance Premium Tax (IPT) payable in 12 monthly installments of £{{ policy.premium.monthlyPremiumPrice|number_format(2, '.', ',') }}.</li>
+                {% else %}
+                <li>Cost of policy: £{{ policy.premium.yearlyPremiumPrice|number_format(2, '.', ',') }}, inclusive of £{{ policy.premium.yearlyIpt|number_format(2, '.', ',') }} Insurance Premium Tax (IPT) payable in 1 installment of £{{ policy.premium.yearlyPremiumPrice|number_format(2, '.', ',') }}.</li>
+                {% endif %}
+            </ul>
+        </div>
+        <div>
+            {% if policy.picSureStatus == 'preapproved' %}
+                <p>Excess to be paid at point of claim:</p>
+                <ul>
+                    <li>£50 for Accidental Damage or Breakdown claim</li>
+                    <li>£70 for Theft or Loss claim</li>
+                </ul>
+                <p>If you upgrade or change phones, and do not provide pictures to clearly show that your phone is in good condition with no cracked screen before claiming.</p>
+                <p>Excess to be paid at point of claim:</p>
+                <ul>
+                    <li>£150 for any type of claim</li>
+                </ul>
+            {% else %}
+                <p>If you have provided pictures to clearly show that your phone is in good condition with no cracked screen before claiming.</p>
+                <p>Excess to be paid at point of claim:</p>
+                <ul>
+                    <li>£50 for Accidental Damage or Breakdown claim</li>
+                    <li>£70 for Theft or Loss claim</li>
+                </ul>
+                <p>If you have not provided pictures to clearly show that your phone is in good condition with no cracked screen before claiming.</p>
+                <p>Excess to be paid at point of claim:</p>
+                <ul>
+                    <li>£150 for any type of claim</li>
+                </ul>
+            {% endif %}
+        </div>
+        <div style="position: absolute; float: left; bottom: 50px; font-size: 12px; margin-right: 25mm;">
+            <i>
+                The insurance cover is underwritten by Salva Kindlustuse AS, which is authorised by the Financial Conduct Authority
+                under registration number 622523 with registered office Pärnu road 16, 10141 Tallinn, Estonia.
+            </i>
+        </div>
+    </body>
+</html>

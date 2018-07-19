@@ -92,7 +92,7 @@ if [ "$RUN_FILTER" == "" ]; then
     if [ "$COVER" == "0" ]; then
         # for some reason, some tests do not do work as expected unless run individually
         echo "Running test cases that need to be run individually :("
-        ./build/phpunit.sh --filter "::testUserCreateNoChangeEmail" --bootstrap vendor/autoload.php src/AppBundle/
+        ./build/phpunit.sh --filter "::testUserCreateNoChangeEmail" --bootstrap vendor/autoload.php src/
     
         echo "Wiping db again"
         init $SKIP_DB $SKIP_POLICY
@@ -102,8 +102,8 @@ if [ "$RUN_FILTER" == "" ]; then
   ./vendor/phing/phing/bin/phing -f build/test.xml $FUNCTIONAL_TEST
 else
   ./vendor/phing/phing/bin/phing -f build/test.xml test:unit
-  echo ./build/phpunit.sh $DEBUG --filter "$RUN_FILTER" --bootstrap vendor/autoload.php src/AppBundle/
-  ./build/phpunit.sh $DEBUG --filter "$RUN_FILTER" --bootstrap vendor/autoload.php src/AppBundle/
+  echo ./build/phpunit.sh $DEBUG --filter "$RUN_FILTER" --bootstrap vendor/autoload.php src/
+  ./build/phpunit.sh $DEBUG --filter "$RUN_FILTER" --bootstrap vendor/autoload.php src/
 fi
 if [ "$SKIP_FLUSH_REDIS" == "0" ]; then
   app/console --env=test redis:flushdb -n

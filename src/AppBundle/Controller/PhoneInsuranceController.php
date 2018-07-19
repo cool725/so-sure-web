@@ -493,18 +493,18 @@ class PhoneInsuranceController extends BaseController
 
         $replacement = $this->sixpack(
             $request,
-            SixpackService::EXPERIMENT_PHONE_REPLACEMENT_MATCHING_ADVERT,
-            ['default', 'next-working-day', 'seventytwo-hours'],
+            SixpackService::EXPERIMENT_PHONE_REPLACEMENT,
+            ['default', 'next-working-day', 'twentyfour-seventy-two'],
             SixpackService::LOG_MIXPANEL_CONVERSION,
             null,
             "0.00000001"
         );
 
-        $moneyBackGuarantee = $this->sixpack(
-            $request,
-            SixpackService::EXPERIMENT_MONEY_BACK_GUARANTEE,
-            ['no-money-back-guarantee', 'money-back-guarantee']
-        );
+        // $moneyBackGuarantee = $this->sixpack(
+        //     $request,
+        //     SixpackService::EXPERIMENT_MONEY_BACK_GUARANTEE,
+        //     ['no-money-back-guarantee', 'money-back-guarantee']
+        // );
 
         $expContent = $this->getSessionSixpackTest(
             $request,
@@ -535,7 +535,7 @@ class PhoneInsuranceController extends BaseController
             'comparision_max' => $maxComparision,
             'coming_soon'     => $phone->getCurrentPhonePrice() ? false : true,
             'slider_test'     => 'slide-me',
-            'moneyBackGuarantee' => $moneyBackGuarantee,
+            // 'moneyBackGuarantee' => $moneyBackGuarantee,
             'replacement'     => $replacement,
             'ab_content'  => $expContent,
         );
