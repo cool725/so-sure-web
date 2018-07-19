@@ -19,6 +19,8 @@ security:
             id: fos_user.user_provider.username
         cognito_identity_user_provider:
             id: app.user.cognitoidentity
+        bearer_token_user_provider:
+            id: AppBundle\Security\BearerTokenUserProvider
 
     firewalls:
         # disables authentication for assets and the profiler, adapt it according to your needs
@@ -33,6 +35,17 @@ security:
             simple_preauth:
                 authenticator: app.user.cognitoidentity.authenticator
             provider: cognito_identity_user_provider
+
+        oauth_token:
+            pattern:    ^/oauth/v2/token
+            security:   false
+        oauth_authorize:
+            pattern:    ^/oauth/v2/auth
+            # Add your favorite authentication process here
+            stateless: true
+            simple_preauth:
+                authenticator: AppBundle\Security\BearerTokenAuthenticator
+            provider: bearer_token_user_provider
 
         main:
             pattern: ^/
@@ -80,4 +93,5 @@ security:
         - { path: ^/claims/, role: ROLE_NO_ACCESS }
         - { path: ^/alpha$, role: ROLE_USER }
         - { path: ^/user/, role: ROLE_USER }
-        - { path: ^/api, access: "isApiPort(8080)" }
+        - { path: ^/api/v1/bearer, roles: [ IS_AUTHENTICATED_FULLY ] }
+        #- { path: ^/api, access: "isApiPort(8080)" }

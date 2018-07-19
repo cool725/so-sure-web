@@ -47,6 +47,7 @@ class AppKernel extends Kernel
             new Rollerworks\Bundle\PasswordStrengthBundle\RollerworksPasswordStrengthBundle(),
             new Nelmio\SecurityBundle\NelmioSecurityBundle(),
             new Peerj\UserSecurityBundle\PeerjUserSecurityBundle(),
+            new FOS\OAuthServerBundle\FOSOAuthServerBundle(),
         );
 
         if (in_array($this->getEnvironment(), array('dev', 'test', 'vagrant'), true)) {

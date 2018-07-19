@@ -13,7 +13,7 @@ use Symfony\Component\Routing\Annotation\Route;
 /**
  * API that deals with Bearer-token based authentication
  *
- * @Route("/v1api/bearer")
+ * @Route("/api/v1/bearer")
  */
 class Bearer extends BaseController
 {
@@ -25,6 +25,14 @@ class Bearer extends BaseController
     public function __construct(LoggerInterface $logger)
     {
         $this->logger = $logger;
+    }
+
+    /**
+     * @Route("/proof")
+     */
+    public function proof(Request $request): JsonResponse
+    {
+        return new JsonResponse($request);
     }
 
     /**
