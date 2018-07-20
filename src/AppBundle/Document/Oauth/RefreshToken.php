@@ -4,6 +4,7 @@ namespace AppBundle\Document\Oauth;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use FOS\OAuthServerBundle\Document\RefreshToken as BaseRefreshToken;
 use FOS\OAuthServerBundle\Model\ClientInterface;
+use AppBundle\Document\User;
 
 /**
  * @MongoDB\Document(collection="oauthRefreshToken")
@@ -21,7 +22,7 @@ class RefreshToken extends BaseRefreshToken
     protected $client;
 
     /**
-     * @MongoDB\ReferenceOne(targetDocument="User")
+     * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\User")
      */
     protected $user;
 

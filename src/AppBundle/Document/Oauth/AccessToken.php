@@ -4,6 +4,7 @@ namespace AppBundle\Document\Oauth;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use FOS\OAuthServerBundle\Document\AccessToken as BaseAccessToken;
 use FOS\OAuthServerBundle\Model\ClientInterface;
+use AppBundle\Document\User;
 
 /**
  * @MongoDB\Document(collection="oauthAccessToken")
@@ -21,7 +22,7 @@ class AccessToken extends BaseAccessToken
     protected $client;
 
     /**
-     * @MongoDB\ReferenceOne(targetDocument="User")
+     * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\User")
      */
     protected $user;
 

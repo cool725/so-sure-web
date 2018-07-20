@@ -4,6 +4,7 @@ namespace AppBundle\Document\Oauth;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use FOS\OAuthServerBundle\Document\AuthCode as BaseAuthCode;
 use FOS\OAuthServerBundle\Model\ClientInterface;
+use AppBundle\Document\User;
 
 /**
  * @MongoDB\Document(collection="oauthAuthCode")
@@ -21,7 +22,7 @@ class AuthCode extends BaseAuthCode
     protected $client;
 
     /**
-     * @MongoDB\ReferenceOne(targetDocument="User")
+     * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\User")
      */
     protected $user;
 
