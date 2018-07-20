@@ -27,6 +27,3 @@ services:
         calls:
             - [setContainer, ["@service_container"]]
         #tags: ['controller.service_arguments']  prefer constructor injection
-
-    AppBundle\Security\BearerTokenUserProvider: ~
-    AppBundle\Security\BearerTokenAuthenticator: ~

@@ -19,8 +19,6 @@ security:
             id: fos_user.user_provider.username
         cognito_identity_user_provider:
             id: app.user.cognitoidentity
-        bearer_token_user_provider:
-            id: AppBundle\Security\BearerTokenUserProvider
 
     firewalls:
         # disables authentication for assets and the profiler, adapt it according to your needs

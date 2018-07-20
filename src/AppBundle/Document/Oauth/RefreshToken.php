@@ -4,7 +4,6 @@ namespace AppBundle\Document\Oauth;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use FOS\OAuthServerBundle\Document\RefreshToken as BaseRefreshToken;
 use FOS\OAuthServerBundle\Model\ClientInterface;
-use AppBundle\Document\User;
 
 /**
  * @MongoDB\Document(collection="oauthRefreshToken")

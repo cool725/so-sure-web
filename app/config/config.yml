@@ -1281,3 +1281,10 @@ fos_oauth_server:
         user_provider: fos_user.user_provider
         options:
             supported_scopes: read
+            # Changing tokens and authcode lifetime
+            # 6 months
+            access_token_lifetime: 15768000
+            # 14 days
+            refresh_token_lifetime: 1209600
+            # initial request to getting a token
+            auth_code_lifetime: 120
