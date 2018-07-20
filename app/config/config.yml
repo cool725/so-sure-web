@@ -1278,5 +1278,6 @@ fos_oauth_server:
     refresh_token_class: AppBundle\Document\Oauth\RefreshToken
     auth_code_class:     AppBundle\Document\Oauth\AuthCode
     service:
+        user_provider: fos_user.user_provider
         options:
             supported_scopes: read

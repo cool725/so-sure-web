@@ -29,23 +29,22 @@ security:
             security: false
             provider: fos_userbundle
 
+        oauth_token:
+            pattern:    ^/oauth/v2/token
+            security:   false
+
+        oauth2_api:
+            pattern:    ^/api/v1/bearer
+            fos_oauth: true
+            stateless: true
+            anonymous: false
+
         api:
             pattern: ^/api
             stateless: true
             simple_preauth:
                 authenticator: app.user.cognitoidentity.authenticator
             provider: cognito_identity_user_provider
-
-        oauth_token:
-            pattern:    ^/oauth/v2/token
-            security:   false
-        oauth_authorize:
-            pattern:    ^/oauth/v2/auth
-            # Add your favorite authentication process here
-            stateless: true
-            simple_preauth:
-                authenticator: AppBundle\Security\BearerTokenAuthenticator
-            provider: bearer_token_user_provider
 
         main:
             pattern: ^/
@@ -93,5 +92,5 @@ security:
         - { path: ^/claims/, role: ROLE_NO_ACCESS }
         - { path: ^/alpha$, role: ROLE_USER }
         - { path: ^/user/, role: ROLE_USER }
-        - { path: ^/api/v1/bearer, roles: [ IS_AUTHENTICATED_FULLY ] }
+        - { path: ^/api, roles: [ IS_AUTHENTICATED_FULLY ] }
         #- { path: ^/api, access: "isApiPort(8080)" }

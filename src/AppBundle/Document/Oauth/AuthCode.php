@@ -20,6 +20,11 @@ class AuthCode extends BaseAuthCode
      */
     protected $client;
 
+    /**
+     * @MongoDB\ReferenceOne(targetDocument="User")
+     */
+    protected $user;
+
     public function getClient()
     {
         return $this->client;
