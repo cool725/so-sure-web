@@ -5,6 +5,7 @@ $(function() {
 
         // Elements & Data
         var phones     = $('#select-phone-data').data('phones');
+        var memOptTest = $('#select-phone-data').data('show-single-mem-opt');
         var make       = $('.select-phone-make');
         var model      = $('.select-phone-model');
         var memory     = $('.select-phone-memory');
@@ -31,7 +32,11 @@ $(function() {
             $.each(phones[make.val()], function(key, value) {
                 $.each(value, function(key2, mod) {
                     if (mod['featured'] && !model.find('option[value="' + key +'"]').length) {
-                        model.append($('<option />').val(key).text(key));
+                        if (memOptTest == true) {
+                            model.append($('<option />').val(key).text(make.val() + ' ' + key));
+                        } else {
+                            model.append($('<option />').val(key).text(key));
+                        }
                     }
                 });
             });
@@ -40,7 +45,11 @@ $(function() {
             $.each(phones[make.val()], function(key, value) {
                 $.each(value, function(key2, mod) {
                     if (!mod['featured'] && !model.find('option[value="' + key +'"]').length) {
-                        model.append($('<option />').val(key).text(key));
+                        if (memOptTest == true) {
+                            model.append($('<option />').val(key).text(make.val() + ' ' + key));
+                        } else {
+                            model.append($('<option />').val(key).text(key));
+                        }
                     }
                 });
             });
@@ -62,7 +71,11 @@ $(function() {
 
             // Get phones from list and add to options
             $.each(phones[make.val()][model.val()], function(key, value) {
-                memory.append($('<option />').val(key).text(value['memory'] + 'GB'));
+                if (memOptTest == true) {
+                    memory.append($('<option />').val(key).text(make.val() + ' ' + model.val() + ' ' + value['memory'] + 'GB'));
+                } else {
+                    memory.append($('<option />').val(key).text(value['memory'] + 'GB'));
+                }
             });
 
         }
@@ -81,9 +94,15 @@ $(function() {
 
             if ($(this).val() != '') {
                 model.show();
+                if (memOptTest == true) {
+                    $(this).hide();
+                }
             } else {
                 model.hide();
                 memory.hide();
+                if (memOptTest == true) {
+
+                }
             }
 
         });
@@ -96,11 +115,43 @@ $(function() {
             // Update Memory
             updateMemory();
 
-            if (value != '') {
-                memory.show();
+            // Get memory options
+            var memSel = memory.children('option').not('[value=""]').val();
+            var memOpt = memory.children('option').not('[value=""]').size();
+
+            // Check for memory test otherwise revert
+            if (memOptTest == true) {
+                // If more than one storage option
+                if (memOpt > 1) {
+                    // console.log(make.val() + ' ' + model.val() + ' has more than one storage size');
+                    if (value != '') {
+                        memory.show();
+                        $(this).hide();
+                    } else {
+                        make.show();
+                        memory.hide();
+                        $(this).hide();
+                    }
+                } else {
+                    // If only one storage option
+                    // console.log(make.val() + ' ' + model.val() + ' has only one storage size');
+                    if (value != '') {
+                        memory.val(memSel);
+                        controls.show();
+                    } else {
+                        make.show();
+                        memory.hide();
+                        $(this).hide();
+                        controls.hide();
+                    }
+                }
             } else {
-                make.show();
-                memory.hide();
+                if (value != '') {
+                    memory.show();
+                } else {
+                    make.show();
+                    memory.hide();
+                }
             }
         });
 
@@ -111,6 +162,10 @@ $(function() {
                 controls.show();
             } else {
                 controls.hide();
+                if (memOptTest == true) {
+                    $(this).hide();
+                    model.show();
+                }
             }
 
         });

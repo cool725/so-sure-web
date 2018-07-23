@@ -1,6 +1,7 @@
 {% set uid = '' %}
 {% set formId = 'dropdown-phone-form' %}
 {% set buttonText = 'Quote me' %}
+{% set formClass = '' %}
 
 {% if type is defined and type == 'purchase-select' %}
     {% set buttonText = 'Select Phone' %}
@@ -18,7 +19,7 @@
 
 <div id="select-phone-data"
      class="dropdown-phone-form"
-     data-phones="{{ phones|json_encode|raw }}">
+     data-phones='{{ phones|json_encode|raw }}'>
     {{ form_start(form_phone, { 'attr': { 'id': formId, 'autocomplete': 'off' }}) }}
         <div class="form-group">
             {{ form_widget(form_phone.make, {

@@ -6,15 +6,15 @@
         display: none;
     }
 
-    &-single-mem {
-        .select-phone-option {
-            font-family: $avenir-heavy;
+    // &-single-mem {
+    //     .select-phone-option {
+    //         font-family: $avenir-heavy;
 
-            &-focus {
-                color: $primary-blue;
-            }
-        }
-    }
+    //         &-focus {
+    //             color: $primary-blue;
+    //         }
+    //     }
+    // }
 }
 
 .dropdown-phone-form.affix {

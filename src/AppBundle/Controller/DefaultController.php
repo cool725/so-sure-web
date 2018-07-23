@@ -116,11 +116,18 @@ class DefaultController extends BaseController
             ['old-content-no-nav', 'new-content-with-nav']
         );
 
+        $expSearch = $this->sixpack(
+            $request,
+            SixpackService::EXPERIMENT_TEXT_VS_DROPDOWN,
+            ['text-search', 'dropdown-search']
+        );
+
         $data = array(
             // Make sure to check homepage landing below too
             'replacement' => $replacement,
             'referral'    => $referral,
             'phone'       => $this->getQuerystringPhone($request),
+            'search_type' => $expSearch,
         );
 
         $template = 'AppBundle:Default:index.html.twig';
@@ -347,11 +354,76 @@ class DefaultController extends BaseController
             }
         }
 
-        $exp = $this->sixpack(
-            $request,
-            SixpackService::EXPERIMENT_TEXT_VS_DROPDOWN,
-            ['text-search', 'dropdown-search']
-        );
+        // throw new \Exception(print_r($this->getPhonesArray(), true));
+
+        return [
+            'form_phone' => $formPhone->createView(),
+            'phones' => $this->getPhonesArray(),
+            'type' => $type,
+            'phone' => $phone,
+        ];
+    }
+
+    /**
+     * @Route("/select-phone-dropdown", name="select_phone_make_dropdown")
+     * @Route("/select-phone-dropdown/{type}/{id}", name="select_phone_make_dropdown_type_id")
+     * @Route("/select-phone-dropdown/{type}", name="select_phone_make_dropdown_type")
+     * @Template()
+     */
+    public function selectPhoneMakeDropdownNewAction(Request $request, $type = null, $id = null)
+    {
+        $dm = $this->getManager();
+        $phoneRepo = $dm->getRepository(Phone::class);
+        $phone = null;
+        $phoneMake = new PhoneMake();
+        if ($id) {
+            $phone = $phoneRepo->find($id);
+            $phoneMake->setMake($phone->getMake());
+        }
+
+        // throw new \Exception($id);
+
+        if ($phone && in_array($type, ['purchase-select', 'purchase-change'])) {
+            if ($session = $request->getSession()) {
+                $session->set('quote', $phone->getId());
+            }
+
+            // don't check for partial partial as selected phone may be different from partial policy phone
+            return $this->redirectToRoute('purchase_step_policy');
+        } elseif ($phone && in_array($type, ['learn-more'])) {
+            if ($session = $request->getSession()) {
+                $session->set('quote', $phone->getId());
+            }
+        }
+
+        $formPhone = $this->get('form.factory')
+            ->createNamedBuilder('launch_phone', PhoneMakeType::class, $phoneMake, [
+                'action' => $this->generateUrl('select_phone_make_dropdown'),
+            ])
+            ->getForm();
+        if ('POST' === $request->getMethod()) {
+            if ($request->request->has('launch_phone')) {
+                $phoneId = $this->getDataString($request->get('launch_phone'), 'memory');
+                if ($phoneId) {
+                    $phone = $phoneRepo->find($phoneId);
+                    if (!$phone) {
+                        throw new \Exception('unknown phone');
+                    }
+                    if ($phone->getMemory()) {
+                        return $this->redirectToRoute('quote_make_model_memory', [
+                            'make' => $phone->getMake(),
+                            'model' => $phone->getEncodedModel(),
+                            'memory' => $phone->getMemory(),
+                        ]);
+                    } else {
+                        return $this->redirectToRoute('quote_make_model', [
+                            'make' => $phone->getMake(),
+                            'model' => $phone->getEncodedModel(),
+                        ]);
+                    }
+                }
+            }
+        }
 
         // throw new \Exception(print_r($this->getPhonesArray(), true));
 
@@ -360,7 +432,6 @@ class DefaultController extends BaseController
             'phones' => $this->getPhonesArray(),
             'type' => $type,
             'phone' => $phone,
-            'search_type' => $exp,
         ];
     }
 

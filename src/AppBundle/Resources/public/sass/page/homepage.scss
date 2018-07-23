@@ -1161,12 +1161,23 @@
 
 // TODO: Move!
 .dropdown-phone-form--homepage {
-    max-width: 450px;
-    background-color: $white;
-    padding: 0;
-    position: relative;
-    margin: 0 auto;
-    z-index: 5;
+    // max-width: 450px;
+    // background-color: $white;
+    // padding: 0;
+    // position: relative;
+    // margin: 0 auto;
+    // z-index: 5;
+    //
+    .btn {
+        margin-top: 20px;
+    }
+
+    @include breakpoint(laptop) {
+        max-width: 600px;
+        position: relative;
+        z-index: 5;
+        margin: 0 auto;
+    }
 }
 
 .search-phone-form--homepage {
@@ -1307,7 +1318,7 @@
 }
 
 // Dropdown Affix adjust for mobile - iOS
-.dropdown-phone-form.affix {
+.dropdown-phone-form--homepage.affix {
     top: 50px;
     padding-top: 15px;
     background-color: $off-white !important;
@@ -1362,9 +1373,13 @@
 }
 
 // Dropdown Stuck adjust for mobile - Android
-.dropdown-phone-form.stuck {
+.dropdown-phone-form--homepage.stuck {
     padding: 15px 15px 0;
     background-color: $off-white;
+
+    @include breakpoint(laptop) {
+        top: 55px;
+    }
 }
 
 .speech-bubble {
