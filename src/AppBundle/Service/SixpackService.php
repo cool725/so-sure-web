@@ -76,6 +76,12 @@ class SixpackService
     // Exp 6
     const EXPERIMENT_PHONE_REPLACEMENT = 'twentyfour-seventy-two';
     // Exp 7
+    const EXPERIMENT_TEXT_VS_DROPDOWN = 'dropdown-search';
+    // Exp 8
+
+    // Exp 9
+
+    // Exp 10
 
     const ALTERNATIVES_SHARE_MESSAGE_SIMPLE = 'simple';
     const ALTERNATIVES_APP_SHARE_METHOD_NATIVE = 'native';
@@ -120,6 +126,12 @@ class SixpackService
         // Exp 6
         self::EXPERIMENT_PHONE_REPLACEMENT,
         // Exp 7
+        self::EXPERIMENT_TEXT_VS_DROPDOWN,
+        // Exp 8
+
+        // Exp 9
+
+        // Exp 10
 
     ];
 
@@ -168,6 +180,11 @@ class SixpackService
 
         // Exp 7
 
+        // Exp 8
+
+        // Exp 9
+
+        // Exp 10
     ];
 
     /**
@@ -185,7 +202,7 @@ class SixpackService
         // Exp 1
         self::EXPERIMENT_AB_NEW_CONTENT,
         // Exp 2
-
+        self::EXPERIMENT_TEXT_VS_DROPDOWN,
         // Exp 3
 
         // Exp 4
@@ -196,6 +213,11 @@ class SixpackService
 
         // Exp 7
 
+        // Exp 8
+
+        // Exp 9
+
+        // Exp 10
     ];
 
     /** @var LoggerInterface */

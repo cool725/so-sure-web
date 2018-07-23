@@ -512,6 +512,10 @@ class PhoneInsuranceController extends BaseController
             ['old-content-no-nav', 'new-content-with-nav']
         );
 
+        $this->get('app.sixpack')->convert(
+            SixpackService::EXPERIMENT_TEXT_VS_DROPDOWN
+        );
+
         $data = array(
             'phone'            => $phone,
             'phone_price'      => $phone->getCurrentPhonePrice(),

@@ -347,6 +347,12 @@ class DefaultController extends BaseController
             }
         }
 
+        $exp = $this->sixpack(
+            $request,
+            SixpackService::EXPERIMENT_TEXT_VS_DROPDOWN,
+            ['text-search', 'dropdown-search']
+        );
+
         // throw new \Exception(print_r($this->getPhonesArray(), true));
 
         return [
@@ -354,6 +360,7 @@ class DefaultController extends BaseController
             'phones' => $this->getPhonesArray(),
             'type' => $type,
             'phone' => $phone,
+            'search_type' => $exp,
         ];
     }
 
