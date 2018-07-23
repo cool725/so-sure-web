@@ -325,26 +325,30 @@
     {% include 'AppBundle::Default/_sectionComparison.html.twig' %}
     {% include 'AppBundle::Default/_sectionFeedback.html.twig' %}
 
-    {# Instant Quote #}
-    <section class="homepage--instant-quote">
-        <div class="container">
-            <h2 class="text-center h1">Get Your Instant Quote</h2>
-            {# Phone Search #}
-            {% if phone is defined and phone %}
-                {{ render(controller('AppBundle:Default:selectPhoneMakeSearch', {
-                    'type': 'footer',
-                    'id': phone.id
-                })) }}
-            {% else %}
-                {{ render(controller('AppBundle:Default:selectPhoneMakeSearch', {
-                    'type': 'footer',
-                })) }}
-            {% endif %}
-            {# End Phone Search #}
-            <img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" data-src="{{ cdn_url }}/images/homepage/so-sure_form_rocket.svg"
-                 class="img-responsive form-rocket lozad" alt="so-sure - rocket">
-        </div>
-    </section>
+    {% if search_type is defined and search_type == 'dropdown-search' %}
+        {# Hide search when using dropdodwn #}
+    {% else %}
+        {# Instant Quote #}
+        <section class="homepage--instant-quote">
+            <div class="container">
+                <h2 class="text-center h1">Get Your Instant Quote</h2>
+                {# Phone Search #}
+                {% if phone is defined and phone %}
+                    {{ render(controller('AppBundle:Default:selectPhoneMakeSearch', {
+                        'type': 'footer',
+                        'id': phone.id
+                    })) }}
+                {% else %}
+                    {{ render(controller('AppBundle:Default:selectPhoneMakeSearch', {
+                        'type': 'footer',
+                    })) }}
+                {% endif %}
+                {# End Phone Search #}
+                <img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" data-src="{{ cdn_url }}/images/homepage/so-sure_form_rocket.svg"
+                     class="img-responsive form-rocket lozad" alt="so-sure - rocket">
+            </div>
+        </section>
+    {% endif %}
 
     {# Page Modals #}
     {% include 'AppBundle::Default/_coverModals.html.twig' %}
@@ -363,6 +367,7 @@
     '@AppBundle/Resources/public/js/Default/homepage.js'
     '@AppBundle/Resources/public/js/Default/selectPhoneMakeSearch.js'
     '@AppBundle/Resources/public/js/Default/selectPhoneMakeDropdown.js'
+    '@AppBundle/Resources/public/js/Default/selectPhoneDropdown.js'
  %}
     <script src="{{ asset_url }}"></script>{% endjavascripts %}
 {% endblock %}

@@ -35,12 +35,14 @@ use AppBundle\Form\Type\LaunchType;
 use AppBundle\Form\Type\LeadEmailType;
 use AppBundle\Form\Type\RegisterUserType;
 use AppBundle\Form\Type\PhoneMakeType;
+use AppBundle\Form\Type\PhoneDropdownType;
 use AppBundle\Form\Type\PhoneType;
 use AppBundle\Form\Type\SmsAppLinkType;
 use AppBundle\Form\Type\ClaimFnolType;
 
 use AppBundle\Document\Form\Register;
 use AppBundle\Document\Form\PhoneMake;
+use AppBundle\Document\Form\PhoneDropdown;
 use AppBundle\Document\Form\ClaimFnol;
 use AppBundle\Document\User;
 use AppBundle\Document\Claim;
@@ -375,7 +377,7 @@ class DefaultController extends BaseController
         $dm = $this->getManager();
         $phoneRepo = $dm->getRepository(Phone::class);
         $phone = null;
-        $phoneMake = new PhoneMake();
+        $phoneMake = new PhoneDropdown();
         if ($id) {
             $phone = $phoneRepo->find($id);
             $phoneMake->setMake($phone->getMake());
@@ -397,7 +399,7 @@ class DefaultController extends BaseController
         }
 
         $formPhone = $this->get('form.factory')
-            ->createNamedBuilder('launch_phone', PhoneMakeType::class, $phoneMake, [
+            ->createNamedBuilder('launch_phone', PhoneDropdownType::class, $phoneMake, [
                 'action' => $this->generateUrl('select_phone_make_dropdown'),
             ])
             ->getForm();
