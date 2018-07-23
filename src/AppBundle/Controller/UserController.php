@@ -1494,6 +1494,19 @@ class UserController extends BaseController
 
         try {
             $invitation = $invitationService->inviteByFacebookId($policy, $facebookId);
+
+            $session = $request->getSession();
+            if ($session) {
+                $friends = $session->get('friends');
+                foreach ($friends as $id => $friend) {
+                    if ($friend['id'] == $facebookId) {
+                        unset($friends[$id]);
+                        break;
+                    }
+                }
+                $session->set('friends', $friends);
+            }
+
             $this->addFlash(
                 'success',
                 sprintf('%s was invited', $invitation->getEmail())
@@ -1530,28 +1543,9 @@ class UserController extends BaseController
                     $friends = array();
                     $facebookFriends = $facebook->getAllFriends();
                     foreach ($facebookFriends as $friend) {
-                        $isInvited = false;
-                        $isConnected = false;
-                        foreach ($policy->getSentInvitations() as $invitation) {
-                            if ($invitation->getChannel() == 'facebook' &&
-                                $friend['id'] == $invitation->getFacebookId()) {
-                                $isInvited = true;
-                                break;
-                            }
-                        }
-                        foreach ($policy->getUser()->getUnprocessedReceivedInvitations() as $invitation) {
-                            if ($invitation->getInviter()->getFacebookId() == $friend['id']) {
-                                $isInvited = true;
-                                break;
-                            }
-                        }
-                        foreach ($policy->getConnections() as $connection) {
-                            if ($connection->getLinkedUser()->getFacebookId() == $friend['id']) {
-                                $isConnected = true;
-                                break;
-                            }
-                        }
-                        if (!$isInvited && !$isConnected) {
+                        if (!$policy->isFacebookUserInvited($friend['id']) &&
+                            !$policy->isFacebookUserConnected($friend['id'])
+                        ) {
                             $friends[] = $friend;
                         }
                     }
