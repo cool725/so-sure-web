@@ -11,8 +11,12 @@ $(function() {
         var updateModels = function() {
 
             // Clear incase model change
-            // model.empty();
-            // memory.empty();
+            model.empty();
+            memory.empty().prop('disabled', 'disabled');
+
+            // Set the default value
+            model.append($('<option />').val('').text('Model'));
+            memory.append($('<option />').val('').text('Memory'));
 
             // Get phones from list and show featured
             $.each(phones[make.val()], function(key, value) {
@@ -35,6 +39,12 @@ $(function() {
 
         var updateMemory = function() {
 
+            // Clear incase model change
+            memory.empty();
+
+            // Set the default value
+            memory.append($('<option />').val('').text('Memory'));
+
             // Get phones from list and add to options
             $.each(phones[make.val()][model.val()], function(key, value) {
                 memory.append($('<option />').val(key).text(value['memory'] + 'GB'));
@@ -52,7 +62,6 @@ $(function() {
                 model.prop('disabled', '');
             } else {
                 model.prop('disabled', 'disabled').val('');
-                memory.prop('disabled', 'disabled').val('');
             }
 
         });
