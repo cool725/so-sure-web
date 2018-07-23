@@ -1,15 +1,21 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
+
+<section class="user-homepage--content section--pad">
 <div class="container">
-    <div class="row-fluid">
-        <div class="col-xs-12">
-            <div class="row-fluid">
-                <div class="col-xs-12">
-                    <h2>Who do you trust?</h2>
-                </div>
+
+    <div class="row">
+
+        <div class="row">
+            <div class="col-md-12">
+                <h1>Who do you trust?</h1>
             </div>
-            <div class="row-fluid">
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+
                 {% for friend in friends %}
                     <div class="col-xs-12 col-md-3">
                         <div class="trust">
@@ -19,10 +25,13 @@
                         </div>
                     </div>
                 {% endfor %}
+
             </div>
         </div>
     </div>
 </div>
+</section>
+
 {% endblock %}
 
 {% block stylesheets %}
