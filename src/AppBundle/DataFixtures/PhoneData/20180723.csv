@@ -1,2 +1,4 @@
 Make,Model,Details,Storage,Device,Monthly Policy Price,Replacement Price,Release Price,Release Price url,Os,InitialVersion,MaxVersion,Processor,Cores,Memory,SSD,Physical Screen,Resolution,Camera,4G,Frequency,Release Date,Picture,Urls,Replacement Make,Replacement Model,Replacement Memory
-Motorola,Moto G6 Plus,Motorola Moto G6 Plus,64,"'evert','evert_n','evert_nt'",5.49,,£269 ,https://www.techradar.com/reviews/moto-g6-plus-review/3,Android,8.0,,4096,8,2200,,160,1080 x 2160,12,Y,850 / 900 / 1800 / 1901,4/18,,,,,
+Motorola,Moto G6 Plus,Motorola Moto G6 Plus,64,"'evert','evert_n','evert_nt'",5.49,,£269 ,https://www.techradar.com/reviews/moto-g6-plus-review/3,Android,8.0,,4096,8,2200,Y,160,1080 x 2160,12,Y,850 / 900 / 1800 / 1901,4/18,,,,,
+LG,G7 ThinQ,LG G7 ThinQ,64,'judyln',7.99,,£619 ,https://www.techradar.com/reviews/lg-g7-thinq-review,Android,8.0,,2800,8,4096,Y,153.2,1440 x 3120,16,Y,850 / 900 / 1800 / 1901,5/18,,,,,
+LG,G7 ThinQ,LG G7 ThinQ,128,'judyln',7.99,,£669 ,https://www.techradar.com/reviews/lg-g7-thinq-review,Android,8.0,,2800,8,6144,Y,153.2,1440 x 3120,16,Y,850 / 900 / 1800 / 1901,5/18,,,,,
