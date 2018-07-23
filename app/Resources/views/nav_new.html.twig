@@ -26,6 +26,16 @@
                 {# Do nothing #}
             {% else %}
                 <ul class="nav navbar-nav navbar-right">
+                    {% if search_type is defined and search_type == 'dropdown-search' %}
+                        <li>
+                            <span>
+                                <a href="#"
+                                   class="btn btn-green navbar-btn pull-right scroll-to"
+                                   data-scroll-to-anchor="#dropdown-search"
+                                   data-scroll-to-adjust="40">Get a quote</a>
+                            </span>
+                        </li>
+                    {% endif %}
                     {# Link to personal or company insurance #}
                     {% if app.request.get('_route') == 'mobile_phone_insurance_for_your_company' %}
                         <li><a href="{{ path('homepage') }}">Personal phones</a></li>
