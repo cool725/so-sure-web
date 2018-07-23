@@ -21,7 +21,7 @@
 {% block body %}
 
     {# Hero #}
-    <section class="homepage--hero homepage--hero-background-trustpilot">
+    <section class="homepage--hero homepage--hero-background">
 
         <h1 class="homepage--hero-h1">Mobile insurance <br> designed for you.</h1>
         <p class="lead">A new type of phone insurance that’s reliable, rewarding and simply better.</p>
@@ -43,6 +43,12 @@
             }|merge(app.request.query.all))) }}
         {% endif %}
         {# End Phone Search #}
+
+        {# TrustBox widget - Mini #}
+        <div class="trustpilot-widget" data-locale="en-GB" data-template-id="5419b732fbfb950b10de65e5" data-businessunit-id="588f81d20000ff00059bc1e1" data-style-height="24px" data-style-width="100%" data-theme="light" style="margin:25px 0 0;">
+        <a href="https://uk.trustpilot.com/review/wearesosure.com" target="_blank">Trustpilot</a>
+        </div>
+        {# End TrustBox widget #}
     </section>
 
     {# What we are #}
@@ -64,7 +70,7 @@
                 <div class="col-md-12 text-center">
                     <ul class="list-inline text-center">
                         <li><img src="{{ cdn_url }}/images/press/ebay_so-sure_defaqto.svg" alt="Defaqto" title="Defaqto" class="homepage__press_defaqto"></li>
-                        <li><img src="{{ cdn_url }}/images/press/ebay_so-sure_trustpilot.svg" alt="TrustPilot" title="TrustPilot" class="homepage__press_trustpilot"></li>
+                        {# <li><img src="{{ cdn_url }}/images/press/ebay_so-sure_trustpilot.svg" alt="TrustPilot" title="TrustPilot" class="homepage__press_trustpilot"></li> #}
                         <li><img src="{{ cdn_url }}/images/press/ebay_so-sure_money.svg" alt="Money.co.uk" title="Money.co.uk" class="homepage__press_money"></li>
                         <li><img src="{{ cdn_url }}/images/press/ebay_so-sure_go-compare.svg" alt="Go Compare" title="Go Compare" class="homepage__press_gocompare"></li>
                         <li><img src="{{ cdn_url }}/images/press/ebay_so-sure_theguardian.svg" alt="The Guardian" title="The Guardian" class="homepage__press_theguardian"></li>
