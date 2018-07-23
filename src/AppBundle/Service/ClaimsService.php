@@ -120,12 +120,6 @@ class ClaimsService
             $pictureOfPhone->setKey($claimDamage->getPictureOfPhone());
             $claim->addFile($pictureOfPhone);
         }
-        if ($claimDamage->getOther()) {
-            $other = new OtherClaimFile();
-            $other->setBucket(self::S3_POLICY_BUCKET);
-            $other->setKey($claimDamage->getOther());
-            $claim->addFile($other);
-        }
         if ($submit) {
             $claim->setSubmissionDate(new \DateTime());
             $claim->setStatus(Claim::STATUS_SUBMITTED);
@@ -171,13 +165,6 @@ class ClaimsService
             $proofOfLoss->setBucket(self::S3_POLICY_BUCKET);
             $proofOfLoss->setKey($claimTheftLoss->getProofOfLoss());
             $claim->addFile($proofOfLoss);
-        }
-
-        if ($claimTheftLoss->getOther()) {
-            $other = new OtherClaimFile();
-            $other->setBucket(self::S3_POLICY_BUCKET);
-            $other->setKey($claimTheftLoss->getOther());
-            $claim->addFile($other);
         }
 
         if ($submit) {

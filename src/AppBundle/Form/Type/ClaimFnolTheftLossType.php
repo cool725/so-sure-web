@@ -76,7 +76,6 @@ class ClaimFnolTheftLossType extends AbstractType
                   ),
             ])
             ->add('proofOfBarring', FileType::class, ['required' => false])
-            ->add('other', FileType::class, ['required' => false])
             ->add('isSave', HiddenType::class)
             ->add('save', ButtonType::class)
             ->add('confirm', SubmitType::class)
@@ -156,15 +155,6 @@ class ClaimFnolTheftLossType extends AbstractType
                     $filename->guessExtension()
                 );
                 $data->setProofOfLoss($s3key);
-            }
-            if ($filename = $data->getOther()) {
-                $s3key = $this->claimsService->uploadS3(
-                    $filename,
-                    sprintf('other-%s', $timestamp),
-                    $data->getClaim()->getPolicy()->getUser()->getId(),
-                    $filename->guessExtension()
-                );
-                $data->setOther($s3key);
             }
         });
     }

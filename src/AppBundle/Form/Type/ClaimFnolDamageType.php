@@ -78,7 +78,6 @@ class ClaimFnolDamageType extends AbstractType
                     'Second hand' => Claim::PHONE_STATUS_SECOND_HAND,
                 ],
             ])
-            ->add('other', FileType::class, ['required' => false])
             ->add('isSave', HiddenType::class)
             ->add('save', ButtonType::class)
             ->add('confirm', SubmitType::class)
@@ -121,15 +120,6 @@ class ClaimFnolDamageType extends AbstractType
                     $filename->guessExtension()
                 );
                 $data->setPictureOfPhone($s3key);
-            }
-            if ($filename = $data->getOther()) {
-                $s3key = $this->claimsService->uploadS3(
-                    $filename,
-                    sprintf('other-%s', $timestamp),
-                    $data->getClaim()->getPolicy()->getUser()->getId(),
-                    $filename->guessExtension()
-                );
-                $data->setOther($s3key);
             }
         });
     }
