@@ -511,7 +511,7 @@ nelmio_security:
                 - https://intercom-sheets.com
                 - https://js.intercomcdn.com
                 - https://fast.wistia.net
-                - http://widget.trustpilot.com
+                - https://widget.trustpilot.com
             script-src:
                 - 'self'
                 - 'unsafe-inline'
@@ -568,7 +568,7 @@ nelmio_security:
                 # linked in
                 - https://secure.adnxs.com
                 - https://www.workable.com
-                - http://widget.trustpilot.com
+                - https://widget.trustpilot.com
                 - 'data:'
                 - https://bat.bing.com
                 # https://en.wikipedia.org/wiki/List_of_Google_domains
