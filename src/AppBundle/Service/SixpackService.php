@@ -144,7 +144,7 @@ class SixpackService
         ],
     ];
 
-    public static $appConversionsByClientId = [
+    public static $appParticipationByClientId = [
         self::EXPERIMENT_APP_PICSURE_LOCATION ,
         self::EXPERIMENT_APP_REQUEST_PICSURE_LOCATION,
     ];
