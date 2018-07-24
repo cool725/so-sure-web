@@ -2159,6 +2159,7 @@ class UserControllerTest extends BaseControllerTest
         } else {
             $this->assertFalse(isset($form['claim_update_form[proofOfUsage]']));
         }
+        //print $crawler->html();
         if ($requireProofOfPurchase) {
             $this->assertTrue(isset($form['claim_update_form[proofOfPurchase]']));
             $form['claim_update_form[proofOfPurchase]']->upload($proofOfPurchase);
@@ -2166,7 +2167,6 @@ class UserControllerTest extends BaseControllerTest
             $this->assertFalse(isset($form['claim_update_form[proofOfPurchase]']));
         }
         $this->assertFalse(isset($form['claim_update_form[proofOfBarring]']));
-        $this->assertFalse(isset($form['claim_update_form[proofOfPurchase]']));
         if ($requirePicture) {
             $this->assertTrue(isset($form['claim_update_form[pictureOfPhone]']));
             $form['claim_update_form[pictureOfPhone]']->upload($damagePicture);
@@ -2191,7 +2191,6 @@ class UserControllerTest extends BaseControllerTest
         $this->assertNotNull($updatedClaim);
         $this->assertEquals(Claim::STATUS_SUBMITTED, $updatedClaim->getStatus());
         $this->assertEquals(0, count($updatedClaim->getProofOfBarringFiles()));
-        $this->assertEquals(0, count($updatedClaim->getProofOfPurchaseFiles()));
         if ($requireProofOfUsage) {
             $this->assertEquals(1 + $previousRunCount, count($updatedClaim->getProofOfUsageFiles()));
         } else {

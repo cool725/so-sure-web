@@ -52,27 +52,26 @@ class ClaimFnolUpdateType extends AbstractType
 
         $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
             $form = $event->getForm();
+            /** @var Claim $claim */
             $claim = $event->getData()->getClaim();
 
             if ($claim->needProofOfUsage()) {
                 $form->add('proofOfUsage', FileType::class, ['required' => false]);
             }
 
-            if ($claim->getType() == Claim::TYPE_DAMAGE && $claim->needPictureOfPhone()) {
+            if ($claim->needPictureOfPhone()) {
                 $form->add('pictureOfPhone', FileType::class, ['required' => false]);
             }
 
-            if (($claim->getType() == Claim::TYPE_THEFT || $claim->getType() == Claim::TYPE_LOSS)) {
+            if ($claim->needProofOfBarring()) {
                 $form->add('proofOfBarring', FileType::class, ['required' => false]);
             }
 
-            if (($claim->getType() == Claim::TYPE_THEFT || $claim->getType() == Claim::TYPE_LOSS) &&
-                $claim->needProofOfPurchase()
-            ) {
+            if ($claim->needProofOfPurchase()) {
                 $form->add('proofOfPurchase', FileType::class, ['required' => false]);
             }
 
-            if ($claim->getType() == Claim::TYPE_LOSS) {
+            if ($claim->needProofOfLoss()) {
                 $form->add('proofOfLoss', FileType::class, ['required' => false]);
             }
 
