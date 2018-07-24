@@ -49,13 +49,14 @@
         {% endif %}
 
         {# Phone Search #}
-        {% if device_category() == 'Mobile' %}
-            {% set select_template = 'AppBundle:Default:selectPhoneMakeDropdown' %}
-        {% elseif search_type is defined and search_type == 'dropdown-search' %}
+        {% if search_type is defined and search_type == 'dropdown-search' %}
             {% set select_template = 'AppBundle:Default:selectPhoneMakeDropdownNew' %}
+        {% elseif device_category() == 'Mobile' %}
+            {% set select_template = 'AppBundle:Default:selectPhoneMakeDropdown' %}
         {% else %}
             {% set select_template = 'AppBundle:Default:selectPhoneMakeSearch' %}
         {% endif %}
+
         {% if phone is defined and phone %}
             {{ render(controller(select_template, {
                 'type': 'homepage-sticky',
