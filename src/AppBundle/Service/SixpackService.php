@@ -66,7 +66,7 @@ class SixpackService
     // Exp 1
     // const EXPERIMENT_HOMEPAGE_NEW_COPY = 'homepage-new-copy';
     // Exp 2
-    const EXPERIMENT_AD_LANDING = 'ad-landing';
+    const EXPERIMENT_AD_LANDING_2 = 'ad-landing';
     // Exp 3
     const EXPERIMENT_STARLING_LANDING = 'starling-landing';
     // Exp 4
@@ -110,7 +110,7 @@ class SixpackService
         // Exp 1
         // self::EXPERIMENT_HOMEPAGE_NEW_COPY,
         // Exp 2
-        self::EXPERIMENT_AD_LANDING,
+        self::EXPERIMENT_AD_LANDING_2,
         // Exp 3
         self::EXPERIMENT_STARLING_LANDING,
         // Exp 4
@@ -157,7 +157,7 @@ class SixpackService
         // Exp 1
         // self::EXPERIMENT_HOMEPAGE_NEW_COPY,
         // Exp 2
-        self::EXPERIMENT_AD_LANDING,
+        self::EXPERIMENT_AD_LANDING_2,
         // Exp 3
         self::EXPERIMENT_STARLING_LANDING,
         // Exp 4

@@ -239,7 +239,7 @@ class PhoneInsuranceController extends BaseController
         if (in_array($request->get('_route'), ['test_insurance_make_model_memory'])) {
             $adLanding = $this->sixpack(
                 $request,
-                SixpackService::EXPERIMENT_AD_LANDING,
+                SixpackService::EXPERIMENT_AD_LANDING_2,
                 ['ad-homepage', 'ad-landing']
             );
             if ($adLanding == 'ad-landing') {
