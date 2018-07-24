@@ -113,7 +113,7 @@ class DefaultController extends BaseController
         $expContent = $this->getSessionSixpackTest(
             $request,
             SixpackService::EXPERIMENT_AB_CONTENT_HOMEPAGE,
-            ['old-content-no-nav', 'new-content-with-nav']
+            ['old-homepage-copy', 'new-homepage-copy']
         );
 
         $data = array(

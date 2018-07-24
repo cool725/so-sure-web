@@ -167,7 +167,7 @@ class SixpackService
         // Exp 5
         self::EXPERIMENT_PHONE_REPLACEMENT,
         // Exp 6
-        self::EXPERIMENT_AB_CONTENT_HOMEPAGE,
+
         // Exp 7
 
     ];
@@ -187,7 +187,7 @@ class SixpackService
         // Exp 1
         // self::EXPERIMENT_AB_NEW_CONTENT,
         // Exp 2
-
+        self::EXPERIMENT_AB_CONTENT_HOMEPAGE,
         // Exp 3
 
         // Exp 4

@@ -243,6 +243,8 @@ class PurchaseController extends BaseController
                     }
                     $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_RECEIVE_DETAILS, $data);
 
+                    $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_AB_CONTENT_HOMEPAGE);
+
                     if ($user->hasPartialPolicy()) {
                         return new RedirectResponse(
                             $this->generateUrl('purchase_step_policy_id', [
@@ -259,11 +261,7 @@ class PurchaseController extends BaseController
         /** @var \Symfony\Component\Security\Csrf\CsrfTokenManagerInterface $csrf */
         $csrf = $this->get('security.csrf.token_manager');
 
-        // $moneyBackGuarantee = $this->sixpack(
-        //     $request,
-        //     SixpackService::EXPERIMENT_MONEY_BACK_GUARANTEE,
-        //     ['no-money-back-guarantee', 'money-back-guarantee']
-        // );
+
 
         $data = array(
             'purchase_form' => $purchaseForm->createView(),
@@ -278,8 +276,6 @@ class PurchaseController extends BaseController
             ) : null,
             // 'postcode' => $this->sixpack($request, SixpackService::EXPERIMENT_POSTCODE, ['comma', 'split', 'type']),
             'postcode' => 'comma',
-            // 'showDropdown' => $dobExp,
-            // 'moneyBackGuarantee' => $moneyBackGuarantee,
         );
 
         return $this->render('AppBundle:Purchase:purchaseStepPersonalAddress.html.twig', $data);
