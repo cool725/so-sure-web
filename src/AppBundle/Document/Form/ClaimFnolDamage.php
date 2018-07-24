@@ -45,8 +45,6 @@ class ClaimFnolDamage
 
     protected $pictureOfPhone;
 
-    protected $isSave;
-
     public function getTypeDetails()
     {
         return $this->typeDetails;
@@ -115,16 +113,6 @@ class ClaimFnolDamage
     public function setPictureOfPhone($pictureOfPhone)
     {
         $this->pictureOfPhone = $pictureOfPhone;
-    }
-
-    public function getIsSave()
-    {
-        return $this->isSave;
-    }
-    
-    public function setIsSave($isSave)
-    {
-        $this->isSave = $isSave;
     }
 
     public function getClaim()

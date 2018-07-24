@@ -76,8 +76,7 @@ class ClaimFnolTheftLossType extends AbstractType
                   ),
             ])
             ->add('proofOfBarring', FileType::class, ['required' => false])
-            ->add('isSave', HiddenType::class)
-            ->add('save', ButtonType::class)
+            ->add('save', SubmitType::class)
             ->add('confirm', SubmitType::class)
             ->add('crimeReferenceNumber', TextType::class, ['required' => false])
             ->add('force', ChoiceType::class, [

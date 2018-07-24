@@ -87,23 +87,12 @@ sosure.claim = (function() {
 })();
 
 $(function(){
+    sosure.claim.init();
 
     if ($('.has-error').length) {
         $('html,body').animate({
            scrollTop: $("#claim-form-container").offset().top
         });
     }
-
-    $('#claim_damage_form_save').click(function(){
-        $('#claim-form').removeData('validator');
-        $('#claim_damage_form_isSave').attr('value', '1');
-        $('#claim-form').submit();
-    });
-
-    $('#claim_damage_form_confirm').click(function(){
-        sosure.claim.init();
-        $('#claim_damage_form_isSave').attr('value', '0');
-        $('#claim-form').submit();
-    });
 
 });

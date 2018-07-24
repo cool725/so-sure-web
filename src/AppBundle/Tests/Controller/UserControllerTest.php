@@ -11,6 +11,7 @@ use AppBundle\Document\Lead;
 use AppBundle\Document\Policy;
 use AppBundle\Document\Claim;
 use AppBundle\Document\CurrencyTrait;
+use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 use Symfony\Component\Serializer\Serializer;
@@ -1230,7 +1231,8 @@ class UserControllerTest extends BaseControllerTest
         $this->assertTrue($claim->needPictureOfPhone());
 
         $this->login($email, $password);
-        $this->submitDamageForm($policy, $now, true, true);
+        $this->submitDamageForm($policy, $now, true, true, true);
+        $this->submitDamageForm($policy, $now, true, true, false, 1);
     }
 
     public function testUserClaimDamageNoPictureOfPhone()
@@ -1259,7 +1261,8 @@ class UserControllerTest extends BaseControllerTest
 
         $this->login($email, $password);
 
-        $this->submitDamageForm($policy, $now, true, false);
+        $this->submitDamageForm($policy, $now, true, false, true);
+        $this->submitDamageForm($policy, $now, true, false, false, 1);
     }
 
     public function testUserClaimDamageNoProofOfUsage()
@@ -1305,7 +1308,8 @@ class UserControllerTest extends BaseControllerTest
 
         $this->login($email, $password);
 
-        $this->submitDamageForm($policy, $now, false, false);
+        $this->submitDamageForm($policy, $now, false, false, true);
+        $this->submitDamageForm($policy, $now, false, false, false, 1);
     }
 
     public function testUserClaimLoss()
@@ -1331,7 +1335,8 @@ class UserControllerTest extends BaseControllerTest
         $this->assertTrue($claim->needProofOfPurchase());
 
         $this->login($email, $password);
-        $this->submitLossTheftForm($policy, $now, true, true);
+        $this->submitLossTheftForm($policy, $now, true, true, true);
+        $this->submitLossTheftForm($policy, $now, true, true, false, 1);
     }
 
     public function testUserClaimLossNoProofOfPurchase()
@@ -1359,7 +1364,8 @@ class UserControllerTest extends BaseControllerTest
         $this->assertFalse($claim->needProofOfPurchase());
 
         $this->login($email, $password);
-        $this->submitLossTheftForm($policy, $now, true, false);
+        $this->submitLossTheftForm($policy, $now, true, false, true);
+        $this->submitLossTheftForm($policy, $now, true, false, false, 1);
     }
 
     public function testUserClaimLossNoProofOfUsage()
@@ -1401,7 +1407,8 @@ class UserControllerTest extends BaseControllerTest
         $this->assertFalse($claim->needProofOfPurchase());
 
         $this->login($email, $password);
-        $this->submitLossTheftForm($policy, $now, false, false);
+        $this->submitLossTheftForm($policy, $now, false, false, true);
+        $this->submitLossTheftForm($policy, $now, false, false, false, 1);
     }
 
     public function testUserClaimTheft()
@@ -1427,7 +1434,8 @@ class UserControllerTest extends BaseControllerTest
         $this->assertTrue($claim->needProofOfPurchase());
 
         $this->login($email, $password);
-        $this->submitLossTheftForm($policy, $now, true, true);
+        $this->submitLossTheftForm($policy, $now, true, true, true);
+        $this->submitLossTheftForm($policy, $now, true, true, false, 1);
     }
 
     public function testUserClaimTheftNoProofOfPurchase()
@@ -1455,7 +1463,8 @@ class UserControllerTest extends BaseControllerTest
         $this->assertFalse($claim->needProofOfPurchase());
 
         $this->login($email, $password);
-        $this->submitLossTheftForm($policy, $now, true, false);
+        $this->submitLossTheftForm($policy, $now, true, false, true);
+        $this->submitLossTheftForm($policy, $now, true, false, false, 1);
     }
 
     public function testUserClaimTheftNoProofOfUsage()
@@ -1497,7 +1506,8 @@ class UserControllerTest extends BaseControllerTest
         $this->assertFalse($claim->needProofOfPurchase());
 
         $this->login($email, $password);
-        $this->submitLossTheftForm($policy, $now, false, false);
+        $this->submitLossTheftForm($policy, $now, false, false, true);
+        $this->submitLossTheftForm($policy, $now, false, false, false, 1);
     }
 
     public function testUserClaimUpdateTheft()
@@ -1523,9 +1533,10 @@ class UserControllerTest extends BaseControllerTest
         $this->assertTrue($claim->needProofOfPurchase());
 
         $this->login($email, $password);
-        $this->submitLossTheftForm($policy, $now, true, true);
+        $this->submitLossTheftForm($policy, $now, true, true, true);
+        $this->submitLossTheftForm($policy, $now, true, true, false, 1);
 
-        $this->updateLossTheftForm($policy, $now, true, true);
+        $this->updateLossTheftForm($policy, $now, true, true, 2);
     }
 
     public function testUserClaimUpdateTheftNoProofOfUsage()
@@ -1567,9 +1578,10 @@ class UserControllerTest extends BaseControllerTest
         $this->assertFalse($claim->needProofOfPurchase());
 
         $this->login($email, $password);
-        $this->submitLossTheftForm($policy, $now, false, false);
+        $this->submitLossTheftForm($policy, $now, false, false, true);
+        $this->submitLossTheftForm($policy, $now, false, false, false, 1);
 
-        $this->updateLossTheftForm($policy, $now, false, false);
+        $this->updateLossTheftForm($policy, $now, false, false, 2);
     }
 
     public function testUserClaimUpdateLoss()
@@ -1595,9 +1607,10 @@ class UserControllerTest extends BaseControllerTest
         $this->assertTrue($claim->needProofOfPurchase());
 
         $this->login($email, $password);
-        $this->submitLossTheftForm($policy, $now, true, true);
+        $this->submitLossTheftForm($policy, $now, true, true, true);
+        $this->submitLossTheftForm($policy, $now, true, true, false, 1);
 
-        $this->updateLossTheftForm($policy, $now, true, true);
+        $this->updateLossTheftForm($policy, $now, true, true, 2);
     }
 
     public function testUserClaimUpdateLossNoProofOfUsage()
@@ -1639,9 +1652,10 @@ class UserControllerTest extends BaseControllerTest
         $this->assertFalse($claim->needProofOfPurchase());
 
         $this->login($email, $password);
-        $this->submitLossTheftForm($policy, $now, false, false);
+        $this->submitLossTheftForm($policy, $now, false, false, true);
+        $this->submitLossTheftForm($policy, $now, false, false, false, 1);
 
-        $this->updateLossTheftForm($policy, $now, false, false);
+        $this->updateLossTheftForm($policy, $now, false, false, 2);
     }
 
     public function testUserClaimUpdateDamage()
@@ -1669,7 +1683,7 @@ class UserControllerTest extends BaseControllerTest
         $this->login($email, $password);
         $this->submitDamageForm($policy, $now, true, true);
 
-        $this->updateDamageForm($policy, $now, true, true);
+        $this->updateDamageForm($policy, $now, true, true, 1);
     }
 
     public function testUserClaimUpdateDamageNoProofOfUsage()
@@ -1713,7 +1727,7 @@ class UserControllerTest extends BaseControllerTest
         $this->login($email, $password);
         $this->submitDamageForm($policy, $now, false, false);
 
-        $this->updateDamageForm($policy, $now, false, false);
+        $this->updateDamageForm($policy, $now, false, false, 1);
     }
 
     private function createClaim(Policy $policy, $type, \DateTime $date)
@@ -1740,7 +1754,8 @@ class UserControllerTest extends BaseControllerTest
         Policy $policy,
         \DateTime $now,
         $requireProofOfUsage,
-        $requireProofOfPurchase
+        $requireProofOfPurchase,
+        $partial = false
     ) {
         $serializer = new Serializer(array(new DateTimeNormalizer()));
 
@@ -1778,10 +1793,17 @@ class UserControllerTest extends BaseControllerTest
         );
 
         $claimPage = self::$router->generate('claimed_theftloss_policy', ['policyId' => $policy->getId()]);
+        /** @var Crawler $crawler */
         $crawler = self::$client->request('GET', $claimPage);
         self::verifyResponse(200);
-        $form = $crawler->selectButton('claim_theftloss_form[confirm]')->form();
-        $form['claim_theftloss_form[hasContacted]'] = true;
+        if ($partial) {
+            $form = $crawler->selectButton('claim_theftloss_form[save]')->form();
+        } else {
+            $form = $crawler->selectButton('claim_theftloss_form[confirm]')->form();
+        }
+        if ($partial) {
+            $form['claim_theftloss_form[hasContacted]'] = true;
+        }
         $form['claim_theftloss_form[contactedPlace]'] = 'so-sure offices';
         $form['claim_theftloss_form[blockedDate]'] = $serializer->normalize(
             $now,
@@ -1810,6 +1832,14 @@ class UserControllerTest extends BaseControllerTest
             $this->assertFalse(isset($form['claim_theftloss_form[proofOfPurchase]']));
         }
         $crawler = self::$client->submit($form);
+
+        if ($partial) {
+            //print $crawler->html();
+            self::verifyResponse(200);
+
+            return;
+        }
+        print $crawler->html();
 
         self::verifyResponse(302);
         $this->assertTrue(self::$client->getResponse()->isRedirect(sprintf('/user/claim/%s', $policy->getId())));
@@ -1855,7 +1885,9 @@ class UserControllerTest extends BaseControllerTest
         Policy $policy,
         \DateTime $now,
         $requireProofOfUsage,
-        $requirePicture
+        $requirePicture,
+        $partial = false,
+        $previousRunCount = 0
     ) {
         $serializer = new Serializer(array(new DateTimeNormalizer()));
 
@@ -1882,12 +1914,19 @@ class UserControllerTest extends BaseControllerTest
         );
 
         $claimPage = self::$router->generate('claimed_damage_policy', ['policyId' => $policy->getId()]);
+        /** @var Crawler $crawler */
         $crawler = self::$client->request('GET', $claimPage);
         self::verifyResponse(200);
-        $form = $crawler->selectButton('claim_damage_form[confirm]')->form();
+        if ($partial) {
+            $form = $crawler->selectButton('claim_damage_form[save]')->form();
+        } else {
+            $form = $crawler->selectButton('claim_damage_form[confirm]')->form();
+        }
         $form['claim_damage_form[typeDetails]'] = Claim::DAMAGE_BROKEN_SCREEN;
         $form['claim_damage_form[typeDetailsOther]'] = '';
-        $form['claim_damage_form[monthOfPurchase]'] = 'December';
+        if ($partial) {
+            $form['claim_damage_form[monthOfPurchase]'] = 'December';
+        }
         $form['claim_damage_form[yearOfPurchase]'] = '2018';
         $form['claim_damage_form[phoneStatus]'] = Claim::PHONE_STATUS_NEW;
 
@@ -1904,6 +1943,14 @@ class UserControllerTest extends BaseControllerTest
             $this->assertFalse(isset($form['claim_damage_form[pictureOfPhone]']));
         }
         $crawler = self::$client->submit($form);
+
+        if ($partial) {
+            //print $crawler->html();
+            self::verifyResponse(200);
+
+            return;
+        }
+        print $crawler->html();
 
         self::verifyResponse(302);
         $this->assertTrue(self::$client->getResponse()->isRedirect(sprintf('/user/claim/%s', $policy->getId())));
@@ -1925,12 +1972,12 @@ class UserControllerTest extends BaseControllerTest
         $this->assertEquals(Claim::DAMAGE_BROKEN_SCREEN, $updatedClaim->getTypeDetails());
 
         if ($requireProofOfUsage) {
-            $this->assertEquals(1, count($updatedClaim->getProofOfUsageFiles()));
+            $this->assertEquals(1 + $previousRunCount, count($updatedClaim->getProofOfUsageFiles()));
         } else {
             $this->assertEquals(0, count($updatedClaim->getProofOfUsageFiles()));
         }
         if ($requirePicture) {
-            $this->assertEquals(1, count($updatedClaim->getDamagePictureFiles()));
+            $this->assertEquals(1 + $previousRunCount, count($updatedClaim->getDamagePictureFiles()));
         } else {
             $this->assertEquals(0, count($updatedClaim->getDamagePictureFiles()));
         }
@@ -1940,7 +1987,8 @@ class UserControllerTest extends BaseControllerTest
         Policy $policy,
         \DateTime $now,
         $requireProofOfUsage,
-        $requireProofOfPurchase
+        $requireProofOfPurchase,
+        $previousRunCount = 0
     ) {
         $serializer = new Serializer(array(new DateTimeNormalizer()));
 
@@ -2014,14 +2062,14 @@ class UserControllerTest extends BaseControllerTest
         $updatedClaim = $updatedPolicy->getLatestClaim();
         $this->assertNotNull($updatedClaim);
         $this->assertEquals(Claim::STATUS_SUBMITTED, $updatedClaim->getStatus());
-        $this->assertEquals(2, count($updatedClaim->getProofOfBarringFiles()));
+        $this->assertEquals(1 + $previousRunCount, count($updatedClaim->getProofOfBarringFiles()));
         if ($requireProofOfUsage) {
-            $this->assertEquals(2, count($updatedClaim->getProofOfUsageFiles()));
+            $this->assertEquals(1 + $previousRunCount, count($updatedClaim->getProofOfUsageFiles()));
         } else {
             $this->assertEquals(0, count($updatedClaim->getProofOfUsageFiles()));
         }
         if ($requireProofOfPurchase) {
-            $this->assertEquals(2, count($updatedClaim->getProofOfPurchaseFiles()));
+            $this->assertEquals(1 + $previousRunCount, count($updatedClaim->getProofOfPurchaseFiles()));
         } else {
             $this->assertEquals(0, count($updatedClaim->getProofOfPurchaseFiles()));
         }
@@ -2031,7 +2079,8 @@ class UserControllerTest extends BaseControllerTest
         Policy $policy,
         \DateTime $now,
         $requireProofOfUsage,
-        $requirePicture
+        $requirePicture,
+        $previousRunCount = 0
     ) {
         $serializer = new Serializer(array(new DateTimeNormalizer()));
 
@@ -2097,12 +2146,12 @@ class UserControllerTest extends BaseControllerTest
         $this->assertEquals(0, count($updatedClaim->getProofOfBarringFiles()));
         $this->assertEquals(0, count($updatedClaim->getProofOfPurchaseFiles()));
         if ($requireProofOfUsage) {
-            $this->assertEquals(2, count($updatedClaim->getProofOfUsageFiles()));
+            $this->assertEquals(1 + $previousRunCount, count($updatedClaim->getProofOfUsageFiles()));
         } else {
             $this->assertEquals(0, count($updatedClaim->getProofOfUsageFiles()));
         }
         if ($requirePicture) {
-            $this->assertEquals(2, count($updatedClaim->getDamagePictureFiles()));
+            $this->assertEquals(1 + $previousRunCount, count($updatedClaim->getDamagePictureFiles()));
         } else {
             $this->assertEquals(0, count($updatedClaim->getDamagePictureFiles()));
         }

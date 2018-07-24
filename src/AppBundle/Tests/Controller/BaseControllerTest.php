@@ -13,6 +13,7 @@ class BaseControllerTest extends WebTestCase
 {
     use \AppBundle\Tests\PhingKernelClassTrait;
     use \AppBundle\Tests\UserClassTrait;
+    /** @var \Symfony\Bundle\FrameworkBundle\Client */
     protected static $client;
     protected static $container;
     /** @var DocumentManager */
@@ -31,7 +32,9 @@ class BaseControllerTest extends WebTestCase
 
     public static function setUpBeforeClass()
     {
-        self::$client = self::createClient();
+        /** @var \Symfony\Bundle\FrameworkBundle\Client $client */
+        $client = self::createClient();
+        self::$client = $client;
         self::$container = self::$client->getContainer();
         if (!self::$container) {
             throw new \Exception('unable to find container');

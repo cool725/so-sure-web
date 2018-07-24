@@ -62,8 +62,6 @@ class ClaimFnolTheftLoss
      */
     protected $force;
 
-    protected $isSave;
-
     public function getHasContacted()
     {
         return $this->hasContacted;
@@ -172,16 +170,6 @@ class ClaimFnolTheftLoss
     public function setForce($force)
     {
         $this->force = $force;
-    }
-
-    public function getIsSave()
-    {
-        return $this->isSave;
-    }
-    
-    public function setIsSave($isSave)
-    {
-        $this->isSave = $isSave;
     }
 
     public function getClaim()

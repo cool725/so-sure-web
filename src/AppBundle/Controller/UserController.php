@@ -1626,20 +1626,19 @@ class UserController extends BaseController
             ->getForm();
 
         if ('POST' === $request->getMethod()) {
+            /** @var ClaimsService $claimsService */
+            $claimsService = $this->get('app.claims');
             if ($request->request->has('claim_damage_form')) {
                 $claimDamageForm->handleRequest($request);
-                if ($claimDamageForm->isValid()) {
-                    $claimsService = $this->get('app.claims');
-                    if ($claimFnolDamage->getIsSave()) {
-                        $claimsService->updateDamageDocuments($claim, $claimFnolDamage);
-                        $this->addFlash(
-                            'success',
-                            'Your claim has been saved.'
-                        );
-                    } else {
-                        $claimsService->updateDamageDocuments($claim, $claimFnolDamage, true);
-                        return $this->redirectToRoute('claimed_policy', ['policyId' => $policy->getId()]);
-                    }
+                if ($claimDamageForm->get('save')->isClicked()) {
+                    $claimsService->updateDamageDocuments($claim, $claimFnolDamage);
+                    $this->addFlash(
+                        'success',
+                        'Your claim has been saved.'
+                    );
+                } elseif ($claimDamageForm->isValid()) {
+                    $claimsService->updateDamageDocuments($claim, $claimFnolDamage, true);
+                    return $this->redirectToRoute('claimed_policy', ['policyId' => $policy->getId()]);
                 }
             }
         }
@@ -1683,21 +1682,19 @@ class UserController extends BaseController
             ->getForm();
 
         if ('POST' === $request->getMethod()) {
+            /** @var ClaimsService $claimsService */
+            $claimsService = $this->get('app.claims');
             if ($request->request->has('claim_theftloss_form')) {
                 $claimTheftLossForm->handleRequest($request);
-                if ($claimTheftLossForm->isValid()) {
-                    /** @var ClaimsService $claimsService */
-                    $claimsService = $this->get('app.claims');
-                    if ($claimFnolTheftLoss->getIsSave()) {
-                        $claimsService->updateTheftLossDocuments($claim, $claimFnolTheftLoss);
-                        $this->addFlash(
-                            'success',
-                            'Your claim has been saved.'
-                        );
-                    } else {
-                        $claimsService->updateTheftLossDocuments($claim, $claimFnolTheftLoss, true);
-                        return $this->redirectToRoute('claimed_policy', ['policyId' => $policy->getId()]);
-                    }
+                if ($claimTheftLossForm->get('save')->isClicked()) {
+                    $claimsService->updateTheftLossDocuments($claim, $claimFnolTheftLoss);
+                    $this->addFlash(
+                        'success',
+                        'Your claim has been saved.'
+                    );
+                } elseif ($claimTheftLossForm->isValid()) {
+                    $claimsService->updateTheftLossDocuments($claim, $claimFnolTheftLoss, true);
+                    return $this->redirectToRoute('claimed_policy', ['policyId' => $policy->getId()]);
                 }
             }
         }
