@@ -1126,14 +1126,6 @@ class PurchaseController extends BaseController
                         $intercom->queueMessage($policy->getUser()->getEmail(), $body);
                     }
 
-                    /** @var MailerService $mailer */
-                    $mailer = $this->get('app.mailer');
-                    $mailer->send(
-                        'Requested Policy Cancellation',
-                        'info@so-sure.com',
-                        $body
-                    );
-
                     $this->get('app.mixpanel')->queueTrack(
                         MixpanelService::EVENT_REQUEST_CANCEL_POLICY,
                         ['Policy Id' => $policy->getId(), 'Reason' => $reason]
