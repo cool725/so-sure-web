@@ -66,7 +66,7 @@ class SixpackService
     // Exp 1
     // const EXPERIMENT_HOMEPAGE_NEW_COPY = 'homepage-new-copy';
     // Exp 2
-    const EXPERIMENT_AD_LANDING_2 = 'ad-landing';
+    const EXPERIMENT_AD_LANDING = 'ad-landing-2';
     // Exp 3
     const EXPERIMENT_STARLING_LANDING = 'starling-landing';
     // Exp 4
