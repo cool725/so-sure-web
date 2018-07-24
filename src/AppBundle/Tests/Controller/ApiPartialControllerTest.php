@@ -111,6 +111,10 @@ class ApiPartialControllerTest extends BaseApiControllerTest
         $url = sprintf('/api/v1/partial/ab/%s?_method=GET', SixpackService::EXPERIMENT_APP_PICSURE_LOCATION);
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, array());
         $data = $this->verifyResponse(200);
+
+        $url = sprintf('/api/v1/partial/ab/%s?_method=GET', SixpackService::EXPERIMENT_APP_REQUEST_PICSURE_LOCATION);
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, array());
+        $data = $this->verifyResponse(200);
     }
 
     public function testABAllNone()

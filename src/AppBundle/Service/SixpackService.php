@@ -144,6 +144,11 @@ class SixpackService
         ],
     ];
 
+    public static $appConversionsByClientId = [
+        self::EXPERIMENT_APP_PICSURE_LOCATION ,
+        self::EXPERIMENT_APP_REQUEST_PICSURE_LOCATION,
+    ];
+
     /**
      * For cases where there is only one conversion point (purchase)
      * @var array

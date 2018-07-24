@@ -131,7 +131,7 @@ class ApiPartialController extends BaseController
                     throw new NotFoundHttpException();
                 }
                 $clientId = $scode->getCode();
-            } elseif ($name == SixpackService::EXPERIMENT_APP_PICSURE_LOCATION) {
+            } elseif (in_array($name, SixpackService::$appConversionsByClientId)) {
                 $clientId = $user->getId();
             }
 
@@ -168,19 +168,13 @@ class ApiPartialController extends BaseController
                     '',
                     200
                 );
-            } elseif ($name == SixpackService::EXPERIMENT_APP_SHARE_METHOD) {
+            } elseif (in_array($name, array_keys(SixpackService::$appExperiments))) {
                 $id = $this->getRequestString($request, 'id');
                 if ($id) {
-                    $experiment = $sixpack->convertByClientId(
-                        $id,
-                        SixpackService::EXPERIMENT_APP_SHARE_METHOD
-                    );
+                    $experiment = $sixpack->convertByClientId($id, $name);
                 } else {
-                    $experiment = $sixpack->convert(
-                        SixpackService::EXPERIMENT_APP_SHARE_METHOD
-                    );
+                    $experiment = $sixpack->convert($name);
                 }
-
                 return $this->getErrorJsonResponse(
                     ApiErrorCode::SUCCESS,
                     '',
