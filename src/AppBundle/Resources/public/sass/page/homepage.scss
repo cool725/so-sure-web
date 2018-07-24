@@ -1161,6 +1161,8 @@
 
 // TODO: Move!
 .dropdown-phone-form--homepage {
+    max-width: 450px;
+    margin: 0 auto;
 
     .btn {
         margin-top: 20px;
@@ -1170,7 +1172,6 @@
         max-width: 600px;
         position: relative;
         z-index: 5;
-        margin: 0 auto;
     }
 }
 
