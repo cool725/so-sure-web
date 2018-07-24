@@ -1511,6 +1511,10 @@ class UserController extends BaseController
                 'success',
                 sprintf('%s was invited', $invitation->getEmail())
             );
+        } catch (NotFoundHttpException $e) {
+            $this->addFlash('error', 'Sorry, your facebook friend is not a so-sure customer yet');
+        } catch (DuplicateInvitationException $e) {
+            $this->addFlash('error', 'Sorry, you have already invited this facebook friend');
         } catch (SelfInviteException $e) {
             $this->addFlash('error', 'Sorry, you are not able to invite yourself');
         } catch (\Exception $e) {
