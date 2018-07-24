@@ -51,7 +51,7 @@ class PhoneDropdownType extends AbstractType
             }
         }
         $makeChoiceOptions = [
-            'placeholder' => 'Phone Make',
+            'placeholder' => 'Make',
             'choices' => $this->dm->getRepository(Phone::class)->findActiveMakes(),
             'required' => $this->required,
         ];
