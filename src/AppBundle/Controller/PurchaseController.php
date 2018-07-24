@@ -243,11 +243,6 @@ class PurchaseController extends BaseController
                     }
                     $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_RECEIVE_DETAILS, $data);
 
-                    // Convert point from quote
-                    $this->get('app.sixpack')->convert(
-                        SixpackService::EXPERIMENT_TEXT_VS_DROPDOWN
-                    );
-
                     $this->get('app.sixpack')->convert(
                         SixpackService::EXPERIMENT_AB_NEW_CONTENT
                     );

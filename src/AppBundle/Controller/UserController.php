@@ -1172,10 +1172,6 @@ class UserController extends BaseController
             $this->generateUrl('purchase_cancel', ['id' => $user->getLatestPolicy()->getId()])
         ));
 
-        $this->get('app.sixpack')->convert(
-            SixpackService::EXPERIMENT_TEXT_VS_DROPDOWN
-        );
-
         return array(
             'policy_key' => $this->getParameter('policy_key'),
             'policy' => $user->getLatestPolicy(),
