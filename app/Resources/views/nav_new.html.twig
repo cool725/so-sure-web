@@ -18,12 +18,7 @@
                 </button>
             {% endif %}
             {% if search_type is defined and search_type == 'dropdown-search' %}
-                <span class="navbar-btn pull-right hidden-md hidden-lg">
-                    <a href="#"
-                       class="btn btn-green scroll-to"
-                       data-scroll-to-anchor="#dropdown-search"
-                       data-scroll-to-adjust="40">Get a quote</a>
-                </span>
+                <span class="hidden-md hidden-lg pull-right"><a href="#" class="btn btn-blue-hollow scroll-to navbar-btn-alt" data-scroll-to-anchor="#dropdown-search" data-scroll-to-adjust="40">Get a quote</a></span>
             {% endif %}
             <a class="navbar-brand" href="/">
                 <div class="so-sure-logo so-sure-logo-blue-flat"></div>
@@ -43,9 +38,7 @@
                     <li><a href="{{ path('faq') }}">FAQ</a></li>
                     {% if search_type is defined and search_type == 'dropdown-search' %}
                         <li class="hidden-xs hidden-sm">
-                            <span class="navbar-btn">
-                                <a href="#" class="btn btn-green scroll-to" data-scroll-to-anchor="#dropdown-search" data-scroll-to-adjust="40">Get a quote</a>
-                            </span>
+                            <span><a href="#" class="btn navbar-btn scroll-to" data-scroll-to-anchor="#dropdown-search" data-scroll-to-adjust="40">Get a quote</a></span>
                         </li>
                     {% endif %}
                     {% if app.user is not null and app.user %}
