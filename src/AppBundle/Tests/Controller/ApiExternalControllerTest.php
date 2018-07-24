@@ -387,7 +387,10 @@ class ApiExternalControllerTest extends BaseApiControllerTest
     {"gadget": {"gadget_id": 820, "loss_cover": true}},
 
     {"gadget": {"gadget_id": 835, "loss_cover": true}},
-    {"gadget": {"gadget_id": 836, "loss_cover": true}}
+    {"gadget": {"gadget_id": 836, "loss_cover": true}},
+
+    {"gadget": {"gadget_id": 1239, "loss_cover": true}},
+    {"gadget": {"gadget_id": 1240, "loss_cover": true}}
   ]
 }}';
         $url = sprintf(
@@ -406,7 +409,7 @@ class ApiExternalControllerTest extends BaseApiControllerTest
             $data
         );
         $data = $this->verifyResponse(200);
-        $this->assertEquals(45, count($data['response']), json_encode($data));
+        $this->assertEquals(47, count($data['response']), json_encode($data));
     }
 
     public function testGoCompareDeeplink()
