@@ -110,7 +110,7 @@ class SixpackService
         // Exp 1
         // self::EXPERIMENT_HOMEPAGE_NEW_COPY,
         // Exp 2
-        self::EXPERIMENT_AD_LANDING_2,
+        self::EXPERIMENT_AD_LANDING,
         // Exp 3
         self::EXPERIMENT_STARLING_LANDING,
         // Exp 4
@@ -157,7 +157,7 @@ class SixpackService
         // Exp 1
         // self::EXPERIMENT_HOMEPAGE_NEW_COPY,
         // Exp 2
-        self::EXPERIMENT_AD_LANDING_2,
+        self::EXPERIMENT_AD_LANDING,
         // Exp 3
         self::EXPERIMENT_STARLING_LANDING,
         // Exp 4
