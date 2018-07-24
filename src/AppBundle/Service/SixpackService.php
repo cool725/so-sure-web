@@ -45,7 +45,7 @@ class SixpackService
 
     const EXPERIMENT_HOMEPAGE_AA_V2 = 'homepage-aa-v2';
     const EXPERIMENT_APP_SHARE_METHOD = 'app-share-method';
-    const EXPERIMENT_APP_PICSURE_LOCATION = 'app-picsure-location';
+    const EXPERIMENT_APP_PICSURE_LOCATION = 'app-request-picsure-location';
     //const EXPERIMENT_STEP_3 = 'step-3-payment-new';
     const EXPERIMENT_PURCHASE_FLOW_BACS = 'purchase-flow-bacs';
     const EXPERIMENT_CPC_QUOTE_HOMEPAGE = 'cpc-quote-or-homepage';
@@ -132,10 +132,6 @@ class SixpackService
         self::EXPERIMENT_APP_SHARE_METHOD => [
             self::ALTERNATIVES_APP_SHARE_METHOD_NATIVE,
             self::ALTERNATIVES_APP_SHARE_METHOD_API,
-        ],
-        self::EXPERIMENT_APP_PICSURE_LOCATION => [
-            self::ALTERNATIVES_APP_PICSURE_NO_LOCATION,
-            self::ALTERNATIVES_APP_PICSURE_REQUEST_LOCATION,
         ],
     ];
 
