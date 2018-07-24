@@ -1,5 +1,4 @@
 <?php
-
 namespace AppBundle\DataFixtures\MongoDB\d\Oauth2;
 
 use AppBundle\Document\Oauth\Client;
@@ -36,7 +35,7 @@ class LoadOauth2Data implements FixtureInterface, ContainerAwareInterface
             throw new \Exception('missing container');
         }
 
-        $this->newOauth2Client($manager, [], []);
+        $this->newOauth2Client($manager, ['read', 'summary'], []);
 
         $manager->flush();
         // $this->valdiateGedmoLogging($manager);
@@ -61,7 +60,7 @@ class LoadOauth2Data implements FixtureInterface, ContainerAwareInterface
         $client->setRandomId(self::KNOWN_CLIENT_ID_RANDOM);
 
         $client->setSecret(self::KNOWN_CLIENT_SECRET);
-        $client->setAllowedGrantTypes(array_merge(($client->getAllowedGrantTypes()),$grantTypes));
+        $client->setAllowedGrantTypes(array_merge($client->getAllowedGrantTypes(), $grantTypes));
         $client->setRedirectUris($redirectUrls);
 
         /** @var UserManagerInterface $userManager */
