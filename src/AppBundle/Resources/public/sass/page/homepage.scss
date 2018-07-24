@@ -1313,7 +1313,7 @@
 }
 
 // Dropdown Affix adjust for mobile - iOS
-.dropdown-phone-form--homepage.affix {
+.dropdown-phone-form.affix {
     top: 50px;
     padding-top: 15px;
     background-color: $off-white !important;
@@ -1368,7 +1368,7 @@
 }
 
 // Dropdown Stuck adjust for mobile - Android
-.dropdown-phone-form--homepage.stuck {
+.dropdown-phone-form.stuck {
     padding: 15px 15px 0;
     background-color: $off-white;
 

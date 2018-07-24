@@ -15,51 +15,54 @@ $(function(){
     // Stuck, replace affix for non iOS
     $(window).bind('load', function() {
 
-        // If iOS
-        if (sosure.globals.isiOS) {
+        if ($('#select-phone-data').length) {
 
-            // Offset of search from top of page once page is loaded
-            var stickyOffset = $('#select-phone-data').offset().top;
+            // If iOS
+            if (sosure.globals.isiOS) {
 
-            // Init BS affix
-            $('#select-phone-data').affix({
-                offset: {
-                    top: stickyOffset + 50,
-                    bottom: function () {
-                        return (this.bottom = $('footer').outerHeight(true) + 1000)
+                // Offset of search from top of page once page is loaded
+                var stickyOffset = $('#select-phone-data').offset().top;
+
+                // Init BS affix
+                $('#select-phone-data').affix({
+                    offset: {
+                        top: stickyOffset + 50,
+                        bottom: function () {
+                            return (this.bottom = $('footer').outerHeight(true) + 1000)
+                        }
+                    }
+                }).on('affixed.bs.affix', function() {
+                    // This event is fired after the element has been affixed.
+
+                    // Add animation
+                    $(this).addClass('animated fadeInDown');
+
+                }).on('affix-top.bs.affix',function() {
+                    // This event fires immediately before the element has been affixed-top.
+
+                    // Remove animation to refire
+                    $(this).removeClass('animated fadeInDown');
+                });
+            // If anything else
+            } else {
+
+                var target = $('#select-phone-data');
+
+                function stuck() {
+                    var height = $(window).scrollTop();
+                    var position = target.position();
+                    var subClass = null;
+
+                    if (height > position.top) {
+                        target.addClass('stuck animated fadeInDown');
+                    } else {
+                        target.removeClass('stuck animated fadeInDown');
                     }
                 }
-            }).on('affixed.bs.affix', function() {
-                // This event is fired after the element has been affixed.
 
-                // Add animation
-                $(this).addClass('animated fadeInDown');
-
-            }).on('affix-top.bs.affix',function() {
-                // This event fires immediately before the element has been affixed-top.
-
-                // Remove animation to refire
-                $(this).removeClass('animated fadeInDown');
-            });
-        // If anything else
-        } else {
-
-            var target = $('#select-phone-data');
-
-            function stuck() {
-                var height = $(window).scrollTop();
-                var position = target.position();
-                var subClass = null;
-
-                if (height > position.top) {
-                    target.addClass('stuck animated fadeInDown');
-                } else {
-                    target.removeClass('stuck animated fadeInDown');
+                if (target.length) {
+                    $(window).scroll(stuck);
                 }
-            }
-
-            if (target.length) {
-                $(window).scroll(stuck);
             }
         }
 
