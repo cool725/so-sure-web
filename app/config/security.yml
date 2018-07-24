@@ -27,16 +27,14 @@ security:
             security: false
             provider: fos_userbundle
 
-        oauth_token:
-            pattern:    ^/oauth/v2/token
-            security:   false
-
         oauth2_api:
             pattern:    ^/api/v1/bearer
             fos_oauth: true
             stateless: true
-            anonymous: false
-            provider: fos_userbundle
+            anonymous: true
+        oauth_token:
+            pattern:    ^/oauth/v2/token
+            security:   false
 
         api:
             pattern: ^/api
@@ -91,5 +89,5 @@ security:
         - { path: ^/claims/, role: ROLE_NO_ACCESS }
         - { path: ^/alpha$, role: ROLE_USER }
         - { path: ^/user/, role: ROLE_USER }
-        - { path: ^/api, roles: [ IS_AUTHENTICATED_FULLY ] }
-        #- { path: ^/api, access: "isApiPort(8080)" }
+        - { path: ^/bearer-api, roles: [ IS_AUTHENTICATED_FULLY ] }
+        - { path: ^/api, access: "isApiPort(8080)" }

@@ -21,8 +21,8 @@ services:
 
     # controllers are imported separately to make sure they're public
     # (and have a tag that allows actions to type-hint services)
-    AppBundle\Controller\Api\:
-        resource: '../../../src/AppBundle/Controller/Api/*'
+    AppBundle\Controller\BearerApi\:
+        resource: '../../../src/AppBundle/Controller/BearerApi/*'
         public: true
         calls:
             - [setContainer, ["@service_container"]]

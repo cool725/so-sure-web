@@ -1,9 +1,8 @@
 <?php
 
-namespace AppBundle\DataFixtures\MongoDB\b\Oauth2;
+namespace AppBundle\DataFixtures\MongoDB\d\Oauth2;
 
 use AppBundle\Document\Oauth\Client;
-use AppBundle\Document\User;
 use Doctrine\Common\DataFixtures\FixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 use FOS\UserBundle\Model\UserManagerInterface;
@@ -11,7 +10,7 @@ use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 // @codingStandardsIgnoreFile
-class LoadUserData implements FixtureInterface, ContainerAwareInterface
+class LoadOauth2Data implements FixtureInterface, ContainerAwareInterface
 {
     // These can be used for testing
     const KNOWN_CLIENT_ID = '5b51ec6b636239778924b671_36v22l3ei3wgw0k4wos48kokk0cwsgo0ocggggoc84w0cw8844';

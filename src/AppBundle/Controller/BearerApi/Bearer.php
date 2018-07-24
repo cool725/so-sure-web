@@ -1,5 +1,5 @@
 <?php
-namespace AppBundle\Controller\Api;
+namespace AppBundle\Controller\BearerApi;
 
 use AppBundle\Classes\ApiErrorCode;
 use AppBundle\Controller\BaseController;
@@ -13,7 +13,7 @@ use Symfony\Component\Routing\Annotation\Route;
 /**
  * API that deals with Bearer-token based authentication
  *
- * @Route("/api/v1/bearer")
+ * @Route("/bearer-api/v1")
  */
 class Bearer extends BaseController
 {
