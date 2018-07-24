@@ -176,7 +176,51 @@ class ClaimFnolTheftLoss
     {
         return $this->claim;
     }
-    
+
+    /**
+     * @Assert\IsTrue(message="At least one Proof of Usage File must be uploaded")
+     */
+    public function hasProofOfUsage()
+    {
+        if ($this->getClaim()->needProofOfUsage()) {
+            return $this->getProofOfUsage() || count($this->getClaim()->getProofOfUsageFiles()) > 0;
+        } else {
+            return true;
+        }
+    }
+
+    /**
+     * @Assert\IsTrue(message="At least one Proof of Barring File must be uploaded")
+     */
+    public function hasProofOfBarring()
+    {
+        return $this->getProofOfBarring() || count($this->getClaim()->getProofOfBarringFiles()) > 0;
+    }
+
+    /**
+     * @Assert\IsTrue(message="At least one Proof of Purchase File must be uploaded")
+     */
+    public function hasProofOfPurchase()
+    {
+        if ($this->getClaim()->needProofOfPurchase()) {
+            return $this->getProofOfPurchase() || count($this->getClaim()->getProofOfPurchaseFiles()) > 0;
+        } else {
+            return true;
+        }
+    }
+
+    /**
+     * @Assert\IsTrue(message="At least one Proof of Loss File must be uploaded")
+     */
+    public function hasProofOfLoss()
+    {
+        if ($this->getClaim()->needProofOfLoss()) {
+            return $this->getProofOfLoss() || count($this->getClaim()->getProofOfLossFiles()) > 0;
+        } else {
+            return true;
+        }
+    }
+
     public function setClaim(Claim $claim)
     {
         $this->claim = $claim;

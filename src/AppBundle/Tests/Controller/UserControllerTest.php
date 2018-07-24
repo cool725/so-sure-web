@@ -1522,7 +1522,7 @@ class UserControllerTest extends BaseControllerTest
             $phone,
             self::$dm
         );
-        $now = new \DateTime('2018-01-01');
+        $now = new \DateTime();
         $policy = self::initPolicy($user, self::$dm, $phone, null, true, true);
         $policy->setStatus(Policy::STATUS_ACTIVE);
         $policy->setStart($now);
@@ -1596,7 +1596,7 @@ class UserControllerTest extends BaseControllerTest
             $phone,
             self::$dm
         );
-        $now = new \DateTime('2018-01-01');
+        $now = new \DateTime();
         $policy = self::initPolicy($user, self::$dm, $phone, null, true, true);
         $policy->setStatus(Policy::STATUS_ACTIVE);
         $policy->setStart($now);
@@ -1670,7 +1670,7 @@ class UserControllerTest extends BaseControllerTest
             $phone,
             self::$dm
         );
-        $now = new \DateTime('2018-01-01');
+        $now = new \DateTime();
         $policy = self::initPolicy($user, self::$dm, $phone, null, true, true);
         $policy->setStatus(Policy::STATUS_ACTIVE);
         $policy->setStart($now);
@@ -1755,7 +1755,8 @@ class UserControllerTest extends BaseControllerTest
         \DateTime $now,
         $requireProofOfUsage,
         $requireProofOfPurchase,
-        $partial = false
+        $partial = false,
+        $previousRunCount = 0
     ) {
         $serializer = new Serializer(array(new DateTimeNormalizer()));
 
@@ -1839,7 +1840,7 @@ class UserControllerTest extends BaseControllerTest
 
             return;
         }
-        print $crawler->html();
+        //print $crawler->html();
 
         self::verifyResponse(302);
         $this->assertTrue(self::$client->getResponse()->isRedirect(sprintf('/user/claim/%s', $policy->getId())));
@@ -1868,14 +1869,14 @@ class UserControllerTest extends BaseControllerTest
         $this->assertEquals('britishtransportpolice', $updatedClaim->getForce());
         $this->assertEquals('1234567890', $updatedClaim->getCrimeRef());
 
-        $this->assertEquals(1, count($updatedClaim->getProofOfBarringFiles()));
+        $this->assertEquals(1 + $previousRunCount, count($updatedClaim->getProofOfBarringFiles()));
         if ($requireProofOfUsage) {
-            $this->assertEquals(1, count($updatedClaim->getProofOfUsageFiles()));
+            $this->assertEquals(1 + $previousRunCount, count($updatedClaim->getProofOfUsageFiles()));
         } else {
             $this->assertEquals(0, count($updatedClaim->getProofOfUsageFiles()));
         }
         if ($requireProofOfPurchase) {
-            $this->assertEquals(1, count($updatedClaim->getProofOfPurchaseFiles()));
+            $this->assertEquals(1 + $previousRunCount, count($updatedClaim->getProofOfPurchaseFiles()));
         } else {
             $this->assertEquals(0, count($updatedClaim->getProofOfPurchaseFiles()));
         }
@@ -1950,7 +1951,7 @@ class UserControllerTest extends BaseControllerTest
 
             return;
         }
-        print $crawler->html();
+        //print $crawler->html();
 
         self::verifyResponse(302);
         $this->assertTrue(self::$client->getResponse()->isRedirect(sprintf('/user/claim/%s', $policy->getId())));

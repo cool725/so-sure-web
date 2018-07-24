@@ -1762,6 +1762,11 @@ class Claim
         return !$policy->isPicSureValidated();
     }
 
+    public function needProofOfLoss()
+    {
+        return $this->getType() == self::TYPE_LOSS && $this->getReportType() == self::REPORT_ONLINE;
+    }
+
     public static function getExcessValue($type, $picSureValidated, $picSureEnabled)
     {
         if ($picSureEnabled && !$picSureValidated) {

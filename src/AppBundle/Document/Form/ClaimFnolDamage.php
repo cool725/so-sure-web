@@ -32,7 +32,9 @@ class ClaimFnolDamage
     protected $monthOfPurchase;
 
     /**
-     * @Assert\Range(min="2015", max="2050")
+     * 2016 is launched year - allowed 3 years gives 2013
+     * TODO: Adjust to use a max of current year as a specialised validator
+     * @Assert\Range(min="2013", max="2050")
      */
     protected $yearOfPurchase;
 
@@ -119,7 +121,31 @@ class ClaimFnolDamage
     {
         return $this->claim;
     }
-    
+
+    /**
+     * @Assert\IsTrue(message="At least one Proof of Usage File must be uploaded")
+     */
+    public function hasProofOfUsage()
+    {
+        if ($this->getClaim()->needProofOfUsage()) {
+            return $this->getProofOfUsage() || count($this->getClaim()->getProofOfUsageFiles()) > 0;
+        } else {
+            return true;
+        }
+    }
+
+    /**
+     * @Assert\IsTrue(message="At least one Picture of Damage File must be uploaded")
+     */
+    public function hasPictureOfPhone()
+    {
+        if ($this->getClaim()->needPictureOfPhone()) {
+            return $this->getPictureOfPhone() || count($this->getClaim()->getDamagePictureFiles()) > 0;
+        } else {
+            return true;
+        }
+    }
+
     public function setClaim($claim)
     {
         $this->claim = $claim;
