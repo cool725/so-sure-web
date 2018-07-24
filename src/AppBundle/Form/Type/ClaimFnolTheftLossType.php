@@ -75,7 +75,6 @@ class ClaimFnolTheftLossType extends AbstractType
                       'year' => 'YYYY', 'month' => 'MM', 'day' => 'DD',
                   ),
             ])
-            ->add('proofOfBarring', FileType::class, ['required' => false])
             ->add('save', SubmitType::class)
             ->add('confirm', SubmitType::class)
             ->add('crimeReferenceNumber', TextType::class, ['required' => false])
@@ -88,6 +87,7 @@ class ClaimFnolTheftLossType extends AbstractType
 
         $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
             $form = $event->getForm();
+            /** @var Claim $claim */
             $claim = $event->getData()->getClaim();
 
             if ($claim->needProofOfUsage()) {
@@ -96,9 +96,13 @@ class ClaimFnolTheftLossType extends AbstractType
             if ($claim->needProofOfPurchase()) {
                 $form->add('proofOfPurchase', FileType::class, ['required' => false]);
             }
+            if ($claim->needProofOfBarring()) {
+                $form->add('proofOfBarring', FileType::class, ['required' => false]);
+            }
             if ($claim->getType() == Claim::TYPE_THEFT) {
                 $form->add('reportType', HiddenType::class);
             } else {
+                // don't use needProofOfLoss here to determine display as would then require 2 steps to submit
                 $form->add('proofOfLoss', FileType::class, ['required' => false]);
                 $form->add('reportType', ChoiceType::class, [
                     'required' => false,

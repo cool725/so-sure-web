@@ -1568,18 +1568,29 @@ class UserController extends BaseController
             ->getForm();
 
         if ('POST' === $request->getMethod()) {
-            if ($request->request->has('claim_update_form')) {
-                $claimUpdateForm->handleRequest($request);
-                if ($claimUpdateForm->isValid()) {
-                    /** @var ClaimsService $claimsService */
-                    $claimsService = $this->get('app.claims');
-                    $claimsService->updateDocuments($claim, $claimFnolUpdate);
-                    $this->addFlash(
-                        'success',
-                        'Your claim has been updated.'
-                    );
-                    return $this->redirectToRoute('claimed_policy', ['policyId' => $policy->getId()]);
+            try {
+                if ($request->request->has('claim_update_form')) {
+                    $claimUpdateForm->handleRequest($request);
+                    if ($claimUpdateForm->isValid()) {
+                        /** @var ClaimsService $claimsService */
+                        $claimsService = $this->get('app.claims');
+                        $claimsService->updateDocuments($claim, $claimFnolUpdate);
+                        $this->addFlash(
+                            'success',
+                            'Your claim has been updated.'
+                        );
+                        return $this->redirectToRoute('claimed_policy', ['policyId' => $policy->getId()]);
+                    }
                 }
+            } catch (\Exception $e) {
+                $this->get('logger')->error(
+                    sprintf('claimSubmittedPolicyAction %s', $policyId),
+                    ['exception' => $e]
+                );
+                $this->addFlash(
+                    'error',
+                    'Sorry, there was a system error. Our engineers are investigating.'
+                );
             }
         }
 
@@ -1629,16 +1640,27 @@ class UserController extends BaseController
             /** @var ClaimsService $claimsService */
             $claimsService = $this->get('app.claims');
             if ($request->request->has('claim_damage_form')) {
-                $claimDamageForm->handleRequest($request);
-                if ($claimDamageForm->get('save')->isClicked()) {
-                    $claimsService->updateDamageDocuments($claim, $claimFnolDamage);
-                    $this->addFlash(
-                        'success',
-                        'Your claim has been saved.'
+                try {
+                    $claimDamageForm->handleRequest($request);
+                    if ($claimDamageForm->get('save')->isClicked()) {
+                        $claimsService->updateDamageDocuments($claim, $claimFnolDamage);
+                        $this->addFlash(
+                            'success',
+                            'Your claim has been saved.'
+                        );
+                    } elseif ($claimDamageForm->isValid()) {
+                        $claimsService->updateDamageDocuments($claim, $claimFnolDamage, true);
+                        return $this->redirectToRoute('claimed_policy', ['policyId' => $policy->getId()]);
+                    }
+                } catch (\Exception $e) {
+                    $this->get('logger')->error(
+                        sprintf('claimDamagePolicyAction %s', $policyId),
+                        ['exception' => $e]
                     );
-                } elseif ($claimDamageForm->isValid()) {
-                    $claimsService->updateDamageDocuments($claim, $claimFnolDamage, true);
-                    return $this->redirectToRoute('claimed_policy', ['policyId' => $policy->getId()]);
+                    $this->addFlash(
+                        'error',
+                        'Sorry, there was a system error. Our engineers are investigating.'
+                    );
                 }
             }
         }
@@ -1686,15 +1708,26 @@ class UserController extends BaseController
             $claimsService = $this->get('app.claims');
             if ($request->request->has('claim_theftloss_form')) {
                 $claimTheftLossForm->handleRequest($request);
-                if ($claimTheftLossForm->get('save')->isClicked()) {
-                    $claimsService->updateTheftLossDocuments($claim, $claimFnolTheftLoss);
-                    $this->addFlash(
-                        'success',
-                        'Your claim has been saved.'
+                try {
+                    if ($claimTheftLossForm->get('save')->isClicked()) {
+                        $claimsService->updateTheftLossDocuments($claim, $claimFnolTheftLoss);
+                        $this->addFlash(
+                            'success',
+                            'Your claim has been saved.'
+                        );
+                    } elseif ($claimTheftLossForm->isValid()) {
+                        $claimsService->updateTheftLossDocuments($claim, $claimFnolTheftLoss, true);
+                        return $this->redirectToRoute('claimed_policy', ['policyId' => $policy->getId()]);
+                    }
+                } catch (\Exception $e) {
+                    $this->get('logger')->error(
+                        sprintf('claimTheftLossPolicyAction %s', $policyId),
+                        ['exception' => $e]
                     );
-                } elseif ($claimTheftLossForm->isValid()) {
-                    $claimsService->updateTheftLossDocuments($claim, $claimFnolTheftLoss, true);
-                    return $this->redirectToRoute('claimed_policy', ['policyId' => $policy->getId()]);
+                    $this->addFlash(
+                        'error',
+                        'Sorry, there was a system error. Our engineers are investigating.'
+                    );
                 }
             }
         }

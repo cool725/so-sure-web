@@ -21,6 +21,7 @@
 {# {% block nav %}{% endblock %} #}
 
 {% block body %}
+    {% set sectionCount = 1 %}
 
     <section id="claim-form-container" class="section--pad background-off-white">
         <div class="container">
@@ -35,7 +36,8 @@
 
                         <div class="panel panel-info">
                             <div class="panel-heading">
-                                <h3 class="panel-title">1. Can you find your phone?</h3>
+                                <h3 class="panel-title">{{ sectionCount }}. Can you find your phone?</h3>
+                                {% set sectionCount = sectionCount + 1 %}
                             </div>
                             <div class="panel-body">
                                 Losing a phone can happen to anyone and although it doesn't always seem like it will work, we've had many
@@ -61,7 +63,8 @@
 
                         <div class="panel panel-info">
                             <div class="panel-heading">
-                                <h3 class="panel-title">2. Contacting your mobile provider</h3>
+                                <h3 class="panel-title">{{ sectionCount }}. Contacting your mobile provider</h3>
+                                {% set sectionCount = sectionCount + 1 %}
                             </div>
                             <div class="panel-body">
                                 You'll need to call up your mobile phone provider and:
@@ -121,7 +124,8 @@
 
                         <div class="panel panel-info">
                             <div class="panel-heading">
-                                <h3 class="panel-title">3. Reporting your loss to the authorities</h3>
+                                <h3 class="panel-title">{{ sectionCount }}. Reporting your loss to the authorities</h3>
+                                {% set sectionCount = sectionCount + 1 %}
                             </div>
                             <div class="panel-body">
                                 Sadly in this day and age, there is little the police can initially do about this. However, occasionally, the police may come across your phone at a later date.
@@ -176,12 +180,11 @@
                             </div>
                         </div>
 
-                        {% set sectionCount = 3 %}
                         {% if claim_form.proofOfPurchase is defined %}
-                            {% set sectionCount = 5 %}
                             <div class="panel panel-info">
                                 <div class="panel-heading">
-                                    <h3 class="panel-title">4. Proof of purchase</h3>
+                                    <h3 class="panel-title">{{ sectionCount }}. Proof of purchase</h3>
+                                    {% set sectionCount = sectionCount + 1 %}
                                 </div>
                                 <div class="panel-body">
                                     We require a proof of purchase document such as a receipt.
@@ -207,6 +210,7 @@
                         <div class="panel panel-info">
                             <div class="panel-heading">
                                 <h3 class="panel-title">{{ sectionCount }}. Submit your claim</h3>
+                                {% set sectionCount = sectionCount + 1 %}
                             </div>
                             <div class="panel-body">
                                 Once your claim is submitted, we aim to get back to you within 3 working hours. You can save your progress and come back at a later date if you need more time to get all of the required documents.

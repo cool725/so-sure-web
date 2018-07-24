@@ -2,6 +2,7 @@
 
 namespace AppBundle\Form\Type;
 
+use AppBundle\Document\Form\ClaimFnolDamage;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -90,6 +91,9 @@ class ClaimFnolDamageType extends AbstractType
             if ($claim->needProofOfUsage()) {
                 $form->add('proofOfUsage', FileType::class, ['required' => false]);
             }
+            if ($claim->needProofOfPurchase()) {
+                $form->add('proofOfPurchase', FileType::class, ['required' => false]);
+            }
             if ($claim->needPictureOfPhone()) {
                 $form->add('pictureOfPhone', FileType::class, ['required' => false]);
             }
@@ -97,6 +101,7 @@ class ClaimFnolDamageType extends AbstractType
 
         $builder->addEventListener(FormEvents::SUBMIT, function (FormEvent $event) {
             $form = $event->getForm();
+            /** @var ClaimFnolDamage $data */
             $data = $event->getData();
 
             $now = new \DateTime();
@@ -110,6 +115,15 @@ class ClaimFnolDamageType extends AbstractType
                     $filename->guessExtension()
                 );
                 $data->setProofOfUsage($s3key);
+            }
+            if ($filename = $data->getProofOfPurchase()) {
+                $s3key = $this->claimsService->uploadS3(
+                    $filename,
+                    sprintf('proof-of-purchase-%s', $timestamp),
+                    $data->getClaim()->getPolicy()->getUser()->getId(),
+                    $filename->guessExtension()
+                );
+                $data->setProofOfPurchase($s3key);
             }
             if ($filename = $data->getPictureOfPhone()) {
                 $s3key = $this->claimsService->uploadS3(

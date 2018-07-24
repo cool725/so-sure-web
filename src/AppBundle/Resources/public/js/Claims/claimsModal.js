@@ -51,6 +51,22 @@ $('#claimsModal').on('show.bs.modal', function (event) {
                     modal.find('#claims-detail-damage-proof-usages').html('Not requested');                    
                 }
 
+                if (claim.needProofOfPurchase) {
+                    if (documents.proofOfPurchases.length > 0) {
+                        var proofOfPurchases = '';
+                        $.each(documents.proofOfPurchases, function(key, value) {
+                            proofOfPurchases += '<p><a href="'+value.ulr+'">'+value.filename+'</a></p>';
+                        });
+                        modal.find('#claims-detail-proof-purchases').html(proofOfPurchases);
+                    }
+                    else {
+                        modal.find('#claims-detail-proof-purchases').html('Not uploaded yet');
+                    }
+                }
+                else {
+                    modal.find('#claims-detail-proof-purchases').html('Not requested');
+                }
+
                 if (claim.needPictureOfPhone) {
                     if (documents.damagePictures.length > 0) {
                         var damagePictures = '';
@@ -106,15 +122,20 @@ $('#claimsModal').on('show.bs.modal', function (event) {
                     modal.find('#claims-detail-theftloss-proof-usages').html('Not requested');
                 }
 
-                if (documents.proofOfBarrings.length > 0) {
-                    var proofOfBarrings = '';
-                    $.each(documents.proofOfBarrings, function(key, value) {
-                        proofOfBarrings += '<p><a href="'+value.url+'">'+value.filename+'</a></p>';
-                    });
-                    modal.find('#claims-detail-proof-barrings').html(proofOfBarrings);
+                if (claim.needProofOfBarring) {
+                    if (documents.proofOfBarrings.length > 0) {
+                        var proofOfBarrings = '';
+                        $.each(documents.proofOfBarrings, function (key, value) {
+                            proofOfBarrings += '<p><a href="' + value.url + '">' + value.filename + '</a></p>';
+                        });
+                        modal.find('#claims-detail-proof-barrings').html(proofOfBarrings);
+                    }
+                    else {
+                        modal.find('#claims-detail-proof-barrings').html('Not uploaded yet');
+                    }
                 }
                 else {
-                    modal.find('#claims-detail-proof-barrings').html('Not uploaded yet');
+                        modal.find('#claims-detail-proof-barrings').html('Not requested');
                 }
 
                 if (claim.needProofOfPurchase) {
@@ -134,15 +155,20 @@ $('#claimsModal').on('show.bs.modal', function (event) {
                 }
                 
                 if (claim.type == 'loss') {
-                    if (documents.proofOfLosses.length > 0) {
-                        var proofOfLosses = '';
-                        $.each(documents.proofOfLosses, function(key, value) {
-                            proofOfLosses += '<p><a href="'+value.ulr+'">'+value.filename+'</a></p>';
-                        });
-                        modal.find('#claims-detail-proof-losses').html(proofOfLosses);
+                    if (claim.needProofOfLoss) {
+                        if (documents.proofOfLosses.length > 0) {
+                            var proofOfLosses = '';
+                            $.each(documents.proofOfLosses, function(key, value) {
+                                proofOfLosses += '<p><a href="'+value.ulr+'">'+value.filename+'</a></p>';
+                            });
+                            modal.find('#claims-detail-proof-losses').html(proofOfLosses);
+                        }
+                        else {
+                            modal.find('#claims-detail-proof-losses').html('Not uploaded yet');
+                        }
                     }
                     else {
-                        modal.find('#claims-detail-proof-losses').html('Not uploaded yet');                        
+                        modal.find('#claims-detail-proof-losses').html('Not requested');
                     }
                     modal.find('#claims-detail-proof-losses-container').show();
                 }

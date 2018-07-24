@@ -1228,11 +1228,12 @@ class UserControllerTest extends BaseControllerTest
         $claim = $this->createClaim($policy, Claim::TYPE_DAMAGE, $now);
 
         $this->assertTrue($claim->needProofOfUsage());
+        $this->assertTrue($claim->needProofOfPurchase());
         $this->assertTrue($claim->needPictureOfPhone());
 
         $this->login($email, $password);
-        $this->submitDamageForm($policy, $now, true, true, true);
-        $this->submitDamageForm($policy, $now, true, true, false, 1);
+        $this->submitDamageForm($policy, $now, true, true, true, true);
+        $this->submitDamageForm($policy, $now, true, true, true, false, 1);
     }
 
     public function testUserClaimDamageNoPictureOfPhone()
@@ -1257,12 +1258,13 @@ class UserControllerTest extends BaseControllerTest
         $claim = $this->createClaim($policy, Claim::TYPE_DAMAGE, $now);
 
         $this->assertTrue($claim->needProofOfUsage());
+        $this->assertFalse($claim->needProofOfPurchase());
         $this->assertFalse($claim->needPictureOfPhone());
 
         $this->login($email, $password);
 
-        $this->submitDamageForm($policy, $now, true, false, true);
-        $this->submitDamageForm($policy, $now, true, false, false, 1);
+        $this->submitDamageForm($policy, $now, true, false,false, true);
+        $this->submitDamageForm($policy, $now, true, false,false, false, 1);
     }
 
     public function testUserClaimDamageNoProofOfUsage()
@@ -1304,12 +1306,13 @@ class UserControllerTest extends BaseControllerTest
         $claim = $this->createClaim($policy, Claim::TYPE_DAMAGE, $now);
 
         $this->assertFalse($claim->needProofOfUsage());
+        $this->assertFalse($claim->needProofOfPurchase());
         $this->assertFalse($claim->needPictureOfPhone());
 
         $this->login($email, $password);
 
-        $this->submitDamageForm($policy, $now, false, false, true);
-        $this->submitDamageForm($policy, $now, false, false, false, 1);
+        $this->submitDamageForm($policy, $now, false, false, false, true);
+        $this->submitDamageForm($policy, $now, false, false, false, false, 1);
     }
 
     public function testUserClaimLoss()
@@ -1679,11 +1682,12 @@ class UserControllerTest extends BaseControllerTest
 
         $this->assertTrue($claim->needProofOfUsage());
         $this->assertTrue($claim->needProofOfPurchase());
+        $this->assertTrue($claim->needPictureOfPhone());
 
         $this->login($email, $password);
-        $this->submitDamageForm($policy, $now, true, true);
+        $this->submitDamageForm($policy, $now, true, true, true);
 
-        $this->updateDamageForm($policy, $now, true, true, 1);
+        $this->updateDamageForm($policy, $now, true, true, true,1);
     }
 
     public function testUserClaimUpdateDamageNoProofOfUsage()
@@ -1723,11 +1727,12 @@ class UserControllerTest extends BaseControllerTest
 
         $this->assertFalse($claim->needProofOfUsage());
         $this->assertFalse($claim->needProofOfPurchase());
+        $this->assertFalse($claim->needPictureOfPhone());
 
         $this->login($email, $password);
-        $this->submitDamageForm($policy, $now, false, false);
+        $this->submitDamageForm($policy, $now, false, false, false);
 
-        $this->updateDamageForm($policy, $now, false, false, 1);
+        $this->updateDamageForm($policy, $now, false, false,false, 1);
     }
 
     private function createClaim(Policy $policy, $type, \DateTime $date)
@@ -1886,6 +1891,7 @@ class UserControllerTest extends BaseControllerTest
         Policy $policy,
         \DateTime $now,
         $requireProofOfUsage,
+        $requireProofOfPurchase,
         $requirePicture,
         $partial = false,
         $previousRunCount = 0
@@ -1901,6 +1907,17 @@ class UserControllerTest extends BaseControllerTest
             'proofOfUsage.txt',
             'text/plain',
             14
+        );
+
+        $proofOfPurchaseFile = sprintf(
+            "%s/../src/AppBundle/Tests/Resources/proofOfPurchase.txt",
+            self::$rootDir
+        );
+        $proofOfPurchase = new UploadedFile(
+            $proofOfPurchaseFile,
+            'proofOfPurchase.txt',
+            'text/plain',
+            17
         );
 
         $damagePictureFile = sprintf(
@@ -1936,6 +1953,12 @@ class UserControllerTest extends BaseControllerTest
             $form['claim_damage_form[proofOfUsage]']->upload($proofOfUsage);
         } else {
             $this->assertFalse(isset($form['claim_damage_form[proofOfUsage]']));
+        }
+        if ($requireProofOfPurchase) {
+            $this->assertTrue(isset($form['claim_damage_form[proofOfPurchase]']));
+            $form['claim_damage_form[proofOfPurchase]']->upload($proofOfPurchase);
+        } else {
+            $this->assertFalse(isset($form['claim_damage_form[proofOfPurchase]']));
         }
         if ($requirePicture) {
             $this->assertTrue(isset($form['claim_damage_form[pictureOfPhone]']));
@@ -1976,6 +1999,11 @@ class UserControllerTest extends BaseControllerTest
             $this->assertEquals(1 + $previousRunCount, count($updatedClaim->getProofOfUsageFiles()));
         } else {
             $this->assertEquals(0, count($updatedClaim->getProofOfUsageFiles()));
+        }
+        if ($requireProofOfPurchase) {
+            $this->assertEquals(1 + $previousRunCount, count($updatedClaim->getProofOfPurchaseFiles()));
+        } else {
+            $this->assertEquals(0, count($updatedClaim->getProofOfPurchaseFiles()));
         }
         if ($requirePicture) {
             $this->assertEquals(1 + $previousRunCount, count($updatedClaim->getDamagePictureFiles()));
@@ -2080,6 +2108,7 @@ class UserControllerTest extends BaseControllerTest
         Policy $policy,
         \DateTime $now,
         $requireProofOfUsage,
+        $requireProofOfPurchase,
         $requirePicture,
         $previousRunCount = 0
     ) {
@@ -2094,6 +2123,17 @@ class UserControllerTest extends BaseControllerTest
             'proofOfUsage.txt',
             'text/plain',
             14
+        );
+
+        $proofOfPurchaseFile = sprintf(
+            "%s/../src/AppBundle/Tests/Resources/proofOfPurchase.txt",
+            self::$rootDir
+        );
+        $proofOfPurchase = new UploadedFile(
+            $proofOfPurchaseFile,
+            'proofOfPurchase.txt',
+            'text/plain',
+            17
         );
 
         $damagePictureFile = sprintf(
@@ -2118,6 +2158,12 @@ class UserControllerTest extends BaseControllerTest
             $form['claim_update_form[proofOfUsage]']->upload($proofOfUsage);
         } else {
             $this->assertFalse(isset($form['claim_update_form[proofOfUsage]']));
+        }
+        if ($requireProofOfPurchase) {
+            $this->assertTrue(isset($form['claim_update_form[proofOfPurchase]']));
+            $form['claim_update_form[proofOfPurchase]']->upload($proofOfPurchase);
+        } else {
+            $this->assertFalse(isset($form['claim_update_form[proofOfPurchase]']));
         }
         $this->assertFalse(isset($form['claim_update_form[proofOfBarring]']));
         $this->assertFalse(isset($form['claim_update_form[proofOfPurchase]']));
@@ -2150,6 +2196,11 @@ class UserControllerTest extends BaseControllerTest
             $this->assertEquals(1 + $previousRunCount, count($updatedClaim->getProofOfUsageFiles()));
         } else {
             $this->assertEquals(0, count($updatedClaim->getProofOfUsageFiles()));
+        }
+        if ($requireProofOfPurchase) {
+            $this->assertEquals(1 + $previousRunCount, count($updatedClaim->getProofOfPurchaseFiles()));
+        } else {
+            $this->assertEquals(0, count($updatedClaim->getProofOfPurchaseFiles()));
         }
         if ($requirePicture) {
             $this->assertEquals(1 + $previousRunCount, count($updatedClaim->getDamagePictureFiles()));

@@ -546,6 +546,13 @@ class Claim
     protected $fnolRiskReason;
 
     /**
+     * @Assert\Type("bool")
+     * @MongoDB\Field(type="boolean")
+     * @Gedmo\Versioned
+     */
+    protected $fnolPicSureValidated;
+
+    /**
      * @MongoDB\ReferenceMany(targetDocument="Charge", mappedBy="claim", cascade={"persist"})
      */
     protected $charges = array();
@@ -729,13 +736,18 @@ class Claim
         return null;
     }
 
-    public function setPolicy($policy)
+    public function setPolicy(Policy $policy)
     {
         if (!$this->getFnolRisk()) {
             $this->setFnolRisk($policy->getRisk());
         }
         if (!$this->getFnolRiskReason()) {
             $this->setFnolRiskReason($policy->getRiskReason());
+        }
+        if ($policy instanceof PhonePolicy && $this->getFnolPicSureValidated() == null) {
+            /** @var PhonePolicy $phonePolicy */
+            $phonePolicy = $policy;
+            $this->setFnolPicSureValidated($phonePolicy->isPicSureValidated());
         }
         $this->policy = $policy;
     }
@@ -1238,6 +1250,16 @@ class Claim
         $this->fnolRiskReason = $fnolRiskReason;
     }
 
+    public function getFnolPicSureValidated()
+    {
+        return $this->fnolPicSureValidated;
+    }
+
+    public function setFnolPicSureValidated($fnolPicSureValidated)
+    {
+        $this->fnolPicSureValidated = $fnolPicSureValidated;
+    }
+
     public function getCharges()
     {
         return $this->charges;
@@ -1650,6 +1672,8 @@ class Claim
             'shippingAddress' => $this->getShippingAddress(),
             'needProofOfUsage' => $this->needProofOfUsage(),
             'needProofOfPurchase' => $this->needProofOfPurchase(),
+            'needProofOfBarring' => $this->needProofOfBarring(),
+            'needProofOfLoss' => $this->needProofOfLoss(),
             'needPictureOfPhone' => $this->needPictureOfPhone(),
         ];
     }
@@ -1745,21 +1769,31 @@ class Claim
 
     public function needProofOfUsage()
     {
-        return $this->policy->getRisk() != Policy::RISK_LEVEL_LOW;
+        return $this->getFnolRisk() != Policy::RISK_LEVEL_LOW;
+    }
+
+    public function needProofOfBarring()
+    {
+        return in_array($this->getType(), [self::TYPE_LOSS, self::TYPE_THEFT]);
     }
 
     public function needProofOfPurchase()
     {
         /** @var PhonePolicy  $policy */
         $policy = $this->getPolicy();
-        return $policy->getRisk() == Policy::RISK_LEVEL_HIGH && !$policy->isPicSureValidated();
+        // TODO: Consider if we should be using claim FNOL pic-sure validation
+        // or current policy pic-sure validation
+        return $this->getFnolRisk() == Policy::RISK_LEVEL_HIGH && !$policy->isPicSureValidated();
     }
 
     public function needPictureOfPhone()
     {
         /** @var PhonePolicy  $policy */
         $policy = $this->getPolicy();
-        return !$policy->isPicSureValidated();
+        // TODO: Consider if we should be using claim FNOL pic-sure validation
+        // or current policy pic-sure validation
+        return $this->getType() == self::TYPE_DAMAGE && $this->getFnolRisk() == Policy::RISK_LEVEL_HIGH &&
+            !$policy->isPicSureValidated();
     }
 
     public function needProofOfLoss()

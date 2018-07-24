@@ -21,6 +21,7 @@
 {# {% block nav %}{% endblock %} #}
 
 {% block body %}
+    {% set sectionCount = 1 %}
 
     <section id="claim-form-container" class="section--pad background-off-white">
         <div class="container">
@@ -35,7 +36,8 @@
 
                         <div class="panel panel-info">
                             <div class="panel-heading">
-                                <h3 class="panel-title">1. About your phone</h3>
+                                <h3 class="panel-title">{{ sectionCount }}. About your phone</h3>
+                                {% set sectionCount = sectionCount + 1 %}
                             </div>
                             <div class="panel-body">
                                 We need a bit more information about your phone.
@@ -71,7 +73,8 @@
 
                         <div class="panel panel-info">
                             <div class="panel-heading">
-                                <h3 class="panel-title">2. About your damage claim</h3>
+                                <h3 class="panel-title">{{ sectionCount }}. About your damage claim</h3>
+                                {% set sectionCount = sectionCount + 1 %}
                             </div>
                             <div class="panel-body">
                                 We need a bit more information about the type of damage, for example ‘badly cracked screen’.
@@ -113,13 +116,12 @@
                             </div>
                         {% endif %}
 
-                        {% set sectionCount = 3 %}
                         {% if claim_form.proofOfUsage is defined %}
-                            {% set sectionCount = 4 %}
 
                             <div class="panel panel-info">
                                 <div class="panel-heading">
-                                    <h3 class="panel-title">3. Contacting your mobile provider</h3>
+                                    <h3 class="panel-title">{{ sectionCount }}. Contacting your mobile provider</h3>
+                                    {% set sectionCount = sectionCount + 1 %}
                                 </div>
                                 <div class="panel-body">
                                     You'll need to call up your mobile phone provider and request a <strong>Proof of Usage</strong> document that has your IMEI number and the first and last time that IMEI was used on their network.
@@ -142,9 +144,38 @@
                             </div>
                         {% endif %}
 
+                    {% if claim_form.proofOfPurchase is defined %}
                         <div class="panel panel-info">
                             <div class="panel-heading">
-                                <h3 class="panel-title"> {{ sectionCount }}. Submit your claim</h3>
+                                <h3 class="panel-title">{{ sectionCount }}. Proof of purchase</h3>
+                                {% set sectionCount = sectionCount + 1 %}
+                            </div>
+                            <div class="panel-body">
+                                We require a proof of purchase document such as a receipt.
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group {% if form_errors(claim_form.proofOfPurchase) %}has-error{% endif %}">
+                                    <label>Proof of purchase</label>
+                                    {{ form_widget(claim_form.proofOfPurchase, { 'attr': {'class': 'form-control'}}) }}
+                                    <div class="help-block with-errors">{{ form_errors(claim_form.proofOfPurchase) }}</div>
+                                    <div class="help-block with-errors">
+                                        <a href="#" data-toggle="modal" data-target="#purchaseModal">
+                                            {{ claim.proofOfPurchaseFiles|length }} file(s) upload
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+
+
+                    <div class="panel panel-info">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">{{ sectionCount }}. Submit your claim</h3>
+                                {% set sectionCount = sectionCount + 1 %}
                             </div>
                             <div class="panel-body">
                                 Once your claim is submitted, we aim to get back to you within 3 working hours. You can save your progress and come back at a later date if you need more time to get all of the required documents.

@@ -194,7 +194,11 @@ class ClaimFnolTheftLoss
      */
     public function hasProofOfBarring()
     {
-        return $this->getProofOfBarring() || count($this->getClaim()->getProofOfBarringFiles()) > 0;
+        if ($this->getClaim()->needProofOfBarring()) {
+            return $this->getProofOfBarring() || count($this->getClaim()->getProofOfBarringFiles()) > 0;
+        } else {
+            return true;
+        }
     }
 
     /**

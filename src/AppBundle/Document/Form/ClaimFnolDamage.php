@@ -45,6 +45,8 @@ class ClaimFnolDamage
 
     protected $proofOfUsage;
 
+    protected $proofOfPurchase;
+
     protected $pictureOfPhone;
 
     public function getTypeDetails()
@@ -106,7 +108,17 @@ class ClaimFnolDamage
     {
         $this->proofOfUsage = $proofOfUsage;
     }
-    
+
+    public function getProofOfPurchase()
+    {
+        return $this->proofOfPurchase;
+    }
+
+    public function setProofOfPurchase($proofOfPurchase)
+    {
+        $this->proofOfPurchase = $proofOfPurchase;
+    }
+
     public function getPictureOfPhone()
     {
         return $this->pictureOfPhone;
@@ -141,6 +153,18 @@ class ClaimFnolDamage
     {
         if ($this->getClaim()->needPictureOfPhone()) {
             return $this->getPictureOfPhone() || count($this->getClaim()->getDamagePictureFiles()) > 0;
+        } else {
+            return true;
+        }
+    }
+
+    /**
+     * @Assert\IsTrue(message="At least one Proof of Purchase File must be uploaded")
+     */
+    public function hasProofOfPurchase()
+    {
+        if ($this->getClaim()->needProofOfPurchase()) {
+            return $this->getProofOfPurchase() || count($this->getClaim()->getProofOfPurchaseFiles()) > 0;
         } else {
             return true;
         }

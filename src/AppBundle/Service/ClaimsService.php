@@ -114,6 +114,12 @@ class ClaimsService
             $proofOfUsage->setKey($claimDamage->getProofOfUsage());
             $claim->addFile($proofOfUsage);
         }
+        if ($claimDamage->getProofOfPurchase()) {
+            $proofOfPurchase = new ProofOfPurchaseFile();
+            $proofOfPurchase->setBucket(self::S3_POLICY_BUCKET);
+            $proofOfPurchase->setKey($claimDamage->getProofOfPurchase());
+            $claim->addFile($proofOfPurchase);
+        }
         if ($claimDamage->getPictureOfPhone()) {
             $pictureOfPhone = new DamagePictureFile();
             $pictureOfPhone->setBucket(self::S3_POLICY_BUCKET);
