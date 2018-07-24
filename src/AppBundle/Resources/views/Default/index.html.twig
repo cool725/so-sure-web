@@ -51,7 +51,7 @@
         {# Phone Search #}
         {% if search_type is defined and search_type == 'dropdown-search' %}
             {% set select_template = 'AppBundle:Default:selectPhoneMakeDropdownNew' %}
-        {% elseif device_category() == 'Mobile' %}
+        {% elseif search_type is defined and search_type == 'dropdown-search-old' %}
             {% set select_template = 'AppBundle:Default:selectPhoneMakeDropdown' %}
         {% else %}
             {% set select_template = 'AppBundle:Default:selectPhoneMakeSearch' %}

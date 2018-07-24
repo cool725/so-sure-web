@@ -78,7 +78,7 @@ class SixpackService
     // Exp 7
     const EXPERIMENT_TEXT_VS_DROPDOWN = 'dropdown-search';
     // Exp 8
-
+    const EXPERIMENT_TEXT_VS_DROPDOWN_MOBILE = 'dropdown-search';
     // Exp 9
 
     // Exp 10
@@ -128,7 +128,7 @@ class SixpackService
         // Exp 7
         self::EXPERIMENT_TEXT_VS_DROPDOWN,
         // Exp 8
-
+        self::EXPERIMENT_TEXT_VS_DROPDOWN_MOBILE,
         // Exp 9
 
         // Exp 10
@@ -204,7 +204,7 @@ class SixpackService
         // Exp 2
         self::EXPERIMENT_TEXT_VS_DROPDOWN,
         // Exp 3
-
+        self::EXPERIMENT_TEXT_VS_DROPDOWN_MOBILE,
         // Exp 4
 
         // Exp 5
