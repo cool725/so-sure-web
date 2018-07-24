@@ -6,7 +6,8 @@ $(function() {
         var phones = $('#dropdown-search').data('phones'),
             make   = $('.dropdown-phone-form--homepage_make'),
             model  = $('.dropdown-phone-form--homepage_model'),
-            memory = $('.dropdown-phone-form--homepage_memory');
+            memory = $('.dropdown-phone-form--homepage_memory'),
+            btn    = $('.dropdown-phone-form--homepage_cta');
 
         var updateModels = function() {
 
@@ -50,6 +51,10 @@ $(function() {
                 memory.append($('<option />').val(key).text(value['memory'] + 'GB'));
             });
 
+            if (memory.find('option').size() == 2) {
+                memory.find('option:eq(1)').prop('selected', true);
+            }
+
         }
 
         // When user selects make > update
@@ -63,7 +68,6 @@ $(function() {
             } else {
                 model.prop('disabled', 'disabled').val('');
             }
-
         });
 
         model.on('change', function() {
