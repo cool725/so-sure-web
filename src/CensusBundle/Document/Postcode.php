@@ -5,7 +5,7 @@ namespace CensusBundle\Document;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 
 /**
- * @MongoDB\Document(repositoryClass="CensusBundle\Repository\PostCodeRepository")
+ * @MongoDB\Document(collection="Postcode2016", repositoryClass="CensusBundle\Repository\PostCodeRepository")
  * @MongoDB\Index(keys={"Location"="2dsphere"}, sparse="true")
  */
 class Postcode
@@ -49,5 +49,10 @@ class Postcode
     public function getLocation()
     {
         return $this->location;
+    }
+
+    public function setLocation(Coordinates $coordinates)
+    {
+        $this->location = $coordinates;
     }
 }

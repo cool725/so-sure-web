@@ -1,0 +1,23 @@
+{% extends 'AppBundle:Email:base.txt.twig' %}
+{% block body %}
+Your link to proceed with your claim.
+
+**
+------------------------------------------------------------
+Hi {{ username }},
+
+Thank you for starting or continuing your online claims process. Once you have finished our online claims process and your claim is approved, we aim to get you back up and running in 24-72 hours.
+
+Please now click on the link below to proceed to the next step in the claims process.
+
+START OR CONTINUE MY CLAIM:
+{{ tokenUrl }}
+
+Please note this link will expire in {{ tokenValid }} {{ tokenValidTimeframe }}.
+
+You can re-reactivate the link here:
+{{ url('claim') }}
+
+If you have any questions regarding your claim please contact the claims team on 0344 856 0852.
+
+{% endblock body %}

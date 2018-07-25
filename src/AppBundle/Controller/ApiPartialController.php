@@ -131,7 +131,7 @@ class ApiPartialController extends BaseController
                     throw new NotFoundHttpException();
                 }
                 $clientId = $scode->getCode();
-            } elseif (in_array($name, SixpackService::$appParticipationByClientId)) {
+            } elseif (in_array($name, SixpackService::getAppParticipationByClientId())) {
                 $clientId = $user->getId();
             }
 

@@ -1,0 +1,18 @@
+{% extends 'AppBundle:Email:base.txt.twig' %}
+{% block body %}
+Your claim with so-sure.
+
+**
+------------------------------------------------------------
+Hi {{ data.policy.user.name }},
+
+Thank you for starting your online claim. In order to quickly process your claim, we need you to complete the form you started on our website.
+
+If you need to come back to that form, just enter your email using the link below. You will then receive another email to login to your account which is valid for 2 hours (due to security reasons).
+
+{{ url('claim') }}
+
+We’re here if you have any further questions and hope to resolve your claim as fast as we can.
+
+Thanks for using so-sure.
+{% endblock body %}

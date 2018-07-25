@@ -21,9 +21,16 @@ class Coordinates
      */
     public $type = "Point";
 
+    /**
+     * @return Point|null
+     */
     public function asPoint()
     {
-        return new Point($this->coordinates);
+        if ($this->coordinates) {
+            return new Point($this->coordinates);
+        } else {
+            return null;
+        }
     }
 
     public function setCoordinates(float $longitude, float $latitude)

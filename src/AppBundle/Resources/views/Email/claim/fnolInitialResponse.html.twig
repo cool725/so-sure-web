@@ -1,0 +1,25 @@
+{% extends 'AppBundle:Email:base.html.twig' %}
+{% import "AppBundle:Email:macros.html.twig" as macros %}
+{% block title %}Your claim with so-sure.{% endblock %}
+{% block body %}
+	{{ macros.start_table() }}
+	<h1>
+	   <!--?xml version="1.0" encoding="UTF-8" standalone="no"?-->
+	</h1>
+	<div style="font-size: 14px; text-align: left;">
+	   <!--?xml version="1.0" encoding="UTF-8" standalone="no"?-->
+	   <div style="font-size: 14px; text-align: left;"><span style="font-family:arial,helvetica neue,helvetica,sans-serif">
+        Hi {{ data.policy.user.name }},
+        <br><br>
+        Thank you for starting your online claim. In order to quickly process your claim, we need you to complete the form you started on our website.
+        <br><br>
+        If you need to come back to that form, just enter your email <a href="{{ url('claim') }}">here</a>. You will then receive another email to login to your account which is valid for 2 hours (due to security reasons).
+        <br><br>
+        We’re here if you have any further questions and hope to resolve your claim as fast as we can.
+        <br><br>
+        Thanks for using so-sure.
+		   </span>
+	   </div>
+	</div>
+	{{ macros.end_table() }}
+{% endblock %}

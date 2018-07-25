@@ -1,0 +1,26 @@
+{% extends 'AppBundle:Email:base.html.twig' %}
+{% import "AppBundle:Email:macros.html.twig" as macros %}
+{% block title %}Your link to proceed with your claim.{% endblock %}
+{% block body %}
+	{{ macros.start_table() }}
+	<h1>
+	   <!--?xml version="1.0" encoding="UTF-8" standalone="no"?-->
+	</h1>
+	<div style="font-size: 14px; text-align: left;">
+	   <!--?xml version="1.0" encoding="UTF-8" standalone="no"?-->
+	   <div style="font-size: 14px; text-align: left;"><span style="font-family:arial,helvetica neue,helvetica,sans-serif">
+        Hi {{ username }},<br><br>
+		Thank you for starting or continuing your online claims process. Once you have finished our online claims process and your claim is approved, we aim to get you back up and running in 24-72 hours.
+        <br><br>
+		Please now click on the link below to proceed to the next step in the claims process.
+        <br><br>
+        {{ macros.email_button_table(tokenUrl, "START OR CONTINUE MY CLAIM", "START OR CONTINUE MY CLAIM")}}
+        <br><br>
+		Please note this link will expire in {{ tokenValid }} {{ tokenValidTimeframe }}, you can re-reactivate the link by clicking <a href="{{ url('claim') }}">here</a>.
+        <br><br>
+		If you have any questions regarding your claim please contact the claims team on 0344 856 0852.
+		   </span>
+	   </div>
+	</div>
+	{{ macros.end_table() }}
+{% endblock %}

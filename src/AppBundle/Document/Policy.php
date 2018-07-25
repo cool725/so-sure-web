@@ -1234,6 +1234,10 @@ abstract class Policy
         return $this->claims;
     }
 
+    /**
+     * @param bool $requireReplacementImei
+     * @return Claim|null
+     */
     public function getLatestClaim($requireReplacementImei = false)
     {
         $claims = $this->getClaims();
@@ -1255,6 +1259,45 @@ abstract class Policy
         });
 
         return $claims[0];
+    }
+
+    public function getLatestFnolClaim()
+    {
+        return $this->getLatestClaimByStatus(array(Claim::STATUS_FNOL));
+    }
+
+    public function getLatestSubmittedClaim()
+    {
+        return $this->getLatestClaimByStatus(array(Claim::STATUS_SUBMITTED));
+    }
+
+    /**
+     * @return Claim|null
+     */
+    public function getLatestFnolSubmittedClaim()
+    {
+        return $this->getLatestClaimByStatus(array(Claim::STATUS_FNOL, Claim::STATUS_SUBMITTED));
+    }
+
+    private function getLatestClaimByStatus($status)
+    {
+        $claims = $this->getClaims();
+        if (!is_array($claims)) {
+            $claims = $claims->getValues();
+        }
+        if (count($claims) == 0) {
+            return null;
+        }
+
+        // sort most recent to older
+        usort($claims, function ($a, $b) {
+            return $a->getRecordedDate() < $b->getRecordedDate();
+        });
+
+        if (in_array($claims[0]->getStatus(), $status)) {
+            return $claims[0];
+        }
+        return null;
     }
 
     public function addLinkedClaim(Claim $claim)
@@ -4019,11 +4062,18 @@ abstract class Policy
         }
 
         $text = '';
-        if ($data['in-review'] > 0) {
+        if ($data['fnol'] > 0) {
             $text = sprintf(
-                '%s<span title="In Review" class="fa fa-question">%s</span> ',
+                '%s<span title="FNOL" class="fa fa-clock-o">%s</span> ',
                 $text,
-                $data['in-review']
+                $data['fnol']
+            );
+        }
+        if ($data['in-review'] + $data['submitted'] > 0) {
+            $text = sprintf(
+                '%s<span title="Submitted & In Review" class="fa fa-question">%s</span> ',
+                $text,
+                $data['in-review'] + $data['submitted']
             );
         }
         if ($data['approved'] + $data['settled'] > 0) {

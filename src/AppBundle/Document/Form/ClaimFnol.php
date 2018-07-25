@@ -2,20 +2,17 @@
 
 namespace AppBundle\Document\Form;
 
-use AppBundle\Document\Policy;
 use AppBundle\Document\User;
+use AppBundle\Document\Claim;
 use AppBundle\Document\DateTrait;
 use Symfony\Component\Validator\Constraints as Assert;
 use AppBundle\Validator\Constraints as AppAssert;
+use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
+use Symfony\Component\Serializer\Serializer;
 
 class ClaimFnol
 {
     use DateTrait;
-
-    /**
-     * @var Policy
-     */
-    protected $policy;
 
     /**
      * @var User
@@ -56,6 +53,11 @@ class ClaimFnol
     protected $type;
 
     /**
+     * @Assert\Choice(callback="getNetworks", strict=true)
+     */
+    protected $network;
+
+    /**
      * @Assert\Length(min="50", max="1000")
      */
     protected $message;
@@ -78,7 +80,7 @@ class ClaimFnol
     protected $time;
 
     /**
-     * @Assert\Length(min="10", max="200")
+     * @Assert\Length(min="5", max="200")
      */
     protected $where;
 
@@ -111,7 +113,7 @@ class ClaimFnol
     {
         $this->signature = $signature;
     }
-    
+
     public function getPolicyNumber()
     {
         return $this->policyNumber;
@@ -136,17 +138,27 @@ class ClaimFnol
     {
         return $this->type;
     }
-    
+
     public function setType($type)
     {
         $this->type = $type;
     }
-    
+
+    public function getNetwork()
+    {
+        return $this->network;
+    }
+
+    public function setNetwork($network)
+    {
+        $this->network = $network;
+    }
+
     public function getMessage()
     {
         return $this->message;
     }
-    
+
     public function setMessage($message)
     {
         $this->message = $message;
@@ -156,38 +168,34 @@ class ClaimFnol
     {
         return $this->timeToReach;
     }
-    
+
     public function setTimeToReach($timeToReach)
     {
         $this->timeToReach = $timeToReach;
     }
 
-    public function getPolicy()
+    public function getUser()
     {
-        return $this->policy;
-    }
-
-    public function setPolicy(Policy $policy)
-    {
-        $this->policy = $policy;
-        if ($policy) {
-            $this->policyNumber = $policy->getPolicyNumber();
-            $this->setUser($policy->getUser());
-        }
+        return $this->user;
     }
 
     public function setUser(User $user)
     {
+        $this->user = $user;
         if ($user) {
             $this->name = $user->getName();
             $this->email = $user->getEmail();
-            $this->phone = $user->getMobileNumber();
         }
     }
-    
-    public function getWhen()
+
+    public function getWhen($normalised = false)
     {
-        return $this->when;
+        if ($normalised) {
+            $serializer = new Serializer(array(new DateTimeNormalizer()));
+            return $serializer->normalize($this->when);
+        } else {
+            return $this->when;
+        }
     }
 
     public function setWhen($when)
@@ -213,5 +221,30 @@ class ClaimFnol
     public function setWhere($where)
     {
         $this->where = $where;
+    }
+
+    public function getTypeString()
+    {
+        $claimType = '';
+        switch ($this->type) {
+            case 'damage':
+                $claimType = 'DAMAGED OR BROKEN DOWN';
+                break;
+            case 'loss':
+                $claimType = 'LOST';
+                break;
+            case 'theft':
+                $claimType = 'STOLEN';
+                break;
+            default:
+                $claimType = '';
+                break;
+        }
+        return $claimType;
+    }
+
+    public static function getNetworks()
+    {
+        return Claim::$networks;
     }
 }

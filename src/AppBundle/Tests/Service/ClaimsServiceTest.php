@@ -89,7 +89,7 @@ class ClaimsServiceTest extends WebTestCase
         $this->assertEquals($policy->getPhone()->getId(), $lostPhone->getPhone()->getId());
     }
 
-    public function testDuplicateClaim()
+    public function testDuplicateAddClaim()
     {
         $userA = static::createUser(
             static::$userManager,
@@ -117,6 +117,43 @@ class ClaimsServiceTest extends WebTestCase
 
         $claimB = new Claim();
         $claimB->setStatus(Claim::STATUS_INREVIEW);
+        $claimB->setType(Claim::TYPE_THEFT);
+        $claimB->setNumber($claimNumber);
+        // same policy, same number, different status allowed
+        $this->assertTrue(static::$claimsService->addClaim($policyA, $claimB));
+        // not allowed for diff policy
+        $this->assertFalse(static::$claimsService->addClaim($policyB, $claimB));
+    }
+
+    public function testDuplicateUpdateClaim()
+    {
+        $userA = static::createUser(
+            static::$userManager,
+            static::generateEmail('testDuplicateUpdateClaim-a', $this),
+            'bar'
+        );
+        $phoneA = static::getRandomPhone(static::$dm);
+        $policyA = static::initPolicy($userA, static::$dm, $phoneA, null, true, true);
+        
+        $userB = static::createUser(
+            static::$userManager,
+            static::generateEmail('testDuplicateUpdateClaim-b', $this),
+            'bar'
+        );
+        $phoneB = static::getRandomPhone(static::$dm);
+        $policyB = static::initPolicy($userB, static::$dm, $phoneB, null, true, true);
+
+        $claimNumber = rand(1, 999999);
+
+        $claimA = new Claim();
+        $claimA->setStatus(Claim::STATUS_SUBMITTED);
+        $claimA->setType(Claim::TYPE_THEFT);
+        $this->assertTrue(static::$claimsService->addClaim($policyA, $claimA));
+
+        $claimA->setNumber($claimNumber);
+
+        $claimB = new Claim();
+        $claimB->setStatus(Claim::STATUS_SUBMITTED);
         $claimB->setType(Claim::TYPE_THEFT);
         $claimB->setNumber($claimNumber);
         // same policy, same number, different status allowed
@@ -451,5 +488,27 @@ class ClaimsServiceTest extends WebTestCase
         self::$claimsService->setMailerMailer($mailer);
         self::$claimsService->processClaim($claim);
 
+    }
+
+    public function testSendUniqueLoginLink()
+    {
+        $email = self::generateEmail('testSendUniqueLoginLink', $this);
+        $password = 'foo';
+        $phone = self::getRandomPhone(self::$dm);
+        $user = self::createUser(
+            self::$userManager,
+            $email,
+            $password,
+            $phone,
+            self::$dm
+        );
+
+        $redis = self::$container->get('snc_redis.default');
+        $token = md5(sprintf('%s%s', time(), $email));
+        $redis->setex($token, 900, $user->getId());
+
+        self::$claimsService->sendUniqueLoginLink($user);
+        $userId = self::$claimsService->getUserIdFromLoginLinkToken($token);
+        $this->assertEquals($userId, $user->getId());
     }
 }

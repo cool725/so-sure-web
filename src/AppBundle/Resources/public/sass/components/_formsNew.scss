@@ -18,6 +18,13 @@
     }
 }
 
+.form-control.input-sm {
+    height: 30px;
+    font-size: 12px;
+    line-height: 1.5;
+    @include border-radius(3px);
+}
+
 .help-block {
     font-size: 14px;
 

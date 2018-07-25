@@ -3,6 +3,10 @@
 // Sections
 .section--pad {
     padding: 40px 0;
+
+    @include breakpoint(tablet) {
+        padding: 80px 0;
+    }
 }
 
 .section--arrow {

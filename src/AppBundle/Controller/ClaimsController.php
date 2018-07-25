@@ -77,7 +77,7 @@ class ClaimsController extends BaseController
             return new RedirectResponse($e->getMessage());
         }
         return array_merge($data, [
-            'policy_route' => 'claim_policy',
+            'policy_route' => 'user_claim',
         ]);
     }
 
@@ -127,8 +127,11 @@ class ClaimsController extends BaseController
             throw $this->createNotFoundException('Policy not found');
         }
 
-        $claim = new Claim();
-        $claim->setPolicy($policy);
+        $claim = $policy->getLatestFnolSubmittedClaim();
+        if ($claim === null) {
+            $claim = new Claim();
+            $claim->setPolicy($policy);
+        }
         $claimscheck = new ClaimsCheck();
         $claimscheck->setPolicy($policy);
         $crimeRef = new CrimeRef();
@@ -155,7 +158,19 @@ class ClaimsController extends BaseController
                     $claim->setHandler($this->getUser());
                     /** @var ClaimsService $claimsService */
                     $claimsService = $this->get('app.claims');
-                    if ($claimsService->addClaim($policy, $claim)) {
+                    if ($claim->getStatus() == Claim::STATUS_SUBMITTED) {
+                        if ($claimsService->updateClaim($policy, $claim)) {
+                            $this->addFlash('success', sprintf(
+                                'Claim %s is updated. Excess is £%d',
+                                $claim->getNumber(),
+                                $claim->getExpectedExcess()
+                            ));
+
+                            return $this->redirectToRoute('claims_policy', ['id' => $id]);
+                        } else {
+                            $this->addFlash('error', sprintf('Duplicate claim number %s', $claim->getNumber()));
+                        }
+                    } elseif ($claimsService->addClaim($policy, $claim)) {
                         $this->addFlash('success', sprintf(
                             'Claim %s is added. Excess is £%d',
                             $claim->getNumber(),

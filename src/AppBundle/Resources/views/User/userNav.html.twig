@@ -90,9 +90,9 @@
                     {% endif %}
                     <li role="presentation">
                         {% if policy is defined and policy %}
-                            <a href="{{ path('claim_policy', {'policyId': policy.id}) }}">Make a claim</a>
+                            <a href="{{ path('user_claim_policy', {'policyId': policy.id}) }}">Make a claim</a>
                         {% else %}
-                            <a href="{{ path('claim') }}">Make a claim</a>
+                            <a href="{{ path('user_claim') }}">Make a claim</a>
                         {% endif %}
                     </li>
                 </ul>

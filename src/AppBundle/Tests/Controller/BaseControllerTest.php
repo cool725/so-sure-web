@@ -23,6 +23,7 @@ class BaseControllerTest extends WebTestCase
     /** @var Client */
     protected static $redis;
     protected static $invitationService;
+    protected static $rootDir;
 
     public function tearDown()
     {
@@ -30,7 +31,9 @@ class BaseControllerTest extends WebTestCase
 
     public static function setUpBeforeClass()
     {
-        self::$client = self::createClient();
+        /** @var \Symfony\Bundle\FrameworkBundle\Client $client */
+        $client = self::createClient();
+        self::$client = $client;
         self::$container = self::$client->getContainer();
         if (!self::$container) {
             throw new \Exception('unable to find container');
@@ -47,6 +50,7 @@ class BaseControllerTest extends WebTestCase
         self::$redis = $redis;
         self::$policyService = self::$container->get('app.policy');
         self::$invitationService = self::$container->get('app.invitation');
+        self::$rootDir = self::$container->getParameter('kernel.root_dir');
     }
     
     public function setUp()
