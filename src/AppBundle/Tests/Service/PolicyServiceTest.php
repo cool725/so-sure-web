@@ -1030,8 +1030,8 @@ class PolicyServiceTest extends WebTestCase
      */
     public function testValidateUserInValidDetails()
     {
-       $user = new User();
-       static::$policyService->validateUser($user);
+        $user = new User();
+        static::$policyService->validateUser($user);
     }
 
     /**
