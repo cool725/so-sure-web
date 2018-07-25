@@ -49,7 +49,7 @@ class GoCompare
       817 => ['make' => 'Apple', 'model' => 'iPhone 8 Plus', 'memory' => 256],
       818 => ['make' => 'Apple', 'model' => 'iPhone X', 'memory' => 64],
       819 => ['make' => 'Apple', 'model' => 'iPhone X', 'memory' => 256],
-      820 => ['make' => 'Samsung', 'model' => 'Note 8', 'memory' => 64],
+      820 => ['make' => 'Samsung', 'model' => 'Galaxy Note 8', 'memory' => 64],
 
       835 => ['make' => 'Google', 'model' => 'Pixel 2', 'memory' => 128],
       836 => ['make' => 'Google', 'model' => 'Pixel 2 XL', 'memory' => 128],

@@ -75,7 +75,7 @@
                             data-claim='{{ claim.toModalArray|json_encode }}'>
                                 {{ claim.number }}</button>
                             </td>
-                            <td><a href="{{ path('admin_policy', {id: claim.policy.id}) }}">{{ claim.policy.policyNumber }}</a></td>
+                            <td><a href="{{ path('claims_policy', {id: claim.policy.id}) }}">{{ claim.policy.policyNumber }}</a></td>
                             <td>{{ claim.type }}</td>
                             <td>{{ claim.status }}</td>
                             <td>{{ claim.policy.status }}</td>

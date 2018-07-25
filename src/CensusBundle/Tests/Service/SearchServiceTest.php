@@ -50,7 +50,7 @@ class SearchServiceTest extends WebTestCase
         $this->assertFalse(self::$searchService->validatePostcode('SE15 2sz'));
 
         $postcode = new Postcode();
-        $postcode->setPostcode($this->normalizePostcode('SE15 2sz'));
+        $postcode->setPostcode($this->normalizePostcodeForDb('SE15 2sz'));
         self::$dm->persist($postcode);
         self::$dm->flush();
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace AppBundle\Tests\Document;
+namespace AppBundle\Tests\Document\Form;
 
 use AppBundle\Document\Address;
 use AppBundle\Document\Form\Cancel;

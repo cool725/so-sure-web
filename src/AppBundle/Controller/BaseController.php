@@ -2,6 +2,8 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Document\Claim;
+use AppBundle\Form\Type\ClaimSearchType;
 use AppBundle\Repository\PhoneRepository;
 use AppBundle\Service\QuoteService;
 use Doctrine\ODM\MongoDB\Query\Builder;
@@ -989,6 +991,39 @@ abstract class BaseController extends Controller
             'users' => $pager->getCurrentPageResults(),
             'pager' => $pager,
             'form' => $form->createView()
+        ];
+    }
+
+    protected function searchClaims(Request $request)
+    {
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(Claim::class);
+        $qb = $repo->createQueryBuilder();
+
+        $form = $this->createForm(ClaimSearchType::class, null, ['method' => 'GET']);
+        $form->handleRequest($request);
+        $status = $form->get('status')->getData();
+        $claimNumber = $form->get('number')->getData();
+        $claimId = $form->get('id')->getData();
+        $qb = $qb->field('status')->in($status);
+        if (mb_strlen($claimNumber) > 0) {
+            $qb = $qb->field('number')->equals(new MongoRegex(sprintf("/.*%s.*/i", $claimNumber)));
+        }
+        if (mb_strlen($claimId) > 0 && \MongoId::isValid($claimId)) {
+            $qb = $qb->field('id')->equals(new \MongoId($claimId));
+        }
+        $qb = $qb->sort('replacementReceivedDate', 'desc')
+            ->sort('approvedDate', 'desc')
+            ->sort('lossDate', 'desc')
+            ->sort('notificationDate', 'desc');
+        $pager = $this->pager($request, $qb);
+
+        return [
+            'claims' => $pager->getCurrentPageResults(),
+            'pager' => $pager,
+            'phones' => $dm->getRepository(Phone::class)->findActiveInactive()->getQuery()->execute(),
+            'claim_types' => Claim::$claimTypes,
+            'form' => $form->createView(),
         ];
     }
 

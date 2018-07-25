@@ -242,10 +242,8 @@ class PurchaseController extends BaseController
                         $data['Facebook'] = true;
                     }
                     $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_RECEIVE_DETAILS, $data);
-
-                    $this->get('app.sixpack')->convert(
-                        SixpackService::EXPERIMENT_AB_NEW_CONTENT
-                    );
+                  
+                    $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_AB_CONTENT_HOMEPAGE);
 
                     if ($user->hasPartialPolicy()) {
                         return new RedirectResponse(
@@ -263,11 +261,7 @@ class PurchaseController extends BaseController
         /** @var \Symfony\Component\Security\Csrf\CsrfTokenManagerInterface $csrf */
         $csrf = $this->get('security.csrf.token_manager');
 
-        // $moneyBackGuarantee = $this->sixpack(
-        //     $request,
-        //     SixpackService::EXPERIMENT_MONEY_BACK_GUARANTEE,
-        //     ['no-money-back-guarantee', 'money-back-guarantee']
-        // );
+
 
         $data = array(
             'purchase_form' => $purchaseForm->createView(),
@@ -282,8 +276,6 @@ class PurchaseController extends BaseController
             ) : null,
             // 'postcode' => $this->sixpack($request, SixpackService::EXPERIMENT_POSTCODE, ['comma', 'split', 'type']),
             'postcode' => 'comma',
-            // 'showDropdown' => $dobExp,
-            // 'moneyBackGuarantee' => $moneyBackGuarantee,
         );
 
         return $this->render('AppBundle:Purchase:purchaseStepPersonalAddress.html.twig', $data);
@@ -1120,14 +1112,6 @@ class PurchaseController extends BaseController
                         $intercom = $this->get('app.intercom');
                         $intercom->queueMessage($policy->getUser()->getEmail(), $body);
                     }
-
-                    /** @var MailerService $mailer */
-                    $mailer = $this->get('app.mailer');
-                    $mailer->send(
-                        'Requested Policy Cancellation',
-                        'info@so-sure.com',
-                        $body
-                    );
 
                     $this->get('app.mixpanel')->queueTrack(
                         MixpanelService::EVENT_REQUEST_CANCEL_POLICY,

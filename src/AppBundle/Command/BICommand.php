@@ -280,6 +280,7 @@ class BICommand extends BaseCommand
             '"Premium Paid"',
             '"Yearly Premium"',
             '"Premium Outstanding"',
+            '"Policy Purchase Time"',
         ]);
         foreach ($policies as $policy) {
             /** @var Policy $policy */
@@ -330,6 +331,7 @@ class BICommand extends BaseCommand
                 sprintf('"%0.2f"', $policy->getPremiumPaid()),
                 sprintf('"%0.2f"', $policy->getPremium()->getYearlyPremiumPrice()),
                 sprintf('"%0.2f"', $policy->getUnderwritingOutstandingPremium()),
+                sprintf('"%s"', $policy->getStart()->format('H:i')),
             ]);
         }
         if (!$skipS3) {
