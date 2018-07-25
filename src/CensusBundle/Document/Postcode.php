@@ -50,4 +50,9 @@ class Postcode
     {
         return $this->location;
     }
+
+    public function setLocation(Coordinates $coordinates)
+    {
+        $this->location = $coordinates;
+    }
 }
