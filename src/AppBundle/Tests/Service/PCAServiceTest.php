@@ -63,7 +63,7 @@ class PCAServiceTest extends WebTestCase
 
     public function testNormalize()
     {
-        $this->assertEquals('SE152SZ', self::$pca->normalizePostcode('se15 2sz '));
+        $this->assertEquals('SE152SZ', self::$pca->normalizePostcodeForDb('se15 2sz '));
     }
 
     public function testTransform3()
