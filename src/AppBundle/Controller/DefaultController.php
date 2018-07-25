@@ -125,7 +125,7 @@ class DefaultController extends BaseController
             $expSearch = $this->sixpack(
                 $request,
                 SixpackService::EXPERIMENT_TEXT_VS_DROPDOWN_MOBILE,
-                ['dropdown-search-old', 'dropdown-search']
+                ['dropdown-search-mobile-old', 'dropdown-search-mobile']
             );
         } else {
             $expSearch = $this->sixpack(
