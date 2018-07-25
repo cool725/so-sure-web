@@ -56,6 +56,7 @@ class SearchService
         /** @var PostCodeRepository $postcodeRepo */
         $postcodeRepo = $this->dm->getRepository(PostCode::class);
 
+        /** @var Postcode $postcode */
         $postcode = $postcodeRepo->findOneBy(['Postcode' => $code]);
         if (!$postcode || !$postcode->getLocation()) {
             return null;
