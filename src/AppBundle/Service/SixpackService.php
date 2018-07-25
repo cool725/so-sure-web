@@ -127,6 +127,7 @@ class SixpackService
     public static $authExperiments = [
         self::EXPERIMENT_APP_SHARE_METHOD,
         self::EXPERIMENT_APP_PICSURE_LOCATION,
+        self::EXPERIMENT_APP_REQUEST_PICSURE_LOCATION,
     ];
 
     public static $appExperiments = [
@@ -144,10 +145,10 @@ class SixpackService
         ],
     ];
 
-    public static $appParticipationByClientId = [
-        self::EXPERIMENT_APP_PICSURE_LOCATION ,
-        self::EXPERIMENT_APP_REQUEST_PICSURE_LOCATION,
-    ];
+    public static function getAppParticipationByClientId()
+    {
+        return array_diff(self::$authExperiments, array(self::EXPERIMENT_APP_SHARE_METHOD));
+    }
 
     /**
      * For cases where there is only one conversion point (purchase)
