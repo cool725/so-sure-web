@@ -114,8 +114,8 @@ class DefaultController extends BaseController
 
         $expContent = $this->getSessionSixpackTest(
             $request,
-            SixpackService::EXPERIMENT_AB_NEW_CONTENT,
-            ['old-content-no-nav', 'new-content-with-nav']
+            SixpackService::EXPERIMENT_AB_CONTENT_HOMEPAGE,
+            ['old-homepage-copy', 'new-homepage-copy']
         );
 
         $data = array(
@@ -128,7 +128,7 @@ class DefaultController extends BaseController
         $template = 'AppBundle:Default:index.html.twig';
 
         // If A/B content test
-        if ($expContent == 'new-content-with-nav') {
+        if ($expContent == 'new-homepage-copy') {
             $template = 'AppBundle:Default:indexContent.html.twig';
         }
 

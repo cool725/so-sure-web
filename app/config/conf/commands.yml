@@ -1,0 +1,28 @@
+services:
+    # default configuration for services in *this* file
+    _defaults:
+        autowire: true
+        autoconfigure: true
+        public: false
+
+    # makes classes in src/AppBundle available to be used as services & tag them as commands
+    AppBundle\Command\:
+        resource: '../../../src/AppBundle/Command'
+
+    ## @todo upgrade the bundles for proper Symfony 4 support and less hacks like this
+    Doctrine\Bundle\MongoDBBundle\Command\:
+        resource: '../../../vendor/doctrine/mongodb-odm-bundle/Command/'
+    FOS\UserBundle\Command\:
+        resource: '../../../vendor/friendsofsymfony/user-bundle/Command/'
+    JMS\SecurityExtraBundle\Command\:
+        resource: '../../../vendor/jms/security-extra-bundle/Command/'
+    Peerj\UserSecurityBundle\Command\:
+        resource: '../../../vendor/peerj/peerj-user-security-bundle/Peerj/UserSecurityBundle/Command/'
+    Scheb\TwoFactorBundle\Command\:
+        resource: '../../../vendor/scheb/two-factor-bundle/Command/'
+    Sensio\Bundle\GeneratorBundle\Command\:
+        resource: '../../../vendor/sensio/generator-bundle/Command/'
+    Symfony\Bundle\AsseticBundle\Command\:
+        resource: '../../../vendor/symfony/assetic-bundle/Command/'
+    Vich\UploaderBundle\Command\:
+        resource: '../../../vendor/vich/uploader-bundle/Command/'

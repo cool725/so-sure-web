@@ -6,6 +6,6 @@ Misc
 * [ ] Add to Releases Calendar (might have impact on conversion)
 
 Product Approval
-* [ ] Marta
-* [ ] Not required (technical/business change) 
+* [ ] Yes
+* [ ] No, not required (technical/business change)
 

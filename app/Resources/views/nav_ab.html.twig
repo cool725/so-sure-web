@@ -49,7 +49,7 @@
                     {% endif %}
                     {% if is_granted('ROLE_PREVIOUS_ADMIN') %}
                         <li class="hidden-md hidden-lg">
-                            <span><a href="{{ path('homepage', {'_impersonate': '_exit'}) }}?nav=1" class="btn btn-white-hollow" title="Logged in as {{ app.user.email }}">Logout</a></span>
+                            <span><a href="{{ path('homepage', {'_impersonate': '_exit'}) }}&nav=1" class="btn btn-white-hollow" title="Logged in as {{ app.user.email }}">Logout</a></span>
                         </li>
                     {% else %}
                         <li class="hidden-md hidden-lg">

@@ -4580,6 +4580,37 @@ abstract class Policy
         return false;
     }
 
+    public function isFacebookUserInvited($facebookId)
+    {
+        $isInvited = false;
+        foreach ($this->getSentInvitations() as $invitation) {
+            if ($invitation->getChannel() == 'facebook' &&
+                $facebookId == $invitation->getFacebookId()) {
+                $isInvited = true;
+                break;
+            }
+        }
+        foreach ($this->getUser()->getUnprocessedReceivedInvitations() as $invitation) {
+            if ($invitation->getInviter()->getFacebookId() == $facebookId) {
+                $isInvited = true;
+                break;
+            }
+        }
+        return $isInvited;
+    }
+
+    public function isFacebookUserConnected($facebookId)
+    {
+        $isConnected = false;
+        foreach ($this->getConnections() as $connection) {
+            if ($connection->getLinkedUser()->getFacebookId() == $facebookId) {
+                $isConnected = true;
+                break;
+            }
+        }
+        return $isConnected;
+    }
+
     protected function toApiArray()
     {
         if ($this->isPolicy() && !$this->getPolicyTerms() && in_array($this->getStatus(), [

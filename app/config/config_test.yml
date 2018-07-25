@@ -32,6 +32,9 @@ swiftmailer:
 
 doctrine_mongodb:
     default_database: sosure-test
+    document_managers:
+        census:
+          database: census-test
 
 swiftmailer:
     default_mailer: default

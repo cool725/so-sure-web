@@ -2,6 +2,7 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Form\Type\ClaimSearchType;
 use AppBundle\Service\ClaimsService;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
@@ -338,5 +339,14 @@ class ClaimsController extends BaseController
         );
 
         return new RedirectResponse($this->generateUrl('claims_policy', ['id' => $claim->getPolicy()->getId()]));
+    }
+
+    /**
+     * @Route("/claims", name="claims_claims")
+     * @Template()
+     */
+    public function claimsAction(Request $request)
+    {
+        return $this->searchClaims($request);
     }
 }

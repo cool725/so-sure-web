@@ -46,6 +46,7 @@ class SixpackService
     const EXPERIMENT_HOMEPAGE_AA_V2 = 'homepage-aa-v2';
     const EXPERIMENT_APP_SHARE_METHOD = 'app-share-method';
     const EXPERIMENT_APP_PICSURE_LOCATION = 'app-picsure-location';
+    const EXPERIMENT_APP_REQUEST_PICSURE_LOCATION = 'app-request-picsure-location';
     //const EXPERIMENT_STEP_3 = 'step-3-payment-new';
     const EXPERIMENT_PURCHASE_FLOW_BACS = 'purchase-flow-bacs';
     const EXPERIMENT_CPC_QUOTE_HOMEPAGE = 'cpc-quote-or-homepage';
@@ -66,16 +67,17 @@ class SixpackService
     // Exp 1
     // const EXPERIMENT_HOMEPAGE_NEW_COPY = 'homepage-new-copy';
     // Exp 2
-    const EXPERIMENT_AD_LANDING = 'ad-landing';
+    const EXPERIMENT_AD_LANDING = 'ad-landing-2';
     // Exp 3
     const EXPERIMENT_STARLING_LANDING = 'starling-landing';
     // Exp 4
     // const EXPERIMENT_PHONE_REPLACEMENT_MATCHING_ADVERT = 'phone-replacement-matching-advert';
     // Exp 5
-    const EXPERIMENT_AB_NEW_CONTENT = 'new-content-with-nav';
+    // const EXPERIMENT_AB_NEW_CONTENT = 'new-content-with-nav';
     // Exp 6
     const EXPERIMENT_PHONE_REPLACEMENT = 'twentyfour-seventy-two';
     // Exp 7
+    const EXPERIMENT_AB_CONTENT_HOMEPAGE = 'new-homepage-copy';
 
     const ALTERNATIVES_SHARE_MESSAGE_SIMPLE = 'simple';
     const ALTERNATIVES_APP_SHARE_METHOD_NATIVE = 'native';
@@ -116,7 +118,8 @@ class SixpackService
         // Exp 4
         // self::EXPERIMENT_PHONE_REPLACEMENT_MATCHING_ADVERT,
         // Exp 5
-        self::EXPERIMENT_AB_NEW_CONTENT,
+        // self::EXPERIMENT_AB_NEW_CONTENT,
+        self::EXPERIMENT_AB_CONTENT_HOMEPAGE,
         // Exp 6
         self::EXPERIMENT_PHONE_REPLACEMENT,
         // Exp 7
@@ -137,6 +140,15 @@ class SixpackService
             self::ALTERNATIVES_APP_PICSURE_NO_LOCATION,
             self::ALTERNATIVES_APP_PICSURE_REQUEST_LOCATION,
         ],
+        self::EXPERIMENT_APP_REQUEST_PICSURE_LOCATION => [
+            self::ALTERNATIVES_APP_PICSURE_NO_LOCATION,
+            self::ALTERNATIVES_APP_PICSURE_REQUEST_LOCATION,
+        ],
+    ];
+
+    public static $appParticipationByClientId = [
+        self::EXPERIMENT_APP_PICSURE_LOCATION ,
+        self::EXPERIMENT_APP_REQUEST_PICSURE_LOCATION,
     ];
 
     /**
@@ -183,9 +195,9 @@ class SixpackService
         // New Test Money Back Guarantee
         // self::EXPERIMENT_MONEY_BACK_GUARANTEE,
         // Exp 1
-        self::EXPERIMENT_AB_NEW_CONTENT,
+        // self::EXPERIMENT_AB_NEW_CONTENT,
         // Exp 2
-
+        self::EXPERIMENT_AB_CONTENT_HOMEPAGE,
         // Exp 3
 
         // Exp 4

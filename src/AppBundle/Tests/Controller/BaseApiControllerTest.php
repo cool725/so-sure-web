@@ -2,6 +2,9 @@
 
 namespace AppBundle\Tests\Controller;
 
+use AppBundle\Document\PostcodeTrait;
+use CensusBundle\Document\Postcode;
+use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\User;
 use AppBundle\Document\Claim;
@@ -28,6 +31,10 @@ use AppBundle\Document\Payment\PolicyDiscountPayment;
 
 class BaseApiControllerTest extends BaseControllerTest
 {
+    use PostcodeTrait;
+
+    /** @var DocumentManager */
+    protected static $censusDm;
 
     public function tearDown()
     {
@@ -36,6 +43,10 @@ class BaseApiControllerTest extends BaseControllerTest
     public static function setUpBeforeClass()
     {
         parent::setUpBeforeClass();
+
+        /** @var DocumentManager */
+        $censusDm = self::$container->get('doctrine_mongodb.odm.census_document_manager');
+        self::$censusDm = $censusDm;
     }
 
     /**
@@ -262,7 +273,10 @@ class BaseApiControllerTest extends BaseControllerTest
         $pca = self::$client->getContainer()->get('app.address');
         $redis = self::$client->getContainer()->get('snc_redis.default');
         foreach (SoSure::$yearlyOnlyPostcodes as $postcode) {
-            $redis->hset(PCAService::REDIS_POSTCODE_KEY, $pca->normalizePostcode($postcode), 1);
+            $postcode = new Postcode();
+            $postcode->setPostcode(PostcodeTrait::normalizePostcode($postcode));
+            self::$censusDm->persist($postcode);
         }
+        self::$censusDm->flush();
     }
 }

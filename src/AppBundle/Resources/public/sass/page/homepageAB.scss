@@ -98,6 +98,7 @@ body {
         text-align: center;
         padding-left: 15px;
         padding-right: 15px;
+        background-color: $white;
 
         // Heading
         &-h1 {
@@ -121,6 +122,59 @@ body {
         // Strapline
         p {
             margin-bottom: 0 0 30px;
+        }
+    }
+
+    &--hero-background {
+        // Mobile
+        padding: 20px 15px 120px;
+        background: $white url('#{$cdn_url}/images/homepage/so-sure_homepage_hero_mobile_background.svg') no-repeat center bottom;
+        background-size: 85%;
+
+      // Tablet
+        @include breakpoint(tablet) {
+            // padding: 20px 15px 270px;
+            padding: 20px 15px 270px;
+            background-size: 70%;
+        }
+
+        // Laptop
+        @include breakpoint(laptop) {
+            padding: 100px 15px 200px;
+            // Reset background
+            background: $white;
+
+            &:after, &:before {
+                width: 100%; height: 100%;
+                content: '';
+                position: absolute;
+                z-index: 0;
+                left: 50%;
+                margin-left: -50%;
+            }
+
+            // Add the Buildings
+            &:before {
+                bottom: 0;
+                background: transparent url('#{$cdn_url}/images/homepage/so-sure_hero_background_empty_space_for_bench.svg') no-repeat center bottom;
+                background-size: 1900px;
+            }
+
+            // Add the Clouds
+            &:after {
+                top: 0; left: 50%;
+                background: transparent url('#{$cdn_url}/images/homepage/so-sure_homepage-hero-clouds-combined.svg') repeat-x center top;
+                background-size: 100%;
+            }
+        }
+
+        // Desktop
+        @include breakpoint(desktop) {
+            padding: 120px 15px 200px;
+        }
+
+        @include breakpoint(hd) {
+            padding: 200px 15px;
         }
     }
 

@@ -4,6 +4,7 @@ namespace CensusBundle\Tests\Service;
 
 use AppBundle\Document\PostcodeTrait;
 use CensusBundle\Document\Postcode;
+use CensusBundle\Repository\PostCodeRepository;
 use CensusBundle\Service\SearchService;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Service\StatsService;
@@ -44,13 +45,22 @@ class SearchServiceTest extends WebTestCase
 
     public function testValidatePostcode()
     {
+        /** @var PostCodeRepository $postcodeRepo */
+        $postcodeRepo = self::$dm->getRepository(PostCode::class);
+        $postcode = $postcodeRepo->findOneBy(['Postcode' => 'SE15 2SZ']);
+        if ($postcode) {
+            self::$dm->remove($postcode);
+            self::$dm->flush();
+        }
+
         $this->assertTrue(self::$searchService->validatePostcode('BX11LT'));
         $this->assertFalse(self::$searchService->validatePostcode('ZZ993CZ'));
         $this->assertFalse(self::$searchService->validatePostcode('B'));
         $this->assertFalse(self::$searchService->validatePostcode('SE15 2sz'));
 
         $postcode = new Postcode();
-        $postcode->setPostcode($this->normalizePostcode('SE15 2sz'));
+        // hardcode format for Postcode (do not use normalizePostcodeForDb)
+        $postcode->setPostcode('SE15 2SZ');
         self::$dm->persist($postcode);
         self::$dm->flush();
 
