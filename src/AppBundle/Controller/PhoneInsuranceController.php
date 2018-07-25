@@ -479,9 +479,9 @@ class PhoneInsuranceController extends BaseController
                 ]);
             }
 
-            $this->get('app.sixpack')->convert(
-                SixpackService::EXPERIMENT_HOMEPAGE_AA_V2
-            );
+            // $this->get('app.sixpack')->convert(
+            //     SixpackService::EXPERIMENT_HOMEPAGE_AA_V2
+            // );
         }
 
         $replacement = $this->sixpack(

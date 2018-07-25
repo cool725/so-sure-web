@@ -43,7 +43,7 @@ class SixpackService
     //const EXPERIMENT_NEW_QUOTE_DESIGN = 'new-quote-design';
     //const EXPERIMENT_CPC_MANUFACTURER_OLD_NEW = 'cpc-manufacturer-old-new';
 
-    const EXPERIMENT_HOMEPAGE_AA_V2 = 'homepage-aa-v2';
+    // const EXPERIMENT_HOMEPAGE_AA_V2 = 'homepage-aa-v2';
     const EXPERIMENT_APP_SHARE_METHOD = 'app-share-method';
     const EXPERIMENT_APP_PICSURE_LOCATION = 'app-picsure-location';
     const EXPERIMENT_APP_REQUEST_PICSURE_LOCATION = 'app-request-picsure-location';
@@ -99,7 +99,7 @@ class SixpackService
     const EXPIRED_EXPERIMENT_SHARE_MESSAGE = 'share-message';
 
     public static $unauthExperiments = [
-        self::EXPERIMENT_HOMEPAGE_AA_V2,
+        // self::EXPERIMENT_HOMEPAGE_AA_V2,
         //self::EXPERIMENT_STEP_3,
         self::EXPERIMENT_PURCHASE_FLOW_BACS,
         // self::EXPERIMENT_CPC_QUOTE_HOMEPAGE,
@@ -209,7 +209,7 @@ class SixpackService
      * @var array
      */
     public static $purchaseConversionKpi = [
-        self::EXPERIMENT_HOMEPAGE_AA_V2,
+        // self::EXPERIMENT_HOMEPAGE_AA_V2,
         // self::EXPERIMENT_DOB,
         // self::EXPERIMENT_TRUSTPILOT_REVIEW,
         // New Test Single Mem Option
