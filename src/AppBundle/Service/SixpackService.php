@@ -147,7 +147,10 @@ class SixpackService
 
     public static function getAppParticipationByClientId()
     {
-        return array_diff(self::$authExperiments, array(self::EXPERIMENT_APP_SHARE_METHOD));
+        return array_diff(
+            array_intersect(self::$authExperiments, array_keys(self::$appExperiments)),
+            array(self::EXPERIMENT_APP_SHARE_METHOD)
+        );
     }
 
     /**
