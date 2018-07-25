@@ -61,7 +61,7 @@ class SixpackService
     const EXPERIMENT_COMPETITOR_LANDING = 'competitor-landing';
     // const EXPERIMENT_TRUSTPILOT_REVIEW = 'trustpilot';
     // New Test Single Mem Option
-    const EXPERIMENT_MEMORY_OPTIONS = 'single-progressive-dropdown';
+    // const EXPERIMENT_MEMORY_OPTIONS = 'single-progressive-dropdown';
     // New Test Money Back Guarantee
     // const EXPERIMENT_MONEY_BACK_GUARANTEE = 'money-back-guarantee';
     // Exp 1
@@ -78,6 +78,13 @@ class SixpackService
     const EXPERIMENT_PHONE_REPLACEMENT = 'twentyfour-seventy-two';
     // Exp 7
     const EXPERIMENT_AB_CONTENT_HOMEPAGE = 'new-homepage-copy';
+    // Exp 8
+    const EXPERIMENT_TEXT_VS_DROPDOWN = 'dropdown-search';
+    // Exp 9
+    const EXPERIMENT_TEXT_VS_DROPDOWN_MOBILE = 'dropdown-search';
+    // Exp 10
+
+    // Exp 11
 
     const ALTERNATIVES_SHARE_MESSAGE_SIMPLE = 'simple';
     const ALTERNATIVES_APP_SHARE_METHOD_NATIVE = 'native';
@@ -106,7 +113,7 @@ class SixpackService
         self::EXPERIMENT_COMPETITOR_LANDING,
         // self::EXPERIMENT_TRUSTPILOT_REVIEW,
         // New Test Single Mem Option
-        self::EXPERIMENT_MEMORY_OPTIONS,
+        // self::EXPERIMENT_MEMORY_OPTIONS,
         // New Test Money Back Guarantee
          // self::EXPERIMENT_MONEY_BACK_GUARANTEE,
         // Exp 1
@@ -123,6 +130,12 @@ class SixpackService
         // Exp 6
         self::EXPERIMENT_PHONE_REPLACEMENT,
         // Exp 7
+        self::EXPERIMENT_TEXT_VS_DROPDOWN,
+        // Exp 8
+        self::EXPERIMENT_TEXT_VS_DROPDOWN_MOBILE,
+        // Exp 9
+
+        // Exp 10
 
     ];
 
@@ -184,6 +197,11 @@ class SixpackService
 
         // Exp 7
 
+        // Exp 8
+
+        // Exp 9
+
+        // Exp 10
     ];
 
     /**
@@ -195,7 +213,7 @@ class SixpackService
         // self::EXPERIMENT_DOB,
         // self::EXPERIMENT_TRUSTPILOT_REVIEW,
         // New Test Single Mem Option
-        self::EXPERIMENT_MEMORY_OPTIONS,
+        // self::EXPERIMENT_MEMORY_OPTIONS,
         // New Test Money Back Guarantee
         // self::EXPERIMENT_MONEY_BACK_GUARANTEE,
         // Exp 1
@@ -203,15 +221,20 @@ class SixpackService
         // Exp 2
         self::EXPERIMENT_AB_CONTENT_HOMEPAGE,
         // Exp 3
-
+        self::EXPERIMENT_TEXT_VS_DROPDOWN,
         // Exp 4
-
+        self::EXPERIMENT_TEXT_VS_DROPDOWN_MOBILE,
         // Exp 5
 
         // Exp 6
 
         // Exp 7
 
+        // Exp 8
+
+        // Exp 9
+
+        // Exp 10
     ];
 
     /** @var LoggerInterface */

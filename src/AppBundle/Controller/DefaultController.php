@@ -36,6 +36,7 @@ use AppBundle\Form\Type\LaunchType;
 use AppBundle\Form\Type\LeadEmailType;
 use AppBundle\Form\Type\RegisterUserType;
 use AppBundle\Form\Type\PhoneMakeType;
+use AppBundle\Form\Type\PhoneDropdownType;
 use AppBundle\Form\Type\PhoneType;
 use AppBundle\Form\Type\SmsAppLinkType;
 use AppBundle\Form\Type\ClaimFnolEmailType;
@@ -43,6 +44,8 @@ use AppBundle\Form\Type\ClaimFnolType;
 
 use AppBundle\Document\Form\Register;
 use AppBundle\Document\Form\PhoneMake;
+use AppBundle\Document\Form\PhoneDropdown;
+use AppBundle\Document\Form\ClaimFnol;
 use AppBundle\Document\Form\ClaimFnolEmail;
 use AppBundle\Document\User;
 use AppBundle\Document\Claim;
@@ -118,11 +121,26 @@ class DefaultController extends BaseController
             ['old-homepage-copy', 'new-homepage-copy']
         );
 
+        if ($this->get('app.request')->getDeviceCategory() == RequestService::DEVICE_CATEGORY_MOBILE) {
+            $expSearch = $this->sixpack(
+                $request,
+                SixpackService::EXPERIMENT_TEXT_VS_DROPDOWN_MOBILE,
+                ['dropdown-search-old', 'dropdown-search']
+            );
+        } else {
+            $expSearch = $this->sixpack(
+                $request,
+                SixpackService::EXPERIMENT_TEXT_VS_DROPDOWN,
+                ['text-search', 'dropdown-search']
+            );
+        }
+
         $data = array(
             // Make sure to check homepage landing below too
             'replacement' => $replacement,
             'referral'    => $referral,
             'phone'       => $this->getQuerystringPhone($request),
+            'search_type' => $expSearch,
         );
 
         $template = 'AppBundle:Default:index.html.twig';
@@ -349,11 +367,76 @@ class DefaultController extends BaseController
             }
         }
 
-        $memoptions = $this->sixpack(
-            $request,
-            SixpackService::EXPERIMENT_MEMORY_OPTIONS,
-            ['three-dropdowns', 'single-progressive-dropdown']
-        );
+        // throw new \Exception(print_r($this->getPhonesArray(), true));
+
+        return [
+            'form_phone' => $formPhone->createView(),
+            'phones' => $this->getPhonesArray(),
+            'type' => $type,
+            'phone' => $phone,
+        ];
+    }
+
+    /**
+     * @Route("/phone-dropdown", name="phone_make_dropdown")
+     * @Route("/phone-dropdown/{type}/{id}", name="phone_make_dropdown_type_id")
+     * @Route("/phone-dropdown/{type}", name="phone_make_dropdown_type")
+     * @Template()
+     */
+    public function phoneMakeDropdownNewAction(Request $request, $type = null, $id = null)
+    {
+        $dm = $this->getManager();
+        $phoneRepo = $dm->getRepository(Phone::class);
+        $phone = null;
+        $phoneMake = new PhoneDropdown();
+        if ($id) {
+            $phone = $phoneRepo->find($id);
+            $phoneMake->setMake($phone->getMake());
+        }
+
+        // throw new \Exception($id);
+
+        if ($phone && in_array($type, ['purchase-select', 'purchase-change'])) {
+            if ($session = $request->getSession()) {
+                $session->set('quote', $phone->getId());
+            }
+
+            // don't check for partial partial as selected phone may be different from partial policy phone
+            return $this->redirectToRoute('purchase_step_policy');
+        } elseif ($phone && in_array($type, ['learn-more'])) {
+            if ($session = $request->getSession()) {
+                $session->set('quote', $phone->getId());
+            }
+        }
+
+        $formPhone = $this->get('form.factory')
+            ->createNamedBuilder('launch_phone', PhoneDropdownType::class, $phoneMake, [
+                'action' => $this->generateUrl('phone_make_dropdown'),
+            ])
+            ->getForm();
+        if ('POST' === $request->getMethod()) {
+            if ($request->request->has('launch_phone')) {
+                $phoneId = $this->getDataString($request->get('launch_phone'), 'memory');
+                if ($phoneId) {
+                    $phone = $phoneRepo->find($phoneId);
+                    if (!$phone) {
+                        throw new \Exception('unknown phone');
+                    }
+                    if ($phone->getMemory()) {
+                        return $this->redirectToRoute('quote_make_model_memory', [
+                            'make' => $phone->getMake(),
+                            'model' => $phone->getEncodedModel(),
+                            'memory' => $phone->getMemory(),
+                        ]);
+                    } else {
+                        return $this->redirectToRoute('quote_make_model', [
+                            'make' => $phone->getMake(),
+                            'model' => $phone->getEncodedModel(),
+                        ]);
+                    }
+                }
+            }
+        }
 
         // throw new \Exception(print_r($this->getPhonesArray(), true));
 
@@ -362,7 +445,6 @@ class DefaultController extends BaseController
             'phones' => $this->getPhonesArray(),
             'type' => $type,
             'phone' => $phone,
-            'memoptions' => $memoptions,
         ];
     }
 
