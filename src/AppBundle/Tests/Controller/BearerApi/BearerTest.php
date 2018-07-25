@@ -146,12 +146,12 @@ class BearerTest extends BaseControllerTest
 //            #->debug()
 //        ;
 //var_dump([$x]);die;
-        $repo = $dm->getRepository(Client::class);
-        $x = $repo->findBy([
-            "id" => new \MongoId("5b51ec6b636239778924b671"),   #)
-            "randomId" => "36v22l3ei3wgw0k4wos48kokk0cwsgo0ocggggoc84w0cw8844"
-        ]);
-var_dump([$x]);die;
+//        $repo = $dm->getRepository(Client::class);
+//        $x = $repo->findBy([
+//            "id" => new \MongoId("5b51ec6b636239778924b671"),   #)
+//            "randomId" => "36v22l3ei3wgw0k4wos48kokk0cwsgo0ocggggoc84w0cw8844"
+//        ]);
+//var_dump([$x]);die;
 
         $crawler = self::$client->request('GET', '/oauth/v2/auth', $params);
 #echo self::$client->getResponse()->getContent();die;
