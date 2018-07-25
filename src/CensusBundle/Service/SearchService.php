@@ -2,6 +2,7 @@
 namespace CensusBundle\Service;
 
 use AppBundle\Document\PostcodeTrait;
+use CensusBundle\Document\Coordinates;
 use CensusBundle\Document\Postcode;
 use CensusBundle\Document\OutputArea;
 use CensusBundle\Document\Income;
@@ -46,12 +47,27 @@ class SearchService
         return true;
     }
 
+    /**
+     * @param string $code
+     * @return Postcode|null
+     */
     public function getPostcode($code)
     {
         /** @var PostCodeRepository $postcodeRepo */
         $postcodeRepo = $this->dm->getRepository(PostCode::class);
 
-        return $postcodeRepo->findOneBy(['Postcode' => $code]);
+        $postcode = $postcodeRepo->findOneBy(['Postcode' => $code]);
+        if (!$postcode || !$postcode->getLocation()) {
+            return null;
+        }
+
+        /** @var Coordinates $location */
+        $location = $postcode->getLocation();
+        if (!$location->asPoint()) {
+            return null;
+        }
+
+        return $postcode;
     }
 
     public function findNearest($code)
@@ -60,6 +76,7 @@ class SearchService
         if (!$postcode) {
             return null;
         }
+
         $searchQuery = $this->dm->createQueryBuilder('CensusBundle:Census')
             ->field('Location')
             ->geoNear($postcode->getLocation()->asPoint())
