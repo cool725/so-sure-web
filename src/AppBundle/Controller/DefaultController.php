@@ -375,12 +375,12 @@ class DefaultController extends BaseController
     }
 
     /**
-     * @Route("/select-phone-dropdown", name="select_phone_make_dropdown")
-     * @Route("/select-phone-dropdown/{type}/{id}", name="select_phone_make_dropdown_type_id")
-     * @Route("/select-phone-dropdown/{type}", name="select_phone_make_dropdown_type")
+     * @Route("/phone-dropdown", name="phone_make_dropdown")
+     * @Route("/phone-dropdown/{type}/{id}", name="phone_make_dropdown_type_id")
+     * @Route("/phone-dropdown/{type}", name="phone_make_dropdown_type")
      * @Template()
      */
-    public function selectPhoneMakeDropdownNewAction(Request $request, $type = null, $id = null)
+    public function phoneMakeDropdownNewAction(Request $request, $type = null, $id = null)
     {
         $dm = $this->getManager();
         $phoneRepo = $dm->getRepository(Phone::class);
@@ -408,7 +408,7 @@ class DefaultController extends BaseController
 
         $formPhone = $this->get('form.factory')
             ->createNamedBuilder('launch_phone', PhoneDropdownType::class, $phoneMake, [
-                'action' => $this->generateUrl('select_phone_make_dropdown'),
+                'action' => $this->generateUrl('phone_make_dropdown'),
             ])
             ->getForm();
         if ('POST' === $request->getMethod()) {

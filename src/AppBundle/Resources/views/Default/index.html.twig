@@ -50,7 +50,7 @@
 
         {# Phone Search #}
         {% if search_type is defined and search_type == 'dropdown-search' %}
-            {% set select_template = 'AppBundle:Default:selectPhoneMakeDropdownNew' %}
+            {% set select_template = 'AppBundle:Default:phoneMakeDropdownNew' %}
         {% elseif search_type is defined and search_type == 'dropdown-search-old' %}
             {% set select_template = 'AppBundle:Default:selectPhoneMakeDropdown' %}
         {% else %}
