@@ -516,6 +516,7 @@ class OpsController extends BaseController
                 'savingsslider-a.akamaihd.net',
                 'cdncache-a.akamaihd.net',
                 'sxt.cdn.skype.com',
+                'cdn.joinhoney.com',
             ])) {
                 $logger->debug(sprintf('Content-Security-Policy called with ignore host: %s', $host));
 
