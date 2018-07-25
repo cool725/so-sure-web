@@ -40,7 +40,7 @@
                                 {% set sectionCount = sectionCount + 1 %}
                             </div>
                             <div class="panel-body">
-                                We need a bit more information about your phone.
+                                We need a bit more information about your {{ claim.policy.phone }}.
                             </div>
                         </div>
 
@@ -77,7 +77,7 @@
                                 {% set sectionCount = sectionCount + 1 %}
                             </div>
                             <div class="panel-body">
-                                We need a bit more information about the type of damage, for example ‘badly cracked screen’.
+                                We need a bit more information about the type of damage, for example ‘broken screen’.
                                 {% if picture_of_phone is defined and picture_of_phone %}We also need a photo of your phone showing the damage. You may need someone else's phone, or if your camera is working, using a mirror in a well lit room so we can clearly see the damage.{% endif %}
                             </div>
                         </div>
@@ -131,7 +131,7 @@
                             <div class="row">
                                 <div class="col-sm-6">
                                     <div class="form-group {% if form_errors(claim_form.proofOfUsage) %}has-error{% endif %}">
-                                        <label>Proof of usage <span class="req">*</span></label>
+                                        <label>Proof of usage</label>
                                         {{ form_widget(claim_form.proofOfUsage, { 'attr': {'class': 'form-control'}}) }}
                                         <div class="help-block with-errors">
                                             <a href="#" data-toggle="modal" data-target="#usageModal">
@@ -178,18 +178,18 @@
                                 {% set sectionCount = sectionCount + 1 %}
                             </div>
                             <div class="panel-body">
-                                Once your claim is submitted, we aim to get back to you within 3 working hours. You can save your progress and come back at a later date if you need more time to get all of the required documents.
+                                Once your claim is approved, we aim to get you back up and running in 24-72 hours. You can save your progress and come back at a later date if you need more time to get all of the required documents.
                             </div>
                         </div>
 
                         <div class="row">
                             <div class="col-xs-12 text-center">
-                                <div class="h4">I confirm that I have attached the requested documents and that all of the above is true.</div>
+                                <div class="h4">I confirm that all of the above is true, and understand that if I fail to provide the requested documentation that my claim may be delayed.</div>
                                 <div class="form-group">
                                     {{ form_widget(claim_form.confirm, { 'label': 'Submit my claim', 'attr': {'class': 'btn btn-green btn-lg'}}) }}
                                 </div>
                                 <div class="form-group">
-                                    {{ form_widget(claim_form.save, { 'label': 'Save my progress', 'attr': {'class': 'cancel btn btn-link btn-lg'}}) }}
+                                    {{ form_widget(claim_form.save, { 'label': 'Save my progress', 'attr': {'class': 'cancel btn btn-primary btn-lg'}}) }}
                                 </div>
                             </div>
                         </div>

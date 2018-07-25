@@ -43,7 +43,7 @@
                                 We know It sounds a bit silly, because someone <strong>just stole</strong> your phone and we're asking you if you can find it.
                                 However, we have had several cases where our customers thought that someone had stolen a phone, but instead
                                 it had accidentally slipped out of their bag and some kind person handed it in.
-                                We do ask that you contact the last place you can recall having your phone to see if some kind person has had your back.
+                                We do ask that you contact the last place you can recall having your phone to see if a kind person has handed it in.
                             </div>
                         </div>
 
@@ -195,18 +195,18 @@
                                 {% set sectionCount = sectionCount + 1 %}
                             </div>
                             <div class="panel-body">
-                                Once your claim is submitted, we aim to get back to you within 3 working hours. You can save your progress and come back at a later date if you need more time to get all of the required documents.
+                                Once your claim is approved, we aim to get you back up and running in 24-72 hours. You can save your progress and come back at a later date if you need more time to get all of the required documents.
                             </div>
                         </div>
 
                         <div class="row">
                             <div class="col-xs-12 text-center">
-                                <div class="h4">I confirm that I have attached the requested documents and that all of the above is true.</div>
+                                <div class="h4">I confirm that all of the above is true, and understand that if I fail to provide the requested documentation that my claim may be delayed.</div>
                                 <div class="form-group">
                                     {{ form_widget(claim_form.confirm, { 'label': 'Submit my claim', 'attr': {'class': 'btn btn-green btn-lg'}}) }}
                                 </div>
                                 <div class="form-group">
-                                    {{ form_widget(claim_form.save, { 'label': 'Save my progress', 'attr': {'class': 'cancel btn btn-link btn-lg'}}) }}
+                                    {{ form_widget(claim_form.save, { 'label': 'Save my progress', 'attr': {'class': 'cancel btn btn-primary btn-lg'}}) }}
                                 </div>
                             </div>
                         </div>

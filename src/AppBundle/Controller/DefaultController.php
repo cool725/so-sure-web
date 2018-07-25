@@ -607,7 +607,7 @@ class DefaultController extends BaseController
                     // @codingStandardsIgnoreStart
                     $this->addFlash(
                         'success',
-                        "Thank you. An email with further instructions on how to proceed with your claim has been sent to your email address. Please check it now and follow the instructions to start the process."
+                        "Thank you. For our policy holders, an email with further instructions on how to proceed with your claim has been sent to you. If you do not receive the email shortly, please check your spam folders and also verify that the email address matches your policy."
                     );
                 }
             }
