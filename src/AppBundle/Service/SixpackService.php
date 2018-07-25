@@ -81,7 +81,7 @@ class SixpackService
     // Exp 8
     const EXPERIMENT_TEXT_VS_DROPDOWN = 'dropdown-search';
     // Exp 9
-    const EXPERIMENT_TEXT_VS_DROPDOWN_MOBILE = 'dropdown-search';
+    const EXPERIMENT_TEXT_VS_DROPDOWN_MOBILE = 'dropdown-search-mobile';
     // Exp 10
 
     // Exp 11
