@@ -1415,7 +1415,7 @@ class UserController extends BaseController
     }
 
     /**
-     * @Route("/claim", name="claim_policy")
+     * @Route("/claim", name="user_claim")
      * @Template
      */
     public function claimAction(Request $request)
@@ -1432,8 +1432,9 @@ class UserController extends BaseController
         if (count($user->getValidPoliciesWithoutOpenedClaim(true)) == 0) {
             $policies = $user->getValidPolicies();
             foreach ($policies as $policy) {
-                if ($policy->getLatestFnolClaim()) {
-                    return $this->redirectToRoute('claimed_policy', ['policyId' => $policy->getId()]);
+                /** @var Policy $policy */
+                if ($policy->getLatestFnolClaim() || $policy->getLatestSubmittedClaim()) {
+                    return $this->redirectToRoute('user_claim_policy', ['policyId' => $policy->getId()]);
                 }
             }
             throw $this->createNotFoundException('No active claimable policy found');
@@ -1487,7 +1488,7 @@ class UserController extends BaseController
                     $claimsService->notifyFnolSubmission($claim);
                     $dm->flush();
 
-                    return $this->redirectToRoute('claimed_policy', ['policyId' => $policy->getId()]);
+                    return $this->redirectToRoute('user_claim_policy', ['policyId' => $policy->getId()]);
                 }
             }
         }
@@ -1511,7 +1512,7 @@ class UserController extends BaseController
     }
 
     /**
-     * @Route("/claim/{policyId}", name="claimed_policy")
+     * @Route("/claim/{policyId}", name="user_claim_policy")
      * @Template
      */
     public function claimPolicyAction($policyId)
@@ -1524,7 +1525,7 @@ class UserController extends BaseController
         $claim = $policy->getLatestFnolSubmittedClaim();
 
         if ($claim === null) {
-            return $this->redirectToRoute('claim_policy');
+            return $this->redirectToRoute('user_claim');
         }
 
         $this->denyAccessUnlessGranted(ClaimVoter::EDIT, $claim);
@@ -1536,7 +1537,7 @@ class UserController extends BaseController
         } elseif ($claim->getType() == Claim::TYPE_THEFT || $claim->getType() == Claim::TYPE_LOSS) {
             return $this->redirectToRoute('claimed_theftloss_policy', ['policyId' => $policy->getId()]);
         } else {
-            return $this->redirectToRoute('claim_policy');
+            return $this->redirectToRoute('user_claim');
         }
     }
 
@@ -1555,7 +1556,7 @@ class UserController extends BaseController
         $claim = $policy->getLatestFnolSubmittedClaim();
 
         if ($claim === null) {
-            return $this->redirectToRoute('claim_policy');
+            return $this->redirectToRoute('user_claim');
         }
 
         $this->denyAccessUnlessGranted(ClaimVoter::EDIT, $claim);
@@ -1579,7 +1580,7 @@ class UserController extends BaseController
                             'success',
                             'Your claim has been updated.'
                         );
-                        return $this->redirectToRoute('claimed_policy', ['policyId' => $policy->getId()]);
+                        return $this->redirectToRoute('user_claim_policy', ['policyId' => $policy->getId()]);
                     }
                 }
             } catch (\Exception $e) {
@@ -1619,11 +1620,11 @@ class UserController extends BaseController
         $claim = $policy->getLatestFnolClaim();
 
         if ($claim === null) {
-            return $this->redirectToRoute('claim_policy');
+            return $this->redirectToRoute('user_claim');
         } elseif ($claim->getStatus() == Claim::STATUS_SUBMITTED) {
             return $this->redirectToRoute('claimed_submitted_policy', ['policyId' => $policy->getId()]);
         } elseif ($claim->getType() != Claim::TYPE_DAMAGE) {
-            return $this->redirectToRoute('claimed_policy', ['policyId' => $policy->getId()]);
+            return $this->redirectToRoute('user_claim_policy', ['policyId' => $policy->getId()]);
         }
 
         $this->denyAccessUnlessGranted(ClaimVoter::EDIT, $claim);
@@ -1650,7 +1651,7 @@ class UserController extends BaseController
                         );
                     } elseif ($claimDamageForm->isValid()) {
                         $claimsService->updateDamageDocuments($claim, $claimFnolDamage, true);
-                        return $this->redirectToRoute('claimed_policy', ['policyId' => $policy->getId()]);
+                        return $this->redirectToRoute('user_claim_policy', ['policyId' => $policy->getId()]);
                     }
                 } catch (\Exception $e) {
                     $this->get('logger')->error(
@@ -1687,11 +1688,11 @@ class UserController extends BaseController
         $claim = $policy->getLatestFnolClaim();
 
         if ($claim === null) {
-            return $this->redirectToRoute('claim_policy');
+            return $this->redirectToRoute('user_claim');
         } elseif ($claim->getStatus() == Claim::STATUS_SUBMITTED) {
             return $this->redirectToRoute('claimed_submitted_policy', ['policyId' => $policy->getId()]);
         } elseif (!($claim->getType() == Claim::TYPE_THEFT || $claim->getType() == Claim::TYPE_LOSS)) {
-            return $this->redirectToRoute('claimed_policy', ['policyId' => $policy->getId()]);
+            return $this->redirectToRoute('user_claim_policy', ['policyId' => $policy->getId()]);
         }
 
         $this->denyAccessUnlessGranted(ClaimVoter::EDIT, $claim);
@@ -1717,7 +1718,7 @@ class UserController extends BaseController
                         );
                     } elseif ($claimTheftLossForm->isValid()) {
                         $claimsService->updateTheftLossDocuments($claim, $claimFnolTheftLoss, true);
-                        return $this->redirectToRoute('claimed_policy', ['policyId' => $policy->getId()]);
+                        return $this->redirectToRoute('user_claim_policy', ['policyId' => $policy->getId()]);
                     }
                 } catch (\Exception $e) {
                     $this->get('logger')->error(

@@ -1094,7 +1094,7 @@ class UserControllerTest extends BaseControllerTest
         $policy->setStart($now);
         self::$dm->flush();
 
-        $claimPage = self::$router->generate('claim_policy');
+        $claimPage = self::$router->generate('user_claim');
         $this->login($email, $password);
         $crawler = self::$client->request('GET', $claimPage);
         self::verifyResponse(404);
@@ -1123,7 +1123,7 @@ class UserControllerTest extends BaseControllerTest
         $policy->addClaim($claim);
         self::$dm->flush();
 
-        $claimPage = self::$router->generate('claim_policy');
+        $claimPage = self::$router->generate('user_claim');
         $this->login($email, $password);
         $crawler = self::$client->request('GET', $claimPage);
         self::verifyResponse(404);
@@ -1150,7 +1150,7 @@ class UserControllerTest extends BaseControllerTest
         $mobileNumber = self::generateRandomMobile();
         $serializer = new Serializer(array(new DateTimeNormalizer()));
 
-        $claimPage = self::$router->generate('claim_policy');
+        $claimPage = self::$router->generate('user_claim');
         $this->login($email, $password);
         $crawler = self::$client->request('GET', $claimPage);
         self::verifyResponse(200);

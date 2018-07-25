@@ -583,7 +583,7 @@ class DefaultController extends BaseController
     {
         $user = $this->getUser();
         if ($user) {
-            return $this->redirectToRoute('claim_policy');
+            return $this->redirectToRoute('user_claim');
         }
 
         $claimFnolEmail = new ClaimFnolEmail();
@@ -627,7 +627,7 @@ class DefaultController extends BaseController
         $user = $this->getUser();
 
         if ($user) {
-            return $this->redirectToRoute('claim_policy');
+            return $this->redirectToRoute('user_claim');
         }
 
         if ($tokenId) {
@@ -663,7 +663,7 @@ class DefaultController extends BaseController
                     $user
                 );
 
-                return $this->redirectToRoute('claim_policy');
+                return $this->redirectToRoute('user_claim');
             }
         }
 

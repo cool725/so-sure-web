@@ -76,7 +76,7 @@ class ClaimsController extends BaseController
             return new RedirectResponse($e->getMessage());
         }
         return array_merge($data, [
-            'policy_route' => 'claim_policy',
+            'policy_route' => 'user_claim',
         ]);
     }
 
