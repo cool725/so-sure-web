@@ -325,8 +325,7 @@ class DefaultControllerTest extends BaseControllerTest
         $crawler = self::$client->submit($form);
 
         self::verifyResponse(200);
-        // @codingStandardsIgnoreStart
-        $this->expectFlashSuccess($crawler, 'Thank you. An email with further instructions on how to proceed with your claim has been sent to your email address if you have a policy with us. Please check it now and follow the instructions to start the process.');
+        $this->expectFlashSuccess($crawler, 'email with further instructions');
     }
 
     public function testClaimUserNoActivePolicy()
@@ -356,8 +355,7 @@ class DefaultControllerTest extends BaseControllerTest
         $crawler = self::$client->submit($form);
 
         self::verifyResponse(200);
-        // @codingStandardsIgnoreStart
-        $this->expectFlashError($crawler, 'Sorry, your email address could not be associated with an active policy. Please check the email address you have created your policy under and try again.');
+        $this->expectFlashSuccess($crawler, 'email with further instructions');
     }
 
     public function testClaimValid()
@@ -387,8 +385,7 @@ class DefaultControllerTest extends BaseControllerTest
         $crawler = self::$client->submit($form);
 
         self::verifyResponse(200);
-        // @codingStandardsIgnoreStart
-        $this->expectFlashSuccess($crawler, 'Thank you. An email with further instructions on how to proceed with your claim has been sent to your email address. Please check it now and follow the instructions to start the process.');
+        $this->expectFlashSuccess($crawler, 'email with further instructions');
     }
 
     public function testClaimLoginAlreadyLogin()
