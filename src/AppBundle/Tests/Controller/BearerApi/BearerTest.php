@@ -66,20 +66,18 @@ class BearerTest extends BaseControllerTest
         $authInfo = $this->getBearerToken();
 
         $accessToken = $authInfo['access_token'];
-        /** @var Client $oauth2Details */
-        $oauth2Details = $authInfo['oauth2Details'];
 
         $params = [];
         $headers = [
             'HTTP_AUTHORIZATION' => 'Bearer '. $accessToken,
             'CONTENT_TYPE' => 'application/json',
         ];
-        #var_dump($headers);die;
         self::$client->request('GET', '/bearer-api/v1/ping', $params, [], $headers);
 
         $content = self::$client->getResponse()->getContent();
         $this->assertContains('pong', $content);
-        $this->assertContains('contractor21', $content);
+        #$this->assertContains($email, $content);
+var_dump($content);
     }
 
     private function loginTestUser(): array
@@ -116,7 +114,6 @@ class BearerTest extends BaseControllerTest
     private function getBearerToken(): array
     {
         $authInfo = $this->getAuthToken();
-        echo __METHOD__,':',__LINE__;die;
         $authInfo = $this->getBearerTokenWithAuthToken($authInfo);
 
         return $authInfo;
@@ -136,25 +133,11 @@ class BearerTest extends BaseControllerTest
             'response_type' => 'code',
             'redirect_uri' => LoadOauth2Data::KNOWN_CLIENT_CALLBACK_URL,
         ];
-        echo "\n\n", http_build_query($params), "\n\n";#die;
+        #echo "\n\n", http_build_query($params), "\n\n";#die;
 
-        $dm = static::$container->get('doctrine_mongodb.odm.default_document_manager');
-//        $x = $dm->createQueryBuilder(Client::class)
-//            ->field('id')->equals('5b51ec6b636239778924b671')
-//            ->getQuery()
-//            ->getSingleResult();
-//            #->debug()
-//        ;
-//var_dump([$x]);die;
-//        $repo = $dm->getRepository(Client::class);
-//        $x = $repo->findBy([
-//            "id" => new \MongoId("5b51ec6b636239778924b671"),   #)
-//            "randomId" => "36v22l3ei3wgw0k4wos48kokk0cwsgo0ocggggoc84w0cw8844"
-//        ]);
-//var_dump([$x]);die;
+        #$dm = static::$container->get('doctrine_mongodb.odm.default_document_manager');
 
         $crawler = self::$client->request('GET', '/oauth/v2/auth', $params);
-#echo self::$client->getResponse()->getContent();die;
         $this->assertFalse(self::$client->getResponse()->isNotFound(), 'Expected to find the client_id!');
         $this->assertNotContains('Client not found.', self::$client->getResponse()->getContent());
 
@@ -162,9 +145,8 @@ class BearerTest extends BaseControllerTest
         $form = $crawler->selectButton('Allow')->form();
         self::$client->submit($form);
 
-        $redirectLocation = self::$client->getResponse()->headers->get('location') ?? null;
-        $this->assertNotEmpty($redirectLocation);
-        $this->assertContains('http://dev.so-sure.net:40080/test', $redirectLocation);
+        $redirectLocation = self::$client->getResponse()->headers->get('location');
+        $this->assertNotNull($redirectLocation);
         $queryString = parse_url($redirectLocation, PHP_URL_QUERY);
         parse_str($queryString, $output);
 
@@ -174,8 +156,45 @@ class BearerTest extends BaseControllerTest
 
         return [
             'code' => $output['code'],
-            'oauth2Details' => $oauth2Details,
-            #'client' => $client,
+            'oauth2Details' => $params,
+        ];
+    }
+
+    private function getBearerTokenWithAuthToken($authInfo): array
+    {
+        $state = (string)time(true);
+        $params = [
+            #'client_id' => '5b51ec6b636239778924b671_36v22l3ei3wgw0k4wos48kokk0cwsgo0ocggggoc84w0cw8844',
+            'client_id' => LoadOauth2Data::KNOWN_CLIENT_ID,
+            'client_secret' =>LoadOauth2Data::KNOWN_CLIENT_SECRET,
+            'response_type' => 'code',
+
+            'scope' => 'read',
+            'redirect_uri' => LoadOauth2Data::KNOWN_CLIENT_CALLBACK_URL,
+            'state' => $state,
+
+            'grant_type' => 'authorization_code',
+            'code' => $authInfo['code'],
+        ];
+
+        /** @var \Symfony\Bundle\FrameworkBundle\Client $client */
+        self::$client->request('GET', '/oauth/v2/token', $params);
+        $content = self::$client->getResponse()->getContent();
+#var_dump($content);die;
+
+        $ret = json_decode($content, true);
+        $this->assertArrayHasKey('access_token', $ret);
+        $this->assertArrayHasKey('expires_in', $ret);
+        $this->assertArrayHasKey('token_type', $ret);
+        $this->assertArrayHasKey('scope', $ret);
+        $this->assertArrayHasKey('refresh_token', $ret);
+
+        $this->assertInternalType('string', $ret['access_token']);
+        $this->assertGreaterThanOrEqual(10, strlen($ret['access_token']));
+
+        return [
+            'access_token' => $ret['access_token'],
+            #'oauth2Details' => $oauth2Details,
         ];
     }
 
