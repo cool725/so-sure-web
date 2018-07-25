@@ -1,6 +1,7 @@
 $('#claimsModal').on('show.bs.modal', function (event) {
     var button = $(event.relatedTarget); // Button that triggered the modal
     var claim = button.data('claim');
+    var documents = button.data('documents');
     var modal = $(this);
 
     if (claim) {
@@ -10,11 +11,195 @@ $('#claimsModal').on('show.bs.modal', function (event) {
         modal.find('#claims-detail-policy').text(claim.policyNumber);
         modal.find('#claims-detail-type').val(claim.type);
         modal.find('#claims-detail-status').text(claim.status);
+        modal.find('#claims-detail-number-to-reach').text(claim.phoneToReach);
+        modal.find('#claims-detail-time-to-reach').text(claim.timeToReach);
         modal.find('#claims-detail-initial-suspicion').text(claim.initialSuspicion);
         modal.find('#claims-detail-final-suspicion').text(claim.finalSuspicion);
         modal.find('#claims-detail-davies-status').text(claim.daviesStatus);
         modal.find('#claims-detail-notes').text(claim.notes);
         modal.find('#claims-detail-description').text(claim.description);
+
+        modal.find('#claims-damage').hide();
+        modal.find('#claims-theftloss').hide();
+
+        if (claim.type == 'damage') {
+            modal.find('#claims-damage').show();
+            if (claim.typeDetails == 'other') {
+                modal.find('#claims-detail-type-details').text(claim.typeDetailsOther);
+            }
+            else {
+                modal.find('#claims-detail-type-details').text(claim.typeDetails);
+            }
+            modal.find('#claims-detail-bought').text(claim.monthOfPurchase+' / '+claim.yearOfPurchase);
+            modal.find('#claims-detail-phone-status').text(claim.phoneStatus);
+            modal.find('#claims-detail-warranty').text(claim.isUnderWarranty ? 'Yes' : 'No');
+
+            if (documents) {
+                if (claim.needProofOfUsage) {
+                    if (documents.proofOfUsages.length > 0) {
+                        var proofOfUsages = '';
+                        $.each(documents.proofOfUsages, function(key, value) {
+                            proofOfUsages += '<p><a href="'+value.url+'">'+value.filename+'</a></p>';
+                        });
+                        modal.find('#claims-detail-damage-proof-usages').html(proofOfUsages);                        
+                    }
+                    else {
+                        modal.find('#claims-detail-damage-proof-usages').html('Not uploaded yet');                                            
+                    }
+                }
+                else {
+                    modal.find('#claims-detail-damage-proof-usages').html('Not requested');                    
+                }
+
+                if (claim.needProofOfPurchase) {
+                    if (documents.proofOfPurchases.length > 0) {
+                        var proofOfPurchases = '';
+                        $.each(documents.proofOfPurchases, function(key, value) {
+                            proofOfPurchases += '<p><a href="'+value.ulr+'">'+value.filename+'</a></p>';
+                        });
+                        modal.find('#claims-detail-proof-purchases').html(proofOfPurchases);
+                    }
+                    else {
+                        modal.find('#claims-detail-proof-purchases').html('Not uploaded yet');
+                    }
+                }
+                else {
+                    modal.find('#claims-detail-proof-purchases').html('Not requested');
+                }
+
+                if (claim.needPictureOfPhone) {
+                    if (documents.damagePictures.length > 0) {
+                        var damagePictures = '';
+                        $.each(documents.damagePictures, function(key, value) {
+                            damagePictures += '<p><a href="'+value.url+'">'+value.filename+'</a></p>';
+                        });
+                        modal.find('#claims-detail-pictures-phone').html(damagePictures);
+                    }
+                    else {
+                        modal.find('#claims-detail-pictures-phone').html('Not uploaded yet');                        
+                    }
+                }
+                else {
+                    modal.find('#claims-detail-pictures-phone').html('Not requested');
+                }
+
+                if (documents.others.length > 0) {
+                    var others = '';
+                    $.each(documents.others, function(key, value) {
+                        others += '<p><a href="'+value.url+'">'+value.filename+'</a></p>';
+                    });
+                    modal.find('#claims-detail-damage-others').html(others);
+                }
+                else {
+                    modal.find('#claims-detail-damage-others').html('Not uploaded yet');                        
+                }
+            }
+        }
+
+        if (claim.type == 'theft' || claim.type == 'loss') {
+            modal.find('#claims-theftloss').show();
+
+            modal.find('#claims-detail-contacted').text(claim.hasContacted ? claim.contactedPlace : 'N/A');
+            modal.find('#claims-detail-network').text(claim.network);
+            modal.find('#claims-detail-blocked').text((claim.blockedDate) ? moment(claim.blockedDate).format('DD-MM-YYYY') : '');
+            modal.find('#claims-detail-reported').text((claim.reportedDate) ? moment(claim.reportedDate).format('DD-MM-YYYY') : '');
+            modal.find('#claims-detail-reported-to').text(claim.reportType);
+
+            if (documents) {
+                if (claim.needProofOfUsage) {
+                    if (documents.proofOfUsages.length > 0) {
+                        var proofOfUsages = '';
+                        $.each(documents.proofOfUsages, function(key, value) {
+                            proofOfUsages += '<p><a href="'+value.url+'">'+value.filename+'</a></p>';
+                        });
+                        modal.find('#claims-detail-theftloss-proof-usages').html(proofOfUsages);
+                    }
+                    else {
+                        modal.find('#claims-detail-theftloss-proof-usages').html('Not uploaded yet');
+                    }
+                }
+                else {
+                    modal.find('#claims-detail-theftloss-proof-usages').html('Not requested');
+                }
+
+                if (claim.needProofOfBarring) {
+                    if (documents.proofOfBarrings.length > 0) {
+                        var proofOfBarrings = '';
+                        $.each(documents.proofOfBarrings, function (key, value) {
+                            proofOfBarrings += '<p><a href="' + value.url + '">' + value.filename + '</a></p>';
+                        });
+                        modal.find('#claims-detail-proof-barrings').html(proofOfBarrings);
+                    }
+                    else {
+                        modal.find('#claims-detail-proof-barrings').html('Not uploaded yet');
+                    }
+                }
+                else {
+                        modal.find('#claims-detail-proof-barrings').html('Not requested');
+                }
+
+                if (claim.needProofOfPurchase) {
+                    if (documents.proofOfPurchases.length > 0) {
+                        var proofOfPurchases = '';
+                        $.each(documents.proofOfPurchases, function(key, value) {
+                            proofOfPurchases += '<p><a href="'+value.ulr+'">'+value.filename+'</a></p>';
+                        });
+                        modal.find('#claims-detail-proof-purchases').html(proofOfPurchases);
+                    }
+                    else {
+                        modal.find('#claims-detail-proof-purchases').html('Not uploaded yet');                        
+                    }
+                }
+                else {
+                    modal.find('#claims-detail-proof-purchases').html('Not requested');
+                }
+                
+                if (claim.type == 'loss') {
+                    if (claim.needProofOfLoss) {
+                        if (documents.proofOfLosses.length > 0) {
+                            var proofOfLosses = '';
+                            $.each(documents.proofOfLosses, function(key, value) {
+                                proofOfLosses += '<p><a href="'+value.ulr+'">'+value.filename+'</a></p>';
+                            });
+                            modal.find('#claims-detail-proof-losses').html(proofOfLosses);
+                        }
+                        else {
+                            modal.find('#claims-detail-proof-losses').html('Not uploaded yet');
+                        }
+                    }
+                    else {
+                        modal.find('#claims-detail-proof-losses').html('Not requested');
+                    }
+                    modal.find('#claims-detail-proof-losses-container').show();
+                }
+                else {
+                    modal.find('#claims-detail-proof-losses-container').hide();
+                }
+
+                if (documents.others.length > 0) {
+                    var others = '';
+                    $.each(documents.others, function(key, value) {
+                        others += '<p><a href="'+value.url+'">'+value.filename+'</a></p>';
+                    });
+                    modal.find('#claims-detail-theftloss-others').html(others);
+                }
+                else {
+                    modal.find('#claims-detail-theftloss-others').html('Not uploaded yet');                        
+                }
+            }
+
+            if (claim.type == 'theft') {
+                modal.find('#claims-detail-crime-reference').text(claim.crimeRef);
+                modal.find('#claims-detail-crime-reference-container').show();
+                modal.find('#claims-detail-policy-report-container').hide();
+            }
+            else {
+                modal.find('#claims-detail-policy-report').text(claim.crimeRef);
+                modal.find('#claims-detail-crime-reference-container').hide();
+                modal.find('#claims-detail-policy-report-container').show();
+            }
+        }
+
         modal.find('#claims-detail-replacement-imei').text(claim.replacementImei);
         if (!claim.validReplacementImei) {
             modal.find('#claims-detail-replacement-imei').html('<s>' + claim.replacementImei + '</s> <i class="fa fa-warning" title="Invalid IMEI Number (Luhn Failure)"></i>');

@@ -11,6 +11,7 @@ use AppBundle\Service\InvitationService;
 use AppBundle\Service\MailerService;
 use AppBundle\Service\RateLimitService;
 use AppBundle\Service\RequestService;
+use AppBundle\Service\ClaimsService;
 use PHPStan\Rules\Arrays\AppendedArrayItemTypeRule;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
@@ -37,11 +38,12 @@ use AppBundle\Form\Type\RegisterUserType;
 use AppBundle\Form\Type\PhoneMakeType;
 use AppBundle\Form\Type\PhoneType;
 use AppBundle\Form\Type\SmsAppLinkType;
+use AppBundle\Form\Type\ClaimFnolEmailType;
 use AppBundle\Form\Type\ClaimFnolType;
 
 use AppBundle\Document\Form\Register;
 use AppBundle\Document\Form\PhoneMake;
-use AppBundle\Document\Form\ClaimFnol;
+use AppBundle\Document\Form\ClaimFnolEmail;
 use AppBundle\Document\User;
 use AppBundle\Document\Claim;
 use AppBundle\Document\Lead;
@@ -575,65 +577,97 @@ class DefaultController extends BaseController
 
     /**
      * @Route("/claim", name="claim")
-     * @Route("/claim/{policyId}", name="claim_policy")
      * @Template
      */
-    public function claimAction(Request $request, $policyId = null)
+    public function claimAction(Request $request)
     {
         $user = $this->getUser();
-        $claimFnol = new ClaimFnol();
-
-        if ($policyId) {
-            $repo = $this->getManager()->getRepository(Policy::class);
-            $policy = $repo->find($policyId);
-            $claimFnol->setPolicy($policy);
-        } elseif ($user) {
-            $claimFnol->setUser($user);
+        if ($user) {
+            return $this->redirectToRoute('user_claim');
         }
 
-        $claimForm = $this->get('form.factory')
-            ->createNamedBuilder('claim_form', ClaimFnolType::class, $claimFnol)
+        $claimFnolEmail = new ClaimFnolEmail();
+
+        $claimEmailForm = $this->get('form.factory')
+            ->createNamedBuilder('claim_email_form', ClaimFnolEmailType::class, $claimFnolEmail)
             ->getForm();
 
         if ('POST' === $request->getMethod()) {
-            if ($request->request->has('claim_form')) {
-                $claimForm->handleRequest($request);
-                if ($claimForm->isValid()) {
-                    $mailer = $this->get('app.mailer');
-                    $subject = sprintf(
-                        'New Claim from %s/%s',
-                        $claimFnol->getName(),
-                        $claimFnol->getPolicyNumber()
-                    );
-                    $mailer->sendTemplate(
-                        $subject,
-                        'new-claim@wearesosure.com',
-                        'AppBundle:Email:claim/fnolToClaims.html.twig',
-                        ['data' => $claimFnol]
-                    );
+            if ($request->request->has('claim_email_form')) {
+                $claimEmailForm->handleRequest($request);
+                if ($claimEmailForm->isValid()) {
+                    $repo = $this->getManager()->getRepository(User::class);
+                    $user = $repo->findOneBy(['emailCanonical' => mb_strtolower($claimFnolEmail->getEmail())]);
 
-                    $mailer->sendTemplate(
-                        'Your claim with so-sure',
-                        $claimFnol->getEmail(),
-                        'AppBundle:Email:claim/fnolResponse.html.twig',
-                        ['data' => $claimFnol],
-                        'AppBundle:Email:claim/fnolResponse.txt.twig',
-                        ['data' => $claimFnol]
-                    );
-
+                    if ($user) {
+                        /** @var ClaimsService $claimsService */
+                        $claimsService = $this->get('app.claims');
+                        $claimsService->sendUniqueLoginLink($user);
+                    }
+                    // @codingStandardsIgnoreStart
                     $this->addFlash(
                         'success',
-                        "Thanks. We'll be in touch shortly"
+                        "Thank you. For our policy holders, an email with further instructions on how to proceed with your claim has been sent to you. If you do not receive the email shortly, please check your spam folders and also verify that the email address matches your policy."
                     );
-
-                    return $this->redirectToRoute('claim');
                 }
             }
         }
 
         return [
-            'claim_form' => $claimForm->createView(),
+            'claim_email_form' => $claimEmailForm->createView(),
         ];
+    }
+
+    /**
+     * @Route("/claim/login/{tokenId}", name="claim_login")
+     * @Template
+     */
+    public function claimLoginAction(Request $request, $tokenId = null)
+    {
+        $user = $this->getUser();
+
+        if ($user) {
+            return $this->redirectToRoute('user_claim');
+        }
+
+        if ($tokenId) {
+            /** @var ClaimsService $claimsService */
+            $claimsService = $this->get('app.claims');
+            $userId = $claimsService->getUserIdFromLoginLinkToken($tokenId);
+            if (!$userId) {
+                // @codingStandardsIgnoreStart
+                $this->addFlash(
+                    'error',
+                    "Sorry, it looks like your link as expired. Please re-enter the email address you have created your policy under and try again."
+                );
+                return $this->redirectToRoute('claim');
+            }
+
+            $dm = $this->getManager();
+            $userRepo = $dm->getRepository(User::class);
+            $user = $userRepo->find($userId);
+
+            if ($user) {
+                if ($user->isLocked() || !$user->isEnabled()) {
+                    // @codingStandardsIgnoreStart
+                    $this->addFlash(
+                        'error',
+                        "Sorry, it looks like your user account is locked or expired. Please email support@wearesosure.com"
+                    );
+
+                    return $this->redirectToRoute('claim');
+                }
+
+                $this->get('fos_user.security.login_manager')->loginUser(
+                    $this->getParameter('fos_user.firewall_name'),
+                    $user
+                );
+
+                return $this->redirectToRoute('user_claim');
+            }
+        }
+
+        throw $this->createNotFoundException('Invalid link');
     }
 
     /**

@@ -182,7 +182,10 @@ services:
             - "@doctrine_mongodb.odm.default_document_manager"
             - "@logger"
             - "@app.mailer"
+            - "@app.router"
+            - "@snc_redis.default"
             - "%kernel.environment%"
+            - "@oneup_flysystem.mount_manager"
 
     app.shortlink:
         class: AppBundle\Service\ShortLinkService
@@ -329,6 +332,14 @@ services:
         arguments:
             - "@app.intercom"
             - "@logger"
+        public: false
+        tags:
+            - { name: twig.extension }
+
+    app.twig.claims:
+        class: AppBundle\Service\ClaimsTwigExtension
+        arguments:
+            - "@aws.s3"
         public: false
         tags:
             - { name: twig.extension }
@@ -643,6 +654,11 @@ services:
 
     app.voter.policy:
         class: AppBundle\Security\PolicyVoter
+        tags:
+            - { name: security.voter }
+
+    app.voter.claim:
+        class: AppBundle\Security\ClaimVoter
         tags:
             - { name: security.voter }
 
@@ -971,9 +987,38 @@ services:
         tags:
             - { name: form.type }
 
+    app.form.type.claimfnolemail:
+        class: AppBundle\Form\Type\ClaimFnolEmailType
+        tags:
+            - { name: form.type }
+
     app.form.type.claimfnol:
         class: AppBundle\Form\Type\ClaimFnolType
         arguments: ["%form_required%"]
+        tags:
+            - { name: form.type }
+
+    app.form.type.claimfnolconfirm:
+        class: AppBundle\Form\Type\ClaimFnolConfirmType
+        arguments: ["%form_required%"]
+        tags:
+            - { name: form.type }
+
+    app.form.type.claimfnoldamage:
+        class: AppBundle\Form\Type\ClaimFnolDamageType
+        arguments: ["@app.claims"]
+        tags:
+            - { name: form.type }
+
+    app.form.type.claimfnoltheftloss:
+        class: AppBundle\Form\Type\ClaimFnolTheftLossType
+        arguments: ["@app.claims", "@app.imei"]
+        tags:
+            - { name: form.type }
+
+    app.form.type.claimfnolupdate:
+        class: AppBundle\Form\Type\ClaimFnolUpdateType
+        arguments: ["%form_required%", "@app.claims"]
         tags:
             - { name: form.type }
 

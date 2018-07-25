@@ -42,11 +42,13 @@ class ClaimSearchType extends BaseType
                 'expanded' => true,
                 'choices' => [
                     Claim::STATUS_APPROVED => Claim::STATUS_APPROVED,
+                    Claim::STATUS_SUBMITTED => Claim::STATUS_SUBMITTED,
                     Claim::STATUS_INREVIEW => Claim::STATUS_INREVIEW,
                     Claim::STATUS_WITHDRAWN => Claim::STATUS_WITHDRAWN,
                     Claim::STATUS_DECLINED => Claim::STATUS_DECLINED,
                     Claim::STATUS_SETTLED => Claim::STATUS_SETTLED,
                     Claim::STATUS_PENDING_CLOSED => Claim::STATUS_PENDING_CLOSED,
+                    Claim::STATUS_FNOL => Claim::STATUS_FNOL,
                 ],
                 'data' => [Claim::STATUS_INREVIEW, Claim::STATUS_APPROVED],
             ])

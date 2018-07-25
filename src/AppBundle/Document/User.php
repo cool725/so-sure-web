@@ -942,6 +942,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     public function hasValidPolicy($active = true)
     {
         foreach ($this->getPolicies() as $policy) {
+            /** @var Policy $policy */
             if ($policy->isValidPolicy()) {
                 if ($active) {
                     if (in_array($policy->getStatus(), [Policy::STATUS_ACTIVE])) {
@@ -975,6 +976,35 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
                 $policies[] = $policy;
             } elseif ($includeUnpaid && $policy->getStatus() == Policy::STATUS_UNPAID) {
                 $policies[] = $policy;
+            }
+        }
+
+        return $policies;
+    }
+
+    public function getValidPoliciesWithoutOpenedClaim($includeUnpaid = false)
+    {
+        $policies = [];
+        foreach ($this->getPolicies() as $policy) {
+            $noOpenClaim = true;
+            foreach ($policy->getClaims() as $claim) {
+                if (!in_array($claim->getStatus(), [
+                    Claim::STATUS_APPROVED,
+                    Claim::STATUS_SETTLED,
+                    Claim::STATUS_DECLINED,
+                    Claim::STATUS_PENDING_CLOSED,
+                    Claim::STATUS_WITHDRAWN
+                ])) {
+                    $noOpenClaim = false;
+                    break;
+                }
+            }
+            if ($noOpenClaim) {
+                if (in_array($policy->getStatus(), [Policy::STATUS_ACTIVE])) {
+                    $policies[] = $policy;
+                } elseif ($includeUnpaid && $policy->getStatus() == Policy::STATUS_UNPAID) {
+                    $policies[] = $policy;
+                }
             }
         }
 

@@ -2,11 +2,18 @@
 
 namespace AppBundle\Document;
 
+use AppBundle\Document\File\ProofOfLossFile;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Component\Validator\Constraints as Assert;
 use AppBundle\Validator\Constraints as AppAssert;
 use AppBundle\Validator\Constraints\AlphanumericSpaceDotValidator;
+use AppBundle\Document\File\S3ClaimFile;
+use AppBundle\Document\File\ProofOfUsageFile;
+use AppBundle\Document\File\ProofOfBarringFile;
+use AppBundle\Document\File\ProofOfPurchaseFile;
+use AppBundle\Document\File\DamagePictureFile;
+use AppBundle\Document\File\OtherClaimFile;
 
 /**
  * @MongoDB\Document(repositoryClass="AppBundle\Repository\ClaimRepository")
@@ -23,6 +30,8 @@ class Claim
     const TYPE_WARRANTY = 'warranty';
     const TYPE_EXTENDED_WARRANTY = 'extended-warranty';
 
+    const STATUS_FNOL = 'fnol';
+    const STATUS_SUBMITTED = 'submitted';
     const STATUS_INREVIEW = 'in-review';
     const STATUS_APPROVED = 'approved';
     const STATUS_SETTLED = 'settled';
@@ -43,6 +52,89 @@ class Claim
     const WARNING_FLAG_IGNORE_USER_DECLINED = 'ignore-user-declined';
     const WARNING_FLAG_IGNORE_POLICY_EXPIRE_CLAIM_WAIT = 'ignore-policy-expire-claim-wait';
 
+    const NETWORK_ = "";
+
+    const NETWORK_1PMOBILE = "1pMobile";
+    const NETWORK_360COMS_TELECOM = "360Coms Telecom";
+    const NETWORK_AFRIMOBILE = "AfriMobile";
+    const NETWORK_AGE_UK_MY_PHONE = "Age UK My Phone";
+    const NETWORK_AIRWAVE_SMART_MOBILE = "Airwave Smart Mobile";
+    const NETWORK_ALWAYSONLINE_WIRELESS = "AlwaysOnline Wireless";
+    const NETWORK_ANYWHERE_SIM = "Anywhere Sim";
+    const NETWORK_ASDA_MOBILE = "Asda Mobile";
+    const NETWORK_AURACALL_TRAVEL_TALK = "Auracall Travel Talk";
+    const NETWORK_AXIS_TELECOM = "Axis Telecom";
+    const NETWORK_BT_MOBILE = "BT Mobile";
+    const NETWORK_C4C_MOBILE = "C4C Mobile";
+    const NETWORK_CALL_GIVE = "Call & Give";
+    const NETWORK_CHAMPIONS_MOBILE = "Champions Mobile";
+    const NETWORK_CHATSIM = "ChatSim";
+    const NETWORK_CUNIQ = "CUniq";
+    const NETWORK_CMLINK = "CMLink";
+    const NETWORK_CTEXCEL = "CTExcel";
+    const NETWORK_CTRL_MOBILE = "Ctrl Mobile";
+    const NETWORK_ECONET_MOBILE = "Econet Mobile";
+    const NETWORK_ECONOMY_MOBILE = "Economy Mobile";
+    const NETWORK_ECOTALK = "Ecotalk";
+    const NETWORK_EE = "EE";
+    const NETWORK_ETS_MOBILE = "ETS Mobile";
+    const NETWORK_FREEDOMPOP = "FreedomPop";
+    const NETWORK_FONOME_MOBILE = "Fonome Mobile";
+    const NETWORK_GAMMA_TELECOM = "Gamma Telecom";
+    const NETWORK_GIFFGAFF = "giffgaff";
+    const NETWORK_GLOBALGIG = "Globalgig";
+    const NETWORK_HP_MOBILE_CONNECT = "HP Mobile Connect";
+    const NETWORK_ID_MOBILE = "iD Mobile";
+    const NETWORK_JOI_TELECOM = "JOi Telecom";
+    const NETWORK_JUMP = "Jump";
+    const NETWORK_KC_MOBILE = "KC Mobile";
+    const NETWORK_LEBARA_MOBILE = "Lebara Mobile";
+    const NETWORK_LYCAMOBILE = "Lycamobile";
+    const NETWORK_MEEM_MOBILE = "Meem Mobile";
+    const NETWORK_NORDTELEKOM = "NordTelekom";
+    const NETWORK_NOW_PAYG = "Now PAYG";
+    const NETWORK_O2 = "O2";
+    const NETWORK_PEBBLE_MOBILE_NETWORK = "Pebble Mobile Network";
+    const NETWORK_PIRANHA_MOBILE = "Piranha Mobile";
+    const NETWORK_PLUSNET_MOBILE = "Plusnet Mobile";
+    const NETWORK_ROK_MOBILE = "Rok Mobile";
+    const NETWORK_RWG_MOBILE = "RWG Mobile";
+    const NETWORK_SKY_MOBILE = "Sky Mobile";
+    const NETWORK_SMARTY = "SMARTY";
+    const NETWORK_TALK_HOME_MOBILE = "Talk Home Mobile";
+    const NETWORK_TALKMOBILE = "Talkmobile";
+    const NETWORK_TALKTALK_MOBILE = "TalkTalk Mobile";
+    const NETWORK_TALKXTRA_MOBILE = "TalkXtra Mobile";
+    const NETWORK_TELECOM_PLUS = "Telecom Plus";
+    const NETWORK_TELFONI = "Telfoni";
+    const NETWORK_TESCO_MOBILE = "Tesco Mobile";
+    const NETWORK_THE_PEOPLES_OPERATOR = "The People's Operator";
+    const NETWORK_THE_PHONE_COOP = "The Phone Co-op";
+    const NETWORK_THREE = "Three";
+    const NETWORK_TORICA_MOBILE = "Torica Mobile";
+    const NETWORK_TOGGLE_MOBILE = "Toggle Mobile";
+    const NETWORK_TRUPHONE = "Truphone";
+    const NETWORK_U2I_MOBILE = "U2i Mobile";
+    const NETWORK_VECTONE_MOBILE = "Vectone Mobile";
+    const NETWORK_VIRGIN_MOBILE = "Virgin Mobile";
+    const NETWORK_VIVIO = "Vivio";
+    const NETWORK_VODAFONE = "Vodafone";
+    const NETWORK_VOXI = "VOXI";
+    const NETWORK_WHITE_MOBILE = "White Mobile";
+    const NETWORK_WORLDSIM = "WorldSim";
+
+    const DAMAGE_BROKEN_SCREEN = "broken-screen";
+    const DAMAGE_WATER = "water-damage";
+    const DAMAGE_OUT_OF_WARRANTY = "out-of-warranty-breakdown";
+    const DAMAGE_OTHER = "other";
+
+    const PHONE_STATUS_NEW = "new";
+    const PHONE_STATUS_REFURBISHED = "refurbished";
+    const PHONE_STATUS_SECOND_HAND = "second-hand";
+
+    const REPORT_POLICE_STATION = "police-station";
+    const REPORT_ONLINE = "online";
+
     public static $warningFlags = [
         self::WARNING_FLAG_DAVIES_NAME_MATCH => self::WARNING_FLAG_DAVIES_NAME_MATCH,
         self::WARNING_FLAG_DAVIES_POSTCODE => self::WARNING_FLAG_DAVIES_POSTCODE,
@@ -60,6 +152,86 @@ class Claim
         self::TYPE_EXTENDED_WARRANTY,
         self::TYPE_WARRANTY,
         self::TYPE_LOSS
+    ];
+
+    public static $networks = [
+        self::NETWORK_1PMOBILE => self::NETWORK_1PMOBILE,
+        self::NETWORK_360COMS_TELECOM => self::NETWORK_360COMS_TELECOM,
+        self::NETWORK_AFRIMOBILE => self::NETWORK_AFRIMOBILE,
+        self::NETWORK_AGE_UK_MY_PHONE => self::NETWORK_AGE_UK_MY_PHONE,
+        self::NETWORK_AIRWAVE_SMART_MOBILE => self::NETWORK_AIRWAVE_SMART_MOBILE,
+        self::NETWORK_ALWAYSONLINE_WIRELESS => self::NETWORK_ALWAYSONLINE_WIRELESS,
+        self::NETWORK_ANYWHERE_SIM => self::NETWORK_ANYWHERE_SIM,
+        self::NETWORK_ASDA_MOBILE => self::NETWORK_ASDA_MOBILE,
+        self::NETWORK_AURACALL_TRAVEL_TALK => self::NETWORK_AURACALL_TRAVEL_TALK,
+        self::NETWORK_AXIS_TELECOM => self::NETWORK_AXIS_TELECOM,
+        self::NETWORK_BT_MOBILE => self::NETWORK_BT_MOBILE,
+        self::NETWORK_C4C_MOBILE => self::NETWORK_C4C_MOBILE,
+        self::NETWORK_CALL_GIVE => self::NETWORK_CALL_GIVE,
+        self::NETWORK_CHAMPIONS_MOBILE => self::NETWORK_CHAMPIONS_MOBILE,
+        self::NETWORK_CHATSIM => self::NETWORK_CHATSIM,
+        self::NETWORK_CUNIQ => self::NETWORK_CUNIQ,
+        self::NETWORK_CMLINK => self::NETWORK_CMLINK,
+        self::NETWORK_CTEXCEL => self::NETWORK_CTEXCEL,
+        self::NETWORK_CTRL_MOBILE => self::NETWORK_CTRL_MOBILE,
+        self::NETWORK_ECONET_MOBILE => self::NETWORK_ECONET_MOBILE,
+        self::NETWORK_ECONOMY_MOBILE => self::NETWORK_ECONOMY_MOBILE,
+        self::NETWORK_ECOTALK => self::NETWORK_ECOTALK,
+        self::NETWORK_EE => self::NETWORK_EE,
+        self::NETWORK_ETS_MOBILE => self::NETWORK_ETS_MOBILE,
+        self::NETWORK_FREEDOMPOP => self::NETWORK_FREEDOMPOP,
+        self::NETWORK_FONOME_MOBILE => self::NETWORK_FONOME_MOBILE,
+        self::NETWORK_GAMMA_TELECOM => self::NETWORK_GAMMA_TELECOM,
+        self::NETWORK_GIFFGAFF => self::NETWORK_GIFFGAFF,
+        self::NETWORK_GLOBALGIG => self::NETWORK_GLOBALGIG,
+        self::NETWORK_HP_MOBILE_CONNECT => self::NETWORK_HP_MOBILE_CONNECT,
+        self::NETWORK_ID_MOBILE => self::NETWORK_ID_MOBILE,
+        self::NETWORK_JOI_TELECOM => self::NETWORK_JOI_TELECOM,
+        self::NETWORK_JUMP => self::NETWORK_JUMP,
+        self::NETWORK_KC_MOBILE => self::NETWORK_KC_MOBILE,
+        self::NETWORK_LEBARA_MOBILE => self::NETWORK_LEBARA_MOBILE,
+        self::NETWORK_LYCAMOBILE => self::NETWORK_LYCAMOBILE,
+        self::NETWORK_MEEM_MOBILE => self::NETWORK_MEEM_MOBILE,
+        self::NETWORK_NORDTELEKOM => self::NETWORK_NORDTELEKOM,
+        self::NETWORK_NOW_PAYG => self::NETWORK_NOW_PAYG,
+        self::NETWORK_O2 => self::NETWORK_O2,
+        self::NETWORK_PEBBLE_MOBILE_NETWORK => self::NETWORK_PEBBLE_MOBILE_NETWORK,
+        self::NETWORK_PIRANHA_MOBILE => self::NETWORK_PIRANHA_MOBILE,
+        self::NETWORK_PLUSNET_MOBILE => self::NETWORK_PLUSNET_MOBILE,
+        self::NETWORK_ROK_MOBILE => self::NETWORK_ROK_MOBILE,
+        self::NETWORK_RWG_MOBILE => self::NETWORK_RWG_MOBILE,
+        self::NETWORK_SKY_MOBILE => self::NETWORK_SKY_MOBILE,
+        self::NETWORK_SMARTY => self::NETWORK_SMARTY,
+        self::NETWORK_TALK_HOME_MOBILE => self::NETWORK_TALK_HOME_MOBILE,
+        self::NETWORK_TALKMOBILE => self::NETWORK_TALKMOBILE,
+        self::NETWORK_TALKTALK_MOBILE => self::NETWORK_TALKTALK_MOBILE,
+        self::NETWORK_TALKXTRA_MOBILE => self::NETWORK_TALKXTRA_MOBILE,
+        self::NETWORK_TELECOM_PLUS => self::NETWORK_TELECOM_PLUS,
+        self::NETWORK_TELFONI => self::NETWORK_TELFONI,
+        self::NETWORK_TESCO_MOBILE => self::NETWORK_TESCO_MOBILE,
+        self::NETWORK_THE_PEOPLES_OPERATOR => self::NETWORK_THE_PEOPLES_OPERATOR,
+        self::NETWORK_THE_PHONE_COOP => self::NETWORK_THE_PHONE_COOP,
+        self::NETWORK_THREE => self::NETWORK_THREE,
+        self::NETWORK_TORICA_MOBILE => self::NETWORK_TORICA_MOBILE,
+        self::NETWORK_TOGGLE_MOBILE => self::NETWORK_TOGGLE_MOBILE,
+        self::NETWORK_TRUPHONE => self::NETWORK_TRUPHONE,
+        self::NETWORK_U2I_MOBILE => self::NETWORK_U2I_MOBILE,
+        self::NETWORK_VECTONE_MOBILE => self::NETWORK_VECTONE_MOBILE,
+        self::NETWORK_VIRGIN_MOBILE => self::NETWORK_VIRGIN_MOBILE,
+        self::NETWORK_VIVIO => self::NETWORK_VIVIO,
+        self::NETWORK_VODAFONE => self::NETWORK_VODAFONE,
+        self::NETWORK_VOXI => self::NETWORK_VOXI,
+        self::NETWORK_WHITE_MOBILE => self::NETWORK_WHITE_MOBILE,
+        self::NETWORK_WORLDSIM => self::NETWORK_WORLDSIM
+    ];
+
+    public static $preferedNetworks = [
+        self::NETWORK_EE => self::NETWORK_EE,
+        self::NETWORK_GIFFGAFF => self::NETWORK_GIFFGAFF,
+        self::NETWORK_O2 => self::NETWORK_O2,
+        self::NETWORK_TESCO_MOBILE => self::NETWORK_TESCO_MOBILE,
+        self::NETWORK_THREE => self::NETWORK_THREE,
+        self::NETWORK_VODAFONE => self::NETWORK_VODAFONE
     ];
 
     /**
@@ -117,6 +289,14 @@ class Claim
      * @var \DateTime
      */
     protected $recordedDate;
+
+    /**
+     * @Assert\DateTime()
+     * @MongoDB\Field(type="date")
+     * @Gedmo\Versioned
+     * @var \DateTime
+     */
+    protected $submissionDate;
 
     /**
      * @Assert\DateTime()
@@ -183,6 +363,22 @@ class Claim
     protected $description;
 
     /**
+     * @Assert\DateTime()
+     * @MongoDB\Field(type="date")
+     * @Gedmo\Versioned
+     * @var \DateTime
+     */
+    protected $incidentDate;
+
+    /**
+     * @AppAssert\AlphanumericSpaceDot()
+     * @Assert\Length(min="4", max="100")
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
+    protected $incidentTime;
+
+    /**
      * @AppAssert\AlphanumericSpaceDot()
      * @Assert\Length(min="1", max="250")
      * @MongoDB\Field(type="string")
@@ -198,7 +394,8 @@ class Claim
     protected $type;
 
     /**
-     * @Assert\Choice({"in-review", "approved", "settled", "declined", "withdrawn", "pending-closed"}, strict=true)
+     * @Assert\Choice({"fnol", "submitted", "in-review", "approved", "settled", "declined",
+     *                 "withdrawn", "pending-closed"}, strict=true)
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
@@ -349,6 +546,13 @@ class Claim
     protected $fnolRiskReason;
 
     /**
+     * @Assert\Type("bool")
+     * @MongoDB\Field(type="boolean")
+     * @Gedmo\Versioned
+     */
+    protected $fnolPicSureValidated;
+
+    /**
      * @MongoDB\ReferenceMany(targetDocument="Charge", mappedBy="claim", cascade={"persist"})
      */
     protected $charges = array();
@@ -357,6 +561,121 @@ class Claim
      * @MongoDB\Field(type="collection")
      */
     protected $ignoreWarningFlags = array();
+
+    /**
+     * @Assert\Choice(callback="getNetworks", strict=true)
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
+    protected $network;
+
+    /**
+     * @AppAssert\PhoneNumber(message="Please enter a valid phone number")
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
+    protected $phoneToReach;
+
+    /**
+     * @AppAssert\AlphanumericSpaceDot()
+     * @Assert\Length(min="4", max="100")
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
+    protected $timeToReach;
+
+    /**
+     * @AppAssert\AlphanumericSpaceDot()
+     * @Assert\Length(min="1", max="100")
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
+    protected $signature;
+
+    /**
+     * @Assert\Choice({"broken-screen", "water-damage", "out-of-warranty-breakdown", "other"}, strict=true)
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
+    protected $typeDetails;
+
+    /**
+     * @AppAssert\AlphanumericSpaceDot()
+     * @Assert\Length(min="10", max="200")
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
+    protected $typeDetailsOther;
+
+    /**
+    /**
+     * @AppAssert\AlphanumericSpaceDot()
+     * @Assert\Length(min="3", max="200")
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
+    protected $monthOfPurchase;
+
+    /**
+     * @Assert\Length(min="4", max="4")
+     * @Assert\Range(min="2015", max="2050")
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
+    protected $yearOfPurchase;
+
+    /**
+     * @Assert\Choice({"new", "refurbished", "second-hand"}, strict=true)
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
+    protected $phoneStatus;
+
+    /**
+     * @Assert\Type("bool")
+     * @MongoDB\Field(type="boolean")
+     * @Gedmo\Versioned
+     */
+    protected $hasContacted;
+
+    /**
+     * @AppAssert\AlphanumericSpaceDot()
+     * @Assert\Length(min="4", max="200")
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
+    protected $contactedPlace;
+
+    /**
+     * @Assert\DateTime()
+     * @MongoDB\Field(type="date")
+     * @Gedmo\Versioned
+     * @var \DateTime
+     */
+    protected $blockedDate;
+
+    /**
+     * @Assert\DateTime()
+     * @MongoDB\Field(type="date")
+     * @Gedmo\Versioned
+     * @var \DateTime
+     */
+    protected $reportedDate;
+
+    /**
+     * @Assert\Choice({"police-station", "online"}, strict=true)
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
+    protected $reportType;
+
+    /**
+     * @MongoDB\ReferenceMany(
+     *  targetDocument="AppBundle\Document\File\S3ClaimFile",
+     *  cascade={"persist"}
+     * )
+     */
+    protected $files = array();
 
     public function __construct()
     {
@@ -376,6 +695,16 @@ class Claim
     public function setRecordedDate($recordedDate)
     {
         $this->recordedDate = $recordedDate;
+    }
+
+    public function getSubmissionDate()
+    {
+        return $this->submissionDate;
+    }
+
+    public function setSubmissionDate($submissionDate)
+    {
+        $this->submissionDate = $submissionDate;
     }
 
     public function isWithin30Days($date)
@@ -407,13 +736,18 @@ class Claim
         return null;
     }
 
-    public function setPolicy($policy)
+    public function setPolicy(Policy $policy)
     {
         if (!$this->getFnolRisk()) {
             $this->setFnolRisk($policy->getRisk());
         }
         if (!$this->getFnolRiskReason()) {
             $this->setFnolRiskReason($policy->getRiskReason());
+        }
+        if ($policy instanceof PhonePolicy && $this->getFnolPicSureValidated() == null) {
+            /** @var PhonePolicy $phonePolicy */
+            $phonePolicy = $policy;
+            $this->setFnolPicSureValidated($phonePolicy->isPicSureValidated());
         }
         $this->policy = $policy;
     }
@@ -467,8 +801,10 @@ class Claim
         if (!$status) {
             throw new \Exception('Status must be defined');
         }
-        
+
         if (!in_array($status, [
+            self::STATUS_FNOL,
+            self::STATUS_SUBMITTED,
             self::STATUS_APPROVED,
             self::STATUS_DECLINED,
             self::STATUS_INREVIEW,
@@ -507,7 +843,7 @@ class Claim
 
     public function isOpen()
     {
-        return in_array($this->getStatus(), [Claim::STATUS_APPROVED, Claim::STATUS_INREVIEW]);
+        return in_array($this->getStatus(), [Claim::STATUS_APPROVED, Claim::STATUS_SUBMITTED, Claim::STATUS_INREVIEW]);
     }
 
     public function getDaviesStatus()
@@ -636,6 +972,26 @@ class Claim
     public function setDescription($description)
     {
         $this->description = $description;
+    }
+
+    public function getIncidentDate()
+    {
+        return $this->incidentDate;
+    }
+
+    public function setIncidentDate($incidentDate)
+    {
+        $this->incidentDate = $incidentDate;
+    }
+
+    public function getIncidentTime()
+    {
+        return $this->incidentTime;
+    }
+
+    public function setIncidentTime($incidentTime)
+    {
+        $this->incidentTime = $incidentTime;
     }
 
     public function getLocation()
@@ -894,6 +1250,16 @@ class Claim
         $this->fnolRiskReason = $fnolRiskReason;
     }
 
+    public function getFnolPicSureValidated()
+    {
+        return $this->fnolPicSureValidated;
+    }
+
+    public function setFnolPicSureValidated($fnolPicSureValidated)
+    {
+        $this->fnolPicSureValidated = $fnolPicSureValidated;
+    }
+
     public function getCharges()
     {
         return $this->charges;
@@ -1025,11 +1391,164 @@ class Claim
         return  $this->isIgnoreWarningFlagSet(self::WARNING_FLAG_IGNORE_USER_DECLINED);
     }
 
+    public function getNetwork()
+    {
+        return $this->network;
+    }
+
+    public function setNetwork($network)
+    {
+        $this->network = $network;
+    }
+
+    public function getPhoneToReach()
+    {
+        return $this->phoneToReach;
+    }
+
+    public function setPhoneToReach($phoneToReach)
+    {
+        $this->phoneToReach = $phoneToReach;
+    }
+
+    public function getTimeToReach()
+    {
+        return $this->timeToReach;
+    }
+
+    public function setTimeToReach($timeToReach)
+    {
+        $this->timeToReach = $timeToReach;
+    }
+
+    public function getSignature()
+    {
+        return $this->signature;
+    }
+
+    public function setSignature($signature)
+    {
+        $this->signature = $signature;
+    }
+
+    public function getTypeDetails()
+    {
+        return $this->typeDetails;
+    }
+
+    public function setTypeDetails($typeDetails)
+    {
+        $this->typeDetails = $typeDetails;
+    }
+
+    public function getTypeDetailsOther()
+    {
+        return $this->typeDetailsOther;
+    }
+
+    public function setTypeDetailsOther($typeDetailsOther)
+    {
+        $this->typeDetailsOther = $typeDetailsOther;
+    }
+
+    public function getMonthOfPurchase()
+    {
+        return $this->monthOfPurchase;
+    }
+
+    public function setMonthOfPurchase($monthOfPurchase)
+    {
+        $this->monthOfPurchase = $monthOfPurchase;
+    }
+
+    public function getYearOfPurchase()
+    {
+        return $this->yearOfPurchase;
+    }
+
+    public function setYearOfPurchase($yearOfPurchase)
+    {
+        $this->yearOfPurchase = $yearOfPurchase;
+    }
+
+    public function getPhoneStatus()
+    {
+        return $this->phoneStatus;
+    }
+
+    public function setPhoneStatus($phoneStatus)
+    {
+        $this->phoneStatus = $phoneStatus;
+    }
+
+    public function getHasContacted()
+    {
+        return $this->hasContacted;
+    }
+
+    public function setHasContacted($hasContacted)
+    {
+        $this->hasContacted = $hasContacted;
+    }
+
+    public function getContactedPlace()
+    {
+        return $this->contactedPlace;
+    }
+
+    public function setContactedPlace($contactedPlace)
+    {
+        $this->contactedPlace = $contactedPlace;
+    }
+
+    public function getBlockedDate()
+    {
+        return $this->blockedDate;
+    }
+
+    public function setBlockedDate($blockedDate)
+    {
+        $this->blockedDate = $blockedDate;
+    }
+
+    public function getReportedDate()
+    {
+        return $this->reportedDate;
+    }
+
+    public function setReportedDate($reportedDate)
+    {
+        $this->reportedDate = $reportedDate;
+    }
+
+    public function getReportType()
+    {
+        return $this->reportType;
+    }
+
+    public function setReportType($reportType)
+    {
+        $this->reportType = $reportType;
+    }
+
+    public function addFile(S3ClaimFile $file)
+    {
+        $file->setClaim($this);
+        $this->files[] = $file;
+    }
+
+    public function getFiles()
+    {
+        return $this->files;
+    }
+
     public static function sumClaims($claims)
     {
         $data = [
             'total' => 0,
             'approved-settled' => 0,
+            self::STATUS_FNOL => 0,
+            self::STATUS_SUBMITTED => 0,
             self::STATUS_INREVIEW => 0,
             self::STATUS_APPROVED => 0,
             self::STATUS_SETTLED => 0,
@@ -1101,12 +1620,26 @@ class Claim
             'policyId' => $this->getPolicy()->getId(),
             'policyNumber' => $this->getPolicy()->getPolicyNumber(),
             'handler' => $this->getHandler() ? $this->getHandler()->getName() : 'unknown',
+            'phoneToReach' => $this->getPhoneToReach(),
+            'timeToReach' => $this->getTimeToReach(),
+            'typeDetails' => $this->getTypeDetails(),
+            'typeDetailsOther' => $this->getTypeDetailsOther(),
+            'monthOfPurchase' => $this->getMonthOfPurchase(),
+            'yearOfPurchase' => $this->getYearOfPurchase(),
+            'phoneStatus' => $this->getPhoneStatus(),
+            'hasContacted' => $this->getHasContacted(),
+            'contactedPlace' => $this->getContactedPlace(),
+            'network' => $this->getNetwork(),
+            'blockedDate' => $this->getBlockedDate() ? $this->getBlockedDate()->format(\DateTime::ATOM) : null,
+            'reportedDate' => $this->getReportedDate() ? $this->getReportedDate()->format(\DateTime::ATOM) : null,
+            'reportType' => $this->getReportType(),
             'replacementPhone' => $this->getReplacementPhone(),
             'replacementPhoneDetails' => $this->getReplacementPhoneDetails(),
             'replacementPhoneId' => $this->getReplacementPhone() ? $this->getReplacementPhone()->getId() : null,
             'replacementImei' => $this->getReplacementImei(),
             'validReplacementImei' => $this->isImei($this->getReplacementImei()),
             'recordedDate' => $this->getRecordedDate() ? $this->getRecordedDate()->format(\DateTime::ATOM) : null,
+            'submittedDate' => $this->getSubmissionDate() ? $this->getSubmissionDate()->format(\DateTime::ATOM) : null,
             'approvedDate' => $this->getApprovedDate() ? $this->getApprovedDate()->format(\DateTime::ATOM) : null,
             'lossDate' => $this->getLossDate() ? $this->getLossDate()->format(\DateTime::ATOM) : null,
             'notificationDate' => $this->getNotificationDate() ?
@@ -1137,6 +1670,11 @@ class Claim
             'crimeRef' => $this->getCrimeRef(),
             'validCrimeRef' => $this->isValidCrimeRef(),
             'shippingAddress' => $this->getShippingAddress(),
+            'needProofOfUsage' => $this->needProofOfUsage(),
+            'needProofOfPurchase' => $this->needProofOfPurchase(),
+            'needProofOfBarring' => $this->needProofOfBarring(),
+            'needProofOfLoss' => $this->needProofOfLoss(),
+            'needPictureOfPhone' => $this->needPictureOfPhone(),
         ];
     }
 
@@ -1156,6 +1694,113 @@ class Claim
         return self::getExcessValue($this->getType(), $picSureValidated, $picSureEnabled);
     }
 
+    public function getProofOfUsageFiles()
+    {
+        return $this->getFilesByType(ProofOfUsageFile::class);
+    }
+
+    public function getProofOfBarringFiles()
+    {
+        return $this->getFilesByType(ProofOfBarringFile::class);
+    }
+
+    public function getProofOfPurchaseFiles()
+    {
+        return $this->getFilesByType(ProofOfPurchaseFile::class);
+    }
+
+    public function getProofOfLossFiles()
+    {
+        return $this->getFilesByType(ProofOfLossFile::class);
+    }
+
+    public function getDamagePictureFiles()
+    {
+        return $this->getFilesByType(DamagePictureFile::class);
+    }
+
+    public function getOtherFiles()
+    {
+        return $this->getFilesByType(OtherClaimFile::class);
+    }
+
+    public function getAttachmentFiles()
+    {
+        $files = [];
+        foreach ($this->getProofOfUsageFiles() as $file) {
+            $files[] = $file;
+        }
+        foreach ($this->getProofOfBarringFiles() as $file) {
+            $files[] = $file;
+        }
+        foreach ($this->getProofOfPurchaseFiles() as $file) {
+            $files[] = $file;
+        }
+        foreach ($this->getProofOfLossFiles() as $file) {
+            $files[] = $file;
+        }
+        foreach ($this->getDamagePictureFiles() as $file) {
+            $files[] = $file;
+        }
+        foreach ($this->getOtherFiles() as $file) {
+            $files[] = $file;
+        }
+
+        return $files;
+    }
+
+    public function getFilesByType($type)
+    {
+        $files = [];
+        foreach ($this->files as $file) {
+            /** @var S3ClaimFile  $file */
+            if ($file instanceof $type) {
+                $files[] = $file;
+            }
+        }
+
+        // sort more recent to older
+        usort($files, function ($a, $b) {
+            return $a->getCreated() < $b->getCreated();
+        });
+
+        return $files;
+    }
+
+    public function needProofOfUsage()
+    {
+        return $this->getFnolRisk() != Policy::RISK_LEVEL_LOW;
+    }
+
+    public function needProofOfBarring()
+    {
+        return in_array($this->getType(), [self::TYPE_LOSS, self::TYPE_THEFT]);
+    }
+
+    public function needProofOfPurchase()
+    {
+        /** @var PhonePolicy  $policy */
+        $policy = $this->getPolicy();
+        // TODO: Consider if we should be using claim FNOL pic-sure validation
+        // or current policy pic-sure validation
+        return $this->getFnolRisk() == Policy::RISK_LEVEL_HIGH && !$policy->isPicSureValidated();
+    }
+
+    public function needPictureOfPhone()
+    {
+        /** @var PhonePolicy  $policy */
+        $policy = $this->getPolicy();
+        // TODO: Consider if we should be using claim FNOL pic-sure validation
+        // or current policy pic-sure validation
+        return $this->getType() == self::TYPE_DAMAGE && $this->getFnolRisk() == Policy::RISK_LEVEL_HIGH &&
+            !$policy->isPicSureValidated();
+    }
+
+    public function needProofOfLoss()
+    {
+        return $this->getType() == self::TYPE_LOSS && $this->getReportType() == self::REPORT_ONLINE;
+    }
+
     public static function getExcessValue($type, $picSureValidated, $picSureEnabled)
     {
         if ($picSureEnabled && !$picSureValidated) {
@@ -1173,5 +1818,10 @@ class Claim
         }
 
         throw new \Exception(sprintf('Unknown claim type %s', $type));
+    }
+
+    public static function getNetworks()
+    {
+        return self::$networks;
     }
 }

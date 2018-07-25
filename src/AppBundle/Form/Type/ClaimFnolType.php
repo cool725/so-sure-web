@@ -21,6 +21,7 @@ use Doctrine\Bundle\MongoDBBundle\Form\Type\DocumentType;
 
 class ClaimFnolType extends AbstractType
 {
+
     /**
      * @var boolean
      */
@@ -36,10 +37,14 @@ class ClaimFnolType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        $hoursChoices = [];
+        for ($h = 0; $h < 24; $h++) {
+            $formattedTime = sprintf("%02d:00", $h);
+            $hoursChoices[$formattedTime] = $formattedTime;
+        }
         $builder
-            ->add('email', EmailType::class)
-            ->add('name', TextType::class)
-            ->add('policyNumber', TextType::class)
+            ->add('email', EmailType::class, ['disabled' => true])
+            ->add('name', TextType::class, ['disabled' => true])
             ->add('phone', TextType::class)
             ->add('when', DateType::class, [
                   'required' => $this->required,
@@ -49,7 +54,11 @@ class ClaimFnolType extends AbstractType
                       'year' => 'YYYY', 'month' => 'MM', 'day' => 'DD',
                   ),
             ])
-            ->add('time', TextType::class)
+            ->add('time', ChoiceType::class, [
+                'required' => true,
+                'placeholder' => 'Select',
+                'choices' => $hoursChoices,
+            ])
             ->add('where', TextType::class)
             ->add('timeToReach', TextType::class)
             ->add('signature', TextType::class)
@@ -57,14 +66,39 @@ class ClaimFnolType extends AbstractType
                 'required' => true,
                 'placeholder' => 'My phone is...',
                 'choices' => [
-                    'My phone is lost' => Claim::TYPE_LOSS,
-                    'My phone was stolen' => Claim::TYPE_THEFT,
-                    'My phone is damaged or not working' => Claim::TYPE_DAMAGE,
+                    'Lost' => Claim::TYPE_LOSS,
+                    'Stolen' => Claim::TYPE_THEFT,
+                    'Damaged or not working' => Claim::TYPE_DAMAGE,
                 ],
+            ])
+            ->add('network', ChoiceType::class, [
+                'required' => true,
+                'placeholder' => 'My network operator is ...',
+                'choices' => Claim::$networks,
+                'preferred_choices' => Claim::$preferedNetworks,
             ])
             ->add('message', TextareaType::class)
             ->add('submit', SubmitType::class)
         ;
+
+
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
+            $form = $event->getForm();
+            $data = $event->getData();
+
+            $policies = array();
+            $userPolicies = $data->getUser()->getValidPoliciesWithoutOpenedClaim(true);
+            foreach ($userPolicies as $policy) {
+                $policies[$policy->getPolicyNumber()] = $policy->getId();
+            }
+
+            $form->add('policyNumber', ChoiceType::class, [
+                'required' => true,
+                'expanded' => false,
+                'multiple' => false,
+                'choices' => $policies
+            ]);
+        });
     }
 
     public function configureOptions(OptionsResolver $resolver)
