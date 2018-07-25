@@ -4754,7 +4754,7 @@ class PhonePolicyTest extends WebTestCase
         $this->assertFalse($foundSoSure);
         $this->assertTrue($foundPot);
         $this->assertNull($updatedPolicyA->getCashback());
-        $this->assertTrue($policyA->arePolicyScheduledPaymentsCorrect());
+        $this->assertNull($policyA->arePolicyScheduledPaymentsCorrect());
         $this->assertTrue($policyA->hasCorrectCommissionPayments(new \DateTime('2017-01-01')));
     }
 
