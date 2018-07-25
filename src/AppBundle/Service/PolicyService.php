@@ -2,6 +2,7 @@
 namespace AppBundle\Service;
 
 use AppBundle\Classes\SoSure;
+use AppBundle\Document\Address;
 use AppBundle\Repository\CashbackRepository;
 use AppBundle\Repository\OptOut\EmailOptOutRepository;
 use AppBundle\Repository\PhonePolicyRepository;
@@ -248,7 +249,10 @@ class PolicyService
         if (!$user->hasValidDetails() || !$user->hasValidBillingDetails()) {
             throw new InvalidUserDetailsException();
         }
-        if (!$this->searchService->validatePostcode($user->getBillingAddress()->getPostCode())) {
+
+        /** @var Address $address */
+        $address = $user->getBillingAddress();
+        if (!$address || !$this->searchService->validatePostcode($address->getPostcode())) {
             throw new GeoRestrictedException();
         }
     }
