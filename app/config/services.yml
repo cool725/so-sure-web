@@ -452,7 +452,7 @@ services:
             - "@statsd"
             - "@snc_redis.default"
             - "@app.branch"
-            - "@app.address"
+            - "@census.search"
             - "@app.imei"
             - "@app.ratelimit"
             - "@app.intercom"

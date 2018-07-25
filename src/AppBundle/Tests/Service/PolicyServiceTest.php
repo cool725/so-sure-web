@@ -4,6 +4,8 @@ namespace AppBundle\Tests\Service;
 
 use AppBundle\Document\Company;
 use AppBundle\Document\Form\Bacs;
+use AppBundle\Exception\GeoRestrictedException;
+use AppBundle\Exception\InvalidUserDetailsException;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\User;
 use AppBundle\Document\Address;
@@ -1021,6 +1023,68 @@ class PolicyServiceTest extends WebTestCase
             $policyA->getStandardSCode()->getCode(),
             $policyB->getStandardSCode()->getCode()
         );
+    }
+
+    /**
+     * @expectedException \AppBundle\Exception\InvalidUserDetailsException
+     */
+    public function testValidateUserInValidDetails()
+    {
+       $user = new User();
+       static::$policyService->validateUser($user);
+    }
+
+    /**
+     * @expectedException \AppBundle\Exception\InvalidUserDetailsException
+     */
+    public function testValidateUserInValidBillingDetails()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testValidateUserInValidBillingDetails', $this),
+            'bar',
+            $this->getRandomPhone(static::$dm),
+            static::$dm
+        );
+
+        static::$policyService->validateUser($user);
+    }
+
+    /**
+     * @expectedException \AppBundle\Exception\GeoRestrictedException
+     */
+    public function testValidateUserInValidPostcode()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testValidateUserInValidPostcode', $this),
+            'bar',
+            $this->getRandomPhone(static::$dm),
+            static::$dm
+        );
+
+        static::addAddress($user);
+        $user->getBillingAddress()->setPostcode('ZZ993CZ');
+
+        static::$policyService->validateUser($user);
+    }
+
+    public function testValidateUser()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testValidateUser', $this),
+            'bar',
+            $this->getRandomPhone(static::$dm),
+            static::$dm
+        );
+
+        static::addAddress($user);
+
+        static::$policyService->validateUser($user);
+
+        // test is that exception is not thrown
+        $this->assertTrue(true);
     }
 
     public function testValidatePremiumIptRateChange()
