@@ -18,6 +18,7 @@ class LoadOauth2Data implements FixtureInterface, ContainerAwareInterface
     // split the client_id for the fields (must match KNOWN_CLIENT_ID!!)
     const KNOWN_CLIENT_ID_KEY = '5b51ec6b636239778924b671';
     const KNOWN_CLIENT_ID_RANDOM = '36v22l3ei3wgw0k4wos48kokk0cwsgo0ocggggoc84w0cw8844';
+    const KNOWN_CLIENT_CALLBACK_URL = 'http://dev.so-sure.net:40080/';
 
     /**
      * @var ContainerInterface|null
@@ -47,7 +48,7 @@ class LoadOauth2Data implements FixtureInterface, ContainerAwareInterface
         array $redirectUrls = []
     ) {
         $grantTypes = array_merge($grantTypes, []);
-        $redirectUrls = array_merge($redirectUrls, ['http://dev.so-sure.net:40080/']);
+        $redirectUrls = array_merge($redirectUrls, [self::KNOWN_CLIENT_CALLBACK_URL]);
 
         /** @var DocumentManager $dm */
         $dm = $this->container->get('doctrine_mongodb.odm.default_document_manager');

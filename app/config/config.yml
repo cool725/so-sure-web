@@ -60,8 +60,8 @@ twig:
         branch_key: "%branch_key%"
         drift_key: "%drift_key%"
         use_cdn: true
-        default_login_method: "accountkit"
-        #default_login_method: "email"
+        #default_login_method: "accountkit"
+        default_login_method: "email"
         branch_pot_url: "%branch_pot_url%"
         branch_share_url: "%branch_share_url%"
         branch_policy_url: "%branch_policy_url%"

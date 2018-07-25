@@ -28,11 +28,16 @@ class Bearer extends BaseController
     }
 
     /**
-     * @Route("/proof")
+     * @Route("/ping")
      */
-    public function proof(Request $request): JsonResponse
+    public function ping(Request $request): Response
     {
-        return new JsonResponse($request);
+        $data = [
+            'response' => 'pong',
+            'data' => $user->getUsername(),
+        ];
+
+        return new Response(json_encode($data));
     }
 
     /**

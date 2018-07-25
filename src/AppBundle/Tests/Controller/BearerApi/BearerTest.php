@@ -20,81 +20,75 @@ use Symfony\Component\HttpFoundation\Session\Storage\MockFileSessionStorage;
  */
 class BearerTest extends BaseControllerTest
 {
+    use \AppBundle\Tests\PhingKernelClassTrait;
     use \AppBundle\Tests\UserClassTrait;
     use \AppBundle\Document\DateTrait;
 
+    public function tearDown()
+    {
+    }
+
+    public function setUp()
+    {
+        parent::setUp();
+        $this->clearRateLimit();
+        $this->logout();
+        self::$client->followRedirects(false);
+    }
+
     public function testNotAuthenticatedPing()
-    {;
+    {
         /** @var \Symfony\Bundle\FrameworkBundle\Client $client */
-        $client = static::createClient();
-        $client->followRedirects(true);
+        #$client = static::createClient();
 
-        $params = [];
-        self::$client->request('GET', '/bearer-api/v1/proof', $params);
-
-        $content = self::$client->getResponse()->getContent();
+        self::$client->request('GET', '/bearer-api/v1/ping', []);
         $this->assertTrue(self::$client->getResponse()->isRedirect('http://localhost/login'));
         // @todo expect a 403 permission denied
+        //# $content = self::$client->getResponse()->getContent();
         // $this->assertContains('access_denied', $content);
     }
 
     public function testFailToAccessApiWithBadToken()
     {
-        /** @var \Symfony\Bundle\FrameworkBundle\Client $client */
-        #self::$client = static::createClient();
-        self::$client->followRedirects(false);
-
         $server = [
             'Authorization' => 'Bearer bad-token',
         ];
 
-        self::$client->request('GET', '/bearer-api/v1/proof', [], [], $server);
+        self::$client->request('GET', '/bearer-api/v1/ping', [], [], $server);
+
         // @todo expect a 403 permission denied
         $this->assertTrue(self::$client->getResponse()->isRedirect('http://localhost/login'));
     }
 
-    public function testMakeUser()
+    public function testAuthenticatedPing()
     {
-        $this->markTestIncomplete(__METHOD__);
-        $this->createTestUser();
-        self::$client->request('GET', '/user', []);
-
-        $content = self::$client->getResponse();
-        #$this->assertSame($content);
-        var_dump($content);
-    }
-
-    public function testMakeBearerToken(): string
-    {
+        list($email, $password) = $this->loginTestUser();
         $authInfo = $this->getBearerToken();
-    }
 
-    public function testProof()
-    {
-        $this->markTestIncomplete('Not yet making a new bearer-token in a test');
-        $this->createTestUser();
-        $bearer = $this->getBearerToken();
+        $accessToken = $authInfo['access_token'];
+        /** @var Client $oauth2Details */
+        $oauth2Details = $authInfo['oauth2Details'];
 
-        self::$client->followRedirects(true);
-
-        $server = [
-            'Authorization' => 'Bearer ' . $bearer,
+        $params = [];
+        $headers = [
+            'HTTP_AUTHORIZATION' => 'Bearer '. $accessToken,
+            'CONTENT_TYPE' => 'application/json',
         ];
-        self::$client->request('GET', '/bearer-api/v1/proof', [], [], $server);
+        #var_dump($headers);die;
+        self::$client->request('GET', '/bearer-api/v1/ping', $params, [], $headers);
 
-        $this->assertEquals('http://localhost/bearer-api/v1/proof', self::$client->getRequest()->getUri());
-        var_dump(self::$client->getResponse()->headers);
-        var_dump(self::$client->getResponse()->getContent());
+        $content = self::$client->getResponse()->getContent();
+        $this->assertContains('pong', $content);
+        $this->assertContains('contractor21', $content);
     }
 
-    private function createTestUser()
+    private function loginTestUser(): array
     {
-        $user = static::createUser(
-            static::$userManager,
-            $email = static::generateEmail('BearerTest'.time(), $this),
-            $password = 'bar',
-            static::$dm
-        );
+        $email = static::generateEmail('BearerTest'.time().random_int(1,999), $this);
+        $password = 'bar';
+
+        $user = static::createUser(static::$userManager, $email, $password, static::$dm);
+
         $policy = static::initPolicy(
             $user,
             static::$dm,
@@ -104,6 +98,7 @@ class BearerTest extends BaseControllerTest
             true,
             true
         );
+
         #$policy->setStatus(PhonePolicy::STATUS_PENDING);
         #static::$policyService->create($policy, new \DateTime('2016-10-01'));
         $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
@@ -111,6 +106,8 @@ class BearerTest extends BaseControllerTest
         static::$dm->flush();
 
         $this->login($email, $password, 'user/');
+
+        return [$email, $password];
     }
 
     /**
@@ -127,45 +124,47 @@ class BearerTest extends BaseControllerTest
 
     protected function getAuthToken()
     {
-        /** @var \Symfony\Bundle\FrameworkBundle\Client */
-        $client = static::createClient();
-        $client->followRedirects(true);
-
-        // Generate an initial auth-token
-
-        // we can't easily know without a search what the ID is
-        $repo = self::$dm->getRepository(Client::class);
-
-        /** @var Client $oauth2Details */
-        $oauth2Details = $repo->findBy(['id' => LoadOauth2Data::KNOWN_CLIENT_ID_KEY]);
-var_dump($oauth2Details);
-        $oauth2Details = $repo->findAll();
-var_dump([$oauth2Details, LoadOauth2Data::KNOWN_CLIENT_ID_KEY, 3]);
-echo __METHOD__,':',__LINE__;die;
+        // Generate an initial auth-token, using the client-id/secret fixture data
+        self::$client->followRedirects(true);
 
         $state = (string)time(true);
         $params = [
-            'client_id' => $oauth2Details->getId() .'_'. $oauth2Details->getRandomId(),
-            'redirect_uri' => current($oauth2Details->getRedirectUris()),
-            'response_type' => 'code',
+            #'client_id' => '5b51ec6b636239778924b671_36v22l3ei3wgw0k4wos48kokk0cwsgo0ocggggoc84w0cw8844',
+            'client_id' => LoadOauth2Data::KNOWN_CLIENT_ID,
+            'scope' => 'read',
             'state' => $state,
-            'scope' => 'api',
+            'response_type' => 'code',
+            'redirect_uri' => LoadOauth2Data::KNOWN_CLIENT_CALLBACK_URL,
         ];
+        echo "\n\n", http_build_query($params), "\n\n";#die;
 
-        echo __METHOD__,':',__LINE__;die;
-        $client->request('GET', self::URL .'/oauth/v2/auth', $params);
-        $content = $client->getResponse()->getContent();
-        $this->assertContains('This user does not have access to this section.', $content);
-        $this->login($client, 'contractor21', 'password');
+        $dm = static::$container->get('doctrine_mongodb.odm.default_document_manager');
+//        $x = $dm->createQueryBuilder(Client::class)
+//            ->field('id')->equals('5b51ec6b636239778924b671')
+//            ->getQuery()
+//            ->getSingleResult();
+//            #->debug()
+//        ;
+//var_dump([$x]);die;
+        $repo = $dm->getRepository(Client::class);
+        $x = $repo->findBy([
+            "id" => new \MongoId("5b51ec6b636239778924b671"),   #)
+            "randomId" => "36v22l3ei3wgw0k4wos48kokk0cwsgo0ocggggoc84w0cw8844"
+        ]);
+var_dump([$x]);die;
 
-        $client->followRedirects(false);
-        $crawler = $client->request('GET', self::URL .'/oauth/v2/auth', $params);
+        $crawler = self::$client->request('GET', '/oauth/v2/auth', $params);
+#echo self::$client->getResponse()->getContent();die;
+        $this->assertFalse(self::$client->getResponse()->isNotFound(), 'Expected to find the client_id!');
+        $this->assertNotContains('Client not found.', self::$client->getResponse()->getContent());
+
+        self::$client->followRedirects(false);
         $form = $crawler->selectButton('Allow')->form();
-        $client->submit($form);
+        self::$client->submit($form);
 
-        $redirectLocation = $client->getResponse()->headers->get('location') ?? null;
+        $redirectLocation = self::$client->getResponse()->headers->get('location') ?? null;
         $this->assertNotEmpty($redirectLocation);
-        $this->assertContains(self::URL .'/test', $redirectLocation);
+        $this->assertContains('http://dev.so-sure.net:40080/test', $redirectLocation);
         $queryString = parse_url($redirectLocation, PHP_URL_QUERY);
         parse_str($queryString, $output);
 
@@ -176,7 +175,7 @@ echo __METHOD__,':',__LINE__;die;
         return [
             'code' => $output['code'],
             'oauth2Details' => $oauth2Details,
-            'client' => $client,
+            #'client' => $client,
         ];
     }
 
@@ -191,10 +190,9 @@ var_dump(['authToken'=>$authToken]);
 
     protected function createToken($tokenString, $expiresAt = false)
     {
-        echo __METHOD__,':',__LINE__;die;
-        self::$client = new \FOS\OAuthServerBundle\Model\Client();
+        $oauthClient = new \FOS\OAuthServerBundle\Model\Client();
         $token = new AccessToken();
-        $token->setClient(self::$client);
+        $token->setClient($oauthClient);
         $token->setToken($tokenString);
         if ($expiresAt) {
             $token->setExpiresAt($expiresAt);
