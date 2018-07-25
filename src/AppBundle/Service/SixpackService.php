@@ -49,7 +49,7 @@ class SixpackService
     const EXPERIMENT_APP_REQUEST_PICSURE_LOCATION = 'app-request-picsure-location';
     //const EXPERIMENT_STEP_3 = 'step-3-payment-new';
     const EXPERIMENT_PURCHASE_FLOW_BACS = 'purchase-flow-bacs';
-    const EXPERIMENT_CPC_QUOTE_HOMEPAGE = 'cpc-quote-or-homepage';
+    // const EXPERIMENT_CPC_QUOTE_HOMEPAGE = 'cpc-quote-or-homepage';
     // const EXPERIMENT_DOB = 'purchase-funnel-dob-dropdown';
     // const EXPERIMENT_72_REPLACEMENT = 'seventytwo-hours';
     // const EXPERIMENT_PICSURE_SECTION = 'picsure-redesign';
@@ -102,7 +102,7 @@ class SixpackService
         self::EXPERIMENT_HOMEPAGE_AA_V2,
         //self::EXPERIMENT_STEP_3,
         self::EXPERIMENT_PURCHASE_FLOW_BACS,
-        self::EXPERIMENT_CPC_QUOTE_HOMEPAGE,
+        // self::EXPERIMENT_CPC_QUOTE_HOMEPAGE,
         // self::EXPERIMENT_DOB,
         // self::EXPERIMENT_72_REPLACEMENT,
         // self::EXPERIMENT_PICSURE_SECTION,
@@ -173,7 +173,7 @@ class SixpackService
      * @var array
      */
     public static $purchaseConversionSimple = [
-        self::EXPERIMENT_CPC_QUOTE_HOMEPAGE,
+        // self::EXPERIMENT_CPC_QUOTE_HOMEPAGE,
         //self::EXPERIMENT_STEP_3,
         self::EXPERIMENT_PURCHASE_FLOW_BACS,
         // self::EXPERIMENT_72_REPLACEMENT,

@@ -215,14 +215,7 @@ class PhoneInsuranceController extends BaseController
     public function quoteAction(Request $request, $id = null, $make = null, $model = null, $memory = null)
     {
         if (in_array($request->get('_route'), ['insure_make_model_memory', 'insure_make_model'])) {
-            $exp = $this->sixpack(
-                $request,
-                SixpackService::EXPERIMENT_CPC_QUOTE_HOMEPAGE,
-                ['homepage', 'quote']
-            );
-            if ($exp == 'homepage') {
-                return new RedirectResponse($this->generateUrl('homepage'));
-            } elseif ($memory) {
+            if ($memory) {
                 return new RedirectResponse($this->generateUrl('quote_make_model_memory', [
                     'make' => $make,
                     'model' => $model,
