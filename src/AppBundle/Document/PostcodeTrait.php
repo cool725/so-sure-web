@@ -6,6 +6,12 @@ use VasilDakov\Postcode\Postcode;
 
 trait PostcodeTrait
 {
+    /**
+     * Used for the so-sure db address postcodes
+     * Note that the Census::Postcode collection uses a different format
+     * @param string $code
+     * @return string|null
+     */
     public function normalizePostcodeForDb($code)
     {
         return self::normalizePostcode($code);
