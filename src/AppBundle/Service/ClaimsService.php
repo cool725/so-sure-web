@@ -237,18 +237,9 @@ class ClaimsService
     {
         $repo = $this->dm->getRepository(Claim::class);
 
-        // Claim state for same claim number may change
-        // (not yet sure if we want a new claim record vs update claim record)
-        // Regardless, same claim number for different policies is not allowed
-        // Also same claim number on same policy with same state is not allowed
         $duplicates = $repo->findBy(['number' => (string) $claim->getNumber()]);
-        foreach ($duplicates as $duplicate) {
-            if ($policy->getId() != $duplicate->getPolicy()->getId()) {
-                return false;
-            }
-            if ($claim->getStatus() == $duplicate->getStatus()) {
-                return false;
-            }
+        if (count($duplicates) > 0) {
+            return false;
         }
 
         $policy->addClaim($claim);
@@ -266,18 +257,9 @@ class ClaimsService
     {
         $repo = $this->dm->getRepository(Claim::class);
 
-        // Claim state for same claim number may change
-        // (not yet sure if we want a new claim record vs update claim record)
-        // Regardless, same claim number for different policies is not allowed
-        // Also same claim number on same policy with same state is not allowed
         $duplicates = $repo->findBy(['number' => (string) $claim->getNumber()]);
-        foreach ($duplicates as $duplicate) {
-            if ($policy->getId() != $duplicate->getPolicy()->getId()) {
-                return false;
-            }
-            if ($claim->getStatus() == $duplicate->getStatus()) {
-                return false;
-            }
+        if (count($duplicates) > 0) {
+            return false;
         }
 
         $this->dm->flush();
