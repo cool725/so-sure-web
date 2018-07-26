@@ -131,6 +131,7 @@ class ClaimsController extends BaseController
         if ($claim === null) {
             $claim = new Claim();
             $claim->setPolicy($policy);
+            $claim->setStatus(Claim::STATUS_INREVIEW);
         }
         $claimscheck = new ClaimsCheck();
         $claimscheck->setPolicy($policy);
@@ -159,6 +160,7 @@ class ClaimsController extends BaseController
                     /** @var ClaimsService $claimsService */
                     $claimsService = $this->get('app.claims');
                     if ($claim->getStatus() == Claim::STATUS_SUBMITTED) {
+                        $claim->setStatus(Claim::STATUS_INREVIEW);
                         if ($claimsService->updateClaim($policy, $claim)) {
                             $this->addFlash('success', sprintf(
                                 'Claim %s is updated. Excess is £%d',
