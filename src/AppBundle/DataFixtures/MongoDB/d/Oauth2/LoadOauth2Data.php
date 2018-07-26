@@ -51,10 +51,6 @@ class LoadOauth2Data implements FixtureInterface, ContainerAwareInterface
         $grantTypes = array_merge($grantTypes, []);
         $redirectUrls = array_merge($redirectUrls, [self::KNOWN_CLIENT_CALLBACK_URL]);
 
-        /** @var DocumentManager $dm */
-        $dm = $this->container->get('doctrine_mongodb.odm.default_document_manager');
-        //$clientRepo = $dm->getRepository(Client::class);
-
         $client = new Client();
 
         // The 'CLIENT_ID' is (*_KEY . *_RANDOM)
