@@ -273,7 +273,7 @@ class DefaultController extends BaseController
             // return $this->redirectToRoute('homepage');
         // }
         //
-        return $this->render('AppBundle:Default:indexCompetitor.html.twig', $data);
+        return $this->render('homepage');
     }
 
     /**
