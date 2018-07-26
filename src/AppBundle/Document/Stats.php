@@ -24,11 +24,14 @@ class Stats
     const MIXPANEL_CPC_COMPETITORS_UK = 'mixpanel-cpc-competitors-uk';
     const MIXPANEL_CLICK_BUY_NOW = 'mixpanel-click-buy-now';
     const MIXPANEL_RECEIVE_PERSONAL_DETAILS = 'mixpanel-receive-personal-details';
+    const MIXPANEL_POLICY_READY = 'mixpanel-policy-ready';
+    const MIXPANEL_PURCHASE_POLICY = 'mixpanel-purchase-policy';
     const MIXPANEL_INVITE_SOMEONE = 'mixpanel-invite-someone';
     const MIXPANEL_VIEW_INVITATION_SCODE = 'mixpanel-view-invitation-scode';
     const MIXPANEL_VIEW_INVITATION_EMAIL = 'mixpanel-view-invitation-email';
     const MIXPANEL_VIEW_INVITATION_SMS = 'mixpanel-view-invitation-sms';
     const MIXPANEL_PURCHASE_POLICY_APP_ATTRIB = 'mixpanel-purchase-policy-app-attrib';
+    const MIXPANEL_GOOGLE = 'mixpanel-purchase-policy-app-attrib';
 
     const KPI_PICSURE_TOTAL_UNSTARTED_POLICIES = 'kpi-picsure-unstarted-policies';
     const KPI_PICSURE_TOTAL_APPROVED_POLICIES = 'kpi-picsure-approved-policies';
