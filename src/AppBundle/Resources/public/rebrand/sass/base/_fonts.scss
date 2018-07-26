@@ -1,0 +1,68 @@
+// fonts.scss
+
+// Galano Grotesque Regular
+@font-face {
+    font-family: 'Galano Grotesque Regular';
+    src: url('#{$cdn_url}/fonts/GalanoGrotesque-Regular.eot');
+    src: url('#{$cdn_url}/fonts/GalanoGrotesque-Regular.woff2') format('woff2'),
+         url('#{$cdn_url}/fonts/GalanoGrotesque-Regular.woff') format('woff'),
+         url('#{$cdn_url}/fonts/GalanoGrotesque-Regular?#iefix') format('embedded-opentype');
+    font-weight: 500;
+    font-style: normal;
+}
+
+$gg-regular: 'Galano Grotesque Regular', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+
+// Galano Grotesque Medium
+@font-face {
+    font-family: 'Galano Grotesque Medium';
+    src: url('#{$cdn_url}/fonts/GalanoGrotesque-Medium.eot');
+    src: url('#{$cdn_url}/fonts/GalanoGrotesque-Medium.woff2') format('woff2'),
+         url('#{$cdn_url}/fonts/GalanoGrotesque-Medium.woff') format('woff'),
+         url('#{$cdn_url}/fonts/GalanoGrotesque-Medium?#iefix') format('embedded-opentype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+$gg-medium: 'Galano Grotesque Medium', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+
+// Galano Grotesque Light
+@font-face {
+    font-family: 'Galano Grotesque Light';
+    src: url('#{$cdn_url}/fonts/GalanoGrotesque-Light.eot');
+    src: url('#{$cdn_url}/fonts/GalanoGrotesque-Light.woff2') format('woff2'),
+         url('#{$cdn_url}/fonts/GalanoGrotesque-Light.woff') format('woff'),
+         url('#{$cdn_url}/fonts/GalanoGrotesque-Light?#iefix') format('embedded-opentype');
+    font-weight: 500;
+    font-style: normal;
+}
+
+$gg-light: 'Galano Grotesque Light', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+
+// Galano Grotesque Bold
+@font-face {
+    font-family: 'Galano Grotesque Bold';
+    src: url('#{$cdn_url}/fonts/GalanoGrotesque-Bold.eot');
+    src: url('#{$cdn_url}/fonts/GalanoGrotesque-Bold.woff2') format('woff2'),
+         url('#{$cdn_url}/fonts/GalanoGrotesque-Bold.woff') format('woff'),
+         url('#{$cdn_url}/fonts/GalanoGrotesque-Bold?#iefix') format('embedded-opentype');
+    font-weight: 700;
+    font-style: normal;
+}
+
+$gg-bold: 'Galano Grotesque Bold', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+
+// Galano Grotesque Semi Bold
+@font-face {
+    font-family: 'Galano Grotesque Semi Bold';
+    src: url('#{$cdn_url}/fonts/GalanoGrotesque-SemiBold.eot');
+    src: url('#{$cdn_url}/fonts/GalanoGrotesque-SemiBold.woff2') format('woff2'),
+         url('#{$cdn_url}/fonts/GalanoGrotesque-SemiBold.woff') format('woff'),
+         url('#{$cdn_url}/fonts/GalanoGrotesque-SemiBold?#iefix') format('embedded-opentype');
+    font-weight: 700;
+    font-style: normal;
+}
+
+$gg-semi-bold: 'Galano Grotesque Semi Bold', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+
+

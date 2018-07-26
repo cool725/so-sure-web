@@ -1,0 +1,30 @@
+// palette.scss
+
+$white: #ffffff;
+$off-white: #f2f2f3;
+
+$blue-d: #1a7bdb;
+$blue-1: #1e90ff;
+$blue-2: #02bcfe;
+$blue-l: #24d2fd;
+
+$grey:   #9999a1;
+
+$dark-70: #4c4c5a;
+$dark-80: #333342;
+$dark-85: #262636;
+$dark-90: #19192a;
+$dark:    #000014;
+
+
+$theme-colors: (
+    "primary": $blue-1,
+    "blue1":  $blue-1,
+    "blue2":  $blue-2,
+    "white":  $white,
+);
+
+// Gradients
+.standard-gradient {
+    @include linear-gradient(90deg, $blue-1, $blue-2);
+}
