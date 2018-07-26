@@ -7,11 +7,11 @@ class AppKernel extends Kernel
 {
     public function getCacheDir()
     {
-        if (in_array($this->getEnvironment(), array('vagrant'), true)) {
+        if (gethostname() === 'vagrant') {
             return '/dev/shm/cache/'.$this->environment.'/cache';
-        } else {
-            return parent::getCacheDir();
         }
+
+        return parent::getCacheDir();
     }
 
     public function registerBundles()
