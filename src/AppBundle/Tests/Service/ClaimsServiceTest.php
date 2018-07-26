@@ -141,20 +141,17 @@ class ClaimsServiceTest extends WebTestCase
         $phoneB = static::getRandomPhone(static::$dm);
         $policyB = static::initPolicy($userB, static::$dm, $phoneB, null, true, true);
 
-        $claimA = new Claim();
-        $claimA->setStatus(Claim::STATUS_SUBMITTED);
-        $claimA->setType(Claim::TYPE_THEFT);
-        $claimA->setNumber('101');
-        $this->assertTrue(static::$claimsService->addClaim($policyA, $claimA));
+        $claim = new Claim();
+        $claim->setStatus(Claim::STATUS_SUBMITTED);
+        $claim->setType(Claim::TYPE_THEFT);
+        $claim->setNumber('101');
+        $this->assertTrue(static::$claimsService->addClaim($policyA, $claim));
 
-        $claimB = new Claim();
-        $claimB->setStatus(Claim::STATUS_SUBMITTED);
-        $claimB->setType(Claim::TYPE_THEFT);
-        $claimB->setNumber('101');
-        // same policy, same number, diff not allowed
-        $this->assertFalse(static::$claimsService->addClaim($policyA, $claimB));
-        // not allowed for diff policy
-        $this->assertFalse(static::$claimsService->addClaim($policyB, $claimB));
+        $claim->setStatus(Claim::STATUS_INREVIEW);
+        $this->assertTrue(static::$claimsService->updateClaim($policyA, $claim));
+
+        $claim->setStatus(Claim::STATUS_APPROVED);
+        $this->assertFalse(static::$claimsService->updateClaim($policyB, $claim));
     }
 
     public function testProcessClaimProcessed()

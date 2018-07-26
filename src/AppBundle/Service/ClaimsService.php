@@ -258,8 +258,10 @@ class ClaimsService
         $repo = $this->dm->getRepository(Claim::class);
 
         $duplicates = $repo->findBy(['number' => (string) $claim->getNumber()]);
-        if (count($duplicates) > 0) {
-            return false;
+        foreach ($duplicates as $duplicate) {
+            if ($policy->getId() != $duplicate->getPolicy()->getId()) {
+                return false;
+            }
         }
 
         $this->dm->flush();
