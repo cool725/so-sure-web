@@ -942,9 +942,9 @@
                 <tr>
                     <td><i class="fa fa-lock" title="Admin only"></i> Pay Policy</td>
                     <td>
-                        {% if not policy.user.paymentMethod %}
+                        {% if not policy.payerOrUser.paymentMethod %}
                             Missing payment method
-                        {% elseif policy.user.paymentMethod.type != 'judo' %}
+                        {% elseif policy.payerOrUser.paymentMethod.type != 'judo' %}
                             Non-Judo payment method
                         {% elseif not policy.user.hasValidDetails %}
                             Invalid user details (missing mobile number, address, or birthday)
