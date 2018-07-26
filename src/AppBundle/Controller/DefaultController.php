@@ -273,7 +273,7 @@ class DefaultController extends BaseController
             // return $this->redirectToRoute('homepage');
         // }
         //
-        return $this->render('homepage');
+        return $this->redirectToRoute('homepage');
     }
 
     /**
