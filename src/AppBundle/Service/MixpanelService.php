@@ -116,8 +116,8 @@ class MixpanelService
 
     public static function getSegments()
     {
-        $data = array_merge([
-            self::EVENT_INVITATION_PAGE => [
+        $data = array_merge(
+            [self::EVENT_INVITATION_PAGE => [
                 'Invitation Method' => [
                     'scode' => Stats::MIXPANEL_VIEW_INVITATION_SCODE,
                     'sms' => Stats::MIXPANEL_VIEW_INVITATION_SMS,
