@@ -44,23 +44,4 @@ class MarketingController extends BaseController
             'utm_campaign' => 'trinitiymaxwell',
         ]));
     }
-
-    /**
-     * @Route("/starling", name="starling_landing")
-     */
-    public function starlingAction(Request $request)
-    {
-        //$this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE);
-        $session = $request->getSession();
-        if ($session && $session->isStarted()) {
-            $session->set('partner', 'starling');
-        }
-
-        $data = array(
-            'device_category' => $this->get('app.request')->getDeviceCategory(),
-            'partner' => 'starling',
-        );
-
-        return $this->render('AppBundle:Default:indexV2.html.twig', $data);
-    }
 }
