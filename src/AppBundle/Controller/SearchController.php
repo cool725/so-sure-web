@@ -165,5 +165,4 @@ class SearchController extends BaseController
             'phone' => $phone,
         ];
     }
-
 }
