@@ -1122,6 +1122,9 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             ->createNamedBuilder('makemodel_form', AdminMakeModelType::class, $makeModel)
             ->getForm();
         $address = $user->getBillingAddress();
+        if (!$address) {
+            $address = new Address();
+        }
         $userAddressForm = $this->get('form.factory')
             ->createNamedBuilder('user_address_form', AddressType::class, $address)
             ->getForm();
@@ -1261,6 +1264,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             } elseif ($request->request->has('user_address_form')) {
                 $userAddressForm->handleRequest($request);
                 if ($userAddressForm->isValid()) {
+                    $user->setBillingAddress($address);
                     $dm->flush();
                     $this->addFlash(
                         'success',
