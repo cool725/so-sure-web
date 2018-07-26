@@ -107,20 +107,18 @@ class ClaimsServiceTest extends WebTestCase
         $phoneB = static::getRandomPhone(static::$dm);
         $policyB = static::initPolicy($userB, static::$dm, $phoneB, null, true, true);
 
-        $claimNumber = rand(1, 999999);
-
         $claimA = new Claim();
         $claimA->setStatus(Claim::STATUS_APPROVED);
         $claimA->setType(Claim::TYPE_THEFT);
-        $claimA->setNumber($claimNumber);
+        $claimA->setNumber('100');
         $this->assertTrue(static::$claimsService->addClaim($policyA, $claimA));
 
         $claimB = new Claim();
         $claimB->setStatus(Claim::STATUS_INREVIEW);
         $claimB->setType(Claim::TYPE_THEFT);
-        $claimB->setNumber($claimNumber);
-        // same policy, same number, different status allowed
-        $this->assertTrue(static::$claimsService->addClaim($policyA, $claimB));
+        $claimB->setNumber('100');
+        // same policy, same number, diff not allowed
+        $this->assertFalse(static::$claimsService->addClaim($policyA, $claimB));
         // not allowed for diff policy
         $this->assertFalse(static::$claimsService->addClaim($policyB, $claimB));
     }
@@ -143,23 +141,17 @@ class ClaimsServiceTest extends WebTestCase
         $phoneB = static::getRandomPhone(static::$dm);
         $policyB = static::initPolicy($userB, static::$dm, $phoneB, null, true, true);
 
-        $claimNumber = rand(1, 999999);
+        $claim = new Claim();
+        $claim->setStatus(Claim::STATUS_SUBMITTED);
+        $claim->setType(Claim::TYPE_THEFT);
+        $claim->setNumber('101');
+        $this->assertTrue(static::$claimsService->addClaim($policyA, $claim));
 
-        $claimA = new Claim();
-        $claimA->setStatus(Claim::STATUS_SUBMITTED);
-        $claimA->setType(Claim::TYPE_THEFT);
-        $this->assertTrue(static::$claimsService->addClaim($policyA, $claimA));
+        $claim->setStatus(Claim::STATUS_INREVIEW);
+        $this->assertTrue(static::$claimsService->updateClaim($policyA, $claim));
 
-        $claimA->setNumber($claimNumber);
-
-        $claimB = new Claim();
-        $claimB->setStatus(Claim::STATUS_SUBMITTED);
-        $claimB->setType(Claim::TYPE_THEFT);
-        $claimB->setNumber($claimNumber);
-        // same policy, same number, different status allowed
-        $this->assertTrue(static::$claimsService->addClaim($policyA, $claimB));
-        // not allowed for diff policy
-        $this->assertFalse(static::$claimsService->addClaim($policyB, $claimB));
+        $claim->setStatus(Claim::STATUS_APPROVED);
+        $this->assertFalse(static::$claimsService->updateClaim($policyB, $claim));
     }
 
     public function testProcessClaimProcessed()
@@ -196,7 +188,7 @@ class ClaimsServiceTest extends WebTestCase
         $claim = new Claim();
         $claim->setStatus(Claim::STATUS_SETTLED);
         $claim->setType(Claim::TYPE_THEFT);
-        $claim->setNumber(rand(1, 999999));
+        $claim->setNumber('102');
         $policy->addClaim($claim);
         $this->assertTrue(static::$claimsService->processClaim($claim));
         $this->assertEquals(0, $connection->getPromoValue());
@@ -219,7 +211,7 @@ class ClaimsServiceTest extends WebTestCase
         $claim = new Claim();
         $claim->setStatus(Claim::STATUS_SETTLED);
         $claim->setType(Claim::TYPE_THEFT);
-        $claim->setNumber(rand(1, 999999));
+        $claim->setNumber('103');
         $policy->addClaim($claim);
         static::$dm->flush();
 
@@ -247,7 +239,7 @@ class ClaimsServiceTest extends WebTestCase
         $claim = new Claim();
         $claim->setStatus(Claim::STATUS_SETTLED);
         $claim->setType(Claim::TYPE_THEFT);
-        $claim->setNumber(rand(1, 999999));
+        $claim->setNumber('104');
         $policy->addClaim($claim);
         static::$dm->flush();
 

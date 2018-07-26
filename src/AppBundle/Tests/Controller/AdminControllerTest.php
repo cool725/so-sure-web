@@ -67,7 +67,7 @@ class AdminControllerTest extends BaseControllerTest
         $policy = static::initPolicy($user, self::$dm, $phone, null, true, true);
         $claim = new Claim();
         $claim->setPolicy($policy);
-        $claim->setNumber('TEST/123');
+        $claim->setNumber('TEST/789');
         $claim->setProcessed(false);
         $claim->setStatus(Claim::STATUS_APPROVED);
         $claim->setApprovedDate(new \DateTime('-2 days'));
@@ -113,7 +113,7 @@ class AdminControllerTest extends BaseControllerTest
         $charge->setAmount(0.02);
         $claim = new Claim();
         $claim->setPolicy($policy);
-        $claim->setNumber('TEST/123');
+        $claim->setNumber('TEST/456');
         $claim->setProcessed(false);
         $claim->setStatus(Claim::STATUS_APPROVED);
         $claim->setApprovedDate(new \DateTime('-2 days'));
