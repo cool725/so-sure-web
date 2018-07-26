@@ -1,0 +1,74 @@
+// typography.scss
+
+body {
+    font-family: $gg-regular;
+}
+
+h1, h2, h3,
+.h1, .h2, .h3 {
+    font-family: $gg-semi-bold;
+}
+
+h4, h5, h6,
+.h4, .h5, .h6 {
+    font-family: $gg-regular;
+    line-height: 1.5;
+}
+
+strong {
+    font-family: $gg-medium;
+}
+
+// Modify list to handle fa icons
+.list {
+
+    &-fa {
+
+        li {
+            position: relative;
+            padding-left: 30px;
+
+            > .fas {
+                position: absolute;
+                left: 0; top: 5px;
+            }
+        }
+    }
+}
+
+.fas {
+    vertical-align: middle;
+}
+
+.text-link-dark {
+    // make links stand out a little more
+    font-family: $gg-medium;
+    color: $dark;
+    border-bottom: 2px solid $blue-1;
+
+    &:hover, &:focus {
+        color: $blue-1;
+    }
+
+    &:active {
+        color: $blue-1;
+        border-bottom-color: $blue-1;
+    }
+}
+
+.text-link-light {
+    // make links stand out a little more
+    font-family: $gg-medium;
+    color: $white;
+    border-bottom: 2px solid $white;
+
+    &:hover, &:focus {
+        color: $dark;
+    }
+
+    &:active {
+        color: $dark;
+        border-bottom-color: $dark;
+    }
+}
+

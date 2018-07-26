@@ -1,0 +1,118 @@
+<nav class="navbar fixed-top justify-content-between flex-nowrap flex-row">
+    <a href="/" class="navbar-brand float-left">
+        <img class="d-none d-sm-block" src="{{ cdn_url }}/images/logo/so-sure-logo-full-white.svg" width="120px" alt="so-sure" class="navbar__logo">
+        <img class="d-block d-sm-none" src="{{ cdn_url }}/images/logo/so-sure-logo-smile-white.svg" width="30px" height="30px" alt="so-sure" class="navbar__logo">
+    </a>
+    <ul class="nav navbar-nav flex-row">
+        {% if app.user is not null and app.user %}
+            {% if is_granted('ROLE_ADMIN') %}
+            <li class="nav-item d-none d-lg-block">
+                <a href="{{ path('admin_home') }}" class="nav-link pr-3">
+                    <span class="btn btn-outline-white">admin</span>
+                </a>
+            </li>
+            {% elseif is_granted('ROLE_EMPLOYEE') %}
+            <li class="nav-item d-none d-lg-block">
+                <a href="{{ path('admin_home') }}" class="nav-link pr-3">
+                    <span class="btn btn-outline-white">admin</span>
+                </a>
+            </li>
+            {% elseif is_granted('ROLE_CLAIMS') %}
+            <li class="nav-item d-none d-lg-block">
+                <a href="{{ path('claims_home') }}" class="nav-link pr-3">
+                    <span class="btn btn-outline-white">claims</span>
+                </a>
+            </li>
+            {% else %}
+            <li class="nav-item d-none d-lg-block">
+                <a href="{{ path('user_home') }}" class="nav-link pr-3">
+                    <span class="btn btn-outline-white">your account</span>
+                </a>
+            </li>
+            {% endif %}
+            {% if is_granted('ROLE_PREVIOUS_ADMIN') %}
+            <li class="nav-item d-none d-lg-block">
+                <a href="{{ path('homepage', {'_impersonate': '_exit'}) }}" class="nav-link pr-5">
+                    <span class="btn btn-outline-white">exit {{ app.user.email }}</span>
+                </a>
+            </li>
+            {% else %}
+            <li class="nav-item d-none d-lg-block">
+                <a href="{{ path('fos_user_security_logout') }}" class="nav-link pr-3">
+                    <span class="btn btn-outline-white">logout</span>
+                </a>
+            </li>
+            {% endif %}
+        {% else %}
+        <li class="nav-item d-none d-lg-block">
+            <a href="{{ path('fos_user_security_login') }}" class="nav-link pr-3">
+                <span class="btn btn-outline-white">log in</span>
+            </a>
+        </li>
+        {% endif %}
+        <li id="search_toggle" class="nav-item phone-search_sticky_toggle d-sm-none">
+            <a href="#" class="nav-link pr-2">
+                <i class="fas fa-search fa-lg mt-2"></i>
+            </a>
+        </li>
+        <li class="nav-item">
+            <button id="nav_toggle" class="hamburger hamburger--spring-r hamburger--collapse" type="button">
+                <span class="hamburger-box">
+                    <span class="hamburger-inner"></span>
+                </span>
+            </button>
+        </li>
+    </ul>
+    <div id="menu" class="menu d-flex">
+        <ul class="list-unstyled mt-4 mx-auto justify-content-center menu__links">
+            <li class="d-block d-lg-none my-4">
+                {% if app.user is not null and app.user %}
+                    {% if is_granted('ROLE_ADMIN') %}
+                        <a href="{{ path('admin_home') }}" class="btn btn-outline-white">admin</a>
+                    {% elseif is_granted('ROLE_EMPLOYEE') %}
+                        <a href="{{ path('admin_home') }}" class="btn btn-outline-white">admin</a>
+                    {% elseif is_granted('ROLE_CLAIMS') %}
+                        <a href="{{ path('claims_home') }}" class="btn btn-outline-white">claims</a>
+                    {% else %}
+                        <a href="{{ path('user_home') }}" class="btn btn-outline-white">your account</a>
+                    {% endif %}
+                    {% if is_granted('ROLE_PREVIOUS_ADMIN') %}
+                        <a href="{{ path('homepage', {'_impersonate': '_exit'}) }}" class="btn btn-outline-white  ">exit {{ app.user.email }}</a>
+                    {% else %}
+                        <a href="{{ path('fos_user_security_logout') }}" class="btn btn-outline-white ">logout</a>
+                    {% endif %}
+                {% else %}
+                    <a href="{{ path('fos_user_security_login') }}" class="btn btn-outline-white ">log in</a>
+                {% endif %}
+            </li>
+            <li class="h3 my-4">
+                <a href="{{ path('about_home') }}">About</a>
+            </li>
+            <li class="h3 my-4">
+                <a href="{{ path('claim') }}">Making a claim</a>
+            </li>
+            <li class="h3 my-4">
+                <a href="{{ path('faq') }}#social-insurance-and-reward-pot">Reward Pot</a>
+            </li>
+            <li class="h3 my-4">
+                <a href="{{ path('faq') }}#top-questions">pic-sure</a>
+            </li>
+            <li class="h3 my-4">
+                <a href="{{ path('faq') }}">FAQs</a>
+            </li>
+            <li class="h3 my-4">
+                <a href="{{ path('mobile_phone_insurance_for_your_company') }}">Company phones</a>
+            </li>
+            <li class="h3 my-4">
+                <a href="{{ path('about_how_to_contact_so_sure') }}">Contact Us</a>
+            </li>
+            <li class="h3 mt-4 mb-5">
+                <a href="{{ path('blog') }}">Blog</a>
+            </li>
+            <li class="text-center pb-5">
+                <a href="https://www.facebook.com/wearesosure" rel="noopener" target="_blank" class="d-inline mx-2"><i class="fab fa-facebook fa-2x"></i><span class="sr-only">so-sure on Facebook</span></a>
+                <a href="https://twitter.com/wearesosure" rel="noopener" target="_blank" class="d-inline mx-2"><i class="fab fa-twitter fa-2x"></i><span class="sr-only">so-sure on Twitter</span></a>
+            </li>
+        </ul>
+    </div>
+</nav>

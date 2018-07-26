@@ -1,0 +1,25 @@
+// helpers.scss
+
+.body--overflow {
+    width: 100%; height: 100%;
+    overflow: hidden;
+
+    &_iOS {
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+    }
+}
+
+
+.bordered-columns {
+
+    @include media-breakpoint-up(md) {
+        > div {
+            border-right: 2px dotted lighten($grey, 20%);
+
+            &:last-of-type {
+                border: none;
+            }
+        }
+    }
+}
