@@ -972,13 +972,13 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                     /** @var JudopayService $judopay */
                     $judopay = $this->get('app.judopay');
                     $details = $judopay->runTokenPayment(
-                        $policy->getUser(),
+                        $policy->getPayerOrUser(),
                         $amount,
                         $date->getTimestamp(),
                         $policy->getId()
                     );
                     /** @var JudoPaymentMethod $judoPaymentMethod */
-                    $judoPaymentMethod = $policy->getUser()->getPaymentMethod();
+                    $judoPaymentMethod = $policy->getPayerOrUser()->getPaymentMethod();
                     $judopay->add(
                         $policy,
                         $details['receiptId'],
