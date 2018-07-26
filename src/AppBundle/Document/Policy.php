@@ -2574,6 +2574,7 @@ abstract class Policy
     {
         $claims = [];
         foreach ($this->claims as $claim) {
+            /** @var Claim $claim */
             if ($claim->isMonetaryClaim($includeApproved)) {
                 $claims[] = $claim;
             }
