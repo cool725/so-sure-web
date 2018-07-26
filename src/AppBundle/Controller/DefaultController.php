@@ -253,7 +253,7 @@ class DefaultController extends BaseController
      * @Route("/comparison", name="comparison")
      * @Template
      */
-    public function soSureCompetitors(Request $request)
+    public function soSureCompetitors()
     {
         $data = [
             'headline'     => 'Mobile Insurance Beyond Compare',
@@ -270,8 +270,10 @@ class DefaultController extends BaseController
         // if ($exp == 'competitor-landing') {
         //     return $this->render('AppBundle:Default:indexCompetitor.html.twig', $data);
         // } else {
-            return $this->redirectToRoute('homepage');
+            // return $this->redirectToRoute('homepage');
         // }
+        //
+        return $this->render('AppBundle:Default:indexCompetitor.html.twig', $data);
     }
 
     /**
