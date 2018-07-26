@@ -31,7 +31,7 @@ class Bearer extends BaseController
     /**
      * @Route("/ping")
      */
-    public function ping(Request $request): Response
+    public function ping(): Response
     {
         $user = $this->getUser();
 

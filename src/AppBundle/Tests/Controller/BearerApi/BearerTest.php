@@ -72,7 +72,7 @@ class BearerTest extends BaseControllerTest
      */
     private function loginTestUser(): array
     {
-        $email = static::generateEmail('BearerTest'.time().random_int(1,999), $this);
+        $email = static::generateEmail('BearerTest'.time().random_int(1, 999), $this);
         $password = 'bar';
 
         $user = static::createUser(static::$userManager, $email, $password, static::$dm);
@@ -112,7 +112,7 @@ class BearerTest extends BaseControllerTest
         // Generate an initial auth-token, using the client-id/secret fixture data
         self::$client->followRedirects(true);
 
-        $state = (string)time();
+        $state = (string) time();
         $params = [
             'client_id' => LoadOauth2Data::KNOWN_CLIENT_ID,
             'scope' => $scope,
@@ -146,7 +146,7 @@ class BearerTest extends BaseControllerTest
      */
     private function getBearerTokenWithAuthToken(string $authCode): string
     {
-        $state = (string)time();
+        $state = (string) time();
         $params = [
             'client_id' => LoadOauth2Data::KNOWN_CLIENT_ID,
             'client_secret' =>LoadOauth2Data::KNOWN_CLIENT_SECRET,
@@ -169,10 +169,14 @@ class BearerTest extends BaseControllerTest
         $this->assertArrayHasKey('scope', $ret);
         $this->assertArrayHasKey('refresh_token', $ret);
 
-        $this->assertSame(15768000, $ret['expires_in']);    // 182.5days
+        $this->assertSame(
+            15768000,
+            $ret['expires_in'],
+            'expected expires_in (seconds) to be ~6 months' // 182.5days
+        );
 
         $this->assertInternalType('string', $ret['access_token']);
-        $this->assertGreaterThanOrEqual(10, strlen($ret['access_token']));
+        $this->assertGreaterThanOrEqual(10, mb_strlen($ret['access_token']), 'expected a longer access_token');
 
         return $ret['access_token'];
     }
