@@ -8,6 +8,7 @@ use AppBundle\Document\User;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
@@ -32,6 +33,8 @@ class Bearer extends BaseController
      */
     public function ping(Request $request): Response
     {
+        $user = $this->getUser();
+
         $data = [
             'response' => 'pong',
             'data' => $user->getUsername(),
