@@ -183,6 +183,7 @@ services:
             - "@logger"
             - "@app.mailer"
             - "@app.router"
+            - "@app.imei"
             - "@snc_redis.default"
             - "%kernel.environment%"
             - "@oneup_flysystem.mount_manager"
