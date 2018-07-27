@@ -19,6 +19,8 @@ services:
     #    resource: '../../src/AppBundle/*'
     #    public: true
 
+    ## Controllers ####################################################
+
     # controllers are imported separately to make sure they're public
     # (and have a tag that allows actions to type-hint services)
     AppBundle\Controller\BearerApi\:
@@ -27,3 +29,8 @@ services:
         calls:
             - [setContainer, ["@service_container"]]
         #tags: ['controller.service_arguments']  prefer constructor injection
+
+    ## Services #######################################################
+
+    AppBundle\Security\:
+        resource: '../../../src/AppBundle/Security/*'

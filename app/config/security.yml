@@ -28,7 +28,6 @@ security:
             provider: fos_userbundle
 
         oauth2_api:
-            #pattern:    ^/api/v1/bearer
             pattern:    ^/bearer-api
             fos_oauth: true
             stateless: true
@@ -36,6 +35,11 @@ security:
         oauth_token:
             pattern:    ^/oauth/v2/token
             security:   false
+        oauth2_auth:
+            pattern:    ^/oauth/v2/auth
+            stateless: true
+            anonymous: true
+            entry_point: AppBundle\Security\BearerApiLoginEntryPoint
 
         api:
             pattern: ^/api
@@ -90,5 +94,6 @@ security:
         - { path: ^/claims/, role: ROLE_NO_ACCESS }
         - { path: ^/alpha$, role: ROLE_USER }
         - { path: ^/user/, role: ROLE_USER }
+        - { path: ^/oauth/v2/auth, roles: [ IS_AUTHENTICATED_ANONYMOUSLY ] }
         - { path: ^/bearer-api, roles: [ IS_AUTHENTICATED_FULLY ] }
         - { path: ^/api, access: "isApiPort(8080)" }
