@@ -380,6 +380,13 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
      */
     protected $previousPasswordCheck;
 
+    /**
+     * @Assert\Choice({"davies", "direct-group"}, strict=true)
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
+    protected $handlingTeam;
+
     public function __construct()
     {
         parent::__construct();
@@ -493,6 +500,16 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     public function getReferrals()
     {
         return $this->referrals;
+    }
+
+    public function getHandlingTeam()
+    {
+        $this->handlingTeam;
+    }
+
+    public function setHandlingTeam($handlingTeam)
+    {
+        $this->handlingTeam = $handlingTeam;
     }
 
     public function setLeadSource($source)
