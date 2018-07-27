@@ -19,7 +19,7 @@ class BearerApiLoginEntryPoint implements AuthenticationEntryPointInterface
 {
     /** @var UrlGeneratorInterface */
     private $router;
-    
+
     public function __construct(UrlGeneratorInterface $router)
     {
         $this->router = $router;

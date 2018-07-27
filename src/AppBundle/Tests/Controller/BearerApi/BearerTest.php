@@ -9,6 +9,8 @@ use Symfony\Component\BrowserKit\Client;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
+ * Test when a user tries to go to a protected URL, not logged in, bad-token, or when logged in
+ *
  * @group functional-nonet
  */
 class BearerTest extends BaseControllerTest
