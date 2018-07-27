@@ -5,9 +5,7 @@ namespace AppBundle\Security;
 use AppBundle\Oauth2Scopes;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\InsufficientAuthenticationException;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
@@ -19,8 +17,9 @@ use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface
  */
 class BearerApiLoginEntryPoint implements AuthenticationEntryPointInterface
 {
-    protected $router;
-
+    /** @var UrlGeneratorInterface */
+    private $router;
+    
     public function __construct(UrlGeneratorInterface $router)
     {
         $this->router = $router;

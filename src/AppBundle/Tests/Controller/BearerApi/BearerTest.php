@@ -3,7 +3,9 @@ namespace AppBundle\Tests\Controller\BearerApi;
 
 use AppBundle\DataFixtures\MongoDB\d\Oauth2\LoadOauth2Data;
 use AppBundle\Document\PhonePolicy;
+use AppBundle\Oauth2Scopes;
 use AppBundle\Tests\Controller\BaseControllerTest;
+use Symfony\Component\BrowserKit\Client;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -103,12 +105,18 @@ class BearerTest extends BaseControllerTest
      */
     private function getBearerToken(): string
     {
-        $code = $this->getAuthToken('read');
+        $code = $this->getAuthToken(Oauth2Scopes::USER_STARLING_SUMMARY);
         return $this->getBearerTokenWithAuthToken($code);
     }
 
+    /**
+     * User presses a button to authorise sharing their data
+     */
     protected function getAuthToken(string $scope): string
     {
+        /** @var Client $client */
+        $client = self::$client;
+
         // Generate an initial auth-token, using the client-id/secret fixture data
         self::$client->followRedirects(true);
 
@@ -123,11 +131,26 @@ class BearerTest extends BaseControllerTest
 
         $crawler = self::$client->request('GET', '/oauth/v2/auth', $params);
         $this->assertFalse(self::$client->getResponse()->isNotFound(), 'Expected to find the client_id!');
-        $this->assertNotContains('Client not found.', self::$client->getResponse()->getContent());
+        $this->assertNotContains(
+            'Client not found.',
+            self::$client->getResponse()->getContent(),
+            'Expected to find the client_id!'
+        );
 
         self::$client->followRedirects(false);
-        $form = $crawler->selectButton('Allow')->form();
-        self::$client->submit($form);
+
+        $this->assertContains(
+            $scope,
+            self::$client->getInternalResponse()->getContent(),
+            'Expected the user-allow-access page to pass back scope et al to next step'
+        );
+
+        try {
+            $form = $crawler->selectButton('Allow')->form();
+            self::$client->submit($form);
+        } catch (\InvalidArgumentException $exception) {
+            $this->markTestSkipped('route: starling_bank needs to have a form to [Allow] or [Deny] access');
+        }
 
         $redirectLocation = self::$client->getResponse()->headers->get('location');
         $this->assertNotNull($redirectLocation);
