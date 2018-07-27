@@ -8,15 +8,21 @@
 		</h1>
 		<div style="font-size: 14px; text-align: left;">
 		   <!--?xml version="1.0" encoding="UTF-8" standalone="no"?-->
-		   <div style="font-size: 14px; text-align: center;"><span style="font-family:arial,helvetica neue,helvetica,sans-serif">
+		   <div style="font-size: 14px; text-align: left;"><span style="font-family:arial,helvetica neue,helvetica,sans-serif">
 			   Welcome to the so-sure family!<br><br>
 			   You've made a very smart decision. Never again will you have to worry about dropping your phone and seeing that cracked screen, or it being stolen by some pesky thief!<br><br>
-			   Starting now, you can also be on your way to receive 80% of your money back at the end of your policy year when you connect with friends or family and none of you claim. You can share your unique code now here <a href="{{ url('scode', {code: policy.getStandardSCode.code}) }}">{{ policy.getStandardSCode.code }}</a>.<br><br>
+			   Starting now, you can also be on your way to receive 80% of your money back at the end of your policy year when you connect with friends or family and none of you claim.
+				<br><br>
+				You can start by sharing this unique URL to your friends.  Simply copy it, and send it via What's App, Email or even your favourite social channels.  What you waiting for?
+				<br><br>
+				   <a href="{{ url('scode', {code: policy.getStandardSCode.code}) }}">{{ url('scode', {code: policy.getStandardSCode.code}) }}</a>
+				<br><br>
 			   Now enough about us, here's your policy details:<br><br>
 			   Your policy is for a <strong>{{ policy.phone }}</strong> and runs from <strong>{{ policy.start | date('d M Y H:i', 'Europe/London') }}</strong> to <strong>{{ policy.end | date('d M Y H:i', 'Europe/London') }}</strong>.<br><br>
 			   Cover includes: Loss, Theft, Accidental Damage, Out of Warranty Breakdown, Accessories, Global Travel<br><br>
 			   Attached is a copy of all your key documents, including your policy terms for reference. If you have any questions, please don't hesitate to contact us.<br><br>
 				<br><br><br>
+			   </span>
 		   </div>
 		</div>
 		{% if policy.policyTerms.isPicSureEnabled and policy.picSureStatus != 'preapproved' %}
