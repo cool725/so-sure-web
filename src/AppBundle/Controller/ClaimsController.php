@@ -122,6 +122,7 @@ class ClaimsController extends BaseController
         $fraudService = $this->get('app.fraud');
         $dm = $this->getManager();
         $repo = $dm->getRepository(Policy::class);
+        /** @var Policy $policy */
         $policy = $repo->find($id);
         if (!$policy) {
             throw $this->createNotFoundException('Policy not found');
@@ -289,6 +290,7 @@ class ClaimsController extends BaseController
             'claim_types' => Claim::$claimTypes,
             'phones' => $dm->getRepository(Phone::class)->findActive()->getQuery()->execute(),
             'now' => new \DateTime(),
+            'claim' => $claim,
         ];
     }
 

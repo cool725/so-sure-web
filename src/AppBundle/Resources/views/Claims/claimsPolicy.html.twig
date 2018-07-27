@@ -38,14 +38,21 @@
   {% if policy.isClaimable %}
     <div class="bg-warning" style="border-radius: 10px; padding: 20px; margin-bottom: 20px;">
         <ul class="nav nav-tabs nav-justified">
-          <li role="presentation" {% if not policy.hasOpenClaim %}class="active"{% endif %}><a href="#record">Record Claim</a></li>
-          <li role="presentation" {% if policy.hasOpenClaim %}class="active"{% endif %}><a href="#claimscheck">ClaimsCheck</a></li>
+          <li role="presentation" {% if not policy.hasOpenClaim or claim.type %}class="active"{% endif %}><a href="#record">Record Claim {% if claim.type %}[from FNOL]{% endif %}</a></li>
+          <li role="presentation" {% if policy.hasOpenClaim and not claim.type %}class="active"{% endif %}><a href="#claimscheck">ClaimsCheck</a></li>
           <li role="presentation"><a href="#crimeref">Crime Ref Check</a></li>
         </ul>
         <div class="tab-content">
-            <div role="tabpanel" class="tab-pane {% if not policy.hasOpenClaim %}active"{% endif %}" id="record">
+            <div role="tabpanel" class="tab-pane {% if not policy.hasOpenClaim or claim.type %}active"{% endif %}" id="record">
                 <p></p>
-                <p class="text-center"><strong>Record Claim</strong></p>
+                <p class="text-center"><strong>Record Claim
+                {% if claim.type %}
+                        [<button type="button" class="btn btn-link" data-toggle="modal" data-target="#claimsModal"
+                                data-claim='{{ claim.toModalArray()|json_encode }}' data-documents='{{ s3DownloadLinks(claim)|json_encode }}'>
+                            FNOL Details</button>]
+                {% endif %}
+                    </strong>
+                </p>
                 {{ form_start(formClaim) }}
                 <div class="row">
                     <div class="col-md-8">
@@ -64,15 +71,6 @@
                                     {{ form_label(formClaim.type, 'Claim Type', {'label_attr': {'class': 'col-sm-6'}}) }}
                                     {{ form_errors(formClaim.type) }}
                                     {{ form_widget(formClaim.type, {'attr': {'class': 'col-sm-6'}}) }}
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="form-group">
-                                    {{ form_label(formClaim.status, '', {'label_attr': {'class': 'col-sm-6'}}) }}
-                                    {{ form_errors(formClaim.status) }}
-                                    {{ form_widget(formClaim.status, {'attr': {'class': 'col-sm-6'}}) }}
                                 </div>
                             </div>
                         </div>
@@ -106,7 +104,7 @@
                 </div>
                 {{ form_end(formClaim) }}
             </div>
-            <div role="tabpanel" class="tab-pane {% if policy.hasOpenClaim %}active"{% endif %}" id="claimscheck">
+            <div role="tabpanel" class="tab-pane {% if policy.hasOpenClaim and not claim.type %}active"{% endif %}" id="claimscheck">
                 <p></p>
                 <p class="text-center"><strong>Run ClaimsCheck</strong></p>
                 <p>

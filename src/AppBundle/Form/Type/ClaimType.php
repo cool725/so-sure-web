@@ -42,6 +42,7 @@ class ClaimType extends AbstractType
         ;
 
         $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
+            /** @var Claim $claim */
             $claim = $event->getData();
             $form = $event->getForm();
             $picSureEnabled = $claim->getPolicy() ? $claim->getPolicy()->isPicSurePolicy() : true;
@@ -59,7 +60,11 @@ class ClaimType extends AbstractType
                 $this->getClaimTypeCopy(Claim::TYPE_EXTENDED_WARRANTY, $validated, $picSureEnabled) =>
                     Claim::TYPE_EXTENDED_WARRANTY,
             ]);
-            $form->add('type', ChoiceType::class, ['choices' => $choices]);
+            $form->add('type', ChoiceType::class, [
+                'placeholder' => 'Select Claim Type',
+                'choices' => $choices,
+                'disabled' => $claim->getType() == null ? false : true,
+            ]);
         });
     }
 
