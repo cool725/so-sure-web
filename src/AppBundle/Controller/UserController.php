@@ -1459,16 +1459,26 @@ class UserController extends BaseController
                 if ($claimForm->isValid()) {
                     $dm = $this->getManager();
                     $policyRepo = $dm->getRepository(Policy::class);
+                    /** @var Policy $policy */
                     $policy = $policyRepo->find($claimFnol->getPolicyNumber());
                     if (!$policy) {
                         throw $this->createNotFoundException('Policy not found');
                     }
                     $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
-
-                    $claimFnolConfirm = clone $claimFnol;
-                    $claimConfirmForm = $this->get('form.factory')
-                        ->createNamedBuilder('claim_confirm_form', ClaimFnolConfirmType::class, $claimFnolConfirm)
-                        ->getForm();
+                    if (in_array($claimFnol->getType(), [Claim::TYPE_LOSS, Claim::TYPE_THEFT]) &&
+                        !$policy->isAdditionalClaimLostTheftApprovedAllowed()) {
+                        // @codingStandardsIgnoreStart
+                        $this->addFlash(
+                            'error',
+                            'Sorry, but we are unable to accept an additional claim on your policy for loss or theft as you already have had 2 successful claims'
+                        );
+                        // @codingStandardsIgnoreEnd
+                    } else {
+                        $claimFnolConfirm = clone $claimFnol;
+                        $claimConfirmForm = $this->get('form.factory')
+                            ->createNamedBuilder('claim_confirm_form', ClaimFnolConfirmType::class, $claimFnolConfirm)
+                            ->getForm();
+                    }
                 }
             } elseif ($request->request->has('claim_confirm_form')) {
                 $claimConfirmForm->handleRequest($request);
