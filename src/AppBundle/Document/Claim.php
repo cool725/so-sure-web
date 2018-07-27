@@ -1653,6 +1653,8 @@ class Claim
                 null,
             'closedDate' => $this->getClosedDate() ? $this->getClosedDate()->format(\DateTime::ATOM) : null,
             'description' => $this->getDescription(),
+            'incidentDate' => $this->getIncidentDate() ? $this->getIncidentDate()->format(\DateTime::ATOM) : null,
+            'incidentTime' => $this->getIncidentTime(),
             'location' => $this->getLocation(),
             'type' => $this->getType(),
             'status' => $this->getStatus(),
