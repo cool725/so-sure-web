@@ -135,7 +135,7 @@ class ClaimsService
         if ($submit) {
             $claim->setSubmissionDate(new \DateTime());
             $claim->setStatus(Claim::STATUS_SUBMITTED);
-            //$this->notifyClaimSubmission($claim);
+            $this->notifyClaimSubmission($claim);
         }
 
         $this->dm->flush();
@@ -185,7 +185,7 @@ class ClaimsService
         if ($submit) {
             $claim->setSubmissionDate(new \DateTime());
             $claim->setStatus(Claim::STATUS_SUBMITTED);
-            //$this->notifyClaimSubmission($claim);
+            $this->notifyClaimSubmission($claim);
         }
 
         $this->dm->flush();
@@ -239,7 +239,7 @@ class ClaimsService
         }
         $this->dm->flush();
 
-        //$this->notifyClaimAdditionalDocuments($claim, $attachments);
+        $this->notifyClaimAdditionalDocuments($claim, $attachments);
     }
 
     public function addClaim(Policy $policy, Claim $claim)
