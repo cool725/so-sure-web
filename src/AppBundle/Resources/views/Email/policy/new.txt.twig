@@ -1,14 +1,21 @@
 {% extends 'AppBundle:Email:base.txt.twig' %}
 {% block body %}
-Welcome {{ policy.user.name }}.
-
 **
 ------------------------------------------------------------
-Thank you for joining so-sure.  We're excited to have you onboard.
+Welcome to the so-sure family!
 
-Your policy is for {{ policy.phone }} and runs from {{ policy.start | date('d M Y H:i', 'Europe/London') }} to {{ policy.end | date('d M Y H:i', 'Europe/London') }}.
+You've made a very smart decision. Never again will you have to worry about dropping your phone and seeing that cracked screen, or it being stolen by some pesky thief!
 
-We've also attached a copy of all your key documents, including your policy terms for reference. If you have any questions, please don't hesitate to contact us (support@wearesosure.com).
+Starting now, you can also be on your way to receive 80% of your money back at the end of your policy year when you connect with friends or family and none of you claim. You can share your unique code now here {{ policy.getStandardSCode.code }}.
+{{ url('scode', {code: policy.getStandardSCode.code}) }}
+
+Now enough about us, here's your policy details:
+
+Your policy is for a {{ policy.phone }} and runs from {{ policy.start | date('d M Y H:i', 'Europe/London') }} to {{ policy.end | date('d M Y H:i', 'Europe/London') }}.
+
+Cover includes: Loss, Theft, Accidental Damage, Out of Warranty Breakdown, Accessories, Global Travel
+
+Attached is a copy of all your key documents, including your policy terms for reference. If you have any questions, please don't hesitate to contact us.
 
 {% if policy.policyTerms.isPicSureEnabled and policy.picSureStatus != 'preapproved' %}
 Your excess is currently £150, however, you can easily reduce this amount to £50 (£70 for Theft/Loss) by validating your phone with pic-sure.
@@ -26,7 +33,7 @@ Just email a picture of your phone's screen in the mirror to support@wearesosure
 {% endif %}
 {% endif %}
 {% if policy.phone.newHighDemand %}
-Your {{ policy.phone }} has recently been released. Sadly this means that there is a market shortage of parts/phones available over the coming few weeks. Hence, we might be delayed in providing you a next day replacement or repair. As we know you can't live without a phone, if we can't fulfil your claim promptly, we will loan you an older model phone until we are able to get a replacement device to you.
+As you have a shiny new model, we wanted to let you know your next day replacement or repair may be an older model just for a few days until we get the new model to you (this is an unusual occurrence that's out of our control and due to market shortages).
 
 {% endif %}
 Cancel your policy now if your phone already has a cracked screen.
