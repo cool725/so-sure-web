@@ -1147,65 +1147,33 @@ class UserControllerTest extends BaseControllerTest
         $policy->setStart($now);
         self::$dm->flush();
 
-        $mobileNumber = self::generateRandomMobile();
-        $serializer = new Serializer(array(new DateTimeNormalizer()));
-
-        $claimPage = self::$router->generate('user_claim');
         $this->login($email, $password);
-        $crawler = self::$client->request('GET', $claimPage);
-        self::verifyResponse(200);
-        $form = $crawler->selectButton('claim_form[submit]')->form();
-        $form['claim_form[email]'] = $email;
-        $form['claim_form[name]'] = 'foo bar';
-        $form['claim_form[phone]'] = $mobileNumber;
-        $form['claim_form[when]'] = $serializer->normalize(
-            $now,
-            null,
-            array(DateTimeNormalizer::FORMAT_KEY => 'd/m/Y')
+        $this->submitFnolForm($policy, $now, Claim::TYPE_DAMAGE);
+    }
+
+    public function testUserClaimFnolNoAdditionalLoss()
+    {
+        $email = self::generateEmail('testUserClaimFnolNoAdditionalLoss', $this);
+        $password = 'foo';
+        $phone = self::getRandomPhone(self::$dm);
+        $user = self::createUser(
+            self::$userManager,
+            $email,
+            $password,
+            $phone,
+            self::$dm
         );
-        $form['claim_form[time]'] = '02:00';
-        $form['claim_form[where]'] = 'so-sure offices';
-        $form['claim_form[timeToReach]'] = '2 pm';
-        $form['claim_form[signature]'] = 'foo bar';
-        $form['claim_form[type]'] = Claim::TYPE_DAMAGE;
-        $form['claim_form[network]'] = Claim::NETWORK_O2;
-        // @codingStandardsIgnoreStart
-        $form['claim_form[message]'] = 'bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla';
-        $form['claim_form[policyNumber]'] = $policy->getId();
-        $crawler = self::$client->submit($form);
+        $now = new \DateTime();
+        $policy = self::initPolicy($user, self::$dm, $phone, null, true, true);
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        $policy->setStart($now);
+        self::$dm->flush();
 
-        self::verifyResponse(200);
-        $this->assertContains(
-            'data-active="claimfnol-confirm"',
-            self::$client->getResponse()->getContent()
-        );
+        $claim1 = $this->createClaim($policy, Claim::TYPE_LOSS, $now, Claim::STATUS_APPROVED);
+        $claim2 = $this->createClaim($policy, Claim::TYPE_LOSS, $now, Claim::STATUS_APPROVED);
 
-        $form = $crawler->selectButton('claim_confirm_form[submit]')->form();
-        $form['claim_confirm_form[email]'] = $email;
-        $form['claim_confirm_form[name]'] = 'foo bar';
-        $form['claim_confirm_form[phone]'] = $mobileNumber;
-        $form['claim_confirm_form[when]'] = $serializer->normalize(
-            $now,
-            null,
-            array(DateTimeNormalizer::FORMAT_KEY => 'Y/m/d')
-        );
-        $form['claim_confirm_form[time]'] = '2 am';
-        $form['claim_confirm_form[where]'] = 'so-sure offices';
-        $form['claim_confirm_form[timeToReach]'] = '2 pm';
-        $form['claim_confirm_form[signature]'] = 'foo bar';
-        $form['claim_confirm_form[type]'] = Claim::TYPE_DAMAGE;
-        $form['claim_confirm_form[network]'] = Claim::NETWORK_O2;
-        // @codingStandardsIgnoreStart
-        $form['claim_confirm_form[message]'] = 'bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla';
-        $form['claim_confirm_form[policyNumber]'] = $policy->getId();
-        $crawler = self::$client->submit($form);
-
-        self::verifyResponse(302);
-        $this->assertTrue(self::$client->getResponse()->isRedirect(sprintf('/user/claim/%s', $policy->getId())));
-
-        $updatedPolicy = $this->assertPolicyByIdExists(self::$client->getContainer(), $policy->getId());
-        $updatedClaim = $updatedPolicy->getLatestClaim();
-        $this->assertEquals(Claim::STATUS_FNOL, $updatedClaim->getStatus());
+        $this->login($email, $password);
+        $this->submitFnolForm($policy, $now, Claim::TYPE_LOSS, true);
     }
 
     public function testUserClaimDamage()
@@ -1263,8 +1231,8 @@ class UserControllerTest extends BaseControllerTest
 
         $this->login($email, $password);
 
-        $this->submitDamageForm($policy, $now, true, false,false, true);
-        $this->submitDamageForm($policy, $now, true, false,false, false, 1);
+        $this->submitDamageForm($policy, $now, true, false, false, true);
+        $this->submitDamageForm($policy, $now, true, false, false, false, 1);
     }
 
     public function testUserClaimDamageNoProofOfUsage()
@@ -1687,7 +1655,7 @@ class UserControllerTest extends BaseControllerTest
         $this->login($email, $password);
         $this->submitDamageForm($policy, $now, true, true, true);
 
-        $this->updateDamageForm($policy, $now, true, true, true,1);
+        $this->updateDamageForm($policy, $now, true, true, true, 1);
     }
 
     public function testUserClaimUpdateDamageNoProofOfUsage()
@@ -1732,10 +1700,10 @@ class UserControllerTest extends BaseControllerTest
         $this->login($email, $password);
         $this->submitDamageForm($policy, $now, false, false, false);
 
-        $this->updateDamageForm($policy, $now, false, false,false, 1);
+        $this->updateDamageForm($policy, $now, false, false, false, 1);
     }
 
-    private function createClaim(Policy $policy, $type, \DateTime $date)
+    private function createClaim(Policy $policy, $type, \DateTime $date, $status = Claim::STATUS_FNOL)
     {
         $claim = new Claim();
         $claim->setIncidentDate($date);
@@ -1747,12 +1715,85 @@ class UserControllerTest extends BaseControllerTest
         $claim->setType($type);
         $claim->setNetwork(Claim::NETWORK_O2);
         $claim->setDescription('bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla');
-        $claim->setStatus(Claim::STATUS_FNOL);
+        $claim->setStatus($status);
         $claim->setPolicy($policy);
         $policy->addClaim($claim);
         self::$dm->flush();
 
         return $claim;
+    }
+
+    private function submitFnolForm(Policy $policy, \DateTime $now, $type, $expectNoAdditionalClaimAllowed = false)
+    {
+        $serializer = new Serializer(array(new DateTimeNormalizer()));
+        $mobileNumber = self::generateRandomMobile();
+
+        $claimPage = self::$router->generate('user_claim');
+        $crawler = self::$client->request('GET', $claimPage);
+        self::verifyResponse(200);
+
+        $form = $crawler->selectButton('claim_form[submit]')->form();
+        $form['claim_form[email]'] = $policy->getUser()->getEmail();
+        $form['claim_form[name]'] = 'foo bar';
+        $form['claim_form[phone]'] = $mobileNumber;
+        $form['claim_form[when]'] = $serializer->normalize(
+            $now,
+            null,
+            array(DateTimeNormalizer::FORMAT_KEY => 'd/m/Y')
+        );
+        $form['claim_form[time]'] = '02:00';
+        $form['claim_form[where]'] = 'so-sure offices';
+        $form['claim_form[timeToReach]'] = '2 pm';
+        $form['claim_form[signature]'] = 'foo bar';
+        $form['claim_form[type]'] = $type;
+        $form['claim_form[network]'] = Claim::NETWORK_O2;
+        // @codingStandardsIgnoreStart
+        $form['claim_form[message]'] = 'bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla';
+        $form['claim_form[policyNumber]'] = $policy->getId();
+        $crawler = self::$client->submit($form);
+
+        self::verifyResponse(200);
+        if ($expectNoAdditionalClaimAllowed) {
+            $this->assertNotContains(
+                'data-active="claimfnol-confirm"',
+                self::$client->getResponse()->getContent()
+            );
+            $this->expectFlashError($crawler, 'unable to accept an additional claim');
+
+            return;
+        }
+
+        $this->assertContains(
+            'data-active="claimfnol-confirm"',
+            self::$client->getResponse()->getContent()
+        );
+
+        $form = $crawler->selectButton('claim_confirm_form[submit]')->form();
+        $form['claim_confirm_form[email]'] = $policy->getUser()->getEmail();
+        $form['claim_confirm_form[name]'] = 'foo bar';
+        $form['claim_confirm_form[phone]'] = $mobileNumber;
+        $form['claim_confirm_form[when]'] = $serializer->normalize(
+            $now,
+            null,
+            array(DateTimeNormalizer::FORMAT_KEY => 'Y/m/d')
+        );
+        $form['claim_confirm_form[time]'] = '2 am';
+        $form['claim_confirm_form[where]'] = 'so-sure offices';
+        $form['claim_confirm_form[timeToReach]'] = '2 pm';
+        $form['claim_confirm_form[signature]'] = 'foo bar';
+        $form['claim_confirm_form[type]'] = $type;
+        $form['claim_confirm_form[network]'] = Claim::NETWORK_O2;
+        // @codingStandardsIgnoreStart
+        $form['claim_confirm_form[message]'] = 'bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla';
+        $form['claim_confirm_form[policyNumber]'] = $policy->getId();
+        $crawler = self::$client->submit($form);
+
+        self::verifyResponse(302);
+        $this->assertTrue(self::$client->getResponse()->isRedirect(sprintf('/user/claim/%s', $policy->getId())));
+
+        $updatedPolicy = $this->assertPolicyByIdExists(self::$client->getContainer(), $policy->getId());
+        $updatedClaim = $updatedPolicy->getLatestClaim();
+        $this->assertEquals(Claim::STATUS_FNOL, $updatedClaim->getStatus());
     }
 
     private function submitLossTheftForm(
