@@ -188,13 +188,18 @@ $('#claimsModal').on('show.bs.modal', function (event) {
                 }
             }
 
+            var crimeRef = claim.crimeRef;
+            if (!claim.validCrimeRef) {
+                crimeRef += ' <i class="fa fa-warning" title="Invalid crime reference"></i>';
+            }
+
             if (claim.type == 'theft') {
-                modal.find('#claims-detail-crime-reference').text(claim.crimeRef);
+                modal.find('#claims-detail-crime-reference').html(crimeRef+' / '+claim.force);
                 modal.find('#claims-detail-crime-reference-container').show();
                 modal.find('#claims-detail-policy-report-container').hide();
             }
             else {
-                modal.find('#claims-detail-policy-report').text(claim.crimeRef);
+                modal.find('#claims-detail-policy-report').html(crimeRef+' / '+claim.force);
                 modal.find('#claims-detail-crime-reference-container').hide();
                 modal.find('#claims-detail-policy-report-container').show();
             }

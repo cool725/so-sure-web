@@ -12,6 +12,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Doctrine\ODM\MongoDB\DocumentRepository;
 use AppBundle\Document\Claim;
+use AppBundle\Document\PhonePolicy;
 use AppBundle\Service\ReceperioService;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormEvent;
@@ -45,10 +46,12 @@ class ClaimType extends AbstractType
             /** @var Claim $claim */
             $claim = $event->getData();
             $form = $event->getForm();
-            $picSureEnabled = $claim->getPolicy() ? $claim->getPolicy()->isPicSurePolicy() : true;
-            $validated = $claim->getPolicy() ? $claim->getPolicy()->isPicSureValidated() : false;
+            /** @var PhonePolicy $policy */
+            $policy = $claim->getPolicy();
+            $picSureEnabled = $policy ? $policy->isPicSurePolicy() : true;
+            $validated = $policy ? $policy->isPicSureValidated() : false;
             $choices = [];
-            if ($claim->getPolicy() &&  $claim->getPolicy()->isAdditionalClaimLostTheftApprovedAllowed()) {
+            if ($policy && $policy->isAdditionalClaimLostTheftApprovedAllowed()) {
                 $choices = [
                     $this->getClaimTypeCopy(Claim::TYPE_LOSS, $validated, $picSureEnabled) => Claim::TYPE_LOSS,
                     $this->getClaimTypeCopy(Claim::TYPE_THEFT, $validated, $picSureEnabled) => Claim::TYPE_THEFT,

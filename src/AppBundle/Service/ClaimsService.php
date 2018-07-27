@@ -46,6 +46,9 @@ class ClaimsService
     /** @var RouterService */
     protected $routerService;
 
+    /** @var ReceperioService */
+    protected $imeiService;
+
     /** @var Client */
     protected $redis;
 
@@ -56,19 +59,21 @@ class ClaimsService
     protected $filesystem;
 
     /**
-     * @param DocumentManager $dm
-     * @param LoggerInterface $logger
-     * @param MailerService   $mailer
-     * @param RouterService   $routerService
-     * @param Client          $redis
-     * @param string          $environment
-     * @param MountManager    $filesystem
+     * @param DocumentManager  $dm
+     * @param LoggerInterface  $logger
+     * @param MailerService    $mailer
+     * @param RouterService    $routerService
+     * @param ReceperioService $imeiService
+     * @param Client           $redis
+     * @param string           $environment
+     * @param MountManager     $filesystem
      */
     public function __construct(
         DocumentManager $dm,
         LoggerInterface $logger,
         MailerService $mailer,
         RouterService $routerService,
+        ReceperioService $imeiService,
         $redis,
         $environment,
         MountManager $filesystem
@@ -77,6 +82,7 @@ class ClaimsService
         $this->logger = $logger;
         $this->mailer = $mailer;
         $this->routerService = $routerService;
+        $this->imeiService = $imeiService;
         $this->redis = $redis;
         $this->environment = $environment;
         $this->filesystem = $filesystem;
@@ -144,6 +150,9 @@ class ClaimsService
         $claim->setReportType($claimTheftLoss->getReportType());
         $claim->setCrimeRef($claimTheftLoss->getCrimeReferenceNumber());
         $claim->setForce($claimTheftLoss->getForce());
+
+        $validCrimeRef = $this->imeiService->validateCrimeRef($claim->getForce(), $claim->getCrimeRef());
+        $claim->setValidCrimeRef($validCrimeRef);
 
         if ($claimTheftLoss->getProofOfUsage()) {
             $proofOfUsage = new ProofOfUsageFile();
