@@ -1503,13 +1503,15 @@ class UserController extends BaseController
             }
         }
 
+        /** @var PhonePolicy $phonePolicy */
+        $phonePolicy = $policy;
         $data = [
             'username' => $user->getName(),
-            'phone' => $policy ? sprintf(
+            'phone' => $phonePolicy ? sprintf(
                 "%s %s (IMEI %s)",
-                $policy->getPhone()->getMake(),
-                $policy->getPhone()->getModel(),
-                $policy->getImei()
+                $phonePolicy->getPhone()->getMake(),
+                $phonePolicy->getPhone()->getModel(),
+                $phonePolicy->getImei()
             ) : '',
             'claim_type' => $claimFnol->getTypeString(),
             'policy_date' => $policy ? $policy->getStart() : '',
