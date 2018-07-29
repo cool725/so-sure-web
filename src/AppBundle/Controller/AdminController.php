@@ -9,6 +9,7 @@ use AppBundle\Document\File\ReconciliationFile;
 use AppBundle\Document\File\SalvaPaymentFile;
 use AppBundle\Document\Payment\BacsIndemnityPayment;
 use AppBundle\Document\Sequence;
+use AppBundle\Document\ValidatorTrait;
 use AppBundle\Form\Type\BacsMandatesType;
 use AppBundle\Form\Type\UploadFileType;
 use AppBundle\Form\Type\ReconciliationFileType;
@@ -111,6 +112,7 @@ class AdminController extends BaseController
     use DateTrait;
     use CurrencyTrait;
     use ArrayToApiArrayTrait;
+    use ValidatorTrait;
 
     /**
      * @Route("/phone", name="admin_phone_add")

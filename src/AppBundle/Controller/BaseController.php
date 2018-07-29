@@ -723,20 +723,6 @@ abstract class BaseController extends Controller
         $dm->flush();
     }
 
-    protected function conformAlphanumericSpaceDot($value, $length)
-    {
-        $validator = new AlphanumericSpaceDotValidator();
-
-        return $validator->conform(mb_substr($value, 0, $length));
-    }
-
-    protected function conformAlphanumeric($value, $length)
-    {
-        $validator = new AlphanumericValidator();
-
-        return $validator->conform(mb_substr($value, 0, $length));
-    }
-
     /**
      * @param Request $request
      * @return Phone|null

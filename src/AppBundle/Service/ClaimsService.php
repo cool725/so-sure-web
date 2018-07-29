@@ -4,6 +4,7 @@ namespace AppBundle\Service;
 use AppBundle\Document\File\ProofOfLossFile;
 use AppBundle\Document\File\S3ClaimFile;
 use AppBundle\Document\File\S3File;
+use AppBundle\Document\ValidatorTrait;
 use Predis\Client;
 use AppBundle\Repository\PhonePolicyRepository;
 use Psr\Log\LoggerInterface;
@@ -30,6 +31,8 @@ use League\Flysystem\Filesystem;
 
 class ClaimsService
 {
+    use ValidatorTrait;
+
     const S3_POLICY_BUCKET = 'policy.so-sure.com';
     const S3_CLAIMS_FOLDER = 'claim-documents';
     const LOGIN_LINK_TOKEN_EXPIRATION = 7200; // 2 hours
@@ -95,8 +98,8 @@ class ClaimsService
         $claim->setType($claimFnol->getType());
         $claim->setIncidentDate($claimFnol->getWhen());
         $claim->setIncidentTime($claimFnol->getTime());
-        $claim->setLocation($claimFnol->getWhere());
-        $claim->setDescription($claimFnol->getMessage());
+        $claim->setLocation($this->conformAlphanumericSpaceDot($claimFnol->getWhere(), 250));
+        $claim->setDescription($this->conformAlphanumericSpaceDot($claimFnol->getMessage(), 5000));
         $claim->setNetwork($claimFnol->getNetwork());
         $claim->setPhoneToReach($claimFnol->getPhone());
         $claim->setTimeToReach($claimFnol->getTimeToReach());
