@@ -1,6 +1,7 @@
 <?php
 namespace AppBundle\Service;
 
+use AppBundle\Document\ValidatorTrait;
 use AppBundle\Validator\Constraints\AlphanumericSpaceDotPipeValidator;
 use AppBundle\Validator\Constraints\AlphanumericSpaceDotValidator;
 use Predis\Client;
@@ -19,6 +20,8 @@ use CensusBundle\Service\SearchService;
 
 class MixpanelService
 {
+    use ValidatorTrait;
+
     const KEY_MIXPANEL_QUEUE = 'queue:mixpanel';
 
     const QUEUE_PERSON_PROPERTIES = 'person';
@@ -229,20 +232,6 @@ class MixpanelService
         $user = $repo->findOneBy(['emailCanonical' => mb_strtolower($email)]);
 
         return $this->attributionByUser($user);
-    }
-
-    protected function conformAlphanumericSpaceDotPipe($value, $length)
-    {
-        $validator = new AlphanumericSpaceDotPipeValidator();
-
-        return $validator->conform(mb_substr($value, 0, $length));
-    }
-
-    protected function conformAlphanumericSpaceDot($value, $length)
-    {
-        $validator = new AlphanumericSpaceDotValidator();
-
-        return $validator->conform(mb_substr($value, 0, $length));
     }
 
     public function attributionByUser(User $user = null)

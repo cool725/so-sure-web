@@ -58,6 +58,7 @@ class ClaimFnol
     protected $network;
 
     /**
+     * @AppAssert\AlphanumericSpaceDot()
      * @Assert\Length(min="50", max="1000")
      */
     protected $message;
