@@ -33,7 +33,6 @@ class AlphanumericSpaceDotValidatorTest extends \PHPUnit\Framework\TestCase
         // standard alphanumeric
         $validator->validate(' aA1-.,;:+():_£&@*!^#"%/’[]', self::$constraint);
         $validator->validate("'", self::$constraint);
-        $validator->validate("My phone has dropped during work and the front screen has shattered. I am still able to use the phone but would like the screen repaired.Thanks Darren", self::$constraint);
     }
 
     public function testValidatorAccented()
