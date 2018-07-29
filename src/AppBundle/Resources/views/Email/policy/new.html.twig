@@ -28,7 +28,7 @@
 		{% if policy.policyTerms.isPicSureEnabled and policy.picSureStatus != 'preapproved' %}
 		<div style="font-size: 14px; text-align: left;">
 		   <!--?xml version="1.0" encoding="UTF-8" standalone="no"?-->
-		   <div style="font-size: 14px; text-align: center;"><span style="font-family:arial,helvetica neue,helvetica,sans-serif">
+		   <div style="font-size: 14px; text-align: left;"><span style="font-family:arial,helvetica neue,helvetica,sans-serif">
 			   Your excess is currently £150, however, you can easily reduce this amount to £50 (£70 for Theft/Loss) by validating your phone with pic-sure.
 			   {% if policy.phone.isITunes %}
 			   <a href="{{ url('download_apple', {'medium': 'pic-sure-welcome-email'}) }}">Download our iOS App</a>, login, and complete the pic-sure validation process.
@@ -38,24 +38,26 @@
 					Just email a picture of your phone's screen in the mirror to <a href="support@wearesosure.com">support@wearesosure.com</a> and we'll get started on that process.
 	 		   {% endif %}
 			   <br><br><br>
+			   </span>
 		   </div>
 		</div>
 	    {% endif %}
 	    {% if policy.phone.newHighDemand %}
 		<div style="font-size: 14px; text-align: left;">
 		   <!--?xml version="1.0" encoding="UTF-8" standalone="no"?-->
-		   <div style="font-size: 14px; text-align: center;"><span style="font-family:arial,helvetica neue,helvetica,sans-serif">
+		   <div style="font-size: 14px; text-align: left;"><span style="font-family:arial,helvetica neue,helvetica,sans-serif">
 				As you have a shiny new model, we wanted to let you know your next day replacement or repair may be an older model,
 				   just for a few days until we get the new model to you (this is an unusual occurrence that's out of our control
 				   and due to market shortages).
 			   <br><br>
+			   </span>
 		   </div>
 		</div>
 	    {% endif %}
 
 		<div style="font-size: 14px; text-align: left;">
 		   <!--?xml version="1.0" encoding="UTF-8" standalone="no"?-->
-		   <div style="font-size: 14px; text-align: center;"><span style="font-family:arial,helvetica neue,helvetica,sans-serif">
+		   <div style="font-size: 14px; text-align: left;"><span style="font-family:arial,helvetica neue,helvetica,sans-serif">
 		<table border="1" cellpadding="20" cellspacing="0" height="100%" width="100%" id="cancelPolicy">
     <tr>
         <td align="center" valign="top">
@@ -70,6 +72,7 @@
 		</td>
 	</tr>
 		</table>
+			   </span>
 		   </div>
 		</div>
 	{{ macros.end_table() }}
