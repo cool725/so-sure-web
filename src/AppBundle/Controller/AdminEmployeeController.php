@@ -1040,7 +1040,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
 
                     return $this->redirectToRoute('admin_policy', ['id' => $id]);
                 }
-            } elseif($request->request->has('bacs_refund_form')) {
+            } elseif ($request->request->has('bacs_refund_form')) {
                 $bacsRefundForm->handleRequest($request);
                 if ($bacsRefundForm->isValid()) {
                     $bacsRefund->setAmount(0 - abs($bacsRefund->getAmount()));
