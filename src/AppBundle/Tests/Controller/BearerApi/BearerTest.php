@@ -2,6 +2,7 @@
 namespace AppBundle\Tests\Controller\BearerApi;
 
 use AppBundle\DataFixtures\MongoDB\d\Oauth2\LoadOauth2Data;
+use AppBundle\Document\Oauth\AccessToken;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Oauth2Scopes;
 use AppBundle\Tests\Controller\BaseControllerTest;
@@ -54,22 +55,32 @@ class BearerTest extends BaseControllerTest
 
     public function testAuthenticatedPing()
     {
-        list($email, $password) = $this->loginTestUser();
-        $accessToken = $this->getBearerToken();
+        // get a pre-prepared acces token
+        $accessToken = $this->getAccessTokenObject('test-with-api-alister');
 
         $params = [];
         $headers = [
-            'HTTP_AUTHORIZATION' => 'Bearer '. $accessToken,
+            'HTTP_AUTHORIZATION' => 'Bearer '. $accessToken->getToken(),
             'CONTENT_TYPE' => 'application/json',
         ];
         self::$client->request('GET', '/bearer-api/v1/ping', $params, [], $headers);
 
         $content = self::$client->getResponse()->getContent();
 
-        $expected = '{"response":"pong","data":"'.$email.'"}';
+        $expected = '{"response":"pong","data":"alister@so-sure.com"}';
         $this->assertContains('pong', $content);
         $this->assertJsonStringEqualsJsonString($expected, $content);
     }
+
+    public function getAccessTokenObject(string $knownAccessToken): AccessToken
+    {
+        // we can't easily know without a search what the ID is
+        $repo = self::$container->get('fos_oauth_server.access_token_manager.default');
+
+        /** @var AccessToken $oauth2Details */
+        return $repo->findTokenByToken($knownAccessToken);
+    }
+
 
     /**
      * Make a new - valid - user (with time/random email) and log in
@@ -139,31 +150,14 @@ class BearerTest extends BaseControllerTest
             'Expected to find the client_id!'
         );
 
-        self::$client->followRedirects(false);
-
         $this->assertContains(
-            $scope,
-            self::$client->getInternalResponse()->getContent(),
-            'Expected the user-allow-access page to pass back scope et al to next step'
+            'http://localhost/starling-bank',
+            self::$client->getRequest()->getUri(),
+            'Expected to be on the starling-bank login page'
         );
+        // @todo check for params in the session, as they will be used later, after purchase
 
-        try {
-            $form = $crawler->selectButton('Allow')->form();
-            self::$client->submit($form);
-        } catch (\InvalidArgumentException $exception) {
-            $this->markTestSkipped('route: starling_bank needs to have a form to [Allow] or [Deny] access');
-        }
-
-        $redirectLocation = self::$client->getResponse()->headers->get('location');
-        $this->assertNotNull($redirectLocation);
-        $queryString = parse_url($redirectLocation, PHP_URL_QUERY);
-        parse_str($queryString, $output);
-
-        $this->assertArrayHasKey('state', $output);
-        $this->assertArrayHasKey('code', $output);
-        $this->assertSame($state, $output['state']);
-
-        return $output['code'];
+        return $this->shortcutMakeUserToReturnAuthCode($params);
     }
 
     /**
@@ -204,5 +198,32 @@ class BearerTest extends BaseControllerTest
         $this->assertGreaterThanOrEqual(10, mb_strlen($ret['access_token']), 'expected a longer access_token');
 
         return $ret['access_token'];
+    }
+
+    /**
+     * we shortcut the user flow (as if we manually [Allow]'d) & go to the final redirect_url for auth code
+     */
+    private function shortcutMakeUserToReturnAuthCode(array $params)
+    {
+        // Skipping the [Allow] form, we go right to the redirect it would send us to
+
+        self::$client->followRedirects(true);
+        $crawler = self::$client->request('GET', '/oauth/v2/auth', $params);
+
+        // we should be redirected to /starling-bank
+
+        $redirectLocation = self::$client->getRequest()->getUri();
+        $this->assertNotNull($redirectLocation);
+        $this->assertContains('/starling-bank', $redirectLocation);
+
+        $queryString = parse_url($redirectLocation, PHP_URL_QUERY);
+        parse_str($queryString, $output);
+
+        // we should still have the client, and state in the URL
+        $this->assertArrayHasKey('client_id', $output);
+        $this->assertArrayHasKey('state', $output);
+        $this->assertArrayHasKey('scope', $output);
+
+        return $output['code'];
     }
 }

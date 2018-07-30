@@ -1,12 +1,15 @@
 <?php
 namespace AppBundle\DataFixtures\MongoDB\d\Oauth2;
 
+use AppBundle\Document\Oauth\AccessToken;
 use AppBundle\Document\Oauth\Client;
+use AppBundle\Document\User;
 use Doctrine\Common\DataFixtures\FixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 use FOS\UserBundle\Model\UserManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 // @codingStandardsIgnoreFile
 class LoadOauth2Data implements FixtureInterface, ContainerAwareInterface
@@ -37,7 +40,10 @@ class LoadOauth2Data implements FixtureInterface, ContainerAwareInterface
             throw new \Exception('missing container');
         }
 
-        $this->newOauth2Client($manager, ['read', 'summary'], []);
+        /** @var Client $client */
+        $client = $this->newOauth2Client($manager, ['read', 'summary'], []);
+
+        $this->newOauth2AccessToken($manager, $client, 'test-with-api-alister');
 
         $manager->flush();
         // $this->valdiateGedmoLogging($manager);
@@ -47,13 +53,13 @@ class LoadOauth2Data implements FixtureInterface, ContainerAwareInterface
         ObjectManager $manager,
         array $grantTypes = [],
         array $redirectUrls = []
-    ) {
+    ): Client {
         $grantTypes = array_merge($grantTypes, []);
         $redirectUrls = array_merge($redirectUrls, [self::KNOWN_CLIENT_CALLBACK_URL]);
 
         $client = new Client();
 
-        // The 'CLIENT_ID' is (*_KEY . *_RANDOM)
+        // The 'CLIENT_ID' is (*_KEY . '_' . *_RANDOM)
         $this->setClientId($client, self::KNOWN_CLIENT_ID_KEY);
         $client->setRandomId(self::KNOWN_CLIENT_ID_RANDOM);
 
@@ -63,6 +69,26 @@ class LoadOauth2Data implements FixtureInterface, ContainerAwareInterface
 
         /** @var UserManagerInterface $userManager */
         $manager->persist($client);
+
+        return $client;
+    }
+
+    private function newOauth2AccessToken(ObjectManager $manager, Client $client, string $token)
+    {
+        $dm = $this->container->get('doctrine_mongodb.odm.default_document_manager');
+        $repo = $dm->getRepository(User::class);
+        /** @var UserInterface $user */
+        $user = $repo->findOneBy(['email' => 'alister@so-sure.com']);
+
+        $accessToken = new AccessToken();
+        $accessToken->setClient($client);
+        $accessToken->setUser($user);
+        $accessToken->setToken($token);
+        $accessToken->setExpiresAt(PHP_INT_MAX);
+        $accessToken->setScope('api');
+
+        /** @var UserManagerInterface $userManager */
+        $manager->persist($accessToken);
     }
 
     /**

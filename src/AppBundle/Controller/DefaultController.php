@@ -180,6 +180,12 @@ class DefaultController extends BaseController
      */
     public function starlingLanding(Request $request)
     {
+        /* @todo The Oauth2 request to go to /oauth/v2/auth?... is in Session: '_security.oauth2_auth.target_path'
+         * @see TargetPathTrait
+         */
+
+        $request->getSession()->set('oauth2Flow', 'starling');
+
         $exp = $this->sixpack(
             $request,
             SixpackService::EXPERIMENT_STARLING_LANDING,
@@ -188,9 +194,9 @@ class DefaultController extends BaseController
 
         if ($exp == 'starling-landing') {
             return $this->render('AppBundle:Default:indexStarlingBank.html.twig');
-        } else {
-            return $this->redirectToRoute('homepage');
         }
+
+        return $this->redirectToRoute('homepage');
     }
 
     /**

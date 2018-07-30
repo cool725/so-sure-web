@@ -13,6 +13,7 @@ class OauthLoginTest extends WebTestCase
 {
     public function testOauthRedirection()
     {
+        /** @var Symfony\Bundle\FrameworkBundle\Client $client */
         $client = static::createClient();
 
         $params = [
@@ -29,6 +30,7 @@ class OauthLoginTest extends WebTestCase
 
     public function testStarlingRedirection()
     {
+        /** @var Symfony\Bundle\FrameworkBundle\Client $client */
         $client = static::createClient();
 
         $state = md5(time());
@@ -41,11 +43,26 @@ class OauthLoginTest extends WebTestCase
         ];
         $client->request('GET', '/oauth/v2/auth?'. build_query($params));
 
-        $this->assertContains('/starling-bank', $client->getInternalResponse()->getHeader('location'));
-        $this->assertContains(
-            $state,
-            $client->getInternalResponse()->getHeader('location'),
-            'expected the Oauth2-Params to be carried over to the login/[Allow] page'
+        $redirectLocation = $client->getInternalResponse()->getHeader('location');
+        $this->assertContains('/starling-bank', $redirectLocation);
+
+        // Check for params in the session, as they will be used later, after purchase
+        $queryString = parse_url($redirectLocation, PHP_URL_QUERY);
+        parse_str($queryString, $output);
+
+        $this->assertArrayHasKey(
+            'client_id',
+            $output,
+            'expected the Oauth2-Params to be carried over to Starling bank Oauth/Auth landing page'
+        );
+        $this->assertArrayHasKey('state', $output);
+        $this->assertArrayHasKey('scope', $output);
+
+        // the target_path, stored in the session, will be used later to go back to Starling
+        $session = $client->getContainer()->get('session');
+        $this->assertTrue(
+            $session->has('_security.oauth2_auth.target_path'),
+            'expected the Oauth2-Params to be carried over to the login/[Allow] page, via the session'
         );
     }
 }
