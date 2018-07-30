@@ -19,29 +19,29 @@
         {% if app.user is not null and app.user %}
             <li class="nav-item d-none d-lg-block pr-lg-5">
                 {% if is_granted('ROLE_ADMIN') %}
-                    <a href="{{ path('admin_home') }}" class="nav-link">Admin <i class="fas fa-users-cog fa-sm"></i></a>
+                    <a href="{{ path('admin_home') }}" class="nav-link text-primary">Admin <i class="fas fa-users-cog fa-sm"></i></a>
                 {% elseif is_granted('ROLE_EMPLOYEE') %}
-                    <a href="{{ path('admin_home') }}" class="nav-link">Admin <i class="fas fa-user-tie fa-sm"></i></a>
+                    <a href="{{ path('admin_home') }}" class="nav-link text-primary">Admin <i class="fas fa-user-tie fa-sm"></i></a>
                 {% elseif is_granted('ROLE_CLAIMS') %}
-                    <a href="{{ path('claims_home') }}" class="nav-link">Claims <i class="fas fa-user-shield fa-sm"></i></a>
+                    <a href="{{ path('claims_home') }}" class="nav-link text-primary">Claims <i class="fas fa-user-shield fa-sm"></i></a>
                 {% else %}
-                    <a href="{{ path('user_home') }}" class="nav-link">Your account <i class="fas fa-user-circle fa-sm"></i></a>
+                    <a href="{{ path('user_home') }}" class="nav-link text-primary">Your account <i class="fas fa-user-circle fa-sm"></i></a>
                 {% endif %}
             </li>
         {% else %}
             <li class="nav-item pr-lg-5">
-                <a href="#" class="btn btn-primary">Get a Quote</a>
+                <a href="#" class="btn btn-primary btn-sm">Get a Quote</a>
             </li>
         {% endif %}
         <li class="nav-item d-none d-lg-block pr-lg-5">
             {% if app.user is not null and app.user %}
                 {% if is_granted('ROLE_PREVIOUS_ADMIN') %}
-                    <a href="{{ path('homepage', {'_impersonate': '_exit'}) }}" class="nav-link">Exit <u>{{ app.user.email }}</u></a>
+                    <a href="{{ path('homepage', {'_impersonate': '_exit'}) }}" class="nav-link text-primary">Exit <u>{{ app.user.email }}</u></a>
                 {% else %}
-                    <a href="{{ path('fos_user_security_logout') }}" class="nav-link">Log out</i></a>
+                    <a href="{{ path('fos_user_security_logout') }}" class="nav-link text-primary">Log out</i></a>
                 {% endif %}
             {% else %}
-                <a href="{{ path('fos_user_security_login') }}" class="nav-link">Log in <i class="fas fa-arrow-right fa-sm ml-2"></i></a>
+                <a href="{{ path('fos_user_security_login') }}" class="nav-link text-primary">Log in <i class="fas fa-arrow-right fa-sm ml-2"></i></a>
             {% endif %}
         </li>
         <li class="nav-item d-lg-none">

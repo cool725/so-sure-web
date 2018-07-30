@@ -8,6 +8,14 @@
     @include media-breakpoint-up(lg) {
         padding-top: 2rem;
     }
+
+    .navbar-nav {
+
+        .nav-link {
+            font-family: $g-medium;
+            color: $dark;
+        }
+    }
 }
 
 .navbar-scrolled {
