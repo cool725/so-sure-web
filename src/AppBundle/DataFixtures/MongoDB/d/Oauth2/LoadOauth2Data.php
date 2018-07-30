@@ -6,6 +6,7 @@ use AppBundle\Document\Oauth\Client;
 use AppBundle\Document\User;
 use Doctrine\Common\DataFixtures\FixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\ODM\MongoDB\DocumentManager;
 use FOS\UserBundle\Model\UserManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -75,6 +76,7 @@ class LoadOauth2Data implements FixtureInterface, ContainerAwareInterface
 
     private function newOauth2AccessToken(ObjectManager $manager, Client $client, string $token)
     {
+        /** @var DocumentManager $dm */
         $dm = $this->container->get('doctrine_mongodb.odm.default_document_manager');
         $repo = $dm->getRepository(User::class);
         /** @var UserInterface $user */

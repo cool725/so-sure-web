@@ -184,7 +184,11 @@ class DefaultController extends BaseController
          * @see TargetPathTrait
          */
 
-        $request->getSession()->set('oauth2Flow', 'starling');
+        /** @var Session $session */
+        $session = $request->getSession();
+        if ($session) {
+            $session->set('oauth2Flow', 'starling');
+        }
 
         $exp = $this->sixpack(
             $request,

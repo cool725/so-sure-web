@@ -4,6 +4,7 @@ namespace AppBundle\Tests\Controller\BearerApi;
 
 use AppBundle\Oauth2Scopes;
 use function GuzzleHttp\Psr7\build_query;
+use Symfony\Bundle\FrameworkBundle\Client;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 /**
@@ -13,7 +14,7 @@ class OauthLoginTest extends WebTestCase
 {
     public function testOauthRedirection()
     {
-        /** @var Symfony\Bundle\FrameworkBundle\Client $client */
+        /** @var Client $client */
         $client = static::createClient();
 
         $params = [
@@ -30,7 +31,7 @@ class OauthLoginTest extends WebTestCase
 
     public function testStarlingRedirection()
     {
-        /** @var Symfony\Bundle\FrameworkBundle\Client $client */
+        /** @var Client $client */
         $client = static::createClient();
 
         $state = md5(time());
