@@ -4,14 +4,14 @@
     background-color: transparent;
     transition: 500ms ease;
 
-    @include media-breakpoint-up(md) {
+    @include media-breakpoint-up(lg) {
         padding-top: 2rem;
     }
 }
 
 .navbar-scrolled {
 
-    @include media-breakpoint-up(md) {
+    @include media-breakpoint-up(lg) {
         padding-top: 0.5rem;
     }
     // background-color: $blue-1;
