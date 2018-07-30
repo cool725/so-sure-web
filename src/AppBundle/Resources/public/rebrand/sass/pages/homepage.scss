@@ -12,6 +12,15 @@
     padding-top: 8rem;
     padding-bottom: 4rem;
     // overflow: hidden;
+    //
+
+    h1 {
+        color: $blue-2;
+
+        span {
+            color: $blue-4;
+        }
+    }
 
     // Background
     // TODO: See if we can use background image instead
@@ -74,5 +83,7 @@
 }
 
 .intro {
-
+    position: relative;
+    z-index: 2;
+    background-color: $bb-2;
 }
