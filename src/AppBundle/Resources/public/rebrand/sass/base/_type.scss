@@ -1,17 +1,21 @@
 // typography.scss
 
 body {
-    // font-family: $gg-regular;
+    font-family: $g-regular;
 }
 
 h1, h2, h3,
 .h1, .h2, .h3 {
-    // font-family: $gg-semi-bold;
+    font-family: $g-bold;
+
+    .sub {
+        font-family: $g-regular;
+    }
 }
 
 h4, h5, h6,
 .h4, .h5, .h6 {
-    // font-family: $gg-regular;
+    font-family: $g-regular;
     line-height: 1.5;
 }
 
@@ -40,7 +44,7 @@ strong {
     vertical-align: middle;
 }
 
-.text-link-dark {
+/* .text-link-dark {
     // make links stand out a little more
     font-family: $gg-medium;
     color: $dark;
@@ -70,5 +74,5 @@ strong {
         color: $dark;
         border-bottom-color: $dark;
     }
-}
+} */
 

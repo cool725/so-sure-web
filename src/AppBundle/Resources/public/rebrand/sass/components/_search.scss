@@ -57,7 +57,7 @@
         &-suggestion {
 
             a {
-                font-family: $gg-regular;
+                font-family: $g-regular;
                 display: block;
                 padding: 15px;
                 color: $dark-70;
@@ -80,7 +80,7 @@
 
         // Added to the element that wraps highlighted text
         &-highlight {
-            font-family: $gg-medium;
+            font-family: $g-medium;
             color: $dark;
         }
 
