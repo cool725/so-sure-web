@@ -560,7 +560,10 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                         }
                         $policyService->cancel(
                             $policy,
-                            $cancel->getCancellationReason()
+                            $cancel->getCancellationReason(),
+                            true,
+                            null,
+                            true
                         );
                         $this->addFlash(
                             'success',
