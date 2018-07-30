@@ -64,6 +64,7 @@ use AppBundle\Service\SixpackService;
 class DefaultController extends BaseController
 {
     use PhoneTrait;
+    use \Symfony\Component\Security\Http\Util\TargetPathTrait;
 
     /**
      * @Route("/", name="homepage", options={"sitemap"={"priority":"1.0","changefreq":"daily"}})
@@ -188,6 +189,8 @@ class DefaultController extends BaseController
         $session = $request->getSession();
         if ($session) {
             $session->set('oauth2Flow', 'starling');
+            // out local copy of the target path, to use to go back to the oauth2/v2/auth page
+            $session->set('oauth2Flow.targetPath', $this->getTargetPath($session, 'main'));
         }
 
         $exp = $this->sixpack(

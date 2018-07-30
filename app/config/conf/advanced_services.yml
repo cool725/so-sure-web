@@ -34,3 +34,5 @@ services:
 
     AppBundle\Security\:
         resource: '../../../src/AppBundle/Security/*'
+    AppBundle\Service\Twig\:
+        resource: '../../../src/AppBundle/Service/Twig/*'

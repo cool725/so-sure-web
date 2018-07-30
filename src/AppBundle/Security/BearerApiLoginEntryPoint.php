@@ -61,7 +61,7 @@ class BearerApiLoginEntryPoint implements AuthenticationEntryPointInterface
 
         $parameters = $request->query->all();
 
-        $scope = $parameters['scope'];
+        $scope = $parameters['scope'] ?? null;
         $route = $loginRoutesForOauthScopes[$scope] ?? null;
         if (!$route) {
             return null;

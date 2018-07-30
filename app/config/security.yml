@@ -35,11 +35,11 @@ security:
         oauth_token:
             pattern:    ^/oauth/v2/token
             security:   false
-        oauth2_auth:
-            pattern:    ^/oauth/v2/auth
-            stateless: false    # need to be able to save the TargetPath
-            anonymous: true
-            entry_point: AppBundle\Security\BearerApiLoginEntryPoint
+        #oauth2_auth:
+            #pattern:    ^/oauth/v2/auth
+            #stateless: false    # need to be able to save the TargetPath
+            #anonymous: true
+            #entry_point: AppBundle\Security\BearerApiLoginEntryPoint
 
         api:
             pattern: ^/api
@@ -80,6 +80,7 @@ security:
                 lifetime: 43200 # 12 hours in seconds
                 path:     /
             switch_user: { role: ROLE_CUSTOMER_SERVICES, parameter: _impersonate }
+            entry_point: AppBundle\Security\BearerApiLoginEntryPoint
 
     access_control:
         - { path: ^/login$, role: IS_AUTHENTICATED_ANONYMOUSLY }

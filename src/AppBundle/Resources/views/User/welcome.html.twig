@@ -305,6 +305,12 @@
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
+
+{% if app.session.has('oauth2Flow') and app.session.get('oauth2Flow') == 'starling' %}
+    <p>Would you like to return to your Starling Bank and show your new policy summary on the app?</p>
+    <a href="{{ app.session.get('oauth2Flow.targetPath') }}">Show my policy details on my Starling App</a>
+{% endif %}
+
                         <h3 class="h2 text-blue text-center">You’ve made a great choice</h3>
                     </div>
                     <div class="modal-body">
