@@ -21,8 +21,18 @@
 }
 
 .hamburger {
+    position: relative;
+    z-index: 1040;
 
     &:focus {
         outline: 0;
+    }
+}
+
+.hamburger--spring-r.is-active .hamburger-inner {
+    &,
+    &::before,
+    &::after {
+        background-color: $white;
     }
 }

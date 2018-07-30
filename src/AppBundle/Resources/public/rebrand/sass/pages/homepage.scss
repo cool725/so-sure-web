@@ -28,11 +28,29 @@
     .container {
         position: relative;
         z-index: 2;
+
+        // TODO: Make happen in build
+        @include media-breakpoint-down(xs) {
+            padding-left: 30px;
+            padding-right: 30px;
+        }
     }
 
     &__controls {}
 
     &__illustration {}
+
+    &__credbar {
+        text-align: center;
+
+        img {
+            opacity: 0.4;
+        }
+
+        @include media-breakpoint-up(lg) {
+            text-align: right;
+        }
+    }
 
     @include media-breakpoint-up(lg) {
         padding-top: 10rem;
