@@ -130,6 +130,152 @@ class PhonePolicyTest extends WebTestCase
         $this->assertFalse($policy->canAdjustPicSureStatusForClaim());
     }
 
+    public function testPicSureStatusWithClaims()
+    {
+        $policy = static::createUserPolicy(true);
+        $policy->getUser()->setEmail(static::generateEmail('testPicSureStatusWithClaims', $this));
+        static::$dm->persist($policy->getUser());
+        static::$dm->persist($policy);
+        static::$dm->flush();
+        $this->assertNotNull($policy->getId());
+
+        $claimA = new Claim();
+        $policy->addClaim($claimA);
+
+        $claimA->setStatus(Claim::STATUS_FNOL);
+        $this->assertEquals(
+            PhonePolicy::PICSURE_STATUS_CLAIM_PREVENTED,
+            $policy->getPicSureStatusWithClaims()
+        );
+
+        $claimA->setStatus(Claim::STATUS_SUBMITTED);
+        $this->assertEquals(
+            PhonePolicy::PICSURE_STATUS_CLAIM_PREVENTED,
+            $policy->getPicSureStatusWithClaims()
+        );
+
+        $claimA->setStatus(Claim::STATUS_INREVIEW);
+        $this->assertEquals(
+            PhonePolicy::PICSURE_STATUS_CLAIM_PREVENTED,
+            $policy->getPicSureStatusWithClaims()
+        );
+
+        $claimA->setStatus(Claim::STATUS_DECLINED);
+        $this->assertNull($policy->getPicSureStatusWithClaims());
+
+        $claimA->setStatus(Claim::STATUS_WITHDRAWN);
+        $this->assertNull($policy->getPicSureStatusWithClaims());
+
+        $claimA->setStatus(Claim::STATUS_APPROVED);
+        $this->assertNull($policy->getPicSureStatusWithClaims());
+
+        $claimB = new Claim();
+        $policy->addClaim($claimB);
+
+        $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_INVALID);
+
+        $claimB->setStatus(Claim::STATUS_FNOL);
+        $this->assertEquals(
+            PhonePolicy::PICSURE_STATUS_CLAIM_PREVENTED,
+            $policy->getPicSureStatusWithClaims()
+        );
+
+        $claimB->setStatus(Claim::STATUS_SUBMITTED);
+        $this->assertEquals(
+            PhonePolicy::PICSURE_STATUS_CLAIM_PREVENTED,
+            $policy->getPicSureStatusWithClaims()
+        );
+
+        $claimB->setStatus(Claim::STATUS_INREVIEW);
+        $this->assertEquals(
+            PhonePolicy::PICSURE_STATUS_CLAIM_PREVENTED,
+            $policy->getPicSureStatusWithClaims()
+        );
+
+        $claimB->setStatus(Claim::STATUS_DECLINED);
+        $this->assertEquals(
+            PhonePolicy::PICSURE_STATUS_INVALID,
+            $policy->getPicSureStatusWithClaims()
+        );
+
+        $claimB->setStatus(Claim::STATUS_WITHDRAWN);
+        $this->assertEquals(
+            PhonePolicy::PICSURE_STATUS_INVALID,
+            $policy->getPicSureStatusWithClaims()
+        );
+
+        $claimB->setStatus(Claim::STATUS_APPROVED);
+        $this->assertEquals(
+            PhonePolicy::PICSURE_STATUS_INVALID,
+            $policy->getPicSureStatusWithClaims()
+        );
+
+        $claimStatus = array(
+            Claim::STATUS_FNOL,
+            Claim::STATUS_SUBMITTED,
+            Claim::STATUS_INREVIEW,
+            Claim::STATUS_DECLINED,
+            Claim::STATUS_WITHDRAWN,
+            Claim::STATUS_APPROVED,
+            Claim::STATUS_SETTLED
+        );
+
+        $claimC = new Claim();
+        $policy->addClaim($claimC);
+        $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_MANUAL);
+        foreach ($claimStatus as $status) {
+            $claimC->setStatus($status);
+            $this->assertEquals(
+                PhonePolicy::PICSURE_STATUS_MANUAL,
+                $policy->getPicSureStatusWithClaims()
+            );
+        }
+
+        $claimD = new Claim();
+        $policy->addClaim($claimD);
+        $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_PREAPPROVED);
+        foreach ($claimStatus as $status) {
+            $claimD->setStatus($status);
+            $this->assertEquals(
+                PhonePolicy::PICSURE_STATUS_PREAPPROVED,
+                $policy->getPicSureStatusWithClaims()
+            );
+        }
+
+        $claimE = new Claim();
+        $policy->addClaim($claimE);
+        $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_APPROVED);
+        foreach ($claimStatus as $status) {
+            $claimE->setStatus($status);
+            $this->assertEquals(
+                PhonePolicy::PICSURE_STATUS_APPROVED,
+                $policy->getPicSureStatusWithClaims()
+            );
+        }
+
+        $claimF = new Claim();
+        $policy->addClaim($claimF);
+        $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_REJECTED);
+        foreach ($claimStatus as $status) {
+            $claimF->setStatus($status);
+            $this->assertEquals(
+                PhonePolicy::PICSURE_STATUS_REJECTED,
+                $policy->getPicSureStatusWithClaims()
+            );
+        }
+
+        $claimG = new Claim();
+        $policy->addClaim($claimG);
+        $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_APPROVED);
+        foreach ($claimStatus as $status) {
+            $claimG->setStatus($status);
+            $this->assertEquals(
+                PhonePolicy::PICSURE_STATUS_APPROVED,
+                $policy->getPicSureStatusWithClaims()
+            );
+        }
+    }
+
     public function testEmptyPolicyReturnsCorrectApiData()
     {
         $policy = new SalvaPhonePolicy();
