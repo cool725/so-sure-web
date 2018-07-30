@@ -1,4 +1,4 @@
-<nav class="navbar fixed-top justify-content-between flex-nowrap flex-row pt-lg-5 px-lg-5">
+<nav class="navbar fixed-top justify-content-between flex-nowrap flex-row px-lg-5">
     <a href="/" class="navbar-brand float-left">LOGO</a>
     <ul class="nav navbar-nav flex-row align-items-center">
         <li class="nav-item d-none d-lg-block pr-lg-5">
@@ -16,8 +16,8 @@
         <li class="nav-item d-none d-lg-block pr-lg-5">
             <a href="#" class="nav-link">Contact</a>
         </li>
-        <li class="nav-item d-none d-lg-block pr-lg-5">
-            {% if app.user is not null and app.user %}
+        {% if app.user is not null and app.user %}
+            <li class="nav-item d-none d-lg-block pr-lg-5">
                 {% if is_granted('ROLE_ADMIN') %}
                     <a href="{{ path('admin_home') }}" class="nav-link">Admin <i class="fas fa-users-cog fa-sm"></i></a>
                 {% elseif is_granted('ROLE_EMPLOYEE') %}
@@ -27,10 +27,12 @@
                 {% else %}
                     <a href="{{ path('user_home') }}" class="nav-link">Your account <i class="fas fa-user-circle fa-sm"></i></a>
                 {% endif %}
-            {% else %}
-                <a href="#" class="btn btn-primary">Get a quote</a>
-            {% endif %}
-        </li>
+            </li>
+        {% else %}
+            <li class="nav-item pr-lg-5">
+                <a href="#" class="btn btn-primary">Get a Quote</a>
+            </li>
+        {% endif %}
         <li class="nav-item d-none d-lg-block pr-lg-5">
             {% if app.user is not null and app.user %}
                 {% if is_granted('ROLE_PREVIOUS_ADMIN') %}
