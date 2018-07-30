@@ -76,6 +76,9 @@ class LoadOauth2Data implements FixtureInterface, ContainerAwareInterface
 
     private function newOauth2AccessToken(ObjectManager $manager, Client $client, string $token)
     {
+        if (!$this->container) {
+            throw new \Exception('missing container, somehow');
+        }
         /** @var DocumentManager $dm */
         $dm = $this->container->get('doctrine_mongodb.odm.default_document_manager');
         $repo = $dm->getRepository(User::class);

@@ -3,20 +3,38 @@
 namespace AppBundle\Tests\Controller\BearerApi;
 
 use AppBundle\Oauth2Scopes;
-use function GuzzleHttp\Psr7\build_query;
+use PHPUnit\Framework\AssertionFailedError;
 use Symfony\Bundle\FrameworkBundle\Client;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\BrowserKit\Response;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 /**
  * Test when a user needs to login to get a token issued, they go to the right place
  */
 class OauthLoginTest extends WebTestCase
 {
+    /** @var Client $client */
+    private $client;
+    /** @var ContainerInterface|null $container */
+    private $container;
+
+    public function setUp()
+    {
+        $this->client = static::createClient();
+        if (!$this->client instanceof Client) {
+            throw new AssertionFailedError('did not get a valid web-client');
+        }
+
+        $this->container = $this->client->getContainer();
+        if (!$this->container instanceof ContainerInterface) {
+            throw new AssertionFailedError('did not get a valid ContainerInterface');
+        }
+    }
+
     public function testOauthRedirection()
     {
-        /** @var Client $client */
-        $client = static::createClient();
-
         $params = [
             'client_id' => '123_456',
             'state' => md5(time()),
@@ -24,16 +42,20 @@ class OauthLoginTest extends WebTestCase
             'scope' => "read",
             'redirect_uri' => 'http://dev.so-sure.net:40080/',
         ];
-        $client->request('GET', '/oauth/v2/auth?'. build_query($params));
+        $this->client->request('GET', '/oauth/v2/auth?'. http_build_query($params));
 
-        $this->assertSame('/login', $client->getInternalResponse()->getHeader('location'));
+        $response = $this->client->getInternalResponse();
+        $this->assertNotNull($response);
+        $this->assertInstanceOf(Response::class, $response);
+        if ($response === null || ! $response instanceof Response) {
+            $this->fail('did not get a valid response from oauth/v2/auth');
+            return;
+        }
+        $this->assertSame('/login', $response->getHeader('location'));
     }
 
     public function testStarlingRedirection()
     {
-        /** @var Client $client */
-        $client = static::createClient();
-
         $state = md5(time());
         $params = [
             'client_id' => '5b51ec6b636239778924b671_36v22l3ei3wgw0k4wos48kokk0cwsgo0ocggggoc84w0cw8844',
@@ -42,9 +64,16 @@ class OauthLoginTest extends WebTestCase
             'scope' => Oauth2Scopes::USER_STARLING_SUMMARY,
             'redirect_uri' => 'http://dev.so-sure.net:40080/',
         ];
-        $client->request('GET', '/oauth/v2/auth?'. build_query($params));
+        $this->client->request('GET', '/oauth/v2/auth?'. http_build_query($params));
 
-        $redirectLocation = $client->getInternalResponse()->getHeader('location');
+        $response = $this->client->getInternalResponse();
+        $this->assertNotNull($response);
+        $this->assertInstanceOf(Response::class, $response);
+        if (! $response instanceof Response) {
+            $this->fail('response was null');
+            return;
+        }
+        $redirectLocation = $response->getHeader('location');
         $this->assertContains('/starling-bank', $redirectLocation);
 
         // Check for params in the session, as they will be used later, after purchase
@@ -60,7 +89,17 @@ class OauthLoginTest extends WebTestCase
         $this->assertArrayHasKey('scope', $output);
 
         // the target_path, stored in the session, will be used later to go back to Starling
-        $session = $client->getContainer()->get('session');
+        if (! $this->container) {
+            $this->fail('testing container, over and over again...');
+            return;
+        }
+        $session = $this->container->get('session');
+        $this->assertNotNull($session);
+        $this->assertInstanceOf(SessionInterface::class, $session);
+        if ($session == null || ! $session instanceof SessionInterface) {
+            $this->fail('Do not have a valid session');
+            return;
+        }
         $this->assertTrue(
             $session->has('_security.oauth2_auth.target_path'),
             'expected the Oauth2-Params to be carried over to the login/[Allow] page, via the session'
