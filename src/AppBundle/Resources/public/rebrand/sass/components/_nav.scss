@@ -3,6 +3,7 @@
 .navbar {
     background-color: transparent;
     transition: 500ms ease;
+    padding-top: 1.2rem;
 
     @include media-breakpoint-up(lg) {
         padding-top: 2rem;
@@ -10,12 +11,13 @@
 }
 
 .navbar-scrolled {
+    padding-top: 0.5rem;
 
     @include media-breakpoint-up(lg) {
         padding-top: 0.5rem;
     }
-    // background-color: $blue-1;
-    // box-shadow: 0 2px 0 0 rgba(0, 0, 0, 0.04);
+    background-color: $white;
+    box-shadow: 0 2px 0 0 rgba(0, 0, 0, 0.04);
 }
 
 .hamburger {

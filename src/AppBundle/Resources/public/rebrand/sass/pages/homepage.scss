@@ -7,15 +7,35 @@
 @import "../abstracts/palette";
 @import "../abstracts/variables";
 
-.homepage {
+.hero {
+    height: auto;
+    position: relative;
 
-    &__hero {
-        position: relative;
+    padding-top: 8rem;
 
-        svg {
-            position: absolute;
-            top: 0; left: 0;
+    // Background
+    // TODO: See if we can use background image instead
+    svg {
+        position: absolute;
+        top: 0; left: 0;
+        z-index: 1;
+
+        @include media-breakpoint-up(lg) {
+            width: 100%;
         }
+    }
+
+    .container {
+        position: relative;
+        z-index: 2;
+    }
+
+    &__controls {}
+
+    &__illustration {}
+
+    @include media-breakpoint-up(lg) {
+        padding-top: 10rem;
     }
 }
 // body {

@@ -15,3 +15,16 @@
         // font-size: 1rem;
     }
 }
+
+@include media-breakpoint-down(xs) {
+
+    .btn-block-xs {
+        display: block;
+        width: 100%;
+    }
+
+    .btn-block-xs + .btn-block-xs  {
+        margin-top: 1rem;
+    }
+}
+
