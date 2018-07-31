@@ -1680,11 +1680,21 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $imei = $form->getData()['imei'];
+            $imei = trim($form->getData()['imei']);
             $history = $logRepo->findBy([
                 'data.imei' => $imei
             ]);
             $charges = $chargeRepo->findBy(['details' => $imei]);
+
+            if (!$this->isImei($imei)) {
+                $otherImei = 'unknown - invalid length';
+                if (mb_strlen($imei) >= 14) {
+                    $otherImei = $this->luhnGenerate(mb_substr($imei, 0, 14));
+                }
+                $this->addFlash('error', sprintf(
+                    sprintf('Invalid IMEI. Did you mean %s?', $otherImei)
+                ));
+            }
         }
 
         return [
