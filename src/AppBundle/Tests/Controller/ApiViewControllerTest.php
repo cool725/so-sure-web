@@ -117,10 +117,16 @@ class ApiViewControllerTest extends BaseApiControllerTest
             self::$dm->flush();
             $data = $this->checkPolicy($policy, true);
 
+            // TODO: Probably won't carry davies through to future version, but see how that pans out
+            $claimDefaultDirectGroup = false;
+            if (in_array($version, [PolicyTerms::VERSION_9])) {
+                $claimDefaultDirectGroup = false;
+            }
+
             $templating = self::$container->get('templating');
             $pdf = $templating->render(
                 sprintf('AppBundle:Pdf:policyTermsV%d.html.twig', PolicyTerms::getVersionNumberByVersion($version)),
-                ['policy' => $policy, 'claims_default_direct_group' => true]
+                ['policy' => $policy, 'claims_default_direct_group' => $claimDefaultDirectGroup]
             );
 
             $this->verifyTerms($data, $pdf);
