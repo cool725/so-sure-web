@@ -215,25 +215,7 @@ class PhoneInsuranceController extends BaseController
     public function quoteAction(Request $request, $id = null, $make = null, $model = null, $memory = null)
     {
         if (in_array($request->get('_route'), ['insure_make_model_memory', 'insure_make_model'])) {
-            $exp = $this->sixpack(
-                $request,
-                SixpackService::EXPERIMENT_CPC_QUOTE_HOMEPAGE,
-                ['homepage', 'quote']
-            );
-            if ($exp == 'homepage') {
-                return new RedirectResponse($this->generateUrl('homepage'));
-            } elseif ($memory) {
-                return new RedirectResponse($this->generateUrl('quote_make_model_memory', [
-                    'make' => $make,
-                    'model' => $model,
-                    'memory' => $memory,
-                ]));
-            } else {
-                return new RedirectResponse($this->generateUrl('quote_make_model', [
-                    'make' => $make,
-                    'model' => $model,
-                ]));
-            }
+            return new RedirectResponse($this->generateUrl('homepage'));
         }
 
         if (in_array($request->get('_route'), ['test_insurance_make_model_memory'])) {
@@ -486,9 +468,9 @@ class PhoneInsuranceController extends BaseController
                 ]);
             }
 
-            $this->get('app.sixpack')->convert(
-                SixpackService::EXPERIMENT_HOMEPAGE_AA_V2
-            );
+            // $this->get('app.sixpack')->convert(
+            //     SixpackService::EXPERIMENT_HOMEPAGE_AA_V2
+            // );
         }
 
         $replacement = $this->sixpack(
