@@ -120,7 +120,7 @@ class ApiViewControllerTest extends BaseApiControllerTest
             $templating = self::$container->get('templating');
             $pdf = $templating->render(
                 sprintf('AppBundle:Pdf:policyTermsV%d.html.twig', PolicyTerms::getVersionNumberByVersion($version)),
-                ['policy' => $policy]
+                ['policy' => $policy, 'claims_default_direct_group' => true]
             );
 
             $this->verifyTerms($data, $pdf);
