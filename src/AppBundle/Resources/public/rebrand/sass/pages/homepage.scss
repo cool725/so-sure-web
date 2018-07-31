@@ -12,14 +12,6 @@
     padding-top: 8rem;
     // padding-bottom: 4rem;
 
-    h1 {
-        color: $blue-2;
-
-        span {
-            color: $blue-4;
-        }
-    }
-
     // Background
     // TODO: See if we can use background image instead
     svg {
@@ -84,4 +76,29 @@
     position: relative;
     z-index: 2;
     background-color: $bb-2;
+
+    @include media-breakpoint-up(lg) {
+        background: $bb-2 url('#{$cdn_url}/images/rebrand/homepage/ss-intro-illustration-group.svg') no-repeat -210px 140px;
+        background-size: 600px;
+    }
+
+    @include media-breakpoint-up(xl) {
+        background-position: -100px 140px;
+    }
+
+    @include media-breakpoint-up(fk) {
+        background-position: 450px 140px;
+    }
+}
+
+.cover {
+
+    &__illustration-mb {
+        height: 240px;
+        overflow: hidden;
+    }
+
+    &__mobile {
+        background-color: $bb-2;
+    }
 }

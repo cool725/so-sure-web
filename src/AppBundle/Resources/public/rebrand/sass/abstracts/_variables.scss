@@ -1,6 +1,16 @@
 // variables.scss
 // Note: copy and overide boostrap variables here!
 
+// Breakpoints extend for 4k
+$grid-breakpoints: (
+  xs: 0,
+  sm: 576px,
+  md: 768px,
+  lg: 992px,
+  xl: 1200px,
+  fk: 1600px
+);
+
 $font-size-base:                 0.9rem;
 
 // Headings
