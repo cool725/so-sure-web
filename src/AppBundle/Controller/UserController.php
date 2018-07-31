@@ -1197,9 +1197,10 @@ class UserController extends BaseController
                 $this->getParameter('fos_user.firewall_name'),
                 $user
             );
-            #// logInUser to other firewall
-            $this->get('logger')->notice('Logging into oauth2_auth firewall', ['target_path'=> $session->get('_security.oauth2_auth.target_path')]);
-            #$this->get('fos_user.security.login_manager')->logInUser('oauth2_auth', $user);
+            $this->get('logger')->notice(
+                'Logging into oauth2_auth firewall',
+                ['target_path'=> $session->get('_security.oauth2_auth.target_path')]
+            );
         }
         $this->get('logger')->notice('passed oauth2_auth firewall handling');
 
