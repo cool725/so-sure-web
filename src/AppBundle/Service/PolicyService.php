@@ -3,6 +3,7 @@ namespace AppBundle\Service;
 
 use AppBundle\Classes\SoSure;
 use AppBundle\Document\Address;
+use AppBundle\Document\Feature;
 use AppBundle\Repository\CashbackRepository;
 use AppBundle\Repository\OptOut\EmailOptOutRepository;
 use AppBundle\Repository\PhonePolicyRepository;
@@ -138,6 +139,9 @@ class PolicyService
     /** @var SixpackService */
     protected $sixpackService;
 
+    /** @var FeatureService */
+    protected $featureService;
+
     protected $warnMakeModelMismatch = true;
 
     public function setMailer($mailer)
@@ -195,6 +199,7 @@ class PolicyService
      * @param SmsService               $sms
      * @param SCodeService             $scodeService
      * @param SixpackService           $sixpackService
+     * @param FeatureService           $featureService
      */
     public function __construct(
         DocumentManager $dm,
@@ -218,7 +223,8 @@ class PolicyService
         IntercomService $intercom,
         SmsService $sms,
         SCodeService $scodeService,
-        SixpackService $sixpackService
+        SixpackService $sixpackService,
+        FeatureService $featureService
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
@@ -242,6 +248,7 @@ class PolicyService
         $this->sms = $sms;
         $this->scodeService = $scodeService;
         $this->sixpackService = $sixpackService;
+        $this->featureService = $featureService;
     }
 
     public function validateUser(User $user)
@@ -671,7 +678,12 @@ class PolicyService
         $this->snappyPdf->setOption('margin-top', '0');
         $this->snappyPdf->setOption('margin-bottom', '5');
         $this->snappyPdf->generateFromHtml(
-            $this->templating->render($template, ['policy' => $policy]),
+            $this->templating->render($template, [
+                'policy' => $policy,
+                'claims_default_direct_group' => $this->featureService->isEnabled(
+                    Feature::FEATURE_CLAIMS_DEFAULT_DIRECT_GROUP
+                ),
+            ]),
             $tmpFile
         );
 

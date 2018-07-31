@@ -460,6 +460,7 @@ services:
             - "@app.sms"
             - "@app.scode"
             - "@app.sixpack"
+            - "@app.feature"
 
     app.quote:
         class: AppBundle\Service\QuoteService

@@ -741,7 +741,7 @@
   </div>
   <div style="{{ column_one_margins }}">
     <p>
-        To start your claim, you can register your claim online or call our claim handling team during business hours on 0113 320 9722 to take down all the details. Our claim validation team will then start processing the claim. The claim validation team works UK business hours.
+        To start your claim, you can register your claim online or call our claim handling team during business hours on 0113 320 9722 to take down all the details. Our claim validation team will then start processing the claim.
     </p>
     <h4>
         <u>Section A: Steps when your mobile phone has been stolen or lost </u>
@@ -980,9 +980,14 @@
     <p>
         We will always try to be fair and reasonable. If you believe we have not provided you with a satisfactory level of service, please tell us so that we can do our best to resolve the problem. The easiest way to contact us is to call us on 0113 320 9722. We will do everything possible to ensure that your query is dealt with promptly. Alternatively, you can email complaints@wearesosure.com or write to: Quality Assurance Manager, so-sure Limited, 10 Finbsury Square, London EC2A 1AF. Please quote your mobile phone number in any correspondence.
     </p>
-    <p>
-        so-sure Limited handle all queries and complaints.
-    </p>
+      <p>
+          {% if claims_default_direct_group %}
+              Direct Group Property Services Limited
+          {% else %}
+              Davies Group Limited
+          {% endif %}
+          handle all queries and complaints.
+      </p>
     <p>
         If you are not happy with our decision you can, within 6 months of our final decision, refer your complaint for an independent assessment to: The Financial Ombudsman Service, Exchange Tower, Harbour Exchange, LONDON, E14 9SR. Telephone: 0800 023 4567 / 0300 123 9123, Email: complaint.info@financial-ombudsman.org.uk Web: financial-ombudsman.org.uk Nothing in these terms, including referral to the Financial Ombudsman Service, affects your statutory rights.
     </p>
