@@ -37,7 +37,7 @@ class PolicyTerms extends PolicyDocument
     const VERSION_8 = 'Version 8 July 2018';
 
     // New claims address
-    const VERSION_9 = 'Version 9 August 2018';
+    const VERSION_9 = 'Version 9 July 2018';
 
     public static $allVersions = [
         self::VERSION_0,
