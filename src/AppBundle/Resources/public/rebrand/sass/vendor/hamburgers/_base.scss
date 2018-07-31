@@ -1,7 +1,7 @@
 // Hamburger
 // ==================================================
 .hamburger {
-  padding: $hamburger-padding-y $hamburger-padding-x 11px;
+  padding: $hamburger-padding-y 0 $hamburger-padding-y $hamburger-padding-x;
   display: inline-block;
   cursor: pointer;
 
@@ -30,7 +30,7 @@
 
 .hamburger-box {
   width: $hamburger-layer-width;
-  height: $hamburger-layer-height * 3 + $hamburger-layer-spacing * 2;
+  height: 25px;
   display: inline-block;
   position: relative;
 }

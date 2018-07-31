@@ -3,16 +3,44 @@
 .navbar {
     background-color: transparent;
     transition: 500ms ease;
+    padding-top: 1.2rem;
+
+    @include media-breakpoint-up(lg) {
+        padding-top: 2rem;
+    }
+
+    .navbar-nav {
+
+        .nav-link {
+            font-family: $g-medium;
+            color: $dark;
+        }
+    }
 }
 
 .navbar-scrolled {
-    background-color: $blue-1;
+    padding-top: 0.5rem;
+
+    @include media-breakpoint-up(lg) {
+        padding-top: 0.5rem;
+    }
+    background-color: $white;
     box-shadow: 0 2px 0 0 rgba(0, 0, 0, 0.04);
 }
 
 .hamburger {
+    position: relative;
+    z-index: 1040;
 
     &:focus {
         outline: 0;
+    }
+}
+
+.hamburger--spring-r.is-active .hamburger-inner {
+    &,
+    &::before,
+    &::after {
+        background-color: $white;
     }
 }

@@ -14,309 +14,75 @@
 
 {% block body %}
 
-    {# Hero #}
-    <section class="section__hero">
+    <section class="hero">
         <div class="container">
             <div class="row">
-                <div class="col-sm-12 col-md-10 offset-md-1">
-                    <div class="row">
-                        <div class="col-md-8 col-lg-8 col-xl-7">
-                            <h1 class="text-white mb-3">Mobile insurance <br> designed for you.</h1>
-                            <p class="lead text-white">A new type of phone insurance that's <br class="d-none d-sm-inline">reliable, rewarding and simply better.</p>
-                            <a href="#" class="sosure-track">Test track</a>
-
-                            {# Phone Search #}
-                            {% if phone is defined and phone %}
-                                {{ render(controller('AppBundle:Search:phoneSearchDropdown', { 'type': 'homepage-jc', 'id': phone.id }|merge(app.request.query.all))) }}
-                            {% else %}
-                                {{ render(controller('AppBundle:Search:phoneSearchDropdown', { 'type': 'homepage-jc' }|merge(app.request.query.all))) }}
-                            {% endif %}
-                            {# End Phone Search #}
-                        </div>
-                        <div class="col-md-4 col-lg-4 col-xs-5">
-                            <div class="section__hero_image mx-auto">
-                                <img src="{{ cdn_url }}/images/rebrand/ss-samsung-S8-cracked-screen-hero.png" alt="" class="img-fluid">
-                            </div>
-                        </div>
+                <div class="col-lg-5">
+                    <div class="hero__intro">
+                        <h1 class="pb-3">Mobile insurance <br><span class="sub">designed for you</span></h1>
+                        <p class="pb-3">A new type of phone insurance that’s reliable, rewarding and simply better. lorem ipsum dolor amet, so-sure low excess adipiscing et praesent et replacement next day.</p>
+                    </div>
+                    <div class="hero__controls pb-3">
+                        <a href="#" class="btn btn-primary btn-block-xs mr-lg-2">Get a Quote</a>
+                        <a href="#" class="btn btn-outline-primary btn-block-xs"><i class="far fa-play-circle"></i> Watch our Video</a>
+                    </div>
+                </div>
+                <div class="col-lg-7 d-none d-lg-block">
+                    <div class="hero__illustration pt-lg-0">
+                        <img src="{{ cdn_url }}/images/rebrand/homepage/ss-hero-illustration-group.svg" alt="so-sure - social insurance" class="img-fluid">
                     </div>
                 </div>
             </div>
-        </div>
-        {# Curved Bottom #}
-        <svg class="d-block section__hero_curve"
-             preserveAspectRatio="xMinYMin meet"
-             viewBox="0 0 1368 198"
-             version="1.1"
-             xmlns="http://www.w3.org/2000/svg"
-             xmlns:xlink="http://www.w3.org/1999/xlink">
-            <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-                <g id="Artboard-1" fill="#ffff">
-                    <path d="M0,60 C228,133.333333 456,170 684,170 C912,170 1140,113.333333 1368,0 L1368,198 L0,198 L0,60 Z" id="Rectangle"></path>
-                </g>
-            </g>
-        </svg>
-    </section>
-
-    {# Who we are #}
-    <section class="section__about py-5">
-        <div class="container">
-            <div class="row justify-content-md-center">
-                <div class="col-lg-8">
-                    <h2 class="text-primary mt-lg-5">Who we are</h2>
-                    <h5>We’re a new kind of insurer – an insurer that’s focused on people, not profits. We saw an opportunity to make insurance better. So that’s what we did. We provide mobile insurance that’s simple, reasonable and hassle-free, so you can get back to worrying about the big stuff.</h5>
-                </div>
+            <div class="hero__illustration d-block d-lg-none py-4">
+                <img src="{{ cdn_url }}/images/rebrand/ss-hero-illustration-group.svg" alt="so-sure - social insurance" class="img-fluid">
+            </div>
+            <div class="hero__credbar pt-4">
+                <ul class="list-inline">
+                    <li class="list-inline-item">
+                        <img src="{{ cdn_url }}/images/rebrand/credbar/ss-credbar-trustpilot.png" alt="Trustpilot" width="100px">
+                    </li>
+                    <li class="list-inline-item">
+                        <img src="{{ cdn_url }}/images/rebrand/credbar/ss-credbar-money.png" alt="Money" width="100px">
+                    </li>
+                    <li class="list-inline-item">
+                        <img src="{{ cdn_url }}/images/rebrand/credbar/ss-credbar-gocompare.png" alt="GoCompare" width="100px">
+                    </li>
+                    <li class="list-inline-item">
+                        <img src="{{ cdn_url }}/images/rebrand/credbar/ss-credbar-theguardian.png" alt="The Guardian" width="100px">
+                    </li>
+                    <li class="list-inline-item">
+                        <img src="{{ cdn_url }}/images/rebrand/credbar/ss-credbar-ft.png" alt="The Financial Times" width="100px">
+                    </li>
+                </ul>
             </div>
         </div>
     </section>
 
-    {# Credibility Bar #}
-    <section class="section__credbar">
-        <div class="container">
-            <div class="d-flex justify-content-between">
-                <img src="{{ cdn_url }}/images/rebrand/ss-defaqto.svg" alt="Defaqto" title="Defaqto" class="section__credbar-defaqto">
-                <img src="{{ cdn_url }}/images/rebrand/ss-trustpilot.svg" alt="TrustPilot" title="TrustPilot" class="section__credbar-trustpilot">
-                <img src="{{ cdn_url }}/images/rebrand/ss-money.svg" alt="Money.co.uk" title="Money.co.uk" class="section__credbar-money d-none d-md-inline">
-                <img src="{{ cdn_url }}/images/rebrand/ss-go-compare.svg" alt="Go Compare" title="Go Compare" class="section__credbar-gocompare d-none d-md-inline">
-                <img src="{{ cdn_url }}/images/rebrand/ss-theguardian.svg" alt="The Guardian" title="The Guardian" class="section__credbar-theguardian d-none d-lg-inline">
-                <img src="{{ cdn_url }}/images/rebrand/ss-financial-times.svg" alt="Financial Times" title="Financial Times" class="section__credbar-financialtimes d-none d-lg-inline">
-            </div>
-        </div>
-    </section>
-
-    {# We do things differently & We’ve got you’re covered... #}
-    <section class="section__cover py-5">
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-sm-8 offset-sm-2 col-md-8 offset-md-2 col-lg-5 offset-lg-1 mb-5 mb-lg-0">
-                    <h2 class="text-center text-lg-left text-white my-4">We do things differently</h2>
-                    <ul class="list-unstyled">
-                        <li class="media pb-3">
-                            <img class="mr-4" src="{{ cdn_url }}/images/rebrand/ss-handshake.svg" width="60px" alt="so-sure handshake">
-                            <div class="media-body text-white">
-                                So-sure aren’t like the old insurance giants who are preoccupied with profits not people – what we say is what you get.
-                            </div>
-                        </li>
-                        <li class="media py-3">
-                            <img class="mr-4" src="{{ cdn_url }}/images/rebrand/ss-birthday-cake.svg" width="60px" alt="so-sure birthday cake">
-                            <div class="media-body text-white pt-2">
-                                We insure your long-time-loved devices of up to three years.
-                            </div>
-                        </li>
-                        <li class="media py-3">
-                            <img class="mr-4" src="{{ cdn_url }}/images/rebrand/ss-phone-hands.svg" width="60px" alt="so-sure phone hands">
-                            <div class="media-body text-white">
-                                We reward you when you’re careful and look after you when bad stuff happens. If you don’t make a claim, we could return 80% of your premium each year.
-                            </div>
-                        </li>
-                        <li class="media pt-3">
-                            <img class="mr-4" src="{{ cdn_url }}/images/rebrand/ss-replacement-time.svg" width="60px" alt="so-sure 24-72 hours">
-                            <div class="media-body text-white">
-                                If you make a claim, we’ll get you back up and running with a replacement between 24–72 hours.
-                            </div>
-                        </li>
-                    </ul>
-                </div>
-                <div class="col-sm-8 offset-sm-2 col-md-8 offset-md-2 col-lg-5 offset-lg-1">
-                    <h2 class="text-center text-lg-left text-white my-4">We’ve got you’re covered...</h2>
-                    <ul class="list-unstyled list-fa text-white">
-                        <li class="h5 mb-3 popup">
-                            <i class="fas fa-check-circle"></i>
-                            <a href="#"
-                               title="Loss"
-                               class="text-white d-block"
-                               data-toggle="modal"
-                               data-target="#modalHome"
-                               data-body="Content...">Loss</a>
-                        </li>
-                        <li class="h5 my-3">
-                            <i class="fas fa-check-circle"></i>
-                            <a href="#"
-                               title="Theft"
-                               class="text-white d-block"
-                               data-toggle="modal"
-                               data-target="#modalHome"
-                               data-body="Content...">Theft</a>
-                        </li>
-                        <li class="h5 my-3">
-                            <i class="fas fa-check-circle"></i>
-                            <a href="#"
-                               title="Accidental damamge"
-                               class="text-white d-block"
-                               data-toggle="modal"
-                               data-target="#modalHome"
-                               data-body="Content...">Accidental damamge</a>
-                        </li>
-                        <li class="h5 my-3">
-                            <i class="fas fa-check-circle"></i>
-                            <a href="#"
-                               title="Out-of-warranty breakdowns"
-                               class="text-white d-block"
-                               data-toggle="modal"
-                               data-target="#modalHome"
-                               data-body="Content...">Out-of-warranty breakdowns</a>
-                        </li>
-                        <li class="h5 my-3">
-                            <i class="fas fa-check-circle"></i>
-                            <a href="#"
-                               title="International travel"
-                               class="text-white d-block"
-                               data-toggle="modal"
-                               data-target="#modalHome"
-                               data-body="Content...">International travel</a>
-                        </li>
-                        <li class="h5 mt-3">
-                            <i class="fas fa-check-circle"></i>
-                            <a href="#"
-                               title="Phones up to three years old"
-                               class="text-white d-block"
-                               data-toggle="modal"
-                               data-target="#modalHome"
-                               data-body="Content...">Phones up to three years old</a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    {# We're here if you need us #}
-    <section class="section__service py-5">
+    <section class="intro bg-bb1 py-5">
         <div class="container">
             <div class="row">
-                <div class="col-sm-8 offset-sm-2 col-md-10 offset-md-1 col-lg-6 offset-lg-0">
-                    <h2 class="text-center text-lg-left text-primary mt-lg-5 mb-3">We're here if you need us</h2>
-                    <h5>We give you a phone back in your hands within <span class="text-nowrap">24-72hrs</span>.</h5>
-                    <p>How? We have a proprietary technology, called pic-sure, which allows us to verify the functioning of your phone when you insure it.</p>
-                    <p>That means that your claim process is much quicker, your excess gets slashed in half, and you will tbe treated on the phone with compassion, not interrogation.</p>
+                <div class="col-lg-6">
+                    <h2 class="h4 pb-4 text-blue2">We're a new kind of insurer</h2>
                 </div>
-                <div class="col-sm-8 offset-sm-2 col-md-10 offset-md-1 col-lg-6 offset-lg-0">
-                    <div class="phone-carousel">
-                        <div class="phone-carousel__mask"></div>
-                        <div class="phone-carousel__controls phone-carousel__prev">
-                            <a href="#phoneCarousel" role="button" data-slide="prev">
-                                <i class="fas fa-caret-left fa-3x"></i>
-                                <span class="sr-only">Previous</span>
-                            </a>
-                        </div>
-                        <div class="phone-carousel__controls phone-carousel__next">
-                            <a href="#phoneCarousel" role="button" data-slide="next">
-                                <i class="fas fa-caret-right fa-3x"></i>
-                                <span class="sr-only">Next</span>
-                            </a>
-                        </div>
-                        <div id="phoneCarousel"
-                             class="carousel slide"
-                             data-ride="carousel"
-                             data-interval="false">
-                            <div class="carousel-inner">
-                                <div class="carousel-item phone-carousel__item active">
-                                    <div class="phone-carousel__item__top">
-                                        Top
-                                    </div>
-                                    <div class="phone-carousel__item__bottom">
-                                        Bottom
-                                    </div>
-                                </div>
-                                <div class="carousel-item phone-carousel__item">
-                                    <div class="phone-carousel__item__top">
-                                        Top
-                                    </div>
-                                    <div class="phone-carousel__item__bottom">
-                                        Bottom
-                                    </div>
-                                </div>
-                                <div class="carousel-item phone-carousel__item">
-                                    <div class="phone-carousel__item__top">
-                                        Top
-                                    </div>
-                                    <div class="phone-carousel__item__bottom">
-                                        Bottom
-                                    </div>
-                                </div>
-                            </div>
-{#                             <div class="phone-carousel__indicators">
-                                <strong class="text-primary">HOW IT WORKS</strong>
-                                <ol class="carousel-indicators mt-3">
-                                    <li data-target="#phoneCarousel" data-slide-to="0" class="active"></li>
-                                    <li data-target="#phoneCarousel" data-slide-to="1"></li>
-                                    <li data-target="#phoneCarousel" data-slide-to="2"></li>
-                                </ol>
-                            </div> #}
-                        </div>
-                    </div>
-                    <div class="d-lg-none">
-                        <h3 class="text-center mt-5">Download the app:</h3>
-                    </div>
-                </div>
-            </div>
-        </div>
-        {# Curved Bottom #}
-        <svg class="d-block section__were_here_if_you_need_us_curve"
-             preserveAspectRatio="xMinYMin meet"
-             viewBox="0 0 1368 198"
-             version="1.1"
-             xmlns="http://www.w3.org/2000/svg"
-             xmlns:xlink="http://www.w3.org/1999/xlink">
-            <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-                <g id="Artboard-1" fill="#ffff">
-                    <path d="M0,60 C228,133.333333 456,170 684,170 C912,170 1140,113.333333 1368,0 L1368,198 L0,198 L0,60 Z" id="Rectangle"></path>
-                </g>
-            </g>
-        </svg>
-    </section>
-
-
-    <section class="section__claims py-5">
-        <div class="container-fluid">
-            <h2 class="text-primary">Our hassle-free claims process...</h2>
-            <h5 class="mb-5">When something bad happens to your phone:</h5>
-            <div class="row bordered-columns">
-                <div class="col-md-4">
-                    <div class="my-4">
-                        <img src="{{ cdn_url }}/images/rebrand/ss-claim-1.svg" width="100px" alt="1">
-                    </div>
-                    <h3 class="text-primary">Contact Claims Team</h3>
-                    <p class="px-2">Let us know what happened. You can do this by <a href="#" class="text-nowrap text-link-dark">filling in this form</a>, or <strong>calling our claims team on 0344 856 0852</strong> (local rates apply)</p>
-                </div>
-                <div class="col-md-4">
-                    <div class="my-4">
-                        <img src="{{ cdn_url }}/images/rebrand/ss-claim-2.svg" width="100px" alt="1">
-                    </div>
-                    <h3 class="text-primary">Review Claim</h3>
-                    <p class="px-2">Our UK based claims team will review your claim and reach out with a request for any further details or documents (if necessary). <strong>We aim to do this within a matter of hours during UK business hours</strong>.</p>
-                </div>
-                <div class="col-md-4">
-                    <div class="my-4">
-                        <img src="{{ cdn_url }}/images/rebrand/ss-claim-3.svg" width="100px" alt="1">
-                    </div>
-                    <h3 class="text-primary">Approve Claim</h3>
-                    <p class="px-2">Once your claim is approved, we take your excess payment over the phone and aim to <strong>get a replacement phone in the next working day</strong>. If you prefer to have your phone repaired, it may take more time.</p>
+                <div class="col-lg-6">
+                    <dl class="tick-list">
+                        <dt class="h5 text-blue4">We’re here for people not profits</dt>
+                        <dd>
+                            <p>We’re an insurer that’s focused on people, not profits. We saw an opportunity to make insurance better.</p>
+                        </dd>
+                        <dt class="h5 text-blue4">We’re uncomplicated and up to 40% cheaper</dt>
+                        <dd>
+                            <p>We provide mobile insurance that’s simple, reasonable and hassle-free lorem ipsum dolor amet et so-sure.</p>
+                        </dd>
+                        <dt class="h5 text-blue4">We’re here for people not profits</dt>
+                        <dd>
+                            <p>We’re an insurer that’s focused on people, not profits. We saw an opportunity to make insurance better. </p>
+                        </dd>
+                    </dl>
                 </div>
             </div>
         </div>
     </section>
-
-    {# Page Modals #}
-    <div class="modal fade"
-         id="modalHome"
-         tabindex="-1"
-         role="dialog"
-         aria-labelledby="modalHome"
-         aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title text-primary"></h5>
-                </div>
-                <div class="modal-body"></div>
-                <div class="modal-footer justify-content-between">
-                    <a href="#" class="btn btn-blue2">more info</a>
-                    <a href="#" class="text-blue2" data-dismiss="modal"><i class="fas fa-times-circle fa-lg"></i></a>
-                </div>
-            </div>
-        </div>
-    </div>
-
 
 {% endblock %}
 

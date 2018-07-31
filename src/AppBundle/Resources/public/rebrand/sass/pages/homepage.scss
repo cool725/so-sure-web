@@ -7,117 +7,81 @@
 @import "../abstracts/palette";
 @import "../abstracts/variables";
 
-
-body {
+.hero {
     position: relative;
-}
+    padding-top: 8rem;
+    // padding-bottom: 4rem;
 
-.section {
+    h1 {
+        color: $blue-2;
 
-    &__hero {
-        height: 630px;
-        padding-top: 100px;
-        position: relative;
-        overflow: hidden;
-
-        @include linear-gradient(90deg, $blue-d, $blue-1);
-
-        @include media-breakpoint-up(md) {
-            height: 500px;
-            overflow: visible;
-        }
-
-        @include media-breakpoint-up(lg) {
-            height: 600px;
-            padding-top: 150px;
-        }
-
-        @include media-breakpoint-up(lg) {
-
-            h1 {
-                font-size: 3.3rem;
-            }
-        }
-
-        &_image {
-            width: 280px;
-            position: relative;
-            text-align: center;
-            overflow: hidden;
-
-            @include media-breakpoint-up(md) {
-                width: 200px;
-                overflow: visible;
-            }
-
-            @include media-breakpoint-up(lg) {
-                width: 360px;
-            }
-
-            img {
-                transform: rotate(5deg);
-
-                @include media-breakpoint-up(md) {
-                    margin-top: -40px;
-                    position: relative;
-                    z-index: 11;
-                }
-
-                @include media-breakpoint-up(lg) {
-                    margin-top: -80px;
-                }
-            }
-
-        }
-
-        &_curve {
-            position: absolute;
-            bottom: 0; left: 0;
-            z-index: 10;
+        span {
+            color: $blue-4;
         }
     }
 
-    &__about {
-        text-align: center;
+    // Background
+    // TODO: See if we can use background image instead
+    svg {
+        position: absolute;
+        top: 0; left: 0;
+        z-index: 1;
+
+        @include media-breakpoint-up(lg) {
+            width: 100%;
+        }
+    }
+
+    .container {
+        position: relative;
+        z-index: 2;
+
+        // TODO: Make happen in build
+        @include media-breakpoint-down(xs) {
+            // padding-left: 30px;
+            // padding-right: 30px;
+        }
+    }
+
+    &__intro {
+        @include media-breakpoint-up(lg) {
+            padding-top: 6rem;
+        }
+    }
+
+    &__controls {}
+
+    &__illustration {
+        // margin-left: -30px;
+        // margin-right: -30px;
+
+        @include media-breakpoint-up(lg) {
+            // margin: 0;
+        }
     }
 
     &__credbar {
-        background-color: $off-white;
+        text-align: center;
+        // margin-left: -15px;
+        // margin-right: -15px;
 
         img {
-            width: 150px;
+            opacity: 0.4;
+        }
+
+        @include media-breakpoint-up(lg) {
+            text-align: right;
         }
     }
 
-    &__cover {
-        @include linear-gradient(90deg, $blue-d, $blue-1);
+    @include media-breakpoint-up(lg) {
+        // padding-bottom: 8rem;
     }
 
-    &__service {
-        background-color: $off-white;
-        position: relative;
+}
 
-        .phone-carousel {
-            margin-left: auto;
-            margin-right: auto;
-            margin-top: 45px;
-            margin-bottom: 45px;
-
-            @include media-breakpoint-up(lg) {
-                margin-top: 0;
-                margin-bottom: 0;
-            }
-        }
-
-
-        &_curve {
-            position: absolute;
-            bottom: 0; left: 0;
-            z-index: 10;
-        }
-    }
-
-    &__claims {
-        text-align: center;
-    }
+.intro {
+    position: relative;
+    z-index: 2;
+    background-color: $bb-2;
 }
