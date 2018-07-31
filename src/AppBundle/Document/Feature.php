@@ -21,6 +21,7 @@ class Feature
     const FEATURE_BACS = 'bacs';
     const FEATURE_APP_IOS_IMEI_VALIDATION_COLOUR = 'app-ios-imei-validation-colour';
     const FEATURE_APP_PICSURE_ACCELEROMETER = 'app-picsure-accelerometer';
+    const FEATURE_CLAIMS_DEFAULT_DIRECT_GROUP = 'claims-default-direct-group';
 
     public static $features = [
         self::FEATURE_QUOTE_LEAD,
@@ -33,6 +34,7 @@ class Feature
         self::FEATURE_BACS,
         self::FEATURE_APP_IOS_IMEI_VALIDATION_COLOUR,
         self::FEATURE_APP_PICSURE_ACCELEROMETER,
+        self::FEATURE_CLAIMS_DEFAULT_DIRECT_GROUP,
     ];
 
     /**
