@@ -105,5 +105,9 @@
 
 .why {
     background-color: $bb-2;
-    // @include border-radius($radius: $border-radius);
+
+    @include media-breakpoint-up(lg) {
+        background: $bb-2 url('#{$cdn_url}/images/rebrand/homepage/ss-why-illustration.svg') no-repeat -220px 440px;
+        background-size: 480px;
+    }
 }
