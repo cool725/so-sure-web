@@ -504,7 +504,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
 
     public function getHandlingTeam()
     {
-        $this->handlingTeam;
+        return $this->handlingTeam;
     }
 
     public function setHandlingTeam($handlingTeam)
