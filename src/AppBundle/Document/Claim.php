@@ -352,6 +352,7 @@ class Claim
      * @AppAssert\Token()
      * @Assert\Length(min="1", max="50")
      * @MongoDB\Field(type="string")
+     * @MongoDB\Index(unique=true, sparse=true)
      * @Gedmo\Versioned
      */
     protected $number;
@@ -1652,6 +1653,8 @@ class Claim
                 null,
             'closedDate' => $this->getClosedDate() ? $this->getClosedDate()->format(\DateTime::ATOM) : null,
             'description' => $this->getDescription(),
+            'incidentDate' => $this->getIncidentDate() ? $this->getIncidentDate()->format(\DateTime::ATOM) : null,
+            'incidentTime' => $this->getIncidentTime(),
             'location' => $this->getLocation(),
             'type' => $this->getType(),
             'status' => $this->getStatus(),

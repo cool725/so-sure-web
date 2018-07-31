@@ -1,0 +1,26 @@
+// footer.scss
+
+body {
+    min-height: 100vh;
+}
+
+.footer {
+    position: relative;
+
+    &__top {
+        background-color: $dark-80;
+
+        .fab {
+            vertical-align: middle;
+        }
+    }
+
+    &__bottom {
+        background-color: $dark;
+        color: $grey;
+    }
+
+    &:before {
+
+    }
+}

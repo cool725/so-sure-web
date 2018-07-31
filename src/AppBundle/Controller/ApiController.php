@@ -2,6 +2,7 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Document\ValidatorTrait;
 use AppBundle\Exception\InvalidEmailException;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
@@ -41,6 +42,7 @@ use GuzzleHttp\Client;
 class ApiController extends BaseController
 {
     use ArrayToApiArrayTrait;
+    use ValidatorTrait;
 
     /**
      * @Route("/login", name="api_login")

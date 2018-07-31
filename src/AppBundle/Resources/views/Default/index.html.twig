@@ -34,10 +34,7 @@
             {% endif %}
         </h1>
 
-        {% if partner is defined and partner == 'starling' %}
-            <p class="lead"><small>in partnership with</small><br><img src="{{ cdn_url }}/images/homepage/so-sure_starling_bank_logo.svg" alt="Starling Bank" width="300px"></p>
-            <p class="lead">Providing exceptional experience when you claim, <br class="hidden-xs">and rewarding you and your friends when you don't</p>
-        {% elseif sub is defined and sub %}
+        {% if sub is defined and sub %}
             <p class="lead">
                 {{ sub }}
                 {% if sub_cont is defined and sub_cont %}
@@ -307,7 +304,7 @@
                 <div class="col-md-4">
                     <span class="large-no large-no--arrow">1</span>
                     <h4 class="h3 text-blue">Contact Claims Team</h4>
-                    <p class="text-left">Let us know what happened. You can do this by <a href="{{ path('claim') }}" class="text-nowrap">filling in this form</a>, or calling our claims team on 0344 856 0852 <small>(local rates apply)</small></p>
+                    <p class="text-left">Let us know what happened. You can do this by <a href="{{ path('claim') }}" class="text-nowrap">filling in this form</a>, or calling our claims team on 0113 320 9722 <small>(local rates apply)</small></p>
                 </div>
                 <div class="col-md-4">
                     <span class="large-no large-no--arrow">2</span>

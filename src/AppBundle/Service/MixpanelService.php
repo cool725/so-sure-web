@@ -1,6 +1,7 @@
 <?php
 namespace AppBundle\Service;
 
+use AppBundle\Document\ValidatorTrait;
 use AppBundle\Validator\Constraints\AlphanumericSpaceDotPipeValidator;
 use AppBundle\Validator\Constraints\AlphanumericSpaceDotValidator;
 use Predis\Client;
@@ -19,6 +20,8 @@ use CensusBundle\Service\SearchService;
 
 class MixpanelService
 {
+    use ValidatorTrait;
+
     const KEY_MIXPANEL_QUEUE = 'queue:mixpanel';
 
     const QUEUE_PERSON_PROPERTIES = 'person';
@@ -77,27 +80,64 @@ class MixpanelService
     const CUSTOM_PURCHASE_POLICY_APP_ATTRIB = '$custom_event:674827';
 
     public static $events = [
-            self::CUSTOM_TOTAL_SITE_VISITORS => Stats::MIXPANEL_TOTAL_SITE_VISITORS,
-            self::CUSTOM_QUOTE_PAGE_UK => Stats::MIXPANEL_QUOTES_UK,
-            self::CUSTOM_LANDING_PAGE_UK => Stats::MIXPANEL_LANDING_UK,
-            self::EVENT_BUY_BUTTON_CLICKED => Stats::MIXPANEL_CLICK_BUY_NOW,
-            self::EVENT_RECEIVE_DETAILS => Stats::MIXPANEL_RECEIVE_PERSONAL_DETAILS,
-            self::EVENT_INVITE => Stats::MIXPANEL_INVITE_SOMEONE,
-            self::CUSTOM_CPC_QUOTE_PAGE_UK => Stats::MIXPANEL_CPC_QUOTES_UK,
-            self::CUSTOM_CPC_MANUFACTURER_PAGE_UK => Stats::MIXPANEL_CPC_MANUFACTURER_UK,
-            self::CUSTOM_CPC_COMPETITOR_PAGE_UK => Stats::MIXPANEL_CPC_COMPETITORS_UK,
-            self::CUSTOM_PURCHASE_POLICY_APP_ATTRIB => Stats::MIXPANEL_PURCHASE_POLICY_APP_ATTRIB,
+        self::CUSTOM_TOTAL_SITE_VISITORS => Stats::MIXPANEL_TOTAL_SITE_VISITORS,
+        self::CUSTOM_QUOTE_PAGE_UK => Stats::MIXPANEL_QUOTES_UK,
+        self::CUSTOM_LANDING_PAGE_UK => Stats::MIXPANEL_LANDING_UK,
+        self::EVENT_BUY_BUTTON_CLICKED => Stats::MIXPANEL_CLICK_BUY_NOW,
+        self::EVENT_RECEIVE_DETAILS => Stats::MIXPANEL_RECEIVE_PERSONAL_DETAILS,
+        self::EVENT_POLICY_READY => Stats::MIXPANEL_POLICY_READY,
+        self::EVENT_PURCHASE_POLICY => Stats::MIXPANEL_PURCHASE_POLICY,
+        self::EVENT_INVITE => Stats::MIXPANEL_INVITE_SOMEONE,
+        self::CUSTOM_CPC_QUOTE_PAGE_UK => Stats::MIXPANEL_CPC_QUOTES_UK,
+        self::CUSTOM_CPC_MANUFACTURER_PAGE_UK => Stats::MIXPANEL_CPC_MANUFACTURER_UK,
+        self::CUSTOM_CPC_COMPETITOR_PAGE_UK => Stats::MIXPANEL_CPC_COMPETITORS_UK,
+        self::CUSTOM_PURCHASE_POLICY_APP_ATTRIB => Stats::MIXPANEL_PURCHASE_POLICY_APP_ATTRIB,
     ];
 
-    public static $segments = [
-        self::EVENT_INVITATION_PAGE => [
-            'Invitation Method' => [
-                'scode' => Stats::MIXPANEL_VIEW_INVITATION_SCODE,
-                'sms' => Stats::MIXPANEL_VIEW_INVITATION_SMS,
-                'email' => Stats::MIXPANEL_VIEW_INVITATION_EMAIL,
-            ]
-        ],
+    public static $campaignSources = [
+        'google' => 'google',
+        'Google' => 'google',
+        'Facebook' => 'facebook',
+        'facebook' => 'facebook',
+        'Instagram' => 'instagram',
+        'bing' => 'bing',
+        'PYG' => 'pyg',
+        'money.co.uk' => 'money',
+        //'Affiliate',
+        //'MoneySupermarket',
     ];
+
+    public static function getCampaignSources($event)
+    {
+        $data = [];
+        foreach (self::$campaignSources as $campaignSource => $extension) {
+            $data[$event]['Campaign Source'][$campaignSource] = sprintf('%s-%s', self::$events[$event], $extension);
+        }
+
+        return $data;
+    }
+
+    public static function getSegments()
+    {
+        $data = array_merge(
+            [self::EVENT_INVITATION_PAGE => [
+                'Invitation Method' => [
+                    'scode' => Stats::MIXPANEL_VIEW_INVITATION_SCODE,
+                    'sms' => Stats::MIXPANEL_VIEW_INVITATION_SMS,
+                    'email' => Stats::MIXPANEL_VIEW_INVITATION_EMAIL,
+                ]
+            ]],
+            self::getCampaignSources(self::CUSTOM_TOTAL_SITE_VISITORS),
+            self::getCampaignSources(self::CUSTOM_QUOTE_PAGE_UK),
+            self::getCampaignSources(self::EVENT_BUY_BUTTON_CLICKED),
+            self::getCampaignSources(self::EVENT_RECEIVE_DETAILS),
+            self::getCampaignSources(self::EVENT_POLICY_READY),
+            self::getCampaignSources(self::EVENT_PURCHASE_POLICY)
+        );
+
+        //print_r($data);
+        return $data;
+    }
 
     /** @var DocumentManager */
     protected $dm;
@@ -192,20 +232,6 @@ class MixpanelService
         $user = $repo->findOneBy(['emailCanonical' => mb_strtolower($email)]);
 
         return $this->attributionByUser($user);
-    }
-
-    protected function conformAlphanumericSpaceDotPipe($value, $length)
-    {
-        $validator = new AlphanumericSpaceDotPipeValidator();
-
-        return $validator->conform(mb_substr($value, 0, $length));
-    }
-
-    protected function conformAlphanumericSpaceDot($value, $length)
-    {
-        $validator = new AlphanumericSpaceDotValidator();
-
-        return $validator->conform(mb_substr($value, 0, $length));
     }
 
     public function attributionByUser(User $user = null)
@@ -410,10 +436,9 @@ class MixpanelService
         $key = $data['data']['series'][0];
         foreach ($data['data']['values'] as $event => $results) {
             $stats[self::$events[$event]] = $results[$key];
-            $this->stats->set(self::$events[$event], $start, $results[$key]);
         }
 
-        foreach (self::$segments as $event => $segmentData) {
+        foreach (self::getSegments() as $event => $segmentData) {
             foreach ($segmentData as $segment => $mapping) {
                 $query = [
                     'event' => $event,
@@ -429,12 +454,18 @@ class MixpanelService
                 foreach ($data['data']['values'] as $on => $results) {
                     foreach ($mapping as $type => $statsKey) {
                         if ($on == $type) {
-                            $stats[sprintf('%s-%s', $statsKey, $type)] = $results[$key];
-                            $this->stats->set($statsKey, $start, $results[$key]);
+                            if (!isset($stats[$statsKey])) {
+                                $stats[$statsKey] = 0;
+                            }
+                            $stats[$statsKey] += $results[$key];
                         }
                     }
                 }
             }
+        }
+
+        foreach ($stats as $key => $value) {
+            $this->stats->set($key, $start, $value);
         }
 
         return $stats;

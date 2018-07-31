@@ -12,6 +12,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Doctrine\ODM\MongoDB\DocumentRepository;
 use AppBundle\Document\Claim;
+use AppBundle\Document\PhonePolicy;
 use AppBundle\Service\ReceperioService;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormEvent;
@@ -36,26 +37,21 @@ class ClaimType extends AbstractType
     {
         $builder
             ->add('number', TextType::class)
-            ->add('status', ChoiceType::class, ['choices' => [
-                Claim::STATUS_INREVIEW => Claim::STATUS_INREVIEW,
-                Claim::STATUS_APPROVED => Claim::STATUS_APPROVED,
-                Claim::STATUS_WITHDRAWN => Claim::STATUS_WITHDRAWN,
-                Claim::STATUS_DECLINED => Claim::STATUS_DECLINED,
-            ],
-                'preferred_choices' => [Claim::STATUS_INREVIEW]
-            ])
             ->add('shouldCancelPolicy', CheckboxType::class, ['required' => false])
             ->add('notes', TextareaType::class, ['required' => false])
             ->add('record', SubmitType::class)
         ;
 
         $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
+            /** @var Claim $claim */
             $claim = $event->getData();
             $form = $event->getForm();
-            $picSureEnabled = $claim->getPolicy() ? $claim->getPolicy()->isPicSurePolicy() : true;
-            $validated = $claim->getPolicy() ? $claim->getPolicy()->isPicSureValidated() : false;
+            /** @var PhonePolicy $policy */
+            $policy = $claim->getPolicy();
+            $picSureEnabled = $policy ? $policy->isPicSurePolicy() : true;
+            $validated = $policy ? $policy->isPicSureValidated() : false;
             $choices = [];
-            if ($claim->getPolicy() &&  $claim->getPolicy()->isAdditionalClaimLostTheftApprovedAllowed()) {
+            if ($policy && $policy->isAdditionalClaimLostTheftApprovedAllowed()) {
                 $choices = [
                     $this->getClaimTypeCopy(Claim::TYPE_LOSS, $validated, $picSureEnabled) => Claim::TYPE_LOSS,
                     $this->getClaimTypeCopy(Claim::TYPE_THEFT, $validated, $picSureEnabled) => Claim::TYPE_THEFT,
@@ -67,7 +63,11 @@ class ClaimType extends AbstractType
                 $this->getClaimTypeCopy(Claim::TYPE_EXTENDED_WARRANTY, $validated, $picSureEnabled) =>
                     Claim::TYPE_EXTENDED_WARRANTY,
             ]);
-            $form->add('type', ChoiceType::class, ['choices' => $choices]);
+            $form->add('type', ChoiceType::class, [
+                'placeholder' => 'Select Claim Type',
+                'choices' => $choices,
+                'disabled' => $claim->getType() == null ? false : true,
+            ]);
         });
     }
 

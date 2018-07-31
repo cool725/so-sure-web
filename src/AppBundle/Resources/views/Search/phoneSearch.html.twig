@@ -1,0 +1,26 @@
+{# Defaults #}
+{% set uid = '' %}
+{% set base_path = '/phone-insurance/' %}
+{% set path_suffix = '' %}
+{% set form_modify_class = '' %}
+{% set placeholder  = 'Find your phone e.g. iPhone 8 Plus...' %}
+
+{% if phone %}
+  {% set form_action = path('quote_phone', {'id': phone.id }) %}
+{% endif %}
+
+<form method="get"
+      id="phone-search-component{{ uid }}"
+      class="phone-search rounded {{ form_modify_class }}"
+      {% if phone %}
+        action="{{ form_action }}"
+      {% endif %}
+      data-base-path="{{ base_path }}"
+      data-path-suffix="{{ path_suffix }}"
+      autocomplete="off">
+
+    <input type="text"
+         class="required form-control phone-search__input"
+         placeholder="{{ placeholder }}"
+         value="" />
+</form>

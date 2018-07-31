@@ -8,19 +8,27 @@
 		</h1>
 		<div style="font-size: 14px; text-align: left;">
 		   <!--?xml version="1.0" encoding="UTF-8" standalone="no"?-->
-		   <div style="font-size: 14px; text-align: center;"><span style="font-family:arial,helvetica neue,helvetica,sans-serif">
-				Thank you for joining so-sure. We're very excited to have you onboard.<br><br>
-                As a reminder your policy is for a <strong>{{ policy.phone }}</strong> and runs from <strong>{{ policy.start | date('d M Y H:i', 'Europe/London') }}</strong> to <strong>{{ policy.end | date('d M Y H:i', 'Europe/London') }}</strong>.<br><br>
-                We've also attached a copy of all your key documents, including your policy terms for reference. If you have any questions, please don't hesitate to
-				<a href="mailto:support@wearesosure.com?subject=I%20have%20a%20question" target="_blank"><span style="color:#3399ff">contact us</span></a>.
+		   <div style="font-size: 14px; text-align: left;"><span style="font-family:arial,helvetica neue,helvetica,sans-serif">
+			   Welcome to the so-sure family!<br><br>
+			   You've made a very smart decision. Never again will you have to worry about dropping your phone and seeing that cracked screen, or it being stolen by some pesky thief!<br><br>
+			   Starting now, you can also be on your way to receive 80% of your money back at the end of your policy year when you connect with friends or family and none of you claim.
+				<br><br>
+				You can start by sharing this unique URL to your friends.  Simply copy it, and send it via What's App, Email or even your favourite social channels.  What you waiting for?
+				<br><br>
+				   <a href="{{ url('scode', {code: policy.getStandardSCode.code}) }}">{{ url('scode', {code: policy.getStandardSCode.code}) }}</a>
+				<br><br>
+			   Now enough about us, here's your policy details:<br><br>
+			   Your policy is for a <strong>{{ policy.phone }}</strong> and runs from <strong>{{ policy.start | date('d M Y H:i', 'Europe/London') }}</strong> to <strong>{{ policy.end | date('d M Y H:i', 'Europe/London') }}</strong>.<br><br>
+			   Cover includes: Loss, Theft, Accidental Damage, Out of Warranty Breakdown, Accessories, Global Travel<br><br>
+			   Attached is a copy of all your key documents, including your policy terms for reference. If you have any questions, please don't hesitate to contact us.<br><br>
 				<br><br><br>
-
+			   </span>
 		   </div>
 		</div>
 		{% if policy.policyTerms.isPicSureEnabled and policy.picSureStatus != 'preapproved' %}
 		<div style="font-size: 14px; text-align: left;">
 		   <!--?xml version="1.0" encoding="UTF-8" standalone="no"?-->
-		   <div style="font-size: 14px; text-align: center;"><span style="font-family:arial,helvetica neue,helvetica,sans-serif">
+		   <div style="font-size: 14px; text-align: left;"><span style="font-family:arial,helvetica neue,helvetica,sans-serif">
 			   Your excess is currently £150, however, you can easily reduce this amount to £50 (£70 for Theft/Loss) by validating your phone with pic-sure.
 			   {% if policy.phone.isITunes %}
 			   <a href="{{ url('download_apple', {'medium': 'pic-sure-welcome-email'}) }}">Download our iOS App</a>, login, and complete the pic-sure validation process.
@@ -30,25 +38,26 @@
 					Just email a picture of your phone's screen in the mirror to <a href="support@wearesosure.com">support@wearesosure.com</a> and we'll get started on that process.
 	 		   {% endif %}
 			   <br><br><br>
+			   </span>
 		   </div>
 		</div>
 	    {% endif %}
 	    {% if policy.phone.newHighDemand %}
 		<div style="font-size: 14px; text-align: left;">
 		   <!--?xml version="1.0" encoding="UTF-8" standalone="no"?-->
-		   <div style="font-size: 14px; text-align: center;"><span style="font-family:arial,helvetica neue,helvetica,sans-serif">
-			   Your {{ policy.phone }} has recently been released. Sadly this means that there is a market shortage
-			   of parts/phones available over the coming few weeks. Hence, we might be delayed in providing you a next
-			   day replacement or repair. As we know you can't live without a phone, if we can't fulfil your claim
-			   promptly, we will loan you an older model phone until we are able to get a replacement device to you.
+		   <div style="font-size: 14px; text-align: left;"><span style="font-family:arial,helvetica neue,helvetica,sans-serif">
+				As you have a shiny new model, we wanted to let you know your next day replacement or repair may be an older model,
+				   just for a few days until we get the new model to you (this is an unusual occurrence that's out of our control
+				   and due to market shortages).
 			   <br><br>
+			   </span>
 		   </div>
 		</div>
 	    {% endif %}
 
 		<div style="font-size: 14px; text-align: left;">
 		   <!--?xml version="1.0" encoding="UTF-8" standalone="no"?-->
-		   <div style="font-size: 14px; text-align: center;"><span style="font-family:arial,helvetica neue,helvetica,sans-serif">
+		   <div style="font-size: 14px; text-align: left;"><span style="font-family:arial,helvetica neue,helvetica,sans-serif">
 		<table border="1" cellpadding="20" cellspacing="0" height="100%" width="100%" id="cancelPolicy">
     <tr>
         <td align="center" valign="top">
@@ -63,6 +72,7 @@
 		</td>
 	</tr>
 		</table>
+			   </span>
 		   </div>
 		</div>
 	{{ macros.end_table() }}
