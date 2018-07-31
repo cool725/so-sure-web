@@ -18,55 +18,36 @@ strong {
 }
 
 // Modify list to handle fa icons
-.list {
+// .list {
 
-    &-fa {
+//     &-fa {
 
-        li {
-            position: relative;
-            padding-left: 30px;
+//         li {
+//             position: relative;
+//             padding-left: 30px;
 
-            > .fas {
-                position: absolute;
-                left: 0; top: 5px;
-            }
-        }
+//             > .fas {
+//                 position: absolute;
+//                 left: 0; top: 5px;
+//             }
+//         }
+//     }
+// }
+
+// .fas {
+//     vertical-align: middle;
+// }
+//
+.tick-list {
+
+    dt {
+        padding-left: 40px;
+        margin-bottom: 2rem;
+    }
+
+    dd {
+        margin-bottom: 2rem;
     }
 }
 
-.fas {
-    vertical-align: middle;
-}
-
-/* .text-link-dark {
-    // make links stand out a little more
-    font-family: $gg-medium;
-    color: $dark;
-    border-bottom: 2px solid $blue-1;
-
-    &:hover, &:focus {
-        color: $blue-1;
-    }
-
-    &:active {
-        color: $blue-1;
-        border-bottom-color: $blue-1;
-    }
-}
-
-.text-link-light {
-    // make links stand out a little more
-    font-family: $gg-medium;
-    color: $white;
-    border-bottom: 2px solid $white;
-
-    &:hover, &:focus {
-        color: $dark;
-    }
-
-    &:active {
-        color: $dark;
-        border-bottom-color: $dark;
-    }
-} */
 

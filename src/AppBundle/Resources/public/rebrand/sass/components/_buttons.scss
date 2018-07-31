@@ -4,6 +4,7 @@
     font-family: $g-medium;
 }
 
+// Button block mobile only
 @include media-breakpoint-down(xs) {
 
     .btn-block-xs {
