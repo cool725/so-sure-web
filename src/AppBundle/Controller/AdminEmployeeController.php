@@ -6,6 +6,7 @@ use AppBundle\Document\BacsPaymentMethod;
 use AppBundle\Document\File\PaymentRequestUploadFile;
 use AppBundle\Document\JudoPaymentMethod;
 use AppBundle\Form\Type\AdminEmailOptOutType;
+use AppBundle\Form\Type\BacsCreditType;
 use AppBundle\Form\Type\PaymentRequestUploadFileType;
 use AppBundle\Form\Type\UploadFileType;
 use AppBundle\Security\FOSUBUserProvider;
@@ -337,7 +338,8 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                     $dm->persist($user);
                     $dm->flush();
                     $this->addFlash('success', sprintf(
-                        'Created User. %s',
+                        'Created User. <a href="%s">%s</a>',
+                        $this->generateUrl('admin_user', ['id' => $user->getId()]),
                         $email
                     ));
                 }
@@ -542,6 +544,12 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         $runScheduledPaymentForm = $this->get('form.factory')
             ->createNamedBuilder('run_scheduled_payment_form', PaymentRequestUploadFileType::class, $paymentRequestFile)
             ->getForm();
+        $bacsRefund = new BacsPayment();
+        $bacsRefund->setPolicy($policy);
+        $bacsRefund->setStatus(BacsPayment::STATUS_PENDING);
+        $bacsRefundForm = $this->get('form.factory')
+            ->createNamedBuilder('bacs_refund_form', BacsCreditType::class, $bacsRefund)
+            ->getForm();
 
         if ('POST' === $request->getMethod()) {
             if ($request->request->has('cancel_form')) {
@@ -553,7 +561,10 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                         }
                         $policyService->cancel(
                             $policy,
-                            $cancel->getCancellationReason()
+                            $cancel->getCancellationReason(),
+                            true,
+                            null,
+                            true
                         );
                         $this->addFlash(
                             'success',
@@ -1033,6 +1044,15 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
 
                     return $this->redirectToRoute('admin_policy', ['id' => $id]);
                 }
+            } elseif ($request->request->has('bacs_refund_form')) {
+                $bacsRefundForm->handleRequest($request);
+                if ($bacsRefundForm->isValid()) {
+                    $bacsRefund->setAmount(0 - abs($bacsRefund->getAmount()));
+                    $bacsRefund->calculateSplit();
+                    $bacsRefund->setRefundTotalCommission($bacsRefund->getTotalCommission());
+                    $this->getManager()->persist($bacsRefund);
+                    $this->getManager()->flush();
+                }
             }
         }
         $checks = $fraudService->runChecks($policy);
@@ -1065,6 +1085,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             'pay_policy_form' => $payPolicyForm->createView(),
             'cancel_direct_debit_form' => $cancelDirectDebitForm->createView(),
             'run_scheduled_payment_form' => $runScheduledPaymentForm->createView(),
+            'bacs_refund_form' => $bacsRefundForm->createView(),
             'fraud' => $checks,
             'policy_route' => 'admin_policy',
             'policy_history' => $this->getSalvaPhonePolicyHistory($policy->getId()),
@@ -1256,10 +1277,21 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                     $dm->flush();
                     $this->addFlash(
                         'success',
-                        'Update User'
+                        'Updated User'
                     );
 
                     return $this->redirectToRoute('admin_user', ['id' => $id]);
+                } else {
+                    $errors = 'Unknown';
+                    try {
+                        $this->validateObject($user);
+                    } catch (\Exception $e) {
+                        $errors = $e->getMessage();
+                    }
+                    $this->addFlash(
+                        'error',
+                        sprintf('Failed to update user. Error: %s', $errors)
+                    );
                 }
             } elseif ($request->request->has('user_address_form')) {
                 $userAddressForm->handleRequest($request);
@@ -1648,11 +1680,21 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $imei = $form->getData()['imei'];
+            $imei = trim($form->getData()['imei']);
             $history = $logRepo->findBy([
                 'data.imei' => $imei
             ]);
             $charges = $chargeRepo->findBy(['details' => $imei]);
+
+            if (!$this->isImei($imei)) {
+                $otherImei = 'unknown - invalid length';
+                if (mb_strlen($imei) >= 14) {
+                    $otherImei = $this->luhnGenerate(mb_substr($imei, 0, 14));
+                }
+                $this->addFlash('error', sprintf(
+                    sprintf('Invalid IMEI. Did you mean %s?', $otherImei)
+                ));
+            }
         }
 
         return [

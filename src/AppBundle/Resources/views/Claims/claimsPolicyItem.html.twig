@@ -72,6 +72,7 @@
                             <td>{{ policy.imei }}
                             </td>
                         </tr>
+                        {% if policy.phone.isApple %}
                         <tr>
                             <td>
                                 IMEI Circumvention
@@ -86,6 +87,7 @@
                                 {% endif %}
                             </td>
                         </tr>
+                        {% endif %}
                         {% endif %}
                         <tr>
                             <td>Policy Status</td>
@@ -973,6 +975,19 @@
                         </tr>
                     {% endif %}
                 {% endif %}
+                {% if is_granted('ROLE_ADMIN') %}
+                    {% if policy.isPolicy
+                        and policy.payerOrUser.paymentMethod
+                        and policy.payerOrUser.paymentMethod.getType == "bacs" %}
+                        <tr>
+                            <td><i class="fa fa-lock" title="Admin only"></i> Refund Bacs</td>
+                            <td>
+                                <button type="button" class="btn btn-info" data-toggle="modal" data-target="#bacsRefundModal"
+                                >Refund</button>
+                            </td>
+                        </tr>
+                    {% endif %}
+                {% endif %}
             </table>
             {% if is_granted('ROLE_ADMIN') %}
             <h3>Update Policy</h3>
@@ -1363,4 +1378,41 @@
         </div>
       </div>
     </div>
+
+        <div class="modal fade" id="bacsRefundModal" tabindex="-1" role="dialog">
+            <div class="modal-dialog" role="document" style="width: 60%;">
+                <div class="modal-content">
+                    {{ form_start(bacs_refund_form )}}
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title">Issue Bacs Credit (next payment run)</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    {{ form_label(bacs_refund_form.amount) }}
+                                    {{ form_errors(bacs_refund_form.amount) }}
+                                    {{ form_widget(bacs_refund_form.amount) }}
+                                </div>
+                                <div class="form-group">
+                                    {{ form_label(bacs_refund_form.totalCommission) }}
+                                    {{ form_errors(bacs_refund_form.totalCommission) }}
+                                    {{ form_widget(bacs_refund_form.totalCommission) }}
+                                </div>
+                                <div class="form-group">
+                                    {{ form_label(bacs_refund_form.notes) }}
+                                    {{ form_errors(bacs_refund_form.notes) }}
+                                    {{ form_widget(bacs_refund_form.notes, {'attr': {'placeholder': 'Notes regarding credit'}}) }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        {{ form_widget(bacs_refund_form.add, {'label': 'Save Payment', 'attr': {'class': 'btn btn-success'}}) }}
+                    </div>
+                    {{ form_end(bacs_refund_form )}}
+                </div>
+            </div>
+        </div>
     {% endif %}

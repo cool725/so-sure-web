@@ -25,7 +25,7 @@ trait PostcodeTrait
     public static function normalizePostcode($code, $forDisplay = false)
     {
         try {
-            $postcode = new Postcode($code);
+            $postcode = new Postcode(trim($code));
 
             if ($forDisplay) {
                 return $postcode->normalise();

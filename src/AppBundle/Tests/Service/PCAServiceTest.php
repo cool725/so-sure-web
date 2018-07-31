@@ -14,22 +14,25 @@ class PCAServiceTest extends WebTestCase
 {
     use \AppBundle\Tests\PhingKernelClassTrait;
     protected static $container;
+    /** @var PCAService */
     protected static $pca;
     protected static $redis;
 
     public static function setUpBeforeClass()
     {
-         //start the symfony kernel
-         $kernel = static::createKernel();
-         $kernel->boot();
+        //start the symfony kernel
+        $kernel = static::createKernel();
+        $kernel->boot();
 
-         //get the DI container
-         self::$container = $kernel->getContainer();
+        //get the DI container
+        self::$container = $kernel->getContainer();
 
-         //now we can instantiate our service (if you want a fresh one for
-         //each test method, do this in setUp() instead
-         self::$pca = self::$container->get('app.address');
-         self::$redis = self::$container->get('snc_redis.default');
+        //now we can instantiate our service (if you want a fresh one for
+        //each test method, do this in setUp() instead
+        /** @var PCAService $pca */
+        $pca = self::$container->get('app.address');
+        self::$pca = $pca;
+        self::$redis = self::$container->get('snc_redis.default');
     }
 
     public function tearDown()
@@ -40,8 +43,9 @@ class PCAServiceTest extends WebTestCase
     {
         self::$redis->flushdb();
         $this->assertFalse(self::$redis->hexists(PCAService::REDIS_POSTCODE_KEY, 'BX11LT') == 1);
-        $address = self::$pca->getAddress('BX11LT', null);
-        $this->assertEquals('BX1 1LT', $address->getPostCode());
+        $address = self::$pca->getAddress('BX11LT', '1');
+        $this->assertNotNull($address);
+        $this->assertEquals('BX1 1LT', $address ? $address->getPostcode() : null);
         $this->assertTrue(self::$redis->hexists(PCAService::REDIS_POSTCODE_KEY, 'BX11LT') == 1);
     }
 
