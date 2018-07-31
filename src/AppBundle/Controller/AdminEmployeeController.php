@@ -1682,7 +1682,6 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                 $this->addFlash('error', sprintf(
                     sprintf('Invalid IMEI. Did you mean %s?', $otherImei)
                 ));
-
             }
         }
 
