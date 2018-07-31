@@ -2,12 +2,14 @@
 namespace AppBundle\Service;
 
 use AppBundle\Classes\SoSure;
+use AppBundle\Document\Address;
 use AppBundle\Repository\CashbackRepository;
 use AppBundle\Repository\OptOut\EmailOptOutRepository;
 use AppBundle\Repository\PhonePolicyRepository;
 use AppBundle\Repository\PhoneRepository;
 use AppBundle\Repository\PolicyRepository;
 use Aws\S3\S3Client;
+use CensusBundle\Service\SearchService;
 use Gedmo\Loggable\Entity\Repository\LogEntryRepository;
 use Knp\Bundle\SnappyBundle\Snappy\LoggableGenerator;
 use Knp\Snappy\AbstractGenerator;
@@ -118,7 +120,8 @@ class PolicyService
     /** @var BranchService */
     protected $branch;
 
-    protected $address;
+    /** @var SearchService $searchService */
+    protected $searchService;
 
     protected $imeiValidator;
 
@@ -185,7 +188,7 @@ class PolicyService
      * @param \Domnikl\Statsd\Client   $statsd
      * @param Client                   $redis
      * @param BranchService            $branch
-     * @param PCAService               $address
+     * @param SearchService            $searchService
      * @param ReceperioService         $imeiValidator
      * @param RateLimitService         $rateLimit
      * @param IntercomService          $intercom
@@ -209,7 +212,7 @@ class PolicyService
         \Domnikl\Statsd\Client $statsd,
         Client $redis,
         BranchService $branch,
-        PCAService $address,
+        SearchService $searchService,
         ReceperioService $imeiValidator,
         RateLimitService $rateLimit,
         IntercomService $intercom,
@@ -232,7 +235,7 @@ class PolicyService
         $this->statsd = $statsd;
         $this->redis = $redis;
         $this->branch = $branch;
-        $this->address = $address;
+        $this->searchService = $searchService;
         $this->imeiValidator = $imeiValidator;
         $this->rateLimit = $rateLimit;
         $this->intercom = $intercom;
@@ -241,12 +244,15 @@ class PolicyService
         $this->sixpackService = $sixpackService;
     }
 
-    private function validateUser($user)
+    public function validateUser(User $user)
     {
         if (!$user->hasValidDetails() || !$user->hasValidBillingDetails()) {
             throw new InvalidUserDetailsException();
         }
-        if (!$this->address->validatePostcode($user->getBillingAddress()->getPostCode())) {
+
+        /** @var Address $address */
+        $address = $user->getBillingAddress();
+        if (!$address || !$this->searchService->validatePostcode($address->getPostcode())) {
             throw new GeoRestrictedException();
         }
     }
@@ -335,36 +341,60 @@ class PolicyService
             $policy->setMakeModelValidatedStatus($checkmend['makeModelValidatedStatus']);
             return $policy;
         } catch (InvalidPremiumException $e) {
+            $this->logger->warning(
+                sprintf('Failed to init policy for user %s', $user->getId()),
+                ['exception' => $e]
+            );
             $this->dispatchEvent(
                 UserPaymentEvent::EVENT_FAILED,
                 new UserPaymentEvent($user, 'Invalid premium')
             );
             throw $e;
         } catch (InvalidUserDetailsException $e) {
+            $this->logger->warning(
+                sprintf('Failed to init policy for user %s', $user->getId()),
+                ['exception' => $e]
+            );
             $this->dispatchEvent(
                 UserPaymentEvent::EVENT_FAILED,
                 new UserPaymentEvent($user, 'Invalid User Details')
             );
             throw $e;
         } catch (GeoRestrictedException $e) {
+            $this->logger->warning(
+                sprintf('Failed to init policy for user %s', $user->getId()),
+                ['exception' => $e]
+            );
             $this->dispatchEvent(
                 UserPaymentEvent::EVENT_FAILED,
                 new UserPaymentEvent($user, 'Non-UK Address')
             );
             throw $e;
         } catch (DuplicateImeiException $e) {
+            $this->logger->warning(
+                sprintf('Failed to init policy for user %s', $user->getId()),
+                ['exception' => $e]
+            );
             $this->dispatchEvent(
                 UserPaymentEvent::EVENT_FAILED,
                 new UserPaymentEvent($user, 'IMEI Already In System')
             );
             throw $e;
         } catch (LostStolenImeiException $e) {
+            $this->logger->warning(
+                sprintf('Failed to init policy for user %s', $user->getId()),
+                ['exception' => $e]
+            );
             $this->dispatchEvent(
                 UserPaymentEvent::EVENT_FAILED,
                 new UserPaymentEvent($user, 'IMEI Lost Or Stolen (so-sure)')
             );
             throw $e;
         } catch (ImeiBlacklistedException $e) {
+            $this->logger->warning(
+                sprintf('Failed to init policy for user %s', $user->getId()),
+                ['exception' => $e]
+            );
             $this->dispatchEvent(
                 UserPaymentEvent::EVENT_FAILED,
                 new UserPaymentEvent($user, 'IMEI Blacklisted')

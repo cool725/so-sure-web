@@ -241,6 +241,17 @@
                         </td>
                     {% endif %}
                 </tr>
+                 {% if user.hasClaimsRole %}
+                    <tr>
+                        <td colspan="1">Claims Handling Team</td>
+                        <td>{% if user.handlingTeam %}{{ user.handlingTeam }}{% else %}Not set{% endif %}</td>
+                        {% if is_granted('ROLE_ADMIN') %}
+                            <td>
+                                <button type="button" class="btn btn-info" data-toggle="modal" data-target="#handlingTeamModal">Edit Handling Team</button>
+                            </td>
+                        {% endif %}
+                    </tr>
+                  {% endif %}
                 <tr>
                     <td colspan="1">Delete</td>
                     <td>
@@ -534,4 +545,29 @@
       </div>
     </div>
 {% endif %}
+    {% if handling_team_form is defined %}
+        <div class="modal fade" id="handlingTeamModal" tabindex="-1" role="dialog">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    {{ form_start(handling_team_form) }}
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title">Edit Handling Team</h4>
+                    </div>
+                    <div class="modal-body">
+                <span class="text-danger">
+                    {{ form_errors(handling_team_form) }}
+                </span>
+                        {{ form_widget(handling_team_form.handlingTeam)}}
+                    </div>
+                    <div class="modal-footer">
+                        {{ form_widget(handling_team_form.save, {'label': 'Update Handling Team', 'attr': {'class': 'btn btn-success'}}) }}
+                    </div>
+                    {{ form_end(handling_team_form) }}
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    handlingTeamModal
 {% endblock %}

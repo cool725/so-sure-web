@@ -154,6 +154,19 @@ class DefaultController extends BaseController
     }
 
     /**
+     * @Route("/jc", name="jc")
+     */
+    public function indexJc(Request $request)
+    {
+        /** @var RequestService $requestService */
+        // $requestService = $this->get('app.request');
+        $data = array(
+            'phone' => $this->getQuerystringPhone($request),
+        );
+        return $this->render('AppBundle:Default:indexRebrand.html.twig', $data);
+    }
+
+    /**
      * @Route("/money", name="money")
      */
     public function moneyLanding()

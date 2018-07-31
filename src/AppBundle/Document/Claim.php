@@ -136,6 +136,14 @@ class Claim
     const REPORT_POLICE_STATION = "police-station";
     const REPORT_ONLINE = "online";
 
+    const TEAM_DAVIES = 'davies';
+    const TEAM_DIRECT_GROUP = 'direct-group';
+
+    public static $handlingTeams = [
+        self::TEAM_DAVIES => self::TEAM_DAVIES,
+        self::TEAM_DIRECT_GROUP => self::TEAM_DIRECT_GROUP,
+    ];
+
     public static $warningFlags = [
         self::WARNING_FLAG_DAVIES_NAME_MATCH => self::WARNING_FLAG_DAVIES_NAME_MATCH,
         self::WARNING_FLAG_DAVIES_POSTCODE => self::WARNING_FLAG_DAVIES_POSTCODE,
@@ -262,6 +270,13 @@ class Claim
     public $handler;
 
     /**
+     * @Assert\Choice({"davies", "direct-group"}, strict=true)
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
+    protected $handlingTeam;
+
+    /**
      * @MongoDB\ReferenceOne(targetDocument="Phone")
      * @Gedmo\Versioned
      * @var Phone
@@ -352,6 +367,7 @@ class Claim
      * @AppAssert\Token()
      * @Assert\Length(min="1", max="50")
      * @MongoDB\Field(type="string")
+     * @MongoDB\Index(unique=true, sparse=true)
      * @Gedmo\Versioned
      */
     protected $number;
@@ -775,6 +791,16 @@ class Claim
     public function setHandler($handler)
     {
         $this->handler = $handler;
+    }
+
+    public function getHandlingTeam()
+    {
+        $this->handlingTeam;
+    }
+
+    public function setHandlingTeam($handlingTeam)
+    {
+        $this->handlingTeam = $handlingTeam;
     }
 
     public function getType()
@@ -1652,6 +1678,8 @@ class Claim
                 null,
             'closedDate' => $this->getClosedDate() ? $this->getClosedDate()->format(\DateTime::ATOM) : null,
             'description' => $this->getDescription(),
+            'incidentDate' => $this->getIncidentDate() ? $this->getIncidentDate()->format(\DateTime::ATOM) : null,
+            'incidentTime' => $this->getIncidentTime(),
             'location' => $this->getLocation(),
             'type' => $this->getType(),
             'status' => $this->getStatus(),

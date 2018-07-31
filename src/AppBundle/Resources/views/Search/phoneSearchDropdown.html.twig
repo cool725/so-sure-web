@@ -1,0 +1,35 @@
+{{ form_start(form_phone, { 'attr': {
+    'class': 'phone-search-dropdown',
+    'data-phones': phones|json_encode|raw,
+    'autocomplete': 'off'
+}}) }}
+    <div class="row">
+        <div class="form-group col-sm-4">
+            {{ form_widget(form_phone.make, {
+              'attr': {
+                'class': 'form-control phone-search-dropdown__make'
+            }}) }}
+        </div>
+        <div class="form-group col-sm-4">
+            {{ form_widget(form_phone.model, {
+              'attr': {
+                'class': 'form-control phone-search-dropdown__model',
+                'disabled': 'disabled'
+            }}) }}
+        </div>
+        <div class="form-group col-sm-4">
+            {{ form_widget(form_phone.memory, {
+                'attr': {
+                    'class': 'form-control phone-search-dropdown__memory',
+                    'disabled': 'disabled'
+            }}) }}
+        </div>
+    </div>
+    <div class="form-group text-center">
+        {{ form_widget(form_phone.next, {
+          'label': 'Get a quote',
+          'attr': {
+            'class': 'btn btn-outline-white',
+        }}) }}
+    </div>
+{{ form_end(form_phone) }}

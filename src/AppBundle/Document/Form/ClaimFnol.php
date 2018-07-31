@@ -80,7 +80,7 @@ class ClaimFnol
     protected $time;
 
     /**
-     * @Assert\Length(min="5", max="200")
+     * @Assert\Length(min="1", max="250")
      */
     protected $where;
 

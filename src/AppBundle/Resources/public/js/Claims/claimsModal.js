@@ -10,13 +10,18 @@ $('#claimsModal').on('show.bs.modal', function (event) {
         modal.find('#claims-detail-delete-id').val(claim.id);
         modal.find('#claims-detail-policy').text(claim.policyNumber);
         modal.find('#claims-detail-type').val(claim.type);
-        modal.find('#claims-detail-status').text(claim.status);
+        var status = claim.status;
+        if (claim.daviesStatus) {
+            status += ' ('+claim.daviesStatus+')'
+        }
+        modal.find('#claims-detail-status').text(status);
         modal.find('#claims-detail-number-to-reach').text(claim.phoneToReach);
         modal.find('#claims-detail-time-to-reach').text(claim.timeToReach);
         modal.find('#claims-detail-initial-suspicion').text(claim.initialSuspicion);
         modal.find('#claims-detail-final-suspicion').text(claim.finalSuspicion);
-        modal.find('#claims-detail-davies-status').text(claim.daviesStatus);
         modal.find('#claims-detail-notes').text(claim.notes);
+        modal.find('#claims-detail-incident-date').text(((claim.incidentDate) ? moment(claim.incidentDate).format('DD-MM-YYYY') : '')+' at '+claim.incidentTime);
+        modal.find('#claims-detail-incident-location').text(claim.location);
         modal.find('#claims-detail-description').text(claim.description);
 
         modal.find('#claims-damage').hide();
@@ -188,13 +193,18 @@ $('#claimsModal').on('show.bs.modal', function (event) {
                 }
             }
 
+            var crimeRef = claim.crimeRef;
+            if (!claim.validCrimeRef) {
+                crimeRef += ' <i class="fa fa-warning" title="Invalid crime reference"></i>';
+            }
+
             if (claim.type == 'theft') {
-                modal.find('#claims-detail-crime-reference').text(claim.crimeRef);
+                modal.find('#claims-detail-crime-reference').html(crimeRef+' / '+claim.force);
                 modal.find('#claims-detail-crime-reference-container').show();
                 modal.find('#claims-detail-policy-report-container').hide();
             }
             else {
-                modal.find('#claims-detail-policy-report').text(claim.crimeRef);
+                modal.find('#claims-detail-policy-report').html(crimeRef+' / '+claim.force);
                 modal.find('#claims-detail-crime-reference-container').hide();
                 modal.find('#claims-detail-policy-report-container').show();
             }

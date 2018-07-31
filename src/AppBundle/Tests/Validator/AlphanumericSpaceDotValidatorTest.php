@@ -51,6 +51,8 @@ class AlphanumericSpaceDotValidatorTest extends \PHPUnit\Framework\TestCase
         $validator->validate('$', self::$constraint);
     }
 
+
+
     public function configureValidator($expectedMessage = null)
     {
         // mock the violation builder

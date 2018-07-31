@@ -1,0 +1,33 @@
+// palette.scss
+
+$white: #ffffff;
+$off-white: #f2f2f3;
+
+// $blue-d: #1a7bdb;
+// $blue-1: #1e90ff;
+// $blue-2: #02bcfe;
+// $blue-l: #24d2fd;
+
+$grey:   #687296;
+$dark:   #170B38;
+$bb-1:   #ECF5FE;
+$bb-2:   #E0EFFD;
+$blue-1: #00BAFF;
+$blue-2: #2593F3;
+$blue-3: #0051E8;
+$blue-4: #081B9A;
+
+
+$theme-colors: (
+    "primary": $blue-2,
+    "blue1":  $blue-1,
+    "blue2":  $blue-2,
+    "blue3":  $blue-3,
+    "blue4":  $blue-4,
+    "white":  $white,
+);
+
+// Gradients
+.standard-gradient {
+    // @include linear-gradient(90deg, $blue-1, $blue-2);
+}

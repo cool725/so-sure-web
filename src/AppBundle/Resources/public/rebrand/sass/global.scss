@@ -1,0 +1,36 @@
+// global.scss
+
+// Abstracts
+// - functions, mixins, variables
+@import "abstracts/mixins";
+@import "abstracts/variables";
+@import "abstracts/palette";
+
+// Import Bootstrap
+@import "vendor/bs4/bootstrap.scss";
+
+// Base
+// - animations, typography, utilies
+@import "base/fonts";
+@import "base/type";
+@import "base/helpers";
+
+// Components
+// - split into individual files
+@import "components/buttons";
+@import "components/nav";
+@import "components/menu";
+@import "components/search";
+@import "components/phone-carousel";
+
+// Layout
+// - header, footer, navigation
+@import "layout/header";
+@import "layout/footer";
+
+// Vendor
+// - third parts CSS
+@import "vendor/hamburgers/hamburgers";
+
+// Pages
+// @import "pages/homepage";

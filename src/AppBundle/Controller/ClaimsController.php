@@ -122,6 +122,7 @@ class ClaimsController extends BaseController
         $fraudService = $this->get('app.fraud');
         $dm = $this->getManager();
         $repo = $dm->getRepository(Policy::class);
+        /** @var Policy $policy */
         $policy = $repo->find($id);
         if (!$policy) {
             throw $this->createNotFoundException('Policy not found');
@@ -131,6 +132,8 @@ class ClaimsController extends BaseController
         if ($claim === null) {
             $claim = new Claim();
             $claim->setPolicy($policy);
+            $claim->setStatus(Claim::STATUS_INREVIEW);
+            $claim->setHandlingTeam($this->getUser()->getHandlingTeam());
         }
         $claimscheck = new ClaimsCheck();
         $claimscheck->setPolicy($policy);
@@ -159,6 +162,7 @@ class ClaimsController extends BaseController
                     /** @var ClaimsService $claimsService */
                     $claimsService = $this->get('app.claims');
                     if ($claim->getStatus() == Claim::STATUS_SUBMITTED) {
+                        $claim->setStatus(Claim::STATUS_INREVIEW);
                         if ($claimsService->updateClaim($policy, $claim)) {
                             $this->addFlash('success', sprintf(
                                 'Claim %s is updated. Excess is £%d',
@@ -287,6 +291,7 @@ class ClaimsController extends BaseController
             'claim_types' => Claim::$claimTypes,
             'phones' => $dm->getRepository(Phone::class)->findActive()->getQuery()->execute(),
             'now' => new \DateTime(),
+            'claim' => $claim,
         ];
     }
 

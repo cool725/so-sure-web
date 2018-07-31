@@ -2,6 +2,7 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Document\ValidatorTrait;
 use AppBundle\Service\MailerService;
 use Egulias\EmailValidator\Validation\RFCValidation;
 use Psr\Log\LoggerInterface;
@@ -81,6 +82,7 @@ use Egulias\EmailValidator\EmailValidator;
 class ApiAuthController extends BaseController
 {
     use PhoneTrait;
+    use ValidatorTrait;
 
     /**
      * @Route("/address", name="api_auth_address")

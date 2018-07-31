@@ -1,0 +1,91 @@
+{% extends 'base_rebrand.html.twig' %}
+
+{# Set vars #}
+{% set body_class = 'home' %}
+
+{% block title %}so-sure - Welcome to Social Insurance{% endblock %}
+{% block meta %}
+    <meta name="description" content="Social mobile phone insurance that's better and up to 80% cheaper when you connect with friends and don't claim. Download our app now to see how much you could save."/>
+{% endblock %}
+
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/homepage.css') }}">
+{% endblock %}
+
+{% block body %}
+
+    <section class="hero">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-5">
+                    <div class="hero__intro">
+                        <h1 class="pb-3">Mobile insurance <br><span class="sub">designed for you</span></h1>
+                        <p class="pb-3">A new type of phone insurance that’s reliable, rewarding and simply better. lorem ipsum dolor amet, so-sure low excess adipiscing et praesent et replacement next day.</p>
+                    </div>
+                    <div class="hero__controls pb-3">
+                        <a href="#" class="btn btn-primary btn-block-xs mr-lg-2">Get a Quote</a>
+                        <a href="#" class="btn btn-outline-primary btn-block-xs"><i class="far fa-play-circle"></i> Watch our Video</a>
+                    </div>
+                </div>
+                <div class="col-lg-7 d-none d-lg-block">
+                    <div class="hero__illustration pt-lg-0">
+                        <img src="{{ cdn_url }}/images/rebrand/homepage/ss-hero-illustration-group.svg" alt="so-sure - social insurance" class="img-fluid">
+                    </div>
+                </div>
+            </div>
+            <div class="hero__illustration d-block d-lg-none py-4">
+                <img src="{{ cdn_url }}/images/rebrand/ss-hero-illustration-group.svg" alt="so-sure - social insurance" class="img-fluid">
+            </div>
+            <div class="hero__credbar pt-4">
+                <ul class="list-inline">
+                    <li class="list-inline-item">
+                        <img src="{{ cdn_url }}/images/rebrand/credbar/ss-credbar-trustpilot.png" alt="Trustpilot" width="100px">
+                    </li>
+                    <li class="list-inline-item">
+                        <img src="{{ cdn_url }}/images/rebrand/credbar/ss-credbar-money.png" alt="Money" width="100px">
+                    </li>
+                    <li class="list-inline-item">
+                        <img src="{{ cdn_url }}/images/rebrand/credbar/ss-credbar-gocompare.png" alt="GoCompare" width="100px">
+                    </li>
+                    <li class="list-inline-item">
+                        <img src="{{ cdn_url }}/images/rebrand/credbar/ss-credbar-theguardian.png" alt="The Guardian" width="100px">
+                    </li>
+                    <li class="list-inline-item">
+                        <img src="{{ cdn_url }}/images/rebrand/credbar/ss-credbar-ft.png" alt="The Financial Times" width="100px">
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <section class="intro bg-bb1 py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-6">
+                    <h2 class="h4 pb-4 text-blue2">We're a new kind of insurer</h2>
+                </div>
+                <div class="col-lg-6">
+                    <dl class="tick-list">
+                        <dt class="h5 text-blue4">We’re here for people not profits</dt>
+                        <dd>
+                            <p>We’re an insurer that’s focused on people, not profits. We saw an opportunity to make insurance better.</p>
+                        </dd>
+                        <dt class="h5 text-blue4">We’re uncomplicated and up to 40% cheaper</dt>
+                        <dd>
+                            <p>We provide mobile insurance that’s simple, reasonable and hassle-free lorem ipsum dolor amet et so-sure.</p>
+                        </dd>
+                        <dt class="h5 text-blue4">We’re here for people not profits</dt>
+                        <dd>
+                            <p>We’re an insurer that’s focused on people, not profits. We saw an opportunity to make insurance better. </p>
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </section>
+
+{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/homepage.js') }}"></script>
+{% endblock %}

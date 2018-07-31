@@ -4,6 +4,7 @@ namespace AppBundle\Service;
 use AppBundle\Document\File\ProofOfLossFile;
 use AppBundle\Document\File\S3ClaimFile;
 use AppBundle\Document\File\S3File;
+use AppBundle\Document\ValidatorTrait;
 use Predis\Client;
 use AppBundle\Repository\PhonePolicyRepository;
 use Psr\Log\LoggerInterface;
@@ -30,6 +31,8 @@ use League\Flysystem\Filesystem;
 
 class ClaimsService
 {
+    use ValidatorTrait;
+
     const S3_POLICY_BUCKET = 'policy.so-sure.com';
     const S3_CLAIMS_FOLDER = 'claim-documents';
     const LOGIN_LINK_TOKEN_EXPIRATION = 7200; // 2 hours
@@ -46,6 +49,9 @@ class ClaimsService
     /** @var RouterService */
     protected $routerService;
 
+    /** @var ReceperioService */
+    protected $imeiService;
+
     /** @var Client */
     protected $redis;
 
@@ -56,19 +62,21 @@ class ClaimsService
     protected $filesystem;
 
     /**
-     * @param DocumentManager $dm
-     * @param LoggerInterface $logger
-     * @param MailerService   $mailer
-     * @param RouterService   $routerService
-     * @param Client          $redis
-     * @param string          $environment
-     * @param MountManager    $filesystem
+     * @param DocumentManager  $dm
+     * @param LoggerInterface  $logger
+     * @param MailerService    $mailer
+     * @param RouterService    $routerService
+     * @param ReceperioService $imeiService
+     * @param Client           $redis
+     * @param string           $environment
+     * @param MountManager     $filesystem
      */
     public function __construct(
         DocumentManager $dm,
         LoggerInterface $logger,
         MailerService $mailer,
         RouterService $routerService,
+        ReceperioService $imeiService,
         $redis,
         $environment,
         MountManager $filesystem
@@ -77,6 +85,7 @@ class ClaimsService
         $this->logger = $logger;
         $this->mailer = $mailer;
         $this->routerService = $routerService;
+        $this->imeiService = $imeiService;
         $this->redis = $redis;
         $this->environment = $environment;
         $this->filesystem = $filesystem;
@@ -89,8 +98,8 @@ class ClaimsService
         $claim->setType($claimFnol->getType());
         $claim->setIncidentDate($claimFnol->getWhen());
         $claim->setIncidentTime($claimFnol->getTime());
-        $claim->setLocation($claimFnol->getWhere());
-        $claim->setDescription($claimFnol->getMessage());
+        $claim->setLocation($this->conformAlphanumericSpaceDot($claimFnol->getWhere(), 250));
+        $claim->setDescription($this->conformAlphanumericSpaceDot($claimFnol->getMessage(), 5000));
         $claim->setNetwork($claimFnol->getNetwork());
         $claim->setPhoneToReach($claimFnol->getPhone());
         $claim->setTimeToReach($claimFnol->getTimeToReach());
@@ -144,6 +153,9 @@ class ClaimsService
         $claim->setReportType($claimTheftLoss->getReportType());
         $claim->setCrimeRef($claimTheftLoss->getCrimeReferenceNumber());
         $claim->setForce($claimTheftLoss->getForce());
+
+        $validCrimeRef = $this->imeiService->validateCrimeRef($claim->getForce(), $claim->getCrimeRef());
+        $claim->setValidCrimeRef($validCrimeRef);
 
         if ($claimTheftLoss->getProofOfUsage()) {
             $proofOfUsage = new ProofOfUsageFile();
@@ -237,18 +249,9 @@ class ClaimsService
     {
         $repo = $this->dm->getRepository(Claim::class);
 
-        // Claim state for same claim number may change
-        // (not yet sure if we want a new claim record vs update claim record)
-        // Regardless, same claim number for different policies is not allowed
-        // Also same claim number on same policy with same state is not allowed
         $duplicates = $repo->findBy(['number' => (string) $claim->getNumber()]);
-        foreach ($duplicates as $duplicate) {
-            if ($policy->getId() != $duplicate->getPolicy()->getId()) {
-                return false;
-            }
-            if ($claim->getStatus() == $duplicate->getStatus()) {
-                return false;
-            }
+        if (count($duplicates) > 0) {
+            return false;
         }
 
         $policy->addClaim($claim);
@@ -266,16 +269,9 @@ class ClaimsService
     {
         $repo = $this->dm->getRepository(Claim::class);
 
-        // Claim state for same claim number may change
-        // (not yet sure if we want a new claim record vs update claim record)
-        // Regardless, same claim number for different policies is not allowed
-        // Also same claim number on same policy with same state is not allowed
         $duplicates = $repo->findBy(['number' => (string) $claim->getNumber()]);
         foreach ($duplicates as $duplicate) {
             if ($policy->getId() != $duplicate->getPolicy()->getId()) {
-                return false;
-            }
-            if ($claim->getStatus() == $duplicate->getStatus()) {
                 return false;
             }
         }

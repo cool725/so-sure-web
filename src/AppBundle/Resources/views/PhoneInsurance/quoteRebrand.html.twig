@@ -1,0 +1,148 @@
+{% extends 'base_rebrand.html.twig' %}
+
+{# Set vars #}
+{% set body_class = 'quote' %}
+
+{% block title %} {{ phone.make }} {{ phone.model }} Insurance - so-sure{% endblock %}
+{% block meta %}
+    <meta name="description" content="For a small monthly fee your phone is covered for theft, loss, accidental damage and unauthorised usage."/>
+    <link rel="canonical" href="{{ url('quote_make_model', {'make': phone.makeCanonical, 'model': phone.encodedModelCanonical}) }}" />
+{% endblock %}
+
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/quotepage.css') }}">
+{% endblock %}
+
+{% block body %}
+
+    {# Hero #}
+    <section class="section__hero">
+        <div class="container">
+            <h1 class="text-white mb-5 section__hero_title">
+                Insurance for your <br>
+                {{ phone.make }} {{ phone.model }} <small>({{ phone.memory }}GB)</small> <br>
+                <span class="text-blue2">&pound;{{ phone_price.monthlyPremiumPrice }} per month</span>
+            </h1>
+            <div class="section__hero_controls">
+                <a href="#" class="btn btn-white btn-lg mb-4 text-primary">get started</a>
+                <ul class="list-inline">
+                    <li class="list-inline-item">
+                        <small><a href="#" class="text-link-light">Not your phone?</a></small>
+                    </li>
+                    <li class="list-inline-item">
+                        <small><a href="#" class="text-link-light">Log in with Google</a></small>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        {# Curved Bottom #}
+        <svg class="d-block section__hero_curve"
+             preserveAspectRatio="xMinYMin meet"
+             viewBox="0 0 1368 198"
+             version="1.1"
+             xmlns="http://www.w3.org/2000/svg"
+             xmlns:xlink="http://www.w3.org/1999/xlink">
+            <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                <g id="Artboard-1" fill="#ffff">
+                    <path d="M0,60 C228,133.333333 456,170 684,170 C912,170 1140,113.333333 1368,0 L1368,198 L0,198 L0,60 Z" id="Rectangle"></path>
+                </g>
+            </g>
+        </svg>
+    </section>
+
+    {# Cover #}
+    <section class="section__cover py-5">
+        <div class="container">
+            <div class="row bordered-columns">
+                <div class="col-sm-6 col-lg-4 offset-lg-2">
+                    <h3 class="mb-3">We always cover:</h3>
+                    <ul class="list-unstyled list-fa">
+                        <li class="mb-3"><i class="fas fa-check-circle text-blue2 fa-lg"></i> Theft</li>
+                        <li class="mb-3"><i class="fas fa-check-circle text-blue2 fa-lg"></i> Loss</li>
+                        <li class="mb-3"><i class="fas fa-check-circle text-blue2 fa-lg"></i> Out of warranty breakdown</li>
+                        <li class="mb-3"><i class="fas fa-check-circle text-blue2 fa-lg"></i> Water damage</li>
+                        <li class="mb-3"><i class="fas fa-check-circle text-blue2 fa-lg"></i> Cracked screen</li>
+                        <li class="mb-3"><i class="fas fa-check-circle text-blue2 fa-lg"></i> Worldwide cover</li>
+                    </ul>
+                </div>
+                <div class="col-sm-6 col-lg-5 offset-lg-1">
+                    <h3 class="mb-3">What we offer:</h3>
+                    <ul class="list-unstyled list-fa">
+                        <li class="mb-3"><i class="fas fa-check-circle text-blue1 fa-lg"></i> 24-72 hour replacement or repair <br> <small>on approval of claim</small></li>
+                        <li class="mb-3"><i class="fas fa-check-circle text-blue1 fa-lg"></i> 24/7 live support</li>
+                        <li class="mb-3"><i class="fas fa-check-circle text-blue1 fa-lg"></i> Insured used phones</li>
+                        <li class="mb-3"><i class="fas fa-check-circle text-blue1 fa-lg"></i> Instant cover when you purchase your policy</li>
+                        <li class="mb-3"><i class="fas fa-check-circle text-blue1 fa-lg"></i> Up to 80% cashback every year</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {# Excess #}
+    <section class="section__excess py-5">
+        <div class="container">
+            <h2 class="text-center mb-5">Our Excess</h2>
+            <div class="row">
+                <div class="col-md-4">
+                    <p>When you validate that your phone is in good working condition via our app your excess is reduced to just <strong>£50 accidental damage/breakdown, £70 for loss and theft</strong>.</p>
+                </div>
+                <div class="col-md-4">
+                    <p>Not only that, should you make a claim, it becomes an easier and speedier process, and we dont ask you to provide proof of purchase.</p>
+                </div>
+                <div class="col-md-4">
+                    <p>If you do not validate your phone, your excess will be £150 and your claims process may take some more time.</p>
+                </div>
+            </div>
+            <div class="text-center my-3">
+                <a href="#" class="btn btn-blue2 btn-lg">get started</a>
+            </div>
+        </div>
+    </section>
+
+    {# Video #}
+    <section class="section__video py-5">
+        <div class="container">
+            <h2 class="text-center text-white">Get up to 80% cashback a year</h2>
+            <h5 class="text-center text-white mb-5">Fill your reward pot buy connecting to friends</h5>
+        </div>
+        {# Curved Bottom #}
+        <svg class="d-block section__hero_curve"
+             preserveAspectRatio="xMinYMin meet"
+             viewBox="0 0 1368 198"
+             version="1.1"
+             xmlns="http://www.w3.org/2000/svg"
+             xmlns:xlink="http://www.w3.org/1999/xlink">
+            <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                <g id="Artboard-1" fill="#ffff">
+                    <path d="M0,60 C228,133.333333 456,170 684,170 C912,170 1140,113.333333 1368,0 L1368,198 L0,198 L0,60 Z" id="Rectangle"></path>
+                </g>
+            </g>
+        </svg>
+    </section>
+
+    {# Reward Pot #}
+    <section class="section__reward-pot py-5">
+        <div class="container">
+            <h2 class="text-center text-primary">The reward pot explained</h2>
+            <h5 class="text-center mb-5">If you and your friends take good care of your phones and don’t need to claim, <br class="d-none d-sm-inline"> we’ll give you up to 80% of your premium back at the end of your policy year.</h5>
+            <div class="text-center my-3">
+                <a href="#" class="btn btn-blue2 btn-lg">get started</a>
+            </div>
+        </div>
+    </section>
+
+    {# Lead #}
+    <section class="section__lead py-5">
+        <div class="container">
+            <h2 class="text-center text-white">Guarantee this price for the next 7 days</h2>
+        </div>
+    </section>
+
+
+
+{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/quotepage.js') }}"></script>
+{% endblock %}

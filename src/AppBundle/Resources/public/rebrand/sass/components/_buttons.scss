@@ -1,0 +1,21 @@
+// button.scss
+
+.btn {
+    font-family: $g-medium;
+}
+
+// Button block mobile only
+@include media-breakpoint-down(xs) {
+
+    .btn-block-xs {
+        display: block;
+        width: 100%;
+        padding-top: .8rem;
+        padding-bottom: .8rem;
+    }
+
+    .btn-block-xs + .btn-block-xs  {
+        margin-top: 1.1rem;
+    }
+}
+

@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+        <meta name="referrer" content="origin" />
+
+        <title>{% block title %}so-sure{% endblock %}</title>
+
+        {% block meta %}{% endblock %}
+
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css" integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ" crossorigin="anonymous">
+
+        <link rel="stylesheet" href="{{ asset('css-js/global.css') }}">
+
+        {% block cssPage %}{% endblock %}
+
+        {% include '::meta_rebrand.html.twig' %}
+
+        <script>
+            var dataLayer = window.dataLayer = window.dataLayer || [];
+
+            {% if intercom_enabled is not defined %}
+                {% set intercom_enabled = true %}
+            {% endif %}
+            {% if app is not null and app.session.isStarted %}
+                {% set session_referral = app.session.get('referral') %}
+                {% set session_scode = app.session.get('scode') %}
+                {% set session_quote_url = app.session.get('quote_url') %}
+            {% else %}
+                {% set session_referral = '' %}
+                {% set session_scode = '' %}
+                {% set session_quote_url = '' %}
+            {% endif %}
+
+            dataLayer.push({
+                {% if (app is not defined or app is null) or
+                    ( (app.user is not defined or app.user is null or not app.user) or
+                      (app.session.isStarted and is_granted('ROLE_PREVIOUS_ADMIN'))
+                    )
+                %}
+                    'branch': {
+                        'banner': true,
+                        'referral': '{{ session_referral }}',
+                        'scode': '{{ session_scode }}'
+                    },
+                    'user': {
+                        'id': undefined,
+                    },
+                    'intercom': {
+                        'user_id': null,
+                        'user_hash': null,
+                        'email': null,
+                        'name':  null,
+                        'created_at': null,
+                        'quote_url': '{{ session_quote_url }}',
+                        'enabled': {% if intercom_enabled %}true{% else %}false{% endif %}
+                    }
+                {% else %}
+                    'branch': {
+                        'banner': false,
+                        'referral': '{{ session_referral }}',
+                        'scode': '{{ session_scode }}'
+                    },
+                    'user': {
+                        'id': '{{ app.user.id }}'
+                    },
+                    'intercom': {
+                        'user_id': '{{ app.user.id }}',
+                        'user_hash': '{{ intercom(app.user) }}',
+                        'email': '{{ app.user.email }}',
+                        'name': '{{ app.user.name }}',
+                        'created_at': '{{ app.user.created|date('U') }}',
+                        'quote_url': '{{ session_quote_url }}',
+                        'enabled': {% if intercom_enabled %}true{% else %}false{% endif %}
+                    }
+                {% endif %}
+                ,'has_visited_welcome_page': {% if has_visited_welcome_page is not defined or not has_visited_welcome_page %}false{% else %}true{% endif %}
+                {% block gtm_data %}{% endblock %}
+            });
+        </script>
+
+        {% if exclude_remote_scripts is not defined or not exclude_remote_scripts %}
+            <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+            new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+            j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+            'https://www.googletagmanager.com/gtm.js?id='+i+dl+'{{ ga_tag_manager_env|raw }}';f.parentNode.insertBefore(j,f);
+            })(window,document,'script','dataLayer','GTM-KGBBJQ');</script>
+        {% endif %}
+
+        {% block remotestylesheets %}{% endblock %}
+        {% block metaend %}{% endblock %}
+    </head>
+    <body class="d-flex flex-column {% if body_class is defined %}{{ body_class }}{% endif %}">
+
+        {% if exclude_remote_scripts is not defined or not exclude_remote_scripts %}
+            <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KGBBJQ{{ ga_tag_manager_env|raw }}"
+            height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+        {% endif %}
+
+        {% block nav %}
+            {% include '::nav_rebrand.html.twig' %}
+        {% endblock %}
+
+        {% include '::flash_rebrand.html.twig' %}
+
+        <main id="content" class="w-100 pb-5 flex-grow-1">
+            {% block body %}{% endblock %}
+        </main>
+
+        {% block footer %}
+            {% include '::footer_rebrand.html.twig' %}
+        {% endblock %}
+
+        <script src="{{ asset('css-js/manifest.js') }}"></script>
+        <script src="{{ asset('css-js/vendor.js') }}"></script>
+        <script src="{{ asset('css-js/global.js') }}"></script>
+
+        {% block javascriptsPage %}{% endblock %}
+    </body>
+</html>
