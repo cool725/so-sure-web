@@ -61,6 +61,9 @@ class ClaimsService
     /** @var MountManager */
     protected $filesystem;
 
+    /** @var FeatureService */
+    protected $featureService;
+
     /**
      * @param DocumentManager  $dm
      * @param LoggerInterface  $logger
@@ -70,6 +73,7 @@ class ClaimsService
      * @param Client           $redis
      * @param string           $environment
      * @param MountManager     $filesystem
+     * @param FeatureService   $featureService
      */
     public function __construct(
         DocumentManager $dm,
@@ -79,7 +83,8 @@ class ClaimsService
         ReceperioService $imeiService,
         $redis,
         $environment,
-        MountManager $filesystem
+        MountManager $filesystem,
+        FeatureService $featureService
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
@@ -89,6 +94,7 @@ class ClaimsService
         $this->redis = $redis;
         $this->environment = $environment;
         $this->filesystem = $filesystem;
+        $this->featureService = $featureService;
     }
 
     public function createClaim(ClaimFnol $claimFnol)
@@ -463,14 +469,21 @@ class ClaimsService
             $claim->getPolicy()->getUser()->getName(),
             $claim->getPolicy()->getPolicyNumber()
         );
+
+        $email = 'new-claim@wearesosure.com';
+        if ($this->featureService->isEnabled(Feature::FEATURE_CLAIMS_DEFAULT_DIRECT_GROUP)) {
+            $email = 'SoSure@directgroup.co.uk';
+        }
+
         $this->mailer->sendTemplate(
             $subject,
-            'new-claim@wearesosure.com',
+            $email,
             'AppBundle:Email:claim/fnolToClaims.html.twig',
             ['data' => $claim],
             null,
             null,
-            $this->downloadAttachmentFiles($claim)
+            $this->downloadAttachmentFiles($claim),
+            'bcc@so-sure.com'
         );
 
         $this->mailer->sendTemplate(
@@ -494,9 +507,14 @@ class ClaimsService
             'Additional Documents for Policy %s',
             $claim->getPolicy()->getPolicyNumber()
         );
+
+        $email = 'update-claim@wearesosure.com';
+        if ($this->featureService->isEnabled(Feature::FEATURE_CLAIMS_DEFAULT_DIRECT_GROUP)) {
+            $email = 'SoSure@directgroup.co.uk';
+        }
         $this->mailer->sendTemplate(
             $subject,
-            'update-claim@wearesosure.com',
+            $email,
             'AppBundle:Email:claim/fnolToClaims.html.twig',
             ['data' => $claim],
             null,
