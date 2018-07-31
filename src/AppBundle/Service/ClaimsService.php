@@ -520,7 +520,8 @@ class ClaimsService
             ['data' => $claim],
             null,
             null,
-            $localAttachments
+            $localAttachments,
+            'bcc@so-sure.com'
         );
     }
 
