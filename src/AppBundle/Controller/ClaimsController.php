@@ -133,6 +133,7 @@ class ClaimsController extends BaseController
             $claim = new Claim();
             $claim->setPolicy($policy);
             $claim->setStatus(Claim::STATUS_INREVIEW);
+            $claim->setHandlingTeam($this->getUser()->getHandlingTeam());
         }
         $claimscheck = new ClaimsCheck();
         $claimscheck->setPolicy($policy);

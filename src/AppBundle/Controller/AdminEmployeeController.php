@@ -9,6 +9,7 @@ use AppBundle\Form\Type\AdminEmailOptOutType;
 use AppBundle\Form\Type\BacsCreditType;
 use AppBundle\Form\Type\PaymentRequestUploadFileType;
 use AppBundle\Form\Type\UploadFileType;
+use AppBundle\Form\Type\UserHandlingTeamType;
 use AppBundle\Security\FOSUBUserProvider;
 use AppBundle\Service\BacsService;
 use AppBundle\Service\FraudService;
@@ -1162,6 +1163,9 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         $roleForm = $this->get('form.factory')
             ->createNamedBuilder('user_role_form', UserRoleType::class, $role)
             ->getForm();
+        $handlingTeamForm = $this->get('form.factory')
+            ->createNamedBuilder('handling_team_form', UserHandlingTeamType::class, $user)
+            ->getForm();
         $deleteForm = $this->get('form.factory')
             ->createNamedBuilder('delete_form')
             ->add('delete', SubmitType::class)
@@ -1387,6 +1391,17 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
 
                     return $this->redirectToRoute('admin_user', ['id' => $id]);
                 }
+            } elseif ($request->request->has('handling_team_form')) {
+                $handlingTeamForm->handleRequest($request);
+                if ($handlingTeamForm->isValid()) {
+                    $dm->flush();
+                    $this->addFlash(
+                        'success',
+                        'Updated Handling Team'
+                    );
+
+                    return $this->redirectToRoute('admin_user', ['id' => $id]);
+                }
             } elseif ($request->request->has('delete_form')) {
                 $deleteForm->handleRequest($request);
                 if ($deleteForm->isValid()) {
@@ -1416,6 +1431,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             'user_high_risk_form' => $userHighRiskForm->createView(),
             'makemodel_form' => $makeModelForm->createView(),
             'sanctions_form' => $sanctionsForm->createView(),
+            'handling_team_form' => $handlingTeamForm->createView(),
             'delete_form' => $deleteForm->createView(),
             'postcode' => $postcode,
             'census' => $census,

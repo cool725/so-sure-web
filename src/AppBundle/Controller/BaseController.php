@@ -983,6 +983,8 @@ abstract class BaseController extends Controller
     protected function searchClaims(Request $request)
     {
         $dm = $this->getManager();
+        /** @var User $user */
+        $user = $this->getUser();
         $repo = $dm->getRepository(Claim::class);
         $qb = $repo->createQueryBuilder();
 
@@ -997,6 +999,9 @@ abstract class BaseController extends Controller
         }
         if (mb_strlen($claimId) > 0 && \MongoId::isValid($claimId)) {
             $qb = $qb->field('id')->equals(new \MongoId($claimId));
+        }
+        if ($user->getHandlingTeam()) {
+            $qb = $qb->field('handlingTeam')->equals($user->getHandlingTeam());
         }
         $qb = $qb->sort('replacementReceivedDate', 'desc')
             ->sort('approvedDate', 'desc')
