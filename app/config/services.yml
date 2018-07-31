@@ -187,6 +187,7 @@ services:
             - "@snc_redis.default"
             - "%kernel.environment%"
             - "@oneup_flysystem.mount_manager"
+            - "@app.feature"
 
     app.shortlink:
         class: AppBundle\Service\ShortLinkService
