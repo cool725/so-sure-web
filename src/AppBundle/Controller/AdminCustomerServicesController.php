@@ -275,11 +275,13 @@ class AdminCustomerServicesController extends BaseController
             throw $this->createNotFoundException('Claim not found');
         }
         if (!in_array($claim->getStatus(), [
+            Claim::STATUS_FNOL,
+            Claim::STATUS_SUBMITTED,
             Claim::STATUS_INREVIEW,
             Claim::STATUS_PENDING_CLOSED,
         ])) {
             throw new \Exception(
-                'Claim can only be withdrawn if claim is in-review or pending-closed state'
+                'Claim can only be withdrawn if claim is fnol, submitted, in-review or pending-closed state'
             );
         }
 
