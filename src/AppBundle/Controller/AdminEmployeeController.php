@@ -338,7 +338,8 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                     $dm->persist($user);
                     $dm->flush();
                     $this->addFlash('success', sprintf(
-                        'Created User. %s',
+                        'Created User. <a href="%s">%s</a>',
+                        $this->generateUrl('admin_user', ['id' => $user->getId()]),
                         $email
                     ));
                 }
@@ -1276,10 +1277,21 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                     $dm->flush();
                     $this->addFlash(
                         'success',
-                        'Update User'
+                        'Updated User'
                     );
 
                     return $this->redirectToRoute('admin_user', ['id' => $id]);
+                } else {
+                    $errors = 'Unknown';
+                    try {
+                        $this->validateObject($user);
+                    } catch (\Exception $e) {
+                        $errors = $e->getMessage();
+                    }
+                    $this->addFlash(
+                        'error',
+                        sprintf('Failed to update user. Error: %s', $errors)
+                    );
                 }
             } elseif ($request->request->has('user_address_form')) {
                 $userAddressForm->handleRequest($request);
