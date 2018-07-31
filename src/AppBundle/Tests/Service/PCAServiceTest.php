@@ -14,22 +14,25 @@ class PCAServiceTest extends WebTestCase
 {
     use \AppBundle\Tests\PhingKernelClassTrait;
     protected static $container;
+    /** @var PCAService */
     protected static $pca;
     protected static $redis;
 
     public static function setUpBeforeClass()
     {
-         //start the symfony kernel
-         $kernel = static::createKernel();
-         $kernel->boot();
+        //start the symfony kernel
+        $kernel = static::createKernel();
+        $kernel->boot();
 
-         //get the DI container
-         self::$container = $kernel->getContainer();
+        //get the DI container
+        self::$container = $kernel->getContainer();
 
-         //now we can instantiate our service (if you want a fresh one for
-         //each test method, do this in setUp() instead
-         self::$pca = self::$container->get('app.address');
-         self::$redis = self::$container->get('snc_redis.default');
+        //now we can instantiate our service (if you want a fresh one for
+        //each test method, do this in setUp() instead
+        /** @var PCAService $pca */
+        $pca = self::$container->get('app.address');
+        self::$pca = $pca;
+        self::$redis = self::$container->get('snc_redis.default');
     }
 
     public function tearDown()
