@@ -1,6 +1,7 @@
 <?php
 namespace AppBundle\Service;
 
+use AppBundle\Document\Feature;
 use AppBundle\Document\File\ProofOfLossFile;
 use AppBundle\Document\File\S3ClaimFile;
 use AppBundle\Document\File\S3File;
