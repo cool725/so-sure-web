@@ -29,6 +29,7 @@ class Bearer extends BaseController
     }
 
     /**
+     * Show the identified username for the access-token (Bearer token)
      * @Route("/ping")
      */
     public function ping(): Response
@@ -44,20 +45,25 @@ class Bearer extends BaseController
     }
 
     /**
-     * @Route("/user/{id}")
+     * Get user & policy summary for the current user.
+     *
+     * When accessing via a Bearer token, the user was attached to the token during the original auth.
+     *
+     * @Route("/user")
      */
-    public function user(Request $request, $id): JsonResponse
+    public function user(Request $request): JsonResponse
     {
         try {
-            $dm = $this->getManager();
-            $repo = $dm->getRepository(User::class);
+            #$dm = $this->getManager();
+
             /** @var User $user */
-            $user = $repo->find($id);
+            $user = $this->getUser();
             if (!$user) {
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_NOT_FOUND, 'User not found', 404);
             }
 
             #$this->denyAccessUnlessGranted(PolicyVoter::VIEW, $user);
+            $this->denyAccessUnlessGranted('ROLE_API', $user, 'Access to user/policy summary denied');
 
             $debug = false;
             if ($this->getRequestBool($request, 'debug')) {
@@ -65,7 +71,6 @@ class Bearer extends BaseController
             }
 
             $response = new PolicySummary($user);
-            #$this->logger->info(sprintf('getUserAction Resp %s', json_encode($response)));
 
             return new JsonResponse($response->get());
         } catch (\Throwable $e) {
