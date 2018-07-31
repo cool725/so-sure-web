@@ -35,11 +35,9 @@ security:
         oauth_token:
             pattern:    ^/oauth/v2/token
             security:   false
-        #oauth2_auth:
-            #pattern:    ^/oauth/v2/auth
-            #stateless: false    # need to be able to save the TargetPath
-            #anonymous: true
-            #entry_point: AppBundle\Security\BearerApiLoginEntryPoint
+        # Don't put a firewall on  ^/oauth/v2/auth, and no access_control on it either
+        # It, and the main purchase flow must be on the same firewall context to stay logged in between them
+        # while maintaining the redirect URL in the targetPath session
 
         api:
             pattern: ^/api
@@ -95,6 +93,5 @@ security:
         - { path: ^/claims/, role: ROLE_NO_ACCESS }
         - { path: ^/alpha$, role: ROLE_USER }
         - { path: ^/user/, role: ROLE_USER }
-        - { path: ^/oauth/v2/auth, roles: [ IS_AUTHENTICATED_ANONYMOUSLY ] }
         - { path: ^/bearer-api, roles: [ IS_AUTHENTICATED_FULLY ] }
         - { path: ^/api, access: "isApiPort(8080)" }

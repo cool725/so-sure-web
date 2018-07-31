@@ -3,6 +3,7 @@ declare(strict_types=1);
 namespace AppBundle\Security;
 
 use AppBundle\Oauth2Scopes;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -19,10 +20,15 @@ class BearerApiLoginEntryPoint implements AuthenticationEntryPointInterface
 {
     /** @var UrlGeneratorInterface */
     private $router;
+    /**
+     * @var LoggerInterface
+     */
+    private $log;
 
-    public function __construct(UrlGeneratorInterface $router)
+    public function __construct(UrlGeneratorInterface $router, LoggerInterface $logger)
     {
         $this->router = $router;
+        $this->log = $logger;
     }
 
     /**
@@ -39,6 +45,8 @@ class BearerApiLoginEntryPoint implements AuthenticationEntryPointInterface
     {
         $defaultLoginRoute  = 'fos_user_security_login';
         $parameters = [];
+
+        $this->log->notice('in '.__METHOD__, ['request' => $request, 'AuthenticationException' => $authException]);
 
         if ($authException instanceof InsufficientAuthenticationException) {
             if ($redirection = $this->oauthRequiresLogin($request)) {
