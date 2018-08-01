@@ -67,9 +67,11 @@ class BearerTest extends BaseControllerTest
 
         $content = self::$client->getResponse()->getContent();
 
-        $expected = '{"response":"pong","data":"alister@so-sure.com"}';
         $this->assertContains('pong', $content);
-        $this->assertJsonStringEqualsJsonString($expected, $content);
+        $this->assertJsonStringEqualsJsonString(
+            '{"response":"pong","data":"alister@so-sure.com"}',
+            $content
+        );
     }
 
     public function getAccessTokenObject(string $knownAccessToken): AccessToken

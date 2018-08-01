@@ -189,7 +189,7 @@ class DefaultController extends BaseController
         $session = $request->getSession();
         if ($session) {
             $session->set('oauth2Flow', 'starling');
-            // out local copy of the target path, to use to go back to the oauth2/v2/auth page
+            // our local copy of the target path, to use to go back to the oauth2/v2/auth page
             $session->set('oauth2Flow.targetPath', $this->getTargetPath($session, 'main'));
         }
 
