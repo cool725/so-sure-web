@@ -1132,7 +1132,7 @@ class UserController extends BaseController
      * @Route("/welcome/{id}", name="user_welcome_policy_id")
      * @Template
      */
-    public function welcomeAction(Request $request, $id = null)
+    public function welcomeAction($id = null)
     {
         $dm = $this->getManager();
         $user = $this->getUser();
