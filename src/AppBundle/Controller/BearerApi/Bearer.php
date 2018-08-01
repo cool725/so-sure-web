@@ -5,11 +5,13 @@ use AppBundle\Classes\ApiErrorCode;
 use AppBundle\Controller\BaseController;
 use AppBundle\DataObjects\PolicySummary;
 use AppBundle\Document\User;
+use AppBundle\Security\PolicyVoter;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 /**
  * API that deals with Bearer-token based authentication
@@ -54,27 +56,24 @@ class Bearer extends BaseController
     public function user(Request $request): JsonResponse
     {
         try {
-            #$dm = $this->getManager();
-
             /** @var User $user */
             $user = $this->getUser();
             if (!$user) {
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_NOT_FOUND, 'User not found', 404);
             }
 
-            #$this->denyAccessUnlessGranted(PolicyVoter::VIEW, $user);
-            $this->denyAccessUnlessGranted('ROLE_API', $user, 'Access to user/policy summary denied');
-
-            $debug = false;
-            if ($this->getRequestBool($request, 'debug')) {
-                $debug = true;
-            }
+            $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $user);
 
             $response = new PolicySummary($user);
 
             return new JsonResponse($response->get());
+        } catch (AccessDeniedException $exception) {
+            $this->logger->notice('Access Denied for user', ['user' => $user->getUsername()]);
+
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
         } catch (\Throwable $e) {
-            $this->logger->notice('exception thrown: ', ['exception'=>$e]);
+            $this->logger->error('exception thrown: ', ['exception' => $e]);
+
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
         }
     }
