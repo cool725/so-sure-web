@@ -164,7 +164,7 @@ $('#claimsModal').on('show.bs.modal', function (event) {
                         if (documents.proofOfLosses.length > 0) {
                             var proofOfLosses = '';
                             $.each(documents.proofOfLosses, function(key, value) {
-                                proofOfLosses += '<p><a href="'+value.ulr+'">'+value.filename+'</a></p>';
+                                proofOfLosses += '<p><a href="'+value.url+'">'+value.filename+'</a></p>';
                             });
                             modal.find('#claims-detail-proof-losses').html(proofOfLosses);
                         }
