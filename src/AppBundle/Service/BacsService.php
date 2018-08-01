@@ -1308,13 +1308,25 @@ class BacsService
             $bacsPaymentForDateCalcs = new BacsPayment();
             $bacsPaymentForDateCalcs->submit($scheduledDate);
             if ($policy->getPolicyExpirationDate() < $bacsPaymentForDateCalcs->getBacsReversedDate()) {
-                $msg = sprintf(
-                    'Skipping payment %s as payment date is after expiration date',
-                    $scheduledPayment->getId()
-                );
-                $this->logger->error($msg);
+                // If admin has rescheduled, then allow payment to go through, but should be manually approved
+                if ($scheduledPayment->getType() != ScheduledPayment::TYPE_ADMIN) {
+                    $msg = sprintf(
+                        'Skipping payment %s as payment date is after expiration date',
+                        $scheduledPayment->getId()
+                    );
+                    $this->logger->error($msg);
 
-                continue;
+                    continue;
+                } else {
+                    // @codingStandardsIgnoreStart
+                    $msg = sprintf(
+                        'Running admin payment %s for policy %s. Warning! Payment date is after expiration date and should be immediately manually approved',
+                        $scheduledPayment->getId(),
+                        $policy->getId()
+                    );
+                    // @codingStandardsIgnoreEnd
+                    $this->logger->error($msg);
+                }
             }
 
             // If admin has rescheduled, then notify to user will have been performed and so no need to check
