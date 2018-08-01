@@ -193,17 +193,7 @@ class DefaultController extends BaseController
             $session->set('oauth2Flow.targetPath', $this->getTargetPath($session, 'main'));
         }
 
-        $exp = $this->sixpack(
-            $request,
-            SixpackService::EXPERIMENT_STARLING_LANDING,
-            ['homepage', 'starling-landing']
-        );
-
-        if ($exp == 'starling-landing') {
-            return $this->render('AppBundle:Default:indexStarlingBank.html.twig');
-        }
-
-        return $this->redirectToRoute('homepage');
+        return $this->render('AppBundle:Default:indexStarlingBank.html.twig');
     }
 
     /**
