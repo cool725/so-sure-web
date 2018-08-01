@@ -93,7 +93,7 @@
 
 .cover {
 
-    &__illustration-mb {
+    &__illustration-mobile {
         height: 240px;
         overflow: hidden;
     }
@@ -109,5 +109,40 @@
     @include media-breakpoint-up(lg) {
         background: $bb-2 url('#{$cdn_url}/images/rebrand/homepage/so-sure_why-illustration.svg ') no-repeat -220px 440px;
         background-size: 480px;
+    }
+}
+
+.app {
+    position: relative;
+
+    @include media-breakpoint-up(lg) {
+        background: $white url('#{$cdn_url}/images/rebrand/homepage/so-sure_app-illustration.svg') no-repeat 550px 50px;
+        background-size: 600px;
+    }
+
+    @include media-breakpoint-up(xl) {
+        background-position: right 50px;
+        background-size: 640px;
+    }
+
+    &__illustration-mobile {
+        position: relative;
+
+        img {
+            // left: 50%;
+            // margin-left: -200px;
+        }
+    }
+}
+
+.claims {
+    background-color: $bb-2;
+}
+
+.comparison {
+    background-color: $bb-2;
+
+    .table-list {
+        max-width: 400px;
     }
 }

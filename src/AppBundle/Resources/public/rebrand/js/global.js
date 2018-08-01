@@ -1,7 +1,5 @@
 // global.js
 
-const $ = require('jquery');
-
 require('../sass/global.scss');
 
 // Require components
