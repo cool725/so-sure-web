@@ -242,6 +242,51 @@ class DaviesServiceTest extends WebTestCase
         $this->assertTrue(true);
     }
 
+    public function testSaveClaimsDirectGroup()
+    {
+        $policyOpen = static::createUserPolicy(true);
+        $policyOpen->getUser()->setEmail(static::generateEmail('testSaveClaimsDirectGroup', $this));
+        $claimOpen = new Claim();
+        $claimOpen->setNumber($this->getRandomPolicyNumber());
+        $claimOpen->setHandlingTeam(Claim::TEAM_DIRECT_GROUP);
+        $policyOpen->addClaim($claimOpen);
+        static::$dm->persist($policyOpen->getUser());
+        static::$dm->persist($policyOpen);
+        static::$dm->persist($claimOpen);
+        static::$dm->flush();
+
+        $daviesOpen = new DaviesClaim();
+        $daviesOpen->policyNumber = $policyOpen->getPolicyNumber();
+        $daviesOpen->claimNumber = $claimOpen->getNumber();
+        $daviesOpen->status = 'Open';
+        $daviesOpen->lossDate = new \DateTime('2017-02-01');
+        static::$dm->flush();
+
+        $this->assertFalse(self::$daviesService->saveClaim($daviesOpen, $claimOpen));
+        $this->insureSoSureActionExists('/Skipping davies import/');
+    }
+
+    public function testSaveClaimsNoHandlingTeam()
+    {
+        $policyOpen = static::createUserPolicy(true);
+        $policyOpen->getUser()->setEmail(static::generateEmail('testSaveClaimsNoHandlingTeam', $this));
+        $claimOpen = new Claim();
+        $claimOpen->setNumber($this->getRandomPolicyNumber());
+        $policyOpen->addClaim($claimOpen);
+        $daviesOpen = new DaviesClaim();
+        $daviesOpen->policyNumber = $policyOpen->getPolicyNumber();
+        $daviesOpen->claimNumber = $claimOpen->getNumber();
+        $daviesOpen->status = 'Open';
+        $daviesOpen->lossDate = new \DateTime('2017-02-01');
+        static::$dm->persist($policyOpen->getUser());
+        static::$dm->persist($policyOpen);
+        static::$dm->persist($claimOpen);
+        static::$dm->flush();
+
+        $this->assertFalse(self::$daviesService->saveClaim($daviesOpen, $claimOpen));
+        $this->insureSoSureActionExists('/Skipping davies import/');
+    }
+
     public function testSaveClaimsOpen()
     {
         $policyOpen = static::createUserPolicy(true);
@@ -528,6 +573,7 @@ class DaviesServiceTest extends WebTestCase
         $policy1 = static::createUserPolicy(true);
         $policy1->getUser()->setEmail(static::generateEmail('testSaveClaimsSaveException-1', $this));
         $claim1 = new Claim();
+        $claim1->setHandlingTeam(Claim::TEAM_DAVIES);
         $policy1->addClaim($claim1);
         $claim1->setNumber('1');
         $claim1->setType(Claim::TYPE_THEFT);
@@ -535,6 +581,7 @@ class DaviesServiceTest extends WebTestCase
         $policy2 = static::createUserPolicy(true);
         $policy2->getUser()->setEmail(static::generateEmail('testSaveClaimsSaveException-2', $this));
         $claim2 = new Claim();
+        $claim2->setHandlingTeam(Claim::TEAM_DAVIES);
         $policy2->addClaim($claim2);
         $claim2->setNumber('2');
 
@@ -1467,6 +1514,7 @@ class DaviesServiceTest extends WebTestCase
         $claim->setNumber(rand(1, 999999));
         $claim->setType(Claim::TYPE_LOSS);
         $claim->setStatus(Claim::STATUS_INREVIEW);
+        $claim->setHandlingTeam(Claim::TEAM_DAVIES);
         $policy->addClaim($claim);
         static::$dm->persist($policy->getUser());
         static::$dm->persist($policy);
@@ -1507,6 +1555,7 @@ class DaviesServiceTest extends WebTestCase
         $claim->setNumber(rand(1, 999999));
         $claim->setType(Claim::TYPE_LOSS);
         $claim->setStatus(Claim::STATUS_INREVIEW);
+        $claim->setHandlingTeam(Claim::TEAM_DAVIES);
         $policy->addClaim($claim);
         static::$dm->persist($policy->getUser());
         static::$dm->persist($policy);
@@ -1560,6 +1609,7 @@ class DaviesServiceTest extends WebTestCase
         $claim->setType(Claim::TYPE_DAMAGE);
         $claim->setStatus(Claim::STATUS_INREVIEW);
         $policy->addClaim($claim);
+        $claim->setHandlingTeam(Claim::TEAM_DAVIES);
         static::$dm->persist($policy->getUser());
         static::$dm->persist($policy);
         static::$dm->persist($claim);
@@ -1597,6 +1647,7 @@ class DaviesServiceTest extends WebTestCase
         $claim->setNumber(rand(1, 999999));
         $claim->setType(Claim::TYPE_LOSS);
         $claim->setStatus(Claim::STATUS_APPROVED);
+        $claim->setHandlingTeam(Claim::TEAM_DAVIES);
         $policy->addClaim($claim);
         static::$dm->persist($policy->getUser());
         static::$dm->persist($policy);
@@ -1644,6 +1695,7 @@ class DaviesServiceTest extends WebTestCase
         $claim->setNumber(rand(1, 999999));
         $claim->setType(Claim::TYPE_LOSS);
         $claim->setStatus(Claim::STATUS_INREVIEW);
+        $claim->setHandlingTeam(Claim::TEAM_DAVIES);
         $policy->addClaim($claim);
         static::$dm->persist($policy->getUser());
         static::$dm->persist($policy);
@@ -1674,6 +1726,7 @@ class DaviesServiceTest extends WebTestCase
         $claim->setNumber(rand(1, 999999));
         $claim->setType(Claim::TYPE_LOSS);
         $claim->setStatus(Claim::STATUS_APPROVED);
+        $claim->setHandlingTeam(Claim::TEAM_DAVIES);
         $policy->addClaim($claim);
         static::$dm->persist($policy->getUser());
         static::$dm->persist($policy);
@@ -1849,6 +1902,7 @@ class DaviesServiceTest extends WebTestCase
         $claim->setNumber($this->getRandomClaimNumber());
         $claim->setType(Claim::TYPE_LOSS);
         $claim->setStatus(Claim::STATUS_APPROVED);
+        $claim->setHandlingTeam(Claim::TEAM_DAVIES);
         $policy->addClaim($claim);
         static::$dm->persist($policy->getUser());
         static::$dm->persist($policy);
@@ -1891,6 +1945,7 @@ class DaviesServiceTest extends WebTestCase
         $claim->setNumber($this->getRandomClaimNumber());
         $claim->setType(Claim::TYPE_LOSS);
         $claim->setStatus(Claim::STATUS_APPROVED);
+        $claim->setHandlingTeam(Claim::TEAM_DAVIES);
         $policy->addClaim($claim);
         static::$dm->persist($policy->getUser());
         static::$dm->persist($policy);
@@ -1933,6 +1988,7 @@ class DaviesServiceTest extends WebTestCase
         $claim->setNumber($this->getRandomClaimNumber());
         $claim->setType(Claim::TYPE_LOSS);
         $claim->setStatus(Claim::STATUS_APPROVED);
+        $claim->setHandlingTeam(Claim::TEAM_DAVIES);
         $policy->addClaim($claim);
         static::$dm->persist($policy->getUser());
         static::$dm->persist($policy);
@@ -1978,6 +2034,7 @@ class DaviesServiceTest extends WebTestCase
         $claim->setNumber(rand(1, 999999));
         $claim->setType(Claim::TYPE_LOSS);
         $claim->setStatus(Claim::STATUS_APPROVED);
+        $claim->setHandlingTeam(Claim::TEAM_DAVIES);
 
         $yesterday = new \DateTime();
         $yesterday = $yesterday->sub(new \DateInterval('P1D'));
@@ -2015,6 +2072,7 @@ class DaviesServiceTest extends WebTestCase
         $claim1->setType(Claim::TYPE_LOSS);
         $claim1->setStatus(Claim::STATUS_APPROVED);
         $claim1->setNumber($this->getRandomClaimNumber());
+        $claim1->setHandlingTeam(Claim::TEAM_DAVIES);
         $policy->addClaim($claim1);
 
         $yesterday = new \DateTime();
@@ -2024,6 +2082,7 @@ class DaviesServiceTest extends WebTestCase
         $claim2->setType(Claim::TYPE_LOSS);
         $claim2->setStatus(Claim::STATUS_APPROVED);
         $claim2->setNumber($this->getRandomClaimNumber());
+        $claim2->setHandlingTeam(Claim::TEAM_DAVIES);
         $policy->addClaim($claim2);
 
         static::$dm->persist($policy->getUser());
@@ -2079,6 +2138,7 @@ class DaviesServiceTest extends WebTestCase
         $claim->setNumber($this->getRandomClaimNumber());
         $claim->setType(Claim::TYPE_LOSS);
         $claim->setStatus(Claim::STATUS_SETTLED);
+        $claim->setHandlingTeam(Claim::TEAM_DAVIES);
         $policy->addClaim($claim);
         static::$dm->persist($policy->getUser());
         static::$dm->persist($policy);
@@ -2140,6 +2200,7 @@ class DaviesServiceTest extends WebTestCase
         $claim->setType(Claim::TYPE_LOSS);
         $claim->setStatus(Claim::STATUS_SETTLED);
         $claim->setReplacementPhone(static::$phone);
+        $claim->setHandlingTeam(Claim::TEAM_DAVIES);
         $policy->addClaim($claim);
         static::$dm->persist($policy->getUser());
         static::$dm->persist($policy);
