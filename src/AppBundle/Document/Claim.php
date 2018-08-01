@@ -795,7 +795,7 @@ class Claim
 
     public function getHandlingTeam()
     {
-        $this->handlingTeam;
+        return $this->handlingTeam;
     }
 
     public function setHandlingTeam($handlingTeam)
