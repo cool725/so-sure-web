@@ -78,7 +78,7 @@
     background-color: $bb-2;
 
     @include media-breakpoint-up(lg) {
-        background: $bb-2 url('#{$cdn_url}/images/rebrand/homepage/ss-intro-illustration-group.svg') no-repeat -210px 140px;
+        background: $bb-2 url('#{$cdn_url}/images/rebrand/homepage/so-sure_intro-illustration.svg') no-repeat -210px 140px;
         background-size: 600px;
     }
 
@@ -107,7 +107,7 @@
     background-color: $bb-2;
 
     @include media-breakpoint-up(lg) {
-        background: $bb-2 url('#{$cdn_url}/images/rebrand/homepage/ss-why-illustration.svg') no-repeat -220px 440px;
+        background: $bb-2 url('#{$cdn_url}/images/rebrand/homepage/so-sure_why-illustration.svg ') no-repeat -220px 440px;
         background-size: 480px;
     }
 }

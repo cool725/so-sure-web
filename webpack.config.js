@@ -1,8 +1,8 @@
-// webpack.config.js
-
 var Encore = require('@symfony/webpack-encore');
 
 Encore
+    .enableSingleRuntimeChunk()
+
     // the project directory where all compiled assets will be stored
     .setOutputPath('web/css-js/')
 
@@ -10,11 +10,7 @@ Encore
     .setPublicPath('/web')
 
     // this creates a 'vendor.js' file with jquery and the bootstrap JS module
-    .createSharedEntry('vendor', [
-        'jquery',
-        'popper.js',
-        'bootstrap'
-    ])
+    .createSharedEntry('vendor', './web/components/jquery/jquery.min.js')
 
     // List all files here
     .addEntry('global', './src/AppBundle/Resources/public/rebrand/js/global.js')
@@ -32,7 +28,6 @@ Encore
 
     // show OS notifications when builds finish/fail
     .enableBuildNotifications()
-
     // create hashed filenames (e.g. app.abc123.css)
     // TODO: Get working in config!
     // .enableVersioning()
