@@ -1,5 +1,5 @@
 <?php
-namespace AppBundle;
+namespace App;
 
 final class Oauth2Scopes
 {

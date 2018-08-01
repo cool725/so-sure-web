@@ -1,10 +1,10 @@
 <?php
-namespace AppBundle\Tests\Controller\BearerApi;
+namespace App\Tests\Controller\BearerApi;
 
 use AppBundle\DataFixtures\MongoDB\d\Oauth2\LoadOauth2Data;
 use AppBundle\Document\Oauth\AccessToken;
 use AppBundle\Document\PhonePolicy;
-use AppBundle\Oauth2Scopes;
+use App\Oauth2Scopes;
 use AppBundle\Tests\Controller\BaseControllerTest;
 use Symfony\Component\BrowserKit\Client;
 use Symfony\Component\HttpFoundation\Response;

@@ -15,24 +15,13 @@ services:
 
     # makes classes in src/AppBundle available to be used as services
     # this creates a service per class whose id is the fully-qualified class name
-    #AppBundle\:
-    #    resource: '../../src/AppBundle/*'
-    #    public: true
+    App\:
+        resource: '../../../src/App/*'
 
     ## Controllers ####################################################
 
     # controllers are imported separately to make sure they're public
     # (and have a tag that allows actions to type-hint services)
-    AppBundle\Controller\BearerApi\:
-        resource: '../../../src/AppBundle/Controller/BearerApi/*'
+    App\Controller\:
+        resource: '../../../src/App/Controller/*'
         public: true
-        calls:
-            - [setContainer, ["@service_container"]]
-        #tags: ['controller.service_arguments']  prefer constructor injection
-
-    ## Services #######################################################
-
-    AppBundle\Security\:
-        resource: '../../../src/AppBundle/Security/*'
-    AppBundle\Service\Twig\:
-        resource: '../../../src/AppBundle/Service/Twig/*'

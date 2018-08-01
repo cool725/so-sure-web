@@ -78,7 +78,7 @@ security:
                 lifetime: 43200 # 12 hours in seconds
                 path:     /
             switch_user: { role: ROLE_CUSTOMER_SERVICES, parameter: _impersonate }
-            entry_point: AppBundle\Security\BearerApiLoginEntryPoint
+            entry_point: App\Security\Oauth2LoginEntryPoint
 
     access_control:
         - { path: ^/login$, role: IS_AUTHENTICATED_ANONYMOUSLY }

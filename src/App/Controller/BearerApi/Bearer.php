@@ -1,14 +1,14 @@
 <?php
-namespace AppBundle\Controller\BearerApi;
+namespace App\Controller\BearerApi;
 
 use AppBundle\Classes\ApiErrorCode;
 use AppBundle\Controller\BaseController;
 use AppBundle\DataObjects\PolicySummary;
 use AppBundle\Document\User;
 use AppBundle\Security\PolicyVoter;
+use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
@@ -25,9 +25,10 @@ class Bearer extends BaseController
      */
     private $logger;
 
-    public function __construct(LoggerInterface $logger)
+    public function __construct(LoggerInterface $logger, ContainerInterface $container)
     {
         $this->logger = $logger;
+        $this->container = $container;
     }
 
     /**
@@ -53,7 +54,7 @@ class Bearer extends BaseController
      *
      * @Route("/user")
      */
-    public function user(Request $request): JsonResponse
+    public function user(): JsonResponse
     {
         try {
             /** @var User $user */

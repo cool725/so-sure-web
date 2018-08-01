@@ -1,7 +1,7 @@
 <?php
-namespace AppBundle\Service\Twig;
+namespace App\Twig;
 
-use AppBundle\Oauth2Scopes;
+use App\Oauth2Scopes;
 use Psr\Log\LoggerInterface;
 
 class Oauth2TwigExtension extends \Twig_Extension

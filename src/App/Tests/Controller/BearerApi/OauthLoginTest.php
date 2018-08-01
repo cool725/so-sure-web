@@ -1,8 +1,8 @@
 <?php
 
-namespace AppBundle\Tests\Controller\BearerApi;
+namespace App\Tests\Controller\BearerApi;
 
-use AppBundle\Oauth2Scopes;
+use App\Oauth2Scopes;
 use PHPUnit\Framework\AssertionFailedError;
 use Symfony\Bundle\FrameworkBundle\Client;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;

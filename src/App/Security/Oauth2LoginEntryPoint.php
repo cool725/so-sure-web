@@ -1,8 +1,8 @@
 <?php
 declare(strict_types=1);
-namespace AppBundle\Security;
+namespace App\Security;
 
-use AppBundle\Oauth2Scopes;
+use App\Oauth2Scopes;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -16,7 +16,7 @@ use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface
  *
  * @see https://symfony.com/doc/3.4/components/security/firewall.html#entry-points
  */
-class BearerApiLoginEntryPoint implements AuthenticationEntryPointInterface
+class Oauth2LoginEntryPoint implements AuthenticationEntryPointInterface
 {
     /** @var UrlGeneratorInterface */
     private $router;
