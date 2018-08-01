@@ -687,7 +687,7 @@
         <div role="tabpanel" class="tab-pane" id="history">
             {% if is_granted('ROLE_EMPLOYEE') %}
             <h3>Salva History</h3>
-            <table>
+            <table class="table table-striped">
                 <tr>
                     <td>Salva Policy Numbers</td>
                     <td>
@@ -711,7 +711,7 @@
             </table>
             {% endif %}
             <h3>User History</h3>
-            <table>
+            <table class="table table-striped">
             {% for item in user_history %}
               <tr>
                 <td width="10%">{{ item.action }}</td>
@@ -728,7 +728,7 @@
               <p>No history is present</p>
             {% endif %}
             <h3>Policy History</h3>
-            <table>
+            <table class="table table-striped">
             {% for item in policy_history %}
               <tr>
                 <td width="10%">{{ item.action }}</td>
