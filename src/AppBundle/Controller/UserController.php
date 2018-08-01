@@ -1184,26 +1184,6 @@ class UserController extends BaseController
             $this->generateUrl('purchase_cancel', ['id' => $user->getLatestPolicy()->getId()])
         ));
 
-        $session = $request->getSession();
-        if ($session && $session->has('oauth2Flow') && $session->has('_security.oauth2_auth.target_path')) {
-            $this->get('logger')->notice(
-                'Logging into main firewall',
-                [
-                    'alt'=>$this->getParameter('fos_user.firewall_name'),
-                    'target_path'=> $session->get('_security.oauth2_auth.target_path')
-                ]
-            );
-            $this->get('fos_user.security.login_manager')->logInUser(
-                $this->getParameter('fos_user.firewall_name'),
-                $user
-            );
-            $this->get('logger')->notice(
-                'Logging into oauth2_auth firewall',
-                ['target_path'=> $session->get('_security.oauth2_auth.target_path')]
-            );
-        }
-        $this->get('logger')->notice('passed oauth2_auth firewall handling');
-
         return array(
             'policy_key' => $this->getParameter('policy_key'),
             'policy' => $user->getLatestPolicy(),
