@@ -25,3 +25,15 @@ services:
     App\Controller\:
         resource: '../../../src/App/Controller/*'
         public: true
+
+    ## Miscellaneous services #########################################
+    app.datetimenormalizer:
+        class: Symfony\Component\Serializer\Normalizer\DateTimeNormalizer
+        tags: [serializer.normalizer]
+
+    ###################################################################
+    ## Legacy Aliases for services - to remove after Symfony 4.1 with access to test.container
+
+    test.App\Normalizer\UserPolicySummary:
+        class: App\Normalizer\UserPolicySummary
+        public: true

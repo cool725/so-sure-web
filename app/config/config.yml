@@ -32,6 +32,7 @@ framework:
     form:            ~
     csrf_protection: ~
     #serializer:      { enable_annotations: true }
+    serializer:      { enabled: true }
     templating:
         engines: ['twig']
         #assets_version: SomeVersionScheme

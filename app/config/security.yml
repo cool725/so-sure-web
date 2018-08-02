@@ -32,6 +32,7 @@ security:
             fos_oauth: true
             stateless: true
             anonymous: true
+            provider: fos_userbundle
         oauth_token:
             pattern:    ^/oauth/v2/token
             security:   false

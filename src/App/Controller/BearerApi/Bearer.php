@@ -3,7 +3,7 @@ namespace App\Controller\BearerApi;
 
 use AppBundle\Classes\ApiErrorCode;
 use AppBundle\Controller\BaseController;
-use AppBundle\DataObjects\PolicySummary;
+use App\Normalizer\UserPolicySummary;
 use AppBundle\Document\User;
 use AppBundle\Security\PolicyVoter;
 use Psr\Container\ContainerInterface;
@@ -65,7 +65,7 @@ class Bearer extends BaseController
 
             $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $user);
 
-            $response = new PolicySummary($user);
+            $response = new UserPolicySummary($user);
 
             return new JsonResponse($response->get());
         } catch (AccessDeniedException $exception) {
