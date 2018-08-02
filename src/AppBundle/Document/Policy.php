@@ -2053,15 +2053,11 @@ abstract class Policy
         }
     }
 
-    public function getRefundAmount(\DateTime $date = null)
+    public function getRefundAmount()
     {
         // Just in case - make sure we don't refund for non-cancelled policies
         if (!$this->isCancelled()) {
             return 0;
-        }
-
-        if (!$date) {
-            $date = new \DateTime();
         }
 
         if (!$this->isRefundAllowed()) {
@@ -2074,16 +2070,12 @@ abstract class Policy
         if ($this->getCancelledReason() == Policy::CANCELLED_COOLOFF) {
             return $this->getCooloffPremiumRefund();
         } else {
-            return $this->getProratedPremiumRefund($date);
+            return $this->getProratedPremiumRefund($this->getEnd());
         }
     }
 
-    public function getRefundCommissionAmount(\DateTime $date = null)
+    public function getRefundCommissionAmount()
     {
-        if (!$date) {
-            $date = new \DateTime();
-        }
-
         // Just in case - make sure we don't refund for non-cancelled policies
         if (!$this->isCancelled()) {
             return 0;
@@ -2099,7 +2091,7 @@ abstract class Policy
         if ($this->getCancelledReason() == Policy::CANCELLED_COOLOFF) {
             return $this->getCooloffCommissionRefund();
         } else {
-            return $this->getProratedCommissionRefund($date);
+            return $this->getProratedCommissionRefund($this->getEnd());
         }
     }
 
@@ -4256,7 +4248,10 @@ abstract class Policy
         $premium = $this->getPremium();
 
         $expectedCommission = null;
-        if (in_array($this->getStatus(), [self::STATUS_ACTIVE, self::STATUS_UNPAID])) {
+        // active/unpaid should be on a cash received based
+        // also if a policy has been cancelled and there is no refund allowed, then should be based on cash recevied
+        if (in_array($this->getStatus(), [self::STATUS_ACTIVE, self::STATUS_UNPAID]) ||
+            ($this->isCancelled() && !$this->isRefundAllowed())) {
             $numPayments = $premium->getNumberOfMonthlyPayments($this->getTotalSuccessfulUserPayments($date));
             $expectedCommission = $salva->sumBrokerFee($numPayments, $numPayments == 12);
         } else {

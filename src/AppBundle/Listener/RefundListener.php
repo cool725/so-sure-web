@@ -113,8 +113,8 @@ class RefundListener
         }
 
         $payment = $policy->getLastSuccessfulUserPaymentCredit();
-        $refundAmount = $policy->getRefundAmount($event->getDate());
-        $refundCommissionAmount = $policy->getRefundCommissionAmount($event->getDate());
+        $refundAmount = $policy->getRefundAmount();
+        $refundCommissionAmount = $policy->getRefundCommissionAmount();
         $this->logger->info(sprintf('Processing refund %f (policy %s)', $refundAmount, $policy->getId()));
         if ($refundAmount > 0) {
             if ($refundAmount > $payment->getAmount()) {
