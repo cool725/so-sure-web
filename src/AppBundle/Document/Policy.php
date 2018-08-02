@@ -2689,6 +2689,10 @@ abstract class Policy
 
     public function hasCorrectIptRate()
     {
+        if (!$this->getPremium()) {
+            return null;
+        }
+
         return $this->areEqualToTwoDp(
             $this->getPremium()->getIptRate(),
             $this->getCurrentIptRate($this->getStart())
