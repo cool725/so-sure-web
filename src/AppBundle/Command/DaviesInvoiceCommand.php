@@ -2,6 +2,7 @@
 
 namespace AppBundle\Command;
 
+use AppBundle\Repository\ChargeRepository;
 use AppBundle\Service\InvoiceService;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
@@ -93,6 +94,7 @@ class DaviesInvoiceCommand extends BaseCommand
     private function getCharges($date)
     {
         $dm = $this->getManager();
+        /** @var ChargeRepository $repo */
         $repo = $dm->getRepository(Charge::class);
 
         return $repo->findMonthly($date, [Charge::TYPE_CLAIMSCHECK, Charge::TYPE_CLAIMSDAMAGE], true);

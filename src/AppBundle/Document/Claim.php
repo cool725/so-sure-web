@@ -144,6 +144,11 @@ class Claim
         self::TEAM_DIRECT_GROUP => self::TEAM_DIRECT_GROUP,
     ];
 
+    public static $handlingTeamEmail = [
+        self::TEAM_DAVIES => 'update-claim@so-sure.com',
+        self::TEAM_DIRECT_GROUP => 'SoSure@directgroup.co.uk',
+    ];
+
     public static $warningFlags = [
         self::WARNING_FLAG_DAVIES_NAME_MATCH => self::WARNING_FLAG_DAVIES_NAME_MATCH,
         self::WARNING_FLAG_DAVIES_POSTCODE => self::WARNING_FLAG_DAVIES_POSTCODE,
@@ -801,6 +806,11 @@ class Claim
     public function setHandlingTeam($handlingTeam)
     {
         $this->handlingTeam = $handlingTeam;
+    }
+
+    public function getHandlingTeamEmail()
+    {
+        return Claim::$handlingTeamEmail[$this->getHandlingTeam()];
     }
 
     public function getType()
