@@ -143,10 +143,23 @@
     background-color: $bb-2;
 
     .table-list {
-        // width: 440px;
+        position: relative;
 
-        li {
-     // ÷       height: 80px;
+        @include media-breakpoint-up(md) {
+            width: 520px;
+        }
+
+        @include media-breakpoint-up(lg) {
+
+            &__insurers {
+                transform: translateX(25px);
+                z-index: 10;
+            }
+
+            &__so-sure {
+                transform: translateX(-25px);
+                z-index: 11;
+            }
         }
     }
 }
