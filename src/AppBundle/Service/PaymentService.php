@@ -181,6 +181,7 @@ class PaymentService
         $bacsPaymentMethod->getBankAccount()->setInitialNotificationDate(
             $bacsPaymentMethod->getBankAccount()->getFirstPaymentDate($policy->getUser())
         );
+        $bacsPaymentMethod->getBankAccount()->setFirstPayment(true);
         $bacsPaymentMethod->getBankAccount()->setStandardNotificationDate($policy->getBilling());
         // ensure payer is current user for bacs
         if ($policy->isDifferentPayer()) {

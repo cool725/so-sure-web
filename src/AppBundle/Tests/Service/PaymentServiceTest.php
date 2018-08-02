@@ -103,9 +103,11 @@ class PaymentServiceTest extends WebTestCase
         static::$paymentService->confirmBacs($policy, $bacs);
 
         $updatedPolicy = $this->assertPolicyExists(static::$container, $policy);
+        /** @var BankAccount $bankAcccount */
         $bankAcccount = $updatedPolicy->getUser()->getPaymentMethod()->getBankAccount();
         $this->assertNotNull($bankAcccount->getInitialNotificationDate());
         $this->assertEquals($policy->getBilling(), $bankAcccount->getStandardNotificationDate());
+        $this->assertTrue($bankAcccount->isFirstPayment());
     }
 
     public function testConfirmBacsDifferentPayer()
