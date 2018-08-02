@@ -389,7 +389,7 @@ class ValidatePolicyCommand extends BaseCommand
                     $refundCommission
                 );
             }
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             // TODO: May want to swallow some exceptions here
             throw $e;
         }
