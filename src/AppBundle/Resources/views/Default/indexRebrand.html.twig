@@ -344,7 +344,7 @@
                 <table class="table-list mx-md-auto mx-lg-0 mb-5 table-list__so-sure">
                     <thead>
                         <tr>
-                            <th class="table-list__header h4 text-white blue-gradient">so-sure</th>
+                            <th class="table-list__header h4 text-white blue-gradient-ld">so-sure</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -384,8 +384,8 @@
             <div class="row">
                 <div class="col-lg-6">
                     <h2 class="h3 pb-4 text-blue4 text-center text-lg-left">Don't just take our <br class="d-inline d-sm-none"> word for it!</h2>
-                    <div class="reviews__container mb-5 text-center text-lg-left">
-                        <div class="reviews__content">
+                    <div class="review mb-5 text-center text-lg-left">
+                        <div class="reviewreview">
                             <ul class="list-inline">
                                 <li class="list-inline-item"><i class="fas fa-star fa-lg text-primary"></i></li>
                                 <li class="list-inline-item"><i class="fas fa-star fa-lg text-primary"></i></li>
@@ -394,17 +394,42 @@
                                 <li class="list-inline-item"><i class="fas fa-star fa-lg text-primary"></i></li>
                             </ul>
                             <p class="lead py-4">"My so-sure claim was super fast and everyone was really friendly! Based on previous phone insurance experiences, I can honestly say this truly is a revolution"</p>
-                            <span class="h5 text-blue4 mr-2">Nick Waller</span> <strong class="text-primary">|</strong> <span class="ml-2">so-sure customer</span>
+                            <div class="d-lg-flex justify-content-lg-between">
+                                <div class="review__footer">
+                                    <span class="h5 text-blue4 mr-2">Nick Waller</span> <strong class="text-primary">|</strong> <span class="ml-2">so-sure customer</span>
+                                </div>
+                                <div class="review__controls my-4 my-lg-0">
+                                    <ul class="list-inline">
+                                        <li class="list-inline-item"><a href="#"><i class="fas fa-long-arrow-alt-left fa-2x"></i></a></li>
+                                        <li class="list-inline-item"><a href="#"><i class="fas fa-long-arrow-alt-right fa-2x"></i></a></li>
+                                    </ul>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <div class="reviews__image-mobile my-4 d-block d-lg-none">
+                    <div class="reviews__image-mobile my-5 d-block d-lg-none">
                         <img src="{{ cdn_url }}/images/rebrand/homepage/so-sure_review-image.png" alt="so-sure - pic-sure" width="500px">
                     </div>
-                    <a href="#" class="btn btn-primary btn-shadow btn-block-xs mr-lg-2">See more reviews</a>
+                    <a href="#" class="btn btn-primary btn-shadow btn-block-xs">See more reviews</a>
                 </div>
             </div>
         </div>
     </div>
+
+    <section class="banner blue-gradient-dl py-5">
+        <div class="container">
+            <div class="d-md-flex justify-content-md-between align-items-md-center">
+                <div class="banner__text">
+                    <h4 class="text-white">Mobile insurance designed for you</h4>
+                    <p class="lead text-white">Cover your phone in minutes </p>
+                </div>
+                <div class="banner__controls">
+                    <a href="#" class="btn btn-white btn-shadow btn-block-xs mr-lg-2">Get a Quote</a>
+                    <a href="#" class="btn btn-outline-white btn-block-xs"><i class="far fa-play-circle fa-lg"></i> Watch our Video</a>
+                </div>
+            </div>
+        </div>
+    </section>
 
 {% endblock %}
 

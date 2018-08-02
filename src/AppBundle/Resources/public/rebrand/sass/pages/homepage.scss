@@ -168,6 +168,11 @@
 
     &__image-mobile {
         transform: translateX(20px);
+
+        @include media-breakpoint-up(md) {
+            transform: none;
+            text-align: center;
+        }
     }
 
     @include media-breakpoint-up(lg) {

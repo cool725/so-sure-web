@@ -21,14 +21,19 @@ $purple: #443b5f;
 // Extend Theme colours and overide primary BS colour
 $theme-colors: (
     "primary": $blue-2,
-    "blue1":  $blue-1,
-    "blue2":  $blue-2,
-    "blue3":  $blue-3,
-    "blue4":  $blue-4,
-    "purple": $purple,
+    "blue1":   $blue-1,
+    "blue2":   $blue-2,
+    "blue3":   $blue-3,
+    "blue4":   $blue-4,
+    "purple":  $purple,
+    "white":   $white,
 );
 
 // Gradients
-.blue-gradient {
+.blue-gradient-ld {
     @include linear-gradient(90deg, $blue-1, $blue-3);
+}
+
+.blue-gradient-dl {
+    @include linear-gradient(90deg, $blue-3, $blue-1);
 }
