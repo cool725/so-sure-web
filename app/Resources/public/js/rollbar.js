@@ -10,6 +10,7 @@ var _rollbarConfig = {
         "is not a function",
         "is not defined",
         "Cannot read property",
+        "Unable to get property",
         "Object doesn't support property or method",
         "is not an object"
     ]
