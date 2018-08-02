@@ -251,7 +251,7 @@ class ClaimsController extends BaseController
                         }
                     } else {
                         $this->addFlash('error', sprintf(
-                            'Select a force',
+                            'Select a force for crimeref %s',
                             $claim->getCrimeRef()
                         ));
                     }
