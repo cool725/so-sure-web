@@ -3,6 +3,7 @@
 namespace AppBundle\Command;
 
 use AppBundle\Document\CurrencyTrait;
+use AppBundle\Document\Payment\BacsPayment;
 use AppBundle\Repository\PolicyRepository;
 use AppBundle\Service\MailerService;
 use AppBundle\Service\PolicyService;
@@ -382,12 +383,27 @@ class ValidatePolicyCommand extends BaseCommand
             }
             $refund = $policy->getRefundAmount();
             $refundCommission = $policy->getRefundCommissionAmount();
-            if (!$this->areEqualToTwoDp(0, $refund) || !$this->areEqualToTwoDp(0, $refundCommission)) {
+            if (($refund > 0 && !$this->areEqualToTwoDp(0, $refund)) ||
+                ($refundCommission > 0 && !$this->areEqualToTwoDp(0, $refundCommission))) {
                 $lines[] = sprintf(
                     'Warning!! Refund Due. Refund %f / Commission %f',
                     $refund,
                     $refundCommission
                 );
+            }
+            // bacs checks are only necessary on active policies
+            if ($policy->getUser()->hasBacsPaymentMethod() && $policy->isActive(true)) {
+                $bacsPayments = count($policy->getPaymentsByType(BacsPayment::class));
+                $bankAccount = $policy->getUser()->getBacsPaymentMethod()->getBankAccount();
+                $isFirstPayment = $bankAccount->isFirstPayment();
+                if ($bacsPayments >= 1 && $isFirstPayment) {
+                    $lines[] = 'Warning!! 1 or more bacs payments, yet bank has first payment flag set';
+                } elseif ($bacsPayments == 0 && !$isFirstPayment) {
+                    $lines[] = 'Warning!! No bacs payments, yet bank does not have first payment flag set';
+                }
+                if ($bacsPayments == 0 && $bankAccount->getInitialNotificationDate() > new \DateTime()) {
+                    $lines[] = 'Warning!! There are no bacs payments, yet its past the initial notification date';
+                }
             }
         } catch (\Exception $e) {
             // TODO: May want to swallow some exceptions here
