@@ -9,8 +9,8 @@ Encore
     // the public path used by the web server to access the previous directory
     .setPublicPath('/web')
 
-    // this creates a 'vendor.js' file with jquery and the bootstrap JS module
-    .createSharedEntry('vendor', './web/components/jquery/jquery.min.js')
+    // this creates a 'vendor.js' file with jquery and the bootstrap JS module plus popper
+    .createSharedEntry('vendor', './web/components/vendor.js')
 
     // List all files here
     .addEntry('global', './src/AppBundle/Resources/public/rebrand/js/global.js')
