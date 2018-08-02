@@ -2,6 +2,7 @@
 
 namespace AppBundle\Command;
 
+use AppBundle\Classes\DirectGroup;
 use AppBundle\Service\MailerService;
 use AppBundle\Service\PolicyService;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
@@ -17,7 +18,7 @@ use AppBundle\Document\InvoiceItem;
 use AppBundle\Document\CurrencyTrait;
 use AppBundle\Document\DateTrait;
 
-class DaviesBreakdownCommand extends ContainerAwareCommand
+class PolicyBreakdownCommand extends ContainerAwareCommand
 {
     use DateTrait;
     use CurrencyTrait;
@@ -25,8 +26,8 @@ class DaviesBreakdownCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this
-            ->setName('sosure:davies:breakdown')
-            ->setDescription('Email policy breakdown report to davies')
+            ->setName('sosure:policy:breakdown')
+            ->setDescription('Email policy breakdown report to claims handlers')
         ;
     }
 
@@ -51,12 +52,13 @@ class DaviesBreakdownCommand extends ContainerAwareCommand
         $mailer = $this->getContainer()->get('app.mailer');
         $mailer->sendTemplate(
             sprintf('so-sure Policy Breakdown Report'),
-            DaviesClaim::$breakdownEmailAddresses,
+            ['patrick@so-sure.com','dylan@so-sure.com'],
             'AppBundle:Email:davies/breakdown.html.twig',
             [],
             null,
             null,
-            [$tmpFile]
+            [$tmpFile],
+            array_merge(DaviesClaim::$breakdownEmailAddresses, DirectGroup::$breakdownEmailAddresses)
         );
 
         if (file_exists($tmpFile)) {
