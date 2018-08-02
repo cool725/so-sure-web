@@ -1151,13 +1151,13 @@ class PolicyService
             return;
         }
 
-        $baseTemplate = sprintf('AppBundle:Email:davies/claimCancellation');
+        $baseTemplate = sprintf('AppBundle:Email:claimsHandler/claimCancellation');
         $htmlTemplate = sprintf("%s.html.twig", $baseTemplate);
         $textTemplate = sprintf("%s.txt.twig", $baseTemplate);
 
         $this->mailer->sendTemplate(
             sprintf('@%s Claim should be closed', $claim->getNumber()),
-            'update-claim@wearesosure.com',
+            $claim->getHandlingTeamEmail(),
             $htmlTemplate,
             ['claim' => $claim],
             null,
@@ -1789,7 +1789,7 @@ class PolicyService
             return;
         }
 
-        $baseTemplate = sprintf('AppBundle:Email:davies/pendingCancellation');
+        $baseTemplate = sprintf('AppBundle:Email:claimsHandler/pendingCancellation');
         $htmlTemplate = sprintf("%s.html.twig", $baseTemplate);
         $textTemplate = sprintf("%s.txt.twig", $baseTemplate);
 
@@ -1797,9 +1797,10 @@ class PolicyService
             '@%s Claim should be finalised',
             $claim->getNumber()
         );
+
         $this->mailer->sendTemplate(
             $subject,
-            'update-claim@wearesosure.com',
+            $claim->getHandlingTeamEmail(),
             $htmlTemplate,
             ['claim' => $claim, 'cancellationDate' => $cancellationDate],
             null,
