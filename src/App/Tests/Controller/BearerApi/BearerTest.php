@@ -1,7 +1,6 @@
 <?php
 namespace App\Tests\Controller\BearerApi;
 
-use AppBundle\Document\Oauth\AccessToken;
 use AppBundle\Tests\Controller\BaseControllerTest;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -51,12 +50,9 @@ class BearerTest extends BaseControllerTest
 
     public function testAuthenticatedPing()
     {
-        // get a pre-prepared acces token
-        $accessToken = $this->getAccessTokenObject('test-with-api-alister');
-
         $params = [];
         $headers = [
-            'HTTP_AUTHORIZATION' => 'Bearer '. $accessToken->getToken(),
+            'HTTP_AUTHORIZATION' => 'Bearer test-with-api-alister',
             'CONTENT_TYPE' => 'application/json',
         ];
         self::$client->request('GET', '/bearer-api/v1/ping', $params, [], $headers);
@@ -68,19 +64,5 @@ class BearerTest extends BaseControllerTest
             '{"response":"pong","data":"alister@so-sure.com"}',
             $content
         );
-    }
-
-    /**
-     * Get one of the pre-generated access tokens.
-     *
-     * It is the bearer-token for a specific user to go to /bearer-api/....
-     */
-    private function getAccessTokenObject(string $knownAccessToken): AccessToken
-    {
-        // we can't easily know without a search what the ID is
-        $repo = self::$container->get('fos_oauth_server.access_token_manager.default');
-
-        /** @var AccessToken $oauth2Details */
-        return $repo->findTokenByToken($knownAccessToken);
     }
 }

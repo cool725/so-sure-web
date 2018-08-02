@@ -1,9 +1,9 @@
 <?php
 namespace App\Controller\BearerApi;
 
+use App\Normalizer\UserPolicySummary;
 use AppBundle\Classes\ApiErrorCode;
 use AppBundle\Controller\BaseController;
-use App\Normalizer\UserPolicySummary;
 use AppBundle\Document\User;
 use AppBundle\Security\PolicyVoter;
 use Psr\Container\ContainerInterface;
@@ -24,10 +24,16 @@ class Bearer extends BaseController
      * @var LoggerInterface
      */
     private $logger;
+    /** @var UserPolicySummary */
+    private $userPolicySummary;
 
-    public function __construct(LoggerInterface $logger, ContainerInterface $container)
-    {
+    public function __construct(
+        LoggerInterface $logger,
+        UserPolicySummary $userPolicySummary,
+        ContainerInterface $container
+    ) {
         $this->logger = $logger;
+        $this->userPolicySummary = $userPolicySummary;
         $this->container = $container;
     }
 
@@ -38,6 +44,7 @@ class Bearer extends BaseController
     public function ping(): Response
     {
         $user = $this->getUser();
+
 
         $data = [
             'response' => 'pong',
@@ -65,9 +72,9 @@ class Bearer extends BaseController
 
             $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $user);
 
-            $response = new UserPolicySummary($user);
-
-            return new JsonResponse($response->get());
+            return new JsonResponse($this->userPolicySummary->shortPolicySummary($user));
+            #$response = new UserPolicySummary();
+            #return new JsonResponse($response->get());
         } catch (AccessDeniedException $exception) {
             $this->logger->notice('Access Denied for user', ['user' => $user->getUsername()]);
 
@@ -75,7 +82,7 @@ class Bearer extends BaseController
         } catch (\Throwable $e) {
             $this->logger->error('exception thrown: ', ['exception' => $e]);
 
-            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Access denied', 500);
         }
     }
 }

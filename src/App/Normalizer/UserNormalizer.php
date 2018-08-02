@@ -11,20 +11,17 @@ class UserNormalizer implements NormalizerInterface, SerializerAwareInterface
 {
     use SerializerAwareTrait;
 
-    /**
-     * {@inheritdoc}
-     */
     public function supportsNormalization($data, $format = null)
     {
+        $format = $format;
+
         return is_object($data) && $data instanceof User;
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @param User $object
+     * @param User   $object
      * @param string $format
-     * @param array $context
+     * @param array  $context
      *
      * @return array
      */

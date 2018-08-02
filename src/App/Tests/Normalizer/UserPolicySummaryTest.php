@@ -1,27 +1,20 @@
 <?php
 namespace App\Tests\Normalizer;
 
-use App\Normalizer\UserPolicySummary;
 use AppBundle\Document\Policy;
-use AppBundle\Document\User;
 use AppBundle\Tests\Controller\BaseControllerTest;
-use Doctrine\ODM\MongoDB\DocumentManager;
-use FOS\UserBundle\Model\UserManager;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
-class UserPolicySummaryTest extends BaseControllerTest #WebTestCase
+class UserPolicySummaryTest extends BaseControllerTest
 {
     use \AppBundle\Tests\UserClassTrait;
-
-    static private $userRepo;
-    static private $policyRepo;
 
     /**
      * A test user has one policy.
      */
     public function testOnePolicySummary()
     {
-        $email = $this->generateUserWithPolicy();
+        $countOfPolicies = 2;
+        $email = $this->generateUserWithTwoPolicies();
         $user = self::$userManager->findUserByEmail($email);
 
         $userPolicySummary = self::$container->get('test.App\Normalizer\UserPolicySummary');
@@ -32,7 +25,7 @@ class UserPolicySummaryTest extends BaseControllerTest #WebTestCase
 
         $this->assertArrayHasKey('name', $summary);
         $this->assertArrayHasKey('policies', $summary);
-        $this->assertCount(1, $summary['policies']);
+        $this->assertCount($countOfPolicies, $summary['policies']);
 
         $policy = current($summary['policies']);
         $this->assertArrayHasKey('policyNumber', $policy);
@@ -54,7 +47,7 @@ class UserPolicySummaryTest extends BaseControllerTest #WebTestCase
      *
      * @see \AppBundle\Tests\Controller\UserControllerTest::testUserInvite();
      */
-    public function generateUserWithPolicy(): string
+    public function generateUserWithTwoPolicies(): string
     {
         $email = self::generateEmail('testUserInvite-inviter'.microtime(true), $this);
         $password = 'foo';
@@ -72,6 +65,11 @@ class UserPolicySummaryTest extends BaseControllerTest #WebTestCase
         self::$dm->flush();
 
         $this->assertTrue($policy->getUser()->hasActivePolicy());
+
+        $phone2 = self::getRandomPhone(self::$dm);
+        $policy = self::initPolicy($user, self::$dm, $phone2, null, true, true);
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        self::$dm->flush();
 
         return $email;
     }

@@ -42,7 +42,7 @@ class OauthLoginTest extends WebTestCase
             'scope' => "read",
             'redirect_uri' => 'http://dev.so-sure.net:40080/',
         ];
-        $this->client->request('GET', '/oauth/v2/auth?'. http_build_query($params));
+        $this->client->request('GET', '/oauth/v2/auth', $params);
 
         $response = $this->client->getInternalResponse();
         $this->assertNotNull($response);
@@ -64,7 +64,7 @@ class OauthLoginTest extends WebTestCase
             'scope' => Oauth2Scopes::USER_STARLING_SUMMARY,
             'redirect_uri' => 'http://dev.so-sure.net:40080/',
         ];
-        $this->client->request('GET', '/oauth/v2/auth?'. http_build_query($params));
+        $this->client->request('GET', '/oauth/v2/auth?', $params);
 
         $response = $this->client->getInternalResponse();
         $this->assertNotNull($response);
@@ -88,18 +88,22 @@ class OauthLoginTest extends WebTestCase
         $this->assertArrayHasKey('state', $output);
         $this->assertArrayHasKey('scope', $output);
 
+        // following the redirect is required to get the session in place
+        $this->client->followRedirect();
+
         // the target_path, stored in the session, will be used later to go back to Starling
-        if (! $this->container) {
-            $this->fail('testing container, over and over again...');
+        if (! $this->client->getContainer()) {
+            $this->fail('testing container, over and over again..., this time, in the client');
             return;
         }
-        $session = $this->container->get('session');
+        $session = $this->client->getContainer()->get('session');
         $this->assertNotNull($session);
         $this->assertInstanceOf(SessionInterface::class, $session);
         if ($session == null || ! $session instanceof SessionInterface) {
             $this->fail('Do not have a valid session');
             return;
         }
+
         $this->assertTrue(
             $session->has('oauth2Flow.targetPath'),
             'expected the Oauth2-Params & targetPath to be carried over to the login/[Allow] page, via the session'
