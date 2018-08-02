@@ -115,6 +115,47 @@ class AdminController extends BaseController
     use ValidatorTrait;
 
     /**
+     * @Route("/claims/delete-claim", name="admin_claims_delete_claim")
+     * @Method({"POST"})
+     */
+    public function adminClaimsDeleteClaim(Request $request)
+    {
+        if (!$this->isCsrfTokenValid('default', $request->get('token'))) {
+            throw new \InvalidArgumentException('Invalid csrf token');
+        }
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(Claim::class);
+        $claim = $repo->find($request->get('id'));
+        if (!$claim) {
+            throw $this->createNotFoundException('Claim not found');
+        }
+
+        $subject = sprintf("Claim %s has been manually deleted.", $claim->getNumber());
+        $mailer = $this->get('app.mailer');
+        $mailer->sendTemplate(
+            $subject,
+            'tech@so-sure.com',
+            'AppBundle:Email:claim/manuallyDeleted.html.twig',
+            ['claim' => $claim, 'policy' => $claim->getPolicy()]
+        );
+        foreach ($claim->getCharges() as $charge) {
+            $charge->setClaim(null);
+            $this->get('logger')->warning(sprintf(
+                'Charge %s for £%0.2f has been disassocated for deleted claim %s (%s)',
+                $charge->getId(),
+                $charge->getAmount(),
+                $claim->getNumber(),
+                $claim->getId()
+            ));
+        }
+        $dm->remove($claim);
+        $dm->flush();
+        $dm->clear();
+
+        return $this->redirectToRoute('admin_claims');
+    }
+
+    /**
      * @Route("/phone", name="admin_phone_add")
      * @Method({"POST"})
      */
