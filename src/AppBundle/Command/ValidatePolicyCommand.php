@@ -380,8 +380,8 @@ class ValidatePolicyCommand extends BaseCommand
                     $policy->getPolicyNumber()
                 );
             }
-            $refund = $policy->getRefundAmount($data['validateDate']);
-            $refundCommission = $policy->getRefundCommissionAmount($data['validateDate']);
+            $refund = $policy->getRefundAmount();
+            $refundCommission = $policy->getRefundCommissionAmount();
             if (!$this->areEqualToTwoDp(0, $refund) || !$this->areEqualToTwoDp(0, $refundCommission)) {
                 $lines[] = sprintf(
                     'Warning!! Refund Due. Refund %f / Commission %f',
