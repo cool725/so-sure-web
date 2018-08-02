@@ -229,7 +229,10 @@ class ClaimsController extends BaseController
                 $formCrimeRef->handleRequest($request);
                 if ($formCrimeRef->isValid()) {
                     if ($crimeRef->getForce()) {
-                        $validCrimeRef = $imeiService->validateCrimeRef($crimeRef->getForce(), $crimeRef->getCrimeRef());
+                        $validCrimeRef = $imeiService->validateCrimeRef(
+                            $crimeRef->getForce(),
+                            $crimeRef->getCrimeRef()
+                        );
                         $crimeRef->getClaim()->setForce($crimeRef->getForce());
                         $crimeRef->getClaim()->setCrimeRef($crimeRef->getCrimeRef());
                         $crimeRef->getClaim()->setValidCrimeRef($validCrimeRef);
