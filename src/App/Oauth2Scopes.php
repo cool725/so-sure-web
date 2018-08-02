@@ -8,8 +8,9 @@ final class Oauth2Scopes
         self::USER_STARLING_SUMMARY => [
             'intro' => 'Starling Bank would like access to your policy details:',
             'points' => [
-                'Your make of phone',
-                'Your policy number & end-dates',
+                'Policy number & end-dates',
+                'Make & model of phone',
+                'Current value of your reward pot'
             ],
         ],
     ];

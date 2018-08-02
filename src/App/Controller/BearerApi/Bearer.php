@@ -44,8 +44,6 @@ class Bearer extends BaseController
     public function ping(): Response
     {
         $user = $this->getUser();
-
-
         $data = [
             'response' => 'pong',
             'data' => $user->getUsername(),

@@ -1,6 +1,7 @@
 <?php
 namespace App\Tests\Normalizer;
 
+use App\Normalizer\UserPolicySummary;
 use AppBundle\Document\Policy;
 use AppBundle\Tests\Controller\BaseControllerTest;
 
@@ -13,10 +14,12 @@ class UserPolicySummaryTest extends BaseControllerTest
      */
     public function testOnePolicySummary()
     {
-        $countOfPolicies = 2;
-        $email = $this->generateUserWithTwoPolicies();
+        $rewardPotValue = 11.97;
+
+        $email = $this->generateUserWithTwoPolicies($rewardPotValue);
         $user = self::$userManager->findUserByEmail($email);
 
+        /** @var UserPolicySummary $userPolicySummary */
         $userPolicySummary = self::$container->get('test.App\Normalizer\UserPolicySummary');
         $summary = $userPolicySummary->shortPolicySummary($user);
 
@@ -25,21 +28,21 @@ class UserPolicySummaryTest extends BaseControllerTest
 
         $this->assertArrayHasKey('name', $summary);
         $this->assertArrayHasKey('policies', $summary);
-        $this->assertCount($countOfPolicies, $summary['policies']);
 
-        $policy = current($summary['policies']);
-        $this->assertArrayHasKey('policyNumber', $policy);
-        $this->assertArrayHasKey('endDate', $policy);
-        $this->assertArrayHasKey('phoneName', $policy);
-        $this->assertArrayHasKey('connections', $policy);
-        $this->assertArrayHasKey('rewardPot', $policy);
-        $this->assertArrayHasKey('rewardPotCurrency', $policy);
+        $this->assertCount(2, $summary['policies']);
+        $this->assertPolicySummaryHaveKeys($summary['policies'][0]);
+        $this->assertPolicySummaryHaveKeys($summary['policies'][1]);
+
+        $policy = $summary['policies'][0];
 
         ## Not yet adding connections, or adding to the rewardPot
+        $this->assertEquals(
+            $rewardPotValue,
+            $policy['rewardPot'],
+            'Expected the reward pot to have a value',
+            0.02    // float delta
+        );
         #$this->assertSame(1, $policy['connections']);
-        #$this->assertSame(10, $policy['rewardPot']);
-
-        $this->assertSame('GBP', $policy['rewardPotCurrency']);
     }
 
     /**
@@ -47,9 +50,9 @@ class UserPolicySummaryTest extends BaseControllerTest
      *
      * @see \AppBundle\Tests\Controller\UserControllerTest::testUserInvite();
      */
-    public function generateUserWithTwoPolicies(): string
+    public function generateUserWithTwoPolicies($rewardPotValue = 10): string
     {
-        $email = self::generateEmail('testUserInvite-inviter'.microtime(true), $this);
+        $email = self::generateEmail('testUserInvite-inviter'.random_int(PHP_INT_MIN, PHP_INT_MAX), $this);
         $password = 'foo';
         $phone = self::getRandomPhone(self::$dm);
 
@@ -62,6 +65,8 @@ class UserPolicySummaryTest extends BaseControllerTest
         );
         $policy = self::initPolicy($user, self::$dm, $phone, null, true, true);
         $policy->setStatus(Policy::STATUS_ACTIVE);
+        $policy->setPotValue($rewardPotValue);
+
         self::$dm->flush();
 
         $this->assertTrue($policy->getUser()->hasActivePolicy());
@@ -69,35 +74,21 @@ class UserPolicySummaryTest extends BaseControllerTest
         $phone2 = self::getRandomPhone(self::$dm);
         $policy = self::initPolicy($user, self::$dm, $phone2, null, true, true);
         $policy->setStatus(Policy::STATUS_ACTIVE);
+
         self::$dm->flush();
 
         return $email;
     }
 
-    private function acceptInvitationToAddToRewardPot($email, $password, $inviteeEmail)
+    private function assertPolicySummaryHaveKeys(array $policy)
     {
-        $this->login($email, $password, 'user/');
+        $this->assertArrayHasKey('policyNumber', $policy);
+        $this->assertArrayHasKey('endDate', $policy);
+        $this->assertArrayHasKey('phoneName', $policy);
+        $this->assertArrayHasKey('connections', $policy);
+        $this->assertArrayHasKey('rewardPot', $policy);
+        $this->assertArrayHasKey('rewardPotCurrency', $policy);
 
-        $crawler = self::$client->request('GET', '/user/');
-        self::verifyResponse(200);
-        $form = $crawler->selectButton('email[submit]')->form();
-        $form['email[email]'] = $inviteeEmail;
-
-        self::$client->submit($form);
-
-        $this->login($inviteeEmail, $password, 'user/');
-        $crawler = self::$client->request('GET', '/user/');
-        $form = $crawler->selectButton('Accept')->form();
-        self::$client->submit($form);
-
-        $crawler = self::$client->request('GET', '/user/');
-
-        #$this->validateRewardPot($crawler, 10);
-        $this->assertEquals(
-            10,
-            $crawler->filterXPath('//div[@id="reward-pot-chart"]')->attr('data-pot-value')
-        );
-
-        unset($crawler);
+        $this->assertSame('GBP', $policy['rewardPotCurrency']);
     }
 }
