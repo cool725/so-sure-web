@@ -74,11 +74,6 @@ class UserPolicySummaryTest extends BaseControllerTest
         return $email;
     }
 
-    /**
-     * @param $email
-     * @param $password
-     * @param $inviteeEmail
-     */
     private function acceptInvitationToAddToRewardPot($email, $password, $inviteeEmail)
     {
         $this->login($email, $password, 'user/');

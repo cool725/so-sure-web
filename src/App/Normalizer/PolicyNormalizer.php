@@ -35,7 +35,7 @@ class PolicyNormalizer implements NormalizerInterface, SerializerAwareInterface
             return [
                 'policyNumber' => $object->getPolicyNumber(),
                 'endDate' => $object->getEnd()->format('Y-m-d'),
-                'phoneName' => $object->getPhone()->__toString(),
+                'phoneName' => $this->serializer->normalize($object->getPhone(), $format, $context),
                 'connections' => count($object->getConnections()),
                 'rewardPot' => (float) $object->getPotValue(),
                 'rewardPotCurrency' =>'GBP' ,

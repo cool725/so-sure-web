@@ -35,11 +35,3 @@ class AuthCode extends BaseAuthCode
         $this->client = $client;
     }
 }
-
-/* @todo
-    <!-- src/Acme/ApiBundle/Resources/config/doctrine/AuthCode.mongodb.xml -->
-    <document name="Acme\ApiBundle\Document\AuthCode" db="acme" collection="oauthAuthCode" customId="true">
-        <field fieldName="id" id="true" strategy="AUTO" />
-        <reference-one target-document="Acme\ApiBundle\Document\Client" field="client" />
-    </document>
-*/

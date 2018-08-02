@@ -11,7 +11,7 @@ use Symfony\Component\Serializer\SerializerInterface;
  */
 class UserPolicySummary
 {
-    /** @var Serializer&SerializerInterface */
+    /** @var Serializer|SerializerInterface */
     private $serializer;
 
     public function __construct(SerializerInterface $serializer)
@@ -22,7 +22,7 @@ class UserPolicySummary
     /**
      * return the summary suitable to show an authenticated user, or service
      */
-    public function shortPolicySummary(User $user): array
+    public function shortPolicySummary(User $user) //: array
     {
         return $this->serializer->normalize(
             $user,

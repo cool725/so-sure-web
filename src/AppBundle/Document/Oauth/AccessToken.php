@@ -35,11 +35,3 @@ class AccessToken extends BaseAccessToken
         $this->client = $client;
     }
 }
-
-/* @todo
-    <!-- src/Acme/ApiBundle/Resources/config/doctrine/AccessToken.mongodb.xml -->
-    <document name="Acme\ApiBundle\Document\AccessToken" db="acme" collection="oauthAccessToken" customId="true">
-        <field fieldName="id" id="true" strategy="AUTO" />
-        <reference-one target-document="Acme\ApiBundle\Document\Client" field="client" />
-    </document>
-*/
