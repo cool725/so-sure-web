@@ -114,13 +114,13 @@ class BankAccountTest extends \PHPUnit\Framework\TestCase
 
         $this->assertTrue($policy->isPolicyPaidToDate(new \DateTime('2018-03-06')));
         $this->assertEquals(
-            new \DateTime('2018-04-05', new \DateTimeZone(SoSure::TIMEZONE)),
+            new \DateTime('2018-04-05 01:00', new \DateTimeZone(SoSure::TIMEZONE)),
             $policy->getNextBillingDate(new \DateTime('2018-03-06'))
         );
 
         $bankAccount = new BankAccount();
         $this->assertEquals(
-            new \DateTime('2018-04-05', new \DateTimeZone(SoSure::TIMEZONE)),
+            new \DateTime('2018-04-05 01:00', new \DateTimeZone(SoSure::TIMEZONE)),
             $bankAccount->getFirstPaymentDate($user, new \DateTime('2018-03-06'))
         );
     }
@@ -147,7 +147,7 @@ class BankAccountTest extends \PHPUnit\Framework\TestCase
 
         $this->assertTrue($policy->isPolicyPaidToDate(new \DateTime('2018-04-04')));
         $this->assertEquals(
-            new \DateTime('2018-04-05', new \DateTimeZone(SoSure::TIMEZONE)),
+            new \DateTime('2018-04-05 01:00', new \DateTimeZone(SoSure::TIMEZONE)),
             $policy->getNextBillingDate(new \DateTime('2018-04-04'))
         );
 
