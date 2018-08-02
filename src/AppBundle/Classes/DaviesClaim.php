@@ -68,6 +68,8 @@ class DaviesClaim extends DaviesExcel
         'Samantha.adams@davies-group.com',
         'Simon.Harvey@davies-group.com',
         'Owen.Pugh@davies-group.com',
+        'Katie.Molyneux@davies-group.com',
+        'Thomas.Gibbs@davies-group.com',
         'patrick@so-sure.com',
         'dylan@so-sure.com',
     ];
