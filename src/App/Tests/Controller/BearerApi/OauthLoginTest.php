@@ -106,7 +106,7 @@ class OauthLoginTest extends WebTestCase
 
         $this->assertTrue(
             $session->has('oauth2Flow.targetPath'),
-            'expected the Oauth2-Params & targetPath to be carried over to the login/[Allow] page, via the session'
+            'expected the Oauth2-Params to be carried over, via the session'
         );
     }
 }

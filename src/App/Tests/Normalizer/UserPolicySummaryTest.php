@@ -84,7 +84,7 @@ class UserPolicySummaryTest extends BaseControllerTest
     {
         $this->assertArrayHasKey('policyNumber', $policy);
         $this->assertArrayHasKey('endDate', $policy);
-        $this->assertArrayHasKey('phoneName', $policy);
+        $this->assertArrayHasKey('insuredPhone', $policy);
         $this->assertArrayHasKey('connections', $policy);
         $this->assertArrayHasKey('rewardPot', $policy);
         $this->assertArrayHasKey('rewardPotCurrency', $policy);

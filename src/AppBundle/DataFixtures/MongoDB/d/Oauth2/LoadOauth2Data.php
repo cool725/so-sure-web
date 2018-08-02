@@ -1,6 +1,7 @@
 <?php
 namespace AppBundle\DataFixtures\MongoDB\d\Oauth2;
 
+use App\Oauth2Scopes;
 use AppBundle\Document\Oauth\AccessToken;
 use AppBundle\Document\Oauth\Client;
 use AppBundle\Document\User;
@@ -42,14 +43,17 @@ class LoadOauth2Data implements FixtureInterface, ContainerAwareInterface
         }
 
         /** @var Client $client */
-        $client = $this->newOauth2Client($manager, ['read', 'summary'], []);
+        $client = $this->newOauth2Client($manager, [Oauth2Scopes::USER_STARLING_SUMMARY], []);
 
-        $this->newOauth2AccessToken($manager, $client, 'test-with-api-alister');
+        $this->newOauth2AccessToken($manager, $client, 'alister@so-sure.com', 'test-with-api-alister');
 
         $manager->flush();
         // $this->valdiateGedmoLogging($manager);
     }
 
+    /**
+     * Make an OauthClient with specific id & secret. Used to test logging in
+     */
     private function newOauth2Client(
         ObjectManager $manager,
         array $grantTypes = [],
@@ -74,7 +78,10 @@ class LoadOauth2Data implements FixtureInterface, ContainerAwareInterface
         return $client;
     }
 
-    private function newOauth2AccessToken(ObjectManager $manager, Client $client, string $token)
+    /**
+     * Make the bearer-token directly for a given user (by email)
+     */
+    private function newOauth2AccessToken(ObjectManager $manager, Client $client, string $userEmail, string $token)
     {
         if (!$this->container) {
             throw new \Exception('missing container, somehow');
@@ -83,14 +90,14 @@ class LoadOauth2Data implements FixtureInterface, ContainerAwareInterface
         $dm = $this->container->get('doctrine_mongodb.odm.default_document_manager');
         $repo = $dm->getRepository(User::class);
         /** @var UserInterface $user */
-        $user = $repo->findOneBy(['email' => 'alister@so-sure.com']);
+        $user = $repo->findOneBy(['email' => $userEmail]);
 
         $accessToken = new AccessToken();
         $accessToken->setClient($client);
         $accessToken->setUser($user);
         $accessToken->setToken($token);
         $accessToken->setExpiresAt(PHP_INT_MAX);
-        $accessToken->setScope('api');
+        $accessToken->setScope(Oauth2Scopes::USER_STARLING_SUMMARY);
 
         /** @var UserManagerInterface $userManager */
         $manager->persist($accessToken);
