@@ -29,6 +29,6 @@
     "popper.js": "^1.14.3"
   },
   "scripts": {
-    "js": "concat-cli -f ./node_modules/jquery/dist/jquery.min.js -f ./node_modules/bootstrap/dist/js/bootstrap.min.js -f ./node_modules/popper.js/dist/popper.min.js -o ./web/components/vendor.js"
+    "js": "concat-cli -f ./node_modules/jquery/dist/jquery.min.js ./node_modules/bootstrap/dist/js/bootstrap.min.js ./node_modules/popper.js/dist/popper.min.js -o ./web/components/vendor.js"
   }
 }
