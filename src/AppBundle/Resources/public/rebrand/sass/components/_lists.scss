@@ -16,39 +16,40 @@
     }
 }
 
-.table-list {
-    background-color: $white;
-    box-shadow: 0 15px 30px 0 rgba(8,27,154,0.08),
-                0 5px 15px 0 rgba(8,27,154,0.08);
-    @include border-radius(15px);
+// .table-list {
+//     // display: table;
+//     background-color: $white;
+//     box-shadow: 0 15px 30px 0 rgba(8,27,154,0.08),
+//                 0 5px 15px 0 rgba(8,27,154,0.08);
+//     @include border-radius(15px);
 
-    &__header {
-        padding: 1.4rem;
-        text-align: center;
-        background-color: $purple;
-        @include border-top-radius(15px);
-    }
+//     &__header {
+//         padding: 1.4rem;
+//         text-align: center;
+//         background-color: $purple;
+//         @include border-top-radius(15px);
+//     }
 
-    &__item {
-        background-color: $bb-1;
-        padding: 1.4rem 1.2rem 1.4rem 70px;
-        background-image: url('#{$cdn_url}/images/rebrand/icns/so-sure_unhappy-icn.svg');
-        background-repeat: no-repeat;
-        background-position: 20px center;
+//     &__item {
+//         background-color: $bb-1;
+//         // padding: 1.4rem 70px;
+//         background-image: url('#{$cdn_url}/images/rebrand/icns/so-sure_unhappy-icn.svg');
+//         background-repeat: no-repeat;
+//         background-position: 20px center;
 
-        &:nth-child(even) {
-            background-color: $white;
-        }
+//         &:nth-child(even) {
+//             background-color: $white;
+//         }
 
-        &:last-of-type {
-            @include border-bottom-radius(15px);
-        }
-    }
+//         &:last-of-type {
+//             @include border-bottom-radius(15px);
+//         }
+//     }
 
-    &__ss {
-        background-image: url('#{$cdn_url}/images/rebrand/icns/so-sure_happy-icn.svg');
-    }
-}
+//     &__ss {
+//         background-image: url('#{$cdn_url}/images/rebrand/icns/so-sure_happy-icn.svg');
+//     }
+// }
 
 // Modify list to handle fa icons
 // .list {

@@ -1,0 +1,25 @@
+// tables.scss
+
+.table-list {
+    background-color: $white;
+    box-shadow: 0 15px 30px 0 rgba(8,27,154,0.08),
+                0 5px 15px 0 rgba(8,27,154,0.08);
+    @include border-radius(15px);
+
+    &__header {
+        padding: 1.4rem;
+        text-align: center;
+        background-color: $purple;
+        @include border-top-radius(15px);
+    }
+
+    tbody > tr {
+        &:nth-child(even) {
+            background-color: $white;
+        }
+
+        &:last-of-type {
+            @include border-bottom-radius(15px);
+        }
+    }
+}
