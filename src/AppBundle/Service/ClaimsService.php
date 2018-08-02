@@ -161,8 +161,10 @@ class ClaimsService
         $claim->setCrimeRef($claimTheftLoss->getCrimeReferenceNumber());
         $claim->setForce($claimTheftLoss->getForce());
 
-        $validCrimeRef = $this->imeiService->validateCrimeRef($claim->getForce(), $claim->getCrimeRef());
-        $claim->setValidCrimeRef($validCrimeRef);
+        if ($claim->getForce()) {
+            $validCrimeRef = $this->imeiService->validateCrimeRef($claim->getForce(), $claim->getCrimeRef());
+            $claim->setValidCrimeRef($validCrimeRef);
+        }
 
         if ($claimTheftLoss->getProofOfUsage()) {
             $proofOfUsage = new ProofOfUsageFile();

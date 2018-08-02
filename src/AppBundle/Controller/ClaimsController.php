@@ -228,20 +228,30 @@ class ClaimsController extends BaseController
             } elseif ($request->request->has('crimeref')) {
                 $formCrimeRef->handleRequest($request);
                 if ($formCrimeRef->isValid()) {
-                    $validCrimeRef = $imeiService->validateCrimeRef($crimeRef->getForce(), $crimeRef->getCrimeRef());
-                    $crimeRef->getClaim()->setForce($crimeRef->getForce());
-                    $crimeRef->getClaim()->setCrimeRef($crimeRef->getCrimeRef());
-                    $crimeRef->getClaim()->setValidCrimeRef($validCrimeRef);
-                    $dm->flush();
-                    if (!$validCrimeRef) {
-                        $this->addFlash('error', sprintf(
-                            'CrimeRef %s is not valid. %s',
-                            $claim->getCrimeRef(),
-                            json_encode($imeiService->getResponseData())
-                        ));
+                    if ($crimeRef->getForce()) {
+                        $validCrimeRef = $imeiService->validateCrimeRef(
+                            $crimeRef->getForce(),
+                            $crimeRef->getCrimeRef()
+                        );
+                        $crimeRef->getClaim()->setForce($crimeRef->getForce());
+                        $crimeRef->getClaim()->setCrimeRef($crimeRef->getCrimeRef());
+                        $crimeRef->getClaim()->setValidCrimeRef($validCrimeRef);
+                        $dm->flush();
+                        if (!$validCrimeRef) {
+                            $this->addFlash('error', sprintf(
+                                'CrimeRef %s is not valid. %s',
+                                $claim->getCrimeRef(),
+                                json_encode($imeiService->getResponseData())
+                            ));
+                        } else {
+                            $this->addFlash('error', sprintf(
+                                'CrimeRef %s is valid.',
+                                $claim->getCrimeRef()
+                            ));
+                        }
                     } else {
                         $this->addFlash('error', sprintf(
-                            'CrimeRef %s is valid.',
+                            'Select a force for crimeref %s',
                             $claim->getCrimeRef()
                         ));
                     }
