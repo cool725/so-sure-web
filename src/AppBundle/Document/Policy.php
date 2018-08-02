@@ -4257,6 +4257,9 @@ abstract class Policy
             $numPayments = $premium->getNumberOfMonthlyPayments($this->getTotalSuccessfulUserPayments($date));
             $expectedCommission = $salva->sumBrokerFee($numPayments, $numPayments == 12);
         } else {
+            if (!$date) {
+                $date = new \DateTime();
+            }
             // policy is not active (above if statement)
             // so at most we should only be calculating to the end of the policy
             if ($date > $this->getEnd()) {
