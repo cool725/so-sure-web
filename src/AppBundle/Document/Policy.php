@@ -4250,11 +4250,18 @@ abstract class Policy
         $expectedCommission = null;
         // active/unpaid should be on a cash received based
         // also if a policy has been cancelled and there is no refund allowed, then should be based on cash recevied
-        if (in_array($this->getStatus(), [self::STATUS_ACTIVE, self::STATUS_UNPAID]) ||
+        if ($this->isCooloffCancelled()) {
+            return 0;
+        } elseif (in_array($this->getStatus(), [self::STATUS_ACTIVE, self::STATUS_UNPAID]) ||
             ($this->isCancelled() && !$this->isRefundAllowed())) {
             $numPayments = $premium->getNumberOfMonthlyPayments($this->getTotalSuccessfulUserPayments($date));
             $expectedCommission = $salva->sumBrokerFee($numPayments, $numPayments == 12);
         } else {
+            // policy is not active (above if statement)
+            // so at most we should only be calculating to the end of the policy
+            if ($date > $this->getEnd()) {
+                $date = $this->getEnd();
+            }
             $expectedCommission = $this->getProratedCommission($date);
         }
 
