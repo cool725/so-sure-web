@@ -2,7 +2,7 @@
 
 .navbar {
     background-color: transparent;
-    transition: 500ms ease;
+    // transition: padding 0.8s linear;;
     padding-top: 1.2rem;
 
     @include media-breakpoint-up(lg) {
@@ -10,6 +10,7 @@
     }
 
     .navbar-nav {
+        transition: none;
 
         .nav-link {
             font-family: $g-medium;
