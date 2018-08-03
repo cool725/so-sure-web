@@ -1184,6 +1184,7 @@ class UserController extends BaseController
             $this->generateUrl('purchase_cancel', ['id' => $user->getLatestPolicy()->getId()])
         ));
 
+        $oauth2FlowParams = null;
         $session = $request->getSession();
         if ($session && $session->has('oauth2Flow')) {
             $firewallName = $this->getParameter('fos_user.firewall_name');
@@ -1195,6 +1196,10 @@ class UserController extends BaseController
             );
             $this->get('fos_user.security.login_manager')->logInUser($firewallName, $user);
             $this->get('logger')->notice('(re-?) Logged into firewall');
+
+            $url = $session->get('oauth2Flow.targetPath');
+            $query = parse_url($url, PHP_URL_QUERY);
+            parse_str($query, $oauth2FlowParams);
         }
 
         return array(
@@ -1202,6 +1207,7 @@ class UserController extends BaseController
             'policy' => $user->getLatestPolicy(),
             'has_visited_welcome_page' => $pageVisited,
             // 'user_modal_welcome' => $exp,
+            'oauth2FlowParams' => $oauth2FlowParams,
         );
     }
     /**
