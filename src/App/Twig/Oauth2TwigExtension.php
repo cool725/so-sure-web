@@ -27,6 +27,9 @@ class Oauth2TwigExtension extends \Twig_Extension
 
     public function oauth2ScopeDescription($scopeName): string
     {
+        if (!$scopeName || !is_string($scopeName)) {
+            return '';
+        }
         $description = Oauth2Scopes::scopeToDescription($scopeName);
         if (empty($description)) {
             $this->logger->notice('scopeToDescription is not defined', ['scope' => $scopeName]);
