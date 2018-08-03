@@ -37,7 +37,8 @@ class ClaimsTwigExtension extends \Twig_Extension
                 'filename' => $file->getFilename(),
                 'url' => $this->router->generateUrl('claims_download_file', ['id' => $file->getId()]),
                 'url_download' => $this->router->generateUrl(
-                    'claims_download_file_attachment', ['id' => $file->getId()]
+                    'claims_download_file_attachment',
+                    ['id' => $file->getId()]
                 ),
             );
         }
@@ -48,7 +49,8 @@ class ClaimsTwigExtension extends \Twig_Extension
                 'filename' => $file->getFilename(),
                 'url' => $this->router->generateUrl('claims_download_file', ['id' => $file->getId()]),
                 'url_download' => $this->router->generateUrl(
-                    'claims_download_file_attachment', ['id' => $file->getId()]
+                    'claims_download_file_attachment',
+                    ['id' => $file->getId()]
                 ),
             );
         }
@@ -59,7 +61,8 @@ class ClaimsTwigExtension extends \Twig_Extension
                 'filename' => $file->getFilename(),
                 'url' => $this->router->generateUrl('claims_download_file', ['id' => $file->getId()]),
                 'url_download' => $this->router->generateUrl(
-                    'claims_download_file_attachment', ['id' => $file->getId()]
+                    'claims_download_file_attachment',
+                    ['id' => $file->getId()]
                 ),
             );
         }
@@ -70,7 +73,8 @@ class ClaimsTwigExtension extends \Twig_Extension
                 'filename' => $file->getFilename(),
                 'url' => $this->router->generateUrl('claims_download_file', ['id' => $file->getId()]),
                 'url_download' => $this->router->generateUrl(
-                    'claims_download_file_attachment', ['id' => $file->getId()]
+                    'claims_download_file_attachment',
+                    ['id' => $file->getId()]
                 ),
             );
         }
@@ -81,7 +85,8 @@ class ClaimsTwigExtension extends \Twig_Extension
                 'filename' => $file->getFilename(),
                 'url' => $this->router->generateUrl('claims_download_file', ['id' => $file->getId()]),
                 'url_download' => $this->router->generateUrl(
-                    'claims_download_file_attachment', ['id' => $file->getId()]
+                    'claims_download_file_attachment',
+                    ['id' => $file->getId()]
                 ),
             );
         }
@@ -92,7 +97,8 @@ class ClaimsTwigExtension extends \Twig_Extension
                 'filename' => $file->getFilename(),
                 'url' => $this->router->generateUrl('claims_download_file', ['id' => $file->getId()]),
                 'url_download' => $this->router->generateUrl(
-                    'claims_download_file_attachment', ['id' => $file->getId()]
+                    'claims_download_file_attachment',
+                    ['id' => $file->getId()]
                 ),
             );
         }
