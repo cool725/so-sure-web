@@ -1,6 +1,74 @@
 {% import "::macros.html.twig" as macros %}
 
-<footer style="footer navbar fixed-bottom">
+<footer class="footer py-5 fixed-bottom">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-4">
+                LOGO
+                <ul class="list-inline">
+                    <li class="list-inline-item d-none d-sm-inline-block mr-4">
+                        <a href="https://www.facebook.com/wearesosure" rel="noopener" target="_blank" class="text-white"><i class="fab fa-facebook fa-2x"></i><span class="sr-only">so-sure on Facebook</span></a>
+                    </li>
+                    <li class="list-inline-item d-none d-sm-inline-block mr-4">
+                        <a href="https://twitter.com/wearesosure" rel="noopener" target="_blank" class="text-white"><i class="fab fa-twitter fa-2x"></i><span class="sr-only">so-sure on Twitter</span></a>
+                    </li>
+                </ul>
+            </div>
+            <div class="col-lg-8">
+                <div class="row">
+                    <div class="col-6 col-lg-3 offset-lg-3">
+                        <ul class="list-unstyled footer__links mb-5 mb-lg-0">
+                            <li class="h5 text-blue1 mb-3">Claims</li>
+                            <li class="mb-2"><a href="{{ path('claim') }}" class="text-white">Make a Claim</a></li>
+                            <li class="mb-2"><a href="{{ path('about_how_to_contact_so_sure') }}" class="text-white">Contact Us</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-6 col-lg-3">
+                        <ul class="list-unstyled footer__links mb-5 mb-lg-0">
+                            <li class="h5 text-blue1 mb-3">Address</li>
+                            <li class="text-white mb-2">so-sure Ltd</li>
+                            <li class="text-white mb-2">10 Finsbury Square</li>
+                            <li class="text-white mb-2">London</li>
+                            <li class="text-white mb-2">EC2A 1AF, GB</li>
+                        </ul>
+                    </div>
+                    <div class="col-6 col-lg-3">
+                        <ul class="list-unstyled footer__links">
+                            <li class="h5 text-blue1 mb-3">Company</li>
+                            <li class="mb-2"><a href="{{ path('about_home') }}" class="text-white">About Us</a></li>
+                            <li class="mb-2"><a href="{{ path('mobile_phone_insurance_for_your_company') }}" class="text-white">Company Phones</a></li>
+                            <li class="mb-2"><a href="{{ path('faq') }}" class="text-white">FAQ</a></li>
+                            <li class="mb-2"><a href="{{ path('blog') }}" class="text-white">Blog</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-6 col-lg-3 d-block d-lg-none">
+                        <ul class="list-unstyled footer__links">
+                            <li class="h5 text-blue1 mb-3">Legal</li>
+                            <li class="mb-2"><a href="{{ path('privacy') }}" class="text-white">Privacy policy</a></li>
+                            <li class="mb-2"><a href="{{ path('terms') }}" class="text-white">Terms &amp; Conditions</a></li>
+                            <li class="mb-2"><a href="{{ cookie_url }}" target="_blank" class="text-white">Cookie Policy</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-10">
+
+            </div>
+        </div>
+    </div>
+    <svg preserveAspectRatio="xMinYMin meet" viewBox="0 0 1999 163" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+        <defs></defs>
+        <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" opacity="0.05">
+            <g id="Artboard-2" transform="translate(-1.000000, -35.000000)" fill="#FFFFFF">
+                <path d="M1,45 C233.933571,27.8484182 540.933571,33.8484182 922,63 C1303.06643,92.1515818 1662.7331,137.151582 2001,198 L1,198" id="Path-2"></path>
+            </g>
+        </g>
+    </svg>
+</footer>
+
+{% include '::footer_data.html.twig' %}
 
 {#     <svg class="d-block"
          preserveAspectRatio="xMinYMin meet"
@@ -68,6 +136,3 @@
             <p class="mb-0"><small>so-sure Limited is an appointed representative of AFL Insurance Brokers Limited which is authorised and regulated by the Financial Conduct Authority. Our firm's Registration Number is 744729. We are permitted to arrange, deal as an agent of insurers and clients, and assist in claims handling</small></p>
         </div>
     </section> #}
-</footer>
-
-{% include '::footer_data.html.twig' %}

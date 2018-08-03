@@ -7,6 +7,25 @@ body {
 .footer {
     position: relative;
 
+    @include linear-gradient(90deg, $blue-4, $dark);
+
+    .container {
+        position: relative;
+        z-index: 2;
+    }
+
+    svg {
+        position: absolute;
+        bottom: 0; left: 0;
+        z-index: 1;
+    }
+
+    &__links {
+
+        a {
+            text-decoration: underline;
+        }
+    }
     // &__top {
     //     background-color: $dark-80;
 
