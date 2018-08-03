@@ -6,6 +6,10 @@ body {
 
 .footer {
     position: relative;
+    z-index: 1010;
+    padding-top: 4rem;
+    padding-bottom: 1rem;
+    font-family: $g-light;
 
     @include linear-gradient(90deg, $blue-4, $dark);
 
@@ -26,20 +30,8 @@ body {
             text-decoration: underline;
         }
     }
-    // &__top {
-    //     background-color: $dark-80;
 
-    //     .fab {
-    //         vertical-align: middle;
-    //     }
-    // }
+    @include media-breakpoint-up(lg) {
 
-    // &__bottom {
-    //     background-color: $dark;
-    //     color: $grey;
-    // }
-
-    // &:before {
-
-    // }
+    }
 }

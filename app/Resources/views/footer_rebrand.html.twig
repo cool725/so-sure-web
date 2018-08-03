@@ -1,6 +1,6 @@
 {% import "::macros.html.twig" as macros %}
 
-<footer class="footer py-5 fixed-bottom">
+<footer class="footer fixed-bottom">
     <div class="container">
         <div class="row">
             <div class="col-lg-4">
@@ -52,17 +52,35 @@
                 </div>
             </div>
         </div>
+        <hr class="d-block d-lg-none border-white opacity-50 my-5">
         <div class="row">
             <div class="col-lg-10">
-
+                <ul class="list-inline footer__links mt-lg-5">
+                    <li class="list-inline-item text-white">&copy; so-sure. All rights reserved</li>
+                    <li class="list-inline-item text-white d-none d-lg-inline-block">|</li>
+                    <li class="list-inline-item d-none d-lg-inline-block"><a href="{{ path('privacy') }}" class="text-white">Privacy policy</a></li>
+                    <li class="list-inline-item text-white d-none d-lg-inline-block">|</li>
+                    <li class="list-inline-item d-none d-lg-inline-block"><a href="{{ path('terms') }}" class="text-white">Terms &amp; Conditions</a></li>
+                    <li class="list-inline-item text-white d-none d-lg-inline-block">|</li>
+                    <li class="list-inline-item d-none d-lg-inline-block"><a href="{{ cookie_url }}" target="_blank" class="text-white">Cookie Policy</a></li>
+                </ul>
+                <p class="text-white opacity-50"><small>so-sure Limited is an appointed representative of AFL Insurance Brokers Limited which is authorised and regulated by the Financial Conduct Authority. Our firm's Registration Number is 744729. We are permitted to arrange, deal as an agent of insurers and clients, and assist in claims handling.</small></p>
             </div>
         </div>
     </div>
-    <svg preserveAspectRatio="xMinYMin meet" viewBox="0 0 1999 163" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+{#     <svg preserveAspectRatio="xMinYMin meet" viewBox="0 0 1999 163" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
         <defs></defs>
         <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" opacity="0.05">
             <g id="Artboard-2" transform="translate(-1.000000, -35.000000)" fill="#FFFFFF">
                 <path d="M1,45 C233.933571,27.8484182 540.933571,33.8484182 922,63 C1303.06643,92.1515818 1662.7331,137.151582 2001,198 L1,198" id="Path-2"></path>
+            </g>
+        </g>
+    </svg> #}
+
+    <svg preserveAspectRatio="xMinYMin meet" viewBox="0 0 2000 276" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+        <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" opacity="0.05">
+            <g id="Artboard-2" transform="translate(0.000000, -103.000000)" fill="#FFFFFF">
+                <path d="M0,119.183212 C232.933571,90.0572718 539.933571,100.246165 921,149.749893 C1302.06643,199.253621 1661.7331,275.670323 2000,379 L0,379" id="Path-2"></path>
             </g>
         </g>
     </svg>
