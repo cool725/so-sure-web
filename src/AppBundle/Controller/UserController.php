@@ -1132,7 +1132,7 @@ class UserController extends BaseController
      * @Route("/welcome/{id}", name="user_welcome_policy_id")
      * @Template
      */
-    public function welcomeAction($id = null)
+    public function welcomeAction(Request $request, $id = null)
     {
         $dm = $this->getManager();
         $user = $this->getUser();
@@ -1183,6 +1183,19 @@ class UserController extends BaseController
             'Is your phone already damaged? <a href="%s">Click here</a>',
             $this->generateUrl('purchase_cancel', ['id' => $user->getLatestPolicy()->getId()])
         ));
+
+        $session = $request->getSession();
+        if ($session && $session->has('oauth2Flow')) {
+            $firewallName = $this->getParameter('fos_user.firewall_name');
+            $this->get('logger')->notice(
+                'Logging into main firewall',
+                [
+                    'alt' => $firewallName,
+                ]
+            );
+            $this->get('fos_user.security.login_manager')->logInUser($firewallName, $user);
+            $this->get('logger')->notice('(re-?) Logged into firewall');
+        }
 
         return array(
             'policy_key' => $this->getParameter('policy_key'),

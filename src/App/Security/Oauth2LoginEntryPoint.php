@@ -62,10 +62,7 @@ class Oauth2LoginEntryPoint implements AuthenticationEntryPointInterface
         static $loginRoutesForOauthScopes = [
             Oauth2Scopes::USER_STARLING_SUMMARY => 'starling_bank',
         ];
-        static $extraParameters = [
-            // @todo remove 'force' when no longer feature-flagged
-            Oauth2Scopes::USER_STARLING_SUMMARY => ['force' => 'starling-landing'],
-        ];
+        static $extraParameters = [ ];
 
         $parameters = $request->query->all();
 
