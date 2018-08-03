@@ -12,7 +12,8 @@ var _rollbarConfig = {
         "Cannot read property",
         "Unable to get property",
         "Object doesn't support property or method",
-        "is not an object"
+        "is not an object",
+        "Unable to get value of the property"
     ]
 };
 // Rollbar Snippet
