@@ -11,18 +11,11 @@ trait Oauth
 {
     /**
      * Make an OauthClient with specific id & secret. Used to test logging in
-     * @param ObjectManager $manager
-     * @param array $grantTypes
-     * @param array $redirectUrls
-     * @param $clientIdKey
-     * @param $clientIdRandom
-     * @param $clientSecret
-     * @return Client
      */
     protected function newOauth2Client(
         DocumentManager $manager,
-        array $grantTypes = [],
-        array $redirectUrls = [],
+        array $grantTypes,
+        array $redirectUrls,
         $clientIdKey,
         $clientIdRandom,
         $clientSecret
