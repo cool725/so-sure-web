@@ -4,6 +4,7 @@
     {{ parent() }}
     {% stylesheets output='css/*.css'
     '@AppBundle/Resources/public/sass/page/admin.scss'
+    'components/viewerjs/viewer.min.css'
  %}<link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
 {% endblock %}
 
@@ -11,6 +12,8 @@
     {{ parent() }}
     {% javascripts
         '@AppBundle/Resources/public/js/tabs.js'
+        'components/viewerjs/viewer.min.js'
+        'components/jquery-viewer/jquery-viewer.min.js'
         '@AppBundle/Resources/public/js/Claims/phoneAlternativesModal.js'
         '@AppBundle/Resources/public/js/Claims/tabs.js'
         '@AppBundle/Resources/public/js/Claims/policy.js'

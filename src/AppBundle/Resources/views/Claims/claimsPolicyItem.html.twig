@@ -469,7 +469,7 @@
                     {% for file in policy.policyFiles %}
                     <tr>
                         <td>{{ file.fileType }}</td>
-                        <td><a href="{{ s3DownloadLink(file.bucket, file.key) }}">{{ file.fileName }}</a> (Generated {{ file.created|date }})</td>
+                        <td><a href="{{ path('claims_download_file', {'id': file.id}) }}">{{ file.fileName }}</a> (Generated {{ file.created|date }})</td>
                     </tr>
                     {% endfor %}
                 </table>

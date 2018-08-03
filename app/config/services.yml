@@ -342,6 +342,7 @@ services:
         class: AppBundle\Service\ClaimsTwigExtension
         arguments:
             - "@aws.s3"
+            - "@app.router"
         public: false
         tags:
             - { name: twig.extension }

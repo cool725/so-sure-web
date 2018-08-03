@@ -5,16 +5,21 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Psr\Log\LoggerInterface;
 use AppBundle\Document\CurrencyTrait;
 use AppBundle\Document\Claim;
+use Symfony\Component\Routing\Router;
 
 class ClaimsTwigExtension extends \Twig_Extension
 {
     protected $s3;
 
+    /** @var RouterService */
+    protected $router;
+
     /**
      */
-    public function __construct($s3)
+    public function __construct($s3, $router)
     {
         $this->s3 = $s3;
+        $this->router = $router;
     }
 
     public function getFunctions()
@@ -30,7 +35,11 @@ class ClaimsTwigExtension extends \Twig_Extension
         foreach ($claim->getProofOfUsageFiles() as $file) {
             $proofOfUsages[] = array(
                 'filename' => $file->getFilename(),
-                'url' => $this->s3DownloadLink($file->getBucket(), $file->getKey())
+                'url' => $this->router->generateUrl('claims_download_file', ['id' => $file->getId()]),
+                'url_download' => $this->router->generateUrl(
+                    'claims_download_file_attachment',
+                    ['id' => $file->getId()]
+                ),
             );
         }
 
@@ -38,7 +47,11 @@ class ClaimsTwigExtension extends \Twig_Extension
         foreach ($claim->getProofOfBarringFiles() as $file) {
             $proofOfBarrings[] = array(
                 'filename' => $file->getFilename(),
-                'url' => $this->s3DownloadLink($file->getBucket(), $file->getKey())
+                'url' => $this->router->generateUrl('claims_download_file', ['id' => $file->getId()]),
+                'url_download' => $this->router->generateUrl(
+                    'claims_download_file_attachment',
+                    ['id' => $file->getId()]
+                ),
             );
         }
 
@@ -46,7 +59,11 @@ class ClaimsTwigExtension extends \Twig_Extension
         foreach ($claim->getProofOfPurchaseFiles() as $file) {
             $proofOfPurchases[] = array(
                 'filename' => $file->getFilename(),
-                'url' => $this->s3DownloadLink($file->getBucket(), $file->getKey())
+                'url' => $this->router->generateUrl('claims_download_file', ['id' => $file->getId()]),
+                'url_download' => $this->router->generateUrl(
+                    'claims_download_file_attachment',
+                    ['id' => $file->getId()]
+                ),
             );
         }
 
@@ -54,7 +71,11 @@ class ClaimsTwigExtension extends \Twig_Extension
         foreach ($claim->getDamagePictureFiles() as $file) {
             $damagePictures[] = array(
                 'filename' => $file->getFilename(),
-                'url' => $this->s3DownloadLink($file->getBucket(), $file->getKey())
+                'url' => $this->router->generateUrl('claims_download_file', ['id' => $file->getId()]),
+                'url_download' => $this->router->generateUrl(
+                    'claims_download_file_attachment',
+                    ['id' => $file->getId()]
+                ),
             );
         }
 
@@ -62,7 +83,11 @@ class ClaimsTwigExtension extends \Twig_Extension
         foreach ($claim->getProofOfLossFiles() as $file) {
             $proofOfLosses[] = array(
                 'filename' => $file->getFilename(),
-                'url' => $this->s3DownloadLink($file->getBucket(), $file->getKey())
+                'url' => $this->router->generateUrl('claims_download_file', ['id' => $file->getId()]),
+                'url_download' => $this->router->generateUrl(
+                    'claims_download_file_attachment',
+                    ['id' => $file->getId()]
+                ),
             );
         }
 
@@ -70,7 +95,11 @@ class ClaimsTwigExtension extends \Twig_Extension
         foreach ($claim->getOtherFiles() as $file) {
             $others[] = array(
                 'filename' => $file->getFilename(),
-                'url' => $this->s3DownloadLink($file->getBucket(), $file->getKey())
+                'url' => $this->router->generateUrl('claims_download_file', ['id' => $file->getId()]),
+                'url_download' => $this->router->generateUrl(
+                    'claims_download_file_attachment',
+                    ['id' => $file->getId()]
+                ),
             );
         }
 
