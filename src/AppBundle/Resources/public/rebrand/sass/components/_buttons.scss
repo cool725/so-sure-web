@@ -9,6 +9,16 @@
                 0 5px 15px 0 rgba(8,27,154,0.08);
 }
 
+// Modify white btns to match design
+.btn-white {
+    color: $blue-2;
+}
+
+.btn-gradient {
+    border: none;
+    @include linear-gradient(90deg, $blue-3, $blue-1);
+}
+
 // Button block mobile only
 @include media-breakpoint-down(xs) {
 
