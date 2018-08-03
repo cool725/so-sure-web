@@ -79,11 +79,11 @@ class BearerTest extends BaseControllerTest
         $mongoId = new \MongoId();
         $clientToken = $this->newOauth2Client(
             $dm,
-            [Oauth2Scopes::USER_STARLING_SUMMARY],
-            [],
             (string) $mongoId,
             'clientIdRandom',
-            'clientSecret'
+            'clientSecret',
+            [Oauth2Scopes::USER_STARLING_SUMMARY],
+            []
         );
         $this->newOauth2AccessToken($dm, $clientToken, $user, $token);
 
