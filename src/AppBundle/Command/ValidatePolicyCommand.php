@@ -2,6 +2,7 @@
 
 namespace AppBundle\Command;
 
+use AppBundle\Document\BankAccount;
 use AppBundle\Document\CurrencyTrait;
 use AppBundle\Document\Payment\BacsPayment;
 use AppBundle\Repository\PolicyRepository;
@@ -343,7 +344,9 @@ class ValidatePolicyCommand extends BaseCommand
                     $lines[] = $this->failureScheduledPaymentsMessage($policy, $data['validateDate']);
                 }
             }
-            if ($policy->hasCorrectCommissionPayments($data['validateDate']) === false) {
+
+            // allow £0.10 difference - no need to warn for a few days off in case of refunds
+            if ($policy->hasCorrectCommissionPayments($data['validateDate'], 0.10) === false) {
                 // Ignore a couple of policies that should have been cancelled unpaid, but went to expired
                 if (!in_array($policy->getId(), [
                     '5960afe142bece15ca46c796',
@@ -356,6 +359,7 @@ class ValidatePolicyCommand extends BaseCommand
                     $lines[] = $this->failureCommissionMessage($policy, $data['prefix'], $data['validateDate']);
                 }
             }
+
             if ($data['validate-premiums'] && (!$policy->getStatus() ||
                 in_array($policy->getStatus(), [Policy::STATUS_PENDING, Policy::STATUS_MULTIPAY_REJECTED]))) {
                 /** @var PolicyService $policyService */
@@ -395,14 +399,16 @@ class ValidatePolicyCommand extends BaseCommand
             if ($policy->getUser()->hasBacsPaymentMethod() && $policy->isActive(true)) {
                 $bacsPayments = count($policy->getPaymentsByType(BacsPayment::class));
                 $bankAccount = $policy->getUser()->getBacsPaymentMethod()->getBankAccount();
-                $isFirstPayment = $bankAccount->isFirstPayment();
-                if ($bacsPayments >= 1 && $isFirstPayment) {
-                    $lines[] = 'Warning!! 1 or more bacs payments, yet bank has first payment flag set';
-                } elseif ($bacsPayments == 0 && !$isFirstPayment) {
-                    $lines[] = 'Warning!! No bacs payments, yet bank does not have first payment flag set';
-                }
-                if ($bacsPayments == 0 && $bankAccount->getInitialNotificationDate() > new \DateTime()) {
-                    $lines[] = 'Warning!! There are no bacs payments, yet its past the initial notification date';
+                if ($bankAccount->getMandateStatus() == BankAccount::MANDATE_SUCCESS) {
+                    $isFirstPayment = $bankAccount->isFirstPayment();
+                    if ($bacsPayments >= 1 && $isFirstPayment) {
+                        $lines[] = 'Warning!! 1 or more bacs payments, yet bank has first payment flag set';
+                    } elseif ($bacsPayments == 0 && !$isFirstPayment) {
+                        $lines[] = 'Warning!! No bacs payments, yet bank does not have first payment flag set';
+                    }
+                    if ($bacsPayments == 0 && $bankAccount->getInitialNotificationDate() > new \DateTime()) {
+                        $lines[] = 'Warning!! There are no bacs payments, yet its past the initial notification date';
+                    }
                 }
             }
         } catch (\Exception $e) {

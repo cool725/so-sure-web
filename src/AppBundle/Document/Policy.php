@@ -643,8 +643,23 @@ abstract class Policy
             return [];
         }
 
-        return array_filter($payments, function ($payment) {
+        return array_filter($payments, function (Payment $payment) {
             return $payment->isSuccess() && $payment->isUserPayment();
+        });
+    }
+
+    public function getSuccessfulStandardPayments()
+    {
+        $payments = $this->getPayments();
+        if (is_object($payments)) {
+            $payments = $payments->toArray();
+        }
+        if (!$this->getPayments()) {
+            return [];
+        }
+
+        return array_filter($payments, function (Payment $payment) {
+            return $payment->isSuccess() && $payment->isStandardPayment();
         });
     }
 
@@ -2693,7 +2708,17 @@ abstract class Policy
 
     public function isCooloffCancelled()
     {
-        return $this->isCancelled() && $this->getCancelledReason() == self::CANCELLED_COOLOFF;
+        return $this->isCancelledForReason(self::CANCELLED_COOLOFF);
+    }
+
+    public function isUnpaidCancelled()
+    {
+        return $this->isCancelledForReason(self::CANCELLED_UNPAID);
+    }
+
+    private function isCancelledForReason($reason)
+    {
+        return $this->isCancelled() && $this->getCancelledReason() == $reason;
     }
 
     public function canCancel($reason, $date = null)
@@ -3808,6 +3833,21 @@ abstract class Policy
         return $totalPaid;
     }
 
+    public function getTotalSuccessfulStandardPayments(\DateTime $date = null)
+    {
+        if (!$date) {
+            $date = new \DateTime();
+        }
+        $totalPaid = 0;
+        foreach ($this->getSuccessfulStandardPayments() as $payment) {
+            if ($payment->getDate() <= $date) {
+                $totalPaid += $payment->getAmount();
+            }
+        }
+
+        return $totalPaid;
+    }
+
     public function getTotalExpectedPaidToDate(\DateTime $date = null)
     {
         if (!$this->isPolicy() || !$this->getStart()) {
@@ -4254,7 +4294,7 @@ abstract class Policy
             return 0;
         } elseif (in_array($this->getStatus(), [self::STATUS_ACTIVE, self::STATUS_UNPAID]) ||
             ($this->isCancelled() && !$this->isRefundAllowed())) {
-            $numPayments = $premium->getNumberOfMonthlyPayments($this->getTotalSuccessfulUserPayments($date));
+            $numPayments = $premium->getNumberOfMonthlyPayments($this->getTotalSuccessfulStandardPayments($date));
             $expectedCommission = $salva->sumBrokerFee($numPayments, $numPayments == 12);
         } else {
             if (!$date) {
@@ -4271,7 +4311,7 @@ abstract class Policy
         return $expectedCommission;
     }
 
-    public function hasCorrectCommissionPayments(\DateTime $date = null)
+    public function hasCorrectCommissionPayments(\DateTime $date = null, $allowedVariance = 0)
     {
         $expectedCommission = $this->getExpectedCommission($date);
         /*
@@ -4280,7 +4320,9 @@ abstract class Policy
         print $this->getTotalCommissionPaid() . PHP_EOL;
         */
 
-        return $this->areEqualToTwoDp($this->getTotalCommissionPaid(), $expectedCommission);
+        $diff = abs($this->getTotalCommissionPaid() - $expectedCommission);
+
+        return $diff <= $allowedVariance;
     }
 
     public function getPremiumPayments()
