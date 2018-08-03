@@ -36,7 +36,9 @@ class ClaimsTwigExtension extends \Twig_Extension
             $proofOfUsages[] = array(
                 'filename' => $file->getFilename(),
                 'url' => $this->router->generateUrl('claims_download_file', ['id' => $file->getId()]),
-                'url_download' => $this->router->generateUrl('claims_download_file_attachment', ['id' => $file->getId()]),
+                'url_download' => $this->router->generateUrl(
+                    'claims_download_file_attachment', ['id' => $file->getId()]
+                ),
             );
         }
 
@@ -45,7 +47,9 @@ class ClaimsTwigExtension extends \Twig_Extension
             $proofOfBarrings[] = array(
                 'filename' => $file->getFilename(),
                 'url' => $this->router->generateUrl('claims_download_file', ['id' => $file->getId()]),
-                'url_download' => $this->router->generateUrl('claims_download_file_attachment', ['id' => $file->getId()]),
+                'url_download' => $this->router->generateUrl(
+                    'claims_download_file_attachment', ['id' => $file->getId()]
+                ),
             );
         }
 
@@ -54,7 +58,9 @@ class ClaimsTwigExtension extends \Twig_Extension
             $proofOfPurchases[] = array(
                 'filename' => $file->getFilename(),
                 'url' => $this->router->generateUrl('claims_download_file', ['id' => $file->getId()]),
-                'url_download' => $this->router->generateUrl('claims_download_file_attachment', ['id' => $file->getId()]),
+                'url_download' => $this->router->generateUrl(
+                    'claims_download_file_attachment', ['id' => $file->getId()]
+                ),
             );
         }
 
@@ -63,7 +69,9 @@ class ClaimsTwigExtension extends \Twig_Extension
             $damagePictures[] = array(
                 'filename' => $file->getFilename(),
                 'url' => $this->router->generateUrl('claims_download_file', ['id' => $file->getId()]),
-                'url_download' => $this->router->generateUrl('claims_download_file_attachment', ['id' => $file->getId()]),
+                'url_download' => $this->router->generateUrl(
+                    'claims_download_file_attachment', ['id' => $file->getId()]
+                ),
             );
         }
 
@@ -72,7 +80,9 @@ class ClaimsTwigExtension extends \Twig_Extension
             $proofOfLosses[] = array(
                 'filename' => $file->getFilename(),
                 'url' => $this->router->generateUrl('claims_download_file', ['id' => $file->getId()]),
-                'url_download' => $this->router->generateUrl('claims_download_file_attachment', ['id' => $file->getId()]),
+                'url_download' => $this->router->generateUrl(
+                    'claims_download_file_attachment', ['id' => $file->getId()]
+                ),
             );
         }
 
@@ -81,7 +91,9 @@ class ClaimsTwigExtension extends \Twig_Extension
             $others[] = array(
                 'filename' => $file->getFilename(),
                 'url' => $this->router->generateUrl('claims_download_file', ['id' => $file->getId()]),
-                'url_download' => $this->router->generateUrl('claims_download_file_attachment', ['id' => $file->getId()]),
+                'url_download' => $this->router->generateUrl(
+                    'claims_download_file_attachment', ['id' => $file->getId()]
+                ),
             );
         }
 
