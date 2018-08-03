@@ -256,8 +256,20 @@
                     </div>
                     <p>How? We have a proprietary technology, called pic-sure, which allows us to verify the functioning of your phone when you insure it.</p>
                     <p class="pb-4">That means that your claim process is much quicker, your excess gets slashed in half, and you will tbe treated on the phone with compassion, not interrogation.</p>
-                    <a href="#" class="btn btn-primary btn-shadow btn-gradient btn-block-xs mr-lg-2">Download on App Store <i class="fab fa-apple fa-lg"></i></a>
-                    <a href="#" class="btn btn-primary btn-shadow btn-gradient btn-block-xs mr-lg-2">Download of Google Play <i class="fab fa-android fa-lg"></i></a>
+{#                     <a href="#" class="btn btn-primary btn-shadow btn-gradient btn-block-xs mr-lg-2">Download on App Store <i class="fab fa-apple fa-lg"></i></a>
+                    <a href="#" class="btn btn-primary btn-shadow btn-gradient btn-block-xs mr-lg-2">Download of Google Play <i class="fab fa-android fa-lg"></i></a> #}
+                    <ul class="list-inline">
+                        <li class="list-inline-item">
+                            <a class="ga-outbound-click" data-clicklabel="iTunes" href="{{ apple_download('app-section') }}" target="_blank" rel="noopener">
+                                <img src="{{ cdn_url }}/images/icons/app-store-original.svg" alt="Download so-sure on the App Store" /><span class="sr-only">so-sure app - Apple App Store</span>
+                            </a>
+                        </li>
+                        <li class="list-inline-item">
+                            <a class="ga-outbound-click" data-clicklabel="PlayStore" href="{{ google_download('app-section') }}" target="_blank" rel="noopener">
+                                <img src="{{ cdn_url }}/images/icons/google-play-original.svg" alt="Get so-sure on Google Play" /><span class="sr-only">so-sure app - Google Play</span>
+                            </a>
+                        </li>
+                    </ul>
                 </div>
                 <div class="col-lg-6">
 
