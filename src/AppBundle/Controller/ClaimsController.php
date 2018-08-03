@@ -137,7 +137,6 @@ class ClaimsController extends BaseController
             $claim = new Claim();
             $claim->setPolicy($policy);
             $claim->setStatus(Claim::STATUS_INREVIEW);
-            $claim->setHandlingTeam($this->getUser()->getHandlingTeam());
         }
         $claimscheck = new ClaimsCheck();
         $claimscheck->setPolicy($policy);
@@ -163,6 +162,7 @@ class ClaimsController extends BaseController
                 $formClaim->handleRequest($request);
                 if ($formClaim->isValid()) {
                     $claim->setHandler($this->getUser());
+                    $claim->setHandlingTeam($this->getUser()->getHandlingTeam());
                     /** @var ClaimsService $claimsService */
                     $claimsService = $this->get('app.claims');
                     if ($claim->getStatus() == Claim::STATUS_SUBMITTED) {
