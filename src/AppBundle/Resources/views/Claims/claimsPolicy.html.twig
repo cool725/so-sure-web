@@ -41,12 +41,14 @@
   {% if policy.isClaimable %}
     <div class="bg-warning" style="border-radius: 10px; padding: 20px; margin-bottom: 20px;">
         <ul class="nav nav-tabs nav-justified">
-          <li role="presentation" {% if not policy.hasOpenClaim or claim.type %}class="active"{% endif %}><a href="#record">Record Claim {% if claim.type %}[from FNOL]{% endif %}</a></li>
-          <li role="presentation" {% if policy.hasOpenClaim and not claim.type %}class="active"{% endif %}><a href="#claimscheck">ClaimsCheck</a></li>
+          <li role="presentation" {% if not policy.hasOpenClaim or claim.type or app.user.handlingTeam == 'direct-group' %}class="active"{% endif %}><a href="#record">Record Claim {% if claim.type %}[from FNOL]{% endif %}</a></li>
+          {% if app.user.handlingTeam != 'direct-group' %}
+            <li role="presentation" {% if policy.hasOpenClaim and not claim.type %}class="active"{% endif %}><a href="#claimscheck">ClaimsCheck</a></li>
+          {% endif %}
           <li role="presentation"><a href="#crimeref">Crime Ref Check</a></li>
         </ul>
         <div class="tab-content">
-            <div role="tabpanel" class="tab-pane {% if not policy.hasOpenClaim or claim.type %}active"{% endif %}" id="record">
+            <div role="tabpanel" class="tab-pane {% if not policy.hasOpenClaim or claim.type or app.user.handlingTeam == 'direct-group' %}active"{% endif %}" id="record">
                 <p></p>
                 <p class="text-center"><strong>Record Claim
                 {% if claim.type %}
@@ -107,6 +109,7 @@
                 </div>
                 {{ form_end(formClaim) }}
             </div>
+            {% if app.user.handlingTeam != 'direct-group' %}
             <div role="tabpanel" class="tab-pane {% if policy.hasOpenClaim and not claim.type %}active"{% endif %}" id="claimscheck">
                 <p></p>
                 <p class="text-center"><strong>Run ClaimsCheck</strong></p>
@@ -151,6 +154,7 @@
                     {% endif %}
                 {% endif %}
             </div>
+            {% endif %}
             <div role="tabpanel" class="tab-pane" id="crimeref">
                 <p></p>
                 <p class="text-center"><strong>Run Crime Ref Check</strong></p>
