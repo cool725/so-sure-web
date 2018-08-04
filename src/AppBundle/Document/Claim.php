@@ -47,6 +47,7 @@ class Claim
     const WARNING_FLAG_DAVIES_REPLACEMENT_COST_HIGHER = 'davies-replacement-cost-higher';
     const WARNING_FLAG_DAVIES_INCORRECT_EXCESS = 'davies-incorrect-excess';
     const WARNING_FLAG_DAVIES_IMEI_MISMATCH = 'davies-imei-mismatch';
+    const WARNING_FLAG_DAVIES_HANDLING_TEAM = 'davies-handling-team';
 
     // technically not a warning flag, but fits nicely under that for UI with little change required
     // and very little usage envisioned
