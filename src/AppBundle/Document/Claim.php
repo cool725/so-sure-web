@@ -626,7 +626,7 @@ class Claim
 
     /**
      * @AppAssert\AlphanumericSpaceDot()
-     * @Assert\Length(min="10", max="200")
+     * @Assert\Length(min="1", max="200")
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
