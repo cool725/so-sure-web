@@ -119,7 +119,9 @@ class ClaimsService
     public function updateDamageDocuments(Claim $claim, ClaimFnolDamage $claimDamage, $submit = false)
     {
         $claim->setTypeDetails($claimDamage->getTypeDetails());
-        $claim->setTypeDetailsOther($claimDamage->getTypeDetailsOther());
+        $claim->setTypeDetailsOther(
+            $this->conformAlphanumericSpaceDot($claimDamage->getTypeDetailsOther(), 200)
+        );
         $claim->setMonthOfPurchase($claimDamage->getMonthOfPurchase());
         $claim->setYearOfPurchase($claimDamage->getYearOfPurchase());
         $claim->setPhoneStatus($claimDamage->getPhoneStatus());
