@@ -1352,7 +1352,6 @@ class BacsService
             );
             $scheduledPayment->setPayment($payment);
             if ($payment->getStatus() != BacsPayment::STATUS_SKIPPED) {
-
                 $metadata['debit-amount'] += $scheduledPayment->getAmount();
                 $lines[] = implode(',', [
                     sprintf('"%s"', $scheduledDate->format('d/m/y')),
