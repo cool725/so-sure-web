@@ -26,6 +26,7 @@ class BacsPayment extends Payment
     const STATUS_SUBMITTED = 'submitted';
     const STATUS_SUCCESS = 'success';
     const STATUS_FAILURE = 'failure';
+    const STATUS_SKIPPED = 'skipped';
 
     /**
      * @Assert\Type("bool")
@@ -41,7 +42,8 @@ class BacsPayment extends Payment
      *      "submitted",
      *      "transfer-wait-exception",
      *      "success",
-     *      "failure"
+     *      "failure",
+     *      "skipped"
      * }, strict=true)
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
