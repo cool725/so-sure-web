@@ -1180,7 +1180,7 @@ class JudopayService
                 $payment->setRiskScore($tokenPaymentDetails["riskScore"]);
             }
         } else {
-            $this->logger->warning(sprintf(
+            $this->logger->info(sprintf(
                 'User %s does not have a valid payment method (Policy %s)',
                 $user->getId(),
                 $policy->getId()

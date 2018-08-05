@@ -1079,7 +1079,8 @@ class BacsService
         $policy->addPayment($payment);
 
         if (!$user->hasValidPaymentMethod()) {
-            throw new \Exception(sprintf(
+            $payment->setStatus(BacsPayment::STATUS_SKIPPED);
+            $this->logger->warning(sprintf(
                 'User %s does not have a valid payment method (Policy %s)',
                 $user->getId(),
                 $policy->getId()
@@ -1350,38 +1351,40 @@ class BacsService
                 $scheduledPayment->getAmount()
             );
             $scheduledPayment->setPayment($payment);
+            if ($payment->getStatus() != BacsPayment::STATUS_SKIPPED) {
 
-            $metadata['debit-amount'] += $scheduledPayment->getAmount();
-            $lines[] = implode(',', [
-                sprintf('"%s"', $scheduledDate->format('d/m/y')),
-                '"Scheduled Payment"',
-                $bankAccount->isFirstPayment() ?
-                    sprintf('"%s"', self::BACS_COMMAND_FIRST_DIRECT_DEBIT) :
-                    sprintf('"%s"', self::BACS_COMMAND_DIRECT_DEBIT),
-                sprintf('"%s"', $bankAccount->getAccountName()),
-                sprintf('"%s"', $bankAccount->getSortCode()),
-                sprintf('"%s"', $bankAccount->getAccountNumber()),
-                sprintf('"%0.2f"', $scheduledPayment->getAmount()),
-                sprintf('"%s"', $bankAccount->getReference()),
-                sprintf('"%s"', $scheduledPayment->getPolicy()->getUser()->getId()),
-                sprintf('"%s"', $scheduledPayment->getPolicy()->getId()),
-                sprintf('"SP-%s"', $scheduledPayment->getId()),
-            ]);
-            $payment->setSubmittedDate($scheduledDate);
-            $payment->setStatus(BacsPayment::STATUS_GENERATED);
-            $payment->setSerialNumber($serialNumber);
-            $scheduledPayment->setStatus(ScheduledPayment::STATUS_PENDING);
-            if ($bankAccount->isFirstPayment()) {
-                $bankAccount->setFirstPayment(false);
+                $metadata['debit-amount'] += $scheduledPayment->getAmount();
+                $lines[] = implode(',', [
+                    sprintf('"%s"', $scheduledDate->format('d/m/y')),
+                    '"Scheduled Payment"',
+                    $bankAccount->isFirstPayment() ?
+                        sprintf('"%s"', self::BACS_COMMAND_FIRST_DIRECT_DEBIT) :
+                        sprintf('"%s"', self::BACS_COMMAND_DIRECT_DEBIT),
+                    sprintf('"%s"', $bankAccount->getAccountName()),
+                    sprintf('"%s"', $bankAccount->getSortCode()),
+                    sprintf('"%s"', $bankAccount->getAccountNumber()),
+                    sprintf('"%0.2f"', $scheduledPayment->getAmount()),
+                    sprintf('"%s"', $bankAccount->getReference()),
+                    sprintf('"%s"', $scheduledPayment->getPolicy()->getUser()->getId()),
+                    sprintf('"%s"', $scheduledPayment->getPolicy()->getId()),
+                    sprintf('"SP-%s"', $scheduledPayment->getId()),
+                ]);
+                $payment->setSubmittedDate($scheduledDate);
+                $payment->setStatus(BacsPayment::STATUS_GENERATED);
+                $payment->setSerialNumber($serialNumber);
+                $scheduledPayment->setStatus(ScheduledPayment::STATUS_PENDING);
+                if ($bankAccount->isFirstPayment()) {
+                    $bankAccount->setFirstPayment(false);
+                }
+                $accountData = sprintf('%s%s', $bankAccount->getSortCode(), $bankAccount->getAccountNumber());
+                if (in_array($accountData, $accounts)) {
+                    $this->logger->warning(sprintf(
+                        'More than 1 payment for Policy %s is present in the bacs file',
+                        $scheduledPayment->getPolicy()->getId()
+                    ));
+                }
+                $accounts[] = $accountData;
             }
-            $accountData = sprintf('%s%s', $bankAccount->getSortCode(), $bankAccount->getAccountNumber());
-            if (in_array($accountData, $accounts)) {
-                $this->logger->warning(sprintf(
-                    'More than 1 payment for Policy %s is present in the bacs file',
-                    $scheduledPayment->getPolicy()->getId()
-                ));
-            }
-            $accounts[] = $accountData;
         }
 
         return $lines;

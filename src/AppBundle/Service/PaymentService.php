@@ -116,7 +116,7 @@ class PaymentService
                 continue;
             }
             if (!$scheduledPayment->getPolicy()->getPayerOrUser()->hasValidPaymentMethod()) {
-                $this->logger->warning(sprintf(
+                $this->logger->info(sprintf(
                     'User %s does not have a valid payment method',
                     $scheduledPayment->getPolicy()->getPayerOrUser()->getId()
                 ));
