@@ -4,6 +4,7 @@ namespace AppBundle\Controller;
 
 use AppBundle\Document\ValidatorTrait;
 use AppBundle\Service\MailerService;
+use AppBundle\Service\RouterService;
 use Egulias\EmailValidator\Validation\RFCValidation;
 use Psr\Log\LoggerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -1160,6 +1161,7 @@ class ApiAuthController extends BaseController
             }
 
             $repo = $dm->getRepository(Policy::class);
+            /** @var PhonePolicy $policy */
             $policy = $repo->find($id);
             if (!$policy) {
                 throw new NotFoundHttpException();
@@ -1208,14 +1210,15 @@ class ApiAuthController extends BaseController
                     $mailer = $this->get('app.mailer');
                     /** @var RouterService $router */
                     $router = $this->get('app.router');
+                    $body = sprintf(
+                        '<a href="%s">%s</a>',
+                        $router->generateUrl('admin_policy', ['id' => $policy->getId()]),
+                        $policy->getPolicyNumber()
+                    );
                     $mailer->send(
                         'Detected imei circumvention attempt',
                         'tech+ops@so-sure.com',
-                        sprintf(
-                            '<a href="%s">%s</a>',
-                            $router->generateUrl('admin_policy', ['id' => $policy->getId()]),
-                            $policy->getPolicyNumber()
-                        )
+                        $body
                     );
                 } else {
                     $policy->setImeiCircumvention(false);
