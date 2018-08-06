@@ -4,10 +4,13 @@ import usrAgnt from '../common/setAgent.js';
 
 $(function() {
 
-    let nav       = $('.navbar'),
-        hamburger = $('#nav_toggle'),
-        menu      = $('#menu'),
-        open      = false;
+    const nav       = $('.navbar'),
+          hamburger = $('#nav_toggle'),
+          menu      = $('#menu'),
+          logo      = $('.navbar-brand__logo'),
+          quoteBtn  = $('#quote-btn');
+
+    let open = false;
 
     // Toggle - Menu
     hamburger.on('click', function(e) {
@@ -18,6 +21,12 @@ $(function() {
 
         // Toggle menu open
         menu.toggleClass('menu--open');
+
+        // Toggle logo class
+        logo.toggleClass('navbar-brand__logo-white-light');
+
+        // Toggle the quote btn class
+        quoteBtn.toggleClass('btn-gradient btn-outline-white');
 
         // Prevent scrolling whilst open
         $('body').toggleClass('body--overflow');

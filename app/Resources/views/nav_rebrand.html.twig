@@ -1,5 +1,5 @@
 <nav class="navbar fixed-top justify-content-between flex-nowrap flex-row pl-lg-5">
-    <a href="/" class="navbar-brand"><img src="{{ cdn_url }}/images/rebrand/logo/so-sure_logo-blue.svg" width="120px"></a>
+    <a href="/" class="navbar-brand show-in-nav"><div class="navbar-brand__logo"></div></a>
     <ul class="nav navbar-nav flex-row align-items-center">
         <li class="nav-item d-none d-lg-block pr-lg-5">
             <a href="#" class="nav-link">About</a>
@@ -30,7 +30,7 @@
             </li>
         {% else %}
             <li class="nav-item pr-lg-5">
-                <a href="#" class="btn btn-primary btn-sm btn-gradient">Get a Quote</a>
+                <a id="quote-btn" href="#" class="btn btn-primary btn-sm btn-gradient show-in-nav">Get a Quote</a>
             </li>
         {% endif %}
         <li class="nav-item d-none d-lg-block pr-lg-5">
@@ -52,56 +52,27 @@
             </button>
         </li>
     </ul>
-    <div id="menu" class="menu d-flex d-lg-none pt-5">
-        <ul class="list-unstyled mt-4 mx-auto justify-content-center menu__links">
-            <li class="my-4">
-                {% if app.user is not null and app.user %}
-                    {% if is_granted('ROLE_ADMIN') %}
-                        <a href="{{ path('admin_home') }}" class="">Admin <i class="fas fa-users-cog fa-sm"></i></a>
-                    {% elseif is_granted('ROLE_EMPLOYEE') %}
-                        <a href="{{ path('admin_home') }}" class="">Admin <i class="fas fa-user-tie fa-sm"></i></a>
-                    {% elseif is_granted('ROLE_CLAIMS') %}
-                        <a href="{{ path('claims_home') }}" class="">Claims <i class="fas fa-user-shield fa-sm"></i></a>
-                    {% else %}
-                        <a href="{{ path('user_home') }}" class="">Your account <i class="fas fa-user-circle fa-sm"></i></a>
-                    {% endif %}
-                    {% if is_granted('ROLE_PREVIOUS_ADMIN') %}
-                        <a href="{{ path('homepage', {'_impersonate': '_exit'}) }}" class="">Exit <u>{{ app.user.email }}</u></a>
-                    {% else %}
-                        <a href="{{ path('fos_user_security_logout') }}" class="">Log out</i></a>
-                    {% endif %}
-                {% else %}
-                    <a href="{{ path('fos_user_security_login') }}" class="">Custome log in <i class="fas fa-arrow-right fa-sm ml-2"></i></a>
-                {% endif %}
+    <div id="menu" class="menu d-flex flex-column d-lg-none">
+        <ul class="list-unstyled align-self-stretch px-5 menu__links">
+            <li class="mb-4">
+                <a href="{{ path('about_home') }}" class="h4">About</a>
             </li>
             <li class="my-4">
-                <a href="{{ path('about_home') }}">About</a>
+                <a href="{{ path('claim') }}" class="h4">Making a claim</a>
             </li>
             <li class="my-4">
-                <a href="{{ path('claim') }}">Making a claim</a>
+                <a href="{{ path('faq') }}" class="h4">FAQs</a>
             </li>
             <li class="my-4">
-                <a href="{{ path('faq') }}#social-insurance-and-reward-pot">Reward Pot</a>
+                <a href="{{ path('blog') }}" class="h4">Blog</a>
             </li>
             <li class="my-4">
-                <a href="{{ path('faq') }}#top-questions">pic-sure</a>
-            </li>
-            <li class="my-4">
-                <a href="{{ path('faq') }}">FAQs</a>
-            </li>
-            <li class="my-4">
-                <a href="{{ path('mobile_phone_insurance_for_your_company') }}">Company phones</a>
-            </li>
-            <li class="my-4">
-                <a href="{{ path('about_how_to_contact_so_sure') }}">Contact Us</a>
-            </li>
-            <li class="mt-4 mb-5">
-                <a href="{{ path('blog') }}">Blog</a>
-            </li>
-            <li class="text-center pb-5">
-                <a href="https://www.facebook.com/wearesosure" rel="noopener" target="_blank" class="d-inline mx-2"><i class="fab fa-facebook fa-2x"></i><span class="sr-only">so-sure on Facebook</span></a>
-                <a href="https://twitter.com/wearesosure" rel="noopener" target="_blank" class="d-inline mx-2"><i class="fab fa-twitter fa-2x"></i><span class="sr-only">so-sure on Twitter</span></a>
+                <a href="{{ path('about_how_to_contact_so_sure') }}" class="h4">Contact</a>
             </li>
         </ul>
+        <div class="p-5 align-self-stretch menu__buttons">
+            <a href="#" class="btn btn-primary btn-shadow btn-gradient btn-block mb-3">Get insured</a>
+            <a href="#" class="btn btn-outline-white btn-block"><i class="far fa-play-circle fa-lg"></i> Watch our Video</a>
+        </div>
     </div>
 </nav>

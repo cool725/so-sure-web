@@ -3,10 +3,10 @@
 .navbar {
     background-color: transparent;
     // transition: padding 0.8s linear;;
-    padding-top: 1.2rem;
+    // padding-top: 1.2rem;
 
     @include media-breakpoint-up(lg) {
-        padding-top: 2rem;
+        // padding-top: 2rem;
     }
 
     .navbar-nav {
@@ -16,6 +16,23 @@
             font-family: $g-medium;
             color: $dark;
         }
+    }
+}
+
+.navbar-brand {
+
+    &__logo {
+        width: 120px; height: 30px;
+        background: transparent url('#{$cdn_url}/images/rebrand/logo/so-sure_logo-blue.svg') no-repeat center center;
+        background-size: 120px;
+    }
+
+    &__logo-white-dark {
+        background: transparent url('#{$cdn_url}/images/rebrand/logo/so-sure_logo-white-dark.svg') no-repeat center center;
+    }
+
+    &__logo-white-light {
+        background: transparent url('#{$cdn_url}/images/rebrand/logo/so-sure_logo-white-light.svg') no-repeat center center;
     }
 }
 
@@ -42,6 +59,12 @@
     &,
     &::before,
     &::after {
+        opacity: 1;
         background-color: $white;
     }
+}
+
+.show-in-nav {
+    position: relative;
+    z-index: 1040;
 }
