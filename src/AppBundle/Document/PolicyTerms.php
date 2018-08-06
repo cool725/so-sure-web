@@ -39,17 +39,22 @@ class PolicyTerms extends PolicyDocument
     // New claims address
     const VERSION_9 = 'Version 9 July 2018';
 
+    // 24-72 hour repair
+    const VERSION_10 = 'Version 10 August 2018';
+
+    // ensure that lastest version is last in the array
     public static $allVersions = [
-        self::VERSION_0,
-        self::VERSION_1,
-        self::VERSION_2,
-        self::VERSION_3,
-        self::VERSION_4,
-        self::VERSION_5,
-        self::VERSION_6,
-        self::VERSION_7,
-        self::VERSION_8,
-        self::VERSION_9,
+        self::VERSION_0 => '1',
+        self::VERSION_1 => '1',
+        self::VERSION_2 => '2',
+        self::VERSION_3 => '3',
+        self::VERSION_4 => '4',
+        self::VERSION_5 => '5',
+        self::VERSION_6 => '6',
+        self::VERSION_7 => '7',
+        self::VERSION_8 => '8',
+        self::VERSION_9 => '9',
+        self::VERSION_10 => '10',
     ];
 
     public function getVersionNumber()
@@ -59,25 +64,10 @@ class PolicyTerms extends PolicyDocument
 
     public static function getVersionNumberByVersion($version)
     {
-        if (in_array($version, [self::VERSION_0, self::VERSION_1])) {
-            return '1';
-        } elseif (in_array($version, [self::VERSION_2])) {
-            return '2';
-        } elseif (in_array($version, [self::VERSION_3])) {
-            return '3';
-        } elseif (in_array($version, [self::VERSION_4])) {
-            return '4';
-        } elseif (in_array($version, [self::VERSION_5])) {
-            return '5';
-        } elseif (in_array($version, [self::VERSION_6])) {
-            return '6';
-        } elseif (in_array($version, [self::VERSION_7])) {
-            return '7';
-        } elseif (in_array($version, [self::VERSION_8])) {
-            return '8';
-        } elseif (in_array($version, [self::VERSION_9])) {
-            return '9';
+        if (in_array($version, array_keys(self::$allVersions))) {
+            return self::$allVersions[$version];
         }
+
         return null;
     }
 

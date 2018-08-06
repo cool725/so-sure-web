@@ -52,7 +52,7 @@
                                     <li>Loss of your mobile phone</li>
                                     <li>up to £1,000 of unauthorised network changes related to approved loss or theft claim, as long as your network was notified within 24hrs of the loss or theft</li>
                                     <li>Accessory claims (up to £100 including VAT) related to approved loss or theft claim</li>
-                                    <li>We aim to replace or repair your phone the next working day.</li>
+                                    <li>We aim to replace or repair your phone in 24-72 hours once your claim is approved.</li>
                                 </ul>
                                 <h4 class="text-underline">What is not covered?</h4>
                                 <ul>
@@ -300,11 +300,8 @@
                         </div>
                         <div id="collapseTwelve" class="panel-collapse collapse" role="tabpanel" aria-labelledby="policyTwelve">
                             <div class="panel-body">
-                                {% if replacement is defined and replacement == 'twentyfour-seventy-two' %}
-                                    We understand how inconvenient it is to be without your phone. Thus if your device is damaged or broken, we will aim to repair it within 72 hours, or in times when it takes longer, we will provide you within 72 hours a replacement phone. If your phone is lost or stolen, we will provide you with a replacement phone within 72 hours. Your replacement phone may be new or refurbished; rest assured the refurbished phone will look like new and work exactly the same. Regardless, your replacement phone will be covered under your existing policy.
-                                {% else %}
-                                    We understand how inconvenient it is to be without your phone. Thus if your device is damaged or broken, we will aim to repair it the next working day, or in times when it takes longer, we will provide you with a next working day replacement phone. If your phone is lost or stolen, we will provide you with a replacement phone next working day. Your replacement phone may be new or refurbished; rest assured the refurbished phone will look like new and work exactly the same. Regardless, your replacement phone will be covered under your existing policy.
-                                {% endif %}
+                                We understand how inconvenient it is to be without your phone. Thus if your device is damaged or broken, we will aim to repair it within 72 hours, or in times when it takes longer, we will provide you within 72 hours a replacement phone. If your phone is lost or stolen, we will provide you with a replacement phone within 72 hours. Your replacement phone may be new or refurbished; rest assured the refurbished phone will look like new and work exactly the same. Regardless, your replacement phone will be covered under your existing policy.
+
                             </div>
                         </div>
                     </div>
@@ -324,7 +321,7 @@
                         </div>
                         <div id="collapseThirteen" class="panel-collapse collapse" role="tabpanel" aria-labelledby="policyThirteen">
                             <div class="panel-body">
-                                Once a claim is approved, we aim to have a replacement phone in your hand {% if replacement is defined and replacement == 'twentyfour-seventy-two' %}in the next 24-72 hours{% else %}the next working day{% endif %}.
+                                Once a claim is approved, we aim to have a replacement phone in your hand in the next 24-72 hours.
                             </div>
                         </div>
                     </div>
@@ -344,11 +341,7 @@
                         </div>
                         <div id="collapseFourteen" class="panel-collapse collapse" role="tabpanel" aria-labelledby="policyFourteen">
                             <div class="panel-body">
-                                {% if replacement is defined and replacement == 'twentyfour-seventy-two' %}
-                                    Once a claim is approved, we aim to repair your phone within 72 hours. If we aren’t able to do so, we will aim to have a replacement phone in your hand within 72 hours.
-                                {% else %}
-                                    Once a claim is approved, we aim to repair your phone the next working day. If we aren’t able to do so, we will aim to have a replacement phone in your hand the next working day.
-                                {% endif %}
+                                Once a claim is approved, we aim to repair your phone within 72 hours. If we aren’t able to do so, we will aim to have a replacement phone in your hand within 72 hours.
                             </div>
                         </div>
                     </div>

@@ -104,9 +104,9 @@ class ApiViewControllerTest extends BaseApiControllerTest
     {
         $policyTermsRepo = static::$dm->getRepository(PolicyTerms::class);
         $count = 0;
-        foreach (PolicyTerms::$allVersions as $version) {
+        foreach (PolicyTerms::$allVersions as $versionName => $version) {
             $count++;
-            $terms = $policyTermsRepo->findOneBy(['version' => $version]);
+            $terms = $policyTermsRepo->findOneBy(['version' => $versionName]);
             $user = self::createUser(
                 self::$userManager,
                 self::generateEmail(sprintf('policy-terms-diff-v%d', $count), $this),

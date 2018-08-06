@@ -473,14 +473,14 @@ class PhoneInsuranceController extends BaseController
             // );
         }
 
-        $replacement = $this->sixpack(
-            $request,
-            SixpackService::EXPERIMENT_PHONE_REPLACEMENT,
-            ['default', 'next-working-day', 'twentyfour-seventy-two'],
-            SixpackService::LOG_MIXPANEL_CONVERSION,
-            null,
-            "0.00000001"
-        );
+        // $replacement = $this->sixpack(
+        //     $request,
+        //     SixpackService::EXPERIMENT_PHONE_REPLACEMENT,
+        //     ['default', 'next-working-day', 'twentyfour-seventy-two'],
+        //     SixpackService::LOG_MIXPANEL_CONVERSION,
+        //     null,
+        //     "0.00000001"
+        // );
 
         $this->get('app.sixpack')->convert(
             SixpackService::EXPERIMENT_TEXT_VS_DROPDOWN
@@ -513,7 +513,7 @@ class PhoneInsuranceController extends BaseController
             'comparision_max' => $maxComparision,
             'coming_soon'     => $phone->getCurrentPhonePrice() ? false : true,
             'slider_test'     => 'slide-me',
-            'replacement'     => $replacement,
+            // 'replacement'     => $replacement,
         );
 
         // Adwords landingpage test

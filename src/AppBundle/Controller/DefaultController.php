@@ -103,15 +103,15 @@ class DefaultController extends BaseController
             $trafficFraction = 1;
         }
 
-        $replacement = $this->sixpack(
-            $request,
-            SixpackService::EXPERIMENT_PHONE_REPLACEMENT,
-            ['default', 'next-working-day', 'twentyfour-seventy-two'],
-            SixpackService::LOG_MIXPANEL_CONVERSION,
-            null,
-            $trafficFraction,
-            $force
-        );
+        // $replacement = $this->sixpack(
+        //     $request,
+        //     SixpackService::EXPERIMENT_PHONE_REPLACEMENT,
+        //     ['default', 'next-working-day', 'twentyfour-seventy-two'],
+        //     SixpackService::LOG_MIXPANEL_CONVERSION,
+        //     null,
+        //     $trafficFraction,
+        //     $force
+        // );
 
         $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE);
 
@@ -137,7 +137,7 @@ class DefaultController extends BaseController
 
         $data = array(
             // Make sure to check homepage landing below too
-            'replacement' => $replacement,
+            // 'replacement' => $replacement,
             'referral'    => $referral,
             'phone'       => $this->getQuerystringPhone($request),
             'search_type' => $expSearch,
@@ -937,8 +937,8 @@ class DefaultController extends BaseController
                 's_theft_bg' => 'tick-background',
                 's_loss' => 'As standard',
                 's_loss_bg' => 'tick-background',
-                's_theft_replacement' => '1 working day',
-                's_damage_replacement' => '1 working day',
+                's_theft_replacement' => '24-72 hours once claim approved',
+                's_damage_replacement' => '24-72 hours once claim approved',
                 's_used_phones' => 'Yes',
                 's_used_phones_bg' => 'tick-background',
                 's_cashback' => 'Yes',
@@ -961,8 +961,8 @@ class DefaultController extends BaseController
                 's_theft_bg' => 'tick-background',
                 's_loss' => 'Yes',
                 's_loss_bg' => 'tick-background',
-                's_theft_replacement' => 'Next working day',
-                's_damage_replacement' => 'Next working day',
+                's_theft_replacement' => '24-72 hours once claim approved',
+                's_damage_replacement' => '24-72 hours once claim approved',
                 's_used_phones' => 'Yes',
                 's_used_phones_bg' => 'tick-background',
                 's_cashback' => 'Yes',
@@ -985,8 +985,8 @@ class DefaultController extends BaseController
                 's_theft_bg' => 'tick-background',
                 's_loss' => 'Yes',
                 's_loss_bg' => 'tick-background',
-                's_theft_replacement' => 'Next working day',
-                's_damage_replacement' => 'Next working day',
+                's_theft_replacement' => '24-72 hours once claim approved',
+                's_damage_replacement' => '24-72 hours once claim approved',
                 's_used_phones' => 'Yes',
                 's_used_phones_bg' => 'tick-background',
                 's_cashback' => 'Yes',
@@ -1009,8 +1009,8 @@ class DefaultController extends BaseController
                 's_theft_bg' => 'tick-background',
                 's_loss' => 'Yes',
                 's_loss_bg' => 'tick-background',
-                's_theft_replacement' => 'Next working day',
-                's_damage_replacement' => 'Next working day',
+                's_theft_replacement' => '24-72 hours once claim approved',
+                's_damage_replacement' => '24-72 hours once claim approved',
                 's_used_phones' => 'Yes',
                 's_used_phones_bg' => 'tick-background',
                 's_cashback' => 'Yes',
