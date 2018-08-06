@@ -103,15 +103,15 @@ class DefaultController extends BaseController
             $trafficFraction = 1;
         }
 
-        $replacement = $this->sixpack(
-            $request,
-            SixpackService::EXPERIMENT_PHONE_REPLACEMENT,
-            ['default', 'next-working-day', 'twentyfour-seventy-two'],
-            SixpackService::LOG_MIXPANEL_CONVERSION,
-            null,
-            $trafficFraction,
-            $force
-        );
+        // $replacement = $this->sixpack(
+        //     $request,
+        //     SixpackService::EXPERIMENT_PHONE_REPLACEMENT,
+        //     ['default', 'next-working-day', 'twentyfour-seventy-two'],
+        //     SixpackService::LOG_MIXPANEL_CONVERSION,
+        //     null,
+        //     $trafficFraction,
+        //     $force
+        // );
 
         $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE);
 
@@ -137,7 +137,7 @@ class DefaultController extends BaseController
 
         $data = array(
             // Make sure to check homepage landing below too
-            'replacement' => $replacement,
+            // 'replacement' => $replacement,
             'referral'    => $referral,
             'phone'       => $this->getQuerystringPhone($request),
             'search_type' => $expSearch,
