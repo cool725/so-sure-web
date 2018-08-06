@@ -1357,7 +1357,8 @@
         </div>
       </div>
     </div>
-
+    {% endif %}
+    {% if is_granted('ROLE_CUSTOMER_SERVICES') %}
     <div class="modal fade" id="withdrawModal" tabindex="-1" role="dialog">
       <div class="modal-dialog" role="document" style="width: 60%;">
         <div class="modal-content">
@@ -1378,7 +1379,8 @@
         </div>
       </div>
     </div>
-
+    {% endif %}
+    {% if is_granted('ROLE_ADMIN') %}
         <div class="modal fade" id="bacsRefundModal" tabindex="-1" role="dialog">
             <div class="modal-dialog" role="document" style="width: 60%;">
                 <div class="modal-content">
