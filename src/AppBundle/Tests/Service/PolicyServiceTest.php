@@ -645,15 +645,18 @@ class PolicyServiceTest extends WebTestCase
         $policy->setStatus(PhonePolicy::STATUS_PENDING);
         static::$policyService->create($policy, $date);
         $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
-        $this->assertEquals($date, $policy->getBilling());
+        $this->assertEquals(
+            new \DateTime('2017-04-15 01:00:00', new \DateTimeZone('Europe/London')),
+            $policy->getBilling()
+        );
 
         $timezone = new \DateTimeZone('Europe/London');
         $this->assertEquals(
-            new \DateTime('2017-05-15', $timezone),
+            new \DateTime('2017-05-15 01:00', $timezone),
             $policy->getNextBillingDate(new \DateTime('2017-04-16'))
         );
         $this->assertEquals(
-            new \DateTime('2017-06-15', $timezone),
+            new \DateTime('2017-06-15 01:00', $timezone),
             $policy->getNextBillingDate(new \DateTime('2017-06-14'))
         );
         $this->assertEquals(
