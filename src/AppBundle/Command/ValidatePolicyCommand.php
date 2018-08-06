@@ -2,6 +2,9 @@
 
 namespace AppBundle\Command;
 
+use AppBundle\Document\BankAccount;
+use AppBundle\Document\CurrencyTrait;
+use AppBundle\Document\Payment\BacsPayment;
 use AppBundle\Repository\PolicyRepository;
 use AppBundle\Service\MailerService;
 use AppBundle\Service\PolicyService;
@@ -20,6 +23,8 @@ use AppBundle\Document\ScheduledPayment;
 
 class ValidatePolicyCommand extends BaseCommand
 {
+    use CurrencyTrait;
+
     protected function configure()
     {
         $this
@@ -86,6 +91,12 @@ class ValidatePolicyCommand extends BaseCommand
                 'all, expiry, none'
             )
             ->addOption(
+                'skip-cancelled',
+                null,
+                InputOption::VALUE_NONE,
+                'Do not validate cancelled policies'
+            )
+            ->addOption(
                 'resync-picsure-s3file-metadata',
                 null,
                 InputOption::VALUE_NONE,
@@ -113,6 +124,7 @@ class ValidatePolicyCommand extends BaseCommand
         $adjustScheduledPayments = $input->getOption('adjust-scheduled-payments');
         $validatePremiums = $input->getOption('validate-premiums');
         $skipEmail = true === $input->getOption('skip-email');
+        $skipCancelled = true === $input->getOption('skip-cancelled');
         $unpaid = $input->getOption('unpaid');
         if (!in_array($unpaid, [null, 'all', 'expiry', 'none'])) {
             throw new \Exception(sprintf('Unknown option for unpaid: %s', $unpaid));
@@ -157,13 +169,6 @@ class ValidatePolicyCommand extends BaseCommand
                 $blank = [];
                 $this->header($policy, $blank, $lines);
 
-                if ($policy->isCancelled()) {
-                    $lines[] = sprintf(
-                        'Policy is cancelled. Refund %f / Commission %f',
-                        $policy->getRefundAmount($validateDate),
-                        $policy->getRefundCommissionAmount($validateDate)
-                    );
-                }
                 $data = [
                     'warnClaim' => true,
                     'prefix' => $prefix,
@@ -172,6 +177,7 @@ class ValidatePolicyCommand extends BaseCommand
                     'validate-premiums' => $validatePremiums,
                     'updatePotValue' => $updatePotValue,
                     'unpaid' => 'all',
+                    'validateCancelled' => !$skipCancelled,
                 ];
                 $this->validatePolicy($policy, $policies, $lines, $data);
                 if ($updatePotValue || $adjustScheduledPayments) {
@@ -186,10 +192,6 @@ class ValidatePolicyCommand extends BaseCommand
                     if ($prefix && !$policy->hasPolicyPrefix($prefix)) {
                         continue;
                     }
-                    // TODO: Run financials for cancelled policies as well
-                    if ($policy->isCancelled()) {
-                        continue;
-                    }
                     $data = [
                         'warnClaim' => false,
                         'prefix' => $prefix,
@@ -198,6 +200,7 @@ class ValidatePolicyCommand extends BaseCommand
                         'validate-premiums' => $validatePremiums,
                         'updatePotValue' => false,
                         'unpaid' => $unpaid,
+                        'validateCancelled' => !$skipCancelled,
                     ];
                     $this->validatePolicy($policy, $policies, $lines, $data);
                 }
@@ -219,7 +222,7 @@ class ValidatePolicyCommand extends BaseCommand
                     );
                     if ($policy->hasOpenClaim()) {
                         $lines[] = sprintf(
-                            'WARNING!! - Policy %s has an open claim that should be resolved prior to cancellation',
+                            'WARNING!! - Policy %s has an open claim (resolved prior to cancellation)',
                             $policy->getPolicyNumber()
                         );
                     }
@@ -266,105 +269,151 @@ class ValidatePolicyCommand extends BaseCommand
 
     private function validatePolicy(Policy $policy, &$policies, &$lines, $data)
     {
-        $closeToExpiration = false;
-        if ($policy->getPolicyExpirationDate()) {
-            $date = $data['validateDate'] ? $data['validateDate'] : new \DateTime();
-            $diff = $date->diff($policy->getPolicyExpirationDate());
-            $closeToExpiration = $diff->days < 14 && $diff->invert == 0;
+        if (!$data['validateCancelled'] && $policy->isCancelled()) {
+            return;
         }
-        if ($policy->isPolicyPaidToDate($data['validateDate']) === false) {
-            if ($data['unpaid'] == 'all' || ($closeToExpiration && $data['unpaid'] == 'expiry')) {
-                $this->header($policy, $policies, $lines);
-                $lines[] = "Not Paid To Date";
-                $lines[] = sprintf(
-                    'Next attempt: %s.',
-                    $policy->getNextScheduledPayment() && $policy->getNextScheduledPayment()->getScheduled() ?
-                        $policy->getNextScheduledPayment()->getScheduled()->format(\DateTime::ATOM) :
-                        'unknown'
-                );
-                $lines[] = sprintf(
-                    'Cancellation date: %s',
-                    $policy->getPolicyExpirationDate() ?
-                        $policy->getPolicyExpirationDate()->format(\DateTime::ATOM) :
-                        'unknown'
-                );
-                $lines[] = $this->failurePaymentMessage(
-                    $policy,
-                    $data['prefix'],
-                    $data['validateDate']
-                );
+        try {
+            $closeToExpiration = false;
+            if ($policy->getPolicyExpirationDate()) {
+                $date = $data['validateDate'] ? $data['validateDate'] : new \DateTime();
+                $diff = $date->diff($policy->getPolicyExpirationDate());
+                $closeToExpiration = $diff->days < 14 && $diff->invert == 0;
             }
-        }
-        if ($policy->isPotValueCorrect() === false) {
-            $this->header($policy, $policies, $lines);
-            $lines[] = $this->failurePotValueMessage($policy);
-            if ($data['updatePotValue']) {
-                $policy->updatePotValue();
-                $lines[] = 'Updated pot value';
-                $lines[] = $this->failurePotValueMessage($policy);
-            }
-        }
-        if ($policy->hasCorrectIptRate() === false) {
-            $this->header($policy, $policies, $lines);
-            $lines[] = $this->failureIptRateMessage($policy);
-        }
-        if ($policy->hasCorrectPolicyStatus($data['validateDate']) === false) {
-            $this->header($policy, $policies, $lines);
-            $lines[] = $this->failureStatusMessage($policy, $data['prefix'], $data['validateDate']);
-        }
-        if ($policy->arePolicyScheduledPaymentsCorrect(true, $data['validateDate']) === false) {
-            $this->header($policy, $policies, $lines);
-            if ($data['adjustScheduledPayments']) {
-                /** @var PolicyService $policyService */
-                $policyService = $this->getContainer()->get('app.policy');
-                if ($policyService->adjustScheduledPayments($policy)) {
+            if ($policy->isPolicyPaidToDate($data['validateDate']) === false) {
+                if ($data['unpaid'] == 'all' || ($closeToExpiration && $data['unpaid'] == 'expiry')) {
+                    $this->header($policy, $policies, $lines);
+                    $lines[] = "Not Paid To Date";
                     $lines[] = sprintf(
-                        'Adjusted Incorrect scheduled payments for policy %s',
+                        'Next attempt: %s.',
+                        $policy->getNextScheduledPayment() && $policy->getNextScheduledPayment()->getScheduled() ?
+                            $policy->getNextScheduledPayment()->getScheduled()->format(\DateTime::ATOM) :
+                            'unknown'
+                    );
+                    $lines[] = sprintf(
+                        'Cancellation date: %s',
+                        $policy->getPolicyExpirationDate() ?
+                            $policy->getPolicyExpirationDate()->format(\DateTime::ATOM) :
+                            'unknown'
+                    );
+                    $lines[] = $this->failurePaymentMessage(
+                        $policy,
+                        $data['prefix'],
+                        $data['validateDate']
+                    );
+                }
+            }
+            if ($policy->isPotValueCorrect() === false) {
+                $this->header($policy, $policies, $lines);
+                $lines[] = $this->failurePotValueMessage($policy);
+                if ($data['updatePotValue']) {
+                    $policy->updatePotValue();
+                    $lines[] = 'Updated pot value';
+                    $lines[] = $this->failurePotValueMessage($policy);
+                }
+            }
+            if ($policy->hasCorrectIptRate() === false) {
+                $this->header($policy, $policies, $lines);
+                $lines[] = $this->failureIptRateMessage($policy);
+            }
+            if ($policy->hasCorrectPolicyStatus($data['validateDate']) === false) {
+                $this->header($policy, $policies, $lines);
+                $lines[] = $this->failureStatusMessage($policy, $data['prefix'], $data['validateDate']);
+            }
+            if ($policy->arePolicyScheduledPaymentsCorrect(true, $data['validateDate']) === false) {
+                $this->header($policy, $policies, $lines);
+                if ($data['adjustScheduledPayments']) {
+                    /** @var PolicyService $policyService */
+                    $policyService = $this->getContainer()->get('app.policy');
+                    if ($policyService->adjustScheduledPayments($policy)) {
+                        $lines[] = sprintf(
+                            'Adjusted Incorrect scheduled payments for policy %s',
+                            $policy->getPolicyNumber()
+                        );
+                    } else {
+                        $policy = $this->getManager()->merge($policy);
+                        $lines[] = sprintf(
+                            'WARNING!! Failed to adjusted Incorrect scheduled payments for policy %s',
+                            $policy->getPolicyNumber()
+                        );
+                    }
+                } else {
+                    $lines[] = sprintf(
+                        'WARNING!! Incorrect scheduled payments for policy %s',
                         $policy->getPolicyNumber()
                     );
-                } else {
-                    $policy = $this->getManager()->merge($policy);
+                    $lines[] = $this->failureScheduledPaymentsMessage($policy, $data['validateDate']);
+                }
+            }
+
+            // allow £0.10 difference - no need to warn for a few days off in case of refunds
+            if ($policy->hasCorrectCommissionPayments($data['validateDate'], 0.10) === false) {
+                // Ignore a couple of policies that should have been cancelled unpaid, but went to expired
+                if (!in_array($policy->getId(), [
+                    '5960afe142bece15ca46c796',
+                    '5963fe30e57c396d46347475',
+                    '596765ef42bece52d026aa65',
+                    '5970d065b674b62bac4be365',
+                    '5973293aa603ad542d4ed949',
+                ])) {
+                    $this->header($policy, $policies, $lines);
+                    $lines[] = $this->failureCommissionMessage($policy, $data['prefix'], $data['validateDate']);
+                }
+            }
+
+            if ($data['validate-premiums'] && (!$policy->getStatus() ||
+                in_array($policy->getStatus(), [Policy::STATUS_PENDING, Policy::STATUS_MULTIPAY_REJECTED]))) {
+                /** @var PolicyService $policyService */
+                $policyService = $this->getContainer()->get('app.policy');
+                if ($policyService->validatePremium($policy)) {
                     $lines[] = sprintf(
-                        'WARNING!! Failed to adjusted Incorrect scheduled payments for policy %s',
+                        'WARNING!! - Policy %s has its premium updated',
                         $policy->getPolicyNumber()
                     );
                 }
-            } else {
-                $lines[] = sprintf(
-                    'WARNING!! Incorrect scheduled payments for policy %s',
-                    $policy->getPolicyNumber()
-                );
-                $lines[] = $this->failureScheduledPaymentsMessage($policy, $data['validateDate']);
             }
-        }
-        if ($policy->hasCorrectCommissionPayments($data['validateDate']) === false) {
-            $this->header($policy, $policies, $lines);
-            $lines[] = $this->failureCommissionMessage($policy, $data['prefix'], $data['validateDate']);
-        }
-        if ($data['validate-premiums'] && (!$policy->getStatus() ||
-            in_array($policy->getStatus(), [Policy::STATUS_PENDING, Policy::STATUS_MULTIPAY_REJECTED]))) {
-            /** @var PolicyService $policyService */
-            $policyService = $this->getContainer()->get('app.policy');
-            if ($policyService->validatePremium($policy)) {
+            if ($data['warnClaim'] && $policy->hasOpenClaim()) {
+                $this->header($policy, $policies, $lines);
                 $lines[] = sprintf(
-                    'WARNING!! - Policy %s has its premium updated',
+                    'WARNING!! - Policy %s has an open claim that should be resolved prior to cancellation',
                     $policy->getPolicyNumber()
                 );
             }
-        }
-        if ($data['warnClaim'] && $policy->hasOpenClaim()) {
-            $this->header($policy, $policies, $lines);
-            $lines[] = sprintf(
-                'WARNING!! - Policy %s has an open claim that should be resolved prior to cancellation',
-                $policy->getPolicyNumber()
-            );
-        }
-        if ($data['warnClaim'] && $policy->hasMonetaryClaimed()) {
-            $this->header($policy, $policies, $lines);
-            $lines[] = sprintf(
-                'WARNING!! - Prior successful claim (extra care should be used to avoid cancellation) for %s',
-                $policy->getPolicyNumber()
-            );
+            if ($data['warnClaim'] && $policy->hasMonetaryClaimed()) {
+                $this->header($policy, $policies, $lines);
+                $lines[] = sprintf(
+                    'WARNING!! - Prior successful claim (care should be used to avoid cancellation) for %s',
+                    $policy->getPolicyNumber()
+                );
+            }
+            $refund = $policy->getRefundAmount();
+            $refundCommission = $policy->getRefundCommissionAmount();
+            if (($refund > 0 && !$this->areEqualToTwoDp(0, $refund)) ||
+                ($refundCommission > 0 && !$this->areEqualToTwoDp(0, $refundCommission))) {
+                $lines[] = sprintf(
+                    'Warning!! Refund Due. Refund %f / Commission %f',
+                    $refund,
+                    $refundCommission
+                );
+            }
+            // bacs checks are only necessary on active policies
+            if ($policy->getUser()->hasBacsPaymentMethod() && $policy->isActive(true)) {
+                $bacsPayments = count($policy->getPaymentsByType(BacsPayment::class));
+                $bankAccount = $policy->getUser()->getBacsPaymentMethod()->getBankAccount();
+                if ($bankAccount->getMandateStatus() == BankAccount::MANDATE_SUCCESS) {
+                    $isFirstPayment = $bankAccount->isFirstPayment();
+                    if ($bacsPayments >= 1 && $isFirstPayment) {
+                        $lines[] = 'Warning!! 1 or more bacs payments, yet bank has first payment flag set';
+                    } elseif ($bacsPayments == 0 && !$isFirstPayment) {
+                        $lines[] = 'Warning!! No bacs payments, yet bank does not have first payment flag set';
+                    }
+                    if ($bacsPayments == 0 && $bankAccount->getInitialNotificationDate() > new \DateTime()) {
+                        $lines[] = 'Warning!! There are no bacs payments, yet its past the initial notification date';
+                    }
+                }
+            }
+        } catch (\Exception $e) {
+            // TODO: May want to swallow some exceptions here
+            throw $e;
         }
     }
 

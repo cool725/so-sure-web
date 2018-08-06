@@ -83,12 +83,12 @@ class DefaultController extends BaseController
             $this->get('logger')->debug(sprintf('Referral %s', $referral));
         }
 
-        $this->sixpack(
-            $request,
-            SixpackService::EXPERIMENT_HOMEPAGE_AA_V2,
-            ['A1', 'A2'],
-            SixpackService::LOG_MIXPANEL_CONVERSION
-        );
+        // $this->sixpack(
+        //     $request,
+        //     SixpackService::EXPERIMENT_HOMEPAGE_AA_V2,
+        //     ['A1', 'A2'],
+        //     SixpackService::LOG_MIXPANEL_CONVERSION
+        // );
 
         /** @var RequestService $requestService */
         $requestService = $this->get('app.request');
@@ -266,7 +266,7 @@ class DefaultController extends BaseController
      * @Route("/comparison", name="comparison")
      * @Template
      */
-    public function soSureCompetitors(Request $request)
+    public function soSureCompetitors()
     {
         $data = [
             'headline'     => 'Mobile Insurance Beyond Compare',
@@ -274,17 +274,19 @@ class DefaultController extends BaseController
             'sub_heading2' => 'here’s how we stack up against the competition',
         ];
 
-        $exp = $this->sixpack(
-            $request,
-            SixpackService::EXPERIMENT_COMPETITOR_LANDING,
-            ['homepage', 'competitor-landing']
-        );
+        // $exp = $this->sixpack(
+        //     $request,
+        //     SixpackService::EXPERIMENT_COMPETITOR_LANDING,
+        //     ['homepage', 'competitor-landing']
+        // );
 
-        if ($exp == 'competitor-landing') {
-            return $this->render('AppBundle:Default:indexCompetitor.html.twig', $data);
-        } else {
-            return $this->redirectToRoute('homepage');
-        }
+        // if ($exp == 'competitor-landing') {
+        //     return $this->render('AppBundle:Default:indexCompetitor.html.twig', $data);
+        // } else {
+            // return $this->redirectToRoute('homepage');
+        // }
+        //
+        return $this->redirectToRoute('homepage');
     }
 
     /**

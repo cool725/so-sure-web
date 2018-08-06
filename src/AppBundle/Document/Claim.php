@@ -47,6 +47,7 @@ class Claim
     const WARNING_FLAG_DAVIES_REPLACEMENT_COST_HIGHER = 'davies-replacement-cost-higher';
     const WARNING_FLAG_DAVIES_INCORRECT_EXCESS = 'davies-incorrect-excess';
     const WARNING_FLAG_DAVIES_IMEI_MISMATCH = 'davies-imei-mismatch';
+    const WARNING_FLAG_DAVIES_HANDLING_TEAM = 'davies-handling-team';
 
     // technically not a warning flag, but fits nicely under that for UI with little change required
     // and very little usage envisioned
@@ -144,6 +145,11 @@ class Claim
         self::TEAM_DIRECT_GROUP => self::TEAM_DIRECT_GROUP,
     ];
 
+    public static $handlingTeamEmail = [
+        self::TEAM_DAVIES => 'update-claim@so-sure.com',
+        self::TEAM_DIRECT_GROUP => 'SoSure@directgroup.co.uk',
+    ];
+
     public static $warningFlags = [
         self::WARNING_FLAG_DAVIES_NAME_MATCH => self::WARNING_FLAG_DAVIES_NAME_MATCH,
         self::WARNING_FLAG_DAVIES_POSTCODE => self::WARNING_FLAG_DAVIES_POSTCODE,
@@ -154,6 +160,7 @@ class Claim
         self::WARNING_FLAG_DAVIES_REPLACEMENT_COST_HIGHER => self::WARNING_FLAG_DAVIES_REPLACEMENT_COST_HIGHER,
         self::WARNING_FLAG_DAVIES_INCORRECT_EXCESS => self::WARNING_FLAG_DAVIES_INCORRECT_EXCESS,
         self::WARNING_FLAG_DAVIES_IMEI_MISMATCH => self::WARNING_FLAG_DAVIES_IMEI_MISMATCH,
+        self::WARNING_FLAG_DAVIES_HANDLING_TEAM => self::WARNING_FLAG_DAVIES_HANDLING_TEAM,
     ];
 
     public static $claimTypes = [
@@ -619,7 +626,7 @@ class Claim
 
     /**
      * @AppAssert\AlphanumericSpaceDot()
-     * @Assert\Length(min="10", max="200")
+     * @Assert\Length(min="1", max="200")
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
@@ -795,12 +802,17 @@ class Claim
 
     public function getHandlingTeam()
     {
-        $this->handlingTeam;
+        return $this->handlingTeam;
     }
 
     public function setHandlingTeam($handlingTeam)
     {
         $this->handlingTeam = $handlingTeam;
+    }
+
+    public function getHandlingTeamEmail()
+    {
+        return Claim::$handlingTeamEmail[$this->getHandlingTeam()];
     }
 
     public function getType()

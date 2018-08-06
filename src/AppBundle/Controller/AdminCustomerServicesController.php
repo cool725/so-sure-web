@@ -110,47 +110,6 @@ class AdminCustomerServicesController extends BaseController
     use ArrayToApiArrayTrait;
 
     /**
-     * @Route("/claims/delete-claim", name="admin_claims_delete_claim")
-     * @Method({"POST"})
-     */
-    public function adminClaimsDeleteClaim(Request $request)
-    {
-        if (!$this->isCsrfTokenValid('default', $request->get('token'))) {
-            throw new \InvalidArgumentException('Invalid csrf token');
-        }
-        $dm = $this->getManager();
-        $repo = $dm->getRepository(Claim::class);
-        $claim = $repo->find($request->get('id'));
-        if (!$claim) {
-            throw $this->createNotFoundException('Claim not found');
-        }
-
-        $subject = sprintf("Claim %s has been manually deleted.", $claim->getNumber());
-        $mailer = $this->get('app.mailer');
-        $mailer->sendTemplate(
-            $subject,
-            'tech@so-sure.com',
-            'AppBundle:Email:claim/manuallyDeleted.html.twig',
-            ['claim' => $claim, 'policy' => $claim->getPolicy()]
-        );
-        foreach ($claim->getCharges() as $charge) {
-            $charge->setClaim(null);
-            $this->get('logger')->warning(sprintf(
-                'Charge %s for £%0.2f has been disassocated for deleted claim %s (%s)',
-                $charge->getId(),
-                $charge->getAmount(),
-                $claim->getNumber(),
-                $claim->getId()
-            ));
-        }
-        $dm->remove($claim);
-        $dm->flush();
-        $dm->clear();
-
-        return $this->redirectToRoute('admin_claims');
-    }
-
-    /**
      * @Route("/claims/replacement-phone", name="admin_claims_replacement_phone")
      * @Method({"POST"})
      */
@@ -275,11 +234,13 @@ class AdminCustomerServicesController extends BaseController
             throw $this->createNotFoundException('Claim not found');
         }
         if (!in_array($claim->getStatus(), [
+            Claim::STATUS_FNOL,
+            Claim::STATUS_SUBMITTED,
             Claim::STATUS_INREVIEW,
             Claim::STATUS_PENDING_CLOSED,
         ])) {
             throw new \Exception(
-                'Claim can only be withdrawn if claim is in-review or pending-closed state'
+                'Claim can only be withdrawn if claim is fnol, submitted, in-review or pending-closed state'
             );
         }
 

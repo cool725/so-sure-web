@@ -1079,7 +1079,8 @@ class BacsService
         $policy->addPayment($payment);
 
         if (!$user->hasValidPaymentMethod()) {
-            throw new \Exception(sprintf(
+            $payment->setStatus(BacsPayment::STATUS_SKIPPED);
+            $this->logger->warning(sprintf(
                 'User %s does not have a valid payment method (Policy %s)',
                 $user->getId(),
                 $policy->getId()
@@ -1308,13 +1309,25 @@ class BacsService
             $bacsPaymentForDateCalcs = new BacsPayment();
             $bacsPaymentForDateCalcs->submit($scheduledDate);
             if ($policy->getPolicyExpirationDate() < $bacsPaymentForDateCalcs->getBacsReversedDate()) {
-                $msg = sprintf(
-                    'Skipping payment %s as payment date is after expiration date',
-                    $scheduledPayment->getId()
-                );
-                $this->logger->error($msg);
+                // If admin has rescheduled, then allow payment to go through, but should be manually approved
+                if ($scheduledPayment->getType() != ScheduledPayment::TYPE_ADMIN) {
+                    $msg = sprintf(
+                        'Skipping payment %s as payment date is after expiration date',
+                        $scheduledPayment->getId()
+                    );
+                    $this->logger->error($msg);
 
-                continue;
+                    continue;
+                } else {
+                    // @codingStandardsIgnoreStart
+                    $msg = sprintf(
+                        'Running admin payment %s for policy %s. Warning! Payment date is after expiration date and should be immediately manually approved',
+                        $scheduledPayment->getId(),
+                        $policy->getId()
+                    );
+                    // @codingStandardsIgnoreEnd
+                    $this->logger->error($msg);
+                }
             }
 
             // If admin has rescheduled, then notify to user will have been performed and so no need to check
@@ -1338,38 +1351,39 @@ class BacsService
                 $scheduledPayment->getAmount()
             );
             $scheduledPayment->setPayment($payment);
-
-            $metadata['debit-amount'] += $scheduledPayment->getAmount();
-            $lines[] = implode(',', [
-                sprintf('"%s"', $scheduledDate->format('d/m/y')),
-                '"Scheduled Payment"',
-                $bankAccount->isFirstPayment() ?
-                    sprintf('"%s"', self::BACS_COMMAND_FIRST_DIRECT_DEBIT) :
-                    sprintf('"%s"', self::BACS_COMMAND_DIRECT_DEBIT),
-                sprintf('"%s"', $bankAccount->getAccountName()),
-                sprintf('"%s"', $bankAccount->getSortCode()),
-                sprintf('"%s"', $bankAccount->getAccountNumber()),
-                sprintf('"%0.2f"', $scheduledPayment->getAmount()),
-                sprintf('"%s"', $bankAccount->getReference()),
-                sprintf('"%s"', $scheduledPayment->getPolicy()->getUser()->getId()),
-                sprintf('"%s"', $scheduledPayment->getPolicy()->getId()),
-                sprintf('"SP-%s"', $scheduledPayment->getId()),
-            ]);
-            $payment->setSubmittedDate($scheduledDate);
-            $payment->setStatus(BacsPayment::STATUS_GENERATED);
-            $payment->setSerialNumber($serialNumber);
-            $scheduledPayment->setStatus(ScheduledPayment::STATUS_PENDING);
-            if ($bankAccount->isFirstPayment()) {
-                $bankAccount->setFirstPayment(false);
+            if ($payment->getStatus() != BacsPayment::STATUS_SKIPPED) {
+                $metadata['debit-amount'] += $scheduledPayment->getAmount();
+                $lines[] = implode(',', [
+                    sprintf('"%s"', $scheduledDate->format('d/m/y')),
+                    '"Scheduled Payment"',
+                    $bankAccount->isFirstPayment() ?
+                        sprintf('"%s"', self::BACS_COMMAND_FIRST_DIRECT_DEBIT) :
+                        sprintf('"%s"', self::BACS_COMMAND_DIRECT_DEBIT),
+                    sprintf('"%s"', $bankAccount->getAccountName()),
+                    sprintf('"%s"', $bankAccount->getSortCode()),
+                    sprintf('"%s"', $bankAccount->getAccountNumber()),
+                    sprintf('"%0.2f"', $scheduledPayment->getAmount()),
+                    sprintf('"%s"', $bankAccount->getReference()),
+                    sprintf('"%s"', $scheduledPayment->getPolicy()->getUser()->getId()),
+                    sprintf('"%s"', $scheduledPayment->getPolicy()->getId()),
+                    sprintf('"SP-%s"', $scheduledPayment->getId()),
+                ]);
+                $payment->setSubmittedDate($scheduledDate);
+                $payment->setStatus(BacsPayment::STATUS_GENERATED);
+                $payment->setSerialNumber($serialNumber);
+                $scheduledPayment->setStatus(ScheduledPayment::STATUS_PENDING);
+                if ($bankAccount->isFirstPayment()) {
+                    $bankAccount->setFirstPayment(false);
+                }
+                $accountData = sprintf('%s%s', $bankAccount->getSortCode(), $bankAccount->getAccountNumber());
+                if (in_array($accountData, $accounts)) {
+                    $this->logger->warning(sprintf(
+                        'More than 1 payment for Policy %s is present in the bacs file',
+                        $scheduledPayment->getPolicy()->getId()
+                    ));
+                }
+                $accounts[] = $accountData;
             }
-            $accountData = sprintf('%s%s', $bankAccount->getSortCode(), $bankAccount->getAccountNumber());
-            if (in_array($accountData, $accounts)) {
-                $this->logger->warning(sprintf(
-                    'More than 1 payment for Policy %s is present in the bacs file',
-                    $scheduledPayment->getPolicy()->getId()
-                ));
-            }
-            $accounts[] = $accountData;
         }
 
         return $lines;

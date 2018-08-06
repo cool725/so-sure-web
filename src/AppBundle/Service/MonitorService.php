@@ -445,4 +445,22 @@ class MonitorService
             }
         }
     }
+
+    public function pendingPolicies()
+    {
+        /** @var PolicyRepository $repo */
+        $repo = $this->dm->getRepository(Policy::class);
+        $policies = $repo->findBy(['status' => Policy::STATUS_PENDING]);
+        $oneHourAgo = new \DateTime();
+        $oneHourAgo = $oneHourAgo->sub(new \DateInterval('PT1H'));
+        foreach ($policies as $policy) {
+            /** @var Policy $policy */
+            if (!$policy->getStatusUpdated() || $policy->getStatusUpdated() < $oneHourAgo) {
+                throw new MonitorException(sprintf(
+                    'Policy %s is pending over 1 hour ago',
+                    $policy->getId()
+                ));
+            }
+        }
+    }
 }

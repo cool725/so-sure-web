@@ -56,6 +56,9 @@ class ApiViewController extends BaseController
             'yearlyPremium' => $yearlyPremium,
             'promo_code' => null,
             'include' => $request->get('include'),
+            'claims_default_direct_group' => $this->get('app.feature')->isEnabled(
+                Feature::FEATURE_CLAIMS_DEFAULT_DIRECT_GROUP
+            ),
             // don't display promo values
             // 'promo_code' => $repo->isPromoLaunch($prefix) ? 'launch' : null,
         );
@@ -97,12 +100,16 @@ class ApiViewController extends BaseController
         $maxConnections = ceil($maxPotVaue / 10);
         $yearlyPremium = $request->get('yearlyPremium') ? $request->get('yearlyPremium') : ( $maxPotVaue / 0.8);
         $promoCode = $policy->getPromoCode();
+
         $data = array(
             'maxPotValue' => $maxPotVaue,
             'maxConnections' => $maxConnections,
             'yearlyPremium' => $yearlyPremium,
             'promo_code' => $promoCode,
             'include' => $request->get('include'),
+            'claims_default_direct_group' => $this->get('app.feature')->isEnabled(
+                Feature::FEATURE_CLAIMS_DEFAULT_DIRECT_GROUP
+            ),
         );
 
         $template = sprintf(

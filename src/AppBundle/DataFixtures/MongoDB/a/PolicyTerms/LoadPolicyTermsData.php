@@ -82,8 +82,13 @@ class LoadPolicyTermsData implements FixtureInterface, ContainerAwareInterface
         $manager->persist($policyTerms);
 
         $policyTerms = new PolicyTerms();
-        $policyTerms->setLatest(true);
+        $policyTerms->setLatest(false);
         $policyTerms->setVersion('Version 8 July 2018');
+        $manager->persist($policyTerms);
+
+        $policyTerms = new PolicyTerms();
+        $policyTerms->setLatest(true);
+        $policyTerms->setVersion('Version 9 July 2018');
         $manager->persist($policyTerms);
     }
 }

@@ -43,13 +43,13 @@ class SixpackService
     //const EXPERIMENT_NEW_QUOTE_DESIGN = 'new-quote-design';
     //const EXPERIMENT_CPC_MANUFACTURER_OLD_NEW = 'cpc-manufacturer-old-new';
 
-    const EXPERIMENT_HOMEPAGE_AA_V2 = 'homepage-aa-v2';
+    // const EXPERIMENT_HOMEPAGE_AA_V2 = 'homepage-aa-v2';
     const EXPERIMENT_APP_SHARE_METHOD = 'app-share-method';
     const EXPERIMENT_APP_PICSURE_LOCATION = 'app-picsure-location';
     const EXPERIMENT_APP_REQUEST_PICSURE_LOCATION = 'app-request-picsure-location';
     //const EXPERIMENT_STEP_3 = 'step-3-payment-new';
     const EXPERIMENT_PURCHASE_FLOW_BACS = 'purchase-flow-bacs';
-    const EXPERIMENT_CPC_QUOTE_HOMEPAGE = 'cpc-quote-or-homepage';
+    // const EXPERIMENT_CPC_QUOTE_HOMEPAGE = 'cpc-quote-or-homepage';
     // const EXPERIMENT_DOB = 'purchase-funnel-dob-dropdown';
     // const EXPERIMENT_72_REPLACEMENT = 'seventytwo-hours';
     // const EXPERIMENT_PICSURE_SECTION = 'picsure-redesign';
@@ -58,7 +58,7 @@ class SixpackService
     const EXPERIMENT_EBAY_LANDING_2 = 'ebay-landing-2';
     // const EXPERIMENT_NEW_WELCOME_MODAL = 'new-welcome-modal';
     // New Exp Competitor Landing
-    const EXPERIMENT_COMPETITOR_LANDING = 'competitor-landing';
+    // const EXPERIMENT_COMPETITOR_LANDING = 'competitor-landing';
     // const EXPERIMENT_TRUSTPILOT_REVIEW = 'trustpilot';
     // New Test Single Mem Option
     // const EXPERIMENT_MEMORY_OPTIONS = 'single-progressive-dropdown';
@@ -99,10 +99,10 @@ class SixpackService
     const EXPIRED_EXPERIMENT_SHARE_MESSAGE = 'share-message';
 
     public static $unauthExperiments = [
-        self::EXPERIMENT_HOMEPAGE_AA_V2,
+        // self::EXPERIMENT_HOMEPAGE_AA_V2,
         //self::EXPERIMENT_STEP_3,
         self::EXPERIMENT_PURCHASE_FLOW_BACS,
-        self::EXPERIMENT_CPC_QUOTE_HOMEPAGE,
+        // self::EXPERIMENT_CPC_QUOTE_HOMEPAGE,
         // self::EXPERIMENT_DOB,
         // self::EXPERIMENT_72_REPLACEMENT,
         // self::EXPERIMENT_PICSURE_SECTION,
@@ -110,7 +110,7 @@ class SixpackService
         self::EXPERIMENT_EBAY_LANDING_1,
         self::EXPERIMENT_EBAY_LANDING_2,
         // New Exp Competitor Landing
-        self::EXPERIMENT_COMPETITOR_LANDING,
+        // self::EXPERIMENT_COMPETITOR_LANDING,
         // self::EXPERIMENT_TRUSTPILOT_REVIEW,
         // New Test Single Mem Option
         // self::EXPERIMENT_MEMORY_OPTIONS,
@@ -173,7 +173,7 @@ class SixpackService
      * @var array
      */
     public static $purchaseConversionSimple = [
-        self::EXPERIMENT_CPC_QUOTE_HOMEPAGE,
+        // self::EXPERIMENT_CPC_QUOTE_HOMEPAGE,
         //self::EXPERIMENT_STEP_3,
         self::EXPERIMENT_PURCHASE_FLOW_BACS,
         // self::EXPERIMENT_72_REPLACEMENT,
@@ -182,7 +182,7 @@ class SixpackService
         self::EXPERIMENT_EBAY_LANDING_1,
         self::EXPERIMENT_EBAY_LANDING_2,
         // New Exp Competitor Landing
-        self::EXPERIMENT_COMPETITOR_LANDING,
+        // self::EXPERIMENT_COMPETITOR_LANDING,
         // Exp 1
         // self::EXPERIMENT_HOMEPAGE_NEW_COPY,
         // Exp 2
@@ -209,7 +209,7 @@ class SixpackService
      * @var array
      */
     public static $purchaseConversionKpi = [
-        self::EXPERIMENT_HOMEPAGE_AA_V2,
+        // self::EXPERIMENT_HOMEPAGE_AA_V2,
         // self::EXPERIMENT_DOB,
         // self::EXPERIMENT_TRUSTPILOT_REVIEW,
         // New Test Single Mem Option

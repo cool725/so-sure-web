@@ -252,6 +252,16 @@ class DaviesService extends S3EmailService
         $claim = $this->getClaim($daviesClaim);
         if (!$claim) {
             throw new \Exception(sprintf('Unable to locate claim %s in db', $daviesClaim->claimNumber));
+        } elseif ($claim->getHandlingTeam() != Claim::TEAM_DAVIES &&
+            !$claim->isIgnoreWarningFlagSet(Claim::WARNING_FLAG_DAVIES_HANDLING_TEAM)) {
+            $msg = sprintf(
+                'Claim %s is being processed by %s, not davies. Skipping davies import.',
+                $daviesClaim->claimNumber,
+                $claim->getHandlingTeam()
+            );
+            $this->sosureActions[$daviesClaim->claimNumber][] = $msg;
+
+            return false;
         }
 
         $this->validateClaimDetails($claim, $daviesClaim);

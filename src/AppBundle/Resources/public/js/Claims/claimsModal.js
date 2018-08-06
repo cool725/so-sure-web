@@ -44,7 +44,7 @@ $('#claimsModal').on('show.bs.modal', function (event) {
                     if (documents.proofOfUsages.length > 0) {
                         var proofOfUsages = '';
                         $.each(documents.proofOfUsages, function(key, value) {
-                            proofOfUsages += '<p><a href="'+value.url+'">'+value.filename+'</a></p>';
+                            proofOfUsages += '<p>'+value.filename+' <img class="img-preview" src="'+value.url+'" /> <a href="'+value.url_download+'"><i class="fa fa-download"></i></a></p>';
                         });
                         modal.find('#claims-detail-damage-proof-usages').html(proofOfUsages);                        
                     }
@@ -60,7 +60,7 @@ $('#claimsModal').on('show.bs.modal', function (event) {
                     if (documents.proofOfPurchases.length > 0) {
                         var proofOfPurchases = '';
                         $.each(documents.proofOfPurchases, function(key, value) {
-                            proofOfPurchases += '<p><a href="'+value.ulr+'">'+value.filename+'</a></p>';
+                            proofOfPurchases += '<p>'+value.filename+' <img class="img-preview" src="'+value.url+'" /> <a href="'+value.url_download+'"><i class="fa fa-download"></i></a></p>';
                         });
                         modal.find('#claims-detail-proof-purchases').html(proofOfPurchases);
                     }
@@ -76,7 +76,7 @@ $('#claimsModal').on('show.bs.modal', function (event) {
                     if (documents.damagePictures.length > 0) {
                         var damagePictures = '';
                         $.each(documents.damagePictures, function(key, value) {
-                            damagePictures += '<p><a href="'+value.url+'">'+value.filename+'</a></p>';
+                            damagePictures += '<p>'+value.filename+' <img class="img-preview" src="'+value.url+'" /> <a href="'+value.url_download+'"><i class="fa fa-download"></i></a></p>';
                         });
                         modal.find('#claims-detail-pictures-phone').html(damagePictures);
                     }
@@ -91,7 +91,7 @@ $('#claimsModal').on('show.bs.modal', function (event) {
                 if (documents.others.length > 0) {
                     var others = '';
                     $.each(documents.others, function(key, value) {
-                        others += '<p><a href="'+value.url+'">'+value.filename+'</a></p>';
+                        others += '<p>'+value.filename+' <img class="img-preview" src="'+value.url+'" /> <a href="'+value.url_download+'"><i class="fa fa-download"></i></a></p>';
                     });
                     modal.find('#claims-detail-damage-others').html(others);
                 }
@@ -115,7 +115,7 @@ $('#claimsModal').on('show.bs.modal', function (event) {
                     if (documents.proofOfUsages.length > 0) {
                         var proofOfUsages = '';
                         $.each(documents.proofOfUsages, function(key, value) {
-                            proofOfUsages += '<p><a href="'+value.url+'">'+value.filename+'</a></p>';
+                            proofOfUsages += '<p>'+value.filename+' <img class="img-preview" src="'+value.url+'" /> <a href="'+value.url_download+'"><i class="fa fa-download"></i></a></p>';
                         });
                         modal.find('#claims-detail-theftloss-proof-usages').html(proofOfUsages);
                     }
@@ -131,7 +131,7 @@ $('#claimsModal').on('show.bs.modal', function (event) {
                     if (documents.proofOfBarrings.length > 0) {
                         var proofOfBarrings = '';
                         $.each(documents.proofOfBarrings, function (key, value) {
-                            proofOfBarrings += '<p><a href="' + value.url + '">' + value.filename + '</a></p>';
+                            proofOfBarrings += '<p>'+value.filename+' <img class="img-preview" src="'+value.url+'" /> <a href="'+value.url_download+'"><i class="fa fa-download"></i></a></p>';
                         });
                         modal.find('#claims-detail-proof-barrings').html(proofOfBarrings);
                     }
@@ -147,7 +147,7 @@ $('#claimsModal').on('show.bs.modal', function (event) {
                     if (documents.proofOfPurchases.length > 0) {
                         var proofOfPurchases = '';
                         $.each(documents.proofOfPurchases, function(key, value) {
-                            proofOfPurchases += '<p><a href="'+value.ulr+'">'+value.filename+'</a></p>';
+                            proofOfPurchases += '<p>'+value.filename+' <img class="img-preview" src="'+value.url+'" /> <a href="'+value.url_download+'"><i class="fa fa-download"></i></a></p>';
                         });
                         modal.find('#claims-detail-proof-purchases').html(proofOfPurchases);
                     }
@@ -164,7 +164,7 @@ $('#claimsModal').on('show.bs.modal', function (event) {
                         if (documents.proofOfLosses.length > 0) {
                             var proofOfLosses = '';
                             $.each(documents.proofOfLosses, function(key, value) {
-                                proofOfLosses += '<p><a href="'+value.ulr+'">'+value.filename+'</a></p>';
+                                proofOfLosses += '<p>'+value.filename+' <img class="img-preview" src="'+value.url+'" /> <a href="'+value.url_download+'"><i class="fa fa-download"></i></a></p>';
                             });
                             modal.find('#claims-detail-proof-losses').html(proofOfLosses);
                         }
@@ -304,6 +304,10 @@ $('#claimsModal').on('show.bs.modal', function (event) {
         }
     });
 
+    $('.img-preview').viewer({
+        inline: false,
+        navbar: false
+    });
 });
 
 $('#flagsModal').on('show.bs.modal', function (event) {

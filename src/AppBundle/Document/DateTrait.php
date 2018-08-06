@@ -261,8 +261,16 @@ trait DateTrait
         if ($billingDate->format('d') > 28) {
             $billingDate->sub(new \DateInterval(sprintf('P%dD', $billingDate->format('d') - 28)));
             if ($adjustTimeIfAdjusted) {
-                $billingDate->setTime(23, 59, 59);
+                $billingDate->setTime(22, 59, 59);
             }
+        }
+        // horrible hack, but to avoid issues with timezones & daylight savings when adjusting the billing date,
+        // ensure that we don't have any times between 23:00 - 00:59:59
+        // this ensures that regardless of BST/GMT date, the day will be consistent when compared across the year
+        if ($billingDate->format('H') == 23) {
+            $billingDate->setTime(22, 0, 0);
+        } elseif ($billingDate->format('H') == 0) {
+            $billingDate->setTime(1, 0, 0);
         }
 
         return $billingDate;
