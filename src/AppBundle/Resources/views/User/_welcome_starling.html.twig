@@ -1,0 +1,43 @@
+{#Included from welcome.html.twig #}
+
+<div class="modal modal-new fade"
+     id="welcome-modal"
+     tabindex="-1"
+     role="dialog"
+     aria-labelledby="welcome-modal"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+
+                <h3 class="h2 text-blue text-center">You’ve made a great choice</h3>
+            </div>
+
+            <div class="modal-body">
+                <p class="lead text-center"><p>Would you like to return to your Starling Bank and show your new policy summary on the app?</p></p>
+                <div class="row">
+                    <div class="col-md-12">
+                        <p>
+                            <i><strong>NOTE:</strong> only needs one of these - either the link to th page, OR render the same thing directly by controller</i><br>
+
+                            <a href="{{ app.session.get('oauth2Flow.targetPath') }}">Return to Starling to show my policy details on the Starling App</a>
+                            {{ render(controller('fos_oauth_server.controller.authorize:authorizeAction', oauth2FlowParams)) }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <div class="row">
+                    <div class="col-md-6 col-md-offset-3">
+                        <a href="#" class="btn btn-blue btn-block btn-pad btn-big-text" data-dismiss="modal">Right choice, indeed!</a>
+                    </div>
+                </div>
+                <hr>
+            </div>
+        </div>
+    </div>
+</div>

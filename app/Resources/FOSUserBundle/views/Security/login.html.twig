@@ -115,7 +115,7 @@
 
                 {% if feature_enabled('starling') %}
                 <div class="form-group">
-                    <a class="btn btn-block btn-starling" href="/login/starling"><img src="{{ cdn_url }}/images/StarlingMarkIcon.png" height="20px"> &nbsp;Login with Starling</a>
+                    <a class="btn btn-block btn-starling" href="{{ path('hwi_oauth_service_redirect', {'service': 'starling'}) }}"><img src="{{ cdn_url }}/images/StarlingMarkIcon.png" height="20px"> &nbsp;Login with Starling</a>
                 </div>
                 {% endif %}
 
