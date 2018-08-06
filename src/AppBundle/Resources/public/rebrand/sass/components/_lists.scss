@@ -1,0 +1,40 @@
+// lists.scss
+
+.tick-list {
+    // Uses our tick icon on the dt element
+    dt {
+        padding-left: 45px;
+        padding-top: 1rem;
+        padding-bottom: 1rem;
+        margin-bottom: 1rem;
+        background: url('#{$cdn_url}/images/rebrand/icns/so-sure_tick-icn.svg') no-repeat left center;
+        background-size: 35px;
+    }
+
+    dd {
+        margin-bottom: 2rem;
+    }
+}
+
+// Modify list to handle fa icons
+.icn-list {
+
+    &-fa {
+
+        li {
+            position: relative;
+            padding-left: 30px;
+
+            > .fas {
+                position: absolute;
+                left: 0; top: 5px;
+            }
+        }
+    }
+}
+
+.fas {
+    vertical-align: middle;
+}
+
+

@@ -1,5 +1,5 @@
 <nav class="navbar fixed-top justify-content-between flex-nowrap flex-row pl-lg-5">
-    <a href="/" class="navbar-brand float-left">LOGO</a>
+    <a href="/" class="navbar-brand"><img src="{{ cdn_url }}/images/rebrand/logo/so-sure_logo-blue.svg" width="120px"></a>
     <ul class="nav navbar-nav flex-row align-items-center">
         <li class="nav-item d-none d-lg-block pr-lg-5">
             <a href="#" class="nav-link">About</a>
@@ -30,7 +30,7 @@
             </li>
         {% else %}
             <li class="nav-item pr-lg-5">
-                <a href="#" class="btn btn-primary btn-sm">Get a Quote</a>
+                <a href="#" class="btn btn-primary btn-sm btn-gradient">Get a Quote</a>
             </li>
         {% endif %}
         <li class="nav-item d-none d-lg-block pr-lg-5">
@@ -41,7 +41,7 @@
                     <a href="{{ path('fos_user_security_logout') }}" class="nav-link text-primary">Log out</i></a>
                 {% endif %}
             {% else %}
-                <a href="{{ path('fos_user_security_login') }}" class="nav-link text-primary">Log in <i class="fas fa-arrow-right fa-sm ml-2"></i></a>
+                <a href="{{ path('fos_user_security_login') }}" class="nav-link text-primary">Customer log in <i class="fas fa-arrow-right fa-sm ml-2"></i></a>
             {% endif %}
         </li>
         <li class="nav-item d-lg-none">
@@ -71,7 +71,7 @@
                         <a href="{{ path('fos_user_security_logout') }}" class="">Log out</i></a>
                     {% endif %}
                 {% else %}
-                    <a href="{{ path('fos_user_security_login') }}" class="">Log in <i class="fas fa-arrow-right fa-sm ml-2"></i></a>
+                    <a href="{{ path('fos_user_security_login') }}" class="">Custome log in <i class="fas fa-arrow-right fa-sm ml-2"></i></a>
                 {% endif %}
             </li>
             <li class="my-4">

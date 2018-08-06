@@ -1,0 +1,42 @@
+// tables.scss
+
+.table-list {
+    table-layout: fixed;
+    background-color: $white;
+    box-shadow: 0 15px 30px 0 rgba(8,27,154,0.08),
+                0 5px 15px 0 rgba(8,27,154,0.08);
+    @include border-radius(15px);
+
+    &__header {
+        padding: 1.4rem;
+        text-align: center;
+        background-color: $purple;
+        @include border-top-radius(15px);
+    }
+
+    tbody {
+        tr {
+            &:nth-child(even) {
+                background-color: $bb-1;
+            }
+
+            td {
+                height: 90px;
+                vertical-align: middle;
+            }
+        }
+    }
+
+    &__icn {
+        display: block;
+        padding: 5px 50px;
+        background-image: url('#{$cdn_url}/images/rebrand/icns/so-sure_unhappy-icn.svg');
+        background-repeat: no-repeat;
+        background-position: left center;
+        overflow: visible;
+    }
+
+    &__icn-happy {
+        background-image: url('#{$cdn_url}/images/rebrand/icns/so-sure_happy-icn.svg');
+    }
+}
