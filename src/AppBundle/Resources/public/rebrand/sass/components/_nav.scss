@@ -2,11 +2,10 @@
 
 .navbar {
     background-color: transparent;
-    // transition: padding 0.8s linear;;
-    // padding-top: 1.2rem;
+    padding-top: 1.2rem;
 
     @include media-breakpoint-up(lg) {
-        // padding-top: 2rem;
+        padding-top: 2rem;
     }
 
     .navbar-nav {
@@ -37,11 +36,8 @@
 }
 
 .navbar-scrolled {
-    // padding-top: 0.5rem;
-
-    @include media-breakpoint-up(lg) {
-        // padding-top: 0.5rem;
-    }
+    transition: padding 0.2s linear;
+    padding-top: 0.5rem;
     background-color: $white;
     box-shadow: 0 2px 0 0 rgba(0, 0, 0, 0.04);
 }

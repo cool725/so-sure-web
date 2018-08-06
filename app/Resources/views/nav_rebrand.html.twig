@@ -2,19 +2,19 @@
     <a href="/" class="navbar-brand show-in-nav"><div class="navbar-brand__logo"></div></a>
     <ul class="nav navbar-nav flex-row align-items-center">
         <li class="nav-item d-none d-lg-block pr-lg-5">
-            <a href="#" class="nav-link">About</a>
+            <a href="{{ path('about_home') }}" class="nav-link">About</a>
         </li>
         <li class="nav-item d-none d-lg-block pr-lg-5">
-            <a href="#" class="nav-link">Company phones</a>
+            <a href="{{ path('claim') }}" class="nav-link">Make a claim</a>
         </li>
         <li class="nav-item d-none d-lg-block pr-lg-5">
-            <a href="#" class="nav-link">FAQs</a>
+            <a href="{{ path('faq') }}" class="nav-link">FAQs</a>
         </li>
         <li class="nav-item d-none d-lg-block pr-lg-5">
-            <a href="#" class="nav-link">Blog</a>
+            <a href="{{ path('blog') }}" class="nav-link">Blog</a>
         </li>
         <li class="nav-item d-none d-lg-block pr-lg-5">
-            <a href="#" class="nav-link">Contact</a>
+            <a href="{{ path('about_how_to_contact_so_sure') }}" class="nav-link">Contact</a>
         </li>
         {% if app.user is not null and app.user %}
             <li class="nav-item d-none d-lg-block pr-lg-5">
@@ -58,7 +58,7 @@
                 <a href="{{ path('about_home') }}" class="h5">About</a>
             </li>
             <li class="my-4">
-                <a href="{{ path('claim') }}" class="h5">Making a claim</a>
+                <a href="{{ path('claim') }}" class="h5">Make a claim</a>
             </li>
             <li class="my-4">
                 <a href="{{ path('faq') }}" class="h5">FAQs</a>
@@ -87,7 +87,7 @@
                     {% if is_granted('ROLE_PREVIOUS_ADMIN') %}
                         <a href="{{ path('homepage', {'_impersonate': '_exit'}) }}" class="d-block h5 m-0">Exit <u>{{ app.user.email }}</u></a>
                     {% else %}
-                        <a href="{{ path('fos_user_security_logout') }}" class="d-block h5 m-0">Log out</i></a>
+                        <a href="{{ path('fos_user_security_logout') }}" class="d-block h5 m-0"><i class="fas fa-arrow-left fa-sm ml-2"></i> Log out</i></a>
                     {% endif %}
                 {% else %}
                     <a href="{{ path('fos_user_security_login') }}" class="d-block h5 m-0">Customer log in <i class="fas fa-arrow-right fa-sm ml-2"></i></a>
