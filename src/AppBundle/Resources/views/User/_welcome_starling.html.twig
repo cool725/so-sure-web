@@ -7,36 +7,27 @@
      aria-labelledby="welcome-modal"
      aria-hidden="true">
     <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
+        <div class="modal-content welcome-modal-content">
+            <div class="modal-header text-center">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
-
-                <h3 class="h2 text-blue text-center">You’ve made a great choice</h3>
+                <h3 class="text-white">Thank you for buying your Mobile phone Insurance with so-sure</h3>
             </div>
+            <div class="modal-body text-center">
+                <p class="text-white"><small>in partnership with</small></p>
 
-            <div class="modal-body">
-                <p class="lead text-center"><p>Would you like to return to your Starling Bank and show your new policy summary on the app?</p></p>
-                <div class="row">
-                    <div class="col-md-12">
-                        <p>
-                            <i><strong>NOTE:</strong> only needs one of these - either the link to th page, OR render the same thing directly by controller</i><br>
+                <p><img src="{{ cdn_url }}/images/logo/so-sure_starling_bank_logo.svg" alt="Starling Bank" width="200px"></p>
 
-                            <a href="{{ app.session.get('oauth2Flow.targetPath') }}">Return to Starling to show my policy details on the Starling App</a>
-                            {{ render(controller('fos_oauth_server.controller.authorize:authorizeAction', oauth2FlowParams)) }}
-                        </p>
-                    </div>
-                </div>
+                <p class="text-white">To link up your policy details with the Starling Bank app click here:</p>
+
+                <p><a href="{{ app.session.get('oauth2Flow.targetPath') }}" class="btn btn-starling btn-pad"><i class="fa fa-link" aria-hidden="true"></i> Link My Policy</a></p>
+
+                <p class="text-white"><small>If you have any questions or need support about your policy <br> contact us on <a href="mailto:support@wearesosure.com" class="text-white text-underline">support@wearesosure.com</a></small></p>
+
+                {# {{ render(controller('fos_oauth_server.controller.authorize:authorizeAction', oauth2FlowParams)) }} #}
             </div>
-
             <div class="modal-footer">
-                <div class="row">
-                    <div class="col-md-6 col-md-offset-3">
-                        <a href="#" class="btn btn-blue btn-block btn-pad btn-big-text" data-dismiss="modal">Right choice, indeed!</a>
-                    </div>
-                </div>
-                <hr>
             </div>
         </div>
     </div>
