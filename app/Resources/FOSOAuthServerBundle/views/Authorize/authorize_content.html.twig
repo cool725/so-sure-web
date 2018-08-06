@@ -1,15 +1,38 @@
-<p>this page is app/Resources/FOSOAuthServerBundle/views/Authorize/authorize_content.html.twig</p>
+{% extends '::base.html.twig' %}
 
-<p>{{ form.vars.value.scope|oauth2ScopeDescription }}</p>
+{# Set vars #}
+{% set exclude_remote_scripts = true %}
+{% set new_stylesheet = 1 %}
+{% set distraction_free = 1 %}
 
-{{ form_start(form, {'method': 'POST', 'action': path('fos_oauth_server_authorize'), 'label_attr': {'class': 'fos_oauth_server_authorize'} }) }}
-    <input type="submit" name="accepted" value="{{ 'authorize.accept'|trans({}, 'FOSOAuthServerBundle') }}" />
-    <input type="submit" name="rejected" value="{{ 'authorize.reject'|trans({}, 'FOSOAuthServerBundle') }}" />
+{% block stylesheets %}
+    {{ parent() }}
+    {% stylesheets output='css/*.css'
+    '@AppBundle/Resources/public/sass/page/login.scss'
+ %}<link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
+{% endblock %}
 
-    {{ form_row(form.client_id) }}
-    {{ form_row(form.response_type) }}
-    {{ form_row(form.redirect_uri) }}
-    {{ form_row(form.state) }}
-    {{ form_row(form.scope) }}
-    {{ form_rest(form) }}
-</form>
+{% block body %}
+    <section class="section--pad login">
+        <div class="container">
+            <div class="panel login__panel">
+                <div class="panel-body">
+                    {{ form_start(form, {'method': 'POST', 'action': path('fos_oauth_server_authorize'), 'label_attr': {'class': 'fos_oauth_server_authorize'} }) }}
+                        <p class="lead">{{ form.vars.value.scope|oauth2ScopeDescription }}</p>
+                        <hr>
+                        <input class="btn btn-green" type="submit" name="accepted" value="{{ 'authorize.accept'|trans({}, 'FOSOAuthServerBundle') }}" />
+                        <input class="btn btn-blue-hollow" type="submit" name="rejected" value="{{ 'authorize.reject'|trans({}, 'FOSOAuthServerBundle') }}" />
+                        {{ form_row(form.client_id) }}
+                        {{ form_row(form.response_type) }}
+                        {{ form_row(form.redirect_uri) }}
+                        {{ form_row(form.state) }}
+                        {{ form_row(form.scope) }}
+                        {{ form_rest(form) }}
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+
+{% block footer %}{% endblock %}

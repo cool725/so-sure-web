@@ -24,8 +24,6 @@
                 <p><a href="{{ app.session.get('oauth2Flow.targetPath') }}" class="btn btn-starling btn-pad"><i class="fa fa-link" aria-hidden="true"></i> Link My Policy</a></p>
 
                 <p class="text-white"><small>If you have any questions or need support about your policy <br> contact us on <a href="mailto:support@wearesosure.com" class="text-white text-underline">support@wearesosure.com</a></small></p>
-
-                {{ render(controller('fos_oauth_server.controller.authorize:authorizeAction', oauth2FlowParams)) }}
             </div>
             <div class="modal-footer">
             </div>
