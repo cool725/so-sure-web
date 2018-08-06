@@ -2897,6 +2897,7 @@ abstract class Policy
 
         // and business rule of 30 days unpaid before auto cancellation
         $billingDate->add(new \DateInterval('P30D'));
+        $billingDate = $this->startOfDay($billingDate);
 
         return $billingDate;
     }
