@@ -375,8 +375,8 @@ class MixpanelService
         $count = 0;
         if ($data) {
             foreach ($data['results'] as $user) {
-                //$this->queueDelete($user['$distinct_id'], 0);
-                //$count++;
+                $this->queueDelete($user['$distinct_id'], 0);
+                $count++;
             }
         }
 
@@ -416,8 +416,8 @@ class MixpanelService
         if ($data) {
             $count = 0;
             foreach ($data['results'] as $user) {
-                //$this->queueDelete($user['$distinct_id'], 0);
-                //$count++;
+                $this->queueDelete($user['$distinct_id'], 0);
+                $count++;
             }
         }
 
@@ -428,7 +428,7 @@ class MixpanelService
         // @codingStandardsIgnoreStart
         $query = [
             'selector' => sprintf(
-                '(behaviors["behavior_11114"] == 1 and datetime(%s - 86400) > user["$last_seen"] and user["$last_name"] == null and behaviors["behavior_11115"] == 0 and behaviors["behavior_11116"] == 0 and behaviors["behavior_11117"] == 0)',
+                '(behaviors["behavior_11114"] == 1 and datetime(%s - 86400) > user["$last_seen"] and not defined(user["$last_name"]) and behaviors["behavior_11115"] == 0 and behaviors["behavior_11116"] == 0 and behaviors["behavior_11117"] == 0)',
                 $now->format('U')
             ),
             'behaviors' => [[
