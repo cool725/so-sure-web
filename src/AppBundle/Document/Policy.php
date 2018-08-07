@@ -4297,7 +4297,8 @@ abstract class Policy
             return 0;
         } elseif (in_array($this->getStatus(), [self::STATUS_ACTIVE, self::STATUS_UNPAID]) ||
             ($this->isCancelled() && !$this->isRefundAllowed())) {
-            $numPayments = $premium->getNumberOfMonthlyPayments($this->getTotalSuccessfulStandardPayments(false, $date));
+            $totalPayments = $this->getTotalSuccessfulStandardPayments(false, $date);
+            $numPayments = $premium->getNumberOfMonthlyPayments($totalPayments);
             $expectedCommission = $salva->sumBrokerFee($numPayments, $numPayments == 12);
         } else {
             if (!$date) {
