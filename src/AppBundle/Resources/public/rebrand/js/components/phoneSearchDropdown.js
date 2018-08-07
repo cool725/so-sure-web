@@ -9,6 +9,7 @@ $(function() {
             make   = $('.phone-search-dropdown__make'),
             model  = $('.phone-search-dropdown__model'),
             memory = $('.phone-search-dropdown__memory');
+            button = $('.phone-search-dropdown__button');
 
         let updateModels = () => {
 
@@ -57,6 +58,7 @@ $(function() {
             // Note: The placeholder value means a length of 2
             if (memory.find('option').length == 2) {
                 memory.find('option:eq(1)').prop('selected', true);
+                button.prop('disabled', '').removeClass('btn-outline-white').addClass('btn-success btn-shadow');
             }
         }
 
@@ -67,8 +69,10 @@ $(function() {
             if ($(this).val() != '') {
                 model.prop('disabled', '');
             } else {
-                model.prop('disabled', 'disabled').val('');;
+                model.prop('disabled', 'disabled').val('');
             }
+
+            button.prop('disabled', 'disabled').removeClass('btn-success btn-shadow').addClass('btn-outline-white');
 
         });
 
@@ -79,9 +83,20 @@ $(function() {
             if ($(this).val() != '') {
                 memory.prop('disabled', '');
             } else {
-                memory.prop('disabled', 'disabled').val('');;
+                memory.prop('disabled', 'disabled').val('');
             }
 
+            // button.prop('disabled', 'disabled').removeClass('btn-success btn-shadow').addClass('btn-outline-white');
+
+        });
+
+        memory.on('change', function() {
+
+            if ($(this).val() != '') {
+                button.prop('disabled', '').removeClass('btn-outline-white').addClass('btn-success btn-shadow');
+            } else {
+                button.prop('disabled', 'disabled').removeClass('btn-success btn-shadow').addClass('btn-outline-white');
+            }
         });
 
         updateModels();

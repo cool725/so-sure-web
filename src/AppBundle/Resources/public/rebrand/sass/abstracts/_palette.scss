@@ -17,10 +17,12 @@ $blue-2: #2593F3;
 $blue-3: #0051E8;
 $blue-4: #081B9A;
 $purple: #443b5f;
+$green:  #3FC67D;
 
 // Extend Theme colours and overide primary BS colour
 $theme-colors: (
     "primary": $blue-2,
+    "success": $green,
     "blue1":   $blue-1,
     "blue2":   $blue-2,
     "blue3":   $blue-3,

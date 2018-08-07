@@ -4,8 +4,7 @@ $(function() {
 
     const quoteToggle = $('.get-a-quote'),
           quoteModal  = $('.getquote'),
-          logo        = $('.navbar-brand__logo'),
-          quoteOpen   = 'getquote-open';
+          logo        = $('.navbar-brand__logo');
 
     quoteToggle.on('click', function(e) {
         e.preventDefault();
@@ -16,6 +15,6 @@ $(function() {
         // Prevent scrolling whilst open
         $('body').toggleClass('body--overflow');
 
-        quoteModal.toggleClass(quoteOpen);
+        quoteModal.toggleClass('getquote-open');
     });
 });
