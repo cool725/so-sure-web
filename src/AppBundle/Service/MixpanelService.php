@@ -371,7 +371,7 @@ class MixpanelService
                 $time->format('U')
             ),
         ];
-        //$data = $this->mixpanelData->data('engage', $query);
+        $data = $this->mixpanelData->data('engage', $query);
         $count = 0;
         if ($data) {
             foreach ($data['results'] as $user) {
@@ -412,7 +412,7 @@ class MixpanelService
             ]
         ]];
         // @codingStandardsIgnoreEnd
-        //$data = $this->mixpanelData->data('engage', $query);
+        $data = $this->mixpanelData->data('engage', $query);
         if ($data) {
             $count = 0;
             foreach ($data['results'] as $user) {
