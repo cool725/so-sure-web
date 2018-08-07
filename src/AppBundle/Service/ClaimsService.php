@@ -112,6 +112,7 @@ class ClaimsService
         $claim->setTimeToReach($claimFnol->getTimeToReach());
         $claim->setSignature($claimFnol->getSignature());
         $claim->setStatus(Claim::STATUS_FNOL);
+        $claim->setNotificationDate(new \DateTime());
 
         return $claim;
     }
