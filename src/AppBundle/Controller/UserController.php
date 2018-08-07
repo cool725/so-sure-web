@@ -1491,6 +1491,7 @@ class UserController extends BaseController
                     }
                     $this->denyAccessUnlessGranted(PolicyVoter::EDIT, $policy);
 
+                    /** @var ClaimsService $claimsService */
                     $claimsService = $this->get('app.claims');
                     $claim = $claimsService->createClaim($claimConfirmForm->getData());
                     $claim->setPolicy($policy);
