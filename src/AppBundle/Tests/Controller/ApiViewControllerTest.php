@@ -119,22 +119,23 @@ class ApiViewControllerTest extends BaseApiControllerTest
 
             // TODO: Probably won't carry davies through to future version, but see how that pans out
             $claimDefaultDirectGroup = false;
-            if (in_array($version, [PolicyTerms::VERSION_9])) {
+            if (in_array($versionName, [PolicyTerms::VERSION_9])) {
                 $claimDefaultDirectGroup = false;
             }
 
             $templating = self::$container->get('templating');
             $pdf = $templating->render(
-                sprintf('AppBundle:Pdf:policyTermsV%d.html.twig', PolicyTerms::getVersionNumberByVersion($version)),
+                sprintf('AppBundle:Pdf:policyTermsV%d.html.twig', PolicyTerms::getVersionNumberByVersion($versionName)),
                 ['policy' => $policy, 'claims_default_direct_group' => $claimDefaultDirectGroup]
             );
 
-            $this->verifyTerms($data, $pdf);
-            //$this->verifyTerms($data, $pdf, true);
+            $debug = false;
+            //$debug = true;
+            $this->verifyTerms($data, $pdf, $versionName, $debug);
         }
     }
 
-    private function verifyTerms($data, $pdf, $debug = false)
+    private function verifyTerms($data, $pdf, $version, $debug = false)
     {
         $this->assertContains('<body>', $data);
         // remove tags
@@ -157,6 +158,8 @@ class ApiViewControllerTest extends BaseApiControllerTest
         // delete extra spaces, and chunk into 200 chars to make comparision easier
         $data = trim(preg_replace('/\s+/', ' ', $data));
         $pdf = trim(preg_replace('/\s+/', ' ', $pdf));
+        $data = sprintf('%s%s', $data, $version);
+        $pdf = sprintf('%s%s', $pdf, $version);
         $data = chunk_split($data, 200);
         $pdf = chunk_split($pdf, 200);
 
