@@ -29,4 +29,9 @@ class PolicyDiscountRefundPayment extends Payment
     {
         return false;
     }
+
+    public function isDiscount()
+    {
+        return true;
+    }
 }
