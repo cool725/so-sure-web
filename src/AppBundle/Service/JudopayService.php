@@ -325,7 +325,7 @@ class JudopayService
         } elseif ($policy->getStatus() == PhonePolicy::STATUS_ACTIVE) {
             // shouldn't really happen as policy should be in unpaid status
             // but seems to occur on occasion - make sure we credit that policy anyway
-            $this->logger->warning(sprintf(
+            $this->logger->info(sprintf(
                 'Non-token payment is being applied to active policy %s',
                 $policy->getId()
             ));
