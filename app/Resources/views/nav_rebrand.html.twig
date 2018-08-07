@@ -1,8 +1,22 @@
 <nav class="navbar fixed-top justify-content-between flex-nowrap flex-row pl-lg-5">
     <a href="/" class="navbar-brand show-in-nav"><div class="navbar-brand__logo"></div></a>
     <ul class="nav navbar-nav flex-row align-items-center">
-        <li class="nav-item d-none d-lg-block pr-lg-5">
-            <a href="#" class="nav-link">Why so-sure?</a>
+        <li class="nav-item dropdown d-none d-lg-block pr-lg-5">
+            <a href="#"
+               id="whyDropdown"
+               class="nav-link dropdown-toggle"
+               data-toggle="dropdown"
+               aria-haspopup="true"
+               aria-expanded="false"
+               role="button">
+               Why so-sure? <i class="fas fa-chevron-down ml-2 text-blue2"></i>
+            </a>
+            <div class="dropdown-menu" aria-labelledby="whyDropdown">
+                <a class="dropdown-item" href="#">Action</a>
+                <a class="dropdown-item" href="#">Another action</a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="#">Something else here</a>
+            </div>
         </li>
         <li class="nav-item d-none d-lg-block pr-lg-5">
             <a href="{{ path('claim') }}" class="nav-link">Make a claim</a>

@@ -17,12 +17,14 @@
     @include border-radius(15px);
 
     &__body {
-        padding: 2.4rem;
+        padding: 2.4rem 2rem;
     }
 
     &__title {}
 
-    &__text {}
+    &__text {
+        // font-size: 13px;
+    }
 
     @include media-breakpoint-up(lg) {
         width: 300px;
