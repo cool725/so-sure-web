@@ -345,8 +345,12 @@ class ValidatePolicyCommand extends BaseCommand
                 }
             }
 
-            // allow £0.10 difference - no need to warn for a few days off in case of refunds
-            if ($policy->hasCorrectCommissionPayments($data['validateDate'], 0.10) === false) {
+            // allow up to 1 month difference for non-active policies
+            $allowedVariance = Salva::MONTHLY_TOTAL_COMMISSION - 0.01;
+            if ((!$policy->isActive(true) &&
+                $policy->hasCorrectCommissionPayments($data['validateDate'], $allowedVariance) === false) ||
+                ($policy->isActive(true) && $policy->hasCorrectCommissionPayments($data['validateDate']) === false)
+            ) {
                 // Ignore a couple of policies that should have been cancelled unpaid, but went to expired
                 if (!in_array($policy->getId(), [
                     '5960afe142bece15ca46c796',
