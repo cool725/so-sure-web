@@ -27,11 +27,11 @@
         <div class="container">
 
             <h1 class="text-center">Mobile Insurance You Deserve.</h1>
-            <p class="big-text text-center">We're a new type of insurer that’s reliable, rewarding and all together better.</p>
-
             <div class="text-center">
-                <span class="lead"><small>in partnership with</small></span><br>
-                <img src="{{ cdn_url }}/images/logo/so-sure_starling_bank_logo.svg" alt="Starling Bank" width="300px">
+                <p><small>in partnership with</small></p>
+                <p><img src="{{ cdn_url }}/images/logo/so-sure_starling_bank_logo.svg" alt="Starling Bank" width="300px"></p>
+                <p><small>already have an account with so-sure?</small></p>
+                <p><a href="{{ path('fos_user_security_login') }}" class="btn btn-green">Log in to so-sure</a></p>
             </div>
 
             <div class="animated slideInLeft text-center">
@@ -52,8 +52,6 @@
                     })) }}
                 {% endif %}
                 {# End Phone Search #}
-                <h3 class="text-white">or</h3>
-                <a class="btn btn-starling btn-lg" href="{{ path('hwi_oauth_service_redirect', {'service': 'starling'}) }}"><img src="{{ cdn_url }}/images/StarlingMarkIcon.png" height="15px"> &nbsp;Login with Starling</a>
             </div>
         </div>
     </section>

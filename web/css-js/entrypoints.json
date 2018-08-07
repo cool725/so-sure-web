@@ -1,0 +1,29 @@
+{
+  "global": {
+    "js": [
+      "web/runtime.js",
+      "web/global.js"
+    ],
+    "css": [
+      "web/global.css"
+    ]
+  },
+  "homepage": {
+    "js": [
+      "web/runtime.js",
+      "web/homepage.js"
+    ],
+    "css": [
+      "web/homepage.css"
+    ]
+  },
+  "quotepage": {
+    "js": [
+      "web/runtime.js",
+      "web/quotepage.js"
+    ],
+    "css": [
+      "web/quotepage.css"
+    ]
+  }
+}
