@@ -1700,7 +1700,20 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             $history = $logRepo->findBy([
                 'data.imei' => $imei
             ]);
-            $charges = $chargeRepo->findBy(['details' => $imei]);
+            $unsafeCharges = $chargeRepo->findBy(['details' => $imei]);
+            foreach ($unsafeCharges as $unsafeCharge) {
+                try {
+                    // attempt to access user
+                    if ($unsafeCharge->getUser() && $unsafeCharge->getUser()->getName()) {
+                        $charges[] = $unsafeCharge;
+                    }
+                } catch (\Exception $e) {
+                    $user = new User();
+                    $user->setFirstName('Deleted');
+                    $unsafeCharge->setUser($user);
+                    $charges[] = $unsafeCharge;
+                }
+            }
 
             if (!$this->isImei($imei)) {
                 $otherImei = 'unknown - invalid length';

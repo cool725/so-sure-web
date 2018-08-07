@@ -94,7 +94,11 @@
                             </td>
                             <td>
                                 {% if charge.user %}
-                                <a href="{{ path('admin_user', {'id': charge.user.id }) }}">{{ charge.user.name }}</a>
+                                    {% if charge.user.id %}
+                                        <a href="{{ path('admin_user', {'id': charge.user.id }) }}">{{ charge.user.name }}</a>
+                                    {% else  %}
+                                            {{ charge.user.name }}
+                                    {% endif %}
                                 {% else %}
                                     -
                                 {% endif %}
