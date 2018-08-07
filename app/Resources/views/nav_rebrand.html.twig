@@ -1,5 +1,5 @@
 <nav class="navbar fixed-top justify-content-between flex-nowrap flex-row pl-lg-5">
-    <a href="/" class="navbar-brand show-in-nav"><div class="navbar-brand__logo"></div></a>
+    <a href="/" class="navbar-brand show-in-nav show-in-quote"><div class="navbar-brand__logo"></div></a>
     <ul class="nav navbar-nav flex-row align-items-center">
         <li class="nav-item dropdown d-none d-lg-block pr-lg-5">
             <a href="#"
@@ -44,7 +44,7 @@
             </li>
         {% else %}
             <li class="nav-item pr-lg-5">
-                <a id="quote-btn" href="#" class="btn btn-primary btn-sm show-in-nav">Get a Quote</a>
+                <a id="quote-btn" href="#" class="btn btn-primary btn-sm show-in-nav get-a-quote">Get a Quote</a>
             </li>
         {% endif %}
         <li class="nav-item d-none d-lg-block pr-lg-5">
@@ -109,4 +109,6 @@
             </div>
         </div>
     </div>
+    {# Include - Get Quote #}
+    {% include 'AppBundle::Default/getQuote.html.twig' %}
 </nav>
