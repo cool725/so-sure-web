@@ -344,6 +344,11 @@ abstract class Payment
         return true;
     }
 
+    public function isDiscount()
+    {
+        return false;
+    }
+
     public function calculateSplit()
     {
         $gwp = $this->getAmount() / (1 + $this->getPolicy()->getPremium()->getIptRate());
