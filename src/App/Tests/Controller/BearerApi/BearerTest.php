@@ -83,7 +83,7 @@ class BearerTest extends BaseControllerTest
             'clientIdRandom',
             'clientSecret',
             [Oauth2Scopes::USER_STARLING_SUMMARY],
-            []
+            [ 'http://dev.so-sure.net:40080/' ]
         );
         $this->newOauth2AccessToken($dm, $clientToken, $user, $token);
 

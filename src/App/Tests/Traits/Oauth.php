@@ -20,9 +20,6 @@ trait Oauth
         array $grantTypes = [],
         array $redirectUrls = []
     ): Client {
-        $grantTypes = array_merge($grantTypes, []);
-        $redirectUrls = array_merge($redirectUrls, [ '/' ]);  // a 'KNOWN_CLIENT_CALLBACK_URL'
-
         $client = new Client();
 
         // The 'CLIENT_ID' is (*_KEY . '_' . *_RANDOM)

@@ -343,6 +343,21 @@
                 <a href="{{ url('iphone_7_insured_with_your_mobile_network') }}">iPhone 7</a>
                 <a href="{{ url('iphone_7_plus_insured_with_your_mobile_network') }}">iPhone 7+</a>
             </li>
+            <li>
+                Oauth request inbound
+                <a href="{{ url('fos_oauth_server_authorize', {
+                    'client_id': '5b51ec6b636239778924b671_36v22l3ei3wgw0k4wos48kokk0cwsgo0ocggggoc84w0cw8844',
+                    'response_type': 'code',
+                    'state': 'random-string.12345',
+                    'scope': 'user.starling.summary',
+                    'redirect_uri': url('homepage')
+                }) }}">Request Starling summary access</a>. <br/>
+
+            </li>
+            <p>The resulting 'code' (from the oauth/auth URL) can be used with
+                <code title="see: src/AppBundle/DataFixtures/MongoDB/d/Oauth2/LoadOauth2Data.php">client_secret=...</code> and <code>grant_type=authorization_code</code> to get a bearer token.
+                You can also get the token via Postman for API tests, or create your own by writing a
+                <code title="example: App\Tests\Controller\BearerApi\BearerTest::testAuthenticatedComplexUser()">\App\Tests\Traits\Oauth::newOauth2AccessToken()</code> record yourself.</p>
         </ul>
     </section>
 </div>

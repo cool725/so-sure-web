@@ -1281,7 +1281,7 @@ fos_oauth_server:
     service:
         user_provider: fos_user.user_provider
         options:
-            supported_scopes: read
+            supported_scopes: user.starling.summary
             # Changing tokens and authcode lifetime
             # 6 months
             access_token_lifetime: 15768000
@@ -1289,3 +1289,4 @@ fos_oauth_server:
             refresh_token_lifetime: 1209600
             # initial request to getting a token
             auth_code_lifetime: 120
+

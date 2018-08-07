@@ -1,6 +1,9 @@
 <?php
 namespace App;
 
+/*
+ * All scopes must be listed in config.yml: fos_oauth_server.service.options.supported_scopes:
+ */
 final class Oauth2Scopes
 {
     /*public */const USER_STARLING_SUMMARY = 'user.starling.summary';
