@@ -48,14 +48,18 @@ $(function() {
 
     // Add navbar background if page reloads not at the top
     $(window).on('load', function(e) {
-        if ($(this).scrollTop() > 5) {
-            nav.addClass('navbar-scrolled');
+        if (!$('body').hasClass('quote')) {
+            if ($(this).scrollTop() > 5) {
+                nav.addClass('navbar-scrolled');
+            }
         }
     });
 
     // Scroll - Add navbar background on scroll
     $(window).scroll(function(e) {
-        nav.toggleClass('navbar-scrolled', $(this).scrollTop() > 5);
+        if (!$('body').hasClass('quote')) {
+            nav.toggleClass('navbar-scrolled', $(this).scrollTop() > 5);
+        }
     });
 
 });

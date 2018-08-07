@@ -93,7 +93,7 @@ $(function() {
         memory.on('change', function() {
 
             if ($(this).val() != '') {
-                button.prop('disabled', '').removeClass('btn-outline-white').addClass('btn-success btn-shadow');
+                button.prop('disabled', '').removeClass('btn-outline-white').addClass('btn-success btn-shadow btn-gradient-green');
             } else {
                 button.prop('disabled', 'disabled').removeClass('btn-success btn-shadow').addClass('btn-outline-white');
             }

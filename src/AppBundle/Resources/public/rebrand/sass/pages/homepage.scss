@@ -9,15 +9,8 @@
 
 .hero {
     position: relative;
-    // z-index: 2;
     padding-top: 8rem;
     padding-bottom: 4rem;
-
-
-    // .container {
-    //     position: relative;
-    //     // z-index: 5;
-    // }
 
     &__intro {
         @include media-breakpoint-up(lg) {
@@ -44,29 +37,6 @@
 
     @include media-breakpoint-up(lg) {
 
-        // .curve {
-        //     width: 100%;
-        //     position: absolute;
-        //     z-index: 3;
-        //     top: 0; right: 0; bottom: 0; left: 0;
-        //     background: transparent url('#{$cdn_url}/images/rebrand/homepage/so-sure_lg-hero-curve.svg') no-repeat;
-        //     background-size: cover;
-        // }
-
-        // svg {
-        //     position: absolute;
-        //     bottom: 0; left: 0;
-        //     z-index: 4;
-        // }
-
-        // .curve-2 {
-        //     width: 100%;
-        //     position: absolute;
-        //     z-index: 4;
-        //     right: 0; bottom: 0; left: 0;
-        //     background: transparent url('#{$cdn_url}/images/rebrand/homepage/so-sure_lg-hero-curve-bottom.svg') no-repeat;
-        //     background-size: cover;
-        // }
     }
 
 }
@@ -130,11 +100,6 @@
 
     &__illustration-mobile {
         position: relative;
-
-        img {
-            // left: 50%;
-            // margin-left: -200px;
-        }
     }
 }
 

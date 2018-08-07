@@ -4,9 +4,11 @@
 {% set body_class = 'quote' %}
 {% set quote_mode = 1 %}
 
-{% block title %}so-sure - Welcome to Social Insurance{% endblock %}
+{% block title %}{{ phone.model }} Insurance - {{ phone.make }} - Welcome to Social Insurance{% endblock %}
 {% block meta %}
     <meta name="description" content="Social mobile phone insurance that's better and up to 80% cheaper when you connect with friends and don't claim. Download our app now to see how much you could save."/>
+    <meta name="description" content="For a small monthly fee your phone is covered for theft, loss, accidental damage and unauthorised usage."/>
+    <link rel="canonical" href="{{ url('quote_make_model', {'make': phone.makeCanonical, 'model': phone.encodedModelCanonical}) }}" />
 {% endblock %}
 
 {% block cssPage %}
@@ -15,7 +17,77 @@
 
 {% block body %}
 
-    QUOTEPAGE
+    <section class="quote">
+        <div class="d-lg-flex">
+            <div class="quote__details-container d-lg-flex align-items-center p-5">
+                <div class="quote__details pl-lg-5">
+                    <div class="text-white mb-3 h5">Here’s your quote details, Insure your:</div>
+                    <h1 class="text-blue1 mb-3">{{ phone.make }} {{ phone.model }} <small>({{ phone.memory }}GB)</small></h1>
+                    <div class="text-white h1 mb-5">For only &pound;{{ phone_price.monthlyPremiumPrice }} a month</div>
+                    {{ form_start(buy_form) }}
+                        {{ form_widget(buy_form.buy_tablet, {
+                            'label': 'Get Started',
+                            'attr': {
+                                'class': 'btn btn-success btn-shadow btn-gradient-green'
+                            }})
+                        }}
+                    {{ form_end(buy_form) }}
+                </div>
+            </div>
+            <div class="quote__cover p-5">
+                <h4 class="text-blue2 mb-4">Cover Overview:</h4>
+                <ul class="list-unstyled icn-list">
+                    <li class="mb-4">
+                        <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_accidental-damage-icn.svg" alt="so-sure - Accidental damage" width="30px" class="mr-2">
+                        <strong class="text-blue4">Cracked screens</strong>
+                    </li>
+                    <li class="mb-4">
+                        <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_theft-loss-icn.svg" alt="so-sure - Theft or loss" width="30px" class="mr-2">
+                        <strong class="text-blue4">Theft or loss</strong>
+                    </li>
+                    <li class="mb-4">
+                        <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_broken-phone-icn.svg" alt="so-sure - Water damage" width="30px" class="mr-2">
+                        <strong class="text-blue4">Water damage</strong>
+                    </li>
+                    <li class="mb-4">
+                        <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_travel-icn.svg" alt="so-sure - Travel Cover" width="30px" class="mr-2">
+                        <strong class="text-blue4">International travel</strong>
+                    </li>
+                    <li class="mb-4">
+                        <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_out-of-warranty-icn.svg" alt="so-sure - Out of Warranty Breakdown" width="30px" class="mr-2">
+                        <strong class="text-blue4">Out-of-warranty breakdowns</strong>
+                    </li>
+                    <li class="mb-5">
+                        <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_broken-phone-icn.svg" alt="so-sure - Broken headphone jack" width="30px" class="mr-2">
+                        <strong class="text-blue4">Broken headphone jack</strong>
+                    </li>
+                </ul>
+                <h4 class="text-blue2 my-4">We also offer:</h4>
+                <ul class="list-unstyled icn-list">
+                    <li class="mb-4">
+                        <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_happy-icn-min.svg" alt="so-sure - Accidental damage" width="30px" class="mr-2">
+                        <strong class="text-blue4">24-72 hour replacement <span class="ml-2 text-blue2"><i class="far fa-question-circle"></i></span></strong>
+                    </li>
+                    <li class="mb-4">
+                        <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_happy-icn-min.svg" alt="so-sure - Accidental damage" width="30px" class="mr-2">
+                        <strong class="text-blue4">Instant cover after purchase</strong>
+                    </li>
+                    <li class="my-4">
+                        <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_happy-icn-min.svg" alt="so-sure - Accidental damage" width="30px" class="mr-2">
+                        <strong class="text-blue4">Up to 80% cashback every year <span class="ml-2 text-blue2"><i class="far fa-question-circle"></i></span></strong>
+                    </li>
+                </ul>
+                {{ form_start(buy_form_banner) }}
+                    {{ form_widget(buy_form_banner.buy, {
+                        'label': 'Get Started',
+                        'attr': {
+                            'class': 'btn btn-success btn-shadow btn-gradient-green'
+                        }})
+                    }}
+                {{ form_end(buy_form_banner) }}
+            </div>
+        </div>
+    </section>
 
 {% endblock %}
 

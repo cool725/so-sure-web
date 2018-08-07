@@ -16,8 +16,18 @@
     }
 }
 
-// Modify list to handle fa icons
 .icn-list {
+
+    li {
+
+        img {
+            vertical-align: middle;
+        }
+    }
+}
+
+// Modify list to handle fa icons
+.fa-list {
 
     &-fa {
 

@@ -7,61 +7,29 @@
 @import "../abstracts/palette";
 @import "../abstracts/variables";
 
+body {
+    background-color: $blue-2;
+    @include linear-gradient(180deg, $blue-3, $blue-1);
+}
 
-// body {
-//     position: relative;
-// }
+.quote {
+    position: relative;
 
-// .section {
+    &__details-container {
 
-//     &__hero {
-//         height: 630px;
-//         text-align: center;
-//         padding-top: 100px;
-//         position: relative;
+        @include media-breakpoint-up(lg) {
+            width: 60vw; height: 100vh;
+        }
+    }
 
-//         // @include linear-gradient(90deg, $blue-d, $blue-1);
+    &__cover {
+        background-color: $white;
 
-//         @include media-breakpoint-up(md) {
-//             height: 530px;
-//         }
-
-//         @include media-breakpoint-up(lg) {
-//             padding-top: 150px;
-//         }
-
-//         &_controls {
-//             position: relative;
-//             z-index: 100;
-//         }
-
-//         &_curve {
-//             position: absolute;
-//             bottom: 0; left: 0;
-//             z-index: 10;
-//         }
-//     }
-
-//     &__cover {}
-
-//     &__video {
-//         position: relative;
-
-//         @include linear-gradient(90deg, $blue-d, $blue-1);
-
-
-//         &_curve {
-//             position: absolute;
-//             bottom: 0; left: 0;
-//             z-index: 10;
-//         }
-//     }
-
-//     &__reward-pot {
-
-//     }
-
-//     &__lead {
-//         @include linear-gradient(90deg, $blue-d, $blue-1);
-//     }
-// }
+        @include media-breakpoint-up(lg) {
+            width: 40vw; height: 100vh;
+            // width: 30%;
+            // position: fixed;
+            // top: 0; right: 0; bottom: 0;
+        }
+    }
+}

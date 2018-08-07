@@ -1,8 +1,10 @@
 <nav class="navbar fixed-top justify-content-between flex-nowrap flex-row pl-lg-5">
-    <a href="/" class="navbar-brand show-in-nav show-in-quote">
+    <a href="/jc" class="navbar-brand show-in-nav show-in-quote">
         <div class="navbar-brand__logo {% if quote_mode is defined and quote_mode == 1 %}navbar-brand__logo-white-light{% endif %}"></div>
     </a>
-    {% if not quote_mode is defined and not quote_mode == 1 %}
+    {% if quote_mode is defined and quote_mode == 1 %}
+        {# Hide the nav #}
+    {% else %}
         <ul class="nav navbar-nav flex-row align-items-center">
             <li class="nav-item dropdown d-none d-lg-block pr-lg-5">
                 <a href="#"
