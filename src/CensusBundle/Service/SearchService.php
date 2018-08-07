@@ -34,6 +34,8 @@ class SearchService
             return true;
         } elseif ($code == "ZZ99 3CZ") {
             return false;
+        } elseif (!$code || mb_strlen($code) == 0) {
+            return false;
         }
 
         /** @var PostCodeRepository $postcodeRepo */
