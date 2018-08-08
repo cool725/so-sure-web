@@ -21,58 +21,171 @@
         <div class="d-lg-flex">
 
             <div class="quote__details__container">
-                <div class="quote__details px-lg-5">
-                    <div class="text-white mb-4 h5">Here’s your quote details, Insure your:</div>
-                    <h1 class="text-blue1 mb-2">
+                <div class="quote__details px-4 pb-5 px-xl-5 pb-xl-0">
+                    <div class="quote__h5 text-white mb-4 h5">Here’s your quote details, Insure your:</div>
+                    <h1 class="quote__h1 text-blue1 mb-2">
                         <span class="sub">
                             {{ phone.make }} {{ phone.model }}
                             <small>({{ phone.memory }}GB)</small>
                         </span>
                     </h1>
-                    <div class="text-white h1 mb-4"><span class="sub">For only</span> &pound;{{ phone_price.monthlyPremiumPrice }} a month</div>
+                    <div class="quote__h1 text-white h1 mb-4"><span class="sub">For only</span> &pound;{{ phone_price.monthlyPremiumPrice }} a month</div>
                     {{ form_start(buy_form) }}
                         {{ form_widget(buy_form.buy_tablet, {
                             'label': 'Get Started',
                             'attr': {
-                                'class': 'btn btn-success btn-shadow btn-gradient-green'
+                                'class': 'btn btn-success btn-shadow btn-gradient-green  btn-block-xs'
                             }})
                         }}
                     {{ form_end(buy_form) }}
-                    <div class="quote__footer d-lg-flex justify-content-lg-between align-items-lg-center mt-5">
+                    <div class="quote__footer d-none d-lg-flex justify-content-lg-between align-items-lg-center mt-5">
                         <div class="quote__footer__text">
                             <h5 class="text-white">The higest level of cover!</h5>
                             <p class="text-blue1">We offer the markets highest level of cover</p>
                         </div>
-                        <a id="quote_info_toggle" href="#quote_info" class="btn btn-outline-white"><span>See full policy</span> <i class="fas fa-caret-down"></i></a>
+                        <a href="#quote_info"
+                           class="btn btn-outline-blue1"
+                           data-toggle="collapse"
+                           role="button"
+                           aria-expanded="false"
+                           aria-controls="quote_info"><span>See full policy</span>
+                           <i class="fas fa-caret-down"></i></a>
                     </div>
                 </div>
-                <div class="quote__info mx-lg-5 py-5 mt-5">
-                    <div class="h1 text-white">{{ phone.make }} {{ phone.model }}
-                            <small>({{ phone.memory }}GB)</small></div>
-                    <div class="h1 text-blue1 mb-5">Full Cover Details</div>
-                    <h4 class="text-blue1 mb-4">What's covered:</h4>
-                    <ul class="list-unstyled icn-fa-list">
-                        <li class="text-white mb-3"><i class="fas fa-check text-blue1 fa-lg"></i> Loss</li>
-                        <li class="text-white mb-3"><i class="fas fa-check text-blue1 fa-lg"></i> Accidental Damage, including water damage &amp; cracked screens</li>
-                        <li class="text-white mb-3"><i class="fas fa-check text-blue1 fa-lg"></i> 90 days global travel</li>
-                        <li class="text-white mb-3"><i class="fas fa-check text-blue1 fa-lg"></i> Out of warranty breakdown</li>
-                        <li class="text-white mb-3"><i class="fas fa-check text-blue1 fa-lg"></i> Unauthorised network charges up the value of £1000 (inc VAT)</li>
-                        <li class="text-white mb-3"><i class="fas fa-check text-blue1 fa-lg"></i> Accessories up to the value of £100 (inc VAT) for theft of loss claims</li>
-                        <li class="text-white mb-5"><i class="fas fa-check text-blue1 fa-lg"></i> Cover for phones up to 3 years old, including second hand and refurbished devices</li>
-                    </ul>
-                    <h4 class="text-blue1 my-4">What's not covered:</h4>
-                    <ul class="list-unstyled icn-fa-list">
-                        <li class="text-white mb-3"><i class="fas fa-times text-blue1 fa-lg"></i> Theft, Loss, Accidental Damage or Breakdown where you have knowingly put your phone at risk</li>
-                        <li class="text-white mb-3"><i class="fas fa-times text-blue1 fa-lg"></i> 3+ claims for Loss and/or Theft in any policy year</li>
-                    </ul>
-                </div>
-                <div class="quote__info mx-lg-5 py-5 mt-5">
-                    <h4 class="text-blue1 mb-4">Here’s how we compare to competitors:</h4>
-                </div>
-                <div class="quote__info mx-lg-5 py-5 mt-5">
-                    <h4 class="text-blue1 mb-4">Here’s how we compare to other insurers:</h4>
+                <div id="quote_info" class="quote__info__container collapse">
+                    <div class="quote__info mx-5 py-5">
+                        <div class="h1 text-white">{{ phone.make }} {{ phone.model }}
+                                <small>({{ phone.memory }}GB)</small></div>
+                        <div class="h1 text-blue1 mb-5">Full Cover Details</div>
+                        <h4 class="text-blue1 mb-4">What's covered:</h4>
+                        <ul class="list-unstyled icn-fa-list">
+                            <li class="text-white mb-3"><i class="fas fa-check text-blue1 fa-lg"></i> Loss</li>
+                            <li class="text-white mb-3"><i class="fas fa-check text-blue1 fa-lg"></i> Accidental Damage, including water damage &amp; cracked screens</li>
+                            <li class="text-white mb-3"><i class="fas fa-check text-blue1 fa-lg"></i> 90 days global travel</li>
+                            <li class="text-white mb-3"><i class="fas fa-check text-blue1 fa-lg"></i> Out of warranty breakdown</li>
+                            <li class="text-white mb-3"><i class="fas fa-check text-blue1 fa-lg"></i> Unauthorised network charges up the value of &pound;1000 (inc VAT)</li>
+                            <li class="text-white mb-3"><i class="fas fa-check text-blue1 fa-lg"></i> Accessories up to the value of £100 (inc VAT) for theft of loss claims</li>
+                            <li class="text-white mb-5"><i class="fas fa-check text-blue1 fa-lg"></i> Cover for phones up to 3 years old, including second hand and refurbished devices</li>
+                        </ul>
+                        <h4 class="text-blue1 my-4">What's not covered:</h4>
+                        <ul class="list-unstyled icn-fa-list">
+                            <li class="text-white mb-3"><i class="fas fa-times text-blue1 fa-lg"></i> Theft, Loss, Accidental Damage or Breakdown where you have knowingly put your phone at risk</li>
+                            <li class="text-white mb-3"><i class="fas fa-times text-blue1 fa-lg"></i> 3+ claims for Loss and/or Theft in any policy year</li>
+                        </ul>
+                    </div>
+                    <div class="quote__info mx-5 py-5">
+                        <h4 class="text-blue1 mb-4">Here’s how we compare to competitors:</h4>
+                        {# TODO: Competitors table #}
+                    </div>
+                    <div class="quote__info mx-5 py-5">
+                        <h4 class="text-blue1 mb-4">Here’s how we compare to other insurers:</h4>
+                        <div class="row no-gutters">
+                            <div class="col-xl-6">
+                                <table class="table-list mx-auto mb-5 table-list__insurers">
+                                    <thead>
+                                        <tr>
+                                            <th class="table-list__header h4 text-white">Traditional Insurers</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td class="py-3 px-4">
+                                                <span class="table-list__icn table-list__icn-dark text-white">4-18 days wait on average</span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="py-3 px-4">
+                                                <span class="table-list__icn table-list__icn-dark text-white">Cover starts after 14 days</span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="py-3 px-4">
+                                                <span class="table-list__icn table-list__icn-dark text-white">Only phones purchased within  30 days are covered</span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="py-3 px-4">
+                                                <span class="table-list__icn table-list__icn-dark text-white">You'll need to have a law degree  to understand the terms</span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="py-3 px-4 border-fix">
+                                                <span class="table-list__icn table-list__icn-dark text-white">Unnecessarily expensive</span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="col-xl-6">
+                                <table class="table-list mx-auto mb-5 table-list__so-sure">
+                                    <thead>
+                                        <tr>
+                                            <th class="table-list__header h4 text-white blue-gradient-ld"><img src="{{ cdn_url }}/images/rebrand/logo/so-sure_logo-white-light.svg" width="130px"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td class="py-3 px-4">
+                                                <span class="table-list__icn table-list__icn-happy"><strong>24-72 hour replacement once claim approved</strong></span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="py-3 px-4">
+                                                <span class="table-list__icn table-list__icn-happy"><strong>Immediate cover</strong></span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="py-3 px-4">
+                                                <span class="table-list__icn table-list__icn-happy"><strong>Refurbished and second-hand devices up to 3 years old covered</strong></span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="py-3 px-4">
+                                                <span class="table-list__icn table-list__icn-happy"><strong>Plain English Terms &amp; Conditions</strong></span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="py-3 px-4">
+                                                <span class="table-list__icn table-list__icn-happy"><strong>We’re up to 40% cheaper</strong></span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <p class="text-blue1"><small>*FCA report Dec 2015</small></p>
+                    </div>
+                    <div class="quote__info mx-5 py-5">
+                        <div class="media">
+                            <img src="http://via.placeholder.com/150x150" class="rounded-circle mr-5">
+                            <div class="media-body text-white px-5">
+                                <h4 class="mt-0 mb-4 text-blue1">Excess</h4>
+                                <p class="mb-5">Our excess is as low as &pound;50 for accidental damage and &pound;70 for loss and theft when you validate your phone with our app. If you don't validate your phone with our app the standard excess is &pound;150</p>
+                                <a href="#" class="btn btn-outline-blue1">Find out more</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="quote__info mx-5 py-5">
+                        <div class="media">
+                            <img src="http://via.placeholder.com/150x150" class="rounded-circle mr-5">
+                            <div class="media-body text-white px-5">
+                                <h4 class="mt-0 mb-4 text-blue1">Cashback and Social Insurance</h4>
+                                <p>Get up to 80% cashback every year when you and your friends don’t claim.</p>
+                                <h5 class="text-blue1">How?</h5>
+                                <p class="mb-5">Connect to friends/family and each receive up to £10 in your individual Reward Pots. At the end of the year, when you and your connections haven’t claimed, your Reward Pot is paid out to you</p>
+                                <a href="#" class="btn btn-outline-blue1 mr-lg-2"><i class="far fa-play-circle fa-lg"></i> Watch video</a>
+                                <a href="#" class="btn btn-outline-blue1">Find out more</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="quote__info mx-5 py-5">
+                        <h4 class="text-blue1 mb-4">Top FAQ's</h4>
+                        {# TODO: Collapse #}
+                    </div>
                 </div>
             </div>
+
+            {# TODO: Curve #}
 
             <div class="quote__cover p-5">
                 <h4 class="text-blue2 mb-4">Cover Overview:</h4>
@@ -107,6 +220,7 @@
                     <li class="mb-4">
                         <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_happy-icn-min.svg" alt="so-sure - Accidental damage" width="30px" class="mr-2">
                         <strong class="text-blue4">24-72 hour replacement <span class="ml-2 text-blue2"><i class="far fa-question-circle"></i></span></strong>
+                        {# TODO: info popup #}
                     </li>
                     <li class="mb-4">
                         <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_happy-icn-min.svg" alt="so-sure - Accidental damage" width="30px" class="mr-2">
@@ -115,16 +229,12 @@
                     <li class="my-4">
                         <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_happy-icn-min.svg" alt="so-sure - Accidental damage" width="30px" class="mr-2">
                         <strong class="text-blue4">Up to 80% cashback every year <span class="ml-2 text-blue2"><i class="far fa-question-circle"></i></span></strong>
+                        {# TODO: info popup #}
                     </li>
                 </ul>
-                {{ form_start(buy_form_banner) }}
-                    {{ form_widget(buy_form_banner.buy, {
-                        'label': 'Get Started',
-                        'attr': {
-                            'class': 'btn btn-success btn-shadow btn-gradient-green'
-                        }})
-                    }}
-                {{ form_end(buy_form_banner) }}
+                <div class="quote__cover__footer">
+                    <a class="btn btn-primary btn-gradient btn-block d-block d-sm-block d-md-none"><span>See full policy</span> <i class="fas fa-caret-down"></i></a>
+                </div>
             </div>
 
         </div>

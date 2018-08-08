@@ -15,6 +15,19 @@ body {
 .quote {
     position: relative;
 
+    &__h1 {
+        @include media-breakpoint-down(xs) {
+            font-size: 1.5rem;
+        }
+
+    }
+
+    &__h5 {
+        @include media-breakpoint-down(xs) {
+            font-size: 1rem;
+        }
+    }
+
     &__details__container {
 
         @include media-breakpoint-up(lg) {
@@ -24,7 +37,7 @@ body {
     }
 
     &__details {
-        padding-top: 4rem;
+        padding-top: 6rem;
 
         @include media-breakpoint-up(lg) {
             padding-top: 12rem;
@@ -34,6 +47,8 @@ body {
     &__footer {
         @include media-breakpoint-up(lg) {
             padding-top: 8rem;
+
+            //TODO: This is terrible needs positioning
         }
     }
 
@@ -45,6 +60,45 @@ body {
 
         &:first-of-type {
             border-top: none;
+        }
+
+        .table-list {
+            width: 384px;
+            position: relative;
+
+            &__header {
+                background-color: $blue-4;
+            }
+
+            &__insurers {
+                tr {
+                    td {
+                        background-color: $blue-2;
+                        border-bottom-color: rgba(255, 255, 255, 0.1);
+                    }
+
+                    td.border-fix {
+                        border-bottom-left-radius: 15px;
+                    }
+                }
+            }
+
+            &__icn-dark {
+                background-image: url('#{$cdn_url}/images/rebrand/icns/so-sure_unhappy-dark-icn.svg');
+            }
+
+            @include media-breakpoint-up(xl) {
+
+                &__insurers {
+                    z-index: 10;
+                }
+
+                &__so-sure {
+                    width: 400px;
+                    transform: translateX(-25px);
+                    z-index: 11;
+                }
+            }
         }
     }
 

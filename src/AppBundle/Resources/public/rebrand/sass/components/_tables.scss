@@ -23,6 +23,13 @@
             td {
                 height: 90px;
                 vertical-align: middle;
+                border-bottom: 1px solid transparent;
+            }
+
+            &:last-of-type {
+                td {
+                    border-bottom: 0;
+                }
             }
         }
     }
@@ -33,6 +40,7 @@
         background-image: url('#{$cdn_url}/images/rebrand/icns/so-sure_unhappy-icn.svg');
         background-repeat: no-repeat;
         background-position: left center;
+        background-size: 30px;
         overflow: visible;
     }
 

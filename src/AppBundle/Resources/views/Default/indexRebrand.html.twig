@@ -67,7 +67,7 @@
                     <a href="#" class="btn btn-primary btn-shadow btn-gradient btn-block-xs get-a-quote">Insure your phone in minutes</a>
                 </div>
                 <div class="col-lg-6">
-                    <dl class="tick-list">
+               {#      <dl class="tick-list">
                         <dt class="h5 text-blue4">Up to 80% money back</dt>
                         <dd>
                             <p>We’re an insurer that’s focused on people, not profits. We saw an opportunity to make insurance better.</p>
@@ -88,7 +88,7 @@
                         <dd>
                             <p>We’re an insurer that’s focused on people, not profits. We saw an opportunity to make insurance better. </p>
                         </dd>
-                    </dl>
+                    </dl> #}
                 </div>
             </div>
         </div>
@@ -265,7 +265,8 @@
                     <p>Insurance has become a distrusted, process driven industry because of pesky dishonest people that make life worse for everyone by making fake claims (trust us it happens a lot). </p>
                     <p class="pb-4">So we decided to do something about it and protect honest customers by developing clever technology that detects your phone is in working order in a matter of seconds. </p>
 
-                    {# TODO: Here's how it works #}
+                    {# TODO: Here's how it works collapse #}
+
                     <ul class="list-inline">
                         <li class="list-inline-item">
                             <a class="ga-outbound-click" data-clicklabel="iTunes" href="{{ apple_download('app-section') }}" target="_blank" rel="noopener">
@@ -364,7 +365,7 @@
                 <table class="table-list mx-md-auto mx-lg-0 mb-5 table-list__so-sure">
                     <thead>
                         <tr>
-                            <th class="table-list__header h4 text-white blue-gradient-ld">so-sure</th>
+                            <th class="table-list__header h4 text-white blue-gradient-ld"><img src="{{ cdn_url }}/images/rebrand/logo/so-sure_logo-white-light.svg" width="130px"></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -414,24 +415,23 @@
                                 <li class="list-inline-item"><i class="fas fa-star fa-lg text-primary"></i></li>
                             </ul>
                             <p class="lead py-4">"My so-sure claim was super fast and everyone was really friendly! Based on previous phone insurance experiences, I can honestly say this truly is a revolution"</p>
-                            <div class="d-lg-flex justify-content-lg-between">
-                                <div class="review__footer">
-                                    <span class="h5 text-blue4 mr-2">Nick Waller</span> <strong class="text-primary">|</strong> <span class="ml-2">so-sure customer</span>
-                                </div>
-                                <div class="review__controls my-4 my-lg-0">
-                                    <ul class="list-inline">
-                                        <li class="list-inline-item"><a href="#"><i class="fas fa-long-arrow-alt-left fa-2x"></i></a></li>
-                                        <li class="list-inline-item"><a href="#"><i class="fas fa-long-arrow-alt-right fa-2x"></i></a></li>
-                                    </ul>
-                                </div>
+                            <div class="review__footer mb-4">
+                                <span class="h5 text-blue4 mr-2">Nick Waller</span> <strong class="text-primary">|</strong> <span class="ml-2">so-sure customer</span>
+                            </div>
+                            <div class="review__controls">
+                                <ul class="list-inline">
+                                    <li class="list-inline-item">
+                                        <a href="#" class=""><i class="fas fa-long-arrow-alt-left fa-2x"></i></a>
+                                    </li>
+                                    <li class="list-inline-item">
+                                        <a href="#" class=""><i class="fas fa-long-arrow-alt-right fa-2x"></i></a>
+                                    </li>
+                                </ul>
                             </div>
                         </div>
                     </div>
                     <div class="reviews__image__mobile my-5 d-block d-lg-none">
                         <img src="{{ cdn_url }}/images/rebrand/homepage/so-sure_review-image.png" alt="so-sure - pic-sure" width="500px">
-                    </div>
-                    <div class="text-center text-lg-left">
-                        <a href="#" class="btn btn-primary btn-shadow btn-gradient btn-block-xs">See more reviews</a>
                     </div>
                 </div>
             </div>
