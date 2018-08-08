@@ -31,8 +31,8 @@ security:
             pattern:    ^/bearer-api
             fos_oauth: true
             stateless: true
-            anonymous: true
-            provider: fos_userbundle
+            anonymous: false
+
         oauth_token:
             pattern:    ^/oauth/v2/token
             security:   false

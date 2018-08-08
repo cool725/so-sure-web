@@ -1187,16 +1187,6 @@ class UserController extends BaseController
         $oauth2FlowParams = null;
         $session = $request->getSession();
         if ($session && $session->has('oauth2Flow')) {
-            $firewallName = $this->getParameter('fos_user.firewall_name');
-            $this->get('logger')->notice(
-                'Logging into main firewall',
-                [
-                    'alt' => $firewallName,
-                ]
-            );
-            $this->get('fos_user.security.login_manager')->logInUser($firewallName, $user);
-            $this->get('logger')->notice('(re-?) Logged into firewall');
-
             $url = $session->get('oauth2Flow.targetPath');
             $query = parse_url($url, PHP_URL_QUERY);
             parse_str($query, $oauth2FlowParams);
