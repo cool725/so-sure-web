@@ -71,7 +71,8 @@ class BearerTest extends BaseControllerTest
 
     public function testAuthenticatedComplexUser()
     {
-        $user = $this->generateUserWithTwoPolicies(12.50);
+        $rewardPotValue = 12.50;
+        $user = $this->generateUserWithTwoPolicies($rewardPotValue);
 
         $token = 'accessToken' . random_int(1, 1E7);
         $dm = self::$container->get('doctrine.odm.mongodb.document_manager');
@@ -99,6 +100,6 @@ class BearerTest extends BaseControllerTest
         $this->assertContains('Foo Bar', $content);
 
         $summary = json_decode($content, true);
-        $this->assertSummaryMatchesUserWithTwoPolicies($summary);
+        $this->assertSummaryMatchesUserWithTwoPolicies($summary, $rewardPotValue);
     }
 }

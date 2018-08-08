@@ -31,7 +31,7 @@ class PolicyNormalizer implements NormalizerInterface, SerializerAwareInterface
         $format = $format;
         $groups = array_flip($context["groups"]);
 
-        if (isset($groups[Oauth2Scopes::USER_STARLING_SUMMARY])) {
+        if (isset($groups[Oauth2Scopes::USER_STARLING_SUMMARY]) && $object->isActive()) {
             return [
                 'policyNumber' => $object->getPolicyNumber(),
                 'endDate' => $object->getEnd()->format('Y-m-d'),

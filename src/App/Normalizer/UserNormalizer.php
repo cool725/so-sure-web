@@ -28,9 +28,12 @@ class UserNormalizer implements NormalizerInterface, SerializerAwareInterface
     public function normalize($object, $format = null, array $context = [])
     {
         if (in_array(Oauth2Scopes::USER_STARLING_SUMMARY, $context['groups'])) {
+            $policies = $this->serializer->normalize($object->getPolicies(), $format, $context);
+            $policies = array_filter($policies);
+
             return [
                 'name' => $object->getName(),
-                'policies' => $this->serializer->normalize($object->getPolicies(), $format, $context),
+                'policies' => $policies,
             ];
         }
 

@@ -8,8 +8,6 @@ trait UserCreation
 {
     use \AppBundle\Tests\UserClassTrait;
 
-    private $rewardPotValue;
-
     /**
      * Make a user, with a policy
      *
@@ -17,8 +15,6 @@ trait UserCreation
      */
     public function generateUserWithTwoPolicies(float $rewardPotValue = 0): User
     {
-        $this->rewardPotValue = $rewardPotValue;
-
         $email = self::generateEmail('testUser'.random_int(PHP_INT_MIN, PHP_INT_MAX), $this);
         $password = 'foo';
         $phone = self::getRandomPhone(self::$dm);
@@ -32,7 +28,7 @@ trait UserCreation
         );
         $policy = self::initPolicy($user, self::$dm, $phone, null, true, true);
         $policy->setStatus(Policy::STATUS_ACTIVE);
-        $policy->setPotValue($this->rewardPotValue);
+        $policy->setPotValue($rewardPotValue);
 
         self::$dm->flush();
 
@@ -47,7 +43,7 @@ trait UserCreation
         return $user;
     }
 
-    protected function assertSummaryMatchesUserWithTwoPolicies(array $summary)
+    protected function assertSummaryMatchesUserWithTwoPolicies(array $summary, float $rewardPotValue = 0)
     {
         $this->assertNotNull($summary);
         $this->assertNotEmpty($summary);
@@ -63,7 +59,7 @@ trait UserCreation
 
             # Not yet adding connections
         $this->assertEquals(
-            $this->rewardPotValue,
+            $rewardPotValue,
             $policy['rewardPot'],
             'Expected the reward pot to have a value',
             0.02    // float delta
