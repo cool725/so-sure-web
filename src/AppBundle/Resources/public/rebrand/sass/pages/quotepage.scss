@@ -15,10 +15,36 @@ body {
 .quote {
     position: relative;
 
-    &__details-container {
+    &__details__container {
 
         @include media-breakpoint-up(lg) {
             width: 60vw; height: 100vh;
+            overflow-y: scroll;
+        }
+    }
+
+    &__details {
+        padding-top: 4rem;
+
+        @include media-breakpoint-up(lg) {
+            padding-top: 12rem;
+        }
+    }
+
+    &__footer {
+        @include media-breakpoint-up(lg) {
+            padding-top: 8rem;
+        }
+    }
+
+    &__info {
+        // display: none;
+        // height: 90vh;
+
+        border-top: 2px solid $blue-1;
+
+        &:first-of-type {
+            border-top: none;
         }
     }
 
@@ -27,9 +53,6 @@ body {
 
         @include media-breakpoint-up(lg) {
             width: 40vw; height: 100vh;
-            // width: 30%;
-            // position: fixed;
-            // top: 0; right: 0; bottom: 0;
         }
     }
 }

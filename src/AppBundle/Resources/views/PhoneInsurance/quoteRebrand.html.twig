@@ -19,11 +19,17 @@
 
     <section class="quote">
         <div class="d-lg-flex">
-            <div class="quote__details-container d-lg-flex align-items-center p-5">
-                <div class="quote__details pl-lg-5">
-                    <div class="text-white mb-3 h5">Here’s your quote details, Insure your:</div>
-                    <h1 class="text-blue1 mb-3">{{ phone.make }} {{ phone.model }} <small>({{ phone.memory }}GB)</small></h1>
-                    <div class="text-white h1 mb-5">For only &pound;{{ phone_price.monthlyPremiumPrice }} a month</div>
+
+            <div class="quote__details__container">
+                <div class="quote__details px-lg-5">
+                    <div class="text-white mb-4 h5">Here’s your quote details, Insure your:</div>
+                    <h1 class="text-blue1 mb-2">
+                        <span class="sub">
+                            {{ phone.make }} {{ phone.model }}
+                            <small>({{ phone.memory }}GB)</small>
+                        </span>
+                    </h1>
+                    <div class="text-white h1 mb-4"><span class="sub">For only</span> &pound;{{ phone_price.monthlyPremiumPrice }} a month</div>
                     {{ form_start(buy_form) }}
                         {{ form_widget(buy_form.buy_tablet, {
                             'label': 'Get Started',
@@ -32,8 +38,42 @@
                             }})
                         }}
                     {{ form_end(buy_form) }}
+                    <div class="quote__footer d-lg-flex justify-content-lg-between align-items-lg-center mt-5">
+                        <div class="quote__footer__text">
+                            <h5 class="text-white">The higest level of cover!</h5>
+                            <p class="text-blue1">We offer the markets highest level of cover</p>
+                        </div>
+                        <a id="quote_info_toggle" href="#quote_info" class="btn btn-outline-white"><span>See full policy</span> <i class="fas fa-caret-down"></i></a>
+                    </div>
+                </div>
+                <div class="quote__info mx-lg-5 py-5 mt-5">
+                    <div class="h1 text-white">{{ phone.make }} {{ phone.model }}
+                            <small>({{ phone.memory }}GB)</small></div>
+                    <div class="h1 text-blue1 mb-5">Full Cover Details</div>
+                    <h4 class="text-blue1 mb-4">What's covered:</h4>
+                    <ul class="list-unstyled icn-fa-list">
+                        <li class="text-white mb-3"><i class="fas fa-check text-blue1 fa-lg"></i> Loss</li>
+                        <li class="text-white mb-3"><i class="fas fa-check text-blue1 fa-lg"></i> Accidental Damage, including water damage &amp; cracked screens</li>
+                        <li class="text-white mb-3"><i class="fas fa-check text-blue1 fa-lg"></i> 90 days global travel</li>
+                        <li class="text-white mb-3"><i class="fas fa-check text-blue1 fa-lg"></i> Out of warranty breakdown</li>
+                        <li class="text-white mb-3"><i class="fas fa-check text-blue1 fa-lg"></i> Unauthorised network charges up the value of £1000 (inc VAT)</li>
+                        <li class="text-white mb-3"><i class="fas fa-check text-blue1 fa-lg"></i> Accessories up to the value of £100 (inc VAT) for theft of loss claims</li>
+                        <li class="text-white mb-5"><i class="fas fa-check text-blue1 fa-lg"></i> Cover for phones up to 3 years old, including second hand and refurbished devices</li>
+                    </ul>
+                    <h4 class="text-blue1 my-4">What's not covered:</h4>
+                    <ul class="list-unstyled icn-fa-list">
+                        <li class="text-white mb-3"><i class="fas fa-times text-blue1 fa-lg"></i> Theft, Loss, Accidental Damage or Breakdown where you have knowingly put your phone at risk</li>
+                        <li class="text-white mb-3"><i class="fas fa-times text-blue1 fa-lg"></i> 3+ claims for Loss and/or Theft in any policy year</li>
+                    </ul>
+                </div>
+                <div class="quote__info mx-lg-5 py-5 mt-5">
+                    <h4 class="text-blue1 mb-4">Here’s how we compare to competitors:</h4>
+                </div>
+                <div class="quote__info mx-lg-5 py-5 mt-5">
+                    <h4 class="text-blue1 mb-4">Here’s how we compare to other insurers:</h4>
                 </div>
             </div>
+
             <div class="quote__cover p-5">
                 <h4 class="text-blue2 mb-4">Cover Overview:</h4>
                 <ul class="list-unstyled icn-list">
@@ -86,6 +126,7 @@
                     }}
                 {{ form_end(buy_form_banner) }}
             </div>
+
         </div>
     </section>
 

@@ -62,7 +62,7 @@
 
 .cover {
 
-    &__illustration-mobile {
+    &__illustration__mobile {
         height: 240px;
         overflow: hidden;
     }
@@ -98,7 +98,7 @@
         background-size: 640px;
     }
 
-    &__illustration-mobile {
+    &__illustration__mobile {
         position: relative;
     }
 }
@@ -134,7 +134,7 @@
 
 .reviews {
 
-    &__image-mobile {
+    &__image__mobile {
         transform: translateX(20px);
 
         @include media-breakpoint-up(md) {

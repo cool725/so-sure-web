@@ -27,18 +27,15 @@
 }
 
 // Modify list to handle fa icons
-.fa-list {
+.icn-fa-list {
 
-    &-fa {
+    li {
+        position: relative;
+        padding-left: 30px;
 
-        li {
-            position: relative;
-            padding-left: 30px;
-
-            > .fas {
-                position: absolute;
-                left: 0; top: 5px;
-            }
+        > .fas {
+            position: absolute;
+            left: 0; top: 5px;
         }
     }
 }

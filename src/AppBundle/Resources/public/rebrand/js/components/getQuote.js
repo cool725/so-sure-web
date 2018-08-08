@@ -15,6 +15,6 @@ $(function() {
         // Prevent scrolling whilst open
         $('body').toggleClass('body--overflow');
 
-        quoteModal.toggleClass('getquote-open');
+        quoteModal.toggleClass('getquote--open');
     });
 });

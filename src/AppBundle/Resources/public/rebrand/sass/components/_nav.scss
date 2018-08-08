@@ -55,6 +55,12 @@
     box-shadow: 0 2px 0 0 rgba(0, 0, 0, 0.05);
 }
 
+.navbar-scrolled-quote {
+    .navbar-brand {
+        display: none;
+    }
+}
+
 .hamburger {
     position: relative;
     z-index: 1040;

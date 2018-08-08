@@ -8,7 +8,7 @@ $(function() {
           hamburger = $('#nav_toggle'),
           menu      = $('#menu'),
           logo      = $('.navbar-brand__logo'),
-          quoteBtn  = $('#quote-btn');
+          quoteBtn  = $('#quote_btn');
 
     let open = false;
 
@@ -48,8 +48,8 @@ $(function() {
 
     // Add navbar background if page reloads not at the top
     $(window).on('load', function(e) {
-        if (!$('body').hasClass('quote')) {
-            if ($(this).scrollTop() > 5) {
+        if ($(this).scrollTop() > 5) {
+            if (!$('body').hasClass('quote')) {
                 nav.addClass('navbar-scrolled');
             }
         }
