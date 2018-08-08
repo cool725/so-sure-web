@@ -31,3 +31,45 @@
         height: 480px;
     }
 }
+
+.expanding-cardbox {
+    border: 2px solid rgba(37,147,243, 0.2);
+    @include border-radius(10px);
+
+    cursor: pointer;
+
+    &__body {
+
+    }
+
+    &__title {
+        position: relative;
+        padding: 0 45px 0 0;
+
+        .fas {
+            position: absolute;
+            right: 0; top: 5px;
+            color: $blue-2;
+        }
+    }
+
+    &__expand {
+        display: none;
+    }
+
+    &:hover {
+        background-color: $white;
+        border-color: $white;
+        box-shadow: 0 15px 30px 0 rgba(8,27,154,0.08),
+                    0 5px 15px 0 rgba(8,27,154,0.08);
+    }
+}
+
+.expanding-cardbox__tick__icon {
+    background: url('#{$cdn_url}/images/rebrand/icns/so-sure_tick-icn.svg') no-repeat 15px center;
+    background-size: 35px;
+
+    .expanding-cardbox__title {
+        padding-left: 50px;
+    }
+}
