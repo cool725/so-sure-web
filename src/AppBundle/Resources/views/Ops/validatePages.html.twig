@@ -343,16 +343,18 @@
                 <a href="{{ url('iphone_7_insured_with_your_mobile_network') }}">iPhone 7</a>
                 <a href="{{ url('iphone_7_plus_insured_with_your_mobile_network') }}">iPhone 7+</a>
             </li>
+        </ul>
+        <h4>OAuth/Bearer Api</h4>
+        <ul>
             <li>
                 Oauth request inbound
-                <a href="{{ url('fos_oauth_server_authorize', {
-                    'client_id': '5b51ec6b636239778924b671_36v22l3ei3wgw0k4wos48kokk0cwsgo0ocggggoc84w0cw8844',
-                    'response_type': 'code',
-                    'state': 'random-string.12345',
-                    'scope': 'user.starling.summary',
-                    'redirect_uri': url('homepage')
-                }) }}">Request Starling summary access</a>. <br/>
-
+                <a href="{{ oauthStarlingUrl }}">Request Starling summary access</a>
+            </li>
+            <li>Bearer Api
+                <form id="bearer-form">
+                    <input type="text" name="bearer" id="bearer-token">
+                    <input type="button" class="btn btn-success" id="bearer-submit" value="Query User Api">
+                </form>
             </li>
             <p>The resulting 'code' (from the oauth/auth URL) can be used with
                 <code title="see: src/AppBundle/DataFixtures/MongoDB/d/Oauth2/LoadOauth2Data.php">client_secret=...</code> and <code>grant_type=authorization_code</code> to get a bearer token.
