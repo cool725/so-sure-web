@@ -61,7 +61,6 @@ class ClaimFnolType extends AbstractType
             ])
             ->add('where', TextType::class)
             ->add('timeToReach', TextType::class)
-            ->add('signature', TextType::class)
             ->add('type', ChoiceType::class, [
                 'required' => true,
                 'placeholder' => 'My phone is...',
@@ -85,6 +84,15 @@ class ClaimFnolType extends AbstractType
         $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
             $form = $event->getForm();
             $data = $event->getData();
+
+            $form->add('signature', TextType::class, [
+                'attr' => [
+                    'data-msg-equalTo' => sprintf(
+                        'Signature does not match the name on your policy: "%s"',
+                        $data->getUser()->getName()
+                    )
+                ]
+            ]);
 
             $policies = array();
             $userPolicies = $data->getUser()->getValidPoliciesWithoutOpenedClaim(true);

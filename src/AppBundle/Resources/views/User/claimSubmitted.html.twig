@@ -26,8 +26,9 @@
         <div class="container">
             <div class="row">
                 <div class="col-md-8 col-md-offset-2">
+                    <h1 class="text-center">Thank you for submitting your claim.</h1>
 
-                    <p class="lead text-center">Thank you for submitting your claim for <span class="h4">{{ claim.type }}</span> for your <span class="h4">{{ phone }}</span> with IMEI <span class="h4">{{ claim.policy.imei }}</span>. </p>
+                    <p class="lead text-center">Your claim for <span class="h4">{{ claim.type }}</span> for your <span class="h4">{{ phone }}</span> with IMEI <span class="h4">{{ claim.policy.imei }}</span> has been sent to our claims team for processing. </p>
 
                     <p class="text-center">We will make any attempt to get in touch with you on the number you provided <span class="h4">{{ claim.phoneToReach }}</span> when you requested: <span class="h4">{{ claim.timeToReach }}</span>.</p>
 
@@ -35,7 +36,7 @@
 
                     <hr>
 
-                    <h2>Need to Upload Additional Documents?</h2>
+                    <h4>Need to Upload Additional Documents?</h4>
                     <p class="lead">
                         It can happen to anyone. The network didn't give you quite the right document we need. Or perhaps the scan was missing part of a number that we need. Dont worry, simply just upload another document below and we'll pass that along to the claims team to review.
                     </p>

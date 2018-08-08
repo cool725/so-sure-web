@@ -42,7 +42,7 @@
                                 <div class="row">
                                     <div class="col-xs-12 text-center">
                                         <div class="form-group {% if form_errors(claim_form.signature) %}has-error{% endif %}">
-                                            <p class="lead text-left">I, <span class="h4">{{ username }}</span>, am providing all accurate and truthful information. I understand that failure to do so will invalidate my claim and could lead to me being prosecuted.</label></p>
+                                            <p class="lead text-left">I, <span class="h4">{{ username }}</span>, am providing all accurate and truthful information. I understand that failure to do so will invalidate my claim and could lead to me being prosecuted.</p>
                                             {{ form_widget(claim_form.signature, { 'attr': {'placeholder': 'Type in your full name to sign this document', 'class': 'form-control'}}) }}
                                             <div class="help-block with-errors">{{ form_errors(claim_form.signature) }}</div>
                                             <input type="hidden" value="{{ username }}" id="username_signature">
@@ -163,6 +163,7 @@
                                 <p class="lead">I acknowledge that not telling the truth would constitute insurance fraud, which is a criminal offence. I agree to this and I understand that I could be prosecuted if I were not telling the truth.</p>
                                 <div class="form-group">
                                     {{ form_widget(claim_confirm_form.submit, {'label': 'I confirm', 'attr': {'class': 'btn btn-green btn-lg'}}) }}
+                                    <div class="help-block with-errors">Once you confirmed your claim, you will not be able to change the information you have provided</div>
                                 </div>
                                 <div class="form-group">
                                     <a id="claim-back" href="#" class="btn btn-link btn-lg">Go back</a>
