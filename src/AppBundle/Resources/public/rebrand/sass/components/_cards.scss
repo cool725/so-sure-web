@@ -32,24 +32,22 @@
     }
 }
 
+// Only using px here for consistency
 .expanding-cardbox {
     border: 2px solid rgba(37,147,243, 0.2);
     @include border-radius(10px);
-
     cursor: pointer;
 
     &__body {
-
+        padding: 1.56rem;
     }
 
     &__title {
         position: relative;
-        padding: 0 45px 0 0;
 
         .fas {
             position: absolute;
-            right: 0; top: 5px;
-            color: $blue-2;
+            right: 0; top: 4px;
         }
     }
 
@@ -63,13 +61,25 @@
         box-shadow: 0 15px 30px 0 rgba(8,27,154,0.08),
                     0 5px 15px 0 rgba(8,27,154,0.08);
     }
+
+    &__open {
+        background-color: $white;
+        border-color: $white;
+        box-shadow: 0 15px 30px 0 rgba(8,27,154,0.08),
+                    0 5px 15px 0 rgba(8,27,154,0.08);
+    }
 }
 
-.expanding-cardbox__tick__icon {
-    background: url('#{$cdn_url}/images/rebrand/icns/so-sure_tick-icn.svg') no-repeat 15px center;
-    background-size: 35px;
+.expanding-cardbox__icon {
+    background: url('#{$cdn_url}/images/rebrand/icns/so-sure_tick-icn.svg') no-repeat 20px 20px;
+    background-size: 2rem;
 
     .expanding-cardbox__title {
-        padding-left: 50px;
+        padding-left: 2.4rem;
+        padding-right: 2.4rem;
+    }
+
+    .expanding-cardbox__expand {
+        padding-left: 2.6rem;
     }
 }
