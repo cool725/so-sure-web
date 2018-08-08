@@ -134,7 +134,7 @@
                                 <div class="form-group col-sm-6 {% if form_errors(claim_form.proofOfLoss) %}has-error{% endif %}">
                                     {{ form_widget(claim_form.proofOfLoss, { 'attr': {'class': 'form-control'}}) }}
                                     <div class="help-block with-errors">
-                                        <a href="#" data-toggle="modal" data-target="#purchaseModal">
+                                        <a href="#" data-toggle="modal" data-target="#lossModal">
                                             {{ claim.proofOfLossFiles|length }} file(s) upload
                                         </a>
                                     </div>
