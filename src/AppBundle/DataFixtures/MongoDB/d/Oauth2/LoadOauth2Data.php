@@ -44,7 +44,11 @@ class LoadOauth2Data implements FixtureInterface, ContainerAwareInterface
             self::KNOWN_CLIENT_ID_RANDOM,
             self::KNOWN_CLIENT_SECRET,
             [Oauth2Scopes::USER_STARLING_SUMMARY],
-            [ 'http://dev.so-sure.net:40080/ops/pages' ]
+            [
+                'http://dev.so-sure.net:40080/ops/pages',
+                'https://testing.wearesosure.com/ops/pages',
+                'https://staging.wearesosure.com/ops/pages',
+            ]
         );
 
         /** @var UserManagerInterface $userManager */
