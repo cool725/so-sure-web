@@ -350,7 +350,25 @@
                 Oauth request inbound
                 <a href="{{ oauthStarlingUrl }}">Request Starling summary access</a>
             </li>
-            <li>Bearer Api
+            <li>User Welcome w/Starling Session
+                <ol>
+                    <li>
+                        Ensure logged in as admin
+                    </li>
+                    <li>
+                        {% if not valid_policy_monthly.user.enabled %}<del>{% endif %}
+                        <a href="{{ url('ops_pages') }}?_impersonate={{ valid_policy_monthly.user.email }}">Ops</a> <b>(auto impersonate {{ valid_policy_monthly.user.email }})</b>
+                        {% if not valid_policy_monthly.user.enabled %}</del> (user not enabled){% endif %}
+                    </li>
+                    <li>
+                        {{ form_start(starling_form) }}
+                        {{ form_widget(starling_form.set, {'attr': {'class': 'btn btn-success'}, 'label': 'Set Session Vars' }) }}
+                        {{ form_end(starling_form) }}
+                    </li>
+                </ol>
+
+            </li>
+            <li>Bearer Api:
                 <form id="bearer-form">
                     <input type="text" name="bearer" id="bearer-token">
                     <input type="button" class="btn btn-success" id="bearer-submit" value="Query User Api">

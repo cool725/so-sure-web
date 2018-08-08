@@ -13,6 +13,8 @@ use AppBundle\Service\RequestService;
 use AppBundle\Service\RouterService;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
@@ -429,6 +431,21 @@ class OpsController extends BaseController
             'cancelledReason' => Policy::CANCELLED_USER_REQUESTED,
         ]);
 
+        $starlingForm = $this->get('form.factory')
+            ->createNamedBuilder('starling_form')
+            ->add('set', SubmitType::class)
+            ->getForm();
+        if ('POST' === $request->getMethod()) {
+            if ($request->request->has('starling_form')) {
+                $starlingForm->handleRequest($request);
+                if ($starlingForm->isValid()) {
+                    $this->starlingOAuthSession($request, $oauthStarlingUrl);
+
+                    return new RedirectResponse($this->generateUrl('user_welcome', []));
+                }
+            }
+        }
+
         return [
             'scode' => $scode->getCode(),
             'invitation' => $invitation,
@@ -464,6 +481,7 @@ class OpsController extends BaseController
             'upcoming_phone' => $upcomingPhone,
             'active_phone' => $activePhone,
             'oauthStarlingUrl' => $oauthStarlingUrl,
+            'starling_form' => $starlingForm->createView(),
         ];
     }
 

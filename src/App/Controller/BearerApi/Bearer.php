@@ -6,6 +6,7 @@ use AppBundle\Classes\ApiErrorCode;
 use AppBundle\Controller\BaseController;
 use AppBundle\Document\User;
 use AppBundle\Security\PolicyVoter;
+use AppBundle\Security\UserVoter;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -68,7 +69,7 @@ class Bearer extends BaseController
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_NOT_FOUND, 'User not found', 404);
             }
 
-            $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $user);
+            $this->denyAccessUnlessGranted(UserVoter::VIEW, $user);
 
             return new JsonResponse($this->userPolicySummary->shortPolicySummary($user));
             #$response = new UserPolicySummary();

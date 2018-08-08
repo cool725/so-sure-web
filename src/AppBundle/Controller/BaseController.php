@@ -12,6 +12,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\Security\Http\Util\TargetPathTrait;
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\ControllerTrait;
@@ -48,6 +50,7 @@ use AppBundle\Service\SixpackService;
 abstract class BaseController extends Controller
 {
     use PhoneTrait;
+    use TargetPathTrait;
     use ControllerTrait;
 
     const MONGO_QUERY_TYPE_REGEX = 'regex';
@@ -1105,5 +1108,19 @@ abstract class BaseController extends Controller
         }
 
         return $url;
+    }
+
+    protected function starlingOAuthSession(Request $request, $targetPath = null)
+    {
+        /** @var Session $session */
+        $session = $request->getSession();
+        if ($session) {
+            $session->set('oauth2Flow', 'starling');
+            // our local copy of the target path, to use to go back to the oauth2/v2/auth page
+            if (!$targetPath) {
+                $targetPath = $this->getTargetPath($session, 'main');
+            }
+            $session->set('oauth2Flow.targetPath', $targetPath);
+        }
     }
 }

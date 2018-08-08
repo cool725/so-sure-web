@@ -181,13 +181,7 @@ class DefaultController extends BaseController
      */
     public function starlingLanding(Request $request)
     {
-        /** @var Session $session */
-        $session = $request->getSession();
-        if ($session) {
-            $session->set('oauth2Flow', 'starling');
-            // our local copy of the target path, to use to go back to the oauth2/v2/auth page
-            $session->set('oauth2Flow.targetPath', $this->getTargetPath($session, 'main'));
-        }
+        $this->starlingOAuthSession($request);
 
         return $this->render('AppBundle:Default:indexStarlingBank.html.twig');
     }
