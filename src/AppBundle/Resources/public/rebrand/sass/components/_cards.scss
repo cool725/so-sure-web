@@ -44,11 +44,16 @@
 
     &__title {
         position: relative;
+        padding-right: 2.4rem;
 
         .fas {
             position: absolute;
             right: 0; top: 4px;
         }
+    }
+
+    &__excerpt {
+        padding-right: 2.4rem;
     }
 
     &__expand {
@@ -61,25 +66,24 @@
         box-shadow: 0 15px 30px 0 rgba(8,27,154,0.08),
                     0 5px 15px 0 rgba(8,27,154,0.08);
     }
-
-    &__open {
-        background-color: $white;
-        border-color: $white;
-        box-shadow: 0 15px 30px 0 rgba(8,27,154,0.08),
-                    0 5px 15px 0 rgba(8,27,154,0.08);
-    }
 }
 
 .expanding-cardbox__icon {
-    background: url('#{$cdn_url}/images/rebrand/icns/so-sure_tick-icn.svg') no-repeat 20px 20px;
+    background: url('#{$cdn_url}/images/rebrand/icns/so-sure_tick-icn.svg') no-repeat 1.3rem 1.25rem;
     background-size: 2rem;
 
     .expanding-cardbox__title {
-        padding-left: 2.4rem;
-        padding-right: 2.4rem;
+        padding-left: 2.8rem;
     }
 
     .expanding-cardbox__expand {
         padding-left: 2.6rem;
     }
+}
+
+.expanding-cardbox__open {
+    background-color: $white;
+    border-color: $white;
+    box-shadow: 0 15px 30px 0 rgba(8,27,154,0.08),
+                0 5px 15px 0 rgba(8,27,154,0.08);
 }
