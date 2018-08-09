@@ -21,8 +21,6 @@ $(function() {
             model.append($('<option />').val('').text('model'));
             memory.append($('<option />').val('').text('memory'));
 
-            model.resizeselect();
-
             // Get phones from list and show featured
             $.each(phones[make.val()], function(key, value) {
                 $.each(value, function(key2, mod) {
@@ -51,7 +49,6 @@ $(function() {
             // Set the default value
             memory.append($('<option />').val('').text('memory'));
 
-            memory.resizeselect();
 
             // Get phones from list and add to options
             $.each(phones[make.val()][model.val()], function(key, value) {
@@ -77,6 +74,8 @@ $(function() {
             }
 
             button.prop('disabled', 'disabled').removeClass('btn-success btn-shadow').addClass('btn-outline-white');
+
+            model.resizeselect();
         });
 
         model.on('change', function() {
@@ -90,6 +89,7 @@ $(function() {
             }
 
             // button.prop('disabled', 'disabled').removeClass('btn-success btn-shadow').addClass('btn-outline-white');
+            memory.resizeselect();
 
         });
 
