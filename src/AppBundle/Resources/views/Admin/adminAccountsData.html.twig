@@ -401,11 +401,11 @@
     <tr>
         <td width="{{ indent_width }}"></td>
         <td width="{{ text_width }}">Total payments from CSV file</td>
-        <td>{{ paymentsTotal }}</td>
+        <td>{{ paymentsTotal|number_format(2, '.', ',') }}</td>
     </tr>
     <tr>
         <td width="{{ indent_width }}"></td>
-        <td width="{{ text_width }}">Net Renewal Discount Refund To Customers</td>
+        <td width="{{ text_width }}">Net Renewal Discount Refund To Customers (included in payments csv but not a premium payment)</td>
         <td>(£{{ (0 - paymentTotals.policyDiscountRefunds.total)|number_format(2, '.', ',') }})</td>
     </tr>
     <tr>
