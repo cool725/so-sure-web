@@ -310,10 +310,12 @@
         {% set reportTotal = paymentTotals.all.totalUnderwriter + paymentTotals.all.totalCommission %}
         {% set paymentsTotal = 0 %}
         {% if paymentTotals.salvaPaymentFile.metadata['total'] is defined %}
-        {% set paymentsTotal = paymentTotals.salvaPaymentFile.metadata['total'] %}
+            {% set paymentsTotal = paymentTotals.salvaPaymentFile.metadata['total'] %}
         {% endif %}
-        {% if equal_to_two_dp(reportTotal, paymentsTotal) %}
-            <td><strong>£{{ reportTotal|number_format(2, '.', ',') }}</strong></td>
+        {%  set expectedTotal = paymentsTotal - paymentTotals.policyDiscountRefunds.total %}
+
+        {% if equal_to_two_dp(reportTotal, expectedTotal) %}
+            <td title="Matches expected total from payments of £{{ paymentsTotal|number_format(2, '.', ',') }} - discount refunds of £{{ paymentTotals.policyDiscountRefunds.total|number_format(2, '.', ',') }}"><strong>£{{ reportTotal|number_format(2, '.', ',') }}</strong></td>
         {% else %}
             <td class="bg-danger" title="Expect total from payments £{{ paymentsTotal|number_format(2, '.', ',') }}"><strong>£{{ reportTotal|number_format(2, '.', ',') }}</strong></td>
         {% endif %}
@@ -393,6 +395,29 @@
 </table>
 <h4>Details</h4>
 <table class="table table-striped">
+    <tr class="info">
+        <td colspan="3">Payments CSV</td>
+    </tr>
+    <tr>
+        <td width="{{ indent_width }}"></td>
+        <td width="{{ text_width }}">Total payments from CSV file</td>
+        <td>{{ paymentsTotal }}</td>
+    </tr>
+    <tr>
+        <td width="{{ indent_width }}"></td>
+        <td width="{{ text_width }}">Net Renewal Discount Refund To Customers</td>
+        <td>(£{{ (0 - paymentTotals.policyDiscountRefunds.total)|number_format(2, '.', ',') }})</td>
+    </tr>
+    <tr>
+        <td width="{{ indent_width }}"></td>
+        <td width="{{ text_width }}"><strong>Expected Total premium distributions</strong></td>
+        {% if equal_to_two_dp(reportTotal, expectedTotal) %}
+            <td><strong>£{{ expectedTotal|number_format(2, '.', ',') }}</strong></td>
+        {% else %}
+            <td class="bg-danger" title="Should match premium distribution £{{ reportTotal|number_format(2, '.', ',') }}"><strong>£{{ expectedTotal|number_format(2, '.', ',') }}</strong></td>
+        {% endif %}
+    </tr>
+
     <tr class="info">
         <td colspan="3">Payments Received</td>
     </tr>
