@@ -408,13 +408,8 @@ trait UserClassTrait
         );
     }
 
-    protected static function createReward($email)
+    protected static function createRewardForUser(User $user): Reward
     {
-        $user = static::createUser(
-            static::$userManager,
-            $email,
-            'bar'
-        );
         $reward = new Reward();
         $reward->setUser($user);
         static::$dm->persist($user);
@@ -422,6 +417,16 @@ trait UserClassTrait
         static::$dm->flush();
 
         return $reward;
+    }
+
+    protected static function createReward(string $email): Reward
+    {
+        $user = static::createUser(
+            static::$userManager,
+            $email,
+            'bar'
+        );
+        return self::createRewardForUser($user);
     }
 
     protected function createLinkedConnections(

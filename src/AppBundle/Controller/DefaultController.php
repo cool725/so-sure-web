@@ -64,6 +64,7 @@ use AppBundle\Service\SixpackService;
 class DefaultController extends BaseController
 {
     use PhoneTrait;
+    use \Symfony\Component\Security\Http\Util\TargetPathTrait;
 
     /**
      * @Route("/", name="homepage", options={"sitemap"={"priority":"1.0","changefreq":"daily"}})
@@ -180,17 +181,9 @@ class DefaultController extends BaseController
      */
     public function starlingLanding(Request $request)
     {
-        $exp = $this->sixpack(
-            $request,
-            SixpackService::EXPERIMENT_STARLING_LANDING,
-            ['homepage', 'starling-landing']
-        );
+        $this->starlingOAuthSession($request);
 
-        if ($exp == 'starling-landing') {
-            return $this->render('AppBundle:Default:indexStarlingBank.html.twig');
-        } else {
-            return $this->redirectToRoute('homepage');
-        }
+        return $this->render('AppBundle:Default:indexStarlingBank.html.twig');
     }
 
     /**

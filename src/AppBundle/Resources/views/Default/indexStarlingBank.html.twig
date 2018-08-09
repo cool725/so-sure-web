@@ -25,15 +25,16 @@
 
     <section class="section--pad starling__hero">
         <div class="container">
-            <h1 class="text-center">Mobile Insurance You Deserve.</h1>
-            <p class="big-text text-center">We're a new type of insurer that’s reliable, rewarding and all together better.</p>
 
+            <h1 class="text-center">Mobile Insurance You Deserve.</h1>
             <div class="text-center">
-                <span class="lead"><small>in partnership with</small></span><br>
-                <img src="{{ cdn_url }}/images/logo/so-sure_starling_bank_logo.svg" alt="Starling Bank" width="300px">
+                <p><small>in partnership with</small></p>
+                <p><img src="{{ cdn_url }}/images/logo/so-sure_starling_bank_logo.svg" alt="Starling Bank" width="300px"></p>
+                <p><small>already have an account with so-sure?</small></p>
+                <p><a href="{{ path('fos_user_security_login') }}" class="btn btn-green">Log in to so-sure</a></p>
             </div>
 
-            <div class="animated slideInLeft">
+            <div class="animated slideInLeft text-center">
                 {# Phone Search #}
                 {% if device_category() == 'Mobile' %}
                     {% set select_template = 'AppBundle:Default:selectPhoneMakeDropdown' %}
@@ -51,12 +52,6 @@
                     })) }}
                 {% endif %}
                 {# End Phone Search #}
-
-                {# TrustBox widget - Mini #}
-                <div class="trustpilot-widget" data-locale="en-GB" data-template-id="5419b732fbfb950b10de65e5" data-businessunit-id="588f81d20000ff00059bc1e1" data-style-height="24px" data-style-width="100%" data-theme="dark" style="margin:25px 0 0;">
-                <a href="https://uk.trustpilot.com/review/wearesosure.com" target="_blank">Trustpilot</a>
-                </div>
-                {# End TrustBox widget #}
             </div>
         </div>
     </section>

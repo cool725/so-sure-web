@@ -69,7 +69,7 @@ class SixpackService
     // Exp 2
     const EXPERIMENT_AD_LANDING = 'ad-landing-2';
     // Exp 3
-    const EXPERIMENT_STARLING_LANDING = 'starling-landing';
+    // const EXPERIMENT_STARLING_LANDING = 'starling-landing';
     // Exp 4
     // const EXPERIMENT_PHONE_REPLACEMENT_MATCHING_ADVERT = 'phone-replacement-matching-advert';
     // Exp 5
@@ -121,7 +121,7 @@ class SixpackService
         // Exp 2
         self::EXPERIMENT_AD_LANDING,
         // Exp 3
-        self::EXPERIMENT_STARLING_LANDING,
+        // self::EXPERIMENT_STARLING_LANDING,
         // Exp 4
         // self::EXPERIMENT_PHONE_REPLACEMENT_MATCHING_ADVERT,
         // Exp 5
@@ -188,7 +188,7 @@ class SixpackService
         // Exp 2
         self::EXPERIMENT_AD_LANDING,
         // Exp 3
-        self::EXPERIMENT_STARLING_LANDING,
+        // self::EXPERIMENT_STARLING_LANDING,
         // Exp 4
         // self::EXPERIMENT_PHONE_REPLACEMENT_MATCHING_ADVERT,
         // Exp 5

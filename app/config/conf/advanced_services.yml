@@ -1,0 +1,39 @@
+# Advanced services
+
+services:
+    # default configuration for services in *this* file
+    _defaults:
+        # automatically injects dependencies in your services
+        autowire: true
+        # automatically registers your services as commands, event subscribers, etc.
+        autoconfigure: true
+        # this means you cannot fetch services directly from the container via $container->get()
+        # if you need to do this, you can override this setting on individual services
+        public: false
+        bind:
+            #$kernelEnvironment: "%kernel.environment%"
+
+    # makes classes in src/AppBundle available to be used as services
+    # this creates a service per class whose id is the fully-qualified class name
+    App\:
+        resource: '../../../src/App/*'
+
+    ## Controllers ####################################################
+
+    # controllers are imported separately to make sure they're public
+    # (and have a tag that allows actions to type-hint services)
+    App\Controller\:
+        resource: '../../../src/App/Controller/*'
+        public: true
+
+    ## Miscellaneous services #########################################
+    app.datetimenormalizer:
+        class: Symfony\Component\Serializer\Normalizer\DateTimeNormalizer
+        tags: [serializer.normalizer]
+
+    ###################################################################
+    ## Legacy Aliases for services - to remove after Symfony 4.1 with access to test.container
+
+    test.App\Normalizer\UserPolicySummary:
+        class: App\Normalizer\UserPolicySummary
+        public: true

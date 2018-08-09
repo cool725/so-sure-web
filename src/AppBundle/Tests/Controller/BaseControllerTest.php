@@ -13,6 +13,7 @@ class BaseControllerTest extends WebTestCase
 {
     use \AppBundle\Tests\PhingKernelClassTrait;
     use \AppBundle\Tests\UserClassTrait;
+
     protected static $client;
     protected static $container;
     /** @var DocumentManager */
