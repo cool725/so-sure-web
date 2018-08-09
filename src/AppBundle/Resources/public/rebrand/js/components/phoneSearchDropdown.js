@@ -19,7 +19,7 @@ $(function() {
 
             // Set the default value
             model.append($('<option />').val('').text('model'));
-            memory.append($('<option />').val('').text('memory'));
+            memory.append($('<option />').val('').text('GB size'));
 
             // Get phones from list and show featured
             $.each(phones[make.val()], function(key, value) {
@@ -47,7 +47,7 @@ $(function() {
             memory.empty();
 
             // Set the default value
-            memory.append($('<option />').val('').text('memory'));
+            memory.append($('<option />').val('').text('GB size'));
 
 
             // Get phones from list and add to options

@@ -74,7 +74,7 @@ class PhoneDropdownType extends AbstractType
                 'required' => $this->required
             ])
             ->add('memory', ChoiceType::class, [
-                'placeholder' => 'memory',
+                'placeholder' => 'GB size',
                 'choices' => $memory,
                 'required' => $this->required
             ])
