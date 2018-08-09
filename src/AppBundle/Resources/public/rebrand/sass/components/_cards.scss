@@ -1,14 +1,5 @@
 // cards.scss
 
-// .card {
-//     border: none;
-//     @include border-radius(15px);
-
-//     @include media-breakpoint-up(lg) {
-//         width: 300px;
-//     }
-// }
-//
 .cardbox {
     height: 440px;
     background-color: $white;
@@ -54,6 +45,9 @@
 
     &__excerpt {
         padding-right: 2.4rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
     &__expand {
