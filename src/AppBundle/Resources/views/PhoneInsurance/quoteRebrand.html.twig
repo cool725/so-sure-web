@@ -52,15 +52,10 @@
                             </div>
                         </div>
                     </div>
-{#                     <div id="alt_phones" class="quote__alt__phones collapse py-3">
-                        {% if phones | length > 1 %}
-                        {% endif %}
-                        asdjfapdifjaipdsfj
-                    </div> #}
                     <div class="quote__h1 text-white h1 mb-4"><span class="sub">For only</span> &pound;{{ phone_price.monthlyPremiumPrice }} a month</div>
                     {{ form_start(buy_form) }}
                         {{ form_widget(buy_form.buy_tablet, {
-                            'label': 'Get Started',
+                            'label': 'Get Insured',
                             'attr': {
                                 'class': 'btn btn-success btn-shadow btn-gradient-green  btn-block-xs'
                             }})
@@ -213,13 +208,56 @@
                                 <h5 class="expanding-cardbox__title text-white mb-0">
                                     Here's how it works <i class="fas fa-chevron-down text-white fa-lg"></i>
                                 </h5>
-    {#                             <div class="expanding-cardbox__excerpt">
+    {#                             <div class="expanding-cardbox__excerpt text-white">
                                     Validate your phone with pic-sure and greatly reduce your excess
                                 </div> #}
-                                <div class="expanding-cardbox__expand mt-4">
+                                <div class="expanding-cardbox__expand text-white mt-4">
                                     We reward our careful customers. If you and your connections don’t make a claim, we return up to 80% of your premium each year.
                                 </div>
                             </div>
+                        </div>
+                        <div class="expanding-cardbox expanding-cardbox-alt mb-4">
+                            <div class="expanding-cardbox__body">
+                                <h5 class="expanding-cardbox__title text-white mb-0">
+                                    Here's how it works <i class="fas fa-chevron-down text-white fa-lg"></i>
+                                </h5>
+    {#                             <div class="expanding-cardbox__excerpt text-white">
+                                    Validate your phone with pic-sure and greatly reduce your excess
+                                </div> #}
+                                <div class="expanding-cardbox__expand text-white mt-4">
+                                    We reward our careful customers. If you and your connections don’t make a claim, we return up to 80% of your premium each year.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="quote__info mx-5 py-5">
+                        <div class="media">
+                            <img src="http://via.placeholder.com/150x150" class="rounded-circle mr-5">
+                            <div class="media-body text-white px-5">
+                                <h4 class="mt-0 mb-4 text-blue1">About the {{ phone.make }} {{ phone.model }}</h4>
+                                <ul class="list-inline">
+                                    <li class="list-inline-item"><strong class="h5">Camera</strong>: {{ phone.camera }} MP</li>
+                                    <li class="list-inline-item text-blue1">|</li>
+                                    <li class="list-inline-item"><strong class="h5">Size</strong>: {{ phone.getScreenPhysicalInch }}</li>
+                                    <li class="list-inline-item text-blue1">|</li>
+                                    <li class="list-inline-item"><strong class="h5">Screen Resolution</strong>: {{ phone.getScreenResolution }}</li>
+                                    <li class="list-inline-item text-blue1">|</li>
+                                    <li class="list-inline-item"><strong class="h5">RAM</strong>: {{ phone.getRamDisplay }}</li>
+                                </ul>
+                                {# <p class="mb-5"></p> #}
+                                {# <a href="#" class="btn btn-outline-blue1">Find out more</a> #}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="quote__info mx-5 py-5">
+                        <div class="d-md-flex align-items-md-center justify-content-md-between py-3 px-4 rounded bg-blue3">
+                            <div class="text-center text-lg-left">
+                                <h4 class="text-white">Let's get you covered</h4>
+                                <p class="lead text-white mb-0">It'll only take a few minutes</p>
+                            </div>
+                            {{ form_start(buy_form_banner) }}
+                                {{ form_widget(buy_form_banner.buy, {'label': 'Get Insured', 'attr': {'class': 'btn btn-success btn-shadow btn-gradient-green  btn-block-xs'}}) }}
+                            {{ form_end(buy_form_banner) }}
                         </div>
                     </div>
                 </div>

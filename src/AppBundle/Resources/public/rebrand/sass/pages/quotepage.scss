@@ -75,7 +75,6 @@ body {
         }
 
         .table-list {
-            width: 384px;
             position: relative;
 
             &__header {
@@ -99,6 +98,10 @@ body {
                 background-image: url('#{$cdn_url}/images/rebrand/icns/so-sure_unhappy-dark-icn.svg');
             }
 
+            @include media-breakpoint-up(md) {
+                width: 384px;
+            }
+
             @include media-breakpoint-up(xl) {
 
                 &__insurers {
@@ -106,9 +109,12 @@ body {
                 }
 
                 &__so-sure {
-                    width: 400px;
                     transform: translateX(-25px);
                     z-index: 11;
+
+                    @include media-breakpoint-up(md) {
+                        width: 400px;
+                    }
                 }
             }
         }
