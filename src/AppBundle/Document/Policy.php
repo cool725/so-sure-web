@@ -3953,6 +3953,10 @@ abstract class Policy
         if (!$this->isPolicy()) {
             return null;
         }
+        if (!$date) {
+            $date = new \DateTime();
+        }
+
         $ignoredStatuses = [
             self::STATUS_CANCELLED,
             self::STATUS_EXPIRED,
@@ -3972,7 +3976,9 @@ abstract class Policy
             return false;
         }
 
-        if ($this->isPolicyPaidToDate($date, true)) {
+        if ($this->getStatus() == self::STATUS_RENEWAL) {
+            return $this->getStart() > $date;
+        } elseif ($this->isPolicyPaidToDate($date, true)) {
             return $this->getStatus() == self::STATUS_ACTIVE;
         } elseif ($this->getUser()->hasBacsPaymentMethod() &&
             $this->getUser()->getBacsPaymentMethod() &&
@@ -3980,7 +3986,7 @@ abstract class Policy
             $this->getUser()->getBacsPaymentMethod()->getBankAccount()->isMandateInProgress()) {
             return $this->getStatus() == self::STATUS_ACTIVE;
         } else {
-            return in_array($this->getStatus(), [self::STATUS_UNPAID, self::STATUS_RENEWAL]);
+            return in_array($this->getStatus(), [self::STATUS_UNPAID]);
         }
     }
 

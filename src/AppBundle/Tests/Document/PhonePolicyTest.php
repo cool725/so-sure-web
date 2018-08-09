@@ -3284,6 +3284,10 @@ class PhonePolicyTest extends WebTestCase
             $policy->setStatus($status);
             $this->assertNull($policy->hasCorrectPolicyStatus());
         }
+
+        $policy->setStatus(SalvaPhonePolicy::STATUS_RENEWAL);
+        $this->assertTrue($policy->hasCorrectPolicyStatus(new \DateTime('2015-12-30')));
+        $this->assertFalse($policy->hasCorrectPolicyStatus($date));
     }
 
     public function testAddTwoLostTheftClaims()
