@@ -256,7 +256,7 @@
 
     {% if app.session.has('oauth2Flow') and app.session.get('oauth2Flow') == 'starling' %}
         {% include 'AppBundle::User/_welcome_starling.html.twig' %}
-    {% elseif user_modal_welcome is defined and user_modal_welcome == 'welcome-modal-requested-cancellation' %}
+    {% elseif user_modal_welcome is defined and user_modal_welcome == 'welcome-modal' %}
         <div class="modal modal-new fade"
              id="welcome-modal"
              tabindex="-1"
