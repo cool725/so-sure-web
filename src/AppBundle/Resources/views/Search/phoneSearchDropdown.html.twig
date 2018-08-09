@@ -3,29 +3,28 @@
     'data-phones': phones|json_encode|raw,
     'autocomplete': 'off'
 }}) }}
-    <div class="row">
-        <div class="form-group col-sm-4">
-            {{ form_widget(form_phone.make, {
-              'attr': {
-                'class': 'form-control phone-search-dropdown__make'
-            }}) }}
-        </div>
-        <div class="form-group col-sm-4">
-            {{ form_widget(form_phone.model, {
-              'attr': {
-                'class': 'form-control phone-search-dropdown__model',
-                'disabled': 'disabled'
-            }}) }}
-        </div>
-        <div class="form-group col-sm-4">
-            {{ form_widget(form_phone.memory, {
-                'attr': {
-                    'class': 'form-control phone-search-dropdown__memory',
-                    'disabled': 'disabled'
-            }}) }}
-        </div>
+    <div class="d-flex align-items-center">
+        <span class="h1 text-white">My mobile phone is an</span>
+        {{ form_widget(form_phone.make, {
+          'attr': {
+            'class': 'form-control-lg ml-3 phone-search-dropdown__make'
+        }}) }}
+        {{ form_widget(form_phone.model, {
+          'attr': {
+            'class': 'form-control-lg ml-3 phone-search-dropdown__model',
+            'disabled': 'disabled'
+        }}) }}
     </div>
-    <div class="form-group mt-4">
+    <div class="d-flex align-items-center">
+        <span class="h1 text-white">that has</span>
+        {{ form_widget(form_phone.memory, {
+            'attr': {
+                'class': 'form-control-lg mx-3 phone-search-dropdown__memory',
+                'disabled': 'disabled'
+        }}) }}
+        <span class="h1 text-white">storage</span>
+    </div>
+    <div class="form-group mt-5">
         {{ form_widget(form_phone.next, {
           'label': 'Show my prices',
           'attr': {

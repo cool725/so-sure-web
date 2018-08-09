@@ -1,142 +1,23 @@
-// // search.scss
+// search.scss
 
-// .phone-search {
-//     max-width: 480px;
-//     position: relative;
-//     z-index: 100;
-//     background-color: $white;
-//     box-shadow: 0 5px 20px 2px rgba(0, 0, 0, 0.2);
+.phone-search-dropdown {
 
-//     // transition: all .2s;
+    select {
+        @include media-breakpoint-up(lg) {
+            width: 180px;
+        }
+    }
 
-//     // Standard Input
-//     &__input {
-//         border: none;
-//         padding: 15px 15px 15px 55px;
-//         background: $white url('#{$cdn_url}/images/rebrand/ss-phone-search.svg') no-repeat 15px 16px;
-//         background-size: 21px;
+    &__make {
 
-//         &:focus {
-//             box-shadow: 0 0 0 0.3rem rgba(255, 255, 255, 0.25);
-//         }
-//     }
+    }
 
-//     // Style the Typeahead
-//     .twitter-typeahead {
-//         // Match the width of the form
-//         width: 100%;
-//     }
+    &__model {
 
-//     .tt {
-//         // Added to input that's initialized into a typeahead
-//         &-input {}
+    }
 
-//         // Added to hint input
-//         &-hint {
-//             color: $blue-1;
-//         }
+    &__memory {
 
-//         // Added to menu element
-//         &-menu {
-//             // Stretch the full width of parent
-//             right: 0;
-//             max-height: 250px;
-//             overflow-y: scroll;
-//             margin-left: 5px;
-//             margin-right: 5px;
-//             background-color: $white;
-//             box-shadow: 0 16px 20px 2px rgba(0, 0, 0, 0.2);
+    }
 
-//             @include border-bottom-radius(4px);
-//         }
-
-//         // Added to dataset elements
-//         &-dataset {}
-
-//         // Added to suggestion elements
-//         &-suggestion {
-
-//             a {
-//                 font-family: $g-regular;
-//                 display: block;
-//                 padding: 15px;
-//                 color: $dark-70;
-
-//                 &:hover {
-//                     text-decoration: none;
-//                     background-color: $off-white;
-//                 }
-//             }
-//         }
-
-//         //  Added to menu element when it contains no content
-//         &-empty {}
-
-//         // Added to menu element when it is opened
-//         &-open {}
-
-//         // Added to suggestion element when menu cursor moves to said suggestion
-//         &-cursor {}
-
-//         // Added to the element that wraps highlighted text
-//         &-highlight {
-//             font-family: $g-medium;
-//             color: $dark;
-//         }
-
-//         &-header {
-//             padding: 10px 15px;
-//         }
-//     }
-
-//     // Sticky Search
-//     // TODO: Check iOS
-//     &_sticky {
-//         top: 7px; left: 5px; right: 5px;
-//         position: fixed;
-//         z-index: 1029;
-//         margin-left: auto;
-//         margin-right: auto;
-
-//         // transition: all .2s;
-
-//         &_top {
-//             top: 72px;
-//         }
-
-//         @include media-breakpoint-up(sm) {
-//             display: block;
-//             top: 7px; left: 50%;
-//             z-index: 1031;
-//             width: 380px;
-//             margin: 0 0 0 -190px;
-//             box-shadow: none;
-//         }
-
-//         @include media-breakpoint-up(xl) {
-//             width: 480px;
-//             margin: 0 0 0 -260px;
-//         }
-//     }
-
-//     &_sticky_toggle {
-//         display: none;
-
-//         &_show {
-//             display: inline-block;
-
-//             a {
-//                 color: $white;
-
-//                 &:focus, &:hover, &:active {
-//                     color: $white;
-//                 }
-//             }
-//         }
-//     }
-// }
-
-// .phone-search-dropdown {
-//     position: relative;
-//     z-index: 100;
-// }
+}
