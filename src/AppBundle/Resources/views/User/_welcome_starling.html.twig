@@ -1,0 +1,32 @@
+{#Included from welcome.html.twig #}
+
+<div class="modal modal-new fade"
+     id="welcome-modal"
+     tabindex="-1"
+     role="dialog"
+     aria-labelledby="welcome-modal"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content welcome-modal-content">
+            <div class="modal-header text-center">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h3 class="text-white">Thank you for buying your Mobile phone Insurance with so-sure</h3>
+            </div>
+            <div class="modal-body text-center">
+                <p class="text-white"><small>in partnership with</small></p>
+
+                <p><img src="{{ cdn_url }}/images/logo/so-sure_starling_bank_logo.svg" alt="Starling Bank" width="200px"></p>
+
+                <p class="text-white">To link up your policy details with the Starling Bank app click here:</p>
+
+                <p><a href="{{ app.session.get('oauth2Flow.targetPath') }}" class="btn btn-starling btn-pad"><i class="fa fa-link" aria-hidden="true"></i> Link My Policy</a></p>
+
+                <p class="text-white"><small>If you have any questions or need support about your policy <br> contact us on <a href="mailto:support@wearesosure.com" class="text-white text-underline">support@wearesosure.com</a></small></p>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>

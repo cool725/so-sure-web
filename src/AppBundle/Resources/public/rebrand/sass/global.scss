@@ -21,10 +21,15 @@
 @import "components/nav";
 @import "components/menu";
 @import "components/search";
-@import "components/phone-carousel";
+// @import "components/phone-carousel";
+@import "components/lists";
+@import "components/cards";
+@import "components/tables";
+@import "components/reviews";
 
 // Layout
 // - header, footer, navigation
+@import "layout/main";
 @import "layout/header";
 @import "layout/footer";
 

@@ -1,73 +1,83 @@
 {% import "::macros.html.twig" as macros %}
 
-<footer style="footer navbar fixed-bottom">
+<footer class="footer fixed-bottom">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-4">
+                <div class="d-flex d-lg-block justify-content-between mb-5">
+                    <img src="{{ cdn_url }}/images/rebrand/logo/so-sure_logo-white-dark.svg" width="140px" class="mb-lg-5">
+                    <ul class="list-inline">
+                        <li class="list-inline-item mr-4">
+                            <a href="https://www.facebook.com/wearesosure" rel="noopener" target="_blank" class="text-blue1"><i class="fab fa-facebook fa-2x"></i><span class="sr-only">so-sure on Facebook</span></a>
+                        </li>
+                        <li class="list-inline-item mr-4">
+                            <a href="https://twitter.com/wearesosure" rel="noopener" target="_blank" class="text-blue1"><i class="fab fa-twitter fa-2x"></i><span class="sr-only">so-sure on Twitter</span></a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-lg-8">
+                <div class="row">
+                    <div class="col-6 col-lg-3 offset-lg-3">
+                        <ul class="list-unstyled footer__links mb-5 mb-lg-0">
+                            <li class="h5 text-blue1 mb-3">Claims</li>
+                            <li class="mb-2"><a href="{{ path('claim') }}" class="text-white">Make a Claim</a></li>
+                            <li class="mb-2"><a href="{{ path('about_how_to_contact_so_sure') }}" class="text-white">Contact Us</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-6 col-lg-3">
+                        <ul class="list-unstyled footer__links mb-5 mb-lg-0">
+                            <li class="h5 text-blue1 mb-3">Address</li>
+                            <li class="text-white mb-2">so-sure Ltd</li>
+                            <li class="text-white mb-2">10 Finsbury Square</li>
+                            <li class="text-white mb-2">London</li>
+                            <li class="text-white mb-2">EC2A 1AF, GB</li>
+                        </ul>
+                    </div>
+                    <div class="col-6 col-lg-3">
+                        <ul class="list-unstyled footer__links">
+                            <li class="h5 text-blue1 mb-3">Company</li>
+                            <li class="mb-2"><a href="{{ path('about_home') }}" class="text-white">About Us</a></li>
+                            <li class="mb-2"><a href="{{ path('mobile_phone_insurance_for_your_company') }}" class="text-white">Company Phones</a></li>
+                            <li class="mb-2"><a href="{{ path('faq') }}" class="text-white">FAQ</a></li>
+                            <li class="mb-2"><a href="{{ path('blog') }}" class="text-white">Blog</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-6 col-lg-3 d-block d-lg-none">
+                        <ul class="list-unstyled footer__links">
+                            <li class="h5 text-blue1 mb-3">Legal</li>
+                            <li class="mb-2"><a href="{{ path('privacy') }}" class="text-white">Privacy policy</a></li>
+                            <li class="mb-2"><a href="{{ path('terms') }}" class="text-white">Terms &amp; Conditions</a></li>
+                            <li class="mb-2"><a href="{{ cookie_url }}" target="_blank" class="text-white">Cookie Policy</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <hr class="d-block d-lg-none border-white opacity-50 my-5">
+        <div class="row">
+            <div class="col-lg-10">
+                <ul class="list-inline footer__links mt-lg-5">
+                    <li class="list-inline-item text-white">&copy; so-sure. All rights reserved</li>
+                    <li class="list-inline-item text-white d-none d-lg-inline-block">|</li>
+                    <li class="list-inline-item d-none d-lg-inline-block"><a href="{{ path('privacy') }}" class="text-white">Privacy policy</a></li>
+                    <li class="list-inline-item text-white d-none d-lg-inline-block">|</li>
+                    <li class="list-inline-item d-none d-lg-inline-block"><a href="{{ path('terms') }}" class="text-white">Terms &amp; Conditions</a></li>
+                    <li class="list-inline-item text-white d-none d-lg-inline-block">|</li>
+                    <li class="list-inline-item d-none d-lg-inline-block"><a href="{{ cookie_url }}" target="_blank" class="text-white">Cookie Policy</a></li>
+                </ul>
+                <p class="text-white opacity-50"><small>so-sure Limited is an appointed representative of AFL Insurance Brokers Limited which is authorised and regulated by the Financial Conduct Authority. Our firm's Registration Number is 744729. We are permitted to arrange, deal as an agent of insurers and clients, and assist in claims handling.</small></p>
+            </div>
+        </div>
+    </div>
 
-{#     <svg class="d-block"
-         preserveAspectRatio="xMinYMin meet"
-         viewBox="0 0 1368 138"
-         version="1.1"
-         xmlns="http://www.w3.org/2000/svg"
-         xmlns:xlink="http://www.w3.org/1999/xlink">
-        <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-            <g id="Artboard-1" fill="#333342">
-                <path d="M0,0 C228,73.3333333 456,110 684,110 C912,110 1140,73.3333333 1368,0 L1368,138 L0,138 L0,0 Z" id="Rectangle"></path>
+    <svg class="d-none d-lg-block" preserveAspectRatio="xMinYMin meet" viewBox="0 0 2000 276" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+        <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" opacity="0.05">
+            <g id="Artboard-2" transform="translate(0.000000, -103.000000)" fill="#FFFFFF">
+                <path d="M0,119.183212 C232.933571,90.0572718 539.933571,100.246165 921,149.749893 C1302.06643,199.253621 1661.7331,275.670323 2000,379 L0,379" id="Path-2"></path>
             </g>
         </g>
     </svg>
-
-    <section class="footer__top pt-4 pt-sm-2 pb-5">
-        <div class="container">
-            <h4 class="text-white">
-                Get covered in less than 2 minutes. <br>
-                Download the app:
-            </h4>
-            <div class="d-flex flex-row align-items-center mb-4">
-                <a class="ga-outbound-click mr-2" data-clicklabel="iTunes" href="{{ apple_download('footer') }}" target="_blank" rel="noopener">
-                    <img src="{{ cdn_url }}/images/icons/app-store-original.svg" alt="Download so-sure on the App Store" /><span class="sr-only">so-sure app - Apple App Store</span>
-                </a>
-                <a class="ga-outbound-click" data-clicklabel="PlayStore" href="{{ google_download('footer') }}" target="_blank" rel="noopener">
-                    <img src="{{ cdn_url }}/images/icons/google-play-original.svg" alt="Get so-sure on Google Play" /><span class="sr-only">so-sure app - Google Play</span>
-                </a>
-            </div>
-            <div class="clearfix">
-                <ul class="list-inline float-sm-left mb-4 mb-sm-0 footer__links">
-                    <li class="list-inline-item d-none d-sm-inline-block mr-4">
-                        <a href="https://www.facebook.com/wearesosure" rel="noopener" target="_blank" class="text-white"><i class="fab fa-facebook fa-2x"></i><span class="sr-only">so-sure on Facebook</span></a>
-                    </li>
-                    <li class="list-inline-item d-none d-sm-inline-block mr-4">
-                        <a href="https://twitter.com/wearesosure" rel="noopener" target="_blank" class="text-white"><i class="fab fa-twitter fa-2x"></i><span class="sr-only">so-sure on Twitter</span></a>
-                    </li>
-                    <li class="list-inline-item mr-4">
-                        <a href="{{ path('about_home') }}" class="text-white">About Us</a>
-                    </li>
-                    <li class="list-inline-item mr-4">
-                        <a href="{{ path('faq') }}" class="text-white">FAQ</a>
-                    </li>
-                    <li class="list-inline-item mr-4">
-                        <a href="{{ path('claim') }}" class="text-white">Make a Claim</a>
-                    </li>
-                    <li class="list-inline-item mr-4">
-                        <a href="{{ path('about_how_to_contact_so_sure') }}" class="text-white">Contact Us</a>
-                    </li>
-                    <li class="list-inline-item mr-4">
-                        <a href="{{ path('mobile_phone_insurance_for_your_company') }}" class="text-white">Company Phones</a>
-                    </li>
-                    <li class="list-inline-item mr-4">
-                        <a href="{{ path('careers') }}" class="text-white">Careers</a>
-                    </li>
-                </ul>
-                <img src="{{ cdn_url }}/images/logo/so-sure_so-sure-full-logo-white-flat.svg" alt="" width="120px" class="d-inline-block mt-4 mt-sm-0 float-sm-right">
-            </div>
-        </div>
-    </section>
-    <section class="footer__bottom py-4">
-        <div class="container">
-            <p><small>&copy; 2018 so-sure Limited Terms Privacy Cookie Policy Sitemap <br>
-            We are a company registered in England & Wales (No. 09365669) and our registered address is:</small></p>
-            <address class="mb-0"><small>so-sure Limited, 58 City Rd, London EC1Y 2AL</small></address>
-            <p class="mb-0"><small>so-sure Limited is an appointed representative of AFL Insurance Brokers Limited which is authorised and regulated by the Financial Conduct Authority. Our firm's Registration Number is 744729. We are permitted to arrange, deal as an agent of insurers and clients, and assist in claims handling</small></p>
-        </div>
-    </section> #}
 </footer>
 
 {% include '::footer_data.html.twig' %}

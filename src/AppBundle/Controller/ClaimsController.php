@@ -2,7 +2,9 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Document\File\S3File;
 use AppBundle\Form\Type\ClaimSearchType;
+use AppBundle\Repository\File\S3FileRepository;
 use AppBundle\Service\ClaimsService;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
@@ -23,6 +25,8 @@ use AppBundle\Form\Type\ClaimCrimeRefType;
 use AppBundle\Form\Type\ClaimsCheckType;
 use AppBundle\Form\Type\ClaimFlagsType;
 use AppBundle\Form\Type\UserSearchType;
+use Symfony\Component\HttpFoundation\StreamedResponse;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Pagerfanta\Pagerfanta;
@@ -133,7 +137,6 @@ class ClaimsController extends BaseController
             $claim = new Claim();
             $claim->setPolicy($policy);
             $claim->setStatus(Claim::STATUS_INREVIEW);
-            $claim->setHandlingTeam($this->getUser()->getHandlingTeam());
         }
         $claimscheck = new ClaimsCheck();
         $claimscheck->setPolicy($policy);
@@ -159,6 +162,7 @@ class ClaimsController extends BaseController
                 $formClaim->handleRequest($request);
                 if ($formClaim->isValid()) {
                     $claim->setHandler($this->getUser());
+                    $claim->setHandlingTeam($this->getUser()->getHandlingTeam());
                     /** @var ClaimsService $claimsService */
                     $claimsService = $this->get('app.claims');
                     if ($claim->getStatus() == Claim::STATUS_SUBMITTED) {
@@ -228,7 +232,7 @@ class ClaimsController extends BaseController
             } elseif ($request->request->has('crimeref')) {
                 $formCrimeRef->handleRequest($request);
                 if ($formCrimeRef->isValid()) {
-                    if ($crimeRef->getForce()) {
+                    if ($crimeRef->getForce() && $crimeRef->getCrimeRef()) {
                         $validCrimeRef = $imeiService->validateCrimeRef(
                             $crimeRef->getForce(),
                             $crimeRef->getCrimeRef()
@@ -305,6 +309,45 @@ class ClaimsController extends BaseController
         ];
     }
 
+    /**
+     * @Route("/download/{id}", name="claims_download_file")
+     * @Route("/download/{id}/attachment", name="claims_download_file_attachment")
+     */
+    public function claimsDownloadFileAction(Request $request, $id)
+    {
+        $dm = $this->getManager();
+        /** @var S3FileRepository $repo */
+        $repo = $dm->getRepository(S3File::class);
+        /** @var S3File $s3File */
+        $s3File = $repo->find($id);
+        if (!$s3File) {
+            throw new NotFoundHttpException();
+        }
+
+        $filesystem = $this->get('oneup_flysystem.mount_manager')->getFilesystem('s3policy_fs');
+        $environment = $this->getParameter('kernel.environment');
+        $file = str_replace(sprintf('%s/', $environment), '', $s3File->getKey());
+
+        if (!$filesystem->has($file)) {
+            throw $this->createNotFoundException(sprintf('URL not found %s', $file));
+        }
+
+        $headers = [
+            'Content-Type' => $filesystem->getMimetype($file)
+        ];
+        if ($request->get('_route') == 'claims_download_file_attachment') {
+            $headers['Content-Disposition'] = sprintf('attachment; filename="%s"', $s3File->getFilename());
+        }
+        return StreamedResponse::create(
+            function () use ($file, $filesystem) {
+                $stream = $filesystem->readStream($file);
+                echo stream_get_contents($stream);
+                flush();
+            },
+            200,
+            $headers
+        );
+    }
 
     /**
      * @Route("/phone/{id}/alternatives", name="claims_phone_alternatives")

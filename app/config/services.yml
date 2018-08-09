@@ -1,5 +1,5 @@
 imports:
-    - { resource: conf/commands.yml }
+    - { resource: conf/advanced_services.yml }
 
 # Learn more about services, parameters and containers at
 # http://symfony.com/doc/current/book/service_container.html
@@ -342,6 +342,7 @@ services:
         class: AppBundle\Service\ClaimsTwigExtension
         arguments:
             - "@aws.s3"
+            - "@app.router"
         public: false
         tags:
             - { name: twig.extension }

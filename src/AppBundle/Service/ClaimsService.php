@@ -112,6 +112,7 @@ class ClaimsService
         $claim->setTimeToReach($claimFnol->getTimeToReach());
         $claim->setSignature($claimFnol->getSignature());
         $claim->setStatus(Claim::STATUS_FNOL);
+        $claim->setNotificationDate(new \DateTime());
 
         return $claim;
     }
@@ -119,7 +120,9 @@ class ClaimsService
     public function updateDamageDocuments(Claim $claim, ClaimFnolDamage $claimDamage, $submit = false)
     {
         $claim->setTypeDetails($claimDamage->getTypeDetails());
-        $claim->setTypeDetailsOther($claimDamage->getTypeDetailsOther());
+        $claim->setTypeDetailsOther(
+            $this->conformAlphanumericSpaceDot($claimDamage->getTypeDetailsOther(), 200)
+        );
         $claim->setMonthOfPurchase($claimDamage->getMonthOfPurchase());
         $claim->setYearOfPurchase($claimDamage->getYearOfPurchase());
         $claim->setPhoneStatus($claimDamage->getPhoneStatus());
@@ -161,7 +164,7 @@ class ClaimsService
         $claim->setCrimeRef($claimTheftLoss->getCrimeReferenceNumber());
         $claim->setForce($claimTheftLoss->getForce());
 
-        if ($claim->getForce()) {
+        if ($claim->getForce() && $claim->getCrimeRef()) {
             $validCrimeRef = $this->imeiService->validateCrimeRef($claim->getForce(), $claim->getCrimeRef());
             $claim->setValidCrimeRef($validCrimeRef);
         }

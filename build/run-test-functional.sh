@@ -50,6 +50,7 @@ while getopts ":snpdDhcClr" opt; do
       ;;
     h)
       echo "Usage: $0 [-d skip db refresh] [-D debug] [-s populate sample policy data] [-n no network test | -p run paid test | -c run coverage | -C run coverage no network] [-l keep logs (skip force:cs check)] [-r do not flush redis after running] [filter e.g. (::Method or namespace - use \\)"
+      exit 1
       ;;
   esac
 done
@@ -81,6 +82,7 @@ if [ "$SKIP_DB" == "0" ]; then
     app/console --env=test doctrine:mongodb:fixtures:load --no-interaction --fixtures src/AppBundle/DataFixtures/MongoDB/b/Phone --append
     app/console --env=test doctrine:mongodb:fixtures:load --no-interaction --fixtures src/AppBundle/DataFixtures/MongoDB/b/User --append
     app/console --env=test doctrine:mongodb:fixtures:load --no-interaction --fixtures src/AppBundle/DataFixtures/MongoDB/d/Feature --append
+    app/console --env=test doctrine:mongodb:fixtures:load --no-interaction --fixtures=src/AppBundle/DataFixtures/MongoDB/d/Oauth2 --append
     app/console --env=test sosure:doctrine:index
   fi
 fi
@@ -108,6 +110,7 @@ else
   ./build/phpunit.sh $DEBUG --filter "$RUN_FILTER" --bootstrap vendor/autoload.php tests
 fi
 if [ "$SKIP_FLUSH_REDIS" == "0" ]; then
+  echo "Flushing redis"
   app/console --env=test redis:flushdb -n
 fi
 if [ "$SKIP_PHING" == "0" ]; then

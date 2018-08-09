@@ -4,6 +4,7 @@ namespace AppBundle\Controller;
 
 use AppBundle\Document\ValidatorTrait;
 use AppBundle\Service\MailerService;
+use AppBundle\Service\RouterService;
 use Egulias\EmailValidator\Validation\RFCValidation;
 use Psr\Log\LoggerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -1160,6 +1161,7 @@ class ApiAuthController extends BaseController
             }
 
             $repo = $dm->getRepository(Policy::class);
+            /** @var PhonePolicy $policy */
             $policy = $repo->find($id);
             if (!$policy) {
                 throw new NotFoundHttpException();
@@ -1204,12 +1206,20 @@ class ApiAuthController extends BaseController
                 $imei->addMetadata('imei-suspected-fraud', $result['Metadata']['suspected-fraud']);
                 if ($result['Metadata']['suspected-fraud'] === "1") {
                     $policy->setImeiCircumvention(true);
-                    /** @var LoggerInterface $logger */
-                    $logger = $this->get('logger');
-                    $logger->error(sprintf(
-                        'Detected imei circumvention attempt for policy %s',
-                        $policy->getId()
-                    ));
+                    /** @var MailerService $mailer */
+                    $mailer = $this->get('app.mailer');
+                    /** @var RouterService $router */
+                    $router = $this->get('app.router');
+                    $body = sprintf(
+                        '<a href="%s">%s</a>',
+                        $router->generateUrl('admin_policy', ['id' => $policy->getId()]),
+                        $policy->getPolicyNumber()
+                    );
+                    $mailer->send(
+                        'Detected imei circumvention attempt',
+                        'tech+ops@so-sure.com',
+                        $body
+                    );
                 } else {
                     $policy->setImeiCircumvention(false);
                 }

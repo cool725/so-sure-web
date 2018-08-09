@@ -6,21 +6,32 @@ body {
 
 .footer {
     position: relative;
+    z-index: 1010;
+    padding-top: 4rem;
+    padding-bottom: 1rem;
+    font-family: $g-light;
 
-    // &__top {
-    //     background-color: $dark-80;
+    @include linear-gradient(90deg, $blue-4, $dark);
 
-    //     .fab {
-    //         vertical-align: middle;
-    //     }
-    // }
+    .container {
+        position: relative;
+        z-index: 2;
+    }
 
-    // &__bottom {
-    //     background-color: $dark;
-    //     color: $grey;
-    // }
+    svg {
+        position: absolute;
+        bottom: 0; left: 0;
+        z-index: 1;
+    }
 
-    // &:before {
+    &__links {
 
-    // }
+        a {
+            text-decoration: underline;
+        }
+    }
+
+    @include media-breakpoint-up(lg) {
+
+    }
 }

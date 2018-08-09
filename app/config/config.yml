@@ -32,6 +32,7 @@ framework:
     form:            ~
     csrf_protection: ~
     #serializer:      { enable_annotations: true }
+    serializer:      { enabled: true }
     templating:
         engines: ['twig']
         #assets_version: SomeVersionScheme
@@ -60,8 +61,8 @@ twig:
         branch_key: "%branch_key%"
         drift_key: "%drift_key%"
         use_cdn: true
+        #default_login_method: "accountkit"
         default_login_method: "accountkit"
-        #default_login_method: "email"
         branch_pot_url: "%branch_pot_url%"
         branch_share_url: "%branch_share_url%"
         branch_policy_url: "%branch_policy_url%"
@@ -140,7 +141,7 @@ monolog:
     channels: ['receperio']
 
 assetic:
-    bundles:        [ AppBundle, PicsureMLBundle, FOSUserBundle, TwigBundle, SchebTwoFactorBundle ]
+    bundles:        [ AppBundle, PicsureMLBundle, FOSUserBundle, TwigBundle, SchebTwoFactorBundle, FOSOAuthServerBundle ]
     debug:          '%kernel.debug%'
     use_controller: '%kernel.debug%'
     filters:
@@ -1035,6 +1036,7 @@ nelmio_security:
                 - https://*.bizographics.com
                 - https://www.accountkit.com
                 - https://www.glassdoor.co.uk
+                - http://via.placeholder.com
                 - 'data:'
                 # https://en.wikipedia.org/wiki/List_of_Google_domains
                 - https://www.google.com
@@ -1253,20 +1255,38 @@ nelmio_security:
             - starlingbank.com
             - campaign.wearesosure.com
             - accounts.google.com
-
     # forced HTTPS handling, don't combine with flexible mode
     # and make sure you have SSL working on your site before enabling this
-#    forced_ssl:
-#        hsts_max_age: 2592000 # 30 days
-#        hsts_subdomains: true
+    #forced_ssl:
+    #    hsts_max_age: 2592000 # 30 days
+    #    hsts_subdomains: true
 
     # flexible HTTPS handling, read the detailed config info
     # and make sure you have SSL working on your site before enabling this
-#    flexible_ssl:
-#        cookie_name: auth
-#        unsecured_logout: false
+    #flexible_ssl:
+    #    cookie_name: auth
+    #    unsecured_logout: false
 
 dpn_xml_sitemap:
     additional_sitemaps:
         - help/sitemap.xml
         - blog/sitemap.xml
+
+fos_oauth_server:
+    db_driver: mongodb
+    client_class:        AppBundle\Document\Oauth\Client
+    access_token_class:  AppBundle\Document\Oauth\AccessToken
+    refresh_token_class: AppBundle\Document\Oauth\RefreshToken
+    auth_code_class:     AppBundle\Document\Oauth\AuthCode
+    service:
+        user_provider: fos_user.user_provider
+        options:
+            supported_scopes: user.starling.summary
+            # Changing tokens and authcode lifetime
+            # 6 months
+            access_token_lifetime: 15768000
+            # 14 days
+            refresh_token_lifetime: 1209600
+            # initial request to getting a token
+            auth_code_lifetime: 120
+

@@ -69,13 +69,13 @@ class SixpackService
     // Exp 2
     const EXPERIMENT_AD_LANDING = 'ad-landing-2';
     // Exp 3
-    const EXPERIMENT_STARLING_LANDING = 'starling-landing';
+    // const EXPERIMENT_STARLING_LANDING = 'starling-landing';
     // Exp 4
     // const EXPERIMENT_PHONE_REPLACEMENT_MATCHING_ADVERT = 'phone-replacement-matching-advert';
     // Exp 5
     // const EXPERIMENT_AB_NEW_CONTENT = 'new-content-with-nav';
     // Exp 6
-    const EXPERIMENT_PHONE_REPLACEMENT = 'twentyfour-seventy-two';
+    // const EXPERIMENT_PHONE_REPLACEMENT = 'twentyfour-seventy-two';
     // Exp 7
     const EXPERIMENT_AB_CONTENT_HOMEPAGE = 'new-homepage-copy';
     // Exp 8
@@ -121,14 +121,14 @@ class SixpackService
         // Exp 2
         self::EXPERIMENT_AD_LANDING,
         // Exp 3
-        self::EXPERIMENT_STARLING_LANDING,
+        // self::EXPERIMENT_STARLING_LANDING,
         // Exp 4
         // self::EXPERIMENT_PHONE_REPLACEMENT_MATCHING_ADVERT,
         // Exp 5
         // self::EXPERIMENT_AB_NEW_CONTENT,
         self::EXPERIMENT_AB_CONTENT_HOMEPAGE,
         // Exp 6
-        self::EXPERIMENT_PHONE_REPLACEMENT,
+        // self::EXPERIMENT_PHONE_REPLACEMENT,
         // Exp 7
         self::EXPERIMENT_TEXT_VS_DROPDOWN,
         // Exp 8
@@ -188,11 +188,11 @@ class SixpackService
         // Exp 2
         self::EXPERIMENT_AD_LANDING,
         // Exp 3
-        self::EXPERIMENT_STARLING_LANDING,
+        // self::EXPERIMENT_STARLING_LANDING,
         // Exp 4
         // self::EXPERIMENT_PHONE_REPLACEMENT_MATCHING_ADVERT,
         // Exp 5
-        self::EXPERIMENT_PHONE_REPLACEMENT,
+        // self::EXPERIMENT_PHONE_REPLACEMENT,
         // Exp 6
 
         // Exp 7

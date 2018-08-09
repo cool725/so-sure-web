@@ -469,7 +469,7 @@
                     {% for file in policy.policyFiles %}
                     <tr>
                         <td>{{ file.fileType }}</td>
-                        <td><a href="{{ s3DownloadLink(file.bucket, file.key) }}">{{ file.fileName }}</a> (Generated {{ file.created|date }})</td>
+                        <td><a href="{{ path('claims_download_file', {'id': file.id}) }}">{{ file.fileName }}</a> (Generated {{ file.created|date }})</td>
                     </tr>
                     {% endfor %}
                 </table>
@@ -1357,7 +1357,8 @@
         </div>
       </div>
     </div>
-
+    {% endif %}
+    {% if is_granted('ROLE_CUSTOMER_SERVICES') %}
     <div class="modal fade" id="withdrawModal" tabindex="-1" role="dialog">
       <div class="modal-dialog" role="document" style="width: 60%;">
         <div class="modal-content">
@@ -1366,7 +1367,7 @@
             <h4 class="modal-title">Withdraw Claim</h4>
           </div>
           <div class="modal-body">
-            <h4>Claim should only be withdrawn if Davies has been contacted.</h4>
+            <h4>Claim should only be withdrawn if the claims team has been contacted.</h4>
             <p>This is to allow for cancellation to occur.</p>
             <p><form id="withdraw-form" method="POST">
                 <button type="submit" class="btn btn-danger">Withdraw claim</button>
@@ -1378,7 +1379,8 @@
         </div>
       </div>
     </div>
-
+    {% endif %}
+    {% if is_granted('ROLE_ADMIN') %}
         <div class="modal fade" id="bacsRefundModal" tabindex="-1" role="dialog">
             <div class="modal-dialog" role="document" style="width: 60%;">
                 <div class="modal-content">

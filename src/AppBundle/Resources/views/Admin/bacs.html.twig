@@ -458,7 +458,7 @@
                                         {% set color = 'danger' %}
                                     {% endif %}
                                     <td class="{{ color }}" width="25%">
-                                        {% if reportAmount > 0 %}
+                                        {% if reportAmount != 0 %}
                                             {{ reportAmount|number_format(2, '.', ',') }}
                                         {% else %}
                                             -

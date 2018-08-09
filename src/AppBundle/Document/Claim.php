@@ -47,6 +47,7 @@ class Claim
     const WARNING_FLAG_DAVIES_REPLACEMENT_COST_HIGHER = 'davies-replacement-cost-higher';
     const WARNING_FLAG_DAVIES_INCORRECT_EXCESS = 'davies-incorrect-excess';
     const WARNING_FLAG_DAVIES_IMEI_MISMATCH = 'davies-imei-mismatch';
+    const WARNING_FLAG_DAVIES_HANDLING_TEAM = 'davies-handling-team';
 
     // technically not a warning flag, but fits nicely under that for UI with little change required
     // and very little usage envisioned
@@ -159,6 +160,7 @@ class Claim
         self::WARNING_FLAG_DAVIES_REPLACEMENT_COST_HIGHER => self::WARNING_FLAG_DAVIES_REPLACEMENT_COST_HIGHER,
         self::WARNING_FLAG_DAVIES_INCORRECT_EXCESS => self::WARNING_FLAG_DAVIES_INCORRECT_EXCESS,
         self::WARNING_FLAG_DAVIES_IMEI_MISMATCH => self::WARNING_FLAG_DAVIES_IMEI_MISMATCH,
+        self::WARNING_FLAG_DAVIES_HANDLING_TEAM => self::WARNING_FLAG_DAVIES_HANDLING_TEAM,
     ];
 
     public static $claimTypes = [
@@ -624,7 +626,7 @@ class Claim
 
     /**
      * @AppAssert\AlphanumericSpaceDot()
-     * @Assert\Length(min="10", max="200")
+     * @Assert\Length(min="1", max="200")
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */

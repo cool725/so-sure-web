@@ -325,7 +325,7 @@ class JudopayService
         } elseif ($policy->getStatus() == PhonePolicy::STATUS_ACTIVE) {
             // shouldn't really happen as policy should be in unpaid status
             // but seems to occur on occasion - make sure we credit that policy anyway
-            $this->logger->warning(sprintf(
+            $this->logger->info(sprintf(
                 'Non-token payment is being applied to active policy %s',
                 $policy->getId()
             ));
@@ -1180,7 +1180,7 @@ class JudopayService
                 $payment->setRiskScore($tokenPaymentDetails["riskScore"]);
             }
         } else {
-            $this->logger->warning(sprintf(
+            $this->logger->info(sprintf(
                 'User %s does not have a valid payment method (Policy %s)',
                 $user->getId(),
                 $policy->getId()

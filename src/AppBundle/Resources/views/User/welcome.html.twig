@@ -277,7 +277,7 @@
                             </div>
                             <div class="col-md-4">
                                 <img src="{{ cdn_url }}/images/homepage/pic-sure_steps_homepage_4.svg" class="img-center" width="120px">
-                                <p>Plus our claims process is simple and hassle free. Once your claim is approved we provide you with a replacement phone the very next working day, or we can even do a speedy repair at your home of office.</p>
+                                <p>Plus our claims process is simple and hassle free. Once your claim is approved we provide you with a replacement phone with 24-72 hours, or we can even do a speedy repair at your home of office.</p>
                             </div>
                             <div class="col-md-4">
                                 <img src="{{ cdn_url }}/images/homepage/pic-sure_steps_homepage_2.svg" class="img-center" width="120px">
@@ -292,7 +292,10 @@
                 </div>
             </div>
         </div>
-    {% else %} #}
+    {% endif %}  #}
+    {% if app.session.has('oauth2Flow') and app.session.get('oauth2Flow') == 'starling' %}
+        {% include 'AppBundle::User/_welcome_starling.html.twig' %}
+    {% else %}
         <div class="modal modal-new fade"
              id="welcome-modal"
              tabindex="-1"
@@ -305,6 +308,8 @@
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
+
+
                         <h3 class="h2 text-blue text-center">You’ve made a great choice</h3>
                     </div>
                     <div class="modal-body">
@@ -318,7 +323,7 @@
                             <div class="col-md-4">
                                 <img src="{{ cdn_url }}/images/user/welcome_modal_home_insurance_.svg" class="img-center">
                                 <div class="h4 text-center">Home insurance</div>
-                                <p>Unlikely to get you up and running with a replacement phone the next working day (unlike us). Plus home insurance usually has high excess of £200 or more (with us its as low as £50) and might well increase your excess next year if you make a claim, ouch, we won't.</p>
+                                <p>Unlikely to get you up and running with a replacement phone in 24-72 hours (unlike us). Plus home insurance usually has high excess of £200 or more (with us its as low as £50) and might well increase your excess next year if you make a claim, ouch, we won't.</p>
                             </div>
                             <div class="col-md-4">
                                 <img src="{{ cdn_url }}/images/user/welcome_modal_cheap_insurance_.svg" class="img-center">
@@ -343,7 +348,7 @@
                 </div>
             </div>
         </div>
-    {# {% endif %} #}
+    {% endif %}
     {# End Page Modals #}
 
 
