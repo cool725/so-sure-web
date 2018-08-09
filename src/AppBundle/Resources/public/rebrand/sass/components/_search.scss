@@ -3,9 +3,16 @@
 .phone-search-dropdown {
 
     select {
+        width: 140px;
+
         @include media-breakpoint-up(lg) {
             width: 180px;
         }
+    }
+
+    // Allows for a line break in flexed rows
+    &__break {
+        width: 100%;
     }
 
     &__make {
