@@ -62,6 +62,16 @@
     }
 }
 
+.expanding-cardbox-alt {
+    border: 2px solid $blue-1;
+    color: $white;
+
+    &:hover {
+        border: 2px solid $blue-1;
+        background-color: rgba(255,255,255,.08);
+    }
+}
+
 .expanding-cardbox__icon {
     background: url('#{$cdn_url}/images/rebrand/icns/so-sure_tick-icn.svg') no-repeat 1.3rem 1.25rem;
     background-size: 2rem;
@@ -80,4 +90,9 @@
     border-color: $white;
     box-shadow: 0 15px 30px 0 rgba(8,27,154,0.08),
                 0 5px 15px 0 rgba(8,27,154,0.08);
+
+    &.expanding-cardbox-alt {
+        background-color: rgba(255,255,255,.08);
+        border: 2px solid $blue-1;
+    }
 }

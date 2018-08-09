@@ -23,12 +23,40 @@
             <div class="quote__details__container">
                 <div class="quote__details px-4 pb-5 px-xl-5 pb-xl-0">
                     <div class="quote__h5 text-white mb-4 h5">Here’s your quote details, Insure your:</div>
-                    <h1 class="quote__h1 text-blue1 mb-2">
-                        <span class="sub">
-                            {{ phone.make }} {{ phone.model }}
-                            <small>({{ phone.memory }}GB)</small>
-                        </span>
-                    </h1>
+                    <div class="d-flex align-items-md-center">
+                        <h1 class="quote__h1 text-blue1 mb-2">
+                            <span class="sub">
+                                {{ phone.make }} {{ phone.model }}
+                                <small>({{ phone.memory }}GB)</small>
+                            </span>
+                        </h1>
+                        <div class="quote__alt__phones dropdown dropleft">
+                            <a href="#"
+                               class="dropdown-toggle"
+                               id="dropdownMenuLink"
+                               data-toggle="dropdown"
+                               aria-haspopup="true"
+                               aria-expanded="false">
+                                <i class="fas fa-chevron-down text-white fa-lg ml-3"></i>
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                                {% if phones | length > 1 %}
+                                    {% for phone_mem in phones %}
+                                        {% if phone_mem.id != phone.id  %}
+                                            <a href="{{ path('quote_make_model_memory', {'make': phone_mem.makeCanonical, 'model': phone_mem.encodedModelCanonical, 'memory': phone_mem.memory}) }}" class="dropdown-item" href="#">{{ phone_mem.memory }}GB</a>
+                                        {% endif %}
+                                    {% endfor %}
+                                    <div class="dropdown-divider"></div>
+                                {% endif %}
+                                <a class="dropdown-item get-a-quote" href="#">I have a different phone</a>
+                            </div>
+                        </div>
+                    </div>
+{#                     <div id="alt_phones" class="quote__alt__phones collapse py-3">
+                        {% if phones | length > 1 %}
+                        {% endif %}
+                        asdjfapdifjaipdsfj
+                    </div> #}
                     <div class="quote__h1 text-white h1 mb-4"><span class="sub">For only</span> &pound;{{ phone_price.monthlyPremiumPrice }} a month</div>
                     {{ form_start(buy_form) }}
                         {{ form_widget(buy_form.buy_tablet, {
@@ -52,7 +80,7 @@
                            <i class="fas fa-caret-down"></i></a>
                     </div>
                 </div>
-                <div id="quote_info" class="quote__info__container collapse">
+                <div id="quote_info" class="quote__info__container">
                     <div class="quote__info mx-5 py-5">
                         <div class="h1 text-white">{{ phone.make }} {{ phone.model }}
                                 <small>({{ phone.memory }}GB)</small></div>
@@ -180,10 +208,10 @@
                     </div>
                     <div class="quote__info mx-5 py-5">
                         <h4 class="text-blue1 mb-4">Top FAQ's</h4>
-                        <div class="expanding-cardbox mb-4">
+                        <div class="expanding-cardbox expanding-cardbox-alt mb-4">
                             <div class="expanding-cardbox__body">
-                                <h5 class="expanding-cardbox__title text-blue4 mb-0">
-                                    Here's how it works <i class="fas fa-chevron-down text-blue2 fa-lg"></i>
+                                <h5 class="expanding-cardbox__title text-white mb-0">
+                                    Here's how it works <i class="fas fa-chevron-down text-white fa-lg"></i>
                                 </h5>
     {#                             <div class="expanding-cardbox__excerpt">
                                     Validate your phone with pic-sure and greatly reduce your excess

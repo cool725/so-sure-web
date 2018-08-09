@@ -14,7 +14,7 @@ $(function() {
         let updateModels = () => {
 
             // Clear incase model change
-            model.empty();
+            model.empty().prop('disabled', 'disabled');
             memory.empty().prop('disabled', 'disabled');
 
             // Set the default value

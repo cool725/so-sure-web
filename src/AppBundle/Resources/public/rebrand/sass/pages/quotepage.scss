@@ -20,6 +20,9 @@ body {
             font-size: 1.5rem;
         }
 
+        .fas {
+            cursor: pointer;
+        }
     }
 
     &__h5 {
@@ -41,6 +44,15 @@ body {
 
         @include media-breakpoint-up(lg) {
             padding-top: 12rem;
+        }
+    }
+
+    &__alt__phones {
+
+        a.dropdown-toggle {
+            &:before {
+                display: none;
+            }
         }
     }
 
