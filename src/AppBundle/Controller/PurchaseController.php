@@ -242,7 +242,7 @@ class PurchaseController extends BaseController
                         $data['Facebook'] = true;
                     }
                     $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_RECEIVE_DETAILS, $data);
-                  
+
                     $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_AB_CONTENT_HOMEPAGE);
 
                     if ($user->hasPartialPolicy()) {
@@ -1118,10 +1118,10 @@ class PurchaseController extends BaseController
                         ['Policy Id' => $policy->getId(), 'Reason' => $reason]
                     );
 
-                    // $this->get('app.sixpack')->convertByClientId(
-                    //     $policy->getUser()->getId(),
-                    //     SixpackService::EXPERIMENT_NEW_WELCOME_MODAL
-                    // );
+                    $this->get('app.sixpack')->convertByClientId(
+                        $policy->getUser()->getId(),
+                        SixpackService::EXPERIMENT_WELCOME_MODAL_NO_WELCOME_MODAL
+                    );
 
                     // @codingStandardsIgnoreStart
                     $this->addFlash(

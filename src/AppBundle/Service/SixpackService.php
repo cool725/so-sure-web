@@ -83,7 +83,7 @@ class SixpackService
     // Exp 9
     const EXPERIMENT_TEXT_VS_DROPDOWN_MOBILE = 'dropdown-search-mobile';
     // Exp 10
-
+    const EXPERIMENT_WELCOME_MODAL_NO_WELCOME_MODAL = 'welcome-modal-requested-cancellation';
     // Exp 11
 
     const ALTERNATIVES_SHARE_MESSAGE_SIMPLE = 'simple';
