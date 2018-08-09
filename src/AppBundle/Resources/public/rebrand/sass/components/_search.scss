@@ -2,12 +2,48 @@
 
 .phone-search-dropdown {
 
-    select {
-        width: 140px;
+    &__select {
+        position: relative;
+
+        // Reset
+        appearance: none;
+        -webkit-appearance: none;
+
+        // Set width
+        // width: 140px;
+
+        // Style
+        background-color: transparent;
+        border: 0;
+        border-bottom: 3px solid $blue-1;
+        @include border-radius(0);
+
+        color: $blue-1;
+
+        padding: 0;
 
         @include media-breakpoint-up(lg) {
-            width: 180px;
+            // width: 180px;
         }
+
+        &:after {
+            width: 0; height: 0;
+            position: absolute;
+            content: '';
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-top: 6px solid rgba(0, 0, 0, 0.12);
+            pointer-events: none;
+        }
+    }
+
+    &__select:disabled {
+        opacity: 0.5;
+    }
+
+    &__select:valid {
+        // color: $white;
+        // border-bottom-color: $white;
     }
 
     // Allows for a line break in flexed rows

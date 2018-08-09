@@ -1,5 +1,7 @@
 // getQuote.js
 
+require('./select.js');
+
 $(function() {
 
     const quoteToggle = $('.get-a-quote'),

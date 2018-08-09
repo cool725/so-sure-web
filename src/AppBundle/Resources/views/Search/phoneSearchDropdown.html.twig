@@ -7,18 +7,18 @@
         <span class="h1 mb-2 text-white">My mobile phone is an</span>
         {{ form_widget(form_phone.make, {
           'attr': {
-            'class': 'form-control-lg mb-2 ml-2 phone-search-dropdown__make'
+            'class': 'mb-2 ml-2 phone-search-dropdown__select phone-search-dropdown__make h1 resizeselect'
         }}) }}
         {{ form_widget(form_phone.model, {
           'attr': {
-            'class': 'form-control-lg mb-2 ml-2 phone-search-dropdown__model',
+            'class': 'mb-2 ml-2 phone-search-dropdown__select phone-search-dropdown__model h1',
             'disabled': 'disabled'
         }}) }}
-        <div class="phone-search-dropdown__break"></div>
+        <div class="phone-search-dropdown__break d-none d-lg-block"></div>
         <span class="h1 text-white">that has</span>
         {{ form_widget(form_phone.memory, {
             'attr': {
-                'class': 'form-control-lg mb-2 ml-2 mx-lg-2 phone-search-dropdown__memory',
+                'class': 'mb-2 ml-2 mx-lg-2 phone-search-dropdown__select phone-search-dropdown__memory h1',
                 'disabled': 'disabled'
         }}) }}
         <span class="h1 mb-2 text-white">storage</span>

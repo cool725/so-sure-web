@@ -9,6 +9,11 @@ require('./components/phoneSearchDropdown.js');
 require('./components/getQuote.js');
 require('./components/cardbox.js');
 
+// Enable fa pseudo elements
+// window.FontAwesomeConfig = {
+//     searchPseudoElements: true
+// }
+
 $(function() {
 
 

@@ -51,7 +51,7 @@ class PhoneDropdownType extends AbstractType
             }
         }
         $makeChoiceOptions = [
-            'placeholder' => 'Make',
+            'placeholder' => 'make',
             'choices' => $this->dm->getRepository(Phone::class)->findActiveMakes(),
             'required' => $this->required,
         ];
@@ -59,9 +59,9 @@ class PhoneDropdownType extends AbstractType
             $makeChoiceOptions['preferred_choices'] = ['Apple', 'Samsung'];
             $makeChoiceOptions['group_by'] = function ($value) {
                 if ($value === 'Apple' or $value === 'Samsung') {
-                    return 'Top Makes:';
+                    return 'Top makes:';
                 } else {
-                    return 'Other Makes:';
+                    return 'Other makes:';
                 }
             };
         }
@@ -69,12 +69,12 @@ class PhoneDropdownType extends AbstractType
         $builder
             ->add('make', ChoiceType::class, $makeChoiceOptions)
             ->add('model', ChoiceType::class, [
-                'placeholder' => 'Model',
+                'placeholder' => 'model',
                 'choices' => $models,
                 'required' => $this->required
             ])
             ->add('memory', ChoiceType::class, [
-                'placeholder' => 'Memory',
+                'placeholder' => 'memory',
                 'choices' => $memory,
                 'required' => $this->required
             ])
