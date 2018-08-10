@@ -15,7 +15,7 @@ use AppBundle\Document\User;
 use AppBundle\Document\Charge;
 use AppBundle\Document\DateTrait;
 
-use AppBundle\Classes\DaviesClaim;
+use AppBundle\Classes\DaviesHandlerClaim;
 
 /**
  * @group functional-nonet
@@ -87,7 +87,7 @@ class DaviesServiceTest extends WebTestCase
         $claim = new Claim();
         $policy->addClaim($claim);
 
-        $davies = new DaviesClaim();
+        $davies = new DaviesHandlerClaim();
 
         self::$daviesService->updatePolicy($claim, $davies, false);
         $this->assertEquals($imeiOld, $policy->getImei());
@@ -99,7 +99,7 @@ class DaviesServiceTest extends WebTestCase
         $claimB->setStatus(Claim::STATUS_APPROVED);
         $policy->addClaim($claimB);
 
-        $daviesB = new DaviesClaim();
+        $daviesB = new DaviesHandlerClaim();
         $daviesB->replacementMake = 'Apple';
         $daviesB->replacementModel = 'iPhone 4';
 
@@ -125,7 +125,7 @@ class DaviesServiceTest extends WebTestCase
         $claim->setStatus(Claim::STATUS_APPROVED);
         $policy->addClaim($claim);
 
-        $davies = new DaviesClaim();
+        $davies = new DaviesHandlerClaim();
 
         self::$daviesService->updatePolicy($claim, $davies, false);
         $this->assertEquals($imeiOld, $policy->getImei());
@@ -139,7 +139,7 @@ class DaviesServiceTest extends WebTestCase
         $claimB->setStatus(Claim::STATUS_APPROVED);
         $policy->addClaim($claimB);
 
-        $daviesB = new DaviesClaim();
+        $daviesB = new DaviesHandlerClaim();
         $daviesB->replacementMake = 'Apple';
         $daviesB->replacementModel = 'iPhone 4';
 
@@ -171,7 +171,7 @@ class DaviesServiceTest extends WebTestCase
         $claim->setStatus(Claim::STATUS_APPROVED);
         $policy->addClaim($claim);
 
-        $davies = new DaviesClaim();
+        $davies = new DaviesHandlerClaim();
 
         self::$daviesService->updatePolicy($claim, $davies, false);
         $this->assertEquals($imeiOld, $policy->getImei());
@@ -183,7 +183,7 @@ class DaviesServiceTest extends WebTestCase
         $claimB->setStatus(Claim::STATUS_APPROVED);
         $policy->addClaim($claimB);
 
-        $daviesB = new DaviesClaim();
+        $daviesB = new DaviesHandlerClaim();
         $daviesB->replacementMake = 'Apple';
         $daviesB->replacementModel = 'iPhone 4';
 
@@ -200,7 +200,7 @@ class DaviesServiceTest extends WebTestCase
 
     public function testGetPolicyNumber()
     {
-        $davies = new DaviesClaim();
+        $davies = new DaviesHandlerClaim();
         $davies->policyNumber = 'TEST/2017/12345';
         $this->assertEquals('TEST/2017/12345', $davies->getPolicyNumber());
 
@@ -218,7 +218,7 @@ class DaviesServiceTest extends WebTestCase
         $claimOpen = new Claim();
         $claimOpen->setNumber($this->getRandomPolicyNumber());
         $policyOpen->addClaim($claimOpen);
-        $daviesOpen = new DaviesClaim();
+        $daviesOpen = new DaviesHandlerClaim();
         $daviesOpen->policyNumber = $policyOpen->getPolicyNumber();
         $daviesOpen->claimNumber = $claimOpen->getNumber();
         $daviesOpen->status = 'Open';
@@ -229,7 +229,7 @@ class DaviesServiceTest extends WebTestCase
         $claimClosed = new Claim();
         $claimClosed->setNumber($this->getRandomPolicyNumber());
         $policyClosed->addClaim($claimClosed);
-        $daviesClosed = new DaviesClaim();
+        $daviesClosed = new DaviesHandlerClaim();
         $daviesClosed->policyNumber = $policyClosed->getPolicyNumber();
         $daviesClosed->claimNumber = $claimClosed->getNumber();
         $daviesClosed->status = 'Closed';
@@ -255,7 +255,7 @@ class DaviesServiceTest extends WebTestCase
         static::$dm->persist($claimOpen);
         static::$dm->flush();
 
-        $daviesOpen = new DaviesClaim();
+        $daviesOpen = new DaviesHandlerClaim();
         $daviesOpen->policyNumber = $policyOpen->getPolicyNumber();
         $daviesOpen->claimNumber = $claimOpen->getNumber();
         $daviesOpen->status = 'Open';
@@ -273,7 +273,7 @@ class DaviesServiceTest extends WebTestCase
         $claimOpen = new Claim();
         $claimOpen->setNumber($this->getRandomPolicyNumber());
         $policyOpen->addClaim($claimOpen);
-        $daviesOpen = new DaviesClaim();
+        $daviesOpen = new DaviesHandlerClaim();
         $daviesOpen->policyNumber = $policyOpen->getPolicyNumber();
         $daviesOpen->claimNumber = $claimOpen->getNumber();
         $daviesOpen->status = 'Open';
@@ -294,7 +294,7 @@ class DaviesServiceTest extends WebTestCase
         $claimOpen = new Claim();
         $claimOpen->setNumber($this->getRandomPolicyNumber());
         $policyOpen->addClaim($claimOpen);
-        $daviesOpen = new DaviesClaim();
+        $daviesOpen = new DaviesHandlerClaim();
         $daviesOpen->policyNumber = $policyOpen->getPolicyNumber();
         $daviesOpen->claimNumber = $claimOpen->getNumber();
         $daviesOpen->status = 'Open';
@@ -322,9 +322,9 @@ class DaviesServiceTest extends WebTestCase
         $claim->setNumber(time());
         $claim->setStatus(Claim::STATUS_SETTLED);
 
-        $daviesClaim = new DaviesClaim();
+        $daviesClaim = new DaviesHandlerClaim();
         $daviesClaim->claimNumber = $claim->getNumber();
-        $daviesClaim->status = DaviesClaim::STATUS_CLOSED;
+        $daviesClaim->status = DaviesHandlerClaim::STATUS_CLOSED;
         $daviesClaim->finalSuspicion = null;
         $daviesClaim->initialSuspicion = null;
         $daviesClaim->finalSuspicion = null;
@@ -347,9 +347,9 @@ class DaviesServiceTest extends WebTestCase
         $claim->setNumber(time());
         $claim->setStatus(Claim::STATUS_SETTLED);
 
-        $daviesClaim = new DaviesClaim();
+        $daviesClaim = new DaviesHandlerClaim();
         $daviesClaim->claimNumber = $claim->getNumber();
-        $daviesClaim->status = DaviesClaim::STATUS_CLOSED;
+        $daviesClaim->status = DaviesHandlerClaim::STATUS_CLOSED;
         $daviesClaim->finalSuspicion = null;
         $daviesClaim->initialSuspicion = null;
         $daviesClaim->finalSuspicion = null;
@@ -378,9 +378,9 @@ class DaviesServiceTest extends WebTestCase
         $claim->setNumber(time());
         $claim->setStatus(Claim::STATUS_INREVIEW);
 
-        $daviesClaim = new DaviesClaim();
+        $daviesClaim = new DaviesHandlerClaim();
         $daviesClaim->claimNumber = $claim->getNumber();
-        $daviesClaim->status = DaviesClaim::STATUS_OPEN;
+        $daviesClaim->status = DaviesHandlerClaim::STATUS_OPEN;
         $daviesClaim->insuredName = 'Marko Marulic';
         $daviesClaim->initialSuspicion = null;
         $daviesClaim->finalSuspicion = null;
@@ -408,9 +408,9 @@ class DaviesServiceTest extends WebTestCase
         $claim->setNumber(time());
         $claim->setStatus(Claim::STATUS_INREVIEW);
 
-        $daviesClaim = new DaviesClaim();
+        $daviesClaim = new DaviesHandlerClaim();
         $daviesClaim->claimNumber = $claim->getNumber();
-        $daviesClaim->status = DaviesClaim::STATUS_OPEN;
+        $daviesClaim->status = DaviesHandlerClaim::STATUS_OPEN;
         $daviesClaim->insuredName = 'Marko Marulic';
         $daviesClaim->lossDescription = 'min length';
         $daviesClaim->initialSuspicion = false;
@@ -438,9 +438,9 @@ class DaviesServiceTest extends WebTestCase
         $claim->setNumber(time());
         $claim->setStatus(Claim::STATUS_APPROVED);
 
-        $daviesClaim = new DaviesClaim();
+        $daviesClaim = new DaviesHandlerClaim();
         $daviesClaim->claimNumber = $claim->getNumber();
-        $daviesClaim->status = DaviesClaim::STATUS_CLOSED;
+        $daviesClaim->status = DaviesHandlerClaim::STATUS_CLOSED;
         $daviesClaim->insuredName = 'Marko Marulic';
         $daviesClaim->lossDescription = 'min length';
         $daviesClaim->initialSuspicion = false;
@@ -468,9 +468,9 @@ class DaviesServiceTest extends WebTestCase
         $claim->setNumber(time());
         $claim->setStatus(Claim::STATUS_INREVIEW);
 
-        $daviesClaim = new DaviesClaim();
+        $daviesClaim = new DaviesHandlerClaim();
         $daviesClaim->claimNumber = $claim->getNumber();
-        $daviesClaim->status = DaviesClaim::STATUS_OPEN;
+        $daviesClaim->status = DaviesHandlerClaim::STATUS_OPEN;
         $daviesClaim->insuredName = 'Marko Marulic';
         $daviesClaim->initialSuspicion = null;
         $daviesClaim->finalSuspicion = null;
@@ -498,9 +498,9 @@ class DaviesServiceTest extends WebTestCase
         $claim->setNumber(time());
         $claim->setStatus(Claim::STATUS_APPROVED);
 
-        $daviesClaim = new DaviesClaim();
+        $daviesClaim = new DaviesHandlerClaim();
         $daviesClaim->claimNumber = $claim->getNumber();
-        $daviesClaim->status = DaviesClaim::STATUS_CLOSED;
+        $daviesClaim->status = DaviesHandlerClaim::STATUS_CLOSED;
         $daviesClaim->insuredName = 'Marko Marulic';
         $daviesClaim->initialSuspicion = false;
         $daviesClaim->finalSuspicion = null;
@@ -524,13 +524,13 @@ class DaviesServiceTest extends WebTestCase
 
     public function testSaveClaimsOpenClosed()
     {
-        $daviesOpen = new DaviesClaim();
+        $daviesOpen = new DaviesHandlerClaim();
         $daviesOpen->policyNumber = $this->getRandomPolicyNumber();
         $daviesOpen->claimNumber = 'a';
         $daviesOpen->status = 'Open';
         $daviesOpen->lossDate = new \DateTime('2017-01-01');
 
-        $daviesClosed = new DaviesClaim();
+        $daviesClosed = new DaviesHandlerClaim();
         $daviesClosed->policyNumber = $daviesOpen->getPolicyNumber();
         $daviesClosed->claimNumber = 'a';
         $daviesClosed->status = 'Closed';
@@ -547,13 +547,13 @@ class DaviesServiceTest extends WebTestCase
 
     public function testSaveClaimsClosedOpen()
     {
-        $daviesOpen = new DaviesClaim();
+        $daviesOpen = new DaviesHandlerClaim();
         $daviesOpen->policyNumber = $this->getRandomPolicyNumber();
         $daviesOpen->claimNumber = 'a';
         $daviesOpen->status = 'Open';
         $daviesOpen->lossDate = new \DateTime('2017-02-01');
 
-        $daviesClosed = new DaviesClaim();
+        $daviesClosed = new DaviesHandlerClaim();
         $daviesClosed->policyNumber = $daviesOpen->getPolicyNumber();
         $daviesClosed->claimNumber = 'a';
         $daviesClosed->status = 'Closed';
@@ -596,7 +596,7 @@ class DaviesServiceTest extends WebTestCase
         $claim1Id = $claim1->getId();
         $claim2Id = $claim2->getId();
 
-        $daviesOpen1 = new DaviesClaim();
+        $daviesOpen1 = new DaviesHandlerClaim();
         $daviesOpen1->claimNumber = '1';
         $daviesOpen1->policyNumber = $policy1->getPolicyNumber();
         $daviesOpen1->status = 'Open';
@@ -606,7 +606,7 @@ class DaviesServiceTest extends WebTestCase
         $daviesOpen1->insuredName = 'Foo Bar';
         //$daviesOpen1->type = DaviesClaim::TYPE_LOSS;
 
-        $daviesOpen2 = new DaviesClaim();
+        $daviesOpen2 = new DaviesHandlerClaim();
         $daviesOpen2->claimNumber = '2';
         $daviesOpen2->policyNumber = $policy2->getPolicyNumber();
         $daviesOpen2->status = 'Open';
@@ -643,7 +643,7 @@ class DaviesServiceTest extends WebTestCase
         $policy->addClaim($claim);
         $policy->setPolicyNumber('TEST/2016/123456');
 
-        $daviesClaim = new DaviesClaim();
+        $daviesClaim = new DaviesHandlerClaim();
         $daviesClaim->policyNumber = 'TEST/2017/123456';
 
         $this->validateClaimsDetailsThrowsException(
@@ -668,7 +668,7 @@ class DaviesServiceTest extends WebTestCase
         $policy->addClaim($claim);
         $policy->setPolicyNumber('TEST/2017/123456');
 
-        $daviesClaim = new DaviesClaim();
+        $daviesClaim = new DaviesHandlerClaim();
         $daviesClaim->policyNumber = 'TEST/2017/123456';
         $daviesClaim->replacementImei = '123';
         $daviesClaim->status = 'Closed';
@@ -697,7 +697,7 @@ class DaviesServiceTest extends WebTestCase
         $policy->addClaim($claim);
         $policy->setPolicyNumber('TEST/2017/123456');
 
-        $daviesClaim = new DaviesClaim();
+        $daviesClaim = new DaviesHandlerClaim();
         $daviesClaim->policyNumber = 'TEST/2017/123456';
         $daviesClaim->status = 'Open';
         $daviesClaim->miStatus = '';
@@ -723,10 +723,10 @@ class DaviesServiceTest extends WebTestCase
         $policy->addClaim($claim);
         $policy->setPolicyNumber('TEST/2017/1234569');
 
-        $daviesClaim = new DaviesClaim();
+        $daviesClaim = new DaviesHandlerClaim();
         $daviesClaim->policyNumber = 'TEST/2017/1234569';
         $daviesClaim->insuredName = 'Mr Bar Foo';
-        $daviesClaim->status = DaviesClaim::STATUS_OPEN;
+        $daviesClaim->status = DaviesHandlerClaim::STATUS_OPEN;
 
         $this->validateClaimsDetailsThrowsException(
             $claim,
@@ -752,12 +752,12 @@ class DaviesServiceTest extends WebTestCase
         $policy->addClaim($claim);
         $policy->setPolicyNumber('TEST/2017/123456');
 
-        $daviesClaim = new DaviesClaim();
+        $daviesClaim = new DaviesHandlerClaim();
         $daviesClaim->policyNumber = 'TEST/2017/123456';
         $daviesClaim->reserved = 1;
         $daviesClaim->insuredName = 'Mr foo bar';
         $daviesClaim->riskPostCode = 'se152sz';
-        $daviesClaim->status = DaviesClaim::STATUS_OPEN;
+        $daviesClaim->status = DaviesHandlerClaim::STATUS_OPEN;
         //$daviesClaim->type = DaviesClaim::TYPE_LOSS;
 
         self::$daviesService->validateClaimDetails($claim, $daviesClaim);
@@ -770,9 +770,9 @@ class DaviesServiceTest extends WebTestCase
         $claim = new Claim();
         $policy->addClaim($claim);
 
-        $daviesClaim = new DaviesClaim();
+        $daviesClaim = new DaviesHandlerClaim();
         $daviesClaim->policyNumber = -1;
-        $daviesClaim->status = DaviesClaim::STATUS_OPEN;
+        $daviesClaim->status = DaviesHandlerClaim::STATUS_OPEN;
 
         $this->validateClaimsDetailsThrowsException(
             $claim,
@@ -787,10 +787,10 @@ class DaviesServiceTest extends WebTestCase
         $claim = new Claim();
         $policy->addClaim($claim);
 
-        $daviesClaim = new DaviesClaim();
+        $daviesClaim = new DaviesHandlerClaim();
         $daviesClaim->policyNumber = $policy->getPolicyNumber();
         $daviesClaim->insuredName = 'Mr Patrick McAndrew';
-        $daviesClaim->status = DaviesClaim::STATUS_OPEN;
+        $daviesClaim->status = DaviesHandlerClaim::STATUS_OPEN;
 
         $this->validateClaimsDetailsThrowsException(
             $claim,
@@ -805,16 +805,16 @@ class DaviesServiceTest extends WebTestCase
         $claim = new Claim();
         $policy->addClaim($claim);
 
-        $daviesClaim = new DaviesClaim();
+        $daviesClaim = new DaviesHandlerClaim();
         $daviesClaim->claimNumber = 1;
-        $daviesClaim->status = DaviesClaim::STATUS_OPEN;
+        $daviesClaim->status = DaviesHandlerClaim::STATUS_OPEN;
         $daviesClaim->incurred = 0;
         $daviesClaim->reserved = 0;
         $daviesClaim->lossDate = new \DateTime('2017-07-01');
         $daviesClaim->replacementReceivedDate = new \DateTime('2017-06-01');
         $daviesClaim->policyNumber = $policy->getPolicyNumber();
         $daviesClaim->insuredName = 'Mr foo bar';
-        $daviesClaim->status = DaviesClaim::STATUS_OPEN;
+        $daviesClaim->status = DaviesHandlerClaim::STATUS_OPEN;
 
         $this->validateClaimsDetailsThrowsException(
             $claim,
@@ -829,12 +829,12 @@ class DaviesServiceTest extends WebTestCase
         $claim = new Claim();
         $policy->addClaim($claim);
 
-        $daviesClaim = new DaviesClaim();
+        $daviesClaim = new DaviesHandlerClaim();
         $daviesClaim->claimNumber = 1;
         $daviesClaim->policyNumber = $policy->getPolicyNumber();
         $daviesClaim->insuredName = 'Mr foo bar';
         $daviesClaim->riskPostCode = 'se152sz';
-        $daviesClaim->status = DaviesClaim::STATUS_OPEN;
+        $daviesClaim->status = DaviesHandlerClaim::STATUS_OPEN;
 
         self::$daviesService->validateClaimDetails($claim, $daviesClaim);
         $this->insureWarningExists('/does not match expected postcode/');
@@ -847,7 +847,7 @@ class DaviesServiceTest extends WebTestCase
         $claim->setStatus(Claim::STATUS_SETTLED);
         $policy->addClaim($claim);
 
-        $daviesClaim = new DaviesClaim();
+        $daviesClaim = new DaviesHandlerClaim();
         $daviesClaim->claimNumber = 1;
         $daviesClaim->policyNumber = $policy->getPolicyNumber();
         $daviesClaim->insuredName = 'Mr foo bar';
@@ -867,7 +867,7 @@ class DaviesServiceTest extends WebTestCase
         $claim->setStatus(Claim::STATUS_SETTLED);
         $policy->addClaim($claim);
 
-        $daviesClaim = new DaviesClaim();
+        $daviesClaim = new DaviesHandlerClaim();
         $daviesClaim->claimNumber = 1;
         $daviesClaim->policyNumber = $policy->getPolicyNumber();
         $daviesClaim->insuredName = 'Mr foo bar';
@@ -886,14 +886,14 @@ class DaviesServiceTest extends WebTestCase
         $claim = new Claim();
         $policy->addClaim($claim);
 
-        $daviesClaim = new DaviesClaim();
+        $daviesClaim = new DaviesHandlerClaim();
         $daviesClaim->claimNumber = 1;
-        $daviesClaim->status = DaviesClaim::STATUS_OPEN;
+        $daviesClaim->status = DaviesHandlerClaim::STATUS_OPEN;
         $daviesClaim->incurred = 0;
         $daviesClaim->reserved = 0;
         $daviesClaim->policyNumber = $policy->getPolicyNumber();
         $daviesClaim->insuredName = 'Mr foo bar';
-        $daviesClaim->status = DaviesClaim::STATUS_OPEN;
+        $daviesClaim->status = DaviesHandlerClaim::STATUS_OPEN;
 
         self::$daviesService->validateClaimDetails($claim, $daviesClaim);
         $this->insureErrorExists('/does not have a reserved value/');
@@ -905,9 +905,9 @@ class DaviesServiceTest extends WebTestCase
         $claim = new Claim();
         $policy->addClaim($claim);
 
-        $daviesClaim = new DaviesClaim();
+        $daviesClaim = new DaviesHandlerClaim();
         $daviesClaim->claimNumber = 1;
-        $daviesClaim->status = DaviesClaim::STATUS_OPEN;
+        $daviesClaim->status = DaviesHandlerClaim::STATUS_OPEN;
         $daviesClaim->lossType = "Loss - From Pocket";
         $daviesClaim->excess = 50;
         $daviesClaim->incurred = 0;
@@ -931,9 +931,9 @@ class DaviesServiceTest extends WebTestCase
         $claim = new Claim();
         $policy->addClaim($claim);
 
-        $daviesClaim = new DaviesClaim();
+        $daviesClaim = new DaviesHandlerClaim();
         $daviesClaim->claimNumber = 1;
-        $daviesClaim->status = DaviesClaim::STATUS_OPEN;
+        $daviesClaim->status = DaviesHandlerClaim::STATUS_OPEN;
         $daviesClaim->lossType = "Loss - From Pocket";
         $daviesClaim->excess = -150;
         $daviesClaim->incurred = 0;
@@ -956,9 +956,9 @@ class DaviesServiceTest extends WebTestCase
         $claim = new Claim();
         $policy->addClaim($claim);
 
-        $daviesClaim = new DaviesClaim();
+        $daviesClaim = new DaviesHandlerClaim();
         $daviesClaim->claimNumber = 1;
-        $daviesClaim->status = DaviesClaim::STATUS_OPEN;
+        $daviesClaim->status = DaviesHandlerClaim::STATUS_OPEN;
         $daviesClaim->lossType = "Loss - From Pocket";
         $daviesClaim->excess = 70;
         $daviesClaim->incurred = 0;
@@ -977,9 +977,9 @@ class DaviesServiceTest extends WebTestCase
         $claim = new Claim();
         $policy->addClaim($claim);
 
-        $daviesClaim = new DaviesClaim();
+        $daviesClaim = new DaviesHandlerClaim();
         $daviesClaim->claimNumber = 1;
-        $daviesClaim->status = DaviesClaim::STATUS_OPEN;
+        $daviesClaim->status = DaviesHandlerClaim::STATUS_OPEN;
         $daviesClaim->lossType = "Loss - From Pocket";
         $daviesClaim->excess = 150;
         $daviesClaim->incurred = 0;
@@ -998,9 +998,9 @@ class DaviesServiceTest extends WebTestCase
         $claim = new Claim();
         $policy->addClaim($claim);
 
-        $daviesClaim = new DaviesClaim();
+        $daviesClaim = new DaviesHandlerClaim();
         $daviesClaim->claimNumber = 1;
-        $daviesClaim->status = DaviesClaim::STATUS_OPEN;
+        $daviesClaim->status = DaviesHandlerClaim::STATUS_OPEN;
         $daviesClaim->lossType = "Loss - From Pocket";
         $daviesClaim->excess = 70;
         $daviesClaim->incurred = 0;
@@ -1018,9 +1018,9 @@ class DaviesServiceTest extends WebTestCase
         $claim = new Claim();
         $policy->addClaim($claim);
 
-        $daviesClaim = new DaviesClaim();
+        $daviesClaim = new DaviesHandlerClaim();
         $daviesClaim->claimNumber = 1;
-        $daviesClaim->status = DaviesClaim::STATUS_CLOSED;
+        $daviesClaim->status = DaviesHandlerClaim::STATUS_CLOSED;
         $daviesClaim->lossType = "Loss - From Pocket";
         $daviesClaim->reserved = 10;
         $daviesClaim->policyNumber = $policy->getPolicyNumber();
@@ -1036,9 +1036,9 @@ class DaviesServiceTest extends WebTestCase
         $claim = new Claim();
         $policy->addClaim($claim);
 
-        $daviesClaim = new DaviesClaim();
+        $daviesClaim = new DaviesHandlerClaim();
         $daviesClaim->claimNumber = 1;
-        $daviesClaim->status = DaviesClaim::STATUS_OPEN;
+        $daviesClaim->status = DaviesHandlerClaim::STATUS_OPEN;
         $daviesClaim->incurred = 0;
         $daviesClaim->reserved = 1;
         $daviesClaim->policyNumber = $policy->getPolicyNumber();
@@ -1054,7 +1054,7 @@ class DaviesServiceTest extends WebTestCase
         $claim = new Claim();
         $policy->addClaim($claim);
 
-        $daviesClaim = new DaviesClaim();
+        $daviesClaim = new DaviesHandlerClaim();
         $daviesClaim->claimNumber = 1;
         $daviesClaim->status = 'open';
         $daviesClaim->incurred = 1;
@@ -1074,7 +1074,7 @@ class DaviesServiceTest extends WebTestCase
 
         $twelveDaysAgo = new \DateTime();
         $twelveDaysAgo = $twelveDaysAgo->sub(new \DateInterval('P12D'));
-        $daviesClaim = new DaviesClaim();
+        $daviesClaim = new DaviesHandlerClaim();
         $daviesClaim->claimNumber = 1;
         $daviesClaim->status = 'open';
         $daviesClaim->incurred = 6.68;
@@ -1104,7 +1104,7 @@ class DaviesServiceTest extends WebTestCase
 
         $fourDaysAgo = new \DateTime();
         $fourDaysAgo = $fourDaysAgo->sub(new \DateInterval('P4D'));
-        $daviesClaim = new DaviesClaim();
+        $daviesClaim = new DaviesHandlerClaim();
         $daviesClaim->claimNumber = 1;
         $daviesClaim->status = 'open';
         $daviesClaim->incurred = 6.68;
@@ -1132,7 +1132,7 @@ class DaviesServiceTest extends WebTestCase
         $claim = new Claim();
         $policy->addClaim($claim);
 
-        $daviesClaim = new DaviesClaim();
+        $daviesClaim = new DaviesHandlerClaim();
         $daviesClaim->claimNumber = 1;
         $daviesClaim->status = 'open';
         $daviesClaim->incurred = 6.68;
@@ -1157,7 +1157,7 @@ class DaviesServiceTest extends WebTestCase
         $claim = new Claim();
         $policy->addClaim($claim);
 
-        $daviesClaim = new DaviesClaim();
+        $daviesClaim = new DaviesHandlerClaim();
         $daviesClaim->claimNumber = 1;
         $daviesClaim->status = 'open';
         $daviesClaim->incurred = 1;
@@ -1182,7 +1182,7 @@ class DaviesServiceTest extends WebTestCase
         $claim = new Claim();
         $policy->addClaim($claim);
 
-        $daviesClaim = new DaviesClaim();
+        $daviesClaim = new DaviesHandlerClaim();
         $daviesClaim->claimNumber = 1;
         $daviesClaim->status = 'open';
         $daviesClaim->incurred = 1;
@@ -1210,7 +1210,7 @@ class DaviesServiceTest extends WebTestCase
         $charge->setAmount(0.90);
         $claim->addCharge($charge);
 
-        $daviesClaim = new DaviesClaim();
+        $daviesClaim = new DaviesHandlerClaim();
         $daviesClaim->claimNumber = 1;
         $daviesClaim->status = 'open';
         $daviesClaim->reciperoFee = 1.08;
@@ -1235,7 +1235,7 @@ class DaviesServiceTest extends WebTestCase
         $claim->setApprovedDate(new \DateTime('2016-01-02'));
         $policy->addClaim($claim);
 
-        $daviesClaim = new DaviesClaim();
+        $daviesClaim = new DaviesHandlerClaim();
         $daviesClaim->claimNumber = 1;
         $daviesClaim->status = 'open';
         $daviesClaim->incurred = 1;
@@ -1270,7 +1270,7 @@ class DaviesServiceTest extends WebTestCase
         $claim->setApprovedDate(new \DateTime('2016-01-02'));
         $policy->addClaim($claim);
 
-        $daviesClaim = new DaviesClaim();
+        $daviesClaim = new DaviesHandlerClaim();
         $daviesClaim->claimNumber = 1;
         $daviesClaim->status = 'open';
         $daviesClaim->incurred = 1;
@@ -1309,7 +1309,7 @@ class DaviesServiceTest extends WebTestCase
         $claim->setApprovedDate(new \DateTime('2016-01-02'));
         $policy->addClaim($claim);
 
-        $daviesClaim = new DaviesClaim();
+        $daviesClaim = new DaviesHandlerClaim();
         $daviesClaim->claimNumber = 1;
         $daviesClaim->status = 'open';
         $daviesClaim->incurred = 1;
@@ -1343,7 +1343,7 @@ class DaviesServiceTest extends WebTestCase
         $claim->setApprovedDate(new \DateTime('2016-01-02'));
         $policy->addClaim($claim);
 
-        $daviesClaim = new DaviesClaim();
+        $daviesClaim = new DaviesHandlerClaim();
         $daviesClaim->claimNumber = 1;
         $daviesClaim->status = 'open';
         $daviesClaim->incurred = 1;
@@ -1373,7 +1373,7 @@ class DaviesServiceTest extends WebTestCase
         $claim->setApprovedDate(new \DateTime('2016-04-01'));
         $policy->addClaim($claim);
 
-        $daviesClaim = new DaviesClaim();
+        $daviesClaim = new DaviesHandlerClaim();
         $daviesClaim->claimNumber = 1;
         $daviesClaim->status = 'open';
         $daviesClaim->incurred = 1;
@@ -1411,7 +1411,7 @@ class DaviesServiceTest extends WebTestCase
         $claim->setApprovedDate($twoWeekAgo);
         $policy->addClaim($claim);
 
-        $daviesClaim = new DaviesClaim();
+        $daviesClaim = new DaviesHandlerClaim();
         $daviesClaim->claimNumber = 1;
         $daviesClaim->status = 'open';
         $daviesClaim->incurred = 1;
@@ -1430,7 +1430,7 @@ class DaviesServiceTest extends WebTestCase
         //$daviesClaim->replacementReceivedDate = new \DateTime('2016-01-01');
 
         $daviesClaim->status = 'closed';
-        $daviesClaim->miStatus = DaviesClaim::MISTATUS_WITHDRAWN;
+        $daviesClaim->miStatus = DaviesHandlerClaim::MISTATUS_WITHDRAWN;
         self::$daviesService->validateClaimDetails($claim, $daviesClaim);
         $this->insureSoSureActionExists('/previously approved, however is now withdrawn/');
         $this->insureSoSureActionDoesNotExist('/previously approved, however no longer appears to be/');
@@ -1499,7 +1499,7 @@ class DaviesServiceTest extends WebTestCase
         $claim->setReplacementReceivedDate(new \DateTime('2016-01-01'));
         $policy->addClaim($claim);
 
-        $daviesClaim = new DaviesClaim();
+        $daviesClaim = new DaviesHandlerClaim();
         $daviesClaim->claimNumber = 1;
 
         self::$daviesService->postValidateClaimDetails($claim, $daviesClaim);
@@ -1521,14 +1521,14 @@ class DaviesServiceTest extends WebTestCase
         static::$dm->persist($claim);
         static::$dm->flush();
 
-        $daviesClaim = new DaviesClaim();
+        $daviesClaim = new DaviesHandlerClaim();
         $daviesClaim->claimNumber = (string) $claim->getNumber();
         $daviesClaim->incurred = 0;
         $daviesClaim->reserved = 0;
         $daviesClaim->policyNumber = $policy->getPolicyNumber();
         $daviesClaim->insuredName = 'Mr foo bar';
-        $daviesClaim->status = DaviesClaim::STATUS_OPEN;
-        $daviesClaim->lossType = DaviesClaim::TYPE_LOSS;
+        $daviesClaim->status = DaviesHandlerClaim::STATUS_OPEN;
+        $daviesClaim->lossType = DaviesHandlerClaim::TYPE_LOSS;
         $daviesClaim->replacementReceivedDate = new \DateTime('2016-01-02');
         $daviesClaim->replacementMake = 'Apple';
         $daviesClaim->replacementModel = 'iPhone 4';
@@ -1562,18 +1562,18 @@ class DaviesServiceTest extends WebTestCase
         static::$dm->persist($claim);
         static::$dm->flush();
 
-        $daviesClaim = new DaviesClaim();
+        $daviesClaim = new DaviesHandlerClaim();
         $daviesClaim->claimNumber = (string) $claim->getNumber();
         $daviesClaim->incurred = 0;
         $daviesClaim->reserved = 0;
         $daviesClaim->policyNumber = $policy->getPolicyNumber();
         $daviesClaim->insuredName = 'Mr foo bar';
-        $daviesClaim->status = DaviesClaim::STATUS_OPEN;
-        $daviesClaim->lossType = DaviesClaim::TYPE_LOSS;
+        $daviesClaim->status = DaviesHandlerClaim::STATUS_OPEN;
+        $daviesClaim->lossType = DaviesHandlerClaim::TYPE_LOSS;
         $daviesClaim->replacementReceivedDate = new \DateTime('2016-01-02');
         $daviesClaim->replacementMake = 'Apple';
         $daviesClaim->replacementModel = 'iPhone 4';
-        $daviesClaim->miStatus = DaviesClaim::MISTATUS_REPUDIATED;
+        $daviesClaim->miStatus = DaviesHandlerClaim::MISTATUS_REPUDIATED;
 
         $mailer = $this->getMockBuilder('Swift_Mailer')
             ->disableOriginalConstructor()
@@ -1615,18 +1615,18 @@ class DaviesServiceTest extends WebTestCase
         static::$dm->persist($claim);
         static::$dm->flush();
 
-        $daviesClaim = new DaviesClaim();
+        $daviesClaim = new DaviesHandlerClaim();
         $daviesClaim->claimNumber = (string) $claim->getNumber();
         $daviesClaim->incurred = 0;
         $daviesClaim->reserved = 0;
         $daviesClaim->policyNumber = $policy->getPolicyNumber();
         $daviesClaim->insuredName = 'Mr foo bar';
-        $daviesClaim->status = DaviesClaim::STATUS_OPEN;
-        $daviesClaim->lossType = DaviesClaim::TYPE_DAMAGE;
+        $daviesClaim->status = DaviesHandlerClaim::STATUS_OPEN;
+        $daviesClaim->lossType = DaviesHandlerClaim::TYPE_DAMAGE;
         $daviesClaim->replacementReceivedDate = new \DateTime('2016-01-02');
         $daviesClaim->replacementMake = 'Apple';
         $daviesClaim->replacementModel = 'iPhone 4';
-        $daviesClaim->miStatus = DaviesClaim::MISTATUS_REPUDIATED;
+        $daviesClaim->miStatus = DaviesHandlerClaim::MISTATUS_REPUDIATED;
 
         $mailer = $this->getMockBuilder('Swift_Mailer')
             ->disableOriginalConstructor()
@@ -1654,14 +1654,14 @@ class DaviesServiceTest extends WebTestCase
         static::$dm->persist($claim);
         static::$dm->flush();
 
-        $daviesClaim = new DaviesClaim();
+        $daviesClaim = new DaviesHandlerClaim();
         $daviesClaim->claimNumber = (string) $claim->getNumber();
         $daviesClaim->incurred = 0;
         $daviesClaim->reserved = 0;
         $daviesClaim->policyNumber = $policy->getPolicyNumber();
         $daviesClaim->insuredName = 'Mr foo bar';
-        $daviesClaim->status = DaviesClaim::STATUS_OPEN;
-        $daviesClaim->lossType = DaviesClaim::TYPE_LOSS;
+        $daviesClaim->status = DaviesHandlerClaim::STATUS_OPEN;
+        $daviesClaim->lossType = DaviesHandlerClaim::TYPE_LOSS;
         $daviesClaim->replacementReceivedDate = new \DateTime('2016-01-02');
         $daviesClaim->replacementMake = 'Apple';
         $daviesClaim->replacementModel = 'iPhone 4';
@@ -1702,15 +1702,15 @@ class DaviesServiceTest extends WebTestCase
         static::$dm->persist($claim);
         static::$dm->flush();
 
-        $daviesClaim = new DaviesClaim();
+        $daviesClaim = new DaviesHandlerClaim();
         $daviesClaim->claimNumber = $claim->getNumber();
         $daviesClaim->phoneReplacementCost = -70;
         $daviesClaim->incurred = -70;
         $daviesClaim->reserved = 0;
         $daviesClaim->policyNumber = $policy->getPolicyNumber();
         $daviesClaim->insuredName = 'Mr foo bar';
-        $daviesClaim->status = DaviesClaim::STATUS_OPEN;
-        $daviesClaim->lossType = DaviesClaim::TYPE_LOSS;
+        $daviesClaim->status = DaviesHandlerClaim::STATUS_OPEN;
+        $daviesClaim->lossType = DaviesHandlerClaim::TYPE_LOSS;
         static::$daviesService->saveClaim($daviesClaim, false);
         $this->assertEquals(Claim::STATUS_APPROVED, $claim->getStatus());
         $now = new \DateTime();
@@ -1733,14 +1733,14 @@ class DaviesServiceTest extends WebTestCase
         static::$dm->persist($claim);
         static::$dm->flush();
 
-        $daviesClaim = new DaviesClaim();
+        $daviesClaim = new DaviesHandlerClaim();
         $daviesClaim->claimNumber = $claim->getNumber();
         $daviesClaim->incurred = 0;
         $daviesClaim->reserved = 0;
         $daviesClaim->policyNumber = $policy->getPolicyNumber();
         $daviesClaim->insuredName = 'Mr foo bar';
-        $daviesClaim->status = DaviesClaim::STATUS_OPEN;
-        $daviesClaim->lossType = DaviesClaim::TYPE_LOSS;
+        $daviesClaim->status = DaviesHandlerClaim::STATUS_OPEN;
+        $daviesClaim->lossType = DaviesHandlerClaim::TYPE_LOSS;
         static::$daviesService->saveClaim($daviesClaim, false);
         $now = new \DateTime();
         $yesterday = $this->subBusinessDays($now, 1);
@@ -1909,7 +1909,7 @@ class DaviesServiceTest extends WebTestCase
         static::$dm->persist($claim);
         static::$dm->flush();
 
-        $daviesClaim = new DaviesClaim();
+        $daviesClaim = new DaviesHandlerClaim();
         $daviesClaim->claimNumber = $claim->getNumber();
         $daviesClaim->incurred = 0;
         $daviesClaim->reserved = 10;
@@ -1917,8 +1917,8 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim->finalSuspicion = false;
         $daviesClaim->policyNumber = $policy->getPolicyNumber();
         $daviesClaim->insuredName = 'Mr foo bar';
-        $daviesClaim->status = DaviesClaim::STATUS_OPEN;
-        $daviesClaim->lossType = DaviesClaim::TYPE_LOSS;
+        $daviesClaim->status = DaviesHandlerClaim::STATUS_OPEN;
+        $daviesClaim->lossType = DaviesHandlerClaim::TYPE_LOSS;
         $daviesClaim->lossDescription = 'min length';
         $daviesClaim->replacementMake = 'Apple';
         $daviesClaim->replacementModel = 'iPhone 4';
@@ -1952,7 +1952,7 @@ class DaviesServiceTest extends WebTestCase
         static::$dm->persist($claim);
         static::$dm->flush();
 
-        $daviesClaim = new DaviesClaim();
+        $daviesClaim = new DaviesHandlerClaim();
         $daviesClaim->claimNumber = $claim->getNumber();
         $daviesClaim->incurred = 0;
         $daviesClaim->reserved = 10;
@@ -1960,8 +1960,8 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim->finalSuspicion = false;
         $daviesClaim->policyNumber = $policy->getPolicyNumber();
         $daviesClaim->insuredName = 'Mr foo bar';
-        $daviesClaim->status = DaviesClaim::STATUS_OPEN;
-        $daviesClaim->lossType = DaviesClaim::TYPE_LOSS;
+        $daviesClaim->status = DaviesHandlerClaim::STATUS_OPEN;
+        $daviesClaim->lossType = DaviesHandlerClaim::TYPE_LOSS;
         $daviesClaim->lossDescription = 'min length';
         $daviesClaim->replacementMake = 'Apple';
         $daviesClaim->replacementModel = 'iPhone 4';
@@ -1995,7 +1995,7 @@ class DaviesServiceTest extends WebTestCase
         static::$dm->persist($claim);
         static::$dm->flush();
 
-        $daviesClaim = new DaviesClaim();
+        $daviesClaim = new DaviesHandlerClaim();
         $daviesClaim->claimNumber = $claim->getNumber();
         $daviesClaim->incurred = 0;
         $daviesClaim->reserved = 10;
@@ -2003,8 +2003,8 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim->finalSuspicion = false;
         $daviesClaim->policyNumber = $policy->getPolicyNumber();
         $daviesClaim->insuredName = 'Mr foo bar';
-        $daviesClaim->status = DaviesClaim::STATUS_OPEN;
-        $daviesClaim->lossType = DaviesClaim::TYPE_LOSS;
+        $daviesClaim->status = DaviesHandlerClaim::STATUS_OPEN;
+        $daviesClaim->lossType = DaviesHandlerClaim::TYPE_LOSS;
         $daviesClaim->replacementMake = 'Apple';
         $daviesClaim->replacementModel = 'iPhone 4';
         // fromArray will transform replacementImei = 'Unable to obtain' to a null value and add to unobtainableFields
@@ -2046,9 +2046,9 @@ class DaviesServiceTest extends WebTestCase
         static::$dm->persist($claim);
         static::$dm->flush();
 
-        $daviesClaim = new DaviesClaim();
+        $daviesClaim = new DaviesHandlerClaim();
         //$daviesClaim->claimNumber = $claim->getNumber();
-        $daviesClaim->status = DaviesClaim::STATUS_CLOSED;
+        $daviesClaim->status = DaviesHandlerClaim::STATUS_CLOSED;
         $daviesClaim->finalSuspicion = null;
         $daviesClaim->initialSuspicion = null;
         $daviesClaim->finalSuspicion = null;
@@ -2091,14 +2091,14 @@ class DaviesServiceTest extends WebTestCase
         static::$dm->persist($claim2);
         static::$dm->flush();
 
-        $daviesClaim = new DaviesClaim();
+        $daviesClaim = new DaviesHandlerClaim();
         $daviesClaim->policyNumber = $claim1->getPolicy()->getPolicyNumber();
         $daviesClaim->claimNumber = $claim2->getNumber();
         $daviesClaim->insuredName = 'foo bar';
         $daviesClaim->initialSuspicion = false;
         $daviesClaim->finalSuspicion = false;
-        $daviesClaim->status = DaviesClaim::STATUS_CLOSED;
-        $daviesClaim->lossType = DaviesClaim::TYPE_LOSS;
+        $daviesClaim->status = DaviesHandlerClaim::STATUS_CLOSED;
+        $daviesClaim->lossType = DaviesHandlerClaim::TYPE_LOSS;
         $daviesClaim->replacementMake = 'Apple';
         $daviesClaim->replacementModel = 'iPhone 4';
         $daviesClaim->replacementImei = '123 Bx11lt';
@@ -2111,11 +2111,11 @@ class DaviesServiceTest extends WebTestCase
         $this->insureErrorDoesNotExist('/'.$claim1->getNumber().'/');
         $this->insureErrorDoesNotExist('/'.$claim2->getNumber().'/');
 
-        $daviesClaim = new DaviesClaim();
+        $daviesClaim = new DaviesHandlerClaim();
         $daviesClaim->policyNumber = $claim1->getPolicy()->getPolicyNumber();
         $daviesClaim->claimNumber = $this->getRandomClaimNumber();
-        $daviesClaim->status = DaviesClaim::STATUS_CLOSED;
-        $daviesClaim->lossType = DaviesClaim::TYPE_LOSS;
+        $daviesClaim->status = DaviesHandlerClaim::STATUS_CLOSED;
+        $daviesClaim->lossType = DaviesHandlerClaim::TYPE_LOSS;
         $daviesClaim->insuredName = 'foo bar';
         $daviesClaim->initialSuspicion = 'no';
         $daviesClaim->finalSuspicion = 'no';
@@ -2145,7 +2145,7 @@ class DaviesServiceTest extends WebTestCase
         static::$dm->persist($claim);
         static::$dm->flush();
 
-        $daviesClaim = new DaviesClaim();
+        $daviesClaim = new DaviesHandlerClaim();
         $daviesClaim->claimNumber = $claim->getNumber();
         $daviesClaim->incurred = 150;
         $daviesClaim->reserved = 0;
@@ -2154,10 +2154,10 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim->finalSuspicion = false;
         $daviesClaim->policyNumber = $policy->getPolicyNumber();
         $daviesClaim->insuredName = 'Mr foo bar';
-        $daviesClaim->status = DaviesClaim::STATUS_CLOSED;
-        $daviesClaim->miStatus = DaviesClaim::MISTATUS_SETTLED;
+        $daviesClaim->status = DaviesHandlerClaim::STATUS_CLOSED;
+        $daviesClaim->miStatus = DaviesHandlerClaim::MISTATUS_SETTLED;
         $daviesClaim->lossDescription = 'min length';
-        $daviesClaim->lossType = DaviesClaim::TYPE_LOSS;
+        $daviesClaim->lossType = DaviesHandlerClaim::TYPE_LOSS;
         $daviesClaim->replacementMake = 'Apple';
         $daviesClaim->replacementModel = 'iPhone 4';
         //$daviesClaim->replacementImei = $this->generateRandomImei();
@@ -2207,7 +2207,7 @@ class DaviesServiceTest extends WebTestCase
         static::$dm->persist($claim);
         static::$dm->flush();
 
-        $daviesClaim = new DaviesClaim();
+        $daviesClaim = new DaviesHandlerClaim();
         $daviesClaim->claimNumber = $claim->getNumber();
         $daviesClaim->incurred = 150;
         $daviesClaim->reserved = 0;
@@ -2216,10 +2216,10 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim->finalSuspicion = false;
         $daviesClaim->policyNumber = $policy->getPolicyNumber();
         $daviesClaim->insuredName = 'Mr foo bar';
-        $daviesClaim->status = DaviesClaim::STATUS_CLOSED;
-        $daviesClaim->miStatus = DaviesClaim::MISTATUS_SETTLED;
+        $daviesClaim->status = DaviesHandlerClaim::STATUS_CLOSED;
+        $daviesClaim->miStatus = DaviesHandlerClaim::MISTATUS_SETTLED;
         $daviesClaim->lossDescription = 'min length';
-        $daviesClaim->lossType = DaviesClaim::TYPE_LOSS;
+        $daviesClaim->lossType = DaviesHandlerClaim::TYPE_LOSS;
         $daviesClaim->replacementMake = 'Apple';
         $daviesClaim->replacementModel = 'iPhone 4';
         //$daviesClaim->replacementImei = $this->generateRandomImei();

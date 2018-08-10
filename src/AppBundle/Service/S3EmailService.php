@@ -3,7 +3,7 @@ namespace AppBundle\Service;
 
 use Psr\Log\LoggerInterface;
 use Aws\S3\S3Client;
-use AppBundle\Classes\DaviesClaim;
+use AppBundle\Classes\DaviesHandlerClaim;
 use AppBundle\Document\Claim;
 use AppBundle\Document\Phone;
 use AppBundle\Document\CurrencyTrait;

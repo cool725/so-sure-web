@@ -9,7 +9,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Helper\Table;
-use AppBundle\Classes\DaviesClaim;
+use AppBundle\Classes\DaviesHandlerClaim;
 
 class ClaimsNotifyPolicyPendingCancellationCommand extends ContainerAwareCommand
 {

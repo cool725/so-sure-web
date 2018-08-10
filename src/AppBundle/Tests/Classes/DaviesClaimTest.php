@@ -2,7 +2,7 @@
 
 namespace AppBundle\Tests\Classes;
 
-use AppBundle\Classes\DaviesClaim;
+use AppBundle\Classes\DaviesHandlerClaim;
 use AppBundle\Document\Claim;
 
 /**
@@ -53,8 +53,8 @@ class DaviesClaimTest extends \PHPUnit\Framework\TestCase
             '42794',
             '123 The Street, Town, City, Postcode'
         ];
-        $davies = new DaviesClaim();
-        $davies->fromArray($data, DaviesClaim::COLUMN_COUNT_V1);
+        $davies = new DaviesHandlerClaim();
+        $davies->fromArray($data, DaviesHandlerClaim::COLUMN_COUNT_V1);
         $this->assertEquals(new \DateTime('2017-02-28'), $davies->endDate);
         $this->assertEquals(new \DateTime('2017-02-28'), $davies->startDate);
 
@@ -112,8 +112,8 @@ class DaviesClaimTest extends \PHPUnit\Framework\TestCase
             '42461',
             '123 The Street, Town, City, Postcode'
         ];
-        $davies = new DaviesClaim();
-        $davies->fromArray($data, DaviesClaim::COLUMN_COUNT_V1);
+        $davies = new DaviesHandlerClaim();
+        $davies->fromArray($data, DaviesHandlerClaim::COLUMN_COUNT_V1);
     }
 
     public function testFromArrayV6()
@@ -159,8 +159,8 @@ class DaviesClaimTest extends \PHPUnit\Framework\TestCase
         ];
         // @codingStandardsIgnoreEnd
 
-        $davies = new DaviesClaim();
-        $davies->fromArray($data, DaviesClaim::COLUMN_COUNT_V6);
+        $davies = new DaviesHandlerClaim();
+        $davies->fromArray($data, DaviesHandlerClaim::COLUMN_COUNT_V6);
         $this->assertEquals(new \DateTime('2017-11-02'), $davies->endDate);
         $this->assertEquals(new \DateTime('2016-11-03'), $davies->startDate);
 
@@ -227,8 +227,8 @@ class DaviesClaimTest extends \PHPUnit\Framework\TestCase
         ];
         // @codingStandardsIgnoreEnd
 
-        $davies = new DaviesClaim();
-        $davies->fromArray($data, DaviesClaim::COLUMN_COUNT_V8);
+        $davies = new DaviesHandlerClaim();
+        $davies->fromArray($data, DaviesHandlerClaim::COLUMN_COUNT_V8);
         $this->assertEquals(new \DateTime('2017-11-02'), $davies->endDate);
         $this->assertEquals(new \DateTime('2016-11-03'), $davies->startDate);
 
@@ -298,8 +298,8 @@ class DaviesClaimTest extends \PHPUnit\Framework\TestCase
         ];
         // @codingStandardsIgnoreEnd
 
-        $davies = new DaviesClaim();
-        $davies->fromArray($data, DaviesClaim::COLUMN_COUNT_V8);
+        $davies = new DaviesHandlerClaim();
+        $davies->fromArray($data, DaviesHandlerClaim::COLUMN_COUNT_V8);
         $this->assertEquals(new \DateTime('2017-11-02'), $davies->endDate);
         $this->assertEquals(new \DateTime('2016-11-03'), $davies->startDate);
 
@@ -367,8 +367,8 @@ class DaviesClaimTest extends \PHPUnit\Framework\TestCase
         ];
         // @codingStandardsIgnoreEnd
 
-        $davies = new DaviesClaim();
-        $this->assertTrue($davies->fromArray($data, DaviesClaim::COLUMN_COUNT_V6));
+        $davies = new DaviesHandlerClaim();
+        $this->assertTrue($davies->fromArray($data, DaviesHandlerClaim::COLUMN_COUNT_V6));
         $this->assertEquals($davies::MISTATUS_CLAIMANT_CORRESPONDENCE, $davies->miStatus);
     }
 
@@ -415,8 +415,8 @@ class DaviesClaimTest extends \PHPUnit\Framework\TestCase
         ];
         // @codingStandardsIgnoreEnd
 
-        $davies = new DaviesClaim();
-        $this->assertTrue($davies->fromArray($data, DaviesClaim::COLUMN_COUNT_V6));
+        $davies = new DaviesHandlerClaim();
+        $this->assertTrue($davies->fromArray($data, DaviesHandlerClaim::COLUMN_COUNT_V6));
         $this->assertEquals($davies::MISTATUS_ERROR, $davies->miStatus);
         $this->assertTrue($davies->hasError());
     }
@@ -464,8 +464,8 @@ class DaviesClaimTest extends \PHPUnit\Framework\TestCase
         ];
         // @codingStandardsIgnoreEnd
 
-        $davies = new DaviesClaim();
-        $this->assertTrue($davies->fromArray($data, DaviesClaim::COLUMN_COUNT_V6));
+        $davies = new DaviesHandlerClaim();
+        $this->assertTrue($davies->fromArray($data, DaviesHandlerClaim::COLUMN_COUNT_V6));
         $this->assertEquals($davies::MISTATUS_DMS_ERROR, $davies->miStatus);
         $this->assertTrue($davies->hasError());
     }
@@ -516,8 +516,8 @@ class DaviesClaimTest extends \PHPUnit\Framework\TestCase
         ];
         // @codingStandardsIgnoreEnd
 
-        $davies = new DaviesClaim();
-        $this->assertTrue($davies->fromArray($data, DaviesClaim::COLUMN_COUNT_V6));
+        $davies = new DaviesHandlerClaim();
+        $this->assertTrue($davies->fromArray($data, DaviesHandlerClaim::COLUMN_COUNT_V6));
     }
 
     public function testRepairedImei()
@@ -567,8 +567,8 @@ class DaviesClaimTest extends \PHPUnit\Framework\TestCase
         ];
         // @codingStandardsIgnoreEnd
 
-        $davies = new DaviesClaim();
-        $davies->fromArray($data, DaviesClaim::COLUMN_COUNT_V8);
+        $davies = new DaviesHandlerClaim();
+        $davies->fromArray($data, DaviesHandlerClaim::COLUMN_COUNT_V8);
         $this->assertEquals(new \DateTime('2017-11-02'), $davies->endDate);
         $this->assertEquals(new \DateTime('2016-11-03'), $davies->startDate);
 
@@ -602,8 +602,8 @@ class DaviesClaimTest extends \PHPUnit\Framework\TestCase
             'So-Sure -Mobile',
             '320160401000001',
         ];
-        $davies = new DaviesClaim();
-        $davies->fromArray($data, DaviesClaim::COLUMN_COUNT_V1);
+        $davies = new DaviesHandlerClaim();
+        $davies->fromArray($data, DaviesHandlerClaim::COLUMN_COUNT_V1);
     }
 
     public function testFromArrayInvalidClient()
@@ -641,8 +641,8 @@ class DaviesClaimTest extends \PHPUnit\Framework\TestCase
             '42461',
             '123 The Street, Town, City, Postcode'
         ];
-        $davies = new DaviesClaim();
-        $this->assertNull($davies->fromArray($data, DaviesClaim::COLUMN_COUNT_V1));
+        $davies = new DaviesHandlerClaim();
+        $this->assertNull($davies->fromArray($data, DaviesHandlerClaim::COLUMN_COUNT_V1));
         $this->assertNull($davies->claimNumber);
     }
 
@@ -684,8 +684,8 @@ class DaviesClaimTest extends \PHPUnit\Framework\TestCase
             '42461',
             '123 The Street, Town, City, Postcode'
         ];
-        $davies = new DaviesClaim();
-        $davies->fromArray($data, DaviesClaim::COLUMN_COUNT_V1);
+        $davies = new DaviesHandlerClaim();
+        $davies->fromArray($data, DaviesHandlerClaim::COLUMN_COUNT_V1);
     }
 
     public function testFromArrayReceivedDateEarly()
@@ -723,8 +723,8 @@ class DaviesClaimTest extends \PHPUnit\Framework\TestCase
             '42794',
             '123 The Street, Town, City, Postcode'
         ];
-        $davies = new DaviesClaim();
-        $davies->fromArray($data, DaviesClaim::COLUMN_COUNT_V1);
+        $davies = new DaviesHandlerClaim();
+        $davies->fromArray($data, DaviesHandlerClaim::COLUMN_COUNT_V1);
         $this->assertNull($davies->replacementReceivedDate);
     }
 
@@ -766,13 +766,13 @@ class DaviesClaimTest extends \PHPUnit\Framework\TestCase
             '42461',
             '123 The Street, Town, City, Postcode'
         ];
-        $davies = new DaviesClaim();
-        $davies->fromArray($data, DaviesClaim::COLUMN_COUNT_V1);
+        $davies = new DaviesHandlerClaim();
+        $davies->fromArray($data, DaviesHandlerClaim::COLUMN_COUNT_V1);
     }
 
     public function testClaimsType()
     {
-        $davies = new DaviesClaim();
+        $davies = new DaviesHandlerClaim();
         $davies->lossType = "Loss - From Pocket";
         $this->assertEquals(Claim::TYPE_LOSS, $davies->getClaimType());
         $this->assertEquals(70, $davies->getExpectedExcess(false, false));
@@ -811,7 +811,7 @@ class DaviesClaimTest extends \PHPUnit\Framework\TestCase
 
     public function testClaimsExcess()
     {
-        $davies = new DaviesClaim();
+        $davies = new DaviesHandlerClaim();
         $davies->lossType = "Loss - From Pocket";
         $davies->excess = 70;
         $this->assertEquals(Claim::TYPE_LOSS, $davies->getClaimType());
@@ -924,8 +924,8 @@ class DaviesClaimTest extends \PHPUnit\Framework\TestCase
         ];
         // @codingStandardsIgnoreEnd
 
-        $davies = new DaviesClaim();
-        $davies->fromArray($data, DaviesClaim::COLUMN_COUNT_V6);
+        $davies = new DaviesHandlerClaim();
+        $davies->fromArray($data, DaviesHandlerClaim::COLUMN_COUNT_V6);
     }
 
     /**
@@ -974,8 +974,8 @@ class DaviesClaimTest extends \PHPUnit\Framework\TestCase
         ];
         // @codingStandardsIgnoreEnd
 
-        $davies = new DaviesClaim();
-        $davies->fromArray($data, DaviesClaim::COLUMN_COUNT_V6);
+        $davies = new DaviesHandlerClaim();
+        $davies->fromArray($data, DaviesHandlerClaim::COLUMN_COUNT_V6);
     }
 
     /**
@@ -1024,7 +1024,7 @@ class DaviesClaimTest extends \PHPUnit\Framework\TestCase
         ];
         // @codingStandardsIgnoreEnd
 
-        $davies = new DaviesClaim();
-        $davies->fromArray($data, DaviesClaim::COLUMN_COUNT_V6);
+        $davies = new DaviesHandlerClaim();
+        $davies->fromArray($data, DaviesHandlerClaim::COLUMN_COUNT_V6);
     }
 }

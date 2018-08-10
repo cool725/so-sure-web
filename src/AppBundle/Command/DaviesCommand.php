@@ -9,7 +9,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Helper\Table;
-use AppBundle\Classes\DaviesClaim;
+use AppBundle\Classes\DaviesHandlerClaim;
 
 class DaviesCommand extends ContainerAwareCommand
 {
@@ -40,7 +40,7 @@ class DaviesCommand extends ContainerAwareCommand
                 'sheetName',
                 null,
                 InputOption::VALUE_REQUIRED,
-                json_encode(DaviesClaim::$sheetNames)
+                json_encode(DaviesHandlerClaim::$sheetNames)
             )
             ->addOption(
                 'max-parse-errors',
@@ -60,12 +60,12 @@ class DaviesCommand extends ContainerAwareCommand
         $maxParseErrors = $input->getOption('max-parse-errors');
         $sheetName = $input->getOption('sheetName');
         if (!$sheetName) {
-            $sheetName = DaviesClaim::SHEET_NAME_V6;
+            $sheetName = DaviesHandlerClaim::SHEET_NAME_V6;
         }
-        if (!in_array($sheetName, DaviesClaim::$sheetNames)) {
+        if (!in_array($sheetName, DaviesHandlerClaim::$sheetNames)) {
             throw new \Exception(sprintf(
                 'sheetName must be a valid option %s',
-                json_encode(DaviesClaim::$sheetNames)
+                json_encode(DaviesHandlerClaim::$sheetNames)
             ));
         }
         /** @var DaviesService $davies */

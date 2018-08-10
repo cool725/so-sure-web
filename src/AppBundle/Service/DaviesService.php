@@ -4,7 +4,7 @@ namespace AppBundle\Service;
 use AppBundle\Document\Policy;
 use Psr\Log\LoggerInterface;
 use Aws\S3\S3Client;
-use AppBundle\Classes\DaviesClaim;
+use AppBundle\Classes\DaviesHandlerClaim;
 use AppBundle\Document\Claim;
 use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePolicy;
@@ -126,12 +126,12 @@ class DaviesService extends S3EmailService
 
     public function getColumnsFromSheetName($sheetName)
     {
-        return DaviesClaim::getColumnsFromSheetName($sheetName);
+        return DaviesHandlerClaim::getColumnsFromSheetName($sheetName);
     }
 
     public function createLineObject($line, $columns)
     {
-        return DaviesClaim::create($line, $columns);
+        return DaviesHandlerClaim::create($line, $columns);
     }
 
     public function saveClaims($key, array $daviesClaims)
@@ -239,12 +239,12 @@ class DaviesService extends S3EmailService
     }
 
     /**
-     * @param DaviesClaim $daviesClaim
+     * @param DaviesHandlerClaim $daviesClaim
      * @param boolean     $skipImeiUpdate
      * @return bool
      * @throws \Exception
      */
-    public function saveClaim(DaviesClaim $daviesClaim, $skipImeiUpdate)
+    public function saveClaim(DaviesHandlerClaim $daviesClaim, $skipImeiUpdate)
     {
         if ($daviesClaim->hasError()) {
             throw new \Exception(sprintf(
@@ -351,7 +351,7 @@ class DaviesService extends S3EmailService
         $this->claimsService->processClaim($claim);
 
         // Only for active/unpaid policies with a theft/lost claim that have been repudiated
-        if ($daviesClaim->miStatus === DaviesClaim::MISTATUS_REPUDIATED &&
+        if ($daviesClaim->miStatus === DaviesHandlerClaim::MISTATUS_REPUDIATED &&
             in_array($claim->getType(), [Claim::TYPE_LOSS, Claim::TYPE_THEFT]) &&
             in_array($claim->getPolicy()->getStatus(), [Policy::STATUS_ACTIVE, Policy::STATUS_UNPAID])) {
             $body = sprintf(
@@ -371,10 +371,10 @@ class DaviesService extends S3EmailService
 
     /**
      * @param Claim       $claim
-     * @param DaviesClaim $daviesClaim
+     * @param DaviesHandlerClaim $daviesClaim
      * @throws \Exception
      */
-    public function validateClaimDetails(Claim $claim, DaviesClaim $daviesClaim)
+    public function validateClaimDetails(Claim $claim, DaviesHandlerClaim $daviesClaim)
     {
         if (mb_strtolower($claim->getPolicy()->getPolicyNumber()) != mb_strtolower($daviesClaim->getPolicyNumber())) {
             throw new \Exception(sprintf(
@@ -683,7 +683,7 @@ class DaviesService extends S3EmailService
         }
     }
 
-    public function postValidateClaimDetails(Claim $claim, DaviesClaim $daviesClaim)
+    public function postValidateClaimDetails(Claim $claim, DaviesHandlerClaim $daviesClaim)
     {
         if ($claim->getApprovedDate() && $claim->getReplacementReceivedDate() &&
             $claim->getApprovedDate() > $claim->getReplacementReceivedDate()) {
@@ -707,7 +707,7 @@ class DaviesService extends S3EmailService
         }
     }
 
-    public function getReplacementPhone(DaviesClaim $daviesClaim)
+    public function getReplacementPhone(DaviesHandlerClaim $daviesClaim)
     {
         \AppBundle\Classes\NoOp::ignore([$daviesClaim]);
         $repo = $this->dm->getRepository(Phone::class);
@@ -723,11 +723,11 @@ class DaviesService extends S3EmailService
 
     /**
      * @param Claim       $claim
-     * @param DaviesClaim $daviesClaim
+     * @param DaviesHandlerClaim $daviesClaim
      * @param boolean     $skipImeiUpdate
      * @throws \Exception
      */
-    public function updatePolicy(Claim $claim, DaviesClaim $daviesClaim, $skipImeiUpdate)
+    public function updatePolicy(Claim $claim, DaviesHandlerClaim $daviesClaim, $skipImeiUpdate)
     {
         /** @var PhonePolicy $policy */
         $policy = $claim->getPolicy();
@@ -837,7 +837,7 @@ class DaviesService extends S3EmailService
         if (count($this->errors) > 0) {
             $emails = 'tech+ops@so-sure.com';
             if ($this->featureService->isEnabled(Feature::FEATURE_DAVIES_IMPORT_ERROR_EMAIL)) {
-                $emails = DaviesClaim::$errorEmailAddresses;
+                $emails = DaviesHandlerClaim::$errorEmailAddresses;
             }
 
             $this->mailer->sendTemplate(

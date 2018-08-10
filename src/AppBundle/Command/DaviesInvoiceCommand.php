@@ -10,7 +10,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Helper\Table;
-use AppBundle\Classes\DaviesClaim;
+use AppBundle\Classes\DaviesHandlerClaim;
 use AppBundle\Document\Charge;
 use AppBundle\Document\Invoice;
 use AppBundle\Document\InvoiceItem;
@@ -53,7 +53,7 @@ class DaviesInvoiceCommand extends BaseCommand
         }
 
         $skipEmail = true === $input->getOption('skip-email');
-        $emailAddress = DaviesClaim::$invoiceEmailAddresses;
+        $emailAddress = DaviesHandlerClaim::$invoiceEmailAddresses;
         if ($skipEmail) {
             $emailAddress = null;
         }
