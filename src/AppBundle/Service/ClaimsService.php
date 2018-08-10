@@ -148,6 +148,11 @@ class ClaimsService
         if ($submit) {
             $claim->setSubmissionDate(new \DateTime());
             $claim->setStatus(Claim::STATUS_SUBMITTED);
+            if ($this->featureService->isEnabled(Feature::FEATURE_CLAIMS_DEFAULT_DIRECT_GROUP)) {
+                $claim->setHandlingTeam(Claim::TEAM_DIRECT_GROUP);
+            } else {
+                $claim->setHandlingTeam(Claim::TEAM_DAVIES);
+            }
             $this->notifyClaimSubmission($claim);
         }
 
@@ -200,6 +205,11 @@ class ClaimsService
         if ($submit) {
             $claim->setSubmissionDate(new \DateTime());
             $claim->setStatus(Claim::STATUS_SUBMITTED);
+            if ($this->featureService->isEnabled(Feature::FEATURE_CLAIMS_DEFAULT_DIRECT_GROUP)) {
+                $claim->setHandlingTeam(Claim::TEAM_DIRECT_GROUP);
+            } else {
+                $claim->setHandlingTeam(Claim::TEAM_DAVIES);
+            }
             $this->notifyClaimSubmission($claim);
         }
 
