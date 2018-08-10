@@ -1,15 +1,9 @@
 {% extends 'base_rebrand.html.twig' %}
+{% form_theme purchase_form 'AppBundle:Form:fields.html.twig' %}
 
 {# Set vars #}
-{% set use_pca = true %}
 {% set body_class = 'quote' %}
 {% set quote_mode = 1 %}
-{% set showAddress = purchase_form.addressLine1.vars.data | length > 0 or purchase_form.postcode.vars.data | length > 0 %}
-{% set showDOB = purchase_form.name.vars.data | length > 0 and purchase_form.email.vars.data | length > 0 %}
-{% set starling = false %}
-{% if app is not null and app.session.isStarted and app.session.get('partner') == 'starling' %}
-    {% set starling = true %}
-{% endif %}
 
 {% block title %}
     {% if phone %}
@@ -263,7 +257,7 @@
 
                 <div class="purchase__form__container p-4 p-lg-5">
                     {# Include - Old Form #}
-                    {% include 'AppBundle::Purchase/_currentStepPersonalAddress.html.twig' %}
+                    {% include 'AppBundle::Purchase/_currentStepPersonalPhoneReview.html.twig' %}
                 </div>
             {% else %}
                 {# No phone #}

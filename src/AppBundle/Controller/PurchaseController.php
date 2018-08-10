@@ -590,11 +590,11 @@ class PurchaseController extends BaseController
         $requestService = $this->get('app.request');
         $template = null;
         // Might be better to just check the phone we're purchasing ($phone->getOs() == Phone::OS_IOS)
-        if ($requestService->isDeviceOsIOS()) {
-            $template = 'AppBundle:Purchase:purchaseStepPhoneReview.html.twig';
-        } else {
-            $template = 'AppBundle:Purchase:purchaseStepPhoneReviewNew.html.twig';
-        }
+        // if ($requestService->isDeviceOsIOS()) {
+            $template = 'AppBundle:Purchase:purchaseStepPersonalReviewRebrand.html.twig';
+        // } else {
+            // $template = 'AppBundle:Purchase:purchaseStepPhoneReviewNew.html.twig';
+        // }
 
         $now = new \DateTime();
         $billingDate = $this->adjustDayForBilling($now);

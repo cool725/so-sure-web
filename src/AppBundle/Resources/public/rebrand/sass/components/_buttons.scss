@@ -2,6 +2,10 @@
 
 .btn {
     font-family: $g-medium;
+
+    .fas {
+        vertical-align: middle;
+    }
 }
 
 .btn-shadow {
@@ -23,6 +27,7 @@
     border: none;
     @include linear-gradient(90deg, darken($green, 5%), $green);
 }
+
 
 // Button block mobile only
 @include media-breakpoint-down(xs) {

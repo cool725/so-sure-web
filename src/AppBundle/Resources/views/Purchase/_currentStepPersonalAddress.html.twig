@@ -1,0 +1,157 @@
+{{ form_start(purchase_form, {'attr': {'data-toggle': 'validator', 'class': 'validate-form', 'data-client-validation': form_client_validation, 'autocomplete': 'off'}}) }}
+
+    <div class="form-step">
+        {% if feature_enabled('starling') and starling %}
+            <a class="btn btn-block btn-starling btn-pad" href="/login/starling"><img src="{{ cdn_url }}/images/StarlingMarkIcon.png" height="15px"> &nbsp;Continue with Starling</a>
+            <div class="text-break text-grey">
+                <div class="line"></div>OR<div class="line"></div>
+            </div>
+            <p class="help-block text-center">If you prefer you can enter your details manually</p>
+        {% endif %}
+
+        <div class="form-group {% if form_errors(purchase_form.firstName) or form_errors(purchase_form.lastName) or form_errors(purchase_form.name) %}has-error{% endif %}">
+            {{ form_label(purchase_form.name, 'Full Name:', { 'label_attr': {'class': ''} }) }}
+            {{ form_widget(purchase_form.name, {'attr':{'class':'form-control', 'placeholder': 'Full Name', 'data-hj-suppress' : ''}}) }}
+            <div class="help-block with-errors">{{ form_errors(purchase_form.name) }}</div>
+        </div>
+
+        <div class="form-group {% if form_errors(purchase_form.email) %}has-error{% endif %}">
+            {{ form_label(purchase_form.email, 'Email:', { 'label_attr': {'class': ''} }) }}
+            {{ form_widget(purchase_form.email, {'attr':{'class':'form-control', 'placeholder': 'Email', 'data-hj-suppress' : ''}}) }}
+            <div class="help-block with-errors">{{ form_errors(purchase_form.email) }}</div>
+        </div>
+        <div id="step--one-controls" class="form-group form-controls {% if showDOB %}step--hide{% endif %}">
+            <a href="#" id="step--validate" class="btn btn-success" data-csrf="{{ lead_csrf }}" data-lead="{{ path('lead', {'source': 'purchase-flow'}) }}">
+                Continue
+            </a>
+
+            <h5>Or login via social networks</h5>
+
+            {# Social Logins #}
+            <div class="form-group">
+                <a href="#"
+                   formnovalidate="formnovalidate"
+                   class="btn btn-facebook btn-sm facebook_login"
+                   {% if app.user %}disabled{% endif %}>
+                    <i class="fab fa-facebook"></i>
+                    &nbsp;Continue with Facebook
+               </a>
+            </div>
+            <div class="form-group">
+                <a href="{{ path('hwi_oauth_service_redirect', {'service': 'google' }) }}"
+                   class="btn btn-google btn-sm"
+                   formnovalidate="formnovalidate"
+                   {% if app.user %}disabled{% endif %}>
+                    <i class="fab fa-google"></i>
+                    Continue in with Google</span>
+                </a>
+            </div>
+            {# Starling #}
+            {% if feature_enabled('starling') and not starling %}
+                <a class="btn btn-starling btn-sm" href="/login/starling"><img src="{{ cdn_url }}/images/StarlingMarkIcon.png" height="15px" class="mr-2">Continue with Starling</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="form-step {% if not showDOB %}step--hide{% endif %}">
+        {# Control #}
+        <div class="form-group {% if form_errors(purchase_form.birthday) %}has-error{% endif %} text-left">
+            {{ form_label(purchase_form.birthday, 'Date of Birth:', { 'label_attr': {'class': ''} }) }}
+            {{ form_widget(purchase_form.birthday, {'attr':{'class': 'birthday form-control dob', 'placeholder': 'Date of birth (DD/MM/YYYY)', 'data-hj-suppress' : ''}}) }}
+            <div class="help-block with-errors">{{ form_errors(purchase_form.birthday) }}</div>
+        </div>
+        <div class="form-group {% if form_errors(purchase_form.mobileNumber) %}has-error{% endif %}">
+            {{ form_label(purchase_form.mobileNumber, 'Mobile Number:', { 'label_attr': {'class': ''} }) }}
+            {{ form_widget(purchase_form.mobileNumber, {'attr':{'class':'form-control', 'placeholder':'Mobile number', 'data-hj-suppress' : ''}}) }}
+            <div class="mobile-err help-block with-errors">{{ form_errors(purchase_form.mobileNumber) }}</div>
+        </div>
+        {% set showAddress = purchase_form.addressLine1.vars.data | length > 0 or purchase_form.postcode.vars.data | length > 0 %}
+        <div class="address-search" style="{% if showAddress %}display: none;{% endif %}">
+            <div class="form-group {% if is_postback %}has-error{% endif %}">
+                <label class="">Billing Address:</label>
+                {% if postcode == 'split' %}
+                    <div class="form-group input-group">
+                        <input id="search_address_number" class="form-control" type="text" placeholder="House Number" {% if not showAddress %} required="required" {% endif %}>
+                        <input id="search_address_postcode" class="form-control" name="search_postcode" type="text" placeholder="Postcode" {% if not showAddress %} required="required" {% endif %} data-hj-suppress="">
+                        <div class="input-group-addon">
+                            <a id="search_address_button" href="#" class="btn btn-info"><i class="fa fa-search"></i></a>
+                        </div>
+                    </div>
+                    {% set display_error = false %}
+                    {% if is_postback and (form_errors(purchase_form.addressLine1)|length > 0 or
+                        form_errors(purchase_form.city)|length > 0 or
+                        form_errors(purchase_form.postcode)|length > 0) %}
+                        {% set display_error = true %}
+                    {% endif %}
+                    <div id="search_address_errors" class="help-block with-errors" style="{% if not display_error %}display: none;{% endif %}">Unable to find the address. Try using manual entry.</div>
+                    <a id="search-address-manual" href="#" class="btn btn-link btn-block btn-pad">Enter address manually</a>
+                {% else %}
+                    <input id="address-select" class="typeahead form-control" type="text" placeholder="{% if postcode == 'type' %}Type your address (eg. 10 Downing Street, SW1A 2AA){% elseif postcode == 'comma' %}House Number, Postcode (eg. 10, SW1A 2AA){% endif %}" {% if not showAddress %} required="required" {% endif %} data-hj-suppress="">
+                    {% set display_error = false %}
+                    {% if is_postback and (form_errors(purchase_form.addressLine1)|length > 0 or
+                        form_errors(purchase_form.city)|length > 0 or
+                        form_errors(purchase_form.postcode)|length > 0) %}
+                        {% set display_error = true %}
+                    {% endif %}
+                    <div id="select_address_errors" class="help-block with-errors" style="{% if not display_error %}display: none;{% endif %}">Select an address from the dropdown after searching</div>
+                    <a id="address-manual" href="#" class="btn btn-link btn-block btn-pad">Enter address manually</a>
+                {% endif %}
+            </div>
+            <div id="display-address" style="margin-bottom: 20px" data-hj-suppress="">
+                {% if purchase_form.vars.data.addressLine1|length > 0 %}{{ purchase_form.vars.data.addressLine1 }}<br>{% endif %}
+                {% if purchase_form.vars.data.addressLine2|length > 0 %}{{ purchase_form.vars.data.addressLine2 }}<br>{% endif %}
+                {% if purchase_form.vars.data.addressLine3|length > 0 %}{{ purchase_form.vars.data.addressLine3 }}<br>{% endif %}
+                {% if purchase_form.vars.data.city|length > 0 %}{{ purchase_form.vars.data.city }}<br>{% endif %}
+                {% if purchase_form.vars.data.postcode|length > 0 %}{{ purchase_form.vars.data.postcode }}{% endif %}
+            </div>
+            <div class="form-group">
+                {{ form_widget(purchase_form.next, {'label': 'Continue', 'attr': {'class': 'btn btn-green btn-block btn-pad'}}) }}
+            </div>
+        </div>
+
+        <div class="address-show" style="{% if not showAddress %}display: none;{% endif %}">
+            <div class="form-group form-group-fix address-show-error" style="display: none;">
+                <label class="text-danger address-show-error-text error"></label>
+            </div>
+            <div class="form-group {% if showAddress and form_errors(purchase_form.addressLine1) %}has-error{% endif %}">
+                {{ form_label(purchase_form.addressLine1, 'Billing Address Line 1:', { 'label_attr': {'class': 'sr-only'} }) }}
+                {{ form_widget(purchase_form.addressLine1, {'attr':{'class':'form-control addressLine1', 'placeholder': 'Address Line 1', 'data-hj-suppress' : ''}}) }}
+                {% if showAddress %}
+                    <div class="help-block with-errors">{{ form_errors(purchase_form.addressLine1) }}</div>
+                {% endif %}
+            </div>
+            <div class="form-group {% if showAddress and form_errors(purchase_form.addressLine2) %}has-error{% endif %}">
+                {{ form_label(purchase_form.addressLine2, 'Billing Address Line 2:', { 'label_attr': {'class': 'sr-only'} }) }}
+                {{ form_widget(purchase_form.addressLine2, {'attr':{'class':'form-control addressLine2', 'placeholder': 'Address Line 2', 'data-hj-suppress' : ''}}) }}
+                {% if showAddress %}
+                    <div class="help-block with-errors">{{ form_errors(purchase_form.addressLine2) }}</div>
+                {% endif %}
+            </div>
+            <div class="form-group {% if showAddress and form_errors(purchase_form.addressLine3) %}has-error{% endif %}">
+                {{ form_label(purchase_form.addressLine3, 'Billing Address Line 3:', { 'label_attr': {'class': 'sr-only'} }) }}
+                {{ form_widget(purchase_form.addressLine3, {'attr':{'class':'form-control addressLine3', 'placeholder': 'Address Line 3', 'data-hj-suppress' : ''}}) }}
+                {% if showAddress %}
+                    <div class="help-block with-errors">{{ form_errors(purchase_form.addressLine3) }}</div>
+                {% endif %}
+            </div>
+            <div class="form-group {% if showAddress and form_errors(purchase_form.city) %}has-error{% endif %}">
+                {{ form_label(purchase_form.city, 'Billing Address City:', { 'label_attr': {'class': 'sr-only'} }) }}
+                {{ form_widget(purchase_form.city, {'attr':{'class':'form-control city', 'placeholder': 'City', 'data-hj-suppress' : ''}}) }}
+                {% if showAddress %}
+                    <div class="help-block with-errors">{{ form_errors(purchase_form.city) }}</div>
+                {% endif %}
+            </div>
+            <div class="form-group {% if showAddress and form_errors(purchase_form.postcode) %}has-error{% endif %}">
+                {{ form_label(purchase_form.postcode, 'Billing Address Postcode:', { 'label_attr': {'class': 'sr-only'} }) }}
+                {{ form_widget(purchase_form.postcode, {'attr':{'class':'form-control postcode', 'placeholder': 'Postcode', 'data-hj-suppress' : ''}}) }}
+                {% if showAddress %}
+                    <div class="help-block with-errors">{{ form_errors(purchase_form.postcode) }}</div>
+                {% endif %}
+            </div>
+            <div class="form-group">
+                {{ form_widget(purchase_form.manual_next, {'label': 'Continue', 'attr': {'class': 'btn btn-success'}}) }}
+            </div>
+        </div>
+    </div>
+
+{{ form_end(purchase_form) }}

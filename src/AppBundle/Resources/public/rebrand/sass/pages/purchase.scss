@@ -65,7 +65,7 @@ body {
     }
 
     &__info__container {
-        display: none;
+        // display: none;
 
         @include media-breakpoint-up(lg) {
             display: block;
@@ -137,6 +137,18 @@ body {
 
         @include media-breakpoint-up(lg) {
             width: 40vw; height: 100vh;
+            overflow-y: scroll;
         }
     }
 }
+
+
+// Old Form CSS
+.step {
+
+    &--hide {
+        display: none;
+    }
+
+}
+
