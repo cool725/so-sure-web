@@ -16,14 +16,18 @@
         @include border-radius(0);
         color: $blue-1;
         padding: 0 0 1px 0;
-    }
 
-    &__select:disabled {
-        opacity: 0.5;
-    }
+        &:disabled {
+            opacity: 0.5;
+        }
 
-    &__select:valid {
-        color: $white;
+        &.valid-select {
+            color: $white;
+        }
+
+        &:focus {
+            outline: 0;
+        }
     }
 
     // Allows for a line break in flexed rows

@@ -5,11 +5,11 @@ $(function() {
     if ($('.phone-search-dropdown').length) {
 
         // Elements & Date
-        let phones = $('.phone-search-dropdown').data('phones'),
-            make   = $('.phone-search-dropdown__make'),
-            model  = $('.phone-search-dropdown__model'),
-            memory = $('.phone-search-dropdown__memory');
-            button = $('.phone-search-dropdown__button');
+        const phones = $('.phone-search-dropdown').data('phones'),
+              make   = $('.phone-search-dropdown__make'),
+              model  = $('.phone-search-dropdown__model'),
+              memory = $('.phone-search-dropdown__memory');
+              button = $('.phone-search-dropdown__button');
 
         let updateModels = () => {
 
@@ -69,11 +69,13 @@ $(function() {
 
             if ($(this).val() != '') {
                 model.prop('disabled', '');
+                $(this).addClass('valid-select');
             } else {
                 model.prop('disabled', 'disabled').val('');
+                $(this).removeClass('valid-select');
             }
 
-            button.prop('disabled', 'disabled').removeClass('btn-success btn-shadow').addClass('btn-outline-white');
+            button.prop('disabled', 'disabled').removeClass('btn-success btn-gradient-green btn-shadow').addClass('btn-outline-white');
 
             model.resizeselect();
         });
@@ -84,8 +86,10 @@ $(function() {
 
             if ($(this).val() != '') {
                 memory.prop('disabled', '');
+                $(this).addClass('valid-select');
             } else {
                 memory.prop('disabled', 'disabled').val('');
+                $(this).removeClass('valid-select');
             }
 
             // button.prop('disabled', 'disabled').removeClass('btn-success btn-shadow').addClass('btn-outline-white');
@@ -96,9 +100,11 @@ $(function() {
         memory.on('change', function() {
 
             if ($(this).val() != '') {
+                $(this).addClass('valid-select');
                 button.prop('disabled', '').removeClass('btn-outline-white').addClass('btn-success btn-shadow btn-gradient-green');
             } else {
-                button.prop('disabled', 'disabled').removeClass('btn-success btn-shadow').addClass('btn-outline-white');
+                button.prop('disabled', 'disabled').removeClass('btn-success btn-gradient-green btn-shadow').addClass('btn-outline-white');
+                $(this).removeClass('valid-select');
             }
         });
 

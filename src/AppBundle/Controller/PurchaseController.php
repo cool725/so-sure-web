@@ -242,7 +242,7 @@ class PurchaseController extends BaseController
                         $data['Facebook'] = true;
                     }
                     $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_RECEIVE_DETAILS, $data);
-                  
+
                     $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_AB_CONTENT_HOMEPAGE);
 
                     if ($user->hasPartialPolicy()) {
@@ -278,7 +278,8 @@ class PurchaseController extends BaseController
             'postcode' => 'comma',
         );
 
-        return $this->render('AppBundle:Purchase:purchaseStepPersonalAddress.html.twig', $data);
+        // return $this->render('AppBundle:Purchase:purchaseStepPersonalAddress.html.twig', $data);
+        return $this->render('AppBundle:Purchase:purchaseStepPersonalAddressRebrand.html.twig', $data);
     }
 
     /**
