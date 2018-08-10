@@ -2001,8 +2001,14 @@ class PhonePolicyTest extends WebTestCase
 
         $policy->link($renewal);
         
-        $this->assertEquals(new \DateTime('2017-01-01'), $renewal->getNextBillingDate(new \DateTime('2017-01-01')));
-        $this->assertEquals(new \DateTime('2017-02-01'), $renewal->getNextBillingDate(new \DateTime('2017-01-02')));
+        $this->assertEquals(
+            new \DateTime('2017-01-01 01:00'),
+            $renewal->getNextBillingDate(new \DateTime('2017-01-01'))
+        );
+        $this->assertEquals(
+            new \DateTime('2017-02-01 01:00'),
+            $renewal->getNextBillingDate(new \DateTime('2017-01-02'))
+        );
 
         $this->assertEquals(
             new \DateTime('2017-01-31'),
@@ -2754,8 +2760,8 @@ class PhonePolicyTest extends WebTestCase
         $this->assertEquals(0, $monthlyPolicy->getOutstandingPremiumToDate($date));
         $this->assertTrue($monthlyPolicy->isValidPolicy(null));
 
-        // needs to be just slightly after 1 month
-        $date->add(new \DateInterval('PT1S'));
+        // billing date is +1 hour, and needs to be slight after
+        $date->add(new \DateInterval('PT2H'));
 
         for ($i = 1; $i <= 11; $i++) {
             $date->add(new \DateInterval('P1M'));
@@ -2807,8 +2813,8 @@ class PhonePolicyTest extends WebTestCase
         );
         $this->assertTrue($monthlyPolicy->isValidPolicy(null));
 
-        // needs to be just slightly later
-        $date->add(new \DateInterval('PT1S'));
+        // billing date is +1 hour, and needs to be slight after
+        $date->add(new \DateInterval('PT2H'));
 
         $this->assertEquals(
             $monthlyPolicy->getPremium()->getMonthlyPremiumPrice(),
@@ -2944,11 +2950,11 @@ class PhonePolicyTest extends WebTestCase
         $policy->setPremiumInstallments(12);
         $policy->setStart(new \DateTime('2016-01-15'));
         $this->assertEquals(
-            new \DateTime('2016-02-15', $timezone),
+            new \DateTime('2016-02-15 01:00', $timezone),
             $policy->getNextBillingDate(new \DateTime('2016-02-14'))
         );
         $this->assertEquals(
-            new \DateTime('2016-03-15', $timezone),
+            new \DateTime('2016-03-15 01:00', $timezone),
             $policy->getNextBillingDate(new \DateTime('2016-02-16'))
         );
 
@@ -2956,11 +2962,11 @@ class PhonePolicyTest extends WebTestCase
         $policy->setPremiumInstallments(12);
         $policy->setStart(new \DateTime('2016-03-29'));
         $this->assertEquals(
-            new \DateTime('2016-04-28', $timezone),
+            new \DateTime('2016-04-28 01:00', $timezone),
             $policy->getNextBillingDate(new \DateTime('2016-04-14'))
         );
         $this->assertEquals(
-            new \DateTime('2016-05-28', $timezone),
+            new \DateTime('2016-05-28 01:00', $timezone),
             $policy->getNextBillingDate(new \DateTime('2016-04-30'))
         );
     }
@@ -3278,6 +3284,10 @@ class PhonePolicyTest extends WebTestCase
             $policy->setStatus($status);
             $this->assertNull($policy->hasCorrectPolicyStatus());
         }
+
+        $policy->setStatus(SalvaPhonePolicy::STATUS_RENEWAL);
+        $this->assertTrue($policy->hasCorrectPolicyStatus(new \DateTime('2015-12-30')));
+        $this->assertFalse($policy->hasCorrectPolicyStatus($date));
     }
 
     public function testAddTwoLostTheftClaims()

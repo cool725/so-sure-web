@@ -41,54 +41,14 @@ class LoadPolicyTermsData implements FixtureInterface, ContainerAwareInterface
 
     private function newPolicyTerms($manager)
     {
-        $policyTerms = new PolicyTerms();
-        $policyTerms->setLatest(false);
-        $policyTerms->setVersion('Version 1 May 2016');
-        $manager->persist($policyTerms);
-
-        $policyTerms = new PolicyTerms();
-        $policyTerms->setLatest(false);
-        $policyTerms->setVersion('Version 1 June 2016');
-        $manager->persist($policyTerms);
-
-        $policyTerms = new PolicyTerms();
-        $policyTerms->setLatest(false);
-        $policyTerms->setVersion('Version 2 Aug 2017');
-        $manager->persist($policyTerms);
-
-        $policyTerms = new PolicyTerms();
-        $policyTerms->setLatest(false);
-        $policyTerms->setVersion('Version 3 Aug 2017');
-        $manager->persist($policyTerms);
-
-        $policyTerms = new PolicyTerms();
-        $policyTerms->setLatest(false);
-        $policyTerms->setVersion('Version 4 Nov 2017');
-        $manager->persist($policyTerms);
-
-        $policyTerms = new PolicyTerms();
-        $policyTerms->setLatest(false);
-        $policyTerms->setVersion('Version 5 May 2018');
-        $manager->persist($policyTerms);
-
-        $policyTerms = new PolicyTerms();
-        $policyTerms->setLatest(false);
-        $policyTerms->setVersion('Version 6 May 2018');
-        $manager->persist($policyTerms);
-
-        $policyTerms = new PolicyTerms();
-        $policyTerms->setLatest(false);
-        $policyTerms->setVersion('Version 7 July 2018');
-        $manager->persist($policyTerms);
-
-        $policyTerms = new PolicyTerms();
-        $policyTerms->setLatest(false);
-        $policyTerms->setVersion('Version 8 July 2018');
-        $manager->persist($policyTerms);
-
-        $policyTerms = new PolicyTerms();
-        $policyTerms->setLatest(true);
-        $policyTerms->setVersion('Version 9 July 2018');
-        $manager->persist($policyTerms);
+        $versions = count(PolicyTerms::$allVersions);
+        $count = 1;
+        foreach (PolicyTerms::$allVersions as $versionName => $version) {
+            $policyTerms = new PolicyTerms();
+            $policyTerms->setLatest($versions == $count);
+            $policyTerms->setVersion($versionName);
+            $manager->persist($policyTerms);
+            $count++;
+        }
     }
 }

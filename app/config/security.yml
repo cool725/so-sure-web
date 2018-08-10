@@ -27,6 +27,19 @@ security:
             security: false
             provider: fos_userbundle
 
+        oauth2_api:
+            pattern:    ^/bearer-api
+            fos_oauth: true
+            stateless: true
+            anonymous: false
+
+        oauth_token:
+            pattern:    ^/oauth/v2/token
+            security:   false
+        # Don't put a firewall on  ^/oauth/v2/auth, and no access_control on it either
+        # It, and the main purchase flow must be on the same firewall context to stay logged in between them
+        # while maintaining the redirect URL in the targetPath session
+
         api:
             pattern: ^/api
             stateless: true
@@ -66,6 +79,7 @@ security:
                 lifetime: 43200 # 12 hours in seconds
                 path:     /
             switch_user: { role: ROLE_CUSTOMER_SERVICES, parameter: _impersonate }
+            entry_point: App\Security\Oauth2LoginEntryPoint
 
     access_control:
         - { path: ^/login$, role: IS_AUTHENTICATED_ANONYMOUSLY }
@@ -80,4 +94,5 @@ security:
         - { path: ^/claims/, role: ROLE_NO_ACCESS }
         - { path: ^/alpha$, role: ROLE_USER }
         - { path: ^/user/, role: ROLE_USER }
+        - { path: ^/bearer-api, roles: [ IS_AUTHENTICATED_FULLY ] }
         - { path: ^/api, access: "isApiPort(8080)" }

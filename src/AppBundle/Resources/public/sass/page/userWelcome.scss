@@ -268,3 +268,7 @@
         }
     }
 }
+
+.welcome-modal-content {
+    @include linear-gradient(#3883FB, #24ADFC);
+}

@@ -5,8 +5,12 @@ redirect_quote_samsung_7_edge:
         path: /phone-insurance/Samsung+Galaxy+S7+Edge+32GB
         permanent: true
 
-app:
+appbundle:
     resource: "@AppBundle/Controller/"
+    type:     annotation
+    prefix:   /
+app:
+    resource: "../../src/App/Controller/"
     type:     annotation
     prefix:   /
 
@@ -89,6 +93,12 @@ starling_login:
 
 accountkit_login:
     path: /login/check-accountkit
+
+# FOSAuthServerBundle
+fos_oauth_server_token:
+    resource: "@FOSOAuthServerBundle/Resources/config/routing/token.xml"
+fos_oauth_server_authorize:
+    resource: "@FOSOAuthServerBundle/Resources/config/routing/authorize.xml"
 
 redirect_homepage:
     path: /index.html

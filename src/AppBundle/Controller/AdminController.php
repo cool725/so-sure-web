@@ -25,6 +25,7 @@ use AppBundle\Repository\File\S3FileRepository;
 use AppBundle\Repository\PaymentRepository;
 use AppBundle\Repository\UserRepository;
 use AppBundle\Service\BacsService;
+use AppBundle\Service\BarclaysService;
 use AppBundle\Service\LloydsService;
 use AppBundle\Service\MailerService;
 use AppBundle\Service\ReportingService;
@@ -824,7 +825,7 @@ class AdminController extends BaseController
     public function adminBankingAction(Request $request, $year = null, $month = null)
     {
         // default 30s for prod is no longer enough
-        set_time_limit(120);
+        set_time_limit(180);
 
         $now = new \DateTime();
         if (!$year) {
@@ -914,6 +915,7 @@ class AdminController extends BaseController
                     $barclaysFile->setBucket('admin.so-sure.com');
                     $barclaysFile->setKeyFormat($this->getParameter('kernel.environment') . '/%s');
 
+                    /** @var BarclaysService $barclaysService */
                     $barclaysService = $this->get('app.barclays');
                     $data = $barclaysService->processCsv($barclaysFile);
 
