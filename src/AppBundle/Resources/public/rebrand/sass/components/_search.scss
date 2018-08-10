@@ -24,24 +24,11 @@
 
     &__select:valid {
         color: $white;
-        // border-bottom-color: $white;
     }
 
     // Allows for a line break in flexed rows
     &__break {
         width: 100%;
-    }
-
-    &__make {
-
-    }
-
-    &__model {
-
-    }
-
-    &__memory {
-
     }
 
 }

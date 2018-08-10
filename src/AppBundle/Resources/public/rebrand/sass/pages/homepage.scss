@@ -94,8 +94,11 @@
     }
 
     @include media-breakpoint-up(xl) {
-        background-position: right 50px;
-        background-size: 640px;
+        background-position: 800px 50px;
+    }
+
+    @include media-breakpoint-up(fk) {
+        background-position: 1400px 50px;
     }
 
     &__illustration__mobile {
