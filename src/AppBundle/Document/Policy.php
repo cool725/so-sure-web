@@ -2897,6 +2897,7 @@ abstract class Policy
 
         // and business rule of 30 days unpaid before auto cancellation
         $billingDate->add(new \DateInterval('P30D'));
+        $billingDate = $this->startOfDay($billingDate);
 
         return $billingDate;
     }
@@ -3833,15 +3834,17 @@ abstract class Policy
         return $totalPaid;
     }
 
-    public function getTotalSuccessfulStandardPayments(\DateTime $date = null)
+    public function getTotalSuccessfulStandardPayments($includeDiscounts = false, \DateTime $date = null)
     {
         if (!$date) {
             $date = new \DateTime();
         }
         $totalPaid = 0;
         foreach ($this->getSuccessfulStandardPayments() as $payment) {
-            if ($payment->getDate() <= $date) {
-                $totalPaid += $payment->getAmount();
+            if (!$payment->isDiscount() || ($includeDiscounts && $payment->isDiscount())) {
+                if ($payment->getDate() <= $date) {
+                    $totalPaid += $payment->getAmount();
+                }
             }
         }
 
@@ -3950,6 +3953,10 @@ abstract class Policy
         if (!$this->isPolicy()) {
             return null;
         }
+        if (!$date) {
+            $date = new \DateTime();
+        }
+
         $ignoredStatuses = [
             self::STATUS_CANCELLED,
             self::STATUS_EXPIRED,
@@ -3969,7 +3976,9 @@ abstract class Policy
             return false;
         }
 
-        if ($this->isPolicyPaidToDate($date, true)) {
+        if ($this->getStatus() == self::STATUS_RENEWAL) {
+            return $this->getStart() > $date;
+        } elseif ($this->isPolicyPaidToDate($date, true)) {
             return $this->getStatus() == self::STATUS_ACTIVE;
         } elseif ($this->getUser()->hasBacsPaymentMethod() &&
             $this->getUser()->getBacsPaymentMethod() &&
@@ -3977,7 +3986,7 @@ abstract class Policy
             $this->getUser()->getBacsPaymentMethod()->getBankAccount()->isMandateInProgress()) {
             return $this->getStatus() == self::STATUS_ACTIVE;
         } else {
-            return in_array($this->getStatus(), [self::STATUS_UNPAID, self::STATUS_RENEWAL]);
+            return in_array($this->getStatus(), [self::STATUS_UNPAID]);
         }
     }
 
@@ -4294,7 +4303,8 @@ abstract class Policy
             return 0;
         } elseif (in_array($this->getStatus(), [self::STATUS_ACTIVE, self::STATUS_UNPAID]) ||
             ($this->isCancelled() && !$this->isRefundAllowed())) {
-            $numPayments = $premium->getNumberOfMonthlyPayments($this->getTotalSuccessfulStandardPayments($date));
+            $totalPayments = $this->getTotalSuccessfulStandardPayments(false, $date);
+            $numPayments = $premium->getNumberOfMonthlyPayments($totalPayments);
             $expectedCommission = $salva->sumBrokerFee($numPayments, $numPayments == 12);
         } else {
             if (!$date) {

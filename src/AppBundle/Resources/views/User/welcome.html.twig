@@ -254,7 +254,9 @@
         </div>
     </div>
 
-    {# {% if user_modal_welcome is defined and user_modal_welcome == 'new-welcome-modal' %}
+    {% if app.session.has('oauth2Flow') and app.session.get('oauth2Flow') == 'starling' %}
+        {% include 'AppBundle::User/_welcome_starling.html.twig' %}
+    {% elseif user_modal_welcome is defined and user_modal_welcome == 'welcome-modal' %}
         <div class="modal modal-new fade"
              id="welcome-modal"
              tabindex="-1"
@@ -267,44 +269,8 @@
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
-                        <h3 class="h2 text-blue text-center">Welcome to the so-sure family <br><small>You've just joined thousands of customers who trust so-sure with their phones</small></h3>
-                    </div>
-                    <div class="modal-body">
-                        <div class="row">
-                            <div class="col-md-4">
-                                <img src="{{ cdn_url }}/images/homepage/pic-sure_steps_homepage_1.svg" class="img-center" width="120px">
-                                <p>Your policy covers you immediatly for Loss, Theft, Accidental Damage, Out of Warranty Breakdown, Accessories and Global Travel.</p>
-                            </div>
-                            <div class="col-md-4">
-                                <img src="{{ cdn_url }}/images/homepage/pic-sure_steps_homepage_4.svg" class="img-center" width="120px">
-                                <p>Plus our claims process is simple and hassle free. Once your claim is approved we provide you with a replacement phone the very next working day, or we can even do a speedy repair at your home of office.</p>
-                            </div>
-                            <div class="col-md-4">
-                                <img src="{{ cdn_url }}/images/homepage/pic-sure_steps_homepage_2.svg" class="img-center" width="120px">
-                                <p>And, with our anti-fraud app you can reduce your excess to just &pound;50. Oh and did we mention you can get up to 80% of your money back too?</p>
-                            </div>
-                        </div>
-                        <div class="speech-bubble animated fadeInLeft clearfix"><mark>Reported a broken screen on a Sunday night via form. Monday morning received call. Tuesday morning received replacement phone. <br> What more can you ask for</mark> <br><small>Stephen Miller, London</small></div>
-                    </div>
-                    <div class="modal-footer">
-                        <a href="#" class="btn btn-green btn-big-text btn-pad" data-dismiss="modal" aria-label="Close">Find out more</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    {% else %} #}
-        <div class="modal modal-new fade"
-             id="welcome-modal"
-             tabindex="-1"
-             role="dialog"
-             aria-labelledby="welcome-modal"
-             aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
+
+
                         <h3 class="h2 text-blue text-center">You’ve made a great choice</h3>
                     </div>
                     <div class="modal-body">
@@ -318,12 +284,12 @@
                             <div class="col-md-4">
                                 <img src="{{ cdn_url }}/images/user/welcome_modal_home_insurance_.svg" class="img-center">
                                 <div class="h4 text-center">Home insurance</div>
-                                <p>Unlikely to get you up and running with a replacement phone the next working day (unlike us). Plus home insurance usually has high excess of £200 or more (with us its as low as £50) and might well increase your excess next year if you make a claim, ouch, we won't.</p>
+                                <p>Unlikely to get you up and running with a replacement phone in 24-72 hours (unlike us). Plus home insurance usually has high excess of £200 or more (with us its as low as £50) and might well increase your premium next year if you make a claim, ouch, we won't.</p>
                             </div>
                             <div class="col-md-4">
                                 <img src="{{ cdn_url }}/images/user/welcome_modal_cheap_insurance_.svg" class="img-center">
                                 <div class="h4 text-center">Cheap Insurance</div>
-                                <p>Yes, we may be slightly more expensive than some of the independent insurers out there, but our claims process is super simple, hassle free and we only decline 3% of claims.</p>
+                                <p>Yes, we may be slightly more expensive than some of the independent insurers out there, but our claims process is super simple, hassle free and we decline less than 3.5% of claims.</p>
                             </div>
                         </div>
                     </div>
@@ -343,7 +309,7 @@
                 </div>
             </div>
         </div>
-    {# {% endif %} #}
+    {% endif %}
     {# End Page Modals #}
 
 

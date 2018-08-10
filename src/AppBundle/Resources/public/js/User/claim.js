@@ -74,8 +74,7 @@ sosure.claim = (function() {
             },
             messages: {
                 "claim_form[signature]" : {
-                    required: 'Please sign the declaration',
-                    equalTo: "Name doesn't match"
+                    required: 'Please sign the declaration'
                 },
                 "claim_form[name]": {
                     required: 'Please enter your full name',

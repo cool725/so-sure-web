@@ -1132,7 +1132,7 @@ class UserController extends BaseController
      * @Route("/welcome/{id}", name="user_welcome_policy_id")
      * @Template
      */
-    public function welcomeAction($id = null)
+    public function welcomeAction(Request $request, $id = null)
     {
         $dm = $this->getManager();
         $user = $this->getUser();
@@ -1162,13 +1162,13 @@ class UserController extends BaseController
             $dm->flush($policy);
         }
 
-        // $exp = $this->sixpack(
-        //     $request,
-        //     SixpackService::EXPERIMENT_NEW_WELCOME_MODAL,
-        //     ['current-welcome-modal', 'new-welcome-modal'],
-        //     SixpackService::LOG_MIXPANEL_CONVERSION,
-        //     $user->getId()
-        // );
+        $exp = $this->sixpack(
+            $request,
+            SixpackService::EXPERIMENT_WELCOME_MODAL_NO_WELCOME_MODAL,
+            ['welcome-modal', 'without-welcome-modal'],
+            SixpackService::LOG_MIXPANEL_CONVERSION,
+            $user->getId()
+        );
 
         $countUnprocessedInvitations = count($user->getUnprocessedReceivedInvitations());
         if ($countUnprocessedInvitations > 0) {
@@ -1184,11 +1184,20 @@ class UserController extends BaseController
             $this->generateUrl('purchase_cancel', ['id' => $user->getLatestPolicy()->getId()])
         ));
 
+        $oauth2FlowParams = null;
+        $session = $request->getSession();
+        if ($session && $session->has('oauth2Flow')) {
+            $url = $session->get('oauth2Flow.targetPath');
+            $query = parse_url($url, PHP_URL_QUERY);
+            parse_str($query, $oauth2FlowParams);
+        }
+
         return array(
             'policy_key' => $this->getParameter('policy_key'),
             'policy' => $user->getLatestPolicy(),
             'has_visited_welcome_page' => $pageVisited,
-            // 'user_modal_welcome' => $exp,
+            'user_modal_welcome' => $exp,
+            'oauth2FlowParams' => $oauth2FlowParams,
         );
     }
     /**
@@ -1491,6 +1500,7 @@ class UserController extends BaseController
                     }
                     $this->denyAccessUnlessGranted(PolicyVoter::EDIT, $policy);
 
+                    /** @var ClaimsService $claimsService */
                     $claimsService = $this->get('app.claims');
                     $claim = $claimsService->createClaim($claimConfirmForm->getData());
                     $claim->setPolicy($policy);

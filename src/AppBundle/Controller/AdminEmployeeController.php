@@ -1700,7 +1700,20 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             $history = $logRepo->findBy([
                 'data.imei' => $imei
             ]);
-            $charges = $chargeRepo->findBy(['details' => $imei]);
+            $unsafeCharges = $chargeRepo->findBy(['details' => $imei]);
+            foreach ($unsafeCharges as $unsafeCharge) {
+                try {
+                    // attempt to access user
+                    if ($unsafeCharge->getUser() && $unsafeCharge->getUser()->getName()) {
+                        $charges[] = $unsafeCharge;
+                    }
+                } catch (\Exception $e) {
+                    $user = new User();
+                    $user->setFirstName('Deleted');
+                    $unsafeCharge->setUser($user);
+                    $charges[] = $unsafeCharge;
+                }
+            }
 
             if (!$this->isImei($imei)) {
                 $otherImei = 'unknown - invalid length';
@@ -2319,6 +2332,11 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                     'AppBundle:Email:picsure/adminRejected.html.twig',
                     ['policy' => $policy]
                 );
+                $this->addFlash('error', sprintf(
+                    'Policy <a href="%s">%s</a> should be cancelled (intercom support message also sent).',
+                    $this->get('app.router')->generateUrl('admin_policy', ['id' => $policy->getId()]),
+                    $policy->getPolicyNumber()
+                ));
             }
             try {
                 $push = $this->get('app.push');

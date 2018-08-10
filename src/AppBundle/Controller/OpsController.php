@@ -2,6 +2,7 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\DataFixtures\MongoDB\d\Oauth2\LoadOauth2Data;
 use AppBundle\Repository\Invitation\EmailInvitationRepository;
 use AppBundle\Repository\Invitation\InvitationRepository;
 use AppBundle\Repository\PhoneRepository;
@@ -9,8 +10,11 @@ use AppBundle\Repository\PolicyRepository;
 use AppBundle\Repository\SCodeRepository;
 use AppBundle\Repository\UserRepository;
 use AppBundle\Service\RequestService;
+use AppBundle\Service\RouterService;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
@@ -122,11 +126,39 @@ class OpsController extends BaseController
      * @Route("/pages", name="ops_pages")
      * @Template()
      */
-    public function validatePagesAction()
+    public function validatePagesAction(Request $request)
     {
         if ($this->isProduction()) {
             throw $this->createAccessDeniedException('Only for dev use');
         }
+        /** @var RouterService $router */
+        $router = $this->get('app.router');
+        $oauthStarlingUrl = $router->generateUrl('fos_oauth_server_authorize', [
+            'client_id' => LoadOauth2Data::KNOWN_CLIENT_ID,
+            'response_type' => 'code',
+            'redirect_uri' => $router->generateUrl('ops_pages', []),
+            'state' => 'random-string.12345',
+            'scope' => 'user.starling.summary'
+        ]);
+
+        if ($request->get('code')) {
+            $bearer = $router->generateUrl('fos_oauth_server_token', [
+                'client_id' => LoadOauth2Data::KNOWN_CLIENT_ID,
+                'client_secret' => LoadOauth2Data::KNOWN_CLIENT_SECRET,
+                'grant_type' => 'authorization_code',
+                'redirect_uri' => $router->generateUrl('ops_pages', []),
+                'code' => $request->get('code')
+            ]);
+            $this->addFlash(
+                'success',
+                sprintf(
+                    'OAuth Code Added: %s <a href="%s" target="_blank">Exchange for bearer token</a>',
+                    $request->get('code'),
+                    $bearer
+                )
+            );
+        }
+
         $validPolicy = null;
         $validPolicyMonthly = null;
         $unpaidValidPolicyMonthly = null;
@@ -399,6 +431,21 @@ class OpsController extends BaseController
             'cancelledReason' => Policy::CANCELLED_USER_REQUESTED,
         ]);
 
+        $starlingForm = $this->get('form.factory')
+            ->createNamedBuilder('starling_form')
+            ->add('set', SubmitType::class)
+            ->getForm();
+        if ('POST' === $request->getMethod()) {
+            if ($request->request->has('starling_form')) {
+                $starlingForm->handleRequest($request);
+                if ($starlingForm->isValid()) {
+                    $this->starlingOAuthSession($request, $oauthStarlingUrl);
+
+                    return new RedirectResponse($this->generateUrl('user_welcome', []));
+                }
+            }
+        }
+
         return [
             'scode' => $scode->getCode(),
             'invitation' => $invitation,
@@ -433,6 +480,8 @@ class OpsController extends BaseController
             'fully_expired_policy_cashback' => $fullyExpiredPolicyCashback,
             'upcoming_phone' => $upcomingPhone,
             'active_phone' => $activePhone,
+            'oauthStarlingUrl' => $oauthStarlingUrl,
+            'starling_form' => $starlingForm->createView(),
         ];
     }
 

@@ -64,6 +64,7 @@ use AppBundle\Service\SixpackService;
 class DefaultController extends BaseController
 {
     use PhoneTrait;
+    use \Symfony\Component\Security\Http\Util\TargetPathTrait;
 
     /**
      * @Route("/", name="homepage", options={"sitemap"={"priority":"1.0","changefreq":"daily"}})
@@ -103,15 +104,15 @@ class DefaultController extends BaseController
             $trafficFraction = 1;
         }
 
-        $replacement = $this->sixpack(
-            $request,
-            SixpackService::EXPERIMENT_PHONE_REPLACEMENT,
-            ['default', 'next-working-day', 'twentyfour-seventy-two'],
-            SixpackService::LOG_MIXPANEL_CONVERSION,
-            null,
-            $trafficFraction,
-            $force
-        );
+        // $replacement = $this->sixpack(
+        //     $request,
+        //     SixpackService::EXPERIMENT_PHONE_REPLACEMENT,
+        //     ['default', 'next-working-day', 'twentyfour-seventy-two'],
+        //     SixpackService::LOG_MIXPANEL_CONVERSION,
+        //     null,
+        //     $trafficFraction,
+        //     $force
+        // );
 
         $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE);
 
@@ -137,7 +138,7 @@ class DefaultController extends BaseController
 
         $data = array(
             // Make sure to check homepage landing below too
-            'replacement' => $replacement,
+            // 'replacement' => $replacement,
             'referral'    => $referral,
             'phone'       => $this->getQuerystringPhone($request),
             'search_type' => $expSearch,
@@ -180,17 +181,9 @@ class DefaultController extends BaseController
      */
     public function starlingLanding(Request $request)
     {
-        $exp = $this->sixpack(
-            $request,
-            SixpackService::EXPERIMENT_STARLING_LANDING,
-            ['homepage', 'starling-landing']
-        );
+        $this->starlingOAuthSession($request);
 
-        if ($exp == 'starling-landing') {
-            return $this->render('AppBundle:Default:indexStarlingBank.html.twig');
-        } else {
-            return $this->redirectToRoute('homepage');
-        }
+        return $this->render('AppBundle:Default:indexStarlingBank.html.twig');
     }
 
     /**
@@ -678,8 +671,10 @@ class DefaultController extends BaseController
      */
     public function claimAction(Request $request)
     {
+        /** @var User $user */
         $user = $this->getUser();
-        if ($user) {
+        // causes admin's (or claims) too much confusion to be redirected to a 404
+        if ($user && !$user->hasEmployeeRole() && !$user->hasClaimsRole()) {
             return $this->redirectToRoute('user_claim');
         }
 
@@ -937,8 +932,8 @@ class DefaultController extends BaseController
                 's_theft_bg' => 'tick-background',
                 's_loss' => 'As standard',
                 's_loss_bg' => 'tick-background',
-                's_theft_replacement' => '1 working day',
-                's_damage_replacement' => '1 working day',
+                's_theft_replacement' => '24-72 hours once claim approved',
+                's_damage_replacement' => '24-72 hours once claim approved',
                 's_used_phones' => 'Yes',
                 's_used_phones_bg' => 'tick-background',
                 's_cashback' => 'Yes',
@@ -961,8 +956,8 @@ class DefaultController extends BaseController
                 's_theft_bg' => 'tick-background',
                 's_loss' => 'Yes',
                 's_loss_bg' => 'tick-background',
-                's_theft_replacement' => 'Next working day',
-                's_damage_replacement' => 'Next working day',
+                's_theft_replacement' => '24-72 hours once claim approved',
+                's_damage_replacement' => '24-72 hours once claim approved',
                 's_used_phones' => 'Yes',
                 's_used_phones_bg' => 'tick-background',
                 's_cashback' => 'Yes',
@@ -985,8 +980,8 @@ class DefaultController extends BaseController
                 's_theft_bg' => 'tick-background',
                 's_loss' => 'Yes',
                 's_loss_bg' => 'tick-background',
-                's_theft_replacement' => 'Next working day',
-                's_damage_replacement' => 'Next working day',
+                's_theft_replacement' => '24-72 hours once claim approved',
+                's_damage_replacement' => '24-72 hours once claim approved',
                 's_used_phones' => 'Yes',
                 's_used_phones_bg' => 'tick-background',
                 's_cashback' => 'Yes',
@@ -1009,8 +1004,8 @@ class DefaultController extends BaseController
                 's_theft_bg' => 'tick-background',
                 's_loss' => 'Yes',
                 's_loss_bg' => 'tick-background',
-                's_theft_replacement' => 'Next working day',
-                's_damage_replacement' => 'Next working day',
+                's_theft_replacement' => '24-72 hours once claim approved',
+                's_damage_replacement' => '24-72 hours once claim approved',
                 's_used_phones' => 'Yes',
                 's_used_phones_bg' => 'tick-background',
                 's_cashback' => 'Yes',

@@ -232,7 +232,7 @@ class ClaimsController extends BaseController
             } elseif ($request->request->has('crimeref')) {
                 $formCrimeRef->handleRequest($request);
                 if ($formCrimeRef->isValid()) {
-                    if ($crimeRef->getForce()) {
+                    if ($crimeRef->getForce() && $crimeRef->getCrimeRef()) {
                         $validCrimeRef = $imeiService->validateCrimeRef(
                             $crimeRef->getForce(),
                             $crimeRef->getCrimeRef()

@@ -362,6 +362,7 @@ class MixpanelService
         if (!$days) {
             $days = 90;
         }
+        $data = null;
         $time = new \DateTime();
         $time = $time->sub(new \DateInterval(sprintf('P%dD', $days)));
         $query = [
@@ -411,6 +412,53 @@ class MixpanelService
             ]
         ]];
         // @codingStandardsIgnoreEnd
+        $data = $this->mixpanelData->data('engage', $query);
+        if ($data) {
+            $count = 0;
+            foreach ($data['results'] as $user) {
+                $this->queueDelete($user['$distinct_id'], 0);
+                $count++;
+            }
+        }
+
+        // Although facebook should be allowed, there seems to be a 'preview' mode which causes havoc
+        // with our sixpack tests and causes a huge increase (30k+ users over a few week period)
+        // so delete any users over 1 day old with a facebook brower that have just 1 sixpack experiment
+        $now = new \DateTime();
+        // @codingStandardsIgnoreStart
+        $query = [
+            'selector' => sprintf(
+                '(behaviors["behavior_11114"] == 1 and datetime(%s - 86400) > user["$last_seen"] and not defined(user["$last_name"]) and behaviors["behavior_11115"] == 0 and behaviors["behavior_11116"] == 0 and behaviors["behavior_11117"] == 0)',
+                $now->format('U')
+            ),
+            'behaviors' => [[
+                "window" => "90d",
+                "name" => "behavior_11114",
+                "event_selectors" => [[
+                    "event" => "Sixpack Experiment",
+                ]]
+            ], [
+                "window" => "90d",
+                "name" => "behavior_11115",
+                "event_selectors" => [[
+                    "event" => "Home Page"
+                ]]
+            ], [
+                "window" => "90d",
+                "name" => "behavior_11116",
+                "event_selectors" => [[
+                    "event" => "Quote Page"
+                ]]
+            ], [
+                "window" => "90d",
+                "name" => "behavior_11117",
+                "event_selectors" => [[
+                    "event" => "CPC Manufacturer Page"
+                ]]
+            ]
+            ]];
+        // @codingStandardsIgnoreEnd
+        //print_r($query);
         $data = $this->mixpanelData->data('engage', $query);
         if ($data) {
             $count = 0;
