@@ -2,6 +2,7 @@
 
 namespace AppBundle\DataFixtures\MongoDB\b\User;
 
+use AppBundle\Document\Claim;
 use Doctrine\Common\DataFixtures\FixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 use AppBundle\Document\User;
@@ -31,9 +32,11 @@ class LoadUserData implements FixtureInterface, ContainerAwareInterface
         $this->newUser('dylan@so-sure.com', self::DEFAULT_PASSWORD, 'Dylan', 'Bourguignon', [User::ROLE_ADMIN]);
         $this->newUser('julien@so-sure.com', self::DEFAULT_PASSWORD, 'Julien', 'Champagne', [User::ROLE_ADMIN]);
         $this->newUser('nick@so-sure.com', self::DEFAULT_PASSWORD, 'Nick', 'Waller', [User::ROLE_ADMIN]);
-        $this->newUser('marta@so-sure.com', self::DEFAULT_PASSWORD, 'Marta', 'Datkiewicz', [User::ROLE_ADMIN]);
+        $this->newUser('olly@so-sure.com', self::DEFAULT_PASSWORD, 'Olly', 'Mandling', [User::ROLE_ADMIN]);
         $this->newUser('kitti@so-sure.com', self::DEFAULT_PASSWORD, 'Kitti', 'Varga', [User::ROLE_CUSTOMER_SERVICES]);
         $this->newUser('claims@so-sure.com', self::DEFAULT_PASSWORD, 'so-sure', 'Claims', [User::ROLE_CLAIMS]);
+        $this->newUser('claims-davies@so-sure.com', self::DEFAULT_PASSWORD, 'so-sure', 'Claims', [User::ROLE_CLAIMS], Claim::TEAM_DAVIES);
+        $this->newUser('claims-directgroup@so-sure.com', self::DEFAULT_PASSWORD, 'so-sure', 'Claims', [User::ROLE_CLAIMS], Claim::TEAM_DIRECT_GROUP);
         $this->newUser('employee@so-sure.com', self::DEFAULT_PASSWORD, 'so-sure', 'Employee', [User::ROLE_EMPLOYEE]);
         $this->newUser('customer-services@so-sure.com', self::DEFAULT_PASSWORD, 'so-sure', 'CustomerServices', [User::ROLE_CUSTOMER_SERVICES]);
         $this->newUser('alister@so-sure.com', self::DEFAULT_PASSWORD, 'Alister', 'Bulman', [User::ROLE_ADMIN]);
@@ -55,7 +58,7 @@ class LoadUserData implements FixtureInterface, ContainerAwareInterface
         $manager->flush();
     }
 
-    private function newUser($email, $password, $firstName, $lastName, $roles)
+    private function newUser($email, $password, $firstName, $lastName, $roles, $handlingTeam = null)
     {
         if (!$this->container) {
             throw new \Exception('missing container');
@@ -70,6 +73,9 @@ class LoadUserData implements FixtureInterface, ContainerAwareInterface
         $user->setPlainPassword($password);
         $user->setEnabled(true);
         $user->setRoles($roles);
+        if ($handlingTeam) {
+            $user->setHandlingTeam($handlingTeam);
+        }
         $userManager->updateUser($user);
     }
 }
