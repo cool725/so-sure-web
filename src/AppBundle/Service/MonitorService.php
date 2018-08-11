@@ -463,4 +463,20 @@ class MonitorService
             }
         }
     }
+
+    public function missingClaimHandler()
+    {
+        /** @var ClaimRepository $repo */
+        $repo = $this->dm->getRepository(Claim::class);
+        $claims = $repo->findBy([
+            'status' => ['$in' => [Claim::STATUS_SUBMITTED, Claim::STATUS_INREVIEW]],
+            'handlingTeam' => null
+        ]);
+        foreach ($claims as $claim) {
+            throw new MonitorException(sprintf(
+                'Claim %s is missing a handling team',
+                $claim->getId()
+            ));
+        }
+    }
 }
