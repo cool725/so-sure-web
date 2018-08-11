@@ -12,9 +12,13 @@ $('#claimsModal').on('show.bs.modal', function (event) {
         modal.find('#claims-detail-type').val(claim.type);
         var status = claim.status;
         if (claim.daviesStatus) {
-            status += ' ('+claim.daviesStatus+')'
+            status += ' ('+claim.daviesStatus+')';
         }
-        modal.find('#claims-detail-status').text(status);
+        if (claim.status == 'fnol') {
+            status = '<span class="text-warning" title="Claim not yet submitted to claims handler">' + status + '</span>';
+        }
+        modal.find('#claims-detail-status').html(status);
+        modal.find('#claims-detail-handling-team').text(claim.handlingTeam);
         modal.find('#claims-detail-number-to-reach').text(claim.phoneToReach);
         modal.find('#claims-detail-time-to-reach').text(claim.timeToReach);
         modal.find('#claims-detail-initial-suspicion').text(claim.initialSuspicion);
