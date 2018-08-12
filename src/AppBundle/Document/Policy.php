@@ -4259,6 +4259,11 @@ abstract class Policy
             );
         }
 
+        if ($this->getLatestFnolClaim()) {
+            $warnings[] =
+                'Policy has a FNOL claim, but not yet submitted and so required documents may not yet be uploaded.';
+        }
+
         if ($this instanceof PhonePolicy) {
             $foundSerial = false;
             $mismatch = false;
