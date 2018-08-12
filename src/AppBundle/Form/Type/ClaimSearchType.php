@@ -39,7 +39,7 @@ class ClaimSearchType extends BaseType
             ->add('number', TextType::class, ['required' => false])
             ->add('status', ChoiceType::class, [
                 'multiple' => true,
-                'expanded' => true,
+                'expanded' => false,
                 'choices' => [
                     Claim::STATUS_APPROVED => Claim::STATUS_APPROVED,
                     Claim::STATUS_SUBMITTED => Claim::STATUS_SUBMITTED,
