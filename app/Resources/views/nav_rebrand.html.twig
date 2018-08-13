@@ -39,13 +39,13 @@
             {% if app.user is not null and app.user %}
                 <li class="nav-item d-none d-xl-block pr-xl-5">
                     {% if is_granted('ROLE_ADMIN') %}
-                        <a href="{{ path('admin_home') }}" class="nav-link text-primary">Admin <i class="fas fa-users-cog fa-sm"></i></a>
+                        <a href="{{ path('admin_home') }}" class="nav-link text-primary">Admin</a>
                     {% elseif is_granted('ROLE_EMPLOYEE') %}
-                        <a href="{{ path('admin_home') }}" class="nav-link text-primary">Admin <i class="fas fa-user-tie fa-sm"></i></a>
+                        <a href="{{ path('admin_home') }}" class="nav-link text-primary">Admin</a>
                     {% elseif is_granted('ROLE_CLAIMS') %}
-                        <a href="{{ path('claims_home') }}" class="nav-link text-primary">Claims <i class="fas fa-user-shield fa-sm"></i></a>
+                        <a href="{{ path('claims_home') }}" class="nav-link text-primary">Claims</a>
                     {% else %}
-                        <a href="{{ path('user_home') }}" class="nav-link text-primary">Your account <i class="fas fa-user-circle fa-sm"></i></a>
+                        <a href="{{ path('user_home') }}" class="nav-link text-primary">Your account</a>
                     {% endif %}
                 </li>
             {% else %}
@@ -75,38 +75,42 @@
     {% endif %}
     <div id="menu" class="menu d-flex flex-column d-lg-none">
         <ul class="list-unstyled align-self-stretch menu__links">
-            <li class="mb-4">
+            {% if app.user is not null and app.user %}
+                <li>
+                    {% if is_granted('ROLE_ADMIN') %}
+                        <a href="{{ path('admin_home') }}" class="h5">Admin</a>
+                    {% elseif is_granted('ROLE_EMPLOYEE') %}
+                        <a href="{{ path('admin_home') }}" class="h5">Admin</a>
+                    {% elseif is_granted('ROLE_CLAIMS') %}
+                        <a href="{{ path('claims_home') }}" class="h5">Claims</a>
+                    {% else %}
+                        <a href="{{ path('user_home') }}" class="h5">Your account</a>
+                    {% endif %}
+                </li>
+            {% endif %}
+            <li>
                 <a href="#" class="h5">Why so-sure?</a>
             </li>
-            <li class="my-4">
+            <li>
                 <a href="{{ path('claim') }}" class="h5">Make a claim</a>
             </li>
-            <li class="my-4">
+            <li>
                 <a href="{{ path('faq') }}" class="h5">FAQs</a>
             </li>
-            <li class="my-4">
+            <li>
                 <a href="{{ path('blog') }}" class="h5">Blog</a>
             </li>
-            <li class="my-4">
+            <li>
                 <a href="{{ path('about_how_to_contact_so_sure') }}" class="h5">Contact</a>
             </li>
         </ul>
         <div class="p-5 align-self-stretch menu__buttons">
-            <a href="#" class="btn btn-primary btn-shadow btn-gradient btn-block mb-3">Get insured</a>
+            <a href="#" class="btn btn-primary btn-shadow btn-gradient btn-block mb-3 get-a-quote">Get insured</a>
             <a href="#" class="btn btn-outline-white btn-block"><i class="far fa-play-circle fa-lg"></i> Watch our Video</a>
-            <div class="menu__user-button p-3 text-center">
+            <div class="menu__user-button text-center">
                 {% if app.user is not null and app.user %}
-                    {% if is_granted('ROLE_ADMIN') %}
-                        <a href="{{ path('admin_home') }}" class="d-block h5 m-0">Admin <i class="fas fa-users-cog fa-sm"></i></a>
-                    {% elseif is_granted('ROLE_EMPLOYEE') %}
-                        <a href="{{ path('admin_home') }}" class="d-block h5 m-0">Admin <i class="fas fa-user-tie fa-sm"></i></a>
-                    {% elseif is_granted('ROLE_CLAIMS') %}
-                        <a href="{{ path('claims_home') }}" class="d-block h5 m-0">Claims <i class="fas fa-user-shield fa-sm"></i></a>
-                    {% else %}
-                        <a href="{{ path('user_home') }}" class="d-block h5 m-0">Your account <i class="fas fa-user-circle fa-sm"></i></a>
-                    {% endif %}
                     {% if is_granted('ROLE_PREVIOUS_ADMIN') %}
-                        <a href="{{ path('homepage', {'_impersonate': '_exit'}) }}" class="d-block h5 m-0">Exit <u>{{ app.user.email }}</u></a>
+                        <a href="{{ path('homepage', {'_impersonate': '_exit'}) }}" class="d-block h5 m-0"><i class="fas fa-arrow-left fa-sm ml-2"></i> Exit <u>{{ app.user.email }}</u></a>
                     {% else %}
                         <a href="{{ path('fos_user_security_logout') }}" class="d-block h5 m-0"><i class="fas fa-arrow-left fa-sm ml-2"></i> Log out</i></a>
                     {% endif %}

@@ -15,11 +15,16 @@
         width: 100%;
         display: none;
         flex: 1;
+        margin: 0;
+        overflow-y: scroll;
+
         > li {
 
             > a {
+                display: block;
                 color: $white;
                 transition: all 0.2s linear;
+                padding: 0.6rem 2rem;
 
                 &:hover, &:focus {
                     color: $dark;
@@ -44,11 +49,20 @@
 
     &__user-button {
         position: absolute;
-        background-color: $blue-3;
+        // background-color: $blue-3;
         bottom: 0; left: 0; right: 0;
 
         a {
+            display: block;
+            padding: 1rem 2rem;
             color: $blue-2;
+            background-color: $blue-3;
+
+            &:hover, &:focus {
+                color: $white;
+                background-color: $blue-2;
+                text-decoration: none;
+            }
         }
     }
 

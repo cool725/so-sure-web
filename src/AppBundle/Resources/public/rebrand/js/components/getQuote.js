@@ -6,10 +6,16 @@ $(function() {
 
     const quoteToggle = $('.get-a-quote'),
           quoteModal  = $('.getquote'),
+          menu        = $('#menu'),
+          hamburger   = $('#nav_toggle'),
           logo        = $('.navbar-brand__logo');
 
     quoteToggle.on('click', function(e) {
         e.preventDefault();
+
+        if ($(menu).hasClass('menu--open')) {
+            $(hamburger).trigger('click');
+        }
 
         // Toggle logo class
         if (!$('body').hasClass('quote')) {
