@@ -920,7 +920,7 @@ class DaviesServiceTest extends WebTestCase
 
         self::$daviesService->clearErrors();
 
-        $claim->setIgnoreWarningFlags(Claim::WARNING_FLAG_DAVIES_INCORRECT_EXCESS);
+        $claim->setIgnoreWarningFlags(Claim::WARNING_FLAG_CLAIMS_INCORRECT_EXCESS);
         self::$daviesService->validateClaimDetails($claim, $daviesClaim);
         $this->insureErrorDoesNotExist('/does not have the correct excess value/');
     }
@@ -1255,7 +1255,7 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim->replacementModel = 'iPhone 8';
         $daviesClaim->replacementReceivedDate = new \DateTime('2016-01-01');
         // set ignore warning flag
-        $claim->setIgnoreWarningFlags(Claim::WARNING_FLAG_DAVIES_REPLACEMENT_COST_HIGHER);
+        $claim->setIgnoreWarningFlags(Claim::WARNING_FLAG_CLAIMS_REPLACEMENT_COST_HIGHER);
         self::$daviesService->validateClaimDetails($claim, $daviesClaim);
         $this->insureWarningDoesNotExist('/Device replacement cost/');
     }

@@ -28,8 +28,9 @@ trait ExcelTrait
                 }
                 $origin = $this->startOfDay($date);
             } else {
-                $origin = new \DateTime("1900-01-01");
-                $origin->add(new \DateInterval(sprintf('P%dD', $days - 2)));
+                $origin = \PHPExcel_Shared_Date::ExcelToPHPObject((int) $days);
+                //$origin = new \DateTime("1900-01-01");
+                //$origin->add(new \DateInterval(sprintf('P%dD', $days - 2)));
             }
 
             $minDate = new \DateTime(SoSure::POLICY_START);
@@ -38,7 +39,6 @@ trait ExcelTrait
             if ($nullIfTooEarly && $origin < $minDate) {
                 return null;
             }
-
             if ($origin < $minDate || ($origin > $now && !$skipEndCheck)) {
                 throw new \Exception(sprintf('Out of range for date %s', $origin->format(\DateTime::ATOM)));
             }

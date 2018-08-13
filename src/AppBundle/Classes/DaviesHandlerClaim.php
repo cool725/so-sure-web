@@ -53,6 +53,10 @@ class DaviesHandlerClaim extends HandlerClaim
     const TYPE_WARRANTY = 'Warranty';
     const TYPE_EXTENDED_WARRANTY = 'Extended Warranty';
 
+    public $brightstarProductNumber;
+    public $reciperoFee;
+    public $transactionFees;
+
     public static $breakdownEmailAddresses = [
         'laura.harvey@davies-group.com',
     ];
@@ -114,6 +118,21 @@ class DaviesHandlerClaim extends HandlerClaim
         } else {
             return null;
         }
+    }
+
+    public function getExpectedIncurred()
+    {
+        // Incurred fee only appears to be populated at the point where the phone replacement cost is known,
+        if (!$this->phoneReplacementCost || $this->phoneReplacementCost < 0 ||
+            $this->areEqualToTwoDp(0, $this->phoneReplacementCost)) {
+            return null;
+        }
+
+        // phone replacement cost now excludes excess
+        $total = $this->unauthorizedCalls + $this->accessories + $this->phoneReplacementCost +
+            $this->transactionFees + $this->handlingFees + $this->reciperoFee;
+
+        return $this->toTwoDp($total);
     }
 
     public function getClaimType()

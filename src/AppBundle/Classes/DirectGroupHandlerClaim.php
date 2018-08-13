@@ -15,14 +15,56 @@ class DirectGroupHandlerClaim extends HandlerClaim
 
     const SHEET_NAME_V1 = 'Report';
     const CLIENT_NAME = "SO-SURE";
-    const COLUMN_COUNT_V1 = 31;
+    const COLUMN_COUNT_V1 = 43;
 
     const STATUS_OPEN = 'Open';
     const STATUS_CLOSED = 'Paid Closed';
+    const STATUS_WITHDRAWN = 'Withdrawn';
+    const STATUS_REJECTED = 'Rejected';
 
-    const DETAIL_STATUS_FNOL_NOT_PROGRESS = 'Not Progressed (Fnol)';
-    const DETAIL_STATUS_REPAIRED = 'Item repaired elsewhere';
-    const DETAIL_STATUS_FOUND = 'Item Returned/Found';
+    const DETAIL_STATUS_WITHDRAW_NO_DOC = 'Claim Documentation not provided'; // WITHDRAW01
+    const DETAIL_STATUS_WITHDRAW_NO_INTERVIEW = 'Claim Interview not completed'; // WITHDRAW02
+    const DETAIL_STATUS_WITHDRAW_NO_CONF_CALL = 'Conference Call not completed'; // WITHDRAW03
+    const DETAIL_STATUS_WITHDRAW_BY_REQUEST = 'Customer Request'; // WITHDRAW04
+    const DETAIL_STATUS_WITHDRAW_MISSING_EXCESS = 'Excess Fee not paid'; // WITHDRAW06
+    const DETAIL_STATUS_WITHDRAW_WARRANTY = 'Repaired/Replaced under warranty'; // WITHDRAW07
+    const DETAIL_STATUS_WITHDRAW_FOUND = 'Item Returned/Found'; // WITHDRAW08
+    const DETAIL_STATUS_WITHDRAW_WORKING = 'Item started working again'; // WITHDRAW09
+    const DETAIL_STATUS_WITHDRAW_NO_OWNERSHIP = 'Evidence of ownership not provided'; // WITHDRAW10
+    const DETAIL_STATUS_WITHDRAW_UPGRADE = 'Customer received an upgrade'; // WITHDRAW12
+    const DETAIL_STATUS_WITHDRAW_MISSING_INFO = 'Unable to provide req. info'; // WITHDRAW13
+    const DETAIL_STATUS_WITHDRAW_NO_REPAIR = 'Item not sent for repair'; // WITHDRAW14
+    const DETAIL_STATUS_WITHDRAW_REPLACED_ELSEWHERE = 'Replaced Elsewhere'; // WITHDRAW15
+    const DETAIL_STATUS_WITHDRAW_FNOL_NOT_PROGRESS = 'Not Processed (FNOL)'; // WITHDRAW16
+    const DETAIL_STATUS_WITHDRAW_TOO_LONG = 'Process Too Long'; // WITHDRAW17
+    const DETAIL_STATUS_WITHDRAW_NOT_INSURED = 'Item Not Insured With US'; // WITHDRAW19
+    const DETAIL_STATUS_WITHDRAW_ENQUIRY = 'No Claim / Enquiry only'; // WITHDRAW20
+    const DETAIL_STATUS_WITHDRAW_HIGH_COST = 'Not cost effective'; // WITHDRAW21
+
+    const DETAIL_STATUS_REJECTED_BAD_OWNERSHIP = 'Evidence of Ownership not accepted'; // REJECT - 01
+    const DETAIL_STATUS_REJECTED_BAD_INFORMATION = 'Mismatch of Information'; // REJECT - 02
+    const DETAIL_STATUS_REJECTED_TOO_OLD = 'Item insured Too old'; // REJECT - 03
+    const DETAIL_STATUS_REJECTED_SECONDHAND = 'Item insured is second hand/ refurbished'; // REJECT - 04
+    const DETAIL_STATUS_REJECTED_UNAUTH_REPAIR = 'Unauthorised Repair'; // REJECT - 05
+    const DETAIL_STATUS_REJECTED_UNATTENDED = 'Left Unattended'; // REJECT - 06
+    const DETAIL_STATUS_REJECTED_UNREASONABLE = 'Unreasonable /Not used all available precautions'; // REJECT - 08
+    const DETAIL_STATUS_REJECTED_NOT_COVERED = 'Loss Not Covered'; // REJECT - 09
+    const DETAIL_STATUS_REJECTED_OUTSIDE_COVER = 'Incident Outside policy cover'; // REJECT - 10
+    const DETAIL_STATUS_REJECTED_FAMILY = 'Immediate Family'; // REJECT - 11
+    const DETAIL_STATUS_REJECTED_NO_PROOF_USAGE = 'No Proof of Usage'; // REJECT - 12
+    const DETAIL_STATUS_REJECTED_NO_FORCED_ENTRY = 'No Forced Entry'; // REJECT - 13
+    const DETAIL_STATUS_REJECTED_NOT_IN_USE = 'Item Not In Use'; // REJECT - 15
+    const DETAIL_STATUS_REJECTED_FIRST_14_DAYS = 'Incident occurred within first 14 days'; // REJECT - 16
+    const DETAIL_STATUS_REJECTED_VEHICLE_NOT_CONCEALED = 'Motor Vehicle not concealed'; // REJECT - 17
+    const DETAIL_STATUS_REJECTED_NOT_GADGET = 'Item Not Insurer with Us / Item Not Considered a Gadget'; // REJECT - 18
+    const DETAIL_STATUS_REJECTED_LATE_POLICE = 'Late to Police/No Police Report'; // REJECT - 21
+    const DETAIL_STATUS_REJECTED_MAX_CLAIMS = 'Maximum Claims Reached'; // REJECT - 22
+    const DETAIL_STATUS_REJECTED_OTHER_INSURER = 'Customer claiming with another insurer'; // REJECT - 24
+    const DETAIL_STATUS_REJECTED_USE_BEFORE_PURCHASE = 'Last Use before Purchase Date'; // REJECT - 25
+    const DETAIL_STATUS_REJECTED_NO_SIM = 'Non Original SIM/SIM Not Present'; // REJECT - 26
+    const DETAIL_STATUS_REJECTED_UNPAID = 'Payments in arrears'; // REJECT - 27
+    const DETAIL_STATUS_REJECTED_UNCLEAR = 'Unclear Circumstances'; // REJECT - 28
+    const DETAIL_STATUS_REJECTED_COSMETIC = 'Wear and Tear/Cosmetic damages'; // REJECT - 29
 
     public static $breakdownEmailAddresses = [
         'SoSure@directgroup.co.uk',
@@ -55,7 +97,19 @@ class DirectGroupHandlerClaim extends HandlerClaim
 
     public function getReplacementPhoneDetails()
     {
-        return null;
+        if ($this->replacementMake && $this->replacementModel) {
+            return (sprintf(
+                '%s %s',
+                $this->replacementMake,
+                $this->replacementModel
+            ));
+        } elseif ($this->replacementMake) {
+            return $this->replacementMake;
+        } elseif ($this->replacementModel) {
+            return $this->replacementModel;
+        } else {
+            return null;
+        }
     }
 
 
@@ -68,6 +122,12 @@ class DirectGroupHandlerClaim extends HandlerClaim
         } elseif (mb_stripos($lossType, mb_strtolower(self::TYPE_THEFT)) !== false) {
             return Claim::TYPE_THEFT;
         } elseif (mb_stripos($lossType, mb_strtolower(self::TYPE_DAMAGE)) !== false) {
+            return Claim::TYPE_DAMAGE;
+        } elseif (mb_stripos($lossType, 'Breakdown') !== false) {
+            return Claim::TYPE_DAMAGE;
+        } elseif (mb_stripos($lossType, 'Impact') !== false) {
+            return Claim::TYPE_DAMAGE;
+        } elseif (mb_stripos($lossType, 'Water') !== false) {
             return Claim::TYPE_DAMAGE;
         } elseif (mb_stripos($lossType, mb_strtolower(self::TYPE_EXTENDED_WARRANTY)) !== false) {
             return Claim::TYPE_EXTENDED_WARRANTY;
@@ -90,43 +150,39 @@ class DirectGroupHandlerClaim extends HandlerClaim
 
     public function isOpen($includeReOpened = false)
     {
-        if ($includeReOpened) {
-            return in_array(mb_strtolower($this->status), [
-                mb_strtolower(self::STATUS_OPEN),
-            ]);
-        } else {
-            return in_array(mb_strtolower($this->status), [mb_strtolower(self::STATUS_OPEN)]);
-        }
+        \AppBundle\Classes\NoOp::ignore([$includeReOpened]);
+
+        return in_array(mb_strtolower($this->status), [
+            mb_strtolower(self::STATUS_OPEN)
+        ]);
     }
 
     public function isClosed($includeReClosed = false)
     {
-        if ($includeReClosed) {
-            return in_array(mb_strtolower($this->status), [
-                mb_strtolower(self::STATUS_CLOSED),
-            ]);
-        } else {
-            return in_array(mb_strtolower($this->status), [mb_strtolower(self::STATUS_CLOSED)]);
-        }
-    }
+        \AppBundle\Classes\NoOp::ignore([$includeReClosed]);
 
-    public function getDirectStatus()
-    {
-        if (in_array(mb_strtolower($this->status), [
-            mb_strtolower(self::STATUS_OPEN),
-        ])) {
-            return self::STATUS_OPEN;
-        } elseif (in_array(mb_strtolower($this->status), [
+        return in_array(mb_strtolower($this->status), [
             mb_strtolower(self::STATUS_CLOSED),
-        ])) {
-            return self::STATUS_CLOSED;
-        }
-
-        return null;
+            mb_strtolower(self::STATUS_WITHDRAWN),
+            mb_strtolower(self::STATUS_REJECTED)
+        ]);
     }
 
     public function getClaimStatus()
     {
+        // open status should not update
+        if ($this->isOpen()) {
+            return null;
+        } elseif ($this->isClosed()) {
+            if (in_array(mb_strtolower($this->status), [mb_strtolower(self::STATUS_CLOSED)])) {
+                return Claim::STATUS_SETTLED;
+            } elseif (in_array(mb_strtolower($this->status), [mb_strtolower(self::STATUS_REJECTED)])) {
+                return Claim::STATUS_DECLINED;
+            } elseif (in_array(mb_strtolower($this->status), [mb_strtolower(self::STATUS_WITHDRAWN)])) {
+                return Claim::STATUS_WITHDRAWN;
+            }
+        }
+
         return null;
     }
 
@@ -144,6 +200,19 @@ class DirectGroupHandlerClaim extends HandlerClaim
         return false;
     }
 
+    public function getExpectedIncurred()
+    {
+        // Incurred fee only appears to be populated at the point where the phone replacement cost is known,
+        if (!$this->phoneReplacementCost || $this->phoneReplacementCost < 0 ||
+            $this->areEqualToTwoDp(0, $this->phoneReplacementCost)) {
+            return null;
+        }
+
+        $total = $this->unauthorizedCalls + $this->accessories + $this->phoneReplacementCost;
+
+        return $this->toTwoDp($total);
+    }
+
     public function fromArray($data, $columns)
     {
         try {
@@ -159,43 +228,58 @@ class DirectGroupHandlerClaim extends HandlerClaim
                 throw new \Exception(sprintf('Expected %d columns', $columns));
             }
 
-            $this->policyNumber = $this->nullIfBlank($data[++$i]);
+            $this->policyNumber = str_replace('MOB', 'Mob', $this->nullIfBlank($data[++$i]));
             $this->claimNumber = $this->nullIfBlank($data[++$i]);
             $this->insuredName = $this->nullIfBlank($data[++$i]);
             $this->riskPostCode = $this->nullIfBlank($data[++$i]);
-
-            $this->lossDate = $this->excelDate($data[++$i]);
+            $this->risk = $this->nullIfBlank($data[++$i]);
             $this->startDate = $this->excelDate($data[++$i]);
             $this->endDate = $this->excelDate($data[++$i], true);
+            $this->initialSuspicion = $this->isSuspicious($data[++$i]);
+            // todo: Claim Type Suspicious notes  captured at time report is run
+            $this->nullIfBlank($data[++$i]);
+            $this->lossDate = $this->excelDate($data[++$i]);
+            $this->notificationDate = $this->excelDate($data[++$i]);
+            $this->dateCreated = $this->excelDate($data[++$i]);
+            // todo: Date of claim decision
+            $this->excelDate($data[++$i]);
+            $this->dateClosed = $this->excelDate($data[++$i]);
             $this->lossType = $this->nullIfBlank($data[++$i]);
             $this->lossDescription = $this->nullIfBlank($data[++$i]);
             $this->location = $this->nullIfBlank($data[++$i]);
             $this->status = $this->nullIfBlank($data[++$i]);
-            $this->miStatus = $this->nullIfBlank($data[++$i]);
-            $this->brightstarProductNumber = $this->nullIfBlank($data[++$i]);
+            // todo: detailed status
+            $this->nullIfBlank($data[++$i]);
+            // todo: Latest Claim handling team touch point date
+            $this->excelDate($data[++$i]);
+            // todo: Replacement Supplier Name
+            $this->nullIfBlank($data[++$i]);
+            // todo: Repair Supplier Name
+            $this->nullIfBlank($data[++$i]);
+            // todo: Supplier status
+            $this->nullIfBlank($data[++$i]);
+            // todo: Supplier pick up date
+            $this->excelDate($data[++$i]);
+            // todo: Supplier repair date
+            $this->excelDate($data[++$i]);
+            $this->replacementReceivedDate = $this->excelDate($data[++$i]);
             $this->replacementMake = $this->nullIfBlank($data[++$i]);
             $this->replacementModel = $this->nullIfBlank($data[++$i]);
             $this->replacementImei = $this->nullIfBlank($data[++$i], 'replacementImei', $this);
-            $this->replacementReceivedDate = $this->excelDate($data[++$i], false, true);
-
+            $this->shippingAddress = $this->nullIfBlank($data[++$i]);
             $this->phoneReplacementCost = $this->nullIfBlank($data[++$i]);
             $this->phoneReplacementCostReserve = $this->nullIfBlank($data[++$i]);
             $this->accessories = $this->nullIfBlank($data[++$i]);
             $this->accessoriesReserve = $this->nullIfBlank($data[++$i]);
             $this->unauthorizedCalls = $this->nullIfBlank($data[++$i]);
             $this->unauthorizedCallsReserve = $this->nullIfBlank($data[++$i]);
-            $this->reciperoFee = $this->nullIfBlank($data[++$i]);
-            $this->transactionFees = $this->nullIfBlank($data[++$i]);
-            $this->feesReserve = $this->nullIfBlank($data[++$i]);
-
             $this->reserved = $this->nullIfBlank($data[++$i]);
-            $this->incurred = $this->nullIfBlank($data[++$i]);
             $this->handlingFees = $this->nullIfBlank($data[++$i]);
             $this->excess = $this->nullIfBlank($data[++$i]);
-            $this->notificationDate = $this->excelDate($data[++$i]);
-            $this->dateCreated = $this->excelDate($data[++$i]);
-            $this->dateClosed = $this->excelDate($data[++$i]);
-            $this->shippingAddress = $this->nullIfBlank($data[++$i]);
+            // todo: KFI score
+            $this->nullIfBlank($data[++$i]);
+            // TODO: Is incurred from DB, the same as incurred from Davies??
+            $this->incurred = $this->nullIfBlank($data[++$i]);
 
             if ($this->getClaimType() === null) {
                 throw new \Exception('Unknown or missing claim type');
@@ -249,6 +333,22 @@ class DirectGroupHandlerClaim extends HandlerClaim
     public function isReplacementRepaired()
     {
         return false;
+    }
+
+
+    protected function isSuspicious($field)
+    {
+        if (!$field || $this->isNullableValue($field)) {
+            return null;
+        }
+
+        if (in_array(mb_strtolower($field), ['ok'])) {
+            return false;
+        } elseif (in_array(mb_strtolower($field), ['concerns'])) {
+            return true;
+        }
+
+        return null;
     }
 
     public static function create($data, $columns)

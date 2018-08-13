@@ -396,6 +396,16 @@ services:
             - [setS3, ['@aws.s3']]
             - [setEnvironment, ['%kernel.environment%']]
 
+    base.sftp:
+        abstract: true
+        class: AppBundle\Service\SftpService
+        calls:
+            - [setLogger, ['@monolog.logger.receperio']]
+            - [setDm, ['@doctrine_mongodb.odm.default_document_manager']]
+            - [setExcel, ['@app.excel']]
+            - [setS3, ['@aws.s3']]
+            - [setEnvironment, ['%kernel.environment%']]
+
     app.davies:
         parent: base.s3email
         autowire: false
@@ -411,6 +421,26 @@ services:
             - [setFeature, ['@app.feature']]
         tags:
             - { name: monolog.logger, channel: davies }
+
+    app.directgroup:
+        parent: base.sftp
+        autowire: false
+        autoconfigure: false
+        public: true
+        class: AppBundle\Service\DirectGroupService
+        calls:
+            - [setClaims, ['@app.claims']]
+            - [setMailer, ['@app.mailer']]
+            - [setBucket, ['ops.so-sure.com']]
+            - [setPath, ['directgroup-report']]
+            - [setValidator, ['@validator']]
+            - [setFeature, ['@app.feature']]
+            - [setServer, ['%directgroup_sftp_server%']]
+            - [setUsername, ['%directgroup_sftp_username%']]
+            - [setPassword, ['%directgroup_sftp_password%']]
+            - [setZipPassword, ['%directgroup_zip_password%']]
+        tags:
+            - { name: monolog.logger, channel: directgroup }
 
     app.brightstar:
         parent: base.s3email

@@ -338,6 +338,7 @@ class ClaimsService
 
         if ($policy->canAdjustPicSureStatusForClaim()) {
             $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_CLAIM_APPROVED);
+            $policy->setPicSureClaimApprovedClaim($claim);
         }
         $claim->setProcessed(true);
         $this->recordLostPhone($claim->getPolicy(), $claim);

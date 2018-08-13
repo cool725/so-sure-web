@@ -175,6 +175,12 @@ class PhonePolicy extends Policy
     protected $picSureStatus;
 
     /**
+     * @MongoDB\ReferenceOne(targetDocument="Claim")
+     * @Gedmo\Versioned
+     */
+    protected $picSureClaimApprovedClaim;
+
+    /**
      * @Assert\Choice({"valid-serial", "valid-imei", "no-models", "no-memory", "no-makes",
      *     "multiple-makes", "empty-makes", "memory-mismatch", "missing-response", "no-model-reference",
      *     "make-model-memory-mismatch", "model-mismatch", "device-not-found"}, strict=false)
@@ -693,6 +699,16 @@ class PhonePolicy extends Policy
         }
 
         return $this->picSureStatus;
+    }
+
+    public function getPicSureClaimApprovedClaim()
+    {
+        return $this->picSureClaimApprovedClaim;
+    }
+
+    public function setPicSureClaimApprovedClaim(Claim $claim)
+    {
+        $this->picSureClaimApprovedClaim = $claim;
     }
 
     public function getPicSureStatusForApi()

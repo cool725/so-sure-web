@@ -39,7 +39,6 @@ abstract class HandlerClaim
     // settled, repudiated (declined), and withdrawn
     public $miStatus;
 
-    public $brightstarProductNumber;
     public $replacementMake;
     public $replacementModel;
     public $replacementImei;
@@ -52,8 +51,6 @@ abstract class HandlerClaim
     public $accessoriesReserve;
     public $unauthorizedCalls;
     public $unauthorizedCallsReserve;
-    public $reciperoFee;
-    public $transactionFees;
     public $feesReserve;
 
     public $reserved;
@@ -102,10 +99,10 @@ abstract class HandlerClaim
         return $this->reserved;
     }
 
-    public function getExpectedExcess($validated, $picSureEnabled)
+    public function getExpectedExcess($validated, $picSureEnabled, $repairDiscount = false)
     {
         try {
-            return Claim::getExcessValue($this->getClaimType(), $validated, $picSureEnabled);
+            return Claim::getExcessValue($this->getClaimType(), $validated, $picSureEnabled, $repairDiscount);
         } catch (\Exception $e) {
             return null;
         }
@@ -113,14 +110,16 @@ abstract class HandlerClaim
 
     public function isExcessValueCorrect($validated = true, $picSureEnabled = false, $negativeExcessAllowed = false)
     {
+        $excessNoRepairDiscount = $this->getExpectedExcess($validated, $picSureEnabled);
+        $excessRepairDiscount = $this->getExpectedExcess($validated, $picSureEnabled, true);
+
         if ($this->excess > 0) {
-            return $this->areEqualToTwoDp($this->excess, $this->getExpectedExcess($validated, $picSureEnabled));
+            return $this->areEqualToTwoDp($this->excess, $excessNoRepairDiscount) ||
+                $this->areEqualToTwoDp($this->excess, $excessRepairDiscount);
         } elseif ($this->excess < 0) {
             if ($negativeExcessAllowed) {
-                return $this->areEqualToTwoDp(
-                    abs($this->excess),
-                    $this->getExpectedExcess($validated, $picSureEnabled)
-                );
+                return $this->areEqualToTwoDp(abs($this->excess), $excessNoRepairDiscount) ||
+                    $this->areEqualToTwoDp(abs($this->excess), $excessRepairDiscount);
             } else {
                 return false;
             }
@@ -155,21 +154,6 @@ abstract class HandlerClaim
         return true;
     }
 
-    public function getExpectedIncurred()
-    {
-        // Incurred fee only appears to be populated at the point where the phone replacement cost is known,
-        if (!$this->phoneReplacementCost || $this->phoneReplacementCost < 0 ||
-            $this->areEqualToTwoDp(0, $this->phoneReplacementCost)) {
-            return null;
-        }
-
-        // phone replacement cost now excludes excess
-        $total = $this->unauthorizedCalls + $this->accessories + $this->phoneReplacementCost +
-            $this->transactionFees + $this->handlingFees + $this->reciperoFee;
-
-        return $this->toTwoDp($total);
-    }
-
     public function isClaimWarranty()
     {
         return in_array($this->getClaimType(), [HandlerClaim::TYPE_WARRANTY]);
@@ -198,6 +182,7 @@ abstract class HandlerClaim
     abstract public function isClosed($includeReClosed = false);
     abstract public function getClaimStatus();
     abstract public function isApproved();
+    abstract public function getExpectedIncurred();
     abstract public function fromArray($data, $columns);
     abstract public function isReplacementRepaired();
     abstract public static function create($data, $columns);

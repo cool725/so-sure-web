@@ -1,24 +1,24 @@
 <?php
 namespace AppBundle\Service;
 
+use AppBundle\Classes\DirectGroupHandlerClaim;
+use AppBundle\Document\File\DirectGroupFile;
 use AppBundle\Document\Policy;
 use Psr\Log\LoggerInterface;
 use Aws\S3\S3Client;
-use AppBundle\Classes\DaviesHandlerClaim;
 use AppBundle\Document\Claim;
 use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Feature;
 use AppBundle\Document\CurrencyTrait;
 use AppBundle\Document\DateTrait;
-use AppBundle\Document\File\DaviesFile;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use VasilDakov\Postcode\Postcode;
 use AppBundle\Validator\Constraints\AlphanumericSpaceDotValidator;
 use AppBundle\Exception\ValidationException;
 use AppBundle\Repository\ClaimRepository;
 
-class DaviesService extends S3EmailService
+class DirectGroupService extends SftpService
 {
     use CurrencyTrait;
     use DateTrait;
@@ -72,7 +72,7 @@ class DaviesService extends S3EmailService
         $this->fees = [];
     }
 
-    public function reportMissingClaims($daviesClaims)
+    public function reportMissingClaims($directGroupClaims)
     {
         $dbClaims = [];
         $processedClaims = [];
@@ -81,14 +81,14 @@ class DaviesService extends S3EmailService
         $startOfToday = $this->startOfDay($startOfToday);
         $findAllClaims = $repoClaims->findBy([
             'recordedDate' => ['$lt' => $startOfToday],
-            'handlingTeam' => Claim::TEAM_DAVIES
+            'handlingTeam' => Claim::TEAM_DIRECT_GROUP,
         ]);
         foreach ($findAllClaims as $claim) {
             $dbClaims[] = $claim->getNumber();
         }
 
-        foreach ($daviesClaims as $daviesClaim) {
-            $processedClaims[] = $daviesClaim->claimNumber;
+        foreach ($directGroupClaims as $directGroupClaim) {
+            $processedClaims[] = $directGroupClaim->claimNumber;
         }
 
         $foundClaims = array_intersect($processedClaims, $dbClaims);
@@ -119,22 +119,90 @@ class DaviesService extends S3EmailService
         $this->claimsDailyErrors();
     }
 
+    public function claimsDailyEmail()
+    {
+        $phoneRepo = $this->dm->getRepository(Phone::class);
+        $highDemandPhones = $phoneRepo->findBy(['newHighDemand' => true]);
+
+        $fileRepo = $this->dm->getRepository(DirectGroupFile::class);
+        $latestFiles = $fileRepo->findBy([], ['created' => 'desc'], 1);
+        $latestFile = count($latestFiles) > 0 ? $latestFiles[0] : null;
+
+        $successFiles = $fileRepo->findBy(['success' => true], ['created' => 'desc'], 1);
+        $successFile = count($successFiles) > 0 ? $successFiles[0] : null;
+
+        /** @var ClaimRepository $claimsRepo */
+        $claimsRepo = $this->dm->getRepository(Claim::class);
+        $claims = $claimsRepo->findOutstanding(Claim::TEAM_DIRECT_GROUP);
+
+        $this->mailer->sendTemplate(
+            sprintf('Direct Group Daily Claims Report'),
+            'tech+ops@so-sure.com',
+            'AppBundle:Email:claimsHandler/dailyEmail.html.twig',
+            [
+                'claims' => $claims,
+                'latestFile' => $latestFile,
+                'successFile' => $successFile,
+                'warnings' => $this->warnings,
+                'errors' => $this->errors,
+                'sosureActions' => $this->sosureActions,
+                'fees' => $this->fees,
+                'title' => 'Direct Group Daily Claims Report',
+                'highDemandPhones' => $highDemandPhones,
+            ]
+        );
+
+        return count($claims);
+    }
+
+    public function claimsDailyErrors()
+    {
+        $fileRepo = $this->dm->getRepository(DirectGroupFile::class);
+        $latestFiles = $fileRepo->findBy([], ['created' => 'desc'], 1);
+        $latestFile = count($latestFiles) > 0 ? $latestFiles[0] : null;
+
+        $successFiles = $fileRepo->findBy(['success' => true], ['created' => 'desc'], 1);
+        $successFile = count($successFiles) > 0 ? $successFiles[0] : null;
+
+        if (count($this->errors) > 0) {
+            $emails = DirectGroupHandlerClaim::$errorEmailAddresses;
+
+            $this->mailer->sendTemplate(
+                sprintf('Errors in Daily Claims Report'),
+                $emails,
+                'AppBundle:Email:claimsHandler/dailyEmail.html.twig',
+                [
+                    'latestFile' => $latestFile,
+                    'successFile' => $successFile,
+                    'errors' => $this->errors,
+                    'warnings' => null,
+                    'sosureActions' => null,
+                    'claims' => null,
+                    'fees' => $this->fees,
+                    'title' => 'Errors in Daily Claims Report',
+                ]
+            );
+        }
+
+        return count($this->errors);
+    }
+
     public function getNewS3File()
     {
-        return new DaviesFile();
+        return new DirectGroupFile();
     }
 
     public function getColumnsFromSheetName($sheetName)
     {
-        return DaviesHandlerClaim::getColumnsFromSheetName($sheetName);
+        return DirectGroupHandlerClaim::getColumnsFromSheetName($sheetName);
     }
 
     public function createLineObject($line, $columns)
     {
-        return DaviesHandlerClaim::create($line, $columns);
+        return DirectGroupHandlerClaim::create($line, $columns);
     }
 
-    public function saveClaims($key, array $daviesClaims)
+    public function saveClaims($key, array $directGroupClaims)
     {
         // was using key for logging purposes - can be removed in the future
         \AppBundle\Classes\NoOp::ignore([$key]);
@@ -143,56 +211,59 @@ class DaviesService extends S3EmailService
         $openClaims = [];
         $multiple = [];
 
-        $this->reportMissingClaims($daviesClaims);
+        $this->reportMissingClaims($directGroupClaims);
 
-        foreach ($daviesClaims as $daviesClaim) {
+        foreach ($directGroupClaims as $directGroupClaim) {
             // get the most recent claim that's open
-            if ($daviesClaim->isOpen()) {
-                if (!isset($openClaims[$daviesClaim->getPolicyNumber()]) ||
-                    $daviesClaim->lossDate > $openClaims[$daviesClaim->getPolicyNumber()]) {
-                    $openClaims[$daviesClaim->getPolicyNumber()] = $daviesClaim->lossDate;
+            if ($directGroupClaim->isOpen()) {
+                if (!isset($openClaims[$directGroupClaim->getPolicyNumber()]) ||
+                    $directGroupClaim->lossDate > $openClaims[$directGroupClaim->getPolicyNumber()]) {
+                    $openClaims[$directGroupClaim->getPolicyNumber()] = $directGroupClaim->lossDate;
                 }
             }
-            if (isset($claims[$daviesClaim->getPolicyNumber()]) &&
-                $claims[$daviesClaim->getPolicyNumber()]) {
-                if ($daviesClaim->isOpen()) {
+            if (isset($claims[$directGroupClaim->getPolicyNumber()]) &&
+                $claims[$directGroupClaim->getPolicyNumber()]) {
+                if ($directGroupClaim->isOpen()) {
                     $msg = sprintf(
                         'There are multiple open claims against policy %s. Please manually update the IMEI.',
-                        $daviesClaim->getPolicyNumber()
+                        $directGroupClaim->getPolicyNumber()
                     );
-                    $this->warnings[$daviesClaim->claimNumber][] = $msg;
-                    $multiple[] = $daviesClaim->getPolicyNumber();
+                    $this->warnings[$directGroupClaim->claimNumber][] = $msg;
+                    $multiple[] = $directGroupClaim->getPolicyNumber();
                 }
             }
-            $claims[$daviesClaim->getPolicyNumber()] = $daviesClaim->isOpen();
+            $claims[$directGroupClaim->getPolicyNumber()] = $directGroupClaim->isOpen();
         }
 
         // Check for any claims that are closed that appear after an open claim
-        foreach ($daviesClaims as $daviesClaim) {
-            if (!$daviesClaim->isOpen() &&
-                isset($openClaims[$daviesClaim->getPolicyNumber()]) &&
-                $daviesClaim->lossDate > $openClaims[$daviesClaim->getPolicyNumber()]) {
+        foreach ($directGroupClaims as $directGroupClaim) {
+            if (!$directGroupClaim->isOpen() &&
+                isset($openClaims[$directGroupClaim->getPolicyNumber()]) &&
+                $directGroupClaim->lossDate > $openClaims[$directGroupClaim->getPolicyNumber()]) {
                     // @codingStandardsIgnoreStart
                     $msg = sprintf(
                         'There is open claim against policy %s that is older then the closed claim of %s and needs to be closed. Unable to determine imei',
-                        $daviesClaim->getPolicyNumber(),
-                        $daviesClaim->claimNumber
+                        $directGroupClaim->getPolicyNumber(),
+                        $directGroupClaim->claimNumber
                     );
                     // @codingStandardsIgnoreEnd
-                    $this->errors[$daviesClaim->claimNumber][] = $msg;
-                    $multiple[] = $daviesClaim->getPolicyNumber();
+                    $this->errors[$directGroupClaim->claimNumber][] = $msg;
+                    $multiple[] = $directGroupClaim->getPolicyNumber();
             }
         }
 
-        foreach ($daviesClaims as $daviesClaim) {
+        foreach ($directGroupClaims as $directGroupClaim) {
             try {
-                $skipImeiUpdate = in_array($daviesClaim->getPolicyNumber(), $multiple);
-                $this->saveClaim($daviesClaim, $skipImeiUpdate);
+                $skipImeiUpdate = in_array($directGroupClaim->getPolicyNumber(), $multiple);
+                $this->saveClaim($directGroupClaim, $skipImeiUpdate);
             } catch (\Exception $e) {
                 //$success = false;
-                $this->errors[$daviesClaim->claimNumber][] = sprintf("%s [Record import failed]", $e->getMessage());
+                $this->errors[$directGroupClaim->claimNumber][] = sprintf(
+                    "%s [Record import failed]",
+                    $e->getMessage()
+                );
                 // In case any of the db data failed validation, clear the changeset
-                if ($claim = $this->getClaim($daviesClaim)) {
+                if ($claim = $this->getClaim($directGroupClaim)) {
                     $this->dm->refresh($claim);
                 }
             }
@@ -200,24 +271,24 @@ class DaviesService extends S3EmailService
         return $success;
     }
 
-    private function getClaim($daviesClaim)
+    private function getClaim($directGroupClaim)
     {
         /** @var ClaimRepository $repo */
         $repo = $this->dm->getRepository(Claim::class);
-        $claim = $repo->findOneBy(['number' => $daviesClaim->claimNumber]);
+        $claim = $repo->findOneBy(['number' => $directGroupClaim->claimNumber]);
         // Davies swapped to a new claim numbering format
         // and appear to be unable to enter the correct data
         // sometimes they are leaving off the last 2 digits when entering the claim
         // on our system
         if (!$claim) {
             /** @var Claim $claim */
-            $claim = $repo->findOneBy(['number' => mb_substr($daviesClaim->claimNumber, 0, -2)]);
+            $claim = $repo->findOneBy(['number' => mb_substr($directGroupClaim->claimNumber, 0, -2)]);
             if ($claim) {
-                if ($daviesClaim->getPolicyNumber() != $claim->getPolicy()->getPolicyNumber()) {
+                if ($directGroupClaim->getPolicyNumber() != $claim->getPolicy()->getPolicyNumber()) {
                     throw new \Exception(sprintf(
                         'Unable to locate claim %s in db with number matching. (%s != %s)',
-                        $daviesClaim->claimNumber,
-                        $daviesClaim->getPolicyNumber(),
+                        $directGroupClaim->claimNumber,
+                        $directGroupClaim->getPolicyNumber(),
                         $claim->getPolicy()->getPolicyNumber()
                     ));
                 }
@@ -227,11 +298,11 @@ class DaviesService extends S3EmailService
                     'AppBundle:Email:davies/incorrectClaimNumber.html.twig',
                     [
                         'claim' => $claim,
-                        'claimNumber' => $daviesClaim->claimNumber,
-                        'policyNumber' => $daviesClaim->getPolicyNumber(),
+                        'claimNumber' => $directGroupClaim->claimNumber,
+                        'policyNumber' => $directGroupClaim->getPolicyNumber(),
                     ]
                 );
-                $claim->setNumber($daviesClaim->claimNumber, true);
+                $claim->setNumber($directGroupClaim->claimNumber, true);
             }
         }
 
@@ -239,97 +310,86 @@ class DaviesService extends S3EmailService
     }
 
     /**
-     * @param DaviesHandlerClaim $daviesClaim
-     * @param boolean            $skipImeiUpdate
+     * @param DirectGroupHandlerClaim $directGroupClaim
+     * @param boolean                 $skipImeiUpdate
      * @return bool
      * @throws \Exception
      */
-    public function saveClaim(DaviesHandlerClaim $daviesClaim, $skipImeiUpdate)
+    public function saveClaim(DirectGroupHandlerClaim $directGroupClaim, $skipImeiUpdate)
     {
-        if ($daviesClaim->hasError()) {
+        if ($directGroupClaim->hasError()) {
             throw new \Exception(sprintf(
                 'Claim %s has error status. Skipping, but claim should not be in the export most likely.',
-                $daviesClaim->claimNumber
+                $directGroupClaim->claimNumber
             ));
         }
-        $claim = $this->getClaim($daviesClaim);
+        $claim = $this->getClaim($directGroupClaim);
         if (!$claim) {
-            throw new \Exception(sprintf('Unable to locate claim %s in db', $daviesClaim->claimNumber));
-        } elseif ($claim->getHandlingTeam() != Claim::TEAM_DAVIES &&
-            !$claim->isIgnoreWarningFlagSet(Claim::WARNING_FLAG_CLAIMS_HANDLING_TEAM)) {
+            throw new \Exception(sprintf('Unable to locate claim %s in db', $directGroupClaim->claimNumber));
+        } elseif ($claim->getHandlingTeam() != Claim::TEAM_DIRECT_GROUP) {
             $msg = sprintf(
-                'Claim %s is being processed by %s, not davies. Skipping davies import.',
-                $daviesClaim->claimNumber,
+                'Claim %s is being processed by %s, not direct group. Skipping direct group import.',
+                $directGroupClaim->claimNumber,
                 $claim->getHandlingTeam()
             );
-            $this->sosureActions[$daviesClaim->claimNumber][] = $msg;
+            $this->sosureActions[$directGroupClaim->claimNumber][] = $msg;
 
             return false;
         }
 
-        $this->validateClaimDetails($claim, $daviesClaim);
+        $this->validateClaimDetails($claim, $directGroupClaim);
 
-        if ($claim->getType() != $daviesClaim->getClaimType()) {
-            throw new \Exception(sprintf('Claims type does not match for claim %s', $daviesClaim->claimNumber));
+        if ($claim->getType() != $directGroupClaim->getClaimType()) {
+            throw new \Exception(sprintf('Claims type does not match for claim %s', $directGroupClaim->claimNumber));
         }
-        if ($daviesClaim->getClaimStatus()) {
-            $claim->setStatus($daviesClaim->getClaimStatus());
-        } elseif ($daviesClaim->isApproved() && $claim->getStatus() == Claim::STATUS_INREVIEW) {
+        if ($directGroupClaim->getClaimStatus()) {
+            $claim->setStatus($directGroupClaim->getClaimStatus());
+        } elseif ($directGroupClaim->isApproved() && $claim->getStatus() == Claim::STATUS_INREVIEW) {
             $claim->setStatus(Claim::STATUS_APPROVED);
         }
 
-        $claim->setDaviesStatus($daviesClaim->status);
-        // TODO: May want to normalize the davies status as well, but then would want an additional column
-        // $claim->setDaviesStatus($daviesClaim->getDaviesStatus());
+        $claim->setExcess($directGroupClaim->excess);
+        $claim->setIncurred($directGroupClaim->incurred);
+        $claim->setClaimHandlingFees($directGroupClaim->handlingFees);
+        $claim->setReservedValue($directGroupClaim->reserved);
+        $claim->setTotalIncurred($directGroupClaim->totalIncurred);
 
-        $claim->setExcess($daviesClaim->excess);
-        $claim->setIncurred($daviesClaim->incurred);
-        $claim->setClaimHandlingFees($daviesClaim->handlingFees);
-        $claim->setReservedValue($daviesClaim->reserved);
-        $claim->setTotalIncurred($daviesClaim->totalIncurred);
-
-        $claim->setAccessories($daviesClaim->accessories);
-        $claim->setUnauthorizedCalls($daviesClaim->unauthorizedCalls);
-        $claim->setPhoneReplacementCost($daviesClaim->phoneReplacementCost);
-        $claim->setTransactionFees($daviesClaim->transactionFees);
-
-        // Probably not going to be returned, but maybe one day will be able to map Davies/Brighstar data
-        if ($replacementPhone = $this->getReplacementPhone($daviesClaim)) {
-            $claim->setReplacementPhone($replacementPhone);
-        }
+        $claim->setAccessories($directGroupClaim->accessories);
+        $claim->setUnauthorizedCalls($directGroupClaim->unauthorizedCalls);
+        $claim->setPhoneReplacementCost($directGroupClaim->phoneReplacementCost);
 
         if (in_array($claim->getStatus(), [Claim::STATUS_APPROVED, Claim::STATUS_SETTLED])
             && !$claim->getApprovedDate()) {
             // for claims without replacement date, the replacement should have occurred yesterday
             // for cases where its been forgotten, the business day should be 1 day prior to the received date
             $yesterday = new \DateTime();
-            if ($daviesClaim->replacementReceivedDate) {
-                $yesterday = clone $daviesClaim->replacementReceivedDate;
+            if ($directGroupClaim->replacementReceivedDate) {
+                $yesterday = clone $directGroupClaim->replacementReceivedDate;
             }
             $yesterday = $this->subBusinessDays($yesterday, 1);
 
             $claim->setApprovedDate($yesterday);
         }
 
-        $claim->setReplacementImei($daviesClaim->replacementImei);
-        $claim->setReplacementReceivedDate($daviesClaim->replacementReceivedDate);
-        $claim->setReplacementPhoneDetails($daviesClaim->getReplacementPhoneDetails());
+        $claim->setReplacementImei($directGroupClaim->replacementImei);
+        $claim->setReplacementReceivedDate($directGroupClaim->replacementReceivedDate);
+        $claim->setReplacementPhoneDetails($directGroupClaim->getReplacementPhoneDetails());
 
         $validator = new AlphanumericSpaceDotValidator();
-        $claim->setDescription($validator->conform($daviesClaim->lossDescription));
-        $claim->setLocation($daviesClaim->location);
+        $claim->setDescription($validator->conform($directGroupClaim->lossDescription));
+        $claim->setLocation($directGroupClaim->location);
 
-        $claim->setClosedDate($daviesClaim->dateClosed);
-        $claim->setCreatedDate($daviesClaim->dateCreated);
-        $claim->setNotificationDate($daviesClaim->notificationDate);
-        $claim->setLossDate($daviesClaim->lossDate);
+        $claim->setClosedDate($directGroupClaim->dateClosed);
+        $claim->setCreatedDate($directGroupClaim->dateCreated);
+        $claim->setNotificationDate($directGroupClaim->notificationDate);
+        $claim->setLossDate($directGroupClaim->lossDate);
 
-        $claim->setShippingAddress($daviesClaim->shippingAddress);
+        $claim->setShippingAddress($directGroupClaim->shippingAddress);
 
-        $claim->setInitialSuspicion($daviesClaim->initialSuspicion);
-        $claim->setFinalSuspicion($daviesClaim->finalSuspicion);
+        $claim->setInitialSuspicion($directGroupClaim->initialSuspicion);
+        $claim->setFinalSuspicion($directGroupClaim->finalSuspicion);
 
-        $this->updatePolicy($claim, $daviesClaim, $skipImeiUpdate);
+        $this->updatePolicy($claim, $directGroupClaim, $skipImeiUpdate);
 
         $errors = $this->validator->validate($claim);
         if (count($errors) > 0) {
@@ -337,7 +397,7 @@ class DaviesService extends S3EmailService
             $this->logger->error(sprintf(
                 'Claim %s/%s (status: %s) failed validation. Discarding updates. Error: %s',
                 $claim->getId(),
-                $daviesClaim->claimNumber,
+                $directGroupClaim->claimNumber,
                 $claim->getStatus(),
                 json_encode($errors)
             ));
@@ -346,12 +406,12 @@ class DaviesService extends S3EmailService
 
         $this->dm->flush();
 
-        $this->postValidateClaimDetails($claim, $daviesClaim);
+        $this->postValidateClaimDetails($claim, $directGroupClaim);
 
         $this->claimsService->processClaim($claim);
 
         // Only for active/unpaid policies with a theft/lost claim that have been repudiated
-        if ($daviesClaim->miStatus === DaviesHandlerClaim::MISTATUS_REPUDIATED &&
+        if ($directGroupClaim->getClaimStatus() === Claim::STATUS_DECLINED &&
             in_array($claim->getType(), [Claim::TYPE_LOSS, Claim::TYPE_THEFT]) &&
             in_array($claim->getPolicy()->getStatus(), [Policy::STATUS_ACTIVE, Policy::STATUS_UNPAID])) {
             $body = sprintf(
@@ -370,84 +430,87 @@ class DaviesService extends S3EmailService
     }
 
     /**
-     * @param Claim              $claim
-     * @param DaviesHandlerClaim $daviesClaim
+     * @param Claim                   $claim
+     * @param DirectGroupHandlerClaim $directGroupClaim
      * @throws \Exception
      */
-    public function validateClaimDetails(Claim $claim, DaviesHandlerClaim $daviesClaim)
+    public function validateClaimDetails(Claim $claim, DirectGroupHandlerClaim $directGroupClaim)
     {
-        if (mb_strtolower($claim->getPolicy()->getPolicyNumber()) != mb_strtolower($daviesClaim->getPolicyNumber())) {
+        if (mb_strtolower($claim->getPolicy()->getPolicyNumber()) !=
+            mb_strtolower($directGroupClaim->getPolicyNumber())) {
             throw new \Exception(sprintf(
                 'Claim %s does not match policy number %s',
-                $daviesClaim->claimNumber,
-                $daviesClaim->getPolicyNumber()
+                $directGroupClaim->claimNumber,
+                $directGroupClaim->getPolicyNumber()
             ));
         }
 
-        if ($daviesClaim->replacementImei && in_array($daviesClaim->getClaimStatus(), [
+        if ($directGroupClaim->replacementImei && in_array($directGroupClaim->getClaimStatus(), [
             Claim::STATUS_DECLINED,
             Claim::STATUS_WITHDRAWN
         ])) {
             throw new \Exception(sprintf(
                 'Claim %s has a replacement IMEI Number, yet has a withdrawn/declined status',
-                $daviesClaim->claimNumber
+                $directGroupClaim->claimNumber
             ));
         }
-        if ($daviesClaim->replacementReceivedDate && $daviesClaim->replacementReceivedDate < $daviesClaim->lossDate) {
+        if ($directGroupClaim->replacementReceivedDate &&
+            $directGroupClaim->replacementReceivedDate < $directGroupClaim->lossDate) {
             throw new \Exception(sprintf(
                 'Claim %s has a replacement received date prior to loss date',
-                $daviesClaim->claimNumber
+                $directGroupClaim->claimNumber
             ));
         }
-        if ($daviesClaim->replacementReceivedDate &&
-            (!$daviesClaim->replacementMake || !$daviesClaim->replacementModel)) {
+        if ($directGroupClaim->replacementReceivedDate &&
+            (!$directGroupClaim->replacementMake || !$directGroupClaim->replacementModel)) {
             throw new \Exception(sprintf(
                 'Claim %s has a replacement received date without a replacement make/model',
-                $daviesClaim->claimNumber
+                $directGroupClaim->claimNumber
             ));
         }
 
         $now = new \DateTime();
-        if ($daviesClaim->isOpen() || ($daviesClaim->dateClosed && $daviesClaim->dateClosed->diff($now)->days < 5)) {
+        if ($directGroupClaim->isOpen() ||
+            ($directGroupClaim->dateClosed && $directGroupClaim->dateClosed->diff($now)->days < 5)) {
             // lower case & remove title
-            $daviesInsuredName = mb_strtolower($daviesClaim->insuredName);
+            $insuredName = mb_strtolower($directGroupClaim->insuredName);
             foreach (['Mr. ', 'Mr ', 'Mrs. ', 'Mrs ', 'Miss '] as $title) {
-                $daviesInsuredName = str_replace($title, '', $daviesInsuredName);
+                $insuredName = str_replace($title, '', $insuredName);
             }
-            similar_text(mb_strtolower($claim->getPolicy()->getUser()->getName()), $daviesInsuredName, $percent);
+            similar_text(mb_strtolower($claim->getPolicy()->getUser()->getName()), $insuredName, $percent);
 
             if ($percent < 50 && !$claim->isIgnoreWarningFlagSet(Claim::WARNING_FLAG_CLAIMS_NAME_MATCH)) {
                 throw new \Exception(sprintf(
                     'Claim %s: %s does not match expected insuredName %s (match %0.1f)',
-                    $daviesClaim->claimNumber,
-                    $daviesClaim->insuredName,
+                    $directGroupClaim->claimNumber,
+                    $directGroupClaim->insuredName,
                     $claim->getPolicy()->getUser()->getName(),
                     $percent
                 ));
             } elseif ($percent < 75 && !$claim->isIgnoreWarningFlagSet(Claim::WARNING_FLAG_CLAIMS_NAME_MATCH)) {
                 $msg = sprintf(
                     'Claim %s: %s does not match expected insuredName %s (match %0.1f)',
-                    $daviesClaim->claimNumber,
-                    $daviesClaim->insuredName,
+                    $directGroupClaim->claimNumber,
+                    $directGroupClaim->insuredName,
                     $claim->getPolicy()->getUser()->getName(),
                     $percent
                 );
-                $this->warnings[$daviesClaim->claimNumber][] = $msg;
+                $this->warnings[$directGroupClaim->claimNumber][] = $msg;
             }
 
-            if ($daviesClaim->riskPostCode && $claim->getPolicy()->getUser()->getBillingAddress() &&
+            if ($directGroupClaim->riskPostCode && $claim->getPolicy()->getUser()->getBillingAddress() &&
                 !$claim->isIgnoreWarningFlagSet(Claim::WARNING_FLAG_CLAIMS_POSTCODE)) {
                 if (!$this->postcodeCompare(
                     $claim->getPolicy()->getUser()->getBillingAddress()->getPostcode(),
-                    $daviesClaim->riskPostCode
+                    $directGroupClaim->riskPostCode
                 )) {
                     $msg = sprintf(
                         'Claim %s: %s does not match expected postcode %s',
-                        $daviesClaim->claimNumber,
-                        $daviesClaim->riskPostCode,
+                        $directGroupClaim->claimNumber,
+                        $directGroupClaim->riskPostCode,
                         $claim->getPolicy()->getUser()->getBillingAddress()->getPostcode()
                     );
-                    $this->warnings[$daviesClaim->claimNumber][] = $msg;
+                    $this->warnings[$directGroupClaim->claimNumber][] = $msg;
                 }
             }
         }
@@ -455,19 +518,19 @@ class DaviesService extends S3EmailService
         /** @var PhonePolicy $phonePolicy */
         $phonePolicy = $claim->getPolicy();
         if (!$claim->isIgnoreWarningFlagSet(Claim::WARNING_FLAG_CLAIMS_REPLACEMENT_COST_HIGHER) &&
-            $daviesClaim->phoneReplacementCost > $phonePolicy->getPhone()->getInitialPrice()) {
+            $directGroupClaim->phoneReplacementCost > $phonePolicy->getPhone()->getInitialPrice()) {
             $msg = sprintf(
                 'Device replacement cost for claim %s is greater than initial price of the device',
-                $daviesClaim->claimNumber
+                $directGroupClaim->claimNumber
             );
-            $this->warnings[$daviesClaim->claimNumber][] = $msg;
+            $this->warnings[$directGroupClaim->claimNumber][] = $msg;
         }
         // Open Non-Warranty Claims are expected to either have a total incurred value or a reserved value
-        if ($daviesClaim->isOpen() && !$daviesClaim->isClaimWarranty() &&
-            $this->areEqualToTwoDp($daviesClaim->getIncurred(), 0) &&
-            $this->areEqualToTwoDp($daviesClaim->getReserved(), 0)) {
-            $msg = sprintf('Claim %s does not have a reserved value', $daviesClaim->claimNumber);
-            $this->errors[$daviesClaim->claimNumber][] = $msg;
+        if ($directGroupClaim->isOpen() && !$directGroupClaim->isClaimWarranty() &&
+            $this->areEqualToTwoDp($directGroupClaim->getIncurred(), 0) &&
+            $this->areEqualToTwoDp($directGroupClaim->getReserved(), 0)) {
+            $msg = sprintf('Claim %s does not have a reserved value', $directGroupClaim->claimNumber);
+            $this->errors[$directGroupClaim->claimNumber][] = $msg;
         }
 
         // assume validated prices for pre-picsure policies
@@ -481,224 +544,209 @@ class DaviesService extends S3EmailService
             }
         }
 
-        // negative excess indicates that the excess was paid by the policy holder
-        // davies business process is to update this value once the invoice is recevied by the supplier
-        // which should be at the same time the replacement imei is provided
-        $negativeExcessAllowed = mb_strlen($daviesClaim->replacementImei) == 0;
-        $isExcessValueCorrect = $daviesClaim->isExcessValueCorrect(
+        $isExcessValueCorrect = $directGroupClaim->isExcessValueCorrect(
             $validated,
-            $phonePolicy->isPicSurePolicy(),
-            $negativeExcessAllowed
+            $phonePolicy->isPicSurePolicy()
         );
 
-        // many of davies excess figures are incorrect if withdrawn and no actual need to validate in those cases
+        // if withdrawn and no actual need to validate in those cases
         if (!$isExcessValueCorrect &&
             !$claim->isIgnoreWarningFlagSet(Claim::WARNING_FLAG_CLAIMS_INCORRECT_EXCESS) &&
-            !in_array($daviesClaim->getClaimStatus(), [
+            !in_array($directGroupClaim->getClaimStatus(), [
                 Claim::STATUS_DECLINED,
                 Claim::STATUS_WITHDRAWN
             ])
         ) {
             $msg = sprintf(
-                'Claim %s does not have the correct excess value. Expected %0.2f Actual %0.2f for %s/%s',
-                $daviesClaim->claimNumber,
-                $daviesClaim->getExpectedExcess($validated, $phonePolicy->isPicSurePolicy()),
-                $daviesClaim->excess,
-                $daviesClaim->getClaimType(),
-                $daviesClaim->getClaimStatus()
+                'Claim %s does not have the correct excess value. Expected %0.2f Actual %0.2f for %s/%s/%s/%s',
+                $directGroupClaim->claimNumber,
+                $directGroupClaim->getExpectedExcess($validated, $phonePolicy->isPicSurePolicy()),
+                $directGroupClaim->excess,
+                $directGroupClaim->getClaimType(),
+                $directGroupClaim->getClaimStatus(),
+                $validated ? 'validated pic-sure' : 'not validated pic-sure',
+                $phonePolicy->isPicSurePolicy() ? 'pic-sure policy' : 'non pic-sure policy'
             );
-            $this->errors[$daviesClaim->claimNumber][] = $msg;
+            $this->errors[$directGroupClaim->claimNumber][] = $msg;
         }
 
-        if ($daviesClaim->isIncurredValueCorrect() === false) {
+        if ($directGroupClaim->isIncurredValueCorrect() === false) {
             $msg = sprintf(
                 'Claim %s does not have the correct incurred value. Expected %0.2f Actual %0.2f',
-                $daviesClaim->claimNumber,
-                $daviesClaim->getExpectedIncurred(),
-                $daviesClaim->incurred
+                $directGroupClaim->claimNumber,
+                $directGroupClaim->getExpectedIncurred(),
+                $directGroupClaim->incurred
             );
             // seems to be an issue with small difference in the incurred value related to receipero fees
             // if under £2, then assume that to be the case and move to the fees section
-            if (abs($daviesClaim->getExpectedIncurred() - $daviesClaim->incurred) < 2) {
-                $this->fees[$daviesClaim->claimNumber][] = $msg;
+            if (abs($directGroupClaim->getExpectedIncurred() - $directGroupClaim->incurred) < 2) {
+                $this->fees[$directGroupClaim->claimNumber][] = $msg;
             } else {
-                $this->errors[$daviesClaim->claimNumber][] = $msg;
+                $this->errors[$directGroupClaim->claimNumber][] = $msg;
             }
         }
 
         $approvedDate = null;
         if ($claim->getApprovedDate()) {
             $approvedDate = $this->startOfDay(clone $claim->getApprovedDate());
-        } elseif ($daviesClaim->replacementReceivedDate) {
-            $approvedDate = $this->startOfDay(clone $daviesClaim->replacementReceivedDate);
+        } elseif ($directGroupClaim->replacementReceivedDate) {
+            $approvedDate = $this->startOfDay(clone $directGroupClaim->replacementReceivedDate);
         }
         if ($approvedDate) {
             $fiveBusinessDays = $this->addBusinessDays($approvedDate, 5);
-            if ($daviesClaim->isPhoneReplacementCostCorrect() === false && $fiveBusinessDays < new \DateTime()) {
+            if ($directGroupClaim->isPhoneReplacementCostCorrect() === false && $fiveBusinessDays < new \DateTime()) {
                 $msg = sprintf(
                     'Claim %s does not have the correct phone replacement cost. Expected > 0 Actual %0.2f',
-                    $daviesClaim->claimNumber,
-                    $daviesClaim->phoneReplacementCost
+                    $directGroupClaim->claimNumber,
+                    $directGroupClaim->phoneReplacementCost
                 );
-                $this->errors[$daviesClaim->claimNumber][] = $msg;
+                $this->errors[$directGroupClaim->claimNumber][] = $msg;
             }
         }
 
-        // We should always validate Recipero Fee if the fee is present or if the claim is closed
-        if (($daviesClaim->isClosed(true) || $daviesClaim->reciperoFee > 0) &&
-            !$this->areEqualToTwoDp($claim->totalChargesWithVat(), $daviesClaim->reciperoFee)) {
-            $msg = sprintf(
-                'Claim %s does not have the correct recipero fee. Expected £%0.2f Actual £%0.2f',
-                $daviesClaim->claimNumber,
-                $claim->totalChargesWithVat(),
-                $daviesClaim->reciperoFee
-            );
-            $this->fees[$daviesClaim->claimNumber][] = $msg;
-        }
-
-        if ($daviesClaim->isClosed(true) && $daviesClaim->reserved > 0) {
+        if ($directGroupClaim->isClosed(true) && $directGroupClaim->reserved > 0) {
             $msg = sprintf(
                 'Claim %s is closed, yet still has a reserve fee.',
-                $daviesClaim->claimNumber
+                $directGroupClaim->claimNumber
             );
-            $this->errors[$daviesClaim->claimNumber][] = $msg;
+            $this->errors[$directGroupClaim->claimNumber][] = $msg;
         }
 
-        if (!$claim->getReplacementReceivedDate() && $daviesClaim->replacementReceivedDate) {
+        if (!$claim->getReplacementReceivedDate() && $directGroupClaim->replacementReceivedDate) {
             // We should be notified the next day when a replacement device is delivered
             // so we can follow up with our customer. Unlikely to occur.
             $ago = new \DateTime();
             $ago = $this->subBusinessDays($ago, 1);
 
-            if ($daviesClaim->replacementReceivedDate < $ago) {
+            if ($directGroupClaim->replacementReceivedDate < $ago) {
                 $msg = sprintf(
                     'Claim %s has a delayed replacement date (%s) which is more than 1 business day ago (%s)',
-                    $daviesClaim->claimNumber,
-                    $daviesClaim->replacementReceivedDate->format(\DateTime::ATOM),
+                    $directGroupClaim->claimNumber,
+                    $directGroupClaim->replacementReceivedDate->format(\DateTime::ATOM),
                     $ago->format(\DateTime::ATOM)
                 );
-                $this->warnings[$daviesClaim->claimNumber][] = $msg;
+                $this->warnings[$directGroupClaim->claimNumber][] = $msg;
             }
         }
 
         $twoWeekAgo = new \DateTime();
         $twoWeekAgo = $twoWeekAgo->sub(new \DateInterval('P2W'));
-        if ($claim->getApprovedDate() && in_array($daviesClaim->getClaimStatus(), [
+        if ($claim->getApprovedDate() && in_array($directGroupClaim->getClaimStatus(), [
             Claim::STATUS_DECLINED,
             Claim::STATUS_WITHDRAWN
         ])) {
             $msg = sprintf(
                 'Claim %s was previously approved, however is now withdrawn/declined. SO-SURE to remove approved date',
-                $daviesClaim->claimNumber
+                $directGroupClaim->claimNumber
             );
-            $this->sosureActions[$daviesClaim->claimNumber][] = $msg;
-        } elseif ($claim->getApprovedDate() && !$daviesClaim->isApproved()) {
+            $this->sosureActions[$directGroupClaim->claimNumber][] = $msg;
+        } elseif ($claim->getApprovedDate() && !$directGroupClaim->isApproved()) {
             $msg = sprintf(
                 'Claim %s was previously approved, however no longer appears to be. SO-SURE to remove approved date',
-                $daviesClaim->claimNumber
+                $directGroupClaim->claimNumber
             );
-            $this->sosureActions[$daviesClaim->claimNumber][] = $msg;
+            $this->sosureActions[$directGroupClaim->claimNumber][] = $msg;
         } elseif ($claim->getApprovedDate() && $claim->getApprovedDate() <= $twoWeekAgo) {
             $items = [];
-            if (!$daviesClaim->replacementReceivedDate) {
+            if (!$directGroupClaim->replacementReceivedDate) {
                 $items[] = 'received date';
             }
-            if (!$daviesClaim->replacementImei && !$daviesClaim->isReplacementRepaired() &&
-                !in_array('replacementImei', $daviesClaim->unobtainableFields)) {
+            if (!$directGroupClaim->replacementImei && !$directGroupClaim->isReplacementRepaired() &&
+                !in_array('replacementImei', $directGroupClaim->unobtainableFields)) {
                 $items[] = 'imei';
             }
-            if (!$daviesClaim->replacementMake || !$daviesClaim->replacementModel) {
+            if (!$directGroupClaim->replacementMake || !$directGroupClaim->replacementModel) {
                 $items[] = 'phone';
             }
             if (count($items) > 0) {
                 $msg = sprintf(
                     'Claim %s was approved over 2 weeks ago (%s), however, the replacement data not recorded (%s).',
-                    $daviesClaim->claimNumber,
+                    $directGroupClaim->claimNumber,
                     $claim->getApprovedDate()->format(\DateTime::ATOM),
                     implode('; ', $items)
                 );
-                $this->errors[$daviesClaim->claimNumber][] = $msg;
+                $this->errors[$directGroupClaim->claimNumber][] = $msg;
             }
         }
 
-        if (!$daviesClaim->replacementImei && !$daviesClaim->isReplacementRepaired() &&
-            in_array('replacementImei', $daviesClaim->unobtainableFields)) {
+        if (!$directGroupClaim->replacementImei && !$directGroupClaim->isReplacementRepaired() &&
+            in_array('replacementImei', $directGroupClaim->unobtainableFields)) {
             $msg = sprintf(
                 'Claim %s does not have a replacement IMEI - unobtainable. Contact customer if possible.',
-                $daviesClaim->claimNumber
+                $directGroupClaim->claimNumber
             );
-            $this->warnings[$daviesClaim->claimNumber][] = $msg;
+            $this->warnings[$directGroupClaim->claimNumber][] = $msg;
         }
 
-        if (!$daviesClaim->replacementImei && !$daviesClaim->isReplacementRepaired() &&
-            $daviesClaim->getClaimStatus() == Claim::STATUS_SETTLED) {
+        if (!$directGroupClaim->replacementImei && !$directGroupClaim->isReplacementRepaired() &&
+            $directGroupClaim->getClaimStatus() == Claim::STATUS_SETTLED) {
             $msg = sprintf(
                 'Claim %s is settled without a replacement imei.',
-                $daviesClaim->claimNumber
+                $directGroupClaim->claimNumber
             );
-            $this->errors[$daviesClaim->claimNumber][] = $msg;
+            $this->errors[$directGroupClaim->claimNumber][] = $msg;
         }
 
-        if ($daviesClaim->isOpen() && $claim->getPhonePolicy() && $daviesClaim->replacementImei &&
-            $daviesClaim->replacementImei == $claim->getPhonePolicy()->getImei() && (
-            !$daviesClaim->replacementMake || !$daviesClaim->replacementModel)) {
+        if ($directGroupClaim->isOpen() && $claim->getPhonePolicy() && $directGroupClaim->replacementImei &&
+            $directGroupClaim->replacementImei == $claim->getPhonePolicy()->getImei() && (
+            !$directGroupClaim->replacementMake || !$directGroupClaim->replacementModel)) {
             // @codingStandardsIgnoreStart
             $msg = sprintf(
                 'Claim %s has a replacement imei that matches the policy but is missing a replacement make and/or model. This is likely to be a data entry mistake.',
-                $daviesClaim->claimNumber
+                $directGroupClaim->claimNumber
             );
             // @codingStandardsIgnoreEnd
-            $this->errors[$daviesClaim->claimNumber][] = $msg;
+            $this->errors[$directGroupClaim->claimNumber][] = $msg;
         }
 
         $threeMonthsAgo = new \DateTime();
         $threeMonthsAgo = $threeMonthsAgo->sub(new \DateInterval('P3M'));
-        if ($daviesClaim->isOpen() && $daviesClaim->replacementReceivedDate &&
-            $daviesClaim->replacementReceivedDate < $threeMonthsAgo) {
+        if ($directGroupClaim->isOpen() && $directGroupClaim->replacementReceivedDate &&
+            $directGroupClaim->replacementReceivedDate < $threeMonthsAgo) {
             $msg = sprintf(
                 'Claim %s should be closed. Replacement was delivered more than 3 months ago on %s.',
-                $daviesClaim->claimNumber,
-                $daviesClaim->replacementReceivedDate->format(\DateTime::ATOM)
+                $directGroupClaim->claimNumber,
+                $directGroupClaim->replacementReceivedDate->format(\DateTime::ATOM)
             );
-            $this->errors[$daviesClaim->claimNumber][] = $msg;
+            $this->errors[$directGroupClaim->claimNumber][] = $msg;
         }
 
-        if (!isset($daviesClaim->initialSuspicion)) {
+        if (!isset($directGroupClaim->initialSuspicion)) {
             $msg = sprintf(
                 'Claim %s does not have initialSuspicion flag set.',
-                $daviesClaim->claimNumber
+                $directGroupClaim->claimNumber
             );
-            $this->warnings[$daviesClaim->claimNumber][] = $msg;
+            $this->warnings[$directGroupClaim->claimNumber][] = $msg;
         }
         if (in_array($claim->getStatus(), array(Claim::STATUS_SETTLED, Claim::STATUS_APPROVED))
-            && !isset($daviesClaim->finalSuspicion)) {
+            && !isset($directGroupClaim->finalSuspicion)) {
             $msg = sprintf(
                 'Claim %s should have finalSuspicion flag set.',
-                $daviesClaim->claimNumber
+                $directGroupClaim->claimNumber
             );
-            $this->warnings[$daviesClaim->claimNumber][] = $msg;
+            $this->warnings[$directGroupClaim->claimNumber][] = $msg;
         }
 
-        if (mb_strlen($daviesClaim->lossDescription) < self::MIN_LOSS_DESCRIPTION_LENGTH) {
+        if (mb_strlen($directGroupClaim->lossDescription) < self::MIN_LOSS_DESCRIPTION_LENGTH) {
             $msg = sprintf(
                 'Claim %s does not have a detailed loss description',
-                $daviesClaim->claimNumber
+                $directGroupClaim->claimNumber
             );
-            $this->warnings[$daviesClaim->claimNumber][] = $msg;
+            $this->warnings[$directGroupClaim->claimNumber][] = $msg;
         }
     }
 
-    public function postValidateClaimDetails(Claim $claim, DaviesHandlerClaim $daviesClaim)
+    public function postValidateClaimDetails(Claim $claim, DirectGroupHandlerClaim $directGroupClaim)
     {
         if ($claim->getApprovedDate() && $claim->getReplacementReceivedDate() &&
             $claim->getApprovedDate() > $claim->getReplacementReceivedDate()) {
             $msg = sprintf(
                 'Claim %s has an approved date (%s) more recent than the received date (%s)',
-                $daviesClaim->claimNumber,
+                $directGroupClaim->claimNumber,
                 $claim->getApprovedDate()->format(\DateTime::ATOM),
                 $claim->getReplacementReceivedDate()->format(\DateTime::ATOM)
             );
-            $this->warnings[$daviesClaim->claimNumber][] = $msg;
+            $this->warnings[$directGroupClaim->claimNumber][] = $msg;
         }
 
         // Should be in post validate in case the record fails import
@@ -706,33 +754,19 @@ class DaviesService extends S3EmailService
             $claim->getStatus() == Claim::STATUS_SETTLED) {
             $msg = sprintf(
                 'Claim %s is settled without a replacement phone being set. SO-SURE to set replacement phone.',
-                $daviesClaim->claimNumber
+                $directGroupClaim->claimNumber
             );
-            $this->sosureActions[$daviesClaim->claimNumber][] = $msg;
+            $this->sosureActions[$directGroupClaim->claimNumber][] = $msg;
         }
     }
 
-    public function getReplacementPhone(DaviesHandlerClaim $daviesClaim)
-    {
-        \AppBundle\Classes\NoOp::ignore([$daviesClaim]);
-        $repo = $this->dm->getRepository(Phone::class);
-        // TODO: Can we get the brightstar product numbers?
-        // $phone = $repo->findOneBy(['brightstar_number' => $daviesClaim->brightstarProductNumber]);
-
-        // TODO: If not brightstar, should be able to somehow parse these....
-        // $daviesClaim->replacementMake $daviesClaim->replacementModel
-        $phone = null;
-
-        return $phone;
-    }
-
     /**
-     * @param Claim              $claim
-     * @param DaviesHandlerClaim $daviesClaim
-     * @param boolean            $skipImeiUpdate
+     * @param Claim                   $claim
+     * @param DirectGroupHandlerClaim $directGroupClaim
+     * @param boolean                 $skipImeiUpdate
      * @throws \Exception
      */
-    public function updatePolicy(Claim $claim, DaviesHandlerClaim $daviesClaim, $skipImeiUpdate)
+    public function updatePolicy(Claim $claim, DirectGroupHandlerClaim $directGroupClaim, $skipImeiUpdate)
     {
         /** @var PhonePolicy $policy */
         $policy = $claim->getPolicy();
@@ -755,7 +789,7 @@ class DaviesService extends S3EmailService
                     sprintf('Verify Policy %s IMEI Update', $policy->getPolicyNumber()),
                     ['tech+ops@so-sure.com', 'marketing@so-sure.com'],
                     'AppBundle:Email:davies/checkPhone.html.twig',
-                    ['policy' => $policy, 'daviesClaim' => $daviesClaim, 'skipImeiUpdate' => $skipImeiUpdate]
+                    ['policy' => $policy, 'daviesClaim' => $directGroupClaim, 'skipImeiUpdate' => $skipImeiUpdate]
                 );
             }
         } elseif (count($policy->getClaims()) == 1) {
@@ -767,7 +801,7 @@ class DaviesService extends S3EmailService
                     sprintf('Verify Policy %s IMEI Update', $policy->getPolicyNumber()),
                     ['tech+ops@so-sure.com', 'marketing@so-sure.com'],
                     'AppBundle:Email:davies/checkPhone.html.twig',
-                    ['policy' => $policy, 'daviesClaim' => $daviesClaim, 'skipImeiUpdate' => true]
+                    ['policy' => $policy, 'daviesClaim' => $directGroupClaim, 'skipImeiUpdate' => true]
                 );
             }
         }
@@ -787,81 +821,10 @@ class DaviesService extends S3EmailService
             if ($now >= $twoBusinessDays) {
                 $msg = sprintf(
                     'Claim %s is missing a replacement recevied date (expected 2 days after imei replacement)',
-                    $daviesClaim->claimNumber
+                    $directGroupClaim->claimNumber
                 );
-                $this->errors[$daviesClaim->claimNumber][] = $msg;
+                $this->errors[$directGroupClaim->claimNumber][] = $msg;
             }
         }
-    }
-
-    public function claimsDailyEmail()
-    {
-        $phoneRepo = $this->dm->getRepository(Phone::class);
-        $highDemandPhones = $phoneRepo->findBy(['newHighDemand' => true]);
-
-        $fileRepo = $this->dm->getRepository(DaviesFile::class);
-        $latestFiles = $fileRepo->findBy([], ['created' => 'desc'], 1);
-        $latestFile = count($latestFiles) > 0 ? $latestFiles[0] : null;
-
-        $successFiles = $fileRepo->findBy(['success' => true], ['created' => 'desc'], 1);
-        $successFile = count($successFiles) > 0 ? $successFiles[0] : null;
-
-        /** @var ClaimRepository $claimsRepo */
-        $claimsRepo = $this->dm->getRepository(Claim::class);
-        $claims = $claimsRepo->findOutstanding(Claim::TEAM_DAVIES);
-
-        $this->mailer->sendTemplate(
-            sprintf('Davies Daily Claims Report'),
-            'tech+ops@so-sure.com',
-            'AppBundle:Email:claimsHandler/dailyEmail.html.twig',
-            [
-                'claims' => $claims,
-                'latestFile' => $latestFile,
-                'successFile' => $successFile,
-                'warnings' => $this->warnings,
-                'errors' => $this->errors,
-                'sosureActions' => $this->sosureActions,
-                'fees' => $this->fees,
-                'title' => 'Davies Daily Claims Report',
-                'highDemandPhones' => $highDemandPhones,
-            ]
-        );
-
-        return count($claims);
-    }
-
-    public function claimsDailyErrors()
-    {
-        $fileRepo = $this->dm->getRepository(DaviesFile::class);
-        $latestFiles = $fileRepo->findBy([], ['created' => 'desc'], 1);
-        $latestFile = count($latestFiles) > 0 ? $latestFiles[0] : null;
-
-        $successFiles = $fileRepo->findBy(['success' => true], ['created' => 'desc'], 1);
-        $successFile = count($successFiles) > 0 ? $successFiles[0] : null;
-
-        if (count($this->errors) > 0) {
-            $emails = 'tech+ops@so-sure.com';
-            if ($this->featureService->isEnabled(Feature::FEATURE_DAVIES_IMPORT_ERROR_EMAIL)) {
-                $emails = DaviesHandlerClaim::$errorEmailAddresses;
-            }
-
-            $this->mailer->sendTemplate(
-                sprintf('Errors in So-Sure Mobile - Daily Claims Report'),
-                $emails,
-                'AppBundle:Email:claimsHandler/dailyEmail.html.twig',
-                [
-                    'latestFile' => $latestFile,
-                    'successFile' => $successFile,
-                    'errors' => $this->errors,
-                    'warnings' => null,
-                    'sosureActions' => null,
-                    'claims' => null,
-                    'fees' => $this->fees,
-                    'title' => 'Errors in So-Sure Mobile - Daily Claims Report',
-                ]
-            );
-        }
-
-        return count($this->errors);
     }
 }
