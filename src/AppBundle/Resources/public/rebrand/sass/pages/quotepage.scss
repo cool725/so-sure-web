@@ -36,6 +36,9 @@ body {
         @include media-breakpoint-up(lg) {
             width: 60vw; height: 100vh;
             overflow-y: scroll;
+
+            // IE
+            -ms-overflow-style: none;
         }
     }
 
@@ -137,6 +140,9 @@ body {
 
         @include media-breakpoint-up(lg) {
             width: 40vw; height: 100vh;
+
+            // IE
+            -ms-overflow-style: none;
         }
     }
 }

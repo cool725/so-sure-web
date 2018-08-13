@@ -8,6 +8,9 @@
         // Reset
         appearance: none;
         -webkit-appearance: none;
+        -moz-appearance: none;
+        -o-appearance: none;
+        appearance: none;
 
         // Style
         background-color: transparent;
@@ -33,6 +36,11 @@
     // Allows for a line break in flexed rows
     &__break {
         width: 100%;
+    }
+
+    // IE
+    select::-ms-expand {
+        display: none;
     }
 
 }

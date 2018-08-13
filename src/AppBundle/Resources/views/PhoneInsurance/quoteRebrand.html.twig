@@ -43,12 +43,17 @@
                                 {% if phones | length > 1 %}
                                     {% for phone_mem in phones %}
                                         {% if phone_mem.id != phone.id  %}
-                                            <a href="{{ path('quote_make_model_memory', {'make': phone_mem.makeCanonical, 'model': phone_mem.encodedModelCanonical, 'memory': phone_mem.memory}) }}" class="dropdown-item" href="#">{{ phone_mem.memory }}GB</a>
+                                            <a href="{{ path('quote_make_model_memory', {'make': phone_mem.makeCanonical, 'model': phone_mem.encodedModelCanonical, 'memory': phone_mem.memory}) }}" class="dropdown-item h6" href="#">
+                                                {{ phone_mem.memory }}GB
+                                                <small>{{ phone.make }} {{ phone.model }}</small>
+                                            </a>
                                         {% endif %}
                                     {% endfor %}
-                                    <div class="dropdown-divider"></div>
                                 {% endif %}
-                                <a class="dropdown-item get-a-quote" href="#">I have a different phone</a>
+                                <a class="dropdown-item h6 get-a-quote" href="#">
+                                    Start a new quote
+                                    <small>Not the phone you're looking for?</small>
+                                </a>
                             </div>
                         </div>
                     </div>
