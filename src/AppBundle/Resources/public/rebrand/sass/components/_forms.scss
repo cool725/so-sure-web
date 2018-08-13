@@ -24,6 +24,10 @@ label {
     }
 }
 
+.form-text {
+    color: rgba(23, 11, 56, 0.4);
+}
+
 // Server side error styling
 .with-errors {
     ul {
@@ -93,11 +97,12 @@ label {
     overflow: hidden;
 }
 
+// Currently using a row and columns to size for now
 .radio-btn {
+    width: 100%; height: 4.6rem;
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 9rem; height: 4.4rem;
     text-align: center;
     color: rgba(104, 114, 150, 0.6);
     background-color: rgba(37, 147, 243, 0.1);

@@ -18,8 +18,8 @@ $(function() {
     $('.radio-btn').on('click', function(e) {
         e.preventDefault();
 
-        $(this).toggleClass('radio-btn-active')
-        .siblings().removeClass('radio-btn-active');
+        $('.radio-btn').removeClass('radio-btn-active');
+        $(this).addClass('radio-btn-active');
 
         let value = $(this).data('value');
         $('input[name="purchase_form[amount]"][value="' + value + '"]').prop('checked', true);

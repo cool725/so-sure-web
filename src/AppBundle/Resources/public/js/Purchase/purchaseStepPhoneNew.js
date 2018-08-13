@@ -79,9 +79,13 @@ sosure.purchaseStepPhone = (function() {
             },
 
             errorPlacement: function(error, element) {
+                // if (element.attr('name') === "purchase_form[amount]") {
+                //     $('.payment-options h4').addClass('error');
+                // } else {
+                //     error.insertAfter(element);
+                // }
                 if (element.attr('name') === "purchase_form[amount]") {
-                    $('.payment-options h4').addClass('error');
-                } else {
+                    $('.payment-options__title').addClass('error');
                     error.insertAfter(element);
                 }
             },

@@ -1,29 +1,34 @@
 {{ form_start(purchase_form, {'attr': {'data-toggle': 'validator', 'class': 'validate-form', 'data-client-validation': form_client_validation, 'autocomplete': 'off' }}) }}
 
-    <h4 class="text-blue2 mb-3">How would you like to pay?</h4>
-
-    <div class="form-group {% if form_errors(purchase_form.amount) %}has-error{% endif %}">
+    <div class="form-group payment-options {% if form_errors(purchase_form.amount) %}has-error{% endif %}">
+        <h4 class="payment-options__title text-blue2 mb-3">How would you like to pay?</h4>
         <div class="radio-btn-original">
             {{ form_label(purchase_form.amount, 'Payment options') }}
             {{ form_widget(purchase_form.amount) }}
         </div>
-        <div class="radio-btn-group d-flex flex-wrap">
-            {% if app.user.allowedMonthlyPayments %}
-            <div class="radio-btn mr-3 {% if purchase_form.vars.value.amount == phone.currentPhonePrice.monthlyPremiumPrice %}radio-btn-active{% endif %}" data-value="{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }}">
-                <div class="radio-btn__content">
-                    <h6 class="radio-btn__title mb-0">Yearly</h6>
-                    <div class="radio-btn__price"><small>(&pound;{{ phone.currentPhonePrice.monthlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }})</small></div>
-                </div>
+        <div class="radio-btn-group">
+            <div class="row">
+                {% if app.user.allowedMonthlyPayments %}
+                    <div class="col-6">
+                        <div class="radio-btn {% if purchase_form.vars.value.amount == phone.currentPhonePrice.monthlyPremiumPrice %}radio-btn-active{% endif %}" data-value="{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }}">
+                            <div class="radio-btn__content">
+                                <h6 class="radio-btn__title mb-0">Yearly</h6>
+                                <div class="radio-btn__price"><small>(&pound;{{ phone.currentPhonePrice.monthlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }})</small></div>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+                {% if app.user.allowedYearlyPayments %}
+                    <div class="col-6">
+                        <div class="radio-btn {% if purchase_form.vars.value.amount == phone.currentPhonePrice.yearlyPremiumPrice(app.user.additionalPremium) %}radio-btn-active{% endif %}" data-value="{{ phone.currentPhonePrice.yearlyPremiumPrice|number_format(2, '.', ',') }}">
+                            <div class="radio-btn__content">
+                                <h6 class="radio-btn__title mb-0">Monthly</h6>
+                                <div class="radio-btn__price"><small>(&pound;{{ phone.currentPhonePrice.monthlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }})</small></div>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
             </div>
-            {% endif %}
-            {% if app.user.allowedYearlyPayments %}
-            <div class="radio-btn {% if purchase_form.vars.value.amount == phone.currentPhonePrice.yearlyPremiumPrice(app.user.additionalPremium) %}radio-btn-active{% endif %}" data-value="{{ phone.currentPhonePrice.yearlyPremiumPrice|number_format(2, '.', ',') }}">
-                <div class="radio-btn__content">
-                    <h6 class="radio-btn__title mb-0">Monthly</h6>
-                    <div class="radio-btn__price"><small>(&pound;{{ phone.currentPhonePrice.monthlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }})</small></div>
-                </div>
-            </div>
-            {% endif %}
         </div>
 
         <div class="with-errors">{{ form_errors(purchase_form.amount) }}</div>
@@ -32,8 +37,8 @@
     <div class="form-group {% if form_errors(purchase_form.imei) %}has-error{% endif %}">
         {{ form_label(purchase_form.imei, 'IMEI Number:') }}
         {{ form_widget(purchase_form.imei, {'attr':{'class':'form-control imei', 'placeholder':'IMEI Number', 'data-hj-suppress' : ''}}) }}
-        <small class="form-text samsung-imei">Numbers only please (no / required)</small>
-        <small class="form-text">Dial <strong>*#06#</strong> on your phone keypad to display your IMEI number.</small>
+        {# <small class="form-text samsung-imei">Numbers only please (no / required)</small> #}
+        <small class="form-text">Dial <strong>*#06#</strong> on your phone to display your IMEI number.</small>
         <small class="form-text">{{ form_errors(purchase_form.imei) }}</small>
     </div>
 
@@ -41,7 +46,7 @@
         <div class="form-group {% if form_errors(purchase_form.serialNumber) %}has-error{% endif %}">
             {{ form_label(purchase_form.serialNumber, 'Serial Number:') }}
             {{ form_widget(purchase_form.serialNumber, {'attr':{'class':'form-control',  'pattern': '[a-zA-Z0-9]{5,32}', 'title': 'Enter a valid serial number', 'placeholder':'Serial Number', 'data-hj-suppress' : ''}}) }}
-            <small class="form-text"><i class="fa fa-question-circle"></i> Need help?</small>
+            <small class="form-text">To find your Serial Numbers open your phone Settings, navigate to General and view About</small>
             <small class="form-text">{{ form_errors(purchase_form.serialNumber) }}</small>
         </div>
     {% endif %}

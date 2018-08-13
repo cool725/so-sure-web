@@ -12,7 +12,9 @@ $(function() {
         e.preventDefault();
 
         // Toggle logo class
-        logo.toggleClass('navbar-brand__logo-white-light');
+        if (!$('body').hasClass('quote')) {
+            logo.toggleClass('navbar-brand__logo-white-light');
+        }
 
         // Prevent scrolling whilst open
         $('body').toggleClass('body--overflow');
