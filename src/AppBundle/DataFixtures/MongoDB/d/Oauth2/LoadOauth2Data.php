@@ -13,7 +13,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 // @codingStandardsIgnoreFile
 class LoadOauth2Data implements FixtureInterface, ContainerAwareInterface
 {
-    use \App\Tests\Traits\Oauth;
+    use \Tests\Traits\Oauth;
 
     // These can be used for testing
     const KNOWN_CLIENT_ID = '5b51ec6b636239778924b671_36v22l3ei3wgw0k4wos48kokk0cwsgo0ocggggoc84w0cw8844';
