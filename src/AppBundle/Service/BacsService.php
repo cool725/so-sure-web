@@ -1284,10 +1284,6 @@ class BacsService
                     $this->logger->warning($msg);
                 }
 
-                $rescheduled = $scheduledPayment->reschedule($scheduledDate);
-                $policy->addScheduledPayment($rescheduled);
-                $this->dm->flush(null, array('w' => 'majority', 'j' => true));
-
                 continue;
             }
             if (!$bankAccount->allowedSubmission()) {
