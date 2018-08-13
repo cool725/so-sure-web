@@ -359,6 +359,18 @@ class ValidatePolicyCommand extends BaseCommand
                     '596765ef42bece52d026aa65',
                     '5970d065b674b62bac4be365',
                     '5973293aa603ad542d4ed949',
+                    '594a3f642a964c01fc294435',
+                    '5954b2382a964c2b461c8f35',
+                    '596ddd2ec188843b4878e765',
+                    '59cfae48aff01f609c59b085',
+                    '59dc0eb8f4a90d4b2622b55d',
+                    '59de9d9175435e233d6c06a5',
+                    '59e7202b446b0f221f7e1935',
+                    '59fc527dc502d078f04b92b5',
+                    '5ab298b4332fe80e4517791d',
+                    '5ab62a8e75435e720828dd75',
+                    '5ac7fd271eae6236c1275b3c',
+                    '5aca36be75435e1ab25efe35',
                 ])) {
                     $this->header($policy, $policies, $lines);
                     $lines[] = $this->failureCommissionMessage($policy, $data['prefix'], $data['validateDate']);
