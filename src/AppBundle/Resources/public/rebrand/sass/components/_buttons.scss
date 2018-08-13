@@ -8,6 +8,7 @@
     }
 }
 
+// Add shadow to button rather than modifying the core css
 .btn-shadow {
     box-shadow: 0 15px 30px 0 rgba(8,27,154,0.08),
                 0 5px 15px 0 rgba(8,27,154,0.08);
@@ -18,22 +19,25 @@
     color: $blue-2;
 }
 
+// Add gradient to button rather than modifying the core css
 .btn-gradient {
     border: none;
     @include linear-gradient(90deg, $blue-3, $blue-1);
 }
 
+// Add gradient to button rather than modifying the core css
 .btn-gradient-green {
     border: none;
     @include linear-gradient(90deg, darken($green, 5%), $green);
 }
 
+// Add square buttons for icons to button rather than modifying the core css
 .btn-square {
     padding: .6rem 1rem;
     @include border-radius(4px);
 }
 
-// Button block mobile only
+// Button block mobile only - make buttons full width xs < down
 @include media-breakpoint-down(xs) {
 
     .btn-block-xs {

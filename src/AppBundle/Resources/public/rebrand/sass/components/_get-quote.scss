@@ -6,7 +6,7 @@
     z-index: 1090;
     top: 0; left: 0; right: 0; bottom: 0;
     background-color: $blue-2;
-    @include linear-gradient(180deg, $blue-3, $blue-1);
+    // @include linear-gradient(180deg, $blue-3, $blue-1);
     opacity: 0;
     visibility: hidden;
     transition: opacity .35s, visibility .35s, height .35s;

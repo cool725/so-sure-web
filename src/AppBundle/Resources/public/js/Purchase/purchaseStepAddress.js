@@ -35,9 +35,10 @@ sosure.purchaseStepAddress = (function() {
             // When to validate
             onkeyup: false,
             onclick: false,
-            onfocusout: false,
+            focusCleanup: true,
+            // onfocusout: false,
             // Validation classes
-            validClass: 'is-valid',
+            validClass: 'is-valid-ss',
             errorClass: 'is-invalid',
             groups: {
                 birthday: 'purchase_form_birthday_day purchase_form_birthday_month purchase_form_birthday_year',

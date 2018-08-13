@@ -256,7 +256,7 @@
                 {# TODO: Curve #}
 
                 <div class="purchase__form__container p-4 p-lg-5">
-                    {# Include - Old Form #}
+                    {% include 'AppBundle::Purchase/_purchaseStepsRebrand.html.twig' %}
                     {% include 'AppBundle::Purchase/_currentStepPersonalPhoneReview.html.twig' %}
                 </div>
             {% else %}
