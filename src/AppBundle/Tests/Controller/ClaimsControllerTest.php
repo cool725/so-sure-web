@@ -110,6 +110,7 @@ class ClaimsControllerTest extends BaseControllerTest
         $crawler = self::$client->submit($form);
         $this->verifyResponse(200);
         self::$client->followRedirects(false);
+
         $this->expectFlashSuccess($crawler, 'Excess is £150');
         $claims = $crawler->filterXPath('//div[@id="claims"]');
         $this->assertContains('£150', $claims->text());

@@ -136,7 +136,6 @@ class ClaimsController extends BaseController
         if ($claim === null) {
             $claim = new Claim();
             $claim->setPolicy($policy);
-            $claim->setStatus(Claim::STATUS_INREVIEW);
         }
         $claimscheck = new ClaimsCheck();
         $claimscheck->setPolicy($policy);
@@ -178,7 +177,7 @@ class ClaimsController extends BaseController
                         } else {
                             $this->addFlash('error', sprintf('Duplicate claim number %s', $claim->getNumber()));
                         }
-                    } elseif ($claimsService->addClaim($policy, $claim)) {
+                    } elseif ($claimsService->addClaim($policy, $claim, Claim::STATUS_INREVIEW)) {
                         $this->addFlash('success', sprintf(
                             'Claim %s is added. Excess is £%d',
                             $claim->getNumber(),
