@@ -1130,7 +1130,6 @@ abstract class BaseController extends Controller
             // our local copy of the target path, to use to go back to the oauth2/v2/auth page
             if (!$targetPath) {
                 $targetPath = $this->getTargetPath($session, 'main');
-                $this->removeTargetPath($session, 'main');
             }
             $session->set('oauth2Flow.targetPath', $targetPath);
         }
