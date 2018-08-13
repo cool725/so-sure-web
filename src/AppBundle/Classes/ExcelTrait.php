@@ -6,8 +6,6 @@ use AppBundle\Document\DateTrait;
 
 trait ExcelTrait
 {
-    use DateTrait;
-
     /**
      * @param mixed   $days           int (excel number of days from 1/1/1900) or string date 31/1/2016
      * @param boolean $skipEndCheck   future dates are normally disallowed except for policy end date

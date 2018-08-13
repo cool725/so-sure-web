@@ -240,7 +240,7 @@ class DaviesService extends S3EmailService
 
     /**
      * @param DaviesHandlerClaim $daviesClaim
-     * @param boolean     $skipImeiUpdate
+     * @param boolean            $skipImeiUpdate
      * @return bool
      * @throws \Exception
      */
@@ -370,7 +370,7 @@ class DaviesService extends S3EmailService
     }
 
     /**
-     * @param Claim       $claim
+     * @param Claim              $claim
      * @param DaviesHandlerClaim $daviesClaim
      * @throws \Exception
      */
@@ -722,9 +722,9 @@ class DaviesService extends S3EmailService
     }
 
     /**
-     * @param Claim       $claim
+     * @param Claim              $claim
      * @param DaviesHandlerClaim $daviesClaim
-     * @param boolean     $skipImeiUpdate
+     * @param boolean            $skipImeiUpdate
      * @throws \Exception
      */
     public function updatePolicy(Claim $claim, DaviesHandlerClaim $daviesClaim, $skipImeiUpdate)

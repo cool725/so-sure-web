@@ -191,14 +191,14 @@ abstract class HandlerClaim
         return null;
     }
 
-    public abstract function hasError();
-    public abstract function getClaimType();
-    public abstract function getReplacementPhoneDetails();
-    public abstract function isOpen($includeReOpened = false);
-    public abstract function isClosed($includeReClosed = false);
-    public abstract function getClaimStatus();
-    public abstract function isApproved();
-    public abstract function fromArray($data, $columns);
-    public abstract function isReplacementRepaired();
-    public abstract static function create($data, $columns);
+    abstract public function hasError();
+    abstract public function getClaimType();
+    abstract public function getReplacementPhoneDetails();
+    abstract public function isOpen($includeReOpened = false);
+    abstract public function isClosed($includeReClosed = false);
+    abstract public function getClaimStatus();
+    abstract public function isApproved();
+    abstract public function fromArray($data, $columns);
+    abstract public function isReplacementRepaired();
+    abstract public static function create($data, $columns);
 }
