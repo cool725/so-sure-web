@@ -4154,6 +4154,25 @@ abstract class Policy
         return $text;
     }
 
+    public function getBadDebtAmount()
+    {
+        if (!$this->isCancelledAndPaymentOwed()) {
+            return 0;
+        }
+
+        if (!$this->getPolicyTerms()->isFullReImbursementEnabled()) {
+            return $this->getOutstandingPremium();
+        }
+
+        $amount = 0;
+        foreach ($this->getApprovedClaims(true, true) as $claim) {
+            /** @var Claim $claim */
+            $amount += $claim->getTotalIncurred();
+        }
+
+        return $amount;
+    }
+
     public function isCancelledAndPaymentOwed()
     {
         if (!$this->isFullyPaid() &&
