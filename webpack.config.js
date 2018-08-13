@@ -1,5 +1,5 @@
 var Encore = require('@symfony/webpack-encore');
-
+var webpack = require('webpack');
 Encore
     .enableSingleRuntimeChunk()
 
@@ -35,6 +35,15 @@ Encore
 
     // allow sass/scss files to be processed
     .enableSassLoader()
+
+    .addPlugin(
+        new webpack.ProvidePlugin({
+            $: "jquery",
+            jQuery: "jquery",
+            Bloodhound: "corejs-typeahead/dist/bloodhound.js",
+            doT: "dot/doT.js"
+        })
+    )
 ;
 
 // export the final configuration

@@ -3,8 +3,8 @@
 require('../../sass/pages/purchase.scss');
 
 // Require components
-require('dot/doT.min.js');
-require('bloodhound-js');
+require('dot/doT.js');
+require('corejs-typeahead/dist/bloodhound.js');
 require('corejs-typeahead/dist/typeahead.jquery.js');
 require('jquery-mask-plugin');
 require('fuse.js');
