@@ -1,0 +1,25 @@
+<ul class="list-inline pt-lg-5 mb-5">
+    <li class="list-inline-item">
+        {% if step == 1 %}
+            1
+        {% else %}
+            <i class="far fa-check-circle"></i>
+        {% endif  %}
+    </li>
+    <li class="list-inline-item">
+        {% if step == 2 %}
+            2
+        {% elseif step == 3 %}
+            <i class="far fa-check-circle"></i>
+        {% else %}
+            <i class="far fa-circle"></i>
+        {% endif  %}
+    </li>
+    <li class="list-inline-item">
+        {% if step == 3 %}
+            <i class="far fa-check-circle"></i>
+        {% else %}
+            <i class="far fa-circle"></i>
+        {% endif  %}
+    </li>
+</ul>

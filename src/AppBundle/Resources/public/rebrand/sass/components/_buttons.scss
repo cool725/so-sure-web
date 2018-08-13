@@ -28,6 +28,10 @@
     @include linear-gradient(90deg, darken($green, 5%), $green);
 }
 
+.btn-square {
+    padding: .6rem 1rem;
+    @include border-radius(4px);
+}
 
 // Button block mobile only
 @include media-breakpoint-down(xs) {

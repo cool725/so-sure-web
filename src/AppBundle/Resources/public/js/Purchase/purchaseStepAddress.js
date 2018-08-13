@@ -32,9 +32,13 @@ sosure.purchaseStepAddress = (function() {
     self.addValidation = function() {
         self.form.validate({
             debug: false,
+            // When to validate
             onkeyup: false,
-            focusCleanup: true,
-            validClass: 'has-success',
+            onclick: false,
+            onfocusout: false,
+            // Validation classes
+            validClass: 'is-valid',
+            errorClass: 'is-invalid',
             groups: {
                 birthday: 'purchase_form_birthday_day purchase_form_birthday_month purchase_form_birthday_year',
             },

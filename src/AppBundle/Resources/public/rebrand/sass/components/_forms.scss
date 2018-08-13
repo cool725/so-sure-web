@@ -1,0 +1,68 @@
+// forms.scss
+
+label {
+    font-family: $g-medium;
+    color: $blue-4;
+
+
+    &.error,
+    &.is-invalid {
+        font-family: $g-regular;
+        font-size: $font-size-sm;
+        color: $red;
+    }
+}
+
+.form-control {
+
+    &.is-valid,
+    &.is-valid:focus,
+    &:focus {
+        border-color: $blue-2;
+        background-color: rgba(37, 147, 243, 0.1);
+        box-shadow: rgba(37, 147, 243, 0.1);
+    }
+}
+
+// Twitter Typeahead
+.twitter-typeahead {
+    width: 100%;
+
+    .tt {
+
+        &-input {
+            z-index: 1071;
+        }
+
+        &-hint {}
+
+        &-menu {
+            width: 90%;
+            width: calc(100% - 2rem);
+            left: 1rem !important;
+            max-height: 200px;
+            background-color: $white;
+            @include border-bottom-radius(10px);
+            box-shadow: 0 15px 30px 0 rgba(8,27,154,0.08),
+                        0 5px 15px 0 rgba(8,27,154,0.08);
+
+            overflow-y: scroll;
+            z-index: 1070 !important;
+        }
+
+        &-suggestion {
+            padding: 0.5rem 1rem;
+            border-bottom: 1px solid $blue-1;
+            vertical-align: middle;
+            cursor: pointer;
+
+            &:last-of-type {
+                border-bottom: none;
+            }
+
+            &:hover {
+                background-color: rgba(37, 147, 243, 0.1);
+            }
+        }
+    }
+}
