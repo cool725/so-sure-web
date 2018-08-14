@@ -79,13 +79,9 @@ sosure.purchaseStepPhone = (function() {
             },
 
             errorPlacement: function(error, element) {
-                // if (element.attr('name') === "purchase_form[amount]") {
-                //     $('.payment-options h4').addClass('error');
-                // } else {
-                //     error.insertAfter(element);
-                // }
                 if (element.attr('name') === "purchase_form[amount]") {
                     $('.payment-options__title').addClass('error');
+                } else {
                     error.insertAfter(element);
                 }
             },
@@ -120,6 +116,16 @@ $(function(){
 
         // Modify the help text accordingly
         // $('.payment-options--info').text(help);
+    });
+
+    $('.radio-btn').on('click', function(e) {
+        e.preventDefault();
+
+        $('.radio-btn').removeClass('radio-btn-active');
+        $(this).addClass('radio-btn-active');
+
+        let value = $(this).data('value');
+        $('input[name="purchase_form[amount]"][value="' + value + '"]').prop('checked', true);
     });
 
     if ($.trim($('#Reference').val()).length > 0) {

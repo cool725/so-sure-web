@@ -15,14 +15,5 @@ require('../../../js/Purchase/purchaseStepPhoneNew.js');
 
 $(function() {
 
-    $('.radio-btn').on('click', function(e) {
-        e.preventDefault();
-
-        $('.radio-btn').removeClass('radio-btn-active');
-        $(this).addClass('radio-btn-active');
-
-        let value = $(this).data('value');
-        $('input[name="purchase_form[amount]"][value="' + value + '"]').prop('checked', true);
-    });
 
 });
