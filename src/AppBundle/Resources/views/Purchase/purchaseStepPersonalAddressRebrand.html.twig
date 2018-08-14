@@ -29,15 +29,15 @@
 
 {% block body %}
 
-    <section class="quote">
+    <section class="purchase">
         <div class="d-lg-flex">
 
             {% if phone %}
                 <div class="purchase__details__container">
-                    <div class="purchase__details px-4 pb-5 px-xl-5 pb-xl-0">
-                        <div class="purchase__h5 text-white mb-4 h5">Here’s your quote details, Insure your:</div>
-                        <div class="d-flex align-items-md-center">
-                            <h1 class="quote__h1 text-blue1 mb-2">
+                    <div class="purchase__details px-4 pb-4 px-lg-5 pb-lg-0">
+                        <div class="purchase__h5 text-white mb-4 h5 d-none d-lg-block">Here’s your quote details, Insure your:</div>
+                        <div class="d-flex justify-content-center align-items-center justify-content-lg-start">
+                            <h1 class="purchase__h1 text-blue1b mb-2">
                                 <span class="sub">
                                     {{ phone.make }} {{ phone.model }}
                                     <small>({{ phone.memory }}GB)</small>
@@ -56,16 +56,21 @@
                                     {% if phones | length > 1 %}
                                         {% for phone_mem in phones %}
                                             {% if phone_mem.id != phone.id  %}
-                                                <a href="{{ path('quote_make_model_memory', {'make': phone_mem.makeCanonical, 'model': phone_mem.encodedModelCanonical, 'memory': phone_mem.memory}) }}" class="dropdown-item" href="#">{{ phone_mem.memory }}GB</a>
+                                                <a href="{{ path('quote_make_model_memory', {'make': phone_mem.makeCanonical, 'model': phone_mem.encodedModelCanonical, 'memory': phone_mem.memory}) }}" class="dropdown-item h6" href="#">
+                                                    {{ phone_mem.memory }}GB
+                                                    <small>{{ phone.make }} {{ phone.model }}</small>
+                                                </a>
                                             {% endif %}
                                         {% endfor %}
-                                        <div class="dropdown-divider"></div>
                                     {% endif %}
-                                    <a class="dropdown-item get-a-quote" href="#">I have a different phone</a>
+                                    <a class="dropdown-item h6 get-a-quote" href="#">
+                                        Start a new quote
+                                        <small>Not the phone you're looking for?</small>
+                                    </a>
                                 </div>
                             </div>
                         </div>
-                        <div class="purchase__h1 text-white h1 mb-4">
+                        <div class="purchase__h1 text-white text-center text-lg-left h1">
                             <span class="sub">For only</span>
                             {% if not app.user or app.user.allowedMonthlyPayments %}
                                 &pound;{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }} a month
@@ -73,7 +78,7 @@
                                 &pound;{{ phone.currentPhonePrice.yearlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }} a year
                             {% endif %}
                         </div>
-                        <div class="purchase__footer mt-2">
+                        <div class="purchase__footer d-none d-lg-block mt-5">
                             <div class="purchase__footer__text">
                                 <h4 class="text-blue1">An amazing level of cover:</h4>
                                 <ul class="list-unstyled icn-fa-list">
@@ -263,7 +268,7 @@
 
                 {# TODO: Curve #}
 
-                <div class="purchase__form__container p-4 p-lg-5">
+                <div class="purchase__form__container p-4 py-lg-5">
                     {% include 'AppBundle::Purchase/_purchaseStepsRebrand.html.twig' %}
                     {% include 'AppBundle::Purchase/_currentStepPersonalAddress.html.twig' %}
                 </div>

@@ -28,7 +28,7 @@
 // Add gradient to button rather than modifying the core css
 .btn-gradient-green {
     border: none;
-    @include linear-gradient(90deg, darken($green, 5%), $green);
+    @include linear-gradient(90deg, $green, $green-2);
 }
 
 // Add square buttons for icons to button rather than modifying the core css

@@ -15,6 +15,10 @@ body {
 .quote {
     position: relative;
 
+    h1 {
+        border-bottom: 2px solid $blue-1b;
+    }
+
     &__h1 {
         @include media-breakpoint-down(xs) {
             font-size: 1.5rem;
@@ -28,6 +32,7 @@ body {
     &__h5 {
         @include media-breakpoint-down(xs) {
             font-size: 1rem;
+            opacity: 0.5;
         }
     }
 
@@ -135,7 +140,7 @@ body {
         }
     }
 
-    &__cover {
+    &__cover__container {
         background-color: $white;
 
         @include media-breakpoint-up(lg) {
@@ -144,5 +149,10 @@ body {
             // IE
             -ms-overflow-style: none;
         }
+    }
+
+    &__cover {
+        max-width: 400px;
+        margin: 0 auto;
     }
 }

@@ -167,4 +167,33 @@ $(function(){
         return value == '' || value.match(/^([01][0-9]|2[0-3]):[0-5][0-9]$/);
     }, 'Please Enter a valid time: hh:mm');
 
+    jQuery.validator.addMethod('imei', function(value, element) {
+        var imei = value;
+            imei = imei.replace('/', '');
+            imei = imei.replace('-', '');
+            imei = imei.replace(' ', '');
+            imei = imei.substring(0, 15);
+
+        // accept only digits, dashes or spaces
+        if (/[^0-9-\s]+/.test(imei)) return false;
+
+        // The Luhn Algorithm. It's so pretty.
+        var nCheck = 0, bEven = false;
+        imei.replace(/\D/g, "");
+
+        for (var n = imei.length - 1; n >= 0; n--) {
+            var cDigit = imei.charAt(n),
+                nDigit = parseInt(cDigit, 10);
+
+            if (bEven) {
+                if ((nDigit *= 2) > 9) nDigit -= 9;
+            }
+
+            nCheck += nDigit;
+            bEven = !bEven;
+        }
+
+        return (nCheck % 10) === 0;
+
+    }, 'Please enter a valid IMEI number');
 });

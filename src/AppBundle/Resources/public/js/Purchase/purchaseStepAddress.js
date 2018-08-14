@@ -33,13 +33,11 @@ sosure.purchaseStepAddress = (function() {
         self.form.validate({
             debug: false,
             // When to validate
-            onkeyup: false,
-            onclick: false,
-            focusCleanup: true,
-            // onfocusout: false,
-            // Validation classes
             validClass: 'is-valid-ss',
             errorClass: 'is-invalid',
+            onfocusout: false,
+            onkeyup: false,
+            onclick: false,
             groups: {
                 birthday: 'purchase_form_birthday_day purchase_form_birthday_month purchase_form_birthday_year',
             },

@@ -26,7 +26,7 @@
 
 
 // Hide on XXS mobile
-@media (max-width: 321px) {
+@include media-breakpoint-down(xs) {
 
     .d-none-xxs {
         display: none !important;

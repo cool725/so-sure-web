@@ -13,44 +13,38 @@ sosure.purchaseStepPhone = (function() {
         }
     };
 
-    self.valid_credit_card = function(value) {
-        // accept only digits, dashes or spaces
-        if (/[^0-9-\s]+/.test(value)) return false;
+    // self.valid_credit_card = function(value) {
+    //     // accept only digits, dashes or spaces
+    //     if (/[^0-9-\s]+/.test(value)) return false;
 
-        // The Luhn Algorithm. It's so pretty.
-        var nCheck = 0, bEven = false;
-        value = value.replace(/\D/g, "");
+    //     // The Luhn Algorithm. It's so pretty.
+    //     var nCheck = 0, bEven = false;
+    //     value = value.replace(/\D/g, "");
 
-        for (var n = value.length - 1; n >= 0; n--) {
-            var cDigit = value.charAt(n),
-                nDigit = parseInt(cDigit, 10);
+    //     for (var n = value.length - 1; n >= 0; n--) {
+    //         var cDigit = value.charAt(n),
+    //             nDigit = parseInt(cDigit, 10);
 
-            if (bEven) {
-                if ((nDigit *= 2) > 9) nDigit -= 9;
-            }
+    //         if (bEven) {
+    //             if ((nDigit *= 2) > 9) nDigit -= 9;
+    //         }
 
-            nCheck += nDigit;
-            bEven = !bEven;
-        }
+    //         nCheck += nDigit;
+    //         bEven = !bEven;
+    //     }
 
-        return (nCheck % 10) === 0;
-    };
+    //     return (nCheck % 10) === 0;
+    // };
 
     self.addValidation = function() {
-        $.validator.addMethod(
-            "imei",
-            function(value, element) {
-                var imei = value;
-                imei = imei.replace('/', '');
-                imei = imei.replace('-', '');
-                imei = imei.replace(' ', '');
-                imei = imei.substring(0, 15);
-                return sosure.purchaseStepPhone.valid_credit_card(imei);
-            }
-        );
         self.form.validate({
-            debug: false,
-            validClass: 'has-success',
+            debug: true,
+            // When to validate
+            validClass: 'is-valid-ss',
+            errorClass: 'is-invalid',
+            onfocusout: false,
+            onkeyup: false,
+            onclick: false,
             rules: {
                 "purchase_form[imei]" : {
                     required: true,
@@ -102,21 +96,21 @@ $(function(){
 $(function(){
 
     // Payment buttons action radio buttons
-    $('.payment-options--btn').click(function() {
-        // Toggle Class on Btns
-        $('.payment-options--btn').removeClass('payment-options--btn-selected animated pulse');
-        $(this).addClass('payment-options--btn-selected animated pulse');
+    // $('.payment-options--btn').click(function() {
+    //     // Toggle Class on Btns
+    //     $('.payment-options--btn').removeClass('payment-options--btn-selected animated pulse');
+    //     $(this).addClass('payment-options--btn-selected animated pulse');
 
-        // Grab data from btn value to input
-        var value = $(this).data('value');
-        // var help  = $(this).data('help-block');
+    //     // Grab data from btn value to input
+    //     var value = $(this).data('value');
+    //     // var help  = $(this).data('help-block');
 
-        // Select the radio
-        $('input[name="purchase_form[amount]"][value="' + value + '"]').prop('checked', true);
+    //     // Select the radio
+    //     $('input[name="purchase_form[amount]"][value="' + value + '"]').prop('checked', true);
 
-        // Modify the help text accordingly
-        // $('.payment-options--info').text(help);
-    });
+    //     // Modify the help text accordingly
+    //     // $('.payment-options--info').text(help);
+    // });
 
     $('.radio-btn').on('click', function(e) {
         e.preventDefault();

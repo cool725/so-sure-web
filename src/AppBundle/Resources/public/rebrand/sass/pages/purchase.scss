@@ -15,6 +15,10 @@ body {
 .purchase {
     position: relative;
 
+    h1 {
+        border-bottom: 2px solid $blue-1b;
+    }
+
     &__h1 {
         @include media-breakpoint-down(xs) {
             font-size: 1.5rem;
@@ -28,6 +32,7 @@ body {
     &__h5 {
         @include media-breakpoint-down(xs) {
             font-size: 1rem;
+            opacity: 0.5;
         }
     }
 
@@ -41,9 +46,11 @@ body {
 
     &__details {
         padding-top: 6rem;
+        // position: fixed;
 
         @include media-breakpoint-up(lg) {
             padding-top: 12rem;
+            // position: static;
         }
     }
 

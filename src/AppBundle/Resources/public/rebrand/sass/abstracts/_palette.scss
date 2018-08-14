@@ -14,11 +14,13 @@ $bb-1:     #ECF5FE; // bb = background blue
 $bb-2:     #E0EFFD;
 $blue-1:   #99E3FF;
 $blue-1a:  #00BAFF;
+$blue-1b:  #00D9FF;
 $blue-2:   #2593F3;
 $blue-3:   #0051E8;
 $blue-4:   #081B9A;
 $purple:   #443b5f;
-$green:    #3FC67D;
+$green:    #00B500;
+$green-2:  #2FC476;
 $facebook: #3B5998;
 $google:   #DF4A32;
 $starling: #593FA7;
@@ -27,7 +29,7 @@ $starling: #593FA7;
 // D3E8FB
 // A8D1F7
 // 99E3FF * $blue-1
-// 00D9FF
+// 00D9FF * $blue-1b
 // 00BAFF * $blue-1a
 // 2593F3 * $blue-2
 // 0051E8 * $blue-3
@@ -38,6 +40,8 @@ $theme-colors: (
     "primary":  $blue-2,
     "success":  $green,
     "blue1":    $blue-1,
+    "blue1a":   $blue-1a,
+    "blue1b":   $blue-1b,
     "blue2":    $blue-2,
     "blue3":    $blue-3,
     "blue4":    $blue-4,

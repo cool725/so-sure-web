@@ -22,6 +22,11 @@ $(function() {
             logo.toggleClass('navbar-brand__logo-white-light');
         }
 
+        // Fix for resizing select if phone in session
+        if ($('body').hasClass('quote')) {
+            $('.phone-search-dropdown__make, .phone-search-dropdown__model, .phone-search-dropdown__memory').resizeselect();
+        }
+
         // Prevent scrolling whilst open
         $('body').toggleClass('body--overflow');
 

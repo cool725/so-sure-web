@@ -15,9 +15,9 @@
         // Style
         background-color: transparent;
         border: 0;
-        border-bottom: 3px solid $blue-1;
+        border-bottom: 3px solid $blue-1b;
         @include border-radius(0);
-        color: $blue-1;
+        color: $blue-1b;
         padding: 0 0 1px 0;
 
         &:disabled {

@@ -8,7 +8,7 @@ Encore
     .setOutputPath('web/css-js/')
 
     // the public path used by the web server to access the previous directory
-    .setPublicPath('/web')
+    .setPublicPath('/css-js')
 
     // this creates a 'vendor.js' file with jquery and the bootstrap JS module plus popper
     .createSharedEntry('vendor', './web/components/vendor.js')
@@ -33,7 +33,7 @@ Encore
 
     // create hashed filenames (e.g. app.abc123.css)
     // TODO: Get working in config!
-    // .enableVersioning()
+    .enableVersioning()
 
     // allow sass/scss files to be processed
     .enableSassLoader()

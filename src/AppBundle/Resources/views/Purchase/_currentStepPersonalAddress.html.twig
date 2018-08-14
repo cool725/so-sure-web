@@ -1,8 +1,8 @@
 {{ form_start(purchase_form, {'attr': {
     'data-toggle': 'validator',
-    'class': 'validate-form',
+    'class': 'validate-form form-400',
     'data-client-validation': form_client_validation,
-    'autocomplete': 'off',
+    'autocomplete': 'off'
 }}) }}
 
     <div class="form-step">
@@ -60,7 +60,7 @@
             <div class="form-group text-right">
                 <a href="#"
                    id="step--validate"
-                   class="btn btn-success"
+                   class="btn btn-success btn-gradient-green btn-block-xs"
                    data-csrf="{{ lead_csrf }}"
                    data-lead="{{ path('lead', {'source': 'purchase-flow'}) }}">
                    Continue <i class="fas fa-arrow-right ml-3"></i>
@@ -96,7 +96,6 @@
                     {% set display_error = true %}
                 {% endif %}
                 <div id="select_address_errors" class="help-block with-errors" style="{% if not display_error %}display: none;{% endif %}">Select an address from the dropdown after searching</div>
-                {# <a id="address-manual" href="#"><small>Enter address manually</small></a> #}
                 <small class="form-text"><a id="address-manual" href="#">Enter address manually</small></a>
             </div>
             <div id="display-address" style="margin-bottom: 20px" data-hj-suppress="">
@@ -109,7 +108,7 @@
 
             <div class="form-group">
                 {# TODO: Add icon #}
-                {{ form_widget(purchase_form.next, {'label': 'Continue', 'attr': {'class': 'btn btn-success'}}) }}
+                {{ form_widget(purchase_form.next, {'label': 'Continue', 'attr': {'class': 'btn btn-success btn-gradient-green btn-block-xs'}}) }}
             </div>
         </div>
 
@@ -152,8 +151,8 @@
                     <div class="with-errors">{{ form_errors(purchase_form.postcode) }}</div>
                 {% endif %}
             </div>
-            <div class="form-group">
-                {{ form_widget(purchase_form.manual_next, {'label': 'Continue', 'attr': {'class': 'btn btn-success'}}) }}
+            <div class="form-group text-right">
+                {{ form_widget(purchase_form.manual_next, {'label': 'Continue', 'attr': {'class': 'btn btn-success btn-gradient-green btn-block-xs'}}) }}
             </div>
         </div>
     </div>
