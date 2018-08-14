@@ -219,7 +219,9 @@ class ValidatePolicyCommand extends BaseCommand
                     $lines[] = sprintf(
                         'Policy %s is pending cancellation on %s',
                         $policy->getPolicyNumber(),
-                        $policy->getPendingCancellation()->format(\DateTime::ATOM)
+                        $policy->getPendingCancellation() ?
+                            $policy->getPendingCancellation()->format(\DateTime::ATOM) :
+                            'unknown'
                     );
                     if ($policy->hasOpenClaim()) {
                         $lines[] = sprintf(
