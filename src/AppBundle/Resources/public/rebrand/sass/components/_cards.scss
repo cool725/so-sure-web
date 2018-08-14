@@ -30,12 +30,13 @@
     cursor: pointer;
 
     &__body {
-        padding: 1.56rem;
+        padding: 1.2rem 1.56rem 1.56rem 1.56rem;
     }
 
     &__title {
         position: relative;
         padding-right: 2.4rem;
+        margin-top: .25rem;
 
         .fas {
             position: absolute;

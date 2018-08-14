@@ -23,3 +23,12 @@
         }
     }
 }
+
+
+// Hide on XXS mobile
+@media (max-width: 321px) {
+
+    .d-none-xxs {
+        display: none !important;
+    }
+}

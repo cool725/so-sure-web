@@ -31,6 +31,14 @@
         &:focus {
             outline: 0;
         }
+
+        @media (max-width: 321px) {
+            &__select {
+                .h1 {
+                    font-size: 1.8rem;
+                }
+            }
+        }
     }
 
     // Allows for a line break in flexed rows
