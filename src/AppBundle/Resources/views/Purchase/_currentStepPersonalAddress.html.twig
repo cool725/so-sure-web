@@ -106,7 +106,7 @@
                 {% if purchase_form.vars.data.postcode|length > 0 %}{{ purchase_form.vars.data.postcode }}{% endif %}
             </div>
 
-            <div class="form-group">
+            <div class="form-group text-right">
                 {# TODO: Add icon #}
                 {{ form_widget(purchase_form.next, {'label': 'Continue', 'attr': {'class': 'btn btn-success btn-gradient-green btn-block-xs'}}) }}
             </div>

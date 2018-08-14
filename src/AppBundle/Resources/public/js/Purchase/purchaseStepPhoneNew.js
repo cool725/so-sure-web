@@ -112,6 +112,8 @@ $(function(){
     //     // $('.payment-options--info').text(help);
     // });
 
+
+    // TODO: Move to component
     $('.radio-btn').on('click', function(e) {
         e.preventDefault();
 
@@ -124,16 +126,17 @@ $(function(){
 
     if ($.trim($('#Reference').val()).length > 0) {
         // Show loading overlay
+        // TODO: New loader
         $('.so-sure-loading').show();
         $('#webpay-form').submit();
     }
 
-    $('#imei-screenshot').click(function(e) {
-        e.preventDefault();
-        sosure.track.byName('Clicked Upload Imei');
-        Intercom('trackEvent', 'clicked upload imei');
-        Intercom('showNewMessage', $(this).data('intercom-msg'));
-    });
+    // $('#imei-screenshot').click(function(e) {
+    //     e.preventDefault();
+    //     sosure.track.byName('Clicked Upload Imei');
+    //     Intercom('trackEvent', 'clicked upload imei');
+    //     Intercom('showNewMessage', $(this).data('intercom-msg'));
+    // });
 
     // Trim as you type
     $('.imei').on('keyup paste', function() {
