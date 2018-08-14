@@ -991,7 +991,7 @@ class PolicyService
                 // avoid warning every hour; 12 hours is sufficent
                 $key = sprintf(self::KEY_PREVENT_CANCELLATION, $policy->getId());
                 if (!$this->redis->exists($key)) {
-                    $this->redis->setex($key, CACHE_PREVENT_CANCELLATION, 1);
+                    $this->redis->setex($key, self::CACHE_PREVENT_CANCELLATION, 1);
                     throw new \Exception(sprintf(
                         'Unable to cancel unpaid policy %s/%s as less than 15 days in unpaid state.',
                         $policy->getPolicyNumber(),
