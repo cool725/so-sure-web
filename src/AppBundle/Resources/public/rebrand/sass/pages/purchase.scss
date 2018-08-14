@@ -134,6 +134,7 @@ body {
 
     &__form__container {
         background-color: $white;
+        position: relative;
 
         @include media-breakpoint-up(lg) {
             width: 40vw; height: 100vh;

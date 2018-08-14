@@ -44,6 +44,8 @@ framework:
     fragments:       ~
     http_method_override: true
     validation: { enabled: true, enable_annotations: true }
+    assets:
+        json_manifest_path: '%kernel.root_dir%/../web/css-js/manifest.json'
 
 # Twig Configuration
 twig:
@@ -142,8 +144,8 @@ monolog:
 
 assetic:
     bundles:        [ AppBundle, PicsureMLBundle, FOSUserBundle, TwigBundle, SchebTwoFactorBundle, FOSOAuthServerBundle ]
-    debug:          false
-    use_controller: false
+    debug:          '%kernel.debug%'
+    use_controller: '%kernel.debug%'
     filters:
         cssrewrite: ~
         sass:

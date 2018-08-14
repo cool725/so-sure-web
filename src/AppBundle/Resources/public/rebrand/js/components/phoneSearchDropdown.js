@@ -38,7 +38,6 @@ $(function() {
                     }
                 });
             });
-
         }
 
         let updateMemory = () => {
@@ -109,7 +108,6 @@ $(function() {
         });
 
         updateModels();
-        // make.resizeselect();
 
     }
 });

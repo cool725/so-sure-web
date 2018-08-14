@@ -278,8 +278,8 @@ class PurchaseController extends BaseController
             'postcode' => 'comma',
         );
 
-        return $this->render('AppBundle:Purchase:purchaseStepPersonalAddress.html.twig', $data);
-        // return $this->render('AppBundle:Purchase:purchaseStepPersonalAddressRebrand.html.twig', $data);
+        // return $this->render('AppBundle:Purchase:purchaseStepPersonalAddress.html.twig', $data);
+        return $this->render('AppBundle:Purchase:purchaseStepPersonalAddressRebrand.html.twig', $data);
     }
 
     /**

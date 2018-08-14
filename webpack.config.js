@@ -30,6 +30,7 @@ Encore
 
     // show OS notifications when builds finish/fail
     .enableBuildNotifications()
+
     // create hashed filenames (e.g. app.abc123.css)
     // TODO: Get working in config!
     // .enableVersioning()

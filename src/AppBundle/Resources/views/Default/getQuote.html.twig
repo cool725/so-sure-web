@@ -10,11 +10,11 @@
                 <h4 class="text-white mb-5 opacity-05">Let's get your quote - it'll only take a few seconds</h4>
                 {# Phone Search #}
                 {# TODO: Rework if phone in session #}
-{#                 {% if phone is defined and phone %}
+                {% if phone is defined and phone %}
                     {{ render(controller('AppBundle:Search:phoneSearchDropdown', { 'type': 'homepage-jc', 'id': phone.id }|merge(app.request.query.all))) }}
-                {% else %} #}
+                {% else %}
                     {{ render(controller('AppBundle:Search:phoneSearchDropdown', { 'type': 'homepage-jc' }|merge(app.request.query.all))) }}
-                {# {% endif %} #}
+                {% endif %}
                 {# End Phone Search #}
             </div>
         </div>
