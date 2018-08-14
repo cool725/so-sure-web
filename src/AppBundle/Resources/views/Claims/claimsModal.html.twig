@@ -39,6 +39,10 @@
                     <td>Status</td>
                     <td id='claims-detail-status'></td>
                 </tr>
+                <tr {% if app.user.handlingTeam == 'davies' %}class="hidden"{% endif %}>
+                    <td>Claim Handling Team</td>
+                    <td id='claims-detail-handling-team'></td>
+                </tr>
                 <tr>
                     <td>Number to reach</td>
                     <td id='claims-detail-number-to-reach'></td>

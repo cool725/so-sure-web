@@ -22,5 +22,6 @@ if [ "$RUN_FILTER" == "" ]; then
   ./vendor/phing/phing/bin/phing -f build/test.xml test:unit
 else
   ./build/phpunit.sh --filter "$RUN_FILTER" --bootstrap vendor/autoload.php src/AppBundle/
+  ./build/phpunit.sh --filter "$RUN_FILTER" --bootstrap vendor/autoload.php tests/
 fi
 ./vendor/phing/phing/bin/phing force:cs

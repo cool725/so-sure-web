@@ -281,6 +281,7 @@ class BICommand extends BaseCommand
             '"Yearly Premium"',
             '"Premium Outstanding"',
             '"Policy Purchase Time"',
+            '"Past Due Amount (Bad Debt Only)"',
         ]);
         foreach ($policies as $policy) {
             /** @var Policy $policy */
@@ -332,6 +333,7 @@ class BICommand extends BaseCommand
                 sprintf('"%0.2f"', $policy->getPremium()->getYearlyPremiumPrice()),
                 sprintf('"%0.2f"', $policy->getUnderwritingOutstandingPremium()),
                 sprintf('"%s"', $policy->getStart()->format('H:i')),
+                sprintf('"%0.2f"', $policy->getBadDebtAmount()),
             ]);
         }
         if (!$skipS3) {

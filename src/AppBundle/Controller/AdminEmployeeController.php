@@ -869,6 +869,22 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                         // To appear for the correct account month, should be when we assign
                         // the chargeback to the policy
                         $chargeback->setDate(new \DateTime());
+
+                        if ($this->areEqualToTwoDp(
+                            $chargeback->getAmount(),
+                            $policy->getPremiumInstallmentPrice(true)
+                        )) {
+                            $chargeback->setRefundTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
+                        } else {
+                            $this->addFlash(
+                                'error',
+                                sprintf(
+                                    'Unable to determine commission to refund for chargeback %s',
+                                    $chargeback->getReference()
+                                )
+                            );
+                        }
+
                         $policy->addPayment($chargeback);
                         $dm->flush();
                         $this->addFlash(

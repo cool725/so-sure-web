@@ -148,6 +148,11 @@ class ClaimsService
         if ($submit) {
             $claim->setSubmissionDate(new \DateTime());
             $claim->setStatus(Claim::STATUS_SUBMITTED);
+            if ($this->featureService->isEnabled(Feature::FEATURE_CLAIMS_DEFAULT_DIRECT_GROUP)) {
+                $claim->setHandlingTeam(Claim::TEAM_DIRECT_GROUP);
+            } else {
+                $claim->setHandlingTeam(Claim::TEAM_DAVIES);
+            }
             $this->notifyClaimSubmission($claim);
         }
 
@@ -200,6 +205,11 @@ class ClaimsService
         if ($submit) {
             $claim->setSubmissionDate(new \DateTime());
             $claim->setStatus(Claim::STATUS_SUBMITTED);
+            if ($this->featureService->isEnabled(Feature::FEATURE_CLAIMS_DEFAULT_DIRECT_GROUP)) {
+                $claim->setHandlingTeam(Claim::TEAM_DIRECT_GROUP);
+            } else {
+                $claim->setHandlingTeam(Claim::TEAM_DAVIES);
+            }
             $this->notifyClaimSubmission($claim);
         }
 
@@ -257,7 +267,7 @@ class ClaimsService
         $this->notifyClaimAdditionalDocuments($claim, $attachments);
     }
 
-    public function addClaim(Policy $policy, Claim $claim)
+    public function addClaim(Policy $policy, Claim $claim, $status = null)
     {
         $repo = $this->dm->getRepository(Claim::class);
 
@@ -266,6 +276,9 @@ class ClaimsService
             return false;
         }
 
+        if ($status) {
+            $claim->setStatus($status);
+        }
         $policy->addClaim($claim);
         $this->dm->flush();
 

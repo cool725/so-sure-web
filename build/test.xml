@@ -3,6 +3,7 @@
   <!-- Properties -->
     <property name="dir.app" value="${project.basedir}/../app" />
     <property name="dir.src" value="${project.basedir}/../src" />
+    <property name="dir.tests" value="${project.basedir}/../tests" />
 
     <autoloader autoloaderpath="${dir.app}/autoload.php"/>
 
@@ -24,6 +25,10 @@
               <fileset dir="${dir.src}">
                  <include name="**/Tests/**/*Test*.php"/>
               </fileset>
+              <fileset dir="${dir.tests}">
+                  <include name="tests/**/*Test.php"/>
+                  <include name="tests/*Test.php"/>
+              </fileset>
           </batchtest>
         </phpunit>
     </target>
@@ -35,6 +40,10 @@
           <batchtest>
               <fileset dir="${dir.src}">
                  <include name="**/Tests/**/*Test*.php"/>
+              </fileset>
+              <fileset dir="${dir.tests}">
+                  <include name="tests/**/*Test.php"/>
+                  <include name="tests/*Test.php"/>
               </fileset>
           </batchtest>
        </phpunit>
@@ -54,6 +63,10 @@
           <batchtest>
               <fileset dir="${dir.src}">
                  <include name="**/Tests/**/*Test*.php"/>
+              </fileset>
+              <fileset dir="${dir.tests}">
+                  <include name="tests/**/*Test.php"/>
+                  <include name="tests/*Test.php"/>
               </fileset>
           </batchtest>
        </phpunit>
@@ -78,6 +91,10 @@
               <fileset dir="${dir.src}">
                  <include name="**/Tests/**/*Test*.php"/>
               </fileset>
+              <fileset dir="${dir.tests}">
+                  <include name="tests/**/*Test.php"/>
+                  <include name="tests/*Test.php"/>
+              </fileset>
           </batchtest>
        </phpunit>
         <coverage-report outfile="/tmp/coverage-report/coverage.xml">
@@ -94,6 +111,10 @@
               <fileset dir="${dir.src}">
                  <include name="**/Tests/**/*Test*.php"/>
               </fileset>
+              <fileset dir="${dir.tests}">
+                  <include name="tests/**/*Test.php"/>
+                  <include name="tests/*Test.php"/>
+              </fileset>
           </batchtest>
        </phpunit>
     </target>
@@ -105,6 +126,10 @@
           <batchtest>
               <fileset dir="${dir.src}">
                  <include name="**/Tests/**/*Test*.php"/>
+              </fileset>
+              <fileset dir="${dir.tests}">
+                  <include name="tests/**/*Test.php"/>
+                  <include name="tests/*Test.php"/>
               </fileset>
           </batchtest>
        </phpunit>
