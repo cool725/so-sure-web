@@ -110,3 +110,7 @@
     {% endif %}
 
 {{ form_end(purchase_form) }}
+
+<form action="{{ webpay_action }}" method="post" id="webpay-form">
+    <input id="Reference" name="Reference" type="hidden" value="{{ webpay_reference }}">
+</form>
