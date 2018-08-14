@@ -59,6 +59,11 @@ class PhonePolicy extends Policy
      */
     const PICSURE_STATUS_CLAIM_APPROVED = 'claim-approved';
 
+    /**
+     * if policy has a fnol, submitted or in-review claim
+     */
+    const PICSURE_STATUS_CLAIM_PREVENTED = 'claim-prevented';
+
     const MAKEMODEL_VALID_SERIAL = 'valid-serial';
     const MAKEMODEL_VALID_IMEI = 'valid-imei';
     const MAKEMODEL_NO_MODELS = 'no-models';
@@ -692,7 +697,7 @@ class PhonePolicy extends Policy
 
     public function getPicSureStatusForApi()
     {
-        $status = $this->getPicSureStatus();
+        $status = $this->getPicSureStatusWithClaims();
         if (in_array($status, [self::PICSURE_STATUS_PREAPPROVED, self::PICSURE_STATUS_CLAIM_APPROVED])) {
             return self::PICSURE_STATUS_APPROVED;
         }
@@ -700,6 +705,29 @@ class PhonePolicy extends Policy
         return $status;
     }
     
+    public function getPicSureStatusWithClaims()
+    {
+        $status = $this->getPicSureStatus();
+
+        if ($status === null || $status == self::PICSURE_STATUS_INVALID) {
+            foreach ($this->getClaims() as $claim) {
+                if (in_array(
+                    $claim->getStatus(),
+                    array(
+                        Claim::STATUS_FNOL,
+                        Claim::STATUS_SUBMITTED,
+                        Claim::STATUS_INREVIEW
+                    )
+                )) {
+                    $status = self::PICSURE_STATUS_CLAIM_PREVENTED;
+                    break;
+                }
+            }
+        }
+
+        return $status;
+    }
+
     public function setPicSureStatus($picSureStatus, User $user = null)
     {
         $this->picSureStatus = $picSureStatus;
