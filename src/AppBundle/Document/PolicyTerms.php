@@ -80,4 +80,22 @@ class PolicyTerms extends PolicyDocument
             self::VERSION_3,
         ]);
     }
+
+    /**
+     * Can we attempt to collect the cost of the phone?
+     *
+     * @return bool
+     */
+    public function isFullReImbursementEnabled()
+    {
+        // assuming that full re-imbursement will always be enabled going forward
+        return !in_array($this->getVersion(), [
+            self::VERSION_0,
+            self::VERSION_1,
+            self::VERSION_2,
+            self::VERSION_3,
+            self::VERSION_4,
+            self::VERSION_5,
+        ]);
+    }
 }

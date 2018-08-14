@@ -910,6 +910,12 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $claim = new Claim();
         $claim->setNumber(rand(1, 999999));
 
+        if (rand(0, 1) == 0) {
+            $claim->setHandlingTeam(Claim::TEAM_DIRECT_GROUP);
+        } else {
+            $claim->setHandlingTeam(Claim::TEAM_DAVIES);
+        }
+
         $date = new \DateTime();
         $date->sub(new \DateInterval(sprintf('P%dD', rand(5,15))));
         $claim->setLossDate(clone $date);

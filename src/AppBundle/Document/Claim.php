@@ -1660,6 +1660,7 @@ class Claim
             'policyId' => $this->getPolicy()->getId(),
             'policyNumber' => $this->getPolicy()->getPolicyNumber(),
             'handler' => $this->getHandler() ? $this->getHandler()->getName() : 'unknown',
+            'handlingTeam' => $this->getHandlingTeam(),
             'phoneToReach' => $this->getPhoneToReach(),
             'timeToReach' => $this->getTimeToReach(),
             'typeDetails' => $this->getTypeDetails(),

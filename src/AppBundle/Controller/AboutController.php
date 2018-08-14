@@ -2,6 +2,7 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Service\IntercomService;
 use AppBundle\Service\MailerService;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
@@ -118,6 +119,7 @@ class AboutController extends BaseController
                         $contactForm->getData()['message']
                     );
                     // @codingStandardsIgnoreEnd
+                    /** @var IntercomService $intercom */
                     $intercom = $this->get('app.intercom');
                     $intercom->queueMessage($contactForm->getData()['email'], $body, Lead::SOURCE_CONTACT_US);
 
@@ -130,7 +132,7 @@ class AboutController extends BaseController
                     $mailer = $this->get('app.mailer');
                     $mailer->send(
                         $subject,
-                        'contact-us@so-sure.com',
+                        'bcc@so-sure.com',
                         $body
                     );
 

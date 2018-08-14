@@ -4154,6 +4154,25 @@ abstract class Policy
         return $text;
     }
 
+    public function getBadDebtAmount()
+    {
+        if (!$this->isCancelledAndPaymentOwed()) {
+            return 0;
+        }
+
+        if (!$this->getPolicyTerms()->isFullReImbursementEnabled()) {
+            return $this->getOutstandingPremium();
+        }
+
+        $amount = 0;
+        foreach ($this->getApprovedClaims(true, true) as $claim) {
+            /** @var Claim $claim */
+            $amount += $claim->getTotalIncurred();
+        }
+
+        return $amount;
+    }
+
     public function isCancelledAndPaymentOwed()
     {
         if (!$this->isFullyPaid() &&
@@ -4257,6 +4276,11 @@ abstract class Policy
                 'User has requested (%s) that this policy be cancelled.',
                 $this->getRequestedCancellation()->format(\DateTime::ATOM)
             );
+        }
+
+        if ($this->getLatestFnolClaim()) {
+            $warnings[] =
+                'Policy has a FNOL claim, but not yet submitted and so required documents may not yet be uploaded.';
         }
 
         if ($this instanceof PhonePolicy) {
