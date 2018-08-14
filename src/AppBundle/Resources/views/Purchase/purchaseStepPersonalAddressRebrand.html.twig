@@ -56,7 +56,7 @@
                                     {% if phones | length > 1 %}
                                         {% for phone_mem in phones %}
                                             {% if phone_mem.id != phone.id  %}
-                                                <a href="{{ path('quote_make_model_memory', {'make': phone_mem.makeCanonical, 'model': phone_mem.encodedModelCanonical, 'memory': phone_mem.memory}) }}" class="dropdown-item h6" href="#">
+                                                <a href="{{ path('select_phone_make_search_type_id', {'type': 'purchase-change', 'id': phone_mem.id}) }}" class="dropdown-item h6" href="#">
                                                     {{ phone_mem.memory }}GB
                                                     <small>{{ phone.make }} {{ phone.model }}</small>
                                                 </a>
