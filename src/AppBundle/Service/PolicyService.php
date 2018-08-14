@@ -69,6 +69,8 @@ class PolicyService
 
     const S3_BUCKET = 'policy.so-sure.com';
     const KEY_POLICY_QUEUE = 'policy:queue';
+    const KEY_PREVENT_CANCELLATION = 'policy:prevent-cancellation:%s';
+    const CACHE_PREVENT_CANCELLATION = 43200; // 12 hours
 
     /** @var LoggerInterface */
     protected $logger;
@@ -986,11 +988,19 @@ class PolicyService
             }
             $diff = $now->diff($loggedAt);
             if ($diff->days < 15) {
-                throw new \Exception(sprintf(
-                    'Unable to cancel unpaid policy %s/%s as less than 15 days in unpaid state.',
-                    $policy->getPolicyNumber(),
-                    $policy->getId()
-                ));
+                // avoid warning every hour; 12 hours is sufficent
+                $key = sprintf(self::KEY_PREVENT_CANCELLATION, $policy->getId());
+                if (!$this->redis->exists($key)) {
+                    $this->redis->setex($key, self::CACHE_PREVENT_CANCELLATION, 1);
+                    throw new \Exception(sprintf(
+                        'Unable to cancel unpaid policy %s/%s as less than 15 days in unpaid state.',
+                        $policy->getPolicyNumber(),
+                        $policy->getId()
+                    ));
+                } else {
+                    // don't throw exception, but do not process cancellation
+                    return;
+                }
             }
         }
 

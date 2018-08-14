@@ -1158,7 +1158,7 @@ services:
 
     app.validator.postcode:
         class: AppBundle\Validator\Constraints\PostcodeValidator
-        arguments: ["@census.search"]
+        arguments: ["@census.search", "@app.address", "@doctrine_mongodb.odm.census_document_manager"]
         tags:
             - { name: validator.constraint_validator }
 

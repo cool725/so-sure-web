@@ -79,7 +79,10 @@ class DaviesService extends S3EmailService
         $repoClaims = $this->dm->getRepository(Claim::class);
         $startOfToday = new \DateTime();
         $startOfToday = $this->startOfDay($startOfToday);
-        $findAllClaims = $repoClaims->findBy(['recordedDate' => ['$lt' => $startOfToday]]);
+        $findAllClaims = $repoClaims->findBy([
+            'recordedDate' => ['$lt' => $startOfToday],
+            'handlingTeam' => Claim::TEAM_DAVIES
+        ]);
         foreach ($findAllClaims as $claim) {
             $dbClaims[] = $claim->getNumber();
         }
