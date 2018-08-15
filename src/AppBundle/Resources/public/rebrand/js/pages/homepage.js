@@ -1,8 +1,6 @@
 // homepage.js
 
 require('../../sass/pages/homepage.scss');
-require('../components/reviews.js');
-
 // Require components
 // require('../components/phoneSearchDropdown.js');
 
