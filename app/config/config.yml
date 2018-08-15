@@ -993,6 +993,7 @@ nelmio_security:
                 - https://cdn-images.mailchimp.com
                 - https://*.vimeocdn.com
                 - https://use.fontawesome.com
+                - https://pro.fontawesome.com
             img-src:
                 - 'self'
                 - https://wearesosure.com

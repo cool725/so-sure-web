@@ -22,13 +22,21 @@
 // Add gradient to button rather than modifying the core css
 .btn-gradient {
     border: none;
-    @include linear-gradient(90deg, $blue-3, $blue-1);
+    @include linear-gradient(90deg, $blue-3, $blue-1a);
+
+    &:hover {
+        @include linear-gradient(90deg, $blue-1a, $blue-3);
+    }
 }
 
 // Add gradient to button rather than modifying the core css
 .btn-gradient-green {
     border: none;
     @include linear-gradient(90deg, $green, $green-2);
+
+    &:hover {
+        @include linear-gradient(90deg, $green-2, $green);
+    }
 }
 
 // Add square buttons for icons to button rather than modifying the core css

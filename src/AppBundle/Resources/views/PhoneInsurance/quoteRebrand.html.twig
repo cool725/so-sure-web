@@ -77,7 +77,8 @@
                            role="button"
                            aria-expanded="false"
                            aria-controls="quote_info"><span>See full policy</span>
-                           <i class="fas fa-caret-down"></i></a>
+                           <i class="fas fa-arrow-down"></i>
+                        </a>
                     </div>
                 </div>
                 <div id="quote_info" class="quote__info__container collapse">
@@ -297,7 +298,7 @@
                     <ul class="list-unstyled icn-list">
                         <li class="mb-4">
                             <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_happy-icn-min.svg" alt="so-sure - Accidental damage" width="30px" class="mr-2">
-                            <strong class="text-blue4">24-72 hour replacement <span class="ml-2 text-blue2"><i class="far fa-question-circle"></i></span></strong>
+                            <strong class="text-blue4">24-72 hour replacement
                             {# TODO: info popup #}
                         </li>
                         <li class="mb-4">
@@ -306,7 +307,17 @@
                         </li>
                         <li class="my-4">
                             <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_happy-icn-min.svg" alt="so-sure - Accidental damage" width="30px" class="mr-2">
-                            <strong class="text-blue4">Up to 80% cashback every year <span class="ml-2 text-blue2"><i class="far fa-question-circle"></i></span></strong>
+                            <strong class="text-blue4">
+                                Up to 80% cashback every year
+                                <span class="ml-2 text-blue2">
+                                    <a href="#"
+                                       data-toggle="modal"
+                                       data-target="#exampleModalCenter"
+                                       role="button">
+                                        <i class="far fa-question-circle"></i>
+                                    </a>
+                                </span>
+                            </strong>
                             {# TODO: info popup #}
                         </li>
                     </ul>
@@ -329,6 +340,30 @@
 
         </div>
     </section>
+
+    {# Page Modals #}
+    <div class="modal fade"
+         id="exampleModalCenter"
+         tabindex="-1" role="dialog"
+         aria-labelledby="exampleModalCenterTitle"
+         aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalCenterTitle">Modal title</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                ...
+                </div>
+                <div class="modal-footer">
+
+                </div>
+            </div>
+        </div>
+    </div>
 
 {% endblock %}
 
