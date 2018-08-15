@@ -139,17 +139,17 @@ $(function(){
     // });
 
     // Trim as you type
-    $('.imei').on('keyup paste', function() {
-        var simei  = $(this).val();
+    // $('.imei').on('keyup paste', function() {
+    //     var simei  = $(this).val();
 
-        if (simei.indexOf('/') > 1) {
-            var newtxt = simei.replace('/', '');
-            $(this).val(newtxt);
-            $('.samsung-imei').show();
-        }
+    //     if (simei.indexOf('/') > 1) {
+    //         var newtxt = simei.replace('/', '');
+    //         $(this).val(newtxt);
+    //         $('.samsung-imei').show();
+    //     }
 
-        if ($(this).valid()) {
-            $('.samsung-imei').hide();
-        }
-    });
+    //     if ($(this).valid()) {
+    //         $('.samsung-imei').hide();
+    //     }
+    // });
 });

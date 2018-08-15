@@ -1,7 +1,5 @@
 // getQuote.js
 
-require('./select.js');
-
 $(function() {
 
     const quoteToggle = $('.get-a-quote'),
@@ -24,7 +22,8 @@ $(function() {
 
         // Fix for resizing select if phone in session
         if ($('body').hasClass('quote')) {
-            $('.phone-search-dropdown__make, .phone-search-dropdown__model, .phone-search-dropdown__memory').resizeselect();
+            $('.phone-search-dropdown__make').resizeselect();
+            console.log('resize');
         }
 
         // Prevent scrolling whilst open

@@ -109,5 +109,7 @@ $(function() {
 
         updateModels();
 
+        model.resizeselect();
+
     }
 });
