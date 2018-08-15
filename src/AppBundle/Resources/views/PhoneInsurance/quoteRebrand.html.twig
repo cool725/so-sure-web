@@ -37,7 +37,7 @@
                                data-toggle="dropdown"
                                aria-haspopup="true"
                                aria-expanded="false">
-                                <i class="fas fa-chevron-down text-white fa-lg ml-3"></i>
+                                <i class="far fa-chevron-down text-white fa-lg ml-3"></i>
                             </a>
                             <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
                                 {% if phones | length > 1 %}
@@ -77,7 +77,7 @@
                            role="button"
                            aria-expanded="false"
                            aria-controls="quote_info"><span>See full policy</span>
-                           <i class="fas fa-arrow-down"></i>
+                           <i class="far fa-arrow-down ml-2"></i>
                         </a>
                     </div>
                 </div>
@@ -88,18 +88,18 @@
                         <div class="h1 text-blue1 mb-5">Full Cover Details</div>
                         <h4 class="text-blue1 mb-4">What's covered:</h4>
                         <ul class="list-unstyled icn-fa-list">
-                            <li class="text-white mb-3"><i class="fas fa-check text-blue1 fa-lg"></i> Loss</li>
-                            <li class="text-white mb-3"><i class="fas fa-check text-blue1 fa-lg"></i> Accidental Damage, including water damage &amp; cracked screens</li>
-                            <li class="text-white mb-3"><i class="fas fa-check text-blue1 fa-lg"></i> 90 days global travel</li>
-                            <li class="text-white mb-3"><i class="fas fa-check text-blue1 fa-lg"></i> Out of warranty breakdown</li>
-                            <li class="text-white mb-3"><i class="fas fa-check text-blue1 fa-lg"></i> Unauthorised network charges up the value of &pound;1000 (inc VAT)</li>
-                            <li class="text-white mb-3"><i class="fas fa-check text-blue1 fa-lg"></i> Accessories up to the value of £100 (inc VAT) for theft of loss claims</li>
-                            <li class="text-white mb-5"><i class="fas fa-check text-blue1 fa-lg"></i> Cover for phones up to 3 years old, including second hand and refurbished devices</li>
+                            <li class="text-white mb-3"><i class="far fa-check text-blue1 fa-lg"></i> Loss</li>
+                            <li class="text-white mb-3"><i class="far fa-check text-blue1 fa-lg"></i> Accidental Damage, including water damage &amp; cracked screens</li>
+                            <li class="text-white mb-3"><i class="far fa-check text-blue1 fa-lg"></i> 90 days global travel</li>
+                            <li class="text-white mb-3"><i class="far fa-check text-blue1 fa-lg"></i> Out of warranty breakdown</li>
+                            <li class="text-white mb-3"><i class="far fa-check text-blue1 fa-lg"></i> Unauthorised network charges up the value of &pound;1000 (inc VAT)</li>
+                            <li class="text-white mb-3"><i class="far fa-check text-blue1 fa-lg"></i> Accessories up to the value of £100 (inc VAT) for theft of loss claims</li>
+                            <li class="text-white mb-5"><i class="far fa-check text-blue1 fa-lg"></i> Cover for phones up to 3 years old, including second hand and refurbished devices</li>
                         </ul>
                         <h4 class="text-blue1 my-4">What's not covered:</h4>
                         <ul class="list-unstyled icn-fa-list">
-                            <li class="text-white mb-3"><i class="fas fa-times text-blue1 fa-lg"></i> Theft, Loss, Accidental Damage or Breakdown where you have knowingly put your phone at risk</li>
-                            <li class="text-white mb-3"><i class="fas fa-times text-blue1 fa-lg"></i> 3+ claims for Loss and/or Theft in any policy year</li>
+                            <li class="text-white mb-3"><i class="far fa-times text-blue1 fa-lg"></i> Theft, Loss, Accidental Damage or Breakdown where you have knowingly put your phone at risk</li>
+                            <li class="text-white mb-3"><i class="far fa-times text-blue1 fa-lg"></i> 3+ claims for Loss and/or Theft in any policy year</li>
                         </ul>
                     </div>
                     <div class="quote__info mx-4 mx-lg-5 py-5">
@@ -212,7 +212,7 @@
                         <div class="expanding-cardbox expanding-cardbox-alt mb-4">
                             <div class="expanding-cardbox__body">
                                 <h5 class="expanding-cardbox__title text-white mb-0">
-                                    Here's how it works <i class="fas fa-chevron-down text-white fa-lg"></i>
+                                    Here's how it works <i class="far fa-chevron-down text-white fa-lg"></i>
                                 </h5>
                                 <div class="expanding-cardbox__expand text-white mt-4">
                                     We reward our careful customers. If you and your connections don’t make a claim, we return up to 80% of your premium each year.
@@ -222,7 +222,7 @@
                         <div class="expanding-cardbox expanding-cardbox-alt mb-4">
                             <div class="expanding-cardbox__body">
                                 <h5 class="expanding-cardbox__title text-white mb-0">
-                                    Here's how it works <i class="fas fa-chevron-down text-white fa-lg"></i>
+                                    Here's how it works <i class="far fa-chevron-down text-white fa-lg"></i>
                                 </h5>
                                 <div class="expanding-cardbox__expand text-white mt-4">
                                     We reward our careful customers. If you and your connections don’t make a claim, we return up to 80% of your premium each year.
@@ -312,7 +312,10 @@
                                 <span class="ml-2 text-blue2">
                                     <a href="#"
                                        data-toggle="modal"
-                                       data-target="#exampleModalCenter"
+                                       data-target="#quote_page_modal"
+                                       data-title="Up to 80% cashback every year"
+                                       data-body="asdasdasdasdasdasdasd"
+                                       data-img="{{ cdn_url }}/images/rebrand/icns/so-sure_happy-icn-min.svg"
                                        role="button">
                                         <i class="far fa-question-circle"></i>
                                     </a>
@@ -328,7 +331,7 @@
                            role="button"
                            aria-expanded="false"
                            aria-controls="quote_info_mobile"><span>See full policy</span>
-                           <i class="fas fa-caret-down"></i></a>
+                           <i class="far fa-caret-down"></i></a>
                     </div>
                     <div id="quote_info_mobile" class="quote__info__container__mobile collapse">
                         <div class="quote__info py-3">
@@ -343,23 +346,20 @@
 
     {# Page Modals #}
     <div class="modal fade"
-         id="exampleModalCenter"
+         id="quote_page_modal"
          tabindex="-1" role="dialog"
-         aria-labelledby="exampleModalCenterTitle"
+         aria-labelledby="quote_page_modal"
          aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalCenterTitle">Modal title</h5>
+                    <h5 class="modal-title">Modal title</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
+                        <i class="fal fa-times text-white"></i>
                     </button>
                 </div>
                 <div class="modal-body">
                 ...
-                </div>
-                <div class="modal-footer">
-
                 </div>
             </div>
         </div>

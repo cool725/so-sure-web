@@ -39,7 +39,21 @@
     </div>
 
     <div class="form-group {% if form_errors(purchase_form.imei) %}has-error{% endif %}">
-        {{ form_label(purchase_form.imei, 'IMEI Number:') }}
+        {{ form_label(purchase_form.imei, 'IMEI Number:', { 'label_attr': {'class': 'sr-only'} }) }}
+        <label for="purchase_form[imei]">
+            IMEI Number:
+            <span class="ml-2 text-blue2">
+                <a href="#"
+                   data-toggle="modal"
+                   data-target="#purchase_policy_imei_number"
+                   {# data-title="Up to 80% cashback every year" #}
+                   {# data-body="asdasdasdasdasdasdasd" #}
+                   data-img="{{ cdn_url }}/images/rebrand/icns/so-sure_happy-icn-min.svg"
+                   role="button">
+                    <i class="far fa-question-circle"></i>
+                </a>
+            </span>
+        </label>
         {{ form_widget(purchase_form.imei, {'attr':{'class':'form-control imei', 'placeholder':'IMEI Number', 'data-hj-suppress' : ''}}) }}
         <small class="form-text">Dial <strong>*#06#</strong> on your phone to display your IMEI number.</small>
         <small class="form-text samsung-imei d-none">Numbers only please (no / required)</small>
@@ -48,7 +62,21 @@
 
     {% if purchase_form.serialNumber is defined %}
         <div class="form-group {% if form_errors(purchase_form.serialNumber) %}has-error{% endif %}">
-            {{ form_label(purchase_form.serialNumber, 'Serial Number:') }}
+            {{ form_label(purchase_form.serialNumber, 'Serial Number:', { 'label_attr': {'class': 'sr-only'} }) }}
+            <label for="purchase_form[serialNumber]">
+                Serial Number:
+                <span class="ml-2 text-blue2">
+                    <a href="#"
+                       data-toggle="modal"
+                       data-target="#purchase_policy_serial_number"
+                       {# data-title="Up to 80% cashback every year" #}
+                       {# data-body="asdasdasdasdasdasdasd" #}
+                       data-img="{{ cdn_url }}/images/rebrand/icns/so-sure_happy-icn-min.svg"
+                       role="button">
+                        <i class="far fa-question-circle"></i>
+                    </a>
+                </span>
+            </label>
             {{ form_widget(purchase_form.serialNumber, {'attr':{'class':'form-control',  'pattern': '[a-zA-Z0-9]{5,32}', 'title': 'Enter a valid serial number', 'placeholder':'Serial Number', 'data-hj-suppress' : ''}}) }}
             <small class="form-text">To find your Serial Numbers open your phone Settings, navigate to General and view About</small>
             <div class="with-errors">{{ form_errors(purchase_form.serialNumber) }}</div>
@@ -61,7 +89,7 @@
     </div>
 
     <div class="form-group">
-        <label>Please confirm that the following are correct:</label>
+        <h4 class="text-blue2 mb-3">Please confirm that the following are correct:</h4>
         <ul class="pl-4">
             <li>My phone is in full working condition</li>
             <li>My screen is not cracked</li>
@@ -79,13 +107,13 @@
             <a href="{{ path('user_home') }}"
                class="btn btn-outline-grey">
                 <span class="sr-only">back</span>
-                <i class="fas fa-arrow-left"></i></a>
+                <i class="far fa-arrow-left"></i></a>
             </a>
             {% else %}
             <a href="{{ path('purchase_step_personal') }}"
                class="btn btn-outline-grey">
                 <span class="sr-only">back</span>
-                <i class="fas fa-arrow-left"></i></a>
+                <i class="far fa-arrow-left"></i></a>
             </a>
             {% endif %}
         </div>

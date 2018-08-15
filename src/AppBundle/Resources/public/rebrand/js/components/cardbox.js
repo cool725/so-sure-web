@@ -13,7 +13,7 @@ $(function() {
         .slideToggle('fast');
 
         // Adjust the arrow
-        $(this).find('.fas').toggleClass('fa-chevron-up');
+        $(this).find('.far').toggleClass('fa-chevron-up');
     });
 
 });

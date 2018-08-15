@@ -8,7 +8,22 @@
     <div class="form-step">
 
         <div class="form-group {% if form_errors(purchase_form.firstName) or form_errors(purchase_form.lastName) or form_errors(purchase_form.name) %}has-error{% endif %}">
-            {{ form_label(purchase_form.name, 'Policy Holder\'s Full Name:', { 'label_attr': {'class': ''} }) }}
+            {# TODO: Add icon trigger to label? #}
+            {{ form_label(purchase_form.name, 'Policy Holder\'s Full Name:', { 'label_attr': {'class': 'sr-only'} }) }}
+            <label for="">
+                Policy Holder's Full Name:
+                <span class="ml-2 text-blue2">
+                    <a href="#"
+                       data-toggle="modal"
+                       data-target="#purchase_policy_name"
+                       {# data-title="Up to 80% cashback every year" #}
+                       {# data-body="asdasdasdasdasdasdasd" #}
+                       data-img="{{ cdn_url }}/images/rebrand/icns/so-sure_happy-icn-min.svg"
+                       role="button">
+                        <i class="far fa-question-circle"></i>
+                    </a>
+                </span>
+            </label>
             {{ form_widget(purchase_form.name, {'attr':{'class':'form-control', 'placeholder': 'Enter full name', 'data-hj-suppress' : ''}}) }}
             <div class="with-errors">{{ form_errors(purchase_form.name) }}</div>
         </div>
@@ -63,7 +78,7 @@
                    class="btn btn-success btn-gradient-green btn-block-xs"
                    data-csrf="{{ lead_csrf }}"
                    data-lead="{{ path('lead', {'source': 'purchase-flow'}) }}">
-                   Continue <i class="fas fa-arrow-right ml-3"></i>
+                   Continue <i class="far fa-arrow-right ml-2"></i>
                 </a>
             </div>
         </div>

@@ -4,13 +4,16 @@ require('../../sass/pages/quotepage.scss');
 
 $(function() {
 
-    // const infoBtn = $('#quote_info_toggle'),
-    //       info    = $('.quote__info');
+    // $('#quote_page_modal').on('show.bs.modal', function(e) {
 
-    // infoBtn.on('click', function(e) {
-    //     e.preventDefault();
+    //     let modal   = $(this);
+    //         button  = $(e.relatedTarget),
+    //         title   = trigger.data('title'),
+    //         body    = trigger.data('body'),
+    //         img     = trigger.data('img');
 
-    //     info.slideToggle();
+    //     modal.find('.modal-title').text(title);
+
     // });
 
 });
