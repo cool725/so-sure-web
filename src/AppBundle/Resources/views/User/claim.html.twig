@@ -162,7 +162,7 @@
                                 <p class="lead"><mark>My <span class="h4">{{ phone }}</span> was <span class="h4">{{ claim_type }}</span> after I purchased my policy on <span class="h4">{{ policy_date|date('d M Y', 'Europe/London') }} at {{ policy_date|date('H:i', 'Europe/London') }}</span>.</mark></p>
                                 <p class="lead">I acknowledge that not telling the truth would constitute insurance fraud, which is a criminal offence. I agree to this and I understand that I could be prosecuted if I were not telling the truth.</p>
                                 <div class="form-group">
-                                    {{ form_widget(claim_confirm_form.submit, {'label': 'I confirm', 'attr': {'class': 'btn btn-green btn-lg'}}) }}
+                                    {{ form_widget(claim_confirm_form.submit, {'label': 'Proceed to last step', 'attr': {'class': 'btn btn-green btn-lg'}}) }}
                                     <div class="help-block with-errors">Once you have confirmed your claim, you will not be able to change the information you have provided</div>
                                 </div>
                                 <div class="form-group">
