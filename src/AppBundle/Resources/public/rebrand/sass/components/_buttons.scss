@@ -32,10 +32,10 @@
 // Add gradient to button rather than modifying the core css
 .btn-gradient-green {
     border: none;
-    @include linear-gradient(90deg, $green, $green-2);
+    // @include linear-gradient(90deg, $green, $green-2);
 
     &:hover {
-        @include linear-gradient(90deg, $green-2, $green);
+        // @include linear-gradient(90deg, $green-2, $green);
     }
 }
 

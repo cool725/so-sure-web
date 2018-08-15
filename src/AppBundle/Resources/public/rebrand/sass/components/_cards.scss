@@ -1,7 +1,6 @@
 // cards.scss
 
 .cardbox {
-    height: 440px;
     background-color: $white;
     box-shadow: 0 15px 30px 0 rgba(8,27,154,0.08),
                 0 5px 15px 0 rgba(8,27,154,0.08);
@@ -19,7 +18,19 @@
 
     @include media-breakpoint-up(lg) {
         width: 300px;
-        height: 480px;
+        // height: 480px;
+    }
+}
+
+.cardbox-400 {
+    @include media-breakpoint-up(md) {
+        height: 400px;
+    }
+}
+
+.cardbox-460 {
+    @include media-breakpoint-up(md) {
+        height: 460px;
     }
 }
 
