@@ -15,7 +15,7 @@
             <div class="row">
                 {% if app.user.allowedMonthlyPayments %}
                     <div class="col-6">
-                        <div class="radio-btn {% if purchase_form.vars.value.amount == phone.currentPhonePrice.monthlyPremiumPrice %}radio-btn-active{% endif %}" data-value="{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }}">
+                        <div class="radio-btn {% if purchase_form.vars.value.amount == phone.currentPhonePrice.monthlyPremiumPrice %}radio-btn-active{% endif %}" data-value="{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }}" data-premium-type="month">
                             <div class="radio-btn__content">
                                 <h6 class="radio-btn__title mb-0">Monthly</h6>
                                 <div class="radio-btn__price"><small>(&pound;{{ phone.currentPhonePrice.monthlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }})</small></div>
@@ -25,7 +25,7 @@
                 {% endif %}
                 {% if app.user.allowedYearlyPayments %}
                     <div class="col-6">
-                        <div class="radio-btn {% if purchase_form.vars.value.amount == phone.currentPhonePrice.yearlyPremiumPrice(app.user.additionalPremium) %}radio-btn-active{% endif %}" data-value="{{ phone.currentPhonePrice.yearlyPremiumPrice|number_format(2, '.', ',') }}">
+                        <div class="radio-btn {% if purchase_form.vars.value.amount == phone.currentPhonePrice.yearlyPremiumPrice(app.user.additionalPremium) %}radio-btn-active{% endif %}" data-value="{{ phone.currentPhonePrice.yearlyPremiumPrice|number_format(2, '.', ',') }}" data-premium-type="year">
                             <div class="radio-btn__content">
                                 <h6 class="radio-btn__title mb-0">Yearly</h6>
                                 <div class="radio-btn__price"><small>(&pound;{{ phone.currentPhonePrice.yearlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }})</small></div>
@@ -55,22 +55,22 @@
         </div>
     {% endif %}
 
-    {# <div class="d-none"> #}
+    <div class="d-none">
         {{ form_widget(purchase_form.fileValid, {'attr': {'style':'display:none'}}) }}
         {{ form_widget(purchase_form.file, {'attr': {'style':'display:none'}}) }}
-    {# </div> #}
-
-{#     <p>Before you continue</p>
-    <p>Please confirm that the following are correct:</p>
-    <ol>
-        <li>My phone is in full working condition and my screen is not cracked.</li>
-        <li>I am a resident of the United Kingdom.</li>
-        <li>I have read &amp; understood the <a class="policy-doc-toggle" href="#policy-doc" data-toggle="modal" data-target="#policy-modal" id="policy-modal-trigger">so-sure policy document</a>.</li>
-    </ol> #}
+    </div>
 
     <div class="form-group">
-        <p><small>Please be advised that if you confirm that the above is true and we later discover that it isn’t, your claim might get denied.</small></p>
-        {{ form_widget(purchase_form.agreed, {'label': ' I confirm the above is correct', 'value': 'checked'}) }}
+        <label>Please confirm that the following are correct:</label>
+        <ul class="pl-4">
+            <li>My phone is in full working condition</li>
+            <li>My screen is not cracked</li>
+            <li>I am a resident of the United Kingdom</li>
+            <li>I have read &amp; understood the so-sure policy document</li>
+        </ul>
+        {{ form_widget(purchase_form.agreed, {
+            'label': 'I confirm the above is correct'
+        }) }}
     </div>
 
     <div class="form-row">

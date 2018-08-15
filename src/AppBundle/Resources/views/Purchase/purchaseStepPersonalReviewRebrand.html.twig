@@ -64,11 +64,13 @@
                         </div>
                         <div class="purchase__h1 text-white text-center text-lg-left h1">
                             <span class="sub">For only</span>
-                            {% if not app.user or app.user.allowedMonthlyPayments %}
-                                &pound;{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }} a month
-                            {% else %}
-                                &pound;{{ phone.currentPhonePrice.yearlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }} a year
-                            {% endif %}
+                            <span id="purchase_price">
+                                {% if not app.user or app.user.allowedMonthlyPayments %}
+                                    &pound;{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }} a month
+                                {% else %}
+                                    &pound;{{ phone.currentPhonePrice.yearlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }} a year
+                                {% endif %}
+                            </span>
                         </div>
                         <div class="purchase__footer d-none d-lg-block mt-5">
                             <div class="purchase__footer__text">

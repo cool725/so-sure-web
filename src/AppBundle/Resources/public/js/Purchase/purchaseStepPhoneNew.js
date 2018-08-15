@@ -120,8 +120,14 @@ $(function(){
         $('.radio-btn').removeClass('radio-btn-active');
         $(this).addClass('radio-btn-active');
 
+        // Set the value for the form element
         let value = $(this).data('value');
         $('input[name="purchase_form[amount]"][value="' + value + '"]').prop('checked', true);
+
+        // Adjust the price in the copy
+        let premium = $(this).data('premium-type');
+        let price = $('#purchase_price');
+        price.html('&pound;' + value + ' a ' + premium);
     });
 
     if ($.trim($('#Reference').val()).length > 0) {
@@ -139,6 +145,7 @@ $(function(){
     // });
 
     // Trim as you type
+    // TODO: Rework as it's affecting validation
     // $('.imei').on('keyup paste', function() {
     //     var simei  = $(this).val();
 

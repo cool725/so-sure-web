@@ -5,7 +5,7 @@ $(function() {
     if ($('.phone-search-dropdown').length) {
 
         // Elements & Date
-        const phones = $('.phone-search-dropdown').data('phones'),
+        let phones = $('.phone-search-dropdown').data('phones'),
               make   = $('.phone-search-dropdown__make'),
               model  = $('.phone-search-dropdown__model'),
               memory = $('.phone-search-dropdown__memory');
@@ -107,9 +107,9 @@ $(function() {
             }
         });
 
-        updateModels();
-
-        model.resizeselect();
-
+        $(window).on('load', function() {
+            updateModels();
+            model.resizeselect();
+        });
     }
 });
