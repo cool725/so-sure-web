@@ -80,6 +80,25 @@ body {
         }
     }
 
+    &__cover__container {
+        background-color: $white;
+
+        @include media-breakpoint-up(lg) {
+            width: 40vw; height: 100vh;
+            overflow-y: scroll;
+
+            // IE
+            -ms-overflow-style: none;
+        }
+    }
+
+    &__cover {
+        max-width: 400px;
+        margin: 0 auto;
+    }
+}
+
+.policy {
     &__info {
 
         @include media-breakpoint-up(lg) {
@@ -138,22 +157,5 @@ body {
                 }
             }
         }
-    }
-
-    &__cover__container {
-        background-color: $white;
-
-        @include media-breakpoint-up(lg) {
-            width: 40vw; height: 100vh;
-            overflow-y: scroll;
-
-            // IE
-            -ms-overflow-style: none;
-        }
-    }
-
-    &__cover {
-        max-width: 400px;
-        margin: 0 auto;
     }
 }

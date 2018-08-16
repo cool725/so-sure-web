@@ -79,15 +79,27 @@ body {
         }
     }
 
+    &__form__container {
+        background-color: $white;
+        position: relative;
+
+        @include media-breakpoint-up(lg) {
+            width: 40vw; height: 100vh;
+            overflow-y: scroll;
+        }
+    }
+}
+
+.policy {
     &__info {
 
-        // @include media-breakpoint-up(lg) {
+        @include media-breakpoint-up(lg) {
             border-top: 1px solid $blue-1;
 
             &:first-of-type {
                 border-top: none;
             }
-        // }
+        }
 
         .table-list {
             position: relative;
@@ -138,18 +150,7 @@ body {
             }
         }
     }
-
-    &__form__container {
-        background-color: $white;
-        position: relative;
-
-        @include media-breakpoint-up(lg) {
-            width: 40vw; height: 100vh;
-            overflow-y: scroll;
-        }
-    }
 }
-
 
 // Old Form CSS
 .step {

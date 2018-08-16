@@ -62,54 +62,53 @@ $(function() {
             }
         }
 
-        make.on('change', function() {
-
-            updateModels();
-
-            if ($(this).val() != '') {
-                model.prop('disabled', '');
-                $(this).addClass('valid-select');
-            } else {
-                model.prop('disabled', 'disabled').val('');
-                $(this).removeClass('valid-select');
-            }
-
-            button.prop('disabled', 'disabled').removeClass('btn-success btn-gradient-green btn-shadow').addClass('btn-outline-white');
-
-            model.resizeselect();
-        });
-
-        model.on('change', function() {
-
-            updateMemory();
-
-            if ($(this).val() != '') {
-                memory.prop('disabled', '');
-                $(this).addClass('valid-select');
-            } else {
-                memory.prop('disabled', 'disabled').val('');
-                $(this).removeClass('valid-select');
-            }
-
-            // button.prop('disabled', 'disabled').removeClass('btn-success btn-shadow').addClass('btn-outline-white');
-            memory.resizeselect();
-
-        });
-
-        memory.on('change', function() {
-
-            if ($(this).val() != '') {
-                $(this).addClass('valid-select');
-                button.prop('disabled', '').removeClass('btn-outline-white').addClass('btn-success btn-shadow btn-gradient-green');
-            } else {
-                button.prop('disabled', 'disabled').removeClass('btn-success btn-gradient-green btn-shadow').addClass('btn-outline-white');
-                $(this).removeClass('valid-select');
-            }
-        });
-
         $(window).on('load', function() {
             updateModels();
-            model.resizeselect();
+            make.resizeselect();
+
+            make.on('change', function() {
+
+                updateModels();
+
+                if ($(this).val() != '') {
+                    model.prop('disabled', '');
+                    $(this).addClass('valid-select');
+                } else {
+                    model.prop('disabled', 'disabled').val('');
+                    $(this).removeClass('valid-select');
+                }
+
+                button.prop('disabled', 'disabled').removeClass('btn-success btn-gradient-green btn-shadow').addClass('btn-outline-white');
+
+                model.resizeselect();
+            });
+
+            model.on('change', function() {
+
+                updateMemory();
+
+                if ($(this).val() != '') {
+                    memory.prop('disabled', '');
+                    $(this).addClass('valid-select');
+                } else {
+                    memory.prop('disabled', 'disabled').val('');
+                    $(this).removeClass('valid-select');
+                }
+
+                memory.resizeselect();
+
+            });
+
+            memory.on('change', function() {
+
+                if ($(this).val() != '') {
+                    $(this).addClass('valid-select');
+                    button.prop('disabled', '').removeClass('btn-outline-white').addClass('btn-success btn-shadow btn-gradient-green');
+                } else {
+                    button.prop('disabled', 'disabled').removeClass('btn-success btn-gradient-green btn-shadow').addClass('btn-outline-white');
+                    $(this).removeClass('valid-select');
+                }
+            });
         });
     }
 });
