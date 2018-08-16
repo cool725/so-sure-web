@@ -1192,13 +1192,15 @@ class UserController extends BaseController
             parse_str($query, $oauth2FlowParams);
         }
 
-        return array(
+        $data = array(
             'policy_key' => $this->getParameter('policy_key'),
             'policy' => $user->getLatestPolicy(),
             'has_visited_welcome_page' => $pageVisited,
             'user_modal_welcome' => $exp,
             'oauth2FlowParams' => $oauth2FlowParams,
         );
+
+        return $this->render('AppBundle:User:welcomeRebrand.html.twig', $data);
     }
     /**
      * @Route("/payment-details", name="user_payment_details")
