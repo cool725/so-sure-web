@@ -2,19 +2,12 @@
 
 namespace App\Controller\Admin\Employee;
 
-use AppBundle\Classes\SoSure;
-use AppBundle\Document\Claim;
+use App\Admin\Reports\KpiInterface;
 use AppBundle\Document\DateTrait;
-use AppBundle\Document\PhonePolicy;
-use AppBundle\Document\Stats;
-use AppBundle\Repository\PhonePolicyRepository;
-use AppBundle\Repository\StatsRepository;
-use AppBundle\Service\ReportingService;
-use Doctrine\Common\Persistence\ObjectRepository;
-use Doctrine\ODM\MongoDB\DocumentManager;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
@@ -25,21 +18,14 @@ class KpiController extends AbstractController
 {
     use DateTrait;
 
-    /** @var ReportingService */
-    private $reporting;
-    /** @var PhonePolicyRepository|ObjectRepository  */
-    private $policyRepo;
-    /** @var StatsRepository|ObjectRepository  */
-    private $statsRepo;
-    /** @var DocumentManager */
-    private $documentManager;
+    /** @var KpiInterface */
+    private $kpiReport;
+    /** @var bool Flag to be able to empty the cached data, instead of use it. */
+    private $clearCache = false;
 
-    public function __construct(DocumentManager $documentManager, ReportingService $reportingService)
+    public function __construct(KpiInterface $kpiReport)
     {
-        $this->reporting = $reportingService;
-
-        $this->statsRepo = $documentManager->getRepository(Stats::class);
-        $this->policyRepo = $documentManager->getRepository(PhonePolicy::class);
+        $this->kpiReport = $kpiReport;
     }
 
     /**
@@ -90,8 +76,10 @@ class KpiController extends AbstractController
         while ($date < $now) {
             $end = clone $date;
             $end->add(new \DateInterval('P6D'));
+            $startOfDay = $this->startOfDay(clone $date);
+            $endOfDay = $this->endOfDay($end);
 
-            $week = $this->reportForPeriod($this->startOfDay(clone $date), $this->endOfDay($end));
+            $week = $this->kpiReport->reportForPeriod($startOfDay, $endOfDay);
 
             $week['count'] = $count;
             $weeks[] = $week;
@@ -116,50 +104,5 @@ class KpiController extends AbstractController
         $date = $date->sub(new \DateInterval(sprintf('P%dD', $numWeeks * 7)));
 
         return $date;
-    }
-
-    private function reportForPeriod(\DateTime $start, \DateTime $end): array
-    {
-        $week = [
-            'start_date' => clone $start,
-            'end_date' => $end,
-            'end_date_disp' => (clone $end)->sub(new \DateInterval('PT1S')),
-        ];
-
-        $week['period'] = $this->reporting->report($start, $end, true);
-        // $totalStart = clone $end;
-        // $totalStart = $totalStart->sub(new \DateInterval('P1Y'));
-        $week['total'] = $this->reporting->report(new \DateTime(SoSure::POLICY_START), $end, true);
-        $week['sumPolicies'] = $this->reporting->sumTotalPoliciesPerWeek($end);
-
-        $approved = $week['total']['approvedClaims'][Claim::STATUS_APPROVED] +
-            $week['total']['approvedClaims'][Claim::STATUS_SETTLED];
-
-        $week['freq-claims'] = 'N/A';
-        if ($week['sumPolicies'] != 0) {
-            $week['freq-claims'] = ((52 * $approved) / $week['sumPolicies']);
-        }
-        $week['total-policies'] = $this->policyRepo->countAllActivePolicies($end);
-
-        /** @var Stats[] $stats */
-        $stats = $this->statsRepo->getStatsByRange($start, $end);
-        foreach ($stats as $stat) {
-            if (!isset($week[$stat->getName()])) {
-                $week[$stat->getName()] = 0;
-            }
-            if (!$stat->isAbsolute()) {
-                $week[$stat->getName()] += $stat->getValue();
-            } else {
-                $week[$stat->getName()] = $stat->getValue();
-            }
-        }
-
-        foreach (Stats::$allStats as $stat) {
-            if (!isset($week[$stat])) {
-                $week[$stat] = '-';
-            }
-        }
-
-        return $week;
     }
 }
