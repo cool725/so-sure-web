@@ -6,7 +6,7 @@
         {# Hide the nav #}
     {% else %}
         <ul class="nav navbar-nav flex-row align-items-center">
-            <li class="nav-item dropdown d-none d-xl-block pr-xl-5">
+   {#          <li class="nav-item dropdown d-none d-xl-block pr-xl-5">
                 <a href="#"
                    id="why_dropdown"
                    class="nav-link dropdown-toggle"
@@ -30,8 +30,7 @@
                         <small>Some test text</small>
                     </a>
                 </div>
-                {# TODO: Style dropdowns #}
-            </li>
+            </li> #}
             <li class="nav-item d-none d-xl-block pr-xl-5">
                 <a href="{{ path('claim') }}" class="nav-link">Make a claim</a>
             </li>
@@ -96,9 +95,9 @@
                     {% endif %}
                 </li>
             {% endif %}
-            <li>
+{#             <li>
                 <a href="#" class="h5">Why so-sure?</a>
-            </li>
+            </li> #}
             <li>
                 <a href="{{ path('claim') }}" class="h5">Make a claim</a>
             </li>
