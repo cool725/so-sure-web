@@ -144,12 +144,12 @@ class DefaultController extends BaseController
             'search_type' => $expSearch,
         );
 
-        $template = 'AppBundle:Default:index.html.twig';
-
+        // $template = 'AppBundle:Default:index.html.twig';
+        $template = 'AppBundle:Default:indexContent.html.twig';
         // If A/B content test
-        if ($expContent == 'new-homepage-copy') {
-            $template = 'AppBundle:Default:indexContent.html.twig';
-        }
+        // if ($expContent == 'new-homepage-copy') {
+        //     $template = 'AppBundle:Default:indexContent.html.twig';
+        // }
 
         return $this->render($template, $data);
     }
