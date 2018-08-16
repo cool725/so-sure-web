@@ -354,30 +354,33 @@
                             <td></td>
                             <td>{{ data.totalAvgHoursToConnect|number_format(1, '.', ',')  }}</td>
                         </tr>
+
                         <tr>
                             <td>pic-sure Approved</td>
                             <td></td>
-                            <td>{{ data.picsureApproved|number_format(0, '.', ',')  }}</td>
+                            <td>{% if data.picsureApproved is defined %}{{ data.picsureApproved|number_format(0, '.', ',')  }}{% endif %}
+                            </td>
                         </tr>
+
                         <tr>
                             <td>pic-sure Invalid (pic-sure in progress)</td>
                             <td></td>
-                            <td>{{ data.picsureInvalid|number_format(0, '.', ',')  }}</td>
+                            <td>{% if data.picsureInvalid is defined %}{{ data.picsureInvalid|number_format(0, '.', ',')  }}{% endif %}</td>
                         </tr>
                         <tr>
                             <td>pic-sure PreApproved (Policy was renewed)</td>
                             <td></td>
-                            <td>{{ data.picsurePreApproved|number_format(0, '.', ',')  }}</td>
+                            <td>{% if data.picsurePreApproved is defined %}{{ data.picsurePreApproved|number_format(0, '.', ',')  }}{% endif %}</td>
                         </tr>
                         <tr>
                             <td>pic-sure Rejected</td>
                             <td></td>
-                            <td>{{ data.picsureRejected|number_format(0, '.', ',')  }}</td>
+                            <td>{% if data.picsureRejected is defined %}{{ data.picsureRejected|number_format(0, '.', ',')  }}{% endif %}</td>
                         </tr>
                         <tr>
                             <td>pic-sure Un-Started</td>
                             <td></td>
-                            <td>{{ data.picsureUnstarted|number_format(0, '.', ',')  }}</td>
+                            <td>{% if data.picsureUnstarted is defined %}{{ data.picsureUnstarted|number_format(0, '.', ',')  }}{% endif %}</td>
                         </tr>
                     </tbody>
                 </table>

@@ -1516,7 +1516,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
 
     /**
      * @Route("/reports", name="admin_reports")
-     * @Template
+     * @Template("AppBundle:AdminEmployee:adminReports.html.twig")
      */
     public function adminReportsAction(Request $request)
     {
