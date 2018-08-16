@@ -5,7 +5,9 @@ namespace AppBundle\Controller\AdminEmployee;
 use AppBundle\Classes\SoSure;
 use AppBundle\Controller\BaseController;
 use AppBundle\Document\Claim;
+use AppBundle\Document\CurrencyTrait;
 use AppBundle\Document\DateTrait;
+use AppBundle\Document\ImeiTrait;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Stats;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
@@ -35,77 +37,15 @@ class KpiController extends BaseController implements ContainerAwareInterface
         // default 30s for prod is no longer enough
         // TODO: Refactor method to improve performance
         set_time_limit(60);
-        $dm = $this->getManager();
-        $policyRepo = $dm->getRepository(PhonePolicy::class);
-        $statsRepo = $dm->getRepository(Stats::class);
         $numWeeks = 4;
-        $weeks = [];
 
         if (!$now) {
             $now = new \DateTime();
         } else {
             $now = new \DateTime($now);
         }
-        $date = new \DateTime('2016-09-12 00:00');
-        // TODO: Be smarter with start date, but this at least drops number of queries down significantly
-        while ($date < $now) {
-            $end = clone $date;
-            $end->add(new \DateInterval('P6D'));
-            $end = $this->endOfDay($end);
-            $date = $date->add(new \DateInterval('P7D'));
-        }
-        $date = $date->sub(new \DateInterval(sprintf('P%dD', $numWeeks * 7)));
 
-        $count = 1;
-        while ($date < $now) {
-            $end = clone $date;
-            $end->add(new \DateInterval('P6D'));
-            $end = $this->endOfDay($end);
-            $week = [
-                'start_date' => clone $date,
-                'end_date' => $end,
-                'end_date_disp' => (clone $end)->sub(new \DateInterval('PT1S')),
-                'count' => $count,
-            ];
-            $start = $this->startOfDay(clone $date);
-            $date = $date->add(new \DateInterval('P7D'));
-            $count++;
-            $reporting = $this->get('app.reporting');
-            $week['period'] = $reporting->report($start, $end, true);
-            $totalStart = clone $end;
-            $totalStart = $totalStart->sub(new \DateInterval('P1Y'));
-            $week['total'] = $reporting->report(new \DateTime(SoSure::POLICY_START), $end, true);
-            $week['sumPolicies'] = $reporting->sumTotalPoliciesPerWeek($end);
-
-            $approved = $week['total']['approvedClaims'][Claim::STATUS_APPROVED] +
-                $week['total']['approvedClaims'][Claim::STATUS_SETTLED];
-            if ($week['sumPolicies'] != 0) {
-                $week['freq-claims'] = 52 * $approved / $week['sumPolicies'];
-            } else {
-                $week['freq-claims'] = 'N/A';
-            }
-            $week['total-policies'] = $policyRepo->countAllActivePolicies($date);
-
-            /** @var Stats[] $stats */
-            $stats = $statsRepo->getStatsByRange($start, $date);
-            foreach ($stats as $stat) {
-                if (!isset($week[$stat->getName()])) {
-                    $week[$stat->getName()] = 0;
-                }
-                if (!$stat->isAbsolute()) {
-                    $week[$stat->getName()] += $stat->getValue();
-                } else {
-                    $week[$stat->getName()] = $stat->getValue();
-                }
-            }
-            foreach (Stats::$allStats as $stat) {
-                if (!isset($week[$stat])) {
-                    $week[$stat] = '-';
-                }
-            };
-
-            $weeks[] = $week;
-        }
+        $weeks = $this->getReportsByWeek($now, $numWeeks);
 
         $adjustedWeeks = array_slice($weeks, 0 - $numWeeks);
         $reversedAdjustedWeeks = array_reverse($adjustedWeeks);
@@ -123,4 +63,86 @@ class KpiController extends BaseController implements ContainerAwareInterface
             ]),
             'now' => $now,
         ];
-    }}
+    }
+
+    private function getReportsByWeek($now, $numWeeks): array
+    {
+        $dm = $this->getManager();
+        $policyRepo = $dm->getRepository(PhonePolicy::class);
+        $statsRepo = $dm->getRepository(Stats::class);
+
+        $date = $this->showFromDate($now, $numWeeks);
+
+        $weeks = [];
+        $count = 1;
+        while ($date < $now) {
+            $end = clone $date;
+            $end->add(new \DateInterval('P6D'));
+            $end = $this->endOfDay($end);
+            $week = [
+                'start_date' => clone $date,
+                'end_date' => $end,
+                'end_date_disp' => (clone $end)->sub(new \DateInterval('PT1S')),
+                'count' => $count,
+            ];
+
+            $start = $this->startOfDay(clone $date);
+            $date = $date->add(new \DateInterval('P7D'));
+
+            $count++;
+            $reporting = $this->get('app.reporting');
+            $week['period'] = $reporting->report($start, $end, true);
+            // $totalStart = clone $end;
+            // $totalStart = $totalStart->sub(new \DateInterval('P1Y'));
+            $week['total'] = $reporting->report(new \DateTime(SoSure::POLICY_START), $end, true);
+            $week['sumPolicies'] = $reporting->sumTotalPoliciesPerWeek($end);
+
+            $approved = $week['total']['approvedClaims'][Claim::STATUS_APPROVED]
+                + $week['total']['approvedClaims'][Claim::STATUS_SETTLED];
+
+            $week['freq-claims'] = 'N/A';
+            if ($week['sumPolicies'] != 0) {
+                $week['freq-claims'] = ((52 * $approved) / $week['sumPolicies']);
+            }
+            $week['total-policies'] = $policyRepo->countAllActivePolicies($date);
+
+            /** @var Stats[] $stats */
+            $stats = $statsRepo->getStatsByRange($start, $date);
+            foreach ($stats as $stat) {
+                if (!isset($week[$stat->getName()])) {
+                    $week[$stat->getName()] = 0;
+                }
+                if (!$stat->isAbsolute()) {
+                    $week[$stat->getName()] += $stat->getValue();
+                } else {
+                    $week[$stat->getName()] = $stat->getValue();
+                }
+            }
+
+            foreach (Stats::$allStats as $stat) {
+                if (!isset($week[$stat])) {
+                    $week[$stat] = '-';
+                }
+            };
+
+            $weeks[] = $week;
+        }
+
+        return $weeks;
+    }
+
+    private function showFromDate($now, $numWeeks): \DateTime
+    {
+        $date = new \DateTime('2016-09-12 00:00');
+        // TODO: Be smarter with start date, but this at least drops number of queries down significantly
+        while ($date < $now) {
+            // $end = clone $date;
+            // $end->add(new \DateInterval('P6D'));
+            // $end = $this->endOfDay($end);
+            $date = $date->add(new \DateInterval('P7D'));
+        }
+        $date = $date->sub(new \DateInterval(sprintf('P%dD', $numWeeks * 7)));
+
+        return $date;
+    }
+}
