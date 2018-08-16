@@ -15,26 +15,26 @@ body {
 .welcome {
     position: relative;
 
-    h1 {
-        border-bottom: 2px solid $blue-1b;
-    }
+    // h1 {
+    //     border-bottom: 2px solid $blue-1b;
+    // }
 
-    &__h1 {
-        @include media-breakpoint-down(xs) {
-            font-size: 1.5rem;
-        }
+    // &__h1 {
+    //     @include media-breakpoint-down(xs) {
+    //         font-size: 1.5rem;
+    //     }
 
-        .far {
-            cursor: pointer;
-        }
-    }
+    //     .far {
+    //         cursor: pointer;
+    //     }
+    // }
 
-    &__h5 {
-        @include media-breakpoint-down(xs) {
-            font-size: 1rem;
-            opacity: 0.5;
-        }
-    }
+    // &__h5 {
+    //     @include media-breakpoint-down(xs) {
+    //         font-size: 1rem;
+    //         opacity: 0.5;
+    //     }
+    // }
 
     &__details__container {
 
