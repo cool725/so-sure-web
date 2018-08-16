@@ -521,7 +521,7 @@ class PhoneInsuranceController extends BaseController
             return $this->render('AppBundle:PhoneInsurance:adlanding.html.twig', $data);
         } else {
             // Default
-            return $this->render('AppBundle:PhoneInsurance:quote.html.twig', $data);
+            return $this->render('AppBundle:PhoneInsurance:quoteContent.html.twig', $data);
         }
     }
 
