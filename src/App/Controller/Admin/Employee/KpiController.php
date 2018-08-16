@@ -32,9 +32,15 @@ class KpiController extends AbstractController
      * @Route("/kpi", name="admin_kpi")
      * @Route("/kpi/{now}", name="admin_kpi_date")
      * @Template("AppBundle::AdminEmployee/kpi.html.twig")
+     *
+     * If the URL has ?clear-cache=1 appended, any periods searched for will have the data removed from the cache
      */
-    public function kpiAction($now = null): array
+    public function kpiAction(Request $request, $now = null): array
     {
+        if ($request->get('clear-cache')) {
+            $this->clearCache = true;
+        }
+
         // default 30s for prod is no longer enough
         // TODO: Refactor method to improve performance
         set_time_limit(60);
@@ -78,6 +84,10 @@ class KpiController extends AbstractController
             $end->add(new \DateInterval('P6D'));
             $startOfDay = $this->startOfDay(clone $date);
             $endOfDay = $this->endOfDay($end);
+
+            if ($this->clearCache) {
+                $this->kpiReport->clearCacheForPeriod($startOfDay, $endOfDay);
+            }
 
             $week = $this->kpiReport->reportForPeriod($startOfDay, $endOfDay);
 
