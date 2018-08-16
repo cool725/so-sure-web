@@ -4,17 +4,16 @@ require('../../sass/pages/quotepage.scss');
 
 $(function() {
 
+    $('.toggle-text[data-toggle="collapse"]').on('click', function(e){
+        e.preventDefault();
+        $(this)
+        .data('text-original', $(this).html())
+        .html($(this).data('text-swap') )
+        .data('text-swap', $(this).data('text-original'));
+    });
 
-    // $('#quote_page_modal').on('show.bs.modal', function(e) {
-
-    //     let modal   = $(this);
-    //         button  = $(e.relatedTarget),
-    //         title   = trigger.data('title'),
-    //         body    = trigger.data('body'),
-    //         img     = trigger.data('img');
-
-    //     modal.find('.modal-title').text(title);
-
-    // });
+    $('.quote__details__container').scroll(function(e) {
+        $('.navbar').toggleClass('navbar-scrolled-quote', $(this).scrollTop() > 5);
+    });
 
 });

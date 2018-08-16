@@ -66,25 +66,27 @@
                             }})
                         }}
                     {{ form_end(buy_form) }}
-                    <div class="quote__footer d-none d-lg-flex justify-content-lg-between align-items-lg-center mt-5">
+                    <div class="quote__footer d-none d-lg-flex justify-content-lg-between mt-5">
                         <div class="quote__footer__text">
                             <h4 class="text-white">The higest level of cover!</h4>
                             <p class="text-blue1 lead">We offer the markets highest level of cover</p>
                         </div>
-                        <a href="#quote_info"
-                           class="btn btn-outline-blue1 toggle-text"
-                           data-toggle="collapse"
-                           data-text-swap='Hide full policy <i class="far fa-arrow-up ml-2"></i>'
-                           role="button"
-                           aria-expanded="false"
-                           aria-controls="quote_info">See full policy
-                           <i class="far fa-arrow-down ml-2"></i>
-                        </a>
+                        <div class="quote__footer__cta">
+                            <a href="#quote_info"
+                               class="btn btn-outline-blue1 toggle-text"
+                               data-toggle="collapse"
+                               data-text-swap='Hide full policy <i class="far fa-arrow-up ml-2"></i>'
+                               role="button"
+                               aria-expanded="false"
+                               aria-controls="quote_info">See full policy
+                               <i class="far fa-arrow-down ml-2"></i>
+                            </a>
+                        </div>
                     </div>
                 </div>
-                <div id="quote_info" class="quote__info__container ">
+                <div id="quote_info" class="quote__info__container collapse">
                     {% include 'AppBundle::PhoneInsurance/_seeFullPolicy.html.twig' %}
-                    <div class="quote__info mx-4 mx-lg-5 py-5">
+                    <div class="policy__info mx-4 mx-lg-5 py-5">
                         <div class="d-md-flex align-items-md-center justify-content-md-between py-3 px-4 mx-md-5 rounded bg-blue3">
                             <div class="text-center text-lg-left">
                                 <h4 class="text-white">Let's get you covered</h4>

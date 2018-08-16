@@ -94,7 +94,10 @@ body {
 
     &__cover {
         max-width: 400px;
-        margin: 0 auto;
+
+        @include media-breakpoint-up(lg) {
+            margin: 0 auto;
+        }
     }
 }
 

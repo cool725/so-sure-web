@@ -18,10 +18,10 @@
         <li class="text-white mb-3"><i class="far fa-times text-blue1 fa-lg"></i> 3+ claims for Loss and/or Theft in any policy year</li>
     </ul>
 </div>
-<div class="policy__info mx-4 mx-lg-5 py-5">
-    <h4 class="text-blue1 mb-4">Here’s how we compare to competitors:</h4>
+{# <div class="policy__info mx-4 mx-lg-5 py-5"> #}
+    {# <h4 class="text-blue1 mb-4">Here’s how we compare to competitors:</h4> #}
     {# TODO: Competitors table #}
-</div>
+{# </div> #}
 <div class="policy__info mx-4 mx-lg-5 py-5">
     <h4 class="text-blue1 mb-4">Here’s how we compare to other insurers:</h4>
     <div class="d-xl-flex justify-content-lg-center">
@@ -104,7 +104,7 @@
         <div class="col-md-8">
             <h4 class="mt-0 mb-4 text-blue1">Excess</h4>
             <p class="mb-5 text-white">Our excess is as low as &pound;50 for accidental damage and &pound;70 for loss and theft when you validate your phone with our app. If you don't validate your phone with our app the standard excess is &pound;150</p>
-            {# <a href="#" class="btn btn-outline-blue1">Find out more</a> #}
+            <a href="{{ path('faq') }}" class="btn btn-outline-blue1">Find out more</a>
         </div>
     </div>
 </div>
@@ -118,8 +118,8 @@
             <p>Get up to 80% cashback every year when you and your friends don’t claim.</p>
                 <h5 class="text-blue1">How?</h5>
             <p class="mb-5">Connect to friends/family and each receive up to £10 in your individual Reward Pots. At the end of the year, when you and your connections haven’t claimed, your Reward Pot is paid out to you</p>
-            <a href="#" class="btn btn-outline-blue1 mr-lg-2"><i class="far fa-play-circle fa-lg"></i> Watch video</a>
-            <a href="#" class="btn btn-outline-blue1">Find out more</a>
+            {# <a href="#" class="btn btn-outline-blue1 mr-lg-2"><i class="far fa-play-circle fa-lg"></i> Watch video</a> #}
+            <a href="{{ path('faq') }}" class="btn btn-outline-blue1">Find out more</a>
         </div>
     </div>
 </div>
