@@ -20,7 +20,64 @@
                     <h1 class="text-white mb-4">
                         {{ policy.user.firstname }}, <span class="sub">welcome to so-sure!</span>
                     </h1>
-                    <p class="text-white mb-4">Your {{ policy.phone.make }} {{ policy.phone.model }} is now protected against Theft, Loss, Accidental Damage and breakdown. You’ll receive your policy shortly via email.</p>
+                    <p class="text-white mb-5">Your {{ policy.phone.make }} {{ policy.phone.model }} is now protected against Theft, Loss, Accidental Damage and breakdown. You’ll receive your policy shortly via email.</p>
+                    <div class="expanding-cardbox expanding-cardbox-alt mb-4">
+                        <div class="expanding-cardbox__body">
+                            <h5 class="expanding-cardbox__title text-white mb-0">
+                                Policy Summary <i class="far fa-chevron-down text-white fa-lg"></i>
+                            </h5>
+                            <div class="expanding-cardbox__expand text-white mt-4">
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_pic-sure-lg-icn.svg" alt="so-sure - super quick cover" class="mb-4" width="150px">
+                                    </div>
+                                    <div class="col-md-8">
+                                        <ul class="list-unstyled mb-5">
+                                            <li class="mb-3"><strong>Phone:</strong> {{ policy.phone.make }} {{ policy.phone.model }} {{ policy.phone.memory }}GB</li>
+                                            <li class="mb-3"><strong>Policy number:</strong> {{ policy.policyNumber }}</li>
+                                            <li class="mb-3">
+                                                <strong>Cost:</strong>
+                                                {% if policy.getPremiumPlan == 'monthly'%}
+                                                    &pound;{{ policy.premium.monthlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }} per month
+                                                {% elseif policy.getPremiumPlan == 'yearly' %}
+                                                    &pound;{{ policy.premium.yearlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }} a year
+                                                {% else %}
+                                                    Unknown
+                                                {% endif %}
+                                            </li>
+                                            <li>
+                                                <strong>Start/End Date:</strong>
+                                                {{ policy.start|date('jS F Y', 'Europe/London') }} - {{ policy.end|date('jS F Y', 'Europe/London') }}
+                                            </li>
+                                        </ul>
+                                        <a href="#" class="btn btn-outline-white">Download Policy details <i class="fal fa-download"></i></a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="expanding-cardbox expanding-cardbox-alt mb-4">
+                        <div class="expanding-cardbox__body">
+                            <h5 class="expanding-cardbox__title text-white mb-0">
+                                How do I lower my excess? <i class="far fa-chevron-down text-white fa-lg"></i>
+                            </h5>
+                            <div class="expanding-cardbox__expand text-white mt-4">
+{#                                 <p>Our excess is as low as &pound;50 for accidental damage and &pound;70 for loss and theft when you validate your phone with our anti-fraud technology.</p>
+                                <p class="mb-0"><strong>If you don't validate your phone with pic-sure the excess is &pound;150</strong>.</p> #}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="expanding-cardbox expanding-cardbox-alt mb-4">
+                        <div class="expanding-cardbox__body">
+                            <h5 class="expanding-cardbox__title text-white mb-0">
+                                How do I get cashback? <i class="far fa-chevron-down text-white fa-lg"></i>
+                            </h5>
+                            <div class="expanding-cardbox__expand text-white mt-4">
+{#                                 <p>Our excess is as low as &pound;50 for accidental damage and &pound;70 for loss and theft when you validate your phone with our anti-fraud technology.</p>
+                                <p class="mb-0"><strong>If you don't validate your phone with pic-sure the excess is &pound;150</strong>.</p> #}
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 

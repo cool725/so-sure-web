@@ -75,11 +75,11 @@
                             <a href="#quote_info"
                                class="btn btn-outline-blue1 toggle-text"
                                data-toggle="collapse"
-                               data-text-swap='Hide full details <i class="far fa-arrow-up ml-2"></i>'
+                               data-text-swap='Hide full details <i class="fas fa-caret-up ml-2"></i>'
                                role="button"
                                aria-expanded="false"
                                aria-controls="quote_info">See full details
-                               <i class="far fa-arrow-down ml-2"></i>
+                               <i class="fas fa-caret-down ml-2"></i>
                             </a>
                         </div>
                     </div>
@@ -178,7 +178,7 @@
 
     <div id="quote_info_mobile" class="quote__info__container__mobile collapse">
         <div class="quote__info py-3">
-            {% include 'AppBundle::PhoneInsurance/_seeFullPolicy.html.twig' %}
+            {% include 'AppBundle::PhoneInsurance/_seeFullDetails.html.twig' %}
         </div>
     </div>
 
@@ -202,7 +202,7 @@
                             <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_wallet-lg-icn.svg" alt="so-sure - Policy" class="mb-4" width="120px">
                         </div>
                         <div class="col-sm-8">
-                            By joining forces with your most careful friends and family members, you could see 80% of your insurance premium reimbursed every year. Yes, really.  All you have to do is share this unique link to those you trust.
+                            By joining forces with your most careful friends and family members, you could see 80% of your insurance premium reimbursed every year.
                         </div>
                     </div>
                 </div>
