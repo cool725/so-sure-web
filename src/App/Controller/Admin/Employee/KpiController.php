@@ -2,6 +2,7 @@
 
 namespace App\Controller\Admin\Employee;
 
+use App\Admin\Reports\KpiCacheInterface;
 use App\Admin\Reports\KpiInterface;
 use AppBundle\Document\DateTrait;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
@@ -85,7 +86,7 @@ class KpiController extends AbstractController
             $startOfDay = $this->startOfDay(clone $date);
             $endOfDay = $this->endOfDay($end);
 
-            if ($this->clearCache) {
+            if ($this->clearCache && $this->kpiReport instanceof KpiCacheInterface) {
                 $this->kpiReport->clearCacheForPeriod($startOfDay, $endOfDay);
             }
 

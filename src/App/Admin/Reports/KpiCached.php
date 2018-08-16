@@ -5,7 +5,7 @@ namespace App\Admin\Reports;
 use DateTime;
 use Predis\Client;
 
-class KpiCached implements KpiInterface
+class KpiCached implements KpiInterface, KpiCacheInterface
 {
     /** @var KpiInterface inner, fetching service*/
     private $kpi;
@@ -41,13 +41,11 @@ class KpiCached implements KpiInterface
     {
         $cacheKey = $this->keyForPeriod($startOfDay, $endOfDay);
 
-        $this->redis->del($cacheKey);
+        $this->redis->del([$cacheKey]);
     }
 
     private function keyForPeriod(DateTime $start, DateTime $end): string
     {
-        $cacheKey = 'KpiCached:'.$start->format('Ymd.H').$end->format('Ymd.H');
-
-        return $cacheKey;
+        return 'KpiCached:'.$start->format('Ymd.H').$end->format('Ymd.H');
     }
 }

@@ -6,21 +6,16 @@ use AppBundle\Classes\SoSure;
 use AppBundle\Document\Claim;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Stats;
-use AppBundle\Repository\PhonePolicyRepository;
-use AppBundle\Repository\StatsRepository;
 use AppBundle\Service\ReportingService;
 use DateInterval;
 use DateTime;
-use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\ODM\MongoDB\DocumentManager;
 
 class Kpi implements KpiInterface
 {
     /** @var ReportingService */
     private $reporting;
-    /** @var PhonePolicyRepository|ObjectRepository */
     private $policyRepo;
-    /** @var StatsRepository|ObjectRepository */
     private $statsRepo;
 
     public function __construct(DocumentManager $documentManager, ReportingService $reportingService)
