@@ -1,1 +1,38 @@
-Welcome
+{% extends 'base_rebrand.html.twig' %}
+
+{# Set vars #}
+{% set body_class = 'quote' %}
+{% set quote_mode = 1 %}
+
+{% block title %}Welcome to Social Insurance{% endblock %}
+
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/welcome.css') }}">
+{% endblock %}
+
+{% block body %}
+
+    <section class="welcome">
+        <div class="d-lg-flex">
+
+            <div class="welcome__details__container">
+                <div class="welcome__details px-4 pb-4 px-lg-5 pb-lg-0">
+                    LEFT
+                </div>
+            </div>
+
+            {# TODO: Curve #}
+
+            <div class="welcome__cover__container p-4 py-lg-5">
+                <div class="welcome__cover">
+                    COVER
+                </div>
+            </div>
+        </div>
+    </section>
+
+{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/welcome.js') }}"></script>
+{% endblock %}
