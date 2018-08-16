@@ -9,10 +9,6 @@ appbundle:
     resource: "@AppBundle/Controller/"
     type:     annotation
     prefix:   /
-appbundle_adminEmployee:
-    resource: "@AppBundle/Controller/AdminEmployee/"
-    type:     annotation
-    prefix:   /
 app:
     resource: "../../src/App/Controller/"
     type:     annotation

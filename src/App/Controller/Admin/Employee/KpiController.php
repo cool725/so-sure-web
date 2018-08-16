@@ -1,31 +1,46 @@
 <?php
 
-namespace AppBundle\Controller\AdminEmployee;
+namespace App\Controller\Admin\Employee;
 
 use AppBundle\Classes\SoSure;
-use AppBundle\Controller\BaseController;
 use AppBundle\Document\Claim;
-use AppBundle\Document\CurrencyTrait;
 use AppBundle\Document\DateTrait;
-use AppBundle\Document\ImeiTrait;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Stats;
+use AppBundle\Repository\PhonePolicyRepository;
+use AppBundle\Repository\StatsRepository;
+use AppBundle\Service\ReportingService;
+use Doctrine\Common\Persistence\ObjectRepository;
+use Doctrine\ODM\MongoDB\DocumentManager;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * @Route("/admin")
  * @Security("has_role('ROLE_EMPLOYEE')")
  */
-class KpiController extends BaseController implements ContainerAwareInterface
+class KpiController extends AbstractController
 {
     use DateTrait;
-    // use CurrencyTrait;
-    // use ImeiTrait;
-    use ContainerAwareTrait;
+
+    /** @var ReportingService */
+    private $reporting;
+    /** @var PhonePolicyRepository|ObjectRepository  */
+    private $policyRepo;
+    /** @var StatsRepository|ObjectRepository  */
+    private $statsRepo;
+    /** @var DocumentManager */
+    private $documentManager;
+
+    public function __construct(DocumentManager $documentManager, ReportingService $reportingService)
+    {
+        $this->reporting = $reportingService;
+
+        $this->statsRepo = $documentManager->getRepository(Stats::class);
+        $this->policyRepo = $documentManager->getRepository(PhonePolicy::class);
+    }
 
     /**
      * @Route("/kpi", name="admin_kpi")
@@ -67,14 +82,11 @@ class KpiController extends BaseController implements ContainerAwareInterface
 
     private function getReportsByWeek($now, $numWeeks): array
     {
-        $dm = $this->getManager();
-        $policyRepo = $dm->getRepository(PhonePolicy::class);
-        $statsRepo = $dm->getRepository(Stats::class);
-
         $date = $this->showFromDate($now, $numWeeks);
 
         $weeks = [];
         $count = 1;
+
         while ($date < $now) {
             $end = clone $date;
             $end->add(new \DateInterval('P6D'));
@@ -90,12 +102,11 @@ class KpiController extends BaseController implements ContainerAwareInterface
             $date = $date->add(new \DateInterval('P7D'));
 
             $count++;
-            $reporting = $this->get('app.reporting');
-            $week['period'] = $reporting->report($start, $end, true);
+            $week['period'] = $this->reporting->report($start, $end, true);
             // $totalStart = clone $end;
             // $totalStart = $totalStart->sub(new \DateInterval('P1Y'));
-            $week['total'] = $reporting->report(new \DateTime(SoSure::POLICY_START), $end, true);
-            $week['sumPolicies'] = $reporting->sumTotalPoliciesPerWeek($end);
+            $week['total'] = $this->reporting->report(new \DateTime(SoSure::POLICY_START), $end, true);
+            $week['sumPolicies'] = $this->reporting->sumTotalPoliciesPerWeek($end);
 
             $approved = $week['total']['approvedClaims'][Claim::STATUS_APPROVED]
                 + $week['total']['approvedClaims'][Claim::STATUS_SETTLED];
@@ -104,10 +115,10 @@ class KpiController extends BaseController implements ContainerAwareInterface
             if ($week['sumPolicies'] != 0) {
                 $week['freq-claims'] = ((52 * $approved) / $week['sumPolicies']);
             }
-            $week['total-policies'] = $policyRepo->countAllActivePolicies($date);
+            $week['total-policies'] = $this->policyRepo->countAllActivePolicies($date);
 
             /** @var Stats[] $stats */
-            $stats = $statsRepo->getStatsByRange($start, $date);
+            $stats = $this->statsRepo->getStatsByRange($start, $date);
             foreach ($stats as $stat) {
                 if (!isset($week[$stat->getName()])) {
                     $week[$stat->getName()] = 0;
