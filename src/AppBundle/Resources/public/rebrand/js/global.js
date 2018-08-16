@@ -5,6 +5,7 @@ require('../sass/global.scss');
 // Require components
 require('./common/track.js');
 require('./common/fbLogin.js');
+require('./common/textSwap.js');
 require('./components/nav.js');
 require('./components/getQuote.js');
 require('./components/phoneSearchDropdown.js');

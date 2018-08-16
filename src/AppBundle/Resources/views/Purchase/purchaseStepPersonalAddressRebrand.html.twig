@@ -78,7 +78,7 @@
                                 &pound;{{ phone.currentPhonePrice.yearlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }} a year
                             {% endif %}
                         </div>
-                        <div class="purchase__footer d-none d-lg-block mt-5">
+                        <div class="purchase__footer d-none d-lg-flex justify-content-lg-between mt-5">
                             <div class="purchase__footer__text">
                                 <h4 class="text-blue1">An amazing level of cover:</h4>
                                 <ul class="list-unstyled icn-fa-list">
@@ -86,14 +86,17 @@
                                     <li class="text-white mb-2"><i class="far fa-check text-blue1 fa-lg"></i> Instant Cover and 24/7 live support</li><li class="text-white"><i class="far fa-check text-blue1 fa-lg"></i> 24-72 replacement phone once claim approved</li>
                                 </ul>
                             </div>
-                            <a href="#purchase_info"
-                               class="btn btn-outline-blue1 mt-2"
-                               data-toggle="collapse"
-                               role="button"
-                               aria-expanded="false"
-                               aria-controls="purchase_info"><span>See full policy</span>
-                               <i class="far fa-arrow-down ml-2"></i>
-                           </a>
+                            <div class="purchase__footer__cta">
+                                <a href="#purchase_info"
+                                   class="btn btn-outline-blue1 mt-2 toggle-text"
+                                   data-toggle="collapse"
+                                   data-text-swap='Hide full policy <i class="far fa-arrow-up ml-2"></i>'
+                                   role="button"
+                                   aria-expanded="false"
+                                   aria-controls="purchase_info"><span>See full policy</span>
+                                   <i class="far fa-arrow-down ml-2"></i>
+                               </a>
+                            </div>
                         </div>
                     </div>
                     <div id="purchase_info" class="purchase__info__container collapse">

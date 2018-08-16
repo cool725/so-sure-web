@@ -4,6 +4,7 @@ require('../../sass/pages/quotepage.scss');
 
 $(function() {
 
+
     // $('#quote_page_modal').on('show.bs.modal', function(e) {
 
     //     let modal   = $(this);
