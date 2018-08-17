@@ -23,7 +23,6 @@ $(function() {
         // Fix for resizing select if phone in session
         if ($('body').hasClass('quote')) {
             $('.phone-search-dropdown__make').resizeselect();
-            console.log('resize');
         }
 
         // Prevent scrolling whilst open

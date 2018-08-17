@@ -111,7 +111,12 @@
                     {% include 'AppBundle::Purchase/_currentStepPersonalAddress.html.twig' %}
                 </div>
             {% else %}
-                {# No phone #}
+                <div class="purchase__details__container">
+                    <div class="purchase__details px-4 pb-4 px-lg-5 pb-lg-0">
+                        <h2 class="text-white h1 mb-5">Whoops, no phone selected...</h2>
+                        <a href="#" class="btn btn-success btn-shadow btn-block-xs mb-5 get-a-quote">Get a Quote</a>
+                    </div>
+                </div>
             {% endif %}
         </div>
     </section>
@@ -133,7 +138,7 @@
                 <div class="modal-body text-center text-sm-left">
                     <div class="row">
                         <div class="col-sm-4">
-                            <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_policy-lg-icn.svg" alt="so-sure - Policy" class="mb-4" width="120px">
+                            <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_contract.png" alt="so-sure - Policy" width="120px">
                         </div>
                         <div class="col-sm-8">
                             Policy holders must be over 18 years old, a UK resident, and be the main user of the mobile phone. The mobile phone must also have been purchased within the UK.

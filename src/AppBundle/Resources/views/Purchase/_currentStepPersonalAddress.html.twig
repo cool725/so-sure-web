@@ -16,8 +16,6 @@
                     <a href="#"
                        data-toggle="modal"
                        data-target="#purchase_policy_name"
-                       {# data-title="Up to 80% cashback every year" #}
-                       {# data-body="asdasdasdasdasdasdasd" #}
                        data-img="{{ cdn_url }}/images/rebrand/icns/so-sure_happy-icn-min.svg"
                        role="button">
                         <i class="far fa-question-circle"></i>
@@ -133,31 +131,11 @@
                 <div id="select_address_errors" class="help-block with-errors" style="{% if not display_error %}display: none;{% endif %}">Select an address from the dropdown after searching</div>
                 <small class="form-text"><a id="address-manual" href="#">Enter address manually</small></a>
             </div>
-{#             <div id="display-address" style="margin-bottom: 20px" data-hj-suppress="">
-                {% if purchase_form.vars.data.addressLine1|length > 0 %}{{ purchase_form.vars.data.addressLine1 }}<br>{% endif %}
-                {% if purchase_form.vars.data.addressLine2|length > 0 %}{{ purchase_form.vars.data.addressLine2 }}<br>{% endif %}
-                {% if purchase_form.vars.data.addressLine3|length > 0 %}{{ purchase_form.vars.data.addressLine3 }}<br>{% endif %}
-                {% if purchase_form.vars.data.city|length > 0 %}{{ purchase_form.vars.data.city }}<br>{% endif %}
-                {% if purchase_form.vars.data.postcode|length > 0 %}{{ purchase_form.vars.data.postcode }}{% endif %}
-            </div> #}
 
             <div class="form-group">
                 <div class="form-row">
                     <div class="col text-left">
                         {# TODO: Needs to go back quote #}
-                        {% if app.request.get('_route') == "purchase_step_policy_id" %}
-                            <a href="{{ path('user_home') }}"
-                               class="btn btn-outline-grey">
-                                <span class="sr-only">back</span>
-                                <i class="far fa-arrow-left"></i></a>
-                            </a>
-                        {% else %}
-                            <a href="{{ path('purchase_step_personal') }}"
-                               class="btn btn-outline-grey">
-                                <span class="sr-only">back</span>
-                                <i class="far fa-arrow-left"></i></a>
-                            </a>
-                        {% endif %}
                     </div>
                     <div class="col text-right">
                         {# TODO: Add icon #}
@@ -210,19 +188,6 @@
                 <div class="form-row">
                     <div class="col text-left">
                         {# TODO: Needs to go back quote #}
-                        {% if app.request.get('_route') == "purchase_step_policy_id" %}
-                            <a href="{{ path('user_home') }}"
-                               class="btn btn-outline-grey">
-                                <span class="sr-only">back</span>
-                                <i class="far fa-arrow-left"></i></a>
-                            </a>
-                        {% else %}
-                            <a href="{{ path('purchase_step_personal') }}"
-                               class="btn btn-outline-grey">
-                                <span class="sr-only">back</span>
-                                <i class="far fa-arrow-left"></i></a>
-                            </a>
-                        {% endif %}
                     </div>
                     <div class="col text-right">
                         {{ form_widget(purchase_form.manual_next, {'label': 'Continue', 'attr': {'class': 'btn btn-success btn-gradient-green btn-block-xs'}}) }}
