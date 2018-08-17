@@ -19,4 +19,8 @@ $(function() {
         e.preventDefault();
     });
 
+    $('.quote__details__container').scroll(function(e) {
+        $('.navbar').toggleClass('navbar-scrolled-quote', $(this).scrollTop() > 5);
+    });
+
 });

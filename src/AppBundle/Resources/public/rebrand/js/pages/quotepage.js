@@ -12,7 +12,7 @@ $(function() {
         .data('text-swap', $(this).data('text-original'));
     });
 
-    $('.quote__details__container').scroll(function(e) {
+    $('.welcome__details__container').scroll(function(e) {
         $('.navbar').toggleClass('navbar-scrolled-quote', $(this).scrollTop() > 5);
     });
 
