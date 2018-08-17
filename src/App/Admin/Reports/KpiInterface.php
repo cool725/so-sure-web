@@ -6,5 +6,7 @@ use DateTime;
 
 interface KpiInterface
 {
-    public function reportForPeriod(DateTime $startOfDay, DateTime $endOfDay): array;
+    public function collectWeekRanges(DateTime $now, int $numWeeks): array;
+    public function reportForPeriod(array $dateRange): array;
+    public function getReportsByWeekRanges(array $weekRanges, bool $clearCache = false): array;
 }

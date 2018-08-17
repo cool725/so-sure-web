@@ -2,9 +2,6 @@
 
 namespace App\Admin\Reports;
 
-use DateTime;
-
-interface KpiCacheInterface
+interface KpiCacheInterface extends KpiInterface
 {
-    public function clearCacheForPeriod(DateTime $startOfDay, DateTime $endOfDay);
 }

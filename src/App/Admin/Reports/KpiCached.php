@@ -18,27 +18,55 @@ class KpiCached implements KpiInterface, KpiCacheInterface
         $this->redis = $redis;
     }
 
-    public function reportForPeriod(DateTime $startOfDay, DateTime $endOfDay): array
+    public function collectWeekRanges(DateTime $now, int $numWeeks): array
     {
-        $cacheKey = $this->keyForPeriod($startOfDay, $endOfDay);
+        return $this->kpi->collectWeekRanges($now, $numWeeks);
+    }
 
-        if ($value = $this->redis->get($cacheKey)) {
-            return unserialize($value);
+    public function reportForPeriod(array $dateRange): array
+    {
+        list($startOfDay, $endOfDay) = $dateRange;
+
+        $cacheKey = $this->keyForPeriod($startOfDay, $endOfDay);
+        if ($this->redis->exists($cacheKey)) {
+            $data = unserialize($this->redis->get($cacheKey));
+            if ($data) {
+                return $data;
+            }
         }
 
         // get from cache, else fetch, and fill cache
-        $value =  $this->kpi->reportForPeriod($startOfDay, $endOfDay);
+        $value = $this->kpi->reportForPeriod($dateRange);
 
         $this->redis->set($cacheKey, serialize($value));
-
         $tonight = strtotime('00:01 tomorrow');
         $this->redis->expire($cacheKey, $tonight);
 
         return $value;
     }
 
-    public function clearCacheForPeriod(DateTime $startOfDay, DateTime $endOfDay)
+    public function getReportsByWeekRanges(array $weekRanges, bool $clearCache = false): array
     {
+        $weeks = [];
+        $count = 1;
+
+        foreach ($weekRanges as $dateRange) {
+            if ($clearCache === true) {
+                $this->clearCacheForPeriod($dateRange);
+            }
+            $week = $this->reportForPeriod($dateRange);
+
+            $week['count'] = $count;
+            $weeks[] = $week;
+            $count++;
+        }
+
+        return $weeks;
+    }
+
+    private function clearCacheForPeriod(array $dateRange)
+    {
+        list($startOfDay, $endOfDay) = $dateRange;
         $cacheKey = $this->keyForPeriod($startOfDay, $endOfDay);
 
         $this->redis->del([$cacheKey]);
@@ -46,6 +74,6 @@ class KpiCached implements KpiInterface, KpiCacheInterface
 
     private function keyForPeriod(DateTime $start, DateTime $end): string
     {
-        return 'KpiCached:'.$start->format('Ymd.H').$end->format('Ymd.H');
+        return 'KpiCached:'.$start->format('Ymd.H').'-'.$end->format('Ymd.H');
     }
 }

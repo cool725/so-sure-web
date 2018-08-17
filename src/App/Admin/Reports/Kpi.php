@@ -4,6 +4,7 @@ namespace App\Admin\Reports;
 
 use AppBundle\Classes\SoSure;
 use AppBundle\Document\Claim;
+use AppBundle\Document\DateTrait;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Stats;
 use AppBundle\Service\ReportingService;
@@ -13,6 +14,8 @@ use Doctrine\ODM\MongoDB\DocumentManager;
 
 class Kpi implements KpiInterface
 {
+    use DateTrait;
+
     /** @var ReportingService */
     private $reporting;
     private $policyRepo;
@@ -26,8 +29,24 @@ class Kpi implements KpiInterface
         $this->policyRepo = $documentManager->getRepository(PhonePolicy::class);
     }
 
-    public function reportForPeriod(DateTime $startOfDay, DateTime $endOfDay): array
+    public function collectWeekRanges(DateTime $now, int $numWeeks): array
     {
+        $weeksRanges = [];
+
+        $date = $this->showFromDate($now, $numWeeks);
+
+        while ($date < $now) {
+            $weeksRanges[] = $this->getWeekPeriod($date);
+            $date = $date->add(new \DateInterval('P7D'));
+        }
+
+        return $weeksRanges;
+    }
+
+    public function reportForPeriod(array $dateRange): array
+    {
+        list($startOfDay, $endOfDay) = $dateRange;
+
         $week = [
             'start_date' => clone $startOfDay,
             'end_date' => $endOfDay,
@@ -69,5 +88,50 @@ class Kpi implements KpiInterface
         }
 
         return $week;
+    }
+
+    /**
+     * phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
+     */
+    public function getReportsByWeekRanges(array $weekRanges, bool $clearCache = false): array
+    {
+        $clearCache = $clearCache;
+        $weeks = [];
+        $count = 1;
+
+        foreach ($weekRanges as $x => $range) {
+            $week = $this->reportForPeriod($range);
+
+            $week['count'] = $count;
+            $weeks[] = $week;
+            $count++;
+        }
+
+        return $weeks;
+    }
+
+    private function showFromDate($now, $numWeeks): DateTime
+    {
+        $date = new DateTime('2016-09-12 00:00');
+        // TODO: Be smarter with start date, but this at least drops number of queries down significantly
+        while ($date < $now) {
+            // $end = clone $date;
+            // $end->add(new \DateInterval('P6D'));
+            // $end = $this->endOfDay($end);
+            $date = $date->add(new \DateInterval('P7D'));
+        }
+        $date = $date->sub(new \DateInterval(sprintf('P%dD', $numWeeks * 7)));
+
+        return $date;
+    }
+
+    private function getWeekPeriod($date): array
+    {
+        $end = clone $date;
+        $end->add(new \DateInterval('P6D'));
+        $startOfDay = $this->startOfDay(clone $date);
+        $endOfDay = $this->endOfDay($end);
+
+        return array($startOfDay, $endOfDay);
     }
 }
