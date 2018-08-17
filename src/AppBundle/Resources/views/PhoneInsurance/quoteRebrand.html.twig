@@ -186,6 +186,17 @@
     <div id="quote_info_mobile" class="quote__info__container__mobile collapse">
         <div class="quote__info py-3">
             {% include 'AppBundle::PhoneInsurance/_seeFullDetails.html.twig' %}
+{#             <div class="policy__info mx-4 mx-lg-5 py-4">
+                <div class="d-md-flex align-items-md-center justify-content-md-between py-3 px-4 mx-md-5 rounded bg-blue3">
+                    <div class="text-center text-lg-left">
+                        <h4 class="text-white">Let's get you covered</h4>
+                        <p class="lead text-white mb-0">It'll only take a few minutes</p>
+                    </div>
+                    {{ form_start(buy_form_banner) }}
+                        {{ form_widget(buy_form_banner.buy, {'label': 'Get Insured', 'attr': {'class': 'btn btn-success btn-shadow btn-gradient-green  btn-block-xs'}}) }}
+                    {{ form_end(buy_form_banner) }}
+                </div>
+            </div> #}
         </div>
     </div>
 

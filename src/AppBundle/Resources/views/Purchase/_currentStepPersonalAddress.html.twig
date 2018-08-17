@@ -74,19 +74,6 @@
                 <div class="form-row">
                     <div class="col text-left">
                         {# TODO: Needs to go back quote #}
-                        {% if app.request.get('_route') == "purchase_step_policy_id" %}
-                            <a href="{{ path('user_home') }}"
-                               class="btn btn-outline-grey">
-                                <span class="sr-only">back</span>
-                                <i class="far fa-arrow-left"></i></a>
-                            </a>
-                        {% else %}
-                            <a href="{{ path('purchase_step_personal') }}"
-                               class="btn btn-outline-grey">
-                                <span class="sr-only">back</span>
-                                <i class="far fa-arrow-left"></i></a>
-                            </a>
-                        {% endif %}
                     </div>
                     <div class="col text-right">
                         <a href="#"
