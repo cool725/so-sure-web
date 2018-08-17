@@ -243,7 +243,7 @@ class PurchaseController extends BaseController
                     }
                     $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_RECEIVE_DETAILS, $data);
 
-                    $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_AB_CONTENT_HOMEPAGE);
+                    // $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_AB_CONTENT_HOMEPAGE);
 
                     if ($user->hasPartialPolicy()) {
                         return new RedirectResponse(
