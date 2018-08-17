@@ -135,7 +135,17 @@
                     <ul class="list-unstyled icn-list">
                         <li class="mb-4">
                             <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_happy-icn-min.svg" alt="so-sure - Accidental damage" width="30px" class="mr-2">
-                            <strong class="text-blue4">24-72 hour replacement once claim approved</strong>
+                            <strong class="text-blue4">
+                                24-72 hour replace/repair <br> once claim approved
+                                <span class="ml-2 text-blue2">
+                                    <a href="#"
+                                       data-toggle="modal"
+                                       data-target="#quote_page_modal_replace_repair"
+                                       role="button">
+                                        <i class="far fa-question-circle"></i>
+                                    </a>
+                                </span>
+                            </strong>
                         </li>
                         <li class="mb-4">
                             <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_happy-icn-min.svg" alt="so-sure - Accidental damage" width="30px" class="mr-2">
@@ -148,10 +158,7 @@
                                 <span class="ml-2 text-blue2">
                                     <a href="#"
                                        data-toggle="modal"
-                                       data-target="#quote_page_modal"
-                                       data-title="Up to 80% cashback every year"
-                                       data-body="asdasdasdasdasdasdasd"
-                                       data-img="{{ cdn_url }}/images/rebrand/icns/so-sure_happy-icn-min.svg"
+                                       data-target="#quote_page_modal_cashback"
                                        role="button">
                                         <i class="far fa-question-circle"></i>
                                     </a>
@@ -184,9 +191,35 @@
 
     {# Page Modals #}
     <div class="modal fade"
-         id="quote_page_modal"
+         id="quote_page_modal_replace_repair"
          tabindex="-1" role="dialog"
-         aria-labelledby="quote_page_modal"
+         aria-labelledby="quote_page_modal_replace_repair"
+         aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">24-72 hour replace/repair</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <i class="fal fa-times text-white"></i>
+                    </button>
+                </div>
+                <div class="modal-body text-center text-sm-left">
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_phone-lg-icn.svg" alt="so-sure - Policy" class="mb-4" width="120px">
+                        </div>
+                        <div class="col-sm-8">
+                            Some repairs can take longer (eg water damage) but we will be as fast as possible once your claim approved
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade"
+         id="quote_page_modal_cashback"
+         tabindex="-1" role="dialog"
+         aria-labelledby="quote_page_modal_cashback"
          aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
@@ -202,7 +235,7 @@
                             <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_wallet-lg-icn.svg" alt="so-sure - Policy" class="mb-4" width="120px">
                         </div>
                         <div class="col-sm-8">
-                            By joining forces with your most careful friends and family members, you could see 80% of your insurance premium reimbursed every year.
+                            By joining forces with your most careful friends and family members, you could see 80% of your insurance premium reimbursed every year
                         </div>
                     </div>
                 </div>

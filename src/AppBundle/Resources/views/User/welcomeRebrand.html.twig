@@ -21,7 +21,7 @@
                     <h1 class="text-white mb-4">
                         {{ policy.user.firstname }}, <span class="sub">welcome to <span class="text-nowrap">so-sure!</span></span>
                     </h1>
-                    <p class="text-white mb-5">Your {{ policy.phone.make }} {{ policy.phone.model }} is now protected against Theft, Loss, Accidental Damage and breakdown. You’ll receive your policy shortly via email.</p>
+                    <p class="text-white mb-5">Your <strong>{{ policy.phone.make }} {{ policy.phone.model }}</strong> is now protected against Theft, Loss, Accidental Damage and breakdown. You’ll receive your policy shortly via email.</p>
                     <div class="expanding-cardbox expanding-cardbox-alt mb-4">
                         <div class="expanding-cardbox__body">
                             <h5 id="welcome_policy_summary" class="expanding-cardbox__title text-white mb-0">
@@ -57,6 +57,7 @@
                             </div>
                         </div>
                     </div>
+                    <p class="text-center text-white mb-4">⚠️ Is your phone already damaged e.g. cracked screen or no longer working? <a href="{{ cancel_url }}" class="text-white"><u>Click here</u></a></p>
                     <div class="expanding-cardbox expanding-cardbox-alt mb-4">
                         <div class="expanding-cardbox__body">
                             <h5 class="expanding-cardbox__title text-white mb-0">
@@ -112,7 +113,6 @@
                     <h2 class="text-blue2 mb-3">You're covered 🎉</h2>
                     <h5 class="mb-4">Thank you for choosing so-sure</h5>
                     <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_phone-lg-icn.svg" alt="so-sure - Simple Terms &amp; Conditions" class="mb-4" width="150px">
-                    <p>You'll receive a confirmation email with full details of your policy shortly, but here's a summary.</p>
                     <a href="{{ path('user_policy', {'policyId': policy.id }) }}" class="btn btn-success btn-shadow">View your account <i class="far fa-arrow-right ml-2"></i></a>
                 </div>
             </div>

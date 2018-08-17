@@ -1179,10 +1179,10 @@ class UserController extends BaseController
             );
             $this->addFlash('success', $message);
         }
-        $this->addFlash('error', sprintf(
-            'Is your phone already damaged (eg broken screen or no longer working)? <a href="%s" class="text-nowrap alert-link">Click here</a>',
-            $this->generateUrl('purchase_cancel', ['id' => $user->getLatestPolicy()->getId()])
-        ));
+        // $this->addFlash('error', sprintf(
+        //     'Is your phone already damaged (eg broken screen or no longer working)? <a href="%s" class="text-nowrap alert-link">Click here</a>',
+        //     $this->generateUrl('purchase_cancel', ['id' => $user->getLatestPolicy()->getId()])
+        // ));
 
         $oauth2FlowParams = null;
         $session = $request->getSession();
@@ -1193,6 +1193,7 @@ class UserController extends BaseController
         }
 
         $data = array(
+            'cancel_url' => $this->generateUrl('purchase_cancel', ['id' => $user->getLatestPolicy()->getId()]),
             'policy_key' => $this->getParameter('policy_key'),
             'policy' => $user->getLatestPolicy(),
             'has_visited_welcome_page' => $pageVisited,

@@ -19,8 +19,13 @@
 .icn-list {
 
     li {
+        position: relative;
+        padding-left: 45px;
+        padding-top: 2px;
 
         img {
+            position: absolute;
+            left: 0; top: 0;
             vertical-align: middle;
         }
     }

@@ -15,27 +15,6 @@ body {
 .welcome {
     position: relative;
 
-    // h1 {
-    //     border-bottom: 2px solid $blue-1b;
-    // }
-
-    // &__h1 {
-    //     @include media-breakpoint-down(xs) {
-    //         font-size: 1.5rem;
-    //     }
-
-    //     .far {
-    //         cursor: pointer;
-    //     }
-    // }
-
-    // &__h5 {
-    //     @include media-breakpoint-down(xs) {
-    //         font-size: 1rem;
-    //         opacity: 0.5;
-    //     }
-    // }
-
     &__details__container {
 
         @include media-breakpoint-up(lg) {
@@ -48,7 +27,7 @@ body {
     }
 
     &__details {
-        padding-top: 6rem;
+        padding-top: 2rem;
 
         @include media-breakpoint-up(lg) {
             padding-top: 8rem;
@@ -58,10 +37,12 @@ body {
 
     &__cover__container {
         background-color: $white;
+        margin-top: 4rem;
 
         @include media-breakpoint-up(lg) {
             width: 40vw; height: 100vh;
             overflow-y: scroll;
+            margin-top: 0;
 
             // IE
             -ms-overflow-style: none;
@@ -70,11 +51,11 @@ body {
 
     &__cover {
         max-width: 400px;
+        margin: 0 auto;
         text-align: center;
         padding-top: 2em;
 
         @include media-breakpoint-up(lg) {
-            margin: 0 auto;
             padding-top: 8rem;
         }
     }
