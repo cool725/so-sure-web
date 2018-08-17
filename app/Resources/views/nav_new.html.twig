@@ -29,18 +29,10 @@
                 {# Do nothing #}
             {% else %}
                 <ul class="nav navbar-nav navbar-right">
-                    {# Link to personal or company insurance #}
-                    {% if app.request.get('_route') == 'mobile_phone_insurance_for_your_company' %}
-                        <li><a href="{{ path('homepage') }}">Personal phones</a></li>
-                    {% else %}
-                        <li><a href="{{ path('mobile_phone_insurance_for_your_company') }}">Company phones</a></li>
-                    {% endif %}
+                    <li><a href="{{ path('claim') }}">Make a claim</a></li>
                     <li><a href="{{ path('faq') }}">FAQ</a></li>
-                    {% if search_type is defined and search_type == 'dropdown-search' %}
-                        <li class="hidden-xs hidden-sm">
-                            <span><a href="#" class="btn navbar-btn scroll-to" data-scroll-to-anchor="#dropdown-search" data-scroll-to-adjust="40">Get a quote</a></span>
-                        </li>
-                    {% endif %}
+                    <li><a href="https://blog.wearesosure.com">Blog</a></li>
+                    <li><a href="{{ path('about_how_to_contact_so_sure') }}">Contact</a></li>
                     {% if app.user is not null and app.user %}
                         {% if is_granted('ROLE_ADMIN') %}
                             <li><a href="{{ path('admin_home') }}"><i class="fa fa-home"></i> Admin</a></li>
@@ -62,7 +54,7 @@
                         {% endif %}
                     {% else %}
                         <li>
-                            <span><a href="{{ path('fos_user_security_login') }}" class="btn navbar-btn"> Login</a></span>
+                            <span><a href="{{ path('fos_user_security_login') }}" class="btn navbar-btn"> Customer log in</a></span>
                         </li>
                     {% endif %}
                 </ul>
