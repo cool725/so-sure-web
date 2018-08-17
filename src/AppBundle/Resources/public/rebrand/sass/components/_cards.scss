@@ -39,7 +39,6 @@
 .expanding-cardbox {
     border: 2px solid rgba(37,147,243, 0.2);
     @include border-radius(10px);
-    cursor: pointer;
 
     &__body {
         padding: 1.2rem 1.56rem 1.56rem 1.56rem;
@@ -49,6 +48,7 @@
         position: relative;
         padding-right: 2.4rem;
         margin-top: .25rem;
+        cursor: pointer;
 
         .far {
             position: absolute;
@@ -77,11 +77,6 @@
 
 .expanding-cardbox-alt {
     border: 2px solid $blue-1;
-
-    a {
-        // color: $white;
-        // text-decoration: underline;
-    }
 
     &:hover {
         border: 2px solid $blue-1;

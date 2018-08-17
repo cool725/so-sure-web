@@ -2,13 +2,14 @@
 
 $(function() {
 
-    const cardbox = $('.expanding-cardbox');
+    const cardbox = $('.expanding-cardbox'),
+          title   = $('.expanding-cardbox__title');
 
-    cardbox.on('click', function(e) {
+    title.on('click', function(e) {
         e.preventDefault();
 
         // Toggle the content
-        $(this).toggleClass('expanding-cardbox__open')
+        $(this).parent().parent().toggleClass('expanding-cardbox__open')
         .find('.expanding-cardbox__expand, .expanding-cardbox__excerpt')
         .slideToggle('fast');
 

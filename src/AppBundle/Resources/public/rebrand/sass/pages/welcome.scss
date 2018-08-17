@@ -51,34 +51,10 @@ body {
         padding-top: 6rem;
 
         @include media-breakpoint-up(lg) {
-            padding-top: 12rem;
-        }
-    }
-
-    &__alt__phones {
-
-        a.dropdown-toggle {
-            &:before {
-                display: none;
-            }
-        }
-    }
-
-    &__footer {
-        @include media-breakpoint-up(lg) {
             padding-top: 8rem;
-
-            //TODO: This is terrible needs positioning
         }
     }
 
-    &__info__container {
-        display: none;
-
-        @include media-breakpoint-up(lg) {
-            display: block;
-        }
-    }
 
     &__cover__container {
         background-color: $white;
@@ -94,9 +70,12 @@ body {
 
     &__cover {
         max-width: 400px;
+        text-align: center;
+        padding-top: 2em;
 
         @include media-breakpoint-up(lg) {
             margin: 0 auto;
+            padding-top: 8rem;
         }
     }
 }

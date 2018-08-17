@@ -30,6 +30,15 @@ label {
         background-color: rgba(37, 147, 243, 0.1);
         box-shadow: rgba(37, 147, 243, 0.1);
     }
+
+    &:disabled,
+    &[readonly] {
+        background-color: $off-white;
+
+        &:focus {
+            background-color: $off-white;
+        }
+    }
 }
 
 .form-text {
