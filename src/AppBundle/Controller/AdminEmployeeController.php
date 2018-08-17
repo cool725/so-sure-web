@@ -1515,34 +1515,6 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
     }
 
     /**
-     * @Route("/reports", name="admin_reports")
-     * @Template("AppBundle:AdminEmployee:adminReports.html.twig")
-     */
-    public function adminReportsAction(Request $request)
-    {
-        $data = [];
-        $start = $request->get('start');
-        $end = $request->get('end');
-        if (!$start) {
-            $start = new \DateTime();
-            $start->sub(new \DateInterval('P7D'));
-        } else {
-            $start = new \DateTime($start, new \DateTimeZone(SoSure::TIMEZONE));
-        }
-        if (!$end) {
-            $end = new \DateTime();
-        } else {
-            $end = new \DateTime($end, new \DateTimeZone(SoSure::TIMEZONE));
-        }
-
-        $reporting = $this->get('app.reporting');
-        $report = $reporting->report($start, $end);
-        $report['data'] = array_merge($report['data'], $reporting->connectionReport());
-
-        return $report;
-    }
-
-    /**
      * @Route("/pl", name="admin_quarterly_pl")
      * @Route("/pl/{year}/{month}", name="admin_quarterly_pl_date")
      * @Template
