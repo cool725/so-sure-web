@@ -116,11 +116,11 @@ class DefaultController extends BaseController
 
         $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE);
 
-        $expContent = $this->getSessionSixpackTest(
-            $request,
-            SixpackService::EXPERIMENT_AB_CONTENT_HOMEPAGE,
-            ['old-homepage-copy', 'new-homepage-copy']
-        );
+        // $expContent = $this->getSessionSixpackTest(
+        //     $request,
+        //     SixpackService::EXPERIMENT_AB_CONTENT_HOMEPAGE,
+        //     ['old-homepage-copy', 'new-homepage-copy']
+        // );
 
         if ($this->get('app.request')->getDeviceCategory() == RequestService::DEVICE_CATEGORY_MOBILE) {
             $expSearch = $this->sixpack(
