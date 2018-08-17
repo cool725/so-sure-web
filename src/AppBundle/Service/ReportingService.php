@@ -43,7 +43,6 @@ use AppBundle\Document\User;
 
 class ReportingService
 {
-    const REPORT_KEY_FORMAT = 'Report:%s:%s';
     const REPORT_CACHE_TIME = 3600;
 
     use DateTrait;
@@ -86,7 +85,12 @@ class ReportingService
 
     public function report($start, $end, $isKpi = false)
     {
-        $redisKey = sprintf(self::REPORT_KEY_FORMAT, $start->format('ymdhi'), $end->format('ymdhi'));
+        $redisKey = sprintf(
+            'Report:%s:%s:%s',
+            $start->format('Y-m-d.hi'),
+            $end->format('Y-m-d.hi'),
+            $isKpi ? 'kpiYES': 'kpiNo'
+        );
         if ($this->redis->exists($redisKey)) {
             return unserialize($this->redis->get($redisKey));
         }
@@ -122,8 +126,6 @@ class ReportingService
         $connectionRepo = $this->dm->getRepository(StandardConnection::class);
         /** @var InvitationRepository $invitationRepo */
         $invitationRepo = $this->dm->getRepository(Invitation::class);
-        /** @var ScheduledPaymentRepository $scheduledPaymentRepo */
-        $scheduledPaymentRepo = $this->dm->getRepository(ScheduledPayment::class);
         /** @var ClaimRepository $claimsRepo */
         $claimsRepo = $this->dm->getRepository(Claim::class);
         $claims = $claimsRepo->findFNOLClaims($start, $end);
@@ -159,14 +161,6 @@ class ReportingService
         $data['rolling12MonthClaimAttributionText'] = $this->arrayToString($data['rolling12MonthClaims']);
 
         $data['newUsers'] = $userRepo->findNewUsers($start, $end)->count();
-
-        $invalidPolicies = $policyRepo->getActiveInvalidPolicies();
-        $invalidPoliciesIds = [];
-        foreach ($invalidPolicies as $invalidPolicy) {
-            $invalidPoliciesIds[] = new \MongoId($invalidPolicy->getId());
-        }
-        $scheduledPaymentRepo->setExcludedPolicyIds($invalidPoliciesIds);
-        $data['scheduledPayments'] = $scheduledPaymentRepo->getMonthlyValues();
 
         $excludedPolicyIds = $this->getExcludedPolicyIds($isKpi);
         $excludedPolicies = $this->getExcludedPolicies($isKpi);
@@ -666,6 +660,11 @@ class ReportingService
 
     public function connectionReport()
     {
+        $redisKey = sprintf('ConnectionReport');
+        if ($this->redis->exists($redisKey)) {
+            return unserialize($this->redis->get($redisKey));
+        }
+
         /** @var PhonePolicyRepository $policyRepo */
         $policyRepo = $this->dm->getRepository(PhonePolicy::class);
         /** @var ConnectionRepository $connectionRepo */
@@ -731,6 +730,8 @@ class ReportingService
         } else {
             $data['totalWeightedAvgConnections'] = null;
         }
+
+        $this->redis->setex($redisKey, self::REPORT_CACHE_TIME, serialize($data));
 
         return $data;
     }
@@ -1173,5 +1174,31 @@ class ReportingService
         }
 
         return implode($lineSeperator, $data);
+    }
+
+    public function getScheduledPayments() // @todo : iterable
+    {
+        $redisKey = sprintf('ScheduledPaymentsReport');
+        if ($this->redis->exists($redisKey)) {
+            return unserialize($this->redis->get($redisKey));
+        }
+
+        /** @var PhonePolicyRepository $policyRepo */
+        $policyRepo = $this->dm->getRepository(PhonePolicy::class);
+        $invalidPolicies = $policyRepo->getActiveInvalidPolicies();
+
+        $invalidPoliciesIds = [];
+        foreach ($invalidPolicies as $invalidPolicy) {
+            $invalidPoliciesIds[] = new \MongoId($invalidPolicy->getId());
+        }
+
+        /** @var ScheduledPaymentRepository $scheduledPaymentRepo */
+        $scheduledPaymentRepo = $this->dm->getRepository(ScheduledPayment::class);
+        $scheduledPaymentRepo->setExcludedPolicyIds($invalidPoliciesIds);
+
+        $results = $scheduledPaymentRepo->getMonthlyValues();
+        $this->redis->setex($redisKey, self::REPORT_CACHE_TIME, serialize($results));
+
+        return $results;
     }
 }
