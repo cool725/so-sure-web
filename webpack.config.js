@@ -33,7 +33,6 @@ Encore
     .enableBuildNotifications()
 
     // create hashed filenames (e.g. app.abc123.css)
-    // TODO: Get working in config!
     .enableVersioning()
 
     // allow sass/scss files to be processed

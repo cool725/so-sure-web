@@ -67,7 +67,7 @@ label {
     .tt {
 
         &-input {
-            z-index: 1071;
+            z-index: 1001;
         }
 
         &-hint {}
@@ -83,7 +83,7 @@ label {
                         0 5px 15px 0 rgba(8,27,154,0.08);
 
             overflow-y: scroll;
-            z-index: 1070 !important;
+            z-index: 1000 !important;
         }
 
         &-suggestion {

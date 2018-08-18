@@ -5,6 +5,8 @@ $(function() {
     const cardbox = $('.expanding-cardbox'),
           title   = $('.expanding-cardbox__title');
 
+    let open = false;
+
     title.on('click', function(e) {
         e.preventDefault();
 
