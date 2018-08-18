@@ -25,7 +25,7 @@ $(function() {
         setTimeout(function() { $('.btn-copy').tooltip('hide'); }, 1500);
     });
 
-    $('.quote__details__container').scroll(function(e) {
+    $('.welcome__details__container').scroll(function(e) {
         $('.navbar').toggleClass('navbar-scrolled-quote', $(this).scrollTop() > 5);
     });
 
