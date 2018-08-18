@@ -19,6 +19,12 @@ $(function() {
         e.preventDefault();
     });
 
+    clipboard.on('success', function(event) {
+        console.log(event);
+        $('.btn-copy').tooltip('show');
+        setTimeout(function() { $('.btn-copy').tooltip('hide'); }, 1500);
+    });
+
     $('.quote__details__container').scroll(function(e) {
         $('.navbar').toggleClass('navbar-scrolled-quote', $(this).scrollTop() > 5);
     });

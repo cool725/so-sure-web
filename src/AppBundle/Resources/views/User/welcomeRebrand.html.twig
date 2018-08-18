@@ -51,7 +51,7 @@
                                                 {{ policy.start|date('jS F Y', 'Europe/London') }} - {{ policy.end|date('jS F Y', 'Europe/London') }}
                                             </li>
                                         </ul>
-                                        <a href="#" class="btn btn-outline-white">Download Policy details <i class="fal fa-download ml-2"></i></a>
+                                        <a href="" class="btn btn-outline-white">Download Policy details <i class="fal fa-download ml-2"></i></a>
                                     </div>
                                 </div>
                             </div>
@@ -118,6 +118,27 @@
             </div>
         </div>
     </section>
+
+    {# Page Modals #}
+    <div class="modal fade"
+         id="policy_doc"
+         tabindex="-1" role="dialog"
+         aria-labelledby="policy_doc"
+         aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">IMEI Number</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <i class="fal fa-times text-white"></i>
+                    </button>
+                </div>
+                <div class="modal-body" data-url="{{ url('latest_policy_terms', {'policy_key': policy_key, 'maxPotValue':  policy.maxPot, 'include': true, 'noH1': true }) }}">
+
+                </div>
+            </div>
+        </div>
+    </div>
 
     {# Pixels #}
     {% if environment == 'prod' %}
