@@ -43,6 +43,7 @@ use AppBundle\Document\User;
 
 class ReportingService
 {
+    const REPORT_KEY_FORMAT = 'Report:%s:%s:%s';
     const REPORT_CACHE_TIME = 3600;
 
     use DateTrait;
@@ -86,7 +87,7 @@ class ReportingService
     public function report($start, $end, $isKpi = false)
     {
         $redisKey = sprintf(
-            'Report:%s:%s:%s',
+            self::REPORT_KEY_FORMAT,
             $start->format('Y-m-d.hi'),
             $end->format('Y-m-d.hi'),
             $isKpi ? 'kpiYES': 'kpiNo'
@@ -1052,7 +1053,7 @@ class ReportingService
 
         return $data;
     }
-    
+
     private function getQuarterlyPLDates(\DateTime $date)
     {
         $start = null;
