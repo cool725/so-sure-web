@@ -12,6 +12,8 @@ services:
         public: false
         bind:
             #$kernelEnvironment: "%kernel.environment%"
+            $redis: "@snc_redis.default"
+            $documentManager: "@doctrine_mongodb.odm.default_document_manager"
 
     # makes classes in src/AppBundle available to be used as services
     # this creates a service per class whose id is the fully-qualified class name
@@ -30,6 +32,14 @@ services:
     app.datetimenormalizer:
         class: Symfony\Component\Serializer\Normalizer\DateTimeNormalizer
         tags: [serializer.normalizer]
+
+    App\Admin\Reports\KpiCached:
+        # overrides the App\Admin\Reports\Kpi service
+        # but that service is still available as App\Admin\Reports\Kpi.inner
+        decorates: App\Admin\Reports\Kpi
+        arguments:
+            $kpi: '@App\Admin\Reports\KpiCached.inner'
+    App\Admin\Reports\KpiInterface: '@App\Admin\Reports\KpiCached'
 
     ###################################################################
     ## Legacy Aliases for services - to remove after Symfony 4.1 with access to test.container
