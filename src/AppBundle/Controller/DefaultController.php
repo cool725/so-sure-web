@@ -141,7 +141,7 @@ class DefaultController extends BaseController
             // 'replacement' => $replacement,
             'referral'    => $referral,
             'phone'       => $this->getQuerystringPhone($request),
-            'search_type' => $expSearch,
+            // 'search_type' => $expSearch,
         );
 
         $template = 'AppBundle:Default:indexRebrand.html.twig';

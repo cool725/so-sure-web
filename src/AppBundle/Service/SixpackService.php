@@ -130,9 +130,9 @@ class SixpackService
         // Exp 6
         // self::EXPERIMENT_PHONE_REPLACEMENT,
         // Exp 7
-        self::EXPERIMENT_TEXT_VS_DROPDOWN,
+        // self::EXPERIMENT_TEXT_VS_DROPDOWN,
         // Exp 8
-        self::EXPERIMENT_TEXT_VS_DROPDOWN_MOBILE,
+        // self::EXPERIMENT_TEXT_VS_DROPDOWN_MOBILE,
         // Exp 9
 
         // Exp 10
@@ -221,9 +221,9 @@ class SixpackService
         // Exp 2
         // self::EXPERIMENT_AB_CONTENT_HOMEPAGE,
         // Exp 3
-        self::EXPERIMENT_TEXT_VS_DROPDOWN,
+        // self::EXPERIMENT_TEXT_VS_DROPDOWN,
         // Exp 4
-        self::EXPERIMENT_TEXT_VS_DROPDOWN_MOBILE,
+        // self::EXPERIMENT_TEXT_VS_DROPDOWN_MOBILE,
         // Exp 5
 
         // Exp 6
