@@ -10,18 +10,20 @@
         -webkit-appearance: none;
         -moz-appearance: none;
         -o-appearance: none;
-        appearance: none;
 
         // Style
-        background-color: transparent;
+        background: transparent url('#{$cdn_url}/images/rebrand/icns/so-sure_arrow-down-icn.svg') no-repeat right 20px;
+        background-size: 20px;
         border: 0;
         border-bottom: 3px solid $blue-1b;
         @include border-radius(0);
         color: $blue-1b;
-        padding: 0 0 1px 0;
+        padding: 0 24px 1px 0;
 
         &:disabled {
             opacity: 0.5;
+            // background: transparent;
+            padding: 0 24px 1px 0;
         }
 
         &.valid-select {

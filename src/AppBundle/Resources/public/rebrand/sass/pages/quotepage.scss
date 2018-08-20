@@ -104,6 +104,7 @@ body {
 
     &__curve {
         svg {
+            // Fix for 1px gap
             transform: translateY(1px);
         }
 
@@ -116,6 +117,7 @@ body {
                 position: absolute;
                 right: 0; top: 0;
                 transform: translateY(0);
+                transform: translateX(1px);
             }
         }
     }

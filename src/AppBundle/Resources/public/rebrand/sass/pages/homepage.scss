@@ -64,10 +64,12 @@
 }
 
 .cover {
+    position: relative;
 
     &__illustration__mobile {
         height: 240px;
         overflow: hidden;
+        position: relative;
     }
 
     &__mobile {
@@ -76,6 +78,11 @@
 
     &__list {
         margin-top: 7rem;
+    }
+
+    svg {
+        position: absolute;
+        bottom: -1px; left: 0; right: 0;
     }
 }
 
