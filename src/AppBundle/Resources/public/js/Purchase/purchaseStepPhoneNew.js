@@ -121,8 +121,8 @@ $(function(){
         $(this).addClass('radio-btn-active');
 
         // Set the value for the form element
-        let value = $(this).data('value');
-        $('input[name="purchase_form[amount]"][value="' + value + '"]').prop('checked', true);
+        let val = $(this).data('value');
+        $('input[name="purchase_form[amount]"][value="' + val + '"]').prop('checked', true);
 
         // Adjust the price in the copy
         let premium = $(this).data('premium-type');
