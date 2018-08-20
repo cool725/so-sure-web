@@ -119,16 +119,21 @@
                 </a>
                 {% endif %}
             </div>
-            <div class="col">
-                {% if app.user.hasValidPaymentMethod and app.user.hasJudoPaymentMethod %}
+            {% if app.user.hasValidPaymentMethod and app.user.hasJudoPaymentMethod %}
+                <div class="col">
                     {{ form_widget(purchase_form.existing, {'label': 'Pay with card on file', 'attr': {'class': 'btn btn-success btn-gradient-green'}}) }}
+                </div>
+                <div class="col">
                     {{ form_widget(purchase_form.next, {'label': 'Pay with a new card', 'attr': {'class': 'btn btn-success btn-gradient-green'}}) }}
-                {% else %}
+                </div>
+            {% else %}
+                <div class="col">
                     {% if purchase_form.existing is defined %}
                         {% do purchase_form.existing.setRendered %}
                     {% endif %}
                     {{ form_widget(purchase_form.next, {'label': 'I agree, proceed to payment', 'attr': {'class': 'btn btn-success btn-gradient-green'}}) }}
-                {% endif %}
+                </div>
+            {% endif %}
             </div>
         </div>
     </div>

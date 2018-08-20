@@ -2,21 +2,19 @@
 
 // Logo
 .so-sure-logo {
-	width: 130px; height: 30px;
+	width: 120px; height: 30px;
+    background-size: 120px;
 
 	&-dark {
-		background: transparent no-repeat center top url('#{$cdn_url}/logo/so-sure-logo-dark.svg');
-	    background-size: 130px;
+		background: transparent no-repeat top center url('#{$cdn_url}/logo/so-sure-logo-dark.svg');
 	}
 
 	&-light {
-		background: transparent no-repeat center top url('#{$cdn_url}/images/logo/so-sure_so-sure-full-logo-white-flat.svg');
-		background-size: 130px;
+		background: transparent url('#{$cdn_url}/images/rebrand/logo/so-sure_logo-white-light.svg') no-repeat top center;
 	}
 
     &-blue-flat {
-        background: transparent no-repeat center top url('#{$cdn_url}/images/logo/so-sure_so-sure-full-logo-blue-flat.svg');
-        background-size: 130px;
+        background: transparent url('#{$cdn_url}/images/rebrand/logo/so-sure_logo-blue.svg') no-repeat top center;
     }
 }
 

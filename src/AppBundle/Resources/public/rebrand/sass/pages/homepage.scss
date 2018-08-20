@@ -56,9 +56,6 @@
         background-size: 600px;
     }
 
-    @include media-breakpoint-up(fk) {
-        background-position: 450px 280px;
-    }
 }
 
 .cover {
