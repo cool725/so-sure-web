@@ -103,13 +103,20 @@ body {
     }
 
     &__curve {
-        width: 5vw; height: 100vh;
-        position: relative;
-
         svg {
-            height: 100vh;
-            position: absolute;
-            right: 0; top: 0;
+            transform: translateY(1px);
+        }
+
+        @include media-breakpoint-up(lg) {
+            width: 5vw; height: 100vh;
+            position: relative;
+
+            svg {
+                height: 100vh;
+                position: absolute;
+                right: 0; top: 0;
+                transform: translateY(0);
+            }
         }
     }
 }

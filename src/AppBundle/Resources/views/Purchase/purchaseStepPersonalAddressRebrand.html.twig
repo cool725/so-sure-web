@@ -104,20 +104,28 @@
                     </div>
                 </div>
 
-                <div class="purchase__curve d-none d-lg-block">
-                    <svg preserveAspectRatio="xMinYMin meet" viewBox="0 0 57 846" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-                        <!-- Generator: Sketch 50.2 (55047) - http://www.bohemiancoding.com/sketch -->
-                        <desc>Created with Sketch.</desc>
+                <div class="purchase__curve">
+                    <svg class="d-block d-lg-none" preserveAspectRatio="xMinYMin meet" viewBox="0 0 750 117" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
                         <defs></defs>
                         <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-                            <g id="3.0-so-sure-(Price-&amp;-Payment)" transform="translate(-12.000000, 0.000000)" fill="#FFFFFF">
+                            <g transform="translate(0.000000, -32.000000)" fill="#FFFFFF">
+                                <g id="---BG---" transform="translate(-4700.000000, -8443.000000)">
+                                    <path d="M4700,8515 C4824,8488.33333 4948.66667,8475 5074,8475 C5199.33333,8475 5324.66667,8488.33333 5450,8515 L5450,8592 L4700,8592 L4700,8515 Z" id="Rectangle"></path>
+                                </g>
+                            </g>
+                        </g>
+                    </svg>
+                    <svg class="d-none d-lg-block" preserveAspectRatio="xMinYMin meet" viewBox="0 0 57 846" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                        <defs></defs>
+                        <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                            <g transform="translate(-12.000000, 0.000000)" fill="#FFFFFF">
                                 <path d="M69,0 L69,846 L68,846 C30.6666667,705 12,564 12,423 C12,282 31,141 69,0 Z" id="Rectangle-3"></path>
                             </g>
                         </g>
                     </svg>
                 </div>
 
-                <div class="purchase__form__container p-4 py-lg-5">
+                <div class="purchase__form__container px-4 pb-4 pt-0 py-lg-5">
                     {% include 'AppBundle::Purchase/_purchaseStepsRebrand.html.twig' %}
                     {% include 'AppBundle::Purchase/_currentStepPersonalAddress.html.twig' %}
                 </div>
