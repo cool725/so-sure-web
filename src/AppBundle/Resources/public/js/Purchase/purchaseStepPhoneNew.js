@@ -121,21 +121,21 @@ $(function(){
         $(this).addClass('radio-btn-active');
 
         // Set the value for the form element
-        let val = $(this).data('value');
+        var val = $(this).data('value');
         $('input[name="purchase_form[amount]"][value="' + val + '"]').prop('checked', true);
 
         // Adjust the price in the copy
-        let premium = $(this).data('premium-type');
-        let price = $('#purchase_price');
+        var premium = $(this).data('premium-type');
+        var price = $('#purchase_price');
         price.html('&pound;' + val + ' a ' + premium);
     });
 
-    if ($.trim($('#Reference').val()).length > 0) {
-        // Show loading overlay
-        // TODO: New loader
-        $('.so-sure-loading').show();
-        $('#webpay-form').submit();
-    }
+    // if ($.trim($('#Reference').val()).length > 0) {
+    //     // Show loading overlay
+    //     // TODO: New loader
+    //     $('.so-sure-loading').show();
+    //     $('#webpay-form').submit();
+    // }
 
     // $('#imei-screenshot').click(function(e) {
     //     e.preventDefault();
