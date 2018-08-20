@@ -602,6 +602,7 @@ services:
             - "%appannie_apikey%"
             - "@app.stats"
 
+    AppBundle\Service\ReportingService: '@app.reporting'
     app.reporting:
         class: AppBundle\Service\ReportingService
         arguments:
