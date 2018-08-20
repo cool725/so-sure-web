@@ -45,6 +45,10 @@ label {
     color: rgba(23, 11, 56, 0.4);
 }
 
+.custom-checkbox .custom-control-input:checked ~ .custom-control-label::before {
+    background-color: #00B500;
+}
+
 // Server side error styling
 .with-errors {
     ul {

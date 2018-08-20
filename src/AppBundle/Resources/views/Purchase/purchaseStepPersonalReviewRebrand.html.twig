@@ -72,7 +72,7 @@
                                 {% endif %}
                             </span>
                         </div>
-                        <div class="purchase__footer d-none d-lg-flex justify-content-lg-between mt-5">
+                        <div class="purchase__footer d-none d-lg-block mt-5">
                             <div class="purchase__footer__text">
                                 <h4 class="text-blue1">An amazing level of cover:</h4>
                                 <ul class="list-unstyled icn-fa-list">
@@ -98,7 +98,18 @@
                     </div>
                 </div>
 
-                {# TODO: Curve #}
+                <div class="purchase__curve d-none d-lg-block">
+                    <svg preserveAspectRatio="xMinYMin meet" viewBox="0 0 57 846" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                        <!-- Generator: Sketch 50.2 (55047) - http://www.bohemiancoding.com/sketch -->
+                        <desc>Created with Sketch.</desc>
+                        <defs></defs>
+                        <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                            <g id="3.0-so-sure-(Price-&amp;-Payment)" transform="translate(-12.000000, 0.000000)" fill="#FFFFFF">
+                                <path d="M69,0 L69,846 L68,846 C30.6666667,705 12,564 12,423 C12,282 31,141 69,0 Z" id="Rectangle-3"></path>
+                            </g>
+                        </g>
+                    </svg>
+                </div>
 
                 <div class="purchase__form__container p-4 py-lg-5">
                     {% include 'AppBundle::Purchase/_purchaseStepsRebrand.html.twig' %}
@@ -132,7 +143,7 @@
                 <div class="modal-body">
                     <div class="row">
                         <div class="col-sm-3">
-                            <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_phone-lg-icn.svg" alt="so-sure - Policy" class="mb-4" width="120px">
+                            <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_phone-smile.png" alt="so-sure - Policy" class="mb-4" width="120px">
                         </div>
                         <div class="col-sm-8 offset-sm-1">
                             <small>Unlike other insurers we ask for this now, so if your phone is lost of stolen you dont have the additional hassle of finding this information.</small>
@@ -158,7 +169,7 @@
                 <div class="modal-body">
                     <div class="row">
                         <div class="col-sm-3">
-                            <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_phone-lg-icn.svg" alt="so-sure - Policy" class="mb-4" width="120px">
+                            <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_phone-smile.png" alt="so-sure - Policy" class="mb-4" width="120px">
                         </div>
                         <div class="col-sm-8 offset-sm-1">
                             <small>Unlike other insurers we ask for this now, so if your phone is lost of stolen you dont have the additional hassle of finding this information.</small>

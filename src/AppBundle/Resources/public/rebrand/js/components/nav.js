@@ -26,7 +26,7 @@ $(function() {
         logo.toggleClass('navbar-brand__logo-white-light');
 
         // Toggle the quote btn class
-        quoteBtn.toggleClass('btn-outline-white');
+        quoteBtn.toggleClass('btn-outline-white btn-gradient');
 
         // Prevent scrolling whilst open
         $('body').toggleClass('body--overflow');

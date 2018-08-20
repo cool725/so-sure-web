@@ -82,21 +82,34 @@ body {
 
     &__cover__container {
         background-color: $white;
+        position: relative;
+
+        // IE
+        -ms-overflow-style: none;
 
         @include media-breakpoint-up(lg) {
-            width: 40vw; height: 100vh;
+            width: 35vw; height: 100vh;
             overflow-y: scroll;
-
-            // IE
-            -ms-overflow-style: none;
         }
     }
 
     &__cover {
         max-width: 400px;
+        overflow-y: scroll;
 
         @include media-breakpoint-up(lg) {
             margin: 0 auto;
+        }
+    }
+
+    &__curve {
+        width: 5vw; height: 100vh;
+        position: relative;
+
+        svg {
+            height: 100vh;
+            position: absolute;
+            right: 0; top: 0;
         }
     }
 }

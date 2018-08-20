@@ -78,7 +78,7 @@
                                 &pound;{{ phone.currentPhonePrice.yearlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }} a year
                             {% endif %}
                         </div>
-                        <div class="purchase__footer d-none d-lg-flex justify-content-lg-between mt-5">
+                        <div class="purchase__footer d-none d-lg-block mt-5">
                             <div class="purchase__footer__text">
                                 <h4 class="text-blue1">An amazing level of cover:</h4>
                                 <ul class="list-unstyled icn-fa-list">
@@ -104,7 +104,18 @@
                     </div>
                 </div>
 
-                {# TODO: Curve #}
+                <div class="purchase__curve d-none d-lg-block">
+                    <svg preserveAspectRatio="xMinYMin meet" viewBox="0 0 57 846" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                        <!-- Generator: Sketch 50.2 (55047) - http://www.bohemiancoding.com/sketch -->
+                        <desc>Created with Sketch.</desc>
+                        <defs></defs>
+                        <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                            <g id="3.0-so-sure-(Price-&amp;-Payment)" transform="translate(-12.000000, 0.000000)" fill="#FFFFFF">
+                                <path d="M69,0 L69,846 L68,846 C30.6666667,705 12,564 12,423 C12,282 31,141 69,0 Z" id="Rectangle-3"></path>
+                            </g>
+                        </g>
+                    </svg>
+                </div>
 
                 <div class="purchase__form__container p-4 py-lg-5">
                     {% include 'AppBundle::Purchase/_purchaseStepsRebrand.html.twig' %}

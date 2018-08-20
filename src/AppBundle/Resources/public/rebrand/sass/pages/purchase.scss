@@ -41,6 +41,9 @@ body {
         @include media-breakpoint-up(lg) {
             width: 60vw; height: 100vh;
             overflow-y: scroll;
+
+            // IE
+            -ms-overflow-style: none;
         }
     }
 
@@ -83,9 +86,23 @@ body {
         background-color: $white;
         position: relative;
 
+        // IE
+        -ms-overflow-style: none;
+
         @include media-breakpoint-up(lg) {
-            width: 40vw; height: 100vh;
+            width: 35vw; height: 100vh;
             overflow-y: scroll;
+        }
+    }
+
+    &__curve {
+        width: 5vw; height: 100vh;
+        position: relative;
+
+        svg {
+            height: 100vh;
+            position: absolute;
+            right: 0; top: 0;
         }
     }
 }

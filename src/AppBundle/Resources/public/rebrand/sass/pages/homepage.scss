@@ -56,6 +56,11 @@
         background-size: 600px;
     }
 
+    @include media-breakpoint-up(fk) {
+        background-position: 120px 280px;
+        background-size: 600px;
+    }
+
 }
 
 .cover {
@@ -87,16 +92,16 @@
     position: relative;
 
     @include media-breakpoint-up(lg) {
-        background: $white url('#{$cdn_url}/images/rebrand/homepage/so-sure_app-illustration.png') no-repeat 550px 50px;
+        background: $white url('#{$cdn_url}/images/rebrand/homepage/so-sure_app-illustration.png') no-repeat 550px 120px;
         background-size: 600px;
     }
 
     @include media-breakpoint-up(xl) {
-        background-position: 800px 50px;
+        background-position: 800px 120px;
     }
 
     @include media-breakpoint-up(fk) {
-        background-position: 1400px 50px;
+        background-position: 1400px 120px;
     }
 
     &__illustration__mobile {
