@@ -127,7 +127,7 @@ $(function(){
         // Adjust the price in the copy
         let premium = $(this).data('premium-type');
         let price = $('#purchase_price');
-        price.html('&pound;' + value + ' a ' + premium);
+        price.html('&pound;' + val + ' a ' + premium);
     });
 
     if ($.trim($('#Reference').val()).length > 0) {
