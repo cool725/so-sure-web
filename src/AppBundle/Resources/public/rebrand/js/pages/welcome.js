@@ -29,4 +29,41 @@ $(function() {
         $('.navbar').toggleClass('navbar-scrolled-quote', $(this).scrollTop() > 5);
     });
 
+    // Load Data
+    const policyModal   = $('#policy_doc'),
+          policyContent = $('.policy-content'),
+          policyLoader  = $('#policy_doc_loader'),
+          policyToggle  = $('#policy_doc_toggle'),
+          policyReload  = $('#policy_doc_reload'),
+          url           = policyModal.data('url');
+
+    const loadDoc = () => {
+        policyContent.load(url, function(responseTxt, statusTxt) {
+            if (statusTxt === 'success') {
+                // Hide the loader
+                policyLoader.fadeOut();
+                // Find the tables to add some styling classes
+                $(this).find('h2').hide();
+                $(this).find('table').addClass('table table-striped');
+            }
+            if (statusTxt === 'error') {
+                policyLoader.fadeOut(function() {
+                    policyReload.fadeIn();
+
+                });
+            }
+        });
+    }
+
+    policyToggle.on('click', function(e) {
+        e.preventDefault();
+        loadDoc();
+    });
+
+    policyReload.on('click', function(e) {
+        e.preventDefault();
+        $(this).fadeOut();
+        loadDoc();
+    });
+
 });
