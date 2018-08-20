@@ -91,11 +91,12 @@ class Kpi implements KpiInterface
     }
 
     /**
-     * phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
+     * @codingStandardsIgnoreStart
      */
     public function getReportsByWeekRanges(array $weekRanges, bool $clearCache = false): array
     {
-        $clearCache = $clearCache;
+        // @codingStandardsIgnoreEnd
+
         $weeks = [];
         $count = 1;
 
