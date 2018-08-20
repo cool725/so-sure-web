@@ -116,25 +116,25 @@ class DefaultController extends BaseController
 
         $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE);
 
-        $expContent = $this->getSessionSixpackTest(
-            $request,
-            SixpackService::EXPERIMENT_AB_CONTENT_HOMEPAGE,
-            ['old-homepage-copy', 'new-homepage-copy']
-        );
+        // $expContent = $this->getSessionSixpackTest(
+        //     $request,
+        //     SixpackService::EXPERIMENT_AB_CONTENT_HOMEPAGE,
+        //     ['old-homepage-copy', 'new-homepage-copy']
+        // );
 
-        if ($this->get('app.request')->getDeviceCategory() == RequestService::DEVICE_CATEGORY_MOBILE) {
-            $expSearch = $this->sixpack(
-                $request,
-                SixpackService::EXPERIMENT_TEXT_VS_DROPDOWN_MOBILE,
-                ['dropdown-search-old', 'dropdown-search']
-            );
-        } else {
-            $expSearch = $this->sixpack(
-                $request,
-                SixpackService::EXPERIMENT_TEXT_VS_DROPDOWN,
-                ['text-search', 'dropdown-search']
-            );
-        }
+        // if ($this->get('app.request')->getDeviceCategory() == RequestService::DEVICE_CATEGORY_MOBILE) {
+        //     $expSearch = $this->sixpack(
+        //         $request,
+        //         SixpackService::EXPERIMENT_TEXT_VS_DROPDOWN_MOBILE,
+        //         ['dropdown-search-old', 'dropdown-search']
+        //     );
+        // } else {
+        //     $expSearch = $this->sixpack(
+        //         $request,
+        //         SixpackService::EXPERIMENT_TEXT_VS_DROPDOWN,
+        //         ['text-search', 'dropdown-search']
+        //     );
+        // }
 
         $data = array(
             // Make sure to check homepage landing below too
@@ -144,12 +144,7 @@ class DefaultController extends BaseController
             'search_type' => $expSearch,
         );
 
-        $template = 'AppBundle:Default:index.html.twig';
-
-        // If A/B content test
-        if ($expContent == 'new-homepage-copy') {
-            $template = 'AppBundle:Default:indexContent.html.twig';
-        }
+        $template = 'AppBundle:Default:indexRebrand.html.twig';
 
         return $this->render($template, $data);
     }

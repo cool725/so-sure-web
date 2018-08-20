@@ -77,11 +77,11 @@ class SixpackService
     // Exp 6
     // const EXPERIMENT_PHONE_REPLACEMENT = 'twentyfour-seventy-two';
     // Exp 7
-    const EXPERIMENT_AB_CONTENT_HOMEPAGE = 'new-homepage-copy';
+    // const EXPERIMENT_AB_CONTENT_HOMEPAGE = 'new-homepage-copy';
     // Exp 8
-    const EXPERIMENT_TEXT_VS_DROPDOWN = 'dropdown-search';
+    // const EXPERIMENT_TEXT_VS_DROPDOWN = 'dropdown-search';
     // Exp 9
-    const EXPERIMENT_TEXT_VS_DROPDOWN_MOBILE = 'dropdown-search-mobile';
+    // const EXPERIMENT_TEXT_VS_DROPDOWN_MOBILE = 'dropdown-search-mobile';
     // Exp 10
     const EXPERIMENT_WELCOME_MODAL_NO_WELCOME_MODAL = 'welcome-modal-requested-cancellation';
     // Exp 11
