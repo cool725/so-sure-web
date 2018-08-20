@@ -386,6 +386,9 @@ class IntercomService
             'name' => $user->getName(),
             'signed_up_at' => $user->getCreated()->getTimestamp(),
             'user_id' => $user->getId(),
+            'user_url' => $this->router->generate('user_home', [
+                'id' => $user->getId()
+            ], UrlGeneratorInterface::ABSOLUTE_URL),
         );
         if ($user->getIntercomId()) {
             $data['id'] = $user->getIntercomId();
