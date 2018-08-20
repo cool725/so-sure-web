@@ -515,15 +515,8 @@ class PhoneInsuranceController extends BaseController
             'slider_test'     => 'slide-me',
             // 'replacement'     => $replacement,
         );
-
-        // Adwords landingpage test
-        if (in_array($request->get('_route'), ['insurance_make_model_memory'])) {
-            return $this->render('AppBundle:PhoneInsurance:adlanding.html.twig', $data);
-        } else {
-            // Default
-            // return $this->render('AppBundle:PhoneInsurance:quote.html.twig', $data);
-            return $this->render('AppBundle:PhoneInsurance:quoteRebrand.html.twig', $data);
-        }
+      
+        return $this->render('AppBundle:PhoneInsurance:quoteContent.html.twig', $data);
     }
 
     /**

@@ -116,11 +116,11 @@ class DefaultController extends BaseController
 
         $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE);
 
-        $expContent = $this->getSessionSixpackTest(
-            $request,
-            SixpackService::EXPERIMENT_AB_CONTENT_HOMEPAGE,
-            ['old-homepage-copy', 'new-homepage-copy']
-        );
+        // $expContent = $this->getSessionSixpackTest(
+        //     $request,
+        //     SixpackService::EXPERIMENT_AB_CONTENT_HOMEPAGE,
+        //     ['old-homepage-copy', 'new-homepage-copy']
+        // );
 
         if ($this->get('app.request')->getDeviceCategory() == RequestService::DEVICE_CATEGORY_MOBILE) {
             $expSearch = $this->sixpack(
@@ -144,12 +144,12 @@ class DefaultController extends BaseController
             'search_type' => $expSearch,
         );
 
-        $template = 'AppBundle:Default:index.html.twig';
-
+        // $template = 'AppBundle:Default:index.html.twig';
+        $template = 'AppBundle:Default:indexContent.html.twig';
         // If A/B content test
-        if ($expContent == 'new-homepage-copy') {
-            $template = 'AppBundle:Default:indexContent.html.twig';
-        }
+        // if ($expContent == 'new-homepage-copy') {
+        //     $template = 'AppBundle:Default:indexContent.html.twig';
+        // }
 
         return $this->render($template, $data);
     }
@@ -267,19 +267,7 @@ class DefaultController extends BaseController
             'sub_heading2' => 'here’s how we stack up against the competition',
         ];
 
-        // $exp = $this->sixpack(
-        //     $request,
-        //     SixpackService::EXPERIMENT_COMPETITOR_LANDING,
-        //     ['homepage', 'competitor-landing']
-        // );
-
-        // if ($exp == 'competitor-landing') {
-        //     return $this->render('AppBundle:Default:indexCompetitor.html.twig', $data);
-        // } else {
-            // return $this->redirectToRoute('homepage');
-        // }
-        //
-        return $this->redirectToRoute('homepage');
+        return $this->render('AppBundle:Default:indexCompetitor.html.twig', $data);
     }
 
     /**
