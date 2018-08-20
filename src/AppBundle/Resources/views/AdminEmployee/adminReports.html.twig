@@ -9,446 +9,457 @@
     {% endjavascripts %}
 {% endblock %}
 
-    {% block body %}
-    <div class="container">
-        <h2>so-sure Reports</h2>
+{% block body %}
 <div class="container">
-    <form method="GET">
-    <div class='col-md-4'>
-        <div class="form-group">
-            <div class='input-group date' id='report-start'>
-                <input name="start" type='text' class="form-control" value="{{ start |date('d-m-Y H:i', 'Europe/London')}}" />
-                <span class="input-group-addon">
-                    <span class="fa fa-calendar"></span>
-                </span>
+
+    <h2>so-sure Reports</h2>
+    {% if start is defined %}
+        <div class="row-fluid">
+            <div class="col-md-12">
+                <form method="GET">
+                <div class='col-md-4'>
+                    <div class="form-group">
+                        <div class='input-group date' id='report-start'>
+                            <input name="start" type='text' class="form-control" value="{{ start |date('d-m-Y H:i', 'Europe/London')}}" />
+                            <span class="input-group-addon">
+                                <span class="fa fa-calendar"></span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class='col-md-4'>
+                    <div class="form-group">
+                        <div class='input-group date' id='report-end'>
+                            <input name="end" type='text' class="form-control" value="{{ end |date('d-m-Y H:i', 'Europe/London')}}" />
+                            <span class="input-group-addon">
+                                <span class="fa fa-calendar"></span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class='col-md-4'>
+                    <button class="btn btn-primary">Run Report</button>
+                </div>
+                </form>
             </div>
         </div>
-    </div>
-    <div class='col-md-4'>
-        <div class="form-group">
-            <div class='input-group date' id='report-end'>
-                <input name="end" type='text' class="form-control" value="{{ end |date('d-m-Y H:i', 'Europe/London')}}" />
-                <span class="input-group-addon">
-                    <span class="fa fa-calendar"></span>
-                </span>
-            </div>
-        </div>
-    </div>
-    <div class='col-md-4'>
-        <button class="btn btn-primary">Run Report</button>
-    </div>
-    </form>
-</div>
+    {% endif %}
 
     <div class="row-fluid">
-        <div class="col-md-11">
-    <ul class="nav nav-tabs nav-justified">
-      <li role="presentation" class="active"><a data-toggle="tab" href="#general">General</a></li>
-      <li role="presentation"><a data-toggle="tab" href="#connections">Connections</a></li>
-      <li role="presentation"><a data-toggle="tab" href="#billing">Monthly Billing</a></li>
-    </ul>
-    <div class="tab-content">
-        <div role="tabpanel" class="tab-pane active" id="general">
-
-        <h3>Excludes Policies:
-            {% for excluded_policy in excluded_policies %}
-            <a href="{{ path('admin_policy', {'id': excluded_policy.id }) }}">{{ excluded_policy.policyNumber }}</a>
-            {% endfor %}
-            {% if excluded_policies|length == 0 %}n/a{% endif %}
-        </h3>
-            <div class="table-responsive">
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th></th>
-                            <th>New (in period)</th>
-                            <th>Total</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Active Policies</td>
-                            <td></td>
-                            <td>{{ data.totalActivePolicies }}</td>
-                        </tr>
-                        <tr>
-                            <td style="padding-left: 30px">Active Monthly Policies
-                            </td>
-                            <td></td>
-                            <td>{{ data.totalActiveMonthlyPolicies }}</td>
-                        </tr>
-                        <tr>
-                            <td style="padding-left: 30px">Active Yearly Policies
-                            </td>
-                            <td></td>
-                            <td>{{ data.totalActiveYearlyPolicies }}</td>
-                        </tr>
-                        <tr>
-                            <td>New Policies (adjusted for upgrades)</td>
-                            <td>{{ data.newPoliciesAdjUpgrade }}</td>
-                            <td>{{ data.totalPoliciesAdjUpgrade }}</td>
-                        </tr>
-                        <tr>
-                            <td style="padding-left: 30px">New Policies (Direct)
-        <i style="cursor: pointer" class="fa fa-warning" data-toggle="popover" data-placement="bottom" data-html="true"
-           title="Data Validity" data-content="Data only populated after 22/9/16"></i>
-                            </td>
-                            <td>{{ data.newDirectPolicies }}</td>
-                            <td>{{ data.totalDirectPolicies }}</td>
-                        </tr>
-                        <tr>
-                            <td style="padding-left: 30px">New Policies (Invitation)
-        <i style="cursor: pointer" class="fa fa-warning" data-toggle="popover" data-placement="bottom" data-html="true"
-           title="Data Validity" data-content="Data only populated after 22/9/16"></i>
-                            </td>
-                            <td>{{ data.newInvitationPolicies }}</td>
-                            <td>{{ data.totalInvitationPolicies }}</td>
-                        </tr>
-                        <tr>
-                            <td style="padding-left: 30px">New Policies (SCode)
-        <i style="cursor: pointer" class="fa fa-warning" data-toggle="popover" data-placement="bottom" data-html="true"
-           title="Data Validity" data-content="Data only populated after 22/9/16"></i>
-                            </td>
-                            <td>{{ data.newSCodePolicies }}</td>
-                            <td>{{ data.totalSCodePolicies }}</td>
-                        </tr>
-                        <tr>
-                            <td>Policy Upgrades
-        <i style="cursor: pointer" class="fa fa-warning" data-toggle="popover" data-placement="bottom" data-html="true"
-           title="Cancellation data only" data-content="Assumed that if cancelled due to upgrade, a new police will be put in place"></i>
-                            </td>
-                            <td>{{ data.endingUpgradePolicies }}</td>
-                            <td>{{ data.totalUpgradePolicies }}</td>
-                        </tr>
-
-                        <tr>
-                            <td>Ending/Cancelled Policies (adjusted for upgrades)</td>
-                            <td>{{ data.endingEndingPoliciesAdjUpgrade }} ({{ data.endingEndingFNOLPoliciesAdjUpgrade }} w/FNOL)</td>
-                            <td>{{ data.totalEndingPoliciesAdjUpgrade }} ({{ data.totalEndingFNOLPoliciesAdjUpgrade }} w/FNOL)</td>
-                        </tr>
-                        <tr>
-                            <td style="padding-left: 30px">Cancelled Unpaid Policies
-                            </td>
-                            <td>{{ data.endingUnpaidPolicies }} ({{ data.endingUnpaidFNOLPolicies }} w/FNOL)</td>
-                            <td>{{ data.totalUnpaidPolicies }} ({{ data.totalUnpaidFNOLPolicies }} w/FNOL)</td>
-                        </tr>
-                        <tr>
-                            <td style="padding-left: 30px">Cancelled Actual Fraud Policies
-                            </td>
-                            <td>{{ data.endingActualFraudPolicies }} ({{ data.endingActualFraudFNOLPolicies }} w/FNOL)</td>
-                            <td>{{ data.totalActualFraudPolicies }} ({{ data.totalActualFraudFNOLPolicies }} w/FNOL)</td>
-                        </tr>
-                        <tr>
-                            <td style="padding-left: 30px">Cancelled Suspected Fraud Policies
-                            </td>
-                            <td>{{ data.endingSuspectedFraudPolicies }} ({{ data.endingSuspectedFraudFNOLPolicies }} w/FNOL)</td>
-                            <td>{{ data.totalSuspectedFraudPolicies }} ({{ data.totalSuspectedFraudFNOLPolicies }} w/FNOL)</td>
-                        </tr>
-                        <tr>
-                            <td style="padding-left: 30px">Cancelled User Requested Policies
-                            </td>
-                            <td>{{ data.endingUserRequestedPolicies }} ({{ data.endingUserRequestedFNOLPolicies }} w/FNOL)</td>
-                            <td>{{ data.totalUserRequestedPolicies }} ({{ data.totalUserRequestedFNOLPolicies }} w/FNOL)</td>
-                        </tr>
-                        <tr>
-                            <td style="padding-left: 30px">Cancelled Cooloff Policies
-                            </td>
-                            <td>{{ data.endingCooloffPolicies }} ({{ data.endingCooloffFNOLPolicies }} w/FNOL)</td>
-                            <td>{{ data.totalCooloffPolicies }} ({{ data.totalCooloffFNOLPolicies }} w/FNOL)</td>
-                        </tr>
-                        <tr>
-                            <td style="padding-left: 30px">Cancelled Bad Risk Policies
-                            </td>
-                            <td>{{ data.endingBadRiskPolicies }} ({{ data.endingBadRiskFNOLPolicies }} w/FNOL)</td>
-                            <td>{{ data.totalBadRiskPolicies }} ({{ data.totalBadRiskFNOLPolicies }} w/FNOL)</td>
-                        </tr>
-                        <tr>
-                            <td style="padding-left: 30px">Cancelled Dispossesion Policies
-                            </td>
-                            <td>{{ data.endingDispossessionPolicies }} ({{ data.endingDispossessionFNOLPolicies }} w/FNOL)</td>
-                            <td>{{ data.totalDispossessionPolicies }} ({{ data.totalDispossessionFNOLPolicies }} w/FNOL)</td>
-                        </tr>
-                        <tr>
-                            <td style="padding-left: 30px">Cancelled Wreckage Policies
-                            </td>
-                            <td>{{ data.endingWreckagePolicies }} ({{ data.endingWreckageFNOLPolicies }} w/FNOL)</td>
-                            <td>{{ data.totalWreckagePolicies }} ({{ data.totalWreckageFNOLPolicies }} w/FNOL)</td>
-                        </tr>
-                        <tr>
-                            <td>Cancelled w/Payment Owed
-                            </td>
-                            <td></td>
-                            <td>{{ data.cancelledAndPaymentOwed }}</td>
-                        </tr>
-
-                        <tr>
-                            <td>Avg Yearly Premium</td>
-                            <td>{% if data.newPoliciesAvgPremium is defined %}<span title="£{{ data.newPoliciesPremium }} total">£{{ data.newPoliciesAvgPremium }}</span>{% else %}n/a{% endif %}</td>
-                            <td><del>{% if data.totalPoliciesAvgPremium is defined %}<span title="£{{ data.totalPoliciesPremium }} total">£{{ data.totalPoliciesAvgPremium }}</span>{% else %}n/a{% endif %}</del>
-        <i style="cursor: pointer" class="fa fa-warning" data-toggle="popover" data-placement="bottom" data-html="true"
-           title="Incorrect figure" data-content="This figure appears to be incorrect. See Clubhouse ch3122 for latest status. Workaround is to run report from 2016-09-01 to present."></i>
-
-                            </td>
-                        </tr>
-                        <!--
-                        <tr>
-                            <td style="padding-left: 30px">Avg Yearly Premium (Direct)
-        <i style="cursor: pointer" class="fa fa-warning" data-toggle="popover" data-placement="bottom" data-html="true"
-           title="Data Validity" data-content="Data only populated after 22/9/16"></i>
-                            </td>
-                            <td>{% if data.newDirectPoliciesAvgPremium is defined %}<span title="£{{ data.newDirectPoliciesPremium }} total">£{{ data.newDirectPoliciesAvgPremium }}</span>{% else %}n/a{% endif %}</td>
-                            <td>{% if data.totalDirectPoliciesAvgPremium is defined %}<span title="£{{ data.totalDirectPoliciesPremium }} total">£{{ data.totalDirectPoliciesAvgPremium }}</span>{% else %}n/a{% endif %}</td>
-                        </tr>
-                        <tr>
-                            <td style="padding-left: 30px">Avg Yearly Premium (Invitation)
-        <i style="cursor: pointer" class="fa fa-warning" data-toggle="popover" data-placement="bottom" data-html="true"
-           title="Data Validity" data-content="Data only populated after 22/9/16"></i>
-                            </td>
-                            <td>{% if data.newInvitationPoliciesAvgPremium is defined %}<span title="£{{ data.newInvitationPolicies }} total">£{{ data.newInvitationPoliciesAvgPremium }}</span>{% else %}n/a{% endif %}</td>
-                            <td>{% if data.totalInvitationPoliciesAvgPremium is defined %}<span title="£{{ data.totalInvitationPolicies }} total">£{{ data.totalInvitationPoliciesAvgPremium }}</span>{% else %}n/a{% endif %}</td>
-                        </tr>
-                            <td style="padding-left: 30px">Avg Yearly Premium (SCode)
-        <i style="cursor: pointer" class="fa fa-warning" data-toggle="popover" data-placement="bottom" data-html="true"
-           title="Data Validity" data-content="Data only populated after 22/9/16"></i>
-                            </td>
-                            <td>{% if data.newSCodePoliciesAvgPremium is defined %}<span title="£{{ data.newSCodePoliciesPremium }} total">£{{ data.newSCodePoliciesAvgPremium }}</span>{% else %}n/a{% endif %}</td>
-                            <td>{% if data.totalSCodePoliciesAvgPremium is defined %}<span title="£{{ data.totalSCodePoliciesPremium }} total">£{{ data.totalSCodePoliciesAvgPremium }}</span>{% else %}n/a{% endif %}</td>
-                        </tr>
-                        -->
-                        <tr>
-                            <td>Current Pot Value
-        <i style="cursor: pointer" class="fa fa-info" data-toggle="popover" data-placement="bottom" data-html="true"
-           title="" data-content="Sum of all of the pots across all policies. Includes the promo pot value portion."></i>
-                            </td>
-                            <td></td>
-                            <td>£{{ data.totalPot|number_format(2, '.', ',') }}</td>
-                        </tr>
-                        <tr>
-                            <td>Current Promo Pot Value
-        <i style="cursor: pointer" class="fa fa-info" data-toggle="popover" data-placement="bottom" data-html="true"
-           title="" data-content="Sum of all of the promo portion of the pots across all policies"></i>
-                            </td>
-                            <td></td>
-                            <td>£{{ data.totalPromoPot|number_format(2, '.', ',') }}</td>
-                        </tr>
-                        <tr>
-                            <td>Total Connection Links
-        <i style="cursor: pointer" class="fa fa-info" data-toggle="popover" data-placement="bottom" data-html="true"
-           title="Based on two way connections" data-content="Connection count is now based on a two-way connection (actual count / 2) as more intuative"></i>
-                            </td>
-                            <td>{{ data['newTotalConnections'] }}
-        <i style="cursor: pointer" class="fa fa-question-circle" data-toggle="popover" data-placement="bottom" data-html="true"
-           title="Details" data-content="New connections made across all policies during period"></i>
-                            </td>
-                            <td>{{ data['totalTotalConnections'] }}</td>
-                        </tr>
-                        <tr>
-                            <td style="padding-left: 30px">Active Connection Links
-        <i style="cursor: pointer" class="fa fa-info" data-toggle="popover" data-placement="bottom" data-html="true"
-           title="Based on two way connections" data-content="Connection count is now based on a two-way connection (actual count / 2) as more intuative"></i>
-                            </td>
-                            <td>{{ data['newActiveConnections'] }}
-        <i style="cursor: pointer" class="fa fa-question-circle" data-toggle="popover" data-placement="bottom" data-html="true"
-           title="Details" data-content="New connections made across all policies during period"></i>
-                            </td>
-                            <td>{{ data['totalActiveConnections'] }}</td>
-                        </tr>
-                        <tr>
-                            <td style="padding-left: 30px">Ended/Cancelled Connection Links
-        <i style="cursor: pointer" class="fa fa-info" data-toggle="popover" data-placement="bottom" data-html="true"
-           title="Based on two way connections" data-content="Connection count is now based on a two-way connection (actual count / 2) as more intuative"></i>
-                            </td>
-                            <td>{{ data['newEndedConnections'] }}
-        <i style="cursor: pointer" class="fa fa-question-circle" data-toggle="popover" data-placement="bottom" data-html="true"
-           title="Details" data-content="New connections made across all policies during period"></i>
-                            </td>
-                            <td>{{ data['totalEndedConnections'] }}</td>
-                        </tr>
-                        <tr>
-                            <td>Invitations</td>
-                            <td>{{ data.newInvitations }}
-        <i style="cursor: pointer" class="fa fa-question-circle" data-toggle="popover" data-placement="bottom" data-html="true"
-           title="Details" data-content="New invitation across all policies during period"></i>
-                            </td>
-                            <td>{{ data.totalInvitations }}</td>
-                        </tr>
-                        <tr>
-                            <td style="padding-left: 30px">Invitations (Direct)
-        <i style="cursor: pointer" class="fa fa-warning" data-toggle="popover" data-placement="bottom" data-html="true"
-           title="Data Validity" data-content="Data only populated after 22/9/16"></i>
-                            </td>
-                            <td>{{ data.newDirectInvitations }}</td>
-                            <td>{{ data.totalDirectInvitations }}</td>
-                        </tr>
-                        <tr>
-                            <td style="padding-left: 30px">Invitations (Invitation)
-        <i style="cursor: pointer" class="fa fa-warning" data-toggle="popover" data-placement="bottom" data-html="true"
-           title="Data Validity" data-content="Data only populated after 22/9/16"></i>
-                            </td>
-                            <td>{{ data.newInvitationInvitations }}</td>
-                            <td>{{ data.totalInvitationInvitations }}</td>
-                        </tr>
-                            <td style="padding-left: 30px">Invitations (SCode)
-        <i style="cursor: pointer" class="fa fa-warning" data-toggle="popover" data-placement="bottom" data-html="true"
-           title="Data Validity" data-content="Data only populated after 22/9/16"></i>
-                            </td>
-                            <td>{{ data.newSCodeInvitations }}</td>
-                            <td>{{ data.totalSCodeInvitations }}</td>
-                        </tr>
-                        <tr>
-                            <td>Avg # of Invitations per policy</td>
-                            <td>{% if data.newAvgInvitations != 'n/a' %}{{ data.newAvgInvitations|number_format(2, '.', ',') }}{% else %}n/a{% endif %}</td>
-                            <td>{% if data.totalAvgInvitations != 'n/a' %}{{ data.totalAvgInvitations|number_format(2, '.', ',') }}{% else %}n/a{% endif %}</td>
-                        </tr>
-                        <tr>
-                            <td style="padding-left: 30px">Avg # of Invitations per policy (Direct)
-        <i style="cursor: pointer" class="fa fa-warning" data-toggle="popover" data-placement="bottom" data-html="true"
-           title="Data Validity" data-content="Data only populated after 22/9/16"></i>
-                            </td>
-                            <td>{% if data.newAvgDirectInvitations != 'n/a' %}{{ data.newAvgDirectInvitations|number_format(2, '.', ',') }}{% else %}n/a{% endif %}</td>
-                            <td>{% if data.totalAvgDirectInvitations != 'n/a' %}{{ data.totalAvgDirectInvitations|number_format(2, '.', ',') }}{% else %}n/a{% endif %}</td>
-                        </tr>
-                        <tr>
-                            <td style="padding-left: 30px">Avg # of Invitations per policy (Invitation)
-        <i style="cursor: pointer" class="fa fa-warning" data-toggle="popover" data-placement="bottom" data-html="true"
-           title="Data Validity" data-content="Data only populated after 22/9/16"></i>
-                            </td>
-                            <td>{% if data.newAvgInvitationInvitations != 'n/a' %}{{ data.newAvgInvitationInvitations|number_format(2, '.', ',') }}{% else %}n/a{% endif %}</td>
-                            <td>{% if data.totalAvgInvitationInvitations != 'n/a' %}{{ data.totalAvgInvitationInvitations|number_format(2, '.', ',') }}{% else %}n/a{% endif %}</td>
-                        </tr>
-                        <tr>
-                            <td style="padding-left: 30px">Avg # of Invitations per policy (SCode)
-        <i style="cursor: pointer" class="fa fa-warning" data-toggle="popover" data-placement="bottom" data-html="true"
-           title="Data Validity" data-content="Data only populated after 22/9/16"></i>
-                            </td>
-                            <td>{% if data.newAvgSCodeInvitations != 'n/a' %}{{ data.newAvgSCodeInvitations|number_format(2, '.', ',') }}{% else %}n/a{% endif %}</td>
-                            <td>{% if data.totalAvgSCodeInvitations != 'n/a' %}{{ data.totalAvgSCodeInvitations|number_format(2, '.', ',') }}{% else %}n/a{% endif %}</td>
-                        </tr>
-                        <tr>
-                            <td>Claims (FNOL based date)</td>
-                            <td>{{ claims.total }}</td>
-                            <td></td>
-                        </tr>
-                        {% for claim, value in claims if claim != 'total' %}
-                        <tr>
-                            <td style="padding-left: 30px">Claims (FNOL based date) - {{ claim }}</td>
-                            <td>{{ value }}
-                                <i style="cursor: pointer" class="fa fa-question-circle" data-toggle="popover" data-placement="bottom" data-html="true"
-                                           title="Data May Change" data-content="Claim status is point in time and so may change when viewed historically vs when claims may still be in progress"></i>
-                            </td>
-                            <td></td>
-                        </tr>
-                        {% endfor %}
-                        <tr>
-                            <td>Closed Claims (Closed based date)</td>
-                            <td>{{ closedClaims.total }}</td>
-                            <td></td>
-                        </tr>
-                        <tr>
-                            <td>Avg hours to connect
-        <i style="cursor: pointer" class="fa fa-warning" data-toggle="popover" data-placement="bottom" data-html="true"
-           title="Data Validity" data-content="Data only populated after 22/9/16"></i>
-        <i style="cursor: pointer" class="fa fa-question-circle" data-toggle="popover" data-placement="bottom" data-html="true"
-           title="Details" data-content="From when invitation was sent to user to user accepting.  For scode this would starting from when scode was entered as invite code to acceptance."></i>
-                            </td>
-                            <td></td>
-                            <td>{{ data.totalAvgHoursToConnect|number_format(1, '.', ',')  }}</td>
-                        </tr>
-                        <tr>
-                            <td>pic-sure Approved</td>
-                            <td></td>
-                            <td>{{ data.picsureApproved|number_format(0, '.', ',')  }}</td>
-                        </tr>
-                        <tr>
-                            <td>pic-sure Invalid (pic-sure in progress)</td>
-                            <td></td>
-                            <td>{{ data.picsureInvalid|number_format(0, '.', ',')  }}</td>
-                        </tr>
-                        <tr>
-                            <td>pic-sure PreApproved (Policy was renewed)</td>
-                            <td></td>
-                            <td>{{ data.picsurePreApproved|number_format(0, '.', ',')  }}</td>
-                        </tr>
-                        <tr>
-                            <td>pic-sure Rejected</td>
-                            <td></td>
-                            <td>{{ data.picsureRejected|number_format(0, '.', ',')  }}</td>
-                        </tr>
-                        <tr>
-                            <td>pic-sure Un-Started</td>
-                            <td></td>
-                            <td>{{ data.picsureUnstarted|number_format(0, '.', ',')  }}</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        <div role="tabpanel" class="tab-pane" id="connections">
-                <h3>Across all Dates - Includes all policies</h3>
-            <div class="table-responsive">
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th></th>
-                            <th>Total</th>
-                            <th>w/1 settled claim</th>
-                            <th>w/2+ settled claims</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-
-                        <tr>
-                            <td>Policies with X Connection</td>
-                            <td>{{ data.policyConnections['total']['total'] }}</td>
-                            <td>{{ data.policyConnections['total']['1claim'] }}</td>
-                            <td>{{ data.policyConnections['total']['2+claims'] }}</td>
-                        </tr>
-                        {% for i in 0..10 %}
-                            <tr>
-                                <td style="padding-left: 30px">Policies with {{ i }}{% if i == 10 %}+{% endif %} Connection(s)</td>
-                                <td>{{ data.policyConnections[i]['total'] }}</td>
-                                <td>{{ data.policyConnections[i]['1claim'] }}</td>
-                                <td>{{ data.policyConnections[i]['2+claims'] }}</td>
-                            </tr>
-                        {% endfor %}
-                        <tr>
-                            <td>Avg Connections / Policy</td>
-                            <td>{{ data.totalAvgConnections|number_format(2, '.', ',') }}</td>
-                        </tr>
-                        <tr>
-                            <td>Weighted Avg Connections / Policy</td>
-                            <td>{{ data.totalWeightedAvgConnections|number_format(2, '.', ',') }}</td>
-                        </tr>
-                    </tbody>
-                </table>
+        <div class="col-md-12">
+            <a href="{{ path('admin_reports_claims') }}">Claims report</a> |
+            <a href="{{ path('admin_reports_connections') }}">Connections report</a> |
+            <a href="{{ path('admin_reports_scheduled') }}">Scheduled Payments report</a>
         </div>
     </div>
-        <div role="tabpanel" class="tab-pane" id="billing">
-                <h3>Monthly Billing</h3>
-            <div class="table-responsive">
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>Month</th>
-                            <th>Total
-        <i style="cursor: pointer" class="fa fa-info-circle" data-toggle="popover" data-placement="bottom" data-html="true"
-           data-content="Includes both Successful & Scheduled Payments"></i>
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for scheduledPayment in data.scheduledPayments %}
-                        <tr>
-                            <td>{{ scheduledPayment._id.month }}/{{ scheduledPayment._id.year }}</td>
-                            <td>£{{ scheduledPayment.total|number_format(2, '.', ',')  }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+
+    {% if data.totalActivePolicies is defined %}
+    <h1>General</h1>
+    <h3>Excludes Policies:
+        {% for excluded_policy in excluded_policies %}
+        <a href="{{ path('admin_policy', {'id': excluded_policy.id }) }}">{{ excluded_policy.policyNumber }}</a>
+        {% endfor %}
+        {% if excluded_policies|length == 0 %}n/a{% endif %}
+    </h3>
+    <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>New (in period)</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Active Policies</td>
+                        <td></td>
+                        <td>{{ data.totalActivePolicies }}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding-left: 30px">Active Monthly Policies
+                        </td>
+                        <td></td>
+                        <td>{{ data.totalActiveMonthlyPolicies }}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding-left: 30px">Active Yearly Policies
+                        </td>
+                        <td></td>
+                        <td>{{ data.totalActiveYearlyPolicies }}</td>
+                    </tr>
+                    <tr>
+                        <td>New Policies (adjusted for upgrades)</td>
+                        <td>{{ data.newPoliciesAdjUpgrade }}</td>
+                        <td>{{ data.totalPoliciesAdjUpgrade }}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding-left: 30px">New Policies (Direct)
+    <i style="cursor: pointer" class="fa fa-warning" data-toggle="popover" data-placement="bottom" data-html="true"
+       title="Data Validity" data-content="Data only populated after 22/9/16"></i>
+                        </td>
+                        <td>{{ data.newDirectPolicies }}</td>
+                        <td>{{ data.totalDirectPolicies }}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding-left: 30px">New Policies (Invitation)
+    <i style="cursor: pointer" class="fa fa-warning" data-toggle="popover" data-placement="bottom" data-html="true"
+       title="Data Validity" data-content="Data only populated after 22/9/16"></i>
+                        </td>
+                        <td>{{ data.newInvitationPolicies }}</td>
+                        <td>{{ data.totalInvitationPolicies }}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding-left: 30px">New Policies (SCode)
+    <i style="cursor: pointer" class="fa fa-warning" data-toggle="popover" data-placement="bottom" data-html="true"
+       title="Data Validity" data-content="Data only populated after 22/9/16"></i>
+                        </td>
+                        <td>{{ data.newSCodePolicies }}</td>
+                        <td>{{ data.totalSCodePolicies }}</td>
+                    </tr>
+                    <tr>
+                        <td>Policy Upgrades
+    <i style="cursor: pointer" class="fa fa-warning" data-toggle="popover" data-placement="bottom" data-html="true"
+       title="Cancellation data only" data-content="Assumed that if cancelled due to upgrade, a new police will be put in place"></i>
+                        </td>
+                        <td>{{ data.endingUpgradePolicies }}</td>
+                        <td>{{ data.totalUpgradePolicies }}</td>
+                    </tr>
+
+                    <tr>
+                        <td>Ending/Cancelled Policies (adjusted for upgrades)</td>
+                        <td>{{ data.endingEndingPoliciesAdjUpgrade }} ({{ data.endingEndingFNOLPoliciesAdjUpgrade }} w/FNOL)</td>
+                        <td>{{ data.totalEndingPoliciesAdjUpgrade }} ({{ data.totalEndingFNOLPoliciesAdjUpgrade }} w/FNOL)</td>
+                    </tr>
+                    <tr>
+                        <td style="padding-left: 30px">Cancelled Unpaid Policies
+                        </td>
+                        <td>{{ data.endingUnpaidPolicies }} ({{ data.endingUnpaidFNOLPolicies }} w/FNOL)</td>
+                        <td>{{ data.totalUnpaidPolicies }} ({{ data.totalUnpaidFNOLPolicies }} w/FNOL)</td>
+                    </tr>
+                    <tr>
+                        <td style="padding-left: 30px">Cancelled Actual Fraud Policies
+                        </td>
+                        <td>{{ data.endingActualFraudPolicies }} ({{ data.endingActualFraudFNOLPolicies }} w/FNOL)</td>
+                        <td>{{ data.totalActualFraudPolicies }} ({{ data.totalActualFraudFNOLPolicies }} w/FNOL)</td>
+                    </tr>
+                    <tr>
+                        <td style="padding-left: 30px">Cancelled Suspected Fraud Policies
+                        </td>
+                        <td>{{ data.endingSuspectedFraudPolicies }} ({{ data.endingSuspectedFraudFNOLPolicies }} w/FNOL)</td>
+                        <td>{{ data.totalSuspectedFraudPolicies }} ({{ data.totalSuspectedFraudFNOLPolicies }} w/FNOL)</td>
+                    </tr>
+                    <tr>
+                        <td style="padding-left: 30px">Cancelled User Requested Policies
+                        </td>
+                        <td>{{ data.endingUserRequestedPolicies }} ({{ data.endingUserRequestedFNOLPolicies }} w/FNOL)</td>
+                        <td>{{ data.totalUserRequestedPolicies }} ({{ data.totalUserRequestedFNOLPolicies }} w/FNOL)</td>
+                    </tr>
+                    <tr>
+                        <td style="padding-left: 30px">Cancelled Cooloff Policies
+                        </td>
+                        <td>{{ data.endingCooloffPolicies }} ({{ data.endingCooloffFNOLPolicies }} w/FNOL)</td>
+                        <td>{{ data.totalCooloffPolicies }} ({{ data.totalCooloffFNOLPolicies }} w/FNOL)</td>
+                    </tr>
+                    <tr>
+                        <td style="padding-left: 30px">Cancelled Bad Risk Policies
+                        </td>
+                        <td>{{ data.endingBadRiskPolicies }} ({{ data.endingBadRiskFNOLPolicies }} w/FNOL)</td>
+                        <td>{{ data.totalBadRiskPolicies }} ({{ data.totalBadRiskFNOLPolicies }} w/FNOL)</td>
+                    </tr>
+                    <tr>
+                        <td style="padding-left: 30px">Cancelled Dispossesion Policies
+                        </td>
+                        <td>{{ data.endingDispossessionPolicies }} ({{ data.endingDispossessionFNOLPolicies }} w/FNOL)</td>
+                        <td>{{ data.totalDispossessionPolicies }} ({{ data.totalDispossessionFNOLPolicies }} w/FNOL)</td>
+                    </tr>
+                    <tr>
+                        <td style="padding-left: 30px">Cancelled Wreckage Policies
+                        </td>
+                        <td>{{ data.endingWreckagePolicies }} ({{ data.endingWreckageFNOLPolicies }} w/FNOL)</td>
+                        <td>{{ data.totalWreckagePolicies }} ({{ data.totalWreckageFNOLPolicies }} w/FNOL)</td>
+                    </tr>
+                    <tr>
+                        <td>Cancelled w/Payment Owed
+                        </td>
+                        <td></td>
+                        <td>{{ data.cancelledAndPaymentOwed }}</td>
+                    </tr>
+
+                    <tr>
+                        <td>Avg Yearly Premium</td>
+                        <td>{% if data.newPoliciesAvgPremium is defined %}<span title="£{{ data.newPoliciesPremium }} total">£{{ data.newPoliciesAvgPremium }}</span>{% else %}n/a{% endif %}</td>
+                        <td><del>{% if data.totalPoliciesAvgPremium is defined %}<span title="£{{ data.totalPoliciesPremium }} total">£{{ data.totalPoliciesAvgPremium }}</span>{% else %}n/a{% endif %}</del>
+    <i style="cursor: pointer" class="fa fa-warning" data-toggle="popover" data-placement="bottom" data-html="true"
+       title="Incorrect figure" data-content="This figure appears to be incorrect. See Clubhouse ch3122 for latest status. Workaround is to run report from 2016-09-01 to present."></i>
+
+                        </td>
+                    </tr>
+                    <!--
+                    <tr>
+                        <td style="padding-left: 30px">Avg Yearly Premium (Direct)
+    <i style="cursor: pointer" class="fa fa-warning" data-toggle="popover" data-placement="bottom" data-html="true"
+       title="Data Validity" data-content="Data only populated after 22/9/16"></i>
+                        </td>
+                        <td>{% if data.newDirectPoliciesAvgPremium is defined %}<span title="£{{ data.newDirectPoliciesPremium }} total">£{{ data.newDirectPoliciesAvgPremium }}</span>{% else %}n/a{% endif %}</td>
+                        <td>{% if data.totalDirectPoliciesAvgPremium is defined %}<span title="£{{ data.totalDirectPoliciesPremium }} total">£{{ data.totalDirectPoliciesAvgPremium }}</span>{% else %}n/a{% endif %}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding-left: 30px">Avg Yearly Premium (Invitation)
+    <i style="cursor: pointer" class="fa fa-warning" data-toggle="popover" data-placement="bottom" data-html="true"
+       title="Data Validity" data-content="Data only populated after 22/9/16"></i>
+                        </td>
+                        <td>{% if data.newInvitationPoliciesAvgPremium is defined %}<span title="£{{ data.newInvitationPolicies }} total">£{{ data.newInvitationPoliciesAvgPremium }}</span>{% else %}n/a{% endif %}</td>
+                        <td>{% if data.totalInvitationPoliciesAvgPremium is defined %}<span title="£{{ data.totalInvitationPolicies }} total">£{{ data.totalInvitationPoliciesAvgPremium }}</span>{% else %}n/a{% endif %}</td>
+                    </tr>
+                        <td style="padding-left: 30px">Avg Yearly Premium (SCode)
+    <i style="cursor: pointer" class="fa fa-warning" data-toggle="popover" data-placement="bottom" data-html="true"
+       title="Data Validity" data-content="Data only populated after 22/9/16"></i>
+                        </td>
+                        <td>{% if data.newSCodePoliciesAvgPremium is defined %}<span title="£{{ data.newSCodePoliciesPremium }} total">£{{ data.newSCodePoliciesAvgPremium }}</span>{% else %}n/a{% endif %}</td>
+                        <td>{% if data.totalSCodePoliciesAvgPremium is defined %}<span title="£{{ data.totalSCodePoliciesPremium }} total">£{{ data.totalSCodePoliciesAvgPremium }}</span>{% else %}n/a{% endif %}</td>
+                    </tr>
+                    -->
+                    <tr>
+                        <td>Current Pot Value
+    <i style="cursor: pointer" class="fa fa-info" data-toggle="popover" data-placement="bottom" data-html="true"
+       title="" data-content="Sum of all of the pots across all policies. Includes the promo pot value portion."></i>
+                        </td>
+                        <td></td>
+                        <td>£{{ data.totalPot|number_format(2, '.', ',') }}</td>
+                    </tr>
+                    <tr>
+                        <td>Current Promo Pot Value
+    <i style="cursor: pointer" class="fa fa-info" data-toggle="popover" data-placement="bottom" data-html="true"
+       title="" data-content="Sum of all of the promo portion of the pots across all policies"></i>
+                        </td>
+                        <td></td>
+                        <td>£{{ data.totalPromoPot|number_format(2, '.', ',') }}</td>
+                    </tr>
+                    <tr>
+                        <td>Total Connection Links
+    <i style="cursor: pointer" class="fa fa-info" data-toggle="popover" data-placement="bottom" data-html="true"
+       title="Based on two way connections" data-content="Connection count is now based on a two-way connection (actual count / 2) as more intuative"></i>
+                        </td>
+                        <td>{{ data['newTotalConnections'] }}
+    <i style="cursor: pointer" class="fa fa-question-circle" data-toggle="popover" data-placement="bottom" data-html="true"
+       title="Details" data-content="New connections made across all policies during period"></i>
+                        </td>
+                        <td>{{ data['totalTotalConnections'] }}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding-left: 30px">Active Connection Links
+    <i style="cursor: pointer" class="fa fa-info" data-toggle="popover" data-placement="bottom" data-html="true"
+       title="Based on two way connections" data-content="Connection count is now based on a two-way connection (actual count / 2) as more intuative"></i>
+                        </td>
+                        <td>{{ data['newActiveConnections'] }}
+    <i style="cursor: pointer" class="fa fa-question-circle" data-toggle="popover" data-placement="bottom" data-html="true"
+       title="Details" data-content="New connections made across all policies during period"></i>
+                        </td>
+                        <td>{{ data['totalActiveConnections'] }}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding-left: 30px">Ended/Cancelled Connection Links
+    <i style="cursor: pointer" class="fa fa-info" data-toggle="popover" data-placement="bottom" data-html="true"
+       title="Based on two way connections" data-content="Connection count is now based on a two-way connection (actual count / 2) as more intuative"></i>
+                        </td>
+                        <td>{{ data['newEndedConnections'] }}
+    <i style="cursor: pointer" class="fa fa-question-circle" data-toggle="popover" data-placement="bottom" data-html="true"
+       title="Details" data-content="New connections made across all policies during period"></i>
+                        </td>
+                        <td>{{ data['totalEndedConnections'] }}</td>
+                    </tr>
+                    <tr>
+                        <td>Invitations</td>
+                        <td>{{ data.newInvitations }}
+    <i style="cursor: pointer" class="fa fa-question-circle" data-toggle="popover" data-placement="bottom" data-html="true"
+       title="Details" data-content="New invitation across all policies during period"></i>
+                        </td>
+                        <td>{{ data.totalInvitations }}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding-left: 30px">Invitations (Direct)
+    <i style="cursor: pointer" class="fa fa-warning" data-toggle="popover" data-placement="bottom" data-html="true"
+       title="Data Validity" data-content="Data only populated after 22/9/16"></i>
+                        </td>
+                        <td>{{ data.newDirectInvitations }}</td>
+                        <td>{{ data.totalDirectInvitations }}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding-left: 30px">Invitations (Invitation)
+    <i style="cursor: pointer" class="fa fa-warning" data-toggle="popover" data-placement="bottom" data-html="true"
+       title="Data Validity" data-content="Data only populated after 22/9/16"></i>
+                        </td>
+                        <td>{{ data.newInvitationInvitations }}</td>
+                        <td>{{ data.totalInvitationInvitations }}</td>
+                    </tr>
+                        <td style="padding-left: 30px">Invitations (SCode)
+    <i style="cursor: pointer" class="fa fa-warning" data-toggle="popover" data-placement="bottom" data-html="true"
+       title="Data Validity" data-content="Data only populated after 22/9/16"></i>
+                        </td>
+                        <td>{{ data.newSCodeInvitations }}</td>
+                        <td>{{ data.totalSCodeInvitations }}</td>
+                    </tr>
+                    <tr>
+                        <td>Avg # of Invitations per policy</td>
+                        <td>{% if data.newAvgInvitations != 'n/a' %}{{ data.newAvgInvitations|number_format(2, '.', ',') }}{% else %}n/a{% endif %}</td>
+                        <td>{% if data.totalAvgInvitations != 'n/a' %}{{ data.totalAvgInvitations|number_format(2, '.', ',') }}{% else %}n/a{% endif %}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding-left: 30px">Avg # of Invitations per policy (Direct)
+    <i style="cursor: pointer" class="fa fa-warning" data-toggle="popover" data-placement="bottom" data-html="true"
+       title="Data Validity" data-content="Data only populated after 22/9/16"></i>
+                        </td>
+                        <td>{% if data.newAvgDirectInvitations != 'n/a' %}{{ data.newAvgDirectInvitations|number_format(2, '.', ',') }}{% else %}n/a{% endif %}</td>
+                        <td>{% if data.totalAvgDirectInvitations != 'n/a' %}{{ data.totalAvgDirectInvitations|number_format(2, '.', ',') }}{% else %}n/a{% endif %}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding-left: 30px">Avg # of Invitations per policy (Invitation)
+    <i style="cursor: pointer" class="fa fa-warning" data-toggle="popover" data-placement="bottom" data-html="true"
+       title="Data Validity" data-content="Data only populated after 22/9/16"></i>
+                        </td>
+                        <td>{% if data.newAvgInvitationInvitations != 'n/a' %}{{ data.newAvgInvitationInvitations|number_format(2, '.', ',') }}{% else %}n/a{% endif %}</td>
+                        <td>{% if data.totalAvgInvitationInvitations != 'n/a' %}{{ data.totalAvgInvitationInvitations|number_format(2, '.', ',') }}{% else %}n/a{% endif %}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding-left: 30px">Avg # of Invitations per policy (SCode)
+    <i style="cursor: pointer" class="fa fa-warning" data-toggle="popover" data-placement="bottom" data-html="true"
+       title="Data Validity" data-content="Data only populated after 22/9/16"></i>
+                        </td>
+                        <td>{% if data.newAvgSCodeInvitations != 'n/a' %}{{ data.newAvgSCodeInvitations|number_format(2, '.', ',') }}{% else %}n/a{% endif %}</td>
+                        <td>{% if data.totalAvgSCodeInvitations != 'n/a' %}{{ data.totalAvgSCodeInvitations|number_format(2, '.', ',') }}{% else %}n/a{% endif %}</td>
+                    </tr>
+                    <tr>
+                        <td>Claims (FNOL based date)</td>
+                        <td>{{ claims.total }}</td>
+                        <td></td>
+                    </tr>
+                    {% for claim, value in claims if claim != 'total' %}
+                    <tr>
+                        <td style="padding-left: 30px">Claims (FNOL based date) - {{ claim }}</td>
+                        <td>{{ value }}
+                            <i style="cursor: pointer" class="fa fa-question-circle" data-toggle="popover" data-placement="bottom" data-html="true"
+                                       title="Data May Change" data-content="Claim status is point in time and so may change when viewed historically vs when claims may still be in progress"></i>
+                        </td>
+                        <td></td>
+                    </tr>
+                    {% endfor %}
+                    <tr>
+                        <td>Closed Claims (Closed based date)</td>
+                        <td>{{ closedClaims.total }}</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>Avg hours to connect
+    <i style="cursor: pointer" class="fa fa-warning" data-toggle="popover" data-placement="bottom" data-html="true"
+       title="Data Validity" data-content="Data only populated after 22/9/16"></i>
+    <i style="cursor: pointer" class="fa fa-question-circle" data-toggle="popover" data-placement="bottom" data-html="true"
+       title="Details" data-content="From when invitation was sent to user to user accepting.  For scode this would starting from when scode was entered as invite code to acceptance."></i>
+                        </td>
+                        <td></td>
+                        <td>{{ data.totalAvgHoursToConnect|number_format(1, '.', ',')  }}</td>
+                    </tr>
+
+                    <tr>
+                        <td>pic-sure Approved</td>
+                        <td></td>
+                        <td>{% if data.picsureApproved is defined %}{{ data.picsureApproved|number_format(0, '.', ',')  }}{% endif %}
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>pic-sure Invalid (pic-sure in progress)</td>
+                        <td></td>
+                        <td>{% if data.picsureInvalid is defined %}{{ data.picsureInvalid|number_format(0, '.', ',')  }}{% endif %}</td>
+                    </tr>
+                    <tr>
+                        <td>pic-sure PreApproved (Policy was renewed)</td>
+                        <td></td>
+                        <td>{% if data.picsurePreApproved is defined %}{{ data.picsurePreApproved|number_format(0, '.', ',')  }}{% endif %}</td>
+                    </tr>
+                    <tr>
+                        <td>pic-sure Rejected</td>
+                        <td></td>
+                        <td>{% if data.picsureRejected is defined %}{{ data.picsureRejected|number_format(0, '.', ',')  }}{% endif %}</td>
+                    </tr>
+                    <tr>
+                        <td>pic-sure Un-Started</td>
+                        <td></td>
+                        <td>{% if data.picsureUnstarted is defined %}{{ data.picsureUnstarted|number_format(0, '.', ',')  }}{% endif %}</td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
-            </div>
-        </div>
+    {% endif %}
+
+    {% if data.policyConnections is defined %}
+    <h1>Connections</h1>
+    <h3>Across all Dates - Includes all policies</h3>
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>Total</th>
+                    <th>w/1 settled claim</th>
+                    <th>w/2+ settled claims</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Policies with X Connection</td>
+                    <td>{{ data.policyConnections['total']['total'] }}</td>
+                    <td>{{ data.policyConnections['total']['1claim'] }}</td>
+                    <td>{{ data.policyConnections['total']['2+claims'] }}</td>
+                </tr>
+                {% for i in 0..10 %}
+                    <tr>
+                        <td style="padding-left: 30px">Policies with {{ i }}{% if i == 10 %}+{% endif %} Connection(s)</td>
+                        <td>{{ data.policyConnections[i]['total'] }}</td>
+                        <td>{{ data.policyConnections[i]['1claim'] }}</td>
+                        <td>{{ data.policyConnections[i]['2+claims'] }}</td>
+                    </tr>
+                {% endfor %}
+                <tr>
+                    <td>Avg Connections / Policy</td>
+                    <td>{{ data.totalAvgConnections|number_format(2, '.', ',') }}</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>Weighted Avg Connections / Policy</td>
+                    <td>{{ data.totalWeightedAvgConnections|number_format(2, '.', ',') }}</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </tbody>
+        </table>
     </div>
+    {% endif %}
+
+    {% if data.scheduledPayments is defined %}
+    <h1>Monthly Billing</h1>
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Month</th>
+                    <th>Total <i style="cursor: pointer" class="fa fa-info-circle" data-toggle="popover"
+                                data-placement="bottom" data-html="true" data-content="Includes both Successful & Scheduled Payments"></i>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for scheduledPayment in data.scheduledPayments %}
+                <tr>
+                    <td>{{ scheduledPayment._id.month }}/{{ scheduledPayment._id.year }}</td>
+                    <td>£{{ scheduledPayment.total|number_format(2, '.', ',')  }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+
 </div>
 {% endblock %}
