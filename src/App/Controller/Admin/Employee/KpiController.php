@@ -3,7 +3,6 @@
 namespace App\Controller\Admin\Employee;
 
 use App\Admin\Reports\KpiInterface;
-use App\Admin\Reports\KpiCacheInterface;
 use AppBundle\Document\DateTrait;
 use DateInterval;
 use DateTime;
@@ -21,7 +20,7 @@ class KpiController extends AbstractController
 {
     use DateTrait;
 
-    /** @var KpiInterface|KpiCacheInterface */
+    /** @var KpiInterface */
     private $kpiReport;
 
     public function __construct(KpiInterface $kpiReport)

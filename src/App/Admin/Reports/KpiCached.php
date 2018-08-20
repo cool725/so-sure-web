@@ -5,7 +5,7 @@ namespace App\Admin\Reports;
 use DateTime;
 use Predis\Client;
 
-class KpiCached implements KpiInterface, KpiCacheInterface
+class KpiCached implements KpiInterface
 {
     /** @var KpiInterface inner, fetching service*/
     private $kpi;
