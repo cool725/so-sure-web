@@ -395,6 +395,9 @@ class IntercomService
         }
 
         $analytics = $user->getAnalytics();
+        $data['custom_attributes']['User url'] = $this->router->generate('admin_user', [
+                'id' => $user->getId()
+            ], UrlGeneratorInterface::ABSOLUTE_URL);
         $data['custom_attributes']['Premium'] = $this->toTwoDp($analytics['annualPremium']);
         $data['custom_attributes']['Displayable Premium'] = (string) sprintf('%.2f', $analytics['annualPremium']);
         $data['custom_attributes']['Monthly Premium'] = $this->toTwoDp($analytics['monthlyPremium']);
