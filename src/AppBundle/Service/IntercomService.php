@@ -386,9 +386,6 @@ class IntercomService
             'name' => $user->getName(),
             'signed_up_at' => $user->getCreated()->getTimestamp(),
             'user_id' => $user->getId(),
-            'user_url' => $this->router->generate('user_home', [
-                'id' => $user->getId()
-            ], UrlGeneratorInterface::ABSOLUTE_URL),
         );
         if ($user->getIntercomId()) {
             $data['id'] = $user->getIntercomId();
@@ -398,6 +395,9 @@ class IntercomService
         }
 
         $analytics = $user->getAnalytics();
+        $data['custom_attributes']['User url'] = $this->router->generate('user_home', [
+                'id' => $user->getId()
+            ], UrlGeneratorInterface::ABSOLUTE_URL);
         $data['custom_attributes']['Premium'] = $this->toTwoDp($analytics['annualPremium']);
         $data['custom_attributes']['Displayable Premium'] = (string) sprintf('%.2f', $analytics['annualPremium']);
         $data['custom_attributes']['Monthly Premium'] = $this->toTwoDp($analytics['monthlyPremium']);
