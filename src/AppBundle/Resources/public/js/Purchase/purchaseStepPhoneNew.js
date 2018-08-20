@@ -130,12 +130,12 @@ $(function(){
         price.html('&pound;' + val + ' a ' + premium);
     });
 
-    // if ($.trim($('#Reference').val()).length > 0) {
-    //     // Show loading overlay
-    //     // TODO: New loader
-    //     $('.so-sure-loading').show();
-    //     $('#webpay-form').submit();
-    // }
+    if ($.trim($('#Reference').val()).length > 0) {
+        // Show loading overlay
+        // TODO: New loader
+        $('.so-sure-loading').show();
+        $('#webpay-form').submit();
+    }
 
     // $('#imei-screenshot').click(function(e) {
     //     e.preventDefault();
