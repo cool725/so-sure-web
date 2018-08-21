@@ -38,7 +38,7 @@
                 <a href="{{ path('faq') }}" class="nav-link">FAQs</a>
             </li>
             <li class="nav-item d-none d-xl-block pr-xl-5">
-                <a href="https://blog.wearesosure.com" class="nav-link">Blog</a>
+                <a href="https://blog.wearesosure.com" target="_blank" class="nav-link">Blog</a>
             </li>
             <li class="nav-item d-none d-xl-block pr-xl-5">
                 <a href="{{ path('about_how_to_contact_so_sure') }}" class="nav-link">Contact</a>
@@ -113,7 +113,7 @@
         </ul>
         <div class="p-5 align-self-stretch menu__buttons">
             <a href="#" class="btn btn-primary btn-shadow btn-gradient btn-block mb-3 get-a-quote">Get insured</a>
-            <a href="#" class="btn btn-outline-white btn-block"><i class="far fa-play-circle fa-lg"></i> Watch our Video</a>
+            {# <a href="#" class="btn btn-outline-white btn-block"><i class="far fa-play-circle fa-lg"></i> Watch our Video</a> #}
             <div class="menu__user-button text-center">
                 {% if app.user is not null and app.user %}
                     {% if is_granted('ROLE_PREVIOUS_ADMIN') %}
