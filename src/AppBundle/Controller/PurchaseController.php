@@ -354,7 +354,7 @@ class PurchaseController extends BaseController
             }
         }
 
-        $purchase->setAgreed(true);
+        //$purchase->setAgreed(true);
         $purchase->setNew(true);
 
         /** @var Form $purchaseForm */
