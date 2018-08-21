@@ -103,9 +103,9 @@ $(function() {
 
                 if ($(this).val() != '') {
                     $(this).addClass('valid-select');
-                    button.prop('disabled', '').removeClass('btn-outline-white').addClass('btn-success btn-shadow btn-gradient-green');
+                    button.prop('disabled', '').removeClass('btn-outline-white').addClass('btn-white btn-shadow-jules');
                 } else {
-                    button.prop('disabled', 'disabled').removeClass('btn-success btn-gradient-green btn-shadow').addClass('btn-outline-white');
+                    button.prop('disabled', 'disabled').removeClass('btn-white btn-shadow-jules').addClass('btn-outline-white');
                     $(this).removeClass('valid-select');
                 }
             });
