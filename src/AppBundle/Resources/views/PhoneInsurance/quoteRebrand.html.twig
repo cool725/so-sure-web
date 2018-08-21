@@ -62,7 +62,7 @@
                         {{ form_widget(buy_form.buy_tablet, {
                             'label': 'Get Insured',
                             'attr': {
-                                'class': 'btn btn-success btn-shadow btn-gradient-green  btn-block-xs'
+                                'class': 'btn btn-white btn-shadow btn-block-xs'
                             }})
                         }}
                     {{ form_end(buy_form) }}
@@ -93,7 +93,7 @@
                                 <p class="lead text-white mb-0">It'll only take a few minutes</p>
                             </div>
                             {{ form_start(buy_form_banner) }}
-                                {{ form_widget(buy_form_banner.buy, {'label': 'Get Insured', 'attr': {'class': 'btn btn-success btn-shadow btn-gradient-green  btn-block-xs'}}) }}
+                                {{ form_widget(buy_form_banner.buy, {'label': 'Get Insured', 'attr': {'class': 'btn btn-white btn-shadow btn-block-xs'}}) }}
                             {{ form_end(buy_form_banner) }}
                         </div>
                     </div>
@@ -186,6 +186,8 @@
                             </strong>
                         </li>
                     </ul>
+                    {# JULES CRAP #}
+                    <a href="#" class="btn btn-success btn-shadow btn-gradient-green  btn-block-xs" id="fix-get-insured">Get Insured</a>
                     <div class="quote__cover__footer my-4">
                         <a href="#quote_info_mobile"
                            class="btn btn-primary btn-shadow btn-gradient btn-block-xs d-block d-sm-block d-md-none toggle-text"

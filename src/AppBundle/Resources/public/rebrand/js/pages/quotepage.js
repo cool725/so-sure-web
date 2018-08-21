@@ -17,4 +17,9 @@ $(function() {
         $('.navbar').toggleClass('navbar-scrolled-quote', $(this).scrollTop() > 5);
     });
 
+    // JULES CRAP
+    $('#fix-get-insured').on('click', function(e){
+        $('form[name="buy_form"]').submit();
+    });
+
 });

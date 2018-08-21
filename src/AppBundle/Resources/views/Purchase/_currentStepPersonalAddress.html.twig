@@ -44,6 +44,7 @@
 
             {# Social Logins #}
             <div class="form-group">
+                {#
                 <a href="#"
                    formnovalidate="formnovalidate"
                    class="btn btn-facebook btn-square facebook_login"
@@ -51,6 +52,7 @@
                     <i class="fab fa-facebook fa-lg"></i>
                     <span class="sr-only">Facebook</span>
                 </a>
+                #}
                 <a href="{{ path('hwi_oauth_service_redirect', {'service': 'google' }) }}"
                    class="btn btn-google btn-square"
                    formnovalidate="formnovalidate"
