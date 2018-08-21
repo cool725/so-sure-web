@@ -11,6 +11,11 @@ $(function() {
         .data('text-original', $(this).html())
         .html($(this).data('text-swap') )
         .data('text-swap', $(this).data('text-original'));
+
+        // JULES CRAP
+        $('.quote__details__container').animate({
+            scrollTop: ($(this).offset().top - 70)
+        }, 500);
     });
 
     $('.welcome__details__container').scroll(function(e) {
