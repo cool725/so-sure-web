@@ -113,7 +113,9 @@ class SearchController extends BaseController
         $phoneMake = new PhoneMake();
         if ($id) {
             $phone = $phoneRepo->find($id);
-            $phoneMake->setMake($phone->getMake());
+            if ($phone) {
+                $phoneMake->setMake($phone->getMake());
+            }
         }
 
         if ($phone && in_array($type, ['purchase-select', 'purchase-change'])) {

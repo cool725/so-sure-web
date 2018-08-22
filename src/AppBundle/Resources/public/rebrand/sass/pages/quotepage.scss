@@ -45,6 +45,12 @@ body {
             // IE
             -ms-overflow-style: none;
         }
+
+        // JULES CRAP
+        &::-webkit-scrollbar {
+            width: 0px;
+            background: transparent;
+        }
     }
 
     &__details {
