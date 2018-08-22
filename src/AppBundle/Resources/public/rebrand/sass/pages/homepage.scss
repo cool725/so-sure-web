@@ -9,15 +9,8 @@
 
 .hero {
     position: relative;
-    // z-index: 2;
     padding-top: 8rem;
     padding-bottom: 4rem;
-
-
-    // .container {
-    //     position: relative;
-    //     // z-index: 5;
-    // }
 
     &__intro {
         @include media-breakpoint-up(lg) {
@@ -44,29 +37,6 @@
 
     @include media-breakpoint-up(lg) {
 
-        // .curve {
-        //     width: 100%;
-        //     position: absolute;
-        //     z-index: 3;
-        //     top: 0; right: 0; bottom: 0; left: 0;
-        //     background: transparent url('#{$cdn_url}/images/rebrand/homepage/so-sure_lg-hero-curve.svg') no-repeat;
-        //     background-size: cover;
-        // }
-
-        // svg {
-        //     position: absolute;
-        //     bottom: 0; left: 0;
-        //     z-index: 4;
-        // }
-
-        // .curve-2 {
-        //     width: 100%;
-        //     position: absolute;
-        //     z-index: 4;
-        //     right: 0; bottom: 0; left: 0;
-        //     background: transparent url('#{$cdn_url}/images/rebrand/homepage/so-sure_lg-hero-curve-bottom.svg') no-repeat;
-        //     background-size: cover;
-        // }
     }
 
 }
@@ -77,28 +47,42 @@
     background-color: $bb-2;
 
     @include media-breakpoint-up(lg) {
-        background: $bb-2 url('#{$cdn_url}/images/rebrand/homepage/so-sure_intro-illustration.svg') no-repeat -210px 140px;
-        background-size: 600px;
+        background: $bb-2 url('#{$cdn_url}/images/rebrand/homepage/so-sure_intro-illustration.png') no-repeat -110px 280px;
+        background-size: 500px;
     }
 
     @include media-breakpoint-up(xl) {
-        background-position: -100px 140px;
+        background-position: -40px 280px;
+        background-size: 600px;
     }
 
     @include media-breakpoint-up(fk) {
-        background-position: 450px 140px;
+        background-position: 120px 280px;
+        background-size: 600px;
     }
+
 }
 
 .cover {
+    position: relative;
 
-    &__illustration-mobile {
+    &__illustration__mobile {
         height: 240px;
         overflow: hidden;
+        position: relative;
     }
 
     &__mobile {
         background-color: $bb-2;
+    }
+
+    &__list {
+        margin-top: 7rem;
+    }
+
+    svg {
+        position: absolute;
+        bottom: -1px; left: 0; right: 0;
     }
 }
 
@@ -106,7 +90,7 @@
     background-color: $bb-2;
 
     @include media-breakpoint-up(lg) {
-        background: $bb-2 url('#{$cdn_url}/images/rebrand/homepage/so-sure_why-illustration.svg ') no-repeat -220px 440px;
+        background: $bb-2 url('#{$cdn_url}/images/rebrand/homepage/so-sure_why-illustration.png ') no-repeat -220px 440px;
         background-size: 480px;
     }
 }
@@ -115,22 +99,20 @@
     position: relative;
 
     @include media-breakpoint-up(lg) {
-        background: $white url('#{$cdn_url}/images/rebrand/homepage/so-sure_app-illustration.svg') no-repeat 550px 50px;
+        background: $white url('#{$cdn_url}/images/rebrand/homepage/so-sure_app-illustration.png') no-repeat 550px 120px;
         background-size: 600px;
     }
 
     @include media-breakpoint-up(xl) {
-        background-position: right 50px;
-        background-size: 640px;
+        background-position: 800px 120px;
     }
 
-    &__illustration-mobile {
-        position: relative;
+    @include media-breakpoint-up(fk) {
+        background-position: 1400px 120px;
+    }
 
-        img {
-            // left: 50%;
-            // margin-left: -200px;
-        }
+    &__illustration__mobile {
+        position: relative;
     }
 }
 
@@ -164,18 +146,28 @@
 }
 
 .reviews {
+    padding-bottom: 200px;
+    margin-bottom: 4rem;
 
-    &__image-mobile {
-        transform: translateX(20px);
+    .carousel-inner {
+        min-height: 280px;
 
-        @include media-breakpoint-up(md) {
-            transform: none;
-            text-align: center;
+        @include media-breakpoint-up(lg) {
+            min-height: none;
         }
     }
 
+    background: $white url('#{$cdn_url}/images/rebrand/homepage/so-sure_reviews-image.png') no-repeat 80px bottom;
+    background-size: 500px;
+
+    @include media-breakpoint-up(sm) {
+        background-position: 300px bottom;
+    }
+
     @include media-breakpoint-up(lg) {
-        background: $white url('#{$cdn_url}/images/rebrand/homepage/so-sure_review-image-lg.png') no-repeat 800px 50px;
+        padding-bottom: inherit;
+        margin-bottom: 0;
+        background: $white url('#{$cdn_url}/images/rebrand/homepage/so-sure_reviews-image.png') no-repeat 800px 50px;
         background-size: 600px;
     }
 

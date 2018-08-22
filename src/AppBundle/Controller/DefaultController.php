@@ -122,34 +122,29 @@ class DefaultController extends BaseController
         //     ['old-homepage-copy', 'new-homepage-copy']
         // );
 
-        if ($this->get('app.request')->getDeviceCategory() == RequestService::DEVICE_CATEGORY_MOBILE) {
-            $expSearch = $this->sixpack(
-                $request,
-                SixpackService::EXPERIMENT_TEXT_VS_DROPDOWN_MOBILE,
-                ['dropdown-search-old', 'dropdown-search']
-            );
-        } else {
-            $expSearch = $this->sixpack(
-                $request,
-                SixpackService::EXPERIMENT_TEXT_VS_DROPDOWN,
-                ['text-search', 'dropdown-search']
-            );
-        }
+        // if ($this->get('app.request')->getDeviceCategory() == RequestService::DEVICE_CATEGORY_MOBILE) {
+        //     $expSearch = $this->sixpack(
+        //         $request,
+        //         SixpackService::EXPERIMENT_TEXT_VS_DROPDOWN_MOBILE,
+        //         ['dropdown-search-old', 'dropdown-search']
+        //     );
+        // } else {
+        //     $expSearch = $this->sixpack(
+        //         $request,
+        //         SixpackService::EXPERIMENT_TEXT_VS_DROPDOWN,
+        //         ['text-search', 'dropdown-search']
+        //     );
+        // }
 
         $data = array(
             // Make sure to check homepage landing below too
             // 'replacement' => $replacement,
             'referral'    => $referral,
             'phone'       => $this->getQuerystringPhone($request),
-            'search_type' => $expSearch,
+            // 'search_type' => $expSearch,
         );
 
-        // $template = 'AppBundle:Default:index.html.twig';
-        $template = 'AppBundle:Default:indexContent.html.twig';
-        // If A/B content test
-        // if ($expContent == 'new-homepage-copy') {
-        //     $template = 'AppBundle:Default:indexContent.html.twig';
-        // }
+        $template = 'AppBundle:Default:indexRebrand.html.twig';
 
         return $this->render($template, $data);
     }

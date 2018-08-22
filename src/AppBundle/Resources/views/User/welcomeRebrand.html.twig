@@ -1,0 +1,170 @@
+{% extends 'base_rebrand.html.twig' %}
+
+{# Set vars #}
+{% set body_class = 'quote' %}
+{% set quote_mode = 1 %}
+{% set include_emoji = 1 %}
+
+{% block title %}Welcome to Social Insurance{% endblock %}
+
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/welcome.css') }}">
+{% endblock %}
+
+{% block body %}
+
+    <section class="welcome">
+        <div class="d-flex flex-column flex-lg-row">
+
+            <div class="welcome__details__container order-2 order-lg-1">
+                <div class="welcome__details px-4 pb-4 px-lg-5 pb-lg-0">
+                    <h1 class="text-white mb-4">
+                        {{ policy.user.firstname }}, <span class="sub">welcome to <span class="text-nowrap">so-sure!</span></span>
+                    </h1>
+                    <p class="text-white mb-5">Your <strong>{{ policy.phone.make }} {{ policy.phone.model }}</strong> is now protected against Theft, Loss, Accidental Damage and breakdown. You’ll receive your policy shortly via email.</p>
+                    <div class="expanding-cardbox expanding-cardbox-alt mb-4">
+                        <div class="expanding-cardbox__body">
+                            <h5 id="welcome_policy_summary" class="expanding-cardbox__title text-white mb-0">
+                                Policy Summary <i class="far fa-chevron-down text-white fa-lg"></i>
+                            </h5>
+                            <div class="expanding-cardbox__expand text-white mt-4">
+                                <div class="row">
+                                    <div class="col-md-3 text-center">
+                                        <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_phone-smile.png" alt="so-sure - super quick cover" class="mb-4" width="150px">
+                                    </div>
+                                    <div class="col-md-8">
+                                        <ul class="list-unstyled mb-5">
+                                            <li class="mb-3"><strong>Phone:</strong> {{ policy.phone.make }} {{ policy.phone.model }} {{ policy.phone.memory }}GB</li>
+                                            <li class="mb-3"><strong>Policy number:</strong> {{ policy.policyNumber }}</li>
+                                            <li class="mb-3">
+                                                <strong>Cost:</strong>
+                                                {% if policy.getPremiumPlan == 'monthly'%}
+                                                    &pound;{{ policy.premium.monthlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }} per month
+                                                {% elseif policy.getPremiumPlan == 'yearly' %}
+                                                    &pound;{{ policy.premium.yearlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }} a year
+                                                {% else %}
+                                                    Unknown
+                                                {% endif %}
+                                            </li>
+                                            <li>
+                                                <strong>Start/End Date:</strong>
+                                                {{ policy.start|date('jS F Y', 'Europe/London') }} - {{ policy.end|date('jS F Y', 'Europe/London') }}
+                                            </li>
+                                        </ul>
+                                        <a href="#"
+                                           id="policy_doc_toggle"
+                                           data-toggle="modal"
+                                           data-target="#policy_doc"
+                                           role="button"
+                                           class="btn btn-outline-white">See Policy Document</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-center text-white mb-4">⚠️ Cancel your policy now if your phone already has a cracked screen or is damaged? <a href="{{ cancel_url }}" class="text-white"><u>Click here</u></a></p>
+                    <div class="expanding-cardbox expanding-cardbox-alt mb-4">
+                        <div class="expanding-cardbox__body">
+                            <h5 class="expanding-cardbox__title text-white mb-0">
+                                How do I lower my excess? <i class="far fa-chevron-down text-white fa-lg"></i>
+                            </h5>
+                            <div class="expanding-cardbox__expand text-white mt-4">
+                                <p>Now that you have a policy you need to download our app to reduce your excess by &pound;80-100.</p>
+                                <p>Download the app now, and click on pic-sure in the app.</p>
+                                <ul class="list-inline">
+                                    <li class="list-inline-item mb-2">
+                                        <a class="ga-outbound-click" data-clicklabel="iTunes" href="{{ apple_download('user-welcome') }}" target="_blank" rel="noopener">
+                                            <img src="{{ cdn_url }}/images/icons/app-store-original.svg" alt="Download so-sure on the App Store" /><span class="sr-only">so-sure app - Apple App Store</span>
+                                        </a>
+                                    </li>
+                                    <li class="list-inline-item mb-2">
+                                        <a class="ga-outbound-click" data-clicklabel="PlayStore" href="{{ google_download('user-welcome') }}" target="_blank" rel="noopener">
+                                            <img src="{{ cdn_url }}/images/icons/google-play-original.svg" alt="Get so-sure on Google Play" /><span class="sr-only">so-sure app - Google Play</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                                <a href="{{ path('faq') }}#the-so-sure-app-and-pic-sure" class="btn btn-outline-white">Handy help guide <i class="far fa-arrow-right ml-2"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="expanding-cardbox expanding-cardbox-alt mb-4">
+                        <div class="expanding-cardbox__body">
+                            <h5 class="expanding-cardbox__title text-white mb-0">
+                                How do I get cashback? <i class="far fa-chevron-down text-white fa-lg"></i>
+                            </h5>
+                            <div class="expanding-cardbox__expand text-white mt-4">
+                                <p>By joining forces with your most careful friends and family members, you could see 80% of your insurance premium reimbursed every year. Yes, really.  All you have to do is share this unique link to those you trust.</p>
+                                <div class="d-flex align-items-center">
+                                    <input name="scode" id="scode" readonly="readonly" type="text" class="form-control mr-2" value="{{ policy.standardSCode.shareLink }}">
+                                    <button class="btn btn-outline-white btn-copy sosure-track"
+                                        data-clipboard-target="#scode"
+                                        data-toggle="tooltip"
+                                        data-placement="top"
+                                        data-event="user-welcome-copy-scode"
+                                            >
+                                        Copy <i class="fal fa-copy ml-2"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {# TODO: Curve #}
+
+            <div class="welcome__cover__container order-1 order-lg-2">
+                <div class="welcome__cover px-4 pb-5">
+                    <h2 class="text-blue2 mb-3">You're covered 🎉</h2>
+                    <h5 class="mb-4">Thank you for choosing so-sure</h5>
+                    <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_Icon_friends-connect.png" alt="so-sure - Simple Terms &amp; Conditions" class="mb-4" width="150px">
+                    <a href="{{ path('user_policy', {'policyId': policy.id }) }}" class="btn btn-success btn-shadow">View your account <i class="far fa-arrow-right ml-2"></i></a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {# Page Modals #}
+    <div class="modal fade"
+         id="policy_doc"
+         tabindex="-1" role="dialog"
+         aria-labelledby="policy_doc"
+         aria-hidden="true"
+         data-url="{{ url('latest_policy_terms', {'policy_key': policy_key, 'maxPotValue':  policy.maxPot, 'include': true, 'noH1': true }) }}">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Your Policy Document</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <i class="fal fa-times text-white"></i>
+                    </button>
+                </div>
+                <div id="policy_doc_body" class="modal-body">
+                    <div class="policy-content"></div>
+                    <div id="policy_doc_loader" class="text-center">
+                        <i class="fas fa-circle-notch fa-spin fa-2x text-primary"></i>
+                        <a href="#" id="policy_doc_reload" class="btn btn-outline-primary" style="display:none;">Reload</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Pixels #}
+    {% if environment == 'prod' %}
+        <img src="https://pubads.g.doubleclick.net/activity;xsp=4375795;ord={{ random(999999999) }}?" width=1 height=1 border=0/>
+
+        {% if has_visited_welcome_page is defined and has_visited_welcome_page == false %}
+            <img src='https://www.tagserve.com/saleServlet?MID=357&PID=513&CRID=&ORDERID={{ policy.id }}&ORDERAMNT=10&NUMOFITEMS=1&CUR=GBP' border='0' width='1' height='1'>
+        {% endif %}
+    {% endif %}
+
+{% endblock %}
+
+{% block footer %}
+    {# TODO: Fix footer #}
+{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/welcome.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,38 @@
+<div class="form-steps pt-3 mb-5 clearfix">
+    <div class="form-steps__item">
+        <div class="form-steps__item-content">
+            {% if step == 1 %}
+                <span class="form-steps__item-on">1</span>
+            {% else %}
+                <span class="form-steps__item-done"><i class="far fa-check text-white"></i></span>
+            {% endif  %}
+        </div>
+    </div>
+    <div class="form-steps__item">
+        <div class="form-steps__item-content">
+            {% if step == 2 %}
+                <span class="form-steps__item-on">2</span>
+            {% elseif step == 3 %}
+                <span class="form-steps__item-done"><i class="far fa-check text-white"></i></span>
+            {% else %}
+                <span class="form-steps__item-off"></span>
+            {% endif  %}
+            <span class="form-steps__item-line"></span>
+        </div>
+    </div>
+    <div class="form-steps__item">
+        <div class="form-steps__item-content">
+            {% if step == 3 %}
+                <span class="form-steps__item-on">3</span>
+            {% else %}
+                <span class="form-steps__item-off"></span>
+            {% endif  %}
+            <span class="form-steps__item-line"></span>
+        </div>
+    </div>
+</div>
+
+{# <div class="form-steps">
+    <div class="form-step__line"></div>
+</div>
+ #}

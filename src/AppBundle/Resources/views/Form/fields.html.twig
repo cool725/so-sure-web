@@ -20,9 +20,10 @@
 {% if label is empty %}
     {% set label = name|humanize %}
 {% endif %}
-    <label  for="{{ id }}">
-        <input type="checkbox" {{ block('widget_attributes') }}{% if value is defined %} value="{{ value }}"{% endif %}{% if checked %} checked="checked"{% endif %} />{{ label|trans({}, translation_domain) }}
-    </label>
+<div class="custom-control custom-checkbox">
+    <input type="checkbox" {{ block('widget_attributes') }}{% if value is defined %} value="{{ value }}"{% endif %}{% if checked %} checked="checked"{% endif %} class="custom-control-input" id="{{ id }}">
+    <label class="custom-control-label" for="{{ id }}">{{ label|trans({}, translation_domain) }}</label>
+</div>
 {% endspaceless %}
 {% endblock checkbox_widget %}
 

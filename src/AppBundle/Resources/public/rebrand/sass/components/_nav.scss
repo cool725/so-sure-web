@@ -2,11 +2,11 @@
 
 .navbar {
     background-color: transparent;
-    // transition: padding 0.8s linear;;
-    padding-top: 1.2rem;
+    // padding-top: 1.2rem;
+    transition: padding 0.2s linear;
 
     @include media-breakpoint-up(lg) {
-        padding-top: 2rem;
+        // padding-top: 2rem;
     }
 
     .navbar-nav {
@@ -14,19 +14,49 @@
 
         .nav-link {
             font-family: $g-medium;
-            color: $dark;
+            color: $grey;
+        }
+
+        .dropdown-menu {
+            position: absolute;
+        }
+
+        .dropdown-toggle {
+            // Overide bs toggle style
+            &:after {
+                border: 0;
+                margin: 0;
+            }
         }
     }
 }
 
-.navbar-scrolled {
-    // padding-top: 0.5rem;
+.navbar-brand {
 
-    @include media-breakpoint-up(lg) {
-        // padding-top: 0.5rem;
+    &__logo {
+        width: 120px; height: 30px;
+        background: transparent url('#{$cdn_url}/images/rebrand/logo/so-sure_logo-blue.svg') no-repeat center center;
+        background-size: 120px;
     }
+
+    &__logo-white-dark {
+        background: transparent url('#{$cdn_url}/images/rebrand/logo/so-sure_logo-white-dark.svg') no-repeat center center;
+    }
+
+    &__logo-white-light {
+        background: transparent url('#{$cdn_url}/images/rebrand/logo/so-sure_logo-white-light.svg') no-repeat center center;
+    }
+}
+
+.navbar-scrolled {
+    transition: padding 0.2s linear;
+    // padding-top: 0.5rem;
     background-color: $white;
-    box-shadow: 0 2px 0 0 rgba(0, 0, 0, 0.04);
+    box-shadow: 0 2px 0 0 rgba(0, 0, 0, 0.05);
+}
+
+.navbar-scrolled-quote {
+    visibility: hidden;
 }
 
 .hamburger {
@@ -42,6 +72,12 @@
     &,
     &::before,
     &::after {
+        opacity: 1;
         background-color: $white;
     }
+}
+
+.show-in-nav {
+    position: relative;
+    z-index: 1080;
 }

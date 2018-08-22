@@ -1,6 +1,6 @@
 // palette.scss
 
-$white: #ffffff;
+$white:     #ffffff;
 $off-white: #f2f2f3;
 
 // $blue-d: #1a7bdb;
@@ -8,34 +8,58 @@ $off-white: #f2f2f3;
 // $blue-2: #02bcfe;
 // $blue-l: #24d2fd;
 
-$grey:   #687296;
-$dark:   #170B38;
-$bb-1:   #ECF5FE; // bb = background blue
-$bb-2:   #E0EFFD;
-$blue-1: #00BAFF;
-$blue-2: #2593F3;
-$blue-3: #0051E8;
-$blue-4: #081B9A;
-$purple: #443b5f;
+$grey:     #687296;
+$dark:     #170B38;
+$bb-1:     #ECF5FE; // bb = background blue
+$bb-2:     #E0EFFD;
+$blue-1:   #99E3FF;
+$blue-1a:  #00BAFF;
+$blue-1b:  #00D9FF;
+$blue-2:   #2593F3;
+$blue-3:   #0051E8;
+$blue-4:   #081B9A;
+$purple:   #443b5f;
+$green:    #00B500;
+$green-2:  #2FC476;
+$facebook: #3B5998;
+$google:   #DF4A32;
+$starling: #593FA7;
+
+// Blue light to dark
+// D3E8FB
+// A8D1F7
+// 99E3FF * $blue-1
+// 00D9FF * $blue-1b
+// 00BAFF * $blue-1a
+// 2593F3 * $blue-2
+// 0051E8 * $blue-3
+// 081B9A * $blue-4
 
 // Extend Theme colours and overide primary BS colour
 $theme-colors: (
-    "primary": $blue-2,
-    "blue1":   $blue-1,
-    "blue2":   $blue-2,
-    "blue3":   $blue-3,
-    "blue4":   $blue-4,
-    "purple":  $purple,
-    "white":   $white,
+    "primary":  $blue-2,
+    "success":  $green,
+    "blue1":    $blue-1,
+    "blue1a":   $blue-1a,
+    "blue1b":   $blue-1b,
+    "blue2":    $blue-2,
+    "blue3":    $blue-3,
+    "blue4":    $blue-4,
+    "purple":   $purple,
+    "white":    $white,
+    "facebook": $facebook,
+    "google":   $google,
+    "starling": $starling,
+    "grey":     $grey,
 );
 
 // Gradients
 .blue-gradient-ld {
-    @include linear-gradient(90deg, $blue-1, $blue-3);
+    @include linear-gradient(90deg, $blue-1a, $blue-3);
 }
 
 .blue-gradient-dl {
-    @include linear-gradient(90deg, $blue-3, $blue-1);
+    @include linear-gradient(90deg, $blue-3, $blue-1a);
 }
 
 // Box shadow

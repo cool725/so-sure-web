@@ -2,10 +2,29 @@
 
 require('../../sass/pages/quotepage.scss');
 
-// Require components
-require('../components/phoneSearchDropdown.js');
-
 $(function() {
 
+    $('.toggle-text[data-toggle="collapse"]').on('click', function(e){
+        e.preventDefault();
+
+        $(this)
+        .data('text-original', $(this).html())
+        .html($(this).data('text-swap') )
+        .data('text-swap', $(this).data('text-original'));
+
+        // JULES CRAP
+        $('.quote__details__container').animate({
+            scrollTop: ($(this).offset().top - 70)
+        }, 500);
+    });
+
+    $('.welcome__details__container').scroll(function(e) {
+        $('.navbar').toggleClass('navbar-scrolled-quote', $(this).scrollTop() > 5);
+    });
+
+    // JULES CRAP
+    $('#fix-get-insured').on('click', function(e){
+        $('form[name="buy_form"]').submit();
+    });
 
 });

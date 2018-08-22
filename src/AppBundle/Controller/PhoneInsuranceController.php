@@ -482,13 +482,13 @@ class PhoneInsuranceController extends BaseController
         //     "0.00000001"
         // );
 
-        $this->get('app.sixpack')->convert(
-            SixpackService::EXPERIMENT_TEXT_VS_DROPDOWN
-        );
+        // $this->get('app.sixpack')->convert(
+        //     SixpackService::EXPERIMENT_TEXT_VS_DROPDOWN
+        // );
 
-        $this->get('app.sixpack')->convert(
-            SixpackService::EXPERIMENT_TEXT_VS_DROPDOWN_MOBILE
-        );
+        // $this->get('app.sixpack')->convert(
+        //     SixpackService::EXPERIMENT_TEXT_VS_DROPDOWN_MOBILE
+        // );
 
         $data = array(
             'phone'            => $phone,
@@ -516,13 +516,7 @@ class PhoneInsuranceController extends BaseController
             // 'replacement'     => $replacement,
         );
 
-        // Adwords landingpage test
-        if (in_array($request->get('_route'), ['insurance_make_model_memory'])) {
-            return $this->render('AppBundle:PhoneInsurance:adlanding.html.twig', $data);
-        } else {
-            // Default
-            return $this->render('AppBundle:PhoneInsurance:quoteContent.html.twig', $data);
-        }
+        return $this->render('AppBundle:PhoneInsurance:quoteRebrand.html.twig', $data);
     }
 
     /**

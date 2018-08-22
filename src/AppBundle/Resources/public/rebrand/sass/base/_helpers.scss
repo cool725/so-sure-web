@@ -10,6 +10,12 @@
     }
 }
 
+.container-xtra {
+    @media (max-width: 420px) {
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+}
 
 .bordered-columns {
 
@@ -21,5 +27,14 @@
                 border: none;
             }
         }
+    }
+}
+
+
+// Hide on XXS mobile
+@media (max-width: 340px) {
+
+    .d-none-xxs {
+        display: none !important;
     }
 }

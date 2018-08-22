@@ -278,7 +278,8 @@ class PurchaseController extends BaseController
             'postcode' => 'comma',
         );
 
-        return $this->render('AppBundle:Purchase:purchaseStepPersonalAddress.html.twig', $data);
+        // return $this->render('AppBundle:Purchase:purchaseStepPersonalAddress.html.twig', $data);
+        return $this->render('AppBundle:Purchase:purchaseStepPersonalAddressRebrand.html.twig', $data);
     }
 
     /**
@@ -353,7 +354,7 @@ class PurchaseController extends BaseController
             }
         }
 
-        $purchase->setAgreed(true);
+        //$purchase->setAgreed(true);
         $purchase->setNew(true);
 
         /** @var Form $purchaseForm */
@@ -588,12 +589,9 @@ class PurchaseController extends BaseController
         /** @var RequestService $requestService */
         $requestService = $this->get('app.request');
         $template = null;
-        // Might be better to just check the phone we're purchasing ($phone->getOs() == Phone::OS_IOS)
-        if ($requestService->isDeviceOsIOS()) {
-            $template = 'AppBundle:Purchase:purchaseStepPhoneReview.html.twig';
-        } else {
-            $template = 'AppBundle:Purchase:purchaseStepPhoneReviewNew.html.twig';
-        }
+
+        // $template = 'AppBundle:Purchase:purchaseStepPhoneReviewNew.html.twig';
+        $template = 'AppBundle:Purchase:purchaseStepPersonalReviewRebrand.html.twig';
 
         $now = new \DateTime();
         $billingDate = $this->adjustDayForBilling($now);

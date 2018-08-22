@@ -3,8 +3,8 @@
 // Abstracts
 // - functions, mixins, variables
 @import "abstracts/mixins";
-@import "abstracts/variables";
 @import "abstracts/palette";
+@import "abstracts/variables";
 
 // Import Bootstrap
 @import "vendor/bs4/bootstrap.scss";
@@ -17,15 +17,21 @@
 
 // Components
 // - split into individual files
+@import "components/flash-messages";
+@import "components/forms";
+@import "components/form-steps";
+@import "components/modal";
 @import "components/buttons";
 @import "components/nav";
 @import "components/menu";
+@import "components/dropdown";
 @import "components/search";
 // @import "components/phone-carousel";
 @import "components/lists";
 @import "components/cards";
 @import "components/tables";
 @import "components/reviews";
+@import "components/get-quote";
 
 // Layout
 // - header, footer, navigation
@@ -36,6 +42,7 @@
 // Vendor
 // - third parts CSS
 @import "vendor/hamburgers/hamburgers";
-
+@import "vendor/cookieconsent.min.css";
+@import "vendor/classic.css";
 // Pages
 // @import "pages/homepage";

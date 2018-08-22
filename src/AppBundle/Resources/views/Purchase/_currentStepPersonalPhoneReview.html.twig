@@ -1,0 +1,151 @@
+{{ form_start(purchase_form, {'attr': {
+    'data-toggle': 'validator',
+    'class': 'validate-form form-400',
+    'data-client-validation': form_client_validation,
+    'autocomplete': 'off'
+}}) }}
+
+    <div class="form-group payment-options {% if form_errors(purchase_form.amount) %}has-error{% endif %}">
+        <h4 class="payment-options__title text-blue2 mb-3">How would you like to pay?</h4>
+        <div class="radio-btn-original">
+            {{ form_label(purchase_form.amount, 'Payment options') }}
+            {{ form_widget(purchase_form.amount) }}
+        </div>
+        <div class="radio-btn-group">
+            <div class="row">
+                {% if app.user.allowedMonthlyPayments %}
+                    <div class="col-6">
+                        <div class="radio-btn {% if purchase_form.vars.value.amount == phone.currentPhonePrice.monthlyPremiumPrice %}radio-btn-active{% endif %}" data-value="{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }}" data-premium-type="month">
+                            <div class="radio-btn__content">
+                                <h6 class="radio-btn__title mb-0">Monthly</h6>
+                                <div class="radio-btn__price"><small>(&pound;{{ phone.currentPhonePrice.monthlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }})</small></div>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+                {% if app.user.allowedYearlyPayments %}
+                    <div class="col-6">
+                        <div class="radio-btn {% if purchase_form.vars.value.amount == phone.currentPhonePrice.yearlyPremiumPrice(app.user.additionalPremium) %}radio-btn-active{% endif %}" data-value="{{ phone.currentPhonePrice.yearlyPremiumPrice|number_format(2, '.', ',') }}" data-premium-type="year">
+                            <div class="radio-btn__content">
+                                <h6 class="radio-btn__title mb-0">Yearly</h6>
+                                <div class="radio-btn__price"><small>(&pound;{{ phone.currentPhonePrice.yearlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }})</small></div>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="with-errors">{{ form_errors(purchase_form.amount) }}</div>
+    </div>
+
+    <div class="form-group {% if form_errors(purchase_form.imei) %}has-error{% endif %}">
+        {{ form_label(purchase_form.imei, 'IMEI Number:', { 'label_attr': {'class': 'sr-only'} }) }}
+        <label for="purchase_form[imei]">
+            IMEI Number:
+            <span class="ml-2 text-blue2">
+                <a href="#"
+                   data-toggle="modal"
+                   data-target="#purchase_policy_imei_number"
+                   {# data-title="Up to 80% cashback every year" #}
+                   {# data-body="asdasdasdasdasdasdasd" #}
+                   data-img="{{ cdn_url }}/images/rebrand/icns/so-sure_happy-icn-min.svg"
+                   role="button">
+                    <i class="far fa-question-circle"></i>
+                </a>
+            </span>
+        </label>
+        {{ form_widget(purchase_form.imei, {'attr':{'class':'form-control imei', 'placeholder':'IMEI Number', 'data-hj-suppress' : ''}}) }}
+        <small class="form-text">Dial <strong>*#06#</strong> on your phone to display your IMEI number.</small>
+        <small class="form-text samsung-imei d-none">Numbers only please (no / required)</small>
+        <div class="with-errors">{{ form_errors(purchase_form.imei) }}</div>
+    </div>
+
+    {% if purchase_form.serialNumber is defined %}
+        <div class="form-group {% if form_errors(purchase_form.serialNumber) %}has-error{% endif %}">
+            {{ form_label(purchase_form.serialNumber, 'Serial Number:', { 'label_attr': {'class': 'sr-only'} }) }}
+            <label for="purchase_form[serialNumber]">
+                Serial Number:
+                <span class="ml-2 text-blue2">
+                    <a href="#"
+                       data-toggle="modal"
+                       data-target="#purchase_policy_serial_number"
+                       {# data-title="Up to 80% cashback every year" #}
+                       {# data-body="asdasdasdasdasdasdasd" #}
+                       data-img="{{ cdn_url }}/images/rebrand/icns/so-sure_happy-icn-min.svg"
+                       role="button">
+                        <i class="far fa-question-circle"></i>
+                    </a>
+                </span>
+            </label>
+            {{ form_widget(purchase_form.serialNumber, {'attr':{'class':'form-control',  'pattern': '[a-zA-Z0-9]{5,32}', 'title': 'Enter a valid serial number', 'placeholder':'Serial Number', 'data-hj-suppress' : ''}}) }}
+            <small class="form-text">To find your Serial Numbers open your phone Settings, navigate to General and view About</small>
+            <div class="with-errors">{{ form_errors(purchase_form.serialNumber) }}</div>
+        </div>
+    {% endif %}
+
+    <div class="d-none">
+        {{ form_widget(purchase_form.fileValid, {'attr': {'style':'display:none'}}) }}
+        {{ form_widget(purchase_form.file, {'attr': {'style':'display:none'}}) }}
+    </div>
+
+    <div class="form-group">
+        <h4 class="text-blue2 mb-3">Please confirm that the following are correct:</h4>
+        <ul class="pl-4 form-text">
+            <li>My phone is in full working condition</li>
+            <li>My screen is not cracked</li>
+            <li>I am a resident of the United Kingdom</li>
+            <li>I have read &amp; understood the <a href="{{ cdn_url }}/files/so-sure_sample_policy_doc.pdf" target="_blank">so-sure policy document</a></li>
+        </ul>
+    </div>
+
+    <div class="form-group">
+        {{ form_widget(purchase_form.agreed, {'label': 'I confirm the above is correct'}) }}
+    </div>
+
+    <div class="form-group">
+        <div class="form-row">
+            <div class="col">
+                {% if app.request.get('_route') == "purchase_step_policy_id" %}
+                <a href="{{ path('user_home') }}"
+                   class="btn btn-outline-grey">
+                    <span class="sr-only">back</span>
+                    <i class="far fa-arrow-left"></i></a>
+                </a>
+                {% else %}
+                <a href="{{ path('purchase_step_personal') }}"
+                   class="btn btn-outline-grey">
+                    <span class="sr-only">back</span>
+                    <i class="far fa-arrow-left"></i></a>
+                </a>
+                {% endif %}
+            </div>
+            {% if app.user.hasValidPaymentMethod and app.user.hasJudoPaymentMethod %}
+                <div class="col">
+                    {{ form_widget(purchase_form.existing, {'label': 'Pay with card on file', 'attr': {'class': 'btn btn-success btn-gradient-green'}}) }}
+                </div>
+                <div class="col">
+                    {{ form_widget(purchase_form.next, {'label': 'Pay with a new card', 'attr': {'class': 'btn btn-success btn-gradient-green'}}) }}
+                </div>
+            {% else %}
+                <div class="col">
+                    {% if purchase_form.existing is defined %}
+                        {% do purchase_form.existing.setRendered %}
+                    {% endif %}
+                    {{ form_widget(purchase_form.next, {'label': 'I agree, proceed to payment', 'attr': {'class': 'btn btn-success btn-gradient-green'}}) }}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if payment_provider == 'judo' %}
+        <div class="form-group text-center">
+            <small class="text-grey">Payments powered by</small> <br>
+            <img src="{{ cdn_url }}/images/purchase/judo_pay_logo.svg" alt="Judo Pay" title="Powered by - Judo Pay" width="70px">
+        </div>
+    {% endif %}
+
+{{ form_end(purchase_form) }}
+
+<form action="{{ webpay_action }}" method="post" id="webpay-form">
+    <input id="Reference" name="Reference" type="hidden" value="{{ webpay_reference }}">
+</form>

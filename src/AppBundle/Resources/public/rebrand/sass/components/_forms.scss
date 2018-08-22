@@ -1,0 +1,156 @@
+// forms.scss
+
+.form-400 {
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+label {
+    font-family: $g-medium;
+    color: $blue-4;
+
+    &.error,
+    &.is-invalid {
+        font-family: $g-regular;
+        font-size: $font-size-sm;
+        color: $red;
+    }
+}
+
+// Modify error styling - main styling done in _variables.scss
+.form-control {
+
+    &.is-valid-ss,
+    &.is-valid-ss:focus,
+    &:focus {
+        border-color: $blue-2;
+        background-color: rgba(37, 147, 243, 0.1);
+        box-shadow: rgba(37, 147, 243, 0.1);
+    }
+
+    &:disabled,
+    &[readonly] {
+        background-color: $off-white;
+
+        &:focus {
+            background-color: $off-white;
+        }
+    }
+}
+
+.form-text {
+    color: rgba(23, 11, 56, 0.4);
+}
+
+.custom-checkbox .custom-control-input:checked ~ .custom-control-label::before {
+    background-color: #00B500;
+}
+
+// Server side error styling
+.with-errors {
+    ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+
+        li {
+            font-family: $g-regular;
+            font-size: $font-size-sm;
+            color: $red;
+        }
+    }
+}
+
+// Twitter Typeahead
+.twitter-typeahead {
+    width: 100%;
+
+    .tt {
+
+        &-input {
+            z-index: 1001;
+        }
+
+        &-hint {}
+
+        &-menu {
+            width: 90%;
+            width: calc(100% - 2rem);
+            left: 1rem !important;
+            max-height: 180px;
+            background-color: $white;
+            @include border-bottom-radius(10px);
+            box-shadow: 0 15px 30px 0 rgba(8,27,154,0.08),
+                        0 5px 15px 0 rgba(8,27,154,0.08);
+
+            overflow-y: scroll;
+            z-index: 1000 !important;
+        }
+
+        &-suggestion {
+            padding: 0.5rem 1rem;
+            border-bottom: 1px solid $blue-1;
+            vertical-align: middle;
+            cursor: pointer;
+
+            &:last-of-type {
+                border-bottom: none;
+            }
+
+            &:hover {
+                background-color: rgba(37, 147, 243, 0.1);
+            }
+        }
+    }
+}
+
+// Radio Button Group
+// Apply class to original options container
+.radio-btn-original {
+    position: absolute;
+    left: -10000px;
+    top: auto;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+}
+
+// Currently using a row and columns to size for now
+// ".radio-btn-original" to the orignal form-group to hide
+// TODO: Make js based off data attr's.
+.radio-btn {
+    width: 100%; height: 4.6rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: rgba(104, 114, 150, 0.6);
+    background-color: rgba(37, 147, 243, 0.1);
+    border: 2px solid rgba(104, 114, 150, 0.1);
+    @include border-radius(10px);
+
+    -webkit-transition: all 300ms 0ms ease-in-out;
+    transition: all 300ms 0ms ease-in-out;
+
+    &:hover {
+        -webkit-transform: scale(1.05);
+        transform: scale(1.05);
+    }
+
+    &:hover,
+    &.radio-btn-active {
+        cursor: pointer;
+        color: $white;
+        background-color: $blue-2;
+        border-color: $blue-1a;
+        box-shadow: 0 15px 30px 0 rgba(8,27,154,0.08),
+                    0 5px 15px 0 rgba(8,27,154,0.08);
+    }
+
+    &.radio-btn-active {
+        &:hover {
+            -webkit-transform: none;
+            transform: none;
+        }
+    }
+}

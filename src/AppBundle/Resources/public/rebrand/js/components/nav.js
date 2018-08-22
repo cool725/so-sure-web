@@ -4,10 +4,13 @@ import usrAgnt from '../common/setAgent.js';
 
 $(function() {
 
-    let nav       = $('.navbar'),
-        hamburger = $('#nav_toggle'),
-        menu      = $('#menu'),
-        open      = false;
+    const nav       = $('.navbar'),
+          hamburger = $('#nav_toggle'),
+          menu      = $('#menu'),
+          logo      = $('.navbar-brand__logo'),
+          quoteBtn  = $('#quote_btn');
+
+    let open = false;
 
     // Toggle - Menu
     hamburger.on('click', function(e) {
@@ -18,6 +21,12 @@ $(function() {
 
         // Toggle menu open
         menu.toggleClass('menu--open');
+
+        // Toggle logo class
+        logo.toggleClass('navbar-brand__logo-white-light');
+
+        // Toggle the quote btn class
+        quoteBtn.toggleClass('btn-outline-white btn-gradient');
 
         // Prevent scrolling whilst open
         $('body').toggleClass('body--overflow');
@@ -40,13 +49,21 @@ $(function() {
     // Add navbar background if page reloads not at the top
     $(window).on('load', function(e) {
         if ($(this).scrollTop() > 5) {
-            nav.addClass('navbar-scrolled');
+            if (!$('body').hasClass('quote')) {
+                nav.addClass('navbar-scrolled');
+            } else {
+                nav.addClass('navbar-scrolled-quote');
+            }
         }
     });
 
     // Scroll - Add navbar background on scroll
     $(window).scroll(function(e) {
-        nav.toggleClass('navbar-scrolled', $(this).scrollTop() > 5);
+        if (!$('body').hasClass('quote')) {
+            nav.toggleClass('navbar-scrolled', $(this).scrollTop() > 5);
+        } else {
+            nav.toggleClass('navbar-scrolled-quote', $(this).scrollTop() > 5);
+        }
     });
 
 });

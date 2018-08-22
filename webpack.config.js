@@ -1,4 +1,5 @@
 var Encore = require('@symfony/webpack-encore');
+var webpack = require('webpack');
 
 Encore
     .enableSingleRuntimeChunk()
@@ -7,7 +8,7 @@ Encore
     .setOutputPath('web/css-js/')
 
     // the public path used by the web server to access the previous directory
-    .setPublicPath('/web')
+    .setPublicPath('/css-js')
 
     // this creates a 'vendor.js' file with jquery and the bootstrap JS module plus popper
     .createSharedEntry('vendor', './web/components/vendor.js')
@@ -16,6 +17,8 @@ Encore
     .addEntry('global', './src/AppBundle/Resources/public/rebrand/js/global.js')
     .addEntry('homepage', './src/AppBundle/Resources/public/rebrand/js/pages/homepage.js')
     .addEntry('quotepage', './src/AppBundle/Resources/public/rebrand/js/pages/quotepage.js')
+    .addEntry('purchase', './src/AppBundle/Resources/public/rebrand/js/pages/purchase.js')
+    .addEntry('welcome', './src/AppBundle/Resources/public/rebrand/js/pages/welcome.js')
 
     // allow legacy applications to use $/jQuery as a global variable
     .autoProvidejQuery()
@@ -28,12 +31,21 @@ Encore
 
     // show OS notifications when builds finish/fail
     .enableBuildNotifications()
+
     // create hashed filenames (e.g. app.abc123.css)
-    // TODO: Get working in config!
-    // .enableVersioning()
+    .enableVersioning()
 
     // allow sass/scss files to be processed
     .enableSassLoader()
+
+    .addPlugin(
+        new webpack.ProvidePlugin({
+            $: "jquery",
+            jQuery: "jquery",
+            Bloodhound: "corejs-typeahead/dist/bloodhound.js",
+            doT: "dot/doT.js"
+        })
+    )
 ;
 
 // export the final configuration

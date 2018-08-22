@@ -43,7 +43,7 @@ class PhoneMakeType extends AbstractType
         $isAndroid = $this->requestService->isDeviceOsAndroid();
         $make = $builder->getData()->getMake();
         $models = [];
-        $phonePlaceholder = 'Select your phone make first';
+        $phonePlaceholder = 'make';
         if ($make) {
             $phones = $this->dm->getRepository(Phone::class)->findActiveModels($make);
             foreach ($phones as $phone) {
@@ -54,7 +54,7 @@ class PhoneMakeType extends AbstractType
         $models[''] = $phonePlaceholder;
         $memory[''] = $phonePlaceholder;
         $makeChoiceOptions = [
-            'placeholder' => 'Find your phone for an instant quote...',
+            'placeholder' => 'make',
             'choices' => $this->dm->getRepository(Phone::class)->findActiveMakes(),
             'required' => $this->required,
         ];
@@ -62,9 +62,9 @@ class PhoneMakeType extends AbstractType
             $makeChoiceOptions['preferred_choices'] = ['Apple', 'Samsung'];
             $makeChoiceOptions['group_by'] = function ($value) {
                 if ($value === 'Apple' or $value === 'Samsung') {
-                    return 'Top Makes:';
+                    return 'Top makes:';
                 } else {
-                    return 'Other Makes:';
+                    return 'Other makes:';
                 }
             };
         }

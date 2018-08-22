@@ -1179,10 +1179,6 @@ class UserController extends BaseController
             );
             $this->addFlash('success', $message);
         }
-        $this->addFlash('error', sprintf(
-            'Is your phone already damaged? <a href="%s">Click here</a>',
-            $this->generateUrl('purchase_cancel', ['id' => $user->getLatestPolicy()->getId()])
-        ));
 
         $oauth2FlowParams = null;
         $session = $request->getSession();
@@ -1192,13 +1188,16 @@ class UserController extends BaseController
             parse_str($query, $oauth2FlowParams);
         }
 
-        return array(
+        $data = array(
+            'cancel_url' => $this->generateUrl('purchase_cancel', ['id' => $user->getLatestPolicy()->getId()]),
             'policy_key' => $this->getParameter('policy_key'),
             'policy' => $user->getLatestPolicy(),
             'has_visited_welcome_page' => $pageVisited,
             'user_modal_welcome' => $exp,
             'oauth2FlowParams' => $oauth2FlowParams,
         );
+
+        return $this->render('AppBundle:User:welcomeRebrand.html.twig', $data);
     }
     /**
      * @Route("/payment-details", name="user_payment_details")

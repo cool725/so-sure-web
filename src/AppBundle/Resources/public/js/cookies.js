@@ -1,7 +1,7 @@
 window.addEventListener("load", function(){
   if (window.cookieconsent) {
     window.cookieconsent.initialise({
-      container: document.getElementById("content"),
+      container: document.getElementsByTagName("body"),
       palette: {
         popup: {
           background: "#237afc"

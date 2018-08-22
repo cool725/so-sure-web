@@ -1,0 +1,22 @@
+<div class="getquote">
+    <div class="getquote__inner d-flex align-items-center">
+        <button class="hamburger hamburger--spring-r hamburger--collapse is-active get-a-quote" type="button">
+            <span class="hamburger-box">
+                <span class="hamburger-inner"></span>
+            </span>
+        </button>
+        <div class="container">
+            <div class="getquote__contents">
+                <h4 class="text-white mb-5 opacity-05">Let's get your quote - it'll only take a few seconds</h4>
+                {# Phone Search #}
+                {# TODO: Rework if phone in session #}
+                {% if phone is defined and phone %}
+                    {{ render(controller('AppBundle:Search:phoneSearchDropdown', { 'type': 'homepage-jc', 'id': phone.id }|merge(app.request.query.all))) }}
+                {% else %}
+                    {{ render(controller('AppBundle:Search:phoneSearchDropdown', { 'type': 'homepage-jc' }|merge(app.request.query.all))) }}
+                {% endif %}
+                {# End Phone Search #}
+            </div>
+        </div>
+    </div>
+</div>

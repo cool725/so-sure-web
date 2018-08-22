@@ -16,24 +16,36 @@
     }
 }
 
-// Modify list to handle fa icons
 .icn-list {
 
-    &-fa {
+    li {
+        position: relative;
+        padding-left: 45px;
+        padding-top: 2px;
 
-        li {
-            position: relative;
-            padding-left: 30px;
-
-            > .fas {
-                position: absolute;
-                left: 0; top: 5px;
-            }
+        img {
+            position: absolute;
+            left: 0; top: 0;
+            vertical-align: middle;
         }
     }
 }
 
-.fas {
+// Modify list to handle fa icons
+.icn-fa-list {
+
+    li {
+        position: relative;
+        padding-left: 30px;
+
+        > .far {
+            position: absolute;
+            left: 0; top: 5px;
+        }
+    }
+}
+
+.far {
     vertical-align: middle;
 }
 

@@ -32,9 +32,12 @@ sosure.purchaseStepAddress = (function() {
     self.addValidation = function() {
         self.form.validate({
             debug: false,
+            // When to validate
+            validClass: 'is-valid-ss',
+            // errorClass: 'is-invalid',
+            // onfocusout: false,
             onkeyup: false,
-            focusCleanup: true,
-            validClass: 'has-success',
+            onclick: false,
             groups: {
                 birthday: 'purchase_form_birthday_day purchase_form_birthday_month purchase_form_birthday_year',
             },
@@ -364,9 +367,10 @@ $(function(){
         sosure.purchaseStepAddress.step_one_change();
     });
 
-    $('#purchase_form_name').on('blur', function() {
-        sosure.purchaseStepAddress.step_one_continue();
-    });
+    // Breaking validation setup
+    // $('#purchase_form_name').on('blur', function() {
+        // sosure.purchaseStepAddress.step_one_continue();
+    // });
 
     $('#purchase_form_email').on('change', function() {
         sosure.purchaseStepAddress.step_one_change();

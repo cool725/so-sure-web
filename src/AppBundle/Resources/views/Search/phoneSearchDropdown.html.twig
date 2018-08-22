@@ -3,33 +3,32 @@
     'data-phones': phones|json_encode|raw,
     'autocomplete': 'off'
 }}) }}
-    <div class="row">
-        <div class="form-group col-sm-4">
-            {{ form_widget(form_phone.make, {
-              'attr': {
-                'class': 'form-control phone-search-dropdown__make'
-            }}) }}
-        </div>
-        <div class="form-group col-sm-4">
-            {{ form_widget(form_phone.model, {
-              'attr': {
-                'class': 'form-control phone-search-dropdown__model',
-                'disabled': 'disabled'
-            }}) }}
-        </div>
-        <div class="form-group col-sm-4">
-            {{ form_widget(form_phone.memory, {
-                'attr': {
-                    'class': 'form-control phone-search-dropdown__memory',
-                    'disabled': 'disabled'
-            }}) }}
-        </div>
-    </div>
-    <div class="form-group text-center">
-        {{ form_widget(form_phone.next, {
-          'label': 'Get a quote',
+    <div class="d-lg-flex align-items-center flex-wrap">
+        <span class="h1 mb-2 text-white">My mobile phone is an</span>
+        {{ form_widget(form_phone.make, {
           'attr': {
-            'class': 'btn btn-outline-white',
+            'class': 'mb-2 ml-2 phone-search-dropdown__select phone-search-dropdown__make h1 resizeselect'
+        }}) }}
+        {{ form_widget(form_phone.model, {
+          'attr': {
+            'class': 'mb-2 ml-2 phone-search-dropdown__select phone-search-dropdown__model h1',
+            'disabled': 'disabled'
+        }}) }}
+        <div class="phone-search-dropdown__break"></div>
+        <span class="h1 text-white">that has</span>
+        {{ form_widget(form_phone.memory, {
+            'attr': {
+                'class': 'mb-2 ml-2 mx-lg-2 phone-search-dropdown__select phone-search-dropdown__memory h1',
+                'disabled': 'disabled'
+        }}) }}
+        <span class="h1 mb-2 text-white">storage</span>
+    </div>
+    <div class="form-group mt-5">
+        {{ form_widget(form_phone.next, {
+          'label': 'Show my price',
+          'attr': {
+            'class': 'btn btn-outline-white phone-search-dropdown__button',
+            'disabled': 'disabled'
         }}) }}
     </div>
 {{ form_end(form_phone) }}

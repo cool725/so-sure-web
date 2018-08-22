@@ -1,0 +1,61 @@
+// form-steps.scss
+
+.form-steps {
+    width: 100%;
+    position: relative;
+
+    &__item {
+        width: 33.3333333333%;
+        position: relative;
+        float: left;
+        text-align: center;
+
+        &-content {
+            display: inline-block;
+        }
+
+        &-off {
+            width: 14px; height: 14px;
+            display: block;
+            position: relative;
+            top: 6px;
+            z-index: 2;
+            border-radius: 100%;
+            background-color: $white;
+            border: 2px solid $bb-2;
+        }
+
+        &-on {
+            width: 32px; height: 32px;
+            display: block;
+            position: relative;
+            z-index: 2;
+            color: $white;
+            line-height: 31px;
+            border-radius: 100%;
+            background-color: $bb-2;
+            font-family: $g-bold;
+            box-shadow: 0 0 0 8px rgba(224, 239, 253, 0.8);
+            @include linear-gradient(90deg, $blue-3, $blue-1a);
+        }
+
+        &-done {
+            width: 32px; height: 32px;
+            display: block;
+            position: relative;
+            z-index: 2;
+            border-radius: 100%;
+            background-color: $bb-2;
+            line-height: 32px;
+        }
+
+        &-line {
+            width: 100%; height: 3px;
+            display: inline-block;
+            position: absolute;
+            left: -50%; top: 15px;
+            z-index: 1;
+            background-color: $bb-2;
+        }
+    }
+}

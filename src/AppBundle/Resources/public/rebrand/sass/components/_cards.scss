@@ -1,31 +1,115 @@
 // cards.scss
 
-// .card {
-//     border: none;
-//     @include border-radius(15px);
-
-//     @include media-breakpoint-up(lg) {
-//         width: 300px;
-//     }
-// }
-//
 .cardbox {
-    height: 440px;
+    max-width: 300px;
     background-color: $white;
     box-shadow: 0 15px 30px 0 rgba(8,27,154,0.08),
                 0 5px 15px 0 rgba(8,27,154,0.08);
     @include border-radius(15px);
 
     &__body {
-        padding: 2.4rem;
+        padding: 2rem;
     }
 
     &__title {}
 
-    &__text {}
+    &__text {
+        // font-size: 13px;
+    }
 
     @include media-breakpoint-up(lg) {
         width: 300px;
-        height: 480px;
+        // height: 480px;
+    }
+}
+
+.cardbox-400 {
+    @include media-breakpoint-up(md) {
+        height: 400px;
+    }
+}
+
+.cardbox-460 {
+    @include media-breakpoint-up(md) {
+        height: 460px;
+    }
+}
+
+// Only using px here for consistency
+.expanding-cardbox {
+    border: 2px solid rgba(37,147,243, 0.2);
+    @include border-radius(10px);
+
+    &__body {
+        padding: 1.2rem 1.56rem 1.56rem 1.56rem;
+    }
+
+    &__title {
+        position: relative;
+        padding-right: 2.4rem;
+        margin-top: .25rem;
+        cursor: pointer;
+
+        .far {
+            position: absolute;
+            right: 0; top: 4px;
+        }
+    }
+
+    &__excerpt {
+        padding-right: 2.4rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    &__expand {
+        display: none;
+    }
+
+    &:hover {
+        background-color: $white;
+        border-color: $white;
+        box-shadow: 0 15px 30px 0 rgba(8,27,154,0.08),
+                    0 5px 15px 0 rgba(8,27,154,0.08);
+    }
+}
+
+.expanding-cardbox-alt {
+    border: 2px solid $blue-1;
+
+    &:hover {
+        border: 2px solid $blue-1;
+        background-color: rgba(255,255,255,.08);
+    }
+}
+
+.expanding-cardbox__icon {
+    background: url('#{$cdn_url}/images/rebrand/icns/so-sure_tick-icn.svg') no-repeat 1.3rem 1.25rem;
+    background-size: 2rem;
+
+    .expanding-cardbox__title {
+        padding-left: 2.8rem;
+    }
+
+    .expanding-cardbox__expand {
+        padding-left: 2.6rem;
+    }
+
+    .expanding-cardbox__excerpt {
+        padding-left: 2.8rem;
+    }
+}
+
+.expanding-cardbox__open {
+    background-color: $white;
+    border-color: $white;
+    cursor: default;
+    box-shadow: 0 15px 30px 0 rgba(8,27,154,0.08),
+                0 5px 15px 0 rgba(8,27,154,0.08);
+
+    &.expanding-cardbox-alt {
+        background-color: rgba(255,255,255,.08);
+        border: 2px solid $blue-1;
     }
 }

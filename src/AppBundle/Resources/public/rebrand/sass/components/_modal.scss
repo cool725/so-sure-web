@@ -1,0 +1,18 @@
+// modal.scss
+
+.modal {
+
+    &-header {
+        @include linear-gradient(90deg, $blue-3, $blue-1a);
+        @include  border-top-radius(10px);
+    }
+
+    &-title {
+        color: $white;
+        text-align: center;
+    }
+
+    &-body {
+        padding: 2rem;
+    }
+}
