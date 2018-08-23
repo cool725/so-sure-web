@@ -1,0 +1,57 @@
+{% extends 'base.html.twig' %}
+
+{# Set vars #}
+{% set new_stylesheet = 1 %}
+{% set new_footer = 1 %}
+
+{% block title %}so-sure - Better Phone Insurance{% endblock %}
+{% block meta %}
+    <meta name="description" content="Social mobile phone insurance that's better and up to 80% cheaper when you connect with friends don't claim. Download our app now to see how much you could save."/>
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {% stylesheets output='css/*.css'
+    '@AppBundle/Resources/public/sass/page/cancel.scss'
+    %}
+    <link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
+{% endblock %}
+
+{% block body %}
+    <section class="section--pad">
+        <div class="container">
+
+            <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_broken-phone.png" width="220px" class="img-center" />
+            <h1 class="text-center">Already Broken or Damaged?</h1>
+            <p class="lead">We understand mistakes happen, so if your phone is already damaged (the screen is cracked or the phone does not work) you now have to cancel your policy. If your phone has cosmetic damage, like a few scratches, you can keep your policy and remain covered.</p>
+            <p>Please keep in mind that we take fraud seriously and do prosecute. If you purchased a policy knowing that your phone is damaged this is fraud. We can exercise our right to cancel a policy at anytime and report any instance of fraud to the police.</p>
+            <p class="text-center">
+                <a href="{{ path('user_welcome_policy_id', {'id': policy.id}) }}"
+                   class="btn btn-grey btn-pad">NO, ITS FINE
+                </a>
+                <a href="#"
+                   class="btn btn-grey btn-pad btn-cancel-policy sosure-track"
+                   data-event="cancel-damaged"
+                   data-reason="damaged">YES MY PHONE IS DAMAGED
+                </a>
+            </p>
+
+        </div>
+    </section>
+
+    <div class="hidden">
+        {{ form_start(cancel_form, {'attr': {'id': 'cancel_form'}}) }}
+        {{ form_widget(cancel_form.reason) }}
+        {{ form_widget(cancel_form.othertxt) }}
+        {{ form_widget(cancel_form.cancel) }}
+        {{ form_end(cancel_form) }}
+    </div>
+
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {% javascripts
+    '@AppBundle/Resources/public/js/Purchase/cancel.js' %}
+    <script src="{{ asset_url }}"></script>{% endjavascripts %}
+{% endblock %}
