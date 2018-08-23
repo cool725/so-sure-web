@@ -1141,7 +1141,7 @@ class PurchaseController extends BaseController
         if ($request->get('_route') == "purchase_cancel_damaged") {
             $template = 'AppBundle:Purchase:cancelDamaged.html.twig';
         } else {
-            $template = 'AppBundle:Purchase:cancel.html.twig';            
+            $template = 'AppBundle:Purchase:cancel.html.twig';
         }
         $data = [
             'policy' => $policy,
