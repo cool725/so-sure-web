@@ -1062,8 +1062,9 @@ class PurchaseController extends BaseController
 
     /**
      * @Route("/cancel/{id}", name="purchase_cancel")
+     * @Route("/cancel/damaged/{id}", name="purchase_cancel_damaged")
      * @Template
-    */
+     */
     public function cancelAction(Request $request, $id)
     {
         $dm = $this->getManager();
@@ -1137,93 +1138,11 @@ class PurchaseController extends BaseController
             );
         }
 
-        $template = 'AppBundle:Purchase:cancel.html.twig';
-        $data = [
-            'policy' => $policy,
-            'cancel_form' => $cancelForm->createView(),
-        ];
-
-        return $this->render($template, $data);
-    }
-
-    /**
-     * @Route("/cancel/damaged/{id}", name="purchase_cancel_damaged")
-     * @Template
-    */
-    public function cancelDamagedAction(Request $request, $id)
-    {
-        $dm = $this->getManager();
-        $repo = $dm->getRepository(Policy::class);
-        $policy = $repo->find($id);
-        if (!$policy) {
-            throw $this->createNotFoundException('Unable to see policy');
-        }
-
-        if (!$policy->hasViewedCancellationPage()) {
-            $policy->setViewedCancellationPage(new \DateTime());
-            $dm->flush();
-        }
-        $cancelForm = $this->get('form.factory')
-            ->createNamedBuilder('cancel_form', UserCancelType::class)
-            ->getForm();
-
-        if ('POST' === $request->getMethod()) {
-            if ($request->request->has('cancel_form')) {
-                $cancelForm->handleRequest($request);
-                if ($cancelForm->isValid()) {
-                    $reason = $cancelForm->getData()['reason'];
-                    $other = $cancelForm->getData()['othertxt'];
-
-                    // @codingStandardsIgnoreStart
-                    $body = sprintf(
-                        "This is a so-sure generated message. Policy: <a href='%s'>%s/%s</a> requested a cancellation via the site as phone was damaged (%s) prior to purchase. so-sure support team: Please contact the policy holder to get their reason(s) for cancelling before action. Additional comments: %s",
-                        $this->generateUrl(
-                            'admin_policy',
-                            ['id' => $policy->getId()],
-                            UrlGeneratorInterface::ABSOLUTE_URL
-                        ),
-                        $policy->getPolicyNumber(),
-                        $policy->getId(),
-                        $reason,
-                        $other
-                    );
-                    // @codingStandardsIgnoreEnd
-
-                    if (!$policy->hasRequestedCancellation()) {
-                        $policy->setRequestedCancellation(new \DateTime());
-                        $policy->setRequestedCancellationReason($reason);
-                        $dm->flush();
-                        $intercom = $this->get('app.intercom');
-                        $intercom->queueMessage($policy->getUser()->getEmail(), $body);
-                    }
-
-                    $this->get('app.mixpanel')->queueTrack(
-                        MixpanelService::EVENT_REQUEST_CANCEL_POLICY,
-                        ['Policy Id' => $policy->getId(), 'Reason' => $reason]
-                    );
-
-                    $this->get('app.sixpack')->convertByClientId(
-                        $policy->getUser()->getId(),
-                        SixpackService::EXPERIMENT_WELCOME_MODAL_NO_WELCOME_MODAL
-                    );
-
-                    // @codingStandardsIgnoreStart
-                    $this->addFlash(
-                        'success',
-                        'We have passed your request to our policy team. You should receive a cancellation email once that is processed.'
-                    );
-                    // @codingStandardsIgnoreEnd
-                    return $this->redirectToRoute('purchase_cancel_requested', ['id' => $id]);
-                }
-            }
+        if ($request->get('_route') == "purchase_cancel_damaged") {
+            $template = 'AppBundle:Purchase:cancelDamaged.html.twig';
         } else {
-            $this->get('app.mixpanel')->queueTrack(
-                MixpanelService::EVENT_CANCEL_POLICY_PAGE,
-                ['Policy Id' => $policy->getId()]
-            );
+            $template = 'AppBundle:Purchase:cancel.html.twig';            
         }
-
-        $template = 'AppBundle:Purchase:cancelDamaged.html.twig';
         $data = [
             'policy' => $policy,
             'cancel_form' => $cancelForm->createView(),
