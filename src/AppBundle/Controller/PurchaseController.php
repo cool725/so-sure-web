@@ -1146,7 +1146,6 @@ class PurchaseController extends BaseController
         return $this->render($template, $data);
     }
 
-
     /**
      * @Route("/cancel/damaged/{id}", name="purchase_cancel_damaged")
      * @Template
