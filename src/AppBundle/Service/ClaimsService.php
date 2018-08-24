@@ -478,7 +478,7 @@ class ClaimsService
             $files[] = $this->downloadS3($file);
         }
 
-        return $files;
+        return array_values(array_filter($files));
     }
 
     public function notifyClaimSubmission(Claim $claim)
@@ -522,6 +522,7 @@ class ClaimsService
             /** @var S3ClaimFile $attachment */
             $localAttachments[] = $this->downloadS3($attachment);
         }
+
         $subject = sprintf(
             'Additional Documents for Policy %s',
             $claim->getPolicy()->getPolicyNumber()
@@ -538,7 +539,7 @@ class ClaimsService
             ['data' => $claim],
             null,
             null,
-            $localAttachments,
+            array_values(array_filter($localAttachments)),
             'bcc@so-sure.com'
         );
     }
@@ -631,11 +632,11 @@ class ClaimsService
         /** @var array $response */
         $response = $s3Adapater->read($key);
         //#dump($response);
-        if ($response !== false) {
+        if (is_array($response)) {
             file_put_contents($tempFile, $response['contents']);
+            return $tempFile;
         }
-        //#dump($s3File, $key);
 
-        return $tempFile;
+        return null;
     }
 }
