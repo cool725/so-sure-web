@@ -89,6 +89,8 @@ class ReportingService
 
     public function report($start, $end, $isKpi = false, $useCache = true)
     {
+        $data = [];
+
         $redisKey = sprintf(
             self::REPORT_KEY_FORMAT,
             $start->format('Y-m-d.hi'),
@@ -107,17 +109,17 @@ class ReportingService
         }
         $endActivation = clone $start;
         $endActivation = $endActivation->sub(SoSure::getActivationInterval());
-//       $endActivation = $this->endOfDay($endActivation);
+        //$endActivation = $this->endOfDay($endActivation);
         $startActivation = clone $endActivation;
         $startActivation = $startActivation->sub(new \DateInterval('P7D'));
-//        $startActivation = $this->startOfDay($startActivation);
+        //$startActivation = $this->startOfDay($startActivation);
 
         $endHardActivation = clone $start;
         $endHardActivation = $endHardActivation->sub(SoSure::getHardActivationInterval());
-//        $endHardActivation = $this->endOfDay($endHardActivation);
+        //$endHardActivation = $this->endOfDay($endHardActivation);
         $startHardActivation = clone $endHardActivation;
         $startHardActivation = $startHardActivation->sub(new \DateInterval('P7D'));
-//        $startHardActivation = $this->startOfDay($startHardActivation);
+        //$startHardActivation = $this->startOfDay($startHardActivation);
 
         $rolling12Months = clone $end;
         $rolling12Months = $rolling12Months->sub(new \DateInterval('P1Y'));

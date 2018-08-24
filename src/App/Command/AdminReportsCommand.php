@@ -30,23 +30,19 @@ class AdminReportsCommand extends ContainerAwareCommand
 
     protected function configure()
     {
-        $this->setDescription('Pre-generate all cacheable reports.')
-            ->addOption(
-                'daily',
-                null,
-                InputOption::VALUE_NONE,
-                "Run only the 'daily' reports"
-            )
+        $this->setDescription('Pre-generate/run cacheable reports.')
+            ->addOption('kpi', null, InputOption::VALUE_NONE, "Run the 'kpi' report")
+            ->addOption('claims', null, InputOption::VALUE_NONE, "Run the 'claims' report")
         ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $output->writeln("Running the 'frequent' report(s)", OutputInterface::VERBOSITY_VERBOSE);
-        $this->cacheClaimsMainReport();
+        if ($input->getOption('claims')) {
+            $this->cacheClaimsMainReport();
+        }
 
-        if ($input->getOption('daily')) {
-            $output->writeln("Running the 'daily' report(s)", OutputInterface::VERBOSITY_VERBOSE);
+        if ($input->getOption('kpi')) {
             $this->cacheKpiReport();
         }
     }
