@@ -4,6 +4,7 @@
 {% set use_pca = true %}
 {% set body_class = 'quote' %}
 {% set quote_mode = 1 %}
+{% set intercom_enabled = false %}
 
 {% set showAddress = purchase_form.addressLine1.vars.data | length > 0 or purchase_form.postcode.vars.data | length > 0 %}
 {% set showDOB = purchase_form.name.vars.data | length > 0 and purchase_form.email.vars.data | length > 0 %}

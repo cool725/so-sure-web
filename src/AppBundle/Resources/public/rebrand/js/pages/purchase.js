@@ -22,6 +22,11 @@ $(function() {
         .data('text-original', $(this).html())
         .html($(this).data('text-swap') )
         .data('text-swap', $(this).data('text-original'));
+
+        // Scroll to content
+        $('.purchase__details__container').animate({
+            scrollTop: ($(this).offset().top - 70)
+        }, 500);
     });
 
     $('.purchase__details__container').scroll(function(e) {

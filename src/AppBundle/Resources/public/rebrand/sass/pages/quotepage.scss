@@ -88,7 +88,6 @@ body {
 
     &__cover__container {
         background-color: $white;
-        position: relative;
 
         @include media-breakpoint-up(lg) {
             width: 35vw; height: 100vh;
@@ -108,6 +107,8 @@ body {
     &__cover {
         max-width: 400px;
         overflow-y: scroll;
+        position: relative;
+        z-index: 4;
 
         @include media-breakpoint-up(lg) {
             margin: 0 auto;
@@ -115,6 +116,9 @@ body {
     }
 
     &__curve {
+        position: relative;
+        z-index: 2;
+
         svg {
             // Fix for 1px gap
             transform: translateY(1px);
@@ -122,11 +126,11 @@ body {
 
         @include media-breakpoint-up(lg) {
             width: 5vw; height: 100vh;
-            position: relative;
 
             svg {
                 height: 100vh;
                 position: absolute;
+                z-index: 3;
                 right: 0; top: 0;
                 transform: translateY(0);
                 transform: translateX(1px);

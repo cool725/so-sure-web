@@ -12,7 +12,7 @@ $(function() {
         .html($(this).data('text-swap') )
         .data('text-swap', $(this).data('text-original'));
 
-        // JULES CRAP
+        // Scroll to content
         $('.quote__details__container').animate({
             scrollTop: ($(this).offset().top - 70)
         }, 500);
