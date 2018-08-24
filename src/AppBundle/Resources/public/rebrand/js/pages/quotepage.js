@@ -18,7 +18,7 @@ $(function() {
         }, 500);
     });
 
-    $('.welcome__details__container').scroll(function(e) {
+    $('.quote__details__container').scroll(function(e) {
         $('.navbar').toggleClass('navbar-scrolled-quote', $(this).scrollTop() > 5);
     });
 
