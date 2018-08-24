@@ -628,8 +628,13 @@ class ClaimsService
             throw new \Exception(sprintf('URL not found %s', $key));
         }
 
-        $contents = $s3Adapater->read($key);
-        file_put_contents($tempFile, $contents);
+        /** @var array $response */
+        $response = $s3Adapater->read($key);
+        //#dump($response);
+        if ($response !== false) {
+            file_put_contents($tempFile, $response['contents']);
+        }
+        //#dump($s3File, $key);
 
         return $tempFile;
     }
