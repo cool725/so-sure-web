@@ -18,9 +18,10 @@ Story: {{ data.description }}
 <br>
 Signature: {{ data.signature }}
 <br>
-Expected attachments?:  {% if data.needProofOfUsage %}Proof of usage, {% endif
-%}{% if data.needProofOfBarring %}Proof of barring, {% endif
-%}{% if data.needProofOfPurchase %}Proof of purchase, {% endif
-%}{% if data.needProofOfLoss %}Proof of loss, {% endif
-%}{% if data.needPictureOfPhone %}Picture of phone{% endif
-%}.
+Expected attachments:
+{% if data.needProofOfUsage %} - Proof of usage{% endif %}
+{% if data.needProofOfBarring %} - Proof of barring{% endif%}
+{% if data.needProofOfPurchase %} - Proof of purchase{% endif%}
+{% if data.needProofOfLoss %} - Proof of loss{% endif%}
+{% if data.needPictureOfPhone %} - Picture of phone{% endif%}.
+<br>
