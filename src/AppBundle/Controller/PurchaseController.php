@@ -1062,8 +1062,9 @@ class PurchaseController extends BaseController
 
     /**
      * @Route("/cancel/{id}", name="purchase_cancel")
+     * @Route("/cancel/damaged/{id}", name="purchase_cancel_damaged")
      * @Template
-    */
+     */
     public function cancelAction(Request $request, $id)
     {
         $dm = $this->getManager();
@@ -1137,7 +1138,11 @@ class PurchaseController extends BaseController
             );
         }
 
-        $template = 'AppBundle:Purchase:cancel.html.twig';
+        if ($request->get('_route') == "purchase_cancel_damaged") {
+            $template = 'AppBundle:Purchase:cancelDamaged.html.twig';
+        } else {
+            $template = 'AppBundle:Purchase:cancel.html.twig';
+        }
         $data = [
             'policy' => $policy,
             'cancel_form' => $cancelForm->createView(),

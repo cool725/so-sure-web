@@ -1189,7 +1189,7 @@ class UserController extends BaseController
         }
 
         $data = array(
-            'cancel_url' => $this->generateUrl('purchase_cancel', ['id' => $user->getLatestPolicy()->getId()]),
+            'cancel_url' => $this->generateUrl('purchase_cancel_damaged', ['id' => $user->getLatestPolicy()->getId()]),
             'policy_key' => $this->getParameter('policy_key'),
             'policy' => $user->getLatestPolicy(),
             'has_visited_welcome_page' => $pageVisited,
