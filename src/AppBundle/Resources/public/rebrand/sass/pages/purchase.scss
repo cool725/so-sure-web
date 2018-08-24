@@ -41,12 +41,12 @@ body {
         @include media-breakpoint-up(lg) {
             width: 60vw; height: 100vh;
             overflow-y: scroll;
-
-            // IE
-            -ms-overflow-style: none;
         }
 
-        // JULES CRAP
+        // IE
+        -ms-overflow-style: none;
+
+        // Webkit
         &::-webkit-scrollbar {
             width: 0px;
             background: transparent;
@@ -92,12 +92,18 @@ body {
         background-color: $white;
         position: relative;
 
-        // IE
-        -ms-overflow-style: none;
-
         @include media-breakpoint-up(lg) {
             width: 35vw; height: 100vh;
             overflow-y: scroll;
+        }
+
+        // IE
+        -ms-overflow-style: none;
+
+        // Webkit
+        &::-webkit-scrollbar {
+            width: 0px;
+            background: transparent;
         }
     }
 
