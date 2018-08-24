@@ -35,15 +35,14 @@
         <div id="step--one-controls"
              class="form-group form-controls {% if showDOB %}step--hide{% endif %}">
 
-            <h6 class="text-grey my-4">
-                or login via social networks
-                {% if feature_enabled('starling') and starling %}
-                    &amp; partners
-                {% endif %}
-            </h6>
-
             {# Social Logins #}
             <div class="form-group">
+                <h6 class="text-grey mt-4">
+                    or login via social networks
+                    {% if feature_enabled('starling') and starling %}
+                        &amp; partners
+                    {% endif %}
+                </h6>
                 {#
                 <a href="#"
                    formnovalidate="formnovalidate"
@@ -72,12 +71,11 @@
             </div>
 
 
-            <div class="form-group">
+            <div class="form-group mt-5">
                 <div class="form-row">
                     <div class="col text-left">
-                        {# TODO: Needs to go back quote #}
                         <a href="{{ path('quote_make_model_memory', {'make': phone.make, 'model': phone.model, 'memory': phone.memory}) }}"
-                           class="btn btn-outline-grey">
+                           class="btn btn-outline-grey btn-circle d-flex justify-content-center align-items-center">
                             <span class="sr-only">back</span>
                             <i class="far fa-arrow-left"></i>
                         </a>
@@ -115,7 +113,7 @@
         <div class="address-search" style="{% if showAddress %}display: none;{% endif %}">
             <div class="form-group {% if is_postback %}has-error{% endif %}">
                 <label class="">Billing Address:</label>
-                <input id="address-select" class="typeahead form-control" type="text" placeholder="{% if postcode == 'type' %}Type your address (eg. 10 Downing Street, SW1A 2AA){% elseif postcode == 'comma' %}House Number, Postcode (eg. 10, SW1A 2AA){% endif %}" {% if not showAddress %} required="required" {% endif %} data-hj-suppress="">
+                <input id="address-select" class="typeahead form-control" type="text" placeholder="Postcode (eg. 10, SW1A 2AA)" {% if not showAddress %} required="required" {% endif %} data-hj-suppress="">
                 {% set display_error = false %}
                 {% if is_postback and (form_errors(purchase_form.addressLine1)|length > 0 or
                     form_errors(purchase_form.city)|length > 0 or
@@ -126,12 +124,11 @@
                 <small class="form-text"><a id="address-manual" href="#">Enter address manually</small></a>
             </div>
 
-            <div class="form-group">
+            <div class="form-group mt-5">
                 <div class="form-row">
                     <div class="col text-left">
-                        {# TODO: Needs to go back quote #}
                         <a href="{{ path('quote_make_model_memory', {'make': phone.make, 'model': phone.model, 'memory': phone.memory}) }}"
-                           class="btn btn-outline-grey">
+                           class="btn btn-outline-grey btn-circle d-flex justify-content-center align-items-center">
                             <span class="sr-only">back</span>
                             <i class="far fa-arrow-left"></i>
                         </a>
@@ -183,12 +180,11 @@
                     <div class="with-errors">{{ form_errors(purchase_form.postcode) }}</div>
                 {% endif %}
             </div>
-            <div class="form-group">
+            <div class="form-group mt-5">
                 <div class="form-row">
                     <div class="col text-left">
-                        {# TODO: Needs to go back quote #}
                         <a href="{{ path('quote_make_model_memory', {'make': phone.make, 'model': phone.model, 'memory': phone.memory}) }}"
-                           class="btn btn-outline-grey">
+                           class="btn btn-outline-grey btn-circle d-flex justify-content-center align-items-center">
                             <span class="sr-only">back</span>
                             <i class="far fa-arrow-left"></i>
                         </a>

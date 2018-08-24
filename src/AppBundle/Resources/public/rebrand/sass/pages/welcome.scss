@@ -36,11 +36,13 @@ body {
 
 
     &__cover__container {
+        position: relative;
+        z-index: 4;
         background-color: $white;
-        margin-top: 4rem;
+        margin-top: 3.4rem;
 
         @include media-breakpoint-up(lg) {
-            width: 40vw; height: 100vh;
+            width: 35vw; height: 100vh;
             overflow-y: scroll;
             margin-top: 0;
 
@@ -57,6 +59,27 @@ body {
 
         @include media-breakpoint-up(lg) {
             padding-top: 8rem;
+        }
+    }
+
+    &__curve {
+        svg {
+            // Fix for 1px gap
+            transform: translateY(-1px);
+            z-index: 2;
+        }
+
+        @include media-breakpoint-up(lg) {
+            width: 5vw; height: 100vh;
+            position: relative;
+
+            svg {
+                height: 100vh;
+                position: absolute;
+                right: 0; top: 0;
+                transform: translateY(0);
+                transform: translateX(1px);
+            }
         }
     }
 }

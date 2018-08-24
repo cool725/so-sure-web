@@ -35,7 +35,7 @@ sosure.purchaseStepAddress = (function() {
             // When to validate
             validClass: 'is-valid-ss',
             // errorClass: 'is-invalid',
-            // onfocusout: false,
+            onfocusout: false,
             onkeyup: false,
             onclick: false,
             groups: {

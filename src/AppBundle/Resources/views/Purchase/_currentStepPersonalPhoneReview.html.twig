@@ -89,7 +89,7 @@
     </div>
 
     <div class="form-group">
-        <h4 class="text-blue2 mb-3">Please confirm that the following are correct:</h4>
+        <h4 class="text-blue2 mt-5 mb-3">Please confirm that the following are correct:</h4>
         <ul class="pl-4 form-text">
             <li>My phone is in full working condition</li>
             <li>My screen is not cracked</li>
@@ -102,18 +102,18 @@
         {{ form_widget(purchase_form.agreed, {'label': 'I confirm the above is correct'}) }}
     </div>
 
-    <div class="form-group">
+    <div class="form-group mt-5">
         <div class="form-row">
             <div class="col">
                 {% if app.request.get('_route') == "purchase_step_policy_id" %}
                 <a href="{{ path('user_home') }}"
-                   class="btn btn-outline-grey">
+                   class="btn btn-outline-grey btn-circle d-flex justify-content-center align-items-center">
                     <span class="sr-only">back</span>
                     <i class="far fa-arrow-left"></i></a>
                 </a>
                 {% else %}
                 <a href="{{ path('purchase_step_personal') }}"
-                   class="btn btn-outline-grey">
+                   class="btn btn-outline-grey btn-circle d-flex justify-content-center align-items-center">
                     <span class="sr-only">back</span>
                     <i class="far fa-arrow-left"></i></a>
                 </a>
@@ -138,9 +138,9 @@
     </div>
 
     {% if payment_provider == 'judo' %}
-        <div class="form-group text-center">
-            <small class="text-grey">Payments powered by</small> <br>
-            <img src="{{ cdn_url }}/images/purchase/judo_pay_logo.svg" alt="Judo Pay" title="Powered by - Judo Pay" width="70px">
+        <div class="form-group d-flex justify-content-center align-items-center">
+            <small class="text-grey">Payments powered by</small>
+            <img src="{{ cdn_url }}/images/purchase/judo_pay_logo.svg" alt="Judo Pay" title="Powered by - Judo Pay" width="70px" class="ml-2">
         </div>
     {% endif %}
 
