@@ -40,6 +40,9 @@ use AppBundle\Document\Payment\ChargebackPayment;
 use AppBundle\Document\Payment\DebtCollectionPayment;
 use AppBundle\Document\PolicyTerms;
 use AppBundle\Document\User;
+use DateInterval;
+use DateTime;
+use DateTimeZone;
 
 class ReportingService
 {
@@ -84,17 +87,21 @@ class ReportingService
         $this->redis = $redis;
     }
 
-    public function report($start, $end, $isKpi = false)
+    public function report($start, $end, $isKpi = false, $useCache = true)
     {
+        $data = [];
+
         $redisKey = sprintf(
             self::REPORT_KEY_FORMAT,
             $start->format('Y-m-d.hi'),
             $end->format('Y-m-d.hi'),
             $isKpi ? 'kpiYES': 'kpiNo'
         );
-        if ($this->redis->exists($redisKey)) {
+        if ($useCache === true && $this->redis->exists($redisKey)) {
             return unserialize($this->redis->get($redisKey));
         }
+
+        $data['dataFetchedAt'] = new DateTime();
 
         $totalEnd = null;
         if ($isKpi) {
@@ -102,17 +109,17 @@ class ReportingService
         }
         $endActivation = clone $start;
         $endActivation = $endActivation->sub(SoSure::getActivationInterval());
-//       $endActivation = $this->endOfDay($endActivation);
+        //$endActivation = $this->endOfDay($endActivation);
         $startActivation = clone $endActivation;
         $startActivation = $startActivation->sub(new \DateInterval('P7D'));
-//        $startActivation = $this->startOfDay($startActivation);
+        //$startActivation = $this->startOfDay($startActivation);
 
         $endHardActivation = clone $start;
         $endHardActivation = $endHardActivation->sub(SoSure::getHardActivationInterval());
-//        $endHardActivation = $this->endOfDay($endHardActivation);
+        //$endHardActivation = $this->endOfDay($endHardActivation);
         $startHardActivation = clone $endHardActivation;
         $startHardActivation = $startHardActivation->sub(new \DateInterval('P7D'));
-//        $startHardActivation = $this->startOfDay($startHardActivation);
+        //$startHardActivation = $this->startOfDay($startHardActivation);
 
         $rolling12Months = clone $end;
         $rolling12Months = $rolling12Months->sub(new \DateInterval('P1Y'));
@@ -673,6 +680,8 @@ class ReportingService
         $totalEnd = null;
 
         $data = [];
+        $data['dataFetchedAt'] = new DateTime();
+
         $data['totalTotalConnections'] = $connectionRepo->count(null, $totalEnd, null) / 2;
 
         $policies = $policyRepo->findAllPolicies($this->environment);
@@ -1198,8 +1207,30 @@ class ReportingService
         $scheduledPaymentRepo->setExcludedPolicyIds($invalidPoliciesIds);
 
         $results = $scheduledPaymentRepo->getMonthlyValues();
+        #$results['dataFetchedAt'] = new DateTime();
+
         $this->redis->setex($redisKey, self::REPORT_CACHE_TIME, serialize($results));
 
         return $results;
+    }
+
+    public function getLast7DaysPeriod($start = null, $end = null): array
+    {
+        if ($start) {
+            $start = new DateTime($start, new DateTimeZone(SoSure::TIMEZONE));
+        } else {
+            $start = new DateTime();
+            $start->sub(new DateInterval('P7D'));
+            $start->setTime(0, 0, 0);   // default to start of day, midnight
+        }
+
+        if ($end) {
+            $end = new DateTime($end, new DateTimeZone(SoSure::TIMEZONE));
+        } else {
+            $end = new DateTime();
+            $end->setTime(0, 0, 0);   // default to start of day here too. Start is 7 days before
+        }
+
+        return [$start, $end];
     }
 }

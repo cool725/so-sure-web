@@ -37,7 +37,7 @@ class ReportController extends AbstractController
      */
     public function claimsReportAction(Request $request)
     {
-        list($start, $end) = $this->getPeriod($request->get('start'), $end = $request->get('end'));
+        list($start, $end) = $this->reporting->getLast7DaysPeriod($request->get('start'), $end = $request->get('end'));
 
         $report = $this->reporting->report($start, $end, false);    // 233 queries
 
@@ -62,25 +62,5 @@ class ReportController extends AbstractController
         $report['data']['scheduledPayments'] = $this->reporting->getScheduledPayments();
 
         return $this->render('AppBundle:AdminEmployee:adminReports.html.twig', $report);
-    }
-
-    private function getPeriod($start = null, $end = null)
-    {
-        if ($start) {
-            $start = new DateTime($start, new DateTimeZone(SoSure::TIMEZONE));
-        } else {
-            $start = new DateTime();
-            $start->sub(new DateInterval('P7D'));
-            $start->setTime(0, 0, 0);   // default to start of day, midnight
-        }
-
-        if ($end) {
-            $end = new DateTime($end, new DateTimeZone(SoSure::TIMEZONE));
-        } else {
-            $end = new DateTime();
-            $end->setTime(0, 0, 0);   // default to start of day here too. Start is 7 days before
-        }
-
-        return [$start, $end];
     }
 }
