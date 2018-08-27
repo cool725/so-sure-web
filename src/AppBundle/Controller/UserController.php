@@ -1162,14 +1162,6 @@ class UserController extends BaseController
             $dm->flush($policy);
         }
 
-        $exp = $this->sixpack(
-            $request,
-            SixpackService::EXPERIMENT_WELCOME_MODAL_NO_WELCOME_MODAL,
-            ['welcome-modal', 'without-welcome-modal'],
-            SixpackService::LOG_MIXPANEL_CONVERSION,
-            $user->getId()
-        );
-
         $countUnprocessedInvitations = count($user->getUnprocessedReceivedInvitations());
         if ($countUnprocessedInvitations > 0) {
             $message = sprintf(
@@ -1193,7 +1185,6 @@ class UserController extends BaseController
             'policy_key' => $this->getParameter('policy_key'),
             'policy' => $user->getLatestPolicy(),
             'has_visited_welcome_page' => $pageVisited,
-            'user_modal_welcome' => $exp,
             'oauth2FlowParams' => $oauth2FlowParams,
         );
 
