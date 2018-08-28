@@ -137,16 +137,9 @@ $(function(){
         $('#webpay-form').submit();
     }
 
-    // $('#imei-screenshot').click(function(e) {
-    //     e.preventDefault();
-    //     sosure.track.byName('Clicked Upload Imei');
-    //     Intercom('trackEvent', 'clicked upload imei');
-    //     Intercom('showNewMessage', $(this).data('intercom-msg'));
-    // });
-
     // Trim as you type
-    // TODO: Rework as it's affecting validation
-    $('.imei').on('keyup paste', function() {
+    // TODO: Rework as it's affecting validation - possible fix for now
+    $('.imei').on('blur', function() {
         var simei  = $(this).val();
 
         if (simei.indexOf('/') > 1) {
