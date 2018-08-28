@@ -3,9 +3,9 @@
 .table-list {
     table-layout: fixed;
     background-color: $white;
+    @include border-radius(15px);
     box-shadow: 0 15px 30px 0 rgba(8,27,154,0.08),
                 0 5px 15px 0 rgba(8,27,154,0.08);
-    @include border-radius(15px);
 
     &__header {
         padding: 1.4rem;
@@ -46,5 +46,110 @@
 
     &__icn-happy {
         background-image: url('#{$cdn_url}/images/rebrand/icns/so-sure_happy-icn.svg');
+    }
+}
+
+
+.table-comparison {
+    table-layout: fixed;
+    background-color: $white;
+    @include border-radius(15px);
+    box-shadow: 0 15px 30px 0 rgba(8,27,154,0.08),
+                0 5px 15px 0 rgba(8,27,154,0.08);
+
+    // Add round corners to th's & td's
+    th {
+        &:first-of-type {
+            border-top-left-radius: 15px;
+        }
+        &:last-of-type {
+            border-top-right-radius: 15px;
+        }
+    }
+
+    tr {
+        &:last-of-type {
+            td {
+                &:first-of-type {
+                    border-bottom-left-radius: 15px;
+                }
+                &:last-of-type {
+                    border-bottom-right-radius: 15px;
+                }
+            }
+        }
+    }
+
+    // Spacing
+    th, td {
+        height: 90px;
+        padding: 0 1.4rem;
+        text-align: center;
+    }
+
+    // Borders
+    th {
+        border-left: 1px solid rgba(255, 255, 255, 0.4);
+        border-right: 1px solid rgba(255, 255, 255, 0.4);
+
+        &:first-of-type {
+            border-left: none;
+        }
+
+        &:last-of-type {
+            border-right: none;
+        }
+    }
+
+    td {
+        border: 1px solid rgba(255, 255, 255, 0.4);
+    }
+
+    tr {
+        td {
+            &:first-of-type {
+                border-left: none;
+            }
+            &:last-of-type {
+                border-right: none;
+            }
+        }
+
+        &:last-of-type {
+            td {
+                border-bottom: none;
+            }
+        }
+    }
+
+    // TH/TD Colours
+    th.bb1,
+    td.bb1 {
+        background-color: $bb-1;
+        color: $blue-4;
+    }
+
+    th.b2,
+    td.b2 {
+        background-color: $blue-2;
+        color: $white;
+    }
+
+    th.b2a,
+    td.b2a {
+        background-color: $blue-2a;
+        color: $white;
+    }
+
+    th.b4,
+    td.b4 {
+        background-color: $blue-4;
+        color: $white;
+    }
+
+    th.wh,
+    td.wh {
+        background-color: $white;
+        color: $blue-4;
     }
 }
