@@ -21,48 +21,75 @@
     <table class="table-comparison mb-5">
         <thead>
             <tr>
-                <th class="b2 text-left">Features</th>
-                <th class="wh">so-sure</th>
-                <th class="b4">protect your bubble</th>
-                <th class="b4">love it cover it</th>
-                <th class="b4">gadget cover</th>
+                <th width="24%" class="b2 h5 text-left">Features</th>
+                <th width="19%" class="wh bs">so-sure</th>
+                <th width="19%" class="b4">protect your bubble</th>
+                <th width="19%" class="b4">love it cover it</th>
+                <th width="19%" class="b4">gadget cover</th>
             </tr>
         </thead>
         <tbody>
             <tr>
-                <td class="bb1  text-left">Time to Repair/replace</td>
-                <td class="b2">24-72 hours</td>
-                <td class="b2">2-5 work days</td>
-                <td class="b2">3+ work days</td>
-                <td class="b2">2-7 work days</td>
+                <td class="bb1 text-left"><strong>Time to Repair/replace</strong></td>
+                <td class="b2 bs">
+                    <strong>24 - 72</strong> <div>hours</div>
+                    <a href="#"
+                       class="td-info-btn"
+                       data-toggle="modal"
+                       data-target="#table_24_72_hours"
+                       role="button">
+                        <i class="fal fa-info-circle fa-lg"></i>
+                    </a>
+                </td>
+                <td class="b2"><strong>2 - 5</strong> <div>work days</div>
+                <td class="b2"><strong>3+</strong> <div>work days</div></td>
+                <td class="b2"><strong>2 - 7</strong> <div>work days</div></td>
             </tr>
             <tr>
-                <td class="wh  text-left">Broken phone excess</td>
-                <td class="b2a">from &pound;50</td>
-                <td class="b2a">&pound;90</td>
-                <td class="b2a">&pound;80</td>
-                <td class="b2a">&pound;75</td>
+                <td class="wh text-left"><strong>Broken phone excess</strong></td>
+                <td class="b2a bs">
+                    from <strong>&pound;50</strong>
+                    <a href="#"
+                       class="td-info-btn"
+                       data-toggle="modal"
+                       data-target="#table_excess_50"
+                       role="button">
+                        <i class="fal fa-info-circle fa-lg"></i>
+                    </a>
+                </td>
+                <td class="b2a"><strong>&pound;90</strong></td>
+                <td class="b2a"><strong>&pound;80</strong></td>
+                <td class="b2a"><strong>&pound;75</strong></td>
             </tr>
             <tr>
-                <td class="bb1  text-left">Loss, Theft &amp; Damage Cover</td>
-                <td class="b2"><i class="far fa-check fa-2x"></i></td>
-                <td class="b2">+ &pound;1.50 Loss</td>
-                <td class="b2">+ &pound;2 Damage</td>
-                <td class="b2">+ &pound;2 Loss</td>
+                <td class="bb1 text-left"><strong>Loss, Theft &amp; Damage Cover</strong></td>
+                <td class="b2 bs"><i class="far fa-check fa-2x"></i></td>
+                <td class="b2">+ <strong>&pound;1.50</strong> Loss</td>
+                <td class="b2">+ <strong>&pound;2</strong> Damage</td>
+                <td class="b2">+ <strong>&pound;2</strong> Loss</td>
             </tr>
             <tr>
-                <td class="wh  text-left">Proof of purchase required?</td>
-                <td class="b2a">No</td>
-                <td class="b2a">Yes</td>
-                <td class="b2a">Yes</td>
-                <td class="b2a">Yes</td>
+                <td class="wh text-left"><strong>Proof of purchase required?</strong></td>
+                <td class="b2a bs">
+                    <strong>No</strong>
+                    <a href="#"
+                       class="td-info-btn"
+                       data-toggle="modal"
+                       data-target="#table_pop"
+                       role="button">
+                        <i class="fal fa-info-circle fa-lg"></i>
+                    </a>
+                </td>
+                <td class="b2a"><strong>Yes</strong></td>
+                <td class="b2a"><strong>Yes</strong></td>
+                <td class="b2a"><strong>Yes</strong></td>
             </tr>
             <tr>
-                <td class="bb1  text-left">Age of phones insured</td>
-                <td class="b2">&lt; 3 Years</td>
-                <td class="b2">&lt; 6 Months</td>
-                <td class="b2">&lt; 3 Years</td>
-                <td class="b2">&lt; 18 Months</td>
+                <td class="bb1 text-left"><strong>Age of phones insured</strong></td>
+                <td class="b2 bs"><strong>&lt; 3</strong> Years</td>
+                <td class="b2"><strong>&lt; 6</strong> Months</td>
+                <td class="b2"><strong>&lt; 3</strong> Years</td>
+                <td class="b2"><strong>&lt; 18</strong> Months</td>
             </tr>
         </tbody>
     </table>
@@ -277,6 +304,87 @@
                 <li class="list-inline-item text-blue1">|</li>
                 <li class="list-inline-item"><strong class="h5">RAM</strong>: {{ phone.getRamDisplay }}</li>
             </ul>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade"
+     id="table_24_72_hours"
+     tabindex="-1" role="dialog"
+     aria-labelledby="table_24_72_hours"
+     aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">24-72 hour replace/repair</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <i class="fal fa-times text-white"></i>
+                </button>
+            </div>
+            <div class="modal-body text-center text-sm-left">
+                <div class="row">
+                    <div class="col-sm-4">
+                        <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_phone-smile.png" alt="so-sure - Policy" width="120px">
+                    </div>
+                    <div class="col-sm-8">
+                        Some repairs can take longer (eg water damage) but we will be as fast as possible once your claim approved
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade"
+     id="table_excess_50"
+     tabindex="-1" role="dialog"
+     aria-labelledby="table_excess_50"
+     aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Excess from £50</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <i class="fal fa-times text-white"></i>
+                </button>
+            </div>
+            <div class="modal-body text-center text-sm-left">
+                <div class="row">
+                    <div class="col-sm-4">
+                        <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_phone-smile.png" alt="so-sure - Policy" width="120px">
+                    </div>
+                    <div class="col-sm-8">
+                        Some repairs can take longer (eg water damage) but we will be as fast as possible once your claim approved
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade"
+     id="table_pop"
+     tabindex="-1" role="dialog"
+     aria-labelledby="table_pop"
+     aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">No Proof of Purchase</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <i class="fal fa-times text-white"></i>
+                </button>
+            </div>
+            <div class="modal-body text-center text-sm-left">
+                <div class="row">
+                    <div class="col-sm-4">
+                        <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_phone-smile.png" alt="so-sure - Policy" width="120px">
+                    </div>
+                    <div class="col-sm-8">
+                        Some repairs can take longer (eg water damage) but we will be as fast as possible once your claim approved
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
