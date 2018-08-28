@@ -13,29 +13,6 @@ sosure.purchaseStepPhone = (function() {
         }
     };
 
-    // self.valid_credit_card = function(value) {
-    //     // accept only digits, dashes or spaces
-    //     if (/[^0-9-\s]+/.test(value)) return false;
-
-    //     // The Luhn Algorithm. It's so pretty.
-    //     var nCheck = 0, bEven = false;
-    //     value = value.replace(/\D/g, "");
-
-    //     for (var n = value.length - 1; n >= 0; n--) {
-    //         var cDigit = value.charAt(n),
-    //             nDigit = parseInt(cDigit, 10);
-
-    //         if (bEven) {
-    //             if ((nDigit *= 2) > 9) nDigit -= 9;
-    //         }
-
-    //         nCheck += nDigit;
-    //         bEven = !bEven;
-    //     }
-
-    //     return (nCheck % 10) === 0;
-    // };
-
     self.addValidation = function() {
         self.form.validate({
             debug: true,
@@ -95,24 +72,6 @@ $(function(){
 
 $(function(){
 
-    // Payment buttons action radio buttons
-    // $('.payment-options--btn').click(function() {
-    //     // Toggle Class on Btns
-    //     $('.payment-options--btn').removeClass('payment-options--btn-selected animated pulse');
-    //     $(this).addClass('payment-options--btn-selected animated pulse');
-
-    //     // Grab data from btn value to input
-    //     var value = $(this).data('value');
-    //     // var help  = $(this).data('help-block');
-
-    //     // Select the radio
-    //     $('input[name="purchase_form[amount]"][value="' + value + '"]').prop('checked', true);
-
-    //     // Modify the help text accordingly
-    //     // $('.payment-options--info').text(help);
-    // });
-
-
     // TODO: Move to component
     $('.radio-btn').on('click', function(e) {
         e.preventDefault();
@@ -137,26 +96,23 @@ $(function(){
         $('#webpay-form').submit();
     }
 
-    // $('#imei-screenshot').click(function(e) {
-    //     e.preventDefault();
-    //     sosure.track.byName('Clicked Upload Imei');
-    //     Intercom('trackEvent', 'clicked upload imei');
-    //     Intercom('showNewMessage', $(this).data('intercom-msg'));
-    // });
-
     // Trim as you type
-    // TODO: Rework as it's affecting validation
-    $('.imei').on('keyup paste', function() {
-        var simei  = $(this).val();
+    // TODO: Rework as it's affecting validation - possible fix for now
+    var imei  = $('.imei'),
+        phone = imei.data('make');
 
-        if (simei.indexOf('/') > 1) {
-            var newtxt = simei.replace('/', '');
-            $(this).val(newtxt);
-            $('.samsung-imei').show();
-        }
+    if (phone == 'Samsung') {
+        imei.on('blur', function() {
+            var simei  = $(this).val();
 
-        if ($(this).valid()) {
-            $('.samsung-imei').hide();
-        }
-    });
+            if (simei.indexOf('/') > 1) {
+                var newtxt = simei.replace('/', '');
+                $(this).val(newtxt);
+            }
+
+            if ($(this).valid()) {
+                $('.samsung-imei').hide();
+            }
+        });
+    }
 });
