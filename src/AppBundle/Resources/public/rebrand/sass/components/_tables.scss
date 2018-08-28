@@ -92,6 +92,20 @@
         height: 30px;
     }
 
+    .td-prev-btn,
+    .td-next-btn {
+        position: absolute;
+        top: 24px;
+    }
+
+    .td-prev-btn {
+        left: 10px;
+    }
+
+    .td-next-btn {
+        right: 10px;
+    }
+
     .td-info-btn {
         position: absolute;
         bottom: 10px; right: 10px;

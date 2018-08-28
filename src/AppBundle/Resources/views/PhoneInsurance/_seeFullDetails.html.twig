@@ -18,14 +18,21 @@
 </div>
 <div class="policy__info mx-4 mx-lg-5 py-4">
     <h4 class="text-blue1 mb-4">Here’s how we compare to competitors:</h4>
-    <table width="100%" class="table-comparison mb-5 d-table d-sm-none">
+    <table width="100%" class="table-comparison table-comparison-carousel mb-5 d-table d-sm-none">
         <thead>
             <tr>
                 <th width="50%" class="wh">
                     <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_app-icn.svg" width="65px" alt="so-sure" class="mt-2">
                 </th>
-                <th width="50%" class="b4">
-                    <img src="{{ cdn_url }}/images/rebrand/competitors/so-sure_protect-your-bubble.svg" alt="protect your bubble" width="120px">
+                <th width="50%"
+                    class="b4 td-swap"
+                    data-one='<img src="{{ cdn_url }}/images/rebrand/competitors/so-sure_love-it-cover-it.svg" alt="love it cover it" width="120px">'
+                    data-two='<img src="{{ cdn_url }}/images/rebrand/competitors/so-sure_gadget-cover.svg" alt="gadget cover" width="120px">'>
+                    <a href="#" class="td-prev-btn"><i class="fal fa-angle-left fa-3x text-blue1"></i></a>
+                    <span>
+                        <img src="{{ cdn_url }}/images/rebrand/competitors/so-sure_protect-your-bubble.svg" alt="protect your bubble" width="120px">
+                    </span>
+                    <a href="#" class="td-next-btn"><i class="fal fa-angle-right fa-3x text-blue1"></i></a>
                 </th>
             </tr>
         </thead>
@@ -46,7 +53,9 @@
                         <i class="fal fa-info-circle fa-lg"></i>
                     </a> #}
                 </td>
-                <td class="b2">
+                <td class="b2 td-swap"
+                    data-one='<strong>3+</strong> <div>work days</div>'
+                    data-two='<strong>2 - 7</strong> <div>work days</div>'>
                     <strong>2 - 5</strong> <div>work days</div>
                 </td>
             </tr>
@@ -66,7 +75,9 @@
                         <i class="fal fa-info-circle fa-lg"></i>
                     </a> #}
                 </td>
-                <td class="b2">
+                <td class="b2 td-swap"
+                    data-one='<strong>&pound;80</strong>'
+                    data-two='<strong>&pound;75</strong>'>
                     <strong>&pound;90</strong>
                 </td>
             </tr>
@@ -79,7 +90,9 @@
                 <td class="b2a">
                     <i class="far fa-check fa-2x"></i>
                 </td>
-                <td class="b2">
+                <td class="b2 td-swap"
+                    data-one='+ <strong>&pound;2</strong> Damage'
+                    data-two='+ <strong>&pound;2</strong> Loss'>
                     + <strong>&pound;1.50</strong> Loss
                 </td>
             </tr>
@@ -99,7 +112,9 @@
                         <i class="fal fa-info-circle fa-lg"></i>
                     </a> #}
                 </td>
-                <td class="b2">
+                <td class="b2 td-swap"
+                    data-one='<strong>Yes</strong>'
+                    data-two='<strong>Yes</strong>'>
                     <strong>Yes</strong>
                 </td>
             </tr>
@@ -112,7 +127,9 @@
                 <td class="b2a">
                     <strong>&lt; 3</strong> Years
                 </td>
-                <td class="b2">
+                <td class="b2 td-swap"
+                    data-one='<strong>&lt; 3</strong> Years'
+                    data-two='<strong>&lt; 18</strong> Months'>
                     <strong>&lt; 6</strong> Months
                 </td>
             </tr>

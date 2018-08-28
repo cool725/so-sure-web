@@ -22,7 +22,7 @@ $(function() {
         $('.navbar').toggleClass('navbar-scrolled-quote', $(this).scrollTop() > 5);
     });
 
-    // JULES CRAP
+    // TODO: Use form builder to add extra button
     $('#fix-get-insured').on('click', function(e){
         $('form[name="buy_form"]').submit();
     });
