@@ -37,6 +37,22 @@ class LoadOauth2Data implements FixtureInterface, ContainerAwareInterface
             throw new \RuntimeException('no container available');
         }
 
+        // create DEV/Staging client credentials for Starling-Bank integration
+        $this->newOauth2Client(
+            $manager,
+            'starlingbank_at_so-sure',          // client-ID
+            '7ffe8826f451770c28eb8c2fdf5d6e74', // client's Random -- complete ID is 'clientid_random', joined with '_'
+            '24a92e3610dfff608978cec8f76599f2', // client secret
+            [Oauth2Scopes::USER_STARLING_SUMMARY],  // 'user.starling.summary' + adds 'authorization_code'
+            [
+                'https://demo-developer.possiblefs.com/oauth-redirect/so-sure', // preferred, To be confirmed
+                //'https://demo-developer.possiblefs.com/oauth-redirect/sosure',
+                //#'https://developer.starlingbank.com/oauth-redirect/so-sure',       PROD/LIVE
+                //#'https://developer.starlingbank.com/oauth-redirect/sosure',        PROD
+            ]
+        );
+
+
         /** @var Client $client */
         $client = $this->newOauth2Client(
             $manager,
