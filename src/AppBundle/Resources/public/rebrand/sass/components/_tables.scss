@@ -49,7 +49,6 @@
     }
 }
 
-
 .table-comparison {
     table-layout: fixed;
     background-color: $white;
@@ -87,6 +86,10 @@
         text-align: center;
         position: relative;
         vertical-align: middle;
+    }
+
+    td.td-30 {
+        height: 30px;
     }
 
     .td-info-btn {
@@ -176,3 +179,4 @@
         box-shadow: inset 8px 0 8px -2px rgba(8,27,154,0.1);
     }
 }
+
