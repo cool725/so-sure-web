@@ -1,14 +1,110 @@
 // main.scss
 
-// body {
-//     position: relative;
-// }
-
-// @include media-breakpoint-down(xs) {
-//     .container-pad-mb {
-//         padding-left: 30px;
-//         padding-right: 30px;
-//     }
-// }
-
 // Funnel Template
+.qpw {
+    position: relative;
+
+    // Containers & Curves
+    &__main__container {
+        width: 100vw;
+        position: sticky;
+        z-index: 4;
+        top: 0;
+
+        // Curve
+        svg {
+            transform: translateY(1px);
+        }
+
+        @include media-breakpoint-up(lg) {
+            width: 60vw; height: 100vh;
+            position: static;
+
+            // Scroll stuff
+            overflow-y: scroll;
+
+            // IE
+            -ms-overflow-style: none;
+
+            // Webkit
+            &::-webkit-scrollbar {
+                width: 0;
+                background: transparent;
+            }
+        }
+
+        background-color: $blue-3;
+        // @include linear-gradient(160deg, $blue-3, $blue-1a);
+    }
+
+    &__main {
+        padding-top: 6rem;
+
+        @include media-breakpoint-up(lg) {
+            padding-top: 12rem;
+        }
+    }
+
+    &__info__container {
+
+    }
+
+    &__curve {
+        position: relative;
+
+        @include media-breakpoint-up(lg) {
+            width: 5vw; height: 100vh;
+
+            svg {
+                height: 100vh;
+                position: absolute;
+                z-index: 4;
+                right: 0; top: 0;
+                transform: translateX(1px);
+            }
+        }
+    }
+
+    &__sub__container {
+        width: 100vw;
+        background-color: $white;
+
+        @include media-breakpoint-up(lg) {
+            width: 35vw; height: 100vh;
+        }
+
+        // @extend .hide-bars;
+    }
+
+    // Contents
+    h1 {
+        border-bottom: 2px solid $blue-1b;
+    }
+
+    &__h1 {
+
+        @include media-breakpoint-down(xs) {
+            font-size: 1.5rem;
+        }
+
+        .far {
+            cursor: pointer;
+        }
+    }
+
+    &__h5 {
+        @include media-breakpoint-down(xs) {
+            font-size: 0.9rem;
+            opacity: 0.6;
+        }
+    }
+
+    &__alt__phones {
+
+        a.dropdown-toggle {
+            &:before {
+                display: none;
+            }
+        }
+    }
+}

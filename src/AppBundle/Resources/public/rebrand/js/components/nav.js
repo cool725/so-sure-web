@@ -52,7 +52,7 @@ $(function() {
             if (!$('body').hasClass('quote')) {
                 nav.addClass('navbar-scrolled');
             } else {
-                nav.addClass('navbar-scrolled-quote');
+                // nav.addClass('navbar-scrolled-quote');
             }
         }
     });
@@ -62,7 +62,7 @@ $(function() {
         if (!$('body').hasClass('quote')) {
             nav.toggleClass('navbar-scrolled', $(this).scrollTop() > 5);
         } else {
-            nav.toggleClass('navbar-scrolled-quote', $(this).scrollTop() > 5);
+            // nav.toggleClass('navbar-scrolled-quote', $(this).scrollTop() > 5);
         }
     });
 

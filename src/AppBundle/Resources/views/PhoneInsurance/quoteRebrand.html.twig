@@ -20,23 +20,86 @@
     <section class="qpw">
         <div class="d-lg-flex">
 
+            {# Main Content #}
             <div class="qpw__main__container">
-                <div class="qpw__main">
-
+                <div class="qpw__main px-4 px-lg-5">
+                    <div class="qpw__h5 h5 text-white mb-4">Here’s your quote details, Insure your:</div>
+                    <div class="d-flex justify-content-start align-items-center justify-content-lg-start">
+                        <h1 class="qpw__h1 text-blue1b">
+                            <span class="sub">
+                                {{ phone.make }} {{ phone.model }}
+                                <small>({{ phone.memory }}GB)</small>
+                            </span>
+                        </h1>
+                        <div class="qpw__alt__phones dropdown dropleft">
+                            <a href="#"
+                               class="dropdown-toggle"
+                               id="dropdownMenuLink"
+                               data-toggle="dropdown"
+                               aria-haspopup="true"
+                               aria-expanded="false">
+                                <i class="far fa-chevron-down text-white fa-lg ml-3"></i>
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                                {% if phones | length > 1 %}
+                                    {% for phone_mem in phones %}
+                                        {% if phone_mem.id != phone.id  %}
+                                            <a href="{{ path('quote_make_model_memory', {'make': phone_mem.makeCanonical, 'model': phone_mem.encodedModelCanonical, 'memory': phone_mem.memory}) }}" class="dropdown-item h6" href="#">
+                                                {{ phone_mem.memory }}GB
+                                                <small>{{ phone.make }} {{ phone.model }}</small>
+                                            </a>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endif %}
+                                <a class="dropdown-item h6 get-a-quote" href="#">
+                                    Start a new quote
+                                    <small>Not the phone you're looking for?</small>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="qpw__h1 h1 text-white mb-4">
+                        <span class="sub">For only</span>
+                        &pound;{{ phone_price.monthlyPremiumPrice }} a month
+                    </div>
+                    {{ form_start(buy_form) }}
+                        {{ form_widget(buy_form.buy_tablet, {
+                            'label': 'Get Started',
+                            'attr': {
+                                'class': 'btn btn-white btn-shadow btn-lg btn-block-xs'
+                            }})
+                        }}
+                    {{ form_end(buy_form) }}
+                    <div class="qpw__footer d-none d-lg-block mt-5 pt-lg-5">
+                        <h4 class="text-white">The higest level of cover!</h4>
+                        <p class="text-blue1 lead">We offer the markets highest level of cover</p>
+                    </div>
                 </div>
-            </div>
 
-            <div class="qpw__curve">
-                <svg class="d-block d-lg-none" preserveAspectRatio="xMinYMin meet" viewBox="0 0 750 117" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-                    <defs></defs>
+                <div class="qpw__info__container">
+                    {% include 'AppBundle::PhoneInsurance/_seeFullDetails.html.twig' %}
+                </div>
+
+                {# Curve Mobile #}
+                <svg class="d-block d-lg-none" preserveAspectRatio="xMinYMin meet" viewBox="0 0 750 47" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
                     <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-                        <g transform="translate(0.000000, -32.000000)" fill="#FFFFFF">
-                            <g id="---BG---" transform="translate(-4700.000000, -8443.000000)">
-                                <path d="M4700,8515 C4824,8488.33333 4948.66667,8475 5074,8475 C5199.33333,8475 5324.66667,8488.33333 5450,8515 L5450,8592 L4700,8592 L4700,8515 Z" id="Rectangle"></path>
+                        <g id="Artboard" fill="#FFFFFF" fill-rule="nonzero">
+                            <g id="SVG-Layer">
+                                <g id="Page-1">
+                                    <g id="Group">
+                                        <g id="---BG---">
+                                            <path d="M0,40 C124,13.33333 248.66667,0 374,0 C499.33333,0 624.66667,13.33333 750,40 L750,47 L0,47 L0,40 Z" id="Rectangle"></path>
+                                        </g>
+                                    </g>
+                                </g>
                             </g>
                         </g>
                     </g>
                 </svg>
+            </div>
+
+            {# Curve Desktop #}
+            <div class="qpw__curve">
                 <svg class="d-none d-lg-block" preserveAspectRatio="xMinYMin meet" viewBox="0 0 57 846" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
                     <defs></defs>
                     <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -47,13 +110,81 @@
                 </svg>
             </div>
 
+            {# Sub Content #}
             <div class="qpw__sub__container">
+                <div class="qpw__sub p-4 p-lg-5">
 
+                    <h4 class="text-blue2 mb-4">Your cover includes:</h4>
+                    <ul class="list-unstyled icn-list mb-5">
+                        <li class="mb-4">
+                            <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_accidental-damage-icn.svg" alt="so-sure - Accidental damage" width="30px" class="mr-2">
+                            <strong class="text-blue4">Cracked screens</strong>
+                        </li>
+                        <li class="mb-4">
+                            <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_theft-loss-icn.svg" alt="so-sure - Theft or loss" width="30px" class="mr-2">
+                            <strong class="text-blue4">Theft or loss</strong>
+                        </li>
+                        <li class="mb-4">
+                            <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_broken-phone-icn.svg" alt="so-sure - Water damage" width="30px" class="mr-2">
+                            <strong class="text-blue4">Water damage</strong>
+                        </li>
+                        <li class="mb-4">
+                            <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_travel-icn.svg" alt="so-sure - Travel Cover" width="30px" class="mr-2">
+                            <strong class="text-blue4">International travel</strong>
+                        </li>
+                        <li class="mb-4">
+                            <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_out-of-warranty-icn.svg" alt="so-sure - Out of Warranty Breakdown" width="30px" class="mr-2">
+                            <strong class="text-blue4">Out-of-warranty breakdowns</strong>
+                        </li>
+                        <li class="mb-4">
+                            <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_broken-phone-icn.svg" alt="so-sure - Broken headphone jack" width="30px" class="mr-2">
+                            <strong class="text-blue4">Accessories</strong>
+                        </li>
+                    </ul>
+                    <h4 class="text-blue2 my-4">We also offer:</h4>
+                    <ul class="list-unstyled icn-list">
+                        <li class="mb-4">
+                            <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_happy-icn-min.svg" alt="so-sure - Accidental damage" width="30px" class="mr-2">
+                            <strong class="text-blue4">
+                                24-72 hour replace/repair <br> once claim approved
+                                <span class="ml-2 text-blue2">
+                                    <a href="#"
+                                       data-toggle="modal"
+                                       data-target="#quote_page_modal_replace_repair"
+                                       role="button">
+                                        <i class="fal fa-info-circle"></i>
+                                    </a>
+                                </span>
+                            </strong>
+                        </li>
+                        <li class="mb-4">
+                            <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_happy-icn-min.svg" alt="so-sure - Accidental damage" width="30px" class="mr-2">
+                            <strong class="text-blue4">Instant cover after purchase</strong>
+                        </li>
+                        <li class="mb-4">
+                            <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_happy-icn-min.svg" alt="so-sure - Accidental damage" width="30px" class="mr-2">
+                            <strong class="text-blue4">
+                                Up to 80% cashback every year
+                                <span class="ml-2 text-blue2">
+                                    <a href="#"
+                                       data-toggle="modal"
+                                       data-target="#quote_page_modal_cashback"
+                                       role="button">
+                                        <i class="fal fa-info-circle"></i>
+                                    </a>
+                                </span>
+                            </strong>
+                        </li>
+                    </ul>
+                    <div class="mt-5 d-none d-lg-block">
+                        <a href="#" class="btn btn-success btn-gradient-green btn-block-xs btn-lg" id="fix-get-insured">Get Started <i class="far fa-arrow-right ml-2"></i></a>
+                    </div>
+
+                </div>
             </div>
 
         </div>
     </section>
-
 
     {# Page Modals #}
     <div class="modal fade"
