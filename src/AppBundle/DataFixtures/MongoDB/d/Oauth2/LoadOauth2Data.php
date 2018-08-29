@@ -40,7 +40,7 @@ class LoadOauth2Data implements FixtureInterface, ContainerAwareInterface
         // create DEV/Staging client credentials for Starling-Bank integration
         $this->newOauth2Client(
             $manager,
-            'starlingbank_at_so-sure',          // client-ID
+            '5b8659c8a6af70a6e8f92a54',         // starlingbank client-ID
             '7ffe8826f451770c28eb8c2fdf5d6e74', // client's Random -- complete ID is 'clientid_random', joined with '_'
             '24a92e3610dfff608978cec8f76599f2', // client secret
             [Oauth2Scopes::USER_STARLING_SUMMARY],  // 'user.starling.summary' + adds 'authorization_code'
