@@ -17,90 +17,16 @@
 
 {% block body %}
 
-    <section class="quote">
+    <section class="qpw">
         <div class="d-lg-flex">
 
-            <div class="quote__details__container">
-                <div class="quote__details px-4 pb-4 px-lg-5 pb-lg-0">
-                    <div class="quote__h5 text-white mb-4 h5">Here’s your quote details, Insure your:</div>
-                    <div class="d-flex justify-content-start align-items-center justify-content-lg-start">
-                        <h1 class="quote__h1 text-blue1b mb-2">
-                            <span class="sub">
-                                {{ phone.make }} {{ phone.model }}
-                                <small>({{ phone.memory }}GB)</small>
-                            </span>
-                        </h1>
-                        <div class="quote__alt__phones dropdown dropleft">
-                            <a href="#"
-                               class="dropdown-toggle"
-                               id="dropdownMenuLink"
-                               data-toggle="dropdown"
-                               aria-haspopup="true"
-                               aria-expanded="false">
-                                <i class="far fa-chevron-down text-white fa-lg ml-3"></i>
-                            </a>
-                            <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-                                {% if phones | length > 1 %}
-                                    {% for phone_mem in phones %}
-                                        {% if phone_mem.id != phone.id  %}
-                                            <a href="{{ path('quote_make_model_memory', {'make': phone_mem.makeCanonical, 'model': phone_mem.encodedModelCanonical, 'memory': phone_mem.memory}) }}" class="dropdown-item h6" href="#">
-                                                {{ phone_mem.memory }}GB
-                                                <small>{{ phone.make }} {{ phone.model }}</small>
-                                            </a>
-                                        {% endif %}
-                                    {% endfor %}
-                                {% endif %}
-                                <a class="dropdown-item h6 get-a-quote" href="#">
-                                    Start a new quote
-                                    <small>Not the phone you're looking for?</small>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="quote__h1 text-white h1 mb-4"><span class="sub">For only</span> &pound;{{ phone_price.monthlyPremiumPrice }} a month</div>
-                    {{ form_start(buy_form) }}
-                        {{ form_widget(buy_form.buy_tablet, {
-                            'label': 'Get Started',
-                            'attr': {
-                                'class': 'btn btn-white btn-shadow btn-lg btn-block-xs'
-                            }})
-                        }}
-                    {{ form_end(buy_form) }}
-                    <div class="quote__footer d-none d-lg-flex justify-content-lg-between mt-5">
-                        <div class="quote__footer__text">
-                            <h4 class="text-white">The higest level of cover!</h4>
-                            <p class="text-blue1 lead">We offer the markets highest level of cover</p>
-                        </div>
-                        <div class="quote__footer__cta">
-                            <a href="#quote_info"
-                               class="btn btn-outline-blue1 toggle-text"
-                               data-toggle="collapse"
-                               data-text-swap='Hide full details <i class="fas fa-caret-up ml-2"></i>'
-                               role="button"
-                               aria-expanded="false"
-                               aria-controls="quote_info">See full details
-                               <i class="fas fa-caret-down ml-2"></i>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-                <div id="quote_info" class="quote__info__container collapse">
-                    {% include 'AppBundle::PhoneInsurance/_seeFullDetails.html.twig' %}
-                    <div class="policy__info mx-4 mx-lg-5 py-4">
-                        <div class="d-md-flex align-items-md-center justify-content-md-between py-3 px-4 mx-md-5 rounded bg-blue3">
-                            <div class="text-center text-lg-left">
-                                <h4 class="text-white">Let's get you covered</h4>
-                                <p class="lead text-white mb-0">It'll only take a few minutes</p>
-                            </div>
-                            {{ form_start(buy_form_banner) }}
-                                {{ form_widget(buy_form_banner.buy, {'label': 'Get Started', 'attr': {'class': 'btn btn-white btn-shadow btn-block-xs'}}) }}
-                            {{ form_end(buy_form_banner) }}
-                        </div>
-                    </div>
+            <div class="qpw__main__container">
+                <div class="qpw__main">
+
                 </div>
             </div>
 
-            <div class="quote__curve">
+            <div class="qpw__curve">
                 <svg class="d-block d-lg-none" preserveAspectRatio="xMinYMin meet" viewBox="0 0 750 117" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
                     <defs></defs>
                     <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -121,111 +47,13 @@
                 </svg>
             </div>
 
-            <div class="quote__cover__container px-4 pb-4 pt-0 py-lg-5">
+            <div class="qpw__sub__container">
 
-                <div class="quote__cover">
-                    <h4 class="text-blue2 mb-4">Cover Overview:</h4>
-                    <ul class="list-unstyled icn-list mb-5">
-                        <li class="mb-4">
-                            <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_accidental-damage-icn.svg" alt="so-sure - Accidental damage" width="30px" class="mr-2">
-                            <strong class="text-blue4">Cracked screens</strong>
-                        </li>
-                        <li class="mb-4">
-                            <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_theft-loss-icn.svg" alt="so-sure - Theft or loss" width="30px" class="mr-2">
-                            <strong class="text-blue4">Theft or loss</strong>
-                        </li>
-                        <li class="mb-4">
-                            <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_broken-phone-icn.svg" alt="so-sure - Water damage" width="30px" class="mr-2">
-                            <strong class="text-blue4">Water damage</strong>
-                        </li>
-                        <li class="mb-4">
-                            <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_travel-icn.svg" alt="so-sure - Travel Cover" width="30px" class="mr-2">
-                            <strong class="text-blue4">International travel</strong>
-                        </li>
-                        <li class="mb-4">
-                            <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_out-of-warranty-icn.svg" alt="so-sure - Out of Warranty Breakdown" width="30px" class="mr-2">
-                            <strong class="text-blue4">Out-of-warranty breakdowns</strong>
-                        </li>
-                        <li class="mb-4">
-                            <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_broken-phone-icn.svg" alt="so-sure - Broken headphone jack" width="30px" class="mr-2">
-                            <strong class="text-blue4">Accessories</strong>
-                        </li>
-                    </ul>
-                    <h4 class="text-blue2 my-4">We also offer:</h4>
-                    <ul class="list-unstyled icn-list">
-                        <li class="mb-4">
-                            <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_happy-icn-min.svg" alt="so-sure - Accidental damage" width="30px" class="mr-2">
-                            <strong class="text-blue4">
-                                24-72 hour replace/repair <br> once claim approved
-                                <span class="ml-2 text-blue2">
-                                    <a href="#"
-                                       data-toggle="modal"
-                                       data-target="#quote_page_modal_replace_repair"
-                                       role="button">
-                                        <i class="fal fa-info-circle"></i>
-                                    </a>
-                                </span>
-                            </strong>
-                        </li>
-                        <li class="mb-4">
-                            <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_happy-icn-min.svg" alt="so-sure - Accidental damage" width="30px" class="mr-2">
-                            <strong class="text-blue4">Instant cover after purchase</strong>
-                        </li>
-                        <li class="mb-4">
-                            <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_happy-icn-min.svg" alt="so-sure - Accidental damage" width="30px" class="mr-2">
-                            <strong class="text-blue4">
-                                Up to 80% cashback every year
-                                <span class="ml-2 text-blue2">
-                                    <a href="#"
-                                       data-toggle="modal"
-                                       data-target="#quote_page_modal_cashback"
-                                       role="button">
-                                        <i class="fal fa-info-circle"></i>
-                                    </a>
-                                </span>
-                            </strong>
-                        </li>
-                    </ul>
-                    <a href="#" class="ml-2 btn btn-success btn-gradient-green btn-lg btn-block-xs my-4" id="fix-get-insured">Get Started</a>
-                    {# TODO: This form widget doesn't work #}
-{#                     {{ form_start(buy_form) }}
-                        {{ form_widget(buy_form.buy_tablet, {'label': 'Get Started', 'attr': {'class': 'btn btn-success btn-gradient-green btn-block-xs'}}) }}
-                    {{ form_end(buy_form) }} #}
-                    <div class="quote__cover__footer my-4">
-                        <a href="#quote_info_mobile"
-                           class="btn btn-primary btn-shadow btn-gradient btn-block-xs d-block d-sm-block d-lg-none toggle-text"
-                           data-toggle="collapse"
-                           data-text-swap='Hide full policy <i class="far fa-arrow-up ml-2"></i>'
-                           role="button"
-                           aria-expanded="false"
-                           aria-controls="quote_info_mobile"><span>See full policy</span>
-                           <i class="far fa-arrow-down ml-2"></i>
-                        </a>
-                    </div>
-                </div>
             </div>
+
         </div>
     </section>
 
-    <div id="quote_info_mobile" class="quote__info__container__mobile">
-        <div class="quote__info py-3">
-            {% include 'AppBundle::PhoneInsurance/_seeFullDetails.html.twig' %}
-            <div class="policy__info mx-4 mx-lg-5 py-4">
-                {# TODO: Not working! #}
-                <div class="py-3 px-4 mx-md-5 rounded bg-blue3">
-                    <div class="text-center text-lg-left">
-                        <h4 class="text-white">Let's get you covered</h4>
-                        <p class="lead text-white mb-0">It'll only take a few minutes</p>
-                    </div>
-                    <a href="#" class="btn btn-white btn-shadow btn-block-xs mt-4" id="fix-get-insured">Get Started</a>
-                    {# TODO: Another widget we need #}
-{#                     {{ form_start(buy_form_banner) }}
-                        {{ form_widget(buy_form_banner.buy, {'label': 'Get Insured', 'attr': {'class': 'btn btn-success btn-shadow btn-gradient-green  btn-block-xs'}}) }}
-                    {{ form_end(buy_form_banner) }} #}
-                </div>
-            </div>
-        </div>
-    </div>
 
     {# Page Modals #}
     <div class="modal fade"
