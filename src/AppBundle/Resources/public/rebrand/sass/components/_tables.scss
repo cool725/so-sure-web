@@ -112,6 +112,15 @@
         color: rgba(255, 255, 255, 0.7);
     }
 
+    // Hide
+    .td-swap {
+        display: none;
+
+        &.td-active {
+            display: block;
+        }
+    }
+
     // Borders
     th {
         border-left: 1px solid #71B2F5;

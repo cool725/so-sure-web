@@ -1,6 +1,7 @@
 // quotepage.js
 
 require('../../sass/pages/quotepage.scss');
+require('../components/table.js');
 
 $(function() {
 
