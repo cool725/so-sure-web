@@ -70,9 +70,19 @@
 
         @include media-breakpoint-up(lg) {
             width: 35vw; height: 100vh;
-        }
 
-        // @extend .hide-bars;
+            // Scroll stuff
+            overflow-y: scroll;
+
+            // IE
+            -ms-overflow-style: none;
+
+            // Webkit
+            &::-webkit-scrollbar {
+                width: 0;
+                background: transparent;
+            }
+        }
     }
 
     &__info__container__mobile {
