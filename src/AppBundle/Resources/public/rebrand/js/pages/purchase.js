@@ -15,22 +15,27 @@ require('../../../js/Purchase/purchaseStepPhoneNew.js');
 
 $(function() {
 
-    $('.toggle-text[data-toggle="collapse"]').on('click', function(e) {
+    $('#qpw-info-btn').on('click', function(e) {
         e.preventDefault();
 
-        $(this)
-        .data('text-original', $(this).html())
-        .html($(this).data('text-swap') )
-        .data('text-swap', $(this).data('text-original'));
+        // Toggle sticky quote so we can scroll
+        $('.qpw__main__container').toggleClass('qpw__main__container-unstuck');
 
-        // Scroll to content
-        $('.purchase__details__container').animate({
-            scrollTop: ($(this).offset().top - 70)
-        }, 500);
-    });
+        // Toggle body class so navbar effect works
+        $('body').toggleClass('quote-scroll');
 
-    $('.purchase__details__container').scroll(function(e) {
+        if ($('#qpw-info').is('.collapse')) {
+            $('html, body').animate({
+                scrollTop: $('.qpw__sub__container').offset().top
+            }, 1500);
+        }
+
+        // Toggle back when we close to show the logo again
         $('.navbar').toggleClass('navbar-scrolled-quote', $(this).scrollTop() > 5);
     });
 
+    // As fixed page on desktop init scroll effect on main container scroll
+    $('.qpw__main__container').scroll(function(e) {
+        $('.navbar').toggleClass('navbar-scrolled-quote', $(this).scrollTop() > 5);
+    });
 });

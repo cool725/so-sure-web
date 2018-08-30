@@ -65,11 +65,7 @@
                     </div>
                     {{ form_start(buy_form) }}
                         {{ form_widget(buy_form.buy_tablet, {
-                            'label': 'Get Started',
-                            'attr': {
-                                'class': 'btn btn-success btn-gradient-green btn-shadow btn-lg btn-block-xs'
-                            }})
-                        }}
+                            'label': 'Get Started','attr': { 'class': 'btn btn-success btn-gradient-green btn-shadow btn-lg btn-block-xs' }}) }}
                     {{ form_end(buy_form) }}
                     <div class="qpw__footer d-none d-lg-block mt-5 pt-lg-5">
                         <h4 class="text-white">The higest level of cover!</h4>
@@ -84,7 +80,9 @@
                             <h4 class="text-white">Let's get you covered</h4>
                             <p class="lead text-white mb-0">It'll only take a few minutes</p>
                         </div>
-                        <a href="#" class="btn btn-success btn-gradient-green btn-shadow btn-block-xs mt-4 mt-lg-0" id="fix-get-insured">Get Started</a>
+                        {{ form_start(buy_form_banner_two) }}
+                            {{ form_widget(buy_form_banner_two.buy, {'label': 'Get Started', 'attr': {'class': 'btn btn-success btn-gradient-green btn-shadow btn-block-xs mt-4 mt-lg-0'}}) }}
+                        {{ form_end(buy_form_banner_two) }}
                     </div>
                 </div>
 
@@ -177,7 +175,9 @@
                         </li>
                     </ul>
                     <div class="mt-5 d-none d-lg-block">
-                        <a href="#" class="btn btn-success btn-gradient-green btn-shadow btn-block-xs btn-lg" id="fix-get-insured">Get Started <i class="far fa-arrow-right ml-2"></i></a>
+                        {{ form_start(buy_form_banner_three) }}
+                            {{ form_widget(buy_form_banner_three.buy, {'label': 'Get Started', 'attr': {'class': 'btn btn-success btn-gradient-green btn-shadow btn-block-xs btn-lg mt-4 mt-lg-0'}}) }}
+                        {{ form_end(buy_form_banner_three) }}
                     </div>
                     <div class="mt-5 d-block d-lg-none">
                         <a href="#qpw-info"
@@ -206,7 +206,9 @@
                         <h4 class="text-white">Let's get you covered</h4>
                         <p class="lead text-white mb-0">It'll only take a few minutes</p>
                     </div>
-                    <a href="#" class="btn btn-success btn-gradient-green btn-shadow btn-block-xs mt-4 mt-lg-0" id="fix-get-insured">Get Started</a>
+                    {{ form_start(buy_form_banner) }}
+                        {{ form_widget(buy_form_banner.buy, {'label': 'Get Started', 'attr': {'class': 'btn btn-success btn-gradient-green btn-shadow btn-block-xs mt-4 mt-lg-0'}}) }}
+                    {{ form_end(buy_form_banner) }}
                 </div>
             </div>
 
