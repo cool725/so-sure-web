@@ -17,6 +17,10 @@
             top: 100%; left: 0;
         }
 
+        &-unstuck {
+            position: relative;
+        }
+
         @include media-breakpoint-up(lg) {
             width: 60vw; height: 100vh;
             position: static;
@@ -38,7 +42,7 @@
     }
 
     &__main {
-        padding-top: 6rem;
+        padding-top: 5rem;
         padding-bottom: 1.5rem;
         @include media-breakpoint-up(lg) {
             padding-top: 12rem;
@@ -69,6 +73,13 @@
         }
 
         // @extend .hide-bars;
+    }
+
+    &__info__container__mobile {
+
+        svg {
+            transform: translateY(-1px);
+        }
     }
 
     // Contents

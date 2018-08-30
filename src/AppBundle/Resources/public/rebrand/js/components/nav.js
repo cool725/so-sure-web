@@ -52,7 +52,7 @@ $(function() {
             // if (!$('body').hasClass('quote') || !$('body').hasClass('purchase')) {
             if (!$('body').is('.quote, .purchase')) {
                 nav.addClass('navbar-scrolled');
-            } else {
+            } else if ($('body').is('.quote-scroll')) {
                 nav.addClass('navbar-scrolled-quote');
             }
         }
@@ -62,7 +62,7 @@ $(function() {
     $(window).scroll(function(e) {
         if (!$('body').is('.quote, .purchase')) {
             nav.toggleClass('navbar-scrolled', $(this).scrollTop() > 5);
-        } else {
+        } else if ($('body').is('.quote-scroll')) {
             nav.toggleClass('navbar-scrolled-quote', $(this).scrollTop() > 5);
         }
     });

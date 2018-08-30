@@ -180,14 +180,28 @@
                         <a href="#" class="btn btn-success btn-gradient-green btn-shadow btn-block-xs btn-lg" id="fix-get-insured">Get Started <i class="far fa-arrow-right ml-2"></i></a>
                     </div>
                     <div class="mt-5 d-block d-lg-none">
-                        <a href="#" class="btn btn-primary btn-gradient btn-shadow btn-block-xs"><span>See full policy</span> <i class="far fa-arrow-down ml-2"></i></a>
+                        <a href="#qpw-info"
+                           id="qpw-info-btn"
+                           class="btn btn-primary btn-gradient btn-shadow btn-block-xs"
+                           data-toggle="collapse"
+                           data-target="#qpw-info"
+                           role="button"
+                           aria-expanded="false"
+                           aria-controls="qpw-info"><span>See full policy</span> <i class="far fa-arrow-down ml-2"></i></a>
                     </div>
                 </div>
             </div>
 
-            <div class="qpw__info__container_mobile collapse">
+            <div id="qpw-info" class="qpw__info__container__mobile collapse">
+                <svg preserveAspectRatio="xMinYMin meet" viewBox="0 0 750 47" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                        <g id="Artboard" fill="#FFFFFF">
+                            <path d="M374,0 C499.333333,0 624.666667,15.6666667 750,47 L0,47 C124,15.6666667 248.666667,8.69674703e-16 374,0 Z" id="Rectangle" transform="translate(375.000000, 23.500000) scale(1, -1) translate(-375.000000, -23.500000) "></path>
+                        </g>
+                    </g>
+                </svg>
                 {% include 'AppBundle::PhoneInsurance/_seeFullDetails.html.twig' %}
-                <div class="py-3 px-4 mx-2 mb-5 rounded bg-blue2 d-lg-flex justify-content-lg-between align-items-lg-center">
+                <div class="py-3 px-4 mx-3 mb-5 rounded bg-blue2 d-lg-flex justify-content-lg-between align-items-lg-center">
                     <div class="text-center text-lg-left">
                         <h4 class="text-white">Let's get you covered</h4>
                         <p class="lead text-white mb-0">It'll only take a few minutes</p>
