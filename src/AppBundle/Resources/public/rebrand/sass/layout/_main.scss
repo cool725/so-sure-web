@@ -12,7 +12,9 @@
 
         // Curve
         svg {
-            transform: translateY(1px);
+            transform: translateY(-1px);
+            position: absolute;
+            top: 100%; left: 0;
         }
 
         @include media-breakpoint-up(lg) {
@@ -37,14 +39,10 @@
 
     &__main {
         padding-top: 6rem;
-
+        padding-bottom: 1.5rem;
         @include media-breakpoint-up(lg) {
             padding-top: 12rem;
         }
-    }
-
-    &__info__container {
-
     }
 
     &__curve {
@@ -64,7 +62,6 @@
     }
 
     &__sub__container {
-        width: 100vw;
         background-color: $white;
 
         @include media-breakpoint-up(lg) {

@@ -3,6 +3,7 @@
 {# Set vars #}
 {% set body_class = 'quote' %}
 {% set quote_mode = 1 %}
+{% set intercom_enabled = false %}
 
 {% block title %}{{ phone.model }} Insurance - {{ phone.make }} - Welcome to Social Insurance{% endblock %}
 {% block meta %}
@@ -66,7 +67,7 @@
                         {{ form_widget(buy_form.buy_tablet, {
                             'label': 'Get Started',
                             'attr': {
-                                'class': 'btn btn-white btn-shadow btn-lg btn-block-xs'
+                                'class': 'btn btn-success btn-gradient-green btn-shadow btn-lg btn-block-xs'
                             }})
                         }}
                     {{ form_end(buy_form) }}
@@ -76,23 +77,22 @@
                     </div>
                 </div>
 
-                <div class="qpw__info__container">
-                    {# {% include 'AppBundle::PhoneInsurance/_seeFullDetails.html.twig' %} #}
+                <div class="qpw__info__container d-none d-lg-block">
+                    {% include 'AppBundle::PhoneInsurance/_seeFullDetails.html.twig' %}
+                    <div class="py-3 px-4 mx-md-5 mb-5 rounded bg-blue2 d-lg-flex justify-content-lg-between align-items-lg-center">
+                        <div class="text-center text-lg-left">
+                            <h4 class="text-white">Let's get you covered</h4>
+                            <p class="lead text-white mb-0">It'll only take a few minutes</p>
+                        </div>
+                        <a href="#" class="btn btn-success btn-gradient-green btn-shadow btn-block-xs mt-4 mt-lg-0" id="fix-get-insured">Get Started</a>
+                    </div>
                 </div>
 
                 {# Curve Mobile #}
                 <svg class="d-block d-lg-none" preserveAspectRatio="xMinYMin meet" viewBox="0 0 750 47" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
                     <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-                        <g id="Artboard" fill="#FFFFFF" fill-rule="nonzero">
-                            <g id="SVG-Layer">
-                                <g id="Page-1">
-                                    <g id="Group">
-                                        <g id="---BG---">
-                                            <path d="M0,40 C124,13.33333 248.66667,0 374,0 C499.33333,0 624.66667,13.33333 750,40 L750,47 L0,47 L0,40 Z" id="Rectangle"></path>
-                                        </g>
-                                    </g>
-                                </g>
-                            </g>
+                        <g id="Artboard-Copy" fill="#0068ED">
+                            <path d="M0,0 L750,0 L750,47 C625,18.3333333 500,4 375,4 C250,4 125,18.3333333 0,47 L0,0 Z" id="Rectangle-2"></path>
                         </g>
                     </g>
                 </svg>
@@ -112,7 +112,7 @@
 
             {# Sub Content #}
             <div class="qpw__sub__container">
-                <div class="qpw__sub p-4 p-lg-5">
+                <div class="qpw__sub px-4 pb-4 pt-5 p-lg-5">
 
                     <h4 class="text-blue2 mb-4">Your cover includes:</h4>
                     <ul class="list-unstyled icn-list mb-5">
@@ -177,9 +177,22 @@
                         </li>
                     </ul>
                     <div class="mt-5 d-none d-lg-block">
-                        <a href="#" class="btn btn-success btn-gradient-green btn-block-xs btn-lg" id="fix-get-insured">Get Started <i class="far fa-arrow-right ml-2"></i></a>
+                        <a href="#" class="btn btn-success btn-gradient-green btn-shadow btn-block-xs btn-lg" id="fix-get-insured">Get Started <i class="far fa-arrow-right ml-2"></i></a>
                     </div>
+                    <div class="mt-5 d-block d-lg-none">
+                        <a href="#" class="btn btn-primary btn-gradient btn-shadow btn-block-xs"><span>See full policy</span> <i class="far fa-arrow-down ml-2"></i></a>
+                    </div>
+                </div>
+            </div>
 
+            <div class="qpw__info__container_mobile collapse">
+                {% include 'AppBundle::PhoneInsurance/_seeFullDetails.html.twig' %}
+                <div class="py-3 px-4 mx-2 mb-5 rounded bg-blue2 d-lg-flex justify-content-lg-between align-items-lg-center">
+                    <div class="text-center text-lg-left">
+                        <h4 class="text-white">Let's get you covered</h4>
+                        <p class="lead text-white mb-0">It'll only take a few minutes</p>
+                    </div>
+                    <a href="#" class="btn btn-success btn-gradient-green btn-shadow btn-block-xs mt-4 mt-lg-0" id="fix-get-insured">Get Started</a>
                 </div>
             </div>
 
