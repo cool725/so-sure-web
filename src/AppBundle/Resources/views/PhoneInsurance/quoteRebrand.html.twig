@@ -148,7 +148,7 @@
                                 <span class="ml-2 text-blue2">
                                     <a href="#"
                                        data-toggle="modal"
-                                       data-target="#quote_page_modal_replace_repair"
+                                       data-target="#policy_24_72_hours"
                                        role="button">
                                         <i class="fal fa-info-circle"></i>
                                     </a>
@@ -166,7 +166,7 @@
                                 <span class="ml-2 text-blue2">
                                     <a href="#"
                                        data-toggle="modal"
-                                       data-target="#quote_page_modal_cashback"
+                                       data-target="#policy_cashback"
                                        role="button">
                                         <i class="fal fa-info-circle"></i>
                                     </a>
@@ -216,58 +216,7 @@
     </section>
 
     {# Page Modals #}
-    <div class="modal fade"
-         id="quote_page_modal_replace_repair"
-         tabindex="-1" role="dialog"
-         aria-labelledby="quote_page_modal_replace_repair"
-         aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">24-72 hour replace/repair</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <i class="fal fa-times text-white"></i>
-                    </button>
-                </div>
-                <div class="modal-body text-center text-sm-left">
-                    <div class="row">
-                        <div class="col-sm-4">
-                            <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_phone-smile.png" alt="so-sure - Policy" width="120px">
-                        </div>
-                        <div class="col-sm-8">
-                            Some repairs can take longer (eg water damage) but we will be as fast as possible once your claim approved
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="modal fade"
-         id="quote_page_modal_cashback"
-         tabindex="-1" role="dialog"
-         aria-labelledby="quote_page_modal_cashback"
-         aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Up to 80% cashback every year </h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <i class="fal fa-times text-white"></i>
-                    </button>
-                </div>
-                <div class="modal-body text-center text-sm-left">
-                    <div class="row">
-                        <div class="col-sm-4">
-                            <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_wallet-cashback.png" alt="so-sure - Policy" width="120px">
-                        </div>
-                        <div class="col-sm-8">
-                            By joining forces with your most careful friends and family members, you could see 80% of your insurance premium reimbursed every year
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+    {% include 'AppBundle::PhoneInsurance/_policyInfoModals.html.twig' %}
 
 {% endblock %}
 

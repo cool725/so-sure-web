@@ -157,32 +157,7 @@
     </section>
 
     {# Page Modals #}
-    <div class="modal fade"
-         id="purchase_policy_name"
-         tabindex="-1" role="dialog"
-         aria-labelledby="purchase_policy_name"
-         aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Policy Holder’s Full Name</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <i class="fal fa-times text-white"></i>
-                    </button>
-                </div>
-                <div class="modal-body text-center text-sm-left">
-                    <div class="row">
-                        <div class="col-sm-4">
-                            <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_contract.png" alt="so-sure - Policy" width="120px">
-                        </div>
-                        <div class="col-sm-8">
-                            Policy holders must be over 18 years old, a UK resident, and be the main user of the mobile phone. The mobile phone must also have been purchased within the UK.
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+    {% include 'AppBundle::PhoneInsurance/_policyInfoModals.html.twig' %}
 
 {% endblock %}
 
