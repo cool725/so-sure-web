@@ -6,7 +6,6 @@
 
     // Containers & Curves
     &__main__container {
-        width: 100vw;
         position: sticky;
         z-index: 4;
         top: 0;
@@ -34,7 +33,6 @@
         }
 
         background-color: $blue-3;
-        // @include linear-gradient(160deg, $blue-3, $blue-1a);
     }
 
     &__main {
