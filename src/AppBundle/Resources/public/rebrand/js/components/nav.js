@@ -50,7 +50,7 @@ $(function() {
     $(window).on('load', function(e) {
         if ($(this).scrollTop() > 5) {
             // if (!$('body').hasClass('quote') || !$('body').hasClass('purchase')) {
-            if (!$('body').is('.quote, .purchase')) {
+            if (!$('body').is('.quote, .purchase, .welcome')) {
                 nav.addClass('navbar-scrolled');
             } else if ($('body').is('.quote-scroll')) {
                 nav.addClass('navbar-scrolled-quote');
@@ -60,7 +60,7 @@ $(function() {
 
     // Scroll - Add navbar background on scroll
     $(window).scroll(function(e) {
-        if (!$('body').is('.quote, .purchase')) {
+        if (!$('body').is('.quote, .purchase, .welcome')) {
             nav.toggleClass('navbar-scrolled', $(this).scrollTop() > 5);
         } else if ($('body').is('.quote-scroll')) {
             nav.toggleClass('navbar-scrolled-quote', $(this).scrollTop() > 5);

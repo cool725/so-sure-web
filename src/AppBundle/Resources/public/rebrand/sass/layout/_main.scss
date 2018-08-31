@@ -6,15 +6,18 @@
 
     // Containers & Curves
     &__main__container {
-        position: sticky;
         z-index: 4;
-        top: 0;
 
         // Curve
         svg {
             transform: translateY(-1px);
             position: absolute;
             top: 100%; left: 0;
+        }
+
+        &-stuck {
+            position: sticky;
+            top: 0;
         }
 
         &-unstuck {
