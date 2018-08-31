@@ -28,6 +28,8 @@
 
         &.valid-select {
             color: $white;
+            background: transparent url('#{$cdn_url}/images/rebrand/icns/so-sure_arrow-down-active-icn.svg') no-repeat right 20px;
+            background-size: 20px;
         }
 
         &:focus {

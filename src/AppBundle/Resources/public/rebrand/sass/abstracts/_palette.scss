@@ -60,7 +60,7 @@ $theme-colors: (
 }
 
 .blue-gradient-dl {
-    @include linear-gradient(90deg, $blue-3, $blue-1a);
+    @include linear-gradient(135deg, $blue-3, $blue-1a);
 }
 
 // Box shadow
