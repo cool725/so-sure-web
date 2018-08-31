@@ -6,6 +6,7 @@
 
     // Containers & Curves
     &__main__container {
+        position: relative;
         z-index: 4;
 
         // Curve
@@ -18,10 +19,6 @@
         &-stuck {
             position: sticky;
             top: 0;
-        }
-
-        &-unstuck {
-            position: relative;
         }
 
         @include media-breakpoint-up(lg) {

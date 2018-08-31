@@ -49,14 +49,11 @@ $(function() {
     // Add navbar background if page reloads not at the top
     $(window).on('load', function(e) {
         if ($(this).scrollTop() > 5) {
-            // if (!$('body').hasClass('quote') || !$('body').hasClass('purchase')) {
             if (!$('body').is('.quote, .purchase, .welcome')) {
                 nav.addClass('navbar-scrolled');
-            } else if ($('body').is('.quote-scroll')) {
-                nav.addClass('navbar-scrolled-quote');
-            } else if ($('body').is('.welcome')) {
-            nav.toggleClass('navbar-scrolled-quote', $(this).scrollTop() > 5);
-        }
+            } else {
+                nav.addClass('navbar-scrolled-quote', $(this).scrollTop() > 5);
+            }
         }
     });
 
@@ -64,9 +61,7 @@ $(function() {
     $(window).scroll(function(e) {
         if (!$('body').is('.quote, .purchase, .welcome')) {
             nav.toggleClass('navbar-scrolled', $(this).scrollTop() > 5);
-        } else if ($('body').is('.quote-scroll')) {
-            nav.toggleClass('navbar-scrolled-quote', $(this).scrollTop() > 5);
-        } else if ($('body').is('.welcome')) {
+        } else {
             nav.toggleClass('navbar-scrolled-quote', $(this).scrollTop() > 5);
         }
     });

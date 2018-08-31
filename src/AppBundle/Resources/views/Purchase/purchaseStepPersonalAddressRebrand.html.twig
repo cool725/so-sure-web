@@ -35,7 +35,7 @@
 
             {% if phone %}
                 {# Main Content #}
-                <div class="qpw__main__container qpw__main__container-stuck">
+                <div class="qpw__main__container">
                     <div class="qpw__main px-4 px-lg-5">
                         <div class="d-flex justify-content-center justify-content-lg-start align-items-center justify-content-lg-start">
                             <h1 class="qpw__h1 text-blue1b">
@@ -79,7 +79,7 @@
                                 &pound;{{ phone.currentPhonePrice.yearlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }} a year
                             {% endif %}
                         </div>
-                        <div class="qpw__h5 h5 d-block d-lg-none text-center">
+{#                         <div class="qpw__h5 h5 d-block d-lg-none text-center">
                             <a href="#qpw-info-mobile"
                                id="qpw-info-btn"
                                class="text-white toggle-text"
@@ -88,6 +88,13 @@
                                data-text-swap='hide full details <i class="fas fa-caret-up ml-2"></i>'
                                aria-expanded="false"
                                aria-controls="qpw-info-mobile">
+                                see full details <i class="fas fa-caret-down ml-2"></i>
+                            </a>
+                        </div> #}
+                        <div class="qpw__h5 h5 d-block d-lg-none text-center">
+                            <a href="#qpw-info-mobile"
+                               id="qpw-info-btn"
+                               class="text-white">
                                 see full details <i class="fas fa-caret-down ml-2"></i>
                             </a>
                         </div>
@@ -148,7 +155,7 @@
                     </div>
                 </div>
 
-            <div id="qpw-info-mobile" class="qpw__info__container__mobile collapse">
+            <div id="qpw-info-mobile" class="qpw__info__container__mobile d-block d-lg-none">
                 <svg preserveAspectRatio="xMinYMin meet" viewBox="0 0 750 47" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
                     <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
                         <g id="Artboard" fill="#FFFFFF">

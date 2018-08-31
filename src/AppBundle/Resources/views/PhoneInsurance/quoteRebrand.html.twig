@@ -22,7 +22,7 @@
         <div class="d-lg-flex">
 
             {# Main Content #}
-            <div class="qpw__main__container qpw__main__container-stuck">
+            <div class="qpw__main__container">
                 <div class="qpw__main px-4 px-lg-5">
                     <div class="qpw__h5 h5 text-white mb-4">Here’s your quote details, Insure your:</div>
                     <div class="d-flex justify-content-start align-items-center justify-content-lg-start">
@@ -177,20 +177,10 @@
                             {{ form_widget(buy_form_banner_three.buy, {'label': 'Get Started', 'attr': {'class': 'btn btn-success btn-gradient-green btn-shadow btn-block-xs btn-lg mt-4 mt-lg-0'}}) }}
                         {{ form_end(buy_form_banner_three) }}
                     </div>
-                    <div class="mt-5 d-block d-lg-none">
-                        <a href="#qpw-info"
-                           id="qpw-info-btn"
-                           class="btn btn-primary btn-gradient btn-shadow btn-block-xs"
-                           data-toggle="collapse"
-                           data-target="#qpw-info"
-                           role="button"
-                           aria-expanded="false"
-                           aria-controls="qpw-info"><span>See full policy</span> <i class="far fa-arrow-down ml-2"></i></a>
-                    </div>
                 </div>
             </div>
 
-            <div id="qpw-info" class="qpw__info__container__mobile collapse">
+            <div id="qpw-info" class="qpw__info__container__mobile d-block d-lg-none">
                 <svg preserveAspectRatio="xMinYMin meet" viewBox="0 0 750 47" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
                     <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
                         <g id="Artboard" fill="#FFFFFF">
