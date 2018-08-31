@@ -15,7 +15,7 @@ $(function() {
         $('body').toggleClass('quote-scroll');
 
         // Toggle back when we close to show the logo again
-        $('.navbar').toggleClass('navbar-scrolled-quote', $(this).scrollTop() > 5);
+        $('.navbar').toggleClass('navbar-scrolled-quote');
     });
 
     // As fixed page on desktop init scroll effect on main container scroll
