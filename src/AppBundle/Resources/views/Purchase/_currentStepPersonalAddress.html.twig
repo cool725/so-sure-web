@@ -72,15 +72,15 @@
 
             <div class="form-group">
                 <div class="form-row">
-                    <div class="col text-left">
+                    <div class="col-3 text-left">
                         {# TODO: Needs to go back quote #}
                         <a href="{{ path('quote_make_model_memory', {'make': phone.make, 'model': phone.model, 'memory': phone.memory}) }}"
-                           class="btn btn-outline-grey">
+                           class="btn btn-outline-grey btn-block-xs">
                             <span class="sr-only">back</span>
                             <i class="far fa-arrow-left"></i>
                         </a>
                     </div>
-                    <div class="col text-right">
+                    <div class="col-9 text-right">
                         <a href="#"
                            id="step--validate"
                            class="btn btn-success btn-gradient-green btn-block-xs"
@@ -126,15 +126,15 @@
 
             <div class="form-group">
                 <div class="form-row">
-                    <div class="col text-left">
+                    <div class="col-3 text-left">
                         {# TODO: Needs to go back quote #}
                         <a href="{{ path('quote_make_model_memory', {'make': phone.make, 'model': phone.model, 'memory': phone.memory}) }}"
-                           class="btn btn-outline-grey">
+                           class="btn btn-outline-grey btn-block-xs">
                             <span class="sr-only">back</span>
                             <i class="far fa-arrow-left"></i>
                         </a>
                     </div>
-                    <div class="col text-right">
+                    <div class="col-9 text-right">
                         {# TODO: Add icon #}
                         {{ form_widget(purchase_form.next, {'label': 'Continue', 'attr': {'class': 'btn btn-success btn-gradient-green btn-block-xs'}}) }}
                     </div>
@@ -183,15 +183,15 @@
             </div>
             <div class="form-group">
                 <div class="form-row">
-                    <div class="col text-left">
+                    <div class="col-3 text-left">
                         {# TODO: Needs to go back quote #}
                         <a href="{{ path('quote_make_model_memory', {'make': phone.make, 'model': phone.model, 'memory': phone.memory}) }}"
-                           class="btn btn-outline-grey">
+                           class="btn btn-outline-grey btn-block-xs">
                             <span class="sr-only">back</span>
                             <i class="far fa-arrow-left"></i>
                         </a>
                     </div>
-                    <div class="col text-right">
+                    <div class="col-9 text-right">
                         {{ form_widget(purchase_form.manual_next, {'label': 'Continue', 'attr': {'class': 'btn btn-success btn-gradient-green btn-block-xs'}}) }}
                     </div>
                 </div>
