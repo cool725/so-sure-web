@@ -67,22 +67,20 @@
                         {{ form_widget(buy_form.buy_tablet, {
                             'label': 'Get Started','attr': { 'class': 'btn btn-success btn-gradient-green btn-shadow btn-lg btn-block-xs' }}) }}
                     {{ form_end(buy_form) }}
-                    <div class="qpw__footer d-none d-lg-block mt-5 pt-lg-5">
-                        <h4 class="text-white">The higest level of cover!</h4>
-                        <p class="text-blue1 lead">We offer the markets highest level of cover</p>
-                    </div>
                 </div>
 
                 <div class="qpw__info__container d-none d-lg-block">
                     {% include 'AppBundle::PhoneInsurance/_seeFullDetails.html.twig' %}
-                    <div class="py-3 px-4 mx-md-5 mb-5 rounded bg-blue2 d-lg-flex justify-content-lg-between align-items-lg-center">
-                        <div class="text-center text-lg-left">
-                            <h4 class="text-white">Let's get you covered</h4>
-                            <p class="lead text-white mb-0">It'll only take a few minutes</p>
+                    <div class="policy__info mx-4 mx-lg-5 py-4 ">
+                        <div class="p-4 bg-blue2 d-lg-flex rounded justify-content-lg-between align-items-lg-center">
+                            <div class="text-center text-lg-left">
+                                <h4 class="text-white">Let's get you covered</h4>
+                                <p class="lead text-white mb-0">It'll only take a few minutes</p>
+                            </div>
+                            {{ form_start(buy_form_banner_two) }}
+                                {{ form_widget(buy_form_banner_two.buy, {'label': 'Get Started', 'attr': {'class': 'btn btn-success btn-gradient-green btn-lg btn-shadow btn-block-xs mt-4 mt-lg-0'}}) }}
+                            {{ form_end(buy_form_banner_two) }}
                         </div>
-                        {{ form_start(buy_form_banner_two) }}
-                            {{ form_widget(buy_form_banner_two.buy, {'label': 'Get Started', 'attr': {'class': 'btn btn-success btn-gradient-green btn-shadow btn-block-xs mt-4 mt-lg-0'}}) }}
-                        {{ form_end(buy_form_banner_two) }}
                     </div>
                 </div>
 
@@ -201,14 +199,16 @@
                     </g>
                 </svg>
                 {% include 'AppBundle::PhoneInsurance/_seeFullDetails.html.twig' %}
-                <div class="py-3 px-4 mx-3 mb-5 rounded bg-blue2 d-lg-flex justify-content-lg-between align-items-lg-center">
-                    <div class="text-center text-lg-left">
-                        <h4 class="text-white">Let's get you covered</h4>
-                        <p class="lead text-white mb-0">It'll only take a few minutes</p>
+                <div class="policy__info mx-4 mx-lg-5 py-4 ">
+                    <div class="p-4 bg-blue2 d-lg-flex rounded justify-content-lg-between align-items-lg-center">
+                        <div class="text-center text-lg-left">
+                            <h4 class="text-white">Let's get you covered</h4>
+                            <p class="lead text-white mb-0">It'll only take a few minutes</p>
+                        </div>
+                        {{ form_start(buy_form_banner) }}
+                            {{ form_widget(buy_form_banner.buy, {'label': 'Get Started', 'attr': {'class': 'btn btn-success btn-gradient-green btn-shadow btn-block-xs mt-4 mt-lg-0'}}) }}
+                        {{ form_end(buy_form_banner) }}
                     </div>
-                    {{ form_start(buy_form_banner) }}
-                        {{ form_widget(buy_form_banner.buy, {'label': 'Get Started', 'attr': {'class': 'btn btn-success btn-gradient-green btn-shadow btn-block-xs mt-4 mt-lg-0'}}) }}
-                    {{ form_end(buy_form_banner) }}
                 </div>
             </div>
 

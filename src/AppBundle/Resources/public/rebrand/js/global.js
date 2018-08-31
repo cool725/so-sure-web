@@ -29,6 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
 // Require components
 require('./common/track.js');
 require('./common/fbLogin.js');
+require('./common/toggleText.js');
 require('./components/nav.js');
 require('./components/getQuote.js');
 require('./components/phoneSearchDropdown.js');

@@ -15,6 +15,8 @@ require('../../../js/Purchase/purchaseStepPhoneNew.js');
 
 $(function() {
 
+    let open = false;
+
     $('#qpw-info-btn').on('click', function(e) {
         e.preventDefault();
 
@@ -24,10 +26,18 @@ $(function() {
         // Toggle body class so navbar effect works
         $('body').toggleClass('quote-scroll');
 
-        if ($('#qpw-info').is('.collapse')) {
+        $('#qpw-info-mobile').toggleClass('open');
+
+        if ($('#qpw-info-mobile').is('.open')) {
+            console.log('show');
             $('html, body').animate({
-                scrollTop: $('.qpw__sub__container').offset().top
-            }, 1500);
+                scrollTop: $('.qpw__sub__container')[0].scrollHeight
+            }, 500);
+        } else {
+            console.log('no show');
+            $('html, body').animate({
+                scrollTop: 0
+            }, 500);
         }
 
         // Toggle back when we close to show the logo again

@@ -80,14 +80,15 @@
                             {% endif %}
                         </div>
                         <div class="qpw__h5 h5 d-block d-lg-none text-center">
-                            <a href="#qpw-info"
+                            <a href="#qpw-info-mobile"
                                id="qpw-info-btn"
-                               class="text-white"
+                               class="text-white toggle-text"
                                data-toggle="collapse"
-                               data-target="#qpw-info"
+                               data-target="#qpw-info-mobile"
+                               data-text-swap='hide full details <i class="fas fa-caret-up ml-2"></i>'
                                aria-expanded="false"
-                               aria-controls="qpw-info">
-                                See Full Policy <i class="fas fa-caret-down ml-2"></i>
+                               aria-controls="qpw-info-mobile">
+                                see full details <i class="fas fa-caret-down ml-2"></i>
                             </a>
                         </div>
                         <div class="qpw__footer d-none d-lg-block mt-5 pt-lg-5">
@@ -98,10 +99,22 @@
                                     <li class="text-white mb-2"><i class="far fa-check text-blue1 fa-lg"></i> Instant Cover and 24/7 live support</li><li class="text-white"><i class="far fa-check text-blue1 fa-lg"></i> 24-72 replacement phone once claim approved</li>
                                 </ul>
                             </div>
+                            <div class="qpw__footer__cta">
+                                <a href="#qpw-info"
+                                   class="btn btn-outline-blue1 mt-2 toggle-text"
+                                   data-toggle="collapse"
+                                   data-target="#qpw-info"
+                                   data-text-swap='hide full details <i class="fas fa-caret-up ml-2"></i>'
+                                   role="button"
+                                   aria-expanded="false"
+                                   aria-controls="qpw-info">see full details
+                                   <i class="fas fa-caret-down ml-2"></i>
+                               </a>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="qpw__info__container d-none d-lg-block">
+                    <div id="qpw-info" class="qpw__info__container mt-4 collapse">
                         {% include 'AppBundle::PhoneInsurance/_seeFullDetails.html.twig' %}
                     </div>
 
@@ -135,7 +148,7 @@
                     </div>
                 </div>
 
-            <div id="qpw-info" class="qpw__info__container__mobile collapse">
+            <div id="qpw-info-mobile" class="qpw__info__container__mobile collapse">
                 <svg preserveAspectRatio="xMinYMin meet" viewBox="0 0 750 47" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
                     <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
                         <g id="Artboard" fill="#FFFFFF">
