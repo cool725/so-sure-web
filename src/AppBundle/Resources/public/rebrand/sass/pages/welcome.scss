@@ -19,6 +19,14 @@ body {
         border: none;
     }
 
+    &__main {
+        padding-top: 1.5rem;
+
+        @include media-breakpoint-up(lg) {
+            padding-top: 12rem;
+        }
+    }
+
     &__curve {
         transform: translateY(-1px);
     }
@@ -28,6 +36,17 @@ body {
 
         @include media-breakpoint-up(lg) {
             margin-top: 0;
+        }
+    }
+
+    &__sub {
+        max-width: 400px;
+        margin: 0 auto;
+        text-align: center;
+        padding-top: 2em;
+
+        @include media-breakpoint-up(lg) {
+            padding-top: 12rem;
         }
     }
 }

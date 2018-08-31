@@ -1,9 +1,10 @@
 // welcome.js
 
+import 'bootstrap/js/dist/tooltip';
+
 require('../../sass/pages/welcome.scss');
 
-// Require components
-// require('clipboard/dist/clipboard.min.js');
+// Require components;
 let Clipboard = require('clipboard');
 
 $(function() {
@@ -19,16 +20,22 @@ $(function() {
         e.preventDefault();
     });
 
+    $('.btn-copy').tooltip({
+        'title':'Copied',
+        'trigger':'manual'
+    });
+
     clipboard.on('success', function(event) {
-        console.log(event);
         $('.btn-copy').tooltip('show');
         setTimeout(function() { $('.btn-copy').tooltip('hide'); }, 1500);
     });
 
-    $('.welcome__details__container').scroll(function(e) {
+    $('.qpw__main__container').scroll(function(e) {
         $('.navbar').toggleClass('navbar-scrolled-quote', $(this).scrollTop() > 5);
     });
 
+
+    // Policy modal
     // Load Data
     const policyModal   = $('#policy_doc'),
           policyContent = $('.policy-content'),

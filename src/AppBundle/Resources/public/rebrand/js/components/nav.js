@@ -54,7 +54,9 @@ $(function() {
                 nav.addClass('navbar-scrolled');
             } else if ($('body').is('.quote-scroll')) {
                 nav.addClass('navbar-scrolled-quote');
-            }
+            } else if ($('body').is('.welcome')) {
+            nav.toggleClass('navbar-scrolled-quote', $(this).scrollTop() > 5);
+        }
         }
     });
 
@@ -63,6 +65,8 @@ $(function() {
         if (!$('body').is('.quote, .purchase, .welcome')) {
             nav.toggleClass('navbar-scrolled', $(this).scrollTop() > 5);
         } else if ($('body').is('.quote-scroll')) {
+            nav.toggleClass('navbar-scrolled-quote', $(this).scrollTop() > 5);
+        } else if ($('body').is('.welcome')) {
             nav.toggleClass('navbar-scrolled-quote', $(this).scrollTop() > 5);
         }
     });
