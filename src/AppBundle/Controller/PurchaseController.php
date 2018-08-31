@@ -364,22 +364,24 @@ class PurchaseController extends BaseController
         $webpay = null;
         $allowPayment = true;
 
-        $paymentProviderTest = $this->sixpack(
-            $request,
-            SixpackService::EXPERIMENT_PURCHASE_FLOW_BACS,
-            ['judo', 'bacs'],
-            SixpackService::LOG_MIXPANEL_CONVERSION,
-            null,
-            0.1
-        );
-        $bacsFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_BACS);
-        // For now, only allow 1 policy with bacs
-        if ($bacsFeature && count($user->getValidPolicies(true)) >= 1) {
-            $bacsFeature = false;
-        }
-        if (!$bacsFeature) {
-            $paymentProviderTest = 'judo';
-        }
+        // $paymentProviderTest = $this->sixpack(
+        //     $request,
+        //     SixpackService::EXPERIMENT_PURCHASE_FLOW_BACS,
+        //     ['judo', 'bacs'],
+        //     SixpackService::LOG_MIXPANEL_CONVERSION,
+        //     null,
+        //     0.1
+        // );
+        // $bacsFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_BACS);
+        // // For now, only allow 1 policy with bacs
+        // if ($bacsFeature && count($user->getValidPolicies(true)) >= 1) {
+        //     $bacsFeature = false;
+        // }
+        // if (!$bacsFeature) {
+        //     $paymentProviderTest = 'judo';
+        // }
+
+        $paymentProviderTest = 'judo';
 
         //$this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_POSTCODE);
         if ('POST' === $request->getMethod()) {
