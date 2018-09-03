@@ -53,6 +53,7 @@ class UserSearchType extends BaseType
             ])
             ->add('waitingSanctions', CheckboxType::class, ['required' => false])
             ->add('allSanctions', CheckboxType::class, ['required' => false])
+            ->add('id', TextType::class, ['required' => false])
             ->add('search', SubmitType::class)
         ;
 
@@ -66,6 +67,7 @@ class UserSearchType extends BaseType
             $this->formQuerystring($form, $currentRequest, 'facebookId');
             $this->formQuerystring($form, $currentRequest, 'waitingSanctions');
             $this->formQuerystring($form, $currentRequest, 'allSanctions');
+            $this->formQuerystring($form, $currentRequest, 'id');
         });
     }
 

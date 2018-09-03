@@ -958,6 +958,14 @@ abstract class BaseController extends Controller
                 $dataField
             );
         }
+        $this->formToMongoSearch(
+            $form,
+            $usersQb,
+            'id',
+            '_id',
+            false,
+            self::MONGO_QUERY_TYPE_ID
+        );
         $allSanctions = $this->getFormBool($form, 'allSanctions');
         $waitingSanctions = $this->getFormBool($form, 'waitingSanctions');
         if ($allSanctions || $waitingSanctions) {
@@ -996,6 +1004,7 @@ abstract class BaseController extends Controller
         $status = $form->get('status')->getData();
         $claimNumber = $form->get('number')->getData();
         $claimId = $form->get('id')->getData();
+        $handlingTeam = $form->get('handlingTeam')->getData();
         $qb = $qb->field('status')->in($status);
         if (mb_strlen($claimNumber) > 0) {
             $qb = $qb->field('number')->equals(new MongoRegex(sprintf("/.*%s.*/i", $claimNumber)));
@@ -1005,6 +1014,8 @@ abstract class BaseController extends Controller
         }
         if ($user->getHandlingTeam()) {
             $qb = $qb->field('handlingTeam')->equals($user->getHandlingTeam());
+        } elseif ($handlingTeam) {
+            $qb = $qb->field('handlingTeam')->equals($handlingTeam);
         }
         $qb = $qb->sort('replacementReceivedDate', 'desc')
             ->sort('approvedDate', 'desc')
