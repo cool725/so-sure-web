@@ -12,7 +12,8 @@
         -o-appearance: none;
 
         // Style
-        background: transparent url('#{$cdn_url}/images/rebrand/icns/so-sure_arrow-down-icn.svg') no-repeat right 20px;
+        background: transparent url('#{$cdn_url}/images/rebrand/icns/so-sure_arrow-down-icn.svg') no-repeat;
+        background-position: right 15px;
         background-size: 20px;
         border: 0;
         border-bottom: 3px solid $blue-1b;
@@ -28,7 +29,8 @@
 
         &.valid-select {
             color: $white;
-            background: transparent url('#{$cdn_url}/images/rebrand/icns/so-sure_arrow-down-active-icn.svg') no-repeat right 20px;
+            background: transparent url('#{$cdn_url}/images/rebrand/icns/so-sure_arrow-down-active-icn.svg') no-repeat;
+            background-position: right 15px;
             background-size: 20px;
         }
 
@@ -36,12 +38,18 @@
             outline: 0;
         }
 
-        @media (max-width: 321px) {
-            &__select {
-                .h1 {
-                    font-size: 1.8rem;
-                }
+        @include media-breakpoint-up(sm) {
+            background-position:  right 20px;
+
+            &.valid-select {
+                background-position:  right 20px;
             }
+        }
+    }
+
+    @include media-breakpoint-down(xs) {
+        .h1 {
+            font-size: 1.8rem;
         }
     }
 
