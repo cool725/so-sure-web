@@ -391,6 +391,7 @@ class ValidatePolicyCommand extends BaseCommand
                 /** @var PolicyService $policyService */
                 $policyService = $this->getContainer()->get('app.policy');
                 if ($policyService->validatePremium($policy)) {
+                    $this->header($policy, $policies, $lines);
                     $lines[] = sprintf(
                         'WARNING!! - Policy %s has its premium updated',
                         $policy->getPolicyNumber()
@@ -415,6 +416,7 @@ class ValidatePolicyCommand extends BaseCommand
             $refundCommission = $policy->getRefundCommissionAmount();
             if (($refund > 0 && !$this->areEqualToTwoDp(0, $refund)) ||
                 ($refundCommission > 0 && !$this->areEqualToTwoDp(0, $refundCommission))) {
+                $this->header($policy, $policies, $lines);
                 $lines[] = sprintf(
                     'Warning!! Refund Due. Refund %f / Commission %f',
                     $refund,
@@ -426,6 +428,7 @@ class ValidatePolicyCommand extends BaseCommand
                 $bacsPayments = count($policy->getPaymentsByType(BacsPayment::class));
                 $bankAccount = $policy->getUser()->getBacsPaymentMethod()->getBankAccount();
                 if ($bankAccount->getMandateStatus() == BankAccount::MANDATE_SUCCESS) {
+                    $this->header($policy, $policies, $lines);
                     $isFirstPayment = $bankAccount->isFirstPayment();
                     if ($bacsPayments >= 1 && $isFirstPayment) {
                         $lines[] = 'Warning!! 1 or more bacs payments, yet bank has first payment flag set';
