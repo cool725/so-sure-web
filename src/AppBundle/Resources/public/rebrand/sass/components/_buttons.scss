@@ -3,7 +3,9 @@
 .btn {
     font-family: $g-medium;
 
-    .far {
+    .far,
+    .fab,
+    .fas {
         vertical-align: middle;
     }
 }
