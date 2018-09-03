@@ -41,6 +41,7 @@
     }
 }
 
+// Logo bits
 .navbar-brand {
 
     &__logo {
@@ -58,6 +59,7 @@
     }
 }
 
+// Scroll effects
 .navbar-scrolled {
     transition: padding 0.2s linear;
     // padding-top: 0.5rem;
@@ -65,16 +67,34 @@
     box-shadow: 0 2px 0 0 rgba(0, 0, 0, 0.05);
 }
 
+.navbar-light {
+    &.navbar-scrolled {
+        @include linear-gradient(135deg, $blue-3, $blue-1a);
+    }
+}
+
 .navbar-scrolled-quote {
     visibility: hidden;
 }
 
+// Hamburger toggle
 .hamburger {
     position: relative;
     z-index: 1040;
 
     &:focus {
         outline: 0;
+    }
+}
+
+.navbar-light {
+    .hamburger--spring-r .hamburger-inner {
+        &,
+        &::before,
+        &::after {
+            opacity: 0.7;
+            background-color: $white;
+        }
     }
 }
 
@@ -87,6 +107,7 @@
     }
 }
 
+// Utilities
 .show-in-nav {
     position: relative;
     z-index: 1080;

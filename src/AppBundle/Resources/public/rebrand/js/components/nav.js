@@ -23,10 +23,16 @@ $(function() {
         menu.toggleClass('menu--open');
 
         // Toggle logo class
-        logo.toggleClass('navbar-brand__logo-white-light');
+        if (!nav.hasClass('navbar-light')) {
+            logo.toggleClass('navbar-brand__logo-white-light');
+        }
 
         // Toggle the quote btn class
-        quoteBtn.toggleClass('btn-outline-white btn-gradient');
+        if (!nav.hasClass('navbar-light')) {
+            quoteBtn.toggleClass('btn-outline-white btn-gradient');
+        } else {
+            quoteBtn.toggleClass('btn-white btn-outline-white btn-shadow');
+        }
 
         // Prevent scrolling whilst open
         $('body').toggleClass('body--overflow');
