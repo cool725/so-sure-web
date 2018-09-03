@@ -380,6 +380,7 @@ class ValidatePolicyCommand extends BaseCommand
                     '59afaa64e6759b15cc52eee7', // commission diff agreed w/salva
                     '5a0421dec502d01a414f5b53', // commission diff agreed w/salva
                     '5a4681720eb25b15aa49f227', // commission diff agreed w/salva
+                    '58341bfc1d255d3f0a6641c9', // commission diff agreed w/salva
                 ])) {
                     $this->header($policy, $policies, $lines);
                     $lines[] = $this->failureCommissionMessage($policy, $data['prefix'], $data['validateDate']);
@@ -428,14 +429,16 @@ class ValidatePolicyCommand extends BaseCommand
                 $bacsPayments = count($policy->getPaymentsByType(BacsPayment::class));
                 $bankAccount = $policy->getUser()->getBacsPaymentMethod()->getBankAccount();
                 if ($bankAccount->getMandateStatus() == BankAccount::MANDATE_SUCCESS) {
-                    $this->header($policy, $policies, $lines);
                     $isFirstPayment = $bankAccount->isFirstPayment();
                     if ($bacsPayments >= 1 && $isFirstPayment) {
+                        $this->header($policy, $policies, $lines);
                         $lines[] = 'Warning!! 1 or more bacs payments, yet bank has first payment flag set';
                     } elseif ($bacsPayments == 0 && !$isFirstPayment) {
+                        $this->header($policy, $policies, $lines);
                         $lines[] = 'Warning!! No bacs payments, yet bank does not have first payment flag set';
                     }
                     if ($bacsPayments == 0 && $bankAccount->getInitialNotificationDate() > new \DateTime()) {
+                        $this->header($policy, $policies, $lines);
                         $lines[] = 'Warning!! There are no bacs payments, yet its past the initial notification date';
                     }
                 }
