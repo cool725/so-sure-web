@@ -81,3 +81,13 @@
     position: relative;
     z-index: 1080;
 }
+
+.devbar {
+    background-color: rgba(236, 245, 254, 0.5);
+
+    &:hover,
+    &:focus {
+        box-shadow: 0 -2px 0 0 rgba(0, 0, 0, 0.04);
+        background-color: rgba(236, 245, 254, 1);
+    }
+}
