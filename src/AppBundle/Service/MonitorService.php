@@ -158,7 +158,12 @@ class MonitorService
         $cashbacks = $repo->findBy(['status' => Cashback::STATUS_PENDING_CLAIMABLE]);
         foreach ($cashbacks as $cashback) {
             /** @var Cashback $cashback */
-            if ($cashback->getPolicy()->getStatus() != Policy::STATUS_EXPIRED_CLAIMABLE) {
+            // Cashback pending claimable may be present for active policies as well
+            if (!in_array($cashback->getPolicy()->getStatus(), [
+                Policy::STATUS_ACTIVE,
+                Policy::STATUS_UNPAID,
+                Policy::STATUS_EXPIRED_CLAIMABLE,
+            ])) {
                 throw new MonitorException(sprintf(
                     'Cashback status (claimable) for policy id:%s (%s) is incorrect. Policy status %s',
                     $cashback->getPolicy()->getId(),

@@ -380,6 +380,7 @@ class ValidatePolicyCommand extends BaseCommand
                     '59afaa64e6759b15cc52eee7', // commission diff agreed w/salva
                     '5a0421dec502d01a414f5b53', // commission diff agreed w/salva
                     '5a4681720eb25b15aa49f227', // commission diff agreed w/salva
+                    '58341bfc1d255d3f0a6641c9', // commission diff agreed w/salva
                 ])) {
                     $this->header($policy, $policies, $lines);
                     $lines[] = $this->failureCommissionMessage($policy, $data['prefix'], $data['validateDate']);
@@ -391,6 +392,7 @@ class ValidatePolicyCommand extends BaseCommand
                 /** @var PolicyService $policyService */
                 $policyService = $this->getContainer()->get('app.policy');
                 if ($policyService->validatePremium($policy)) {
+                    $this->header($policy, $policies, $lines);
                     $lines[] = sprintf(
                         'WARNING!! - Policy %s has its premium updated',
                         $policy->getPolicyNumber()
@@ -415,6 +417,7 @@ class ValidatePolicyCommand extends BaseCommand
             $refundCommission = $policy->getRefundCommissionAmount();
             if (($refund > 0 && !$this->areEqualToTwoDp(0, $refund)) ||
                 ($refundCommission > 0 && !$this->areEqualToTwoDp(0, $refundCommission))) {
+                $this->header($policy, $policies, $lines);
                 $lines[] = sprintf(
                     'Warning!! Refund Due. Refund %f / Commission %f',
                     $refund,
@@ -428,11 +431,14 @@ class ValidatePolicyCommand extends BaseCommand
                 if ($bankAccount->getMandateStatus() == BankAccount::MANDATE_SUCCESS) {
                     $isFirstPayment = $bankAccount->isFirstPayment();
                     if ($bacsPayments >= 1 && $isFirstPayment) {
+                        $this->header($policy, $policies, $lines);
                         $lines[] = 'Warning!! 1 or more bacs payments, yet bank has first payment flag set';
                     } elseif ($bacsPayments == 0 && !$isFirstPayment) {
+                        $this->header($policy, $policies, $lines);
                         $lines[] = 'Warning!! No bacs payments, yet bank does not have first payment flag set';
                     }
                     if ($bacsPayments == 0 && $bankAccount->getInitialNotificationDate() > new \DateTime()) {
+                        $this->header($policy, $policies, $lines);
                         $lines[] = 'Warning!! There are no bacs payments, yet its past the initial notification date';
                     }
                 }
