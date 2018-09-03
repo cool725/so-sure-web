@@ -29,6 +29,16 @@
             }
         }
     }
+
+    &-light {
+        .navbar-nav {
+
+            .nav-link {
+                color: $white;
+            }
+
+        }
+    }
 }
 
 .navbar-brand {

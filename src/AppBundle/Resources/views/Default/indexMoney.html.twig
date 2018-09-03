@@ -1,125 +1,24 @@
-{% extends 'base.html.twig' %}
+{% extends 'base_rebrand.html.twig' %}
 
 {# Set vars #}
-{% set new_stylesheet = 1 %}
-{% set new_footer = 1 %}
-{% set homepage = 1 %}
-{% set useDropdownSearch = 1 %}
+{% set body_class = 'landing' %}
+{% set light_nav  = 1 %}
 
-{% block title %}so-sure - Welcome to Social Insurance in partnership with Money{% endblock %}
+{% block title %}so-sure - Welcome to Social Insurance with money.co.uk{% endblock %}
 {% block meta %}
     <meta name="description" content="Social mobile phone insurance that's better and up to 80% cheaper when you connect with friends and don't claim. Download our app now to see how much you could save."/>
 {% endblock %}
 
-{% block stylesheets %}
-    {{ parent() }}
-    {% stylesheets output='css/*.css'
-    'components/animate.css/animate.min.css'
-    '@AppBundle/Resources/public/sass/page/money.scss'
-    '@AppBundle/Resources/public/sass/page/comparisonTable.scss'
- %}<link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/landing.css') }}">
 {% endblock %}
 
 {% block body %}
 
-    <section class="section--pad money__hero">
-        <div class="container">
-            <h1 class="text-blue text-center">See How We Compare On Mobile Insurance <br><small class="h-light">with so-sure, we've got you covered</small></h1>
 
-            {% include 'AppBundle::Default/_comparisonTable.html.twig' %}
-
-            {# TrustBox widget - Mini #}
-            <div class="trustpilot-widget" data-locale="en-GB" data-template-id="5419b732fbfb950b10de65e5" data-businessunit-id="588f81d20000ff00059bc1e1" data-style-height="24px" data-style-width="100%" data-theme="light" style="margin:25px 0 0;">
-            <a href="https://uk.trustpilot.com/review/wearesosure.com" target="_blank">Trustpilot</a>
-            </div>
-            {# End TrustBox widget #}
-
-            <div class="text-center">
-                <a href="#" class="btn btn-green btn-pad btn-lg h2 sosure-track" data-toggle="modal" data-target="#quoteModal" data-event="money-cta">Get Insured</a>
-            </div>
-        </div>
-    </section>
-
-    {# Press #}
-    <section class="section--pad money__press">
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-md-12 text-center">
-                    <h4 class="text-center h-light">as seen on</h4>
-                    <img src="{{ cdn_url }}/images/moneycouk.png" alt="Money" class="" width="140px">
-                    <ul class="list-inline press-list text-center">
-                        <li class="press-img" title="The Guardian - Why Facebook and Microsoft say chatbots are the talk of the town"></li>
-                        <li class="press-img" title="Financial Times - Innovation to watch: Friends based insurance"></li>
-                        <li class="press-img" title="Insurance Post - so-sure to launch revolutionary social peer-to-peer mobile insurance app"></li>
-                        <li class="press-img" title="As seen on Money.co.uk"></li>
-                        <li class="press-img" title="Digital Top 50 Awards 2016 - B2C Start-up"></li>
-                        {# <li class="press-img" title="Insurance Choice Awards 2017 - ‘Best Insurance App' + 'Innovation of the Year' categories 2017"></li> #}
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section class="section--pad money__cover">
-        <div class="container">
-            <h2 class="text-center">What's Covered</h2>
-            {% include 'AppBundle::Default/_whatsCovered.html.twig' %}
-        </div>
-    </section>
-
-    <section class="section--pad money__cover_next">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-4">
-                    <img src="{{ cdn_url }}/images/mobile_mike.svg" alt="Mobile Mike" class="">
-                </div>
-                <div class="col-md-8">
-                    <h2 class="text-blue">Premium Cover. Premium Service</h2>
-                    <ul class="list-unstyled">
-                        <li>24-72 hours once claim is approved</li>
-                        <li>Cashback when you and your connections don't claim</li>
-                        <li>Low excess from just &pound;50 when validated using our app</li>
-                        <li>Instant Cover</li>
-                    </ul>
-                </div>
-            </div>
-            <div class="text-center">
-                <a href="#" class="btn btn-green btn-pad btn-lg h2 sosure-track" data-toggle="modal" data-target="#quoteModal" data-event="money-cta">Get Insured</a>
-            </div>
-        </div>
-    </section>
-
-    <section class="section--pad money__feedback">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-8 col-md-offset-2">
-                    <h3 class="text-center">What Our Customers Say</h3>
-                    <div class="speech-bubble animated fadeInLeft clearfix"><mark>Superb service with my first use of so-sure. I couldn't be happier with the way my claim was handled and I got my phone the next day 😁</mark><br><br>
-                    <img src="{{ cdn_url }}/images/feedback/so-sure_feedback_temp.png" alt="" class="img-circle" width="120px;">
-                    <br><small>Ben Allsopp General Manager, Living in London.</small></div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    {# Page Modals #}
-    {% include 'AppBundle::Default/modalQuote.html.twig' with {'selectPhoneMakeType': 'other_pages'} %}
-    {# End Page Modals #}
 
 {% endblock %}
 
-{% block javascripts %}
-    {{ parent() }}
-    {% javascripts
-    'components/lozad/lozad.min.js'
-    'components/dot/doT.min.js'
-    'components/corejs-typeahead/typeahead.bundle.min.js'
-    'components/fuse.js/fuse.min.js'
-    '@AppBundle/Resources/public/js/Default/images.js'
-    '@AppBundle/Resources/public/js/Default/selectPhoneMakeSearch.js'
-    '@AppBundle/Resources/public/js/Default/selectPhoneMakeDropdown.js'
-    '@AppBundle/Resources/public/js/Default/money.js'
- %}
-    <script src="{{ asset_url }}"></script>{% endjavascripts %}
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/landing.js') }}"></script>
 {% endblock %}
-

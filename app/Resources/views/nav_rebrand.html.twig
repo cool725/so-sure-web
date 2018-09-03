@@ -1,6 +1,6 @@
-<nav class="navbar fixed-top justify-content-between flex-nowrap flex-row pl-lg-5">
+<nav class="navbar fixed-top justify-content-between flex-nowrap flex-row pl-lg-5 {% if light_nav is defined and light_nav == 1 %}navbar-light{% endif %}">
     <a href="/" class="navbar-brand show-in-nav show-in-quote">
-        <div class="navbar-brand__logo {% if quote_mode is defined and quote_mode == 1 %}navbar-brand__logo-white-light{% endif %}"></div>
+        <div class="navbar-brand__logo {% if light_nav is defined and light_nav == 1 %}navbar-brand__logo-white-light{% endif %}"></div>
     </a>
     {% if quote_mode is defined and quote_mode == 1 %}
         {# Hide the nav #}
@@ -57,7 +57,7 @@
                 </li>
             {% else %}
                 <li class="nav-item d-none-xxs pr-xl-5">
-                    <a id="quote_btn" href="#" class="btn btn-primary btn-gradient btn-sm show-in-nav get-a-quote">Get a Quote</a>
+                    <a id="quote_btn" href="#" class="btn {% if light_nav is defined and light_nav == 1 %}btn-white btn-shadow{% else %}btn-primary btn-gradient{% endif %} btn-sm show-in-nav get-a-quote">Get a Quote</a>
                 </li>
             {% endif %}
             <li class="nav-item d-none d-xl-block pr-xl-5">
@@ -68,7 +68,7 @@
                         <a href="{{ path('fos_user_security_logout') }}" class="nav-link text-primary">Log out</i></a>
                     {% endif %}
                 {% else %}
-                    <a href="{{ path('fos_user_security_login') }}" class="nav-link text-primary">Customer log in <i class="far fa-arrow-right fa-sm ml-2"></i></a>
+                    <a href="{{ path('fos_user_security_login') }}" class="{% if light_nav is defined and light_nav == 1 %}btn btn-outline-blue1 btn-sm{% else %}nav-link text-primary{% endif %}">Customer log in <i class="far fa-arrow-right fa-sm ml-2"></i></a>
                 {% endif %}
             </li>
             <li class="nav-item d-xl-none">
