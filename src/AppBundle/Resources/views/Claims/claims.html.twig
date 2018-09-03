@@ -55,6 +55,19 @@
                     </div>
                 </div>
                 <div class="row">
+                    <div class="form-group col-sm-5">
+                        {% if is_granted('ROLE_EMPLOYEE') %}
+                            {{ form_label(form.handlingTeam, 'Handling Team', {'label_attr': {'class': 'col-sm-6'}}) }}
+                            {{ form_errors(form.handlingTeam) }}
+                            {{ form_widget(form.handlingTeam, {'attr': {'class': 'col-sm-6'}}) }}
+                        {% else %}
+                            <div class="hidden">
+                                {{ form_widget(form.handlingTeam) }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="row">
                     <div class="form-group">
                       <div class="col-sm-12 text-center">
                         {{ form_widget(form.search, {'label': 'Search', 'attr': {'class': 'btn btn-success'}}) }}
