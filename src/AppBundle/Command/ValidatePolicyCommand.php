@@ -428,14 +428,16 @@ class ValidatePolicyCommand extends BaseCommand
                 $bacsPayments = count($policy->getPaymentsByType(BacsPayment::class));
                 $bankAccount = $policy->getUser()->getBacsPaymentMethod()->getBankAccount();
                 if ($bankAccount->getMandateStatus() == BankAccount::MANDATE_SUCCESS) {
-                    $this->header($policy, $policies, $lines);
                     $isFirstPayment = $bankAccount->isFirstPayment();
                     if ($bacsPayments >= 1 && $isFirstPayment) {
+                        $this->header($policy, $policies, $lines);
                         $lines[] = 'Warning!! 1 or more bacs payments, yet bank has first payment flag set';
                     } elseif ($bacsPayments == 0 && !$isFirstPayment) {
+                        $this->header($policy, $policies, $lines);
                         $lines[] = 'Warning!! No bacs payments, yet bank does not have first payment flag set';
                     }
                     if ($bacsPayments == 0 && $bankAccount->getInitialNotificationDate() > new \DateTime()) {
+                        $this->header($policy, $policies, $lines);
                         $lines[] = 'Warning!! There are no bacs payments, yet its past the initial notification date';
                     }
                 }
