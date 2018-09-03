@@ -21,12 +21,10 @@
                     </a>
                 </li>
             </ul>
-            {% if quote_mode is defined and quote_mode == 1 and app.user is not null and app.user %}
-                {% if is_granted('ROLE_PREVIOUS_ADMIN') %}
-                    <span class="navbar-text"><a href="{{ path('homepage', {'_impersonate': '_exit'}) }}">Exit <strong>{{ app.user.email }}</strong></a></span>
-                {% else %}
-                    <span class="navbar-text"><a href="{{ path('fos_user_security_logout') }}">Logout <strong>{{ app.user.email }}</strong></a></span>
-                {% endif %}
+            {% if is_granted('ROLE_PREVIOUS_ADMIN') %}
+                <span class="navbar-text"><a href="{{ path('homepage', {'_impersonate': '_exit'}) }}">Exit <strong>{{ app.user.email }}</strong></a></span>
+            {% else %}
+                <span class="navbar-text"><a href="{{ path('fos_user_security_logout') }}">Logout <strong>{{ app.user.email }}</strong></a></span>
             {% endif %}
         </div>
     </nav>
