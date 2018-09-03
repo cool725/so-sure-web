@@ -48,7 +48,7 @@ class SixpackService
     const EXPERIMENT_APP_PICSURE_LOCATION = 'app-picsure-location';
     const EXPERIMENT_APP_REQUEST_PICSURE_LOCATION = 'app-request-picsure-location';
     //const EXPERIMENT_STEP_3 = 'step-3-payment-new';
-    const EXPERIMENT_PURCHASE_FLOW_BACS = 'purchase-flow-bacs';
+    // const EXPERIMENT_PURCHASE_FLOW_BACS = 'purchase-flow-bacs';
     // const EXPERIMENT_CPC_QUOTE_HOMEPAGE = 'cpc-quote-or-homepage';
     // const EXPERIMENT_DOB = 'purchase-funnel-dob-dropdown';
     // const EXPERIMENT_72_REPLACEMENT = 'seventytwo-hours';
@@ -67,7 +67,7 @@ class SixpackService
     // Exp 1
     // const EXPERIMENT_HOMEPAGE_NEW_COPY = 'homepage-new-copy';
     // Exp 2
-    const EXPERIMENT_AD_LANDING = 'ad-landing-2';
+    // const EXPERIMENT_AD_LANDING = 'ad-landing-2';
     // Exp 3
     // const EXPERIMENT_STARLING_LANDING = 'starling-landing';
     // Exp 4
@@ -83,8 +83,9 @@ class SixpackService
     // Exp 9
     // const EXPERIMENT_TEXT_VS_DROPDOWN_MOBILE = 'dropdown-search-mobile';
     // Exp 10
-    const EXPERIMENT_WELCOME_MODAL_NO_WELCOME_MODAL = 'welcome-modal-requested-cancellation';
+    // const EXPERIMENT_WELCOME_MODAL_NO_WELCOME_MODAL = 'welcome-modal-requested-cancellation';
     // Exp 11
+    const EXPERIMENT_SOCIAL_AD_LANDING = 'ad-landing-quotepage';
 
     const ALTERNATIVES_SHARE_MESSAGE_SIMPLE = 'simple';
     const ALTERNATIVES_APP_SHARE_METHOD_NATIVE = 'native';
@@ -101,7 +102,7 @@ class SixpackService
     public static $unauthExperiments = [
         // self::EXPERIMENT_HOMEPAGE_AA_V2,
         //self::EXPERIMENT_STEP_3,
-        self::EXPERIMENT_PURCHASE_FLOW_BACS,
+        // self::EXPERIMENT_PURCHASE_FLOW_BACS,
         // self::EXPERIMENT_CPC_QUOTE_HOMEPAGE,
         // self::EXPERIMENT_DOB,
         // self::EXPERIMENT_72_REPLACEMENT,
@@ -119,7 +120,7 @@ class SixpackService
         // Exp 1
         // self::EXPERIMENT_HOMEPAGE_NEW_COPY,
         // Exp 2
-        self::EXPERIMENT_AD_LANDING,
+        // self::EXPERIMENT_AD_LANDING,
         // Exp 3
         // self::EXPERIMENT_STARLING_LANDING,
         // Exp 4
@@ -134,7 +135,7 @@ class SixpackService
         // Exp 8
         // self::EXPERIMENT_TEXT_VS_DROPDOWN_MOBILE,
         // Exp 9
-
+        self::EXPERIMENT_SOCIAL_AD_LANDING,
         // Exp 10
 
     ];
@@ -175,7 +176,7 @@ class SixpackService
     public static $purchaseConversionSimple = [
         // self::EXPERIMENT_CPC_QUOTE_HOMEPAGE,
         //self::EXPERIMENT_STEP_3,
-        self::EXPERIMENT_PURCHASE_FLOW_BACS,
+        // self::EXPERIMENT_PURCHASE_FLOW_BACS,
         // self::EXPERIMENT_72_REPLACEMENT,
         // self::EXPERIMENT_PICSURE_SECTION,
         self::EXPERIMENT_EBAY_LANDING,
@@ -186,7 +187,7 @@ class SixpackService
         // Exp 1
         // self::EXPERIMENT_HOMEPAGE_NEW_COPY,
         // Exp 2
-        self::EXPERIMENT_AD_LANDING,
+        // self::EXPERIMENT_AD_LANDING,
         // Exp 3
         // self::EXPERIMENT_STARLING_LANDING,
         // Exp 4
@@ -194,7 +195,7 @@ class SixpackService
         // Exp 5
         // self::EXPERIMENT_PHONE_REPLACEMENT,
         // Exp 6
-
+        self::EXPERIMENT_SOCIAL_AD_LANDING,
         // Exp 7
 
         // Exp 8

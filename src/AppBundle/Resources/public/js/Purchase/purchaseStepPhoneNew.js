@@ -97,18 +97,22 @@ $(function(){
     }
 
     // Trim as you type
-    // TODO: Rework as it's affecting validation
-    $('.imei').on('keyup paste', function() {
-        var simei  = $(this).val();
+    // TODO: Rework as it's affecting validation - possible fix for now
+    var imei  = $('.imei'),
+        phone = imei.data('make');
 
-        if (simei.indexOf('/') > 1) {
-            var newtxt = simei.replace('/', '');
-            $(this).val(newtxt);
-            $('.samsung-imei').show();
-        }
+    if (phone == 'Samsung') {
+        imei.on('blur', function() {
+            var simei  = $(this).val();
 
-        if ($(this).valid()) {
-            $('.samsung-imei').hide();
-        }
-    });
+            if (simei.indexOf('/') > 1) {
+                var newtxt = simei.replace('/', '');
+                $(this).val(newtxt);
+            }
+
+            if ($(this).valid()) {
+                $('.samsung-imei').hide();
+            }
+        });
+    }
 });

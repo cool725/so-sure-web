@@ -54,7 +54,7 @@
     </div>
 
     {% if data.totalActivePolicies is defined %}
-    <h1>General</h1>
+    <h1 title="{% if data.dataFetchedAt is defined %}Generated at {{ data.dataFetchedAt|date }}{% endif %}">General</h1>
     <h3>Excludes Policies:
         {% for excluded_policy in excluded_policies %}
         <a href="{{ path('admin_policy', {'id': excluded_policy.id }) }}">{{ excluded_policy.policyNumber }}</a>
@@ -393,8 +393,8 @@
     {% endif %}
 
     {% if data.policyConnections is defined %}
-    <h1>Connections</h1>
-    <h3>Across all Dates - Includes all policies</h3>
+        <h1 title="{% if data.dataFetchedAt is defined %}Generated at {{ data.dataFetchedAt|date }}{% endif %}">Connections</h1>
+        <h3>Across all Dates - Includes all policies</h3>
     <div class="table-responsive">
         <table class="table table-striped">
             <thead>
@@ -438,7 +438,7 @@
     {% endif %}
 
     {% if data.scheduledPayments is defined %}
-    <h1>Monthly Billing</h1>
+    <h1 title="{% if data.scheduledPayments.dataFetchedAt is defined %}Generated at {{ data.scheduledPayments.dataFetchedAt|date }}{% endif %}">Monthly Billing</h1>
     <div class="table-responsive">
         <table class="table table-striped">
             <thead>

@@ -52,10 +52,6 @@ class ClaimsServiceTest extends WebTestCase
          self::$invitationService = self::$container->get('app.invitation');
     }
 
-    public function tearDown()
-    {
-    }
-
     private function expect($mailer, $at, $needle)
     {
         $mailer->expects($this->at($at))

@@ -17,3 +17,12 @@ Where did it occur: {{ data.location }}
 Story: {{ data.description }}
 <br>
 Signature: {{ data.signature }}
+<br><br>
+Expected attachments:
+<br>
+{% if data.needProofOfUsage %} - Proof of usage<br>{% endif %}
+{% if data.needProofOfBarring %} - Proof of barring<br>{% endif %}
+{% if data.needProofOfPurchase %} - Proof of purchase<br>{% endif %}
+{% if data.needProofOfLoss %} - Proof of loss<br>{% endif %}
+{% if data.needPictureOfPhone %} - Picture of phone<br>{% endif %}
+<br>

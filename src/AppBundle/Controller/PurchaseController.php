@@ -364,22 +364,24 @@ class PurchaseController extends BaseController
         $webpay = null;
         $allowPayment = true;
 
-        $paymentProviderTest = $this->sixpack(
-            $request,
-            SixpackService::EXPERIMENT_PURCHASE_FLOW_BACS,
-            ['judo', 'bacs'],
-            SixpackService::LOG_MIXPANEL_CONVERSION,
-            null,
-            0.1
-        );
-        $bacsFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_BACS);
-        // For now, only allow 1 policy with bacs
-        if ($bacsFeature && count($user->getValidPolicies(true)) >= 1) {
-            $bacsFeature = false;
-        }
-        if (!$bacsFeature) {
-            $paymentProviderTest = 'judo';
-        }
+        // $paymentProviderTest = $this->sixpack(
+        //     $request,
+        //     SixpackService::EXPERIMENT_PURCHASE_FLOW_BACS,
+        //     ['judo', 'bacs'],
+        //     SixpackService::LOG_MIXPANEL_CONVERSION,
+        //     null,
+        //     0.1
+        // );
+        // $bacsFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_BACS);
+        // // For now, only allow 1 policy with bacs
+        // if ($bacsFeature && count($user->getValidPolicies(true)) >= 1) {
+        //     $bacsFeature = false;
+        // }
+        // if (!$bacsFeature) {
+        //     $paymentProviderTest = 'judo';
+        // }
+
+        $paymentProviderTest = 'judo';
 
         //$this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_POSTCODE);
         if ('POST' === $request->getMethod()) {
@@ -1062,8 +1064,9 @@ class PurchaseController extends BaseController
 
     /**
      * @Route("/cancel/{id}", name="purchase_cancel")
+     * @Route("/cancel/damaged/{id}", name="purchase_cancel_damaged")
      * @Template
-    */
+     */
     public function cancelAction(Request $request, $id)
     {
         $dm = $this->getManager();
@@ -1116,11 +1119,6 @@ class PurchaseController extends BaseController
                         ['Policy Id' => $policy->getId(), 'Reason' => $reason]
                     );
 
-                    $this->get('app.sixpack')->convertByClientId(
-                        $policy->getUser()->getId(),
-                        SixpackService::EXPERIMENT_WELCOME_MODAL_NO_WELCOME_MODAL
-                    );
-
                     // @codingStandardsIgnoreStart
                     $this->addFlash(
                         'success',
@@ -1137,7 +1135,11 @@ class PurchaseController extends BaseController
             );
         }
 
-        $template = 'AppBundle:Purchase:cancel.html.twig';
+        if ($request->get('_route') == "purchase_cancel_damaged") {
+            $template = 'AppBundle:Purchase:cancelDamaged.html.twig';
+        } else {
+            $template = 'AppBundle:Purchase:cancel.html.twig';
+        }
         $data = [
             'policy' => $policy,
             'cancel_form' => $cancelForm->createView(),
