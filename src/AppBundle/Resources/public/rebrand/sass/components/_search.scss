@@ -38,6 +38,12 @@
             outline: 0;
         }
 
+        .sub {
+            > option {
+                font-size: 16px;
+            }
+        }
+
         @include media-breakpoint-up(sm) {
             background-position:  right 20px;
 
