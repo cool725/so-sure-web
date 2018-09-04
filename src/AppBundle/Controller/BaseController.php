@@ -1062,6 +1062,21 @@ abstract class BaseController extends Controller
         return $exp;
     }
 
+    protected function sixpackSimple($name, Request $request = null)
+    {
+        $sixpack = $this->get('app.sixpack');
+        $exp = $sixpack->runningSixpackExperiment($name);
+
+        if ($request) {
+            $override = $request->get('force');
+            if ($override && in_array($override, $sixpack->getOptionsAvailable($name))) {
+                return $override;
+            }
+        }
+
+        return $exp;
+    }
+
     protected function isRealUSAIp(Request $request)
     {
         $geoip = $this->get('app.geoip');

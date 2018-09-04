@@ -1,6 +1,7 @@
 <?php
 namespace AppBundle\Service;
 
+use App\Experiments;
 use Psr\Log\LoggerInterface;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use AppBundle\Document\Stats;
@@ -8,6 +9,7 @@ use AppBundle\Document\DateTrait;
 use AppBundle\Service\StatsService;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
+use Symfony\Component\HttpFoundation\Request;
 
 class SixpackService
 {
@@ -271,6 +273,31 @@ class SixpackService
         $this->url = $url;
         $this->requestService = $requestService;
         $this->mixpanel = $mixpanel;
+    }
+
+    public function getOptionsAvailable(string $testName)
+    {
+        return Experiments::optionsAvailable($testName);
+    }
+
+    public function runningSixpackExperiment(
+        string $name,
+        $logMixpanel = self::LOG_MIXPANEL_NONE,
+        $trafficFraction = 1,
+        $clientId = null,
+        $force = null
+    ) {
+        $options = $this->getOptionsAvailable($name);
+
+        // @todo replace with a direct call (or vice versa) to  self::runningExperiment(...)
+        $experiment = $this->participate($name, $options, $logMixpanel, $trafficFraction, $clientId, $force);
+
+        /*Request $request,
+        $override = $request->get('force');
+        if ($override && in_array($override, $options)) {
+            $experiment = $override;
+        }*/
+        return $experiment;
     }
 
     public function participate(
