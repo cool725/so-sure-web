@@ -56,7 +56,7 @@ $theme-colors: (
 
 // Gradients
 .blue-gradient-ld {
-    @include linear-gradient(90deg, $blue-1a, $blue-3);
+    @include linear-gradient(135deg, $blue-3, $blue-1a);
 }
 
 .blue-gradient-dl {

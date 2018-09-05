@@ -19,10 +19,251 @@
         <div class="container container-xtra">
             <div class="hero__intro">
                 <h1 class="mb-2 text-white">See How We Compare On Mobile Insurance</h1>
-                <p class="lead text-blue1">with so-sure, we've got you covered</p>
+                <p class="lead text-blue1 mb-5">with so-sure, we've got you covered</p>
             </div>
             <div class="hero__controls">
-
+                <a href="#" class="btn btn btn-outline-blue1 btn-lg btn-block-xs get-a-quote  mb-5">Get Insured  <i class="far fa-arrow-right fa-sm ml-2"></i></a>
+            </div>
+            <table width="100%" class="table-comparison table-comparison-carousel light-table d-table d-sm-none">
+                <thead>
+                    <tr>
+                        <th width="50%" class="blue-gradient-ld">
+                            <img src="{{ cdn_url }}/images/rebrand/logo/so-sure_logo-white-dark.svg" width="80px" alt="so-sure">
+                        </th>
+                        <th width="50%" class="b4">
+                            <a href="#" class="td-prev-btn"><i class="fal fa-angle-left fa-3x text-blue1"></i></a>
+                            <div class="td-container">
+                                <span class="td-swap td-active">
+                                    Protect Your Bubble
+                                </span>
+                                <span class="td-swap">
+                                    Love it Cover it
+                                </span>
+                                <span class="td-swap">
+                                    Gadget Cover
+                                </span>
+                            </div>
+                            <a href="#" class="td-next-btn"><i class="fal fa-angle-right fa-3x text-blue1"></i></a>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="td-30 bb1" colspan="2" align="center">
+                            <strong>Time to Repair/replace</strong>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="b2a">
+                            <strong>24 - 72</strong> <div>hours</div>
+                            <a href="#"
+                               class="td-info-btn"
+                               data-toggle="modal"
+                               data-target="#policy_24_72_hours"
+                               role="button">
+                                <i class="fal fa-info-circle fa-lg"></i>
+                            </a>
+                        </td>
+                        <td class="wh">
+                            <div class="td-container">
+                                <span class="td-swap td-active">
+                                    <strong>2 - 5</strong> <div>work days</div>
+                                </span>
+                                <span class="td-swap">
+                                    <strong>3+</strong> <div>work days</div>
+                                </span>
+                                <span class="td-swap">
+                                    <strong>2 - 7</strong> <div>work days</div>
+                                </span>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="td-30 bb1" colspan="2" align="center">
+                            <strong>Broken phone excess</strong>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="b2a">
+                            from <strong>&pound;50</strong>
+                            <a href="#"
+                               class="td-info-btn"
+                               data-toggle="modal"
+                               data-target="#policy_excess_50"
+                               role="button">
+                                <i class="fal fa-info-circle fa-lg"></i>
+                            </a>
+                        </td>
+                        <td class="wh">
+                            <div class="td-container">
+                                <span class="td-swap td-active">
+                                    <strong>&pound;90</strong>
+                                </span>
+                                <span class="td-swap">
+                                    <strong>&pound;80</strong>
+                                </span>
+                                <span class="td-swap">
+                                    <strong>&pound;75</strong>
+                                </span>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="td-30 bb1" colspan="2" align="center">
+                            <strong>Loss, Theft &amp; Damage Cover</strong>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="b2a">
+                            <i class="far fa-check fa-2x"></i>
+                        </td>
+                        <td class="wh">
+                            <div class="td-container">
+                                <span class="td-swap td-active">
+                                    + <strong>&pound;1.50</strong> Loss
+                                </span>
+                                <span class="td-swap">
+                                    + <strong>&pound;2</strong> Damage
+                                </span>
+                                <span class="td-swap">
+                                    + <strong>&pound;2</strong> Loss
+                                </span>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="td-30 bb1" colspan="2" align="center">
+                            <strong>Proof of purchase required?</strong>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="b2a">
+                            <strong>No</strong>
+                            <a href="#"
+                               class="td-info-btn"
+                               data-toggle="modal"
+                               data-target="#policy_pop"
+                               role="button">
+                                <i class="fal fa-info-circle fa-lg"></i>
+                            </a>
+                        </td>
+                        <td class="wh">
+                            <div class="td-container">
+                                <span class="td-swap td-active">
+                                    <strong>Yes</strong>
+                                </span>
+                                <span class="td-swap">
+                                    <strong>Yes</strong>
+                                </span>
+                                <span class="td-swap">
+                                    <strong>Yes</strong>
+                                </span>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="td-30 bb1" colspan="2" align="center">
+                            <strong>Age of phones insured</strong>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="b2a">
+                            <strong>&lt; 3</strong> Years
+                        </td>
+                        <td class="wh">
+                            <div class="td-container">
+                                <span class="td-swap td-active">
+                                    <strong>&lt; 6</strong> Months
+                                </span>
+                                <span class="td-swap">
+                                    <strong>&lt; 3</strong> Years
+                                </span>
+                                <span class="td-swap">
+                                    <strong>&lt; 18</strong> Months
+                                </span>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <table class="table-comparison light-table d-none d-sm-block mx-auto mt-lg-5">
+                <thead>
+                    <tr>
+                        <th width="24%" class="wh h5 text-left text-primary">Features</th>
+                        <th width="19%" class="blue-gradient-ld"><img src="{{ cdn_url }}/images/rebrand/logo/so-sure_logo-white-dark.svg" width="120px" alt="so-sure"></th>
+                        <th width="19%" class="b4 bs-l">Protect Your Bubble</th>
+                        <th width="19%" class="b4">Love it <br> Cover it</th>
+                        <th width="19%" class="b4">Gadget <br> Cover</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="bb1 text-left"><strong>Time to Repair/replace</strong></td>
+                        <td class="b2">
+                            <strong>24 - 72</strong> <div>hours</div>
+                            <a href="#"
+                               class="td-info-btn"
+                               data-toggle="modal"
+                               data-target="#policy_24_72_hours"
+                               role="button">
+                                <i class="fal fa-info-circle fa-lg"></i>
+                            </a>
+                        </td>
+                        <td class="bb1 bs-l"><strong>2 - 5</strong> <div>work days</div></td>
+                        <td class="bb1"><strong>3+</strong> <div>work days</div></td>
+                        <td class="bb1"><strong>2 - 7</strong> <div>work days</div></td>
+                    </tr>
+                    <tr>
+                        <td class="wh text-left"><strong>Broken phone excess</strong></td>
+                        <td class="b2a">
+                            from <strong>&pound;50</strong>
+                            <a href="#"
+                               class="td-info-btn"
+                               data-toggle="modal"
+                               data-target="#policy_excess_50"
+                               role="button">
+                                <i class="fal fa-info-circle fa-lg"></i>
+                            </a>
+                        </td>
+                        <td class="wh bs-l"><strong>&pound;90</strong></td>
+                        <td class="wh"><strong>&pound;80</strong></td>
+                        <td class="wh"><strong>&pound;75</strong></td>
+                    </tr>
+                    <tr>
+                        <td class="bb1 text-left"><strong>Loss, Theft &amp; Damage Cover</strong></td>
+                        <td class="b2"><i class="far fa-check fa-2x"></i></td>
+                        <td class="bb1 bs-l">+ <strong>&pound;1.50</strong> Loss</td>
+                        <td class="bb1">+ <strong>&pound;2</strong> Damage</td>
+                        <td class="bb1">+ <strong>&pound;2</strong> Loss</td>
+                    </tr>
+                    <tr>
+                        <td class="wh text-left"><strong>Proof of purchase required?</strong></td>
+                        <td class="b2a">
+                            <strong>No</strong>
+                            <a href="#"
+                               class="td-info-btn"
+                               data-toggle="modal"
+                               data-target="#policy_pop"
+                               role="button">
+                                <i class="fal fa-info-circle fa-lg"></i>
+                            </a>
+                        </td>
+                        <td class="wh bs-l"><strong>Yes</strong></td>
+                        <td class="wh"><strong>Yes</strong></td>
+                        <td class="wh"><strong>Yes</strong></td>
+                    </tr>
+                    <tr>
+                        <td class="bb1 text-left"><strong>Age of phones insured</strong></td>
+                        <td class="b2"><strong>&lt; 3</strong> Years</td>
+                        <td class="bb1 bs-l"><strong>&lt; 6</strong> Months</td>
+                        <td class="bb1"><strong>&lt; 3</strong> Years</td>
+                        <td class="bb1"><strong>&lt; 18</strong> Months</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="hero__partner-logo d-flex justify-content-center align-items-center mt-5">
+                <h6 class="text-blue4 mr-3">As seen on:</h6>
+                <img src="{{ cdn_url }}/images/moneycouk.png" alt="money.co.uk" width="120px">
             </div>
         </div>
         <svg  preserveAspectRatio="xMinYMin meet" viewBox="0 0 750 77" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -39,11 +280,6 @@
 
     <section class="comparison">
         <div class="container container-xtra">
-            TABLE
-            <div class="d-flex justify-content-center align-items-center my-4">
-                <h6 class="text-blue4 mr-3">As seen on:</h6>
-                <img src="{{ cdn_url }}/images/moneycouk.png" alt="money.co.uk" width="120px">
-            </div>
         </div>
     </section>
 
@@ -351,6 +587,9 @@
             </div>
         </div>
     </section>
+
+    {# Page Modals #}
+    {% include 'AppBundle::PhoneInsurance/_policyInfoModals.html.twig' %}
 
 {% endblock %}
 

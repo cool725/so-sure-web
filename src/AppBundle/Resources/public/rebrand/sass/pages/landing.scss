@@ -29,17 +29,54 @@
     svg {
         position: absolute;
         bottom: -1px; left: 0;
+        z-index: 1;
+    }
 
+    .table-comparison {
+        position: relative;
+        z-index: 4;
+    }
+
+    &__partner-logo {
+        position: relative;
+        z-index: 4;
+    }
+
+    // Height so table overlaps
+    height: 500px;
+
+    @include media-breakpoint-up(sm) {
+        height: 600px;
+    }
+
+    @include media-breakpoint-up(md) {
+        height: 650px;
     }
 
     @include media-breakpoint-up(lg) {
         padding-top: 12rem;
-        padding-bottom: 12rem;
+        height: 700px;
     }
 }
 
 .comparison {
     background-color: $white;
+    position: relative;
+
+    // Height so table overlaps
+    height: 600px;
+
+    @include media-breakpoint-up(sm) {
+        height: 400px;
+    }
+
+    @include media-breakpoint-up(md) {
+        height: 325px;
+    }
+
+    @include media-breakpoint-up(lg) {
+        height: 350px;
+    }
 }
 
 .why {
@@ -107,6 +144,7 @@
 
     .carousel-inner {
         min-height: 280px;
+        background: $bb-2 url('#{$cdn_url}/images/rebrand/misc/so-sure_quote-background.svg') no-repeat right 50%;
 
         @include media-breakpoint-up(lg) {
             min-height: none;
