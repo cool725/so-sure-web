@@ -3,7 +3,9 @@
 .btn {
     font-family: $g-medium;
 
-    .far {
+    .far,
+    .fab,
+    .fas {
         vertical-align: middle;
     }
 }
@@ -12,17 +14,11 @@
 .btn-shadow {
     box-shadow: 0 15px 30px 0 rgba(8,27,154,0.08),
                 0 5px 15px 0 rgba(8,27,154,0.08);
-}
 
-// JULES CRAP
-.btn-shadow-jules {
-    box-shadow: 0 15px 30px 0 rgba(8,27,154,0.2),
-                0 5px 15px 0 rgba(8,27,154,0.2);
-
-    &:hover {
-        box-shadow: 0 15px 30px 0 rgba(8,27,154,0.4),
-                    0 5px 15px 0 rgba(8,27,154,0.4);
-    }                
+    // &:hover {
+    //     box-shadow: 0 15px 30px 0 rgba(8,27,154,0.1),
+    //                 0 5px 15px 0 rgba(8,27,154,0.1);
+    // }
 }
 
 // Modify white btns to match design
@@ -43,10 +39,10 @@
 // Add gradient to button rather than modifying the core css
 .btn-gradient-green {
     border: none;
-    // @include linear-gradient(90deg, $green, $green-2);
+    @include linear-gradient(90deg, $green, $green-2);
 
     &:hover {
-        // @include linear-gradient(90deg, $green-2, $green);
+        @include linear-gradient(90deg, $green-2, $green);
     }
 }
 
@@ -56,12 +52,17 @@
     @include border-radius(4px);
 }
 
+.btn-circle {
+    width: 50px; height: 50px;
+    @include border-radius(50%);
+}
+
 // Button block mobile only - make buttons full width xs < down
 @include media-breakpoint-down(xs) {
 
     .btn-block-xs {
         display: block;
-        width: 95%;
+        width: 100%;
         padding-top: .9rem;
         padding-bottom: .9rem;
         margin-left: auto;

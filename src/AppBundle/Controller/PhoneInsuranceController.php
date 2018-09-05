@@ -336,13 +336,21 @@ class PhoneInsuranceController extends BaseController
             ->createNamedBuilder('buy_form')
             ->add('buy_tablet', SubmitType::class)
             ->add('slider_used', HiddenType::class)
-            ->add('claim_used', HiddenType::class)
             ->getForm();
         $buyBannerForm = $this->get('form.factory')
             ->createNamedBuilder('buy_form_banner')
             ->add('buy', SubmitType::class)
             ->add('slider_used', HiddenType::class)
-            ->add('claim_used', HiddenType::class)
+            ->getForm();
+        $buyBannerTwoForm = $this->get('form.factory')
+            ->createNamedBuilder('buy_form_banner_two')
+            ->add('buy', SubmitType::class)
+            ->add('slider_used', HiddenType::class)
+            ->getForm();
+        $buyBannerThreeForm = $this->get('form.factory')
+            ->createNamedBuilder('buy_form_banner_three')
+            ->add('buy', SubmitType::class)
+            ->add('slider_used', HiddenType::class)
             ->getForm();
 
         if ('POST' === $request->getMethod()) {
@@ -396,13 +404,9 @@ class PhoneInsuranceController extends BaseController
                     if ($buyForm->get('buy_tablet')->isClicked()) {
                         $properties['Location'] = 'main';
                     }
-
-                    if ($buyForm->getData()['slider_used']) {
-                        $properties['Played with Slider'] = true;
-                    }
-                    if ($buyForm->getData()['claim_used']) {
-                        $properties['Played with Claims'] = true;
-                    }
+                    // if ($buyForm->getData()['claim_used']) {
+                    //     $properties['Played with Claims'] = true;
+                    // }
                     $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_BUY_BUTTON_CLICKED, $properties);
 
                     // Multipolicy should skip user details
@@ -417,13 +421,46 @@ class PhoneInsuranceController extends BaseController
                 $buyBannerForm->handleRequest($request);
                 if ($buyBannerForm->isValid()) {
                     $properties = [];
-                    $properties['Location'] = 'banner';
-                    if ($buyBannerForm->getData()['slider_used']) {
-                        $properties['Played with Slider'] = true;
+                    $properties['Location'] = 'seeFullDetailsMobile';
+                    // if ($buyForm->getData()['claim_used']) {
+                    //     $properties['Played with Claims'] = true;
+                    // }
+                    $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_BUY_BUTTON_CLICKED, $properties);
+
+                    // Multipolicy should skip user details
+                    if ($this->getUser() && $this->getUser()->hasPolicy()) {
+                        // don't check for partial partial as quote phone may be different from partial policy phone
+                        return $this->redirectToRoute('purchase_step_policy');
+                    } else {
+                        return $this->redirectToRoute('purchase');
                     }
-                    if ($buyForm->getData()['claim_used']) {
-                        $properties['Played with Claims'] = true;
+                }
+            } elseif ($request->request->has('buy_form_banner_two')) {
+                $buyBannerTwoForm->handleRequest($request);
+                if ($buyBannerTwoForm->isValid()) {
+                    $properties = [];
+                    $properties['Location'] = 'seeFullDetailsDesktop';
+                    // if ($buyForm->getData()['claim_used']) {
+                    //     $properties['Played with Claims'] = true;
+                    // }
+                    $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_BUY_BUTTON_CLICKED, $properties);
+
+                    // Multipolicy should skip user details
+                    if ($this->getUser() && $this->getUser()->hasPolicy()) {
+                        // don't check for partial partial as quote phone may be different from partial policy phone
+                        return $this->redirectToRoute('purchase_step_policy');
+                    } else {
+                        return $this->redirectToRoute('purchase');
                     }
+                }
+            } elseif ($request->request->has('buy_form_banner_three')) {
+                $buyBannerThreeForm->handleRequest($request);
+                if ($buyBannerThreeForm->isValid()) {
+                    $properties = [];
+                    $properties['Location'] = 'sidebar';
+                    // if ($buyForm->getData()['claim_used']) {
+                    //     $properties['Played with Claims'] = true;
+                    // }
                     $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_BUY_BUTTON_CLICKED, $properties);
 
                     // Multipolicy should skip user details
@@ -467,40 +504,21 @@ class PhoneInsuranceController extends BaseController
                     'Monthly Cost' => $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
                 ]);
             }
-
-            // $this->get('app.sixpack')->convert(
-            //     SixpackService::EXPERIMENT_HOMEPAGE_AA_V2
-            // );
         }
 
-        // $replacement = $this->sixpack(
-        //     $request,
-        //     SixpackService::EXPERIMENT_PHONE_REPLACEMENT,
-        //     ['default', 'next-working-day', 'twentyfour-seventy-two'],
-        //     SixpackService::LOG_MIXPANEL_CONVERSION,
-        //     null,
-        //     "0.00000001"
-        // );
-
-        // $this->get('app.sixpack')->convert(
-        //     SixpackService::EXPERIMENT_TEXT_VS_DROPDOWN
-        // );
-
-        // $this->get('app.sixpack')->convert(
-        //     SixpackService::EXPERIMENT_TEXT_VS_DROPDOWN_MOBILE
-        // );
-
         $data = array(
-            'phone'            => $phone,
-            'phone_price'      => $phone->getCurrentPhonePrice(),
-            'policy_key'       => $this->getParameter('policy_key'),
-            'connection_value' => PhonePolicy::STANDARD_VALUE,
-            'annual_premium'   => $annualPremium,
-            'max_connections'  => $maxConnections,
-            'max_pot'          => $maxPot,
-            'lead_form'        => $leadForm->createView(),
-            'buy_form'         => $buyForm->createView(),
-            'buy_form_banner'  => $buyBannerForm->createView(),
+            'phone'                 => $phone,
+            'phone_price'           => $phone->getCurrentPhonePrice(),
+            'policy_key'            => $this->getParameter('policy_key'),
+            'connection_value'      => PhonePolicy::STANDARD_VALUE,
+            'annual_premium'        => $annualPremium,
+            'max_connections'       => $maxConnections,
+            'max_pot'               => $maxPot,
+            'lead_form'             => $leadForm->createView(),
+            'buy_form'              => $buyForm->createView(),
+            'buy_form_banner'       => $buyBannerForm->createView(),
+            'buy_form_banner_two'   => $buyBannerTwoForm->createView(),
+            'buy_form_banner_three' => $buyBannerTwoForm->createView(),
             'phones'           => $repo->findBy(
                 [
                     'active'         => true,

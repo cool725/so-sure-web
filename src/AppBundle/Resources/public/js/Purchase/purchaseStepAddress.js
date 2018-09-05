@@ -35,7 +35,7 @@ sosure.purchaseStepAddress = (function() {
             // When to validate
             validClass: 'is-valid-ss',
             // errorClass: 'is-invalid',
-            // onfocusout: false,
+            onfocusout: false,
             onkeyup: false,
             onclick: false,
             groups: {
@@ -235,7 +235,7 @@ sosure.purchaseStepAddress = (function() {
           url: "https://services.postcodeanywhere.co.uk/CapturePlus/Interactive/Find/v2.10/json3.ws",
           prepare: function (query, settings) {
               if (query && (query.toLowerCase() == "bx11lt" || query.toLowerCase() == "bx1 1lt")) {
-                  //sosure.purchaseStepAddress.showAddress();
+                  sosure.purchaseStepAddress.showAddress();
                   self.setAddress({'Line1': '123 test', 'City': 'Unknown', 'PostalCode': 'bx1 1lt'});
                   $('.typeahead .with-errors').html('');
               }

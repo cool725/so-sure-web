@@ -10,6 +10,7 @@
     }
 }
 
+// Add extra paddin to container on smaller devices
 .container-xtra {
     @media (max-width: 420px) {
         padding-left: 20px;
@@ -17,24 +18,24 @@
     }
 }
 
-.bordered-columns {
-
-    @include media-breakpoint-up(md) {
-        > div {
-            border-right: 2px dotted lighten($grey, 20%);
-
-            &:last-of-type {
-                border: none;
-            }
-        }
-    }
-}
-
-
 // Hide on XXS mobile
 @media (max-width: 340px) {
 
     .d-none-xxs {
         display: none !important;
+    }
+}
+
+// Hide the scrollbars
+.hide-bars {
+    overflow-y: scroll;
+
+    // IE
+    -ms-overflow-style: none;
+
+    // Webkit
+    &::-webkit-scrollbar {
+        width: 0;
+        background: transparent;
     }
 }
