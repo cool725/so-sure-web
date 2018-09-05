@@ -2,7 +2,7 @@
 {% form_theme purchase_form 'AppBundle:Form:fields.html.twig' %}
 
 {# Set vars #}
-{% set body_class = 'quote' %}
+{% set body_class = 'purchase' %}
 {% set light_logo = 1 %}
 {% set quote_mode = 1 %}
 
@@ -22,21 +22,21 @@
 
 {% block body %}
 
-    <section class="purchase">
+    <section class="qpw">
         <div class="d-lg-flex">
 
             {% if phone %}
-                <div class="purchase__details__container">
-                    <div class="purchase__details px-4 pb-4 px-lg-5 pb-lg-0">
-                        <div class="purchase__h5 text-white mb-4 h5 d-none d-lg-block">Here’s your quote details, Insure your:</div>
-                        <div class="d-flex justify-content-center align-items-center justify-content-lg-start">
-                            <h1 class="purchase__h1 text-blue1b mb-2">
+                {# Main Content #}
+                <div class="qpw__main__container">
+                    <div class="qpw__main px-4 px-lg-5">
+                        <div class="d-flex justify-content-center justify-content-lg-start align-items-center justify-content-lg-start">
+                            <h1 class="qpw__h1 text-blue1b">
                                 <span class="sub">
                                     {{ phone.make }} {{ phone.model }}
                                     <small>({{ phone.memory }}GB)</small>
                                 </span>
                             </h1>
-                            <div class="purchase__alt__phones dropdown dropleft">
+                            <div class="qpw__alt__phones dropdown dropleft">
                                 <a href="#"
                                    class="dropdown-toggle"
                                    id="dropdownMenuLink"
@@ -63,17 +63,22 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="purchase__h1 text-white text-center text-lg-left h1">
+                        <div class="qpw__h1 h1 text-center text-lg-left text-white mb-4">
                             <span class="sub">For only</span>
-                            <span id="purchase_price">
-                                {% if not app.user or app.user.allowedMonthlyPayments %}
-                                    &pound;{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }} a month
-                                {% else %}
-                                    &pound;{{ phone.currentPhonePrice.yearlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }} a year
-                                {% endif %}
-                            </span>
+                            {% if not app.user or app.user.allowedMonthlyPayments %}
+                                &pound;{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }} a month
+                            {% else %}
+                                &pound;{{ phone.currentPhonePrice.yearlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }} a year
+                            {% endif %}
                         </div>
-                        <div class="purchase__footer d-none d-lg-block mt-5">
+                        <div class="qpw__h5 h5 d-block d-lg-none text-center">
+                            <a href="#qpw-info-mobile"
+                               id="qpw-info-btn"
+                               class="text-white">
+                                see full details <i class="fas fa-caret-down ml-2"></i>
+                            </a>
+                        </div>
+                        <div class="qpw__footer d-none d-lg-block mt-5 pt-lg-5">
                             <div class="purchase__footer__text">
                                 <h4 class="text-blue1">An amazing level of cover:</h4>
                                 <ul class="list-unstyled icn-fa-list">
@@ -81,35 +86,38 @@
                                     <li class="text-white mb-2"><i class="far fa-check text-blue1 fa-lg"></i> Instant Cover and 24/7 live support</li><li class="text-white"><i class="far fa-check text-blue1 fa-lg"></i> 24-72 replacement phone once claim approved</li>
                                 </ul>
                             </div>
-                            <div class="purchase__footer__cta">
-                                <a href="#purchase_info"
+                            <div class="qpw__footer__cta">
+                                <a href="#qpw-info"
                                    class="btn btn-outline-blue1 mt-2 toggle-text"
                                    data-toggle="collapse"
-                                   data-text-swap='Hide full details <i class="fas fa-caret-up ml-2"></i>'
+                                   data-target="#qpw-info"
+                                   data-text-swap='hide full details <i class="fas fa-caret-up ml-2"></i>'
                                    role="button"
                                    aria-expanded="false"
-                                   aria-controls="purchase_info">See full details
+                                   aria-controls="qpw-info">see full details
                                    <i class="fas fa-caret-down ml-2"></i>
                                </a>
                             </div>
                         </div>
                     </div>
-                    <div id="purchase_info" class="purchase__info__container collapse">
+
+                    <div id="qpw-info" class="qpw__info__container mt-4 collapse">
                         {% include 'AppBundle::PhoneInsurance/_seeFullDetails.html.twig' %}
                     </div>
-                </div>
 
-                <div class="purchase__curve">
-                    <svg class="d-block d-lg-none" preserveAspectRatio="xMinYMin meet" viewBox="0 0 750 117" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-                        <defs></defs>
+
+                    {# Curve Mobile #}
+                    <svg class="d-block d-lg-none" preserveAspectRatio="xMinYMin meet" viewBox="0 0 750 47" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
                         <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-                            <g transform="translate(0.000000, -32.000000)" fill="#FFFFFF">
-                                <g id="---BG---" transform="translate(-4700.000000, -8443.000000)">
-                                    <path d="M4700,8515 C4824,8488.33333 4948.66667,8475 5074,8475 C5199.33333,8475 5324.66667,8488.33333 5450,8515 L5450,8592 L4700,8592 L4700,8515 Z" id="Rectangle"></path>
-                                </g>
+                            <g id="Artboard-Copy" fill="#0068ED">
+                                <path d="M0,0 L750,0 L750,47 C625,18.3333333 500,4 375,4 C250,4 125,18.3333333 0,47 L0,0 Z" id="Rectangle-2"></path>
                             </g>
                         </g>
                     </svg>
+                </div>
+
+                {# Curve Desktop #}
+                <div class="qpw__curve">
                     <svg class="d-none d-lg-block" preserveAspectRatio="xMinYMin meet" viewBox="0 0 57 846" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
                         <defs></defs>
                         <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -120,14 +128,28 @@
                     </svg>
                 </div>
 
-                <div class="purchase__form__container px-4 pb-4 pt-0 py-lg-5">
-                    {% include 'AppBundle::Purchase/_purchaseStepsRebrand.html.twig' %}
-                    {% include 'AppBundle::Purchase/_currentStepPersonalPhoneReview.html.twig' %}
+                {# Sub Content #}
+                <div class="qpw__sub__container">
+                    <div class="qpw__sub px-4 pb-4 pt-5 p-lg-5">
+                        {% include 'AppBundle::Purchase/_purchaseStepsRebrand.html.twig' %}
+                        {% include 'AppBundle::Purchase/_currentStepPersonalPhoneReview.html.twig' %}
+                    </div>
                 </div>
+
+            <div id="qpw-info-mobile" class="qpw__info__container__mobile  d-block d-lg-none">
+                <svg preserveAspectRatio="xMinYMin meet" viewBox="0 0 750 47" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                        <g id="Artboard" fill="#FFFFFF">
+                            <path d="M374,0 C499.333333,0 624.666667,15.6666667 750,47 L0,47 C124,15.6666667 248.666667,8.69674703e-16 374,0 Z" id="Rectangle" transform="translate(375.000000, 23.500000) scale(1, -1) translate(-375.000000, -23.500000) "></path>
+                        </g>
+                    </g>
+                </svg>
+                {% include 'AppBundle::PhoneInsurance/_seeFullDetails.html.twig' %}
+            </div>
             {% else %}
                 <div class="purchase__details__container">
-                    <div class="purchase__details px-4 pb-4 px-lg-5 pb-lg-0">
-                        <h2 class="text-white h1 mb-5">Whoops, no phone selected...</h2>
+                    <div class="purchase__details p-4 p-lg-5 mt-5">
+                        <h2 class="text-white h1 mb-5">Whoops, no phone selected... 😩</h2>
                         <a href="#" class="btn btn-success btn-shadow btn-block-xs mb-5 get-a-quote">Get a Quote</a>
                     </div>
                 </div>
@@ -136,58 +158,7 @@
     </section>
 
     {# Page Modals #}
-    <div class="modal fade"
-         id="purchase_policy_imei_number"
-         tabindex="-1" role="dialog"
-         aria-labelledby="purchase_policy_imei_number"
-         aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">IMEI Number</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <i class="fal fa-times text-white"></i>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col-sm-3">
-                            <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_phone-smile.png" alt="so-sure - Policy" class="mb-4" width="120px">
-                        </div>
-                        <div class="col-sm-8 offset-sm-1">
-                            <small>Unlike other insurers we ask for this now, so if your phone is lost of stolen you don't have the additional hassle of finding this information.</small>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="modal fade"
-         id="purchase_policy_serial_number"
-         tabindex="-1" role="dialog"
-         aria-labelledby="purchase_policy_serial_number"
-         aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Serial Number</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <i class="fal fa-times text-white"></i>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col-sm-3">
-                            <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_phone-smile.png" alt="so-sure - Policy" class="mb-4" width="120px">
-                        </div>
-                        <div class="col-sm-8 offset-sm-1">
-                            <small>Unlike other insurers we ask for this now, so if your phone is lost of stolen you don't have the additional hassle of finding this information.</small>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+    {% include 'AppBundle::PhoneInsurance/_policyInfoModals.html.twig' %}
 
 {% endblock %}
 

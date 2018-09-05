@@ -18,20 +18,21 @@
 
 {% block body %}
 
-    <section class="quote">
+    <section class="qpw">
         <div class="d-lg-flex">
 
-            <div class="quote__details__container">
-                <div class="quote__details px-4 pb-4 px-lg-5 pb-lg-0">
-                    <div class="quote__h5 text-white mb-4 h5">Here’s your quote details, Insure your:</div>
+            {# Main Content #}
+            <div class="qpw__main__container">
+                <div class="qpw__main px-4 px-lg-5">
+                    <div class="qpw__h5 h5 text-white mb-4">Here’s your quote details, Insure your:</div>
                     <div class="d-flex justify-content-start align-items-center justify-content-lg-start">
-                        <h1 class="quote__h1 text-blue1b mb-2">
+                        <h1 class="qpw__h1 text-blue1b">
                             <span class="sub">
                                 {{ phone.make }} {{ phone.model }}
                                 <small>({{ phone.memory }}GB)</small>
                             </span>
                         </h1>
-                        <div class="quote__alt__phones dropdown dropleft">
+                        <div class="qpw__alt__phones dropdown dropleft">
                             <a href="#"
                                class="dropdown-toggle"
                                id="dropdownMenuLink"
@@ -58,60 +59,43 @@
                             </div>
                         </div>
                     </div>
-                    <div class="quote__h1 text-white h1 mb-4"><span class="sub">For only</span> &pound;{{ phone_price.monthlyPremiumPrice }} a month</div>
+                    <div class="qpw__h1 h1 text-white mb-4">
+                        <span class="sub">For only</span>
+                        &pound;{{ phone_price.monthlyPremiumPrice }} a month
+                    </div>
                     {{ form_start(buy_form) }}
                         {{ form_widget(buy_form.buy_tablet, {
-                            'label': 'Get Insured',
-                            'attr': {
-                                'class': 'btn btn-white btn-shadow-jules btn-block-xs'
-                            }})
-                        }}
+                            'label': 'Get Started','attr': { 'class': 'btn btn-success btn-gradient-green btn-shadow btn-lg btn-block-xs' }}) }}
                     {{ form_end(buy_form) }}
-                    <div class="quote__footer d-none d-lg-flex justify-content-lg-between mt-5">
-{#                         <div class="quote__footer__text">
-                            <h4 class="text-white">The highest level of cover!</h4>
-                            <p class="text-blue1 lead">We offer the markets highest level of cover</p>
-                        </div> #}
-                        <div class="quote__footer__cta">
-                            <a href="#quote_info"
-                               class="btn btn-outline-blue1 toggle-text"
-                               data-toggle="collapse"
-                               data-text-swap='Hide full details <i class="fas fa-caret-up ml-2"></i>'
-                               role="button"
-                               aria-expanded="false"
-                               aria-controls="quote_info">See full details
-                               <i class="fas fa-caret-down ml-2"></i>
-                            </a>
-                        </div>
-                    </div>
                 </div>
-                <div id="quote_info" class="quote__info__container collapse">
+
+                <div class="qpw__info__container d-none d-lg-block">
                     {% include 'AppBundle::PhoneInsurance/_seeFullDetails.html.twig' %}
-                    <div class="policy__info mx-4 mx-lg-5 py-4">
-                        <div class="d-md-flex align-items-md-center justify-content-md-between py-3 px-4 mx-md-5 rounded bg-blue3">
+                    <div class="policy__info mx-4 mx-lg-5 py-5">
+                        <div class="p-4 bg-blue2 d-lg-flex rounded justify-content-lg-between align-items-lg-center">
                             <div class="text-center text-lg-left">
                                 <h4 class="text-white">Let's get you covered</h4>
                                 <p class="lead text-white mb-0">It'll only take a few minutes</p>
                             </div>
-                            {{ form_start(buy_form_banner) }}
-                                {{ form_widget(buy_form_banner.buy, {'label': 'Get Insured', 'attr': {'class': 'btn btn-white btn-shadow-jules btn-block-xs'}}) }}
-                            {{ form_end(buy_form_banner) }}
+                            {{ form_start(buy_form_banner_two) }}
+                                {{ form_widget(buy_form_banner_two.buy, {'label': 'Get Started', 'attr': {'class': 'btn btn-success btn-gradient-green btn-lg btn-shadow btn-block-xs mt-4 mt-lg-0'}}) }}
+                            {{ form_end(buy_form_banner_two) }}
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="quote__curve">
-                <svg class="d-block d-lg-none" preserveAspectRatio="xMinYMin meet" viewBox="0 0 750 117" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-                    <defs></defs>
+                {# Curve Mobile #}
+                <svg class="d-block d-lg-none" preserveAspectRatio="xMinYMin meet" viewBox="0 0 750 47" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
                     <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-                        <g transform="translate(0.000000, -32.000000)" fill="#FFFFFF">
-                            <g id="---BG---" transform="translate(-4700.000000, -8443.000000)">
-                                <path d="M4700,8515 C4824,8488.33333 4948.66667,8475 5074,8475 C5199.33333,8475 5324.66667,8488.33333 5450,8515 L5450,8592 L4700,8592 L4700,8515 Z" id="Rectangle"></path>
-                            </g>
+                        <g id="Artboard-Copy" fill="#0068ED">
+                            <path d="M0,0 L750,0 L750,47 C625,18.3333333 500,4 375,4 C250,4 125,18.3333333 0,47 L0,0 Z" id="Rectangle-2"></path>
                         </g>
                     </g>
                 </svg>
+            </div>
+
+            {# Curve Desktop #}
+            <div class="qpw__curve">
                 <svg class="d-none d-lg-block" preserveAspectRatio="xMinYMin meet" viewBox="0 0 57 846" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
                     <defs></defs>
                     <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -122,11 +106,12 @@
                 </svg>
             </div>
 
-            <div class="quote__cover__container px-4 pb-4 pt-0 py-lg-5">
+            {# Sub Content #}
+            <div class="qpw__sub__container">
+                <div class="qpw__sub px-4 pb-4 pt-5 p-lg-5">
 
-                <div class="quote__cover">
-                    <h4 class="text-blue2 mb-4 my-lg-4">Cover Overview:</h4>
-                    <ul class="list-unstyled icn-list">
+                    <h4 class="text-blue2 mb-4">Your cover includes:</h4>
+                    <ul class="list-unstyled icn-list mb-5">
                         <li class="mb-4">
                             <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_accidental-damage-icn.svg" alt="so-sure - Accidental damage" width="30px" class="mr-2">
                             <strong class="text-blue4">Cracked screens</strong>
@@ -147,7 +132,7 @@
                             <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_out-of-warranty-icn.svg" alt="so-sure - Out of Warranty Breakdown" width="30px" class="mr-2">
                             <strong class="text-blue4">Out-of-warranty breakdowns</strong>
                         </li>
-                        <li class="mb-5">
+                        <li class="mb-4">
                             <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_broken-phone-icn.svg" alt="so-sure - Broken headphone jack" width="30px" class="mr-2">
                             <strong class="text-blue4">Accessories</strong>
                         </li>
@@ -161,9 +146,9 @@
                                 <span class="ml-2 text-blue2">
                                     <a href="#"
                                        data-toggle="modal"
-                                       data-target="#quote_page_modal_replace_repair"
+                                       data-target="#policy_24_72_hours"
                                        role="button">
-                                        <i class="far fa-question-circle"></i>
+                                        <i class="fal fa-info-circle"></i>
                                     </a>
                                 </span>
                             </strong>
@@ -172,110 +157,56 @@
                             <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_happy-icn-min.svg" alt="so-sure - Accidental damage" width="30px" class="mr-2">
                             <strong class="text-blue4">Instant cover after purchase</strong>
                         </li>
-                        <li class="my-4">
+                        <li class="mb-4">
                             <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_happy-icn-min.svg" alt="so-sure - Accidental damage" width="30px" class="mr-2">
                             <strong class="text-blue4">
                                 Up to 80% cashback every year
                                 <span class="ml-2 text-blue2">
                                     <a href="#"
                                        data-toggle="modal"
-                                       data-target="#quote_page_modal_cashback"
+                                       data-target="#policy_cashback"
                                        role="button">
-                                        <i class="far fa-question-circle"></i>
+                                        <i class="fal fa-info-circle"></i>
                                     </a>
                                 </span>
                             </strong>
                         </li>
                     </ul>
-                    {# JULES CRAP #}
-                    <a href="#" class="btn btn-success btn-shadow btn-gradient-green  btn-block-xs" id="fix-get-insured">Get Insured</a>
-                    <div class="quote__cover__footer my-4">
-                        <a href="#quote_info_mobile"
-                           class="btn btn-primary btn-shadow btn-gradient btn-block-xs d-block d-sm-block d-md-none toggle-text"
-                           data-toggle="collapse"
-                           data-text-swap='Hide full policy <i class="far fa-arrow-up ml-2"></i>'
-                           role="button"
-                           aria-expanded="false"
-                           aria-controls="quote_info_mobile"><span>See full policy</span>
-                           <i class="far fa-arrow-down ml-2"></i>
-                        </a>
+                    <div class="mt-5 d-none d-lg-block">
+                        {{ form_start(buy_form_banner_three) }}
+                            {{ form_widget(buy_form_banner_three.buy, {'label': 'Get Started', 'attr': {'class': 'btn btn-success btn-gradient-green btn-shadow btn-block-xs btn-lg mt-4 mt-lg-0'}}) }}
+                        {{ form_end(buy_form_banner_three) }}
                     </div>
                 </div>
             </div>
+
+            <div id="qpw-info" class="qpw__info__container__mobile d-block d-lg-none">
+                <svg preserveAspectRatio="xMinYMin meet" viewBox="0 0 750 47" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                        <g id="Artboard" fill="#FFFFFF">
+                            <path d="M374,0 C499.333333,0 624.666667,15.6666667 750,47 L0,47 C124,15.6666667 248.666667,8.69674703e-16 374,0 Z" id="Rectangle" transform="translate(375.000000, 23.500000) scale(1, -1) translate(-375.000000, -23.500000) "></path>
+                        </g>
+                    </g>
+                </svg>
+                {% include 'AppBundle::PhoneInsurance/_seeFullDetails.html.twig' %}
+                <div class="policy__info mx-4 mx-lg-5 py-5">
+                    <div class="p-4 bg-blue2 d-lg-flex rounded justify-content-lg-between align-items-lg-center">
+                        <div class="text-center text-lg-left">
+                            <h4 class="text-white">Let's get you covered</h4>
+                            <p class="lead text-white mb-0">It'll only take a few minutes</p>
+                        </div>
+                        {{ form_start(buy_form_banner) }}
+                            {{ form_widget(buy_form_banner.buy, {'label': 'Get Started', 'attr': {'class': 'btn btn-success btn-gradient-green btn-shadow btn-block-xs mt-4 mt-lg-0'}}) }}
+                        {{ form_end(buy_form_banner) }}
+                    </div>
+                </div>
+            </div>
+
         </div>
     </section>
 
-    <div id="quote_info_mobile" class="quote__info__container__mobile collapse">
-        <div class="quote__info py-3">
-            {% include 'AppBundle::PhoneInsurance/_seeFullDetails.html.twig' %}
-{#             <div class="policy__info mx-4 mx-lg-5 py-4">
-                TODO: Not working!
-                <div class="d-md-flex align-items-md-center justify-content-md-between py-3 px-4 mx-md-5 rounded bg-blue3">
-                    <div class="text-center text-lg-left">
-                        <h4 class="text-white">Let's get you covered</h4>
-                        <p class="lead text-white mb-0">It'll only take a few minutes</p>
-                    </div>
-                    {{ form_start(buy_form_banner) }}
-                        {{ form_widget(buy_form_banner.buy, {'label': 'Get Insured', 'attr': {'class': 'btn btn-success btn-shadow btn-gradient-green  btn-block-xs'}}) }}
-                    {{ form_end(buy_form_banner) }}
-                </div>
-            </div> #}
-        </div>
-    </div>
-
     {# Page Modals #}
-    <div class="modal fade"
-         id="quote_page_modal_replace_repair"
-         tabindex="-1" role="dialog"
-         aria-labelledby="quote_page_modal_replace_repair"
-         aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">24-72 hour replace/repair</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <i class="fal fa-times text-white"></i>
-                    </button>
-                </div>
-                <div class="modal-body text-center text-sm-left">
-                    <div class="row">
-                        <div class="col-sm-4">
-                            <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_phone-smile.png" alt="so-sure - Policy" width="120px">
-                        </div>
-                        <div class="col-sm-8">
-                            Some repairs can take longer (e.g. water damage) but we will be as fast as possible once your claim approved
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="modal fade"
-         id="quote_page_modal_cashback"
-         tabindex="-1" role="dialog"
-         aria-labelledby="quote_page_modal_cashback"
-         aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Up to 80% cashback every year </h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <i class="fal fa-times text-white"></i>
-                    </button>
-                </div>
-                <div class="modal-body text-center text-sm-left">
-                    <div class="row">
-                        <div class="col-sm-4">
-                            <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_wallet-cashback.png" alt="so-sure - Policy" width="120px">
-                        </div>
-                        <div class="col-sm-8">
-                            By joining forces with your most careful friends and family members, you could see 80% of your insurance premium reimbursed every year
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+    {% include 'AppBundle::PhoneInsurance/_policyInfoModals.html.twig' %}
 
 {% endblock %}
 

@@ -15,10 +15,10 @@
                 <span class="ml-2 text-blue2">
                     <a href="#"
                        data-toggle="modal"
-                       data-target="#purchase_policy_name"
+                       data-target="#policy_name"
                        data-img="{{ cdn_url }}/images/rebrand/icns/so-sure_happy-icn-min.svg"
                        role="button">
-                        <i class="far fa-question-circle"></i>
+                        <i class="fal fa-info-circle"></i>
                     </a>
                 </span>
             </label>
@@ -70,12 +70,11 @@
             </div>
 
 
-            <div class="form-group">
+            <div class="form-group mt-5">
                 <div class="form-row">
                     <div class="col-3 text-left">
-                        {# TODO: Needs to go back quote #}
                         <a href="{{ path('quote_make_model_memory', {'make': phone.make, 'model': phone.model, 'memory': phone.memory}) }}"
-                           class="btn btn-outline-grey btn-block-xs">
+                           class="btn btn-outline-grey btn-circle d-flex justify-content-center align-items-center">
                             <span class="sr-only">back</span>
                             <i class="far fa-arrow-left"></i>
                         </a>
@@ -113,23 +112,30 @@
         <div class="address-search" style="{% if showAddress %}display: none;{% endif %}">
             <div class="form-group {% if is_postback %}has-error{% endif %}">
                 <label class="">Billing Address:</label>
-                <input id="address-select" class="typeahead form-control" type="text" placeholder="{% if postcode == 'type' %}Type your address (eg. 10 Downing Street, SW1A 2AA){% elseif postcode == 'comma' %}House Number, Postcode (eg. 10, SW1A 2AA){% endif %}" {% if not showAddress %} required="required" {% endif %} data-hj-suppress="">
+                <input id="address-select" class="typeahead form-control" type="text" placeholder="Postcode (eg. 10, SW1A 2AA)" {% if not showAddress %} required="required" {% endif %} data-hj-suppress="">
                 {% set display_error = false %}
                 {% if is_postback and (form_errors(purchase_form.addressLine1)|length > 0 or
                     form_errors(purchase_form.city)|length > 0 or
                     form_errors(purchase_form.postcode)|length > 0) %}
                     {% set display_error = true %}
                 {% endif %}
-                <div id="select_address_errors" class="help-block with-errors" style="{% if not display_error %}display: none;{% endif %}">Select an address from the drop-down after searching</div>
+                <div id="select_address_errors" class="help-block with-errors" style="{% if not display_error %}display: none;{% endif %}">Select an address from the dropdown after searching</div>
                 <small class="form-text"><a id="address-manual" href="#">Enter address manually</small></a>
             </div>
+{#
+            <div id="display-address" style="margin-bottom: 20px" data-hj-suppress="">
+                {% if purchase_form.vars.data.addressLine1|length > 0 %}{{ purchase_form.vars.data.addressLine1 }}<br>{% endif %}
+                {% if purchase_form.vars.data.addressLine2|length > 0 %}{{ purchase_form.vars.data.addressLine2 }}<br>{% endif %}
+                {% if purchase_form.vars.data.addressLine3|length > 0 %}{{ purchase_form.vars.data.addressLine3 }}<br>{% endif %}
+                {% if purchase_form.vars.data.city|length > 0 %}{{ purchase_form.vars.data.city }}<br>{% endif %}
+                {% if purchase_form.vars.data.postcode|length > 0 %}{{ purchase_form.vars.data.postcode }}{% endif %}
+            </div> #}
 
-            <div class="form-group">
+            <div class="form-group mt-5">
                 <div class="form-row">
-                    <div class="col-3 text-left">
-                        {# TODO: Needs to go back quote #}
+                    <div class="col text-left">
                         <a href="{{ path('quote_make_model_memory', {'make': phone.make, 'model': phone.model, 'memory': phone.memory}) }}"
-                           class="btn btn-outline-grey btn-block-xs">
+                           class="btn btn-outline-grey btn-circle d-flex justify-content-center align-items-center">
                             <span class="sr-only">back</span>
                             <i class="far fa-arrow-left"></i>
                         </a>
@@ -147,46 +153,45 @@
                 <label class="text-danger address-show-error-text error"></label>
             </div>
             <div class="form-group {% if showAddress and form_errors(purchase_form.addressLine1) %}has-error{% endif %}">
-                {{ form_label(purchase_form.addressLine1, 'Billing Address Line 1:', { 'label_attr': {'class': 'sr-only'} }) }}
+                {{ form_label(purchase_form.addressLine1, 'Billing Address Line 1:', { 'label_attr': {'class': ''} }) }}
                 {{ form_widget(purchase_form.addressLine1, {'attr':{'class':'form-control addressLine1', 'placeholder': 'Address Line 1', 'data-hj-suppress' : ''}}) }}
                 {% if showAddress %}
                     <div class="with-errors">{{ form_errors(purchase_form.addressLine1) }}</div>
                 {% endif %}
             </div>
             <div class="form-group {% if showAddress and form_errors(purchase_form.addressLine2) %}has-error{% endif %}">
-                {{ form_label(purchase_form.addressLine2, 'Billing Address Line 2:', { 'label_attr': {'class': 'sr-only'} }) }}
+                {{ form_label(purchase_form.addressLine2, 'Billing Address Line 2:', { 'label_attr': {'class': ''} }) }}
                 {{ form_widget(purchase_form.addressLine2, {'attr':{'class':'form-control addressLine2', 'placeholder': 'Address Line 2', 'data-hj-suppress' : ''}}) }}
                 {% if showAddress %}
                     <div class="with-errors">{{ form_errors(purchase_form.addressLine2) }}</div>
                 {% endif %}
             </div>
             <div class="form-group {% if showAddress and form_errors(purchase_form.addressLine3) %}has-error{% endif %}">
-                {{ form_label(purchase_form.addressLine3, 'Billing Address Line 3:', { 'label_attr': {'class': 'sr-only'} }) }}
+                {{ form_label(purchase_form.addressLine3, 'Billing Address Line 3:', { 'label_attr': {'class': ''} }) }}
                 {{ form_widget(purchase_form.addressLine3, {'attr':{'class':'form-control addressLine3', 'placeholder': 'Address Line 3', 'data-hj-suppress' : ''}}) }}
                 {% if showAddress %}
                     <div class="with-errors">{{ form_errors(purchase_form.addressLine3) }}</div>
                 {% endif %}
             </div>
             <div class="form-group {% if showAddress and form_errors(purchase_form.city) %}has-error{% endif %}">
-                {{ form_label(purchase_form.city, 'Billing Address City:', { 'label_attr': {'class': 'sr-only'} }) }}
+                {{ form_label(purchase_form.city, 'Billing Address City:', { 'label_attr': {'class': ''} }) }}
                 {{ form_widget(purchase_form.city, {'attr':{'class':'form-control city', 'placeholder': 'City', 'data-hj-suppress' : ''}}) }}
                 {% if showAddress %}
                     <div class="with-errors">{{ form_errors(purchase_form.city) }}</div>
                 {% endif %}
             </div>
             <div class="form-group {% if showAddress and form_errors(purchase_form.postcode) %}has-error{% endif %}">
-                {{ form_label(purchase_form.postcode, 'Billing Address Postcode:', { 'label_attr': {'class': 'sr-only'} }) }}
+                {{ form_label(purchase_form.postcode, 'Billing Address Postcode:', { 'label_attr': {'class': ''} }) }}
                 {{ form_widget(purchase_form.postcode, {'attr':{'class':'form-control postcode', 'placeholder': 'Postcode', 'data-hj-suppress' : ''}}) }}
                 {% if showAddress %}
                     <div class="with-errors">{{ form_errors(purchase_form.postcode) }}</div>
                 {% endif %}
             </div>
-            <div class="form-group">
+            <div class="form-group mt-5">
                 <div class="form-row">
-                    <div class="col-3 text-left">
-                        {# TODO: Needs to go back quote #}
+                    <div class="col text-left">
                         <a href="{{ path('quote_make_model_memory', {'make': phone.make, 'model': phone.model, 'memory': phone.memory}) }}"
-                           class="btn btn-outline-grey btn-block-xs">
+                           class="btn btn-outline-grey btn-circle d-flex justify-content-center align-items-center">
                             <span class="sr-only">back</span>
                             <i class="far fa-arrow-left"></i>
                         </a>

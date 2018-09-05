@@ -3,31 +3,31 @@
     'data-phones': phones|json_encode|raw,
     'autocomplete': 'off'
 }}) }}
-    <div class="d-lg-flex align-items-center flex-wrap">
-        <span class="h1 mb-2 text-white">My mobile phone is an</span>
+    <div class="d-lg-flex align-items-center flex-wrap h1">
+        <span class="mb-2 text-white mr-2">My mobile phone is <br class="d-inline d-sm-none"> an</span>
         {{ form_widget(form_phone.make, {
           'attr': {
-            'class': 'mb-2 ml-2 phone-search-dropdown__select phone-search-dropdown__make h1 resizeselect'
+            'class': 'mb-2 mr-2 phone-search-dropdown__select phone-search-dropdown__make sub resizeselect'
         }}) }}
         {{ form_widget(form_phone.model, {
           'attr': {
-            'class': 'mb-2 ml-2 phone-search-dropdown__select phone-search-dropdown__model h1',
+            'class': 'mb-2 mr-2 phone-search-dropdown__select phone-search-dropdown__model sub',
             'disabled': 'disabled'
         }}) }}
-        <div class="phone-search-dropdown__break"></div>
-        <span class="h1 text-white">that has</span>
+        <div class="phone-search-dropdown__break d-none d-lg-block"></div>
+        <span class="text-white mr-2">that has</span>
         {{ form_widget(form_phone.memory, {
             'attr': {
-                'class': 'mb-2 ml-2 mx-lg-2 phone-search-dropdown__select phone-search-dropdown__memory h1',
+                'class': 'mb-2 mr-2 phone-search-dropdown__select phone-search-dropdown__memory sub',
                 'disabled': 'disabled'
         }}) }}
-        <span class="h1 mb-2 text-white">storage</span>
+        <span class="mb-2 text-white">storage</span>
     </div>
     <div class="form-group mt-5">
         {{ form_widget(form_phone.next, {
           'label': 'Show my price',
           'attr': {
-            'class': 'btn btn-outline-white phone-search-dropdown__button',
+            'class': 'btn btn-outline-white btn-lg phone-search-dropdown__button',
             'disabled': 'disabled'
         }}) }}
     </div>

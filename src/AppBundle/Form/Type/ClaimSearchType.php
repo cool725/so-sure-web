@@ -52,6 +52,11 @@ class ClaimSearchType extends BaseType
                 ],
                 'data' => [Claim::STATUS_INREVIEW, Claim::STATUS_APPROVED],
             ])
+            ->add('handlingTeam', ChoiceType::class, [
+                'multiple' => false,
+                'expanded' => false,
+                'choices' => array_merge(['All' => null], Claim::$handlingTeams),
+            ])
             ->add('search', SubmitType::class)
         ;
 
@@ -65,6 +70,7 @@ class ClaimSearchType extends BaseType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(array(
+            'csrf_protection'   => false,
         ));
     }
 }
