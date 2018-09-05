@@ -15,6 +15,10 @@
         .nav-link {
             font-family: $g-medium;
             color: $grey;
+
+            &.user-link {
+                color: $blue-2;
+            }
         }
 
         .dropdown-menu {
@@ -35,6 +39,10 @@
 
             .nav-link {
                 color: $white;
+
+                &.user-link {
+                    color: $blue-1;
+                }
             }
 
         }
