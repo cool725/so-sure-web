@@ -626,6 +626,34 @@ class PolicyServiceTest extends WebTestCase
         );
     }
 
+    public function testPolicyYearlyWithDiscountUnpaidExpirationDate()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testPolicyYearlyWithDiscountUnpaidExpirationDate', $this),
+            'bar',
+            static::$dm
+        );
+        $policy = static::initPolicy(
+            $user,
+            static::$dm,
+            $this->getRandomPhone(static::$dm),
+            new \DateTime('2017-01-29'),
+            false
+        );
+        $policy->setPremiumInstallments(1);
+        $policy->getPremium()->setAnnualDiscount(2);
+        $policy->setStatus(PhonePolicy::STATUS_PENDING);
+        static::$policyService->create($policy, new \DateTime('2017-01-29'));
+        $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
+
+        $timezone = new \DateTimeZone('Europe/London');
+        $this->assertEquals(
+            new \DateTime('2017-02-28', $timezone),
+            $policy->getPolicyExpirationDate()
+        );
+    }
+
     public function testPolicyCancelledTooEarlyBug()
     {
         $user = static::createUser(
