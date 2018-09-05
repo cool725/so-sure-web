@@ -2,6 +2,10 @@
 
 require('../../sass/pages/purchase.scss');
 
+// Require BS component(s)
+require('bootstrap/js/dist/modal');
+require('bootstrap/js/dist/collapse');
+
 // Require components
 require('dot');
 require('corejs-typeahead/dist/bloodhound.js');

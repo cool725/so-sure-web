@@ -1,7 +1,10 @@
 // quotepage.js
 
 require('../../sass/pages/quotepage.scss');
-require('../components/table.js');
+
+// Require BS component(s)
+require('bootstrap/js/dist/modal');
+require('bootstrap/js/dist/collapse');
 
 $(function() {
 

@@ -1,5 +1,5 @@
-const gulp    = require('gulp'),
-      concat  = require('gulp-concat');
+const gulp   = require('gulp'),
+      concat = require('gulp-concat');
 
 gulp.task('default', function() {
     gulp.src('node_modules/viewerjs/dist/viewer.min.*')
@@ -8,7 +8,7 @@ gulp.task('default', function() {
     gulp.src('node_modules/jquery-viewer/dist/jquery-viewer.min.*')
         .pipe(gulp.dest('web/components/jquery-viewer'));
 
-    gulp.src(['node_modules/jquery/dist/jquery.min.js', 'node_modules/popper.js/dist/umd/popper.min.js', 'node_modules/bootstrap/dist/js/bootstrap.min.js'] )
+    gulp.src(['node_modules/jquery/dist/jquery.min.js', 'node_modules/popper.js/dist/umd/popper.min.js'] )
         .pipe(concat('vendor.js'))
         .pipe(gulp.dest('web/components'));
 
