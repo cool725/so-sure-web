@@ -2235,6 +2235,11 @@ abstract class Policy
         return $this->toTwoDp($this->getPremiumPaid() - $this->getPremiumPaid($payments));
     }
 
+    public function getUserPremiumPaid(\DateTime $date = null)
+    {
+        return $this->getPremiumPaid($this->getSuccessfulUserPayments(), $date);
+    }
+
     public function getPremiumPaid($payments = null, \DateTime $date = null)
     {
         $paid = 0;
@@ -2847,7 +2852,7 @@ abstract class Policy
         if ($this->getPremiumPlan() == self::PLAN_YEARLY) {
             if ($this->areEqualToTwoDp(0, $this->getOutstandingPremiumToDate($date))) {
                 return $this->endOfDay($this->getEnd());
-            } elseif ($this->areEqualToTwoDp(0, $this->getPremiumPaid(null, $date))) {
+            } elseif ($this->areEqualToTwoDp(0, $this->getUserPremiumPaid($date))) {
                 $thirthDays = clone $this->getStart();
                 $thirthDays = $thirthDays->add(new \DateInterval('P30D'));
 

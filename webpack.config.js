@@ -15,6 +15,7 @@ Encore
 
     // List all files here
     .addEntry('global', './src/AppBundle/Resources/public/rebrand/js/global.js')
+    .addEntry('dev', './src/AppBundle/Resources/public/rebrand/js/dev.js')
     .addEntry('homepage', './src/AppBundle/Resources/public/rebrand/js/pages/homepage.js')
     .addEntry('quotepage', './src/AppBundle/Resources/public/rebrand/js/pages/quotepage.js')
     .addEntry('purchase', './src/AppBundle/Resources/public/rebrand/js/pages/purchase.js')

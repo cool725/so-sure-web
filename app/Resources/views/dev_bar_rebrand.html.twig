@@ -1,0 +1,78 @@
+{% if environment != 'prod' %}
+    <nav class="navbar fixed-bottom navbar-expand-md d-none d-md-flex devbar">
+        <a class="navbar-brand" href="/" ><span class="text-primary font-weight-bold">{{ environment }}</span></a>
+        <div class="collapse navbar-collapse" id="navbarText">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ path('ops_pages') }}"><i class="fal fa-wrench fa-lg"></i></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ path('quote_make_model_memory', {'make':'Apple','model':'iPhone 7','memory':128}) }}"><i class="fal fa-mobile-android fa-lg"></i></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" id="dev-reload"><i class="fal fa-sync-alt fa-lg"></i></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link"
+                       href="#"
+                       data-toggle="modal"
+                       data-target="#dev-modal">
+                       <i class="fal fa-info-circle fa-lg"></i>
+                    </a>
+                </li>
+            </ul>
+            {% if app.user is not null and app.user %}
+                {% if is_granted('ROLE_PREVIOUS_ADMIN') %}
+                    <span class="navbar-text"><a href="{{ path('homepage', {'_impersonate': '_exit'}) }}">Exit <strong>{{ app.user.email }}</strong></a></span>
+                {% else %}
+                    <span class="navbar-text"><a href="{{ path('fos_user_security_logout') }}">Logout <strong>{{ app.user.email }}</strong></a></span>
+                {% endif %}
+            {% endif %}
+        </div>
+    </nav>
+
+    {# Page Modals #}
+    <div class="modal fade"
+         id="dev-modal"
+         tabindex="-1" role="dialog"
+         aria-labelledby="dev-modal"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Dev Modal</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <i class="fal fa-times text-white"></i>
+                    </button>
+                </div>
+                <div class="modal-body text-center text-sm-left">
+                    <h5>Phone:</h5>
+                    <ul>
+                        <li><strong>IMEI:</strong> {{ random_imei() }}</li>
+                        <li><strong>Serial:</strong> {{ random_serial() }}</li>
+                        <li>
+                            <strong>Phone number: </strong>
+                            use a range 07700 900000 to 900999 (reserved by offcomm for TV use)
+                        </li>
+                    </ul>
+                    <h5>Postcode:</h5>
+                    <ul>
+                        <li>BX1 1LT</li>
+                    </ul>
+                    <h5>Card:</h5>
+                    <ul>
+                        <li>4921810000005462 12/20 441</li>
+                    </ul>
+                    <h5>BACS:</h5>
+                    <ul>
+                        <li><strong>Ok:</strong> 000099 87654321</li>
+                        <li><strong>Adjusted:</strong> 000099 876543</li>
+                        <li><strong>No DD:</strong> 000099 00000000</li>
+                        <li><strong>Fail:</strong> 000099 99999999</li>
+                        <li><strong>PCA:</strong> 000099 12345678</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endif %}
