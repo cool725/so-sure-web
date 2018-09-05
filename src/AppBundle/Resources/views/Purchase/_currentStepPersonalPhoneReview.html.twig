@@ -54,9 +54,11 @@
                 </a>
             </span>
         </label>
-        {{ form_widget(purchase_form.imei, {'attr':{'class':'form-control imei', 'placeholder':'IMEI Number', 'data-hj-suppress' : ''}}) }}
+        {{ form_widget(purchase_form.imei, {'attr':{'class':'form-control imei', 'placeholder':'IMEI Number', 'data-hj-suppress' : '', 'data-make': phone.make}}) }}
         <small class="form-text">Dial <strong>*#06#</strong> on your phone to display your IMEI number.</small>
-        <small class="form-text samsung-imei d-none">Numbers only please (no / required)</small>
+        {% if phone.make == 'Samsung' %}
+            <small class="form-text samsung-imei">Numbers only please (no / required)</small>
+        {% endif %}
         <div class="with-errors">{{ form_errors(purchase_form.imei) }}</div>
     </div>
 

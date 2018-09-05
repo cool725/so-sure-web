@@ -335,22 +335,22 @@ class PhoneInsuranceController extends BaseController
         $buyForm = $this->get('form.factory')
             ->createNamedBuilder('buy_form')
             ->add('buy_tablet', SubmitType::class)
-            ->add('claim_used', HiddenType::class)
+            ->add('slider_used', HiddenType::class)
             ->getForm();
         $buyBannerForm = $this->get('form.factory')
             ->createNamedBuilder('buy_form_banner')
             ->add('buy', SubmitType::class)
-            ->add('claim_used', HiddenType::class)
+            ->add('slider_used', HiddenType::class)
             ->getForm();
         $buyBannerTwoForm = $this->get('form.factory')
             ->createNamedBuilder('buy_form_banner_two')
             ->add('buy', SubmitType::class)
-            ->add('claim_used', HiddenType::class)
+            ->add('slider_used', HiddenType::class)
             ->getForm();
         $buyBannerThreeForm = $this->get('form.factory')
             ->createNamedBuilder('buy_form_banner_three')
             ->add('buy', SubmitType::class)
-            ->add('claim_used', HiddenType::class)
+            ->add('slider_used', HiddenType::class)
             ->getForm();
 
         if ('POST' === $request->getMethod()) {
@@ -404,9 +404,9 @@ class PhoneInsuranceController extends BaseController
                     if ($buyForm->get('buy_tablet')->isClicked()) {
                         $properties['Location'] = 'main';
                     }
-                    if ($buyForm->getData()['claim_used']) {
-                        $properties['Played with Claims'] = true;
-                    }
+                    // if ($buyForm->getData()['claim_used']) {
+                    //     $properties['Played with Claims'] = true;
+                    // }
                     $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_BUY_BUTTON_CLICKED, $properties);
 
                     // Multipolicy should skip user details
@@ -421,10 +421,10 @@ class PhoneInsuranceController extends BaseController
                 $buyBannerForm->handleRequest($request);
                 if ($buyBannerForm->isValid()) {
                     $properties = [];
-                    $properties['Location'] = 'banner';
-                    if ($buyForm->getData()['claim_used']) {
-                        $properties['Played with Claims'] = true;
-                    }
+                    $properties['Location'] = 'seeFullDetailsMobile';
+                    // if ($buyForm->getData()['claim_used']) {
+                    //     $properties['Played with Claims'] = true;
+                    // }
                     $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_BUY_BUTTON_CLICKED, $properties);
 
                     // Multipolicy should skip user details
@@ -439,10 +439,10 @@ class PhoneInsuranceController extends BaseController
                 $buyBannerTwoForm->handleRequest($request);
                 if ($buyBannerTwoForm->isValid()) {
                     $properties = [];
-                    $properties['Location'] = 'banner';
-                    if ($buyForm->getData()['claim_used']) {
-                        $properties['Played with Claims'] = true;
-                    }
+                    $properties['Location'] = 'seeFullDetailsDesktop';
+                    // if ($buyForm->getData()['claim_used']) {
+                    //     $properties['Played with Claims'] = true;
+                    // }
                     $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_BUY_BUTTON_CLICKED, $properties);
 
                     // Multipolicy should skip user details
@@ -457,10 +457,10 @@ class PhoneInsuranceController extends BaseController
                 $buyBannerThreeForm->handleRequest($request);
                 if ($buyBannerThreeForm->isValid()) {
                     $properties = [];
-                    $properties['Location'] = 'banner';
-                    if ($buyForm->getData()['claim_used']) {
-                        $properties['Played with Claims'] = true;
-                    }
+                    $properties['Location'] = 'sidebar';
+                    // if ($buyForm->getData()['claim_used']) {
+                    //     $properties['Played with Claims'] = true;
+                    // }
                     $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_BUY_BUTTON_CLICKED, $properties);
 
                     // Multipolicy should skip user details
