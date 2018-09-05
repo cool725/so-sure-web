@@ -4,6 +4,8 @@ require('../../sass/pages/welcome.scss');
 
 // Require components
 // require('clipboard/dist/clipboard.min.js');
+require('bootstrap');
+
 let Clipboard = require('clipboard');
 
 $(function() {
@@ -68,6 +70,6 @@ $(function() {
 
     // Show Starling Welcome
     if ($('#starling-modal').length) {
-        $(this).modal('show');
+        $('#starling-modal').modal('show');
     }
 });
