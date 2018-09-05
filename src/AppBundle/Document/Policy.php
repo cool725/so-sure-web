@@ -2852,6 +2852,8 @@ abstract class Policy
                 $thirthDays = $thirthDays->add(new \DateInterval('P30D'));
 
                 return $thirthDays;
+            } elseif ($this->areEqualToTwoDp(0, $this->getOutstandingPremiumToDate($date, true))) {
+                return $this->endOfDay($this->getEnd());
             } else {
                 throw new \Exception(sprintf(
                     'Failed to find a yearly date with a 0 outstanding premium (%f). Policy %s/%s',
