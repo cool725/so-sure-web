@@ -4,7 +4,7 @@ require('../../sass/pages/quotepage.scss');
 
 // Require BS component(s)
 require('bootstrap/js/dist/modal');
-require('bootstrap/js/dist/collapse');
+require('bootstrap/js/dist/dropdown');
 
 $(function() {
 
