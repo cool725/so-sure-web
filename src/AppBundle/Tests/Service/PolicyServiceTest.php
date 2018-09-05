@@ -4,6 +4,7 @@ namespace AppBundle\Tests\Service;
 
 use AppBundle\Document\Company;
 use AppBundle\Document\Form\Bacs;
+use AppBundle\Document\Payment\PolicyDiscountPayment;
 use AppBundle\Exception\GeoRestrictedException;
 use AppBundle\Exception\InvalidUserDetailsException;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -642,7 +643,12 @@ class PolicyServiceTest extends WebTestCase
             false
         );
         $policy->setPremiumInstallments(1);
-        $policy->getPremium()->setAnnualDiscount(2);
+        $discount = new PolicyDiscountPayment();
+        $discount->setAmount(2);
+        $discount->setDate(new \DateTime('2017-01-29'));
+        $policy->addPayment($discount);
+        $policy->getPremium()->setAnnualDiscount($discount->getAmount());
+
         $policy->setStatus(PhonePolicy::STATUS_PENDING);
         static::$policyService->create($policy, new \DateTime('2017-01-29'));
         $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
