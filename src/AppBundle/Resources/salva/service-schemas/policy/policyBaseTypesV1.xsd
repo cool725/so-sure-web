@@ -3,10 +3,12 @@
     targetNamespace="http://sims.salva.ee/service/schema/policy/v1"
     xmlns="http://sims.salva.ee/service/schema/policy/v1"
     xmlns:base="http://sims.salva.ee/service/schema/v1"
+    xmlns:customer="http://sims.salva.ee/service/schema/customer/v1"
     elementFormDefault="qualified"
     attributeFormDefault="qualified">
 
     <xs:import namespace="http://sims.salva.ee/service/schema/v1" schemaLocation="../baseTypesV1.xsd"></xs:import>
+    <xs:import namespace="http://sims.salva.ee/service/schema/customer/v1" schemaLocation="../customer/customerBaseTypesV1.xsd"></xs:import>
 
     <xs:complexType name="policyType">
         <xs:sequence>
@@ -167,6 +169,7 @@
 
     <xs:complexType name="customerType">
         <xs:sequence>
+            <xs:element name="id" type="xs:long" minOccurs="0"/>
             <xs:element name="code" type="xs:string" minOccurs="0"/>
             <xs:element name="name" type="xs:string" minOccurs="0"/>
             <xs:element name="firstName" type="xs:string" minOccurs="0"/>
@@ -177,7 +180,13 @@
             <xs:element name="address" type="base:addressType" minOccurs="0"/>
             <xs:element name="email" type="xs:string" minOccurs="0"/>
             <xs:element name="phone" type="xs:string" minOccurs="0"/>
-            <xs:element name="noSpam" type="xs:boolean" minOccurs="0"/>
+            <xs:element name="consents" minOccurs="0">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="consent" type="customer:consentType" minOccurs="0" maxOccurs="unbounded"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
         </xs:sequence>
         <xs:attribute name="role" type="base:nonEmptyString"/>
         <xs:attribute name="oppositeParty" type="xs:boolean"/>
@@ -256,6 +265,7 @@
 
     <xs:complexType name="fileRelationType">
         <xs:attribute name="fileId" type="xs:long" use="required"/>
+        <xs:attribute name="name" type="xs:string"/>
         <xs:attribute name="fileRelationTypeCode" type="base:nonEmptyString"/>
     </xs:complexType>
 

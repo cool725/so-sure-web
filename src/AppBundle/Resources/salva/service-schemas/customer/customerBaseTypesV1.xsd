@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    targetNamespace="http://sims.salva.ee/service/schema/customer/v1"
+    xmlns="http://sims.salva.ee/service/schema/customer/v1"
+    xmlns:base="http://sims.salva.ee/service/schema/v1"
+    elementFormDefault="qualified"
+    attributeFormDefault="qualified">
+
+    <xs:import namespace="http://sims.salva.ee/service/schema/v1" schemaLocation="../baseTypesV1.xsd"></xs:import>
+
+    <xs:complexType name="consentType">
+        <xs:sequence>
+            <xs:element name="consentTypeCode" type="xs:string"/>
+            <xs:element name="consentChannelCode" type="xs:string"/>
+            <xs:element name="value" type="xs:boolean"/>
+        </xs:sequence>
+    </xs:complexType>
+</xs:schema>
