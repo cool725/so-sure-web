@@ -1,12 +1,189 @@
 // main.scss
 
-// body {
-//     position: relative;
-// }
+// Funnel Template
+.qpw {
+    position: relative;
 
-// @include media-breakpoint-down(xs) {
-//     .container-pad-mb {
-//         padding-left: 30px;
-//         padding-right: 30px;
-//     }
-// }
+    // Containers & Curves
+    &__main__container {
+        position: relative;
+        z-index: 4;
+
+        // Curve
+        svg {
+            transform: translateY(-1px);
+            position: absolute;
+            top: 100%; left: 0;
+        }
+
+        &-stuck {
+            position: sticky;
+            top: 0;
+        }
+
+        @include media-breakpoint-up(lg) {
+            width: 60vw; height: 100vh;
+            position: static;
+
+            // Scroll stuff
+            overflow-y: scroll;
+
+            // IE
+            -ms-overflow-style: none;
+
+            // Webkit
+            &::-webkit-scrollbar {
+                width: 0;
+                background: transparent;
+            }
+        }
+
+        background-color: $blue-3;
+    }
+
+    &__main {
+        padding-top: 5rem;
+        padding-bottom: 1.5rem;
+
+        @include media-breakpoint-up(lg) {
+            height: 70vh;
+            padding-top: 12rem;
+        }
+    }
+
+    &__curve {
+        position: relative;
+
+        @include media-breakpoint-up(lg) {
+            width: 5vw; height: 100vh;
+
+            svg {
+                height: 100vh;
+                position: absolute;
+                z-index: 4;
+                right: 0; top: 0;
+                transform: translateX(1px);
+            }
+        }
+    }
+
+    &__sub__container {
+        background-color: $white;
+
+        @include media-breakpoint-up(lg) {
+            width: 35vw; height: 100vh;
+
+            // Scroll stuff
+            overflow-y: scroll;
+
+            // IE
+            -ms-overflow-style: none;
+
+            // Webkit
+            &::-webkit-scrollbar {
+                width: 0;
+                background: transparent;
+            }
+        }
+    }
+
+    &__info__container__mobile {
+
+        svg {
+            transform: translateY(-1px);
+        }
+    }
+
+    // Contents
+    h1 {
+        border-bottom: 2px solid $blue-1b;
+    }
+
+    &__h1 {
+
+        @include media-breakpoint-down(xs) {
+            font-size: 1.5rem;
+        }
+
+        .far {
+            cursor: pointer;
+        }
+    }
+
+    &__h5 {
+        @include media-breakpoint-down(xs) {
+            font-size: 0.9rem;
+            opacity: 0.6;
+        }
+    }
+
+    &__alt__phones {
+
+        a.dropdown-toggle {
+            &:before {
+                display: none;
+            }
+        }
+    }
+}
+
+.policy {
+
+    &__info {
+
+        border-top: 1px solid $blue-1;
+
+        &:first-of-type {
+            border-top: none;
+        }
+
+        .table-list {
+            position: relative;
+
+            &__header {
+                background-color: $blue-4;
+            }
+
+            &__insurers {
+                tr {
+                    td {
+                        background-color: $blue-2;
+                        border-bottom-color: rgba(255, 255, 255, 0.1);
+                    }
+
+                    td.border-fix {
+                        @include  border-bottom-radius(15px);
+
+                        @include media-breakpoint-up(lg) {
+
+                        }
+                    }
+                }
+            }
+
+            &__icn-dark {
+                background-image: url('#{$cdn_url}/images/rebrand/icns/so-sure_unhappy-dark-icn.svg');
+            }
+
+            @include media-breakpoint-up(md) {
+                width: 384px;
+            }
+
+            @include media-breakpoint-up(xl) {
+
+                &__insurers {
+                    z-index: 10;
+                }
+
+                &__so-sure {
+                    transform: translateX(-25px);
+                    z-index: 11;
+
+                    @include media-breakpoint-up(md) {
+                        width: 400px;
+                    }
+                }
+            }
+        }
+    }
+}

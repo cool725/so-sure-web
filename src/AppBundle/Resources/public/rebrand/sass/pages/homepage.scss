@@ -151,6 +151,7 @@
 
     .carousel-inner {
         min-height: 280px;
+        background: $white url('#{$cdn_url}/images/rebrand/misc/so-sure_quote-background.svg') no-repeat right 50%;
 
         @include media-breakpoint-up(lg) {
             min-height: none;

@@ -22,7 +22,7 @@
                 $test.remove();
 
                 // Set the width
-                $this.width(width + 10);
+                $this.width(width);
 
             }).change();
 

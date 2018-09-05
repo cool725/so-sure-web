@@ -1,7 +1,7 @@
 {% extends 'base_rebrand.html.twig' %}
 
 {# Set vars #}
-{% set body_class = 'quote' %}
+{% set body_class = 'welcome' %}
 {% set quote_mode = 1 %}
 {% set include_emoji = 1 %}
 
@@ -34,11 +34,12 @@
 
 {% block body %}
 
-    <section class="welcome">
+    <section class="qpw">
         <div class="d-flex flex-column flex-lg-row">
 
-            <div class="welcome__details__container order-2 order-lg-1">
-                <div class="welcome__details px-4 pb-4 px-lg-5 pb-lg-0">
+            {# Main Content #}
+            <div class="qpw__main__container order-3 order-lg-1">
+                <div class="qpw__main px-4 px-lg-5">
                     <h1 class="text-white mb-4">
                         {{ policy.user.firstname }}, <span class="sub">welcome to <span class="text-nowrap">so-sure!</span></span>
                     </h1>
@@ -90,8 +91,8 @@
                                 How do I lower my excess? <i class="far fa-chevron-down text-white fa-lg"></i>
                             </h5>
                             <div class="expanding-cardbox__expand text-white mt-4">
-                                <p>Now that you have a policy you need to download our app to reduce your excess by &pound;80-100.</p>
-                                <p>Download the app now, and click on pic-sure in the app.</p>
+                                <p>Now that you have a policy, let's get your excess reduced from &pound;150 to &pound;50 for accidental damage and &pound;70 for loss</p>
+                                <p>Download the app now, login and click on pic-sure to get started.</p>
                                 <ul class="list-inline">
                                     <li class="list-inline-item mb-2">
                                         <a class="ga-outbound-click" data-clicklabel="iTunes" href="{{ apple_download('user-welcome') }}" target="_blank" rel="noopener">
@@ -132,16 +133,46 @@
                 </div>
             </div>
 
-            {# TODO: Curve #}
+            {# Curve Desktop #}
+            <div class="qpw__curve order-2">
+                <svg class="d-block d-lg-none" preserveAspectRatio="xMinYMin meet" viewBox="0 0 750 117" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                    <defs></defs>
+                    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                        <g id="Artboard" fill="#FFFFFF" fill-rule="nonzero">
+                            <g transform="translate(375.000000, 58.500000) scale(1, -1) translate(-375.000000, -58.500000) ">
+                                <g id="Page-1">
+                                    <g id="Group">
+                                        <g id="---BG---">
+                                            <path d="M0,40 C124,13.33333 248.66667,0 374,0 C499.33333,0 624.66667,13.33333 750,40 L750,117 L0,117 L0,40 Z" id="Rectangle"></path>
+                                        </g>
+                                    </g>
+                                </g>
+                            </g>
+                        </g>
+                    </g>
+                </svg>
+                <svg class="d-none d-lg-block" preserveAspectRatio="xMinYMin meet" viewBox="0 0 57 846" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                    <defs></defs>
+                    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                        <g transform="translate(-12.000000, 0.000000)" fill="#FFFFFF">
+                            <path d="M69,0 L69,846 L68,846 C30.6666667,705 12,564 12,423 C12,282 31,141 69,0 Z" id="Rectangle-3"></path>
+                        </g>
+                    </g>
+                </svg>
+            </div>
 
-            <div class="welcome__cover__container order-1 order-lg-2">
-                <div class="welcome__cover px-4 pb-5">
+            {# Sub Content #}
+            <div class="qpw__sub__container order-1 order-lg-3">
+                <div class="qpw__sub px-4 pb-4 px-lg-5">
                     <h2 class="text-blue2 mb-3">You're covered 🎉</h2>
                     <h5 class="mb-4">Thank you for choosing so-sure</h5>
                     <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_Icon_friends-connect.png" alt="so-sure - Simple Terms &amp; Conditions" class="mb-4" width="150px">
-                    <a href="{{ path('user_policy', {'policyId': policy.id }) }}" class="btn btn-success btn-shadow">View your account <i class="far fa-arrow-right ml-2"></i></a>
+                    <div>
+                        <a href="{{ path('user_policy', {'policyId': policy.id }) }}" class="btn btn-success btn-shadow">View your account <i class="far fa-arrow-right ml-2"></i></a>
+                    </div>
                 </div>
             </div>
+
         </div>
     </section>
 

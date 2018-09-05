@@ -4,6 +4,7 @@ namespace AppBundle\Tests\Service;
 
 use AppBundle\Document\Company;
 use AppBundle\Document\Form\Bacs;
+use AppBundle\Document\Payment\PolicyDiscountPayment;
 use AppBundle\Exception\GeoRestrictedException;
 use AppBundle\Exception\InvalidUserDetailsException;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -622,6 +623,39 @@ class PolicyServiceTest extends WebTestCase
 
         $this->assertEquals(
             new \DateTime('2017-05-15', $timezone),
+            $policy->getPolicyExpirationDate()
+        );
+    }
+
+    public function testPolicyYearlyWithDiscountUnpaidExpirationDate()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testPolicyYearlyWithDiscountUnpaidExpirationDate', $this),
+            'bar',
+            static::$dm
+        );
+        $policy = static::initPolicy(
+            $user,
+            static::$dm,
+            $this->getRandomPhone(static::$dm),
+            new \DateTime('2017-01-29'),
+            false
+        );
+        $policy->setPremiumInstallments(1);
+        $discount = new PolicyDiscountPayment();
+        $discount->setAmount(2);
+        $discount->setDate(new \DateTime('2017-01-29'));
+        $policy->addPayment($discount);
+        $policy->getPremium()->setAnnualDiscount($discount->getAmount());
+
+        $policy->setStatus(PhonePolicy::STATUS_PENDING);
+        static::$policyService->create($policy, new \DateTime('2017-01-29'));
+        $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
+
+        $timezone = new \DateTimeZone('Europe/London');
+        $this->assertEquals(
+            new \DateTime('2017-02-28', $timezone),
             $policy->getPolicyExpirationDate()
         );
     }

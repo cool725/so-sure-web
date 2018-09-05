@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    targetNamespace="http://sims.salva.ee/service/schema/customer/export/v1"
+    xmlns="http://sims.salva.ee/service/schema/customer/export/v1"
+    xmlns:base="http://sims.salva.ee/service/schema/v1"
+    xmlns:policy="http://sims.salva.ee/service/schema/policy/v1"
+    elementFormDefault="qualified"
+    attributeFormDefault="qualified">
+
+    <xs:import namespace="http://sims.salva.ee/service/schema/v1" schemaLocation="../../baseTypesV1.xsd"></xs:import>
+    <xs:import namespace="http://sims.salva.ee/service/schema/policy/v1" schemaLocation="../../policy/policyBaseTypesV1.xsd"></xs:import>
+
+    <xs:element name="serviceRequest" type="serviceRequestType"/>
+    <xs:element name="serviceResponse" type="serviceResponseType"/>
+
+    <xs:complexType name="serviceRequestType">
+        <xs:all>
+            <xs:element name="code" type="xs:string" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="countryCode" type="xs:string" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="personTypeCode" type="xs:string" minOccurs="0" maxOccurs="1"/>
+        </xs:all>
+    </xs:complexType>
+
+    <xs:complexType name="serviceResponseType">
+        <xs:complexContent>
+            <xs:extension base="base:abstractResponseType">
+                <xs:sequence>
+                    <xs:element name="customer" type="policy:customerType"/>
+                    <xs:element name="request" type="serviceRequestType"/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+</xs:schema>
