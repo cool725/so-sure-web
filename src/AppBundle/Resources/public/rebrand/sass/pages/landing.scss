@@ -35,6 +35,10 @@
     .table-comparison {
         position: relative;
         z-index: 4;
+
+        @include media-breakpoint-down(xs) {
+            max-width: 300px;
+        }
     }
 
     &__partner-logo {
