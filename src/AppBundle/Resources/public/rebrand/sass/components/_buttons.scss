@@ -74,3 +74,28 @@
     }
 }
 
+// Btn icons using FA5
+.btn-icon {
+
+    &:after {
+        display: inline-block;
+        font-style: normal;
+        font-variant: normal;
+        text-rendering: auto;
+        -webkit-font-smoothing: antialiased;
+        font-family: 'Font Awesome 5 Pro';
+        vertical-align: middle;
+        margin-left: 20px;
+        opacity: 0.7;
+    }
+}
+
+.arrow-right {
+
+    &:after {
+        font-weight: 400;
+        content: '\f178'
+    }
+
+}
+
