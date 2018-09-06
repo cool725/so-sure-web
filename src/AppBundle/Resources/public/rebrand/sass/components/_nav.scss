@@ -92,34 +92,53 @@
     &:focus {
         outline: 0;
     }
-}
 
-.navbar-light {
-    .hamburger--spring-r .hamburger-inner {
-        &,
-        &::before,
-        &::after {
-            opacity: 0.7;
-            background-color: $white;
+    &.is-active {
+
+        .hamburger-inner {
+            &,
+            &::before,
+            &::after {
+                background-color: $white;
+            }
         }
     }
 }
 
-.hamburger--spring-r.is-active .hamburger-inner {
-    &,
-    &::before,
-    &::after {
-        opacity: 1;
-        background-color: $white;
+.navbar-light {
+    .hamburger {
+        .hamburger-inner {
+            &,
+            &::before,
+            &::after {
+                background-color: $white;
+            }
+        }
     }
 }
 
+
+// Page specific
+.quote,
+.purchase {
+
+    .navbar {
+        @include media-breakpoint-up(lg) {
+            box-shadow: none;
+        }
+    }
+
+}
+
+
 // Utilities
+// Allow elements to show through when menu is open
 .show-in-nav {
     position: relative;
     z-index: 1080;
 }
 
+// Devbar - non-prod
 .devbar {
     background-color: rgba(236, 245, 254, 0.5);
 
