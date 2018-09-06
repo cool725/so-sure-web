@@ -175,9 +175,19 @@
                                     {% if policy.isPolicy and policy.start %}
                                         <br>
                                         {% if policy.end < now %}
-                                            Commission of £{{ policy.getProratedCommission(policy.end) | number_format(2, '.', ',') }} was due on policy
+                                            Commission of £{{ policy.getProratedCommission(policy.end) | number_format(2, '.', ',') }}
+                                            (
+                                            £{{ policy.getProratedCoverholderCommission(policy.end) | number_format(2, '.', ',') }} /
+                                            £{{ policy.getProratedBrokerCommission(policy.end) | number_format(2, '.', ',') }}
+                                            )
+                                            was due on policy
                                         {% else %}
-                                            Commission of £{{ policy.getProratedCommission() | number_format(2, '.', ',') }} due (daily calc)
+                                            Commission of £{{ policy.getProratedCommission() | number_format(2, '.', ',') }}
+                                            (
+                                            £{{ policy.getProratedCoverholderCommission() | number_format(2, '.', ',') }} /
+                                            £{{ policy.getProratedBrokerCommission() | number_format(2, '.', ',') }}
+                                            )
+                                            due (daily calc)
                                         {% endif %}
                                     {% endif %}
                                 </td>
@@ -1174,7 +1184,11 @@
                       <th>Payment Status</th>
                       <th>Actions</th>
                   </tr>
+                  {% set totalScheduled = 0 %}
                   {% for scheduledPayment in policy.scheduledPayments %}
+                      {% if scheduledPayment.status == 'scheduled' %}
+                          {% set totalScheduled = totalScheduled + scheduledPayment.amount %}
+                      {% endif %}
                     <tr>
                         <td>
                             {% if scheduledPayment.type == 'scheduled' %}
@@ -1218,6 +1232,12 @@
                         </td>
                     </tr>
                   {% endfor %}
+                    <tr>
+                        <td>Remaining Scheduled</td>
+                        <td>
+                            £{{ totalScheduled | number_format(2, '.', ',') }}
+                        </td>
+                    </tr>
               </tbody>
             </table>
           </div>
