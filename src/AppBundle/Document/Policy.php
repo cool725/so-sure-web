@@ -2178,6 +2178,21 @@ abstract class Policy
         return $this->toTwoDp($used);
     }
 
+    public function getProratedCoverholderCommission(\DateTime $date = null)
+    {
+        // TODO: either make abstract to get the total commission, or move to a db collection
+        $used = Salva::YEARLY_COVERHOLDER_COMMISSION * $this->getProrataMultiplier($date);
+
+        return $this->toTwoDp($used);
+    }
+
+    public function getProratedBrokerCommission(\DateTime $date = null)
+    {
+        return $this->toTwoDp(
+            $this->getProratedCommission($date) - $this->getProratedCoverholderCommission($date)
+        );
+    }
+
     public function getProratedCommissionRefund(\DateTime $date = null)
     {
         $used = $this->getProratedCommission($date);
