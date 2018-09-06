@@ -3,7 +3,7 @@
 require('../sass/global.scss');
 
 // Cookies
-import { CookieConsent } from 'cookieconsent';
+let CookieConsent = require('cookieconsent');
 
 document.addEventListener('DOMContentLoaded', () => {
     cookieconsent.initialise({
