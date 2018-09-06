@@ -381,6 +381,8 @@ class ValidatePolicyCommand extends BaseCommand
                     '5a0421dec502d01a414f5b53', // commission diff agreed w/salva
                     '5a4681720eb25b15aa49f227', // commission diff agreed w/salva
                     '58341bfc1d255d3f0a6641c9', // commission diff agreed w/salva
+                    '5ada39a375435e4af22daa45', // refund was provided
+                    '5ab17d0754e50f610f289ab5', // refund was provided
                 ])) {
                     $this->header($policy, $policies, $lines);
                     $lines[] = $this->failureCommissionMessage($policy, $data['prefix'], $data['validateDate']);
