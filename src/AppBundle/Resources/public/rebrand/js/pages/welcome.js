@@ -1,8 +1,9 @@
 // welcome.js
 
-import 'bootstrap/js/dist/tooltip';
-
 require('../../sass/pages/welcome.scss');
+
+// Require BS component(s)
+require('bootstrap/js/dist/tooltip');
 
 // Require components;
 let Clipboard = require('clipboard');
@@ -73,4 +74,8 @@ $(function() {
         loadDoc();
     });
 
+    // Show Starling Welcome
+    if ($('#starling-modal').length) {
+        $('#starling-modal').modal('show');
+    }
 });
