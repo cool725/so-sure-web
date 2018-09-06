@@ -155,7 +155,7 @@
         }
     }
 
-    background: $bb-2 url('#{$cdn_url}/images/rebrand/homepage/so-sure_reviews-image.png') no-repeat 80px 550px;
+    background: $bb-2 url('#{$cdn_url}/images/rebrand/homepage/so-sure_reviews-image.png') no-repeat 80px 500px;
     background-size: 500px;
 
     @include media-breakpoint-up(sm) {
