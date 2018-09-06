@@ -689,7 +689,7 @@ class ReceperioService extends BaseImeiService
                         ReciperoManualProcessException::MAKE_MODEL_MEMORY_MISMATCH,
                     ])) {
                         // Don't pass exception as param (string ok) here. Message missing/confusing in rollbar
-                        $this->logger->error(
+                        $this->logger->info(
                             sprintf(
                                 "Unable to recheck iPhone using imei as serial number '%s'. Exception: %s",
                                 $imei,
