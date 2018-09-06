@@ -352,6 +352,11 @@ class PhoneInsuranceController extends BaseController
             ->add('buy', SubmitType::class)
             ->add('slider_used', HiddenType::class)
             ->getForm();
+        $buyBannerFourForm = $this->get('form.factory')
+            ->createNamedBuilder('buy_form_banner_four')
+            ->add('buy', SubmitType::class)
+            ->add('slider_used', HiddenType::class)
+            ->getForm();
 
         if ('POST' === $request->getMethod()) {
             if ($request->request->has('lead_form')) {
@@ -471,6 +476,24 @@ class PhoneInsuranceController extends BaseController
                         return $this->redirectToRoute('purchase');
                     }
                 }
+            } elseif ($request->request->has('buy_form_banner_four')) {
+                $buyBannerFourForm->handleRequest($request);
+                if ($buyBannerFourForm->isValid()) {
+                    $properties = [];
+                    $properties['Location'] = 'sticky';
+                    // if ($buyForm->getData()['claim_used']) {
+                    //     $properties['Played with Claims'] = true;
+                    // }
+                    $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_BUY_BUTTON_CLICKED, $properties);
+
+                    // Multipolicy should skip user details
+                    if ($this->getUser() && $this->getUser()->hasPolicy()) {
+                        // don't check for partial partial as quote phone may be different from partial policy phone
+                        return $this->redirectToRoute('purchase_step_policy');
+                    } else {
+                        return $this->redirectToRoute('purchase');
+                    }
+                }
             }
         }
 
@@ -519,7 +542,8 @@ class PhoneInsuranceController extends BaseController
             'buy_form_banner'       => $buyBannerForm->createView(),
             'buy_form_banner_two'   => $buyBannerTwoForm->createView(),
             'buy_form_banner_three' => $buyBannerTwoForm->createView(),
-            'phones'           => $repo->findBy(
+            'buy_form_banner_four'  => $buyBannerTwoForm->createView(),
+            'phones'                => $repo->findBy(
                 [
                     'active'         => true,
                     'makeCanonical'  => mb_strtolower($make),
@@ -530,7 +554,7 @@ class PhoneInsuranceController extends BaseController
             'comparision'     => $phone->getComparisions(),
             'comparision_max' => $maxComparision,
             'coming_soon'     => $phone->getCurrentPhonePrice() ? false : true,
-            'slider_test'     => 'slide-me',
+            // 'slider_test'     => 'slide-me',
             // 'replacement'     => $replacement,
         );
 
