@@ -74,4 +74,8 @@ $(function() {
         loadDoc();
     });
 
+    // Show Starling Welcome
+    if ($('#starling-modal').length) {
+        $('#starling-modal').modal('show');
+    }
 });
