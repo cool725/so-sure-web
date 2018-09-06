@@ -201,7 +201,11 @@
                 {{ phone.make }} {{ phone.model }} | <strong>&pound;{{ phone_price.monthlyPremiumPrice }}</strong> p/m
             </div>
             {{ form_start(buy_form_banner_four) }}
-                {{ form_widget(buy_form_banner_four.buy, {'label': 'Insure your ' ~ phone.model, 'attr': {'class': 'btn btn-success btn-gradient-green btn-shadow btn-icon arrow-right'}}) }}
+                {{ form_widget(buy_form_banner_four.buy, {
+                    'label': 'Insure your ' ~ phone.make ~ ' phone',
+                    'attr': {
+                        'class': 'btn btn-success btn-gradient-green btn-shadow btn-icon arrow-right'
+                }}) }}
             {{ form_end(buy_form_banner_four) }}
         </div>
     </div>
