@@ -446,7 +446,7 @@ class MonitorService
         foreach ($paymentsRepo->findPayments(new \DateTime()) as $payment) {
             /** @var BacsPayment $payment */
             if ($payment->canAction(new \DateTime())) {
-                throw new MonitorException(srpintf('There are bacs payments waiting actioning: %s', $payment->getId()));
+                throw new MonitorException(sprintf('There are bacs payments waiting actioning: %s', $payment->getId()));
             }
         }
     }
