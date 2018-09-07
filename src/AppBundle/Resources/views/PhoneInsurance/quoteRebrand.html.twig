@@ -198,13 +198,14 @@
     <div class="qpw__sticky">
         <div class="qpw__sticky__inner px-4 py-3">
             <div class="mb-2">
-                {{ phone.make }} {{ phone.model }} | <strong>&pound;{{ phone_price.monthlyPremiumPrice }}</strong> p/m
+                {% set phone_name = phone.make ~ ' ' ~ phone.model %}
+                {{ phone_name[:20] ~ '...' }} | <strong>&pound;{{ phone_price.monthlyPremiumPrice }}</strong> p/m
             </div>
             {{ form_start(buy_form_banner_four) }}
                 {{ form_widget(buy_form_banner_four.buy, {
                     'label': 'Insure your ' ~ phone.make ~ ' phone',
                     'attr': {
-                        'class': 'btn btn-success btn-gradient-green btn-shadow btn-icon arrow-right'
+                        'class': 'btn btn-success btn-gradient-green btn-shadow btn-sm btn-icon arrow-right'
                 }}) }}
             {{ form_end(buy_form_banner_four) }}
         </div>
