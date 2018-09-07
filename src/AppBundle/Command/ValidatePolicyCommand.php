@@ -339,6 +339,13 @@ class ValidatePolicyCommand extends BaseCommand
                             $policy->getPolicyNumber()
                         );
                     }
+                } elseif ($policy->getUser()->hasBacsPaymentMethod() &&
+                    $policy->getUser()->getBacsPaymentMethod()->getBankAccount()->isMandateInvalid()) {
+                    $lines[] = sprintf(
+                        'Invalid BACS Mandate. Can ignore incorrect scheduled payments for policy %s',
+                        $policy->getPolicyNumber()
+                    );
+                    $lines[] = $this->failureScheduledPaymentsMessage($policy, $data['validateDate']);
                 } else {
                     $lines[] = sprintf(
                         'WARNING!! Incorrect scheduled payments for policy %s',
@@ -439,7 +446,14 @@ class ValidatePolicyCommand extends BaseCommand
                         $this->header($policy, $policies, $lines);
                         $lines[] = 'Warning!! No bacs payments, yet bank does not have first payment flag set';
                     }
-                    if ($bacsPayments == 0 && $bankAccount->getInitialNotificationDate() > new \DateTime()) {
+                    $now = new \DateTime();
+                    // BacsService::exportPaymentsDebits had a 3 day advance generation
+                    // + 1 day processing date
+                    // Anything scheduled further in advance would not be expected to be in the system
+                    $fourDays = clone $now;
+                    $fourDays = $fourDays->add(new \DateInterval('P4D'));
+                    if ($bacsPayments == 0 && $bankAccount->getInitialNotificationDate() > new \DateTime() &&
+                        $bankAccount->getInitialNotificationDate() < $fourDays) {
                         $this->header($policy, $policies, $lines);
                         $lines[] = 'Warning!! There are no bacs payments, yet its past the initial notification date';
                     }
