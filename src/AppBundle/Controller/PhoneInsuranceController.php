@@ -8,6 +8,7 @@ use AppBundle\Exception\ValidationException;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -602,7 +603,7 @@ class PhoneInsuranceController extends BaseController
         return $this->render('AppBundle:PhoneInsurance:learnMore.html.twig', $data);
     }
 
-    private function makeBuyButtonForm(string $formName, string $buttonName = 'buy'): FormInterface
+    private function makeBuyButtonForm(string $formName, string $buttonName = 'buy')
     {
         return $this->get('form.factory')
             ->createNamedBuilder($formName)
@@ -611,10 +612,6 @@ class PhoneInsuranceController extends BaseController
             ->getForm();
     }
 
-    /**
-     * @param $make
-     * @return Phone[]|array
-     */
     private function getAllPhonesByMake($make)
     {
         $dm = $this->getManager();
@@ -630,10 +627,6 @@ class PhoneInsuranceController extends BaseController
         return $phones;
     }
 
-    /**
-     * @param $phones
-     * @return array
-     */
     private function sortPhoneNamesByMemory($phones): array
     {
         $phonesMem = [];
@@ -661,13 +654,6 @@ class PhoneInsuranceController extends BaseController
         return $phonesMem;
     }
 
-    /**
-     * @param Request $request
-     * @param $make
-     * @param $model
-     * @param $memory
-     * @return null|RedirectResponse
-     */
     private function willRunQuoteTest(Request $request, $make, $model, $memory) //: ?RedirectResponse
     {
         if ($request->get('_route') === 'test_insurance_make_model_memory') {
