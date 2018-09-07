@@ -13,7 +13,7 @@
 
         // Style
         background: transparent url('#{$cdn_url}/images/rebrand/icns/so-sure_arrow-down-icn.svg') no-repeat;
-        background-position: right 15px;
+        background-position: right 12px;
         background-size: 20px;
         border: 0;
         border-bottom: 3px solid $blue-1b;
@@ -30,7 +30,7 @@
         &.valid-select {
             color: $white;
             background: transparent url('#{$cdn_url}/images/rebrand/icns/so-sure_arrow-down-active-icn.svg') no-repeat;
-            background-position: right 15px;
+            background-position: right 12px;
             background-size: 20px;
         }
 
@@ -55,7 +55,7 @@
 
     @include media-breakpoint-down(xs) {
         .h1 {
-            font-size: 1.6rem;
+            font-size: 1.4rem;
         }
     }
 
