@@ -577,7 +577,7 @@ class PurchaseControllerTest extends BaseControllerTest
             self::$router->generate('purchase_step_policy')
         );
         self::verifyResponse(200, null, $crawler);
-        $this->assertNotContains('Get a quote', $crawler->html());
+        $this->assertNotContains('Get a Quote', $crawler->html());
 
         $crawler = $this->setPhoneNew($phone, null, 1, true, null, ReceperioService::TEST_INVALID_SERIAL);
 
@@ -1150,7 +1150,7 @@ class PurchaseControllerTest extends BaseControllerTest
         $crawler = self::$client->request('GET', '/purchase/');
         $data = self::$client->getResponse();
         $this->assertEquals(200, $data->getStatusCode());
-        self::verifySearchFormData($crawler->filter('form'), '/select-phone-search/purchase-change/', 1);
+        $this->assertHasFormAction($crawler, '/select-phone-dropdown');
     }
 
     public function testPhoneSearchUserInvalidPolicy()

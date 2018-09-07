@@ -8,6 +8,7 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Listener\UserListener;
 use AppBundle\Event\UserEmailEvent;
 use Symfony\Component\BrowserKit\Tests\TestClient;
+use Symfony\Component\DomCrawler\Crawler;
 
 class BaseControllerTest extends WebTestCase
 {
@@ -252,25 +253,44 @@ class BaseControllerTest extends WebTestCase
 
     protected function expectFlashSuccess($crawler, $message)
     {
+        $rebrand = $crawler->filterXPath('//div[contains(@class, "alert-success")]')->html();
+        $oldSite = $crawler->filterXPath('//div[contains(@class, "flash-success")]')->html();
+
         $this->assertContains(
             $message,
-            $crawler->filterXPath('//div[contains(@class, "flash-success")]')->html()
+            $rebrand . $oldSite
         );
     }
 
     protected function expectFlashWarning($crawler, $message)
     {
+        $rebrand = $crawler->filterXPath('//div[contains(@class, "alert-warning")]')->html();
+        $oldSite = $crawler->filterXPath('//div[contains(@class, "flash-warning")]')->html();
+
         $this->assertContains(
             $message,
-            $crawler->filterXPath('//div[contains(@class, "flash-warning")]')->html()
+            $rebrand . $oldSite
         );
     }
 
     protected function expectFlashError($crawler, $message)
     {
+        $rebrand = $crawler->filterXPath('//div[contains(@class, "alert-danger")]')->html();
+        $oldSite = $crawler->filterXPath('//div[contains(@class, "flash-danger")]')->html();
+
         $this->assertContains(
             $message,
-            $crawler->filterXPath('//div[contains(@class, "flash-danger")]')->html()
+            $rebrand . $oldSite
         );
+    }
+
+    protected function assertHasFormAction(Crawler $crawler, string $actionUrl)
+    {
+        $forms = $crawler->filter('form');
+        $actions = [];
+        foreach ($forms as $form) {
+            $actions[] = $form->getAttribute('action');
+        }
+        $this->assertContains($actionUrl, $actions, "Expected a form to be sent to {$actionUrl}");
     }
 }
