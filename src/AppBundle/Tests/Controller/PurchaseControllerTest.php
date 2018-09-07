@@ -609,7 +609,7 @@ class PurchaseControllerTest extends BaseControllerTest
             self::$router->generate('purchase_step_policy')
         );
         self::verifyResponse(200, null, $crawler);
-        $this->assertContains('Get a quote', $crawler->html());
+        $this->assertContains('Get a Quote', $crawler->html());
     }
 
     public function testPurchaseReviewIOSWithNoPhoneSession()
@@ -641,7 +641,7 @@ class PurchaseControllerTest extends BaseControllerTest
         );
         // @codingStandardsIgnoreEnd
         self::verifyResponse(200, null, $crawler);
-        $this->assertContains('Get a quote', $crawler->html());
+        $this->assertContains('Get a Quote', $crawler->html());
     }
 
     public function testPayCC()
