@@ -1,44 +1,12 @@
-<nav class="navbar fixed-top justify-content-between flex-nowrap flex-row pl-lg-5
-     {% if quote_mode is defined and quote_mode == 1 %}
-        navbar-quote
-     {% endif %}">
+<nav class="navbar fixed-top justify-content-between flex-nowrap flex-row pl-lg-5 {% if light_nav is defined and light_nav == 1 %}navbar-light{% endif %}">
     <a href="/" class="navbar-brand show-in-nav show-in-quote">
-        <div class="navbar-brand__logo
-             {% if quote_mode is defined and quote_mode == 1 %}
-                navbar-brand__logo-white-light
-            {% endif %}">
-        </div>
+        <div class="navbar-brand__logo {% if light_nav is defined and light_nav == 1 %}navbar-brand__logo-white-light{% endif %}"></div>
         <span class="sr-only">so-sure</span>
     </a>
     {% if quote_mode is defined and quote_mode == 1 %}
         {# Hide the nav #}
     {% else %}
         <ul class="nav navbar-nav flex-row align-items-center">
-   {#          <li class="nav-item dropdown d-none d-xl-block pr-xl-5">
-                <a href="#"
-                   id="why_dropdown"
-                   class="nav-link dropdown-toggle"
-                   data-toggle="dropdown"
-                   aria-haspopup="true"
-                   aria-expanded="false"
-                   role="button">
-                   Why so-sure? <i class="far fa-chevron-down ml-2 text-blue2"></i>
-                </a>
-                <div class="dropdown-menu" aria-labelledby="why_dropdown">
-                    <a class="dropdown-item h6" href="#">
-                        Action
-                        <small>Some test text</small>
-                    </a>
-                    <a class="dropdown-item h6" href="#">
-                        Action
-                        <small>Some test text</small>
-                    </a>
-                    <a class="dropdown-item h6" href="#">
-                        Action
-                        <small>Some test text</small>
-                    </a>
-                </div>
-            </li> #}
             <li class="nav-item d-none d-xl-block pr-xl-5">
                 <a href="{{ path('claim') }}" class="nav-link">Make a claim</a>
             </li>
@@ -54,29 +22,29 @@
             {% if app.user is not null and app.user %}
                 <li class="nav-item d-none d-xl-block pr-xl-5">
                     {% if is_granted('ROLE_ADMIN') %}
-                        <a href="{{ path('admin_home') }}" class="nav-link text-primary">Admin</a>
+                        <a href="{{ path('admin_home') }}" class="nav-link user-link">Admin</a>
                     {% elseif is_granted('ROLE_EMPLOYEE') %}
-                        <a href="{{ path('admin_home') }}" class="nav-link text-primary">Admin</a>
+                        <a href="{{ path('admin_home') }}" class="nav-link user-link">Admin</a>
                     {% elseif is_granted('ROLE_CLAIMS') %}
-                        <a href="{{ path('claims_home') }}" class="nav-link text-primary">Claims</a>
+                        <a href="{{ path('claims_home') }}" class="nav-link user-link">Claims</a>
                     {% else %}
-                        <a href="{{ path('user_home') }}" class="nav-link text-primary">Your account</a>
+                        <a href="{{ path('user_home') }}" class="nav-link user-link">Your account</a>
                     {% endif %}
                 </li>
             {% else %}
                 <li class="nav-item d-none-xxs pr-xl-5">
-                    <a id="quote_btn" href="#" class="btn btn-primary btn-gradient btn-sm show-in-nav get-a-quote">Get a Quote</a>
+                    <a id="quote_btn" href="#" class="btn {% if light_nav is defined and light_nav == 1 %}btn-white btn-shadow{% else %}btn-primary btn-gradient{% endif %} btn-sm show-in-nav get-a-quote">Get a Quote</a>
                 </li>
             {% endif %}
             <li class="nav-item d-none d-xl-block pr-xl-5">
                 {% if app.user is not null and app.user %}
                     {% if is_granted('ROLE_PREVIOUS_ADMIN') %}
-                        <a href="{{ path('homepage', {'_impersonate': '_exit'}) }}" class="nav-link text-primary">Exit <u>{{ app.user.email }}</u></a>
+                        <a href="{{ path('homepage', {'_impersonate': '_exit'}) }}" class="nav-link user-link">Exit <u>{{ app.user.email }}</u></a>
                     {% else %}
-                        <a href="{{ path('fos_user_security_logout') }}" class="nav-link text-primary">Log out</i></a>
+                        <a href="{{ path('fos_user_security_logout') }}" class="nav-link user-link">Log out</i></a>
                     {% endif %}
                 {% else %}
-                    <a href="{{ path('fos_user_security_login') }}" class="nav-link text-primary">Customer log in <i class="far fa-arrow-right fa-sm ml-2"></i></a>
+                    <a href="{{ path('fos_user_security_login') }}" class="{% if light_nav is defined and light_nav == 1 %}btn btn-outline-blue1 btn-sm{% else %}nav-link user-link{% endif %}">Customer log in <i class="far fa-arrow-right fa-sm ml-2"></i></a>
                 {% endif %}
             </li>
             <li class="nav-item d-xl-none">
@@ -84,7 +52,6 @@
                     <span class="hamburger-box">
                         <span class="hamburger-inner"></span>
                     </span>
-                    <span class="sr-only">menu</span>
                 </button>
             </li>
         </ul>
@@ -104,9 +71,6 @@
                     {% endif %}
                 </li>
             {% endif %}
-{#             <li>
-                <a href="#" class="h5">Why so-sure?</a>
-            </li> #}
             <li>
                 <a href="{{ path('claim') }}" class="h5">Make a claim</a>
             </li>

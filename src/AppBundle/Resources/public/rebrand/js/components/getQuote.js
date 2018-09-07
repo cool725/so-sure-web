@@ -16,7 +16,7 @@ $(function() {
         }
 
         // Toggle logo class
-        if (!$('body').is('.quote, .purchase')) {
+        if (!$('.navbar').is('.navbar-light')) {
             logo.toggleClass('navbar-brand__logo-white-light');
         }
 

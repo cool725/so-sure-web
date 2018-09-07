@@ -15,6 +15,10 @@
         .nav-link {
             font-family: $g-medium;
             color: $grey;
+
+            &.user-link {
+                color: $blue-2;
+            }
         }
 
         .dropdown-menu {
@@ -29,14 +33,23 @@
             }
         }
     }
-}
 
-.navbar-quote {
-    @include media-breakpoint-up(lg) {
-        box-shadow: none;
+    &-light {
+        .navbar-nav {
+
+            .nav-link {
+                color: $white;
+
+                &.user-link {
+                    color: $blue-1;
+                }
+            }
+
+        }
     }
 }
 
+// Logo bits
 .navbar-brand {
 
     &__logo {
@@ -54,16 +67,24 @@
     }
 }
 
+// Scroll effects
 .navbar-scrolled {
     transition: padding 0.2s linear;
     background-color: $white;
     box-shadow: 0 2px 0 0 rgba(0, 0, 0, 0.05);
 }
 
+.navbar-light {
+    &.navbar-scrolled {
+        @include linear-gradient(135deg, $blue-3, $blue-1a);
+    }
+}
+
 .navbar-scrolled-quote {
     visibility: hidden;
 }
 
+// Hamburger toggle
 .hamburger {
     position: relative;
     z-index: 1040;
@@ -71,22 +92,53 @@
     &:focus {
         outline: 0;
     }
-}
 
-.hamburger--spring-r.is-active .hamburger-inner {
-    &,
-    &::before,
-    &::after {
-        opacity: 1;
-        background-color: $white;
+    &.is-active {
+
+        .hamburger-inner {
+            &,
+            &::before,
+            &::after {
+                background-color: $white;
+            }
+        }
     }
 }
 
+.navbar-light {
+    .hamburger {
+        .hamburger-inner {
+            &,
+            &::before,
+            &::after {
+                background-color: $white;
+            }
+        }
+    }
+}
+
+
+// Page specific
+.quote,
+.purchase {
+
+    .navbar {
+        @include media-breakpoint-up(lg) {
+            box-shadow: none;
+        }
+    }
+
+}
+
+
+// Utilities
+// Allow elements to show through when menu is open
 .show-in-nav {
     position: relative;
     z-index: 1080;
 }
 
+// Devbar - non-prod
 .devbar {
     background-color: rgba(236, 245, 254, 0.5);
 
