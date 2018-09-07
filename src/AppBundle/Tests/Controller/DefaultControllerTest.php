@@ -140,7 +140,7 @@ class DefaultControllerTest extends BaseControllerTest
         /** @var PhonePrice $price */
         $price = $phone->getCurrentPhonePrice();
         $this->assertContains(
-            sprintf("£%.2f", $price->getMonthlyPremiumPrice()),
+            sprintf("&pound;%.2f", $price->getMonthlyPremiumPrice()),
             self::$client->getResponse()->getContent()
         );
     }
