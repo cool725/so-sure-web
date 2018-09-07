@@ -577,7 +577,7 @@ class PurchaseControllerTest extends BaseControllerTest
             self::$router->generate('purchase_step_policy')
         );
         self::verifyResponse(200, null, $crawler);
-        $this->assertNotContains('Select phone', $crawler->html());
+        $this->assertNotContains('Get a quote', $crawler->html());
 
         $crawler = $this->setPhoneNew($phone, null, 1, true, null, ReceperioService::TEST_INVALID_SERIAL);
 
@@ -641,8 +641,7 @@ class PurchaseControllerTest extends BaseControllerTest
         );
         // @codingStandardsIgnoreEnd
         self::verifyResponse(200, null, $crawler);
-        $this->assertContains('Select phone', $crawler->html());
-        $this->assertContains('data-device-os="iOS"', $crawler->html());
+        $this->assertContains('Get a quote', $crawler->html());
     }
 
     public function testPayCC()
