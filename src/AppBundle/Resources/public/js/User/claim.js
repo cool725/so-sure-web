@@ -37,7 +37,6 @@ sosure.claim = (function() {
                             return true;
                         }
                     },
-                    // equalTo: '#username_signature'
                     equalToIgnoreCase: '#username_signature'
                 },
                 "claim_form[name]" : {
