@@ -609,8 +609,7 @@ class PurchaseControllerTest extends BaseControllerTest
             self::$router->generate('purchase_step_policy')
         );
         self::verifyResponse(200, null, $crawler);
-        $this->assertContains('Select phone', $crawler->html());
-        $this->assertNotContains('data-device-os="iOS"', $crawler->html());
+        $this->assertContains('Get a quote', $crawler->html());
     }
 
     public function testPurchaseReviewIOSWithNoPhoneSession()
