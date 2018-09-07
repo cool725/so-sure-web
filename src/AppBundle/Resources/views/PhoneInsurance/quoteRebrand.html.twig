@@ -198,7 +198,8 @@
     <div class="qpw__sticky">
         <div class="qpw__sticky__inner px-4 py-3">
             <div class="mb-2">
-                {{ (phone.make ~ ' ' ~ phone.model)|truncate(20) ~ '...' }} | <strong>&pound;{{ phone_price.monthlyPremiumPrice }}</strong> p/m
+                {{ (phone.make ~ ' ' ~ phone.model)|truncate(20) }}
+                | <strong>&pound;{{ phone_price.monthlyPremiumPrice }}</strong> p/m
             </div>
             {{ form_start(buy_form_banner_four) }}
                 {{ form_widget(buy_form_banner_four.buy, {
