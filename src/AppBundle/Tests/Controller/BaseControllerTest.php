@@ -251,36 +251,46 @@ class BaseControllerTest extends WebTestCase
         $this->assertEquals($numOfForms, $processed);
     }
 
-    protected function expectFlashSuccess($crawler, $message)
+    protected function getCrawlerClassHtml(Crawler $crawler, $class)
     {
-        $rebrand = $crawler->filterXPath('//div[contains(@class, "alert-success")]')->html();
-        $oldSite = $crawler->filterXPath('//div[contains(@class, "flash-success")]')->html();
+        $xPath = $crawler->filterXPath('//div[contains(@class, "' . $class . '")]');
+        if ($xPath->count() > 0) {
+            return $xPath->html();
+        }
+
+        return null;
+    }
+
+    protected function expectFlashSuccess(Crawler $crawler, $message)
+    {
+        $rebrand = $this->getCrawlerClassHtml($crawler,'alert-success');
+        $oldSite = $this->getCrawlerClassHtml($crawler,'flash-success');
 
         $this->assertContains(
             $message,
-            $rebrand . $oldSite
+            sprintf('%s %s', $rebrand, $oldSite)
         );
     }
 
-    protected function expectFlashWarning($crawler, $message)
+    protected function expectFlashWarning(Crawler $crawler, $message)
     {
-        $rebrand = $crawler->filterXPath('//div[contains(@class, "alert-warning")]')->html();
-        $oldSite = $crawler->filterXPath('//div[contains(@class, "flash-warning")]')->html();
+        $rebrand = $this->getCrawlerClassHtml($crawler,'alert-warning');
+        $oldSite = $this->getCrawlerClassHtml($crawler,'flash-warning');
 
         $this->assertContains(
             $message,
-            $rebrand . $oldSite
+            sprintf('%s %s', $rebrand, $oldSite)
         );
     }
 
-    protected function expectFlashError($crawler, $message)
+    protected function expectFlashError(Crawler $crawler, $message)
     {
-        $rebrand = $crawler->filterXPath('//div[contains(@class, "alert-danger")]')->html();
-        $oldSite = $crawler->filterXPath('//div[contains(@class, "flash-danger")]')->html();
+        $rebrand = $this->getCrawlerClassHtml($crawler,'alert-danger');
+        $oldSite = $this->getCrawlerClassHtml($crawler,'flash-danger');
 
         $this->assertContains(
             $message,
-            $rebrand . $oldSite
+            sprintf('%s %s', $rebrand, $oldSite)
         );
     }
 
