@@ -196,4 +196,14 @@ $(function(){
         return (nCheck % 10) === 0;
 
     }, 'Please enter a valid IMEI number');
+
+    jQuery.validator.addMethod('equalToIgnoreCase', function(value, element, param) {
+
+        // console.log('Value: ' + value);
+        // console.log('Element: ' + element);
+        // console.log('Param: ' + param.text());
+
+        return this.optional(element) || (value.toLowerCase() == $(param).val().toLowerCase());
+
+    }, 'Signature does not match name on policy');
 });
