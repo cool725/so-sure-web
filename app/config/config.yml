@@ -756,6 +756,7 @@ nelmio_security:
                 - http://www.google-analytics.com
                 - https://www.googletagmanager.com
                 - http://www.googletagmanager.com
+                - https://tagmanager.google.com
                 - http://*.googleadservices.com
                 - https://*.googleadservices.com
                 - https://*.googlesyndication.com
