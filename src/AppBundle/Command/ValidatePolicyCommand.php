@@ -340,6 +340,8 @@ class ValidatePolicyCommand extends BaseCommand
                         );
                     }
                 } elseif ($policy->getUser()->hasBacsPaymentMethod() &&
+                    $policy->getUser()->getBacsPaymentMethod() &&
+                    $policy->getUser()->getBacsPaymentMethod()->getBankAccount() &&
                     $policy->getUser()->getBacsPaymentMethod()->getBankAccount()->isMandateInvalid()) {
                     $lines[] = sprintf(
                         'Invalid BACS Mandate. Can ignore incorrect scheduled payments for policy %s',
