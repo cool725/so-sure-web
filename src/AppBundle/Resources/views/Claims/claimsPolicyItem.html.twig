@@ -633,7 +633,12 @@
             <table class="table table-striped">
                 <tr>
                     <td>User Id</td>
-                    <td>{{ policy.user.id }}</td>
+                    <td>
+                        {{ policy.user.id }}
+                        {% if is_granted('ROLE_EMPLOYEE') and policy.user.intercomId %}
+                            <a target="_blank" title="Intercom" href="https://app.intercom.io/a/apps/bjo63djg/users/{{ policy.user.intercomId }}/all-conversations"><i class="fa fa-external-link"></i></a>
+                        {% endif %}
+                    </td>
                 </tr>
                 <tr>
                     <td>Name</td>

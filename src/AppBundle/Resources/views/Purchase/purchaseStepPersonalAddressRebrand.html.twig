@@ -3,6 +3,7 @@
 {# Set vars #}
 {% set use_pca = true %}
 {% set body_class = 'purchase' %}
+{% set light_nav  = 1 %}
 {% set quote_mode = 1 %}
 
 {% set showAddress = purchase_form.addressLine1.vars.data | length > 0 or purchase_form.postcode.vars.data | length > 0 %}
