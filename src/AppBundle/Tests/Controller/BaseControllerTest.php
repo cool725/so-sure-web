@@ -263,8 +263,8 @@ class BaseControllerTest extends WebTestCase
 
     protected function expectFlashSuccess(Crawler $crawler, $message)
     {
-        $rebrand = $this->getCrawlerClassHtml($crawler,'alert-success');
-        $oldSite = $this->getCrawlerClassHtml($crawler,'flash-success');
+        $rebrand = $this->getCrawlerClassHtml($crawler, 'alert-success');
+        $oldSite = $this->getCrawlerClassHtml($crawler, 'flash-success');
 
         $this->assertContains(
             $message,
@@ -274,8 +274,8 @@ class BaseControllerTest extends WebTestCase
 
     protected function expectFlashWarning(Crawler $crawler, $message)
     {
-        $rebrand = $this->getCrawlerClassHtml($crawler,'alert-warning');
-        $oldSite = $this->getCrawlerClassHtml($crawler,'flash-warning');
+        $rebrand = $this->getCrawlerClassHtml($crawler, 'alert-warning');
+        $oldSite = $this->getCrawlerClassHtml($crawler, 'flash-warning');
 
         $this->assertContains(
             $message,
@@ -285,8 +285,8 @@ class BaseControllerTest extends WebTestCase
 
     protected function expectFlashError(Crawler $crawler, $message)
     {
-        $rebrand = $this->getCrawlerClassHtml($crawler,'alert-danger');
-        $oldSite = $this->getCrawlerClassHtml($crawler,'flash-danger');
+        $rebrand = $this->getCrawlerClassHtml($crawler, 'alert-danger');
+        $oldSite = $this->getCrawlerClassHtml($crawler, 'flash-danger');
 
         $this->assertContains(
             $message,
