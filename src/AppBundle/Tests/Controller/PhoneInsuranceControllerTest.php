@@ -48,7 +48,7 @@ class PhoneInsuranceControllerTest extends BaseControllerTest
         $this->assertEquals($redirectUrl, $data->getTargetUrl());
         $crawler = self::$client->followRedirect();
 
-        self::verifySearchFormData($crawler->filter('form'), '/phone-insurance/', 1);
+        $this->assertHasFormAction($crawler, '/select-phone-dropdown');
     }
 
     public function testSessionPurchasePhone()
