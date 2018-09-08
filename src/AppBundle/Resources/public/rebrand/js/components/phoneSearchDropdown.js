@@ -11,7 +11,7 @@ $(function() {
             memory = $('.phone-search-dropdown__memory');
             button = $('.phone-search-dropdown__button');
 
-        let updateModels = () => {
+        const updateModels = () => {
 
             // Clear incase model change
             model.empty().prop('disabled', 'disabled');
@@ -40,7 +40,7 @@ $(function() {
             });
         }
 
-        let updateMemory = () => {
+        const updateMemory = () => {
 
             // Clear incase model change
             memory.empty();
@@ -63,14 +63,14 @@ $(function() {
         }
 
         $(window).on('load', function() {
+
             updateModels();
-            make.resizeselect();
 
             make.on('change', function() {
 
                 updateModels();
 
-                if ($(this).val() != '') {
+                if ($(this).val()) {
                     model.prop('disabled', '');
                     $(this).addClass('valid-select');
                 } else {
@@ -78,10 +78,11 @@ $(function() {
                     $(this).removeClass('valid-select');
                 }
 
-                button.prop('disabled', 'disabled').removeClass('btn-success btn-gradient-green btn-shadow').addClass('btn-outline-white');
+                button.prop('disabled', 'disabled')
+                .removeClass('btn-success btn-gradient-green btn-shadow')
+                .addClass('btn-outline-white');
 
                 model.resizeselect();
-
 
             });
 
@@ -89,7 +90,7 @@ $(function() {
 
                 updateMemory();
 
-                if ($(this).val() != '') {
+                if ($(this).val()) {
                     memory.prop('disabled', '');
                     $(this).addClass('valid-select');
                 } else {
@@ -103,13 +104,18 @@ $(function() {
 
             memory.on('change', function() {
 
-                if ($(this).val() != '') {
+                if ($(this).val()) {
                     $(this).addClass('valid-select');
-                    button.prop('disabled', '').removeClass('btn-outline-white').addClass('btn-success btn-gradient-green btn-shadow');
+                    button.prop('disabled', '')
+                    .removeClass('btn-outline-white')
+                    .addClass('btn-success btn-gradient-green btn-shadow');
                 } else {
-                    button.prop('disabled', 'disabled').removeClass('btn-success btn-gradient-green btn-shadow').addClass('btn-outline-white');
                     $(this).removeClass('valid-select');
+                    button.prop('disabled', 'disabled')
+                    .removeClass('btn-success btn-gradient-green btn-shadow')
+                    .addClass('btn-outline-white');
                 }
+
             });
         });
     }
