@@ -705,6 +705,24 @@ class PhonePolicyTest extends WebTestCase
         $this->assertEquals(SalvaPhonePolicy::RISK_NOT_CONNECTED_NEW_POLICY, $policy->getRiskReason());
     }
 
+    public function testGetRiskReasonPolicyRenewed()
+    {
+        $now = new \DateTime();
+        $yearAgo = clone $now;
+        $yearAgo = $yearAgo->sub(new \DateInterval('P1Y'));
+        $policyPrev = static::createUserPolicy(true);
+        $policyPrev->setStart($yearAgo);
+        $policy = static::createUserPolicy(true);
+        $policy->getUser()->setEmail(static::generateEmail('testGetRiskReasonPolicyRenewed', $this));
+        $policy->setStart(new \DateTime());
+        $policyPrev->link($policy);
+        static::$dm->persist($policyPrev);
+        static::$dm->persist($policy);
+        static::$dm->persist($policy->getUser());
+
+        $this->assertEquals(SalvaPhonePolicy::RISK_NOT_CONNECTED_ESTABLISHED_POLICY, $policyPrev->getRiskReason());
+    }
+
     public function testGetRiskReasonPolicyPromoOnlyConnection()
     {
         $policyConnected = static::createUserPolicy(true, null, true);
