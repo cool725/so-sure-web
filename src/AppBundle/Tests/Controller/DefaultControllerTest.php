@@ -140,7 +140,7 @@ class DefaultControllerTest extends BaseControllerTest
         /** @var PhonePrice $price */
         $price = $phone->getCurrentPhonePrice();
         $this->assertContains(
-            sprintf("£%.2f", $price->getMonthlyPremiumPrice()),
+            sprintf("&pound;%.2f", $price->getMonthlyPremiumPrice()),
             self::$client->getResponse()->getContent()
         );
     }
@@ -208,7 +208,7 @@ class DefaultControllerTest extends BaseControllerTest
         $crawler = self::$client->request('GET', '/');
         $data = self::$client->getResponse();
         $this->assertEquals(200, $data->getStatusCode());
-        self::verifySearchFormData($crawler->filter('form'), '/phone-insurance/', 2);
+        $this->assertHasFormAction($crawler, '/select-phone-dropdown');
     }
 
     public function areLinksValid($name, $key, $allKeys, $phoneLinks)
