@@ -478,8 +478,8 @@ class PhoneInsuranceController extends BaseController
             'buy_form'              => $buyForm->createView(),
             'buy_form_banner'       => $buyBannerForm->createView(),
             'buy_form_banner_two'   => $buyBannerTwoForm->createView(),
-            'buy_form_banner_three' => $buyBannerTwoForm->createView(),
-            'buy_form_banner_four'  => $buyBannerTwoForm->createView(),
+            'buy_form_banner_three' => $buyBannerThreeForm->createView(),
+            'buy_form_banner_four'  => $buyBannerFourForm->createView(),
             'phones'                => $repo->findBy(
                 [
                     'active'         => true,
@@ -488,7 +488,7 @@ class PhoneInsuranceController extends BaseController
                 ],
                 ['memory' => 'asc']
             ),
-            'comparision'     => $phone->getComparisions(),
+            'comparision'     => $phone->getetComparisions(),
             'comparision_max' => $maxComparision,
             'coming_soon'     => $phone->getCurrentPhonePrice() ? false : true,
             // 'slider_test'     => 'slide-me',
