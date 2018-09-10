@@ -150,19 +150,6 @@ class DefaultController extends BaseController
     }
 
     /**
-     * @Route("/jc", name="jc")
-     */
-    public function indexJc(Request $request)
-    {
-        /** @var RequestService $requestService */
-        // $requestService = $this->get('app.request');
-        $data = array(
-            'phone' => $this->getQuerystringPhone($request),
-        );
-        return $this->render('AppBundle:Default:indexRebrand.html.twig', $data);
-    }
-
-    /**
      * @Route("/money", name="money")
      */
     public function moneyLanding()
@@ -272,28 +259,28 @@ class DefaultController extends BaseController
      */
     public function homepageLanding(Request $request)
     {
-        $data = [];
-        if ($request->get('_route') == "reimagined") {
-            $data = array(
-                'main'              => 'Mobile Insurance',
-                'main_cont'         => 'Re-Imagined',
-                'sub'               => 'Quicker. Easier. Jargon Free.',
-                // 'sub_cont'  => '',
-            );
-        } elseif ($request->get('_route') == "hasslefree") {
-            $data = array(
-                'main'              => 'Hassle Free',
-                'main_cont'         => 'Mobile Insurance',
-                'sub'               => 'We dont give you the run around when you claim.',
-                // 'sub_cont'  => '',
-            );
-        }
+        // $data = [];
+        // if ($request->get('_route') == "reimagined") {
+        //     $data = array(
+        //         'main'              => 'Mobile Insurance',
+        //         'main_cont'         => 'Re-Imagined',
+        //         'sub'               => 'Quicker. Easier. Jargon Free.',
+        //         // 'sub_cont'  => '',
+        //     );
+        // } elseif ($request->get('_route') == "hasslefree") {
+        //     $data = array(
+        //         'main'              => 'Hassle Free',
+        //         'main_cont'         => 'Mobile Insurance',
+        //         'sub'               => 'We dont give you the run around when you claim.',
+        //         // 'sub_cont'  => '',
+        //     );
+        // }
 
-        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_LANDING_PAGE, [
-            'Page' => $request->get('_route'),
-        ]);
+        // $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_LANDING_PAGE, [
+        //     'Page' => $request->get('_route'),
+        // ]);
 
-        return $this->render('AppBundle:Default:index.html.twig', $data);
+        return $this->render('AppBundle:Default:indexRebrand.html.twig');
     }
 
 
