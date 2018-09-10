@@ -8,6 +8,7 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Listener\UserListener;
 use AppBundle\Event\UserEmailEvent;
 use Symfony\Component\BrowserKit\Tests\TestClient;
+use Symfony\Component\DomCrawler\Crawler;
 
 class BaseControllerTest extends WebTestCase
 {
@@ -250,27 +251,56 @@ class BaseControllerTest extends WebTestCase
         $this->assertEquals($numOfForms, $processed);
     }
 
-    protected function expectFlashSuccess($crawler, $message)
+    protected function getCrawlerClassHtml(Crawler $crawler, $class)
     {
+        $xPath = $crawler->filterXPath('//div[contains(@class, "' . $class . '")]');
+        if ($xPath->count() > 0) {
+            return $xPath->html();
+        }
+
+        return null;
+    }
+
+    protected function expectFlashSuccess(Crawler $crawler, $message)
+    {
+        $rebrand = $this->getCrawlerClassHtml($crawler, 'alert-success');
+        $oldSite = $this->getCrawlerClassHtml($crawler, 'flash-success');
+
         $this->assertContains(
             $message,
-            $crawler->filterXPath('//div[contains(@class, "flash-success")]')->html()
+            sprintf('%s %s', $rebrand, $oldSite)
         );
     }
 
-    protected function expectFlashWarning($crawler, $message)
+    protected function expectFlashWarning(Crawler $crawler, $message)
     {
+        $rebrand = $this->getCrawlerClassHtml($crawler, 'alert-warning');
+        $oldSite = $this->getCrawlerClassHtml($crawler, 'flash-warning');
+
         $this->assertContains(
             $message,
-            $crawler->filterXPath('//div[contains(@class, "flash-warning")]')->html()
+            sprintf('%s %s', $rebrand, $oldSite)
         );
     }
 
-    protected function expectFlashError($crawler, $message)
+    protected function expectFlashError(Crawler $crawler, $message)
     {
+        $rebrand = $this->getCrawlerClassHtml($crawler, 'alert-danger');
+        $oldSite = $this->getCrawlerClassHtml($crawler, 'flash-danger');
+
         $this->assertContains(
             $message,
-            $crawler->filterXPath('//div[contains(@class, "flash-danger")]')->html()
+            sprintf('%s %s', $rebrand, $oldSite)
         );
+    }
+
+    protected function assertHasFormAction(Crawler $crawler, string $actionUrl)
+    {
+        $forms = $crawler->filter('form');
+        $actions = [];
+        foreach ($forms as $form) {
+            $actions[] = $form->getAttribute('action');
+        }
+        $this->assertContains($actionUrl, $actions, "Expected a form to be sent to {$actionUrl}");
     }
 }

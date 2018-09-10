@@ -25,7 +25,7 @@ class PhoneInsuranceControllerTest extends BaseControllerTest
         $crawler = self::$client->request('GET', '/phone-insurance/apple+iphone+7');
         $data = self::$client->getResponse();
         $this->assertEquals(200, $data->getStatusCode());
-        self::verifySearchFormData($crawler->filter('form'), '/phone-insurance/', 1);
+        $this->assertHasFormAction($crawler, '/select-phone-dropdown');
     }
 
     public function testPhoneSearchPhoneInsuranceByPhoneId()
@@ -48,7 +48,7 @@ class PhoneInsuranceControllerTest extends BaseControllerTest
         $this->assertEquals($redirectUrl, $data->getTargetUrl());
         $crawler = self::$client->followRedirect();
 
-        self::verifySearchFormData($crawler->filter('form'), '/phone-insurance/', 1);
+        $this->assertHasFormAction($crawler, '/select-phone-dropdown');
     }
 
     public function testSessionPurchasePhone()

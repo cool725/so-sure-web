@@ -31,8 +31,13 @@ sosure.claim = (function() {
             onclick: false,
             rules: {
                 "claim_form[signature]" : {
-                    required: true,
-                    equalTo: '#username_signature'
+                    required: {
+                        depends:function(){
+                            $(this).val($.trim($(this).val()));
+                            return true;
+                        }
+                    },
+                    equalToIgnoreCase: '#username_signature'
                 },
                 "claim_form[name]" : {
                     required: true,

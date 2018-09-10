@@ -17,6 +17,7 @@ require('jquery-validation');
 require('../../../js/Default/jqueryValidatorMethods.js');
 require('../../../js/Purchase/purchaseStepAddress.js');
 require('../../../js/Purchase/purchaseStepPhoneNew.js');
+require('../components/table.js');
 
 $(function() {
 

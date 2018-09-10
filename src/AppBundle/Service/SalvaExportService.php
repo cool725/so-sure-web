@@ -280,6 +280,10 @@ class SalvaExportService
         $lines[] = sprintf("%s", $this->formatLine($this->transformPayment(null)));
         $payments = $repo->getAllPaymentsForExport($date);
         foreach ($payments as $payment) {
+            if (!$payment->getPolicy()) {
+                throw new \Exception(sprintf('Payment %s is missing policy', $payment->getId()));
+            }
+
             // For prod, skip invalid policies
             if ($this->environment == 'prod' && !$payment->getPolicy()->isValidPolicy()) {
                 continue;
