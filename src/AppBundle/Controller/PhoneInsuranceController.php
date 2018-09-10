@@ -62,10 +62,11 @@ class PhoneInsuranceController extends BaseController
     /**
      * @Route("/phone-insurance/theft", name="phone_insurance_theft",
      *          options={"sitemap"={"priority":"0.5","changefreq":"monthly"}})
+     * @Template()
      */
     public function theftAction()
     {
-        $this->render('AppBundle::PhoneInsurance/theft.html.twig', []);
+        return array();
     }
 
     /**
