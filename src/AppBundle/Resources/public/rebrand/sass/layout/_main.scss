@@ -125,6 +125,20 @@
             }
         }
     }
+
+    &__sticky {
+        position: fixed;
+        bottom: -1px; left: 0; right: 0;
+        z-index: 1000;
+        color: $white;
+        @include linear-gradient(160deg, $blue-3, $blue-1a);
+        box-shadow: 0 -15px 30px 0 rgba(8,27,154,0.08),
+                    0 -5px 15px 0 rgba(8,27,154,0.08);
+
+        @include media-breakpoint-up(md) {
+            display: none;
+        }
+    }
 }
 
 .policy {

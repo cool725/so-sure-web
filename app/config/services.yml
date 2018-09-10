@@ -1285,3 +1285,7 @@ services:
         arguments: ["@picsureml.picsureml", "%form_required%"]
         tags:
             - { name: form.type }
+    twig.extension.text:
+           class: Twig_Extensions_Extension_Text
+           tags:
+               - { name: twig.extension }

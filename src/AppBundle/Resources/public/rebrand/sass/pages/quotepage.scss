@@ -11,3 +11,11 @@ body {
     background-color: $blue-3;
     // @include linear-gradient(160deg, $blue-3, $blue-1a);
 }
+
+.qpw {
+    padding-bottom: 6rem;
+
+    @include media-breakpoint-up(md) {
+        padding-bottom: 0;
+    }
+}
