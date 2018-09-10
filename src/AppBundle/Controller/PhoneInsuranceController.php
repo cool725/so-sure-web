@@ -479,7 +479,7 @@ class PhoneInsuranceController extends BaseController
             'buy_form_banner'       => $buyBannerForm->createView(),
             'buy_form_banner_two'   => $buyBannerTwoForm->createView(),
             'buy_form_banner_three' => $buyBannerThreeForm->createView(),
-            'buy_form_banner_four'  => $buyBannerFormForm->createView(),
+            'buy_form_banner_four'  => $buyBannerFourForm->createView(),
             'phones'                => $repo->findBy(
                 [
                     'active'         => true,
