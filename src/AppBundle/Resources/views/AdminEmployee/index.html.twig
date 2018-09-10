@@ -3,9 +3,9 @@
 {% block body %}
     {% set style = "text-align: center; height: 100px; margin-bottom: 20px; padding-top: 30px; font-size: 24px; vertical-align: middle; border-radius: 5px; border: solid 1px;" %}
 <div class="container" style="margin-bottom: 50px; margin-top: 70px;"  >
-    <h3>
-        <i class="fa fa-question-circle" title="Actually Random Imei of the second, but...This imei passes luhn, and should only be used for test purposes"></i>
+    <h3><i class="fa fa-question-circle" title="Actually Random Imei of the second, but...This imei passes luhn, and should only be used for test purposes"></i>
         Random Imei of the day: {{ randomImei }}</h3>
+
     <div class="row">
         <div class="col-md-12">
             <h3>General</h3>
@@ -40,6 +40,7 @@
             <a href="{{ path('admin_detected_imei') }}"><i class="fa fa-bullseye fa-large"></i> Detected IMEI</a>
         </div>
     </div>
+
     <div class="row">
         <div class="col-md-12">
             <h3>Reporting</h3>
@@ -74,57 +75,63 @@
             <a href="{{ path('admin_underwriting') }}"><i class="fa fa-bar-chart fa-large"></i> Underwriting</a>
         </div>
     </div>
-  {% if is_granted('ROLE_ADMIN') %}
-    <div class="row">
-        <div class="col-md-12">
-            <h3>Accounts</h3>
+
+    {% if is_granted('ROLE_ADMIN') %}
+        <div class="row">
+            <div class="col-md-12">
+                <h3>Accounts</h3>
+            </div>
         </div>
-    </div>
-    <div class="row">
-        <div class="col-md-3 col-md-offset-1" style="{{ style }};">
-            <a href="{{ path('admin_accounts') }}"><i class="fa fa-money fa-large"></i> Accounts</a>
+        <div class="row">
+            <div class="col-md-3 col-md-offset-1" style="{{ style }};">
+                <a href="{{ path('admin_accounts') }}"><i class="fa fa-money fa-large"></i> Accounts</a>
+            </div>
+            <div class="col-md-3 col-md-offset-1" style="{{ style }};">
+                <a href="{{ path('admin_banking') }}"><i class="fa fa-bank fa-large"></i> Banking</a>
+            </div>
+            <div class="col-md-3 col-md-offset-1" style="{{ style }};">
+                <a href="{{ path('admin_charge') }}"><i class="fa fa-credit-card fa-large"></i> Charges</a>
+            </div>
+            <div class="col-md-3 col-md-offset-1" style="{{ style }};">
+                <a href="{{ path('admin_invoices') }}"><i class="fa fa-file fa-large"></i> Invoices</a>
+            </div>
+            <div class="col-md-3 col-md-offset-1" style="{{ style }};">
+                <a href="{{ path('admin_cashback') }}"><i class="fa fa-handshake-o fa-large"></i> Cashback</a>
+            </div>
+            <div class="col-md-3 col-md-offset-1" style="{{ style }};">
+                <a href="{{ path('admin_chargeback') }}"><i class="fa fa-reply fa-large"></i> Chargebacks</a>
+            </div>
+            <div class="col-md-3 col-md-offset-1" style="{{ style }};">
+                <a href="{{ path('admin_bacs') }}"><i class="fa fa-sliders fa-large"></i> Bacs</a>
+            </div>
         </div>
-        <div class="col-md-3 col-md-offset-1" style="{{ style }};">
-            <a href="{{ path('admin_banking') }}"><i class="fa fa-bank fa-large"></i> Banking</a>
+    {% endif %}
+
+    {% if is_granted('ROLE_EMPLOYEE') or is_granted('ROLE_ADMIN') %}
+        <div class="row">
+            <div class="col-md-12">
+                <h3>System</h3>
+            </div>
         </div>
-        <div class="col-md-3 col-md-offset-1" style="{{ style }};">
-            <a href="{{ path('admin_charge') }}"><i class="fa fa-credit-card fa-large"></i> Charges</a>
+        <div class="row">
+            {% if is_granted('ROLE_ADMIN') %}
+                <div class="col-md-3 col-md-offset-1" style="{{ style }};">
+                    <a href="{{ path('admin_admin_users') }}"><i class="fa fa-lock fa-large"></i> Admin Users</a>
+                </div>
+                <div class="col-md-3 col-md-offset-1" style="{{ style }};">
+                    <a href="{{ path('admin_rate_limits') }}"><i class="fa fa-hand-stop-o fa-large"></i> Rate Limits</a>
+                </div>
+                <div class="col-md-3 col-md-offset-1" style="{{ style }};">
+                    <a href="{{ path('admin_feature_flags') }}"><i class="fa fa-flag fa-large"></i> Feature Flags</a>
+                </div>
+                <div class="col-md-3 col-md-offset-1" style="{{ style }};">
+                    <a href="{{ path('admin_picsure_ml') }}"><i class="fa fa-photo fa-large"></i> Picsure ML</a>
+                </div>
+            {% endif %}
+            <div class="col-md-3 col-md-offset-1" style="{{ style }};">
+                <a href="{{ path('admin_sixpack_tests') }}"><i class="fa fa-comments fa-large"></i> Running tests</a>
+            </div>
         </div>
-        <div class="col-md-3 col-md-offset-1" style="{{ style }};">
-            <a href="{{ path('admin_invoices') }}"><i class="fa fa-file fa-large"></i> Invoices</a>
-        </div>
-        <div class="col-md-3 col-md-offset-1" style="{{ style }};">
-            <a href="{{ path('admin_cashback') }}"><i class="fa fa-handshake-o fa-large"></i> Cashback</a>
-        </div>
-        <div class="col-md-3 col-md-offset-1" style="{{ style }};">
-            <a href="{{ path('admin_chargeback') }}"><i class="fa fa-reply fa-large"></i> Chargebacks</a>
-        </div>
-        <div class="col-md-3 col-md-offset-1" style="{{ style }};">
-            <a href="{{ path('admin_bacs') }}"><i class="fa fa-sliders fa-large"></i> Bacs</a>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-md-12">
-            <h3>System</h3>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-md-3 col-md-offset-1" style="{{ style }};">
-            <a href="{{ path('admin_admin_users') }}"><i class="fa fa-lock fa-large"></i> Admin Users</a>
-        </div>
-        <div class="col-md-3 col-md-offset-1" style="{{ style }};">
-            <a href="{{ path('admin_rate_limits') }}"><i class="fa fa-hand-stop-o fa-large"></i> Rate Limits</a>
-        </div>
-        <div class="col-md-3 col-md-offset-1" style="{{ style }};">
-            <a href="{{ path('admin_feature_flags') }}"><i class="fa fa-flag fa-large"></i> Feature Flags</a>
-        </div>
-        <div class="col-md-3 col-md-offset-1" style="{{ style }};">
-            <a href="{{ path('admin_picsure_ml') }}"><i class="fa fa-photo fa-large"></i> Picsure ML</a>
-        </div>
-        <div class="col-md-3 col-md-offset-1" style="{{ style }};">
-            <a href="{{ path('admin_sixpack_tests') }}"><i class="fa fa-comments fa-large"></i> Running tests</a>
-        </div>
-    </div>
-  {% endif %}
+    {% endif %}
 </div>
 {% endblock %}
