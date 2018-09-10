@@ -10,6 +10,7 @@ final class Experiments
         SixpackService::EXPERIMENT_EBAY_LANDING => ['homepage', 'ebay-landing'],
         SixpackService::EXPERIMENT_EBAY_LANDING_1 => ['homepage', 'ebay-landing-1'],
         SixpackService::EXPERIMENT_EBAY_LANDING_2 => ['homepage', 'ebay-landing-2'],
+        SixpackService::EXPERIMENT_SOCIAL_AD_LANDING => ['ad-landing-quotepage-homepage', 'ad-landing-quotepage'],
     ];
 
     private static $authExperiments = [];
