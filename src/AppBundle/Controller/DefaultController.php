@@ -144,7 +144,7 @@ class DefaultController extends BaseController
             // 'search_type' => $expSearch,
         );
 
-        $template = 'AppBundle:Default:indexRebrand.html.twig';
+        $template = 'AppBundle:Default:index.html.twig';
 
         return $this->render($template, $data);
     }
@@ -280,7 +280,7 @@ class DefaultController extends BaseController
         //     'Page' => $request->get('_route'),
         // ]);
 
-        return $this->render('AppBundle:Default:indexRebrand.html.twig');
+        return $this->render('AppBundle:Default:index.html.twig');
     }
 
 
