@@ -264,7 +264,7 @@ class SalvaExportService
         return $lines;
     }
 
-    public function exportPayments($s3, \DateTime $date = null)
+    public function exportPayments($uploadS3, \DateTime $date = null, SalvaPaymentFile $paymentFile = null)
     {
         if (!$date) {
             $date = new \DateTime();
@@ -298,7 +298,12 @@ class SalvaExportService
             $dailyTransaction[$payment->getDate()->format('Ymd')] += $payment->getAmount();
         }
 
-        if ($s3) {
+        if ($paymentFile) {
+            $paymentFile->addMetadata('total', $total);
+            $paymentFile->addMetadata('numPayments', $numPayments);
+            $paymentFile->setDailyTransaction($dailyTransaction);
+            $this->dm->flush();
+        } elseif ($uploadS3) {
             $filename = sprintf(
                 'payments-export-%d-%02d-%s.csv',
                 $date->format('Y'),
