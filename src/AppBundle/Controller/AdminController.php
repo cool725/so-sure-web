@@ -452,6 +452,9 @@ class AdminController extends BaseController
      */
     public function adminAccountsAction($year = null, $month = null)
     {
+        // default 30s for prod is no longer enough
+        set_time_limit(180);
+
         $now = new \DateTime();
         if (!$year) {
             $year = $now->format('Y');

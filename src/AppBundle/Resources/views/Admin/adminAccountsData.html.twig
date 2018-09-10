@@ -312,10 +312,10 @@
         {% if paymentTotals.salvaPaymentFile.metadata['total'] is defined %}
             {% set paymentsTotal = paymentTotals.salvaPaymentFile.metadata['total'] %}
         {% endif %}
-        {%  set expectedTotal = paymentsTotal - paymentTotals.policyDiscountRefunds.total %}
+        {%  set expectedTotal = paymentsTotal - paymentTotals.policyDiscountRefunds.total - paymentTotals.potRewardCashback.total %}
 
         {% if equal_to_two_dp(reportTotal, expectedTotal) %}
-            <td title="Matches expected total from payments of £{{ paymentsTotal|number_format(2, '.', ',') }} - discount refunds of £{{ paymentTotals.policyDiscountRefunds.total|number_format(2, '.', ',') }}"><strong>£{{ reportTotal|number_format(2, '.', ',') }}</strong></td>
+            <td title="Matches expected total from payments of £{{ paymentsTotal|number_format(2, '.', ',') }} + discount refunds of £{{ (0 - paymentTotals.policyDiscountRefunds.total)|number_format(2, '.', ',') }} + cashback pot rewards of £{{ (0 - paymentTotals.potRewardCashback.total)|number_format(2, '.', ',') }}"><strong>£{{ reportTotal|number_format(2, '.', ',') }}</strong></td>
         {% else %}
             <td class="bg-danger" title="Expect total from payments £{{ paymentsTotal|number_format(2, '.', ',') }}"><strong>£{{ reportTotal|number_format(2, '.', ',') }}</strong></td>
         {% endif %}
@@ -401,12 +401,17 @@
     <tr>
         <td width="{{ indent_width }}"></td>
         <td width="{{ text_width }}">Total payments from CSV file</td>
-        <td>{{ paymentsTotal|number_format(2, '.', ',') }}</td>
+        <td>£{{ paymentsTotal|number_format(2, '.', ',') }}</td>
     </tr>
     <tr>
         <td width="{{ indent_width }}"></td>
         <td width="{{ text_width }}">Net Renewal Discount Refund To Customers (included in payments csv but not a premium payment)</td>
-        <td>(£{{ (0 - paymentTotals.policyDiscountRefunds.total)|number_format(2, '.', ',') }})</td>
+        <td>£{{ (0 - paymentTotals.policyDiscountRefunds.total)|number_format(2, '.', ',') }}</td>
+    </tr>
+    <tr>
+        <td width="{{ indent_width }}"></td>
+        <td width="{{ text_width }}">Total Underwriter End of Year Reward Pot Incurred (Cashback) (included in payments csv but not a premium payment)</td>
+        <td>£{{ (0 - paymentTotals.potRewardCashback.total)|number_format(2, '.', ',') }}</td>
     </tr>
     <tr>
         <td width="{{ indent_width }}"></td>
