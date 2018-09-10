@@ -257,7 +257,7 @@ class DefaultController extends BaseController
      * @Route("/hasslefree", name="hasslefree")
      * @Template
      */
-    public function homepageLanding(Request $request)
+    public function homepageLanding()
     {
         // $data = [];
         // if ($request->get('_route') == "reimagined") {
