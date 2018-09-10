@@ -11,6 +11,9 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use Symfony\Component\HttpFoundation\Request;
 
+/**
+ * The list of options/alternatives for each experiment has moved to App\Experiments (from the controllers)
+ */
 class SixpackService
 {
     const TIMEOUT = 3;

@@ -19,8 +19,13 @@ final class Experiments
      */
     public static function optionsAvailable(string $name): array
     {
-        return self::$unauthExperiments[$name]
-            ?? self::$authExperiments[$name]
-            ?? ['homepage', 'unknown-default'];
+        if (isset(self::$unauthExperiments[$name])) {
+            return self::$unauthExperiments[$name];
+        }
+        if (isset(self::$authExperiments[$name])) {
+            return self::$authExperiments[$name];
+        }
+
+        throw new \UnexpectedValueException("No [default,...alternatives] set for experiment: {$name}");
     }
 }
