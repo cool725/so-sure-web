@@ -2460,7 +2460,7 @@ abstract class Policy
             // return self::RISK_LEVEL_HIGH;
         }
 
-        // If all the connections are only to the same user (mutliple policy), then ignore that aspect
+        // If all the connections are only to the same user (multiple policy), then ignore that aspect
         if (count($this->getStandardConnections()) > 0 &&
             count($this->getStandardConnections()) > count($this->getStandardSelfConnections())) {
             // Connected and value of their pot is zero
@@ -2487,7 +2487,8 @@ abstract class Policy
         }
 
         // Claim within first month of buying policy, has no connections and has made no attempts to make connections
-        if ($this->isPolicyWithin30Days($date)) {
+        // and not a renewal policy
+        if ($this->isPolicyWithin30Days($date) && !$this->getPreviousPolicy()) {
             return self::RISK_NOT_CONNECTED_NEW_POLICY;
             //return self::RISK_LEVEL_HIGH;
         } else {

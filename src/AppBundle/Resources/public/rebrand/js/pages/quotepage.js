@@ -6,6 +6,9 @@ require('../../sass/pages/quotepage.scss');
 require('bootstrap/js/dist/modal');
 require('bootstrap/js/dist/dropdown');
 
+// Require components
+require('../components/table.js');
+
 $(function() {
 
     // As fixed page on desktop init scroll effect on main container scroll

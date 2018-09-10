@@ -4,6 +4,7 @@ namespace AppBundle\Service;
 use AppBundle\Document\Cashback;
 use AppBundle\Document\File\AccessPayFile;
 use AppBundle\Document\Payment\BacsPayment;
+use AppBundle\Document\Payment\Payment;
 use AppBundle\Document\User;
 use AppBundle\Repository\BacsPaymentRepository;
 use AppBundle\Repository\CashbackRepository;
@@ -445,7 +446,7 @@ class MonitorService
         $paymentsRepo = $this->dm->getRepository(BacsPayment::class);
         foreach ($paymentsRepo->findPayments(new \DateTime()) as $payment) {
             /** @var BacsPayment $payment */
-            if ($payment->canAction(new \DateTime())) {
+            if ($payment->canAction(new \DateTime()) && $payment->getSource() != Payment::SOURCE_ADMIN) {
                 throw new MonitorException(sprintf('There are bacs payments waiting actioning: %s', $payment->getId()));
             }
         }
