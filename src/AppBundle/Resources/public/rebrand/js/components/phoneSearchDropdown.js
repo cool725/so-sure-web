@@ -66,6 +66,8 @@ $(function() {
 
             updateModels();
 
+            make.resizeselect();
+
             make.on('change', function() {
 
                 updateModels();
