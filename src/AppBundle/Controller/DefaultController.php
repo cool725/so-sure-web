@@ -135,17 +135,13 @@ class DefaultController extends BaseController
      */
     public function ebLanding(Request $request)
     {
-        $exp = $this->sixpack(
-            $request,
-            SixpackService::EXPERIMENT_EBAY_LANDING,
-            ['homepage', 'ebay-landing']
-        );
+        $exp = $this->sixpackSimple(SixpackService::EXPERIMENT_EBAY_LANDING, $request);
 
-        if ($exp == 'ebay-landing') {
+        if ($exp === 'ebay-landing') {
             return $this->render('AppBundle:Default:indexEbay.html.twig');
-        } else {
-            return $this->redirectToRoute('homepage');
         }
+
+        return $this->redirectToRoute('homepage');
     }
 
     /**
@@ -154,23 +150,18 @@ class DefaultController extends BaseController
      */
     public function eb1Landing(Request $request)
     {
-
         $data = [
             'main_title' => 'Honest Insurance for Honest People',
             'hero_class' => 'ebay__hero_1',
         ];
 
-        $exp = $this->sixpack(
-            $request,
-            SixpackService::EXPERIMENT_EBAY_LANDING_1,
-            ['homepage', 'ebay-landing-1']
-        );
+        $exp = $this->sixpackSimple(SixpackService::EXPERIMENT_EBAY_LANDING_1, $request);
 
-        if ($exp == 'ebay-landing') {
+        if ($exp === 'ebay-landing') {
             return $this->render('AppBundle:Default:indexEbay.html.twig', $data);
-        } else {
-            return $this->redirectToRoute('homepage');
         }
+
+        return $this->redirectToRoute('homepage');
     }
 
     /**
