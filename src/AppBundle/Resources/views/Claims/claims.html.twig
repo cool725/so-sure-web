@@ -41,8 +41,8 @@
                 {{ form_errors(form.status) }}
                 {{ form_widget(form.status, {'attr': {'class': 'claim-status', 'size': '8'}}) }}
                 <br>
-                <input type="button" name="Button" value="All" onclick="selectAll('claim_search_status',true)" />
-                <input type="button" name="Button" value="None" onclick="selectAll(document.getElementById('claim_search_status'),false)" />
+                <input type="button" id="claim_search_status-all"  name="Button" value="All" />
+                <input type="button" id="claim_search_status-none" name="Button" value="None" />
             </div>
             <div class="col-sm-8">
                 <div class="row">

@@ -12,6 +12,15 @@ function selectAll(selectBox,selectAll) {
     }
 }
 
+$(document).ready(function() {
+    $('#claim_search_status-all').on("click",function() {
+        selectAll(document.getElementById('claim_search_status'),true)
+    });
+    $('#claim_search_status-none').on("click",function() {
+        selectAll(document.getElementById('claim_search_status'),false)
+    });
+});
+
 $('#claimsModal').on('show.bs.modal', function (event) {
     var button = $(event.relatedTarget); // Button that triggered the modal
     var claim = button.data('claim');
