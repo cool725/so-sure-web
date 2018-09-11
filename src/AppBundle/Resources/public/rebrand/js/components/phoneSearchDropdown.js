@@ -38,6 +38,8 @@ $(function() {
                     }
                 });
             });
+
+            make.resizeselect();
         }
 
         const updateMemory = () => {
