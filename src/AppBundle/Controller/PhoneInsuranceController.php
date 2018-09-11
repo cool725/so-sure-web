@@ -8,6 +8,8 @@ use AppBundle\Exception\ValidationException;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 
+use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -100,57 +102,23 @@ class PhoneInsuranceController extends BaseController
     /**
      * @Route("/phone-insurance/{make}", name="quote_make", requirements={"make":"[a-zA-Z]+"})
      * @Route("/insure/{make}", name="insure_make", requirements={"make":"[a-zA-Z]+"})
-     * @Template
      */
     public function makeInsurance(Request $request, $make)
     {
-        $dm = $this->getManager();
-        $repo = $dm->getRepository(Phone::class);
-        $phones = $repo->findBy(
-            ['make' => $make, 'active' => true, 'highlight' => true],
-            ['releaseDate' => 'desc', 'initialPrice' => 'desc']
-        );
-        if (count($phones) == 0) {
-            throw $this->createNotFoundException('No phones with make are available');
-        }
-
-        $phonesMem = [];
-        foreach ($phones as $phone) {
-            /** @var Phone $phone */
-            if (!isset($phonesMem[$phone->getName()])) {
-                $phonesMem[$phone->getName()] = [
-                    'make' => $phone->getMake(),
-                    'model' => $phone->getModel(),
-                    'currentPhonePrice' => $phone->getCurrentPhonePrice(),
-                    'imageUrlWithFallback' => $phone->getImageUrlWithFallback(),
-                ];
-            }
-            $phonesMem[$phone->getName()]['mem'][$phone->getMemory()] = $this->generateUrl(
-                'quote_make_model_memory',
-                [
-                    'make' => $phone->getMakeCanonical(),
-                    'model' => $phone->getModelCanonical(),
-                    'memory' => $phone->getMemory()
-                ]
-            );
-            ksort($phonesMem[$phone->getName()]['mem']);
-        }
+        $phones = $this->getAllPhonesByMake($make);
+        $phonesMem = $this->sortPhoneNamesByMemory($phones);
 
         $template = 'AppBundle:PhoneInsurance:makeInsurance.html.twig';
-
-        if (in_array($request->get('_route'), ['insure_make'])) {
+        if ($request->get('_route') === 'insure_make') {
              $template = 'AppBundle:PhoneInsurance:makeInsuranceBottom.html.twig';
         }
 
         $event = MixpanelService::EVENT_MANUFACTURER_PAGE;
-
-        if (in_array($request->get('_route'), ['insure_make'])) {
+        if ($request->get('_route') === 'insure_make') {
              $event = MixpanelService::EVENT_CPC_MANUFACTURER_PAGE;
         }
 
-        $this->get('app.mixpanel')->queueTrackWithUtm($event, [
-            'Manufacturer' => $make,
-        ]);
+        $this->get('app.mixpanel')->queueTrackWithUtm($event, ['Manufacturer' => $make,]);
 
         $data = ['phones' => $phonesMem, 'make' => $make];
 
@@ -179,7 +147,7 @@ class PhoneInsuranceController extends BaseController
         }
 
         $quoteUrl = $this->setPhoneSession($request, $phone);
-        if (in_array($request->get('_route'), ['purchase_phone_make_model_memory'])) {
+        if ($request->get('_route') == 'purchase_phone_make_model_memory') {
             $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_BUY_BUTTON_CLICKED, [
                 'Location' => 'offsite'
             ]);
@@ -245,13 +213,15 @@ class PhoneInsuranceController extends BaseController
                     'model' => $phone->getEncodedModelCanonical(),
                     'memory' => $phone->getMemory(),
                 ], 301);
-            } else {
-                return $this->redirectToRoute('quote_make_model', [
-                    'make' => $phone->getMakeCanonical(),
-                    'model' => $phone->getEncodedModelCanonical(),
-                ], 301);
             }
-        } elseif ($memory) {
+
+            return $this->redirectToRoute('quote_make_model', [
+                'make' => $phone->getMakeCanonical(),
+                'model' => $phone->getEncodedModelCanonical(),
+            ], 301);
+        }
+
+        if ($memory) {
             $phone = $repo->findOneBy([
                 'active' => true,
                 'makeCanonical' => mb_strtolower($make),
@@ -328,26 +298,12 @@ class PhoneInsuranceController extends BaseController
         $leadForm = $this->get('form.factory')
             ->createNamedBuilder('lead_form', LeadEmailType::class, $lead)
             ->getForm();
-        $buyForm = $this->get('form.factory')
-            ->createNamedBuilder('buy_form')
-            ->add('buy_tablet', SubmitType::class)
-            ->add('slider_used', HiddenType::class)
-            ->getForm();
-        $buyBannerForm = $this->get('form.factory')
-            ->createNamedBuilder('buy_form_banner')
-            ->add('buy', SubmitType::class)
-            ->add('slider_used', HiddenType::class)
-            ->getForm();
-        $buyBannerTwoForm = $this->get('form.factory')
-            ->createNamedBuilder('buy_form_banner_two')
-            ->add('buy', SubmitType::class)
-            ->add('slider_used', HiddenType::class)
-            ->getForm();
-        $buyBannerThreeForm = $this->get('form.factory')
-            ->createNamedBuilder('buy_form_banner_three')
-            ->add('buy', SubmitType::class)
-            ->add('slider_used', HiddenType::class)
-            ->getForm();
+
+        $buyForm = $this->makeBuyButtonForm('buy_form', 'buy_tablet');
+        $buyBannerForm = $this->makeBuyButtonForm('buy_form_banner');
+        $buyBannerTwoForm = $this->makeBuyButtonForm('buy_form_banner_two');
+        $buyBannerThreeForm = $this->makeBuyButtonForm('buy_form_banner_three');
+        $buyBannerFourForm = $this->makeBuyButtonForm('buy_form_banner_four', 'buy');
 
         if ('POST' === $request->getMethod()) {
             if ($request->request->has('lead_form')) {
@@ -409,9 +365,9 @@ class PhoneInsuranceController extends BaseController
                     if ($this->getUser() && $this->getUser()->hasPolicy()) {
                         // don't check for partial partial as quote phone may be different from partial policy phone
                         return $this->redirectToRoute('purchase_step_policy');
-                    } else {
-                        return $this->redirectToRoute('purchase');
                     }
+
+                    return $this->redirectToRoute('purchase');
                 }
             } elseif ($request->request->has('buy_form_banner')) {
                 $buyBannerForm->handleRequest($request);
@@ -427,9 +383,9 @@ class PhoneInsuranceController extends BaseController
                     if ($this->getUser() && $this->getUser()->hasPolicy()) {
                         // don't check for partial partial as quote phone may be different from partial policy phone
                         return $this->redirectToRoute('purchase_step_policy');
-                    } else {
-                        return $this->redirectToRoute('purchase');
                     }
+
+                    return $this->redirectToRoute('purchase');
                 }
             } elseif ($request->request->has('buy_form_banner_two')) {
                 $buyBannerTwoForm->handleRequest($request);
@@ -454,6 +410,24 @@ class PhoneInsuranceController extends BaseController
                 if ($buyBannerThreeForm->isValid()) {
                     $properties = [];
                     $properties['Location'] = 'sidebar';
+                    // if ($buyForm->getData()['claim_used']) {
+                    //     $properties['Played with Claims'] = true;
+                    // }
+                    $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_BUY_BUTTON_CLICKED, $properties);
+
+                    // Multipolicy should skip user details
+                    if ($this->getUser() && $this->getUser()->hasPolicy()) {
+                        // don't check for partial partial as quote phone may be different from partial policy phone
+                        return $this->redirectToRoute('purchase_step_policy');
+                    } else {
+                        return $this->redirectToRoute('purchase');
+                    }
+                }
+            } elseif ($request->request->has('buy_form_banner_four')) {
+                $buyBannerFourForm->handleRequest($request);
+                if ($buyBannerFourForm->isValid()) {
+                    $properties = [];
+                    $properties['Location'] = 'sticky';
                     // if ($buyForm->getData()['claim_used']) {
                     //     $properties['Played with Claims'] = true;
                     // }
@@ -514,8 +488,9 @@ class PhoneInsuranceController extends BaseController
             'buy_form'              => $buyForm->createView(),
             'buy_form_banner'       => $buyBannerForm->createView(),
             'buy_form_banner_two'   => $buyBannerTwoForm->createView(),
-            'buy_form_banner_three' => $buyBannerTwoForm->createView(),
-            'phones'           => $repo->findBy(
+            'buy_form_banner_three' => $buyBannerThreeForm->createView(),
+            'buy_form_banner_four'  => $buyBannerFourForm->createView(),
+            'phones'                => $repo->findBy(
                 [
                     'active'         => true,
                     'makeCanonical'  => mb_strtolower($make),
@@ -526,11 +501,11 @@ class PhoneInsuranceController extends BaseController
             'comparision'     => $phone->getComparisions(),
             'comparision_max' => $maxComparision,
             'coming_soon'     => $phone->getCurrentPhonePrice() ? false : true,
-            'slider_test'     => 'slide-me',
+            // 'slider_test'     => 'slide-me',
             // 'replacement'     => $replacement,
         );
 
-        return $this->render('AppBundle:PhoneInsurance:quoteRebrand.html.twig', $data);
+        return $this->render('AppBundle:PhoneInsurance:quote.html.twig', $data);
     }
 
     /**
@@ -636,5 +611,81 @@ class PhoneInsuranceController extends BaseController
         );
 
         return $this->render('AppBundle:PhoneInsurance:learnMore.html.twig', $data);
+    }
+
+    private function makeBuyButtonForm(string $formName, string $buttonName = 'buy')
+    {
+        return $this->get('form.factory')
+            ->createNamedBuilder($formName)
+            ->add($buttonName, SubmitType::class)
+            ->add('slider_used', HiddenType::class)
+            ->getForm();
+    }
+
+    private function getAllPhonesByMake($make)
+    {
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(Phone::class);
+        $phones = $repo->findBy(
+            ['make' => $make, 'active' => true, 'highlight' => true],
+            ['releaseDate' => 'desc', 'initialPrice' => 'desc']
+        );
+        if (count($phones) == 0) {
+            throw $this->createNotFoundException('No phones with make are available');
+        }
+
+        return $phones;
+    }
+
+    private function sortPhoneNamesByMemory($phones): array
+    {
+        $phonesMem = [];
+        foreach ($phones as $phone) {
+            /** @var Phone $phone */
+            if (!isset($phonesMem[$phone->getName()])) {
+                $phonesMem[$phone->getName()] = [
+                    'make' => $phone->getMake(),
+                    'model' => $phone->getModel(),
+                    'currentPhonePrice' => $phone->getCurrentPhonePrice(),
+                    'imageUrlWithFallback' => $phone->getImageUrlWithFallback(),
+                ];
+            }
+            $phonesMem[$phone->getName()]['mem'][$phone->getMemory()] = $this->generateUrl(
+                'quote_make_model_memory',
+                [
+                    'make' => $phone->getMakeCanonical(),
+                    'model' => $phone->getModelCanonical(),
+                    'memory' => $phone->getMemory()
+                ]
+            );
+            ksort($phonesMem[$phone->getName()]['mem']);
+        }
+
+        return $phonesMem;
+    }
+
+    private function willRunQuoteTest(Request $request, $make, $model, $memory) //: ?RedirectResponse
+    {
+        if ($request->get('_route') === 'test_insurance_make_model_memory') {
+            $adLanding = $this->sixpack(
+                $request,
+                SixpackService::EXPERIMENT_SOCIAL_AD_LANDING,
+                ['ad-landing-quotepage-homepage', 'ad-landing-quotepage']
+            );
+            if ($adLanding === 'ad-landing-quotepage') {
+                return $this->redirectToRoute(
+                    'insurance_make_model_memory',
+                    [
+                        'make' => $make,
+                        'model' => $model,
+                        'memory' => $memory,
+                    ]
+                );
+            }
+
+            return $this->redirectToRoute('homepage');
+        }
+
+        return null;
     }
 }

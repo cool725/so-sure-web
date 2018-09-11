@@ -278,8 +278,7 @@ class PurchaseController extends BaseController
             'postcode' => 'comma',
         );
 
-        // return $this->render('AppBundle:Purchase:purchaseStepPersonalAddress.html.twig', $data);
-        return $this->render('AppBundle:Purchase:purchaseStepPersonalAddressRebrand.html.twig', $data);
+        return $this->render('AppBundle:Purchase:purchaseStepPersonalAddress.html.twig', $data);
     }
 
     /**
@@ -592,8 +591,7 @@ class PurchaseController extends BaseController
         $requestService = $this->get('app.request');
         $template = null;
 
-        // $template = 'AppBundle:Purchase:purchaseStepPhoneReviewNew.html.twig';
-        $template = 'AppBundle:Purchase:purchaseStepPersonalReviewRebrand.html.twig';
+        $template = 'AppBundle:Purchase:purchaseStepPersonalReview.html.twig';
 
         $now = new \DateTime();
         $billingDate = $this->adjustDayForBilling($now);

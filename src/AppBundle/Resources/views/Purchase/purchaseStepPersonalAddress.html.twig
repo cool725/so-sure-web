@@ -1,381 +1,190 @@
-{% set use_pca = true %}
-
-{% extends 'base.html.twig' %}
+{% extends 'base_rebrand.html.twig' %}
 
 {# Set vars #}
-{% set new_stylesheet = 1 %}
-{% set distraction_free = 1 %}
-{% set new_footer = 1 %}
-{% set include_emoji = 1 %}
+{% set use_pca = true %}
+{% set body_class = 'purchase' %}
+{% set light_nav  = 1 %}
+{% set quote_mode = 1 %}
 
 {% set showAddress = purchase_form.addressLine1.vars.data | length > 0 or purchase_form.postcode.vars.data | length > 0 %}
 {% set showDOB = purchase_form.name.vars.data | length > 0 and purchase_form.email.vars.data | length > 0 %}
-
 {% set starling = false %}
+
 {% if app is not null and app.session.isStarted and app.session.get('partner') == 'starling' %}
     {% set starling = true %}
 {% endif %}
 
-{% block stylesheets %}
-    {{ parent() }}
-    {% stylesheets output='css/*.css'
-        'components/owl.carousel/owl.carousel.min.css'
-        'components/owl.carousel/owl.theme.default.min.css'
-        '@AppBundle/Resources/public/sass/page/checkout.scss'
-    %}
-        <link rel="stylesheet" href="{{ asset_url }}">
-    {% endstylesheets %}
+{% block title %}
+    {% if phone %}
+        {{ phone.model }} Insurance - {{ phone.make }} - Welcome to Social Insurance
+    {% else %}
+        so-sure - Welcome to Social Insurance
+    {% endif %}
+{% endblock %}
+
+{% block meta %}{% endblock %}
+
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/purchase.css') }}">
 {% endblock %}
 
 {% block body %}
 
-<section id="purchase-step-personal" class="checkout">
+    <section class="qpw">
+        <div class="d-lg-flex">
 
-    {% include 'AppBundle::Purchase/purchaseNav.html.twig' %}
-
-    {% if phone %}
-        <div class="checkout--top">
-            <div class="conatiner">
-                <h1>
-                    <span class="title-top">Insurance for your</span>
-                    <br class="visible-xs">
-                    <div class="dropdown memory-dropdown-list title-phone text-nowrap">
-                        <a href="#"
-                           class="dropdown-toggle"
-                           type="button"
-                           id="memoryDropdownList"
-                           data-toggle="dropdown"
-                           aria-haspopup="true"
-                           aria-expanded="true">
-                            <span class="title-phone text-blue text-nowrap">
-                                {{ phone.make }} {{ phone.model }}
-                                {% if phone.memory %}
-                                    {{ phone.memory }}GB
-                                {% endif %}
-                                <i class="fa fa-caret-down" aria-hidden="true"></i>
-                            </span>
-                        </a>
-                        <ul class="dropdown-menu memory-dropdown"aria-labelledby="memoryDropdownList">
-                            {% if phones | length > 1 %}
-                                <li class="dropdown-header">Select alternate model</li>
-                                {% for phone_mem in phones if phone_mem.id != phone.id %}
-                                    <li>
-                                        <a href="{{ path('select_phone_make_search_type_id', {
-                                            'type': 'purchase-change',
-                                            'id': phone_mem.id}) }}"
-                                           class=""> {{ phone.model }} - {{ phone_mem.memory }}GB</a>
-                                    </li>
-                                {% endfor %}
-                                <li role="separator" class="divider"></li>
-                            {% endif %}
-                            <li><a href="#" data-toggle="modal" data-target="#quoteModal"> I have a different phone</a></li>
-                        </ul>
-                    </div>
-                    <br>
-                    {% if not app.user or app.user.allowedMonthlyPayments %}
-                        <span class="title-price">for just <span class="text-blue">£{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }}</span> a month</span>
-                    {% else %}
-                        <span class="title-price">for just <span class="text-blue">£{{ phone.currentPhonePrice.yearlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }}</span> a year</span>
-                    {% endif %}
-                </h1>
-            </div>
-        </div>
-
-        <div class="owl-carousel owl-theme visible-xs benefits">
-            <div class="item">
-                <img src="{{ cdn_url }}/images/library_benefits/so-sure_cover-water-damage.svg" alt="Accidental Damage" title="Accidental damage">
-                <h5>Water damage</h5>
-            </div>
-            <div class="item">
-                <img src="{{ cdn_url }}/images/library_benefits/so-sure_cover-cracked-screen.svg" alt="Cracked screen" title="Cracked screen">
-                <h5>Cracked screen</h5>
-            </div>
-            <div class="item">
-                <img src="{{ cdn_url }}/images/library_benefits/so-sure_cover-loss.svg" alt="Loss" title="Loss">
-                <h5>Loss</h5>
-            </div>
-            <div class="item">
-                <img src="{{ cdn_url }}/images/library_benefits/so-sure_cover-theft.svg" alt="Theft" title="Theft">
-                <h5>Theft</h5>
-            </div>
-        </div>
-
-        <ul class="list-inline cover-list hidden-xs benefits">
-            <li>
-                <img src="{{ cdn_url }}/images/library_benefits/so-sure_cover-water-damage.svg" alt="Accidental Damage" title="Accidental damage">
-                <h5 class="h-light">Water damage</h5>
-            </li>
-            <li>
-                <img src="{{ cdn_url }}/images/library_benefits/so-sure_cover-cracked-screen.svg" alt="Cracked screen" title="Cracked screen">
-                <h5 class="h-light">Cracked screen</h5>
-            </li>
-            <li>
-                <img src="{{ cdn_url }}/images/library_benefits/so-sure_cover-loss.svg" alt="Loss" title="Loss">
-                <h5 class="h-light">Loss</h5>
-            </li>
-            <li>
-                <img src="{{ cdn_url }}/images/library_benefits/so-sure_cover-theft.svg" alt="Theft" title="Theft">
-                <h5 class="h-light">Theft</h5>
-            </li>
-        </ul>
-
-        <h4 class="text-center">All this covered and more...</h4>
-
-{#         {% if moneyBackGuarantee is defined and moneyBackGuarantee == 'money-back-guarantee' %}
-            <div class="h4 h-light text-center"><mark class="mgreen">Plus.. We're so-sure you'll love us, we'll give you a 14 day money back guarantee 💰🔙</mark></div>
-        {% endif %} #}
-
-        <div class="checkout--step">
-            <div class="container">
-
-                {{ form_start(purchase_form, {'attr': {'data-toggle': 'validator', 'class': 'validate-form', 'data-client-validation': form_client_validation, 'autocomplete': 'off'}}) }}
-
-                    <div class="form-step">
-                        {% if feature_enabled('starling') and starling %}
-                            <a class="btn btn-block btn-starling btn-pad" href="/login/starling"><img src="{{ cdn_url }}/images/StarlingMarkIcon.png" height="15px"> &nbsp;Continue with Starling</a>
-                            <div class="text-break text-grey">
-                                <div class="line"></div>OR<div class="line"></div>
-                            </div>
-                            <p class="help-block text-center">If you prefer you can enter your details manually</p>
-                        {% endif %}
-
-                        <div class="form-group {% if form_errors(purchase_form.firstName) or form_errors(purchase_form.lastName) or form_errors(purchase_form.name) %}has-error{% endif %}">
-                            {{ form_label(purchase_form.name, 'Full Name:', { 'label_attr': {'class': 'sr-only'} }) }}
-                            {{ form_widget(purchase_form.name, {'attr':{'class':'form-control', 'placeholder': 'Full Name', 'data-hj-suppress' : ''}}) }}
-                            <div class="help-block with-errors">{{ form_errors(purchase_form.name) }}</div>
-                        </div>
-
-                        <div class="form-group {% if form_errors(purchase_form.email) %}has-error{% endif %}">
-                            {{ form_label(purchase_form.email, 'Email:', { 'label_attr': {'class': 'sr-only'} }) }}
-                            {{ form_widget(purchase_form.email, {'attr':{'class':'form-control', 'placeholder': 'Email', 'data-hj-suppress' : ''}}) }}
-                            <div class="help-block with-errors">{{ form_errors(purchase_form.email) }}</div>
-                        </div>
-                        <div id="step--one-controls" class="form-group form-controls {% if showDOB %}step--hide{% endif %}">
-                            <a href="#" id="step--validate" class="btn btn-green btn-block btn-pad" data-csrf="{{ lead_csrf }}" data-lead="{{ path('lead', {'source': 'purchase-flow'}) }}">
-                                Continue
-                            </a>
-                            <div class="text-break text-grey">
-                                <div class="line"></div>OR<div class="line"></div>
-                            </div>
-                            {# Social Logins #}
-                            <div class="form-group text-center">
+            {% if phone %}
+                {# Main Content #}
+                <div class="qpw__main__container">
+                    <div class="qpw__main px-4 px-lg-5">
+                        <div class="d-flex justify-content-center justify-content-lg-start align-items-center justify-content-lg-start">
+                            <h1 class="qpw__h1 text-blue1b">
+                                <span class="sub">
+                                    {{ phone.make }} {{ phone.model }}
+                                    <small>({{ phone.memory }}GB)</small>
+                                </span>
+                            </h1>
+                            <div class="qpw__alt__phones dropdown dropleft">
                                 <a href="#"
-                                   formnovalidate="formnovalidate"
-                                   class="btn btn-facebook btn-facebook-login facebook_login"
-                                   {% if app.user %}disabled{% endif %}>
-                                   <i class="fa fa-facebook-official fa-lg"></i>
-                                   &nbsp;Continue with Facebook
+                                   class="dropdown-toggle"
+                                   id="dropdownMenuLink"
+                                   data-toggle="dropdown"
+                                   aria-haspopup="true"
+                                   aria-expanded="false">
+                                    <i class="far fa-chevron-down text-white fa-lg ml-3"></i>
+                                </a>
+                                <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                                    {% if phones | length > 1 %}
+                                        {% for phone_mem in phones %}
+                                            {% if phone_mem.id != phone.id  %}
+                                                <a href="{{ path('select_phone_make_search_type_id', {'type': 'purchase-change', 'id': phone_mem.id}) }}" class="dropdown-item h6" href="#">
+                                                    {{ phone_mem.memory }}GB
+                                                    <small>{{ phone.make }} {{ phone.model }}</small>
+                                                </a>
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% endif %}
+                                    <a class="dropdown-item h6 get-a-quote" href="#">
+                                        Start a new quote
+                                        <small>Not the phone you're looking for?</small>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="qpw__h1 h1 text-center text-lg-left text-white mb-4">
+                            <span class="sub">For only</span>
+                            {% if not app.user or app.user.allowedMonthlyPayments %}
+                                &pound;{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }} a month
+                            {% else %}
+                                &pound;{{ phone.currentPhonePrice.yearlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }} a year
+                            {% endif %}
+                        </div>
+{#                         <div class="qpw__h5 h5 d-block d-lg-none text-center">
+                            <a href="#qpw-info-mobile"
+                               id="qpw-info-btn"
+                               class="text-white toggle-text"
+                               data-toggle="collapse"
+                               data-target="#qpw-info-mobile"
+                               data-text-swap='hide full details <i class="fas fa-caret-up ml-2"></i>'
+                               aria-expanded="false"
+                               aria-controls="qpw-info-mobile">
+                                see full details <i class="fas fa-caret-down ml-2"></i>
+                            </a>
+                        </div> #}
+                        <div class="qpw__h5 h5 d-block d-lg-none text-center">
+                            <a href="#qpw-info-mobile"
+                               id="qpw-info-btn"
+                               class="text-white">
+                                see full details <i class="fas fa-caret-down ml-2"></i>
+                            </a>
+                        </div>
+                        <div class="qpw__footer d-none d-lg-block mt-5 pt-lg-5">
+                            <div class="purchase__footer__text">
+                                <h4 class="text-blue1">An amazing level of cover:</h4>
+                                <ul class="list-unstyled icn-fa-list">
+                                    <li class="text-white mb-2"><i class="far fa-check text-blue1 fa-lg"></i> Cracked Screens, Theft, Loss and much more</li>
+                                    <li class="text-white mb-2"><i class="far fa-check text-blue1 fa-lg"></i> Instant Cover and 24/7 live support</li><li class="text-white"><i class="far fa-check text-blue1 fa-lg"></i> 24-72 replacement phone once claim approved</li>
+                                </ul>
+                            </div>
+                            <div class="qpw__footer__cta">
+                                <a href="#qpw-info"
+                                   class="btn btn-outline-blue1 mt-2 toggle-text"
+                                   data-toggle="collapse"
+                                   data-target="#qpw-info"
+                                   data-text-swap='hide full details <i class="fas fa-caret-up ml-2"></i>'
+                                   role="button"
+                                   aria-expanded="false"
+                                   aria-controls="qpw-info">see full details
+                                   <i class="fas fa-caret-down ml-2"></i>
                                </a>
                             </div>
-                            <div class="form-group text-center">
-                                <a href="{{ path('hwi_oauth_service_redirect', {'service': 'google' }) }}"
-                                   class="btn-google-login"
-                                   formnovalidate="formnovalidate"
-                                   {% if app.user %}disabled{% endif %}>
-                                    <span class="sr-only">Sign in with Google</span>
-                                </a>
-                            </div>
-                            {# Starling #}
-                            {% if feature_enabled('starling') and not starling %}
-                                <div class="text-break text-grey">
-                                    <div class="line"></div>OR<div class="line"></div>
-                                </div>
-                                <a class="btn btn-block btn-starling btn-pad" href="/login/starling"><img src="{{ cdn_url }}/images/StarlingMarkIcon.png" height="20px"> &nbsp;Continue with Starling</a>
-                            {% endif %}
-                            {% if phone.googlePlay or phone.iTunes %}
-                                <div class="text-break text-grey">
-                                    <div class="line"></div>OR<div class="line"></div>
-                                </div>
-                                <p><strong class="h4">SIGN UP IN MINUTES</strong> using our handy app: less forms to fill, validate your phone instantly to <u>reduce your excess by half</u>!</p>
-                                <div class="text-center app-links">
-                                    {% if phone.googlePlay %}
-                                        <a class="ga-outbound-click" data-clicklabel="PlayStore" href="{{ google_download('purchase-flow') }}" target="_blank"><img src="{{ cdn_url }}/images/purchase/app_download_purchase_android_2x.png" alt="Get it on Google Play" class="img-responsive img-responsive--center"></a>
-                                    {% endif %}
-                                    {% if phone.iTunes %}
-                                        <a class="ga-outbound-click" data-clicklabel="iTunes" href="{{ apple_download('purchase-flow') }}" target="_blank"><img src="{{ cdn_url }}/images/purchase/app_download_purchase_app_store_2x.png" alt="Available on the AppStore" class="img-responsive img-responsive--center"></a>
-                                    {% endif %}
-                                </div>
-                            {% endif %}
                         </div>
                     </div>
 
-                    <div class="form-step {% if not showDOB %}step--hide{% endif %}">
-                        {# {% if showDropdown is defined and showDropdown == 'dropdowns'  %}
-                            <div class="form-group {% if form_errors(purchase_form.birthday) %}has-error{% endif %}">
-                                {{ form_label(purchase_form.birthday, 'Date of Birth:', {'label_attr': {'class': 'text-muted'} }) }}
-                                <div id="dob-field" class="row">
-                                    <div class="col-xs-4">
-                                        {{ form_widget(purchase_form.birthday.day,{'attr':{
-                                            'class': 'form-control',
-                                            'maxlength': '2',
-                                            'placeholder': 'DD',
-                                            'data-hj-suppress' : ''
-                                        }}) }}
-                                    </div>
-                                    <div class="col-xs-4">
-                                        {{ form_widget(purchase_form.birthday.month,{'attr':{
-                                            'class': 'form-control',
-                                            'maxlength': '2',
-                                            'placeholder': 'MM',
-                                            'data-hj-suppress' : ''
-                                        }}) }}
-                                    </div>
-                                    <div class="col-xs-4">
-                                        {{ form_widget(purchase_form.birthday.year,{'attr':{
-                                            'class': 'form-control',
-                                            'maxlength': '4',
-                                            'placeholder': 'YYYY',
-                                            'data-hj-suppress' : ''
-                                        }}) }}
-                                    </div>
-                                </div>
-                                <div class="help-block with-errors">{{ form_errors(purchase_form.birthday) }}</div>
-                            </div>
-                        {% else %} #}
-                            {# Control #}
-                            <div class="form-group {% if form_errors(purchase_form.birthday) %}has-error{% endif %} text-left">
-                                {{ form_label(purchase_form.birthday, 'Date of Birth:', { 'label_attr': {'class': 'sr-only'} }) }}
-                                {{ form_widget(purchase_form.birthday, {'attr':{'class': 'birthday form-control dob', 'placeholder': 'Date of birth (DD/MM/YYYY)', 'data-hj-suppress' : ''}}) }}
-                                <div class="help-block with-errors">{{ form_errors(purchase_form.birthday) }}</div>
-                            </div>
-                        {# {% endif %} #}
-                        <div class="form-group {% if form_errors(purchase_form.mobileNumber) %}has-error{% endif %}">
-                            {{ form_label(purchase_form.mobileNumber, 'Mobile Number:', { 'label_attr': {'class': 'sr-only'} }) }}
-                            {{ form_widget(purchase_form.mobileNumber, {'attr':{'class':'form-control', 'placeholder':'Mobile number', 'data-hj-suppress' : ''}}) }}
-                            <div class="mobile-err help-block with-errors">{{ form_errors(purchase_form.mobileNumber) }}</div>
-                        </div>
-                        {% set showAddress = purchase_form.addressLine1.vars.data | length > 0 or purchase_form.postcode.vars.data | length > 0 %}
-                        <div class="address-search" style="{% if showAddress %}display: none;{% endif %}">
-                            <div class="form-group {% if is_postback %}has-error{% endif %}">
-                                <label class="sr-only">Billing Address:</label>
-                                {% if postcode == 'split' %}
-                                    <div class="form-group input-group">
-                                        <input id="search_address_number" class="form-control" type="text" placeholder="House Number" {% if not showAddress %} required="required" {% endif %}>
-                                        <input id="search_address_postcode" class="form-control" name="search_postcode" type="text" placeholder="Postcode" {% if not showAddress %} required="required" {% endif %} data-hj-suppress="">
-                                        <div class="input-group-addon">
-                                            <a id="search_address_button" href="#" class="btn btn-info"><i class="fa fa-search"></i></a>
-                                        </div>
-                                    </div>
-                                    {% set display_error = false %}
-                                    {% if is_postback and (form_errors(purchase_form.addressLine1)|length > 0 or
-                                        form_errors(purchase_form.city)|length > 0 or
-                                        form_errors(purchase_form.postcode)|length > 0) %}
-                                        {% set display_error = true %}
-                                    {% endif %}
-                                    <div id="search_address_errors" class="help-block with-errors" style="{% if not display_error %}display: none;{% endif %}">Unable to find the address. Try using manual entry.</div>
-                                    <a id="search-address-manual" href="#" class="btn btn-link btn-block btn-pad">Enter address manually</a>
-                                {% else %}
-                                    <input id="address-select" class="typeahead form-control" type="text" placeholder="{% if postcode == 'type' %}Type your address (eg. 10 Downing Street, SW1A 2AA){% elseif postcode == 'comma' %}House Number, Postcode (eg. 10, SW1A 2AA){% endif %}" {% if not showAddress %} required="required" {% endif %} data-hj-suppress="">
-                                    {% set display_error = false %}
-                                    {% if is_postback and (form_errors(purchase_form.addressLine1)|length > 0 or
-                                        form_errors(purchase_form.city)|length > 0 or
-                                        form_errors(purchase_form.postcode)|length > 0) %}
-                                        {% set display_error = true %}
-                                    {% endif %}
-                                    <div id="select_address_errors" class="help-block with-errors" style="{% if not display_error %}display: none;{% endif %}">Select an address from the dropdown after searching</div>
-                                    <a id="address-manual" href="#" class="btn btn-link btn-block btn-pad">Enter address manually</a>
-                                {% endif %}
-                            </div>
-                            <div id="display-address" style="margin-bottom: 20px" data-hj-suppress="">
-                                {% if purchase_form.vars.data.addressLine1|length > 0 %}{{ purchase_form.vars.data.addressLine1 }}<br>{% endif %}
-                                {% if purchase_form.vars.data.addressLine2|length > 0 %}{{ purchase_form.vars.data.addressLine2 }}<br>{% endif %}
-                                {% if purchase_form.vars.data.addressLine3|length > 0 %}{{ purchase_form.vars.data.addressLine3 }}<br>{% endif %}
-                                {% if purchase_form.vars.data.city|length > 0 %}{{ purchase_form.vars.data.city }}<br>{% endif %}
-                                {% if purchase_form.vars.data.postcode|length > 0 %}{{ purchase_form.vars.data.postcode }}{% endif %}
-                            </div>
-                            <div class="form-group">
-                                {{ form_widget(purchase_form.next, {'label': 'Continue', 'attr': {'class': 'btn btn-green btn-block btn-pad'}}) }}
-                            </div>
-                        </div>
-
-                        <div class="address-show" style="{% if not showAddress %}display: none;{% endif %}">
-                            <div class="form-group form-group-fix address-show-error" style="display: none;">
-                                <label class="text-danger address-show-error-text error"></label>
-                            </div>
-                            <div class="form-group {% if showAddress and form_errors(purchase_form.addressLine1) %}has-error{% endif %}">
-                                {{ form_label(purchase_form.addressLine1, 'Billing Address Line 1:', { 'label_attr': {'class': 'sr-only'} }) }}
-                                {{ form_widget(purchase_form.addressLine1, {'attr':{'class':'form-control addressLine1', 'placeholder': 'Address Line 1', 'data-hj-suppress' : ''}}) }}
-                                {% if showAddress %}
-                                    <div class="help-block with-errors">{{ form_errors(purchase_form.addressLine1) }}</div>
-                                {% endif %}
-                            </div>
-                            <div class="form-group {% if showAddress and form_errors(purchase_form.addressLine2) %}has-error{% endif %}">
-                                {{ form_label(purchase_form.addressLine2, 'Billing Address Line 2:', { 'label_attr': {'class': 'sr-only'} }) }}
-                                {{ form_widget(purchase_form.addressLine2, {'attr':{'class':'form-control addressLine2', 'placeholder': 'Address Line 2', 'data-hj-suppress' : ''}}) }}
-                                {% if showAddress %}
-                                    <div class="help-block with-errors">{{ form_errors(purchase_form.addressLine2) }}</div>
-                                {% endif %}
-                            </div>
-                            <div class="form-group {% if showAddress and form_errors(purchase_form.addressLine3) %}has-error{% endif %}">
-                                {{ form_label(purchase_form.addressLine3, 'Billing Address Line 3:', { 'label_attr': {'class': 'sr-only'} }) }}
-                                {{ form_widget(purchase_form.addressLine3, {'attr':{'class':'form-control addressLine3', 'placeholder': 'Address Line 3', 'data-hj-suppress' : ''}}) }}
-                                {% if showAddress %}
-                                    <div class="help-block with-errors">{{ form_errors(purchase_form.addressLine3) }}</div>
-                                {% endif %}
-                            </div>
-                            <div class="form-group {% if showAddress and form_errors(purchase_form.city) %}has-error{% endif %}">
-                                {{ form_label(purchase_form.city, 'Billing Address City:', { 'label_attr': {'class': 'sr-only'} }) }}
-                                {{ form_widget(purchase_form.city, {'attr':{'class':'form-control city', 'placeholder': 'City', 'data-hj-suppress' : ''}}) }}
-                                {% if showAddress %}
-                                    <div class="help-block with-errors">{{ form_errors(purchase_form.city) }}</div>
-                                {% endif %}
-                            </div>
-                            <div class="form-group {% if showAddress and form_errors(purchase_form.postcode) %}has-error{% endif %}">
-                                {{ form_label(purchase_form.postcode, 'Billing Address Postcode:', { 'label_attr': {'class': 'sr-only'} }) }}
-                                {{ form_widget(purchase_form.postcode, {'attr':{'class':'form-control postcode', 'placeholder': 'Postcode', 'data-hj-suppress' : ''}}) }}
-                                {% if showAddress %}
-                                    <div class="help-block with-errors">{{ form_errors(purchase_form.postcode) }}</div>
-                                {% endif %}
-                            </div>
-                            <div class="form-group">
-                                {{ form_widget(purchase_form.manual_next, {'label': 'Continue', 'attr': {'class': 'btn btn-green btn-block btn-pad'}}) }}
-                            </div>
-                        </div>
+                    <div id="qpw-info" class="qpw__info__container mt-4 collapse">
+                        {% include 'AppBundle::PhoneInsurance/_seeFullDetails.html.twig' %}
                     </div>
 
-                {{ form_end(purchase_form) }}
-            </div>
-        </div>
-    {% else %}
-        <div class="checkout--top">
-            <div class="container">
-                <h1 class="h2">
-                    <span class="title-phone">Please select your phone to continue with your purchase.</span>
-                </h1>
-            </div>
-        </div>
-        <div class="checkout--step">
-            <form>
-                <a href="#"
-                   class="btn btn-blue btn-block btn-pad"
-                   data-toggle="modal"
-                   data-target="#quoteModal">Select phone</a>
-            </form>
-        </div>
-    {% endif %}
+                    {# Curve Mobile #}
+                    <svg class="d-block d-lg-none" preserveAspectRatio="xMinYMin meet" viewBox="0 0 750 47" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                        <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                            <g id="Artboard-Copy" fill="#0068ED">
+                                <path d="M0,0 L750,0 L750,47 C625,18.3333333 500,4 375,4 C250,4 125,18.3333333 0,47 L0,0 Z" id="Rectangle-2"></path>
+                            </g>
+                        </g>
+                    </svg>
+                </div>
 
-</section>
+                {# Curve Desktop #}
+                <div class="qpw__curve">
+                    <svg class="d-none d-lg-block" preserveAspectRatio="xMinYMin meet" viewBox="0 0 57 846" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                        <defs></defs>
+                        <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                            <g transform="translate(-12.000000, 0.000000)" fill="#FFFFFF">
+                                <path d="M69,0 L69,846 L68,846 C30.6666667,705 12,564 12,423 C12,282 31,141 69,0 Z" id="Rectangle-3"></path>
+                            </g>
+                        </g>
+                    </svg>
+                </div>
 
-{# Page Modals #}
-{% include 'AppBundle::Default/modalQuote.html.twig' with {'selectPhoneMakeType': 'purchase-change'} %}
-{# End Page Modals #}
+                {# Sub Content #}
+                <div class="qpw__sub__container">
+                    <div class="qpw__sub px-4 pb-4 pt-5 p-lg-5">
+                        {% include 'AppBundle::Purchase/_purchaseStepsRebrand.html.twig' %}
+                        {% include 'AppBundle::Purchase/_currentStepPersonalAddress.html.twig' %}
+                    </div>
+                </div>
+
+            <div id="qpw-info-mobile" class="qpw__info__container__mobile d-block d-lg-none">
+                <svg preserveAspectRatio="xMinYMin meet" viewBox="0 0 750 47" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                        <g id="Artboard" fill="#FFFFFF">
+                            <path d="M374,0 C499.333333,0 624.666667,15.6666667 750,47 L0,47 C124,15.6666667 248.666667,8.69674703e-16 374,0 Z" id="Rectangle" transform="translate(375.000000, 23.500000) scale(1, -1) translate(-375.000000, -23.500000) "></path>
+                        </g>
+                    </g>
+                </svg>
+                {% include 'AppBundle::PhoneInsurance/_seeFullDetails.html.twig' %}
+            </div>
+            {% else %}
+                <div class="purchase__details__container">
+                    <div class="purchase__details p-4 p-lg-5 mt-5">
+                        <h2 class="text-white h1 mb-5">Whoops, no phone selected... 😩</h2>
+                        <a href="#" class="btn btn-success btn-shadow btn-block-xs mb-5 get-a-quote">Get a Quote</a>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </section>
+
+    {# Page Modals #}
+    {% include 'AppBundle::PhoneInsurance/_policyInfoModals.html.twig' %}
 
 {% endblock %}
 
-{% block javascripts %}
-    {{ parent() }}
-    {% javascripts
-    'components/dot/doT.min.js'
-    'components/moment/moment.min.js'
-    'components/corejs-typeahead/typeahead.bundle.min.js'
-    'components/owl.carousel/owl.carousel.min.js'
-    'components/jquery-mask-plugin/jquery.mask.min.js'
-    'components/fuse.js/fuse.min.js'
-    'components/jquery-validation/jquery.validate.min.js'
-    '@AppBundle/Resources/public/js/Default/jqueryValidatorMethods.js'
-    '@AppBundle/Resources/public/js/Default/selectPhoneMakeSearch.js'
-    '@AppBundle/Resources/public/js/Default/selectPhoneMakeDropdown.js'
-    '@AppBundle/Resources/public/js/Purchase/purchaseStep.js'
-    '@AppBundle/Resources/public/js/Purchase/purchaseStepAddress.js' %}
-    <script src="{{ asset_url }}"></script>{% endjavascripts %}
+{% block footer %}
+    {# TODO: Fix footer #}
+{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/purchase.js') }}"></script>
 {% endblock %}

@@ -75,20 +75,20 @@ label {
 
         &-menu {
             width: 90%;
-            width: calc(100% - 2rem);
-            left: 1rem !important;
+            width: calc(100% - 1rem);
+            left: 0.5rem !important;
             max-height: 180px;
             background-color: $white;
             @include border-bottom-radius(10px);
-            box-shadow: 0 15px 30px 0 rgba(8,27,154,0.08),
-                        0 5px 15px 0 rgba(8,27,154,0.08);
+            box-shadow: 0 15px 30px 0 rgba(8,27,154,0.1),
+                        0 5px 15px 0 rgba(8,27,154,0.1);
 
             overflow-y: scroll;
             z-index: 1000 !important;
         }
 
         &-suggestion {
-            padding: 0.5rem 1rem;
+            padding: 1rem;
             border-bottom: 1px solid $blue-1;
             vertical-align: middle;
             cursor: pointer;
