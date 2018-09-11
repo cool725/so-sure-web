@@ -8,14 +8,15 @@ $(function() {
           hamburger   = $('#nav_toggle'),
           logo        = $('.navbar-brand__logo');
 
-    quoteToggle.on('click', function(e) {
-        e.preventDefault();
+    const getQuote = () => {
 
+        // If menu is open whilst clicking get quote, close the menu
         if ($(menu).hasClass('menu--open')) {
             $(hamburger).trigger('click');
         }
 
-        // Toggle logo class
+        // If using lighter theme - Toggle logo class
+        // TODO: this could all be done by class - refactor
         if (!$('.navbar').is('.navbar-light')) {
             logo.toggleClass('navbar-brand__logo-white-light');
         }
@@ -28,6 +29,21 @@ $(function() {
         // Prevent scrolling whilst open
         $('body').toggleClass('body--overflow');
 
+        // Toggle 'open' class
         quoteModal.toggleClass('getquote--open');
+    }
+
+    // Trigger by class
+    quoteToggle.on('click', function(e) {
+        e.preventDefault();
+        getQuote();
     });
+
+    // Escape key close
+    $(document).keyup(function(e) {
+        if (quoteModal.is('.getquote--open') && e.keyCode === 27) {
+            getQuote();
+        }
+    });
+
 });
