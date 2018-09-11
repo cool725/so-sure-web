@@ -38,8 +38,6 @@ $(function() {
                     }
                 });
             });
-
-            make.resizeselect();
         }
 
         const updateMemory = () => {
@@ -67,6 +65,8 @@ $(function() {
         $(window).on('load', function() {
 
             updateModels();
+
+            make.resizeselect();
 
             make.on('change', function() {
 
