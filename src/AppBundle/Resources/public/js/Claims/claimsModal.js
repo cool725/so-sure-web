@@ -1,3 +1,26 @@
+// turn on (or off) all the choices in a select-multiple
+function selectAll(selectBox,selectAll) {
+    // have we been passed an ID
+    if (typeof selectBox == "string") {
+        selectBox = document.getElementById(selectBox);
+    }
+    // is the select box a multiple select box?
+    if (selectBox.type == "select-multiple") {
+        for (var i = 0; i < selectBox.options.length; i++) {
+            selectBox.options[i].selected = selectAll;
+        }
+    }
+}
+
+$(document).ready(function() {
+    $('#claim_search_status-all').on("click",function() {
+        selectAll(document.getElementById('claim_search_status'),true)
+    });
+    $('#claim_search_status-none').on("click",function() {
+        selectAll(document.getElementById('claim_search_status'),false)
+    });
+});
+
 $('#claimsModal').on('show.bs.modal', function (event) {
     var button = $(event.relatedTarget); // Button that triggered the modal
     var claim = button.data('claim');
