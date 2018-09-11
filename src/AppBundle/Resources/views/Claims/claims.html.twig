@@ -27,7 +27,7 @@
         <div class="row">
             <div class="form-group col-sm-4 text-center">
                 <span class="align-top">
-            <i style="cursor: pointer" class="fa fa-question-circle" data-toggle="popover" data-placement="bottom" data-html="true" title="Status Explanations" data-content="
+                    <i style="cursor: pointer" class="fa fa-question-circle" data-toggle="popover" data-placement="bottom" data-html="true" title="Status Explanations" data-content="
             <b>fnol</b>: claim was confirmed by the user, but they have NOT uploaded all documents to the system. Claim Handlers should NOT be processing unless specifically requested to.<br />
             <b>submitted</b>: claim was confirmed by the user and they have uploaded all documents to the system. Claim Handlers SHOULD be processing the claim.<br />
             <b>in-review</b>: claim has a claim number assigned and the claim is being reviewed by the claim handler.<br />
@@ -36,10 +36,13 @@
             <b>withdrawl</b>: policy holder has decided not to proceed with their claim. NO replacement or repair has been authorised.<br />
             <b>declined</b>: claims handler has rejected the claim. NO replacement or repair has been authorised.<br />
             "></i>
-                    </span>
+                </span>
                 {{ form_label(form.status, 'Status:', {'label_attr': {'class': 'align-top'}}) }}
                 {{ form_errors(form.status) }}
                 {{ form_widget(form.status, {'attr': {'class': 'claim-status', 'size': '8'}}) }}
+                <br>
+                <input type="button" id="claim_search_status-all"  name="Button" value="Select all statuses" class="btn-link" />
+                <input type="button" id="claim_search_status-none" name="Button" value="Deselect all statuses" class="btn-link" />
             </div>
             <div class="col-sm-8">
                 <div class="row">

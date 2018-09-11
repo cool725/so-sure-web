@@ -15,7 +15,6 @@ class QuoteService
     const REDIS_DIFFERENT_MAKE_EMAIL_KEY_FORMAT = 'DIFFERENT-MAKE:%s-%s';
     const REDIS_ROOTED_DEVICE_EMAIL_KEY_FORMAT = 'ROOTED-DEVICE:%s-%s';
 
-
     /** @var MailerService */
     protected $mailer;
     protected $dm;
@@ -35,7 +34,7 @@ class QuoteService
 
     public function getQuotes($make, $device, $memory = null, $rooted = null, $ignoreMake = false)
     {
-        // TODO: We should probably be checking make as well.  However, we need to analyize the data
+        // TODO: We should probably be checking make as well.  However, we need to analyze the data
         // See Phone::isSameMake()
         \AppBundle\Classes\NoOp::ignore([$make]);
         $repo = $this->dm->getRepository(Phone::class);
@@ -92,7 +91,6 @@ class QuoteService
         ];
     }
 
-
     /**
      * @param string $device
      * @param float  $memory
@@ -131,7 +129,6 @@ class QuoteService
             'tech+ops@so-sure.com'
         );
 
-
         return true;
     }
 
@@ -141,9 +138,13 @@ class QuoteService
      */
     private function differentMake(Phone $phone, $phoneMake)
     {
+        if ($this->ignoreThisPhone($phone, $phoneMake)) {
+            return;
+        }
+
         $key = sprintf(self::REDIS_DIFFERENT_MAKE_EMAIL_KEY_FORMAT, $phone->getMake(), $phoneMake);
         if ($this->redis->get($key)) {
-            return false;
+            return;
         }
         $this->redis->setex($key, self::DUPLICATE_EMAIL_CACHE_TIME, 1);
 
@@ -155,13 +156,13 @@ class QuoteService
             json_encode($phone->toApiArray())
         );
 
-        $this->mailer->send(
-            'Make different in db',
-            'tech+ops@so-sure.com',
-            $body
-        );
+        $this->mailer->send('Make different in db', 'tech+ops@so-sure.com', $body);
+    }
 
-
+    private function ignoreThisPhone(Phone $phone, string $phoneMake): bool
+    {
+        // if we get more things we want to ignore, we'll get fancier.
+        return $phone->getMake() === 'Huawei' && $phoneMake === 'HONOR';
     }
 
     /**
@@ -193,8 +194,8 @@ class QuoteService
             'tech+ops@so-sure.com',
             $body
         );
-
     }
+
     public function getMailer()
     {
         return $this->mailer;

@@ -1,0 +1,40 @@
+{% extends 'admin_claims_base.html.twig' %}
+
+{% block body %}
+<div class="container">
+    <div class="row">
+        <div class="col-sm-8">
+            <h2>so-sure sixpack tests</h2>
+        </div>
+    </div>
+
+    {% if allTests|length == 0 %}
+    <div class="row-fluid">
+        <h2>No tests were found in the list of experiments</h2>
+    </div>
+    {% else %}
+    <div class="row-fluid">
+        <div class="col-md-11">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Available tests</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for testName,alternatives in allTests %}
+                        <tr>
+                            <td>{{ testName }}</td>
+                            <td>{{ alternatives|join(', ') }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
