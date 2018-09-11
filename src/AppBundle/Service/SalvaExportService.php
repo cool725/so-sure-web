@@ -472,6 +472,7 @@ class SalvaExportService
                     $claim->getReplacementPhone()->getModel() :
                     '',
                 $claim->getReplacementImei(),
+                $claim->getHandlingTeam() ? $claim->getHandlingTeam() : '',
             ];
         } else {
             $data = [
@@ -490,6 +491,7 @@ class SalvaExportService
                 'ReplacementMake',
                 'ReplacementModel',
                 'ReplacementImei',
+                'Claims Handler',
             ];
         }
 
