@@ -185,9 +185,18 @@ class PhoneInsuranceController extends BaseController
         if (in_array($request->get('_route'), ['insure_make_model_memory', 'insure_make_model'])) {
             return new RedirectResponse($this->generateUrl('homepage'));
         }
-        $ret = $this->willRunQuoteTest($request, $make, $model, $memory);
-        if ($ret) {
-            return $ret;
+
+        if ($request->get('_route') === 'test_insurance_make_model_memory') {
+            $adLanding = $this->sixpackSimple(SixpackService::EXPERIMENT_SOCIAL_AD_LANDING, $request);
+            if ($adLanding === 'ad-landing-quotepage') {
+                return $this->redirectToRoute('insurance_make_model_memory', [
+                    'make' => $make,
+                    'model' => $model,
+                    'memory' => $memory,
+                ]);
+            }
+
+            return $this->redirectToRoute('homepage');
         }
 
         $dm = $this->getManager();
