@@ -84,13 +84,6 @@ class DefaultController extends BaseController
             $this->get('logger')->debug(sprintf('Referral %s', $referral));
         }
 
-        // $this->sixpack(
-        //     $request,
-        //     SixpackService::EXPERIMENT_HOMEPAGE_AA_V2,
-        //     ['A1', 'A2'],
-        //     SixpackService::LOG_MIXPANEL_CONVERSION
-        // );
-
         /** @var RequestService $requestService */
         $requestService = $this->get('app.request');
 
@@ -104,62 +97,17 @@ class DefaultController extends BaseController
             $trafficFraction = 1;
         }
 
-        // $replacement = $this->sixpack(
-        //     $request,
-        //     SixpackService::EXPERIMENT_PHONE_REPLACEMENT,
-        //     ['default', 'next-working-day', 'twentyfour-seventy-two'],
-        //     SixpackService::LOG_MIXPANEL_CONVERSION,
-        //     null,
-        //     $trafficFraction,
-        //     $force
-        // );
-
         $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE);
-
-        // $expContent = $this->getSessionSixpackTest(
-        //     $request,
-        //     SixpackService::EXPERIMENT_AB_CONTENT_HOMEPAGE,
-        //     ['old-homepage-copy', 'new-homepage-copy']
-        // );
-
-        // if ($this->get('app.request')->getDeviceCategory() == RequestService::DEVICE_CATEGORY_MOBILE) {
-        //     $expSearch = $this->sixpack(
-        //         $request,
-        //         SixpackService::EXPERIMENT_TEXT_VS_DROPDOWN_MOBILE,
-        //         ['dropdown-search-old', 'dropdown-search']
-        //     );
-        // } else {
-        //     $expSearch = $this->sixpack(
-        //         $request,
-        //         SixpackService::EXPERIMENT_TEXT_VS_DROPDOWN,
-        //         ['text-search', 'dropdown-search']
-        //     );
-        // }
 
         $data = array(
             // Make sure to check homepage landing below too
-            // 'replacement' => $replacement,
             'referral'    => $referral,
             'phone'       => $this->getQuerystringPhone($request),
-            // 'search_type' => $expSearch,
         );
 
-        $template = 'AppBundle:Default:indexRebrand.html.twig';
+        $template = 'AppBundle:Default:index.html.twig';
 
         return $this->render($template, $data);
-    }
-
-    /**
-     * @Route("/jc", name="jc")
-     */
-    public function indexJc(Request $request)
-    {
-        /** @var RequestService $requestService */
-        // $requestService = $this->get('app.request');
-        $data = array(
-            'phone' => $this->getQuerystringPhone($request),
-        );
-        return $this->render('AppBundle:Default:indexRebrand.html.twig', $data);
     }
 
     /**
@@ -270,30 +218,30 @@ class DefaultController extends BaseController
      * @Route("/hasslefree", name="hasslefree")
      * @Template
      */
-    public function homepageLanding(Request $request)
+    public function homepageLanding()
     {
-        $data = [];
-        if ($request->get('_route') == "reimagined") {
-            $data = array(
-                'main'              => 'Mobile Insurance',
-                'main_cont'         => 'Re-Imagined',
-                'sub'               => 'Quicker. Easier. Jargon Free.',
-                // 'sub_cont'  => '',
-            );
-        } elseif ($request->get('_route') == "hasslefree") {
-            $data = array(
-                'main'              => 'Hassle Free',
-                'main_cont'         => 'Mobile Insurance',
-                'sub'               => 'We dont give you the run around when you claim.',
-                // 'sub_cont'  => '',
-            );
-        }
+        // $data = [];
+        // if ($request->get('_route') == "reimagined") {
+        //     $data = array(
+        //         'main'              => 'Mobile Insurance',
+        //         'main_cont'         => 'Re-Imagined',
+        //         'sub'               => 'Quicker. Easier. Jargon Free.',
+        //         // 'sub_cont'  => '',
+        //     );
+        // } elseif ($request->get('_route') == "hasslefree") {
+        //     $data = array(
+        //         'main'              => 'Hassle Free',
+        //         'main_cont'         => 'Mobile Insurance',
+        //         'sub'               => 'We dont give you the run around when you claim.',
+        //         // 'sub_cont'  => '',
+        //     );
+        // }
 
-        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_LANDING_PAGE, [
-            'Page' => $request->get('_route'),
-        ]);
+        // $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_LANDING_PAGE, [
+        //     'Page' => $request->get('_route'),
+        // ]);
 
-        return $this->render('AppBundle:Default:index.html.twig', $data);
+        return $this->render('AppBundle:Default:index.html.twig');
     }
 
 

@@ -1,24 +1,15 @@
-{% extends 'base.html.twig' %}
+{% extends 'base_rebrand.html.twig' %}
 
 {# Set vars #}
-{% set new_stylesheet = 1 %}
-{% set new_footer = 1 %}
+{% set body_class = 'welcome' %}
+{% set light_nav  = 1 %}
+{% set quote_mode = 1 %}
+{% set include_emoji = 1 %}
 
-{% block title %}so-sure - learn more{% endblock %}
-{% block meta %}
-    <meta property="og:video" content="{{ cdn_url }}/video/explainer-subtitle-640.mp4" />
-    <meta property="og:video:secure_url" content="{{ cdn_url }}/video/explainer-subtitle-640.mp4" />
-    <meta property="og:video:type" content="video/mp4" />
-    <meta property="og:video:width" content="640" />
-    <meta property="og:video:height" content="360" />
-{% endblock %}
+{% block title %}Welcome to Social Insurance{% endblock %}
 
-{% block stylesheets %}
-    {{ parent() }}
-    {% stylesheets output='css/*.css'
-    '@AppBundle//Resources/public/sass/page/userWelcome.scss'
-    %}
-    <link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/welcome.css') }}">
 {% endblock %}
 
 {% block gtm_data %}
@@ -44,210 +35,168 @@
 
 {% block body %}
 
-    <section class="section--pad user-welcome--intro">
-        <div class="container">
-            <h1 class="text-white text-center">Welcome to so-sure, {{ policy.user.firstname }}</h1>
-            <p class="lead text-white text-center">Your <strong>{{ policy.phone.make }} {{ policy.phone.model }}</strong> is now protected against Theft, Loss, Accidental Damage and Breakdown. You'll receive a confirmation email with full details of your policy shortly, but here's a summary:</p>
-            <div class="policy-roundup">
-                <div class="policy-roundup--inner">
-                    <div class="row">
-                        <div class="col-sm-4 text-center">
-                            <img src="{{ cdn_url }}/images/library_phones/so-sure_phone-placeholder.png" alt="{{ policy.phone.make }} - {{ policy.phone.model }}">
-                        </div>
-                        <div class="col-sm-8">
-                            <ul class="list-unstyled">
-                                <li class="h4 h-light">
-                                    Phone:<br>
-                                    <strong>{{ policy.phone.make }} {{ policy.phone.model }} {{ policy.phone.memory }}GB</strong>
-                                </li>
-                                <li class="h4 h-light">
-                                    Policy number:<br>
-                                    <strong>{{ policy.policyNumber }}</strong>
-                                </li>
-                                <li class="h4 h-light">
-                                    Cost:<br>
-                                    {% if policy.getPremiumPlan == 'monthly'%}
-                                        <strong>&pound;{{ policy.premium.monthlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }}</strong> per month
-                                    {% elseif policy.getPremiumPlan == 'yearly' %}
-                                        <strong>&pound;{{ policy.premium.yearlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }}</strong> a year
-                                    {% else %}
-                                        Unknown
-                                    {% endif %}
-                                </li>
-                                <li class="h4 h-light">
-                                    Start/End Date:<br>
-                                    <strong>{{ policy.start|date('jS F Y', 'Europe/London') }}</strong> - <strong>{{ policy.end|date('jS F Y', 'Europe/London') }}</strong>
-                                </li>
-                            </ul>
+    <section class="qpw">
+        <div class="d-flex flex-column flex-lg-row">
+
+            {# Main Content #}
+            <div class="qpw__main__container order-3 order-lg-1">
+                <div class="qpw__main px-4 px-lg-5">
+                    <h1 class="text-white mb-4">
+                        {{ policy.user.firstname }}, <span class="sub">welcome to <span class="text-nowrap">so-sure!</span></span>
+                    </h1>
+                    <p class="text-white mb-5">Your <strong>{{ policy.phone.make }} {{ policy.phone.model }}</strong> is now protected against Theft, Loss, Accidental Damage and breakdown. You’ll receive your policy shortly via email.</p>
+                    <div class="expanding-cardbox expanding-cardbox-alt mb-4">
+                        <div class="expanding-cardbox__body">
+                            <h5 id="welcome_policy_summary" class="expanding-cardbox__title text-white mb-0">
+                                Policy Summary <i class="far fa-chevron-down text-white fa-lg"></i>
+                            </h5>
+                            <div class="expanding-cardbox__expand text-white mt-4">
+                                <div class="row">
+                                    <div class="col-md-3 text-center">
+                                        <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_phone-smile.png" alt="so-sure - super quick cover" class="mb-4" width="150px">
+                                    </div>
+                                    <div class="col-md-8">
+                                        <ul class="list-unstyled mb-5">
+                                            <li class="mb-3"><strong>Phone:</strong> {{ policy.phone.make }} {{ policy.phone.model }} {{ policy.phone.memory }}GB</li>
+                                            <li class="mb-3"><strong>Policy number:</strong> {{ policy.policyNumber }}</li>
+                                            <li class="mb-3">
+                                                <strong>Cost:</strong>
+                                                {% if policy.getPremiumPlan == 'monthly'%}
+                                                    &pound;{{ policy.premium.monthlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }} per month
+                                                {% elseif policy.getPremiumPlan == 'yearly' %}
+                                                    &pound;{{ policy.premium.yearlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }} a year
+                                                {% else %}
+                                                    Unknown
+                                                {% endif %}
+                                            </li>
+                                            <li>
+                                                <strong>Start/End Date:</strong>
+                                                {{ policy.start|date('jS F Y', 'Europe/London') }} - {{ policy.end|date('jS F Y', 'Europe/London') }}
+                                            </li>
+                                        </ul>
+                                        <a href="#"
+                                           id="policy_doc_toggle"
+                                           data-toggle="modal"
+                                           data-target="#policy_doc"
+                                           role="button"
+                                           class="btn btn-outline-white">See Policy Document</a>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    {# <h4 class="text-center h-light">Here’s a few links to help you get started:</h4> #}
-                    <div class="policy-roundup--share">
-                        <h2 class="text-blue">Sharing is... rewarding</h2>
-                        <p class="lead">Get &pound;{{ policy.connectionValue }} in your Reward Pot for every friend you connect with. <a href="#" class="scroll-to text-nowrap" data-scroll-to-anchor="#how-to-get-cashback">See how it works</a>.</p>
-                        <label for="scode" class="sr-only">Share this link:</label>
-                        <div class="input-group">
-                            <input name="scode" id="scode" readonly="readonly" type="text" class="form-control" value="{{ policy.standardSCode.shareLink }}">
-                            <span class="input-group-btn">
-                                <button class="btn btn-blue btn-pad btn-copy sosure-track"
+                    <p class="text-center text-white mb-4">⚠️ Cancel your policy now if your phone already has a cracked screen or is damaged? <a href="{{ cancel_url }}" class="text-white"><u>Click here</u></a></p>
+                    <div class="expanding-cardbox expanding-cardbox-alt mb-4">
+                        <div class="expanding-cardbox__body">
+                            <h5 class="expanding-cardbox__title text-white mb-0">
+                                How do I lower my excess? <i class="far fa-chevron-down text-white fa-lg"></i>
+                            </h5>
+                            <div class="expanding-cardbox__expand text-white mt-4">
+                                <p>Now that you have a policy, let's get your excess reduced from &pound;150 to &pound;50 for accidental damage and &pound;70 for loss</p>
+                                <p>Download the app now, login and click on pic-sure to get started.</p>
+                                <ul class="list-inline">
+                                    <li class="list-inline-item mb-2">
+                                        <a class="ga-outbound-click" data-clicklabel="iTunes" href="{{ apple_download('user-welcome') }}" target="_blank" rel="noopener">
+                                            <img src="{{ cdn_url }}/images/icons/app-store-original.svg" alt="Download so-sure on the App Store" /><span class="sr-only">so-sure app - Apple App Store</span>
+                                        </a>
+                                    </li>
+                                    <li class="list-inline-item mb-2">
+                                        <a class="ga-outbound-click" data-clicklabel="PlayStore" href="{{ google_download('user-welcome') }}" target="_blank" rel="noopener">
+                                            <img src="{{ cdn_url }}/images/icons/google-play-original.svg" alt="Get so-sure on Google Play" /><span class="sr-only">so-sure app - Google Play</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                                <a href="{{ path('faq') }}#the-so-sure-app-and-pic-sure" class="btn btn-outline-white">Handy help guide <i class="far fa-arrow-right ml-2"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="expanding-cardbox expanding-cardbox-alt mb-4">
+                        <div class="expanding-cardbox__body">
+                            <h5 class="expanding-cardbox__title text-white mb-0">
+                                How do I get cashback? <i class="far fa-chevron-down text-white fa-lg"></i>
+                            </h5>
+                            <div class="expanding-cardbox__expand text-white mt-4">
+                                <p>By joining forces with your most careful friends and family members, you could see 80% of your insurance premium reimbursed every year. Yes, really.  All you have to do is share this unique link to those you trust.</p>
+                                <div class="d-flex align-items-center">
+                                    <input name="scode" id="scode" readonly="readonly" type="text" class="form-control mr-2" value="{{ policy.standardSCode.shareLink }}">
+                                    <button class="btn btn-outline-white btn-copy sosure-track"
                                         data-clipboard-target="#scode"
                                         data-toggle="tooltip"
-                                        data-placement="bottom"
+                                        data-placement="top"
                                         data-event="user-welcome-copy-scode"
-                                        >Copy</button>
-                            </span>
-                        </div>
-                    </div>
-                    <div class="row text-center">
-                        <div class="col-sm-4">
-                            <a data-toggle="modal"
-                               data-target="#policy-modal" class="btn btn-blue-hollow btn-block btn-pad">
-                            <i class="fa fa-file-text-o" aria-hidden="true"></i> Policy details</a>
-                        </div>
-                        <div class="col-sm-4">
-                            <a href="{{ path('user_policy', {'policyId': policy.id }) }}" class="btn btn-blue-hollow btn-block btn-pad"><i class="fa fa-user-circle-o" aria-hidden="true"></i> Account page</a>
-                        </div>
-                        <div class="col-sm-4">
-                            <a href="#"
-                               class="btn btn-blue-hollow btn-block btn-pad scroll-to"
-                               data-scroll-to-anchor="#how-to-get-cashback">How do I get cashback?</a>
+                                            >
+                                        Copy <i class="fal fa-copy ml-2"></i>
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
 
-    <section class="section--pad user-welcome--pic-sure section--arrow section--arrow__lightest-blue">
-        <div class="container">
-            <h3>Download our handy app - reduce your excess!</h3>
-            <p>Validate your phone using our pic-sure technology, this not only helps us recognise your phone is in good working order and not already damaged but <mark class="background-white text-uppercase">reduces your excess by half!</mark> <br>Help us stamp out fraud, reduce claims times and reduce costs to give that saving back to you.</p>
-            <table class="table hidden-xs">
-                <thead>
-                    <tr>
-                        <td width="50%" class="h3 contrast">Excess <u>without</u> pic-sure</td>
-                        <td width="50%" class="h3 sosure">Excess <u>with</u> pic-sure</td>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td class="contrast" align="middle" valign="middle">
-                            <span class="text-blue h1">£150</span><br>
-                            FOR THEFT/LOSS/ACCIDENTAL DAMAGE/BREAKDOWN
-                        </td>
-                        <td class="sosure" align="middle" valign="middle">
-                            <span class="text-blue h1">£50</span><br>
-                            FOR ACCIDENTAL DAMAGE/BREAKDOWN <br><br>
-                            <span class="text-blue h1">£70</span><br>
-                            FOR THEFT/LOSS
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-            <table class="table visible-xs">
-                <thead>
-                    <tr>
-                        <td width="100%" class="h3 contrast">Excess <u>without</u> pic-sure</td>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td class="contrast" align="middle" valign="middle">
-                            <span class="text-blue h1">£150</span><br>
-                            FOR THEFT/LOSS/ACCIDENTAL DAMAGE/BREAKDOWN
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-            <table class="table visible-xs">
-                <thead>
-                    <tr>
-                        <td width="100%" class="h3 sosure">Excess <u>with</u> pic-sure</td>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td class="sosure" align="middle" valign="middle">
-                            <span class="text-blue h1">£50</span><br>
-                            FOR ACCIDENTAL DAMAGE/BREAKDOWN <br><br>
-                            <span class="text-blue h1">£70</span><br>
-                            FOR THEFT/LOSS
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-            {% if policy.phone.googlePlay or policy.phone.iTunes %}
-                <div class="app-link">
-                    {% if policy.phone.iTunes %}
-                        <a class="ga-outbound-click"
-                           data-clicklabel="iTunes"
-                           href="{{ apple_download('user-welcome') }}"
-                           target="_blank"><img src="{{ cdn_url }}/images/user/app_download_welcome_apple.png" alt="Available at the AppleStore" class="img-responsive">
-                        </a>
-                    {% endif %}
-                    {% if policy.phone.googlePlay %}
-                        <a class="ga-outbound-click"
-                           data-clicklabel="PlayStore"
-                           href="{{ google_download('user-welcome') }}"
-                           target="_blank"><img src="{{ cdn_url }}/images/user/app_download_welcome_android.png" alt="Get it on Google Play" class="img-responsive">
-                       </a>
-                    {% endif %}
+            {# Curve Desktop #}
+            <div class="qpw__curve order-2">
+                <svg class="d-block d-lg-none" preserveAspectRatio="xMinYMin meet" viewBox="0 0 750 117" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                    <defs></defs>
+                    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                        <g id="Artboard" fill="#FFFFFF" fill-rule="nonzero">
+                            <g transform="translate(375.000000, 58.500000) scale(1, -1) translate(-375.000000, -58.500000) ">
+                                <g id="Page-1">
+                                    <g id="Group">
+                                        <g id="---BG---">
+                                            <path d="M0,40 C124,13.33333 248.66667,0 374,0 C499.33333,0 624.66667,13.33333 750,40 L750,117 L0,117 L0,40 Z" id="Rectangle"></path>
+                                        </g>
+                                    </g>
+                                </g>
+                            </g>
+                        </g>
+                    </g>
+                </svg>
+                <svg class="d-none d-lg-block" preserveAspectRatio="xMinYMin meet" viewBox="0 0 57 846" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                    <defs></defs>
+                    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                        <g transform="translate(-12.000000, 0.000000)" fill="#FFFFFF">
+                            <path d="M69,0 L69,846 L68,846 C30.6666667,705 12,564 12,423 C12,282 31,141 69,0 Z" id="Rectangle-3"></path>
+                        </g>
+                    </g>
+                </svg>
+            </div>
+
+            {# Sub Content #}
+            <div class="qpw__sub__container order-1 order-lg-3">
+                <div class="qpw__sub px-4 pb-4 px-lg-5">
+                    <h2 class="text-blue2 mb-3">You're covered 🎉</h2>
+                    <h5 class="mb-4">Thank you for choosing so-sure</h5>
+                    <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_Icon_friends-connect.png" alt="so-sure - Simple Terms &amp; Conditions" class="mb-4" width="150px">
+                    <div>
+                        <a href="{{ path('user_policy', {'policyId': policy.id }) }}" class="btn btn-success btn-shadow">View your account <i class="far fa-arrow-right ml-2"></i></a>
+                    </div>
                 </div>
-                <p>You can also add additional phones, invite and connect or get in touch when you need us most.</p>
-            {% else %}
-                <div class="app-link">
-                    <img src="{{ cdn_url }}/images/user/app_download_welcome_other_os_2x.png" alt="Other OS" class="img-responsive">
-                    <p class="non-iosandroid">For non-iOS or Android phones, please <a href="#" class="open-intercom">click here</a> to chat to us for further instructions on how to validate your phone.</p>
-                </div>
-            {% endif %}
-        </div>
-    </section>
+            </div>
 
-    <section id="how-to-get-cashback" class="section--pad section--arrow user-welcome--how-to-get-cashback">
-        <div class="container">
-            {% include 'AppBundle::Default/_howToGetCashback.html.twig' %}
-        </div>
-    </section>
-
-    <section class="section--pad section--arrow user-welcome--slider">
-        <div class="container">
-            {# Set vars for slider #}
-            {% set max_connections = policy.maxConnections %}
-            {% set connection_value = policy.ConnectionValue %}
-            {% set max_pot = policy.MaxPot %}
-            {% set annual_premium = policy.premium.yearlyPremiumPrice(app.user.additionalPremium) %}
-            {# Include reward slider hide title #}
-            {% include 'AppBundle::Default/_rewardSlider.html.twig' with { show_title: false} %}
-        </div>
-    </section>
-
-    <section class="section--pad section--arrow section--arrow__off-white user-welcome--effective-monthly-premium">
-        <div class="container">
-            {% include 'AppBundle::Default/_effectiveMonthlyPremium.html.twig' %}
-        </div>
-    </section>
-
-    <section class="section--pad user-welcome--video">
-        <div class="container">
-            {% include 'AppBundle::Default/_explainerVideo.html.twig' %}
         </div>
     </section>
 
     {# Page Modals #}
-    <div class="modal modal-fullscreen fade"
-         id="policy-modal"
-         tabindex="-1"
-         role="dialog"
-         aria-labelledby="So-Sure Policy Terms"
-         aria-hidden="true">
-        <div class="modal-dialog">
+    <div class="modal fade"
+         id="policy_doc"
+         tabindex="-1" role="dialog"
+         aria-labelledby="policy_doc"
+         aria-hidden="true"
+         data-url="{{ url('latest_policy_terms', {'policy_key': policy_key, 'maxPotValue':  policy.maxPot, 'include': true, 'noH1': true }) }}">
+        <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h5 class="modal-title">Your Policy Document</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <i class="fal fa-times text-white"></i>
+                    </button>
                 </div>
-                <div class="modal-body modal-policy" data-url="{{ url('latest_policy_terms', {'policy_key': policy_key, 'maxPotValue':  policy.maxPot, 'include': true, 'noH1': true }) }}">
-                    <div class="text-center" style="margin-bottom: 20px;">
-                        <img src="{{ cdn_url }}/images/spinner.svg" alt="Loading...">
+                <div id="policy_doc_body" class="modal-body">
+                    <div class="policy-content"></div>
+                    <div id="policy_doc_loader" class="text-center">
+                        <i class="fas fa-circle-notch fa-spin fa-2x text-primary"></i>
+                        <a href="#" id="policy_doc_reload" class="btn btn-outline-primary" style="display:none;">Reload</a>
                     </div>
                 </div>
             </div>
@@ -255,64 +204,10 @@
     </div>
 
     {% if app.session.has('oauth2Flow') and app.session.get('oauth2Flow') == 'starling' %}
-        {% include 'AppBundle::User/_welcome_starling.html.twig' %}
-    {% elseif user_modal_welcome is defined and user_modal_welcome == 'welcome-modal' %}
-        <div class="modal modal-new fade"
-             id="welcome-modal"
-             tabindex="-1"
-             role="dialog"
-             aria-labelledby="welcome-modal"
-             aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-
-
-                        <h3 class="h2 text-blue text-center">You’ve made a great choice</h3>
-                    </div>
-                    <div class="modal-body">
-                        <p class="lead text-center">Just to make you feel even better about your policy, here's some feel-good info:</p>
-                        <div class="row">
-                            <div class="col-md-4">
-                                <img src="{{ cdn_url }}/images/user/welcome_modal_my_bank_.svg" class="img-center">
-                                <div class="h4 text-center">Banks</div>
-                                <p>Often you're not covered immediately or for loss/theft (with us you are). Banks can take 7-14 days to get you back on your feet. Can you live without your phone for that long?</p>
-                            </div>
-                            <div class="col-md-4">
-                                <img src="{{ cdn_url }}/images/user/welcome_modal_home_insurance_.svg" class="img-center">
-                                <div class="h4 text-center">Home insurance</div>
-                                <p>Unlikely to get you up and running with a replacement phone in 24-72 hours (unlike us). Plus home insurance usually has high excess of £200 or more (with us its as low as £50) and might well increase your premium next year if you make a claim, ouch, we won't.</p>
-                            </div>
-                            <div class="col-md-4">
-                                <img src="{{ cdn_url }}/images/user/welcome_modal_cheap_insurance_.svg" class="img-center">
-                                <div class="h4 text-center">Cheap Insurance</div>
-                                <p>Yes, we may be slightly more expensive than some of the independent insurers out there, but our claims process is super simple, hassle free and we decline less than 3.5% of claims.</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <div class="row">
-                            <div class="col-md-6 col-md-offset-3">
-                                <a href="#" class="btn btn-blue btn-block btn-pad btn-big-text" data-dismiss="modal">Right choice, indeed!</a>
-                            </div>
-                        </div>
-                        <hr>
-                        <div class="row">
-                            <div class="col-md-10 col-md-offset-1">
-                                <p><small>Plus we're upfront and honest and don't hide behind small print, that's why our customer satisfaction rates are better than Apples (so-sure's NPS is 73, apples is 72 - how good is that?).</small></p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        {% include 'AppBundle::User/_starlingModal.html.twig' %}
     {% endif %}
-    {# End Page Modals #}
 
-
+    {# Pixels #}
     {% if environment == 'prod' %}
         <img src="https://pubads.g.doubleclick.net/activity;xsp=4375795;ord={{ random(999999999) }}?" width=1 height=1 border=0/>
 
@@ -323,18 +218,10 @@
 
 {% endblock %}
 
-{% block javascripts %}
-    {{ parent() }}
-    {% javascripts
-    'components/dot/doT.min.js'
-    'components/corejs-typeahead/typeahead.bundle.min.js'
-    'components/fuse.js/fuse.min.js'
-    'components/clipboard/clipboard.min.js'
-    'components/rangeslider.js/rangeslider.min.js'
-    '@AppBundle/Resources/public/js/Default/animations.js'
-    '@AppBundle/Resources/public/js/Default/sliderNew.js'
-    '@AppBundle/Resources/public/js/Default/selectPhoneMakeSearch.js'
-    '@AppBundle/Resources/public/js/Default/selectPhoneMakeDropdown.js'
-    '@AppBundle/Resources/public/js/User/welcome.js' %}
-    <script src="{{ asset_url }}"></script>{% endjavascripts %}
+{% block footer %}
+    {# TODO: Fix footer #}
+{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/welcome.js') }}"></script>
 {% endblock %}

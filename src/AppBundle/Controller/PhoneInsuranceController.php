@@ -496,7 +496,7 @@ class PhoneInsuranceController extends BaseController
             // 'replacement'     => $replacement,
         );
 
-        return $this->render('AppBundle:PhoneInsurance:quoteRebrand.html.twig', $data);
+        return $this->render('AppBundle:PhoneInsurance:quote.html.twig', $data);
     }
 
     /**
