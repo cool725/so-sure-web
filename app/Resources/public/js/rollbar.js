@@ -6,7 +6,14 @@ var _rollbarConfig = {
         environment: document.getElementById('ss-root').getAttribute('data-environment')
     },
     ignoredMessages: [
-        "Script error"
+        "Script error",
+        "is not a function",
+        "is not defined",
+        "Cannot read property",
+        "Unable to get property",
+        "Object doesn't support property or method",
+        "is not an object",
+        "Unable to get value of the property"
     ]
 };
 // Rollbar Snippet
