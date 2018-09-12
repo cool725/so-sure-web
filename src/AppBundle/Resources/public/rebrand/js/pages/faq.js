@@ -14,7 +14,7 @@ $(function() {
     // Init scrollspy
     $('.faq').scrollspy({
         target: '#faq-nav',
-        offset: 0,
+        offset: 10,
     });
 
     // Add smooth scroll and active class on click
@@ -27,7 +27,7 @@ $(function() {
         $(this).parent().addClass('active');
 
         // store hash
-        var hash = this.hash;
+        let hash = this.hash;
 
         // animate
         $('html, body').animate({
@@ -39,6 +39,14 @@ $(function() {
             window.location.hash = hash;
         });
 
+    });
+
+    $('#back-to-top-faq').on('click', function(e) {
+        event.preventDefault();
+
+        $('html,body').animate({
+            scrollTop: 0
+        }, 300);
     });
 
 

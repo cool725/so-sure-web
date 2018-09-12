@@ -6,6 +6,7 @@
 @import "../abstracts/mixins";
 @import "../abstracts/palette";
 @import "../abstracts/variables";
+@import "../base/fonts";
 
 body {
     position: relative;
@@ -24,5 +25,81 @@ body {
 
     &__nav {
         position: fixed;
+
+        .list-group {
+            font-family: $g-medium;
+
+            a {
+                color: $blue-4;
+                border: none;
+                border-bottom: 2px solid $bb-1;
+                margin-bottom: 0;
+                padding: 1rem 0;
+                @include border-radius(0);
+                transition: color 0.5s;
+
+                .far {
+                    display: none;
+                }
+
+                &.active {
+                    color: $blue-2;
+                    border-bottom: 2px solid $bb-1;
+                    background: transparent;
+
+                    .far {
+                        display: inline-block;
+                    }
+                }
+
+                &:hover {
+                    color: $blue-2;
+                    border-bottom: 2px solid $bb-1;
+                    background-color: transparent;
+                }
+
+                &:first-of-type,
+                &:last-of-type {
+                    @include border-radius(0);
+                }
+
+                &:last-of-type {
+                    border: none;
+                }
+            }
+        }
+
+
+        // li {
+        //     border-bottom: 2px solid $bb-1;
+
+        //     a {
+        //         color: $blue-4;
+
+        //         &:hover {
+        //             text-decoration: none;
+        //         }
+        //     }
+
+        //     &.active {
+
+        //         a {
+        //             color: $blue-2;
+
+        //             &:before {
+        //                 display: inline-block;
+        //                 font-style: normal;
+        //                 font-variant: normal;
+        //                 text-rendering: auto;
+        //                 -webkit-font-smoothing: antialiased;
+        //                 font-family: 'Font Awesome 5 Pro';
+        //                 vertical-align: middle;
+        //                 content: '\f105';
+        //                 font-weight: 900;
+        //                 margin-right: 0.6rem;
+        //             }
+        //         }
+        //     }
+        // }
     }
 }
