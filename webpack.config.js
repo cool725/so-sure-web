@@ -21,6 +21,7 @@ Encore
     .addEntry('purchase', './src/AppBundle/Resources/public/rebrand/js/pages/purchase.js')
     .addEntry('welcome', './src/AppBundle/Resources/public/rebrand/js/pages/welcome.js')
     .addEntry('landing', './src/AppBundle/Resources/public/rebrand/js/pages/landing.js')
+    .addEntry('faq', './src/AppBundle/Resources/public/rebrand/js/pages/faq.js')
 
     // allow legacy applications to use $/jQuery as a global variable
     .autoProvidejQuery()
