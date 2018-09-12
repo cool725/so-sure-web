@@ -38,76 +38,10 @@
         <div class="with-errors">{{ form_errors(purchase_form.amount) }}</div>
     </div>
 
-    <div class="form-group {% if form_errors(purchase_form.imei) %}has-error{% endif %}">
-        {{ form_label(purchase_form.imei, 'IMEI Number:', { 'label_attr': {'class': 'sr-only'} }) }}
-        <label for="purchase_form[imei]">
-            IMEI Number:
-            <span class="ml-2 text-blue2">
-                <a href="#"
-                   data-toggle="modal"
-                   data-target="#policy_imei_number"
-                   {# data-title="Up to 80% cashback every year" #}
-                   {# data-body="asdasdasdasdasdasdasd" #}
-                   data-img="{{ cdn_url }}/images/rebrand/icns/so-sure_happy-icn-min.svg"
-                   role="button">
-                    <i class="fal fa-info-circle"></i>
-                </a>
-            </span>
-        </label>
-        {{ form_widget(purchase_form.imei, {'attr':{'class':'form-control imei', 'placeholder':'IMEI Number', 'data-hj-suppress' : '', 'data-make': phone.make}}) }}
-        <small class="form-text">Dial <strong>*#06#</strong> on your phone to display your IMEI number.</small>
-        {% if phone.make == 'Samsung' %}
-            <small class="form-text samsung-imei">Numbers only please (no / required)</small>
-        {% endif %}
-        <div class="with-errors">{{ form_errors(purchase_form.imei) }}</div>
-    </div>
-
-    {% if purchase_form.serialNumber is defined %}
-        <div class="form-group {% if form_errors(purchase_form.serialNumber) %}has-error{% endif %}">
-            {{ form_label(purchase_form.serialNumber, 'Serial Number:', { 'label_attr': {'class': 'sr-only'} }) }}
-            <label for="purchase_form[serialNumber]">
-                Serial Number:
-                <span class="ml-2 text-blue2">
-                    <a href="#"
-                       data-toggle="modal"
-                       data-target="#policy_serial_number"
-                       {# data-title="Up to 80% cashback every year" #}
-                       {# data-body="asdasdasdasdasdasdasd" #}
-                       data-img="{{ cdn_url }}/images/rebrand/icns/so-sure_happy-icn-min.svg"
-                       role="button">
-                        <i class="far fa-question-circle"></i>
-                    </a>
-                </span>
-            </label>
-            {{ form_widget(purchase_form.serialNumber, {'attr':{'class':'form-control',  'pattern': '[a-zA-Z0-9]{5,32}', 'title': 'Enter a valid serial number', 'placeholder':'Serial Number', 'data-hj-suppress' : ''}}) }}
-            <small class="form-text">To find your Serial Numbers open your phone Settings, navigate to General and view About</small>
-            <div class="with-errors">{{ form_errors(purchase_form.serialNumber) }}</div>
-        </div>
-    {% endif %}
-
-    <div class="d-none">
-        {{ form_widget(purchase_form.fileValid, {'attr': {'style':'display:none'}}) }}
-        {{ form_widget(purchase_form.file, {'attr': {'style':'display:none'}}) }}
-    </div>
-
-    <div class="form-group">
-        <h4 class="text-blue2 mt-5 mb-3">Please confirm that the following are correct:</h4>
-        <ul class="pl-4 form-text">
-            <li>My phone is in full working condition and the screen is not damaged</li>
-            <li>I am 18 years of age or over</li>
-            <li>I am a resident of the United Kingdom</li>
-            <li>I have read &amp; understood the <a href="{{ cdn_url }}/files/so-sure_sample_policy_doc.pdf" target="_blank" class="text-nowrap"><u>so-sure policy document</u></a></li>
-        </ul>
-    </div>
-
-    <div class="form-group">
-        {{ form_widget(purchase_form.agreed, {'label': 'I confirm the above is correct'}) }}
-    </div>
-
     <div class="form-group mt-5">
         <div class="form-row">
             <div class="col-3">
-                {% if app.request.get('_route') == "purchase_step_policy_id" %}
+                {% if app.request.get('_route') == "purchase_step_payment_id" %}
                 <a href="{{ path('user_home') }}"
                    class="btn btn-outline-grey btn-circle d-flex justify-content-center align-items-center">
                     <span class="sr-only">back</span>

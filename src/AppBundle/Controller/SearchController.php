@@ -84,7 +84,7 @@ class SearchController extends BaseController
             }
 
             // don't check for partial partial as selected phone may be different from partial policy phone
-            return $this->redirectToRoute('purchase_step_policy');
+            return $this->redirectToRoute('purchase_step_payment_id');
         } elseif ($phone && in_array($type, ['learn-more'])) {
             if ($session = $request->getSession()) {
                 $session->set('quote', $phone->getId());
@@ -124,7 +124,7 @@ class SearchController extends BaseController
             }
 
             // don't check for partial partial as selected phone may be different from partial policy phone
-            return $this->redirectToRoute('purchase_step_policy');
+            return $this->redirectToRoute('purchase_step_payment');
         } elseif ($phone && in_array($type, ['learn-more'])) {
             if ($session = $request->getSession()) {
                 $session->set('quote', $phone->getId());

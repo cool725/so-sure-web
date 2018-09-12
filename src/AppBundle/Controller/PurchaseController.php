@@ -4,11 +4,13 @@ namespace AppBundle\Controller;
 
 use AppBundle\Document\Feature;
 use AppBundle\Document\Form\Bacs;
+use AppBundle\Document\Form\PurchaseStepPayment;
 use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Exception\InvalidEmailException;
 use AppBundle\Exception\InvalidFullNameException;
 use AppBundle\Form\Type\BacsConfirmType;
 use AppBundle\Form\Type\BacsType;
+use AppBundle\Form\Type\PurchaseStepPaymentType;
 use AppBundle\Repository\JudoPaymentRepository;
 use AppBundle\Repository\PaymentRepository;
 use AppBundle\Repository\PhoneRepository;
@@ -247,12 +249,12 @@ class PurchaseController extends BaseController
 
                     if ($user->hasPartialPolicy()) {
                         return new RedirectResponse(
-                            $this->generateUrl('purchase_step_policy_id', [
+                            $this->generateUrl('purchase_step_phone_id', [
                                 'id' => $user->getPartialPolicies()[0]->getId()
                             ])
                         );
                     } else {
-                        return $this->redirectToRoute('purchase_step_policy');
+                        return $this->redirectToRoute('purchase_step_phone');
                     }
                 }
             }
@@ -285,11 +287,11 @@ class PurchaseController extends BaseController
      * Note that any changes to actual path routes need to be reflected in the Google Analytics Goals
      *   as these will impact Adwords
      *
-     * @Route("/step-policy", name="purchase_step_policy")
-     * @Route("/step-policy/{id}", name="purchase_step_policy_id")
+     * @Route("/step-phone", name="purchase_step_phone")
+     * @Route("/step-phone/{id}", name="purchase_step_phone_id")
      * @Template
-    */
-    public function purchaseStepPhoneReviewAction(Request $request, $id = null)
+     */
+    public function purchaseStepPhoneAction(Request $request, $id = null)
     {
         /** @var User $user */
         $user = $this->getUser();
@@ -342,47 +344,13 @@ class PurchaseController extends BaseController
 
         if ($phone) {
             $purchase->setPhone($phone);
-            // Default to monthly payment
-            if ('GET' === $request->getMethod()) {
-                $price = $phone->getCurrentPhonePrice();
-                if ($user->allowedMonthlyPayments()) {
-                    $purchase->setAmount($price->getMonthlyPremiumPrice($user->getAdditionalPremium()));
-                } elseif ($user->allowedYearlyPayments()) {
-                    $purchase->setAmount($price->getYearlyPremiumPrice($user->getAdditionalPremium()));
-                }
-            }
         }
-
-        //$purchase->setAgreed(true);
-        $purchase->setNew(true);
 
         /** @var Form $purchaseForm */
         $purchaseForm = $this->get('form.factory')
             ->createNamedBuilder('purchase_form', PurchaseStepPhoneType::class, $purchase)
             ->getForm();
-        $webpay = null;
-        $allowPayment = true;
 
-        // $paymentProviderTest = $this->sixpack(
-        //     $request,
-        //     SixpackService::EXPERIMENT_PURCHASE_FLOW_BACS,
-        //     ['judo', 'bacs'],
-        //     SixpackService::LOG_MIXPANEL_CONVERSION,
-        //     null,
-        //     0.1
-        // );
-        // $bacsFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_BACS);
-        // // For now, only allow 1 policy with bacs
-        // if ($bacsFeature && count($user->getValidPolicies(true)) >= 1) {
-        //     $bacsFeature = false;
-        // }
-        // if (!$bacsFeature) {
-        //     $paymentProviderTest = 'judo';
-        // }
-
-        $paymentProviderTest = 'judo';
-
-        //$this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_POSTCODE);
         if ('POST' === $request->getMethod()) {
             if ($request->request->has('purchase_form')) {
                 $purchaseForm->handleRequest($request);
@@ -418,6 +386,7 @@ class PurchaseController extends BaseController
 
                     if (!$policy) {
                         try {
+                            $allowContinue = true;
                             $policyService = $this->get('app.policy');
                             $policyService->setWarnMakeModelMismatch(false);
                             $policy = $policyService->init(
@@ -446,7 +415,7 @@ class PurchaseController extends BaseController
                                 'error',
                                 "Please check all your details.  It looks like we're missing something."
                             );
-                            $allowPayment = false;
+                            $allowContinue = false;
                         } catch (GeoRestrictedException $e) {
                             $this->addFlash(
                                 'error',
@@ -463,7 +432,7 @@ class PurchaseController extends BaseController
                                     "Sorry, you weren't in quite the right place. Please try again here."
                                 );
                                 return new RedirectResponse(
-                                    $this->generateUrl('purchase_step_policy_id', [
+                                    $this->generateUrl('purchase_step_phone_id', [
                                         'id' => $partialPolicy->getId()
                                     ])
                                 );
@@ -473,25 +442,25 @@ class PurchaseController extends BaseController
                                     "Sorry, your phone is already in our system. Perhaps it's already insured?"
                                 );
                             }
-                            $allowPayment = false;
+                            $allowContinue = false;
                         } catch (LostStolenImeiException $e) {
                             $this->addFlash(
                                 'error',
                                 "Sorry, it looks this phone is already insured"
                             );
-                            $allowPayment = false;
+                            $allowContinue = false;
                         } catch (ImeiBlacklistedException $e) {
                             $this->addFlash(
                                 'error',
                                 "Sorry, we are unable to insure you."
                             );
-                            $allowPayment = false;
+                            $allowContinue = false;
                         } catch (InvalidImeiException $e) {
                             $this->addFlash(
                                 'error',
                                 "Looks like the IMEI you provided isn't quite right.  Please check the number again."
                             );
-                            $allowPayment = false;
+                            $allowContinue = false;
                         } catch (ImeiPhoneMismatchException $e) {
                             // @codingStandardsIgnoreStart
                             $this->addFlash(
@@ -499,102 +468,37 @@ class PurchaseController extends BaseController
                                 "Looks like phone model you selected isn't quite right. Please check that you selected the correct model."
                             );
                             // @codingStandardsIgnoreEnd
-                            $allowPayment = false;
+                            $allowContinue = false;
                         } catch (RateLimitException $e) {
                             $this->addFlash(
                                 'error',
                                 "Sorry, we are unable to insure you."
                             );
-                            $allowPayment = false;
+                            $allowContinue = false;
                         }
                     }
                     $dm->flush();
 
-                    if ($allowPayment) {
-                        $monthly = $this->areEqualToTwoDp(
-                            $purchase->getAmount(),
-                            $purchase->getPhone()->getCurrentPhonePrice()->getMonthlyPremiumPrice()
-                        );
-                        $yearly = $this->areEqualToTwoDp(
-                            $purchase->getAmount(),
-                            $purchase->getPhone()->getCurrentPhonePrice()->getYearlyPremiumPrice()
-                        );
+                    if ($allowContinue) {
+                        $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_POLICY_READY, [
+                            'Device Insured' => $purchase->getPhone()->__toString(),
+                            'OS' => $purchase->getPhone()->getOs(),
+                            'Policy Id' => $policy->getId(),
+                        ]);
 
-                        if ($monthly || $yearly) {
-                            $price = $purchase->getPhone()->getCurrentPhonePrice();
-                            $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_POLICY_READY, [
-                                'Device Insured' => $purchase->getPhone()->__toString(),
-                                'OS' => $purchase->getPhone()->getOs(),
-                                'Final Monthly Cost' => $price->getMonthlyPremiumPrice(),
-                                'Policy Id' => $policy->getId(),
-                            ]);
-
-                            if ($paymentProviderTest == 'bacs') {
-                                return new RedirectResponse(
-                                    $this->generateUrl('purchase_step_payment_id', [
-                                        'id' => $policy->getId(),
-                                        'freq' => $monthly ? Policy::PLAN_MONTHLY : Policy::PLAN_YEARLY,
-                                    ])
-                                );
-                            } else {
-                                // There was an odd case of next not being detected as clicked
-                                // perhaps a brower issue with multiple buttons
-                                // just in case, assume judo pay if we don't detect existing
-                                if ($purchaseFormExistingClicked) {
-                                    // TODO: Try/catch
-                                    if ($this->get('app.judopay')->existing(
-                                        $policy,
-                                        $purchase->getAmount()
-                                    )) {
-                                        $purchase->setAgreed(true);
-                                        return $this->redirectToRoute(
-                                            'user_welcome_policy_id',
-                                            ['id' => $policy->getId()]
-                                        );
-                                    } else {
-                                        // @codingStandardsIgnoreStart
-                                        $this->addFlash(
-                                            'warning',
-                                            "Sorry, there was a problem with your existing payment method. Try again, or use the Pay with new card option."
-                                        );
-                                        // @codingStandardsIgnoreEnd
-                                    }
-                                } else {
-                                    $webpay = $this->get('app.judopay')->webpay(
-                                        $policy,
-                                        $purchase->getAmount(),
-                                        $request->getClientIp(),
-                                        $request->headers->get('User-Agent'),
-                                        JudopayService::WEB_TYPE_STANDARD
-                                    );
-                                    $purchase->setAgreed(true);
-                                }
-                            }
-                        } else {
-                            $this->addFlash(
-                                'error',
-                                "Please select the monthly or yearly option."
-                            );
-                        }
+                        return new RedirectResponse(
+                            $this->generateUrl('purchase_step_payment_id', [
+                                'id' => $policy->getId()
+                            ])
+                        );
                     }
                 }
             }
         }
 
-        // $moneyBackGuarantee = $this->sixpack(
-        //     $request,
-        //     SixpackService::EXPERIMENT_MONEY_BACK_GUARANTEE,
-        //     ['no-money-back-guarantee', 'money-back-guarantee']
-        // );
-
         /** @var RequestService $requestService */
         $requestService = $this->get('app.request');
-        $template = null;
-
-        $template = 'AppBundle:Purchase:purchaseStepPersonalReview.html.twig';
-
-        $now = new \DateTime();
-        $billingDate = $this->adjustDayForBilling($now);
+        $template = 'AppBundle:Purchase:purchaseStepPhone.html.twig';
 
         $data = array(
             'policy' => $policy,
@@ -602,16 +506,11 @@ class PurchaseController extends BaseController
             'purchase_form' => $purchaseForm->createView(),
             'is_postback' => 'POST' === $request->getMethod(),
             'step' => 2,
-            'webpay_action' => $webpay ? $webpay['post_url'] : null,
-            'webpay_reference' => $webpay ? $webpay['payment']->getReference() : null,
             'policy_key' => $this->getParameter('policy_key'),
             'phones' => $phone ? $phoneRepo->findBy(
                 ['active' => true, 'make' => $phone->getMake(), 'model' => $phone->getModel()],
                 ['memory' => 'asc']
             ) : null,
-            'billing_date' => $billingDate,
-            'payment_provider' => $paymentProviderTest,
-            // 'moneyBackGuarantee' => $moneyBackGuarantee,
         );
 
         return $this->render($template, $data);
@@ -621,9 +520,9 @@ class PurchaseController extends BaseController
      * Note that any changes to actual path routes need to be reflected in the Google Analytics Goals
      *   as these will impact Adwords
      *
-     * @Route("/step-payment/{id}/{freq}", name="purchase_step_payment_id")
+     * @Route("/step-payment/{id}/{freq}", name="purchase_step_payment_bacs_id")
      */
-    public function purchaseStepPaymentAction(Request $request, $id, $freq)
+    public function purchaseStepPaymentBacsAction(Request $request, $id, $freq)
     {
         $user = $this->getUser();
         if (!$user) {
@@ -751,7 +650,190 @@ class PurchaseController extends BaseController
         return $this->render($template, $data);
     }
 
-        /**
+    /**
+     * Note that any changes to actual path routes need to be reflected in the Google Analytics Goals
+     *   as these will impact Adwords
+     *
+     * @Route("/step-payment", name="purchase_step_payment")
+     * @Route("/step-payment/{id}", name="purchase_step_payment_id")
+     * @Template
+    */
+    public function purchaseStepPaymentAction(Request $request, $id = null)
+    {
+        /** @var User $user */
+        $user = $this->getUser();
+        if (!$user) {
+            return $this->redirectToRoute('purchase');
+        } elseif (!$user->canPurchasePolicy()) {
+            $this->addFlash(
+                'error',
+                "Sorry, but you've reached the maximum number of allowed policies. Contact us for more details."
+            );
+
+            return $this->redirectToRoute('user_home');
+        }
+
+        $this->denyAccessUnlessGranted(UserVoter::ADD_POLICY, $user);
+        if (!$user->hasValidBillingDetails()) {
+            return $this->redirectToRoute('purchase_step_personal');
+        }
+
+        $dm = $this->getManager();
+        /** @var PhoneRepository $phoneRepo */
+        $phoneRepo = $dm->getRepository(Phone::class);
+        /** @var PolicyRepository $policyRepo */
+        $policyRepo = $dm->getRepository(Policy::class);
+
+        $phone = $this->getSessionQuotePhone($request);
+
+        $purchase = new PurchaseStepPayment();
+        $purchase->setUser($user);
+        /** @var PhonePolicy $policy */
+        $policy = null;
+        if ($id) {
+            $policy = $policyRepo->find($id);
+        }
+
+        if (!$policy && $user->hasPartialPolicy()) {
+            $policy = $user->getPartialPolicies()[0];
+        }
+        $purchase->setPolicy($policy);
+
+        // Default to monthly payment
+        if ('GET' === $request->getMethod()) {
+            $price = $policy->getPhone()->getCurrentPhonePrice();
+            if ($user->allowedMonthlyPayments()) {
+                $purchase->setAmount($price->getMonthlyPremiumPrice($user->getAdditionalPremium()));
+            } elseif ($user->allowedYearlyPayments()) {
+                $purchase->setAmount($price->getYearlyPremiumPrice($user->getAdditionalPremium()));
+            }
+        }
+
+        //$purchase->setAgreed(true);
+        $purchase->setNew(true);
+
+        /** @var Form $purchaseForm */
+        $purchaseForm = $this->get('form.factory')
+            ->createNamedBuilder('purchase_form', PurchaseStepPaymentType::class, $purchase)
+            ->getForm();
+        $webpay = null;
+        $allowPayment = true;
+
+        $paymentProviderTest = 'judo';
+
+        //$this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_POSTCODE);
+        if ('POST' === $request->getMethod()) {
+            if ($request->request->has('purchase_form')) {
+                $purchaseForm->handleRequest($request);
+
+                // as we may recreate the form, make sure to get everything we need from the form first
+                $purchaseFormValid = $purchaseForm->isValid();
+                $purchaseFormExistingClicked = false;
+                if ($purchaseForm->has('existing')) {
+                    /** @var SubmitButton $existingButton */
+                    $existingButton = $purchaseForm->get('existing');
+                    $purchaseFormExistingClicked = $existingButton->isClicked();
+                }
+
+                if ($purchaseFormValid) {
+                    if ($allowPayment) {
+                        $monthly = $this->areEqualToTwoDp(
+                            $purchase->getAmount(),
+                            $policy->getPhone()->getCurrentPhonePrice()->getMonthlyPremiumPrice()
+                        );
+                        $yearly = $this->areEqualToTwoDp(
+                            $purchase->getAmount(),
+                            $policy->getPhone()->getCurrentPhonePrice()->getYearlyPremiumPrice()
+                        );
+
+                        if ($monthly || $yearly) {
+                            $price = $purchase->getPolicy()->getPhone()->getCurrentPhonePrice();
+                            if ($paymentProviderTest == 'bacs') {
+                                return new RedirectResponse(
+                                    $this->generateUrl('purchase_step_payment_bacs_id', [
+                                        'id' => $policy->getId(),
+                                        'freq' => $monthly ? Policy::PLAN_MONTHLY : Policy::PLAN_YEARLY,
+                                    ])
+                                );
+                            } else {
+                                // There was an odd case of next not being detected as clicked
+                                // perhaps a brower issue with multiple buttons
+                                // just in case, assume judo pay if we don't detect existing
+                                if ($purchaseFormExistingClicked) {
+                                    // TODO: Try/catch
+                                    if ($this->get('app.judopay')->existing(
+                                        $policy,
+                                        $purchase->getAmount()
+                                    )) {
+                                        $purchase->setAgreed(true);
+                                        return $this->redirectToRoute(
+                                            'user_welcome_policy_id',
+                                            ['id' => $policy->getId()]
+                                        );
+                                    } else {
+                                        // @codingStandardsIgnoreStart
+                                        $this->addFlash(
+                                            'warning',
+                                            "Sorry, there was a problem with your existing payment method. Try again, or use the Pay with new card option."
+                                        );
+                                        // @codingStandardsIgnoreEnd
+                                    }
+                                } else {
+                                    $webpay = $this->get('app.judopay')->webpay(
+                                        $policy,
+                                        $purchase->getAmount(),
+                                        $request->getClientIp(),
+                                        $request->headers->get('User-Agent'),
+                                        JudopayService::WEB_TYPE_STANDARD
+                                    );
+                                }
+                            }
+                        } else {
+                            $this->addFlash(
+                                'error',
+                                "Please select the monthly or yearly option."
+                            );
+                        }
+                    }
+                }
+            }
+        }
+
+        // $moneyBackGuarantee = $this->sixpack(
+        //     $request,
+        //     SixpackService::EXPERIMENT_MONEY_BACK_GUARANTEE,
+        //     ['no-money-back-guarantee', 'money-back-guarantee']
+        // );
+
+        /** @var RequestService $requestService */
+        $requestService = $this->get('app.request');
+        $template = 'AppBundle:Purchase:purchaseStepPayment.html.twig';
+
+        $now = new \DateTime();
+        $billingDate = $this->adjustDayForBilling($now);
+
+        $data = array(
+            'policy' => $policy,
+            'phone' => $policy->getPhone(),
+            'purchase_form' => $purchaseForm->createView(),
+            'is_postback' => 'POST' === $request->getMethod(),
+            'step' => 3,
+            'webpay_action' => $webpay ? $webpay['post_url'] : null,
+            'webpay_reference' => $webpay ? $webpay['payment']->getReference() : null,
+            'policy_key' => $this->getParameter('policy_key'),
+            'phones' => $phone ? $phoneRepo->findBy(
+                ['active' => true, 'make' => $phone->getMake(), 'model' => $phone->getModel()],
+                ['memory' => 'asc']
+            ) : null,
+            'billing_date' => $billingDate,
+            'payment_provider' => $paymentProviderTest,
+            // 'moneyBackGuarantee' => $moneyBackGuarantee,
+        );
+
+        return $this->render($template, $data);
+    }
+
+    /**
      * @Route("/sample-policy-terms", name="sample_policy_terms")
      * @Template()
      */

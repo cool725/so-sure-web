@@ -128,12 +128,12 @@ class UserController extends BaseController
                 // login page would be nice to add a flash message saying their policy has not yet been purchased
                 if ($user->hasPartialPolicy()) {
                     return new RedirectResponse(
-                        $this->generateUrl('purchase_step_policy_id', [
+                        $this->generateUrl('purchase_step_payment_id', [
                             'id' => $user->getPartialPolicies()[0]->getId()
                         ])
                     );
                 } else {
-                    return new RedirectResponse($this->generateUrl('purchase_step_policy'));
+                    return new RedirectResponse($this->generateUrl('purchase_step_payment'));
                 }
             } else {
                 return new RedirectResponse($this->generateUrl('user_invalid_policy'));
@@ -554,7 +554,7 @@ class UserController extends BaseController
         $policyService = $this->get('app.policy');
         $newPolicy = $policyService->repurchase($policy);
 
-        return $this->redirectToRoute('purchase_step_policy_id', ['id' => $newPolicy->getId()]);
+        return $this->redirectToRoute('purchase_step_payment_id', ['id' => $newPolicy->getId()]);
     }
 
     /**
@@ -1026,7 +1026,7 @@ class UserController extends BaseController
         foreach ($user->getPartialPolicies() as $partialPolicy) {
             $message = sprintf(
                 'Insure your <a href="%s">%s phone</a>',
-                $this->generateUrl('purchase_step_policy_id', ['id' => $partialPolicy->getId()]),
+                $this->generateUrl('purchase_step_payment_id', ['id' => $partialPolicy->getId()]),
                 $partialPolicy->getPhone()->__toString()
             );
             $this->addFlash('success', $message);
