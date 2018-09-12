@@ -2,6 +2,8 @@
 
 {# Set vars #}
 {% set body_class = 'faq' %}
+{% set scrollspy = 1 %}
+{% set scrollspyID = '#faq-nav' %}
 
 {% block title %}so-sure - Frequently Asked Questions{% endblock %}
 
@@ -15,34 +17,42 @@
 
 {% block body %}
 
-    <section class="qpw">
-        <div class="d-lg-flex">
+    <section class="faq">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-7">
 
-            {# Main Content #}
-            <div class="qpw__main__container">
+                    {# Main Content #}
+                    <div class="faq__main__container">
+                        <h5 class="text-blue4 mb-0">so-sure help</h5>
+                        <h1 class="text-primary mb-4">Frequently Asked Questions</h1>
+                        <p class="mb-4">We all need a little extra info sometimes, that's why we've put together this handy FAQ section for you! Can't find what you're looking for? Then don't hesitate to ask via <a href="#" class="open-intercom">live chat</a> Monday-Friday 9am-6pm or by emailing us at <a href="mailto:support@wearesosure.com">support@wearesosure.com</a>.</p>
 
-            </div>
+                        <h4 id="list-item-1">Item 1</h4>
+                        <p>is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum</p>
+                        <h4 id="list-item-2">Item 2</h4>
+                        <p>is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum</p>
+                        <h4 id="list-item-3">Item 3</h4>
+                        <p>is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum</p>
+                        <h4 id="list-item-4">Item 4</h4>
+                        <p>is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum</p>
+                    </div>
 
-            {# Curve Desktop #}
-            <div class="qpw__curve">
-                <svg class="d-none d-lg-block" preserveAspectRatio="xMinYMin meet" viewBox="0 0 57 846" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-                    <defs></defs>
-                    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-                        <g transform="translate(-12.000000, 0.000000)" fill="#FFFFFF">
-                            <path d="M69,0 L69,846 L68,846 C30.6666667,705 12,564 12,423 C12,282 31,141 69,0 Z" id="Rectangle-3"></path>
-                        </g>
-                    </g>
-                </svg>
-            </div>
+                </div>
+                <div class="col-md-3 offset-2">
 
-            {# Sub Content #}
-            <div class="qpw__sub__container">
-                <div class="qpw__sub px-4 pb-4 pt-5 p-lg-5">
-
+                    {# Sub Content #}
+                    <div class="faq__sub__container d-none d-md-block">
+                        <div id="faq-nav" class="list-group faq__nav">
+                          <a class="list-group-item list-group-item-action" href="#list-item-1">Item 1</a>
+                          <a class="list-group-item list-group-item-action" href="#list-item-2">Item 2</a>
+                          <a class="list-group-item list-group-item-action" href="#list-item-3">Item 3</a>
+                          <a class="list-group-item list-group-item-action" href="#list-item-4">Item 4</a>
+                        </div>
+                    </div>
 
                 </div>
             </div>
-
         </div>
     </section>
 

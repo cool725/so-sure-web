@@ -6,3 +6,24 @@
 @import "../abstracts/mixins";
 @import "../abstracts/palette";
 @import "../abstracts/variables";
+
+body {
+    position: relative;
+    overflow-y: scroll;
+}
+
+.faq {
+    padding-top: 5rem;
+    padding-bottom: 1.5rem;
+
+
+    &__sub__container {
+        height: 100vh;
+        position: relative;
+    }
+
+    &__nav {
+        width: inherit;
+        position: fixed;
+    }
+}

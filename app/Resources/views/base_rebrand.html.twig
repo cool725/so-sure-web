@@ -97,7 +97,8 @@
         {% block remotestylesheets %}{% endblock %}
         {% block metaend %}{% endblock %}
     </head>
-    <body class="d-flex flex-column {% if body_class is defined %}{{ body_class }}{% endif %}">
+    <body class="d-flex flex-column {% if body_class is defined %}{{ body_class }}{% endif %}"
+          {% if scrollspy is defined and scrollspy == 1 %}data-spy="scroll" data-target="{% if scrollspyID is defined  %}{{ scrollspyID }}{% endif %}"{% endif %}>
 
         {% if exclude_remote_scripts is not defined or not exclude_remote_scripts %}
             <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KGBBJQ{{ ga_tag_manager_env|raw }}"
