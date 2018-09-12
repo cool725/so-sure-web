@@ -208,7 +208,7 @@ class DirectGroupHandlerClaim extends HandlerClaim
             return null;
         }
 
-        $total = $this->unauthorizedCalls + $this->accessories + $this->phoneReplacementCost;
+        $total = $this->unauthorizedCalls + $this->accessories + $this->phoneReplacementCost - $this->handlingFees;
 
         return $this->toTwoDp($total);
     }
