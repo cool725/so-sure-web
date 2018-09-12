@@ -17,6 +17,7 @@ use AppBundle\Service\JudopayService;
 use AppBundle\Service\PolicyService;
 use AppBundle\Service\ReceperioService;
 use AppBundle\Service\ReportingService;
+use Gedmo\Loggable\Document\Repository\LogEntryRepository;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -1075,6 +1076,17 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         $checks = $fraudService->runChecks($policy);
         $now = new \DateTime();
 
+        /** @var LogEntryRepository $logRepo */
+        $logRepo = $this->getManager()->getRepository(LogEntry::class);
+        $previousPicSureStatuses = $logRepo->findBy([
+            'objectId' => $policy->getId(),
+            'data.picSureStatus' => ['$nin' => [null, PhonePolicy::PICSURE_STATUS_CLAIM_APPROVED]],
+        ], ['loggedAt' => 'desc'], 1);
+        $previousPicSureStatus = null;
+        if (count($previousPicSureStatuses) > 0) {
+            $previousPicSureStatus = $previousPicSureStatuses[0];
+        }
+
         return [
             'policy' => $policy,
             'cancel_form' => $cancelForm->createView(),
@@ -1111,6 +1123,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             'claim_types' => Claim::$claimTypes,
             'phones' => $dm->getRepository(Phone::class)->findActive()->getQuery()->execute(),
             'now' => new \DateTime(),
+            'previousPicSureStatus' => $previousPicSureStatus,
         ];
     }
 
