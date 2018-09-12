@@ -260,7 +260,7 @@ $('#claimsModal').on('show.bs.modal', function (event) {
         modal.find('#claims-detail-transaction').text(claim.transactionFees);
         modal.find('#claims-detail-handling').text(claim.claimHandlingFees);
         modal.find('#claims-detail-reserved').text(claim.reservedValue);
-        modal.find('#claims-detail-incurred').text(claim.incurred);
+        modal.find('#claims-detail-total-incurred').text(claim.totalIncurred);
     } else {
         modal.find('.modal-title').text('Claim: Unknown');
         modal.find('#claims-detail-id').val('');
@@ -290,7 +290,7 @@ $('#claimsModal').on('show.bs.modal', function (event) {
         modal.find('#claims-detail-transaction').text('');
         modal.find('#claims-detail-handling').text('');
         modal.find('#claims-detail-reserved').text('');
-        modal.find('#claims-detail-incurred').text('');
+        modal.find('#claims-detail-total-incurred').text('');
     }
 
     $("#change-claim-type").change(function(){

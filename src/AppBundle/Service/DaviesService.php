@@ -283,10 +283,12 @@ class DaviesService extends S3EmailService
         // $claim->setDaviesStatus($daviesClaim->getDaviesStatus());
 
         $claim->setExcess($daviesClaim->excess);
-        $claim->setIncurred($daviesClaim->incurred);
         $claim->setClaimHandlingFees($daviesClaim->handlingFees);
         $claim->setReservedValue($daviesClaim->reserved);
-        $claim->setTotalIncurred($daviesClaim->totalIncurred);
+
+        // Davies data is incorrect and incurred / totalIncurred are swapped
+        $claim->setIncurred($daviesClaim->totalIncurred);
+        $claim->setTotalIncurred($daviesClaim->incurred);
 
         $claim->setAccessories($daviesClaim->accessories);
         $claim->setUnauthorizedCalls($daviesClaim->unauthorizedCalls);

@@ -1656,7 +1656,7 @@ class DaviesServiceTest extends WebTestCase
 
         $daviesClaim = new DaviesHandlerClaim();
         $daviesClaim->claimNumber = (string) $claim->getNumber();
-        $daviesClaim->incurred = 0;
+        $daviesClaim->totalIncurred = 0;
         $daviesClaim->reserved = 0;
         $daviesClaim->policyNumber = $policy->getPolicyNumber();
         $daviesClaim->insuredName = 'Mr foo bar';
@@ -1671,7 +1671,7 @@ class DaviesServiceTest extends WebTestCase
 
         // fail validation
         $daviesClaim->location = '☺';
-        $daviesClaim->incurred = 1;
+        $daviesClaim->totalIncurred = 1;
         static::$daviesService->saveClaim($daviesClaim, false);
 
         $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
@@ -1680,7 +1680,7 @@ class DaviesServiceTest extends WebTestCase
         $this->assertEquals(0, $updatedClaim->getIncurred());
 
         $daviesClaim->location = null;
-        $daviesClaim->incurred = 2;
+        $daviesClaim->totalIncurred = 2;
         static::$daviesService->saveClaim($daviesClaim, false);
 
         $updatedClaim = $repo->find($claim->getId());
