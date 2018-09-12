@@ -58,6 +58,11 @@ parameters:
     rollbar_access_token:
     rollbar_client_access_token:
 
+    directgroup_sftp_server:
+    directgroup_sftp_username:
+    directgroup_sftp_password:
+    directgroup_zip_password:
+
     heap_id:
     mixpanel_apitoken:
     mixpanel_apisecret:

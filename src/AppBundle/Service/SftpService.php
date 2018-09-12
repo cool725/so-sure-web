@@ -1,6 +1,7 @@
 <?php
 namespace AppBundle\Service;
 
+use phpseclib\Net\SFTP;
 use Psr\Log\LoggerInterface;
 use Aws\S3\S3Client;
 use AppBundle\Classes\DaviesHandlerClaim;
@@ -12,14 +13,13 @@ use AppBundle\Document\File\DaviesFile;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use VasilDakov\Postcode\Postcode;
 
-abstract class S3EmailService
+abstract class SftpService
 {
     use CurrencyTrait;
     use DateTrait;
 
-    const PROCESSED_FOLDER = 'processed';
-    const UNPROCESSED_FOLDER = 'unprocessed';
-    const FAILED_FOLDER = 'failed';
+    const PROCESSED_FOLDER = 'Processed';
+    const FAILED_FOLDER = 'Failed';
 
     /** @var DocumentManager */
     protected $dm;
@@ -40,11 +40,26 @@ abstract class S3EmailService
     protected $path;
 
     /** @var string */
+    protected $server;
+
+    /** @var string */
+    protected $username;
+
+    /** @var string */
+    protected $password;
+
+    /** @var string */
+    protected $zipPassword;
+
+    /** @var string */
     protected $environment;
 
     protected $warnings = [];
     protected $errors = [];
     protected $sosureActions = [];
+
+    /** @var SFTP */
+    protected $sftp;
 
     public function setDm($dm)
     {
@@ -79,6 +94,26 @@ abstract class S3EmailService
     public function setPath($pathPrefix)
     {
         $this->path = sprintf('%s/%s', $pathPrefix, $this->environment);
+    }
+
+    public function setUsername($username)
+    {
+        $this->username = $username;
+    }
+
+    public function setPassword($password)
+    {
+        $this->password = $password;
+    }
+
+    public function setZipPassword($zipPassword)
+    {
+        $this->zipPassword = $zipPassword;
+    }
+
+    public function setServer($server)
+    {
+        $this->server = $server;
     }
 
     public function getWarnings()
@@ -117,45 +152,63 @@ abstract class S3EmailService
     abstract public function getColumnsFromSheetName($sheetName);
     abstract public function createLineObject($line, $columns);
 
-    public function import($sheetName, $useMime = true, $maxParseErrors = 0)
+    public function import($sheetName, $useMime = true, $maxParseErrors = 0, $skipCleanup = false)
     {
         $lines = [];
-        $keys = $this->listS3();
-        foreach ($keys as $key) {
+        $files = $this->listSftp();
+        foreach ($files as $file) {
             $this->clearWarnings();
             $this->clearErrors();
-            $excelFile = null;
-            $emailFile = null;
-            $lines[] = sprintf('Processing %s/%s', $this->path, $key);
+            $tempFile = null;
+            $unzipTempFiles = null;
+            $lines[] = sprintf('Processing %s/%s', $this->path, $file);
             $processed = false;
             try {
-                $emailFile = $this->downloadEmail($key);
-                if ($excelFile = $this->extractExcelFromEmail($emailFile)) {
+                $tempFile = $this->downloadFile($file);
+                $unzipTempFiles = $this->unzipFile($tempFile);
+                foreach ($unzipTempFiles as $excelFile) {
                     $data = $this->parseExcel($excelFile, $sheetName, $useMime, $maxParseErrors);
-                    $processed = $this->processExcelData($key, $data);
-                } else {
-                    throw new \Exception('Unable to locate excel file in email message');
+                    $processed = $this->processExcelData($file, $data);
                 }
             } catch (\Exception $e) {
                 $processed = false;
-                $this->logger->error(sprintf('Error processing %s. Moving to failed. Ex: %s', $key, $e->getMessage()));
+                $this->logger->error(sprintf(
+                    'Error processing %s. Moving to failed. Ex: %s',
+                    $file,
+                    $e->getMessage()
+                ));
             }
 
             if ($processed) {
-                $this->moveS3($key, self::PROCESSED_FOLDER);
-                $lines[] = sprintf('Successfully imported %s/%s and moved to processed folder', $this->path, $key);
+                $key = $this->uploadS3($tempFile, $file, self::PROCESSED_FOLDER);
+                $lines[] = sprintf('Successfully imported %s and moved to processed folder', $key);
             } else {
-                $this->moveS3($key, self::FAILED_FOLDER);
-                $lines[] = sprintf('Failed to import %s/%s and moved to failed folder', $this->path, $key);
+                $key = $this->uploadS3($tempFile, $file, self::FAILED_FOLDER);
+                $lines[] = sprintf('Failed to import %s and moved to failed folder', $key);
             }
 
             $this->postProcess();
 
-            if (file_exists($excelFile)) {
-                unlink($excelFile);
-            }
-            if (file_exists($emailFile)) {
-                unlink($emailFile);
+            if (!$skipCleanup) {
+                if (file_exists($tempFile)) {
+                    unlink($tempFile);
+                }
+                foreach ($unzipTempFiles as $unzipTempFile) {
+                    if (file_exists($unzipTempFile)) {
+                        unlink($unzipTempFile);
+                    }
+                }
+
+                $this->moveSftp($file, self::PROCESSED_FOLDER);
+            } else {
+                if (file_exists($tempFile)) {
+                    $lines[] = sprintf('Skipping cleanup for %s', $tempFile);
+                }
+                foreach ($unzipTempFiles as $unzipTempFile) {
+                    if (file_exists($unzipTempFile)) {
+                        $lines[] = sprintf('Skipping cleanup for %s', $unzipTempFile);
+                    }
+                }
             }
         }
 
@@ -185,51 +238,69 @@ abstract class S3EmailService
         return $lines;
     }
 
+    private function loginSftp()
+    {
+        $this->sftp = new SFTP($this->server);
+        if (!$this->sftp->login($this->username, $this->password)) {
+            throw new \Exception('Login Failed');
+        }
+    }
+
     /**
      * @return array
      */
-    public function listS3()
+    public function listSftp($extension = '.zip')
     {
-        $iterator = $this->s3->getIterator('ListObjects', [
-            'Bucket' => $this->bucket,
-            'Prefix' => sprintf('%s/unprocessed/', $this->path),
-        ]);
-
-        $keys = [];
-        foreach ($iterator as $object) {
-            if ($object['Size'] > 0 &&
-                mb_stripos($object['Key'], 'AMAZON_SES_SETUP_NOTIFICATION') === false) {
-                $keys[] = $object['Key'];
+        if (!$this->sftp) {
+            $this->loginSftp();
+        }
+        $files = $this->sftp->nlist('.', false);
+        $list = [];
+        foreach ($files as $file) {
+            if (mb_stripos($file, $extension) !== false) {
+                $list[] = $file;
             }
         }
 
-        return $keys;
+        return $list;
     }
 
-    public function moveS3($sourceKey, $folder)
+    public function moveSftp($file, $folder)
+    {
+        if (!$this->sftp) {
+            $this->loginSftp();
+        }
+
+        $this->sftp->rename($file, sprintf('%s/%s', $folder, $file));
+    }
+
+    public function uploadS3($file, $name, $folder)
     {
         $now = new \DateTime();
-        $destKey = str_replace(
-            sprintf('/%s/', self::UNPROCESSED_FOLDER),
-            sprintf('/%s/%d/', $folder, $now->format('Y')),
-            $sourceKey
+        $extension = sprintf('.%s', pathinfo($name, PATHINFO_EXTENSION));
+        $s3Key = sprintf(
+            '%s/%s/%d/%s-%s%s',
+            $this->path,
+            $folder,
+            $now->format('Y'),
+            basename($name, $extension),
+            $now->format('U'),
+            $extension
         );
-        $this->s3->copyObject([
+        $result = $this->s3->putObject(array(
             'Bucket' => $this->bucket,
-            'CopySource' => sprintf("%s/%s", $this->bucket, $sourceKey),
-            'Key' => $destKey,
-        ]);
-        $this->s3->deleteObject([
-            'Bucket' => $this->bucket,
-            'Key' => $sourceKey,
-        ]);
+            'Key'    => $s3Key,
+            'SourceFile' => $file,
+        ));
 
         $file = $this->getNewS3File();
         $file->setBucket($this->bucket);
-        $file->setKey($destKey);
+        $file->setKey($s3Key);
         $file->setSuccess($folder == self::PROCESSED_FOLDER);
         $this->dm->persist($file);
         $this->dm->flush();
+
+        return $s3Key;
     }
 
     public function generateTempFile()
@@ -239,17 +310,39 @@ abstract class S3EmailService
         return $tempFile;
     }
 
-    public function downloadEmail($s3Key)
+    public function downloadFile($file)
     {
+        if (!$this->sftp) {
+            $this->loginSftp();
+        }
         $tempFile = $this->generateTempFile();
 
-        $result = $this->s3->getObject(array(
-            'Bucket' => $this->bucket,
-            'Key'    => $s3Key,
-            'SaveAs' => $tempFile,
-        ));
+        $this->sftp->get($file, $tempFile);
 
         return $tempFile;
+    }
+
+    public function unzipFile($file, $extension = '.xlsx')
+    {
+        $files = [];
+
+        $zip = new \ZipArchive();
+        if ($zip->open($file) === true) {
+            if ($zip->setPassword($this->zipPassword)) {
+                if (!$zip->extractTo(sys_get_temp_dir())) {
+                    throw new \Exception("Extraction failed (wrong password?)");
+                }
+                for ($i = 0; $i < $zip->numFiles; $i++) {
+                    if (mb_stripos($zip->getNameIndex($i), $extension) !== false) {
+                        $files[] = sprintf('%s/%s', sys_get_temp_dir(), $zip->getNameIndex($i));
+                    }
+                }
+            }
+
+            $zip->close();
+        }
+
+        return $files;
     }
 
     /**

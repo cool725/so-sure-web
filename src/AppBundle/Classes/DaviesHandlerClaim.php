@@ -6,11 +6,12 @@ use AppBundle\Document\CurrencyTrait;
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\ImeiTrait;
 
-class DaviesClaim extends DaviesExcel
+class DaviesHandlerClaim extends HandlerClaim
 {
     use CurrencyTrait;
     use DateTrait;
     use ImeiTrait;
+    use ExcelTrait;
 
     const SHEET_NAME_V8 = 'Created - Cumulative';
     const SHEET_NAME_V7 = 'Created - Cumulative';
@@ -52,6 +53,10 @@ class DaviesClaim extends DaviesExcel
     const TYPE_WARRANTY = 'Warranty';
     const TYPE_EXTENDED_WARRANTY = 'Extended Warranty';
 
+    public $brightstarProductNumber;
+    public $reciperoFee;
+    public $transactionFees;
+
     public static $breakdownEmailAddresses = [
         'laura.harvey@davies-group.com',
     ];
@@ -90,166 +95,12 @@ class DaviesClaim extends DaviesExcel
         }
     }
 
-    public $client;
-    public $claimNumber;
-    public $insuredName;
-    public $riskPostCode;
-    public $shippingAddress;
-    /** @var \DateTime */
-    public $lossDate;
-    /** @var \DateTime */
-    public $startDate;
-    /** @var \DateTime */
-    public $endDate;
-
-    // losss, theft, damage??
-    public $lossType;
-    public $lossDescription;
-    public $location;
-
-    // Open, Closed, ReOpen, ReClosed
-    public $status;
-
-    // settled, repudiated (declined), and withdrawn
-    public $miStatus;
-
-    public $brightstarProductNumber;
-    public $replacementMake;
-    public $replacementModel;
-    public $replacementImei;
-    /** @var \DateTime */
-    public $replacementReceivedDate;
-
-    public $phoneReplacementCost;
-    public $phoneReplacementCostReserve;
-    public $accessories;
-    public $accessoriesReserve;
-    public $unauthorizedCalls;
-    public $unauthorizedCallsReserve;
-    public $reciperoFee;
-    public $transactionFees;
-    public $feesReserve;
-
-    public $reserved;
-    public $incurred;
-    public $handlingFees;
-    // will appear regardless of if paid/unpaid
-    public $excess;
-
-    public $policyNumber;
-    public $notificationDate;
-    public $dateCreated;
-    public $dateClosed;
-
-    public $totalIncurred;
-
-    public $risk;
-
-    public $daysSinceInception;
-    public $initialSuspicion;
-    public $finalSuspicion;
-
-    public $unobtainableFields;
-
-    public $isReplacementRepair = null;
-
-    public function __construct()
-    {
-        $this->unobtainableFields = [];
-    }
-
-    public function getIncurred()
-    {
-        if (!$this->incurred) {
-            return 0;
-        }
-
-        return $this->incurred;
-    }
-
-    public function getReserved()
-    {
-        if (!$this->reserved) {
-            return 0;
-        }
-
-        return $this->reserved;
-    }
-
     public function hasError()
     {
         return in_array(mb_strtolower($this->miStatus), [
             mb_strtolower(self::MISTATUS_ERROR),
             mb_strtolower(self::MISTATUS_DMS_ERROR),
         ]);
-    }
-
-    public function getExpectedExcess($validated, $picSureEnabled)
-    {
-        try {
-            return Claim::getExcessValue($this->getClaimType(), $validated, $picSureEnabled);
-        } catch (\Exception $e) {
-            return null;
-        }
-    }
-
-    public function isExcessValueCorrect($validated = true, $picSureEnabled = false, $negativeExcessAllowed = false)
-    {
-        if ($this->excess > 0) {
-            return $this->areEqualToTwoDp($this->excess, $this->getExpectedExcess($validated, $picSureEnabled));
-        } elseif ($this->excess < 0) {
-            if ($negativeExcessAllowed) {
-                return $this->areEqualToTwoDp(
-                    abs($this->excess),
-                    $this->getExpectedExcess($validated, $picSureEnabled)
-                );
-            } else {
-                return false;
-            }
-        }
-
-        // Settled claims should always have excess
-        if ($this->getClaimStatus() == Claim::STATUS_SETTLED) {
-            return false;
-        }
-
-        return true;
-    }
-
-    public function isIncurredValueCorrect()
-    {
-        $expected = $this->getExpectedIncurred();
-        if ($expected === null) {
-            return null;
-        }
-
-        return $this->areEqualToTwoDp($this->incurred, $this->getExpectedIncurred());
-    }
-
-    public function isPhoneReplacementCostCorrect()
-    {
-        if ($this->replacementImei || $this->replacementReceivedDate) {
-            if ($this->phoneReplacementCost <= 0) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    public function getExpectedIncurred()
-    {
-        // Incurred fee only appears to be populated at the point where the phone replacement cost is known,
-        if (!$this->phoneReplacementCost || $this->phoneReplacementCost < 0 ||
-            $this->areEqualToTwoDp(0, $this->phoneReplacementCost)) {
-            return null;
-        }
-
-        // phone replacement cost now excludes excess
-        $total = $this->unauthorizedCalls + $this->accessories + $this->phoneReplacementCost +
-            $this->transactionFees + $this->handlingFees + $this->reciperoFee;
-
-        return $this->toTwoDp($total);
     }
 
     public function getReplacementPhoneDetails()
@@ -269,14 +120,19 @@ class DaviesClaim extends DaviesExcel
         }
     }
 
-    public function isClaimWarranty()
+    public function getExpectedIncurred()
     {
-        return in_array($this->getClaimType(), [Claim::TYPE_WARRANTY]);
-    }
+        // Incurred fee only appears to be populated at the point where the phone replacement cost is known,
+        if (!$this->phoneReplacementCost || $this->phoneReplacementCost < 0 ||
+            $this->areEqualToTwoDp(0, $this->phoneReplacementCost)) {
+            return null;
+        }
 
-    public function isClaimWarrantyOrExtended()
-    {
-        return in_array($this->getClaimType(), [Claim::TYPE_WARRANTY, Claim::TYPE_EXTENDED_WARRANTY]);
+        // phone replacement cost now excludes excess
+        $total = $this->unauthorizedCalls + $this->accessories + $this->phoneReplacementCost +
+            $this->transactionFees + $this->handlingFees + $this->reciperoFee;
+
+        return $this->toTwoDp($total);
     }
 
     public function getClaimType()
@@ -295,16 +151,6 @@ class DaviesClaim extends DaviesExcel
         } else {
             return null;
         }
-    }
-
-    public function getPolicyNumber()
-    {
-        if (preg_match('/[^a-zA-Z]*([a-zA-Z]+\/[0-9]{4,4}\/[0-9]{5,20}).*/', $this->policyNumber, $matches) &&
-            isset($matches[1])) {
-            return $matches[1];
-        }
-
-        return null;
     }
 
     public function isOpen($includeReOpened = false)
@@ -531,11 +377,56 @@ class DaviesClaim extends DaviesExcel
 
     public static function create($data, $columns)
     {
-        $claim = new DaviesClaim();
+        $claim = new DaviesHandlerClaim();
         if (!$claim->fromArray($data, $columns)) {
             return null;
         }
 
         return $claim;
+    }
+
+    protected function nullIfBlank($field, $fieldName = null, $ref = null)
+    {
+        if (!$field || $this->isNullableValue($field)) {
+            return null;
+        } elseif ($this->isUnobtainableValue($field)) {
+            if ($fieldName && $ref) {
+                $ref->unobtainableFields[] = $fieldName;
+            }
+
+            return null;
+        }
+
+        return str_replace('£', '', trim($field));
+    }
+
+    protected function isSuspicious($field)
+    {
+        if (!$field || $this->isNullableValue($field)) {
+            return null;
+        }
+
+        if (in_array(mb_strtolower($field), ['ok'])) {
+            return false;
+        } elseif (in_array(mb_strtolower($field), ['suspicious'])) {
+            return true;
+        }
+
+        return null;
+    }
+
+    protected function isNullableValue($value)
+    {
+        // possible values that Davies might use as placeholders
+        // when a field is required by their system, but not yet known
+        return in_array(trim($value), ['', 'Unknown', 'TBC', 'Tbc', 'tbc', '-', '0',
+            'N/A', 'n/a', 'NA', 'na', '#N/A', 'Not Applicable']);
+    }
+
+    protected function isUnobtainableValue($value)
+    {
+        // possible values that Davies might use as placeholders
+        // when a field is required by their system, but data will never be provided
+        return in_array(trim(mb_strtolower($value)), ['unable to obtain']);
     }
 }

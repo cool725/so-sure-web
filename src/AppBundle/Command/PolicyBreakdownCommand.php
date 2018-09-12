@@ -2,7 +2,7 @@
 
 namespace AppBundle\Command;
 
-use AppBundle\Classes\DirectGroup;
+use AppBundle\Classes\DirectGroupHandlerClaim;
 use AppBundle\Service\MailerService;
 use AppBundle\Service\PolicyService;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
@@ -11,7 +11,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Helper\Table;
-use AppBundle\Classes\DaviesClaim;
+use AppBundle\Classes\DaviesHandlerClaim;
 use AppBundle\Document\Charge;
 use AppBundle\Document\Invoice;
 use AppBundle\Document\InvoiceItem;
@@ -58,7 +58,7 @@ class PolicyBreakdownCommand extends ContainerAwareCommand
             null,
             null,
             [$tmpFile],
-            array_merge(DaviesClaim::$breakdownEmailAddresses, DirectGroup::$breakdownEmailAddresses)
+            array_merge(DaviesHandlerClaim::$breakdownEmailAddresses, DirectGroupHandlerClaim::$breakdownEmailAddresses)
         );
 
         if (file_exists($tmpFile)) {

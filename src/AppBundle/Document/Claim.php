@@ -40,14 +40,15 @@ class Claim
     // Temporary status to allow the system to suggest closing a claim, as the policy is about to be cancelled
     const STATUS_PENDING_CLOSED = 'pending-closed';
 
-    const WARNING_FLAG_DAVIES_NAME_MATCH = 'davies-name-match';
-    const WARNING_FLAG_DAVIES_POSTCODE = 'davies-postcode';
+    const WARNING_FLAG_CLAIMS_NAME_MATCH = 'claim-name-match';
+    const WARNING_FLAG_CLAIMS_POSTCODE = 'claim-postcode';
+    const WARNING_FLAG_CLAIMS_REPLACEMENT_COST_HIGHER = 'claim-replacement-cost-higher';
+    const WARNING_FLAG_CLAIMS_INCORRECT_EXCESS = 'claim-incorrect-excess';
+    const WARNING_FLAG_CLAIMS_IMEI_MISMATCH = 'claim-imei-mismatch';
+    const WARNING_FLAG_CLAIMS_HANDLING_TEAM = 'claim-handling-team';
+
     const WARNING_FLAG_BRIGHTSTAR_NAME_MATCH = 'brightstar-name-match';
     const WARNING_FLAG_BRIGHTSTAR_POSTCODE = 'brighstar-postcode';
-    const WARNING_FLAG_DAVIES_REPLACEMENT_COST_HIGHER = 'davies-replacement-cost-higher';
-    const WARNING_FLAG_DAVIES_INCORRECT_EXCESS = 'davies-incorrect-excess';
-    const WARNING_FLAG_DAVIES_IMEI_MISMATCH = 'davies-imei-mismatch';
-    const WARNING_FLAG_DAVIES_HANDLING_TEAM = 'davies-handling-team';
 
     // technically not a warning flag, but fits nicely under that for UI with little change required
     // and very little usage envisioned
@@ -151,16 +152,16 @@ class Claim
     ];
 
     public static $warningFlags = [
-        self::WARNING_FLAG_DAVIES_NAME_MATCH => self::WARNING_FLAG_DAVIES_NAME_MATCH,
-        self::WARNING_FLAG_DAVIES_POSTCODE => self::WARNING_FLAG_DAVIES_POSTCODE,
+        self::WARNING_FLAG_CLAIMS_NAME_MATCH => self::WARNING_FLAG_CLAIMS_NAME_MATCH,
+        self::WARNING_FLAG_CLAIMS_POSTCODE => self::WARNING_FLAG_CLAIMS_POSTCODE,
         self::WARNING_FLAG_BRIGHTSTAR_NAME_MATCH => self::WARNING_FLAG_BRIGHTSTAR_NAME_MATCH,
         self::WARNING_FLAG_BRIGHTSTAR_POSTCODE => self::WARNING_FLAG_BRIGHTSTAR_POSTCODE,
         self::WARNING_FLAG_IGNORE_USER_DECLINED => self::WARNING_FLAG_IGNORE_USER_DECLINED,
         self::WARNING_FLAG_IGNORE_POLICY_EXPIRE_CLAIM_WAIT => self::WARNING_FLAG_IGNORE_POLICY_EXPIRE_CLAIM_WAIT,
-        self::WARNING_FLAG_DAVIES_REPLACEMENT_COST_HIGHER => self::WARNING_FLAG_DAVIES_REPLACEMENT_COST_HIGHER,
-        self::WARNING_FLAG_DAVIES_INCORRECT_EXCESS => self::WARNING_FLAG_DAVIES_INCORRECT_EXCESS,
-        self::WARNING_FLAG_DAVIES_IMEI_MISMATCH => self::WARNING_FLAG_DAVIES_IMEI_MISMATCH,
-        self::WARNING_FLAG_DAVIES_HANDLING_TEAM => self::WARNING_FLAG_DAVIES_HANDLING_TEAM,
+        self::WARNING_FLAG_CLAIMS_REPLACEMENT_COST_HIGHER => self::WARNING_FLAG_CLAIMS_REPLACEMENT_COST_HIGHER,
+        self::WARNING_FLAG_CLAIMS_INCORRECT_EXCESS => self::WARNING_FLAG_CLAIMS_INCORRECT_EXCESS,
+        self::WARNING_FLAG_CLAIMS_IMEI_MISMATCH => self::WARNING_FLAG_CLAIMS_IMEI_MISMATCH,
+        self::WARNING_FLAG_CLAIMS_HANDLING_TEAM => self::WARNING_FLAG_CLAIMS_HANDLING_TEAM,
     ];
 
     public static $claimTypes = [
@@ -1844,9 +1845,14 @@ class Claim
         return $this->getType() == self::TYPE_LOSS && $this->getReportType() == self::REPORT_ONLINE;
     }
 
-    public static function getExcessValue($type, $picSureValidated, $picSureEnabled)
+    public static function getExcessValue($type, $picSureValidated, $picSureEnabled, $repairDiscount = false)
     {
         if ($picSureEnabled && !$picSureValidated) {
+            if ($repairDiscount) {
+                // £25 discount for repairs offered in some cases by claims team
+                return 125;
+            }
+
             return 150;
         }
 
@@ -1857,6 +1863,11 @@ class Claim
             Claim::TYPE_WARRANTY,
             Claim::TYPE_EXTENDED_WARRANTY
         ])) {
+            if ($repairDiscount) {
+                // £25 discount for repairs offered in some cases by claims team
+                return 25;
+            }
+
             return 50;
         }
 

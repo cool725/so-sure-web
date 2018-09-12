@@ -6,10 +6,11 @@ use AppBundle\Document\Claim;
 use AppBundle\Document\CurrencyTrait;
 use AppBundle\Document\DateTrait;
 
-class Brightstar extends DaviesExcel
+class Brightstar
 {
     use CurrencyTrait;
     use DateTrait;
+    use ExcelTrait;
 
     const SHEET_NAME_V1 = 'So Sure Claims';
     const COLUMN_COUNT_V1 = 40;
@@ -158,6 +159,31 @@ class Brightstar extends DaviesExcel
         }
 
         return true;
+    }
+
+    protected function nullIfBlank($field)
+    {
+        if (!$field || $this->isNullableValue($field)) {
+            return null;
+        }
+
+        return str_replace('£', '', trim($field));
+    }
+
+    protected function isNullableValue($value)
+    {
+        // possible values that Davies might use as placeholders
+        // when a field is required by their system, but not yet known
+        return in_array(trim($value), ['', 'Unknown', 'TBC', 'Tbc', 'tbc', '-', '0',
+            'N/A', 'n/a', 'NA', 'na', '#N/A', 'Not Applicable']);
+    }
+
+    protected function isUnobtainableValue($value)
+    {
+        // possible values that Direct Group might use as placeholders
+        // when a field is required by their system, but data will never be provided
+        // return in_array(trim(mb_strtolower($value)), ['unable to obtain']);
+        return false;
     }
 
     public static function create($data, $columns)

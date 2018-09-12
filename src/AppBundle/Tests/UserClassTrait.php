@@ -76,6 +76,9 @@ trait UserClassTrait
             if (!$phone) {
                 $phone = self::getRandomPhone(self::$dm);
             }
+            if (!$phone) {
+                throw new \Exception('Missing phone');
+            }
             $policy->setPhone($phone, $date);
             $policy->create(rand(1, 999999), 'TEST', $date, rand(1, 999999));
         }

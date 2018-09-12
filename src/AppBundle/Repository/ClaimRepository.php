@@ -65,10 +65,14 @@ class ClaimRepository extends DocumentRepository
         return $qb->getQuery()->execute();
     }
 
-    public function findOutstanding()
+    public function findOutstanding($handlingTeam = null)
     {
         $qb = $this->createQueryBuilder()
             ->field('status')->in([Claim::STATUS_INREVIEW, Claim::STATUS_APPROVED]);
+
+        if ($handlingTeam) {
+            $qb = $qb->field('handlingTeam')->equals($handlingTeam);
+        }
 
         return $qb->getQuery()->execute();
     }

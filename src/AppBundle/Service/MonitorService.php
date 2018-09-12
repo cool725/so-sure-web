@@ -306,7 +306,7 @@ class MonitorService
             }
 
             if ($lastestClaimForPolicy = $policy->getLatestClaim(true)) {
-                if ($lastestClaimForPolicy->isIgnoreWarningFlagSet(Claim::WARNING_FLAG_DAVIES_IMEI_MISMATCH)) {
+                if ($lastestClaimForPolicy->isIgnoreWarningFlagSet(Claim::WARNING_FLAG_CLAIMS_IMEI_MISMATCH)) {
                     continue;
                 }
                 if ($policy->getImei() != $lastestClaimForPolicy->getReplacementImei()) {
