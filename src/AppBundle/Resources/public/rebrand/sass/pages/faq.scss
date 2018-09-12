@@ -17,10 +17,14 @@ body {
     padding-top: 5rem;
     padding-bottom: 1.5rem;
 
+    &__main__container {
+
+    }
 
     &__sub__container {
         height: 100vh;
         position: relative;
+        z-index: 2;
     }
 
     &__nav {
@@ -32,9 +36,10 @@ body {
             a {
                 color: $blue-4;
                 border: none;
-                border-bottom: 2px solid $bb-1;
+                border-bottom: 2px solid $bb-2;
                 margin-bottom: 0;
                 padding: 1rem 0;
+                background-color: transparent;
                 @include border-radius(0);
                 transition: color 0.5s;
 
@@ -44,7 +49,7 @@ body {
 
                 &.active {
                     color: $blue-2;
-                    border-bottom: 2px solid $bb-1;
+                    border-bottom: 2px solid $bb-2;
                     background: transparent;
 
                     .far {
@@ -68,38 +73,16 @@ body {
                 }
             }
         }
+    }
 
+    &__curve {
+        width: 35vw;
+        position: fixed;
+        z-index: 1;
+        top: 77px; right: 0;
 
-        // li {
-        //     border-bottom: 2px solid $bb-1;
-
-        //     a {
-        //         color: $blue-4;
-
-        //         &:hover {
-        //             text-decoration: none;
-        //         }
-        //     }
-
-        //     &.active {
-
-        //         a {
-        //             color: $blue-2;
-
-        //             &:before {
-        //                 display: inline-block;
-        //                 font-style: normal;
-        //                 font-variant: normal;
-        //                 text-rendering: auto;
-        //                 -webkit-font-smoothing: antialiased;
-        //                 font-family: 'Font Awesome 5 Pro';
-        //                 vertical-align: middle;
-        //                 content: '\f105';
-        //                 font-weight: 900;
-        //                 margin-right: 0.6rem;
-        //             }
-        //         }
-        //     }
-        // }
+        @include media-breakpoint-up(xl) {
+            top: 56px;
+        }
     }
 }

@@ -18,12 +18,12 @@ $(function() {
     });
 
     // Add smooth scroll and active class on click
-    $('#faq-nav li a[href^="#"]').on('click', function(e) {
+    $('#faq-nav a[href^="#"]').on('click', function(e) {
 
         // prevent default anchor click behavior
         e.preventDefault();
 
-        $('#faq-nav li').removeClass('active');
+        $('#faq-nav a').removeClass('active');
         $(this).parent().addClass('active');
 
         // store hash
