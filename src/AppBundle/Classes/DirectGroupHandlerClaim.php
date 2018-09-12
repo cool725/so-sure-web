@@ -278,8 +278,10 @@ class DirectGroupHandlerClaim extends HandlerClaim
             $this->excess = $this->nullIfBlank($data[++$i]);
             // todo: KFI score
             $this->nullIfBlank($data[++$i]);
-            // TODO: Is incurred from DB, the same as incurred from Davies??
-            $this->incurred = $this->nullIfBlank($data[++$i]);
+            $this->totalIncurred = $this->nullIfBlank($data[++$i]);
+
+            // No incurred value is present, but incurred is total - cost of claim
+            $this->incurred = $this->totalIncurred - $this->handlingFees;
 
             if ($this->getClaimType() === null) {
                 throw new \Exception('Unknown or missing claim type');
