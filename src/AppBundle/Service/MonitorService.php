@@ -1,6 +1,7 @@
 <?php
 namespace AppBundle\Service;
 
+use AppBundle\Classes\Salva;
 use AppBundle\Document\Cashback;
 use AppBundle\Document\File\AccessPayFile;
 use AppBundle\Document\Payment\BacsPayment;
@@ -10,6 +11,7 @@ use AppBundle\Repository\BacsPaymentRepository;
 use AppBundle\Repository\CashbackRepository;
 use AppBundle\Repository\ClaimRepository;
 use AppBundle\Repository\File\S3FileRepository;
+use AppBundle\Repository\PaymentRepository;
 use AppBundle\Repository\PhonePolicyRepository;
 use AppBundle\Repository\PolicyRepository;
 use AppBundle\Repository\UserRepository;
@@ -467,6 +469,41 @@ class MonitorService
                     $policy->getId()
                 ));
             }
+        }
+    }
+
+    public function missingPaymentCommissions()
+    {
+        // a few payments were missing, but had a later payment to adjust the missing commission figure
+        $commissionValidationPaymentExclusions = [
+            new \MongoId('5a8a7f55c084c74d28413471'),
+            new \MongoId('5aa6dec854e50f46ab3e8874'),
+            new \MongoId('5ac61e7a7c62216654636bea'),
+            new \MongoId('5ad5e80e75435e73e152874f'),
+        ];
+
+        $commissionValidationPolicyExclusions = [];
+        foreach (Salva::$commissionValidationExclusions as $item) {
+            $commissionValidationPolicyExclusions[] = new \MongoId($item);
+        }
+
+        /** @var PaymentRepository $repo */
+        $repo = $this->dm->getRepository(Payment::class);
+        $payments = $repo->findBy([
+            'success' => true,
+            'totalCommission' => null,
+            'type' => ['$nin' => ['potReward', 'sosurePotReward', 'policyDiscount']],
+            'amount' => ['$gt' => 2], // we may need to take small offsets; if so, there would not be a commission
+            'policy.$id' => ['$nin' => $commissionValidationPolicyExclusions],
+            '_id' => ['$nin' => $commissionValidationPaymentExclusions],
+            'date' => ['$gt' => new \DateTime('2017-11-01')],
+        ]);
+        foreach ($payments as $payment) {
+            /** @var Payment $payment */
+            throw new MonitorException(sprintf(
+                'Payment %s is missing a commission amount',
+                $payment->getId()
+            ));
         }
     }
 
