@@ -289,6 +289,14 @@ class ClaimsController extends BaseController
             $oa = $search->findOutputArea($policy->getUser()->getBillingAddress()->getPostcode());
         }
 
+        /** @var LogEntryRepository $logRepo */
+        $logRepo = $this->getManager()->getRepository(LogEntry::class);
+        /** @var LogEntry $history */
+        $previousPicSureStatus = $logRepo->findOneBy([
+            'objectId' => $policy->getId(),
+            'data.picSureStatus' => ['$nin' => [null, PhonePolicy::PICSURE_STATUS_CLAIM_APPROVED]],
+        ], ['loggedAt' => 'desc']);
+
         return [
             'policy' => $policy,
             'formClaim' => $formClaim->createView(),
@@ -305,6 +313,7 @@ class ClaimsController extends BaseController
             'phones' => $dm->getRepository(Phone::class)->findActive()->getQuery()->execute(),
             'now' => new \DateTime(),
             'claim' => $claim,
+            'previousPicSureStatus' => $previousPicSureStatus,
         ];
     }
 
