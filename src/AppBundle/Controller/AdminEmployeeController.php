@@ -17,7 +17,7 @@ use AppBundle\Service\JudopayService;
 use AppBundle\Service\PolicyService;
 use AppBundle\Service\ReceperioService;
 use AppBundle\Service\ReportingService;
-use Gedmo\Loggable\Entity\Repository\LogEntryRepository;
+use Gedmo\Loggable\Document\Repository\LogEntryRepository;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -1078,11 +1078,14 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
 
         /** @var LogEntryRepository $logRepo */
         $logRepo = $this->getManager()->getRepository(LogEntry::class);
-        /** @var LogEntry $history */
-        $previousPicSureStatus = $logRepo->findOneBy([
+        $previousPicSureStatuses = $logRepo->findBy([
             'objectId' => $policy->getId(),
             'data.picSureStatus' => ['$nin' => [null, PhonePolicy::PICSURE_STATUS_CLAIM_APPROVED]],
-        ], ['loggedAt' => 'desc']);
+        ], ['loggedAt' => 'desc'], 1);
+        $previousPicSureStatus = null;
+        if (count($previousPicSureStatuses) > 0) {
+            $previousPicSureStatus = $previousPicSureStatuses[0];
+        }
 
         return [
             'policy' => $policy,

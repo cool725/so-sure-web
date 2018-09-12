@@ -3,9 +3,12 @@
 namespace AppBundle\Controller;
 
 use AppBundle\Document\File\S3File;
+use AppBundle\Document\PhonePolicy;
 use AppBundle\Form\Type\ClaimSearchType;
 use AppBundle\Repository\File\S3FileRepository;
 use AppBundle\Service\ClaimsService;
+use Gedmo\Loggable\Document\LogEntry;
+use Gedmo\Loggable\Document\Repository\LogEntryRepository;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -291,11 +294,14 @@ class ClaimsController extends BaseController
 
         /** @var LogEntryRepository $logRepo */
         $logRepo = $this->getManager()->getRepository(LogEntry::class);
-        /** @var LogEntry $history */
-        $previousPicSureStatus = $logRepo->findOneBy([
+        $previousPicSureStatuses = $logRepo->findBy([
             'objectId' => $policy->getId(),
             'data.picSureStatus' => ['$nin' => [null, PhonePolicy::PICSURE_STATUS_CLAIM_APPROVED]],
-        ], ['loggedAt' => 'desc']);
+        ], ['loggedAt' => 'desc'], 1);
+        $previousPicSureStatus = null;
+        if (count($previousPicSureStatuses) > 0) {
+            $previousPicSureStatus = $previousPicSureStatuses[0];
+        }
 
         return [
             'policy' => $policy,
