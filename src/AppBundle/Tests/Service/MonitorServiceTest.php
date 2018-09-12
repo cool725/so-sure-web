@@ -105,9 +105,6 @@ class MonitorServiceTest extends WebTestCase
     }
 
 
-    /**
-     * @group unit
-     */
     public function testExpectedFailOldSubmittedClaimsUnit()
     {
         $daysAgo = $this->subBusinessDays(new \DateTime(), 3);
@@ -123,9 +120,6 @@ class MonitorServiceTest extends WebTestCase
         self::$monitor->outstandingSubmittedClaims([$claim]);
     }
 
-    /**
-     * @group unit
-     */
     public function testNoOldSubmittedClaimsSucceedsUnit()
     {
         self::$monitor->outstandingSubmittedClaims([]);
