@@ -7,15 +7,17 @@ require('bootstrap/js/dist/scrollspy');
 // require('bootstrap/js/dist/dropdown');
 
 // Require components
-// require('../components/table.js');
+require('../common/fixedWidth.js');
 
 $(function() {
 
+    // Init scrollspy
     $('.faq').scrollspy({
         target: '#faq-nav',
         offset: 0,
     });
 
+    // Add smooth scroll and active class on click
     $('#faq-nav li a[href^="#"]').on('click', function(e) {
 
         // prevent default anchor click behavior
@@ -38,4 +40,6 @@ $(function() {
         });
 
     });
+
+
 });
