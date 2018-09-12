@@ -43,4 +43,13 @@
             </exclude>
         </whitelist>
     </filter>
+
+    <!--<listeners>
+        <listener class="Symfony\Bridge\PhpUnit\SymfonyTestsListener">
+            <arguments>
+                <array>
+                </array>
+            </arguments>
+        </listener>
+    </listeners>-->
 </phpunit>
