@@ -963,7 +963,7 @@ class ReportingService
             $claimsReserves = 0;
             foreach ($policy->getClaims() as $claim) {
                 /** @var Claim $claim */
-                $claimsCost += $claim->getIncurred();
+                $claimsCost += $claim->getTotalIncurred();
                 $claimsReserves += $claim->getReservedValue();
             }
             $data['claimsCost'] += $claimsCost;
