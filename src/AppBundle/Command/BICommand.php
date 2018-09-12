@@ -171,6 +171,7 @@ class BICommand extends BaseCommand
             '"Claim Initial Suspicion"',
             '"Claim Final Suspicion"',
             '"Claim Replacement Received Date"',
+            '"Claim handling team"',
         ]);
         foreach ($claims as $claim) {
             /** @var Claim $claim */
@@ -227,6 +228,7 @@ class BICommand extends BaseCommand
                         $claim->getReplacementReceivedDate()->format('Y-m-d') :
                         ''
                 ),
+                sprintf('"%s"', $claim->getHandlingTeam()),
             ]);
         }
         if (!$skipS3) {
@@ -282,6 +284,7 @@ class BICommand extends BaseCommand
             '"Premium Outstanding"',
             '"Policy Purchase Time"',
             '"Past Due Amount (Bad Debt Only)"',
+            '"Has previous policy"',
         ]);
         foreach ($policies as $policy) {
             /** @var Policy $policy */
@@ -334,6 +337,7 @@ class BICommand extends BaseCommand
                 sprintf('"%0.2f"', $policy->getUnderwritingOutstandingPremium()),
                 sprintf('"%s"', $policy->getStart()->format('H:i')),
                 sprintf('"%0.2f"', $policy->getBadDebtAmount()),
+                sprintf('"%s"', $policy->hasPreviousPolicy() ? 'yes' : 'no'),
             ]);
         }
         if (!$skipS3) {
