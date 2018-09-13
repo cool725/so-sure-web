@@ -5,12 +5,14 @@ namespace AppBundle\Controller;
 use AppBundle\Document\Feature;
 use AppBundle\Document\Form\Bacs;
 use AppBundle\Document\Form\PurchaseStepPayment;
+use AppBundle\Document\Form\PurchaseStepPledge;
 use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Exception\InvalidEmailException;
 use AppBundle\Exception\InvalidFullNameException;
 use AppBundle\Form\Type\BacsConfirmType;
 use AppBundle\Form\Type\BacsType;
 use AppBundle\Form\Type\PurchaseStepPaymentType;
+use AppBundle\Form\Type\PurchaseStepPledgeType;
 use AppBundle\Repository\JudoPaymentRepository;
 use AppBundle\Repository\PaymentRepository;
 use AppBundle\Repository\PhoneRepository;
@@ -487,7 +489,7 @@ class PurchaseController extends BaseController
                         ]);
 
                         return new RedirectResponse(
-                            $this->generateUrl('purchase_step_payment_id', [
+                            $this->generateUrl('purchase_step_pledge_id', [
                                 'id' => $policy->getId()
                             ])
                         );
@@ -654,11 +656,91 @@ class PurchaseController extends BaseController
      * Note that any changes to actual path routes need to be reflected in the Google Analytics Goals
      *   as these will impact Adwords
      *
-     * @Route("/step-payment", name="purchase_step_payment")
+     * @Route("/step-pledge/{id}", name="purchase_step_pledge_id")
+     * @Template
+     */
+    public function purchaseStepPledgeAction(Request $request, $id)
+    {
+        /** @var User $user */
+        $user = $this->getUser();
+        if (!$user) {
+            return $this->redirectToRoute('purchase');
+        } elseif (!$user->canPurchasePolicy()) {
+            $this->addFlash(
+                'error',
+                "Sorry, but you've reached the maximum number of allowed policies. Contact us for more details."
+            );
+
+            return $this->redirectToRoute('user_home');
+        }
+
+        $this->denyAccessUnlessGranted(UserVoter::ADD_POLICY, $user);
+        if (!$user->hasValidBillingDetails()) {
+            return $this->redirectToRoute('purchase_step_personal');
+        }
+
+        $dm = $this->getManager();
+        /** @var PhoneRepository $phoneRepo */
+        $phoneRepo = $dm->getRepository(Phone::class);
+        /** @var PolicyRepository $policyRepo */
+        $policyRepo = $dm->getRepository(Policy::class);
+
+        $phone = $this->getSessionQuotePhone($request);
+
+        $purchase = new PurchaseStepPledge();
+        $purchase->setUser($user);
+        /** @var PhonePolicy $policy */
+        $policy = $policyRepo->find($id);
+        $purchase->setPolicy($policy);
+
+        if (!$policy) {
+            return $this->redirectToRoute('purchase_step_phone');
+        }
+
+        /** @var Form $purchaseForm */
+        $purchaseForm = $this->get('form.factory')
+            ->createNamedBuilder('purchase_form', PurchaseStepPledgeType::class, $purchase)
+            ->getForm();
+        if ('POST' === $request->getMethod()) {
+            if ($request->request->has('purchase_form')) {
+                $purchaseForm->handleRequest($request);
+
+                if ($purchaseForm->isValid()) {
+                    return new RedirectResponse(
+                        $this->generateUrl('purchase_step_payment_id', [
+                            'id' => $policy->getId()
+                        ])
+                    );
+                }
+            }
+        }
+
+        $template = 'AppBundle:Purchase:purchaseStepPledge.html.twig';
+
+        $data = array(
+            'policy' => $policy,
+            'phone' => $policy->getPhone(),
+            'purchase_form' => $purchaseForm->createView(),
+            'is_postback' => 'POST' === $request->getMethod(),
+            'step' => 3,
+            'policy_key' => $this->getParameter('policy_key'),
+            'phones' => $phone ? $phoneRepo->findBy(
+                ['active' => true, 'make' => $phone->getMake(), 'model' => $phone->getModel()],
+                ['memory' => 'asc']
+            ) : null,
+        );
+
+        return $this->render($template, $data);
+    }
+
+    /**
+     * Note that any changes to actual path routes need to be reflected in the Google Analytics Goals
+     *   as these will impact Adwords
+     *
      * @Route("/step-payment/{id}", name="purchase_step_payment_id")
      * @Template
     */
-    public function purchaseStepPaymentAction(Request $request, $id = null)
+    public function purchaseStepPaymentAction(Request $request, $id)
     {
         /** @var User $user */
         $user = $this->getUser();
@@ -689,15 +771,12 @@ class PurchaseController extends BaseController
         $purchase = new PurchaseStepPayment();
         $purchase->setUser($user);
         /** @var PhonePolicy $policy */
-        $policy = null;
-        if ($id) {
-            $policy = $policyRepo->find($id);
-        }
-
-        if (!$policy && $user->hasPartialPolicy()) {
-            $policy = $user->getPartialPolicies()[0];
-        }
+        $policy = $policyRepo->find($id);
         $purchase->setPolicy($policy);
+
+        if (!$policy) {
+            return $this->redirectToRoute('purchase_step_phone');
+        }
 
         // Default to monthly payment
         if ('GET' === $request->getMethod()) {
@@ -817,7 +896,7 @@ class PurchaseController extends BaseController
             'phone' => $policy->getPhone(),
             'purchase_form' => $purchaseForm->createView(),
             'is_postback' => 'POST' === $request->getMethod(),
-            'step' => 3,
+            'step' => 4,
             'webpay_action' => $webpay ? $webpay['post_url'] : null,
             'webpay_reference' => $webpay ? $webpay['payment']->getReference() : null,
             'policy_key' => $this->getParameter('policy_key'),

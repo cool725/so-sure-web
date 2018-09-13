@@ -1129,9 +1129,15 @@ services:
         tags:
             - { name: form.type }
 
+    app.form.type.purchasesteppledge:
+        class: AppBundle\Form\Type\PurchaseStepPledgeType
+        arguments: ["@request_stack", "%form_required%", "@logger"]
+        tags:
+            - { name: form.type }
+
     app.form.type.purchasesteppayment:
         class: AppBundle\Form\Type\PurchaseStepPaymentType
-        arguments: ["@request_stack", "%form_required%", "@app.imei", "@logger"]
+        arguments: ["@request_stack", "%form_required%", "@logger"]
         tags:
             - { name: form.type }
 

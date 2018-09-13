@@ -2,7 +2,6 @@
 
 namespace AppBundle\Form\Type;
 
-use AppBundle\Service\BaseImeiService;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -33,24 +32,17 @@ class PurchaseStepPaymentType extends AbstractType
      */
     private $requestStack;
 
-    /**
-     * @var BaseImeiService
-     */
-    private $imeiService;
-
     protected $logger;
 
     /**
      * @param RequestStack    $requestStack
      * @param boolean         $required
-     * @param BaseImeiService $imeiService
      * @param LoggerInterface $logger
      */
-    public function __construct(RequestStack $requestStack, $required, $imeiService, LoggerInterface $logger)
+    public function __construct(RequestStack $requestStack, $required, LoggerInterface $logger)
     {
         $this->requestStack = $requestStack;
         $this->required = $required;
-        $this->imeiService = $imeiService;
         $this->logger = $logger;
     }
 

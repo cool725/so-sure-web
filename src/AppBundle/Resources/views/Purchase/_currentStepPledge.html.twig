@@ -1,0 +1,31 @@
+{{ form_start(purchase_form, {'attr': {
+    'data-toggle': 'validator',
+    'class': 'validate-form form-400',
+    'data-client-validation': form_client_validation,
+    'autocomplete': 'off'
+}}) }}
+
+    {{ form_widget(purchase_form.agreed) }}
+
+    <div class="form-group mt-5">
+        <div class="form-row">
+            <div class="col-3">
+                {% if app.request.get('_route') == "purchase_step_payment_id" %}
+                <a href="{{ path('user_home') }}"
+                   class="btn btn-outline-grey btn-circle d-flex justify-content-center align-items-center">
+                    <span class="sr-only">back</span>
+                    <i class="far fa-arrow-left"></i></a>
+                </a>
+                {% else %}
+                <a href="{{ path('purchase_step_personal') }}"
+                   class="btn btn-outline-grey btn-circle d-flex justify-content-center align-items-center">
+                    <span class="sr-only">back</span>
+                    <i class="far fa-arrow-left"></i></a>
+                </a>
+                {% endif %}
+            </div>
+            <div class="col-9">
+                {{ form_widget(purchase_form.next, {'label': 'I agree, proceed to payment', 'attr': {'class': 'btn btn-success btn-gradient-green btn-block-xs'}}) }}
+            </div>
+    </div>
+{{ form_end(purchase_form) }}
