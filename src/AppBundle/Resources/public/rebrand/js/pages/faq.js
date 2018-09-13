@@ -14,31 +14,22 @@ $(function() {
     // Init scrollspy
     $('body').scrollspy({
         target: '#faq-nav',
-        offset: 10,
+        offset: 55
     });
 
-    // Add smooth scroll and active class on click
-    $('#faq-nav a[href^="#"]').on('click', function(e) {
+    $('#faq-nav a').on('click', function(e) {
+        if (this.hash != '') {
+            e.preventDefault();
 
-        // prevent default anchor click behavior
-        e.preventDefault();
+            let hash = this.hash;
 
-        $('#faq-nav a').removeClass('active');
-        $(this).parent().addClass('active');
+            $('html, body').animate({
+                scrollTop: $(hash).offset().top
+                }, 800, function(){
 
-        // store hash
-        let hash = this.hash;
-
-        // animate
-        $('html, body').animate({
-            scrollTop: $(hash).offset().top - 55
-        }, 300, function(){
-
-            // when done, add hash to url
-            // (default click behaviour)
-            window.location.hash = hash;
-        });
-
+                window.location.hash = hash;
+            });
+        }
     });
 
     $('#back-to-top-faq').on('click', function(e) {
