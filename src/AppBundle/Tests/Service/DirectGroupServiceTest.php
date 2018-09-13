@@ -813,7 +813,7 @@ class DirectGroupServiceTest extends WebTestCase
         $directGroupClaim = new DirectGroupHandlerClaim();
         $directGroupClaim->claimNumber = 1;
         $directGroupClaim->status = DirectGroupHandlerClaim::STATUS_OPEN;
-        $directGroupClaim->incurred = 0;
+        $directGroupClaim->setTotalIncurred = 0;
         $directGroupClaim->reserved = 0;
         $directGroupClaim->lossDate = new \DateTime('2017-07-01');
         $directGroupClaim->replacementReceivedDate = new \DateTime('2017-06-01');
@@ -894,7 +894,7 @@ class DirectGroupServiceTest extends WebTestCase
         $directGroupClaim = new DirectGroupHandlerClaim();
         $directGroupClaim->claimNumber = 1;
         $directGroupClaim->status = DirectGroupHandlerClaim::STATUS_OPEN;
-        $directGroupClaim->incurred = 0;
+        $directGroupClaim->totalIncurred = 0;
         $directGroupClaim->reserved = 0;
         $directGroupClaim->policyNumber = $policy->getPolicyNumber();
         $directGroupClaim->insuredName = 'Mr foo bar';
@@ -915,7 +915,7 @@ class DirectGroupServiceTest extends WebTestCase
         $directGroupClaim->status = DirectGroupHandlerClaim::STATUS_OPEN;
         $directGroupClaim->lossType = "Loss - From Pocket";
         $directGroupClaim->excess = 50;
-        $directGroupClaim->incurred = 0;
+        $directGroupClaim->totalIncurred = 0;
         $directGroupClaim->reserved = 0;
         $directGroupClaim->policyNumber = $policy->getPolicyNumber();
         $directGroupClaim->insuredName = 'Mr foo bar';
@@ -942,7 +942,7 @@ class DirectGroupServiceTest extends WebTestCase
         $directGroupClaim->status = DirectGroupHandlerClaim::STATUS_OPEN;
         $directGroupClaim->lossType = "Loss - From Pocket";
         $directGroupClaim->excess = 70;
-        $directGroupClaim->incurred = 0;
+        $directGroupClaim->totalIncurred = 0;
         $directGroupClaim->reserved = 0;
         $directGroupClaim->policyNumber = $policy->getPolicyNumber();
         $directGroupClaim->insuredName = 'Mr foo bar';
@@ -963,7 +963,7 @@ class DirectGroupServiceTest extends WebTestCase
         $directGroupClaim->status = DirectGroupHandlerClaim::STATUS_OPEN;
         $directGroupClaim->lossType = "Loss - From Pocket";
         $directGroupClaim->excess = 150;
-        $directGroupClaim->incurred = 0;
+        $directGroupClaim->totalIncurred = 0;
         $directGroupClaim->reserved = 0;
         $directGroupClaim->policyNumber = $policy->getPolicyNumber();
         $directGroupClaim->insuredName = 'Mr foo bar';
@@ -984,7 +984,7 @@ class DirectGroupServiceTest extends WebTestCase
         $directGroupClaim->status = DirectGroupHandlerClaim::STATUS_OPEN;
         $directGroupClaim->lossType = "Loss - From Pocket";
         $directGroupClaim->excess = 70;
-        $directGroupClaim->incurred = 0;
+        $directGroupClaim->totalIncurred = 0;
         $directGroupClaim->reserved = 500;
         $directGroupClaim->policyNumber = $policy->getPolicyNumber();
         $directGroupClaim->insuredName = 'Mr foo bar';
@@ -1020,7 +1020,7 @@ class DirectGroupServiceTest extends WebTestCase
         $directGroupClaim = new DirectGroupHandlerClaim();
         $directGroupClaim->claimNumber = 1;
         $directGroupClaim->status = DirectGroupHandlerClaim::STATUS_OPEN;
-        $directGroupClaim->incurred = 0;
+        $directGroupClaim->totalIncurred = 0;
         $directGroupClaim->reserved = 1;
         $directGroupClaim->policyNumber = $policy->getPolicyNumber();
         $directGroupClaim->insuredName = 'Mr foo bar';
@@ -1038,7 +1038,7 @@ class DirectGroupServiceTest extends WebTestCase
         $directGroupClaim = new DirectGroupHandlerClaim();
         $directGroupClaim->claimNumber = 1;
         $directGroupClaim->status = 'open';
-        $directGroupClaim->incurred = 1;
+        $directGroupClaim->totalIncurred = 1;
         $directGroupClaim->reserved = 0;
         $directGroupClaim->policyNumber = $policy->getPolicyNumber();
         $directGroupClaim->insuredName = 'Mr foo bar';
@@ -1058,7 +1058,7 @@ class DirectGroupServiceTest extends WebTestCase
         $directGroupClaim = new DirectGroupHandlerClaim();
         $directGroupClaim->claimNumber = 1;
         $directGroupClaim->status = 'open';
-        $directGroupClaim->incurred = 6.68;
+        $directGroupClaim->totalIncurred = 6.68;
         $directGroupClaim->unauthorizedCalls = 1.01;
         $directGroupClaim->accessories = 1.03;
         $directGroupClaim->phoneReplacementCost = -50;
@@ -1086,7 +1086,7 @@ class DirectGroupServiceTest extends WebTestCase
         $directGroupClaim = new DirectGroupHandlerClaim();
         $directGroupClaim->claimNumber = 1;
         $directGroupClaim->status = 'open';
-        $directGroupClaim->incurred = 6.68;
+        $directGroupClaim->totalIncurred = 6.68;
         $directGroupClaim->unauthorizedCalls = 1.01;
         $directGroupClaim->accessories = 1.03;
         $directGroupClaim->phoneReplacementCost = -50;
@@ -1112,7 +1112,7 @@ class DirectGroupServiceTest extends WebTestCase
         $directGroupClaim = new DirectGroupHandlerClaim();
         $directGroupClaim->claimNumber = 1;
         $directGroupClaim->status = 'open';
-        $directGroupClaim->incurred = 3.11;
+        $directGroupClaim->totalIncurred = 3.11;
         $directGroupClaim->unauthorizedCalls = 1.01;
         $directGroupClaim->accessories = 1.03;
         $directGroupClaim->phoneReplacementCost = 1.07;
@@ -1135,12 +1135,12 @@ class DirectGroupServiceTest extends WebTestCase
         $directGroupClaim = new DirectGroupHandlerClaim();
         $directGroupClaim->claimNumber = 1;
         $directGroupClaim->status = 'open';
-        $directGroupClaim->incurred = 1;
+        $directGroupClaim->totalIncurred = 1;
         $directGroupClaim->unauthorizedCalls = 1.01;
         $directGroupClaim->accessories = 1.03;
         $directGroupClaim->phoneReplacementCost = 1.07;
         $directGroupClaim->handlingFees = 1.19;
-        $directGroupClaim->excess = 6;
+        $directGroupClaim->excess = 150;
         $directGroupClaim->reserved = 0;
         $directGroupClaim->policyNumber = $policy->getPolicyNumber();
         $directGroupClaim->insuredName = 'Mr foo bar';
@@ -1158,12 +1158,12 @@ class DirectGroupServiceTest extends WebTestCase
         $directGroupClaim = new DirectGroupHandlerClaim();
         $directGroupClaim->claimNumber = 1;
         $directGroupClaim->status = 'open';
-        $directGroupClaim->incurred = 1;
+        $directGroupClaim->totalIncurred = 1;
         $directGroupClaim->unauthorizedCalls = 1.01;
         $directGroupClaim->accessories = 1.03;
         $directGroupClaim->phoneReplacementCost = 1.07;
         $directGroupClaim->handlingFees = 1.19;
-        $directGroupClaim->excess = 1.5;
+        $directGroupClaim->excess = 150;
         $directGroupClaim->reserved = 0;
         $directGroupClaim->policyNumber = $policy->getPolicyNumber();
         $directGroupClaim->insuredName = 'Mr foo bar';
@@ -1185,7 +1185,7 @@ class DirectGroupServiceTest extends WebTestCase
         $directGroupClaim = new DirectGroupHandlerClaim();
         $directGroupClaim->claimNumber = 1;
         $directGroupClaim->status = 'open';
-        $directGroupClaim->incurred = 1;
+        $directGroupClaim->totalIncurred = 1;
         $directGroupClaim->unauthorizedCalls = 1.01;
         $directGroupClaim->accessories = 1.03;
         // replacement cost is bigger than initial price, should create warning
@@ -1218,7 +1218,7 @@ class DirectGroupServiceTest extends WebTestCase
         $directGroupClaim = new DirectGroupHandlerClaim();
         $directGroupClaim->claimNumber = 1;
         $directGroupClaim->status = 'open';
-        $directGroupClaim->incurred = 1;
+        $directGroupClaim->totalIncurred = 1;
         $directGroupClaim->unauthorizedCalls = 1.01;
         $directGroupClaim->accessories = 1.03;
 
@@ -1255,7 +1255,7 @@ class DirectGroupServiceTest extends WebTestCase
         $directGroupClaim = new DirectGroupHandlerClaim();
         $directGroupClaim->claimNumber = 1;
         $directGroupClaim->status = 'open';
-        $directGroupClaim->incurred = 1;
+        $directGroupClaim->totalIncurred = 1;
         $directGroupClaim->unauthorizedCalls = 1.01;
         $directGroupClaim->accessories = 1.03;
 
@@ -1287,7 +1287,7 @@ class DirectGroupServiceTest extends WebTestCase
         $directGroupClaim = new DirectGroupHandlerClaim();
         $directGroupClaim->claimNumber = 1;
         $directGroupClaim->status = 'open';
-        $directGroupClaim->incurred = 1;
+        $directGroupClaim->totalIncurred = 1;
         $directGroupClaim->unauthorizedCalls = 1.01;
         $directGroupClaim->accessories = 1.03;
         $directGroupClaim->phoneReplacementCost = 1.07;
@@ -1315,7 +1315,7 @@ class DirectGroupServiceTest extends WebTestCase
         $directGroupClaim = new DirectGroupHandlerClaim();
         $directGroupClaim->claimNumber = 1;
         $directGroupClaim->status = 'open';
-        $directGroupClaim->incurred = 1;
+        $directGroupClaim->totalIncurred = 1;
         $directGroupClaim->unauthorizedCalls = 1.01;
         $directGroupClaim->accessories = 1.03;
         $directGroupClaim->phoneReplacementCost = 1.07;
@@ -1351,7 +1351,7 @@ class DirectGroupServiceTest extends WebTestCase
         $directGroupClaim = new DirectGroupHandlerClaim();
         $directGroupClaim->claimNumber = 1;
         $directGroupClaim->status = 'open';
-        $directGroupClaim->incurred = 1;
+        $directGroupClaim->totalIncurred = 1;
         $directGroupClaim->unauthorizedCalls = 1.01;
         $directGroupClaim->accessories = 1.03;
         $directGroupClaim->phoneReplacementCost = 0;
@@ -1445,7 +1445,7 @@ class DirectGroupServiceTest extends WebTestCase
 
         $directGroupClaim = new DirectGroupHandlerClaim();
         $directGroupClaim->claimNumber = (string) $claim->getNumber();
-        $directGroupClaim->incurred = 0;
+        $directGroupClaim->totalIncurred = 0;
         $directGroupClaim->reserved = 0;
         $directGroupClaim->policyNumber = $policy->getPolicyNumber();
         $directGroupClaim->insuredName = 'Mr foo bar';
@@ -1483,7 +1483,7 @@ class DirectGroupServiceTest extends WebTestCase
 
         $directGroupClaim = new DirectGroupHandlerClaim();
         $directGroupClaim->claimNumber = (string) $claim->getNumber();
-        $directGroupClaim->incurred = 0;
+        $directGroupClaim->totalIncurred = 0;
         $directGroupClaim->reserved = 0;
         $directGroupClaim->policyNumber = $policy->getPolicyNumber();
         $directGroupClaim->insuredName = 'Mr foo bar';
@@ -1498,7 +1498,7 @@ class DirectGroupServiceTest extends WebTestCase
 
         // fail validation
         $directGroupClaim->location = '☺';
-        $directGroupClaim->incurred = 1;
+        $directGroupClaim->totalIncurred = 1;
         static::$directGroupService->saveClaim($directGroupClaim, false);
 
         $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
@@ -1507,7 +1507,7 @@ class DirectGroupServiceTest extends WebTestCase
         $this->assertEquals(0, $updatedClaim->getIncurred());
 
         $directGroupClaim->location = null;
-        $directGroupClaim->incurred = 2;
+        $directGroupClaim->totalIncurred = 2;
         static::$directGroupService->saveClaim($directGroupClaim, false);
 
         $updatedClaim = $repo->find($claim->getId());
@@ -1532,7 +1532,7 @@ class DirectGroupServiceTest extends WebTestCase
         $directGroupClaim = new DirectGroupHandlerClaim();
         $directGroupClaim->claimNumber = $claim->getNumber();
         $directGroupClaim->phoneReplacementCost = -70;
-        $directGroupClaim->incurred = -70;
+        $directGroupClaim->totalIncurred = -70;
         $directGroupClaim->reserved = 0;
         $directGroupClaim->policyNumber = $policy->getPolicyNumber();
         $directGroupClaim->insuredName = 'Mr foo bar';
@@ -1562,7 +1562,7 @@ class DirectGroupServiceTest extends WebTestCase
 
         $directGroupClaim = new DirectGroupHandlerClaim();
         $directGroupClaim->claimNumber = $claim->getNumber();
-        $directGroupClaim->incurred = 0;
+        $directGroupClaim->totalIncurred = 0;
         $directGroupClaim->reserved = 0;
         $directGroupClaim->policyNumber = $policy->getPolicyNumber();
         $directGroupClaim->insuredName = 'Mr foo bar';
@@ -1741,7 +1741,7 @@ class DirectGroupServiceTest extends WebTestCase
 
         $directGroupClaim = new DirectGroupHandlerClaim();
         $directGroupClaim->claimNumber = $claim->getNumber();
-        $directGroupClaim->incurred = 0;
+        $directGroupClaim->totalIncurred = 0;
         $directGroupClaim->reserved = 10;
         $directGroupClaim->initialSuspicion = false;
         $directGroupClaim->finalSuspicion = false;
@@ -1784,7 +1784,7 @@ class DirectGroupServiceTest extends WebTestCase
 
         $directGroupClaim = new DirectGroupHandlerClaim();
         $directGroupClaim->claimNumber = $claim->getNumber();
-        $directGroupClaim->incurred = 0;
+        $directGroupClaim->totalIncurred = 0;
         $directGroupClaim->reserved = 10;
         $directGroupClaim->initialSuspicion = false;
         $directGroupClaim->finalSuspicion = false;
@@ -1827,7 +1827,7 @@ class DirectGroupServiceTest extends WebTestCase
 
         $directGroupClaim = new DirectGroupHandlerClaim();
         $directGroupClaim->claimNumber = $claim->getNumber();
-        $directGroupClaim->incurred = 0;
+        $directGroupClaim->totalIncurred = 0;
         $directGroupClaim->reserved = 10;
         $directGroupClaim->initialSuspicion = false;
         $directGroupClaim->finalSuspicion = false;
@@ -1912,7 +1912,7 @@ class DirectGroupServiceTest extends WebTestCase
 
         $directGroupClaim = new DirectGroupHandlerClaim();
         $directGroupClaim->claimNumber = $claim->getNumber();
-        $directGroupClaim->incurred = 150;
+        $directGroupClaim->totalIncurred = 150;
         $directGroupClaim->reserved = 0;
         $directGroupClaim->excess = 150;
         $directGroupClaim->initialSuspicion = false;
@@ -1975,7 +1975,7 @@ class DirectGroupServiceTest extends WebTestCase
 
         $directGroupClaim = new DirectGroupHandlerClaim();
         $directGroupClaim->claimNumber = $claim->getNumber();
-        $directGroupClaim->incurred = 150;
+        $directGroupClaim->totalIncurred = 150;
         $directGroupClaim->reserved = 0;
         $directGroupClaim->excess = 150;
         $directGroupClaim->initialSuspicion = false;
@@ -2044,7 +2044,7 @@ class DirectGroupServiceTest extends WebTestCase
         $directGroupClaim->replacementReceivedDate = new \DateTime();
         $directGroupClaim->phoneReplacementCost = 100;
         $directGroupClaim->excess = 150;
-        $directGroupClaim->incurred = 100;
+        $directGroupClaim->totalIncurred = 100;
         $directGroupClaims = array($directGroupClaim);
 
         static::$directGroupService->saveClaims('', $directGroupClaims);
