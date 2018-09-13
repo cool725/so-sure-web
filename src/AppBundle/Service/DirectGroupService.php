@@ -167,6 +167,16 @@ class DirectGroupService extends SftpService
         if (count($this->errors) > 0) {
             $emails = DirectGroupHandlerClaim::$errorEmailAddresses;
 
+            $tmpFile = sprintf('%s/%s', sys_get_temp_dir(), 'dg-errors.csv');
+            $lines = [];
+            foreach ($this->errors as $clamId => $errors) {
+                foreach ($errors as $error) {
+                    $lines[] = sprintf('"%s", "%s"', $clamId, str_replace('"', "''", $error));
+                }
+            }
+            $data = implode(PHP_EOL, $lines);
+            file_put_contents($tmpFile, $data);
+
             $this->mailer->sendTemplate(
                 sprintf('Errors in Daily Claims Report'),
                 $emails,
@@ -180,8 +190,15 @@ class DirectGroupService extends SftpService
                     'claims' => null,
                     'fees' => $this->fees,
                     'title' => 'Errors in Daily Claims Report',
-                ]
+                ],
+                null,
+                null,
+                [$tmpFile]
             );
+
+            if (file_exists($tmpFile)) {
+                unlink($tmpFile);
+            }
         }
 
         return count($this->errors);
