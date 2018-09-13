@@ -12,7 +12,7 @@ require('../common/fixedWidth.js');
 $(function() {
 
     // Init scrollspy
-    $('.faq').scrollspy({
+    $('body').scrollspy({
         target: '#faq-nav',
         offset: 10,
     });
@@ -31,7 +31,7 @@ $(function() {
 
         // animate
         $('html, body').animate({
-            scrollTop: $(hash).offset().top
+            scrollTop: $(hash).offset().top - 55
         }, 300, function(){
 
             // when done, add hash to url
@@ -42,9 +42,9 @@ $(function() {
     });
 
     $('#back-to-top-faq').on('click', function(e) {
-        event.preventDefault();
+        e.preventDefault();
 
-        $('html,body').animate({
+        $('html, body').animate({
             scrollTop: 0
         }, 300);
     });

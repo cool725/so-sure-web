@@ -1,7 +1,7 @@
 // nav.scss
 
 .navbar {
-    background-color: transparent;
+    background-color: $white;
     // padding-top: 1.2rem;
     transition: padding 0.2s linear;
 
@@ -75,6 +75,7 @@
 }
 
 .navbar-light {
+    background-color: transparent;
     &.navbar-scrolled {
         @include linear-gradient(135deg, $blue-3, $blue-1a);
     }

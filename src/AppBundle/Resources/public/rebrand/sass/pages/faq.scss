@@ -14,21 +14,86 @@ body {
 }
 
 .faq {
-    padding-top: 5rem;
-    padding-bottom: 1.5rem;
+    position: relative;
 
+    // Containers & Curves
     &__main__container {
+        position: relative;
+        z-index: 4;
+
+        // Curve
+        svg {
+            transform: translateY(-1px);
+            position: absolute;
+            top: 100%; left: 0;
+        }
+
+        &-stuck {
+            position: sticky;
+            top: 0;
+        }
+
+        @include media-breakpoint-up(lg) {
+            width: 60vw; height: 100vh;
+            position: static;
+
+            // Scroll stuff
+            // overflow-y: scroll;
+
+            // // IE
+            // -ms-overflow-style: none;
+
+            // // Webkit
+            // &::-webkit-scrollbar {
+            //     width: 0;
+            //     background: transparent;
+            // }
+        }
 
     }
 
-    &__sub__container {
-        height: 100vh;
+    &__main {
+        padding-top: 5rem;
+        padding-bottom: 1.5rem;
+
+        @include media-breakpoint-up(lg) {
+            height: 70vh;
+            padding-top: 12rem;
+        }
+    }
+
+    &__curve {
         position: relative;
-        z-index: 2;
+
+        @include media-breakpoint-up(lg) {
+            width: 5vw; height: 100vh;
+
+            svg {
+                height: 100vh;
+                position: absolute;
+                z-index: 4;
+                left: 0; top: 0;
+                // transform: translateX(1px);
+            }
+        }
+    }
+
+    &__sub__container {
+        background-color: $bb-1;
+
+        @include media-breakpoint-up(lg) {
+            width: 40vw; height: 100vh;
+            position: fixed;
+            right: 0;
+
+            // Scroll stuff
+            overflow: hidden;
+        }
     }
 
     &__nav {
         position: fixed;
+        top: 10rem;
 
         .list-group {
             font-family: $g-medium;
@@ -36,7 +101,7 @@ body {
             a {
                 color: $blue-4;
                 border: none;
-                border-bottom: 2px solid $bb-2;
+                border-bottom: 2px solid darken($bb-2, 5%);
                 margin-bottom: 0;
                 padding: 1rem 0;
                 background-color: transparent;
@@ -49,7 +114,7 @@ body {
 
                 &.active {
                     color: $blue-2;
-                    border-bottom: 2px solid $bb-2;
+                    border-bottom: 2px solid darken($bb-2, 5%);
                     background: transparent;
 
                     .far {
@@ -59,7 +124,7 @@ body {
 
                 &:hover {
                     color: $blue-2;
-                    border-bottom: 2px solid $bb-1;
+                    border-bottom: 2px solid darken($bb-2, 5%);
                     background-color: transparent;
                 }
 
@@ -75,14 +140,77 @@ body {
         }
     }
 
-    &__curve {
-        width: 35vw;
-        position: fixed;
-        z-index: 1;
-        top: 77px; right: 0;
-
-        @include media-breakpoint-up(xl) {
-            top: 56px;
-        }
-    }
 }
+
+// .faq {
+//     // padding-top: 5rem;
+
+//     &__main__container {
+
+//     }
+
+//     &__sub__container {
+//         height: 100vh;
+//         position: relative;
+//         z-index: 2;
+//     }
+
+//     &__nav {
+//         position: fixed;
+
+//         .list-group {
+//             font-family: $g-medium;
+
+//             a {
+//                 color: $blue-4;
+//                 border: none;
+//                 border-bottom: 2px solid $bb-2;
+//                 margin-bottom: 0;
+//                 padding: 1rem 0;
+//                 background-color: transparent;
+//                 @include border-radius(0);
+//                 transition: color 0.5s;
+
+//                 .far {
+//                     display: none;
+//                 }
+
+//                 &.active {
+//                     color: $blue-2;
+//                     border-bottom: 2px solid $bb-2;
+//                     background: transparent;
+
+//                     .far {
+//                         display: inline-block;
+//                     }
+//                 }
+
+//                 &:hover {
+//                     color: $blue-2;
+//                     border-bottom: 2px solid $bb-1;
+//                     background-color: transparent;
+//                 }
+
+//                 &:first-of-type,
+//                 &:last-of-type {
+//                     @include border-radius(0);
+//                 }
+
+//                 &:last-of-type {
+//                     border: none;
+//                 }
+//             }
+//         }
+//     }
+
+//     &__curve {
+//         width: 35vw; height: 100vh;
+//         position: fixed;
+//         z-index: 1;
+//         top: 77px; right: 0;
+
+//         @include media-breakpoint-up(xl) {
+//             top: 56px;
+//         }
+//     }
+// }
