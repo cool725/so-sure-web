@@ -140,7 +140,7 @@ abstract class HandlerClaim
             return null;
         }
 
-        return $this->areEqualToTwoDp($this->incurred, $this->getExpectedIncurred());
+        return $this->areEqualToTwoDp($this->getIncurred(), $this->getExpectedIncurred());
     }
 
     public function isPhoneReplacementCostCorrect()

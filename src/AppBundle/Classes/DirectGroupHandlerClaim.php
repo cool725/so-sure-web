@@ -89,6 +89,16 @@ class DirectGroupHandlerClaim extends HandlerClaim
         }
     }
 
+    public function getIncurred()
+    {
+        if (!$this->totalIncurred) {
+            return 0;
+        }
+
+        // No incurred value is present, but incurred is total - cost of claim
+        return $this->totalIncurred - $this->handlingFees;
+    }
+
     public function hasError()
     {
         return false;
@@ -279,9 +289,6 @@ class DirectGroupHandlerClaim extends HandlerClaim
             // todo: KFI score
             $this->nullIfBlank($data[++$i]);
             $this->totalIncurred = $this->nullIfBlank($data[++$i]);
-
-            // No incurred value is present, but incurred is total - cost of claim
-            $this->incurred = $this->totalIncurred - $this->handlingFees;
 
             if ($this->getClaimType() === null) {
                 throw new \Exception('Unknown or missing claim type');
