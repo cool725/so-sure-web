@@ -22,6 +22,15 @@
 					£{{ policy.nextPolicy.premium.monthlyPremiumPrice|number_format(2, '.', ',') }} per month</strong>,
 	 			    {% endspaceless %}
 					your phone can remain protected from loss, theft, accidental damage & out of warranty breakdown.
+               {% elseif equal_to_two_dp(policy.nextPolicy.premium.monthlyPremiumPrice, policy.premium.monthlyPremiumPrice) %}
+				   We have great news! Your monthly premium has remained the same and is currently £{{ policy.nextPolicy.premium.monthlyPremiumPrice|number_format(2, '.', ',') }} per month!
+				   <br><br>
+	 			   So for only
+					{% spaceless %}
+					   <strong style="color: #3399ff;font-weight: bold;font-family:arial,helvetica neue,helvetica,sans-serif">
+					£{{ policy.nextPolicy.premium.monthlyPremiumPrice|number_format(2, '.', ',') }} per month</strong>,
+                   {% endspaceless %}
+					your phone can remain protected from loss, theft, accidental damage & out of warranty breakdown.
 			   {% else %}
 	 			   For only
 					{% spaceless %}
@@ -30,7 +39,7 @@
 	 			    {% endspaceless %}
 					your phone can remain protected from loss, theft, accidental damage & out of warranty breakdown.
 					<br><br>
-					Unfortunately, our pricing may have slightly increased due to the government mandated increase in IPT to 12% (June 2017). By way of comparison, your premium last year was £{{ policy.premium.monthlyPremiumPrice|number_format(2, '.', ',') }} per month.
+					By way of comparison, your premium last year was £{{ policy.premium.monthlyPremiumPrice|number_format(2, '.', ',') }} per month.
 			   {% endif %}
 			   {% if policy.potValue > 0 %}
 			   <br><br>

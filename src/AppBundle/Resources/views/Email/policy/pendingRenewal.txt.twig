@@ -12,10 +12,14 @@ Your SO-SURE policy {{ policy.policyNumber }} is due to expire on {{ policy.end 
 We have great news! Your monthly premium has decreased from £{{ policy.premium.monthlyPremiumPrice|number_format(2, '.', ',') }} to £{{ policy.nextPolicy.premium.monthlyPremiumPrice|number_format(2, '.', ',') }} per month!
 
 So for only £{{ policy.nextPolicy.premium.monthlyPremiumPrice|number_format(2, '.', ',') }} per month, your phone can remain protected from loss, theft, accidental damage & out of warranty breakdown.
+{% elseif equal_to_two_dp(policy.nextPolicy.premium.monthlyPremiumPrice, policy.premium.monthlyPremiumPrice) %}
+We have great news! Your monthly premium has remained the same and is currently £{{ policy.nextPolicy.premium.monthlyPremiumPrice|number_format(2, '.', ',') }} per month!
+
+So for only £{{ policy.nextPolicy.premium.monthlyPremiumPrice|number_format(2, '.', ',') }} per month, your phone can remain protected from loss, theft, accidental damage & out of warranty breakdown.
 {% else %}
 For only £{{ policy.nextPolicy.premium.monthlyPremiumPrice|number_format(2, '.', ',') }} per month, your phone can remain protected from loss, theft, accidental damage & out of warranty breakdown.
 
-Unfortunately, our pricing may have slightly increased due to the government mandated increase in IPT to 12% (June 2017). By way of comparison, your premium last year was £{{ policy.premium.monthlyPremiumPrice|number_format(2, '.', ',') }} per month.
+By way of comparison, your premium last year was £{{ policy.premium.monthlyPremiumPrice|number_format(2, '.', ',') }} per month.
 {% endif %}
 {% if policy.potValue > 0 %}
 
