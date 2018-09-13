@@ -61,22 +61,22 @@
         <div class="form-row">
             <div class="col-3">
                 {% if app.request.get('_route') == "purchase_step_phone_id" %}
-                <a href="{{ path('user_home') }}"
-                   class="btn btn-outline-grey btn-circle d-flex justify-content-center align-items-center">
-                    <span class="sr-only">back</span>
-                    <i class="far fa-arrow-left"></i></a>
-                </a>
+                    <a href="{{ path('user_home') }}"
+                       class="btn btn-outline-grey btn-circle d-flex justify-content-center align-items-center">
+                        <span class="sr-only">back</span>
+                        <i class="far fa-arrow-left"></i></a>
+                    </a>
                 {% else %}
-                <a href="{{ path('purchase_step_personal') }}"
-                   class="btn btn-outline-grey btn-circle d-flex justify-content-center align-items-center">
-                    <span class="sr-only">back</span>
-                    <i class="far fa-arrow-left"></i></a>
-                </a>
+                    <a href="{{ path('purchase_step_personal') }}"
+                       class="btn btn-outline-grey btn-circle d-flex justify-content-center align-items-center">
+                        <span class="sr-only">back</span>
+                        <i class="far fa-arrow-left"></i></a>
+                    </a>
                 {% endif %}
             </div>
-                <div class="col">
-                    {{ form_widget(purchase_form.next, {'label': 'Proceed to payment', 'attr': {'class': 'btn btn-success btn-gradient-green'}}) }}
-                </div>
+            <div class="col text-right">
+                {{ form_widget(purchase_form.next, {'label': 'Continue', 'attr': {'class': 'btn btn-success btn-gradient-green btn-block-xs'}}) }}
+            </div>
         </div>
     </div>
 

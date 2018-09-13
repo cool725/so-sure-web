@@ -3,7 +3,7 @@
 
 {# Set vars #}
 {% set body_class = 'purchase' %}
-{% set light_logo = 1 %}
+{% set light_nav  = 1 %}
 {% set quote_mode = 1 %}
 
 {% block title %}
@@ -168,4 +168,5 @@
 
 {% block javascriptsPage %}
     <script src="{{ asset('css-js/purchase.js') }}"></script>
+    <script src="{{ asset('css-js/purchase-phone.js') }}"></script>
 {% endblock %}
