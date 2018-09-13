@@ -813,7 +813,7 @@ class DirectGroupServiceTest extends WebTestCase
         $directGroupClaim = new DirectGroupHandlerClaim();
         $directGroupClaim->claimNumber = 1;
         $directGroupClaim->status = DirectGroupHandlerClaim::STATUS_OPEN;
-        $directGroupClaim->setTotalIncurred = 0;
+        $directGroupClaim->totalIncurred = 0;
         $directGroupClaim->reserved = 0;
         $directGroupClaim->lossDate = new \DateTime('2017-07-01');
         $directGroupClaim->replacementReceivedDate = new \DateTime('2017-06-01');
