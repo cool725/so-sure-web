@@ -570,11 +570,11 @@ class PurchaseControllerTest extends BaseControllerTest
         );
 
         self::verifyResponse(302);
-        $this->assertTrue(self::$client->getResponse()->isRedirect('/purchase/step-policy'));
+        $this->assertTrue(self::$client->getResponse()->isRedirect('/purchase/step-phone'));
 
         $crawler = self::$client->request(
             'GET',
-            self::$router->generate('purchase_step_payment')
+            self::$router->generate('purchase_step_phone')
         );
         self::verifyResponse(200, null, $crawler);
         $this->assertNotContains('Get a Quote', $crawler->html());
@@ -606,7 +606,7 @@ class PurchaseControllerTest extends BaseControllerTest
 
         $crawler = self::$client->request(
             'GET',
-            self::$router->generate('purchase_step_payment')
+            self::$router->generate('purchase_step_phone')
         );
         self::verifyResponse(200, null, $crawler);
         $this->assertContains('Get a Quote', $crawler->html());
