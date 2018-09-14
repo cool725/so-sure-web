@@ -9,7 +9,7 @@ use AppBundle\Tests\Controller\BaseControllerTest;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Test when a user tries to go to a protected URL, not logged in, bad-token, or when logged in
+ * Test when there is an API call to go a protected URL - no-token, bad-token, or happy-path success
  *
  * @group functional-nonet
  */
