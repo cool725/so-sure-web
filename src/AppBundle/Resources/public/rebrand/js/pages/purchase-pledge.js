@@ -34,20 +34,15 @@ sosure.purchaseStepPledge = (function() {
             errorClass: 'is-invalid',
             onfocusout: false,
             onkeyup: false,
-            onclick: false,
+            // onclick: false,
             rules: {
 
             },
             messages: {
 
             },
-
             errorPlacement: function(error, element) {
-                // if (element.attr('name') === "purchase_form[amount]") {
-                    // $('.payment-options__title').addClass('error');
-                // } else {
-                    error.insertAfter(element);
-                // }
+                // error.insertAfter($(element).find('.custom-checkbox '));
             },
 
             submitHandler: function(form) {

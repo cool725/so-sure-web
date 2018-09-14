@@ -5,27 +5,58 @@
     'autocomplete': 'off'
 }}) }}
 
-    {{ form_widget(purchase_form.agreed) }}
+    <h2 class="text-blue2 text-center">Pledge of Honesty</h2>
+    <h6 class="text-center">Before you continue to payment...</h6>
+
+    <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_contract.png" alt="so-sure - contract" width="200px" class="mx-auto d-block">
+
+    <p class="text-center mb-4"><a href="{{ cdn_url }}/files/so-sure_sample_policy_doc.pdf" target="_blank" class="btn btn-outline-blue2 btn-sm">📄 Read the policy document here</a></p>
+
+    <div class="pledge-items">
+        <div class="form-group">
+            {{ form_widget(purchase_form.agreedDamage, {
+                'label': 'My phone is in working condition & the screen is not cracked',
+                'attr': {'class':'custom-control-input'}}
+            ) }}
+        </div>
+        <div class="form-group">
+            {{ form_widget(purchase_form.agreedAgeLocation, {
+                'label': 'I am a resident of the United Kingdom and over the age of 18',
+                'attr': {'class':'custom-control-input'}}
+            ) }}
+        </div>
+        <div class="form-group">
+            {{ form_widget(purchase_form.agreedTerms, {
+                'label': 'I have read & understood the so-sure policy document',
+                'attr': {'class':'custom-control-input'}}
+            ) }}
+        </div>
+    </div>
+{#
+    <div class="custom-control custom-checkbox mb-2">
+        <input type="checkbox" class="custom-control-input" id="customCheck1">
+        <label class="custom-control-label" for="customCheck1"></label>
+    </div> #}
 
     <div class="form-group mt-5">
         <div class="form-row">
             <div class="col-3">
                 {% if app.request.get('_route') == "purchase_step_payment_id" %}
-                <a href="{{ path('user_home') }}"
-                   class="btn btn-outline-grey btn-circle d-flex justify-content-center align-items-center">
-                    <span class="sr-only">back</span>
-                    <i class="far fa-arrow-left"></i></a>
-                </a>
+                    <a href="{{ path('user_home') }}"
+                       class="btn btn-outline-grey btn-circle d-flex justify-content-center align-items-center">
+                        <span class="sr-only">back</span>
+                        <i class="far fa-arrow-left"></i></a>
+                    </a>
                 {% else %}
-                <a href="{{ path('purchase_step_personal') }}"
-                   class="btn btn-outline-grey btn-circle d-flex justify-content-center align-items-center">
-                    <span class="sr-only">back</span>
-                    <i class="far fa-arrow-left"></i></a>
-                </a>
+                    <a href="{{ path('purchase_step_personal') }}"
+                       class="btn btn-outline-grey btn-circle d-flex justify-content-center align-items-center">
+                        <span class="sr-only">back</span>
+                        <i class="far fa-arrow-left"></i></a>
+                    </a>
                 {% endif %}
             </div>
-            <div class="col-9">
-                {{ form_widget(purchase_form.next, {'label': 'I agree, proceed to payment', 'attr': {'class': 'btn btn-success btn-gradient-green btn-block-xs'}}) }}
+            <div class="col-9 text-right">
+                {{ form_widget(purchase_form.next, {'label': 'I swear I\'ll be honest!', 'attr': {'class': 'btn btn-success btn-gradient-green btn-block-xs'}}) }}
             </div>
     </div>
 {{ form_end(purchase_form) }}

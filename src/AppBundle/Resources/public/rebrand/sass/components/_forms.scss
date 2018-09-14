@@ -17,6 +17,15 @@ label {
     }
 }
 
+// Overide for checkbox elements
+.custom-checkbox {
+
+    label {
+        font-family: $g-regular;
+        color: $dark;
+    }
+}
+
 // Modify error styling - main styling done in _variables.scss
 .form-control {
 

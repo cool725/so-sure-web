@@ -23,7 +23,11 @@ class PurchaseStepPledge
     /** @var User */
     protected $user;
 
-    protected $agreed;
+    protected $agreedDamage;
+
+    protected $agreedAgeLocation;
+
+    protected $agreedTerms;
 
     public function getPolicy()
     {
@@ -45,13 +49,33 @@ class PurchaseStepPledge
         $this->user = $user;
     }
 
-    public function getAgreed()
+    public function getAgreedDamage()
     {
-        return $this->agreed;
+        return $this->agreedDamage;
     }
 
-    public function setAgreed($agreed)
+    public function setAgreedDamage($agreedDamage)
     {
-        $this->agreed = $agreed;
+        $this->agreedDamage = $agreedDamage;
+    }
+
+    public function getagreedAgeLocation()
+    {
+        return $this->agreedAgeLocation;
+    }
+
+    public function setAgreedAgeLocation($agreedAgeLocation)
+    {
+        $this->agreedAgeLocation = $agreedAgeLocation;
+    }
+
+    public function getAgreedTerms()
+    {
+        return $this->agreedTerms;
+    }
+
+    public function setAgreedTerms($agreedTerms)
+    {
+        $this->agreedTerms = $agreedTerms;
     }
 }
