@@ -2,7 +2,7 @@
 namespace App\Tests\Normalizer;
 
 use App\Normalizer\UserPolicySummary;
-use App\Tests\Traits;
+use Tests\Traits;
 use AppBundle\Document\Policy;
 use AppBundle\Tests\Controller\BaseControllerTest;
 use stdClass;
