@@ -6,7 +6,7 @@
 }}) }}
 
     <div class="form-group payment-options {% if form_errors(purchase_form.amount) %}has-error{% endif %}">
-        <h4 class="payment-options__title text-blue2 mb-3">How would you like to pay?</h4>
+        <h4 class="payment-options__title text-blue2 mb-4">How would you like to pay?</h4>
         <div class="radio-btn-original">
             {{ form_label(purchase_form.amount, 'Payment options') }}
             {{ form_widget(purchase_form.amount) }}
