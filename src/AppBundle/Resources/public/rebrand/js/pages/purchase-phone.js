@@ -1,4 +1,4 @@
-// purchase.js
+// purchase-phone.js
 
 // require('../../sass/pages/purchase.scss');
 
@@ -82,30 +82,6 @@ sosure.purchaseStepPhone = (function() {
 $(function(){
 
     sosure.purchaseStepPhone.init();
-
-    // TODO: Move to component
-    $('.radio-btn').on('click', function(e) {
-        e.preventDefault();
-
-        $('.radio-btn').removeClass('radio-btn-active');
-        $(this).addClass('radio-btn-active');
-
-        // Set the value for the form element
-        var val = $(this).data('value');
-        $('input[name="purchase_form[amount]"][value="' + val + '"]').prop('checked', true);
-
-        // Adjust the price in the copy
-        var premium = $(this).data('premium-type');
-        var price = $('#purchase_price');
-        price.html('&pound;' + val + ' a ' + premium);
-    });
-
-    if ($.trim($('#Reference').val()).length > 0) {
-        // Show loading overlay
-        // TODO: New loader
-        $('.so-sure-loading').show();
-        $('#webpay-form').submit();
-    }
 
     // Trim as you type
     // TODO: Rework as it's affecting validation - possible fix for now
