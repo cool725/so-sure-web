@@ -633,6 +633,51 @@ class DefaultController extends BaseController
     }
 
     /**
+     * @Route("/claim-update", name="claim_update")
+     * @Template
+     */
+    public function claimUpdateAction(Request $request)
+    {
+        /** @var User $user */
+        $user = $this->getUser();
+        // causes admin's (or claims) too much confusion to be redirected to a 404
+        if ($user && !$user->hasEmployeeRole() && !$user->hasClaimsRole()) {
+            return $this->redirectToRoute('user_claim');
+        }
+
+        $claimFnolEmail = new ClaimFnolEmail();
+
+        $claimEmailForm = $this->get('form.factory')
+            ->createNamedBuilder('claim_email_form', ClaimFnolEmailType::class, $claimFnolEmail)
+            ->getForm();
+
+        if ('POST' === $request->getMethod()) {
+            if ($request->request->has('claim_email_form')) {
+                $claimEmailForm->handleRequest($request);
+                if ($claimEmailForm->isValid()) {
+                    $repo = $this->getManager()->getRepository(User::class);
+                    $user = $repo->findOneBy(['emailCanonical' => mb_strtolower($claimFnolEmail->getEmail())]);
+
+                    if ($user) {
+                        /** @var ClaimsService $claimsService */
+                        $claimsService = $this->get('app.claims');
+                        $claimsService->sendUniqueLoginLink($user);
+                    }
+                    // @codingStandardsIgnoreStart
+                    $this->addFlash(
+                        'success',
+                        "Thank you. For our policy holders, an email with further instructions on how to proceed with updating your claim has been sent to you. If you do not receive the email shortly, please check your spam folders and also verify that the email address matches your policy."
+                    );
+                }
+            }
+        }
+
+        return [
+            'claim_email_form' => $claimEmailForm->createView(),
+        ];
+    }
+
+    /**
      * @Route("/claim/login/{tokenId}", name="claim_login")
      * @Template
      */

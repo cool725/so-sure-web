@@ -1432,7 +1432,10 @@ class UserController extends BaseController
             $policies = $user->getValidPolicies();
             foreach ($policies as $policy) {
                 /** @var Policy $policy */
-                if ($policy->getLatestFnolClaim() || $policy->getLatestSubmittedClaim()) {
+                if ($policy->getLatestFnolClaim() ||
+                    $policy->getLatestSubmittedClaim() ||
+                    $policy->getLatestInReviewClaim()
+                ) {
                     return $this->redirectToRoute('user_claim_policy', ['policyId' => $policy->getId()]);
                 }
             }
@@ -1534,7 +1537,7 @@ class UserController extends BaseController
         $policyRepo = $dm->getRepository(Policy::class);
         $policy = $policyRepo->find($policyId);
 
-        $claim = $policy->getLatestFnolSubmittedClaim();
+        $claim = $policy->getLatestFnolSubmittedInReviewClaim();
 
         if ($claim === null) {
             return $this->redirectToRoute('user_claim');
@@ -1542,7 +1545,7 @@ class UserController extends BaseController
 
         $this->denyAccessUnlessGranted(ClaimVoter::EDIT, $claim);
 
-        if ($claim->getStatus() == Claim::STATUS_SUBMITTED) {
+        if (in_array($claim->getStatus(), array(Claim::STATUS_SUBMITTED, Claim::STATUS_INREVIEW))) {
             return $this->redirectToRoute('claimed_submitted_policy', ['policyId' => $policy->getId()]);
         }
         if ($claim->getType() == Claim::TYPE_DAMAGE) {
@@ -1567,7 +1570,7 @@ class UserController extends BaseController
         /** @var Policy $policy */
         $policy = $policyRepo->find($policyId);
 
-        $claim = $policy->getLatestFnolSubmittedClaim();
+        $claim = $policy->getLatestFnolSubmittedInReviewClaim();
 
         if ($claim === null) {
             return $this->redirectToRoute('user_claim');
@@ -1616,6 +1619,9 @@ class UserController extends BaseController
             'claim_form' => $claimUpdateForm->createView(),
         ];
 
+        if ($claim->getStatus() == Claim::STATUS_INREVIEW) {
+            return $this->render('AppBundle:User:claimInReview.html.twig', $data);
+        }
         return $this->render('AppBundle:User:claimSubmitted.html.twig', $data);
     }
 

@@ -1294,6 +1294,22 @@ abstract class Policy
         return $this->getLatestClaimByStatus(array(Claim::STATUS_FNOL, Claim::STATUS_SUBMITTED));
     }
 
+    public function getLatestInReviewClaim()
+    {
+        return $this->getLatestClaimByStatus(array(Claim::STATUS_INREVIEW));
+    }
+
+    /**
+     * @return Claim|null
+     */
+    public function getLatestFnolSubmittedInReviewClaim()
+    {
+        return $this->getLatestClaimByStatus(array(
+            Claim::STATUS_FNOL,
+            Claim::STATUS_SUBMITTED,
+            Claim::STATUS_INREVIEW));
+    }
+
     private function getLatestClaimByStatus($status)
     {
         $claims = $this->getClaims();
