@@ -26,11 +26,11 @@
         <div class="container">
             <div class="row">
                 <div class="col-md-8 col-md-offset-2">
-                    <h1 class="text-center">Your claim is currently being reviewed.</h1>
+                    <h1 class="text-center">Currently being reviewed.</h1>
 
                     <p class="lead text-center">Your claim for <span class="h4">{{ claim.type }}</span> for your <span class="h4">{{ phone }}</span> with IMEI <span class="h4">{{ claim.policy.imei }}</span> is being processed by our claims team. </p>
 
-                    <p class="text-center">If you need to upload more documents please use the form below. They will be sent to the claim team directly.</p>
+                    <p class="text-center">If you need to upload more documents please use the form below.</p>
 
                     <p class="text-center"><a href="{{ path('user_home') }}" class="btn btn-link btn-lg">Get back to your account</a></p>
 
@@ -38,10 +38,10 @@
 
                     <h4>Need to Upload Additional Documents?</h4>
                     <p class="lead">
-                        It can happen to anyone. The network didn't give you quite the right document we need. Or perhaps the scan was missing part of a number that we need. Dont worry, simply just upload another document below and we'll pass that along to the claims team to review.
+                        It can happen to anyone. The network didn't give you quite the right document we need. Or perhaps the scan was missing part of a number. Dont worry, simply upload another document below and we'll pass that along to the claims team to review.
                     </p>
                     <p>
-                        If you need further assistance in submitting your claim please chat to our friendly customer service team <a href="#" class="open-intercom">here</a> Monday to Friday 9-5.30pm.
+                        If you need further assistance please contact our customer service team <a href="#" class="open-intercom">here</a> Monday to Friday 9-5.30pm.
                     </p>
 
                     {{ form_start(claim_form, {'attr': {'data-toggle': 'validator', 'class': 'validate-form claim__form-generic', 'id':'claim-form', 'data-client-validation': form_client_validation }}) }}
@@ -201,6 +201,7 @@
                         </div>
                     {{ form_end(claim_form) }}
 
+                    <p class="lead text-center"><br><strong>Prefer to speak to a human?</strong><br>Call our claims team on <strong><a href="tel:01133209722" class="text-nowrap text-blue">0113 320 9722</a></strong> (local rates apply).</p>
                 </div>
             </div>
         </div>
