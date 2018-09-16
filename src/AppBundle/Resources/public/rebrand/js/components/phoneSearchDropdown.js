@@ -9,7 +9,8 @@ $(function() {
             make   = $('.phone-search-dropdown__make'),
             model  = $('.phone-search-dropdown__model'),
             memory = $('.phone-search-dropdown__memory');
-            button = $('.phone-search-dropdown__button');
+            button = $('.phone-search-dropdown__button'),
+            arule  = $('#a-rule');
 
         const updateModels = () => {
 
@@ -75,6 +76,14 @@ $(function() {
                 if ($(this).val()) {
                     model.prop('disabled', '');
                     $(this).addClass('valid-select');
+
+                    let value = $(this).val()
+
+                    if (value.charAt(0) == 'A') {
+                        arule.text('an')
+                    } else {
+                        arule.text('a')
+                    }
                 } else {
                     model.prop('disabled', 'disabled').val('');
                     $(this).removeClass('valid-select');
