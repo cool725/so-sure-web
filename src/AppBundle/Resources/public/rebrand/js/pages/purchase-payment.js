@@ -42,6 +42,14 @@ sosure.purchaseStepPayment = (function() {
 
             },
 
+            errorPlacement: function(error, element) {
+                if (element.attr('name') === "purchase_form[amount]") {
+                    error.insertAfter($('.payment-options__title'));
+                } else {
+                    error.insertAfter(element);
+                }
+            },
+
             submitHandler: function(form) {
                 form.submit();
             }

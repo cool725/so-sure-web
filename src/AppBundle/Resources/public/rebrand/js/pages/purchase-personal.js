@@ -154,10 +154,6 @@ sosure.purchaseStepAddress = (function() {
                 "purchase_form[postcode]" : 'Please enter a valid UK postcode'
             },
 
-            submitHandler: function(form) {
-                form.submit();
-            },
-
             errorPlacement: function(error, element) {
                 if (element.attr('name') == 'purchase_form[birthday][day]' || element.attr('name') == 'purchase_form[birthday][month]' || element.attr('name') == 'purchase_form[birthday][year]') {
                     error.insertAfter('#dob-field');
@@ -166,6 +162,7 @@ sosure.purchaseStepAddress = (function() {
                 }
             },
 
+            // Error Reporting
             showErrors: function(errorMap, errorList) {
                 this.defaultShowErrors();
                 var vals = [];
@@ -180,6 +177,10 @@ sosure.purchaseStepAddress = (function() {
                   dataType:"json",
                   data: JSON.stringify({ 'errors': vals, 'url': self.url })
                 });
+            },
+
+            submitHandler: function(form) {
+                form.submit();
             }
         });
     }
