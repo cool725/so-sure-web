@@ -5,6 +5,8 @@
     'autocomplete': 'off'
 }}) }}
 
+    {% include 'AppBundle::Purchase/_purchaseStepsRebrand.html.twig' %}
+
     <div class="form-group {% if form_errors(purchase_form.imei) %}has-error{% endif %}">
         {{ form_label(purchase_form.imei, 'IMEI Number', { 'label_attr': {'class': 'sr-only'} }) }}
         <label for="purchase_form[imei]">

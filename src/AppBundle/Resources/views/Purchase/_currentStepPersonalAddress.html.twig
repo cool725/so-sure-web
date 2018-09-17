@@ -5,6 +5,8 @@
     'autocomplete': 'off'
 }}) }}
 
+    {% include 'AppBundle::Purchase/_purchaseStepsRebrand.html.twig' %}
+
     <div class="form-step">
 
         <div class="form-group {% if form_errors(purchase_form.firstName) or form_errors(purchase_form.lastName) or form_errors(purchase_form.name) %}has-error{% endif %}">

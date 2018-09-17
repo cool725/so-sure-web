@@ -1,15 +1,10 @@
 // form-steps.scss
 
 .form-steps {
-    width: 110%;
-    margin-left: -5%;
+    width: 120%;
+    margin-left: -10%;
     position: relative;
 
-    @include media-breakpoint-up(lg) {
-        max-width: 500px;
-        margin-left: auto;
-        margin-right: auto;
-    }
 
     &__item {
         width: 25%;
