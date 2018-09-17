@@ -77,13 +77,14 @@ $(function() {
                     model.prop('disabled', '');
                     $(this).addClass('valid-select');
 
-                    let value = $(this).val()
+                    let value = $(this).val();
 
-                    if (value.charAt(0) == 'A') {
+                    if (value.charAt(0).match(/[AEIOU]/)) {
                         arule.text('an')
                     } else {
                         arule.text('a')
                     }
+
                 } else {
                     model.prop('disabled', 'disabled').val('');
                     $(this).removeClass('valid-select');
