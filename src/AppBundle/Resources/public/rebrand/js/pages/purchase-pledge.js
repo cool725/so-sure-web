@@ -39,7 +39,16 @@ sosure.purchaseStepPledge = (function() {
 
             },
             messages: {
-
+                // Leave validation messages blank as class gets added to the label
+                "purchase_form[agreedDamage]": {
+                    required: ''
+                },
+                "purchase_form[agreedAgeLocation]": {
+                    required: ''
+                },
+                "purchase_form[agreedTerms]": {
+                    required: ''
+                }
             },
 
             submitHandler: function(form) {
