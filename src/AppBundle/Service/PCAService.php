@@ -365,7 +365,7 @@ class PCAService
             $this->logger->info(sprintf('Address find for %s %s', $id, json_encode($data->toApiArray())));
 
             if (!$this->searchService->validatePostcode($data->getPostcode())) {
-                $this->logger->error(sprintf(
+                $this->logger->info(sprintf(
                     'Postcode %s was found in PCA but missing from local db',
                     $data->getPostcode()
                 ));
