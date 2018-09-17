@@ -79,18 +79,6 @@
                                 &pound;{{ phone.currentPhonePrice.yearlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }} a year
                             {% endif %}
                         </div>
-{#                         <div class="qpw__h5 h5 d-block d-lg-none text-center">
-                            <a href="#qpw-info-mobile"
-                               id="qpw-info-btn"
-                               class="text-white toggle-text"
-                               data-toggle="collapse"
-                               data-target="#qpw-info-mobile"
-                               data-text-swap='hide full details <i class="fas fa-caret-up ml-2"></i>'
-                               aria-expanded="false"
-                               aria-controls="qpw-info-mobile">
-                                see full details <i class="fas fa-caret-down ml-2"></i>
-                            </a>
-                        </div> #}
                         <div class="qpw__h5 h5 d-block d-lg-none text-center">
                             <a href="#qpw-info-mobile"
                                id="qpw-info-btn"
@@ -149,7 +137,7 @@
 
                 {# Sub Content #}
                 <div class="qpw__sub__container">
-                    <div class="qpw__sub px-4 pb-4 pt-5 p-lg-5">
+                    <div class="qpw__sub px-4 pb-4 pt-5 p-lg-5 w-100">
                         {% include 'AppBundle::Purchase/_purchaseStepsRebrand.html.twig' %}
                         {% include 'AppBundle::Purchase/_currentStepPersonalAddress.html.twig' %}
                     </div>

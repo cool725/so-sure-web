@@ -26,6 +26,7 @@
             ) }}
         </div>
         <div class="form-group">
+            {% set terms = '<a href="{{ cdn_url }}/files/so-sure_sample_policy_doc.pdf" target="_blank">so-sure policy document</a>' %}
             {{ form_widget(purchase_form.agreedTerms, {
                 'label': 'I have read & understood the so-sure policy document',
                 'attr': {'class':'custom-control-input'}}

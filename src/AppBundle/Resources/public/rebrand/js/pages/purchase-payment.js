@@ -75,7 +75,7 @@ $(function(){
     if ($.trim($('#Reference').val()).length > 0) {
         // Show loading overlay
         // TODO: New loader
-        $('.so-sure-loading').show();
+        // $('.so-sure-loading').show();
         $('#webpay-form').submit();
     }
 });
