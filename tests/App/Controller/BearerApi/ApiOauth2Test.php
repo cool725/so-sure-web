@@ -12,11 +12,11 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 /**
- * Test when a user needs to login to get a token issued, they go to the right place
+ * Test access and failures, with codes for automated access by another machine
  *
- * NOTE: This is an event being run by a human, clicking links. Not an API call.
+ * How the exceptions are gonna get changed is a different problem....
  */
-class OauthLoginTest extends WebTestCase
+class ApiOauth2Test extends WebTestCase
 {
     /** @var Client $client */
     private $client;
@@ -36,22 +36,74 @@ class OauthLoginTest extends WebTestCase
         }
     }
 
+    // post a valid client_id, secret & code to get an access_token
+    //#public function testOauthGetAccessToken()
+
     /**
      * going to the oauth/v2/auth page with bad creds redirects to /login
      */
-    public function testOauthRedirectionWithNoParameters()
+    public function testOauthSwapTokenWithNoParametersReturnsStarlingErrors()
     {
-        $params = [];
-        $this->client->request('GET', '/oauth/v2/auth', $params);
+        #$this->markTestIncomplete();
 
+        $params = [];
+        $this->client->request('GET', '/oauth/v2/token', $params);
         $response = $this->client->getInternalResponse();
-        $this->assertNotNull($response);
-        $this->assertInstanceOf(Response::class, $response);
-        if ($response === null || ! $response instanceof Response) {
-            $this->fail('did not get a valid response from oauth/v2/auth');
-            return;
-        }
-        $this->assertSame('/login', $response->getHeader('location'));
+        // what we want for Starling
+        $this->assertJsonError(400, 'invalid_request', 'grant_type must be provided', $response);
+
+        $params['grant_type'] = 'token';    // set it to something 'valid', but not useful here yet
+        $this->client->request('GET', '/oauth/v2/token', $params);
+        $response = $this->client->getInternalResponse();
+        // what we want for Starling
+        $this->assertJsonError(400, 'invalid_request', 'client_id must be specified', $response);
+
+        $params['client_id'] = 'blah';
+        $this->client->request('GET', '/oauth/v2/token', $params);
+        $response = $this->client->getInternalResponse();
+        $this->assertJsonError(
+            400,
+            'invalid_request',
+            'Client not authorised to access token or authentication failed',
+            $response
+        );
+
+        $params['client_secret'] = 'blah';
+        $this->client->request('GET', '/oauth/v2/token', $params);
+        $response = $this->client->getInternalResponse();
+        $this->assertJsonError(
+            400,
+            'invalid_request',
+            'Client not authorised to access token or authentication failed',
+            $response
+        );
+
+        $params['grant_type'] = 'authorization_code';
+        $params['client_id'] = LoadOauth2Data::KNOWN_CLIENT_ID;
+        $params['client_secret'] = LoadOauth2Data::KNOWN_CLIENT_SECRET;
+        $this->client->request('GET', '/oauth/v2/token', $params);
+        $response = $this->client->getInternalResponse();
+        $this->assertJsonError(400, 'invalid_request', 'authorization_code must be specified', $response);
+
+        $params['code'] = '12331231231';
+        $this->client->request('GET', '/oauth/v2/token', $params);
+        $response = $this->client->getInternalResponse();
+        $this->assertJsonError(
+            400,
+            'invalid_request',
+            'redirect_uri must match the value provided when getting the authorization code',
+            $response
+        );
+
+        $params['redirect_uri'] = 'http://dev.so-sure.net:40080/ops/pages';
+        $this->client->request('GET', '/oauth/v2/token', $params);
+        $response = $this->client->getInternalResponse();
+        $this->assertJsonError(
+            400,    // this error is a 403 in starling docs
+            'invalid_request',
+            'authorization code could not be validated. It could be invalid, expired or revoked',
+            $response
+        );
     }
 
     /**
@@ -132,5 +184,28 @@ class OauthLoginTest extends WebTestCase
             $session->has('oauth2Flow.targetPath'),
             'expected the Oauth2-Params to be carried over, via the session'
         );
+    }
+
+    private function assertJsonError(int $statusCode, string $errorCode, string $errorDescription, Response $response)
+    {
+        $this->assertSaneResponse($response);
+
+        $this->assertEquals($response->getStatus(), $statusCode, 'status code does not match expected');
+        $this->assertJson($response->getContent(), 'Expected the return to be JSON');
+
+        $data = json_decode($response->getContent());
+        $this->assertNotNull($data->{'error-code'}, "Starling-compatible ->{error-code} does not exist");
+        $this->assertSame($data->{'error-code'}, $errorCode, "not the expected ->error");
+        $this->assertSame($data->error_description, $errorDescription, "not the expected ->error_description");
+    }
+
+    private function assertSaneResponse($response)
+    {
+        $this->assertNotNull($response, 'response should not be null');
+        $this->assertInstanceOf(Response::class, $response);
+
+        if ($response === null || !$response instanceof Response) {
+            $this->fail('did not get a valid response from oauth/v2/auth');
+        }
     }
 }
