@@ -6,9 +6,9 @@
 }}) }}
 
     <div class="form-group {% if form_errors(purchase_form.imei) %}has-error{% endif %}">
-        {{ form_label(purchase_form.imei, 'IMEI Number:', { 'label_attr': {'class': 'sr-only'} }) }}
+        {{ form_label(purchase_form.imei, 'IMEI Number', { 'label_attr': {'class': 'sr-only'} }) }}
         <label for="purchase_form[imei]">
-            IMEI Number:
+            IMEI Number
             <span class="ml-2 text-blue2">
                 <a href="#"
                    data-toggle="modal"
@@ -31,9 +31,9 @@
 
     {% if purchase_form.serialNumber is defined %}
         <div class="form-group {% if form_errors(purchase_form.serialNumber) %}has-error{% endif %}">
-            {{ form_label(purchase_form.serialNumber, 'Serial Number:', { 'label_attr': {'class': 'sr-only'} }) }}
+            {{ form_label(purchase_form.serialNumber, 'Serial Number', { 'label_attr': {'class': 'sr-only'} }) }}
             <label for="purchase_form[serialNumber]">
-                Serial Number:
+                Serial Number
                 <span class="ml-2 text-blue2">
                     <a href="#"
                        data-toggle="modal"
