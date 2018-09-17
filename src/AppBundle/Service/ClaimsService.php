@@ -550,7 +550,7 @@ class ClaimsService
         $this->mailer->setMailer($mailer);
     }
 
-    public function sendUniqueLoginLink(User $user)
+    public function sendUniqueLoginLink(User $user, $isUpdate = false)
     {
         try {
             $token = md5(sprintf('%s%s', time(), $user->getEmail()));
@@ -566,15 +566,25 @@ class ClaimsService
                 'tokenValidTimeframe' => 'hours'
             ];
 
-            $this->mailer->sendTemplate(
-                'Your link to proceed with your claim',
-                $user->getEmail(),
-                "AppBundle:Email:claim/loginLink.html.twig",
-                $data,
-                "AppBundle:Email:claim/loginLink.txt.twig",
-                $data
-            );
-
+            if ($isUpdate) {
+                $this->mailer->sendTemplate(
+                    'Your link to review with your claim',
+                    $user->getEmail(),
+                    "AppBundle:Email:claim/loginLinkUpdate.html.twig",
+                    $data,
+                    "AppBundle:Email:claim/loginLinkUpdate.txt.twig",
+                    $data
+                );
+            } else {
+                $this->mailer->sendTemplate(
+                    'Your link to proceed with your claim',
+                    $user->getEmail(),
+                    "AppBundle:Email:claim/loginLink.html.twig",
+                    $data,
+                    "AppBundle:Email:claim/loginLink.txt.twig",
+                    $data
+                );
+            }
             return true;
         } catch (\Exception $e) {
             $this->logger->error("Error in sendUniqueLoginLink.", ['exception' => $e]);

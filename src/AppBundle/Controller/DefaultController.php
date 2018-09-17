@@ -616,7 +616,7 @@ class DefaultController extends BaseController
                     if ($user) {
                         /** @var ClaimsService $claimsService */
                         $claimsService = $this->get('app.claims');
-                        $claimsService->sendUniqueLoginLink($user);
+                        $claimsService->sendUniqueLoginLink($user, false);
                     }
                     // @codingStandardsIgnoreStart
                     $this->addFlash(
@@ -661,7 +661,7 @@ class DefaultController extends BaseController
                     if ($user) {
                         /** @var ClaimsService $claimsService */
                         $claimsService = $this->get('app.claims');
-                        $claimsService->sendUniqueLoginLink($user);
+                        $claimsService->sendUniqueLoginLink($user, true);
                     }
                     // @codingStandardsIgnoreStart
                     $this->addFlash(
