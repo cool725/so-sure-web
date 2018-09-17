@@ -167,6 +167,16 @@ class DirectGroupService extends SftpService
         if (count($this->errors) > 0) {
             $emails = DirectGroupHandlerClaim::$errorEmailAddresses;
 
+            $tmpFile = sprintf('%s/%s', sys_get_temp_dir(), 'dg-errors.csv');
+            $lines = [];
+            foreach ($this->errors as $clamId => $errors) {
+                foreach ($errors as $error) {
+                    $lines[] = sprintf('"%s", "%s"', $clamId, str_replace('"', "''", $error));
+                }
+            }
+            $data = implode(PHP_EOL, $lines);
+            file_put_contents($tmpFile, $data);
+
             $this->mailer->sendTemplate(
                 sprintf('Errors in Daily Claims Report'),
                 $emails,
@@ -180,8 +190,15 @@ class DirectGroupService extends SftpService
                     'claims' => null,
                     'fees' => $this->fees,
                     'title' => 'Errors in Daily Claims Report',
-                ]
+                ],
+                null,
+                null,
+                [$tmpFile]
             );
+
+            if (file_exists($tmpFile)) {
+                unlink($tmpFile);
+            }
         }
 
         return count($this->errors);
@@ -349,7 +366,7 @@ class DirectGroupService extends SftpService
         }
 
         $claim->setExcess($directGroupClaim->excess);
-        $claim->setIncurred($directGroupClaim->incurred);
+        $claim->setIncurred($directGroupClaim->getIncurred());
         $claim->setClaimHandlingFees($directGroupClaim->handlingFees);
         $claim->setReservedValue($directGroupClaim->reserved);
         $claim->setTotalIncurred($directGroupClaim->totalIncurred);
@@ -527,7 +544,7 @@ class DirectGroupService extends SftpService
         }
         // Open Non-Warranty Claims are expected to either have a total incurred value or a reserved value
         if ($directGroupClaim->isOpen() && !$directGroupClaim->isClaimWarranty() &&
-            $this->areEqualToTwoDp($directGroupClaim->getIncurred(), 0) &&
+            $this->areEqualToTwoDp($directGroupClaim->totalIncurred, 0) &&
             $this->areEqualToTwoDp($directGroupClaim->getReserved(), 0)) {
             $msg = sprintf('Claim %s does not have a reserved value', $directGroupClaim->claimNumber);
             $this->errors[$directGroupClaim->claimNumber][] = $msg;
@@ -575,11 +592,11 @@ class DirectGroupService extends SftpService
                 'Claim %s does not have the correct incurred value. Expected %0.2f Actual %0.2f',
                 $directGroupClaim->claimNumber,
                 $directGroupClaim->getExpectedIncurred(),
-                $directGroupClaim->incurred
+                $directGroupClaim->getIncurred()
             );
             // seems to be an issue with small difference in the incurred value related to receipero fees
             // if under £2, then assume that to be the case and move to the fees section
-            if (abs($directGroupClaim->getExpectedIncurred() - $directGroupClaim->incurred) < 2) {
+            if (abs($directGroupClaim->getExpectedIncurred() - $directGroupClaim->getIncurred()) < 2) {
                 $this->fees[$directGroupClaim->claimNumber][] = $msg;
             } else {
                 $this->errors[$directGroupClaim->claimNumber][] = $msg;

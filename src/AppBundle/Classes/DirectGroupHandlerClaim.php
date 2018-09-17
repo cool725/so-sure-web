@@ -89,6 +89,16 @@ class DirectGroupHandlerClaim extends HandlerClaim
         }
     }
 
+    public function getIncurred()
+    {
+        if (!$this->totalIncurred) {
+            return 0;
+        }
+
+        // No incurred value is present, but incurred is total - cost of claim
+        return $this->totalIncurred - $this->handlingFees;
+    }
+
     public function hasError()
     {
         return false;
@@ -208,7 +218,7 @@ class DirectGroupHandlerClaim extends HandlerClaim
             return null;
         }
 
-        $total = $this->unauthorizedCalls + $this->accessories + $this->phoneReplacementCost;
+        $total = $this->unauthorizedCalls + $this->accessories + $this->phoneReplacementCost - $this->handlingFees;
 
         return $this->toTwoDp($total);
     }
@@ -278,8 +288,7 @@ class DirectGroupHandlerClaim extends HandlerClaim
             $this->excess = $this->nullIfBlank($data[++$i]);
             // todo: KFI score
             $this->nullIfBlank($data[++$i]);
-            // TODO: Is incurred from DB, the same as incurred from Davies??
-            $this->incurred = $this->nullIfBlank($data[++$i]);
+            $this->totalIncurred = $this->nullIfBlank($data[++$i]);
 
             if ($this->getClaimType() === null) {
                 throw new \Exception('Unknown or missing claim type');

@@ -310,7 +310,13 @@
                             </td>
                             <td>
                                 {% if policy.policyTerms.isPicSureEnabled %}
-                                    {% if policy.picSureStatus %}{{ policy.picSureStatus }}{% else %}Not started{% endif %}
+                                    {% if policy.picSureStatus == 'claim-approved' and previousPicSureStatus is defined %}
+                                        pic-sure Approved due to a settled claim (previously was {% if previousPicSureStatus %}{{ previousPicSureStatus.data.picSureStatus }}{% else %}Not started{% endif %})
+                                    {% elseif policy.picSureStatus %}
+                                        {{ policy.picSureStatus }}
+                                    {% else %}
+                                        Not started
+                                    {% endif %}
                                     {% if policy.getPicSureApprovedDate %}<br />Approved: {{ policy.getPicSureApprovedDate|date }}{% endif %}
                                 {% else %}
                                     Non pic-sure policy

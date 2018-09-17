@@ -76,7 +76,8 @@ class DirectGroupHandlerClaimTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(250.49, $directGroup->phoneReplacementCost);
         $this->assertEquals(1.3, $directGroup->accessories);
         $this->assertEquals(0.75, $directGroup->unauthorizedCalls);
-        $this->assertEquals(1.08, $directGroup->incurred);
+        $this->assertEquals(1.08, $directGroup->totalIncurred);
+        $this->assertEquals(-218.92, $directGroup->getIncurred());
 
         $this->assertEquals('149358212660892', $directGroup->replacementImei);
         $this->assertEquals('Samsung', $directGroup->replacementMake);

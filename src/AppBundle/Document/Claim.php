@@ -514,12 +514,14 @@ class Claim
     protected $reservedValue;
 
     /**
+     * Cost of claim - excess (does not inc claim handling fee)
      * @MongoDB\Field(type="float")
      * @Gedmo\Versioned
      */
     protected $incurred;
 
     /**
+     * Total inc claim handling fee - excess
      * @MongoDB\Field(type="float")
      * @Gedmo\Versioned
      */
@@ -1709,7 +1711,7 @@ class Claim
             'transactionFees' => $this->toTwoDp($this->getTransactionFees()),
             'claimHandlingFees' => $this->toTwoDp($this->getClaimHandlingFees()),
             'reservedValue' => $this->toTwoDp($this->getReservedValue()),
-            'incurred' => $this->toTwoDp($this->getIncurred()),
+            'totalIncurred' => $this->toTwoDp($this->getTotalIncurred()),
             'force' => $this->getForce(),
             'crimeRef' => $this->getCrimeRef(),
             'validCrimeRef' => $this->isValidCrimeRef(),
