@@ -10,15 +10,15 @@
 	   <!--?xml version="1.0" encoding="UTF-8" standalone="no"?-->
 	   <div style="font-size: 14px; text-align: left;"><span style="font-family:arial,helvetica neue,helvetica,sans-serif">
         Hi {{ username }},<br><br>
-		Thank you for starting your online claims process. Once you have finished our online claims process and your claim is approved, we aim to get you back up and running in 24-72 hours.
+
+        Ok, let's get your claim started...
         <br><br>
-		Please now click on the link below to proceed to the next step in the claims process.
-        <br><br>
+		The next step is to click the button below and fill out a short form with the details.
+		<br><br>
+		Once you have finished and your claim is approved, we aim to get you back up and running in 24-72 hours with a repaired or replacement phone. 
+		<br><br>
+		Please now click on the link below to get started:
         {{ macros.email_button_table(tokenUrl, "START MY CLAIM", "START MY CLAIM")}}
-        <br><br>
-		Please note this link will expire in {{ tokenValid }} {{ tokenValidTimeframe }}, you can re-reactivate the link by clicking <a href="{{ url('claim') }}">here</a>.
-        <br><br>
-		If you have any questions regarding your claim please contact the claims team on 0113 320 9722.
 		   </span>
 	   </div>
 	</div>

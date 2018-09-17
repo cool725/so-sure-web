@@ -26,7 +26,7 @@
             <div class="row">
                 <div class="col-md-6 col-md-offset-3">
                     <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_broken-phone.png" width="220px" class="img-center img-circle" alt="">
-                    <h3>Enter your email address to review your claim.</h3>
+                    <h3>Enter your email and we'll send you a link to review your claim.</h3>
                     {{ form_start(claim_email_form, {
                         'attr': {
                             'data-toggle': 'validator',
@@ -41,7 +41,7 @@
                         </div>
                         <div class="form-group">
                            {{ form_widget(claim_email_form.submit, {
-                                'label': 'Review my claim',
+                                'label': 'Send me the link',
                                 'attr': {
                                     'class': 'btn btn-blue btn-pad btn-lg'
                             }}) }}

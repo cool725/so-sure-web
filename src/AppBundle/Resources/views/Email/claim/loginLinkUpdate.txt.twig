@@ -1,23 +1,21 @@
 {% extends 'AppBundle:Email:base.txt.twig' %}
 {% block body %}
-Your link to proceed with your claim.
+Your link to review your claim.
 
 **
 ------------------------------------------------------------
 Hi {{ username }},
 
-Thank you for continuing your online claims process. Once you have finished our online claims process and your claim is approved, we aim to get you back up and running in 24-72 hours.
+Great, let's get you logged in to review your claim....
 
-Please now click on the link below to proceed to the next step in the claims process.
+Just click on the link below. Simples!
 
-CONTINUE MY CLAIM:
 {{ tokenUrl }}
 
-Please note this link will expire in {{ tokenValid }} {{ tokenValidTimeframe }}.
-
-You can re-reactivate the link here:
-{{ url('claim') }}
+Please note this link will expire in 2 hours, you can re-reactivate the link by clicking {{ url('claim') }}. 
 
 If you have any questions regarding your claim please contact the claims team on 0113 320 9722.
 
+Thanks
+The so-sure team
 {% endblock body %}
