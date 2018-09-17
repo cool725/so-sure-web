@@ -1,7 +1,5 @@
 // purchase.js
 
-// require('../../sass/pages/purchase.scss');
-
 // Require BS component(s)
 require('bootstrap/js/dist/modal');
 require('bootstrap/js/dist/collapse');
@@ -11,7 +9,7 @@ require('bootstrap/js/dist/dropdown');
 require('jquery-validation');
 require('../../../js/Default/jqueryValidatorMethods.js');
 
-let sosure = sosure || {};
+const sosure = sosure || {};
 
 sosure.purchaseStepPledge = (function() {
     let self = {};

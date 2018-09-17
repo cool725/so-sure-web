@@ -1,7 +1,5 @@
 // purchase-phone.js
 
-// require('../../sass/pages/purchase.scss');
-
 // Require BS component(s)
 require('bootstrap/js/dist/modal');
 require('bootstrap/js/dist/collapse');
@@ -11,14 +9,14 @@ require('bootstrap/js/dist/dropdown');
 require('jquery-validation');
 require('../../../js/Default/jqueryValidatorMethods.js');
 
-var sosure = sosure || {};
+const sosure = sosure || {};
 
 sosure.purchaseStepPhone = (function() {
-    var self = {};
+    let self = {};
     self.form = null;
     self.isIE = null;
 
-    self.init = function() {
+    self.init = () => {
         self.form = $('.validate-form');
         self.isIE = !!navigator.userAgent.match(/Trident/g) || !!navigator.userAgent.match(/MSIE/g);
         if (self.form.data('client-validation') && !self.isIE) {
@@ -26,7 +24,7 @@ sosure.purchaseStepPhone = (function() {
         }
     };
 
-    self.addValidation = function() {
+    self.addValidation = () => {
         self.form.validate({
             debug: true,
             // When to validate
@@ -73,9 +71,9 @@ sosure.purchaseStepPhone = (function() {
             // Error Reporting
             showErrors: function(errorMap, errorList) {
                 this.defaultShowErrors();
-                var vals = [];
-                for (var err in errorMap) {
-                    var val = $('body').find('input[name="' + err + '"]').val()
+                let vals = [];
+                for (let err in errorMap) {
+                    let val = $('body').find('input[name="' + err + '"]').val()
                     vals.push({'name': err, 'value': val, 'message': errorMap[err]});
                 }
                 $.ajax({
@@ -102,15 +100,15 @@ $(function(){
 
     // Trim as you type
     // TODO: Rework as it's affecting validation - possible fix for now
-    var imei  = $('.imei'),
+    let imei  = $('.imei'),
         phone = imei.data('make');
 
     if (phone == 'Samsung') {
         imei.on('blur', function() {
-            var simei  = $(this).val();
+            let simei  = $(this).val();
 
             if (simei.indexOf('/') > 1) {
-                var newtxt = simei.replace('/', '');
+                let newtxt = simei.replace('/', '');
                 $(this).val(newtxt);
             }
 

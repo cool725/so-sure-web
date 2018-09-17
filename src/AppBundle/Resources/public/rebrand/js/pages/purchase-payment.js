@@ -1,7 +1,5 @@
 // purchase-payment.js
 
-// require('../../sass/pages/purchase.scss');
-
 // Require BS component(s)
 require('bootstrap/js/dist/modal');
 require('bootstrap/js/dist/collapse');
@@ -11,7 +9,7 @@ require('bootstrap/js/dist/dropdown');
 require('jquery-validation');
 require('../../../js/Default/jqueryValidatorMethods.js');
 
-let sosure = sosure || {};
+const sosure = sosure || {};
 
 sosure.purchaseStepPayment = (function() {
     let self = {};
@@ -71,12 +69,12 @@ $(function(){
         $(this).addClass('radio-btn-active');
 
         // Set the value for the form element
-        var val = $(this).data('value');
+        let val = $(this).data('value');
         $('input[name="purchase_form[amount]"][value="' + val + '"]').prop('checked', true);
 
         // Adjust the price in the copy
-        var premium = $(this).data('premium-type');
-        var price = $('#purchase_price');
+        let premium = $(this).data('premium-type');
+        let price = $('#purchase_price');
         price.html('&pound;' + val + ' a ' + premium);
     });
 

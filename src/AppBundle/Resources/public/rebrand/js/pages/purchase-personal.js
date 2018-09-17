@@ -1,7 +1,5 @@
 // purchase.js
 
-// require('../../sass/pages/purchase.scss');
-
 // Require BS component(s)
 require('bootstrap/js/dist/modal');
 require('bootstrap/js/dist/collapse');
@@ -16,10 +14,10 @@ require('fuse.js');
 require('jquery-validation');
 require('../../../js/Default/jqueryValidatorMethods.js');
 
-var sosure = sosure || {};
+const sosure = sosure || {};
 
 sosure.purchaseStepAddress = (function() {
-    var self = {};
+    let self = {};
     self.form = null;
     self.delayTimer = null;
     self.focusTimer = null;
@@ -30,7 +28,7 @@ sosure.purchaseStepAddress = (function() {
     self.key = null;
     self.isIE = null;
 
-    self.init = function() {
+   self.init = () => {
         self.form = $('.validate-form');
         self.dobMask();
         self.isIE = !!navigator.userAgent.match(/Trident/g) || !!navigator.userAgent.match(/MSIE/g);
@@ -42,12 +40,12 @@ sosure.purchaseStepAddress = (function() {
         self.init_bloodhound();
     }
 
-    self.dobMask = function () {
+    self.dobMask = () => {
         // Mask date input and add picker
         $('.dob').mask('00/00/0000');
     }
 
-    self.addValidation = function() {
+    self.addValidation = () => {
         self.form.validate({
             debug: false,
             // When to validate
@@ -165,9 +163,9 @@ sosure.purchaseStepAddress = (function() {
             // Error Reporting
             showErrors: function(errorMap, errorList) {
                 this.defaultShowErrors();
-                var vals = [];
-                for (var err in errorMap) {
-                    var val = $('body').find('input[name="' + err + '"]').val()
+                let vals = [];
+                for (let err in errorMap) {
+                    let val = $('body').find('input[name="' + err + '"]').val()
                     vals.push({'name': err, 'value': val, 'message': errorMap[err]});
                 }
                 $.ajax({
@@ -185,11 +183,11 @@ sosure.purchaseStepAddress = (function() {
         });
     }
 
-    self.step_one_change = function() {
+    self.step_one_change = () => {
         self.name_email_changed = true;
     }
 
-    self.step_one_continue = function() {
+    self.step_one_continue = () => {
         if ($('#purchase_form_name').valid() == true && $('#purchase_form_email').valid() == true) {
             $('.step--hide').show();
             $('#step--one-controls').hide();
@@ -198,12 +196,12 @@ sosure.purchaseStepAddress = (function() {
             if (self.name_email_changed) {
                 self.name_email_changed = false;
                 self.delayTimer = setTimeout(function() {
-                    var data = {
+                    let data = {
                         name: $('#purchase_form_name').val(),
                         email: $('#purchase_form_email').val(),
                         csrf: $('#step--validate').data('csrf')
                     };
-                    var url = $('#step--validate').data('lead');
+                    let url = $('#step--validate').data('lead');
                     $.ajax({
                         url: url,
                         type: 'POST',
@@ -220,7 +218,7 @@ sosure.purchaseStepAddress = (function() {
         }
     }
 
-    self.step_address_continue = function() {
+    self.step_address_continue = () => {
         if (self.form.valid()) {
             self.showAddress();
             return true;
@@ -229,7 +227,7 @@ sosure.purchaseStepAddress = (function() {
         }
     }
 
-    self.showAddress = function(err) {
+    self.showAddress = (err) => {
         $('.address-search').hide();
         $('.typeahead').removeAttr('required');
         $('.address-show').show();
@@ -239,14 +237,14 @@ sosure.purchaseStepAddress = (function() {
         }
     }
 
-    self.focusBirthday = function() {
+    self.focusBirthday = () => {
         clearTimeout(self.focusTimer);
         self.focusTimer = setTimeout(function() {
             $('#purchase_form_birthday').focus();
         }, 300);
     }
 
-    self.init_bloodhound = function() {
+    self.init_bloodhound = () => {
       self.bloodhound = new Bloodhound({
         datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
         queryTokenizer: Bloodhound.tokenizers.whitespace,
@@ -277,15 +275,15 @@ sosure.purchaseStepAddress = (function() {
       });
     }
 
-    self.clearAddress = function() {
+    self.clearAddress = () => {
         self.setAddress({'Line1': '', 'Line2': '', 'Line3': '', 'City': '', 'Postcode': ''});
     }
 
-    self.setAddress = function(addr) {
+    self.setAddress = (addr) => {
         if (!addr) {
             return;
         }
-        var address = '';
+        let address = '';
         if (addr.Line1) {
             $('.addressLine1').val(addr.Line1);
             address = addr.Line1;
@@ -310,7 +308,7 @@ sosure.purchaseStepAddress = (function() {
         $('.typeahead .with-errors').html('');
     }
 
-    self.toggleSearch = function() {
+    self.toggleSearch = () => {
         if ($('#search_address_button').length > 0) {
             if ($('#search_address_button').html().indexOf('fa-search') >= 0) {
                 $('#search_address_button').html('<i class="fa fa-spinner fa-spin"></i>');
@@ -320,7 +318,7 @@ sosure.purchaseStepAddress = (function() {
         }
     }
 
-    self.selectAddress = function(suggestion) {
+    self.selectAddress = (suggestion) => {
         if (!suggestion) {
             $('#search_address_errors').show();
             $('#select_address_errors').show();
@@ -348,7 +346,7 @@ sosure.purchaseStepAddress = (function() {
         });
     }
 
-    self.selectAddressFinal = function(suggestion) {
+    self.selectAddressFinal = (suggestion) => {
         $.ajax({
             method: "POST",
             url: "https://services.postcodeanywhere.co.uk/CapturePlus/Interactive/Retrieve/v2.10/json3.ws",
@@ -362,7 +360,7 @@ sosure.purchaseStepAddress = (function() {
             $('#select_address_errors').hide();
             $('.address-search').removeClass('has-error');
             self.toggleSearch();
-            var addr = msg.Items[0];
+            let addr = msg.Items[0];
             sosure.purchaseStepAddress.setAddress(addr);
             $.ajax({
                 method: "POST",
@@ -395,7 +393,7 @@ $(function(){
     });
 
     $('#purchase_form_email').on('blur', function(e) {
-        var was_hidden = $('#step--one-controls').is(":visible");
+        let was_hidden = $('#step--one-controls').is(":visible");
         sosure.purchaseStepAddress.step_one_continue();
         if (was_hidden) {
             sosure.purchaseStepAddress.focusBirthday();
@@ -404,9 +402,9 @@ $(function(){
 
     $('#search_address_button').click(function(e) {
         e.preventDefault();
-        var search_number = $('#search_address_number').val();
-        var search_postcode = $('#search_address_postcode').val();
-        var allow_search = search_number.length > 0 && search_postcode.length > 0;
+        let search_number = $('#search_address_number').val();
+        let search_postcode = $('#search_address_postcode').val();
+        let allow_search = search_number.length > 0 && search_postcode.length > 0;
 
         if (!allow_search) {
             return sosure.purchaseStepAddress.step_address_continue();
@@ -425,7 +423,7 @@ $(function(){
                 return sosure.purchaseStepAddress.step_address_continue();
             }
 
-            var search = search_number + ", " + response.postcode;
+            let search = search_number + ", " + response.postcode;
             sosure.purchaseStepAddress.bloodhound.search(search, function(sync) {}, function(async) {
                 if (async.length > 0) {
                     sosure.purchaseStepAddress.selectAddress(async[0]);
