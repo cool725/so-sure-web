@@ -5,6 +5,12 @@
     margin-left: -5%;
     position: relative;
 
+    @include media-breakpoint-up(lg) {
+        max-width: 500px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
     &__item {
         width: 25%;
         position: relative;
