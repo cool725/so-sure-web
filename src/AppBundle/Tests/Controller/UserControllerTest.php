@@ -1940,7 +1940,7 @@ class UserControllerTest extends BaseControllerTest
         $serializer = new Serializer(array(new DateTimeNormalizer()));
 
         $proofOfUsageFile = sprintf(
-            "%s/../src/AppBundle/Tests/Resources/proofOfUsage.txt",
+            "%s/../src/AppBundle/Tests/Resources/Blank.JPG",
             self::$rootDir
         );
         $proofOfUsage = new UploadedFile(
@@ -1951,7 +1951,7 @@ class UserControllerTest extends BaseControllerTest
         );
 
         $proofOfPurchaseFile = sprintf(
-            "%s/../src/AppBundle/Tests/Resources/proofOfPurchase.txt",
+            "%s/../src/AppBundle/Tests/Resources/Blank.JPG",
             self::$rootDir
         );
         $proofOfPurchase = new UploadedFile(
@@ -2063,7 +2063,7 @@ class UserControllerTest extends BaseControllerTest
         $serializer = new Serializer(array(new DateTimeNormalizer()));
 
         $proofOfUsageFile = sprintf(
-            "%s/../src/AppBundle/Tests/Resources/proofOfUsage.txt",
+            "%s/../src/AppBundle/Tests/Resources/Blank.JPG",
             self::$rootDir
         );
         $proofOfUsage = new UploadedFile(
@@ -2074,7 +2074,7 @@ class UserControllerTest extends BaseControllerTest
         );
 
         $proofOfBarringFile = sprintf(
-            "%s/../src/AppBundle/Tests/Resources/proofOfBarring.txt",
+            "%s/../src/AppBundle/Tests/Resources/Blank.JPG",
             self::$rootDir
         );
         $proofOfBarring = new UploadedFile(
@@ -2085,7 +2085,7 @@ class UserControllerTest extends BaseControllerTest
         );
 
         $proofOfPurchaseFile = sprintf(
-            "%s/../src/AppBundle/Tests/Resources/proofOfPurchase.txt",
+            "%s/../src/AppBundle/Tests/Resources/Blank.JPG",
             self::$rootDir
         );
         $proofOfPurchase = new UploadedFile(
