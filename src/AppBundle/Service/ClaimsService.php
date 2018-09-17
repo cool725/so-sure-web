@@ -462,7 +462,7 @@ class ClaimsService
     public function notifyFnolSubmission(Claim $claim)
     {
         $this->mailer->sendTemplate(
-            'Your claim with so-sure',
+            'ATTENTION: You have an unfinished claim with so-sure',
             $claim->getPolicy()->getUser()->getEmail(),
             'AppBundle:Email:claim/fnolInitialResponse.html.twig',
             ['data' => $claim],
