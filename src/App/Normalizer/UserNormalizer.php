@@ -2,10 +2,10 @@
 namespace App\Normalizer;
 
 use App\Oauth2Scopes;
-use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Policy;
 use AppBundle\Document\User;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\SerializerAwareInterface;
 use Symfony\Component\Serializer\SerializerAwareTrait;
@@ -13,6 +13,14 @@ use Symfony\Component\Serializer\SerializerAwareTrait;
 class UserNormalizer implements NormalizerInterface, SerializerAwareInterface
 {
     use SerializerAwareTrait;
+
+    /** @var UrlGeneratorInterface */
+    private $router;
+
+    public function __construct(UrlGeneratorInterface $router)
+    {
+        $this->router = $router;
+    }
 
     /**
      * @codingStandardsIgnoreStart(Generic.CodeAnalysis.UnusedFunctionParameter)
@@ -52,6 +60,7 @@ class UserNormalizer implements NormalizerInterface, SerializerAwareInterface
             // @codingStandardsIgnoreStart
             $text = "Expires on {$expiresDate}. You currently have {$connections} connections & your reward pot is worth £{$pot}";
             // @codingStandardsIgnoreEnd
+            $userHomepage = $this->router->generate('user_home', [], UrlGeneratorInterface::ABSOLUTE_URL);
 
             return [
                 'widgets' => [
@@ -59,7 +68,7 @@ class UserNormalizer implements NormalizerInterface, SerializerAwareInterface
                         'type' => 'TEXT',
                         "title" => "So-Sure Policy {$policyNumber} for your {$phone}",
                         'text' => $text,
-                        #'launchUrl' => 'https://yourapi.com/specific/path',
+                        'launchUrl' => $userHomepage,
                     ]
                 ],
                 #'name' => $object->getName(),

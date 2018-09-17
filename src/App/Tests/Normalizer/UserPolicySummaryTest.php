@@ -2,6 +2,7 @@
 namespace App\Tests\Normalizer;
 
 use App\Normalizer\UserPolicySummary;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Tests\Traits;
 use AppBundle\Document\Policy;
 use AppBundle\Tests\Controller\BaseControllerTest;
@@ -34,16 +35,22 @@ class UserPolicySummaryTest extends BaseControllerTest
 
         $actualJson = json_encode($summaryWidget);
         // @codingStandardsIgnoreStart
+
+        // the URL changes between local dev, build, etc. so build it & json-escape the string
+        $router = self::$container->get('router');
+        $userPageUrl = $router->generate('user_home', [], UrlGeneratorInterface::ABSOLUTE_URL);
+        $userPageUrl = str_replace('/', '\/', $userPageUrl);
+
         $expectedJson = <<<JSON
 {
     "widgets": [{
         "type": "TEXT",
         "title": "So-Sure Policy {$policy->getPolicyNumber()} for your {$out->activePhone}",
-        "text": "Expires on {$expiresDate}. You currently have {$connectionsCount} connections & your reward pot is worth {$pot}"
+        "text": "Expires on {$expiresDate}. You currently have {$connectionsCount} connections & your reward pot is worth {$pot}",
+        "launchUrl": "{$userPageUrl}"
     }]
 }
 JSON;
-        #Optional link in the JSON:         "launchUrl": "https://yourapi.com/specific/path"
         // @codingStandardsIgnoreEnd
 
         $this->assertNotNull($actualJson);
@@ -117,6 +124,6 @@ JSON;
         $this->assertSame('TEXT', $widget['type']);
         $this->assertArrayHasKey('title', $widget);
         $this->assertArrayHasKey('text', $widget);
-        #$this->assertArrayHasKey('launchUrl', $widget);
+        $this->assertArrayHasKey('launchUrl', $widget);
     }
 }
