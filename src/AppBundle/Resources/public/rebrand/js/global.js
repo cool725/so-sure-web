@@ -26,6 +26,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
+// Require BS component(s)
+require('bootstrap/js/dist/alert');
+
 // Require components
 require('./common/track.js');
 require('./common/fbLogin.js');
