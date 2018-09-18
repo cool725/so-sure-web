@@ -397,6 +397,11 @@ class FOSUBUserProvider extends BaseClass
                 continue;
             }
 
+            // don't delete so-sure accounts
+            if ($duplicate->hasSoSureEmail()) {
+                continue;
+            }
+
             // One duplicate may match multiple items
             if ($duplicate->getMobileNumber() == $mobile) {
                 $duplicate->setMobileNumber(null);
