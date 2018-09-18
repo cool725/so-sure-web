@@ -269,6 +269,41 @@ class DirectGroupService extends SftpService
             }
         }
 
+        // Check for any claims in db that are closed that appear after an open claim
+        foreach ($directGroupClaims as $directGroupClaim) {
+            $repo = $this->dm->getRepository(Policy::class);
+            $policy = $repo->findOneBy(['policyNumber' => $directGroupClaim->getPolicyNumber()]);
+            if ($policy) {
+                foreach ($policy->getClaims() as $claim) {
+                    /** @var Claim $claim */
+                    // 2 options - either db claim is closed or davies claim is closed
+                    $logError = false;
+                    if (!$claim->isOpen() &&
+                        isset($openClaims[$directGroupClaim->getPolicyNumber()]) &&
+                        $claim->getLossDate() > $openClaims[$directGroupClaim->getPolicyNumber()] &&
+                        $claim->getNumber() != $directGroupClaim->claimNumber) {
+                        $logError = true;
+                    } elseif (!$directGroupClaim->isOpen() &&
+                        $directGroupClaim->lossDate > $claim->getLossDate() &&
+                        $claim->getNumber() != $directGroupClaim->claimNumber) {
+                        $logError = true;
+                    }
+
+                    if ($logError) {
+                        // @codingStandardsIgnoreStart
+                        $msg = sprintf(
+                            'There is open claim against policy %s that is older then the closed claim of %s and needs to be closed. Unable to determine imei',
+                            $policy->getPolicyNumber(),
+                            $claim->getNumber()
+                        );
+                        // @codingStandardsIgnoreEnd
+                        $this->errors[$claim->getNumber()][] = $msg;
+                        $multiple[] = $policy->getPolicyNumber();
+                    }
+                }
+            }
+        }
+
         foreach ($directGroupClaims as $directGroupClaim) {
             try {
                 $skipImeiUpdate = in_array($directGroupClaim->getPolicyNumber(), $multiple);

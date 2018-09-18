@@ -545,6 +545,46 @@ class DaviesServiceTest extends WebTestCase
         $this->insureErrorExists('/older then the closed claim/');
     }
 
+    public function testSaveClaimsOpenClosedDb()
+    {
+        $policy1 = static::createUserPolicy(true);
+        $policy1->getUser()->setEmail(static::generateEmail('testSaveClaimsOpenClosedDb-1', $this));
+        $claim1 = new Claim();
+        $claim1->setHandlingTeam(Claim::TEAM_DAVIES);
+        $policy1->addClaim($claim1);
+        $claim1->setNumber(rand(1, 999999));
+        $claim1->setType(Claim::TYPE_THEFT);
+
+        static::$dm->persist($policy1->getUser());
+        static::$dm->persist($policy1);
+        static::$dm->persist($claim1);
+        static::$dm->flush();
+
+        $daviesOpen = new DaviesHandlerClaim();
+        $daviesOpen->policyNumber = $policy1->getPolicyNumber();
+        $daviesOpen->claimNumber = $claim1->getNumber();
+        $daviesOpen->status = 'Open';
+        $daviesOpen->lossDate = new \DateTime('2017-01-01');
+
+        $this->assertEquals(0, count(self::$daviesService->getErrors()));
+        self::$daviesService->saveClaims(1, [$daviesOpen]);
+
+        $daviesClosed = new DaviesHandlerClaim();
+        $daviesClosed->policyNumber = $daviesOpen->getPolicyNumber();
+        $daviesClosed->claimNumber = 'a';
+        $daviesClosed->status = 'Closed';
+        $daviesClosed->lossDate = new \DateTime('2017-02-01');
+
+        self::$daviesService->clearErrors();
+
+        $this->assertEquals(0, count(self::$daviesService->getErrors()));
+        self::$daviesService->saveClaims(1, [$daviesClosed]);
+        // also missing claim number
+        $this->assertEquals(2, count(self::$daviesService->getErrors()));
+
+        $this->insureErrorExists('/older then the closed claim/');
+    }
+
     public function testSaveClaimsClosedOpen()
     {
         $daviesOpen = new DaviesHandlerClaim();
