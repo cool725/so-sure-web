@@ -272,6 +272,7 @@ class DirectGroupService extends SftpService
         // Check for any claims in db that are closed that appear after an open claim
         foreach ($directGroupClaims as $directGroupClaim) {
             $repo = $this->dm->getRepository(Policy::class);
+            /** @var Policy $policy */
             $policy = $repo->findOneBy(['policyNumber' => $directGroupClaim->getPolicyNumber()]);
             if ($policy) {
                 foreach ($policy->getClaims() as $claim) {

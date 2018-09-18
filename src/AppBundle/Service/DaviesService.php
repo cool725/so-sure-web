@@ -187,6 +187,7 @@ class DaviesService extends S3EmailService
         // Check for any claims in db that are closed that appear after an open claim
         foreach ($daviesClaims as $daviesClaim) {
             $repo = $this->dm->getRepository(Policy::class);
+            /** @var Policy $policy */
             $policy = $repo->findOneBy(['policyNumber' => $daviesClaim->getPolicyNumber()]);
             if ($policy) {
                 foreach ($policy->getClaims() as $claim) {
