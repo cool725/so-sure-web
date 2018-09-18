@@ -531,11 +531,15 @@ class MonitorService
         }
 
         if (count($tooOldSubmittedClaims) > 0) {
-            throw new MonitorException("At least one Claim is still Submitted after 2 business days");
+            $sampleClaim = current($tooOldSubmittedClaims);
+            $claimId = $sampleClaim->getId();
+            throw new MonitorException(
+                "At least one Claim (eg: {$claimId}) is still marked as 'Submitted' after 2 business days"
+            );
         }
     }
 
-    private function findOldSubmittedClaims($businessDaysOld = 2)
+    private function findOldSubmittedClaims(int $businessDaysOld = 2): array
     {
         /** @var ClaimRepository $claimRepository */
         $claimRepository = $this->dm->getRepository(Claim::class);

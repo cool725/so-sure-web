@@ -5,6 +5,7 @@ namespace AppBundle\Tests\Service;
 use AppBundle\Document\DateTrait;
 use AppBundle\Exception\MonitorException;
 use AppBundle\Service\MonitorService;
+use Exception;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\Claim;
 
@@ -32,7 +33,7 @@ class MonitorServiceTest extends WebTestCase
          //now we can instantiate our service (if you want a fresh one for
          //each test method, do this in setUp() instead
          self::$dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
-        /** @var MonitorService monitor */
+        /** @var MonitorService $monitor */
          self::$monitor = self::$container->get('app.monitor');
     }
 
@@ -59,25 +60,18 @@ class MonitorServiceTest extends WebTestCase
         $this->assertTrue(true);
     }
 
-    /**
-     * @expectedException \Exception
-     */
     public function testMissingName()
     {
-        $this->assertFalse(self::$monitor->run('foo'));
+        $this->expectException(Exception::class);
+        self::$monitor->run('foo');
     }
 
-    /**
-     * @expectedException \Exception
-     */
     public function testMissingPartialName()
     {
-        $this->assertFalse(self::$monitor->run('claimsSettledUnprocessedFoo'));
+        $this->expectException(Exception::class);
+        self::$monitor->run('claimsSettledUnprocessedFoo');
     }
 
-    /**
-     * @expectedException \Exception
-     */
     public function testClaimsSettledUnprocessedFalse()
     {
         $claim = new Claim();
@@ -87,12 +81,11 @@ class MonitorServiceTest extends WebTestCase
         self::$dm->persist($claim);
         self::$dm->flush();
 
+        $this->expectException(MonitorException::class);
+
         self::$monitor->claimsSettledUnprocessed();
     }
 
-    /**
-     * @expectedException \Exception
-     */
     public function testClaimsSettledUnprocessedNull()
     {
         $claim = new Claim();
@@ -101,9 +94,10 @@ class MonitorServiceTest extends WebTestCase
         self::$dm->persist($claim);
         self::$dm->flush();
 
+        $this->expectException(MonitorException::class);
+
         self::$monitor->claimsSettledUnprocessed();
     }
-
 
     public function testExpectedFailOldSubmittedClaimsUnit()
     {
@@ -144,9 +138,13 @@ class MonitorServiceTest extends WebTestCase
         $this->assertSame($claim->getStatusLastUpdated(), $daysAgo);
 
         $this->expectException(MonitorException::class);
+        $this->expectExceptionMessage('At least one Claim (eg: ');
+        $this->expectExceptionMessage(") is still marked as 'Submitted' after 2 business days");
+
         self::$monitor->outstandingSubmittedClaims();
 
         // try to clean up, and remove the record
         self::$dm->remove($claim);
+        self::$dm->flush();
     }
 }
