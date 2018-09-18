@@ -59,8 +59,8 @@ class UserNormalizer implements NormalizerInterface, SerializerAwareInterface
                     'widgets' => [
                         [
                             'type' => 'TEXT',
-                            "title" => "So-Sure insurance policy",
-                            'text' => "You don't have a So-Sure Policy",
+                            "title" => "SO-SURE insurance policy",
+                            'text' => "You don't have a SO-SURE Policy",
                             'launchUrl' => $userHomepage,
                         ]
                     ],
@@ -81,7 +81,7 @@ class UserNormalizer implements NormalizerInterface, SerializerAwareInterface
                 'widgets' => [
                     [
                         'type' => 'TEXT',
-                        "title" => "So-Sure Policy {$policyNumber} for your {$phone}",
+                        "title" => "SO-SURE Policy {$policyNumber} for your {$phone}",
                         'text' => $text,
                         'launchUrl' => $userHomepage,
                     ]
