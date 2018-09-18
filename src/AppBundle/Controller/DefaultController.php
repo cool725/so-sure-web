@@ -589,7 +589,7 @@ class DefaultController extends BaseController
 
     /**
      * @Route("/claim", name="claim")
-     * @Template
+     * @Route("/claim/login", name="claim_login")
      */
     public function claimAction(Request $request)
     {
@@ -616,69 +616,30 @@ class DefaultController extends BaseController
                     if ($user) {
                         /** @var ClaimsService $claimsService */
                         $claimsService = $this->get('app.claims');
-                        $claimsService->sendUniqueLoginLink($user, false);
+                        $claimsService->sendUniqueLoginLink($user, $request->get('_route') == 'claim_login');
                     }
+
                     // @codingStandardsIgnoreStart
-                    $this->addFlash(
-                        'success',
-                        "Thank you. For our policy holders, an email with further instructions on how to proceed with your claim has been sent to you. If you do not receive the email shortly, please check your spam folders and also verify that the email address matches your policy."
-                    );
+                    $message = $request->get('_route') == 'claim_login' ? "Thank you. For our policy holders, an email with further instructions on how to proceed with updating your claim has been sent to you. If you do not receive the email shortly, please check your spam folders and also verify that the email address matches your policy." : "Thank you. For our policy holders, an email with further instructions on how to proceed with your claim has been sent to you. If you do not receive the email shortly, please check your spam folders and also verify that the email address matches your policy.";
+
+                    $this->addFlash('success', $message);
                 }
             }
         }
 
-        return [
+        $data = [
             'claim_email_form' => $claimEmailForm->createView(),
         ];
+
+        if ($request->get('_route') == 'claim_login') {
+            return $this->render('AppBundle:Default:claimLogin.html.twig', $data);
+        } else {
+            return $this->render('AppBundle:Default:claim.html.twig', $data);
+        }
     }
 
     /**
-     * @Route("/claim-update", name="claim_update")
-     * @Template
-     */
-    public function claimUpdateAction(Request $request)
-    {
-        /** @var User $user */
-        $user = $this->getUser();
-        // causes admin's (or claims) too much confusion to be redirected to a 404
-        if ($user && !$user->hasEmployeeRole() && !$user->hasClaimsRole()) {
-            return $this->redirectToRoute('user_claim');
-        }
-
-        $claimFnolEmail = new ClaimFnolEmail();
-
-        $claimEmailForm = $this->get('form.factory')
-            ->createNamedBuilder('claim_email_form', ClaimFnolEmailType::class, $claimFnolEmail)
-            ->getForm();
-
-        if ('POST' === $request->getMethod()) {
-            if ($request->request->has('claim_email_form')) {
-                $claimEmailForm->handleRequest($request);
-                if ($claimEmailForm->isValid()) {
-                    $repo = $this->getManager()->getRepository(User::class);
-                    $user = $repo->findOneBy(['emailCanonical' => mb_strtolower($claimFnolEmail->getEmail())]);
-
-                    if ($user) {
-                        /** @var ClaimsService $claimsService */
-                        $claimsService = $this->get('app.claims');
-                        $claimsService->sendUniqueLoginLink($user, true);
-                    }
-                    // @codingStandardsIgnoreStart
-                    $this->addFlash(
-                        'success',
-                        "Thank you. For our policy holders, an email with further instructions on how to proceed with updating your claim has been sent to you. If you do not receive the email shortly, please check your spam folders and also verify that the email address matches your policy."
-                    );
-                }
-            }
-        }
-
-        return [
-            'claim_email_form' => $claimEmailForm->createView(),
-        ];
-    }
-
-    /**
-     * @Route("/claim/login/{tokenId}", name="claim_login")
+     * @Route("/claim/login/{tokenId}", name="claim_login_token")
      * @Template
      */
     public function claimLoginAction(Request $request, $tokenId = null)

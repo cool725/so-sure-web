@@ -26,11 +26,19 @@
         <div class="container">
             <div class="row">
                 <div class="col-md-8 col-md-offset-2">
-                    <h1 class="text-center">Thank you for submitting your claim.</h1>
+                    {% if is_in_review %}
+                        <h1 class="text-center">Currently being reviewed.</h1>
 
-                    <p class="lead text-center">Your claim for <span class="h4">{{ claim.type }}</span> for your <span class="h4">{{ phone }}</span> with IMEI <span class="h4">{{ claim.policy.imei }}</span> has been sent to our claims team for processing. </p>
+                        <p class="lead text-center">Your claim for <span class="h4">{{ claim.type }}</span> for your <span class="h4">{{ phone }}</span> with IMEI <span class="h4">{{ claim.policy.imei }}</span> is being processed by our claims team. </p>
 
-                    <p class="text-center">If we need to get in touch we will contact you with the details you provided...<br><br>Number: <span class="h4">{{ claim.phoneToReach }}</span><br>Time you requested: <span class="h4">{{ claim.timeToReach }}</span>.<br><small>(Incorrect details? <a href="#" class="open-intercom">Contact us</a>)</small></p>
+                        <p class="text-center">If you need to upload more documents please use the form below.</p>
+                    {% else %}
+                        <h1 class="text-center">Thank you for submitting your claim.</h1>
+
+                        <p class="lead text-center">Your claim for <span class="h4">{{ claim.type }}</span> for your <span class="h4">{{ phone }}</span> with IMEI <span class="h4">{{ claim.policy.imei }}</span> has been sent to our claims team for processing. </p>
+
+                        <p class="text-center">If we need to get in touch we will contact you with the details you provided...<br><br>Number: <span class="h4">{{ claim.phoneToReach }}</span><br>Time you requested: <span class="h4">{{ claim.timeToReach }}</span>.<br><small>(Incorrect details? <a href="#" class="open-intercom">Contact us</a>)</small></p>
+                    {% endif %}
 
                     <p class="text-center"><a href="{{ path('user_home') }}" class="btn btn-link btn-lg">Get back to your account</a></p>
 

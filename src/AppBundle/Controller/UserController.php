@@ -1572,7 +1572,7 @@ class UserController extends BaseController
 
         $claim = $policy->getLatestFnolSubmittedInReviewClaim();
 
-        if ($claim === null) {
+        if ($claim === null || in_array($claim->getStatus(), array(Claim::STATUS_SUBMITTED, Claim::STATUS_INREVIEW))) {
             return $this->redirectToRoute('user_claim');
         }
 
@@ -1617,11 +1617,9 @@ class UserController extends BaseController
             'phone' => $claim->getPhonePolicy() ? $claim->getPhonePolicy()->getPhone()->__toString() : 'Unknown',
             'time' => $this->getClaimResponseTime(),
             'claim_form' => $claimUpdateForm->createView(),
+            'is_in_review' => $claim->getStatus() == Claim::STATUS_INREVIEW,
         ];
 
-        if ($claim->getStatus() == Claim::STATUS_INREVIEW) {
-            return $this->render('AppBundle:User:claimInReview.html.twig', $data);
-        }
         return $this->render('AppBundle:User:claimSubmitted.html.twig', $data);
     }
 

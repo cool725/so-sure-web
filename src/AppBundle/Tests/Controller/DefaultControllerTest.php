@@ -401,7 +401,7 @@ class DefaultControllerTest extends BaseControllerTest
             self::$dm
         );
 
-        $claimPage = self::$router->generate('claim_login');
+        $claimPage = self::$router->generate('claim_login_token');
         $this->login($email, $password);
         $crawler = self::$client->request('GET', $claimPage);
         self::verifyResponse(302);
@@ -422,7 +422,7 @@ class DefaultControllerTest extends BaseControllerTest
             self::$dm
         );
 
-        $claimPage = self::$router->generate('claim_login', ['tokenId' => 'foo']);
+        $claimPage = self::$router->generate('claim_login_token', ['tokenId' => 'foo']);
         $crawler = self::$client->request('GET', $claimPage);
         
         self::verifyResponse(302);
@@ -446,7 +446,7 @@ class DefaultControllerTest extends BaseControllerTest
         $token = md5(sprintf('%s%s', time(), $email));
         $redis->setex($token, 900, $user->getId());
 
-        $claimPage = self::$router->generate('claim_login', ['tokenId' => $token]);
+        $claimPage = self::$router->generate('claim_login_token', ['tokenId' => $token]);
         $crawler = self::$client->request('GET', $claimPage);
         self::verifyResponse(302);
         $this->assertTrue(self::$client->getResponse()->isRedirect(sprintf('/user/claim')));

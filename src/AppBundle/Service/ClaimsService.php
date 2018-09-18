@@ -559,7 +559,7 @@ class ClaimsService
             $data = [
                 'username' => $user->getName(),
                 'tokenUrl' => $this->routerService->generateUrl(
-                    'claim_login',
+                    'claim_login_token',
                     ['tokenId' => $token]
                 ),
                 'tokenValid' => self::LOGIN_LINK_TOKEN_EXPIRATION / 3600, // hours
