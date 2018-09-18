@@ -1572,7 +1572,7 @@ class UserController extends BaseController
 
         $claim = $policy->getLatestFnolSubmittedInReviewClaim();
 
-        if ($claim === null || in_array($claim->getStatus(), array(Claim::STATUS_SUBMITTED, Claim::STATUS_INREVIEW))) {
+        if ($claim === null || !in_array($claim->getStatus(), array(Claim::STATUS_SUBMITTED, Claim::STATUS_INREVIEW))) {
             return $this->redirectToRoute('user_claim');
         }
 
