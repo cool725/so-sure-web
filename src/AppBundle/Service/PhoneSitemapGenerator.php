@@ -1,12 +1,12 @@
 <?php
 namespace AppBundle\Service;
 
-use AppBundle\Repository\PhoneRepository;
-use Dpn\XmlSitemapBundle\Sitemap\Entry;
-use Dpn\XmlSitemapBundle\Sitemap\GeneratorInterface;
-use Doctrine\ODM\MongoDB\DocumentManager;
-use Psr\Log\LoggerInterface;
+use App\Sitemap\DecoratedEntry as Entry;
 use AppBundle\Document\Phone;
+use AppBundle\Repository\PhoneRepository;
+use Doctrine\ODM\MongoDB\DocumentManager;
+use Dpn\XmlSitemapBundle\Sitemap\GeneratorInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 
@@ -53,8 +53,8 @@ class PhoneSitemapGenerator implements GeneratorInterface
             if (!in_array($url, $makeModelUrls)) {
                 $makeModelUrls[] = $url;
                 $item = new Entry($url, null, 'weekly', 0.7);
-                $item->description = $phone->getMakeWithAlternative() . ' ' . $phone->getModel();
-                $entries[$item->description] = $item;
+                $item->setDescription($phone->getMakeWithAlternative() . ' ' . $phone->getModel());
+                $entries[$item->getDescription()] = $item;
             }
 
             $url = $this->router->generate('quote_make_model_memory', [
@@ -63,8 +63,8 @@ class PhoneSitemapGenerator implements GeneratorInterface
                 'memory' => $phone->getMemory()
             ], UrlGeneratorInterface::ABSOLUTE_URL);
             $item = new Entry($url, null, 'weekly', 0.7);
-            $item->description = (string) $phone;
-            $entries[$item->description] = $item;
+            $item->setDescription((string) $phone);
+            $entries[$item->getDescription()] = $item;
         }
 
         $makes = [];
@@ -83,7 +83,7 @@ class PhoneSitemapGenerator implements GeneratorInterface
             ], UrlGeneratorInterface::ABSOLUTE_URL);
 
             $item = new Entry($url, null, 'weekly', 0.7);
-            $item->description = $make;
+            $item->setDescription($make);
             $entries[$make] = $item;
         }
 
