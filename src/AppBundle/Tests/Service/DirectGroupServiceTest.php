@@ -535,17 +535,57 @@ class DirectGroupServiceTest extends WebTestCase
         $dgOpen->status = 'Open';
         $dgOpen->lossDate = new \DateTime('2017-01-01');
 
-        $daviesClosed = new DirectGroupHandlerClaim();
-        $daviesClosed->policyNumber = $dgOpen->getPolicyNumber();
-        $daviesClosed->claimNumber = 'a';
-        $daviesClosed->status = 'Closed';
-        $daviesClosed->lossDate = new \DateTime('2017-02-01');
+        $dgClosed = new DirectGroupHandlerClaim();
+        $dgClosed->policyNumber = $dgOpen->getPolicyNumber();
+        $dgClosed->claimNumber = 'a';
+        $dgClosed->status = 'Closed';
+        $dgClosed->lossDate = new \DateTime('2017-02-01');
 
         self::$directGroupService->clearErrors();
 
         $this->assertEquals(0, count(self::$directGroupService->getErrors()));
-        self::$directGroupService->saveClaims(1, [$dgOpen, $daviesClosed]);
+        self::$directGroupService->saveClaims(1, [$dgOpen, $dgClosed]);
         $this->assertEquals(1, count(self::$directGroupService->getErrors()));
+
+        $this->insureErrorExists('/older then the closed claim/');
+    }
+
+    public function testSaveClaimsOpenClosedDb()
+    {
+        $policy1 = static::createUserPolicy(true);
+        $policy1->getUser()->setEmail(static::generateEmail('testSaveClaimsOpenClosedDb-1', $this));
+        $claim1 = new Claim();
+        $claim1->setHandlingTeam(Claim::TEAM_DIRECT_GROUP);
+        $policy1->addClaim($claim1);
+        $claim1->setNumber(rand(1, 999999));
+        $claim1->setType(Claim::TYPE_THEFT);
+
+        static::$dm->persist($policy1->getUser());
+        static::$dm->persist($policy1);
+        static::$dm->persist($claim1);
+        static::$dm->flush();
+
+        $dgOpen = new DirectGroupHandlerClaim();
+        $dgOpen->policyNumber = $policy1->getPolicyNumber();
+        $dgOpen->claimNumber = $claim1->getNumber();
+        $dgOpen->status = 'Open';
+        $dgOpen->lossDate = new \DateTime('2017-01-01');
+
+        $this->assertEquals(0, count(self::$directGroupService->getErrors()));
+        self::$directGroupService->saveClaims(1, [$dgOpen]);
+
+        $dgClosed = new DirectGroupHandlerClaim();
+        $dgClosed->policyNumber = $dgOpen->getPolicyNumber();
+        $dgClosed->claimNumber = 'a';
+        $dgClosed->status = 'Closed';
+        $dgClosed->lossDate = new \DateTime('2017-02-01');
+
+        self::$directGroupService->clearErrors();
+
+        $this->assertEquals(0, count(self::$directGroupService->getErrors()));
+        self::$directGroupService->saveClaims(1, [$dgClosed]);
+        // also missing claim number
+        $this->assertEquals(2, count(self::$directGroupService->getErrors()));
 
         $this->insureErrorExists('/older then the closed claim/');
     }
@@ -558,16 +598,16 @@ class DirectGroupServiceTest extends WebTestCase
         $dgOpen->status = 'Open';
         $dgOpen->lossDate = new \DateTime('2017-02-01');
 
-        $daviesClosed = new DirectGroupHandlerClaim();
-        $daviesClosed->policyNumber = $dgOpen->getPolicyNumber();
-        $daviesClosed->claimNumber = 'a';
-        $daviesClosed->status = 'Closed';
-        $daviesClosed->lossDate = new \DateTime('2017-01-01');
+        $dgClosed = new DirectGroupHandlerClaim();
+        $dgClosed->policyNumber = $dgOpen->getPolicyNumber();
+        $dgClosed->claimNumber = 'a';
+        $dgClosed->status = 'Closed';
+        $dgClosed->lossDate = new \DateTime('2017-01-01');
 
         self::$directGroupService->clearErrors();
 
         $this->assertEquals(0, count(self::$directGroupService->getErrors()));
-        self::$directGroupService->saveClaims(1, [$dgOpen, $daviesClosed]);
+        self::$directGroupService->saveClaims(1, [$dgOpen, $dgClosed]);
         $this->assertEquals(1, count(self::$directGroupService->getErrors()));
         $this->insureErrorDoesNotExist('/older then the closed claim/');
         $this->insureErrorExists('/Unable to locate claim/');

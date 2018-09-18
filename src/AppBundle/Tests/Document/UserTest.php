@@ -270,6 +270,10 @@ class UserTest extends \PHPUnit\Framework\TestCase
         $user2 = new User();
         $user2->setEmailCanonical('foo@notsosure.com');
         $this->assertFalse($user2->hasSoSureEmail());
+
+        $user3 = new User();
+        $user3->setEmailCanonical('foo@so-sure.net');
+        $this->assertTrue($user3->hasSoSureEmail());
     }
 
     public function testImageUrlFacebook()
