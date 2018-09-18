@@ -70,7 +70,7 @@
             <div class="col-md-6">
                 <h4>Scheduled Policy Cancellation</h4>
                 <p>For User Requested Cancellation (given after 14 days of policy start date)</p>
-                {{ form_start(pending_cancel_form, {'attr': {'class': 'form-inline'}}) }}
+                {{ form_start(pending_cancel_form, {'attr': {'class': 'form-inline', 'autocomplete': 'off'}}) }}
                 <div class="form-group">
                     {{ form_label(pending_cancel_form.pendingCancellation, 'Policy Termination Date') }}
                     {{ form_errors(pending_cancel_form.pendingCancellation) }}
