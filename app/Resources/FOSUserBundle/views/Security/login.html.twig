@@ -45,6 +45,22 @@
                         </div>
                     </form>
                     <div class="login__divider"><span class="h6 text-grey">or login via</span></div>
+                    <ul class="list-inline text-center">
+                        <li class="list-inline-item">
+                            <a href="#" class="btn btn-primary btn-square btn-shadow"><i class="fas fa-envelope fa-lg"></i> Email</a>
+                        </li>
+                        <li class="list-inline-item">
+                            <a href="#" class="btn btn-facebook btn-square"><i class="fab fa-facebook fa-lg"></i> Facebook</a>
+                        </li>
+                        <li class="list-inline-item">
+                            <a href="#" class="btn btn-google btn-square"><i class="fab fa-google fa-lg"></i> Google</a>
+                        </li>
+                        {% if feature_enabled('starling') %}
+                            <li>
+                                <a href="#">Starling</a>
+                            </li>
+                        {% endif %}
+                    </ul>
                 </div>
 
                 {# Email #}
