@@ -36,6 +36,9 @@ class PhoneSitemapGenerator implements GeneratorInterface
         $this->router = $router;
     }
 
+    /**
+     * A tad slow, and memory hungry when looping the DB, but we could cache the final $entries if it gets too annoying
+     */
     public function generate()
     {
         $entries = array();
@@ -43,19 +46,16 @@ class PhoneSitemapGenerator implements GeneratorInterface
         /** @var PhoneRepository $repo */
         $repo = $this->dm->getRepository(Phone::class);
         $phones = $repo->findActive()->getQuery()->execute();
-        $makeModelUrls = [];
         foreach ($phones as $phone) {
             /** @var Phone $phone */
             $url = $this->router->generate('quote_make_model', [
                 'make' => $phone->getMakeCanonical(),
                 'model' => $phone->getEncodedModelCanonical()
             ], UrlGeneratorInterface::ABSOLUTE_URL);
-            if (!in_array($url, $makeModelUrls)) {
-                $makeModelUrls[] = $url;
-                $item = new Entry($url, null, 'weekly', 0.7);
-                $item->setDescription($phone->getMakeWithAlternative() . ' ' . $phone->getModel());
-                $entries[$item->getDescription()] = $item;
-            }
+
+            $item = new Entry($url, null, 'weekly', 0.7);
+            $item->setDescription($phone->getMakeWithAlternative() . ' ' . $phone->getModel());
+            $entries[$item->getDescription()] = $item;
 
             $url = $this->router->generate('quote_make_model_memory', [
                 'make' => $phone->getMakeCanonical(),
@@ -72,9 +72,8 @@ class PhoneSitemapGenerator implements GeneratorInterface
             ['active' => true, 'highlight' => true]
         );
         foreach ($phones as $phone) {
-            if (!in_array($phone->getMake(), $makes)) {
-                $makes[$phone->getMake()] = $phone->getMake();
-            }
+            $phoneMake = $phone->getMake();
+            $makes[$phoneMake] = $phoneMake;
         }
 
         foreach ($makes as $make) {
