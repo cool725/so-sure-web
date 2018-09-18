@@ -76,6 +76,11 @@
 
 .navbar-light {
     background-color: transparent;
+
+    @include media-breakpoint-up(lg) {
+        box-shadow: none;
+    }
+
     &.navbar-scrolled {
         @include linear-gradient(135deg, $blue-3, $blue-1a);
     }
