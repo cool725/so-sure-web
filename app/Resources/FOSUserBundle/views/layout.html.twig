@@ -22,8 +22,11 @@
             {# </div> #}
         {# </div> #}
     {# </section> #}
-    <div class="login">
+    <div class="login  p-3 d-flex align-items-center">
         <div class="login__inner">
+
+            {% block fos_user_content %}
+            {% endblock fos_user_content %}
 
         </div>
     </div>

@@ -1,130 +1,57 @@
 {% extends "FOSUserBundle::layout.html.twig" %}
 
 {% block fos_user_content %}
-    <div class="panel login__panel">
-        <div class="panel-body">
-            {% if app.user is not null and app.user %}
-                <h3 class="h-light">You're logged in as:</h3>
-                <h1 class="text-center h2">{{ app.user.name }}</h1>
-                <p>
-                    {% if is_granted('ROLE_ADMIN') %}
-                        <a href="{{ path('admin_home') }}" class="btn btn-blue-hollow"><i class="fa fa-home"></i> Admin</a>
-                    {% elseif is_granted('ROLE_EMPLOYEE') %}
-                        <a href="{{ path('admin_home') }}" class="btn btn-blue-hollow"><i class="fa fa-home"></i> Admin</a>
-                    {% elseif is_granted('ROLE_CLAIMS') %}
-                        <a href="{{ path('claims_home') }}" class="btn btn-blue-hollow"><i class="fa fa-home"></i> Claims</a>
-                    {% else %}
-                        <a href="{{ path('user_home') }}">Your Account</a>
-                    {% endif %}
-                </p>
-                <p><a href="{{ path('fos_user_security_logout') }}" class="btn btn-link">Logout</a></p>
-            {% else %}
-                <h1 class="text-center h2">Welcome back!</h1>
-                {# Email Login #}
-                <div class="login-email"
-                     style="{% if default_login_method == 'accountkit' %}display: none;{% endif %}">
-                    <form class="" action="{{ path("fos_user_security_check") }}#email" method="post" autocomplete="off">
-                        <input type="hidden" name="_csrf_token" value="{{ csrf_token }}"/>
-                        <div class="form-group">
-                            <input type="email" id="username" name="_username" value="{{ last_username }}" required="required" placeholder="Email Address" class="form-control input-lg" />
-                        </div>
-                        <div class="form-group">
-                            <input type="password" id="password" name="_password" required="required" placeholder="Password" class="form-control input-lg" />
-                        </div>
-                        {% if error %}
-                            <div class="error-text" style="padding-bottom: 10px;">
-                                {% if app.request.clientIp == davies_ip or app.request.clientIp in sosure_ips %}
-                                    Looks like the email address or password you’ve entered is incorrect, or <strong>your password has expired</strong>. Please try again. You may want to <a href="{{ path('fos_user_resetting_request') }}">reset your password</a>.
-                                {% else %}
-                                    Looks like the email address or password you’ve entered is incorrect. Please try again. You may want to <a href="{{ path('fos_user_resetting_request') }}">reset your password</a>.
-                                {% endif %}
-                            </div>
-                        {% endif %}
-                        <div class="row">
-                            <div class="col-xs-6">
-                                <div class="form-group text-left">
-                                    <label for="remember_me">
-                                        <input type="checkbox" id="remember_me" name="_remember_me" value="on" {% if app.request.clientIp == davies_ip %}checked{% endif %} />
-                                        Remember me
-                                    </label>
-                                </div>
-                            </div>
-                            <div class="col-xs-6">
-                                <div class="form-group text-right">
-                                    <small><a class="btn btn-link btn-xs" href="{{ path('fos_user_resetting_request') }}">Forgot password?</a></small>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <input type="submit" id="_submit" name="_submit" value="Login" class="btn btn-green btn-pad btn-block"/>
-                        </div>
-                    </form>
-                </div>
+
+    {% if app.user is not null and app.user %}
+
+        <div class="login__card">
+            Card
+        </div>
+
+    {% else %}
+
+        <h4 class="text-blue1 text-center mb-1">Login to your account</h4>
+        <h1 class="text-white text-center mb-4">Welcome Back!</h1>
+
+        <div class="login__card">
+            <div class="login__card__body">
 
                 {# Account Kit #}
-                <div id="login-account-kit"
-                     class="login-account-kit"
-                     style="{% if default_login_method == 'email' %}display: none;{% endif %}"
-                     data-key="{{ fb_appid }}"
-                     data-csrf="{{ csrf_token('account-kit') }}"
-                     data-toggle="{% if app.request.clientIp == davies_ip %}1{% else %}0{% endif %}">
+                <div class="login__account-kit">
                     <form method="get" action="https://www.accountkit.com/v1.0/basic/dialog/sms_login/" autocomplete="off">
-                    <div class="form-group">
                         <input type="hidden" value="+44" id="country_code" class="form-control" />
                         <input type="hidden" name="app_id" value="{{ fb_appid }}">
                         <input type="hidden" name="redirect" value="{{ app.request.schemeAndHttpHost }}/login/check-accountkit">
                         <input type="hidden" name="state" value="{{ accountkit_state() }}">
                         <input type="hidden" name="fbAppEventsEnabled" value=true>
                         <input type="hidden" name="debug" value=false>
-                    </div>
-                    <div class="form-group">
-                        <input placeholder="Mobile Number - UK numbers only!" id="phone_number" name="phone_number" class="form-control input-lg" type="tel" />
-                    </div>
-                    {% if error %}
-                        <div class="error-text" style="padding-bottom: 10px;">Sorry, we were unable to log you in. You can try again, or <a href="mailto:support@wearesosure.com" class="open-intercom">contact us</a> for help.</div>
-                    {% endif %}
-                    <div class="form-group">
-                       <button class="btn btn-green btn-pad btn-block">
-                            <span id="btn-spinner" style="display:none;"><i class="fa fa-refresh fa-spin"></i></span>
-                            Login via SMS
-                        </button>
-                    </div>
-                    </form>
-                    <div id="sms-login__warning" class="form-group" style="display:none;">
-                        <div class="help-block">
-                            <small>There may be a small delay whilst we open a new window.<br><br></small>
+                        <div class="form-group">
+                            <label for="phone_number">Mobile Number</label>
+                            {# TODO: Add validation for uk number as to match placeholder #}
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text"><i class="fal fa-mobile-android fa-lg"></i></div>
+                                </div>
+                                <input placeholder="Enter Mobile Number" id="phone_number" name="phone_number" class="form-control" type="tel" />
+                            </div>
+                            {% if error %}
+                                <label class="error mt-1">Sorry, we were unable to log you in. You can try again, or <a href="mailto:support@wearesosure.com" class="open-intercom">contact us</a> for help.</label>
+                            {% endif %}
                         </div>
-                    </div>
-                </div>
-                <a href="#" id="swap-login" class="btn btn-link btn-xs">Prefer to login via <span>{% if default_login_method == 'accountkit' %}email{% else %}SMS{% endif %}</span>?</a>
-
-                <div class="text-break text-grey">
-                    <div class="line"></div>OR<div class="line"></div>
-                </div>
-
-                {# Social Logins #}
-                <div class="form-group">
-                    <a href="#" class="btn btn-facebook btn-facebook-login"><i class="fa fa-facebook-official fa-lg"></i> &nbsp;Continue with Facebook</a>
+                        <div class="form-group">
+                            <button class="btn btn-block btn-icon btn-grey arrow-right" disabled>
+                                Login via SMS
+                            </button>
+                        </div>
+                    </form>
+                    <div class="login__divider"><span class="h6 text-grey">or login via</span></div>
                 </div>
 
-                <div class="form-group">
-                    <a href="{{ path('hwi_oauth_service_redirect', {'service': 'google' }) }}" class="btn-google-login">
-                        <span class="sr-only">Sign in with Google</span>
-                    </a>
-                </div>
+                {# Email #}
 
-                {% if feature_enabled('starling') %}
-                <div class="form-group">
-                    <a class="btn btn-block btn-starling" href="{{ path('hwi_oauth_service_redirect', {'service': 'starling'}) }}"><img src="{{ cdn_url }}/images/StarlingMarkIcon.png" height="20px"> &nbsp;Login with Starling</a>
-                </div>
-                {% endif %}
-
-            {% endif %}
+            </div>
         </div>
-    </div>
 
-    <form id="accountkit-form" method="post" action="{{ path('accountkit_login') }}">
-        <input type="hidden" id="accountkit-code" name="code">
-        <input type="hidden" id="accountkit-csrf" name="csrf">
-    </form>
+    {% endif %}
+
 {% endblock fos_user_content %}
