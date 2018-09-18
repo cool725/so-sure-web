@@ -79,6 +79,13 @@ class LoadOauth2Data implements FixtureInterface, ContainerAwareInterface
         }
         $this->newOauth2AccessToken($manager, $client, $user, 'test-with-api-alister');
 
+        /** @var User $user */
+        $user = $userManager->findUserByEmail('julien+apple@so-sure.com');
+        if (!$user) {
+            throw new \RuntimeException('expected to have a valid user to attach to OauthAccessToken');
+        }
+        $this->newOauth2AccessToken($manager, $client, $user, 'test-with-api-julien');
+
         $manager->flush();
     }
 }
