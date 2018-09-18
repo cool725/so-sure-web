@@ -38,7 +38,9 @@
         position: relative;
         padding-left: 30px;
 
-        > .far {
+        > .far,
+        > .fal,
+        > .fas {
             position: absolute;
             left: 0; top: 5px;
         }
