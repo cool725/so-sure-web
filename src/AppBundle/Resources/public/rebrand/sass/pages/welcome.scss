@@ -27,10 +27,6 @@ body {
         }
     }
 
-    &__curve {
-        transform: translateY(-1px);
-    }
-
     &__sub__container {
         margin-top: 3.4rem;
 
@@ -50,76 +46,4 @@ body {
         }
     }
 }
-
-// .welcome {
-//     position: relative;
-
-//     &__details__container {
-
-//         @include media-breakpoint-up(lg) {
-//             width: 60vw; height: 100vh;
-//             overflow-y: scroll;
-
-//             // IE
-//             -ms-overflow-style: none;
-//         }
-//     }
-
-//     &__details {
-//         padding-top: 2rem;
-
-//         @include media-breakpoint-up(lg) {
-//             padding-top: 8rem;
-//         }
-//     }
-
-
-//     &__cover__container {
-//         position: relative;
-//         z-index: 4;
-//         background-color: $white;
-//         margin-top: 3.4rem;
-
-//         @include media-breakpoint-up(lg) {
-//             width: 35vw; height: 100vh;
-//             overflow-y: scroll;
-//             margin-top: 0;
-
-//             // IE
-//             -ms-overflow-style: none;
-//         }
-//     }
-
-//     &__cover {
-//         max-width: 400px;
-//         margin: 0 auto;
-//         text-align: center;
-//         padding-top: 2em;
-
-//         @include media-breakpoint-up(lg) {
-//             padding-top: 8rem;
-//         }
-//     }
-
-//     &__curve {
-//         svg {
-//             // Fix for 1px gap
-//             transform: translateY(-1px);
-//             z-index: 2;
-//         }
-
-//         @include media-breakpoint-up(lg) {
-//             width: 5vw; height: 100vh;
-//             position: relative;
-
-//             svg {
-//                 height: 100vh;
-//                 position: absolute;
-//                 right: 0; top: 0;
-//                 transform: translateY(0);
-//                 transform: translateX(1px);
-//             }
-//         }
-//     }
-// }
 
