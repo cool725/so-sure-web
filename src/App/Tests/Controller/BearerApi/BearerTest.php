@@ -2,18 +2,20 @@
 namespace App\Tests\Controller\BearerApi;
 
 use App\Oauth2Scopes;
-use AppBundle\Tests\Controller\BaseControllerTest;
 use App\Tests\Traits;
+use AppBundle\Document\Policy;
+use AppBundle\Document\User;
+use AppBundle\Tests\Controller\BaseControllerTest;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Test when a user tries to go to a protected URL, not logged in, bad-token, or when logged in
+ * Test when there is an API call to go a protected URL - no-token, bad-token, or happy-path success
  *
  * @group functional-nonet
  */
 class BearerTest extends BaseControllerTest
 {
-    use Traits\UserCreation;
+    use \AppBundle\Tests\UserClassTrait;
     use Traits\Oauth;
 
     public function setUp()
@@ -97,9 +99,64 @@ class BearerTest extends BaseControllerTest
 
         $content = self::$client->getResponse()->getContent();
 
-        $this->assertContains('Foo Bar', $content);
+        $this->assertContains('","text":"Expires on ', $content);
 
         $summary = json_decode($content, true);
-        $this->assertSummaryMatchesUserWithTwoPolicies($summary, $rewardPotValue);
+        $this->assertSummaryMatchesUserWithTwoPolicies($summary);
+    }
+
+    /**
+     * Make a user, with a policy
+     *
+     * @see \AppBundle\Tests\Controller\UserControllerTest::testUserInvite();
+     */
+    public function generateUserWithTwoPolicies(float $rewardPotValue = 0): User
+    {
+        $email = self::generateEmail('testUser'.random_int(PHP_INT_MIN, PHP_INT_MAX), $this);
+        $password = 'foo';
+        $phone = self::getRandomPhone(self::$dm);
+
+        $user = self::createUser(
+            self::$userManager,
+            $email,
+            $password,
+            $phone,
+            self::$dm
+        );
+        $policy = self::initPolicy($user, self::$dm, $phone, null, true, true);
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        $policy->setPotValue($rewardPotValue);
+
+        self::$dm->flush();
+
+        $this->assertTrue($policy->getUser()->hasActivePolicy());
+
+        $phone2 = self::getRandomPhone(self::$dm);
+        $policy = self::initPolicy($user, self::$dm, $phone2, null, true, true);
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+
+        self::$dm->flush();
+
+        return $user;
+    }
+
+    protected function assertSummaryMatchesUserWithTwoPolicies(array $summary)
+    {
+        $this->assertNotNull($summary);
+        $this->assertNotEmpty($summary);
+
+        $this->assertArrayHasKey('widgets', $summary);
+        #$this->assertArrayHasKey('policies', $summary);
+
+        $this->assertCount(1, $summary['widgets']);
+        $this->assertPolicySummaryHasKeys($summary['widgets'][0]);
+    }
+
+    private function assertPolicySummaryHasKeys(array $widget)
+    {
+        $this->assertArrayHasKey('type', $widget);
+        $this->assertSame('TEXT', $widget['type']);
+        $this->assertArrayHasKey('title', $widget);
+        $this->assertArrayHasKey('text', $widget);
     }
 }

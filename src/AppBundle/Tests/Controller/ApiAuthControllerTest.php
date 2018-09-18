@@ -2663,11 +2663,11 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $url = sprintf("/api/v1/auth/policy/%s/invitation?debug=true", $policyData['id']);
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
-            'email' => 'patrick@so-sure.net',
+            'email' => 'patrick@so-sure.org',
             'name' => 'functional test',
         ]);
         $data = $this->verifyResponse(200);
-        $this->assertEquals('patrick@so-sure.net', $data['invitation_detail']);
+        $this->assertEquals('patrick@so-sure.org', $data['invitation_detail']);
         $this->assertEquals('functional test', $data['name']);
 
         $cancelUrl = sprintf("/api/v1/auth/invitation/%s", $data['id']);
@@ -2678,7 +2678,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $data = $this->verifyResponse(200);
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
-            'email' => 'patrick@so-sure.net',
+            'email' => 'patrick@so-sure.org',
             'name' => 'functional test',
         ]);
         $this->verifyResponse(200);

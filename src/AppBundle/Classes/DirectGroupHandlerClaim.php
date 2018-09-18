@@ -74,6 +74,7 @@ class DirectGroupHandlerClaim extends HandlerClaim
         'SoSure@directgroup.co.uk',
         'patrick@so-sure.com',
         'dylan@so-sure.com',
+        'Sally.Hancock@directgroup.co.uk',
     ];
 
     public static $sheetNames = [

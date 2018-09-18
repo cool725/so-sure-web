@@ -35,7 +35,7 @@ class Bearer extends BaseController
     ) {
         $this->logger = $logger;
         $this->userPolicySummary = $userPolicySummary;
-        $this->container = $container;
+        $this->container = $container;  // because: JMS is used in one small place, we have to fix it everywhere
     }
 
     /**

@@ -311,7 +311,7 @@ class InvitationServiceTest extends WebTestCase
         self::$invitationService->setEnvironment('prod');
         $invitation = self::$invitationService->inviteByEmail(
             $policy,
-            'foo@so-sure.net'
+            'foo@so-sure.org'
         );
     }
 
@@ -401,7 +401,7 @@ class InvitationServiceTest extends WebTestCase
         );
         self::$invitationService->setEnvironment('test');
 
-        $invitee->setEmail('testAcceptSoSureEmail-invitee@so-sure.net');
+        $invitee->setEmail('testAcceptSoSureEmail-invitee@so-sure.org');
         static::$dm->flush();
 
         self::$invitationService->setEnvironment('prod');
