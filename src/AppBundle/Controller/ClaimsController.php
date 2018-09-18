@@ -167,7 +167,7 @@ class ClaimsController extends BaseController
                     $claim->setHandlingTeam($this->getUser()->getHandlingTeam());
                     /** @var ClaimsService $claimsService */
                     $claimsService = $this->get('app.claims');
-                    if (in_array($claim->getStatus(), [Claim::STATUS_INREVIEW, Claim::STATUS_SUBMITTED])) {
+                    if (in_array($claim->getStatus(), [Claim::STATUS_FNOL, Claim::STATUS_SUBMITTED])) {
                         $claim->setStatus(Claim::STATUS_INREVIEW);
                         if ($claimsService->updateClaim($policy, $claim)) {
                             $this->addFlash('success', sprintf(

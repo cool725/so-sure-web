@@ -44,8 +44,9 @@ class DefaultControllerTest extends BaseControllerTest
 
     public function testIndexRedirect()
     {
+        // usa ip should no longer redirect
         $crawler = self::$client->request('GET', '/', [], [], ['REMOTE_ADDR' => '70.248.28.23']);
-        self::verifyResponse(302);
+        self::verifyResponse(200);
     }
 
     public function testIndexFacebookNoRedirect()

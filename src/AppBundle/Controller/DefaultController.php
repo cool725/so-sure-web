@@ -73,10 +73,6 @@ class DefaultController extends BaseController
      */
     public function indexAction(Request $request)
     {
-        if ($this->isRealUSAIp($request) && $request->get('site') != 'uk') {
-            return $this->redirectToRoute('launch_usa');
-        }
-
         $referral = $request->get('referral');
         if ($referral) {
             $session = $this->get('session');

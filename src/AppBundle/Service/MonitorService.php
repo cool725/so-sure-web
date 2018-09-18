@@ -296,6 +296,7 @@ class MonitorService
         // claim is closed prior to being able to update imei
         $claims = $repo->findAll();
         foreach ($claims as $claim) {
+            /** @var Claim $claim */
             $policy = $claim->getPolicy();
             // Only concerned about active (or unpaid) policies here
             if (!in_array($policy->getStatus(), [
