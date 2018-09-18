@@ -15,8 +15,15 @@ class UserPolicySummaryTest extends BaseControllerTest
 {
     use Traits\UserCreation;
 
+    public function testZeroActivePolicySummary()
+    {
+        $this->markTestIncomplete('test expected API return when a user does not have a policy');
+    }
+
     /**
      * A policy-holder with two policies, but only one is active (or unpaid)
+     *
+     * We only show a single policy, but we'll make sure it is an active one
      */
     public function testOneActivePolicySummary()
     {
@@ -34,18 +41,18 @@ class UserPolicySummaryTest extends BaseControllerTest
         $summaryWidget = $userPolicySummary->shortPolicySummary($out->user);
 
         $actualJson = json_encode($summaryWidget);
-        // @codingStandardsIgnoreStart
 
         // the URL changes between local dev, build, etc. so build it & json-escape the string
         $router = self::$container->get('router');
         $userPageUrl = $router->generate('user_home', [], UrlGeneratorInterface::ABSOLUTE_URL);
         $userPageUrl = str_replace('/', '\/', $userPageUrl);
 
+        // @codingStandardsIgnoreStart
         $expectedJson = <<<JSON
 {
     "widgets": [{
         "type": "TEXT",
-        "title": "So-Sure Policy {$policy->getPolicyNumber()} for your {$out->activePhone}",
+        "title": "SO-SURE Policy {$policy->getPolicyNumber()} for your {$out->activePhone}",
         "text": "Expires on {$expiresDate}. You currently have {$connectionsCount} connections & your reward pot is worth {$pot}",
         "launchUrl": "{$userPageUrl}"
     }]
@@ -63,18 +70,6 @@ JSON;
         //#$this->assertPolicySummaryHaveKeys($summaryWidget['widget'][0]);
         $this->assertPolicySummaryHasStarlingWidgetKeys($summaryWidget['widgets'][0]);
     }
-
-    #public function testTwoPolicySummary()
-    #{
-    #    $rewardPotValue = 11.97;
-    #    $user = $this->generateUserWithTwoPolicies($rewardPotValue);
-    #
-    #    /** @var UserPolicySummary $userPolicySummary */
-    #    $userPolicySummary = self::$container->get('test.App\Normalizer\UserPolicySummary');
-    #
-    #    $summary = $userPolicySummary->shortPolicySummary($user);
-    #    $this->assertSummaryMatchesUserWithTwoPolicies($summary, $rewardPotValue);
-    #}
 
     /**
      * Make a user, with one cancelled policy + a good one
