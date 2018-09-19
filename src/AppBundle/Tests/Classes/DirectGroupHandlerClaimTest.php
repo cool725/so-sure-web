@@ -310,6 +310,14 @@ class DirectGroupHandlerClaimTest extends \PHPUnit\Framework\TestCase
         $directGroup->fromArray($data, DirectGroupHandlerClaim::COLUMN_COUNT_V1);
     }
 
+    public function testReplacementRepair()
+    {
+        $directGroup = new DirectGroupHandlerClaim();
+        $this->assertFalse($directGroup->isReplacementRepaired());
+        $directGroup->repairSupplier = 'foo';
+        $this->assertTrue($directGroup->isReplacementRepaired());
+    }
+
     public function testClaimsExcess()
     {
         $directGroup = new DirectGroupHandlerClaim();

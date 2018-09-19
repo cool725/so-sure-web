@@ -442,6 +442,12 @@ class DirectGroupService extends SftpService
         $claim->setInitialSuspicion($directGroupClaim->initialSuspicion);
         $claim->setFinalSuspicion($directGroupClaim->finalSuspicion);
 
+        $claim->setSupplier(
+            $directGroupClaim->isReplacementRepaired() ?
+            $directGroupClaim->repairSupplier : $directGroupClaim->replacementSupplier
+        );
+        $claim->setSupplierStatus($directGroupClaim->supplierStatus);
+
         $this->updatePolicy($claim, $directGroupClaim, $skipImeiUpdate);
 
         $errors = $this->validator->validate($claim);

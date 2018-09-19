@@ -636,7 +636,6 @@ class Claim
     protected $typeDetailsOther;
 
     /**
-    /**
      * @AppAssert\AlphanumericSpaceDot()
      * @Assert\Length(min="3", max="200")
      * @MongoDB\Field(type="string")
@@ -704,6 +703,22 @@ class Claim
      * )
      */
     protected $files = array();
+
+    /**
+     * @AppAssert\AlphanumericSpaceDot()
+     * @Assert\Length(max="100")
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
+    protected $supplier;
+
+    /**
+     * @AppAssert\AlphanumericSpaceDot()
+     * @Assert\Length(max="100")
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
+    protected $supplierStatus;
 
     public function __construct()
     {
@@ -1583,6 +1598,26 @@ class Claim
     public function getFiles()
     {
         return $this->files;
+    }
+
+    public function getSupplier()
+    {
+        return $this->supplier;
+    }
+
+    public function setSupplier($supplier)
+    {
+        $this->supplier = $supplier;
+    }
+
+    public function getSupplierStatus()
+    {
+        return $this->supplierStatus;
+    }
+
+    public function setSupplierStatus($supplierStatus)
+    {
+        $this->supplierStatus = $supplierStatus;
     }
 
     public static function sumClaims($claims)
