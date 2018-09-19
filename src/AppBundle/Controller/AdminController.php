@@ -33,6 +33,7 @@ use AppBundle\Service\SequenceService;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -538,6 +539,11 @@ class AdminController extends BaseController
         $sequenceForm = $this->get('form.factory')
             ->createNamedBuilder('sequence', SequenceType::class, $sequenceData)
             ->getForm();
+        $approvePaymentsForm = $this->get('form.factory')
+            ->createNamedBuilder('approvePayments')
+            ->add('confirm', CheckboxType::class)
+            ->add('approve', SubmitType::class)
+            ->getForm();
         if ('POST' === $request->getMethod()) {
             if ($request->request->has('upload')) {
                 $uploadForm->handleRequest($request);
@@ -644,6 +650,22 @@ class AdminController extends BaseController
                         'month' => $month
                     ]));
                 }
+            } elseif ($request->request->has('approvePayments')) {
+                $approvePaymentsForm->handleRequest($request);
+                if ($approvePaymentsForm->isSubmitted() && $approvePaymentsForm->isValid()) {
+                    /** @var BacsService $bacsService */
+                    $bacsService = $this->get('app.bacs');
+                    $bacsService->approvePayments(new \DateTime());
+                    $this->addFlash(
+                        'success',
+                        'Approved outstanding payments'
+                    );
+
+                    return new RedirectResponse($this->generateUrl('admin_bacs_date', [
+                        'year' => $year,
+                        'month' => $month
+                    ]));
+                }
             }
         }
 
@@ -665,6 +687,7 @@ class AdminController extends BaseController
             'uploadCreditForm' => $uploadCreditForm->createView(),
             'mandatesForm' => $mandatesForm->createView(),
             'sequenceForm' => $sequenceForm->createView(),
+            'approvePaymentsForm' => $approvePaymentsForm->createView(),
             'currentSequence' => $currentSequence,
             'outstandingMandates' => $userRepo->findPendingMandates()->getQuery()->execute()->count(),
         ];
