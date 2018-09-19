@@ -428,6 +428,14 @@ class Claim
     protected $status;
 
     /**
+     * @Assert\DateTime()
+     * @MongoDB\Field(type="date")
+     * @Gedmo\Versioned
+     * @var \DateTime
+     */
+    protected $statusLastUpdated;
+
+    /**
      * @AppAssert\AlphanumericSpaceDot()
      * @Assert\Length(min="1", max="50")
      * @MongoDB\Field(type="string")
@@ -896,7 +904,31 @@ class Claim
             // @codingStandardsIgnoreEnd
         }
 
+        if ($this->status != $status) { // status is changing
+            $this->setStatusLastUpdated();
+        }
+
         $this->status = $status;
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getStatusLastUpdated(): \DateTime
+    {
+        return $this->statusLastUpdated;
+    }
+
+    /**
+     * @param \DateTime $statusLastUpdated
+     */
+    public function setStatusLastUpdated(\DateTime $statusLastUpdated = null)
+    {
+        if ($statusLastUpdated === null) {
+            $statusLastUpdated = \DateTime::createFromFormat('U', (string) time());
+        }
+
+        $this->statusLastUpdated = $statusLastUpdated;
     }
 
     public function isOpen()
