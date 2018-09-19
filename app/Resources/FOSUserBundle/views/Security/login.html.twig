@@ -18,11 +18,12 @@
 
                 {# Account Kit #}
                 <div id="login-account-kit"
+                     {% if default_login_method == 'email' %}style="display: none;"{% endif %}
                      class="login__account-kit"
                      data-key="{{ fb_appid }}"
                      data-csrf="{{ csrf_token('account-kit') }}"
                      data-toggle="{% if app.request.clientIp == davies_ip %}1{% else %}0{% endif %}">
-                    <form method="get" action="https://www.accountkit.com/v1.0/basic/dialog/sms_login/" autocomplete="off">
+                    <form id="login-account-kit-form" method="get" action="https://www.accountkit.com/v1.0/basic/dialog/sms_login/" autocomplete="off">
                         <input type="hidden" value="+44" id="country_code" class="form-control" />
                         <input type="hidden" name="app_id" value="{{ fb_appid }}">
                         <input type="hidden" name="redirect" value="{{ app.request.schemeAndHttpHost }}/login/check-accountkit">
@@ -32,7 +33,7 @@
                         <div class="form-group">
                             <label for="phone_number">Mobile Number</label>
                             {# TODO: Add validation for uk number as to match placeholder #}
-                            <div class="input-group">
+                            <div class="input-group" id="phone-number-holder">
                                 <div class="input-group-prepend">
                                     <div class="input-group-text"><i class="fal fa-mobile-android fa-lg"></i></div>
                                 </div>
@@ -43,7 +44,7 @@
                             {% endif %}
                         </div>
                         <div class="form-group">
-                            <button class="btn btn-block btn-icon btn-grey arrow-right" disabled>
+                            <button class="btn btn-block btn-icon btn-success arrow-right">
                                 Login via SMS
                             </button>
                         </div>
@@ -55,8 +56,10 @@
                 </div>
 
                 {# Email Login #}
-                <div class="login__email">
-                    <form class="" action="{{ path("fos_user_security_check") }}#email" method="post" autocomplete="off">
+                <div id="login-email"
+                     class="login__email"
+                     {% if default_login_method == 'accountkit' %}style="display: none;"{% endif %}>
+                    <form id="login-email-form" action="{{ path("fos_user_security_check") }}#email" method="post" autocomplete="off" class="validate-form">
                         <input type="hidden" name="_csrf_token" value="{{ csrf_token }}"/>
                         <div class="form-group">
                             <label for="_username">Email Address</label>
@@ -89,7 +92,7 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <button type="submit" id="_submit" name="_submit" class="btn btn-block btn-icon btn-grey arrow-right" disabled>
+                            <button type="submit" id="_submit" name="_submit" class="btn btn-block btn-icon btn-success arrow-right">
                                 Login via Email
                             </button>
                             {# <input type="submit" id="_submit" name="_submit" value="Login via Email" class="btn btn-block btn-icon btn-grey arrow-right"/> #}
@@ -102,10 +105,14 @@
                 {# Login with #}
                 <ul class="list-inline text-center mb-0">
                     <li class="list-inline-item">
-                        <a href="#" class="btn btn-primary btn-square btn-shadow"><i class="fas fa-envelope fa-lg mr-sm-1"></i> <span class="mt-1 mt-sm-0">Email</span></a>
+                        {# {% if default_login_method == 'accountkit' %} #}
+                            <a href="#" id="swap-login" class="btn btn-primary btn-square btn-shadow"><i class="fas fa-envelope fa-lg mr-sm-1"></i> <span class="mt-1 mt-sm-0">Email</span></a>
+{#                         {% else %}
+                            <a href="#" id="swap-login" class="btn btn-primary btn-square btn-shadow"><i class="fal fa-mobile-android fa-lg mr-sm-1"></i> <span class="mt-1 mt-sm-0">SMS</span></a>
+                        {% endif %} #}
                     </li>
                     <li class="list-inline-item">
-                        <a href="#" class="btn btn-facebook btn-square"><i class="fab fa-facebook fa-lg mr-sm-1"></i> <span class="mt-1 mt-sm-0">Facebook</span></a>
+                        <a href="#" id="fb-login" class="btn btn-facebook btn-square"><i class="fab fa-facebook fa-lg mr-sm-1"></i> <span class="mt-1 mt-sm-0">Facebook</span></a>
                     </li>
                     <li class="list-inline-item">
                         <a href="#" class="btn btn-google btn-square"><i class="fab fa-google fa-lg mr-sm-1"></i> <span class="mt-1 mt-sm-0">Google</span></a>
