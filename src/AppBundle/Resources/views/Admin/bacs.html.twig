@@ -46,16 +46,16 @@
             <div class="col-md-5">
                 <div class="form-group" style="padding-top: 15px;">
                     <div class="btn-group">
-                        <button type="button" class="btn btn-info" data-toggle="modal" data-target="#uploadModal"
+                        <button type="button" class="btn btn-success" data-toggle="modal" data-target="#uploadModal"
                         > Upload Report</button>
+                        <button class="btn btn-success bacs-serial-edit" type="button"
+                                data-toggle="modal" data-target="#approvePaymentsModal">
+                            Approve Payments
+                        </button>
                     </div>
                 </div>
                 <div class="form-group" style="padding-top: 15px;">
-                    <button type="button" class="btn btn-info" data-toggle="modal" data-target="#mandatesModal"
-                    > Approve Mandates <span class="badge" title="Actionable Mandates">{{ outstandingMandates }}</span></button>
-                </div>
-                <div class="form-group" style="padding-top: 15px;">
-                    <button class="btn btn-success bacs-serial-edit" type="button"
+                    <button class="btn btn-warning bacs-serial-edit" type="button"
                             data-toggle="modal" data-target="#editSequenceSerialNumberModal">
                         <span title="Current Sequence File">{{ currentSequence.seq }}</span> <i class="fa fa-edit"></i>
                     </button>
@@ -63,16 +63,16 @@
                 <div class="form-group" style="padding-top: 15px;">
                     <div class="btn-group">
                         <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#uploadDebitModal"
-                        > Upload Bacs Debit</button>
+                        > Bacs Debit</button>
                         <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#uploadCreditModal"
-                        > Upload Bacs Credit</button>
+                        > Bacs Credit</button>
                     </div>
                 </div>
                 <div class="form-group" style="padding-top: 15px;">
-                    <button class="btn btn-success bacs-serial-edit" type="button"
-                            data-toggle="modal" data-target="#approvePaymentsModal">
-                        Approve Payments
-                    </button>
+                    <div class="form-group">
+                        <button type="button" class="btn btn-info" data-toggle="modal" data-target="#mandatesModal"
+                        > Mandates <span class="badge" title="Actionable Mandates">{{ outstandingMandates }}</span></button>
+                    </div>
                 </div>
             </div>
         </form>
