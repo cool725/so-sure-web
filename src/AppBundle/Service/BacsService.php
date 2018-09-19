@@ -808,7 +808,7 @@ class BacsService
                 foreach ($errorsList as $error) {
                     $results['errors'][] = $error->attributes->getNamedItem('line1')->nodeValue;
                 }
-            } elseif ($recordType == "N") {
+            } elseif (in_array($recordType, ["N", "D"])) {
                 $reference = $this->getReference($element);
                 $repo = $this->dm->getRepository(User::class);
                 /** @var User $user */
@@ -843,11 +843,14 @@ class BacsService
             } else {
                 throw new \Exception(sprintf('Unknown record type %s', $recordType));
             }
-            $results['serial-number'] = $this->getNodeValue($element, 'vol-serial-number');
-            $results['file-numbers'][] = $this->getNodeValue($element, 'originator-file-number');
+
             $results['records']++;
-            $results['accepted-ddi'] += $this->getNodeValue($element, 'accepted-ddi', 0);
-            $results['rejected-ddi'] += $this->getNodeValue($element, 'rejected-ddi', 0);
+            if ($recordType != "D") {
+                $results['serial-number'] = $this->getNodeValue($element, 'vol-serial-number');
+                $results['file-numbers'][] = $this->getNodeValue($element, 'originator-file-number');
+                $results['accepted-ddi'] += $this->getNodeValue($element, 'accepted-ddi', 0);
+                $results['rejected-ddi'] += $this->getNodeValue($element, 'rejected-ddi', 0);
+            }
         }
 
         return $results;
