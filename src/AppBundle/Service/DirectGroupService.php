@@ -520,13 +520,6 @@ class DirectGroupService extends SftpService
                 $directGroupClaim->claimNumber
             ));
         }
-        if ($directGroupClaim->replacementReceivedDate &&
-            (!$directGroupClaim->replacementMake || !$directGroupClaim->replacementModel)) {
-            throw new \Exception(sprintf(
-                'Claim %s has a replacement received date without a replacement make/model',
-                $directGroupClaim->claimNumber
-            ));
-        }
 
         $now = new \DateTime();
         if ($directGroupClaim->isOpen() ||
