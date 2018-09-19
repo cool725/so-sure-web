@@ -866,7 +866,13 @@ class AdminController extends BaseController
             'monthlyJudoTransaction' => Payment::sumPayments($payments, $isProd, JudoPayment::class),
             'dailyJudoShiftedTransaction' => Payment::dailyPayments($payments, $isProd, JudoPayment::class, $tz),
             'monthlyJudoShiftedTransaction' => Payment::sumPayments($payments, $isProd, JudoPayment::class),
-            'dailyBacsTransaction' => Payment::dailyPayments($payments, $isProd, BacsPayment::class),
+            'dailyBacsTransaction' => Payment::dailyPayments(
+                $payments,
+                $isProd,
+                BacsPayment::class,
+                null,
+                'getBacsCreditDate'
+            ),
             'monthlyBacsTransaction' => Payment::sumPayments($payments, $isProd, BacsPayment::class),
         ];
 
