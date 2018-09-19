@@ -27,7 +27,6 @@ class UserPolicySummaryTest extends BaseControllerTest
         // the URL changes between local dev, build, etc. so build it & json-escape the string
         $router = self::$container->get('router');
         $userPageUrl = $router->generate('user_home', [], UrlGeneratorInterface::ABSOLUTE_URL);
-        $userPageUrl = str_replace('/', '\/', $userPageUrl);
 
         /** @var UserPolicySummary $userPolicySummary */
         $userPolicySummary = self::$container->get('test.App\Normalizer\UserPolicySummary');
@@ -39,7 +38,7 @@ class UserPolicySummaryTest extends BaseControllerTest
                     "type" => "TEXT",
                     "title" => "SO-SURE insurance policy",
                     "text" => "You don't have a SO-SURE Policy",
-                    "launchUrl" => "http://dev.so-sure.net/user/"
+                    "launchUrl" => $userPageUrl
                 ]
             ]
         ];
@@ -47,6 +46,8 @@ class UserPolicySummaryTest extends BaseControllerTest
 
         // and we'll also check it with a JSON-ified encoding, since that is what Starling gets from the API
         $actualJson = json_encode($summaryWidget);
+        $userPageUrl = str_replace('/', '\/', $userPageUrl);    // JSON-escape it
+
         // @codingStandardsIgnoreStart
         $expectedJson = <<<JSON
 {
@@ -54,7 +55,7 @@ class UserPolicySummaryTest extends BaseControllerTest
         "type": "TEXT",
         "title": "SO-SURE insurance policy",
         "text": "You don't have a SO-SURE Policy",
-        "launchUrl": "http:\/\/dev.so-sure.net\/user\/"
+        "launchUrl": "{$userPageUrl}"
     }]
 }
 JSON;
