@@ -17,7 +17,52 @@ class UserPolicySummaryTest extends BaseControllerTest
 
     public function testZeroActivePolicySummary()
     {
-        $this->markTestIncomplete('test expected API return when a user does not have a policy');
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testUser'.random_int(1, 1e7), $this),
+            'foo',
+            self::getRandomPhone(self::$dm),
+            self::$dm
+        );
+        // the URL changes between local dev, build, etc. so build it & json-escape the string
+        $router = self::$container->get('router');
+        $userPageUrl = $router->generate('user_home', [], UrlGeneratorInterface::ABSOLUTE_URL);
+
+        /** @var UserPolicySummary $userPolicySummary */
+        $userPolicySummary = self::$container->get('test.App\Normalizer\UserPolicySummary');
+        $summaryWidget = $userPolicySummary->shortPolicySummary($user);
+
+        $expectedData = [
+            "widgets" => [
+                [
+                    "type" => "TEXT",
+                    "title" => "SO-SURE insurance policy",
+                    "text" => "You don't have a SO-SURE Policy",
+                    "launchUrl" => $userPageUrl
+                ]
+            ]
+        ];
+        $this->assertEquals($expectedData, $summaryWidget);
+
+        // and we'll also check it with a JSON-ified encoding, since that is what Starling gets from the API
+        $actualJson = json_encode($summaryWidget);
+        $userPageUrl = str_replace('/', '\/', $userPageUrl);    // JSON-escape it
+
+        // @codingStandardsIgnoreStart
+        $expectedJson = <<<JSON
+{
+    "widgets": [{
+        "type": "TEXT",
+        "title": "SO-SURE insurance policy",
+        "text": "You don't have a SO-SURE Policy",
+        "launchUrl": "{$userPageUrl}"
+    }]
+}
+JSON;
+        // @codingStandardsIgnoreEnd
+
+        $this->assertNotNull($actualJson);
+        $this->assertJsonStringEqualsJsonString($actualJson, $expectedJson);
     }
 
     /**
