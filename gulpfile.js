@@ -12,9 +12,15 @@ gulp.task('default', function() {
         .pipe(concat('vendor.js'))
         .pipe(gulp.dest('web/components'));
 
+    // Cookies style > vendor
     gulp.src('node_modules/cookieconsent/build/cookieconsent.min.css')
         .pipe(gulp.dest('src/AppBundle/Resources/public/rebrand/sass/vendor'));
 
+    // Cookies style > vendor
     gulp.src('node_modules/cookieconsent/src/styles/themes/classic.css')
+        .pipe(gulp.dest('src/AppBundle/Resources/public/rebrand/sass/vendor'));
+
+    // Animate.css > vendor
+    gulp.src('node_modules/animate.css/animate.css')
         .pipe(gulp.dest('src/AppBundle/Resources/public/rebrand/sass/vendor'));
 });
