@@ -5,7 +5,7 @@
     {% if app.user is not null and app.user %}
 
         <div class="login__card">
-            Card
+            {# TODO: If already logged in #}
         </div>
 
     {% else %}
@@ -17,7 +17,11 @@
             <div class="login__card__body">
 
                 {# Account Kit #}
-                <div class="login__account-kit">
+                <div id="login-account-kit"
+                     class="login__account-kit"
+                     data-key="{{ fb_appid }}"
+                     data-csrf="{{ csrf_token('account-kit') }}"
+                     data-toggle="{% if app.request.clientIp == davies_ip %}1{% else %}0{% endif %}">
                     <form method="get" action="https://www.accountkit.com/v1.0/basic/dialog/sms_login/" autocomplete="off">
                         <input type="hidden" value="+44" id="country_code" class="form-control" />
                         <input type="hidden" name="app_id" value="{{ fb_appid }}">
@@ -44,24 +48,79 @@
                             </button>
                         </div>
                     </form>
-                    <div class="login__divider"><span class="h6 text-grey">or login via</span></div>
-                    <ul class="list-inline text-center">
-                        <li class="list-inline-item">
-                            <a href="#" class="btn btn-primary btn-square btn-shadow"><i class="fas fa-envelope fa-lg"></i> Email</a>
-                        </li>
-                        <li class="list-inline-item">
-                            <a href="#" class="btn btn-facebook btn-square"><i class="fab fa-facebook fa-lg"></i> Facebook</a>
-                        </li>
-                        <li class="list-inline-item">
-                            <a href="#" class="btn btn-google btn-square"><i class="fab fa-google fa-lg"></i> Google</a>
-                        </li>
-                        {% if feature_enabled('starling') %}
-                            <li>
-                                <a href="#">Starling</a>
-                            </li>
-                        {% endif %}
-                    </ul>
+                    <form id="accountkit-form" method="post" action="{{ path('accountkit_login') }}">
+                        <input type="hidden" id="accountkit-code" name="code">
+                        <input type="hidden" id="accountkit-csrf" name="csrf">
+                    </form>
                 </div>
+
+                {# Email Login #}
+                <div class="login__email">
+                    <form class="" action="{{ path("fos_user_security_check") }}#email" method="post" autocomplete="off">
+                        <input type="hidden" name="_csrf_token" value="{{ csrf_token }}"/>
+                        <div class="form-group">
+                            <label for="_username">Email Address</label>
+                            <input type="email" id="username" name="_username" value="{{ last_username }}" required="required" placeholder="Enter Email Address" class="form-control" />
+                        </div>
+                        <div class="form-group">
+                            <label for="_password">Password</label>
+                            <input type="password" id="password" name="_password" required="required" placeholder="Enter Password" class="form-control" />
+                            {% if error %}
+                                <label class="error mt-1">
+                                    {% if app.request.clientIp == davies_ip or app.request.clientIp in sosure_ips %}
+                                        Looks like the email address or password you’ve entered is incorrect, or <strong>your password has expired</strong>. Please try again. You may want to <a href="{{ path('fos_user_resetting_request') }}">reset your password</a>.
+                                    {% else %}
+                                        Looks like the email address or password you’ve entered is incorrect. Please try again. You may want to <a href="{{ path('fos_user_resetting_request') }}">reset your password</a>.
+                                    {% endif %}
+                                </label>
+                            {% endif %}
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-7">
+                                    <div class="custom-control custom-checkbox">
+                                        <input type="checkbox" id="remember_me" name="_remember_me" value="on" {% if app.request.clientIp == davies_ip %}checked{% endif %} class="custom-control-input" />
+                                        <label class="custom-control-label" for="remember_me">Remember me</label>
+                                    </div>
+                                </div>
+                                <div class="col text-right">
+                                    <a href="{{ path('fos_user_resetting_request') }}"><small>Forgot password?</small></a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <button type="submit" id="_submit" name="_submit" class="btn btn-block btn-icon btn-grey arrow-right" disabled>
+                                Login via Email
+                            </button>
+                            {# <input type="submit" id="_submit" name="_submit" value="Login via Email" class="btn btn-block btn-icon btn-grey arrow-right"/> #}
+                        </div>
+                    </form>
+                </div>
+
+                <div class="login__divider"><span class="h6 text-grey">or login via</span></div>
+
+                {# Login with #}
+                <ul class="list-inline text-center mb-0">
+                    <li class="list-inline-item">
+                        <a href="#" class="btn btn-primary btn-square btn-shadow"><i class="fas fa-envelope fa-lg mr-sm-1"></i> <span class="mt-1 mt-sm-0">Email</span></a>
+                    </li>
+                    <li class="list-inline-item">
+                        <a href="#" class="btn btn-facebook btn-square"><i class="fab fa-facebook fa-lg mr-sm-1"></i> <span class="mt-1 mt-sm-0">Facebook</span></a>
+                    </li>
+                    <li class="list-inline-item">
+                        <a href="#" class="btn btn-google btn-square"><i class="fab fa-google fa-lg mr-sm-1"></i> <span class="mt-1 mt-sm-0">Google</span></a>
+                    </li>
+                </ul>
+
+                {% if feature_enabled('starling') %}
+                    <div class="login__divider"><span class="h6 text-grey">partner login</span></div>
+
+                    <ul class="list-inline text-center mb-0">
+                        <li class="list-inline-item">
+                            <a href="#" class="btn btn-starling btn-square"><i class="fab fa-google fa-lg mr-1"></i> <span>Starling</span></a>
+                        </li>
+                    </ul>
+                {% endif %}
 
                 {# Email #}
 

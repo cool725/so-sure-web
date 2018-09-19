@@ -43,7 +43,14 @@
 // Add square buttons for icons to button rather than modifying the core css
 .btn-square {
     padding: .6rem 1rem;
-    @include border-radius(4px);
+    @include border-radius(8px);
+
+    @include media-breakpoint-down(xs) {
+        span {
+            display: block;
+            font-size: 80%;
+        }
+    }
 }
 
 .btn-circle {
