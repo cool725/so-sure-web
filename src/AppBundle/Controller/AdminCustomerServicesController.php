@@ -152,6 +152,16 @@ class AdminCustomerServicesController extends BaseController
             throw $this->createNotFoundException('Claim not found');
         }
 
+        // inputs that change specific fields on the /admin/claims modal
+        if ($request->get('change-claim-number')) {
+            $updatedClaimNumber = $request->get('claims-detail-number');
+            $updatedClaimNumber = trim($updatedClaimNumber);
+            if (empty($updatedClaimNumber)) {
+                throw new \LengthException('New claim number cannot be empty');
+            }
+            $claim->setNumber($updatedClaimNumber, true);
+        }
+
         if ($request->get('change-claim-type') && $request->get('claim-type')) {
             $claim->setType($request->get('claim-type'), true);
         }
