@@ -386,9 +386,9 @@ class PurchaseController extends BaseController
                         }
                     }
 
+                    $allowContinue = true;
                     if (!$policy) {
                         try {
-                            $allowContinue = true;
                             $policyService = $this->get('app.policy');
                             $policyService->setWarnMakeModelMismatch(false);
                             $policy = $policyService->init(
@@ -705,7 +705,7 @@ class PurchaseController extends BaseController
             if ($request->request->has('purchase_form')) {
                 $purchaseForm->handleRequest($request);
 
-                if ($purchaseForm->isValid()) {
+                if ($purchaseForm->isValid() && $purchase->areAllAgreed()) {
                     return new RedirectResponse(
                         $this->generateUrl('purchase_step_payment_id', [
                             'id' => $policy->getId()
@@ -844,7 +844,6 @@ class PurchaseController extends BaseController
                                         $policy,
                                         $purchase->getAmount()
                                     )) {
-                                        $purchase->setAgreed(true);
                                         return $this->redirectToRoute(
                                             'user_welcome_policy_id',
                                             ['id' => $policy->getId()]

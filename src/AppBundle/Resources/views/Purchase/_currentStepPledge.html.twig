@@ -18,12 +18,14 @@
                 'label': 'My phone is in working condition & the screen is not cracked',
                 'attr': {'class':'custom-control-input'}}
             ) }}
+            <div class="with-errors">{{ form_errors(purchase_form.agreedDamage) }}</div>
         </div>
         <div class="form-group">
             {{ form_widget(purchase_form.agreedAgeLocation, {
                 'label': 'I am a resident of the United Kingdom and over the age of 18',
                 'attr': {'class':'custom-control-input'}}
             ) }}
+            <div class="with-errors">{{ form_errors(purchase_form.agreedAgeLocation) }}</div>
         </div>
         <div class="form-group">
             {% set terms = '<a href="{{ cdn_url }}/files/so-sure_sample_policy_doc.pdf" target="_blank">so-sure policy document</a>' %}
@@ -31,25 +33,18 @@
                 'label': 'I have read & understood the <a href="'~ cdn_url ~'/files/so-sure_sample_policy_doc.pdf" target="_blank"><strong class=""><u>so-sure policy document</u></strong></a>',
                 'attr': {'class':'custom-control-input'}}
             ) }}
+            <div class="with-errors">{{ form_errors(purchase_form.agreedTerms) }}</div>
         </div>
     </div>
 
     <div class="form-group mt-5">
         <div class="form-row">
             <div class="col-3">
-                {% if app.request.get('_route') == "purchase_step_payment_id" %}
-                    <a href="{{ path('user_home') }}"
-                       class="btn btn-outline-grey btn-circle d-flex justify-content-center align-items-center">
-                        <span class="sr-only">back</span>
-                        <i class="far fa-arrow-left"></i></a>
-                    </a>
-                {% else %}
-                    <a href="{{ path('purchase_step_personal') }}"
-                       class="btn btn-outline-grey btn-circle d-flex justify-content-center align-items-center">
-                        <span class="sr-only">back</span>
-                        <i class="far fa-arrow-left"></i></a>
-                    </a>
-                {% endif %}
+                <a href="{{ path('purchase_step_phone_id', {'id': policy.id}) }}"
+                   class="btn btn-outline-grey btn-circle d-flex justify-content-center align-items-center">
+                    <span class="sr-only">back</span>
+                    <i class="far fa-arrow-left"></i>
+                </a>
             </div>
             <div class="col-9 text-right">
                 {{ form_widget(purchase_form.next, {'label': 'I swear I\'ll be honest!', 'attr': {'class': 'btn btn-success btn-gradient-green btn-block-xs'}}) }}

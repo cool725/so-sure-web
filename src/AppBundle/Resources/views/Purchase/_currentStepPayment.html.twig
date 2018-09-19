@@ -43,19 +43,11 @@
     <div class="form-group mt-5">
         <div class="form-row">
             <div class="col-3">
-                {% if app.request.get('_route') == "purchase_step_payment_id" %}
-                <a href="{{ path('user_home') }}"
+                <a href="{{ path('purchase_step_pledge_id', {'id': policy.id}) }}"
                    class="btn btn-outline-grey btn-circle d-flex justify-content-center align-items-center">
                     <span class="sr-only">back</span>
-                    <i class="far fa-arrow-left"></i></a>
+                    <i class="far fa-arrow-left"></i>
                 </a>
-                {% else %}
-                <a href="{{ path('purchase_step_personal') }}"
-                   class="btn btn-outline-grey btn-circle d-flex justify-content-center align-items-center">
-                    <span class="sr-only">back</span>
-                    <i class="far fa-arrow-left"></i></a>
-                </a>
-                {% endif %}
             </div>
             {% if app.user.hasValidPaymentMethod and app.user.hasJudoPaymentMethod %}
                 <div class="col">

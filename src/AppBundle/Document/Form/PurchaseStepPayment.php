@@ -88,7 +88,7 @@ class PurchaseStepPayment
             return true;
         }
 
-        return !$this->isAgreed();
+        return true;
     }
 
     public function toApiArray()

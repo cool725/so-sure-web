@@ -23,10 +23,22 @@ class PurchaseStepPledge
     /** @var User */
     protected $user;
 
+    /**
+     * @var boolean
+     * @Assert\IsTrue(message="You must confirm that your phone is in working condition and the screen is not cracked")
+     */
     protected $agreedDamage;
 
+    /**
+     * @var boolean
+     * @Assert\IsTrue(message="You must confirm that you are a UK resident and over the age of 18")
+     */
     protected $agreedAgeLocation;
 
+    /**
+     * @var boolean
+     * @Assert\IsTrue(message="You must agree to our terms")
+     */
     protected $agreedTerms;
 
     public function getPolicy()
@@ -59,7 +71,7 @@ class PurchaseStepPledge
         $this->agreedDamage = $agreedDamage;
     }
 
-    public function getagreedAgeLocation()
+    public function getAgreedAgeLocation()
     {
         return $this->agreedAgeLocation;
     }
@@ -77,5 +89,10 @@ class PurchaseStepPledge
     public function setAgreedTerms($agreedTerms)
     {
         $this->agreedTerms = $agreedTerms;
+    }
+
+    public function areAllAgreed()
+    {
+        return $this->getAgreedAgeLocation() && $this->getAgreedDamage() && $this->getAgreedTerms();
     }
 }

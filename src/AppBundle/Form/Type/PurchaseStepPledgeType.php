@@ -50,9 +50,9 @@ class PurchaseStepPledgeType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('agreedDamage', CheckboxType::class)
-            ->add('agreedAgeLocation', CheckboxType::class)
-            ->add('agreedTerms', CheckboxType::class)
+            ->add('agreedDamage', CheckboxType::class, ['required' => $this->required])
+            ->add('agreedAgeLocation', CheckboxType::class, ['required' => $this->required])
+            ->add('agreedTerms', CheckboxType::class, ['required' => $this->required])
             ->add('next', SubmitType::class)
         ;
 
