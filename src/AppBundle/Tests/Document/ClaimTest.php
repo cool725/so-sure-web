@@ -11,14 +11,6 @@ use Symfony\Bridge\PhpUnit\ClockMock;
  */
 class ClaimTest extends \PHPUnit\Framework\TestCase
 {
-    public static function setUpBeforeClass()
-    {
-    }
-
-    public function tearDown()
-    {
-    }
-
     public function testSetStatus()
     {
         $claim = new Claim();
@@ -47,45 +39,14 @@ class ClaimTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue(true);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testSetStatusWarranty()
     {
         $claim = new Claim();
         $claim->setType(Claim::TYPE_WARRANTY);
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Unable to use approved with Warranty Types.');
+
         $claim->setStatus(Claim::STATUS_APPROVED);
     }
-
-    /**
-     * @group time-sensitive
-     */
-    /*public function testGetStatusLastUpdatedOnChange()       #The test-structure is incompatible with ClockMocking
-    {
-        ClockMock::register(self::class);
-        ClockMock::register(Claim::class);
-        ClockMock::withClockMock(true);
-
-        $now = DateTime::createFromFormat('U', (string) time());
-
-        $claim = new Claim();
-        $claim->setStatus(Claim::STATUS_SUBMITTED);
-        $this->assertEquals($claim->getStatusLastUpdated(), $now, __LINE__);
-
-        sleep(3);
-
-        $claim->setStatus(Claim::STATUS_SUBMITTED);
-        $this->assertEquals($claim->getStatusLastUpdated(), $now, 'Expected the StatusLastUpdated to be unchanged');
-        sleep(4);
-        $this->assertEquals($claim->getStatusLastUpdated(), $now, 'Expected StatusLastUpdated to still be unchanged');
-
-        $later = DateTime::createFromFormat('U', (string) time());
-        $claim->setStatus(Claim::STATUS_SETTLED);
-
-        $this->assertEquals(
-            (string) $later->format('U'),
-            (string) $claim->getStatusLastUpdated()->format('U'),
-            'Expected StatusLastUpdated to have been updated'
-        );
-    }*/
 }

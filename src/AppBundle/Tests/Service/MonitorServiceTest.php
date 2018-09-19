@@ -39,6 +39,7 @@ class MonitorServiceTest extends WebTestCase
 
     public function tearDown()
     {
+        // block tearDown from running, because setUpBeforeClass
     }
 
     public function setUp()
