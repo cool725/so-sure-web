@@ -856,6 +856,7 @@ class AdminController extends BaseController
         $reconcilationFileRepo = $dm->getRepository(ReconciliationFile::class);
 
         $payments = $paymentRepo->getAllPaymentsForExport($date);
+        $extraPayments = $paymentRepo->getAllPaymentsForExport($date, true);
         $isProd = $this->isProduction();
         $tz = new \DateTimeZone(SoSure::TIMEZONE);
         $sosure = [
@@ -867,7 +868,7 @@ class AdminController extends BaseController
             'dailyJudoShiftedTransaction' => Payment::dailyPayments($payments, $isProd, JudoPayment::class, $tz),
             'monthlyJudoShiftedTransaction' => Payment::sumPayments($payments, $isProd, JudoPayment::class),
             'dailyBacsTransaction' => Payment::dailyPayments(
-                $payments,
+                $extraPayments,
                 $isProd,
                 BacsPayment::class,
                 null,

@@ -12,10 +12,14 @@ class PaymentRepository extends DocumentRepository
 {
     use DateTrait;
 
-    public function getAllPaymentsForExport(\DateTime $date)
+    public function getAllPaymentsForExport(\DateTime $date, $extraMonth = false)
     {
         $startMonth = $this->startOfMonth($date);
         $nextMonth = $this->endOfMonth($date);
+        if ($extraMonth) {
+            $startMonth = $this->startOfMonth($date->sub(new \DateInterval('P1D')));
+            $nextMonth = $this->endOfMonth($nextMonth);
+        }
 
         $qb = $this->createQueryBuilder()
             ->field('success')->equals(true)
