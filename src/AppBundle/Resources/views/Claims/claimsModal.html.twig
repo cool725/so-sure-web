@@ -12,7 +12,7 @@
             <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
             {% if is_granted('ROLE_ADMIN') %}
                 <h4>Claim: <input type="text" name="claims-detail-number" disabled="disabled" id="claims-detail-number"/>
-                    <label>(change)</label><input type="checkbox" id="change-claim-number" name="change-claim-number"></td>
+                    <label for="change-claim-number" >(change)</label><input type="checkbox" id="change-claim-number" name="change-claim-number"></td>
                 </h4>
             {% else %}
                 <h4 class="modal-title">Claim: Unknown</h4>
