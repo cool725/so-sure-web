@@ -2,6 +2,7 @@
 
 namespace AppBundle\Repository;
 
+use AppBundle\Document\Payment\BacsPayment;
 use Doctrine\ODM\MongoDB\DocumentRepository;
 use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Document\DateTrait;
@@ -20,6 +21,15 @@ class BacsPaymentRepository extends PaymentRepository
             ->field('date')->lt($nextDay)
             ->sort('date', 'desc')
             ->sort('serialNumber', 'desc')
+            ->getQuery()
+            ->execute();
+    }
+
+    public function findSubmittedPayments(\DateTime $date)
+    {
+        return $this->createQueryBuilder()
+            ->field('status')->equals(BacsPayment::STATUS_SUBMITTED)
+            ->field('bacsReversedDate')->lte($date)
             ->getQuery()
             ->execute();
     }
