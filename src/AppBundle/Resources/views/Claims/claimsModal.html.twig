@@ -10,7 +10,13 @@
             <input type="hidden" name="token" value="{{  csrf_token('default') }}"></input>
             <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title">Claim: Unknown</h4>
+            {% if is_granted('ROLE_ADMIN') %}
+                <h4>Claim: <input type="text" name="claims-detail-number" disabled="disabled" id="claims-detail-number"/>
+                    <label>(change)</label><input type="checkbox" id="change-claim-number" name="change-claim-number"></td>
+                </h4>
+            {% else %}
+                <h4 class="modal-title">Claim: Unknown</h4>
+            {% endif %}
           </div>
           <div class="modal-body">
             <h3>General</h3>

@@ -28,7 +28,13 @@ $('#claimsModal').on('show.bs.modal', function (event) {
     var modal = $(this);
 
     if (claim) {
-        modal.find('.modal-title').text('Claim: ' + claim.number);
+        if ($('#claims-detail-number')) {
+            modal.find('#claims-detail-number').val(claim.number);
+        }
+        if ($('.modal-title')) {
+            modal.find('.modal-title').text('Claim: '+ claim.number);
+        }
+
         modal.find('#claims-detail-id').val(claim.id);
         modal.find('#claims-detail-delete-id').val(claim.id);
         modal.find('#claims-detail-policy').text(claim.policyNumber);
@@ -292,6 +298,14 @@ $('#claimsModal').on('show.bs.modal', function (event) {
         modal.find('#claims-detail-reserved').text('');
         modal.find('#claims-detail-total-incurred').text('');
     }
+
+    $("#change-claim-number").change(function(){
+        if(this.checked) {
+            $('#claims-detail-number').attr('disabled', false);
+        } else {
+            $('#claims-detail-number').attr('disabled', 'disabled');
+        }
+    });
 
     $("#change-claim-type").change(function(){
         if(this.checked) {
