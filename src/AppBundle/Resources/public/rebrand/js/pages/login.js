@@ -52,9 +52,13 @@ sosure.login = (function() {
         self.swapLogin = $('#swap-login');
         self.fbLoginBtn = $('#fb-login');
         self.form = $('#login-email-form');
+        if (self.form.data('client-validation') && !self.isIE) {
+            self.addValidation();
+        }
         self.formNumbers = $('#login-account-kit-form');
-        self.addValidation();
-        self.addValidationNumbers();
+        if (self.formNumbers.data('client-validation') && !self.isIE) {
+            self.addValidationNumbers();
+        }
     }
 
     self.formToggle = () => {
@@ -222,13 +226,6 @@ sosure.login = (function() {
 
     return self;
 })();
-
-// TODO: Move or use new data method
-$.fn.extend({
-    toggleText: function(a, b){
-        return this.text(this.text() == b ? a : b);
-    }
-});
 
 $(function() {
 

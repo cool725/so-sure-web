@@ -1,12 +1,15 @@
 {% extends "FOSUserBundle::layout.html.twig" %}
 {% block fos_user_content %}
-    <div class="panel login__panel">
-        <div class="panel-body">
-            <h1 class="h2">Password reset request received</h1>
+
+    <h1 class="text-white text-center mb-4">Password reset request received</h1>
+
+    <div class="login__card">
+        <div class="login__card__body">
             <p>If you have an account, you should receive an email shortly with instructions on how to reset your password.</p>
             <p>If you don't receive an email, please check your spam/junk/promotions folders as sometimes these type of emails will wind up there.</p>
             <p>To protect your account, we only allow one reset request every {{ tokenLifetime }} hours.</p>
-            <p><a id="open-intercom" href="mailto:hello@wearesosure.com" class="btn btn-blue btn-pad">Need help?</a></p>
+            <a id="open-intercom" href="mailto:hello@wearesosure.com" class="btn btn-outline-primary btn-block"><i class="fal fa-ambulance fa-lg"></i> Need help?</a>
         </div>
     </div>
+
 {% endblock %}

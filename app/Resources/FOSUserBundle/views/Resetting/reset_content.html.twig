@@ -1,24 +1,30 @@
-<div class="panel login__panel">
-    <div class="panel-body">
-        <h1 class="h2">Choose a new password</h1>
-        <p>Make sure it contains a mixture of letters, numbers and special characters.</p>
-        <form action="{{ path('fos_user_resetting_reset', {'token': token}) }}" method="POST" class="fos_user_resetting_reset login-box" autocomplete="off">
-            <div class="reset">
-                <div class="reset-error">
-                    {{ form_errors(form.plainPassword.first) }}
-                </div>
-                <div class="form-group">
-                    <input id="fos_user_resetting_form_plainPassword_first" type="password" class="form-control input-lg {% if not form.vars.valid %} reset-error-box{% endif %}"
-                        name="fos_user_resetting_form[plainPassword][first]" required="required" class="username" placeholder="New Password"/>
-                </div>
-                <div class="form-group">
-                    <input id="fos_user_resetting_form_plainPassword_second" type="password" class="form-control input-lg{% if not form.vars.valid %} reset-error-box{% endif %}"
-                        name="fos_user_resetting_form[plainPassword][second]" required="required" class="form-control password" placeholder="Confirm Password" />
-                </div>
-                <div class="form-group">
-                    <input type="hidden" id="fos_user_resetting_form__token" name="fos_user_resetting_form[_token]" value="{{ form._token.vars['value'] }}" />
-                    <input type="submit" value="Set password" class="btn btn-blue btn-block btn-pad" />
-                </div>
+{# TODO: Add JS Validation #}
+<h1 class="text-white text-center mb-1">Choose a new password</h1>
+<h4 class="text-blue1 text-center mb-4">Make sure it contains a mixture of letters, numbers and special characters</h4>
+
+<div class="login__card">
+    <div class="login__card__body">
+        <form action="{{ path('fos_user_resetting_reset', {'token': token}) }}"
+              method="POST"
+              class="fos_user_resetting_reset login-box"
+              autocomplete="off"
+              data-client-validation="{{ form_client_validation }}">
+            <div class="reset-error">
+                {{ form_errors(form.plainPassword.first) }}
+            </div>
+            <div class="form-group">
+                <label for="fos_user_resetting_form[plainPassword][first]">New Password</label>
+                <input id="fos_user_resetting_form_plainPassword_first" type="password" class="form-control input-lg {% if not form.vars.valid %} reset-error-box{% endif %}"
+                    name="fos_user_resetting_form[plainPassword][first]" required="required" class="username" placeholder="Enter New Password"/>
+            </div>
+            <div class="form-group">
+                <label for="fos_user_resetting_form[plainPassword][second]">Confirm Password</label>
+                <input id="fos_user_resetting_form_plainPassword_second" type="password" class="form-control input-lg{% if not form.vars.valid %} reset-error-box{% endif %}"
+                    name="fos_user_resetting_form[plainPassword][second]" required="required" class="form-control password" placeholder="Confirm your Password" />
+            </div>
+            <div class="form-group">
+                <input type="hidden" id="fos_user_resetting_form__token" name="fos_user_resetting_form[_token]" value="{{ form._token.vars['value'] }}" />
+                <input type="submit" value="Set password" class="btn btn-success btn-block" />
             </div>
         </form>
     </div>

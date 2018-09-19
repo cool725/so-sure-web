@@ -5,7 +5,7 @@
 {% set body_class = 'login' %}
 {% set light_nav  = 1 %}
 {# TODO: Do we need to hide the nav or at least the login button #}
-{# {% set quote_mode = 1 %} #}
+{% set quote_mode = 1 %}
 
 {% block cssPage %}
     <link rel="stylesheet" href="{{ asset('css-js/login.css') }}">
@@ -22,6 +22,10 @@
         <span class="login__phone__background"></span>
         <span class="login__money__background"></span>
     </div>
+{% endblock %}
+
+{% block footer %}
+    {# TODO: Fix footer #}
 {% endblock %}
 
 {% block javascriptsPage %}

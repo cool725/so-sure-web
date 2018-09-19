@@ -1,19 +1,26 @@
-<div class="panel login__panel">
-    <div class="panel-body">
-        <h1 class="text-center h2">Reset Password</h1>
-        <p>Enter your email and we'll send you a reset link.</p>
-        <form action="{{ path('fos_user_resetting_send_email') }}" method="POST" class="fos_user_resetting_request login-box" autocomplete="off">
+{# TODO: Add JS Validation #}
+<h1 class="text-white text-center mb-1">Reset Password</h1>
+<h4 class="text-blue1 text-center mb-4">Enter your email and we'll send you a reset link</h4>
+
+<div class="login__card">
+    <div class="login__card__body">
+        <form action="{{ path('fos_user_resetting_send_email') }}"
+              method="POST"
+              class="fos_user_resetting_request"
+              autocomplete="off"
+              data-client-validation="{{ form_client_validation }}">
             <div class="form-group">
-                <input type="email" id="username" name="username" required="required" class="reset form-control input-lg" placeholder="Email Address"/>
+                <label for="username">Email Address</label>
+                <input type="email" id="username" name="username" required="required" class="reset form-control" placeholder="Enter Email Address"/>
+                {% if invalid_username is defined %}
+                    <label class="error">Invalid email address</label>
+                {% endif %}
             </div>
-            {% if invalid_username is defined %}
-                <p class="error-text">Invalid email address</p>
-            {% endif %}
             <div class="form-group" >
-                <input type="submit" value="Send me a link!" class="btn btn-blue btn-pad btn-block" />
+                <input type="submit" value="Send me a link!" class="btn btn-success btn-block" />
             </div>
             <div class="form-group">
-                <small><a href="{{ path('fos_user_security_login') }}" class="btn btn-link btn-xs">back to login</a></small>
+                <a href="{{ path('fos_user_security_login') }}" class="btn btn-link btn-block"><i class="far fa-arrow-left"></i> back to login</a>
             </div>
         </form>
     </div>

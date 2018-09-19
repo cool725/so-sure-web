@@ -4,8 +4,22 @@
 
     {% if app.user is not null and app.user %}
 
+        <h4 class="text-blue1 text-center mb-1">You're logged in as:</h4>
+        <h1 class="text-white text-center mb-4">{{ app.user.name }}</h1>
+
         <div class="login__card">
-            {# TODO: If already logged in #}
+            <div class="login__card__body">
+                {% if is_granted('ROLE_ADMIN') %}
+                    <a href="{{ path('admin_home') }}" class="btn btn-primary btn-block">Admin</a>
+                {% elseif is_granted('ROLE_EMPLOYEE') %}
+                    <a href="{{ path('admin_home') }}" class="btn btn-primary btn-block">Admin</a>
+                {% elseif is_granted('ROLE_CLAIMS') %}
+                    <a href="{{ path('claims_home') }}" class="btn btn-primary btn-block">Claims</a>
+                {% else %}
+                    <a href="{{ path('user_home') }}" class="btn btn-primary btn-block">Your Account</a>
+                {% endif %}
+                <a href="{{ path('fos_user_security_logout') }}" class="btn btn-outline-primary btn-block">Logout</a>
+            </div>
         </div>
 
     {% else %}
@@ -23,7 +37,10 @@
                      data-key="{{ fb_appid }}"
                      data-csrf="{{ csrf_token('account-kit') }}"
                      data-toggle="{% if app.request.clientIp == davies_ip %}1{% else %}0{% endif %}">
-                    <form id="login-account-kit-form" method="get" action="https://www.accountkit.com/v1.0/basic/dialog/sms_login/" autocomplete="off">
+                    <form id="login-account-kit-form"
+                          method="get"
+                          action="https://www.accountkit.com/v1.0/basic/dialog/sms_login/" autocomplete="off"
+                          data-client-validation="{{ form_client_validation }}">
                         <input type="hidden" value="+44" id="country_code" class="form-control" />
                         <input type="hidden" name="app_id" value="{{ fb_appid }}">
                         <input type="hidden" name="redirect" value="{{ app.request.schemeAndHttpHost }}/login/check-accountkit">
@@ -44,9 +61,7 @@
                             {% endif %}
                         </div>
                         <div class="form-group">
-                            <button class="btn btn-block btn-icon btn-success arrow-right">
-                                Login via SMS
-                            </button>
+                            <button class="btn btn-block btn-icon btn-success arrow-right">Login via SMS</button>
                         </div>
                     </form>
                     <form id="accountkit-form" method="post" action="{{ path('accountkit_login') }}">
@@ -59,7 +74,12 @@
                 <div id="login-email"
                      class="login__email"
                      {% if default_login_method == 'accountkit' %}style="display: none;"{% endif %}>
-                    <form id="login-email-form" action="{{ path("fos_user_security_check") }}#email" method="post" autocomplete="off" class="validate-form">
+                    <form id="login-email-form"
+                          action="{{ path("fos_user_security_check") }}#email"
+                          method="post"
+                          autocomplete="off"
+                          class="validate-form"
+                          data-client-validation="{{ form_client_validation }}">
                         <input type="hidden" name="_csrf_token" value="{{ csrf_token }}"/>
                         <div class="form-group">
                             <label for="_username">Email Address</label>
@@ -80,10 +100,10 @@
                         </div>
                         <div class="form-group">
                             <div class="row">
-                                <div class="col-7">
+                                <div class="col">
                                     <div class="custom-control custom-checkbox">
                                         <input type="checkbox" id="remember_me" name="_remember_me" value="on" {% if app.request.clientIp == davies_ip %}checked{% endif %} class="custom-control-input" />
-                                        <label class="custom-control-label" for="remember_me">Remember me</label>
+                                        <label class="custom-control-label" for="remember_me"><small>Remember me</small></label>
                                     </div>
                                 </div>
                                 <div class="col text-right">
@@ -92,10 +112,7 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <button type="submit" id="_submit" name="_submit" class="btn btn-block btn-icon btn-success arrow-right">
-                                Login via Email
-                            </button>
-                            {# <input type="submit" id="_submit" name="_submit" value="Login via Email" class="btn btn-block btn-icon btn-grey arrow-right"/> #}
+                            <button type="submit" id="_submit" name="_submit" class="btn btn-block btn-icon btn-success arrow-right">Login via Email</button>
                         </div>
                     </form>
                 </div>
@@ -105,11 +122,7 @@
                 {# Login with #}
                 <ul class="list-inline text-center mb-0">
                     <li class="list-inline-item">
-                        {# {% if default_login_method == 'accountkit' %} #}
-                            <a href="#" id="swap-login" class="btn btn-primary btn-square btn-shadow"><i class="fas fa-envelope fa-lg mr-sm-1"></i> <span class="mt-1 mt-sm-0">Email</span></a>
-{#                         {% else %}
-                            <a href="#" id="swap-login" class="btn btn-primary btn-square btn-shadow"><i class="fal fa-mobile-android fa-lg mr-sm-1"></i> <span class="mt-1 mt-sm-0">SMS</span></a>
-                        {% endif %} #}
+                        <a href="#" id="swap-login" class="btn btn-primary btn-square btn-shadow"><i class="fas fa-envelope fa-lg mr-sm-1"></i> <span class="mt-1 mt-sm-0">Email</span></a>
                     </li>
                     <li class="list-inline-item">
                         <a href="#" id="fb-login" class="btn btn-facebook btn-square"><i class="fab fa-facebook fa-lg mr-sm-1"></i> <span class="mt-1 mt-sm-0">Facebook</span></a>
@@ -119,18 +132,16 @@
                     </li>
                 </ul>
 
+                {# Partner Login #}
                 {% if feature_enabled('starling') %}
                     <div class="login__divider"><span class="h6 text-grey">partner login</span></div>
 
                     <ul class="list-inline text-center mb-0">
                         <li class="list-inline-item">
-                            <a href="#" class="btn btn-starling btn-square"><i class="fab fa-google fa-lg mr-1"></i> <span>Starling</span></a>
+                            <a href="{{ path('hwi_oauth_service_redirect', {'service': 'starling'}) }}" class="btn btn-starling btn-square"><img src="{{ cdn_url }}/images/StarlingMarkIcon.png" height="20px"> &nbsp; <span>Starling</span></a>
                         </li>
                     </ul>
                 {% endif %}
-
-                {# Email #}
-
             </div>
         </div>
 
