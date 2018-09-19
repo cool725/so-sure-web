@@ -1570,6 +1570,12 @@ abstract class Policy
 
     public function addScheduledPayment(ScheduledPayment $scheduledPayment)
     {
+        // For some reason, duplicate scheduled payments occurred in production
+        // this pattern is used in other methods to fix issues with tests, so will hopefully work
+        if ($this->scheduledPayments->contains($scheduledPayment)) {
+            throw new \Exception('duplicate scheduled payment');
+        }
+
         $scheduledPayment->setPolicy($this);
         $this->scheduledPayments[] = $scheduledPayment;
     }
