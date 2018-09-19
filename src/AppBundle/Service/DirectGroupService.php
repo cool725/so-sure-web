@@ -279,15 +279,26 @@ class DirectGroupService extends SftpService
                     /** @var Claim $claim */
                     // 2 options - either db claim is closed or davies claim is closed
                     $logError = false;
+                    $preventImeiUpdate = false;
                     if (!$claim->isOpen() &&
                         isset($openClaims[$directGroupClaim->getPolicyNumber()]) &&
                         $claim->getLossDate() > $openClaims[$directGroupClaim->getPolicyNumber()] &&
                         $claim->getNumber() != $directGroupClaim->claimNumber) {
-                        $logError = true;
+                        $preventImeiUpdate = true;
+                        if ($claim->getHandlingTeam() == Claim::TEAM_DIRECT_GROUP) {
+                            $logError = true;
+                        }
                     } elseif (!$directGroupClaim->isOpen() &&
                         $directGroupClaim->lossDate > $claim->getLossDate() &&
                         $claim->getNumber() != $directGroupClaim->claimNumber) {
-                        $logError = true;
+                        $preventImeiUpdate = true;
+                        if ($claim->getHandlingTeam() == Claim::TEAM_DIRECT_GROUP) {
+                            $logError = true;
+                        }
+                    }
+
+                    if ($preventImeiUpdate) {
+                        $multiple[] = $policy->getPolicyNumber();
                     }
 
                     if ($logError) {
@@ -299,7 +310,6 @@ class DirectGroupService extends SftpService
                         );
                         // @codingStandardsIgnoreEnd
                         $this->errors[$claim->getNumber()][] = $msg;
-                        $multiple[] = $policy->getPolicyNumber();
                     }
                 }
             }
