@@ -139,7 +139,7 @@ class DirectGroupHandlerClaim extends HandlerClaim
         } elseif (mb_stripos($lossType, mb_strtolower(self::TYPE_DAMAGE)) !== false) {
             return Claim::TYPE_DAMAGE;
         } elseif (mb_stripos($lossType, 'Breakdown') !== false) {
-            return Claim::TYPE_DAMAGE;
+            return Claim::TYPE_WARRANTY;
         } elseif (mb_stripos($lossType, 'Impact') !== false) {
             return Claim::TYPE_DAMAGE;
         } elseif (mb_stripos($lossType, 'Water') !== false) {
