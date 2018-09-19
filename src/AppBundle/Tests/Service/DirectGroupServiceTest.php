@@ -727,36 +727,6 @@ class DirectGroupServiceTest extends WebTestCase
         );
     }
 
-    public function testValidateClaimDetailsMissingPhone()
-    {
-        $address = new Address();
-        $address->setType(Address::TYPE_BILLING);
-        $address->setPostcode('BX11LT');
-        $user = new User();
-        $user->setBillingAddress($address);
-        $user->setFirstName('foo');
-        $user->setLastName('bar');
-        $policy = new PhonePolicy();
-        $user->addPolicy($policy);
-        $claim = new Claim();
-        $policy->addClaim($claim);
-        $policy->setPolicyNumber('TEST/2017/123456');
-
-        $directGroupClaim = new DirectGroupHandlerClaim();
-        $directGroupClaim->policyNumber = 'TEST/2017/123456';
-        $directGroupClaim->status = 'Open';
-        $directGroupClaim->miStatus = '';
-        $directGroupClaim->insuredName = 'Mr Foo Bar';
-        $directGroupClaim->lossDate = new \DateTime('2017-07-01');
-        $directGroupClaim->replacementReceivedDate = new \DateTime('2017-07-02');
-
-        $this->validateClaimsDetailsThrowsException(
-            $claim,
-            $directGroupClaim,
-            'replacement received date without a replacement make/model'
-        );
-    }
-
     public function testValidateClaimDetailsName()
     {
         $user = new User();
