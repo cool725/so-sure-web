@@ -4,6 +4,7 @@ namespace AppBundle\Document\Payment;
 
 use AppBundle\Document\BacsPaymentMethod;
 use AppBundle\Document\DateTrait;
+use AppBundle\Document\Policy;
 use AppBundle\Document\ScheduledPayment;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Gedmo\Mapping\Annotation as Gedmo;
@@ -159,6 +160,9 @@ class BacsPayment extends Payment
         $this->setSubmittedDate($date);
         $this->setBacsCreditDate($this->addBusinessDays($date, self::DAYS_CREDIT));
         $this->setBacsReversedDate($this->addBusinessDays($date, self::DAYS_REVERSE));
+        if ($this->getPolicy() && $this->getPolicy()->getStatus() == Policy::STATUS_UNPAID) {
+            $this->getPolicy()->setStatus(Policy::STATUS_ACTIVE);
+        }
     }
 
     public function inProgress()
