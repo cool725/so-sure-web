@@ -36,14 +36,18 @@ class SequenceService
         $this->logger = $logger;
     }
 
-    public function getSequenceId($name)
+    public function getSequenceId($name, $increment = true)
     {
         $sequence = $this->dm->getDocumentCollection(Sequence::class);
-        $result = $sequence->findAndUpdate(
-            ['_id' => $name],
-            ['$inc' => ['seq' => 1]],
-            ['new' => true, 'upsert' => true]
-        );
+        if ($increment) {
+            $result = $sequence->findAndUpdate(
+                ['_id' => $name],
+                ['$inc' => ['seq' => 1]],
+                ['new' => true, 'upsert' => true]
+            );
+        } else {
+            $result = $sequence->findOneBy(['_id' => $name]);
+        }
         if ($result['_id'] != $name) {
             throw new \Exception('Unable to generate sequenceId');
         }

@@ -129,7 +129,7 @@ class BacsCommand extends BaseCommand
             $creditPayments = $this->runPaymentCredits($input, $output, $processingDate);
         }
 
-        if (count($debitPayments) == 0 && count($creditPayments) == 0) {
+        if ((count($debitPayments) == 0 && count($creditPayments) == 0) || $debug) {
             $skipEmail = true;
         }
 
@@ -156,11 +156,17 @@ class BacsCommand extends BaseCommand
         $debug = $input->getOption('debug');
         $prefix = $input->getArgument('prefix');
 
+        if ($debug) {
+            $skipS3 = true;
+            $skipSftp = true;
+            $output->writeln('Debug option is set. Skipping sftp & s3 upload');
+        }
+
         /** @var BacsService $bacsService */
         $bacsService = $this->getContainer()->get('app.bacs');
         /** @var SequenceService $sequenceService */
         $sequenceService = $this->getContainer()->get('app.sequence');
-        $serialNumber = $sequenceService->getSequenceId(SequenceService::SEQUENCE_BACS_SERIAL_NUMBER);
+        $serialNumber = $sequenceService->getSequenceId(SequenceService::SEQUENCE_BACS_SERIAL_NUMBER, !$debug);
         $serialNumber = AccessPayFile::formatSerialNumber($serialNumber);
         $output->writeln(sprintf('Using serial number %s', $serialNumber));
 
@@ -176,14 +182,21 @@ class BacsCommand extends BaseCommand
         }
 
         $output->writeln('Exporting Mandates');
-        $mandates = $bacsService->exportMandates($processingDate, $serialNumber);
+        $mandates = $bacsService->exportMandates($processingDate, $serialNumber, false, !$debug);
         $data['ddi'] = count($mandates);
         if ($debug) {
             $output->writeln(json_encode($mandates, JSON_PRETTY_PRINT));
         }
 
         $output->writeln('Exporting Debit Payments');
-        $debitPayments = $bacsService->exportPaymentsDebits($prefix, $processingDate, $serialNumber, $data);
+        $debitPayments = $bacsService->exportPaymentsDebits(
+            $prefix,
+            $processingDate,
+            $serialNumber,
+            $data,
+            false,
+            !$debug
+        );
         $data['debits'] = count($debitPayments);
         if ($debug) {
             $output->writeln(json_encode($debitPayments, JSON_PRETTY_PRINT));
@@ -227,13 +240,19 @@ class BacsCommand extends BaseCommand
         $skipSftp = true === $input->getOption('skip-sftp');
         $skipS3 = true === $input->getOption('skip-s3');
         $debug = $input->getOption('debug');
+
+        if ($debug) {
+            $skipS3 = true;
+            $skipSftp = true;
+            $output->writeln('Debug option is set. Skipping sftp & s3 upload');
+        }
         //$prefix = $input->getArgument('prefix');
 
         /** @var BacsService $bacsService */
         $bacsService = $this->getContainer()->get('app.bacs');
         /** @var SequenceService $sequenceService */
         $sequenceService = $this->getContainer()->get('app.sequence');
-        $serialNumber = $sequenceService->getSequenceId(SequenceService::SEQUENCE_BACS_SERIAL_NUMBER);
+        $serialNumber = $sequenceService->getSequenceId(SequenceService::SEQUENCE_BACS_SERIAL_NUMBER, !$debug);
         $serialNumber = AccessPayFile::formatSerialNumber($serialNumber);
         $output->writeln(sprintf('Using serial number %s', $serialNumber));
 
@@ -242,7 +261,7 @@ class BacsCommand extends BaseCommand
         ];
 
         $output->writeln('Exporting Credit Payments');
-        $creditPayments = $bacsService->exportPaymentsCredits($processingDate, $serialNumber, $data);
+        $creditPayments = $bacsService->exportPaymentsCredits($processingDate, $serialNumber, $data, !$debug);
         $data['credits'] = count($creditPayments);
         if ($debug) {
             $output->writeln(json_encode($creditPayments, JSON_PRETTY_PRINT));
