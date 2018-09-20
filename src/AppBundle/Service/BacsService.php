@@ -577,7 +577,7 @@ class BacsService
         $payments = $repo->findSubmittedPayments($this->endOfDay($date));
         foreach ($payments as $payment) {
             /** @var BacsPayment $payment */
-            $payment->setStatus(BacsPayment::STATUS_SUCCESS);
+            $payment->approve();
         }
         $this->dm->flush();
     }
