@@ -1073,7 +1073,7 @@ class DirectGroupServiceTest extends WebTestCase
         $directGroupClaim->accessories = 1.03;
         $directGroupClaim->phoneReplacementCost = -50;
         $directGroupClaim->handlingFees = 1.19;
-        $directGroupClaim->excess = 6;
+        $directGroupClaim->excess = 150;
         $directGroupClaim->reserved = 0;
         $directGroupClaim->replacementMake = 'Apple';
         $directGroupClaim->replacementModel = 'iPhone';
@@ -1081,6 +1081,10 @@ class DirectGroupServiceTest extends WebTestCase
         $directGroupClaim->policyNumber = $policy->getPolicyNumber();
         $directGroupClaim->insuredName = 'Mr foo bar';
 
+        self::$directGroupService->validateClaimDetails($claim, $directGroupClaim);
+        $this->insureErrorDoesNotExist('/does not have the correct phone replacement cost/');
+
+        $directGroupClaim->status = 'Paid Closed';
         self::$directGroupService->validateClaimDetails($claim, $directGroupClaim);
         $this->insureErrorExists('/does not have the correct phone replacement cost/');
     }
@@ -2001,7 +2005,7 @@ class DirectGroupServiceTest extends WebTestCase
         $directGroupClaim->replacementReceivedDate = new \DateTime();
         $this->assertTrue(static::$directGroupService->saveClaim($directGroupClaim, false));
         $this->assertEquals(
-            1,
+            2,
             count(self::$directGroupService->getErrors()[$claim->getNumber()]),
             json_encode(self::$directGroupService->getErrors())
         );
