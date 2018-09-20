@@ -1092,14 +1092,8 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             'data.picSureStatus' => PhonePolicy::PICSURE_STATUS_INVALID
         ]);
         $hadInvalidPicSureStatus = false;
-        foreach ($previousInvalidPicSureStatuses as $status) {
-            $data = $status->getData();
-            if (array_key_exists('picSureStatus', $data) &&
-                $data['picSureStatus'] == PhonePolicy::PICSURE_STATUS_INVALID
-            ) {
-                $hadInvalidPicSureStatus = true;
-                break;
-            }
+        if (count($previousPicSureStatuses) > 0) {
+            $hadInvalidPicSureStatus = true;
         }
 
         return [
