@@ -194,15 +194,26 @@ class DaviesService extends S3EmailService
                     /** @var Claim $claim */
                     // 2 options - either db claim is closed or davies claim is closed
                     $logError = false;
+                    $preventImeiUpdate = false;
                     if (!$claim->isOpen() &&
                         isset($openClaims[$daviesClaim->getPolicyNumber()]) &&
                         $claim->getLossDate() > $openClaims[$daviesClaim->getPolicyNumber()] &&
                         $claim->getNumber() != $daviesClaim->claimNumber) {
-                        $logError = true;
+                        $preventImeiUpdate = true;
+                        if ($claim->getHandlingTeam() == Claim::TEAM_DAVIES) {
+                            $logError = true;
+                        }
                     } elseif (!$daviesClaim->isOpen() &&
                         $daviesClaim->lossDate > $claim->getLossDate() &&
                         $claim->getNumber() != $daviesClaim->claimNumber) {
-                        $logError = true;
+                        $preventImeiUpdate = true;
+                        if ($claim->getHandlingTeam() == Claim::TEAM_DAVIES) {
+                            $logError = true;
+                        }
+                    }
+
+                    if ($preventImeiUpdate) {
+                        $multiple[] = $policy->getPolicyNumber();
                     }
 
                     if ($logError) {
@@ -214,7 +225,6 @@ class DaviesService extends S3EmailService
                         );
                         // @codingStandardsIgnoreEnd
                         $this->errors[$claim->getNumber()][] = $msg;
-                        $multiple[] = $policy->getPolicyNumber();
                     }
                 }
             }

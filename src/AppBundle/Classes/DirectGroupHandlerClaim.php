@@ -66,6 +66,10 @@ class DirectGroupHandlerClaim extends HandlerClaim
     const DETAIL_STATUS_REJECTED_UNCLEAR = 'Unclear Circumstances'; // REJECT - 28
     const DETAIL_STATUS_REJECTED_COSMETIC = 'Wear and Tear/Cosmetic damages'; // REJECT - 29
 
+    public $replacementSupplier;
+    public $repairSupplier;
+    public $supplierStatus;
+
     public static $breakdownEmailAddresses = [
         'SoSure@directgroup.co.uk',
     ];
@@ -135,7 +139,7 @@ class DirectGroupHandlerClaim extends HandlerClaim
         } elseif (mb_stripos($lossType, mb_strtolower(self::TYPE_DAMAGE)) !== false) {
             return Claim::TYPE_DAMAGE;
         } elseif (mb_stripos($lossType, 'Breakdown') !== false) {
-            return Claim::TYPE_DAMAGE;
+            return Claim::TYPE_WARRANTY;
         } elseif (mb_stripos($lossType, 'Impact') !== false) {
             return Claim::TYPE_DAMAGE;
         } elseif (mb_stripos($lossType, 'Water') !== false) {
@@ -263,12 +267,9 @@ class DirectGroupHandlerClaim extends HandlerClaim
             $this->nullIfBlank($data[++$i]);
             // todo: Latest Claim handling team touch point date
             $this->excelDate($data[++$i]);
-            // todo: Replacement Supplier Name
-            $this->nullIfBlank($data[++$i]);
-            // todo: Repair Supplier Name
-            $this->nullIfBlank($data[++$i]);
-            // todo: Supplier status
-            $this->nullIfBlank($data[++$i]);
+            $this->replacementSupplier = $this->nullIfBlank($data[++$i]);
+            $this->repairSupplier = $this->nullIfBlank($data[++$i]);
+            $this->supplierStatus = $this->nullIfBlank($data[++$i]);
             // todo: Supplier pick up date
             $this->excelDate($data[++$i]);
             // todo: Supplier repair date
@@ -342,7 +343,8 @@ class DirectGroupHandlerClaim extends HandlerClaim
 
     public function isReplacementRepaired()
     {
-        return false;
+        // if repair supplier is present, then its a repair and imei will not be present
+        return mb_strlen($this->repairSupplier) > 0;
     }
 
 

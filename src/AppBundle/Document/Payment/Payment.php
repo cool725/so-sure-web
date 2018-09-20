@@ -581,10 +581,16 @@ abstract class Payment
      * @param boolean            $requireValidPolicy
      * @param string|null        $class
      * @param \DateTimeZone|null $timezone
+     * @param string|null        $dateMethod
      * @return array|null
      */
-    public static function dailyPayments($payments, $requireValidPolicy, $class = null, \DateTimeZone $timezone = null)
-    {
+    public static function dailyPayments(
+        $payments,
+        $requireValidPolicy,
+        $class = null,
+        \DateTimeZone $timezone = null,
+        $dateMethod = null
+    ) {
         if (count($payments) == 0) {
             return null;
         }
@@ -603,7 +609,17 @@ abstract class Payment
             }
 
             /** @var \DateTime $date */
-            $date = $payment->getDate();
+            $date = null;
+            if ($dateMethod) {
+                $date = call_user_func([$payment, $dateMethod]);
+            } else {
+                $date = $payment->getDate();
+            }
+            if (!$date) {
+                //$date = $payment->getDate();
+                continue;
+            }
+
             if ($timezone) {
                 $date = self::convertTimezone($date, $timezone);
             }

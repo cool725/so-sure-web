@@ -77,9 +77,9 @@ class MonitorService
     {
         if (method_exists($this, $name)) {
             return call_user_func([$this, $name]);
-        } else {
-            throw new \Exception(sprintf('Unknown monitor %s', $name));
         }
+
+        throw new \Exception(sprintf('Unknown monitor %s', $name));
     }
 
     public function multipay()
@@ -522,5 +522,34 @@ class MonitorService
                 $claim->getId()
             ));
         }
+    }
+
+    public function outstandingSubmittedClaims(array $tooOldSubmittedClaims = null)
+    {
+        if ($tooOldSubmittedClaims === null) {
+            $tooOldSubmittedClaims = $this->findOldSubmittedClaims(2);
+        }
+
+        if (count($tooOldSubmittedClaims) > 0) {
+            $sampleClaim = current($tooOldSubmittedClaims);
+            $claimId = $sampleClaim->getId();
+            throw new MonitorException(
+                "At least one Claim (eg: {$claimId}) is still marked as 'Submitted' after 2 business days"
+            );
+        }
+    }
+
+    private function findOldSubmittedClaims(int $businessDaysOld = 2): array
+    {
+        /** @var ClaimRepository $claimRepository */
+        $claimRepository = $this->dm->getRepository(Claim::class);
+        $twoBusinessDaysAgo = $this->subBusinessDays(new \DateTime(), $businessDaysOld);
+
+        return $claimRepository->findBy(
+            [
+                'status' => ['$in' => [Claim::STATUS_SUBMITTED]],
+                'statusLastUpdated' => ['$lte' => $twoBusinessDaysAgo],
+            ]
+        );
     }
 }

@@ -486,6 +486,16 @@ class BacsService
 
         $submittedPayments = $paymentRepo->findBy(['status' => BacsPayment::STATUS_SUBMITTED]);
 
+        /** @var \DateTime $currentProcessingDate */
+        $currentProcessingDate = null;
+        $elementList = $xpath->query(
+            '//BACSDocument/Data/ARUDD/Header'
+        );
+        /** @var \DOMElement $element */
+        foreach ($elementList as $element) {
+            $currentProcessingDate = $this->getCurrentProcessingDate($element);
+        }
+
         $elementList = $xpath->query(
             '//BACSDocument/Data/ARUDD/Advice/OriginatingAccountRecords/OriginatingAccountRecord/ReturnedDebitItem'
         );
@@ -527,6 +537,8 @@ class BacsService
                             $days->days
                         ));
                     }
+
+                    $this->dm->flush();
                 }
             }
 
@@ -553,7 +565,21 @@ class BacsService
             }
         }
 
+        $this->approvePayments($currentProcessingDate);
+
         return $results;
+    }
+
+    public function approvePayments(\DateTime $date)
+    {
+        /** @var BacsPaymentRepository $repo */
+        $repo = $this->dm->getRepository(BacsPayment::class);
+        $payments = $repo->findSubmittedPayments($this->endOfDay($date));
+        foreach ($payments as $payment) {
+            /** @var BacsPayment $payment */
+            $payment->approve();
+        }
+        $this->dm->flush();
     }
 
     public function ddic($file)
@@ -763,6 +789,15 @@ class BacsService
         return $originalProcessingDate;
     }
 
+    private function getCurrentProcessingDate(\DOMElement $element)
+    {
+        $currentProcessingDate = $element->attributes->getNamedItem('currentProcessingDate')->nodeValue;
+
+        $currentProcessingDate = \DateTime::createFromFormat('Y-m-d', $currentProcessingDate);
+
+        return $currentProcessingDate;
+    }
+
     private function validateRecordType(\DOMElement $element, $expectedRecordType)
     {
         $recordType = $this->getRecordType($element);
@@ -808,7 +843,7 @@ class BacsService
                 foreach ($errorsList as $error) {
                     $results['errors'][] = $error->attributes->getNamedItem('line1')->nodeValue;
                 }
-            } elseif ($recordType == "N") {
+            } elseif (in_array($recordType, ["N", "D"])) {
                 $reference = $this->getReference($element);
                 $repo = $this->dm->getRepository(User::class);
                 /** @var User $user */
@@ -843,11 +878,25 @@ class BacsService
             } else {
                 throw new \Exception(sprintf('Unknown record type %s', $recordType));
             }
-            $results['serial-number'] = $this->getNodeValue($element, 'vol-serial-number');
-            $results['file-numbers'][] = $this->getNodeValue($element, 'originator-file-number');
+
             $results['records']++;
-            $results['accepted-ddi'] += $this->getNodeValue($element, 'accepted-ddi', 0);
-            $results['rejected-ddi'] += $this->getNodeValue($element, 'rejected-ddi', 0);
+            if ($recordType != "D") {
+                $results['serial-number'] = $this->getNodeValue($element, 'vol-serial-number');
+                $results['file-numbers'][] = $this->getNodeValue($element, 'originator-file-number');
+                $results['accepted-ddi'] += $this->getNodeValue($element, 'accepted-ddi', 0);
+                $results['rejected-ddi'] += $this->getNodeValue($element, 'rejected-ddi', 0);
+            }
+        }
+
+        if ($results['rejected-ddi'] == 0 && $results['cancelled-ddi'] == 0) {
+            $this->approveMandates($results['serial-number']);
+        } else {
+            $this->logger->warning(sprintf(
+                'Failed to auto-approve mandates for serial file %s due to %d rejected ddis/%d cancelled ddis',
+                $results['serial-number'],
+                $results['rejected-ddi'],
+                $results['cancelled-ddi']
+            ));
         }
 
         return $results;

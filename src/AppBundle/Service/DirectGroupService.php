@@ -279,15 +279,26 @@ class DirectGroupService extends SftpService
                     /** @var Claim $claim */
                     // 2 options - either db claim is closed or davies claim is closed
                     $logError = false;
+                    $preventImeiUpdate = false;
                     if (!$claim->isOpen() &&
                         isset($openClaims[$directGroupClaim->getPolicyNumber()]) &&
                         $claim->getLossDate() > $openClaims[$directGroupClaim->getPolicyNumber()] &&
                         $claim->getNumber() != $directGroupClaim->claimNumber) {
-                        $logError = true;
+                        $preventImeiUpdate = true;
+                        if ($claim->getHandlingTeam() == Claim::TEAM_DIRECT_GROUP) {
+                            $logError = true;
+                        }
                     } elseif (!$directGroupClaim->isOpen() &&
                         $directGroupClaim->lossDate > $claim->getLossDate() &&
                         $claim->getNumber() != $directGroupClaim->claimNumber) {
-                        $logError = true;
+                        $preventImeiUpdate = true;
+                        if ($claim->getHandlingTeam() == Claim::TEAM_DIRECT_GROUP) {
+                            $logError = true;
+                        }
+                    }
+
+                    if ($preventImeiUpdate) {
+                        $multiple[] = $policy->getPolicyNumber();
                     }
 
                     if ($logError) {
@@ -299,7 +310,6 @@ class DirectGroupService extends SftpService
                         );
                         // @codingStandardsIgnoreEnd
                         $this->errors[$claim->getNumber()][] = $msg;
-                        $multiple[] = $policy->getPolicyNumber();
                     }
                 }
             }
@@ -442,6 +452,12 @@ class DirectGroupService extends SftpService
         $claim->setInitialSuspicion($directGroupClaim->initialSuspicion);
         $claim->setFinalSuspicion($directGroupClaim->finalSuspicion);
 
+        $claim->setSupplier(
+            $directGroupClaim->isReplacementRepaired() ?
+            $directGroupClaim->repairSupplier : $directGroupClaim->replacementSupplier
+        );
+        $claim->setSupplierStatus($directGroupClaim->supplierStatus);
+
         $this->updatePolicy($claim, $directGroupClaim, $skipImeiUpdate);
 
         $errors = $this->validator->validate($claim);
@@ -511,13 +527,6 @@ class DirectGroupService extends SftpService
             $directGroupClaim->replacementReceivedDate < $directGroupClaim->lossDate) {
             throw new \Exception(sprintf(
                 'Claim %s has a replacement received date prior to loss date',
-                $directGroupClaim->claimNumber
-            ));
-        }
-        if ($directGroupClaim->replacementReceivedDate &&
-            (!$directGroupClaim->replacementMake || !$directGroupClaim->replacementModel)) {
-            throw new \Exception(sprintf(
-                'Claim %s has a replacement received date without a replacement make/model',
                 $directGroupClaim->claimNumber
             ));
         }

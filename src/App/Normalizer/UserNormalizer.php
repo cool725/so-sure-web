@@ -49,7 +49,23 @@ class UserNormalizer implements NormalizerInterface, SerializerAwareInterface
                 ->filter(function (Policy $policy) {
                     return $policy->isActive();
                 })
-                ->first();
+                ->first()
+            ;
+
+            $userHomepage = $this->router->generate('user_home', [], UrlGeneratorInterface::ABSOLUTE_URL);
+
+            if ($policy == false) {
+                return [
+                    'widgets' => [
+                        [
+                            'type' => 'TEXT',
+                            "title" => "SO-SURE insurance policy",
+                            'text' => "You don't have a SO-SURE Policy",
+                            'launchUrl' => $userHomepage,
+                        ]
+                    ],
+                ];
+            }
 
             $policyNumber = $policy->getPolicyNumber();
             $phone = $policy->getPhone();
@@ -60,19 +76,16 @@ class UserNormalizer implements NormalizerInterface, SerializerAwareInterface
             // @codingStandardsIgnoreStart
             $text = "Expires on {$expiresDate}. You currently have {$connections} connections & your reward pot is worth £{$pot}";
             // @codingStandardsIgnoreEnd
-            $userHomepage = $this->router->generate('user_home', [], UrlGeneratorInterface::ABSOLUTE_URL);
 
             return [
                 'widgets' => [
                     [
                         'type' => 'TEXT',
-                        "title" => "So-Sure Policy {$policyNumber} for your {$phone}",
+                        "title" => "SO-SURE Policy {$policyNumber} for your {$phone}",
                         'text' => $text,
                         'launchUrl' => $userHomepage,
                     ]
                 ],
-                #'name' => $object->getName(),
-                #'policies' => $policies,
             ];
         }
 
