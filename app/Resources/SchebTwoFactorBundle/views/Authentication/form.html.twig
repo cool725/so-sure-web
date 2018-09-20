@@ -21,7 +21,11 @@
                         <div class="form-group">
                             <label for="_auth_code" class="h2">Google Auth MFA Code</label>
                             <input id="_auth_code" type="tel" class="form-control" placeholder="Enter 2FA" autocomplete="off" name="_auth_code" autofocus />
+                            {% for flashMessage in app.session.flashbag.get("two_factor") %}
+                                <label class="error">{{ flashMessage|trans }}</label>
+                            {% endfor %}
                         </div>
+
                         <div class="form-group">
                             <input type="submit" value="Login" class="btn btn-success btn-block" />
                         </div>

@@ -8,6 +8,26 @@ require('../../sass/pages/login.scss');
 require('jquery-validation');
 require('../../../js/Default/jqueryValidatorMethods.js');
 
+// Facebook
+AccountKit_OnInteractive = () => {
+    AccountKit.init({
+        appId: document.getElementById('login-account-kit').getAttribute('data-key'),
+        state: document.getElementById('login-account-kit').getAttribute('data-csrf'),
+        version: "v1.0",
+        fbAppEventsEnabled: true
+    });
+}
+
+// Load facebook SDK
+window.fbAsyncInit = () => {
+    FB.init({
+        appId: document.getElementById('ss-root').getAttribute('data-fb-id'),
+        xfbml: true,
+        version: 'v2.12',
+        status: true
+    });
+}
+
 (function(d, s, id) {
   var js, fjs = d.getElementsByTagName(s)[0];
   if (d.getElementById(id)) {
@@ -18,13 +38,72 @@ require('../../../js/Default/jqueryValidatorMethods.js');
   js.src = "//connect.facebook.net/en_US/sdk.js";
   fjs.parentNode.insertBefore(js, fjs);
 }(document, 'script', 'facebook-jssdk'));
+// End - Load facebook SDK
 
-window.fbAsyncInit = () => {
-    FB.init({
-        appId: document.getElementById('ss-root').getAttribute('data-fb-id'),
-        xfbml: true,
-        version: 'v2.12',
-        status: true
+
+loginCallback = (response) => {
+    if (response.status === "PARTIALLY_AUTHENTICATED") {
+        $('#accountkit-code').val(response.code);
+        $('#accountkit-csrf').val(response.state);
+        $('#accountkit-form').submit();
+    }
+    else if (response.status === "NOT_AUTHENTICATED") {
+        // handle authentication failure
+    }
+    else if (response.status === "BAD_PARAMS") {
+        // handle bad parameters
+    }
+}
+
+smsLogin = () => {
+    let countryCode = document.getElementById("country_code").value;
+    let phoneNumber = document.getElementById("phone_number").value;
+    AccountKit.login(
+        'PHONE',
+        {countryCode: countryCode, phoneNumber: phoneNumber}, // will use default values if not specified
+        loginCallback
+    );
+}
+
+onLogin = (loginResponse) => {
+    // Send headers to your server and validate user by calling Digits API
+    let oAuthHeaders = loginResponse.oauth_echo_headers;
+    let verifyData = {
+        credentials: oAuthHeaders['X-Verify-Credentials-Authorization'],
+        provider: oAuthHeaders['X-Auth-Service-Provider']
+    };
+    $('#credentials').val(verifyData.credentials);
+    $('#provider').val(verifyData.provider);
+    $('#digits-form').submit();
+}
+
+let loadDigitsInterval;
+
+loadDigits = () => {
+    window.Digits.init({ consumerKey: $('.login-digits').data('key') }).done(function() {
+        clearInterval(loadDigitsInterval);
+        $('.digits-loading').hide();
+        window.Digits.embed({
+            container: '.digits-container',
+            phoneNumber: '+44'
+        })
+        .done(onLogin)
+        .fail(function() { alert('Sorry, there seems to be a temporary issue with logging in.  Please try the email login or contact support@wearesosure.com'); });
+    });
+}
+
+fb_login = () => {
+    FB.getLoginStatus(function(response) {
+        if (response.status === 'connected') {
+            document.location = $('#ss-root').data('fb-redirect');
+        } else {
+            // not_authorized
+            FB.login(function(response) {
+                if (response.authResponse) {
+                    document.location = $('#ss-root').data('fb-redirect');
+                }
+            }, {scope: 'email'});
+        }
     });
 }
 
@@ -37,9 +116,9 @@ sosure.login = (function() {
     self.accountkit = null;
     self.showSMSLogin = null;
     self.swapLogin = null;
+    self.smsLoginbtn = null;
     // Facebook
     self.fbLoginBtn = null;
-    self.loadDigitsInterval = null;
     // Validation
     self.form = null;
     self.isIE = null;
@@ -52,6 +131,7 @@ sosure.login = (function() {
         self.swapLogin = $('#swap-login');
         self.fbLoginBtn = $('#fb-login');
         self.form = $('#login-email-form');
+        self.smsLoginbtn = $('#sms-login-btn');
         if (self.form.data('client-validation') && !self.isIE) {
             self.addValidation();
         }
@@ -69,80 +149,6 @@ sosure.login = (function() {
     self.btnToggle = () => {
         self.swapLogin.find('span').toggleText('SMS', 'Email');
         self.swapLogin.find('i').toggleClass('fas fa-envelope fal fa-mobile-android');
-    }
-
-    // Facebook
-    self.AccountKit_OnInteractive = () => {
-        AccountKit.init({
-            appId: document.getElementById('login-account-kit').getAttribute('data-key'),
-            state: document.getElementById('login-account-kit').getAttribute('data-csrf'),
-            version: "v1.0",
-            fbAppEventsEnabled: true
-        });
-    }
-
-    self.loginCallback = (response) => {
-        if (response.status === "PARTIALLY_AUTHENTICATED") {
-            $('#accountkit-code').val(response.code);
-            $('#accountkit-csrf').val(response.state);
-            $('#accountkit-form').submit();
-        }
-        else if (response.status === "NOT_AUTHENTICATED") {
-            // handle authentication failure
-        }
-        else if (response.status === "BAD_PARAMS") {
-            // handle bad parameters
-        }
-    }
-
-    self.smsLogin = () => {
-        let countryCode = document.getElementById("country_code").value;
-        let phoneNumber = document.getElementById("phone_number").value;
-        AccountKit.login(
-            'PHONE',
-            {countryCode: countryCode, phoneNumber: phoneNumber}, // will use default values if not specified
-            self.loginCallback
-        );
-    }
-
-    self.onLogin = (loginResponse) => {
-        // Send headers to your server and validate user by calling Digits API
-        let oAuthHeaders = loginResponse.oauth_echo_headers;
-        let verifyData = {
-            credentials: oAuthHeaders['X-Verify-Credentials-Authorization'],
-            provider: oAuthHeaders['X-Auth-Service-Provider']
-        };
-        $('#credentials').val(verifyData.credentials);
-        $('#provider').val(verifyData.provider);
-        $('#digits-form').submit();
-    }
-
-    self.loadDigits = () => {
-        window.Digits.init({ consumerKey: $('.login-digits').data('key') }).done(function() {
-            clearInterval(loadDigitsInterval);
-            $('.digits-loading').hide();
-            window.Digits.embed({
-                container: '.digits-container',
-                phoneNumber: '+44'
-            })
-            .done(onLogin)
-            .fail(function() { alert('Sorry, there seems to be a temporary issue with logging in.  Please try the email login or contact support@wearesosure.com'); });
-        });
-    }
-
-    self.fb_login = () => {
-        FB.getLoginStatus(function(response) {
-            if (response.status === 'connected') {
-                document.location = $('#ss-root').data('fb-redirect');
-            } else {
-                // not_authorized
-                FB.login(function(response) {
-                    if (response.authResponse) {
-                        document.location = $('#ss-root').data('fb-redirect');
-                    }
-                }, {scope: 'email'});
-            }
-        });
     }
 
     // Validate the input
@@ -263,9 +269,14 @@ $(function() {
     sosure.login.fbLoginBtn.on('click', function(e) {
         e.preventDefault();
 
-        sosure.login.fb_login();
+        fb_login();
     });
 
     // SMS Login
+    // sosure.login.smsLoginbtn.on('click', function(e) {
+    //     e.preventDefault();
+
+    //     smsLogin();
+    // });
 
 });
