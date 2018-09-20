@@ -410,7 +410,7 @@ abstract class Policy
     /**
      * @MongoDB\ReferenceMany(targetDocument="AppBundle\Document\ScheduledPayment", cascade={"persist"})
      */
-    protected $scheduledPayments = array();
+    protected $scheduledPayments;
 
     /**
      * @Assert\DateTime()
@@ -497,6 +497,7 @@ abstract class Policy
         $this->linkedClaims = new \Doctrine\Common\Collections\ArrayCollection();
         $this->acceptedConnections = new \Doctrine\Common\Collections\ArrayCollection();
         $this->acceptedConnectionsRenewal = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->scheduledPayments = new \Doctrine\Common\Collections\ArrayCollection();
         $this->potValue = 0;
     }
 
@@ -1570,6 +1571,12 @@ abstract class Policy
 
     public function addScheduledPayment(ScheduledPayment $scheduledPayment)
     {
+        // For some reason, duplicate scheduled payments occurred in production
+        // this pattern is used in other methods to fix issues with tests, so will hopefully work
+        if ($this->scheduledPayments->contains($scheduledPayment)) {
+            throw new \Exception('duplicate scheduled payment');
+        }
+
         $scheduledPayment->setPolicy($this);
         $this->scheduledPayments[] = $scheduledPayment;
     }
