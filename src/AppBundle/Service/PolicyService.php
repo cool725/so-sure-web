@@ -472,6 +472,8 @@ class PolicyService
 
             if ($numPayments === null) {
                 $this->generateScheduledPayments($policy, $date, $numPayments);
+            } else {
+                $policy->setPremiumInstallments($numPayments);
             }
 
             // Generate/set scode prior to creating policy as policy create has a fallback scode creation

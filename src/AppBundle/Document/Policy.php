@@ -3888,7 +3888,7 @@ abstract class Policy
         if ($this->getPremiumPlan() == self::PLAN_YEARLY) {
             $expectedPaid = $this->getPremium()->getAdjustedYearlyPremiumPrice();
         } elseif ($this->getPremiumPlan() == self::PLAN_MONTHLY) {
-            $months = $this->dateDiffMonths($date, $this->getBilling());
+            $months = $this->dateDiffMonths($date, $this->getBilling(), true, true);
             if ($months > 12) {
                 $months = 12;
             }

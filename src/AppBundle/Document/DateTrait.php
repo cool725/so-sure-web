@@ -239,7 +239,7 @@ trait DateTrait
         return $businessDays;
     }
 
-    public function dateDiffMonths(\DateTime $date1, \DateTime $date2, $ceil = true)
+    public function dateDiffMonths(\DateTime $date1, \DateTime $date2, $ceil = true, $diffIfSame = false)
     {
         if ($date1 < $date2) {
             return 0;
@@ -250,6 +250,9 @@ trait DateTrait
             if ($diff->d > 0 || $diff->h > 0 || $diff->i > 0 || $diff->s > 0) {
                 $months++;
             }
+        }
+        if ($date1 == $date2 && $diffIfSame) {
+            $months = 1;
         }
 
         return $months;
