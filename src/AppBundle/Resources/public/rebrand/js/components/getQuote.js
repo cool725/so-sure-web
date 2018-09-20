@@ -15,12 +15,6 @@ $(function() {
             $(hamburger).trigger('click');
         }
 
-        // If using lighter theme - Toggle logo class
-        // TODO: this could all be done by class - refactor
-        if (!$('.navbar').is('.navbar-light')) {
-            logo.toggleClass('navbar-brand__logo-white-light');
-        }
-
         // Fix for resizing select if phone in session
         if ($('body').is('.quote, .purchase')) {
             $('.phone-search-dropdown__make, .phone-search-dropdown__model').resizeselect();
