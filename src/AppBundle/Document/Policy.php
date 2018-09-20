@@ -410,7 +410,7 @@ abstract class Policy
     /**
      * @MongoDB\ReferenceMany(targetDocument="AppBundle\Document\ScheduledPayment", cascade={"persist"})
      */
-    protected $scheduledPayments = array();
+    protected $scheduledPayments;
 
     /**
      * @Assert\DateTime()
@@ -497,6 +497,7 @@ abstract class Policy
         $this->linkedClaims = new \Doctrine\Common\Collections\ArrayCollection();
         $this->acceptedConnections = new \Doctrine\Common\Collections\ArrayCollection();
         $this->acceptedConnectionsRenewal = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->scheduledPayments = new \Doctrine\Common\Collections\ArrayCollection();
         $this->potValue = 0;
     }
 
