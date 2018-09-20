@@ -26,11 +26,19 @@
         <div class="container">
             <div class="row">
                 <div class="col-md-8 col-md-offset-2">
-                    <h1 class="text-center">Thank you for submitting your claim.</h1>
+                    {% if is_in_review %}
+                        <h1 class="text-center">Currently being reviewed.</h1>
 
-                    <p class="lead text-center">Your claim for <span class="h4">{{ claim.type }}</span> for your <span class="h4">{{ phone }}</span> with IMEI <span class="h4">{{ claim.policy.imei }}</span> has been sent to our claims team for processing. </p>
+                        <p class="lead text-center">Your claim for <span class="h4">{{ claim.type }}</span> for your <span class="h4">{{ phone }}</span> with IMEI <span class="h4">{{ claim.policy.imei }}</span> is being processed by our claims team. </p>
 
-                    <p class="text-center">We will make any attempt to get in touch with you on the number you provided <span class="h4">{{ claim.phoneToReach }}</span> when you requested: <span class="h4">{{ claim.timeToReach }}</span>.</p>
+                        <p class="text-center">If you need to upload more documents please use the form below.</p>
+                    {% else %}
+                        <h1 class="text-center">Thank you for submitting your claim.</h1>
+
+                        <p class="lead text-center">Your claim for <span class="h4">{{ claim.type }}</span> for your <span class="h4">{{ phone }}</span> with IMEI <span class="h4">{{ claim.policy.imei }}</span> has been sent to our claims team for processing. </p>
+
+                        <p class="text-center">If we need to get in touch we will contact you with the details you provided...<br><br>Number: <span class="h4">{{ claim.phoneToReach }}</span><br>Time you requested: <span class="h4">{{ claim.timeToReach }}</span>.<br><small>(Incorrect details? <a href="#" class="open-intercom">Contact us</a>)</small></p>
+                    {% endif %}
 
                     <p class="text-center"><a href="{{ path('user_home') }}" class="btn btn-link btn-lg">Get back to your account</a></p>
 
@@ -201,6 +209,7 @@
                         </div>
                     {{ form_end(claim_form) }}
 
+                    <p class="lead text-center"><br><strong>Prefer to speak to a human?</strong><br>Call our claims team on <strong><a href="tel:01133209722" class="text-nowrap text-blue">0113 320 9722</a></strong> (local rates apply).</p>
                 </div>
             </div>
         </div>
@@ -218,7 +227,6 @@
     'components/moment/moment.min.js'
     'components/jquery-mask-plugin/jquery.mask.min.js'
     'components/jquery-validation/jquery.validate.min.js'
-    '@AppBundle/Resources/public/js/Default/jqueryValidatorMethods.js'
-    '@AppBundle/Resources/public/js/User/claim.js' %}
+    '@AppBundle/Resources/public/js/Default/jqueryValidatorMethods.js' %}
     <script src="{{ asset_url }}"></script>{% endjavascripts %}
 {% endblock %}

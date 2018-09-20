@@ -52,6 +52,7 @@ class ClaimVoter extends Voter
             if (!in_array($claim->getStatus(), [
                 Claim::STATUS_FNOL,
                 Claim::STATUS_SUBMITTED,
+                Claim::STATUS_INREVIEW
             ])) {
                 return false;
             }
