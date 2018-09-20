@@ -65,18 +65,6 @@ smsLogin = () => {
     );
 }
 
-onLogin = (loginResponse) => {
-    // Send headers to your server and validate user by calling Digits API
-    let oAuthHeaders = loginResponse.oauth_echo_headers;
-    let verifyData = {
-        credentials: oAuthHeaders['X-Verify-Credentials-Authorization'],
-        provider: oAuthHeaders['X-Auth-Service-Provider']
-    };
-    $('#credentials').val(verifyData.credentials);
-    $('#provider').val(verifyData.provider);
-    $('#digits-form').submit();
-}
-
 fb_login = () => {
     FB.getLoginStatus(function(response) {
         if (response.status === 'connected') {

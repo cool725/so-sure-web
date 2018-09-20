@@ -79,6 +79,12 @@
         }
     }
 
+    @media (max-width: 320px) {
+        width: auto; height: auto;
+        padding-top: 3rem;
+        overflow: scroll;
+    }
+
     // Backgrounds
     &__phone__background {
         width: 352px; height: 467px;
