@@ -216,7 +216,10 @@ class BacsPayment extends Payment
         $this->setStatus(self::STATUS_SUCCESS);
         $this->setSuccess(true);
 
-        $this->setCommission();
+        // Usually commission would not be set, however, if we may have needed to manully set the commission
+        if (!$this->getTotalCommission()) {
+            $this->setCommission();
+        }
 
         /** @var BacsPaymentMethod $bacsPaymentMethod */
         $bacsPaymentMethod = $this->getPolicy()->getUser()->getPaymentMethod();
