@@ -11,8 +11,6 @@
         text-align: center;
 
         @include breakpoint(tablet) {
-            padding-bottom: 100px;
-
             h1 {
                 font-size: 46px;
             }

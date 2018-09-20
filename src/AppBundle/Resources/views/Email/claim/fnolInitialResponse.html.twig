@@ -1,6 +1,6 @@
 {% extends 'AppBundle:Email:base.html.twig' %}
 {% import "AppBundle:Email:macros.html.twig" as macros %}
-{% block title %}Your claim with so-sure.{% endblock %}
+{% block title %}ATTENTION: You have an unfinished claim with so-sure.{% endblock %}
 {% block body %}
 	{{ macros.start_table() }}
 	<h1>
@@ -11,13 +11,17 @@
 	   <div style="font-size: 14px; text-align: left;"><span style="font-family:arial,helvetica neue,helvetica,sans-serif">
         Hi {{ data.policy.user.name }},
         <br><br>
-        Thank you for starting your claim. Please note your claim <strong><u>has not</u></strong> been submitted as you need to submit additional documents. In order to submit and proceed with your claim, you will need you to upload the necessary documents as outlined to you in the online claims portal. Failure to do so will delay your claim.
+		Thank you for starting your claim, but please note at this point <strong>your claim has not been submitted</strong> as you still need to provide additional information.
         <br><br>
-        If you need to come back at a later time to the online claims portal, simply enter your email using the link below. You will then receive another email to login to your account which is valid for 2 hours (due to security reasons).
+		In order to submit and proceed with your claim, you will need to upload the necessary documents as outlined to you in the online claims portal. Failure to do so will result in delays to your claim. 
         <br><br>
-        <a href="{{ url('claim') }}">Click here to login</a>
+		If you need to come back at a later time, simply enter your email using the link below. 
         <br><br>
-        We’re here if you have any further questions and hope to resolve your claim as fast as we can. If you have issues uploading the documents please contact the claims team on 0113 320 9722.
+		You will then receive another email to login to your account, which is valid for 2 hours (due to security reasons). 
+        <br><br>
+		{{ macros.email_button_table(url('claim_login'), "CLICK HERE TO LOGIN", "CLICK HERE TO LOGIN")}}
+        <br><br>
+		If you have any further questions or issue please <a href="mailto:support@wearesosure.com">contact us</a>. 
         <br><br>
         Thanks for using so-sure.
 		   </span>

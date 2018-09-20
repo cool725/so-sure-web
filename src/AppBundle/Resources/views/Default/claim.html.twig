@@ -20,12 +20,36 @@
 
 {% block body %}
 
-    {# Claims Hero #}
-    <section class="section--pad claim__hero section--arrow">
+    {# Claims Form #}
+    <section class="section--pad claim__hero" id="claim-form-container" >
         <div class="container">
-            <h1 class="text-blue">Need to make a claim?</h1>
-            <p class="big-text">Let us guide you through the process so we can get your claim approved and your phone repaired or replaced ASAP.</p><br>
-            <img src="{{ cdn_url }}/images/mobile_mike/so-sure_mobile_mike_damage_dark.png" width="220px" class="img-center img-circle animated tada">
+            <div class="row">
+                <div class="col-md-6 col-md-offset-3">
+                <h1 class="text-blue">Need to make a claim?</h1>
+                    <h3>Enter your email and we'll send you a link to get started.</h3>
+                    {{ form_start(claim_email_form, {
+                        'attr': {
+                            'data-toggle': 'validator',
+                            'class': 'validate-form',
+                            'id':'claim-email-form',
+                            'data-client-validation': form_client_validation
+                    }}) }}
+                        <div class="form-group {% if form_errors(claim_email_form.email) %}has-error{% endif %}">
+                            {{ form_widget(claim_email_form.email, { 'attr': {'class': 'form-control', 'placeholder': 'Email Address'}}) }}
+                            <div class="help-block"><span class="text-danger"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Please use the email address associated with your so-sure policy</span></div>
+                            <div class="help-block with-errors">{{ form_errors(claim_email_form.email) }}</div>
+                        </div>
+                        <div class="form-group">
+                           {{ form_widget(claim_email_form.submit, {
+                                'label': 'Send me the link',
+                                'attr': {
+                                    'class': 'btn btn-blue btn-pad btn-lg'
+                            }}) }}
+                        </div>
+                    {{ form_end(claim_email_form) }}
+                    <p>Need to check an existing claim? Please <a href="{{ url('claim_login') }}">login here</a>.</p>
+                </div>
+            </div>
         </div>
     </section>
 
@@ -37,7 +61,7 @@
                 <div class="col-md-4">
                     <span class="large-no large-no--arrow">1</span>
                     <h3 class="text-blue">Contact Claims Team</h3>
-                    <p>Let us know what happened. You can start our online claims process by <a href="#" class="text-nowrap scroll-to h4 text-blue" data-scroll-to-anchor="#claim-email-form">entering your email in the form below</a>, or calling our claims team on <a href="tel:01133209722" class="h4 text-blue">0113 320 9722</a> <small>(local rates apply)</small>.</p>
+                    <p>Let us know what happened. You can start our online claims process by <a href="#" class="text-nowrap scroll-to h4 text-blue" data-scroll-to-anchor="#claim-email-form">entering your email in the form above</a>.</p>
                 </div>
                 <div class="col-md-4">
                     <span class="large-no large-no--arrow">2</span>
@@ -69,37 +93,6 @@
         </div>
     </section>
 
-    {# Claims Form #}
-    <section class="section--pad claim__form" id="claim-form-container" >
-        <div class="container">
-            <div class="row">
-                <div class="col-md-6 col-md-offset-3">
-                    <img src="{{ cdn_url }}/images/mobile_mike/so-sure_mobile_mike_water_dark.png" width="220px" class="img-center img-circle" alt="">
-                    <h3>Enter your email address to start your claim.</h3>
-                    {{ form_start(claim_email_form, {
-                        'attr': {
-                            'data-toggle': 'validator',
-                            'class': 'validate-form',
-                            'id':'claim-email-form',
-                            'data-client-validation': form_client_validation
-                    }}) }}
-                        <div class="form-group {% if form_errors(claim_email_form.email) %}has-error{% endif %}">
-                            {{ form_widget(claim_email_form.email, { 'attr': {'class': 'form-control', 'placeholder': 'Email Address'}}) }}
-                            <div class="help-block"><span class="text-danger"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Please use the email address associated with your so-sure policy</span></div>
-                            <div class="help-block with-errors">{{ form_errors(claim_email_form.email) }}</div>
-                        </div>
-                        <div class="form-group">
-                           {{ form_widget(claim_email_form.submit, {
-                                'label': 'Start my claim',
-                                'attr': {
-                                    'class': 'btn btn-blue btn-pad btn-lg'
-                            }}) }}
-                        </div>
-                    {{ form_end(claim_email_form) }}
-                </div>
-            </div>
-        </div>
-    </section>
 
     {# Page Modals #}
     {# End Page Modals #}
