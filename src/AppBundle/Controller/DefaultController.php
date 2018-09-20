@@ -629,9 +629,8 @@ class DefaultController extends BaseController
 
         if ($request->get('_route') == 'claim_login') {
             return $this->render('AppBundle:Default:claimLogin.html.twig', $data);
-        } else {
-            return $this->render('AppBundle:Default:claim.html.twig', $data);
         }
+        return $this->render('AppBundle:Default:claim.html.twig', $data);
     }
 
     /**

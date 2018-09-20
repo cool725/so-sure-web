@@ -568,7 +568,7 @@ class ClaimsService
 
             if ($isUpdate) {
                 $this->mailer->sendTemplate(
-                    'Your link to review with your claim',
+                    'Your link to review your claim',
                     $user->getEmail(),
                     "AppBundle:Email:claim/loginLinkUpdate.html.twig",
                     $data,
