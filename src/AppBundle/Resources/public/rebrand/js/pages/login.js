@@ -77,21 +77,6 @@ onLogin = (loginResponse) => {
     $('#digits-form').submit();
 }
 
-let loadDigitsInterval;
-
-loadDigits = () => {
-    window.Digits.init({ consumerKey: $('.login-digits').data('key') }).done(function() {
-        clearInterval(loadDigitsInterval);
-        $('.digits-loading').hide();
-        window.Digits.embed({
-            container: '.digits-container',
-            phoneNumber: '+44'
-        })
-        .done(onLogin)
-        .fail(function() { alert('Sorry, there seems to be a temporary issue with logging in.  Please try the email login or contact support@wearesosure.com'); });
-    });
-}
-
 fb_login = () => {
     FB.getLoginStatus(function(response) {
         if (response.status === 'connected') {
@@ -271,12 +256,5 @@ $(function() {
 
         fb_login();
     });
-
-    // SMS Login
-    // sosure.login.smsLoginbtn.on('click', function(e) {
-    //     e.preventDefault();
-
-    //     smsLogin();
-    // });
 
 });
