@@ -1942,7 +1942,7 @@ class DirectGroupServiceTest extends WebTestCase
         $directGroupClaim->replacementReceivedDate = new \DateTime();
         $this->assertTrue(static::$directGroupService->saveClaim($directGroupClaim, false));
         $this->assertEquals(
-            1,
+            2,
             count(self::$directGroupService->getErrors()[$claim->getNumber()]),
             json_encode(self::$directGroupService->getErrors())
         );
