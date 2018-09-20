@@ -469,6 +469,11 @@ class UserController extends BaseController
             [$policy->getStandardSCode()->getShareLink(), $policy->getStandardSCode()->getCode()]
         );
 
+        $fbFriends = null;
+        if ($this->get('app.feature')->isEnabled(Feature::FEATURE_APP_FACEBOOK_USERFRIENDS_PERMISSION)) {
+            $fbFriends = $this->getFacebookFriends($request, $policy);
+        }
+
         return array(
             'policy' => $policy,
             'email_form' => $emailInvitationForm->createView(),
@@ -478,7 +483,7 @@ class UserController extends BaseController
             'scode' => $scode,
             'unconnected_user_policy_form' => $unconnectedUserPolicyForm->createView(),
             'share_experiment_text' => $shareExperimentText,
-            'friends' => $this->getFacebookFriends($request, $policy),
+            'friends' => $fbFriends,
         );
     }
 
