@@ -1087,6 +1087,21 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             $previousPicSureStatus = $previousPicSureStatuses[0];
         }
 
+        $previousInvalidPicSureStatuses = $logRepo->findBy([
+            'objectId' => $policy->getId(),
+            'data.picSureStatus' => PhonePolicy::PICSURE_STATUS_INVALID
+        ]);
+        $hadInvalidPicSureStatus = false;
+        foreach ($previousInvalidPicSureStatuses as $status) {
+            $data = $status->getData();
+            if (array_key_exists('picSureStatus', $data) &&
+                $data['picSureStatus'] == PhonePolicy::PICSURE_STATUS_INVALID
+            ) {
+                $hadInvalidPicSureStatus = true;
+                break;
+            }
+        }
+
         return [
             'policy' => $policy,
             'cancel_form' => $cancelForm->createView(),
@@ -1124,6 +1139,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             'phones' => $dm->getRepository(Phone::class)->findActive()->getQuery()->execute(),
             'now' => new \DateTime(),
             'previousPicSureStatus' => $previousPicSureStatus,
+            'hadInvalidPicSureStatus' => $hadInvalidPicSureStatus,
         ];
     }
 
