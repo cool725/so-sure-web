@@ -40,6 +40,7 @@ class UserSearchType extends BaseType
             ->add('email', TextType::class, ['required' => false])
             ->add('mobile', TextType::class, ['required' => false])
             ->add('postcode', TextType::class, ['required' => false])
+            ->add('firstname', TextType::class, ['required' => false])
             ->add('lastname', TextType::class, ['required' => false])
             ->add('facebookId', TextType::class, ['required' => false])
             ->add('sosure', ChoiceType::class, [
@@ -53,7 +54,7 @@ class UserSearchType extends BaseType
             ])
             ->add('waitingSanctions', CheckboxType::class, ['required' => false])
             ->add('allSanctions', CheckboxType::class, ['required' => false])
-            ->add('id', TextType::class, ['required' => false])
+            ->add('id', TextType::class, ['required' => false, 'label'=>'ID (User object id)'])
             ->add('search', SubmitType::class)
         ;
 
@@ -63,6 +64,7 @@ class UserSearchType extends BaseType
             $this->formQuerystring($form, $currentRequest, 'email');
             $this->formQuerystring($form, $currentRequest, 'mobile');
             $this->formQuerystring($form, $currentRequest, 'postcode');
+            $this->formQuerystring($form, $currentRequest, 'firstname');
             $this->formQuerystring($form, $currentRequest, 'lastname');
             $this->formQuerystring($form, $currentRequest, 'facebookId');
             $this->formQuerystring($form, $currentRequest, 'waitingSanctions');

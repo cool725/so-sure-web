@@ -945,6 +945,7 @@ abstract class BaseController extends Controller
         }
         $userFormData = [
             'email' => 'emailCanonical',
+            'firstname' => 'firstName',
             'lastname' => 'lastName',
             'mobile' => 'mobileNumber',
             'postcode' => 'billingAddress.postcode',
