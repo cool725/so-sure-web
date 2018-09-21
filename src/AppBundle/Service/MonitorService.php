@@ -3,29 +3,28 @@ namespace AppBundle\Service;
 
 use AppBundle\Classes\Salva;
 use AppBundle\Document\Cashback;
+use AppBundle\Document\Claim;
+use AppBundle\Document\DateTrait;
 use AppBundle\Document\File\AccessPayFile;
+use AppBundle\Document\File\DaviesFile;
+use AppBundle\Document\File\DirectGroupFile;
+use AppBundle\Document\MultiPay;
 use AppBundle\Document\Payment\BacsPayment;
 use AppBundle\Document\Payment\Payment;
+use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\Policy;
+use AppBundle\Document\PolicyTerms;
 use AppBundle\Document\User;
+use AppBundle\Exception\MonitorException;
 use AppBundle\Repository\BacsPaymentRepository;
 use AppBundle\Repository\CashbackRepository;
 use AppBundle\Repository\ClaimRepository;
-use AppBundle\Repository\File\S3FileRepository;
 use AppBundle\Repository\PaymentRepository;
 use AppBundle\Repository\PhonePolicyRepository;
 use AppBundle\Repository\PolicyRepository;
 use AppBundle\Repository\UserRepository;
-use Psr\Log\LoggerInterface;
-use GuzzleHttp\Client;
 use Doctrine\ODM\MongoDB\DocumentManager;
-use AppBundle\Exception\MonitorException;
-use AppBundle\Document\Policy;
-use AppBundle\Document\PhonePolicy;
-use AppBundle\Document\PolicyTerms;
-use AppBundle\Document\MultiPay;
-use AppBundle\Document\Claim;
-use AppBundle\Document\File\DaviesFile;
-use AppBundle\Document\DateTrait;
+use Psr\Log\LoggerInterface;
 
 class MonitorService
 {
@@ -192,6 +191,20 @@ class MonitorService
     public function daviesImport()
     {
         $fileRepo = $this->dm->getRepository(DaviesFile::class);
+        $this->hasRecentS3Import($fileRepo);
+    }
+
+    public function directgroupImport()
+    {
+        $fileRepo = $this->dm->getRepository(DirectGroupFile::class);
+        $this->hasRecentS3Import($fileRepo);
+    }
+
+    /**
+     * Check the 'file repo' - ensure a matching document was put there in the last day
+     */
+    private function hasRecentS3Import($fileRepo)
+    {
         $successFiles = $fileRepo->findBy(['success' => true], ['created' => 'desc'], 1);
         $successFile = count($successFiles) > 0 ? $successFiles[0] : null;
         if (!$successFile) {
@@ -201,10 +214,8 @@ class MonitorService
         $now = $this->startOfDay(new \DateTime());
         $diff = $now->diff($successFile->getCreated());
         if ($diff->days >= 1) {
-            throw new MonitorException(sprintf(
-                'Last successful import on %s',
-                $successFile->getCreated()->format(\DateTime::ATOM)
-            ));
+            $fileDateTime = $successFile->getCreated()->format(\DateTime::ATOM);
+            throw new MonitorException('Last successful import on ' . $fileDateTime);
         }
     }
 
