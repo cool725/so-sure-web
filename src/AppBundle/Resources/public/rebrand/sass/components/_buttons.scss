@@ -45,15 +45,9 @@
     padding: .6rem 1rem;
     @include border-radius(8px);
 
-    @media (max-width: 320px) {
-        span {
-            display: none;
-        }
-    }
-
     span {
         display: block;
-        font-size: 80%;
+        font-size: 75%;
     }
 
     @include media-breakpoint-up(sm) {
@@ -62,12 +56,6 @@
             font-size: 100%;
         }
     }
-    // @include media-breakpoint-down(xs) {
-    //     span {
-    //         display: block;
-    //         font-size: 80%;
-    //     }
-    // }
 }
 
 .btn-circle {

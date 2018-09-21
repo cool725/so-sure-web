@@ -79,12 +79,6 @@
         }
     }
 
-    @media (max-width: 320px) {
-        width: auto; height: auto;
-        padding-top: 3rem;
-        overflow: scroll;
-    }
-
     // Backgrounds
     &__phone__background {
         width: 352px; height: 467px;
@@ -107,6 +101,28 @@
 
             background: transparent url('#{$cdn_url}/images/rebrand/login/so-sure_login-money.png') no-repeat;
             background-size: 367px;
+        }
+    }
+
+    // Adjustments for small phones
+    @media (max-width: 320px) {
+        width: auto; height: auto;
+        padding-top: 3rem;
+        overflow: scroll;
+
+        &:before {
+            background-image: none;
+        }
+
+        &__card {
+
+            &__body {
+                padding: 1.2rem;
+            }
+        }
+
+        &__divider {
+            margin: 1.8rem -1.2rem;
         }
     }
 }
