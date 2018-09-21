@@ -1278,7 +1278,6 @@ nelmio_security:
 dpn_xml_sitemap:
     additional_sitemaps:
         - help/sitemap.xml
-        - blog/sitemap.xml
 
 fos_oauth_server:
     db_driver: mongodb
