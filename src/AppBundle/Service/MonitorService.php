@@ -341,14 +341,18 @@ class MonitorService
                 json_encode($results['additional-payments'])
             ));
             // @codingStandardsIgnoreEnd
-        } elseif (isset($results['missing']) && count($results['missing']) > 0) {
+        }
+
+        if (isset($results['missing']) && count($results['missing']) > 0) {
             // @codingStandardsIgnoreStart
             throw new MonitorException(sprintf(
                 'Judopay is missing database payment records that indices a mobile payment was received, but not recorded. %s',
                 json_encode($results['missing'])
             ));
             // @codingStandardsIgnoreEnd
-        } elseif (isset($results['invalid']) && count($results['invalid']) > 0) {
+        }
+
+        if (isset($results['invalid']) && count($results['invalid']) > 0) {
             // @codingStandardsIgnoreStart
             throw new MonitorException(sprintf(
                 'Judopay has invalid database payment records. %s',
