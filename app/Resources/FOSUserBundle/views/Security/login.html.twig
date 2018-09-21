@@ -56,7 +56,7 @@
                                 <input placeholder="Enter Mobile Number" id="phone_number" name="phone_number" class="form-control" type="tel" />
                             </div>
                             {% if error %}
-                                <label class="error mt-1">Sorry, we were unable to log you in. You can try again, or <a href="mailto:support@wearesosure.com" class="open-intercom">contact us</a> for help.</label>
+                                <label class="error mt-1">Sorry, we were unable to log you in. You can try again, or <a href="{{ path('about_how_to_contact_so_sure') }}">contact us</a> for help.</label>
                             {% endif %}
                         </div>
                         <div class="form-group">
