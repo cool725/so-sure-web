@@ -740,7 +740,7 @@
             {% for item in user_history %}
               <tr>
                 <td width="10%">{{ item.action }}</td>
-                <td width="10%">{{ item.loggedAt|date }}</td>
+                <td width="10%">{{ item.loggedAt|date('F j, Y H:i:s') }}</td>
                 <td width="80%">
                   {% for key, value in item.data %}
                     {{ key }} => {{ value|json_encode }}<br />
@@ -757,7 +757,7 @@
             {% for item in policy_history %}
               <tr>
                 <td width="10%">{{ item.action }}</td>
-                <td width="10%">{{ item.loggedAt|date }}</td>
+                <td width="10%">{{ item.loggedAt|date('F j, Y H:i:s') }}</td>
                 <td width="80%">
                   {% for key, value in item.data %}
                     {{ key }} => {{ value|json_encode }}<br />
