@@ -105,6 +105,6 @@
     {# if not is_granted('IS_AUTHENTICATED_2FA_IN_PROGRESS')  #}
     {% if exclude_remote_scripts is not defined or not exclude_remote_scripts %}
         {# Include - Get Quote #}
-        {# include 'AppBundle::Search/getQuote.html.twig' #}
+        {% include 'AppBundle::Search/getQuote.html.twig' %}
     {%  endif %}
 </nav>
