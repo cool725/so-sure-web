@@ -46,7 +46,7 @@ class SequenceService
                 ['new' => true, 'upsert' => true]
             );
         } else {
-            $result = $sequence->findOneBy(['_id' => $name]);
+            $result = $sequence->find(['_id' => $name]);
         }
         if ($result['_id'] != $name) {
             throw new \Exception('Unable to generate sequenceId');
