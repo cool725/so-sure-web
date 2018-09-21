@@ -6,6 +6,7 @@ use AppBundle\Document\BacsPaymentMethod;
 use AppBundle\Document\BankAccount;
 use AppBundle\Repository\PolicyRepository;
 use AppBundle\Service\BacsService;
+use AppBundle\Service\PaymentService;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\User;
 use AppBundle\Document\Address;
@@ -48,6 +49,7 @@ class PaymentServiceTest extends WebTestCase
     /** @var DocumentManager */
     protected static $dm;
     protected static $policyRepo;
+    /** @var PaymentService */
     protected static $paymentService;
     protected static $redis;
 
@@ -69,7 +71,9 @@ class PaymentServiceTest extends WebTestCase
         self::$policyRepo = self::$dm->getRepository(Policy::class);
         self::$userManager = self::$container->get('fos_user.user_manager');
         self::$policyService = self::$container->get('app.policy');
-        self::$paymentService = self::$container->get('app.payment');
+        /** @var PaymentService $paymentService */
+        $paymentService = self::$container->get('app.payment');
+        self::$paymentService = $paymentService;
         self::$redis = self::$container->get('snc_redis.default');
     }
 
@@ -90,22 +94,25 @@ class PaymentServiceTest extends WebTestCase
             $user,
             static::$dm,
             $this->getRandomPhone(static::$dm),
-            new \DateTime('2016-10-01'),
-            true
+            null,
+            false
         );
-        static::$policyService->create($policy, new \DateTime('2016-10-01'));
-
+        static::$policyService->create($policy, null, true, 12);
+        // Exact same start date should be unpaid
+        //$this->assertFalse($policy->isPolicyPaidToDate($policy->getStart()));
         $bacs = new BacsPaymentMethod();
         $bacs->setBankAccount(new BankAccount());
 
         $dispatcher = $this->createDispatcher($this->once());
         static::$paymentService->setDispatcher($dispatcher);
-        static::$paymentService->confirmBacs($policy, $bacs);
+        static::$paymentService->confirmBacs($policy, $bacs, $policy->getStart());
 
         $updatedPolicy = $this->assertPolicyExists(static::$container, $policy);
         /** @var BankAccount $bankAcccount */
         $bankAcccount = $updatedPolicy->getUser()->getPaymentMethod()->getBankAccount();
         $this->assertNotNull($bankAcccount->getInitialNotificationDate());
+        // should be 3 business days + 4 max holidays/weekends
+        $this->assertLessThan(10, $bankAcccount->getInitialNotificationDate()->diff(new \DateTime)->days);
         $this->assertEquals($policy->getBilling(), $bankAcccount->getStandardNotificationDate());
         $this->assertTrue($bankAcccount->isFirstPayment());
     }

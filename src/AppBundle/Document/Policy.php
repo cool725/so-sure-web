@@ -1643,6 +1643,12 @@ abstract class Policy
 
     public function setPremiumInstallments($premiumInstallments)
     {
+        if (!in_array($premiumInstallments, [1, 12])) {
+            throw new \Exception(sprintf(
+                'Only monthly (12) or yearly (1) installments are supported, not %d',
+                $premiumInstallments
+            ));
+        }
         $this->premiumInstallments = $premiumInstallments;
     }
 
@@ -3895,7 +3901,7 @@ abstract class Policy
         return $totalPaid;
     }
 
-    public function getTotalExpectedPaidToDate(\DateTime $date = null)
+    public function getTotalExpectedPaidToDate(\DateTime $date = null, $firstDayIsUnpaid = false)
     {
         if (!$this->isPolicy() || !$this->getStart()) {
             return null;
@@ -3911,7 +3917,7 @@ abstract class Policy
         if ($this->getPremiumPlan() == self::PLAN_YEARLY) {
             $expectedPaid = $this->getPremium()->getAdjustedYearlyPremiumPrice();
         } elseif ($this->getPremiumPlan() == self::PLAN_MONTHLY) {
-            $months = $this->dateDiffMonths($date, $this->getBilling());
+            $months = $this->dateDiffMonths($date, $this->getBilling(), true, $firstDayIsUnpaid);
             if ($months > 12) {
                 $months = 12;
             }
@@ -3929,14 +3935,17 @@ abstract class Policy
         return $expectedPaid;
     }
 
-    public function getOutstandingPremiumToDate(\DateTime $date = null, $allowNegative = false)
-    {
+    public function getOutstandingPremiumToDate(
+        \DateTime $date = null,
+        $allowNegative = false,
+        $firstDayIsUnpaid = false
+    ) {
         if (!$this->isPolicy()) {
             return null;
         }
 
         $totalPaid = $this->getTotalSuccessfulPayments($date, false);
-        $expectedPaid = $this->getTotalExpectedPaidToDate($date);
+        $expectedPaid = $this->getTotalExpectedPaidToDate($date, $firstDayIsUnpaid);
 
         $diff = $expectedPaid - $totalPaid;
         //print sprintf("paid %f expected %f diff %f\n", $totalPaid, $expectedPaid, $diff);
@@ -4034,7 +4043,7 @@ abstract class Policy
         }
     }
 
-    public function isPolicyPaidToDate(\DateTime $date = null, $includePendingBacs = false)
+    public function isPolicyPaidToDate(\DateTime $date = null, $includePendingBacs = false, $firstDayIsUnpaid = false)
     {
         if (!$this->isPolicy()) {
             return null;
@@ -4044,7 +4053,7 @@ abstract class Policy
         if ($includePendingBacs) {
             $totalPaid += $this->getPendingBacsPaymentsTotal();
         }
-        $expectedPaid = $this->getTotalExpectedPaidToDate($date);
+        $expectedPaid = $this->getTotalExpectedPaidToDate($date, $firstDayIsUnpaid);
         // print sprintf("%f =? %f", $totalPaid, $expectedPaid) . PHP_EOL;
 
         // >= doesn't quite allow for minor float differences
