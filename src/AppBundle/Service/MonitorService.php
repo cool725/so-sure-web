@@ -542,7 +542,7 @@ class MonitorService
     public function outstandingSubmittedClaims(array $tooOldSubmittedClaims = null)
     {
         if ($tooOldSubmittedClaims === null) {
-            $tooOldSubmittedClaims = $this->findOldSubmittedClaims(2);
+            $tooOldSubmittedClaims = $this->findOldClaimsByStatus([Claim::STATUS_SUBMITTED], 2);
         }
 
         if (count($tooOldSubmittedClaims) > 0) {
@@ -554,7 +554,10 @@ class MonitorService
         }
     }
 
-    private function findOldSubmittedClaims(int $businessDaysOld = 2): array
+    /**
+     * Find claims that are more than or equal $n Business days since 'statusLastUpdated'
+     */
+    private function findOldClaimsByStatus(array $status, int $businessDaysOld = 2): array
     {
         /** @var ClaimRepository $claimRepository */
         $claimRepository = $this->dm->getRepository(Claim::class);
@@ -562,7 +565,7 @@ class MonitorService
 
         return $claimRepository->findBy(
             [
-                'status' => ['$in' => [Claim::STATUS_SUBMITTED]],
+                'status' => ['$in' => $status],
                 'statusLastUpdated' => ['$lte' => $twoBusinessDaysAgo],
             ]
         );
