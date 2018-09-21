@@ -1620,6 +1620,12 @@ abstract class Policy
 
     public function setPremiumInstallments($premiumInstallments)
     {
+        if (!in_array($premiumInstallments, [1, 12])) {
+            throw new \Exception(sprintf(
+                'Only monthly (12) or yearly (1) installments are supported, not %d',
+                $premiumInstallments
+            ));
+        }
         $this->premiumInstallments = $premiumInstallments;
     }
 
