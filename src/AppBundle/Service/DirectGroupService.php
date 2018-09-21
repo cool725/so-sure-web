@@ -779,14 +779,6 @@ class DirectGroupService extends SftpService
             );
             $this->warnings[$directGroupClaim->claimNumber][] = $msg;
         }
-        if (in_array($claim->getStatus(), array(Claim::STATUS_SETTLED, Claim::STATUS_APPROVED))
-            && !isset($directGroupClaim->finalSuspicion)) {
-            $msg = sprintf(
-                'Claim %s should have finalSuspicion flag set.',
-                $directGroupClaim->claimNumber
-            );
-            $this->warnings[$directGroupClaim->claimNumber][] = $msg;
-        }
 
         if (mb_strlen($directGroupClaim->lossDescription) < self::MIN_LOSS_DESCRIPTION_LENGTH) {
             $msg = sprintf(
