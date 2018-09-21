@@ -537,7 +537,7 @@ class BankAccount
         $nextPolicyPaymentDate = null;
         foreach ($user->getValidPolicies(true) as $policy) {
             /** @var Policy $policy */
-            if (!$policy->isPolicyPaidToDate($date)) {
+            if (!$policy->isPolicyPaidToDate($date, false, true)) {
                 $useClosestPaymentDate = true;
             } else {
                 $nextPolicyPaymentDate = $policy->getNextBillingDate($date);
