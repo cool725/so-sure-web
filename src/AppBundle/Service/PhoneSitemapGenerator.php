@@ -21,15 +21,10 @@ class PhoneSitemapGenerator implements GeneratorInterface
     /** @var RouterInterface  */
     protected $router;
 
-    /**
-     * @param DocumentManager $dm
-     * @param LoggerInterface $logger
-     * @param RouterInterface $router
-     */
     public function __construct(
         DocumentManager  $dm,
         LoggerInterface $logger,
-        $router
+        RouterInterface $router
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
@@ -41,37 +36,17 @@ class PhoneSitemapGenerator implements GeneratorInterface
      */
     public function generate()
     {
-        $entries = array();
+        $entries = [];
 
         /** @var PhoneRepository $repo */
         $repo = $this->dm->getRepository(Phone::class);
-        $phones = $repo->findActive()->getQuery()->execute();
-        foreach ($phones as $phone) {
-            /** @var Phone $phone */
-            $url = $this->router->generate('quote_make_model', [
-                'make' => $phone->getMakeCanonical(),
-                'model' => $phone->getEncodedModelCanonical()
-            ], UrlGeneratorInterface::ABSOLUTE_URL);
-
-            $item = new Entry($url, null, 'weekly', 0.7);
-            $item->setDescription($phone->getMakeWithAlternative() . ' ' . $phone->getModel());
-            $entries[$item->getDescription()] = $item;
-
-            $url = $this->router->generate('quote_make_model_memory', [
-                'make' => $phone->getMakeCanonical(),
-                'model' => $phone->getEncodedModelCanonical(),
-                'memory' => $phone->getMemory()
-            ], UrlGeneratorInterface::ABSOLUTE_URL);
-            $item = new Entry($url, null, 'weekly', 0.7);
-            $item->setDescription((string) $phone);
-            $entries[$item->getDescription()] = $item;
-        }
 
         $makes = [];
         $phones = $repo->findBy(
             ['active' => true, 'highlight' => true]
         );
         foreach ($phones as $phone) {
+            /** @var Phone $phone */
             $phoneMake = $phone->getMake();
             $makes[$phoneMake] = $phoneMake;
         }
@@ -84,6 +59,19 @@ class PhoneSitemapGenerator implements GeneratorInterface
             $item = new Entry($url, null, 'weekly', 0.7);
             $item->setDescription($make);
             $entries[$make] = $item;
+        }
+
+        $phones = $repo->findActive()->getQuery()->execute();
+        foreach ($phones as $phone) {
+            /** @var Phone $phone */
+            $url = $this->router->generate('quote_make_model', [
+                'make' => $phone->getMakeCanonical(),
+                'model' => $phone->getEncodedModelCanonical()
+            ], UrlGeneratorInterface::ABSOLUTE_URL);
+
+            $item = new Entry($url, null, 'weekly', 0.7);
+            $item->setDescription($phone->getMakeWithAlternative() . ' ' . $phone->getModel() . ' insurance');
+            $entries[$item->getDescription()] = $item;
         }
 
         return $entries;
