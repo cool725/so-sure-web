@@ -15,31 +15,40 @@
     <div class="login p-3 d-flex align-items-center">
         <div class="login__inner">
 
+            <h1 class="text-white text-center mb-1">Google Auth MFA Code</h1>
+            <h4 class="text-blue1 text-center mb-4">Enter your 2FA code to login</h4>
+
             <div class="login__card">
                 <div class="login__card__body">
                     <form class="form" action="" method="post">
                         <div class="form-group">
-                            <label for="_auth_code" class="h2">Google Auth MFA Code</label>
+                            <label for="_auth_code">Google Auth MFA Code</label>
                             <input id="_auth_code" type="tel" class="form-control" placeholder="Enter 2FA" autocomplete="off" name="_auth_code" autofocus />
                             {% for flashMessage in app.session.flashbag.get("two_factor") %}
                                 <label class="error">{{ flashMessage|trans }}</label>
                             {% endfor %}
                         </div>
-
-                        <div class="form-group">
+                        <div class="form-group mb-3">
                             <input type="submit" value="Login" class="btn btn-success btn-block" />
                         </div>
-                        {% if useTrustedOption %}
-                            <div class="form-group">
-                                <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input" id="_trusted" name="_trusted">
-                                    <label class="custom-control-label" for="_trusted">Trust this computer</label>
+                        <div class="form-group">
+                            <div class="row">
+                                {% if useTrustedOption %}
+                                    <div class="col">
+                                        <div class="custom-control custom-checkbox">
+                                            <input type="checkbox" class="custom-control-input" id="_trusted" name="_trusted">
+                                            <label class="custom-control-label" for="_trusted">Trust this computer</label>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                                <div class="col">
+                                    <a class="btn btn-outline-primary btn-sm btn-block" href="{{ path("_security_logout") }}"><i class="fal fa-ban"></i> Abort login</a>
                                 </div>
                             </div>
-                        {% endif %}
-                        <div class="form-group">
-                            <a class="btn btn-link" href="{{ path("_security_logout") }}">Abort login</a>
                         </div>
+{#                         <div class="form-group">
+                            <a class="btn btn-link btn-block" href="{{ path("_security_logout") }}"><i class="fal fa-ban"></i> Abort login</a>
+                        </div> #}
                     </form>
                 </div>
             </div>
