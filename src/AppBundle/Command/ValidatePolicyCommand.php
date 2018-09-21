@@ -9,6 +9,7 @@ use AppBundle\Document\Payment\BacsPayment;
 use AppBundle\Repository\PolicyRepository;
 use AppBundle\Service\MailerService;
 use AppBundle\Service\PolicyService;
+use AppBundle\Service\RouterService;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
@@ -441,12 +442,14 @@ class ValidatePolicyCommand extends BaseCommand
 
     private function header($policy, &$policies, &$lines)
     {
+        /** @var RouterService $routerService */
+        $routerService = $this->getContainer()->get('app.router');
         if (!isset($policies[$policy->getId()])) {
             $lines[] = '';
             $lines[] = sprintf(
                 '%s (<a href="%s">Admin</a>)',
                 $policy->getPolicyNumber() ? $policy->getPolicyNumber() : $policy->getId(),
-                $this->getContainer()->get('app.router')->generateUrl('admin_policy', ['id' => $policy->getId()])
+                $routerService->generateUrl('admin_policy', ['id' => $policy->getId()])
             );
             $lines[] = '---';
             $policies[$policy->getId()] = true;
