@@ -59,11 +59,11 @@ class DirectGroupHandlerClaimTest extends \PHPUnit\Framework\TestCase
             '£0.75',
             '£275',
             '£50',
-            '£220',
-            '£1.08',
+            '£20',
+            '£75',
             '18',
-            '£1.08',
-            '£1.08',
+            '£250',
+            '£230',
         ];
         $directGroup = new DirectGroupHandlerClaim();
         $directGroup->fromArray($data, DirectGroupHandlerClaim::COLUMN_COUNT_V1);
@@ -71,13 +71,13 @@ class DirectGroupHandlerClaimTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(new \DateTime('2017-02-28'), $directGroup->startDate);
 
         $this->assertEquals(50, $directGroup->reserved);
-        $this->assertEquals(1.08, $directGroup->excess);
-        $this->assertEquals(220, $directGroup->handlingFees);
+        $this->assertEquals(75, $directGroup->excess);
+        $this->assertEquals(20, $directGroup->handlingFees);
         $this->assertEquals(250.49, $directGroup->phoneReplacementCost);
         $this->assertEquals(1.3, $directGroup->accessories);
         $this->assertEquals(0.75, $directGroup->unauthorizedCalls);
-        $this->assertEquals(1.08, $directGroup->totalIncurred);
-        $this->assertEquals(-218.92, $directGroup->getIncurred());
+        $this->assertEquals(175, $directGroup->totalIncurred);
+        $this->assertEquals(155, $directGroup->getIncurred());
 
         $this->assertEquals('149358212660892', $directGroup->replacementImei);
         $this->assertEquals('Samsung', $directGroup->replacementMake);
