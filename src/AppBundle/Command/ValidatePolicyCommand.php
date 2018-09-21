@@ -443,7 +443,11 @@ class ValidatePolicyCommand extends BaseCommand
     {
         if (!isset($policies[$policy->getId()])) {
             $lines[] = '';
-            $lines[] = $policy->getPolicyNumber() ? $policy->getPolicyNumber() : $policy->getId();
+            $lines[] = sprintf(
+                '%s (<a href="%s">Admin</a>)',
+                $policy->getPolicyNumber() ? $policy->getPolicyNumber() : $policy->getId(),
+                $this->getContainer()->get('app.router')->generateUrl('admin_policy', ['id' => $policy->getId()])
+            );
             $lines[] = '---';
             $policies[$policy->getId()] = true;
         }
