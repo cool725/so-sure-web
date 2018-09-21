@@ -1092,7 +1092,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             'data.picSureStatus' => PhonePolicy::PICSURE_STATUS_INVALID
         ]);
         $hadInvalidPicSureStatus = false;
-        if (count($previousPicSureStatuses) > 0) {
+        if (count($previousInvalidPicSureStatuses) > 0) {
             $hadInvalidPicSureStatus = true;
         }
 
