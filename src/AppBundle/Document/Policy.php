@@ -3906,8 +3906,11 @@ abstract class Policy
         return $expectedPaid;
     }
 
-    public function getOutstandingPremiumToDate(\DateTime $date = null, $allowNegative = false, $firstDayIsUnpaid = false)
-    {
+    public function getOutstandingPremiumToDate(
+        \DateTime $date = null,
+        $allowNegative = false,
+        $firstDayIsUnpaid = false
+    ) {
         if (!$this->isPolicy()) {
             return null;
         }
