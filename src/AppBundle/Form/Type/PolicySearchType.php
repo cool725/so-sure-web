@@ -59,6 +59,7 @@ class PolicySearchType extends BaseType
             ->add('email', TextType::class, ['required' => false])
             ->add('mobile', TextType::class, ['required' => false])
             ->add('postcode', TextType::class, ['required' => false])
+            ->add('firstname', TextType::class, ['required' => false])
             ->add('lastname', TextType::class, ['required' => false])
             ->add('policy', TextType::class, ['required' => false])
             ->add('imei', TextType::class, ['required' => false])
@@ -112,6 +113,7 @@ class PolicySearchType extends BaseType
             $this->formQuerystring($form, $currentRequest, 'email');
             $this->formQuerystring($form, $currentRequest, 'mobile');
             $this->formQuerystring($form, $currentRequest, 'postcode');
+            $this->formQuerystring($form, $currentRequest, 'firstname');
             $this->formQuerystring($form, $currentRequest, 'lastname');
             $this->formQuerystring($form, $currentRequest, 'policy');
             $this->formQuerystring($form, $currentRequest, 'status');

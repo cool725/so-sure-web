@@ -654,9 +654,8 @@ class DirectGroupService extends SftpService
         } elseif ($directGroupClaim->replacementReceivedDate) {
             $approvedDate = $this->startOfDay(clone $directGroupClaim->replacementReceivedDate);
         }
-        if ($approvedDate) {
-            $fiveBusinessDays = $this->addBusinessDays($approvedDate, 5);
-            if ($directGroupClaim->isPhoneReplacementCostCorrect() === false && $fiveBusinessDays < new \DateTime()) {
+        if ($directGroupClaim->isClosed(true)) {
+            if ($directGroupClaim->isPhoneReplacementCostCorrect() === false) {
                 $msg = sprintf(
                     'Claim %s does not have the correct phone replacement cost. Expected > 0 Actual %0.2f',
                     $directGroupClaim->claimNumber,
@@ -776,14 +775,6 @@ class DirectGroupService extends SftpService
         if (!isset($directGroupClaim->initialSuspicion)) {
             $msg = sprintf(
                 'Claim %s does not have initialSuspicion flag set.',
-                $directGroupClaim->claimNumber
-            );
-            $this->warnings[$directGroupClaim->claimNumber][] = $msg;
-        }
-        if (in_array($claim->getStatus(), array(Claim::STATUS_SETTLED, Claim::STATUS_APPROVED))
-            && !isset($directGroupClaim->finalSuspicion)) {
-            $msg = sprintf(
-                'Claim %s should have finalSuspicion flag set.',
                 $directGroupClaim->claimNumber
             );
             $this->warnings[$directGroupClaim->claimNumber][] = $msg;

@@ -175,11 +175,11 @@ class PaymentService
      * @param Policy            $policy
      * @param BacsPaymentMethod $bacsPaymentMethod
      */
-    public function confirmBacs(Policy $policy, BacsPaymentMethod $bacsPaymentMethod)
+    public function confirmBacs(Policy $policy, BacsPaymentMethod $bacsPaymentMethod, \DateTime $date = null)
     {
         $policy->getUser()->setPaymentMethod($bacsPaymentMethod);
         $bacsPaymentMethod->getBankAccount()->setInitialNotificationDate(
-            $bacsPaymentMethod->getBankAccount()->getFirstPaymentDate($policy->getUser())
+            $bacsPaymentMethod->getBankAccount()->getFirstPaymentDate($policy->getUser(), $date)
         );
         $bacsPaymentMethod->getBankAccount()->setFirstPayment(true);
         $bacsPaymentMethod->getBankAccount()->setStandardNotificationDate($policy->getBilling());
