@@ -465,7 +465,7 @@ class SalvaExportService
                 $claim->getDescription(),
                 $this->toTwoDp($claim->getExcess()),
                 $this->toTwoDp($claim->getReservedValue()),
-                $this->toTwoDp($claim->getIncurred()),
+                $this->toTwoDp($claim->getTotalIncurred()),
                 $this->toTwoDp($claim->getClaimHandlingFees()),
                 $claim->getReplacementReceivedDate() ?
                     $this->adjustDate($claim->getReplacementReceivedDate()) :
