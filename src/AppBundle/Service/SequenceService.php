@@ -39,16 +39,26 @@ class SequenceService
     public function getSequenceId($name, $increment = true)
     {
         $sequence = $this->dm->getDocumentCollection(Sequence::class);
-        if ($increment) {
-            $result = $sequence->findAndUpdate(
-                ['_id' => $name],
-                ['$inc' => ['seq' => 1]],
-                ['new' => true, 'upsert' => true]
-            );
-        } else {
-            $result = $sequence->find(['_id' => $name]);
+        if (!$increment) {
+            $result = $sequence->find(['_id' => $name])->toArray();
+            if (count($result) > 0) {
+                return $result[$name]['seq'];
+            }
         }
-        if ($result['_id'] != $name) {
+
+        return $this->incrementSequenceId($name);
+    }
+
+    private function incrementSequenceId($name)
+    {
+        $sequence = $this->dm->getDocumentCollection(Sequence::class);
+        $result = $sequence->findAndUpdate(
+            ['_id' => $name],
+            ['$inc' => ['seq' => 1]],
+            ['new' => true, 'upsert' => true]
+        );
+
+        if (!$result || $result['_id'] != $name) {
             throw new \Exception('Unable to generate sequenceId');
         }
 

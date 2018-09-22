@@ -547,14 +547,15 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
                 $bankAccount->setMandateStatus(BankAccount::MANDATE_FAILURE);
             } elseif ($status == 2) {
                 $bankAccount->setMandateStatus(BankAccount::MANDATE_PENDING_APPROVAL);
-                $initialPaymentSubmissionDate = new \DateTime();
-                $initialPaymentSubmissionDate = $this->addBusinessDays($initialPaymentSubmissionDate, 2);
-                $bankAccount->setInitialPaymentSubmissionDate($initialPaymentSubmissionDate);
             } elseif ($status == 3) {
                 $bankAccount->setMandateStatus(BankAccount::MANDATE_PENDING_INIT);
             } elseif ($status == 4) {
                 $bankAccount->setMandateStatus(BankAccount::MANDATE_SUCCESS);
             }
+            $initialPaymentSubmissionDate = new \DateTime();
+            $initialPaymentSubmissionDate = $this->addBusinessDays($initialPaymentSubmissionDate, 2);
+            $bankAccount->setInitialPaymentSubmissionDate($initialPaymentSubmissionDate);
+
             $paymentMethod = new BacsPaymentMethod();
             $paymentMethod->setBankAccount($bankAccount);
         } else {

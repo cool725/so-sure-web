@@ -229,8 +229,10 @@ class BacsCommand extends BaseCommand
             $output->writeln(sprintf('Uploaded s3 file %s', $filename));
         }
 
-        $this->getManager()->flush();
-        $output->writeln('Saved changes to db.');
+        if (!$debug) {
+            $this->getManager()->flush();
+            $output->writeln('Saved changes to db.');
+        }
 
         return $lines;
     }
@@ -293,8 +295,10 @@ class BacsCommand extends BaseCommand
             $output->writeln(sprintf('Uploaded s3 file %s', $creditFilename));
         }
 
-        $this->getManager()->flush();
-        $output->writeln('Saved changes to db.');
+        if (!$debug) {
+            $this->getManager()->flush();
+            $output->writeln('Saved changes to db.');
+        }
 
         return $creditPayments;
     }

@@ -399,6 +399,14 @@ class BankAccount
             $now = new \DateTime();
         }
         $now = $this->startOfDay($now);
+
+        if (!$this->getInitialPaymentSubmissionDate()) {
+            throw new \Exception(sprintf(
+                'Missing initial payment submission date for ref %s',
+                $this->getReference()
+            ));
+        }
+
         $initial = clone $this->getInitialPaymentSubmissionDate();
         $initial = $this->startOfDay($initial);
 
