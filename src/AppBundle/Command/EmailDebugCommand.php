@@ -6,6 +6,7 @@ use AppBundle\Repository\CashbackRepository;
 use AppBundle\Repository\ConnectionRepository;
 use AppBundle\Repository\PolicyRepository;
 use AppBundle\Repository\UserRepository;
+use AppBundle\Document\CurrencyTrait;
 use AppBundle\Service\JudopayService;
 use AppBundle\Service\MailerService;
 use AppBundle\Service\PolicyService;
@@ -27,6 +28,8 @@ use AppBundle\Classes\SoSure;
 
 class EmailDebugCommand extends BaseCommand
 {
+    use CurrencyTrait;
+
     protected function configure()
     {
         $this
