@@ -1129,7 +1129,7 @@ class DirectGroupServiceTest extends WebTestCase
         $directGroupClaim->totalIncurred = 3.11;
         $directGroupClaim->unauthorizedCalls = 1.01;
         $directGroupClaim->accessories = 1.03;
-        $directGroupClaim->phoneReplacementCost = 1.07;
+        $directGroupClaim->phoneReplacementCost = 151.07;
         $directGroupClaim->handlingFees = 1.19;
         $directGroupClaim->excess = 150;
         $directGroupClaim->reserved = 0;
@@ -2056,7 +2056,7 @@ class DirectGroupServiceTest extends WebTestCase
         $directGroupClaim->replacementModel = 'iPhone 4';
         $directGroupClaim->replacementImei = '123 Bx11lt';
         $directGroupClaim->replacementReceivedDate = new \DateTime();
-        $directGroupClaim->phoneReplacementCost = 100;
+        $directGroupClaim->phoneReplacementCost = 250;
         $directGroupClaim->excess = 150;
         $directGroupClaim->totalIncurred = 100;
         $directGroupClaims = array($directGroupClaim);
