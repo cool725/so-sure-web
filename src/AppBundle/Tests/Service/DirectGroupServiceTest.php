@@ -314,32 +314,6 @@ class DirectGroupServiceTest extends WebTestCase
         $this->insureWarningExists('/multiple open claims against policy/');
     }
 
-    public function testUpdateClaimNoFinalFlag()
-    {
-
-        $policy = new PhonePolicy();
-        $policy->setStatus(Policy::STATUS_ACTIVE);
-        $policy->setId('1');
-        $policy->setPhone(self::getRandomPhone(self::$dm));
-
-        $claim = new Claim();
-        $claim->setPolicy($policy);
-        $claim->setNumber(time());
-        $claim->setStatus(Claim::STATUS_SETTLED);
-
-        $directGroupClaim = new DirectGroupHandlerClaim();
-        $directGroupClaim->claimNumber = $claim->getNumber();
-        $directGroupClaim->status = DirectGroupHandlerClaim::STATUS_CLOSED;
-        $directGroupClaim->finalSuspicion = null;
-        $directGroupClaim->initialSuspicion = null;
-        $directGroupClaim->finalSuspicion = null;
-        self::$directGroupService->clearWarnings();
-        $this->assertEquals(0, count(self::$directGroupService->getWarnings()));
-        self::$directGroupService->validateClaimDetails($claim, $directGroupClaim);
-        $this->assertEquals(1, count(self::$directGroupService->getWarnings()));
-        $this->insureWarningExists('/finalSuspicion/');
-    }
-
     public function testMissingLossDescription()
     {
         $policy = new PhonePolicy();
@@ -486,37 +460,7 @@ class DirectGroupServiceTest extends WebTestCase
         $this->assertEquals(1, count(self::$directGroupService->getWarnings()));
         $this->insureWarningExists('/initialSuspicion/');
     }
-
-    public function testUpdateClaimValidDaviesFinalFlagMissing()
-    {
-        $user = new User();
-        $user->setFirstName('Marko');
-        $user->setLastName('Marulic');
-        $policy = new PhonePolicy();
-        $policy->setStatus(Policy::STATUS_ACTIVE);
-        $policy->setId('1');
-        $policy->setUser($user);
-        $policy->setPhone(self::getRandomPhone(self::$dm));
-
-        $claim = new Claim();
-        $claim->setPolicy($policy);
-        $claim->setNumber(time());
-        $claim->setStatus(Claim::STATUS_APPROVED);
-
-        $directGroupClaim = new DirectGroupHandlerClaim();
-        $directGroupClaim->claimNumber = $claim->getNumber();
-        $directGroupClaim->status = DirectGroupHandlerClaim::STATUS_CLOSED;
-        $directGroupClaim->insuredName = 'Marko Marulic';
-        $directGroupClaim->initialSuspicion = false;
-        $directGroupClaim->finalSuspicion = null;
-
-        self::$directGroupService->clearWarnings();
-        $this->assertEquals(0, count(self::$directGroupService->getWarnings()));
-        self::$directGroupService->validateClaimDetails($claim, $directGroupClaim);
-        $this->assertEquals(1, count(self::$directGroupService->getWarnings()));
-        $this->insureWarningExists('/finalSuspicion/');
-    }
-
+    
     private function getRandomClaimNumber()
     {
         return sprintf('%6d', rand(1, 999999));
