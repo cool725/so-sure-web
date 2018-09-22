@@ -61,7 +61,7 @@ class PurchaseControllerTest extends BaseControllerTest
         $crawler = self::$client->followRedirect();
 
         $email = self::generateEmail('testPurchaseNew', $this);
-        $crawler = $this->createPurchaseNew(
+        $crawler = $this->createPurchase(
             $email,
             'foo bar',
             new \DateTime('1980-01-01')
@@ -88,7 +88,7 @@ class PurchaseControllerTest extends BaseControllerTest
     {
         $phone = $this->setRandomPhone();
 
-        $crawler = $this->createPurchaseNew(
+        $crawler = $this->createPurchase(
             self::generateEmail('testPurchaseUserPhoneSpaceNew', $this),
             'foo bar',
             new \DateTime('1980-01-01'),
@@ -225,7 +225,7 @@ class PurchaseControllerTest extends BaseControllerTest
     {
         $phone = $this->setRandomPhone();
 
-        $crawler = $this->createPurchaseNew(
+        $crawler = $this->createPurchase(
             self::generateEmail('testPurchaseAddressNew', $this),
             'foo bar',
             new \DateTime('1980-01-01')
@@ -239,7 +239,7 @@ class PurchaseControllerTest extends BaseControllerTest
     {
         $phone = $this->setRandomPhone();
 
-        $crawler = $this->createPurchaseNew(
+        $crawler = $this->createPurchase(
             self::generateEmail('testPurchasePhoneNew', $this),
             'foo bar',
             new \DateTime('1980-01-01')
@@ -267,11 +267,38 @@ class PurchaseControllerTest extends BaseControllerTest
         $this->verifyPurchaseReady($crawler);
     }
 
+    public function testPurchasePhoneNoPledge()
+    {
+        $phone = $this->setRandomPhone();
+
+        $crawler = $this->createPurchase(
+            self::generateEmail('testPurchasePhoneNoPledge', $this),
+            'foo bar',
+            new \DateTime('1980-01-01')
+        );
+        self::verifyResponse(302);
+        $this->assertTrue(self::$client->getResponse()->isRedirect());
+        self::$client->followRedirect();
+        $this->assertContains('/purchase/step-phone', self::$client->getHistory()->current()->getUri());
+
+        $crawler = $this->setPhone($phone);
+        //print $crawler->html();
+        self::verifyResponse(302);
+        $crawler = self::$client->followRedirect();
+        $this->assertContains('/purchase/step-pledge', self::$client->getHistory()->current()->getUri());
+
+        //print $crawler->html();
+        $crawler = $this->agreePledge($crawler, false);
+        //print $crawler->html();
+        self::verifyResponse(200);
+    }
+
+    /*
     public function testPurchasePhoneNewUploadFile()
     {
         $phone = $this->setRandomPhone('Apple');
 
-        $crawler = $this->createPurchaseNew(
+        $crawler = $this->createPurchase(
             self::generateEmail('testPurchasePhoneNewUploadFile', $this),
             'foo bar',
             new \DateTime('1980-01-01')
@@ -279,13 +306,17 @@ class PurchaseControllerTest extends BaseControllerTest
         self::verifyResponse(302);
         $this->assertTrue(self::$client->getResponse()->isRedirect('/purchase/step-phone'));
 
-        $crawler = $this->setPhone($phone, null, 1, true, null, null, true);
+        $crawler = $this->setPhone($phone, null, true, null, null, true);
         //print $crawler->html();
         self::verifyResponse(200);
         $this->verifyPurchaseReady($crawler);
         $this->verifyImei($crawler, '355424073417084', 'C77QMB7SGRY9');
     }
+    */
 
+    /**
+     *
+     */
     public function testPurchasePhoneImeiSpaceNineSixtyEightNew()
     {
         $phoneRepo = static::$dm->getRepository(Phone::class);
@@ -300,7 +331,7 @@ class PurchaseControllerTest extends BaseControllerTest
         );
         $crawler = self::$client->followRedirect();
 
-        $crawler = $this->createPurchaseNew(
+        $crawler = $this->createPurchase(
             self::generateEmail('testPurchasePhoneImeiSpaceNineSixtyEightNew', $this),
             'foo bar',
             new \DateTime('1980-01-01')
@@ -312,6 +343,18 @@ class PurchaseControllerTest extends BaseControllerTest
         $imei = implode(' ', str_split(self::generateRandomImei(), 3));
         $crawler = $this->setPhone($phone, $imei);
 
+        self::verifyResponse(302);
+        $crawler = self::$client->followRedirect();
+        $this->assertContains('/purchase/step-pledge', self::$client->getHistory()->current()->getUri());
+
+        //print $crawler->html();
+        $crawler = $this->agreePledge($crawler);
+        //print $crawler->html();
+        self::verifyResponse(302);
+        $crawler = self::$client->followRedirect();
+        $this->assertContains('/purchase/step-payment', self::$client->getHistory()->current()->getUri());
+
+        $crawler = $this->setPayment($crawler, $phone);
         self::verifyResponse(200);
         $this->verifyPurchaseReady($crawler);
     }
@@ -320,7 +363,7 @@ class PurchaseControllerTest extends BaseControllerTest
     {
         $phone = $this->setRandomPhone();
 
-        $crawler = $this->createPurchaseNew(
+        $crawler = $this->createPurchase(
             self::generateEmail('testPurchasePhoneImeiSpaceNew', $this),
             'foo bar',
             new \DateTime('1980-01-01')
@@ -332,6 +375,18 @@ class PurchaseControllerTest extends BaseControllerTest
         $imei = implode(' ', str_split(self::generateRandomImei(), 3));
         $crawler = $this->setPhone($phone, $imei);
 
+        self::verifyResponse(302);
+        $crawler = self::$client->followRedirect();
+        $this->assertContains('/purchase/step-pledge', self::$client->getHistory()->current()->getUri());
+
+        //print $crawler->html();
+        $crawler = $this->agreePledge($crawler);
+        //print $crawler->html();
+        self::verifyResponse(302);
+        $crawler = self::$client->followRedirect();
+        $this->assertContains('/purchase/step-payment', self::$client->getHistory()->current()->getUri());
+
+        $crawler = $this->setPayment($crawler, $phone);
         self::verifyResponse(200);
         $this->verifyPurchaseReady($crawler);
     }
@@ -345,7 +400,7 @@ class PurchaseControllerTest extends BaseControllerTest
 
         $phone = $this->setRandomPhone();
 
-        $crawler = $this->createPurchaseNew(
+        $crawler = $this->createPurchase(
             self::generateEmail('testPurchasePhoneLostImei', $this),
             'foo bar',
             new \DateTime('1980-01-01')
@@ -358,14 +413,13 @@ class PurchaseControllerTest extends BaseControllerTest
 
         self::verifyResponse(200);
         $this->expectFlashError($crawler, 'Sorry, it looks this phone is already insured');
-        $this->verifyPurchaseNotReady($crawler);
     }
 
     public function testPurchaseChangePhone()
     {
         $phone = $this->setRandomPhone();
 
-        $crawler = $this->createPurchaseNew(
+        $crawler = $this->createPurchase(
             self::generateEmail('testPurchaseChangePhone', $this),
             'foo bar',
             new \DateTime('1980-01-01')
@@ -375,9 +429,9 @@ class PurchaseControllerTest extends BaseControllerTest
         $this->assertTrue(self::$client->getResponse()->isRedirect('/purchase/step-phone'));
 
         $crawler = $this->setPhone($phone);
-        self::verifyResponse(200);
+        self::verifyResponse(302);
+        $crawler = self::$client->followRedirect();
         $this->assertContains($phone->getModel(), $crawler->html());
-        $this->verifyPurchaseReady($crawler);
 
         $phone2 = $this->getRandomPhone(static::$dm);
         $crawler = $this->changePhone($phone2);
@@ -437,7 +491,7 @@ class PurchaseControllerTest extends BaseControllerTest
         );
         $crawler = self::$client->followRedirect();
 
-        $crawler = $this->createPurchaseNew(
+        $crawler = $this->createPurchase(
             self::generateEmail('testPurchasePhoneImeiDashNew', $this),
             'foo bar',
             new \DateTime('1980-01-01')
@@ -449,6 +503,18 @@ class PurchaseControllerTest extends BaseControllerTest
         $imei = implode('-', str_split(self::generateRandomImei(), 3));
         $crawler = $this->setPhone($phone, $imei);
 
+        self::verifyResponse(302);
+        $crawler = self::$client->followRedirect();
+        $this->assertContains('/purchase/step-pledge', self::$client->getHistory()->current()->getUri());
+
+        //print $crawler->html();
+        $crawler = $this->agreePledge($crawler);
+        //print $crawler->html();
+        self::verifyResponse(302);
+        $crawler = self::$client->followRedirect();
+        $this->assertContains('/purchase/step-payment', self::$client->getHistory()->current()->getUri());
+
+        $crawler = $this->setPayment($crawler, $phone);
         self::verifyResponse(200);
         $this->verifyPurchaseReady($crawler);
     }
@@ -464,7 +530,7 @@ class PurchaseControllerTest extends BaseControllerTest
         );
         $crawler = self::$client->followRedirect();
 
-        $crawler = $this->createPurchaseNew(
+        $crawler = $this->createPurchase(
             self::generateEmail('testPurchasePhoneImeiSlashNew', $this),
             'foo bar',
             new \DateTime('1980-01-01')
@@ -476,6 +542,18 @@ class PurchaseControllerTest extends BaseControllerTest
         $imei = implode('/', str_split(self::generateRandomImei(), 3));
         $crawler = $this->setPhone($phone, $imei);
 
+        self::verifyResponse(302);
+        $crawler = self::$client->followRedirect();
+        $this->assertContains('/purchase/step-pledge', self::$client->getHistory()->current()->getUri());
+
+        //print $crawler->html();
+        $crawler = $this->agreePledge($crawler);
+        //print $crawler->html();
+        self::verifyResponse(302);
+        $crawler = self::$client->followRedirect();
+        $this->assertContains('/purchase/step-payment', self::$client->getHistory()->current()->getUri());
+
+        $crawler = $this->setPayment($crawler, $phone);
         self::verifyResponse(200);
         $this->verifyPurchaseReady($crawler);
     }
@@ -491,7 +569,7 @@ class PurchaseControllerTest extends BaseControllerTest
         );
         $crawler = self::$client->followRedirect();
 
-        $crawler = $this->createPurchaseNew(
+        $crawler = $this->createPurchase(
             self::generateEmail('testPurchasePhoneImeiS7New', $this),
             'foo bar',
             new \DateTime('1980-01-01')
@@ -503,6 +581,18 @@ class PurchaseControllerTest extends BaseControllerTest
         $imei = sprintf('%s/71', self::generateRandomImei());
         $crawler = $this->setPhone($phone, $imei);
 
+        self::verifyResponse(302);
+        $crawler = self::$client->followRedirect();
+        $this->assertContains('/purchase/step-pledge', self::$client->getHistory()->current()->getUri());
+
+        //print $crawler->html();
+        $crawler = $this->agreePledge($crawler);
+        //print $crawler->html();
+        self::verifyResponse(302);
+        $crawler = self::$client->followRedirect();
+        $this->assertContains('/purchase/step-payment', self::$client->getHistory()->current()->getUri());
+
+        $crawler = $this->setPayment($crawler, $phone);
         self::verifyResponse(200);
         $this->verifyPurchaseReady($crawler);
     }
@@ -525,7 +615,7 @@ class PurchaseControllerTest extends BaseControllerTest
         );
         $crawler = self::$client->followRedirect();
 
-        $crawler = $this->createPurchaseNew(
+        $crawler = $this->createPurchase(
             self::generateEmail('testPurchaseReviewRequiresAcceptNew', $this),
             'foo bar',
             new \DateTime('1980-01-01')
@@ -536,6 +626,18 @@ class PurchaseControllerTest extends BaseControllerTest
 
         $crawler = $this->setPhone($phone);
 
+        self::verifyResponse(302);
+        $crawler = self::$client->followRedirect();
+        $this->assertContains('/purchase/step-pledge', self::$client->getHistory()->current()->getUri());
+
+        //print $crawler->html();
+        $crawler = $this->agreePledge($crawler);
+        //print $crawler->html();
+        self::verifyResponse(302);
+        $crawler = self::$client->followRedirect();
+        $this->assertContains('/purchase/step-payment', self::$client->getHistory()->current()->getUri());
+
+        $crawler = $this->setPayment($crawler, $phone);
         self::verifyResponse(200);
         $this->verifyPurchaseReady($crawler);
     }
@@ -551,7 +653,7 @@ class PurchaseControllerTest extends BaseControllerTest
         );
         $crawler = self::$client->followRedirect();
 
-        $crawler = $this->createPurchaseNew(
+        $crawler = $this->createPurchase(
             self::generateEmail('testPurchaseReviewWithInvalidSerial', $this),
             'foo bar',
             new \DateTime('1980-01-01')
@@ -567,7 +669,7 @@ class PurchaseControllerTest extends BaseControllerTest
         self::verifyResponse(200, null, $crawler);
         $this->assertNotContains('Get a Quote', $crawler->html());
 
-        $crawler = $this->setPhone($phone, null, 1, true, null, ReceperioService::TEST_INVALID_SERIAL);
+        $crawler = $this->setPhone($phone, null, null, ReceperioService::TEST_INVALID_SERIAL);
 
         self::verifyResponse(200);
         $this->expectFlashError($crawler, 'phone model');
@@ -774,17 +876,24 @@ class PurchaseControllerTest extends BaseControllerTest
         $policyService->setEnvironment('test');
         $this->assertTrue($user->hasValidPaymentMethod());
 
-        $phone2 = $this->setRandomPhone();
         $this->login($email, $password, 'user/');
 
-        $crawler = self::$client->request(
-            'GET',
-            self::$router->generate('quote_phone', ['id' => $phone2->getId()])
-        );
-        $crawler = self::$client->followRedirect();
-
-        $this->setPhone($phone2, null, 1, false);
+        $phone2 = $this->setRandomPhone();
+        $this->setPhone($phone2);
         self::verifyResponse(302);
+        $crawler = self::$client->followRedirect();
+        $this->assertContains('/purchase/step-pledge', self::$client->getHistory()->current()->getUri());
+
+        //print $crawler->html();
+        $crawler = $this->agreePledge($crawler);
+        //print $crawler->html();
+        self::verifyResponse(302);
+        $crawler = self::$client->followRedirect();
+        $this->assertContains('/purchase/step-payment', self::$client->getHistory()->current()->getUri());
+
+        $crawler = $this->setPayment($crawler, $phone2);
+        self::verifyResponse(200);
+        $this->verifyPurchaseReady($crawler);
 
         $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
         $userRepo = $dm->getRepository(User::class);
@@ -918,7 +1027,7 @@ class PurchaseControllerTest extends BaseControllerTest
 
     private function createPurchaseUserNew($user, $name, $birthday)
     {
-        $this->createPurchaseNew($user->getEmail(), $name, $birthday, $user->getMobileNumber());
+        $this->createPurchase($user->getEmail(), $name, $birthday, $user->getMobileNumber());
     }
 
     private function verifyPurchaseReady($crawler)
@@ -945,32 +1054,29 @@ class PurchaseControllerTest extends BaseControllerTest
     private function setPhone(
         $phone,
         $imei = null,
-        $agreed = 1,
-        $nextButton = true,
         $crawler = null,
-        $serialNumber = null,
-        $useFile = false
+        $serialNumber = null
     ) {
         if (!$crawler) {
             $crawler = self::$client->request('GET', '/purchase/step-phone');
         }
         //print $crawler->html();
-        if ($nextButton) {
-            $form = $crawler->selectButton('purchase_form[next]')->form();
-        } else {
-            $form = $crawler->selectButton('purchase_form[existing]')->form();
-        }
-        if (!$imei && !$useFile) {
+        $form = $crawler->selectButton('purchase_form[next]')->form();
+
+        //if (!$imei && !$useFile) {
+        if (!$imei) {
             $imei = self::generateRandomImei();
         }
         $form['purchase_form[imei]'] = $imei;
         if ($phone->isApple()) {
             // use a different number in case we're testing /, -, etc
-            if (!$serialNumber && !$useFile) {
+            //if (!$serialNumber && !$useFile) {
+            if (!$serialNumber) {
                 $serialNumber = self::generateRandomAppleSerialNumber();
             }
             $form['purchase_form[serialNumber]'] = $serialNumber;
         }
+        /*
         if ($useFile) {
             $imeiFile = sprintf(
                 "%s/../src/AppBundle/Tests/Resources/iPhoneSettings.png",
@@ -984,6 +1090,7 @@ class PurchaseControllerTest extends BaseControllerTest
             );
             $form['purchase_form[file]']->upload($imei);
         }
+        */
         $crawler = self::$client->submit($form);
 
         return $crawler;
@@ -992,12 +1099,14 @@ class PurchaseControllerTest extends BaseControllerTest
     private function agreePledge(Crawler $crawler, $agreed = 1)
     {
         $form = $crawler->selectButton('purchase_form[next]')->form();
-        foreach(['agreedDamage', 'agreedAgeLocation', 'agreedTerms'] as $checkbox)
-        if ($agreed) {
-            try {
-                $form['purchase_form[' . $checkbox .']'] = $agreed;
-            } catch (\Exception $e) {
-                $form['purchase_form[' . $checkbox . ']'] = 'checked';
+        $agreedCheckboxes = ['agreedDamage', 'agreedAgeLocation', 'agreedTerms'];
+        foreach ($agreedCheckboxes as $checkbox) {
+            if ($agreed) {
+                try {
+                    $form['purchase_form[' . $checkbox . ']'] = $agreed;
+                } catch (\Exception $e) {
+                    $form['purchase_form[' . $checkbox . ']'] = 'checked';
+                }
             }
         }
         $crawler = self::$client->submit($form);
@@ -1027,7 +1136,7 @@ class PurchaseControllerTest extends BaseControllerTest
         if (!$mobile) {
             $mobile = self::generateRandomMobile();
         }
-        $crawler = self::$client->request('GET', '/purchase/?force_result=original');
+        $crawler = self::$client->request('GET', '/purchase/');
         self::verifyResponse(200);
         $form = $crawler->selectButton('purchase_form[next]')->form();
         $form['purchase_form[email]'] = $email;
@@ -1041,27 +1150,7 @@ class PurchaseControllerTest extends BaseControllerTest
 
         return $crawler;
     }
-
-    private function createPurchaseNew($email, $name, $birthday, $mobile = null)
-    {
-        if (!$mobile) {
-            $mobile = self::generateRandomMobile();
-        }
-        $crawler = self::$client->request('GET', '/purchase/?force_result=new');
-        self::verifyResponse(200);
-        $form = $crawler->selectButton('purchase_form[next]')->form();
-        $form['purchase_form[email]'] = $email;
-        $form['purchase_form[name]'] = $name;
-        $form['purchase_form[birthday]'] = sprintf("%s", $birthday->format('d/m/Y'));
-        $form['purchase_form[mobileNumber]'] = $mobile;
-        $form['purchase_form[addressLine1]'] = '123 Foo St';
-        $form['purchase_form[city]'] = 'Unknown';
-        $form['purchase_form[postcode]'] = 'BX1 1LT';
-        $crawler = self::$client->submit($form);
-
-        return $crawler;
-    }
-
+    
     private function setRandomPhone($make = null)
     {
         $phone = self::getRandomPhone(self::$dm, $make);
@@ -1070,7 +1159,7 @@ class PurchaseControllerTest extends BaseControllerTest
             'GET',
             self::$router->generate('quote_phone', ['id' => $phone->getId()])
         );
-        $crawler = self::$client->followRedirect();
+        self::$client->followRedirect();
 
         return $phone;
     }
