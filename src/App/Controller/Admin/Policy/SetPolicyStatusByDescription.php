@@ -45,7 +45,9 @@ class SetPolicyStatusByDescription extends AbstractController
         }
 
         if (!$this->transitionValid($policy, $requestedStatus)) {
-            throw new UnexpectedValueException("Cannot set policy status from the current value to '{$requestedStatus}'");
+            throw new UnexpectedValueException(
+                "Cannot set policy status from the current value to '{$requestedStatus}'"
+            );
         }
     }
 
