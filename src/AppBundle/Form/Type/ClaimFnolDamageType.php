@@ -6,6 +6,7 @@ use AppBundle\Classes\NoOp;
 use AppBundle\Document\File\UploadFile;
 use AppBundle\Document\Form\ClaimFnolDamage;
 use AppBundle\Exception\ValidationException;
+
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -123,7 +124,7 @@ class ClaimFnolDamageType extends AbstractType
                     $form,
                     $data->getClaim()->getPolicy()->getUser()->getId(),
                     sprintf('proof-of-usage-%s-%06d', $timestamp, rand(1, 999999)),
-                    'proofOsUsage'
+                    'proofOfUsage'
                 );
                 if ($s3Key) {
                     $data->setProofOfUsage($s3Key);
