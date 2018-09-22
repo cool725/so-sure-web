@@ -323,7 +323,7 @@ class DirectGroupHandlerClaim extends HandlerClaim
             return null;
         }
 
-        return str_replace('£', '', trim($field));
+        return str_replace('_x000D_', PHP_EOL, str_replace('£', '', trim($field)));
     }
 
     protected function isNullableValue($value)
