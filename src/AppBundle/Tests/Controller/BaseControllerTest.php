@@ -15,6 +15,7 @@ class BaseControllerTest extends WebTestCase
     use \AppBundle\Tests\PhingKernelClassTrait;
     use \AppBundle\Tests\UserClassTrait;
 
+    /** @var \Symfony\Bundle\FrameworkBundle\Client */
     protected static $client;
     protected static $container;
     /** @var DocumentManager */
@@ -22,7 +23,8 @@ class BaseControllerTest extends WebTestCase
     protected static $identity;
     protected static $jwt;
     protected static $router;
-    /** @var Client */
+
+    /** @var \Snc\RedisBundle\Client\Phpredis\Client */
     protected static $redis;
     protected static $invitationService;
     protected static $rootDir;
