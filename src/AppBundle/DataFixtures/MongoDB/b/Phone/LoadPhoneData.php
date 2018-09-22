@@ -105,13 +105,13 @@ abstract class LoadPhoneData implements ContainerAwareInterface
 
         // @codingStandardsIgnoreStart
         $body = sprintf(
-            'The following phones have been added to the so-sure site. Ensure that tech has the latest go-compare model reference sheet and adds the go-compare reference numbers. New advertising can be added.<br><br>%s',
+            'The following phones have been added to the so-sure site. Ensure that <ul><li>tech has the latest go-compare model reference sheet and adds the go-compare reference numbers</li><li>New models are considered for high in-demand</li><li>New advertising can be added.</li></ul><br><br>%s',
             implode('<br>', $lines)
         );
         // @codingStandardsIgnoreEnd
         $mailer->send(
             'New Phones have been added',
-            'marketing@so-sure.com',
+            ['marketing@so-sure.com', 'tech@so-sure.com'],
             $body,
             null,
             null,
