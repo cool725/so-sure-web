@@ -2069,9 +2069,14 @@ abstract class Policy
     public function isRefundAllowed()
     {
         // Policy upgrade should allow a refund regardless of claim status
+        if ($this->getCancelledReason() == Policy::CANCELLED_UPGRADE) {
+            return true;
+        }
+
         // For all other cases, if there's a claim, then no not allow refund
-        // TODO: Should this be open claim???  Possibly shouldn't allow cancellation if there is an open claim
-        if ($this->hasMonetaryClaimed(true) && $this->getCancelledReason() != Policy::CANCELLED_UPGRADE) {
+        // Open claims should have transitioned to pending closed, and for those cases, do not allow a refund
+        // - potentially would need to handle on a case by case basis
+        if ($this->hasMonetaryClaimed(true) || $this->hasPendingClosedClaimed()) {
             return false;
         }
 
@@ -2097,15 +2102,17 @@ abstract class Policy
         }
     }
 
-    public function getRefundAmount()
+    public function getRefundAmount($skipAllowedCheck = false)
     {
         // Just in case - make sure we don't refund for non-cancelled policies
         if (!$this->isCancelled()) {
             return 0;
         }
 
-        if (!$this->isRefundAllowed()) {
-            return 0;
+        if (!$skipAllowedCheck) {
+            if (!$this->isRefundAllowed()) {
+                return 0;
+            }
         }
 
         // 3 factors determine refund amount
@@ -2118,15 +2125,17 @@ abstract class Policy
         }
     }
 
-    public function getRefundCommissionAmount()
+    public function getRefundCommissionAmount($skipAllowedCheck = false)
     {
         // Just in case - make sure we don't refund for non-cancelled policies
         if (!$this->isCancelled()) {
             return 0;
         }
 
-        if (!$this->isRefundAllowed()) {
-            return 0;
+        if (!$skipAllowedCheck) {
+            if (!$this->isRefundAllowed()) {
+                return 0;
+            }
         }
 
         // 3 factors determine refund amount
@@ -2645,6 +2654,26 @@ abstract class Policy
         $claims = [];
         foreach ($this->linkedClaims as $claim) {
             if ($claim->isMonetaryClaim($includeApproved)) {
+                $claims[] = $claim;
+            }
+        }
+
+        return $claims;
+    }
+
+    public function hasPendingClosedClaimed()
+    {
+        $count = count($this->getPendingClosedClaimed());
+
+        return $count > 0;
+    }
+
+    public function getPendingClosedClaimed()
+    {
+        $claims = [];
+        foreach ($this->claims as $claim) {
+            /** @var Claim $claim */
+            if ($claim->getStatus() == Claim::STATUS_PENDING_CLOSED) {
                 $claims[] = $claim;
             }
         }

@@ -162,6 +162,16 @@ class RefundListener
                 );
                 return;
             }
+        } elseif ($policy->hasPendingClosedClaimed()) {
+            $refundAmount = $policy->getRefundAmount(true);
+            $refundCommissionAmount = $policy->getRefundCommissionAmount(true);
+            $this->logger->warning(sprintf(
+                'Skipping refund of %f (commission %s) for policy %s as claim was auto-closed',
+                $refundAmount,
+                $refundCommissionAmount,
+                $policy->getId()
+            ));
+
         }
 
         if ($policy instanceof SalvaPhonePolicy) {
