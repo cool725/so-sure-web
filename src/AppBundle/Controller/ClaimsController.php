@@ -114,7 +114,7 @@ class ClaimsController extends BaseController
     }
 
     /**
-     * @Route("/policy/{id}", name="claims_policy")
+     * @Route("/policy/{id}", name="claims_policy", requirements={"id":"[0-9a-f]{24,24}"})
      * @Template
      */
     public function claimsPolicyAction(Request $request, $id)
@@ -390,7 +390,7 @@ class ClaimsController extends BaseController
     }
 
     /**
-     * @Route("/claim/{id}", name="claims_notes")
+     * @Route("/claim/{id}", name="claims_notes", requirements={"id":"[0-9a-f]{24,24}"})
      * @Method({"POST"})
      */
     public function claimsNotesAction(Request $request, $id)
@@ -411,6 +411,22 @@ class ClaimsController extends BaseController
         );
 
         return new RedirectResponse($this->generateUrl('claims_policy', ['id' => $claim->getPolicy()->getId()]));
+    }
+
+    /**
+     * @Route("/claim/{number}", name="claims_claim_number")
+     */
+    public function claimsClaimNumberAction($number)
+    {
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(Claim::class);
+        /** @var Claim $claim */
+        $claim = $repo->findOneBy(['number' => $number]);
+        if (!$claim) {
+            throw $this->createNotFoundException('Policy not found');
+        }
+
+        return $this->redirectToRoute('claims_policy', ['id' => $claim->getPolicy()->getId()]);
     }
 
     /**
