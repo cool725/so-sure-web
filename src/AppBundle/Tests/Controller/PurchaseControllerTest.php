@@ -891,9 +891,9 @@ class PurchaseControllerTest extends BaseControllerTest
         $crawler = self::$client->followRedirect();
         $this->assertContains('/purchase/step-payment', self::$client->getHistory()->current()->getUri());
 
-        $crawler = $this->setPayment($crawler, $phone2);
-        self::verifyResponse(200);
-        $this->verifyPurchaseReady($crawler);
+        $crawler = $this->setPaymentExisting($crawler, $phone2);
+        self::verifyResponse(302);
+        //$this->verifyPurchaseNotReady($crawler);
 
         $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
         $userRepo = $dm->getRepository(User::class);
@@ -1117,6 +1117,15 @@ class PurchaseControllerTest extends BaseControllerTest
     private function setPayment(Crawler $crawler, $phone)
     {
         $form = $crawler->selectButton('purchase_form[next]')->form();
+        $form['purchase_form[amount]'] = $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice();
+        $crawler = self::$client->submit($form);
+
+        return $crawler;
+    }
+
+    private function setPaymentExisting(Crawler $crawler, $phone)
+    {
+        $form = $crawler->selectButton('purchase_form[existing]')->form();
         $form['purchase_form[amount]'] = $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice();
         $crawler = self::$client->submit($form);
 
