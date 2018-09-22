@@ -465,7 +465,9 @@ class ValidatePolicyCommand extends BaseCommand
         );
 
         if ($policy->getUser()->hasBacsPaymentMethod()) {
-            $bacsStatus = $policy->getUser()->getBacsPaymentMethod()->getBankAccount()->getMandateStatus();
+            $bacsStatus = $policy->getUser()->getBacsPaymentMethod() ?
+                $policy->getUser()->getBacsPaymentMethod()->getBankAccount()->getMandateStatus() :
+                'unknown';
             $message = sprintf('%s (Bacs Mandate Status: %s)', $message, $bacsStatus);
         }
 
