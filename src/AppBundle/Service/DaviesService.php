@@ -224,7 +224,7 @@ class DaviesService extends S3EmailService
                             $claim->getNumber()
                         );
                         // @codingStandardsIgnoreEnd
-                        $this->errors[$claim->getNumber()][] = $msg;
+                        $this->warnings[$claim->getNumber()][] = $msg;
                     }
                 }
             }
