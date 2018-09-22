@@ -55,7 +55,7 @@ class RequestServiceTest extends WebTestCase
         );
 
         $this->assertEquals(
-            'Windows 7',
+            'Windows',
             self::$requestService->getDeviceOS('Mozilla/5.0 (Windows; U; Windows NT 6.1; sv-SE) AppleWebKit/533.19.4 (KHTML, like Gecko) Version/5.0.3 Safari/533.19.4')
         );
         // @codingStandardsIgnoreEnd
