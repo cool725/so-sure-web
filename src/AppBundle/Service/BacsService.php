@@ -1108,7 +1108,7 @@ class BacsService
      * @return BacsPayment
      * @throws \Exception
      */
-    public function bacsPayment(Policy $policy, $notes, $amount = null, \DateTime $date = null)
+    public function bacsPayment(Policy $policy, $notes, $amount = null, \DateTime $date = null, $update = true)
     {
         if (!$date) {
             $date = new \DateTime();
@@ -1125,7 +1125,6 @@ class BacsService
         $payment->setUser($policy->getUser());
         $payment->setStatus(BacsPayment::STATUS_PENDING);
         $payment->setSource(Payment::SOURCE_TOKEN);
-        $policy->addPayment($payment);
 
         if (!$user->hasValidPaymentMethod()) {
             $payment->setStatus(BacsPayment::STATUS_SKIPPED);
@@ -1135,7 +1134,11 @@ class BacsService
                 $policy->getId()
             ));
         }
-        $this->dm->persist($payment);
+
+        if ($update) {
+            $policy->addPayment($payment);
+            $this->dm->persist($payment);
+        }
 
         return $payment;
     }
@@ -1205,7 +1208,7 @@ class BacsService
         return count($credits) > 0;
     }
 
-    public function exportMandates(\DateTime $date, $serialNumber, $includeHeader = false)
+    public function exportMandates(\DateTime $date, $serialNumber, $includeHeader = false, $update = true)
     {
         /** @var UserRepository $repo */
         $repo = $this->dm->getRepository(User::class);
@@ -1231,13 +1234,16 @@ class BacsService
                 '""',
                 '""',
             ]);
-            $paymentMethod->getBankAccount()->setMandateStatus(BankAccount::MANDATE_PENDING_APPROVAL);
-            $paymentMethod->getBankAccount()->setMandateSerialNumber($serialNumber);
 
-            // do not attempt to take payment until 2 business days after to allow for mandate
-            $initialPaymentSubmissionDate = new \DateTime();
-            $initialPaymentSubmissionDate = $this->addBusinessDays($initialPaymentSubmissionDate, 2);
-            $paymentMethod->getBankAccount()->setInitialPaymentSubmissionDate($initialPaymentSubmissionDate);
+            if ($update) {
+                $paymentMethod->getBankAccount()->setMandateStatus(BankAccount::MANDATE_PENDING_APPROVAL);
+                $paymentMethod->getBankAccount()->setMandateSerialNumber($serialNumber);
+
+                // do not attempt to take payment until 2 business days after to allow for mandate
+                $initialPaymentSubmissionDate = new \DateTime();
+                $initialPaymentSubmissionDate = $this->addBusinessDays($initialPaymentSubmissionDate, 2);
+                $paymentMethod->getBankAccount()->setInitialPaymentSubmissionDate($initialPaymentSubmissionDate);
+            }
         }
 
         return $lines;
@@ -1269,8 +1275,14 @@ class BacsService
         return $lines;
     }
 
-    public function exportPaymentsDebits($prefix, \DateTime $date, $serialNumber, &$metadata, $includeHeader = false)
-    {
+    public function exportPaymentsDebits(
+        $prefix,
+        \DateTime $date,
+        $serialNumber,
+        &$metadata,
+        $includeHeader = false,
+        $update = true
+    ) {
         $accounts = [];
         $lines = [];
         if ($includeHeader) {
@@ -1316,8 +1328,10 @@ class BacsService
                     $bankAccount->getMandateStatus()
                 );
                 $this->logger->warning($msg);
-                $scheduledPayment->cancel();
-                $this->dm->flush(null, array('w' => 'majority', 'j' => true));
+                if ($update) {
+                    $scheduledPayment->cancel();
+                    $this->dm->flush(null, array('w' => 'majority', 'j' => true));
+                }
 
                 continue;
             } elseif ($bankAccount->getMandateStatus() != BankAccount::MANDATE_SUCCESS) {
@@ -1343,10 +1357,12 @@ class BacsService
                 );
                 $this->logger->error($msg);
 
-                $scheduledPayment->setStatus(ScheduledPayment::STATUS_CANCELLED);
-                $rescheduled = $scheduledPayment->reschedule($scheduledDate);
-                $policy->addScheduledPayment($rescheduled);
-                $this->dm->flush(null, array('w' => 'majority', 'j' => true));
+                if ($update) {
+                    $scheduledPayment->setStatus(ScheduledPayment::STATUS_CANCELLED);
+                    $rescheduled = $scheduledPayment->reschedule($scheduledDate);
+                    $policy->addScheduledPayment($rescheduled);
+                    $this->dm->flush(null, array('w' => 'majority', 'j' => true));
+                }
 
                 continue;
             }
@@ -1393,7 +1409,9 @@ class BacsService
             $payment = $this->bacsPayment(
                 $scheduledPayment->getPolicy(),
                 'Scheduled Payment',
-                $scheduledPayment->getAmount()
+                $scheduledPayment->getAmount(),
+                null,
+                $update
             );
             $scheduledPayment->setPayment($payment);
             if ($payment->getStatus() != BacsPayment::STATUS_SKIPPED) {
@@ -1434,8 +1452,13 @@ class BacsService
         return $lines;
     }
 
-    public function exportPaymentsCredits(\DateTime $date, $serialNumber, &$metadata, $includeHeader = false)
-    {
+    public function exportPaymentsCredits(
+        \DateTime $date,
+        $serialNumber,
+        &$metadata,
+        $includeHeader = false,
+        $update = true
+    ) {
         $lines = [];
         if ($includeHeader) {
             $lines[] = $this->getHeader();
@@ -1475,8 +1498,11 @@ class BacsService
                 sprintf('"%s"', $payment->getPolicy()->getId()),
                 sprintf('"P-%s"', $payment->getId()),
             ]);
-            $payment->setStatus(BacsPayment::STATUS_GENERATED);
-            $payment->setSerialNumber($serialNumber);
+
+            if ($update) {
+                $payment->setStatus(BacsPayment::STATUS_GENERATED);
+                $payment->setSerialNumber($serialNumber);
+            }
         }
 
         return $lines;
