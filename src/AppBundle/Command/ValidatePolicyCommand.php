@@ -456,13 +456,20 @@ class ValidatePolicyCommand extends BaseCommand
         }
     }
 
-    private function failureStatusMessage($policy, $prefix, $date)
+    private function failureStatusMessage(Policy $policy, $prefix, $date)
     {
-        return sprintf(
+        $message = sprintf(
             'Unexpected status %s %s',
             $policy->getPolicyNumber() ? $policy->getPolicyNumber() : $policy->getId(),
             $policy->getStatus()
         );
+
+        if ($policy->getUser()->hasBacsPaymentMethod()) {
+            $bacsStatus = $policy->getUser()->getBacsPaymentMethod()->getBankAccount()->getMandateStatus();
+            $message = sprintf('%s (Bacs Mandate Status: %s)', $message, $bacsStatus);
+        }
+
+        return $message;
     }
 
     private function failureCommissionMessage(Policy $policy, $prefix, $date)
