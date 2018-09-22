@@ -399,8 +399,8 @@ class ValidatePolicyCommand extends BaseCommand
             }
             $refund = $policy->getRefundAmount();
             $refundCommission = $policy->getRefundCommissionAmount();
-            if (($refund > 0 && !$this->areEqualToTwoDp(0, $refund)) ||
-                ($refundCommission > 0 && !$this->areEqualToTwoDp(0, $refundCommission))) {
+            if (!in_array($policy->getId(), Salva::$refundValidationExclusions) &&
+                ($this->greaterThanZero($refund) || $this->greaterThanZero($refundCommission))) {
                 $this->header($policy, $policies, $lines);
                 $lines[] = sprintf(
                     'Warning!! Refund Due. Refund %f / Commission %f',
