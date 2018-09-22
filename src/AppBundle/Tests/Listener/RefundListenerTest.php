@@ -3,6 +3,7 @@
 namespace AppBundle\Tests\Listener;
 
 use AppBundle\Document\BacsPaymentMethod;
+use AppBundle\Document\Claim;
 use AppBundle\Document\Payment\BacsPayment;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -198,6 +199,60 @@ class RefundListenerTest extends WebTestCase
         // judo initial, judo refund for free month
         // so-sure payment to offset judo refund, so-sure refund for cancellation
         $this->assertEquals(5, count($policy->getPayments()));
+    }
+
+    public function testRefundListenerClaimNoRefundYearly()
+    {
+        $oneMonthAgo = new \DateTime();
+        $oneMonthAgo = $oneMonthAgo->sub(new \DateInterval('P1M'));
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testRefundListenerClaimNoRefundYearly', $this),
+            'bar'
+        );
+        /** @var Policy $policy */
+        $policy = static::initPolicy(
+            $user,
+            static::$dm,
+            $this->getRandomPhone(static::$dm),
+            $oneMonthAgo,
+            false
+        );
+        static::addJudoPayPayment(self::$judopayService, $policy, $oneMonthAgo, false);
+
+        $policy->setStatus(PhonePolicy::STATUS_PENDING);
+        static::$policyService->setEnvironment('prod');
+        static::$policyService->create($policy, $oneMonthAgo);
+        static::$policyService->setEnvironment('test');
+
+        $this->assertTrue($policy->isValidPolicy());
+
+        $claim = new Claim();
+        // policy service cancel would transition claim to pending closed prior to refund service
+        $claim->setStatus(Claim::STATUS_PENDING_CLOSED);
+        $policy->addClaim($claim);
+
+        $policy->setCancelledReason(PhonePolicy::CANCELLED_USER_REQUESTED);
+        $policy->setStatus(PhonePolicy::STATUS_CANCELLED);
+        $policy->setEnd(new \DateTime());
+        static::$dm->flush();
+
+        $listener = new RefundListener(static::$dm, static::$judopayService, static::$logger, 'test');
+        $listener->onPolicyCancelledEvent(new PolicyEvent($policy));
+
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        $repo = $dm->getRepository(Policy::class);
+        $policy = $repo->find($policy->getId());
+
+        $total = Payment::sumPayments($policy->getPayments(), false);
+        $this->assertTrue($this->areEqualToTwoDp(
+            $policy->getPremium()->getAdjustedYearlyPremiumPrice(),
+            $total['total']
+        ));
+
+        // judo initial, judo refund for free month
+        // so-sure payment to offset judo refund, so-sure refund for cancellation
+        $this->assertEquals(1, count($policy->getPayments()));
     }
 
     public function testRefundListenerBacsCancelledCooloffYearlyManual()
