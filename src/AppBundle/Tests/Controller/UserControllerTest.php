@@ -1796,6 +1796,22 @@ class UserControllerTest extends BaseControllerTest
         $this->assertEquals(Claim::STATUS_FNOL, $updatedClaim->getStatus());
     }
 
+    private function getUploadFile($originalName)
+    {
+        $filename = sprintf(
+            "%s/../src/AppBundle/Tests/Resources/Blank.JPG",
+            self::$rootDir
+        );
+        $uploadFile = new UploadedFile(
+            $filename,
+            $originalName,
+            'image/jpeg',
+            631
+        );
+
+        return $uploadFile;
+    }
+
     private function submitLossTheftForm(
         Policy $policy,
         \DateTime $now,
@@ -1806,38 +1822,9 @@ class UserControllerTest extends BaseControllerTest
     ) {
         $serializer = new Serializer(array(new DateTimeNormalizer()));
 
-        $proofOfUsageFile = sprintf(
-            "%s/../src/AppBundle/Tests/Resources/proofOfUsage.txt",
-            self::$rootDir
-        );
-        $proofOfUsage = new UploadedFile(
-            $proofOfUsageFile,
-            'proofOfUsage.txt',
-            'text/plain',
-            14
-        );
-
-        $proofOfBarringFile = sprintf(
-            "%s/../src/AppBundle/Tests/Resources/proofOfBarring.txt",
-            self::$rootDir
-        );
-        $proofOfBarring = new UploadedFile(
-            $proofOfBarringFile,
-            'proofOfBarring.txt',
-            'text/plain',
-            16
-        );
-
-        $proofOfPurchaseFile = sprintf(
-            "%s/../src/AppBundle/Tests/Resources/proofOfPurchase.txt",
-            self::$rootDir
-        );
-        $proofOfPurchase = new UploadedFile(
-            $proofOfPurchaseFile,
-            'proofOfPurchase.txt',
-            'text/plain',
-            17
-        );
+        $proofOfUsage = $this->getUploadFile('proofOfUsage.jpg');
+        $proofOfBarring = $this->getUploadFile('proofOfBarring.jpg');
+        $proofOfPurchase = $this->getUploadFile('proofOfPurchase.jpg');
 
         $claimPage = self::$router->generate('claimed_theftloss_policy', ['policyId' => $policy->getId()]);
         /** @var Crawler $crawler */
@@ -1939,38 +1926,9 @@ class UserControllerTest extends BaseControllerTest
     ) {
         $serializer = new Serializer(array(new DateTimeNormalizer()));
 
-        $proofOfUsageFile = sprintf(
-            "%s/../src/AppBundle/Tests/Resources/Blank.JPG",
-            self::$rootDir
-        );
-        $proofOfUsage = new UploadedFile(
-            $proofOfUsageFile,
-            'proofOfUsage.txt',
-            'text/plain',
-            14
-        );
-
-        $proofOfPurchaseFile = sprintf(
-            "%s/../src/AppBundle/Tests/Resources/Blank.JPG",
-            self::$rootDir
-        );
-        $proofOfPurchase = new UploadedFile(
-            $proofOfPurchaseFile,
-            'proofOfPurchase.txt',
-            'text/plain',
-            17
-        );
-
-        $damagePictureFile = sprintf(
-            "%s/../src/AppBundle/Tests/Resources/damagePicture.jpg",
-            self::$rootDir
-        );
-        $damagePicture = new UploadedFile(
-            $damagePictureFile,
-            'damagePicture.jpg',
-            'image/jpeg',
-            1305630
-        );
+        $proofOfUsage = $this->getUploadFile('proofOfUsage.jpg');
+        $proofOfPurchase = $this->getUploadFile('proofOfPurchase.jpg');
+        $damagePicture = $this->getUploadFile('damagePicture.jpg');
 
         $claimPage = self::$router->generate('claimed_damage_policy', ['policyId' => $policy->getId()]);
         /** @var Crawler $crawler */
@@ -2003,7 +1961,7 @@ class UserControllerTest extends BaseControllerTest
         }
         if ($requirePicture) {
             $this->assertTrue(isset($form['claim_damage_form[pictureOfPhone]']));
-            $form['claim_damage_form[pictureOfPhone]']->upload($damagePictureFile);
+            $form['claim_damage_form[pictureOfPhone]']->upload($damagePicture);
         } else {
             $this->assertFalse(isset($form['claim_damage_form[pictureOfPhone]']));
         }
@@ -2062,38 +2020,9 @@ class UserControllerTest extends BaseControllerTest
     ) {
         $serializer = new Serializer(array(new DateTimeNormalizer()));
 
-        $proofOfUsageFile = sprintf(
-            "%s/../src/AppBundle/Tests/Resources/Blank.JPG",
-            self::$rootDir
-        );
-        $proofOfUsage = new UploadedFile(
-            $proofOfUsageFile,
-            'proofOfUsage.txt',
-            'text/plain',
-            14
-        );
-
-        $proofOfBarringFile = sprintf(
-            "%s/../src/AppBundle/Tests/Resources/Blank.JPG",
-            self::$rootDir
-        );
-        $proofOfBarring = new UploadedFile(
-            $proofOfBarringFile,
-            'proofOfBarring.txt',
-            'text/plain',
-            16
-        );
-
-        $proofOfPurchaseFile = sprintf(
-            "%s/../src/AppBundle/Tests/Resources/Blank.JPG",
-            self::$rootDir
-        );
-        $proofOfPurchase = new UploadedFile(
-            $proofOfPurchaseFile,
-            'proofOfPurchase.txt',
-            'text/plain',
-            17
-        );
+        $proofOfUsage = $this->getUploadFile('proofOfUsage.jpg');
+        $proofOfBarring = $this->getUploadFile('proofOfBarring.jpg');
+        $proofOfPurchase = $this->getUploadFile('proofOfPurchase.jpg');
 
         $claimPage = self::$router->generate('claimed_submitted_policy', ['policyId' => $policy->getId()]);
         $crawler = self::$client->request('GET', $claimPage);
@@ -2155,38 +2084,9 @@ class UserControllerTest extends BaseControllerTest
     ) {
         $serializer = new Serializer(array(new DateTimeNormalizer()));
 
-        $proofOfUsageFile = sprintf(
-            "%s/../src/AppBundle/Tests/Resources/proofOfUsage.txt",
-            self::$rootDir
-        );
-        $proofOfUsage = new UploadedFile(
-            $proofOfUsageFile,
-            'proofOfUsage.txt',
-            'text/plain',
-            14
-        );
-
-        $proofOfPurchaseFile = sprintf(
-            "%s/../src/AppBundle/Tests/Resources/proofOfPurchase.txt",
-            self::$rootDir
-        );
-        $proofOfPurchase = new UploadedFile(
-            $proofOfPurchaseFile,
-            'proofOfPurchase.txt',
-            'text/plain',
-            17
-        );
-
-        $damagePictureFile = sprintf(
-            "%s/../src/AppBundle/Tests/Resources/damagePicture.jpg",
-            self::$rootDir
-        );
-        $damagePicture = new UploadedFile(
-            $damagePictureFile,
-            'damagePicture.jpg',
-            'image/jpeg',
-            1305630
-        );
+        $proofOfUsage = $this->getUploadFile('proofOfUsage.jpg');
+        $proofOfPurchase = $this->getUploadFile('proofOfPurchase.jpg');
+        $damagePicture = $this->getUploadFile('damagePicture.jpg');
 
         $claimPage = self::$router->generate('claimed_submitted_policy', ['policyId' => $policy->getId()]);
         $crawler = self::$client->request('GET', $claimPage);
