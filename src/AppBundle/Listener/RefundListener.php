@@ -171,7 +171,6 @@ class RefundListener
                 $refundCommissionAmount,
                 $policy->getId()
             ));
-
         }
 
         if ($policy instanceof SalvaPhonePolicy) {
