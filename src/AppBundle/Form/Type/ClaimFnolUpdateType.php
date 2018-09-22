@@ -2,7 +2,9 @@
 
 namespace AppBundle\Form\Type;
 
+use AppBundle\Classes\NoOp;
 use AppBundle\Document\Form\ClaimFnolUpdate;
+use AppBundle\Exception\ValidationException;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -11,6 +13,8 @@ use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\FormError;
+use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Doctrine\ODM\MongoDB\DocumentRepository;
 use AppBundle\Document\Policy;
@@ -23,6 +27,7 @@ use Doctrine\Bundle\MongoDBBundle\Form\Type\DocumentType;
 
 class ClaimFnolUpdateType extends AbstractType
 {
+    use ClaimFnolFileTrait;
 
     /**
      * @var boolean
@@ -88,58 +93,94 @@ class ClaimFnolUpdateType extends AbstractType
             $timestamp = $now->format('U');
 
             if ($filename = $data->getProofOfUsage()) {
-                $s3key = $this->claimsService->uploadS3(
+                $s3Key = $this->handleFile(
                     $filename,
-                    sprintf('proof-of-usage-%s-%06d', $timestamp, rand(1, 999999)),
+                    $this->claimsService,
+                    $form,
                     $data->getClaim()->getPolicy()->getUser()->getId(),
-                    $filename->guessExtension()
+                    sprintf('proof-of-usage-%s-%06d', $timestamp, rand(1, 999999)),
+                    'proofOfUsage'
                 );
-                $data->setProofOfUsage($s3key);
+                if ($s3Key) {
+                    $data->setProofOfUsage($s3Key);
+                } else {
+                    $data->setProofOfUsage(null);
+                }
             }
             if ($filename = $data->getPictureOfPhone()) {
-                $s3key = $this->claimsService->uploadS3(
+                $s3Key = $this->handleFile(
                     $filename,
-                    sprintf('picture-of-phone-%s-%06d', $timestamp, rand(1, 999999)),
+                    $this->claimsService,
+                    $form,
                     $data->getClaim()->getPolicy()->getUser()->getId(),
-                    $filename->guessExtension()
+                    sprintf('picture-of-phone-%s-%06d', $timestamp, rand(1, 999999)),
+                    'pictureOfPhone'
                 );
-                $data->setPictureOfPhone($s3key);
+                if ($s3Key) {
+                    $data->setPictureOfPhone($s3Key);
+                } else {
+                    $data->setPictureOfPhone(null);
+                }
             }
             if ($filename = $data->getProofOfBarring()) {
-                $s3key = $this->claimsService->uploadS3(
+                $s3Key = $this->handleFile(
                     $filename,
-                    sprintf('proof-of-barring-%s-%06d', $timestamp, rand(1, 999999)),
+                    $this->claimsService,
+                    $form,
                     $data->getClaim()->getPolicy()->getUser()->getId(),
-                    $filename->guessExtension()
+                    sprintf('proof-of-barring-%s-%06d', $timestamp, rand(1, 999999)),
+                    'proofOfBarring'
                 );
-                $data->setProofOfBarring($s3key);
+                if ($s3Key) {
+                    $data->setProofOfBarring($s3Key);
+                } else {
+                    $data->setProofOfBarring(null);
+                }
             }
             if ($filename = $data->getProofOfPurchase()) {
-                $s3key = $this->claimsService->uploadS3(
+                $s3Key = $this->handleFile(
                     $filename,
-                    sprintf('proof-of-purchase-%s-%06d', $timestamp, rand(1, 999999)),
+                    $this->claimsService,
+                    $form,
                     $data->getClaim()->getPolicy()->getUser()->getId(),
-                    $filename->guessExtension()
+                    sprintf('proof-of-purchase-%s-%06d', $timestamp, rand(1, 999999)),
+                    'proofOfPurchase'
                 );
-                $data->setProofOfPurchase($s3key);
+                if ($s3Key) {
+                    $data->setProofOfPurchase($s3Key);
+                } else {
+                    $data->setProofOfPurchase(null);
+                }
             }
             if ($filename = $data->getProofOfLoss()) {
-                $s3key = $this->claimsService->uploadS3(
+                $s3Key = $this->handleFile(
                     $filename,
-                    sprintf('proof-of-loss-%s-%06d', $timestamp, rand(1, 999999)),
+                    $this->claimsService,
+                    $form,
                     $data->getClaim()->getPolicy()->getUser()->getId(),
-                    $filename->guessExtension()
+                    sprintf('proof-of-loss-%s-%06d', $timestamp, rand(1, 999999)),
+                    'proofOfLoss'
                 );
-                $data->setProofOfLoss($s3key);
+                if ($s3Key) {
+                    $data->setProofOfLoss($s3Key);
+                } else {
+                    $data->setProofOfLoss(null);
+                }
             }
             if ($filename = $data->getOther()) {
-                $s3key = $this->claimsService->uploadS3(
+                $s3Key = $this->handleFile(
                     $filename,
-                    sprintf('other-%s-%06d', $timestamp, rand(1, 999999)),
+                    $this->claimsService,
+                    $form,
                     $data->getClaim()->getPolicy()->getUser()->getId(),
-                    $filename->guessExtension()
+                    sprintf('other-%s-%06d', $timestamp, rand(1, 999999)),
+                    'other'
                 );
-                $data->setOther($s3key);
+                if ($s3Key) {
+                    $data->setOther($s3Key);
+                } else {
+                    $data->setOther(null);
+                }
             }
         });
     }
