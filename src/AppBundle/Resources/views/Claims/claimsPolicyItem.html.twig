@@ -92,12 +92,26 @@
                         <tr>
                             <td>Policy Status</td>
                             <td>
-                              {{ policy.status }} {% if not policy.isPolicy %}Pre-pending{% endif %}
-                              {% if policy.cancelledReason %}
-                                / {{ policy.cancelledReason }}
-                              {% endif %}
+                                {{ policy.status }} {% if not policy.isPolicy %}Pre-pending{% endif %}
+                                {% if policy.cancelledReason %}
+                                    / {{ policy.cancelledReason }}
+                                {% endif %}
                                 {% if policy.getRequestedCancellationReason %}
                                     / {{ policy.getRequestedCancellationReason }}
+                                {% endif %}
+                                {% if is_granted('ROLE_ADMIN') %}
+                                    {% set settable_alternative_status = null %}
+                                    {% if policy.status == 'active' %}
+                                        {% set settable_alternative_status = 'unpaid' %}
+                                    {% endif %}
+                                    {% if policy.status == 'unpaid' %}
+                                        {% set settable_alternative_status = 'active' %}
+                                    {% endif %}
+                                    {% if settable_alternative_status %}
+                                        <a class="btn btn-sm btn-danger"
+                                            href="{{ path('admin_policy_set_status', { id: policy.id, policyNewStatus: settable_alternative_status}) }}">
+                                            set as  {{ settable_alternative_status }}</a>
+                                    {% endif %}
                                 {% endif %}
                             </td>
                         </tr>
