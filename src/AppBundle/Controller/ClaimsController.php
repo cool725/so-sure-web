@@ -416,7 +416,7 @@ class ClaimsController extends BaseController
     /**
      * @Route("/claim/{number}", name="claims_claim_number")
      */
-    public function claimsClaimNumberAction(Request $request, $number)
+    public function claimsClaimNumberAction($number)
     {
         $dm = $this->getManager();
         $repo = $dm->getRepository(Claim::class);
