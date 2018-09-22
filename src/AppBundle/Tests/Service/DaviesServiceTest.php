@@ -580,9 +580,9 @@ class DaviesServiceTest extends WebTestCase
         $this->assertEquals(0, count(self::$daviesService->getErrors()));
         self::$daviesService->saveClaims(1, [$daviesClosed]);
         // also missing claim number
-        $this->assertEquals(2, count(self::$daviesService->getErrors()));
+        $this->assertEquals(1, count(self::$daviesService->getErrors()));
 
-        $this->insureErrorExists('/older then the closed claim/');
+        $this->insureWarningExists('/older then the closed claim/');
     }
 
     public function testSaveClaimsClosedOpen()
