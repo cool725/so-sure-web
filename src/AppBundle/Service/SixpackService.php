@@ -25,72 +25,34 @@ class SixpackService
     // don't log to mixpanel
     const LOG_MIXPANEL_NONE = 'none';
 
-    //const EXPERIMENT_HOMEPAGE_AA = 'homepage-aa';
-    //const EXPERIMENT_QUOTE_CALC_LOWER = 'quote-calc-lower';
-    //const EXPERIMENT_LANDING_HOME = 'landing-or-home';
-    //const EXPERIMENT_CPC_QUOTE_MANUFACTURER = 'cpc-quote-or-manufacturer';
-    //const EXPERIMENT_HOMEPAGE_PHONE_IMAGE = 'homepage-phone-image';
-    // const EXPERIMENT_QUOTE_SLIDER = 'quote-slider';
-    //const EXPERIMENT_PYG_HOME= 'pyg-or-home';
-    //const EXPERIMENT_QUOTE_SIMPLE_COMPLEX_SPLIT = 'quote-simple-complex-split';
-    //const EXPERIMENT_QUOTE_SIMPLE_SPLIT = 'quote-simple-split';
-    //const EXPERIMENT_CPC_MANUFACTURER_HOME = 'cpc-manufacturer-or-home';
-    //const EXPERIMENT_CPC_MANUFACTURER_WITH_HOME = 'cpc-manufacturer-with-home';
-    //const EXPERIMENT_POSTCODE = 'postcode';
-    //const EXPERIMENT_HOMEPAGE_V1_V2 = 'homepage-v1-v2';
-    //const EXPERIMENT_HOMEPAGE_V1_V2OLD_V2NEW = 'homepage-v1-v2old-v2new';
-    //const EXPERIMENT_FUNNEL_V1_V2 = 'funnel-v1-v2';
-    //const EXPERIMENT_HOMEPAGE_STICKYSEARCH_PICSURE = 'homepage-v2-sticksearch-picsure';
-    //const EXPERIMENT_HOMEPAGE_STICKYSEARCH_SHUFFLE = 'homepage-v2-sticksearch-shuffle';
-    //const EXPERIMENT_QUOTE_SECTIONS = 'quote-sections';
-    //const EXPERIMENT_POLICY_PDF_DOWNLOAD = 'policy-pdf-download';
-    //const EXPERIMENT_CANCELLATION = 'cancellation';
-    //const EXPERIMENT_NEW_QUOTE_DESIGN = 'new-quote-design';
-    //const EXPERIMENT_CPC_MANUFACTURER_OLD_NEW = 'cpc-manufacturer-old-new';
-
-    // const EXPERIMENT_HOMEPAGE_AA_V2 = 'homepage-aa-v2';
     const EXPERIMENT_APP_SHARE_METHOD = 'app-share-method';
     const EXPERIMENT_APP_PICSURE_LOCATION = 'app-picsure-location';
     const EXPERIMENT_APP_REQUEST_PICSURE_LOCATION = 'app-request-picsure-location';
-    //const EXPERIMENT_STEP_3 = 'step-3-payment-new';
-    // const EXPERIMENT_PURCHASE_FLOW_BACS = 'purchase-flow-bacs';
-    // const EXPERIMENT_CPC_QUOTE_HOMEPAGE = 'cpc-quote-or-homepage';
-    // const EXPERIMENT_DOB = 'purchase-funnel-dob-dropdown';
-    // const EXPERIMENT_72_REPLACEMENT = 'seventytwo-hours';
-    // const EXPERIMENT_PICSURE_SECTION = 'picsure-redesign';
     const EXPERIMENT_EBAY_LANDING = 'ebay-landing';
     const EXPERIMENT_EBAY_LANDING_1 = 'ebay-landing-1';
     const EXPERIMENT_EBAY_LANDING_2 = 'ebay-landing-2';
-    // const EXPERIMENT_NEW_WELCOME_MODAL = 'new-welcome-modal';
-    // New Exp Competitor Landing
-    // const EXPERIMENT_COMPETITOR_LANDING = 'competitor-landing';
-    // const EXPERIMENT_TRUSTPILOT_REVIEW = 'trustpilot';
-    // New Test Single Mem Option
-    // const EXPERIMENT_MEMORY_OPTIONS = 'single-progressive-dropdown';
-    // New Test Money Back Guarantee
-    // const EXPERIMENT_MONEY_BACK_GUARANTEE = 'money-back-guarantee';
-    // Exp 1
-    // const EXPERIMENT_HOMEPAGE_NEW_COPY = 'homepage-new-copy';
-    // Exp 2
-    // const EXPERIMENT_AD_LANDING = 'ad-landing-2';
-    // Exp 3
-    // const EXPERIMENT_STARLING_LANDING = 'starling-landing';
-    // Exp 4
-    // const EXPERIMENT_PHONE_REPLACEMENT_MATCHING_ADVERT = 'phone-replacement-matching-advert';
-    // Exp 5
-    // const EXPERIMENT_AB_NEW_CONTENT = 'new-content-with-nav';
-    // Exp 6
-    // const EXPERIMENT_PHONE_REPLACEMENT = 'twentyfour-seventy-two';
-    // Exp 7
-    // const EXPERIMENT_AB_CONTENT_HOMEPAGE = 'new-homepage-copy';
-    // Exp 8
-    // const EXPERIMENT_TEXT_VS_DROPDOWN = 'dropdown-search';
-    // Exp 9
-    // const EXPERIMENT_TEXT_VS_DROPDOWN_MOBILE = 'dropdown-search-mobile';
-    // Exp 10
-    // const EXPERIMENT_WELCOME_MODAL_NO_WELCOME_MODAL = 'welcome-modal-requested-cancellation';
-    // Exp 11
     const EXPERIMENT_SOCIAL_AD_LANDING = 'ad-landing-quotepage';
+    // Exp 1
+    //
+    // Exp 2
+    //
+    // Exp 3
+    //
+    // Exp 4
+    //
+    // Exp 5
+    //
+    // Exp 6
+    //
+    // Exp 7
+    //
+    // Exp 8
+    //
+    // Exp 9
+    //
+    // Exp 10
+    //
+    // Exp 11
 
     const ALTERNATIVES_SHARE_MESSAGE_SIMPLE = 'simple';
     const ALTERNATIVES_APP_SHARE_METHOD_NATIVE = 'native';
@@ -104,45 +66,81 @@ class SixpackService
 
     const EXPIRED_EXPERIMENT_SHARE_MESSAGE = 'share-message';
 
+    public static $archivedExperiments = [
+        'homepage-aa',
+        'quote-calc-lower',
+        'landing-or-home',
+        'cpc-quote-or-manufacturer',
+        'homepage-phone-image',
+        'quote-slider',
+        'pyg-or-home',
+        'quote-simple-complex-split',
+        'quote-simple-split',
+        'cpc-manufacturer-or-home',
+        'cpc-manufacturer-with-home',
+        'postcode',
+        'homepage-v1-v2',
+        'homepage-v1-v2old-v2new',
+        'funnel-v1-v2',
+        'homepage-v2-sticksearch-picsure',
+        'homepage-v2-sticksearch-shuffle',
+        'quote-sections',
+        'policy-pdf-download',
+        'cancellation',
+        'new-quote-design',
+        'cpc-manufacturer-old-new',
+        'homepage-aa-v2',
+        'step-3-payment-new',
+        'purchase-flow-bacs',
+        'cpc-quote-or-homepage',
+        'purchase-funnel-dob-dropdown',
+        'seventytwo-hours',
+        'picsure-redesign',
+        'new-welcome-modal',
+        'competitor-landing',
+        'trustpilot',
+        'single-progressive-dropdown',
+        'money-back-guarantee',
+        'homepage-new-copy',
+        'welcome-modal-requested-cancellation',
+        'dropdown-search-mobile',
+        'new-homepage-copy',
+        'dropdown-search',
+        'twentyfour-seventy-two',
+        'new-content-with-nav',
+        'phone-replacement-matching-advert',
+        'starling-landing',
+        'ad-landing-2',
+        'homepage-new-copy',
+    ];
+
     public static $unauthExperiments = [
-        // self::EXPERIMENT_HOMEPAGE_AA_V2,
-        //self::EXPERIMENT_STEP_3,
-        // self::EXPERIMENT_PURCHASE_FLOW_BACS,
-        // self::EXPERIMENT_CPC_QUOTE_HOMEPAGE,
-        // self::EXPERIMENT_DOB,
-        // self::EXPERIMENT_72_REPLACEMENT,
-        // self::EXPERIMENT_PICSURE_SECTION,
         self::EXPERIMENT_EBAY_LANDING,
         self::EXPERIMENT_EBAY_LANDING_1,
         self::EXPERIMENT_EBAY_LANDING_2,
-        // New Exp Competitor Landing
-        // self::EXPERIMENT_COMPETITOR_LANDING,
-        // self::EXPERIMENT_TRUSTPILOT_REVIEW,
-        // New Test Single Mem Option
-        // self::EXPERIMENT_MEMORY_OPTIONS,
-        // New Test Money Back Guarantee
-         // self::EXPERIMENT_MONEY_BACK_GUARANTEE,
-        // Exp 1
-        // self::EXPERIMENT_HOMEPAGE_NEW_COPY,
-        // Exp 2
-        // self::EXPERIMENT_AD_LANDING,
-        // Exp 3
-        // self::EXPERIMENT_STARLING_LANDING,
-        // Exp 4
-        // self::EXPERIMENT_PHONE_REPLACEMENT_MATCHING_ADVERT,
-        // Exp 5
-        // self::EXPERIMENT_AB_NEW_CONTENT,
-        // self::EXPERIMENT_AB_CONTENT_HOMEPAGE,
-        // Exp 6
-        // self::EXPERIMENT_PHONE_REPLACEMENT,
-        // Exp 7
-        // self::EXPERIMENT_TEXT_VS_DROPDOWN,
-        // Exp 8
-        // self::EXPERIMENT_TEXT_VS_DROPDOWN_MOBILE,
-        // Exp 9
         self::EXPERIMENT_SOCIAL_AD_LANDING,
+        // Exp 1
+        //
+        // Exp 2
+        //
+        // Exp 3
+        //
+        // Exp 4
+        //
+        // Exp 5
+        //
+        // Exp 6
+        //
+        // Exp 7
+        //
+        // Exp 8
+        //
+        // Exp 9
+        //
         // Exp 10
-
+        //
+        // Exp 11
+        //
     ];
 
     public static $authExperiments = [
@@ -179,35 +177,32 @@ class SixpackService
      * @var array
      */
     public static $purchaseConversionSimple = [
-        // self::EXPERIMENT_CPC_QUOTE_HOMEPAGE,
-        //self::EXPERIMENT_STEP_3,
-        // self::EXPERIMENT_PURCHASE_FLOW_BACS,
-        // self::EXPERIMENT_72_REPLACEMENT,
-        // self::EXPERIMENT_PICSURE_SECTION,
         self::EXPERIMENT_EBAY_LANDING,
         self::EXPERIMENT_EBAY_LANDING_1,
         self::EXPERIMENT_EBAY_LANDING_2,
-        // New Exp Competitor Landing
-        // self::EXPERIMENT_COMPETITOR_LANDING,
-        // Exp 1
-        // self::EXPERIMENT_HOMEPAGE_NEW_COPY,
-        // Exp 2
-        // self::EXPERIMENT_AD_LANDING,
-        // Exp 3
-        // self::EXPERIMENT_STARLING_LANDING,
-        // Exp 4
-        // self::EXPERIMENT_PHONE_REPLACEMENT_MATCHING_ADVERT,
-        // Exp 5
-        // self::EXPERIMENT_PHONE_REPLACEMENT,
-        // Exp 6
         self::EXPERIMENT_SOCIAL_AD_LANDING,
+        // Exp 1
+        //
+        // Exp 2
+        //
+        // Exp 3
+        //
+        // Exp 4
+        //
+        // Exp 5
+        //
+        // Exp 6
+        //
         // Exp 7
-
+        //
         // Exp 8
-
+        //
         // Exp 9
-
+        //
         // Exp 10
+        //
+        // Exp 11
+        //
     ];
 
     /**
@@ -215,32 +210,28 @@ class SixpackService
      * @var array
      */
     public static $purchaseConversionKpi = [
-        // self::EXPERIMENT_HOMEPAGE_AA_V2,
-        // self::EXPERIMENT_DOB,
-        // self::EXPERIMENT_TRUSTPILOT_REVIEW,
-        // New Test Single Mem Option
-        // self::EXPERIMENT_MEMORY_OPTIONS,
-        // New Test Money Back Guarantee
-        // self::EXPERIMENT_MONEY_BACK_GUARANTEE,
         // Exp 1
-        // self::EXPERIMENT_AB_NEW_CONTENT,
+        //
         // Exp 2
-        // self::EXPERIMENT_AB_CONTENT_HOMEPAGE,
+        //
         // Exp 3
-        // self::EXPERIMENT_TEXT_VS_DROPDOWN,
+        //
         // Exp 4
-        // self::EXPERIMENT_TEXT_VS_DROPDOWN_MOBILE,
+        //
         // Exp 5
-
+        //
         // Exp 6
-
+        //
         // Exp 7
-
+        //
         // Exp 8
-
+        //
         // Exp 9
-
+        //
         // Exp 10
+        //
+        // Exp 11
+        //
     ];
 
     /** @var LoggerInterface */
