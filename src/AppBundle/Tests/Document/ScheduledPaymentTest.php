@@ -111,6 +111,31 @@ class ScheduledPaymentTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($scheduledPayment2->hasCorrectBillingDay());
     }
 
+    public function testReschedule()
+    {
+        $premium = new PhonePremium();
+        $policy = new SalvaPhonePolicy();
+        $policy->setBilling(new \DateTime('2017-01-15 15:00'));
+
+        $scheduledPayment = new ScheduledPayment();
+        $scheduledPayment->setType(ScheduledPayment::TYPE_SCHEDULED);
+        $scheduledPayment->setStatus(ScheduledPayment::STATUS_SCHEDULED);
+        $scheduledPayment->setScheduled(new \DateTime('2017-06-15 12:00'));
+        $policy->addScheduledPayment($scheduledPayment);
+
+        $rescheduled = $scheduledPayment->reschedule(new \DateTime('2017-06-15 12:00'));
+        $this->assertEquals($scheduledPayment->getAmount(), $rescheduled->getAmount());
+        $this->assertEquals($scheduledPayment::STATUS_SCHEDULED, $rescheduled->getStatus());
+        $this->assertEquals(ScheduledPayment::TYPE_RESCHEDULED, $rescheduled->getType());
+        $this->assertEquals(new \DateTime('2017-06-22 12:00'), $rescheduled->getScheduled());
+
+        $rescheduled = $scheduledPayment->reschedule(new \DateTime('2017-06-15 12:00'), 0);
+        $this->assertEquals($scheduledPayment->getAmount(), $rescheduled->getAmount());
+        $this->assertEquals($scheduledPayment::STATUS_SCHEDULED, $rescheduled->getStatus());
+        $this->assertEquals(ScheduledPayment::TYPE_RESCHEDULED, $rescheduled->getType());
+        $this->assertEquals(new \DateTime('2017-06-15 12:00'), $rescheduled->getScheduled());
+    }
+
     public function testValidateRunable()
     {
         $user = new User();

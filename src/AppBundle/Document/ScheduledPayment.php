@@ -170,14 +170,14 @@ class ScheduledPayment
         $this->setStatus(self::STATUS_CANCELLED);
     }
 
-    public function reschedule($date = null)
+    public function reschedule($date = null, $days = 7)
     {
         if (!$date) {
             $date = new \DateTime();
         } else {
             $date = clone $date;
         }
-        $date->add(new \DateInterval('P7D'));
+        $date->add(new \DateInterval(sprintf('P%dD', $days)));
 
         $rescheduled = new ScheduledPayment();
         $rescheduled->setType(self::TYPE_RESCHEDULED);

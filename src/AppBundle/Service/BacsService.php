@@ -1336,7 +1336,7 @@ class BacsService
                 continue;
             } elseif ($bankAccount->getMandateStatus() != BankAccount::MANDATE_SUCCESS) {
                 $msg = sprintf(
-                    'Skipping scheduled payment %s as mandate is not enabled (%s) [Rescheduled]',
+                    'Skipping scheduled payment %s as mandate is not enabled (%s)',
                     $scheduledPayment->getId(),
                     $bankAccount->getMandateStatus()
                 );
@@ -1359,7 +1359,7 @@ class BacsService
 
                 if ($update) {
                     $scheduledPayment->setStatus(ScheduledPayment::STATUS_CANCELLED);
-                    $rescheduled = $scheduledPayment->reschedule($scheduledDate);
+                    $rescheduled = $scheduledPayment->reschedule($scheduledDate, 0);
                     $policy->addScheduledPayment($rescheduled);
                     $this->dm->flush(null, array('w' => 'majority', 'j' => true));
                 }
