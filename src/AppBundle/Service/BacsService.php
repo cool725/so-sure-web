@@ -1359,7 +1359,7 @@ class BacsService
 
                 if ($update) {
                     $scheduledPayment->setStatus(ScheduledPayment::STATUS_CANCELLED);
-                    $rescheduled = $scheduledPayment->reschedule($scheduledDate);
+                    $rescheduled = $scheduledPayment->reschedule($scheduledDate, 0);
                     $policy->addScheduledPayment($rescheduled);
                     $this->dm->flush(null, array('w' => 'majority', 'j' => true));
                 }
