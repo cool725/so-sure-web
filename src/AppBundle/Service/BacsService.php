@@ -1336,7 +1336,7 @@ class BacsService
                 continue;
             } elseif ($bankAccount->getMandateStatus() != BankAccount::MANDATE_SUCCESS) {
                 $msg = sprintf(
-                    'Skipping scheduled payment %s as mandate is not enabled (%s) [Rescheduled]',
+                    'Skipping scheduled payment %s as mandate is not enabled (%s)',
                     $scheduledPayment->getId(),
                     $bankAccount->getMandateStatus()
                 );
