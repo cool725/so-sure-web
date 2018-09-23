@@ -9,7 +9,7 @@ use AppBundle\Controller\OpsController;
 /**
  * @group unit
  */
-class SixpackServiceUnitTest extends  \PHPUnit\Framework\TestCase
+class SixpackServiceUnitTest extends \PHPUnit\Framework\TestCase
 {
     use \AppBundle\Tests\PhingKernelClassTrait;
 
