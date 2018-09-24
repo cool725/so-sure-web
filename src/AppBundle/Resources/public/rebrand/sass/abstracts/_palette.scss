@@ -106,6 +106,10 @@ $theme-colors: (
     @include linear-gradient(100deg, $blue-3, $blue-1a);
 }
 
+@mixin dark-blue-gradient-ld {
+    @include linear-gradient(90deg, $blue-4, $dark);
+}
+
 // Migrate above to this
 // @mixin sosure-gradient {
 //     @include linear-gradient(100deg, $blue, $ceruleanblue);
@@ -113,6 +117,7 @@ $theme-colors: (
 // @mixin sosure-gradient-r {
 //     @include linear-gradient(100deg, $ceruleanblue, $blue);
 // }
+
 
 // Box shadow
 .box-shadow {

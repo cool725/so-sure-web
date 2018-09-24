@@ -21,6 +21,7 @@
 }
 
 // Add gradient to button rather than modifying the core css
+// TODO: We're removing button gradient fallback to primary
 .btn-gradient {
     border: none;
     @include blue-gradient-ld;
