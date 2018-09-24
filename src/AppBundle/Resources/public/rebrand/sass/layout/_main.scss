@@ -11,9 +11,9 @@
 
         // Curve
         svg {
-            transform: translateY(-1px);
-            position: absolute;
-            top: 100%; left: 0;
+            transform: translateY(1px);
+            // position: absolute;
+            // top: 100%; left: 0;
         }
 
         &-stuck {
@@ -38,7 +38,7 @@
             }
         }
 
-        background-color: $blue-3;
+        // background-color: $blue-3;
     }
 
     &__main {
@@ -135,7 +135,7 @@
         bottom: -1px; left: 0; right: 0;
         z-index: 1000;
         color: $white;
-        @include linear-gradient(160deg, $blue-3, $blue-1a);
+        @include blue-gradient-ld;
         box-shadow: 0 -15px 30px 0 rgba(8,27,154,0.08),
                     0 -5px 15px 0 rgba(8,27,154,0.08);
 

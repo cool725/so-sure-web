@@ -23,7 +23,7 @@
 // Add gradient to button rather than modifying the core css
 .btn-gradient {
     border: none;
-    @include linear-gradient(90deg, $blue-3, $blue-1a);
+    @include blue-gradient-ld;
 
     &:hover {
         @include linear-gradient(90deg, $blue-1a, $blue-3);

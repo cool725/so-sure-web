@@ -9,7 +9,7 @@
 
 body {
     background-color: $blue-3;
-    // @include linear-gradient(160deg, $blue-3, $blue-1a);
+    @include blue-gradient-ld;
 }
 
 .qpw {
@@ -32,6 +32,14 @@ body {
 
         @include media-breakpoint-up(lg) {
             margin-top: 0;
+        }
+    }
+
+    &__curve {
+        transform: translateY(-1px);
+
+        @include media-breakpoint-up(lg) {
+            transform: none;
         }
     }
 

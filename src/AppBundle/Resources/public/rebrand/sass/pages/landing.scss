@@ -7,18 +7,13 @@
 @import "../abstracts/palette";
 @import "../abstracts/variables";
 
-// body {
-
-//     // @include linear-gradient(160deg, $blue-3, $blue-1a);
-// }
-
 .hero {
     position: relative;
     padding-top: 8rem;
     padding-bottom: 8rem;
     text-align: center;
     background-color: $blue-3;
-    @include linear-gradient(135deg, $blue-3, $blue-1a);
+    @include blue-gradient-ld;
 
     h1 {
         @include media-breakpoint-down(xs) {
