@@ -185,7 +185,7 @@ class DirectGroupService extends SftpService
                     'latestFile' => $latestFile,
                     'successFile' => $successFile,
                     'errors' => $this->errors,
-                    'warnings' => null,
+                    'warnings' => $this->warnings,
                     'sosureActions' => null,
                     'claims' => null,
                     'fees' => $this->fees,
@@ -780,7 +780,8 @@ class DirectGroupService extends SftpService
             $this->warnings[$directGroupClaim->claimNumber][] = $msg;
         }
 
-        if (mb_strlen($directGroupClaim->lossDescription) < self::MIN_LOSS_DESCRIPTION_LENGTH) {
+        if ($directGroupClaim->getClaimStatus() != Claim::STATUS_WITHDRAWN &&
+            mb_strlen($directGroupClaim->lossDescription) < self::MIN_LOSS_DESCRIPTION_LENGTH) {
             $msg = sprintf(
                 'Claim %s does not have a detailed loss description',
                 $directGroupClaim->claimNumber

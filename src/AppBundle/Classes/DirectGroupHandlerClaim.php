@@ -96,7 +96,7 @@ class DirectGroupHandlerClaim extends HandlerClaim
 
     public function setTotalIncurred($totalIncurred)
     {
-        $this->totalIncurred = $totalIncurred - $this->excess;
+        $this->totalIncurred = $totalIncurred + $this->handlingFees - $this->excess;
     }
 
     public function getIncurred()
@@ -105,7 +105,7 @@ class DirectGroupHandlerClaim extends HandlerClaim
             return 0;
         }
 
-        // No incurred value is present, but incurred is total - cost of claim - excess
+        // No incurred value is present, but incurred is total (which inc excess) - cost of claim (handling fees)
         return $this->totalIncurred - $this->handlingFees;
     }
 
