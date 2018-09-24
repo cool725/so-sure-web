@@ -2,12 +2,6 @@
 
 .btn {
     font-family: $g-medium;
-
-    .far,
-    .fab,
-    .fas {
-        vertical-align: middle;
-    }
 }
 
 // Add shadow to button rather than modifying the core css
@@ -49,7 +43,19 @@
 // Add square buttons for icons to button rather than modifying the core css
 .btn-square {
     padding: .6rem 1rem;
-    @include border-radius(4px);
+    @include border-radius(8px);
+
+    span {
+        display: block;
+        font-size: 75%;
+    }
+
+    @include media-breakpoint-up(sm) {
+        span {
+            display: inline;
+            font-size: 100%;
+        }
+    }
 }
 
 .btn-circle {
@@ -84,7 +90,6 @@
         text-rendering: auto;
         -webkit-font-smoothing: antialiased;
         font-family: 'Font Awesome 5 Pro';
-        vertical-align: middle;
         margin-left: 20px;
         opacity: 0.7;
     }

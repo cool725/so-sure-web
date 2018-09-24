@@ -1,49 +1,69 @@
-{% extends '::base.html.twig' %}
+{% extends 'base_rebrand.html.twig' %}
 
 {# Set vars #}
 {% set exclude_remote_scripts = true %}
-{% set new_stylesheet = 1 %}
-{% set distraction_free = 1 %}
-{% set new_footer = 1 %}
+{% set body_class = 'login' %}
+{% set light_nav  = 1 %}
+{# TODO: Do we need to hide the nav or at least the login button #}
+{% set quote_mode = 1 %}
 
-{% block stylesheets %}
-    {{ parent() }}
-    {% stylesheets output='css/*.css'
-    '@AppBundle/Resources/public/sass/page/login.scss'
- %}<link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/login.css') }}">
 {% endblock %}
 
 {% block body %}
-    <section class="section--pad">
-        <div class="panel login__panel">
-            <div class="panel-body">
-                <form class="form text-center" action="" method="post">
-                    {% for flashMessage in app.session.flashbag.get("two_factor") %}
-                        <p class="error">{{ flashMessage|trans }}</p>
-                    {% endfor %}
+    <div class="login p-3 d-flex align-items-center">
+        <div class="login__inner">
 
-                    <div class="form-group">
-                        <label for="_auth_code" class="h2">Google Auth MFA Code</label>
-                        <input id="_auth_code" type="tel" class="form-control" placeholder="Enter 2FA" autocomplete="off" name="_auth_code" />
-                    </div>
+            <h1 class="text-white text-center mb-1">Google Auth MFA Code</h1>
+            <h4 class="text-blue1 text-center mb-4">Enter your 2FA code to login</h4>
 
-                    {% if useTrustedOption %}
+            <div class="login__card">
+                <div class="login__card__body">
+                    <form class="form" action="" method="post">
                         <div class="form-group">
-                            <label for="_trusted">
-                                <input id="_trusted" type="checkbox" name="_trusted"  /> Trust this computer
-                            </label>
+                            <label for="_auth_code">Google Auth MFA Code</label>
+                            <input id="_auth_code" type="tel" class="form-control" placeholder="Enter 2FA" autocomplete="off" name="_auth_code" autofocus />
+                            {% for flashMessage in app.session.flashbag.get("two_factor") %}
+                                <label class="error">{{ flashMessage|trans }}</label>
+                            {% endfor %}
                         </div>
-                    {% endif %}
-
-                    <div class="form-group">
-                        <input type="submit" value="Login" class="btn btn-blue btn-block btn-pad" /></p>
-                    </div>
-
-                    <div class="form-group">
-                        <a class="btn btn-link btn-xs" href="{{ path("_security_logout") }}">Abort login</a>
-                    </div>
-                </form>
+                        <div class="form-group mb-3">
+                            <input type="submit" value="Login" class="btn btn-success btn-block" />
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                {% if useTrustedOption %}
+                                    <div class="col">
+                                        <div class="custom-control custom-checkbox">
+                                            <input type="checkbox" class="custom-control-input" id="_trusted" name="_trusted">
+                                            <label class="custom-control-label" for="_trusted">Trust this computer</label>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                                <div class="col">
+                                    <a class="btn btn-outline-primary btn-sm btn-block" href="{{ path("_security_logout") }}"><i class="fal fa-ban"></i> Abort login</a>
+                                </div>
+                            </div>
+                        </div>
+{#                         <div class="form-group">
+                            <a class="btn btn-link btn-block" href="{{ path("_security_logout") }}"><i class="fal fa-ban"></i> Abort login</a>
+                        </div> #}
+                    </form>
+                </div>
             </div>
+
         </div>
-    </section>
+        <span class="login__phone__background animated fadeInLeft"></span>
+        <span class="login__money__background animated jackInTheBox"></span>
+    </div>
 {% endblock %}
+
+{% block footer %}
+    {# TODO: Fix footer #}
+{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/login.js') }}"></script>
+{% endblock %}
+
