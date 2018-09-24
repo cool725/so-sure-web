@@ -4,6 +4,9 @@ imports:
 framework:
     # 10.* required for the elb load balancing health check
     trusted_hosts: ['testing.wearesosure.com', '10\.\d+\.\d+\.\d+']
+    router:
+        resource: "%kernel.root_dir%/config/routing_errors.yml"
+        strict_requirements: true
 #    validation:
 #        cache: validator.mapping.cache.apc
 #    serializer:
@@ -48,17 +51,17 @@ monolog:
             type:   stream
             path:   "%kernel.logs_dir%/salva.log"
             level:  info
-            channels: ["salva"]            
+            channels: ["salva"]
         davies:
             type:   stream
             path:   "%kernel.logs_dir%/davies.log"
             level:  info
-            channels: ["davies"]            
+            channels: ["davies"]
         receperio:
             type:   stream
             path:   "%kernel.logs_dir%/receperio.log"
             level:  info
-            channels: ["receperio"]            
+            channels: ["receperio"]
         main:
             type:   stream
             path:   "%kernel.logs_dir%/%kernel.environment%.log"
