@@ -36,7 +36,7 @@
             background-color: $bb-2;
             font-family: $g-bold;
             box-shadow: 0 0 0 8px rgba(224, 239, 253, 0.8);
-            @include linear-gradient(90deg, $blue-3, $blue-1a);
+            @include blue-gradient-ld;
         }
 
         &-done {

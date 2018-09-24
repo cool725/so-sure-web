@@ -101,13 +101,18 @@ $theme-colors: (
 
 // Gradients
 // TODO: Find cases where gradient is in css and remove apply gradient to it or extend
-.blue-gradient-ld {
-    @include linear-gradient(135deg, $blue-3, $blue-1a);
+
+@mixin blue-gradient-ld {
+    @include linear-gradient(100deg, $blue-3, $blue-1a);
 }
 
-.blue-gradient-dl {
-    @include linear-gradient(135deg, $blue-3, $blue-1a);
-}
+// Migrate above to this
+// @mixin sosure-gradient {
+//     @include linear-gradient(100deg, $blue, $ceruleanblue);
+// }
+// @mixin sosure-gradient-r {
+//     @include linear-gradient(100deg, $ceruleanblue, $blue);
+// }
 
 // Box shadow
 .box-shadow {

@@ -9,7 +9,7 @@
 
 body {
     background-color: $blue-3;
-    // @include linear-gradient(160deg, $blue-3, $blue-1a);
+    @include blue-gradient-ld;
 }
 
 .qpw {
