@@ -33,7 +33,7 @@ class AdminControllerTest extends BaseControllerTest
 
     public function testAdminLoginOk()
     {
-        $this->login('patrick@so-sure.com', LoadUserData::DEFAULT_PASSWORD, 'admin/');
+        $this->login('patrick@so-sure.com', LoadUserData::DEFAULT_PASSWORD, 'admin');
     }
 
     public function testAdminPartialPolicy()
@@ -50,7 +50,7 @@ class AdminControllerTest extends BaseControllerTest
         );
         $policy = self::initPolicy($user, self::$dm, $phone);
 
-        $this->login('patrick@so-sure.com', LoadUserData::DEFAULT_PASSWORD, 'admin/');
+        $this->login('patrick@so-sure.com', LoadUserData::DEFAULT_PASSWORD, 'admin');
         $crawler = self::$client->request('GET', sprintf('/admin/policy/%s', $policy->getId()));
         self::verifyResponse(200);
     }
@@ -75,7 +75,7 @@ class AdminControllerTest extends BaseControllerTest
         self::$dm->persist($claim);
         self::$dm->flush();
 
-        $this->login('patrick@so-sure.com', LoadUserData::DEFAULT_PASSWORD, 'admin/');
+        $this->login('patrick@so-sure.com', LoadUserData::DEFAULT_PASSWORD, 'admin');
         $crawler = self::$client->request('GET', '/admin/claims');
         self::verifyResponse(200);
 
@@ -125,7 +125,7 @@ class AdminControllerTest extends BaseControllerTest
         $claimId = $claim->getId();
         $this->assertNotNull($charge->getClaim());
 
-        $this->login('patrick@so-sure.com', LoadUserData::DEFAULT_PASSWORD, 'admin/');
+        $this->login('patrick@so-sure.com', LoadUserData::DEFAULT_PASSWORD, 'admin');
         $crawler = self::$client->request('GET', '/admin/claims');
         self::verifyResponse(200);
         $form = $crawler->filter('form[id="delete-claim-form"]')->form();
