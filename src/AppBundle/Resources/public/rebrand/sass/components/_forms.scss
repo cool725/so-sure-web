@@ -30,10 +30,10 @@ label {
 
     &:disabled,
     &[readonly] {
-        background-color: $off-white;
+        background-color: darken($white, 5%);
 
         &:focus {
-            background-color: $off-white;
+            background-color: darken($white, 5%);
         }
     }
 }
@@ -43,7 +43,7 @@ label {
 }
 
 .custom-checkbox .custom-control-input:checked ~ .custom-control-label::before {
-    background-color: #00B500;
+    background-color: $green;
 }
 
 // Server side error styling
