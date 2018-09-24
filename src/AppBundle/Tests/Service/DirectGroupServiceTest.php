@@ -1496,10 +1496,12 @@ class DirectGroupServiceTest extends WebTestCase
         $directGroupClaim->insuredName = 'Mr foo bar';
         $directGroupClaim->status = DirectGroupHandlerClaim::STATUS_OPEN;
         $directGroupClaim->lossType = DirectGroupHandlerClaim::TYPE_LOSS;
-        static::$directGroupService->saveClaim($directGroupClaim, false);
-        $this->assertEquals(Claim::STATUS_APPROVED, $claim->getStatus());
+
         $now = new \DateTime();
         $yesterday = $this->subBusinessDays($now, 1);
+        static::$directGroupService->saveClaim($directGroupClaim, false);
+
+        $this->assertEquals(Claim::STATUS_APPROVED, $claim->getStatus());
         $this->assertEquals($yesterday, $claim->getApprovedDate());
     }
 
