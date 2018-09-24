@@ -28,7 +28,7 @@
             <div class="with-errors">{{ form_errors(purchase_form.agreedAgeLocation) }}</div>
         </div>
         <div class="form-group">
-            {% set terms_url = cdn_url ~ "/files/so-sure_sample_policy_doc.pdf" %}
+            {% set terms_url = cdn_url ~ '/files/so-sure_sample_policy_doc.pdf' %}
             {{ form_widget(purchase_form.agreedTerms, {
                 'label': 'I have read & understood the <a href="' ~ terms_url ~  '" target="_blank"><strong class=""><u>so-sure policy document</u></strong></a>',
                 'attr': {'class':'custom-control-input'}}

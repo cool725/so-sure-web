@@ -16,11 +16,11 @@ EOF
 
 grep -R 'cdn_url ' src/ | awk -F 'cdn_url ' '{ print $2 }' | awk -F '"' '{print $1}' | sed 's/\}\}/https:\/\/cdn.so-sure.com/g' > $TMP_FILE
 grep -R 'cdn_url}}' src/ | awk -F 'cdn_url}}' '{ print $2 }' | awk -F '"' '{print $1}' | sed 's/\}\}/https:\/\/cdn.so-sure.com/g' >> $TMP_FILE
-grep -R 'cdn_url ' src/ | grep '~' | awk -F 'cdn_url ' '{ print $2 }' | awk -F "'" '{print $2}' | awk -F '_' '{print "https://cdn.so-sure.com"$1}' >> $TMP_FILE
+grep -R 'cdn_url ' src/ | grep '~' | awk -F 'cdn_url ' '{ print $2 }' | awk -F "'" '{print $2}' | awk -F '"' '{print $1}' >> $TMP_FILE
 
 grep -R 'cdn_url ' app/Resources/ | awk -F 'cdn_url ' '{ print $2 }' | awk -F '"' '{print $1}' | sed 's/\}\}/https:\/\/cdn.so-sure.com/g' >> $TMP_FILE
 grep -R 'cdn_url}}' app/Resources/ | awk -F 'cdn_url}}' '{ print $2 }' | awk -F '"' '{print $1}' | sed 's/\}\}/https:\/\/cdn.so-sure.com/g' >> $TMP_FILE
-grep -R 'cdn_url ' app/Resources/ | grep '~' | awk -F 'cdn_url ' '{ print $2 }' | awk -F "'" '{print $2}' | awk -F '_' '{print "https://cdn.so-sure.com"$1}' >> $TMP_FILE
+grep -R 'cdn_url ' app/Resources/ | grep '~' | awk -F 'cdn_url ' '{ print $2 }' | awk -F "'" '{print $2}' | awk -F '"' '{print $1}'  >> $TMP_FILE
 
 cat $TMP_FILE | uniq | grep 'cdn' | grep -v '{{' | awk -F '_' '{print "url \""$0"\""}' >> $RUN_FILE
 
