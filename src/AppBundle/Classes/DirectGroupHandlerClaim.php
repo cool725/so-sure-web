@@ -66,6 +66,10 @@ class DirectGroupHandlerClaim extends HandlerClaim
     const DETAIL_STATUS_REJECTED_UNCLEAR = 'Unclear Circumstances'; // REJECT - 28
     const DETAIL_STATUS_REJECTED_COSMETIC = 'Wear and Tear/Cosmetic damages'; // REJECT - 29
 
+    public $replacementSupplier;
+    public $repairSupplier;
+    public $supplierStatus;
+
     public static $breakdownEmailAddresses = [
         'SoSure@directgroup.co.uk',
     ];
@@ -74,6 +78,7 @@ class DirectGroupHandlerClaim extends HandlerClaim
         'SoSure@directgroup.co.uk',
         'patrick@so-sure.com',
         'dylan@so-sure.com',
+        'Sally.Hancock@directgroup.co.uk',
     ];
 
     public static $sheetNames = [
@@ -87,6 +92,21 @@ class DirectGroupHandlerClaim extends HandlerClaim
         } else {
             throw new \Exception(sprintf('Unknown sheet name %s', $sheetName));
         }
+    }
+
+    public function setTotalIncurred($totalIncurred)
+    {
+        $this->totalIncurred = $totalIncurred + $this->handlingFees - $this->excess;
+    }
+
+    public function getIncurred()
+    {
+        if (!$this->totalIncurred) {
+            return 0;
+        }
+
+        // No incurred value is present, but incurred is total (which inc excess) - cost of claim (handling fees)
+        return $this->totalIncurred - $this->handlingFees;
     }
 
     public function hasError()
@@ -124,7 +144,7 @@ class DirectGroupHandlerClaim extends HandlerClaim
         } elseif (mb_stripos($lossType, mb_strtolower(self::TYPE_DAMAGE)) !== false) {
             return Claim::TYPE_DAMAGE;
         } elseif (mb_stripos($lossType, 'Breakdown') !== false) {
-            return Claim::TYPE_DAMAGE;
+            return Claim::TYPE_WARRANTY;
         } elseif (mb_stripos($lossType, 'Impact') !== false) {
             return Claim::TYPE_DAMAGE;
         } elseif (mb_stripos($lossType, 'Water') !== false) {
@@ -208,7 +228,8 @@ class DirectGroupHandlerClaim extends HandlerClaim
             return null;
         }
 
-        $total = $this->unauthorizedCalls + $this->accessories + $this->phoneReplacementCost - $this->handlingFees;
+        $total = $this->unauthorizedCalls + $this->accessories + $this->phoneReplacementCost - $this->handlingFees -
+            $this->excess;
 
         return $this->toTwoDp($total);
     }
@@ -252,12 +273,9 @@ class DirectGroupHandlerClaim extends HandlerClaim
             $this->nullIfBlank($data[++$i]);
             // todo: Latest Claim handling team touch point date
             $this->excelDate($data[++$i]);
-            // todo: Replacement Supplier Name
-            $this->nullIfBlank($data[++$i]);
-            // todo: Repair Supplier Name
-            $this->nullIfBlank($data[++$i]);
-            // todo: Supplier status
-            $this->nullIfBlank($data[++$i]);
+            $this->replacementSupplier = $this->nullIfBlank($data[++$i]);
+            $this->repairSupplier = $this->nullIfBlank($data[++$i]);
+            $this->supplierStatus = $this->nullIfBlank($data[++$i]);
             // todo: Supplier pick up date
             $this->excelDate($data[++$i]);
             // todo: Supplier repair date
@@ -278,10 +296,7 @@ class DirectGroupHandlerClaim extends HandlerClaim
             $this->excess = $this->nullIfBlank($data[++$i]);
             // todo: KFI score
             $this->nullIfBlank($data[++$i]);
-            $this->totalIncurred = $this->nullIfBlank($data[++$i]);
-
-            // No incurred value is present, but incurred is total - cost of claim
-            $this->incurred = $this->totalIncurred - $this->handlingFees;
+            $this->setTotalIncurred($this->nullIfBlank($data[++$i]));
 
             if ($this->getClaimType() === null) {
                 throw new \Exception('Unknown or missing claim type');
@@ -314,7 +329,7 @@ class DirectGroupHandlerClaim extends HandlerClaim
             return null;
         }
 
-        return str_replace('£', '', trim($field));
+        return str_replace('_x000D_', PHP_EOL, str_replace('£', '', trim($field)));
     }
 
     protected function isNullableValue($value)
@@ -334,7 +349,8 @@ class DirectGroupHandlerClaim extends HandlerClaim
 
     public function isReplacementRepaired()
     {
-        return false;
+        // if repair supplier is present, then its a repair and imei will not be present
+        return mb_strlen($this->repairSupplier) > 0;
     }
 
 

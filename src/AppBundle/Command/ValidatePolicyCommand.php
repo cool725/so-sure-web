@@ -9,6 +9,7 @@ use AppBundle\Document\Payment\BacsPayment;
 use AppBundle\Repository\PolicyRepository;
 use AppBundle\Service\MailerService;
 use AppBundle\Service\PolicyService;
+use AppBundle\Service\RouterService;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
@@ -398,8 +399,8 @@ class ValidatePolicyCommand extends BaseCommand
             }
             $refund = $policy->getRefundAmount();
             $refundCommission = $policy->getRefundCommissionAmount();
-            if (($refund > 0 && !$this->areEqualToTwoDp(0, $refund)) ||
-                ($refundCommission > 0 && !$this->areEqualToTwoDp(0, $refundCommission))) {
+            if (!in_array($policy->getId(), Salva::$refundValidationExclusions) &&
+                ($this->greaterThanZero($refund) || $this->greaterThanZero($refundCommission))) {
                 $this->header($policy, $policies, $lines);
                 $lines[] = sprintf(
                     'Warning!! Refund Due. Refund %f / Commission %f',
@@ -441,21 +442,36 @@ class ValidatePolicyCommand extends BaseCommand
 
     private function header($policy, &$policies, &$lines)
     {
+        /** @var RouterService $routerService */
+        $routerService = $this->getContainer()->get('app.router');
         if (!isset($policies[$policy->getId()])) {
             $lines[] = '';
-            $lines[] = $policy->getPolicyNumber() ? $policy->getPolicyNumber() : $policy->getId();
+            $lines[] = sprintf(
+                '%s (<a href="%s">Admin</a>)',
+                $policy->getPolicyNumber() ? $policy->getPolicyNumber() : $policy->getId(),
+                $routerService->generateUrl('admin_policy', ['id' => $policy->getId()])
+            );
             $lines[] = '---';
             $policies[$policy->getId()] = true;
         }
     }
 
-    private function failureStatusMessage($policy, $prefix, $date)
+    private function failureStatusMessage(Policy $policy, $prefix, $date)
     {
-        return sprintf(
+        $message = sprintf(
             'Unexpected status %s %s',
             $policy->getPolicyNumber() ? $policy->getPolicyNumber() : $policy->getId(),
             $policy->getStatus()
         );
+
+        if ($policy->getUser()->hasBacsPaymentMethod()) {
+            $bacsStatus = $policy->getUser()->getBacsPaymentMethod() ?
+                $policy->getUser()->getBacsPaymentMethod()->getBankAccount()->getMandateStatus() :
+                'unknown';
+            $message = sprintf('%s (Bacs Mandate Status: %s)', $message, $bacsStatus);
+        }
+
+        return $message;
     }
 
     private function failureCommissionMessage(Policy $policy, $prefix, $date)

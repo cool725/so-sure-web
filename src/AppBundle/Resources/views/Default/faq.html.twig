@@ -1,858 +1,684 @@
-{% extends 'base.html.twig' %}
+{% extends 'base_rebrand.html.twig' %}
 
 {# Set vars #}
-{% set new_stylesheet = 1 %}
-{% set new_footer = 1 %}
-{% set useDropdownSearch = 1 %}
-{% set include_emoji = 1 %}
-{% set scrollspy = 1 %}
-{% set scrollspyID = '#faqs__nav' %}
+{% set body_class = 'faq' %}
+{# {% set scrollspy = 1 %} #}
+{# {% set scrollspyID = '#faq-nav' %} #}
 
 {% block title %}so-sure - Frequently Asked Questions{% endblock %}
+
 {% block meta %}
     <meta name="description" content="Social mobile phone insurance that's better and up to 80% cheaper when you connect with friends and don't claim. Download our app now to see how much you could save."/>
 {% endblock %}
 
-{% block stylesheets %}
-    {{ parent() }}
-    {% stylesheets output='css/*.css'
-    'components/animate.css/animate.min.css'
-    '@AppBundle/Resources/public/sass/page/faq.scss'
- %}<link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
-{% endblock %}
-
-{% block nav %}
-    {% if not hide_nav %}
-        {% include '::nav_new.html.twig' %}
-    {% endif %}
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/faq.css') }}">
 {% endblock %}
 
 {% block body %}
 
-    <section class="section--pad faqs">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-9">
-                    <div class="faqs__content">
-                        <h1 class="h-nom">FAQs</h1>
-                        <p class="lead">We all need a little extra info sometimes, that's why we've put together this handy FAQ section for you! Can't find what you're looking for? Then don't hesitate to ask via <a href="#" class="open-intercom">live chat</a> Monday-Friday 9am-6pm or by emailing us at <a href="mailto:support@wearesosure.com">support@wearesosure.com</a>.</p>
+    <section class="faq">
+        <div class="d-lg-flex">
 
-                        <br>
+            {# Main Content #}
+            <div class="faq__main__container">
+                <div class="faq__main px-4 px-lg-5">
+                    <h5 class="text-blue4 mb-0">so-sure help</h5>
+                    <h1 class="text-primary mb-4">Frequently Asked Questions</h1>
+                    <p class="mb-5">We all need a little extra info sometimes, that's why we've put together this handy FAQ section for you! Can't find what you're looking for? Then don't hesitate to ask via <a href="#" class="open-intercom">live chat</a> Monday-Friday 9am-6pm or by emailing us at <a href="mailto:support@wearesosure.com">support@wearesosure.com</a>.</p>
 
-                        {# Top Questions #}
-                        <h2 id="top-questions">Top Questions</h2>
-
-                        <h3>
-                            <a href="#why-should-i-use-you"
-                               data-toggle="collapse"
-                               aria-expanded="false"
-                               aria-controls="why-should-i-use-you"
-                               class="collapsed">
-                                Why should I use you?
-                            </a>
-                        </h3>
-                        <div class="collapse" id="why-should-i-use-you">
-                            <p>Unlike other insurers, we're less focused on profit, and more focused on giving customers value.  Our mission is to make insurance better and cheaper for honest people,  and that's why we've developed clever anti-fraud tech that makes your life easier. Plus we're the only insurer that gives you <a href="#social-insurance-and-reward-pot" class="scroll-to" data-scroll-to-anchor="#social-insurance-and-reward-pot" data-scroll-to-focus="#social-insurance-and-reward-pot">money back</a>.</p>
-                            <ul>
-                                <li>Instant cover from purchase</li>
-                                <li>24-72 hour replacement once your claim is approved</li>
-                                <li>Hassle-Free Claims</li>
-                                <li>Low excess from just &pound;50 when validated with our anti-fraud technology. If not validated then excess is &pound;150</li>
-                                <li>Insure mobiles up to 3 years old</li>
-                                <li>No proof of purchase required upfront, or at all when you use our anti-fraud technology</li>
-                                <li>Rewards when you and your connections don't claim - up to 80% of your premium back</li>
-                            </ul>
-                        </div>
-
-                        <h3>
-                            <a href="#how-much-is-excess"
-                               data-toggle="collapse"
-                               aria-expanded="false"
-                               aria-controls="how-much-is-excess"
-                               class="collapsed">
-                                How much is excess?
-                            </a>
-                        </h3>
-                        <div class="collapse" id="how-much-is-excess">
-                            <p>Our excess is as low as &pound;50 for accidental damage and &pound;70 for loss and theft when you validate your phone with our anti-fraud technology</p>
-                            <p><mark>If you don't validate your phone with pic-sure using our app, the excess is &pound;150.</mark></p>
-                        </div>
-
-                        <h3>
-                            <a href="#what-is-an-imei-number-and-how-do-i-find-out-the-imei-of-my-mobile"
-                               data-toggle="collapse"
-                               aria-expanded="false"
-                               aria-controls="what-is-an-imei-number-and-how-do-i-find-out-the-imei-of-my-mobile"
-                               class="collapsed">
-                                What is an IMEI number and how do I find out the IMEI of my mobile phone?
-                            </a>
-                        </h3>
-                        <div class="collapse" id="what-is-an-imei-number-and-how-do-i-find-out-the-imei-of-my-mobile">
-                            <p>The IMEI (International Mobile Equipment Identification) number of your mobile phone is a unique identification code that is specific to your mobile phone.  If you change your mobile phone, it is important that you call us so we can update your policy with the correct details.</p>
-                            <h4>For iOS (Apple) users:</h4>
-                            <p>Unfortunately, as we need your serial number on iOS you can’t just dial a number (although dialing the same number as above will reveal your IMEI number).</p>
-                            <p>As such you can find both numbers by going to <mark>Settings &gt; General &gt; About</mark>.</p>
-                            <p>If you’re using our app (or if requested by support), you can take a screenshot by pressing the <mark>Sleep/Wake</mark> and <mark>Home</mark> buttons at the same time until you see the screen flash quickly.</p>
-                            <h4>For Android users:</h4>
-                            <p>The easiest way to find your phone’s IMEI number if you’re on an Android device is to simply dial <mark>*#06#</mark>.</p>
-                            <p>If you’re still having trouble, then you should be able to find it in <mark>Settings &gt; About phone &gt; Status &gt; IMEI information</mark>.</p>
-                            <p>Your serial number will be on the Status screen.</p>
-                            <p>If requested by support, you can take a screenshot on most Android phones by holding the volume down and the power buttons for 1-2 seconds. The screen should flash and the photo can be found in your photos app.</p>
-                        </div>
-
-                        <h3>
-                            <a href="#do-you-cover-other-gadgets-like-laptops"
-                               data-toggle="collapse"
-                               aria-expanded="false"
-                               aria-controls="do-you-cover-other-gadgets-like-laptops"
-                               class="collapsed">
-                                Do you cover other gadgets like laptops?
-                            </a>
-                        </h3>
-                        <div class="collapse" id="do-you-cover-other-gadgets-like-laptops">
-                            <p>No, sorry we only cover mobile phone insurance.</p>
-                        </div>
-
-                        <h3>
-                            <a href="#i-bought-a-used-phone-my-friend-gave-me-an-older-phone-can-i-still-insure-it"
-                               data-toggle="collapse"
-                               aria-expanded="false"
-                               aria-controls="i-bought-a-used-phone-my-friend-gave-me-an-older-phone-can-i-still-insure-it"
-                               class="collapsed">
-                                I bought a used phone/my friend gave me an older phone can I still insure it?
-                            </a>
-                        </h3>
-                        <div class="collapse" id="i-bought-a-used-phone-my-friend-gave-me-an-older-phone-can-i-still-insure-it">
-                            <p>Yes we are able to insure second-hand phones provided they are in full working condition, without any damage, and less than 3 years old.</p>
-                        </div>
-
-                        <h3>
-                            <a href="#do-you-have-a-discount-for-annual-payments"
-                               data-toggle="collapse"
-                               aria-expanded="false"
-                               aria-controls="do-you-have-a-discount-for-annual-payments"
-                               class="collapsed">
-                                Do you have a discount for annual payments?
-                            </a>
-                        </h3>
-                        <div class="collapse" id="do-you-have-a-discount-for-annual-payments">
-                            <p>Our Reward Pot allow you to get the best possible pricing up to 80% cheaper than the networks, so we do not provide annual discounts.</p>
-                        </div>
-
-                        <h3>
-                            <a href="#is-there-an-age-limit-on-the-mobile-phone-i-want-to-insure"
-                               data-toggle="collapse"
-                               aria-expanded="false"
-                               aria-controls="is-there-an-age-limit-on-the-mobile-phone-i-want-to-insure"
-                               class="collapsed">
-                                Is there an age limit on the mobile phone I want to insure?
-                            </a>
-                        </h3>
-                        <div class="collapse" id="is-there-an-age-limit-on-the-mobile-phone-i-want-to-insure">
-                            <p>The phone you want to insure must be <mark>less than 3 years old</mark> from when your policy begins.</p>
-                        </div>
-
-                        <h3>
-                            <a href="#can-i-take-out-insurance-if-i-bought-my-mobile-phone-from-ebay-or-another-auction-site"
-                               data-toggle="collapse"
-                               aria-expanded="false"
-                               aria-controls="can-i-take-out-insurance-if-i-bought-my-mobile-phone-from-ebay-or-another-auction-site"
-                               class="collapsed">
-                                Can I insure a mobile phone I bought from eBay or another auction site?
-                            </a>
-                        </h3>
-                        <div class="collapse" id="can-i-take-out-insurance-if-i-bought-my-mobile-phone-from-ebay-or-another-auction-site">
-                            <p>Yes, you can take out insurance on a second hand phone.</p>
-                            <p>The phone bought needs to have orginally been sold into the UK market prior your purchase (eg we don't insure models sold in China).</p>
-                        </div>
-
-{#                         <h3>
-                            <a href="#i-got-my-mobile-phone-on-a-contract-will-you-cover-the-full-replacement-value-of-the-phone"
-                               data-toggle="collapse"
-                               aria-expanded="false"
-                               aria-controls="i-got-my-mobile-phone-on-a-contract-will-you-cover-the-full-replacement-value-of-the-phone"
-                               class="collapsed">
-                                I got my mobile phone on a contract, will you cover the full replacement value of the phone?
-                            </a>
-                        </h3>
-                        <div class="collapse" id="i-got-my-mobile-phone-on-a-contract-will-you-cover-the-full-replacement-value-of-the-phone">
-                            <p>To Add...</p>
-                        </div> #}
-
-                        <h3>
-                            <a href="#do-you-cover-phones-that-have-been-purchased-outside-of-the-uk"
-                               data-toggle="collapse"
-                               aria-expanded="false"
-                               aria-controls="do-you-cover-phones-that-have-been-purchased-outside-of-the-uk"
-                               class="collapsed">
-                                Do you cover phones that have been purchased outside of the UK?
-                            </a>
-                        </h3>
-                        <div class="collapse" id="do-you-cover-phones-that-have-been-purchased-outside-of-the-uk">
-                            <p>We cover phones bought within the EU.</p>
-                        </div>
-
-                        <h3>
-                            <a href="#are-the-replacement-handsets-brand-new"
-                               data-toggle="collapse"
-                               aria-expanded="false"
-                               aria-controls="are-the-replacement-handsets-brand-new"
-                               class="collapsed">
-                                Are the replacement handsets brand new?
-                            </a>
-                        </h3>
-                        <div class="collapse" id="are-the-replacement-handsets-brand-new">
-                            <p>Where we can, we will repair your phone if requested. If your claim is approved and you need  your  mobile phone  replaced, we will do our best to replace it with an identical fully refurbished or new item. Should this not be possible we will replace it with a fully refurbished or new item of a comparable specification or the equivalent value. Please be aware that it may not always be possible to replace your mobile phone with the same colour.</p>
-                        </div>
-                        {# End #}
-
-                        {# The so-sure app and pic-sure #}
-                        <h2 id="the-so-sure-app-and-pic-sure">The so-sure app and pic-sure</h2>
-
-                        <h3>
-                            <a href="#what-is-pic-sure"
-                               data-toggle="collapse"
-                               aria-expanded="false"
-                               aria-controls="what-is-pic-sure"
-                               class="collapsed">
-                                What is pic-sure
-                            </a>
-                        </h3>
-                        <div class="collapse" id="what-is-pic-sure">
-                            <p>We're all about protecting honest customers, and giving money back when claims are not made.  As there are many dishonest people trying to scam insurers, we decided to develop a piece of technology to protect our customers and keep costs down.</p>
-                            <p>Our clever technology pic-sure, is built into our app. It is super easy to use, and makes sure your phone is in full working order, and the screen is not broken/cracked prior to buying a policy with us - you'd be surprised how many dishonest people are out there.</p>
-                            <p>When validating your phone through pic-sure it vastly reduces your excess, removes the need for proof of purchase and gives you a speedier claims process.</p>
-                        </div>
-
-                        <h3>
-                            <a href="#how-do-i-use-pic-sure"
-                               data-toggle="collapse"
-                               aria-expanded="false"
-                               aria-controls="how-do-i-use-pic-sure"
-                               class="collapsed">
-                                How do I use pic-sure?
-                            </a>
-                        </h3>
-                        <div class="collapse" id="how-do-i-use-pic-sure">
-                            <p>Firstly you need to download the so-sure app and buy a policy.</p>
-                            <ul class="list-inline">
-                                <li>
-                                    <a class="ga-outbound-click" data-clicklabel="iTunes" href="{{ apple_download('faq') }}" target="_blank"><img src="{{ cdn_url }}/images/icons/app-store-original.svg" alt="Download so-sure on the App Store" />
-                                    </a>
-                                </li>
-                                <li>
-                                    <a class="ga-outbound-click" data-clicklabel="PlayStore" href="{{ google_download('faq') }}" target="_blank"><img src="{{ cdn_url }}/images/icons/google-play-original.svg" alt="Get so-sure on Google Play" />
-                                    </a>
-                                </li>
-                            </ul>
-                            <div class="faqs__video">
-                                <iframe width="560" height="315" src="https://www.youtube.com/embed/LB0OZz6pkOE" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+                    <h4 id="top-questions" class="text-primary mt-5 mb-4">Top Questions</h4>
+                    <div class="expanding-cardbox mb-4">
+                        <div class="expanding-cardbox__body">
+                            <h5 class="expanding-cardbox__title text-blue4 mb-0">
+                                Why should I use you? <i class="far fa-chevron-down text-blue2 fa-lg"></i>
+                            </h5>
+                            <div class="expanding-cardbox__expand mt-4">
+                                <p>Unlike other insurers, we're less focused on profit, and more focused on giving customers value.  Our mission is to make insurance better and cheaper for honest people,  and that's why we've developed clever anti-fraud tech that makes your life easier. Plus we're the only insurer that gives you {money back}</p>
+                                <ul class="mb-0">
+                                    <li class="mb-2">Instant cover from purchase</li>
+                                    <li class="mb-2">24-72 hour replacement once your claim is approved</li>
+                                    <li class="mb-2">Hassle-Free Claims</li>
+                                    <li class="mb-2">Low excess from just &pound;50 when validated with our anti-fraud technology. If not validated then excess is &pound;150</li>
+                                    <li class="mb-2">Insure mobiles up to 3 years old</li>
+                                    <li class="mb-2">No proof of purchase required upfront, or at all when you use our anti-fraud technology</li>
+                                    <li>Rewards when you and your connections don't claim - up to 80% of your premium back</li>
+                                </ul>
                             </div>
                         </div>
-
-                        <h3>
-                            <a href="#step-by-step-instructions-for-using-pic-sure"
-                               data-toggle="collapse"
-                               aria-expanded="false"
-                               aria-controls="step-by-step-instructions-for-using-pic-sure"
-                               class="collapsed">
-                                Step by step instructions for using pic-sure
-                            </a>
-                        </h3>
-                        <div class="collapse" id="step-by-step-instructions-for-using-pic-sure">
-                            <ol>
-                                <li>Open the so-sure app</li>
-                                <li>In the top left corner you will see 3 horizontal lines, this is the menu, tap this</li>
-                                <li>In the open menu tap 'pic-sure validation'</li>
-                                <li>In the next screen read the instructions and click start now</li>
-                                <li>A pop-up will appear asking for permission to use the phones camera, tap 'OK'</li>
-                                <li>On the next screen will be instructions on how to complete the process, tap 'NEXT' in the bottom right corner.</li>
-                                <li>The new screen will describe what the QR code will do, when you understand tap 'NEXT' in the bottom right corner</li>
-                                <li>Then the QR code will appear on the screen and you will be able to take the picture in the mirror</li>
-                            </ol>
-                        </div>
-
-                        <h3>
-                            <a href="#handy-tips-for-the-pic-sure-phone-selfie"
-                               data-toggle="collapse"
-                               aria-expanded="false"
-                               aria-controls="handy-tips-for-the-pic-sure-phone-selfie"
-                               class="collapsed">
-                                Handy Tips for the pic-sure 'phone selfie'
-                            </a>
-                        </h3>
-                        <div class="collapse" id="handy-tips-for-the-pic-sure-phone-selfie">
-                            <p>Hold your phone approximately 10cm/4in away from the mirror and keep it steady. Your phone will vibrate once the phone is in the correct position. Make sure to keep it still. When you feel a second vibration, the photo has been taken. Done.</p>
-                            <p>If you don’t feel the vibration, make minor adjustments to the position of the phone, go slowly back and forth, you can tilt the phone slightly as well. You should also see a little preview from the camera when the phone is hold up so make sure the camera is seeing the QR Code.</p>
-                            <p>Then review the photo that is displayed, ensure that your entire phone is visible and if it is submit the photo otherwise try the process again.</p>
-                        </div>
-
-                        <h3>
-                            <a href="#how-much-is-my-excess-if-i-use-pic-sure"
-                               data-toggle="collapse"
-                               aria-expanded="false"
-                               aria-controls="how-much-is-my-excess-if-i-use-pic-sure"
-                               class="collapsed">
-                                How much is my excess if I use pic-sure?
-                            </a>
-                        </h3>
-                        <div class="collapse" id="how-much-is-my-excess-if-i-use-pic-sure">
-                            <p>Your excess greatly reduce from our standard &pound;150 to just &pound;50 accidental damage/breakdown, &pound;70 for loss and theft, and should you need to make a claim it becomes easy and hassle free without the need to provide us proof of purchase.  What you waiting for?</p>
-                            <p>If you fail to verify, the excess will be &pound;150.</p>
-                        </div>
-
-                        <h3>
-                            <a href="#what-happens-if-my-device-gets-rejected"
-                               data-toggle="collapse"
-                               aria-expanded="false"
-                               aria-controls="what-happens-if-my-device-gets-rejected"
-                               class="collapsed">
-                                What happens if my device gets rejected?
-                            </a>
-                        </h3>
-                        <div class="collapse" id="what-happens-if-my-device-gets-rejected">
-                            <p>If your picture is rejected this is because your phone screen is damaged, or we cant see the picture clearly.  If it is cleary damaged your policy will be immediately cancelled as buying a insurance policy with a pre-damaged phone is a fraud and an offence.</p>
-                            <p>If we can't see the picture clearly you will get an invalid notification with feedback on what went wrong. You would then need to try again, making sure you are in a brightly lit room and your mirror and the lens of your phone is clean.</p>
-                        </div>
-
-                        <h3>
-                            <a href="#where-can-i-download-the-app"
-                               data-toggle="collapse"
-                               aria-expanded="false"
-                               aria-controls="where-can-i-download-the-app"
-                               class="collapsed">
-                                Where can I download the app?
-                            </a>
-                        </h3>
-                        <div class="collapse" id="where-can-i-download-the-app">
-                            <p>You can download the so-sure app from the Apple App store of the Google Play store, just click on the revlant store for you below:</p>
-                            <ul class="list-inline">
-                                <li>
-                                    <a class="ga-outbound-click" data-clicklabel="iTunes" href="{{ apple_download('faq') }}" target="_blank"><img src="{{ cdn_url }}/images/icons/app-store-original.svg" alt="Download so-sure on the App Store" />
-                                    </a>
-                                </li>
-                                <li>
-                                    <a class="ga-outbound-click" data-clicklabel="PlayStore" href="{{ google_download('faq') }}" target="_blank"><img src="{{ cdn_url }}/images/icons/google-play-original.svg" alt="Get so-sure on Google Play" />
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
-                        {# End #}
-
-                        {# Social Insurance and the Reward Pot #}
-                        <h2 id="social-insurance-and-reward-pot">Social Insurance and the Reward Pot</h2>
-
-                        <h3>
-                            <a href="#what-is-the-reward-pot"
-                               data-toggle="collapse"
-                               aria-expanded="false"
-                               aria-controls="what-is-the-reward-pot"
-                               class="collapsed">
-                                What is the Reward Pot?
-                            </a>
-                        </h3>
-                        <div class="collapse" id="what-is-the-reward-pot">
-                            <p>The reward pot is basically a <mark>group no claims bonus</mark>.  For each person that buys insurance with us and connects together, for example You buy a policy and invite your mum to buy.  She buys a policy and then you connect, each of you receive up to &pound;10 into your reward pots.</p>
-
-                            <div class="h4">4 people connected to you = &pound;40 in your reward pot, £10 in each of theirs.</div>
-
-                            <div class="h4">8 people connected = &pound;80 in your reward pot, £10 in each of theirs.</div>
-
-                            <p>If neither you nor your connected friends claim, we will payout to you the value of your reward pot at the end of the policy year.</p>
-
-                            {# TODO: When built #}
-                            {# <p>You can see our calculator here {insert new calculator}</p> #}
-                        </div>
-
-                        <h3>
-                            <a href="#is-the-money-back-with-the-reward-pot-guaranteed"
-                               data-toggle="collapse"
-                               aria-expanded="false"
-                               aria-controls="is-the-money-back-with-the-reward-pot-guaranteed"
-                               class="collapsed">
-                                Is the money back with the reward pot guaranteed?
-                            </a>
-                        </h3>
-                        <div class="collapse" id="is-the-money-back-with-the-reward-pot-guaranteed">
-                            <p>It depends on if you and your social circle make a claim.  If none of you claim the money is guaranteed, however if someone makes a claim there may be no money left in the reward pot.</p>
-                        </div>
-
-                        <h3>
-                            <a href="#can-anyone-connect-to-anyone"
-                               data-toggle="collapse"
-                               aria-expanded="false"
-                               aria-controls="can-anyone-connect-to-anyone"
-                               class="collapsed">
-                                Can anyone connect to anyone?
-                            </a>
-                        </h3>
-                        <div class="collapse" id="can-anyone-connect-to-anyone">
-                            <p>Yes, that is the beauty of social insurance, you can have as many connections as you like, as long as they have a policy with so-sure.</p>
-                        </div>
-
-                        <h3>
-                            <a href="#how-do-i-make-connection-to-people"
-                               data-toggle="collapse"
-                               aria-expanded="false"
-                               aria-controls="how-do-i-make-connection-to-people"
-                               class="collapsed">
-                                How do I make connections to people?
-                            </a>
-                        </h3>
-                        <div class="collapse" id="how-do-i-make-connection-to-people">
-                            <p>Once you buy a policy its super easy to make connections either through our app or via SMS, email or whatsapp.</p>
-                        </div>
-
-                        <h3>
-                            <a href="#do-i-need-to-connect-to-get-money-back"
-                               data-toggle="collapse"
-                               aria-expanded="false"
-                               aria-controls="do-i-need-to-connect-to-get-money-back"
-                               class="collapsed">
-                                Do I need to connect to get money back?
-                            </a>
-                        </h3>
-                        <div class="collapse" id="do-i-need-to-connect-to-get-money-back">
-                            <p>Yes, we exist to make insurance better and with us that means being social and connecting in groups of careful people.</p>
-                        </div>
-
-                        <h3>
-                            <a href="#do-i-need-to-connect-to-have-so-sures-insurance-policy"
-                               data-toggle="collapse"
-                               aria-expanded="false"
-                               aria-controls="do-i-need-to-connect-to-have-so-sures-insurance-policy"
-                               class="collapsed">
-                                Do I need to connect to have so-sure’s insurance policy?
-                            </a>
-                        </h3>
-                        <div class="collapse" id="do-i-need-to-connect-to-have-so-sures-insurance-policy">
-                            <p>No, if you want to fly solo that is completely fine, you will still have fantastic cover and great customer service should you need to make a claim.</p>
-                        </div>
-                        {# End #}
-
-                        {# The Insurance Policy #}
-                        <h2 id="the-insurance-policy">The Insurance Policy</h2>
-
-                        <h3>
-                            <a href="#what-am-i-covered-for"
-                               data-toggle="collapse"
-                               aria-expanded="false"
-                               aria-controls="what-am-i-covered-for"
-                               class="collapsed">
-                                What am I covered for?
-                            </a>
-                        </h3>
-                        <div class="collapse" id="what-am-i-covered-for">
-                            <p>We believe that trust starts by us being clear with you about what is covered and what is not covered. If you have a valid claim we’ll have your back and we won't hide behind the small print unlike some insurance providers do.</p>
-                            <p>We have one policy that covers you for:</p>
-                            <ul>
-                                <li>Loss &amp; Theft</li>
-                                <li>Accidental Damage</li>
-                                <li>Out of warranty breakdown</li>
-                                <li>Travel globally travel for up to 90 days</li>
-                                <li>Accessories up to &pound;100 with a loss of theft claim</li>
-                                <li>Unauthorised network charges up to &pound;1000 related to approved loss or theft claim, as long as your network was notified within 24hrs of the loss or theft</li>
-                            </ul>
-                        </div>
-
-                        <h3>
-                            <a href="#whats-not-covered"
-                               data-toggle="collapse"
-                               aria-expanded="false"
-                               aria-controls="whats-not-covered"
-                               class="collapsed">
-                                What’s not covered?
-                            </a>
-                        </h3>
-                        <div class="collapse" id="whats-not-covered">
-                            <p>Excess: You need to pay a contribution every time you make a successful claim, see about more excess in the section below.</p>
-                            <p>You are limited to 2 replacement phones for valid claims due to loss and/or theft in any one policy year.</p>
-                            <p>Theft, loss, accidental damage or breakdown where you have knowingly put your mobile phone at risk and/or you have not taken care of it.</p>
-                            <p>If in doubt ask yourself "Would I have left a pile of &pound;400 in cash there and expect to find it when I return?"" If the answer is no, then you should not leave your phone there either. Of course, we will take in consideration the specifics of your situation as, after all, we are here to have your back if a misfortune happens.</p>
-                            <p>For further details on all of the above, please refer to the full <a href="{{ cdn_url }}/files/so-sure_sample_policy_doc.pdf" target="_blank">policy terms and conditions</a>.</p>
-                        </div>
-
-                        <h3>
-                            <a href="#what-is-accidental-damage"
-                               data-toggle="collapse"
-                               aria-expanded="false"
-                               aria-controls="what-is-accidental-damage"
-                               class="collapsed">
-                                What is accidental damage?
-                            </a>
-                        </h3>
-                        <div class="collapse" id="what-is-accidental-damage">
-                            <p>Essentially accidental damage is when something happens to your property that is completely out of your control. Usually, it is something that other insurance companies try to add-on to your existing plan - which is pretty weird - how can you be expected to prevent something that is out of your control?</p>
-                            <p>Examples of accidental damage:</p>
-                            <ul>
-                                <li><strong>Spillages:</strong> this is one of the most common causes for an accidental damage claim. You would think that people would stop dropping their phones in pints but they never seem to learn.</li>
-                                <li><strong>Damage by children:</strong> You are protected even if they aren’t your children! You can’t really hold a child responsible for their actions. Insurance against accidental damage protects you from ids breaking your stuff.</li>
-                                <li><strong>Damage caused by pets:</strong> We all love animals but they do sometimes have a tendency to break our stuff. It would be prudent to get insurance if you have pets.</li>
-                                <li><strong>Electrical surges:</strong> Incredibly unlikely but it does happen (especially during lightning storms). A power overload can permanently damage a phone.</li>
-                            </ul>
-                        </div>
-
-                        <h3>
-                            <a href="#what-isnt-covered"
-                               data-toggle="collapse"
-                               aria-expanded="false"
-                               aria-controls="what-isnt-covered"
-                               class="collapsed">
-                                What isn't covered
-                            </a>
-                        </h3>
-                        <div class="collapse" id="what-isnt-covered">
-                            <ul>
-                                <li><strong>Cosmetic damage:</strong> If your device has a few scratches but still works perfectly then we can't give a replacement. Normal wear and tear falls under the same category.</li>
-                                <li><strong>Damage resulting from you putting your phone at risk:</strong> If you do something like leaving your phone behind on the train then we can’t really be responsible.</li>
-                                <li><strong>Damage caused before the insurance policy:</strong> We might be great but we’re not that great. Replacing a phone for damage that was caused before we started looking after you doesn’t make much sense.</li>
-                            </ul>
-                        </div>
-
-                        <h3>
-                            <a href="#am-i-still-covered-if-i-upgrade-change-the-device-on-cover"
-                               data-toggle="collapse"
-                               aria-expanded="false"
-                               aria-controls="am-i-still-covered-if-i-upgrade-change-the-device-on-cover"
-                               class="collapsed">
-                                Am I still covered if I upgrade/change the device on cover?
-                            </a>
-                        </h3>
-                        <div class="collapse" id="am-i-still-covered-if-i-upgrade-change-the-device-on-cover">
-                            <p>Yes, if you change or upgrade your device, you can easily change the details of your policy. All you need to do contact our {Customer Services Team} and we will amend your details in minutes.</p>
-                        </div>
-                        {# End #}
-
-                        {# Claims #}
-                        <h2 id="claims">Claims</h2>
-
-                        <h3>
-                            <a href="#how-do-i-make-a-claim"
-                               data-toggle="collapse"
-                               aria-expanded="false"
-                               aria-controls="how-do-i-make-a-claim"
-                               class="collapsed">
-                                How do I make a claim?
-                            </a>
-                        </h3>
-                        <div class="collapse" id="how-do-i-make-a-claim">
-                            <p>Our claims process is as easy as 1,2,3...</p>
-                            <ol>
-                              <li>Get your claim started quickly by using <a href="{{ path('claim') }}">our online portal</a></li>
-                              <li>Our UK based claims team will review your claim and call you with a request for any further details or documents (if necessary). We aim to do this within a matter of business hours</li>
-                              <li>Once your claim is approved, we take your excess payment over the phone and aim to repair/replace your phone within 24-72 hours. Some repairs can take longer (eg water damage) but we will be as fast as possible</li>
-                            </ol>
-                        </div>
-
-                        <h3>
-                            <a href="#do-i-need-to-provide-proof-of-purchase-if-i-make-a-claim"
-                               data-toggle="collapse"
-                               aria-expanded="false"
-                               aria-controls="do-i-need-to-provide-proof-of-purchase-if-i-make-a-claim"
-                               class="collapsed">
-                                Do I need to provide proof of purchase if I make a claim?
-                            </a>
-                        </h3>
-                        <div class="collapse" id="do-i-need-to-provide-proof-of-purchase-if-i-make-a-claim">
-                            <p>If you validate your phone's state using our app, prior your claim, you do not need a proof of purchase. If you don't do this, you must have a proof of purchase for your mobile phone if you wish to make a claim.</p>
-                            <p>The proof of purchase must provide evidence that you own the phone and that the phone is within the 3 year age limit i.e has been purchased in the last 3 years.  The proof of purchase must include the make, model and IMEI number of your mobile phone.  If you cannot provide this evidence, your claim may be rejected.</p>
-                            <p>If you do not have a receipt or were never issued with a one, i.e your phone was free as part of a contract, you will need to provide evidence of the original order and/or contract under which the mobile phone was supplied.</p>
-                            <p>If you cannot provide this evidence, and have not validated your phone with pic-sure, your claim may be rejected.</p>
-                        </div>
-
-                        <h3>
-                            <a href="#how-long-will-it-take-for-my-claim-to-be-processed"
-                               data-toggle="collapse"
-                               aria-expanded="false"
-                               aria-controls="how-long-will-it-take-for-my-claim-to-be-processed"
-                               class="collapsed">
-                                How long will it take for my claim to be processed?
-                            </a>
-                        </h3>
-                        <div class="collapse" id="how-long-will-it-take-for-my-claim-to-be-processed">
-                            <p>Thats a great question. We aim to process your claim as quickly as possible, within 2 hours is our best. <mark>However we cannot begin to process a claim until we have received all the relevant supporting documentation</mark>.</p>
-                            <p>Not fully providing all the required supporting documentation will delay the assessment of your claim, which will delay the 24-72 hour replacement.</p>
-                            <p>Once we have the fully completed claim form and all required supporting documentation, we aim to assess your claim within 24-72 hours and we will then let you know whether your claim has been authorised or not.</p>
-                        </div>
-
-                        <h3>
-                            <a href="#what-kind-of-supporting-document-may-i-need"
-                               data-toggle="collapse"
-                               aria-expanded="false"
-                               aria-controls="what-kind-of-supporting-document-may-i-need"
-                               class="collapsed">
-                                What kind of supporting document may I need?
-                            </a>
-                        </h3>
-                        <div class="collapse" id="what-kind-of-supporting-document-may-i-need">
-                            <p>You may need depending on the claim type e.g Loss, theft, damage:</p>
-                            <ul>
-                                <li><mark>Proof of purchase if you have not validated your phone with our app</mark></li>
-                                <li><mark>Usage report from your network</mark></li>
-                                <li><mark>Police report if stolen</mark></li>
-                            </ul>
-                        </div>
-
-                        <h3>
-                            <a href="#if-i-want-my-mobile-device-repaired-instead-of-replaced-how-long-will-this-take"
-                               data-toggle="collapse"
-                               aria-expanded="false"
-                               aria-controls="if-i-want-my-mobile-device-repaired-instead-of-replaced-how-long-will-this-take"
-                               class="collapsed">
-                                If I want my mobile device repaired instead of replaced how long will this take?
-                            </a>
-                        </h3>
-                        <div class="collapse" id="if-i-want-my-mobile-device-repaired-instead-of-replaced-how-long-will-this-take">
-                            <p>Most repairs (eg cracked screen) will get your phone back within 72hrs once the claim is approved. However, some might take a little longer (eg water damage).</p>
-                        </div>
-                        {# End #}
-
-                        {# Payments & Cancellations #}
-                        <h2 id="payments-and-cancellations">Payments and Cancellations</h2>
-
-                        <h3>
-                            <a href="#im-paying-monthly-how-and-when-will-i-be-charged"
-                               data-toggle="collapse"
-                               aria-expanded="false"
-                               aria-controls="im-paying-monthly-how-and-when-will-i-be-charged"
-                               class="collapsed">
-                                I'm paying monthly. How and when will I be charged?
-                            </a>
-                        </h3>
-                        <div class="collapse" id="im-paying-monthly-how-and-when-will-i-be-charged">
-                            <p>We will automatically bill you every month using the same credit/debit card , or you can set up a Direct Debit when you purchased the policy with. We use the same day of the month as when you purchased your policy, i.e. 16th of every month <mark>except for the 29th, 30th, or 31st, where we will bill you on the 28th of each month</mark>.</p>
-                        </div>
-
-                        <h3>
-                            <a href="#if-i-pay-annually-do-i-get-a-discount"
-                               data-toggle="collapse"
-                               aria-expanded="false"
-                               aria-controls="if-i-pay-annually-do-i-get-a-discount"
-                               class="collapsed">
-                                If I pay annually do I get a discount?
-                            </a>
-                        </h3>
-                        <div class="collapse" id="if-i-pay-annually-do-i-get-a-discount">
-                            <p>Our Reward Pot allow us to give you the best possible pricing, so sorry we do not provide annual discounts.</p>
-                        </div>
-
-                        <h3>
-                            <a href="#i-got-an-email-about-payment-failed-but-my-details-have-not-changed-what-should-i-do"
-                               data-toggle="collapse"
-                               aria-expanded="false"
-                               aria-controls="i-got-an-email-about-payment-failed-but-my-details-have-not-changed-what-should-i-do"
-                               class="collapsed">
-                                I got an email about payment failed but my details have not changed, what should I do?
-                            </a>
-                        </h3>
-                        <div class="collapse" id="i-got-an-email-about-payment-failed-but-my-details-have-not-changed-what-should-i-do">
-                            <p>If you have a failed payment email from us and you have not changed your banking details please email us at <a href="mailto:support@wearesosure.com">support@wearesosure.com</a> or contact us on our <a href="#" class="open-intercom">live chat</a> so we advise you.</p>
-                        </div>
-
-                        <h3>
-                            <a href="#can-i-change-the-date-of-my-direct-debit-if-i-pay-monthly"
-                               data-toggle="collapse"
-                               aria-expanded="false"
-                               aria-controls="can-i-change-the-date-of-my-direct-debit-if-i-pay-monthly"
-                               class="collapsed">
-                                Can I change the date of my Direct Debit if I pay monthly?
-                            </a>
-                        </h3>
-                        <div class="collapse" id="can-i-change-the-date-of-my-direct-debit-if-i-pay-monthly">
-                            <p>Yes you can, just contact us on our <a href="#" class="open-intercom">live chat here</a> and we can update that for you.</p>
-                        </div>
-
-                        <h3>
-                            <a href="#i-want-to-cancel-my-policy-how-do-i-do-it"
-                               data-toggle="collapse"
-                               aria-expanded="false"
-                               aria-controls="i-want-to-cancel-my-policy-how-do-i-do-it"
-                               class="collapsed">
-                                I want to cancel my policy how do I do it?
-                            </a>
-                        </h3>
-                        <div class="collapse" id="i-want-to-cancel-my-policy-how-do-i-do-it">
-                            <p>If you would like to cancel your policy please contact us on our <a href="#" class="open-intercom">live chat</a> or email <a href="mailto:support@wearesosure.com">support@wearesosure.com</a></p>
-                        </div>
-
-                        <h3>
-                            <a href="#can-i-cancel-my-policy-if-i-have-a-successful-claim"
-                               data-toggle="collapse"
-                               aria-expanded="false"
-                               aria-controls="can-i-cancel-my-policy-if-i-have-a-successful-claim"
-                               class="collapsed">
-                                Can I cancel my policy if I have a successful claim?
-                            </a>
-                        </h3>
-                        <div class="collapse" id="can-i-cancel-my-policy-if-i-have-a-successful-claim">
-                            <p>No sorry you can't, if you have had a successful claim with us, then <mark>you are bound by the policy contract and terms and conditions and must pay until your policy has expired which is a period of 1 year</mark>.  If you claim is in review, you can withdraw your claim and cancel your policy.</p>
-                        </div>
-
-                        <h3>
-                            <a href="#can-i-cancel-my-policy-if-i-havent-a-successful-claim"
-                               data-toggle="collapse"
-                               aria-expanded="false"
-                               aria-controls="can-i-cancel-my-policy-if-i-havent-a-successful-claim"
-                               class="collapsed">
-                                Can I cancel my policy if I haven't made a claim?
-                            </a>
-                        </h3>
-                        <div class="collapse" id="can-i-cancel-my-policy-if-i-havent-a-successful-claim">
-                            <p>Yes you can, we get that circumstances change.  If you would like to cancel your policy, you can by giving 30 days notice and contacting us on our <a href="#" class="open-intercom">live chat</a> or email <a href="mailto:support@wearesosure.com">support@wearesosure.com</a></p>
-                        </div>
-
-                        <h3>
-                            <a href="#what-is-the-cool-off-period"
-                               data-toggle="collapse"
-                               aria-expanded="false"
-                               aria-controls="what-is-the-cool-off-period"
-                               class="collapsed">
-                                What is the cool-off period?
-                            </a>
-                        </h3>
-                        <div class="collapse" id="what-is-the-cool-off-period">
-                            <p><mark>By law you have 14 days in which to change your mind and get a full refund</mark></p>
-                        </div>
-
-                        <h3>
-                            <a href="#if-i-have-moved-how-do-i-inform-you-on-my-new-address"
-                               data-toggle="collapse"
-                               aria-expanded="false"
-                               aria-controls="if-i-have-moved-how-do-i-inform-you-on-my-new-address"
-                               class="collapsed">
-                                If I have moved how do I inform you of my new address?
-                            </a>
-                        </h3>
-                        <div class="collapse" id="if-i-have-moved-how-do-i-inform-you-on-my-new-address">
-                            <p>To amend your personal details including change of address please contact us on our <a href="#" class="open-intercom">live chat</a> or email <a href="mailto:support@wearesosure.com">support@wearesosure.com</a></p>
-                        </div>
-                        {# End #}
-
-                        {# About so-sure #}
-                        <h2 id="about-so-sure">About so-sure</h2>
-
-                        <h3>
-                            <a href="#who-is-so-sure"
-                               data-toggle="collapse"
-                               aria-expanded="false"
-                               aria-controls="who-is-so-sure"
-                               class="collapsed">
-                                Who is so-sure?
-                            </a>
-                        </h3>
-                        <div class="collapse" id="who-is-so-sure">
-                            <p>We're here because consumers deserve better when it comes to insurance.</p>
-                            <p>When we launched so-sure in 2016, we wanted to revolutionise the industry by making insurance fairer, reliable and rewarding for honest consumers all over the world.</p>
-                        </div>
-
-                        <h3>
-                            <a href="#our-vision-and-misson"
-                               data-toggle="collapse"
-                               aria-expanded="false"
-                               aria-controls="our-vision-and-misson"
-                               class="collapsed">
-                                Our vision and mission
-                            </a>
-                        </h3>
-                        <div class="collapse" id="our-vision-and-misson">
-                            <p>Our vision is to turn the insurance industry on its head by giving our customers the service they deserve. Provide a new, revolutionary social insurance concept that is significantly cheaper for careful groups of families and friends. We're here protecting customers when they claim and rewarding them when they don't.</p>
-                            <p>Our concept is inspired by the origins of insurance. Back in the seventeenth century - when the concept of insurance was born out of the ship-owner community - insurance was how it should be. It was a time when insurance was designed around the customer, if no-one claimed, you got your money back, and if one of the ships went down, everyone chipped in.</p>
-                            <p>But as the world changed, so too did the insurance industry. Companies started to care less about the customer and more about profits. And in turn, trust in insurance providers plummeted.</p>
-                            <p>At so-sure, we’re on a mission to restore the essence of what insurance was – and make it even better.</p>
-                        </div>
-
-                        <h3>
-                            <a href="#how-are-you-different-from-traditional-insurance-companies"
-                               data-toggle="collapse"
-                               aria-expanded="false"
-                               aria-controls="how-are-you-different-from-traditional-insurance-companies"
-                               class="collapsed">
-                                How are you different from traditional insurance companies?
-                            </a>
-                        </h3>
-                        <div class="collapse" id="how-are-you-different-from-traditional-insurance-companies">
-                            <p>Traditional insurers exist to make big fat profit margins.  They keep the money that they don't pay out on claims. This means whenever they pay a claim, the loose profit.  This is why getting your claim approved and paid is so very painful... they want to keep your money.</p>
-                            <p>so-sure has been designed differently.  Our whole business is built around putting you, the customer first. That's why we decline less than 4% of claims because we believe insurance should have your back when you need it and also reward you for being careful.</p>
-                            <p>We also treat the money you pay as your money, and we believe that people are better together, and that's why we've created insurance that’s social and gives money back when there’s no claims.</p>
-                        </div>
-
-                        <h3>
-                            <a href="#what-is-social-insurance"
-                               data-toggle="collapse"
-                               aria-expanded="false"
-                               aria-controls="what-is-social-insurance"
-                               class="collapsed">
-                                What is social insurance?
-                            </a>
-                        </h3>
-                        <div class="collapse" id="what-is-social-insurance">
-                            <p>We believe that people are better together, we also believe that most customers are honest and will help a friend or family member in need. So when you connect your policy with friends and family and no-one claims, we'll give you up to 80% of your premium back at the end of your policy year. We call this our Reward Pot. Last year we paid thousands back to our lovely customers. Its how insurance should be, and we’re the only ones in the UK doing this.</p>
-                        </div>
-
-                        <h3>
-                            <a href="#how-do-you-make-money"
-                               data-toggle="collapse"
-                               aria-expanded="false"
-                               aria-controls="how-do-you-make-money"
-                               class="collapsed">
-                                How do you make money?
-                            </a>
-                        </h3>
-                        <div class="collapse" id="how-do-you-make-money">
-                            <p>We take a small fee from the monthly payments. The rest is yours, and we will give you up to 80% of that money back if you and your connections don't claim. The profit we make goes into making our customer service and technology even better, and in the future we hope to make insurance even cheaper for our customers.</p>
-                        </div>
-
-                        <h3>
-                            <a href="#how-do-i-contact-so-sure"
-                               data-toggle="collapse"
-                               aria-expanded="false"
-                               aria-controls="how-do-i-contact-so-sure"
-                               class="collapsed">
-                                How do I contact so-sure?
-                            </a>
-                        </h3>
-                        <div class="collapse" id="how-do-i-contact-so-sure">
-                            <p>We are online, you can contact us via:</p>
-                            <ul>
-                                <li><a href="#" class="open-intercom">Live chat</a> <mark>Monday-Friday 9am-6pm</mark></li>
-                                <li>Emailing us at <a href="mailto:support@wearesosure.com">support@wearesosure.com</a></li>
-                                <li>If you have a claim you can call our claims team on <a href="tel:01133209722">0113 320 9722</a> <small>local rates apply</small></li>
-                            </ul>
-                        </div>
-                        {# End #}
                     </div>
-                </div>
-                <div class="col-md-3 hidden-sm hidden-xs">
-                    <div class="faqs__sidebar"
-                         id="faqs__nav">
-                        <ul class="list-unstyled nav nav-pills nav-stacked" role="tablist">
-                            <li><a href="#top-questions">Top Questions</a></li>
-                            <li><a href="#the-so-sure-app-and-pic-sure">The so-sure app and pic-sure</a></li>
-                            <li><a href="#social-insurance-and-reward-pot">Social Insurance &amp; Reward Pot</a></li>
-                            <li><a href="#the-insurance-policy">The Insurance Policy</a></li>
-                            <li><a href="#claims">Claims</a></li>
-                            <li><a href="#payments-and-cancellations">Payments &amp; Cancellations</a></li>
-                            <li><a href="#about-so-sure">About us</a></li>
-                        </ul>
-                        <a href="#" class="scroll-to btn btn-link" data-scroll-to-anchor="body">Back to top</a>
+                    <div class="expanding-cardbox mb-4">
+                        <div class="expanding-cardbox__body">
+                            <h5 class="expanding-cardbox__title text-blue4 mb-0">
+                                How much is excess? <i class="far fa-chevron-down text-blue2 fa-lg"></i>
+                            </h5>
+                            <div class="expanding-cardbox__expand mt-4">
+                                <p>Our excess is as low as &pound;50 for accidental damage and &pound;70 for loss and theft when you validate your phone with our anti-fraud technology</p>
+                                <p class="mb-0"><mark>If you don't validate your phone with pic-sure using our app, the excess is &pound;150.</mark></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="expanding-cardbox mb-4">
+                        <div class="expanding-cardbox__body">
+                            <h5 class="expanding-cardbox__title text-blue4 mb-0">
+                                What is an IMEI number and how do I find out the IMEI of my mobile phone? <i class="far fa-chevron-down text-blue2 fa-lg"></i>
+                            </h5>
+                            <div class="expanding-cardbox__expand mt-4">
+                                <p>The IMEI (International Mobile Equipment Identification) number of your mobile phone is a unique identification code that is specific to your mobile phone.  If you change your mobile phone, it is important that you call us so we can update your policy with the correct details.</p>
+                                <h6 class="text-blue4">For iOS (Apple) users:</h6>
+                                <p>Unfortunately, as we need your serial number on iOS you can’t just dial a number (although dialing the same number as above will reveal your IMEI number).</p>
+                                <p>As such you can find both numbers by going to <mark>Settings &gt; General &gt; About</mark>.</p>
+                                <p>If you’re using our app (or if requested by support), you can take a screenshot by pressing the <mark>Sleep/Wake</mark> and <mark>Home</mark> buttons at the same time until you see the screen flash quickly.</p>
+                                <h6 class="text-blue4">For Android users:</h6>
+                                <p>The easiest way to find your phone’s IMEI number if you’re on an Android device is to simply dial <mark>*#06#</mark>.</p>
+                                <p>If you’re still having trouble, then you should be able to find it in <mark>Settings &gt; About phone &gt; Status &gt; IMEI information</mark>.</p>
+                                <p>Your serial number will be on the Status screen.</p>
+                                <p class="mb-0">If requested by support, you can take a screenshot on most Android phones by holding the volume down and the power buttons for 1-2 seconds. The screen should flash and the photo can be found in your photos app.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="expanding-cardbox mb-4">
+                        <div class="expanding-cardbox__body">
+                            <h5 class="expanding-cardbox__title text-blue4 mb-0">
+                                Do you cover other gadgets like laptops? <i class="far fa-chevron-down text-blue2 fa-lg"></i>
+                            </h5>
+                            <div class="expanding-cardbox__expand mt-4">
+                                No, sorry we only cover mobile phone insurance.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="expanding-cardbox mb-4">
+                        <div class="expanding-cardbox__body">
+                            <h5 class="expanding-cardbox__title text-blue4 mb-0">
+                                I bought a used phone/my friend gave me an older phone can I still insure it? <i class="far fa-chevron-down text-blue2 fa-lg"></i>
+                            </h5>
+                            <div class="expanding-cardbox__expand mt-4">
+                                Yes we are able to insure second-hand phones provided they are in full working condition, without any damage, and less than 3 years old.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="expanding-cardbox mb-4">
+                        <div class="expanding-cardbox__body">
+                            <h5 class="expanding-cardbox__title text-blue4 mb-0">
+                                Do you have a discount for annual payments? <i class="far fa-chevron-down text-blue2 fa-lg"></i>
+                            </h5>
+                            <div class="expanding-cardbox__expand mt-4">
+                                Our Reward Pot allow you to get the best possible pricing up to 80% cheaper than the networks, so we do not provide annual discounts.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="expanding-cardbox mb-4">
+                        <div class="expanding-cardbox__body">
+                            <h5 class="expanding-cardbox__title text-blue4 mb-0">
+                                Is there an age limit on the mobile phone I want to insure? <i class="far fa-chevron-down text-blue2 fa-lg"></i>
+                            </h5>
+                            <div class="expanding-cardbox__expand mt-4">
+                                The phone you want to insure must be <mark>less than 3 years old</mark> from when your policy begins.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="expanding-cardbox mb-4">
+                        <div class="expanding-cardbox__body">
+                            <h5 class="expanding-cardbox__title text-blue4 mb-0">
+                                Can I insure a mobile phone I bought from eBay or another auction site? <i class="far fa-chevron-down text-blue2 fa-lg"></i>
+                            </h5>
+                            <div class="expanding-cardbox__expand mt-4">
+                                <p>Yes, you can take out insurance on a second hand phone.</p>
+                                <p class="mb-0">The phone bought needs to have originally been sold into the UK market prior your purchase (e.g. we don't insure models sold in China).</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="expanding-cardbox mb-4">
+                        <div class="expanding-cardbox__body">
+                            <h5 class="expanding-cardbox__title text-blue4 mb-0">
+                                Do you cover phones that have been purchased outside of the UK? <i class="far fa-chevron-down text-blue2 fa-lg"></i>
+                            </h5>
+                            <div class="expanding-cardbox__expand mt-4">
+                                We only cover phones bought within the EU.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="expanding-cardbox mb-4">
+                        <div class="expanding-cardbox__body">
+                            <h5 class="expanding-cardbox__title text-blue4 mb-0">
+                                Are the replacement handsets brand new? <i class="far fa-chevron-down text-blue2 fa-lg"></i>
+                            </h5>
+                            <div class="expanding-cardbox__expand mt-4">
+                                Where we can, we will repair your phone if requested. If your claim is approved and you need  your  mobile phone  replaced, we will do our best to replace it with an identical fully refurbished or new item. Should this not be possible we will replace it with a fully refurbished or new item of a comparable specification or the equivalent value. Please be aware that it may not always be possible to replace your mobile phone with the same colour.
+                            </div>
+                        </div>
+                    </div>
+
+                    <h4 id="the-so-sure-app-and-pic-sure" class="text-primary mt-5 mb-4">The so-sure app &amp; pic-sure</h4>
+                    <div class="expanding-cardbox mb-4">
+                        <div class="expanding-cardbox__body">
+                            <h5 class="expanding-cardbox__title text-blue4 mb-0">
+                                What is pic-sure <i class="far fa-chevron-down text-blue2 fa-lg"></i>
+                            </h5>
+                            <div class="expanding-cardbox__expand mt-4">
+                                <p>We're all about protecting honest customers, and giving money back when claims are not made.  As there are many dishonest people trying to scam insurers, we decided to develop a piece of technology to protect our customers and keep costs down.</p>
+                                <p>Our clever technology pic-sure, is built into our app. It is super easy to use, and makes sure your phone is in full working order, and the screen is not broken/cracked prior to buying a policy with us - you'd be surprised how many dishonest people are out there.</p>
+                                <p class="mb-0">When validating your phone through pic-sure it vastly reduces your excess, removes the need for proof of purchase and gives you a speedier claims process.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="expanding-cardbox mb-4">
+                        <div class="expanding-cardbox__body">
+                            <h5 class="expanding-cardbox__title text-blue4 mb-0">
+                                How do I use pic-sure? <i class="far fa-chevron-down text-blue2 fa-lg"></i>
+                            </h5>
+                            <div class="expanding-cardbox__expand mt-4">
+                                <p>Firstly you need to download the so-sure app and buy a policy.</p>
+                                <ul class="list-inline mb-0">
+                                    <li class="list-inline-item">
+                                        <a class="ga-outbound-click" data-clicklabel="iTunes" href="{{ apple_download('faq') }}" target="_blank"><img src="{{ cdn_url }}/images/icons/app-store-original.svg" alt="Download so-sure on the App Store" />
+                                        </a>
+                                    </li>
+                                    <li class="list-inline-item">
+                                        <a class="ga-outbound-click" data-clicklabel="PlayStore" href="{{ google_download('faq') }}" target="_blank"><img src="{{ cdn_url }}/images/icons/google-play-original.svg" alt="Get so-sure on Google Play" />
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="expanding-cardbox mb-4">
+                        <div class="expanding-cardbox__body">
+                            <h5 class="expanding-cardbox__title text-blue4 mb-0">
+                                Step by step instructions for using pic-sure <i class="far fa-chevron-down text-blue2 fa-lg"></i>
+                            </h5>
+                            <div class="expanding-cardbox__expand mt-4">
+                                <ol class="mb-0">
+                                    <li class="mb-2">Open the so-sure app</li>
+                                    <li class="mb-2">In the top left corner you will see 3 horizontal lines, this is the menu, tap this</li>
+                                    <li class="mb-2">In the open menu tap 'pic-sure validation'</li>
+                                    <li class="mb-2">In the next screen read the instructions and click start now</li>
+                                    <li class="mb-2">A pop-up will appear asking for permission to use the phones camera, tap 'OK'</li>
+                                    <li class="mb-2">On the next screen will be instructions on how to complete the process, tap 'NEXT' in the bottom right corner.</li>
+                                    <li class="mb-2">The new screen will describe what the QR code will do, when you understand tap 'NEXT' in the bottom right corner</li>
+                                    <li class="mb-2">Then the QR code will appear on the screen and you will be able to take the picture in the mirror</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="expanding-cardbox mb-4">
+                        <div class="expanding-cardbox__body">
+                            <h5 class="expanding-cardbox__title text-blue4 mb-0">
+                                Handy Tips for the pic-sure "phone selfie" <i class="far fa-chevron-down text-blue2 fa-lg"></i>
+                            </h5>
+                            <div class="expanding-cardbox__expand mt-4">
+                                <p>Hold your phone approximately 10cm/4in away from the mirror and keep it steady. Your phone will vibrate once the phone is in the correct position. Make sure to keep it still. When you feel a second vibration, the photo has been taken. Done.</p>
+                                <p>If you don’t feel the vibration, make minor adjustments to the position of the phone, go slowly back and forth, you can tilt the phone slightly as well. You should also see a little preview from the camera when the phone is hold up so make sure the camera is seeing the QR Code.</p>
+                                <p class="mb-0">Then review the photo that is displayed, ensure that your entire phone is visible and if it is submit the photo otherwise try the process again.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="expanding-cardbox mb-4">
+                        <div class="expanding-cardbox__body">
+                            <h5 class="expanding-cardbox__title text-blue4 mb-0">
+                                How much is my excess if I use pic-sure? <i class="far fa-chevron-down text-blue2 fa-lg"></i>
+                            </h5>
+                            <div class="expanding-cardbox__expand mt-4">
+                                <p>Your excess greatly reduce from our standard &pound;150 to just &pound;50 accidental damage/breakdown, &pound;70 for loss and theft, and should you need to make a claim it becomes easy and hassle free without the need to provide us proof of purchase.  What you waiting for?</p>
+                                <p class="mb-0">If you fail to verify, the excess will be &pound;150.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="expanding-cardbox mb-4">
+                        <div class="expanding-cardbox__body">
+                            <h5 class="expanding-cardbox__title text-blue4 mb-0">
+                                What happens if my device gets rejected? <i class="far fa-chevron-down text-blue2 fa-lg"></i>
+                            </h5>
+                            <div class="expanding-cardbox__expand mt-4">
+                                <p>If your picture is rejected this is because your phone screen is damaged, or we cant see the picture clearly.  If it is clearly damaged your policy will be immediately cancelled as buying a insurance policy with a pre-damaged phone is a fraud and an offense.</p>
+                                <p class="mb-0">If we can't see the picture clearly you will get an invalid notification with feedback on what went wrong. You would then need to try again, making sure you are in a brightly lit room and your mirror and the lens of your phone is clean.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="expanding-cardbox mb-4">
+                        <div class="expanding-cardbox__body">
+                            <h5 class="expanding-cardbox__title text-blue4 mb-0">
+                                Where can I download the app? <i class="far fa-chevron-down text-blue2 fa-lg"></i>
+                            </h5>
+                            <div class="expanding-cardbox__expand mt-4">
+                                <p>You can download the so-sure app from the Apple App store of the Google Play store, just click on the relevant store for you below:</p>
+                                <ul class="list-inline mb-0">
+                                    <li class="list-inline-item">
+                                        <a class="ga-outbound-click" data-clicklabel="iTunes" href="{{ apple_download('faq') }}" target="_blank"><img src="{{ cdn_url }}/images/icons/app-store-original.svg" alt="Download so-sure on the App Store" />
+                                        </a>
+                                    </li>
+                                    <li class="list-inline-item">
+                                        <a class="ga-outbound-click" data-clicklabel="PlayStore" href="{{ google_download('faq') }}" target="_blank"><img src="{{ cdn_url }}/images/icons/google-play-original.svg" alt="Get so-sure on Google Play" />
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h4 id="social-insurance-and-reward-pot" class="text-primary mt-5 mb-4">Social Insurance &amp; Reward Pot</h4>
+                    <div class="expanding-cardbox mb-4">
+                        <div class="expanding-cardbox__body">
+                            <h5 class="expanding-cardbox__title text-blue4 mb-0">
+                                What is the Reward Pot? <i class="far fa-chevron-down text-blue2 fa-lg"></i>
+                            </h5>
+                            <div class="expanding-cardbox__expand mt-4">
+                                <p>The reward pot is basically a <mark>group no claims bonus</mark>.  For each person that buys insurance with us and connects together, for example You buy a policy and invite your mum to buy.  She buys a policy and then you connect, each of you receive up to &pound;10 into your reward pots.</p>
+
+                                <div class="h6 text-blue4">4 people connected to you = &pound;40 in your reward pot, £10 in each of theirs.</div>
+
+                                <div class="h6 text-blue4">8 people connected = &pound;80 in your reward pot, £10 in each of theirs.</div>
+
+                                <p class="mb-0">If neither you nor your connected friends claim, we will payout to you the value of your reward pot at the end of the policy year.</p>
+
+                                {# TODO: When built #}
+                                {# <p>You can see our calculator here {insert new calculator}</p> #}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="expanding-cardbox mb-4">
+                        <div class="expanding-cardbox__body">
+                            <h5 class="expanding-cardbox__title text-blue4 mb-0">
+                                Is the money back with the reward pot guaranteed? <i class="far fa-chevron-down text-blue2 fa-lg"></i>
+                            </h5>
+                            <div class="expanding-cardbox__expand mt-4">
+                                It depends on if you and your social circle make a claim. If none of you claim the money is guaranteed, however if someone makes a claim there may be no money left in the reward pot.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="expanding-cardbox mb-4">
+                        <div class="expanding-cardbox__body">
+                            <h5 class="expanding-cardbox__title text-blue4 mb-0">
+                                Can anyone connect to anyone? <i class="far fa-chevron-down text-blue2 fa-lg"></i>
+                            </h5>
+                            <div class="expanding-cardbox__expand mt-4">
+                                Yes, that is the beauty of social insurance, you can have as many connections as you like, as long as they have a policy with so-sure.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="expanding-cardbox mb-4">
+                        <div class="expanding-cardbox__body">
+                            <h5 class="expanding-cardbox__title text-blue4 mb-0">
+                                How do I make connections to people? <i class="far fa-chevron-down text-blue2 fa-lg"></i>
+                            </h5>
+                            <div class="expanding-cardbox__expand mt-4">
+                                Once you buy a policy its super easy to make connections either through our app or via SMS, email or WhatsApp.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="expanding-cardbox mb-4">
+                        <div class="expanding-cardbox__body">
+                            <h5 class="expanding-cardbox__title text-blue4 mb-0">
+                                Do I need to connect to get money back? <i class="far fa-chevron-down text-blue2 fa-lg"></i>
+                            </h5>
+                            <div class="expanding-cardbox__expand mt-4">
+                                Yes, we exist to make insurance better and with us that means being social and connecting in groups of careful people.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="expanding-cardbox mb-4">
+                        <div class="expanding-cardbox__body">
+                            <h5 class="expanding-cardbox__title text-blue4 mb-0">
+                                Do I need to connect to have so-sure's insurance policy? <i class="far fa-chevron-down text-blue2 fa-lg"></i>
+                            </h5>
+                            <div class="expanding-cardbox__expand mt-4">
+                                No, if you want to fly solo that is completely fine, you will still have fantastic cover and great customer service should you need to make a claim.
+                            </div>
+                        </div>
+                    </div>
+
+                    <h4 id="the-insurance-policy" class="text-primary mt-5 mb-4">The Insurance Policy</h4>
+                    <div class="expanding-cardbox mb-4">
+                        <div class="expanding-cardbox__body">
+                            <h5 class="expanding-cardbox__title text-blue4 mb-0">
+                                What am I covered for? <i class="far fa-chevron-down text-blue2 fa-lg"></i>
+                            </h5>
+                            <div class="expanding-cardbox__expand mt-4">
+                                <p>We believe that trust starts by us being clear with you about what is covered and what is not covered. If you have a valid claim we’ll have your back and we won't hide behind the small print unlike some insurance providers do.</p>
+                                <p>We have one policy that covers you for:</p>
+                                <ul class="mb-0">
+                                    <li class="mb-2">Loss &amp; Theft</li>
+                                    <li class="mb-2">Accidental Damage</li>
+                                    <li class="mb-2">Out of warranty breakdown</li>
+                                    <li class="mb-2">Travel globally travel for up to 90 days</li>
+                                    <li class="mb-2">Accessories up to &pound;100 with a loss of theft claim</li>
+                                    <li class="mb-0">Unauthorised network charges up to &pound;1000 related to approved loss or theft claim, as long as your network was notified within 24hrs of the loss or theft</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="expanding-cardbox mb-4">
+                        <div class="expanding-cardbox__body">
+                            <h5 class="expanding-cardbox__title text-blue4 mb-0">
+                                What’s not covered? <i class="far fa-chevron-down text-blue2 fa-lg"></i>
+                            </h5>
+                            <div class="expanding-cardbox__expand mt-4">
+                                <p>Excess: You need to pay a contribution every time you make a successful claim, see about more excess in the section below.</p>
+                                <p>You are limited to 2 replacement phones for valid claims due to loss and/or theft in any one policy year.</p>
+                                <p>Theft, loss, accidental damage or breakdown where you have knowingly put your mobile phone at risk and/or you have not taken care of it.</p>
+                                <p>If in doubt ask yourself "Would I have left a pile of &pound;400 in cash there and expect to find it when I return?"" If the answer is no, then you should not leave your phone there either. Of course, we will take in consideration the specifics of your situation as, after all, we are here to have your back if a misfortune happens.</p>
+                                <p class="mb-0">For further details on all of the above, please refer to the full <a href="{{ cdn_url }}/files/so-sure_sample_policy_doc.pdf" target="_blank">policy terms and conditions</a>.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="expanding-cardbox mb-4">
+                        <div class="expanding-cardbox__body">
+                            <h5 class="expanding-cardbox__title text-blue4 mb-0">
+                                What is accidental damage? <i class="far fa-chevron-down text-blue2 fa-lg"></i>
+                            </h5>
+                            <div class="expanding-cardbox__expand mt-4">
+                                <p>Essentially accidental damage is when something happens to your property that is completely out of your control. Usually, it is something that other insurance companies try to add-on to your existing plan - which is pretty weird - how can you be expected to prevent something that is out of your control?</p>
+                                <p>Examples of accidental damage:</p>
+                                <ul class="mb-0">
+                                    <li class="mb-2"><strong>Spillages:</strong> this is one of the most common causes for an accidental damage claim. You would think that people would stop dropping their phones in pints but they never seem to learn.</li>
+                                    <li class="mb-2"><strong>Damage by children:</strong> You are protected even if they aren’t your children! You can’t really hold a child responsible for their actions. Insurance against accidental damage protects you from ids breaking your stuff.</li>
+                                    <li class="mb-2"><strong>Damage caused by pets:</strong> We all love animals but they do sometimes have a tendency to break our stuff. It would be prudent to get insurance if you have pets.</li>
+                                    <li class="mb-0"><strong>Electrical surges:</strong> Incredibly unlikely but it does happen (especially during lightning storms). A power overload can permanently damage a phone.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="expanding-cardbox mb-4">
+                        <div class="expanding-cardbox__body">
+                            <h5 class="expanding-cardbox__title text-blue4 mb-0">
+                                Whats not classed as accidental damage? <i class="far fa-chevron-down text-blue2 fa-lg"></i>
+                            </h5>
+                            <div class="expanding-cardbox__expand mt-4">
+                                <ul class="mb-0">
+                                    <li class="mb-2"><strong>Cosmetic damage:</strong> If your device has a few scratches but still works perfectly then we can't give a replacement. Normal wear and tear falls under the same category.</li>
+                                    <li class="mb-2"><strong>Damage resulting from you putting your phone at risk:</strong> If you do something like leaving your phone behind on the train then we can’t really be responsible.</li>
+                                    <li class="mb-0"><strong>Damage caused before the insurance policy:</strong> We might be great but we’re not that great. Replacing a phone for damage that was caused before we started looking after you doesn’t make much sense.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="expanding-cardbox mb-4">
+                        <div class="expanding-cardbox__body">
+                            <h5 class="expanding-cardbox__title text-blue4 mb-0">
+                                Am I still covered if I upgrade/change the device on cover? <i class="far fa-chevron-down text-blue2 fa-lg"></i>
+                            </h5>
+                            <div class="expanding-cardbox__expand mt-4">
+                                Yes, if you change or upgrade your device, you can easily change the details of your policy. All you need to do contact our Customer Services Team and we will amend your details in minutes.
+                            </div>
+                        </div>
+                    </div>
+
+                    <h4 id="claims" class="text-primary mt-5 mb-4">Claims</h4>
+                    <div class="expanding-cardbox mb-4">
+                        <div class="expanding-cardbox__body">
+                            <h5 class="expanding-cardbox__title text-blue4 mb-0">
+                                How do I make a claim? <i class="far fa-chevron-down text-blue2 fa-lg"></i>
+                            </h5>
+                            <div class="expanding-cardbox__expand mt-4">
+                                <p>Our claims process is as easy as 1,2,3...</p>
+                                <ol class="mb-0">
+                                    <li class="mb-2">Get your claim started quickly by using <a href="{{ path('claim') }}">our online portal</a></li>
+                                    <li class="mb-2">Our UK based claims team will review your claim and call you with a request for any further details or documents (if necessary). We aim to do this within a matter of business hours</li>
+                                    <li class="mb-2">Once your claim is approved, we take your excess payment over the phone and aim to repair/replace your phone within 24-72 hours. Some repairs can take longer (e.g. water damage) but we will be as fast as possible</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="expanding-cardbox mb-4">
+                        <div class="expanding-cardbox__body">
+                            <h5 class="expanding-cardbox__title text-blue4 mb-0">
+                                Do I need to provide proof of purchase if I make a claim? <i class="far fa-chevron-down text-blue2 fa-lg"></i>
+                            </h5>
+                            <div class="expanding-cardbox__expand mt-4">
+                                <p>If you validate your phone's state using our app, prior your claim, you do not need a proof of purchase. If you don't do this, you must have a proof of purchase for your mobile phone if you wish to make a claim.</p>
+                                <p>The proof of purchase must provide evidence that you own the phone and that the phone is within the 3 year age limit i.e has been purchased in the last 3 years.  The proof of purchase must include the make, model and IMEI number of your mobile phone.  If you cannot provide this evidence, your claim may be rejected.</p>
+                                <p>If you do not have a receipt or were never issued with a one, i.e your phone was free as part of a contract, you will need to provide evidence of the original order and/or contract under which the mobile phone was supplied.</p>
+                                <p class="mb-0">If you cannot provide this evidence, and have not validated your phone with pic-sure, your claim may be rejected.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="expanding-cardbox mb-4">
+                        <div class="expanding-cardbox__body">
+                            <h5 class="expanding-cardbox__title text-blue4 mb-0">
+                                How long will it take for my claim to be processed? <i class="far fa-chevron-down text-blue2 fa-lg"></i>
+                            </h5>
+                            <div class="expanding-cardbox__expand mt-4">
+                                <p>Thats a great question. We aim to process your claim as quickly as possible, within 2 hours is our best. <mark>However we cannot begin to process a claim until we have received all the relevant supporting documentation</mark>.</p>
+                                <p>Not fully providing all the required supporting documentation will delay the assessment of your claim, which will delay the 24-72 hour replacement.</p>
+                                <p class="mb-0">Once we have the fully completed claim form and all required supporting documentation, we aim to assess your claim within 24-72 hours and we will then let you know whether your claim has been authorised or not.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="expanding-cardbox mb-4">
+                        <div class="expanding-cardbox__body">
+                            <h5 class="expanding-cardbox__title text-blue4 mb-0">
+                                What kind of supporting document may I need? <i class="far fa-chevron-down text-blue2 fa-lg"></i>
+                            </h5>
+                            <div class="expanding-cardbox__expand mt-4">
+                                <p>You may need depending on the claim type e.g Loss, theft, damage:</p>
+                                <ul class="mb-0">
+                                    <li class="mb-2"><mark>Proof of purchase if you have not validated your phone with our app</mark></li>
+                                    <li class="mb-2"><mark>Usage report from your network</mark></li>
+                                    <li class="mb-0"><mark>Police report if stolen</mark></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="expanding-cardbox mb-4">
+                        <div class="expanding-cardbox__body">
+                            <h5 class="expanding-cardbox__title text-blue4 mb-0">
+                                If I want my mobile device repaired instead of replaced how long will this take? <i class="far fa-chevron-down text-blue2 fa-lg"></i>
+                            </h5>
+                            <div class="expanding-cardbox__expand mt-4">
+                                Most repairs like a cracked screen will get your phone back within 72hrs once the claim is approved. However, some might take a little longer like water damage.
+                            </div>
+                        </div>
+                    </div>
+
+                    <h4 id="payments-and-cancellations" class="text-primary mt-5 mb-4">Payments &amp; Cancellations</h4>
+                    <div class="expanding-cardbox mb-4">
+                        <div class="expanding-cardbox__body">
+                            <h5 class="expanding-cardbox__title text-blue4 mb-0">
+                                I'm paying monthly. How and when will I be charged? <i class="far fa-chevron-down text-blue2 fa-lg"></i>
+                            </h5>
+                            <div class="expanding-cardbox__expand mt-4">
+                                We will automatically bill you every month using the same credit/debit card , or you can set up a Direct Debit when you purchased the policy with. We use the same day of the month as when you purchased your policy, i.e. 16th of every month <mark>except for the 29th, 30th, or 31st, where we will bill you on the 28th of each month</mark>.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="expanding-cardbox mb-4">
+                        <div class="expanding-cardbox__body">
+                            <h5 class="expanding-cardbox__title text-blue4 mb-0">
+                                If I pay annually do I get a discount? <i class="far fa-chevron-down text-blue2 fa-lg"></i>
+                            </h5>
+                            <div class="expanding-cardbox__expand mt-4">
+                                Our Reward Pot allow us to give you the best possible pricing, so sorry we do not provide annual discounts.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="expanding-cardbox mb-4">
+                        <div class="expanding-cardbox__body">
+                            <h5 class="expanding-cardbox__title text-blue4 mb-0">
+                                I got an email about payment failed but my details have not changed, what should I do? <i class="far fa-chevron-down text-blue2 fa-lg"></i>
+                            </h5>
+                            <div class="expanding-cardbox__expand mt-4">
+                                If you have a failed payment email from us and you have not changed your banking details please email us at <a href="mailto:support@wearesosure.com">support@wearesosure.com</a> or contact us on our <a href="#" class="open-intercom">live chat</a> so we advise you.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="expanding-cardbox mb-4">
+                        <div class="expanding-cardbox__body">
+                            <h5 class="expanding-cardbox__title text-blue4 mb-0">
+                                Can I change the date of my Direct Debit if I pay monthly? <i class="far fa-chevron-down text-blue2 fa-lg"></i>
+                            </h5>
+                            <div class="expanding-cardbox__expand mt-4">
+                                Yes you can, just contact us on our <a href="#" class="open-intercom">live chat here</a> and we can update that for you.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="expanding-cardbox mb-4">
+                        <div class="expanding-cardbox__body">
+                            <h5 class="expanding-cardbox__title text-blue4 mb-0">
+                                I want to cancel my policy how do I do it? <i class="far fa-chevron-down text-blue2 fa-lg"></i>
+                            </h5>
+                            <div class="expanding-cardbox__expand mt-4">
+                                If you would like to cancel your policy please contact us on our <a href="#" class="open-intercom">live chat</a> or email <a href="mailto:support@wearesosure.com">support@wearesosure.com</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="expanding-cardbox mb-4">
+                        <div class="expanding-cardbox__body">
+                            <h5 class="expanding-cardbox__title text-blue4 mb-0">
+                                Can I cancel my policy if I have a successful claim? <i class="far fa-chevron-down text-blue2 fa-lg"></i>
+                            </h5>
+                            <div class="expanding-cardbox__expand mt-4">
+                                No sorry you can't, if you have had a successful claim with us, then <mark>you are bound by the policy contract and terms and conditions and must pay until your policy has expired which is a period of 1 year</mark>.  If you claim is in review, you can withdraw your claim and cancel your policy.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="expanding-cardbox mb-4">
+                        <div class="expanding-cardbox__body">
+                            <h5 class="expanding-cardbox__title text-blue4 mb-0">
+                                Can I cancel my policy if I haven't made a claim? <i class="far fa-chevron-down text-blue2 fa-lg"></i>
+                            </h5>
+                            <div class="expanding-cardbox__expand mt-4">
+                                Yes you can, we get that circumstances change.  If you would like to cancel your policy, you can by giving 30 days notice and contacting us on our <a href="#" class="open-intercom">live chat</a> or email <a href="mailto:support@wearesosure.com">support@wearesosure.com</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="expanding-cardbox mb-4">
+                        <div class="expanding-cardbox__body">
+                            <h5 class="expanding-cardbox__title text-blue4 mb-0">
+                                What is the cool-off period? <i class="far fa-chevron-down text-blue2 fa-lg"></i>
+                            </h5>
+                            <div class="expanding-cardbox__expand mt-4">
+                                <mark>By law you have 14 days in which to change your mind and get a full refund</mark>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="expanding-cardbox mb-4">
+                        <div class="expanding-cardbox__body">
+                            <h5 class="expanding-cardbox__title text-blue4 mb-0">
+                                If I have moved how do I inform you of my new address? <i class="far fa-chevron-down text-blue2 fa-lg"></i>
+                            </h5>
+                            <div class="expanding-cardbox__expand mt-4">
+                                To amend your personal details including change of address please contact us on our <a href="#" class="open-intercom">live chat</a> or email <a href="mailto:support@wearesosure.com">support@wearesosure.com</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h4 id="about-us" class="text-primary mt-5 mb-4">About us</h4>
+                    <div class="expanding-cardbox mb-4">
+                        <div class="expanding-cardbox__body">
+                            <h5 class="expanding-cardbox__title text-blue4 mb-0">
+                                Who is so-sure? <i class="far fa-chevron-down text-blue2 fa-lg"></i>
+                            </h5>
+                            <div class="expanding-cardbox__expand mt-4">
+                                <p>We're here because consumers deserve better when it comes to insurance.</p>
+                                <p class="mb-0">When we launched so-sure in 2016, we wanted to revolutionise the industry by making insurance fairer, reliable and rewarding for honest consumers all over the world.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="expanding-cardbox mb-4">
+                        <div class="expanding-cardbox__body">
+                            <h5 class="expanding-cardbox__title text-blue4 mb-0">
+                                Our vision and mission <i class="far fa-chevron-down text-blue2 fa-lg"></i>
+                            </h5>
+                            <div class="expanding-cardbox__expand mt-4">
+                                <p>Our vision is to turn the insurance industry on its head by giving our customers the service they deserve. Provide a new, revolutionary social insurance concept that is significantly cheaper for careful groups of families and friends. We're here protecting customers when they claim and rewarding them when they don't.</p>
+                                <p>Our concept is inspired by the origins of insurance. Back in the seventeenth century - when the concept of insurance was born out of the ship-owner community - insurance was how it should be. It was a time when insurance was designed around the customer, if no-one claimed, you got your money back, and if one of the ships went down, everyone chipped in.</p>
+                                <p>But as the world changed, so too did the insurance industry. Companies started to care less about the customer and more about profits. And in turn, trust in insurance providers plummeted.</p>
+                                <p class="mb-0">At so-sure, we’re on a mission to restore the essence of what insurance was – and make it even better.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="expanding-cardbox mb-4">
+                        <div class="expanding-cardbox__body">
+                            <h5 class="expanding-cardbox__title text-blue4 mb-0">
+                                How are you different from traditional insurance companies? <i class="far fa-chevron-down text-blue2 fa-lg"></i>
+                            </h5>
+                            <div class="expanding-cardbox__expand mt-4">
+                                <p>Traditional insurers exist to make big fat profit margins.  They keep the money that they don't pay out on claims. This means whenever they pay a claim, the loose profit.  This is why getting your claim approved and paid is so very painful... they want to keep your money.</p>
+                                <p>so-sure has been designed differently.  Our whole business is built around putting you, the customer first. That's why we decline less than 4% of claims because we believe insurance should have your back when you need it and also reward you for being careful.</p>
+                                <p class="mb-0">We also treat the money you pay as your money, and we believe that people are better together, and that's why we've created insurance that’s social and gives money back when there’s no claims.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="expanding-cardbox mb-4">
+                        <div class="expanding-cardbox__body">
+                            <h5 class="expanding-cardbox__title text-blue4 mb-0">
+                                What is social insurance? <i class="far fa-chevron-down text-blue2 fa-lg"></i>
+                            </h5>
+                            <div class="expanding-cardbox__expand mt-4">
+                                We believe that people are better together, we also believe that most customers are honest and will help a friend or family member in need. So when you connect your policy with friends and family and no-one claims, we'll give you up to 80% of your premium back at the end of your policy year. We call this our Reward Pot. Last year we paid thousands back to our lovely customers. Its how insurance should be, and we’re the only ones in the UK doing this.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="expanding-cardbox mb-4">
+                        <div class="expanding-cardbox__body">
+                            <h5 class="expanding-cardbox__title text-blue4 mb-0">
+                                How do you make money? <i class="far fa-chevron-down text-blue2 fa-lg"></i>
+                            </h5>
+                            <div class="expanding-cardbox__expand mt-4">
+                                We take a small fee from the monthly payments. The rest is yours, and we will give you up to 80% of that money back if you and your connections don't claim. The profit we make goes into making our customer service and technology even better, and in the future we hope to make insurance even cheaper for our customers.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="expanding-cardbox mb-4">
+                        <div class="expanding-cardbox__body">
+                            <h5 class="expanding-cardbox__title text-blue4 mb-0">
+                                How do I contact so-sure? <i class="far fa-chevron-down text-blue2 fa-lg"></i>
+                            </h5>
+                            <div class="expanding-cardbox__expand mt-4">
+                                <p>We are online, you can contact us via:</p>
+                                <ul class="mb-0">
+                                    <li class="mb-2"><a href="#" class="open-intercom">Live chat</a> <mark>Monday-Friday 9am-6pm</mark></li>
+                                    <li class="mb-2">Emailing us at <a href="mailto:support@wearesosure.com">support@wearesosure.com</a></li>
+                                    <li class="mb-2">If you have a claim you can call our claims team on <a href="tel:01133209722">0113 320 9722</a> <small>local rates apply</small></li>
+                                </ul>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
+
+            {# Sub Content #}
+            <div class="faq__sub__container d-none d-lg-flex justify-content-lg-start">
+                {# Curve Desktop #}
+                <div class="faq__curve">
+                    <svg preserveAspectRatio="xMinYMin meet" viewBox="0 0 69 846" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                        <!-- Generator: Sketch 51.3 (57544) - http://www.bohemiancoding.com/sketch -->
+                        <desc>Created with Sketch.</desc>
+                        <defs></defs>
+                        <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                            <g id="3.0-so-sure-(Price-&amp;-Payment)">
+                                <path d="M0,0 L69,0 C31,140 12,280.666667 12,422 C12,563.333333 31,704.666667 69,846 L0,846 L0,0 Z" id="Rectangle-2" fill="#FFFFFF"></path>
+                                <path d="M69,0 L69,846 L68,846 C30.6666667,705 12,564 12,423 C12,282 31,141 69,0 Z" id="Rectangle-3" fill="#E5F4FF"></path>
+                            </g>
+                        </g>
+                    </svg>
+                </div>
+                <div class="faq__sub px-4 pb-4 pt-5 p-lg-5">
+                    <div class="faq__nav">
+                        <div id="faq-nav" class="list-group mb-5">
+                            <a class="list-group-item list-group-item-action" href="#top-questions"><i class="far fa-angle-right fa-lg mr-2"></i> Top Questions</a>
+                            <a class="list-group-item list-group-item-action" href="#the-so-sure-app-and-pic-sure"><i class="far fa-angle-right fa-lg  mr-2"></i> The so-sure app &amp; pic-sure</a>
+                            <a class="list-group-item list-group-item-action" href="#social-insurance-and-reward-pot"><i class="far fa-angle-right fa-lg  mr-2"></i> Social Insurance &amp; Reward Pot</a>
+                            <a class="list-group-item list-group-item-action" href="#the-insurance-policy"><i class="far fa-angle-right fa-lg  mr-2"></i> The Insurance Policy</a>
+                            <a class="list-group-item list-group-item-action" href="#claims"><i class="far fa-angle-right fa-lg  mr-2"></i> Claims</a>
+                            <a class="list-group-item list-group-item-action" href="#payments-and-cancellations"><i class="far fa-angle-right fa-lg  mr-2"></i> Payments &amp; Cancellations</a>
+                            <a class="list-group-item list-group-item-action" href="#about-us"><i class="far fa-angle-right fa-lg  mr-2"></i> About us</a>
+                        </div>
+                        <a id="back-to-top-faq" href="#" class="btn btn-outline-blue2"><i class="far fa-arrow-up mr-2"></i> Back to top</a>
+                    </div>
+
+                </div>
+            </div>
+
         </div>
     </section>
 
 {% endblock %}
 
 {% block footer %}
-    {% if not hide_footer %}
-        {% include '::footer_new.html.twig' %}
-    {% endif %}
+    {# TODO: Fix footer #}
 {% endblock %}
 
-{% block javascripts %}
-    {{ parent() }}
-    {% javascripts
-    '@AppBundle/Resources/public/js/Default/faq.js'
- %}
-    <script src="{{ asset_url }}"></script>{% endjavascripts %}
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/faq.js') }}"></script>
 {% endblock %}

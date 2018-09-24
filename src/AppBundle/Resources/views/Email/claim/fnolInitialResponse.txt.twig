@@ -1,18 +1,22 @@
 {% extends 'AppBundle:Email:base.txt.twig' %}
 {% block body %}
-Your claim with so-sure.
+ATTENTION: You have an unfinished claim with so-sure.
 
 **
 ------------------------------------------------------------
 Hi {{ data.policy.user.name }},
 
-Thank you for starting your claim. Please note your claim has not been submitted as you need to submit additional documents. In order to submit and proceed with your claim, you will need you to upload the necessary documents as outlined to you in the online claims portal. Failure to do so will delay your claim.
+Thank you for starting your claim, but please note at this point **your claim has not been submitted** as you still need to provide additional information. 
 
-If you need to come back at a later time to the online claims portal, simply enter your email using the link below. You will then receive another email to login to your account which is valid for 2 hours (due to security reasons).
+In order to submit and proceed with your claim, you will need to upload the necessary documents as outlined to you in the online claims portal. Failure to do so will result in delays to your claim. 
 
-{{ url('claim') }}
+If you need to come back at a later time, simply enter your email using the link below. 
 
-We’re here if you have any further questions and hope to resolve your claim as fast as we can. If you have issues uploading the documents please contact the claims team on 0113 320 9722.
+You will then receive another email to login to your account, which is valid for 2 hours (due to security reasons). 
+
+{{ url('claim_login') }}
+
+If you have any further questions or issue please contact us at support@wearesosure.com. 
 
 Thanks for using so-sure.
 {% endblock body %}

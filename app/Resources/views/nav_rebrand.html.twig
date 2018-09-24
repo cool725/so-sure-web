@@ -1,6 +1,6 @@
-<nav class="navbar fixed-top justify-content-between flex-nowrap flex-row pl-lg-5 {% if light_nav is defined and light_nav == 1 %}navbar-light{% endif %}">
+<nav id="main-nav" class="navbar {% if quote_mode is defined and quote_mode == 1 %}navbar-so-sure-quote{% else %}navbar-so-sure{% endif %} fixed-top justify-content-between flex-nowrap flex-row pl-lg-5">
     <a href="/" class="navbar-brand show-in-nav show-in-quote">
-        <div class="navbar-brand__logo {% if light_nav is defined and light_nav == 1 %}navbar-brand__logo-white-light{% endif %}"></div>
+        <div class="navbar-brand__logo"></div>
         <span class="sr-only">so-sure</span>
     </a>
     {% if quote_mode is defined and quote_mode == 1 %}
@@ -33,7 +33,7 @@
                 </li>
             {% else %}
                 <li class="nav-item d-none-xxs pr-xl-5">
-                    <a id="quote_btn" href="#" class="btn {% if light_nav is defined and light_nav == 1 %}btn-white btn-shadow{% else %}btn-primary btn-gradient{% endif %} btn-sm show-in-nav get-a-quote">Get a Quote</a>
+                    <a id="quote_btn" href="#" class="btn btn-sm py-1 btn-white show-in-nav get-a-quote btn-shadow">Get a Quote</a>
                 </li>
             {% endif %}
             <li class="nav-item d-none d-xl-block pr-xl-5">
@@ -44,7 +44,8 @@
                         <a href="{{ path('fos_user_security_logout') }}" class="nav-link user-link">Log out</i></a>
                     {% endif %}
                 {% else %}
-                    <a href="{{ path('fos_user_security_login') }}" class="{% if light_nav is defined and light_nav == 1 %}btn btn-outline-blue1 btn-sm{% else %}nav-link user-link{% endif %}">Customer log in <i class="far fa-arrow-right fa-sm ml-2"></i></a>
+                    <a href="{{ path('fos_user_security_login') }}"
+                       class="btn btn-outline-blue1 btn-sm">Customer log in <i class="far fa-arrow-right fa-sm ml-2"></i></a>
                 {% endif %}
             </li>
             <li class="nav-item d-xl-none">
@@ -100,6 +101,11 @@
             </div>
         </div>
     </div>
-    {# Include - Get Quote #}
-    {% include 'AppBundle::Search/getQuote.html.twig' %}
+    {# 2fa auth will cause sub requests to fail. in theory below should work, but we're running a old version of the bundle #}
+    {# need to upgrade to php7.1 before upgrade is allowed #}
+    {# if not is_granted('IS_AUTHENTICATED_2FA_IN_PROGRESS')  #}
+    {% if exclude_remote_scripts is not defined or not exclude_remote_scripts %}
+        {# Include - Get Quote #}
+        {% include 'AppBundle::Search/getQuote.html.twig' %}
+    {%  endif %}
 </nav>

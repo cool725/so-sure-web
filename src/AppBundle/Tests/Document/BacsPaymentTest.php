@@ -16,6 +16,7 @@ use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Document\CurrencyTrait;
 use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\User;
+use AppBundle\Event\PolicyEvent;
 
 /**
  * @group unit
@@ -56,6 +57,16 @@ class BacsPaymentTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(new \DateTime('2018-02-01'), $bacs->getSubmittedDate());
         $this->assertEquals(new \DateTime('2018-02-05'), $bacs->getBacsCreditDate());
         $this->assertEquals(new \DateTime('2018-02-08'), $bacs->getBacsReversedDate());
+
+        $policy = new PhonePolicy();
+        $policy->setStatus(PhonePolicy::STATUS_UNPAID);
+        $bacs = new BacsPayment();
+        $bacs->setPolicy($policy);
+        $bacs->setSubmittedDate(new \DateTime('2018-01-01'));
+
+        $this->assertEquals(PhonePolicy::STATUS_UNPAID, $bacs->getPolicy()->getStatus());
+        $bacs->submit(new \DateTime('2018-02-01'));
+        $this->assertEquals(PhonePolicy::STATUS_ACTIVE, $bacs->getPolicy()->getStatus());
     }
 
     public function testInProgress()

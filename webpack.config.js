@@ -16,6 +16,7 @@ Encore
     // List all files here
     .addEntry('global', './src/AppBundle/Resources/public/rebrand/js/global.js')
     .addEntry('dev', './src/AppBundle/Resources/public/rebrand/js/dev.js')
+    .addEntry('login', './src/AppBundle/Resources/public/rebrand/js/pages/login.js')
     .addEntry('homepage', './src/AppBundle/Resources/public/rebrand/js/pages/homepage.js')
     .addEntry('quotepage', './src/AppBundle/Resources/public/rebrand/js/pages/quotepage.js')
     .addEntry('purchase', './src/AppBundle/Resources/public/rebrand/js/pages/purchase.js')
@@ -25,6 +26,7 @@ Encore
     .addEntry('purchase-payment', './src/AppBundle/Resources/public/rebrand/js/pages/purchase-payment.js')
     .addEntry('welcome', './src/AppBundle/Resources/public/rebrand/js/pages/welcome.js')
     .addEntry('landing', './src/AppBundle/Resources/public/rebrand/js/pages/landing.js')
+    .addEntry('faq', './src/AppBundle/Resources/public/rebrand/js/pages/faq.js')
 
     // allow legacy applications to use $/jQuery as a global variable
     .autoProvidejQuery()

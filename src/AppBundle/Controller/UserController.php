@@ -469,6 +469,11 @@ class UserController extends BaseController
             [$policy->getStandardSCode()->getShareLink(), $policy->getStandardSCode()->getCode()]
         );
 
+        $fbFriends = null;
+        if ($this->get('app.feature')->isEnabled(Feature::FEATURE_APP_FACEBOOK_USERFRIENDS_PERMISSION)) {
+            $fbFriends = $this->getFacebookFriends($request, $policy);
+        }
+
         return array(
             'policy' => $policy,
             'email_form' => $emailInvitationForm->createView(),
@@ -478,7 +483,7 @@ class UserController extends BaseController
             'scode' => $scode,
             'unconnected_user_policy_form' => $unconnectedUserPolicyForm->createView(),
             'share_experiment_text' => $shareExperimentText,
-            'friends' => $this->getFacebookFriends($request, $policy),
+            'friends' => $fbFriends,
         );
     }
 
@@ -1432,7 +1437,10 @@ class UserController extends BaseController
             $policies = $user->getValidPolicies();
             foreach ($policies as $policy) {
                 /** @var Policy $policy */
-                if ($policy->getLatestFnolClaim() || $policy->getLatestSubmittedClaim()) {
+                if ($policy->getLatestFnolClaim() ||
+                    $policy->getLatestSubmittedClaim() ||
+                    $policy->getLatestInReviewClaim()
+                ) {
                     return $this->redirectToRoute('user_claim_policy', ['policyId' => $policy->getId()]);
                 }
             }
@@ -1534,7 +1542,7 @@ class UserController extends BaseController
         $policyRepo = $dm->getRepository(Policy::class);
         $policy = $policyRepo->find($policyId);
 
-        $claim = $policy->getLatestFnolSubmittedClaim();
+        $claim = $policy->getLatestFnolSubmittedInReviewClaim();
 
         if ($claim === null) {
             return $this->redirectToRoute('user_claim');
@@ -1542,7 +1550,7 @@ class UserController extends BaseController
 
         $this->denyAccessUnlessGranted(ClaimVoter::EDIT, $claim);
 
-        if ($claim->getStatus() == Claim::STATUS_SUBMITTED) {
+        if (in_array($claim->getStatus(), array(Claim::STATUS_SUBMITTED, Claim::STATUS_INREVIEW))) {
             return $this->redirectToRoute('claimed_submitted_policy', ['policyId' => $policy->getId()]);
         }
         if ($claim->getType() == Claim::TYPE_DAMAGE) {
@@ -1567,9 +1575,9 @@ class UserController extends BaseController
         /** @var Policy $policy */
         $policy = $policyRepo->find($policyId);
 
-        $claim = $policy->getLatestFnolSubmittedClaim();
+        $claim = $policy->getLatestFnolSubmittedInReviewClaim();
 
-        if ($claim === null) {
+        if ($claim === null || !in_array($claim->getStatus(), array(Claim::STATUS_SUBMITTED, Claim::STATUS_INREVIEW))) {
             return $this->redirectToRoute('user_claim');
         }
 
@@ -1614,6 +1622,7 @@ class UserController extends BaseController
             'phone' => $claim->getPhonePolicy() ? $claim->getPhonePolicy()->getPhone()->__toString() : 'Unknown',
             'time' => $this->getClaimResponseTime(),
             'claim_form' => $claimUpdateForm->createView(),
+            'is_in_review' => $claim->getStatus() == Claim::STATUS_INREVIEW,
         ];
 
         return $this->render('AppBundle:User:claimSubmitted.html.twig', $data);

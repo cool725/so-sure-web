@@ -3,20 +3,14 @@
 namespace AppBundle\Tests\Document;
 
 use AppBundle\Document\Claim;
+use DateTime;
+use Symfony\Bridge\PhpUnit\ClockMock;
 
 /**
  * @group unit
  */
 class ClaimTest extends \PHPUnit\Framework\TestCase
 {
-    public static function setUpBeforeClass()
-    {
-    }
-
-    public function tearDown()
-    {
-    }
-
     public function testSetStatus()
     {
         $claim = new Claim();
@@ -45,13 +39,14 @@ class ClaimTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue(true);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testSetStatusWarranty()
     {
         $claim = new Claim();
         $claim->setType(Claim::TYPE_WARRANTY);
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Unable to use approved with Warranty Types.');
+
         $claim->setStatus(Claim::STATUS_APPROVED);
     }
 }

@@ -6,6 +6,7 @@ use AppBundle\Repository\CashbackRepository;
 use AppBundle\Repository\ConnectionRepository;
 use AppBundle\Repository\PolicyRepository;
 use AppBundle\Repository\UserRepository;
+use AppBundle\Document\CurrencyTrait;
 use AppBundle\Service\JudopayService;
 use AppBundle\Service\MailerService;
 use AppBundle\Service\PolicyService;
@@ -27,6 +28,8 @@ use AppBundle\Classes\SoSure;
 
 class EmailDebugCommand extends BaseCommand
 {
+    use CurrencyTrait;
+
     protected function configure()
     {
         $this
@@ -133,8 +136,10 @@ class EmailDebugCommand extends BaseCommand
             'policyRenewal' => [
                 'potIncrease',
                 'potDecrease',
+                'potSame',
                 'noPotIncrease',
                 'noPotDecrease',
+                'noPotSame',
             ],
             'potReward' => [
                 'monthly',
@@ -289,7 +294,14 @@ class EmailDebugCommand extends BaseCommand
                         continue;
                     }
                 }
-                if ($prevPolicy->getNextPolicy()->getPremium()->getMonthlyPremiumPrice() <
+                if ($this->areEqualToTwoDp(
+                    $prevPolicy->getNextPolicy()->getPremium()->getMonthlyPremiumPrice(),
+                    $prevPolicy->getPremium()->getMonthlyPremiumPrice()
+                )) {
+                    if (in_array($variation, ['noPotSame', 'potSame'])) {
+                        continue;
+                    }
+                } elseif ($prevPolicy->getNextPolicy()->getPremium()->getMonthlyPremiumPrice() <
                     $prevPolicy->getPremium()->getMonthlyPremiumPrice()) {
                     if (in_array($variation, ['noPotIncrease', 'potIncrease'])) {
                         continue;

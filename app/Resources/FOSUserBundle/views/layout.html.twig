@@ -1,40 +1,34 @@
-{% extends '::base.html.twig' %}
+{% extends 'base_rebrand.html.twig' %}
 
 {# Set vars #}
 {% set exclude_remote_scripts = true %}
-{% set new_stylesheet = 1 %}
-{% set distraction_free = 1 %}
-{% set new_footer = 1 %}
+{% set body_class = 'login' %}
+{% set light_nav  = 1 %}
+{# TODO: Do we need to hide the nav or at least the login button #}
+{% set quote_mode = 1 %}
 
-{% block stylesheets %}
-    {{ parent() }}
-    {% stylesheets output='css/*.css'
-    '@AppBundle/Resources/public/sass/page/login.scss'
- %}<link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/login.css') }}">
 {% endblock %}
 
 {% block body %}
-    <section class="section--pad login">
-        <div class="container text-center">
-            <div class="row">
-                <div class="col-md-12">
+    <div class="login  p-3 d-flex align-items-center">
+        <div class="login__inner">
 
-                    {% block fos_user_content %}
-                    {% endblock fos_user_content %}
+            {% block fos_user_content %}
+            {% endblock fos_user_content %}
 
-                </div>
-            </div>
         </div>
-    </section>
+        <span class="login__phone__background animated fadeInLeft"></span>
+        <span class="login__money__background animated jackInTheBox"></span>
+    </div>
 {% endblock %}
 
-{% block javascripts %}
-    {{ parent() }}
-    {% javascripts
-        'components/jquery-validation/jquery.validate.js'
-        '../app/Resources/public/js/login.js'
-    %}
-    <script src="{{ asset_url }}"></script>
-    {% endjavascripts %}
+{% block footer %}
+    {# TODO: Fix footer #}
+{% endblock %}
+
+{% block javascriptsPage %}
     <script src="https://sdk.accountkit.com/en_US/sdk.js"></script>
+    <script src="{{ asset('css-js/login.js') }}"></script>
 {% endblock %}

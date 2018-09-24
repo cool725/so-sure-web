@@ -3,6 +3,7 @@
 namespace Tests\App\Controller\BearerApi;
 
 use App\Oauth2Scopes;
+use AppBundle\DataFixtures\MongoDB\d\Oauth2\LoadOauth2Data;
 use PHPUnit\Framework\AssertionFailedError;
 use Symfony\Bundle\FrameworkBundle\Client;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -12,6 +13,8 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 /**
  * Test when a user needs to login to get a token issued, they go to the right place
+ *
+ * NOTE: This is an event being run by a human, clicking links. Not an API call.
  */
 class OauthLoginTest extends WebTestCase
 {
@@ -33,7 +36,28 @@ class OauthLoginTest extends WebTestCase
         }
     }
 
-    public function testOauthRedirection()
+    /**
+     * going to the oauth/v2/auth page with bad creds redirects to /login
+     */
+    public function testOauthRedirectionWithNoParameters()
+    {
+        $params = [];
+        $this->client->request('GET', '/oauth/v2/auth', $params);
+
+        $response = $this->client->getInternalResponse();
+        $this->assertNotNull($response);
+        $this->assertInstanceOf(Response::class, $response);
+        if ($response === null || ! $response instanceof Response) {
+            $this->fail('did not get a valid response from oauth/v2/auth');
+            return;
+        }
+        $this->assertSame('/login', $response->getHeader('location'));
+    }
+
+    /**
+     * going to the oauth/v2/auth page with bad creds redirects to /login
+     */
+    public function testOauthRedirectionWithUnknownCredentials()
     {
         $params = [
             'client_id' => '123_456',
@@ -54,11 +78,11 @@ class OauthLoginTest extends WebTestCase
         $this->assertSame('/login', $response->getHeader('location'));
     }
 
-    public function testStarlingRedirection()
+    public function testStarlingRedirectionWithKnownCredentials()
     {
-        $state = md5(time());
+        $state = md5(random_bytes(8));
         $params = [
-            'client_id' => '5b51ec6b636239778924b671_36v22l3ei3wgw0k4wos48kokk0cwsgo0ocggggoc84w0cw8844',
+            'client_id' => LoadOauth2Data::KNOWN_CLIENT_ID,
             'state' => $state,
             'response_type' => 'code',
             'scope' => Oauth2Scopes::USER_STARLING_SUMMARY,

@@ -46,8 +46,12 @@ class PhoneRepository extends DocumentRepository
         ksort($makes);
 
         // move samsung & apple to top of the list
-        $makes = ['Samsung' => $makes['Samsung']] + $makes;
-        $makes = ['Apple' => $makes['Apple']] + $makes;
+        if (isset($makes['Samsung'])) {
+            $makes = ['Samsung' => $makes['Samsung']] + $makes;
+        }
+        if (isset($makes['Apple'])) {
+            $makes = ['Apple' => $makes['Apple']] + $makes;
+        }
 
         return $makes;
     }

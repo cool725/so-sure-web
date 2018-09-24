@@ -499,4 +499,26 @@ class ClaimsServiceTest extends WebTestCase
         $userId = self::$claimsService->getUserIdFromLoginLinkToken($token);
         $this->assertEquals($userId, $user->getId());
     }
+
+    public function testSendUniqueLoginLinkUpdate()
+    {
+        $email = self::generateEmail('testSendUniqueLoginLinkUpdate', $this);
+        $password = 'foo';
+        $phone = self::getRandomPhone(self::$dm);
+        $user = self::createUser(
+            self::$userManager,
+            $email,
+            $password,
+            $phone,
+            self::$dm
+        );
+
+        $redis = self::$container->get('snc_redis.default');
+        $token = md5(sprintf('%s%s', time(), $email));
+        $redis->setex($token, 900, $user->getId());
+
+        self::$claimsService->sendUniqueLoginLink($user, true);
+        $userId = self::$claimsService->getUserIdFromLoginLinkToken($token);
+        $this->assertEquals($userId, $user->getId());
+    }
 }

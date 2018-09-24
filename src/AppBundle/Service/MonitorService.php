@@ -3,29 +3,28 @@ namespace AppBundle\Service;
 
 use AppBundle\Classes\Salva;
 use AppBundle\Document\Cashback;
+use AppBundle\Document\Claim;
+use AppBundle\Document\DateTrait;
 use AppBundle\Document\File\AccessPayFile;
+use AppBundle\Document\File\DaviesFile;
+use AppBundle\Document\File\DirectGroupFile;
+use AppBundle\Document\MultiPay;
 use AppBundle\Document\Payment\BacsPayment;
 use AppBundle\Document\Payment\Payment;
+use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\Policy;
+use AppBundle\Document\PolicyTerms;
 use AppBundle\Document\User;
+use AppBundle\Exception\MonitorException;
 use AppBundle\Repository\BacsPaymentRepository;
 use AppBundle\Repository\CashbackRepository;
 use AppBundle\Repository\ClaimRepository;
-use AppBundle\Repository\File\S3FileRepository;
 use AppBundle\Repository\PaymentRepository;
 use AppBundle\Repository\PhonePolicyRepository;
 use AppBundle\Repository\PolicyRepository;
 use AppBundle\Repository\UserRepository;
-use Psr\Log\LoggerInterface;
-use GuzzleHttp\Client;
 use Doctrine\ODM\MongoDB\DocumentManager;
-use AppBundle\Exception\MonitorException;
-use AppBundle\Document\Policy;
-use AppBundle\Document\PhonePolicy;
-use AppBundle\Document\PolicyTerms;
-use AppBundle\Document\MultiPay;
-use AppBundle\Document\Claim;
-use AppBundle\Document\File\DaviesFile;
-use AppBundle\Document\DateTrait;
+use Psr\Log\LoggerInterface;
 
 class MonitorService
 {
@@ -77,9 +76,9 @@ class MonitorService
     {
         if (method_exists($this, $name)) {
             return call_user_func([$this, $name]);
-        } else {
-            throw new \Exception(sprintf('Unknown monitor %s', $name));
         }
+
+        throw new \Exception(sprintf('Unknown monitor %s', $name));
     }
 
     public function multipay()
@@ -192,6 +191,20 @@ class MonitorService
     public function daviesImport()
     {
         $fileRepo = $this->dm->getRepository(DaviesFile::class);
+        $this->hasRecentS3Import($fileRepo);
+    }
+
+    public function directgroupImport()
+    {
+        $fileRepo = $this->dm->getRepository(DirectGroupFile::class);
+        $this->hasRecentS3Import($fileRepo);
+    }
+
+    /**
+     * Check the 'file repo' - ensure a matching document was put there in the last day
+     */
+    private function hasRecentS3Import($fileRepo)
+    {
         $successFiles = $fileRepo->findBy(['success' => true], ['created' => 'desc'], 1);
         $successFile = count($successFiles) > 0 ? $successFiles[0] : null;
         if (!$successFile) {
@@ -201,10 +214,8 @@ class MonitorService
         $now = $this->startOfDay(new \DateTime());
         $diff = $now->diff($successFile->getCreated());
         if ($diff->days >= 1) {
-            throw new MonitorException(sprintf(
-                'Last successful import on %s',
-                $successFile->getCreated()->format(\DateTime::ATOM)
-            ));
+            $fileDateTime = $successFile->getCreated()->format(\DateTime::ATOM);
+            throw new MonitorException('Last successful import on ' . $fileDateTime);
         }
     }
 
@@ -296,6 +307,7 @@ class MonitorService
         // claim is closed prior to being able to update imei
         $claims = $repo->findAll();
         foreach ($claims as $claim) {
+            /** @var Claim $claim */
             $policy = $claim->getPolicy();
             // Only concerned about active (or unpaid) policies here
             if (!in_array($policy->getStatus(), [
@@ -329,14 +341,18 @@ class MonitorService
                 json_encode($results['additional-payments'])
             ));
             // @codingStandardsIgnoreEnd
-        } elseif (isset($results['missing']) && count($results['missing']) > 0) {
+        }
+
+        if (isset($results['missing']) && count($results['missing']) > 0) {
             // @codingStandardsIgnoreStart
             throw new MonitorException(sprintf(
                 'Judopay is missing database payment records that indices a mobile payment was received, but not recorded. %s',
                 json_encode($results['missing'])
             ));
             // @codingStandardsIgnoreEnd
-        } elseif (isset($results['invalid']) && count($results['invalid']) > 0) {
+        }
+
+        if (isset($results['invalid']) && count($results['invalid']) > 0) {
             // @codingStandardsIgnoreStart
             throw new MonitorException(sprintf(
                 'Judopay has invalid database payment records. %s',
@@ -521,5 +537,37 @@ class MonitorService
                 $claim->getId()
             ));
         }
+    }
+
+    public function outstandingSubmittedClaims(array $tooOldSubmittedClaims = null)
+    {
+        if ($tooOldSubmittedClaims === null) {
+            $tooOldSubmittedClaims = $this->findOldClaimsByStatus([Claim::STATUS_SUBMITTED], 2);
+        }
+
+        if (count($tooOldSubmittedClaims) > 0) {
+            $sampleClaim = current($tooOldSubmittedClaims);
+            $claimId = $sampleClaim->getId();
+            throw new MonitorException(
+                "At least one Claim (eg: {$claimId}) is still marked as 'Submitted' after 2 business days"
+            );
+        }
+    }
+
+    /**
+     * Find claims that are more than or equal $n Business days since 'statusLastUpdated'
+     */
+    private function findOldClaimsByStatus(array $status, int $businessDaysOld = 2): array
+    {
+        /** @var ClaimRepository $claimRepository */
+        $claimRepository = $this->dm->getRepository(Claim::class);
+        $twoBusinessDaysAgo = $this->subBusinessDays(new \DateTime(), $businessDaysOld);
+
+        return $claimRepository->findBy(
+            [
+                'status' => ['$in' => $status],
+                'statusLastUpdated' => ['$lte' => $twoBusinessDaysAgo],
+            ]
+        );
     }
 }

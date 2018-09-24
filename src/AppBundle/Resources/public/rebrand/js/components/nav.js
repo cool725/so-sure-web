@@ -22,17 +22,8 @@ $(function() {
         // Toggle menu open
         menu.toggleClass('menu--open');
 
-        // Toggle logo class
-        if (!nav.hasClass('navbar-light')) {
-            logo.toggleClass('navbar-brand__logo-white-light');
-        }
-
         // Toggle the quote btn class
-        if (!nav.hasClass('navbar-light')) {
-            quoteBtn.toggleClass('btn-outline-white btn-gradient');
-        } else {
-            quoteBtn.toggleClass('btn-white btn-outline-white btn-shadow');
-        }
+        quoteBtn.toggleClass('btn-white btn-outline-white btn-shadow');
 
         // Prevent scrolling whilst open
         $('body').toggleClass('body--overflow');

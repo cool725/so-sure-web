@@ -33,7 +33,9 @@
 					   <h3>{{ sosureActions|length }} Actions for so-sure in last import</h3>
 					   <hr>
 					   {% for claimNumber,msgs in sosureActions %}
-						   <p>Claim: {{ claimNumber }}</p>
+						   <p>
+							   Claim: <a href="{{ url('claims_claim_number', {'number': claimNumber|url_encode}) }}">{{ claimNumber }}</a>
+						   </p>
 						   <ul>
 							   {% for msg in msgs %}
 								   <li>{{ msg }}</li>
@@ -48,7 +50,9 @@
 			   <h3>{{ errors|length }} Errors in last import</h3>
 	 		   <hr>
 				{% for claimNumber,msgs in errors %}
-					 <p>Claim: {{ claimNumber }}</p>
+					<p>
+						Claim: <a href="{{ url('claims_claim_number', {'number': claimNumber|url_encode}) }}">{{ claimNumber }}</a>
+					</p>
 						 <ul>
 							 {% for msg in msgs %}
 								 <li>{{ msg|raw }}</li>
@@ -63,7 +67,9 @@
 			   <h3>{{ fees|length }} Fee Errors in last import</h3>
 	 		   <hr>
 				{% for claimNumber,msgs in fees %}
-					 <p>Claim: {{ claimNumber }}</p>
+					<p>
+						Claim: <a href="{{ url('claims_claim_number', {'number': claimNumber|url_encode}) }}">{{ claimNumber }}</a>
+					</p>
 						 <ul>
 							 {% for msg in msgs %}
 								 <li>{{ msg }}</li>
@@ -78,7 +84,9 @@
 			   <h3>{{ warnings|length }} Warnings in last import</h3>
 	 		   <hr>
 			{% for claimNumber,msgs in warnings %}
-				 <p>Claim: {{ claimNumber }}</p>
+				<p>
+					Claim: <a href="{{ url('claims_claim_number', {'number': claimNumber|url_encode}) }}">{{ claimNumber }}</a>
+				</p>
 					 <ul>
 						 {% for msg in msgs %}
 							 <li>{{ msg }}</li>

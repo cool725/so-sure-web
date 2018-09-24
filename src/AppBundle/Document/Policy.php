@@ -410,7 +410,7 @@ abstract class Policy
     /**
      * @MongoDB\ReferenceMany(targetDocument="AppBundle\Document\ScheduledPayment", cascade={"persist"})
      */
-    protected $scheduledPayments = array();
+    protected $scheduledPayments;
 
     /**
      * @Assert\DateTime()
@@ -497,6 +497,7 @@ abstract class Policy
         $this->linkedClaims = new \Doctrine\Common\Collections\ArrayCollection();
         $this->acceptedConnections = new \Doctrine\Common\Collections\ArrayCollection();
         $this->acceptedConnectionsRenewal = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->scheduledPayments = new \Doctrine\Common\Collections\ArrayCollection();
         $this->potValue = 0;
     }
 
@@ -1294,6 +1295,22 @@ abstract class Policy
         return $this->getLatestClaimByStatus(array(Claim::STATUS_FNOL, Claim::STATUS_SUBMITTED));
     }
 
+    public function getLatestInReviewClaim()
+    {
+        return $this->getLatestClaimByStatus(array(Claim::STATUS_INREVIEW));
+    }
+
+    /**
+     * @return Claim|null
+     */
+    public function getLatestFnolSubmittedInReviewClaim()
+    {
+        return $this->getLatestClaimByStatus(array(
+            Claim::STATUS_FNOL,
+            Claim::STATUS_SUBMITTED,
+            Claim::STATUS_INREVIEW));
+    }
+
     private function getLatestClaimByStatus($status)
     {
         $claims = $this->getClaims();
@@ -1570,6 +1587,12 @@ abstract class Policy
 
     public function addScheduledPayment(ScheduledPayment $scheduledPayment)
     {
+        // For some reason, duplicate scheduled payments occurred in production
+        // this pattern is used in other methods to fix issues with tests, so will hopefully work
+        if ($this->scheduledPayments->contains($scheduledPayment)) {
+            throw new \Exception('duplicate scheduled payment');
+        }
+
         $scheduledPayment->setPolicy($this);
         $this->scheduledPayments[] = $scheduledPayment;
     }
@@ -1620,6 +1643,12 @@ abstract class Policy
 
     public function setPremiumInstallments($premiumInstallments)
     {
+        if (!in_array($premiumInstallments, [1, 12])) {
+            throw new \Exception(sprintf(
+                'Only monthly (12) or yearly (1) installments are supported, not %d',
+                $premiumInstallments
+            ));
+        }
         $this->premiumInstallments = $premiumInstallments;
     }
 
@@ -2040,9 +2069,14 @@ abstract class Policy
     public function isRefundAllowed()
     {
         // Policy upgrade should allow a refund regardless of claim status
+        if ($this->getCancelledReason() == Policy::CANCELLED_UPGRADE) {
+            return true;
+        }
+
         // For all other cases, if there's a claim, then no not allow refund
-        // TODO: Should this be open claim???  Possibly shouldn't allow cancellation if there is an open claim
-        if ($this->hasMonetaryClaimed(true) && $this->getCancelledReason() != Policy::CANCELLED_UPGRADE) {
+        // Open claims should have transitioned to pending closed, and for those cases, do not allow a refund
+        // - potentially would need to handle on a case by case basis
+        if ($this->hasMonetaryClaimed(true) || $this->hasPendingClosedClaimed()) {
             return false;
         }
 
@@ -2068,15 +2102,17 @@ abstract class Policy
         }
     }
 
-    public function getRefundAmount()
+    public function getRefundAmount($skipAllowedCheck = false)
     {
         // Just in case - make sure we don't refund for non-cancelled policies
         if (!$this->isCancelled()) {
             return 0;
         }
 
-        if (!$this->isRefundAllowed()) {
-            return 0;
+        if (!$skipAllowedCheck) {
+            if (!$this->isRefundAllowed()) {
+                return 0;
+            }
         }
 
         // 3 factors determine refund amount
@@ -2089,15 +2125,17 @@ abstract class Policy
         }
     }
 
-    public function getRefundCommissionAmount()
+    public function getRefundCommissionAmount($skipAllowedCheck = false)
     {
         // Just in case - make sure we don't refund for non-cancelled policies
         if (!$this->isCancelled()) {
             return 0;
         }
 
-        if (!$this->isRefundAllowed()) {
-            return 0;
+        if (!$skipAllowedCheck) {
+            if (!$this->isRefundAllowed()) {
+                return 0;
+            }
         }
 
         // 3 factors determine refund amount
@@ -2616,6 +2654,26 @@ abstract class Policy
         $claims = [];
         foreach ($this->linkedClaims as $claim) {
             if ($claim->isMonetaryClaim($includeApproved)) {
+                $claims[] = $claim;
+            }
+        }
+
+        return $claims;
+    }
+
+    public function hasPendingClosedClaimed()
+    {
+        $count = count($this->getPendingClosedClaimed());
+
+        return $count > 0;
+    }
+
+    public function getPendingClosedClaimed()
+    {
+        $claims = [];
+        foreach ($this->claims as $claim) {
+            /** @var Claim $claim */
+            if ($claim->getStatus() == Claim::STATUS_PENDING_CLOSED) {
                 $claims[] = $claim;
             }
         }
@@ -3872,7 +3930,7 @@ abstract class Policy
         return $totalPaid;
     }
 
-    public function getTotalExpectedPaidToDate(\DateTime $date = null)
+    public function getTotalExpectedPaidToDate(\DateTime $date = null, $firstDayIsUnpaid = false)
     {
         if (!$this->isPolicy() || !$this->getStart()) {
             return null;
@@ -3888,7 +3946,7 @@ abstract class Policy
         if ($this->getPremiumPlan() == self::PLAN_YEARLY) {
             $expectedPaid = $this->getPremium()->getAdjustedYearlyPremiumPrice();
         } elseif ($this->getPremiumPlan() == self::PLAN_MONTHLY) {
-            $months = $this->dateDiffMonths($date, $this->getBilling());
+            $months = $this->dateDiffMonths($date, $this->getBilling(), true, $firstDayIsUnpaid);
             if ($months > 12) {
                 $months = 12;
             }
@@ -3906,14 +3964,17 @@ abstract class Policy
         return $expectedPaid;
     }
 
-    public function getOutstandingPremiumToDate(\DateTime $date = null, $allowNegative = false)
-    {
+    public function getOutstandingPremiumToDate(
+        \DateTime $date = null,
+        $allowNegative = false,
+        $firstDayIsUnpaid = false
+    ) {
         if (!$this->isPolicy()) {
             return null;
         }
 
         $totalPaid = $this->getTotalSuccessfulPayments($date, false);
-        $expectedPaid = $this->getTotalExpectedPaidToDate($date);
+        $expectedPaid = $this->getTotalExpectedPaidToDate($date, $firstDayIsUnpaid);
 
         $diff = $expectedPaid - $totalPaid;
         //print sprintf("paid %f expected %f diff %f\n", $totalPaid, $expectedPaid, $diff);
@@ -4011,7 +4072,7 @@ abstract class Policy
         }
     }
 
-    public function isPolicyPaidToDate(\DateTime $date = null, $includePendingBacs = false)
+    public function isPolicyPaidToDate(\DateTime $date = null, $includePendingBacs = false, $firstDayIsUnpaid = false)
     {
         if (!$this->isPolicy()) {
             return null;
@@ -4021,7 +4082,7 @@ abstract class Policy
         if ($includePendingBacs) {
             $totalPaid += $this->getPendingBacsPaymentsTotal();
         }
-        $expectedPaid = $this->getTotalExpectedPaidToDate($date);
+        $expectedPaid = $this->getTotalExpectedPaidToDate($date, $firstDayIsUnpaid);
         // print sprintf("%f =? %f", $totalPaid, $expectedPaid) . PHP_EOL;
 
         // >= doesn't quite allow for minor float differences

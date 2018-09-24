@@ -87,7 +87,7 @@ facebook_login:
 
 google_login:
     path: /login/check-google
-    
+
 starling_login:
     path: /login/check-starling
 
@@ -289,4 +289,27 @@ redirect_discount_vouchers:
     defaults:
         _controller: FrameworkBundle:Redirect:redirect
         route: homepage
+        permanent: true
+
+redirect_blog_insuretech:
+    path: /blog/2016/06/07/what-is-insurtech.html
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: https://blog.wearesosure.com/the-insurtech-revolution
+        permanent: true
+
+redirect_blog:
+    path: /blog/{file}
+    requirements:
+        file: ".*"
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: https://blog.wearesosure.com/
+        permanent: false # not convinced we may need to add additional redirects, so keep temp for now
+
+redirect_change_password:
+    path: /change-password
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: login
         permanent: true

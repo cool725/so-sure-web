@@ -4,6 +4,7 @@ namespace AppBundle\Document\Payment;
 
 use AppBundle\Document\BacsPaymentMethod;
 use AppBundle\Document\DateTrait;
+use AppBundle\Document\Policy;
 use AppBundle\Document\ScheduledPayment;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Gedmo\Mapping\Annotation as Gedmo;
@@ -159,6 +160,14 @@ class BacsPayment extends Payment
         $this->setSubmittedDate($date);
         $this->setBacsCreditDate($this->addBusinessDays($date, self::DAYS_CREDIT));
         $this->setBacsReversedDate($this->addBusinessDays($date, self::DAYS_REVERSE));
+        $this->setPolicyStatusActiveIfUnpaid();
+    }
+
+    public function setPolicyStatusActiveIfUnpaid()
+    {
+        if ($this->getPolicy() && $this->getPolicy()->getStatus() == Policy::STATUS_UNPAID) {
+            $this->getPolicy()->setStatus(Policy::STATUS_ACTIVE);
+        }
     }
 
     public function inProgress()
@@ -207,15 +216,22 @@ class BacsPayment extends Payment
         $this->setStatus(self::STATUS_SUCCESS);
         $this->setSuccess(true);
 
-        $this->setCommission();
+        // Usually commission would not be set, however, if we may have needed to manully set the commission
+        if (!$this->getTotalCommission()) {
+            $this->setCommission();
+        }
 
-        /** @var BacsPaymentMethod $bacsPaymentMethod */
-        $bacsPaymentMethod = $this->getPolicy()->getUser()->getPaymentMethod();
-        $bacsPaymentMethod->getBankAccount()->setLastSuccessfulPaymentDate($date);
+        if ($this->getPolicy()->getUser()->hasBacsPaymentMethod()) {
+            /** @var BacsPaymentMethod $bacsPaymentMethod */
+            $bacsPaymentMethod = $this->getPolicy()->getUser()->getPaymentMethod();
+            $bacsPaymentMethod->getBankAccount()->setLastSuccessfulPaymentDate($date);
+        }
 
         if ($this->getScheduledPayment()) {
             $this->getScheduledPayment()->setStatus(ScheduledPayment::STATUS_SUCCESS);
         }
+
+        $this->setPolicyStatusActiveIfUnpaid();
     }
 
     public function reject(\DateTime $date = null)

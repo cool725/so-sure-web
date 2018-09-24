@@ -720,6 +720,7 @@ nelmio_security:
                 - https://fast.wistia.net
                 - http://widget.trustpilot.com
                 - https://widget.trustpilot.com
+                - fbrpc://
             script-src:
                 - 'self'
                 - 'unsafe-inline'
@@ -1258,8 +1259,11 @@ nelmio_security:
             - sosure.test-app.link
             - bnc.lt
             - starlingbank.com
+            - demo-developer.possiblefs.com
+            - developer.starlingbank.com
             - campaign.wearesosure.com
             - accounts.google.com
+            - blog.wearesosure.com
     # forced HTTPS handling, don't combine with flexible mode
     # and make sure you have SSL working on your site before enabling this
     #forced_ssl:
@@ -1275,7 +1279,6 @@ nelmio_security:
 dpn_xml_sitemap:
     additional_sitemaps:
         - help/sitemap.xml
-        - blog/sitemap.xml
 
 fos_oauth_server:
     db_driver: mongodb

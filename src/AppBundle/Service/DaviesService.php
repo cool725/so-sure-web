@@ -184,6 +184,52 @@ class DaviesService extends S3EmailService
             }
         }
 
+        // Check for any claims in db that are closed that appear after an open claim
+        foreach ($daviesClaims as $daviesClaim) {
+            $repo = $this->dm->getRepository(Policy::class);
+            /** @var Policy $policy */
+            $policy = $repo->findOneBy(['policyNumber' => $daviesClaim->getPolicyNumber()]);
+            if ($policy) {
+                foreach ($policy->getClaims() as $claim) {
+                    /** @var Claim $claim */
+                    // 2 options - either db claim is closed or davies claim is closed
+                    $logError = false;
+                    $preventImeiUpdate = false;
+                    if (!$claim->isOpen() &&
+                        isset($openClaims[$daviesClaim->getPolicyNumber()]) &&
+                        $claim->getLossDate() > $openClaims[$daviesClaim->getPolicyNumber()] &&
+                        $claim->getNumber() != $daviesClaim->claimNumber) {
+                        $preventImeiUpdate = true;
+                        if ($claim->getHandlingTeam() == Claim::TEAM_DAVIES) {
+                            $logError = true;
+                        }
+                    } elseif (!$daviesClaim->isOpen() &&
+                        $daviesClaim->lossDate > $claim->getLossDate() &&
+                        $claim->getNumber() != $daviesClaim->claimNumber) {
+                        $preventImeiUpdate = true;
+                        if ($claim->getHandlingTeam() == Claim::TEAM_DAVIES) {
+                            $logError = true;
+                        }
+                    }
+
+                    if ($preventImeiUpdate) {
+                        $multiple[] = $policy->getPolicyNumber();
+                    }
+
+                    if ($logError) {
+                        // @codingStandardsIgnoreStart
+                        $msg = sprintf(
+                            'There is open claim against policy %s that is older then the closed claim of %s and needs to be closed. Unable to determine imei',
+                            $policy->getPolicyNumber(),
+                            $claim->getNumber()
+                        );
+                        // @codingStandardsIgnoreEnd
+                        $this->warnings[$claim->getNumber()][] = $msg;
+                    }
+                }
+            }
+        }
+
         foreach ($daviesClaims as $daviesClaim) {
             try {
                 $skipImeiUpdate = in_array($daviesClaim->getPolicyNumber(), $multiple);

@@ -90,7 +90,13 @@
                     {% endif %}
                     <li role="presentation">
                         {% if policy is defined and policy %}
-                            <a href="{{ path('user_claim_policy', {'policyId': policy.id}) }}">Make a claim</a>
+                            {% if policy.getLatestFnolClaim is defined and policy.getLatestFnolClaim %}
+                                <a href="{{ path('user_claim_policy', {'policyId': policy.id}) }}">Continue my claim</a>
+                            {% elseif (policy.getLatestSubmittedClaim is defined and policy.getLatestSubmittedClaim) or (policy.getLatestInReviewClaim is defined and policy.getLatestInReviewClaim) %}
+                                <a href="{{ path('user_claim_policy', {'policyId': policy.id}) }}">Check my claim</a>
+                            {% else %}
+                                <a href="{{ path('user_claim_policy', {'policyId': policy.id}) }}">Make a claim</a>
+                            {% endif %}
                         {% else %}
                             <a href="{{ path('user_claim') }}">Make a claim</a>
                         {% endif %}

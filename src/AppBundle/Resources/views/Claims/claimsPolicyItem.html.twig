@@ -92,12 +92,26 @@
                         <tr>
                             <td>Policy Status</td>
                             <td>
-                              {{ policy.status }} {% if not policy.isPolicy %}Pre-pending{% endif %}
-                              {% if policy.cancelledReason %}
-                                / {{ policy.cancelledReason }}
-                              {% endif %}
+                                {{ policy.status }} {% if not policy.isPolicy %}Pre-pending{% endif %}
+                                {% if policy.cancelledReason %}
+                                    / {{ policy.cancelledReason }}
+                                {% endif %}
                                 {% if policy.getRequestedCancellationReason %}
                                     / {{ policy.getRequestedCancellationReason }}
+                                {% endif %}
+                                {% if is_granted('ROLE_ADMIN') %}
+                                    {% set settable_alternative_status = null %}
+                                    {% if policy.status == 'active' %}
+                                        {% set settable_alternative_status = 'unpaid' %}
+                                    {% endif %}
+                                    {% if policy.status == 'unpaid' %}
+                                        {% set settable_alternative_status = 'active' %}
+                                    {% endif %}
+                                    {% if settable_alternative_status %}
+                                        <a class="btn btn-sm btn-danger"
+                                            href="{{ path('admin_policy_set_status', { id: policy.id, policyNewStatus: settable_alternative_status}) }}">
+                                            set as  {{ settable_alternative_status }}</a>
+                                    {% endif %}
                                 {% endif %}
                             </td>
                         </tr>
@@ -341,8 +355,12 @@
                             <td>
                                 {% if policy.picSureCircumvention is null %}
                                     <span> Pre Anti-fraud check</span>
-                                {% elseif policy.picSureCircumvention == true %}
+                                {% elseif policy.picSureCircumvention == true and hadInvalidPicSureStatus == false %}
                                     <span class="fa fa-exclamation-triangle"> Possible Fraud (i.e. too many attempts to do pic-sure and imei upload was too long, check events in mixpanel) <span class="fa fa-exclamation-triangle"></span></span>
+                                {% elseif policy.picSureCircumvention == false and hadInvalidPicSureStatus == true %}
+                                    <span class="fa fa-exclamation-triangle"> Previously invalidated (check the history log and previous pic-sure images) <span class="fa fa-exclamation-triangle"></span></span>
+                                {% elseif policy.picSureCircumvention == true and hadInvalidPicSureStatus == true %}
+                                    <span class="fa fa-exclamation-triangle"> Possible Fraud and previously invalidated (i.e. too many attempts to do pic-sure and imei upload was too long, check events in mixpanel, and check the history log and previous pic-sure images) <span class="fa fa-exclamation-triangle"></span></span>
                                 {% elseif policy.picSureCircumvention == false %}
                                     <span class="fa fa-thumbs-up"> No Fraud Detected <span class="fa fa-thumbs-up"></span></span>
                                 {% endif %}
@@ -736,7 +754,7 @@
             {% for item in user_history %}
               <tr>
                 <td width="10%">{{ item.action }}</td>
-                <td width="10%">{{ item.loggedAt|date }}</td>
+                <td width="10%">{{ item.loggedAt|date('F j, Y H:i:s') }}</td>
                 <td width="80%">
                   {% for key, value in item.data %}
                     {{ key }} => {{ value|json_encode }}<br />
@@ -753,7 +771,7 @@
             {% for item in policy_history %}
               <tr>
                 <td width="10%">{{ item.action }}</td>
-                <td width="10%">{{ item.loggedAt|date }}</td>
+                <td width="10%">{{ item.loggedAt|date('F j, Y H:i:s') }}</td>
                 <td width="80%">
                   {% for key, value in item.data %}
                     {{ key }} => {{ value|json_encode }}<br />

@@ -1,50 +1,27 @@
 // nav.scss
 
-.navbar {
-    background-color: transparent;
-    // padding-top: 1.2rem;
-    transition: padding 0.2s linear;
-
-    @include media-breakpoint-up(lg) {
-        box-shadow: 0 2px 0 0 rgba(0, 0, 0, 0.05);
-    }
+.navbar-so-sure {
+    // TODO: When we switch to gradient hero adjust
+    @include linear-gradient(135deg, $blue-3, $blue-1a);
 
     .navbar-nav {
         transition: none;
 
         .nav-link {
             font-family: $g-medium;
-            color: $grey;
+            color: $white;
+
+            &:hover {
+                color: $blue-1;
+            }
 
             &.user-link {
-                color: $blue-2;
-            }
-        }
+                color: $blue-1;
 
-        .dropdown-menu {
-            position: absolute;
-        }
-
-        .dropdown-toggle {
-            // Overide bs toggle style
-            &:after {
-                border: 0;
-                margin: 0;
-            }
-        }
-    }
-
-    &-light {
-        .navbar-nav {
-
-            .nav-link {
-                color: $white;
-
-                &.user-link {
-                    color: $blue-1;
+                &:hover {
+                    color: $white;
                 }
             }
-
         }
     }
 }
@@ -54,30 +31,14 @@
 
     &__logo {
         width: 120px; height: 30px;
-        background: transparent url('#{$cdn_url}/images/rebrand/logo/so-sure_logo-blue.svg') no-repeat center center;
-        background-size: 120px;
-    }
-
-    &__logo-white-dark {
-        background: transparent url('#{$cdn_url}/images/rebrand/logo/so-sure_logo-white-dark.svg') no-repeat center center;
-    }
-
-    &__logo-white-light {
         background: transparent url('#{$cdn_url}/images/rebrand/logo/so-sure_logo-white-light.svg') no-repeat center center;
+        background-size: 120px;
     }
 }
 
 // Scroll effects
 .navbar-scrolled {
-    transition: padding 0.2s linear;
-    background-color: $white;
     box-shadow: 0 2px 0 0 rgba(0, 0, 0, 0.05);
-}
-
-.navbar-light {
-    &.navbar-scrolled {
-        @include linear-gradient(135deg, $blue-3, $blue-1a);
-    }
 }
 
 .navbar-scrolled-quote {

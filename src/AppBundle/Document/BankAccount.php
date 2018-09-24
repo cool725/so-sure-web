@@ -399,6 +399,14 @@ class BankAccount
             $now = new \DateTime();
         }
         $now = $this->startOfDay($now);
+
+        if (!$this->getInitialPaymentSubmissionDate()) {
+            throw new \Exception(sprintf(
+                'Missing initial payment submission date for ref %s',
+                $this->getReference()
+            ));
+        }
+
         $initial = clone $this->getInitialPaymentSubmissionDate();
         $initial = $this->startOfDay($initial);
 
@@ -537,7 +545,7 @@ class BankAccount
         $nextPolicyPaymentDate = null;
         foreach ($user->getValidPolicies(true) as $policy) {
             /** @var Policy $policy */
-            if (!$policy->isPolicyPaidToDate($date)) {
+            if (!$policy->isPolicyPaidToDate($date, false, true)) {
                 $useClosestPaymentDate = true;
             } else {
                 $nextPolicyPaymentDate = $policy->getNextBillingDate($date);

@@ -55,11 +55,11 @@
         a {
             display: block;
             padding: 1rem 2rem;
-            color: $blue-2;
+            color: $white;
             background-color: $blue-3;
 
             &:hover, &:focus {
-                color: $white;
+                color: $blue-1;
                 background-color: $blue-2;
                 text-decoration: none;
             }

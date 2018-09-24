@@ -318,7 +318,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
 
     /**
      * @Route("/users", name="admin_users")
-     * @Template()
+     * @Template("AppBundle::AdminEmployee/adminUsers.html.twig")
      */
     public function adminUsersAction(Request $request)
     {
@@ -1087,6 +1087,15 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             $previousPicSureStatus = $previousPicSureStatuses[0];
         }
 
+        $previousInvalidPicSureStatuses = $logRepo->findBy([
+            'objectId' => $policy->getId(),
+            'data.picSureStatus' => PhonePolicy::PICSURE_STATUS_INVALID
+        ]);
+        $hadInvalidPicSureStatus = false;
+        if (count($previousInvalidPicSureStatuses) > 0) {
+            $hadInvalidPicSureStatus = true;
+        }
+
         return [
             'policy' => $policy,
             'cancel_form' => $cancelForm->createView(),
@@ -1124,6 +1133,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             'phones' => $dm->getRepository(Phone::class)->findActive()->getQuery()->execute(),
             'now' => new \DateTime(),
             'previousPicSureStatus' => $previousPicSureStatus,
+            'hadInvalidPicSureStatus' => $hadInvalidPicSureStatus,
         ];
     }
 
