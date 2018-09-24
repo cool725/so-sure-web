@@ -25,7 +25,7 @@ use AppBundle\Document\Lead;
 class AboutController extends BaseController
 {
     /**
-     * @Route("/", name="about_home")
+     * @Route("", name="about_home")
      * @Template
      */
     public function indexAction(Request $request)
