@@ -1,27 +1,22 @@
-{% extends '::base.html.twig' %}
+{% extends '::base_rebrand.html.twig' %}
 
 {% block title %}so-sure - Server Error{% endblock %}
 
-{% block stylesheets %}
-	{{ parent() }}
-	{% stylesheets output='css/*.css'
-		'@AppBundle/Resources/public/sass/page/error.scss'
-	%}
-	<link rel="stylesheet" href="{{ asset_url }}">
-	{% endstylesheets %}
-{% endblock %}        
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/error.css') }}">
+{% endblock %}
 
 {% block body %}
-<section class="error-page">
-    <div class="container">
-        <div class="row">
-          <div class="col-md-12">
-            <h1 class="section-title">Sorry, computer says, no.</h1>
-              <img class="logo" src="{{ cdn_url }}/images/logo/so-sure_blue-frown.svg" alt="Unhappy so-sure smiley" />
-            <p class="lead">It looks like there was a server error. Our engineers will investigate the problem, but in the meantime, you can try refreshing the page.</p>
-            <p>If you're attempting to login or reset your password, you may have too many failed attempts recently, in which case, please <a href="mailto:support@wearesosure.com?Subject=503 Error">contact us</a>.</p>
-           </div>
+    <section class="exception d-flex align-items-center text-center">
+        <div class="container">
+            <img class="logo" src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_broken-phone.png" alt="Unhappy so-sure" width="200px" class="d-block" />
+            <h1 class="text-white">Sorry, computer says, no.</h1>
+            <p class="text-white">It looks like there was a server error. Our engineers will investigate the problem, but in the meantime, you can try refreshing the page.</p>
+            <p class="text-white">If you're attempting to login or reset your password, you may have too many failed attempts recently, in which case, please <a href="mailto:support@wearesosure.com?Subject=503 Error" class="text-white">contact us</a>.</p>
         </div>
-    </div>
-</section>
+    </section>
+{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/error.js') }}"></script>
 {% endblock %}

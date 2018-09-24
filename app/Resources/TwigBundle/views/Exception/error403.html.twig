@@ -1,26 +1,21 @@
-{% extends '::base.html.twig' %}
+{% extends '::base_rebrand.html.twig' %}
 
 {% block title %}so-sure - Server Error{% endblock %}
 
-{% block stylesheets %}
-	{{ parent() }}
-	{% stylesheets output='css/*.css'
-		'@AppBundle/Resources/public/sass/page/error.scss'
-	%}
-	<link rel="stylesheet" href="{{ asset_url }}">
-	{% endstylesheets %}
-{% endblock %}        
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/error.css') }}">
+{% endblock %}
 
 {% block body %}
-<section class="error-page">
-    <div class="container">
-        <div class="row">
-            <div class="col-md-12">
-		      <h1 class="section-title">Access Denied</h1>
-              <img class="logo" src="{{ cdn_url }}/images/logo/so-sure_blue-frown.svg" alt="Unhappy so-sure smiley" />
-		      <p class="lead">Looks like you're trying to view something you're not currently allowed to view.  Maybe you're not logged in?  Or logged in with the wrong account?</p>
-            </div>
+    <section class="exception d-flex align-items-center text-center">
+        <div class="container">
+            <img class="logo" src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_broken-phone.png" alt="Unhappy so-sure" width="200px" class="d-block" />
+            <h1 class="text-white">Access Denied</h1>
+            <p class="text-white">Looks like you're trying to view something you're not currently allowed to view. Maybe you're not logged in?  Or logged in with the wrong account?</p>
         </div>
-    </div>
-</section>
+    </section>
+{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/error.js') }}"></script>
 {% endblock %}
