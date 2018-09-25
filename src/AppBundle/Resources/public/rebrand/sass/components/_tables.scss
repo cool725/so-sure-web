@@ -17,7 +17,7 @@
     tbody {
         tr {
             &:nth-child(even) {
-                background-color: $bb-1;
+                background-color: $lily-white;
             }
 
             td {
@@ -124,8 +124,8 @@
     &.dark-table {
         // Borders
         th.b4 {
-            border-left: 1px solid lighten($blue-4, 50%);
-            border-right: 1px solid lighten($blue-4, 50%);
+            border-left: 1px solid lighten($zaffre, 50%);
+            border-right: 1px solid lighten($zaffre, 50%);
 
             &:first-of-type {
                 border-left: none;
@@ -144,8 +144,8 @@
     &.light-table {
         // Borders
         th.b4 {
-            border-left: 1px solid lighten($blue-4, 50%);
-            border-right: 1px solid lighten($blue-4, 50%);
+            border-left: 1px solid lighten($zaffre, 50%);
+            border-right: 1px solid lighten($zaffre, 50%);
 
             &:first-of-type {
                 border-left: none;
@@ -157,7 +157,7 @@
         }
 
         td {
-            border: 1px solid darken($bb-1, 5%);
+            border: 1px solid darken($lily-white, 5%);
         }
     }
 
@@ -183,32 +183,32 @@
     // TH/TD Colours
     th.bb1,
     td.bb1 {
-        background-color: $bb-1;
-        color: $blue-4;
+        background-color: $lily-white;
+        color: $zaffre;
     }
 
     th.b2,
     td.b2 {
-        background-color: $blue-2;
+        background-color: $dodger-blue;
         color: $white;
     }
 
     th.b2a,
     td.b2a {
-        background-color: $blue-2a;
+        background-color: $dodger-blue;
         color: $white;
     }
 
     th.b4,
     td.b4 {
-        background-color: $blue-4;
+        background-color: $zaffre;
         color: $white;
     }
 
     th.wh,
     td.wh {
         background-color: $white;
-        color: $blue-4;
+        color: $zaffre;
     }
 
     // TH/TD Box shadow

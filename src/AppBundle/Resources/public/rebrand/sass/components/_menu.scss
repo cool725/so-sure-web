@@ -5,7 +5,7 @@
     position: fixed;
     top: 0; left: 0;
     padding-top: 6rem;
-    background-color: $blue-2;
+    background-color: $dodger-blue;
     opacity: 0;
     visibility: hidden;
     transition: opacity .35s, visibility .35s, height .35s;
@@ -42,25 +42,25 @@
     &__buttons {
         width: 100%;
         position: relative;
-        background-color: $blue-4;
+        background-color: $zaffre;
         display: none;
         flex: 1;
     }
 
     &__user-button {
         position: absolute;
-        // background-color: $blue-3;
+        // background-color: $crayon-blue;
         bottom: 0; left: 0; right: 0;
 
         a {
             display: block;
             padding: 1rem 2rem;
             color: $white;
-            background-color: $blue-3;
+            background-color: $crayon-blue;
 
             &:hover, &:focus {
-                color: $blue-1;
-                background-color: $blue-2;
+                color: $columbia-blue-e;
+                background-color: $dodger-blue;
                 text-decoration: none;
             }
         }

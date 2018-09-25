@@ -17,7 +17,7 @@
 
 // Modify white btns to match design
 .btn-white {
-    color: $blue-2;
+    color: $dodger-blue;
 }
 
 // Add gradient to button rather than modifying the core css
@@ -27,17 +27,19 @@
     @include blue-gradient-ld;
 
     &:hover {
-        @include linear-gradient(90deg, $blue-1a, $blue-3);
+        @include linear-gradient(90deg, $columbia-blue-e, $crayon-blue);
     }
 }
 
 // Add gradient to button rather than modifying the core css
 .btn-gradient-green {
     border: none;
-    @include linear-gradient(90deg, $green, $green-2);
+    background-color: $ufo-green;
+    // @include linear-gradient(90deg, $ufo-green, $ufo-green);
 
     &:hover {
-        @include linear-gradient(90deg, $green-2, $green);
+        // @include linear-gradient(90deg, $ufo-green, $ufo-green);
+        background-color: darken($ufo-green, 10%);
     }
 }
 

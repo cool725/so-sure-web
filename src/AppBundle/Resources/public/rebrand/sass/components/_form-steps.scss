@@ -22,7 +22,7 @@
             z-index: 2;
             border-radius: 100%;
             background-color: $white;
-            border: 2px solid $bb-2;
+            border: 2px solid $pattens-blue;
         }
 
         &-on {
@@ -33,7 +33,7 @@
             color: $white;
             line-height: 31px;
             border-radius: 100%;
-            background-color: $bb-2;
+            background-color: $pattens-blue;
             font-family: $g-bold;
             box-shadow: 0 0 0 8px rgba(224, 239, 253, 0.8);
             @include blue-gradient-ld;
@@ -45,7 +45,7 @@
             position: relative;
             z-index: 2;
             border-radius: 100%;
-            background-color: $bb-2;
+            background-color: $pattens-blue;
             line-height: 32px;
         }
 
@@ -55,7 +55,7 @@
             position: absolute;
             left: -50%; top: 15px;
             z-index: 1;
-            background-color: $bb-2;
+            background-color: $pattens-blue;
         }
     }
 }

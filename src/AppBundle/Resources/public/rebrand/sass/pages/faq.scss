@@ -79,7 +79,7 @@ body {
     }
 
     &__sub__container {
-        background-color: $bb-1;
+        background-color: $lily-white;
 
         @include media-breakpoint-up(lg) {
             width: 40vw; height: 100vh;
@@ -99,9 +99,9 @@ body {
             font-family: $g-medium;
 
             a {
-                color: $blue-4;
+                color: $zaffre;
                 border: none;
-                border-bottom: 2px solid darken($bb-2, 5%);
+                border-bottom: 2px solid darken($pattens-blue, 5%);
                 margin-bottom: 0;
                 padding: 1rem 0;
                 background-color: transparent;
@@ -113,8 +113,8 @@ body {
                 }
 
                 &.active {
-                    color: $blue-2;
-                    border-bottom: 2px solid darken($bb-2, 5%);
+                    color: $dodger-blue;
+                    border-bottom: 2px solid darken($pattens-blue, 5%);
                     background: transparent;
 
                     .far {
@@ -123,8 +123,8 @@ body {
                 }
 
                 &:hover {
-                    color: $blue-2;
-                    border-bottom: 2px solid darken($bb-2, 5%);
+                    color: $dodger-blue;
+                    border-bottom: 2px solid darken($pattens-blue, 5%);
                     background-color: transparent;
                 }
 
