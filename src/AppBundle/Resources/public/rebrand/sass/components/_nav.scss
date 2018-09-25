@@ -2,7 +2,7 @@
 
 .navbar-so-sure {
     // TODO: When we switch to gradient hero adjust
-    @include linear-gradient(135deg, $blue-3, $blue-1a);
+    @include blue-gradient;
 
     .navbar-nav {
         transition: none;
@@ -12,11 +12,11 @@
             color: $white;
 
             &:hover {
-                color: $blue-1;
+                color: $columbia-blue-e;
             }
 
             &.user-link {
-                color: $blue-1;
+                color: $columbia-blue-e;
 
                 &:hover {
                     color: $white;

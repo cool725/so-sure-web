@@ -11,7 +11,7 @@
 .login {
     width: 100vw; height: 100vh;
     position: relative;
-    @include linear-gradient(100deg, $blue-3, $blue-1a);
+    @include blue-gradient;
     overflow: hidden;
 
     &__inner {
@@ -41,7 +41,7 @@
     &__divider {
         text-align: center;
         margin: 1.8rem -2rem;
-        border-top: 2px solid $blue-x;
+        border-top: 2px solid $pale-cornflower-blue;
         position: relative;
 
         span {

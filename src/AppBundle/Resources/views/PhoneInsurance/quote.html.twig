@@ -25,7 +25,7 @@
                 <div class="qpw__main px-4 px-lg-5">
                     <div class="qpw__h5 h5 text-white mb-4">Here’s your quote details, Insure your:</div>
                     <div class="d-flex justify-content-start align-items-center justify-content-lg-start">
-                        <h1 class="qpw__h1 text-blue1b">
+                        <h1 class="qpw__h1 text-deep-sky-blue-d">
                             <span class="sub">
                                 {{ phone.make }} {{ phone.model }}
                                 <small>({{ phone.memory }}GB)</small>
@@ -86,12 +86,18 @@
                 {# Curve Mobile #}
                 <svg class="d-block d-lg-none" preserveAspectRatio="xMinYMin meet" viewBox="0 0 750 47" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
                     <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-                        <g id="Artboard-Copy" fill="#0051E8">
-                            {# TODO: Update new purchase flow svg mobile colour #}
-                            <path d="M0,0 L750,0 L750,47 C625,18.3333333 500,4 375,4 C250,4 125,18.3333333 0,47 L0,0 Z" id="Rectangle-2"></path>
+                        <g id="Artboard-Copy" fill="#FFFFFF" fill-rule="nonzero">
+                            <g id="SVG-Layer" transform="translate(375.000000, 23.500000) scale(1, -1) translate(-375.000000, -23.500000) ">
+                                <g id="Page-1">
+                                    <g id="Artboard">
+                                        <path d="M374,0 C499.333333,0 624.666667,15.6666667 750,47 L0,47 C124,15.6666667 248.666667,8.69674703e-16 374,0 Z" id="Rectangle" transform="translate(375.000000, 23.500000) scale(-1, 1) rotate(-180.000000) translate(-375.000000, -23.500000) "></path>
+                                    </g>
+                                </g>
+                            </g>
                         </g>
                     </g>
                 </svg>
+
             </div>
 
             {# Curve Desktop #}
@@ -110,40 +116,40 @@
             <div class="qpw__sub__container">
                 <div class="qpw__sub px-4 pb-4 pt-5 p-lg-5">
 
-                    <h4 class="text-blue2 mb-4">Your cover includes:</h4>
+                    <h4 class="text-dodger-blue mb-4">Your cover includes:</h4>
                     <ul class="list-unstyled icn-list mb-5">
                         <li class="mb-4">
                             <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_accidental-damage-icn.svg" alt="so-sure - Accidental damage" width="30px" class="mr-2">
-                            <strong class="text-blue4">Cracked screens</strong>
+                            <strong class="text-zaffre">Cracked screens</strong>
                         </li>
                         <li class="mb-4">
                             <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_theft-loss-icn.svg" alt="so-sure - Theft or loss" width="30px" class="mr-2">
-                            <strong class="text-blue4">Loss &amp; Theft</strong>
+                            <strong class="text-zaffre">Loss &amp; Theft</strong>
                         </li>
                         <li class="mb-4">
                             <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_broken-phone-icn.svg" alt="so-sure - Water damage" width="30px" class="mr-2">
-                            <strong class="text-blue4">Water damage</strong>
+                            <strong class="text-zaffre">Water damage</strong>
                         </li>
                         <li class="mb-4">
                             <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_travel-icn.svg" alt="so-sure - Travel Cover" width="30px" class="mr-2">
-                            <strong class="text-blue4">International travel</strong>
+                            <strong class="text-zaffre">International travel</strong>
                         </li>
                         <li class="mb-4">
                             <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_out-of-warranty-icn.svg" alt="so-sure - Out of Warranty Breakdown" width="30px" class="mr-2">
-                            <strong class="text-blue4">Out-of-warranty breakdowns</strong>
+                            <strong class="text-zaffre">Out-of-warranty breakdowns</strong>
                         </li>
                         <li class="mb-4">
                             <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_broken-phone-icn.svg" alt="so-sure - Broken headphone jack" width="30px" class="mr-2">
-                            <strong class="text-blue4">Accessories</strong>
+                            <strong class="text-zaffre">Accessories</strong>
                         </li>
                     </ul>
-                    <h4 class="text-blue2 my-4">We also offer:</h4>
+                    <h4 class="text-dodger-blue my-4">We also offer:</h4>
                     <ul class="list-unstyled icn-list">
                         <li class="mb-4">
                             <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_happy-icn-min.svg" alt="so-sure - Accidental damage" width="30px" class="mr-2">
-                            <strong class="text-blue4">
+                            <strong class="text-zaffre">
                                 24-72 hour replace/repair <br> once claim approved
-                                <span class="ml-2 text-blue2">
+                                <span class="ml-2 text-dodger-blue">
                                     <a href="#"
                                        data-toggle="modal"
                                        data-target="#policy_24_72_hours"
@@ -155,13 +161,13 @@
                         </li>
                         <li class="mb-4">
                             <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_happy-icn-min.svg" alt="so-sure - Accidental damage" width="30px" class="mr-2">
-                            <strong class="text-blue4">Instant cover after purchase</strong>
+                            <strong class="text-zaffre">Instant cover after purchase</strong>
                         </li>
                         <li class="mb-4">
                             <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_happy-icn-min.svg" alt="so-sure - Accidental damage" width="30px" class="mr-2">
-                            <strong class="text-blue4">
+                            <strong class="text-zaffre">
                                 Up to 80% cashback every year
-                                <span class="ml-2 text-blue2">
+                                <span class="ml-2 text-dodger-blue">
                                     <a href="#"
                                        data-toggle="modal"
                                        data-target="#policy_cashback"
