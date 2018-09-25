@@ -3,6 +3,8 @@
 namespace AppBundle\Tests\Controller;
 
 use AppBundle\Repository\Invitation\EmailInvitationRepository;
+use AppBundle\Service\JudopayService;
+use PhpParser\Node\Expr\AssignOp\Mul;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\User;
 use AppBundle\Document\Claim;
@@ -303,11 +305,13 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $crawler = $this->generatePolicy($cognitoIdentityId, $user);
         $policyDataB = $this->verifyResponse(200);
 
-        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $dm = $this->getDocumentManager(true);
         $repo = $dm->getRepository(Policy::class);
+        /** @var PhonePolicy $policyA */
         $policyA = $repo->find($policyDataA['id']);
         $policyA->setImei($policyDataB['phone_policy']['imei']);
         $policyA->setStatus(Policy::STATUS_EXPIRED);
+        /** @var PhonePolicy $policyB */
         $policyB = $repo->find($policyDataB['id']);
         $policyB->setStatus(Policy::STATUS_UNPAID);
         $dm->flush();
@@ -743,8 +747,9 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $data = $this->verifyResponse(200);
         //print_r($data);
 
-        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $dm = $this->getDocumentManager(true);
         $repo = $dm->getRepository(MultiPay::class);
+        /** @var MultiPay $updatedMulitPay */
         $updatedMulitPay = $repo->find($multiPay->getId());
         $this->assertEquals(Policy::STATUS_ACTIVE, $updatedMulitPay->getPolicy()->getStatus());
     }
@@ -1002,7 +1007,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $cognitoIdentityId = $this->getAuthUser($user);
         $imei = self::generateRandomImei();
 
-        $redis = self::$client->getContainer()->get('snc_redis.default');
+        $redis = $this->getRedis();
         $redis->set('ERROR_NOT_YET_REGULATED', 1);
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy', ['phone_policy' => [
@@ -1016,7 +1021,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
 
         $data = $this->verifyResponse(422, ApiErrorCode::ERROR_NOT_YET_REGULATED);
 
-        $redis->del('ERROR_NOT_YET_REGULATED');
+        $redis->del(['ERROR_NOT_YET_REGULATED']);
     }
 
     public function testNewPolicyInvalidValidation()
@@ -1194,8 +1199,9 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         ]]);
         $data = $this->verifyResponse(200);
 
-        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $dm = $this->getDocumentManager(true);
         $userRepo = $dm->getRepository(User::class);
+        /** @var User $user */
         $user = $userRepo->find($user->getId());
         $policies = $user->getPolicies();
         $this->assertEquals(1, count($policies));
@@ -1402,8 +1408,9 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $data = $this->verifyResponse(422, ApiErrorCode::ERROR_POLICY_IMEI_BLACKLISTED);
 
         // Ensure that policy wasn't created
-        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $dm = $this->getDocumentManager(true);
         $userRepo = $dm->getRepository(User::class);
+        /** @var User $user */
         $user = $userRepo->find($user->getId());
         $this->assertEquals(0, count($user->getPolicies()));
     }
@@ -1695,8 +1702,9 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         ]]);
         $data = $this->verifyResponse(200);
 
-        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $dm = $this->getDocumentManager(true);
         $userRepo = $dm->getRepository(User::class);
+        /** @var User $user */
         $user = $userRepo->find($user->getId());
         $policies = $user->getPolicies();
         $this->assertEquals(1, count($policies));
@@ -1897,7 +1905,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $crawler = $this->generatePolicy($cognitoIdentityId, self::$testUser);
         $data = $this->verifyResponse(200);
 
-        $redis = self::$client->getContainer()->get('snc_redis.default');
+        $redis = $this->getRedis();
         $redis->set('ERROR_NOT_YET_REGULATED', 1);
 
         $url = sprintf("/api/v1/auth/policy/%s/pay", $data['id']);
@@ -1910,7 +1918,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $data = $this->verifyResponse(403);
         //$data = $this->verifyResponse(422, ApiErrorCode::ERROR_NOT_YET_REGULATED);
 
-        $redis->del('ERROR_NOT_YET_REGULATED');
+        $redis->del(['ERROR_NOT_YET_REGULATED']);
     }
 
     public function testNewPolicyJudopayOk()
@@ -1924,7 +1932,8 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $crawler = $this->generatePolicy($cognitoIdentityId, $user);
         $data = $this->verifyResponse(200);
 
-        $judopay = self::$client->getContainer()->get('app.judopay');
+        /** @var JudopayService $judopay */
+        $judopay = $this->getContainer(true)->get('app.judopay');
         $receiptId = $judopay->testPay(
             $user,
             $data['id'],
@@ -1981,7 +1990,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
 
     public function testNewPolicyWithPremiumValidation()
     {
-        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $dm = $this->getDocumentManager(true);
         $user = self::createUser(
             self::$userManager,
             self::generateEmail('policy-judopay-different-amount', $this),
@@ -1991,8 +2000,9 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $crawler = $this->generatePolicy($cognitoIdentityId, $user, true, null, $this->getRandomPhone($dm));
         $data = $this->verifyResponse(200);
 
-        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $dm = $this->getDocumentManager(true);
         $repo = $dm->getRepository(Policy::class);
+        /** @var PhonePolicy $policy */
         $policy = $repo->find($data['id']);
         $phone = $policy->getPhone();
 
@@ -2010,7 +2020,8 @@ class ApiAuthControllerTest extends BaseApiControllerTest
 
         $dm->flush();
 
-        $judopay = self::$client->getContainer()->get('app.judopay');
+        /** @var JudopayService $judopay */
+        $judopay = $this->getContainer(true)->get('app.judopay');
         $receiptId = $judopay->testPay(
             $user,
             $data['id'],
@@ -2043,8 +2054,9 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $data = $this->verifyResponse(200);
 
         // Simulate an exception occuring - policy status will be pending, but nothing else occurred
-        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $dm = $this->getDocumentManager(true);
         $repo = $dm->getRepository(Policy::class);
+        /** @var PhonePolicy $updatedPolicy */
         $updatedPolicy = $repo->find($data['id']);
         $updatedPolicy->setStatus(Policy::STATUS_PENDING);
         $dm->flush();
@@ -2066,7 +2078,8 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $crawler = $this->generatePolicy($cognitoIdentityId, $user);
         $data = $this->verifyResponse(200);
 
-        $judopay = self::$client->getContainer()->get('app.judopay');
+        /** @var JudopayService $judopay */
+        $judopay = $this->getContainer(true)->get('app.judopay');
         $receiptId = $judopay->testPay(
             $user,
             $data['id'],
@@ -2076,8 +2089,9 @@ class ApiAuthControllerTest extends BaseApiControllerTest
             self::$JUDO_TEST_CARD_PIN
         );
 
-        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $dm = $this->getDocumentManager(true);
         $repo = $dm->getRepository(User::class);
+        /** @var User $updatedUser */
         $updatedUser = $repo->find($user->getId());
         $updatedUser->setMobileNumber(null);
         $dm->flush();
@@ -2111,7 +2125,8 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $crawler = $this->generatePolicy($cognitoIdentityId, $userA);
         $dataA = $this->verifyResponse(200);
 
-        $judopay = self::$client->getContainer()->get('app.judopay');
+        /** @var JudopayService $judopay */
+        $judopay = $this->getContainer(true)->get('app.judopay');
         $receiptId = $judopay->testPay(
             $userA,
             $dataA['id'],
@@ -2151,7 +2166,8 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $crawler = $this->generatePolicy($cognitoIdentityId, $user);
         $data = $this->verifyResponse(200);
 
-        $judopay = self::$client->getContainer()->get('app.judopay');
+        /** @var JudopayService $judopay */
+        $judopay = $this->getContainer(true)->get('app.judopay');
         $receiptId = $judopay->testPay(
             $user,
             $data['id'],
@@ -2169,8 +2185,9 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         ]]);
         $policyData = $this->verifyResponse(422, ApiErrorCode::ERROR_POLICY_PAYMENT_DECLINED);
 
-        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $dm = $this->getDocumentManager(true);
         $repo = $dm->getRepository(SalvaPhonePolicy::class);
+        /** @var SalvaPhonePolicy $policy */
         $policy = $repo->find($data['id']);
 
         // ensure status is reset to null to avoid trigger monitoring alerts
@@ -2188,7 +2205,8 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $crawler = $this->generatePolicy($cognitoIdentityId, $user);
         $data = $this->verifyResponse(200);
 
-        $judopay = self::$client->getContainer()->get('app.judopay');
+        /** @var JudopayService $judopay */
+        $judopay = $this->getContainer(true)->get('app.judopay');
         $receiptId = $judopay->testPay(
             $user,
             $data['id'],
@@ -2210,8 +2228,9 @@ class ApiAuthControllerTest extends BaseApiControllerTest
 
 //        $policyData = $this->verifyResponse(422, ApiErrorCode::ERROR_POLICY_PAYMENT_DECLINED);
 
-        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $dm = $this->getDocumentManager(true);
         $repo = $dm->getRepository(SalvaPhonePolicy::class);
+        /** @var SalvaPhonePolicy $policy */
         $policy = $repo->find($data['id']);
 
         $receiptId = $judopay->testPay(
@@ -2231,8 +2250,9 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         ]]);
         $policyData = $this->verifyResponse(422, ApiErrorCode::ERROR_POLICY_PAYMENT_DECLINED);
 
-        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $dm = $this->getDocumentManager(true);
         $repo = $dm->getRepository(SalvaPhonePolicy::class);
+        /** @var SalvaPhonePolicy $policy */
         $policy = $repo->find($data['id']);
         // Policy was active - should not be chaging state if so
         $this->assertNotNull($policy->getStatus());
@@ -2249,7 +2269,8 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $crawler = $this->generatePolicy($cognitoIdentityId, $user);
         $data = $this->verifyResponse(200);
 
-        $judopay = self::$client->getContainer()->get('app.judopay');
+        /** @var JudopayService $judopay */
+        $judopay = $this->getContainer(true)->get('app.judopay');
         $receiptId = $judopay->testPay(
             $user,
             $data['id'],
@@ -2279,7 +2300,8 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $crawler = $this->generatePolicy($cognitoIdentityId, $user);
         $data = $this->verifyResponse(200);
 
-        $judopay = self::$client->getContainer()->get('app.judopay');
+        /** @var JudopayService $judopay */
+        $judopay = $this->getContainer(true)->get('app.judopay');
         $receiptId = $judopay->testPay(
             $user,
             $data['id'],
@@ -2308,8 +2330,9 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $this->verifyResponse(422, ApiErrorCode::ERROR_POLICY_PAYMENT_REQUIRED);
 
         // Ensure that policy creation didn't run twice
-        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $dm = $this->getDocumentManager(true);
         $repo = $dm->getRepository(SalvaPhonePolicy::class);
+        /** @var SalvaPhonePolicy $policy */
         $policy = $repo->find($policyData['id']);
         $this->assertEquals(11, count($policy->getScheduledPayments()));
     }
@@ -2325,7 +2348,8 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $crawler = $this->generatePolicy($cognitoIdentityId, $user);
         $data = $this->verifyResponse(200);
 
-        $judopay = self::$client->getContainer()->get('app.judopay');
+        /** @var JudopayService $judopay */
+        $judopay = $this->getContainer(true)->get('app.judopay');
         $receiptId = $judopay->testPay(
             $user,
             $data['id'],
@@ -2346,8 +2370,9 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $this->assertEquals($data['id'], $policyData['id']);
 
         // Ensure that policy creation didn't run twice
-        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $dm = $this->getDocumentManager(true);
         $repo = $dm->getRepository(SalvaPhonePolicy::class);
+        /** @var SalvaPhonePolicy $policy */
         $policy = $repo->find($policyData['id']);
         //\Doctrine\Common\Util\Debug::dump($policy->getSuccessfulPayments());
         $this->assertEquals(11, count($policy->getScheduledPayments()));
@@ -2375,8 +2400,9 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $this->assertEquals(SalvaPhonePolicy::STATUS_ACTIVE, $policyData['status']);
         $this->assertEquals($data['id'], $policyData['id']);
 
-        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $dm = $this->getDocumentManager(true);
         $repo = $dm->getRepository(SalvaPhonePolicy::class);
+        /** @var SalvaPhonePolicy $policy */
         $policy = $repo->find($policyData['id']);
         $this->assertEquals(11, count($policy->getScheduledPayments()));
         $this->assertEquals(SalvaPhonePolicy::STATUS_ACTIVE, $policy->getStatus());
@@ -2384,7 +2410,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
 
         $this->assertEquals($policy->getPremium()->getMonthlyPremiumPrice(), $policyData['premium']);
         $this->assertEquals('monthly', $policyData['premium_plan']);
-        $environment = self::$client->getContainer()->getParameter('kernel.environment');
+        $environment = $this->getContainer(true)->getParameter('kernel.environment');
         $this->assertTrue($policy->arePolicyScheduledPaymentsCorrect());
         $this->assertEquals(1, count($policy->getAllScheduledPayments(ScheduledPayment::STATUS_CANCELLED)));
     }
@@ -2420,7 +2446,8 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $crawler = $this->generatePolicy($cognitoIdentityId, $user);
         $data = $this->verifyResponse(200);
 
-        $judopay = self::$client->getContainer()->get('app.judopay');
+        /** @var JudopayService $judopay */
+        $judopay = $this->getContainer(true)->get('app.judopay');
         $details = $judopay->testPayDetails(
             $user,
             $data['id'],
@@ -2470,7 +2497,8 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $policy->setStatus(PhonePolicy::STATUS_MULTIPAY_REJECTED);
         static::$dm->flush();
 
-        $judopay = self::$client->getContainer()->get('app.judopay');
+        /** @var JudopayService $judopay */
+        $judopay = $this->getContainer(true)->get('app.judopay');
         $receiptId = $judopay->testPay(
             $user,
             $data['id'],
@@ -2522,7 +2550,8 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $data = $this->verifyResponse(200);
         //print_r($data);
 
-        $judopay = self::$client->getContainer()->get('app.judopay');
+        /** @var JudopayService $judopay */
+        $judopay = $this->getContainer(true)->get('app.judopay');
         $details = $judopay->testPayDetails(
             $multiPay->getPayee(),
             $multiPay->getPolicy()->getId(),
@@ -2630,8 +2659,9 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $data = $this->verifyResponse(200);
         $this->assertEquals('pending-claimable', $data['cashback_status']);
 
-        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $dm = $this->getDocumentManager(true);
         $repo = $dm->getRepository(SalvaPhonePolicy::class);
+        /** @var SalvaPhonePolicy $policy */
         $policy = $repo->find($policyData['id']);
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
@@ -2924,8 +2954,9 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $this->assertEquals('functional test', $data['name']);
 
         // sending sms should trigger a charge db entry
-        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $dm = $this->getDocumentManager(true);
         $repo = $dm->getRepository(Charge::class);
+        /** @var Charge $charge */
         $charge = $repo->findOneBy(['details' => '+447700900004']);
         $this->assertNull($charge);
     }
@@ -2964,8 +2995,9 @@ class ApiAuthControllerTest extends BaseApiControllerTest
 
         $this->payPolicy($inviter, $policyData['id']);
 
-        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $dm = $this->getDocumentManager(true);
         $policyRepo = $dm->getRepository(SalvaPhonePolicy::class);
+        /** @var SalvaPhonePolicy $policy */
         $policy = $policyRepo->find($policyData['id']);
         $scode = $policy->getStandardSCode()->getCode();
 
@@ -3276,7 +3308,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         ]);
         $data = $this->verifyResponse(200);
 
-        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $dm = $this->getDocumentManager(true);
         $repo = $dm->getRepository(Policy::class);
         /** @var PhonePolicy $updatedPolicy */
         $updatedPolicy = $repo->find($policyData['id']);
@@ -3288,7 +3320,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         ]);
         $data = $this->verifyResponse(200);
 
-        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $dm = $this->getDocumentManager(true);
         $repo = $dm->getRepository(Policy::class);
         /** @var PhonePolicy $updatedPolicy */
         $updatedPolicy = $repo->find($policyData['id']);
@@ -3334,8 +3366,9 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         ]);
         $data = $this->verifyResponse(422, ApiErrorCode::ERROR_POLICY_PICSURE_FILE_NOT_FOUND);
 
-        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $dm = $this->getDocumentManager(true);
         $repo = $dm->getRepository(Policy::class);
+        /** @var PhonePolicy $updatedPolicy */
         $updatedPolicy = $repo->find($policyData['id']);
         $this->assertEquals(PhonePolicy::PICSURE_STATUS_INVALID, $updatedPolicy->getPicSureStatus());
 
@@ -3345,8 +3378,9 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         ]);
         $data = $this->verifyResponse(422, ApiErrorCode::ERROR_POLICY_PICSURE_FILE_INVALID);
 
-        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $dm = $this->getDocumentManager(true);
         $repo = $dm->getRepository(Policy::class);
+        /** @var PhonePolicy $updatedPolicy */
         $updatedPolicy = $repo->find($policyData['id']);
         $this->assertEquals(PhonePolicy::PICSURE_STATUS_INVALID, $updatedPolicy->getPicSureStatus());
 
@@ -3356,7 +3390,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         ]);
         $data = $this->verifyResponse(200);
 
-        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $dm = $this->getDocumentManager(true);
         $repo = $dm->getRepository(Policy::class);
         /** @var PhonePolicy $updatedPolicy */
         $updatedPolicy = $repo->find($policyData['id']);
@@ -3369,7 +3403,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         ]);
         $data = $this->verifyResponse(200);
 
-        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $dm = $this->getDocumentManager(true);
         $repo = $dm->getRepository(Policy::class);
         /** @var PhonePolicy $updatedPolicy */
         $updatedPolicy = $repo->find($policyData['id']);
@@ -3833,8 +3867,9 @@ class ApiAuthControllerTest extends BaseApiControllerTest
 
         $this->payPolicy($user, $policyId);
 
-        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $dm = $this->getDocumentManager(true);
         $policyRepo = $dm->getRepository(SalvaPhonePolicy::class);
+        /** @var SalvaPhonePolicy $policy */
         $policy = $policyRepo->find($policyId);
         $oldCode = $policy->getStandardSCode()->getCode();
         $policy->getStandardSCode()->setActive(false);
@@ -3851,7 +3886,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $this->assertEquals(SCode::TYPE_STANDARD, $getData['type']);
         $this->assertNotEquals($oldCode, $getData['code']);
 
-        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $dm = $this->getDocumentManager(true);
         $scodeRepo = $dm->getRepository(SCode::class);
         $this->assertNotNull($scodeRepo->findOneBy(['code' => $getData['code']]));
     }
@@ -3923,8 +3958,9 @@ class ApiAuthControllerTest extends BaseApiControllerTest
 
         $this->payPolicy($user, $policyId);
 
-        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $dm = $this->getDocumentManager(true);
         $policyRepo = $dm->getRepository(SalvaPhonePolicy::class);
+        /** @var SalvaPhonePolicy $policy */
         $policy = $policyRepo->find($policyId);
         $sCode = $policy->getStandardSCode()->getCode();
 
@@ -3932,8 +3968,9 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
         $getData = $this->verifyResponse(200);
 
-        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $dm = $this->getDocumentManager(true);
         $policyRepo = $dm->getRepository(SalvaPhonePolicy::class);
+        /** @var SalvaPhonePolicy $policy */
         $policy = $policyRepo->find($policyId);
         $this->assertNull($policy->getStandardSCode());
     }
@@ -3952,8 +3989,9 @@ class ApiAuthControllerTest extends BaseApiControllerTest
 
         $this->payPolicy($user, $policyId);
 
-        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $dm = $this->getDocumentManager(true);
         $policyRepo = $dm->getRepository(SalvaPhonePolicy::class);
+        /** @var SalvaPhonePolicy $policy */
         $policy = $policyRepo->find($policyId);
         $sCode = $policy->getStandardSCode();
 
@@ -4004,11 +4042,13 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $getData = $this->verifyResponse(200);
 
         // Verify cancellation
-        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $dm = $this->getDocumentManager(true);
         $policyRepo = $dm->getRepository(SalvaPhonePolicy::class);
+        /** @var SalvaPhonePolicy $payeePolicy */
         $payeePolicy = $policyRepo->find($multiPay->getPolicy()->getId());
         $this->assertNull($payeePolicy->getStatus());
         $userRepo = $dm->getRepository(User::class);
+        /** @var User $updatedPayerUser */
         $updatedPayerUser = $userRepo->find($multiPay->getPayer()->getId());
         $this->assertEquals(1, count($updatedPayerUser->getMultiPays()));
         $updatedMultipay = $updatedPayerUser->getMultiPays()[0];
@@ -4369,6 +4409,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
 
         $policyService = static::$container->get('app.policy');
         $repo = static::$dm->getRepository(SalvaPhonePolicy::class);
+        /** @var SalvaPhonePolicy $policy */
         $policy = $repo->find($policyData['id']);
         $policyService->cancel($policy, SalvaPhonePolicy::CANCELLED_ACTUAL_FRAUD);
 
@@ -4404,6 +4445,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $policyService = static::$container->get('app.policy');
         $policyService->setDispatcher(null);
         $repo = static::$dm->getRepository(SalvaPhonePolicy::class);
+        /** @var SalvaPhonePolicy $policy */
         $policy = $repo->find($policyData['id']);
         $policyService->cancel($policy, SalvaPhonePolicy::CANCELLED_COOLOFF);
 
@@ -4474,8 +4516,9 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $this->assertEquals('+447700900000', $result['mobile_number']);
         $this->assertEquals('abcd', $result['facebook_id']);
 
-        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $dm = $this->getDocumentManager(true);
         $userRepo = $dm->getRepository(User::class);
+        /** @var User $user */
         $user = $userRepo->find($result['id']);
         $this->assertEquals($birthday, $user->getBirthday());
     }
@@ -4537,7 +4580,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
             static::$dm
         );
         $user->setFacebookId('facebook1234');
-        //$dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        //$dm = $this->getDocumentManager(true);
         static::$dm->flush();
 
         $crawler = static::putRequest(self::$client, $cognitoIdentityId, $url, [
@@ -4650,7 +4693,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
 
     public function testUpdateUserSCode()
     {
-        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $dm = $this->getDocumentManager(true);
         $scode = new SCode();
         $dm->persist($scode);
         $dm->flush();
@@ -4664,15 +4707,16 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $crawler = static::putRequest(self::$client, $cognitoIdentityId, $url, $data);
         $result = $this->verifyResponse(200);
 
-        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $dm = $this->getDocumentManager(true);
         $userRepo = $dm->getRepository(User::class);
+        /** @var User $user */
         $user = $userRepo->find($result['id']);
         $this->assertEquals($scode->getId(), $user->getAcceptedSCode()->getId());
     }
 
     public function testUpdateUserInactiveSCode()
     {
-        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $dm = $this->getDocumentManager(true);
         $scode = new SCode();
         $scode->setActive(false);
         $dm->persist($scode);
@@ -4710,7 +4754,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
             'foo'
         );
 
-        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $dm = $this->getDocumentManager(true);
         $dm->flush();
 
         $cognitoIdentityId = $this->getAuthUser($userC);
@@ -4721,11 +4765,14 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $crawler = static::putRequest(self::$client, $cognitoIdentityId, $url, $data);
         $result = $this->verifyResponse(200);
 
-        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $dm = $this->getDocumentManager(true);
         $userRepo = $dm->getRepository(User::class);
 
+        /** @var User $changedUserA */
         $changedUserA = $userRepo->findOneBy(['email' => $userA->getEmail()]);
+        /** @var User $changedUserB */
         $changedUserB = $userRepo->findOneBy(['email' => $userB->getEmail()]);
+        /** @var User $changedUserC */
         $changedUserC = $userRepo->findOneBy(['email' => $userC->getEmail()]);
         $this->assertEquals('foo', $changedUserC->getSnsEndpoint());
         $this->assertNull($changedUserA->getSnsEndpoint());
@@ -4762,8 +4809,9 @@ class ApiAuthControllerTest extends BaseApiControllerTest
 
         $this->payPolicy($user, $policyId);
 
-        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $dm = $this->getDocumentManager(true);
         $userRepo = $dm->getRepository(User::class);
+        /** @var User $user */
         $user = $userRepo->find($user->getId());
         $this->assertTrue($user->hasActivePolicy());
 
@@ -4799,7 +4847,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         );
         $userB->setMobileNumber($mobile);
 
-        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $dm = $this->getDocumentManager(true);
         $dm->persist($userA);
         $dm->persist($userB);
         $dm->flush();
@@ -4928,7 +4976,8 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         );
         $cognitoIdentityId = $this->getAuthUser($user);
 
-        $judopay = self::$client->getContainer()->get('app.judopay');
+        /** @var JudopayService $judopay */
+        $judopay = $this->getContainer(true)->get('app.judopay');
         $details = $judopay->testRegisterDetails(
             $user,
             rand(1, 999999),
@@ -4951,10 +5000,17 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $this->assertEquals(self::$JUDO_TEST_CARD_NAME, $data['card_details']);
         $this->assertEquals('judo', $data['payment_method']);
 
-        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $dm = $this->getDocumentManager(true);
         $repo = $dm->getRepository(User::class);
+        /** @var User $updatedUser */
         $updatedUser = $repo->find($user->getId());
-        $this->assertEquals(self::$JUDO_TEST_CARD_LAST_FOUR, $updatedUser->getPaymentMethod()->getCardLastFour());
+        $this->assertNotNull($updatedUser->getJudoPaymentMethod());
+        if ($updatedUser->getJudoPaymentMethod()) {
+            $this->assertEquals(
+                self::$JUDO_TEST_CARD_LAST_FOUR,
+                $updatedUser->getJudoPaymentMethod()->getCardLastFour()
+            );
+        }
 
         $details = $judopay->testRegisterDetails(
             $user,
@@ -4972,10 +5028,17 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         ]]);
         $data = $this->verifyResponse(200);
 
-        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $dm = $this->getDocumentManager(true);
         $repo = $dm->getRepository(User::class);
+        /** @var User $updatedUser */
         $updatedUser = $repo->find($user->getId());
-        $this->assertEquals(self::$JUDO_TEST_CARD2_LAST_FOUR, $updatedUser->getPaymentMethod()->getCardLastFour());
+        $this->assertNotNull($updatedUser->getJudoPaymentMethod());
+        if ($updatedUser->getJudoPaymentMethod()) {
+            $this->assertEquals(
+                self::$JUDO_TEST_CARD_LAST_FOUR,
+                $updatedUser->getJudoPaymentMethod()->getCardLastFour()
+            );
+        }
     }
 
     public function testUpdateUserPaymentJudopayFail()
@@ -4987,7 +5050,8 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         );
         $cognitoIdentityId = $this->getAuthUser($user);
 
-        $judopay = self::$client->getContainer()->get('app.judopay');
+        /** @var JudopayService $judopay */
+        $judopay = $this->getContainer(true)->get('app.judopay');
         $details = $judopay->testRegisterDetails(
             $user,
             rand(1, 999999),
@@ -5034,7 +5098,8 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         );
         $cognitoIdentityId = $this->getAuthUser($userA);
 
-        $judopay = self::$client->getContainer()->get('app.judopay');
+        /** @var JudopayService $judopay */
+        $judopay = $this->getContainer(true)->get('app.judopay');
         $details = $judopay->testRegisterDetails(
             $userA,
             rand(1, 999999),
@@ -5223,13 +5288,16 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
         $data = $this->verifyResponse(200);
 
-        /** @var EventDataCollector $eventDataCollector */
-        $eventDataCollector = self::$client->getProfile()->getCollector('events');
-        $listeners = $eventDataCollector->getCalledListeners();
-        // @codingStandardsIgnoreStart
-        $this->assertTrue(isset($listeners['security.interactive_login.AppBundle\Listener\SecurityListener::onSecurityInteractiveLogin']));
-        $this->assertFalse(isset($listeners['security.interactive_login.actual.AppBundle\Listener\SecurityListener::onActualSecurityInteractiveLogin']));
-        // @codingStandardsIgnoreEnd
+        $this->assertNotNull(self::$client->getProfile());
+        if (self::$client->getProfile()) {
+            /** @var EventDataCollector $eventDataCollector */
+            $eventDataCollector = self::$client->getProfile()->getCollector('events');
+            $listeners = $eventDataCollector->getCalledListeners();
+            // @codingStandardsIgnoreStart
+            $this->assertTrue(isset($listeners['security.interactive_login.AppBundle\Listener\SecurityListener::onSecurityInteractiveLogin']));
+            $this->assertFalse(isset($listeners['security.interactive_login.actual.AppBundle\Listener\SecurityListener::onActualSecurityInteractiveLogin']));
+            // @codingStandardsIgnoreEnd
+        }
     }
     // policy/{id}/track/location
 
@@ -5257,8 +5325,9 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, $data);
         $result = $this->verifyResponse(200);
 
-        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $dm = $this->getDocumentManager(true);
         $policyRepo = $dm->getRepository(PhonePolicy::class);
+        /** @var PhonePolicy $policy */
         $policy = $policyRepo->find($policyId);
         $locations = $policy->getPicsureLocations();
         $this->assertEquals(1, count($locations));
@@ -5426,9 +5495,9 @@ class ApiAuthControllerTest extends BaseApiControllerTest
             true
         );
 
-        $redis = self::$client->getContainer()->get('snc_redis.default');
+        $redis = $this->getRedis();
         $key = sprintf('Mobile:Validation:%s:%s', $user->getId(), '123456');
-        $redis->setEx($key, 600000, '123456');
+        $redis->setex($key, 600000, '123456');
         $cognitoIdentityId = $this->getAuthUser($user);
         $url = sprintf('/api/v1/auth/user/%s/verify/mobilenumber', $user->getId());
         $data = [
@@ -5462,9 +5531,9 @@ class ApiAuthControllerTest extends BaseApiControllerTest
             true
         );
 
-        $redis = self::$client->getContainer()->get('snc_redis.default');
+        $redis = $this->getRedis();
         $key = sprintf('Mobile:Validation:%s:%s', $user->getId(), '123456');
-        $redis->setEx($key, 600000, '123456');
+        $redis->setex($key, 600000, '123456');
 
         $cognitoIdentityId = $this->getAuthUser($user);
         $url = sprintf('/api/v1/auth/user/%s/verify/mobilenumber', $user->getId());
@@ -5495,5 +5564,13 @@ class ApiAuthControllerTest extends BaseApiControllerTest
             'code' => '123456',
         ]);
         $data = $this->verifyResponse(403);
+    }
+
+    /**
+     * @return Client
+     */
+    private function getRedis()
+    {
+        return $this->$this->getContainer(true)->get('snc_redis.default');
     }
 }

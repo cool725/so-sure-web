@@ -70,8 +70,9 @@ class PurchaseControllerTest extends BaseControllerTest
         //self::verifyResponse(302);
         //$this->assertTrue(self::$client->getResponse()->isRedirect('/purchase/step-missing-phone'));
 
-        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $dm = $this->getDocumentManager();
         $userRepo = $dm->getRepository(User::class);
+        /** @var User $user */
         $user = $userRepo->findOneBy(['emailCanonical' => mb_strtolower($email)]);
         $now = new \DateTime();
 
@@ -96,7 +97,7 @@ class PurchaseControllerTest extends BaseControllerTest
         );
 
         self::verifyResponse(302);
-        $this->assertTrue(self::$client->getResponse()->isRedirect('/purchase/step-phone'));
+        $this->assertTrue($this->isClientResponseRedirect('/purchase/step-phone'));
     }
 
     public function testPurchaseExistingUserDiffDetailsNew()
@@ -112,7 +113,7 @@ class PurchaseControllerTest extends BaseControllerTest
         $crawler = $this->createPurchaseUserNew($user, 'not me', new \DateTime('1980-01-01'));
 
         self::verifyResponse(302);
-        $this->assertTrue(self::$client->getResponse()->isRedirect('/purchase/step-phone'));
+        $this->assertTrue($this->isClientResponseRedirect('/purchase/step-phone'));
     }
 
     public function testPurchaseExistingUserWithPolicyDiffDetailsNew()
@@ -142,7 +143,7 @@ class PurchaseControllerTest extends BaseControllerTest
         $crawler = $this->createPurchaseUserNew($user, 'not me', new \DateTime('1980-01-01'));
 
         self::verifyResponse(302);
-        $this->assertTrue(self::$client->getResponse()->isRedirect('/login'));
+        $this->assertTrue($this->isClientResponseRedirect('/login'));
     }
 
     public function testPurchaseExistingUserSameDetailsNew()
@@ -164,7 +165,7 @@ class PurchaseControllerTest extends BaseControllerTest
 
         $crawler = $this->createPurchaseUserNew($user, 'foo bar', new \DateTime('1980-01-01'));
         self::verifyResponse(302);
-        $this->assertTrue(self::$client->getResponse()->isRedirect('/purchase/step-phone'));
+        $this->assertTrue($this->isClientResponseRedirect('/purchase/step-phone'));
     }
 
     public function testPurchaseExistingUserSameDetailsWithPartialPolicyNew()
@@ -188,7 +189,7 @@ class PurchaseControllerTest extends BaseControllerTest
         $crawler = $this->createPurchaseUserNew($user, 'foo bar', new \DateTime('1980-01-01'));
 
         self::verifyResponse(302);
-        $this->assertTrue(self::$client->getResponse()->isRedirect('/purchase/step-phone'));
+        $this->assertTrue($this->isClientResponseRedirect('/purchase/step-phone'));
     }
 
     public function testPurchaseExistingUserSameDetailsWithMultiplePartialPolicyNew()
@@ -216,7 +217,7 @@ class PurchaseControllerTest extends BaseControllerTest
         $crawler = $this->setPhone($phone, $policy1->getImei());
 
         self::verifyResponse(302);
-        $this->assertTrue(self::$client->getResponse()->isRedirect(
+        $this->assertTrue($this->isClientResponseRedirect(
             sprintf('/purchase/step-phone/%s', $policy1->getId())
         ));
     }
@@ -232,7 +233,7 @@ class PurchaseControllerTest extends BaseControllerTest
         );
 
         self::verifyResponse(302);
-        $this->assertTrue(self::$client->getResponse()->isRedirect('/purchase/step-phone'));
+        $this->assertTrue($this->isClientResponseRedirect('/purchase/step-phone'));
     }
 
     public function testPurchasePhone()
@@ -245,7 +246,7 @@ class PurchaseControllerTest extends BaseControllerTest
             new \DateTime('1980-01-01')
         );
         self::verifyResponse(302);
-        $this->assertTrue(self::$client->getResponse()->isRedirect());
+        $this->assertTrue($this->isClientResponseRedirect());
         self::$client->followRedirect();
         $this->assertContains('/purchase/step-phone', self::$client->getHistory()->current()->getUri());
 
@@ -277,7 +278,7 @@ class PurchaseControllerTest extends BaseControllerTest
             new \DateTime('1980-01-01')
         );
         self::verifyResponse(302);
-        $this->assertTrue(self::$client->getResponse()->isRedirect());
+        $this->assertTrue($this->isClientResponseRedirect());
         self::$client->followRedirect();
         $this->assertContains('/purchase/step-phone', self::$client->getHistory()->current()->getUri());
 
@@ -338,7 +339,7 @@ class PurchaseControllerTest extends BaseControllerTest
         );
 
         self::verifyResponse(302);
-        $this->assertTrue(self::$client->getResponse()->isRedirect('/purchase/step-phone'));
+        $this->assertTrue($this->isClientResponseRedirect('/purchase/step-phone'));
 
         $imei = implode(' ', str_split(self::generateRandomImei(), 3));
         $crawler = $this->setPhone($phone, $imei);
@@ -370,7 +371,7 @@ class PurchaseControllerTest extends BaseControllerTest
         );
 
         self::verifyResponse(302);
-        $this->assertTrue(self::$client->getResponse()->isRedirect('/purchase/step-phone'));
+        $this->assertTrue($this->isClientResponseRedirect('/purchase/step-phone'));
 
         $imei = implode(' ', str_split(self::generateRandomImei(), 3));
         $crawler = $this->setPhone($phone, $imei);
@@ -407,7 +408,7 @@ class PurchaseControllerTest extends BaseControllerTest
         );
 
         self::verifyResponse(302);
-        $this->assertTrue(self::$client->getResponse()->isRedirect('/purchase/step-phone'));
+        $this->assertTrue($this->isClientResponseRedirect('/purchase/step-phone'));
 
         $crawler = $this->setPhone($phone, self::LOSTSTOLEN_IMEI);
 
@@ -426,7 +427,7 @@ class PurchaseControllerTest extends BaseControllerTest
         );
 
         self::verifyResponse(302);
-        $this->assertTrue(self::$client->getResponse()->isRedirect('/purchase/step-phone'));
+        $this->assertTrue($this->isClientResponseRedirect('/purchase/step-phone'));
 
         $crawler = $this->setPhone($phone);
         self::verifyResponse(302);
@@ -498,7 +499,7 @@ class PurchaseControllerTest extends BaseControllerTest
         );
 
         self::verifyResponse(302);
-        $this->assertTrue(self::$client->getResponse()->isRedirect('/purchase/step-phone'));
+        $this->assertTrue($this->isClientResponseRedirect('/purchase/step-phone'));
 
         $imei = implode('-', str_split(self::generateRandomImei(), 3));
         $crawler = $this->setPhone($phone, $imei);
@@ -537,7 +538,7 @@ class PurchaseControllerTest extends BaseControllerTest
         );
 
         self::verifyResponse(302);
-        $this->assertTrue(self::$client->getResponse()->isRedirect('/purchase/step-phone'));
+        $this->assertTrue($this->isClientResponseRedirect('/purchase/step-phone'));
 
         $imei = implode('/', str_split(self::generateRandomImei(), 3));
         $crawler = $this->setPhone($phone, $imei);
@@ -576,7 +577,7 @@ class PurchaseControllerTest extends BaseControllerTest
         );
 
         self::verifyResponse(302);
-        $this->assertTrue(self::$client->getResponse()->isRedirect('/purchase/step-phone'));
+        $this->assertTrue($this->isClientResponseRedirect('/purchase/step-phone'));
 
         $imei = sprintf('%s/71', self::generateRandomImei());
         $crawler = $this->setPhone($phone, $imei);
@@ -622,7 +623,7 @@ class PurchaseControllerTest extends BaseControllerTest
         );
 
         self::verifyResponse(302);
-        $this->assertTrue(self::$client->getResponse()->isRedirect('/purchase/step-phone'));
+        $this->assertTrue($this->isClientResponseRedirect('/purchase/step-phone'));
 
         $crawler = $this->setPhone($phone);
 
@@ -660,7 +661,7 @@ class PurchaseControllerTest extends BaseControllerTest
         );
 
         self::verifyResponse(302);
-        $this->assertTrue(self::$client->getResponse()->isRedirect('/purchase/step-phone'));
+        $this->assertTrue($this->isClientResponseRedirect('/purchase/step-phone'));
 
         $crawler = self::$client->request(
             'GET',
@@ -736,7 +737,7 @@ class PurchaseControllerTest extends BaseControllerTest
 
     public function testPayCC()
     {
-        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        $dm = $this->getDocumentManager();
         $email = self::generateEmail('testPayCC', $this);
         $password = 'foo';
         $phone = self::getRandomPhone($dm);
@@ -774,14 +775,14 @@ class PurchaseControllerTest extends BaseControllerTest
 
         self::verifyResponse(302);
         $redirectUrl = self::$router->generate('user_welcome_policy_id', ['id' => $policy->getId()]);
-        $this->assertTrue(self::$client->getResponse()->isRedirect($redirectUrl));
+        $this->assertTrue($this->isClientResponseRedirect($redirectUrl));
         $crawler = self::$client->followRedirect();
         self::verifyResponse(200);
     }
 
     public function testPayCCRetry()
     {
-        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        $dm = $this->getDocumentManager();
         $email = self::generateEmail('testPayCCRetry', $this);
         $password = 'foo';
         $phone = self::getRandomPhone($dm);
@@ -818,7 +819,7 @@ class PurchaseControllerTest extends BaseControllerTest
         ]);
         self::verifyResponse(302);
         $redirectUrl = self::$router->generate('user_welcome_policy_id', ['id' => $policy->getId()]);
-        $this->assertTrue(self::$client->getResponse()->isRedirect($redirectUrl));
+        $this->assertTrue($this->isClientResponseRedirect($redirectUrl));
         $crawler = self::$client->followRedirect();
         self::verifyResponse(200);
 
@@ -832,7 +833,7 @@ class PurchaseControllerTest extends BaseControllerTest
         // TODO: Current user welcome will only be displayed if one payment has been made,
         // but should check the actual paid amount on policy as well in the future
         $redirectUrl = self::$router->generate('user_welcome_policy_id', ['id' => $policy->getId()]);
-        $this->assertTrue(self::$client->getResponse()->isRedirect($redirectUrl));
+        $this->assertTrue($this->isClientResponseRedirect($redirectUrl));
         $crawler = self::$client->followRedirect();
         self::verifyResponse(200);
     }
@@ -895,15 +896,19 @@ class PurchaseControllerTest extends BaseControllerTest
         self::verifyResponse(302);
         //$this->verifyPurchaseNotReady($crawler);
 
-        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $dm = $this->getDocumentManager(true);
         $userRepo = $dm->getRepository(User::class);
+        /** @var User $updatedUser */
         $updatedUser = $userRepo->find($user->getId());
 
         $latestPolicy = $updatedUser->getLatestPolicy();
-        $redirectUrl = self::$router->generate('user_welcome_policy_id', ['id' => $latestPolicy->getId()]);
-        $this->assertTrue(self::$client->getResponse()->isRedirect($redirectUrl));
-        self::$client->followRedirect();
-        self::verifyResponse(200);
+        $this->assertNotNull($latestPolicy);
+        if ($latestPolicy) {
+            $redirectUrl = self::$router->generate('user_welcome_policy_id', ['id' => $latestPolicy->getId()]);
+            $this->assertTrue($this->isClientResponseRedirect($redirectUrl));
+            self::$client->followRedirect();
+            self::verifyResponse(200);
+        }
     }
 
     public function testLeadSource()
@@ -930,8 +935,9 @@ class PurchaseControllerTest extends BaseControllerTest
         );
         self::verifyResponse(200);
 
-        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $dm = $this->getDocumentManager(true);
         $leadRepo = $dm->getRepository(Lead::class);
+        /** @var Lead $lead */
         $lead = $leadRepo->findOneBy(['email' => mb_strtolower($email)]);
         $this->assertNotNull($lead);
         $this->assertEquals(mb_strtolower($email), $lead->getEmail());
@@ -1012,8 +1018,9 @@ class PurchaseControllerTest extends BaseControllerTest
         );
         self::verifyResponse(200);
 
-        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $dm = $this->getDocumentManager(true);
         $leadRepo = $dm->getRepository(Lead::class);
+        /** @var Lead $lead */
         $lead = $leadRepo->findOneBy(['email' => mb_strtolower($email)]);
         $this->assertNotNull($lead);
         $this->assertEquals(mb_strtolower($email), $lead->getEmail());
@@ -1226,8 +1233,7 @@ class PurchaseControllerTest extends BaseControllerTest
     public function testPhoneSearchPurchasePage()
     {
         $crawler = self::$client->request('GET', '/purchase/');
-        $data = self::$client->getResponse();
-        $this->assertEquals(200, $data->getStatusCode());
+        $this->assertEquals(200, $this->getClientResponseStatusCode());
         $this->assertHasFormAction($crawler, '/select-phone-dropdown');
     }
 
@@ -1245,8 +1251,7 @@ class PurchaseControllerTest extends BaseControllerTest
         );
         self::$dm->flush();
         $crawler = $this->login($email, $password, 'user/invalid');
-        $data = self::$client->getResponse();
-        $this->assertEquals(200, $data->getStatusCode());
+        $this->assertEquals(200, $this->getClientResponseStatusCode());
         self::verifySearchFormData($crawler->filter('form'), '/phone-insurance/', 1);
     }
 }

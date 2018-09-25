@@ -4,6 +4,7 @@ namespace AppBundle\Tests\Controller;
 
 use AppBundle\Repository\UserRepository;
 use Doctrine\ODM\MongoDB\DocumentManager;
+use Predis\Client;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\User;
 use AppBundle\Document\Reward;
@@ -128,7 +129,7 @@ class ApiControllerTest extends BaseApiControllerTest
             throw new \Exception('unable to find container');
         }
         /** @var DocumentManager $dm */
-        $dm = $client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $dm = $this->getDocumentManager(true);
         /** @var UserRepository $repo */
         $repo = $dm->getRepository(User::class);
         /** @var User $user */
@@ -161,8 +162,7 @@ class ApiControllerTest extends BaseApiControllerTest
         if (!$client->getContainer()) {
             throw new \Exception('unable to find container');
         }
-        /** @var DocumentManager $dm */
-        $dm = $client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $dm = $this->getDocumentManager(true);
         $repo = $dm->getRepository(User::class);
         /** @var User $user */
         $user = $repo->findOneBy([
@@ -678,8 +678,7 @@ class ApiControllerTest extends BaseApiControllerTest
         if (!$client->getContainer()) {
             throw new \Exception('unable to find container');
         }
-        /** @var DocumentManager $dm */
-        $dm = $client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $dm = $this->getDocumentManager(true);
         $repo = $dm->getRepository(User::class);
         /** @var User $fooUser */
         $fooUser = $repo->findOneBy(['email' => 'referred@api.bar.com']);
@@ -713,6 +712,7 @@ class ApiControllerTest extends BaseApiControllerTest
 
         // New DM required as some type of caching is occurring
         $repo = $this->getNewDocumentManager()->getRepository(User::class);
+        /** @var User $queryUser */
         $queryUser = $repo->find($user->getId());
         $this->assertTrue(mb_strlen($queryUser->getConfirmationToken()) > 5);
     }
@@ -789,8 +789,9 @@ class ApiControllerTest extends BaseApiControllerTest
      */
     public function testGetSCode()
     {
-        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $dm = $this->getDocumentManager(true);
         $repo = $dm->getRepository(SCode::class);
+        /** @var SCode $sCode */
         $sCode = $repo->findOneBy(['active' => true, 'type' => 'standard']);
         $this->assertNotNull($sCode);
 
@@ -814,8 +815,9 @@ class ApiControllerTest extends BaseApiControllerTest
         static::$dm->persist($s);
         static::$dm->flush();
 
-        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $dm = $this->getDocumentManager(true);
         $repo = $dm->getRepository(SCode::class);
+        /** @var SCode $sCode */
         $sCode = $repo->findOneBy(['active' => false, 'type' => 'standard']);
         $this->assertNotNull($sCode);
 
@@ -954,10 +956,11 @@ class ApiControllerTest extends BaseApiControllerTest
         $data = $this->verifyResponse(200);
         $this->assertEquals('api-new-user@api.bar.com', $data['email']);
 
-        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $dm = $this->getDocumentManager(true);
         $userRepo = $dm->getRepository(User::class);
+        /** @var User $user */
         $user = $userRepo->findOneBy(['email' => 'api-new-user@api.bar.com']);
-        $this->assertTrue($user !== null);
+        $this->assertNotNull($user);
         $this->assertEquals($cognitoIdentityId, $user->getIdentityLog()->getCognitoId());
         $this->assertEquals($birthday->format(\DateTime::ATOM), $user->getBirthday()->format(\DateTime::ATOM));
         $this->assertEquals('Foo', $user->getFirstName());
@@ -979,10 +982,11 @@ class ApiControllerTest extends BaseApiControllerTest
         ));
         $data = $this->verifyResponse(200);
 
-        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $dm = $this->getDocumentManager(true);
         $userRepo = $dm->getRepository(User::class);
+        /** @var User $user */
         $user = $userRepo->findOneBy(['email' => static::generateEmail('user-bad-name', $this)]);
-        $this->assertTrue($user !== null);
+        $this->assertNotNull($user);
         $this->assertEquals($cognitoIdentityId, $user->getIdentityLog()->getCognitoId());
         $this->assertEquals('Foo', $user->getFirstName());
         $this->assertEquals('Bar', $user->getLastName());
@@ -1001,10 +1005,11 @@ class ApiControllerTest extends BaseApiControllerTest
         ));
         $data = $this->verifyResponse(200);
 
-        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $dm = $this->getDocumentManager(true);
         $userRepo = $dm->getRepository(User::class);
+        /** @var User $user */
         $user = $userRepo->findOneBy(['email' => static::generateEmail('user-double-barrelled', $this)]);
-        $this->assertTrue($user !== null);
+        $this->assertNotNull($user);
         $this->assertEquals($cognitoIdentityId, $user->getIdentityLog()->getCognitoId());
         $this->assertEquals('Foo', $user->getFirstName());
         $this->assertEquals('Bar-foo', $user->getLastName());
@@ -1023,10 +1028,11 @@ class ApiControllerTest extends BaseApiControllerTest
         ));
         $data = $this->verifyResponse(200);
 
-        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $dm = $this->getDocumentManager(true);
         $userRepo = $dm->getRepository(User::class);
+        /** @var User $user */
         $user = $userRepo->findOneBy(['email' => static::generateEmail('testUserSpaceInName', $this)]);
-        $this->assertTrue($user !== null);
+        $this->assertNotNull($user);
         $this->assertEquals($cognitoIdentityId, $user->getIdentityLog()->getCognitoId());
         $this->assertEquals('Foobar', $user->getFirstName());
         $this->assertEquals('Barfoofoofoo', $user->getLastName());
@@ -1047,10 +1053,11 @@ class ApiControllerTest extends BaseApiControllerTest
         ));
         $data = $this->verifyResponse(200);
 
-        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $dm = $this->getDocumentManager(true);
         $userRepo = $dm->getRepository(User::class);
+        /** @var User $user */
         $user = $userRepo->find($data['id']);
-        $this->assertTrue($user !== null);
+        $this->assertNotNull($user);
         $this->assertEquals('utm_source=(not%20set)&utm_medium=(not%20set)', $user->getReferer());
     }
 
@@ -1280,7 +1287,7 @@ class ApiControllerTest extends BaseApiControllerTest
 
     public function testUserCreateSCode()
     {
-        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $dm = $this->getDocumentManager(true);
         $scode = new SCode();
         $dm->persist($scode);
         $dm->flush();
@@ -1298,17 +1305,18 @@ class ApiControllerTest extends BaseApiControllerTest
         $data = $this->verifyResponse(200);
         $this->assertEquals('api-new-user-scode@api.bar.com', $data['email']);
 
-        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $dm = $this->getDocumentManager(true);
         $userRepo = $dm->getRepository(User::class);
+        /** @var User $user */
         $user = $userRepo->findOneBy(['email' => 'api-new-user-scode@api.bar.com']);
-        $this->assertTrue($user !== null);
+        $this->assertNotNull($user);
         $this->assertEquals($scode->getId(), $user->getAcceptedSCode()->getId());
         $this->assertEquals(Lead::LEAD_SOURCE_SCODE, $user->getLeadSource());
     }
 
     public function testUserCreateInactiveSCode()
     {
-        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $dm = $this->getDocumentManager(true);
         $scode = new SCode();
         $scode->setActive(false);
         $dm->persist($scode);
@@ -1379,20 +1387,22 @@ class ApiControllerTest extends BaseApiControllerTest
 
     public function testVersionNotRegulated()
     {
-        $redis = self::$client->getContainer()->get('snc_redis.default');
+        /** @var Client $redis */
+        $redis = $this->getContainer(true)->get('snc_redis.default');
         $redis->set('ERROR_NOT_YET_REGULATED', 1);
         $crawler = self::$client->request('GET', '/api/v1/version?platform=ios&version=0.0.0');
         $data = $this->verifyResponse(422, ApiErrorCode::ERROR_NOT_YET_REGULATED);
-        $redis->del('ERROR_NOT_YET_REGULATED');
+        $redis->del(['ERROR_NOT_YET_REGULATED']);
     }
 
     public function testVersionUpgradeNeeded()
     {
-        $redis = self::$client->getContainer()->get('snc_redis.default');
-        $redis->sadd('UPGRADE_APP_VERSIONS_ios', '0.0.1');
+        /** @var Client $redis */
+        $redis = $this->getContainer(true)->get('snc_redis.default');
+        $redis->sadd('UPGRADE_APP_VERSIONS_ios', ['0.0.1']);
         $crawler = self::$client->request('GET', '/api/v1/version?platform=ios&version=0.0.1');
         $data = $this->verifyResponse(422, ApiErrorCode::ERROR_UPGRADE_APP);
-        $redis->del('UPGRADE_APP_VERSIONS_ios');
+        $redis->del(['UPGRADE_APP_VERSIONS_ios']);
     }
 
     public function testVersionDevice()
@@ -1402,7 +1412,8 @@ class ApiControllerTest extends BaseApiControllerTest
         $url = '/api/v1/version?platform=ios&version=2.0.1&device=iPhone%205c&memory=32&uuid=1&_method=GET';
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
         $data = $this->verifyResponse(200, ApiErrorCode::SUCCESS);
-        $redis = self::$client->getContainer()->get('snc_redis.default');
+        /** @var Client $redis */
+        $redis = $this->getContainer(true)->get('snc_redis.default');
         $data = json_decode($redis->get(sprintf("device:%s", $cognitoIdentityId)), true);
         $this->assertEquals('ios', $data['platform']);
         $this->assertEquals('2.0.1', $data['version']);
@@ -1424,8 +1435,9 @@ class ApiControllerTest extends BaseApiControllerTest
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
         $data = $this->verifyResponse(200, ApiErrorCode::SUCCESS);
 
-        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $dm = $this->getDocumentManager(true);
         $repo = $dm->getRepository(User::class);
+        /** @var User $updatedUser */
         $updatedUser = $repo->find($user->getId());
         $identityLog = $updatedUser->getLatestMobileIdentityLog();
 
@@ -1459,8 +1471,9 @@ class ApiControllerTest extends BaseApiControllerTest
         ));
         $data = $this->verifyResponse(200);
 
-        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $dm = $this->getDocumentManager(true);
         $repo = $dm->getRepository(User::class);
+        /** @var User $updatedUser */
         $updatedUser = $repo->find($user->getId());
         $isVerified = false;
         foreach ($updatedUser->getAllPolicies() as $policy) {

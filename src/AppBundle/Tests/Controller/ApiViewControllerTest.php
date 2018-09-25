@@ -34,7 +34,7 @@ class ApiViewControllerTest extends BaseApiControllerTest
     {
         $crawler = self::$client->request('GET', '/view/policy/terms');
         self::verifyResponse(404);
-        $policyKey = self::$client->getContainer()->getParameter('policy_key');
+        $policyKey = $this->getContainer(true)->getParameter('policy_key');
         $url = sprintf('/view/policy/terms?maxPotValue=62.8&policy_key=%s', $policyKey);
         $crawler = self::$client->request('GET', $url);
         $data = self::verifyResponseHtml(200);
@@ -87,7 +87,7 @@ class ApiViewControllerTest extends BaseApiControllerTest
 
     private function checkPolicy($policy, $promo)
     {
-        $policyKey = self::$client->getContainer()->getParameter('policy_key');
+        $policyKey = $this->getContainer(true)->getParameter('policy_key');
         $url = sprintf('/view/policy/%s/terms?maxPotValue=48&policy_key=%s', $policy->getId(), $policyKey);
         $crawler = self::$client->request('GET', $url);
         $data = self::verifyResponseHtml(200);
@@ -195,7 +195,7 @@ class ApiViewControllerTest extends BaseApiControllerTest
         );
         $crawler = self::$client->request('GET', $url);
         self::verifyResponse(200);
-        $body = self::$client->getResponse()->getContent();
+        $body = $this->getClientResponseContent();
 
         $this->assertTrue(mb_stripos($body, 'h1') >= 0);
         $this->assertFalse(mb_stripos($body, 'h4'));
@@ -223,7 +223,7 @@ class ApiViewControllerTest extends BaseApiControllerTest
         );
         $crawler = self::$client->request('GET', $url);
         self::verifyResponse(200);
-        $body = self::$client->getResponse()->getContent();
+        $body = $this->getClientResponseContent();
 
         $this->assertFalse(mb_stripos($body, 'h1'));
         $this->assertTrue(mb_stripos($body, 'h4') >= 0);
@@ -237,7 +237,7 @@ class ApiViewControllerTest extends BaseApiControllerTest
         $url = sprintf('/view/policy/terms?policy_key=%s&maxPotValue=62.8&noH1=0', static::$policyKey);
         $crawler = self::$client->request('GET', $url);
         self::verifyResponse(200);
-        $body = self::$client->getResponse()->getContent();
+        $body = $this->getClientResponseContent();
 
         $this->assertTrue(mb_stripos($body, 'h1') >= 0);
         $this->assertFalse(mb_stripos($body, 'h4'));
@@ -251,7 +251,7 @@ class ApiViewControllerTest extends BaseApiControllerTest
         $url = sprintf('/view/policy/terms?policy_key=%s&maxPotValue=62.8&noH1=1', static::$policyKey);
         $crawler = self::$client->request('GET', $url);
         self::verifyResponse(200);
-        $body = self::$client->getResponse()->getContent();
+        $body = $this->getClientResponseContent();
 
         $this->assertFalse(mb_stripos($body, 'h1'));
         $this->assertTrue(mb_stripos($body, 'h4') >= 0);
@@ -265,7 +265,7 @@ class ApiViewControllerTest extends BaseApiControllerTest
         $url = sprintf('/view/policy/v2/terms?policy_key=%s&maxPotValue=62.8', static::$policyKey);
         $crawler = self::$client->request('GET', $url);
         self::verifyResponse(200);
-        $body = self::$client->getResponse()->getContent();
+        $body = $this->getClientResponseContent();
 
         $this->assertFalse(mb_stripos($body, 'h1'));
         $this->assertTrue(mb_stripos($body, 'h4') >= 0);

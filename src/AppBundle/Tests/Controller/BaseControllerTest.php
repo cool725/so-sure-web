@@ -8,6 +8,7 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Listener\UserListener;
 use AppBundle\Event\UserEmailEvent;
 use Symfony\Component\BrowserKit\Tests\TestClient;
+use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DomCrawler\Crawler;
 
 class BaseControllerTest extends WebTestCase
@@ -24,7 +25,7 @@ class BaseControllerTest extends WebTestCase
     protected static $jwt;
     protected static $router;
 
-    /** @var \Snc\RedisBundle\Client\Phpredis\Client */
+    /** @var Client */
     protected static $redis;
     protected static $invitationService;
     protected static $rootDir;
@@ -56,13 +57,13 @@ class BaseControllerTest extends WebTestCase
         self::$invitationService = self::$container->get('app.invitation');
         self::$rootDir = self::$container->getParameter('kernel.root_dir');
     }
-    
+
     public function setUp()
     {
         parent::setUp();
         $this->expectNoUserChangeEvent();
     }
-    
+
     public function testINeedATest()
     {
         $this->assertTrue(true);
@@ -94,21 +95,21 @@ class BaseControllerTest extends WebTestCase
 
     protected function verifyResponseHtml($statusCode = 200)
     {
-        $this->assertEquals($statusCode, self::$client->getResponse()->getStatusCode());
+        $this->assertEquals($statusCode, $this->getClientResponseStatusCode());
 
-        return self::$client->getResponse()->getContent();
+        return $this->getClientResponseContent();
     }
 
     protected function verifyResponse($statusCode, $errorCode = null, $crawler = null, $errorMessage = null)
     {
-        $data = json_decode(self::$client->getResponse()->getContent(), true);
+        $data = json_decode($this->getClientResponseContent(), true);
         if (!$errorMessage) {
             $errorMessage = json_encode($data);
             if (!$data && $crawler) {
                 $errorMessage = $crawler->html();
             }
         }
-        $this->assertEquals($statusCode, self::$client->getResponse()->getStatusCode(), $errorMessage);
+        $this->assertEquals($statusCode, $this->getClientResponseStatusCode(), $errorMessage);
         if ($errorCode) {
             $this->assertEquals($errorCode, $data['code']);
         }
@@ -119,7 +120,9 @@ class BaseControllerTest extends WebTestCase
     protected function clearRateLimit()
     {
         // clear out redis rate limiting
-        self::$client->getContainer()->get('snc_redis.default')->flushdb();
+        /** @var Client $redis */
+        $redis = $this->getContainer(true)->get('snc_redis.default');
+        $redis->flushdb();
     }
 
     protected function getValidationData($cognitoIdentityId, $validateData)
@@ -142,13 +145,13 @@ class BaseControllerTest extends WebTestCase
         }
         $method = 'onUserEmailChangedEvent';
         $listener = $this->getMockBuilder('UserListener')
-                         ->setMethods(array($method))
-                         ->getMock();
+            ->setMethods(array($method))
+            ->getMock();
         $listener->expects($count)
-                     ->method($method);
+            ->method($method);
 
         $dispatcher = static::$container->get('event_dispatcher');
-        
+
         if ($remove) {
             $dispatcher->removeListener(UserEmailEvent::EVENT_CHANGED, array($listener, $method));
         } else {
@@ -169,7 +172,8 @@ class BaseControllerTest extends WebTestCase
         $expectedLocation = null,
         $loginLocation = null,
         $expectedHttpCode = 200
-    ) {
+    )
+    {
         if (!$loginLocation) {
             $this->logout();
             $loginLocation = '/login';
@@ -304,5 +308,74 @@ class BaseControllerTest extends WebTestCase
             $actions[] = $form->getAttribute('action');
         }
         $this->assertContains($actionUrl, $actions, "Expected a form to be sent to {$actionUrl}");
+    }
+
+    /**
+     * @return Container
+     */
+    protected function getContainer($fromClient = false)
+    {
+        if ($fromClient) {
+            $container = self::$client->getContainer();
+        } else {
+            $container = self::$container;
+        }
+
+        if (!$container) {
+            throw new \Exception('Unable to load container');
+        }
+
+        return $container;
+    }
+
+    /**
+     * @return \Doctrine\ODM\MongoDB\DocumentManager
+     */
+    protected function getDocumentManager($fromClient = false)
+    {
+        $container = $this->getContainer($fromClient);
+
+        /** @var \Doctrine\ODM\MongoDB\DocumentManager $dm */
+        $dm = $container->get('doctrine_mongodb.odm.default_document_manager');
+
+        return $dm;
+    }
+
+    protected function getClientResponse()
+    {
+        $this->assertNotNull(self::$client->getResponse());
+        return self::$client->getResponse() ? self::$client->getResponse() : null;
+    }
+
+    protected function getClientResponseContent()
+    {
+        return $this->getClientResponse() ? $this->getClientResponse()->getContent() : null;
+    }
+
+    protected function isClientResponseRedirect($location = null)
+    {
+        if ($this->getClientResponse()) {
+            return $this->getClientResponse()->isRedirect($location);
+        }
+
+        return null;
+    }
+
+    protected function getClientResponseStatusCode()
+    {
+        if ($this->getClientResponse()) {
+            return $this->getClientResponse()->getStatusCode();
+        }
+
+        return null;
+    }
+
+    protected function getClientResponseTargetUrl()
+    {
+        if ($this->getClientResponse()) {
+            return $this->getClientResponse()->getTargetUrl();
+        }
+
+        return null;
     }
 }

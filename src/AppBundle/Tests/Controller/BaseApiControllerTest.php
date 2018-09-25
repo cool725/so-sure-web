@@ -3,6 +3,7 @@
 namespace AppBundle\Tests\Controller;
 
 use AppBundle\Document\PostcodeTrait;
+use AppBundle\Service\JudopayService;
 use CensusBundle\Document\Postcode;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -114,15 +115,18 @@ class BaseApiControllerTest extends BaseControllerTest
     protected function payPolicy($user, $policyId, $amount = null, $date = null)
     {
         // Reload user to get address
-        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $dm = $this->getDocumentManager(true);
         $userRepo = $dm->getRepository(User::class);
+        /** @var User $user */
         $user = $userRepo->find($user->getId());
 
         $policyRepo = $dm->getRepository(SalvaPhonePolicy::class);
+        /** @var SalvaPhonePolicy $policy */
         $policy = $policyRepo->find($policyId);
 
         if ($amount) {
-            $judopay = self::$client->getContainer()->get('app.judopay');
+            /** @var JudopayService $judopay */
+            $judopay = $this->getContainer(true)->get('app.judopay');
             $payDetails = $judopay->testPayDetails(
                 $user,
                 $policyId,
@@ -149,7 +153,9 @@ class BaseApiControllerTest extends BaseControllerTest
         
         $this->assertNotNull($policy->getUser());
         $this->assertNotNull($policy->getUser()->getBillingAddress());
-        $this->assertNotNull($policy->getUser()->getBillingAddress()->getLine1());
+        if ($policy->getUser()->getBillingAddress()) {
+            $this->assertNotNull($policy->getUser()->getBillingAddress()->getLine1());
+        }
         /*
         $url = sprintf("/api/v1/auth/policy/%s/pay", $policyId);
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['bank_account' => [
@@ -199,8 +205,9 @@ class BaseApiControllerTest extends BaseControllerTest
 
         $amount = null;
         if ($real) {
-            $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+            $dm = $this->getDocumentManager(true);
             $policyRepo = $dm->getRepository(SalvaPhonePolicy::class);
+            /** @var SalvaPhonePolicy $payerPolicy */
             $payerPolicy = $policyRepo->find($payerPolicyId);
             $amount = $payerPolicy->getPremium()->getMonthlyPremiumPrice();
         }
@@ -240,11 +247,13 @@ class BaseApiControllerTest extends BaseControllerTest
         $getData = $this->verifyResponse(200);
 
         // Verify payee data
-        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $dm = $this->getDocumentManager(true);
         $policyRepo = $dm->getRepository(SalvaPhonePolicy::class);
+        /** @var SalvaPhonePolicy $payeePolicy */
         $payeePolicy = $policyRepo->find($payeePolicyId);
         $this->assertEquals(Policy::STATUS_MULTIPAY_REQUESTED, $payeePolicy->getStatus());
         $userRepo = $dm->getRepository(User::class);
+        /** @var User $updatedPayerUser */
         $updatedPayerUser = $userRepo->find($payerUser->getId());
         $this->assertEquals(1, count($updatedPayerUser->getMultiPays()));
         $multipay = $updatedPayerUser->getMultiPays()[0];
@@ -270,8 +279,6 @@ class BaseApiControllerTest extends BaseControllerTest
 
     public static function populateYearlyPostcodes()
     {
-        $pca = self::$client->getContainer()->get('app.address');
-        $redis = self::$client->getContainer()->get('snc_redis.default');
         foreach (SoSure::$yearlyOnlyPostcodes as $postcode) {
             $postcode = new Postcode();
             $postcode->setPostcode(PostcodeTrait::normalizePostcode($postcode));
