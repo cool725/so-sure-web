@@ -155,10 +155,7 @@ class ApiControllerTest extends BaseApiControllerTest
         $data = $this->verifyResponse(200);
 
         // For some reason, querying with the same client/dm is not updating getting the latest record
-        $client = static::createClient();
-        if (!$client->getContainer()) {
-            throw new \Exception('unable to find container');
-        }
+        self::$client = static::createClient();
         $dm = $this->getDocumentManager(true);
         $repo = $dm->getRepository(User::class);
         /** @var User $user */
