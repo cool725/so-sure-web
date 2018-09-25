@@ -172,8 +172,7 @@ class BaseControllerTest extends WebTestCase
         $expectedLocation = null,
         $loginLocation = null,
         $expectedHttpCode = 200
-    )
-    {
+    ) {
         if (!$loginLocation) {
             $this->logout();
             $loginLocation = '/login';
