@@ -15,6 +15,8 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
  * Test when a user needs to login to get a token issued, they go to the right place
  *
  * NOTE: This is an event being run by a human, clicking links. Not an API call.
+ *
+ * @group functional-nonet
  */
 class OauthLoginTest extends WebTestCase
 {

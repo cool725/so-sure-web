@@ -15,6 +15,8 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
  * Test access and failures, with codes for automated access by another machine
  *
  * How the exceptions are gonna get changed is a different problem....
+ *
+ * @group functional-nonet
  */
 class ApiOauth2Test extends WebTestCase
 {
