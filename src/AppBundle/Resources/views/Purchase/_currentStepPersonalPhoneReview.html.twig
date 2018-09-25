@@ -6,7 +6,7 @@
 }}) }}
 
     <div class="form-group payment-options {% if form_errors(purchase_form.amount) %}has-error{% endif %}">
-        <h4 class="payment-options__title text-blue2 mb-3">How would you like to pay?</h4>
+        <h4 class="payment-options__title text-dodger-blue mb-3">How would you like to pay?</h4>
         <div class="radio-btn-original">
             {{ form_label(purchase_form.amount, 'Payment options') }}
             {{ form_widget(purchase_form.amount) }}
@@ -42,7 +42,7 @@
         {{ form_label(purchase_form.imei, 'IMEI Number:', { 'label_attr': {'class': 'sr-only'} }) }}
         <label for="purchase_form[imei]">
             IMEI Number:
-            <span class="ml-2 text-blue2">
+            <span class="ml-2 text-dodger-blue">
                 <a href="#"
                    data-toggle="modal"
                    data-target="#policy_imei_number"
@@ -67,7 +67,7 @@
             {{ form_label(purchase_form.serialNumber, 'Serial Number:', { 'label_attr': {'class': 'sr-only'} }) }}
             <label for="purchase_form[serialNumber]">
                 Serial Number:
-                <span class="ml-2 text-blue2">
+                <span class="ml-2 text-dodger-blue">
                     <a href="#"
                        data-toggle="modal"
                        data-target="#policy_serial_number"
@@ -91,7 +91,7 @@
     </div>
 
     <div class="form-group">
-        <h4 class="text-blue2 mt-5 mb-3">Please confirm that the following are correct:</h4>
+        <h4 class="text-dodger-blue mt-5 mb-3">Please confirm that the following are correct:</h4>
         <ul class="pl-4 form-text">
             <li>My phone is in full working condition and the screen is not damaged</li>
             <li>I am 18 years of age or over</li>

@@ -24,22 +24,20 @@
 // TODO: We're removing button gradient fallback to primary
 .btn-gradient {
     border: none;
-    @include blue-gradient-ld;
+    @include blue-gradient;
 
     &:hover {
-        @include linear-gradient(90deg, $columbia-blue-e, $crayon-blue);
+        @include linear-gradient(100deg, $deep-sky-blue-b, $crayon-blue);
     }
 }
 
 // Add gradient to button rather than modifying the core css
 .btn-gradient-green {
     border: none;
-    background-color: $ufo-green;
-    // @include linear-gradient(90deg, $ufo-green, $ufo-green);
+    @include linear-gradient(90deg, $islamic-green, $ufo-green);
 
     &:hover {
-        // @include linear-gradient(90deg, $ufo-green, $ufo-green);
-        background-color: darken($ufo-green, 10%);
+        @include linear-gradient(90deg, $ufo-green, $islamic-green);
     }
 }
 
