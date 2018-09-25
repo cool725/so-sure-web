@@ -5571,6 +5571,9 @@ class ApiAuthControllerTest extends BaseApiControllerTest
      */
     private function getRedis()
     {
-        return $this->getContainer(true)->get('snc_redis.default');
+        /** @var Client $redis */
+        $redis = $this->getContainer(true)->get('snc_redis.default');
+
+        return $redis;
     }
 }
