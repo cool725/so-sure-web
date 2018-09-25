@@ -113,13 +113,13 @@ class ApiAuthControllerUserEmailTest extends BaseApiControllerTest
         ));
         $this->assertEquals(
             200,
-            self::$client->getResponse()->getStatusCode(),
+            $this->getClientResponseStatusCode(),
             'Possible underlying indication that the UserChanged Event was fired'
         );
         $data = $this->verifyResponse(200);
         $this->assertEquals(mb_strtolower(self::generateEmail('testUserCreateNoChangeEmail', $this)), $data['email']);
 
-        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $dm = $this->getDocumentManager(true);
         $userRepo = $dm->getRepository(User::class);
         $user = $userRepo->findOneBy(['email' => self::generateEmail('testUserCreateNoChangeEmail', $this)]);
         $this->assertTrue($user !== null);

@@ -1,0 +1,53 @@
+{{ form_start(purchase_form, {'attr': {
+    'data-toggle': 'validator',
+    'class': 'validate-form form-400',
+    'data-client-validation': form_client_validation,
+    'autocomplete': 'off'
+}}) }}
+
+    {% include 'AppBundle::Purchase/_purchaseStepsRebrand.html.twig' %}
+
+    <h2 class="text-blue2 text-center">Pledge of Honesty</h2>
+    <h6 class="text-center mb-4">Before you continue to payment...</h6>
+
+    <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_contract.png" alt="so-sure - contract" width="200px" class="mx-auto d-block">
+
+    <div class="pledge-items">
+        <div class="form-group">
+            {{ form_widget(purchase_form.agreedDamage, {
+                'label': 'My phone is in working condition & the screen is not cracked',
+                'attr': {'class':'custom-control-input'}}
+            ) }}
+            <div class="with-errors">{{ form_errors(purchase_form.agreedDamage) }}</div>
+        </div>
+        <div class="form-group">
+            {{ form_widget(purchase_form.agreedAgeLocation, {
+                'label': 'I am a resident of the United Kingdom and over the age of 18',
+                'attr': {'class':'custom-control-input'}}
+            ) }}
+            <div class="with-errors">{{ form_errors(purchase_form.agreedAgeLocation) }}</div>
+        </div>
+        <div class="form-group">
+            {% set terms_url = cdn_url ~ '/files/so-sure_sample_policy_doc.pdf' %}
+            {{ form_widget(purchase_form.agreedTerms, {
+                'label': 'I have read & understood the <a href="' ~ terms_url ~  '" target="_blank"><strong class=""><u>so-sure policy document</u></strong></a>',
+                'attr': {'class':'custom-control-input'}}
+            ) }}
+            <div class="with-errors">{{ form_errors(purchase_form.agreedTerms) }}</div>
+        </div>
+    </div>
+
+    <div class="form-group mt-5">
+        <div class="form-row">
+            <div class="col-3">
+                <a href="{{ path('purchase_step_phone_id', {'id': policy.id}) }}"
+                   class="btn btn-outline-grey btn-circle d-flex justify-content-center align-items-center">
+                    <span class="sr-only">back</span>
+                    <i class="far fa-arrow-left"></i>
+                </a>
+            </div>
+            <div class="col-9 text-right">
+                {{ form_widget(purchase_form.next, {'label': 'I swear I\'ll be honest!', 'attr': {'class': 'btn btn-success btn-gradient-green btn-block-xs'}}) }}
+            </div>
+    </div>
+{{ form_end(purchase_form) }}

@@ -53,7 +53,7 @@ class InvitationControllerTest extends BaseControllerTest
         $url = sprintf('/invitation/%s', $invitation->getId());
         $crawler = self::$client->request('GET', $url);
         $data = self::$client->getResponse();
-        $this->assertEquals(200, $data->getStatusCode());
+        $this->assertEquals(200, $this->getClientResponseStatusCode());
         self::verifySearchFormData($crawler->filter('form'), '/phone-insurance/', 1);
     }
 }

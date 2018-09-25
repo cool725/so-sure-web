@@ -1,17 +1,9 @@
 {% extends 'base_rebrand.html.twig' %}
+{% form_theme purchase_form 'AppBundle:Form:fields.html.twig' %}
 
 {# Set vars #}
-{% set use_pca = true %}
 {% set body_class = 'purchase' %}
 {% set quote_mode = 1 %}
-
-{% set showAddress = purchase_form.addressLine1.vars.data | length > 0 or purchase_form.postcode.vars.data | length > 0 %}
-{% set showDOB = purchase_form.name.vars.data | length > 0 and purchase_form.email.vars.data | length > 0 %}
-{% set starling = false %}
-
-{% if app is not null and app.session.isStarted and app.session.get('partner') == 'starling' %}
-    {% set starling = true %}
-{% endif %}
 
 {% block title %}
     {% if phone %}
@@ -113,10 +105,11 @@
                         {% include 'AppBundle::PhoneInsurance/_seeFullDetails.html.twig' %}
                     </div>
 
+
                     {# Curve Mobile #}
                     <svg class="d-block d-lg-none" preserveAspectRatio="xMinYMin meet" viewBox="0 0 750 47" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
                         <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-                            <g id="Artboard-Copy" fill="#0051E8">
+                            <g id="Artboard-Copy" fill="#0068ED">
                                 <path d="M0,0 L750,0 L750,47 C625,18.3333333 500,4 375,4 C250,4 125,18.3333333 0,47 L0,0 Z" id="Rectangle-2"></path>
                             </g>
                         </g>
@@ -137,12 +130,12 @@
 
                 {# Sub Content #}
                 <div class="qpw__sub__container">
-                    <div class="qpw__sub px-4 pb-4 pt-5 p-lg-5 w-100">
-                        {% include 'AppBundle::Purchase/_currentStepPersonalAddress.html.twig' %}
+                    <div class="qpw__sub px-4 pb-4 pt-5 p-lg-5">
+                        {% include 'AppBundle::Purchase/_currentStepPayment.html.twig' %}
                     </div>
                 </div>
 
-            <div id="qpw-info-mobile" class="qpw__info__container__mobile d-block d-lg-none">
+            <div id="qpw-info-mobile" class="qpw__info__container__mobile  d-block d-lg-none">
                 <svg preserveAspectRatio="xMinYMin meet" viewBox="0 0 750 47" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
                     <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
                         <g id="Artboard" fill="#FFFFFF">
@@ -174,5 +167,5 @@
 
 {% block javascriptsPage %}
     <script src="{{ asset('css-js/purchase.js') }}"></script>
-    <script src="{{ asset('css-js/purchase-personal.js') }}"></script>
+    <script src="{{ asset('css-js/purchase-payment.js') }}"></script>
 {% endblock %}
