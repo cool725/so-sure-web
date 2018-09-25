@@ -66,7 +66,7 @@ class SCodeControllerTest extends BaseControllerTest
         $url = sprintf('/scode/%s', $scode->getCode());
         $crawler = self::$client->request('GET', $url);
         self::verifyResponse(302);
-        $this->assertTrue(self::$client->getResponse()->isRedirect('/user/'));
+        $this->assertTrue($this->isClientResponseRedirect('/user/'));
     }
 
     public function testMultibyte()

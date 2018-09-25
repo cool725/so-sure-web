@@ -11,6 +11,9 @@ use AppBundle\Document\Policy;
 use AppBundle\Document\Claim;
 use AppBundle\Document\CurrencyTrait;
 use AppBundle\DataFixtures\MongoDB\b\User\LoadUserData;
+use Symfony\Bundle\SwiftmailerBundle\DataCollector\MessageDataCollector;
+use Symfony\Component\HttpKernel\DataCollector\DataCollector;
+use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
 
 /**
  * @group functional-net
@@ -28,7 +31,8 @@ class AdminEmployeeControllerTest extends BaseControllerTest
     {
         parent::setUp();
         $this->clearRateLimit();
-        self::$dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $dm = $this->getDocumentManager(true);
+        self::$dm = $dm;
     }
 
     public function testDebtCollectorEmails()
@@ -85,6 +89,10 @@ class AdminEmployeeControllerTest extends BaseControllerTest
         self::$client->enableProfiler();
         self::$client->submit($form);
         self::$client->getResponse();
+        if (!self::$client->getProfile()) {
+            throw new \Exception('Profiler must be enabled');
+        }
+        /** @var MessageDataCollector $mailCollector */
         $mailCollector = self::$client->getProfile()->getCollector('swiftmailer');
         $collectedMessages = $mailCollector->getMessages();
         $this->assertContains('Please start the debt collection', $collectedMessages[0]->getBody());

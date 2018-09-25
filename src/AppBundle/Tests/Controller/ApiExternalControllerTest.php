@@ -438,7 +438,7 @@ class ApiExternalControllerTest extends BaseApiControllerTest
             sprintf("%s %s", static::$phone->__toString(), static::$phone->getId())
         );
         $redirectUrl = self::$router->generate('quote_phone', ['id' => static::$phone->getId()]);
-        $this->assertTrue(self::$client->getResponse()->isRedirect($redirectUrl));
+        $this->assertTrue($this->isClientResponseRedirect($redirectUrl));
     }
 
     public function testGoCompareDeeplinkUtm()
@@ -512,6 +512,6 @@ class ApiExternalControllerTest extends BaseApiControllerTest
             sprintf("%s %s", static::$phone->__toString(), static::$phone->getId())
         );
         $redirectUrl = self::$router->generate('quote_phone', ['id' => static::$phone->getId()]);
-        $this->assertTrue(self::$client->getResponse()->isRedirect($redirectUrl));
+        $this->assertTrue($this->isClientResponseRedirect($redirectUrl));
     }
 }

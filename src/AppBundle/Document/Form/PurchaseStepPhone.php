@@ -34,17 +34,6 @@ class PurchaseStepPhone
     protected $fileValid = true;
 
     /**
-     * @Assert\Range(
-     *      min = 1,
-     *      max = 200,
-     *      minMessage = "You must select monthly or annual policy payments",
-     *      maxMessage = "You must select monthly or annual policy payments"
-     * )
-     * @Assert\NotNull(message="You must select monthly or annual policy payments")
-     */
-    protected $amount;
-
-    /**
      * @var string
      * @AppAssert\Imei()
      * @Assert\NotBlank(message="IMEI is required.")
@@ -60,15 +49,7 @@ class PurchaseStepPhone
      * @Assert\NotBlank(message="Serial Number is required.")
      */
     protected $serialNumber;
-
-    /**
-     * @var string
-     * @Assert\IsTrue(message="You must agree to our terms")
-     */
-    protected $agreed;
-
-    protected $new;
-
+    
     public function getPhone()
     {
         return $this->phone;
@@ -99,22 +80,6 @@ class PurchaseStepPhone
         $this->user = $user;
     }
 
-    public function getAmount()
-    {
-        return $this->amount;
-    }
-
-    public function setAmount($amount)
-    {
-        $additionalPremium = $this->getUser()->getAdditionalPremium();
-        $price = $this->getPhone()->getCurrentPhonePrice();
-        if (!$this->areEqualToTwoDp($amount, $price->getMonthlyPremiumPrice($additionalPremium)) &&
-            !$this->areEqualToTwoDp($amount, $price->getYearlyPremiumPrice($additionalPremium))) {
-            throw new \InvalidArgumentException(sprintf('Amount must be a monthly or annual figure'));
-        }
-        $this->amount = $amount;
-    }
-
     public function getImei()
     {
         return $this->imei;
@@ -128,16 +93,6 @@ class PurchaseStepPhone
         }
     }
 
-    public function getNew()
-    {
-        return $this->new;
-    }
-
-    public function setNew($new)
-    {
-        $this->new = $new;
-    }
-
     public function getSerialNumber()
     {
         return $this->serialNumber;
@@ -146,25 +101,6 @@ class PurchaseStepPhone
     public function setSerialNumber($serialNumber)
     {
         $this->serialNumber = str_replace(' ', '', $serialNumber);
-    }
-    
-    public function setAgreed($agreed)
-    {
-        $this->agreed = $agreed;
-    }
-
-    public function isAgreed()
-    {
-        return $this->agreed;
-    }
-
-    public function allowedAmountChange()
-    {
-        if ($this->getNew()) {
-            return true;
-        }
-
-        return !$this->isAgreed();
     }
 
     public function getFile()

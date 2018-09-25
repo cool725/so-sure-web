@@ -82,7 +82,8 @@
                                 <h4 class="text-blue1">An amazing level of cover:</h4>
                                 <ul class="list-unstyled icn-fa-list">
                                     <li class="text-white mb-2"><i class="far fa-check text-blue1 fa-lg"></i> Cracked Screens, Theft, Loss and much more</li>
-                                    <li class="text-white mb-2"><i class="far fa-check text-blue1 fa-lg"></i> Instant Cover and 24/7 live support</li><li class="text-white"><i class="far fa-check text-blue1 fa-lg"></i> 24-72 replacement phone once claim approved</li>
+                                    <li class="text-white mb-2"><i class="far fa-check text-blue1 fa-lg"></i> Instant Cover and 24/7 live support</li>
+                                    <li class="text-white mb-2"><i class="far fa-check text-blue1 fa-lg"></i> 24-72 replacement phone once claim approved</li>
                                 </ul>
                             </div>
                             <div class="qpw__footer__cta">
@@ -108,7 +109,7 @@
                     {# Curve Mobile #}
                     <svg class="d-block d-lg-none" preserveAspectRatio="xMinYMin meet" viewBox="0 0 750 47" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
                         <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-                            <g id="Artboard-Copy" fill="#0051E8">
+                            <g id="Artboard-Copy" fill="#0068ED">
                                 <path d="M0,0 L750,0 L750,47 C625,18.3333333 500,4 375,4 C250,4 125,18.3333333 0,47 L0,0 Z" id="Rectangle-2"></path>
                             </g>
                         </g>
@@ -130,8 +131,7 @@
                 {# Sub Content #}
                 <div class="qpw__sub__container">
                     <div class="qpw__sub px-4 pb-4 pt-5 p-lg-5">
-                        {% include 'AppBundle::Purchase/_purchaseStepsRebrand.html.twig' %}
-                        {% include 'AppBundle::Purchase/_currentStepPersonalPhoneReview.html.twig' %}
+                        {% include 'AppBundle::Purchase/_currentStepPledge.html.twig' %}
                     </div>
                 </div>
 
@@ -167,4 +167,5 @@
 
 {% block javascriptsPage %}
     <script src="{{ asset('css-js/purchase.js') }}"></script>
+    <script src="{{ asset('css-js/purchase-pledge.js') }}"></script>
 {% endblock %}

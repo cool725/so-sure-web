@@ -626,8 +626,9 @@ class UserControllerTest extends BaseControllerTest
         $crawler = self::$client->submit($form);
         self::verifyResponse(302);
 
-        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $dm = $this->getDocumentManager(true);
         $repo = $dm->getRepository(Policy::class);
+        /** @var PhonePolicy $updatedRenewalPolicy */
         $updatedRenewalPolicy = $repo->find($renewalPolicy->getId());
         $this->assertEquals(Policy::STATUS_RENEWAL, $updatedRenewalPolicy->getStatus());
     }
@@ -668,8 +669,9 @@ class UserControllerTest extends BaseControllerTest
         $crawler = self::$client->submit($form);
         self::verifyResponse(302);
 
-        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $dm = $this->getDocumentManager(true);
         $repo = $dm->getRepository(Policy::class);
+        /** @var PhonePolicy $updatedRenewalPolicy */
         $updatedRenewalPolicy = $repo->find($renewalPolicy->getId());
         $this->assertEquals(Policy::STATUS_RENEWAL, $updatedRenewalPolicy->getStatus());
     }
@@ -710,8 +712,9 @@ class UserControllerTest extends BaseControllerTest
         $crawler = self::$client->submit($form);
         self::verifyResponse(302);
 
-        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $dm = $this->getDocumentManager(true);
         $repo = $dm->getRepository(Policy::class);
+        /** @var PhonePolicy $updatedRenewalPolicy */
         $updatedRenewalPolicy = $repo->find($renewalPolicy->getId());
         $this->assertEquals(Policy::STATUS_DECLINED_RENEWAL, $updatedRenewalPolicy->getStatus());
         $this->assertNull($updatedRenewalPolicy->getPreviousPolicy()->getCashback());
@@ -776,8 +779,9 @@ class UserControllerTest extends BaseControllerTest
         $crawler = self::$client->submit($form);
         self::verifyResponse(302);
 
-        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $dm = $this->getDocumentManager(true);
         $repo = $dm->getRepository(Policy::class);
+        /** @var PhonePolicy $updatedRenewalPolicyA */
         $updatedRenewalPolicyA = $repo->find($renewalPolicyA->getId());
         $this->assertEquals(Policy::STATUS_RENEWAL, $updatedRenewalPolicyA->getStatus());
         $this->assertNotNull($updatedRenewalPolicyA->getPreviousPolicy()->getCashback());
@@ -839,8 +843,9 @@ class UserControllerTest extends BaseControllerTest
         $crawler = self::$client->submit($form);
         self::verifyResponse(302);
 
-        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $dm = $this->getDocumentManager(true);
         $repo = $dm->getRepository(Policy::class);
+        /** @var PhonePolicy $updatedRenewalPolicyA */
         $updatedRenewalPolicyA = $repo->find($renewalPolicyA->getId());
         $this->assertEquals(Policy::STATUS_DECLINED_RENEWAL, $updatedRenewalPolicyA->getStatus());
         $this->assertNotNull($updatedRenewalPolicyA->getPreviousPolicy()->getCashback());
@@ -907,21 +912,21 @@ class UserControllerTest extends BaseControllerTest
         self::verifyResponse(200);
         $this->assertContains(
             "'has_visited_welcome_page': false",
-            self::$client->getResponse()->getContent()
+            $this->getClientResponseContent()
         );
         // set after first show to true
         self::$client->request('GET', $welcomePage);
         self::verifyResponse(200);
         $this->assertContains(
             "'has_visited_welcome_page': true",
-            self::$client->getResponse()->getContent()
+            $this->getClientResponseContent()
         );
         // consistent after repeated show
         self::$client->request('GET', $welcomePage);
         self::verifyResponse(200);
         $this->assertContains(
             "'has_visited_welcome_page': true",
-            self::$client->getResponse()->getContent()
+            $this->getClientResponseContent()
         );
     }
 
@@ -966,12 +971,12 @@ class UserControllerTest extends BaseControllerTest
         //always expecting latest policy to be policy number2
         $this->assertContains(
             $user->getLatestPolicy()->getId(),
-            self::$client->getResponse()->getContent()
+            $this->getClientResponseContent()
         );
         // initial flag is false
         $this->assertContains(
             "'has_visited_welcome_page': false",
-            self::$client->getResponse()->getContent()
+            $this->getClientResponseContent()
         );
 
         // set after first show to true
@@ -979,11 +984,11 @@ class UserControllerTest extends BaseControllerTest
         self::verifyResponse(200);
         $this->assertContains(
             $user->getLatestPolicy()->getId(),
-            self::$client->getResponse()->getContent()
+            $this->getClientResponseContent()
         );
         $this->assertContains(
             "'has_visited_welcome_page': true",
-            self::$client->getResponse()->getContent()
+            $this->getClientResponseContent()
         );
 
         // consistent after repeated show
@@ -991,11 +996,11 @@ class UserControllerTest extends BaseControllerTest
         self::verifyResponse(200);
         $this->assertContains(
             $user->getLatestPolicy()->getId(),
-            self::$client->getResponse()->getContent()
+            $this->getClientResponseContent()
         );
         $this->assertContains(
             "'has_visited_welcome_page': true",
-            self::$client->getResponse()->getContent()
+            $this->getClientResponseContent()
         );
 
         // consistent after repeated show
@@ -1003,11 +1008,11 @@ class UserControllerTest extends BaseControllerTest
         self::verifyResponse(200);
         $this->assertNotContains(
             $user->getFirstPolicy()->getId(),
-            self::$client->getResponse()->getContent()
+            $this->getClientResponseContent()
         );
         $this->assertContains(
             "'has_visited_welcome_page': true",
-            self::$client->getResponse()->getContent()
+            $this->getClientResponseContent()
         );
 
     }
@@ -1756,7 +1761,7 @@ class UserControllerTest extends BaseControllerTest
         if ($expectNoAdditionalClaimAllowed) {
             $this->assertNotContains(
                 'data-active="claimfnol-confirm"',
-                self::$client->getResponse()->getContent()
+                $this->getClientResponseContent()
             );
             $this->expectFlashError($crawler, 'unable to accept an additional claim');
 
@@ -1765,7 +1770,7 @@ class UserControllerTest extends BaseControllerTest
 
         $this->assertContains(
             'data-active="claimfnol-confirm"',
-            self::$client->getResponse()->getContent()
+            $this->getClientResponseContent()
         );
 
         $form = $crawler->selectButton('claim_confirm_form[submit]')->form();
@@ -1789,7 +1794,7 @@ class UserControllerTest extends BaseControllerTest
         $crawler = self::$client->submit($form);
 
         self::verifyResponse(302);
-        $this->assertTrue(self::$client->getResponse()->isRedirect(sprintf('/user/claim/%s', $policy->getId())));
+        $this->assertTrue($this->isClientResponseRedirect(sprintf('/user/claim/%s', $policy->getId())));
 
         $updatedPolicy = $this->assertPolicyByIdExists(self::$client->getContainer(), $policy->getId());
         $updatedClaim = $updatedPolicy->getLatestClaim();
@@ -1876,7 +1881,7 @@ class UserControllerTest extends BaseControllerTest
         //print $crawler->html();
 
         self::verifyResponse(302);
-        $this->assertTrue(self::$client->getResponse()->isRedirect(sprintf('/user/claim/%s', $policy->getId())));
+        $this->assertTrue($this->isClientResponseRedirect(sprintf('/user/claim/%s', $policy->getId())));
 
         $claimPage = self::$router->generate('claimed_submitted_policy', ['policyId' => $policy->getId()]);
         $crawler = self::$client->request('GET', $claimPage);
@@ -1884,7 +1889,7 @@ class UserControllerTest extends BaseControllerTest
 
         $this->assertContains(
             "Thank you for submitting your claim",
-            self::$client->getResponse()->getContent()
+            $this->getClientResponseContent()
         );
 
         /** @var Policy $updatedPolicy */
@@ -1976,7 +1981,7 @@ class UserControllerTest extends BaseControllerTest
         //print $crawler->html();
 
         self::verifyResponse(302);
-        $this->assertTrue(self::$client->getResponse()->isRedirect(sprintf('/user/claim/%s', $policy->getId())));
+        $this->assertTrue($this->isClientResponseRedirect(sprintf('/user/claim/%s', $policy->getId())));
 
         $claimPage = self::$router->generate('claimed_submitted_policy', ['policyId' => $policy->getId()]);
         $crawler = self::$client->request('GET', $claimPage);
@@ -1984,7 +1989,7 @@ class UserControllerTest extends BaseControllerTest
 
         $this->assertContains(
             "Thank you for submitting your claim",
-            self::$client->getResponse()->getContent()
+            $this->getClientResponseContent()
         );
 
         /** @var Policy $updatedPolicy */
@@ -2047,7 +2052,7 @@ class UserControllerTest extends BaseControllerTest
         $crawler = self::$client->submit($form);
 
         self::verifyResponse(302);
-        $this->assertTrue(self::$client->getResponse()->isRedirect(sprintf('/user/claim/%s', $policy->getId())));
+        $this->assertTrue($this->isClientResponseRedirect(sprintf('/user/claim/%s', $policy->getId())));
 
         $claimPage = self::$router->generate('claimed_submitted_policy', ['policyId' => $policy->getId()]);
         $crawler = self::$client->request('GET', $claimPage);
@@ -2117,7 +2122,7 @@ class UserControllerTest extends BaseControllerTest
         $crawler = self::$client->submit($form);
 
         self::verifyResponse(302);
-        $this->assertTrue(self::$client->getResponse()->isRedirect(sprintf('/user/claim/%s', $policy->getId())));
+        $this->assertTrue($this->isClientResponseRedirect(sprintf('/user/claim/%s', $policy->getId())));
 
         $claimPage = self::$router->generate('claimed_submitted_policy', ['policyId' => $policy->getId()]);
         $crawler = self::$client->request('GET', $claimPage);

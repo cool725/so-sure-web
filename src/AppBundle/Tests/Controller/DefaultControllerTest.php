@@ -6,11 +6,13 @@ use AppBundle\Classes\SoSure;
 use AppBundle\Document\Opt\EmailOptIn;
 use AppBundle\Document\Opt\EmailOptOut;
 use AppBundle\Document\PhonePrice;
+use Predis\Client;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\User;
 use AppBundle\Document\Phone;
 use AppBundle\Document\Lead;
 use AppBundle\Document\Policy;
+use Symfony\Bundle\SwiftmailerBundle\DataCollector\MessageDataCollector;
 use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 
 /**
@@ -34,9 +36,9 @@ class DefaultControllerTest extends BaseControllerTest
     {
         $crawler = self::$client->request('GET', '/');
         self::verifyResponse(200);
-        $tag = self::$client->getContainer()->getParameter('ga_tag_manager_env');
-        $body = self::$client->getResponse()->getContent();
-        
+        $tag = $this->getContainer(true)->getParameter('ga_tag_manager_env');
+        $body = $this->getClientResponseContent();
+
         // Not a perfect test, but unable to test js code via symfony client
         // This should at least detect if the custom tag manager code environment was accidental removed
         $this->assertTrue(mb_stripos($body, $tag) !== false);
@@ -94,7 +96,7 @@ class DefaultControllerTest extends BaseControllerTest
 
         $crawler = self::$client->request('GET', $url);
         self::verifyResponse(301);
-        $this->assertTrue(self::$client->getResponse()->isRedirect($redirectUrl), json_encode($crawler->html()));
+        $this->assertTrue($this->isClientResponseRedirect($redirectUrl), json_encode($crawler->html()));
         $crawler = self::$client->followRedirect();
         self::verifyResponse(200);
     }
@@ -121,7 +123,7 @@ class DefaultControllerTest extends BaseControllerTest
 
         $crawler = self::$client->request('GET', $url);
         self::verifyResponse(301);
-        $this->assertTrue(self::$client->getResponse()->isRedirect($redirectUrl), $crawler->html());
+        $this->assertTrue($this->isClientResponseRedirect($redirectUrl), $crawler->html());
         $crawler = self::$client->followRedirect();
         self::verifyResponse(200);
     }
@@ -142,7 +144,7 @@ class DefaultControllerTest extends BaseControllerTest
         $price = $phone->getCurrentPhonePrice();
         $this->assertContains(
             sprintf("&pound;%.2f", $price->getMonthlyPremiumPrice()),
-            self::$client->getResponse()->getContent()
+            $this->getClientResponseContent()
         );
     }
 
@@ -157,7 +159,7 @@ class DefaultControllerTest extends BaseControllerTest
         self::verifyResponse(200);
         $this->assertContains(
             "valid UK Mobile Number",
-            self::$client->getResponse()->getContent()
+            $this->getClientResponseContent()
         );
     }
 
@@ -177,38 +179,35 @@ class DefaultControllerTest extends BaseControllerTest
         self::verifyResponse(200);
         $this->assertContains(
             "already sent you a link",
-            self::$client->getResponse()->getContent()
+            $this->getClientResponseContent()
         );
     }
     public function testPhoneSearchVSGadget()
     {
         $crawler = self::$client->request('GET', '/so-sure-vs-gadget-cover-phone-insurance');
         $data = self::$client->getResponse();
-        $this->assertEquals(200, $data->getStatusCode());
+        $this->assertEquals(200, $this->getClientResponseStatusCode());
         self::verifySearchFormData($crawler->filter('form'), '/phone-insurance/', 1);
     }
 
     public function testPhoneSearchVSHalifax()
     {
         $crawler = self::$client->request('GET', '/so-sure-vs-halifax-phone-insurance');
-        $data = self::$client->getResponse();
-        $this->assertEquals(200, $data->getStatusCode());
+        $this->assertEquals(200, $this->getClientResponseStatusCode());
         self::verifySearchFormData($crawler->filter('form'), '/phone-insurance/', 1);
     }
 
     public function testPhoneSearchVSThree()
     {
         $crawler = self::$client->request('GET', '/so-sure-vs-three-phone-insurance');
-        $data = self::$client->getResponse();
-        $this->assertEquals(200, $data->getStatusCode());
+        $this->assertEquals(200, $this->getClientResponseStatusCode());
         self::verifySearchFormData($crawler->filter('form'), '/phone-insurance/', 1);
     }
 
     public function testPhoneSearchHomepage()
     {
         $crawler = self::$client->request('GET', '/');
-        $data = self::$client->getResponse();
-        $this->assertEquals(200, $data->getStatusCode());
+        $this->assertEquals(200, $this->getClientResponseStatusCode());
         $this->assertHasFormAction($crawler, '/select-phone-dropdown');
     }
 
@@ -246,13 +245,16 @@ class DefaultControllerTest extends BaseControllerTest
         $form = $crawler->selectButton('form[decline]')->form();
         $form['form[email]'] = $email2;
         $crawler = self::$client->submit($form);
-        self::$client->getResponse();
-        $mailCollector = self::$client->getProfile()->getCollector('swiftmailer');
-        $collectedMessages = $mailCollector->getMessages();
-        $this->assertCount(1, $collectedMessages);
-        $collectedMessages = $mailCollector->getMessages();
-        $this->assertCount(1, $collectedMessages);
-        $this->assertContains('manage your communication preferences', $collectedMessages[0]->getBody());
+        $this->assertNotNull(self::$client->getProfile());
+        if (self::$client->getProfile()) {
+            /** @var MessageDataCollector $mailCollector */
+            $mailCollector = self::$client->getProfile()->getCollector('swiftmailer');
+            $collectedMessages = $mailCollector->getMessages();
+            $this->assertCount(1, $collectedMessages);
+            $collectedMessages = $mailCollector->getMessages();
+            $this->assertCount(1, $collectedMessages);
+            $this->assertContains('manage your communication preferences', $collectedMessages[0]->getBody());
+        }
     }
 
     public function testOptInEmailHash()
@@ -312,7 +314,7 @@ class DefaultControllerTest extends BaseControllerTest
         $this->login($email, $password);
         $crawler = self::$client->request('GET', $claimPage);
         self::verifyResponse(302);
-        $this->assertTrue(self::$client->getResponse()->isRedirect(sprintf('/user/claim')));
+        $this->assertTrue($this->isClientResponseRedirect(sprintf('/user/claim')));
     }
 
     public function testClaimUserNotFound()
@@ -406,7 +408,7 @@ class DefaultControllerTest extends BaseControllerTest
         $this->login($email, $password);
         $crawler = self::$client->request('GET', $claimPage);
         self::verifyResponse(302);
-        $this->assertTrue(self::$client->getResponse()->isRedirect(sprintf('/user/claim')));
+        $this->assertTrue($this->isClientResponseRedirect(sprintf('/user/claim')));
     }
 
     public function testClaimLoginInvalid()
@@ -427,7 +429,7 @@ class DefaultControllerTest extends BaseControllerTest
         $crawler = self::$client->request('GET', $claimPage);
         
         self::verifyResponse(302);
-        $this->assertTrue(self::$client->getResponse()->isRedirect(sprintf('/claim')));
+        $this->assertTrue($this->isClientResponseRedirect(sprintf('/claim')));
     }
 
     public function testClaimLoginValid()
@@ -443,13 +445,14 @@ class DefaultControllerTest extends BaseControllerTest
             self::$dm
         );
 
-        $redis = self::$client->getContainer()->get('snc_redis.default');
+        /** @var Client $redis */
+        $redis = $this->getContainer(true)->get('snc_redis.default');
         $token = md5(sprintf('%s%s', time(), $email));
         $redis->setex($token, 900, $user->getId());
 
         $claimPage = self::$router->generate('claim_login_token', ['tokenId' => $token]);
         $crawler = self::$client->request('GET', $claimPage);
         self::verifyResponse(302);
-        $this->assertTrue(self::$client->getResponse()->isRedirect(sprintf('/user/claim')));
+        $this->assertTrue($this->isClientResponseRedirect(sprintf('/user/claim')));
     }
 }

@@ -23,8 +23,7 @@ class PhoneInsuranceControllerTest extends BaseControllerTest
     public function testPhoneSearchPhoneInsuranceByPhoneName()
     {
         $crawler = self::$client->request('GET', '/phone-insurance/apple+iphone+7');
-        $data = self::$client->getResponse();
-        $this->assertEquals(200, $data->getStatusCode());
+        $this->assertEquals(200, $this->getClientResponseStatusCode());
         $this->assertHasFormAction($crawler, '/select-phone-dropdown');
     }
 
@@ -41,11 +40,10 @@ class PhoneInsuranceControllerTest extends BaseControllerTest
             $phone->getMemory()
         );
         $crawler = self::$client->request('GET', $url);
-        $data = self::$client->getResponse();
 
         // should be redirected to redirect url
-        $this->assertEquals(301, $data->getStatusCode());
-        $this->assertEquals($redirectUrl, $data->getTargetUrl());
+        $this->assertEquals(301, $this->getClientResponseStatusCode());
+        $this->assertEquals($redirectUrl, $this->getClientResponseTargetUrl());
         $crawler = self::$client->followRedirect();
 
         $this->assertHasFormAction($crawler, '/select-phone-dropdown');
@@ -53,40 +51,35 @@ class PhoneInsuranceControllerTest extends BaseControllerTest
 
     public function testSessionPurchasePhone()
     {
-        $crawler = self::$client->request('GET', '/purchase-phone/apple+iphone+7+32GB');
-        $data = self::$client->getResponse();
+        self::$client->request('GET', '/purchase-phone/apple+iphone+7+32GB');
 
         // should be redirected to redirect url
-        $this->assertEquals(302, $data->getStatusCode());
-        $this->assertEquals('/purchase/', $data->getTargetUrl());
-        $crawler = self::$client->followRedirect();
+        $this->assertEquals(302, $this->getClientResponseStatusCode());
+        $this->assertEquals('/purchase/', $this->getClientResponseTargetUrl());
+        self::$client->followRedirect();
     }
 
     public function testSessionPurchasePhoneHistorical()
     {
-        $crawler = self::$client->request('GET', '/purchase-phone/Apple+iPhone+7+32GB');
-        $data = self::$client->getResponse();
+        self::$client->request('GET', '/purchase-phone/Apple+iPhone+7+32GB');
 
         // should be redirected to redirect url
-        $this->assertEquals(302, $data->getStatusCode());
-        $this->assertEquals('/purchase/', $data->getTargetUrl());
-        $crawler = self::$client->followRedirect();
+        $this->assertEquals(302, $this->getClientResponseStatusCode());
+        $this->assertEquals('/purchase/', $this->getClientResponseTargetUrl());
+        self::$client->followRedirect();
     }
 
     public function testSessionPurchasePhoneNotFound()
     {
-        $crawler = self::$client->request('GET', '/purchase-phone/Apple+p+7+32GB');
-        $data = self::$client->getResponse();
-
-        $this->assertEquals(404, $data->getStatusCode());
+        self::$client->request('GET', '/purchase-phone/Apple+p+7+32GB');
+        $this->assertEquals(404, $this->getClientResponseStatusCode());
     }
 
     public function testPhoneSearchLearnMore()
     {
         $alternate = [];
         $crawler = self::$client->request('GET', '/phone-insurance/Apple+iPhone+7+256GB/learn-more');
-        $data = self::$client->getResponse();
-        $this->assertEquals(200, $data->getStatusCode());
+        $this->assertEquals(200, $this->getClientResponseStatusCode());
         foreach ($crawler->filter('.memory-dropdown')->filter('li')->filter('a') as $li) {
             $link = $li->getAttribute('href');
             if ($link == '#') {
@@ -108,8 +101,7 @@ class PhoneInsuranceControllerTest extends BaseControllerTest
         $phone->setHighlight(true);
         self::$dm->flush();
         $crawler = self::$client->request('GET', '/phone-insurance/Samsung');
-        $data = self::$client->getResponse();
-        $this->assertEquals(200, $data->getStatusCode());
+        $this->assertEquals(200, $this->getClientResponseStatusCode());
         self::verifySearchFormData($crawler->filter('form'), '/phone-insurance/', 2);
     }
 
@@ -122,48 +114,42 @@ class PhoneInsuranceControllerTest extends BaseControllerTest
         $phone->setHighlight(true);
         self::$dm->flush();
         $crawler = self::$client->request('GET', '/insure/Samsung');
-        $data = self::$client->getResponse();
-        $this->assertEquals(200, $data->getStatusCode());
+        $this->assertEquals(200, $this->getClientResponseStatusCode());
         self::verifySearchFormData($crawler->filter('form'), '/phone-insurance/', 2);
     }
 
     public function testPhoneSearchInsuranceCrackedScreen()
     {
         $crawler = self::$client->request('GET', '/phone-insurance/cracked-screen');
-        $data = self::$client->getResponse();
-        $this->assertEquals(200, $data->getStatusCode());
+        $this->assertEquals(200, $this->getClientResponseStatusCode());
         self::verifySearchFormData($crawler->filter('form'), '/phone-insurance/', 1);
     }
 
     public function testPhoneSearchInsuranceTheft()
     {
         $crawler = self::$client->request('GET', '/phone-insurance/theft');
-        $data = self::$client->getResponse();
-        $this->assertEquals(200, $data->getStatusCode());
+        $this->assertEquals(200, $this->getClientResponseStatusCode());
         self::verifySearchFormData($crawler->filter('form'), '/phone-insurance/', 1);
     }
 
     public function testPhoneSearchInsuranceWaterDamage()
     {
         $crawler = self::$client->request('GET', '/phone-insurance/water-damage');
-        $data = self::$client->getResponse();
-        $this->assertEquals(200, $data->getStatusCode());
+        $this->assertEquals(200, $this->getClientResponseStatusCode());
         self::verifySearchFormData($crawler->filter('form'), '/phone-insurance/', 1);
     }
 
     public function testPhoneSearchInsuranceBrokenPhone()
     {
         $crawler = self::$client->request('GET', '/phone-insurance/broken-phone');
-        $data = self::$client->getResponse();
-        $this->assertEquals(200, $data->getStatusCode());
+        $this->assertEquals(200, $this->getClientResponseStatusCode());
         self::verifySearchFormData($crawler->filter('form'), '/phone-insurance/', 1);
     }
 
     public function testPhoneSearchInsuranceLost()
     {
         $crawler = self::$client->request('GET', '/phone-insurance/loss');
-        $data = self::$client->getResponse();
-        $this->assertEquals(200, $data->getStatusCode());
+        $this->assertEquals(200, $this->getClientResponseStatusCode());
         self::verifySearchFormData($crawler->filter('form'), '/phone-insurance/', 1);
     }
 }

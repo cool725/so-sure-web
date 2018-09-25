@@ -36,14 +36,19 @@ class FOSUserControllerTest extends BaseControllerTest
         $crawler = self::$client->submit($form);
         self::verifyResponse(302);
         /** @var EventDataCollector $eventDataCollector */
-        $eventDataCollector = self::$client->getProfile()->getCollector('events');
-        $listeners = $eventDataCollector->getCalledListeners();
+        $eventDataCollector = self::$client->getProfile() ?
+            self::$client->getProfile()->getCollector('events') :
+            null;
+        if ($eventDataCollector) {
+            $listeners = $eventDataCollector->getCalledListeners();
+        }
         // @codingStandardsIgnoreStart
         $this->assertTrue(isset($listeners['security.interactive_login.actual.AppBundle\Listener\SecurityListener::onActualSecurityInteractiveLogin']));
         // @codingStandardsIgnoreEnd
 
-        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $dm = $this->getDocumentManager(true);
         $userRepo = $dm->getRepository(User::class);
+        /** @var User $user */
         $user = $userRepo->findOneBy(['emailCanonical' => 'patrick@so-sure.com']);
         $now = new \DateTime();
         $this->assertNotNull($user->getLatestWebIdentityLog());
@@ -72,8 +77,9 @@ class FOSUserControllerTest extends BaseControllerTest
         // allowed complex password - should succeed and redirect
         $this->setPassword($reset['url'], 'foooBarr1!', true);
 
-        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $dm = $this->getDocumentManager(true);
         $userRepo = $dm->getRepository(User::class);
+        /** @var User $updatedUser2 */
         $updatedUser2 = $userRepo->findOneBy(['emailCanonical' => mb_strtolower($email)]);
         $this->assertNotEquals($updatedUser2->getPassword(), $password1);
         $this->assertNotEquals($updatedUser2->getPassword(), $password2);
@@ -130,8 +136,9 @@ class FOSUserControllerTest extends BaseControllerTest
         // allowed complex password - should succeed and redirect
         $this->setPassword($reset['url'], 'foooBarr1!', true);
 
-        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $dm = $this->getDocumentManager(true);
         $userRepo = $dm->getRepository(User::class);
+        /** @var User $updatedUser2 */
         $updatedUser2 = $userRepo->findOneBy(['emailCanonical' => mb_strtolower($email)]);
         $this->assertNotEquals($updatedUser2->getPassword(), $password1);
         $this->assertNotEquals($updatedUser2->getPassword(), $password2);
@@ -187,8 +194,9 @@ class FOSUserControllerTest extends BaseControllerTest
         // allowed complex password - should succeed and redirect
         $this->setPassword($reset['url'], 'foooBarr1!', true);
 
-        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $dm = $this->getDocumentManager(true);
         $userRepo = $dm->getRepository(User::class);
+        /** @var User $updatedUser2 */
         $updatedUser2 = $userRepo->findOneBy(['emailCanonical' => mb_strtolower($email)]);
         $this->assertNotEquals($updatedUser2->getPassword(), $password1);
         $this->assertNotEquals($updatedUser2->getPassword(), $password2);
@@ -302,8 +310,9 @@ class FOSUserControllerTest extends BaseControllerTest
             );
         }
 
-        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $dm = $this->getDocumentManager(true);
         $userRepo = $dm->getRepository(User::class);
+        /** @var User $updatedUser */
         $updatedUser = $userRepo->findOneBy(['emailCanonical' => mb_strtolower($email)]);
         if ($expectSuccess) {
             $this->assertTrue(
