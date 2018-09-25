@@ -93,8 +93,9 @@ class AdminControllerTest extends BaseControllerTest
         $crawler = self::$client->submit($form);
         self::verifyResponse(302);
 
-        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $dm = $this->getDocumentManager(true);
         $repoClaim = $dm->getRepository(Claim::class);
+        /** @var Claim $newClaim */
         $newClaim = $repoClaim->find($claimData['id']);
         $this->assertEquals('2022-01-01', $newClaim->getApprovedDate()->format('Y-m-d'));
     }
@@ -131,14 +132,15 @@ class AdminControllerTest extends BaseControllerTest
         $form['id'] = $claimId;
         self::$client->submit($form);
         self::verifyResponse(302);
-        $this->assertEquals(self::$router->generate('admin_claims'), self::$client->getResponse()->getTargetUrl());
+        $this->assertEquals(self::$router->generate('admin_claims'), $this->getClientResponseTargetUrl());
 
-        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $dm = $this->getDocumentManager(true);
         $claimRepo = $dm->getRepository(Claim::class);
         $this->assertNull($claimRepo->find($claimId));
         $this->assertNull($claimRepo->find($claim->getId()));
 
         $chargeRepo = $dm->getRepository(Charge::class);
+        /** @var Charge $updatedCharge */
         $updatedCharge = $chargeRepo->find($charge->getId());
         $this->assertNull($updatedCharge->getClaim());
     }

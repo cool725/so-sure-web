@@ -31,11 +31,14 @@ class BearerTest extends BaseControllerTest
         self::$client->request('GET', '/bearer-api/v1/ping', []);
 
         $this->assertSame(
-            self::$client->getInternalResponse()->getStatus(),
+            self::$client->getInternalResponse() ? self::$client->getInternalResponse()->getStatus() : null,
             Response::HTTP_UNAUTHORIZED,
             'Going to bearer-api without token should be 401'
         );
-        $this->assertContains('access_denied', self::$client->getInternalResponse()->getContent());
+        $this->assertContains(
+            'access_denied',
+            self::$client->getInternalResponse() ? self::$client->getInternalResponse()->getContent() : null
+        );
     }
 
     public function testFailToAccessApiWithBadToken()
@@ -47,7 +50,7 @@ class BearerTest extends BaseControllerTest
         self::$client->request('GET', '/bearer-api/v1/ping', [], [], $server);
 
         $this->assertSame(
-            self::$client->getInternalResponse()->getStatus(),
+            self::$client->getInternalResponse() ? self::$client->getInternalResponse()->getStatus() : null,
             Response::HTTP_UNAUTHORIZED,
             'Going to bearer-api without token should be 401'
         );
@@ -62,7 +65,7 @@ class BearerTest extends BaseControllerTest
         ];
         self::$client->request('GET', '/bearer-api/v1/ping', $params, [], $headers);
 
-        $content = self::$client->getResponse()->getContent();
+        $content = $this->getClientResponseContent();
 
         $this->assertContains('pong', $content);
         $this->assertJsonStringEqualsJsonString(
@@ -97,9 +100,9 @@ class BearerTest extends BaseControllerTest
         ];
         self::$client->request('GET', '/bearer-api/v1/user', $params, [], $headers);
 
-        $content = self::$client->getResponse()->getContent();
+        $content = $this->getClientResponseContent();
 
-        $this->assertContains('","text":"Expires on ', $content);
+        $this->assertContains('. Expires ', $content);
 
         $summary = json_decode($content, true);
         $this->assertSummaryMatchesUserWithTwoPolicies($summary);

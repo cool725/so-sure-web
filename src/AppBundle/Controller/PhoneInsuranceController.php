@@ -155,7 +155,7 @@ class PhoneInsuranceController extends BaseController
             // Multipolicy should skip user details
             if ($this->getUser() && $this->getUser()->hasPolicy()) {
                 // don't check for partial partial as quote phone may be different from partial policy phone
-                return $this->redirectToRoute('purchase_step_policy');
+                return $this->redirectToRoute('purchase_step_phone');
             } else {
                 return $this->redirectToRoute('purchase');
             }
@@ -364,7 +364,7 @@ class PhoneInsuranceController extends BaseController
                     // Multipolicy should skip user details
                     if ($this->getUser() && $this->getUser()->hasPolicy()) {
                         // don't check for partial partial as quote phone may be different from partial policy phone
-                        return $this->redirectToRoute('purchase_step_policy');
+                        return $this->redirectToRoute('purchase_step_phone');
                     }
 
                     return $this->redirectToRoute('purchase');
@@ -382,7 +382,7 @@ class PhoneInsuranceController extends BaseController
                     // Multipolicy should skip user details
                     if ($this->getUser() && $this->getUser()->hasPolicy()) {
                         // don't check for partial partial as quote phone may be different from partial policy phone
-                        return $this->redirectToRoute('purchase_step_policy');
+                        return $this->redirectToRoute('purchase_step_phone');
                     }
 
                     return $this->redirectToRoute('purchase');
@@ -400,7 +400,7 @@ class PhoneInsuranceController extends BaseController
                     // Multipolicy should skip user details
                     if ($this->getUser() && $this->getUser()->hasPolicy()) {
                         // don't check for partial partial as quote phone may be different from partial policy phone
-                        return $this->redirectToRoute('purchase_step_policy');
+                        return $this->redirectToRoute('purchase_step_phone');
                     } else {
                         return $this->redirectToRoute('purchase');
                     }
@@ -418,7 +418,7 @@ class PhoneInsuranceController extends BaseController
                     // Multipolicy should skip user details
                     if ($this->getUser() && $this->getUser()->hasPolicy()) {
                         // don't check for partial partial as quote phone may be different from partial policy phone
-                        return $this->redirectToRoute('purchase_step_policy');
+                        return $this->redirectToRoute('purchase_step_phone');
                     } else {
                         return $this->redirectToRoute('purchase');
                     }
@@ -436,7 +436,7 @@ class PhoneInsuranceController extends BaseController
                     // Multipolicy should skip user details
                     if ($this->getUser() && $this->getUser()->hasPolicy()) {
                         // don't check for partial partial as quote phone may be different from partial policy phone
-                        return $this->redirectToRoute('purchase_step_policy');
+                        return $this->redirectToRoute('purchase_step_phone');
                     } else {
                         return $this->redirectToRoute('purchase');
                     }

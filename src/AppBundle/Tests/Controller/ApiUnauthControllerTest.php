@@ -46,8 +46,9 @@ class ApiUnauthControllerTest extends BaseApiControllerTest
         $data = $this->verifyResponse(200);
         $this->assertTrue(mb_strlen($data['token']) > 20);
 
-        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $dm = $this->getDocumentManager(true);
         $repo = $dm->getRepository(User::class);
+        /** @var User $updatedUser */
         $updatedUser = $repo->find($user->getId());
         $identityLog = $updatedUser->getLatestMobileIdentityLog();
 
@@ -77,8 +78,9 @@ class ApiUnauthControllerTest extends BaseApiControllerTest
         $data = $this->verifyResponse(200);
         $this->assertTrue(mb_strlen($data['token']) > 20);
 
-        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $dm = $this->getDocumentManager(true);
         $repo = $dm->getRepository(User::class);
+        /** @var User $updatedUser */
         $updatedUser = $repo->find($user->getId());
         $identityLog = $updatedUser->getLatestMobileIdentityLog();
 
