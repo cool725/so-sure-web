@@ -439,7 +439,6 @@ nelmio_security:
                 - https://js.intercomcdn.com
                 - http://widget.trustpilot.com
                 - https://widget.trustpilot.com
-                - fbrpc://call
                 - 'data:'
             connect-src:
                 - 'self'
@@ -1264,6 +1263,7 @@ nelmio_security:
             - campaign.wearesosure.com
             - accounts.google.com
             - blog.wearesosure.com
+            - fbrpc://call
     # forced HTTPS handling, don't combine with flexible mode
     # and make sure you have SSL working on your site before enabling this
     #forced_ssl:
