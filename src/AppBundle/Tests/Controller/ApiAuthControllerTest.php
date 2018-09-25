@@ -5035,7 +5035,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $this->assertNotNull($updatedUser->getJudoPaymentMethod());
         if ($updatedUser->getJudoPaymentMethod()) {
             $this->assertEquals(
-                self::$JUDO_TEST_CARD_LAST_FOUR,
+                self::$JUDO_TEST_CARD2_LAST_FOUR,
                 $updatedUser->getJudoPaymentMethod()->getCardLastFour()
             );
         }
@@ -5571,6 +5571,6 @@ class ApiAuthControllerTest extends BaseApiControllerTest
      */
     private function getRedis()
     {
-        return $this->$this->getContainer(true)->get('snc_redis.default');
+        return $this->getContainer(true)->get('snc_redis.default');
     }
 }

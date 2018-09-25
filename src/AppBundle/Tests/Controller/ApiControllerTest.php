@@ -124,10 +124,7 @@ class ApiControllerTest extends BaseApiControllerTest
         $data = $this->verifyResponse(422, ApiErrorCode::ERROR_USER_SUSPENDED);
 
         // For some reason, querying with the same client/dm is not updating getting the latest record
-        $client = static::createClient();
-        if (!$client->getContainer()) {
-            throw new \Exception('unable to find container');
-        }
+        static::$client = static::createClient();
         /** @var DocumentManager $dm */
         $dm = $this->getDocumentManager(true);
         /** @var UserRepository $repo */
