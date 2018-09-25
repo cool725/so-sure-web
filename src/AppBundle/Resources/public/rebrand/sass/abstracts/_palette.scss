@@ -5,21 +5,6 @@ $white:     #ffffff;
 $lynch:     #687296;
 $dark:     #170B38;
 
-// Blues
-// $blue-x:   #A8D1F7; // //
-// $bb-1:     #E5F4FF; // //
-// $bb-2:     #E0EFFD; // //
-// $blue-1:   #99E3FF; // //
-// $blue-1a:  #00BAFF; // //
-// $blue-1b:  #00D9FF; // //
-// $blue-2:   #2593F3; // //
-// $blue-2a:  #3B9EF4; // //
-// $blue-3:   #0051E8; // //
-// $blue-4:   #081B9A; // //
-//
-// $green:    #00B500;
-// $green-2:  #2FC476;
-
 $white:                #ffffff; // < $white
 $lily-white:           #e5f4ff; // < $bb-1
 $pattens-blue:         #e0efff; // < $pattens-blue
@@ -71,20 +56,6 @@ $theme-colors: (
     "google":               $google,
     "starling":             $starling,
 );
-
-// $theme-colors: (
-//     "blue1":    $blue-1,
-//     "blue1a":   $blue-1a,
-//     "blue1b":   $blue-1b,
-//     "blue2":    $blue-2,
-//     "blue3":    $blue-3,
-//     "blue4":    $blue-4,
-//     "purple":   $purple,
-//     "facebook": $facebook,
-//     "google":   $google,
-//     "starling": $starling,
-//     "grey":     $lynch,
-// );
 
 // Bootstrap overides
 $primary:       $dodger-blue;
