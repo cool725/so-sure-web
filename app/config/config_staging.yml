@@ -4,6 +4,9 @@ imports:
 framework:
     # 10.* required for the elb load balancing health check
     trusted_hosts: ['api.staging.so-sure.net','staging.wearesosure.com', '10\.\d+\.\d+\.\d+']
+    router:
+        resource: "%kernel.root_dir%/config/routing_errors.yml"
+        strict_requirements: true
 #    validation:
 #        cache: validator.mapping.cache.apc
 #    serializer:
