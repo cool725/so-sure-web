@@ -11,7 +11,7 @@ body {
     padding-bottom: 1rem;
     font-family: $g-light;
 
-    @include dark-blue-gradient-ld;
+    @include dark-blue-gradient;
 
     .container {
         position: relative;

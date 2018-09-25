@@ -11,7 +11,7 @@
 .login {
     width: 100vw; height: 100vh;
     position: relative;
-    @include blue-gradient-ld;
+    @include blue-gradient;
     overflow: hidden;
 
     &__inner {

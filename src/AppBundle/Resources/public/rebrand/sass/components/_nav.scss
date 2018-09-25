@@ -2,7 +2,7 @@
 
 .navbar-so-sure {
     // TODO: When we switch to gradient hero adjust
-    @include blue-gradient-ld;
+    @include blue-gradient;
 
     .navbar-nav {
         transition: none;

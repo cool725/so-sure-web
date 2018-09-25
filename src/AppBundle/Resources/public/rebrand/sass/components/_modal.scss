@@ -3,7 +3,7 @@
 .modal {
 
     &-header {
-        @include blue-gradient-ld;
+        @include blue-gradient;
         @include  border-top-radius(10px);
     }
 

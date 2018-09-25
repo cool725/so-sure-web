@@ -39,7 +39,7 @@
             background-color: $pattens-blue;
             font-family: $g-bold;
             box-shadow: 0 0 0 8px rgba(224, 239, 253, 0.8);
-            @include blue-gradient-ld;
+            @include blue-gradient;
         }
 
         &-done {
