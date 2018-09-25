@@ -128,6 +128,8 @@ class MonitorService
         /** @var ClaimRepository $repo */
         $repo = $this->dm->getRepository(Claim::class);
         $claims = $repo->findSettledUnprocessed();
+
+        /** @noinspection LoopWhichDoesNotLoopInspection */
         foreach ($claims as $claim) {
             /** @var Claim $claim */
             throw new MonitorException(sprintf(
@@ -470,6 +472,24 @@ class MonitorService
         }
     }
 
+    public function bacsPendingPayments()
+    {
+        /** @var BacsPaymentRepository $paymentsRepo */
+        $paymentsRepo = $this->dm->getRepository(BacsPayment::class);
+
+        /** @var BacsPayment[] $unpaid */
+        $unpaid = $paymentsRepo->findUnprocessedPaymentsOlderThanDays(
+            [BacsPayment::STATUS_PENDING, BacsPayment::STATUS_GENERATED],
+            1
+        );
+
+        /** @noinspection LoopWhichDoesNotLoopInspection */
+        foreach ($unpaid as $payment) {
+            /** @var BacsPayment $payment */
+            throw new MonitorException('There are pending/generated bacs payments waiting: ' . $payment->getId());
+        }
+    }
+
     public function pendingPolicies()
     {
         /** @var PolicyRepository $repo */
@@ -514,6 +534,8 @@ class MonitorService
             '_id' => ['$nin' => $commissionValidationPaymentExclusions],
             'date' => ['$gt' => new \DateTime('2017-11-01')],
         ]);
+
+        /** @noinspection LoopWhichDoesNotLoopInspection */
         foreach ($payments as $payment) {
             /** @var Payment $payment */
             throw new MonitorException(sprintf(
@@ -531,6 +553,8 @@ class MonitorService
             'status' => ['$in' => [Claim::STATUS_SUBMITTED, Claim::STATUS_INREVIEW]],
             'handlingTeam' => null
         ]);
+
+        /** @noinspection LoopWhichDoesNotLoopInspection */
         foreach ($claims as $claim) {
             throw new MonitorException(sprintf(
                 'Claim %s is missing a handling team',

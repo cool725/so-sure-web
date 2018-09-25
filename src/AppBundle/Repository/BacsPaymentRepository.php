@@ -25,6 +25,20 @@ class BacsPaymentRepository extends PaymentRepository
             ->execute();
     }
 
+    public function findUnprocessedPaymentsOlderThanDays(array $statuses, $businessDays = 1)
+    {
+        $date = new \DateTime('now');
+        $prevStartOfBusinessDay = $this->subBusinessDays($date, $businessDays);
+        $prevStartOfBusinessDay = $this->startOfDay($prevStartOfBusinessDay);
+
+        return $this->createQueryBuilder()
+            ->field('date')->lt($prevStartOfBusinessDay)
+            ->field('status')->in($statuses)
+            ->sort('date', 'desc')
+            ->getQuery()
+            ->execute();
+    }
+
     public function findSubmittedPayments(\DateTime $date)
     {
         return $this->createQueryBuilder()
