@@ -893,6 +893,16 @@ class DaviesService extends S3EmailService
                 $emails = DaviesHandlerClaim::$errorEmailAddresses;
             }
 
+            $tmpFile = sprintf('%s/%s', sys_get_temp_dir(), 'davies-errors.csv');
+            $lines = [];
+            foreach ($this->errors as $clamId => $errors) {
+                foreach ($errors as $error) {
+                    $lines[] = sprintf('"%s", "%s"', $clamId, str_replace('"', "''", $error));
+                }
+            }
+            $data = implode(PHP_EOL, $lines);
+            file_put_contents($tmpFile, $data);
+
             $this->mailer->sendTemplate(
                 sprintf('Errors in So-Sure Mobile - Daily Claims Report'),
                 $emails,
@@ -906,7 +916,10 @@ class DaviesService extends S3EmailService
                     'claims' => null,
                     'fees' => $this->fees,
                     'title' => 'Errors in So-Sure Mobile - Daily Claims Report',
-                ]
+                ],
+                null,
+                null,
+                [$tmpFile]
             );
         }
 
