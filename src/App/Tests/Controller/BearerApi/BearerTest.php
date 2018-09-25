@@ -99,7 +99,7 @@ class BearerTest extends BaseControllerTest
 
         $content = self::$client->getResponse()->getContent();
 
-        $this->assertContains('","text":"Expires on ', $content);
+        $this->assertContains('. Expires ', $content);
 
         $summary = json_decode($content, true);
         $this->assertSummaryMatchesUserWithTwoPolicies($summary);

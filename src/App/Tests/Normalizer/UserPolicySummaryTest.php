@@ -92,18 +92,16 @@ JSON;
         $userPageUrl = $router->generate('user_home', [], UrlGeneratorInterface::ABSOLUTE_URL);
         $userPageUrl = str_replace('/', '\/', $userPageUrl);
 
-        // @codingStandardsIgnoreStart
         $expectedJson = <<<JSON
 {
     "widgets": [{
         "type": "TEXT",
-        "title": "SO-SURE Policy {$policy->getPolicyNumber()} for your {$out->activePhone}",
-        "text": "Expires on {$expiresDate}. You currently have {$connectionsCount} connections & your reward pot is worth {$pot}",
+        "title": "{$policy->getPolicyNumber()} ($out->activePhone). Expires {$expiresDate}",
+        "text": "Reward pot: {$pot}",
         "launchUrl": "{$userPageUrl}"
     }]
 }
 JSON;
-        // @codingStandardsIgnoreEnd
 
         $this->assertNotNull($actualJson);
         $this->assertJsonStringEqualsJsonString($actualJson, $expectedJson);
