@@ -5,11 +5,10 @@
     position: fixed;
     z-index: 1090;
     top: 0; left: 0; right: 0; bottom: 0;
-    background-color: $blue-2;
-    // background-image: url('#{$cdn_url}/images/rebrand/misc/so-sure_swoosh-background-mobile.svg'), linear-gradient(180deg, $blue-3, $blue-1a);
+    background-color: $dodger-blue;
     background-repeat: no-repeat;
     background-size: cover;
-    @include linear-gradient(100deg, $blue-3, $blue-1a);
+    @include blue-gradient;
     opacity: 0;
     visibility: hidden;
     transition: opacity .35s, visibility .35s, height .35s;

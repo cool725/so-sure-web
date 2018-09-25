@@ -8,8 +8,8 @@
 @import "../abstracts/variables";
 
 body {
-    background-color: $blue-3;
-     // @include linear-gradient(160deg, $blue-3, $blue-1a);
+    background-color: $crayon-blue;
+    @include blue-gradient;
 }
 
 // Old Form CSS

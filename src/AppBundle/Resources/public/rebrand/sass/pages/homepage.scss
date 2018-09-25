@@ -44,10 +44,10 @@
 .intro {
     position: relative;
     z-index: 1;
-    background-color: $bb-2;
+    background-color: $pattens-blue;
 
     @include media-breakpoint-up(lg) {
-        background: $bb-2 url('#{$cdn_url}/images/rebrand/homepage/so-sure_intro-illustration.png') no-repeat -110px 280px;
+        background: $pattens-blue url('#{$cdn_url}/images/rebrand/homepage/so-sure_intro-illustration.png') no-repeat -110px 280px;
         background-size: 500px;
     }
 
@@ -73,7 +73,7 @@
     }
 
     &__mobile {
-        background-color: $bb-2;
+        background-color: $pattens-blue;
     }
 
     &__list {
@@ -87,10 +87,10 @@
 }
 
 .why {
-    background-color: $bb-2;
+    background-color: $pattens-blue;
 
     @include media-breakpoint-up(lg) {
-        background: $bb-2 url('#{$cdn_url}/images/rebrand/homepage/so-sure_why-illustration.png ') no-repeat -220px 440px;
+        background: $pattens-blue url('#{$cdn_url}/images/rebrand/homepage/so-sure_why-illustration.png ') no-repeat -220px 440px;
         background-size: 480px;
     }
 }
@@ -117,11 +117,11 @@
 }
 
 .claims {
-    background-color: $bb-2;
+    background-color: $pattens-blue;
 }
 
 .comparison {
-    background-color: $bb-2;
+    background-color: $pattens-blue;
 
     .table-list {
         position: relative;

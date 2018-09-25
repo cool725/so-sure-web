@@ -11,9 +11,9 @@
 
         // Curve
         svg {
-            transform: translateY(-1px);
-            position: absolute;
-            top: 100%; left: 0;
+            transform: translateY(1px);
+            // position: absolute;
+            // top: 100%; left: 0;
         }
 
         &-stuck {
@@ -38,7 +38,7 @@
             }
         }
 
-        background-color: $blue-3;
+        // background-color: $crayon-blue;
     }
 
     &__main {
@@ -100,7 +100,7 @@
 
     // Contents
     h1 {
-        border-bottom: 2px solid $blue-1b;
+        border-bottom: 2px solid $deep-sky-blue-d;
     }
 
     &__h1 {
@@ -135,7 +135,7 @@
         bottom: -1px; left: 0; right: 0;
         z-index: 1000;
         color: $white;
-        @include linear-gradient(160deg, $blue-3, $blue-1a);
+        @include blue-gradient;
         box-shadow: 0 -15px 30px 0 rgba(8,27,154,0.08),
                     0 -5px 15px 0 rgba(8,27,154,0.08);
 
@@ -149,7 +149,7 @@
 
     &__info {
 
-        border-top: 1px solid $blue-1;
+        border-top: 1px solid $columbia-blue-e;
 
         &:first-of-type {
             border-top: none;
@@ -159,13 +159,13 @@
             position: relative;
 
             &__header {
-                background-color: $blue-4;
+                background-color: $zaffre;
             }
 
             &__insurers {
                 tr {
                     td {
-                        background-color: $blue-2;
+                        background-color: $dodger-blue;
                         border-bottom-color: rgba(255, 255, 255, 0.1);
                     }
 
