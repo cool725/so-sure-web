@@ -2,122 +2,106 @@
 
 // W/B
 $white:     #ffffff;
-$grey:     #687296;
+$lynch:     #687296;
 $dark:     #170B38;
 
 // Blues
-$blue-x:   #A8D1F7;
-$bb-1:     #E5F4FF; // bb = background blue
-$bb-2:     #E0EFFD;
-$blue-1:   #99E3FF;
-$blue-1a:  #00BAFF;
-$blue-1b:  #00D9FF;
-$blue-2:   #2593F3;
-$blue-2a:  #3B9EF4;
-$blue-3:   #0051E8;
-$blue-4:   #081B9A;
+$blue-x:   #A8D1F7; // //
+$bb-1:     #E5F4FF; // //
+$bb-2:     #E0EFFD; // //
+$blue-1:   #99E3FF; // //
+$blue-1a:  #00BAFF; // //
+$blue-1b:  #00D9FF; // //
+$blue-2:   #2593F3; // //
+$blue-2a:  #3B9EF4; // //
+$blue-3:   #0051E8; // //
+$blue-4:   #081B9A; // //
 
-// #A8D1F7 - $blue-x  > $skyblue:       #A8D1F7;
-// #8FE0FF -            $arcticblue:    #8FE0FF;
-// #99E3FF - $blue-1  > $arctic2blue:   #99E3FF;
-// #00D9FF - $blue-1b > $sky2blue:      #00D9FF;
-// #00BAFF - $blue-1a > $ceruleanblue:  #00BAFF;
-// #2593F3 - $blue-2  > $cerulean2blue: #2593F3;
-// #0051E8 - $blue-3  > $blue:          #0051E8;
-// #081B9A - $blue-4  > $admiralblue:   #081B9A;
-// #170B38 - $dark    > $denimblue:     #170B38;
-// #170B38 - 80%      > $deminblue80:   rgba(23, 11, 56, 0.8);
-// #687296 - grey     > $grey:          #687296;
-// #687296 - grey 30% > $grey30:        rgba(104, 114, 150, 0.3);
-// #3FC67D - green    > $fern:          #3FC67D;
-// #ED1C24 - red      > $red:           #ED1C24;
-// #443B5F - purple   > $purple:        #443B5F;
-// #FD7B3D - tangerine> $tangerine:     #FD7B3D;
-// #FFFFFF - white    > $white:         #FFFFFF;
-
-// Purple
-$purple:   #443b5f; // Use to overide BS - purple
-
-// Action colours
-$green:    #00B500; // Use to overide BS - success
-// TODO: Remove - Button Refactor
-$green-2:  #2FC476;
-$red:      #ED1C24; // Use to overide BS - danger
+$white:                #ffffff; // < $white
+$lily-white:           #e5f4ff; // < $bb-1
+$pattens-blue:         #e0efff; // < $pattens-blue
+$tangerine:            #fd7b3d; // + $tangerine
+$jacarta:              #443b5f; // < $purple
+$lust:                 #ed1c23; // < $lust
+$ufo-green:            #3fc67d; // < $green
+$zaffre:               #081a9a; // < $blue-4
+$crayon-blue:          #0051e8; // < $blue-3
+$dodger-blue:          #2593f3; // < $blue-2
+$deep-sky-blue-b:      #00baff; // < $blue-1a
+$deep-sky-blue-d:      #00d9ff; // < $blue-1b
+$lynch:                #687296; // < $lynch
+$lynch-30:             rgba(104, 114, 150, 0.3); // < $lynch 30%
+$haiti:                #170b38; // < $dark
+$haiti-80:             rgba(23, 11, 56, 0.8);    // < $dark 80%
+$columbia-blue-e:      #99e3ff; // < $blue-1
+$columbia-blue-f:      #8fe0ff; // + new
+$pale-cornflower-blue: #a8d1f7; // < $blue-x
 
 // Brands
 $facebook: #3B5998;
 $google:   #DF4A32;
 $starling: #593FA7;
 
+// Extend Theme colours and overide primary BS colour
 $theme-colors: (
-    "primary":  $blue-2,
-    "success":  $green,
-    "blue1":    $blue-1,
-    "blue1a":   $blue-1a,
-    "blue1b":   $blue-1b,
-    "blue2":    $blue-2,
-    "blue3":    $blue-3,
-    "blue4":    $blue-4,
-    "purple":   $purple,
-    "white":    $white,
-    "facebook": $facebook,
-    "google":   $google,
-    "starling": $starling,
-    "grey":     $grey,
+    "white":                $white,
+    "lily-white":           $lily-white,
+    "tangerine":            $tangerine,
+    "jacarta":              $jacarta,
+    "lust":                 $lust,
+    "ufo-green":            $ufo-green,
+    "zaffre":               $zaffre,
+    "crayon-blue":          $crayon-blue,
+    "dodger-blue":          $dodger-blue,
+    "deep-sky-blue-b":      $deep-sky-blue-b,
+    "deep-sky-blue-d":      $deep-sky-blue-d,
+    "lynch":                $lynch,
+    "grey":                 $lynch,
+    "lynch-30":             $lynch-30,
+    "haiti":                $haiti,
+    "haiti-80":             $haiti-80,
+    "columbia-blue-e":      $columbia-blue-e,
+    "columbia-blue-f":      $columbia-blue-f,
+    "pale-cornflower-blue": $pale-cornflower-blue,
+    "facebook":             $facebook,
+    "google":               $google,
+    "starling":             $starling,
 );
 
-// Extend Theme colours and overide primary BS colour
 // $theme-colors: (
-    // "skyblue":      $skyblue,
-    // "arcticblue":   $arcticblue,
-    // "arctic2blue":  $arctic2blue,
-    // "sky2blue":     $sky2blue,
-    // "ceruleanblue": $ceruleanblue,
-    // "blue":         $blue,
-    // "admiralblue":  $admiralblue,
-    // "denimblue":    $denimblue,
-    // "deminblue80":  $deminblue80,
-    // "grey":         $grey,
-    // "grey30":       $grey30,
-    // "fern":         $fern,
-    // "red":          $red,
-    // "purple":       $purple,
-    // "tangerine":    $tangerine,
-    // "facebook":     $facebook,
-    // "google":       $google,
-    // "starling":     $starling,
+//     "blue1":    $blue-1,
+//     "blue1a":   $blue-1a,
+//     "blue1b":   $blue-1b,
+//     "blue2":    $blue-2,
+//     "blue3":    $blue-3,
+//     "blue4":    $blue-4,
+//     "purple":   $purple,
+//     "facebook": $facebook,
+//     "google":   $google,
+//     "starling": $starling,
+//     "grey":     $lynch,
 // );
 
 // Bootstrap overides
-// $primary:       $cerulean2blue;
-// $secondary:     $grey;
-// $success:       $fern;
-// $info:          $arctic2blue;
-// $warning:       $tangerine;
-// $danger:        $red;
-// $light:         $grey30;
-// $dark:          $denimblue;
+$primary:       $dodger-blue;
+$secondary:     $lynch;
+$success:       $ufo-green;
+$info:          $columbia-blue-e;
+$warning:       $tangerine;
+$danger:        $lust;
+$light:         $lynch-30;
+$dark:          $haiti;
 
 
 // Gradients
 // TODO: Find cases where gradient is in css and remove apply gradient to it or extend
-
 @mixin blue-gradient-ld {
-    @include linear-gradient(100deg, $blue-3, $blue-1a);
+    @include linear-gradient(100deg, $crayon-blue, $deep-sky-blue-b);
 }
 
 @mixin dark-blue-gradient-ld {
-    @include linear-gradient(90deg, $blue-4, $dark);
+    @include linear-gradient(90deg, $zaffre, $haiti);
 }
-
-// Migrate above to this
-// @mixin sosure-gradient {
-//     @include linear-gradient(100deg, $blue, $ceruleanblue);
-// }
-// @mixin sosure-gradient-r {
-//     @include linear-gradient(100deg, $ceruleanblue, $blue);
-// }
-
 
 // Box shadow
 .box-shadow {

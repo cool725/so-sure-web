@@ -8,9 +8,9 @@
 @import "../abstracts/variables";
 
 body {
-    background-color: $blue-3;
+    background-color: $crayon-blue;
     // TODO: Merge and change flow with pledge - match svg too
-     // @include linear-gradient(160deg, $blue-3, $blue-1a);
+     // @include linear-gradient(160deg, $crayon-blue, $blue-1a);
      // @include blue-gradient-ld;
 }
 

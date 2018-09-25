@@ -8,7 +8,7 @@
 @import "../abstracts/variables";
 
 body {
-    background-color: $blue-3;
+    background-color: $crayon-blue;
     @include blue-gradient-ld;
 }
 

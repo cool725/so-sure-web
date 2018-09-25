@@ -7,13 +7,13 @@
 
 label {
     font-family: $g-medium;
-    color: $blue-4;
+    color: $zaffre;
 
     &.error,
     &.is-invalid {
         font-family: $g-regular;
         font-size: $font-size-sm;
-        color: $red;
+        color: $lust;
     }
 }
 
@@ -32,7 +32,7 @@ label {
     &.is-valid-ss,
     &.is-valid-ss:focus,
     &:focus {
-        border-color: $blue-2;
+        border-color: $dodger-blue;
         background-color: rgba(37, 147, 243, 0.1);
         box-shadow: rgba(37, 147, 243, 0.1);
     }
@@ -52,7 +52,7 @@ label {
 }
 
 .custom-checkbox .custom-control-input:checked ~ .custom-control-label::before {
-    background-color: $green;
+    background-color: $ufo-green;
 }
 
 // Server side error styling
@@ -65,7 +65,7 @@ label {
         li {
             font-family: $g-regular;
             font-size: $font-size-sm;
-            color: $red;
+            color: $lust;
         }
     }
 }
@@ -98,7 +98,7 @@ label {
 
         &-suggestion {
             padding: 1rem;
-            border-bottom: 1px solid $blue-1;
+            border-bottom: 1px solid $columbia-blue-e;
             vertical-align: middle;
             cursor: pointer;
 
@@ -150,8 +150,8 @@ label {
     &.radio-btn-active {
         cursor: pointer;
         color: $white;
-        background-color: $blue-2;
-        border-color: $blue-1a;
+        background-color: $dodger-blue;
+        border-color: $columbia-blue-e;
         box-shadow: 0 15px 30px 0 rgba(8,27,154,0.08),
                     0 5px 15px 0 rgba(8,27,154,0.08);
     }
