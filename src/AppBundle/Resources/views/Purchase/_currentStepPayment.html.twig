@@ -61,7 +61,7 @@
                     {% if purchase_form.existing is defined %}
                         {% do purchase_form.existing.setRendered %}
                     {% endif %}
-                    {{ form_widget(purchase_form.next, {'label': 'I agree, proceed to payment', 'attr': {'class': 'btn btn-success btn-gradient-green btn-block-xs'}}) }}
+                    {{ form_widget(purchase_form.next, {'label': 'Proceed to payment', 'attr': {'class': 'btn btn-success btn-gradient-green btn-block-xs'}}) }}
                 </div>
             {% endif %}
         </div>
