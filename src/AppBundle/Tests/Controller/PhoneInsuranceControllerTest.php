@@ -55,7 +55,7 @@ class PhoneInsuranceControllerTest extends BaseControllerTest
 
         // should be redirected to redirect url
         $this->assertEquals(302, $this->getClientResponseStatusCode());
-        $this->assertEquals('/purchase/', $this->getClientResponseTargetUrl());
+        $this->assertEquals('/purchase', $this->getClientResponseTargetUrl());
         self::$client->followRedirect();
     }
 
