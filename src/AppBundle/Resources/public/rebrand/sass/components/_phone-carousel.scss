@@ -46,11 +46,11 @@
         li {
             height: 10px; max-width: 10px;
             border-radius: 10px;
-            background-color: lighten($blue-1, 20%);
+            background-color: lighten($columbia-blue-e, 20%);
         }
 
         li.active {
-            background-color: $blue-1;
+            background-color: $columbia-blue-e;
         }
     }
 

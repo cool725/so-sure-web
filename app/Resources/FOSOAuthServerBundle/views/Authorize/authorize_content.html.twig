@@ -20,8 +20,8 @@
                     {{ form_start(form, {'method': 'POST', 'action': path('fos_oauth_server_authorize'), 'label_attr': {'class': 'fos_oauth_server_authorize'} }) }}
                         <p class="lead">{{ form.vars.value.scope|oauth2ScopeDescription }}</p>
                         <hr>
-                        <input class="btn btn-green" type="submit" name="accepted" value="{{ 'authorize.accept'|trans({}, 'FOSOAuthServerBundle') }}" />
-                        <input class="btn btn-blue-hollow" type="submit" name="rejected" value="{{ 'authorize.reject'|trans({}, 'FOSOAuthServerBundle') }}" />
+                        <input class="btn btn-success" type="submit" name="accepted" value="{{ 'authorize.accept'|trans({}, 'FOSOAuthServerBundle') }}" />
+                        <input class="btn btn-outline-primary" type="submit" name="rejected" value="{{ 'authorize.reject'|trans({}, 'FOSOAuthServerBundle') }}" />
                         {{ form_row(form.client_id) }}
                         {{ form_row(form.response_type) }}
                         {{ form_row(form.redirect_uri) }}

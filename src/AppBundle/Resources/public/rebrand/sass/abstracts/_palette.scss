@@ -1,66 +1,85 @@
 // palette.scss
 
+// W/B
 $white:     #ffffff;
-$off-white: #f2f2f3;
-
-// $blue-d: #1a7bdb;
-// $blue-1: #1e90ff;
-// $blue-2: #02bcfe;
-// $blue-l: #24d2fd;
-
-$grey:     #687296;
+$lynch:     #687296;
 $dark:     #170B38;
-$bb-1:     #E5F4FF; // bb = background blue
-$bb-2:     #E0EFFD;
-$blue-1:   #99E3FF;
-$blue-1a:  #00BAFF;
-$blue-1b:  #00D9FF;
-$blue-2:   #2593F3;
-$blue-2a:  #3B9EF4;
-$blue-3:   #0051E8;
-$blue-4:   #081B9A;
-$purple:   #443b5f;
-$green:    #00B500;
-$green-2:  #2FC476;
+
+$white:                #ffffff; // < $white
+$lily-white:           #e5f4ff; // < $bb-1
+$pattens-blue:         #e0efff; // < $pattens-blue
+$tangerine:            #fd7b3d; // + $tangerine
+$jacarta:              #443b5f; // < $purple
+$lust:                 #ed1c23; // < $lust
+$ufo-green:            #3fc67d; // < $green
+$islamic-green:        #00B500; // < $green
+$zaffre:               #081a9a; // < $blue-4
+$crayon-blue:          #0051e8; // < $blue-3
+$dodger-blue:          #2593f3; // < $blue-2
+$deep-sky-blue-b:      #00baff; // < $blue-1a
+$deep-sky-blue-d:      #00d9ff; // < $blue-1b
+$lynch:                #687296; // < $lynch
+$lynch-30:             rgba(104, 114, 150, 0.3); // < $lynch 30%
+$haiti:                #170b38; // < $dark
+$haiti-80:             rgba(23, 11, 56, 0.8);    // < $dark 80%
+$columbia-blue-e:      #99e3ff; // < $blue-1
+$columbia-blue-f:      #8fe0ff; // + new
+$pale-cornflower-blue: #a8d1f7; // < $blue-x
+
+// Brands
 $facebook: #3B5998;
 $google:   #DF4A32;
 $starling: #593FA7;
 
-// Blue light to dark
-// D3E8FB
-$blue-x:   #A8D1F7;
-// 99E3FF * $blue-1
-// 00D9FF * $blue-1b
-// 00BAFF * $blue-1a
-// 2593F3 * $blue-2
-// 0051E8 * $blue-3
-// 081B9A * $blue-4
-
 // Extend Theme colours and overide primary BS colour
 $theme-colors: (
-    "primary":  $blue-2,
-    "success":  $green,
-    "blue1":    $blue-1,
-    "blue1a":   $blue-1a,
-    "blue1b":   $blue-1b,
-    "blue2":    $blue-2,
-    "blue3":    $blue-3,
-    "blue4":    $blue-4,
-    "purple":   $purple,
-    "white":    $white,
-    "facebook": $facebook,
-    "google":   $google,
-    "starling": $starling,
-    "grey":     $grey,
+    "white":                $white,
+    "lily-white":           $lily-white,
+    "tangerine":            $tangerine,
+    "jacarta":              $jacarta,
+    "lust":                 $lust,
+    "ufo-green":            $ufo-green,
+    "zaffre":               $zaffre,
+    "crayon-blue":          $crayon-blue,
+    "dodger-blue":          $dodger-blue,
+    "deep-sky-blue-b":      $deep-sky-blue-b,
+    "deep-sky-blue-d":      $deep-sky-blue-d,
+    "lynch":                $lynch,
+    "grey":                 $lynch,
+    "lynch-30":             $lynch-30,
+    "haiti":                $haiti,
+    "haiti-80":             $haiti-80,
+    "columbia-blue-e":      $columbia-blue-e,
+    "columbia-blue-f":      $columbia-blue-f,
+    "pale-cornflower-blue": $pale-cornflower-blue,
+    "facebook":             $facebook,
+    "google":               $google,
+    "starling":             $starling,
 );
 
+// Bootstrap overides
+$primary:       $dodger-blue;
+$secondary:     $lynch;
+$success:       $ufo-green;
+$info:          $columbia-blue-e;
+$warning:       $tangerine;
+$danger:        $lust;
+$light:         $lynch-30;
+$dark:          $haiti;
+
+
 // Gradients
-.blue-gradient-ld {
-    @include linear-gradient(135deg, $blue-3, $blue-1a);
+// TODO: Find cases where gradient is in css and remove apply gradient to it or extend
+@mixin blue-gradient {
+    @include linear-gradient(100deg, $crayon-blue, $deep-sky-blue-b);
 }
 
-.blue-gradient-dl {
-    @include linear-gradient(135deg, $blue-3, $blue-1a);
+.blue-gradient {
+    @include linear-gradient(100deg, $crayon-blue, $deep-sky-blue-b);
+}
+
+@mixin dark-blue-gradient {
+    @include linear-gradient(90deg, $zaffre, $haiti);
 }
 
 // Box shadow

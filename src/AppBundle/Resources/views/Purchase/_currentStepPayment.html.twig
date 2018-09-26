@@ -8,7 +8,7 @@
     {% include 'AppBundle::Purchase/_purchaseStepsRebrand.html.twig' %}
 
     <div class="form-group payment-options {% if form_errors(purchase_form.amount) %}has-error{% endif %}">
-        <h4 class="payment-options__title text-blue2 mb-4">How would you like to pay?</h4>
+        <h4 class="payment-options__title text-dodger-blue mb-4">How would you like to pay?</h4>
         <div class="radio-btn-original">
             {{ form_label(purchase_form.amount, 'Payment options') }}
             {{ form_widget(purchase_form.amount) }}
@@ -61,7 +61,7 @@
                     {% if purchase_form.existing is defined %}
                         {% do purchase_form.existing.setRendered %}
                     {% endif %}
-                    {{ form_widget(purchase_form.next, {'label': 'I agree, proceed to payment', 'attr': {'class': 'btn btn-success btn-gradient-green btn-block-xs'}}) }}
+                    {{ form_widget(purchase_form.next, {'label': 'Proceed to payment', 'attr': {'class': 'btn btn-success btn-gradient-green btn-block-xs'}}) }}
                 </div>
             {% endif %}
         </div>

@@ -8,8 +8,8 @@
 @import "../abstracts/variables";
 
 body {
-    background-color: $blue-3;
-    // @include linear-gradient(160deg, $blue-3, $blue-1a);
+    background-color: $crayon-blue;
+    @include blue-gradient;
 }
 
 .qpw {
@@ -32,6 +32,14 @@ body {
 
         @include media-breakpoint-up(lg) {
             margin-top: 0;
+        }
+    }
+
+    &__curve {
+        transform: translateY(-1px);
+
+        @include media-breakpoint-up(lg) {
+            transform: none;
         }
     }
 

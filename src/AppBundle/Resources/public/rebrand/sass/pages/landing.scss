@@ -7,18 +7,13 @@
 @import "../abstracts/palette";
 @import "../abstracts/variables";
 
-// body {
-
-//     // @include linear-gradient(160deg, $blue-3, $blue-1a);
-// }
-
 .hero {
     position: relative;
     padding-top: 8rem;
     padding-bottom: 8rem;
     text-align: center;
-    background-color: $blue-3;
-    @include linear-gradient(135deg, $blue-3, $blue-1a);
+    background-color: $crayon-blue;
+    @include blue-gradient;
 
     h1 {
         @include media-breakpoint-down(xs) {
@@ -100,7 +95,7 @@
     }
 
     &__mobile {
-        background-color: $bb-2;
+        background-color: $pattens-blue;
     }
 
     &__list {
@@ -113,7 +108,7 @@
     }
 
     @include media-breakpoint-up(lg) {
-        background-color: $bb-2;
+        background-color: $pattens-blue;
     }
 }
 
@@ -144,18 +139,18 @@
 
 .reviews {
     padding-bottom: 300px;
-    background-color: $bb-2;
+    background-color: $pattens-blue;
 
     .carousel-inner {
         min-height: 280px;
-        background: $bb-2 url('#{$cdn_url}/images/rebrand/misc/so-sure_quote-background.svg') no-repeat right 50%;
+        background: $pattens-blue url('#{$cdn_url}/images/rebrand/misc/so-sure_quote-background.svg') no-repeat right 50%;
 
         @include media-breakpoint-up(lg) {
             min-height: none;
         }
     }
 
-    background: $bb-2 url('#{$cdn_url}/images/rebrand/homepage/so-sure_reviews-image.png') no-repeat 80px 500px;
+    background: $pattens-blue url('#{$cdn_url}/images/rebrand/homepage/so-sure_reviews-image.png') no-repeat 80px 500px;
     background-size: 500px;
 
     @include media-breakpoint-up(sm) {
@@ -165,7 +160,7 @@
     @include media-breakpoint-up(lg) {
         padding-bottom: inherit;
         margin-bottom: 0;
-        background: $bb-2 url('#{$cdn_url}/images/rebrand/homepage/so-sure_reviews-image.png') no-repeat 800px 50px;
+        background: $pattens-blue url('#{$cdn_url}/images/rebrand/homepage/so-sure_reviews-image.png') no-repeat 800px 50px;
         background-size: 600px;
     }
 
