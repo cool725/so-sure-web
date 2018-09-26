@@ -53,9 +53,14 @@ class PhoneInsuranceControllerTest extends BaseControllerTest
     {
         self::$client->request('GET', '/purchase-phone/apple+iphone+7+32GB');
 
+        $this->assertRedirectionPath('/purchase');
         // should be redirected to redirect url
         $this->assertEquals(302, $this->getClientResponseStatusCode());
-        $this->assertEquals('/purchase', $this->getClientResponseTargetUrl());
+        $this->assertEquals(
+            '/purchase',
+            $this->getClientResponseTargetUrl(),
+            "Expected '/purchase' to match '{$this->getClientResponseTargetUrl()}'"
+        );
         self::$client->followRedirect();
     }
 
