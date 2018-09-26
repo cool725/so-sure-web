@@ -439,7 +439,6 @@ nelmio_security:
                 - https://js.intercomcdn.com
                 - http://widget.trustpilot.com
                 - https://widget.trustpilot.com
-                - fbrpc://call
                 - 'data:'
             connect-src:
                 - 'self'

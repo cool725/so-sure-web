@@ -1,0 +1,93 @@
+{{ form_start(bacs_form, {'attr': {
+    'data-toggle': 'validator',
+    'class': 'validate-form form-400',
+    'data-client-validation': form_client_validation,
+    'autocomplete': 'off'
+}}) }}
+
+    {% include 'AppBundle::Purchase/_purchaseStepsRebrand.html.twig' %}
+
+    <h4 class="text-dodger-blue">
+        Pay via Direct Debit
+        <span class="sub h5">(Recommended)</span>
+    </h4>
+    <p class="mb-4"><smalll class="text-zaffre">💳 Prefer to pay by card? <a href="#" class="web-pay-submit"><u>Click here</u></a>
+    </smalll></p>
+
+    <div class="form-group {% if form_errors(bacs_form.accountName) %}has-error{% endif %}">
+        <label for="bacs_form[accountName]">
+            Name on Account
+            <span class="ml-2 text-dodger-blue">
+                <a href="#"
+                   data-toggle="modal"
+                   data-target="#name_on_account"
+                   role="button">
+                    <i class="fal fa-info-circle"></i>
+                </a>
+            </span>
+        </label>
+        {{ form_widget(bacs_form.accountName, {'attr': {'placeholder': 'Enter full name', 'class': 'form-control', 'data-hj-suppress': ''}}) }}
+        <input type="hidden" value="{{ app.user.name }}" id="policy-holder-name">
+        {% if form_errors(bacs_form.accountName) %}
+            <div class="with-errors">{{ form_errors(bacs_form.accountName) }}</div>
+        {% else %}
+            <small class="form-text">The bank account must be in the policy holder's name "{{ app.user.name }}"</small>
+        {% endif %}
+    </div>
+
+    <div class="form-row">
+        <div class="col">
+            <div class="form-group {% if form_errors(bacs_form.sortCode) %}has-error{% endif %}">
+                {{ form_label(bacs_form.sortCode, 'Sort code') }}
+                {{ form_widget(bacs_form.sortCode, {'attr': {'placeholder': 'e.g. 02-02-02', 'class': 'form-control sort-code', 'maxlength': 6, 'data-hj-suppress': ''}}) }}
+                <div class="with-errors">{{ form_errors(bacs_form.sortCode) }}</div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="form-group {% if form_errors(bacs_form.accountNumber) %}has-error{% endif %}">
+                {{ form_label(bacs_form.sortCode, 'Account number') }}
+                {{ form_widget(bacs_form.accountNumber, {'attr': {'placeholder': 'e.g. 83748596', 'class': 'form-control', 'maxlength': 8, 'data-hj-suppress': ''}}) }}
+                <div class="with-errors">{{ form_errors(bacs_form.accountNumber) }}</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group">
+        {{ form_widget(bacs_form.soleSignature, {
+             'label': 'I am the sole signature on the account',
+            'attr': {'class':'custom-control-input'}}
+        ) }}
+        <div class="with-errors">{{ form_errors(bacs_form.accountNumber) }}</div>
+    </div>
+
+    <div class="form-group my-5">
+        <div class="form-row">
+            <div class="col-3">
+                <a href="{{ path('purchase_step_payment_id', {'id': policy.id}) }}"
+                   class="btn btn-outline-grey btn-circle d-flex justify-content-center align-items-center">
+                    <span class="sr-only">back</span>
+                    <i class="far fa-arrow-left"></i>
+                </a>
+            </div>
+            <div class="col-9 text-right">
+                {{ form_widget(bacs_form.save, {'label': 'Continue', 'attr': {'class': 'btn btn-success btn-gradient-green btn-block-xs'}}) }}
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group d-flex align-items-center">
+        <img src="{{ cdn_url }}/images/rebrand/misc/so-sure_direct-debit-logo.svg" alt="Direct Debit" width="100px">
+        <small class="form-text mb-2 ml-2">
+            Payments protected by the <a href="#" data-toggle="modal" data-target="#direct_debit_guarantee"><u>Direct Debit Guarantee</u></a>.
+            so-sure Ltd, 10 Finsbury Square, London, EC2A 1AF
+        </small>
+    </div>
+
+{{ form_end(bacs_form) }}
+
+<form action="{{ webpay_action }}" method="post" id="webpay-form">
+    <input id="Reference" name="Reference" type="hidden" value="{{ webpay_reference }}">
+</form>
+
+{% include 'AppBundle::Purchase/_directDebitModal.html.twig' %}
+

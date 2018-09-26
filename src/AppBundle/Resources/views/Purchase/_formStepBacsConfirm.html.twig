@@ -1,0 +1,98 @@
+{{ form_start(bacs_confirm_form) }}
+
+    {% include 'AppBundle::Purchase/_purchaseStepsRebrand.html.twig' %}
+
+    <h4 class="text-dodger-blue">Confirm your Direct Debit</h4>
+    <h6 class="mb-4">Please <u>check your details</u> before continuing 🤓</h6>
+
+    <div class="form-group">
+        <div class="form-row">
+            <div class="col">
+                <small class="text-grey">Name of account holder</small><br>
+                <span class="h6">{{ bacs.accountName }}</span>
+            </div>
+            <div class="col">
+                <small class="text-grey">Email</small><br>
+                <span class="h6">{{  policy.user.email }}</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <div class="form-row">
+            <div class="col">
+                <small class="text-grey">Sort code</small><br>
+                <span class="h6">{{ bacs.getDisplayableSortCode }}</span>
+            </div>
+            <div class="col">
+                <small class="text-grey">Account number</small><br>
+                <span class="h6">{{ bacs.getAccountNumber }}</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <div class="form-row">
+            <div class="col">
+                <small class="text-grey">Bank/Building society</small><br>
+                <span class="h6">{{ bacs.bankName }}</span>
+            </div>
+            <div class="col">
+                <small class="text-grey">Reference Number</small><br>
+                <span class="h6">{{  bacs.reference }}</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <div class="form-row">
+            {% if bacs.bankAddress %}
+            <div class="col">
+                <small class="text-grey">Bank/Building society address</small><br>
+                <span class="h6">{{ bacs.bankAddress.stringImplode('<br>')|raw }}</span>
+            </div>
+            {% endif %}
+            <div class="col">
+                <small class="text-grey">Collection frequency:</small><br>
+                <span class="h6">First collection: {{ bacs.getFirstPaymentDate(policy.user)|date('d/m/y','Europe/London') }}</span><br>
+                {% if bacs.annual %}
+                    <small>(Collected on the {{ policy.billing|date('jS M','Europe/London') }} of each year thereafter)</small><br>
+                {% else %}
+                    <small class="form-text">Collected on the {{ policy.billing|date('jS','Europe/London') }} of each month thereafter</small><br>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <small class="form-text">I confirm that the above details are correct and payment to so-sure Limited will be <u>first collected on {{ bacs.getFirstPaymentDate(policy.user)|date('d F','Europe/London') }}</u>. You will receive confirmation of this direct debit along with any future notices via <strong>email</strong>.</small>
+    </div>
+
+    <div class="form-group my-5">
+        <div class="form-row">
+            <div class="col-3">
+{#                 <a href="{{ path('purchase_step_payment_id', {'id': policy.id}) }}"
+                   class="btn btn-outline-grey btn-circle d-flex justify-content-center align-items-center">
+                    <span class="sr-only">back</span>
+                    <i class="far fa-arrow-left"></i>
+                </a> #}
+                {# TODO: This needs to be the arrow as above #}
+                {{ form_widget(bacs_confirm_form.back, {'label': 'Back', 'attr': {'class': 'btn btn-outline-grey btn-circle d-flex justify-content-center align-items-center'}}) }}
+            </div>
+            <div class="col-9 text-right">
+                {{ form_widget(bacs_confirm_form.save, {'label': 'Confirm', 'attr': {'class': 'btn btn-success btn-gradient-green btn-block-xs'}}) }}
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group d-flex align-items-center">
+        <img src="{{ cdn_url }}/images/rebrand/misc/so-sure_direct-debit-logo.svg" alt="Direct Debit" width="100px">
+        <small class="form-text mb-2 ml-2">
+            Payments protected by the <a href="#" data-toggle="modal" data-target="#direct_debit_guarantee"><u>Direct Debit Guarantee</u></a>.
+            so-sure Ltd, 10 Finsbury Square, London, EC2A 1AF
+        </small>
+    </div>
+
+{{ form_end(bacs_confirm_form) }}
+
+{% include 'AppBundle::Purchase/_directDebitModal.html.twig' %}

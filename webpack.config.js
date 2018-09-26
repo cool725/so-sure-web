@@ -25,6 +25,7 @@ Encore
     .addEntry('purchase-phone', './src/AppBundle/Resources/public/rebrand/js/pages/purchase-phone.js')
     .addEntry('purchase-pledge', './src/AppBundle/Resources/public/rebrand/js/pages/purchase-pledge.js')
     .addEntry('purchase-payment', './src/AppBundle/Resources/public/rebrand/js/pages/purchase-payment.js')
+    .addEntry('purchase-bacs', './src/AppBundle/Resources/public/rebrand/js/pages/purchase-bacs.js')
     .addEntry('welcome', './src/AppBundle/Resources/public/rebrand/js/pages/welcome.js')
     .addEntry('landing', './src/AppBundle/Resources/public/rebrand/js/pages/landing.js')
     .addEntry('faq', './src/AppBundle/Resources/public/rebrand/js/pages/faq.js')

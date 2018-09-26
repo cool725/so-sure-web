@@ -798,7 +798,23 @@ class PurchaseController extends BaseController
         $webpay = null;
         $allowPayment = true;
 
-        $paymentProviderTest = 'judo';
+        $paymentProviderTest = $this->sixpack(
+            $request,
+            SixpackService::EXPERIMENT_PURCHASE_FLOW_BACS,
+            ['judo', 'bacs'],
+            SixpackService::LOG_MIXPANEL_CONVERSION,
+            null,
+            0.1
+        );
+
+        $bacsFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_BACS);
+        // For now, only allow 1 policy with bacs
+        if ($bacsFeature && count($user->getValidPolicies(true)) >= 1) {
+            $bacsFeature = false;
+        }
+        if (!$bacsFeature) {
+            $paymentProviderTest = 'judo';
+        }
 
         //$this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_POSTCODE);
         if ('POST' === $request->getMethod()) {
@@ -877,12 +893,6 @@ class PurchaseController extends BaseController
             }
         }
 
-        // $moneyBackGuarantee = $this->sixpack(
-        //     $request,
-        //     SixpackService::EXPERIMENT_MONEY_BACK_GUARANTEE,
-        //     ['no-money-back-guarantee', 'money-back-guarantee']
-        // );
-
         /** @var RequestService $requestService */
         $requestService = $this->get('app.request');
         $template = 'AppBundle:Purchase:purchaseStepPayment.html.twig';
@@ -905,7 +915,6 @@ class PurchaseController extends BaseController
             ) : null,
             'billing_date' => $billingDate,
             'payment_provider' => $paymentProviderTest,
-            // 'moneyBackGuarantee' => $moneyBackGuarantee,
         );
 
         return $this->render($template, $data);
