@@ -640,7 +640,7 @@ class PurchaseController extends BaseController
         $data = array(
             'policy' => $policy,
             'is_postback' => 'POST' === $request->getMethod(),
-            'step' => 3,
+            'step' => 4,
             'bacs_form' => $bacsForm->createView(),
             'bacs_confirm_form' => $bacsConfirmForm->createView(),
             'bacs' => $bacs,
