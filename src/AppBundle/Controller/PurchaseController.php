@@ -625,7 +625,7 @@ class PurchaseController extends BaseController
 
                     $this->addFlash(
                         'success',
-                        'Your direct debit is now setup. You will receive an email confirmation shortly.'
+                        'Your direct debit is now scheduled. You will receive an email confirmation shortly.'
                     );
 
                     return $this->redirectToRoute('user_welcome', ['id' => $policy->getId()]);
