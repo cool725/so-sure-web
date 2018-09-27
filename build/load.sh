@@ -38,6 +38,7 @@ if [ "$PREFIX" != "" ]; then
   sudo app/console --env=$ENV sosure:policy:update-status --skip-email --skip-unpaid-timecheck --prefix $PREFIX
 fi
 
+# keep in sync with run-test-functional.sh
 for feature in "renewal" "picsure" "bacs"
 do
   sudo app/console --env=$ENV sosure:feature $feature true

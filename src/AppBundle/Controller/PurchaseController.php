@@ -629,7 +629,7 @@ class PurchaseController extends BaseController
                         'Your direct debit is now scheduled. You will receive an email confirmation shortly.'
                     );
 
-                    return $this->redirectToRoute('user_welcome', ['id' => $policy->getId()]);
+                    return $this->redirectToRoute('user_welcome_policy_id', ['id' => $policy->getId()]);
                 }
             }
         }
