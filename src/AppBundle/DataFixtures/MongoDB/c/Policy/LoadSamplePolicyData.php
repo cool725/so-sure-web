@@ -424,7 +424,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             $iphoneUI,
             false,
             true,
-            null,
+            180,
             rand(2, 50),
             3
         );
@@ -443,11 +443,10 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             $androidUI,
             false,
             true,
-            null,
+            180,
             rand(2, 50),
             3
         );
-        $policy->setStatus(Policy::STATUS_UNPAID);
 
         $manager->flush();
     }
