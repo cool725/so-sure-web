@@ -187,7 +187,7 @@ class OpsController extends BaseController
 
         /** @var PhoneRepository $phoneRepo */
         $phoneRepo = $dm->getRepository(Phone::class);
-        $activePhone = $phoneRepo->findOneBy(['active' => true]);
+        $activePhone = $phoneRepo->findOneBy(['active' => true, ['devices' => ['$ne' => null]]]);
         $upcomingPhone = $phoneRepo->findOneBy(['active' => true, 'phonePrices' => null]);
 
         /** @var PolicyRepository $policyRepo */
