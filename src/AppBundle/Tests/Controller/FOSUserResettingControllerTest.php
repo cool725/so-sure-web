@@ -286,7 +286,7 @@ class FOSUserControllerTest extends BaseControllerTest
         $this->setPassword($reset['url'], 'foooBarr1!', true);
 
         // now can login
-        $this->login($email, 'foooBarr1!', 'admin/');
+        $this->login($email, 'foooBarr1!', 'admin');
     }
 
     private function resetPassword($email, $expectSuccess = true)
@@ -344,7 +344,7 @@ class FOSUserControllerTest extends BaseControllerTest
         $user->addRole('ROLE_ADMIN');
         static::$dm->flush();
 
-        $this->login($email, 'foo', 'admin/');
+        $this->login($email, 'foo', 'admin');
 
         // can't login
         $this->login($email, 'bar', 'login');
@@ -353,7 +353,7 @@ class FOSUserControllerTest extends BaseControllerTest
         $this->login($email, 'bar', 'login');
         $this->login($email, 'bar', 'login');
 
-        $this->login($email, 'foo', 'admin/');
+        $this->login($email, 'foo', 'admin');
 
         // can't login
         $this->login($email, 'bar', 'login');

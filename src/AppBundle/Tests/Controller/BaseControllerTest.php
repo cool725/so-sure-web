@@ -342,7 +342,8 @@ class BaseControllerTest extends WebTestCase
 
     protected function getClientResponse()
     {
-        $this->assertNotNull(self::$client->getResponse());
+        $this->assertNotNull(self::$client->getResponse(), "Expected 'self::\$client' to have a response");
+        // @todo assert
         return self::$client->getResponse() ? self::$client->getResponse() : null;
     }
 
@@ -369,6 +370,16 @@ class BaseControllerTest extends WebTestCase
         return null;
     }
 
+    protected function assertRedirectionPath(string $path)
+    {
+        $responseTargetUrl = $this->getClientResponse()->getTargetUrl();
+
+        $this->assertEquals($path, $responseTargetUrl, "Expected '$path' to match '{$responseTargetUrl}'");
+    }
+
+    /**
+     * @deprecated prefer assertRedirectionPath
+     */
     protected function getClientResponseTargetUrl()
     {
         if ($this->getClientResponse()) {

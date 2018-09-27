@@ -187,7 +187,7 @@ redirect_terms:
         permanent: true
 
 redirect_about_home:
-    path: /about/
+    path: /about
     defaults:
         _controller: FrameworkBundle:Redirect:redirect
         route: about_home
@@ -313,3 +313,11 @@ redirect_change_password:
         _controller: FrameworkBundle:Redirect:redirect
         route: login
         permanent: true
+
+# https://symfony.com/doc/3.4/routing/redirect_trailing_slash.html with a 301
+remove_trailing_slash:
+    path: /{url}
+    defaults:
+        _controller: 'App\Controller\RedirectingController'
+    requirements:
+        url: .*/$

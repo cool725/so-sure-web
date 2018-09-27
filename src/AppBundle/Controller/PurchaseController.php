@@ -105,7 +105,8 @@ class PurchaseController extends BaseController
      *   as these will impact Adwords
      *
      * @Route("/step-personal", name="purchase_step_personal")
-     * @Route("/", name="purchase")
+     * @Route("", name="purchase")
+     * @Route("/", name="purchase_slash")
      * @Template
     */
     public function purchaseStepPersonalAddressAction(Request $request)

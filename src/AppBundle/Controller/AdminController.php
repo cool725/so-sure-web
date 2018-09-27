@@ -791,7 +791,8 @@ class AdminController extends BaseController
     /**
      * @Route("/bacs/payment/approve/{id}", name="admin_bacs_payment_approve")
      * @Route("/bacs/payment/reject/{id}", name="admin_bacs_payment_reject")
-     * @Route("/bacs/payment/serial/{id}/", name="admin_bacs_payment_serial")
+     * @Route("/bacs/payment/serial/{id}", name="admin_bacs_payment_serial")
+     * @Route("/bacs/payment/serial/{id}/", name="admin_bacs_payment_serial_slash")
      * @Method({"POST"})
      */
     public function bacsPaymentAction(Request $request, $id)

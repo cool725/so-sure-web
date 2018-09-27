@@ -102,7 +102,8 @@ class UserController extends BaseController
     use DateTrait;
 
     /**
-     * @Route("/", name="user_home")
+     * @Route("", name="user_home")
+     * @Route("/", name="user_home_slash")
      * @Route("/{policyId}", name="user_policy", requirements={"policyId":"[0-9a-f]{24,24}"})
      * @Template
      */
