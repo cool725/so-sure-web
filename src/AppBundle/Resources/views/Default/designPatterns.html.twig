@@ -1,0 +1,64 @@
+{% extends 'base_rebrand.html.twig' %}
+
+{# Set vars #}
+{% set body_class = 'design-patterns' %}
+
+{% block title %}so-sure - dEsIgN pAtTeRns{% endblock %}
+
+{% block cssPage %}
+   {# <link rel="stylesheet" href="{{ asset('css-js/homepage.css') }}"> #}
+{% endblock %}
+
+{% block body %}
+
+    <section style="padding-top: 12rem;">
+        <div class="container">
+            <div class="row">
+                <div class="col">
+                    <ul class="list-unstyled">
+                        <li class="my-5">
+                            <a href="#" class="btn btn-primary">Button primary</a>
+                        </li>
+                        <li class="my-5">
+                            <a href="#" class="btn btn-primary btn-blue-gradient">Button gradient</a>
+                        </li>
+                        <li class="my-5">
+                            <a href="#" class="btn btn-success btn-green-gradient">Button gradient</a>
+                        </li>
+                        <li class="my-5">
+                            <a href="#" class="btn btn-success">Button success</a>
+                        </li>
+                        <li class="my-5">
+                            <a href="#" class="btn btn-success">
+                                Button success
+                                <i class="fal fa-arrow-right ml-2"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="col bg-dodger-blue">
+                    <ul class="list-unstyled p-5">
+                        <li class="my-5">
+                            <a href="#" class="btn btn-white btn-sm">Button white</a>
+                            <a href="#" class="btn btn-white">Button white</a>
+                            <a href="#" class="btn btn-white btn-lg">Button white</a>
+                        </li>
+                        <li class="my-5">
+                            <a href="#" class="btn btn-outline-white">Button white</a>
+                        </li>
+                        <li class="my-5">
+                            <a href="#" class="btn btn-outline-columbia-blue-e">Button blue</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+{% endblock %}
+
+{% block footer %}{% endblock %}
+
+{% block javascriptsPage %}
+   {# <script src="{{ asset('css-js/homepage.js') }}"></script> #}
+{% endblock %}

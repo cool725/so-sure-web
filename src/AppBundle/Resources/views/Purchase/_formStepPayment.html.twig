@@ -78,17 +78,17 @@
             </div>
             {% if app.user.hasValidPaymentMethod and app.user.hasJudoPaymentMethod %}
                 <div class="col">
-                    {{ form_widget(purchase_form.existing, {'label': 'Pay with card on file', 'attr': {'class': 'btn btn-success btn-gradient-green'}}) }}
+                    {{ form_widget(purchase_form.existing, {'label': 'Pay with card on file', 'attr': {'class': 'btn btn-success'}}) }}
                 </div>
                 <div class="col">
-                    {{ form_widget(purchase_form.next, {'label': 'Pay with a new card', 'attr': {'class': 'btn btn-success btn-gradient-green'}}) }}
+                    {{ form_widget(purchase_form.next, {'label': 'Pay with a new card', 'attr': {'class': 'btn btn-success'}}) }}
                 </div>
             {% else %}
                 <div class="col-9 text-right">
                     {% if purchase_form.existing is defined %}
                         {% do purchase_form.existing.setRendered %}
                     {% endif %}
-                    {{ form_widget(purchase_form.next, {'label': 'Proceed to payment', 'attr': {'class': 'btn btn-success btn-gradient-green btn-block-xs'}}) }}
+                    {{ form_widget(purchase_form.next, {'label': 'Proceed to payment', 'attr': {'class': 'btn btn-success btn-block-xs'}}) }}
                 </div>
             {% endif %}
         </div>
