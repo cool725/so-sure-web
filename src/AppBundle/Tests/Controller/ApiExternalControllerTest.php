@@ -337,6 +337,13 @@ class ApiExternalControllerTest extends BaseApiControllerTest
      */
     public function testGoCompareFeed()
     {
+        $gadgets = [];
+        foreach (GoCompare::$models as $id => $details) {
+            $gadgets[] = ['gadget' => ['gadget_id' => $id, 'loss_cover' => true]];
+        }
+
+        $data = ['request' => ['gadgets' => $gadgets]];
+        /*
         $data = '{"request": {
   "gadgets" : [
     {"gadget": {"gadget_id": 20, "loss_cover": true}},
@@ -392,7 +399,8 @@ class ApiExternalControllerTest extends BaseApiControllerTest
     {"gadget": {"gadget_id": 1239, "loss_cover": true}},
     {"gadget": {"gadget_id": 1240, "loss_cover": true}}
   ]
-}}';
+}}'; */
+
         $url = sprintf(
             '/external/gocompare/feed?gocompare_key=%s',
             static::$container->getParameter('gocompare_key')
@@ -406,10 +414,10 @@ class ApiExternalControllerTest extends BaseApiControllerTest
             array(
                 'CONTENT_TYPE' => 'application/json'
             ),
-            $data
+            json_encode($data)
         );
         $data = $this->verifyResponse(200);
-        $this->assertEquals(47, count($data['response']), json_encode($data));
+        $this->assertEquals(count(GoCompare::$models), count($data['response']), json_encode($data, JSON_PRETTY_PRINT));
     }
 
     public function testGoCompareDeeplink()
