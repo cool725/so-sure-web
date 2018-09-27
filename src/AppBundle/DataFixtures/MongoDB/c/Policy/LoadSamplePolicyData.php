@@ -428,6 +428,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             rand(2, 50),
             3
         );
+        $policy->setStatus(Policy::STATUS_UNPAID);
 
         $user = $this->newUser('android-testing+unpaid+discount@so-sure.org', false, false);
         $user->setPlainPassword(\AppBundle\DataFixtures\MongoDB\b\User\LoadUserData::DEFAULT_PASSWORD);
