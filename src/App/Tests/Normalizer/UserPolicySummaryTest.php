@@ -51,12 +51,14 @@ class UserPolicySummaryTest extends BaseControllerTest
         // @codingStandardsIgnoreStart
         $expectedJson = <<<JSON
 {
-    "widgets": [{
-        "type": "TEXT",
-        "title": "SO-SURE insurance policy",
-        "text": "You don't have a SO-SURE Policy",
-        "launchUrl": "{$userPageUrl}"
-    }]
+    "widgets": [
+        {
+            "type": "TEXT",
+            "title": "SO-SURE insurance policy",
+            "text": "You don't have a SO-SURE Policy",
+            "launchUrl": "{$userPageUrl}"
+        }
+    ]
 }
 JSON;
         // @codingStandardsIgnoreEnd
@@ -94,12 +96,38 @@ JSON;
 
         $expectedJson = <<<JSON
 {
-    "widgets": [{
-        "type": "TEXT",
-        "title": "{$policy->getPolicyNumber()} ($out->activePhone). Expires {$expiresDate}",
-        "text": "Reward pot: {$pot}",
-        "launchUrl": "{$userPageUrl}"
-    }]
+    "widgets": [
+        {
+            "type": "TEXT",
+            "title": "Policy Reference",
+            "text": "{$policy->getPolicyNumber()}",
+            "launchUrl": "{$userPageUrl}"
+        },
+        {
+            "type": "TEXT",
+            "title": "Covered Device",
+            "text": "{$out->activePhone}",
+            "launchUrl": "{$userPageUrl}"
+        },
+        {
+            "type": "TEXT",
+            "title": "Expiry Date",
+            "text": "{$expiresDate}",
+            "launchUrl": "{$userPageUrl}"
+        },
+        {
+            "type": "TEXT",
+            "title": "Connections",
+            "text": "0",
+            "launchUrl": "{$userPageUrl}"
+        },
+        {
+            "type": "TEXT",
+            "title": "Reward Pot Value",
+            "text": "£$rewardPotValue",
+            "launchUrl": "{$userPageUrl}"
+        }
+    ]
 }
 JSON;
 
