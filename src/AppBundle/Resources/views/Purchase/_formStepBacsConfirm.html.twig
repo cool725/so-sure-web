@@ -71,13 +71,12 @@
     <div class="form-group my-5">
         <div class="form-row">
             <div class="col-3">
-{#                 <a href="{{ path('purchase_step_payment_id', {'id': policy.id}) }}"
-                   class="btn btn-outline-grey btn-circle d-flex justify-content-center align-items-center">
+                {# TODO: Get fa icons working in submit types #}
+                <button type="submit" id="bacs_confirm_form_back" name="bacs_confirm_form[back]" class="btn btn-outline-grey btn-circle d-flex justify-content-center align-items-center">
                     <span class="sr-only">back</span>
                     <i class="far fa-arrow-left"></i>
-                </a> #}
-                {# TODO: This needs to be the arrow as above #}
-                {{ form_widget(bacs_confirm_form.back, {'label': 'Back', 'attr': {'class': 'btn btn-outline-grey btn-circle d-flex justify-content-center align-items-center'}}) }}
+                </button>
+                {{ form_widget(bacs_confirm_form.back, {'label': 'Back', 'attr': {'class': 'd-none'}}) }}
             </div>
             <div class="col-9 text-right">
                 {{ form_widget(bacs_confirm_form.save, {'label': 'Confirm', 'attr': {'class': 'btn btn-success btn-gradient-green btn-block-xs'}}) }}

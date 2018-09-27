@@ -11,7 +11,7 @@
         Pay via Direct Debit
         <span class="sub h5">(Recommended)</span>
     </h4>
-    <p class="mb-4"><smalll class="text-zaffre">💳 Prefer to pay by card? <a href="#" class="web-pay-submit"><u>Click here</u></a>
+    <p class="mb-4"><smalll class="text-zaffre">💳 Prefer to pay by card? <a href="#" id="web-pay-submit"><u>Click here</u></a>
     </smalll></p>
 
     <div class="form-group {% if form_errors(bacs_form.accountName) %}has-error{% endif %}">
@@ -57,13 +57,16 @@
              'label': 'I am the sole signature on the account',
             'attr': {'class':'custom-control-input'}}
         ) }}
-        <div class="with-errors">{{ form_errors(bacs_form.accountNumber) }}</div>
+        <div class="with-errors">{{ form_errors(bacs_form.soleSignature) }}</div>
     </div>
 
     <div class="form-group my-5">
         <div class="form-row">
             <div class="col-3">
-                {{ form_widget(bacs_confirm_form.back, {'label': 'Back', 'attr': {'class': 'btn btn-outline-grey btn-circle d-flex justify-content-center align-items-center'}}) }}
+                <a href="{{ path('purchase_step_payment_id', {'id': policy.id}) }}" class="btn btn-outline-grey btn-circle d-flex justify-content-center align-items-center cancel">
+                    <span class="sr-only">back</span>
+                    <i class="far fa-arrow-left"></i>
+                </a>
             </div>
             <div class="col-9 text-right">
                 {{ form_widget(bacs_form.save, {'label': 'Continue', 'attr': {'class': 'btn btn-success btn-gradient-green btn-block-xs'}}) }}
@@ -85,6 +88,14 @@
 <form action="{{ webpay_action }}" method="post" id="webpay-form">
     <input id="Reference" name="Reference" type="hidden" value="{{ webpay_reference }}">
 </form>
+
+<div id="so-sure-loader" class="loader">
+    <div class="loader__inner d-flex align-items-center flex-column justify-content-center">
+        <img src="{{ cdn_url }}/images/rebrand/misc/so-sure_loader.svg" alt="loading...">
+        <small class="text-grey">Payments powered by</small><br>
+        <img src="{{ cdn_url }}/images/purchase/judo_pay_logo.svg" alt="Judo Pay" title="Powered by - Judo Pay" width="80px">
+    </div>
+</div>
 
 {% include 'AppBundle::Purchase/_directDebitModal.html.twig' %}
 

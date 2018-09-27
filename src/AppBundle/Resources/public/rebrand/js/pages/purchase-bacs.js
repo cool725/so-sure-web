@@ -16,18 +16,24 @@ sosure.purchaseStepBacs = (function() {
     let self = {};
     self.form = null;
     self.isIE = null;
+    self.loader = null;
+    self.webPay = null;
+    self.webPayBtn = null;
 
     self.init = () => {
         self.form = $('.validate-form');
         self.sortCodeMask();
         self.isIE = !!navigator.userAgent.match(/Trident/g) || !!navigator.userAgent.match(/MSIE/g);
+        self.loader = $('#so-sure-loader');
+        self.webPay = $('#webpay-form');
+        self.webPayBtn = $('#web-pay-submit');
         if (self.form.data('client-validation') && !self.isIE) {
             self.addValidation();
         }
     }
 
     self.sortCodeMask = () => {
-        // Mask date input and add picker
+        // Mask sort code input
         $('.sort-code').mask('00-00-00');
     }
 
@@ -88,4 +94,11 @@ $(function(){
 
     sosure.purchaseStepBacs.init();
 
+    sosure.purchaseStepBacs.webPayBtn.on('click', function() {
+        if ($.trim($('#Reference').val()).length > 0) {
+            // Show loading overlay
+            sosure.purchaseStepBacs.loader.show();
+            sosure.purchaseStepBacs.webPay.submit();
+        }
+    });
 });
