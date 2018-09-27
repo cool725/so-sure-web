@@ -758,7 +758,7 @@ class DefaultController extends BaseController
     }
 
     /**
-     * @Route("/price/{id}/", name="price_item")
+     * @Route("/price/{id}", name="price_item")
      */
     public function priceItemAction($id)
     {

@@ -132,7 +132,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
     use ContainerAwareTrait;
 
     /**
-     * @Route("/", name="admin_home")
+     * @Route("", name="admin_home")
      * @Template
      */
     public function indexAction()

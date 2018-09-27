@@ -877,7 +877,7 @@ class PurchaseControllerTest extends BaseControllerTest
         $policyService->setEnvironment('test');
         $this->assertTrue($user->hasValidPaymentMethod());
 
-        $this->login($email, $password, 'user/');
+        $this->login($email, $password, 'user');
 
         $phone2 = $this->setRandomPhone();
         $this->setPhone($phone2);

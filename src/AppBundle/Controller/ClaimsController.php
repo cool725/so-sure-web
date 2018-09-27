@@ -44,7 +44,7 @@ use AppBundle\Exception\RedirectException;
 class ClaimsController extends BaseController
 {
     /**
-     * @Route("/", name="claims_home")
+     * @Route("", name="claims_home")
      * @Template
      */
     public function indexAction()

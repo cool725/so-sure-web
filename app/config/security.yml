@@ -85,7 +85,14 @@ security:
         - { path: ^/login$, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/register, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/resetting, role: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/admin$, role: ROLE_EMPLOYEE }
         - { path: ^/admin/, role: ROLE_EMPLOYEE }
+        - { path: ^/claims$, role: ROLE_CLAIMS, ips: [ "%davies_ip%" ] }
+        - { path: ^/claims$, role: ROLE_CLAIMS, ips: [ "%directgroup_ip%" ] }
+        - { path: ^/claims$, role: ROLE_CLAIMS, ips: [ "%sosure_rwe_ip%" ] }
+        - { path: ^/claims$, role: ROLE_CLAIMS, ips: [ "%sosure_patrick_ip%" ] }
+        - { path: ^/claims$, role: ROLE_CLAIMS, ips: [ "127.0.0.1" ] }
+        - { path: ^/claims$, role: ROLE_NO_ACCESS }
         - { path: ^/claims/, role: ROLE_CLAIMS, ips: [ "%davies_ip%" ] }
         - { path: ^/claims/, role: ROLE_CLAIMS, ips: [ "%directgroup_ip%" ] }
         - { path: ^/claims/, role: ROLE_CLAIMS, ips: [ "%sosure_rwe_ip%" ] }
@@ -93,6 +100,7 @@ security:
         - { path: ^/claims/, role: ROLE_CLAIMS, ips: [ "127.0.0.1" ] }
         - { path: ^/claims/, role: ROLE_NO_ACCESS }
         - { path: ^/alpha$, role: ROLE_USER }
+        - { path: ^/user$, role: ROLE_USER }
         - { path: ^/user/, role: ROLE_USER }
         - { path: ^/bearer-api, roles: [ IS_AUTHENTICATED_FULLY ] }
         - { path: ^/api, access: "isApiPort(8080)" }

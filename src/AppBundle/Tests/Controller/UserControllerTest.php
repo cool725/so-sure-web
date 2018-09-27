@@ -55,12 +55,12 @@ class UserControllerTest extends BaseControllerTest
         self::$dm->flush();
         //print_r($policy->getClaimsWarnings());
         $this->assertTrue($policy->getUser()->hasActivePolicy());
-        $this->login($email, $password, 'user/');
+        $this->login($email, $password, 'user');
 
         $crawler = self::$client->request('GET', '/user/invalid');
         self::verifyResponse(500);
 
-        $crawler = self::$client->request('GET', '/user/');
+        $crawler = self::$client->request('GET', '/user');
 
         $this->validateBonus($crawler, 14, 14);
         $this->validateRewardPot($crawler, 0);
@@ -88,9 +88,9 @@ class UserControllerTest extends BaseControllerTest
         // print_r($policy->getCurrentConnectionValues());
         //print_r($policy->getClaimsWarnings());
         $this->assertTrue($policy->getUser()->hasActivePolicy());
-        $this->login($email, $password, 'user/');
+        $this->login($email, $password, 'user');
 
-        $crawler = self::$client->request('GET', '/user/');
+        $crawler = self::$client->request('GET', '/user');
 
         $this->validateBonus($crawler, 46, 46);
         $this->validateRewardPot($crawler, 0);
@@ -118,9 +118,9 @@ class UserControllerTest extends BaseControllerTest
         // print_r($policy->getCurrentConnectionValues());
         //print_r($policy->getClaimsWarnings());
         $this->assertTrue($policy->getUser()->hasActivePolicy());
-        $this->login($email, $password, 'user/');
+        $this->login($email, $password, 'user');
 
-        $crawler = self::$client->request('GET', '/user/');
+        $crawler = self::$client->request('GET', '/user');
 
         // todo - will fail during leap year
         $this->validateBonus($crawler, [304, 305], [304, 305]);
@@ -154,9 +154,9 @@ class UserControllerTest extends BaseControllerTest
         $claimsService = self::$container->get('app.claims');
         $claimsService->addClaim($policy, $claim);
 
-        $this->login($email, $password, 'user/');
+        $this->login($email, $password, 'user');
 
-        $crawler = self::$client->request('GET', '/user/');
+        $crawler = self::$client->request('GET', '/user');
 
         $this->validateRewardPot($crawler, 0);
         $this->validateInviteAllowed($crawler, false);
@@ -194,20 +194,20 @@ class UserControllerTest extends BaseControllerTest
         $this->assertTrue($policy->getUser()->hasActivePolicy());
         $this->assertTrue($inviteePolicy->getUser()->hasActivePolicy());
 
-        $this->login($email, $password, 'user/');
+        $this->login($email, $password, 'user');
 
-        $crawler = self::$client->request('GET', '/user/');
+        $crawler = self::$client->request('GET', '/user');
         self::verifyResponse(200);
         $form = $crawler->selectButton('email[submit]')->form();
         $form['email[email]'] = $inviteeEmail;
         $crawler = self::$client->submit($form);
 
-        $this->login($inviteeEmail, $password, 'user/');
-        $crawler = self::$client->request('GET', '/user/');
+        $this->login($inviteeEmail, $password, 'user');
+        $crawler = self::$client->request('GET', '/user');
         $form = $crawler->selectButton('Accept')->form();
         $crawler = self::$client->submit($form);
 
-        $crawler = self::$client->request('GET', '/user/');
+        $crawler = self::$client->request('GET', '/user');
         $this->validateRewardPot($crawler, 10);
     }
 
@@ -243,9 +243,9 @@ class UserControllerTest extends BaseControllerTest
         $this->assertTrue($policy->getUser()->hasActivePolicy());
         $this->assertTrue($inviteePolicy->getUser()->hasActivePolicy());
 
-        $this->login($email, $password, 'user/');
+        $this->login($email, $password, 'user');
 
-        $crawler = self::$client->request('GET', '/user/');
+        $crawler = self::$client->request('GET', '/user');
         self::verifyResponse(200);
         $form = $crawler->selectButton('email[submit]')->form();
         $form['email[email]'] = $inviteeEmail;
@@ -285,7 +285,7 @@ class UserControllerTest extends BaseControllerTest
         $this->assertTrue($policy->getUser()->hasActivePolicy());
         $this->assertTrue($inviteePolicy->getUser()->hasActivePolicy());
 
-        $this->login($email, $password, 'user/');
+        $this->login($email, $password, 'user');
 
         self::$client->followRedirects();
         $crawler = self::$client->request('GET', sprintf('/scode/%s', $inviteePolicy->getStandardSCode()->getCode()));
@@ -296,13 +296,13 @@ class UserControllerTest extends BaseControllerTest
         $this->assertEquals($inviteePolicy->getStandardSCode()->getCode(), $form['scode[scode]']->getValue());
         $crawler = self::$client->submit($form);
 
-        $this->login($inviteeEmail, $password, 'user/');
-        $crawler = self::$client->request('GET', '/user/');
+        $this->login($inviteeEmail, $password, 'user');
+        $crawler = self::$client->request('GET', '/user');
         // print $crawler->html();
         $form = $crawler->selectButton('Accept')->form();
         $crawler = self::$client->submit($form);
 
-        $crawler = self::$client->request('GET', '/user/');
+        $crawler = self::$client->request('GET', '/user');
         $this->validateRewardPot($crawler, 10);
     }
 
@@ -332,7 +332,7 @@ class UserControllerTest extends BaseControllerTest
 
         $this->assertTrue($policy->getUser()->hasActivePolicy());
 
-        $this->login($email, $password, 'user/');
+        $this->login($email, $password, 'user');
 
         self::$client->followRedirects();
         $crawler = self::$client->request('GET', '/user/contact-details');
@@ -366,7 +366,7 @@ class UserControllerTest extends BaseControllerTest
 
         self::$client = self::createClient();
 
-        $this->login($email, $password, 'user/');
+        $this->login($email, $password, 'user');
 
         self::$client->followRedirects();
         $crawler = self::$client->request('GET', '/user/contact-details');
@@ -398,7 +398,7 @@ class UserControllerTest extends BaseControllerTest
 
         $this->assertTrue($policy->getUser()->hasActivePolicy());
 
-        $this->login($email, $password, 'user/');
+        $this->login($email, $password, 'user');
 
         self::$client->followRedirects();
         $crawler = self::$client->request('GET', '/user/contact-details');
@@ -581,7 +581,7 @@ class UserControllerTest extends BaseControllerTest
 
         $this->assertTrue($policyA->getUser()->hasActivePolicy());
         $this->assertTrue($policyB->getUser()->hasActivePolicy());
-        $this->login($emailA, $password, 'user/');
+        $this->login($emailA, $password, 'user');
 
         $crawler = self::$client->request('GET', sprintf('/user/%s', $policyA->getId()));
         self::verifyResponse(200);
@@ -616,7 +616,7 @@ class UserControllerTest extends BaseControllerTest
         static::$dm->persist($renewalPolicy);
         static::$dm->flush();
 
-        $crawler = $this->login($email, $password, 'user/');
+        $crawler = $this->login($email, $password, 'user');
 
         $this->validateRenewalAllowed($crawler, 1);
 
@@ -659,7 +659,7 @@ class UserControllerTest extends BaseControllerTest
         static::$dm->persist($renewalPolicy);
         static::$dm->flush();
 
-        $crawler = $this->login($email, $password, 'user/');
+        $crawler = $this->login($email, $password, 'user');
 
         $this->validateRenewalAllowed($crawler, 1);
 
@@ -702,7 +702,7 @@ class UserControllerTest extends BaseControllerTest
         static::$dm->persist($renewalPolicy);
         static::$dm->flush();
 
-        $crawler = $this->login($email, $password, 'user/');
+        $crawler = $this->login($email, $password, 'user');
 
         $this->validateRenewalAllowed($crawler, 1);
 
@@ -764,7 +764,7 @@ class UserControllerTest extends BaseControllerTest
         $this->assertEquals(10, $policyA->getPotValue());
         $this->assertEquals(10, $policyB->getPotValue());
 
-        $crawler = $this->login($emailA, $password, 'user/');
+        $crawler = $this->login($emailA, $password, 'user');
 
         $this->validateRenewalAllowed($crawler, 1);
 
@@ -830,7 +830,7 @@ class UserControllerTest extends BaseControllerTest
         $this->assertEquals(10, $policyA->getPotValue());
         $this->assertEquals(10, $policyB->getPotValue());
 
-        $crawler = $this->login($emailA, $password, 'user/');
+        $crawler = $this->login($emailA, $password, 'user');
 
         $this->validateRenewalAllowed($crawler, 1);
 

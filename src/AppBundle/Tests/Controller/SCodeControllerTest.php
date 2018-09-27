@@ -57,7 +57,7 @@ class SCodeControllerTest extends BaseControllerTest
         self::$dm->flush();
         //print_r($policy->getClaimsWarnings());
         $this->assertTrue($policy->getUser()->hasActivePolicy());
-        $this->login($email, $password, 'user/');
+        $this->login($email, $password, 'user');
 
         $repo = self::$dm->getRepository(SCode::class);
         /** @var SCode $scode */
@@ -66,7 +66,7 @@ class SCodeControllerTest extends BaseControllerTest
         $url = sprintf('/scode/%s', $scode->getCode());
         $crawler = self::$client->request('GET', $url);
         self::verifyResponse(302);
-        $this->assertTrue($this->isClientResponseRedirect('/user/'));
+        $this->assertTrue($this->isClientResponseRedirect('/user'));
     }
 
     public function testMultibyte()

@@ -231,19 +231,19 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
 
         // Users for iOS Testing
         $iphoneUI = $this->getIPhoneUI($manager);
-        $userInviter = $this->newUser('ios-testing+inviter@so-sure.net', false, false);
+        $userInviter = $this->newUser('ios-testing+inviter@so-sure.org', false, false);
         $userInviter->setPlainPassword(\AppBundle\DataFixtures\MongoDB\b\User\LoadUserData::DEFAULT_PASSWORD);
         $userInviter->setEnabled(true);
         $manager->persist($userInviter);
         $this->newPolicy($manager, $userInviter, $count++, self::CLAIM_NONE, null, null, $iphoneUI, true);
 
-        $userInvitee = $this->newUser('ios-testing+invitee@so-sure.net', false, false);
+        $userInvitee = $this->newUser('ios-testing+invitee@so-sure.org', false, false);
         $userInvitee->setPlainPassword(\AppBundle\DataFixtures\MongoDB\b\User\LoadUserData::DEFAULT_PASSWORD);
         $userInvitee->setEnabled(true);
         $manager->persist($userInvitee);
         $this->newPolicy($manager, $userInvitee, $count++, self::CLAIM_NONE, null, null, $iphoneUI, true, false);
 
-        $user = $this->newUser('ios-testing+scode@so-sure.net', false, false);
+        $user = $this->newUser('ios-testing+scode@so-sure.org', false, false);
         $user->setPlainPassword(\AppBundle\DataFixtures\MongoDB\b\User\LoadUserData::DEFAULT_PASSWORD);
         $user->setEnabled(true);
         $manager->persist($user);
@@ -251,7 +251,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
 
         $this->invite($manager, $userInviter, $userInvitee, false);
 
-        $user = $this->newUser('ios-testing+renew+pot@so-sure.net', false, false);
+        $user = $this->newUser('ios-testing+renew+pot@so-sure.org', false, false);
         $user->setPlainPassword(\AppBundle\DataFixtures\MongoDB\b\User\LoadUserData::DEFAULT_PASSWORD);
         $user->setEnabled(true);
         $manager->persist($user);
@@ -265,7 +265,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             }
         }
 
-        $user = $this->newUser('ios-testing+renew+nopot@so-sure.net', false, false);
+        $user = $this->newUser('ios-testing+renew+nopot@so-sure.org', false, false);
         $user->setPlainPassword(\AppBundle\DataFixtures\MongoDB\b\User\LoadUserData::DEFAULT_PASSWORD);
         $user->setEnabled(true);
         $manager->persist($user);
@@ -279,7 +279,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             }
         }
 
-        $user = $this->newUser('ios-testing+cashback@so-sure.net', false, false);
+        $user = $this->newUser('ios-testing+cashback@so-sure.org', false, false);
         $user->setPlainPassword(\AppBundle\DataFixtures\MongoDB\b\User\LoadUserData::DEFAULT_PASSWORD);
         $user->setEnabled(true);
         $manager->persist($user);
@@ -295,19 +295,19 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
 
         // Users for Android Testing
         $androidUI = $this->getAndroidUI($manager);
-        $userInviter = $this->newUser('android-testing+inviter@so-sure.net', false, false);
+        $userInviter = $this->newUser('android-testing+inviter@so-sure.org', false, false);
         $userInviter->setPlainPassword(\AppBundle\DataFixtures\MongoDB\b\User\LoadUserData::DEFAULT_PASSWORD);
         $userInviter->setEnabled(true);
         $manager->persist($userInviter);
         $this->newPolicy($manager, $userInviter, $count++, self::CLAIM_NONE, null, null, $androidUI, true);
 
-        $userInvitee = $this->newUser('android-testing+invitee@so-sure.net', false, false);
+        $userInvitee = $this->newUser('android-testing+invitee@so-sure.org', false, false);
         $userInvitee->setPlainPassword(\AppBundle\DataFixtures\MongoDB\b\User\LoadUserData::DEFAULT_PASSWORD);
         $userInvitee->setEnabled(true);
         $manager->persist($userInvitee);
         $this->newPolicy($manager, $userInvitee, $count++, self::CLAIM_NONE, null, null, $androidUI, true, false);
 
-        $user = $this->newUser('android-testing+scode@so-sure.net', false, false);
+        $user = $this->newUser('android-testing+scode@so-sure.org', false, false);
         $user->setPlainPassword(\AppBundle\DataFixtures\MongoDB\b\User\LoadUserData::DEFAULT_PASSWORD);
         $user->setEnabled(true);
         $manager->persist($user);
@@ -315,7 +315,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
 
         $this->invite($manager, $userInviter, $userInvitee, false);
 
-        $user = $this->newUser('android-testing+renew+pot@so-sure.net', false, false);
+        $user = $this->newUser('android-testing+renew+pot@so-sure.org', false, false);
         $user->setPlainPassword(\AppBundle\DataFixtures\MongoDB\b\User\LoadUserData::DEFAULT_PASSWORD);
         $user->setEnabled(true);
         $manager->persist($user);
@@ -329,7 +329,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             }
         }
 
-        $user = $this->newUser('android-testing+renew+nopot@so-sure.net', false, false);
+        $user = $this->newUser('android-testing+renew+nopot@so-sure.org', false, false);
         $user->setPlainPassword(\AppBundle\DataFixtures\MongoDB\b\User\LoadUserData::DEFAULT_PASSWORD);
         $user->setEnabled(true);
         $manager->persist($user);
@@ -343,7 +343,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             }
         }
 
-        $user = $this->newUser('android-testing+cashback@so-sure.net', false, false);
+        $user = $this->newUser('android-testing+cashback@so-sure.org', false, false);
         $user->setPlainPassword(\AppBundle\DataFixtures\MongoDB\b\User\LoadUserData::DEFAULT_PASSWORD);
         $user->setEnabled(true);
         $manager->persist($user);
@@ -410,7 +410,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $manager->flush();
 
         // unpaid policy with discount
-        $user = $this->newUser('ios-testing+unpaid+discount@so-sure.net', false, false);
+        $user = $this->newUser('ios-testing+unpaid+discount@so-sure.org', false, false);
         $user->setPlainPassword(\AppBundle\DataFixtures\MongoDB\b\User\LoadUserData::DEFAULT_PASSWORD);
         $user->setEnabled(true);
         $manager->persist($user);
@@ -429,7 +429,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             3
         );
 
-        $user = $this->newUser('android-testing+unpaid+discount@so-sure.net', false, false);
+        $user = $this->newUser('android-testing+unpaid+discount@so-sure.org', false, false);
         $user->setPlainPassword(\AppBundle\DataFixtures\MongoDB\b\User\LoadUserData::DEFAULT_PASSWORD);
         $user->setEnabled(true);
         $manager->persist($user);
