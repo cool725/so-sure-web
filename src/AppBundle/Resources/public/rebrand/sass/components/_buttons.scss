@@ -2,42 +2,65 @@
 
 .btn {
     font-family: $g-medium;
-}
-
-// Add shadow to button rather than modifying the core css
-.btn-shadow {
     box-shadow: 0 15px 30px 0 rgba(8,27,154,0.08),
                 0 5px 15px 0 rgba(8,27,154,0.08);
 
-    // &:hover {
-    //     box-shadow: 0 15px 30px 0 rgba(8,27,154,0.1),
-    //                 0 5px 15px 0 rgba(8,27,154,0.1);
-    // }
+    &:hover {
+        box-shadow: none;
+    }
+}
+
+// Remove box-shadow on outline buttons
+a[class*="btn-outline-"] {
+    box-shadow: none;
 }
 
 // Modify white btns to match design
 .btn-white {
     color: $dodger-blue;
-}
-
-// Add gradient to button rather than modifying the core css
-// TODO: We're removing button gradient fallback to primary
-.btn-gradient {
-    border: none;
-    @include blue-gradient;
 
     &:hover {
-        @include linear-gradient(100deg, $deep-sky-blue-b, $crayon-blue);
+        color: darken($dodger-blue, 5%);
     }
 }
 
-// Add gradient to button rather than modifying the core css
-.btn-gradient-green {
+.btn-blue-gradient {
     border: none;
-    @include linear-gradient(90deg, $islamic-green, $ufo-green);
+    @include linear-gradient(100deg, $crayon-blue, $deep-sky-blue-b);
 
-    &:hover {
-        @include linear-gradient(90deg, $ufo-green, $islamic-green);
+    &:hover,
+    &:focus,
+    &:active {
+        @include linear-gradient(100deg, $crayon-blue, $deep-sky-blue-b);
+    }
+
+    &:not(:disabled):not(.disabled).active,
+    &:not(:disabled):not(.disabled):active {
+        @include linear-gradient(100deg, $crayon-blue, $crayon-blue);
+
+        &:focus {
+          @include linear-gradient(100deg, $crayon-blue, $crayon-blue);
+        }
+    }
+}
+
+.btn-green-gradient {
+    border: none;
+    @include linear-gradient(100deg, $islamic-green, $ufo-green);
+
+    &:hover,
+    &:focus,
+    &:active {
+        @include linear-gradient(100deg, $ufo-green, $islamic-green);
+    }
+
+    &:not(:disabled):not(.disabled).active,
+    &:not(:disabled):not(.disabled):active {
+        @include linear-gradient(100deg, $islamic-green, $islamic-green);
+
+        &:focus {
+          @include linear-gradient(100deg, $islamic-green, $islamic-green);
+        }
     }
 }
 
@@ -104,4 +127,3 @@
     }
 
 }
-
