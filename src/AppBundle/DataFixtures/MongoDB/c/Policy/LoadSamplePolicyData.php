@@ -424,11 +424,10 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             $iphoneUI,
             false,
             true,
-            null,
+            180,
             rand(2, 50),
             3
         );
-        $policy->setStatus(Policy::STATUS_UNPAID);
 
         $user = $this->newUser('android-testing+unpaid+discount@so-sure.org', false, false);
         $user->setPlainPassword(\AppBundle\DataFixtures\MongoDB\b\User\LoadUserData::DEFAULT_PASSWORD);
@@ -444,11 +443,10 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             $androidUI,
             false,
             true,
-            null,
+            180,
             rand(2, 50),
             3
         );
-        $policy->setStatus(Policy::STATUS_UNPAID);
 
         $manager->flush();
     }
