@@ -102,7 +102,7 @@ class BearerTest extends BaseControllerTest
 
         $content = $this->getClientResponseContent();
 
-        $this->assertContains('. Expires ', $content);
+        $this->assertContains('Expiry Date', $content);
 
         $summary = json_decode($content, true);
         $this->assertSummaryMatchesUserWithTwoPolicies($summary);
@@ -151,8 +151,10 @@ class BearerTest extends BaseControllerTest
         $this->assertArrayHasKey('widgets', $summary);
         #$this->assertArrayHasKey('policies', $summary);
 
-        $this->assertCount(1, $summary['widgets']);
-        $this->assertPolicySummaryHasKeys($summary['widgets'][0]);
+        $this->assertCount(5, $summary['widgets']);
+        for ($i = 0; $i < count($summary['widgets']); $i++) {
+            $this->assertPolicySummaryHasKeys($summary['widgets'][$i]);
+        }
     }
 
     private function assertPolicySummaryHasKeys(array $widget)
