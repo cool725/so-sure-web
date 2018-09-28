@@ -93,7 +93,7 @@ init $SKIP_DB $SKIP_POLICY
 # keep in sync with load.sh
 for feature in "renewal" "picsure" "bacs"
 do
-  sudo app/console --env=test sosure:feature $feature true
+  app/console --env=test sosure:feature $feature true
 done
 
 if [ "$RUN_FILTER" == "" ]; then
