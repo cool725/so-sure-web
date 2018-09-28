@@ -14,7 +14,7 @@
 
     <testsuites>
         <testsuite name="Project Test Suite">
-            <directory>../Tests</directory>
+            <directory>../tests</directory>
             <directory>../src/App/Tests</directory>
             <directory>../src/*/*Bundle/Tests</directory>
             <directory>../src/*/Bundle/*Bundle/Tests</directory>
@@ -32,7 +32,7 @@
         <whitelist>
             <directory>../src</directory>
             <exclude>
-                <directory>../Tests</directory>
+                <directory>../tests</directory>
                 <directory>../src/App/Tests</directory>
                 <directory>../src/*Bundle/Resources</directory>
                 <directory>../src/*Bundle/Tests</directory>

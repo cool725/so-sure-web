@@ -104,10 +104,7 @@ if [ "$RUN_FILTER" == "" ]; then
   ./vendor/phing/phing/bin/phing -f build/test.xml $FUNCTIONAL_TEST
 else
   ./vendor/phing/phing/bin/phing -f build/test.xml test:unit
-  echo ./build/phpunit.sh $DEBUG --filter "$RUN_FILTER" --bootstrap vendor/autoload.php src/
-  ./build/phpunit.sh $DEBUG --filter "$RUN_FILTER" --bootstrap vendor/autoload.php src/
-  echo ./build/phpunit.sh $DEBUG --filter "$RUN_FILTER" --bootstrap vendor/autoload.php tests/
-  ./build/phpunit.sh $DEBUG --filter "$RUN_FILTER" --bootstrap vendor/autoload.php tests
+  ./build/phpunit.sh $DEBUG --filter "$RUN_FILTER" --bootstrap vendor/autoload.php
 fi
 if [ "$SKIP_FLUSH_REDIS" == "0" ]; then
   echo "Flushing redis"

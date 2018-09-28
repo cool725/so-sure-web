@@ -23,11 +23,10 @@
           <formatter type="plain" usefile="false"/>
           <batchtest>
               <fileset dir="${dir.src}">
-                 <include name="**/Tests/**/*Test*.php"/>
+                 <include name="**/Tests/**/*Test.php"/>
               </fileset>
               <fileset dir="${dir.tests}">
-                  <include name="tests/**/*Test.php"/>
-                  <include name="tests/*Test.php"/>
+                  <include name="**/*Test.php"/>
               </fileset>
           </batchtest>
         </phpunit>
