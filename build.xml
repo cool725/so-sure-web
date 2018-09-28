@@ -869,7 +869,7 @@
           </SymfonyConsole>
     </target>
   <!-- Symfony2 code sniffer -->
-    <target name="check:cs" description="Checks coding standard." depends="build:vendors">
+    <target name="check:cs" description="Checks coding standard.">
         <echo msg="Checking coding standard ..." />
         <phpcodesniffer standard="Symfony2"
                         showSniffs="true"
@@ -879,7 +879,7 @@
         </phpcodesniffer>
     </target>
 
-    <target name="force:cs" depends="build:clean,build:prepare,build:vendors" description="Forces coding standard.">
+    <target name="force:cs" depends="build:clean,build:prepare" description="Forces coding standard.">
         <property name="force.cs.fileset" value="sourcecodesniffer" />
         <property name="force.cs.noop-fileset" value="noop-sourcecodesniffer" />
         <phingcall target="force:cs:run" />
