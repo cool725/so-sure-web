@@ -20,7 +20,7 @@
                         <div class="radio-btn {% if purchase_form.vars.value.amount == phone.currentPhonePrice.monthlyPremiumPrice %}radio-btn-active{% endif %}" data-value="{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }}" data-premium-type="month">
                             <div class="radio-btn__content">
                                 <h6 class="radio-btn__title mb-0">Monthly</h6>
-                                <div class="radio-btn__price">(&pound;{{ phone.currentPhonePrice.monthlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }})</div>
+                                <div class="radio-btn__price">&pound;{{ phone.currentPhonePrice.monthlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }}</div>
                             </div>
                         </div>
                     </div>
@@ -30,7 +30,7 @@
                         <div class="radio-btn {% if purchase_form.vars.value.amount == phone.currentPhonePrice.yearlyPremiumPrice(app.user.additionalPremium) %}radio-btn-active{% endif %}" data-value="{{ phone.currentPhonePrice.yearlyPremiumPrice|number_format(2, '.', ',') }}" data-premium-type="year">
                             <div class="radio-btn__content">
                                 <h6 class="radio-btn__title mb-0">Yearly</h6>
-                                <div class="radio-btn__price">(&pound;{{ phone.currentPhonePrice.yearlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }})</div>
+                                <div class="radio-btn__price">&pound;{{ phone.currentPhonePrice.yearlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }}</div>
                             </div>
                         </div>
                     </div>
@@ -39,33 +39,6 @@
         </div>
         <div class="with-errors">{{ form_errors(purchase_form.amount) }}</div>
     </div>
-
-{#     <div class="form-group mt-5">
-        <h4 class="payment-options__title text-dodger-blue mb-4">Choose payment method</h4>
-        <div class="radio-btn-original">
-        </div>
-        <div class="radio-btn-group">
-            <div class="row">
-                <div class="col-6">
-                    <div class="radio-btn radio-btn-active">
-                        <div class="radio-btn__content">
-                            <h6 class="radio-btn__title mb-0">Monthly</h6>
-                            <div class="radio-btn__price">dasdasdasdasd</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-6">
-                    <div class="radio-btn">
-                        <div class="radio-btn__content">
-                            <h6 class="radio-btn__title mb-0">Yearly</h6>
-                            <div class="radio-btn__price">aasdasd</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="with-errors">{{ form_errors(purchase_form.amount) }}</div>
-    </div> #}
 
     <div class="form-group mt-5">
         <div class="form-row">
@@ -88,7 +61,7 @@
                     {% if purchase_form.existing is defined %}
                         {% do purchase_form.existing.setRendered %}
                     {% endif %}
-                    {{ form_widget(purchase_form.next, {'label': 'Proceed to payment', 'attr': {'class': 'btn btn-success btn-green-gradient btn-block-xs'}}) }}
+                    {{ form_widget(purchase_form.next, {'label': 'Proceed to payment', 'attr': {'class': 'btn btn-success btn-green-gradient btn-icon arrow-right btn-block-xs'}}) }}
                 </div>
             {% endif %}
         </div>
@@ -97,12 +70,12 @@
     {% if payment_provider == 'judo' %}
         <div class="form-group text-center mt-5">
             <small class="text-grey">Payments powered by</small><br>
-            <img src="{{ cdn_url }}/images/purchase/judo_pay_logo.svg" alt="Judo Pay" title="Powered by - Judo Pay" width="80px">
+            <img src="{{ cdn_url }}/images/purchase/judo_pay_logo.svg" alt="Judo Pay" title="Powered by - Judo Pay" width="80px" class="mt-2">
         </div>
     {% elseif payment_provider == 'bacs' %}
         <div class="form-group text-center mt-5">
             <small class="text-grey">Payments via</small><br>
-            <img src="{{ cdn_url }}/images/rebrand/misc/so-sure_direct-debit-logo.svg" alt="Direct Debit" width="100px">
+            <img src="{{ cdn_url }}/images/rebrand/misc/so-sure_direct-debit-logo.svg" alt="Direct Debit" width="100px" class="mt-2">
         </div>
     {% endif %}
 
