@@ -45,6 +45,6 @@ class FeatureCommand extends ContainerAwareCommand
         /** @var FeatureService $feature */
         $feature = $this->getContainer()->get('app.feature');
         $feature->setEnabled($name, $enabled);
-        $output->writeln('Finished');
+        $output->writeln(sprintf('%s %s feature flag', $enabled ? 'Enabled' : 'Disabled', $name));
     }
 }
