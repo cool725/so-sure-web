@@ -80,7 +80,7 @@ abstract class LoadPhoneData implements ContainerAwareInterface
 
         $env = $this->container->getParameter('kernel.environment');
         if ($env != 'prod') {
-            //return;
+            return;
         }
 
         $lines = [];
