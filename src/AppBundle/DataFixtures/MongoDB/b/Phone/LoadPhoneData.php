@@ -80,7 +80,7 @@ abstract class LoadPhoneData implements ContainerAwareInterface
 
         $env = $this->container->getParameter('kernel.environment');
         if ($env != 'prod') {
-            return;
+            //return;
         }
 
         $lines = [];
@@ -105,7 +105,7 @@ abstract class LoadPhoneData implements ContainerAwareInterface
 
         // @codingStandardsIgnoreStart
         $body = sprintf(
-            'The following phones have been added to the so-sure site. Ensure that <ul><li>tech has the latest go-compare model reference sheet and adds the go-compare reference numbers</li><li>New models are considered for high in-demand</li><li>New advertising can be added.</li></ul><br><br>%s',
+            'The following phones have been added to the so-sure site. <ul><li>New models are considered for high in-demand</li><li>New advertising can be added.</li></ul><br><br>%s',
             implode('<br>', $lines)
         );
         // @codingStandardsIgnoreEnd
@@ -117,6 +117,22 @@ abstract class LoadPhoneData implements ContainerAwareInterface
             null,
             'tech+ops@so-sure.com',
             'tech@so-sure.com'
+        );
+
+        // @codingStandardsIgnoreStart
+        $body = sprintf(
+            'The following phones have been added to the so-sure site. Can you please provide your Gadget ID\'s if available, or let us know once they have been added to your system? <br><br>%s',
+            implode('<br>', $lines)
+        );
+        // @codingStandardsIgnoreEnd
+        $mailer->send(
+            'Request for Gadget List ID',
+            ['matt@comparisoncreator.com' ,'marketing@so-sure.com'],
+            $body,
+         null,
+         null,
+        'tech+ops@so-sure.com',
+        'support@wearesosure.com'
         );
     }
 
