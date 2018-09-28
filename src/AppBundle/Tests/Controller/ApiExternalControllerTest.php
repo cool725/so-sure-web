@@ -449,6 +449,35 @@ class ApiExternalControllerTest extends BaseApiControllerTest
         $this->assertTrue($this->isClientResponseRedirect($redirectUrl));
     }
 
+    public function testGoCompareDeeplinkSpace()
+    {
+        $url = sprintf(
+            '/external/gocompare/deeplink'
+        );
+        $data  = [
+            'first_name' => 'foo bar',
+            'surname' => 'bar foo',
+            'email_address' => static::generateEmail('testGoCompareDeeplinkSpace', $this),
+            'dob' => '2018-01-01',
+            'reference' => static::$phone->getId(),
+        ];
+
+        $crawler =  static::$client->request(
+            "POST",
+            $url,
+            $data
+        );
+
+        $data = $this->verifyResponse(
+            302,
+            null,
+            null,
+            sprintf("%s %s", static::$phone->__toString(), static::$phone->getId())
+        );
+        $redirectUrl = self::$router->generate('quote_phone', ['id' => static::$phone->getId()]);
+        $this->assertTrue($this->isClientResponseRedirect($redirectUrl));
+    }
+
     public function testGoCompareDeeplinkUtm()
     {
         $client = self::createClient();

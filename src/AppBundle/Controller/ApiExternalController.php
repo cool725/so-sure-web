@@ -2,6 +2,7 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Validator\Constraints\AlphanumericValidator;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -279,8 +280,9 @@ class ApiExternalController extends BaseController
         }
 
         $user = new User();
-        $user->setFirstName($this->getRequestString($request, 'first_name'));
-        $user->setLastName($this->getRequestString($request, 'surname'));
+        $validator = new AlphanumericValidator();
+        $user->setFirstName($validator->conform($this->getRequestString($request, 'first_name')));
+        $user->setLastName($validator->conform($this->getRequestString($request, 'surname')));
         $user->setEmail($email);
         $user->setBirthday(\DateTime::createFromFormat('Y-m-d', $this->getRequestString($request, 'dob')));
         $user->setEnabled(true);
