@@ -18,7 +18,7 @@ class Bacs extends BankAccount
 
     /**
      * @Assert\Type("bool")
-     * @Assert\IsTrue
+     * @Assert\IsTrue(message="You must be the sole signature on the account to setup a direct debit")
      */
     protected $soleSignature;
 

@@ -49,7 +49,7 @@ class BacsType extends AbstractType
             ->add('accountNumber', TextType::class, ['required' => $this->required])
             ->add('soleSignature', CheckboxType::class, [
                 'label' => 'I am the sole signature on the account',
-                'required' => true
+                'required' => $this->required
             ])
             ->add('save', SubmitType::class)
         ;

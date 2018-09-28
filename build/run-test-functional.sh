@@ -90,6 +90,12 @@ fi
 
 init $SKIP_DB $SKIP_POLICY
 
+# keep in sync with load.sh
+for feature in "renewal" "picsure" "bacs"
+do
+  app/console --env=test sosure:feature $feature true
+done
+
 if [ "$RUN_FILTER" == "" ]; then
     if [ "$COVER" == "0" ]; then
         # for some reason, some tests do not do work as expected unless run individually

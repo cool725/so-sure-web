@@ -3,6 +3,7 @@
 namespace AppBundle\Tests\Controller;
 
 use AppBundle\Document\LostPhone;
+use AppBundle\Service\PCAService;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\User;
 use AppBundle\Document\Phone;
@@ -266,6 +267,73 @@ class PurchaseControllerTest extends BaseControllerTest
         $crawler = $this->setPayment($crawler, $phone);
         self::verifyResponse(200);
         $this->verifyPurchaseReady($crawler);
+    }
+
+    public function testPurchasePhoneBacs()
+    {
+        $phone = $this->setRandomPhone();
+
+        $crawler = $this->createPurchase(
+            self::generateEmail('testPurchasePhoneBacs', $this),
+            'foo bar',
+            new \DateTime('1980-01-01')
+        );
+        self::verifyResponse(302);
+        $this->assertTrue($this->isClientResponseRedirect());
+        self::$client->followRedirect();
+        $this->assertContains('/purchase/step-phone', self::$client->getHistory()->current()->getUri());
+
+        $crawler = $this->setPhone($phone);
+        //print $crawler->html();
+        self::verifyResponse(302);
+        $crawler = self::$client->followRedirect();
+        $this->assertContains('/purchase/step-pledge', self::$client->getHistory()->current()->getUri());
+
+        //print $crawler->html();
+        $crawler = $this->agreePledge($crawler);
+        //print $crawler->html();
+        self::verifyResponse(302);
+        $crawler = self::$client->followRedirect();
+
+        $policy = $this->getPolicyFromPaymentUrl();
+        $url = sprintf('%s?force=bacs', self::$client->getHistory()->current()->getUri());
+        $crawler = self::$client->request('GET', $url);
+        //print $crawler->html();
+        //print $url;
+
+        $crawler = $this->setPayment($crawler, $phone);
+        //print $crawler->html();
+        self::verifyResponse(302);
+        $crawler = self::$client->followRedirect();
+        $this->assertContains('/purchase/step-payment/', self::$client->getHistory()->current()->getUri());
+        $this->assertContains('/monthly', self::$client->getHistory()->current()->getUri());
+
+        $crawler = $this->setBacs($crawler, $policy);
+        self::verifyResponse(200);
+        $crawler = $this->setBacsConfirm($crawler);
+        // print $crawler->html();
+
+        self::verifyResponse(302);
+        $redirectUrl = self::$router->generate('user_welcome_policy_id', ['id' => $policy->getId()]);
+        //print $crawler->html();
+        $this->assertTrue($this->isClientResponseRedirect($redirectUrl));
+        $crawler = self::$client->followRedirect();
+        self::verifyResponse(200);
+    }
+
+    private function getPolicyFromPaymentUrl()
+    {
+        $urlData = explode('/', self::$client->getHistory()->current()->getUri());
+        //print_r($urlData);
+        $this->assertCount(6, $urlData);
+        $policyId = $urlData[5];
+        $dm = $this->getDocumentManager(true);
+        $repo = $dm->getRepository(Policy::class);
+        /** @var Policy $policy */
+        $policy = $repo->find($policyId);
+        $this->assertNotNull($policy);
+
+        return $policy;
     }
 
     public function testPurchasePhoneNoPledge()
@@ -1134,6 +1202,27 @@ class PurchaseControllerTest extends BaseControllerTest
     {
         $form = $crawler->selectButton('purchase_form[existing]')->form();
         $form['purchase_form[amount]'] = $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice();
+        $crawler = self::$client->submit($form);
+
+        return $crawler;
+    }
+
+    private function setBacs(Crawler $crawler, Policy $policy)
+    {
+        //print $crawler->html();
+        $form = $crawler->selectButton('bacs_form[save]')->form();
+        $form['bacs_form[accountName]'] = $policy->getUser()->getName();
+        $form['bacs_form[sortCode]'] = PCAService::TEST_SORT_CODE;
+        $form['bacs_form[accountNumber]'] = PCAService::TEST_ACCOUNT_NUMBER_OK;
+        $form['bacs_form[soleSignature]'] = true;
+        $crawler = self::$client->submit($form);
+
+        return $crawler;
+    }
+
+    private function setBacsConfirm(Crawler $crawler)
+    {
+        $form = $crawler->selectButton('bacs_confirm_form[save]')->form();
         $crawler = self::$client->submit($form);
 
         return $crawler;

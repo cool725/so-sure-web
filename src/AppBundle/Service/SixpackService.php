@@ -33,7 +33,7 @@ class SixpackService
     const EXPERIMENT_EBAY_LANDING_2 = 'ebay-landing-2';
     const EXPERIMENT_SOCIAL_AD_LANDING = 'ad-landing-quotepage';
     // Exp 1
-    //
+    const EXPERIMENT_PURCHASE_FLOW_BACS = 'bacs';
     // Exp 2
     //
     // Exp 3
@@ -120,7 +120,7 @@ class SixpackService
         self::EXPERIMENT_EBAY_LANDING_2,
         self::EXPERIMENT_SOCIAL_AD_LANDING,
         // Exp 1
-        //
+        self::EXPERIMENT_PURCHASE_FLOW_BACS,
         // Exp 2
         //
         // Exp 3
@@ -182,7 +182,7 @@ class SixpackService
         self::EXPERIMENT_EBAY_LANDING_2,
         self::EXPERIMENT_SOCIAL_AD_LANDING,
         // Exp 1
-        //
+        self::EXPERIMENT_PURCHASE_FLOW_BACS,
         // Exp 2
         //
         // Exp 3

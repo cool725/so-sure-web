@@ -1,5 +1,13 @@
+{% if phone is defined %}
+    {% set device = phone %}
+{% else %}
+    {% set device = policy.phone %}
+{% endif %}
+
 <div class="policy__info mx-4 mx-lg-5 py-5">
-    {# <div class="h1 text-white">{{ phone.make }} {{ phone.model }} <span class="sub">({{ phone.memory }}GB)</span></div> #}
+    {% if body_class is defined and body_class != 'quote' %}
+        <div class="h1 text-white">{{ device.make }} {{ device.model }} <span class="sub">({{ device.memory }}GB)</span></div>
+    {% endif %}
     <div class="h1 text-columbia-blue-e mb-5">Full Cover Details</div>
     <h4 class="text-columbia-blue-e mb-4">What's covered:</h4>
     <ul class="list-unstyled icn-fa-list mb-0">
@@ -471,15 +479,15 @@
             <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_phone-smile.png" alt="so-sure - Simple Terms &amp; Conditions" width="180px">
         </div>
         <div class="col-md-8 text-white">
-            <h4 class="my-4 text-columbia-blue-e">About the {{ phone.make }} {{ phone.model }}</h4>
+            <h4 class="my-4 text-columbia-blue-e">About the {{ device.make }} {{ device.model }}</h4>
             <ul class="list-inline mb-0">
-                <li class="list-inline-item"><strong class="h5">Camera</strong>: {{ phone.camera }} MP</li>
+                <li class="list-inline-item"><strong class="h5">Camera</strong>: {{ device.camera }} MP</li>
                 <li class="list-inline-item text-columbia-blue-e">|</li>
-                <li class="list-inline-item"><strong class="h5">Size</strong>: {{ phone.getScreenPhysicalInch }}</li>
+                <li class="list-inline-item"><strong class="h5">Size</strong>: {{ device.getScreenPhysicalInch }}</li>
                 <li class="list-inline-item text-columbia-blue-e">|</li>
-                <li class="list-inline-item"><strong class="h5">Screen Resolution</strong>: {{ phone.getScreenResolution }}</li>
+                <li class="list-inline-item"><strong class="h5">Screen Resolution</strong>: {{ device.getScreenResolution }}</li>
                 <li class="list-inline-item text-columbia-blue-e">|</li>
-                <li class="list-inline-item"><strong class="h5">RAM</strong>: {{ phone.getRamDisplay }}</li>
+                <li class="list-inline-item"><strong class="h5">RAM</strong>: {{ device.getRamDisplay }}</li>
             </ul>
         </div>
     </div>

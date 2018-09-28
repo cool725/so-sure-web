@@ -1,102 +1,134 @@
-{% extends 'base.html.twig' %}
+{% extends 'base_rebrand.html.twig' %}
+{% form_theme bacs_form 'AppBundle:Form:fields.html.twig' %}
 
 {# Set vars #}
-{% set new_stylesheet = 1 %}
-{% set distraction_free = 1 %}
-{% set new_footer = 1 %}
+{% set body_class = 'purchase' %}
+{% set quote_mode = 1 %}
 
-{% block stylesheets %}
-    {{ parent() }}
-    {% stylesheets output='css/*.css'
-        '@AppBundle/Resources/public/sass/page/checkout.scss'
-    %}
-        <link rel="stylesheet" href="{{ asset_url }}">
-    {% endstylesheets %}
+{% block title %}
+    {{ policy.phone.model }} Insurance - {{ policy.phone.make }} - Welcome to Social Insurance
+{% endblock %}
+
+{% block meta %}{% endblock %}
+
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/purchase.css') }}">
 {% endblock %}
 
 {% block body %}
 
-{% include 'AppBundle::Default/loadingWidget.html.twig' with { 'class': ''} %}
-<section id="purchase-step-payment" class="checkout">
+    <section class="qpw">
+        <div class="d-lg-flex">
 
-    {% include 'AppBundle::Purchase/purchaseNav.html.twig' %}
+            {# Main Content #}
+            <div class="qpw__main__container">
+                <div class="qpw__main px-4 px-lg-5">
+                    <h5 class="text-white mb-4 text-center text-lg-left">Almost there, enter your payment details:</h5>
+                    <div class="d-flex justify-content-center justify-content-lg-start align-items-center justify-content-lg-start">
+                        <h1 class="qpw__h1 qpw__h1-policy text-columbia-blue-e">
+                            <i class="far fa-check text-white"></i>
+                            <span class="sub">
+                                {{ policy.phone.make }} {{ policy.phone.model }}
+                                <small>({{ policy.phone.memory }}GB)</small>
+                            </span>
+                        </h1>
+                    </div>
+                    <div class="qpw__h1 h1 text-center text-lg-left text-white mb-4">
+                        <span class="sub">For only</span>
+                        &pound;{{ policy.getPremiumInstallmentPrice(true, true)|number_format(2, '.', ',') }} {% if bacs.annual %}a year{% else %}a month{% endif %}
+                    </div>
+                    <div class="qpw__h5 h5 d-block d-lg-none text-center">
+                        <a href="#qpw-info-mobile"
+                           id="qpw-info-btn"
+                           class="text-white">
+                            see full details <i class="fas fa-caret-down ml-2"></i>
+                        </a>
+                    </div>
+                    <div class="qpw__footer d-none d-lg-block mt-5 pt-lg-5">
+                        <div class="purchase__footer__text">
+                            <h4 class="text-columbia-blue-e">An amazing level of cover:</h4>
+                            <ul class="list-unstyled icn-fa-list">
+                                <li class="text-white mb-2"><i class="far fa-check text-columbia-blue-e fa-lg"></i> Cracked Screens, Theft, Loss and much more</li>
+                                <li class="text-white mb-2"><i class="far fa-check text-columbia-blue-e fa-lg"></i> Instant Cover and 24/7 live support</li><li class="text-white"><i class="far fa-check text-columbia-blue-e fa-lg"></i> 24-72 replacement phone once claim approved</li>
+                            </ul>
+                        </div>
+                        <div class="qpw__footer__cta">
+                            <a href="#qpw-info"
+                               class="btn btn-outline-columbia-blue-e mt-2 toggle-text"
+                               data-toggle="collapse"
+                               data-target="#qpw-info"
+                               data-text-swap='hide full details <i class="fas fa-caret-up ml-2"></i>'
+                               role="button"
+                               aria-expanded="false"
+                               aria-controls="qpw-info">see full details
+                               <i class="fas fa-caret-down ml-2"></i>
+                           </a>
+                        </div>
+                    </div>
+                </div>
 
-    <div class="checkout--top">
-        <div class="container text-center">
-            <h1>Setup a Direct Debit with SO-SURE <br> <small> for your {{ policy.phone.make }} {{ policy.phone.model }}  ({{ policy.phone.memory }}GB) insurance</small></h1>
-            <p><img src="{{ cdn_url }}/images/direct-debit-logo.svg" alt="Direct Debit" width="180px" class="img-center"></p>
-            <p><a href="#" class="web-pay-submit">Prefer to pay by card?</a></p>
+                <div id="qpw-info" class="qpw__info__container mt-4 collapse">
+                    {% include 'AppBundle::PhoneInsurance/_seeFullDetails.html.twig' %}
+                </div>
 
+                {# Curve Mobile #}
+                <svg class="d-block d-lg-none" preserveAspectRatio="xMinYMin meet" viewBox="0 0 750 47" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                        <g id="Artboard-Copy" fill="#FFFFFF" fill-rule="nonzero">
+                            <g id="SVG-Layer" transform="translate(375.000000, 23.500000) scale(1, -1) translate(-375.000000, -23.500000) ">
+                                <g id="Page-1">
+                                    <g id="Artboard">
+                                        <path d="M374,0 C499.333333,0 624.666667,15.6666667 750,47 L0,47 C124,15.6666667 248.666667,8.69674703e-16 374,0 Z" id="Rectangle" transform="translate(375.000000, 23.500000) scale(-1, 1) rotate(-180.000000) translate(-375.000000, -23.500000) "></path>
+                                    </g>
+                                </g>
+                            </g>
+                        </g>
+                    </g>
+                </svg>
+            </div>
+
+            {# Curve Desktop #}
+            <div class="qpw__curve">
+                <svg class="d-none d-lg-block" preserveAspectRatio="xMinYMin meet" viewBox="0 0 57 846" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                    <defs></defs>
+                    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                        <g transform="translate(-12.000000, 0.000000)" fill="#FFFFFF">
+                            <path d="M69,0 L69,846 L68,846 C30.6666667,705 12,564 12,423 C12,282 31,141 69,0 Z" id="Rectangle-3"></path>
+                        </g>
+                    </g>
+                </svg>
+            </div>
+
+            {# Sub Content #}
+            <div class="qpw__sub__container">
+                <div class="qpw__sub px-4 pb-4 pt-5 p-lg-5">
+                    {% include 'AppBundle::Purchase/_formStepBacs.html.twig' %}
+                </div>
+            </div>
+
+            <div id="qpw-info-mobile" class="qpw__info__container__mobile  d-block d-lg-none">
+                <svg preserveAspectRatio="xMinYMin meet" viewBox="0 0 750 47" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                        <g id="Artboard" fill="#FFFFFF">
+                            <path d="M374,0 C499.333333,0 624.666667,15.6666667 750,47 L0,47 C124,15.6666667 248.666667,8.69674703e-16 374,0 Z" id="Rectangle" transform="translate(375.000000, 23.500000) scale(1, -1) translate(-375.000000, -23.500000) "></path>
+                        </g>
+                    </g>
+                </svg>
+                {% include 'AppBundle::PhoneInsurance/_seeFullDetails.html.twig' %}
+            </div>
         </div>
-    </div>
+    </section>
 
-    <div class="checkout--step">
-        <div class="container">
-            <p class="text-center"><small>Please enter your bank details you wish to use for your Direct Debit each month.</small></p>
-
-            {{ form_start(bacs_form, {'attr': {'class': 'form','autocomplete': 'off'}}) }}
-                <div class="form-group {% if form_errors(bacs_form.accountName) %}has-error{% endif %}">
-                    {{ form_widget(bacs_form.accountName, {'attr': {'placeholder': 'Name on account', 'class': 'form-control', 'data-hj-suppress': ''}}) }}
-                    {% if form_errors(bacs_form.accountName) %}
-                        <div class="help-block with-errors">{{ form_errors(bacs_form.accountName) }}</div>
-                    {% else %}
-                        <span class="help-block">The bank account must be in the policy holder's name "{{ app.user.name }}"</span>
-                    {% endif %}
-                </div>
-                <div class="form-group {% if form_errors(bacs_form.sortCode) %}has-error{% endif %}">
-                    {{ form_widget(bacs_form.sortCode, {'attr': {'placeholder': 'Sort code', 'class': 'form-control sort-code', 'maxlength': 6, 'data-hj-suppress': ''}}) }}
-                    <div class="help-block with-errors">{{ form_errors(bacs_form.sortCode) }}</div>
-                </div>
-                <div class="form-group {% if form_errors(bacs_form.accountNumber) %}has-error{% endif %}">
-                    {{ form_widget(bacs_form.accountNumber, {'attr': {'placeholder': 'Account number', 'class': 'form-control', 'maxlength': 8, 'data-hj-suppress': ''}}) }}
-                    <div class="help-block with-errors">{{ form_errors(bacs_form.accountNumber) }}</div>
-                </div>
-                <div class="form-group {% if form_errors(bacs_form.soleSignature) %}has-error{% endif %}">
-                    {{ form_widget(bacs_form.soleSignature, {'attr': {'class': ''}}) }}
-                    {{ form_label(bacs_form.soleSignature) }}
-                    <div class="help-block with-errors">{{ form_errors(bacs_form.soleSignature) }}</div>
-                </div>
-                <div class="form-group">
-                    {{ form_widget(bacs_form.save, {'label': 'Continue', 'attr': {'class': 'btn btn-green btn-block btn-pad'}}) }}
-                </div>
-                <div class="form-group">
-                    <a href="{{ path('purchase_step_payment_id', {'id': policy.id}) }}" class="btn btn-blue-hollow btn-block btn-pad">
-                        Back
-                    </a>
-                </div>
-                <p><small>Your payments are protected by the <a href="#" data-toggle="modal" data-target="#modal-dd" class="text-nowrap">Direct Debit Guarantee</a></small>.</p>
-                <address>
-                    <strong>SO-SURE Limited</strong><br>
-                    10 Finsbury Square, London EC2A 1AF, GB<br>
-                    +44 330 223 4948, <a href="mailto:hello@wearesosure.com">hello@wearesosure.com</a>
-                </address>
-                <img src="{{ cdn_url }}/images/direct-debit-logo.svg" alt="Direct Debit" width="100px">
-            {{ form_end(bacs_form) }}
-
-            <form action="{{ webpay_action }}" method="post" id="webpay-form">
-                <input id="Reference" name="Reference" type="hidden" value="{{ webpay_reference }}">
-            </form>
-        </div>
-    </div>
-
-
-</section>
-
-{% include 'AppBundle::Default/directDebitGuaranteeModal.html.twig' %}
-
-
-{# End Page Modals #}
+    {# Page Modals
+    {% include 'AppBundle::PhoneInsurance/_policyInfoModals.html.twig' %}
 
 {% endblock %}
 
-{% block javascripts %}
-    {{ parent() }}
-    {% javascripts
-    'components/owl.carousel/owl.carousel.min.js'
-    'components/jquery-mask-plugin/jquery.mask.min.js'
-    'components/jquery-validation/jquery.validate.min.js'
-    '@AppBundle/Resources/public/js/Default/jqueryValidatorMethods.js'
-    '@AppBundle/Resources/public/js/Purchase/purchaseStep.js'
-    '@AppBundle/Resources/public/js/Purchase/purchaseStepPayment.js' %}
-    <script src="{{ asset_url }}"></script>{% endjavascripts %}
+{% block footer %}
+    {# TODO: Fix footer #}
+{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/purchase.js') }}"></script>
+    <script src="{{ asset('css-js/purchase-bacs.js') }}"></script>
 {% endblock %}

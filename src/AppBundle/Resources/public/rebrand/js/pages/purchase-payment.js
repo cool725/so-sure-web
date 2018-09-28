@@ -15,10 +15,14 @@ sosure.purchaseStepPayment = (function() {
     let self = {};
     self.form = null;
     self.isIE = null;
+    self.loader = null;
+    self.webPay = null;
 
     self.init = () => {
         self.form = $('.validate-form');
         self.isIE = !!navigator.userAgent.match(/Trident/g) || !!navigator.userAgent.match(/MSIE/g);
+        self.loader = $('#so-sure-loader');
+        self.webPay = $('#webpay-form');
         if (self.form.data('client-validation') && !self.isIE) {
             self.addValidation();
         }
@@ -80,7 +84,7 @@ $(function(){
 
     if ($.trim($('#Reference').val()).length > 0) {
         // Show loading overlay
-        $('#so-sure-loader').show();
-        $('#webpay-form').submit();
+        sosure.purchaseStepPayment.loader.show();
+        sosure.purchaseStepPayment.webPay.submit();
     }
 });

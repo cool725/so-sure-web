@@ -46,7 +46,7 @@
         padding-bottom: 1.5rem;
 
         @include media-breakpoint-up(lg) {
-            height: 70vh;
+            // height: 70vh;
             padding-top: 12rem;
         }
     }
@@ -62,7 +62,7 @@
                 position: absolute;
                 z-index: 4;
                 right: 0; top: 0;
-                transform: translateX(1px);
+                // transform: translateX(1px);
             }
         }
     }
@@ -100,7 +100,11 @@
 
     // Contents
     h1 {
-        border-bottom: 2px solid $deep-sky-blue-d;
+        border-bottom: 2px solid $columbia-blue-e;
+
+        &.qpw__h1-policy {
+            border-bottom: transparent;
+        }
     }
 
     &__h1 {
