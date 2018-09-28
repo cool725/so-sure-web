@@ -12,6 +12,10 @@
 
     <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_contract.png" alt="so-sure - contract" width="200px" class="mx-auto d-block">
 
+    <div class="form-group">
+        <small class="form-text text-center"><a href="{{ cdn_url }}/files/so-sure_sample_policy_doc.pdf" target="_blank"><u>Read our full policy document here</u></a></small>
+    </div>
+
     <div class="pledge-items">
         <div class="form-group">
             {{ form_widget(purchase_form.agreedDamage, {
@@ -28,9 +32,8 @@
             <div class="with-errors">{{ form_errors(purchase_form.agreedAgeLocation) }}</div>
         </div>
         <div class="form-group">
-            {% set terms_url = cdn_url ~ '/files/so-sure_sample_policy_doc.pdf' %}
             {{ form_widget(purchase_form.agreedTerms, {
-                'label': 'I have read & understood the <a href="' ~ terms_url ~  '" target="_blank"><strong class=""><u>so-sure policy document</u></strong></a>',
+                'label': 'I have read & understood the so-sure policy document',
                 'attr': {'class':'custom-control-input'}}
             ) }}
             <div class="with-errors">{{ form_errors(purchase_form.agreedTerms) }}</div>
@@ -49,5 +52,6 @@
             <div class="col-9 text-right">
                 {{ form_widget(purchase_form.next, {'label': 'I swear I\'ll be honest!', 'attr': {'class': 'btn btn-success btn-gradient-green btn-block-xs'}}) }}
             </div>
+        </div>
     </div>
 {{ form_end(purchase_form) }}

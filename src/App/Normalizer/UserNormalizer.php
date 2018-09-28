@@ -70,17 +70,41 @@ class UserNormalizer implements NormalizerInterface, SerializerAwareInterface
             $policyNumber = $policy->getPolicyNumber();
             $phone = $policy->getPhone();
             $expiresDate = $policy->getEnd()->format('M jS Y');   // Dec 25th 2018
-            //#$connections = $policy->getConnections()->count();
+            $connections = $policy->getConnections()->count();
             $pot = $policy->getPotValue();
 
             return [
                 'widgets' => [
                     [
                         'type' => 'TEXT',
-                        "title" => "{$policyNumber} ($phone). Expires {$expiresDate}",
-                        'text' => "Reward pot: £{$pot}",
+                        'title' => 'Policy Reference',
+                        'text' => $policyNumber,
                         'launchUrl' => $userHomepage,
-                    ]
+                    ],
+                    [
+                        'type' => 'TEXT',
+                        'title' => 'Covered Device',
+                        'text' => (string) $phone,
+                        'launchUrl' => $userHomepage,
+                    ],
+                    [
+                        'type' => 'TEXT',
+                        'title' => 'Expiry Date',
+                        'text' => $expiresDate,
+                        'launchUrl' => $userHomepage,
+                    ],
+                    [
+                        'type' => 'TEXT',
+                        'title' => 'Connections',
+                        'text' => "$connections",
+                        'launchUrl' => $userHomepage,
+                    ],
+                    [
+                        'type' => 'TEXT',
+                        'title' => 'Reward Pot Value',
+                        'text' => "£{$pot}",
+                        'launchUrl' => $userHomepage,
+                    ],
                 ],
             ];
         }
