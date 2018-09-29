@@ -88,7 +88,12 @@
 <div id="so-sure-loader" class="loader">
     <div class="loader__inner d-flex align-items-center flex-column justify-content-center">
         <img src="{{ cdn_url }}/images/rebrand/misc/so-sure_loader.svg" alt="loading...">
-        <small class="text-grey">Payments powered by</small><br>
-        <img src="{{ cdn_url }}/images/purchase/judo_pay_logo.svg" alt="Judo Pay" title="Powered by - Judo Pay" width="80px">
+        {% if payment_provider == 'judo' %}
+            <small class="text-grey">Payments powered by</small><br>
+            <img src="{{ cdn_url }}/images/purchase/judo_pay_logo.svg" alt="Judo Pay" title="Powered by - Judo Pay" width="80px">
+        {% elseif payment_provider == 'bacs' %}
+            <small class="text-grey">Payments via</small><br>
+            <img src="{{ cdn_url }}/images/rebrand/misc/so-sure_direct-debit-logo.svg" alt="Direct Debit" width="100px">
+        {% endif %}
     </div>
 </div>

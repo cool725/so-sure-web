@@ -86,15 +86,15 @@ if [ "$SKIP_DB" == "0" ]; then
     app/console --env=test sosure:doctrine:index
   fi
 fi
-}
-
-init $SKIP_DB $SKIP_POLICY
 
 # keep in sync with load.sh
 for feature in "renewal" "picsure" "bacs"
 do
   app/console --env=test sosure:feature $feature true
 done
+}
+
+init $SKIP_DB $SKIP_POLICY
 
 if [ "$RUN_FILTER" == "" ]; then
     if [ "$COVER" == "0" ]; then

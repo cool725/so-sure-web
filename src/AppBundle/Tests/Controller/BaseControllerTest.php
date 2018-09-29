@@ -102,16 +102,22 @@ class BaseControllerTest extends WebTestCase
 
     protected function verifyResponse($statusCode, $errorCode = null, $crawler = null, $errorMessage = null)
     {
-        $data = json_decode($this->getClientResponseContent(), true);
-        if (!$errorMessage) {
-            $errorMessage = json_encode($data);
-            if (!$data && $crawler) {
-                $errorMessage = $crawler->html();
+        $data = $this->getClientResponseContent();
+        if ($this->isClientResponseJson()) {
+            $data = json_decode($data, true);
+            if (!$errorMessage) {
+                $errorMessage = json_encode($data);
+                if (!$data && $crawler) {
+                    $errorMessage = $crawler->html();
+                }
             }
         }
 
         if (!$errorMessage) {
             $errorMessage = self::$client->getHistory()->current()->getUri();
+            if ($crawler) {
+                $errorMessage = sprintf("%s %s", $errorMessage, $crawler->html());
+            }
         }
 
         $this->assertEquals($statusCode, $this->getClientResponseStatusCode(), $errorMessage);
@@ -361,6 +367,15 @@ class BaseControllerTest extends WebTestCase
     {
         if ($this->getClientResponse()) {
             return $this->getClientResponse()->isRedirect($location);
+        }
+
+        return null;
+    }
+
+    protected function isClientResponseJson()
+    {
+        if ($this->getClientResponse()) {
+            return $this->getClientResponse()->headers->contains('Content-Type', 'application/json');
         }
 
         return null;

@@ -2,7 +2,9 @@
 
 namespace AppBundle\Tests\Controller;
 
+use AppBundle\Document\Feature;
 use AppBundle\Document\LostPhone;
+use AppBundle\Service\FeatureService;
 use AppBundle\Service\PCAService;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\User;
@@ -271,6 +273,10 @@ class PurchaseControllerTest extends BaseControllerTest
 
     public function testPurchasePhoneBacs()
     {
+        /** @var FeatureService $feature */
+        $feature = $this->getContainer(true)->get('app.feature');
+        $this->assertTrue($feature->isEnabled(Feature::FEATURE_BACS), 'Bacs feature disabled');
+
         $phone = $this->setRandomPhone();
 
         $crawler = $this->createPurchase(
@@ -278,32 +284,37 @@ class PurchaseControllerTest extends BaseControllerTest
             'foo bar',
             new \DateTime('1980-01-01')
         );
-        self::verifyResponse(302);
+        self::verifyResponse(302, null, $crawler);
         $this->assertTrue($this->isClientResponseRedirect());
         self::$client->followRedirect();
         $this->assertContains('/purchase/step-phone', self::$client->getHistory()->current()->getUri());
 
         $crawler = $this->setPhone($phone);
         //print $crawler->html();
-        self::verifyResponse(302);
+        self::verifyResponse(302, null, $crawler);
         $crawler = self::$client->followRedirect();
         $this->assertContains('/purchase/step-pledge', self::$client->getHistory()->current()->getUri());
 
         //print $crawler->html();
         $crawler = $this->agreePledge($crawler);
         //print $crawler->html();
-        self::verifyResponse(302);
+        self::verifyResponse(302, null, $crawler);
         $crawler = self::$client->followRedirect();
 
         $policy = $this->getPolicyFromPaymentUrl();
         $url = sprintf('%s?force=bacs', self::$client->getHistory()->current()->getUri());
         $crawler = self::$client->request('GET', $url);
+        $this->assertNotContains(
+            'judo',
+            $crawler->html(),
+            sprintf('%s Payment page is referencing judopay', self::$client->getHistory()->current()->getUri())
+        );
         //print $crawler->html();
         //print $url;
 
         $crawler = $this->setPayment($crawler, $phone);
         //print $crawler->html();
-        self::verifyResponse(302);
+        self::verifyResponse(302, null, $crawler);
         $crawler = self::$client->followRedirect();
         $this->assertContains('/purchase/step-payment/', self::$client->getHistory()->current()->getUri());
         $this->assertContains('/monthly', self::$client->getHistory()->current()->getUri());
@@ -313,10 +324,10 @@ class PurchaseControllerTest extends BaseControllerTest
         $crawler = $this->setBacsConfirm($crawler);
         // print $crawler->html();
 
-        self::verifyResponse(302);
+        self::verifyResponse(302, null, $crawler);
         $redirectUrl = self::$router->generate('user_welcome_policy_id', ['id' => $policy->getId()]);
         //print $crawler->html();
-        $this->assertTrue($this->isClientResponseRedirect($redirectUrl));
+        $this->assertTrue($this->isClientResponseRedirect($redirectUrl), 'Redirect to user welcome page');
         $crawler = self::$client->followRedirect();
         self::verifyResponse(200);
     }
