@@ -2,7 +2,9 @@
 
 namespace AppBundle\Tests\Controller;
 
+use AppBundle\Document\Feature;
 use AppBundle\Document\LostPhone;
+use AppBundle\Service\FeatureService;
 use AppBundle\Service\PCAService;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\User;
@@ -271,6 +273,10 @@ class PurchaseControllerTest extends BaseControllerTest
 
     public function testPurchasePhoneBacs()
     {
+        /** @var FeatureService $feature */
+        $feature = $this->getContainer()->get('app.feature');
+        $this->assertTrue($feature->isEnabled(Feature::FEATURE_BACS));
+
         $phone = $this->setRandomPhone();
 
         $crawler = $this->createPurchase(
@@ -298,6 +304,11 @@ class PurchaseControllerTest extends BaseControllerTest
         $policy = $this->getPolicyFromPaymentUrl();
         $url = sprintf('%s?force=bacs', self::$client->getHistory()->current()->getUri());
         $crawler = self::$client->request('GET', $url);
+        $this->assertNotContains(
+            'judo',
+            $crawler->html(),
+            sprintf('%s Payment page is referencing judopay', self::$client->getHistory()->current()->getUri())
+        );
         //print $crawler->html();
         //print $url;
 
