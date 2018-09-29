@@ -109,6 +109,11 @@ class BaseControllerTest extends WebTestCase
                 $errorMessage = $crawler->html();
             }
         }
+
+        if (!$errorMessage) {
+            $errorMessage = self::$client->getHistory()->current()->getUri();
+        }
+
         $this->assertEquals($statusCode, $this->getClientResponseStatusCode(), $errorMessage);
         if ($errorCode) {
             $this->assertEquals($errorCode, $data['code']);

@@ -114,6 +114,26 @@ class RequestService
         return null;
     }
 
+    public function hasClaimsRole()
+    {
+        $user = $this->getUser();
+        if (!$user) {
+            return false;
+        }
+
+        return $user->hasClaimsRole();
+    }
+
+    public function hasEmployeeRole()
+    {
+        $user = $this->getUser();
+        if (!$user) {
+            return false;
+        }
+
+        return $user->hasEmployeeRole();
+    }
+
     public function getUri()
     {
         if ($request = $this->requestStack->getCurrentRequest()) {
