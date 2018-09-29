@@ -10,6 +10,10 @@ trait SixpackFormTrait
     public function setFormAction(FormBuilderInterface $builder, RequestStack $requestStack)
     {
         $currentRequest = $requestStack->getCurrentRequest();
+        if (!$currentRequest) {
+            return;
+        }
+        
         $force = $currentRequest->query->get('force');
         if ($force) {
             $action = $builder->getAction();
