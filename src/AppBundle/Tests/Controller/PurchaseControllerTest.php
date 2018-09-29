@@ -278,21 +278,21 @@ class PurchaseControllerTest extends BaseControllerTest
             'foo bar',
             new \DateTime('1980-01-01')
         );
-        self::verifyResponse(302);
+        self::verifyResponse(302, null, $crawler);
         $this->assertTrue($this->isClientResponseRedirect());
         self::$client->followRedirect();
         $this->assertContains('/purchase/step-phone', self::$client->getHistory()->current()->getUri());
 
         $crawler = $this->setPhone($phone);
         //print $crawler->html();
-        self::verifyResponse(302);
+        self::verifyResponse(302, null, $crawler);
         $crawler = self::$client->followRedirect();
         $this->assertContains('/purchase/step-pledge', self::$client->getHistory()->current()->getUri());
 
         //print $crawler->html();
         $crawler = $this->agreePledge($crawler);
         //print $crawler->html();
-        self::verifyResponse(302);
+        self::verifyResponse(302, null, $crawler);
         $crawler = self::$client->followRedirect();
 
         $policy = $this->getPolicyFromPaymentUrl();
@@ -303,7 +303,7 @@ class PurchaseControllerTest extends BaseControllerTest
 
         $crawler = $this->setPayment($crawler, $phone);
         //print $crawler->html();
-        self::verifyResponse(302);
+        self::verifyResponse(302, null, $crawler);
         $crawler = self::$client->followRedirect();
         $this->assertContains('/purchase/step-payment/', self::$client->getHistory()->current()->getUri());
         $this->assertContains('/monthly', self::$client->getHistory()->current()->getUri());
@@ -313,7 +313,7 @@ class PurchaseControllerTest extends BaseControllerTest
         $crawler = $this->setBacsConfirm($crawler);
         // print $crawler->html();
 
-        self::verifyResponse(302);
+        self::verifyResponse(302, null, $crawler);
         $redirectUrl = self::$router->generate('user_welcome_policy_id', ['id' => $policy->getId()]);
         //print $crawler->html();
         $this->assertTrue($this->isClientResponseRedirect($redirectUrl));
