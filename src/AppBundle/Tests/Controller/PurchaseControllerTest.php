@@ -274,7 +274,7 @@ class PurchaseControllerTest extends BaseControllerTest
     public function testPurchasePhoneBacs()
     {
         /** @var FeatureService $feature */
-        $feature = $this->getContainer()->get('app.feature');
+        $feature = $this->getContainer(true)->get('app.feature');
         $this->assertTrue($feature->isEnabled(Feature::FEATURE_BACS));
 
         $phone = $this->setRandomPhone();
