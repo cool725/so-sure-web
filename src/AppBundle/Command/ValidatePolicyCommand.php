@@ -5,6 +5,7 @@ namespace AppBundle\Command;
 use AppBundle\Classes\Salva;
 use AppBundle\Document\BankAccount;
 use AppBundle\Document\CurrencyTrait;
+use AppBundle\Document\DateTrait;
 use AppBundle\Document\Payment\BacsPayment;
 use AppBundle\Repository\PolicyRepository;
 use AppBundle\Service\MailerService;
@@ -26,6 +27,7 @@ use AppBundle\Document\ScheduledPayment;
 class ValidatePolicyCommand extends BaseCommand
 {
     use CurrencyTrait;
+    use DateTrait;
 
     protected function configure()
     {
@@ -422,13 +424,21 @@ class ValidatePolicyCommand extends BaseCommand
                         $lines[] = 'Warning!! No bacs payments, yet bank does not have first payment flag set';
                     }
                     $now = new \DateTime();
+
                     // BacsService::exportPaymentsDebits had a 3 day advance generation
                     // + 1 day processing date
                     // Anything scheduled further in advance would not be expected to be in the system
                     $fourDays = clone $now;
-                    $fourDays = $fourDays->add(new \DateInterval('P4D'));
+                    $fourDays = $this->addBusinessDays($fourDays, 4);
+
+                    // If the initial payment is tomorrow, the mandate will have just activated, but the payment
+                    // will not yet be scheduled as policy validation runs prior to bacs job creating the payment
+                    $nextDay = clone $now;
+                    $nextDay = $this->addBusinessDays($nextDay, 1);
+                    $isTommorowInitialPayment = $this->isSameDay($nextDay, $bankAccount->getInitialNotificationDate());
+
                     if ($bacsPayments == 0 && $bankAccount->getInitialNotificationDate() > new \DateTime() &&
-                        $bankAccount->getInitialNotificationDate() < $fourDays) {
+                        $bankAccount->getInitialNotificationDate() < $fourDays && !$isTommorowInitialPayment) {
                         $this->header($policy, $policies, $lines);
                         $lines[] = 'Warning!! There are no bacs payments, yet its past the initial notification date';
                     }
