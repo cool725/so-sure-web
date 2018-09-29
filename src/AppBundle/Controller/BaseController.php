@@ -3,7 +3,10 @@
 namespace AppBundle\Controller;
 
 use AppBundle\Document\Claim;
+use AppBundle\Document\File\S3File;
 use AppBundle\Form\Type\ClaimSearchType;
+use AppBundle\Repository\ClaimRepository;
+use AppBundle\Repository\File\S3FileRepository;
 use AppBundle\Repository\PhoneRepository;
 use AppBundle\Service\QuoteService;
 use Doctrine\ODM\MongoDB\Query\Builder;
@@ -13,6 +16,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\StreamedResponse;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Security\Http\Util\TargetPathTrait;
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -1150,5 +1155,93 @@ abstract class BaseController extends Controller
             }
             $session->set('oauth2Flow.targetPath', $targetPath);
         }
+    }
+
+    protected function policyDownloadFile(Request $request, $id, $attachment = false)
+    {
+        $dm = $this->getManager();
+        /** @var S3FileRepository $repo */
+        $repo = $dm->getRepository(S3File::class);
+        /** @var S3File $s3File */
+        $s3File = $repo->find($id);
+        if (!$s3File) {
+            throw new NotFoundHttpException();
+        }
+
+        $filesystem = $this->get('oneup_flysystem.mount_manager')->getFilesystem('s3policy_fs');
+        $environment = $this->getParameter('kernel.environment');
+        $file = str_replace(sprintf('%s/', $environment), '', $s3File->getKey());
+
+        if (!$filesystem->has($file)) {
+            throw $this->createNotFoundException(sprintf('URL not found %s', $file));
+        }
+
+        $headers = [
+            'Content-Type' => $filesystem->getMimetype($file)
+        ];
+        if ($attachment) {
+            $headers['Content-Disposition'] = sprintf('attachment; filename="%s"', $s3File->getFilename());
+        }
+        return StreamedResponse::create(
+            function () use ($file, $filesystem) {
+                $stream = $filesystem->readStream($file);
+                echo stream_get_contents($stream);
+                flush();
+            },
+            200,
+            $headers
+        );
+    }
+
+    protected function phoneAlternatives($id)
+    {
+        $dm = $this->getManager();
+        /** @var PhoneRepository $repo */
+        $repo = $dm->getRepository(Phone::class);
+        $phone = $repo->find($id);
+        $alternatives = $repo->alternatives($phone);
+        $suggestedReplacement = null;
+        if ($phone->getSuggestedReplacement()) {
+            $suggestedReplacement = $repo->find($phone->getSuggestedReplacement()->getId());
+        }
+
+        $data = [];
+        foreach ($alternatives as $alternative) {
+            $data[] = $alternative->toAlternativeArray();
+        }
+
+        return new JsonResponse([
+            'alternatives' => $data,
+            'suggestedReplacement' => $suggestedReplacement ? $suggestedReplacement->toAlternativeArray() : null,
+        ]);
+    }
+
+    protected function claimsNotes(Request $request, $id)
+    {
+        if (!$this->isCsrfTokenValid('default', $request->get('token'))) {
+            throw new \InvalidArgumentException('Invalid csrf token');
+        }
+
+        $dm = $this->getManager();
+        /** @var ClaimRepository $repo */
+        $repo = $dm->getRepository(Claim::class);
+        $claim = $repo->find($id);
+        $validator = new AlphanumericSpaceDotValidator();
+        $claim->setNotes($validator->conform($this->getRequestString($request, 'notes')));
+
+        $dm->flush();
+        $this->addFlash(
+            'success',
+            'Claim notes updated'
+        );
+
+        $redirectRoute = 'claims_policy';
+        /** @var User $user */
+        $user = $this->getUser();
+        if ($user->hasEmployeeRole()) {
+            $redirectRoute = 'admin_policy';
+        }
+
+        return new RedirectResponse($this->generateUrl($redirectRoute, ['id' => $claim->getPolicy()->getId()]));
     }
 }

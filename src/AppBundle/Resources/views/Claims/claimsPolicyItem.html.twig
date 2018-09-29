@@ -55,7 +55,7 @@
                             <td>Phone</td>
                             <td>{{ policy.phone }}&nbsp;
                                     <button type="button" class="btn btn-info" data-toggle="modal" data-target="#alternativeModal"
-                                        data-query="{{ path('claims_phone_alternatives', {'id': policy.phone.id}) }}"
+                                        data-query="{% if is_granted('ROLE_EMPLOYEE') %}{{ path('admin_phone_alternatives', {'id': policy.phone.id}) }}{% else %}{{ path('claims_phone_alternatives', {'id': policy.phone.id}) }}{% endif %}"
                                         data-phone="{{ policy.phone.toAlternativeArray()|json_encode }}"
                                         >Show Alternatives</button>
 
@@ -503,7 +503,14 @@
                     {% for file in policy.policyFiles %}
                     <tr>
                         <td>{{ file.fileType }}</td>
-                        <td><a href="{{ path('claims_download_file', {'id': file.id}) }}">{{ file.fileName }}</a> (Generated {{ file.created|date }})</td>
+                        <td>
+                            {% if is_granted('ROLE_EMPLOYEE') %}
+                                <a href="{{ path('admin_download_file', {'id': file.id}) }}">{{ file.fileName }}</a>
+                            {% elseif is_granted('ROLE_CLAIMS') %}
+                                <a href="{{ path('claims_download_file', {'id': file.id}) }}">{{ file.fileName }}</a>
+                            {% endif %}
+                            (Generated {{ file.created|date }})
+                        </td>
                     </tr>
                     {% endfor %}
                 </table>

@@ -343,6 +343,7 @@ services:
         arguments:
             - "@aws.s3"
             - "@app.router"
+            - "@app.request"
         public: false
         tags:
             - { name: twig.extension }

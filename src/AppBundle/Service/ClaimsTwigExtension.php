@@ -14,12 +14,20 @@ class ClaimsTwigExtension extends \Twig_Extension
     /** @var RouterService */
     protected $router;
 
+    /** @var RequestService */
+    protected $requestService;
+
     /**
+     * ClaimsTwigExtension constructor.
+     * @param                $s3
+     * @param RouterService  $router
+     * @param RequestService $requestService
      */
-    public function __construct($s3, $router)
+    public function __construct($s3, RouterService $router, RequestService $requestService)
     {
         $this->s3 = $s3;
         $this->router = $router;
+        $this->requestService = $requestService;
     }
 
     public function getFunctions()
@@ -31,13 +39,17 @@ class ClaimsTwigExtension extends \Twig_Extension
 
     public function s3DownloadLinks($claim)
     {
+        $downloadRoute = 'claims_download_file_attachment';
+        if ($this->requestService->hasEmployeeRole()) {
+            $downloadRoute = 'admin_download_file_attachment';
+        }
         $proofOfUsages = array();
         foreach ($claim->getProofOfUsageFiles() as $file) {
             $proofOfUsages[] = array(
                 'filename' => $file->getFilename(),
                 'url' => $this->router->generateUrl('claims_download_file', ['id' => $file->getId()]),
                 'url_download' => $this->router->generateUrl(
-                    'claims_download_file_attachment',
+                    $downloadRoute,
                     ['id' => $file->getId()]
                 ),
             );
@@ -49,7 +61,7 @@ class ClaimsTwigExtension extends \Twig_Extension
                 'filename' => $file->getFilename(),
                 'url' => $this->router->generateUrl('claims_download_file', ['id' => $file->getId()]),
                 'url_download' => $this->router->generateUrl(
-                    'claims_download_file_attachment',
+                    $downloadRoute,
                     ['id' => $file->getId()]
                 ),
             );
@@ -61,7 +73,7 @@ class ClaimsTwigExtension extends \Twig_Extension
                 'filename' => $file->getFilename(),
                 'url' => $this->router->generateUrl('claims_download_file', ['id' => $file->getId()]),
                 'url_download' => $this->router->generateUrl(
-                    'claims_download_file_attachment',
+                    $downloadRoute,
                     ['id' => $file->getId()]
                 ),
             );
@@ -73,7 +85,7 @@ class ClaimsTwigExtension extends \Twig_Extension
                 'filename' => $file->getFilename(),
                 'url' => $this->router->generateUrl('claims_download_file', ['id' => $file->getId()]),
                 'url_download' => $this->router->generateUrl(
-                    'claims_download_file_attachment',
+                    $downloadRoute,
                     ['id' => $file->getId()]
                 ),
             );
@@ -85,7 +97,7 @@ class ClaimsTwigExtension extends \Twig_Extension
                 'filename' => $file->getFilename(),
                 'url' => $this->router->generateUrl('claims_download_file', ['id' => $file->getId()]),
                 'url_download' => $this->router->generateUrl(
-                    'claims_download_file_attachment',
+                    $downloadRoute,
                     ['id' => $file->getId()]
                 ),
             );
@@ -97,7 +109,7 @@ class ClaimsTwigExtension extends \Twig_Extension
                 'filename' => $file->getFilename(),
                 'url' => $this->router->generateUrl('claims_download_file', ['id' => $file->getId()]),
                 'url_download' => $this->router->generateUrl(
-                    'claims_download_file_attachment',
+                    $downloadRoute,
                     ['id' => $file->getId()]
                 ),
             );

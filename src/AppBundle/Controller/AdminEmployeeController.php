@@ -1489,6 +1489,37 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
     }
 
     /**
+     * @Route("/policy/download/{id}", name="admin_download_file")
+     * @Route("/policy/download/{id}/attachment", name="admin_download_file_attachment")
+     */
+    public function policyDownloadFileAction(Request $request, $id)
+    {
+        return $this->policyDownloadFile(
+            $request,
+            $id,
+            $request->get('_route') == 'admin_download_file_attachment'
+        );
+    }
+
+    /**
+     * @Route("/phone/{id}/alternatives", name="admin_phone_alternatives")
+     * @Method({"GET"})
+     */
+    public function phoneAlternativesAction($id)
+    {
+        return $this->phoneAlternatives($id);
+    }
+
+    /**
+     * @Route("/claim/notes/{id}", name="admin_claim_notes", requirements={"id":"[0-9a-f]{24,24}"})
+     * @Method({"POST"})
+     */
+    public function claimsNotesAction(Request $request, $id)
+    {
+        return $this->claimsNotes($request, $id);
+    }
+
+    /**
      * @Route("/scheduled-payments", name="admin_scheduled_payments")
      * @Route("/scheduled-payments/{year}/{month}", name="admin_scheduled_payments_date")
      * @Template
