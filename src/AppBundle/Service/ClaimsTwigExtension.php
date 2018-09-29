@@ -1,6 +1,7 @@
 <?php
 namespace AppBundle\Service;
 
+use Aws\S3\S3Client;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Psr\Log\LoggerInterface;
 use AppBundle\Document\CurrencyTrait;
@@ -9,6 +10,7 @@ use Symfony\Component\Routing\Router;
 
 class ClaimsTwigExtension extends \Twig_Extension
 {
+    /** @var S3Client */
     protected $s3;
 
     /** @var RouterService */
@@ -19,11 +21,11 @@ class ClaimsTwigExtension extends \Twig_Extension
 
     /**
      * ClaimsTwigExtension constructor.
-     * @param                $s3
+     * @param S3Client       $s3
      * @param RouterService  $router
      * @param RequestService $requestService
      */
-    public function __construct($s3, RouterService $router, RequestService $requestService)
+    public function __construct(S3Client $s3, RouterService $router, RequestService $requestService)
     {
         $this->s3 = $s3;
         $this->router = $router;

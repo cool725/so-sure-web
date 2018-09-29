@@ -12,6 +12,7 @@ use AppBundle\Service\QuoteService;
 use Doctrine\ODM\MongoDB\Query\Builder;
 use Doctrine\ORM\QueryBuilder;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -1198,15 +1199,21 @@ abstract class BaseController extends Controller
         $dm = $this->getManager();
         /** @var PhoneRepository $repo */
         $repo = $dm->getRepository(Phone::class);
+        /** @var Phone $phone */
         $phone = $repo->find($id);
-        $alternatives = $repo->alternatives($phone);
+        $alternatives = [];
         $suggestedReplacement = null;
-        if ($phone->getSuggestedReplacement()) {
-            $suggestedReplacement = $repo->find($phone->getSuggestedReplacement()->getId());
+        if ($phone) {
+            $alternatives = $repo->alternatives($phone);
+            if ($phone->getSuggestedReplacement()) {
+                /** @var Phone $suggestedReplacement */
+                $suggestedReplacement = $repo->find($phone->getSuggestedReplacement()->getId());
+            }
         }
 
         $data = [];
         foreach ($alternatives as $alternative) {
+            /** @var Phone $alternative */
             $data[] = $alternative->toAlternativeArray();
         }
 
@@ -1225,6 +1232,7 @@ abstract class BaseController extends Controller
         $dm = $this->getManager();
         /** @var ClaimRepository $repo */
         $repo = $dm->getRepository(Claim::class);
+        /** @var Claim $claim */
         $claim = $repo->find($id);
         $validator = new AlphanumericSpaceDotValidator();
         $claim->setNotes($validator->conform($this->getRequestString($request, 'notes')));
