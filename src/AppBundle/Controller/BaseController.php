@@ -747,6 +747,18 @@ abstract class BaseController extends Controller
         return $phone;
     }
 
+    /**
+     * @param Request $request
+     * @param Phone   $phone
+     */
+    protected function setSessionQuotePhone(Request $request, Phone $phone)
+    {
+        $session = $request->getSession();
+        if ($session && !$session->get('quote')) {
+            $session->set('quote', $phone->getId());
+        }
+    }
+
     protected function getSessionSixpackTest(Request $request, $name, $options)
     {
         $exp = null;
