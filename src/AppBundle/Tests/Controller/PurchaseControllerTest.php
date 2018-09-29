@@ -275,7 +275,7 @@ class PurchaseControllerTest extends BaseControllerTest
     {
         /** @var FeatureService $feature */
         $feature = $this->getContainer(true)->get('app.feature');
-        $this->assertTrue($feature->isEnabled(Feature::FEATURE_BACS));
+        $this->assertTrue($feature->isEnabled(Feature::FEATURE_BACS), 'Bacs feature disabled');
 
         $phone = $this->setRandomPhone();
 
@@ -327,7 +327,7 @@ class PurchaseControllerTest extends BaseControllerTest
         self::verifyResponse(302, null, $crawler);
         $redirectUrl = self::$router->generate('user_welcome_policy_id', ['id' => $policy->getId()]);
         //print $crawler->html();
-        $this->assertTrue($this->isClientResponseRedirect($redirectUrl));
+        $this->assertTrue($this->isClientResponseRedirect($redirectUrl), 'Redirect to user welcome page');
         $crawler = self::$client->followRedirect();
         self::verifyResponse(200);
     }
