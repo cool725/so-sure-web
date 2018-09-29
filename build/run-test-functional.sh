@@ -102,8 +102,8 @@ if [ "$RUN_FILTER" == "" ]; then
         echo "Running test cases that need to be run individually :("
         ./build/phpunit.sh --filter "::testUserCreateNoChangeEmail" --bootstrap vendor/autoload.php src/
     
-        #echo "Wiping db again"
-        #init $SKIP_DB $SKIP_POLICY
+        echo "Wiping db again"
+        init $SKIP_DB $SKIP_POLICY
     fi
 
     echo "Running test suite"
