@@ -1495,7 +1495,6 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
     public function policyDownloadFileAction(Request $request, $id)
     {
         return $this->policyDownloadFile(
-            $request,
             $id,
             $request->get('_route') == 'admin_download_file_attachment'
         );

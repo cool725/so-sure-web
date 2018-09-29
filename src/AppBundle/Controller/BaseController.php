@@ -1157,7 +1157,7 @@ abstract class BaseController extends Controller
         }
     }
 
-    protected function policyDownloadFile(Request $request, $id, $attachment = false)
+    protected function policyDownloadFile($id, $attachment = false)
     {
         $dm = $this->getManager();
         /** @var S3FileRepository $repo */

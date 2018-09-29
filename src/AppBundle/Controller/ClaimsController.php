@@ -330,7 +330,6 @@ class ClaimsController extends BaseController
     public function claimsDownloadFileAction(Request $request, $id)
     {
         return $this->policyDownloadFile(
-            $request,
             $id,
             $request->get('_route') == 'claims_download_file_attachment'
         );
