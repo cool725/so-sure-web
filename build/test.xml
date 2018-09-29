@@ -8,13 +8,11 @@
     <autoloader autoloaderpath="${dir.app}/autoload.php"/>
 
     <target name="prepare">
-      <mkdir dir="/tmp/coverage-report"/>
-      <mkdir dir="${dir.src}/../web/cover"/>
+      <mkdir dir="${dir.app}/logs/coverage"/>
     </target>
 
     <target name="clean"> 
-      <delete dir="/tmp/coverage-report"/>
-      <delete dir="${dir.src}/../web/cover"/>
+      <delete dir="${dir.app}/logs/coverage"/>
     </target>
   
     <target name="test:unit" description="Run unit tests">
@@ -49,7 +47,7 @@
     </target>
 
     <target name="test:functional:cover" depends="clean, prepare" description="Run functional tests">
-        <coverage-setup database="/tmp/coverage-report/db">
+        <coverage-setup database="${dir.app}/logs/db">
             <fileset dir="${dir.src}">
                 <include name="**/*.php"/>
                 <exclude name="**/Tests/**/*.php"/>
@@ -69,14 +67,14 @@
               </fileset>
           </batchtest>
        </phpunit>
-        <coverage-report outfile="/tmp/coverage-report/coverage.xml">
+        <coverage-report outfile="${dir.app}/logs/coverage.xml">
             <report 
-              todir="${dir.src}/../web/cover"/>
+              todir="${dir.app}/logs/coverage"/>
         </coverage-report>
     </target>
 
     <target name="test:functional:nonet:cover" depends="clean, prepare" description="Run functional tests">
-        <coverage-setup database="/tmp/coverage-report/db">
+        <coverage-setup database="${dir.app}/logs/db">
             <fileset dir="${dir.src}">
                 <include name="**/*.php"/>
                 <exclude name="**/Tests/**/*.php"/>
@@ -96,9 +94,9 @@
               </fileset>
           </batchtest>
        </phpunit>
-        <coverage-report outfile="/tmp/coverage-report/coverage.xml">
+        <coverage-report outfile="${dir.app}/logs/coverage.xml">
             <report 
-              todir="${dir.src}/../web/cover"/>
+              todir="${dir.app}/logs/cover"/>
         </coverage-report>
     </target>
 
