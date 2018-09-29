@@ -269,6 +269,7 @@ class ScheduledPayment
 
         // Hack for a off by one hour timezone issue between billing & scheduled
         // TODO: Fix scheduled times
+        // TODO: THIS WILL NEVER WORKD AS BILLING IS NOT ADJUSTED FOR CURRENT MONTH
         $diff = $this->getScheduled()->diff($this->policy->getBilling());
         if ($diff->d == 0 && $diff->h <= 1) {
             return true;
