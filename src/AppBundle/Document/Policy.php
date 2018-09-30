@@ -435,11 +435,19 @@ abstract class Policy
     protected $policyFiles = array();
 
     /**
-     * @Assert\Choice({"invitation", "scode"}, strict=true)
+     * @Assert\Choice({"invitation", "scode", "affiliate"}, strict=true)
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
     protected $leadSource;
+
+    /**
+     * @AppAssert\AlphanumericSpaceDot()
+     * @Assert\Length(min="1", max="50")
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
+    protected $leadSourceDetails;
 
     /**
      * @MongoDB\Field(type="hash")
@@ -1750,6 +1758,16 @@ abstract class Policy
         return $this->leadSource;
     }
 
+    public function setLeadSourceDetails($details)
+    {
+        $this->leadSourceDetails = $details;
+    }
+
+    public function getLeadSourceDetails()
+    {
+        return $this->leadSourceDetails;
+    }
+
     public function getNotes()
     {
         return $this->notes;
@@ -1942,6 +1960,7 @@ abstract class Policy
         }
 
         $this->setLeadSource($this->getUser()->getLeadSource());
+        $this->setLeadSourceDetails($this->getUser()->getLeadSourceDetails());
     }
 
     public function setViewedCancellationPage($viewedCancellationPage)

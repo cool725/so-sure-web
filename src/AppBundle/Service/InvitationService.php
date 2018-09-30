@@ -510,7 +510,7 @@ class InvitationService
             $this->addReward($policy, $scode->getReward());
         }
 
-        $this->setSCodeLeadSource($policy, $user, $date);
+        $this->setSCodeLeadSource($scode, $policy, $user, $date);
 
         $inviteePolicies = 0;
         if ($scode->isStandard()) {
@@ -597,7 +597,7 @@ class InvitationService
         return $invitation;
     }
 
-    private function setSCodeLeadSource($policy, $user, \DateTime $date = null)
+    private function setSCodeLeadSource(SCode $scode, Policy $policy, User $user, \DateTime $date = null)
     {
         if (!$date) {
             $date = new \DateTime();
@@ -608,9 +608,11 @@ class InvitationService
         // the lead source was due to the scode
         if (!$policy->getLeadSource() && $policy->getStart() > $date) {
             $policy->setLeadSource(Lead::LEAD_SOURCE_SCODE);
+            $policy->setLeadSourceDetails($scode->getCode());
             // if policy is being set, user probably needs setting as well
             if (!$user->getLeadSource()) {
                 $user->setLeadSource(Lead::LEAD_SOURCE_SCODE);
+                $user->setLeadSourceDetails($scode->getCode());
             }
         }
     }

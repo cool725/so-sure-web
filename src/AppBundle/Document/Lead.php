@@ -24,6 +24,7 @@ class Lead
     // Lead Source is used in User & Policy
     const LEAD_SOURCE_INVITATION = 'invitation';
     const LEAD_SOURCE_SCODE = 'scode';
+    const LEAD_SOURCE_AFFILIATE = 'affiliate';
 
     /**
      * @MongoDB\Id(strategy="auto")

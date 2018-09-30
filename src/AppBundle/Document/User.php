@@ -71,11 +71,19 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     protected $referred;
 
     /**
-     * @Assert\Choice({"invitation", "scode"}, strict=true)
+     * @Assert\Choice({"invitation", "scode", "affiliate"}, strict=true)
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
     protected $leadSource;
+
+    /**
+     * @AppAssert\AlphanumericSpaceDot()
+     * @Assert\Length(min="1", max="50")
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
+    protected $leadSourceDetails;
 
     /**
      * @MongoDB\EmbedOne(targetDocument="Address")
@@ -520,6 +528,16 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     public function getLeadSource()
     {
         return $this->leadSource;
+    }
+
+    public function setLeadSourceDetails($details)
+    {
+        $this->leadSourceDetails = $details;
+    }
+
+    public function getLeadSourceDetails()
+    {
+        return $this->leadSourceDetails;
     }
 
     /**
@@ -1313,6 +1331,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
 
         if (!$this->getLeadSource() && $invitation->getCreated() < $this->getCreated()) {
             $this->setLeadSource(Lead::LEAD_SOURCE_INVITATION);
+            $this->setLeadSourceDetails($invitation->getInviter()->getEmail());
         }
     }
 
@@ -1668,6 +1687,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         $this->acceptedSCode = $scode;
         if (!$this->getLeadSource()) {
             $this->setLeadSource(Lead::LEAD_SOURCE_SCODE);
+            $this->setLeadSourceDetails($scode->getCode());
         }
     }
 

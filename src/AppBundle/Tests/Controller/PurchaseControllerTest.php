@@ -2,10 +2,13 @@
 
 namespace AppBundle\Tests\Controller;
 
+use AppBundle\DataFixtures\MongoDB\d\Oauth2\LoadOauth2Data;
 use AppBundle\Document\Feature;
 use AppBundle\Document\LostPhone;
+use AppBundle\Repository\UserRepository;
 use AppBundle\Service\FeatureService;
 use AppBundle\Service\PCAService;
+use AppBundle\Service\RouterService;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\User;
 use AppBundle\Document\Phone;
@@ -223,6 +226,40 @@ class PurchaseControllerTest extends BaseControllerTest
         $this->assertTrue($this->isClientResponseRedirect(
             sprintf('/purchase/step-phone/%s', $policy1->getId())
         ));
+    }
+
+    public function testStarlingLead()
+    {
+        $oauthStarlingUrl = static::$router->generate('fos_oauth_server_authorize', [
+            'client_id' => LoadOauth2Data::KNOWN_CLIENT_ID,
+            'response_type' => 'code',
+            'redirect_uri' => '/ops/pages',
+            'state' => 'random-string.12345',
+            'scope' => 'user.starling.summary'
+        ]);
+
+        static::$client->followRedirects(true);
+        static::$client->request('GET', $oauthStarlingUrl);
+        static::$client->followRedirects(false);
+
+        $email = self::generateEmail('testStarling', $this);
+        $crawler = $this->createPurchase(
+            self::generateEmail('testStarling', $this),
+            'foo bar',
+            new \DateTime('1980-01-01')
+        );
+        self::verifyResponse(302);
+
+        $dm = $this->getDocumentManager(true);
+        /** @var UserRepository $repo */
+        $repo = $dm->getRepository(User::class);
+        /** @var User $user */
+        $user = $repo->findOneBy(['emailCanonical' => mb_strtolower($email)]);
+        $this->assertNotNull($user);
+        if ($user) {
+            $this->assertEquals(Lead::LEAD_SOURCE_AFFILIATE, $user->getLeadSource());
+            $this->assertEquals('starling', $user->getLeadSourceDetails());
+        }
     }
 
     public function testPurchaseAddressNew()

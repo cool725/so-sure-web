@@ -10,6 +10,7 @@ use AppBundle\Event\UserEmailEvent;
 use Symfony\Component\BrowserKit\Tests\TestClient;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DomCrawler\Crawler;
+use Symfony\Component\Routing\Router;
 
 class BaseControllerTest extends WebTestCase
 {
@@ -23,6 +24,7 @@ class BaseControllerTest extends WebTestCase
     protected static $dm;
     protected static $identity;
     protected static $jwt;
+    /** @var Router */
     protected static $router;
 
     /** @var Client */
