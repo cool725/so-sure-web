@@ -47,7 +47,7 @@ class ApiAuthControllerUserEmailTest extends BaseApiControllerTest
 
     public function testUpdateUserChangeEmail()
     {
-        $this->expectUserChangeEvent();
+        $this->expectUserEmailChangeEvent();
         $user = self::createUser(
             self::$userManager,
             self::generateEmail('testUpdateUserChangeEmail', $this),
