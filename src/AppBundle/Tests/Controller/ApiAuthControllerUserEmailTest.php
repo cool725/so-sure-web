@@ -72,7 +72,7 @@ class ApiAuthControllerUserEmailTest extends BaseApiControllerTest
 
     public function testUpdateUserNoChangeEmail()
     {
-        $this->expectNoUserChangeEvent();
+        $this->expectNoUserEmailChangeEvent();
         $user = self::createUser(
             self::$userManager,
             self::generateEmail('testUpdateUserNoChangeEmail', $this),
@@ -106,7 +106,7 @@ class ApiAuthControllerUserEmailTest extends BaseApiControllerTest
         self::$dm->persist($invitation);
         self::$dm->flush();
 
-        $this->expectNoUserChangeEvent();
+        $this->expectNoUserEmailChangeEvent();
         $cognitoIdentityId = $this->getUnauthIdentity();
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/user', array(
             'email' => self::generateEmail('testUserCreateNoChangeEmail', $this),

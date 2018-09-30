@@ -443,7 +443,7 @@ abstract class Policy
 
     /**
      * @AppAssert\AlphanumericSpaceDot()
-     * @Assert\Length(min="1", max="50")
+     * @Assert\Length(min="1", max="250")
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
@@ -1760,7 +1760,8 @@ abstract class Policy
 
     public function setLeadSourceDetails($details)
     {
-        $this->leadSourceDetails = $details;
+        $validator = new AppAssert\AlphanumericSpaceDotValidator();
+        $this->leadSourceDetails = $validator->conform($details);
     }
 
     public function getLeadSourceDetails()

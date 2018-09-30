@@ -71,7 +71,7 @@ class BaseControllerTest extends WebTestCase
     public function setUp()
     {
         parent::setUp();
-        $this->expectNoUserChangeEvent();
+        $this->expectNoUserEmailChangeEvent();
     }
 
     public function testINeedATest()
@@ -154,12 +154,12 @@ class BaseControllerTest extends WebTestCase
         );
     }
 
-    protected function expectNoUserChangeEvent()
+    protected function expectNoUserEmailChangeEvent()
     {
-        $this->expectUserChangeEvent($this->never());
+        $this->expectUserEmailChangeEvent($this->never());
     }
 
-    protected function expectUserChangeEvent($count = null, $remove = false)
+    protected function expectUserEmailChangeEvent($count = null, $remove = false)
     {
         if (!$count) {
             $count = $this->once();

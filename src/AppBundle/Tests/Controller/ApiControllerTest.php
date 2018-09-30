@@ -933,7 +933,7 @@ class ApiControllerTest extends BaseApiControllerTest
 
     public function testUserCreate()
     {
-        $this->expectNoUserChangeEvent();
+        $this->expectNoUserEmailChangeEvent();
         $cognitoIdentityId = $this->getUnauthIdentity();
 
         $birthday = new \DateTime('1980-01-01');
