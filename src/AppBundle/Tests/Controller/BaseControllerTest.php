@@ -46,15 +46,23 @@ class BaseControllerTest extends WebTestCase
             throw new \Exception('unable to find container');
         }
         self::$identity = self::$container->get('app.cognito.identity');
+
         /** @var DocumentManager */
         $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
         self::$dm = $dm;
+
         self::$userManager = self::$container->get('fos_user.user_manager');
-        self::$router = self::$container->get('router');
+
+        /** @var Router $router */
+        $router = self::$container->get('router');
+        self::$router = $router;
+
         self::$jwt = self::$container->get('app.jwt');
+
         /** @var Client $redis */
         $redis = self::$container->get('snc_redis.default');
         self::$redis = $redis;
+
         self::$policyService = self::$container->get('app.policy');
         self::$invitationService = self::$container->get('app.invitation');
         self::$rootDir = self::$container->getParameter('kernel.root_dir');

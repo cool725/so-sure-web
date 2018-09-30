@@ -18,6 +18,7 @@ use AppBundle\Document\Lead;
 use AppBundle\Document\Payment\Payment;
 use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Document\CurrencyTrait;
+use Symfony\Component\BrowserKit\Cookie;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 use AppBundle\Classes\Salva;
@@ -26,6 +27,7 @@ use AppBundle\Document\JudoPaymentMethod;
 use AppBundle\Document\Invitation\EmailInvitation;
 use AppBundle\Service\ReceperioService;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 /**
  * @group functional-net
@@ -230,17 +232,14 @@ class PurchaseControllerTest extends BaseControllerTest
 
     public function testStarlingLead()
     {
-        $oauthStarlingUrl = static::$router->generate('fos_oauth_server_authorize', [
-            'client_id' => LoadOauth2Data::KNOWN_CLIENT_ID,
-            'response_type' => 'code',
-            'redirect_uri' => '/ops/pages',
-            'state' => 'random-string.12345',
-            'scope' => 'user.starling.summary'
-        ]);
+        $phone = self::getRandomPhone(self::$dm);
 
-        static::$client->followRedirects(true);
-        static::$client->request('GET', $oauthStarlingUrl);
-        static::$client->followRedirects(false);
+        /** @var SessionInterface $session */
+        $session = self::$container->get('session');
+        $session->set('oauth2Flow', 'starling');
+        $session->set('quote', $phone->getId());
+        $session->save();
+        static::$client->getCookieJar()->set(new Cookie($session->getName(), $session->getId()));
 
         $email = self::generateEmail('testStarling', $this);
         $crawler = $this->createPurchase(
@@ -1291,6 +1290,7 @@ class PurchaseControllerTest extends BaseControllerTest
         }
         $crawler = self::$client->request('GET', '/purchase/');
         self::verifyResponse(200);
+        $this->assertNotContains('no phone selected', $crawler->html());
         $form = $crawler->selectButton('purchase_form[next]')->form();
         $form['purchase_form[email]'] = $email;
         $form['purchase_form[name]'] = $name;
