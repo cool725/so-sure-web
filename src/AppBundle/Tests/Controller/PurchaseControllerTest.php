@@ -2,10 +2,13 @@
 
 namespace AppBundle\Tests\Controller;
 
+use AppBundle\DataFixtures\MongoDB\d\Oauth2\LoadOauth2Data;
 use AppBundle\Document\Feature;
 use AppBundle\Document\LostPhone;
+use AppBundle\Repository\UserRepository;
 use AppBundle\Service\FeatureService;
 use AppBundle\Service\PCAService;
+use AppBundle\Service\RouterService;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\User;
 use AppBundle\Document\Phone;
@@ -15,6 +18,7 @@ use AppBundle\Document\Lead;
 use AppBundle\Document\Payment\Payment;
 use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Document\CurrencyTrait;
+use Symfony\Component\BrowserKit\Cookie;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 use AppBundle\Classes\Salva;
@@ -23,6 +27,7 @@ use AppBundle\Document\JudoPaymentMethod;
 use AppBundle\Document\Invitation\EmailInvitation;
 use AppBundle\Service\ReceperioService;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 /**
  * @group functional-net
@@ -223,6 +228,37 @@ class PurchaseControllerTest extends BaseControllerTest
         $this->assertTrue($this->isClientResponseRedirect(
             sprintf('/purchase/step-phone/%s', $policy1->getId())
         ));
+    }
+
+    public function testStarlingLead()
+    {
+        $phone = self::getRandomPhone(self::$dm);
+
+        /** @var SessionInterface $session */
+        $session = self::$container->get('session');
+        $session->set('oauth2Flow', 'starling');
+        $session->set('quote', $phone->getId());
+        $session->save();
+        static::$client->getCookieJar()->set(new Cookie($session->getName(), $session->getId()));
+
+        $email = self::generateEmail('testStarling', $this);
+        $crawler = $this->createPurchase(
+            self::generateEmail('testStarling', $this),
+            'foo bar',
+            new \DateTime('1980-01-01')
+        );
+        self::verifyResponse(302);
+
+        $dm = $this->getDocumentManager(true);
+        /** @var UserRepository $repo */
+        $repo = $dm->getRepository(User::class);
+        /** @var User $user */
+        $user = $repo->findOneBy(['emailCanonical' => mb_strtolower($email)]);
+        $this->assertNotNull($user);
+        if ($user) {
+            $this->assertEquals(Lead::LEAD_SOURCE_AFFILIATE, $user->getLeadSource());
+            $this->assertEquals('starling', $user->getLeadSourceDetails());
+        }
     }
 
     public function testPurchaseAddressNew()
@@ -1254,6 +1290,7 @@ class PurchaseControllerTest extends BaseControllerTest
         }
         $crawler = self::$client->request('GET', '/purchase/');
         self::verifyResponse(200);
+        $this->assertNotContains('no phone selected', $crawler->html());
         $form = $crawler->selectButton('purchase_form[next]')->form();
         $form['purchase_form[email]'] = $email;
         $form['purchase_form[name]'] = $name;

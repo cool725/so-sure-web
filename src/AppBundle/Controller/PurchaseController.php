@@ -193,6 +193,11 @@ class PurchaseController extends BaseController
                         $user = $userManager->createUser();
                         $user->setEnabled(true);
                         $newUser = true;
+
+                        if ($session && $session->get('oauth2Flow') == 'starling') {
+                            $user->setLeadSource(Lead::LEAD_SOURCE_AFFILIATE);
+                            $user->setLeadSourceDetails('starling');
+                        }
                     }
                     $purchase->populateUser($user);
                     if ($newUser) {
