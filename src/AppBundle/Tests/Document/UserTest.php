@@ -592,6 +592,25 @@ class UserTest extends \PHPUnit\Framework\TestCase
         }
     }
 
+    public function testShouldDeleteSoSureEmail()
+    {
+        $emails = [
+            'foo@so-sure.com' => false,
+            'bar@so-sure.net' => false,
+            'foobar@so-sure.org' => true,
+        ];
+        foreach ($emails as $email => $expect) {
+            $user = new User();
+            $user->setCreated(new \DateTime('2016-01-01'));
+            $user->setEmailCanonical($email);
+            if ($expect) {
+                $this->assertTrue($user->shouldDelete(new \DateTime('2017-07-03')), $email);
+            } else {
+                $this->assertFalse($user->shouldDelete(new \DateTime('2017-07-03')), $email);
+            }
+        }
+    }
+
     public function testShouldDeletePartialPolicy()
     {
         $user = new User();
