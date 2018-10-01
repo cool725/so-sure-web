@@ -16,7 +16,7 @@ class PCACommand extends ContainerAwareCommand
     protected function configure()
     {
         $this
-            ->setName('sosure:pca')
+            ->setName('sosure:pca:bankaccount')
             ->setDescription('Query bank account from the PCA provider and output the response.')
             ->addArgument(
                 'sortcode',
