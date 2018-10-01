@@ -43,8 +43,8 @@ class CurrencyTraitTest extends \PHPUnit\Framework\TestCase
 
     public function testWithIpt()
     {
-        $this->assertEquals('13.99', $this->withIpt(12.49 ,new \DateTime('2018-06-01')));
-        $this->assertEquals('14.49', $this->withIpt(12.94 ,new \DateTime('2018-06-01')));
+        $this->assertEquals('13.99', $this->withIpt(12.49, new \DateTime('2018-06-01')));
+        $this->assertEquals('14.49', $this->withIpt(12.94, new \DateTime('2018-06-01')));
     }
 
     public function testStaticToTwoDp()
