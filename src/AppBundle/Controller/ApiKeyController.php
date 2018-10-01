@@ -108,6 +108,8 @@ class ApiKeyController extends BaseController
      */
     public function monitorAction($name)
     {
+        // monitor/api-monitor-intercomPolicyPremium : CheckHttp CRITICAL: Request timed out is occurring frequently
+        set_time_limit(60);
         try {
             $monitor = $this->get('app.monitor');
             $message = $monitor->run($name);
