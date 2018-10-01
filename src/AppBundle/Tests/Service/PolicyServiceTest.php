@@ -69,10 +69,18 @@ class PolicyServiceTest extends WebTestCase
         self::$policyRepo = self::$dm->getRepository(Policy::class);
         self::$userManager = self::$container->get('fos_user.user_manager');
         self::$policyService = self::$container->get('app.policy');
+        self::$policyService->setDispatcher(null);
+
         self::$judopay = self::$container->get('app.judopay');
 
         $phoneRepo = self::$dm->getRepository(Phone::class);
         self::$phone = $phoneRepo->findOneBy(['devices' => 'iPhone 5', 'memory' => 64]);
+    }
+
+    public function setUp()
+    {
+        parent::setUp();
+        set_time_limit(240);
     }
 
     public function tearDown()
@@ -3363,7 +3371,6 @@ class PolicyServiceTest extends WebTestCase
 
     public function testPolicyRenewalConnectionsSingleReconnectReverse11Months()
     {
-        set_time_limit(120);
         /** @var Policy $policyA */
         /** @var Policy $policyB */
         list($policyA, $policyB) = $this->getPendingRenewalPolicies(
