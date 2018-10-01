@@ -3363,6 +3363,7 @@ class PolicyServiceTest extends WebTestCase
 
     public function testPolicyRenewalConnectionsSingleReconnectReverse11Months()
     {
+        set_time_limit(120);
         /** @var Policy $policyA */
         /** @var Policy $policyB */
         list($policyA, $policyB) = $this->getPendingRenewalPolicies(
