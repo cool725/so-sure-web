@@ -105,7 +105,7 @@
         {% endif %}
 
         {% block nav %}
-            {% if not hide_nav %}
+            {% if hide_nav is not defined or not hide_nav %}
                 {% include '::nav_rebrand.html.twig' %}
             {% endif %}
         {% endblock %}
@@ -119,7 +119,7 @@
         </main>
 
         {% block footer %}
-            {% if not hide_footer %}
+            {% if hide_footer is not defined or not hide_footer %}
                 {% include '::footer_rebrand.html.twig' %}
             {% endif %}
         {% endblock %}
@@ -128,9 +128,15 @@
 
         <script src="{{ asset('css-js/runtime.js') }}"></script>
         <script src="{{ asset('css-js/vendor.js') }}"></script>
+
         {% if environment != 'prod' %}
             <script src="{{ asset('css-js/dev.js') }}"></script>
         {% endif %}
+
+        {% if hide_cookie_warning is not defined or not hide_cookie_warning %}
+            <script src="{{ asset('css-js/cookie.js') }}"></script>
+        {% endif %}
+
         <script src="{{ asset('css-js/global.js') }}"></script>
 
         {% block javascriptsPage %}{% endblock %}
