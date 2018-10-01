@@ -4,12 +4,12 @@ namespace AppBundle\Classes;
 class GoCompare
 {
     public static $models = [
-        20 => ['make' => 'Apple', 'model' => 'iPhone 6', 'memory' => 128],
-        21 => ['make' => 'Apple', 'model' => 'iPhone 6', 'memory' => 16],
-        22 => ['make' => 'Apple', 'model' => 'iPhone 6', 'memory' => 64],
-        23 => ['make' => 'Apple', 'model' => 'iPhone 6 Plus', 'memory' => 128],
-        24 => ['make' => 'Apple', 'model' => 'iPhone 6 Plus', 'memory' => 16],
-        25 => ['make' => 'Apple', 'model' => 'iPhone 6 Plus', 'memory' => 64],
+        //20 => ['make' => 'Apple', 'model' => 'iPhone 6', 'memory' => 128],
+        //21 => ['make' => 'Apple', 'model' => 'iPhone 6', 'memory' => 16],
+        //22 => ['make' => 'Apple', 'model' => 'iPhone 6', 'memory' => 64],
+        //23 => ['make' => 'Apple', 'model' => 'iPhone 6 Plus', 'memory' => 128],
+        //24 => ['make' => 'Apple', 'model' => 'iPhone 6 Plus', 'memory' => 16],
+        //25 => ['make' => 'Apple', 'model' => 'iPhone 6 Plus', 'memory' => 64],
         26 => ['make' => 'Apple', 'model' => 'iPhone 6S', 'memory' => 128],
         27 => ['make' => 'Apple', 'model' => 'iPhone 6S', 'memory' => 16],
         28 => ['make' => 'Apple', 'model' => 'iPhone 6S', 'memory' => 32],

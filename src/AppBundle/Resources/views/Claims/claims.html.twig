@@ -109,7 +109,13 @@
                             data-claim='{{ claim.toModalArray|json_encode }}' data-documents='{{ s3DownloadLinks(claim)|json_encode }}'>
                                 {% if claim.number %}{{ claim.number }}{% else %}N/A{% endif %}</button>
                             </td>
-                            <td><a href="{{ path('claims_policy', {id: claim.policy.id}) }}">{{ claim.policy.policyNumber }}</a></td>
+                            <td>
+                                {% if is_granted('ROLE_EMPLOYEE') %}
+                                    <a href="{{ path('admin_policy', {id: claim.policy.id}) }}">{{ claim.policy.policyNumber }}</a>
+                                {% elseif is_granted('ROLE_CLAIMS') %}
+                                    <a href="{{ path('claims_policy', {id: claim.policy.id}) }}">{{ claim.policy.policyNumber }}</a>
+                                {% endif %}
+                            </td>
                             <td>{{ claim.type }}</td>
                             <td>{{ claim.status }}</td>
                             <td>{{ claim.policy.status }}</td>
