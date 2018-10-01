@@ -28,9 +28,9 @@ trait CurrencyTrait
         }
     }
 
-    protected function withIpt($basePrice)
+    protected function withIpt($basePrice, \DateTime $date = null)
     {
-        return $this->toTopTwoDp($basePrice * (1+$this->getCurrentIptRate()));
+        return $this->toTwoDp($basePrice * (1+$this->getCurrentIptRate($date)));
     }
 
     protected function toTopTwoDp($float)
