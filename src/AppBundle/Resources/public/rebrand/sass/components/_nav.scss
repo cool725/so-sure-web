@@ -2,7 +2,7 @@
 
 .navbar-so-sure {
     // TODO: When we switch to gradient hero adjust
-    @include blue-gradient;
+    // @include blue-gradient;
 
     .navbar-nav {
         transition: none;
@@ -38,6 +38,7 @@
 
 // Scroll effects
 .navbar-scrolled {
+    @include blue-gradient;
     box-shadow: 0 2px 0 0 rgba(0, 0, 0, 0.05);
 }
 

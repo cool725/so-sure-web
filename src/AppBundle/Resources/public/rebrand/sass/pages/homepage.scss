@@ -12,33 +12,56 @@
     padding-top: 8rem;
     padding-bottom: 4rem;
 
-    &__intro {
-        @include media-breakpoint-up(lg) {
-            padding-top: 6rem;
-        }
+    @include blue-gradient;
+
+    .container {
+        position: relative;
+        z-index: 4;
     }
 
-
-    &__credbar {
-        text-align: center;
-
-        img {
-            opacity: 0.4;
-        }
-
-        ul {
-            margin-bottom: 0;
-        }
+    &__intro {
 
         @include media-breakpoint-up(lg) {
-            text-align: right;
+            padding-top: 4rem;
         }
+
+        @include media-breakpoint-up(xl) {
+            padding-top: 6rem;
+        }
+
+    }
+
+    &:before {
+        width: 100%; height: 100%;
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        content: '';
+        z-index: 1;
+        background-image: url('#{$cdn_url}/images/rebrand/misc/so-sure_swoosh-hero-background-mobile.svg');
+        background-size: cover;
+        opacity: 0.44;
     }
 
     @include media-breakpoint-up(lg) {
-
+        &:before {
+            background-image: url('#{$cdn_url}/images/rebrand/misc/so-sure_swoosh-hero-background.svg');
+        }
     }
 
+}
+
+.cred {
+    text-align: center;
+    background-color: darken($pattens-blue, 5%);
+
+    img {
+        width: 100px;
+        opacity: 0.3;
+
+        @include media-breakpoint-up(lg) {
+            width: 120px;
+        }
+    }
 }
 
 .intro {
