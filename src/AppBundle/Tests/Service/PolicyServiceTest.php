@@ -7,6 +7,7 @@ use AppBundle\Document\Form\Bacs;
 use AppBundle\Document\Payment\PolicyDiscountPayment;
 use AppBundle\Exception\GeoRestrictedException;
 use AppBundle\Exception\InvalidUserDetailsException;
+use AppBundle\Service\PolicyService;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\User;
 use AppBundle\Document\Address;
@@ -68,7 +69,9 @@ class PolicyServiceTest extends WebTestCase
         self::$dm = $dm;
         self::$policyRepo = self::$dm->getRepository(Policy::class);
         self::$userManager = self::$container->get('fos_user.user_manager');
-        self::$policyService = self::$container->get('app.policy');
+        /** @var PolicyService $policyService */
+        $policyService = self::$container->get('app.policy');
+        self::$policyService = $policyService;
         self::$policyService->setDispatcher(null);
 
         self::$judopay = self::$container->get('app.judopay');
