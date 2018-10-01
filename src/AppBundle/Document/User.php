@@ -1924,7 +1924,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
 
     public function shouldDelete(\DateTime $date = null)
     {
-        if ($this->hasClaimsRole() || $this->hasEmployeeRole()) {
+        if ($this->hasClaimsRole() || $this->hasEmployeeRole() || $this->hasSoSureEmail()) {
             return false;
         }
 
