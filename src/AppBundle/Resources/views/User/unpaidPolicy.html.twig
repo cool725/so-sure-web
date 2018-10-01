@@ -26,12 +26,20 @@
                             <h1 class="text-center">Pending Direct Debit Setup</h1>
                             <p class="lead text-center">We're curently setting up your direct debit. Please come back in a few days.</p>
                         {% elseif app.user.paymentMethod.bankAccount.isMandateInvalid %}
-                            {# TODO: Allow user to re-setup bacs #}
+                            {# failed & cancelled #}
                             <h1 class="text-center">Invalid Mandate</h1>
-                            <p class="lead text-center">Your BACS mandate is either cancelled or failed. Please email <a href="mailto:support@wearesosure.com">support@wearesosure.com</a>.</p>
-                        {% else  %}
+                            <p class="lead text-center">
+                                Your BACS mandate is either cancelled or failed. </p>
+                            <p>
+                                <a href="{{ path('user_payment_details_bacs') }}" class="btn btn-green btn-block btn-pad ">Update direct debit details</a>
+                            </p>
+                        {% elseif policy.getLastPaymentDebit and policy.getLastPaymentDebit.inProgress  %}
                             <h1 class="text-center">Payment is processing</h1>
                             <p class="lead text-center">Your BACS mandate has been setup, and we are currently processing your payment.</p>
+                        {% elseif policy.getLastPaymentDebit and policy.getLastPaymentDebit.status == 'failed'  %}
+                            <h1 class="text-center">Payment failed</h1>
+                            <p class="lead text-center">Your last bacs payment failed and your policy is in danger of being cancelled.</p>
+                            {# TODO: Allow user to re-trigger a bacs payment #}
                         {% endif %}
                     {% elseif webpay_action and webpay_reference and amount > 0 %}
                         <h1 class="text-center">Unpaid Policy</h1>

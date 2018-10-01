@@ -1077,16 +1077,7 @@ class UserController extends BaseController
             $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
             if (!$policy->isPolicyPaidToDate()) {
                 $amount = $policy->getOutstandingPremiumToDate();
-
-                if ($amount > 0) {
-                    $webpay = $this->get('app.judopay')->webpay(
-                        $policy,
-                        $amount,
-                        $request->getClientIp(),
-                        $request->headers->get('User-Agent'),
-                        JudopayService::WEB_TYPE_UNPAID
-                    );
-                } else {
+                if ($amount <= 0) {
                     $this->get('logger')->warning(sprintf(
                         'Unpaid policy %s has unpaid status, yet has a £%0.2f outstanding premium.',
                         $policy->getId(),
@@ -1122,6 +1113,16 @@ class UserController extends BaseController
         $date = $this->addBusinessDays($date, BacsPayment::DAYS_REVERSE + 1);
         if ($bacsFeature && $policy->getPolicyExpirationDate() < $date) {
             $bacsFeature = false;
+        }
+
+        if (!$bacsFeature && $amount > 0) {
+            $webpay = $this->get('app.judopay')->webpay(
+                $policy,
+                $amount,
+                $request->getClientIp(),
+                $request->headers->get('User-Agent'),
+                JudopayService::WEB_TYPE_UNPAID
+            );
         }
 
         $data = [
