@@ -165,6 +165,9 @@ class ApiOauth2Test extends WebTestCase
         );
         $this->assertArrayHasKey('state', $output);
         $this->assertArrayHasKey('scope', $output);
+        $this->assertArrayHasKey('utm_source', $output);
+        $this->assertArrayHasKey('utm_campaign', $output);
+        $this->assertArrayHasKey('utm_medium', $output);
 
         // following the redirect is required to get the session in place
         $this->client->followRedirect();

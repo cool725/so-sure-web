@@ -208,6 +208,7 @@ class Phone
 
     /**
      * @MongoDB\ReferenceOne(targetDocument="Phone")
+     * @var Phone
      */
     protected $suggestedReplacement;
 
@@ -602,6 +603,9 @@ class Phone
         return $this->releaseDate;
     }
 
+    /**
+     * @return Phone
+     */
     public function getSuggestedReplacement()
     {
         return $this->suggestedReplacement;

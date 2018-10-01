@@ -8,6 +8,7 @@ use AppBundle\Security\UserVoter;
 use AppBundle\Security\ClaimVoter;
 use AppBundle\Service\ClaimsService;
 use AppBundle\Service\PCAService;
+use AppBundle\Service\PolicyService;
 use AppBundle\Service\SequenceService;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
@@ -928,6 +929,7 @@ class UserController extends BaseController
     {
         $dm = $this->getManager();
         $cashbackRepo = $dm->getRepository(Cashback::class);
+        /** @var Cashback $cashback */
         $cashback = $cashbackRepo->find($id);
         if (!$cashback) {
             throw $this->createNotFoundException('Cashback not found');
@@ -946,12 +948,16 @@ class UserController extends BaseController
             if ($request->request->has('cashback_form')) {
                 $cashbackForm->handleRequest($request);
                 if ($cashbackForm->isValid()) {
+                    /** @var PolicyService $policyService */
                     $policyService = $this->get('app.policy');
-                    if (in_array($cashback->getPolicy()->getStatus(), [
+                    $policy = $cashback->getPolicy();
+                    if (in_array($policy->getStatus(), [
                         Policy::STATUS_EXPIRED,
                         Policy::STATUS_EXPIRED_CLAIMABLE,
                         Policy::STATUS_EXPIRED_WAIT_CLAIM,
                     ])) {
+                        $policyService->updateCashback($cashback, $cashback->getExpectedStatus());
+                    } elseif ($policy->getStatus() == Policy::STATUS_CANCELLED && $policy->isRefundAllowed()) {
                         $policyService->updateCashback($cashback, $cashback->getExpectedStatus());
                     } else {
                         throw new \Exception(sprintf('Unexpected policy status for cashback %s', $cashback->getId()));

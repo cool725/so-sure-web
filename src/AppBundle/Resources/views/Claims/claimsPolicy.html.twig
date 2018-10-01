@@ -25,7 +25,13 @@
 
 {% block body %}
 <div class="container"{% if not policy.isClaimable %}style="border:5px solid #ff6666;"{% endif %}>
-    <h2><a href="{{ path('claims_user', {'id': policy.user.id}) }}">{{policy.user.name }}</a>'s Policy{% if policy.isEnded %} - {{ policy.status|upper }} POLICY{% endif %}</h2>
+    <h2>
+        {% if is_granted('ROLE_EMPLOYEE') %}
+            <a href="{{ path('admin_user', {'id': policy.user.id}) }}">{{policy.user.name }}</a>
+        {% elseif is_granted('ROLE_CLAIMS') %}
+            <a href="{{ path('claims_user', {'id': policy.user.id}) }}">{{policy.user.name }}</a>
+        {% endif %}
+        's Policy{% if policy.isEnded %} - {{ policy.status|upper }} POLICY{% endif %}</h2>
     {% if policy.claimsWarnings|length > 0 %}
     <div class="bg-danger" style="border-radius: 10px; padding: 20px; margin-bottom: 20px;">
         <h2 class="text-center">Caution - Any Items Below Must Be Considered/Handled Prior To Approval</h2>

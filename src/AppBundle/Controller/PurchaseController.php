@@ -193,6 +193,11 @@ class PurchaseController extends BaseController
                         $user = $userManager->createUser();
                         $user->setEnabled(true);
                         $newUser = true;
+
+                        if ($session && $session->get('oauth2Flow') == 'starling') {
+                            $user->setLeadSource(Lead::LEAD_SOURCE_AFFILIATE);
+                            $user->setLeadSourceDetails('starling');
+                        }
                     }
                     $purchase->populateUser($user);
                     if ($newUser) {
@@ -339,6 +344,7 @@ class PurchaseController extends BaseController
         if ($policy) {
             if (!$phone && $policy->getPhone()) {
                 $phone = $policy->getPhone();
+                $this->setSessionQuotePhone($request, $phone);
             }
             $purchase->setImei($policy->getImei());
             $purchase->setSerialNumber($policy->getSerialNumber());
@@ -697,6 +703,10 @@ class PurchaseController extends BaseController
         if (!$policy) {
             return $this->redirectToRoute('purchase_step_phone');
         }
+        if ($policy && !$phone && $policy->getPhone()) {
+            $phone = $policy->getPhone();
+            $this->setSessionQuotePhone($request, $phone);
+        }
 
         /** @var Form $purchaseForm */
         $purchaseForm = $this->get('form.factory')
@@ -777,6 +787,10 @@ class PurchaseController extends BaseController
 
         if (!$policy) {
             return $this->redirectToRoute('purchase_step_phone');
+        }
+        if ($policy && !$phone && $policy->getPhone()) {
+            $phone = $policy->getPhone();
+            $this->setSessionQuotePhone($request, $phone);
         }
 
         // Default to monthly payment

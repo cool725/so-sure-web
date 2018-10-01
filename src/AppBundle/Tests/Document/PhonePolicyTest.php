@@ -3067,6 +3067,7 @@ class PhonePolicyTest extends WebTestCase
         $user->setEmail(static::generateEmail('lead-source', $this));
         self::$dm->persist($user);
         $user->setLeadSource(Lead::LEAD_SOURCE_SCODE);
+        $user->setLeadSourceDetails('foo');
         self::addAddress($user);
         $policy = new SalvaPhonePolicy();
         // Most tests should be against non-prelaunch users
@@ -3076,6 +3077,7 @@ class PhonePolicyTest extends WebTestCase
         $policy->setPhone(self::$phone);
         $policy->create(rand(1, 999999), null, null, rand(1, 9999));
         $this->assertEquals(Lead::LEAD_SOURCE_SCODE, $policy->getLeadSource());
+        $this->assertEquals('foo', $policy->getLeadSourceDetails());
     }
 
     public function testGetDaysInPolicyYearPreFebLeapYear()

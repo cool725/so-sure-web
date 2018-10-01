@@ -91,7 +91,7 @@ $(function() {
                 }
 
                 button.prop('disabled', 'disabled')
-                .removeClass('btn-success btn-gradient-green btn-shadow')
+                .removeClass('btn-success btn-green-gradient')
                 .addClass('btn-outline-white');
 
                 model.resizeselect();
@@ -120,11 +120,11 @@ $(function() {
                     $(this).addClass('valid-select');
                     button.prop('disabled', '')
                     .removeClass('btn-outline-white')
-                    .addClass('btn-success btn-gradient-green btn-shadow');
+                    .addClass('btn-success btn-green-gradient');
                 } else {
                     $(this).removeClass('valid-select');
                     button.prop('disabled', 'disabled')
-                    .removeClass('btn-success btn-gradient-green btn-shadow')
+                    .removeClass('btn-success btn-green-gradient')
                     .addClass('btn-outline-white');
                 }
 

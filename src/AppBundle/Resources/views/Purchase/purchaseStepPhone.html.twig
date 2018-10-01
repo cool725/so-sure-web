@@ -2,7 +2,6 @@
 {% form_theme purchase_form 'AppBundle:Form:fields.html.twig' %}
 
 {# Set vars #}
-{% set body_class = 'purchase' %}
 {% set quote_mode = 1 %}
 
 {% block title %}
@@ -25,6 +24,9 @@
         <div class="d-lg-flex">
 
             {% if phone %}
+
+                {% set body_class = 'purchase' %}
+
                 {# Main Content #}
                 <div class="qpw__main__container">
                     <div class="qpw__main px-4 px-lg-5">

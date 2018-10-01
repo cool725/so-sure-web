@@ -2,7 +2,6 @@
 
 {# Set vars #}
 {% set use_pca = true %}
-{% set body_class = 'purchase' %}
 {% set quote_mode = 1 %}
 
 {% set showAddress = purchase_form.addressLine1.vars.data | length > 0 or purchase_form.postcode.vars.data | length > 0 %}
@@ -33,6 +32,9 @@
         <div class="d-lg-flex">
 
             {% if phone %}
+
+                {% set body_class = 'purchase' %}
+
                 {# Main Content #}
                 <div class="qpw__main__container">
                     <div class="qpw__main px-4 px-lg-5">

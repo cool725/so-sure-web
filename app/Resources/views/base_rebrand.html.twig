@@ -17,8 +17,6 @@
 
         <link rel="stylesheet" href="{{ asset('css-js/global.css') }}">
 
-        <script type="text/javascript" src="https://widget.trustpilot.com/bootstrap/v5/tp.widget.bootstrap.min.js" async></script>
-
         {% block cssPage %}{% endblock %}
 
         {% include '::meta_rebrand.html.twig' %}
@@ -105,7 +103,9 @@
         {% endif %}
 
         {% block nav %}
-            {% include '::nav_rebrand.html.twig' %}
+            {% if hide_nav is not defined or not hide_nav %}
+                {% include '::nav_rebrand.html.twig' %}
+            {% endif %}
         {% endblock %}
 
         {% include '::flash_rebrand.html.twig' %}
@@ -117,16 +117,24 @@
         </main>
 
         {% block footer %}
-            {% include '::footer_rebrand.html.twig' %}
+            {% if hide_footer is not defined or not hide_footer %}
+                {% include '::footer_rebrand.html.twig' %}
+            {% endif %}
         {% endblock %}
 
         {% include '::footer_data.html.twig' %}
 
         <script src="{{ asset('css-js/runtime.js') }}"></script>
         <script src="{{ asset('css-js/vendor.js') }}"></script>
+
         {% if environment != 'prod' %}
             <script src="{{ asset('css-js/dev.js') }}"></script>
         {% endif %}
+
+        {% if hide_cookie_warning is not defined or not hide_cookie_warning %}
+            <script src="{{ asset('css-js/cookie.js') }}"></script>
+        {% endif %}
+
         <script src="{{ asset('css-js/global.js') }}"></script>
 
         {% block javascriptsPage %}{% endblock %}

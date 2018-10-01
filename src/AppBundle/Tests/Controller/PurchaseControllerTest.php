@@ -2,8 +2,13 @@
 
 namespace AppBundle\Tests\Controller;
 
+use AppBundle\DataFixtures\MongoDB\d\Oauth2\LoadOauth2Data;
+use AppBundle\Document\Feature;
 use AppBundle\Document\LostPhone;
+use AppBundle\Repository\UserRepository;
+use AppBundle\Service\FeatureService;
 use AppBundle\Service\PCAService;
+use AppBundle\Service\RouterService;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\User;
 use AppBundle\Document\Phone;
@@ -13,6 +18,7 @@ use AppBundle\Document\Lead;
 use AppBundle\Document\Payment\Payment;
 use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Document\CurrencyTrait;
+use Symfony\Component\BrowserKit\Cookie;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 use AppBundle\Classes\Salva;
@@ -21,6 +27,7 @@ use AppBundle\Document\JudoPaymentMethod;
 use AppBundle\Document\Invitation\EmailInvitation;
 use AppBundle\Service\ReceperioService;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 /**
  * @group functional-net
@@ -223,6 +230,37 @@ class PurchaseControllerTest extends BaseControllerTest
         ));
     }
 
+    public function testStarlingLead()
+    {
+        $phone = self::getRandomPhone(self::$dm);
+
+        /** @var SessionInterface $session */
+        $session = self::$container->get('session');
+        $session->set('oauth2Flow', 'starling');
+        $session->set('quote', $phone->getId());
+        $session->save();
+        static::$client->getCookieJar()->set(new Cookie($session->getName(), $session->getId()));
+
+        $email = self::generateEmail('testStarling', $this);
+        $crawler = $this->createPurchase(
+            self::generateEmail('testStarling', $this),
+            'foo bar',
+            new \DateTime('1980-01-01')
+        );
+        self::verifyResponse(302);
+
+        $dm = $this->getDocumentManager(true);
+        /** @var UserRepository $repo */
+        $repo = $dm->getRepository(User::class);
+        /** @var User $user */
+        $user = $repo->findOneBy(['emailCanonical' => mb_strtolower($email)]);
+        $this->assertNotNull($user);
+        if ($user) {
+            $this->assertEquals(Lead::LEAD_SOURCE_AFFILIATE, $user->getLeadSource());
+            $this->assertEquals('starling', $user->getLeadSourceDetails());
+        }
+    }
+
     public function testPurchaseAddressNew()
     {
         $phone = $this->setRandomPhone();
@@ -271,6 +309,10 @@ class PurchaseControllerTest extends BaseControllerTest
 
     public function testPurchasePhoneBacs()
     {
+        /** @var FeatureService $feature */
+        $feature = $this->getContainer(true)->get('app.feature');
+        $this->assertTrue($feature->isEnabled(Feature::FEATURE_BACS), 'Bacs feature disabled');
+
         $phone = $this->setRandomPhone();
 
         $crawler = $this->createPurchase(
@@ -278,32 +320,37 @@ class PurchaseControllerTest extends BaseControllerTest
             'foo bar',
             new \DateTime('1980-01-01')
         );
-        self::verifyResponse(302);
+        self::verifyResponse(302, null, $crawler);
         $this->assertTrue($this->isClientResponseRedirect());
         self::$client->followRedirect();
         $this->assertContains('/purchase/step-phone', self::$client->getHistory()->current()->getUri());
 
         $crawler = $this->setPhone($phone);
         //print $crawler->html();
-        self::verifyResponse(302);
+        self::verifyResponse(302, null, $crawler);
         $crawler = self::$client->followRedirect();
         $this->assertContains('/purchase/step-pledge', self::$client->getHistory()->current()->getUri());
 
         //print $crawler->html();
         $crawler = $this->agreePledge($crawler);
         //print $crawler->html();
-        self::verifyResponse(302);
+        self::verifyResponse(302, null, $crawler);
         $crawler = self::$client->followRedirect();
 
         $policy = $this->getPolicyFromPaymentUrl();
         $url = sprintf('%s?force=bacs', self::$client->getHistory()->current()->getUri());
         $crawler = self::$client->request('GET', $url);
+        $this->assertNotContains(
+            'judo',
+            $crawler->html(),
+            sprintf('%s Payment page is referencing judopay', self::$client->getHistory()->current()->getUri())
+        );
         //print $crawler->html();
         //print $url;
 
         $crawler = $this->setPayment($crawler, $phone);
         //print $crawler->html();
-        self::verifyResponse(302);
+        self::verifyResponse(302, null, $crawler);
         $crawler = self::$client->followRedirect();
         $this->assertContains('/purchase/step-payment/', self::$client->getHistory()->current()->getUri());
         $this->assertContains('/monthly', self::$client->getHistory()->current()->getUri());
@@ -313,10 +360,10 @@ class PurchaseControllerTest extends BaseControllerTest
         $crawler = $this->setBacsConfirm($crawler);
         // print $crawler->html();
 
-        self::verifyResponse(302);
+        self::verifyResponse(302, null, $crawler);
         $redirectUrl = self::$router->generate('user_welcome_policy_id', ['id' => $policy->getId()]);
         //print $crawler->html();
-        $this->assertTrue($this->isClientResponseRedirect($redirectUrl));
+        $this->assertTrue($this->isClientResponseRedirect($redirectUrl), 'Redirect to user welcome page');
         $crawler = self::$client->followRedirect();
         self::verifyResponse(200);
     }
@@ -1243,6 +1290,7 @@ class PurchaseControllerTest extends BaseControllerTest
         }
         $crawler = self::$client->request('GET', '/purchase/');
         self::verifyResponse(200);
+        $this->assertNotContains('no phone selected', $crawler->html());
         $form = $crawler->selectButton('purchase_form[next]')->form();
         $form['purchase_form[email]'] = $email;
         $form['purchase_form[name]'] = $name;

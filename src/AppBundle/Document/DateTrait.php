@@ -309,6 +309,16 @@ trait DateTrait
         return $time;
     }
 
+    public function isSameDay(\DateTime $date1, \DateTime $date2)
+    {
+        $diff = $date1->diff($date2);
+        if ($diff->d == 0 && $diff->h <= 1) {
+            return true;
+        }
+
+        return false;
+    }
+
     public static function convertTimezone(\DateTime $date, \DateTimeZone $timezone)
     {
         $adjustedDate = clone $date;

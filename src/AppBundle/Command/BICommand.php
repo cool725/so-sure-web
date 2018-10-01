@@ -285,6 +285,7 @@ class BICommand extends BaseCommand
             '"Policy Purchase Time"',
             '"Past Due Amount (Bad Debt Only)"',
             '"Has previous policy"',
+            '"Payment Method"',
         ]);
         foreach ($policies as $policy) {
             /** @var Policy $policy */
@@ -338,6 +339,10 @@ class BICommand extends BaseCommand
                 sprintf('"%s"', $policy->getStart()->format('H:i')),
                 sprintf('"%0.2f"', $policy->getBadDebtAmount()),
                 sprintf('"%s"', $policy->hasPreviousPolicy() ? 'yes' : 'no'),
+                sprintf(
+                    '"%s"',
+                    $policy->getUser()->hasPaymentMethod() ? $policy->getUser()->getPaymentMethod()->getType() : null
+                ),
             ]);
         }
         if (!$skipS3) {

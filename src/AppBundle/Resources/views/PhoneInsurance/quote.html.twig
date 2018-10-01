@@ -64,20 +64,20 @@
                     </div>
                     {{ form_start(buy_form) }}
                         {{ form_widget(buy_form.buy_tablet, {
-                            'label': 'Get Started','attr': { 'class': 'btn btn-success btn-gradient-green btn-shadow btn-lg btn-block-xs btn-icon arrow-right' }}) }}
+                            'label': 'Get Started','attr': { 'class': 'btn btn-success btn-green-gradient btn-block-xs btn-icon arrow-right' }}) }}
                     {{ form_end(buy_form) }}
                 </div>
 
                 <div class="qpw__info__container d-none d-lg-block">
                     {% include 'AppBundle::PhoneInsurance/_seeFullDetails.html.twig' %}
                     <div class="policy__info mx-4 mx-lg-5 py-5">
-                        <div class="p-4 bg-blue2 d-lg-flex rounded justify-content-lg-between align-items-lg-center">
+                        <div class="p-4 d-lg-flex rounded justify-content-lg-between align-items-lg-center">
                             <div class="text-center text-lg-left">
                                 <h4 class="text-white">Let's get you covered</h4>
                                 <p class="lead text-white mb-0">It'll only take a few minutes</p>
                             </div>
                             {{ form_start(buy_form_banner_two) }}
-                                {{ form_widget(buy_form_banner_two.buy, {'label': 'Get Started', 'attr': {'class': 'btn btn-success btn-gradient-green btn-lg btn-shadow btn-block-xs btn-icon arrow-right mt-4 mt-lg-0'}}) }}
+                                {{ form_widget(buy_form_banner_two.buy, {'label': 'Get Started', 'attr': {'class': 'btn btn-success btn-green-gradient btn-block-xs btn-icon arrow-right mt-4 mt-lg-0'}}) }}
                             {{ form_end(buy_form_banner_two) }}
                         </div>
                     </div>
@@ -180,7 +180,7 @@
                     </ul>
                     <div class="mt-5 d-none d-lg-block">
                         {{ form_start(buy_form_banner_three) }}
-                            {{ form_widget(buy_form_banner_three.buy, {'label': 'Get Started', 'attr': {'class': 'btn btn-success btn-gradient-green btn-shadow btn-block-xs btn-icon arrow-right btn-lg mt-4 mt-lg-0'}}) }}
+                            {{ form_widget(buy_form_banner_three.buy, {'label': 'Get Started', 'attr': {'class': 'btn btn-success btn-green-gradient btn-block-xs btn-icon arrow-right mt-4 mt-lg-0'}}) }}
                         {{ form_end(buy_form_banner_three) }}
                     </div>
                 </div>
@@ -212,7 +212,7 @@
                 {{ form_widget(buy_form_banner_four.buy, {
                     'label': 'Insure your ' ~ phone.make ~ ' phone',
                     'attr': {
-                        'class': 'btn btn-success btn-gradient-green btn-shadow btn-sm btn-icon arrow-right'
+                        'class': 'btn btn-success btn-green-gradient btn-sm btn-icon arrow-right'
                 }}) }}
             {{ form_end(buy_form_banner_four) }}
         </div>

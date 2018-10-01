@@ -84,7 +84,7 @@
                     <div class="col-9 text-right">
                         <a href="#"
                            id="step--validate"
-                           class="btn btn-success btn-gradient-green btn-block-xs"
+                           class="btn btn-success btn-green-gradient btn-block-xs"
                            data-csrf="{{ lead_csrf }}"
                            data-lead="{{ path('lead', {'source': 'purchase-flow'}) }}">
                            Continue <i class="far fa-arrow-right ml-2"></i>
@@ -144,7 +144,7 @@
                     </div>
                     <div class="col-9 text-right">
                         {# TODO: Add icon #}
-                        {{ form_widget(purchase_form.next, {'label': 'Continue', 'attr': {'class': 'btn btn-success btn-gradient-green btn-block-xs'}}) }}
+                        {{ form_widget(purchase_form.next, {'label': 'Continue', 'attr': {'class': 'btn btn-success btn-green-gradient btn-icon arrow-right btn-block-xs'}}) }}
                     </div>
                 </div>
             </div>
@@ -199,7 +199,7 @@
                         </a>
                     </div>
                     <div class="col-9 text-right">
-                        {{ form_widget(purchase_form.manual_next, {'label': 'Continue', 'attr': {'class': 'btn btn-success btn-gradient-green btn-block-xs'}}) }}
+                        {{ form_widget(purchase_form.manual_next, {'label': 'Continue', 'attr': {'class': 'btn btn-success btn-green-gradient btn-icon arrow-right btn-block-xs'}}) }}
                     </div>
                 </div>
             </div>

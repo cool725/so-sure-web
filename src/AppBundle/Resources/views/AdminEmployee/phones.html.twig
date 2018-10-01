@@ -2,7 +2,7 @@
 
 {% macro display_actions(phone) %}
   <button title="Alternatives" type="button" class="btn {% if phone.suggestedReplacement %}btn-info{% elseif phone.replacementPrice > 0 %}btn-info{% else %}btn-primary{% endif %}" data-toggle="modal" data-target="#alternativeModal"
-      data-query="{{ path('claims_phone_alternatives', {'id': phone.id}) }}"
+      data-query="{% if is_granted('ROLE_EMPLOYEE') %}{{ path('admin_phone_alternatives', {'id': phone.id}) }}{% else %}{{ path('claims_phone_alternatives', {'id': phone.id}) }}{% endif %}"
       data-phone="{{ phone.toAlternativeArray()|json_encode }}"
       {% if phone.replacementPrice > 0 %}disabled="disabled"{% endif %}
       ><i class="fa fa-book"></i></button>

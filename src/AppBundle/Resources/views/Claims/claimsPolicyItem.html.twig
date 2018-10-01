@@ -55,7 +55,7 @@
                             <td>Phone</td>
                             <td>{{ policy.phone }}&nbsp;
                                     <button type="button" class="btn btn-info" data-toggle="modal" data-target="#alternativeModal"
-                                        data-query="{{ path('claims_phone_alternatives', {'id': policy.phone.id}) }}"
+                                        data-query="{% if is_granted('ROLE_EMPLOYEE') %}{{ path('admin_phone_alternatives', {'id': policy.phone.id}) }}{% else %}{{ path('claims_phone_alternatives', {'id': policy.phone.id}) }}{% endif %}"
                                         data-phone="{{ policy.phone.toAlternativeArray()|json_encode }}"
                                         >Show Alternatives</button>
 
@@ -503,7 +503,14 @@
                     {% for file in policy.policyFiles %}
                     <tr>
                         <td>{{ file.fileType }}</td>
-                        <td><a href="{{ path('claims_download_file', {'id': file.id}) }}">{{ file.fileName }}</a> (Generated {{ file.created|date }})</td>
+                        <td>
+                            {% if is_granted('ROLE_EMPLOYEE') %}
+                                <a href="{{ path('admin_download_file_attachment', {'id': file.id}) }}">{{ file.fileName }}</a>
+                            {% elseif is_granted('ROLE_CLAIMS') %}
+                                <a href="{{ path('claims_download_file', {'id': file.id}) }}">{{ file.fileName }}</a>
+                            {% endif %}
+                            (Generated {{ file.created|date }})
+                        </td>
                     </tr>
                     {% endfor %}
                 </table>
@@ -548,7 +555,7 @@
                         <td style="width: 20%;">{{ claim.notes }}
                             <button title="Edit notes" type="button" class="btn btn-primary"
                                     data-toggle="modal" data-target="#notesModal"
-                                data-update="{{ path('claims_notes', {'id': claim.id}) }}"
+                                data-update="{% if is_granted('ROLE_EMPLOYEE') %}{{ path('admin_claim_notes', {'id': claim.id}) }}{% else %}{{ path('claims_notes', {'id': claim.id}) }}{% endif %}"
                                 data-notes="{{ claim.notes }}"><i class="fa fa-edit"></i></button>
                               {% if is_granted('ROLE_CUSTOMER_SERVICES') %}
                             <button title="Flags" type="button" class="btn btn-primary"
@@ -608,7 +615,7 @@
                         <td style="width: 20%;">{{ claim.notes }}
                             <button title="Edit notes" type="button" class="btn btn-primary"
                                     data-toggle="modal" data-target="#notesModal"
-                                data-update="{{ path('claims_notes', {'id': claim.id}) }}"
+                                data-update="{% if is_granted('ROLE_EMPLOYEE') %}{{ path('admin_claim_notes', {'id': claim.id}) }}{% else %}{{ path('claims_notes', {'id': claim.id}) }}{% endif %}"
                                 data-notes="{{ claim.notes }}"><i class="fa fa-edit"></i></button>
                         </td>
                     </tr>
