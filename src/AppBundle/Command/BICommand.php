@@ -339,7 +339,10 @@ class BICommand extends BaseCommand
                 sprintf('"%s"', $policy->getStart()->format('H:i')),
                 sprintf('"%0.2f"', $policy->getBadDebtAmount()),
                 sprintf('"%s"', $policy->hasPreviousPolicy() ? 'yes' : 'no'),
-                sprintf('"%s"', $policy->getUser()->getPaymentMethod()->getType()),
+                sprintf(
+                    '"%s"',
+                    $policy->getUser()->hasPaymentMethod() ? $policy->getUser()->getPaymentMethod()->getType() : null
+                ),
             ]);
         }
         if (!$skipS3) {
