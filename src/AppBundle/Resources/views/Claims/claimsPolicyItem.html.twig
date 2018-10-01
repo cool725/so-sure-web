@@ -505,7 +505,7 @@
                         <td>{{ file.fileType }}</td>
                         <td>
                             {% if is_granted('ROLE_EMPLOYEE') %}
-                                <a href="{{ path('admin_download_file', {'id': file.id}) }}">{{ file.fileName }}</a>
+                                <a href="{{ path('admin_download_file_attachment', {'id': file.id}) }}">{{ file.fileName }}</a>
                             {% elseif is_granted('ROLE_CLAIMS') %}
                                 <a href="{{ path('claims_download_file', {'id': file.id}) }}">{{ file.fileName }}</a>
                             {% endif %}
