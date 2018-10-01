@@ -250,8 +250,10 @@ abstract class LoadPhoneData implements ContainerAwareInterface
             );
 
             if ($phone->shouldBeRetired() || $premium == 0) {
+                $isTestPhone = in_array('A0001', $phone->getDevices()) ||
+                    in_array('iPhone 6', $phone->getDevices());
                 $env = $this->container->getParameter('kernel.environment');
-                if ($env == 'test' && in_array('A0001', $phone->getDevices())) {
+                if ($env == 'test' && $isTestPhone) {
                     $phone->setActive(true);
                 } else {
                     $phone->setActive(false);
