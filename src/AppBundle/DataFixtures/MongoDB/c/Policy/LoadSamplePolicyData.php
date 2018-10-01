@@ -75,7 +75,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
 
         $this->createBacsFiles($manager);
 
-        $users = $this->newUsers($manager, 150);
+        $users = $this->newUsers($manager, 250);
         $unpaid = $this->newUsers($manager, 10);
         $unpaidDiscount = $this->newUsers($manager, 10);
         $iosPreExpireUsers = $this->newUsers($manager, 40);
