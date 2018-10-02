@@ -2,6 +2,8 @@
 
 namespace AppBundle\Tests;
 
+use AppBundle\Document\BacsPaymentMethod;
+use AppBundle\Document\BankAccount;
 use AppBundle\Document\JudoPaymentMethod;
 use AppBundle\Document\User;
 use AppBundle\Document\Phone;
@@ -318,11 +320,17 @@ trait UserClassTrait
         $user->setPaymentMethod($judo);
     }
 
-    public static function addBacsPayment($policy, $amount, $commission, $date = null, $manual = true)
-    {
+    public static function addBacsPayment(
+        Policy $policy,
+        $amount,
+        $commission,
+        $date = null,
+        $manual = true,
+        $status = BacsPayment::STATUS_SUCCESS
+    ) {
         $payment = new BacsPayment();
         $payment->setManual($manual);
-        $payment->setStatus(BacsPayment::STATUS_SUCCESS);
+        $payment->setStatus($status);
         $payment->setSuccess(true);
         $payment->setAmount($amount);
         $payment->setTotalCommission($commission);
@@ -332,6 +340,15 @@ trait UserClassTrait
         $policy->addPayment($payment);
 
         return $payment;
+    }
+
+    public static function setBacsPaymentMethod(User $user, $mandateStatus = BankAccount::MANDATE_SUCCESS)
+    {
+        $bacs = new BacsPaymentMethod();
+        $bankAccount = new BankAccount();
+        $bankAccount->setMandateStatus($mandateStatus);
+        $bacs->setBankAccount($bankAccount);
+        $user->setPaymentMethod($bacs);
     }
 
     public static function addSoSureStandardPayment($policy, $date = null, $refund = true, $monthly = true)

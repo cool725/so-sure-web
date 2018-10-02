@@ -2,6 +2,7 @@
 
 namespace AppBundle\Tests\Document;
 
+use AppBundle\Document\BankAccount;
 use AppBundle\Document\Connection\Connection;
 use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\Claim;
@@ -5001,7 +5002,7 @@ class PhonePolicyTest extends WebTestCase
             $policy->getUnpaidReason(new \DateTime('2016-03-01'))
         );
 
-        // add an ontime payment
+        // add an ontime failed payment
         $payment = self::addPayment(
             $policy,
             $policy->getPremium()->getMonthlyPremiumPrice(),
@@ -5012,6 +5013,80 @@ class PhonePolicyTest extends WebTestCase
         );
         $this->assertEquals(
             Policy::UNPAID_JUDO_PAYMENT_FAILED,
+            $policy->getUnpaidReason(new \DateTime('2016-03-01'))
+        );
+    }
+
+    public function testGetUnpaidReasonBacs()
+    {
+        $date = new \DateTime('2016-01-28 15:00');
+        $policy = $this->createPolicyForCancellation(
+            static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(null, $date),
+            Salva::MONTHLY_TOTAL_COMMISSION,
+            12,
+            $date
+        );
+        $this->assertTrue($policy->isPolicyPaidToDate(new \DateTime('2016-01-31 00:01')));
+        $policy->setStatus(Policy::STATUS_UNPAID);
+
+        $this->assertEquals(Policy::UNPAID_PAID, $policy->getUnpaidReason(new \DateTime('2016-01-01')));
+        $this->assertEquals(
+            Policy::UNPAID_PAYMENT_METHOD_MISSING,
+            $policy->getUnpaidReason(new \DateTime('2016-03-01'))
+        );
+
+        self::setBacsPaymentMethod($policy->getUser(), BankAccount::MANDATE_PENDING_INIT);
+        $this->assertEquals(
+            Policy::UNPAID_BACS_MANDATE_PENDING,
+            $policy->getUnpaidReason(new \DateTime('2016-03-01'))
+        );
+        self::setBacsPaymentMethod($policy->getUser(), BankAccount::MANDATE_PENDING_APPROVAL);
+        $this->assertEquals(
+            Policy::UNPAID_BACS_MANDATE_PENDING,
+            $policy->getUnpaidReason(new \DateTime('2016-03-01'))
+        );
+
+        self::setBacsPaymentMethod($policy->getUser(), BankAccount::MANDATE_CANCELLED);
+        $this->assertEquals(
+            Policy::UNPAID_BACS_MANDATE_INVALID,
+            $policy->getUnpaidReason(new \DateTime('2016-03-01'))
+        );
+
+        self::setBacsPaymentMethod($policy->getUser(), BankAccount::MANDATE_FAILURE);
+        $this->assertEquals(
+            Policy::UNPAID_BACS_MANDATE_INVALID,
+            $policy->getUnpaidReason(new \DateTime('2016-03-01'))
+        );
+
+        self::setBacsPaymentMethod($policy->getUser(), BankAccount::MANDATE_SUCCESS);
+
+        $this->assertEquals(
+            Policy::UNPAID_BACS_PAYMENT_MISSING,
+            $policy->getUnpaidReason(new \DateTime('2016-03-01'))
+        );
+
+        // add an ontime payment
+        $payment = self::addBacsPayment(
+            $policy,
+            $policy->getPremium()->getMonthlyPremiumPrice(),
+            Salva::MONTHLY_TOTAL_COMMISSION,
+            null,
+            new \DateTime('2016-02-28 15:00'),
+            BacsPayment::STATUS_GENERATED
+        );
+        $this->assertEquals(
+            Policy::UNPAID_BACS_PAYMENT_PENDING,
+            $policy->getUnpaidReason(new \DateTime('2016-03-01'))
+        );
+        $payment->setStatus(BacsPayment::STATUS_PENDING);
+        $this->assertEquals(
+            Policy::UNPAID_BACS_PAYMENT_PENDING,
+            $policy->getUnpaidReason(new \DateTime('2016-03-01'))
+        );
+
+        $payment->setStatus(BacsPayment::STATUS_FAILURE);
+        $this->assertEquals(
+            Policy::UNPAID_BACS_PAYMENT_FAILED,
             $policy->getUnpaidReason(new \DateTime('2016-03-01'))
         );
     }
