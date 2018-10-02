@@ -98,27 +98,30 @@
     background-color: $pattens-blue;
 
     @include media-breakpoint-up(lg) {
-        background: $pattens-blue url('#{$cdn_url}/images/rebrand/homepage/so-sure_intro-illustration.png') no-repeat -110px 280px;
+        background: $pattens-blue url('#{$cdn_url}/images/rebrand/homepage/so-sure_intro-illustration.png') no-repeat -110px 200px;
         background-size: 500px;
     }
 
     @include media-breakpoint-up(xl) {
-        background-position: -40px 280px;
+        background-position: -40px 200px;
         background-size: 600px;
     }
 
     @include media-breakpoint-up(fk) {
-        background-position: 120px 280px;
+        background-position: 220px 200px;
         background-size: 600px;
     }
 
+    &__illustration__mobile {
+        position: relative;
+    }
 }
 
-.why {
-    background-color: $pattens-blue;
+.reward {
+    background-color: $white;
 
     @include media-breakpoint-up(lg) {
-        background: $pattens-blue url('#{$cdn_url}/images/rebrand/homepage/so-sure_why-illustration.png ') no-repeat -220px 440px;
+        background: $white url('#{$cdn_url}/images/rebrand/homepage/so-sure_why-illustration.png ') no-repeat -220px 440px;
         background-size: 480px;
     }
 }
@@ -146,6 +149,7 @@
 
 .claims {
     background-color: $pattens-blue;
+    text-align: center;
 }
 
 .comparison {

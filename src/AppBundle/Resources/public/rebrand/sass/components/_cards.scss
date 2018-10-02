@@ -15,7 +15,7 @@
     &__title {}
 
     &__text {
-        // font-size: 13px;
+        font-size: 13px;
     }
 
     @include media-breakpoint-up(lg) {

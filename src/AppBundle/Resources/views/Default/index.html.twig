@@ -56,17 +56,17 @@
                 {# TODO: Needs copy #}
                 <div class="col-md-6 col-lg-4">
                     <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_phone-smile.png" alt="so-sure - Simple Terms &amp; Conditions" width="180px">
-                    <h4 class="text-primary">24-72 hour replacement</h4>
+                    <h5 class="text-primary">24-72 hour replacement</h5>
                     <p class="mb-5">On approval of your claim you’ll lorem adipiscing elit congue ipsum ante</p>
                 </div>
                 <div class="col-md-6 col-lg-4">
                     <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_wallet-cashback.png" alt="so-sure - Up to 40% cheaper"width="180px">
-                    <h4 class="text-primary">Up to 80% money back</h4>
+                    <h5 class="text-primary">Up to 80% money back</h5>
                     <p class="mb-5">With the so-sure reward pot you’ll amet, consectetur adipiscing elit ipsum ante</p>
                 </div>
                 <div class="col-md-6 col-lg-4">
                     <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_phone-qr.png" alt="so-sure - super quick cover" width="180px">
-                    <h4 class="text-primary">Low excess from just &pound;50</h4>
+                    <h5 class="text-primary">Low excess from just &pound;50</h5>
                     <p class="mb-5">Download the so-sure app and sit amet, consectetur adipiscing elit ante</p>
                 </div>
             </div>
@@ -202,14 +202,12 @@
     <section class="differently py-lg-5">
         <div class="container container-xtra py-5">
             <h2 class="h3 mb-3 text-primary text-center">We do things differently</h2>
-            <p class="mb-4 text-center">Our insurance is simple and hassle free so you don't need to worry, we've got you covered</p>
+            <p class="mb-5 text-center">Our insurance is simple and hassle free so you don't need to worry, we've got you covered</p>
             <div class="row">
                 <div class="col-lg-6">
-{#                     <div class="text-center text-lg-left">
-                        <h2 class="h3 mb-3 text-primary">A new kind of insurer</h2>
-                        <p class="mb-4">We offer a premium policy at a fantastic price, giving you peace of mind should you need to make a claim</p>
-                        <a href="#" class="btn btn-primary btn-blue-gradient btn-block-xs get-a-quote mb-5">Insure your phone in minutes</a>
-                    </div> #}
+                    <div class="differently__illustration__mobile d-block d-lg-none my-5">
+                        <img src="{{ cdn_url }}/images/rebrand/homepage/so-sure_intro-illustration.png" alt="so-sure - pic-sure" class="img-fluid">
+                    </div>
                 </div>
                 <div class="col-lg-6 pb-lg-5">
                     <div class="expanding-cardbox expanding-cardbox__icon mb-4">
@@ -267,53 +265,73 @@
         </div>
     </section>
 
-    <section class="why py-lg-5">
+    <section class="reward py-lg-5">
         <div class="container container-xtra py-5">
             <div class="row">
                 <div class="col-lg-4">
                     <div class="text-center text-lg-left">
-                        <h2 class="h3 mb-3 text-primary">Mobile insurance with a difference</h2>
-                        <p class="mb-4">We provide mobile insurance that’s simple, reasonable and hassle-free, so you can get back to worrying about the big stuff</p>
-                        <a href="#" class="btn btn-primary btn-blue-gradient btn-block-xs mx-auto mb-5 get-a-quote">Get a Quote</a>
+                        <h2 class="h3 mb-3 text-primary">Mobile back when you don't claim</h2>
+                        <p class="mb-4">Social Insurance, sharing the risk lorem ipsum. At the end of the policy year, your Reward Pot is paid out to you in full. Hooray!</p>
+                        <a href="{{ path('faq') }}#social-insurance-and-reward-pot" class="btn btn-primary btn-blue-gradient btn-block-xs mx-auto mb-5">Tell me more</a>
                     </div>
                 </div>
                 <div class="col-md-6 col-lg-4">
-                    <div class="cardbox cardbox-400 mb-5 mx-auto text-center">
+                    <div class="cardbox cardbox-400 mb-5 mx-auto text-center d-none d-lg-block">
                         <div class="cardbox__body">
-                            <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_wallet-cashback.png" alt="so-sure - Up to 40% cheaper"width="180px">
-                            <h5 class="cardbox__title text-dodger-blue">Up to 40% cheaper</h5>
-                            <div class="cardbox__text">Save with us, we're up to 40% cheaper than the mobile networks</div>
+                            <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_holding-phone.png" alt="so-sure - how it works"width="180px">
+                            <h5 class="cardbox__title text-dodger-blue">How it works</h5>
+                            <div class="cardbox__text">If you and your friends take good care of your phones and don’t need to claim, we’ll give you up to 80% of your premium back at the end of your policy year</div>
                         </div>
                     </div>
-                    <div class="cardbox cardbox-400 mb-5 mx-auto text-center">
+                    <div class="d-block d-lg-none text-center">
+                        <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_holding-phone.png" alt="so-sure - how it works"width="180px">
+                        <h5 class="text-primary">How it works</h5>
+                        <p class="mb-5">If you and your friends take good care of your phones and don't need to claim, we’ll give you up to 80% of your premium back at the end of your policy year</p>
+                    </div>
+                    <div class="cardbox cardbox-400 mb-5 mx-auto text-center d-none d-lg-block">
                         <div class="cardbox__body">
-                            <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_phone-qr.png" alt="so-sure - super quick cover" width="180px">
-                            <h5 class="cardbox__title text-dodger-blue">Super Quick Cover</h5>
-                            <div class="cardbox__text">In just a few clicks, your phone will be instantly covered for peace of mind</div>
+                            <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_broken-phone.png" alt="so-sure - be careful" width="180px">
+                            <h5 class="cardbox__title text-dodger-blue">Be careful</h5>
+                            <div class="cardbox__text">Make a pack with your connections to take good care of your phones throughout the policy period and make no claims</div>
                         </div>
+                    </div>
+                    <div class="d-block d-lg-none text-center">
+                        <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_Icon_friends-connect.png" alt="so-sure - connect" width="180px">
+                        <h5 class="text-primary">Connect</h5>
+                        <p class="mb-5">For every person you connect with, we'll add &pound;10 to your reward pot. If neither of you make a claim, your cash will be returned to you at the end of the policy year</p>
                     </div>
                 </div>
                 <div class="col-md-6 col-lg-4">
-                    <div class="cardbox cardbox-400 mb-5 mx-auto text-center">
+                    <div class="cardbox cardbox-400 mb-5 mx-auto text-center d-none d-lg-block">
                         <div class="cardbox__body">
-                            <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_phone-smile.png" alt="so-sure - Simple Terms &amp; Conditions" width="180px">
-                            <h5 class="cardbox__title text-dodger-blue">Simple Terms &amp; Conditions</h5>
-                            <div class="cardbox__text">Our terms and conditions are there to protect you and written in plain English with no complex jargon</div>
+                            <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_Icon_friends-connect.png" alt="so-sure - connect" width="180px">
+                            <h5 class="cardbox__title text-dodger-blue">Connect</h5>
+                            <div class="cardbox__text">For every person you connect with, we'll add &pound;10 to your reward pot. If neither of you make a claim, your cash will be returned to you at the end of the policy year</div>
                         </div>
                     </div>
-                    <div class="cardbox cardbox-400 mx-auto text-center">
+                    <div class="d-block d-lg-none text-center">
+                        <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_broken-phone.png" alt="so-sure - be careful" width="180px">
+                        <h5 class="text-primary">Be careful</h5>
+                        <p class="mb-5">Make a pack with your connections to take good care of your phones throughout the policy period and make no claims</p>
+                    </div>
+                    <div class="cardbox cardbox-400 mx-auto text-center d-none d-lg-block">
                         <div class="cardbox__body">
-                            <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_claims-team.png" alt="so-sure - Superb Customer Service" width="180px">
-                            <h5 class="cardbox__title text-dodger-blue">Superb Customer Service</h5>
+                            <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_rewards.png" alt="so-sure - get rewarded" width="180px">
+                            <h5 class="cardbox__title text-dodger-blue">Get rewarded</h5>
                             <div class="cardbox__text">We've built a fantastic customer service team to make sure you have a hassle free claims experience</div>
                         </div>
+                    </div>
+                    <div class="d-block d-lg-none text-center">
+                        <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_rewards.png" alt="so-sure - get rewarded" width="180px">
+                        <h5 class="text-primary">Get rewarded</h5>
+                        <p class="mb-5">We've built a fantastic customer service team to make sure you have a hassle free claims experience</p>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <section class="app py-lg-5">
+{#     <section class="app py-lg-5">
         <div class="container container-xtra py-5">
             <div class="row">
                 <div class="col-lg-6">
@@ -330,41 +348,30 @@
                 </div>
             </div>
         </div>
-    </section>
+    </section> #}
 
     <section class="claims py-lg-5">
         <div class="container container-xtra py-5">
-            <h2 class="h3 mb-3 text-primary text-center">Our hassle-free claims process</h2>
-            <p class="text-center mb-4">As easy as 1, 2, 3</p>
+            <h2 class="h3 mb-3 text-primary">Our hassle-free claims process</h2>
+            <p class="mb-4">Need to claim, here's what happens</p>
             <div class="row">
                 <div class="col-md-6 col-lg-4">
-                    <div class="cardbox cardbox-460 mb-5 mx-auto text-center">
-                        <div class="cardbox__body">
-                            <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_make-a-claim.png" alt="so-sure - Make a claim" width="180px">
-                            <h5 class="cardbox__title text-dodger-blue">Launch your claim online</h5>
-                            <div class="cardbox__text">Get your claim started quickly by using our online portal <a href="{{ path('claim') }}" class="btn btn-primary btn-blue-gradient btn-block mt-3">Open the claims portal</a></div>
-                        </div>
-                    </div>
+                    <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_make-a-claim.png" alt="so-sure - Make a claim" width="180px">
+                    <h5 class="text-primary">Launch your claim online</h5>
+                    <p class="mb-5">Get your claim started by using our online portal or by calling our claims team  on 0113 320 9722 (local rates apply)</p>
                 </div>
                 <div class="col-md-6 col-lg-4">
-                    <div class="cardbox cardbox-460 mb-5 mx-auto text-center">
-                        <div class="cardbox__body">
-                            <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_claims-team.png" alt="so-sure - Review claim" width="180px">
-                            <h5 class="cardbox__title text-dodger-blue">Review Claim</h5>
-                            <div class="cardbox__text">Our UK based claims team will review your claim and call you with a request for any further details or documents (if necessary). We aim to do this within a matter of business hours</div>
-                        </div>
-                    </div>
+                    <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_claims-team.png" alt="so-sure - Review claim" width="180px">
+                    <h5 class="text-primary">Review Claim</h5>
+                    <p class="mb-5">Our UK based claims team will review your claim and reach out with a request for any further details or documents</p>
                 </div>
                 <div class="col-md-6 col-lg-4">
-                    <div class="cardbox cardbox-460 mx-auto text-center">
-                        <div class="cardbox__body">
-                            <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_delivery.png" alt="so-sure - Approve claim" width="180px">
-                            <h5 class="cardbox__title text-dodger-blue">Approve Claim</h5>
-                            <div class="cardbox__text">Once your claim is approved, we take your excess payment over the phone and aim to repair/replace your phone within 24-72 hours. Some repairs can take longer (e.g. water damage) but we will be as fast as possible</div>
-                        </div>
-                    </div>
+                    <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_delivery.png" alt="so-sure - Approve claim" width="180px">
+                    <h5 class="text-primary">Approve Claim</h5>
+                    <p class="mb-5">Once approved, we take your excess payment over the phone and aim to get a replacement phone to you for the next working day</p>
                 </div>
             </div>
+            <a href="{{ path('claim') }}" class="btn btn-primary btn-blue-gradient btn-block-xs mt-3">Open the claims portal</a>
         </div>
     </section>
 
