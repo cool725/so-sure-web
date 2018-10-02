@@ -198,14 +198,16 @@
         </ul>
         <h4>Unpaid</h4>
         <ul>
-            {% for unpaid_reason in unpaid_reasons %}
-                <li>
-                    {% if unpaid_policies_for_display[unpaid_reason] is defined %}
-                        <a href="{{ url('user_home') }}?_impersonate={{ unpaid_policies_for_display[unpaid_reason].user.email }}">User Unpaid Page ({{ unpaid_reason }})</a> <b>(auto impersonate {{ unpaid_policies_for_display[unpaid_reason].user.email }})</b>
-                    {% else %}
-                        No policy unpaid available ({{ unpaid_reason }})
-                    {% endif %}
-                </li>
+            {% for paymentOnTime in ['ontime', 'outoftime'] %}
+                {% for unpaid_reason in unpaid_reasons %}
+                    <li>
+                        {% if unpaid_policies_for_display[paymentOnTime][unpaid_reason] is defined %}
+                            <a href="{{ url('user_home') }}?_impersonate={{ unpaid_policies_for_display[paymentOnTime][unpaid_reason].user.email }}">User Unpaid Page ({{ unpaid_reason }} - {{ paymentOnTime }})</a> <b>(auto impersonate {{ unpaid_policies_for_display[paymentOnTime][unpaid_reason].user.email }})</b>
+                        {% else %}
+                            No policy unpaid available ({{ unpaid_reason }} - {{ paymentOnTime }})
+                        {% endif %}
+                    </li>
+                {% endfor %}
             {% endfor %}
         </ul>
 

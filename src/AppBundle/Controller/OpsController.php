@@ -236,12 +236,21 @@ class OpsController extends BaseController
         ]);
 
         $unpaidPoliciesForDisplay = [];
-
+        $paymentOnTimes = [true, false];
         foreach (Policy::$unpaidReasons as $unpaidReason) {
             foreach ($unpaidPolicies as $unpaidPolicy) {
                 /** @var Policy $unpaidPolicy */
-                if ($unpaidPolicy->getUnpaidReason() == $unpaidReason) {
-                    $unpaidPoliciesForDisplay[$unpaidReason] = $unpaidPolicy;
+                if ($unpaidPolicy->getUnpaidReason() == $unpaidReason &&
+                    $unpaidPolicy->canPaymentBeMadeInTime()) {
+                    $unpaidPoliciesForDisplay['ontime'][$unpaidReason] = $unpaidPolicy;
+                    break;
+                }
+            }
+            foreach ($unpaidPolicies as $unpaidPolicy) {
+                /** @var Policy $unpaidPolicy */
+                if ($unpaidPolicy->getUnpaidReason() == $unpaidReason &&
+                    !$unpaidPolicy->canPaymentBeMadeInTime()) {
+                    $unpaidPoliciesForDisplay['outoftime'][$unpaidReason] = $unpaidPolicy;
                     break;
                 }
             }
