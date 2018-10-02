@@ -28,7 +28,7 @@ class UserRoleType extends AbstractType
                 User::ROLE_CUSTOMER_SERVICES => User::ROLE_CUSTOMER_SERVICES,
                 User::ROLE_ADMIN => User::ROLE_ADMIN,
             ],
-            'required'  => true,
+            'required'  => false,
             'multiple'  => true
         ))
         ->add('save', SubmitType::class) ;
