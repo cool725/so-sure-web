@@ -4964,6 +4964,58 @@ class PhonePolicyTest extends WebTestCase
         $this->assertLessThan(10, $renewed);
     }
 
+    public function testGetUnpaidReasonInvalidPolicy()
+    {
+        $policy = $this->getPolicy(static::generateEmail('testGetUnpaidReason', $this));
+        $this->assertNull($policy->getUnpaidReason());
+    }
+
+    public function testGetUnpaidReasonJudo()
+    {
+        $date = new \DateTime('2016-01-28 15:00');
+        $policy = $this->createPolicyForCancellation(
+            static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(null, $date),
+            Salva::MONTHLY_TOTAL_COMMISSION,
+            12,
+            $date
+        );
+        $this->assertTrue($policy->isPolicyPaidToDate(new \DateTime('2016-01-31 00:01')));
+        $policy->setStatus(Policy::STATUS_UNPAID);
+
+        $this->assertEquals(Policy::UNPAID_PAID, $policy->getUnpaidReason(new \DateTime('2016-01-01')));
+        $this->assertEquals(
+            Policy::UNPAID_PAYMENT_METHOD_MISSING,
+            $policy->getUnpaidReason(new \DateTime('2016-03-01'))
+        );
+
+        self::setPaymentMethod($policy->getUser(), '0116');
+        $this->assertEquals(
+            Policy::UNPAID_JUDO_CARD_EXPIRED,
+            $policy->getUnpaidReason(new \DateTime('2016-03-01'))
+        );
+
+        self::setPaymentMethod($policy->getUser(), '0120');
+        //\Doctrine\Common\Util\Debug::dump($policy->getLastPaymentCredit(), 3);
+        $this->assertEquals(
+            Policy::UNPAID_JUDO_PAYMENT_MISSING,
+            $policy->getUnpaidReason(new \DateTime('2016-03-01'))
+        );
+
+        // add an ontime payment
+        $payment = self::addPayment(
+            $policy,
+            $policy->getPremium()->getMonthlyPremiumPrice(),
+            Salva::MONTHLY_TOTAL_COMMISSION,
+            null,
+            new \DateTime('2016-02-28 15:00'),
+            JudoPayment::RESULT_DECLINED
+        );
+        $this->assertEquals(
+            Policy::UNPAID_JUDO_PAYMENT_FAILED,
+            $policy->getUnpaidReason(new \DateTime('2016-03-01'))
+        );
+    }
+
     private function getPolicy($email, \DateTime $date = null)
     {
         if (!$date) {

@@ -63,11 +63,16 @@ class JudoPaymentMethod extends PaymentMethod
         return $this->customerToken;
     }
 
-    public function addCardToken($key, $value)
+    public function addCardToken($key, $json)
     {
         $this->cardToken = $key;
-        $this->cardTokens[$key] = $value;
-        $this->setCardTokenHash(md5(serialize($value)));
+        $this->cardTokens[$key] = $json;
+        $this->setCardTokenHash(md5(serialize($json)));
+    }
+
+    public function addCardTokenArray($key, $array)
+    {
+        $this->addCardToken($key, json_encode($array));
     }
 
     public function getCardToken()

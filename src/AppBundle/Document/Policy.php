@@ -4349,7 +4349,7 @@ abstract class Policy
 
     public function getUnpaidReason(\DateTime $date = null)
     {
-        if ($this->getStatus() != self::STATUS_UNPAID) {
+        if ($this->getStatus() != self::STATUS_UNPAID || !$this->isPolicy()) {
             return null;
         }
 
@@ -4387,7 +4387,7 @@ abstract class Policy
         } elseif ($this->getUser()->hasJudoPaymentMethod()) {
             if ($lastPaymentCredit && $lastPaymentCredit instanceof JudoPayment) {
                 /** @var JudoPayment $lastPaymentCredit */
-                $lastPaymentFailure = $lastPaymentCredit->isSuccess();
+                $lastPaymentFailure = !$lastPaymentCredit->isSuccess();
             }
 
             $judoPaymentMethod = $this->getUser()->getJudoPaymentMethod();

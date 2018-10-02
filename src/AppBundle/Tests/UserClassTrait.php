@@ -2,6 +2,7 @@
 
 namespace AppBundle\Tests;
 
+use AppBundle\Document\JudoPaymentMethod;
 use AppBundle\Document\User;
 use AppBundle\Document\Phone;
 use AppBundle\Document\SalvaPhonePolicy;
@@ -285,15 +286,21 @@ trait UserClassTrait
         );
     }
 
-    public static function addPayment($policy, $amount, $commission, $receiptId = null, $date = null)
-    {
+    public static function addPayment(
+        Policy $policy,
+        $amount,
+        $commission,
+        $receiptId = null,
+        $date = null,
+        $result = JudoPayment::RESULT_SUCCESS
+    ) {
         if (!$receiptId) {
             $receiptId = rand(1, 999999);
         }
         $payment = new JudoPayment();
         $payment->setAmount($amount);
         $payment->setTotalCommission($commission);
-        $payment->setResult(JudoPayment::RESULT_SUCCESS);
+        $payment->setResult($result);
         $payment->setReceipt($receiptId);
         if ($date) {
             $payment->setDate($date);
@@ -301,6 +308,14 @@ trait UserClassTrait
         $policy->addPayment($payment);
 
         return $payment;
+    }
+
+    public static function setPaymentMethod(User $user, $endDate = '1220')
+    {
+        $account = ['type' => '1', 'lastfour' => '1234', 'endDate' => $endDate];
+        $judo = new JudoPaymentMethod();
+        $judo->addCardTokenArray(random_int(1, 999999), $account);
+        $user->setPaymentMethod($judo);
     }
 
     public static function addBacsPayment($policy, $amount, $commission, $date = null, $manual = true)
