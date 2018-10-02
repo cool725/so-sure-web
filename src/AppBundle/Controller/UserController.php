@@ -6,6 +6,7 @@ use AppBundle\Document\DateTrait;
 use AppBundle\Document\Payment\BacsPayment;
 use AppBundle\Security\UserVoter;
 use AppBundle\Security\ClaimVoter;
+use AppBundle\Service\BacsService;
 use AppBundle\Service\ClaimsService;
 use AppBundle\Service\PCAService;
 use AppBundle\Service\PolicyService;
@@ -1105,6 +1106,16 @@ class UserController extends BaseController
             ->getForm();
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
+            $now = new \DateTime();
+            $notes = sprintf(
+                'User manually confirmed payment for £%0.2f on %s from ip: %s',
+                $amount,
+                $now->format(\DateTime::ATOM),
+                $request->getClientIp()
+            );
+            /** @var BacsService $bacsService */
+            $bacsService = $this->get('app.bacs');
+            $bacsService->bacsPayment($policy, $notes, $amount);
         }
 
         $bacsFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_BACS);
