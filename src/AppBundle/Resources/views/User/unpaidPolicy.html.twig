@@ -90,34 +90,46 @@
                     {% endif %}
 
                     {% if show_bacs_setup %}
-                        <div class="row">
-                            <div class="col-sm-4 col-sm-offset-4">
-                                {% if policy.canPaymentBeMadeInTime %}
-                                    {% if not app.user.hasBacsPaymentMethod %}
-                                        <a href="{{ path('user_payment_details_bacs') }}" class="btn btn-green btn-block btn-pad ">Change to direct debit</a>
-                                    {% else %}
-                                        <a href="{{ path('user_payment_details_bacs') }}" class="btn btn-green btn-block btn-pad ">Update direct debit details</a>
-                                    {% endif %}
+                        <p class="lead text-center">
+                            {% if policy.canPaymentBeMadeInTime %}
+                                {% if not app.user.hasBacsPaymentMethod %}
+                                    <a href="{{ path('user_payment_details_bacs') }}" class="btn btn-green btn-block btn-pad ">Change to direct debit</a>
                                 {% else %}
-                                    Sorry, there is not enough time to setup a bacs mandate and take payment before your policy will expire. Please <a href="mailto:support@wearesosure.com" class="open-intercom">contact us</a>.
+                                    <a href="{{ path('user_payment_details_bacs') }}" class="btn btn-green btn-block btn-pad ">Update direct debit details</a>
                                 {% endif %}
-                            </div>
-                        </div>
+                            {% else %}
+                                Sorry, there is not enough time to setup a bacs mandate and take payment before your policy will expire.
+                                {% if not show_judo %}
+                                    Please <a href="mailto:support@wearesosure.com" class="open-intercom">contact us</a>.
+                                {% endif %}
+                            {% endif %}
+                        </p>
                     {% endif %}
 
                     {% if show_bacs_retry %}
-                        <div class="row">
-                            <div class="col-sm-4 col-sm-offset-4">
-                                {% if policy.canPaymentBeMadeInTime %}
-                                    {# TODO: Do we need to check mandate status here? #}
-                                    We need your permission to take £{{ amount|number_format(2, '.', ',') }} from your account ({{ app.user.paymentMethod.bankAccount }}).
-                                    This will be scheduled as soon as possible, but no later than 3 business days from today.
-                                    {# TODO: Form #}
-                                {% else %}
-                                    Sorry, there is not enough time to retry a bacs payment before your policy will expire. Please <a href="mailto:support@wearesosure.com" class="open-intercom">contact us</a>.
-                                {% endif %}
+                        {% if policy.canPaymentBeMadeInTime %}
+                            <p class="lead text-center">
+                                {# TODO: Do we need to check mandate status here? #}
+                                We need your permission to take £{{ amount|number_format(2, '.', ',') }} from your account ({{ app.user.paymentMethod.bankAccount }}).
+                                Once you have given us permission, your payment will be scheduled as soon as possible (within 3 business days).
+                            </p>
+                            <div class="row">
+                                <div class="col-sm-4 col-sm-offset-4">
+                                    {{ form_start(form, {'attr': {'class': 'form-inline'}})  }}
+                                        <div class="form-group">
+                                            {{ form_widget(form.reschedule, {'attr': {'class': 'btn btn-green btn-block btn-pad'}}) }}
+                                        </div>
+                                    {{ form_end(form) }}
+                                </div>
                             </div>
-                        </div>
+                        {% else %}
+                            <p class="lead text-center">
+                                Sorry, there is not enough time to retry a bacs payment before your policy will expire.
+                                {% if not show_judo %}
+                                    Please <a href="mailto:support@wearesosure.com" class="open-intercom">contact us</a>.
+                                {% endif %}
+                            </p>
+                        {% endif %}
                     {% endif %}
 
                     {% if show_judo and webpay_action and webpay_reference and amount > 0 %}
@@ -126,7 +138,7 @@
                                 <form action="{{ webpay_action }}" method="post" id="webpay-form">
                                     <div class="form-group">
                                         <input  id="Reference" name="Reference" type="hidden" value="{{ webpay_reference }}">
-                                        <input type="submit" class="btn {% if bacs_feature %}btn-default{% else %}btn-green{% endif %} btn-block btn-pad " value="Proceed to card payment">
+                                        <input type="submit" class="btn {% if show_bacs_setup %}btn-default{% else %}btn-green{% endif %} btn-block btn-pad " value="Proceed to card payment">
                                     </div>
                                 </form>
                             </div>

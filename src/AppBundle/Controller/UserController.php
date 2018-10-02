@@ -1097,6 +1097,16 @@ class UserController extends BaseController
             ));
         }
 
+
+        $form = $this->createFormBuilder()
+            ->add('reschedule', SubmitType::class, array(
+                'label' => sprintf("Please take £%0.2f from my account", $amount)
+            ))
+            ->getForm();
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+        }
+
         $bacsFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_BACS);
 
         // For now, only allow 1 policy with bacs
@@ -1113,7 +1123,23 @@ class UserController extends BaseController
             $bacsFeature = false;
         }
 
-        if (!$bacsFeature && $amount > 0) {
+        $includeJudoWebpay = false;
+        $unpaidReason = $policy->getUnpaidReason();
+        if (in_array($unpaidReason, [
+            Policy::UNPAID_JUDO_CARD_EXPIRED,
+            Policy::UNPAID_JUDO_PAYMENT_FAILED,
+            Policy::UNPAID_JUDO_PAYMENT_MISSING,
+        ])) {
+            $includeJudoWebpay = true;
+        } elseif (!$policy->canPaymentBeMadeInTime() && in_array($unpaidReason, [
+            Policy::UNPAID_BACS_MANDATE_INVALID,
+            Policy::UNPAID_BACS_PAYMENT_FAILED,
+            Policy::UNPAID_BACS_PAYMENT_MISSING,
+        ])) {
+            $includeJudoWebpay = true;
+        }
+
+        if ($includeJudoWebpay && $amount > 0) {
             $webpay = $this->get('app.judopay')->webpay(
                 $policy,
                 $amount,
@@ -1123,7 +1149,6 @@ class UserController extends BaseController
             );
         }
 
-        $unpaidReason = $policy->getUnpaidReason();
         if (in_array($unpaidReason, [
             Policy::UNPAID_BACS_UNKNOWN,
             Policy::UNPAID_JUDO_UNKNOWN,
@@ -1144,6 +1169,7 @@ class UserController extends BaseController
             'policy' => $policy,
             'bacs_feature' => $bacsFeature,
             'unpaid_reason' => $unpaidReason,
+            'form' => $form->createView(),
         ];
 
         return $data;

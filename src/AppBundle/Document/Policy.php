@@ -116,6 +116,18 @@ abstract class Policy
     const UNPAID_UNKNOWN = 'unpaid_unknown';
     const UNPAID_PAID = 'unpaid_paid';
 
+    public static $unpaidReasons = [
+        self::UNPAID_BACS_MANDATE_PENDING,
+        self::UNPAID_BACS_MANDATE_INVALID,
+        self::UNPAID_BACS_PAYMENT_PENDING,
+        self::UNPAID_BACS_PAYMENT_FAILED,
+        self::UNPAID_BACS_PAYMENT_MISSING,
+        self::UNPAID_JUDO_CARD_EXPIRED,
+        self::UNPAID_JUDO_PAYMENT_FAILED,
+        self::UNPAID_JUDO_PAYMENT_MISSING,
+        self::UNPAID_PAID,
+    ];
+
     // coolooff reasons
     const COOLOFF_REASON_DAMAGED ='damaged';
     const COOLOFF_REASON_COST = 'cost';
