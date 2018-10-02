@@ -89,6 +89,6 @@ class GoCompare
         1446 => ['make' => 'Apple', 'model' => 'iPhone XS Max', 'memory' => 64],
         1447 => ['make' => 'Apple', 'model' => 'iPhone XS Max', 'memory' => 256],
         1448 => ['make' => 'Apple', 'model' => 'iPhone XS Max', 'memory' => 512],
-        1449 => ['make' => 'Samsung', 'model' => 'Galaxy J6 (2018)', 'memory' => 64],
+        // 1449 => ['make' => 'Samsung', 'model' => 'Galaxy J6 (2018)', 'memory' => 64],
     ];
 }
