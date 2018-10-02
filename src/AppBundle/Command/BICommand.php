@@ -457,7 +457,13 @@ class BICommand extends BaseCommand
     public function uploadS3($data, $filename)
     {
         $tmpFile = sprintf('%s/%s', sys_get_temp_dir(), $filename);
-        file_put_contents($tmpFile, $data);
+
+        $result = file_put_contents($tmpFile, $data);
+
+        if (!$result) {
+            throw new \Exception($filename . ' could not be processed into a tmp file.');
+        }
+
         $s3Key = sprintf('%s/bi/%s', $this->getEnvironment(), $filename);
 
         $result = $this->getS3()->putObject(array(

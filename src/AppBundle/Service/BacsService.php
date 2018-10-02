@@ -1473,7 +1473,7 @@ class BacsService
             /* @var BacsPayment $payment */
             /** @var BacsPaymentMethod $bacs */
             $bacs = $payment->getPolicy()->getUser()->getPaymentMethod();
-            if (!$bacs || !$bacs->getBankAccount()) {
+            if (!$bacs || !$payment->getPolicy()->getUser()->hasBacsPaymentMethod()) {
                 $msg = sprintf(
                     'Skipping payment %s as unable to determine payment method or missing bank account',
                     $payment->getId()
