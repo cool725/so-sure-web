@@ -356,19 +356,28 @@
             <p class="mb-4">Need to claim, here's what happens</p>
             <div class="row">
                 <div class="col-md-6 col-lg-4">
-                    <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_make-a-claim.png" alt="so-sure - Make a claim" width="180px">
+                    <div class="claims__step">
+                        <div class="claims__number d-flex justify-content-center align-items-center h4 text-primary">1</div>
+                        <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_make-a-claim.png" alt="so-sure - Make a claim" width="180px">
+                    </div>
                     <h5 class="text-primary">Launch your claim online</h5>
-                    <p class="mb-5">Get your claim started by using our online portal or by calling our claims team  on 0113 320 9722 (local rates apply)</p>
+                    <p class="mb-5">Get your claim started by using our online portal or by calling our claims team  on <strong>0113 320 9722</strong> (local rates apply)</p>
                 </div>
                 <div class="col-md-6 col-lg-4">
-                    <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_claims-team.png" alt="so-sure - Review claim" width="180px">
+                    <div class="claims__step">
+                        <div class="claims__number d-flex justify-content-center align-items-center h4 text-primary">2</div>
+                        <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_claims-team.png" alt="so-sure - Review claim" width="180px">
+                    </div>
                     <h5 class="text-primary">Review Claim</h5>
                     <p class="mb-5">Our UK based claims team will review your claim and reach out with a request for any further details or documents</p>
                 </div>
                 <div class="col-md-6 col-lg-4">
-                    <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_delivery.png" alt="so-sure - Approve claim" width="180px">
+                    <div class="claims__step">
+                        <div class="claims__number d-flex justify-content-center align-items-center h4 text-primary">3</div>
+                        <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_delivery.png" alt="so-sure - Approve claim" width="180px">
+                    </div>
                     <h5 class="text-primary">Approve Claim</h5>
-                    <p class="mb-5">Once approved, we take your excess payment over the phone and aim to get a replacement phone to you for the next working day</p>
+                    <p class="mb-2">Once approved, we take your excess payment over the phone and aim to get a replacement phone to you for the next working day</p>
                 </div>
             </div>
             <a href="{{ path('claim') }}" class="btn btn-primary btn-blue-gradient btn-block-xs mt-3">Open the claims portal</a>
