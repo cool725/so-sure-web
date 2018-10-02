@@ -4,7 +4,7 @@ require('../../sass/pages/welcome.scss');
 
 // Require BS component(s)
 require('bootstrap/js/dist/tooltip');
-require('bootstrap/js/dist/modal');
+// require('bootstrap/js/dist/modal');
 
 // Require components;
 let Clipboard = require('clipboard');

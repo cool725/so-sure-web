@@ -3,6 +3,7 @@
 require('../sass/global.scss');
 
 // Require BS component(s)
+require('bootstrap/js/dist/modal');
 require('bootstrap/js/dist/alert');
 
 // Require components
