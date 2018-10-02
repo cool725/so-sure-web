@@ -175,6 +175,13 @@
                 {% endif %}
             </li>
             <li>
+                {% if unpaid_policy_bacs_failure %}
+                    <a href="{{ url('user_home') }}?_impersonate={{ unpaid_policy_bacs_failure.user.email }}">User Unpaid Page (Bacs Failure)</a> <b>(auto impersonate {{ unpaid_policy_bacs_failure.user.email }})</b>
+                {% else %}
+                    No policy unpaid available (bacs failure)
+                {% endif %}
+            </li>
+            <li>
                 {% if unpaid_policy_judo %}
                     <a href="{{ url('user_home') }}?_impersonate={{ unpaid_policy_judo.user.email }}">User Unpaid Page (Judo)</a> <b>(auto impersonate {{ unpaid_policy_judo.user.email }})</b>
                 {% else %}

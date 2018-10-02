@@ -3,6 +3,7 @@
 namespace AppBundle\Controller;
 
 use AppBundle\DataFixtures\MongoDB\d\Oauth2\LoadOauth2Data;
+use AppBundle\Document\Payment\BacsPayment;
 use AppBundle\Repository\Invitation\EmailInvitationRepository;
 use AppBundle\Repository\Invitation\InvitationRepository;
 use AppBundle\Repository\PhoneRepository;
@@ -276,6 +277,23 @@ class OpsController extends BaseController
                 $unpaidPolicyBacsSuccess = null;
             }
         }
+        $unpaidPolicyBacsFailure = null;
+        foreach ($unpaidPolicies as $unpaidPolicyBacsFailure) {
+            /** @var Policy $unpaidPolicyBacsFailure */
+            if (!$unpaidPolicyBacsFailure->isPolicyPaidToDate() &&
+//                !$unpaidPolicyBacsFailure->hasPolicyDiscountPresent() &&
+//                count($unpaidPolicyBacsFailure->getUser()->getValidPolicies(true)) == 1 &&
+                $unpaidPolicyBacsFailure->getUser()->hasBacsPaymentMethod() &&
+                $unpaidPolicyBacsFailure->getUser()->getBacsPaymentMethod()->getBankAccount()->isMandateSuccess() &&
+                $unpaidPolicyBacsFailure->getLastPaymentCredit() &&
+                $unpaidPolicyBacsFailure->getLastPaymentCredit()->getType() == 'bacs' &&
+                $unpaidPolicyBacsFailure->getLastPaymentCredit()->getStatus() == 'failed'
+            ) {
+                break;
+            } else {
+                $unpaidPolicyBacsFailure = null;
+            }
+        }
         $unpaidPolicyJudo = null;
         foreach ($unpaidPolicies as $unpaidPolicyJudo) {
             /** @var Policy $unpaidPolicyJudo */
@@ -455,6 +473,7 @@ class OpsController extends BaseController
             'unpaid_policy_bacs_inprogress' => $unpaidPolicyBacsInProgress,
             'unpaid_policy_bacs_invalid' => $unpaidPolicyBacsInvalid,
             'unpaid_policy_bacs_success' => $unpaidPolicyBacsSuccess,
+            'unpaid_policy_bacs_failure' => $unpaidPolicyBacsFailure,
             'unpaid_policy_judo' => $unpaidPolicyJudo,
             'unpaid_policydiscount_policy' => $unpaidPolicyDiscountPolicy,
             'valid_policy' => $validPolicy,

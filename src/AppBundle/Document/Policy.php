@@ -3,6 +3,7 @@
 namespace AppBundle\Document;
 
 use AppBundle\Document\Payment\BacsPayment;
+use AppBundle\Document\Payment\JudoPayment;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Doctrine\ODM\MongoDB\PersistentCollection;
@@ -100,6 +101,20 @@ abstract class Policy
     const METRIC_ACTIVATION = 'activation';
     const METRIC_HARD_ACTIVATION = 'hard-activation';
     const METRIC_RENEWAL = 'renewal';
+
+    const UNPAID_BACS_MANDATE_PENDING = 'unpaid_bacs_mandate_pending';
+    const UNPAID_BACS_MANDATE_INVALID = 'unpaid_bacs_mandate_invalid';
+    const UNPAID_BACS_PAYMENT_PENDING = 'unpaid_bacs_payment_pending';
+    const UNPAID_BACS_PAYMENT_FAILED = 'unpaid_bacs_payment_failed';
+    const UNPAID_BACS_PAYMENT_MISSING = 'unpaid_bacs_payment_missing';
+    const UNPAID_BACS_UNKNOWN = 'unpaid_bacs_unknown';
+    const UNPAID_JUDO_CARD_EXPIRED = 'unpaid_judo_card_expired';
+    const UNPAID_JUDO_PAYMENT_FAILED = 'unpaid_judo_payment_failed';
+    const UNPAID_JUDO_PAYMENT_MISSING = 'unpaid_judo_payment_missing';
+    const UNPAID_JUDO_UNKNOWN = 'unpaid_bacs_unknown';
+    const UNPAID_PAYMENT_METHOD_MISSING = 'unpaid_payment_method_missing';
+    const UNPAID_UNKNOWN = 'unpaid_unknown';
+    const UNPAID_PAID = 'unpaid_paid';
 
     // coolooff reasons
     const COOLOFF_REASON_DAMAGED ='damaged';
@@ -772,6 +787,25 @@ abstract class Policy
     /**
      * @return Payment|null
      */
+    public function getLastPaymentCredit()
+    {
+        $payments = $this->getPaymentCredits();
+        if (count($payments) == 0) {
+            return null;
+        }
+
+        // sort more recent to older
+        usort($payments, function ($a, $b) {
+            return $a->getDate() < $b->getDate();
+        });
+        //\Doctrine\Common\Util\Debug::dump($payments, 3);
+
+        return $payments[0];
+    }
+
+    /**
+     * @return Payment|null
+     */
     public function getLastPaymentDebit()
     {
         $payments = $this->getPaymentDebits();
@@ -792,6 +826,15 @@ abstract class Policy
     {
         $payments = array_filter($this->getAllPayments()->toArray(), function ($payment) {
                 return $payment->getAmount() <= 0 && !$payment instanceof SoSurePayment;
+        });
+
+        return $payments;
+    }
+
+    public function getPaymentCredits()
+    {
+        $payments = array_filter($this->getAllPayments()->toArray(), function ($payment) {
+            return $payment->getAmount() > 0 && !$payment instanceof SoSurePayment;
         });
 
         return $payments;
@@ -4304,6 +4347,68 @@ abstract class Policy
         return false;
     }
 
+    public function getUnpaidReason(\DateTime $date = null)
+    {
+        if ($this->getStatus() != self::STATUS_UNPAID) {
+            return null;
+        }
+
+        $outstandingPremium = $this->getOutstandingPremiumToDate($date);
+        if ($this->areEqualToTwoDp(0, $outstandingPremium)) {
+            return self::UNPAID_PAID;
+        }
+
+        $lastPaymentCredit = $this->getLastPaymentCredit();
+        $lastPaymentInProgress = false;
+        $lastPaymentFailure = false;
+        if ($this->getUser()->hasBacsPaymentMethod()) {
+            if ($lastPaymentCredit && $lastPaymentCredit instanceof BacsPayment) {
+                /** @var BacsPayment $lastPaymentCredit */
+                $lastPaymentInProgress = $lastPaymentCredit->inProgress();
+                $lastPaymentFailure = $lastPaymentCredit->getStatus() == BacsPayment::STATUS_FAILURE;
+            }
+
+            $bacsPaymentMethod = $this->getUser()->getBacsPaymentMethod();
+            if ($bacsPaymentMethod && $bacsPaymentMethod->getBankAccount()->isMandateInProgress()) {
+                return self::UNPAID_BACS_MANDATE_PENDING;
+            } elseif ($bacsPaymentMethod && $bacsPaymentMethod->getBankAccount()->isMandateInvalid()) {
+                return self::UNPAID_BACS_MANDATE_INVALID;
+            } elseif ($lastPaymentInProgress) {
+                return self::UNPAID_BACS_PAYMENT_PENDING;
+            } elseif ($lastPaymentFailure) {
+                return self::UNPAID_BACS_PAYMENT_FAILED;
+            } elseif ($outstandingPremium > 0) {
+                // we're unpaid with some premium due - the mandate is successful and the last bacs payment
+                // was either not present, or was successful
+                return self::UNPAID_BACS_PAYMENT_MISSING;
+            }
+
+            return self::UNPAID_BACS_UNKNOWN;
+        } elseif ($this->getUser()->hasJudoPaymentMethod()) {
+            if ($lastPaymentCredit && $lastPaymentCredit instanceof JudoPayment) {
+                /** @var JudoPayment $lastPaymentCredit */
+                $lastPaymentFailure = $lastPaymentCredit->isSuccess();
+            }
+
+            $judoPaymentMethod = $this->getUser()->getJudoPaymentMethod();
+            if ($judoPaymentMethod && $judoPaymentMethod->isCardExpired($date)) {
+                return self::UNPAID_JUDO_CARD_EXPIRED;
+            } elseif ($lastPaymentFailure) {
+                return self::UNPAID_JUDO_PAYMENT_FAILED;
+            } elseif ($outstandingPremium > 0) {
+                // we're unpaid with some premium due - the card is not expired and the last judo payment
+                // was either not present, or was successful
+                return self::UNPAID_JUDO_PAYMENT_MISSING;
+            }
+
+            return self::UNPAID_JUDO_UNKNOWN;
+        } elseif (!$this->getUser()->getPaymentMethod()) {
+            return self::UNPAID_PAYMENT_METHOD_MISSING;
+        }
+
+        return self::UNPAID_UNKNOWN;
+    }
+
     public function getSupportWarnings()
     {
         // @codingStandardsIgnoreStart
@@ -4766,6 +4871,19 @@ abstract class Policy
         }
 
         return false;
+    }
+
+    public function canPaymentBeMadeInTime(\DateTime $date = null)
+    {
+        if (!$date) {
+            $date = new \DateTime();
+        }
+
+        if ($this->getUser()->hasBacsPaymentMethod()) {
+            $date = static::addBusinessDays($date, BacsPayment::DAYS_REVERSE + 1);
+        }
+
+        return $this->getPolicyExpirationDate() < $date;
     }
 
     public function isFacebookUserInvited($facebookId)

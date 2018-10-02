@@ -695,7 +695,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             $policy->setPromoCode(Policy::PROMO_LAUNCH);
         }
 
-        $bacs = $user->hasBacsPaymentMethod();
+        $bacs = $user->hasBacsPaymentMethod() && count($user->getValidPolicies(true)) < 1;
 
         $paymentDate = clone $startDate;
         if ($paid === true || ($paid === null && rand(0, 1) == 0)) {

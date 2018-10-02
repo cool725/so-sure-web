@@ -1109,9 +1109,7 @@ class UserController extends BaseController
         }
         // we need enough time for the bacs to be billed + reverse payment to be notified + 1 day internal processing
         // or no point in swapping to bacs
-        $date = new \DateTime();
-        $date = $this->addBusinessDays($date, BacsPayment::DAYS_REVERSE + 1);
-        if ($bacsFeature && $policy->getPolicyExpirationDate() < $date) {
+        if ($bacsFeature && $policy->canPaymentBeMadeInTime()) {
             $bacsFeature = false;
         }
 
@@ -1125,6 +1123,19 @@ class UserController extends BaseController
             );
         }
 
+        $unpaidReason = $policy->getUnpaidReason();
+        if (in_array($unpaidReason, [
+            Policy::UNPAID_BACS_UNKNOWN,
+            Policy::UNPAID_JUDO_UNKNOWN,
+            Policy::UNPAID_UNKNOWN
+        ])) {
+            $this->get('logger')->warning(sprintf(
+                'Policy %s has an unknown unpaid reason (%s)',
+                $policy->getId(),
+                $unpaidReason
+            ));
+        }
+
         $data = [
             'phone' => $policy ? $policy->getPhone() : null,
             'webpay_action' => $webpay ? $webpay['post_url'] : null,
@@ -1132,6 +1143,7 @@ class UserController extends BaseController
             'amount' => $amount,
             'policy' => $policy,
             'bacs_feature' => $bacsFeature,
+            'unpaid_reason' => $unpaidReason,
         ];
 
         return $data;
@@ -1226,7 +1238,7 @@ class UserController extends BaseController
         $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
 
         // If a user has an unpaid policy, then avoid updating card details (email directing to here)
-        // as its then in a very odd state - card correct, but unpaid. better to take the payment immediately
+        // as its then in a very odd state - card correct, but unpaid. better ask user to take the payment immediately
         if ($user->hasUnpaidPolicy() && $request->get('_route') != 'user_payment_details_bacs') {
             return new RedirectResponse($this->generateUrl('user_unpaid_policy'));
         }
@@ -1243,9 +1255,7 @@ class UserController extends BaseController
         }
         // we need enough time for the bacs to be billed + reverse payment to be notified + 1 day internal processing
         // or no point in swapping to bacs
-        $date = new \DateTime();
-        $date = $this->addBusinessDays($date, BacsPayment::DAYS_REVERSE + 1);
-        if ($bacsFeature && $policy->getPolicyExpirationDate() < $date) {
+        if ($bacsFeature && $policy->canPaymentBeMadeInTime()) {
             $bacsFeature = false;
         }
 
