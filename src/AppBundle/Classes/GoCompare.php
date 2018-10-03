@@ -66,14 +66,14 @@ class GoCompare
         1418 => ['make' => 'Motorola', 'model' => 'Moto G5s', 'memory' => 32],
         1419 => ['make' => 'Motorola', 'model' => 'Moto G5s Plus', 'memory' => 64],
         1420 => ['make' => 'Motorola', 'model' => 'Moto Z2 Force', 'memory' => 64],
-        1421 => ['make' => 'Motorola', 'model' => 'Moto E4 Plus', 'memory' => 64],
+        1421 => ['make' => 'Motorola', 'model' => 'Moto E4 Plus', 'memory' => 16],
         //1422 => ['make' => 'Motorola', 'model' => 'Moto C Plus', 'memory' => 64],
 
         1424 => ['make' => 'Huawei', 'model' => 'Honor 10', 'memory' => 64],
         1425 => ['make' => 'OnePlus', 'model' => '6', 'memory' => 64],
         1426 => ['make' => 'OnePlus', 'model' => '6', 'memory' => 128],
         1427 => ['make' => 'OnePlus', 'model' => '6', 'memory' => 256],
-        1428 => ['make' => 'LG', 'model' => 'G7', 'memory' => 64],
+        1428 => ['make' => 'LG', 'model' => 'G7 ThinQ', 'memory' => 64],
         1429 => ['make' => 'Huawei', 'model' => 'P8 Lite (2017)', 'memory' => 16],
         1430 => ['make' => 'Huawei', 'model' => 'P Smart', 'memory' => 32],
 
