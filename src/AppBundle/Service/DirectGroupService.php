@@ -149,6 +149,9 @@ class DirectGroupService extends SftpService
                 'fees' => $this->fees,
                 'title' => 'Direct Group Daily Claims Report',
                 'highDemandPhones' => $highDemandPhones,
+                'claims_number_route' => 'admin_claim_number',
+                'claims_policy_route' => 'admin_policy',
+                'claims_route' => 'admin_claims',
             ]
         );
 
@@ -178,7 +181,7 @@ class DirectGroupService extends SftpService
             file_put_contents($tmpFile, $data);
 
             $this->mailer->sendTemplate(
-                sprintf('Errors in Daily Claims Report'),
+                sprintf('Errors in Daily Claims Report (Direct Group)'),
                 $emails,
                 'AppBundle:Email:claimsHandler/dailyEmail.html.twig',
                 [
@@ -190,6 +193,9 @@ class DirectGroupService extends SftpService
                     'claims' => null,
                     'fees' => $this->fees,
                     'title' => 'Errors in Daily Claims Report',
+                    'claims_number_route' => 'admin_claim_number',
+                    'claims_policy_route' => 'admin_policy',
+                    'claims_route' => 'admin_claims',
                 ],
                 null,
                 null,
