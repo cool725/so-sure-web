@@ -2,7 +2,9 @@
 
 namespace AppBundle\Document;
 
+use AppBundle\Document\Payment\BacsIndemnityPayment;
 use AppBundle\Document\Payment\BacsPayment;
+use AppBundle\Document\Payment\ChargebackPayment;
 use AppBundle\Document\Payment\JudoPayment;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
@@ -608,6 +610,11 @@ abstract class Policy
 
     public function getPaymentsByType($type)
     {
+        return $this->getPaymentsByTypes([$type]);
+    }
+
+    public function getPaymentsByTypes($types)
+    {
         $payments = $this->getAllPayments();
         if (is_object($payments)) {
             $payments = $payments->toArray();
@@ -616,8 +623,35 @@ abstract class Policy
             return [];
         }
 
-        return array_filter($payments, function ($payment) use ($type) {
-            return $payment instanceof $type;
+        return array_filter($payments, function ($payment) use ($types) {
+            foreach ($types as $type) {
+                if ($payment instanceof $type) {
+                    return true;
+                }
+            }
+
+            return false;
+        });
+    }
+
+    public function getPaymentsExceptTypes($types)
+    {
+        $payments = $this->getAllPayments();
+        if (is_object($payments)) {
+            $payments = $payments->toArray();
+        }
+        if (!$payments) {
+            return [];
+        }
+
+        return array_filter($payments, function ($payment) use ($types) {
+            foreach ($types as $type) {
+                if ($payment instanceof $type) {
+                    return false;
+                }
+            }
+
+            return true;
         });
     }
 
@@ -4583,6 +4617,13 @@ abstract class Policy
     public function hasCorrectCommissionPayments(\DateTime $date = null, $allowedVariance = 0)
     {
         $expectedCommission = $this->getExpectedCommission($date);
+
+        // If there are chargebacks, exclude from the expected commission
+        $excludedPayments = $this->getPaymentsByTypes([ChargebackPayment::class, BacsIndemnityPayment::class]);
+        $excludedPaymentsTotal = Payment::sumPayments($excludedPayments, false);
+        // as refunds, should be negative amount, so + is correct operation
+        $expectedCommission = $expectedCommission + $excludedPaymentsTotal['totalCommission'];
+
         /*
         print $numPayments . PHP_EOL;
         print $expectedCommission . PHP_EOL;
