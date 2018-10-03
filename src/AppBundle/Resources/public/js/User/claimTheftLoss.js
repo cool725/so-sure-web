@@ -101,4 +101,12 @@ $(function(){
         });
     }
 
+    $('#claim_theftloss_form_reportType').on('change', function(e) {
+        if ($(this).val() == 'police-station') {
+            $('#report-to-police').slideDown();
+        } else {
+            $('#report-to-police').slideUp();
+        }
+    });
+
 });
