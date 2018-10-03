@@ -4262,7 +4262,7 @@ abstract class Policy
             // 4 payment retries - 7, 14, 21, 28; should be 30 days unpaid before cancellation
             // 2 days diff + 2 on either side
             $cancellationDate = $cancellationDate->sub(new \DateInterval('P4D'));
-            if ($cancellationDate >= $date) {
+            if ($cancellationDate <= $date) {
                 return null;
             }
         }
