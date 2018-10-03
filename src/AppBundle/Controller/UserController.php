@@ -6,6 +6,7 @@ use AppBundle\Document\DateTrait;
 use AppBundle\Document\Payment\BacsPayment;
 use AppBundle\Security\UserVoter;
 use AppBundle\Security\ClaimVoter;
+use AppBundle\Service\BacsService;
 use AppBundle\Service\ClaimsService;
 use AppBundle\Service\PCAService;
 use AppBundle\Service\PolicyService;
@@ -1077,16 +1078,7 @@ class UserController extends BaseController
             $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
             if (!$policy->isPolicyPaidToDate()) {
                 $amount = $policy->getOutstandingPremiumToDate();
-
-                if ($amount > 0) {
-                    $webpay = $this->get('app.judopay')->webpay(
-                        $policy,
-                        $amount,
-                        $request->getClientIp(),
-                        $request->headers->get('User-Agent'),
-                        JudopayService::WEB_TYPE_UNPAID
-                    );
-                } else {
+                if ($amount <= 0) {
                     $this->get('logger')->warning(sprintf(
                         'Unpaid policy %s has unpaid status, yet has a £%0.2f outstanding premium.',
                         $policy->getId(),
@@ -1106,6 +1098,27 @@ class UserController extends BaseController
             ));
         }
 
+
+        $form = $this->createFormBuilder()
+            ->add('reschedule', SubmitType::class, array(
+                'label' => sprintf("Please take £%0.2f from my account", $amount)
+            ))
+            ->getForm();
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $now = new \DateTime();
+            $notes = sprintf(
+                'User manually confirmed payment for £%0.2f on %s from ip: %s',
+                $amount,
+                $now->format(\DateTime::ATOM),
+                $request->getClientIp()
+            );
+            /** @var BacsService $bacsService */
+            $bacsService = $this->get('app.bacs');
+            $bacsService->bacsPayment($policy, $notes, $amount);
+            $this->getManager()->flush();
+        }
+
         $bacsFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_BACS);
 
         // For now, only allow 1 policy with bacs
@@ -1116,12 +1129,43 @@ class UserController extends BaseController
         if ($bacsFeature && $policy->getPremiumPlan() != Policy::PLAN_MONTHLY) {
             $bacsFeature = false;
         }
-        // we need enough time for the bacs to be billed + reverse payment to be notified + 1 day internal processing
-        // or no point in swapping to bacs
-        $date = new \DateTime();
-        $date = $this->addBusinessDays($date, BacsPayment::DAYS_REVERSE + 1);
-        if ($bacsFeature && $policy->getPolicyExpirationDate() < $date) {
-            $bacsFeature = false;
+
+        $includeJudoWebpay = false;
+        $unpaidReason = $policy->getUnpaidReason();
+        if (in_array($unpaidReason, [
+            Policy::UNPAID_JUDO_CARD_EXPIRED,
+            Policy::UNPAID_JUDO_PAYMENT_FAILED,
+            Policy::UNPAID_JUDO_PAYMENT_MISSING,
+        ])) {
+            $includeJudoWebpay = true;
+        } elseif (!$policy->canBacsPaymentBeMadeInTime() && in_array($unpaidReason, [
+            Policy::UNPAID_BACS_MANDATE_INVALID,
+            Policy::UNPAID_BACS_PAYMENT_FAILED,
+            Policy::UNPAID_BACS_PAYMENT_MISSING,
+        ])) {
+            $includeJudoWebpay = true;
+        }
+
+        if ($includeJudoWebpay && $amount > 0) {
+            $webpay = $this->get('app.judopay')->webpay(
+                $policy,
+                $amount,
+                $request->getClientIp(),
+                $request->headers->get('User-Agent'),
+                JudopayService::WEB_TYPE_UNPAID
+            );
+        }
+
+        if (in_array($unpaidReason, [
+            Policy::UNPAID_BACS_UNKNOWN,
+            Policy::UNPAID_JUDO_UNKNOWN,
+            Policy::UNPAID_UNKNOWN
+        ])) {
+            $this->get('logger')->warning(sprintf(
+                'Policy %s has an unknown unpaid reason (%s)',
+                $policy->getId(),
+                $unpaidReason
+            ));
         }
 
         $data = [
@@ -1131,6 +1175,8 @@ class UserController extends BaseController
             'amount' => $amount,
             'policy' => $policy,
             'bacs_feature' => $bacsFeature,
+            'unpaid_reason' => $unpaidReason,
+            'form' => $form->createView(),
         ];
 
         return $data;
@@ -1225,7 +1271,7 @@ class UserController extends BaseController
         $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
 
         // If a user has an unpaid policy, then avoid updating card details (email directing to here)
-        // as its then in a very odd state - card correct, but unpaid. better to take the payment immediately
+        // as its then in a very odd state - card correct, but unpaid. better ask user to take the payment immediately
         if ($user->hasUnpaidPolicy() && $request->get('_route') != 'user_payment_details_bacs') {
             return new RedirectResponse($this->generateUrl('user_unpaid_policy'));
         }
@@ -1242,9 +1288,7 @@ class UserController extends BaseController
         }
         // we need enough time for the bacs to be billed + reverse payment to be notified + 1 day internal processing
         // or no point in swapping to bacs
-        $date = new \DateTime();
-        $date = $this->addBusinessDays($date, BacsPayment::DAYS_REVERSE + 1);
-        if ($bacsFeature && $policy->getPolicyExpirationDate() < $date) {
+        if ($bacsFeature && $policy->canBacsPaymentBeMadeInTime()) {
             $bacsFeature = false;
         }
 
