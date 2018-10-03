@@ -3253,6 +3253,22 @@ class PhonePolicyTest extends WebTestCase
         $this->assertEquals(new \DateTime('2017-01-01'), $policy->getPolicyExpirationDate(new \DateTime('2016-01-01')));
     }
 
+    public function testCanPaymentBeMadeInTime()
+    {
+        $date = new \DateTime('2018-09-01');
+        $policy = $this->createPolicyForCancellation(
+            static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(null, $date),
+            Salva::MONTHLY_TOTAL_COMMISSION,
+            12,
+            $date
+        );
+        self::setBacsPaymentMethod($policy->getUser(), BankAccount::MANDATE_PENDING_APPROVAL);
+
+        $this->assertEquals(new \DateTime('2018-10-31'), $policy->getPolicyExpirationDate(new \DateTime('2018-09-01')));
+        $this->assertTrue($policy->canPaymentBeMadeInTime(new \DateTime('2018-10-22')));
+        $this->assertFalse($policy->canPaymentBeMadeInTime(new \DateTime('2018-10-23')));
+    }
+
     public function testPolicyRenewalUnpaidExpirationDateYearly()
     {
         $date = new \DateTime('2016-01-01');

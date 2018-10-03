@@ -1116,6 +1116,7 @@ class UserController extends BaseController
             /** @var BacsService $bacsService */
             $bacsService = $this->get('app.bacs');
             $bacsService->bacsPayment($policy, $notes, $amount);
+            $this->getManager()->flush();
         }
 
         $bacsFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_BACS);

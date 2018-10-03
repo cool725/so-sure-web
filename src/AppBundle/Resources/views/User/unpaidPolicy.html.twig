@@ -93,9 +93,9 @@
                         <p class="lead text-center">
                             {% if policy.canPaymentBeMadeInTime %}
                                 {% if not app.user.hasBacsPaymentMethod %}
-                                    <a href="{{ path('user_payment_details_bacs') }}" class="btn btn-green btn-block btn-pad ">Change to direct debit</a>
+                                    <a id="setup-bacs-link" href="{{ path('user_payment_details_bacs') }}" class="btn btn-green btn-block btn-pad ">Change to direct debit</a>
                                 {% else %}
-                                    <a href="{{ path('user_payment_details_bacs') }}" class="btn btn-green btn-block btn-pad ">Update direct debit details</a>
+                                    <a id="update-bacs-link" href="{{ path('user_payment_details_bacs') }}" class="btn btn-green btn-block btn-pad ">Update direct debit details</a>
                                 {% endif %}
                             {% else %}
                                 Sorry, there is not enough time to setup a bacs mandate and take payment before your policy will expire.
@@ -115,7 +115,7 @@
                             </p>
                             <div class="row">
                                 <div class="col-sm-4 col-sm-offset-4">
-                                    {{ form_start(form, {'attr': {'class': 'form-inline'}})  }}
+                                    {{ form_start(form, {'attr': {'id': 'reschedule-bacs-form', 'class': 'form-inline'}})  }}
                                         <div class="form-group">
                                             {{ form_widget(form.reschedule, {'attr': {'class': 'btn btn-green btn-block btn-pad'}}) }}
                                         </div>

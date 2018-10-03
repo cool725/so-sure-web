@@ -2,7 +2,9 @@
 
 namespace AppBundle\Tests\Controller;
 
+use AppBundle\Document\BankAccount;
 use AppBundle\Document\DateTrait;
+use AppBundle\Document\Payment\BacsPayment;
 use AppBundle\Document\PhonePolicy;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\User;
@@ -446,18 +448,44 @@ class UserControllerTest extends BaseControllerTest
         }
     }
 
-    private function validateRenewalAllowed($crawler, $allowed)
+    private function validateRenewalAllowed($crawler, $exists)
     {
-        $count = 0;
-        if ($allowed) {
-            $count = 1;
-        }
-        $this->assertEquals($count, $crawler->evaluate('count(//li[@id="user-homepage--nav-renew"])')[0]);
+        $this->validateXPathCount($crawler, '//li[@id="user-homepage--nav-renew"]', $exists);
     }
 
-    public function testUserUnpaidPolicy()
+    private function validateUnpaidJudoForm($crawler, $exists)
     {
-        $email = self::generateEmail('testUserUnpaid', $this);
+        $this->validateXPathCount($crawler, '//form[@id="webpay-form"]', $exists);
+    }
+
+    private function validateUnpaidRescheduleBacsForm($crawler, $exists)
+    {
+        $this->validateXPathCount($crawler, '//form[@id="reschedule-bacs-form"]', $exists);
+    }
+
+    private function validateUnpaidBacsSetupLink($crawler, $exists)
+    {
+        $this->validateXPathCount($crawler, '//a[@id="setup-bacs-link"]', $exists);
+    }
+
+    private function validateUnpaidBacsUpdateLink($crawler, $exists)
+    {
+        $this->validateXPathCount($crawler, '//a[@id="update-bacs-link"]', $exists);
+    }
+
+    private function validateXPathCount($crawler, $xpath, $exists)
+    {
+        $count = 0;
+        if ($exists) {
+            $count = 1;
+        }
+
+        $this->assertEquals($count, $crawler->evaluate(sprintf('count(%s)', $xpath))[0]);
+    }
+
+    public function testUserUnpaidPolicyPaid()
+    {
+        $email = self::generateEmail('testUserUnpaidPolicyPaid', $this);
         $password = 'foo';
         $phone = self::getRandomPhone(self::$dm);
         $user = self::createUser(
@@ -470,12 +498,269 @@ class UserControllerTest extends BaseControllerTest
         $policy = self::initPolicy($user, self::$dm, $phone, null, true, true);
         $policy->setStatus(Policy::STATUS_UNPAID);
         self::$dm->flush();
+
+        $this->assertEquals(Policy::UNPAID_PAID, $policy->getUnpaidReason());
+
         //print_r($policy->getClaimsWarnings());
         $this->assertFalse($policy->getUser()->hasActivePolicy());
-        $this->login($email, $password, 'user/unpaid');
+        $crawler = $this->login($email, $password, 'user/unpaid');
+
+        $this->validateUnpaidJudoForm($crawler, false);
+        $this->validateUnpaidRescheduleBacsForm($crawler, false);
+        $this->validateUnpaidBacsSetupLink($crawler, false);
+        $this->validateUnpaidBacsUpdateLink($crawler, false);
+        $this->assertContains('policy is paid to date', $crawler->html());
 
         $crawler = self::$client->request('GET', '/user/invalid');
         self::verifyResponse(500);
+    }
+
+    public function testUserUnpaidPolicyMandatePending()
+    {
+        $email = self::generateEmail('testUserUnpaidPolicyMandatePending', $this);
+        $password = 'foo';
+        $phone = self::getRandomPhone(self::$dm);
+        $user = self::createUser(
+            self::$userManager,
+            $email,
+            $password,
+            $phone,
+            self::$dm
+        );
+        self::setBacsPaymentMethod($user, BankAccount::MANDATE_PENDING_APPROVAL);
+        $oneMonthAgo = new \DateTime();
+        $oneMonthAgo = $oneMonthAgo->sub(new \DateInterval('P1M'));
+        $twoMonthsAgo = new \DateTime();
+        $twoMonthsAgo = $twoMonthsAgo->sub(new \DateInterval('P2M'));
+        $policy = self::initPolicy($user, self::$dm, $phone, $twoMonthsAgo, false, true);
+        $policy->setStatus(Policy::STATUS_UNPAID);
+        $payment = static::addBacsPayPayment($policy, $twoMonthsAgo, true);
+        self::$dm->flush();
+
+        $this->assertEquals(Policy::UNPAID_BACS_MANDATE_PENDING, $policy->getUnpaidReason());
+
+        //print_r($policy->getClaimsWarnings());
+        $this->assertFalse($policy->getUser()->hasActivePolicy());
+        $crawler = $this->login($email, $password, 'user/unpaid');
+
+        $this->validateUnpaidJudoForm($crawler, false);
+        $this->validateUnpaidRescheduleBacsForm($crawler, false);
+        $this->validateUnpaidBacsSetupLink($crawler, false);
+        $this->validateUnpaidBacsUpdateLink($crawler, false);
+        $this->assertContains('Pending Direct Debit Setup', $crawler->html());
+    }
+
+    public function testUserUnpaidPolicyMandateInvalid()
+    {
+        $email = self::generateEmail('testUserUnpaidPolicyMandateInvalid', $this);
+        $password = 'foo';
+        $phone = self::getRandomPhone(self::$dm);
+        $user = self::createUser(
+            self::$userManager,
+            $email,
+            $password,
+            $phone,
+            self::$dm
+        );
+        self::setBacsPaymentMethod($user, BankAccount::MANDATE_CANCELLED);
+        $oneMonthAgo = new \DateTime();
+        $oneMonthAgo = $oneMonthAgo->sub(new \DateInterval('P1M'));
+        $twoMonthsAgo = new \DateTime();
+        $twoMonthsAgo = $twoMonthsAgo->sub(new \DateInterval('P2M'));
+        $policy = self::initPolicy($user, self::$dm, $phone, $twoMonthsAgo, false, true);
+        $policy->setStatus(Policy::STATUS_UNPAID);
+        $payment = static::addBacsPayPayment($policy, $twoMonthsAgo, true);
+        self::$dm->flush();
+
+        $this->assertEquals(Policy::UNPAID_BACS_MANDATE_INVALID, $policy->getUnpaidReason());
+        $this->assertFalse($policy->getUser()->hasActivePolicy());
+
+        $crawler = $this->login($email, $password, 'user/unpaid');
+
+        $this->validateUnpaidJudoForm($crawler, true);
+        $this->validateUnpaidRescheduleBacsForm($crawler, false);
+        $this->validateUnpaidBacsSetupLink($crawler, false);
+        $this->validateUnpaidBacsUpdateLink($crawler, false);
+        $this->assertContains('Invalid Mandate', $crawler->html());
+
+        $payment = static::addBacsPayPayment($policy, $oneMonthAgo, true);
+        self::$dm->flush();
+
+        $crawler = self::$client->request('GET', '/user/unpaid');
+
+        $this->validateUnpaidJudoForm($crawler, false);
+        $this->validateUnpaidRescheduleBacsForm($crawler, false);
+        $this->validateUnpaidBacsSetupLink($crawler, false);
+        $this->validateUnpaidBacsUpdateLink($crawler, true);
+        $this->assertContains('Invalid Mandate', $crawler->html());
+    }
+
+    public function testUserUnpaidPolicyPaymentPending()
+    {
+        $email = self::generateEmail('testUserUnpaidPolicyPaymentPending', $this);
+        $password = 'foo';
+        $phone = self::getRandomPhone(self::$dm);
+        $user = self::createUser(
+            self::$userManager,
+            $email,
+            $password,
+            $phone,
+            self::$dm
+        );
+        self::setBacsPaymentMethod($user, BankAccount::MANDATE_SUCCESS);
+        $oneMonthAgo = new \DateTime();
+        $oneMonthAgo = $oneMonthAgo->sub(new \DateInterval('P1M'));
+        $twoMonthsAgo = new \DateTime();
+        $twoMonthsAgo = $twoMonthsAgo->sub(new \DateInterval('P2M'));
+        $policy = self::initPolicy($user, self::$dm, $phone, $twoMonthsAgo, false, true);
+        $policy->setStatus(Policy::STATUS_UNPAID);
+        $payment = static::addBacsPayPayment($policy, $twoMonthsAgo, true);
+        $payment->setStatus(BacsPayment::STATUS_PENDING);
+        self::$dm->flush();
+
+        $this->assertEquals(Policy::UNPAID_BACS_PAYMENT_PENDING, $policy->getUnpaidReason());
+        $this->assertFalse($policy->getUser()->hasActivePolicy());
+
+        $crawler = $this->login($email, $password, 'user/unpaid');
+
+        $this->validateUnpaidJudoForm($crawler, false);
+        $this->validateUnpaidRescheduleBacsForm($crawler, false);
+        $this->validateUnpaidBacsSetupLink($crawler, false);
+        $this->validateUnpaidBacsUpdateLink($crawler, false);
+        $this->assertContains('Payment is processing', $crawler->html());
+    }
+
+    public function testUserUnpaidPolicyPaymentFailed()
+    {
+        $email = self::generateEmail('testUserUnpaidPolicyPaymentFailed', $this);
+        $password = 'foo';
+        $phone = self::getRandomPhone(self::$dm);
+        $user = self::createUser(
+            self::$userManager,
+            $email,
+            $password,
+            $phone,
+            self::$dm
+        );
+        self::setBacsPaymentMethod($user, BankAccount::MANDATE_SUCCESS);
+        $oneMonthAgo = new \DateTime();
+        $oneMonthAgo = $oneMonthAgo->sub(new \DateInterval('P1M'));
+        $twoMonthsAgo = new \DateTime();
+        $twoMonthsAgo = $twoMonthsAgo->sub(new \DateInterval('P2M'));
+        $policy = self::initPolicy($user, self::$dm, $phone, $twoMonthsAgo, false, true);
+        $policy->setStatus(Policy::STATUS_UNPAID);
+        $payment = static::addBacsPayPayment($policy, $twoMonthsAgo, true);
+        $payment->setStatus(BacsPayment::STATUS_FAILURE);
+        self::$dm->flush();
+
+        $this->assertEquals(Policy::UNPAID_BACS_PAYMENT_FAILED, $policy->getUnpaidReason());
+        $this->assertFalse($policy->getUser()->hasActivePolicy());
+
+        $crawler = $this->login($email, $password, 'user/unpaid');
+
+        $this->validateUnpaidJudoForm($crawler, true);
+        $this->validateUnpaidRescheduleBacsForm($crawler, false);
+        $this->validateUnpaidBacsSetupLink($crawler, false);
+        $this->validateUnpaidBacsUpdateLink($crawler, false);
+        $this->assertContains('Payment failed', $crawler->html());
+
+        $payment->setStatus(BacsPayment::STATUS_SUCCESS);
+        $newPayment = static::addBacsPayPayment($policy, $oneMonthAgo, true);
+        $newPayment->setStatus(BacsPayment::STATUS_FAILURE);
+        self::$dm->flush();
+
+        $dm = $this->getDocumentManager(true);
+        $repo = $dm->getRepository(Policy::class);
+        /** @var Policy $updatedPolicy */
+        $updatedPolicy = $repo->find($policy->getId());
+
+        $this->assertEquals(Policy::UNPAID_BACS_PAYMENT_FAILED, $updatedPolicy->getUnpaidReason());
+        $this->logout();
+        $crawler = $this->login($email, $password, 'user/unpaid');
+
+        $this->validateUnpaidJudoForm($crawler, false);
+        $this->validateUnpaidRescheduleBacsForm($crawler, true);
+        $this->validateUnpaidBacsSetupLink($crawler, false);
+        $this->validateUnpaidBacsUpdateLink($crawler, false);
+        $this->assertContains('Payment failed', $crawler->html());
+
+        $form = $crawler->selectButton('form[reschedule]')->form();
+        $crawler = self::$client->submit($form);
+        self::verifyResponse(200);
+        $this->assertContains('Payment is processing', $crawler->html());
+
+        $dm = $this->getDocumentManager(true);
+        $repo = $dm->getRepository(Policy::class);
+        /** @var Policy $updatedPolicy */
+        $updatedPolicy = $repo->find($policy->getId());
+
+        $this->assertEquals(Policy::UNPAID_BACS_PAYMENT_PENDING, $updatedPolicy->getUnpaidReason());
+    }
+
+    public function testUserUnpaidPolicyPaymentMissing()
+    {
+        $email = self::generateEmail('testUserUnpaidPolicyPaymentMissing', $this);
+        $password = 'foo';
+        $phone = self::getRandomPhone(self::$dm);
+        $user = self::createUser(
+            self::$userManager,
+            $email,
+            $password,
+            $phone,
+            self::$dm
+        );
+        self::setBacsPaymentMethod($user, BankAccount::MANDATE_SUCCESS);
+        $oneMonthAgo = new \DateTime();
+        $oneMonthAgo = $oneMonthAgo->sub(new \DateInterval('P1M'));
+        $twoMonthsAgo = new \DateTime();
+        $twoMonthsAgo = $twoMonthsAgo->sub(new \DateInterval('P2M'));
+        $policy = self::initPolicy($user, self::$dm, $phone, $twoMonthsAgo, false, true);
+        $policy->setStatus(Policy::STATUS_UNPAID);
+        $payment = static::addBacsPayPayment($policy, $twoMonthsAgo, true);
+        $payment->setStatus(BacsPayment::STATUS_SUCCESS);
+        self::$dm->flush();
+
+        $this->assertEquals(Policy::UNPAID_BACS_PAYMENT_MISSING, $policy->getUnpaidReason());
+        $this->assertFalse($policy->getUser()->hasActivePolicy());
+
+        $crawler = $this->login($email, $password, 'user/unpaid');
+
+        $this->validateUnpaidJudoForm($crawler, true);
+        $this->validateUnpaidRescheduleBacsForm($crawler, false);
+        $this->validateUnpaidBacsSetupLink($crawler, false);
+        $this->validateUnpaidBacsUpdateLink($crawler, false);
+        $this->assertContains('Payment missing', $crawler->html());
+
+        $newPayment = static::addBacsPayPayment($policy, $oneMonthAgo, true);
+        $newPayment->setStatus(BacsPayment::STATUS_SUCCESS);
+        self::$dm->flush();
+
+        $dm = $this->getDocumentManager(true);
+        $repo = $dm->getRepository(Policy::class);
+        /** @var Policy $updatedPolicy */
+        $updatedPolicy = $repo->find($policy->getId());
+
+        $this->assertEquals(Policy::UNPAID_BACS_PAYMENT_MISSING, $updatedPolicy->getUnpaidReason());
+        $this->logout();
+        $crawler = $this->login($email, $password, 'user/unpaid');
+
+        $this->validateUnpaidJudoForm($crawler, false);
+        $this->validateUnpaidRescheduleBacsForm($crawler, true);
+        $this->validateUnpaidBacsSetupLink($crawler, false);
+        $this->validateUnpaidBacsUpdateLink($crawler, false);
+        $this->assertContains('Payment missing', $crawler->html());
+
+        $form = $crawler->selectButton('form[reschedule]')->form();
+        $crawler = self::$client->submit($form);
+        self::verifyResponse(200);
+        $this->assertContains('Payment is processing', $crawler->html());
+
+        $dm = $this->getDocumentManager(true);
+        $repo = $dm->getRepository(Policy::class);
+        /** @var Policy $updatedPolicy */
+        $updatedPolicy = $repo->find($policy->getId());
+
+        $this->assertEquals(Policy::UNPAID_BACS_PAYMENT_PENDING, $updatedPolicy->getUnpaidReason());
     }
 
     public function testUserUnpaidPolicyPaymentDetails()

@@ -799,11 +799,26 @@ abstract class Policy
     /**
      * @return Payment|null
      */
-    public function getLastPaymentCredit()
+    public function getLastPaymentCredit($excludeMissingStatus = true)
     {
         $payments = $this->getPaymentCredits();
         if (count($payments) == 0) {
             return null;
+        }
+
+        // TODO: Consider if this should be a filter by payment type instead of missing status (or both)
+        // originally added as with bacs, there was an initial judo payment added with empty status
+        // which needed to be excluded
+        if ($excludeMissingStatus) {
+            $payments = array_filter($payments, function ($payment) {
+                if ($payment instanceof JudoPayment) {
+                    /** @var JudoPayment $payment */
+                    return $payment->getResult() !== null;
+                } elseif ($payment instanceof BacsPayment) {
+                    /** @var BacsPayment $payment */
+                    return $payment->getStatus() !== null;
+                }
+            });
         }
 
         // sort more recent to older
@@ -4891,11 +4906,15 @@ abstract class Policy
             $date = new \DateTime();
         }
 
+        $expirationDate = $this->getCurrentOrPreviousBusinessDay($this->getPolicyExpirationDate());
         if ($this->getUser()->hasBacsPaymentMethod()) {
-            $date = static::addBusinessDays($date, BacsPayment::DAYS_REVERSE + 1);
+            $expirationDate = static::subBusinessDays($expirationDate, BacsPayment::DAYS_REVERSE + 1);
         }
 
-        return $this->getPolicyExpirationDate() < $date;
+        //print $date->format(\DateTime::ATOM);
+        //print $expirationDate->format(\DateTime::ATOM);
+
+        return $expirationDate >= $date;
     }
 
     public function isFacebookUserInvited($facebookId)
