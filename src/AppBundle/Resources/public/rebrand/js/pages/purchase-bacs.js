@@ -10,6 +10,8 @@ require('jquery-validation');
 require('jquery-mask-plugin');
 require('../../../js/Default/jqueryValidatorMethods.js');
 
+import simpleTrack from '../common/trackSimple.js';
+
 const sosure = sosure || {};
 
 sosure.purchaseStepBacs = (function() {
@@ -95,10 +97,15 @@ $(function(){
     sosure.purchaseStepBacs.init();
 
     sosure.purchaseStepBacs.webPayBtn.on('click', function() {
+
         if ($.trim($('#Reference').val()).length > 0) {
             // Show loading overlay
             sosure.purchaseStepBacs.loader.show();
             sosure.purchaseStepBacs.webPay.submit();
         }
+
+        // Add tracking
+        let name = $(this).data('event');
+        simpleTrack(name);
     });
 });
