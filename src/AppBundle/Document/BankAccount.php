@@ -376,6 +376,11 @@ class BankAccount
         $this->annual = $annual;
     }
 
+    public function isMandateSuccess()
+    {
+        return $this->getMandateStatus() == self::MANDATE_SUCCESS;
+    }
+
     public function isMandateInProgress()
     {
         return !in_array($this->getMandateStatus(), [

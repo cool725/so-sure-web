@@ -2,6 +2,9 @@
 
 namespace AppBundle\Tests;
 
+use AppBundle\Document\BacsPaymentMethod;
+use AppBundle\Document\BankAccount;
+use AppBundle\Document\JudoPaymentMethod;
 use AppBundle\Document\User;
 use AppBundle\Document\Phone;
 use AppBundle\Document\SalvaPhonePolicy;
@@ -236,8 +239,14 @@ trait UserClassTrait
         return $policy;
     }
 
-    public static function addJudoPayPayment($judopay, $policy, $date = null, $monthly = true, $adjustment = 0)
-    {
+    public static function addJudoPayPayment(
+        $judopay,
+        $policy,
+        $date = null,
+        $monthly = true,
+        $adjustment = 0,
+        $actual = true
+    ) {
         if ($monthly) {
             $policy->setPremiumInstallments(12);
             $premium = $policy->getPremium()->getMonthlyPremiumPrice(null, $date);
@@ -253,9 +262,13 @@ trait UserClassTrait
             $premium = number_format(round($premium, 2), 2, ".", "");
         }
 
-        $details = self::runJudoPayPayment($judopay, $policy->getUser(), $policy, $premium);
-        $receiptId = $details['receiptId'];
-        self::addPayment($policy, $premium, $commission, $receiptId);
+        if ($actual) {
+            $details = self::runJudoPayPayment($judopay, $policy->getUser(), $policy, $premium);
+            $receiptId = $details['receiptId'];
+        } else {
+            $receiptId = random_int(1, 999999);
+        }
+        self::addPayment($policy, $premium, $commission, $receiptId, $date);
     }
 
     public static function addBacsPayPayment($policy, $date = null, $monthly = true, $manual = true)
@@ -285,15 +298,21 @@ trait UserClassTrait
         );
     }
 
-    public static function addPayment($policy, $amount, $commission, $receiptId = null, $date = null)
-    {
+    public static function addPayment(
+        Policy $policy,
+        $amount,
+        $commission,
+        $receiptId = null,
+        $date = null,
+        $result = JudoPayment::RESULT_SUCCESS
+    ) {
         if (!$receiptId) {
             $receiptId = rand(1, 999999);
         }
         $payment = new JudoPayment();
         $payment->setAmount($amount);
         $payment->setTotalCommission($commission);
-        $payment->setResult(JudoPayment::RESULT_SUCCESS);
+        $payment->setResult($result);
         $payment->setReceipt($receiptId);
         if ($date) {
             $payment->setDate($date);
@@ -303,11 +322,25 @@ trait UserClassTrait
         return $payment;
     }
 
-    public static function addBacsPayment($policy, $amount, $commission, $date = null, $manual = true)
+    public static function setPaymentMethod(User $user, $endDate = '1220')
     {
+        $account = ['type' => '1', 'lastfour' => '1234', 'endDate' => $endDate];
+        $judo = new JudoPaymentMethod();
+        $judo->addCardTokenArray(random_int(1, 999999), $account);
+        $user->setPaymentMethod($judo);
+    }
+
+    public static function addBacsPayment(
+        Policy $policy,
+        $amount,
+        $commission,
+        $date = null,
+        $manual = true,
+        $status = BacsPayment::STATUS_SUCCESS
+    ) {
         $payment = new BacsPayment();
         $payment->setManual($manual);
-        $payment->setStatus(BacsPayment::STATUS_SUCCESS);
+        $payment->setStatus($status);
         $payment->setSuccess(true);
         $payment->setAmount($amount);
         $payment->setTotalCommission($commission);
@@ -317,6 +350,15 @@ trait UserClassTrait
         $policy->addPayment($payment);
 
         return $payment;
+    }
+
+    public static function setBacsPaymentMethod(User $user, $mandateStatus = BankAccount::MANDATE_SUCCESS)
+    {
+        $bacs = new BacsPaymentMethod();
+        $bankAccount = new BankAccount();
+        $bankAccount->setMandateStatus($mandateStatus);
+        $bacs->setBankAccount($bankAccount);
+        $user->setPaymentMethod($bacs);
     }
 
     public static function addSoSureStandardPayment($policy, $date = null, $refund = true, $monthly = true)

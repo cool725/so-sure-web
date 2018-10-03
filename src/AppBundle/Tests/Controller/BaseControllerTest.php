@@ -2,6 +2,7 @@
 
 namespace AppBundle\Tests\Controller;
 
+use AppBundle\Service\JudopayService;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Predis\Client;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -31,6 +32,9 @@ class BaseControllerTest extends WebTestCase
     protected static $redis;
     protected static $invitationService;
     protected static $rootDir;
+
+    /** @var JudopayService */
+    protected static $judopayService;
 
     public function tearDown()
     {
@@ -62,6 +66,10 @@ class BaseControllerTest extends WebTestCase
         /** @var Client $redis */
         $redis = self::$container->get('snc_redis.default');
         self::$redis = $redis;
+
+        /** @var JudopayService $judopayService */
+        $judopayService = self::$container->get('app.judopay');
+        self::$judopayService = $judopayService;
 
         self::$policyService = self::$container->get('app.policy');
         self::$invitationService = self::$container->get('app.invitation');
