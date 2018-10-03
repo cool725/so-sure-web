@@ -41,7 +41,7 @@
                     {% elseif unpaid_reason == 'unpaid_bacs_mandate_invalid' %}
                         {# MANDATE FAILED OR CANCELLED #}
                         {% set show_bacs_setup = true %}
-                        {% if not policy.canPaymentBeMadeInTime %}
+                        {% if not policy.canBacsPaymentBeMadeInTime %}
                             {% set show_judo = true %}
                         {% endif %}
                         <h1 class="text-center">Invalid Mandate</h1>
@@ -49,7 +49,7 @@
                     {% elseif unpaid_reason == 'unpaid_bacs_payment_failed' %}
                         {# PAYMENT FAILED #}
                         {% set show_bacs_retry = true %}
-                        {% if not policy.canPaymentBeMadeInTime %}
+                        {% if not policy.canBacsPaymentBeMadeInTime %}
                             {% set show_judo = true %}
                         {% endif %}
                         <h1 class="text-center">Payment failed</h1>
@@ -57,29 +57,29 @@
                     {% elseif unpaid_reason == 'unpaid_bacs_payment_missing' %}
                         {# PAYMENT MISSING #}
                         {% set show_bacs_retry = true %}
-                        {% if not policy.canPaymentBeMadeInTime %}
+                        {% if not policy.canBacsPaymentBeMadeInTime %}
                             {% set show_judo = true %}
                         {% endif %}
                         <h1 class="text-center">Payment missing</h1>
                         <p class="lead text-center">Your account is not paid to date and your policy is in danger of being cancelled.</p>
                     {% elseif unpaid_reason == 'unpaid_judo_card_expired' %}
                         {% set show_judo = true %}
-                        {% if policy.canPaymentBeMadeInTime %}
-                            {% set show_bacs_setup = bacs_feature %}
+                        {% if policy.canBacsPaymentBeMadeInTime and bacs_feature %}
+                            {% set show_bacs_setup = true %}
                         {% endif %}
-                        <h1 class="text-center">Unpaid Policy</h1>
-                        <p class="lead text-center">Your policy is not up to date on your payments. Click below to pay the outstanding due of £{{ amount|number_format(2, '.', ',') }}.</p>
+                        <h1 class="text-center">Card Expired</h1>
+                        <p class="lead text-center">Your card is expired and we were unable to bill you. Your policy is not up to date on your payments. Click below to pay the outstanding due of £{{ amount|number_format(2, '.', ',') }}.</p>
                     {% elseif unpaid_reason == 'unpaid_judo_payment_failed' %}
                         {% set show_judo = true %}
-                        {% if policy.canPaymentBeMadeInTime %}
-                            {% set show_bacs_setup = bacs_feature %}
+                        {% if policy.canBacsPaymentBeMadeInTime and bacs_feature %}
+                            {% set show_bacs_setup = true %}
                         {% endif %}
                         <h1 class="text-center">Unpaid Policy</h1>
                         <p class="lead text-center">Your policy is not up to date on your payments. Click below to pay the outstanding due of £{{ amount|number_format(2, '.', ',') }}.</p>
                     {% elseif unpaid_reason == 'unpaid_judo_payment_missing' %}
                         {% set show_judo = true %}
-                        {% if policy.canPaymentBeMadeInTime %}
-                            {% set show_bacs_setup = bacs_feature %}
+                        {% if policy.canBacsPaymentBeMadeInTime and bacs_feature %}
+                            {% set show_bacs_setup = true %}
                         {% endif %}
                         <h1 class="text-center">Unpaid Policy</h1>
                         <p class="lead text-center">Your policy is not up to date on your payments. Click below to pay the outstanding due of £{{ amount|number_format(2, '.', ',') }}.</p>
@@ -91,7 +91,7 @@
 
                     {% if show_bacs_setup %}
                         <p class="lead text-center">
-                            {% if policy.canPaymentBeMadeInTime %}
+                            {% if policy.canBacsPaymentBeMadeInTime %}
                                 {% if not app.user.hasBacsPaymentMethod %}
                                     <a id="setup-bacs-link" href="{{ path('user_payment_details_bacs') }}" class="btn btn-green btn-block btn-pad ">Change to direct debit</a>
                                 {% else %}
@@ -107,7 +107,7 @@
                     {% endif %}
 
                     {% if show_bacs_retry %}
-                        {% if policy.canPaymentBeMadeInTime %}
+                        {% if policy.canBacsPaymentBeMadeInTime %}
                             <p class="lead text-center">
                                 {# TODO: Do we need to check mandate status here? #}
                                 We need your permission to take £{{ amount|number_format(2, '.', ',') }} from your account ({{ app.user.paymentMethod.bankAccount }}).

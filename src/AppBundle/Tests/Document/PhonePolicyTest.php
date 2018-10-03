@@ -3253,7 +3253,7 @@ class PhonePolicyTest extends WebTestCase
         $this->assertEquals(new \DateTime('2017-01-01'), $policy->getPolicyExpirationDate(new \DateTime('2016-01-01')));
     }
 
-    public function testCanPaymentBeMadeInTime()
+    public function testCanBacsPaymentBeMadeInTime()
     {
         $date = new \DateTime('2018-09-01');
         $policy = $this->createPolicyForCancellation(
@@ -3265,8 +3265,8 @@ class PhonePolicyTest extends WebTestCase
         self::setBacsPaymentMethod($policy->getUser(), BankAccount::MANDATE_PENDING_APPROVAL);
 
         $this->assertEquals(new \DateTime('2018-10-31'), $policy->getPolicyExpirationDate(new \DateTime('2018-09-01')));
-        $this->assertTrue($policy->canPaymentBeMadeInTime(new \DateTime('2018-10-22')));
-        $this->assertFalse($policy->canPaymentBeMadeInTime(new \DateTime('2018-10-23')));
+        $this->assertTrue($policy->canBacsPaymentBeMadeInTime(new \DateTime('2018-10-22')));
+        $this->assertFalse($policy->canBacsPaymentBeMadeInTime(new \DateTime('2018-10-23')));
     }
 
     public function testPolicyRenewalUnpaidExpirationDateYearly()

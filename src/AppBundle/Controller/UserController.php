@@ -1129,11 +1129,6 @@ class UserController extends BaseController
         if ($bacsFeature && $policy->getPremiumPlan() != Policy::PLAN_MONTHLY) {
             $bacsFeature = false;
         }
-        // we need enough time for the bacs to be billed + reverse payment to be notified + 1 day internal processing
-        // or no point in swapping to bacs
-        if ($bacsFeature && $policy->canPaymentBeMadeInTime()) {
-            $bacsFeature = false;
-        }
 
         $includeJudoWebpay = false;
         $unpaidReason = $policy->getUnpaidReason();
@@ -1143,7 +1138,7 @@ class UserController extends BaseController
             Policy::UNPAID_JUDO_PAYMENT_MISSING,
         ])) {
             $includeJudoWebpay = true;
-        } elseif (!$policy->canPaymentBeMadeInTime() && in_array($unpaidReason, [
+        } elseif (!$policy->canBacsPaymentBeMadeInTime() && in_array($unpaidReason, [
             Policy::UNPAID_BACS_MANDATE_INVALID,
             Policy::UNPAID_BACS_PAYMENT_FAILED,
             Policy::UNPAID_BACS_PAYMENT_MISSING,
@@ -1293,7 +1288,7 @@ class UserController extends BaseController
         }
         // we need enough time for the bacs to be billed + reverse payment to be notified + 1 day internal processing
         // or no point in swapping to bacs
-        if ($bacsFeature && $policy->canPaymentBeMadeInTime()) {
+        if ($bacsFeature && $policy->canBacsPaymentBeMadeInTime()) {
             $bacsFeature = false;
         }
 

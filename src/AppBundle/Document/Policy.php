@@ -4901,16 +4901,14 @@ abstract class Policy
         return false;
     }
 
-    public function canPaymentBeMadeInTime(\DateTime $date = null)
+    public function canBacsPaymentBeMadeInTime(\DateTime $date = null)
     {
         if (!$date) {
             $date = new \DateTime();
         }
 
         $expirationDate = $this->getCurrentOrPreviousBusinessDay($this->getPolicyExpirationDate());
-        if ($this->getUser()->hasBacsPaymentMethod()) {
-            $expirationDate = static::subBusinessDays($expirationDate, BacsPayment::DAYS_REVERSE + 1);
-        }
+        $expirationDate = static::subBusinessDays($expirationDate, BacsPayment::DAYS_REVERSE + 1);
 
         //print $date->format(\DateTime::ATOM);
         //print $expirationDate->format(\DateTime::ATOM);
