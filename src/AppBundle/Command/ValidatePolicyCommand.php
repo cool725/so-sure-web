@@ -364,12 +364,16 @@ class ValidatePolicyCommand extends BaseCommand
                 }
             }
 
+            $allowedVariance = 0;
             // allow up to 1 month difference for non-active policies
-            $allowedVariance = Salva::MONTHLY_TOTAL_COMMISSION - 0.01;
-            if ((!$policy->isActive(true) &&
-                $policy->hasCorrectCommissionPayments($data['validateDate'], $allowedVariance) === false) ||
-                ($policy->isActive(true) && $policy->hasCorrectCommissionPayments($data['validateDate']) === false)
-            ) {
+            if (!$policy->isActive(true)) {
+                $allowedVariance = Salva::MONTHLY_TOTAL_COMMISSION - 0.01;
+            }
+
+            // depending on when the chargeback occurs, we may or may not want to exclude that amount
+            // but if they both don't match, then its likely to be a problem
+            if ($policy->hasCorrectCommissionPayments($data['validateDate'], $allowedVariance) === false &&
+                $policy->hasCorrectCommissionPayments($data['validateDate'], $allowedVariance, true) === false) {
                 // Ignore a couple of policies that should have been cancelled unpaid, but went to expired
                 if (!in_array($policy->getId(), Salva::$commissionValidationExclusions)) {
                     $this->header($policy, $policies, $lines);

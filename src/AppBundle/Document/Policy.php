@@ -4262,7 +4262,7 @@ abstract class Policy
             // 4 payment retries - 7, 14, 21, 28; should be 30 days unpaid before cancellation
             // 2 days diff + 2 on either side
             $cancellationDate = $cancellationDate->sub(new \DateInterval('P4D'));
-            if ($cancellationDate >= $date) {
+            if ($cancellationDate <= $date) {
                 return null;
             }
         }
@@ -4629,15 +4629,20 @@ abstract class Policy
         return $expectedCommission;
     }
 
-    public function hasCorrectCommissionPayments(\DateTime $date = null, $allowedVariance = 0)
-    {
+    public function hasCorrectCommissionPayments(
+        \DateTime $date = null,
+        $allowedVariance = 0,
+        $excludeChargebacks = false
+    ) {
         $expectedCommission = $this->getExpectedCommission($date);
 
-        // If there are chargebacks, exclude from the expected commission
-        $excludedPayments = $this->getPaymentsByTypes([ChargebackPayment::class, BacsIndemnityPayment::class]);
-        $excludedPaymentsTotal = Payment::sumPayments($excludedPayments, false);
-        // as refunds, should be negative amount, so + is correct operation
-        $expectedCommission = $expectedCommission + $excludedPaymentsTotal['totalCommission'];
+        if ($excludeChargebacks) {
+            // If there are chargebacks, exclude from the expected commission
+            $excludedPayments = $this->getPaymentsByTypes([ChargebackPayment::class, BacsIndemnityPayment::class]);
+            $excludedPaymentsTotal = Payment::sumPayments($excludedPayments, false);
+            // as refunds, should be negative amount, so + is correct operation
+            $expectedCommission = $expectedCommission + $excludedPaymentsTotal['totalCommission'];
+        }
 
         /*
         print $numPayments . PHP_EOL;
