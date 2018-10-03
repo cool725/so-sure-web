@@ -4255,16 +4255,18 @@ abstract class Policy
 
         $scheduledPayments = $this->getAllScheduledPayments(ScheduledPayment::STATUS_SCHEDULED);
 
-        // once all the payment rescheduling has finished, there is a period of a few days where the scheduled
-        // payments will not match; if this is the case, there is no need to alert on it
-        $cancellationDate = clone $this->getPolicyExpirationDate($date);
-        // 4 payment retries - 7, 14, 21, 28; should be 30 days unpaid before cancellation
-        // 2 days diff + 2 on either side
-        $cancellationDate = $cancellationDate->sub(new \DateInterval('P4D'));
-        if ($cancellationDate >= $date) {
-            return null;
+        if ($skipIfAlmostCancelled) {
+            // once all the payment rescheduling has finished, there is a period of a few days where the scheduled
+            // payments will not match; if this is the case, there is no need to alert on it
+            $cancellationDate = clone $this->getPolicyExpirationDate($date);
+            // 4 payment retries - 7, 14, 21, 28; should be 30 days unpaid before cancellation
+            // 2 days diff + 2 on either side
+            $cancellationDate = $cancellationDate->sub(new \DateInterval('P4D'));
+            if ($cancellationDate >= $date) {
+                return null;
+            }
         }
-
+        
         // All Scheduled day must match the billing day
         if ($verifyBillingDay) {
             foreach ($scheduledPayments as $scheduledPayment) {
