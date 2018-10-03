@@ -101,6 +101,7 @@ $(function(){
         });
     }
 
+    // If reported to the police - show extra fields
     $('#claim_theftloss_form_reportType').on('change', function(e) {
         if ($(this).val() == 'police-station') {
             $('#report-to-police').slideDown();

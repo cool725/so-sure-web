@@ -95,4 +95,12 @@ $(function(){
         });
     }
 
+    // If damage type claim other - show extra field
+    $('#claim_damage_form_typeDetails').on('change', function(e) {
+        if ($(this).val() == 'other') {
+            $('#other-damage').slideDown();
+        } else {
+            $('#other-damage').slideUp();
+        }
+    });
 });
