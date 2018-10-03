@@ -325,7 +325,11 @@ class ValidatePolicyCommand extends BaseCommand
                 $this->header($policy, $policies, $lines);
                 $lines[] = $this->failureStatusMessage($policy, $data['prefix'], $data['validateDate']);
             }
-            if ($policy->arePolicyScheduledPaymentsCorrect(true, $data['validateDate']) === false) {
+            if ($policy->arePolicyScheduledPaymentsCorrect(
+                true,
+                $data['validateDate'],
+                true
+            ) === false) {
                 $this->header($policy, $policies, $lines);
                 if ($data['adjustScheduledPayments']) {
                     /** @var PolicyService $policyService */
