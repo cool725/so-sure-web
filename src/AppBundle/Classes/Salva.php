@@ -57,6 +57,10 @@ class Salva
         '5ab17d0754e50f610f289ab5', // refund was provided
         '5a0421dec502d01a414f5b53', // commission diff agreed w/salva
         '5a8f031076428e7c10473c47', // accidental refund
+        '59b9741d96a9627b626c8a71', // policy not fully paid
+        '59c0bfe778537e2c68430cd7', // policy not fully paid
+        '59327f0687fda67ea6788977', // debt collector did not fully collect
+        '59d47a1496a9626f3c3b8650', // unresolved claim on policy - ignore
     ];
 
     public function sumBrokerFee($months, $includeFinalCommission)
