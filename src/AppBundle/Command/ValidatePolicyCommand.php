@@ -330,8 +330,8 @@ class ValidatePolicyCommand extends BaseCommand
                 $data['validateDate'],
                 true
             ) === false) {
-                $this->header($policy, $policies, $lines);
                 if ($data['adjustScheduledPayments']) {
+                    $this->header($policy, $policies, $lines);
                     /** @var PolicyService $policyService */
                     $policyService = $this->getContainer()->get('app.policy');
                     if ($policyService->adjustScheduledPayments($policy)) {
@@ -359,6 +359,7 @@ class ValidatePolicyCommand extends BaseCommand
                     $lines[] = $this->failureScheduledPaymentsMessage($policy, $data['validateDate']);
                     */
                 } else {
+                    $this->header($policy, $policies, $lines);
                     $lines[] = sprintf(
                         'WARNING!! Incorrect scheduled payments for policy %s',
                         $policy->getPolicyNumber()
