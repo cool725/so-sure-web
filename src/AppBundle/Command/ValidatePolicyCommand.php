@@ -350,11 +350,14 @@ class ValidatePolicyCommand extends BaseCommand
                     $policy->getUser()->getBacsPaymentMethod() &&
                     $policy->getUser()->getBacsPaymentMethod()->getBankAccount() &&
                     $policy->getUser()->getBacsPaymentMethod()->getBankAccount()->isMandateInvalid()) {
+                    // If the mandate is invalid, we can just ignore - user will be prompted to resolve the issue
+                    /*
                     $lines[] = sprintf(
                         'Invalid BACS Mandate. Can ignore incorrect scheduled payments for policy %s',
                         $policy->getPolicyNumber()
                     );
                     $lines[] = $this->failureScheduledPaymentsMessage($policy, $data['validateDate']);
+                    */
                 } else {
                     $lines[] = sprintf(
                         'WARNING!! Incorrect scheduled payments for policy %s',
