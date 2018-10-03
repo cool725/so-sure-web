@@ -2,7 +2,7 @@
 
 .navbar-so-sure {
     // TODO: When we switch to gradient hero adjust
-    // @include blue-gradient;
+    @include blue-gradient;
 
     .navbar-nav {
         transition: none;
@@ -23,6 +23,13 @@
                 }
             }
         }
+    }
+}
+
+// Pages we have the same gradient for the 'hero' add here
+.home {
+    .navbar-so-sure {
+        background-image: none;
     }
 }
 
@@ -81,10 +88,13 @@
 
 
 // Page specific
+//
+
+// Hide box-shadow
 .quote,
 .purchase {
 
-    .navbar {
+    .navbar-so-sure {
         @include media-breakpoint-up(lg) {
             box-shadow: none;
         }
