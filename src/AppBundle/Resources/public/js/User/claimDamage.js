@@ -99,8 +99,10 @@ $(function(){
     $('#claim_damage_form_typeDetails').on('change', function(e) {
         if ($(this).val() == 'other') {
             $('#other-damage').slideDown();
+            $('#claim_damage_form_typeDetailsOther').addClass('required');
         } else {
             $('#other-damage').slideUp();
+            $('#claim_damage_form_typeDetailsOther').removeClass('required');
         }
     });
 });
