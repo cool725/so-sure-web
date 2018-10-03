@@ -662,6 +662,7 @@ abstract class Policy
         }
 
         return array_filter($payments, function ($payment) {
+            /** @var Payment $payment */
             return $payment->isSuccess();
         });
     }

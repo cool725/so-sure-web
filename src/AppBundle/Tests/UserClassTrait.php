@@ -239,8 +239,14 @@ trait UserClassTrait
         return $policy;
     }
 
-    public static function addJudoPayPayment($judopay, $policy, $date = null, $monthly = true, $adjustment = 0)
-    {
+    public static function addJudoPayPayment(
+        $judopay,
+        $policy,
+        $date = null,
+        $monthly = true,
+        $adjustment = 0,
+        $actual = true
+    ) {
         if ($monthly) {
             $policy->setPremiumInstallments(12);
             $premium = $policy->getPremium()->getMonthlyPremiumPrice(null, $date);
@@ -256,9 +262,13 @@ trait UserClassTrait
             $premium = number_format(round($premium, 2), 2, ".", "");
         }
 
-        $details = self::runJudoPayPayment($judopay, $policy->getUser(), $policy, $premium);
-        $receiptId = $details['receiptId'];
-        self::addPayment($policy, $premium, $commission, $receiptId);
+        if ($actual) {
+            $details = self::runJudoPayPayment($judopay, $policy->getUser(), $policy, $premium);
+            $receiptId = $details['receiptId'];
+        } else {
+            $receiptId = random_int(1, 999999);
+        }
+        self::addPayment($policy, $premium, $commission, $receiptId, $date);
     }
 
     public static function addBacsPayPayment($policy, $date = null, $monthly = true, $manual = true)

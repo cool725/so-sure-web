@@ -2,9 +2,11 @@
 
 namespace AppBundle\Tests\Controller;
 
+use AppBundle\Classes\Salva;
 use AppBundle\Document\BankAccount;
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\Payment\BacsPayment;
+use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Document\PhonePolicy;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\User;
@@ -515,9 +517,9 @@ class UserControllerTest extends BaseControllerTest
         self::verifyResponse(500);
     }
 
-    public function testUserUnpaidPolicyMandatePending()
+    public function testUserUnpaidPolicyBacsMandatePending()
     {
-        $email = self::generateEmail('testUserUnpaidPolicyMandatePending', $this);
+        $email = self::generateEmail('testUserUnpaidPolicyBacsMandatePending', $this);
         $password = 'foo';
         $phone = self::getRandomPhone(self::$dm);
         $user = self::createUser(
@@ -550,9 +552,9 @@ class UserControllerTest extends BaseControllerTest
         $this->assertContains('Pending Direct Debit Setup', $crawler->html());
     }
 
-    public function testUserUnpaidPolicyMandateInvalid()
+    public function testUserUnpaidPolicyBacsMandateInvalid()
     {
-        $email = self::generateEmail('testUserUnpaidPolicyMandateInvalid', $this);
+        $email = self::generateEmail('testUserUnpaidPolicyBacsMandateInvalid', $this);
         $password = 'foo';
         $phone = self::getRandomPhone(self::$dm);
         $user = self::createUser(
@@ -595,9 +597,9 @@ class UserControllerTest extends BaseControllerTest
         $this->assertContains('Invalid Mandate', $crawler->html());
     }
 
-    public function testUserUnpaidPolicyPaymentPending()
+    public function testUserUnpaidPolicyBacsPaymentPending()
     {
-        $email = self::generateEmail('testUserUnpaidPolicyPaymentPending', $this);
+        $email = self::generateEmail('testUserUnpaidPolicyBacsPaymentPending', $this);
         $password = 'foo';
         $phone = self::getRandomPhone(self::$dm);
         $user = self::createUser(
@@ -630,9 +632,9 @@ class UserControllerTest extends BaseControllerTest
         $this->assertContains('Payment is processing', $crawler->html());
     }
 
-    public function testUserUnpaidPolicyPaymentFailed()
+    public function testUserUnpaidPolicyBacsPaymentFailed()
     {
-        $email = self::generateEmail('testUserUnpaidPolicyPaymentFailed', $this);
+        $email = self::generateEmail('testUserUnpaidPolicyBacsPaymentFailed', $this);
         $password = 'foo';
         $phone = self::getRandomPhone(self::$dm);
         $user = self::createUser(
@@ -697,9 +699,9 @@ class UserControllerTest extends BaseControllerTest
         $this->assertEquals(Policy::UNPAID_BACS_PAYMENT_PENDING, $updatedPolicy->getUnpaidReason());
     }
 
-    public function testUserUnpaidPolicyPaymentMissing()
+    public function testUserUnpaidPolicyBacsPaymentMissing()
     {
-        $email = self::generateEmail('testUserUnpaidPolicyPaymentMissing', $this);
+        $email = self::generateEmail('testUserUnpaidPolicyBacsPaymentMissing', $this);
         $password = 'foo';
         $phone = self::getRandomPhone(self::$dm);
         $user = self::createUser(
@@ -761,6 +763,202 @@ class UserControllerTest extends BaseControllerTest
         $updatedPolicy = $repo->find($policy->getId());
 
         $this->assertEquals(Policy::UNPAID_BACS_PAYMENT_PENDING, $updatedPolicy->getUnpaidReason());
+    }
+
+    public function testUserUnpaidPolicyJudoPaymentMissing()
+    {
+        $email = self::generateEmail('testUserUnpaidPolicyJudoPaymentMissing', $this);
+        $password = 'foo';
+        $phone = self::getRandomPhone(self::$dm);
+        $user = self::createUser(
+            self::$userManager,
+            $email,
+            $password,
+            $phone,
+            self::$dm
+        );
+        self::setPaymentMethod($user);
+        $oneMonthAgo = new \DateTime();
+        $oneMonthAgo = $oneMonthAgo->sub(new \DateInterval('P1M'));
+        $twoMonthsAgo = new \DateTime();
+        $twoMonthsAgo = $twoMonthsAgo->sub(new \DateInterval('P2M'));
+        $policy = self::initPolicy($user, self::$dm, $phone, $twoMonthsAgo, true, true);
+        $policy->setStatus(Policy::STATUS_UNPAID);
+        self::$dm->flush();
+
+        $this->assertEquals(Policy::UNPAID_JUDO_PAYMENT_MISSING, $policy->getUnpaidReason());
+        $this->assertFalse($policy->getUser()->hasActivePolicy());
+
+        $crawler = $this->login($email, $password, 'user/unpaid');
+
+        $this->validateUnpaidJudoForm($crawler, true);
+        $this->validateUnpaidRescheduleBacsForm($crawler, false);
+        $this->validateUnpaidBacsSetupLink($crawler, false);
+        $this->validateUnpaidBacsUpdateLink($crawler, false);
+        $this->assertContains('Unpaid Policy', $crawler->html());
+
+        /*
+         * TODO: expiration date is set to today - seems like new payment is not being applied
+        static::addPayment(
+            $policy,
+            $policy->getPremium()->getMonthlyPremiumPrice(),
+            Salva::MONTHLY_TOTAL_COMMISSION,
+            null,
+            $oneMonthAgo
+        );
+        self::$dm->flush();
+
+        $dm = $this->getDocumentManager(true);
+        $repo = $dm->getRepository(Policy::class);
+        $updatedPolicy = $repo->find($policy->getId());
+
+        $this->assertEquals(Policy::UNPAID_JUDO_PAYMENT_MISSING, $updatedPolicy->getUnpaidReason());
+        $this->logout();
+        $crawler = $this->login($email, $password, 'user/unpaid');
+print $crawler->html();
+print $updatedPolicy->getPolicyExpirationDate()->format(\DateTime::ATOM);
+        $this->validateUnpaidJudoForm($crawler, true);
+        $this->validateUnpaidRescheduleBacsForm($crawler, false);
+        $this->validateUnpaidBacsSetupLink($crawler, true);
+        $this->validateUnpaidBacsUpdateLink($crawler, false);
+        $this->assertContains('Unpaid Policy', $crawler->html());
+        */
+    }
+
+    public function testUserUnpaidPolicyJudoPaymentFailed()
+    {
+        $email = self::generateEmail('testUserUnpaidPolicyJudoPaymentFailed', $this);
+        $password = 'foo';
+        $phone = self::getRandomPhone(self::$dm);
+        $user = self::createUser(
+            self::$userManager,
+            $email,
+            $password,
+            $phone,
+            self::$dm
+        );
+        self::setPaymentMethod($user);
+        $oneMonthAgo = new \DateTime();
+        $oneMonthAgo = $oneMonthAgo->sub(new \DateInterval('P1M'));
+        $twoMonthsAgo = new \DateTime();
+        $twoMonthsAgo = $twoMonthsAgo->sub(new \DateInterval('P2M'));
+        $policy = self::initPolicy($user, self::$dm, $phone, $twoMonthsAgo, true, true);
+        $policy->setStatus(Policy::STATUS_UNPAID);
+        static::addPayment(
+            $policy,
+            $policy->getPremium()->getMonthlyPremiumPrice(),
+            Salva::MONTHLY_TOTAL_COMMISSION,
+            null,
+            $oneMonthAgo,
+            JudoPayment::RESULT_DECLINED
+        );
+        self::$dm->flush();
+
+        $this->assertEquals(Policy::UNPAID_JUDO_PAYMENT_FAILED, $policy->getUnpaidReason());
+        $this->assertFalse($policy->getUser()->hasActivePolicy());
+
+        $crawler = $this->login($email, $password, 'user/unpaid');
+
+        $this->validateUnpaidJudoForm($crawler, true);
+        $this->validateUnpaidRescheduleBacsForm($crawler, false);
+        $this->validateUnpaidBacsSetupLink($crawler, false);
+        $this->validateUnpaidBacsUpdateLink($crawler, false);
+        $this->assertContains('Unpaid Policy', $crawler->html());
+
+        /*
+         * TODO: expiration date is set to today - seems like new payment is not being applied
+        static::addPayment(
+            $policy,
+            $policy->getPremium()->getMonthlyPremiumPrice(),
+            Salva::MONTHLY_TOTAL_COMMISSION,
+            null,
+            $oneMonthAgo
+        );
+        self::$dm->flush();
+
+        $dm = $this->getDocumentManager(true);
+        $repo = $dm->getRepository(Policy::class);
+        $updatedPolicy = $repo->find($policy->getId());
+
+        $this->assertEquals(Policy::UNPAID_JUDO_PAYMENT_MISSING, $updatedPolicy->getUnpaidReason());
+        $this->logout();
+        $crawler = $this->login($email, $password, 'user/unpaid');
+print $crawler->html();
+print $updatedPolicy->getPolicyExpirationDate()->format(\DateTime::ATOM);
+        $this->validateUnpaidJudoForm($crawler, true);
+        $this->validateUnpaidRescheduleBacsForm($crawler, false);
+        $this->validateUnpaidBacsSetupLink($crawler, true);
+        $this->validateUnpaidBacsUpdateLink($crawler, false);
+        $this->assertContains('Unpaid Policy', $crawler->html());
+        */
+    }
+
+    public function testUserUnpaidPolicyJudoCardExpired()
+    {
+        $email = self::generateEmail('testUserUnpaidPolicyJudoCardExpired', $this);
+        $password = 'foo';
+        $phone = self::getRandomPhone(self::$dm);
+        $user = self::createUser(
+            self::$userManager,
+            $email,
+            $password,
+            $phone,
+            self::$dm
+        );
+        self::setPaymentMethod($user, '0116');
+        $oneMonthAgo = new \DateTime();
+        $oneMonthAgo = $oneMonthAgo->sub(new \DateInterval('P1M'));
+        $twoMonthsAgo = new \DateTime();
+        $twoMonthsAgo = $twoMonthsAgo->sub(new \DateInterval('P2M'));
+        $policy = self::initPolicy($user, self::$dm, $phone, $twoMonthsAgo, true, true);
+        $policy->setStatus(Policy::STATUS_UNPAID);
+        static::addPayment(
+            $policy,
+            $policy->getPremium()->getMonthlyPremiumPrice(),
+            Salva::MONTHLY_TOTAL_COMMISSION,
+            null,
+            $oneMonthAgo,
+            JudoPayment::RESULT_DECLINED
+        );
+        self::$dm->flush();
+
+        $this->assertEquals(Policy::UNPAID_JUDO_CARD_EXPIRED, $policy->getUnpaidReason());
+        $this->assertFalse($policy->getUser()->hasActivePolicy());
+
+        $crawler = $this->login($email, $password, 'user/unpaid');
+
+        $this->validateUnpaidJudoForm($crawler, true);
+        $this->validateUnpaidRescheduleBacsForm($crawler, false);
+        $this->validateUnpaidBacsSetupLink($crawler, false);
+        $this->validateUnpaidBacsUpdateLink($crawler, false);
+        $this->assertContains('Unpaid Policy', $crawler->html());
+
+        /*
+         * TODO: expiration date is set to today - seems like new payment is not being applied
+        static::addPayment(
+            $policy,
+            $policy->getPremium()->getMonthlyPremiumPrice(),
+            Salva::MONTHLY_TOTAL_COMMISSION,
+            null,
+            $oneMonthAgo
+        );
+        self::$dm->flush();
+
+        $dm = $this->getDocumentManager(true);
+        $repo = $dm->getRepository(Policy::class);
+        $updatedPolicy = $repo->find($policy->getId());
+
+        $this->assertEquals(Policy::UNPAID_JUDO_PAYMENT_MISSING, $updatedPolicy->getUnpaidReason());
+        $this->logout();
+        $crawler = $this->login($email, $password, 'user/unpaid');
+print $crawler->html();
+print $updatedPolicy->getPolicyExpirationDate()->format(\DateTime::ATOM);
+        $this->validateUnpaidJudoForm($crawler, true);
+        $this->validateUnpaidRescheduleBacsForm($crawler, false);
+        $this->validateUnpaidBacsSetupLink($crawler, true);
+        $this->validateUnpaidBacsUpdateLink($crawler, false);
+        $this->assertContains('Unpaid Policy', $crawler->html());
+        */
     }
 
     public function testUserUnpaidPolicyPaymentDetails()
