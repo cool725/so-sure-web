@@ -4620,7 +4620,7 @@ abstract class Policy
 
         // If there are chargebacks, exclude from the expected commission
         $excludedPayments = $this->getPaymentsByTypes([ChargebackPayment::class, BacsIndemnityPayment::class]);
-        $excludedPaymentsTotal = Payment::sumPayments($excludedPayments);
+        $excludedPaymentsTotal = Payment::sumPayments($excludedPayments, false);
         // as refunds, should be negative amount, so + is correct operation
         $expectedCommission = $expectedCommission + $excludedPaymentsTotal['totalCommission'];
 
