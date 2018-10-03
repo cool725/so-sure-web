@@ -285,6 +285,7 @@ class BICommand extends BaseCommand
             '"Policy Purchase Time"',
             '"Past Due Amount (Bad Debt Only)"',
             '"Has previous policy"',
+            '"Payment Method"',
         ]);
         foreach ($policies as $policy) {
             /** @var Policy $policy */
@@ -338,6 +339,10 @@ class BICommand extends BaseCommand
                 sprintf('"%s"', $policy->getStart()->format('H:i')),
                 sprintf('"%0.2f"', $policy->getBadDebtAmount()),
                 sprintf('"%s"', $policy->hasPreviousPolicy() ? 'yes' : 'no'),
+                sprintf(
+                    '"%s"',
+                    $policy->getUser()->hasPaymentMethod() ? $policy->getUser()->getPaymentMethod()->getType() : null
+                ),
             ]);
         }
         if (!$skipS3) {
@@ -452,7 +457,13 @@ class BICommand extends BaseCommand
     public function uploadS3($data, $filename)
     {
         $tmpFile = sprintf('%s/%s', sys_get_temp_dir(), $filename);
-        file_put_contents($tmpFile, $data);
+
+        $result = file_put_contents($tmpFile, $data);
+
+        if (!$result) {
+            throw new \Exception($filename . ' could not be processed into a tmp file.');
+        }
+
         $s3Key = sprintf('%s/bi/%s', $this->getEnvironment(), $filename);
 
         $result = $this->getS3()->putObject(array(

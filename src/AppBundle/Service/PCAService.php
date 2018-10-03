@@ -387,19 +387,7 @@ class PCAService
      */
     public function findBankAccount($sortCode, $accountNumber)
     {
-        $data = [
-            'Key' => $this->apiKey,
-            'AccountNumber' => $accountNumber,
-            'SortCode' => $sortCode,
-        ];
-        $url = sprintf("%s?%s", self::BANK_ACCOUNT_URL, http_build_query($data));
-
-        $client = new Client();
-        $res = $client->request('GET', $url, ['connect_timeout' => self::TIMEOUT, 'timeout' => self::TIMEOUT]);
-
-        $body = (string) $res->getBody();
-
-        $data = json_decode($body, true)[0];
+        $data = $this->findBankAccountRequest($sortCode, $accountNumber);
 
         // @codingStandardsIgnoreStart
         // {"IsCorrect":"True","IsDirectDebitCapable":"True","StatusInformation":"CautiousOK","CorrectedSortCode":"000099","CorrectedAccountNumber":"12345678","IBAN":"GB27NWBK00009912345678","Bank":"TEST BANK PLC PLC","BankBIC":"NWBKGB21","Branch":"Worcester","BranchBIC":"18R","ContactAddressLine1":"2 High Street","ContactAddressLine2":"Smallville","ContactPostTown":"Worcester","ContactPostcode":"WR2 6NJ","ContactPhone":"01234 456789","ContactFax":"","FasterPaymentsSupported":"False","CHAPSSupported":"True"}
@@ -430,6 +418,30 @@ class PCAService
         $bankAccount->setBankAddress($address);
 
         return $bankAccount;
+    }
+
+    /**
+     * Perform the http request to PCA Bank Account to validate sortcode/account number
+     *
+     * @param string $sortCode
+     * @param string $accountNumber
+     * @return String
+     */
+    public function findBankAccountRequest($sortCode, $accountNumber)
+    {
+        $data = [
+            'Key' => $this->apiKey,
+            'AccountNumber' => $accountNumber,
+            'SortCode' => $sortCode,
+        ];
+        $url = sprintf("%s?%s", self::BANK_ACCOUNT_URL, http_build_query($data));
+
+        $client = new Client();
+        $res = $client->request('GET', $url, ['connect_timeout' => self::TIMEOUT, 'timeout' => self::TIMEOUT]);
+
+        $body = (string) $res->getBody();
+
+        return json_decode($body, true)[0];
     }
 
     /**
