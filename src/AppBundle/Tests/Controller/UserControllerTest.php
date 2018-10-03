@@ -802,7 +802,7 @@ class UserControllerTest extends BaseControllerTest
 
     public function testUserUnpaidPolicyJudoPaymentMissingBacsLink()
     {
-        $email = self::generateEmail('testUserUnpaidPolicyJudoPaymentMissingNoBacsLink', $this);
+        $email = self::generateEmail('testUserUnpaidPolicyJudoPaymentMissingBacsLink', $this);
         $password = 'foo';
         $phone = self::getRandomPhone(self::$dm);
         $user = self::createUser(
@@ -892,10 +892,20 @@ class UserControllerTest extends BaseControllerTest
             self::$dm
         );
         self::setPaymentMethod($user);
+        $oneMonthAgo = new \DateTime();
+        $oneMonthAgo = $oneMonthAgo->sub(new \DateInterval('P1M'));
         $oneMonthTwoWeeksAgo = new \DateTime();
         $oneMonthTwoWeeksAgo = $oneMonthTwoWeeksAgo->sub(new \DateInterval('P45D'));
         $policy = self::initPolicy($user, self::$dm, $phone, $oneMonthTwoWeeksAgo, true, true);
         $policy->setStatus(Policy::STATUS_UNPAID);
+        static::addPayment(
+            $policy,
+            $policy->getPremium()->getMonthlyPremiumPrice(),
+            Salva::MONTHLY_TOTAL_COMMISSION,
+            null,
+            $oneMonthAgo,
+            JudoPayment::RESULT_DECLINED
+        );
         self::$dm->flush();
 
         $this->assertEquals(Policy::UNPAID_JUDO_PAYMENT_FAILED, $policy->getUnpaidReason());
