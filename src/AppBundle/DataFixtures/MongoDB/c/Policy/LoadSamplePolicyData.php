@@ -75,8 +75,6 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
     {
         $this->faker = Faker\Factory::create('en_GB');
 
-        //$this->createBacsFiles($manager);
-
         $users = $this->newUsers($manager, 350);
         $unpaid = $this->newUsers($manager, 10);
         $unpaidDiscount = $this->newUsers($manager, 10);
@@ -163,8 +161,6 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
                 $this->addConnections($manager, $user, $fullyExpiredUsers);
             }
         }
-
-        //$this->updateBacsFiles($manager);
 
         $phones = [];
         foreach ($preExpireYearlyUsers as $user) {
@@ -686,7 +682,6 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
 
         $bacs = $user->hasBacsPaymentMethod() && count($user->getValidPolicies(true)) < 1;
 
-        $accessPayRepo = $manager->getRepository(AccessPayFile::class);
         $paymentDate = clone $startDate;
         if ($paid === true || ($paid === null && random_int(0, 1) == 0)) {
             if ($bacs) {
@@ -854,9 +849,6 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
 
     private function newBacsPayment(ObjectManager $manager, User $user, $amount, $totalComission, $paymentDate)
     {
-        $accesspayRepo = $manager->getRepository(AccessPayFile::class);
-        $inputFileRepo = $manager->getRepository(BacsReportInputFile::class);
-
         $serialNumber = $paymentDate->format("ymd");
         $submissionFile = null;
         $inputFile = null;
