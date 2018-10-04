@@ -4,6 +4,7 @@ namespace AppBundle\Controller;
 
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\Payment\BacsPayment;
+use AppBundle\Document\ScheduledPayment;
 use AppBundle\Security\UserVoter;
 use AppBundle\Security\ClaimVoter;
 use AppBundle\Service\BacsService;
@@ -14,6 +15,7 @@ use AppBundle\Service\SequenceService;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -1101,12 +1103,22 @@ class UserController extends BaseController
         }
 
         $form = $this->createFormBuilder()
+            ->add('amount', HiddenType::class, ['data' => $amount])
             ->add('reschedule', SubmitType::class, array(
                 'label' => sprintf("Please take £%0.2f from my account", $amount)
             ))
             ->getForm();
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
+            $formAmount = $form->getData()['amount'];
+            if (!$this->areEqualToTwoDp($formAmount, $amount)) {
+                throw new \Exception(sprintf(
+                    'User requested bacs payment amount changed inbetween form submission (%0.2f/%0.2f',
+                    $formAmount,
+                    $amount
+                ));
+            }
+
             $now = new \DateTime();
             $notes = sprintf(
                 'User manually confirmed payment for £%0.2f on %s from ip: %s',
@@ -1114,9 +1126,11 @@ class UserController extends BaseController
                 $now->format(\DateTime::ATOM),
                 $request->getClientIp()
             );
+
             /** @var BacsService $bacsService */
             $bacsService = $this->get('app.bacs');
             $bacsService->bacsPayment($policy, $notes, $amount);
+
             $this->getManager()->flush();
         }
 
