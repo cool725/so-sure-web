@@ -36,6 +36,11 @@
         }
     }
 
+    .updated-text {
+        position: relative;
+        z-index: 6;
+    }
+
     &__partner-logo {
         position: relative;
         z-index: 4;
