@@ -128,7 +128,7 @@ class BacsService
     /** @var EventDispatcherInterface */
     protected $dispatcher;
 
-    public function setDispatcher(EventDispatcherInterface $dispatcher = null)
+    public function setDispatcher($dispatcher)
     {
         $this->dispatcher = $dispatcher;
     }
