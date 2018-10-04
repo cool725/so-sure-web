@@ -1303,6 +1303,7 @@ class BacsService
     public function generatePaymentsDebits(
         $prefix,
         \DateTime $date,
+        &$metadata,
         $update = true
     ) {
         // get all scheduled payments for bacs that should occur within the next 3 business days in order to allow

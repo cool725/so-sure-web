@@ -2,6 +2,7 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Document\CurrencyTrait;
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\Payment\BacsPayment;
 use AppBundle\Document\ScheduledPayment;
@@ -104,6 +105,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 class UserController extends BaseController
 {
     use DateTrait;
+    use CurrencyTrait;
 
     /**
      * @Route("", name="user_home")
