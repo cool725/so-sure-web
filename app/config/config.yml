@@ -1042,6 +1042,7 @@ nelmio_security:
                 - https://www.accountkit.com
                 - https://www.glassdoor.co.uk
                 - http://via.placeholder.com
+                - https://developer.starlingbank.com
                 - 'data:'
                 # https://en.wikipedia.org/wiki/List_of_Google_domains
                 - https://www.google.com
