@@ -12,6 +12,8 @@
 		   <div style="font-size: 14px; text-align: center;"><span style="font-family:arial,helvetica neue,helvetica,sans-serif">
 				Your monthly payment of £{{ policy.premium.monthlyPremiumPrice }} for your {{ policy.phone }} was declined.
 				<br><br>
+				   Please login to your account and request that your payment is rescheduled.
+				<br><br>
                 Your policy will be canceled in {{ policy.policyExpirationDateDays }} days if you fail to make payment.
 				<br><br>
 			    If you have any questions, please don't hesitate to <a href="mailto:support@wearesosure.com?subject=I%20have%20a%20question" target="_blank"><span style="color:#3399ff">contact us</span></a>.
@@ -19,4 +21,5 @@
 		   </div>
 		</div>
 	{{ macros.end_table() }}
+    {{ macros.email_button_table(branch_payment_details_url, "Request payment rescheduling", "Request payment rescheduling")}}
 {% endblock %}

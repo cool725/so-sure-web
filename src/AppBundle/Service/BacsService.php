@@ -20,6 +20,7 @@ use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Policy;
 use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\User;
+use AppBundle\Event\PolicyEvent;
 use AppBundle\Repository\BacsPaymentRepository;
 use AppBundle\Repository\PaymentRepository;
 use AppBundle\Repository\UserRepository;
@@ -34,6 +35,7 @@ use Psr\Log\LoggerInterface;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use DOMDocument;
 use DOMXPath;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Templating\EngineInterface;
 
@@ -123,20 +125,29 @@ class BacsService
     /** @var MailerService */
     protected $mailer;
 
+    /** @var EventDispatcherInterface */
+    protected $dispatcher;
+
+    public function setDispatcher(EventDispatcherInterface $dispatcher = null)
+    {
+        $this->dispatcher = $dispatcher;
+    }
+
     /**
-     * @param DocumentManager   $dm
-     * @param LoggerInterface   $logger
-     * @param S3Client          $s3
-     * @param string            $fileEncryptionPassword
-     * @param string            $environment
-     * @param MailerService     $mailerService
-     * @param Client            $redis
-     * @param PaymentService    $paymentService
-     * @param LoggableGenerator $snappyPdf
-     * @param EngineInterface   $templating
-     * @param SequenceService   $sequenceService
-     * @param array             $accessPay
-     * @param MailerService     $mailer
+     * @param DocumentManager          $dm
+     * @param LoggerInterface          $logger
+     * @param S3Client                 $s3
+     * @param string                   $fileEncryptionPassword
+     * @param string                   $environment
+     * @param MailerService            $mailerService
+     * @param Client                   $redis
+     * @param PaymentService           $paymentService
+     * @param LoggableGenerator        $snappyPdf
+     * @param EngineInterface          $templating
+     * @param SequenceService          $sequenceService
+     * @param array                    $accessPay
+     * @param MailerService            $mailer
+     * @param EventDispatcherInterface $dispatcher
      */
     public function __construct(
         DocumentManager $dm,
@@ -151,7 +162,8 @@ class BacsService
         EngineInterface $templating,
         SequenceService $sequenceService,
         array $accessPay,
-        MailerService $mailer
+        MailerService $mailer,
+        EventDispatcherInterface $dispatcher
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
@@ -169,6 +181,7 @@ class BacsService
         $this->accessPayPassword = $accessPay[2];
         $this->accessPayKeyFile = $accessPay[3];
         $this->mailer = $mailer;
+        $this->dispatcher = $dispatcher;
     }
 
     /**
@@ -517,15 +530,19 @@ class BacsService
             $foundPayments = 0;
             foreach ($submittedPayments as $submittedPayment) {
                 /** @var BacsPayment $submittedPayment */
-                if ($submittedPayment->getPolicy()->getUser()->getId() == $user->getId()) {
+                $policy = $submittedPayment->getPolicy();
+                if ($policy->getUser()->getId() == $user->getId()) {
                     $foundPayments++;
                     $submittedPayment->setStatus(BacsPayment::STATUS_FAILURE);
                     // Set policy as unpaid if there's a payment failure
-                    if (!$submittedPayment->getPolicy()->isPolicyPaidToDate() &&
-                        $submittedPayment->getPolicy()->getStatus() == Policy::STATUS_ACTIVE) {
-                        $submittedPayment->getPolicy()->setStatus(Policy::STATUS_UNPAID);
+                    if (!$policy->isPolicyPaidToDate() && $policy->getStatus() == Policy::STATUS_ACTIVE) {
+                        $policy->setStatus(Policy::STATUS_UNPAID);
                     }
-                    // TODO: Email user
+                    $this->dm->flush(null, array('w' => 'majority', 'j' => true));
+                    $this->triggerPolicyEvent($policy, PolicyEvent::EVENT_UNPAID);
+
+                    $this->failedPaymentEmail($policy);
+
                     $results['failed-payments']++;
                     $days = $submittedPayment->getDate()->diff($originalProcessingDate);
                     $results['details'][$reference] = [$submittedPayment->getId() => $days->days];
@@ -537,8 +554,6 @@ class BacsService
                             $days->days
                         ));
                     }
-
-                    $this->dm->flush();
                 }
             }
 
@@ -550,24 +565,26 @@ class BacsService
             } elseif ($foundPayments > 1) {
                 $this->logger->error(sprintf('Failed %d payments for user %s', $foundPayments, $user->getId()));
             }
-
-            if ($foundPayments > 0) {
-                // TODO: move mandate from user to policy
-                $policy = $user->getLatestPolicy();
-                if ($policy) {
-                    $this->failedPaymentEmail($policy);
-                } else {
-                    $this->logger->warning(sprintf(
-                        'User %s does not have a latest policy (cancelled?). Skipping failed payment email',
-                        $user->getId()
-                    ));
-                }
-            }
         }
 
         $this->approvePayments($currentProcessingDate);
 
         return $results;
+    }
+
+    private function triggerPolicyEvent($policy, $event)
+    {
+        if (!$policy) {
+            return;
+        }
+
+        // Primarily used to allow tests to avoid triggering policy events
+        if ($this->dispatcher) {
+            $this->logger->debug(sprintf('Event %s', $event));
+            $this->dispatcher->dispatch($event, new PolicyEvent($policy));
+        } else {
+            $this->logger->warning('Dispatcher is disabled for Bacs Service');
+        }
     }
 
     public function approvePayments(\DateTime $date)
@@ -652,6 +669,7 @@ class BacsService
     }
 
     /**
+     * TODO: Combine with JudopayService::failedPaymentEmail (move to policy service?)
      * @param Policy $policy
      */
     private function failedPaymentEmail(Policy $policy)
