@@ -34,7 +34,7 @@
 					   <hr>
 					   {% for claimNumber,msgs in sosureActions %}
 						   <p>
-							   Claim: <a href="{{ url('claims_claim_number', {'number': claimNumber|url_encode}) }}">{{ claimNumber }}</a>
+							   Claim: <a href="{{ url(claims_number_route, {'number': claimNumber|url_encode}) }}">{{ claimNumber }}</a>
 						   </p>
 						   <ul>
 							   {% for msg in msgs %}
@@ -51,7 +51,7 @@
 	 		   <hr>
 				{% for claimNumber,msgs in errors %}
 					<p>
-						Claim: <a href="{{ url('claims_claim_number', {'number': claimNumber|url_encode}) }}">{{ claimNumber }}</a>
+						Claim: <a href="{{ url(claims_number_route, {'number': claimNumber|url_encode}) }}">{{ claimNumber }}</a>
 					</p>
 						 <ul>
 							 {% for msg in msgs %}
@@ -68,7 +68,7 @@
 	 		   <hr>
 				{% for claimNumber,msgs in fees %}
 					<p>
-						Claim: <a href="{{ url('claims_claim_number', {'number': claimNumber|url_encode}) }}">{{ claimNumber }}</a>
+						Claim: <a href="{{ url(claims_number_route, {'number': claimNumber|url_encode}) }}">{{ claimNumber }}</a>
 					</p>
 						 <ul>
 							 {% for msg in msgs %}
@@ -85,7 +85,7 @@
 	 		   <hr>
 			{% for claimNumber,msgs in warnings %}
 				<p>
-					Claim: <a href="{{ url('claims_claim_number', {'number': claimNumber|url_encode}) }}">{{ claimNumber }}</a>
+					Claim: <a href="{{ url(claims_number_route, {'number': claimNumber|url_encode}) }}">{{ claimNumber }}</a>
 				</p>
 					 <ul>
 						 {% for msg in msgs %}
@@ -103,7 +103,7 @@ v		   {% if claims|length > 0 %}
 			   {% for claim in claims %}
 					<p>
 						{# Use claims, so we can forward email to claims team - admins will be redirected #}
-						<a href="{{ url('claims_policy', {'id': claim.policy.id}) }}">
+						<a href="{{ url(claims_policy_route, {'id': claim.policy.id}) }}">
 						{{ claim.policy.policyNumber }}
 						</a>
 					</p>
@@ -119,5 +119,5 @@ v		   {% if claims|length > 0 %}
 
 		</div>
 	{{ macros.end_table() }}
-	{{ macros.email_button_table(url('admin_claims'), "View Claims", "View Claims")}}
+	{{ macros.email_button_table(url(claims_route), "View Claims", "View Claims")}}
 {% endblock %}

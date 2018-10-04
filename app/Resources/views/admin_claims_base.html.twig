@@ -4,8 +4,12 @@
         <title>{% block title %}so-sure{% endblock %}</title>
 
         {# Meta #}
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+        <meta name="referrer" content="origin" />
+
         {% block meta %}{% endblock %}
-        {% include '::header.html.twig' %}
+        {% include '::meta_rebrand.html.twig' %}
 
         {# Stylesheets #}
         {% block stylesheets %}

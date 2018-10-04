@@ -10,6 +10,7 @@ use AppBundle\Form\Type\BacsCreditType;
 use AppBundle\Form\Type\PaymentRequestUploadFileType;
 use AppBundle\Form\Type\UploadFileType;
 use AppBundle\Form\Type\UserHandlingTeamType;
+use AppBundle\Repository\ClaimRepository;
 use AppBundle\Security\FOSUBUserProvider;
 use AppBundle\Service\BacsService;
 use AppBundle\Service\FraudService;
@@ -1486,6 +1487,23 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
     public function adminClaimsAction(Request $request)
     {
         return $this->searchClaims($request);
+    }
+
+    /**
+     * @Route("/claim/{number}", name="admin_claim_number")
+     */
+    public function adminClaimNumberAction($number)
+    {
+        $dm = $this->getManager();
+        /** @var ClaimRepository $repo */
+        $repo = $dm->getRepository(Claim::class);
+        /** @var Claim $claim */
+        $claim = $repo->findOneBy(['number' => $number]);
+        if (!$claim) {
+            throw $this->createNotFoundException('Policy not found');
+        }
+
+        return $this->redirectToRoute('admin_policy', ['id' => $claim->getPolicy()->getId()]);
     }
 
     /**

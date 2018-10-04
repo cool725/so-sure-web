@@ -19,10 +19,10 @@
         {% set active_tab = 'bacs-setup' %}
     {% elseif bacs and bacs.isValid %}
         {% set active_tab = 'bacs-setup-confirm' %}
-    {% elseif user.paymentMethod and user.paymentMethod.type == 'bacs' %}
-        {% set active_tab = 'bacs' %}
     {% elseif app.request.get('_route') == 'user_payment_details_bacs' %}
         {% set active_tab = 'bacs-setup' %}
+    {% elseif user.paymentMethod and user.paymentMethod.type == 'bacs' %}
+        {% set active_tab = 'bacs' %}
     {% endif %}
 
     <div class="tab-content">

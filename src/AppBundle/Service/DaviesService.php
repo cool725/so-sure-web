@@ -872,6 +872,9 @@ class DaviesService extends S3EmailService
                 'fees' => $this->fees,
                 'title' => 'Davies Daily Claims Report',
                 'highDemandPhones' => $highDemandPhones,
+                'claims_number_route' => 'admin_claim_number',
+                'claims_policy_route' => 'admin_policy',
+                'claims_route' => 'admin_claims',
             ]
         );
 
@@ -916,6 +919,9 @@ class DaviesService extends S3EmailService
                     'claims' => null,
                     'fees' => $this->fees,
                     'title' => 'Errors in So-Sure Mobile - Daily Claims Report',
+                    'claims_number_route' => 'claims_claim_number',
+                    'claims_policy_route' => 'claims_policy',
+                    'claims_route' => 'claims_claims',
                 ],
                 null,
                 null,

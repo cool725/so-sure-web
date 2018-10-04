@@ -2,7 +2,10 @@
 
 namespace AppBundle\Document;
 
+use AppBundle\Document\Payment\BacsIndemnityPayment;
 use AppBundle\Document\Payment\BacsPayment;
+use AppBundle\Document\Payment\ChargebackPayment;
+use AppBundle\Document\Payment\JudoPayment;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Doctrine\ODM\MongoDB\PersistentCollection;
@@ -100,6 +103,32 @@ abstract class Policy
     const METRIC_ACTIVATION = 'activation';
     const METRIC_HARD_ACTIVATION = 'hard-activation';
     const METRIC_RENEWAL = 'renewal';
+
+    const UNPAID_BACS_MANDATE_PENDING = 'unpaid_bacs_mandate_pending';
+    const UNPAID_BACS_MANDATE_INVALID = 'unpaid_bacs_mandate_invalid';
+    const UNPAID_BACS_PAYMENT_PENDING = 'unpaid_bacs_payment_pending';
+    const UNPAID_BACS_PAYMENT_FAILED = 'unpaid_bacs_payment_failed';
+    const UNPAID_BACS_PAYMENT_MISSING = 'unpaid_bacs_payment_missing';
+    const UNPAID_BACS_UNKNOWN = 'unpaid_bacs_unknown';
+    const UNPAID_JUDO_CARD_EXPIRED = 'unpaid_judo_card_expired';
+    const UNPAID_JUDO_PAYMENT_FAILED = 'unpaid_judo_payment_failed';
+    const UNPAID_JUDO_PAYMENT_MISSING = 'unpaid_judo_payment_missing';
+    const UNPAID_JUDO_UNKNOWN = 'unpaid_bacs_unknown';
+    const UNPAID_PAYMENT_METHOD_MISSING = 'unpaid_payment_method_missing';
+    const UNPAID_UNKNOWN = 'unpaid_unknown';
+    const UNPAID_PAID = 'unpaid_paid';
+
+    public static $unpaidReasons = [
+        self::UNPAID_BACS_MANDATE_PENDING,
+        self::UNPAID_BACS_MANDATE_INVALID,
+        self::UNPAID_BACS_PAYMENT_PENDING,
+        self::UNPAID_BACS_PAYMENT_FAILED,
+        self::UNPAID_BACS_PAYMENT_MISSING,
+        self::UNPAID_JUDO_CARD_EXPIRED,
+        self::UNPAID_JUDO_PAYMENT_FAILED,
+        self::UNPAID_JUDO_PAYMENT_MISSING,
+        self::UNPAID_PAID,
+    ];
 
     // coolooff reasons
     const COOLOFF_REASON_DAMAGED ='damaged';
@@ -581,6 +610,11 @@ abstract class Policy
 
     public function getPaymentsByType($type)
     {
+        return $this->getPaymentsByTypes([$type]);
+    }
+
+    public function getPaymentsByTypes($types)
+    {
         $payments = $this->getAllPayments();
         if (is_object($payments)) {
             $payments = $payments->toArray();
@@ -589,8 +623,35 @@ abstract class Policy
             return [];
         }
 
-        return array_filter($payments, function ($payment) use ($type) {
-            return $payment instanceof $type;
+        return array_filter($payments, function ($payment) use ($types) {
+            foreach ($types as $type) {
+                if ($payment instanceof $type) {
+                    return true;
+                }
+            }
+
+            return false;
+        });
+    }
+
+    public function getPaymentsExceptTypes($types)
+    {
+        $payments = $this->getAllPayments();
+        if (is_object($payments)) {
+            $payments = $payments->toArray();
+        }
+        if (!$payments) {
+            return [];
+        }
+
+        return array_filter($payments, function ($payment) use ($types) {
+            foreach ($types as $type) {
+                if ($payment instanceof $type) {
+                    return false;
+                }
+            }
+
+            return true;
         });
     }
 
@@ -635,6 +696,7 @@ abstract class Policy
         }
 
         return array_filter($payments, function ($payment) {
+            /** @var Payment $payment */
             return $payment->isSuccess();
         });
     }
@@ -772,6 +834,40 @@ abstract class Policy
     /**
      * @return Payment|null
      */
+    public function getLastPaymentCredit($excludeMissingStatus = true)
+    {
+        $payments = $this->getPaymentCredits();
+        if (count($payments) == 0) {
+            return null;
+        }
+
+        // TODO: Consider if this should be a filter by payment type instead of missing status (or both)
+        // originally added as with bacs, there was an initial judo payment added with empty status
+        // which needed to be excluded
+        if ($excludeMissingStatus) {
+            $payments = array_filter($payments, function ($payment) {
+                if ($payment instanceof JudoPayment) {
+                    /** @var JudoPayment $payment */
+                    return $payment->getResult() !== null;
+                } elseif ($payment instanceof BacsPayment) {
+                    /** @var BacsPayment $payment */
+                    return $payment->getStatus() !== null;
+                }
+            });
+        }
+
+        // sort more recent to older
+        usort($payments, function ($a, $b) {
+            return $a->getDate() < $b->getDate();
+        });
+        //\Doctrine\Common\Util\Debug::dump($payments, 3);
+
+        return $payments[0];
+    }
+
+    /**
+     * @return Payment|null
+     */
     public function getLastPaymentDebit()
     {
         $payments = $this->getPaymentDebits();
@@ -792,6 +888,15 @@ abstract class Policy
     {
         $payments = array_filter($this->getAllPayments()->toArray(), function ($payment) {
                 return $payment->getAmount() <= 0 && !$payment instanceof SoSurePayment;
+        });
+
+        return $payments;
+    }
+
+    public function getPaymentCredits()
+    {
+        $payments = array_filter($this->getAllPayments()->toArray(), function ($payment) {
+            return $payment->getAmount() > 0 && !$payment instanceof SoSurePayment;
         });
 
         return $payments;
@@ -4135,8 +4240,11 @@ abstract class Policy
         return $closeToExpiration;
     }
 
-    public function arePolicyScheduledPaymentsCorrect($verifyBillingDay = true, \DateTime $date = null)
-    {
+    public function arePolicyScheduledPaymentsCorrect(
+        $verifyBillingDay = true,
+        \DateTime $date = null,
+        $skipIfAlmostCancelled = false
+    ) {
         if (!in_array($this->getStatus(), [
             self::STATUS_ACTIVE,
             self::STATUS_UNPAID,
@@ -4147,6 +4255,18 @@ abstract class Policy
 
         $scheduledPayments = $this->getAllScheduledPayments(ScheduledPayment::STATUS_SCHEDULED);
 
+        if ($skipIfAlmostCancelled) {
+            // once all the payment rescheduling has finished, there is a period of a few days where the scheduled
+            // payments will not match; if this is the case, there is no need to alert on it
+            $cancellationDate = clone $this->getPolicyExpirationDate($date);
+            // 4 payment retries - 7, 14, 21, 28; should be 30 days unpaid before cancellation
+            // 2 days diff + 2 on either side
+            $cancellationDate = $cancellationDate->sub(new \DateInterval('P4D'));
+            if ($cancellationDate <= $date) {
+                return null;
+            }
+        }
+        
         // All Scheduled day must match the billing day
         if ($verifyBillingDay) {
             foreach ($scheduledPayments as $scheduledPayment) {
@@ -4304,6 +4424,68 @@ abstract class Policy
         return false;
     }
 
+    public function getUnpaidReason(\DateTime $date = null)
+    {
+        if ($this->getStatus() != self::STATUS_UNPAID || !$this->isPolicy()) {
+            return null;
+        }
+
+        $outstandingPremium = $this->getOutstandingPremiumToDate($date);
+        if ($this->areEqualToTwoDp(0, $outstandingPremium)) {
+            return self::UNPAID_PAID;
+        }
+
+        $lastPaymentCredit = $this->getLastPaymentCredit();
+        $lastPaymentInProgress = false;
+        $lastPaymentFailure = false;
+        if ($this->getUser()->hasBacsPaymentMethod()) {
+            if ($lastPaymentCredit && $lastPaymentCredit instanceof BacsPayment) {
+                /** @var BacsPayment $lastPaymentCredit */
+                $lastPaymentInProgress = $lastPaymentCredit->inProgress();
+                $lastPaymentFailure = $lastPaymentCredit->getStatus() == BacsPayment::STATUS_FAILURE;
+            }
+
+            $bacsPaymentMethod = $this->getUser()->getBacsPaymentMethod();
+            if ($bacsPaymentMethod && $bacsPaymentMethod->getBankAccount()->isMandateInProgress()) {
+                return self::UNPAID_BACS_MANDATE_PENDING;
+            } elseif ($bacsPaymentMethod && $bacsPaymentMethod->getBankAccount()->isMandateInvalid()) {
+                return self::UNPAID_BACS_MANDATE_INVALID;
+            } elseif ($lastPaymentInProgress) {
+                return self::UNPAID_BACS_PAYMENT_PENDING;
+            } elseif ($lastPaymentFailure) {
+                return self::UNPAID_BACS_PAYMENT_FAILED;
+            } elseif ($outstandingPremium > 0) {
+                // we're unpaid with some premium due - the mandate is successful and the last bacs payment
+                // was either not present, or was successful
+                return self::UNPAID_BACS_PAYMENT_MISSING;
+            }
+
+            return self::UNPAID_BACS_UNKNOWN;
+        } elseif ($this->getUser()->hasJudoPaymentMethod()) {
+            if ($lastPaymentCredit && $lastPaymentCredit instanceof JudoPayment) {
+                /** @var JudoPayment $lastPaymentCredit */
+                $lastPaymentFailure = !$lastPaymentCredit->isSuccess();
+            }
+
+            $judoPaymentMethod = $this->getUser()->getJudoPaymentMethod();
+            if ($judoPaymentMethod && $judoPaymentMethod->isCardExpired($date)) {
+                return self::UNPAID_JUDO_CARD_EXPIRED;
+            } elseif ($lastPaymentFailure) {
+                return self::UNPAID_JUDO_PAYMENT_FAILED;
+            } elseif ($outstandingPremium > 0) {
+                // we're unpaid with some premium due - the card is not expired and the last judo payment
+                // was either not present, or was successful
+                return self::UNPAID_JUDO_PAYMENT_MISSING;
+            }
+
+            return self::UNPAID_JUDO_UNKNOWN;
+        } elseif (!$this->getUser()->getPaymentMethod()) {
+            return self::UNPAID_PAYMENT_METHOD_MISSING;
+        }
+
+        return self::UNPAID_UNKNOWN;
+    }
+
     public function getSupportWarnings()
     {
         // @codingStandardsIgnoreStart
@@ -4447,9 +4629,21 @@ abstract class Policy
         return $expectedCommission;
     }
 
-    public function hasCorrectCommissionPayments(\DateTime $date = null, $allowedVariance = 0)
-    {
+    public function hasCorrectCommissionPayments(
+        \DateTime $date = null,
+        $allowedVariance = 0,
+        $excludeChargebacks = false
+    ) {
         $expectedCommission = $this->getExpectedCommission($date);
+
+        if ($excludeChargebacks) {
+            // If there are chargebacks, exclude from the expected commission
+            $excludedPayments = $this->getPaymentsByTypes([ChargebackPayment::class, BacsIndemnityPayment::class]);
+            $excludedPaymentsTotal = Payment::sumPayments($excludedPayments, false);
+            // as refunds, should be negative amount, so + is correct operation
+            $expectedCommission = $expectedCommission + $excludedPaymentsTotal['totalCommission'];
+        }
+
         /*
         print $numPayments . PHP_EOL;
         print $expectedCommission . PHP_EOL;
@@ -4766,6 +4960,21 @@ abstract class Policy
         }
 
         return false;
+    }
+
+    public function canBacsPaymentBeMadeInTime(\DateTime $date = null)
+    {
+        if (!$date) {
+            $date = new \DateTime();
+        }
+
+        $expirationDate = $this->getCurrentOrPreviousBusinessDay($this->getPolicyExpirationDate());
+        $expirationDate = static::subBusinessDays($expirationDate, BacsPayment::DAYS_REVERSE + 1);
+
+        //print $date->format(\DateTime::ATOM);
+        //print $expirationDate->format(\DateTime::ATOM);
+
+        return $expirationDate >= $date;
     }
 
     public function isFacebookUserInvited($facebookId)

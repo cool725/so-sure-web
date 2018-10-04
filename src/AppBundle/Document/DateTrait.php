@@ -29,7 +29,7 @@ trait DateTrait
         ];
     }
 
-    public function isBankHoliday(\DateTime $date)
+    public static function isBankHoliday(\DateTime $date)
     {
         foreach (static::getBankHolidays() as $bankHoliday) {
             if ($bankHoliday->diff($date)->days == 0) {
@@ -152,7 +152,7 @@ trait DateTrait
         return $after;
     }
 
-    public function isWeekDay(\DateTime $date)
+    public static function isWeekDay(\DateTime $date)
     {
         return !in_array((int) $date->format('w'), [0, 6]);
     }
@@ -170,11 +170,31 @@ trait DateTrait
             $businessDays = clone $date;
         }
 
-        if ($this->isWeekDay($businessDays) && !$this->isBankHoliday($businessDays)) {
+        if (static::isWeekDay($businessDays) && !static::isBankHoliday($businessDays)) {
             return $businessDays;
         }
 
         return $this->addBusinessDays($businessDays, 1);
+    }
+
+    public function getCurrentOrPreviousBusinessDay(\DateTime $date, \DateTime $now = null)
+    {
+        if (!$now) {
+            $now = new \DateTime();
+        }
+
+        // make sure we don't run in the past
+        if ($date < $now) {
+            $businessDays = $now;
+        } else {
+            $businessDays = clone $date;
+        }
+
+        if (static::isWeekDay($businessDays) && !static::isBankHoliday($businessDays)) {
+            return $businessDays;
+        }
+
+        return $this->subBusinessDays($businessDays, 1);
     }
 
     public function getNextBusinessDay(\DateTime $date, \DateTime $now = null)
@@ -199,15 +219,15 @@ trait DateTrait
      * @return \DateTime
      * @throws \Exception
      */
-    public function addBusinessDays(\DateTime $date, $days)
+    public static function addBusinessDays(\DateTime $date, $days)
     {
         $businessDays = clone $date;
         while ($days > 0) {
             $isBusinessDay = true;
             $businessDays->add(new \DateInterval('P1D'));
-            if (!$this->isWeekDay($businessDays)) {
+            if (!static::isWeekDay($businessDays)) {
                 $isBusinessDay = false;
-            } elseif ($this->isBankHoliday(($businessDays))) {
+            } elseif (static::isBankHoliday(($businessDays))) {
                 $isBusinessDay = false;
             }
 
@@ -225,9 +245,9 @@ trait DateTrait
         while ($days > 0) {
             $isBusinessDay = true;
             $businessDays->sub(new \DateInterval('P1D'));
-            if (!$this->isWeekDay($businessDays)) {
+            if (!static::isWeekDay($businessDays)) {
                 $isBusinessDay = false;
-            } elseif ($this->isBankHoliday(($businessDays))) {
+            } elseif (static::isBankHoliday(($businessDays))) {
                 $isBusinessDay = false;
             }
 
@@ -298,7 +318,7 @@ trait DateTrait
             $date = new \DateTime('now', new \DateTimeZone(SoSure::TIMEZONE));
         }
         $time = 'in the next 3 hours';
-        if (!$this->isWeekDay($date) || $this->isBankHoliday($date)) {
+        if (!static::isWeekDay($date) || static::isBankHoliday($date)) {
             $time = 'on the morning of the next working day';
         } elseif ($date->format('G') < 9) {
             $time = 'by 11am';

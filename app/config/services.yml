@@ -168,6 +168,7 @@ services:
             - "@app.sequence"
             - ["%accesspay_server%", "%accesspay_username%", "%accesspay_password%", "%accesspay_keyfile%"]
             - "@app.mailer"
+            - "@event_dispatcher"
 
     app.push:
         class: AppBundle\Service\PushService
