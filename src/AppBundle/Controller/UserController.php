@@ -1074,30 +1074,31 @@ class UserController extends BaseController
         $user = $this->getUser();
         /** @var PhonePolicy $policy */
         $policy = $user->getUnpaidPolicy();
-        if ($policy) {
-            $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
-            if (!$policy->isPolicyPaidToDate()) {
-                $amount = $policy->getOutstandingPremiumToDate();
-                if ($amount <= 0) {
-                    $this->get('logger')->warning(sprintf(
-                        'Unpaid policy %s has unpaid status, yet has a £%0.2f outstanding premium.',
-                        $policy->getId(),
-                        $amount
-                    ));
-                }
-            } else {
-                $this->get('logger')->warning(sprintf(
-                    'Unpaid policy %s has unpaid status, yet is paid to date.',
-                    $policy->getId()
-                ));
-            }
-        } else {
+        if (!$policy) {
             $this->get('logger')->warning(sprintf(
                 'Unable to locate unpaid policy for user %s. Policy may be in incorrect state.',
                 $user->getId()
             ));
+
+            return new RedirectResponse($this->generateUrl('user_home'));
         }
 
+        $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
+        if (!$policy->isPolicyPaidToDate()) {
+            $amount = $policy->getOutstandingPremiumToDate();
+            if ($amount <= 0) {
+                $this->get('logger')->warning(sprintf(
+                    'Unpaid policy %s has unpaid status, yet has a £%0.2f outstanding premium.',
+                    $policy->getId(),
+                    $amount
+                ));
+            }
+        } else {
+            $this->get('logger')->warning(sprintf(
+                'Unpaid policy %s has unpaid status, yet is paid to date.',
+                $policy->getId()
+            ));
+        }
 
         $form = $this->createFormBuilder()
             ->add('reschedule', SubmitType::class, array(
