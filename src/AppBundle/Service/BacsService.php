@@ -78,6 +78,11 @@ class BacsService
 
     const ARUDD_RETURN_CODE_PAYER = '0128';
 
+    const VALIDATE_OK = 'ok';
+    const VALIDATE_SKIP = 'skip';
+    const VALIDATE_CANCEL = 'cancel';
+    const VALIDATE_RESCHEDULE = 'reschedule';
+    
     /** @var LoggerInterface */
     protected $logger;
 
@@ -1352,11 +1357,6 @@ class BacsService
             }
         }
     }
-
-    const VALIDATE_OK = 'ok';
-    const VALIDATE_SKIP = 'skip';
-    const VALIDATE_CANCEL = 'cancel';
-    const VALIDATE_RESCHEDULE = 'reschedule';
 
     private function validateBacs(Policy $policy, $scheduledDate, $id, $ignoreNotEnoughTime = false)
     {
