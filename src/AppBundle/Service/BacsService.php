@@ -1529,7 +1529,6 @@ class BacsService
                 ));
             }
             $accounts[] = $accountData;
-
         }
 
         return $lines;
