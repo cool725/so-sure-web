@@ -1,7 +1,7 @@
 {% extends 'base_rebrand.html.twig' %}
 
 {# Set vars #}
-{% set body_class = 'landing' %}
+{% set body_class = 'landing starling' %}
 
 {% block title %}so-sure - Welcome to Social Insurance with Starling Bank{% endblock %}
 {% block meta %}
@@ -21,7 +21,7 @@
                 <p class="lead text-columbia-blue-e">in partnership with</p>
                 <img src="{{ cdn_url }}/images/logo/so-sure_starling_bank_logo.svg" alt="Starling Bank" width="280px" class="d-block mb-2 mb-lg-5 mx-auto">
             </div>
-            <div class="hero__controls">
+            <div class="hero__controls mb-4">
                 <a href="#" class="btn btn-success btn-block-xs get-a-quote">Get Insured <i class="far fa-arrow-right fa-sm ml-2"></i></a>
                 <a href="{{ path('fos_user_security_login') }}" class="btn btn-outline-columbia-blue-e btn-block-xs ml-md-2">Already have a so-sure policy ?</a>
             </div>
@@ -51,7 +51,7 @@
                 <tbody>
                     <tr>
                         <td class="td-30 bb1" colspan="2" align="center">
-                            <strong>Time to Repair/replace</strong>
+                            <strong>Time to repair / replace after approval</strong>
                         </td>
                     </tr>
                     <tr>
@@ -68,25 +68,25 @@
                         <td class="wh">
                             <div class="td-container">
                                 <span class="td-swap td-active">
-                                    <strong>2 - 5</strong> <div>work days</div>
+                                    <strong>1 - 5</strong> days <div>depending on stock</div>
                                 </span>
                                 <span class="td-swap">
-                                    <strong>3+</strong> <div>work days</div>
+                                    <strong>5 - 7</strong> <div>working days</div>
                                 </span>
                                 <span class="td-swap">
-                                    <strong>2 - 7</strong> <div>work days</div>
+                                    <strong>1 - 5</strong> <div>working days</div>
                                 </span>
                             </div>
                         </td>
                     </tr>
                     <tr>
                         <td class="td-30 bb1" colspan="2" align="center">
-                            <strong>Broken phone excess</strong>
+                            <strong>Up to 80% Cashback at end of policy year</strong>
                         </td>
                     </tr>
                     <tr>
                         <td class="b2a">
-                            from <strong>&pound;50</strong>
+                            <i class="far fa-check fa-2x"></i>
                             <a href="#"
                                class="td-info-btn"
                                data-toggle="modal"
@@ -98,20 +98,20 @@
                         <td class="wh">
                             <div class="td-container">
                                 <span class="td-swap td-active">
-                                    <strong>&pound;90</strong>
+                                    <i class="far fa-times fa-2x"></i>
                                 </span>
                                 <span class="td-swap">
-                                    <strong>&pound;80</strong>
+                                    <i class="far fa-times fa-2x"></i>
                                 </span>
                                 <span class="td-swap">
-                                    <strong>&pound;75</strong>
+                                    <i class="far fa-times fa-2x"></i>
                                 </span>
                             </div>
                         </td>
                     </tr>
                     <tr>
                         <td class="td-30 bb1" colspan="2" align="center">
-                            <strong>Loss, Theft &amp; Damage Cover</strong>
+                            <strong>Loss, Theft &amp; Accidental Damage included as standard</strong>
                         </td>
                     </tr>
                     <tr>
@@ -121,67 +121,113 @@
                         <td class="wh">
                             <div class="td-container">
                                 <span class="td-swap td-active">
-                                    + <strong>&pound;1.50</strong> Loss
+                                    <i class="far fa-times fa-2x"></i>
                                 </span>
                                 <span class="td-swap">
-                                    + <strong>&pound;2</strong> Damage
+                                    <i class="far fa-times fa-2x"></i>
                                 </span>
                                 <span class="td-swap">
-                                    + <strong>&pound;2</strong> Loss
+                                    <i class="far fa-times fa-2x"></i>
                                 </span>
                             </div>
                         </td>
                     </tr>
                     <tr>
                         <td class="td-30 bb1" colspan="2" align="center">
-                            <strong>Proof of purchase required?</strong>
+                            <strong>Insure second hand phones</strong>
                         </td>
                     </tr>
                     <tr>
                         <td class="b2a">
-                            <strong>No</strong><br>
-                            <small>when validated with our app</small>
-                            <a href="#"
-                               class="td-info-btn"
-                               data-toggle="modal"
-                               data-target="#policy_pop"
-                               role="button">
-                                <i class="fal fa-info-circle fa-lg"></i>
-                            </a>
+                            <i class="far fa-check fa-2x"></i>
                         </td>
                         <td class="wh">
                             <div class="td-container">
                                 <span class="td-swap td-active">
-                                    <strong>Yes</strong>
+                                    <i class="far fa-times fa-2x"></i>
                                 </span>
                                 <span class="td-swap">
-                                    <strong>Yes</strong>
+                                    <i class="far fa-times fa-2x"></i>
                                 </span>
                                 <span class="td-swap">
-                                    <strong>Yes</strong>
+                                    <i class="far fa-times fa-2x"></i>
                                 </span>
                             </div>
                         </td>
                     </tr>
                     <tr>
                         <td class="td-30 bb1" colspan="2" align="center">
-                            <strong>Age of phones insured</strong>
+                            <strong>Cover for phones purchased up to</strong>
                         </td>
                     </tr>
                     <tr>
                         <td class="b2a">
-                            <strong>&lt; 3</strong> Years
+                            <strong>3 years</strong> <div>from purchase</div>
                         </td>
                         <td class="wh">
                             <div class="td-container">
                                 <span class="td-swap td-active">
-                                    <strong>&lt; 6</strong> Months
+                                    <strong>6 months</strong> <div>from purchase</div>
                                 </span>
                                 <span class="td-swap">
-                                    <strong>&lt; 3</strong> Years
+                                    <strong>18 months</strong> <div>from purchase</div>
                                 </span>
                                 <span class="td-swap">
-                                    <strong>&lt; 18</strong> Months
+                                    <strong>3 years</strong> <div>from purchase</div>
+                                </span>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="td-30 bb1" colspan="2" align="center">
+                            <strong>Save up to £100 off your excess</strong>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="b2a">
+                            <i class="far fa-check fa-2x"></i>
+                        </td>
+                        <td class="wh">
+                            <div class="td-container">
+                                <span class="td-swap td-active">
+                                    <i class="far fa-times fa-2x"></i>
+                                </span>
+                                <span class="td-swap">
+                                    <i class="far fa-times fa-2x"></i>
+                                </span>
+                                <span class="td-swap">
+                                   <i class="far fa-times fa-2x"></i>
+                                </span>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="td-30 bb1" colspan="2" align="center">
+                            <strong>Trustpilot rating</strong>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="b2a">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </td>
+                        <td class="wh">
+                            <div class="td-container">
+                                <span class="td-swap td-active">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                </span>
+                                <span class="td-swap">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                </span>
+                                <span class="td-swap">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
                                 </span>
                             </div>
                         </td>

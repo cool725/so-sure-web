@@ -58,6 +58,26 @@
     }
 }
 
+.starling {
+    .hero {
+        // Height so table overlaps
+        height: 540px;
+
+        @include media-breakpoint-up(sm) {
+            height: 600px;
+        }
+
+        @include media-breakpoint-up(md) {
+            height: 650px;
+        }
+
+        @include media-breakpoint-up(lg) {
+            padding-top: 12rem;
+            height: 700px;
+        }
+    }
+}
+
 .comparison {
     background-color: $white;
     position: relative;
@@ -79,6 +99,11 @@
 }
 
 .why {
+    padding-top: 24rem;
+
+    @include media-breakpoint-up(sm) {
+        padding-top: 4rem;
+    }
 
     &__container {
         text-align: center;
