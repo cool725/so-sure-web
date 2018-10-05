@@ -18,27 +18,32 @@ class ClaimFnolTheftLoss
 
     /**
      * @var boolean
+     * @Assert\NotNull(message="Please select if you have contacted the place")
      */
     protected $hasContacted;
 
     /**
      * @AppAssert\AlphanumericSpaceDot()
      * @Assert\Length(min="4", max="200")
+     * @Assert\NotNull(message="Please enter where you last had your phone")
      */
     protected $contactedPlace;
 
     /**
      * @Assert\DateTime()
+     * @Assert\NotNull(message="Please enter when you blocked your phone")
      */
     protected $blockedDate;
 
     /**
      * @Assert\DateTime()
+     * @Assert\NotNull(message="Please enter when you reported the loss")
      */
     protected $reportedDate;
 
     /**
      * @Assert\Choice({"police-station", "online"}, strict=true)
+     * @Assert\NotNull(message="Please select where you reported the loss")
      */
     protected $reportType;
 
