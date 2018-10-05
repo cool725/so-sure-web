@@ -817,9 +817,7 @@ class PurchaseController extends BaseController
             $request,
             SixpackService::EXPERIMENT_PURCHASE_FLOW_BACS,
             ['judo', 'bacs'],
-            SixpackService::LOG_MIXPANEL_CONVERSION,
-            null,
-            0.1
+            SixpackService::LOG_MIXPANEL_CONVERSION
         );
 
         $bacsFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_BACS);
