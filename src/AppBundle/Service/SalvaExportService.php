@@ -775,6 +775,17 @@ class SalvaExportService
         return $count;
     }
 
+    public function queuePolicy(Policy $policy, $action)
+    {
+        $repo = $this->dm->getRepository(SalvaPhonePolicy::class);
+        $salvaPolicy = $repo->find($policy->getId());
+        if (!$salvaPolicy) {
+            return false;
+        }
+
+        return $this->queue($salvaPolicy, $action);
+    }
+
     public function queue(SalvaPhonePolicy $policy, $action, $retryAttempts = 0)
     {
         if (!in_array($action, [self::QUEUE_CANCELLED, self::QUEUE_CREATED, self::QUEUE_UPDATED])) {

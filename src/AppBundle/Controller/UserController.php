@@ -1135,6 +1135,11 @@ class UserController extends BaseController
             $bacsService->bacsPayment($policy, $notes, $amount);
 
             $this->getManager()->flush();
+
+
+            $this->addFlash('success', 'We will scheduled your payment within the next 3 business days');
+
+            return new RedirectResponse($this->generateUrl('user_unpaid_policy'));
         }
 
         $bacsFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_BACS);

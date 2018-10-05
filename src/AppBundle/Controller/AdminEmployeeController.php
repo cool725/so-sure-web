@@ -1082,7 +1082,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                 if ($salvaUpdateForm->isValid()) {
                     /** @var SalvaExportService $salvaService */
                     $salvaService = $this->get('app.salva');
-                    $salvaService->queue($policy, SalvaExportService::QUEUE_UPDATED);
+                    $salvaService->queuePolicy($policy, SalvaExportService::QUEUE_UPDATED);
 
                     $this->addFlash('success', 'Queued Salva Policy Update');
                 }
