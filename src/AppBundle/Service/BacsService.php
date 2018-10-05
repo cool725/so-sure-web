@@ -1129,11 +1129,19 @@ class BacsService
      * @param string         $notes
      * @param float|null     $amount
      * @param \DateTime|null $date
+     * @param boolean        $update
+     * @param string         $source
      * @return BacsPayment
      * @throws \Exception
      */
-    public function bacsPayment(Policy $policy, $notes, $amount = null, \DateTime $date = null, $update = true)
-    {
+    public function bacsPayment(
+        Policy $policy,
+        $notes,
+        $amount = null,
+        \DateTime $date = null,
+        $update = true,
+        $source = Payment::SOURCE_TOKEN
+    ) {
         if (!$date) {
             $date = new \DateTime();
         }
@@ -1149,7 +1157,7 @@ class BacsService
         $payment->setNotes($notes);
         $payment->setUser($policy->getUser());
         $payment->setStatus(BacsPayment::STATUS_PENDING);
-        $payment->setSource(Payment::SOURCE_TOKEN);
+        $payment->setSource($source);
 
         if (!$user->hasValidPaymentMethod()) {
             $payment->setStatus(BacsPayment::STATUS_SKIPPED);
@@ -1350,7 +1358,10 @@ class BacsService
                 'Scheduled Payment',
                 $scheduledPayment->getAmount(),
                 $scheduledDate,
-                $update
+                $update,
+                $scheduledPayment->getType() == ScheduledPayment::TYPE_ADMIN ?
+                    Payment::SOURCE_ADMIN :
+                    Payment::SOURCE_TOKEN
             );
             $scheduledPayment->setPayment($payment);
             if ($payment->getStatus() != BacsPayment::STATUS_SKIPPED) {
@@ -1485,7 +1496,9 @@ class BacsService
             $bacs = $payment->getPolicy()->getUser()->getPaymentMethod();
             $bankAccount = $bacs->getBankAccount();
 
-            $validate = $this->validateBacs($policy, $payment->getDate(), $payment->getId());
+            // If admin/user has rescheduled, then allow payment to go through, but should be manually approved
+            $ignoreNotEnoughTime = in_array($payment->getSource(), [Payment::SOURCE_ADMIN]);
+            $validate = $this->validateBacs($policy, $payment->getDate(), $payment->getId(), $ignoreNotEnoughTime);
             // rescheduling doesn't make sense in context of already generated payments
             if (in_array($validate, [self::VALIDATE_SKIP, self::VALIDATE_RESCHEDULE])) {
                 continue;
