@@ -1356,6 +1356,7 @@ class BacsService
             if ($payment->getStatus() != BacsPayment::STATUS_SKIPPED) {
                 $metadata['debit-amount'] += $scheduledPayment->getAmount();
             }
+            $this->dm->flush(null, array('w' => 'majority', 'j' => true));
         }
     }
 
