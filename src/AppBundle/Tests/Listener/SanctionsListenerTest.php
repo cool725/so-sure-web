@@ -2,7 +2,6 @@
 
 namespace AppBundle\Tests\Listener;
 
-use AppBundle\Document\Company;
 use AppBundle\Document\CustomerCompany;
 use AppBundle\Document\Sanctions;
 use AppBundle\Document\User;
