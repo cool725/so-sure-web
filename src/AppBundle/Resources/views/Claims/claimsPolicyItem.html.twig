@@ -1071,13 +1071,23 @@
                 <tr>
                     <td><i class="fa fa-lock" title="Admin only"></i> Phone</td>
                     <td>
-                      {{ form_start(phone_form, {'attr': {'class': 'form-inline'}}) }}
-                      <div class="form-group">
-                          {{ form_errors(phone_form.phone) }}
-                          {{ form_widget(phone_form.phone) }}
-                      </div>
-                      {{ form_widget(phone_form.next, {'label': 'Update', 'attr': {'class': 'btn btn-danger confirm-phone-update'}}) }}
-                      {{ form_end(phone_form) }}
+                        {{ form_start(phone_form, {'attr': {'class': 'form-inline'}}) }}
+                        <div class="form-group">
+                            {{ form_errors(phone_form.phone) }}
+                            {{ form_widget(phone_form.phone) }}
+                        </div>
+                        {{ form_widget(phone_form.next, {'label': 'Update', 'attr': {'class': 'btn btn-danger confirm-phone-update'}}) }}
+                        {{ form_end(phone_form) }}
+                    </td>
+                </tr>
+                <tr>
+                    <td><i class="fa fa-lock" title="Admin only"></i> Trigger Salva Policy Update</td>
+                    <td>
+                        {{ form_start(salva_update_form, {'attr': {'class': 'form-inline'}}) }}
+                        {{ form_widget(salva_update_form.update, {'label': 'Update', 'attr': {'class': 'btn btn-danger confirm-salva-update'}}) }}
+                        {{ form_end(salva_update_form) }}
+                        <br>
+                        If the policy was manually adjusted, notify Salva of the new price.
                     </td>
                 </tr>
             </table>

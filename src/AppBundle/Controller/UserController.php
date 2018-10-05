@@ -10,6 +10,7 @@ use AppBundle\Security\UserVoter;
 use AppBundle\Security\ClaimVoter;
 use AppBundle\Service\BacsService;
 use AppBundle\Service\ClaimsService;
+use AppBundle\Service\PaymentService;
 use AppBundle\Service\PCAService;
 use AppBundle\Service\PolicyService;
 use AppBundle\Service\SequenceService;
@@ -1309,6 +1310,7 @@ class UserController extends BaseController
             $bacsFeature = false;
         }
 
+        /** @var PaymentService $paymentService */
         $paymentService = $this->get('app.payment');
         // TODO: Move to ajax call
         $webpay = null;

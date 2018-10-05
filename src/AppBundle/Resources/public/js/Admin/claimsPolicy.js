@@ -47,6 +47,10 @@ $('.confirm-pay-policy').on("click",function() {
     return confirm('Are you sure you want to pay for this partial policy?');
 });
 
+$('.confirm-salva-update').on("click",function() {
+    return confirm('Are you sure you want to trigger an update with salva?');
+});
+
 $(document).ready(function(){
     $('.datetimepicker').datetimepicker({
         format: "DD-MM-YYYY HH:mm",
