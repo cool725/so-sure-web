@@ -778,6 +778,7 @@ class SalvaExportService
     public function queuePolicy(Policy $policy, $action)
     {
         $repo = $this->dm->getRepository(SalvaPhonePolicy::class);
+        /** @var SalvaPhonePolicy $salvaPolicy */
         $salvaPolicy = $repo->find($policy->getId());
         if (!$salvaPolicy) {
             return false;
