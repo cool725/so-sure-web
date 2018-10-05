@@ -42,12 +42,12 @@ class AffiliateCompany extends BaseCompany
         return $this->cpa;
     }
 
-    public function setdays(int $days)
+    public function setDays(int $days)
     {
         $this->days = $days;
     }
 
-    public function getdays()
+    public function getDays()
     {
         return $this->days;
     }

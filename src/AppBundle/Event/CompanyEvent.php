@@ -9,7 +9,7 @@ class CompanyEvent extends Event
 {
     const EVENT_CREATED = 'event.company.created';
 
-    /** @var Company */
+    /** @var BaseCompany */
     protected $company;
 
     public function __construct(BaseCompany $company)
