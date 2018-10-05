@@ -16,6 +16,7 @@ class ClaimFnolDamage
 
     /**
      * @Assert\Choice({"broken-screen", "water-damage", "out-of-warranty-breakdown", "other"}, strict=true)
+     * @Assert\NotNull(message="Please select the type of damage")
      */
     protected $typeDetails;
 
@@ -28,6 +29,7 @@ class ClaimFnolDamage
     /**
      * @AppAssert\AlphanumericSpaceDot()
      * @Assert\Length(min="3", max="200")
+     * @Assert\NotNull(message="Please select a month")
      */
     protected $monthOfPurchase;
 
@@ -35,11 +37,13 @@ class ClaimFnolDamage
      * 2016 is launched year - allowed 3 years gives 2013
      * TODO: Adjust to use a max of current year as a specialised validator
      * @Assert\Range(min="2013", max="2050")
+     * @Assert\NotNull(message="Please enter a year")
      */
     protected $yearOfPurchase;
 
     /**
      * @Assert\Choice({"new", "refurbished", "second-hand"}, strict=true)
+     * @Assert\NotNull(message="Please select a condition")
      */
     protected $phoneStatus;
 
@@ -165,6 +169,18 @@ class ClaimFnolDamage
     {
         if ($this->getClaim()->needProofOfPurchase()) {
             return $this->getProofOfPurchase() || count($this->getClaim()->getProofOfPurchaseFiles()) > 0;
+        } else {
+            return true;
+        }
+    }
+
+    /**
+     * @Assert\IsTrue(message="Please explain further")
+     */
+    public function hasTypeDetailsOther()
+    {
+        if ($this->getTypeDetails() == "other") {
+            return mb_strlen($this->getTypeDetailsOther()) > 0;
         } else {
             return true;
         }

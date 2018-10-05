@@ -2473,9 +2473,7 @@ class UserControllerTest extends BaseControllerTest
         }
         $form['claim_damage_form[typeDetails]'] = Claim::DAMAGE_BROKEN_SCREEN;
         $form['claim_damage_form[typeDetailsOther]'] = '';
-        if ($partial) {
-            $form['claim_damage_form[monthOfPurchase]'] = 'December';
-        }
+        $form['claim_damage_form[monthOfPurchase]'] = 'December';
         $form['claim_damage_form[yearOfPurchase]'] = '2018';
         $form['claim_damage_form[phoneStatus]'] = Claim::PHONE_STATUS_NEW;
 
