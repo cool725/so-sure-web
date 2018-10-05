@@ -2,6 +2,7 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Document\AffiliateCompany;
 use AppBundle\Document\BacsPaymentMethod;
 use AppBundle\Document\File\PaymentRequestUploadFile;
 use AppBundle\Document\JudoPaymentMethod;
@@ -37,7 +38,7 @@ use AppBundle\Document\CurrencyTrait;
 use AppBundle\Document\Claim;
 use AppBundle\Document\Payment\BacsPayment;
 use AppBundle\Document\Address;
-use AppBundle\Document\Company;
+use AppBundle\Document\CustomerCompany;
 use AppBundle\Document\Charge;
 use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePrice;
@@ -2008,7 +2009,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             ->getForm();
 
         $dm = $this->getManager();
-        $companyRepo = $dm->getRepository(Company::class);
+        $companyRepo = $dm->getRepository(CustomerCompany::class);
         $userRepo = $dm->getRepository(User::class);
         $companies = $companyRepo->findAll();
 
@@ -2055,7 +2056,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                 } elseif ($request->request->has('companyForm')) {
                     $companyForm->handleRequest($request);
                     if ($companyForm->isValid()) {
-                        $company = new Company();
+                        $company = new CustomerCompany();
                         $company->setName($this->getDataString($companyForm->getData(), 'name'));
                         $address = new Address();
                         $address->setLine1($this->getDataString($companyForm->getData(), 'address1'));
@@ -2412,5 +2413,78 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             200,
             array('Content-Type' => $mimetype)
         );
+    }
+
+    /**
+     * @Route("/affiliate", name="admin_affiliate_company")
+     * @Template
+     */
+    public function affiliateAction(Request $request)
+    {
+
+        $time_range = [
+            30 => 30,
+            60 => 60,
+            90 => 90
+        ];
+
+        $companyForm = $this->get('form.factory')
+            ->createNamedBuilder('companyForm')
+            ->add('name', TextType::class)
+            ->add('address1', TextType::class)
+            ->add('address2', TextType::class, ['required' => false])
+            ->add('address3', TextType::class, ['required' => false])
+            ->add('city', TextType::class)
+            ->add('postcode', TextType::class)
+            ->add('cpa', TextType::class)
+            ->add('days', ChoiceType::class, ['required' => true,
+                                                'choices' => $time_range])
+            ->add('next', SubmitType::class)
+            ->getForm();
+
+        $dm = $this->getManager();
+        $companyRepo = $dm->getRepository(AffiliateCompany::class);
+        $userRepo = $dm->getRepository(User::class);
+        $companies = $companyRepo->findAll();
+
+        try {
+            if ('POST' === $request->getMethod()) {
+                if ($request->request->has('companyForm')) {
+                    $companyForm->handleRequest($request);
+                    if ($companyForm->isValid()) {
+                        $company = new AffiliateCompany();
+                        $company->setName($this->getDataString($companyForm->getData(), 'name'));
+                        $address = new Address();
+                        $address->setLine1($this->getDataString($companyForm->getData(), 'address1'));
+                        $address->setLine2($this->getDataString($companyForm->getData(), 'address2'));
+                        $address->setLine3($this->getDataString($companyForm->getData(), 'address3'));
+                        $address->setCity($this->getDataString($companyForm->getData(), 'city'));
+                        $address->setPostcode($this->getDataString($companyForm->getData(), 'postcode'));
+                        $company->setAddress($address);
+                        $company->setCPA($this->getDataString($companyForm->getData(), 'cpa'));
+                        $company->setDays($this->getDataString($companyForm->getData(), 'days'));
+                        $dm->persist($company);
+                        $dm->flush();
+                        $this->addFlash('success', sprintf(
+                            'Added company'
+                        ));
+
+                        return new RedirectResponse($this->generateUrl('admin_affiliate_company'));
+                    } else {
+                        throw new \InvalidArgumentException(sprintf(
+                            'Unable to add company. %s',
+                            (string) $companyForm->getErrors()
+                        ));
+                    }
+                }
+            }
+        } catch (\InvalidArgumentException $e) {
+            $this->addFlash('error', $e->getMessage());
+        }
+
+        return [
+            'companies' => $companies,
+            'companyForm' => $companyForm->createView(),
+        ];
     }
 }

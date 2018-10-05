@@ -3,7 +3,7 @@
 namespace AppBundle\Event;
 
 use Symfony\Component\EventDispatcher\Event;
-use AppBundle\Document\Company;
+use AppBundle\Document\BaseCompany;
 
 class CompanyEvent extends Event
 {
@@ -12,7 +12,7 @@ class CompanyEvent extends Event
     /** @var Company */
     protected $company;
 
-    public function __construct(Company $company)
+    public function __construct(BaseCompany $company)
     {
         $this->company = $company;
     }

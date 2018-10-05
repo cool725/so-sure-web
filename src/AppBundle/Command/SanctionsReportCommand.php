@@ -12,7 +12,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Helper\Table;
 use AppBundle\Document\Sanctions;
 use AppBundle\Document\User;
-use AppBundle\Document\Company;
+use AppBundle\Document\BaseCompany;
 use AppBundle\Document\DateTrait;
 use AppBundle\Validator\Constraints\AlphanumericSpaceDotValidator;
 use GuzzleHttp\Client;

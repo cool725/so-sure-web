@@ -204,7 +204,7 @@ abstract class Policy
     protected $namedUser;
 
     /**
-     * @MongoDB\ReferenceOne(targetDocument="Company", inversedBy="policies")
+     * @MongoDB\ReferenceOne(targetDocument="CustomerCompany", inversedBy="policies")
      * @Gedmo\Versioned
      */
     protected $company;
@@ -996,7 +996,7 @@ abstract class Policy
         return $this->company;
     }
 
-    public function setCompany(Company $company)
+    public function setCompany(CustomerCompany $company)
     {
         $this->company = $company;
     }

@@ -12,7 +12,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Helper\Table;
 use AppBundle\Document\Sanctions;
 use AppBundle\Document\User;
-use AppBundle\Document\Company;
+use AppBundle\Document\BaseCompany;
 use AppBundle\Document\DateTrait;
 use AppBundle\Validator\Constraints\AlphanumericSpaceDotValidator;
 use GuzzleHttp\Client;
@@ -123,7 +123,7 @@ class SanctionsCommand extends BaseCommand
         $dm = $this->getManager();
         /** @var SanctionsService $sanctions */
         $sanctions = $this->getContainer()->get('app.sanctions');
-        $companyRepo = $dm->getRepository(Company::class);
+        $companyRepo = $dm->getRepository(BaseCompany::class);
         if ($companyId) {
             $companies = [];
             $companies[] = $companyRepo->find($companyId);
@@ -131,7 +131,7 @@ class SanctionsCommand extends BaseCommand
             $companies = $companyRepo->findAll();
         }
         foreach ($companies as $company) {
-            /** @var Company $company */
+            /** @var BaseCompany $company */
             $matches = $sanctions->checkCompany($company, true);
             if ($matches) {
                 print sprintf('%s %s', $company->getName(), json_encode($matches)) . PHP_EOL;

@@ -266,7 +266,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     protected $emailVerified;
 
     /**
-     * @MongoDB\ReferenceOne(targetDocument="Company", inversedBy="user")
+     * @MongoDB\ReferenceOne(targetDocument="BaseCompany", inversedBy="user")
      * @Gedmo\Versioned
      */
     protected $company;
@@ -574,7 +574,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         return $this->company;
     }
 
-    public function setCompany(Company $company)
+    public function setCompany(BaseCompany $company)
     {
         $this->company = $company;
     }

@@ -3,7 +3,7 @@
 namespace AppBundle\Tests\Command;
 
 use AppBundle\Command\OpsReportCommand;
-use AppBundle\Document\Company;
+use AppBundle\Document\CustomerCompany;
 use AppBundle\Document\Sanctions;
 use AppBundle\Listener\SanctionsListener;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
@@ -90,7 +90,7 @@ class SanctionsReportCommandTest extends BaseControllerTest
             SanctionsListener::SANCTIONS_LISTENER_REDIS_KEY,
             serialize(['user' => ['id'=>$user->getId(), 'name' => $user->getName()], 'matches' => $matches])
         );
-        $company = new Company();
+        $company = new CustomerCompany();
         $company->setId(3);
         $company->setName('Aboo');
 
