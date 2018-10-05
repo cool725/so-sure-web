@@ -2416,7 +2416,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
     }
 
     /**
-     * @Route("/affiliate", name="admin_affiliate_company")
+     * @Route("/affiliate", name="admin_affiliate")
      * @Template
      */
     public function affiliateAction(Request $request)
@@ -2466,10 +2466,10 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                         $dm->persist($company);
                         $dm->flush();
                         $this->addFlash('success', sprintf(
-                            'Added company'
+                            'Added affiliate'
                         ));
 
-                        return new RedirectResponse($this->generateUrl('admin_affiliate_company'));
+                        return new RedirectResponse($this->generateUrl('admin_affiliate'));
                     } else {
                         throw new \InvalidArgumentException(sprintf(
                             'Unable to add company. %s',

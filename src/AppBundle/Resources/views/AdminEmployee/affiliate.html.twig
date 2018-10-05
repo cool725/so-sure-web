@@ -13,11 +13,11 @@
 <div class="container" style="margin-bottom: 50px">
 <div class="row">
     <div class="col-md-8">
-        <h2>Affiliantes</h2>
+        <h2>Affiliates</h2>
     </div>
     <div class="col-md-2">
         <button type="button" class="btn btn-info" data-toggle="modal" data-target="#companyModal" style="margin-top: 20px"
-        ><i class="fa fa-plus"></i> New Company</button>
+        ><i class="fa fa-plus"></i> New Affiliate</button>
     </div>
 </div>
 <div class="row" style="margin-top: 20px">
@@ -27,24 +27,21 @@
             <th>Name</th>
             <th>CPA</th>
             <th>Days</th>
-            <th></th>
+            <th>Sanctions</th>
         </tr>
         {% for company in companies %}
             <tr>
                 <td width="20%">{{ company.name }}</td>
-                <td width="20%">£{{ company.cpa }}</td>
-                <td width="60%">{{ company.days }}</td>
-            </tr>
-            <tr>
-                <td></td>
-                <td>
-                    Sanctions:
+                <td width="10%">£{{ company.cpa|number_format(2, '.', ',') }}</td>
+                <td width="10%">{{ company.days }}</td>
+                <td width="60%">
                         {% if company.sanctionsChecks|length == 0%}
                             No checks run
                         {% endif %}
                         {% for check in company.sanctionsChecks %}
-                            Ran: {{ check|date }}<br>
+                            Ran: {{ check|date }}
                         {% endfor %}
+                        <br />
                         {% if company.sanctionsMatches|length == 0%}
                             No matches
                         {% endif %}
@@ -68,7 +65,7 @@
         <div class="modal-content">
           <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title">Add company</h4>
+            <h4 class="modal-title">Add Affiliate</h4>
           </div>
           <div class="modal-body">
             {{ form_start(companyForm) }}
