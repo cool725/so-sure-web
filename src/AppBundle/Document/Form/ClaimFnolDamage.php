@@ -170,6 +170,18 @@ class ClaimFnolDamage
         }
     }
 
+    /**
+     * @Assert\IsTrue(message="Please explain further")
+     */
+    public function hasTypeDetailsOther()
+    {
+        if ($this->getTypeDetails() == "other") {
+            return mb_strlen($this->getTypeDetailsOther()) > 0;
+        } else {
+            return true;
+        }
+    }
+
     public function setClaim($claim)
     {
         $this->claim = $claim;

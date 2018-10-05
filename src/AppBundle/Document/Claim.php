@@ -544,6 +544,7 @@ class Claim
     protected $force;
 
     /**
+     * @AppAssert\AlphanumericSpaceDot()
      * @Assert\Length(min="1", max="50")
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
@@ -1912,6 +1913,12 @@ class Claim
     public function needProofOfLoss()
     {
         return $this->getType() == self::TYPE_LOSS && $this->getReportType() == self::REPORT_ONLINE;
+    }
+
+    public function needValidCrimeRef()
+    {
+        return $this->getType() == self::TYPE_THEFT ||
+            ($this->getType() == self::TYPE_LOSS && $this->getReportType() == self::REPORT_POLICE_STATION);
     }
 
     public static function getExcessValue($type, $picSureValidated, $picSureEnabled, $repairDiscount = false)

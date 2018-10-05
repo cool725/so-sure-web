@@ -149,7 +149,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div id="report-to-police" class="row" style="display:none;">
+                        <div id="report-to-police" class="row" style="{% if claim.reportType != 'police-station' %}display:none;{% endif %}">
                             <div class="col-sm-6">
                                 <div class="form-group {% if form_errors(claim_form.force) %}has-error{% endif %}">
                                     <label>Police Force</label>
@@ -165,7 +165,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div id="report-my-loss" class="row" style="display:none;">
+                        <div id="report-my-loss" class="row" style="{% if claim.reportType != 'online' %}display:none;{% endif %}">
                             <div class="col-sm-6">
                                 <div class="form-group {% if form_errors(claim_form.proofOfLoss) %}has-error{% endif %}">
                                     <label>Upload 'Report My Loss' document</label>

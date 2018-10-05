@@ -218,8 +218,32 @@ class ClaimFnolTheftLoss
      */
     public function hasProofOfLoss()
     {
-        if ($this->getClaim()->needProofOfLoss()) {
+        if ($this->getClaim()->getType() == Claim::TYPE_LOSS && $this->getReportType() == Claim::REPORT_ONLINE) {
             return $this->getProofOfLoss() || count($this->getClaim()->getProofOfLossFiles()) > 0;
+        } else {
+            return true;
+        }
+    }
+
+    /**
+     * @Assert\IsTrue(message="Please select a police force")
+     */
+    public function hasForce()
+    {
+        if ($this->getReportType() == Claim::REPORT_POLICE_STATION) {
+            return mb_strlen($this->getForce()) > 0;
+        } else {
+            return true;
+        }
+    }
+
+    /**
+     * @Assert\IsTrue(message="Please enter a valid crime reference number")
+     */
+    public function hasCrimeReferenceNumber()
+    {
+        if ($this->getReportType() == Claim::REPORT_POLICE_STATION) {
+            return mb_strlen($this->getCrimeReferenceNumber()) > 0;
         } else {
             return true;
         }

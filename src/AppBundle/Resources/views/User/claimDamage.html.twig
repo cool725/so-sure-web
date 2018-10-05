@@ -90,7 +90,7 @@
                                     <span class="help-block with-errors">{{ form_errors(claim_form.typeDetails) }}</span>
                                 </div>
                             </div>
-                            <div id="other-damage" class="col-sm-6" style="display:none;">
+                            <div id="other-damage" class="col-sm-6" style="{% if claim.typeDetails != 'other' %}display:none;{% endif %}">
                                 <div class="form-group">
                                     <label>If you choose "other", please specify</label>
                                     {{ form_widget(claim_form.typeDetailsOther, { 'attr': {'class': 'form-control', 'placeholder': 'Keeps turning off etc...'}}) }}
