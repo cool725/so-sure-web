@@ -690,7 +690,8 @@ class UserControllerTest extends BaseControllerTest
 
         $form = $crawler->selectButton('form[reschedule]')->form();
         $crawler = self::$client->submit($form);
-        self::verifyResponse(200);
+        self::verifyResponse(302);
+        $crawler = self::$client->followRedirect();
         $this->assertContains('Payment is processing', $crawler->html());
 
         $dm = $this->getDocumentManager(true);
@@ -756,7 +757,8 @@ class UserControllerTest extends BaseControllerTest
 
         $form = $crawler->selectButton('form[reschedule]')->form();
         $crawler = self::$client->submit($form);
-        self::verifyResponse(200);
+        self::verifyResponse(302);
+        $crawler = self::$client->followRedirect();
         $this->assertContains('Payment is processing', $crawler->html());
 
         $dm = $this->getDocumentManager(true);
