@@ -13,7 +13,6 @@ use Symfony\Component\Validator\Constraints as Assert;
 use AppBundle\Validator\Constraints as AppAssert;
 use Gedmo\Mapping\Annotation as Gedmo;
 
-
 /**
  * @MongoDB\Document
  * @Gedmo\Loggable
