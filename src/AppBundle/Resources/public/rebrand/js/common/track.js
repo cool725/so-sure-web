@@ -1,15 +1,16 @@
 // track.js
 
-let byName = function(name, callback) {
+let trackByName = function(name, callback) {
     let url = '/ops/track/' + name;
-    $.get(url, callback);
+    $.get(url).always(callback);
 };
 
-let byInvite = function (name, callback) {
+let trackByInvite = function (name, callback) {
     let url = '/ops/track/invite/' + name;
-    $.get(url, callback);
+    $.get(url).always(callback);
 };
 
+export default trackByName;
 
 $(function() {
 
@@ -17,7 +18,7 @@ $(function() {
         event.preventDefault();
         var name = $(this).data('event');
         var url = $(this).data('event-url');
-        byName(name, function() {
+        trackByName(name, function() {
             if (url) {
                 window.location = url;
             }
