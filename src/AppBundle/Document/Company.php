@@ -18,7 +18,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
  * })
  * @Gedmo\Loggable
  */
-abstract class BaseCompany
+abstract class Company
 {
     /**
      * @MongoDB\Id(strategy="auto")

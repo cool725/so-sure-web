@@ -17,7 +17,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
  * @MongoDB\Document
  * @Gedmo\Loggable
  */
-class CustomerCompany extends BaseCompany
+class CustomerCompany extends Company
 {
     /**
      * @MongoDB\ReferenceMany(targetDocument="Policy", mappedBy="company")

@@ -6,7 +6,7 @@ use Doctrine\ODM\MongoDB\DocumentManager;
 use AppBundle\Document\Sanctions;
 use AppBundle\Document\SanctionsMatch;
 use AppBundle\Document\User;
-use AppBundle\Document\BaseCompany;
+use AppBundle\Document\Company;
 
 class SanctionsService
 {
@@ -102,7 +102,7 @@ class SanctionsService
         return $matches;
     }
     
-    public function checkCompany(BaseCompany $company, $skipFlush = false)
+    public function checkCompany(Company $company, $skipFlush = false)
     {
         $sanctionsRepo = $this->dm->getRepository(Sanctions::class);
         $this->loadSanctions();

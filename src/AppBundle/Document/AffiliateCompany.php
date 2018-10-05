@@ -17,7 +17,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
  * @MongoDB\Document
  * @Gedmo\Loggable
  */
-class AffiliateCompany extends BaseCompany
+class AffiliateCompany extends Company
 {
 
     /**

@@ -4,7 +4,7 @@ namespace AppBundle\Listener;
 
 use Doctrine\ODM\MongoDB\Event\PreUpdateEventArgs;
 use Doctrine\ODM\MongoDB\Event\LifecycleEventArgs;
-use AppBundle\Document\BaseCompany;
+use AppBundle\Document\Company;
 use AppBundle\Event\CompanyEvent;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
@@ -21,12 +21,12 @@ class DoctrineCompanyListener
     public function postPersist(LifecycleEventArgs $eventArgs)
     {
         $document = $eventArgs->getDocument();
-        if ($document instanceof BaseCompany) {
+        if ($document instanceof Company) {
             $this->triggerEvent($document, CompanyEvent::EVENT_CREATED);
         }
     }
 
-    private function triggerEvent(BaseCompany $company, $eventType)
+    private function triggerEvent(Company $company, $eventType)
     {
         $event = new CompanyEvent($company);
         $this->dispatcher->dispatch($eventType, $event);
