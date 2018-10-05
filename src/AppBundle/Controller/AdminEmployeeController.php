@@ -18,6 +18,7 @@ use AppBundle\Service\JudopayService;
 use AppBundle\Service\PolicyService;
 use AppBundle\Service\ReceperioService;
 use AppBundle\Service\ReportingService;
+use AppBundle\Service\SalvaExportService;
 use Gedmo\Loggable\Document\Repository\LogEntryRepository;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
@@ -553,6 +554,10 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         $bacsRefundForm = $this->get('form.factory')
             ->createNamedBuilder('bacs_refund_form', BacsCreditType::class, $bacsRefund)
             ->getForm();
+        $salvaUpdateForm = $this->get('form.factory')
+            ->createNamedBuilder('salva_update_form')
+            ->add('update', SubmitType::class)
+            ->getForm();
 
         if ('POST' === $request->getMethod()) {
             if ($request->request->has('cancel_form')) {
@@ -1072,6 +1077,15 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                     $this->getManager()->persist($bacsRefund);
                     $this->getManager()->flush();
                 }
+            } elseif ($request->request->has('salva_update_form')) {
+                $salvaUpdateForm->handleRequest($request);
+                if ($salvaUpdateForm->isValid()) {
+                    /** @var SalvaExportService $salvaService */
+                    $salvaService = $this->get('app.salva');
+                    $salvaService->queuePolicy($policy, SalvaExportService::QUEUE_UPDATED);
+
+                    $this->addFlash('success', 'Queued Salva Policy Update');
+                }
             }
         }
         $checks = $fraudService->runChecks($policy);
@@ -1125,6 +1139,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             'cancel_direct_debit_form' => $cancelDirectDebitForm->createView(),
             'run_scheduled_payment_form' => $runScheduledPaymentForm->createView(),
             'bacs_refund_form' => $bacsRefundForm->createView(),
+            'salva_update_form' => $salvaUpdateForm->createView(),
             'fraud' => $checks,
             'policy_route' => 'admin_policy',
             'policy_history' => $this->getSalvaPhonePolicyHistory($policy->getId()),

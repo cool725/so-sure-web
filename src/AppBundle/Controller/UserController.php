@@ -10,6 +10,7 @@ use AppBundle\Security\UserVoter;
 use AppBundle\Security\ClaimVoter;
 use AppBundle\Service\BacsService;
 use AppBundle\Service\ClaimsService;
+use AppBundle\Service\PaymentService;
 use AppBundle\Service\PCAService;
 use AppBundle\Service\PolicyService;
 use AppBundle\Service\SequenceService;
@@ -1134,6 +1135,11 @@ class UserController extends BaseController
             $bacsService->bacsPayment($policy, $notes, $amount);
 
             $this->getManager()->flush();
+
+
+            $this->addFlash('success', 'We will scheduled your payment within the next 3 business days');
+
+            return new RedirectResponse($this->generateUrl('user_unpaid_policy'));
         }
 
         $bacsFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_BACS);
@@ -1309,6 +1315,7 @@ class UserController extends BaseController
             $bacsFeature = false;
         }
 
+        /** @var PaymentService $paymentService */
         $paymentService = $this->get('app.payment');
         // TODO: Move to ajax call
         $webpay = null;
