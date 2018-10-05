@@ -12,7 +12,7 @@ use AppBundle\Document\User;
 use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\Policy;
 use AppBundle\Document\Phone;
-use AppBundle\Document\Company;
+use AppBundle\Document\CustomerCompany;
 use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Document\CurrencyTrait;
 use AppBundle\Document\Payment\ChargebackPayment;
@@ -181,7 +181,7 @@ class SalvaExportServiceTest extends WebTestCase
             static::generateEmail('testCreateXmlCompany', $this),
             'bar'
         );
-        $company = new Company();
+        $company = new CustomerCompany();
         $company->setName('foo');
         $company->addUser($user);
         self::$dm->persist($company);
@@ -720,7 +720,7 @@ class SalvaExportServiceTest extends WebTestCase
             'bar'
         );
         if ($companyName) {
-            $company = new Company();
+            $company = new CustomerCompany();
             $company->setName($companyName);
             $company->addUser($user);
             static::$dm->persist($company);
