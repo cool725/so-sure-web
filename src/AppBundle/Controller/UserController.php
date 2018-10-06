@@ -1299,6 +1299,15 @@ class UserController extends BaseController
             return new RedirectResponse($this->generateUrl('user_unpaid_policy'));
         }
 
+        $lastPaymentCredit = $policy->getLastPaymentCredit();
+        $lastPaymentInProgress = false;
+        if ($this->getUser()->hasBacsPaymentMethod()) {
+            if ($lastPaymentCredit && $lastPaymentCredit instanceof BacsPayment) {
+                /** @var BacsPayment $lastPaymentCredit */
+                $lastPaymentInProgress = $lastPaymentCredit->inProgress();
+            }
+        }
+
         $bacsFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_BACS);
 
         // For now, only allow 1 policy with bacs
@@ -1405,6 +1414,7 @@ class UserController extends BaseController
             'bacs_confirm_form' => $bacsConfirmForm->createView(),
             'bacs_feature' => $bacsFeature,
             'bacs' => $bacs,
+            'bacs_last_payment_in_progress' => $lastPaymentInProgress,
         ];
 
         return $data;

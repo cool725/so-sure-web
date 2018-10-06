@@ -769,6 +769,82 @@ class UserControllerTest extends BaseControllerTest
         $this->assertEquals(Policy::UNPAID_BACS_PAYMENT_PENDING, $updatedPolicy->getUnpaidReason());
     }
 
+    public function testUserUnpaidPolicyBacsPendingNoPaymentDetailsUpdate()
+    {
+        $email = self::generateEmail('testUserUnpaidPolicyBacsPendingNoPaymentDetailsUpdate', $this);
+        $password = 'foo';
+        $phone = self::getRandomPhone(self::$dm);
+        $user = self::createUser(
+            self::$userManager,
+            $email,
+            $password,
+            $phone,
+            self::$dm
+        );
+        self::setBacsPaymentMethod($user, BankAccount::MANDATE_SUCCESS);
+        $oneMonthAgo = new \DateTime();
+        $oneMonthAgo = $oneMonthAgo->sub(new \DateInterval('P1M'));
+        $twoMonthsAgo = new \DateTime();
+        $twoMonthsAgo = $twoMonthsAgo->sub(new \DateInterval('P2M'));
+        $policy = self::initPolicy($user, self::$dm, $phone, $twoMonthsAgo, false, true);
+        $policy->setStatus(Policy::STATUS_UNPAID);
+        $payment = static::addBacsPayPayment($policy, $twoMonthsAgo, true);
+        $payment->setStatus(BacsPayment::STATUS_SUCCESS);
+        self::$dm->flush();
+
+        $this->assertEquals(Policy::UNPAID_BACS_PAYMENT_MISSING, $policy->getUnpaidReason());
+        $this->assertFalse($policy->getUser()->hasActivePolicy());
+
+        $crawler = $this->login($email, $password, 'user/unpaid');
+
+        $this->validateUnpaidJudoForm($crawler, true);
+        $this->validateUnpaidRescheduleBacsForm($crawler, false);
+        $this->validateUnpaidBacsSetupLink($crawler, false);
+        $this->validateUnpaidBacsUpdateLink($crawler, false);
+        $this->assertContains('Payment missing', $crawler->html());
+
+        $newPayment = static::addBacsPayPayment($policy, $oneMonthAgo, true);
+        $newPayment->setStatus(BacsPayment::STATUS_SUCCESS);
+        self::$dm->flush();
+
+        $dm = $this->getDocumentManager(true);
+        $repo = $dm->getRepository(Policy::class);
+        /** @var Policy $updatedPolicy */
+        $updatedPolicy = $repo->find($policy->getId());
+
+        $this->assertEquals(Policy::UNPAID_BACS_PAYMENT_MISSING, $updatedPolicy->getUnpaidReason());
+        $this->logout();
+        $crawler = $this->login($email, $password, 'user/unpaid');
+
+        $this->validateUnpaidJudoForm($crawler, false);
+        $this->validateUnpaidRescheduleBacsForm($crawler, true);
+        $this->validateUnpaidBacsSetupLink($crawler, false);
+        $this->validateUnpaidBacsUpdateLink($crawler, false);
+        $this->assertContains('Payment missing', $crawler->html());
+
+        $form = $crawler->selectButton('form[reschedule]')->form();
+        $crawler = self::$client->submit($form);
+        self::verifyResponse(302);
+        $crawler = self::$client->followRedirect();
+        $this->assertContains('Payment is processing', $crawler->html());
+
+        $dm = $this->getDocumentManager(true);
+        $repo = $dm->getRepository(Policy::class);
+        /** @var Policy $updatedPolicy */
+        $updatedPolicy = $repo->find($policy->getId());
+
+        $this->assertEquals(Policy::UNPAID_BACS_PAYMENT_PENDING, $updatedPolicy->getUnpaidReason());
+        $crawler = self::$client->request('GET', '/user/payment-details');
+        self::verifyResponse(302);
+        $this->assertTrue($this->isClientResponseRedirect('/user/unpaid'));
+
+        $updatedPolicy->setStatus(Policy::STATUS_ACTIVE);
+        $dm->flush();
+
+        $crawler = self::$client->request('GET', '/user/payment-details');
+        $this->assertNotContains('Change to Credit/Debit Card', $crawler->html());
+    }
+
     public function testUserUnpaidPolicyJudoPaymentMissingNoBacsLink()
     {
         $email = self::generateEmail('testUserUnpaidPolicyJudoPaymentMissingNoBacsLink', $this);
