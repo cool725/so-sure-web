@@ -414,6 +414,8 @@ class OpsController extends BaseController
             }
         }
 
+        $faker = \Faker\Factory::create('en_GB');
+
         return [
             'scode' => $scode->getCode(),
             'invitation' => $invitation,
@@ -448,6 +450,15 @@ class OpsController extends BaseController
             'active_phone' => $activePhone,
             'oauthStarlingUrl' => $oauthStarlingUrl,
             'starling_form' => $starlingForm->createView(),
+            'fake' => [
+                'first' => $faker->firstName,
+                'last' => $faker->lastName,
+                'email' => $faker->email,
+                'dob' => $faker->dateTimeThisCentury->format('Y-m-d'),
+                'line1' => trim(preg_replace('/[\\n\\r]+/', ' ', $faker->streetAddress)),
+                'line2' => $faker->city,
+                'postcode' => $faker->postcode,
+            ]
         ];
     }
 

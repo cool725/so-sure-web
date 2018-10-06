@@ -2,6 +2,10 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Classes\NoOp;
+use AppBundle\Document\Address;
+use AppBundle\Document\DateTrait;
+use AppBundle\Validator\Constraints\AlphanumericSpaceDotValidator;
 use AppBundle\Validator\Constraints\AlphanumericValidator;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
@@ -33,6 +37,8 @@ use AppBundle\Exception\ValidationException;
  */
 class ApiExternalController extends BaseController
 {
+    use DateTrait;
+
     /**
      * @Route("/zendesk", name="api_external_zendesk")
      * @Method({"POST"})
@@ -256,11 +262,27 @@ class ApiExternalController extends BaseController
     }
 
     /**
+     * @Route("/gocompare/deeplink", name="api_external_gocompare_deeplink_redirect")
+     * @Method({"GET"})
+     */
+    public function goCompareDeeplinkRedirectAction()
+    {
+        $this->addFlash(
+            'error',
+            'There seems to be an issue with your request. Please contact support@wearesosure.com for further details.'
+        );
+
+        return $this->redirectToRoute('homepage');
+    }
+
+    /**
      * @Route("/gocompare/deeplink", name="api_external_gocompare_deeplink")
      * @Method({"POST"})
      */
     public function goCompareDeeplinkAction(Request $request)
     {
+        $this->get('logger')->debug(sprintf('GoCompare Deeplink Request: %s', json_encode($request->request->all())));
+
         $email = $this->getRequestString($request, 'email_address');
         $reference = $this->getRequestString($request, 'reference');
 
@@ -279,13 +301,60 @@ class ApiExternalController extends BaseController
             return $this->redirectToRoute('quote_phone', ['id' => $phone->getId()]);
         }
 
+        $alphaValidator = new AlphanumericValidator();
+        $alphaSpaceValidator = new AlphanumericSpaceDotValidator();
+
         $user = new User();
-        $validator = new AlphanumericValidator();
-        $user->setFirstName($validator->conform($this->getRequestString($request, 'first_name')));
-        $user->setLastName($validator->conform($this->getRequestString($request, 'surname')));
-        $user->setEmail($email);
-        $user->setBirthday(\DateTime::createFromFormat('Y-m-d', $this->getRequestString($request, 'dob')));
         $user->setEnabled(true);
+
+        $user->setFirstName($alphaValidator->conform($this->getRequestString($request, 'first_name')));
+        $user->setLastName($alphaValidator->conform($this->getRequestString($request, 'surname')));
+        $user->setEmail($email);
+
+        $dob = $this->getRequestString($request, 'dob');
+        $birthday = null;
+        try {
+            $birthday = \DateTime::createFromFormat('Y-m-d', $dob);
+            if ($birthday) {
+                $birthday = $this->startOfDay($birthday);
+            }
+        } catch (\Exception $e) {
+            // skip birthday if unable to process
+            NoOp::ignore([]);
+        }
+        $user->setBirthday($birthday);
+
+        $address = new Address();
+        $line1 = sprintf(
+            "%s %s",
+            $alphaSpaceValidator->conform($this->getRequestString($request, 'house_no')),
+            $alphaSpaceValidator->conform($this->getRequestString($request, 'address_1'))
+        );
+        $line2 = $alphaSpaceValidator->conform($this->getRequestString($request, 'address_2'));
+        $line3 = $alphaSpaceValidator->conform($this->getRequestString($request, 'address_3'));
+        $line4 = $alphaSpaceValidator->conform($this->getRequestString($request, 'address_4'));
+        $postcode = $alphaSpaceValidator->conform($this->getRequestString($request, 'postcode'));
+
+        // Unfortunately, no city field - assume last line is city
+        $city = null;
+        if (mb_strlen($line4) > 0) {
+            $city = $line4;
+            $line4 = null;
+        } elseif (mb_strlen($line3) > 0) {
+            $city = $line3;
+            $line3 = null;
+        } elseif (mb_strlen($line2) > 0) {
+            $city = $line2;
+            $line2 = null;
+        }
+        $address->setLine1($line1);
+        $address->setLine2($line2);
+        $address->setLine3($line3);
+        $address->setCity($city);
+        if (mb_strlen($postcode) > 0) {
+            $address->setPostcode($postcode);
+        }
+        $user->setBillingAddress($address);
 
         $userManager = $this->get('fos_user.user_manager');
         $userManager->updateUser($user, true);
