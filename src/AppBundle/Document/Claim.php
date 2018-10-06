@@ -1653,6 +1653,15 @@ class Claim
         $this->supplierStatus = $supplierStatus;
     }
 
+    public function warnCrimeRef()
+    {
+        if (mb_strlen($this->getCrimeRef() > 0) && $this->isValidCrimeRef() === false) {
+            return true;
+        }
+
+        return false;
+    }
+
     public static function sumClaims($claims)
     {
         $data = [
@@ -1783,6 +1792,7 @@ class Claim
             'force' => $this->getForce(),
             'crimeRef' => $this->getCrimeRef(),
             'validCrimeRef' => $this->isValidCrimeRef(),
+            'warnCrimeRef' => $this->warnCrimeRef(),
             'shippingAddress' => $this->getShippingAddress(),
             'needProofOfUsage' => $this->needProofOfUsage(),
             'needProofOfPurchase' => $this->needProofOfPurchase(),
