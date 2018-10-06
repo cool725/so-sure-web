@@ -474,7 +474,18 @@ class ClaimsService
     private function downloadAttachmentFiles(Claim $claim)
     {
         $files = [];
+        $types = [];
         foreach ($claim->getAttachmentFiles() as $file) {
+            /** @var S3ClaimFile $file */
+            $type = $file->getFileType();
+            if (!isset($types[$type])) {
+                $types[$type] = $file;
+            } elseif ($file->getCreated() > $types[$type]->getCreated()) {
+                $types[$type] = $file;
+            }
+        }
+
+        foreach ($types as $type => $file) {
             /** @var S3ClaimFile $file */
             $files[] = $this->downloadS3($file);
         }
@@ -518,12 +529,6 @@ class ClaimsService
 
     public function notifyClaimAdditionalDocuments(Claim $claim, array $attachments)
     {
-        $localAttachments = [];
-        foreach ($attachments as $attachment) {
-            /** @var S3ClaimFile $attachment */
-            $localAttachments[] = $this->downloadS3($attachment);
-        }
-
         $subject = sprintf(
             'Additional Documents for Policy %s',
             $claim->getPolicy()->getPolicyNumber()
@@ -540,7 +545,7 @@ class ClaimsService
             ['data' => $claim],
             null,
             null,
-            array_values(array_filter($localAttachments)),
+            $this->downloadAttachmentFiles($claim),
             'bcc@so-sure.com'
         );
     }
