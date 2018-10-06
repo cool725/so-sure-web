@@ -1,5 +1,7 @@
 {% extends 'base.html.twig' %}
 
+{% form_theme starling_form 'AppBundle:Form:submit.html.twig' %}
+
 {# Set vars #}
 {% set new_footer = 1 %}
 
@@ -348,7 +350,7 @@
                     </li>
                     <li>
                         {{ form_start(starling_form) }}
-                        {{ form_widget(starling_form.set, {'attr': {'class': 'btn btn-success'}, 'label': 'Set Session Vars' }) }}
+                        {{ form_widget(starling_form.set, {'fa': 'fa-bank', 'right': true, 'left' : true, 'attr': {'class': 'btn btn-success'}, 'label': 'Set Session Vars' }) }}
                         {{ form_end(starling_form) }}
                     </li>
                 </ol>
