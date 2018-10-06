@@ -471,11 +471,11 @@ class ClaimsService
         );
     }
 
-    private function downloadAttachmentFiles(Claim $claim)
+    private function downloadAttachmentFiles($attachments)
     {
         $files = [];
         $types = [];
-        foreach ($claim->getAttachmentFiles() as $file) {
+        foreach ($attachments as $file) {
             /** @var S3ClaimFile $file */
             $type = $file->getFileType();
             if (!isset($types[$type])) {
@@ -513,7 +513,7 @@ class ClaimsService
             ['data' => $claim],
             null,
             null,
-            $this->downloadAttachmentFiles($claim),
+            $this->downloadAttachmentFiles($claim->getAttachmentFiles()),
             'bcc@so-sure.com'
         );
 
@@ -545,7 +545,7 @@ class ClaimsService
             ['data' => $claim],
             null,
             null,
-            $this->downloadAttachmentFiles($claim),
+            $this->downloadAttachmentFiles($attachments),
             'bcc@so-sure.com'
         );
     }
