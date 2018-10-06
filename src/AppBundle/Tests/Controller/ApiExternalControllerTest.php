@@ -422,13 +422,18 @@ class ApiExternalControllerTest extends BaseApiControllerTest
 
     public function testGoCompareDeeplink()
     {
+        $email = static::generateEmail('testGoCompareDeeplink', $this);
+        $repo = static::$dm->getRepository(User::class);
+        $user = $repo->findOneBy(['emailCanonical' => mb_strtolower($email)]);
+        $this->assertNull($user);
+
         $url = sprintf(
             '/external/gocompare/deeplink'
         );
         $data  = [
             'first_name' => 'foo',
             'surname' => 'bar',
-            'email_address' => static::generateEmail('testGoCompareDeeplink', $this),
+            'email_address' => $email,
             'dob' => '2018-01-01',
             'reference' => static::$phone->getId(),
         ];
@@ -447,6 +452,68 @@ class ApiExternalControllerTest extends BaseApiControllerTest
         );
         $redirectUrl = self::$router->generate('quote_phone', ['id' => static::$phone->getId()]);
         $this->assertTrue($this->isClientResponseRedirect($redirectUrl));
+
+        $dm = $this->getDocumentManager(true);
+        $repo = $dm->getRepository(User::class);
+        /** @var User $updatedUser */
+        $updatedUser = $repo->findOneBy(['emailCanonical' => mb_strtolower($email)]);
+        $this->assertNotNull($updatedUser);
+
+        $this->assertEquals('foo', $updatedUser->getFirstName());
+        $this->assertEquals('bar', $updatedUser->getLastName());
+        $this->assertEquals(new \DateTime('2018-01-01'), $updatedUser->getBirthday());
+    }
+
+    public function testGoCompareDeeplinkAddress()
+    {
+        $email = static::generateEmail('testGoCompareDeeplinkAddress', $this);
+        $repo = static::$dm->getRepository(User::class);
+        $user = $repo->findOneBy(['emailCanonical' => mb_strtolower($email)]);
+        $this->assertNull($user);
+
+        $url = sprintf(
+            '/external/gocompare/deeplink'
+        );
+        $data  = [
+            'first_name' => 'foo',
+            'surname' => 'bar',
+            'email_address' => $email,
+            'dob' => '2018-01-01',
+            'house_no' => '123',
+            'address_1' => 'foo road',
+            'address_2' => 'bar city',
+            'postcode' => 'bx11lt',
+            'reference' => static::$phone->getId(),
+        ];
+
+        $crawler =  static::$client->request(
+            "POST",
+            $url,
+            $data
+        );
+
+        $data = $this->verifyResponse(
+            302,
+            null,
+            null,
+            sprintf("%s %s", static::$phone->__toString(), static::$phone->getId())
+        );
+        $redirectUrl = self::$router->generate('quote_phone', ['id' => static::$phone->getId()]);
+        $this->assertTrue($this->isClientResponseRedirect($redirectUrl));
+
+        $dm = $this->getDocumentManager(true);
+        $repo = $dm->getRepository(User::class);
+        /** @var User $updatedUser */
+        $updatedUser = $repo->findOneBy(['emailCanonical' => mb_strtolower($email)]);
+        $this->assertNotNull($updatedUser);
+        $this->assertNotNull($updatedUser->getBillingAddress());
+
+        $this->assertEquals('foo', $updatedUser->getFirstName());
+        $this->assertEquals('bar', $updatedUser->getLastName());
+        $this->assertEquals(new \DateTime('2018-01-01'), $updatedUser->getBirthday());
+        $this->assertEquals('123 foo road', $updatedUser->getBillingAddress()->getLine1());
+        $this->assertEquals('bar city', $updatedUser->getBillingAddress()->getCity());
+        $this->assertEquals('BX1 1LT', $updatedUser->getBillingAddress()->getPostcode());
     }
 
     public function testGoCompareDeeplinkSpace()
