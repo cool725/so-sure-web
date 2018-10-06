@@ -78,6 +78,9 @@ abstract class LoadPhoneData implements ContainerAwareInterface
             throw new \Exception('missing container');
         }
 
+        /** @var MailerService $mailer */
+        $mailer = $this->container->get('app.mailer');
+
         $env = $this->container->getParameter('kernel.environment');
         if ($env != 'prod') {
             return;
@@ -97,16 +100,13 @@ abstract class LoadPhoneData implements ContainerAwareInterface
             $linesWithDevice[] = sprintf('"%s %s" as "%s"', $phone->getMake(), $phone->getModel(), $device);
         }
 
-        $this->emailRecipero($linesWithDevice);
-        $this->emailComparisonCreator($lines);
-        $this->emailSoSure($linesWithPrice);
+        $this->emailRecipero($mailer, $linesWithDevice);
+        $this->emailComparisonCreator($mailer, $lines);
+        $this->emailSoSure($mailer, $linesWithPrice);
     }
 
-    private function emailRecipero($lines)
+    private function emailRecipero(MailerService $mailer, $lines)
     {
-        /** @var MailerService $mailer */
-        $mailer = $this->container->get('app.mailer');
-
         $body = sprintf(
             'Please add the following modelreferences to the make/model checks<br><br>%s',
             implode('<br>', $lines)
@@ -122,11 +122,8 @@ abstract class LoadPhoneData implements ContainerAwareInterface
         );
     }
 
-    private function emailSoSure($lines)
+    private function emailSoSure(MailerService $mailer, $lines)
     {
-        /** @var MailerService $mailer */
-        $mailer = $this->container->get('app.mailer');
-
         // @codingStandardsIgnoreStart
         $body = sprintf(
             'The following phones have been added to the so-sure site. <ul><li>New models should be considered if the high in-demand flag is required</li><li>New advertising can be added.</li></ul><br><br>%s',
@@ -144,11 +141,8 @@ abstract class LoadPhoneData implements ContainerAwareInterface
         );
     }
 
-    private function emailComparisonCreator($lines)
+    private function emailComparisonCreator(MailerService $mailer, $lines)
     {
-        /** @var MailerService $mailer */
-        $mailer = $this->container->get('app.mailer');
-
         // @codingStandardsIgnoreStart
         $body = sprintf(
             'The following phones have been added to the so-sure site. Can you please provide your Gadget ID\'s if available, or let us know once they have been added to your system? <br><br>%s',
