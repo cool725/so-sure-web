@@ -1010,8 +1010,8 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                         !$this->areEqualToTwoDp($amount, $premium->getAdjustedYearlyPremiumPrice())) {
                         throw new \Exception(sprintf(
                             'Current price does not match policy price for %s',
-                            $policy->getId())
-                        );
+                            $policy->getId()
+                        ));
                     }
 
                     /** @var JudopayService $judopay */
