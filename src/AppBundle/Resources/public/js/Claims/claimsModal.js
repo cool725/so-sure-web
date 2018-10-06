@@ -20,6 +20,22 @@ $(document).ready(function() {
         selectAll(document.getElementById('claim_search_status'),false)
     });
 });
+var clipboard = new Clipboard('.btn-copy');
+
+$('.btn-copy').tooltip({
+    'title':'Copied',
+    'trigger':'manual'
+});
+
+$('.btn-copy').click(function(e) {
+    e.preventDefault();
+});
+
+clipboard.on('success', function(event) {
+    console.log(event);
+    $('.btn-copy').tooltip('show');
+    setTimeout(function() { $('.btn-copy').tooltip('hide'); }, 1500);
+});
 
 $('#claimsModal').on('show.bs.modal', function (event) {
     var button = $(event.relatedTarget); // Button that triggered the modal
@@ -301,9 +317,9 @@ $('#claimsModal').on('show.bs.modal', function (event) {
 
     $("#change-claim-number").change(function(){
         if(this.checked) {
-            $('#claims-detail-number').attr('disabled', false);
+            $('#claims-detail-number').attr('readonly', false);
         } else {
-            $('#claims-detail-number').attr('disabled', 'disabled');
+            $('#claims-detail-number').attr('readonly', true);
         }
     });
 
