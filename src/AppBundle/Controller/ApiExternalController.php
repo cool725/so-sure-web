@@ -31,6 +31,7 @@ use Lcobucci\JWT\Parser;
 use Lcobucci\JWT\ValidationData;
 use Lcobucci\JWT\Signer\Hmac\Sha256;
 use AppBundle\Exception\ValidationException;
+use VasilDakov\Postcode\Postcode;
 
 /**
  * @Route("/external")
@@ -347,6 +348,11 @@ class ApiExternalController extends BaseController
             $city = $line2;
             $line2 = null;
         }
+
+        if (!Postcode::isValid($postcode)) {
+            $postcode = null;
+        }
+
         $address->setLine1($line1);
         $address->setLine2($line2);
         $address->setLine3($line3);
