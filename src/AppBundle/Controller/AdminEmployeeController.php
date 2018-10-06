@@ -1004,6 +1004,15 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                     } else {
                         throw new \Exception('1 or 12 payments only');
                     }
+                    $premium = $policy->getPremium();
+                    if ($premium &&
+                        !$this->areEqualToTwoDp($amount, $premium->getAdjustedStandardMonthlyPremiumPrice()) &&
+                        !$this->areEqualToTwoDp($amount, $premium->getAdjustedYearlyPremiumPrice())) {
+                        throw new \Exception(sprintf(
+                            'Current price does not match policy price for %s',
+                            $policy->getId())
+                        );
+                    }
 
                     /** @var JudopayService $judopay */
                     $judopay = $this->get('app.judopay');
