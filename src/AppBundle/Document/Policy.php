@@ -4567,6 +4567,13 @@ abstract class Policy
                 'Policy has a FNOL claim, but not yet submitted and so required documents may not yet be uploaded.';
         }
 
+        foreach ($this->getClaims() as $claim) {
+            /** @var Claim $claim */
+            if ($claim->warnCrimeRef()) {
+                $warnings[] = sprintf('Claim %s has a crime reference number that is not valid', $claim->getNumber());
+            }
+        }
+
         if ($this instanceof PhonePolicy) {
             $foundSerial = false;
             $mismatch = false;
