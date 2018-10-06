@@ -698,6 +698,12 @@ class BacsService
 
     private function notifyMandateCancelled(User $user)
     {
+        // If a user doesn't have an active or unpaid policy, there is no need to notify of a mandate cancellation
+        // copy would be confusing and there's no value to sending
+        if (!$user->hasActivePolicy() && !$user->hasUnpaidPolicy()) {
+            return;
+        }
+
         $baseTemplate = 'AppBundle:Email:bacs/mandateCancelled';
         $claimed = $user->getAvgPolicyClaims() > 0;
         $templateHtml = sprintf('%s.html.twig', $baseTemplate);
@@ -717,6 +723,12 @@ class BacsService
 
     public function notifyMandateCancelledByNameChange(User $user)
     {
+        // If a user doesn't have an active or unpaid policy, there is no need to notify of a mandate cancellation
+        // copy would be confusing and there's no value to sending
+        if (!$user->hasActivePolicy() && !$user->hasUnpaidPolicy()) {
+            return;
+        }
+
         $baseTemplate = 'AppBundle:Email:bacs/mandateCancelledNameChange';
         $templateHtml = sprintf('%s.html.twig', $baseTemplate);
         $templateText = sprintf('%s.txt.twig', $baseTemplate);
