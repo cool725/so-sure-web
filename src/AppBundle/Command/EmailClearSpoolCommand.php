@@ -12,12 +12,12 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Helper\Table;
 use AppBundle\Classes\Premium;
 
-class DeleteEmailSpoolCommand extends ContainerAwareCommand
+class EmailClearSpoolCommand extends ContainerAwareCommand
 {
     protected function configure()
     {
         $this
-            ->setName('sosure:delete:email:spool')
+            ->setName('sosure:email:clear-spool')
             ->setDescription('Delete email spool')
         ;
     }
