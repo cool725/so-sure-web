@@ -189,13 +189,13 @@ class DaviesServiceTest extends WebTestCase
 
         self::$daviesService->updatePolicy($claimB, $daviesB, true);
         $this->assertEquals($imeiOld, $policy->getImei());
-        $this->assertEquals(self::$phoneB->getId(), $policy->getPhone()->getId());
+        $this->assertEquals(self::$phoneA->getId(), $policy->getPhone()->getId());
 
         // Rerunning old settled claim should keep the newer imei
         $this->assertEquals(Claim::STATUS_APPROVED, $claim->getStatus());
         self::$daviesService->updatePolicy($claim, $davies, true);
         $this->assertEquals($imeiOld, $policy->getImei());
-        $this->assertEquals(self::$phoneB->getId(), $policy->getPhone()->getId());
+        $this->assertEquals(self::$phoneA->getId(), $policy->getPhone()->getId());
     }
 
     public function testGetPolicyNumber()
