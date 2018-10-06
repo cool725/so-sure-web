@@ -835,12 +835,11 @@ class DirectGroupService extends SftpService
         if ($claim->isOpen()) {
             // We've replaced their phone with a new imei number
             if ($claim->getReplacementImei() &&
-                $claim->getReplacementImei() != $policy->getImei()) {
+                $claim->getReplacementImei() != $policy->getImei() && !$skipImeiUpdate) {
                 // Imei has changed, but we can't change their policy premium, which is fixed
                 // If there are multiple open claims, don't update the imei!
-                if (!$skipImeiUpdate) {
-                    $policy->adjustImei($claim->getReplacementImei());
-                }
+                $policy->adjustImei($claim->getReplacementImei());
+
                 // If phone has been updated (unlikely at the moment)
                 if ($claim->getReplacementPhone()) {
                     $policy->setPhone($claim->getReplacementPhone());
