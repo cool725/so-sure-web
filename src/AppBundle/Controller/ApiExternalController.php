@@ -265,7 +265,7 @@ class ApiExternalController extends BaseController
      * @Route("/gocompare/deeplink", name="api_external_gocompare_deeplink_redirect")
      * @Method({"GET"})
      */
-    public function goCompareDeeplinkRedirectAction(Request $request)
+    public function goCompareDeeplinkRedirectAction()
     {
         $this->addFlash(
             'error',
