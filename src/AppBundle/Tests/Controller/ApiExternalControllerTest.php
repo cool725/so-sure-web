@@ -506,14 +506,16 @@ class ApiExternalControllerTest extends BaseApiControllerTest
         /** @var User $updatedUser */
         $updatedUser = $repo->findOneBy(['emailCanonical' => mb_strtolower($email)]);
         $this->assertNotNull($updatedUser);
-        $this->assertNotNull($updatedUser->getBillingAddress());
 
         $this->assertEquals('foo', $updatedUser->getFirstName());
         $this->assertEquals('bar', $updatedUser->getLastName());
         $this->assertEquals(new \DateTime('2018-01-01'), $updatedUser->getBirthday());
-        $this->assertEquals('123 foo road', $updatedUser->getBillingAddress()->getLine1());
-        $this->assertEquals('bar city', $updatedUser->getBillingAddress()->getCity());
-        $this->assertEquals('BX1 1LT', $updatedUser->getBillingAddress()->getPostcode());
+        $this->assertNotNull($updatedUser->getBillingAddress());
+        if ($updatedUser->getBillingAddress()) {
+            $this->assertEquals('123 foo road', $updatedUser->getBillingAddress()->getLine1());
+            $this->assertEquals('bar city', $updatedUser->getBillingAddress()->getCity());
+            $this->assertEquals('BX1 1LT', $updatedUser->getBillingAddress()->getPostcode());
+        }
     }
 
     public function testGoCompareDeeplinkSpace()
