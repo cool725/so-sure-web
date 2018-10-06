@@ -80,8 +80,8 @@
                 30 days from now is <strong>{{ suggested_cancellation_date|date('d M Y') }}</strong>
                 or use <a href="https://www.timeanddate.com/date/dateadded.html?ad=30" target="_blank">online calculator</a>.
                 </div>
-                {{ form_widget(pending_cancel_form.clear, {'label': 'Abort cancellation', 'attr': {'class': 'btn btn-warning confirm-pending-abort'}}) }}
-                {{ form_widget(pending_cancel_form.cancel, {'label': 'Schedule cancellation', 'attr': {'class': 'btn btn-danger confirm-pending-cancel', 'placeholder': '30 days after notice'}}) }}
+                {{ form_widget(pending_cancel_form.clear, {'label': 'Abort cancellation', 'attr': {'class': 'btn btn-warning' }}) }}
+                {{ form_widget(pending_cancel_form.cancel, {'label': 'Schedule cancellation', 'attr': {'class': 'btn btn-danger', 'placeholder': '30 days after notice' }}) }}
                 {{ form_end(pending_cancel_form) }}
                 <br>
                 <b>This schedules the policy cancellation.

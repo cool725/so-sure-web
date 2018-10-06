@@ -108,7 +108,7 @@
                                         {% set settable_alternative_status = 'active' %}
                                     {% endif %}
                                     {% if settable_alternative_status %}
-                                        <a class="btn btn-sm btn-danger"
+                                        <a class="btn btn-sm btn-danger confirm-action" data-confirm-msg="Are you sure you want to change the policy status?"
                                             href="{{ path('admin_policy_set_status', { id: policy.id, policyNewStatus: settable_alternative_status}) }}">
                                             set as  {{ settable_alternative_status }}</a>
                                     {% endif %}
@@ -313,7 +313,7 @@
                             </td>
                             <td>
                                 {{ form_start(receperio_form, {'attr': {'class': 'form-inline'}}) }}
-                                {{ form_widget(receperio_form.rerun, {'label': 'Re-run check', 'attr': {'class': 'btn btn-danger confirm-imei-rerun'}}) }}
+                                {{ form_widget(receperio_form.rerun, {'label': 'Re-run check', 'attr': {'class': 'btn btn-danger confirm-action', 'data-confirm-msg': 'Are you sure you want to rerun the imei/serial number checks? This costs £0.07.'}}) }}
                                 {{ form_end(receperio_form) }}
                               </td>
                         </tr>
@@ -801,7 +801,7 @@
                         {% if policy.premiumPlan == 'monthly' %}
                             {{ form_start(billing_form, {'attr': {'class': 'form-inline'}}) }}
                             {{ form_widget(billing_form.day) }}
-                            {{ form_widget(billing_form.update, {'label': 'Change billing date', 'attr': {'class': 'btn btn-danger confirm-usertoken-clear'}}) }}
+                            {{ form_widget(billing_form.update, {'label': 'Change billing date', 'attr': {'class': 'btn btn-danger confirm-action'}}) }}
                             {{ form_end(billing_form) }}
                             {% if not policy.isPolicyPaidToDate %}<strong>Policy must be paid to date before update is allowed</strong>{% endif %}
                         {% else %}
@@ -815,7 +815,7 @@
                     </td>
                     <td>
                         {{ form_start(regenerate_policy_schedule_form, {'attr': {'class': 'form-inline'}}) }}
-                        {{ form_widget(regenerate_policy_schedule_form.regenerate, {'label': 'Regenerate', 'attr': {'class': 'btn btn-danger confirm-regenerate-schedule'}}) }}
+                        {{ form_widget(regenerate_policy_schedule_form.regenerate, {'label': 'Regenerate', 'attr': {'class': 'btn btn-danger confirm-action', 'data-confirm-msg': 'Are you sure you want to re-generate the Policy Schedule?'}}) }}
                         {{ form_end(regenerate_policy_schedule_form) }}
                     </td>
                 </tr>
@@ -825,7 +825,7 @@
                     </td>
                     <td>
                         {{ form_start(resend_email_form, {'attr': {'class': 'form-inline'}}) }}
-                        {{ form_widget(resend_email_form.resend, {'label': 'Resend Email', 'attr': {'class': 'btn btn-danger confirm-resend-email'}}) }}
+                        {{ form_widget(resend_email_form.resend, {'label': 'Resend Email', 'attr': {'class': 'btn btn-danger confirm-action', 'data-confirm-msg': 'Are you sure you want to resend the Policy Welcome Email?'}}) }}
                         {{ form_end(resend_email_form) }}
                       </td>
                 </tr>
@@ -872,8 +872,8 @@
                             Status: {% if policy.picSureStatus %}{{ policy.picSureStatus }}{% else %}Not started{% endif %}
                             {% if not policy.isPicSureValidated %}
                                 {{ form_start(picsure_form)}}
-                                {{ form_widget(picsure_form.approve, {'attr': {'class': 'btn btn-danger confirm-picsure'}})}}
-                                {{ form_widget(picsure_form.preapprove, {'attr': {'class': 'btn btn-danger confirm-picsure'}})}}
+                                {{ form_widget(picsure_form.approve, {'attr': {'class': 'btn btn-danger confirm-action', 'data-confirm-msg': 'Are you sure you want to approve pic-sure?'}})}}
+                                {{ form_widget(picsure_form.preapprove, {'attr': {'class': 'btn btn-danger confirm-action', 'data-confirm-msg': 'Are you sure you want to pre-approve pic-sure?'}})}}
                                 {{ form_end(picsure_form)}}
                             {% endif %}
                         {% else %}
@@ -895,7 +895,7 @@
                             Not present
                         {% endif %}
                         {{ form_start(usertoken_form, {'attr': {'class': 'form-inline'}}) }}
-                        {{ form_widget(usertoken_form.regenerate, {'label': 'Regenerate', 'attr': {'class': 'btn btn-danger confirm-usertoken-clear'}}) }}
+                        {{ form_widget(usertoken_form.regenerate, {'label': 'Regenerate', 'attr': {'class': 'btn btn-danger confirm-action', 'data-confirm-msg': 'Are you sure you want to regenerate the token?'}}) }}
                         {{ form_end(usertoken_form) }}
                         <strong>This will log the user out on their phone</strong>
                         <br>
@@ -919,7 +919,7 @@
                           Not present
                       {% endif %}
                       {{ form_start(facebook_form, {'attr': {'class': 'form-inline'}}) }}
-                      {{ form_widget(facebook_form.clear, {'label': 'Clear', 'attr': {'class': 'btn btn-danger confirm-facebook-clear'}}) }}
+                      {{ form_widget(facebook_form.clear, {'label': 'Clear', 'attr': {'class': 'btn btn-danger confirm-action', 'data-confirm-msg': 'Are you sure you want to clear this facebook user??? They will not be able to login with facebook anymore.'}}) }}
                       {{ form_end(facebook_form) }}
                     </td>
                 </tr>
@@ -968,7 +968,7 @@
                             {{ form_errors(chargebacks_form.chargeback) }}
                             {{ form_widget(chargebacks_form.chargeback) }}
                         </div>
-                        {{ form_widget(chargebacks_form.add, {'Add': 'Update', 'attr': {'class': 'btn btn-danger confirm-chargeback'}}) }}
+                        {{ form_widget(chargebacks_form.add, {'Add': 'Update', 'attr': {'class': 'btn btn-danger confirm-action' }}) }}
                         {{ form_end(chargebacks_form)}}
                     </td>
                 </tr>
@@ -978,7 +978,7 @@
                         Currently: {{ policy.premiumPlan }}<br />
                         {% if policy.getPremiumPaid == 0 %}
                         {{ form_start(swap_payment_plan_form, {'attr': {'class': 'form-inline'}}) }}
-                        {{ form_widget(swap_payment_plan_form.swap, {'Swap': 'Swap Payment Plan', 'attr': {'class': 'btn btn-danger confirm-swap-payment-plan'}}) }}
+                        {{ form_widget(swap_payment_plan_form.swap, {'Swap': 'Swap Payment Plan', 'attr': {'class': 'btn btn-danger confirm-action' }}) }}
                         {{ form_end(swap_payment_plan_form)}}
                         {% else %}
                             Policy has already received payment - unable to swap.
@@ -1000,8 +1000,8 @@
                             Policy already has a status
                         {% else %}
                             {{ form_start(pay_policy_form, {'attr': {'class': 'form-inline'}}) }}
-                            {{ form_widget(pay_policy_form.monthly, {'attr': {'class': 'btn btn-danger confirm-pay-policy'}}) }}
-                            {{ form_widget(pay_policy_form.yearly, {'attr': {'class': 'btn btn-danger confirm-pay-policy'}}) }}
+                            {{ form_widget(pay_policy_form.monthly, {'attr': {'class': 'btn btn-danger confirm-action', 'data-confirm-msg': 'Are you sure you want to pay for this partial policy?'}}) }}
+                            {{ form_widget(pay_policy_form.yearly, {'attr': {'class': 'btn btn-danger confirm-action', 'data-confirm-msg': 'Are you sure you want to pay for this partial policy?'}}) }}
                             {{ form_end(pay_policy_form)}}
                         {% endif %}
                     </td>
@@ -1015,7 +1015,7 @@
                             <td><i class="fa fa-lock" title="Admin only"></i> Cancel Direct Debit</td>
                             <td>
                                 {{ form_start(cancel_direct_debit_form)}}
-                                {{ form_widget(cancel_direct_debit_form.cancel, {'attr': {'class': 'btn btn-danger'}})}}
+                                {{ form_widget(cancel_direct_debit_form.cancel, {'attr': {'class': 'btn btn-danger confirm-action', 'data-confirm-msg': 'Are you sure you want to cancel this direct debit?'}})}}
                                 {{ form_end(cancel_direct_debit_form)}}
                             </td>
                         </tr>
@@ -1064,7 +1064,7 @@
                           {{ form_errors(imei_form.imei) }}
                           {{ form_widget(imei_form.imei) }}
                       </div>
-                      {{ form_widget(imei_form.update, {'label': 'Update', 'attr': {'class': 'btn btn-danger confirm-imei-update'}}) }}
+                      {{ form_widget(imei_form.update, {'label': 'Update', 'attr': {'class': 'btn btn-danger confirm-action', 'data-confirm-msg': 'Are you sure you want to update this imei?  This should only be done if the phone imei was incorrectly entered or post claim once the IMEI has changed.  This will trigger a Salva Policy Update.'}}) }}
                       {{ form_end(imei_form) }}
                     </td>
                 </tr>
@@ -1076,7 +1076,7 @@
                             {{ form_errors(phone_form.phone) }}
                             {{ form_widget(phone_form.phone) }}
                         </div>
-                        {{ form_widget(phone_form.next, {'label': 'Update', 'attr': {'class': 'btn btn-danger confirm-phone-update'}}) }}
+                        {{ form_widget(phone_form.next, {'label': 'Update', 'attr': {'class': 'btn btn-danger confirm-action', 'data-confirm-msg': 'Are you sure you want to update this phone?  This should only be done if the phone was incorrectly selected or post claim if the phone make/model has changed.  This will trigger a Salva Policy Update, and possibly affect the pricing at Salva, however, it will not update the policy premium charge to the customer.'}}) }}
                         {{ form_end(phone_form) }}
                     </td>
                 </tr>
@@ -1084,7 +1084,7 @@
                     <td><i class="fa fa-lock" title="Admin only"></i> Trigger Salva Policy Update</td>
                     <td>
                         {{ form_start(salva_update_form, {'attr': {'class': 'form-inline'}}) }}
-                        {{ form_widget(salva_update_form.update, {'label': 'Update', 'attr': {'class': 'btn btn-danger confirm-salva-update'}}) }}
+                        {{ form_widget(salva_update_form.update, {'label': 'Update', 'attr': {'class': 'btn btn-danger confirm-action', 'data-confirm-msg': 'Are you sure you want to trigger an update with salva?'}}) }}
                         {{ form_end(salva_update_form) }}
                         <br>
                         If the policy was manually adjusted, notify Salva of the new price.
