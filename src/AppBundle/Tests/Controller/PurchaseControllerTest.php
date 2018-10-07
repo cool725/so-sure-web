@@ -843,7 +843,7 @@ class PurchaseControllerTest extends BaseControllerTest
             self::$router->generate('purchase_step_phone'),
             [],
             [],
-            ['HTTP_User-Agent' => "Mozilla/5.0 (iPhone; CPU iPhone OS 9_1 like Mac OS X) AppleWebKit/601.1.46 (KHTML, like Gecko) Version/9.0 Mobile/13B143 Safari/601.1"]
+            ['HTTP_USER_AGENT' => "Mozilla/5.0 (iPhone; CPU iPhone OS 9_1 like Mac OS X) AppleWebKit/601.1.46 (KHTML, like Gecko) Version/9.0 Mobile/13B143 Safari/601.1"]
         );
         // @codingStandardsIgnoreEnd
         self::verifyResponse(200, null, $crawler);
