@@ -362,12 +362,15 @@ class DaviesHandlerClaim extends HandlerClaim
 
     public function checkReplacementRepaired()
     {
+        if ($this->isReplacementRepaired()) {
+            $this->replacementImei = null;
+        }
+    }
+    
+    public function isReplacementRepaired()
+    {
         if ($this->isReplacementRepair == null) {
             $this->isReplacementRepair = mb_stripos($this->replacementImei, 'repair') != false;
-        }
-
-        if ($this->isReplacementRepair) {
-            $this->replacementImei = null;
         }
 
         return $this->isReplacementRepair;

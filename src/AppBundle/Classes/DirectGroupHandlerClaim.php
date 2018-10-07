@@ -344,7 +344,7 @@ class DirectGroupHandlerClaim extends HandlerClaim
         return false;
     }
 
-    public function checkReplacementRepaired()
+    public function isReplacementRepaired()
     {
         // if repair supplier is present, then its a repair and imei will not be present
         return mb_strlen($this->repairSupplier) > 0;

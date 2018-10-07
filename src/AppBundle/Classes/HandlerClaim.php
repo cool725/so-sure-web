@@ -184,6 +184,6 @@ abstract class HandlerClaim
     abstract public function isApproved();
     abstract public function getExpectedIncurred();
     abstract public function fromArray($data, $columns);
-    abstract public function checkReplacementRepaired();
+    abstract public function isReplacementRepaired();
     abstract public static function create($data, $columns);
 }
