@@ -366,7 +366,7 @@ class DaviesHandlerClaim extends HandlerClaim
             $this->replacementImei = null;
         }
     }
-    
+
     public function isReplacementRepaired()
     {
         if ($this->isReplacementRepair == null) {

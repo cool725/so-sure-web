@@ -300,8 +300,6 @@ class DirectGroupHandlerClaim extends HandlerClaim
             if ($this->getClaimType() === null) {
                 throw new \Exception('Unknown or missing claim type');
             }
-
-            $this->checkReplacementRepaired();
         } catch (\Exception $e) {
             throw new \Exception(sprintf(
                 '<b>%s</b> Data Imported: <small>%s</small> Excel Record: <small>%s</small>',

@@ -314,9 +314,9 @@ class DirectGroupHandlerClaimTest extends \PHPUnit\Framework\TestCase
     public function testReplacementRepair()
     {
         $directGroup = new DirectGroupHandlerClaim();
-        $this->assertFalse($directGroup->checkReplacementRepaired());
+        $this->assertFalse($directGroup->isReplacementRepaired());
         $directGroup->repairSupplier = 'foo';
-        $this->assertTrue($directGroup->checkReplacementRepaired());
+        $this->assertTrue($directGroup->isReplacementRepaired());
     }
 
     public function testClaimsExcess()

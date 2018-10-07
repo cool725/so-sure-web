@@ -581,7 +581,7 @@ class DaviesHandlerClaimTest extends \PHPUnit\Framework\TestCase
 
         $this->assertNull($davies->replacementImei);
         $this->assertEquals(0, count($davies->unobtainableFields));
-        $this->assertTrue($davies->checkReplacementRepaired());
+        $this->assertTrue($davies->isReplacementRepaired());
         $this->assertNull($davies->replacementImei);
         $this->assertEquals('Samsung', $davies->replacementMake);
         $this->assertEquals('NA - repaired', $davies->replacementModel);
