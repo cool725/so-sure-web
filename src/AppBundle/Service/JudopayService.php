@@ -1149,7 +1149,13 @@ class JudopayService
                 if ($abortOnMultipleSameDayPayment) {
                     throw new SameDayPaymentException($msg);
                 } else {
-                    $this->logger->warning($msg);
+                    // to avoid constantly warning, only warn if minutes are < 15 - we run every 10 minutes
+                    // so this should grab one trigger per hour (better than 6/hour)
+                    if ($diff->i < 15) {
+                        $this->logger->warning($msg);
+                    } else {
+                        $this->logger->info($msg);
+                    }
                 }
             }
         }
