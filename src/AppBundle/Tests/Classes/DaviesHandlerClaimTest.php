@@ -470,9 +470,6 @@ class DaviesHandlerClaimTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($davies->hasError());
     }
 
-    /**
-     * @expectedException \Exception
-     */
     public function testInvalidImei()
     {
         // @codingStandardsIgnoreStart
@@ -584,7 +581,7 @@ class DaviesHandlerClaimTest extends \PHPUnit\Framework\TestCase
 
         $this->assertNull($davies->replacementImei);
         $this->assertEquals(0, count($davies->unobtainableFields));
-        $this->assertTrue($davies->isReplacementRepaired());
+        $this->assertTrue($davies->checkReplacementRepaired());
         $this->assertNull($davies->replacementImei);
         $this->assertEquals('Samsung', $davies->replacementMake);
         $this->assertEquals('NA - repaired', $davies->replacementModel);

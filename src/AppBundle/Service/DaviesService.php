@@ -1,6 +1,7 @@
 <?php
 namespace AppBundle\Service;
 
+use AppBundle\Document\ImeiTrait;
 use AppBundle\Document\Policy;
 use Psr\Log\LoggerInterface;
 use Aws\S3\S3Client;
@@ -22,6 +23,7 @@ class DaviesService extends S3EmailService
 {
     use CurrencyTrait;
     use DateTrait;
+    use ImeiTrait;
 
     const MIN_LOSS_DESCRIPTION_LENGTH = 5;
 
@@ -432,6 +434,10 @@ class DaviesService extends S3EmailService
             ));
         }
 
+        if ($daviesClaim->replacementImei && !$this->isImei($daviesClaim->replacementImei)) {
+            throw new \Exception(sprintf('Invalid replacement imei %s', $daviesClaim->replacementImei));
+        }
+
         if ($daviesClaim->replacementImei && in_array($daviesClaim->getClaimStatus(), [
             Claim::STATUS_DECLINED,
             Claim::STATUS_WITHDRAWN
@@ -441,12 +447,14 @@ class DaviesService extends S3EmailService
                 $daviesClaim->claimNumber
             ));
         }
+
         if ($daviesClaim->replacementReceivedDate && $daviesClaim->replacementReceivedDate < $daviesClaim->lossDate) {
             throw new \Exception(sprintf(
                 'Claim %s has a replacement received date prior to loss date',
                 $daviesClaim->claimNumber
             ));
         }
+
         if ($daviesClaim->replacementReceivedDate &&
             (!$daviesClaim->replacementMake || !$daviesClaim->replacementModel)) {
             throw new \Exception(sprintf(

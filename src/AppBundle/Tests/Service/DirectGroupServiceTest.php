@@ -314,6 +314,32 @@ class DirectGroupServiceTest extends WebTestCase
         $this->insureWarningExists('/multiple open claims against policy/');
     }
 
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage Invalid replacement imei invalid
+     */
+    public function testValidateClaimInvalidImei()
+    {
+        $policy = new PhonePolicy();
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        $policy->setId('1');
+        $policy->setPhone(self::getRandomPhone(self::$dm));
+
+        $claim = new Claim();
+        $claim->setPolicy($policy);
+        $claim->setNumber(time());
+        $claim->setStatus(Claim::STATUS_SETTLED);
+
+        $directGroupClaim = new DirectGroupHandlerClaim();
+        $directGroupClaim->claimNumber = $claim->getNumber();
+        $directGroupClaim->status = DirectGroupHandlerClaim::STATUS_CLOSED;
+        $directGroupClaim->replacementImei = 'invalid';
+        $directGroupClaim->finalSuspicion = null;
+        $directGroupClaim->initialSuspicion = null;
+        $directGroupClaim->finalSuspicion = null;
+        self::$directGroupService->validateClaimDetails($claim, $directGroupClaim);
+    }
+
     public function testMissingLossDescription()
     {
         $policy = new PhonePolicy();

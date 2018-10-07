@@ -335,6 +335,32 @@ class DaviesServiceTest extends WebTestCase
         $this->insureWarningExists('/finalSuspicion/');
     }
 
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage Invalid replacement imei invalid
+     */
+    public function testValidateClaimInvalidImei()
+    {
+        $policy = new PhonePolicy();
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        $policy->setId('1');
+        $policy->setPhone(self::getRandomPhone(self::$dm));
+
+        $claim = new Claim();
+        $claim->setPolicy($policy);
+        $claim->setNumber(time());
+        $claim->setStatus(Claim::STATUS_SETTLED);
+
+        $daviesClaim = new DaviesHandlerClaim();
+        $daviesClaim->claimNumber = $claim->getNumber();
+        $daviesClaim->status = DaviesHandlerClaim::STATUS_CLOSED;
+        $daviesClaim->replacementImei = 'invalid';
+        $daviesClaim->finalSuspicion = null;
+        $daviesClaim->initialSuspicion = null;
+        $daviesClaim->finalSuspicion = null;
+        self::$daviesService->validateClaimDetails($claim, $daviesClaim);
+    }
+
     public function testMissingLossDescription()
     {
         $policy = new PhonePolicy();
