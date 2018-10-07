@@ -686,7 +686,7 @@ class DirectGroupServiceTest extends WebTestCase
 
         $directGroupClaim = new DirectGroupHandlerClaim();
         $directGroupClaim->policyNumber = 'TEST/2017/123456';
-        $directGroupClaim->replacementImei = '123';
+        $directGroupClaim->replacementImei = $this->generateRandomImei();
         $directGroupClaim->status = DirectGroupHandlerClaim::STATUS_WITHDRAWN;
         $directGroupClaim->insuredName = 'Mr Foo Bar';
 
@@ -1382,7 +1382,7 @@ class DirectGroupServiceTest extends WebTestCase
         self::$directGroupService->clearErrors();
         self::$directGroupService->clearSoSureActions();
 
-        $directGroupClaim->replacementImei = '123';
+        $directGroupClaim->replacementImei = $this->generateRandomImei();
         self::$directGroupService->validateClaimDetails($claim, $directGroupClaim);
         $this->insureErrorDoesNotExist('/the replacement data not recorded/');
         $this->insureErrorDoesNotExist('/received date/');
@@ -1738,7 +1738,7 @@ class DirectGroupServiceTest extends WebTestCase
         $directGroupClaim->lossDescription = 'min length';
         $directGroupClaim->replacementMake = 'Apple';
         $directGroupClaim->replacementModel = 'iPhone 4';
-        $directGroupClaim->replacementImei = '123 Bx11lt';
+        $directGroupClaim->replacementImei = $this->generateRandomImei();
         $directGroupClaim->replacementReceivedDate = new \DateTime();
         $this->assertFalse(static::$directGroupService->saveClaim($directGroupClaim, false));
         $this->assertEquals(

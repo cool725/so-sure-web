@@ -736,7 +736,7 @@ class DaviesServiceTest extends WebTestCase
 
         $daviesClaim = new DaviesHandlerClaim();
         $daviesClaim->policyNumber = 'TEST/2017/123456';
-        $daviesClaim->replacementImei = '123';
+        $daviesClaim->replacementImei = $this->generateRandomImei();
         $daviesClaim->status = 'Closed';
         $daviesClaim->miStatus = 'Withdrawn';
         $daviesClaim->insuredName = 'Mr Foo Bar';
@@ -1542,7 +1542,7 @@ class DaviesServiceTest extends WebTestCase
         self::$daviesService->clearErrors();
         self::$daviesService->clearSoSureActions();
 
-        $daviesClaim->replacementImei = '123';
+        $daviesClaim->replacementImei = $this->generateRandomImei();
         self::$daviesService->validateClaimDetails($claim, $daviesClaim);
         $this->insureErrorDoesNotExist('/the replacement data not recorded/');
         $this->insureErrorDoesNotExist('/received date/');
@@ -1988,7 +1988,7 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim->lossDescription = 'min length';
         $daviesClaim->replacementMake = 'Apple';
         $daviesClaim->replacementModel = 'iPhone 4';
-        $daviesClaim->replacementImei = '123 Bx11lt';
+        $daviesClaim->replacementImei = $this->generateRandomImei();
         $daviesClaim->replacementReceivedDate = new \DateTime();
         $this->assertFalse(static::$daviesService->saveClaim($daviesClaim, false));
         $this->assertEquals(
