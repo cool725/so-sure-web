@@ -1388,13 +1388,6 @@ class DirectGroupServiceTest extends WebTestCase
         $this->insureErrorDoesNotExist('/received date/');
         $this->insureErrorDoesNotExist('/imei/');
         $this->insureErrorDoesNotExist('/; phone/');
-
-        $directGroupClaim->replacementImei = 'NA - repaired';
-        self::$directGroupService->validateClaimDetails($claim, $directGroupClaim);
-        $this->insureErrorDoesNotExist('/the replacement data not recorded/');
-        $this->insureErrorDoesNotExist('/received date/');
-        $this->insureErrorDoesNotExist('/imei/');
-        $this->insureErrorDoesNotExist('/; phone/');
     }
 
     public function testPostValidateClaimDetailsReceivedDate()
@@ -1710,6 +1703,10 @@ class DirectGroupServiceTest extends WebTestCase
         return $claim;
     }
 
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage Invalid replacement imei invalid
+     */
     public function testSaveClaimsInvalidReplacementImei()
     {
         $policy = static::createUserPolicy(true);
@@ -1738,7 +1735,7 @@ class DirectGroupServiceTest extends WebTestCase
         $directGroupClaim->lossDescription = 'min length';
         $directGroupClaim->replacementMake = 'Apple';
         $directGroupClaim->replacementModel = 'iPhone 4';
-        $directGroupClaim->replacementImei = $this->generateRandomImei();
+        $directGroupClaim->replacementImei = 'invalid';
         $directGroupClaim->replacementReceivedDate = new \DateTime();
         $this->assertFalse(static::$directGroupService->saveClaim($directGroupClaim, false));
         $this->assertEquals(

@@ -1550,6 +1550,7 @@ class DaviesServiceTest extends WebTestCase
         $this->insureErrorDoesNotExist('/; phone/');
 
         $daviesClaim->replacementImei = 'NA - repaired';
+        $daviesClaim->checkReplacementRepaired();
         self::$daviesService->validateClaimDetails($claim, $daviesClaim);
         $this->insureErrorDoesNotExist('/the replacement data not recorded/');
         $this->insureErrorDoesNotExist('/received date/');
@@ -1960,6 +1961,10 @@ class DaviesServiceTest extends WebTestCase
         return $claim;
     }
 
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage Invalid replacement imei invalid
+     */
     public function testSaveClaimsInvalidReplacementImei()
     {
         $policy = static::createUserPolicy(true);
@@ -1988,7 +1993,7 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim->lossDescription = 'min length';
         $daviesClaim->replacementMake = 'Apple';
         $daviesClaim->replacementModel = 'iPhone 4';
-        $daviesClaim->replacementImei = $this->generateRandomImei();
+        $daviesClaim->replacementImei = 'invalid';
         $daviesClaim->replacementReceivedDate = new \DateTime();
         $this->assertFalse(static::$daviesService->saveClaim($daviesClaim, false));
         $this->assertEquals(
