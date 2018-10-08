@@ -8,7 +8,7 @@ use AppBundle\Document\Claim;
 use AppBundle\Event\ClaimEvent;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
-class DoctrineClaimListener
+class DoctrineClaimListener extends BaseDoctrineListener
 {
     /** @var EventDispatcher */
     protected $dispatcher;
@@ -33,14 +33,11 @@ class DoctrineClaimListener
     public function preUpdate(PreUpdateEventArgs $eventArgs)
     {
         $document = $eventArgs->getDocument();
-        if ($document instanceof Claim) {
-            if ($eventArgs->hasChangedField('status') &&
-                mb_strtolower($eventArgs->getOldValue('status')) != mb_strtolower($eventArgs->getNewValue('status'))) {
-                if ($eventType = $this->getEventType($eventArgs->getNewValue('status'))) {
-                    $this->triggerEvent($document, $eventType);
-                }
-                $this->triggerEvent($document, $eventArgs->getNewValue('status'));
+        if ($this->hasDataChanged($eventArgs, Claim::class, ['status'])) {
+            if ($eventType = $this->getEventType($eventArgs->getNewValue('status'))) {
+                $this->triggerEvent($document, $eventType);
             }
+            $this->triggerEvent($document, $eventArgs->getNewValue('status'));
         }
     }
 

@@ -7,10 +7,11 @@ use Doctrine\ODM\MongoDB\Event\LifecycleEventArgs;
 use AppBundle\Document\User;
 use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Event\PolicyEvent;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use AppBundle\Document\CurrencyTrait;
 
-class DoctrineSalvaListener
+class DoctrineSalvaListener extends BaseDoctrineListener
 {
     use CurrencyTrait;
 
@@ -20,9 +21,10 @@ class DoctrineSalvaListener
     /** @var string */
     protected $environment;
 
+    /** @var LoggerInterface */
     protected $logger;
 
-    public function __construct($dispatcher, $environment, $logger)
+    public function __construct(EventDispatcher $dispatcher, $environment, LoggerInterface $logger)
     {
         $this->dispatcher = $dispatcher;
         $this->environment = $environment;
@@ -31,11 +33,12 @@ class DoctrineSalvaListener
 
     public function preUpdate(PreUpdateEventArgs $eventArgs)
     {
+        $dispatched = [];
         try {
-            $dispatched = [];
             $document = $eventArgs->getDocument();
 
             if ($document instanceof SalvaPhonePolicy) {
+                /** @var SalvaPhonePolicy $policy */
                 $policy = $document;
                 if (!$policy->isValidPolicy()) {
                     $this->logger->debug(sprintf('preUpdateDebug invalid policy'));
@@ -44,61 +47,50 @@ class DoctrineSalvaListener
                     $this->logger->debug(sprintf('preUpdateDebug not billable policy'));
                     return;
                 }
-
-                $fields = [
-                    'phone',
-                    'imei',
-                    'premium',
-                    'premiumInstallments',
-                ];
-                foreach ($fields as $field) {
-                    $changed = false;
-
-                    if ($eventArgs->hasChangedField($field)) {
-                        if ($field == 'premium') {
-                            $oldPremium = $eventArgs->getOldValue('premium');
-                            $newPremium = $eventArgs->getNewValue('premium');
-                            if (!$oldPremium && !$newPremium) {
-                                $changed = false;
-                            } elseif ((!$oldPremium && $newPremium)
-                                || !$this->areEqualToTwoDp($oldPremium->getGwp(), $newPremium->getGwp())
-                                || !$this->areEqualToTwoDp($oldPremium->getIpt(), $newPremium->getIpt())
-                                || !$this->areEqualToTwoDp($oldPremium->getIptRate(), $newPremium->getIptRate())) {
-                                $changed = true;
-                            }
-                        } else {
-                            $changed = true;
-                        }
-                    }
-
-                    if ($changed) {
-                        $this->logger->debug(sprintf('preUpdateDebug changedfield : %s', $field));
-                        if (!in_array($policy->getId(), $dispatched)) {
-                            $this->triggerEvent($policy, PolicyEvent::EVENT_SALVA_INCREMENT);
-                            $dispatched[] = $policy->getId();
-                        }
-                    }
-                }
-            }
-
-            if ($document instanceof User) {
+            } elseif ($document instanceof User) {
                 if (!$document->hasActivePolicy() && !$document->hasUnpaidPolicy()) {
                     return;
                 }
-                $fields = [
-                    'firstName',
-                    'lastName',
-                ];
-                foreach ($fields as $field) {
-                    if ($eventArgs->hasChangedField($field)) {
-                        foreach ($document->getPolicies() as $policy) {
-                            if ($policy instanceof SalvaPhonePolicy &&
-                                $policy->isValidPolicy() && $policy->isBillablePolicy()) {
-                                if (!in_array($policy->getId(), $dispatched)) {
-                                    $this->triggerEvent($policy, PolicyEvent::EVENT_SALVA_INCREMENT);
-                                    $dispatched[] = $policy->getId();
-                                }
-                            }
+            }
+
+            if ($this->hasDataChanged(
+                $eventArgs,
+                SalvaPhonePolicy::class,
+                ['phone', 'imei', 'premiumInstallments']
+            )) {
+                /** @var SalvaPhonePolicy $policy */
+                $policy = $document;
+                if (!in_array($policy->getId(), $dispatched)) {
+                    $this->triggerEvent($policy, PolicyEvent::EVENT_SALVA_INCREMENT);
+                    $dispatched[] = $policy->getId();
+                }
+            } elseif ($this->hasDataChanged(
+                $eventArgs,
+                SalvaPhonePolicy::class,
+                ['premium'],
+                self::COMPARE_PREMIUM
+            )) {
+                /** @var SalvaPhonePolicy $policy */
+                $policy = $document;
+                if (!in_array($policy->getId(), $dispatched)) {
+                    $this->triggerEvent($policy, PolicyEvent::EVENT_SALVA_INCREMENT);
+                    $dispatched[] = $policy->getId();
+                }
+            }
+
+            if ($this->hasDataChanged(
+                $eventArgs,
+                User::class,
+                ['firstName', 'lastName']
+            )) {
+                /** @var User $user */
+                $user = $document;
+                foreach ($user->getPolicies() as $policy) {
+                    if ($policy instanceof SalvaPhonePolicy &&
+                        $policy->isValidPolicy() && $policy->isBillablePolicy()) {
+                        if (!in_array($policy->getId(), $dispatched)) {
+                            $this->triggerEvent($policy, PolicyEvent::EVENT_SALVA_INCREMENT);
+                            $dispatched[] = $policy->getId();
                         }
                     }
                 }
