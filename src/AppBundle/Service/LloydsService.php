@@ -167,6 +167,28 @@ class LloydsService
                                     $line['Transaction Description']
                                 ));
                             }
+                        } elseif (mb_stripos($line['Transaction Description'], 'BACS AUTOSETT DDIC') !== false) {
+                            $processedDate = \DateTime::createFromFormat("d/m/Y", $line['Transaction Date']);
+                            $paymentType = self::PAYMENT_TYPE_BACS;
+                            if (preg_match('/DDIC[0-9A-Z]{3,20}/', $line['Transaction Description'], $matches)) {
+                                $bacsIndemnityRepo = $this->dm->getRepository(BacsIndemnityPayment::class);
+                                /** @var BacsIndemnityPayment $bacsIndemnity */
+                                $bacsIndemnity = $bacsIndemnityRepo->findOneBy(['reference' => $matches[0]]);
+                                if ($bacsIndemnity) {
+                                    $bacsIndemnity->setSuccess(true);
+                                    $bacsIndemnity->setStatus(BacsIndemnityPayment::STATUS_REFUNDED);
+                                } else {
+                                    $this->logger->warning(sprintf(
+                                        'Failed to find bacs indemnity payment for DDIC %s',
+                                        $matches[0]
+                                    ));
+                                }
+                            } else {
+                                $this->logger->error(sprintf(
+                                    'Failed to find DDIC record in %s',
+                                    $line['Transaction Description']
+                                ));
+                            }
                         }
                     } elseif (in_array($line['Transaction Type'], [''])) {
                         // can be interest or Unpaid DD
@@ -191,7 +213,7 @@ class LloydsService
                     if ($paymentType == self::PAYMENT_TYPE_UNKNOWN) {
                         $this->logger->warning(sprintf(
                             'Skipping line as unable to parse type and/or description. %s',
-                            implode($line)
+                            implode(',', $line)
                         ));
                         continue;
                     }

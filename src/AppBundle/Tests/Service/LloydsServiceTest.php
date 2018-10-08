@@ -2,6 +2,7 @@
 
 namespace AppBundle\Tests\Service;
 
+use AppBundle\Document\Payment\BacsIndemnityPayment;
 use AppBundle\Service\LloydsService;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -52,8 +53,22 @@ class LloydsServiceTest extends WebTestCase
     {
         $csv = sprintf("%s/../src/AppBundle/Tests/Resources/lloyds.csv", self::$rootDir);
 
+        $bacsIndemnity = new BacsIndemnityPayment();
+        $bacsIndemnity->setReference('DDICNWBKLE00676955');
+        $bacsIndemnity->setAmount(10);
+        static::$dm->persist($bacsIndemnity);
+        static::$dm->flush();
+
         $data = self::$lloyds->processActualCsv($csv);
-        $this->assertEquals(2, count($data['data']), json_encode($data));
-        $this->assertEquals(94.41, $data['total']);
+        $this->assertEquals(3, count($data['data']), json_encode($data));
+        $this->assertEquals(84.41, $data['total']);
+
+        /** @var DocumentManager $dm */
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        $repo = $dm->getRepository(BacsIndemnityPayment::class);
+        /** @var BacsIndemnityPayment $updatedBacsIndemnity */
+        $updatedBacsIndemnity = $repo->find($bacsIndemnity->getId());
+        $this->assertTrue($updatedBacsIndemnity->hasSuccess());
+        $this->assertEquals(BacsIndemnityPayment::STATUS_REFUNDED, $updatedBacsIndemnity->getStatus());
     }
 }
