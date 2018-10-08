@@ -6,6 +6,7 @@ use AppBundle\Document\AffiliateCompany;
 use AppBundle\Document\BacsPaymentMethod;
 use AppBundle\Document\File\PaymentRequestUploadFile;
 use AppBundle\Document\JudoPaymentMethod;
+use AppBundle\Exception\PaymentDeclinedException;
 use AppBundle\Form\Type\AdminEmailOptOutType;
 use AppBundle\Form\Type\BacsCreditType;
 use AppBundle\Form\Type\PaymentRequestUploadFileType;
@@ -1022,21 +1023,30 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                         $date->getTimestamp(),
                         $policy->getId()
                     );
-                    /** @var JudoPaymentMethod $judoPaymentMethod */
-                    $judoPaymentMethod = $policy->getPayerOrUser()->getPaymentMethod();
-                    $judopay->add(
-                        $policy,
-                        $details['receiptId'],
-                        $details['consumer']['consumerToken'],
-                        $details['cardDetails']['cardToken'],
-                        Payment::SOURCE_TOKEN,
-                        $judoPaymentMethod->getDeviceDna(),
-                        $date
-                    );
-                    $this->addFlash(
-                        'success',
-                        'Policy is now paid for. Pdf generation may take a few minutes. Refresh the page to verify.'
-                    );
+                    try {
+                        /** @var JudoPaymentMethod $judoPaymentMethod */
+                        $judoPaymentMethod = $policy->getPayerOrUser()->getPaymentMethod();
+                        $judopay->add(
+                            $policy,
+                            $details['receiptId'],
+                            $details['consumer']['consumerToken'],
+                            $details['cardDetails']['cardToken'],
+                            Payment::SOURCE_TOKEN,
+                            $judoPaymentMethod->getDeviceDna(),
+                            $date
+                        );
+                        // @codingStandardsIgnoreStart
+                        $this->addFlash(
+                            'success',
+                            'Policy is now paid for. Pdf generation may take a few minutes. Refresh the page to verify.'
+                        );
+                        // @codingStandardsIgnoreEnd
+                    } catch (PaymentDeclinedException $e) {
+                        $this->addFlash(
+                            'danger',
+                            'Payment was declined'
+                        );
+                    }
 
                     return $this->redirectToRoute('admin_policy', ['id' => $id]);
                 }
