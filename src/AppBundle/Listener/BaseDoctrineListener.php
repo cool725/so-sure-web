@@ -46,7 +46,7 @@ class BaseDoctrineListener
         $mustExist = false
     ) {
         foreach ($fields as $field) {
-            if ($this->hasDataChanged($eventArgs, $class, $field, $compare, $mustExist)) {
+            if ($this->hasDataFieldChanged($eventArgs, $class, $field, $compare, $mustExist)) {
                 return true;
             }
         }
@@ -132,7 +132,7 @@ class BaseDoctrineListener
         $document = $eventArgs->getDocument();
         $annotations = $this->getDataChangeAnnotation($document, $category);
         foreach ($annotations as $property => $value) {
-            if ($this->hasDataChanged($eventArgs, get_class($document), $property)) {
+            if ($this->hasDataFieldChanged($eventArgs, get_class($document), $property)) {
                 return true;
             }
         }
