@@ -7,13 +7,14 @@ $('.confirm-cancel').on("click",function() {
     }
 });
 
-$('.confirm-action').on("click",function(e) {
-    e.preventDefault();
+$('.confirm-submit').on("click",function(e) {
     var msg = $(this).data('confirm-msg');
     if (!msg || msg.length == 0) {
         msg = 'Are you sure?';
     }
-    return confirm(msg);
+    if (!confirm(msg)) {
+        e.preventDefault();
+    }
 });
 
 $(document).ready(function(){
