@@ -2,14 +2,25 @@
 
 namespace AppBundle\Listener;
 
+use AppBundle\Annotation\DataChange;
 use AppBundle\Document\BacsPaymentMethod;
 use AppBundle\Document\BankAccount;
 use AppBundle\Document\CurrencyTrait;
+use Doctrine\Common\Annotations\Reader;
 use Doctrine\ODM\MongoDB\Event\PreUpdateEventArgs;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class BaseDoctrineListener
 {
     use CurrencyTrait;
+
+    /** @var Reader */
+    protected $reader;
+
+    public function setReader(Reader $reader)
+    {
+        $this->reader = $reader;
+    }
 
     const COMPARE_EQUAL = 'equal';
     const COMPARE_CASE_INSENSITIVE = 'case-insensitive';
@@ -114,5 +125,37 @@ class BaseDoctrineListener
         }
 
         return false;
+    }
+
+    protected function hasDataChangedByCategory(PreUpdateEventArgs $eventArgs, $category)
+    {
+        $document = $eventArgs->getDocument();
+        $annotations = $this->getDataChangeAnnotation($document, $category);
+        foreach ($annotations as $property => $value) {
+            if ($this->hasDataChanged($eventArgs, get_class($document), $property)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function getDataChangeAnnotation($object, $category)
+    {
+        $propertyAccessor = PropertyAccess::createPropertyAccessor();
+        $items = [];
+        // Get method annotation
+        $reflectionObject = new \ReflectionObject($object);
+        $properties = $reflectionObject->getProperties();
+        foreach ($properties as $property) {
+            /** @var \ReflectionProperty $property */
+            /** @var DataChange $propertyAnnotation */
+            $propertyAnnotation = $this->reader->getPropertyAnnotation($property, DataChange::class);
+            if ($propertyAnnotation && in_array($category, $propertyAnnotation->getCategories())) {
+                $items[$property->getName()] = $propertyAccessor->getValue($object, $property->getName());
+            }
+        }
+
+        return $items;
     }
 }

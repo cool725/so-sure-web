@@ -2,6 +2,11 @@
 
 namespace AppBundle\Listener;
 
+use AppBundle\Annotation\DataChange;
+use Doctrine\Common\Annotations\Annotation;
+use Doctrine\Common\Annotations\AnnotationReader;
+use Doctrine\Common\Annotations\Reader;
+use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ODM\MongoDB\Event\PreUpdateEventArgs;
 use Doctrine\ODM\MongoDB\Event\LifecycleEventArgs;
 use AppBundle\Document\Claim;
@@ -14,9 +19,13 @@ class DoctrineClaimListener extends BaseDoctrineListener
     /** @var EventDispatcherInterface */
     protected $dispatcher;
 
-    public function __construct(EventDispatcherInterface $dispatcher)
+    /** @var Reader $reader */
+    protected $reader;
+
+    public function __construct(EventDispatcherInterface $dispatcher, Reader $reader)
     {
         $this->dispatcher = $dispatcher;
+        $this->reader = $reader;
     }
 
     public function postPersist(LifecycleEventArgs $eventArgs)
@@ -33,12 +42,18 @@ class DoctrineClaimListener extends BaseDoctrineListener
 
     public function preUpdate(PreUpdateEventArgs $eventArgs)
     {
-        $document = $eventArgs->getDocument();
+        /** @var Claim $claim */
+        $claim = $eventArgs->getDocument();
         if ($this->hasDataChanged($eventArgs, Claim::class, ['status'])) {
             if ($eventType = $this->getEventType($eventArgs->getNewValue('status'))) {
-                $this->triggerEvent($document, $eventType);
+                $this->triggerEvent($claim, $eventType);
             }
-            $this->triggerEvent($document, $eventArgs->getNewValue('status'));
+            $this->triggerEvent($claim, $eventArgs->getNewValue('status'));
+        }
+
+        if ($this->hasDataChangedByCategory($eventArgs, DataChange::CATEGORY_SALVA_CLAIM)) {
+            $claim->setUnderwriterLastUpdated(new \DateTime());
+            $this->recalulateChangeSet($eventArgs, $claim);
         }
     }
 
