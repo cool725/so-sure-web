@@ -4221,6 +4221,15 @@ abstract class Policy
         return ScheduledPayment::sumScheduledPaymentAmounts($scheduledPayments);
     }
 
+    public function isUnpaidBacs()
+    {
+        if ($this->getStatus() != self::STATUS_UNPAID) {
+            return null;
+        }
+
+        return $this->getUser()->hasBacsPaymentMethod();
+    }
+
     public function isUnpaidCloseToExpirationDate(\DateTime $date = null)
     {
         if ($this->getStatus() != self::STATUS_UNPAID) {
@@ -4300,11 +4309,11 @@ abstract class Policy
         $outstandingPremium = $this->getOutstandingPremium() - $this->getPendingBacsPaymentsTotal();
 
         // generally would expect the outstanding premium to match the scheduled payments
-        // however, if unpaid and past the point where rescheduled payments are taken, then would
-        // expect the scheduled payments to be missing 1 monthly premium
+        // however, if unpaid and either past the point where rescheduled payments are taken or using bacs
+        // then would expect the scheduled payments to be missing 1 monthly premium
         if ($this->areEqualToTwoDp($outstandingPremium, $totalScheduledPayments)) {
             return true;
-        } elseif ($this->isUnpaidCloseToExpirationDate($date)) {
+        } elseif ($this->isUnpaidCloseToExpirationDate($date) || $this->isUnpaidBacs()) {
             if ($this->areEqualToTwoDp(
                 $outstandingPremium,
                 $totalScheduledPayments + $this->getPremium()->getAdjustedStandardMonthlyPremiumPrice()
