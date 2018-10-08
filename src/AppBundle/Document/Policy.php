@@ -4221,7 +4221,7 @@ abstract class Policy
         return ScheduledPayment::sumScheduledPaymentAmounts($scheduledPayments);
     }
 
-    public function isUnpaidBacs(\DateTime $date = null)
+    public function isUnpaidBacs()
     {
         if ($this->getStatus() != self::STATUS_UNPAID) {
             return null;
