@@ -853,7 +853,7 @@
                     <table class="table table-striped">
                         <tr>
                             <th>Day of Month</th>
-                            <th>so-sure</th>
+                            <th>so-sure Credit</th>
                             <th>Lloyds</th>
                             <th>Diff</th>
                             <th>Cumulative Diff</th>
@@ -870,8 +870,8 @@
                                 {% set ymd = year ~ month ~ day %}
                             {% endif %}
                             {% set color = '' %}
-                            {% if sosure['dailyBacsTransaction'][day] is defined and lloyds['dailyBacs'][ymd] is defined  %}
-                                {% if equal_to_two_dp(sosure['dailyBacsTransaction'][day], lloyds['dailyBacs'][ymd]) %}
+                            {% if sosure['dailyCreditBacsTransaction'][day] is defined and lloyds['dailyCreditBacs'][ymd] is defined  %}
+                                {% if equal_to_two_dp(sosure['dailyCreditBacsTransaction'][day], lloyds['dailyCreditBacs'][ymd]) %}
                                     {% set color = 'success' %}
                                 {% else %}
                                     {% set color = 'danger' %}
@@ -879,25 +879,86 @@
                             {% endif %}
                             <tr class='{{ color }}'>
                                 <td>{{ day }}</td>
-                                <td>{% if sosure['dailyBacsTransaction'][day] is defined %}£{{ sosure['dailyBacsTransaction'][day]|number_format(2, '.', ',') }}{% else %}-{% endif %}</td>
-                                <td>{% if lloyds['dailyBacs'][ymd] is defined %}£{{ lloyds['dailyBacs'][ymd]|number_format(2, '.', ',') }}{% else %}-{% endif %}</td>
-                                <td>{% if sosure['dailyBacsTransaction'][day] is defined and lloyds['dailyBacs'][ymd] is defined %}
-                                        {% set diff = sosure['dailyBacsTransaction'][day] - lloyds['dailyBacs'][ymd] %}
+                                <td>{% if sosure['dailyCreditBacsTransaction'][day] is defined %}£{{ sosure['dailyCreditBacsTransaction'][day]|number_format(2, '.', ',') }}{% else %}-{% endif %}</td>
+                                <td>{% if lloyds['dailyCreditBacs'][ymd] is defined %}£{{ lloyds['dailyCreditBacs'][ymd]|number_format(2, '.', ',') }}{% else %}-{% endif %}</td>
+                                <td>{% if sosure['dailyCreditBacsTransaction'][day] is defined and lloyds['dailyCreditBacs'][ymd] is defined %}
+                                        {% set diff = sosure['dailyCreditBacsTransaction'][day] - lloyds['dailyCreditBacs'][ymd] %}
                                         {% set cumulative = cumulative + diff %}
                                         £{{ diff|number_format(2, '.', ',') }}
-                                    {% elseif sosure['dailyBacsTransaction'][day] is defined %}
-                                        {% set diff = sosure['dailyBacsTransaction'][day] %}
+                                    {% elseif sosure['dailyCreditBacsTransaction'][day] is defined %}
+                                        {% set diff = sosure['dailyCreditBacsTransaction'][day] %}
                                         {% set cumulative = cumulative + diff %}
                                         £{{ diff|number_format(2, '.', ',') }}
-                                    {% elseif lloyds['dailyBacs'][ymd] is defined %}
-                                        {% set diff = 0 - lloyds['dailyBacs'][ymd] %}
+                                    {% elseif lloyds['dailyCreditBacs'][ymd] is defined %}
+                                        {% set diff = 0 - lloyds['dailyCreditBacs'][ymd] %}
                                         {% set cumulative = cumulative + diff %}
                                         £{{ diff|number_format(2, '.', ',') }}
                                     {% else %}
                                         -
                                     {% endif %}
                                 </td>
-                                <td>{% if sosure['dailyBacsTransaction'][day] is defined or lloyds['dailyBacs'][ymd] is defined %}
+                                <td>{% if sosure['dailyCreditBacsTransaction'][day] is defined or lloyds['dailyCreditBacs'][ymd] is defined %}
+                                        £{{ cumulative|number_format(2, '.', ',') }}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <h2>Bacs Debit Date / Lloyds Date</h2>
+                    <table class="table table-striped">
+                        <tr>
+                            <th>Day of Month</th>
+                            <th>so-sure Debit</th>
+                            <th>Lloyds</th>
+                            <th>Diff</th>
+                            <th>Cumulative Diff</th>
+                        </tr>
+                        {% set cumulative = 0 %}
+                        {% for day in 1..days_in_month %}
+                            {% if month < 10 and day < 10 %}
+                                {% set ymd = year ~ "0" ~ month ~ "0" ~ day %}
+                            {% elseif day < 10 %}
+                                {% set ymd = year ~ month ~ "0" ~ day %}
+                            {% elseif month < 10 %}
+                                {% set ymd = year ~ "0" ~ month ~ day %}
+                            {% else %}
+                                {% set ymd = year ~ month ~ day %}
+                            {% endif %}
+                            {% set color = '' %}
+                            {% if sosure['dailyDebitBacsTransaction'][day] is defined and lloyds['dailyDebitBacs'][ymd] is defined  %}
+                                {% if equal_to_two_dp(sosure['dailyDebitBacsTransaction'][day], lloyds['dailyDebitBacs'][ymd]) %}
+                                    {% set color = 'success' %}
+                                {% else %}
+                                    {% set color = 'danger' %}
+                                {% endif %}
+                            {% endif %}
+                            <tr class='{{ color }}'>
+                                <td>{{ day }}</td>
+                                <td>{% if sosure['dailyDebitBacsTransaction'][day] is defined %}£{{ sosure['dailyDebitBacsTransaction'][day]|number_format(2, '.', ',') }}{% else %}-{% endif %}</td>
+                                <td>{% if lloyds['dailyDebitBacs'][ymd] is defined %}£{{ lloyds['dailyDebitBacs'][ymd]|number_format(2, '.', ',') }}{% else %}-{% endif %}</td>
+                                <td>{% if sosure['dailyDebitBacsTransaction'][day] is defined and lloyds['dailyDebitBacs'][ymd] is defined %}
+                                        {% set diff = sosure['dailyDebitBacsTransaction'][day] - lloyds['dailyDebitBacs'][ymd] %}
+                                        {% set cumulative = cumulative + diff %}
+                                        £{{ diff|number_format(2, '.', ',') }}
+                                    {% elseif sosure['dailyDebitBacsTransaction'][day] is defined %}
+                                        {% set diff = sosure['dailyDebitBacsTransaction'][day] %}
+                                        {% set cumulative = cumulative + diff %}
+                                        £{{ diff|number_format(2, '.', ',') }}
+                                    {% elseif lloyds['dailyDebitBacs'][ymd] is defined %}
+                                        {% set diff = 0 - lloyds['dailyDebitBacs'][ymd] %}
+                                        {% set cumulative = cumulative + diff %}
+                                        £{{ diff|number_format(2, '.', ',') }}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                                <td>{% if sosure['dailyDebitBacsTransaction'][day] is defined or lloyds['dailyDebitBacs'][ymd] is defined %}
                                         £{{ cumulative|number_format(2, '.', ',') }}
                                     {% else %}
                                         -

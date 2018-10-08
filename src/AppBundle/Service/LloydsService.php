@@ -52,6 +52,8 @@ class LloydsService
         $lloydsFile->setDailyReceived($data['dailyBarclaysReceived']);
         $lloydsFile->setDailyProcessing($data['dailyBarclaysProcessing']);
         $lloydsFile->setDailyBacs($data['dailyBacs']);
+        $lloydsFile->setDailyCreditBacs($data['dailyCreditBacs']);
+        $lloydsFile->setDailyDebitBacs($data['dailyDebitBacs']);
         $lloydsFile->setSalvaPayment($data['salvaPayment']);
         $lloydsFile->setSoSurePayment($data['soSurePayment']);
         $lloydsFile->setAflPayment($data['aflPayment']);
@@ -66,6 +68,8 @@ class LloydsService
         $dailyBarclaysReceived = array();
         $dailyBarclaysProcessing = array();
         $dailyBacs = array();
+        $dailyCreditBacs = array();
+        $dailyDebitBacs = array();
 
         $total = 0;
         $maxDate = null;
@@ -228,6 +232,17 @@ class LloydsService
                             $dailyBacs[$receivedDate->format('Ymd')] = 0;
                         }
                         $dailyBacs[$receivedDate->format('Ymd')] += $amount;
+                        if ($amount < 0.0) {
+                            if (!isset($dailyDebitBacs[$receivedDate->format('Ymd')])) {
+                                $dailyDebitBacs[$receivedDate->format('Ymd')] = 0;
+                            }
+                            $dailyDebitBacs[$receivedDate->format('Ymd')] += $amount;
+                        } else {
+                            if (!isset($dailyCreditBacs[$receivedDate->format('Ymd')])) {
+                                $dailyCreditBacs[$receivedDate->format('Ymd')] = 0;
+                            }
+                            $dailyCreditBacs[$receivedDate->format('Ymd')] += $amount;
+                        }
                     }
 
                     $lines[] = $line;
@@ -243,6 +258,8 @@ class LloydsService
             'dailyBarclaysReceived' => $dailyBarclaysReceived,
             'dailyBarclaysProcessing' => $dailyBarclaysProcessing,
             'dailyBacs' => $dailyBacs,
+            'dailyCreditBacs' => $dailyCreditBacs,
+            'dailyDebitBacs' => $dailyDebitBacs,
             'salvaPayment' => $salvaPayment,
             'soSurePayment' => $soSurePayment,
             'aflPayment' => $aflPayment,

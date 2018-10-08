@@ -881,6 +881,12 @@ class AdminController extends BaseController
 
         $payments = $paymentRepo->getAllPaymentsForExport($date);
         $extraPayments = $paymentRepo->getAllPaymentsForExport($date, true);
+        $extraCreditPayments = array_filter($extraPayments->toArray(), function ($v) {
+            return $v->getAmount() >= 0.0;
+        });
+        $extraDebitPayments = array_filter($extraPayments->toArray(), function ($v) {
+            return $v->getAmount() < 0.0;
+        });
         $isProd = $this->isProduction();
         $tz = new \DateTimeZone(SoSure::TIMEZONE);
         $sosure = [
@@ -891,8 +897,15 @@ class AdminController extends BaseController
             'monthlyJudoTransaction' => Payment::sumPayments($payments, $isProd, JudoPayment::class),
             'dailyJudoShiftedTransaction' => Payment::dailyPayments($payments, $isProd, JudoPayment::class, $tz),
             'monthlyJudoShiftedTransaction' => Payment::sumPayments($payments, $isProd, JudoPayment::class),
-            'dailyBacsTransaction' => Payment::dailyPayments(
-                $extraPayments,
+            'dailyCreditBacsTransaction' => Payment::dailyPayments(
+                $extraCreditPayments,
+                $isProd,
+                BacsPayment::class,
+                null,
+                'getBacsCreditDate'
+            ),
+            'dailyDebitBacsTransaction' => Payment::dailyPayments(
+                $extraDebitPayments,
                 $isProd,
                 BacsPayment::class,
                 null,
@@ -1080,6 +1093,8 @@ class AdminController extends BaseController
         $monthlyPerDayLloydsReceived = LloydsFile::combineDailyReceived($monthlyLloydsFiles);
         $monthlyPerDayLloydsProcessing = LloydsFile::combineDailyProcessing($monthlyLloydsFiles);
         $monthlyPerDayLloydsBacs = LloydsFile::combineDailyBacs($monthlyLloydsFiles);
+        $monthlyPerDayLloydsCreditBacs = LloydsFile::combineDailyCreditBacs($monthlyLloydsFiles);
+        $monthlyPerDayLloydsDebitBacs = LloydsFile::combineDailyDebitBacs($monthlyLloydsFiles);
 
         $yearlyLloydsFiles = $lloydsFileRepo->getYearlyFilesToDate($date);
         $yearlyPerDayLloydsReceived = LloydsFile::combineDailyReceived($yearlyLloydsFiles);
@@ -1094,7 +1109,8 @@ class AdminController extends BaseController
         $lloyds = [
             'dailyReceived' => $monthlyPerDayLloydsReceived,
             'dailyProcessed' => $monthlyPerDayLloydsProcessing,
-            'dailyBacs' => $monthlyPerDayLloydsBacs,
+            'dailyCreditBacs' => $monthlyPerDayLloydsCreditBacs,
+            'dailyDebitBacs' => $monthlyPerDayLloydsDebitBacs,
             'monthlyReceived' => LloydsFile::totalCombinedFiles($monthlyPerDayLloydsReceived, $year, $month),
             'monthlyProcessed' => LloydsFile::totalCombinedFiles($monthlyPerDayLloydsProcessing, $year, $month),
             'monthlyBacs' => LloydsFile::totalCombinedFiles($monthlyPerDayLloydsBacs, $year, $month),
