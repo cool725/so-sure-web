@@ -66,15 +66,16 @@ class BaseDoctrineListener
             return null;
         }
 
-        $oldValue = $eventArgs->getOldValue($field);
-        $newValue = $eventArgs->getNewValue($field);
-
         if ($eventArgs->hasChangedField($field)) {
+            $oldValue = $eventArgs->getOldValue($field);
+            $newValue = $eventArgs->getNewValue($field);
+
             if ($mustExist && mb_strlen(trim($oldValue)) == 0) {
                 return false;
             }
 
             if ($compare == self::COMPARE_EQUAL) {
+                throw new \Exception($newValue);
                 return $oldValue == $newValue;
             } elseif ($compare == self::COMPARE_CASE_INSENSITIVE) {
                 return mb_strtolower($oldValue) == mb_strtolower($newValue);
@@ -142,6 +143,10 @@ class BaseDoctrineListener
 
     private function getDataChangeAnnotation($object, $category)
     {
+        if (!$this->reader) {
+            throw new \Exception('Missing annotation reader');
+        }
+
         $propertyAccessor = PropertyAccess::createPropertyAccessor();
         $items = [];
         // Get method annotation

@@ -19,13 +19,9 @@ class DoctrineClaimListener extends BaseDoctrineListener
     /** @var EventDispatcherInterface */
     protected $dispatcher;
 
-    /** @var Reader $reader */
-    protected $reader;
-
-    public function __construct(EventDispatcherInterface $dispatcher, Reader $reader)
+    public function __construct(EventDispatcherInterface $dispatcher)
     {
         $this->dispatcher = $dispatcher;
-        $this->reader = $reader;
     }
 
     public function postPersist(LifecycleEventArgs $eventArgs)

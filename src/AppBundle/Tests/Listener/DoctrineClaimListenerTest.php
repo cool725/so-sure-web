@@ -2,8 +2,10 @@
 
 namespace AppBundle\Tests\Listener;
 
+use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
 use AppBundle\Listener\DoctrineClaimListener;
 use Doctrine\ODM\MongoDB\Event\LifecycleEventArgs;
@@ -14,6 +16,8 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * @group functional-nonet
+ *
+ * AppBundle\\Tests\\Listener\\DoctrineClaimListenerTest
  */
 class DoctrineClaimListenerTest extends WebTestCase
 {
@@ -117,9 +121,10 @@ class DoctrineClaimListenerTest extends WebTestCase
     private function createClaimEventListener(Claim $claim, $count, $eventTypes)
     {
         $event = new ClaimEvent($claim);
-        $dispatcher = $this->getMockBuilder('EventDispatcherInterface')
+        $dispatcher = $this->getMockBuilder(EventDispatcher::class)
                          ->setMethods(array('dispatch'))
                          ->getMock();
+
         if ($count != $this->never()) {
             $loop = 0;
             foreach ($eventTypes as $eventType) {
@@ -134,6 +139,8 @@ class DoctrineClaimListenerTest extends WebTestCase
         }
 
         $listener = new DoctrineClaimListener($dispatcher);
+        $reader = new AnnotationReader();
+        $listener->setReader($reader);
 
         return $listener;
     }
