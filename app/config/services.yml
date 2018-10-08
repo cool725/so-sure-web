@@ -713,7 +713,7 @@ services:
         abstract: true
         class: AppBundle\Listener\BaseDoctrineListener
         calls:
-            - [setReader, ['@annotation.reader']]
+            - [setReader, ['@annotations.reader']]
 
     doctrine.listener.invitation:
         class:   AppBundle\Listener\DoctrineInvitationListener
