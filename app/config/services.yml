@@ -733,6 +733,9 @@ services:
 
     doctrine.listener.user:
         parent: base.doctrine
+        autowire: false
+        autoconfigure: false
+        public: true
         class:   AppBundle\Listener\DoctrineUserListener
         arguments:
             - "@event_dispatcher"
@@ -752,6 +755,9 @@ services:
 
     doctrine.listener.claim:
         parent: base.doctrine
+        autowire: false
+        autoconfigure: false
+        public: true
         class:   AppBundle\Listener\DoctrineClaimListener
         arguments:
             - "@event_dispatcher"
@@ -762,6 +768,9 @@ services:
 
     doctrine.listener.connection:
         parent: base.doctrine
+        autowire: false
+        autoconfigure: false
+        public: true
         class:   AppBundle\Listener\DoctrineConnectionListener
         arguments:
             - "@event_dispatcher"
@@ -770,6 +779,9 @@ services:
 
     doctrine.listener.salva:
         parent: base.doctrine
+        autowire: false
+        autoconfigure: false
+        public: true
         class:   AppBundle\Listener\DoctrineSalvaListener
         arguments:
             - "@event_dispatcher"
