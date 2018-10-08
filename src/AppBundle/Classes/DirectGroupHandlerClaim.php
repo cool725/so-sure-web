@@ -72,6 +72,7 @@ class DirectGroupHandlerClaim extends HandlerClaim
 
     public static $breakdownEmailAddresses = [
         'SoSure@directgroup.co.uk',
+        'Tracey.McManus@directgroup.co.uk',
     ];
 
     public static $errorEmailAddresses = [
