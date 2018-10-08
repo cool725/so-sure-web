@@ -108,7 +108,7 @@
                                         {% set settable_alternative_status = 'active' %}
                                     {% endif %}
                                     {% if settable_alternative_status %}
-                                        <a class="btn btn-sm btn-danger confirm-click" data-confirm-msg="Are you sure you want to change the policy status?"
+                                        <a class="btn btn-sm btn-danger confirm-submit" data-confirm-msg="Are you sure you want to change the policy status?"
                                             href="{{ path('admin_policy_set_status', { id: policy.id, policyNewStatus: settable_alternative_status}) }}">
                                             set as  {{ settable_alternative_status }}</a>
                                     {% endif %}

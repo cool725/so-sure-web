@@ -7,25 +7,13 @@ $('.confirm-cancel').on("click",function() {
     }
 });
 
-$('.confirm-click').on("click",function(e) {
-    e.preventDefault();
-    var msg = $(this).data('confirm-msg');
-    if (!msg || msg.length == 0) {
-        msg = 'Are you sure?';
-    }
-    return confirm(msg);
-});
-
 $('.confirm-submit').on("click",function(e) {
-    e.preventDefault();
     var msg = $(this).data('confirm-msg');
     if (!msg || msg.length == 0) {
         msg = 'Are you sure?';
     }
-    if (confirm(msg)) {
-        this.submit();
-    } else {
-        return false;
+    if (!confirm(msg)) {
+        e.preventDefault();
     }
 });
 
