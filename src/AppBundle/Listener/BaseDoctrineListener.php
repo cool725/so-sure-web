@@ -2,6 +2,8 @@
 
 namespace AppBundle\Listener;
 
+use AppBundle\Document\BacsPaymentMethod;
+use AppBundle\Document\BankAccount;
 use AppBundle\Document\CurrencyTrait;
 use Doctrine\ODM\MongoDB\Event\PreUpdateEventArgs;
 
@@ -14,11 +16,26 @@ class BaseDoctrineListener
     const COMPARE_INCREASE = 'increase';
     const COMPARE_DECREASE = 'decrease';
     const COMPARE_PREMIUM = 'premium';
+    const COMPARE_TO_NULL = 'to-null';
+    const COMPARE_BACS = 'bacs';
 
-    protected function hasDataChanged(PreUpdateEventArgs $eventArgs, $class, $fields, $compare = self::COMPARE_EQUAL)
+    protected function recalulateChangeSet(PreUpdateEventArgs $eventArgs, $updatedDocument)
     {
+        $dm = $eventArgs->getDocumentManager();
+        $uow = $dm->getUnitOfWork();
+        $meta = $dm->getClassMetadata(get_class($updatedDocument));
+        $uow->recomputeSingleDocumentChangeSet($meta, $updatedDocument);
+    }
+
+    protected function hasDataChanged(
+        PreUpdateEventArgs $eventArgs,
+        $class,
+        $fields,
+        $compare = self::COMPARE_EQUAL,
+        $mustExist = false
+    ) {
         foreach ($fields as $field) {
-            if ($this->hasDataChanged($eventArgs, $class, $field, $compare)) {
+            if ($this->hasDataChanged($eventArgs, $class, $field, $compare, $mustExist)) {
                 return true;
             }
         }
@@ -26,8 +43,13 @@ class BaseDoctrineListener
         return false;
     }
 
-    private function hasDataFieldChanged(PreUpdateEventArgs $eventArgs, $class, $field, $compare = self::COMPARE_EQUAL)
-    {
+    private function hasDataFieldChanged(
+        PreUpdateEventArgs $eventArgs,
+        $class,
+        $field,
+        $compare = self::COMPARE_EQUAL,
+        $mustExist = false
+    ) {
         $document = $eventArgs->getDocument();
         if (!$document instanceof $class) {
             return null;
@@ -37,6 +59,10 @@ class BaseDoctrineListener
         $newValue = $eventArgs->getNewValue($field);
 
         if ($eventArgs->hasChangedField($field)) {
+            if ($mustExist && mb_strlen(trim($oldValue)) == 0) {
+                return false;
+            }
+
             if ($compare == self::COMPARE_EQUAL) {
                 return $oldValue == $newValue;
             } elseif ($compare == self::COMPARE_CASE_INSENSITIVE) {
@@ -55,6 +81,29 @@ class BaseDoctrineListener
                 } elseif (!$this->areEqualToTwoDp($oldValue->getIpt(), $newValue->getIpt())) {
                     return true;
                 } elseif (!$this->areEqualToTwoDp($oldValue->getIptRate(), $newValue->getIptRate())) {
+                    return true;
+                }
+
+                return false;
+            } elseif ($compare == self::COMPARE_TO_NULL) {
+                return $newValue === null;
+            } elseif ($compare == self::COMPARE_BACS) {
+                if (!$oldValue instanceof BacsPaymentMethod || !$newValue instanceof BacsPaymentMethod) {
+                    return false;
+                }
+
+                /** @var BankAccount $oldBankAccount */
+                $oldBankAccount = $oldValue->getBankAccount();
+                /** @var BankAccount $newBankAccount */
+                $newBankAccount = $newValue->getBankAccount();
+
+                if ($oldBankAccount->getAccountNumber() != $newBankAccount->getAccountNumber()) {
+                    return true;
+                } elseif ($oldBankAccount->getSortCode() != $newBankAccount->getSortCode()) {
+                    return true;
+                } elseif ($oldBankAccount->getAccountName() != $newBankAccount->getAccountName()) {
+                    return true;
+                } elseif ($oldBankAccount->getReference() != $newBankAccount->getReference()) {
                     return true;
                 }
 
