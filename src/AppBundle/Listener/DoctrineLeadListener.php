@@ -7,13 +7,14 @@ use Doctrine\ODM\MongoDB\Event\LifecycleEventArgs;
 use AppBundle\Document\Lead;
 use AppBundle\Event\LeadEvent;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class DoctrineLeadListener
 {
-    /** @var EventDispatcher */
+    /** @var EventDispatcherInterface */
     protected $dispatcher;
 
-    public function __construct($dispatcher)
+    public function __construct(EventDispatcherInterface $dispatcher)
     {
         $this->dispatcher = $dispatcher;
     }

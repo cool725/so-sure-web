@@ -10,12 +10,13 @@ use AppBundle\Event\PolicyEvent;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use AppBundle\Document\CurrencyTrait;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class DoctrineSalvaListener extends BaseDoctrineListener
 {
     use CurrencyTrait;
 
-    /** @var EventDispatcher */
+    /** @var EventDispatcherInterface */
     protected $dispatcher;
 
     /** @var string */
@@ -24,7 +25,7 @@ class DoctrineSalvaListener extends BaseDoctrineListener
     /** @var LoggerInterface */
     protected $logger;
 
-    public function __construct(EventDispatcher $dispatcher, $environment, LoggerInterface $logger)
+    public function __construct(EventDispatcherInterface $dispatcher, $environment, LoggerInterface $logger)
     {
         $this->dispatcher = $dispatcher;
         $this->environment = $environment;

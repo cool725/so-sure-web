@@ -7,13 +7,14 @@ use Doctrine\ODM\MongoDB\Event\LifecycleEventArgs;
 use AppBundle\Document\Claim;
 use AppBundle\Event\ClaimEvent;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class DoctrineClaimListener extends BaseDoctrineListener
 {
-    /** @var EventDispatcher */
+    /** @var EventDispatcherInterface */
     protected $dispatcher;
 
-    public function __construct($dispatcher)
+    public function __construct(EventDispatcherInterface $dispatcher)
     {
         $this->dispatcher = $dispatcher;
     }

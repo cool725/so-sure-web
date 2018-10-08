@@ -12,16 +12,17 @@ use AppBundle\Event\UserEvent;
 use AppBundle\Event\UserEmailEvent;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class DoctrineUserListener extends BaseDoctrineListener
 {
-    /** @var EventDispatcher */
+    /** @var EventDispatcherInterface */
     protected $dispatcher;
 
     /** @var LoggerInterface */
     protected $logger;
 
-    public function __construct($dispatcher, LoggerInterface $logger)
+    public function __construct(EventDispatcherInterface $dispatcher, LoggerInterface $logger)
     {
         $this->dispatcher = $dispatcher;
         $this->logger = $logger;
@@ -106,7 +107,7 @@ class DoctrineUserListener extends BaseDoctrineListener
                 /** @var BacsPaymentMethod $paymentMethod */
                 $paymentMethod = $oldValue->getPaymentMethod();
             }
-            
+
             $bankAccount = clone $paymentMethod->getBankAccount();
             $event = new BacsEvent($bankAccount, $user->getId());
             $this->dispatcher->dispatch(BacsEvent::EVENT_UPDATED, $event);

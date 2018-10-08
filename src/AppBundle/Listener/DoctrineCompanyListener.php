@@ -7,13 +7,14 @@ use Doctrine\ODM\MongoDB\Event\LifecycleEventArgs;
 use AppBundle\Document\Company;
 use AppBundle\Event\CompanyEvent;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class DoctrineCompanyListener
 {
-    /** @var EventDispatcher */
+    /** @var EventDispatcherInterface */
     protected $dispatcher;
 
-    public function __construct($dispatcher)
+    public function __construct(EventDispatcherInterface $dispatcher)
     {
         $this->dispatcher = $dispatcher;
     }

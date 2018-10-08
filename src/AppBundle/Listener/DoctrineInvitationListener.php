@@ -6,13 +6,14 @@ use Doctrine\ODM\MongoDB\Event\LifecycleEventArgs;
 use AppBundle\Document\Invitation\Invitation;
 use AppBundle\Event\InvitationEvent;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class DoctrineInvitationListener
 {
-    /** @var EventDispatcher */
+    /** @var EventDispatcherInterface */
     protected $dispatcher;
 
-    public function __construct($dispatcher)
+    public function __construct(EventDispatcherInterface $dispatcher)
     {
         $this->dispatcher = $dispatcher;
     }
