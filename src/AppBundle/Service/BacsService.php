@@ -546,7 +546,7 @@ class BacsService
                     $debitPayment->setSerialNumber($submittedPayment->getSerialNumber());
                     $debitPayment->setDate($this->getNextBusinessDay($currentProcessingDate));
                     $policy->addPayment($debitPayment);
-                    $debitPayment->setTotalCommission($submittedPayment->getTotalCommission());
+                    $debitPayment->setRefundTotalCommission($submittedPayment->getTotalCommission());
                     $debitPayment->calculateSplit();
 
                     // Set policy as unpaid if there's a payment failure
