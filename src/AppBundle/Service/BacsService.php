@@ -267,7 +267,7 @@ class BacsService
         }
 
         if ($uploadFile) {
-            //$this->uploadS3($tmpFile, $file->getClientOriginalName(), $uploadFile, $date, $metadata);
+            $this->uploadS3($tmpFile, $file->getClientOriginalName(), $uploadFile, $date, $metadata);
         }
 
         return true;
