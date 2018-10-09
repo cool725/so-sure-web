@@ -543,6 +543,7 @@ class BacsService
                     $debitPayment = new BacsPayment();
                     $debitPayment->setAmount(0 - $submittedPayment->getAmount());
                     $debitPayment->setStatus(BacsPayment::STATUS_SUCCESS);
+                    $debitPayment->setSuccess(true);
                     $debitPayment->setSerialNumber($submittedPayment->getSerialNumber());
                     $debitPayment->setDate($this->getNextBusinessDay($currentProcessingDate));
                     $policy->addPayment($debitPayment);
