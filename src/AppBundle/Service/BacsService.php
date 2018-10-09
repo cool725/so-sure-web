@@ -539,7 +539,17 @@ class BacsService
                 $policy = $submittedPayment->getPolicy();
                 if ($policy->getUser()->getId() == $user->getId()) {
                     $foundPayments++;
-                    $submittedPayment->setStatus(BacsPayment::STATUS_FAILURE);
+
+                    $debitPayment = new BacsPayment();
+                    $debitPayment->setAmount(0 - $submittedPayment->getAmount());
+                    $debitPayment->setStatus(BacsPayment::STATUS_SUCCESS);
+                    $debitPayment->setSuccess(true);
+                    $debitPayment->setSerialNumber($submittedPayment->getSerialNumber());
+                    $debitPayment->setDate($this->getNextBusinessDay($currentProcessingDate));
+                    $policy->addPayment($debitPayment);
+                    $debitPayment->setRefundTotalCommission($submittedPayment->getTotalCommission());
+                    $debitPayment->calculateSplit();
+
                     // Set policy as unpaid if there's a payment failure
                     if (!$policy->isPolicyPaidToDate() && $policy->getStatus() == Policy::STATUS_ACTIVE) {
                         $policy->setStatus(Policy::STATUS_UNPAID);
