@@ -152,6 +152,8 @@
     text-align: center;
 
     &__step {
+        width: 180px;
+        margin: 0 auto;
         position: relative;
 
         img {
@@ -174,7 +176,7 @@
 
         @include media-breakpoint-up(sm) {
             position: absolute;
-            top: 0; left: 0;
+            top: 20%; left: -20px;
         }
     }
 }
