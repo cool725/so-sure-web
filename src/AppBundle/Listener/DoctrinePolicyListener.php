@@ -17,13 +17,14 @@ class DoctrinePolicyListener extends BaseDoctrineListener
     /** @var EventDispatcherInterface */
     protected $dispatcher;
 
-    public function __construct(EventDispatcherInterface $dispatcher)
+    public function __construct($dispatcher)
     {
         $this->dispatcher = $dispatcher;
     }
 
     public function preUpdate(PreUpdateEventArgs $eventArgs)
     {
+        /** @var Policy $document */
         $document = $eventArgs->getDocument();
         if ($document instanceof Policy) {
             if (!$document->isValidPolicy()) {

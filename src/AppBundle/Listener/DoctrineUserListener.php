@@ -4,6 +4,7 @@ namespace AppBundle\Listener;
 
 use AppBundle\Document\BacsPaymentMethod;
 use AppBundle\Document\BankAccount;
+use AppBundle\Document\PaymentMethod;
 use AppBundle\Event\BacsEvent;
 use Doctrine\ODM\MongoDB\Event\PreUpdateEventArgs;
 use Doctrine\ODM\MongoDB\Event\LifecycleEventArgs;
@@ -22,10 +23,12 @@ class DoctrineUserListener extends BaseDoctrineListener
     /** @var LoggerInterface */
     protected $logger;
 
-    public function __construct(EventDispatcherInterface $dispatcher, LoggerInterface $logger)
+    public function __construct($dispatcher = null, LoggerInterface $logger = null)
     {
         $this->dispatcher = $dispatcher;
-        $this->logger = $logger;
+        if ($logger) {
+            $this->logger = $logger;
+        }
     }
 
     public function postPersist(LifecycleEventArgs $eventArgs)
@@ -102,10 +105,11 @@ class DoctrineUserListener extends BaseDoctrineListener
             $paymentMethod = $user->getPaymentMethod();
 
             // prefer the old bank account data if it exists
-            $oldValue = $eventArgs->getOldValue();
+            /** @var BacsPaymentMethod $oldValue */
+            $oldValue = $eventArgs->getOldValue('paymentMethod');
             if ($oldValue instanceof BacsPaymentMethod && $oldValue->getBankAccount()) {
                 /** @var BacsPaymentMethod $paymentMethod */
-                $paymentMethod = $oldValue->getPaymentMethod();
+                $paymentMethod = $oldValue;
             }
 
             $bankAccount = clone $paymentMethod->getBankAccount();

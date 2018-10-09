@@ -15,7 +15,7 @@ class DoctrineConnectionListener extends BaseDoctrineListener
     /** @var EventDispatcherInterface */
     protected $dispatcher;
 
-    public function __construct(EventDispatcherInterface $dispatcher)
+    public function __construct($dispatcher)
     {
         $this->dispatcher = $dispatcher;
     }

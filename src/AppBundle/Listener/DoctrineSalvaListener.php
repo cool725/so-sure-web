@@ -25,7 +25,7 @@ class DoctrineSalvaListener extends BaseDoctrineListener
     /** @var LoggerInterface */
     protected $logger;
 
-    public function __construct(EventDispatcherInterface $dispatcher, $environment, LoggerInterface $logger)
+    public function __construct($dispatcher, $environment, LoggerInterface $logger)
     {
         $this->dispatcher = $dispatcher;
         $this->environment = $environment;
