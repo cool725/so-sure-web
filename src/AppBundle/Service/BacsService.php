@@ -267,7 +267,7 @@ class BacsService
         }
 
         if ($uploadFile) {
-            $this->uploadS3($tmpFile, $file->getClientOriginalName(), $uploadFile, $date, $metadata);
+            //$this->uploadS3($tmpFile, $file->getClientOriginalName(), $uploadFile, $date, $metadata);
         }
 
         return true;
@@ -539,7 +539,16 @@ class BacsService
                 $policy = $submittedPayment->getPolicy();
                 if ($policy->getUser()->getId() == $user->getId()) {
                     $foundPayments++;
-                    $submittedPayment->setStatus(BacsPayment::STATUS_FAILURE);
+
+                    $debitPayment = new BacsPayment();
+                    $debitPayment->setAmount(0 - $submittedPayment->getAmount());
+                    $debitPayment->setStatus(BacsPayment::STATUS_SUCCESS);
+                    $debitPayment->setSerialNumber($submittedPayment->getSerialNumber());
+                    $debitPayment->setDate($this->getNextBusinessDay($currentProcessingDate));
+                    $policy->addPayment($debitPayment);
+                    $debitPayment->setTotalCommission($submittedPayment->getTotalCommission());
+                    $debitPayment->calculateSplit();
+
                     // Set policy as unpaid if there's a payment failure
                     if (!$policy->isPolicyPaidToDate() && $policy->getStatus() == Policy::STATUS_ACTIVE) {
                         $policy->setStatus(Policy::STATUS_UNPAID);
