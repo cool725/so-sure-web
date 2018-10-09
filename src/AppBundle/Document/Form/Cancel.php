@@ -18,6 +18,9 @@ class Cancel
     /** @var boolean */
     protected $skipNetworkEmail;
 
+    /** @var boolean */
+    protected $force;
+
     public static function getEncodedCooloffReason($reason)
     {
         return sprintf('%s - %s', ucfirst(Policy::CANCELLED_COOLOFF), $reason);
@@ -80,5 +83,15 @@ class Cancel
     public function setSkipNetworkEmail($skipNetworkEmail)
     {
         $this->skipNetworkEmail = $skipNetworkEmail;
+    }
+
+    public function getForce()
+    {
+        return $this->force;
+    }
+
+    public function setForce($force)
+    {
+        $this->force = $force;
     }
 }

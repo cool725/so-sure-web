@@ -2924,7 +2924,7 @@ abstract class Policy
         return $this->isCancelled() && $this->getCancelledReason() == $reason;
     }
 
-    public function canCancel($reason, $date = null)
+    public function canCancel($reason, $date = null, $ignoreClaims = false)
     {
         // Doesn't make sense to cancel
         if (in_array($this->getStatus(), [
@@ -2937,7 +2937,7 @@ abstract class Policy
         }
 
         // Any claims must be completed before cancellation is allowed
-        if ($this->hasOpenClaim()) {
+        if ($this->hasOpenClaim() && !$ignoreClaims) {
             return false;
         }
 
