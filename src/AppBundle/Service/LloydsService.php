@@ -1,6 +1,7 @@
 <?php
 namespace AppBundle\Service;
 
+use AppBundle\Document\DateTrait;
 use AppBundle\Document\File\LloydsFile;
 use AppBundle\Document\File\UploadFile;
 use AppBundle\Document\Payment\BacsIndemnityPayment;
@@ -12,6 +13,7 @@ use AppBundle\Document\CurrencyTrait;
 class LloydsService
 {
     use CurrencyTrait;
+    use DateTrait;
 
     const PAYMENT_TYPE_UNKNOWN = 'unknown';
     const PAYMENT_TYPE_BARCLAYS_STANDARD = 'barclays';
@@ -151,6 +153,7 @@ class LloydsService
                             $paymentType = self::PAYMENT_TYPE_BACS;
                         } elseif (mb_stripos($line['Transaction Description'], 'DDICA') !== false) {
                             $processedDate = \DateTime::createFromFormat("d/m/Y", $line['Transaction Date']);
+                            $processedDate = $this->startOfDay($processedDate);
                             $paymentType = self::PAYMENT_TYPE_BACS;
                             if (preg_match('/DDIC[0-9]{3,20}/', $line['Transaction Description'], $matches)) {
                                 $bacsIndemnityRepo = $this->dm->getRepository(BacsIndemnityPayment::class);
@@ -159,6 +162,33 @@ class LloydsService
                                 if ($bacsIndemnity) {
                                     $bacsIndemnity->setSuccess(true);
                                     $bacsIndemnity->setStatus(BacsIndemnityPayment::STATUS_REFUNDED);
+                                    // may have initally be created in the previous month
+                                    $bacsIndemnity->setDate($processedDate);
+                                } else {
+                                    $this->logger->warning(sprintf(
+                                        'Failed to find bacs indemnity payment for DDIC %s',
+                                        $matches[0]
+                                    ));
+                                }
+                            } else {
+                                $this->logger->error(sprintf(
+                                    'Failed to find DDIC record in %s',
+                                    $line['Transaction Description']
+                                ));
+                            }
+                        } elseif (mb_stripos($line['Transaction Description'], 'BACS AUTOSETT DDIC') !== false) {
+                            $processedDate = \DateTime::createFromFormat("d/m/Y", $line['Transaction Date']);
+                            $processedDate = $this->startOfDay($processedDate);
+                            $paymentType = self::PAYMENT_TYPE_BACS;
+                            if (preg_match('/DDIC[0-9A-Z]{3,20}/', $line['Transaction Description'], $matches)) {
+                                $bacsIndemnityRepo = $this->dm->getRepository(BacsIndemnityPayment::class);
+                                /** @var BacsIndemnityPayment $bacsIndemnity */
+                                $bacsIndemnity = $bacsIndemnityRepo->findOneBy(['reference' => $matches[0]]);
+                                if ($bacsIndemnity) {
+                                    $bacsIndemnity->setSuccess(true);
+                                    $bacsIndemnity->setStatus(BacsIndemnityPayment::STATUS_REFUNDED);
+                                    // may have initally be created in the previous month
+                                    $bacsIndemnity->setDate($processedDate);
                                 } else {
                                     $this->logger->warning(sprintf(
                                         'Failed to find bacs indemnity payment for DDIC %s',
@@ -195,7 +225,7 @@ class LloydsService
                     if ($paymentType == self::PAYMENT_TYPE_UNKNOWN) {
                         $this->logger->warning(sprintf(
                             'Skipping line as unable to parse type and/or description. %s',
-                            implode($line)
+                            implode(',', $line)
                         ));
                         continue;
                     }
