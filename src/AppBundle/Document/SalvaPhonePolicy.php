@@ -44,6 +44,10 @@ class SalvaPhonePolicy extends PhonePolicy
         // Policy needs to be updated (direct update) at salva - will change to active after acceptance
     const SALVA_STATUS_PENDING_UPDATE = 'pending-update';
 
+    const RESULT_TYPE_CREATE = 'create';
+    const RESULT_TYPE_UPDATE = 'update';
+    const RESULT_TYPE_CANCEL = 'cancel';
+
     /**
      * @Assert\Choice({"pending", "active", "cancelled", "wait-cancelled", "pending-cancelled",
      *      "replacement-cancel", "replacement-create", "skipped", "pending-update"}, strict=true)
@@ -136,12 +140,15 @@ class SalvaPhonePolicy extends PhonePolicy
         return $data;
     }
 
-    public function addSalvaPolicyResults($responseId, $cancel, $details)
+    public function addSalvaPolicyResults($responseId, $resultType, $details)
     {
-        $key = sprintf('%d-create', $this->getLatestSalvaPolicyNumberVersion());
-        if ($cancel) {
-            $key = sprintf('%d-cancel', $this->getLatestSalvaPolicyNumberVersion() - 1);
+        $version = $this->getLatestSalvaPolicyNumberVersion();
+        if ($resultType == self::RESULT_TYPE_CANCEL) {
+            $version--;
         }
+        $now = new \DateTime();
+        $key = sprintf('%d-%s-%s', $version, $resultType, $now->format('U'));
+
         $this->salvaPolicyResults[$key] = serialize(array_merge([
             'responseId' => $responseId,
             'time' => new \DateTime()

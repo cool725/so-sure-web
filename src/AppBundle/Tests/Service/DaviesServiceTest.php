@@ -189,13 +189,13 @@ class DaviesServiceTest extends WebTestCase
 
         self::$daviesService->updatePolicy($claimB, $daviesB, true);
         $this->assertEquals($imeiOld, $policy->getImei());
-        $this->assertEquals(self::$phoneB->getId(), $policy->getPhone()->getId());
+        $this->assertEquals(self::$phoneA->getId(), $policy->getPhone()->getId());
 
         // Rerunning old settled claim should keep the newer imei
         $this->assertEquals(Claim::STATUS_APPROVED, $claim->getStatus());
         self::$daviesService->updatePolicy($claim, $davies, true);
         $this->assertEquals($imeiOld, $policy->getImei());
-        $this->assertEquals(self::$phoneB->getId(), $policy->getPhone()->getId());
+        $this->assertEquals(self::$phoneA->getId(), $policy->getPhone()->getId());
     }
 
     public function testGetPolicyNumber()
@@ -333,6 +333,32 @@ class DaviesServiceTest extends WebTestCase
         self::$daviesService->validateClaimDetails($claim, $daviesClaim);
         $this->assertEquals(1, count(self::$daviesService->getWarnings()));
         $this->insureWarningExists('/finalSuspicion/');
+    }
+
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage Invalid replacement imei invalid
+     */
+    public function testValidateClaimInvalidImei()
+    {
+        $policy = new PhonePolicy();
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        $policy->setId('1');
+        $policy->setPhone(self::getRandomPhone(self::$dm));
+
+        $claim = new Claim();
+        $claim->setPolicy($policy);
+        $claim->setNumber(time());
+        $claim->setStatus(Claim::STATUS_SETTLED);
+
+        $daviesClaim = new DaviesHandlerClaim();
+        $daviesClaim->claimNumber = $claim->getNumber();
+        $daviesClaim->status = DaviesHandlerClaim::STATUS_CLOSED;
+        $daviesClaim->replacementImei = 'invalid';
+        $daviesClaim->finalSuspicion = null;
+        $daviesClaim->initialSuspicion = null;
+        $daviesClaim->finalSuspicion = null;
+        self::$daviesService->validateClaimDetails($claim, $daviesClaim);
     }
 
     public function testMissingLossDescription()
@@ -710,7 +736,7 @@ class DaviesServiceTest extends WebTestCase
 
         $daviesClaim = new DaviesHandlerClaim();
         $daviesClaim->policyNumber = 'TEST/2017/123456';
-        $daviesClaim->replacementImei = '123';
+        $daviesClaim->replacementImei = $this->generateRandomImei();
         $daviesClaim->status = 'Closed';
         $daviesClaim->miStatus = 'Withdrawn';
         $daviesClaim->insuredName = 'Mr Foo Bar';
@@ -1516,7 +1542,7 @@ class DaviesServiceTest extends WebTestCase
         self::$daviesService->clearErrors();
         self::$daviesService->clearSoSureActions();
 
-        $daviesClaim->replacementImei = '123';
+        $daviesClaim->replacementImei = $this->generateRandomImei();
         self::$daviesService->validateClaimDetails($claim, $daviesClaim);
         $this->insureErrorDoesNotExist('/the replacement data not recorded/');
         $this->insureErrorDoesNotExist('/received date/');
@@ -1524,6 +1550,7 @@ class DaviesServiceTest extends WebTestCase
         $this->insureErrorDoesNotExist('/; phone/');
 
         $daviesClaim->replacementImei = 'NA - repaired';
+        $daviesClaim->checkReplacementRepaired();
         self::$daviesService->validateClaimDetails($claim, $daviesClaim);
         $this->insureErrorDoesNotExist('/the replacement data not recorded/');
         $this->insureErrorDoesNotExist('/received date/');
@@ -1934,6 +1961,10 @@ class DaviesServiceTest extends WebTestCase
         return $claim;
     }
 
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage Invalid replacement imei invalid
+     */
     public function testSaveClaimsInvalidReplacementImei()
     {
         $policy = static::createUserPolicy(true);
@@ -1962,7 +1993,7 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim->lossDescription = 'min length';
         $daviesClaim->replacementMake = 'Apple';
         $daviesClaim->replacementModel = 'iPhone 4';
-        $daviesClaim->replacementImei = '123 Bx11lt';
+        $daviesClaim->replacementImei = 'invalid';
         $daviesClaim->replacementReceivedDate = new \DateTime();
         $this->assertFalse(static::$daviesService->saveClaim($daviesClaim, false));
         $this->assertEquals(

@@ -1,5 +1,7 @@
 {% extends 'base.html.twig' %}
 
+{% form_theme starling_form 'AppBundle:Form:submit.html.twig' %}
+
 {# Set vars #}
 {% set new_footer = 1 %}
 
@@ -277,16 +279,6 @@
             <li>
                 <a href="{{ url('launch_usa') }}">USA Page</a>
             </li>
-            <li>
-                <form method="POST" action="{{ path('api_external_gocompare_deeplink') }}">
-                    <input type="hidden" name="reference" value="{{ active_phone.id }}">
-                    <input type="text" name="first_name" placeholder="First Name">
-                    <input type="text" name="surname" placeholder="Last Name">
-                    <input type="email" name="email_address" placeholder="email">
-                    <input type="text" name="dob" placeholder="DOB">
-                    <button type="submit" class="btn btn-success">GoCompare</button>
-                </form>
-            </li>
         </ul>
 
         <h4>Error pages</h4>
@@ -330,6 +322,27 @@
                 <a href="{{ url('iphone_7_plus_insured_with_your_mobile_network') }}">iPhone 7+</a>
             </li>
         </ul>
+        <h4>External</h4>
+        <ul>
+            <li><a href="http://test.protectyourgadget.com/quote/" target="_blank">GoCompare / Protect your gadget</a>
+                <form method="POST" action="{{ path('api_external_gocompare_deeplink') }}">
+                    <input type="hidden" name="reference" value="{{ active_phone.id }}">
+                    <input type="text" name="first_name" placeholder="First Name" value="{{ fake.first }}">
+                    <input type="text" name="surname" placeholder="Last Name" value="{{ fake.last }}">
+                    <input type="email" name="email_address" placeholder="email" value="{{ fake.email }}">
+                    <input type="text" name="dob" placeholder="DOB (YYYY-MM-DD)" value="{{ fake.dob }}">
+                    <br>
+                    <input type="text" name="house_no" placeholder="House Number">
+                    <input type="text" name="address_1" placeholder="Address 1" value="{{ fake.line1 }}">
+                    <input type="text" name="address_2" placeholder="Address 2" value="{{ fake.line2 }}">
+                    <input type="text" name="address_3" placeholder="Address 3">
+                    <input type="text" name="address_4" placeholder="Address 4">
+                    <input type="text" name="postcode" placeholder="Postcode" value="{{ fake.postcode }}">
+                    <br>
+                    <button type="submit" class="btn btn-success">Register user</button>
+                </form>
+            </li>
+        </ul>
         <h4>OAuth/Bearer Api</h4>
         <ul>
             <li>
@@ -348,7 +361,7 @@
                     </li>
                     <li>
                         {{ form_start(starling_form) }}
-                        {{ form_widget(starling_form.set, {'attr': {'class': 'btn btn-success'}, 'label': 'Set Session Vars' }) }}
+                        {{ form_widget(starling_form.set, {'fa': 'fa-bank', 'right': true, 'left' : true, 'attr': {'class': 'btn btn-success'}, 'label': 'Set Session Vars' }) }}
                         {{ form_end(starling_form) }}
                     </li>
                 </ol>

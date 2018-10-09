@@ -2,18 +2,22 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Document\CurrencyTrait;
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\Payment\BacsPayment;
+use AppBundle\Document\ScheduledPayment;
 use AppBundle\Security\UserVoter;
 use AppBundle\Security\ClaimVoter;
 use AppBundle\Service\BacsService;
 use AppBundle\Service\ClaimsService;
+use AppBundle\Service\PaymentService;
 use AppBundle\Service\PCAService;
 use AppBundle\Service\PolicyService;
 use AppBundle\Service\SequenceService;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -102,6 +106,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 class UserController extends BaseController
 {
     use DateTrait;
+    use CurrencyTrait;
 
     /**
      * @Route("", name="user_home")
@@ -1074,38 +1079,49 @@ class UserController extends BaseController
         $user = $this->getUser();
         /** @var PhonePolicy $policy */
         $policy = $user->getUnpaidPolicy();
-        if ($policy) {
-            $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
-            if (!$policy->isPolicyPaidToDate()) {
-                $amount = $policy->getOutstandingPremiumToDate();
-                if ($amount <= 0) {
-                    $this->get('logger')->warning(sprintf(
-                        'Unpaid policy %s has unpaid status, yet has a £%0.2f outstanding premium.',
-                        $policy->getId(),
-                        $amount
-                    ));
-                }
-            } else {
-                $this->get('logger')->warning(sprintf(
-                    'Unpaid policy %s has unpaid status, yet is paid to date.',
-                    $policy->getId()
-                ));
-            }
-        } else {
+        if (!$policy) {
             $this->get('logger')->warning(sprintf(
                 'Unable to locate unpaid policy for user %s. Policy may be in incorrect state.',
                 $user->getId()
             ));
+
+            return new RedirectResponse($this->generateUrl('user_home'));
         }
 
+        $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
+        if (!$policy->isPolicyPaidToDate()) {
+            $amount = $policy->getOutstandingPremiumToDate();
+            if ($amount <= 0) {
+                $this->get('logger')->warning(sprintf(
+                    'Unpaid policy %s has unpaid status, yet has a £%0.2f outstanding premium.',
+                    $policy->getId(),
+                    $amount
+                ));
+            }
+        } else {
+            $this->get('logger')->warning(sprintf(
+                'Unpaid policy %s has unpaid status, yet is paid to date.',
+                $policy->getId()
+            ));
+        }
 
         $form = $this->createFormBuilder()
+            ->add('amount', HiddenType::class, ['data' => $amount])
             ->add('reschedule', SubmitType::class, array(
                 'label' => sprintf("Please take £%0.2f from my account", $amount)
             ))
             ->getForm();
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
+            $formAmount = $form->getData()['amount'];
+            if (!$this->areEqualToTwoDp($formAmount, $amount)) {
+                throw new \Exception(sprintf(
+                    'User requested bacs payment amount changed inbetween form submission (%0.2f/%0.2f',
+                    $formAmount,
+                    $amount
+                ));
+            }
+
             $now = new \DateTime();
             $notes = sprintf(
                 'User manually confirmed payment for £%0.2f on %s from ip: %s',
@@ -1113,10 +1129,17 @@ class UserController extends BaseController
                 $now->format(\DateTime::ATOM),
                 $request->getClientIp()
             );
+
             /** @var BacsService $bacsService */
             $bacsService = $this->get('app.bacs');
             $bacsService->bacsPayment($policy, $notes, $amount);
+
             $this->getManager()->flush();
+
+
+            $this->addFlash('success', 'We will scheduled your payment within the next 3 business days');
+
+            return new RedirectResponse($this->generateUrl('user_unpaid_policy'));
         }
 
         $bacsFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_BACS);
@@ -1276,6 +1299,15 @@ class UserController extends BaseController
             return new RedirectResponse($this->generateUrl('user_unpaid_policy'));
         }
 
+        $lastPaymentCredit = $policy->getLastPaymentCredit();
+        $lastPaymentInProgress = false;
+        if ($this->getUser()->hasBacsPaymentMethod()) {
+            if ($lastPaymentCredit && $lastPaymentCredit instanceof BacsPayment) {
+                /** @var BacsPayment $lastPaymentCredit */
+                $lastPaymentInProgress = $lastPaymentCredit->inProgress();
+            }
+        }
+
         $bacsFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_BACS);
 
         // For now, only allow 1 policy with bacs
@@ -1292,6 +1324,7 @@ class UserController extends BaseController
             $bacsFeature = false;
         }
 
+        /** @var PaymentService $paymentService */
         $paymentService = $this->get('app.payment');
         // TODO: Move to ajax call
         $webpay = null;
@@ -1381,6 +1414,7 @@ class UserController extends BaseController
             'bacs_confirm_form' => $bacsConfirmForm->createView(),
             'bacs_feature' => $bacsFeature,
             'bacs' => $bacs,
+            'bacs_last_payment_in_progress' => $lastPaymentInProgress,
         ];
 
         return $data;

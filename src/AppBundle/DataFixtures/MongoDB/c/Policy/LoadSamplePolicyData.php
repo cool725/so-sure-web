@@ -6,6 +6,8 @@ use AppBundle\Document\BacsPaymentMethod;
 use AppBundle\Document\BankAccount;
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\File\AccessPayFile;
+use AppBundle\Document\File\BacsReportInputFile;
+use AppBundle\Document\File\S3File;
 use AppBundle\Document\Payment\BacsPayment;
 use AppBundle\Repository\PolicyRepository;
 use AppBundle\Service\PolicyService;
@@ -53,8 +55,6 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
     const PICSURE_RANDOM = 'random';
     const PICSURE_NON_POLICY = 'n/a';
 
-    const BACS_SERIAL_NUMBERS = 20;
-
     /**
      * @var ContainerInterface|null
      */
@@ -63,6 +63,8 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
     private $faker;
     private $emails = [];
     private $receiptIds = [];
+    private $bacsSubmissions = [];
+    private $bacsInputReports = [];
 
     public function setContainer(ContainerInterface $container = null)
     {
@@ -72,8 +74,6 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
     public function load(ObjectManager $manager)
     {
         $this->faker = Faker\Factory::create('en_GB');
-
-        $this->createBacsFiles($manager);
 
         $users = $this->newUsers($manager, 350);
         $unpaid = $this->newUsers($manager, 10);
@@ -451,21 +451,6 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $manager->flush();
     }
 
-    private function createBacsFiles(ObjectManager $manager)
-    {
-        $now = new \DateTime();
-        for ($i = 0; $i < self::BACS_SERIAL_NUMBERS; $i++) {
-            $date = clone $now;
-            $date = $date->sub(new \DateInterval(sprintf('P%dD', $i)));
-            $file = new AccessPayFile();
-            $file->setDate($date);
-            $file->setSerialNumber($i);
-            $manager->persist($file);
-        }
-
-        $manager->flush();
-    }
-
     private function newUsers($manager, $number, $yearlyOnlyPostcode = false)
     {
         $userRepo = $manager->getRepository(User::class);
@@ -538,8 +523,8 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             $bankAccount->setSortCode('000099');
             $bankAccount->setAccountNumber('87654321');
             $bankAccount->setAccountName($user->getName());
-            $bankAccount->setMandateSerialNumber(random_int(1, self::BACS_SERIAL_NUMBERS));
-            $status = random_int(0, 4);
+            $bankAccount->setMandateSerialNumber(0);
+            $status = rand(0, 4);
             if ($status == 0) {
                 $bankAccount->setMandateStatus(BankAccount::MANDATE_CANCELLED);
             } elseif ($status == 1) {
@@ -700,12 +685,28 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $paymentDate = clone $startDate;
         if ($paid === true || ($paid === null && random_int(0, 1) == 0)) {
             if ($bacs) {
-                $payment = new BacsPayment();
-                $payment->setStatus(BacsPayment::STATUS_SUCCESS);
-                $payment->setSuccess(true);
-                /** @var BacsPaymentMethod $bacs */
-                $bacs = $user->getPaymentMethod();
-                $payment->setSerialNumber($bacs->getBankAccount()->getMandateSerialNumber());
+                $payment = $this->newBacsPayment(
+                    $manager,
+                    $user,
+                    $phone->getCurrentPhonePrice()->getYearlyPremiumPrice(null, clone $startDate),
+                    Salva::YEARLY_TOTAL_COMMISSION,
+                    clone $paymentDate);
+                $policy->addPayment($payment);
+                $payment->submit(clone $paymentDate);
+                $payment->approve($payment->getBacsReversedDate());
+
+                // randomly add refunds
+                if (rand(0, 9) == 0) {
+                    $refund = $this->newBacsPayment(
+                        $manager,
+                        $user,
+                        $phone->getCurrentPhonePrice()->getYearlyPremiumPrice(null, clone $startDate)*-1,
+                        Salva::YEARLY_TOTAL_COMMISSION,
+                        clone $paymentDate);
+                    $policy->addPayment($refund);
+                    $refund->submit(clone $paymentDate);
+                    $refund->approve($refund->getBacsReversedDate());
+                }
             } else {
                 $payment = new JudoPayment();
                 $payment->setResult(JudoPayment::RESULT_SUCCESS);
@@ -715,12 +716,12 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
                 }
                 $this->receiptIds[] = $receiptId;
                 $payment->setReceipt($receiptId);
+                $payment->setDate($paymentDate);
+                $payment->setAmount($phone->getCurrentPhonePrice()->getYearlyPremiumPrice(null, clone $startDate));
+                $payment->setTotalCommission(Salva::YEARLY_TOTAL_COMMISSION);
+                $payment->setNotes('LoadSamplePolicyData');
+                $policy->addPayment($payment);
             }
-            $payment->setDate($paymentDate);
-            $payment->setAmount($phone->getCurrentPhonePrice()->getYearlyPremiumPrice(null, clone $startDate));
-            $payment->setTotalCommission(Salva::YEARLY_TOTAL_COMMISSION);
-            $payment->setNotes('LoadSamplePolicyData');
-            $policy->addPayment($payment);
         } else {
             $months = $paidMonths;
             $lastPaymentSuccess = true;
@@ -730,17 +731,28 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             }
             for ($i = 1; $i <= $months; $i++) {
                 if ($bacs) {
-                    $payment = new BacsPayment();
-                    if ($i == 1 || $i < $months || $lastPaymentSuccess) {
-                        $payment->setStatus(BacsPayment::STATUS_SUCCESS);
-                        $payment->setSuccess(true);
-                    } else {
-                        $payment->setStatus(BacsPayment::STATUS_FAILURE);
-                        $payment->setSuccess(false);
+                    $payment = $this->newBacsPayment(
+                        $manager,
+                        $user,
+                        $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(null, clone $startDate),
+                        $months == 12 ? Salva::FINAL_MONTHLY_TOTAL_COMMISSION : Salva::MONTHLY_TOTAL_COMMISSION,
+                        clone $paymentDate);
+                    $policy->addPayment($payment);
+                    $payment->submit(clone $paymentDate);
+                    $payment->approve($payment->getBacsReversedDate());
+
+                    // randomly add refunds on last month
+                    if (rand(0, 4) == 0 && $i == $months) {
+                        $refund = $this->newBacsPayment(
+                            $manager,
+                            $user,
+                            $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(null, clone $startDate)*-1,
+                            $months == 12 ? Salva::FINAL_MONTHLY_TOTAL_COMMISSION : Salva::MONTHLY_TOTAL_COMMISSION,
+                            clone $paymentDate);
+                        $policy->addPayment($refund);
+                        $refund->submit(clone $paymentDate);
+                        $refund->approve($refund->getBacsReversedDate());
                     }
-                    /** @var BacsPaymentMethod $bacs */
-                    $bacs = $user->getPaymentMethod();
-                    $payment->setSerialNumber($bacs->getBankAccount()->getMandateSerialNumber());
                 } else {
                     $payment = new JudoPayment();
                     if ($i == 1 || $i < $months || $lastPaymentSuccess) {
@@ -754,15 +766,15 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
                     }
                     $this->receiptIds[] = $receiptId;
                     $payment->setReceipt($receiptId);
+                    $payment->setDate(clone $paymentDate);
+                    $payment->setAmount($phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(null, clone $startDate));
+                    $payment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
+                    if ($months == 12) {
+                        $payment->setTotalCommission(Salva::FINAL_MONTHLY_TOTAL_COMMISSION);
+                    }
+                    $payment->setNotes('LoadSamplePolicyData');
+                    $policy->addPayment($payment);
                 }
-                $payment->setDate(clone $paymentDate);
-                $payment->setAmount($phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(null, clone $startDate));
-                $payment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
-                if ($months == 12) {
-                    $payment->setTotalCommission(Salva::FINAL_MONTHLY_TOTAL_COMMISSION);
-                }
-                $payment->setNotes('LoadSamplePolicyData');
-                $policy->addPayment($payment);
                 $paymentDate->add(new \DateInterval('P1M'));
                 if (random_int(0, 3) == 0) {
                     $tDate = clone $paymentDate;
@@ -833,6 +845,59 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         }
 
         return $policy;
+    }
+
+    private function newBacsPayment(ObjectManager $manager, User $user, $amount, $totalComission, $paymentDate)
+    {
+        $serialNumber = $paymentDate->format("ymd");
+        $submissionFile = null;
+        $inputFile = null;
+        if (array_key_exists($serialNumber, $this->bacsSubmissions)) {
+            $submissionFile = $this->bacsSubmissions[$serialNumber];
+            $inputFile = $this->bacsInputReports[$serialNumber];
+        }
+        if (!$submissionFile) {
+            $submissionFile = new AccessPayFile();
+            $submissionFile->setDate($paymentDate);
+            $submissionFile->setSerialNumber(AccessPayFile::formatSerialNumber($serialNumber));
+            $submissionFile->addMetadata('debit-amount', 0.0);
+            $submissionFile->addMetadata('credit-amount', 0.0);
+            $submissionFile->setStatus(AccessPayFile::STATUS_SUBMITTED);
+            $submissionFile->setSubmittedDate($paymentDate);
+            $this->bacsSubmissions[$serialNumber] = $submissionFile;
+            $inputFile = new BacsReportInputFile();
+            $inputFile->setDate($paymentDate);
+            $inputFile->addMetadata('serial-number', $serialNumber);
+            $inputFile->addMetadata('debit-accepted-value', 0.0);
+            $inputFile->addMetadata('credit-accepted-value', 0.0);
+            $this->bacsInputReports[$serialNumber] = $inputFile;
+        }
+
+        $payment = new BacsPayment();
+        $payment->setStatus(BacsPayment::STATUS_SUBMITTED);
+        $payment->setSuccess(true);
+        /** @var BacsPaymentMethod $bacsPaymentMethod */
+        $bacsPaymentMethod = $user->getPaymentMethod();
+        $bankAccount = $bacsPaymentMethod->getBankAccount();
+        $bankAccount->setMandateSerialNumber($serialNumber);
+        $manager->persist($bankAccount);
+        $payment->setSerialNumber(AccessPayFile::formatSerialNumber($serialNumber));
+        $payment->setDate(clone $paymentDate);
+        $payment->setAmount($amount);
+        $payment->setTotalCommission($totalComission);
+        $payment->setNotes('LoadSamplePolicyData');
+
+        if ($amount < 0.0) {
+            $submissionFile->addMetadata('credit-amount', $submissionFile->getMetadata()['credit-amount']+$amount*-1);
+            $inputFile->addMetadata('credit-accepted-value', $inputFile->getMetadata()['credit-accepted-value']+$amount*-1);
+        } else {
+            $submissionFile->addMetadata('debit-amount', $submissionFile->getMetadata()['debit-amount']+$amount);            
+            $inputFile->addMetadata('debit-accepted-value', $inputFile->getMetadata()['debit-accepted-value']+$amount);
+        }
+        $manager->persist($submissionFile);
+        $manager->persist($inputFile);
+
+        return $payment;
     }
 
     private function invite($manager, $userA, $userB, $accepted = true)

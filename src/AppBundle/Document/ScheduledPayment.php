@@ -147,6 +147,7 @@ class ScheduledPayment
 
     public function setPayment(Payment $payment)
     {
+        $payment->setScheduledPayment($this);
         $this->payment = $payment;
     }
 

@@ -101,4 +101,26 @@ $(function(){
         });
     }
 
+    // If reported to the police - show extra fields
+    $('#claim_theftloss_form_reportType').on('change', function(e) {
+        if ($(this).val() == 'police-station') {
+            $('#report-to-police').slideDown();
+            $('#report-my-loss').slideUp();
+            // Add Validation
+            $('#claim_theftloss_form_force, #claim_theftloss_form_crimeReferenceNumber').addClass('required');
+            $('#claim_theftloss_form_proofOfLoss').removeClass('required');
+        } else if ($(this).val() == 'online') {
+            $('#report-my-loss').slideDown();
+            $('#report-to-police').slideUp();
+            // Add Validation
+            $('#claim_theftloss_form_proofOfLoss').addClass('required');
+            $('#claim_theftloss_form_force, #claim_theftloss_form_crimeReferenceNumber').removeClass('required');
+        } else {
+            $('#report-to-police').slideUp();
+            $('#report-my-loss').slideUp();
+            // Add Validation
+            $('#claim_theftloss_form_force, #claim_theftloss_form_crimeReferenceNumber, #claim_theftloss_form_proofOfLoss').removeClass('required');
+        }
+    });
+
 });

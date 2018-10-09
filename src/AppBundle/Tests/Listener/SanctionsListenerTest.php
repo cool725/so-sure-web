@@ -2,7 +2,7 @@
 
 namespace AppBundle\Tests\Listener;
 
-use AppBundle\Document\Company;
+use AppBundle\Document\CustomerCompany;
 use AppBundle\Document\Sanctions;
 use AppBundle\Document\User;
 use AppBundle\Event\CompanyEvent;
@@ -77,7 +77,7 @@ class SanctionsListenerTest extends WebTestCase
         $user->setFirstName('Nashwan');
         $user->setLastName('ABD-AL');
 
-        $company = new Company();
+        $company = new CustomerCompany();
         $company->setId(2);
         $company->setName('Aboo');
 

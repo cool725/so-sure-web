@@ -42,6 +42,18 @@ class LloydsFile extends UploadFile
     protected $dailyBacs = array();
 
     /**
+     * @MongoDB\Field(type="hash")
+     * @Gedmo\Versioned
+     */
+    protected $dailyCreditBacs = array();
+
+    /**
+     * @MongoDB\Field(type="hash")
+     * @Gedmo\Versioned
+     */
+    protected $dailyDebitBacs = array();
+
+    /**
      * @MongoDB\Field(type="float")
      * @Gedmo\Versioned
      */
@@ -104,6 +116,26 @@ class LloydsFile extends UploadFile
         $this->dailyBacs = $dailyBacs;
     }
 
+    public function getDailyCreditBacs()
+    {
+        return $this->dailyCreditBacs;
+    }
+
+    public function setDailyCreditBacs($dailyCreditBacs)
+    {
+        $this->dailyCreditBacs = $dailyCreditBacs;
+    }
+
+    public function getDailyDebitBacs()
+    {
+        return $this->dailyDebitBacs;
+    }
+
+    public function setDailyDebitBacs($dailyDebitBacs)
+    {
+        $this->dailyDebitBacs = $dailyDebitBacs;
+    }
+
     public function getSoSurePayment()
     {
         return $this->soSurePayment;
@@ -147,5 +179,15 @@ class LloydsFile extends UploadFile
     public static function combineDailyBacs($lloydsFiles)
     {
         return self::combineFiles($lloydsFiles, 'getDailyBacs');
+    }
+
+    public static function combineDailyCreditBacs($lloydsFiles)
+    {
+        return self::combineFiles($lloydsFiles, 'getDailyCreditBacs');
+    }
+
+    public static function combineDailyDebitBacs($lloydsFiles)
+    {
+        return self::combineFiles($lloydsFiles, 'getDailyDebitBacs');
     }
 }

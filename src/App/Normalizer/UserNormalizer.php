@@ -77,14 +77,14 @@ class UserNormalizer implements NormalizerInterface, SerializerAwareInterface
                 'widgets' => [
                     [
                         'type' => 'TEXT',
-                        'title' => 'Policy Reference',
-                        'text' => $policyNumber,
+                        'title' => 'Covered Device',
+                        'text' => (string) $phone,
                         'launchUrl' => $userHomepage,
                     ],
                     [
                         'type' => 'TEXT',
-                        'title' => 'Covered Device',
-                        'text' => (string) $phone,
+                        'title' => 'Policy Reference',
+                        'text' => $policyNumber,
                         'launchUrl' => $userHomepage,
                     ],
                     [

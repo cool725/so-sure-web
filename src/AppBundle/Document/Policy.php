@@ -204,7 +204,7 @@ abstract class Policy
     protected $namedUser;
 
     /**
-     * @MongoDB\ReferenceOne(targetDocument="Company", inversedBy="policies")
+     * @MongoDB\ReferenceOne(targetDocument="CustomerCompany", inversedBy="policies")
      * @Gedmo\Versioned
      */
     protected $company;
@@ -996,7 +996,7 @@ abstract class Policy
         return $this->company;
     }
 
-    public function setCompany(Company $company)
+    public function setCompany(CustomerCompany $company)
     {
         $this->company = $company;
     }
@@ -2210,8 +2210,7 @@ abstract class Policy
             $this->getCancelledReason() == Policy::CANCELLED_SUSPECTED_FRAUD) {
             // Never refund for certain cancellation reasons
             return false;
-        } elseif ($this->getCancelledReason() == Policy::CANCELLED_USER_REQUESTED ||
-            $this->getCancelledReason() == Policy::CANCELLED_UPGRADE) {
+        } elseif ($this->getCancelledReason() == Policy::CANCELLED_USER_REQUESTED) {
             // user has 30 days from when they requested cancellation
             // however, as we don't easily have a scheduled cancellation
             // we will start with a manual cancellation that should be done
@@ -4221,6 +4220,15 @@ abstract class Policy
         return ScheduledPayment::sumScheduledPaymentAmounts($scheduledPayments);
     }
 
+    public function isUnpaidBacs()
+    {
+        if ($this->getStatus() != self::STATUS_UNPAID) {
+            return null;
+        }
+
+        return $this->getUser()->hasBacsPaymentMethod();
+    }
+
     public function isUnpaidCloseToExpirationDate(\DateTime $date = null)
     {
         if ($this->getStatus() != self::STATUS_UNPAID) {
@@ -4300,11 +4308,11 @@ abstract class Policy
         $outstandingPremium = $this->getOutstandingPremium() - $this->getPendingBacsPaymentsTotal();
 
         // generally would expect the outstanding premium to match the scheduled payments
-        // however, if unpaid and past the point where rescheduled payments are taken, then would
-        // expect the scheduled payments to be missing 1 monthly premium
+        // however, if unpaid and either past the point where rescheduled payments are taken or using bacs
+        // then would expect the scheduled payments to be missing 1 monthly premium
         if ($this->areEqualToTwoDp($outstandingPremium, $totalScheduledPayments)) {
             return true;
-        } elseif ($this->isUnpaidCloseToExpirationDate($date)) {
+        } elseif ($this->isUnpaidCloseToExpirationDate($date) || $this->isUnpaidBacs()) {
             if ($this->areEqualToTwoDp(
                 $outstandingPremium,
                 $totalScheduledPayments + $this->getPremium()->getAdjustedStandardMonthlyPremiumPrice()
@@ -4565,6 +4573,13 @@ abstract class Policy
         if ($this->getLatestFnolClaim()) {
             $warnings[] =
                 'Policy has a FNOL claim, but not yet submitted and so required documents may not yet be uploaded.';
+        }
+
+        foreach ($this->getClaims() as $claim) {
+            /** @var Claim $claim */
+            if ($claim->warnCrimeRef()) {
+                $warnings[] = sprintf('Claim %s has a crime reference number that is not valid', $claim->getNumber());
+            }
         }
 
         if ($this instanceof PhonePolicy) {

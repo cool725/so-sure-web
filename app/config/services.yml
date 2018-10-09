@@ -168,6 +168,7 @@ services:
             - "@app.sequence"
             - ["%accesspay_server%", "%accesspay_username%", "%accesspay_password%", "%accesspay_keyfile%"]
             - "@app.mailer"
+            - "@event_dispatcher"
 
     app.push:
         class: AppBundle\Service\PushService
@@ -933,6 +934,13 @@ services:
         tags:
             -  { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }
             -  { name: kernel.event_listener, event: kernel.response, method: onKernelResponse }
+
+    app.listener.hubspot:
+        class:   AppBundle\Listener\HubspotKernelListener
+        arguments:
+            - "@logger"
+        tags:
+            -  { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }
 
     app.listener.security:
         class:   AppBundle\Listener\SecurityListener

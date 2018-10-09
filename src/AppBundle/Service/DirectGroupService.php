@@ -3,6 +3,7 @@ namespace AppBundle\Service;
 
 use AppBundle\Classes\DirectGroupHandlerClaim;
 use AppBundle\Document\File\DirectGroupFile;
+use AppBundle\Document\ImeiTrait;
 use AppBundle\Document\Policy;
 use Psr\Log\LoggerInterface;
 use Aws\S3\S3Client;
@@ -22,6 +23,7 @@ class DirectGroupService extends SftpService
 {
     use CurrencyTrait;
     use DateTrait;
+    use ImeiTrait;
 
     const MIN_LOSS_DESCRIPTION_LENGTH = 5;
 
@@ -520,6 +522,10 @@ class DirectGroupService extends SftpService
             ));
         }
 
+        if ($directGroupClaim->replacementImei && !$this->isImei($directGroupClaim->replacementImei)) {
+            throw new \Exception(sprintf('Invalid replacement imei %s', $directGroupClaim->replacementImei));
+        }
+
         if ($directGroupClaim->replacementImei && in_array($directGroupClaim->getClaimStatus(), [
             Claim::STATUS_DECLINED,
             Claim::STATUS_WITHDRAWN
@@ -529,6 +535,7 @@ class DirectGroupService extends SftpService
                 $directGroupClaim->claimNumber
             ));
         }
+
         if ($directGroupClaim->replacementReceivedDate &&
             $directGroupClaim->replacementReceivedDate < $directGroupClaim->lossDate) {
             throw new \Exception(sprintf(
@@ -835,12 +842,11 @@ class DirectGroupService extends SftpService
         if ($claim->isOpen()) {
             // We've replaced their phone with a new imei number
             if ($claim->getReplacementImei() &&
-                $claim->getReplacementImei() != $policy->getImei()) {
+                $claim->getReplacementImei() != $policy->getImei() && !$skipImeiUpdate) {
                 // Imei has changed, but we can't change their policy premium, which is fixed
                 // If there are multiple open claims, don't update the imei!
-                if (!$skipImeiUpdate) {
-                    $policy->adjustImei($claim->getReplacementImei());
-                }
+                $policy->adjustImei($claim->getReplacementImei());
+
                 // If phone has been updated (unlikely at the moment)
                 if ($claim->getReplacementPhone()) {
                     $policy->setPhone($claim->getReplacementPhone());

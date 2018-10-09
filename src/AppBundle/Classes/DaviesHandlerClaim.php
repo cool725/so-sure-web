@@ -347,9 +347,7 @@ class DaviesHandlerClaim extends HandlerClaim
                 throw new \Exception('Unknown or missing claim type');
             }
 
-            if ($this->replacementImei && !$this->isImei($this->replacementImei) && !$this->isReplacementRepaired()) {
-                throw new \Exception(sprintf('Invalid replacement imei %s', $this->replacementImei));
-            }
+            $this->checkReplacementRepaired();
         } catch (\Exception $e) {
             throw new \Exception(sprintf(
                 '<b>%s</b> Data Imported: <small>%s</small> Excel Record: <small>%s</small>',
@@ -362,14 +360,17 @@ class DaviesHandlerClaim extends HandlerClaim
         return true;
     }
 
+    public function checkReplacementRepaired()
+    {
+        if ($this->isReplacementRepaired()) {
+            $this->replacementImei = null;
+        }
+    }
+
     public function isReplacementRepaired()
     {
         if ($this->isReplacementRepair == null) {
             $this->isReplacementRepair = mb_stripos($this->replacementImei, 'repair') != false;
-        }
-
-        if ($this->isReplacementRepair) {
-            $this->replacementImei = null;
         }
 
         return $this->isReplacementRepair;

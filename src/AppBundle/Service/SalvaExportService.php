@@ -556,7 +556,7 @@ class SalvaExportService
         $response = $this->send($xml, self::SCHEMA_POLICY_IMPORT);
         $this->logger->info($response);
         $responseId = $this->getResponseId($response);
-        $phonePolicy->addSalvaPolicyResults($responseId, false, [
+        $phonePolicy->addSalvaPolicyResults($responseId, SalvaPhonePolicy::RESULT_TYPE_CREATE, [
             'ss_phone_base_tariff' => $phonePolicy->getTotalGwp()
         ]);
         $phonePolicy->setSalvaStatus(SalvaPhonePolicy::SALVA_STATUS_ACTIVE);
@@ -613,7 +613,9 @@ class SalvaExportService
         $response = $this->send($xml, self::SCHEMA_POLICY_TERMINATE);
         $this->logger->info($response);
         $responseId = $this->getResponseId($response);
-        $phonePolicy->addSalvaPolicyResults($responseId, true, ['usedFinalPremium' => $cancelXml['usedFinalPremium']]);
+        $phonePolicy->addSalvaPolicyResults($responseId, SalvaPhonePolicy::RESULT_TYPE_CANCEL, [
+            'usedFinalPremium' => $cancelXml['usedFinalPremium'],
+        ]);
         if ($phonePolicy->getSalvaStatus() == SalvaPhonePolicy::SALVA_STATUS_PENDING_CANCELLED) {
             $phonePolicy->setSalvaStatus(SalvaPhonePolicy::SALVA_STATUS_CANCELLED);
             $this->dm->flush();
@@ -673,7 +675,7 @@ class SalvaExportService
         $response = $this->send($xml, self::SCHEMA_POLICY_IMPORT);
         $this->logger->info($response);
         $responseId = $this->getResponseId($response);
-        $phonePolicy->addSalvaPolicyResults($responseId, false, [
+        $phonePolicy->addSalvaPolicyResults($responseId, SalvaPhonePolicy::RESULT_TYPE_UPDATE, [
             'ss_phone_base_tariff' => $phonePolicy->getTotalGwp()
         ]);
         $phonePolicy->setSalvaStatus(SalvaPhonePolicy::SALVA_STATUS_ACTIVE);
@@ -773,6 +775,18 @@ class SalvaExportService
         }
         
         return $count;
+    }
+
+    public function queuePolicy(Policy $policy, $action)
+    {
+        $repo = $this->dm->getRepository(SalvaPhonePolicy::class);
+        /** @var SalvaPhonePolicy $salvaPolicy */
+        $salvaPolicy = $repo->find($policy->getId());
+        if (!$salvaPolicy) {
+            return false;
+        }
+
+        return $this->queue($salvaPolicy, $action);
     }
 
     public function queue(SalvaPhonePolicy $policy, $action, $retryAttempts = 0)
