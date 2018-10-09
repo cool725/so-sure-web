@@ -75,10 +75,9 @@ class BaseDoctrineListener
             }
 
             if ($compare == self::COMPARE_EQUAL) {
-                throw new \Exception($newValue);
-                return $oldValue == $newValue;
+                return $oldValue !== $newValue;
             } elseif ($compare == self::COMPARE_CASE_INSENSITIVE) {
-                return mb_strtolower($oldValue) == mb_strtolower($newValue);
+                return mb_strtolower($oldValue) !== mb_strtolower($newValue);
             } elseif ($compare == self::COMPARE_INCREASE) {
                 return $oldValue < $newValue;
             } elseif ($compare == self::COMPARE_DECREASE) {
