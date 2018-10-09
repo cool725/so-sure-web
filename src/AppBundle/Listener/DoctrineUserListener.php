@@ -48,7 +48,8 @@ class DoctrineUserListener extends BaseDoctrineListener
             $eventArgs,
             User::class,
             ['email'],
-            self::COMPARE_CASE_INSENSITIVE
+            self::COMPARE_CASE_INSENSITIVE,
+            true
         )) {
             $event = new UserEmailEvent($user, $eventArgs->getOldValue('email'));
             $this->dispatcher->dispatch(UserEmailEvent::EVENT_CHANGED, $event);
