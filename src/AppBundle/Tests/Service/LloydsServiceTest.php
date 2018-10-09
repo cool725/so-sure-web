@@ -70,8 +70,9 @@ class LloydsServiceTest extends WebTestCase
         /** @var DocumentManager $dm */
         $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
         $repo = $dm->getRepository(BacsIndemnityPayment::class);
-        /** @var BacsIndemnityPayment $updatedBacsIndemnity */
+        /** @var BacsIndemnityPayment $updatedBacsIndemnityA */
         $updatedBacsIndemnityA = $repo->find($bacsIndemnityA->getId());
+        /** @var BacsIndemnityPayment $updatedBacsIndemnityAuto */
         $updatedBacsIndemnityAuto = $repo->find($bacsIndemnityAuto->getId());
 
         $this->assertTrue($updatedBacsIndemnityA->hasSuccess());
