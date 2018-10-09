@@ -2210,8 +2210,7 @@ abstract class Policy
             $this->getCancelledReason() == Policy::CANCELLED_SUSPECTED_FRAUD) {
             // Never refund for certain cancellation reasons
             return false;
-        } elseif ($this->getCancelledReason() == Policy::CANCELLED_USER_REQUESTED ||
-            $this->getCancelledReason() == Policy::CANCELLED_UPGRADE) {
+        } elseif ($this->getCancelledReason() == Policy::CANCELLED_USER_REQUESTED) {
             // user has 30 days from when they requested cancellation
             // however, as we don't easily have a scheduled cancellation
             // we will start with a manual cancellation that should be done
