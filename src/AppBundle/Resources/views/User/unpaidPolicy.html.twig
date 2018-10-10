@@ -114,10 +114,10 @@
                                 Once you have given us permission, your payment will be scheduled as soon as possible (within 3 business days).
                             </p>
                             <div class="row">
-                                <div class="col-sm-4 col-sm-offset-4">
-                                    {{ form_start(form, {'attr': {'id': 'reschedule-bacs-form', 'class': 'form-inline'}})  }}
+                                <div class="col-sm-12">
+                                    {{ form_start(form, {'attr': {'id': 'reschedule-bacs-form', 'class': 'form-inline text-center'}})  }}
                                         <div class="form-group">
-                                            {{ form_widget(form.reschedule, {'attr': {'class': 'btn btn-green btn-block btn-pad'}}) }}
+                                            {{ form_widget(form.reschedule, {'attr': {'class': 'btn btn-green btn-pad'}}) }}
                                         </div>
                                     {{ form_end(form) }}
                                 </div>
@@ -134,11 +134,11 @@
 
                     {% if show_judo and webpay_action and webpay_reference and amount > 0 %}
                         <div class="row">
-                            <div class="col-sm-4 col-sm-offset-4">
-                                <form action="{{ webpay_action }}" method="post" id="webpay-form">
+                            <div class="col-sm-12">
+                                <form action="{{ webpay_action }}" method="post" id="webpay-form" class="text-center">
                                     <div class="form-group">
                                         <input  id="Reference" name="Reference" type="hidden" value="{{ webpay_reference }}">
-                                        <input type="submit" class="btn {% if show_bacs_setup %}btn-default{% else %}btn-green{% endif %} btn-block btn-pad " value="Proceed to card payment">
+                                        <input type="submit" class="btn {% if show_bacs_setup %}btn-default{% else %}btn-green{% endif %} btn-pad " value="Proceed to card payment">
                                     </div>
                                 </form>
                             </div>
