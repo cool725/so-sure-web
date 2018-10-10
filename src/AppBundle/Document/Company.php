@@ -9,9 +9,16 @@ use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
  * @MongoDB\Document
+ * @MongoDB\InheritanceType("SINGLE_COLLECTION")
+ * @MongoDB\DiscriminatorField("type")
+ * make sure to update getType() if adding
+ * @MongoDB\DiscriminatorMap({
+ *      "customer"="CustomerCompany",
+ *      "affiliate"="AffiliateCompany",
+ * })
  * @Gedmo\Loggable
  */
-class Company
+abstract class Company
 {
     /**
      * @MongoDB\Id(strategy="auto")
@@ -37,11 +44,6 @@ class Company
      * @Gedmo\Versioned
      */
     protected $address;
-
-    /**
-     * @MongoDB\ReferenceMany(targetDocument="Policy", mappedBy="company")
-     */
-    protected $policies;
 
     /**
      * @MongoDB\ReferenceMany(targetDocument="User", mappedBy="company")
@@ -94,17 +96,6 @@ class Company
     public function setAddress(Address $address)
     {
         $this->address = $address;
-    }
-
-    public function addPolicy(Policy $policy)
-    {
-        $policy->setCompany($this);
-        $this->policies[] = $policy;
-    }
-
-    public function getPolicies()
-    {
-        return $this->policies;
     }
 
     public function getUsers()

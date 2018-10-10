@@ -36,13 +36,18 @@
         }
     }
 
+    .updated-text {
+        position: relative;
+        z-index: 6;
+    }
+
     &__partner-logo {
         position: relative;
         z-index: 4;
     }
 
     // Height so table overlaps
-    height: 500px;
+    height: 540px;
 
     @include media-breakpoint-up(sm) {
         height: 600px;
@@ -50,11 +55,6 @@
 
     @include media-breakpoint-up(md) {
         height: 650px;
-    }
-
-    @include media-breakpoint-up(lg) {
-        padding-top: 12rem;
-        height: 700px;
     }
 }
 
@@ -66,19 +66,16 @@
     height: 600px;
 
     @include media-breakpoint-up(sm) {
-        height: 400px;
-    }
-
-    @include media-breakpoint-up(md) {
-        height: 325px;
-    }
-
-    @include media-breakpoint-up(lg) {
-        height: 350px;
+        height: 485px;
     }
 }
 
 .why {
+    padding-top: 24rem;
+
+    @include media-breakpoint-up(sm) {
+        padding-top: 10rem;
+    }
 
     &__container {
         text-align: center;

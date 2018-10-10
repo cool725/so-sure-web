@@ -194,13 +194,13 @@ class DirectGroupServiceTest extends WebTestCase
 
         self::$directGroupService->updatePolicy($claimB, $daviesB, true);
         $this->assertEquals($imeiOld, $policy->getImei());
-        $this->assertEquals(self::$phoneB->getId(), $policy->getPhone()->getId());
+        $this->assertEquals(self::$phoneA->getId(), $policy->getPhone()->getId());
 
         // Rerunning old settled claim should keep the newer imei
         $this->assertEquals(Claim::STATUS_APPROVED, $claim->getStatus());
         self::$directGroupService->updatePolicy($claim, $davies, true);
         $this->assertEquals($imeiOld, $policy->getImei());
-        $this->assertEquals(self::$phoneB->getId(), $policy->getPhone()->getId());
+        $this->assertEquals(self::$phoneA->getId(), $policy->getPhone()->getId());
     }
 
     public function testGetPolicyNumber()
@@ -312,6 +312,32 @@ class DirectGroupServiceTest extends WebTestCase
         $this->assertEquals(1, count(self::$directGroupService->getWarnings()));
 
         $this->insureWarningExists('/multiple open claims against policy/');
+    }
+
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage Invalid replacement imei invalid
+     */
+    public function testValidateClaimInvalidImei()
+    {
+        $policy = new PhonePolicy();
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        $policy->setId('1');
+        $policy->setPhone(self::getRandomPhone(self::$dm));
+
+        $claim = new Claim();
+        $claim->setPolicy($policy);
+        $claim->setNumber(time());
+        $claim->setStatus(Claim::STATUS_SETTLED);
+
+        $directGroupClaim = new DirectGroupHandlerClaim();
+        $directGroupClaim->claimNumber = $claim->getNumber();
+        $directGroupClaim->status = DirectGroupHandlerClaim::STATUS_CLOSED;
+        $directGroupClaim->replacementImei = 'invalid';
+        $directGroupClaim->finalSuspicion = null;
+        $directGroupClaim->initialSuspicion = null;
+        $directGroupClaim->finalSuspicion = null;
+        self::$directGroupService->validateClaimDetails($claim, $directGroupClaim);
     }
 
     public function testMissingLossDescription()
@@ -660,7 +686,7 @@ class DirectGroupServiceTest extends WebTestCase
 
         $directGroupClaim = new DirectGroupHandlerClaim();
         $directGroupClaim->policyNumber = 'TEST/2017/123456';
-        $directGroupClaim->replacementImei = '123';
+        $directGroupClaim->replacementImei = $this->generateRandomImei();
         $directGroupClaim->status = DirectGroupHandlerClaim::STATUS_WITHDRAWN;
         $directGroupClaim->insuredName = 'Mr Foo Bar';
 
@@ -1356,14 +1382,7 @@ class DirectGroupServiceTest extends WebTestCase
         self::$directGroupService->clearErrors();
         self::$directGroupService->clearSoSureActions();
 
-        $directGroupClaim->replacementImei = '123';
-        self::$directGroupService->validateClaimDetails($claim, $directGroupClaim);
-        $this->insureErrorDoesNotExist('/the replacement data not recorded/');
-        $this->insureErrorDoesNotExist('/received date/');
-        $this->insureErrorDoesNotExist('/imei/');
-        $this->insureErrorDoesNotExist('/; phone/');
-
-        $directGroupClaim->replacementImei = 'NA - repaired';
+        $directGroupClaim->replacementImei = $this->generateRandomImei();
         self::$directGroupService->validateClaimDetails($claim, $directGroupClaim);
         $this->insureErrorDoesNotExist('/the replacement data not recorded/');
         $this->insureErrorDoesNotExist('/received date/');
@@ -1684,6 +1703,10 @@ class DirectGroupServiceTest extends WebTestCase
         return $claim;
     }
 
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage Invalid replacement imei invalid
+     */
     public function testSaveClaimsInvalidReplacementImei()
     {
         $policy = static::createUserPolicy(true);
@@ -1712,7 +1735,7 @@ class DirectGroupServiceTest extends WebTestCase
         $directGroupClaim->lossDescription = 'min length';
         $directGroupClaim->replacementMake = 'Apple';
         $directGroupClaim->replacementModel = 'iPhone 4';
-        $directGroupClaim->replacementImei = '123 Bx11lt';
+        $directGroupClaim->replacementImei = 'invalid';
         $directGroupClaim->replacementReceivedDate = new \DateTime();
         $this->assertFalse(static::$directGroupService->saveClaim($directGroupClaim, false));
         $this->assertEquals(

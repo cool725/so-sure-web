@@ -2,7 +2,7 @@
 
 namespace AppBundle\Tests\Service;
 
-use AppBundle\Document\Company;
+use AppBundle\Document\CustomerCompany;
 use AppBundle\Document\Form\Bacs;
 use AppBundle\Document\Payment\PolicyDiscountPayment;
 use AppBundle\Exception\GeoRestrictedException;
@@ -1396,7 +1396,7 @@ class PolicyServiceTest extends WebTestCase
 
     public function testPolicyPendingRenewalCompany()
     {
-        $company = new Company();
+        $company = new CustomerCompany();
 
         $user = static::createUser(
             static::$userManager,

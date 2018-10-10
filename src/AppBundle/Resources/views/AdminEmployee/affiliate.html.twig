@@ -1,0 +1,122 @@
+{% extends 'admin_claims_base.html.twig' %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {% javascripts
+        '@AppBundle/Resources/public/js/AdminEmployee/company.js'
+    %}
+    <script src="{{ asset_url }}"></script>
+    {% endjavascripts %}
+{% endblock %}
+
+{% block body %}
+<div class="container" style="margin-bottom: 50px">
+<div class="row">
+    <div class="col-md-8">
+        <h2>Affiliates</h2>
+    </div>
+    <div class="col-md-2">
+        <button type="button" class="btn btn-info" data-toggle="modal" data-target="#companyModal" style="margin-top: 20px"
+        ><i class="fa fa-plus"></i> New Affiliate</button>
+    </div>
+</div>
+<div class="row" style="margin-top: 20px">
+    <div class="col-md-12">
+    <table class="table table-stripped" width="100%">
+        <tr>
+            <th>Name</th>
+            <th>CPA</th>
+            <th>Days</th>
+            <th>Sanctions</th>
+        </tr>
+        {% for company in companies %}
+            <tr>
+                <td width="20%">{{ company.name }}</td>
+                <td width="10%">£{{ company.cpa|number_format(2, '.', ',') }}</td>
+                <td width="10%">{{ company.days }}</td>
+                <td width="60%">
+                        {% if company.sanctionsChecks|length == 0%}
+                            No checks run
+                        {% endif %}
+                        {% for check in company.sanctionsChecks %}
+                            Ran: {{ check|date }}
+                        {% endfor %}
+                        <br />
+                        {% if company.sanctionsMatches|length == 0%}
+                            No matches
+                        {% endif %}
+                        {% for match in company.sanctionsMatches %}
+                            {% if match.manuallyVerified %}
+                            Confirmed not match: <del>{{ match.sanctions.company }} ({{ match.distance }})</del>
+                            {% else %}
+                            Possible match: {{ match.sanctions.company }}  ({{ match.distance }})
+                            {% endif %}
+                            <br>
+                        {% endfor %}
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+    </div>
+</div>
+
+    <div class="modal fade" id="companyModal" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">Add Affiliate</h4>
+          </div>
+          <div class="modal-body">
+            {{ form_start(companyForm) }}
+                <div class="form-group">
+                    {{ form_label(companyForm.name, 'Name') }}
+                    {{ form_errors(companyForm.name) }}
+                    {{ form_widget(companyForm.name) }}
+                </div>
+                <div class="form-group">
+                    {{ form_label(companyForm.address1, 'Address Line 1') }}
+                    {{ form_errors(companyForm.address1) }}
+                    {{ form_widget(companyForm.address1) }}
+                </div>
+                <div class="form-group">
+                    {{ form_label(companyForm.address2, 'Address Line 2') }}
+                    {{ form_errors(companyForm.address2) }}
+                    {{ form_widget(companyForm.address2) }}
+                </div>
+                <div class="form-group">
+                    {{ form_label(companyForm.address3, 'Address Line 3') }}
+                    {{ form_errors(companyForm.address3) }}
+                    {{ form_widget(companyForm.address3) }}
+                </div>
+                <div class="form-group">
+                    {{ form_label(companyForm.city, 'City') }}
+                    {{ form_errors(companyForm.city) }}
+                    {{ form_widget(companyForm.city) }}
+                </div>
+                <div class="form-group">
+                    {{ form_label(companyForm.postcode, 'Postcode') }}
+                    {{ form_errors(companyForm.postcode) }}
+                    {{ form_widget(companyForm.postcode) }}
+                </div>
+              <div class="form-group">
+                  {{ form_label(companyForm.cpa, 'CPA') }}
+                  {{ form_errors(companyForm.cpa) }}
+                  {{ form_widget(companyForm.cpa) }}
+              </div>
+              <div class="form-group">
+                  {{ form_label(companyForm.days, 'Days') }}
+                  {{ form_errors(companyForm.days) }}
+                  {{ form_widget(companyForm.days) }}
+              </div>
+                <div class="form-group">
+                    {{ form_widget(companyForm.next, {'label': 'Create', 'attr': {'class': 'btn btn-success'}}) }}
+                </div>
+            {{ form_end(companyForm) }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+</div>
+{% endblock %}

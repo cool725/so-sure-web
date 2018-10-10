@@ -1,4 +1,5 @@
 {% extends 'admin_claims_base.html.twig' %}
+{% form_theme bacs_form 'AppBundle:Form:fields.html.twig' %}
 
 {% block stylesheets %}
     {{ parent() }}
@@ -80,8 +81,8 @@
                 30 days from now is <strong>{{ suggested_cancellation_date|date('d M Y') }}</strong>
                 or use <a href="https://www.timeanddate.com/date/dateadded.html?ad=30" target="_blank">online calculator</a>.
                 </div>
-                {{ form_widget(pending_cancel_form.clear, {'label': 'Abort cancellation', 'attr': {'class': 'btn btn-warning confirm-pending-abort'}}) }}
-                {{ form_widget(pending_cancel_form.cancel, {'label': 'Schedule cancellation', 'attr': {'class': 'btn btn-danger confirm-pending-cancel', 'placeholder': '30 days after notice'}}) }}
+                {{ form_widget(pending_cancel_form.clear, {'label': 'Abort cancellation', 'attr': {'class': 'btn btn-warning' }}) }}
+                {{ form_widget(pending_cancel_form.cancel, {'label': 'Schedule cancellation', 'attr': {'class': 'btn btn-danger', 'placeholder': '30 days after notice' }}) }}
                 {{ form_end(pending_cancel_form) }}
                 <br>
                 <b>This schedules the policy cancellation.
@@ -227,24 +228,20 @@
             {% if policy.hasMonetaryClaimed(true) %}{{ claims_table }}{% else %}{{ no_claims_table }}{% endif %}"></i>
                 </div>
                 </div>
+                {% if cancel_form.force is defined %}
                 <div class="row">
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <i style="cursor: pointer" class="fa fa-warning" data-toggle="popover" data-placement="bottom" data-html="true" title="Cancellation Reasons" data-content="
-                        Only do this if manually transferring policy"></i>
+                    <div class="col-md-12">
+                        {{ form_label(cancel_form.force, 'I wish to OVERRIDE the system (OPEN CLAIM - DO NOT DO NORMALLY)') }}<br>
+                        {{ form_widget(cancel_form.force) }}<br>
+                        In RARE circumstances, we may need to cancel a policy with a claim. Please check refund rules to ensure the impact of this is understood.
                     </div>
                 </div>
-                </div>
+                {% endif %}
                 <div class="row">
-                <div class="col-md-12">
-                    {{ form_widget(cancel_form.cancel, {'label': 'Cancel policy', 'attr': {'class': 'btn btn-danger confirm-cancel'}}) }}
-                    {{ form_end(cancel_form) }}
-                </div>
-                </div>
-                <div class="row">
-                <div class="col-md-12">
-                    <i>If cancellation list is empty, then most likely this is an open claim that must be resolved first.</i>
-                </div>
+                    <div class="col-md-12">
+                        {{ form_widget(cancel_form.cancel, {'label': 'Cancel policy', 'attr': {'class': 'btn btn-danger confirm-cancel'}}) }}
+                        {{ form_end(cancel_form) }}
+                    </div>
                 </div>
             </div>
         </div>

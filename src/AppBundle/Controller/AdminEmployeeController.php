@@ -2,14 +2,17 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Document\AffiliateCompany;
 use AppBundle\Document\BacsPaymentMethod;
 use AppBundle\Document\File\PaymentRequestUploadFile;
 use AppBundle\Document\JudoPaymentMethod;
+use AppBundle\Exception\PaymentDeclinedException;
 use AppBundle\Form\Type\AdminEmailOptOutType;
 use AppBundle\Form\Type\BacsCreditType;
 use AppBundle\Form\Type\PaymentRequestUploadFileType;
 use AppBundle\Form\Type\UploadFileType;
 use AppBundle\Form\Type\UserHandlingTeamType;
+use AppBundle\Repository\ClaimRepository;
 use AppBundle\Security\FOSUBUserProvider;
 use AppBundle\Service\BacsService;
 use AppBundle\Service\FraudService;
@@ -17,6 +20,7 @@ use AppBundle\Service\JudopayService;
 use AppBundle\Service\PolicyService;
 use AppBundle\Service\ReceperioService;
 use AppBundle\Service\ReportingService;
+use AppBundle\Service\SalvaExportService;
 use Gedmo\Loggable\Document\Repository\LogEntryRepository;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
@@ -35,7 +39,7 @@ use AppBundle\Document\CurrencyTrait;
 use AppBundle\Document\Claim;
 use AppBundle\Document\Payment\BacsPayment;
 use AppBundle\Document\Address;
-use AppBundle\Document\Company;
+use AppBundle\Document\CustomerCompany;
 use AppBundle\Document\Charge;
 use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePrice;
@@ -552,12 +556,18 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         $bacsRefundForm = $this->get('form.factory')
             ->createNamedBuilder('bacs_refund_form', BacsCreditType::class, $bacsRefund)
             ->getForm();
+        $salvaUpdateForm = $this->get('form.factory')
+            ->createNamedBuilder('salva_update_form')
+            ->add('update', SubmitType::class)
+            ->getForm();
 
         if ('POST' === $request->getMethod()) {
             if ($request->request->has('cancel_form')) {
                 $cancelForm->handleRequest($request);
                 if ($cancelForm->isValid()) {
-                    if ($policy->canCancel($cancel->getCancellationReason())) {
+                    $claimCancel = $policy->canCancel($cancel->getCancellationReason(), null, true);
+                    if ($policy->canCancel($cancel->getCancellationReason()) ||
+                        ($claimCancel && $cancel->getForce())) {
                         if ($cancel->getRequestedCancellationReason()) {
                             $policy->setRequestedCancellationReason($cancel->getRequestedCancellationReason());
                         }
@@ -572,6 +582,12 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                             'success',
                             sprintf('Policy %s was cancelled.', $policy->getPolicyNumber())
                         );
+                    } elseif ($claimCancel && !$cancel->getForce()) {
+                        $this->addFlash('error', sprintf(
+                            'Unable to cancel Policy %s due to %s as override was not enabled',
+                            $policy->getPolicyNumber(),
+                            $cancel->getCancellationReason()
+                        ));
                     } else {
                         $this->addFlash('error', sprintf(
                             'Unable to cancel Policy %s due to %s',
@@ -997,6 +1013,15 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                     } else {
                         throw new \Exception('1 or 12 payments only');
                     }
+                    $premium = $policy->getPremium();
+                    if ($premium &&
+                        !$this->areEqualToTwoDp($amount, $premium->getAdjustedStandardMonthlyPremiumPrice()) &&
+                        !$this->areEqualToTwoDp($amount, $premium->getAdjustedYearlyPremiumPrice())) {
+                        throw new \Exception(sprintf(
+                            'Current price does not match policy price for %s',
+                            $policy->getId()
+                        ));
+                    }
 
                     /** @var JudopayService $judopay */
                     $judopay = $this->get('app.judopay');
@@ -1006,21 +1031,30 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                         $date->getTimestamp(),
                         $policy->getId()
                     );
-                    /** @var JudoPaymentMethod $judoPaymentMethod */
-                    $judoPaymentMethod = $policy->getPayerOrUser()->getPaymentMethod();
-                    $judopay->add(
-                        $policy,
-                        $details['receiptId'],
-                        $details['consumer']['consumerToken'],
-                        $details['cardDetails']['cardToken'],
-                        Payment::SOURCE_TOKEN,
-                        $judoPaymentMethod->getDeviceDna(),
-                        $date
-                    );
-                    $this->addFlash(
-                        'success',
-                        'Policy is now paid for. Pdf generation may take a few minutes. Refresh the page to verify.'
-                    );
+                    try {
+                        /** @var JudoPaymentMethod $judoPaymentMethod */
+                        $judoPaymentMethod = $policy->getPayerOrUser()->getPaymentMethod();
+                        $judopay->add(
+                            $policy,
+                            $details['receiptId'],
+                            $details['consumer']['consumerToken'],
+                            $details['cardDetails']['cardToken'],
+                            Payment::SOURCE_TOKEN,
+                            $judoPaymentMethod->getDeviceDna(),
+                            $date
+                        );
+                        // @codingStandardsIgnoreStart
+                        $this->addFlash(
+                            'success',
+                            'Policy is now paid for. Pdf generation may take a few minutes. Refresh the page to verify.'
+                        );
+                        // @codingStandardsIgnoreEnd
+                    } catch (PaymentDeclinedException $e) {
+                        $this->addFlash(
+                            'danger',
+                            'Payment was declined'
+                        );
+                    }
 
                     return $this->redirectToRoute('admin_policy', ['id' => $id]);
                 }
@@ -1070,6 +1104,15 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                     $bacsRefund->setRefundTotalCommission($bacsRefund->getTotalCommission());
                     $this->getManager()->persist($bacsRefund);
                     $this->getManager()->flush();
+                }
+            } elseif ($request->request->has('salva_update_form')) {
+                $salvaUpdateForm->handleRequest($request);
+                if ($salvaUpdateForm->isValid()) {
+                    /** @var SalvaExportService $salvaService */
+                    $salvaService = $this->get('app.salva');
+                    $salvaService->queuePolicy($policy, SalvaExportService::QUEUE_UPDATED);
+
+                    $this->addFlash('success', 'Queued Salva Policy Update');
                 }
             }
         }
@@ -1124,6 +1167,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             'cancel_direct_debit_form' => $cancelDirectDebitForm->createView(),
             'run_scheduled_payment_form' => $runScheduledPaymentForm->createView(),
             'bacs_refund_form' => $bacsRefundForm->createView(),
+            'salva_update_form' => $salvaUpdateForm->createView(),
             'fraud' => $checks,
             'policy_route' => 'admin_policy',
             'policy_history' => $this->getSalvaPhonePolicyHistory($policy->getId()),
@@ -1486,6 +1530,23 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
     public function adminClaimsAction(Request $request)
     {
         return $this->searchClaims($request);
+    }
+
+    /**
+     * @Route("/claim/{number}", name="admin_claim_number")
+     */
+    public function adminClaimNumberAction($number)
+    {
+        $dm = $this->getManager();
+        /** @var ClaimRepository $repo */
+        $repo = $dm->getRepository(Claim::class);
+        /** @var Claim $claim */
+        $claim = $repo->findOneBy(['number' => $number]);
+        if (!$claim) {
+            throw $this->createNotFoundException('Policy not found');
+        }
+
+        return $this->redirectToRoute('admin_policy', ['id' => $claim->getPolicy()->getId()]);
     }
 
     /**
@@ -1975,7 +2036,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             ->getForm();
 
         $dm = $this->getManager();
-        $companyRepo = $dm->getRepository(Company::class);
+        $companyRepo = $dm->getRepository(CustomerCompany::class);
         $userRepo = $dm->getRepository(User::class);
         $companies = $companyRepo->findAll();
 
@@ -2022,7 +2083,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                 } elseif ($request->request->has('companyForm')) {
                     $companyForm->handleRequest($request);
                     if ($companyForm->isValid()) {
-                        $company = new Company();
+                        $company = new CustomerCompany();
                         $company->setName($this->getDataString($companyForm->getData(), 'name'));
                         $address = new Address();
                         $address->setLine1($this->getDataString($companyForm->getData(), 'address1'));
@@ -2379,5 +2440,78 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             200,
             array('Content-Type' => $mimetype)
         );
+    }
+
+    /**
+     * @Route("/affiliate", name="admin_affiliate")
+     * @Template
+     */
+    public function affiliateAction(Request $request)
+    {
+
+        $time_range = [
+            30 => 30,
+            60 => 60,
+            90 => 90
+        ];
+
+        $companyForm = $this->get('form.factory')
+            ->createNamedBuilder('companyForm')
+            ->add('name', TextType::class)
+            ->add('address1', TextType::class)
+            ->add('address2', TextType::class, ['required' => false])
+            ->add('address3', TextType::class, ['required' => false])
+            ->add('city', TextType::class)
+            ->add('postcode', TextType::class)
+            ->add('cpa', TextType::class)
+            ->add('days', ChoiceType::class, ['required' => true,
+                                                'choices' => $time_range])
+            ->add('next', SubmitType::class)
+            ->getForm();
+
+        $dm = $this->getManager();
+        $companyRepo = $dm->getRepository(AffiliateCompany::class);
+        $userRepo = $dm->getRepository(User::class);
+        $companies = $companyRepo->findAll();
+
+        try {
+            if ('POST' === $request->getMethod()) {
+                if ($request->request->has('companyForm')) {
+                    $companyForm->handleRequest($request);
+                    if ($companyForm->isValid()) {
+                        $company = new AffiliateCompany();
+                        $company->setName($this->getDataString($companyForm->getData(), 'name'));
+                        $address = new Address();
+                        $address->setLine1($this->getDataString($companyForm->getData(), 'address1'));
+                        $address->setLine2($this->getDataString($companyForm->getData(), 'address2'));
+                        $address->setLine3($this->getDataString($companyForm->getData(), 'address3'));
+                        $address->setCity($this->getDataString($companyForm->getData(), 'city'));
+                        $address->setPostcode($this->getDataString($companyForm->getData(), 'postcode'));
+                        $company->setAddress($address);
+                        $company->setCPA($this->getDataString($companyForm->getData(), 'cpa'));
+                        $company->setDays($this->getDataString($companyForm->getData(), 'days'));
+                        $dm->persist($company);
+                        $dm->flush();
+                        $this->addFlash('success', sprintf(
+                            'Added affiliate'
+                        ));
+
+                        return new RedirectResponse($this->generateUrl('admin_affiliate'));
+                    } else {
+                        throw new \InvalidArgumentException(sprintf(
+                            'Unable to add company. %s',
+                            (string) $companyForm->getErrors()
+                        ));
+                    }
+                }
+            }
+        } catch (\InvalidArgumentException $e) {
+            $this->addFlash('error', $e->getMessage());
+        }
+
+        return [
+            'companies' => $companies,
+            'companyForm' => $companyForm->createView(),
+        ];
     }
 }

@@ -72,6 +72,7 @@ class DirectGroupHandlerClaim extends HandlerClaim
 
     public static $breakdownEmailAddresses = [
         'SoSure@directgroup.co.uk',
+        'Tracey.McManus@directgroup.co.uk',
     ];
 
     public static $errorEmailAddresses = [
@@ -299,10 +300,6 @@ class DirectGroupHandlerClaim extends HandlerClaim
 
             if ($this->getClaimType() === null) {
                 throw new \Exception('Unknown or missing claim type');
-            }
-
-            if ($this->replacementImei && !$this->isImei($this->replacementImei) && !$this->isReplacementRepaired()) {
-                throw new \Exception(sprintf('Invalid replacement imei %s', $this->replacementImei));
             }
         } catch (\Exception $e) {
             throw new \Exception(sprintf(

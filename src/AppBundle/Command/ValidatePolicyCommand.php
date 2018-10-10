@@ -325,9 +325,13 @@ class ValidatePolicyCommand extends BaseCommand
                 $this->header($policy, $policies, $lines);
                 $lines[] = $this->failureStatusMessage($policy, $data['prefix'], $data['validateDate']);
             }
-            if ($policy->arePolicyScheduledPaymentsCorrect(true, $data['validateDate']) === false) {
-                $this->header($policy, $policies, $lines);
+            if ($policy->arePolicyScheduledPaymentsCorrect(
+                true,
+                $data['validateDate'],
+                true
+            ) === false) {
                 if ($data['adjustScheduledPayments']) {
+                    $this->header($policy, $policies, $lines);
                     /** @var PolicyService $policyService */
                     $policyService = $this->getContainer()->get('app.policy');
                     if ($policyService->adjustScheduledPayments($policy)) {
@@ -346,12 +350,16 @@ class ValidatePolicyCommand extends BaseCommand
                     $policy->getUser()->getBacsPaymentMethod() &&
                     $policy->getUser()->getBacsPaymentMethod()->getBankAccount() &&
                     $policy->getUser()->getBacsPaymentMethod()->getBankAccount()->isMandateInvalid()) {
+                    // If the mandate is invalid, we can just ignore - user will be prompted to resolve the issue
+                    /*
                     $lines[] = sprintf(
                         'Invalid BACS Mandate. Can ignore incorrect scheduled payments for policy %s',
                         $policy->getPolicyNumber()
                     );
                     $lines[] = $this->failureScheduledPaymentsMessage($policy, $data['validateDate']);
+                    */
                 } else {
+                    $this->header($policy, $policies, $lines);
                     $lines[] = sprintf(
                         'WARNING!! Incorrect scheduled payments for policy %s',
                         $policy->getPolicyNumber()
@@ -360,12 +368,16 @@ class ValidatePolicyCommand extends BaseCommand
                 }
             }
 
+            $allowedVariance = 0;
             // allow up to 1 month difference for non-active policies
-            $allowedVariance = Salva::MONTHLY_TOTAL_COMMISSION - 0.01;
-            if ((!$policy->isActive(true) &&
-                $policy->hasCorrectCommissionPayments($data['validateDate'], $allowedVariance) === false) ||
-                ($policy->isActive(true) && $policy->hasCorrectCommissionPayments($data['validateDate']) === false)
-            ) {
+            if (!$policy->isActive(true)) {
+                $allowedVariance = Salva::MONTHLY_TOTAL_COMMISSION - 0.01;
+            }
+
+            // depending on when the chargeback occurs, we may or may not want to exclude that amount
+            // but if they both don't match, then its likely to be a problem
+            if ($policy->hasCorrectCommissionPayments($data['validateDate'], $allowedVariance) === false &&
+                $policy->hasCorrectCommissionPayments($data['validateDate'], $allowedVariance, true) === false) {
                 // Ignore a couple of policies that should have been cancelled unpaid, but went to expired
                 if (!in_array($policy->getId(), Salva::$commissionValidationExclusions)) {
                     $this->header($policy, $policies, $lines);
@@ -425,22 +437,22 @@ class ValidatePolicyCommand extends BaseCommand
                     }
                     $now = new \DateTime();
 
-                    // BacsService::exportPaymentsDebits had a 3 day advance generation
-                    // + 1 day processing date
-                    // Anything scheduled further in advance would not be expected to be in the system
-                    $fourDays = clone $now;
-                    $fourDays = $this->addBusinessDays($fourDays, 4);
+                    if ($bankAccount->getInitialNotificationDate()) {
+                        // bacs timing is such that:
+                        // if initial notification date is tomorrow, there should be a payment in the system today
+                        // take into account when we run the bacs process
+                        $expectedNotificationDate = clone $bankAccount->getInitialNotificationDate();
+                        if ($now->format('H') >= 15) {
+                            $expectedNotificationDate = $this->subBusinessDays($expectedNotificationDate, 1);
+                        }
 
-                    // If the initial payment is tomorrow, the mandate will have just activated, but the payment
-                    // will not yet be scheduled as policy validation runs prior to bacs job creating the payment
-                    $nextDay = clone $now;
-                    $nextDay = $this->addBusinessDays($nextDay, 1);
-                    $isTommorowInitialPayment = $this->isSameDay($nextDay, $bankAccount->getInitialNotificationDate());
-
-                    if ($bacsPayments == 0 && $bankAccount->getInitialNotificationDate() > new \DateTime() &&
-                        $bankAccount->getInitialNotificationDate() < $fourDays && !$isTommorowInitialPayment) {
+                        if ($bacsPayments == 0 && $expectedNotificationDate < $now) {
+                            $this->header($policy, $policies, $lines);
+                            $lines[] = 'Warning!! There are no bacs payments, yet past the initial notification date';
+                        }
+                    } else {
                         $this->header($policy, $policies, $lines);
-                        $lines[] = 'Warning!! There are no bacs payments, yet its past the initial notification date';
+                        $lines[] = 'Warning!! Missing initial notification date';
                     }
                 }
             }

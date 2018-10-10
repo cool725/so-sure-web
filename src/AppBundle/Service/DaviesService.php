@@ -1,6 +1,7 @@
 <?php
 namespace AppBundle\Service;
 
+use AppBundle\Document\ImeiTrait;
 use AppBundle\Document\Policy;
 use Psr\Log\LoggerInterface;
 use Aws\S3\S3Client;
@@ -22,6 +23,7 @@ class DaviesService extends S3EmailService
 {
     use CurrencyTrait;
     use DateTrait;
+    use ImeiTrait;
 
     const MIN_LOSS_DESCRIPTION_LENGTH = 5;
 
@@ -432,6 +434,10 @@ class DaviesService extends S3EmailService
             ));
         }
 
+        if ($daviesClaim->replacementImei && !$this->isImei($daviesClaim->replacementImei)) {
+            throw new \Exception(sprintf('Invalid replacement imei %s', $daviesClaim->replacementImei));
+        }
+
         if ($daviesClaim->replacementImei && in_array($daviesClaim->getClaimStatus(), [
             Claim::STATUS_DECLINED,
             Claim::STATUS_WITHDRAWN
@@ -441,12 +447,14 @@ class DaviesService extends S3EmailService
                 $daviesClaim->claimNumber
             ));
         }
+
         if ($daviesClaim->replacementReceivedDate && $daviesClaim->replacementReceivedDate < $daviesClaim->lossDate) {
             throw new \Exception(sprintf(
                 'Claim %s has a replacement received date prior to loss date',
                 $daviesClaim->claimNumber
             ));
         }
+
         if ($daviesClaim->replacementReceivedDate &&
             (!$daviesClaim->replacementMake || !$daviesClaim->replacementModel)) {
             throw new \Exception(sprintf(
@@ -789,12 +797,11 @@ class DaviesService extends S3EmailService
         if ($claim->isOpen()) {
             // We've replaced their phone with a new imei number
             if ($claim->getReplacementImei() &&
-                $claim->getReplacementImei() != $policy->getImei()) {
+                $claim->getReplacementImei() != $policy->getImei() && !$skipImeiUpdate) {
                 // Imei has changed, but we can't change their policy premium, which is fixed
                 // If there are multiple open claims, don't update the imei!
-                if (!$skipImeiUpdate) {
-                    $policy->adjustImei($claim->getReplacementImei());
-                }
+                $policy->adjustImei($claim->getReplacementImei());
+
                 // If phone has been updated (unlikely at the moment)
                 if ($claim->getReplacementPhone()) {
                     $policy->setPhone($claim->getReplacementPhone());
@@ -872,6 +879,9 @@ class DaviesService extends S3EmailService
                 'fees' => $this->fees,
                 'title' => 'Davies Daily Claims Report',
                 'highDemandPhones' => $highDemandPhones,
+                'claims_number_route' => 'admin_claim_number',
+                'claims_policy_route' => 'admin_policy',
+                'claims_route' => 'admin_claims',
             ]
         );
 
@@ -916,6 +926,9 @@ class DaviesService extends S3EmailService
                     'claims' => null,
                     'fees' => $this->fees,
                     'title' => 'Errors in So-Sure Mobile - Daily Claims Report',
+                    'claims_number_route' => 'claims_claim_number',
+                    'claims_policy_route' => 'claims_policy',
+                    'claims_route' => 'claims_claims',
                 ],
                 null,
                 null,

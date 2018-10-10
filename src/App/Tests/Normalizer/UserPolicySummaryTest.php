@@ -99,14 +99,14 @@ JSON;
     "widgets": [
         {
             "type": "TEXT",
-            "title": "Policy Reference",
-            "text": "{$policy->getPolicyNumber()}",
+            "title": "Covered Device",
+            "text": "{$out->activePhone}",
             "launchUrl": "{$userPageUrl}"
         },
         {
             "type": "TEXT",
-            "title": "Covered Device",
-            "text": "{$out->activePhone}",
+            "title": "Policy Reference",
+            "text": "{$policy->getPolicyNumber()}",
             "launchUrl": "{$userPageUrl}"
         },
         {

@@ -2,6 +2,7 @@
 
 namespace AppBundle\Tests\Service;
 
+use AppBundle\Document\Payment\BacsIndemnityPayment;
 use AppBundle\Service\LloydsService;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -52,8 +53,34 @@ class LloydsServiceTest extends WebTestCase
     {
         $csv = sprintf("%s/../src/AppBundle/Tests/Resources/lloyds.csv", self::$rootDir);
 
+        $bacsIndemnityA = new BacsIndemnityPayment();
+        $bacsIndemnityA->setReference('DDIC00000001301718');
+        $bacsIndemnityA->setAmount(10);
+        $bacsIndemnityAuto = new BacsIndemnityPayment();
+        $bacsIndemnityAuto->setReference('DDICNWBKLE00676955');
+        $bacsIndemnityAuto->setAmount(10);
+        static::$dm->persist($bacsIndemnityA);
+        static::$dm->persist($bacsIndemnityAuto);
+        static::$dm->flush();
+
         $data = self::$lloyds->processActualCsv($csv);
-        $this->assertEquals(2, count($data['data']), json_encode($data));
-        $this->assertEquals(94.41, $data['total']);
+        $this->assertEquals(4, count($data['data']), json_encode($data));
+        $this->assertEquals(75.92, $data['total']);
+
+        /** @var DocumentManager $dm */
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        $repo = $dm->getRepository(BacsIndemnityPayment::class);
+        /** @var BacsIndemnityPayment $updatedBacsIndemnityA */
+        $updatedBacsIndemnityA = $repo->find($bacsIndemnityA->getId());
+        /** @var BacsIndemnityPayment $updatedBacsIndemnityAuto */
+        $updatedBacsIndemnityAuto = $repo->find($bacsIndemnityAuto->getId());
+
+        $this->assertTrue($updatedBacsIndemnityA->hasSuccess());
+        $this->assertEquals(BacsIndemnityPayment::STATUS_REFUNDED, $updatedBacsIndemnityA->getStatus());
+        $this->assertEquals(new \DateTime('2017-04-28'), $updatedBacsIndemnityA->getDate());
+
+        $this->assertTrue($updatedBacsIndemnityAuto->hasSuccess());
+        $this->assertEquals($updatedBacsIndemnityAuto::STATUS_REFUNDED, $updatedBacsIndemnityAuto->getStatus());
+        $this->assertEquals(new \DateTime('2017-04-30'), $updatedBacsIndemnityAuto->getDate());
     }
 }

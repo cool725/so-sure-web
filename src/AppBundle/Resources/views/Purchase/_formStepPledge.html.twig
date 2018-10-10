@@ -13,7 +13,7 @@
     <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_contract.png" alt="so-sure - contract" width="200px" class="mx-auto d-block">
 
     <div class="form-group">
-        <small class="form-text text-center"><a href="{{ cdn_url }}/files/so-sure_sample_policy_doc.pdf" target="_blank"><u>Read our full policy document here</u></a></small>
+        <small class="form-text text-center"><a href="{{ cdn_url }}/files/so-sure_sample_policy_doc_v10.pdf" target="_blank"><u>Read our full policy document here</u></a></small>
     </div>
 
     <div class="pledge-items">
@@ -50,7 +50,13 @@
                 </a>
             </div>
             <div class="col-9 text-right">
-                {{ form_widget(purchase_form.next, {'label': 'I swear I\'ll be honest!', 'attr': {'class': 'btn btn-success btn-green-gradient btn-icon arrow-right btn-block-xs'}}) }}
+                {{ form_widget(purchase_form.next, {
+                    'label': 'I swear I\'ll be honest!',
+                    'fa': 'far fa-long-arrow-right fa-lg ml-2',
+                    'right': true,
+                    'attr': {
+                        'class': 'btn btn-success btn-green-gradient btn-block-xs'
+                }}) }}
             </div>
         </div>
     </div>

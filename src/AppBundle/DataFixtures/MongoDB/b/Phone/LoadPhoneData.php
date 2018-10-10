@@ -78,21 +78,39 @@ abstract class LoadPhoneData implements ContainerAwareInterface
             throw new \Exception('missing container');
         }
 
+        /** @var MailerService $mailer */
+        $mailer = $this->container->get('app.mailer');
+
         $env = $this->container->getParameter('kernel.environment');
         if ($env != 'prod') {
             return;
         }
 
         $lines = [];
+        $linesWithPrice = [];
+        $linesWithDevice = [];
         foreach ($newPhones as $device => $phone) {
-            $lines[] = sprintf('"%s %s" as "%s"', $phone->getMake(), $phone->getModel(), $device);
+            /** @var Phone $phone */
+            $lines[] = sprintf('"%s"', $phone);
+            $linesWithPrice[] = sprintf(
+                '"%s for £%0.2f / month',
+                $phone,
+                $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice()
+            );
+            $linesWithDevice[] = sprintf('"%s %s" as "%s"', $phone->getMake(), $phone->getModel(), $device);
         }
+
+        $this->emailRecipero($mailer, $linesWithDevice);
+        $this->emailComparisonCreator($mailer, $lines);
+        $this->emailSoSure($mailer, $linesWithPrice);
+    }
+
+    private function emailRecipero(MailerService $mailer, $lines)
+    {
         $body = sprintf(
             'Please add the following modelreferences to the make/model checks<br><br>%s',
             implode('<br>', $lines)
         );
-        /** @var MailerService $mailer */
-        $mailer = $this->container->get('app.mailer');
         $mailer->send(
             'New Model References',
             'support@recipero.com',
@@ -102,10 +120,13 @@ abstract class LoadPhoneData implements ContainerAwareInterface
             'tech+ops@so-sure.com',
             'tech@so-sure.com'
         );
+    }
 
+    private function emailSoSure(MailerService $mailer, $lines)
+    {
         // @codingStandardsIgnoreStart
         $body = sprintf(
-            'The following phones have been added to the so-sure site. <ul><li>New models are considered for high in-demand</li><li>New advertising can be added.</li></ul><br><br>%s',
+            'The following phones have been added to the so-sure site. <ul><li>New models should be considered if the high in-demand flag is required</li><li>New advertising can be added.</li></ul><br><br>%s',
             implode('<br>', $lines)
         );
         // @codingStandardsIgnoreEnd
@@ -118,7 +139,10 @@ abstract class LoadPhoneData implements ContainerAwareInterface
             'tech+ops@so-sure.com',
             'tech@so-sure.com'
         );
+    }
 
+    private function emailComparisonCreator(MailerService $mailer, $lines)
+    {
         // @codingStandardsIgnoreStart
         $body = sprintf(
             'The following phones have been added to the so-sure site. Can you please provide your Gadget ID\'s if available, or let us know once they have been added to your system? <br><br>%s',

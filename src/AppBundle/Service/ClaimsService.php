@@ -169,7 +169,7 @@ class ClaimsService
         $claim->setCrimeRef($claimTheftLoss->getCrimeReferenceNumber());
         $claim->setForce($claimTheftLoss->getForce());
 
-        if ($claim->getForce() && $claim->getCrimeRef()) {
+        if ($claim->needValidCrimeRef() && $claim->getForce() && $claim->getCrimeRef()) {
             $validCrimeRef = $this->imeiService->validateCrimeRef($claim->getForce(), $claim->getCrimeRef());
             $claim->setValidCrimeRef($validCrimeRef);
         }
@@ -471,10 +471,21 @@ class ClaimsService
         );
     }
 
-    private function downloadAttachmentFiles(Claim $claim)
+    private function downloadAttachmentFiles($attachments)
     {
         $files = [];
-        foreach ($claim->getAttachmentFiles() as $file) {
+        $types = [];
+        foreach ($attachments as $file) {
+            /** @var S3ClaimFile $file */
+            $type = $file->getFileType();
+            if (!isset($types[$type])) {
+                $types[$type] = $file;
+            } elseif ($file->getCreated() > $types[$type]->getCreated()) {
+                $types[$type] = $file;
+            }
+        }
+
+        foreach ($types as $type => $file) {
             /** @var S3ClaimFile $file */
             $files[] = $this->downloadS3($file);
         }
@@ -502,7 +513,7 @@ class ClaimsService
             ['data' => $claim],
             null,
             null,
-            $this->downloadAttachmentFiles($claim),
+            $this->downloadAttachmentFiles($claim->getAttachmentFiles()),
             'bcc@so-sure.com'
         );
 
@@ -518,12 +529,6 @@ class ClaimsService
 
     public function notifyClaimAdditionalDocuments(Claim $claim, array $attachments)
     {
-        $localAttachments = [];
-        foreach ($attachments as $attachment) {
-            /** @var S3ClaimFile $attachment */
-            $localAttachments[] = $this->downloadS3($attachment);
-        }
-
         $subject = sprintf(
             'Additional Documents for Policy %s',
             $claim->getPolicy()->getPolicyNumber()
@@ -540,7 +545,7 @@ class ClaimsService
             ['data' => $claim],
             null,
             null,
-            array_values(array_filter($localAttachments)),
+            $this->downloadAttachmentFiles($attachments),
             'bcc@so-sure.com'
         );
     }

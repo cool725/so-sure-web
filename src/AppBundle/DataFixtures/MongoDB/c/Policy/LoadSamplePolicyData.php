@@ -6,6 +6,8 @@ use AppBundle\Document\BacsPaymentMethod;
 use AppBundle\Document\BankAccount;
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\File\AccessPayFile;
+use AppBundle\Document\File\BacsReportInputFile;
+use AppBundle\Document\File\S3File;
 use AppBundle\Document\Payment\BacsPayment;
 use AppBundle\Repository\PolicyRepository;
 use AppBundle\Service\PolicyService;
@@ -53,8 +55,6 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
     const PICSURE_RANDOM = 'random';
     const PICSURE_NON_POLICY = 'n/a';
 
-    const BACS_SERIAL_NUMBERS = 20;
-
     /**
      * @var ContainerInterface|null
      */
@@ -63,6 +63,8 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
     private $faker;
     private $emails = [];
     private $receiptIds = [];
+    private $bacsSubmissions = [];
+    private $bacsInputReports = [];
 
     public function setContainer(ContainerInterface $container = null)
     {
@@ -73,9 +75,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
     {
         $this->faker = Faker\Factory::create('en_GB');
 
-        $this->createBacsFiles($manager);
-
-        $users = $this->newUsers($manager, 150);
+        $users = $this->newUsers($manager, 350);
         $unpaid = $this->newUsers($manager, 10);
         $unpaidDiscount = $this->newUsers($manager, 10);
         $iosPreExpireUsers = $this->newUsers($manager, 40);
@@ -92,7 +92,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             $count++;
 
             // add a second policy for some users
-            $rand = rand(1, 5);
+            $rand = random_int(1, 5);
             if ($rand == 1) {
                 $this->newPolicy($manager, $user, $count);
                 $count++;
@@ -109,7 +109,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         }
 
         foreach ($unpaidDiscount as $user) {
-            $this->newPolicy($manager, $user, $count, self::CLAIM_NONE, null, null, null, false, true, 200, rand(2, 50), 1);
+            $this->newPolicy($manager, $user, $count, self::CLAIM_NONE, null, null, null, false, true, 200, random_int(2, 50), 1);
             $count++;
         }
 
@@ -144,19 +144,19 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $manager->flush();
 
         foreach ($preExpireUsers as $user) {
-            $rand = rand(0, 1);
+            $rand = random_int(0, 1);
             if ($rand == 0) {
                 $this->addConnections($manager, $user, $preExpireUsers);
             }
         }
         foreach ($preExpireYearlyUsers as $user) {
-            $rand = rand(0, 1);
+            $rand = random_int(0, 1);
             if ($rand == 0) {
                 $this->addConnections($manager, $user, $preExpireYearlyUsers);
             }
         }
         foreach ($fullyExpiredUsers as $user) {
-            $rand = rand(0, 1);
+            $rand = random_int(0, 1);
             if ($rand == 0) {
                 $this->addConnections($manager, $user, $fullyExpiredUsers);
             }
@@ -175,7 +175,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $sevenMonthsAgo = $sevenMonthsAgo->sub(new \DateInterval('P7M'));
         $adjusted = [];
         for ($i = 0; $i < 5; $i++) {
-            $phone = $phones[rand(0, count($phones) - 1)];
+            $phone = $phones[random_int(0, count($phones) - 1)];
             if (isset($adjusted[$phone->getId()])) {
                 continue;
             }
@@ -224,7 +224,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             false,
             true,
             null,
-            rand(2, 50),
+            random_int(2, 50),
             3,
             self::PICSURE_NON_POLICY
         );
@@ -425,7 +425,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             false,
             true,
             180,
-            rand(2, 50),
+            random_int(2, 50),
             3
         );
 
@@ -444,24 +444,9 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             false,
             true,
             180,
-            rand(2, 50),
+            random_int(2, 50),
             3
         );
-
-        $manager->flush();
-    }
-
-    private function createBacsFiles(ObjectManager $manager)
-    {
-        $now = new \DateTime();
-        for ($i = 0; $i < self::BACS_SERIAL_NUMBERS; $i++) {
-            $date = clone $now;
-            $date = $date->sub(new \DateInterval(sprintf('P%dD', $i)));
-            $file = new AccessPayFile();
-            $file->setDate($date);
-            $file->setSerialNumber($i);
-            $manager->persist($file);
-        }
 
         $manager->flush();
     }
@@ -497,13 +482,13 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             // Use the first/last name as the user portion of the email address so they vaugely match
             // Keep the random portion of the email domain though
             $email = $this->faker->email;
-            $rand = rand(1, 3);
+            $rand = random_int(1, 3);
             if ($rand == 1) {
                 $email = sprintf("%s.%s@%s", $user->getFirstName(), $user->getLastName(), explode("@", $email)[1]);
             } elseif ($rand == 2) {
                 $email = sprintf("%s%s@%s", mb_substr($user->getFirstName(), 0, 1), $user->getLastName(), explode("@", $email)[1]);
             } elseif ($rand == 3) {
-                $email = sprintf("%s%s%2d@%s", mb_substr($user->getFirstName(), 0, 1), $user->getLastName(), rand(1, 99), explode("@", $email)[1]);
+                $email = sprintf("%s%s%2d@%s", mb_substr($user->getFirstName(), 0, 1), $user->getLastName(), random_int(1, 99), explode("@", $email)[1]);
             }
         }
         $email = str_replace(' ', '', $email);
@@ -526,19 +511,19 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $user->setBillingAddress($address);
         $bacs = false;
         if ($isPaymentMethodBacs === null) {
-            $bacs = rand(0, 1) == 0;                        
+            $bacs = random_int(0, 1) == 0;
         } else {
             $bacs = $isPaymentMethodBacs;
         }
         if ($bacs) {
             $bankAccount = new BankAccount();
             $bankAccount->setMandateStatus(BankAccount::MANDATE_SUCCESS);
-            $reference = sprintf('SOSURE%d', rand(1, 999999));
+            $reference = sprintf('SOSURE%d', random_int(1, 999999));
             $bankAccount->setReference($reference);
             $bankAccount->setSortCode('000099');
             $bankAccount->setAccountNumber('87654321');
             $bankAccount->setAccountName($user->getName());
-            $bankAccount->setMandateSerialNumber(rand(1, self::BACS_SERIAL_NUMBERS));
+            $bankAccount->setMandateSerialNumber(0);
             $status = rand(0, 4);
             if ($status == 0) {
                 $bankAccount->setMandateStatus(BankAccount::MANDATE_CANCELLED);
@@ -588,7 +573,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $phones = $phoneRepo->findAll(['active' => true]);
         $phone = null;
         while ($phone == null) {
-            $phone = $phones[rand(0, count($phones) - 1)];
+            $phone = $phones[random_int(0, count($phones) - 1)];
             if (!$phone->getCurrentPhonePrice(new \DateTime('2016-01-01')) || $phone->getMake() == "ALL") {
                 $phone = null;
             }
@@ -645,7 +630,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
 
         $startDate = new \DateTime();
         if ($days === null) {
-            $days = sprintf("P%dD", rand(0, 120));
+            $days = sprintf("P%dD", random_int(0, 120));
         } else {
             $days = sprintf("P%dD", $days);
         }
@@ -680,7 +665,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $claimStatus = null;
         $claimType = null;
         if ($claim == self::CLAIM_RANDOM) {
-            $claim = rand(0, 3) == 0;
+            $claim = random_int(0, 3) == 0;
         } elseif ($claim == self::CLAIM_SETTLED_LOSS) {
             $claimStatus = Claim::STATUS_SETTLED;
             $claimType = Claim::TYPE_LOSS;
@@ -689,71 +674,109 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             $this->addClaim($dm, $policy, $claimType, $claimStatus);
         }
         if ($promo === null) {
-            $promo = rand(0, 1) == 0;
+            $promo = random_int(0, 1) == 0;
         }
         if ($promo) {
             $policy->setPromoCode(Policy::PROMO_LAUNCH);
         }
 
-        $bacs = $user->hasBacsPaymentMethod();
+        $bacs = $user->hasBacsPaymentMethod() && count($user->getValidPolicies(true)) < 1;
 
         $paymentDate = clone $startDate;
-        if ($paid === true || ($paid === null && rand(0, 1) == 0)) {
+        if ($paid === true || ($paid === null && random_int(0, 1) == 0)) {
             if ($bacs) {
-                $payment = new BacsPayment();
-                $payment->setStatus(BacsPayment::STATUS_SUCCESS);
-                $payment->setSuccess(true);
-                /** @var BacsPaymentMethod $bacs */
-                $bacs = $user->getPaymentMethod();
-                $payment->setSerialNumber($bacs->getBankAccount()->getMandateSerialNumber());
+                $payment = $this->newBacsPayment(
+                    $manager,
+                    $user,
+                    $phone->getCurrentPhonePrice()->getYearlyPremiumPrice(null, clone $startDate),
+                    Salva::YEARLY_TOTAL_COMMISSION,
+                    clone $paymentDate);
+                $policy->addPayment($payment);
+                $payment->submit(clone $paymentDate);
+                $payment->approve($payment->getBacsReversedDate());
+
+                // randomly add refunds
+                if (rand(0, 9) == 0) {
+                    $refund = $this->newBacsPayment(
+                        $manager,
+                        $user,
+                        $phone->getCurrentPhonePrice()->getYearlyPremiumPrice(null, clone $startDate)*-1,
+                        Salva::YEARLY_TOTAL_COMMISSION,
+                        clone $paymentDate);
+                    $policy->addPayment($refund);
+                    $refund->submit(clone $paymentDate);
+                    $refund->approve($refund->getBacsReversedDate());
+                }
             } else {
                 $payment = new JudoPayment();
                 $payment->setResult(JudoPayment::RESULT_SUCCESS);
-                $receiptId = rand(1, 9999999);
+                $receiptId = random_int(1, 9999999);
                 while (in_array($receiptId, $this->receiptIds)) {
-                    $receiptId = rand(1, 9999999);
+                    $receiptId = random_int(1, 9999999);
                 }
                 $this->receiptIds[] = $receiptId;
                 $payment->setReceipt($receiptId);
+                $payment->setDate($paymentDate);
+                $payment->setAmount($phone->getCurrentPhonePrice()->getYearlyPremiumPrice(null, clone $startDate));
+                $payment->setTotalCommission(Salva::YEARLY_TOTAL_COMMISSION);
+                $payment->setNotes('LoadSamplePolicyData');
+                $policy->addPayment($payment);
             }
-            $payment->setDate($paymentDate);
-            $payment->setAmount($phone->getCurrentPhonePrice()->getYearlyPremiumPrice(null, clone $startDate));
-            $payment->setTotalCommission(Salva::YEARLY_TOTAL_COMMISSION);
-            $payment->setNotes('LoadSamplePolicyData');
-            $policy->addPayment($payment);
         } else {
             $months = $paidMonths;
+            $lastPaymentSuccess = true;
             if ($paidMonths === null) {
-                $months = rand(1, 11);
+                $months = random_int(1, 11);
+                $lastPaymentSuccess = random_int(0, 1) == 0;
             }
             for ($i = 1; $i <= $months; $i++) {
                 if ($bacs) {
-                    $payment = new BacsPayment();
-                    $payment->setStatus(BacsPayment::STATUS_SUCCESS);
-                    $payment->setSuccess(true);
-                    /** @var BacsPaymentMethod $bacs */
-                    $bacs = $user->getPaymentMethod();
-                    $payment->setSerialNumber($bacs->getBankAccount()->getMandateSerialNumber());
+                    $payment = $this->newBacsPayment(
+                        $manager,
+                        $user,
+                        $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(null, clone $startDate),
+                        $months == 12 ? Salva::FINAL_MONTHLY_TOTAL_COMMISSION : Salva::MONTHLY_TOTAL_COMMISSION,
+                        clone $paymentDate);
+                    $policy->addPayment($payment);
+                    $payment->submit(clone $paymentDate);
+                    $payment->approve($payment->getBacsReversedDate());
+
+                    // randomly add refunds on last month
+                    if (rand(0, 4) == 0 && $i == $months) {
+                        $refund = $this->newBacsPayment(
+                            $manager,
+                            $user,
+                            $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(null, clone $startDate)*-1,
+                            $months == 12 ? Salva::FINAL_MONTHLY_TOTAL_COMMISSION : Salva::MONTHLY_TOTAL_COMMISSION,
+                            clone $paymentDate);
+                        $policy->addPayment($refund);
+                        $refund->submit(clone $paymentDate);
+                        $refund->approve($refund->getBacsReversedDate());
+                    }
                 } else {
                     $payment = new JudoPayment();
-                    $payment->setResult(JudoPayment::RESULT_SUCCESS);
-                    $receiptId = rand(1, 9999999);
+                    if ($i == 1 || $i < $months || $lastPaymentSuccess) {
+                        $payment->setResult(JudoPayment::RESULT_SUCCESS);
+                    } else {
+                        $payment->setResult(JudoPayment::RESULT_DECLINED);
+                    }
+                    $receiptId = random_int(1, 9999999);
                     while (in_array($receiptId, $this->receiptIds)) {
-                        $receiptId = rand(1, 9999999);
+                        $receiptId = random_int(1, 9999999);
                     }
                     $this->receiptIds[] = $receiptId;
                     $payment->setReceipt($receiptId);
+                    $payment->setDate(clone $paymentDate);
+                    $payment->setAmount($phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(null, clone $startDate));
+                    $payment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
+                    if ($months == 12) {
+                        $payment->setTotalCommission(Salva::FINAL_MONTHLY_TOTAL_COMMISSION);
+                    }
+                    $payment->setNotes('LoadSamplePolicyData');
+                    $policy->addPayment($payment);
                 }
-                $payment->setDate(clone $paymentDate);
-                $payment->setAmount($phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(null, clone $startDate));
-                $payment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
-                if ($months == 12) {
-                    $payment->setTotalCommission(Salva::FINAL_MONTHLY_TOTAL_COMMISSION);
-                }
-                $payment->setNotes('LoadSamplePolicyData');
-                $policy->addPayment($payment);
                 $paymentDate->add(new \DateInterval('P1M'));
-                if (rand(0, 3) == 0) {
+                if (random_int(0, 3) == 0) {
                     $tDate = clone $paymentDate;
                     $tDate->add(new \DateInterval('P1D'));
                     $policy->incrementSalvaPolicyNumber($tDate);
@@ -770,7 +793,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $policy->setStatus(SalvaPhonePolicy::STATUS_ACTIVE);
         if ($picSure == self::PICSURE_RANDOM) {
             $picSureStatus = null;
-            $rand = rand(0, 3);
+            $rand = random_int(0, 3);
             if ($rand == 0) {
                 $picSureStatus = PhonePolicy::PICSURE_STATUS_APPROVED;
             } elseif ($rand == 1) {
@@ -785,7 +808,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
 
         /** @var PolicyService $policyService */
         $policyService = $this->container->get('app.policy');
-        $policyService->generateScheduledPayments($policy, $startDate);
+        $policyService->generateScheduledPayments($policy, $startDate, 12);
 
         if ($policyDiscount) {
             $policy->setPolicyDiscountPresent(true);
@@ -802,7 +825,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             $invitation->setInviter($user);
             $invitation->setPolicy($policy);
             $invitation->setEmail($this->faker->email);
-            $rand = rand(0, 2);
+            $rand = random_int(0, 2);
             if ($rand == 0) {
                 $invitation->setCancelled($policy->getStart());
             } elseif ($rand == 1) {
@@ -822,6 +845,59 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         }
 
         return $policy;
+    }
+
+    private function newBacsPayment(ObjectManager $manager, User $user, $amount, $totalComission, $paymentDate)
+    {
+        $serialNumber = $paymentDate->format("ymd");
+        $submissionFile = null;
+        $inputFile = null;
+        if (array_key_exists($serialNumber, $this->bacsSubmissions)) {
+            $submissionFile = $this->bacsSubmissions[$serialNumber];
+            $inputFile = $this->bacsInputReports[$serialNumber];
+        }
+        if (!$submissionFile) {
+            $submissionFile = new AccessPayFile();
+            $submissionFile->setDate($paymentDate);
+            $submissionFile->setSerialNumber(AccessPayFile::formatSerialNumber($serialNumber));
+            $submissionFile->addMetadata('debit-amount', 0.0);
+            $submissionFile->addMetadata('credit-amount', 0.0);
+            $submissionFile->setStatus(AccessPayFile::STATUS_SUBMITTED);
+            $submissionFile->setSubmittedDate($paymentDate);
+            $this->bacsSubmissions[$serialNumber] = $submissionFile;
+            $inputFile = new BacsReportInputFile();
+            $inputFile->setDate($paymentDate);
+            $inputFile->addMetadata('serial-number', $serialNumber);
+            $inputFile->addMetadata('debit-accepted-value', 0.0);
+            $inputFile->addMetadata('credit-accepted-value', 0.0);
+            $this->bacsInputReports[$serialNumber] = $inputFile;
+        }
+
+        $payment = new BacsPayment();
+        $payment->setStatus(BacsPayment::STATUS_SUBMITTED);
+        $payment->setSuccess(true);
+        /** @var BacsPaymentMethod $bacsPaymentMethod */
+        $bacsPaymentMethod = $user->getPaymentMethod();
+        $bankAccount = $bacsPaymentMethod->getBankAccount();
+        $bankAccount->setMandateSerialNumber($serialNumber);
+        $manager->persist($bankAccount);
+        $payment->setSerialNumber(AccessPayFile::formatSerialNumber($serialNumber));
+        $payment->setDate(clone $paymentDate);
+        $payment->setAmount($amount);
+        $payment->setTotalCommission($totalComission);
+        $payment->setNotes('LoadSamplePolicyData');
+
+        if ($amount < 0.0) {
+            $submissionFile->addMetadata('credit-amount', $submissionFile->getMetadata()['credit-amount']+$amount*-1);
+            $inputFile->addMetadata('credit-accepted-value', $inputFile->getMetadata()['credit-accepted-value']+$amount*-1);
+        } else {
+            $submissionFile->addMetadata('debit-amount', $submissionFile->getMetadata()['debit-amount']+$amount);            
+            $inputFile->addMetadata('debit-accepted-value', $inputFile->getMetadata()['debit-accepted-value']+$amount);
+        }
+        $manager->persist($submissionFile);
+        $manager->persist($inputFile);
+
+        return $payment;
     }
 
     private function invite($manager, $userA, $userB, $accepted = true)
@@ -847,15 +923,23 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
     {
         $policyA = $userA->getPolicies()[0];
         if ($connections == self::CONNECTIONS_RANDOM_OR_NONE) {
-            $connections = rand(0, $policyA->getMaxConnections() - 2);
+            if ($policyA->getMaxConnections() > 2) {
+                $connections = random_int(0, $policyA->getMaxConnections() - 2);
+            } else {
+                $connections = 0;
+            }
         } elseif ($connections == self::CONNECTIONS_RANDOM) {
-            $connections = rand(2, $policyA->getMaxConnections() - 2);
+            if ($policyA->getMaxConnections() > 4) {
+                $connections = random_int(2, $policyA->getMaxConnections() - 2);
+            } else {
+                $connections = 2;
+            }
         }
 
-        //$connections = rand(0, 3);
+        //$connections = random_int(0, 3);
         $maxRetries = 20;
         for ($i = 0; $i < $connections; $i++) {
-            $userB = $users[rand(0, count($users) - 1)];
+            $userB = $users[random_int(0, count($users) - 1)];
             $policyB = $userB->getPolicies()[0];
             if ($policyA->getId() == $policyB->getId() || count($policyB->getConnections()) > 0) {
                 $maxRetries--;
@@ -908,18 +992,18 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
     protected function addClaim($manager, Policy $policy, $type = null, $status = null)
     {
         $claim = new Claim();
-        $claim->setNumber(rand(1, 999999));
+        $claim->setNumber(random_int(1, 999999));
 
-        if (rand(0, 1) == 0) {
+        if (random_int(0, 1) == 0) {
             $claim->setHandlingTeam(Claim::TEAM_DIRECT_GROUP);
         } else {
             $claim->setHandlingTeam(Claim::TEAM_DAVIES);
         }
 
         $date = new \DateTime();
-        $date->sub(new \DateInterval(sprintf('P%dD', rand(5,15))));
+        $date->sub(new \DateInterval(sprintf('P%dD', random_int(5,15))));
         $claim->setLossDate(clone $date);
-        $date->add(new \DateInterval(sprintf('P%dD', rand(0,4))));
+        $date->add(new \DateInterval(sprintf('P%dD', random_int(0,4))));
         $claim->setNotificationDate(clone $date);
 
         if (!$type) {
@@ -948,7 +1032,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             $claim->setExcess(50);
         }
         $claim->setClaimHandlingFees(15);
-        $claim->setTransactionFees(rand(90,190) / 100);
+        $claim->setTransactionFees(random_int(90,190) / 100);
 
         $phone = $this->getRandomPhone($manager);
         $claim->setReservedValue($phone->getReplacementPriceOrSuggestedReplacementPrice() + 15);
@@ -956,12 +1040,12 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             in_array($claim->getType(), [Claim::TYPE_LOSS, Claim::TYPE_THEFT])) {
             $claim->setReplacementPhone($phone);
             $claim->setReplacementImei($this->generateRandomImei());
-            if (rand(0, 1) == 0) {
+            if (random_int(0, 1) == 0) {
                 $claim->setReplacementReceivedDate(new \DateTime());
             }
             $claim->setPhoneReplacementCost($phone->getReplacementPriceOrSuggestedReplacementPrice());
-            $claim->setUnauthorizedCalls(rand(0, 20000) / 100);
-            $claim->setAccessories(rand(0, 20000) / 100);
+            $claim->setUnauthorizedCalls(random_int(0, 20000) / 100);
+            $claim->setAccessories(random_int(0, 20000) / 100);
             $claim->setClosedDate(new \DateTime());
         }
         $claim->setDescription($this->getRandomDescription($claim));
@@ -998,13 +1082,13 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             return null;
         }
 
-        return sprintf('%s - %s', ucfirst($claim->getType()), $data[rand(0, count($data) - 1)]);
+        return sprintf('%s - %s', ucfirst($claim->getType()), $data[random_int(0, count($data) - 1)]);
     }
 
     protected function getRandomStatus($type)
     {
         if (in_array($type, [Claim::TYPE_WARRANTY])) {
-            $random = rand(0, 1);
+            $random = random_int(0, 1);
             if ($random == 0) {
                 return Claim::STATUS_INREVIEW;
             } elseif ($random == 1) {
@@ -1012,7 +1096,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             }
         }
 
-        $random = rand(0, 4);
+        $random = random_int(0, 4);
         if ($random == 0) {
             return Claim::STATUS_INREVIEW;
         } elseif ($random == 1) {
@@ -1028,7 +1112,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
 
     protected function getRandomClaimType()
     {
-        $type = rand(0, 4);
+        $type = random_int(0, 4);
         if ($type == 0) {
             return Claim::TYPE_LOSS;
         } elseif ($type == 1) {

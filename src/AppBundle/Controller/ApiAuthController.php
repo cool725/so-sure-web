@@ -518,6 +518,7 @@ class ApiAuthController extends BaseController
             }
 
             $policyService = $this->get('app.policy');
+            $policyService->setWarnMakeModelMismatch(false);
             $policy = $policyService->init(
                 $user,
                 $phone,

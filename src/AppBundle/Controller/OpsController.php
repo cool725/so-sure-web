@@ -3,6 +3,7 @@
 namespace AppBundle\Controller;
 
 use AppBundle\DataFixtures\MongoDB\d\Oauth2\LoadOauth2Data;
+use AppBundle\Document\Payment\BacsPayment;
 use AppBundle\Repository\Invitation\EmailInvitationRepository;
 use AppBundle\Repository\Invitation\InvitationRepository;
 use AppBundle\Repository\PhoneRepository;
@@ -233,58 +234,25 @@ class OpsController extends BaseController
         $unpaidPolicies = $policyRepo->findBy([
             'status' => Policy::STATUS_UNPAID,
         ]);
-        $unpaidPolicyBacsInProgress = null;
-        foreach ($unpaidPolicies as $unpaidPolicyBacsInProgress) {
-            /** @var Policy $unpaidPolicyBacsInProgress */
-            if (!$unpaidPolicyBacsInProgress->isPolicyPaidToDate() &&
-                !$unpaidPolicyBacsInProgress->hasPolicyDiscountPresent() &&
-                count($unpaidPolicyBacsInProgress->getUser()->getValidPolicies(true)) == 1 &&
-                $unpaidPolicyBacsInProgress->getUser()->hasBacsPaymentMethod() &&
-                $unpaidPolicyBacsInProgress->getUser()->getBacsPaymentMethod()->getBankAccount()->isMandateInProgress()
-            ) {
-                break;
-            } else {
-                $unpaidPolicyBacsInProgress = null;
+
+        $unpaidPoliciesForDisplay = [];
+        $paymentOnTimes = [true, false];
+        foreach (Policy::$unpaidReasons as $unpaidReason) {
+            foreach ($unpaidPolicies as $unpaidPolicy) {
+                /** @var Policy $unpaidPolicy */
+                if ($unpaidPolicy->getUnpaidReason() == $unpaidReason &&
+                    $unpaidPolicy->canBacsPaymentBeMadeInTime()) {
+                    $unpaidPoliciesForDisplay['ontime'][$unpaidReason] = $unpaidPolicy;
+                    break;
+                }
             }
-        }
-        $unpaidPolicyBacsInvalid = null;
-        foreach ($unpaidPolicies as $unpaidPolicyBacsInvalid) {
-            /** @var Policy $unpaidPolicyBacsInvalid */
-            if (!$unpaidPolicyBacsInvalid->isPolicyPaidToDate() &&
-                !$unpaidPolicyBacsInvalid->hasPolicyDiscountPresent() &&
-                count($unpaidPolicyBacsInvalid->getUser()->getValidPolicies(true)) == 1 &&
-                $unpaidPolicyBacsInvalid->getUser()->hasBacsPaymentMethod() &&
-                $unpaidPolicyBacsInvalid->getUser()->getBacsPaymentMethod()->getBankAccount()->isMandateInvalid()
-            ) {
-                break;
-            } else {
-                $unpaidPolicyBacsInvalid = null;
-            }
-        }
-        $unpaidPolicyBacsSuccess = null;
-        foreach ($unpaidPolicies as $unpaidPolicyBacsSuccess) {
-            /** @var Policy $unpaidPolicyBacsSuccess */
-            if (!$unpaidPolicyBacsSuccess->isPolicyPaidToDate() &&
-                !$unpaidPolicyBacsSuccess->hasPolicyDiscountPresent() &&
-                count($unpaidPolicyBacsSuccess->getUser()->getValidPolicies(true)) == 1 &&
-                $unpaidPolicyBacsSuccess->getUser()->hasBacsPaymentMethod() &&
-                !$unpaidPolicyBacsSuccess->getUser()->getBacsPaymentMethod()->getBankAccount()->isMandateInvalid() &&
-                !$unpaidPolicyBacsSuccess->getUser()->getBacsPaymentMethod()->getBankAccount()->isMandateInProgress()
-            ) {
-                break;
-            } else {
-                $unpaidPolicyBacsSuccess = null;
-            }
-        }
-        $unpaidPolicyJudo = null;
-        foreach ($unpaidPolicies as $unpaidPolicyJudo) {
-            /** @var Policy $unpaidPolicyJudo */
-            if (!$unpaidPolicyJudo->isPolicyPaidToDate() && !$unpaidPolicyJudo->hasPolicyDiscountPresent() &&
-                count($unpaidPolicyJudo->getUser()->getValidPolicies(true)) == 1 &&
-                $unpaidPolicyJudo->getUser()->hasJudoPaymentMethod()) {
-                break;
-            } else {
-                $unpaidPolicyJudo = null;
+            foreach ($unpaidPolicies as $unpaidPolicy) {
+                /** @var Policy $unpaidPolicy */
+                if ($unpaidPolicy->getUnpaidReason() == $unpaidReason &&
+                    !$unpaidPolicy->canBacsPaymentBeMadeInTime()) {
+                    $unpaidPoliciesForDisplay['outoftime'][$unpaidReason] = $unpaidPolicy;
+                    break;
+                }
             }
         }
         $unpaidPolicyDiscountPolicy = $policyRepo->findOneBy([
@@ -446,16 +414,16 @@ class OpsController extends BaseController
             }
         }
 
+        $faker = \Faker\Factory::create('en_GB');
+
         return [
             'scode' => $scode->getCode(),
             'invitation' => $invitation,
             'picsure_approved_policy' => $picSureApprovedPolicy,
             'picsure_rejected_policy' => $picSureRejectedPolicy,
             'non_picsure_policy' => $nonPicSurePolicy,
-            'unpaid_policy_bacs_inprogress' => $unpaidPolicyBacsInProgress,
-            'unpaid_policy_bacs_invalid' => $unpaidPolicyBacsInvalid,
-            'unpaid_policy_bacs_success' => $unpaidPolicyBacsSuccess,
-            'unpaid_policy_judo' => $unpaidPolicyJudo,
+            'unpaid_policies_for_display' => $unpaidPoliciesForDisplay,
+            'unpaid_reasons' => Policy::$unpaidReasons,
             'unpaid_policydiscount_policy' => $unpaidPolicyDiscountPolicy,
             'valid_policy' => $validPolicy,
             'valid_policy_monthly' => $validPolicyMonthly,
@@ -482,6 +450,15 @@ class OpsController extends BaseController
             'active_phone' => $activePhone,
             'oauthStarlingUrl' => $oauthStarlingUrl,
             'starling_form' => $starlingForm->createView(),
+            'fake' => [
+                'first' => $faker->firstName,
+                'last' => $faker->lastName,
+                'email' => $faker->email,
+                'dob' => $faker->dateTimeThisCentury->format('Y-m-d'),
+                'line1' => trim(preg_replace('/[\\n\\r]+/', ' ', $faker->streetAddress)),
+                'line2' => $faker->city,
+                'postcode' => $faker->postcode,
+            ]
         ];
     }
 

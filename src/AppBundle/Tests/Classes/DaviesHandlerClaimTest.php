@@ -470,9 +470,6 @@ class DaviesHandlerClaimTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($davies->hasError());
     }
 
-    /**
-     * @expectedException \Exception
-     */
     public function testInvalidImei()
     {
         // @codingStandardsIgnoreStart

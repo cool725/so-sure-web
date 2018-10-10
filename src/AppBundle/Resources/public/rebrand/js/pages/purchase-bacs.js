@@ -1,7 +1,7 @@
 // purchase-payment.js
 
 // Require BS component(s)
-require('bootstrap/js/dist/modal');
+// require('bootstrap/js/dist/modal');
 require('bootstrap/js/dist/collapse');
 require('bootstrap/js/dist/dropdown');
 
@@ -9,6 +9,8 @@ require('bootstrap/js/dist/dropdown');
 require('jquery-validation');
 require('jquery-mask-plugin');
 require('../../../js/Default/jqueryValidatorMethods.js');
+
+import trackByName from '../common/track.js';
 
 const sosure = sosure || {};
 
@@ -95,10 +97,16 @@ $(function(){
     sosure.purchaseStepBacs.init();
 
     sosure.purchaseStepBacs.webPayBtn.on('click', function() {
+
         if ($.trim($('#Reference').val()).length > 0) {
             // Show loading overlay
             sosure.purchaseStepBacs.loader.show();
-            sosure.purchaseStepBacs.webPay.submit();
+
+            // Add tracking
+            let name = $(this).data('event');
+            trackByName(name, function() {
+                sosure.purchaseStepBacs.webPay.submit();
+            });
         }
     });
 });
