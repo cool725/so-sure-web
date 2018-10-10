@@ -14,11 +14,11 @@
     <button type="{{ type|default('button') }}" {{ block('button_attributes') }}>
         {% if fa is defined %}
             {% if left is defined and left %}
-                <i class="fa {{ fa }}"></i>
+                <i class="{{ fa }}"></i>
             {% endif %}
             {{ translation_domain is same as(false) ? label : label|trans({}, translation_domain) }}
             {% if right is defined and right %}
-                <i class="fa {{ fa }}"></i>
+                <i class="{{ fa }}"></i>
             {% endif %}
         {% else %}
             {{ translation_domain is same as(false) ? label : label|trans({}, translation_domain) }}

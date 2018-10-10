@@ -1,4 +1,8 @@
 {% extends 'base_rebrand.html.twig' %}
+{% form_theme buy_form 'AppBundle:Form:submit.html.twig' %}
+{% form_theme buy_form_banner_two 'AppBundle:Form:submit.html.twig' %}
+{% form_theme buy_form_banner_three 'AppBundle:Form:submit.html.twig' %}
+{% form_theme buy_form_banner_four 'AppBundle:Form:submit.html.twig' %}
 
 {# Set vars #}
 {% set body_class = 'quote' %}
@@ -64,7 +68,12 @@
                     </div>
                     {{ form_start(buy_form) }}
                         {{ form_widget(buy_form.buy_tablet, {
-                            'label': 'Get Started','attr': { 'class': 'btn btn-success btn-green-gradient btn-block-xs btn-icon arrow-right' }}) }}
+                            'label': 'Get Started',
+                            'fa': 'far fa-long-arrow-right fa-lg ml-2',
+                            'right': true,
+                            'attr': {
+                                'class': 'btn btn-success btn-green-gradient btn-block-xs'
+                        }}) }}
                     {{ form_end(buy_form) }}
                 </div>
 
@@ -77,7 +86,13 @@
                                 <p class="lead text-white mb-0">It'll only take a few minutes</p>
                             </div>
                             {{ form_start(buy_form_banner_two) }}
-                                {{ form_widget(buy_form_banner_two.buy, {'label': 'Get Started', 'attr': {'class': 'btn btn-success btn-green-gradient btn-block-xs btn-icon arrow-right mt-4 mt-lg-0'}}) }}
+                                {{ form_widget(buy_form_banner_two.buy, {
+                                    'label': 'Get Started',
+                                    'fa': 'far fa-long-arrow-right fa-lg ml-2',
+                                    'right': true,
+                                    'attr': {
+                                        'class': 'btn btn-success btn-green-gradient btn-block-xs mt-4 mt-lg-0'
+                                }}) }}
                             {{ form_end(buy_form_banner_two) }}
                         </div>
                     </div>
@@ -180,7 +195,13 @@
                     </ul>
                     <div class="mt-5 d-none d-lg-block">
                         {{ form_start(buy_form_banner_three) }}
-                            {{ form_widget(buy_form_banner_three.buy, {'label': 'Get Started', 'attr': {'class': 'btn btn-success btn-green-gradient btn-block-xs btn-icon arrow-right mt-4 mt-lg-0'}}) }}
+                            {{ form_widget(buy_form_banner_three.buy, {
+                                'label': 'Get Started',
+                                'fa': 'far fa-long-arrow-right fa-lg ml-2',
+                                'right': true,
+                                'attr': {
+                                    'class': 'btn btn-success btn-green-gradient btn-block-xs mt-4 mt-lg-0'
+                            }}) }}
                         {{ form_end(buy_form_banner_three) }}
                     </div>
                 </div>
@@ -211,8 +232,10 @@
             {{ form_start(buy_form_banner_four) }}
                 {{ form_widget(buy_form_banner_four.buy, {
                     'label': 'Insure your ' ~ phone.make ~ ' phone',
+                    'fa': 'far fa-long-arrow-right fa-lg ml-2',
+                    'right': true,
                     'attr': {
-                        'class': 'btn btn-success btn-green-gradient btn-sm btn-icon arrow-right'
+                        'class': 'btn btn-success btn-green-gradient'
                 }}) }}
             {{ form_end(buy_form_banner_four) }}
         </div>
