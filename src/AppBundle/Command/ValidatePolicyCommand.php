@@ -437,19 +437,24 @@ class ValidatePolicyCommand extends BaseCommand
                     }
                     $now = new \DateTime();
 
-                    // bacs timing is such that:
-                    // if initial notification date is tomorrow, there should be a payment in the system today
-                    // take into account when we run the bacs process
-                    $expectedNotificationDate = clone $bankAccount->getInitialNotificationDate();
-                    if ($now->format('H') <  15) {
-                        $expectedNotificationDate = $this->subBusinessDays($expectedNotificationDate, 2);
-                    } else {
-                        $expectedNotificationDate = $this->subBusinessDays($expectedNotificationDate, 1);
-                    }
+                    if ($bankAccount->getInitialNotificationDate()) {
+                        // bacs timing is such that:
+                        // if initial notification date is tomorrow, there should be a payment in the system today
+                        // take into account when we run the bacs process
+                        $expectedNotificationDate = clone $bankAccount->getInitialNotificationDate();
+                        if ($now->format('H') < 15) {
+                            $expectedNotificationDate = $this->subBusinessDays($expectedNotificationDate, 2);
+                        } else {
+                            $expectedNotificationDate = $this->subBusinessDays($expectedNotificationDate, 1);
+                        }
 
-                    if ($bacsPayments == 0 && $expectedNotificationDate < $now) {
+                        if ($bacsPayments == 0 && $expectedNotificationDate < $now) {
+                            $this->header($policy, $policies, $lines);
+                            $lines[] = 'Warning!! There are no bacs payments, yet past the initial notification date';
+                        }
+                    } else {
                         $this->header($policy, $policies, $lines);
-                        $lines[] = 'Warning!! There are no bacs payments, yet its past the initial notification date';
+                        $lines[] = 'Warning!! Missing initial notification date';
                     }
                 }
             }
