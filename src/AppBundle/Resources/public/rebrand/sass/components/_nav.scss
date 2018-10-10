@@ -26,6 +26,14 @@
     }
 }
 
+// Pages we have the same gradient for the 'hero' add here
+.home,
+.landing {
+    .navbar-so-sure {
+        background-image: none;
+    }
+}
+
 // Logo bits
 .navbar-brand {
 
@@ -37,7 +45,8 @@
 }
 
 // Scroll effects
-.navbar-scrolled {
+.navbar-scrolled:not(.devbar) {
+    @include blue-gradient;
     box-shadow: 0 2px 0 0 rgba(0, 0, 0, 0.05);
 }
 
@@ -80,10 +89,13 @@
 
 
 // Page specific
+//
+
+// Hide box-shadow
 .quote,
 .purchase {
 
-    .navbar {
+    .navbar-so-sure {
         @include media-breakpoint-up(lg) {
             box-shadow: none;
         }
