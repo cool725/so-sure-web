@@ -442,9 +442,7 @@ class ValidatePolicyCommand extends BaseCommand
                         // if initial notification date is tomorrow, there should be a payment in the system today
                         // take into account when we run the bacs process
                         $expectedNotificationDate = clone $bankAccount->getInitialNotificationDate();
-                        if ($now->format('H') < 15) {
-                            $expectedNotificationDate = $this->subBusinessDays($expectedNotificationDate, 2);
-                        } else {
+                        if ($now->format('H') >= 15) {
                             $expectedNotificationDate = $this->subBusinessDays($expectedNotificationDate, 1);
                         }
 
