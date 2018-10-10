@@ -4628,6 +4628,9 @@ abstract class Policy
             ($this->isCancelled() && !$this->isRefundAllowed())) {
             $totalPayments = $this->getTotalSuccessfulStandardPayments(false, $date);
             $numPayments = $premium->getNumberOfMonthlyPayments($totalPayments);
+            if ($numPayments > 12 || $numPayments < 0) {
+                throw new \Exception(sprintf('Unable to calculate expected broker fees for policy %s', $this->getId()));
+            }
             $expectedCommission = $salva->sumBrokerFee($numPayments, $numPayments == 12);
         } else {
             if (!$date) {
