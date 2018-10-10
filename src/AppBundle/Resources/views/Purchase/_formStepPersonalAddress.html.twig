@@ -87,7 +87,7 @@
                            class="btn btn-success btn-green-gradient btn-block-xs"
                            data-csrf="{{ lead_csrf }}"
                            data-lead="{{ path('lead', {'source': 'purchase-flow'}) }}">
-                           Continue <i class="far fa-arrow-right ml-2"></i>
+                           Continue <i class="far fa-long-arrow-right fa-lg ml-2"></i>
                         </a>
                     </div>
                 </div>
@@ -143,8 +143,13 @@
                         </a>
                     </div>
                     <div class="col-9 text-right">
-                        {# TODO: Add icon #}
-                        {{ form_widget(purchase_form.next, {'label': 'Continue', 'attr': {'class': 'btn btn-success btn-green-gradient btn-icon arrow-right btn-block-xs'}}) }}
+                        {{ form_widget(purchase_form.next, {
+                            'label': 'Continue',
+                            'fa': 'far fa-long-arrow-right fa-lg ml-2',
+                            'right': true,
+                            'attr': {
+                                'class': 'btn btn-success btn-green-gradient btn-block-xs'
+                        }}) }}
                     </div>
                 </div>
             </div>
@@ -199,7 +204,13 @@
                         </a>
                     </div>
                     <div class="col-9 text-right">
-                        {{ form_widget(purchase_form.manual_next, {'label': 'Continue', 'attr': {'class': 'btn btn-success btn-green-gradient btn-icon arrow-right btn-block-xs'}}) }}
+                        {{ form_widget(purchase_form.manual_next, {
+                            'label': 'Continue',
+                            'fa': 'far fa-long-arrow-right fa-lg ml-2',
+                            'right': true,
+                            'attr': {
+                                'class': 'btn btn-success btn-green-gradient btn-block-xs'
+                        }}) }}
                     </div>
                 </div>
             </div>

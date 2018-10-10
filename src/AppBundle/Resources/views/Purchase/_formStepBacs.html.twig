@@ -69,7 +69,13 @@
                 </a>
             </div>
             <div class="col-9 text-right">
-                {{ form_widget(bacs_form.save, {'label': 'Continue', 'attr': {'class': 'btn btn-success btn-green-gradient btn-icon arrow-right btn-block-xs'}}) }}
+                {{ form_widget(bacs_form.save, {
+                    'label': 'Continue',
+                    'fa': 'far fa-long-arrow-right fa-lg ml-2',
+                    'right': true,
+                    'attr': {
+                        'class': 'btn btn-success btn-green-gradient btn-block-xs'
+                }}) }}
             </div>
         </div>
     </div>

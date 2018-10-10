@@ -1,6 +1,5 @@
 {% extends 'base_rebrand.html.twig' %}
-{% form_theme purchase_form 'AppBundle:Form:fields.html.twig' %}
-
+{% form_theme purchase_form with ['AppBundle:Form:fields.html.twig', 'AppBundle:Form:submit.html.twig'] %}
 {# Set vars #}
 {% set quote_mode = 1 %}
 
