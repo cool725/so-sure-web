@@ -808,7 +808,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
 
         /** @var PolicyService $policyService */
         $policyService = $this->container->get('app.policy');
-        $policyService->generateScheduledPayments($policy, $startDate);
+        $policyService->generateScheduledPayments($policy, $startDate, 12);
 
         if ($policyDiscount) {
             $policy->setPolicyDiscountPresent(true);
