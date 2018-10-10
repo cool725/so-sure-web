@@ -4,6 +4,7 @@ namespace AppBundle\Form\Type;
 
 use AppBundle\Document\Form\Cancel;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -73,18 +74,24 @@ class CancelPolicyType extends AbstractType
             ->add('cancellationReason', ChoiceType::class, [
                 'choices' => $data,
                 'preferred_choices' => $preferred,
-                'placeholder' => 'Cancellation reason'
+                'placeholder' => $policy->hasOpenClaim() ? 'OPEN CLAIM - DO NOT CANCEL' : 'Cancellation reason'
             ])
             ->add('cancel', SubmitType::class)
         ;
+
+        if ($policy->hasOpenClaim()) {
+            $builder->add('force', CheckboxType::class, [
+                'required' => false,
+            ]);
+        }
     }
 
-    private function addCancellationReason($data, $policy, $reason, $name, $value = null)
+    private function addCancellationReason($data, Policy $policy, $reason, $name, $value = null)
     {
         if (!$value) {
             $value = $reason;
         }
-        if ($policy->canCancel($reason)) {
+        if ($policy->canCancel($reason, null, true)) {
             $data[$name] = $value;
         }
 

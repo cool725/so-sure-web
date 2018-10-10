@@ -565,7 +565,9 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             if ($request->request->has('cancel_form')) {
                 $cancelForm->handleRequest($request);
                 if ($cancelForm->isValid()) {
-                    if ($policy->canCancel($cancel->getCancellationReason())) {
+                    $claimCancel = $policy->canCancel($cancel->getCancellationReason(), null, true);
+                    if ($policy->canCancel($cancel->getCancellationReason()) ||
+                        ($claimCancel && $cancel->getForce())) {
                         if ($cancel->getRequestedCancellationReason()) {
                             $policy->setRequestedCancellationReason($cancel->getRequestedCancellationReason());
                         }
@@ -580,6 +582,12 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                             'success',
                             sprintf('Policy %s was cancelled.', $policy->getPolicyNumber())
                         );
+                    } elseif ($claimCancel && !$cancel->getForce()) {
+                        $this->addFlash('error', sprintf(
+                            'Unable to cancel Policy %s due to %s as override was not enabled',
+                            $policy->getPolicyNumber(),
+                            $cancel->getCancellationReason()
+                        ));
                     } else {
                         $this->addFlash('error', sprintf(
                             'Unable to cancel Policy %s due to %s',
