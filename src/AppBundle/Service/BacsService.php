@@ -560,9 +560,12 @@ class BacsService
                     $debitPayment->setSuccess(true);
                     $debitPayment->setSerialNumber($submittedPayment->getSerialNumber());
                     $debitPayment->setDate($this->getNextBusinessDay($currentProcessingDate));
+                    $debitPayment->setSource(Payment::SOURCE_SYSTEM);
                     $policy->addPayment($debitPayment);
                     $debitPayment->setRefundTotalCommission($submittedPayment->getTotalCommission());
                     $debitPayment->calculateSplit();
+
+                    $submittedPayment->approve($currentProcessingDate, true);
 
                     // Set policy as unpaid if there's a payment failure
                     if (!$policy->isPolicyPaidToDate() && $policy->getStatus() == Policy::STATUS_ACTIVE) {
