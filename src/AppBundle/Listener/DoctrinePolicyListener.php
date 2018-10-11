@@ -44,7 +44,7 @@ class DoctrinePolicyListener extends BaseDoctrineListener
             $eventArgs,
             Policy::class,
             ['premium'],
-            self::COMPARE_PREMIUM
+            self::COMPARE_OBJECT_EQUALS
         )) {
             $this->triggerEvent($document, PolicyEvent::EVENT_UPDATED_PREMIUM);
         }
@@ -52,7 +52,8 @@ class DoctrinePolicyListener extends BaseDoctrineListener
         if ($this->hasDataChanged(
             $eventArgs,
             Policy::class,
-            ['billing']
+            ['billing'],
+            self::COMPARE_OBJECT_EQUALS
         )) {
             $this->triggerEvent($document, PolicyEvent::EVENT_UPDATED_BILLING);
         }

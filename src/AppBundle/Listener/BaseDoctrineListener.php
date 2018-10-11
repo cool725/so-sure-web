@@ -26,7 +26,8 @@ class BaseDoctrineListener
     const COMPARE_CASE_INSENSITIVE = 'case-insensitive';
     const COMPARE_INCREASE = 'increase';
     const COMPARE_DECREASE = 'decrease';
-    const COMPARE_PREMIUM = 'premium';
+    const COMPARE_OBJECT_EQUALS = 'object-equals';
+    const COMPARE_OBJECT_SERIALIZE = 'object-serialize';
     const COMPARE_TO_NULL = 'to-null';
     const COMPARE_BACS = 'bacs';
 
@@ -78,24 +79,20 @@ class BaseDoctrineListener
                 return $oldValue !== $newValue;
             } elseif ($compare == self::COMPARE_CASE_INSENSITIVE) {
                 return mb_strtolower($oldValue) !== mb_strtolower($newValue);
-            } elseif ($compare == self::COMPARE_INCREASE) {
-                return $oldValue < $newValue;
-            } elseif ($compare == self::COMPARE_DECREASE) {
-                return $oldValue > $newValue;
-            } elseif ($compare == self::COMPARE_PREMIUM) {
+            } elseif ($compare == self::COMPARE_OBJECT_SERIALIZE) {
+                return serialize($oldValue) == serialize($newValue);
+            } elseif ($compare == self::COMPARE_OBJECT_EQUALS) {
                 if (!$oldValue && !$newValue) {
                     return false;
                 } elseif (!$oldValue && $newValue) {
                     return true;
-                } elseif (!$this->areEqualToTwoDp($oldValue->getGwp(), $newValue->getGwp())) {
-                    return true;
-                } elseif (!$this->areEqualToTwoDp($oldValue->getIpt(), $newValue->getIpt())) {
-                    return true;
-                } elseif (!$this->areEqualToTwoDp($oldValue->getIptRate(), $newValue->getIptRate())) {
-                    return true;
+                } else {
+                    return !$oldValue->equals($newValue);
                 }
-
-                return false;
+            } elseif ($compare == self::COMPARE_INCREASE) {
+                return $oldValue < $newValue;
+            } elseif ($compare == self::COMPARE_DECREASE) {
+                return $oldValue > $newValue;
             } elseif ($compare == self::COMPARE_TO_NULL) {
                 return $newValue === null;
             } elseif ($compare == self::COMPARE_BACS) {

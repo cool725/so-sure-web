@@ -69,7 +69,7 @@ class DoctrineSalvaListener extends BaseDoctrineListener
                 $eventArgs,
                 SalvaPhonePolicy::class,
                 ['premium'],
-                self::COMPARE_PREMIUM
+                self::COMPARE_OBJECT_EQUALS
             )) {
                 /** @var SalvaPhonePolicy $policy */
                 $policy = $document;
