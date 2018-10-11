@@ -1412,7 +1412,15 @@ class PolicyService
         $policyRepo = $this->dm->getRepository(Policy::class);
         $policies = $policyRepo->findBy(['status' => Policy::STATUS_UNPAID]);
         foreach ($policies as $policy) {
-            if ($policy->shouldCancelPolicy($prefix)) {
+            /** @var Policy $policy */
+            if ($policy->shouldExpirePolicy() && $policy->shouldCancelPolicy($prefix)) {
+                $msg = sprintf(
+                    'Skipping Cancelling Policy as it should be expired %s / %s',
+                    $policy->getPolicyNumber(),
+                    $policy->getId()
+                );
+                $this->logger->error($msg);
+            } elseif ($policy->shouldCancelPolicy($prefix)) {
                 $cancelled[$policy->getId()] = $policy->getPolicyNumber();
                 if (!$dryRun) {
                     try {
