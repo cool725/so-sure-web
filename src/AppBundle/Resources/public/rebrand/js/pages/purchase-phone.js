@@ -116,5 +116,12 @@ $(function(){
                 $('.samsung-imei').hide();
             }
         });
+    } else {
+        // Trim whitespace after user has entered
+        imei.on('blur', function() {
+            let oimei = $(this).val();
+            let timei = oimei.replace(/\s+/g, '');
+            $(this).val(timei);
+        });
     }
 });
