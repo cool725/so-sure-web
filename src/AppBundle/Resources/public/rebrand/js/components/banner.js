@@ -4,7 +4,7 @@ import trackByName from '../common/track.js';
 
 $(function() {
 
-    const close  = $('.banner__close');
+    const close = $('.banner__close');
 
     close.on('click', function(e) {
 
