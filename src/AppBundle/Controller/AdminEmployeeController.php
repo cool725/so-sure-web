@@ -2466,6 +2466,8 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             ->add('cpa', TextType::class)
             ->add('days', ChoiceType::class, ['required' => true,
                                                 'choices' => $time_range])
+            ->add('campaignSource', TextType::class, ['required' => false])
+            ->add('leadSource', TextType::class, ['required' => false])
             ->add('next', SubmitType::class)
             ->getForm();
 
@@ -2490,6 +2492,8 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                         $company->setAddress($address);
                         $company->setCPA($this->getDataString($companyForm->getData(), 'cpa'));
                         $company->setDays($this->getDataString($companyForm->getData(), 'days'));
+                        $company->setCampaignSource($this->getDataString($companyForm->getData(), 'campaignSource'));
+                        $company->setLeadSource($this->getDataString($companyForm->getData(), 'leadSource'));
                         $dm->persist($company);
                         $dm->flush();
                         $this->addFlash('success', sprintf(

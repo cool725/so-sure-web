@@ -27,6 +27,8 @@
             <th>Name</th>
             <th>CPA</th>
             <th>Days</th>
+            <th>Campaign Source</th>
+            <th>Lead Source</th>
             <th>Sanctions</th>
         </tr>
         {% for company in companies %}
@@ -34,7 +36,9 @@
                 <td width="20%">{{ company.name }}</td>
                 <td width="10%">£{{ company.cpa|number_format(2, '.', ',') }}</td>
                 <td width="10%">{{ company.days }}</td>
-                <td width="60%">
+                <td width="10%">{{ company.campaignSource }}</td>
+                <td width="10%">{{ company.leadSource }}</td>
+                <td width="40%">
                         {% if company.sanctionsChecks|length == 0%}
                             No checks run
                         {% endif %}
@@ -108,6 +112,16 @@
                   {{ form_label(companyForm.days, 'Days') }}
                   {{ form_errors(companyForm.days) }}
                   {{ form_widget(companyForm.days) }}
+              </div>
+              <div class="form-group">
+                  {{ form_label(companyForm.campaignSource, 'Campaign Source') }}
+                  {{ form_errors(companyForm.campaignSource) }}
+                  {{ form_widget(companyForm.campaignSource) }}
+              </div>
+              <div class="form-group">
+                  {{ form_label(companyForm.leadSource, 'Lead Source') }}
+                  {{ form_errors(companyForm.leadSource) }}
+                  {{ form_widget(companyForm.leadSource) }}
               </div>
                 <div class="form-group">
                     {{ form_widget(companyForm.next, {'label': 'Create', 'attr': {'class': 'btn btn-success'}}) }}

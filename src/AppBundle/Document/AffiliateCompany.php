@@ -32,6 +32,21 @@ class AffiliateCompany extends Company
      */
     protected $days;
 
+    /**
+     * @AppAssert\AlphanumericSpaceDot()
+     * @Assert\Length(min="1", max="250")
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
+    protected $campaignSource;
+
+    /**
+     * @Assert\Choice({"invitation", "scode", "affiliate"}, strict=true)
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
+    protected $leadSource;
+
     public function setCPA(float $cpa)
     {
         $this->cpa = $cpa;
@@ -51,4 +66,25 @@ class AffiliateCompany extends Company
     {
         return $this->days;
     }
+
+    public function getCampaignSource()
+    {
+        return $this->campaignSource;
+    }
+
+    public function setCampaignSource(String $campaignSource)
+    {
+        $this->campaignSource = $campaignSource;
+    }
+
+    public function getLeadSource()
+    {
+        return $this->leadSource;
+    }
+
+    public function setLeadSource(String $leadSource)
+    {
+        $this->leadSource = $leadSource;
+    }
+
 }
