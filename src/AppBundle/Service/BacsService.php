@@ -1397,7 +1397,9 @@ class BacsService
             if ($payment->getStatus() != BacsPayment::STATUS_SKIPPED) {
                 $metadata['debit-amount'] += $scheduledPayment->getAmount();
             }
-            $this->dm->flush(null, array('w' => 'majority', 'j' => true));
+            if ($update) {
+                $this->dm->flush(null, array('w' => 'majority', 'j' => true));
+            }
         }
     }
 
@@ -1562,6 +1564,11 @@ class BacsService
             $payment->setSerialNumber($serialNumber);
             if ($payment->getScheduledPayment()) {
                 $payment->getScheduledPayment()->setStatus(ScheduledPayment::STATUS_PENDING);
+            } else {
+                $this->logger->warning(sprintf(
+                    'Unable to find scheduled payment for payment %s',
+                    $payment->getId()
+                ));
             }
             if ($bankAccount->isFirstPayment()) {
                 $bankAccount->setFirstPayment(false);
