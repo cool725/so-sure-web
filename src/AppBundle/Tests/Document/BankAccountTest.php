@@ -321,4 +321,20 @@ class BankAccountTest extends \PHPUnit\Framework\TestCase
         $thirteenMonths = $thirteenMonths->add(new \DateInterval('P13M'));
         $this->assertFalse($bankAccount->allowedProcessing($thirteenMonths));
     }
+
+    public function testIsBeforeAfterInitialNotificationDate()
+    {
+        $bankAccount = new BankAccount();
+        $bankAccount->setInitialNotificationDate(new \DateTime('2018-03-05'));
+
+        $this->assertFalse($bankAccount->isAfterInitialNotificationDate(new \DateTime('2018-03-04 00:01')));
+        $this->assertTrue($bankAccount->isBeforeInitialNotificationDate(new \DateTime('2018-03-04 00:01')));
+
+        $this->assertTrue($bankAccount->isAfterInitialNotificationDate(new \DateTime('2018-03-05 00:01')));
+        $this->assertFalse($bankAccount->isBeforeInitialNotificationDate(new \DateTime('2018-03-05 00:01')));
+
+        // after 15:00 should be the day before as bacs should have run
+        $this->assertTrue($bankAccount->isAfterInitialNotificationDate(new \DateTime('2018-03-04 15:01')));
+        $this->assertFalse($bankAccount->isBeforeInitialNotificationDate(new \DateTime('2018-03-04 15:01')));
+    }
 }

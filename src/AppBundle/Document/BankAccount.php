@@ -390,6 +390,40 @@ class BankAccount
         ]);
     }
 
+    public function isBeforeInitialNotificationDate(\DateTime $date = null)
+    {
+        if (!$this->getInitialNotificationDate()) {
+            return null;
+        }
+
+        return !$this->isAfterInitialNotificationDate($date);
+    }
+
+    /**
+     * There's a timing issue where a mandate result comes back as success in the morning,
+     * but we won't have a payment in the system until that afternoon
+     */
+    public function isAfterInitialNotificationDate(\DateTime $date = null)
+    {
+        if (!$date) {
+            $date = new \DateTime();
+        }
+
+        if (!$this->getInitialNotificationDate()) {
+            return null;
+        }
+
+        // bacs timing is such that:
+        // if initial notification date is tomorrow, there should be a payment in the system today
+        // take into account when we run the bacs process
+        $expectedNotificationDate = clone $this->getInitialNotificationDate();
+        if ($date->format('H') >= 15) {
+            $expectedNotificationDate = $this->subBusinessDays($expectedNotificationDate, 1);
+        }
+
+        return $expectedNotificationDate < $date;
+    }
+
     public function isMandateInvalid()
     {
         return in_array($this->getMandateStatus(), [
