@@ -2,6 +2,7 @@
 
 namespace AppBundle\Form\Type;
 
+use AppBundle\Document\Form\Chargebacks;
 use AppBundle\Repository\ChargebackPaymentRepository;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Component\Form\AbstractType;
@@ -44,9 +45,12 @@ class ChargebacksType extends AbstractType
             ->add('add', SubmitType::class)
         ;
         $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
+            /** @var Chargebacks $chargeback */
             $chargeback = $event->getData();
             $form = $event->getForm();
-            $amount = $this->toTwoDp(0 - $chargeback->getPolicy()->getPremiumInstallmentPrice());
+            $amount = $this->toTwoDp(
+                0 - $chargeback->getPolicy()->getPremium()->getAdjustedStandardMonthlyPremiumPrice()
+            );
 
             $form->add('chargeback', DocumentType::class, [
                     'placeholder' => 'Select a chargeback',
