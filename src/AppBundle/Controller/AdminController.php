@@ -907,9 +907,7 @@ class AdminController extends BaseController
             'dailyDebitBacsTransaction' => Payment::dailyPayments(
                 $extraDebitPayments,
                 $isProd,
-                BacsPayment::class,
-                null,
-                'getBacsCreditDate'
+                BacsPayment::class
             ),
             'monthlyBacsTransaction' => Payment::sumPayments($payments, $isProd, BacsPayment::class),
         ];
