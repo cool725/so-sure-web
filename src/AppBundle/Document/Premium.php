@@ -4,6 +4,7 @@ namespace AppBundle\Document;
 
 use AppBundle\Classes\Salva;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
+use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Validator\Constraints as Assert;
 use AppBundle\Validator\Constraints as AppAssert;
 use Gedmo\Mapping\Annotation as Gedmo;
@@ -231,5 +232,22 @@ abstract class Premium
     public function getYearlyTotalCommission()
     {
         return Salva::YEARLY_TOTAL_COMMISSION;
+    }
+
+    public function equals(Premium $compare)
+    {
+        if (!$compare) {
+            return false;
+        }
+
+        if (!$this->areEqualToTwoDp($this->getGwp(), $compare->getGwp())) {
+            return false;
+        } elseif (!$this->areEqualToTwoDp($this->getIpt(), $compare->getIpt())) {
+            return false;
+        } elseif (!$this->areEqualToTwoDp($this->getIptRate(), $compare->getIptRate())) {
+            return false;
+        }
+
+        return true;
     }
 }
