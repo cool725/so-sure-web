@@ -567,7 +567,6 @@ class BacsService
 
                     $submittedPayment->approve($currentProcessingDate, true);
 
-
                     // Set policy as unpaid if there's a payment failure
                     if (!$policy->isPolicyPaidToDate() && $policy->getStatus() == Policy::STATUS_ACTIVE) {
                         $policy->setStatus(Policy::STATUS_UNPAID);
