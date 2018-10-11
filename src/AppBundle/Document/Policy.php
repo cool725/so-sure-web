@@ -3022,6 +3022,19 @@ abstract class Policy
         return $date >= $this->getPolicyExpirationDate($date);
     }
 
+    public function shouldExpirePolicy($prefix = null, $date = null)
+    {
+        if (!$this->isValidPolicy($prefix) || !$this->isActive()) {
+            return false;
+        }
+
+        if ($date == null) {
+            $date = new \DateTime();
+        }
+
+        return $date >= $this->getEnd();
+    }
+
     public function hasPolicyExpirationDate(\DateTime $date = null)
     {
         try {
@@ -4182,14 +4195,17 @@ abstract class Policy
             return false;
         }
 
+        $bacs = $this->getUser()->getBacsPaymentMethod();
+        $bankAccount = null;
+        if ($bacs) {
+            $bankAccount = $bacs->getBankAccount();
+        }
         if ($this->getStatus() == self::STATUS_RENEWAL) {
             return $this->getStart() > $date;
         } elseif ($this->isPolicyPaidToDate($date, true)) {
             return $this->getStatus() == self::STATUS_ACTIVE;
-        } elseif ($this->getUser()->hasBacsPaymentMethod() &&
-            $this->getUser()->getBacsPaymentMethod() &&
-            $this->getUser()->getBacsPaymentMethod()->getBankAccount() &&
-            $this->getUser()->getBacsPaymentMethod()->getBankAccount()->isMandateInProgress()) {
+        } elseif ($bankAccount && ($bankAccount->isMandateInProgress() ||
+                ($bankAccount->isMandateSuccess() && $bankAccount->isBeforeInitialNotificationDate()))) {
             return $this->getStatus() == self::STATUS_ACTIVE;
         } else {
             return in_array($this->getStatus(), [self::STATUS_UNPAID]);

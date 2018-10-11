@@ -3,6 +3,7 @@
 namespace AppBundle\Tests\Listener;
 
 use AppBundle\Classes\Premium;
+use AppBundle\Document\Address;
 use AppBundle\Document\PhonePremium;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -55,11 +56,11 @@ class DoctrinePolicyListenerTest extends WebTestCase
     {
     }
 
-    public function testPolicyPreUpdate()
+    public function testPolicyPreUpdatePot()
     {
         $user = static::createUser(
             static::$userManager,
-            static::generateEmail('policy-preupdate', $this),
+            static::generateEmail('testPolicyPreUpdatePot', $this),
             'bar'
         );
         $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
@@ -71,8 +72,24 @@ class DoctrinePolicyListenerTest extends WebTestCase
         $this->assertTrue($policy->isValidPolicy());
 
         // policy updated
-        $this->runPreUpdate($policy, $this->once(), ['potValue' => 20]);
-        $this->runPreUpdate($policy, $this->once(), ['promoPotValue' => 20]);
+        $this->runPreUpdate($policy, $this->once(), ['potValue' => [null, 20]]);
+        $this->runPreUpdate($policy, $this->once(), ['promoPotValue' => [null, 20]]);
+    }
+
+    public function testPolicyPreUpdatePremium()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testPolicyPreUpdatePremium', $this),
+            'bar'
+        );
+        $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
+        static::$policyService->setEnvironment('prod');
+        static::$policyService->create($policy);
+        static::$policyService->setEnvironment('test');
+        $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
+
+        $this->assertTrue($policy->isValidPolicy());
 
         $premium = new PhonePremium();
         $premium->setGwp(5);
@@ -84,18 +101,33 @@ class DoctrinePolicyListenerTest extends WebTestCase
         $premium->setIptRate(0.12);
         $this->runPreUpdatePremium($policy, $this->once(), ['premium' => [$premium, $premiumChanged]]);
         $this->runPreUpdatePremium($policy, $this->never(), ['premium' => [$premium, $premium]]);
+    }
 
-        $this->runPreUpdateBilling(
-            $policy,
-            $this->once(),
-            ['billing' => [new \DateTime('2018-01-01'), new \DateTime('2018-01-02')]]
+    public function testPolicyPreUpdateBilling()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testPolicyPreUpdateBilling', $this),
+            'bar'
         );
+        $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
+        static::$policyService->setEnvironment('prod');
+        static::$policyService->create($policy);
+        static::$policyService->setEnvironment('test');
+        $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
 
-        $this->runPreUpdateBilling(
-            $policy,
-            $this->never(),
-            ['billing' => [new \DateTime('2018-01-01'), new \DateTime('2018-01-01')]]
-        );
+        $this->assertTrue($policy->isValidPolicy());
+
+        $address = new Address();
+        $address->setLine1('123');
+        $address->setPostcode('BX1 1LT');
+
+        $addressChanged = new Address();
+        $addressChanged->setLine1('1234');
+        $addressChanged->setPostcode('BX1 1LT');
+
+        $this->runPreUpdateBilling($policy, $this->once(), ['billing' => [$address, $addressChanged]]);
+        $this->runPreUpdateBilling($policy, $this->never(), ['billing' => [$address, $address]]);
     }
 
     public function testPolicyPreRemove()

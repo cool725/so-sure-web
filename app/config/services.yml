@@ -709,6 +709,12 @@ services:
         tags:
             - { name: security.voter }
 
+    base.doctrine:
+        abstract: true
+        class: AppBundle\Listener\BaseDoctrineListener
+        calls:
+            - [setReader, ['@annotations.reader']]
+
     doctrine.listener.invitation:
         class:   AppBundle\Listener\DoctrineInvitationListener
         arguments:
@@ -726,6 +732,10 @@ services:
             -  { name: doctrine_mongodb.odm.event_listener, event: postUpdate  }
 
     doctrine.listener.user:
+        parent: base.doctrine
+        autowire: false
+        autoconfigure: false
+        public: true
         class:   AppBundle\Listener\DoctrineUserListener
         arguments:
             - "@event_dispatcher"
@@ -744,14 +754,23 @@ services:
             -  { name: doctrine_mongodb.odm.event_listener, event: postPersist }
 
     doctrine.listener.claim:
+        parent: base.doctrine
+        autowire: false
+        autoconfigure: false
+        public: true
         class:   AppBundle\Listener\DoctrineClaimListener
         arguments:
             - "@event_dispatcher"
+            - "@annotation_reader"
         tags:
             -  { name: doctrine_mongodb.odm.event_listener, event: postPersist }
             -  { name: doctrine_mongodb.odm.event_listener, event: preUpdate  }
 
     doctrine.listener.connection:
+        parent: base.doctrine
+        autowire: false
+        autoconfigure: false
+        public: true
         class:   AppBundle\Listener\DoctrineConnectionListener
         arguments:
             - "@event_dispatcher"
@@ -759,6 +778,10 @@ services:
             -  { name: doctrine_mongodb.odm.event_listener, event: preUpdate  }
 
     doctrine.listener.salva:
+        parent: base.doctrine
+        autowire: false
+        autoconfigure: false
+        public: true
         class:   AppBundle\Listener\DoctrineSalvaListener
         arguments:
             - "@event_dispatcher"

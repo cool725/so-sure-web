@@ -338,10 +338,21 @@ class SalvaExportService
         $repo = $this->dm->getRepository(Claim::class);
         $lines[] =  sprintf("%s", $this->formatLine($this->transformClaim(null)));
         foreach ($repo->getAllClaimsForExport($date, $days) as $claim) {
+            /** @var Claim $claim */
             // For prod, skip invalid policies
             if ($this->environment == 'prod' && !$claim->getPolicy()->isValidPolicy()) {
                 continue;
             }
+
+            // There's a bit of a timing issue with claims - if a fnol claim gets a claim number via the claims
+            // portal (transitioning to in-review), however, this occurs before the claims excel sheet is imported,
+            // then this claim would be exported to salva, which breaks their import process
+            $financialAmounts = $claim->getReservedValue() + $claim->getTotalIncurred() +
+                $claim->getClaimHandlingFees();
+            if ($claim->getStatus() == Claim::STATUS_INREVIEW && $this->areEqualToTwoDp(0, $financialAmounts)) {
+                continue;
+            }
+
             $data = $this->transformClaim($claim);
             $lines[] = sprintf("%s", $this->formatLine($data));
         }

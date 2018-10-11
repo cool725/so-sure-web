@@ -190,4 +190,13 @@ class Address
           'type' => $this->getType(),
         ];
     }
+
+    public function equals(Address $compare)
+    {
+        if (!$compare) {
+            return false;
+        }
+
+        return serialize($this->toApiArray()) == serialize($compare->toApiArray());
+    }
 }
