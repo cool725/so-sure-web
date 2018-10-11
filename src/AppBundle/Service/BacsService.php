@@ -75,6 +75,11 @@ class BacsService
     const AUDDIS_REASON_DD_NOT_ALLOWED = 'G';
     const AUDDIS_REASON_EXPIRED = 'H';
     const AUDDIS_REASON_DUPLICATE_REFERENCE = 'I';
+    const AUDDIS_REASON_CODE_INCOMPATIBLE = 'M';
+    const AUDDIS_REASON_NOT_ALLOWED = 'N';
+    const AUDDIS_REASON_INVALID_REFERENCE = 'O';
+    const AUDDIS_REASON_MISSING_PAYER_NAME = 'P';
+    const AUDDIS_REASON_MISSING_SERVICE_NAME = 'Q';
 
     const ARUDD_RETURN_CODE_PAYER = '0128';
 
@@ -910,6 +915,11 @@ class BacsService
                     self::AUDDIS_REASON_DD_NOT_ALLOWED,
                     self::AUDDIS_REASON_EXPIRED,
                     self::AUDDIS_REASON_DUPLICATE_REFERENCE,
+                    self::AUDDIS_REASON_CODE_INCOMPATIBLE,
+                    self::AUDDIS_REASON_NOT_ALLOWED,
+                    self::AUDDIS_REASON_INVALID_REFERENCE,
+                    self::AUDDIS_REASON_MISSING_PAYER_NAME,
+                    self::AUDDIS_REASON_MISSING_SERVICE_NAME,
                 ])) {
                     /** @var BacsPaymentMethod $bacs */
                     $bacs = $user->getPaymentMethod();
