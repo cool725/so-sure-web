@@ -3022,6 +3022,19 @@ abstract class Policy
         return $date >= $this->getPolicyExpirationDate($date);
     }
 
+    public function shouldExpirePolicy($prefix = null, $date = null)
+    {
+        if (!$this->isValidPolicy($prefix) || !$this->isActive()) {
+            return false;
+        }
+
+        if ($date == null) {
+            $date = new \DateTime();
+        }
+
+        return $date >= $this->getEnd();
+    }
+
     public function hasPolicyExpirationDate(\DateTime $date = null)
     {
         try {
