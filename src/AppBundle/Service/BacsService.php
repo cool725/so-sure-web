@@ -464,7 +464,11 @@ class BacsService
             $bacs->getBankAccount()->setMandateStatus(BankAccount::MANDATE_CANCELLED);
             $this->dm->flush();
 
-            $this->queueCancelBankAccount($bacs->getBankAccount(), $user->getId());
+            // Service users must not send a 0C transaction to the old bank on receipt of an ADDACS reason code 3
+            // advice containing both old and new account details.
+            if ($reason != self::ADDACS_REASON_TRANSFER) {
+                $this->queueCancelBankAccount($bacs->getBankAccount(), $user->getId());
+            }
 
             $this->notifyMandateCancelled($user, $reason);
 
@@ -809,7 +813,7 @@ class BacsService
 
     private function getRecordType(\DOMElement $element)
     {
-        return $this->getNodeValue($element,'record-type');
+        return $this->getNodeValue($element, 'record-type');
     }
 
     private function getReference(\DOMElement $element, $referenceName = 'reference')
