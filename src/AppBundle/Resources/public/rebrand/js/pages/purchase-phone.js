@@ -104,14 +104,12 @@ $(function(){
         phone = imei.data('make');
 
     if (phone == 'Samsung') {
+        // Trim whitespace and / after user has entered
         imei.on('blur', function() {
-            let simei  = $(this).val();
-
-            if (simei.indexOf('/') > 1) {
-                let newtxt = simei.replace('/', '');
-                $(this).val(newtxt);
-            }
-
+            let oimei = $(this).val();
+            let timei = oimei.replace(/[\s\/]/g, '');
+            $(this).val(timei);
+            // If valid hide the warning
             if ($(this).valid()) {
                 $('.samsung-imei').hide();
             }
