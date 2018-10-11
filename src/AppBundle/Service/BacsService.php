@@ -460,12 +460,23 @@ class BacsService
             }
             /** @var BacsPaymentMethod $bacs */
             $bacs = $user->getPaymentMethod();
+
             $bacs->getBankAccount()->setMandateStatus(BankAccount::MANDATE_CANCELLED);
-            $this->notifyMandateCancelled($user);
+            $this->dm->flush();
+
+            // Service users must not send a 0C transaction to the old bank on receipt of an ADDACS reason code 3
+            // advice containing both old and new account details.
+            if ($reason != self::ADDACS_REASON_TRANSFER) {
+                $this->queueCancelBankAccount($bacs->getBankAccount(), $user->getId());
+            }
+
+            $this->notifyMandateCancelled($user, $reason);
+
             if ($reason == self::ADDACS_REASON_TRANSFER) {
                 $results['transer']++;
-                // TODO: automate transfer
-                $this->logger->error(sprintf('Example xml to determine how to handle bacs transfer %s', $reference));
+                $bacs->getBankAccount()->setAccountNumber($this->getNodeValue($element, 'payer-new-account-number'));
+                $bacs->getBankAccount()->setSortCode($this->getNodeValue($element, 'payer-new-sort-code'));
+                $bacs->getBankAccount()->setMandateStatus(BankAccount::MANDATE_PENDING_INIT);
             } elseif ($reason == self::ADDACS_REASON_USER) {
                 $results['user']++;
                 $this->logger->info(sprintf('Contact user regarding bacs cancellation %s', $reference));
@@ -709,7 +720,7 @@ class BacsService
         );
     }
 
-    private function notifyMandateCancelled(User $user)
+    private function notifyMandateCancelled(User $user, $reason)
     {
         // If a user doesn't have an active or unpaid policy, there is no need to notify of a mandate cancellation
         // copy would be confusing and there's no value to sending
@@ -718,10 +729,13 @@ class BacsService
         }
 
         $baseTemplate = 'AppBundle:Email:bacs/mandateCancelled';
-        $claimed = $user->getAvgPolicyClaims() > 0;
+        if ($reason == self::ADDACS_REASON_TRANSFER) {
+            return;
+        }
         $templateHtml = sprintf('%s.html.twig', $baseTemplate);
         $templateText = sprintf('%s.txt.twig', $baseTemplate);
 
+        $claimed = $user->getAvgPolicyClaims() > 0;
         $this->mailerService->sendTemplate(
             'Your Direct Debit Cancellation',
             $user->getEmail(),
@@ -799,13 +813,14 @@ class BacsService
 
     private function getRecordType(\DOMElement $element)
     {
-        return $element->attributes->getNamedItem('record-type')->nodeValue;
+        return $this->getNodeValue($element, 'record-type');
     }
 
     private function getReference(\DOMElement $element, $referenceName = 'reference')
     {
-        return trim($element->attributes->getNamedItem($referenceName)->nodeValue);
+        return trim($this->getNodeValue($element, $referenceName));
     }
+
 
     private function getChildNodeValue(\DOMElement $element, $name)
     {
@@ -1397,7 +1412,9 @@ class BacsService
             if ($payment->getStatus() != BacsPayment::STATUS_SKIPPED) {
                 $metadata['debit-amount'] += $scheduledPayment->getAmount();
             }
-            $this->dm->flush(null, array('w' => 'majority', 'j' => true));
+            if ($update) {
+                $this->dm->flush(null, array('w' => 'majority', 'j' => true));
+            }
         }
     }
 
@@ -1562,6 +1579,11 @@ class BacsService
             $payment->setSerialNumber($serialNumber);
             if ($payment->getScheduledPayment()) {
                 $payment->getScheduledPayment()->setStatus(ScheduledPayment::STATUS_PENDING);
+            } else {
+                $this->logger->warning(sprintf(
+                    'Unable to find scheduled payment for payment %s',
+                    $payment->getId()
+                ));
             }
             if ($bankAccount->isFirstPayment()) {
                 $bankAccount->setFirstPayment(false);
