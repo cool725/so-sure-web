@@ -463,12 +463,10 @@ class BacsService
                 $this->logger->error(sprintf('Example xml to determine how to handle bacs transfer %s', $reference));
             } elseif ($reason == self::ADDACS_REASON_USER) {
                 $results['user']++;
-                // TODO: Email user that bacs was cancelled
-                $this->logger->error(sprintf('Contact user regarding bacs cancellation %s', $reference));
+                $this->logger->info(sprintf('Contact user regarding bacs cancellation %s', $reference));
             } elseif ($reason == self::ADDACS_REASON_BANK) {
                 $results['bank']++;
-                // TODO: Email user that bacs was cancelled by bank
-                $this->logger->error(sprintf('Contact user regarding bacs cancellation %s', $reference));
+                $this->logger->info(sprintf('Contact user regarding bacs cancellation %s', $reference));
             } elseif ($reason == self::ADDACS_REASON_DECEASED) {
                 $results['deceased']++;
                 // TODO: cancel policy, lock user account, unsub user from emails
