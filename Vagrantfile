@@ -29,13 +29,19 @@ sudo apt-get install -y git
 
 if [ ! -d /var/ops ]; then
   sudo mkdir /var/ops
-  sudo chown vagrant /var/ops
-  cd /var/ops
+fi
+
+sudo chown vagrant /var/ops
+cd /var/ops
+
+if [ ! -d /var/ops/.git ]; then
   git init
+fi
+
+if [ `git remote | wc -l` == "0" ]; then
   git remote add origin git@github.com:so-sure/ops.git
 fi
 
-cd /var/ops
 git fetch
 git checkout master
 git pull origin master
