@@ -15,7 +15,7 @@ $(function() {
         // Add tracking
         // Callback stops autoplay *sigh*
         let name = $(this).data('event');
-        trackByName();
+        trackByName(name);
 
         // Set source of iframe
         $('#sosure-video-modal-embed').attr('src',videoSrc + '?rel=0&amp;showinfo=0&amp;modestbranding=1&amp;autoplay=1');
