@@ -489,6 +489,9 @@ class SalvaExportService
                     '',
                 $claim->getReplacementImei(),
                 $claim->getHandlingTeam() ? $claim->getHandlingTeam() : '',
+                $claim->getUnderwriterLastUpdated() ?
+                    $this->adjustDate($claim->getUnderwriterLastUpdated()) :
+                    ''
             ];
         } else {
             $data = [
@@ -508,6 +511,7 @@ class SalvaExportService
                 'ReplacementModel',
                 'ReplacementImei',
                 'Claims Handler',
+                'Last Updated',
             ];
         }
 
