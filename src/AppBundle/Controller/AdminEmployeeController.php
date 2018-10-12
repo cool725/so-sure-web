@@ -123,6 +123,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use CensusBundle\Document\Postcode;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
+use Symfony\Component\Validator\Constraints\Choice;
 
 /**
  * @Route("/admin")
@@ -2455,6 +2456,12 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             90 => 90
         ];
 
+        $lead_sources = [
+            'invitation' => 'invitation',
+            'scode' => 'scode',
+            'affiliate' => 'affiliate'
+        ];
+
         $companyForm = $this->get('form.factory')
             ->createNamedBuilder('companyForm')
             ->add('name', TextType::class)
@@ -2467,7 +2474,8 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             ->add('days', ChoiceType::class, ['required' => true,
                                                 'choices' => $time_range])
             ->add('campaignSource', TextType::class, ['required' => false])
-            ->add('leadSource', TextType::class, ['required' => false])
+            ->add('leadSource', ChoiceType::class, ['required' => false, 'choices' => $lead_sources])
+            ->add('leadSourceDetails', TextType::class, ['required' => false ])
             ->add('next', SubmitType::class)
             ->getForm();
 
@@ -2494,6 +2502,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                         $company->setDays($this->getDataString($companyForm->getData(), 'days'));
                         $company->setCampaignSource($this->getDataString($companyForm->getData(), 'campaignSource'));
                         $company->setLeadSource($this->getDataString($companyForm->getData(), 'leadSource'));
+                        $company->setLeadSourceDetails($this->getDataString($companyForm->getData(), 'leadSourceDetails'));
                         $dm->persist($company);
                         $dm->flush();
                         $this->addFlash('success', sprintf(

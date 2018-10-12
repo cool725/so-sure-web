@@ -47,6 +47,14 @@ class AffiliateCompany extends Company
      */
     protected $leadSource;
 
+    /**
+     * @AppAssert\AlphanumericSpaceDot()
+     * @Assert\Length(min="1", max="250")
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
+    protected $leadSourceDetails;
+
     public function setCPA(float $cpa)
     {
         $this->cpa = $cpa;
@@ -85,6 +93,16 @@ class AffiliateCompany extends Company
     public function setLeadSource(String $leadSource)
     {
         $this->leadSource = $leadSource;
+    }
+
+    public function getLeadSourceDetails()
+    {
+        return $this->leadSourceDetails;
+    }
+
+    public function setLeadSourceDetails(String $leadSourceDetails)
+    {
+        $this->leadSourceDetails = $leadSourceDetails;
     }
 
 }
