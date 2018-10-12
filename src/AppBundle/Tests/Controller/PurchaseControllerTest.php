@@ -368,6 +368,69 @@ class PurchaseControllerTest extends BaseControllerTest
         self::verifyResponse(200);
     }
 
+    public function testPurchasePhoneBacsInvalidAccountNumber()
+    {
+        /** @var FeatureService $feature */
+        $feature = $this->getContainer(true)->get('app.feature');
+        $this->assertTrue($feature->isEnabled(Feature::FEATURE_BACS), 'Bacs feature disabled');
+
+        $phone = $this->setRandomPhone();
+
+        $crawler = $this->createPurchase(
+            self::generateEmail('testPurchasePhoneBacsInvalidAccountNumber', $this),
+            'foo bar',
+            new \DateTime('1980-01-01')
+        );
+        self::verifyResponse(302, null, $crawler);
+        $this->assertTrue($this->isClientResponseRedirect());
+        self::$client->followRedirect();
+        $this->assertContains('/purchase/step-phone', self::$client->getHistory()->current()->getUri());
+
+        $crawler = $this->setPhone($phone);
+        //print $crawler->html();
+        self::verifyResponse(302, null, $crawler);
+        $crawler = self::$client->followRedirect();
+        $this->assertContains('/purchase/step-pledge', self::$client->getHistory()->current()->getUri());
+
+        //print $crawler->html();
+        $crawler = $this->agreePledge($crawler);
+        //print $crawler->html();
+        self::verifyResponse(302, null, $crawler);
+        $crawler = self::$client->followRedirect();
+
+        $policy = $this->getPolicyFromPaymentUrl();
+        $url = sprintf('%s?force=bacs', self::$client->getHistory()->current()->getUri());
+        $crawler = self::$client->request('GET', $url);
+        $this->assertNotContains(
+            'judo',
+            $crawler->html(),
+            sprintf('%s Payment page is referencing judopay', self::$client->getHistory()->current()->getUri())
+        );
+        //print $crawler->html();
+        //print $url;
+
+        $crawler = $this->setPayment($crawler, $phone);
+        //print $crawler->html();
+        self::verifyResponse(302, null, $crawler);
+        $crawler = self::$client->followRedirect();
+        $this->assertContains('/purchase/step-payment/', self::$client->getHistory()->current()->getUri());
+        $this->assertContains('/monthly', self::$client->getHistory()->current()->getUri());
+
+        $crawler = $this->setBacs($crawler, $policy, PCAService::TEST_ACCOUNT_NUMBER_INVALID_ACCOUNT_NUMBER);
+        self::verifyResponse(200);
+        //print $crawler->html();
+
+        $this->assertTrue($crawler->selectButton('bacs_form[save]')->count() > 0);
+        $this->assertTrue($crawler->selectButton('bacs_confirm_form[save]')->count() == 0);
+
+        $crawler = $this->setBacs($crawler, $policy, PCAService::TEST_ACCOUNT_NUMBER_OK);
+        self::verifyResponse(200);
+        //print $crawler->html();
+
+        $this->assertTrue($crawler->selectButton('bacs_form[save]')->count() == 0);
+        $this->assertTrue($crawler->selectButton('bacs_confirm_form[save]')->count() > 0);
+    }
+
     private function getPolicyFromPaymentUrl()
     {
         $urlData = explode('/', self::$client->getHistory()->current()->getUri());
@@ -1254,13 +1317,13 @@ class PurchaseControllerTest extends BaseControllerTest
         return $crawler;
     }
 
-    private function setBacs(Crawler $crawler, Policy $policy)
+    private function setBacs(Crawler $crawler, Policy $policy, $accountNumber = PCAService::TEST_ACCOUNT_NUMBER_OK)
     {
         //print $crawler->html();
         $form = $crawler->selectButton('bacs_form[save]')->form();
         $form['bacs_form[accountName]'] = $policy->getUser()->getName();
         $form['bacs_form[sortCode]'] = PCAService::TEST_SORT_CODE;
-        $form['bacs_form[accountNumber]'] = PCAService::TEST_ACCOUNT_NUMBER_OK;
+        $form['bacs_form[accountNumber]'] = $accountNumber;
         $form['bacs_form[soleSignature]'] = true;
         $crawler = self::$client->submit($form);
 
