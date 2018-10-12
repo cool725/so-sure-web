@@ -199,13 +199,13 @@ class BacsPayment extends Payment
         }
     }
 
-    public function approve(\DateTime $date = null)
+    public function approve(\DateTime $date = null, $ignoreReversedDate = false)
     {
         if (!$date) {
             $date = new \DateTime();
         }
 
-        if (!$this->canAction($date)) {
+        if (!$this->canAction($date) && !$ignoreReversedDate) {
             throw new \Exception(sprintf(
                 'Attempting to action before reveral date (%s) is past',
                 $this->getBacsReversedDate()->format('d m Y')
