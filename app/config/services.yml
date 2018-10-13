@@ -152,6 +152,12 @@ services:
             - "@app.shortlink"
             - "@app.branch"
 
+    app.affiliate:
+        class: AppBundle\Service\AffiliateService
+        arguments:
+            - "@doctrine_mongodb.odm.default_document_manager"
+            - "@logger"
+
     app.bacs:
         class: AppBundle\Service\BacsService
         arguments:
