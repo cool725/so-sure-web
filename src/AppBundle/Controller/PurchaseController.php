@@ -813,12 +813,7 @@ class PurchaseController extends BaseController
         $webpay = null;
         $allowPayment = true;
 
-        $paymentProviderTest = $this->sixpack(
-            $request,
-            SixpackService::EXPERIMENT_PURCHASE_FLOW_BACS,
-            ['judo', 'bacs'],
-            SixpackService::LOG_MIXPANEL_CONVERSION
-        );
+        $paymentProviderTest = 'bacs';
 
         $bacsFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_BACS);
         // For now, only allow 1 policy with bacs
