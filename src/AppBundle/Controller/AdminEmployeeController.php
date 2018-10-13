@@ -2502,7 +2502,9 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                         $company->setDays($this->getDataString($companyForm->getData(), 'days'));
                         $company->setCampaignSource($this->getDataString($companyForm->getData(), 'campaignSource'));
                         $company->setLeadSource($this->getDataString($companyForm->getData(), 'leadSource'));
-                        $company->setLeadSourceDetails($this->getDataString($companyForm->getData(), 'leadSourceDetails'));
+                        $company->setLeadSourceDetails(
+                            $this->getDataString($companyForm->getData(), 'leadSourceDetails')
+                        );
                         $dm->persist($company);
                         $dm->flush();
                         $this->addFlash('success', sprintf(

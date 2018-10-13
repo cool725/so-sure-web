@@ -23,6 +23,7 @@ class Charge
     const TYPE_CLAIMSCHECK = 'claimscheck';
     const TYPE_CLAIMSDAMAGE = 'claimsdamage';
     const TYPE_BANK_ACCOUNT = 'bank-account';
+    const TYPE_AFFILIATE = 'affiliate';
 
     public static $prices = [
         self::TYPE_ADDRESS => 0.037, // ex vat
@@ -167,7 +168,9 @@ class Charge
     public function setType($type)
     {
         $this->type = $type;
-        $this->setAmount(self::$prices[$type]);
+        if (isset(self::$prices[$type])) {
+            $this->setAmount(self::$prices[$type]);
+        }
     }
 
     public function getAmount()

@@ -2686,6 +2686,23 @@ abstract class Policy
         return $this->getStart()->diff($date)->days <= 30;
     }
 
+    public function isPolicyOldEnough($days, \DateTime $date = null)
+    {
+        if (!$this->getStart()) {
+            return null;
+        }
+
+        if ($date == null) {
+            $date = new \DateTime();
+        }
+
+        /** @var \DateTime $start */
+        $start = $this->getStart();
+        $diff = $start->diff($date);
+
+        return $diff->days >= $days && !$diff->invert;
+    }
+
     public function isPolicyExpiredWithin30Days($unrenewed = true, $date = null)
     {
         if (!$this->getEnd()) {
