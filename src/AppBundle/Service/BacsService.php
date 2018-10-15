@@ -561,6 +561,7 @@ class BacsService
                     $debitPayment->setSerialNumber($submittedPayment->getSerialNumber());
                     $debitPayment->setDate($this->getNextBusinessDay($currentProcessingDate));
                     $debitPayment->setSource(Payment::SOURCE_SYSTEM);
+                    $debitPayment->setNotes('Arudd payment failure');
                     $policy->addPayment($debitPayment);
                     $debitPayment->setRefundTotalCommission($submittedPayment->getTotalCommission());
                     $debitPayment->calculateSplit();
