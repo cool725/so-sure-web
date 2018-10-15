@@ -92,7 +92,6 @@
                                 3. How is your personal data collected <i class="far fa-chevron-down text-dodger-blue fa-lg"></i>
                             </h5>
                             <div class="expanding-cardbox__expand mt-4">
-                                {# <h5 class="text-zaffre">Purpose of this privacy notice</h5> #}
                                 <p>We use different methods to collect data from and about you including through:</p>
                                 <p><strong>Direct interactions.</strong> You may give us your Identity, Contact and Financial Data by filling in forms or by corresponding with us by post, phone, email or otherwise. This includes personal data you provide when you:</p>
                                 <ul class="mb-4">
@@ -297,7 +296,13 @@
                             <div class="expanding-cardbox__expand mt-4">
                                 <p>We may have to share your personal data with the parties set out below for the purposes set out in the table in paragraph 4 above.</p>
                                 <ul>
-                                    <li class="mb-2">External Third Parties as set out in the <a href="#third-party-external" class="scroll-to-link">Glossary</a>.</li>
+                                    <li class="mb-2">
+                                        External Third Parties as set out in the
+                                        <a href="#third-party-external"
+                                           data-cardbox-target="#glossary"
+                                           data-cardbox-anchor="#third-party-external">
+                                            Glossary</a>.
+                                    </li>
                                     <li class="mb-2">Third parties to whom we may choose to sell, transfer, or merge parts of our business or our assets. Alternatively, we may seek to acquire other businesses or merge with them. If a change happens to our business, then the new owners may use your personal data in the same way as set out in this privacy notice.</li>
                                     <li class="mb-2">We require all third parties to respect the security of your personal data and to treat it in accordance with the law. We do not allow our third-party service providers to use your personal data for their own purposes and only permit them to process your personal data for specified purposes and in accordance with our instructions.</li>
                                 </ul>
@@ -339,7 +344,14 @@
                             <div class="expanding-cardbox__expand mt-4">
                                 <h5 class="text-zaffre">How long will you use my personal data for?</h5>
                                 <p>By law we have to keep basic information about our customers (including Contact, Identity, Financial and Transaction Data) for seven and a half years after they cease being customers for regulatory purposes.</p>
-                                <p>In some circumstances you can ask us to delete your data: see <a href="#rights-request-erasure" class="scroll-to-link">Request erasure</a> below for further information.</p>
+                                <p>
+                                    In some circumstances you can ask us to delete your data: see
+                                    <a href="#rights-request-erasure"
+                                       data-cardbox-target="#glossary"
+                                       data-cardbox-anchor="#rights-request-erasure">
+                                        Request erasure</a>
+                                    below for further information.
+                                </p>
                                 <p>In some circumstances we may anonymise your personal data (so that it can no longer be associated with you) for research or statistical purposes in which case we may use this information indefinitely without further notice to you.</p>
                             </div>
                         </div>
@@ -354,16 +366,46 @@
                                 <ul class="mb-4">
                                     <li class="mb-2">
                                         <a href="#rights-request-correction"
-                                           class="scroll-to-link"
                                            data-cardbox-target="#glossary"
-                                           data-cardbox-anchor="#rights-request-correction">Request access to your personal data</a>
+                                           data-cardbox-anchor="#rights-request-correction">
+                                            Request access to your personal data</a>
                                     </li>
-                                    <li class="mb-2"><a href="#rights-request-correction" class="scroll-to-link">Request correction of your personal data</a></li>
-                                    <li class="mb-2"><a href="#rights-request-erasure" class="scroll-to-link">Request erasure of your personal data</a></li>
-                                    <li class="mb-2"><a href="#rights-object-processing" class="scroll-to-link">Object to processing of your personal data</a></li>
-                                    <li class="mb-2"><a href="#rights-request-restriction-processing" class="scroll-to-link">Request restriction of processing your personal data</a></li>
-                                    <li class="mb-2"><a href="#rights-request-transfer" class="scroll-to-link">Request transfer of your personal data</a></li>
-                                    <li class="mb-2"><a href="#rights-withdraw-consent" class="scroll-to-link">Right to withdraw consent</a></li>
+                                    <li class="mb-2">
+                                        <a href="#rights-request-correction"
+                                           data-cardbox-target="#glossary"
+                                           data-cardbox-anchor="#rights-request-correction">
+                                            Request correction of your personal data</a>
+                                    </li>
+                                    <li class="mb-2">
+                                        <a href="#rights-request-erasure"
+                                           data-cardbox-target="#glossary"
+                                           data-cardbox-anchor="#rights-request-erasure">
+                                            Request erasure of your personal data</a>
+                                    </li>
+                                    <li class="mb-2">
+                                        <a href="#rights-object-processing"
+                                           data-cardbox-target="#glossary"
+                                           data-cardbox-anchor="#rights-object-processing">
+                                            Object to processing of your personal data</a>
+                                    </li>
+                                    <li class="mb-2">
+                                        <a href="#rights-request-restriction-processing"
+                                           data-cardbox-target="#glossary"
+                                           data-cardbox-anchor="#rights-request-restriction-processing">
+                                            Request restriction of processing your personal data</a>
+                                    </li>
+                                    <li class="mb-2">
+                                        <a href="#rights-request-transfer"
+                                           data-cardbox-target="#glossary"
+                                           data-cardbox-anchor="#rights-request-transfer">
+                                            Request transfer of your personal data</a>
+                                    </li>
+                                    <li class="mb-2">
+                                        <a href="#rights-withdraw-consent"
+                                           data-cardbox-target="#glossary"
+                                           data-cardbox-anchor="#rights-withdraw-consent">
+                                            Right to withdraw consent</a>
+                                    </li>
                                 </ul>
                                 <p>If you wish to exercise any of the rights set out above, please <a href="{{ path('about_how_to_contact_so_sure') }}">Contact us</a>.</p>
                                 <h5 class="text-zaffre">No fee usually required</h5>
@@ -389,8 +431,8 @@
                                 <ul class="mb-4">
                                     <li class="mb-2">Professional advisers acting as processors or joint controllers including lawyers, bankers, auditors and insurers based in the United Kingdom who provide consultancy, banking, legal, insurance and accounting services.</li>
                                     <li class="mb-2">HM Revenue &amp; Customs, regulators and other authorities acting as processors or joint controllers based in the United Kingdom who require reporting of processing activities in certain circumstances.</li>
-                                    <li class="mb-2">Software as a service (SAAS) providers acting as processors based in the United Kindom, other EU countries, and the USA.</li>
-                                    <li class="mb-2">Claims handlers acting as processors or joint controllers based in the United Kindom.</li>
+                                    <li class="mb-2">Software as a service (SAAS) providers acting as processors based in the United Kingdom, other EU countries, and the USA.</li>
+                                    <li class="mb-2">Claims handlers acting as processors or joint controllers based in the United Kingdom.</li>
                                     <li class="mb-2">Other insurance and fraud prevention agencies acting as processors or joint controllers based in the United Kingdom.</li>
                                     <li class="mb-2">Payment gateway, merchant services, and banking services acting as processors or joint controllers based in the United Kingdom.</li>
                                 </ul>
@@ -429,8 +471,8 @@
                 </div>
                 <div class="faq__sub px-4 pb-4 pt-5 p-lg-5 pt-lg-0">
                     <div class="faq__nav">
-{#                         <div id="faq-nav" class="list-group mb-5">
-                            <a class="list-group-item list-group-item-action" href="#important-information-and-who-we-are"><i class="far fa-angle-right fa-lg mr-2"></i> Important information and who we are</a>
+                        <div id="faq-nav" class="list-group mb-5">
+                            {# <a class="list-group-item list-group-item-action" href="#important-information-and-who-we-are"><i class="far fa-angle-right fa-lg mr-2"></i> Important information and who we are</a>
                             <a class="list-group-item list-group-item-action" href="#the-data-we-collect-about-you"><i class="far fa-angle-right fa-lg mr-2"></i> The data we collect about you</a>
                             <a class="list-group-item list-group-item-action" href="#how-is-your-personal-data-collected"><i class="far fa-angle-right fa-lg mr-2"></i> How is your personal data collected</a>
                             <a class="list-group-item list-group-item-action" href="#how-we-use-your-personal-data"><i class="far fa-angle-right fa-lg mr-2"></i> How we use your personal data</a>
@@ -439,9 +481,9 @@
                             <a class="list-group-item list-group-item-action" href="#data-security"><i class="far fa-angle-right fa-lg mr-2"></i> Data security</a>
                             <a class="list-group-item list-group-item-action" href="#data-retention"><i class="far fa-angle-right fa-lg mr-2"></i> Data retention</a>
                             <a class="list-group-item list-group-item-action" href="#your-legal-rights"><i class="far fa-angle-right fa-lg mr-2"></i> Your legal rights</a>
-                            <a class="list-group-item list-group-item-action" href="#glossary"><i class="far fa-angle-right fa-lg mr-2"></i> Glossary</a>
-                        </div> #}
-                        {# <a id="back-to-top-faq" href="#" class="btn btn-outline-dodger-blue"><i class="far fa-arrow-up mr-2"></i> Back to top</a> #}
+                            <a class="list-group-item list-group-item-action" href="#glossary"><i class="far fa-angle-right fa-lg mr-2"></i> Glossary</a> #}
+                        </div>
+                        <a id="back-to-top-faq" href="#" class="btn btn-outline-dodger-blue"><i class="far fa-arrow-up mr-2"></i> Back to top</a>
                     </div>
                 </div>
             </div>
