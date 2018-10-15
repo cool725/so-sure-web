@@ -3,6 +3,7 @@
 
 namespace AppBundle\Document;
 
+use AppBundle\Interfaces\EqualsInterface;
 use FOS\UserBundle\Document\User as BaseUser;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Gedmo\Mapping\Annotation as Gedmo;
@@ -14,7 +15,7 @@ use VasilDakov\Postcode\Postcode;
  * @MongoDB\EmbeddedDocument
  * @Gedmo\Loggable
  */
-class Address
+class Address implements EqualsInterface
 {
     const TYPE_BILLING = 'billing';
     public static $types = [self::TYPE_BILLING];
@@ -191,9 +192,9 @@ class Address
         ];
     }
 
-    public function equals(Address $compare)
+    public function equals($compare)
     {
-        if (!$compare) {
+        if (!$compare || !$compare instanceof Address) {
             return false;
         }
 
