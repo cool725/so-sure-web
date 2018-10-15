@@ -14,18 +14,18 @@ export default trackByName;
 
 $(function() {
 
-    $('.sosure-track').on('click', function(event) {
-        let name = $(this).data('event');
-        let url = $(this).data('event-url');
+    $('.sosure-track').on('click', function(e) {
+        if (!blank) {
+            // if not true prevent default behavior
+            e.preventDefault();
+        }
+        let name  = $(this).data('event');
+        let url   = $(this).data('event-url');
         let blank = $(this).data('event-blank');
-
-        // if (!blank) {
-        //     e.preventDefault();
-        // }
 
         trackByName(name, function() {
             if (url && blank) {
-                window.open(url,'_blank');
+                // Do nothing
             } else if (url) {
                 window.location = url;
             }
