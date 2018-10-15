@@ -16,10 +16,13 @@ $(function() {
 
     $('.sosure-track').on('click', function(event) {
         event.preventDefault();
-        var name = $(this).data('event');
-        var url = $(this).data('event-url');
+        let name = $(this).data('event');
+        let url = $(this).data('event-url');
+        let blank = $(this).data('event-blank');
         trackByName(name, function() {
-            if (url) {
+            if (url && blank) {
+                window.open(url,'_blank');
+            } else if (url) {
                 window.location = url;
             }
         });
