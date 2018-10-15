@@ -1052,7 +1052,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $claim->setIncurred(array_sum([$claim->getClaimHandlingFees(), $claim->getTransactionFees(), $claim->getAccessories(),
             $phone->getReplacementPriceOrSuggestedReplacementPrice(), $claim->getUnauthorizedCalls()]));
 
-        $claim->setTotalIncurred($claim->getIncurred() + $claim->getClaimHandlingFees() - $claim->getExcess());
+        $claim->setTotalIncurred($claim->getIncurred() + $claim->getClaimHandlingFees());
 
         $policy->addClaim($claim);
         $manager->persist($claim);
