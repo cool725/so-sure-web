@@ -16,3 +16,20 @@
         padding: 2rem;
     }
 }
+
+.modal-video {
+
+    .modal-body {
+        position: relative;
+
+        .close {
+            position: absolute;
+            top: -30px; right: 10px;
+
+            @include media-breakpoint-up(lg) {
+                top: 0; right: -30px;
+            }
+        }
+    }
+
+}

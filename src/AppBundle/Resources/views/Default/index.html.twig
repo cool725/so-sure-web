@@ -24,8 +24,16 @@
                         <p class="mb-4 text-white">We're a new type of insurer that you can rely on. We protect you when you need to claim and reward you when you don't.</p>
                     </div>
                     <div class="hero__controls pb-3">
-                        <a href="#" class="btn btn-primary btn-white btn-block-xs mr-lg-2 get-a-quote">Get a Quote</a>
-                        {# <a href="#" class="btn btn-outline-primary btn-block-xs"><i class="far fa-play-circle fa-lg"></i> Watch our Video</a> #}
+                        <a href="#" class="btn btn-primary btn-white btn-block-xs mr-sm-2 get-a-quote">Get a Quote</a>
+                        <a href="#"
+                           class="btn btn-outline-white watch-video btn-block-xs"
+                           data-event="watch-video-index-hero"
+                           data-toggle="modal"
+                           data-target="#sosure-video-modal"
+                           data-src="https://www.youtube.com/embed/QEskwqsNgrQ">
+                            <i class="far fa-play-circle fa-lg opacity-50 mr-1"></i>
+                            Watch our Video
+                        </a>
                     </div>
                 </div>
                 <div class="col-lg-6 d-none d-lg-block">
@@ -485,12 +493,23 @@
                     </div>
                 </div>
                 <div class="banner__controls text-center text-lg-left">
-                    {# <a href="#" class="btn btn-outline-white btn-block-xs mr-2"><i class="far fa-play-circle fa-lg"></i> Watch our Video</a> #}
+                    <a href="#"
+                       class="btn btn-outline-white watch-video btn-block-xs mr-sm-2"
+                       data-event="watch-video-index-bottom-banner"
+                       data-toggle="modal"
+                       data-target="#sosure-video-modal"
+                       data-src="https://www.youtube.com/embed/QEskwqsNgrQ">
+                        <i class="far fa-play-circle fa-lg opacity-50 mr-1"></i>
+                        Watch our Video
+                    </a>
                     <a href="#" class="btn btn-white btn-block-xs get-a-quote">Get a Quote</a>
                 </div>
             </div>
         </div>
     </section>
+
+    {# Page Modals #}
+    {% include 'AppBundle::Default/_modalVideo.html.twig' %}
 
 {% endblock %}
 
