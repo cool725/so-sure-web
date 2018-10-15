@@ -14,6 +14,7 @@ use AppBundle\Document\File\ProofOfBarringFile;
 use AppBundle\Document\File\ProofOfPurchaseFile;
 use AppBundle\Document\File\DamagePictureFile;
 use AppBundle\Document\File\OtherClaimFile;
+use AppBundle\Annotation\DataChange;
 
 /**
  * @MongoDB\Document(repositoryClass="AppBundle\Repository\ClaimRepository")
@@ -280,12 +281,14 @@ class Claim
     /**
      * @Assert\Choice({"davies", "direct-group"}, strict=true)
      * @MongoDB\Field(type="string")
+     * @DataChange(categories="salva-claim")
      * @Gedmo\Versioned
      */
     protected $handlingTeam;
 
     /**
      * @MongoDB\ReferenceOne(targetDocument="Phone")
+     * @DataChange(categories="salva-claim")
      * @Gedmo\Versioned
      * @var Phone
      */
@@ -303,6 +306,7 @@ class Claim
      * @AppAssert\Alphanumeric()
      * @Assert\Length(min="0", max="50")
      * @MongoDB\Field(type="string")
+     * @DataChange(categories="salva-claim")
      * @Gedmo\Versioned
      */
     protected $replacementImei;
@@ -327,6 +331,7 @@ class Claim
      * @Assert\DateTime()
      * @MongoDB\Field(type="date")
      * @Gedmo\Versioned
+     * @DataChange(categories="salva-claim")
      * @var \DateTime
      */
     protected $lossDate;
@@ -335,6 +340,7 @@ class Claim
      * @Assert\DateTime()
      * @MongoDB\Field(type="date")
      * @Gedmo\Versioned
+     * @DataChange(categories="salva")
      * @var \DateTime
      */
     protected $notificationDate;
@@ -342,6 +348,7 @@ class Claim
     /**
      * @Assert\DateTime()
      * @MongoDB\Field(type="date")
+     * @DataChange(categories="salva-claim")
      * @Gedmo\Versioned
      * @var \DateTime
      */
@@ -376,6 +383,7 @@ class Claim
      * @Assert\Length(min="1", max="50")
      * @MongoDB\Field(type="string")
      * @MongoDB\Index(unique=true, sparse=true)
+     * @DataChange(categories="salva-claim")
      * @Gedmo\Versioned
      */
     protected $number;
@@ -384,6 +392,7 @@ class Claim
      * @AppAssert\AlphanumericSpaceDot()
      * @Assert\Length(min="1", max="5000")
      * @MongoDB\Field(type="string")
+     * @DataChange(categories="salva-claim")
      * @Gedmo\Versioned
      */
     protected $description;
@@ -415,6 +424,7 @@ class Claim
     /**
      * @Assert\Choice({"loss", "theft", "damage", "warranty", "extended-warranty"}, strict=true)
      * @MongoDB\Field(type="string")
+     * @DataChange(categories="salva-claim")
      * @Gedmo\Versioned
      */
     protected $type;
@@ -423,6 +433,7 @@ class Claim
      * @Assert\Choice({"fnol", "submitted", "in-review", "approved", "settled", "declined",
      *                 "withdrawn", "pending-closed"}, strict=true)
      * @MongoDB\Field(type="string")
+     * @DataChange(categories="salva-claim")
      * @Gedmo\Versioned
      */
     protected $status;
@@ -434,6 +445,14 @@ class Claim
      * @var \DateTime
      */
     protected $statusLastUpdated;
+
+    /**
+     * @Assert\DateTime()
+     * @MongoDB\Field(type="date")
+     * @Gedmo\Versioned
+     * @var \DateTime
+     */
+    protected $underwriterLastUpdated;
 
     /**
      * @AppAssert\AlphanumericSpaceDot()
@@ -481,6 +500,7 @@ class Claim
 
     /**
      * @MongoDB\Field(type="float")
+     * @DataChange(categories="salva-claim")
      * @Gedmo\Versioned
      */
     protected $excess;
@@ -511,12 +531,14 @@ class Claim
 
     /**
      * @MongoDB\Field(type="float")
+     * @DataChange(categories="salva-claim")
      * @Gedmo\Versioned
      */
     protected $claimHandlingFees;
 
     /**
      * @MongoDB\Field(type="float")
+     * @DataChange(categories="salva-claim")
      * @Gedmo\Versioned
      */
     protected $reservedValue;
@@ -531,6 +553,7 @@ class Claim
     /**
      * Total inc claim handling fee - excess
      * @MongoDB\Field(type="float")
+     * @DataChange(categories="salva-claim")
      * @Gedmo\Versioned
      */
     protected $totalIncurred;
@@ -930,6 +953,22 @@ class Claim
         }
 
         $this->statusLastUpdated = $statusLastUpdated;
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getUnderwriterLastUpdated()
+    {
+        return $this->underwriterLastUpdated;
+    }
+
+    /**
+     * @param \DateTime $underwriterLastUpdated
+     */
+    public function setUnderwriterLastUpdated(\DateTime $underwriterLastUpdated)
+    {
+        $this->underwriterLastUpdated = $underwriterLastUpdated;
     }
 
     public function isOpen()

@@ -2,15 +2,21 @@
 
 namespace AppBundle\Listener;
 
+use AppBundle\Annotation\DataChange;
+use Doctrine\Common\Annotations\Annotation;
+use Doctrine\Common\Annotations\AnnotationReader;
+use Doctrine\Common\Annotations\Reader;
+use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ODM\MongoDB\Event\PreUpdateEventArgs;
 use Doctrine\ODM\MongoDB\Event\LifecycleEventArgs;
 use AppBundle\Document\Claim;
 use AppBundle\Event\ClaimEvent;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class DoctrineClaimListener
+class DoctrineClaimListener extends BaseDoctrineListener
 {
-    /** @var EventDispatcher */
+    /** @var EventDispatcherInterface */
     protected $dispatcher;
 
     public function __construct($dispatcher)
@@ -32,15 +38,18 @@ class DoctrineClaimListener
 
     public function preUpdate(PreUpdateEventArgs $eventArgs)
     {
-        $document = $eventArgs->getDocument();
-        if ($document instanceof Claim) {
-            if ($eventArgs->hasChangedField('status') &&
-                mb_strtolower($eventArgs->getOldValue('status')) != mb_strtolower($eventArgs->getNewValue('status'))) {
-                if ($eventType = $this->getEventType($eventArgs->getNewValue('status'))) {
-                    $this->triggerEvent($document, $eventType);
-                }
-                $this->triggerEvent($document, $eventArgs->getNewValue('status'));
+        /** @var Claim $claim */
+        $claim = $eventArgs->getDocument();
+        if ($this->hasDataChanged($eventArgs, Claim::class, ['status'])) {
+            if ($eventType = $this->getEventType($eventArgs->getNewValue('status'))) {
+                $this->triggerEvent($claim, $eventType);
             }
+            $this->triggerEvent($claim, $eventArgs->getNewValue('status'));
+        }
+
+        if ($this->hasDataChangedByCategory($eventArgs, DataChange::CATEGORY_SALVA_CLAIM)) {
+            $claim->setUnderwriterLastUpdated(new \DateTime());
+            $this->recalulateChangeSet($eventArgs, $claim);
         }
     }
 

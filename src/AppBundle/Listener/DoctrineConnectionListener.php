@@ -8,10 +8,11 @@ use AppBundle\Document\Connection\StandardConnection;
 use AppBundle\Document\Connection\Connection;
 use AppBundle\Event\ConnectionEvent;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class DoctrineConnectionListener
+class DoctrineConnectionListener extends BaseDoctrineListener
 {
-    /** @var EventDispatcher */
+    /** @var EventDispatcherInterface */
     protected $dispatcher;
 
     public function __construct($dispatcher)
@@ -21,15 +22,15 @@ class DoctrineConnectionListener
 
     public function preUpdate(PreUpdateEventArgs $eventArgs)
     {
-        $document = $eventArgs->getDocument();
-        if ($document instanceof StandardConnection) {
-            if ($eventArgs->hasChangedField('value') && $eventArgs->getOldValue('value') > 0 &&
-                $eventArgs->getOldValue('value') > $eventArgs->getNewValue('value')) {
-                $this->triggerEvent($document);
-            } elseif ($eventArgs->hasChangedField('promoValue')  && $eventArgs->getOldValue('promoValue') > 0 &&
-                $eventArgs->getOldValue('promoValue') > $eventArgs->getNewValue('promoValue')) {
-                $this->triggerEvent($document);
-            }
+        if ($this->hasDataChanged(
+            $eventArgs,
+            StandardConnection::class,
+            ['value', 'promoValue'],
+            self::COMPARE_DECREASE
+        )) {
+            /** @var StandardConnection $document */
+            $document = $eventArgs->getDocument();
+            $this->triggerEvent($document);
         }
     }
 

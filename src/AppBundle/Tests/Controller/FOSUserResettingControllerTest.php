@@ -10,7 +10,7 @@ use Symfony\Component\HttpKernel\DataCollector\EventDataCollector;
  * @group functional-net
  * AppBundle\\Tests\\Controller\\FOSUserControllerTest
  */
-class FOSUserControllerTest extends BaseControllerTest
+class FOSUserResettingControllerTest extends BaseControllerTest
 {
     use \AppBundle\Tests\PhingKernelClassTrait;
     use \AppBundle\Tests\UserClassTrait;

@@ -2,6 +2,8 @@
 
 namespace AppBundle\Command;
 
+use AppBundle\Annotation\DataChange;
+use AppBundle\Document\Claim;
 use AppBundle\Document\Opt\EmailOptOut;
 use AppBundle\Document\Opt\OptOut;
 use AppBundle\Document\User;
@@ -15,6 +17,7 @@ use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\Policy;
 use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\DateTrait;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class TestCommand extends BaseCommand
 {
@@ -28,9 +31,15 @@ class TestCommand extends BaseCommand
         ;
     }
 
+    protected $reader;
+
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->testBirthday();
+        $this->reader = $this->getContainer()->get('annotation_reader');
+        // $this->testBirthday();
+        $claim = new Claim();
+        $claim->setNotificationDate(new \DateTime());
+        print_r($this->getDataChangeAnnotation($claim, 'salva'));
         $output->writeln('Finished');
     }
 
@@ -60,5 +69,24 @@ class TestCommand extends BaseCommand
                 }
             }
         }
+    }
+
+    private function getDataChangeAnnotation($object, $category)
+    {
+        $propertyAccessor = PropertyAccess::createPropertyAccessor();
+        $items = [];
+        // Get method annotation
+        $reflectionObject = new \ReflectionObject($object);
+        $properties = $reflectionObject->getProperties();
+        foreach ($properties as $property) {
+            /** @var \ReflectionProperty $property */
+            /** @var DataChange $propertyAnnotation */
+            $propertyAnnotation = $this->reader->getPropertyAnnotation($property, DataChange::class);
+            if ($propertyAnnotation && in_array($category, $propertyAnnotation->getCategories())) {
+                $items[$property->getName()] = $propertyAccessor->getValue($object, $property->getName());
+            }
+        }
+
+        return $items;
     }
 }

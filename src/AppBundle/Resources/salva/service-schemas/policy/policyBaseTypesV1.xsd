@@ -58,10 +58,12 @@
 
     <xs:complexType name="insuredObjectType">
         <xs:sequence>
+            <xs:element name="id" type="xs:long" minOccurs="0"/>
             <xs:element name="tag" type="xs:string" minOccurs="0"/>
             <xs:element name="productObjectCode" type="base:nonEmptyString"/>
             <xs:element name="insurancePeriodStart" type="xs:dateTime" minOccurs="0"/>
             <xs:element name="insurancePeriodEnd" type="xs:dateTime" minOccurs="0"/>
+            <xs:element name="terminationReasonCode" type="xs:string" minOccurs="0"/>
             <xs:element name="name" type="xs:string" minOccurs="0"/>
             <xs:element name="sumInsured" type="base:moneyType" minOccurs="0"/>
             <xs:element name="calculatedPremium" type="base:moneyType" minOccurs="0"/>
@@ -180,6 +182,7 @@
             <xs:element name="address" type="base:addressType" minOccurs="0"/>
             <xs:element name="email" type="xs:string" minOccurs="0"/>
             <xs:element name="phone" type="xs:string" minOccurs="0"/>
+            <xs:element name="bankAccountNo" type="xs:string" minOccurs="0"/>
             <xs:element name="consents" minOccurs="0">
                 <xs:complexType>
                     <xs:sequence>
