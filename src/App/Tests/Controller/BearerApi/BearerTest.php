@@ -60,7 +60,7 @@ class BearerTest extends BaseControllerTest
     {
         $params = [];
         $headers = [
-            'HTTP_AUTHORIZATION' => 'Bearer test-with-api-alister',
+            'HTTP_AUTHORIZATION' => 'Bearer test-with-api-employee',
             'CONTENT_TYPE' => 'application/json',
         ];
         self::$client->request('GET', '/bearer-api/v1/ping', $params, [], $headers);
@@ -69,7 +69,7 @@ class BearerTest extends BaseControllerTest
 
         $this->assertContains('pong', $content);
         $this->assertJsonStringEqualsJsonString(
-            '{"response":"pong","data":"alister@so-sure.com"}',
+            '{"response":"pong","data":"employee@so-sure.com"}',
             $content
         );
     }
