@@ -15,13 +15,15 @@ export default trackByName;
 $(function() {
 
     $('.sosure-track').on('click', function(e) {
+
+        let name  = $(this).data('event');
+        let url   = $(this).data('event-url');
+        let blank = $(this).data('event-blank');
+
         if (!blank) {
             // if not true prevent default behavior
             e.preventDefault();
         }
-        let name  = $(this).data('event');
-        let url   = $(this).data('event-url');
-        let blank = $(this).data('event-blank');
 
         trackByName(name, function() {
             if (url && blank) {
