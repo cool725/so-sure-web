@@ -172,6 +172,7 @@ class BICommand extends BaseCommand
             '"Claim Final Suspicion"',
             '"Claim Replacement Received Date"',
             '"Claim handling team"',
+            '"Total cost of claim"',
         ]);
         foreach ($claims as $claim) {
             /** @var Claim $claim */
@@ -229,6 +230,7 @@ class BICommand extends BaseCommand
                         ''
                 ),
                 sprintf('"%s"', $claim->getHandlingTeam()),
+                sprintf('"%0.2f"', $claim->getTotalIncurred()),
             ]);
         }
         if (!$skipS3) {
