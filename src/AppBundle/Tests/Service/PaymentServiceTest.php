@@ -160,6 +160,45 @@ class PaymentServiceTest extends WebTestCase
         $this->assertFalse($updatedPolicy->isDifferentPayer());
     }
 
+    public function testConfirmBacsUnpaid()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testConfirmBacsUnpaid', $this),
+            'bar',
+            null,
+            static::$dm
+        );
+        $policy = static::initPolicy(
+            $user,
+            static::$dm,
+            $this->getRandomPhone(static::$dm),
+            null,
+            false
+        );
+        static::$policyService->create($policy, null, true, 12);
+        $policy->setStatus(Policy::STATUS_UNPAID);
+        self::$dm->flush();
+        // Exact same start date should be unpaid
+        //$this->assertFalse($policy->isPolicyPaidToDate($policy->getStart()));
+        $bacs = new BacsPaymentMethod();
+        $bacs->setBankAccount(new BankAccount());
+
+        $dispatcher = $this->createDispatcher($this->once());
+        static::$paymentService->setDispatcher($dispatcher);
+        static::$paymentService->confirmBacs($policy, $bacs, $policy->getStart());
+
+        $updatedPolicy = $this->assertPolicyExists(static::$container, $policy);
+        /** @var BankAccount $bankAcccount */
+        $bankAcccount = $updatedPolicy->getUser()->getPaymentMethod()->getBankAccount();
+        $this->assertNotNull($bankAcccount->getInitialNotificationDate());
+        // should be 3 business days + 4 max holidays/weekends
+        $this->assertLessThan(10, $bankAcccount->getInitialNotificationDate()->diff(new \DateTime)->days);
+        $this->assertEquals($policy->getBilling(), $bankAcccount->getStandardNotificationDate());
+        $this->assertTrue($bankAcccount->isFirstPayment());
+        $this->assertEquals(Policy::STATUS_ACTIVE, $updatedPolicy->getStatus());
+    }
+
     private function createDispatcher($count)
     {
         $dispatcher = $this->getMockBuilder('EventDispatcherInterface')
