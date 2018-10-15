@@ -93,3 +93,10 @@ $dark:          $haiti;
 .opacity-50 {
     opacity: 0.5;
 }
+
+a.text-hover-white {
+
+    &:hover {
+        color: $white !important;
+    }
+}

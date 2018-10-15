@@ -3,6 +3,7 @@
 namespace AppBundle\Document;
 
 use AppBundle\Classes\Salva;
+use AppBundle\Interfaces\EqualsInterface;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -16,7 +17,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
  * @MongoDB\DiscriminatorMap({"phone"="AppBundle\Document\PhonePremium"})
  * @Gedmo\Loggable
  */
-abstract class Premium
+abstract class Premium implements EqualsInterface
 {
     use CurrencyTrait;
 
@@ -234,9 +235,9 @@ abstract class Premium
         return Salva::YEARLY_TOTAL_COMMISSION;
     }
 
-    public function equals(Premium $compare)
+    public function equals($compare)
     {
-        if (!$compare) {
+        if (!$compare || !$compare instanceof Premium) {
             return false;
         }
 

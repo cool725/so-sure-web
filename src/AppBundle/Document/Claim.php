@@ -958,7 +958,7 @@ class Claim
     /**
      * @return \DateTime
      */
-    public function getUnderwriterLastUpdated(): \DateTime
+    public function getUnderwriterLastUpdated()
     {
         return $this->underwriterLastUpdated;
     }

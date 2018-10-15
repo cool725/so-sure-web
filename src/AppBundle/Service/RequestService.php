@@ -413,6 +413,9 @@ class RequestService
         if (mb_stripos($userAgent, 'Google-Apps-Script') !== false) {
             return true;
         }
+        if (mb_stripos($userAgent, 'HappyApps') !== false) {
+            return true;
+        }
 
         return false;
     }

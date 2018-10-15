@@ -19,6 +19,8 @@
             <xs:element name="terminationReasonCode" type="xs:string" minOccurs="1" maxOccurs="1"/>
             <xs:element name="terminationTime" type="xs:dateTime" minOccurs="0" maxOccurs="1"/>
             <xs:element name="usedFinalPremium" type="base:moneyType" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="repaymentMethodCode" type="xs:string" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="repaymentRecipientCustomer" type="policy:customerType" minOccurs="0"/>
         </xs:all>
     </xs:complexType>
     
