@@ -103,18 +103,16 @@ $(function(){
     let imei  = $('.imei'),
         phone = imei.data('make');
 
-    if (phone == 'Samsung') {
-        imei.on('blur', function() {
-            let simei  = $(this).val();
-
-            if (simei.indexOf('/') > 1) {
-                let newtxt = simei.replace('/', '');
-                $(this).val(newtxt);
-            }
-
+    // Trim whitespace and / after user has entered
+    imei.on('blur', function() {
+        let oimei = $(this).val();
+        let timei = oimei.replace(/[\s\/]/g, '');
+        $(this).val(timei);
+        // If valid hide the warning
+        if (phone == 'Samsung') {
             if ($(this).valid()) {
                 $('.samsung-imei').hide();
             }
-        });
-    }
+        }
+    });
 });
