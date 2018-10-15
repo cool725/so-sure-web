@@ -1807,6 +1807,13 @@ abstract class Policy
         return null;
     }
 
+    public function setPolicyStatusActiveIfUnpaid()
+    {
+        if ($this->getStatus() == self::STATUS_UNPAID) {
+            $this->setStatus(self::STATUS_ACTIVE);
+        }
+    }
+
     public function isActive($includeUnpaid = true)
     {
         if ($includeUnpaid) {
