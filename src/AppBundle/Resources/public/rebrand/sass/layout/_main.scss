@@ -12,18 +12,10 @@
         // Curve
         svg {
             transform: translateY(1px);
-            // position: absolute;
-            // top: 100%; left: 0;
-        }
-
-        &-stuck {
-            position: sticky;
-            top: 0;
         }
 
         @include media-breakpoint-up(lg) {
             width: 60vw; height: 100vh;
-            position: static;
 
             // Scroll stuff
             overflow-y: scroll;
@@ -37,8 +29,6 @@
                 background: transparent;
             }
         }
-
-        // background-color: $crayon-blue;
     }
 
     &__main {
@@ -46,7 +36,6 @@
         padding-bottom: 1.5rem;
 
         @include media-breakpoint-up(lg) {
-            // height: 70vh;
             padding-top: 12rem;
         }
     }
@@ -62,7 +51,6 @@
                 position: absolute;
                 z-index: 4;
                 right: 0; top: 0;
-                // transform: translateX(1px);
             }
         }
     }
@@ -146,6 +134,10 @@
         @include media-breakpoint-up(md) {
             display: none;
         }
+    }
+
+    @include media-breakpoint-up(lg) {
+        overflow: hidden;
     }
 }
 
