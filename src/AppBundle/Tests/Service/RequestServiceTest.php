@@ -66,6 +66,16 @@ class RequestServiceTest extends WebTestCase
         $this->assertFalse(self::$requestService->isExcludedAnalyticsUserAgent(''));
     }
 
+    public function testIsExcludedAnalyticsIp()
+    {
+        $sosureIps = self::$container->getParameter('sosure_ips');
+        $this->assertGreaterThan(0, count($sosureIps));
+
+        foreach ($sosureIps as $sosureIp) {
+            $this->assertTrue(self::$requestService->isExcludedAnalyticsIp($sosureIp));
+        }
+    }
+
     public function testIsExcludedPreviewPrefetch()
     {
         $crawler =  static::$client->request(
