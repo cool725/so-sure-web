@@ -4306,7 +4306,8 @@ abstract class Policy
                     /*
                     $diff = $scheduledPayment->getScheduled()->diff($this->getBilling());
                     print sprintf(
-                        "%s %s %s%s",
+                        "%s%s %s %s%s",
+                        PHP_EOL,
                         $scheduledPayment->getScheduled()->format(\DateTime::ATOM),
                         $this->getBilling()->format(\DateTime::ATOM),
                         json_encode($diff),
@@ -4320,12 +4321,6 @@ abstract class Policy
         }
 
         $totalScheduledPayments = ScheduledPayment::sumScheduledPaymentAmounts($scheduledPayments);
-        /*
-        print $totalScheduledPayments . PHP_EOL;
-        print $this->getOutstandingPremium() . PHP_EOL;
-        print $this->getPremium()->getYearlyPremiumPrice() . PHP_EOL;
-        print $this->getPremiumPaid() . PHP_EOL;
-        */
 
         // Pending bacs payments should be thought of as successful and thereby reduce the outstanding premium
         $outstandingPremium = $this->getOutstandingPremium() - $this->getPendingBacsPaymentsTotal();
@@ -4348,6 +4343,13 @@ abstract class Policy
                 return true;
             }
         }
+
+        /*
+        print $totalScheduledPayments . PHP_EOL;
+        print $this->getOutstandingPremium() . PHP_EOL;
+        print $this->getPremium()->getYearlyPremiumPrice() . PHP_EOL;
+        print $this->getPremiumPaid() . PHP_EOL;
+        */
 
         return false;
     }
