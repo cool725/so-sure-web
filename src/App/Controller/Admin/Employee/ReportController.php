@@ -45,12 +45,12 @@ class ReportController extends AbstractController
             list($start, $end) = $this->reporting->getLastPeriod();
         } elseif ($period == 'month') {
             list($start, $end) = $this->reporting->getLastPeriod(
-            new DateTime('first day of this month')
+                new DateTime('first day of this month')
             );
         } elseif ($period == 'last month') {
             list($start, $end) = $this->reporting->getLastPeriod(
-            new DateTime('first day of last month'),
-            new DateTime('first day of this month')
+                new DateTime('first day of last month'),
+                new DateTime('first day of this month')
             );
         } else {
             $report['error'] = "Invalid URL, period {$period} does not exist.";
