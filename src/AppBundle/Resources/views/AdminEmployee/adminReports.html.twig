@@ -1,14 +1,5 @@
 {% extends 'admin_claims_base.html.twig' %}
 
-{% block javascripts %}
-    {{ parent() }}
-    {% javascripts
-        '@AppBundle/Resources/public/js/Admin/report.js'
-    %}
-    <script src="{{ asset_url }}"></script>
-    {% endjavascripts %}
-{% endblock %}
-
 {% block body %}
     <div class='container'>
         <h2>so-sure Reports</h2>
