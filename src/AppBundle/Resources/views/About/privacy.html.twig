@@ -20,8 +20,10 @@
             {# Main Content #}
             <div class="faq__main__container">
                 <div class="faq__main px-4 px-lg-5">
-                    <h5 class="text-zaffre mb-0">Welcome to the so-sure's privacy notice</h5>
-                    <h1 class="text-primary mb-4">Website Privacy Policy</h1>
+                    {%  if not hide_title %}
+                        <h5 class="text-zaffre mb-0">Welcome to the so-sure's privacy notice</h5>
+                        <h1 class="text-primary mb-4">Website Privacy Policy</h1>
+                    {% endif %}
                     <p>so-sure respects your privacy and is committed to protecting your personal data. This privacy notice will inform you as to how we look after your personal data when you visit our website (regardless of where you visit it from) and tell you about your privacy rights and how the law protects you.</p>
                     <p class="mb-5">This privacy notice is provided in a layered format so you can click through to the specific areas set out below. Please also use the Glossary to understand the meaning of some of the terms used in this privacy notice.</p>
                     <div id="important-information-and-who-we-are" class="expanding-cardbox mb-4">
