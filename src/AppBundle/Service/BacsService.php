@@ -561,6 +561,7 @@ class BacsService
                     $debitPayment->setSerialNumber($submittedPayment->getSerialNumber());
                     $debitPayment->setDate($this->getNextBusinessDay($currentProcessingDate));
                     $debitPayment->setSource(Payment::SOURCE_SYSTEM);
+                    $debitPayment->setNotes('Arudd payment failure');
                     $policy->addPayment($debitPayment);
                     $debitPayment->setRefundTotalCommission($submittedPayment->getTotalCommission());
                     $debitPayment->calculateSplit();
@@ -568,9 +569,8 @@ class BacsService
                     $submittedPayment->approve($currentProcessingDate, true);
 
                     // Set policy as unpaid if there's a payment failure
-                    if (!$policy->isPolicyPaidToDate() && $policy->getStatus() == Policy::STATUS_ACTIVE) {
-                        $policy->setStatus(Policy::STATUS_UNPAID);
-                    }
+                    $policy->setPolicyStatusUnpaidIfActive();
+
                     $this->dm->flush(null, array('w' => 'majority', 'j' => true));
                     $this->triggerPolicyEvent($policy, PolicyEvent::EVENT_UNPAID);
 
@@ -942,7 +942,13 @@ class BacsService
                     /** @var BacsPaymentMethod $bacs */
                     $bacs = $user->getPaymentMethod();
                     $bacs->getBankAccount()->setMandateStatus(BankAccount::MANDATE_CANCELLED);
-                    $this->dm->flush();
+
+                    foreach ($user->getValidPolicies(true) as $policy) {
+                        /** @var Policy $policy */
+                        $policy->setPolicyStatusUnpaidIfActive();
+                    }
+
+                    $this->dm->flush(null, array('w' => 'majority', 'j' => true));
                     $results['cancelled-ddi']++;
                 } else {
                     throw new \Exception(sprintf('Unknown auddis reason %s', $reason));

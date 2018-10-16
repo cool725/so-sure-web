@@ -128,8 +128,6 @@ parameters:
 
     davies_ip: 10.0.2.2
     directgroup_ip: 10.0.2.2
-    sosure_rwe_ip: 10.0.2.2
-    sosure_patrick_ip: 10.0.2.2
 
     sosure_employee_cookie_value: 'changeme'
     sosure_employee_cookie_domain: '.dev.so-sure.net'

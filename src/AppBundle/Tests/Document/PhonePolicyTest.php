@@ -2167,11 +2167,11 @@ class PhonePolicyTest extends WebTestCase
         $policy->link($renewal);
         
         $this->assertEquals(
-            new \DateTime('2017-01-01 01:00'),
+            new \DateTime('2017-01-01 00:00'),
             $renewal->getNextBillingDate(new \DateTime('2017-01-01'))
         );
         $this->assertEquals(
-            new \DateTime('2017-02-01 01:00'),
+            new \DateTime('2017-02-01 00:00'),
             $renewal->getNextBillingDate(new \DateTime('2017-01-02'))
         );
 
@@ -3117,11 +3117,11 @@ class PhonePolicyTest extends WebTestCase
         $policy->setPremiumInstallments(12);
         $policy->setStart(new \DateTime('2016-01-15'));
         $this->assertEquals(
-            new \DateTime('2016-02-15 01:00', $timezone),
+            new \DateTime('2016-02-15 00:00', $timezone),
             $policy->getNextBillingDate(new \DateTime('2016-02-14'))
         );
         $this->assertEquals(
-            new \DateTime('2016-03-15 01:00', $timezone),
+            new \DateTime('2016-03-15 00:00', $timezone),
             $policy->getNextBillingDate(new \DateTime('2016-02-16'))
         );
 
@@ -3129,11 +3129,11 @@ class PhonePolicyTest extends WebTestCase
         $policy->setPremiumInstallments(12);
         $policy->setStart(new \DateTime('2016-03-29'));
         $this->assertEquals(
-            new \DateTime('2016-04-28 01:00', $timezone),
+            new \DateTime('2016-04-28 00:00', $timezone),
             $policy->getNextBillingDate(new \DateTime('2016-04-14'))
         );
         $this->assertEquals(
-            new \DateTime('2016-05-28 01:00', $timezone),
+            new \DateTime('2016-05-28 00:00', $timezone),
             $policy->getNextBillingDate(new \DateTime('2016-04-30'))
         );
     }
@@ -5208,5 +5208,43 @@ class PhonePolicyTest extends WebTestCase
         $policy->setStatus(Policy::STATUS_UNPAID);
         $this->assertFalse($policy->isUnpaidCloseToExpirationDate($expirationTwelve));
         $this->assertTrue($policy->isUnpaidCloseToExpirationDate($expirationTen));
+    }
+
+    public function testSetPolicyStatusActiveIfUnpaid()
+    {
+        $policy = new SalvaPhonePolicy();
+        $policy->setPolicyStatusActiveIfUnpaid();
+        $this->assertNull($policy->getStatus());
+
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        $policy->setPolicyStatusActiveIfUnpaid();
+        $this->assertEquals(Policy::STATUS_ACTIVE, $policy->getStatus());
+
+        $policy->setStatus(Policy::STATUS_UNPAID);
+        $policy->setPolicyStatusActiveIfUnpaid();
+        $this->assertEquals(Policy::STATUS_ACTIVE, $policy->getStatus());
+
+        $policy->setStatus(Policy::STATUS_CANCELLED);
+        $policy->setPolicyStatusActiveIfUnpaid();
+        $this->assertEquals(Policy::STATUS_CANCELLED, $policy->getStatus());
+    }
+
+    public function testSetPolicyStatusUnpaidIfActive()
+    {
+        $policy = new SalvaPhonePolicy();
+        $policy->setPolicyStatusUnpaidIfActive();
+        $this->assertNull($policy->getStatus());
+
+        $policy->setStatus(Policy::STATUS_UNPAID);
+        $policy->setPolicyStatusUnpaidIfActive();
+        $this->assertEquals(Policy::STATUS_UNPAID, $policy->getStatus());
+
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        $policy->setPolicyStatusUnpaidIfActive(false);
+        $this->assertEquals(Policy::STATUS_UNPAID, $policy->getStatus());
+
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        $policy->setPolicyStatusUnpaidIfActive(true);
+        $this->assertEquals(Policy::STATUS_UNPAID, $policy->getStatus());
     }
 }

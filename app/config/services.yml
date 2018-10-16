@@ -302,6 +302,7 @@ services:
             - "@security.token_storage"
             - "%sosure_employee_cookie_value%"
             - "%kernel.environment%"
+            - "%sosure_ips%"
 
     app.twig.branch:
         class: AppBundle\Service\BranchTwigExtension
@@ -1274,7 +1275,7 @@ services:
         class: AppBundle\Security\AccessDeniedHttpExceptionVoter
         arguments:
             - "@request_stack"
-            - ["%sosure_rwe_ip%", "%sosure_patrick_ip%"]
+            - "%sosure_ips%"
         tags:
             - { name: staffim_rollbar.report_voter }
 

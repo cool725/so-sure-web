@@ -543,6 +543,7 @@ class OpsController extends BaseController
                 'cdncache-a.akamaihd.net',
                 'sxt.cdn.skype.com',
                 'cdn.joinhoney.com',
+                'mozbar.moz.com',
             ])) {
                 $logger->debug(sprintf('Content-Security-Policy called with ignore host: %s', $host));
 

@@ -33,6 +33,7 @@ class RequestService
     protected $adminCookieValue;
     protected $mobileDetect;
     protected $environment;
+    protected $excludedIps;
 
     public function setEnvironment($environment)
     {
@@ -45,13 +46,15 @@ class RequestService
      * @param TokenStorage    $tokenStorage
      * @param string          $adminCookieValue
      * @param string          $environment
+     * @param string          $excludedIps
      */
     public function __construct(
         RequestStack $requestStack,
         LoggerInterface $logger,
         TokenStorage $tokenStorage,
         $adminCookieValue,
-        $environment
+        $environment,
+        $excludedIps
     ) {
         $this->requestStack = $requestStack;
         $this->logger = $logger;
@@ -61,6 +64,7 @@ class RequestService
         if ($request = $this->requestStack->getCurrentRequest()) {
             $this->mobileDetect = new Mobile_Detect($request->server->all());
         }
+        $this->excludedIps = $excludedIps;
     }
 
     public function getReferer()
@@ -303,20 +307,17 @@ class RequestService
         return false;
     }
 
-    public function isExcludedAnalyticsIp()
+    public function isExcludedAnalyticsIp($clientIp = null)
     {
-        if ($clientIp = $this->getClientIp()) {
-            return IpUtils::checkIp($clientIp, [
-                '62.253.24.186', // rwe
-                '213.86.221.35', // wework
-                '80.169.94.194', // rwe shoreditch
-                '167.98.14.60', // coccoon
-                '217.158.0.52', // davies
-                // '10.0.2.2', // for debugging - vagrant
-            ]);
+        if (!$clientIp) {
+            $clientIp = $this->getClientIp();
         }
 
-        return false;
+        if (!$clientIp) {
+            return false;
+        }
+
+        return IpUtils::checkIp($clientIp, $this->excludedIps);
     }
 
     public function getAllXHeaders()
