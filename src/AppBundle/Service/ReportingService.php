@@ -1223,13 +1223,33 @@ class ReportingService
             $start->sub(new DateInterval('P7D'));
             $start->setTime(0, 0, 0);   // default to start of day, midnight
         }
-
         if ($end) {
             $end = new DateTime($end, new DateTimeZone(SoSure::TIMEZONE));
         } else {
             $end = new DateTime();
             $end->setTime(0, 0, 0);   // default to start of day here too. Start is 7 days before
         }
+        return [$start, $end];
+    }
+
+    /**
+     * gives you a period of time with an optional starting date and an optional
+     * ending date, rounding these to the beginnings of days.
+     * @param $start is the start date and defaults to a week ago.
+     * @param $end is the end date and defaults to the start of today.
+     * @return array containing the new start and end dates.
+     */
+    public function getLastPeriod($start = null, $end = null): array
+    {
+        if (!$start) {
+            $start = new \DateTime();
+            $start->sub(new DateInterval('P7D'));
+        }
+        if (!$end) {
+            $end = new \DateTime('now');
+        }
+        $start->setTime(0, 0, 0);
+        $end->setTime(0, 0, 0);
 
         return [$start, $end];
     }

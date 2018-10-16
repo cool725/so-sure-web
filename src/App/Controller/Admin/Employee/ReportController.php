@@ -31,36 +31,46 @@ class ReportController extends AbstractController
         $this->reporting = $reporting;
     }
 
+    /** Collects the data needed for all three reports and returns it in an
+     * associative array.
+     * @param string $period is the period for the claims report
+     * @return array of the three sub reports.
+     */
+    private function buildReport($period)
+    {
+        $report = ['periods' => ['week', 'month', 'last month']];
+
+        // Get the start and end dates for the given period.
+        if ($period == 'week') {
+            list($start, $end) = $this->reporting->getLastPeriod();
+        } else if ($period == 'month') {
+            list($start, $end) = $this->reporting->getLastPeriod(
+                new DateTime('first day of this month'));
+        } else if ($period == 'last month') {
+            list($start, $end) = $this->reporting->getLastPeriod(
+                new DateTime('first day of last month'),
+                new DateTime('first day of this month'));
+        } else {
+            $report['error'] = "Invalid URL, period {$period} does not exist.";
+            $report['period'] = 'week';
+            return $report;
+        }
+
+        $report['claims'] = $this->reporting->report($start, $end, false);
+        $report['connections'] = $this->reporting->connectionReport();
+        $report['scheduledPayments'] = $this->reporting->getScheduledPayments();
+        $report['period'] = $period;
+        return $report;
+    }
+
     /**
      * @Route("/admin/reports",        name="admin_reports")
-     * @Route("/admin/reports/claims", name="admin_reports_claims")
      */
     public function claimsReportAction(Request $request)
     {
-        list($start, $end) = $this->reporting->getLast7DaysPeriod($request->get('start'), $end = $request->get('end'));
-
-        $report = $this->reporting->report($start, $end, false);    // 233 queries
-
-        return $this->render('AppBundle:AdminEmployee:adminReports.html.twig', $report);
-    }
-
-    /**
-     * @Route("/admin/reports/connections", name="admin_reports_connections")
-     */
-    public function connectionsReportAction()
-    {
-        $report['data'] = $this->reporting->connectionReport();
-
-        return $this->render('AppBundle:AdminEmployee:adminReports.html.twig', $report);
-    }
-
-    /**
-     * @Route("/admin/reports/scheduled", name="admin_reports_scheduled")
-     */
-    public function scheduledReportAction()
-    {
-        $report['data']['scheduledPayments'] = $this->reporting->getScheduledPayments();
-
-        return $this->render('AppBundle:AdminEmployee:adminReports.html.twig', $report);
+        $period = $request->get('period');
+        $report = $this->buildReport(isset($period) ? $period : 'week');
+        return $this->render('AppBundle:AdminEmployee:adminReports.html.twig',
+            $report);
     }
 }
