@@ -43,13 +43,15 @@ class ReportController extends AbstractController
         // Get the start and end dates for the given period.
         if ($period == 'week') {
             list($start, $end) = $this->reporting->getLastPeriod();
-        } else if ($period == 'month') {
+        } elseif ($period == 'month') {
             list($start, $end) = $this->reporting->getLastPeriod(
-                new DateTime('first day of this month'));
-        } else if ($period == 'last month') {
+            new DateTime('first day of this month')
+            );
+        } elseif ($period == 'last month') {
             list($start, $end) = $this->reporting->getLastPeriod(
-                new DateTime('first day of last month'),
-                new DateTime('first day of this month'));
+            new DateTime('first day of last month'),
+            new DateTime('first day of this month')
+            );
         } else {
             $report['error'] = "Invalid URL, period {$period} does not exist.";
             $report['period'] = 'week';
@@ -70,7 +72,6 @@ class ReportController extends AbstractController
     {
         $period = $request->get('period');
         $report = $this->buildReport(isset($period) ? $period : 'week');
-        return $this->render('AppBundle:AdminEmployee:adminReports.html.twig',
-            $report);
+        return $this->render('AppBundle:AdminEmployee:adminReports.html.twig', $report);
     }
 }
