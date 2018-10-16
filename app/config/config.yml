@@ -21,7 +21,7 @@ parameters:
         - ROLE_CLAIMS
         - ROLE_EMPLOYEE
     sosure_ips:
-        - '82.163.118.154' # patrick
+        - '82.16.104.75' # patrick
         - '82.163.118.154' # so-sure ip @ frameworks
         - '82.163.117.184' # frameworks ip
 
