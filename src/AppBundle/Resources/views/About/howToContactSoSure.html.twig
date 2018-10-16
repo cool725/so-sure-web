@@ -1,85 +1,64 @@
-{% extends 'base.html.twig' %}
+{% extends 'base_rebrand.html.twig' %}
 
 {# Set vars #}
-{% set new_stylesheet = 1 %}
+{% set body_class = 'contact-us' %}
 
-{% block stylesheets %}
-    {{ parent() }}
-    {% stylesheets output='css/*.css'
-        '@AppBundle/Resources/public/sass/page/about.scss'
-    %}
-        <link rel="stylesheet" href="{{ asset_url }}">
-    {% endstylesheets %}
+{% block title %}so-sure - Contact Us{% endblock %}
+{% block meta %}
+
+{% endblock %}
+
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/faq.css') }}">
 {% endblock %}
 
 {% block body %}
 
-<section id="contact-us" class="section-about-us">
-    <div class="container">
-        <div class="about-panel">
-            <div class="about-panel--thumb about-panel--logo">
-                <img src="{{ cdn_url }}/images/logo/so-sure-blue-smile.svg" alt="so-sure" width="100px" height="100px">
+    <section class="faq">
+        <div class="d-lg-flex">
+
+            {# Main Content #}
+            <div class="faq__main__container">
+                <div class="faq__main px-4 px-lg-5">
+                    <h5 class="text-zaffre mb-0">We are always happy to talk</h5>
+                    <h1 class="text-primary mb-4">Contact Us</h1>
+                    <p class="mb-5">We understand that everyone is different, that's why there's many ways to contact us here at so-sure. Our friendly, helpfuly customer service team will aim to get back to you within a few business hours.  In the meantime why not check out our handy <a href="{{ path('faq') }}">faq</a> section, you can find most of our customers top questions can be found there.</p>
+
+                </div>
             </div>
-            <h2 class="text-blue text-center">Contact us</h2>
-            <p class="lead text-center">We are always happy to talk and can be found via</p>
-            <ul class="link-list list-inline">
-                <li><a href="#" id="contact-us-intercom"><img src="{{ cdn_url }}/images/about/so-sure_intercom-logo.svg" alt="Intercom" width="70px" height="70px"><span>Intercom</span></a></li>
-                <li><a href="mailto:hello@wearesosure.com"><img src="{{ cdn_url }}/images/about/so-sure_email-logo.svg" alt="Email" width="70px" height="70px"><span>Email</span></a></li>
-                <li><a href="https://www.facebook.com/wearesosure/" target="_blank"><img src="{{ cdn_url }}/images/about/so-sure_facebook-logo.svg" alt="Facebook" width="70px" height="70px"><span>Facebook</span></a></li>
-                <li><a href="https://twitter.com/wearesosure" target="_blank"><img src="{{ cdn_url }}/images/about/so-sure_twitter-bird-logo.svg" alt="Twitter" width="70px" height="70px"><span>Twitter</span></a></li>
-            </ul>
-            <p class="lead text-center">However, if you have a more technical question see our <a href="{{ path('faq') }}">faq</a>.</p>
-            <p class="lead text-center">Or drop us a note via the form below:</p>
-            {{ form_start(contact_form, {'attr':{'id': 'contact-us-form', 'class':'contact-page-from'}}) }}
-                <div class="row">
-                    <div class="col-sm-6">
-                        <div class="form-group">
-                            <label class="sr-only">Name <span class="req">*</span></label>
-                            {{ form_widget(contact_form.name, { 'attr': {'class': 'form-control', 'placeholder': 'Name *'}}) }}
-                        </div>
-                    </div>
-                    <div class="col-sm-6">
-                        <div class="form-group">
-                            <label class="sr-only">Email <span class="req">*</span></label>
-                            {{ form_widget(contact_form.email, { 'attr': {'class': 'form-control', 'placeholder': 'Email *'}}) }}
-                        </div>
-                    </div>
+
+            {# Sub Content #}
+            <div class="faq__sub__container d-none d-lg-flex justify-content-lg-start">
+                {# Curve Desktop #}
+                <div class="faq__curve">
+                    <svg preserveAspectRatio="xMinYMin meet" viewBox="0 0 69 846" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                        <!-- Generator: Sketch 51.3 (57544) - http://www.bohemiancoding.com/sketch -->
+                        <desc>Created with Sketch.</desc>
+                        <defs></defs>
+                        <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                            <g id="3.0-so-sure-(Price-&amp;-Payment)">
+                                <path d="M0,0 L69,0 C31,140 12,280.666667 12,422 C12,563.333333 31,704.666667 69,846 L0,846 L0,0 Z" id="Rectangle-2" fill="#FFFFFF"></path>
+                                <path d="M69,0 L69,846 L68,846 C30.6666667,705 12,564 12,423 C12,282 31,141 69,0 Z" id="Rectangle-3" fill="#E5F4FF"></path>
+                            </g>
+                        </g>
+                    </svg>
                 </div>
-                <div class="row">
-                    <div class="col-sm-12">
-                        <div class="form-group">
-                            <label class="sr-only">Phone Number we can reach you on <span class="req">*</span></label>
-                            {{ form_widget(contact_form.phone, { 'attr': {'class': 'form-control', 'placeholder': 'Phone Number we can reach you on *'}}) }}
-                        </div>
-                    </div>
+                <div class="faq__sub text-center">
+                    <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_contract.png" alt="so-sure - contract" width="200px" class="d-block mx-auto">
+                    <h2 class="text-dodger-blue mb-5">Contact Us 🤓</h2>
+                    {# <a id="back-to-top-faq" href="#" class="btn btn-outline-dodger-blue"><i class="far fa-arrow-up mr-2"></i> Back to top</a> #}
                 </div>
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="form-group">
-                            <label class="sr-only">Your message:<span class="req">*</span></label>
-                            {{ form_widget(contact_form.message, { 'attr': {'class': 'form-control', 'rows': '15', 'placeholder': 'Your message *'}}) }}
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-12 text-center">
-                        <div class="form-group">
-                            {{ form_widget(contact_form.submit, { 'label': 'Contact us', 'attr': {'class': 'btn btn-blue btn-lg'}}) }}
-                        </div>
-                    </div>
-                </div>
-            {{ form_end(contact_form) }}
+            </div>
+
         </div>
-    </div>
-</section>
+    </section>
 
 {% endblock %}
 
-{% block javascripts %}
-    {{ parent() }}
-    {% javascripts
-    'components/jquery-validation/jquery.validate.min.js'
-    '@AppBundle/Resources/public/js/Default/jqueryValidatorMethods.js'
-    '@AppBundle/Resources/public/js/About/index.js' %}
-    <script src="{{ asset_url }}"></script>{% endjavascripts %}
+{% block footer %}
+    {# TODO: Fix footer #}
 {% endblock %}
+
+{# {% block javascriptsPage %}
+    <script src="{{ asset('css-js/faq.js') }}"></script>
+{% endblock %} #}
