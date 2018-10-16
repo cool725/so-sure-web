@@ -1,4 +1,5 @@
 {% extends 'base_rebrand.html.twig' %}
+{% form_theme contact_form 'AppBundle:Form:submit.html.twig' %}
 
 {# Set vars #}
 {% set body_class = 'contact-us' %}
@@ -24,21 +25,6 @@
                     <h5 class="text-zaffre mb-0">We are always happy to talk</h5>
                     <h1 class="text-primary mb-4">Contact Us</h1>
                     <p class="mb-3">We understand that everyone is different, that's why there's many ways to contact us here at so-sure. Our friendly, helpfuly customer service team will aim to get back to you within a few business hours.  In the meantime why not check out our handy <a href="{{ path('faq') }}">faq</a> section, you can find most of the answers to the top questions we get there.</p>
-
-{#                     <ul class="list-inline mb-4">
-                        <li class="list-inline-item">
-
-                        </li>
-                        <li class="list-inline-item">
-
-                        </li>
-                        <li class="list-inline-item">
-
-                        </li>
-                        <li class="list-inline-item">
-
-                        </li>
-                    </ul> #}
 
                     <div class="contact__options mb-4">
                         <div class="row">
@@ -69,22 +55,43 @@
                         </div>
                     </div>
 
-                    <h5 class="text-zaffre">Or drop us a note via the form below:</h5>
+                    <h5 class="text-zaffre mb-3">Or drop us a note via the form below:</h5>
 
                     {{ form_start(contact_form, {
                         'attr':{
                             'id': 'contact-us-form',
-                            'class':''
+                            'class':'mb-5'
                     }}) }}
 
-                        <div class="form-row">
-                            <div class="col-sm">
-                                <label for="">Name <span class="req">*</span></label>
-                                {{ form_widget(contact_form.name, { 'attr': {'class': 'form-control', 'placeholder': 'Name *'}}) }}
+                        <div class="row">
+                            <div class="form-group col-sm">
+                                {{ form_label(contact_form.name, 'Name', { 'label_attr': {'class': ''} }) }}
+                                {{ form_widget(contact_form.name, { 'attr': {'class': 'form-control', 'placeholder': 'Enter your name'}}) }}
                             </div>
-                            <div class="col-sm">
+                            <div class="form-group col-sm">
+                                {{ form_label(contact_form.email, 'Email', { 'label_attr': {'class': ''} }) }}
+                                {{ form_widget(contact_form.email, { 'attr': {'class': 'form-control', 'placeholder': 'Enter your email'}}) }}
+                            </div>
+                        </div>
 
-                            </div>
+                        <div class="form-group">
+                            {{ form_label(contact_form.phone, 'Phone number', { 'label_attr': {'class': ''} }) }}
+                            {{ form_widget(contact_form.phone, { 'attr': {'class': 'form-control', 'placeholder': 'Best Phone Number we can reach you on'}}) }}
+                        </div>
+
+                        <div class="form-group">
+                            {{ form_label(contact_form.message, 'Your message', { 'label_attr': {'class': ''} }) }}
+                            {{ form_widget(contact_form.message, { 'attr': {'class': 'form-control', 'rows': '10', 'placeholder': 'Enter your message...'}}) }}
+                        </div>
+
+                        <div class="form-group text-right">
+                            {{ form_widget(contact_form.submit, {
+                                'label': 'Contact us',
+                                'fa': 'far fa-long-arrow-right fa-lg ml-2',
+                                'right': true,
+                                'attr': {
+                                    'class': 'btn btn-success btn-green-gradient btn-block-xs'
+                            }}) }}
                         </div>
 
                     {{ form_end(contact_form) }}

@@ -6,7 +6,10 @@ require('../../sass/pages/contact.scss');
 // require('bootstrap/js/dist/scrollspy');
 
 // Require components
-// require('../common/fixedWidth.js');
+require('jquery-validation');
+require('../../../js/Default/jqueryValidatorMethods.js');
+
+const sosure = sosure || {};
 
 $(function() {
 
