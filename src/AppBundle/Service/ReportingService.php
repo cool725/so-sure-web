@@ -1235,8 +1235,8 @@ class ReportingService
     /**
      * gives you a period of time with an optional starting date and an optional
      * ending date, rounding these to the beginnings of days.
-     * @param $start is the start date and defaults to a week ago.
-     * @param $end is the end date and defaults to the start of today.
+     * @param DateTime $start is the start date and defaults to a week ago.
+     * @param DateTime $end is the end date and defaults to the start of today.
      * @return array containing the new start and end dates.
      */
     public function getLastPeriod($start = null, $end = null): array
