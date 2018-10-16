@@ -1814,6 +1814,15 @@ abstract class Policy
         }
     }
 
+    public function setPolicyStatusUnpaidIfActive($checkUnpaidStatus = true, \DateTime $date = null)
+    {
+        if ($this->getStatus() == self::STATUS_ACTIVE) {
+            if (!$checkUnpaidStatus || ($checkUnpaidStatus && !$this->isPolicyPaidToDate($date))) {
+                $this->setStatus(self::STATUS_UNPAID);
+            }
+        }
+    }
+
     public function isActive($includeUnpaid = true)
     {
         if ($includeUnpaid) {

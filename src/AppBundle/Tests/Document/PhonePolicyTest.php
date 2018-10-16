@@ -5209,4 +5209,42 @@ class PhonePolicyTest extends WebTestCase
         $this->assertFalse($policy->isUnpaidCloseToExpirationDate($expirationTwelve));
         $this->assertTrue($policy->isUnpaidCloseToExpirationDate($expirationTen));
     }
+
+    public function testSetPolicyStatusActiveIfUnpaid()
+    {
+        $policy = new SalvaPhonePolicy();
+        $policy->setPolicyStatusActiveIfUnpaid();
+        $this->assertNull($policy->getStatus());
+
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        $policy->setPolicyStatusActiveIfUnpaid();
+        $this->assertEquals(Policy::STATUS_ACTIVE, $policy->getStatus());
+
+        $policy->setStatus(Policy::STATUS_UNPAID);
+        $policy->setPolicyStatusActiveIfUnpaid();
+        $this->assertEquals(Policy::STATUS_ACTIVE, $policy->getStatus());
+
+        $policy->setStatus(Policy::STATUS_CANCELLED);
+        $policy->setPolicyStatusActiveIfUnpaid();
+        $this->assertEquals(Policy::STATUS_CANCELLED, $policy->getStatus());
+    }
+
+    public function testSetPolicyStatusUnpaidIfActive()
+    {
+        $policy = new SalvaPhonePolicy();
+        $policy->setPolicyStatusUnpaidIfActive();
+        $this->assertNull($policy->getStatus());
+
+        $policy->setStatus(Policy::STATUS_UNPAID);
+        $policy->setPolicyStatusUnpaidIfActive();
+        $this->assertEquals(Policy::STATUS_UNPAID, $policy->getStatus());
+
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        $policy->setPolicyStatusUnpaidIfActive(false);
+        $this->assertEquals(Policy::STATUS_UNPAID, $policy->getStatus());
+
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        $policy->setPolicyStatusUnpaidIfActive(true);
+        $this->assertEquals(Policy::STATUS_UNPAID, $policy->getStatus());
+    }
 }
