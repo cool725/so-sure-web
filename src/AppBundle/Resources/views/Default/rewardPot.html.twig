@@ -14,7 +14,42 @@
 
 {% block body %}
 
-    Reward Pot
+    <section class="hero">
+        <div class="container container-xtra">
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="hero__intro">
+                        <h1 class="mb-4 text-white">
+                            <span class="sub">An insurance company,</span><br>
+                            giving you money back.<br>
+                            <span class="sub">Sorry, what!?</span>
+                        </h1>
+                        <p class="mb-4 text-white">By joining forces with your most careful friends and family members, you could see up to 80% of your insurance premium reimbursed every year. Yes, really.</p>
+                    </div>
+                    <div class="hero__controls pb-3">
+                        <a href="#" class="btn btn-primary btn-white btn-block-xs mr-sm-2 get-a-quote">Get a Quote</a>
+                        <a href="#"
+                           class="btn btn-outline-white watch-video btn-block-xs"
+                           data-event="watch-video-index-hero"
+                           data-toggle="modal"
+                           data-target="#sosure-video-modal"
+                           data-src="https://www.youtube.com/embed/QEskwqsNgrQ">
+                            <i class="far fa-play-circle fa-lg opacity-50 mr-1"></i>
+                            How it works
+                        </a>
+                    </div>
+                </div>
+                <div class="col-lg-6 d-none d-lg-block">
+                    <div class="hero__illustration">
+                        {# <img src="{{ cdn_url }}/images/rebrand/homepage/so-sure_hero-illustration-with-no-shadow.png" alt="so-sure - social insurance" class="img-fluid animated jackInTheBox"> #}
+                    </div>
+                </div>
+            </div>
+            <div class="hero__illustration  d-block d-lg-none">
+                {# <img src="{{ cdn_url }}/images/rebrand/homepage/so-sure_hero-illustration-with-no-shadow.png" alt="so-sure - social insurance" class="img-fluid animated jackInTheBox"> #}
+            </div>
+        </div>
+    </section>
 
     {# Page Modals #}
     {% include 'AppBundle::Default/_modalVideo.html.twig' %}
