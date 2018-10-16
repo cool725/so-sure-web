@@ -126,6 +126,14 @@ class DefaultController extends BaseController
     }
 
     /**
+     * @Route("/reward-pot", name="reward_pot")
+     */
+    public function rewardPot()
+    {
+        return $this->render('AppBundle:Default:rewardPot.html.twig');
+    }
+
+    /**
      * @Route("/eb", name="eb")
      * @Template
      */

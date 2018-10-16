@@ -1,0 +1,26 @@
+{% extends 'base_rebrand.html.twig' %}
+
+{# Set vars #}
+{% set body_class = 'reward-pot' %}
+
+{% block title %}so-sure - Reward Pot{% endblock %}
+{% block meta %}
+    <meta name="description" content="Social mobile phone insurance that's better and up to 80% cheaper when you connect with friends and don't claim. Download our app now to see how much you could save."/>
+{% endblock %}
+
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/rewardpot.css') }}">
+{% endblock %}
+
+{% block body %}
+
+    Reward Pot
+
+    {# Page Modals #}
+    {% include 'AppBundle::Default/_modalVideo.html.twig' %}
+
+{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/rewardpot.js') }}"></script>
+{% endblock %}
