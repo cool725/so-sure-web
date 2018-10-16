@@ -57,12 +57,12 @@
 
                     <h5 class="text-zaffre mb-3">Or drop us a note via the form below:</h5>
 
-                    {{ form_start(contact_form, {
-                        'attr':{
-                            'id': 'contact-us-form',
-                            'class':'mb-5'
+                    {{ form_start(contact_form, {'attr':{
+                        'data-toggle': 'validator',
+                        'class': 'validate-form ',
+                        'data-client-validation': form_client_validation,
+                        'autocomplete': 'off'
                     }}) }}
-
                         <div class="row">
                             <div class="form-group col-sm">
                                 {{ form_label(contact_form.name, 'Name', { 'label_attr': {'class': ''} }) }}
@@ -93,7 +93,6 @@
                                     'class': 'btn btn-success btn-green-gradient btn-block-xs'
                             }}) }}
                         </div>
-
                     {{ form_end(contact_form) }}
                 </div>
             </div>
