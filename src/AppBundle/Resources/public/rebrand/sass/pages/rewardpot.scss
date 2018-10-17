@@ -67,19 +67,12 @@
 .intro {
     background-color: $pattens-blue;
     text-align: center;
+    position: relative;
 
     &__step {
         width: 180px;
         margin: 0 auto;
         position: relative;
-
-        img {
-            display: none;
-
-            @include media-breakpoint-up(sm) {
-                display: inline;
-            }
-        }
     }
 
     &__number {
@@ -91,23 +84,46 @@
         box-shadow: 0 15px 30px 0 rgba(8,27,154,0.08),
                     0 5px 15px 0 rgba(8,27,154,0.08);
 
-        @include media-breakpoint-up(sm) {
+        // @include media-breakpoint-up(sm) {
             position: absolute;
             top: 20%; left: -20px;
-        }
+        // }
+    }
+
+    &__background {
+        position: absolute;
+        right: -120px; bottom: -80px;
     }
 }
 
 .history {
     text-align: center;
 
-    @include media-breakpoint-up(md) {
+    &__img {
+        img {
+            max-width: 300px;
+        }
+
+        @include media-breakpoint-up(lg) {
+            img {
+                max-width: 500px;
+            }
+        }
+    }
+
+    @include media-breakpoint-up(lg) {
         text-align: left;
     }
 }
 
 .faq {
     background-color: $pattens-blue;
+    position: relative;
+
+    &__background {
+        position: absolute;
+        left: -20px; bottom: 100px;
+    }
 }
 
 // .cover {
@@ -240,7 +256,7 @@
         }
     }
 
-    background: $white url('#{$cdn_url}/images/rebrand/homepage/so-sure_reviews-image.png') no-repeat 80px bottom;
+    background: $white url('#{$cdn_url}/images/rebrand/homepage/so-sure_reviews-image-alt.png') no-repeat 80px bottom;
     background-size: 500px;
 
     @include media-breakpoint-up(sm) {
@@ -250,7 +266,7 @@
     @include media-breakpoint-up(lg) {
         padding-bottom: inherit;
         margin-bottom: 0;
-        background: $white url('#{$cdn_url}/images/rebrand/homepage/so-sure_reviews-image.png') no-repeat 800px 50px;
+        background: $white url('#{$cdn_url}/images/rebrand/homepage/so-sure_reviews-image-alt.png') no-repeat 800px 50px;
         background-size: 600px;
     }
 
