@@ -9,7 +9,7 @@
 
 .hero {
     position: relative;
-    padding-top: 8rem;
+    padding-top: 6rem;
     // padding-bottom: 4rem;
 
     @include blue-gradient;
@@ -32,7 +32,7 @@
     }
 
     &__illustration-desktop {
-        width: 700px;
+        width: 655px;
         position: absolute;
         bottom: 0; right: -150px;
 

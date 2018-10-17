@@ -29,10 +29,10 @@
                 {# Do nothing #}
             {% else %}
                 <ul class="nav navbar-nav navbar-right">
-                    <li><a href="{{ path('claim') }}">Make a claim</a></li>
+                    <li><a href="{{ path('reward_pot') }}">Reward Pot</a></li>
+                    <li><a href="{{ path('claim') }}">Make a Claim</a></li>
                     <li><a href="{{ path('faq') }}">FAQ</a></li>
                     <li><a href="https://blog.wearesosure.com">Blog</a></li>
-                    <li><a href="{{ path('about_how_to_contact_so_sure') }}">Contact</a></li>
                     {% if app.user is not null and app.user %}
                         {% if is_granted('ROLE_ADMIN') %}
                             <li><a href="{{ path('admin_home') }}"><i class="fa fa-home"></i> Admin</a></li>
