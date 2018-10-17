@@ -29,6 +29,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Symfony\Component\Validator\Constraints as Assert;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Gedmo\Loggable\Document\LogEntry;
 use AppBundle\Classes\ClientUrl;
@@ -111,6 +112,7 @@ use AppBundle\Service\PushService;
 use AppBundle\Event\PicsureEvent;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
@@ -1502,7 +1504,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                 }
             }
         }
-        
+
         return [
             'user' => $user,
             'reset_form' => $resetForm->createView(),
@@ -1848,7 +1850,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                     'detected_imei' => 'a123',
                     'suggested_imei' => 'a456',
                     'bucket' => 'a',
-                    'key' => 'key', 
+                    'key' => 'key',
                 ]));
         */
         $imeis = [];
@@ -2470,9 +2472,8 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             ->add('address3', TextType::class, ['required' => false])
             ->add('city', TextType::class)
             ->add('postcode', TextType::class)
-            ->add('cpa', TextType::class)
-            ->add('days', ChoiceType::class, ['required' => true,
-                                                'choices' => $time_range])
+            ->add('cpa', NumberType::class, ['constraints' => [new Assert\Range(['min' => 0, 'max' => 20])]])
+            ->add('days', ChoiceType::class, ['required' => true, 'choices' => $time_range])
             ->add('campaignSource', TextType::class, ['required' => false])
             ->add('leadSource', ChoiceType::class, ['required' => false, 'choices' => $lead_sources])
             ->add('leadSourceDetails', TextType::class, ['required' => false ])
@@ -2496,20 +2497,24 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                         $address->setLine2($this->getDataString($companyForm->getData(), 'address2'));
                         $address->setLine3($this->getDataString($companyForm->getData(), 'address3'));
                         $address->setCity($this->getDataString($companyForm->getData(), 'city'));
-                        $address->setPostcode($this->getDataString($companyForm->getData(), 'postcode'));
+                        // The postcode constructor is what validates, and when it is incorrect it throws an
+                        // exception with no message, so here we catch and release it with a message
+                        try {
+                            $address->setPostcode($this->getDataString($companyForm->getData(), 'postcode'));
+                        } catch (\InvalidArgumentException $e) {
+                            throw new \InvalidArgumentException("Invalid Postcode Given.");
+                        }
                         $company->setAddress($address);
-                        $company->setCPA($this->getDataString($companyForm->getData(), 'cpa'));
                         $company->setDays($this->getDataString($companyForm->getData(), 'days'));
                         $company->setCampaignSource($this->getDataString($companyForm->getData(), 'campaignSource'));
                         $company->setLeadSource($this->getDataString($companyForm->getData(), 'leadSource'));
                         $company->setLeadSourceDetails(
                             $this->getDataString($companyForm->getData(), 'leadSourceDetails')
                         );
+                        $company->setCPA($this->getDataString($companyForm->getData(), 'cpa'));
                         $dm->persist($company);
                         $dm->flush();
-                        $this->addFlash('success', sprintf(
-                            'Added affiliate'
-                        ));
+                        $this->addFlash('success', 'Added affiliate');
 
                         return new RedirectResponse($this->generateUrl('admin_affiliate'));
                     } else {

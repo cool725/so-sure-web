@@ -103,8 +103,8 @@ class AffiliateServiceTest extends WebTestCase
 
         $affiliate->setName('Foo');
         $affiliate->setAddress($address);
-        $affiliate->setCPA('4.5');
-        $affiliate->setDays('30');
+        $affiliate->setCPA(4.5);
+        $affiliate->setDays(30);
         $affiliate->setCampaignSource('foobar');
 
         $thirtyOneDaysAgo = new \DateTime();
