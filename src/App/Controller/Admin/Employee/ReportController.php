@@ -43,7 +43,7 @@ class ReportController extends AbstractController
         // Get the start and end dates for the given period.
         try {
             list($start, $end) = ReportingService::getLastPeriod($period);
-        } catch (IllegalArgumentException $e) {
+        } catch (\InvalidArgumentException $e) {
             $report['error'] = "Invalid URL, period {$period} does not exist.";
             $report['period'] = ReportingService::REPORT_PERIODS_DEFAULT;
             return $report;

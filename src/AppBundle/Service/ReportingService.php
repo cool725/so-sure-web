@@ -52,7 +52,7 @@ class ReportingService
     const REPORT_PERIODS = ['week' => ['start' => 'this week', 'end' => 'now'],
         'month' => ['start' => 'first day of this month', 'end' => 'now'],
         'last month' => ['start' => 'first day of last month', 'end' => 'first day of this month']];
-    CONST REPORT_PERIODS_DEFAULT = 'week';
+    const REPORT_PERIODS_DEFAULT = 'week';
 
     use DateTrait;
     use CurrencyTrait;
@@ -1247,7 +1247,9 @@ class ReportingService
     public static function getLastPeriod($period): array
     {
         if (!array_key_exists($period, static::REPORT_PERIODS)) {
-            throw new IllegalArgumentException("{$period} is not a valid period as defined in ReportingService::REPORT_PERIODS");
+            throw new \InvalidArgumentException(
+                "{$period} is not a valid period as defined in ReportingService::REPORT_PERIODS"
+            );
         }
         $start = new DateTime(static::REPORT_PERIODS[$period]['start']);
         $end = new DateTime(static::REPORT_PERIODS[$period]['end']);
