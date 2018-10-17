@@ -323,6 +323,7 @@ class ClaimsService
 
         // As we've had many instances where claims have already been processed, so ahead and set the claim approved
         // before that point
+        // TODO: Should this be approved or just settled. Matching below behaviour for now of settled
         if ($claim->isMonetaryClaim() && $policy->canAdjustPicSureStatusForClaim()) {
             $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_CLAIM_APPROVED);
             $policy->setPicSureClaimApprovedClaim($claim);

@@ -2,6 +2,7 @@
 
 namespace AppBundle\Tests\Service;
 
+use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Repository\PolicyRepository;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\User;
@@ -153,16 +154,71 @@ class ClaimsServiceTest extends WebTestCase
     public function testProcessClaimProcessed()
     {
         $claim = new Claim();
+        $policy = new SalvaPhonePolicy();
+        $claim->setPolicy($policy);
         $claim->setProcessed(true);
         $this->assertFalse(static::$claimsService->processClaim($claim));
+        $this->assertNull($policy->getPicSureClaimApprovedClaim());
     }
 
     public function testProcessClaimNonMonetary()
     {
         $claim = new Claim();
+        $policy = new SalvaPhonePolicy();
+        $claim->setPolicy($policy);
         $claim->setStatus(Claim::STATUS_INREVIEW);
         $claim->setType(Claim::TYPE_THEFT);
         $this->assertFalse(static::$claimsService->processClaim($claim));
+        $this->assertNull($policy->getPicSureClaimApprovedClaim());
+    }
+
+    public function testProcessClaimPicSureClaimApproved()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testProcessClaimPicSureClaimApproved', $this),
+            'bar'
+        );
+        $phone = static::getRandomPhone(static::$dm);
+        $policy = static::initPolicy($user, static::$dm, $phone, null, true, true);
+
+        $claim = new Claim();
+        $claim->setPolicy($policy);
+        $claim->setStatus(Claim::STATUS_INREVIEW);
+        static::$dm->persist($claim);
+        $this->assertNull($claim->getProcessed());
+        $this->assertFalse(static::$claimsService->processClaim($claim));
+        $this->assertNull($policy->getPicSureClaimApprovedClaim());
+
+        $claim->setStatus(Claim::STATUS_SETTLED);
+        $this->assertTrue(static::$claimsService->processClaim($claim));
+        $this->assertNotNull($policy->getPicSureClaimApprovedClaim());
+        $this->assertEquals(PhonePolicy::PICSURE_STATUS_CLAIM_APPROVED, $policy->getPicSureStatus());
+    }
+
+    public function testProcessClaimPicSureClaimApprovedApproved()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testProcessClaimPicSureClaimApprovedApproved', $this),
+            'bar'
+        );
+        $phone = static::getRandomPhone(static::$dm);
+        $policy = static::initPolicy($user, static::$dm, $phone, null, true, true);
+        $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_APPROVED);
+
+        $claim = new Claim();
+        $claim->setPolicy($policy);
+        $claim->setStatus(Claim::STATUS_INREVIEW);
+        static::$dm->persist($claim);
+        $this->assertNull($claim->getProcessed());
+        $this->assertFalse(static::$claimsService->processClaim($claim));
+        $this->assertNull($policy->getPicSureClaimApprovedClaim());
+
+        $claim->setStatus(Claim::STATUS_SETTLED);
+        $this->assertTrue(static::$claimsService->processClaim($claim));
+        $this->assertNotNull($policy->getPicSureClaimApprovedClaim());
+        $this->assertEquals(PhonePolicy::PICSURE_STATUS_APPROVED, $policy->getPicSureStatus());
     }
 
     public function testProcessClaimRewardConnection()
