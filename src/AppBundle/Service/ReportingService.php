@@ -49,6 +49,11 @@ class ReportingService
     const REPORT_KEY_FORMAT = 'Report:%s:%s:%s';
     const REPORT_CACHE_TIME = 3600;
 
+    const REPORT_PERIODS = ['week' => ['start' => 'this week', 'end' => 'now'],
+        'month' => ['start' => 'first day of this month', 'end' => 'now'],
+        'last month' => ['start' => 'first day of last month', 'end' => 'first day of this month']];
+    CONST REPORT_PERIODS_DEFAULT = 'week';
+
     use DateTrait;
     use CurrencyTrait;
 
@@ -1235,19 +1240,17 @@ class ReportingService
     /**
      * gives you a period of time with an optional starting date and an optional
      * ending date, rounding these to the beginnings of days.
-     * @param DateTime $start is the start date and defaults to a week ago.
-     * @param DateTime $end   is the end date and defaults to the start of today.
+     * @param string $period is the string name of a period as defined in
+     *                       REPORT_PERIODS constant
      * @return array containing the new start and end dates.
      */
-    public function getLastPeriod($start = null, $end = null): array
+    public static function getLastPeriod($period): array
     {
-        if (!$start) {
-            $start = new \DateTime();
-            $start->sub(new DateInterval('P7D'));
+        if (!array_key_exists($period, static::REPORT_PERIODS)) {
+            throw new IllegalArgumentException("{$period} is not a valid period as defined in ReportingService::REPORT_PERIODS");
         }
-        if (!$end) {
-            $end = new \DateTime('now');
-        }
+        $start = new DateTime(static::REPORT_PERIODS[$period]['start']);
+        $end = new DateTime(static::REPORT_PERIODS[$period]['end']);
         $start->setTime(0, 0, 0);
         $end->setTime(0, 0, 0);
 

@@ -38,23 +38,14 @@ class ReportController extends AbstractController
      */
     private function buildReport($period)
     {
-        $report = ['periods' => ['week', 'month', 'last month']];
+        $report = ['periods' => array_keys(ReportingService::REPORT_PERIODS)];
 
         // Get the start and end dates for the given period.
-        if ($period == 'week') {
-            list($start, $end) = $this->reporting->getLastPeriod();
-        } elseif ($period == 'month') {
-            list($start, $end) = $this->reporting->getLastPeriod(
-                new DateTime('first day of this month')
-            );
-        } elseif ($period == 'last month') {
-            list($start, $end) = $this->reporting->getLastPeriod(
-                new DateTime('first day of last month'),
-                new DateTime('first day of this month')
-            );
-        } else {
+        try {
+            list($start, $end) = ReportingService::getLastPeriod($period);
+        } catch (IllegalArgumentException $e) {
             $report['error'] = "Invalid URL, period {$period} does not exist.";
-            $report['period'] = 'week';
+            $report['period'] = ReportingService::REPORT_PERIODS_DEFAULT;
             return $report;
         }
 
@@ -71,7 +62,7 @@ class ReportController extends AbstractController
     public function claimsReportAction(Request $request)
     {
         $period = $request->get('period');
-        $report = $this->buildReport(isset($period) ? $period : 'week');
+        $report = $this->buildReport(isset($period) ? $period : ReportingService::REPORT_PERIODS_DEFAULT);
         return $this->render('AppBundle:AdminEmployee:adminReports.html.twig', $report);
     }
 }

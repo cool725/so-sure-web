@@ -56,19 +56,9 @@ class AdminReportsCommand extends ContainerAwareCommand
 
     private function cacheClaimsMainReport()
     {
-        // Calculate for week and throw away the result.
-        list($start, $end) = $this->reporting->getLastPeriod();
-        $this->reporting->report($start, $end, false, false);
-
-        // Calculate for month and throw away the result.
-        list($start, $end) = $this->reporting->getLastPeriod(new \DateTime('first day of this month'));
-        $this->reporting->report($start, $end, false, false);
-
-        // Calculate for last month and throw away the result.
-        list($start, $end) = $this->reporting->getLastPeriod(
-            new \DateTime('first day of last month'),
-            new \DateTime('first day of this month')
-        );
-        $this->reporting->report($start, $end, false, false);
+        foreach (ReportingService::REPORT_PERIODS as $period => $dates) {
+            list($start, $end) = ReportingService::getLastPeriod($period);
+            $this->reporting->report($start, $end, false, false);
+        }
     }
 }
