@@ -7,5 +7,5 @@ require('bootstrap/js/dist/carousel');
 // require('bootstrap/js/dist/modal');
 
 // Require components
-require('../components/modalVideo.js');
+// require('../components/modalVideo.js');
 

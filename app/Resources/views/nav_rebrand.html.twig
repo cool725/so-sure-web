@@ -87,7 +87,15 @@
         </ul>
         <div class="p-5 align-self-stretch menu__buttons">
             <a href="#" class="btn btn-primary btn-block mb-3 get-a-quote">Get insured</a>
-            {# <a href="#" class="btn btn-outline-white btn-block"><i class="far fa-play-circle fa-lg"></i> Watch our Video</a> #}
+            <a href="#"
+               class="btn btn-outline-white watch-video btn-block-xs"
+               data-event="watch-video-mobile-menu"
+               data-toggle="modal"
+               data-target="#sosure-video-modal"
+               data-src="https://www.youtube.com/embed/QEskwqsNgrQ">
+                <i class="far fa-play-circle fa-lg opacity-50 mr-1"></i>
+                Watch our Video
+            </a>
             <div class="menu__user-button text-center">
                 {% if app.user is not null and app.user %}
                     {% if is_granted('ROLE_PREVIOUS_ADMIN') %}
