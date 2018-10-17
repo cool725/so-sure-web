@@ -84,6 +84,16 @@
     }
 }
 
+.expanding-cardbox-white {
+    // border: 2px solid $columbia-blue-e;
+    background-color: $white;
+
+    &:hover {
+        // border: 2px solid $columbia-blue-e;
+        // background-color: rgba(255,255,255,.08);
+    }
+}
+
 .expanding-cardbox__icon {
     background: url('#{$cdn_url}/images/rebrand/icns/so-sure_tick-icn.svg') no-repeat 1.3rem 1.25rem;
     background-size: 2rem;
