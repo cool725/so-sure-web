@@ -10,7 +10,7 @@
 .hero {
     position: relative;
     padding-top: 8rem;
-    padding-bottom: 4rem;
+    // padding-bottom: 4rem;
 
     @include blue-gradient;
 
@@ -31,6 +31,16 @@
 
     }
 
+    &__illustration-desktop {
+        width: 700px;
+        position: absolute;
+        bottom: 0; right: -150px;
+
+        @include media-breakpoint-up(xl) {
+
+        }
+    }
+
     &:before {
         width: 100%; height: 100%;
         position: absolute;
@@ -43,6 +53,8 @@
     }
 
     @include media-breakpoint-up(lg) {
+        padding-bottom: 4rem;
+
         &:before {
             background-image: url('#{$cdn_url}/images/rebrand/misc/so-sure_swoosh-hero-background.svg');
         }
@@ -256,8 +268,8 @@
         }
     }
 
-    background: $white url('#{$cdn_url}/images/rebrand/homepage/so-sure_reviews-image-alt.png') no-repeat 80px bottom;
-    background-size: 500px;
+    background: $white url('#{$cdn_url}/images/rebrand/rewardpot/so-sure_reviews-image-alt.png') no-repeat 80px bottom;
+    background-size: 450px;
 
     @include media-breakpoint-up(sm) {
         background-position: 300px bottom;
@@ -266,7 +278,7 @@
     @include media-breakpoint-up(lg) {
         padding-bottom: inherit;
         margin-bottom: 0;
-        background: $white url('#{$cdn_url}/images/rebrand/homepage/so-sure_reviews-image-alt.png') no-repeat 800px 50px;
+        background: $white url('#{$cdn_url}/images/rebrand/rewardpot/so-sure_reviews-image-alt.png') no-repeat 800px 50px;
         background-size: 600px;
     }
 
