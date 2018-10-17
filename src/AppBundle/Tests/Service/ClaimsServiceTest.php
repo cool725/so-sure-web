@@ -217,7 +217,7 @@ class ClaimsServiceTest extends WebTestCase
 
         $claim->setStatus(Claim::STATUS_SETTLED);
         $this->assertTrue(static::$claimsService->processClaim($claim));
-        $this->assertNotNull($policy->getPicSureClaimApprovedClaim());
+        $this->assertNull($policy->getPicSureClaimApprovedClaim());
         $this->assertEquals(PhonePolicy::PICSURE_STATUS_APPROVED, $policy->getPicSureStatus());
     }
 
