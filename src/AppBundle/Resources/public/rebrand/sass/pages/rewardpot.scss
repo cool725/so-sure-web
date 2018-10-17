@@ -50,24 +50,53 @@
 
 }
 
-// .cred {
-//     text-align: center;
-//     background-color: darken($pattens-blue, 5%);
+.cred {
+    text-align: center;
+    background-color: $white;
 
-//     img {
-//         width: 100px;
-//         opacity: 0.3;
+    img {
+        width: 100px;
+        opacity: 0.3;
 
-//         @include media-breakpoint-up(lg) {
-//             width: 120px;
-//         }
-//     }
-// }
+        @include media-breakpoint-up(lg) {
+            width: 120px;
+        }
+    }
+}
 
-// .intro {
-//     text-align: center;
-//     background-color: $pattens-blue;
-// }
+.intro {
+    background-color: $pattens-blue;
+    text-align: center;
+
+    &__step {
+        width: 180px;
+        margin: 0 auto;
+        position: relative;
+
+        img {
+            display: none;
+
+            @include media-breakpoint-up(sm) {
+                display: inline;
+            }
+        }
+    }
+
+    &__number {
+        width: 55px; height: 55px;
+        background-color: $white;
+        margin: 0 auto 1.2rem;
+
+        @include border-radius(50%);
+        box-shadow: 0 15px 30px 0 rgba(8,27,154,0.08),
+                    0 5px 15px 0 rgba(8,27,154,0.08);
+
+        @include media-breakpoint-up(sm) {
+            position: absolute;
+            top: 20%; left: -20px;
+        }
+    }
+}
 
 // .cover {
 //     position: relative;
@@ -147,39 +176,7 @@
 //     }
 // }
 
-// .claims {
-//     background-color: $pattens-blue;
-//     text-align: center;
 
-//     &__step {
-//         width: 180px;
-//         margin: 0 auto;
-//         position: relative;
-
-//         img {
-//             display: none;
-
-//             @include media-breakpoint-up(sm) {
-//                 display: inline;
-//             }
-//         }
-//     }
-
-//     &__number {
-//         width: 55px; height: 55px;
-//         background-color: $white;
-//         margin: 0 auto 1.2rem;
-
-//         @include border-radius(50%);
-//         box-shadow: 0 15px 30px 0 rgba(8,27,154,0.08),
-//                     0 5px 15px 0 rgba(8,27,154,0.08);
-
-//         @include media-breakpoint-up(sm) {
-//             position: absolute;
-//             top: 20%; left: -20px;
-//         }
-//     }
-// }
 
 // .comparison {
 //     position: relative;
@@ -218,39 +215,39 @@
 //     }
 // }
 
-// .reviews {
-//     padding-bottom: 200px;
-//     margin-bottom: 4rem;
+.reviews {
+    padding-bottom: 200px;
+    margin-bottom: 4rem;
 
-//     .carousel-inner {
-//         min-height: 280px;
-//         background: $white url('#{$cdn_url}/images/rebrand/misc/so-sure_quote-background.svg') no-repeat right 50%;
+    .carousel-inner {
+        min-height: 280px;
+        background: $white url('#{$cdn_url}/images/rebrand/misc/so-sure_quote-background.svg') no-repeat right 50%;
 
-//         @include media-breakpoint-up(lg) {
-//             min-height: none;
-//         }
-//     }
+        @include media-breakpoint-up(lg) {
+            min-height: none;
+        }
+    }
 
-//     background: $white url('#{$cdn_url}/images/rebrand/homepage/so-sure_reviews-image.png') no-repeat 80px bottom;
-//     background-size: 500px;
+    background: $white url('#{$cdn_url}/images/rebrand/homepage/so-sure_reviews-image.png') no-repeat 80px bottom;
+    background-size: 500px;
 
-//     @include media-breakpoint-up(sm) {
-//         background-position: 300px bottom;
-//     }
+    @include media-breakpoint-up(sm) {
+        background-position: 300px bottom;
+    }
 
-//     @include media-breakpoint-up(lg) {
-//         padding-bottom: inherit;
-//         margin-bottom: 0;
-//         background: $white url('#{$cdn_url}/images/rebrand/homepage/so-sure_reviews-image.png') no-repeat 800px 50px;
-//         background-size: 600px;
-//     }
+    @include media-breakpoint-up(lg) {
+        padding-bottom: inherit;
+        margin-bottom: 0;
+        background: $white url('#{$cdn_url}/images/rebrand/homepage/so-sure_reviews-image.png') no-repeat 800px 50px;
+        background-size: 600px;
+    }
 
-//     @include media-breakpoint-up(xl) {
-//         background-position: 940px 50px;
-//         background-size: 700px;
-//     }
+    @include media-breakpoint-up(xl) {
+        background-position: 940px 50px;
+        background-size: 700px;
+    }
 
-//     @include media-breakpoint-up(fk) {
-//         background-position: right 50px;
-//     }
-// }
+    @include media-breakpoint-up(fk) {
+        background-position: right 50px;
+    }
+}

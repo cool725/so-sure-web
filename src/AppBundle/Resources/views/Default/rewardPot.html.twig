@@ -28,7 +28,8 @@
                     </div>
                     <div class="hero__controls pb-3">
                         <a href="#" class="btn btn-primary btn-white btn-block-xs mr-sm-2 get-a-quote">Get a Quote</a>
-                        <a href="#"
+                        {# TODO: Add video to page simply use the embed url from youtube and replace the data attr #}
+                        {# <a href="#"
                            class="btn btn-outline-white watch-video btn-block-xs"
                            data-event="watch-video-index-hero"
                            data-toggle="modal"
@@ -36,7 +37,7 @@
                            data-src="https://www.youtube.com/embed/QEskwqsNgrQ">
                             <i class="far fa-play-circle fa-lg opacity-50 mr-1"></i>
                             How it works
-                        </a>
+                        </a> #}
                     </div>
                 </div>
                 <div class="col-lg-6 d-none d-lg-block">
@@ -47,6 +48,133 @@
             </div>
             <div class="hero__illustration  d-block d-lg-none">
                 {# <img src="{{ cdn_url }}/images/rebrand/homepage/so-sure_hero-illustration-with-no-shadow.png" alt="so-sure - social insurance" class="img-fluid animated jackInTheBox"> #}
+            </div>
+        </div>
+    </section>
+
+    <section class="cred">
+        <div class="container container-xtra py-4 d-lg-flex align-items-center justify-content-between">
+            <img src="{{ cdn_url }}/images/rebrand/credbar/so-sure_credbar-trustpilot.png" alt="Trustpilot">
+            <img src="{{ cdn_url }}/images/rebrand/credbar/so-sure_credbar-money.png" alt="Money">
+            <img src="{{ cdn_url }}/images/rebrand/credbar/so-sure_credbar-gocompare.png" alt="GoCompare">
+            <img src="{{ cdn_url }}/images/rebrand/credbar/so-sure_credbar-theguardian.png" alt="The Guardian">
+            <img src="{{ cdn_url }}/images/rebrand/credbar/so-sure_credbar-ft.png" alt="The Financial Times">
+        </div>
+    </section>
+
+    <section class="intro py-lg-5">
+        <div class="container container-xtra py-5">
+            <h2 class="h3 mb-5 text-primary">Here’s how it works</h2>
+            <div class="row">
+                <div class="col-md-6 col-lg-4">
+                    <div class="intro__step">
+                        <div class="intro__number d-flex justify-content-center align-items-center h4 text-primary">1</div>
+                        <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_make-a-claim.png" alt="so-sure - Make a claim" width="180px">
+                    </div>
+                    <h5 class="text-primary">Start Connecting</h5>
+                    <p class="mb-5 text-zaffre">Invite as many people as you want. Your mum, dad, grandparents, or your mate Bob. Connect until your reward pot is worth 80% of the yearly price of your insurance</p>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <div class="intro__step">
+                        <div class="intro__number d-flex justify-content-center align-items-center h4 text-primary">2</div>
+                        <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_claims-team.png" alt="so-sure - Review claim" width="180px">
+                    </div>
+                    <h5 class="text-primary">Be Careful</h5>
+                    <p class="mb-5 text-zaffre">Easy as that, don’t break or lose your phone, or make any claims throughout the policy year.  And, make sure your connections do the same</p>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <div class="intro__step">
+                        <div class="intro__number d-flex justify-content-center align-items-center h4 text-primary">3</div>
+                        <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_delivery.png" alt="so-sure - Approve claim" width="180px">
+                    </div>
+                    <h5 class="text-primary">Get Rewarded</h5>
+                    <p class="mb-2 text-zaffre">At the end of the year, when you and your connections haven’t claimed, your Reward Pot is paid out to you with your existing payment method</p>
+                </div>
+            </div>
+            <a href="#" class="btn btn-primary btn-blue-gradient btn-block-xs mt-3 get-a-quote">Get Insured in minutes</a>
+        </div>
+    </section>
+
+    <section class="reviews py-lg-5">
+        <div class="container container-xtra py-5">
+            <div class="row">
+                <div class="col-lg-6">
+                    <h2 class="h3 mb-4 text-zaffre text-center text-lg-left">Don't just take our <br class="d-inline d-sm-none"> word for it!</h2>
+                    <div id="reviews_carousel"
+                         class="carousel slide carousel-fade"
+                         data-ride="carousel"
+                         data-interval="false">
+                        <div class="carousel-inner">
+                            <div class="carousel-item active">
+                                <div class="reviews__item text-center text-lg-left">
+                                    <span class="mt-2">
+                                        <i class="fas fa-star fa-lg text-primary"></i>
+                                        <i class="fas fa-star fa-lg text-primary"></i>
+                                        <i class="fas fa-star fa-lg text-primary"></i>
+                                        <i class="fas fa-star fa-lg text-primary"></i>
+                                        <i class="fas fa-star fa-lg text-primary"></i>
+                                    </span>
+                                    <p class="lead py-4">"My so-sure claim was super fast and everyone was really friendly! Based on previous phone insurance experiences, I can honestly say this truly is a revolution"</p>
+                                    <div class="reviews__footer mb-4">
+                                        <span class="h5 text-zaffre mr-2">Nick B</span> <strong class="text-primary">|</strong> <span class="ml-2">so-sure customer</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="carousel-item">
+                                <div class="reviews__item text-center text-lg-left">
+                                    <span class="mt-2">
+                                        <i class="fas fa-star fa-lg text-primary"></i>
+                                        <i class="fas fa-star fa-lg text-primary"></i>
+                                        <i class="fas fa-star fa-lg text-primary"></i>
+                                        <i class="fas fa-star fa-lg text-primary"></i>
+                                        <i class="fas fa-star fa-lg text-primary"></i>
+                                    </span>
+                                    <p class="lead py-4">"Very happy with these guys, my phone was badly cracked after a fall, they picked it up, repaired it good as new in 2 days!  Claims team very nice, would highly recommend"</p>
+                                    <div class="reviews__footer mb-4">
+                                        <span class="h5 text-zaffre mr-2">Tommy P</span> <strong class="text-primary">|</strong> <span class="ml-2">so-sure customer</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="carousel-item">
+                                <div class="reviews__item text-center text-lg-left">
+                                    <span class="mt-2">
+                                        <i class="fas fa-star fa-lg text-primary"></i>
+                                        <i class="fas fa-star fa-lg text-primary"></i>
+                                        <i class="fas fa-star fa-lg text-primary"></i>
+                                        <i class="fas fa-star fa-lg text-primary"></i>
+                                        <i class="fas fa-star fa-lg text-primary"></i>
+                                    </span>
+                                    <p class="lead py-4">"Only paid 50 quid excess for my iphone X which is fab, app is really easy to use and a lady called kitti was very helpful in the claim and getting me my new phone"</p>
+                                    <div class="reviews__footer mb-4">
+                                        <span class="h5 text-zaffre mr-2">Paulo R</span> <strong class="text-primary">|</strong> <span class="ml-2">so-sure customer</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="reviews__controls text-center text-lg-left">
+                        <ul class="list-inline">
+                            <li class="list-inline-item">
+                                <a href="#reviews_carousel"
+                                   class="reviews__controls__prev pr-1"
+                                   role="button"
+                                   data-slide="prev">
+                                   <i class="far fa-long-arrow-alt-left fa-2x"></i>
+                                   <span class="sr-only">prev</span>
+                                </a>
+                            </li>
+                            <li class="list-inline-item">
+                                <a href="#reviews_carousel"
+                                   class="reviews__controls__next pl-1"
+                                   role="button"
+                                   data-slide="next">
+                                    <i class="far fa-long-arrow-alt-right fa-2x"></i>
+                                    <span class="sr-only">next</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
