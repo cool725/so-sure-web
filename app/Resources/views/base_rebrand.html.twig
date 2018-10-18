@@ -116,6 +116,9 @@
             {% block body %}{% endblock %}
         </main>
 
+        {# Site-wide Modals #}
+        {% include 'AppBundle::Default/_modalVideo.html.twig' %}
+
         {% block footer %}
             {% if hide_footer is not defined or not hide_footer %}
                 {% include '::footer_rebrand.html.twig' %}

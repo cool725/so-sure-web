@@ -16,6 +16,7 @@ require('./components/phoneSearchDropdown.js');
 require('./components/select.js');
 require('./components/customSelect.js');
 require('./components/cardbox.js');
+require('./components/modalVideo.js');
 
 $(function() {
 

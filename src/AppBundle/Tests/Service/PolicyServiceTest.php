@@ -364,31 +364,103 @@ class PolicyServiceTest extends WebTestCase
             1 => 1,
         ];
         foreach ($dates as $actualDay => $expectedDay) {
-            $user = static::createUser(
-                static::$userManager,
-                sprintf('scheduled-monthly-%d@so-sure.com', $actualDay),
-                'bar',
-                null,
-                static::$dm
-            );
-            $date = new \DateTime(sprintf('2016-01-%d', $actualDay));
-            $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), $date);
+            foreach ([1, 7] as $month) {
+                $user = static::createUser(
+                    static::$userManager,
+                    sprintf('scheduled-monthly-%d-%d@so-sure.com', $month, $actualDay),
+                    'bar',
+                    null,
+                    static::$dm
+                );
+                $date = new \DateTime(sprintf('2016-%d-%d 22:59', $month, $actualDay));
+                $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), $date);
+                /*
+                print 'I1----------' . PHP_EOL;
+                print_r($date);
+                print 'I2----------' . PHP_EOL;
+                */
+                $phone = $policy->getPhone();
 
-            $payment = new BacsPayment();
-            $payment->setAmount($policy->getPhone()->getCurrentPhonePrice($date)->getMonthlyPremiumPrice(null, $date));
-            $payment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
-            $payment->setDate($date);
-            $payment->setSuccess(true);
-            $policy->addPayment($payment);
+                $payment = new BacsPayment();
+                $payment->setAmount($phone->getCurrentPhonePrice($date)->getMonthlyPremiumPrice(null, $date));
+                $payment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
+                $payment->setDate($date);
+                $payment->setSuccess(true);
+                $policy->addPayment($payment);
 
-            static::$policyService->create($policy, $date);
+                static::$policyService->create($policy, $date);
+                $policy->setStatus(Policy::STATUS_ACTIVE);
+                static::$dm->flush();
+                /*
+                print 'B1----------' . PHP_EOL;
+                print_r($policy->getBilling());
+                print 'B2----------' . PHP_EOL;
+                */
 
-            $updatedPolicy = static::$policyRepo->find($policy->getId());
-            $this->assertEquals(11, count($updatedPolicy->getScheduledPayments()));
-            for ($i = 0; $i < 11; $i++) {
-                $scheduledDate = $updatedPolicy->getScheduledPayments()[$i]->getScheduled();
-                $this->assertEquals($expectedDay, $scheduledDate->format('d'));
-                $this->assertTrue($scheduledDate->diff($policy->getStart())->days >= 28);
+                $updatedPolicy = static::$policyRepo->find($policy->getId());
+                $this->assertEquals(11, count($updatedPolicy->getScheduledPayments()));
+                for ($i = 0; $i < 11; $i++) {
+                    $scheduledDate = $updatedPolicy->getScheduledPayments()[$i]->getScheduled();
+                    //$this->assertEquals($expectedDay, $scheduledDate->format('d'));
+                    $this->assertTrue($scheduledDate->diff($policy->getStart())->days >= 27);
+                }
+
+                $this->assertTrue($policy->arePolicyScheduledPaymentsCorrect(true));
+            }
+        }
+    }
+
+    public function testGenerateScheduledPaymentsMonthlyPaymentsDatesTimezone()
+    {
+        $dates = [
+            28 => 28,
+            29 => 28,
+            31 => 1,
+            1 => 1,
+        ];
+        foreach ($dates as $actualDay => $expectedDay) {
+            foreach ([1, 7] as $month) {
+                $user = static::createUser(
+                    static::$userManager,
+                    sprintf('scheduled-monthly-tz-%d-%d@so-sure.com', $month, $actualDay),
+                    'bar',
+                    null,
+                    static::$dm
+                );
+                $date = new \DateTime(sprintf('2016-%d-%d 23:59', $month, $actualDay));
+                $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), $date);
+                /*
+                print 'I1----------' . PHP_EOL;
+                print_r($date);
+                print 'I2----------' . PHP_EOL;
+                */
+                $phone = $policy->getPhone();
+
+                $payment = new BacsPayment();
+                $payment->setAmount($phone->getCurrentPhonePrice($date)->getMonthlyPremiumPrice(null, $date));
+                $payment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
+                $payment->setDate($date);
+                $payment->setSuccess(true);
+                $policy->addPayment($payment);
+
+                static::$policyService->create($policy, $date);
+                $policy->setStatus(Policy::STATUS_ACTIVE);
+                static::$dm->flush();
+                /*
+                print 'B1----------' . PHP_EOL;
+                print_r($policy->getBilling());
+                print 'B2----------' . PHP_EOL;
+                */
+
+                $updatedPolicy = static::$policyRepo->find($policy->getId());
+                $this->assertEquals(11, count($updatedPolicy->getScheduledPayments()));
+                for ($i = 0; $i < 11; $i++) {
+                    $scheduledDate = $updatedPolicy->getScheduledPayments()[$i]->getScheduled();
+                    //$this->assertEquals($expectedDay, $scheduledDate->format('d'));
+                    $this->assertTrue($scheduledDate->diff($policy->getStart())->days >= 27);
+                }
+
+                $this->assertTrue($policy->arePolicyScheduledPaymentsCorrect(true));
             }
         }
     }
@@ -691,17 +763,17 @@ class PolicyServiceTest extends WebTestCase
         static::$policyService->create($policy, $date);
         $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
         $this->assertEquals(
-            new \DateTime('2017-04-15 01:00:00', new \DateTimeZone('Europe/London')),
+            new \DateTime('2017-04-15 00:16:00', new \DateTimeZone('Europe/London')),
             $policy->getBilling()
         );
 
         $timezone = new \DateTimeZone('Europe/London');
         $this->assertEquals(
-            new \DateTime('2017-05-15 01:00', $timezone),
+            new \DateTime('2017-05-15 00:00', $timezone),
             $policy->getNextBillingDate(new \DateTime('2017-04-16'))
         );
         $this->assertEquals(
-            new \DateTime('2017-06-15 01:00', $timezone),
+            new \DateTime('2017-06-15 00:00', $timezone),
             $policy->getNextBillingDate(new \DateTime('2017-06-14'))
         );
         $this->assertEquals(
