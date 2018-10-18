@@ -34,6 +34,7 @@
 
 }
 
+// Includes Carousel component
 .modal-onboarding {
 
     &-header {
@@ -41,7 +42,24 @@
     }
 
     &-footer {
+        position: relative;
         background-color: $selago;
         @include  border-bottom-radius(10px);
+    }
+
+    .hide-controls {
+        display: none;
+    }
+}
+
+.onboarding-indicators {
+
+    li {
+        color: $dodger-blue;
+        opacity: 0.5;
+
+        &.active {
+            opacity: 1;
+        }
     }
 }

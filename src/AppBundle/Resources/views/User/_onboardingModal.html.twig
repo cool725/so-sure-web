@@ -14,10 +14,64 @@
                 </button>
             </div>
             <div class="modal-body">
-
+                <div id="onboarding-carousel"
+                     class="carousel slide"
+                     data-ride="carousel"
+                     data-interval="false"
+                     data-wrap="false">
+                    <div class="carousel-inner">
+                        <div class="carousel-item active">
+                            1
+                        </div>
+                        <div class="carousel-item">
+                            2
+                        </div>
+                        <div class="carousel-item">
+                            3
+                        </div>
+                    </div>
+{#                     <div>
+                        <ol class="carousel-indicators">
+                            <li data-target="#onboarding-carousel" data-slide-to="0" class="active"></li>
+                            <li data-target="#onboarding-carousel" data-slide-to="1"></li>
+                            <li data-target="#onboarding-carousel" data-slide-to="2"></li>
+                        </ol>
+                    </div> #}
+                </div>
             </div>
             <div class="modal-footer modal-onboarding-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+{#                 <ul class="list-inline mb-0 onboarding-indicators">
+                    <li class="active list-inline-item">
+                        <i class="fas fa-circle"></i>
+                    </li>
+                    <li class="list-inline-item">
+                        <i class="fas fa-circle"></i>
+                    </li>
+                    <li class="list-inline-item">
+                        <i class="fas fa-circle"></i>
+                    </li>
+                </ul> #}
+                <div class="onboarding-controls d-flex align-items-center">
+                    <a href="#onboarding-carousel"
+                       id="onboarding-prev-btn"
+                       class="btn btn-outline-grey d-flex btn-circle justify-content-center align-items-center"
+                       role="button"
+                       data-slide="prev"
+                       disabled="disabled">
+                        <span class="sr-only">back</span>
+                        <i class="far fa-arrow-left"></i></a>
+                    <a href="#onboarding-carousel"
+                       id="onboarding-next-btn"
+                       class="btn btn-primary ml-4"
+                       role="button"
+                       data-slide="next">Next</a>
+                    <a href="#"
+                       id="onboarding-get-started-btn"
+                       class="btn btn-success  ml-4 hide-controls"
+                       role="button"
+                       data-dismiss="modal"
+                       aria-label="Close">Get Started </a>
+                </div>
             </div>
         </div>
     </div>

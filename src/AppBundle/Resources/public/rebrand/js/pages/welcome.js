@@ -4,9 +4,10 @@ require('../../sass/pages/welcome.scss');
 
 // Require BS component(s)
 require('bootstrap/js/dist/tooltip');
-// require('bootstrap/js/dist/modal');
+require('bootstrap/js/dist/carousel');
 
 // Require components;
+require('../components/modalOnboarding.js');
 let Clipboard = require('clipboard');
 
 $(function() {
