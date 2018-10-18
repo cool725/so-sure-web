@@ -141,19 +141,19 @@ class AffiliateServiceTest extends WebTestCase
         $this->assertEquals(1, $charges);
         $charges = self::$affiliateService->generate();
         $this->assertEquals(0, $charges);
-
     }
 
     public function testGetMatchingUsers()
     {
+        $affiliate = $this->createTestAffiliate('foob', 2.5, 30, '655 goereverf fewjf', 'london', 'foobAds');
+        $affiliate2 = $this->createTestAffiliate('barf', 4.5, 60, '244 fqref erf', 'colchester', 'barfAds');
+        $this->assertEquals(0, count(self::$affiliateService->getMatchingUsers($affiliate)));
         $this->createTestUser('31 days ago', 'aaa', 'foobAds');
         $this->createTestUser('61 days ago', 'bbb', 'foobAds');
         $this->createTestUser('91 days ago', 'ccc', 'foobAds');
         $this->createTestUser('1 day ago', 'ddd', 'foobAds');
         $this->createTestUser('3 days ago', 'eee', 'barfAds');
         $this->createTestUser('70 days ago', 'fff', 'barfAds');
-        $affiliate = $this->createTestAffiliate('foob', 2.5, 30, '655 goereverf fewjf', 'london', 'foobAds');
-        $affiliate2 = $this->createTestAffiliate('barf', 4.5, 60, '244 fqref erf', 'colchester', 'barfAds');
         $this->assertEquals(4, count(self::$affiliateService->getMatchingUsers($affiliate)));
         $this->assertEquals(2, count(self::$affiliateService->getMatchingUsers($affiliate2)));
         $this->assertEquals(0, count(self::$affiliateService->getMatchingUsers($affiliate, true)));
