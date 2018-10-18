@@ -48,10 +48,12 @@ class ReportController extends AbstractController
         } catch (\InvalidArgumentException $e) {
             $report['error'] = "Invalid URL, period {$period} does not exist.";
             $report['period'] = ReportingService::REPORT_PERIODS_DEFAULT;
-            return $report;
+            return $this->render('AppBundle:AdminEmployee:adminReports.html.twig', $report);
         }
 
         $report['claims'] = $this->reporting->report($start, $end, false);
+        $report['start'] = $start->format('Y-m-d');
+        $report['end'] = $end->format('Y-m-d');
 
         return $this->render('AppBundle:AdminEmployee:adminReports.html.twig', $report);
     }

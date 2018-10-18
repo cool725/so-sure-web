@@ -21,7 +21,7 @@
             <!-- Navigation Tabs -->
             <ul id="tabs" class="nav nav-tabs nav-justified" role="tablist">
                 <li class="nav-item {% if claims is defined %}active{% endif %}">
-                    <a href="{{ path('admin_reports_claims') }}">Claims report</a>
+                    <a href="{{ path('admin_reports_claims') }}">General report</a>
                 </li>
                 <li class="nav-item {% if connections is defined %}active{% endif %}">
                     <a href="{{ path('admin_reports_connections') }}">Connections report</a>
@@ -39,7 +39,7 @@
                         <div class='col-md-6'>
                             <div class="form-group">
                                 Reporting Period:
-                                <select name='period'>
+                                <select name='period' action='' method='GET' onchange='this.form.submit()'>
                                     {% for item in periods %}
                                         <option value='{{ item }}'
                                             {% if period == item %}
@@ -49,10 +49,8 @@
                                         </option>
                                     {% endfor %}
                                 </select>
+                                {{ start }} to {{ end }}
                             </div>
-                        </div>
-                        <div class='col-md-6'>
-                            <button class="btn btn-primary">Run Report</button>
                         </div>
                     </form>
                     <h3>

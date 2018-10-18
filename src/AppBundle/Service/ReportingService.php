@@ -49,10 +49,10 @@ class ReportingService
     const REPORT_KEY_FORMAT = 'Report:%s:%s:%s';
     const REPORT_CACHE_TIME = 3600;
 
-    const REPORT_PERIODS = ['week' => ['start' => 'this week', 'end' => 'now'],
-        'month' => ['start' => 'first day of this month', 'end' => 'now'],
+    const REPORT_PERIODS = ['last 7 days' => ['start' => '7 days ago', 'end' => 'now'],
+        'month to date' => ['start' => 'first day of this month', 'end' => 'now'],
         'last month' => ['start' => 'first day of last month', 'end' => 'first day of this month']];
-    const REPORT_PERIODS_DEFAULT = 'week';
+    const REPORT_PERIODS_DEFAULT = 'last 7 days';
 
     use DateTrait;
     use CurrencyTrait;
@@ -526,8 +526,6 @@ class ReportingService
         $data['rolling-yearly-claims-totals'] = $rolling12MonthClaimsTotals['approved-settled'];
 
         $results = [
-            'start' => $start,
-            'end' => $end,
             'startActivation' => $startActivation,
             'endActivation' => $endActivation,
             'endActivationDisp' => (clone $endActivation)->sub(new \DateInterval('PT1S')),
@@ -1219,27 +1217,10 @@ class ReportingService
         return $results;
     }
 
-    public function getLast7DaysPeriod($start = null, $end = null): array
-    {
-        if ($start) {
-            $start = new DateTime($start, new DateTimeZone(SoSure::TIMEZONE));
-        } else {
-            $start = new DateTime();
-            $start->sub(new DateInterval('P7D'));
-            $start->setTime(0, 0, 0);   // default to start of day, midnight
-        }
-        if ($end) {
-            $end = new DateTime($end, new DateTimeZone(SoSure::TIMEZONE));
-        } else {
-            $end = new DateTime();
-            $end->setTime(0, 0, 0);   // default to start of day here too. Start is 7 days before
-        }
-        return [$start, $end];
-    }
-
     /**
      * gives you a period of time with an optional starting date and an optional
-     * ending date, rounding these to the beginnings of days.
+     * ending date, start date is rounded to the beginning of the given day, and
+      * end date is rounded to the end of the preceding day.
      * @param string $period is the string name of a period as defined in
      *                       REPORT_PERIODS constant
      * @return array containing the new start and end dates.
@@ -1251,10 +1232,10 @@ class ReportingService
                 "{$period} is not a valid period as defined in ReportingService::REPORT_PERIODS"
             );
         }
-        $start = new DateTime(static::REPORT_PERIODS[$period]['start']);
-        $end = new DateTime(static::REPORT_PERIODS[$period]['end']);
+        $start = new DateTime(static::REPORT_PERIODS[$period]['start'], new DateTimeZone(SoSure::TIMEZONE));
+        $end = new DateTime(static::REPORT_PERIODS[$period]['end'], new DateTimeZone(SoSure::TIMEZONE));
         $start->setTime(0, 0, 0);
-        $end->setTime(0, 0, 0);
+        $end->setTime(0, 0, -1);
 
         return [$start, $end];
     }
