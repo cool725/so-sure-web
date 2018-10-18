@@ -87,6 +87,39 @@ class AffiliateServiceTest extends WebTestCase
         self::$dm = $dm;
     }
 
+    private function createTestAffiliate($name, $cpa, $days, $line1, $city, $source = '', $lead = '')
+    {
+        $affiliate = new AffiliateCompany();
+        $address = new Address();
+        $address->setLine1($line1);
+        $address->setCity($city);
+        $address->setPostcode('SW1A 0PW');
+        $affiliate->setName($name);
+        $affiliate->setAddress($address);
+        $affiliate->setCPA($cpa);
+        $affiliate->setDays($days);
+        $affiliate->setCampaignSource($source);
+        $affiliate->setLeadSource('scode');
+        $affiliate->setLeadSourceDetails($lead);
+        self::$dm->persist($affiliate);
+        self::$dm->flush();
+        return $affiliate;
+    }
+
+    private function createTestUser($policyAge, $email, $source)
+    {
+        $policy = self::createUserPolicy(true, new \DateTime($policyAge));
+        $policy->getUser()->setEmail(static::generateEmail($email, $this));
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        $user = $policy->getUser();
+        $attribution = new Attribution();
+        $attribution->setCampaignSource($source);
+        $user->setAttribution($attribution);
+        self::$dm->persist($policy);
+        self::$dm->persist($user);
+        self::$dm->flush();
+    }
+
     public function tearDown()
     {
         self::$dm->clear();
@@ -94,51 +127,40 @@ class AffiliateServiceTest extends WebTestCase
 
     public function testGenerateAffiliateCampaign()
     {
-        $affiliate = new AffiliateCompany();
-        $address = new Address();
-
-        $address->setLine1('8 Foo Bar');
-        $address->setCity('FooBarTown');
-        $address->setPostcode('bx11lt');
-
-        $affiliate->setName('Foo');
-        $affiliate->setAddress($address);
-        $affiliate->setCPA(4.5);
-        $affiliate->setDays(30);
-        $affiliate->setCampaignSource('foobar');
-
-        $affiliate2 = new AffiliateCompany();
-        $affiliate2->setName('company');
-        $affiliate2->setAddress($address);
-        $affiliate2->setCPA(1.1);
-        $affiliate2->setDays(30);
-        $affiliate2->setCampaignSource('goigle');
-
-
-        $thirtyOneDaysAgo = new \DateTime();
-        $thirtyOneDaysAgo = $thirtyOneDaysAgo->sub(new \DateInterval('P31D'));
-        $policy = self::createUserPolicy(true, $thirtyOneDaysAgo);
-        $policy->getUser()->setEmail(static::generateEmail('testGenerateAffiliateCampaign', $this));
-        $policy->setStatus(Policy::STATUS_ACTIVE);
-
-        $user = $policy->getUser();
-        $attribution = new Attribution();
-        $attribution->setCampaignSource('foobar');
-        $user->setAttribution($attribution);
-
-        self::$dm->persist($affiliate);
-        self::$dm->persist($affiliate2);
-        self::$dm->persist($policy);
-        self::$dm->persist($user);
-        self::$dm->flush();
-
+        $affiliate = $this->createTestAffiliate('Foo', 4.5, 30, '8 Foo Bar', 'FooBarTown', 'foobar');
+        $user = $this->createTestUser('31 days ago', 'testGenerateAffiliateCampaign', 'foobar');
         $charges = self::$affiliateService->generate();
-
         $this->assertEquals(1, $charges);
     }
 
     public function testGenerateAffiliateLead()
     {
+        $affiliate = $this->createTestAffiliate('Foo', 4.5, 30, '8 Foo Bar', 'FooBarTown', '', 'foobar');
+        $user = $this->createTestUser('31 days ago', 'testGenerateAffiliateLead', 'foobar');
+        $charges = self::$affiliateService->generate();
+        $this->assertEquals(1, $charges);
+        $charges = self::$affiliateService->generate();
+        $this->assertEquals(0, $charges);
 
+    }
+
+    public function testGetMatchingUsers()
+    {
+        $this->createTestUser('31 days ago', 'aaa', 'foobAds');
+        $this->createTestUser('61 days ago', 'bbb', 'foobAds');
+        $this->createTestUser('91 days ago', 'ccc', 'foobAds');
+        $this->createTestUser('1 day ago', 'ddd', 'foobAds');
+        $this->createTestUser('3 days ago', 'eee', 'barfAds');
+        $this->createTestUser('70 days ago', 'fff', 'barfAds');
+        $affiliate = $this->createTestAffiliate('foob', 2.5, 30, '655 goereverf fewjf', 'london', 'foobAds');
+        $affiliate2 = $this->createTestAffiliate('barf', 4.5, 60, '244 fqref erf', 'colchester', 'barfAds');
+        $this->assertEquals(4, count(self::$affiliateService->getMatchingUsers($affiliate)));
+        $this->assertEquals(2, count(self::$affiliateService->getMatchingUsers($affiliate2)));
+        $this->assertEquals(0, count(self::$affiliateService->getMatchingUsers($affiliate, true)));
+        self::$affiliateService->generate();
+        $this->assertEquals(3, count(self::$affiliateService->getMatchingUsers($affiliate, true)));
+        $this->assertEquals(1, count(self::$affiliateService->getMatchingUsers($affiliate)));
+        $this->assertEquals(1, count(self::$affiliateService->getMatchingUsers($affiliate2, true)));
+        $this->assertEquals(1, count(self::$affiliateService->getMatchingUsers($affiliate2)));
     }
 }
