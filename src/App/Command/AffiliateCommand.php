@@ -24,7 +24,7 @@ class AffiliateCommand extends ContainerAwareCommand
 
     protected function configure()
     {
-        $this->setDescription('Commit affiliate users who have been in long enough to charge for.');
+        $this->setDescription('Commit policies and costs that originate from an affiliate and have matured.');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
