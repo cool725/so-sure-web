@@ -26,9 +26,7 @@ $(function() {
         }
 
         trackByName(name, function() {
-            if (url && blank) {
-                // Do nothing
-            } else if (url) {
+            if (url && !blank) {
                 window.location = url;
             }
         });
