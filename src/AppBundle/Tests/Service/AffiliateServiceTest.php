@@ -107,6 +107,14 @@ class AffiliateServiceTest extends WebTestCase
         $affiliate->setDays(30);
         $affiliate->setCampaignSource('foobar');
 
+        $affiliate2 = new AffiliateCompany();
+        $affiliate2->setName('company');
+        $affiliate2->setAddress($address);
+        $affiliate2->setCPA(1.1);
+        $affiliate2->setDays(30);
+        $affiliate2->setCampaignSource('goigle');
+
+
         $thirtyOneDaysAgo = new \DateTime();
         $thirtyOneDaysAgo = $thirtyOneDaysAgo->sub(new \DateInterval('P31D'));
         $policy = self::createUserPolicy(true, $thirtyOneDaysAgo);
@@ -119,13 +127,14 @@ class AffiliateServiceTest extends WebTestCase
         $user->setAttribution($attribution);
 
         self::$dm->persist($affiliate);
+        self::$dm->persist($affiliate2);
         self::$dm->persist($policy);
         self::$dm->persist($user);
         self::$dm->flush();
 
         $charges = self::$affiliateService->generate();
 
-        $this->assertGreaterThan(0, $charges);
+        $this->assertEquals(1, $charges);
     }
 
     public function testGenerateAffiliateLead()
