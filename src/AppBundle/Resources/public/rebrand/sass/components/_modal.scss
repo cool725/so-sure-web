@@ -33,3 +33,15 @@
     }
 
 }
+
+.modal-onboarding {
+
+    &-header {
+        background: none;
+    }
+
+    &-footer {
+        background-color: $selago;
+        @include  border-bottom-radius(10px);
+    }
+}

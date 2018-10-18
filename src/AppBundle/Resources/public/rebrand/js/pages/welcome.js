@@ -77,6 +77,10 @@ $(function() {
 
     // Show Starling Welcome
     if ($('#starling-modal').length) {
+        // TODO - Show this after onboarding
         $('#starling-modal').modal('show');
+    } else {
+        $('#onboarding-modal').modal('show');
     }
+
 });
