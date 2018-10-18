@@ -56,8 +56,9 @@ class AdminReportsCommand extends ContainerAwareCommand
 
     private function cacheClaimsMainReport()
     {
-        list($start, $end) = $this->reporting->getLast7DaysPeriod(null, null);
-        // throw away the result.
-        $this->reporting->report($start, $end, false, $useCache = false);
+        foreach (ReportingService::REPORT_PERIODS as $period => $dates) {
+            list($start, $end) = ReportingService::getLastPeriod($period);
+            $this->reporting->report($start, $end, false, false);
+        }
     }
 }
