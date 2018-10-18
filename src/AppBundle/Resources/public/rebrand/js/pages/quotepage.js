@@ -9,7 +9,7 @@ require('bootstrap/js/dist/tooltip');
 
 // Require components
 require('../components/table.js');
-require('../components/modalVideo.js');
+// require('../components/modalVideo.js');
 
 $(function() {
 
