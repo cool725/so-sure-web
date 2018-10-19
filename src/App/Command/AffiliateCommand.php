@@ -29,6 +29,7 @@ class AffiliateCommand extends ContainerAwareCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->affiliateService->generate();
+        $charges = $this->affiliateService->generate();
+        $output->writeln("{$charges} charges made.");
     }
 }
