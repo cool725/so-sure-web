@@ -77,6 +77,10 @@ class BaseDoctrineListener
             }
 
             if ($compare == self::COMPARE_EQUAL) {
+                if (is_float($oldValue)) {
+                    return $this->areEqualToSixDp($oldValue, $newValue);
+                }
+
                 return $oldValue !== $newValue;
             } elseif ($compare == self::COMPARE_CASE_INSENSITIVE) {
                 return mb_strtolower($oldValue) !== mb_strtolower($newValue);
