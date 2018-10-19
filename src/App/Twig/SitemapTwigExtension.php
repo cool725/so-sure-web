@@ -36,7 +36,8 @@ class SitemapTwigExtension extends \Twig_Extension
             '/phone-insurance/loss'           => 'Loss',
             '/phone-insurance/theft'          => 'Theft',
             '/phone-insurance/water-damage'   => 'Water damage',
-            '/text-me-the-app'                => 'Get a download link sent to your phone!',
+            '/text-me-the-app'                => 'Get a download link sent to your phone!'
+            '/reward-pot'                     => 'Reward Pot',
 
             '/mobile-phone-insurance-for-your-company' => 'Mobile phone insurance for your company',
         ];
