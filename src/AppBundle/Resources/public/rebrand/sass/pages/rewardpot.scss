@@ -10,7 +10,7 @@
 .hero {
     position: relative;
     padding-top: 6rem;
-    // padding-bottom: 4rem;
+    overflow: hidden;
 
     @include blue-gradient;
 
@@ -79,7 +79,7 @@
 .intro {
     background-color: $pattens-blue;
     text-align: center;
-    position: relative;
+    position:relative;
 
     &__step {
         width: 180px;
@@ -96,15 +96,13 @@
         box-shadow: 0 15px 30px 0 rgba(8,27,154,0.08),
                     0 5px 15px 0 rgba(8,27,154,0.08);
 
-        // @include media-breakpoint-up(sm) {
-            position: absolute;
-            top: 20%; left: -20px;
-        // }
+        position: absolute;
+        top: 20%; left: -20px;
     }
 
     &__background {
         position: absolute;
-        right: -120px; bottom: -80px;
+        right: 0; bottom: -100px;
     }
 }
 
@@ -131,6 +129,7 @@
 .faq {
     background-color: $pattens-blue;
     position: relative;
+    overflow-x: hidden;
 
     &__background {
         position: absolute;
