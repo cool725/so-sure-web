@@ -80,7 +80,7 @@ class AffiliateService
                     $charge = new Charge();
                     $charge->setType(Charge::TYPE_AFFILIATE);
                     $charge->setAmount($affiliate->getCPA());
-                    $charge->setUser($charge);
+                    $charge->setUser($user);
                     $this->dm->persist($charge);
                     $affiliate->addConfirmedUsers($user);
                     $generatedCharges++;
