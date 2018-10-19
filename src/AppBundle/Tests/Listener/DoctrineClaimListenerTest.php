@@ -180,6 +180,7 @@ class DoctrineClaimListenerTest extends WebTestCase
         /** @var DocumentManager $dm */
         $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
         $repo = $dm->getRepository(Claim::class);
+        /** @var Claim $updatedClaim */
         $updatedClaim = $repo->find($claim->getId());
         $this->assertNotNull($updatedClaim->getUnderwriterLastUpdated());
 
@@ -232,6 +233,7 @@ class DoctrineClaimListenerTest extends WebTestCase
         /** @var DocumentManager $dm */
         $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
         $repo = $dm->getRepository(Claim::class);
+        /** @var Claim $updatedClaim */
         $updatedClaim = $repo->find($claim->getId());
         $this->assertNotNull($updatedClaim->getUnderwriterLastUpdated());
 
