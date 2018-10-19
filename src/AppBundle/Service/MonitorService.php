@@ -471,11 +471,25 @@ class MonitorService
 
     public function bacsPayments()
     {
+        $twoDays = new \DateTime();
+        $twoDays = $this->subBusinessDays($twoDays, 2);
         /** @var BacsPaymentRepository $paymentsRepo */
         $paymentsRepo = $this->dm->getRepository(BacsPayment::class);
         foreach ($paymentsRepo->findPayments(new \DateTime()) as $payment) {
             /** @var BacsPayment $payment */
-            if ($payment->canAction(new \DateTime()) && $payment->getSource() != Payment::SOURCE_ADMIN) {
+            if ($payment->getSource() == Payment::SOURCE_ADMIN) {
+                continue;
+            }
+
+            // TODO: Fixme
+            // There's a horrible hack on refund listener where payments must be successful for salva refund amounts
+            // to work out.
+            if ($payment->getAmount() < 0 && $payment->isSuccess() &&
+                $payment->getStatus() == BacsPayment::STATUS_PENDING && $payment->getDate() < $twoDays) {
+                continue;
+            }
+
+            if ($payment->canAction(new \DateTime())) {
                 throw new MonitorException(sprintf('There are bacs payments waiting actioning: %s', $payment->getId()));
             }
         }

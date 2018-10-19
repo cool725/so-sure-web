@@ -263,7 +263,13 @@ class BacsCommand extends BaseCommand
         ];
 
         $output->writeln('Exporting Credit Payments');
-        $creditPayments = $bacsService->exportPaymentsCredits($processingDate, $serialNumber, $data, !$debug);
+        $creditPayments = $bacsService->exportPaymentsCredits(
+            $processingDate,
+            $serialNumber,
+            $data,
+            false,
+            !$debug
+        );
         $data['credits'] = count($creditPayments);
         if ($debug) {
             $output->writeln(json_encode($creditPayments, JSON_PRETTY_PRINT));

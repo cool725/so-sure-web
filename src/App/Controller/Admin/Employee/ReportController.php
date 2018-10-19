@@ -32,14 +32,28 @@ class ReportController extends AbstractController
     }
 
     /**
-     * @Route("/admin/reports",        name="admin_reports")
-     * @Route("/admin/reports/claims", name="admin_reports_claims")
+     * @Route("/admin/reports",               name="admin_reports")
+     * @Route("/admin/reports/claims",        name="admin_reports_claims")
      */
     public function claimsReportAction(Request $request)
     {
-        list($start, $end) = $this->reporting->getLast7DaysPeriod($request->get('start'), $end = $request->get('end'));
+        $period = $request->get('period');
+        $period = isset($period) ? $period : ReportingService::REPORT_PERIODS_DEFAULT;
+        $report = ['period' => $period];
+        $report['periods'] = array_keys(ReportingService::REPORT_PERIODS);
 
-        $report = $this->reporting->report($start, $end, false);    // 233 queries
+        // Get the start and end dates for the given period.
+        try {
+            list($start, $end) = ReportingService::getLastPeriod($period);
+        } catch (\InvalidArgumentException $e) {
+            $report['error'] = "Invalid URL, period {$period} does not exist.";
+            $report['period'] = ReportingService::REPORT_PERIODS_DEFAULT;
+            return $this->render('AppBundle:AdminEmployee:adminReports.html.twig', $report);
+        }
+
+        $report['claims'] = $this->reporting->report($start, $end, false);
+        $report['start'] = $start->format('Y-m-d');
+        $report['end'] = $end->format('Y-m-d');
 
         return $this->render('AppBundle:AdminEmployee:adminReports.html.twig', $report);
     }
@@ -49,8 +63,7 @@ class ReportController extends AbstractController
      */
     public function connectionsReportAction()
     {
-        $report['data'] = $this->reporting->connectionReport();
-
+        $report['connections'] = $this->reporting->connectionReport();
         return $this->render('AppBundle:AdminEmployee:adminReports.html.twig', $report);
     }
 
@@ -59,8 +72,7 @@ class ReportController extends AbstractController
      */
     public function scheduledReportAction()
     {
-        $report['data']['scheduledPayments'] = $this->reporting->getScheduledPayments();
-
+        $report['scheduledPayments'] = $this->reporting->getScheduledPayments();
         return $this->render('AppBundle:AdminEmployee:adminReports.html.twig', $report);
     }
 }
