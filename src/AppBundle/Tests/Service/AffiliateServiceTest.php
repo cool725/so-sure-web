@@ -6,6 +6,7 @@ use AppBundle\Document\AffiliateCompany;
 use AppBundle\Document\Attribution;
 use AppBundle\Repository\PhoneRepository;
 use AppBundle\Repository\UserRepository;
+use AppBundle\Repository\ChargeRepository;
 use AppBundle\Service\AffiliateService;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Doctrine\ODM\MongoDB\DocumentManager;
@@ -78,7 +79,8 @@ class AffiliateServiceTest extends WebTestCase
         self::$userRepo = $userRepo;
         self::$userManager = self::$container->get('fos_user.user_manager');
         /** @var ChargeRepository $chargeRepo */
-        self::$chargeRepo = self::$dm->getRepository(Charge::class);
+        $chargeRepo = self::$dm->getRepository(Charge::class);
+        self::$chargeRepo = $chargeRepo;
 
         /** @var AffiliateService $affiliateService */
         $affiliateService = self::$container->get('app.affiliate');
