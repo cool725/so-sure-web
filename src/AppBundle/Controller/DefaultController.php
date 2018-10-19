@@ -126,7 +126,7 @@ class DefaultController extends BaseController
     }
 
     /**
-     * @Route("/reward-pot", name="reward_pot")
+     * @Route("/reward-pot", name="reward_pot", options={"sitemap"={"priority":"0.5","changefreq":"daily"}})
      */
     public function rewardPot()
     {
