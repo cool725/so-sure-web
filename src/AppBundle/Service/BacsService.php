@@ -563,6 +563,11 @@ class BacsService
                     $debitPayment->setSource(Payment::SOURCE_SYSTEM);
                     $debitPayment->setNotes('Arudd payment failure');
                     $policy->addPayment($debitPayment);
+
+                    // refund requires commission to be set, but probably isn't at this point in time
+                    if (!$submittedPayment->getTotalCommission()) {
+                        $submittedPayment->setCommission();
+                    }
                     $debitPayment->setRefundTotalCommission($submittedPayment->getTotalCommission());
                     $debitPayment->calculateSplit();
 
@@ -916,7 +921,11 @@ class BacsService
                 /** @var User $user */
                 $user = $repo->findOneBy(['paymentMethod.bankAccount.reference' => $reference]);
                 if (!$user) {
-                    throw new \Exception(sprintf('Unable to find user with reference %s', $reference));
+                    $error = sprintf('Unable to find user with reference %s. Unable to cancel mandate.', $reference);
+                    $results['errors'][] = $error;
+                    $this->logger->warning($error);
+
+                    continue;
                 }
 
                 $reason = $this->getReason($element);
