@@ -13,7 +13,7 @@
                     <i class="fal fa-times text-zaffre"></i>
                 </button>
             </div>
-            <div class="modal-body">
+            <div class="modal-body modal-onboarding-body">
                 <div id="onboarding-carousel"
                      class="carousel slide"
                      data-ride="carousel"
@@ -21,54 +21,88 @@
                      data-wrap="false">
                     <div class="carousel-inner">
                         <div class="carousel-item active">
-                            <div class="d-md-flex align-items-md-center">
-                                <div class="onboarding-carousel__image">
-                                    <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_app.png" alt="so-sure - Download the app" width="280px">
+                            <div class="d-lg-flex align-items-lg-center px-5 pb-5">
+                                <div class="modal-onboarding__image">
+                                    <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_app.png" alt="so-sure - Download the app">
                                 </div>
-                                <div class="onboarding-carousel__body ml-md-3">
-                                    <h2 class="h3 text-primary mb-3">Download the app</h2>
-                                    <p class="mb-3">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi sed ex ut lacus efficitur tincidunt sed et odio. Cras dictum tortor molestie orci ullamcorper.</p>
-                                    <form action="">
-                                        <input type="text">
-                                    </form>
+                                <div class="modal-onboarding__body ml-lg-3">
+                                    <h2 class="h3 text-primary mb-3">Download the so-sure app and lorem ipsum dolor</h2>
+                                    <p class="mb-lg-5">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi sed ex ut lacus efficitur tincidunt sed et odio. Cras dictum tortor molestie orci ullamcorper.</p>
+                                    <a href="#" class="btn btn-primary btn-blue-gradient btn-block-xs mr-lg-2">Send</a>
                                 </div>
                             </div>
                         </div>
                         <div class="carousel-item">
-                            2
+                            <div class="d-lg-flex align-items-lg-center px-5 pb-5">
+                                <div class="modal-onboarding__image">
+                                    <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_phone-qr.png" alt="so-sure - Verify your phone">
+                                </div>
+                                <div class="modal-onboarding__body ml-lg-3">
+                                    <h2 class="h3 text-primary mb-3">Verify your phone &amp; reduce  your excess</h2>
+                                    <p class="mb-lg-5">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi sed ex ut lacus efficitur tincidunt sed et odio. Cras dictum tortor molestie orci ullamcorper.</p>
+                                    <a href="#" class="btn btn-primary btn-blue-gradient btn-block-xs mr-lg-2">Verify Phone</a>
+                                    {# TODO: Update video url #}
+                                    <a href="#"
+                                       class="btn btn-outline-primary watch-video btn-block-xs"
+                                       data-event="watch-video-index-hero"
+                                       data-toggle="modal"
+                                       data-target="#sosure-video-modal"
+                                       data-src="https://www.youtube.com/embed/QEskwqsNgrQ">
+                                        <i class="far fa-play-circle fa-lg opacity-50 mr-1"></i>
+                                        How it works
+                                    </a>
+                                </div>
+                            </div>
                         </div>
                         <div class="carousel-item">
-                            3
+                            <div class="d-lg-flex align-items-lg-center px-5 pb-5">
+                                <div class="modal-onboarding__image">
+                                    <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_friends-connect.png" alt="so-sure - Invite your friends and get  rewarded">
+                                </div>
+                                <div class="modal-onboarding__body ml-lg-3">
+                                    <h2 class="h3 text-primary mb-3">Invite your friends and get  rewarded up to &pound;100!</h2>
+                                    <p class="mb-lg-5">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi sed ex ut lacus efficitur tincidunt sed et odio. Cras dictum tortor molestie orci ullamcorper.</p>
+                                    <a href="#" class="btn btn-primary btn-blue-gradient btn-block-xs mr-lg-2">Verify Phone</a>
+                                    {# TODO: Update video url #}
+                                    <a href="#"
+                                       class="btn btn-outline-primary watch-video btn-block-xs"
+                                       data-event="watch-video-index-hero"
+                                       data-toggle="modal"
+                                       data-target="#sosure-video-modal"
+                                       data-src="https://www.youtube.com/embed/QEskwqsNgrQ">
+                                        <i class="far fa-play-circle fa-lg opacity-50 mr-1"></i>
+                                        How it works
+                                    </a>
+                                </div>
+                            </div>
                         </div>
                     </div>
-{#                     <div>
-                        <ol class="carousel-indicators">
-                            <li data-target="#onboarding-carousel" data-slide-to="0" class="active"></li>
-                            <li data-target="#onboarding-carousel" data-slide-to="1"></li>
-                            <li data-target="#onboarding-carousel" data-slide-to="2"></li>
-                        </ol>
-                    </div> #}
                 </div>
             </div>
-            <div class="modal-footer modal-onboarding-footer">
-{#                 <ul class="list-inline mb-0 onboarding-indicators">
-                    <li class="active list-inline-item">
+            <div class="modal-footer modal-onboarding-footer justify-content-between">
+                <ol class="list-inline mb-0 onboarding-indicators">
+                    <li class="active list-inline-item"
+                        data-target="#onboarding-carousel"
+                        data-slide-to="0">
                         <i class="fas fa-circle"></i>
                     </li>
-                    <li class="list-inline-item">
+                    <li class="list-inline-item"
+                        data-target="#onboarding-carousel"
+                        data-slide-to="1">
                         <i class="fas fa-circle"></i>
                     </li>
-                    <li class="list-inline-item">
+                    <li class="list-inline-item"
+                        data-target="#onboarding-carousel"
+                        data-slide-to="2">
                         <i class="fas fa-circle"></i>
                     </li>
-                </ul> #}
+                </ol>
                 <div class="onboarding-controls d-flex align-items-center">
                     <a href="#onboarding-carousel"
                        id="onboarding-prev-btn"
-                       class="btn btn-outline-grey d-flex btn-circle justify-content-center align-items-center"
+                       class="btn btn-outline-grey d-flex btn-circle justify-content-center align-items-center disabled"
                        role="button"
-                       data-slide="prev"
-                       disabled="disabled">
+                       data-slide="prev">
                         <span class="sr-only">back</span>
                         <i class="far fa-arrow-left"></i></a>
                     <a href="#onboarding-carousel"

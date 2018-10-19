@@ -37,12 +37,48 @@
 // Includes Carousel component
 .modal-onboarding {
 
+    &.modal-dialog {
+
+        @include media-breakpoint-down(xs) {
+            margin: 0;
+        }
+    }
+
+    .modal-content {
+        min-height: 100vh;
+
+        @include media-breakpoint-up(md) {
+            min-height: inherit;
+        }
+    }
+
     &-header {
         background: none;
     }
 
+    &-body {
+        text-align: center;
+        padding: 0;
+
+        @include media-breakpoint-up(lg) {
+            text-align: left;
+        }
+    }
+
+    &__image {
+
+        img {
+            width: 120px;
+
+            @include media-breakpoint-up(lg) {
+                width: 280px;
+            }
+        }
+    }
+
     &-footer {
         position: relative;
+        padding: 1rem 2rem;
         background-color: $selago;
         @include  border-bottom-radius(10px);
     }
