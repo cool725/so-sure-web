@@ -127,7 +127,13 @@ class PolicyPayCommand extends ContainerAwareCommand
             throw new \Exception('1 or 12 payments only');
         }
 
-        $details = $this->judopayService->runTokenPayment($user, $amount, $date->getTimestamp(), $policy->getId(), $customerRef);
+        $details = $this->judopayService->runTokenPayment(
+            $user,
+            $amount,
+            $date->getTimestamp(),
+            $policy->getId(),
+            $customerRef
+        );
         $this->judopayService->add(
             $policy,
             $details['receiptId'],
