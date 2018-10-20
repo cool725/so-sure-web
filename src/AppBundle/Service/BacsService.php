@@ -921,7 +921,11 @@ class BacsService
                 /** @var User $user */
                 $user = $repo->findOneBy(['paymentMethod.bankAccount.reference' => $reference]);
                 if (!$user) {
-                    throw new \Exception(sprintf('Unable to find user with reference %s', $reference));
+                    $error = sprintf('Unable to find user with reference %s. Unable to cancel mandate.', $reference);
+                    $results['errors'][] = $error;
+                    $this->logger->warning($error);
+
+                    continue;
                 }
 
                 $reason = $this->getReason($element);

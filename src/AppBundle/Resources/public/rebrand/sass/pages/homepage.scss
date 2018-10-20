@@ -254,3 +254,19 @@
         background-position: right 50px;
     }
 }
+
+.banner {
+    position: relative;
+    text-align: center;
+
+    @include blue-gradient;
+
+    &__close {
+        position: absolute;
+        top: 2rem; right: 2rem;
+    }
+
+    @include media-breakpoint-up(lg) {
+        text-align: left;
+    }
+}
