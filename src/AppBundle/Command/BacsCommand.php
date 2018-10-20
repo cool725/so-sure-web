@@ -14,6 +14,8 @@ use AppBundle\Service\BacsService;
 use AppBundle\Service\MailerService;
 use AppBundle\Service\PaymentService;
 use AppBundle\Service\SequenceService;
+use Doctrine\ODM\MongoDB\DocumentManager;
+use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
@@ -22,10 +24,19 @@ use AppBundle\Document\User;
 use phpseclib\Net\SFTP;
 use phpseclib\Crypt\RSA;
 
-class BacsCommand extends BaseCommand
+class BacsCommand extends ContainerAwareCommand
 {
     use DateTrait;
     const S3_BUCKET = 'admin.so-sure.com';
+
+    /** @var DocumentManager  */
+    protected $dm;
+
+    public function __construct(DocumentManager $dm)
+    {
+        parent::__construct();
+        $this->dm = $dm;
+    }
 
     protected function configure()
     {
@@ -230,7 +241,7 @@ class BacsCommand extends BaseCommand
         }
 
         if (!$debug) {
-            $this->getManager()->flush();
+            $this->dm->flush();
             $output->writeln('Saved changes to db.');
         }
 
@@ -302,7 +313,7 @@ class BacsCommand extends BaseCommand
         }
 
         if (!$debug) {
-            $this->getManager()->flush();
+            $this->dm->flush();
             $output->writeln('Saved changes to db.');
         }
 

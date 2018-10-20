@@ -3,6 +3,7 @@
 namespace AppBundle\Command;
 
 use AppBundle\Service\MixpanelService;
+use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -12,8 +13,17 @@ use Symfony\Component\Console\Helper\Table;
 use AppBundle\Document\User;
 use AppBundle\Document\PhonePolicy;
 
-class MixpanelCommand extends BaseCommand
+class MixpanelCommand extends ContainerAwareCommand
 {
+    /** @var DocumentManager  */
+    protected $dm;
+
+    public function __construct(DocumentManager $dm)
+    {
+        parent::__construct();
+        $this->dm = $dm;
+    }
+
     protected function configure()
     {
         $this
@@ -157,14 +167,14 @@ class MixpanelCommand extends BaseCommand
 
     private function getUserRepository()
     {
-        $repo = $this->getManager()->getRepository(User::class);
+        $repo = $this->dm->getRepository(User::class);
 
         return $repo;
     }
 
     private function getPhonePolicyRepository()
     {
-        $repo = $this->getManager()->getRepository(PhonePolicy::class);
+        $repo = $this->dm->getRepository(PhonePolicy::class);
 
         return $repo;
     }

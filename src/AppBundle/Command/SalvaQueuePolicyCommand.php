@@ -4,6 +4,7 @@ namespace AppBundle\Command;
 
 use AppBundle\Repository\PhonePolicyRepository;
 use AppBundle\Service\SalvaExportService;
+use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -12,8 +13,17 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Helper\Table;
 use AppBundle\Document\SalvaPhonePolicy;
 
-class SalvaQueuePolicyCommand extends BaseCommand
+class SalvaQueuePolicyCommand extends ContainerAwareCommand
 {
+    /** @var DocumentManager */
+    protected $dm;
+
+    public function __construct(DocumentManager $dm)
+    {
+        parent::__construct();
+        $this->dm = $dm;
+    }
+
     protected function configure()
     {
         $this
@@ -96,9 +106,8 @@ class SalvaQueuePolicyCommand extends BaseCommand
         }
 
         if ($policyNumber) {
-            $dm = $this->getManager();
             /** @var PhonePolicyRepository $repo */
-            $repo = $dm->getRepository(SalvaPhonePolicy::class);
+            $repo = $this->dm->getRepository(SalvaPhonePolicy::class);
             /** @var SalvaPhonePolicy $phonePolicy */
             $phonePolicy = $repo->findOneBy(['policyNumber' => $policyNumber]);
 

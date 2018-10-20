@@ -11,6 +11,7 @@ use AppBundle\Service\JudopayService;
 use AppBundle\Service\MailerService;
 use AppBundle\Service\PolicyService;
 use AppBundle\Service\RouterService;
+use Doctrine\ODM\MongoDB\DocumentManager;
 use Predis\Client;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
@@ -26,9 +27,18 @@ use AppBundle\Document\Cashback;
 use AppBundle\Document\Connection\StandardConnection;
 use AppBundle\Classes\SoSure;
 
-class EmailDebugCommand extends BaseCommand
+class EmailDebugCommand extends ContainerAwareCommand
 {
     use CurrencyTrait;
+
+    /** @var DocumentManager */
+    protected $dm;
+
+    public function __construct(DocumentManager $dm)
+    {
+        parent::__construct();
+        $this->dm = $dm;
+    }
 
     protected function configure()
     {
@@ -168,9 +178,8 @@ class EmailDebugCommand extends BaseCommand
         }
         $data = [];
         if (in_array($template, $templates['bacs'])) {
-            $dm = $this->getManager();
             /** @var UserRepository $repo */
-            $repo = $dm->getRepository(User::class);
+            $repo = $this->dm->getRepository(User::class);
             /** @var User $user */
             $user = $repo->findOneBy(['paymentMethod.type' => 'bacs']);
             $data = [
@@ -179,9 +188,8 @@ class EmailDebugCommand extends BaseCommand
                 'claimed' => $variation == 'cancelledClaimed' ? true : false,
             ];
         } elseif (in_array($template, $templates['cashback'])) {
-            $dm = $this->getManager();
             /** @var CashbackRepository $repo */
-            $repo = $dm->getRepository(Cashback::class);
+            $repo = $this->dm->getRepository(Cashback::class);
             /** @var Cashback $cashback */
             $cashback = $repo->findOneBy([]);
             /** @var RouterService $router */
@@ -194,9 +202,8 @@ class EmailDebugCommand extends BaseCommand
                 ),
             ];
         } elseif (in_array($template, $templates['potReward'])) {
-            $dm = $this->getManager();
             /** @var PolicyRepository $repo */
-            $repo = $dm->getRepository(Policy::class);
+            $repo = $this->dm->getRepository(Policy::class);
             $policies = $repo->findBy(['nextPolicy' => ['$ne' => null]]);
             $policy = null;
             foreach ($policies as $checkPolicy) {
@@ -214,9 +221,8 @@ class EmailDebugCommand extends BaseCommand
                 'additional_amount' => 10,
             ];
         } elseif (in_array($template, $templates['policyConnection'])) {
-            $dm = $this->getManager();
             /** @var ConnectionRepository $repo */
-            $repo = $dm->getRepository(StandardConnection::class);
+            $repo = $this->dm->getRepository(StandardConnection::class);
             /** @var StandardConnection $connection */
             $connection = $repo->findOneBy(['value' => ['$gt' => 0]]);
             /** @var PolicyService $policyService */
@@ -224,9 +230,8 @@ class EmailDebugCommand extends BaseCommand
 
             return $policyService->connectionReduced($connection);
         } elseif (in_array($template, $templates['policy'])) {
-            $dm = $this->getManager();
             /** @var PolicyRepository $repo */
-            $repo = $dm->getRepository(Policy::class);
+            $repo = $this->dm->getRepository(Policy::class);
             $policies = $repo->findBy(['status' => Policy::STATUS_ACTIVE]);
             $policy = null;
             foreach ($policies as $policy) {
@@ -240,9 +245,8 @@ class EmailDebugCommand extends BaseCommand
 
             return $policyService->resendPolicyEmail($policy);
         } elseif (in_array($template, $templates['policyFailedPayment'])) {
-            $dm = $this->getManager();
             /** @var PolicyRepository $repo */
-            $repo = $dm->getRepository(Policy::class);
+            $repo = $this->dm->getRepository(Policy::class);
             $policies = $repo->findBy(['status' => Policy::STATUS_ACTIVE]);
             $policy = null;
             foreach ($policies as $policy) {
@@ -256,9 +260,8 @@ class EmailDebugCommand extends BaseCommand
 
             return $judopayService->failedPaymentEmail($policy);
         } elseif (in_array($template, $templates['policyCancellation'])) {
-            $dm = $this->getManager();
             /** @var PolicyRepository $repo */
-            $repo = $dm->getRepository(Policy::class);
+            $repo = $this->dm->getRepository(Policy::class);
             $policies = $repo->findBy(['status' => Policy::STATUS_ACTIVE]);
             $policy = null;
             foreach ($policies as $policy) {
@@ -273,9 +276,8 @@ class EmailDebugCommand extends BaseCommand
 
             return $policyService->cancelledPolicyEmail($policy, $baseTemplate);
         } elseif (in_array($template, $templates['policyRenewal'])) {
-            $dm = $this->getManager();
             /** @var PolicyRepository $repo */
-            $repo = $dm->getRepository(Policy::class);
+            $repo = $this->dm->getRepository(Policy::class);
             $policies = $repo->findBy(['status' => Policy::STATUS_PENDING_RENEWAL]);
             $policy = null;
             foreach ($policies as $pendingRenewal) {
@@ -322,9 +324,8 @@ class EmailDebugCommand extends BaseCommand
             $policyService = $this->getContainer()->get('app.policy');
             return $policyService->pendingRenewalEmail($policy);
         } elseif (in_array($template, $templates['picsure'])) {
-            $dm = $this->getManager();
             /** @var PolicyRepository $repo */
-            $repo = $dm->getRepository(Policy::class);
+            $repo = $this->dm->getRepository(Policy::class);
             $policy = $repo->findOneBy(['status' => Policy::STATUS_ACTIVE]);
             $data = [
                 'policy' => $policy,

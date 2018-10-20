@@ -6,6 +6,7 @@ use AppBundle\Repository\ClaimRepository;
 use AppBundle\Repository\PhonePolicyRepository;
 use AppBundle\Repository\PhoneRepository;
 use AppBundle\Service\ReceperioService;
+use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -16,8 +17,17 @@ use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Claim;
 
-class ImeiCommand extends BaseCommand
+class ImeiCommand extends ContainerAwareCommand
 {
+    /** @var DocumentManager  */
+    protected $dm;
+
+    public function __construct(DocumentManager $dm)
+    {
+        parent::__construct();
+        $this->dm = $dm;
+    }
+
     protected function configure()
     {
         $this
@@ -166,7 +176,7 @@ class ImeiCommand extends BaseCommand
     private function getPolicyByImei($imei)
     {
         /** @var PhonePolicyRepository $repo */
-        $repo = $this->getManager()->getRepository(PhonePolicy::class);
+        $repo = $this->dm->getRepository(PhonePolicy::class);
         $policy = $repo->findOneBy(['imei' => $imei]);
         if (!$policy) {
             throw new \Exception('Unable to find policy');
@@ -178,7 +188,7 @@ class ImeiCommand extends BaseCommand
     private function getPolicy($policyId)
     {
         /** @var PhonePolicyRepository $repo */
-        $repo = $this->getManager()->getRepository(PhonePolicy::class);
+        $repo = $this->dm->getRepository(PhonePolicy::class);
         $policy = $repo->find($policyId);
         if (!$policy) {
             throw new \Exception('Unable to find policy');
@@ -190,7 +200,7 @@ class ImeiCommand extends BaseCommand
     private function getClaim($claimId)
     {
         /** @var ClaimRepository $repo */
-        $repo = $this->getManager()->getRepository(Claim::class);
+        $repo = $this->dm->getRepository(Claim::class);
         $claim = $repo->find($claimId);
         if (!$claim) {
             throw new \Exception('Unable to find claim');
@@ -202,7 +212,7 @@ class ImeiCommand extends BaseCommand
     private function getClaimByNumber($claimNumber)
     {
         /** @var ClaimRepository $repo */
-        $repo = $this->getManager()->getRepository(Claim::class);
+        $repo = $this->dm->getRepository(Claim::class);
         $claim = $repo->findOneBy(['number' => $claimNumber]);
         if (!$claim) {
             throw new \Exception('Unable to find claim');
@@ -215,7 +225,7 @@ class ImeiCommand extends BaseCommand
     {
         $phone = null;
         /** @var PhoneRepository $phoneRepo */
-        $phoneRepo = $this->getManager()->getRepository(Phone::class);
+        $phoneRepo = $this->dm->getRepository(Phone::class);
         if ($device && $memory) {
             $phone = $phoneRepo->findOneBy(['devices' => $device, 'memory' => (int)$memory]);
         } elseif ($device) {

@@ -2,6 +2,9 @@
 
 namespace AppBundle\Command;
 
+use AppBundle\Service\MailerService;
+use FOS\UserBundle\Mailer\Mailer;
+use Predis\Client;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -13,6 +16,19 @@ use Symfony\Component\HttpFoundation\Request;
 
 class OpsReportCommand extends ContainerAwareCommand
 {
+    /** @var MailerService */
+    protected $mailerService;
+
+    /** @var Client  */
+    protected $redis;
+
+    public function __construct(MailerService $mailerService, Client $redis)
+    {
+        parent::__construct();
+        $this->mailerService = $mailerService;
+        $this->redis = $redis;
+    }
+
     protected function configure()
     {
         $this
@@ -24,18 +40,17 @@ class OpsReportCommand extends ContainerAwareCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $redis = $this->getContainer()->get('snc_redis.default');
-        $mailer = $this->getContainer()->get('app.mailer');
 
-        $response = $this->sendCsp($redis, $mailer);
+        $response = $this->sendCsp();
         $output->writeln(sprintf('Sent %s CSP violations', $response));
-        $response = $this->sendClientValidation($redis, $mailer);
+        $response = $this->sendClientValidation();
         $output->writeln(sprintf('Sent %s', $response));
     }
 
-    private function sendCsp($redis, $mailer)
+    private function sendCsp()
     {
         $items = [];
-        while (($item = $redis->lpop('csp')) != null) {
+        while (($item = $this->redis->lpop('csp')) != null) {
             $items[] = $item;
         }
 
@@ -43,7 +58,7 @@ class OpsReportCommand extends ContainerAwareCommand
         if (!$html) {
             $html = 'No csp violations';
         }
-        $mailer->send('CSP Report', 'tech+ops@so-sure.com', $html);
+        $this->mailerService->send('CSP Report', 'tech+ops@so-sure.com', $html);
         return count($items);
 
     }
@@ -76,17 +91,19 @@ class OpsReportCommand extends ContainerAwareCommand
         return (count($items) == $emptyValues) ? false : $items;
     }
 
-    private function sendClientValidation($redis, $mailer)
+    private function sendClientValidation()
     {
         $items = [];
-        $keys = $redis->hkeys('client-validation');
+        $keys = $this->redis->hkeys('client-validation');
         foreach ($keys as $item) {
             $data = json_decode($item, true);
             if ($data) {
                 if (isset($data['url']) && isset($data['errors'])) {
-                    $time = $redis->hget('client-validation', $item);
-                    if ($time) {
-                        $time = new \DateTime(sprintf('@%s', $time));
+                    $time = null;
+                    $timeValue = $this->redis->hget('client-validation', $item);
+                    if ($timeValue) {
+                        /** @var \DateTime $time */
+                        $time = new \DateTime(sprintf('@%s', $timeValue));
                     }
                     // parsing errors first to se if we need to add items to the email
                     $parsedErrors = $this->parseErrors($data['errors']);
@@ -110,13 +127,13 @@ class OpsReportCommand extends ContainerAwareCommand
                     $items[] = '';
                 }
             }
-            $redis->hdel('client-validation', $item);
+            $this->redis->hdel('client-validation', $item);
         }
         $html = implode('<br>', $items);
         if (!$html) {
             $html = 'No client validation failures';
         }
-        $mailer->send('Client Validation Failures', 'tech+ops@so-sure.com', $html);
+        $this->mailerService->send('Client Validation Failures', 'tech+ops@so-sure.com', $html);
         return count($items) > 0 ? 'found validation failures' : 'no validation failures';
     }
 }

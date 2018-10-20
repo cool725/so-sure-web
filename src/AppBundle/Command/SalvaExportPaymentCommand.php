@@ -4,6 +4,7 @@ namespace AppBundle\Command;
 
 use AppBundle\Document\File\SalvaPaymentFile;
 use AppBundle\Service\SalvaExportService;
+use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -13,9 +14,18 @@ use Symfony\Component\Console\Helper\Table;
 use AppBundle\Classes\Premium;
 use AppBundle\Document\DateTrait;
 
-class SalvaExportPaymentCommand extends BaseCommand
+class SalvaExportPaymentCommand extends ContainerAwareCommand
 {
     use DateTrait;
+
+    /** @var DocumentManager  */
+    protected $dm;
+
+    public function __construct(DocumentManager $dm)
+    {
+        parent::__construct();
+        $this->dm = $dm;
+    }
 
     protected function configure()
     {
@@ -62,7 +72,8 @@ class SalvaExportPaymentCommand extends BaseCommand
             print_r($dateStart);
             $dateEnd = $this->endOfMonth($date);
             print_r($dateEnd);
-            $repo = $this->getManager()->getRepository(SalvaPaymentFile::class);
+            $repo = $this->dm->getRepository(SalvaPaymentFile::class);
+            /** @var SalvaPaymentFile $paymentFile */
             $paymentFile = $repo->findOneBy(['date' => ['$gte' => $dateStart, '$lt' => $dateEnd]]);
             if ($paymentFile) {
                 $data = $salva->exportPayments(true, $date, $paymentFile);

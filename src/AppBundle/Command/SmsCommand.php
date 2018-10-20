@@ -3,6 +3,7 @@
 namespace AppBundle\Command;
 
 use AppBundle\Service\SmsService;
+use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -11,8 +12,17 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Helper\Table;
 use AppBundle\Document\Policy;
 
-class SmsCommand extends BaseCommand
+class SmsCommand extends ContainerAwareCommand
 {
+    /** @var DocumentManager   */
+    protected $dm;
+
+    public function __construct(DocumentManager $dm)
+    {
+        parent::__construct();
+        $this->dm = $dm;
+    }
+
     protected function configure()
     {
         $this
@@ -42,7 +52,8 @@ class SmsCommand extends BaseCommand
         $sms = $this->getContainer()->get('app.sms');
 
         if ($policyNumber) {
-            $repo = $this->getManager()->getRepository(Policy::class);
+            $repo = $this->dm->getRepository(Policy::class);
+            /** @var Policy $policy */
             $policy = $repo->findOneBy(['policyNumber' => $policyNumber]);
             if (!$policy) {
                 throw new \Exception(sprintf('Unable to find policy %s', $policyNumber));

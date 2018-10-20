@@ -9,6 +9,7 @@ use AppBundle\Security\FOSUBUserProvider;
 use AppBundle\Service\JudopayService;
 use AppBundle\Service\MailerService;
 use AppBundle\Service\PolicyService;
+use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\DocumentRepository;
 use FOS\UserBundle\Model\UserManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
@@ -26,8 +27,17 @@ use AppBundle\Document\User;
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\EmailValidator;
 
-class LeadsCommand extends BaseCommand
+class LeadsCommand extends ContainerAwareCommand
 {
+    /** @var DocumentManager  */
+    protected $dm;
+
+    public function __construct(DocumentManager $dm)
+    {
+        parent::__construct();
+        $this->dm = $dm;
+    }
+
     protected function configure()
     {
         $this
@@ -49,9 +59,9 @@ class LeadsCommand extends BaseCommand
         /** @var UserManagerInterface $userManager */
         $userManager = $this->getContainer()->get('fos_user.user_manager');
         /** @var UserRepository $userRepo */
-        $userRepo = $this->getManager()->getRepository(User::class);
+        $userRepo = $this->dm->getRepository(User::class);
         /** @var DocumentRepository $leadsRepo */
-        $leadsRepo = $this->getManager()->getRepository(Lead::class);
+        $leadsRepo = $this->dm->getRepository(Lead::class);
         $yesterday = new \DateTime();
         $yesterday = $yesterday->sub(new \DateInterval(('P1D')));
         $leads = $leadsRepo->findBy(['email' => ['$ne' => null], 'created' => ['$lte' => $yesterday]]);
@@ -67,7 +77,7 @@ class LeadsCommand extends BaseCommand
 
             if (mb_strlen($lead->getEmail()) < 5) {
                 $output->writeln(sprintf('Deleting lead %s as invalid email', $lead->getEmail()));
-                $this->getManager()->remove($lead);
+                $this->dm->remove($lead);
                 continue;
             }
 
@@ -75,18 +85,18 @@ class LeadsCommand extends BaseCommand
             // user exists, so lead can be removed
             if ($user || in_array(mb_strtolower($lead->getEmail()), $newUsers)) {
                 $output->writeln(sprintf('Deleting lead %s as user exists', $lead->getEmail()));
-                $this->getManager()->remove($lead);
+                $this->dm->remove($lead);
             } else {
                 $output->writeln(sprintf('Create user %s from lead', $lead->getEmail()));
                 /** @var User $user */
                 $user = $userManager->createUser();
                 $user->setEnabled(true);
                 $lead->populateUser($user);
-                $this->getManager()->persist($user);
+                $this->dm->persist($user);
                 $newUsers[] = mb_strtolower($lead->getEmail());
             }
         }
-        $this->getManager()->flush();
+        $this->dm->flush();
 
         $output->writeln(sprintf('Finished. Processed %d of %d leads', $count, count($leads)));
     }

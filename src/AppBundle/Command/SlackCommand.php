@@ -4,6 +4,7 @@ namespace AppBundle\Command;
 
 use AppBundle\Repository\PhonePolicyRepository;
 use AppBundle\Service\RouterService;
+use Doctrine\ODM\MongoDB\DocumentManager;
 use Maknz\Slack\Client;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
@@ -15,8 +16,17 @@ use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Policy;
 use Symfony\Component\Routing\RouterInterface;
 
-class SlackCommand extends BaseCommand
+class SlackCommand extends ContainerAwareCommand
 {
+    /** @var DocumentManager  */
+    protected $dm;
+
+    public function __construct(DocumentManager $dm)
+    {
+        parent::__construct();
+        $this->dm = $dm;
+    }
+
     protected function configure()
     {
         $this
@@ -95,12 +105,13 @@ class SlackCommand extends BaseCommand
         /** @var RouterService $router */
         $router = $this->getContainer()->get('app.router');
         /** @var PhonePolicyRepository $repo */
-        $repo = $this->getManager()->getRepository(PhonePolicy::class);
+        $repo = $this->dm->getRepository(PhonePolicy::class);
         $policies = $repo->findAll();
 
         $lines = [];
         $now = new \DateTime();
         foreach ($policies as $policy) {
+            /** @var Policy $policy */
             if (!$policy->isPolicy() || !$policy->isCancelledAndPaymentOwed()) {
                 continue;
             }
@@ -130,7 +141,7 @@ class SlackCommand extends BaseCommand
         /** @var RouterService $router */
         $router = $this->getContainer()->get('app.router');
         /** @var PhonePolicyRepository $repo */
-        $repo = $this->getManager()->getRepository(PhonePolicy::class);
+        $repo = $this->dm->getRepository(PhonePolicy::class);
         $policies = $repo->getUnpaidPolicies();
 
         $lines = [];
@@ -176,12 +187,13 @@ class SlackCommand extends BaseCommand
         /** @var RouterService $router */
         $router = $this->getContainer()->get('app.router');
         /** @var PhonePolicyRepository $repo */
-        $repo = $this->getManager()->getRepository(PhonePolicy::class);
+        $repo = $this->dm->getRepository(PhonePolicy::class);
         $policies = $repo->findBy(['status' => Policy::STATUS_DECLINED_RENEWAL]);
 
         $lines = [];
         $now = new \DateTime();
         foreach ($policies as $policy) {
+            /** @var Policy $policy */
             $diff = $now->diff($policy->getRenewalExpiration());
             if (!in_array($diff->days, [5])) {
                 continue;
@@ -210,7 +222,8 @@ class SlackCommand extends BaseCommand
 
     private function policies($channel, $weeks, $skipSlack)
     {
-        $repo = $this->getManager()->getRepository(PhonePolicy::class);
+        /** @var PhonePolicyRepository $repo */
+        $repo = $this->dm->getRepository(PhonePolicy::class);
 
         $weekText = '';
         $start = new \DateTime('2016-12-05');

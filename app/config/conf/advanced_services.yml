@@ -11,9 +11,9 @@ services:
         # if you need to do this, you can override this setting on individual services
         public: false
         bind:
-            #$kernelEnvironment: "%kernel.environment%"
+            $environment: "%kernel.environment%"
             $redis: "@snc_redis.default"
-            $documentManager: "@doctrine_mongodb.odm.default_document_manager"
+            $dm: "@doctrine_mongodb.odm.default_document_manager"
 
     # makes classes in src/AppBundle available to be used as services
     # this creates a service per class whose id is the fully-qualified class name
@@ -27,6 +27,11 @@ services:
     App\Controller\:
         resource: '../../../src/App/Controller/*'
         public: true
+
+    ## Command ####################################################
+
+    AppBundle\Command\:
+        resource: '../../../src/AppBundle/Command/*'
 
     ## Miscellaneous services #########################################
     app.datetimenormalizer:

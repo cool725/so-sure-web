@@ -8,6 +8,7 @@ use AppBundle\Security\FOSUBUserProvider;
 use AppBundle\Service\JudopayService;
 use AppBundle\Service\MailerService;
 use AppBundle\Service\PolicyService;
+use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -21,8 +22,17 @@ use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Document\Payment\Payment;
 use AppBundle\Document\User;
 
-class UsersDeleteCommand extends BaseCommand
+class UsersDeleteCommand extends ContainerAwareCommand
 {
+    /** @var DocumentManager  */
+    protected $dm;
+
+    public function __construct(DocumentManager $dm)
+    {
+        parent::__construct();
+        $this->dm = $dm;
+    }
+
     protected function configure()
     {
         $this
@@ -70,7 +80,7 @@ class UsersDeleteCommand extends BaseCommand
         $fosUser->resyncOpts();
 
         /** @var UserRepository $repo */
-        $repo = $this->getManager()->getRepository(User::class);
+        $repo = $this->dm->getRepository(User::class);
         $users = $repo->findBy(['created' => ['$lte' => $seventeenMonths]]);
         $output->writeln(sprintf('%d users are 17 months after creation', count($users)));
         foreach ($users as $user) {
@@ -106,7 +116,7 @@ class UsersDeleteCommand extends BaseCommand
             }
         }
 
-        $this->getManager()->flush();
+        $this->dm->flush();
 
         $output->writeln('Finished');
     }

@@ -7,6 +7,7 @@ use AppBundle\Repository\PolicyRepository;
 use AppBundle\Service\FeatureService;
 use AppBundle\Service\MailerService;
 use AppBundle\Service\PolicyService;
+use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -19,8 +20,17 @@ use AppBundle\Document\Policy;
 use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Document\User;
 
-class UpdatePolicyStatusCommand extends BaseCommand
+class UpdatePolicyStatusCommand extends ContainerAwareCommand
 {
+    /** @var DocumentManager  */
+    protected $dm;
+
+    public function __construct(DocumentManager $dm)
+    {
+        parent::__construct();
+        $this->dm = $dm;
+    }
+
     protected function configure()
     {
         $this
@@ -76,7 +86,7 @@ class UpdatePolicyStatusCommand extends BaseCommand
         /** @var FeatureService $featureService */
         $featureService = $this->getContainer()->get('app.feature');
         /** @var PolicyRepository $repo */
-        $repo = $this->getManager()->getRepository(Policy::class);
+        $repo = $this->dm->getRepository(Policy::class);
         if ($skipEmail) {
             $policyService->setMailer(null);
         }

@@ -17,7 +17,7 @@ use AppBundle\Document\Invitation\Invitation;
 use AppBundle\Document\Connection\StandardConnection;
 use AppBundle\Classes\SoSure;
 
-class CacheCommand extends BaseCommand
+class CacheCommand extends ContainerAwareCommand
 {
     protected function configure()
     {

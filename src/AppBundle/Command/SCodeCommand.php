@@ -6,6 +6,7 @@ use AppBundle\Repository\PolicyRepository;
 use AppBundle\Repository\SCodeRepository;
 use AppBundle\Service\BranchService;
 use AppBundle\Service\RouterService;
+use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -17,9 +18,19 @@ use AppBundle\Document\Policy;
 use AppBundle\Document\SCode;
 use AppBundle\Document\DateTrait;
 
-class SCodeCommand extends BaseCommand
+class SCodeCommand extends ContainerAwareCommand
 {
     use DateTrait;
+
+    /** @var DocumentManager  */
+    protected $dm;
+
+    public function __construct(DocumentManager $dm)
+    {
+        parent::__construct();
+        $this->dm = $dm;
+    }
+
 
     protected function configure()
     {
@@ -64,11 +75,10 @@ class SCodeCommand extends BaseCommand
             new \DateTime();
         $updateDate = $this->startOfDay($updateDate);
 
-        $dm = $this->getManager();
         /** @var PolicyRepository $policyRepo */
-        $policyRepo = $dm->getRepository(Policy::class);
+        $policyRepo = $this->dm->getRepository(Policy::class);
         /** @var SCodeRepository $scodeRepo */
-        $scodeRepo = $dm->getRepository(SCode::class);
+        $scodeRepo = $this->dm->getRepository(SCode::class);
 
         if ($policyNumber) {
             /** @var Policy $policy */
@@ -79,7 +89,7 @@ class SCodeCommand extends BaseCommand
             $scode = $policy->getStandardSCode();
             $this->printSCode($output, $scode);
             $this->updateSCode($output, $scode, $updateType, $policyNumber);
-            $dm->flush();
+            $this->dm->flush();
         } else {
             if ($updateSource == 'google') {
                 $scodes = $scodeRepo->getLinkPrefix('https://goo.gl');
@@ -97,10 +107,10 @@ class SCodeCommand extends BaseCommand
                     $this->updateSCode($output, $scode, $updateType);
                 }
                 if ($count % 100 == 0) {
-                    $dm->flush();
+                    $this->dm->flush();
                 }
             }
-            $dm->flush();
+            $this->dm->flush();
         }
 
         $output->writeln(implode(PHP_EOL, $lines));

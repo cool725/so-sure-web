@@ -15,7 +15,7 @@ use AppBundle\Document\Policy;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Classes\SoSure;
 
-class CashbackReminderCommand extends BaseCommand
+class CashbackReminderCommand extends ContainerAwareCommand
 {
     protected function configure()
     {

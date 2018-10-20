@@ -6,6 +6,7 @@ use AppBundle\Repository\ClaimRepository;
 use AppBundle\Repository\PhonePolicyRepository;
 use AppBundle\Service\BaseImeiService;
 use AppBundle\Service\ReceperioService;
+use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -16,8 +17,17 @@ use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Claim;
 
-class PolicyClaimCommand extends BaseCommand
+class PolicyClaimCommand extends ContainerAwareCommand
 {
+    /** @var DocumentManager  */
+    protected $dm;
+
+    public function __construct(DocumentManager $dm)
+    {
+        parent::__construct();
+        $this->dm = $dm;
+    }
+
     protected function configure()
     {
         $this
@@ -69,7 +79,7 @@ class PolicyClaimCommand extends BaseCommand
     private function getPolicy($id)
     {
         /** @var PhonePolicyRepository $repo */
-        $repo = $this->getManager()->getRepository(PhonePolicy::class);
+        $repo = $this->dm->getRepository(PhonePolicy::class);
         $policy = $repo->find($id);
 
         return $policy;
@@ -78,7 +88,7 @@ class PolicyClaimCommand extends BaseCommand
     private function getClaim($id)
     {
         /** @var ClaimRepository $repo */
-        $repo = $this->getManager()->getRepository(Claim::class);
+        $repo = $this->dm->getRepository(Claim::class);
         $claim = $repo->find($id);
 
         return $claim;

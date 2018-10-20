@@ -7,6 +7,7 @@ use AppBundle\Document\Claim;
 use AppBundle\Document\Opt\EmailOptOut;
 use AppBundle\Document\Opt\OptOut;
 use AppBundle\Document\User;
+use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -19,9 +20,18 @@ use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\DateTrait;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
-class TestCommand extends BaseCommand
+class TestCommand extends ContainerAwareCommand
 {
     use DateTrait;
+
+    /** @var DocumentManager  */
+    protected $dm;
+
+    public function __construct(DocumentManager $dm)
+    {
+        parent::__construct();
+        $this->dm = $dm;
+    }
 
     protected function configure()
     {
@@ -45,7 +55,7 @@ class TestCommand extends BaseCommand
 
     private function testBirthday()
     {
-        $repo = $this->getManager()->getRepository(User::class);
+        $repo = $this->dm->getRepository(User::class);
         foreach ($repo->findAll() as $user) {
             /** @var User $user */
             if ($user->getBirthday()) {

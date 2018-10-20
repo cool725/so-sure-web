@@ -4,6 +4,7 @@ namespace AppBundle\Command;
 
 use AppBundle\Repository\ChargeRepository;
 use AppBundle\Service\InvoiceService;
+use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -17,10 +18,19 @@ use AppBundle\Document\InvoiceItem;
 use AppBundle\Document\CurrencyTrait;
 use AppBundle\Document\DateTrait;
 
-class DaviesInvoiceCommand extends BaseCommand
+class DaviesInvoiceCommand extends ContainerAwareCommand
 {
     use DateTrait;
     use CurrencyTrait;
+
+    /** @var DocumentManager  */
+    protected $dm;
+
+    public function __construct(DocumentManager $dm)
+    {
+        parent::__construct();
+        $this->dm = $dm;
+    }
 
     protected function configure()
     {
@@ -58,19 +68,19 @@ class DaviesInvoiceCommand extends BaseCommand
             $emailAddress = null;
         }
 
-        $dm = $this->getManager();
         $charges = $this->getCharges($date);
         if (count($charges) > 0) {
             $invoice = Invoice::generateDaviesInvoice();
             $data = [];
             foreach ($charges as $charge) {
+                /** @var Charge $charge */
                 $charge->setInvoice($invoice);
                 $item = new InvoiceItem($charge->getAmountWithVat(), 1);
                 $item->setDescription($charge->__toString());
                 $invoice->addInvoiceItem($item);
             }
-            $dm->persist($invoice);
-            $dm->flush();
+            $this->dm->persist($invoice);
+            $this->dm->flush();
 
             /** @var InvoiceService $invoiceService */
             $invoiceService = $this->getContainer()->get('app.invoice');
@@ -93,9 +103,8 @@ class DaviesInvoiceCommand extends BaseCommand
 
     private function getCharges($date)
     {
-        $dm = $this->getManager();
         /** @var ChargeRepository $repo */
-        $repo = $dm->getRepository(Charge::class);
+        $repo = $this->dm->getRepository(Charge::class);
 
         return $repo->findMonthly($date, [Charge::TYPE_CLAIMSCHECK, Charge::TYPE_CLAIMSDAMAGE], true);
     }

@@ -8,6 +8,7 @@ use AppBundle\Security\FOSUBUserProvider;
 use AppBundle\Service\JudopayService;
 use AppBundle\Service\MailerService;
 use AppBundle\Service\PolicyService;
+use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -21,8 +22,17 @@ use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Document\Payment\Payment;
 use AppBundle\Document\User;
 
-class UsersEmailCommand extends BaseCommand
+class UsersEmailCommand extends ContainerAwareCommand
 {
+    /** @var DocumentManager  */
+    protected $dm;
+
+    public function __construct(DocumentManager $dm)
+    {
+        parent::__construct();
+        $this->dm = $dm;
+    }
+
     protected function configure()
     {
         $this
@@ -48,7 +58,7 @@ class UsersEmailCommand extends BaseCommand
         $skipEmail = true === $input->getOption('skip-email');
         $from = $input->getOption('from');
         /** @var UserRepository $repo */
-        $repo = $this->getManager()->getRepository(User::class);
+        $repo = $this->dm->getRepository(User::class);
         $users = $repo->findAll();
         $output->writeln(sprintf('%d users', count($users)));
         $process = true;
