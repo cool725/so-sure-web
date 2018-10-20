@@ -22,10 +22,14 @@ class ImeiCommand extends ContainerAwareCommand
     /** @var DocumentManager  */
     protected $dm;
 
-    public function __construct(DocumentManager $dm)
+    /** @var ReceperioService */
+    protected $imeiService;
+
+    public function __construct(DocumentManager $dm, ReceperioService $imeiService)
     {
         parent::__construct();
         $this->dm = $dm;
+        $this->imeiService = $imeiService;
     }
 
     protected function configure()
@@ -112,8 +116,6 @@ class ImeiCommand extends ContainerAwareCommand
         }
         $save = true === $input->getOption('save');
         $phone = $this->getPhone($device, $memory);
-        /** @var ReceperioService $imeiService */
-        $imeiService = $this->getContainer()->get('app.imei');
 
         $policy = null;
         if ($policyId) {
@@ -129,26 +131,26 @@ class ImeiCommand extends ContainerAwareCommand
         }
 
         if ($register !== null) {
-            if ($imeiService->registerClaims($policy, $claim, $imei, $register)) {
+            if ($this->imeiService->registerClaims($policy, $claim, $imei, $register)) {
                 print sprintf("Register claim for imei %s is good\n", $imei);
             } else {
                 print sprintf("Register claim for imei %s failed\n", $imei);
             }
         } elseif ($claimscheck) {
-            if ($imeiService->checkClaims($policy, $claim, $imei, null)) {
+            if ($this->imeiService->checkClaims($policy, $claim, $imei, null)) {
                 print sprintf("Claimscheck for imei %s is good\n", $imei);
             } else {
                 print sprintf("Claimscheck for imei %s failed validation\n", $imei);
             }
         } else {
             if ($save) {
-                if ($imeiService->reprocessImei($phone, $imei)) {
+                if ($this->imeiService->reprocessImei($phone, $imei)) {
                     print sprintf("Imei %s is good\n", $imei);
                 } else {
                     print sprintf("Imei %s failed validation\n", $imei);
                 }
             } else {
-                if ($imeiService->checkImei($phone, $imei)) {
+                if ($this->imeiService->checkImei($phone, $imei)) {
                     print sprintf("Imei %s is good\n", $imei);
                 } else {
                     print sprintf("Imei %s failed validation\n", $imei);
@@ -158,13 +160,13 @@ class ImeiCommand extends ContainerAwareCommand
 
         if ($serial) {
             if ($save) {
-                if ($imeiService->reprocessSerial($phone, $serial)) {
+                if ($this->imeiService->reprocessSerial($phone, $serial)) {
                     print sprintf("Serial %s is good\n", $serial);
                 } else {
                     print sprintf("Serial %s failed validation\n", $serial);
                 }
             } else {
-                if ($imeiService->checkSerial($phone, $serial, $imei)) {
+                if ($this->imeiService->checkSerial($phone, $serial, $imei)) {
                     print sprintf("Serial %s is good\n", $serial);
                 } else {
                     print sprintf("Serial %s failed validation\n", $serial);

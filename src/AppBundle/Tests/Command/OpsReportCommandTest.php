@@ -17,6 +17,7 @@ class OpsReportCommandTest extends KernelTestCase
     protected static $redis;
     protected static $kernel;
     protected static $client;
+    protected static $mailer;
 
     public static function setUpBeforeClass()
     {
@@ -32,13 +33,15 @@ class OpsReportCommandTest extends KernelTestCase
         //now we can instantiate our service (if you want a fresh one for
         //each test method, do this in setUp() instead
         self::$redis = self::$container->get('snc_redis.default');
+
+        self::$mailer = self::$container->get('app.mailer');
     }
 
     public function callCommand($expectedOutput)
     {
 
         $application = new Application(self::$kernel);
-        $application->add(new OpsReportCommand(self::$container->get('app.mailer'), self::$redis));
+        $application->add(new OpsReportCommand(self::$mailer, self::$redis));
         $command = $application->find('sosure:ops:report');
         $commandTester = new CommandTester($command);
         $commandTester->execute(array(

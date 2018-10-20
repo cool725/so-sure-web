@@ -2,6 +2,7 @@
 
 namespace AppBundle\Command;
 
+use AppBundle\Document\PhonePolicy;
 use AppBundle\Service\JudopayService;
 use AppBundle\Service\PolicyService;
 use Doctrine\ODM\MongoDB\DocumentManager;
@@ -23,10 +24,18 @@ class PolicyPayCommand extends ContainerAwareCommand
     /** @var DocumentManager  */
     protected $dm;
 
-    public function __construct(DocumentManager $dm)
+    /** @var PolicyService */
+    protected $policyService;
+
+    /** @var JudopayService */
+    protected $judopayService;
+
+    public function __construct(DocumentManager $dm, PolicyService $policyService, JudopayService $judopayService)
     {
         parent::__construct();
         $this->dm = $dm;
+        $this->policyService = $policyService;
+        $this->judopayService = $judopayService;
     }
 
     protected function configure()
@@ -69,19 +78,19 @@ class PolicyPayCommand extends ContainerAwareCommand
         $policyId = $input->getOption('id');
         $date = new \DateTime();
 
-        /** @var PolicyService $policyService */
-        $policyService = $this->getContainer()->get('app.policy');
-        /** @var JudopayService $judopay */
-        $judopay = $this->getContainer()->get('app.judopay');
         $policy = null;
         $user = null;
 
         if ($policyId) {
-            if ($policy = $this->getPolicy($policyId)) {
+            if ($policy = $this->getPhonePolicy($policyId)) {
                 $user = $policy->getUser();
             }
         } else {
             $user = $this->getUser($email);
+        }
+
+        if (!$user) {
+            throw new \Exception('Unable to find user');
         }
 
         if (!$user->getPaymentMethod()) {
@@ -118,31 +127,43 @@ class PolicyPayCommand extends ContainerAwareCommand
             throw new \Exception('1 or 12 payments only');
         }
 
-        $details = $judopay->runTokenPayment($user, $amount, $date->getTimestamp(), $policy->getId(), $customerRef);
-        $judopay->add(
+        $details = $this->judopayService->runTokenPayment($user, $amount, $date->getTimestamp(), $policy->getId(), $customerRef);
+        $this->judopayService->add(
             $policy,
             $details['receiptId'],
             $details['consumer']['consumerToken'],
             $details['cardDetails']['cardToken'],
             Payment::SOURCE_TOKEN,
-            $user->getPaymentMethod()->getDeviceDna(),
+            $user->getJudoPaymentMethod() ? $user->getJudoPaymentMethod()->getDeviceDna() : null,
             $date
         );
 
         $output->writeln(sprintf('Created Policy %s / %s', $policy->getPolicyNumber(), $policy->getId()));
     }
 
+    /**
+     * @param string $email
+     * @return User
+     */
     private function getUser($email)
     {
         $repo = $this->dm->getRepository(User::class);
+        /** @var User $user */
+        $user = $repo->findOneBy(['emailCanonical' => mb_strtolower($email)]);
 
-        return $repo->findOneBy(['emailCanonical' => mb_strtolower($email)]);
+        return $user;
     }
 
-    private function getPolicy($id)
+    /**
+     * @param mixed $id
+     * @return PhonePolicy
+     */
+    private function getPhonePolicy($id)
     {
-        $repo = $this->dm->getRepository(Policy::class);
+        $repo = $this->dm->getRepository(PhonePolicy::class);
+        /** @var PhonePolicy $policy */
+        $policy = $repo->find($id);
 
-        return $repo->find($id);
+        return $policy;
     }
 }
