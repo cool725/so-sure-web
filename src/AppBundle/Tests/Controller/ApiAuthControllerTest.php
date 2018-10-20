@@ -3097,6 +3097,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $url = sprintf("/api/v1/auth/policy/%s/invitation?debug=true", $inviterPolicyId);
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+            'action' => 'accept',
             'facebook_id' => $invitee->getFacebookId()
         ]);
         $data = $this->verifyResponse(200);
