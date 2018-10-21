@@ -48,6 +48,7 @@ class AdditionalInvalidModelTest extends WebTestCase
     public function testAdditionsInvalidModel()
     {
         $model = new AdditionsInvalidModel();
+        $model->setExpectedImportException();
         $model->setContainer(static::$container);
         $model->load(static::$dm);
     }

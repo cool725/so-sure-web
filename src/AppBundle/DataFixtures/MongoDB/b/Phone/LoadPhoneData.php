@@ -18,6 +18,13 @@ abstract class LoadPhoneData implements ContainerAwareInterface
      */
     protected $container;
 
+    protected $expectedImportException;
+
+    public function setExpectedImportException()
+    {
+        $this->expectedImportException = true;
+    }
+
     public function setContainer(ContainerInterface $container = null)
     {
         $this->container = $container;
@@ -301,7 +308,9 @@ abstract class LoadPhoneData implements ContainerAwareInterface
 
             return $phone;
         } catch (\Exception $e) {
-            print sprintf('Ex: %s. Failed to import %s', $e->getMessage(), json_encode($data));
+            if (!$this->expectedImportException) {
+                print sprintf('Ex: %s. Failed to import %s', $e->getMessage(), json_encode($data));
+            }
             throw $e;
         }
 
