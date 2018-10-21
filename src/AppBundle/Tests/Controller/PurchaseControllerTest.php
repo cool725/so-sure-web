@@ -767,7 +767,7 @@ class PurchaseControllerTest extends BaseControllerTest
 
     public function testPurchaseReviewWithInvalidSerial()
     {
-        $phone = $this->getRandomPhoneAndSetSession();
+        $phone = $this->getRandomPhoneAndSetSession('Apple');
 
         $crawler = $this->createPurchase(
             self::generateEmail('testPurchaseReviewWithInvalidSerial', $this),
@@ -1174,7 +1174,7 @@ class PurchaseControllerTest extends BaseControllerTest
     }
 
     private function setPhone(
-        $phone,
+        Phone $phone,
         $imei = null,
         $crawler = null,
         $serialNumber = null
