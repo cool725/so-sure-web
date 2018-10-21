@@ -313,16 +313,27 @@ class ClaimsService
 
     public function processClaim(Claim $claim)
     {
+        /** @var PhonePolicy $policy */
+        $policy = $claim->getPolicy();
+        if (!$policy instanceof PhonePolicy) {
+            throw new \Exception('not policy');
+        }
+
         $this->sendPicSureNotification($claim);
+
+        // As we've had many instances where claims have already been processed, so ahead and set the claim approved
+        // before that point
+        // TODO: Should this be approved or just settled. Matching below behaviour for now of settled
+        if ($claim->isMonetaryClaim() && $policy->canAdjustPicSureStatusForClaim()) {
+            $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_CLAIM_APPROVED);
+            $policy->setPicSureClaimApprovedClaim($claim);
+            $this->dm->flush();
+        }
+
         if ($claim->getProcessed() || !$claim->isMonetaryClaim()) {
             return false;
         }
 
-        if (!$claim->getPolicy() instanceof PhonePolicy) {
-            throw new \Exception('not policy');
-        }
-        /** @var PhonePolicy $policy */
-        $policy = $claim->getPolicy();
         $claim->getPolicy()->updatePotValue();
         $this->dm->flush();
         $this->notifyMonetaryClaim($claim->getPolicy(), $claim, true);
@@ -336,10 +347,6 @@ class ClaimsService
             $this->notifyMonetaryClaim($networkConnection->getLinkedPolicy(), $claim, false);
         }
 
-        if ($policy->canAdjustPicSureStatusForClaim()) {
-            $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_CLAIM_APPROVED);
-            $policy->setPicSureClaimApprovedClaim($claim);
-        }
         $claim->setProcessed(true);
         $this->recordLostPhone($claim->getPolicy(), $claim);
         $this->dm->flush();

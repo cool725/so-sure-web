@@ -398,6 +398,37 @@
         </svg>
     </section> #}
 
+    <section class="banner banner-dismissible">
+        <div class="container py-5">
+            <div class="d-lg-flex align-items-lg-center">
+                <div class="banner__image">
+                    <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon-home.png" alt="so-sure - how it works"width="250px">
+                </div>
+                <div class="banner__text ml-lg-4">
+                    <h2 class="text-white">Home Insurance Coming 2019</h2>
+                    <p class="text-columbia-blue-e lead mb-0">Take our survey to be in for a chance to <strong>win a phone cover</strong></p>
+                    <p class="text-columbia-blue-e mb-4"><small>*Limited time only, offer ends December 31st 2018, 1 per customer.</small></p>
+                    <a href="https://sosure.typeform.com/to/CdsghS"
+                       target="_blank"
+                       class="btn btn-white sosure-track"
+                       data-event="take-survey-banner-clicked"
+                       data-event-url="https://sosure.typeform.com/to/CdsghS"
+                       data-event-blank="true">
+                        Take Survey
+                        <i class="far fa-long-arrow-right fa-lg ml-2"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <button type="button"
+                class="banner__close close text-white"
+                data-dismiss="banner"
+                data-event="take-survey-banner-closed"
+                aria-label="Close">
+            <i class="fal fa-times fa-lg"></i>
+        </button>
+    </section>
+
     <section class="reviews py-lg-5">
         <div class="container container-xtra py-5">
             <div class="row">
@@ -482,7 +513,7 @@
         </div>
     </section>
 
-    <section class="banner blue-gradient py-5">
+    <section class="banner py-5">
         <div class="container container-xtra">
             <div class="d-lg-flex justify-content-lg-between align-items-lg-center">
                 <div class="mb-4 mb-lg-0 d-lg-flex align-items-lg-center">
@@ -509,7 +540,6 @@
     </section>
 
     {# Page Modals #}
-    {% include 'AppBundle::Default/_modalVideo.html.twig' %}
 
 {% endblock %}
 

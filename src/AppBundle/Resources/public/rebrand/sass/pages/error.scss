@@ -32,14 +32,14 @@
         top: 0; left: 0; right: 0; bottom: 0;
         content: '';
         z-index: 1;
-        background-image: url('#{$cdn_url}/images/rebrand/misc/so-sure_swoosh-background-mobile.svg');
+        background-image: url('#{$cdn_url}/images/rebrand/misc/so-sure_swoosh-hero-background-mobile.svg');
         background-size: cover;
         opacity: 0.44;
     }
 
     @include media-breakpoint-up(lg) {
         &:before {
-            background-image: url('#{$cdn_url}/images/rebrand/misc/so-sure_swoosh-background.svg');
+            background-image: url('#{$cdn_url}/images/rebrand/misc/so-sure_swoosh-hero-background.svg');
         }
     }
 

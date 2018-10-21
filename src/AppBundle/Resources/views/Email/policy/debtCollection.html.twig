@@ -10,21 +10,21 @@
 		   <div style="font-size: 14px; text-align: left;"><span style="font-family:arial,helvetica neue,helvetica,sans-serif">
                 Please start the debt collection process for:
                 <br><br>
-				{{ policy.user.name }} 
+				{{ policy.user.name }}
 				<br><br>
                 for the amount of £{{ policy.getRemainderOfPolicyPrice|number_format(2, '.', ',') }} (due on {{ policy.end | date }})
 				<br><br>
-				Email: {{ policy.user.email }} 
+				Email: {{ policy.user.email }}
                 <br><br>
-				Mobile: {{ policy.user.mobileNumber }} 
+				Mobile: {{ policy.user.mobileNumber }}
                 <br><br>
-				Address: {{ policy.user.billingAddress }} 
+				Address: {{ policy.user.billingAddress }}
                 <br><br>
                 Link to pay: {{ url('purchase_remainder_policy', {'id': policy.Id }) }}
                 <br><br>
                 Reason: {{ policy.phone }} was insured (Policy {{ policy.policyNumber }} and replacement phone was received on {{ policy.getApprovedClaims(true, true)[0].replacementReceivedDate|date }}. As per so-sure terms & conditions, the remainder of the policy must be paid for in full.
 				<br><br>
-                Debt owed to: so-sure Limited, 10 Finsbury Square, London EC2A 1AF (07488 720 002)
+                Debt owed to: so-sure Limited, Martin House, 5 Martin Lane, London EC4R 0DP (07488 720 002)
 		   </div>
 		</div>
 	{{ macros.end_table() }}
