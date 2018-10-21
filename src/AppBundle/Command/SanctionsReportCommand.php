@@ -31,7 +31,7 @@ class SanctionsReportCommand extends ContainerAwareCommand
     /** @var EngineInterface */
     protected $templating;
 
-    public function  __construct(Client $redis, MailerService $mailerService, EngineInterface $templating)
+    public function __construct(Client $redis, MailerService $mailerService, EngineInterface $templating)
     {
         parent::__construct();
         $this->redis = $redis;

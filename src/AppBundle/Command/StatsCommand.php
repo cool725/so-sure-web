@@ -51,7 +51,11 @@ class StatsCommand extends ContainerAwareCommand
         $this->statsService->set(Stats::KPI_PICSURE_TOTAL_APPROVED_POLICIES, $date, $data['picsureApprovedTotal']);
         $this->statsService->set(Stats::KPI_PICSURE_TOTAL_REJECTED_POLICIES, $date, $data['picsureRejectedTotal']);
         $this->statsService->set(Stats::KPI_PICSURE_TOTAL_UNSTARTED_POLICIES, $date, $data['picsureUnstartedTotal']);
-        $this->statsService->set(Stats::KPI_PICSURE_TOTAL_PREAPPROVED_POLICIES, $date, $data['picsurePreApprovedTotal']);
+        $this->statsService->set(
+            Stats::KPI_PICSURE_TOTAL_PREAPPROVED_POLICIES,
+            $date,
+            $data['picsurePreApprovedTotal']
+        );
         $this->statsService->set(
             Stats::KPI_PICSURE_TOTAL_CLAIMS_APPROVED_POLICIES,
             $date,
