@@ -7,6 +7,7 @@ use AppBundle\Document\Claim;
 use AppBundle\Document\Opt\EmailOptOut;
 use AppBundle\Document\Opt\OptOut;
 use AppBundle\Document\User;
+use Doctrine\Common\Annotations\Reader;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
@@ -27,10 +28,14 @@ class TestCommand extends ContainerAwareCommand
     /** @var DocumentManager  */
     protected $dm;
 
-    public function __construct(DocumentManager $dm)
+    /** @var Reader */
+    protected $reader;
+
+    public function __construct(DocumentManager $dm, Reader $reader)
     {
         parent::__construct();
         $this->dm = $dm;
+        $this->reader = $reader;
     }
 
     protected function configure()
@@ -41,11 +46,8 @@ class TestCommand extends ContainerAwareCommand
         ;
     }
 
-    protected $reader;
-
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->reader = $this->getContainer()->get('annotation_reader');
         // $this->testBirthday();
         $claim = new Claim();
         $claim->setNotificationDate(new \DateTime());

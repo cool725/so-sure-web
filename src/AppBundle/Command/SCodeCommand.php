@@ -25,10 +25,26 @@ class SCodeCommand extends ContainerAwareCommand
     /** @var DocumentManager  */
     protected $dm;
 
-    public function __construct(DocumentManager $dm)
-    {
+    /** @var RouterService */
+    protected $routerService;
+
+    /** @var BranchService */
+    protected $branchService;
+
+    /** @var string */
+    protected $branchDomain;
+
+    public function __construct(
+        DocumentManager $dm,
+        RouterService $routerService,
+        BranchService $branchService,
+        $branchDomain
+    ) {
         parent::__construct();
         $this->dm = $dm;
+        $this->routerService = $routerService;
+        $this->branchService = $branchService;
+        $this->branchDomain = $branchDomain;
     }
 
 
@@ -94,12 +110,13 @@ class SCodeCommand extends ContainerAwareCommand
             if ($updateSource == 'google') {
                 $scodes = $scodeRepo->getLinkPrefix('https://goo.gl');
             } elseif ($updateSource == 'branch') {
-                $scodes = $scodeRepo->getLinkPrefix($this->getContainer()->getParameter('branch_domain'));
+                $scodes = $scodeRepo->getLinkPrefix($this->branchDomain);
             } else {
                 $scodes = $scodeRepo->findAll();
             }
             $count = 1;
             foreach ($scodes as $scode) {
+                /** @var SCode $scode */
                 if ($scode->getUpdatedDate() && $scode->getUpdatedDate() >= $updateDate) {
                     continue;
                 }
@@ -117,22 +134,18 @@ class SCodeCommand extends ContainerAwareCommand
         $output->writeln('Finished');
     }
 
-    private function updateSCode($output, $scode, $updateType, $policyNumber = null)
+    private function updateSCode(OutputInterface $output, SCode $scode, $updateType, $policyNumber = null)
     {
         if (!$scode) {
             throw new \Exception(sprintf('Unable to find scode for policy %s', $policyNumber));
         }
-        /** @var BranchService $branch */
-        $branch = $this->getContainer()->get('app.branch');
-        /** @var RouterService $routerService */
-        $routerService = $this->getContainer()->get('app.router');
         if ($updateType == 'db') {
-            $shareLink = $branch->generateSCode($scode->getCode());
+            $shareLink = $this->branchService->generateSCode($scode->getCode());
             $scode->setShareLink($shareLink);
         } elseif ($updateType == 'branch') {
-            if (mb_stripos($scode->getShareLink(), $this->getContainer()->getParameter('branch_domain')) !== false) {
-                $branch->update($scode->getShareLink(), [
-                    '$desktop_url' => $routerService->generateUrl('scode', ['code' => $scode->getCode()]),
+            if (mb_stripos($scode->getShareLink(), $this->branchDomain) !== false) {
+                $this->branchService->update($scode->getShareLink(), [
+                    '$desktop_url' => $this->routerService->generateUrl('scode', ['code' => $scode->getCode()]),
                 ]);
                 $scode->setUpdatedDate(new \DateTime());
             } else {
@@ -144,7 +157,7 @@ class SCodeCommand extends ContainerAwareCommand
         $this->printSCode($output, $scode);
     }
 
-    private function printSCode($output, $scode)
+    private function printSCode(OutputInterface $output, SCode $scode)
     {
         $output->writeln(sprintf(
             '%s %s %s',

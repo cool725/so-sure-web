@@ -15,6 +15,15 @@ use AppBundle\Classes\DaviesHandlerClaim;
 
 class DirectGroupCommand extends ContainerAwareCommand
 {
+    /** @var DirectGroupService */
+    protected $directGroupService;
+
+    public function __construct(DirectGroupService $directGroupService)
+    {
+        parent::__construct();
+        $this->directGroupService = $directGroupService;
+    }
+
     protected function configure()
     {
         $this
@@ -77,16 +86,14 @@ class DirectGroupCommand extends ContainerAwareCommand
                 json_encode(DirectGroupHandlerClaim::$sheetNames)
             ));
         }
-        /** @var DirectGroupService $directGroup */
-        $directGroup = $this->getContainer()->get('app.directgroup');
         if ($isDaily) {
-            $count = $directGroup->claimsDailyEmail();
+            $count = $this->directGroupService->claimsDailyEmail();
             $output->writeln(sprintf('%d outstanding claims. Email report sent.', $count));
         } elseif ($file) {
-            $lines = $directGroup->importFile($file, $sheetName, $useMime, $maxParseErrors);
+            $lines = $this->directGroupService->importFile($file, $sheetName, $useMime, $maxParseErrors);
             $output->writeln(implode(PHP_EOL, $lines));
         } else {
-            $lines = $directGroup->import($sheetName, $useMime, $maxParseErrors, $skipCleanup);
+            $lines = $this->directGroupService->import($sheetName, $useMime, $maxParseErrors, $skipCleanup);
             $output->writeln(implode(PHP_EOL, $lines));
         }
         $output->writeln('Finished');

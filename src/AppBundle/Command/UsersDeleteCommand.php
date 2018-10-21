@@ -27,10 +27,18 @@ class UsersDeleteCommand extends ContainerAwareCommand
     /** @var DocumentManager  */
     protected $dm;
 
-    public function __construct(DocumentManager $dm)
+    /** @var FOSUBUserProvider */
+    protected $userService;
+
+    /** @var MailerService */
+    protected $mailerService;
+
+    public function __construct(DocumentManager $dm, FOSUBUserProvider $userService, MailerService $mailerService)
     {
         parent::__construct();
         $this->dm = $dm;
+        $this->userService = $userService;
+        $this->mailerService = $mailerService;
     }
 
     protected function configure()
@@ -75,9 +83,7 @@ class UsersDeleteCommand extends ContainerAwareCommand
 
         // TODO: Resync optin with users
 
-        /** @var FOSUBUserProvider $fosUser */
-        $fosUser = $this->getContainer()->get('app.user');
-        $fosUser->resyncOpts();
+        $this->userService->resyncOpts();
 
         /** @var UserRepository $repo */
         $repo = $this->dm->getRepository(User::class);
@@ -107,7 +113,7 @@ class UsersDeleteCommand extends ContainerAwareCommand
             }
 
             if (!$skipDelete && $user->shouldDelete()) {
-                $fosUser->deleteUser($user, false);
+                $this->userService->deleteUser($user, false);
                 $output->writeln(sprintf(
                     'Deleted user %s (%s)',
                     $user->getEmail(),
@@ -124,9 +130,7 @@ class UsersDeleteCommand extends ContainerAwareCommand
     private function emailPendingDeletion(User $user)
     {
         $hash = SoSure::encodeCommunicationsHash($user->getEmail());
-        /** @var MailerService $mailer */
-        $mailer = $this->getContainer()->get('app.mailer');
-        $mailer->sendTemplate(
+        $this->mailerService->sendTemplate(
             'Sorry to see you go',
             $user->getEmail(),
             'AppBundle:Email:user/pendingDeletion.html.twig',

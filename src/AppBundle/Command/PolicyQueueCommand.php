@@ -2,6 +2,7 @@
 
 namespace AppBundle\Command;
 
+use AppBundle\Repository\PolicyRepository;
 use AppBundle\Service\PolicyService;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
@@ -17,10 +18,14 @@ class PolicyQueueCommand extends ContainerAwareCommand
     /** @var DocumentManager  */
     protected $dm;
 
-    public function __construct(DocumentManager $dm)
+    /** @var PolicyService */
+    protected $policyService;
+
+    public function __construct(DocumentManager $dm, PolicyService $policyService)
     {
         parent::__construct();
         $this->dm = $dm;
+        $this->policyService = $policyService;
     }
 
     protected function configure()
@@ -64,8 +69,6 @@ class PolicyQueueCommand extends ContainerAwareCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        /** @var PolicyService $policyService */
-        $policyService = $this->getContainer()->get('app.policy');
         $clear = true === $input->getOption('clear');
         $show = true === $input->getOption('show');
         $process = $input->getOption('process');
@@ -74,15 +77,19 @@ class PolicyQueueCommand extends ContainerAwareCommand
 
         if ($clear) {
             if ($process > 0) {
-                $policyService->clearQueue($process);
+                $this->policyService->clearQueue($process);
                 $output->writeln(sprintf("Queue is cleared of %d messages", $process));
             } else {
-                $policyService->clearQueue();
+                $this->policyService->clearQueue();
                 $output->writeln(sprintf("Queue is cleared"));
             }
         } elseif ($show) {
-            $data = $policyService->getQueueData($process);
-            $output->writeln(sprintf("Queue Size: %d (%d shown)", $policyService->getQueueSize(), count($data)));
+            $data = $this->policyService->getQueueData($process);
+            $output->writeln(sprintf(
+                "Queue Size: %d (%d shown)",
+                $this->policyService->getQueueSize(),
+                count($data)
+            ));
             foreach ($data as $line) {
                 $output->writeln(json_encode(unserialize($line), JSON_PRETTY_PRINT));
             }
@@ -91,32 +98,49 @@ class PolicyQueueCommand extends ContainerAwareCommand
             if (!$policy) {
                 throw new \Exception(sprintf('Unable to find policy %s', $policyId));
             }
-            $policyService->generatePolicyFiles($policy, true, 'bcc@so-sure.com');
+            $this->policyService->generatePolicyFiles($policy, true, 'bcc@so-sure.com');
             $output->writeln(sprintf("Re-generated policy (%s) docs and emailed", $policy->getId()));
         } elseif ($policyNumber) {
             $policy = $this->getPolicyByNumber($policyNumber);
             if (!$policy) {
                 throw new \Exception(sprintf('Unable to find policy %s', $policyNumber));
             }
-            $policyService->generatePolicyFiles($policy, true, 'bcc@so-sure.com');
+            $this->policyService->generatePolicyFiles($policy, true, 'bcc@so-sure.com');
             $output->writeln(sprintf("Re-generated policy (%s) docs and emailed", $policy->getPolicyNumber()));
         } else {
-            $count = $policyService->process($process);
+            $count = $this->policyService->process($process);
             $output->writeln(sprintf("Generated docs for %d policies", $count));
         }
     }
 
+    /**
+     * @param mixed $policyId
+     * @return Policy
+     * @throws \Doctrine\ODM\MongoDB\LockException
+     * @throws \Doctrine\ODM\MongoDB\Mapping\MappingException
+     */
     private function getPolicy($policyId)
     {
+        /** @var PolicyRepository $repo */
         $repo = $this->dm->getRepository(Policy::class);
 
-        return $repo->find($policyId);
+        /** @var Policy $policy */
+        $policy = $repo->find($policyId);
+
+        return $policy;
     }
 
+    /**
+     * @param mixed $policyNumber
+     * @return Policy
+     */
     private function getPolicyByNumber($policyNumber)
     {
         $repo = $this->dm->getRepository(Policy::class);
 
-        return $repo->findOneBy(['policyNumber' => $policyNumber]);
+        /** @var Policy $policy */
+        $policy = $repo->findOneBy(['policyNumber' => $policyNumber]);
+
+        return $policy;
     }
 }

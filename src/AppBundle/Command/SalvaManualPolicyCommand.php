@@ -2,6 +2,8 @@
 
 namespace AppBundle\Command;
 
+use AppBundle\Repository\PhoneRepository;
+use AppBundle\Repository\UserRepository;
 use AppBundle\Service\JudopayService;
 use AppBundle\Service\PolicyService;
 use Doctrine\ODM\MongoDB\DocumentManager;
@@ -22,10 +24,18 @@ class SalvaManualPolicyCommand extends ContainerAwareCommand
     /** @var DocumentManager  */
     protected $dm;
 
-    public function __construct(DocumentManager $dm)
+    /** @var PolicyService */
+    protected $policyService;
+
+    /** @var JudopayService */
+    protected $judopayService;
+
+    public function __construct(DocumentManager $dm, PolicyService $policyService, JudopayService $judopayService)
     {
         parent::__construct();
         $this->dm = $dm;
+        $this->policyService = $policyService;
+        $this->judopayService = $judopayService;
     }
 
     protected function configure()
@@ -85,11 +95,6 @@ class SalvaManualPolicyCommand extends ContainerAwareCommand
 
         $phone = $this->getPhone($device, $memory);
 
-        /** @var PolicyService $policyService */
-        $policyService = $this->getContainer()->get('app.policy');
-        /** @var JudopayService $judopay */
-        $judopay = $this->getContainer()->get('app.judopay');
-
         $user = $this->getUser($email);
         if (!$user->getBirthday()) {
             $user->setBirthday(new \DateTime('1980-01-01'));
@@ -104,15 +109,16 @@ class SalvaManualPolicyCommand extends ContainerAwareCommand
         $this->dm->persist($policy);
         $this->dm->flush();
 
-        if ($payments == 12) {
-            $amount = $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice($date);
-        } elseif ($payments = 1) {
-            $amount = $phone->getCurrentPhonePrice()->getYearlyPremiumPrice($date);
+        $currentPrice = $phone->getCurrentPhonePrice();
+        if ($currentPrice && $payments == 12) {
+            $amount = $currentPrice->getMonthlyPremiumPrice($date);
+        } elseif ($currentPrice && $payments = 1) {
+            $amount = $currentPrice->getYearlyPremiumPrice($date);
         } else {
             throw new \Exception('1 or 12 payments only');
         }
 
-        $details = $judopay->testPayDetails(
+        $details = $this->judopayService->testPayDetails(
             $user,
             $policy->getId(),
             $amount,
@@ -122,7 +128,7 @@ class SalvaManualPolicyCommand extends ContainerAwareCommand
             $policy->getId()
         );
         // @codingStandardsIgnoreStart
-        $judopay->add(
+        $this->judopayService->add(
             $policy,
             $details['receiptId'],
             $details['consumer']['consumerToken'],
@@ -136,21 +142,44 @@ class SalvaManualPolicyCommand extends ContainerAwareCommand
         $output->writeln(sprintf('Created Policy %s / %s', $policy->getPolicyNumber(), $policy->getId()));
     }
 
+    /**
+     * @param string $email
+     * @return User
+     */
     private function getUser($email)
     {
+        /** @var UserRepository $repo */
         $repo = $this->dm->getRepository(User::class);
 
-        return $repo->findOneBy(['emailCanonical' => mb_strtolower($email)]);
+        /** @var User $user */
+        $user = $repo->findOneBy(['emailCanonical' => mb_strtolower($email)]);
+
+        return $user;
     }
 
+    /**
+     * @param string     $device
+     * @param mixed|null $memory
+     * @return Phone
+     */
     private function getPhone($device, $memory = null)
     {
+        /** @var PhoneRepository $phoneRepo */
         $phoneRepo = $this->dm->getRepository(Phone::class);
 
+        $phone = null;
         if ($memory) {
-            return $phoneRepo->findOneBy(['devices' => $device, 'memory' => (int)$memory]);
+            /** @var Phone $phone */
+            $phone = $phoneRepo->findOneBy(['devices' => $device, 'memory' => (int)$memory]);
         } else {
-            return $phoneRepo->findOneBy(['devices' => $device]);
+            /** @var Phone $phone */
+            $phone = $phoneRepo->findOneBy(['devices' => $device]);
         }
+
+        if (!$phone) {
+            throw new \Exception('Unable to find phone');
+        }
+
+        return $phone;
     }
 }

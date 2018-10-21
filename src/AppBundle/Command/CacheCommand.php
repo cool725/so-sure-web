@@ -19,6 +19,15 @@ use AppBundle\Classes\SoSure;
 
 class CacheCommand extends ContainerAwareCommand
 {
+    /** @var Client  */
+    protected $redis;
+
+    public function __construct(Client $redis)
+    {
+        parent::__construct();
+        $this->redis = $redis;
+    }
+
     protected function configure()
     {
         $this
@@ -42,8 +51,6 @@ class CacheCommand extends ContainerAwareCommand
     {
         $action = $input->getArgument('action');
         $prefix = $input->getOption('prefix');
-        /** @var Client $redis */
-        $redis = $this->getContainer()->get('snc_redis.default');
         if (!in_array($action, ['list', 'clear'])) {
             throw new \Exception('Unknown action');
         }
@@ -51,10 +58,10 @@ class CacheCommand extends ContainerAwareCommand
             throw new \Exception('Prefix must be at least 2 chars. Use redis:flushdb to clear database');
         }
 
-        foreach ($redis->keys(sprintf('%s*', $prefix)) as $key) {
+        foreach ($this->redis->keys(sprintf('%s*', $prefix)) as $key) {
             if ($action == 'clear') {
                 $output->writeln(sprintf('Clearing %s', $key));
-                $redis->del($key);
+                $this->redis->del($key);
             } elseif ($action == 'list') {
                 $output->writeln(sprintf('%s', $key));
             }

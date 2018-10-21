@@ -17,10 +17,14 @@ class SmsCommand extends ContainerAwareCommand
     /** @var DocumentManager   */
     protected $dm;
 
-    public function __construct(DocumentManager $dm)
+    /** @var SmsService */
+    protected $smsService;
+
+    public function __construct(DocumentManager $dm, SmsService $smsService)
     {
         parent::__construct();
         $this->dm = $dm;
+        $this->smsService = $smsService;
     }
 
     protected function configure()
@@ -48,9 +52,6 @@ class SmsCommand extends ContainerAwareCommand
         $policyNumber = $input->getOption('policyNumber');
         $finalAttempt = true === $input->getOption('final');
 
-        /** @var SmsService $sms */
-        $sms = $this->getContainer()->get('app.sms');
-
         if ($policyNumber) {
             $repo = $this->dm->getRepository(Policy::class);
             /** @var Policy $policy */
@@ -64,7 +65,7 @@ class SmsCommand extends ContainerAwareCommand
                 $smsTemplate = 'AppBundle:Sms:failedPaymentFinal.txt.twig';
             }
 
-            $sms->sendUser($policy, $smsTemplate, ['policy' => $policy]);
+            $this->smsService->sendUser($policy, $smsTemplate, ['policy' => $policy]);
         } else {
             $output->writeln('Nothing to do');
         }

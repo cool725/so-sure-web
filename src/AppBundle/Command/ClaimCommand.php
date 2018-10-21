@@ -18,10 +18,14 @@ class ClaimCommand extends ContainerAwareCommand
     /** @var DocumentManager  */
     protected $dm;
 
-    public function __construct(DocumentManager $dm)
+    /** @var ClaimsService */
+    protected $claimsService;
+
+    public function __construct(DocumentManager $dm, ClaimsService $claimsService)
     {
         parent::__construct();
         $this->dm = $dm;
+        $this->claimsService = $claimsService;
     }
 
     protected function configure()
@@ -47,9 +51,7 @@ class ClaimCommand extends ContainerAwareCommand
         if (!$claim) {
             throw new \Exception(sprintf('Unable to find claim %s', $claimNumber));
         }
-        /** @var ClaimsService $claimsService */
-        $claimsService = $this->getContainer()->get('app.claims');
-        if ($claimsService->processClaim($claim)) {
+        if ($this->claimsService->processClaim($claim)) {
             $output->writeln(sprintf('Successfully processed claim %s', $claimNumber));
         } else {
             $output->writeln(sprintf(
@@ -57,10 +59,5 @@ class ClaimCommand extends ContainerAwareCommand
                 $claimNumber
             ));
         }
-    }
-
-    private function getManager()
-    {
-        return $this->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
     }
 }

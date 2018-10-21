@@ -5,6 +5,7 @@ namespace AppBundle\Command;
 use AppBundle\Document\Invitation\Invitation;
 use AppBundle\Repository\Invitation\EmailInvitationRepository;
 use AppBundle\Service\InvitationService;
+use AppBundle\Service\InvoiceService;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
@@ -19,10 +20,14 @@ class ReinviteCommand extends ContainerAwareCommand
     /** @var DocumentManager  */
     protected $dm;
 
-    public function __construct(DocumentManager $dm)
+    /** @var InvitationService */
+    protected $invitationService;
+
+    public function __construct(DocumentManager $dm, InvitationService $invitationService)
     {
         parent::__construct();
         $this->dm = $dm;
+        $this->invitationService = $invitationService;
     }
 
     protected function configure()
@@ -48,8 +53,6 @@ class ReinviteCommand extends ContainerAwareCommand
             $date = new \DateTime($date);
         }
 
-        /** @var InvitationService $invitationService */
-        $invitationService = $this->getContainer()->get('app.invitation');
         /** @var EmailInvitationRepository $repo */
         $repo = $this->dm->getRepository(EmailInvitation::class);
         $invitations = $repo->findSystemReinvitations($date);
@@ -57,7 +60,7 @@ class ReinviteCommand extends ContainerAwareCommand
         foreach ($invitations as $invitation) {
             /** @var EmailInvitation $invitation */
             print sprintf("Reinviting %s\n", $invitation->getEmail());
-            $invitationService->reinvite($invitation);
+            $this->invitationService->reinvite($invitation);
         }
     }
 }

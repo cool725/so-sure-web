@@ -27,10 +27,14 @@ class UsersEmailCommand extends ContainerAwareCommand
     /** @var DocumentManager  */
     protected $dm;
 
-    public function __construct(DocumentManager $dm)
+    /** @var MailerService */
+    protected $mailerService;
+
+    public function __construct(DocumentManager $dm, MailerService $mailerService)
     {
         parent::__construct();
         $this->dm = $dm;
+        $this->mailerService = $mailerService;
     }
 
     protected function configure()
@@ -66,6 +70,7 @@ class UsersEmailCommand extends ContainerAwareCommand
             $process = false;
         }
         foreach ($users as $user) {
+            /** @var User $user */
             if ($from && $user->getId() == $from) {
                 $process = true;
             }
@@ -74,7 +79,6 @@ class UsersEmailCommand extends ContainerAwareCommand
                 continue;
             }
 
-            /** @var User $user */
             try {
                 if (!$skipEmail) {
                     $this->emailUser($user);
@@ -91,9 +95,7 @@ class UsersEmailCommand extends ContainerAwareCommand
     private function emailUser(User $user)
     {
         $hash = SoSure::encodeCommunicationsHash($user->getEmail());
-        /** @var MailerService $mailer */
-        $mailer = $this->getContainer()->get('app.mailer');
-        $mailer->sendTemplate(
+        $this->mailerService->sendTemplate(
             'Updated Privacy Policy',
             $user->getEmail(),
             'AppBundle:Email:user/updatedPrivacyPolicy.html.twig',

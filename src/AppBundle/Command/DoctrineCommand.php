@@ -16,10 +16,14 @@ class DoctrineCommand extends ContainerAwareCommand
     /** @var DocumentManager  */
     protected $dm;
 
-    public function __construct(DocumentManager $dm)
+    /** @var DocumentManager */
+    protected $censusDm;
+
+    public function __construct(DocumentManager $dm, DocumentManager $censusDm)
     {
         parent::__construct();
         $this->dm = $dm;
+        $this->censusDm = $censusDm;
     }
 
     protected function configure()
@@ -33,9 +37,6 @@ class DoctrineCommand extends ContainerAwareCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->dm->getSchemaManager()->ensureIndexes();
-
-        /** @var DocumentManager $censusDm */
-        $censusDm = $this->getContainer()->get('doctrine_mongodb.odm.census_document_manager');
-        $censusDm->getSchemaManager()->ensureIndexes();
+        $this->censusDm->getSchemaManager()->ensureIndexes();
     }
 }

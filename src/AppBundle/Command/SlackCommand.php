@@ -21,10 +21,18 @@ class SlackCommand extends ContainerAwareCommand
     /** @var DocumentManager  */
     protected $dm;
 
-    public function __construct(DocumentManager $dm)
+    /** @var RouterService */
+    protected $routerService;
+
+    /** @var Client */
+    protected $slackClient;
+
+    public function __construct(DocumentManager $dm, RouterService $routerService, Client $slackClient)
     {
         parent::__construct();
         $this->dm = $dm;
+        $this->routerService = $routerService;
+        $this->slackClient = $slackClient;
     }
 
     protected function configure()
@@ -102,8 +110,6 @@ class SlackCommand extends ContainerAwareCommand
 
     private function cancelledAndPaymentOwed($channel, $skipSlack)
     {
-        /** @var RouterService $router */
-        $router = $this->getContainer()->get('app.router');
         /** @var PhonePolicyRepository $repo */
         $repo = $this->dm->getRepository(PhonePolicy::class);
         $policies = $repo->findAll();
@@ -122,7 +128,7 @@ class SlackCommand extends ContainerAwareCommand
             // @codingStandardsIgnoreStart
             $text = sprintf(
                 "*Policy <%s|%s> has been cancelled w/success claim. User must re-purchase policy or pay outstanding amount.*",
-                $router->generateUrl('admin_policy', ['id' => $policy->getId()]),
+                $this->routerService->generateUrl('admin_policy', ['id' => $policy->getId()]),
                 $policy->getPolicyNumber()
             );
             $lines[] = $text;
@@ -138,8 +144,6 @@ class SlackCommand extends ContainerAwareCommand
 
     private function unpaid($channel, $skipSlack)
     {
-        /** @var RouterService $router */
-        $router = $this->getContainer()->get('app.router');
         /** @var PhonePolicyRepository $repo */
         $repo = $this->dm->getRepository(PhonePolicy::class);
         $policies = $repo->getUnpaidPolicies();
@@ -155,7 +159,7 @@ class SlackCommand extends ContainerAwareCommand
             // @codingStandardsIgnoreStart
             $text = sprintf(
                 "*Policy <%s|%s> is scheduled to be cancelled in %d days*",
-                $router->generateUrl('admin_policy', ['id' => $policy->getId()]),
+                $this->routerService->generateUrl('admin_policy', ['id' => $policy->getId()]),
                 $policy->getPolicyNumber(),
                 $diff->days
             );
@@ -184,8 +188,6 @@ class SlackCommand extends ContainerAwareCommand
 
     private function renewals($channel, $skipSlack)
     {
-        /** @var RouterService $router */
-        $router = $this->getContainer()->get('app.router');
         /** @var PhonePolicyRepository $repo */
         $repo = $this->dm->getRepository(PhonePolicy::class);
         $policies = $repo->findBy(['status' => Policy::STATUS_DECLINED_RENEWAL]);
@@ -205,7 +207,7 @@ class SlackCommand extends ContainerAwareCommand
             // @codingStandardsIgnoreStart
             $text = sprintf(
                 "Policy <%s|%s> will be expired in %d days and customer has declined to renew. Please call customer.",
-                $router->generateUrl('admin_policy', ['id' => $policy->getPreviousPolicy()->getId()]),
+                $this->routerService->generateUrl('admin_policy', ['id' => $policy->getPreviousPolicy()->getId()]),
                 $policy->getPreviousPolicy()->getPolicyNumber(),
                 $diff->days
             );
@@ -284,13 +286,11 @@ class SlackCommand extends ContainerAwareCommand
 
     private function send($text, $channel)
     {
-        /** @var Client $slack */
-        $slack = $this->getContainer()->get('nexy_slack.client');
-        $message = $slack->createMessage();
+        $message = $this->slackClient->createMessage();
         $message
             ->to($channel)
             ->setText($text)
         ;
-        $slack->sendMessage($message);
+        $this->slackClient->sendMessage($message);
     }
 }

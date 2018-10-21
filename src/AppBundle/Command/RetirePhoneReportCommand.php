@@ -20,10 +20,14 @@ class RetirePhoneReportCommand extends ContainerAwareCommand
     /** @var DocumentManager  */
     protected $dm;
 
-    public function __construct(DocumentManager $dm)
+    /** @var MailerService */
+    protected $mailerService;
+
+    public function __construct(DocumentManager $dm, MailerService $mailerService)
     {
         parent::__construct();
         $this->dm = $dm;
+        $this->mailerService = $mailerService;
     }
 
     protected function configure()
@@ -43,8 +47,6 @@ class RetirePhoneReportCommand extends ContainerAwareCommand
     {
         $retire = [];
         $debug = $input->getOption('debug');
-        /** @var MailerService $mailer */
-        $mailer = $this->getContainer()->get('app.mailer');
         /** @var PhoneRepository $repoPhone */
         $repoPhone = $this->dm->getRepository(Phone::class);
         $phones = $repoPhone->findActive()->getQuery()->execute();
@@ -63,7 +65,11 @@ class RetirePhoneReportCommand extends ContainerAwareCommand
         }
         $join = (count($retire) > 0) ? join("<br/>\n", $retire) : 'No phones should be retired.<br/>';
         $message = sprintf("Phones that should be retired:<br/><br/>\n\n%s", $join);
-        $mailer->send('Phones that should be retired report', 'tech+ops@so-sure.com', $message);
+        $this->mailerService->send(
+            'Phones that should be retired report',
+            'tech+ops@so-sure.com',
+            $message
+        );
         if ($debug) {
             $output->writeln($message);
         }

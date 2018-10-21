@@ -32,10 +32,14 @@ class LeadsCommand extends ContainerAwareCommand
     /** @var DocumentManager  */
     protected $dm;
 
-    public function __construct(DocumentManager $dm)
+    /** @var UserManagerInterface */
+    protected $userManager;
+
+    public function __construct(DocumentManager $dm, UserManagerInterface $userManager)
     {
         parent::__construct();
         $this->dm = $dm;
+        $this->userManager = $userManager;
     }
 
     protected function configure()
@@ -56,8 +60,6 @@ class LeadsCommand extends ContainerAwareCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $process = $input->getOption('process');
-        /** @var UserManagerInterface $userManager */
-        $userManager = $this->getContainer()->get('fos_user.user_manager');
         /** @var UserRepository $userRepo */
         $userRepo = $this->dm->getRepository(User::class);
         /** @var DocumentRepository $leadsRepo */
@@ -89,7 +91,7 @@ class LeadsCommand extends ContainerAwareCommand
             } else {
                 $output->writeln(sprintf('Create user %s from lead', $lead->getEmail()));
                 /** @var User $user */
-                $user = $userManager->createUser();
+                $user = $this->userManager->createUser();
                 $user->setEnabled(true);
                 $lead->populateUser($user);
                 $this->dm->persist($user);

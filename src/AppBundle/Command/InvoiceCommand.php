@@ -4,6 +4,7 @@ namespace AppBundle\Command;
 
 use AppBundle\Service\InvoiceService;
 use Doctrine\ODM\MongoDB\DocumentManager;
+use Doctrine\ODM\MongoDB\DocumentRepository;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -17,10 +18,14 @@ class InvoiceCommand extends ContainerAwareCommand
     /** @var DocumentManager  */
     protected $dm;
 
-    public function __construct(DocumentManager $dm)
+    /** @var InvoiceService */
+    protected $invoiceService;
+
+    public function __construct(DocumentManager $dm, InvoiceService $invoiceService)
     {
         parent::__construct();
         $this->dm = $dm;
+        $this->invoiceService = $invoiceService;
     }
 
     protected function configure()
@@ -54,21 +59,29 @@ class InvoiceCommand extends ContainerAwareCommand
         $regenerate = true === $input->getOption('regenerate');
         $email = $input->getOption('email');
         if ($id) {
-            /** @var InvoiceService $invoiceService */
-            $invoiceService = $this->getContainer()->get('app.invoice');
             $invoice = $this->getInvoice($id);
             if (!$invoice) {
                 throw new \Exception(sprintf('Unable to find invoice %s', $id));
             }
-            $result = $invoiceService->generateInvoice($invoice, $email, $regenerate);
+            $result = $this->invoiceService->generateInvoice($invoice, $email, $regenerate);
             $output->writeln(sprintf('Tmp Invoice File: %s', $result['file']));
         }
     }
 
+    /**
+     * @param mixed $id
+     * @return Invoice
+     * @throws \Doctrine\ODM\MongoDB\LockException
+     * @throws \Doctrine\ODM\MongoDB\Mapping\MappingException
+     */
     private function getInvoice($id)
     {
+        /** @var DocumentRepository $repo */
         $repo = $this->dm->getRepository(Invoice::class);
 
-        return $repo->find($id);
+        /** @var Invoice $invoice */
+        $invoice = $repo->find($id);
+
+        return $invoice;
     }
 }

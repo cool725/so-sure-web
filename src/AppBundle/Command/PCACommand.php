@@ -13,6 +13,15 @@ use AppBundle\Classes\Premium;
 
 class PCACommand extends ContainerAwareCommand
 {
+    /** @var PCAService */
+    protected $pcaService;
+
+    public function __construct(PCAService $pcaService)
+    {
+        parent::__construct();
+        $this->pcaService = $pcaService;
+    }
+
     protected function configure()
     {
         $this
@@ -35,9 +44,7 @@ class PCACommand extends ContainerAwareCommand
     {
         $sortcode = $input->getArgument('sortcode');
         $accountNumber = $input->getArgument('account');
-        /** @var PCAService $pca */
-        $pca = $this->getContainer()->get('app.address');
-        $data = $pca->findBankAccountRequest($sortcode, $accountNumber);
+        $data = $this->pcaService->findBankAccountRequest($sortcode, $accountNumber);
         $output->writeln(json_encode($data));
     }
 }

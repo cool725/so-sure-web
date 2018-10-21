@@ -13,7 +13,13 @@ services:
         bind:
             $environment: "%kernel.environment%"
             $redis: "@snc_redis.default"
+            $redisMailer: "@snc_redis.mailer"
             $dm: "@doctrine_mongodb.odm.default_document_manager"
+            $censusDm: "@doctrine_mongodb.odm.census_document_manager"
+            $statsdClient: "@statsd"
+            $slackClient: "@nexy_slack.client"
+            $branchDomain: "%branch_domain%"
+
 
     # makes classes in src/AppBundle available to be used as services
     # this creates a service per class whose id is the fully-qualified class name

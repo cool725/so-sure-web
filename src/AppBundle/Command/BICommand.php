@@ -2,6 +2,7 @@
 
 namespace AppBundle\Command;
 
+use AppBundle\Document\Connection\Connection;
 use AppBundle\Document\Phone;
 use AppBundle\Repository\ClaimRepository;
 use AppBundle\Repository\PhonePolicyRepository;
@@ -36,12 +37,25 @@ class BICommand extends ContainerAwareCommand
     /** @var DocumentManager  */
     protected $dm;
 
-    public function __construct(S3Client $s3, DocumentManager $dm, $environment)
-    {
+    /** @var LoggerInterface */
+    protected $logger;
+
+    /** @var SearchService */
+    protected $searchService;
+
+    public function __construct(
+        S3Client $s3,
+        DocumentManager $dm,
+        $environment,
+        LoggerInterface $logger,
+        SearchService $searchService
+    ) {
         parent::__construct();
         $this->s3 = $s3;
         $this->dm = $dm;
         $this->environment = $environment;
+        $this->logger = $logger;
+        $this->searchService = $searchService;
     }
 
     protected function configure()
@@ -158,8 +172,6 @@ class BICommand extends ContainerAwareCommand
 
     private function exportClaims($skipS3)
     {
-        /** @var SearchService $search */
-        $search = $this->getContainer()->get('census.search');
         /** @var ClaimRepository $repo */
         $repo = $this->dm->getRepository(Claim::class);
         $claims = $repo->findAll();
@@ -198,14 +210,12 @@ class BICommand extends ContainerAwareCommand
             $policy = $claim->getPolicy();
             // mainly for dev use
             if (!$policy) {
-                /** @var LoggerInterface $logger */
-                $logger = $this->getContainer()->get('logger');
-                $logger->error(sprintf('Missing policy for claim %s', $claim->getId()));
+                $this->logger->error(sprintf('Missing policy for claim %s', $claim->getId()));
                 continue;
             }
             $user = $policy->getUser();
-            $census = $search->findNearest($user->getBillingAddress()->getPostcode());
-            $income = $search->findIncome($user->getBillingAddress()->getPostcode());
+            $census = $this->searchService->findNearest($user->getBillingAddress()->getPostcode());
+            $income = $this->searchService->findIncome($user->getBillingAddress()->getPostcode());
             $lines[] = implode(',', [
                 sprintf('"%s"', $policy->getPolicyNumber()),
                 sprintf('"%s"', $policy->getStart()->format('Y-m-d H:i:s')),
@@ -261,8 +271,6 @@ class BICommand extends ContainerAwareCommand
 
     private function exportPolicies($prefix, $skipS3)
     {
-        /** @var SearchService $search */
-        $search = $this->getContainer()->get('census.search');
         /** @var PhonePolicyRepository $repo */
         $repo = $this->dm->getRepository(PhonePolicy::class);
         $policies = $repo->findAllStartedPolicies($prefix);
@@ -311,8 +319,8 @@ class BICommand extends ContainerAwareCommand
         foreach ($policies as $policy) {
             /** @var Policy $policy */
             $user = $policy->getUser();
-            $census = $search->findNearest($user->getBillingAddress()->getPostcode());
-            $income = $search->findIncome($user->getBillingAddress()->getPostcode());
+            $census = $this->searchService->findNearest($user->getBillingAddress()->getPostcode());
+            $income = $this->searchService->findIncome($user->getBillingAddress()->getPostcode());
             $lines[] = implode(',', [
                 sprintf('"%s"', $policy->getPolicyNumber()),
                 sprintf('"%d"', $user->getAge()),
@@ -375,8 +383,6 @@ class BICommand extends ContainerAwareCommand
 
     private function exportUsers($skipS3)
     {
-        /** @var SearchService $search */
-        $search = $this->getContainer()->get('census.search');
         /** @var UserRepository $repo */
         $repo = $this->dm->getRepository(User::class);
         $users = $repo->findAll();
@@ -394,11 +400,12 @@ class BICommand extends ContainerAwareCommand
             '"Latest Campaign Source"',
         ]);
         foreach ($users as $user) {
+            /** @var User $user */
             if (!$user->getBillingAddress()) {
                 continue;
             }
-            $census = $search->findNearest($user->getBillingAddress()->getPostcode());
-            $income = $search->findIncome($user->getBillingAddress()->getPostcode());
+            $census = $this->searchService->findNearest($user->getBillingAddress()->getPostcode());
+            $income = $this->searchService->findIncome($user->getBillingAddress()->getPostcode());
             $lines[] = implode(',', [
                 sprintf('"%d"', $user->getAge()),
                 sprintf('"%s"', $user->getBillingAddress()->getPostcode()),
@@ -431,6 +438,7 @@ class BICommand extends ContainerAwareCommand
             '"Accepted Date"',
         ]);
         foreach ($invitations as $invitation) {
+            /** @var Invitation $invitation */
             $lines[] = implode(',', [
                 sprintf('"%s"', $invitation->getPolicy() ? $invitation->getPolicy()->getPolicyNumber() : ''),
                 sprintf('"%s"', $invitation->getCreated() ? $invitation->getCreated()->format('Y-m-d H:i:s') : ''),
@@ -458,6 +466,7 @@ class BICommand extends ContainerAwareCommand
             '"Connection Date"',
         ]);
         foreach ($connections as $connection) {
+            /** @var Connection $connection */
             // @codingStandardsIgnoreStart
             $lines[] = implode(',', [
                 sprintf('"%s"', $connection->getSourcePolicy() ? $connection->getSourcePolicy()->getPolicyNumber() : ''),

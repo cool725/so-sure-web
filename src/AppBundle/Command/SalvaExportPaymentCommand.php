@@ -21,10 +21,14 @@ class SalvaExportPaymentCommand extends ContainerAwareCommand
     /** @var DocumentManager  */
     protected $dm;
 
-    public function __construct(DocumentManager $dm)
+    /** @var SalvaExportService  */
+    protected $salvaExportService;
+
+    public function __construct(DocumentManager $dm, SalvaExportService $salvaExportService)
     {
         parent::__construct();
         $this->dm = $dm;
+        $this->salvaExportService = $salvaExportService;
     }
 
     protected function configure()
@@ -64,8 +68,6 @@ class SalvaExportPaymentCommand extends ContainerAwareCommand
             $date = $this->startOfPreviousMonth();
             $output->writeln(sprintf('Using last month %s', $date->format('Y-m')));
         }
-        /** @var SalvaExportService $salva */
-        $salva = $this->getContainer()->get('app.salva');
         $data = [];
         if ($updateMetadata) {
             $dateStart = $this->startOfMonth($date);
@@ -76,12 +78,12 @@ class SalvaExportPaymentCommand extends ContainerAwareCommand
             /** @var SalvaPaymentFile $paymentFile */
             $paymentFile = $repo->findOneBy(['date' => ['$gte' => $dateStart, '$lt' => $dateEnd]]);
             if ($paymentFile) {
-                $data = $salva->exportPayments(true, $date, $paymentFile);
+                $data = $this->salvaExportService->exportPayments(true, $date, $paymentFile);
             } else {
                 $output->writeln('Failed to find payment file in db');
             }
         } else {
-            $data = $salva->exportPayments($s3, $date);
+            $data = $this->salvaExportService->exportPayments($s3, $date);
         }
         $output->write(implode(PHP_EOL, $data));
         $output->writeln('');

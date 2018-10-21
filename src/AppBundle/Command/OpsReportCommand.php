@@ -39,8 +39,6 @@ class OpsReportCommand extends ContainerAwareCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $redis = $this->getContainer()->get('snc_redis.default');
-
         $response = $this->sendCsp();
         $output->writeln(sprintf('Sent %s CSP violations', $response));
         $response = $this->sendClientValidation();

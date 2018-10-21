@@ -762,7 +762,6 @@ services:
         class:   AppBundle\Listener\DoctrineClaimListener
         arguments:
             - "@event_dispatcher"
-            - "@annotation_reader"
         tags:
             -  { name: doctrine_mongodb.odm.event_listener, event: postPersist }
             -  { name: doctrine_mongodb.odm.event_listener, event: preUpdate  }

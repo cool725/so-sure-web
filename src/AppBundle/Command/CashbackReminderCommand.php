@@ -17,6 +17,15 @@ use AppBundle\Classes\SoSure;
 
 class CashbackReminderCommand extends ContainerAwareCommand
 {
+    /** @var PolicyService */
+    protected $policyService;
+
+    public function __construct(PolicyService $policyService)
+    {
+        parent::__construct();
+        $this->policyService = $policyService;
+    }
+
     protected function configure()
     {
         $this
@@ -34,9 +43,7 @@ class CashbackReminderCommand extends ContainerAwareCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $dryRun = true === $input->getOption('dry-run');
-        /** @var PolicyService $policyService */
-        $policyService = $this->getContainer()->get('app.policy');
-        $lines = $policyService->cashbackReminder($dryRun);
+        $lines = $this->policyService->cashbackReminder($dryRun);
         $output->writeln(json_encode($lines, JSON_PRETTY_PRINT));
     }
 }

@@ -25,10 +25,14 @@ class SanctionsCommand extends ContainerAwareCommand
     /** @var DocumentManager */
     protected $dm;
 
-    public function __construct(DocumentManager $dm)
+    /** @var SanctionsService  */
+    protected $sanctionsService;
+
+    public function __construct(DocumentManager $dm, SanctionsService $sanctionsService)
     {
         parent::__construct();
         $this->dm = $dm;
+        $this->sanctionsService = $sanctionsService;
     }
 
     protected function configure()
@@ -103,8 +107,6 @@ class SanctionsCommand extends ContainerAwareCommand
 
     protected function checkUsers($userId = null)
     {
-        /** @var SanctionsService $sanctions */
-        $sanctions = $this->getContainer()->get('app.sanctions');
         /** @var UserRepository $userRepo */
         $userRepo = $this->dm->getRepository(User::class);
         if ($userId) {
@@ -115,7 +117,7 @@ class SanctionsCommand extends ContainerAwareCommand
         }
         $count = 0;
         foreach ($users as $user) {
-            $matches = $sanctions->checkUser($user, true);
+            $matches = $this->sanctionsService->checkUser($user, true);
             if ($matches) {
                 print sprintf('%s %s', $user->getName(), json_encode($matches)) . PHP_EOL;
             }
@@ -129,8 +131,6 @@ class SanctionsCommand extends ContainerAwareCommand
 
     protected function checkCompanies($companyId = null)
     {
-        /** @var SanctionsService $sanctions */
-        $sanctions = $this->getContainer()->get('app.sanctions');
         $companyRepo = $this->dm->getRepository(Company::class);
         if ($companyId) {
             $companies = [];
@@ -140,7 +140,7 @@ class SanctionsCommand extends ContainerAwareCommand
         }
         foreach ($companies as $company) {
             /** @var Company $company */
-            $matches = $sanctions->checkCompany($company, true);
+            $matches = $this->sanctionsService->checkCompany($company, true);
             if ($matches) {
                 print sprintf('%s %s', $company->getName(), json_encode($matches)) . PHP_EOL;
             }

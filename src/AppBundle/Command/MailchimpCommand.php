@@ -11,6 +11,15 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class MailchimpCommand extends ContainerAwareCommand
 {
+    /** @var MailchimpService */
+    protected $mailchimp;
+
+    public function __construct(MailchimpService $mailchimp)
+    {
+        parent::__construct();
+        $this->mailchimp = $mailchimp;
+    }
+
     protected function configure()
     {
         $this
@@ -27,9 +36,7 @@ class MailchimpCommand extends ContainerAwareCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $email = $input->getArgument('email');
-        /** @var MailchimpService $mailchimp */
-        $mailchimp = $this->getContainer()->get('app.mailchimp.prelaunch');
-        if ($mailchimp->subscribe($email)) {
+        if ($this->mailchimp->subscribe($email)) {
             $output->writeln('Added');
         } else {
             $output->writeln('User already exists');

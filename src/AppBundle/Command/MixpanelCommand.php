@@ -2,6 +2,9 @@
 
 namespace AppBundle\Command;
 
+use AppBundle\Document\Policy;
+use AppBundle\Repository\PhonePolicyRepository;
+use AppBundle\Repository\UserRepository;
 use AppBundle\Service\MixpanelService;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
@@ -18,10 +21,14 @@ class MixpanelCommand extends ContainerAwareCommand
     /** @var DocumentManager  */
     protected $dm;
 
-    public function __construct(DocumentManager $dm)
+    /** @var MixpanelService */
+    protected $mixpanelService;
+
+    public function __construct(DocumentManager $dm, MixpanelService $mixpanelService)
     {
         parent::__construct();
         $this->dm = $dm;
+        $this->mixpanelService = $mixpanelService;
     }
 
     protected function configure()
@@ -82,34 +89,35 @@ class MixpanelCommand extends ContainerAwareCommand
             if (!$user) {
                 throw new \Exception('Requires user; add --email');
             }
-            $results = $this->getMixpanel()->queueTrackWithUser($user, "button clicked", array("label" => "sign-up"));
-            $output->writeln(json_encode($results, JSON_PRETTY_PRINT));
+            $this->mixpanelService->queueTrackWithUser($user, "button clicked", array("label" => "sign-up"));
+            $output->writeln(sprintf('Queued test event'));
         } elseif ($action == 'data') {
             $end = new \DateTime();
             $end->sub(new \DateInterval(sprintf('P%dD', $end->format('N'))));
             $start = clone $end;
             $start->sub(new \DateInterval('P6D'));
             $output->writeln(sprintf('Running from %s to %s', $start->format('Y-m-d'), $end->format('Y-m-d')));
-            $results = $this->getMixpanel()->stats($start, $end);
+            $results = $this->mixpanelService->stats($start, $end);
             print_r($results);
             $output->writeln('Finished');
         } elseif ($action == 'attribution') {
             if (!$user) {
                 throw new \Exception('Requires user; add --email');
             }
-            $results = $this->getMixpanel()->attributionByUser($user);
+            $results = $this->mixpanelService->attributionByUser($user);
             $output->writeln(sprintf('Attribution %s', json_encode($results, JSON_PRETTY_PRINT)));
         } elseif ($action == 'sync') {
             if (!$user) {
                 throw new \Exception('Requires user; add --email');
             }
-            $results = $this->getMixpanel()->updateUser($user);
+            $this->mixpanelService->updateUser($user);
             $output->writeln('Queued user update');
         } elseif ($action == 'sync-all') {
             $policies = $this->getPhonePolicyRepository()->findAllActiveUnpaidPolicies();
             $count = 0;
             foreach ($policies as $policy) {
-                $results = $this->getMixpanel()->updateUser($policy->getUser());
+                /** @var Policy $policy */
+                $this->mixpanelService->updateUser($policy->getUser());
                 $count++;
             }
             $output->writeln(sprintf('Queued %d user update', $count));
@@ -117,46 +125,41 @@ class MixpanelCommand extends ContainerAwareCommand
             if (!$id) {
                 throw new \Exception('email or id is required');
             }
-            $results = $this->getMixpanel()->queueDelete($id);
-            $output->writeln(json_encode($results, JSON_PRETTY_PRINT));
+            $this->mixpanelService->queueDelete($id);
+            $output->writeln(sprintf('Queued user delete'));
         } elseif ($action == 'delete-old-users') {
-            $data = $this->getMixpanel()->deleteOldUsers($days);
+            $data = $this->mixpanelService->deleteOldUsers($days);
             $output->writeln(sprintf("Queued %d users for deletion (of %d)", $data['count'], $data['total']));
         } elseif ($action == 'count-users') {
-            $total = $this->getMixpanel()->getUserCount();
+            $total = $this->mixpanelService->getUserCount();
             $output->writeln(sprintf("%d Users", $total));
         } elseif ($action == 'count-queue') {
-            $total = $this->getMixpanel()->countQueue();
+            $total = $this->mixpanelService->countQueue();
             $output->writeln(sprintf("%d in queue", $total));
         } elseif ($action == 'clear') {
-            $this->getMixpanel()->clearQueue();
+            $this->mixpanelService->clearQueue();
             $output->writeln(sprintf("Queue is cleared"));
         } elseif ($action == 'show') {
-            $data = $this->getMixpanel()->getQueueData($process);
+            $data = $this->mixpanelService->getQueueData($process);
             $output->writeln(sprintf("Queue Size: %d", count($data)));
             foreach ($data as $line) {
                 $output->writeln(json_encode(unserialize($line), JSON_PRETTY_PRINT));
             }
         } else {
-            $data = $this->getMixpanel()->process($process);
+            $data = $this->mixpanelService->process($process);
             $output->writeln(sprintf("Processed %d Requeued: %d", $data['processed'], $data['requeued']));
         }
     }
 
     /**
-     * @return MixpanelService
+     * @param string $email
+     * @return User
+     * @throws \Exception
      */
-    private function getMixpanel()
-    {
-        /** @var MixpanelService $mixpanel */
-        $mixpanel = $this->getContainer()->get('app.mixpanel');
-
-        return $mixpanel;
-    }
-
     private function getUser($email)
     {
         $repo = $this->getUserRepository();
+        /** @var User $user */
         $user = $repo->findOneBy(['emailCanonical' => mb_strtolower($email)]);
         if (!$user) {
             throw new \Exception('unable to find user');
@@ -165,15 +168,23 @@ class MixpanelCommand extends ContainerAwareCommand
         return $user;
     }
 
+    /**
+     * @return UserRepository
+     */
     private function getUserRepository()
     {
+        /** @var UserRepository $repo */
         $repo = $this->dm->getRepository(User::class);
 
         return $repo;
     }
 
+    /**
+     * @return PhonePolicyRepository
+     */
     private function getPhonePolicyRepository()
     {
+        /** @var PhonePolicyRepository $repo */
         $repo = $this->dm->getRepository(PhonePolicy::class);
 
         return $repo;

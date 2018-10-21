@@ -26,10 +26,14 @@ class DaviesInvoiceCommand extends ContainerAwareCommand
     /** @var DocumentManager  */
     protected $dm;
 
-    public function __construct(DocumentManager $dm)
+    /** @var InvoiceService */
+    protected $invoiceService;
+
+    public function __construct(DocumentManager $dm, InvoiceService $invoiceService)
     {
         parent::__construct();
         $this->dm = $dm;
+        $this->invoiceService = $invoiceService;
     }
 
     protected function configure()
@@ -82,9 +86,7 @@ class DaviesInvoiceCommand extends ContainerAwareCommand
             $this->dm->persist($invoice);
             $this->dm->flush();
 
-            /** @var InvoiceService $invoiceService */
-            $invoiceService = $this->getContainer()->get('app.invoice');
-            $invoiceService->generateInvoice($invoice, $emailAddress);
+            $this->invoiceService->generateInvoice($invoice, $emailAddress);
             if ($emailAddress) {
                 $output->writeln(sprintf('Invoice %s generated and emailed', $invoice->getInvoiceNumber()));
             } else {
