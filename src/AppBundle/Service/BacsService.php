@@ -1747,12 +1747,16 @@ class BacsService
         return $processed;
     }
 
+    /**
+     * @return Policy
+     */
     public function getPolicy($id)
     {
         if (!$id) {
             throw new \InvalidArgumentException('Missing policyId');
         }
         $repo = $this->dm->getRepository(Policy::class);
+        /** @var Policy $policy */
         $policy = $repo->find($id);
         if (!$policy) {
             throw new \InvalidArgumentException(sprintf('Unable to find policyId: %s', $id));

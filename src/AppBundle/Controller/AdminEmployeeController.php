@@ -1006,10 +1006,11 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                 if ($payPolicyForm->isValid()) {
                     $date = new \DateTime();
                     $phone = $policy->getPhone();
-                    if ($payPolicyForm->get('monthly')->isClicked()) {
-                        $amount = $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(null, $date);
-                    } elseif ($payPolicyForm->get('yearly')->isClicked()) {
-                        $amount = $phone->getCurrentPhonePrice()->getYearlyPremiumPrice(null, $date);
+                    $currentPrice = $phone->getCurrentPhonePrice();
+                    if ($currentPrice && $payPolicyForm->get('monthly')->isClicked()) {
+                        $amount = $currentPrice->getMonthlyPremiumPrice(null, $date);
+                    } elseif ($currentPrice && $payPolicyForm->get('yearly')->isClicked()) {
+                        $amount = $currentPrice->getYearlyPremiumPrice(null, $date);
                     } else {
                         throw new \Exception('1 or 12 payments only');
                     }

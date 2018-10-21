@@ -11,6 +11,15 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class JudopayCommand extends ContainerAwareCommand
 {
+    /** @var JudopayService  */
+    protected $judopayService;
+
+    public function __construct(JudopayService $judopayService)
+    {
+        parent::__construct();
+        $this->judopayService = $judopayService;
+    }
+
     protected function configure()
     {
         $this
@@ -36,13 +45,11 @@ class JudopayCommand extends ContainerAwareCommand
     {
         $receiptId = $input->getOption('receiptId');
         $pageSize = $input->getOption('pageSize');
-        /** @var JudopayService $judopay */
-        $judopay = $this->getContainer()->get('app.judopay');
         if ($receiptId) {
-            $details = $judopay->getReceipt($receiptId, false, false);
+            $details = $this->judopayService->getReceipt($receiptId, false, false);
             $output->writeln(json_encode($details, JSON_PRETTY_PRINT));
         } else {
-            $results = $judopay->getTransactions($pageSize);
+            $results = $this->judopayService->getTransactions($pageSize);
             $output->writeln(sprintf('%d Entries %s', $pageSize, json_encode($results, JSON_PRETTY_PRINT)));
         }
     }

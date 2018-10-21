@@ -2012,11 +2012,13 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $validFrom->sub(new \DateInterval('PT1H'));
 
         $price = new PhonePrice();
-        $price->setGwp($phone->getCurrentPhonePrice()->getGwp()+1);
+        if ($currentPrice) {
+            $price->setGwp($currentPrice->getGwp() + 1);
+            $currentPrice->setValidTo($validFrom);
+        }
         $price->setValidFrom($validFrom);
         $phone->addPhonePrice($price);
 
-        $currentPrice->setValidTo($validFrom);
 
         $dm->flush();
 

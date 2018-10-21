@@ -12,6 +12,7 @@
     },
     "require": {
         "php": ">=7.0",
+        "ext-json": "*",
         "symfony/symfony": "~3.4",
         "doctrine/orm": "^2.4.8",
         "doctrine/doctrine-bundle": "^1.4",

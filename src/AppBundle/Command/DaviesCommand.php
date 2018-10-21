@@ -13,6 +13,15 @@ use AppBundle\Classes\DaviesHandlerClaim;
 
 class DaviesCommand extends ContainerAwareCommand
 {
+    /** @var DaviesService  */
+    protected $daviesService;
+
+    public function __construct(DaviesService $daviesService)
+    {
+        parent::__construct();
+        $this->daviesService = $daviesService;
+    }
+
     protected function configure()
     {
         $this
@@ -68,16 +77,15 @@ class DaviesCommand extends ContainerAwareCommand
                 json_encode(DaviesHandlerClaim::$sheetNames)
             ));
         }
-        /** @var DaviesService $davies */
-        $davies = $this->getContainer()->get('app.davies');
+
         if ($isDaily) {
-            $count = $davies->claimsDailyEmail();
+            $count = $this->daviesService->claimsDailyEmail();
             $output->writeln(sprintf('%d outstanding claims. Email report sent.', $count));
         } elseif ($file) {
-            $lines = $davies->importFile($file, $sheetName, $useMime, $maxParseErrors);
+            $lines = $this->daviesService->importFile($file, $sheetName, $useMime, $maxParseErrors);
             $output->writeln(implode(PHP_EOL, $lines));
         } else {
-            $lines = $davies->import($sheetName, $useMime, $maxParseErrors);
+            $lines = $this->daviesService->import($sheetName, $useMime, $maxParseErrors);
             $output->writeln(implode(PHP_EOL, $lines));
         }
         $output->writeln('Finished');
