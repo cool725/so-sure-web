@@ -81,6 +81,7 @@ class ScheduledPaymentRepository extends BaseDocumentRepository
                     ->field('total')
                     ->sum('$amount')
                 ->sort('_id', 'desc')
-            ->execute(['cursor' => [ 'batchSize' => 10000]]);
+            ->execute(['cursor' => true])
+            ->toArray();
     }
 }

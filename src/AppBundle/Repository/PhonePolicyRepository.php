@@ -434,7 +434,8 @@ class PhonePolicyRepository extends PolicyRepository
                     ->sum('$potValue')
                     ->field('promoPotValue')
                     ->sum('$promoPotValue')
-                ->execute(['cursor' => [ 'batchSize' => 100]]);
+                ->execute(['cursor' => true])
+                ->toArray();
     }
 
     public function getActiveInvalidPolicies()
