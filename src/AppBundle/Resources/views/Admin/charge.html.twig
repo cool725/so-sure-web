@@ -4,6 +4,7 @@
     {{ parent() }}
     {% javascripts
         '@AppBundle/Resources/public/js/Admin/month.js'
+        '@AppBundle/Resources/public/js/Admin/charge.js'
     %}
     <script src="{{ asset_url }}"></script>
     {% endjavascripts %}
@@ -16,23 +17,60 @@
     <div class="col-md-6">
         <h1>so-sure Charges for {{ month }} / {{ year }}</h1>
     </div>
-    <form class="month-form form-inline" method="POST" autocomplete="off">
-    <div class="col-md-3">
-        <div class="form-group" style="padding-top: 15px;">
-            <div class="input-group date month" data-url="{{ path('admin_charge') }}">
-                <input name="charge" type='text' class="form-control" value="{{month}}-{{year}}" />
-                <span class="input-group-addon">
-                    <span class="fa fa-calendar"></span>
-                </span>
-            </div>
-            <div class="input-group">
-                <div class="input-group-btn">
-                    <button class="btn btn-success"><i class="fa fa-arrow-right"></i></button>
+
+    <!-- Configuration Form -->
+    <form id="reportForm" class="month-form form-inline" method="GET" autocomplete="off" hidden="hidden">
+        <div class="col-md-6">
+            <div class="form-group" style="padding-top: 15px;">
+                <!-- Charge Types -->
+                <div class="col-md-12">
+                    Charge Type:
+                    <select id="typeMenu" name="type" class="form-control">
+                        <option name="all">All</option>
+                        {% for type, typeName in types %}
+                            <option {% if type == selectedType %} selected="selected" {% endif %} value="{{ type }}">
+                                {{ typeName }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Affiliate Companies -->
+                <div class="col-md-12">
+                    Affiliate Company:
+                    <select id="affiliateMenu" name="affiliate" class="form-control" {% if selectedType != "affiliate" %}disabled="disabled"{% endif %}>
+                        <option name="all">All</option>
+                        {% for affiliate in affiliates %}
+                            <option {% if affiliate.name == selectedAffiliate %}selected="selected"{% endif %} value="{{ affiliate.name }}">
+                                {{ affiliate.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+
+                <!-- Report Month -->
+                <div class="col-md-12">
+                    Report Month:
+                    <div class="input-group date month" data-url="{{ path('admin_charge') }}">
+                        <input name="charge" type='text' class="form-control" value="{{month}}-{{year}}" />
+                        <span class="input-group-addon">
+                            <span class="fa fa-calendar"></span>
+                        </span>
+                    </div>
+                </div>
+
+
+                <!-- running button -->
+                <div class="col-md-12">
+                    <div class="input-group">
+                        <button class="btn btn-primary">Build Report</button>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
     </form>
+
 </div>
     {% if charges|length == 0 %}
     <div class="row-fluid">

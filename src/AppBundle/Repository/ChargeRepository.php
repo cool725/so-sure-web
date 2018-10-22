@@ -12,7 +12,8 @@ class ChargeRepository extends DocumentRepository
 {
     use DateTrait;
 
-    public function findMonthly(\DateTime $date = null, $type = null, $excludeInvoiced = false)
+    public function findMonthly(\DateTime $date = null, $type = null, $excludeInvoiced = false,
+        $affiliateCompany = null)
     {
         if (!$date) {
             $date = new \DateTime();
@@ -32,6 +33,10 @@ class ChargeRepository extends DocumentRepository
 
         if ($excludeInvoiced) {
             $qb->field('invoice')->exists(false);
+        }
+
+        if ($type == 'affiliate' && $affiliateCompany) {
+            //$qb->field('');
         }
 
         return $qb

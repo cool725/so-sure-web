@@ -2,6 +2,7 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Document\AffiliateCompany;
 use AppBundle\Document\ArrayToApiArrayTrait;
 use AppBundle\Document\BacsPaymentMethod;
 use AppBundle\Document\File\AccessPayFile;
@@ -187,7 +188,7 @@ class AdminController extends BaseController
 
         return new RedirectResponse($this->generateUrl('admin_phones'));
     }
-    
+
     /**
      * @Route("/phone/{id}/price", name="admin_phone_price")
      * @Method({"POST"})
@@ -1149,7 +1150,7 @@ class AdminController extends BaseController
      * @Route("/charge/{year}/{month}", name="admin_charge_date")
      * @Template
      */
-    public function chargeAction($year = null, $month = null)
+    public function chargeAction(Request $request, $year = null, $month = null)
     {
         $now = new \DateTime();
         if (!$year) {
@@ -1160,9 +1161,11 @@ class AdminController extends BaseController
         }
         $date = \DateTime::createFromFormat("Y-m-d", sprintf('%d-%d-01', $year, $month));
 
+        $type = $request->get('type') ?: null;
+
         $dm = $this->getManager();
         $repo = $dm->getRepository(Charge::class);
-        $charges = $repo->findMonthly($date);
+        $charges = $repo->findMonthly($date, $type);
         $summary = [];
         foreach ($charges as $charge) {
             if (!isset($summary[$charge->getType()])) {
@@ -1171,11 +1174,29 @@ class AdminController extends BaseController
             $summary[$charge->getType()] += $charge->getAmount();
         }
 
+        // TODO: This function should possibly be rewritten so that it uses the form builder.
+        $affiliates = $dm->getRepository(AffiliateCompany::class)->findAll();
+        $affiliate = $request->get('affiliate') ?: null;
+
         return [
             'year' => $year,
             'month' => $month,
             'charges' => $charges,
             'summary' => $summary,
+            'types' => [
+                Charge::TYPE_ADDRESS => 'Address',
+                Charge::TYPE_SMS => 'SMS',
+                Charge::TYPE_GSMA => 'GSMA',
+                Charge::TYPE_MAKEMODEL => 'Make and Model',
+                Charge::TYPE_CLAIMSCHECK => 'Claims Check',
+                Charge::TYPE_CLAIMSDAMAGE => 'Claims Damage',
+                Charge::TYPE_BANK_ACCOUNT => 'Bank Account',
+                Charge::TYPE_AFFILIATE => 'Affiliate'
+            ],
+            'affiliates' => $affiliates,
+            'selectedType' => $type,
+            'selectedAffiliate' => $affiliate
+
         ];
     }
 
