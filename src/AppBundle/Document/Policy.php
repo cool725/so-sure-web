@@ -3136,6 +3136,10 @@ abstract class Policy
 
     public function getPolicyExpirationDateDays(\DateTime $date = null)
     {
+        if (!$this->getPolicyExpirationDate()) {
+            return null;
+        }
+
         if (!$date) {
             $date = new \DateTime();
         }
