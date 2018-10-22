@@ -2,12 +2,11 @@
 
 $(function() {
 
-    const carousel   = $('#onboarding-carousel'),
-          indicators = $('.onboarding-indicators li');
+    const carousel    = $('#onboarding-carousel'),
+          indicators  = $('.onboarding-indicators li'),
+          // Get the number of slides to set when to show the controls correctly
+          totalSlides = $('.carousel-item').length - 1;
 
-    let clicked = false;
-
-    // TODO: Refactor to be dynamic and handle any number of slides
     carousel.on('slide.bs.carousel', function(e){
 
         // Adjust controls dependant on slide
@@ -17,7 +16,7 @@ $(function() {
             $('#onboarding-prev-btn').addClass('disabled');
         }
 
-        if (e.to == 2) {
+        if (e.to == totalSlides) {
             $('#onboarding-next-btn').addClass('hide-controls');
             $('#onboarding-get-started-btn').removeClass('hide-controls');
         } else {
