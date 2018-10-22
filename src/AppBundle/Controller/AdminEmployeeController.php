@@ -2501,7 +2501,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                         // exception with no message, so here we catch and release it with a message
                         $postcode = $this->getDataString($companyForm->getData(), 'postcode');
                         try {
-                            $address->setPostcode($postcods);
+                            $address->setPostcode($postcode);
                         } catch (\InvalidArgumentException $e) {
                             throw new \InvalidArgumentException("{$postcode} is not a valid post code.");
                         }
