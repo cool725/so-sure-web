@@ -37,6 +37,10 @@
 // Includes Carousel component
 .modal-onboarding {
 
+    .carousel {
+        position: static;
+    }
+
     &.modal-dialog {
 
         @include media-breakpoint-down(xs) {
@@ -88,14 +92,11 @@
     }
 }
 
-.onboarding-indicators {
+.carousel-indicators {
+    margin: 0;
+    left: 32px; right: auto; bottom: -44px;
 
     li {
-        color: $dodger-blue;
-        opacity: 0.5;
-
-        &.active {
-            opacity: 1;
-        }
+        @include border-radius(12px);
     }
 }

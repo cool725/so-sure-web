@@ -3,8 +3,9 @@
 $(function() {
 
     const carousel   = $('#onboarding-carousel'),
-          // indicators = $('.onboarding-indicators'),
-          handled    = false;
+          indicators = $('.onboarding-indicators li');
+
+    let clicked = false;
 
     // TODO: Refactor to be dynamic and handle any number of slides
     carousel.on('slide.bs.carousel', function(e){
@@ -26,14 +27,6 @@ $(function() {
 
     });
 
-    carousel.bind('slide.bs.carousel', function(e) {
-
-        let currentSlide = $(e.target).find('.carousel-item.active');
-        let slideIndex   = $(currentSlide).index();
-
-        console.log(slideIndex);
-
-    });
 });
 
 
