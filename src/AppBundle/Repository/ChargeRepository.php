@@ -36,11 +36,10 @@ class ChargeRepository extends DocumentRepository
         }
 
         if ($type == 'affiliate' && $affiliateCompany) {
-            //$qb->field('');
+            $qb->field('affiliate')->equals($affiliate->getId());
         }
 
-        return $qb
-            ->sort('createdDate', 'asc')
+        return $qb->sort('createdDate', 'asc')
             ->getQuery()
             ->execute();
     }

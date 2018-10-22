@@ -1165,7 +1165,7 @@ class AdminController extends BaseController
 
         $dm = $this->getManager();
         $repo = $dm->getRepository(Charge::class);
-        $charges = $repo->findMonthly($date, $type);
+        $charges = $repo->findMonthly($date, $type, false);
         $summary = [];
         foreach ($charges as $charge) {
             if (!isset($summary[$charge->getType()])) {
@@ -1174,9 +1174,7 @@ class AdminController extends BaseController
             $summary[$charge->getType()] += $charge->getAmount();
         }
 
-        // TODO: This function should possibly be rewritten so that it uses the form builder.
-        $affiliates = $dm->getRepository(AffiliateCompany::class)->findAll();
-        $affiliate = $request->get('affiliate') ?: null;
+        // Maybe I should rewrite this function with form builder.
 
         return [
             'year' => $year,
@@ -1193,10 +1191,7 @@ class AdminController extends BaseController
                 Charge::TYPE_BANK_ACCOUNT => 'Bank Account',
                 Charge::TYPE_AFFILIATE => 'Affiliate'
             ],
-            'affiliates' => $affiliates,
-            'selectedType' => $type,
-            'selectedAffiliate' => $affiliate
-
+            'selectedType' => $type
         ];
     }
 

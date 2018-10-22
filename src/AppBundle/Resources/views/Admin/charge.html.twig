@@ -4,7 +4,6 @@
     {{ parent() }}
     {% javascripts
         '@AppBundle/Resources/public/js/Admin/month.js'
-        '@AppBundle/Resources/public/js/Admin/charge.js'
     %}
     <script src="{{ asset_url }}"></script>
     {% endjavascripts %}
@@ -19,7 +18,7 @@
     </div>
 
     <!-- Configuration Form -->
-    <form id="reportForm" class="month-form form-inline" method="GET" autocomplete="off" hidden="hidden">
+    <form id="reportForm" class="month-form form-inline" method="GET" autocomplete="off">
         <div class="col-md-6">
             <div class="form-group" style="padding-top: 15px;">
                 <!-- Charge Types -->
@@ -34,20 +33,6 @@
                         {% endfor %}
                     </select>
                 </div>
-
-                <!-- Affiliate Companies -->
-                <div class="col-md-12">
-                    Affiliate Company:
-                    <select id="affiliateMenu" name="affiliate" class="form-control" {% if selectedType != "affiliate" %}disabled="disabled"{% endif %}>
-                        <option name="all">All</option>
-                        {% for affiliate in affiliates %}
-                            <option {% if affiliate.name == selectedAffiliate %}selected="selected"{% endif %} value="{{ affiliate.name }}">
-                                {{ affiliate.name }}
-                            </option>
-                        {% endfor %}
-                    </select>
-                </div>
-
 
                 <!-- Report Month -->
                 <div class="col-md-12">

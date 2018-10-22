@@ -1,0 +1,16 @@
+{% extends 'admin_claims_base.html.twig' %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {% javascripts
+        '@AppBundle/Resources/public/js/Admin/month.js'
+    %}
+    <script src="{{ asset_url }}"></script>
+    {% endjavascripts %}
+{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <h1>{{ affiliate.name }}</h1>
+    </div>
+{% endblock %}

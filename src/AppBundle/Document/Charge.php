@@ -62,6 +62,12 @@ class Charge
     protected $user;
 
     /**
+     * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\AffiliateCompany")
+     * @Gedmo\Versioned
+     */
+    protected $affiliate;
+
+    /**
      * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\Policy")
      * @Gedmo\Versioned
      */
@@ -128,6 +134,16 @@ class Charge
     public function setUser($user)
     {
         $this->user = $user;
+    }
+
+    public function getAffiliate()
+    {
+        return $this->affiliate;
+    }
+
+    public function setAffiliate($affiliate)
+    {
+        $this->affiliate = $affiliate;
     }
 
     public function getPolicy()

@@ -2534,4 +2534,13 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             'companyForm' => $companyForm->createView(),
         ];
     }
+
+    /**
+     * @Route("/affiliatecharge/{id}", name="admin_affiliate_charge")
+     * @Template
+     */
+    public function affiliateChargeAction()
+    {
+        return ['affiliate' => ['name' => 'this is a real affiliate I MEAN It']];
+    }
 }
