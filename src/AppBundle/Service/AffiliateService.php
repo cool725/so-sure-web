@@ -67,7 +67,7 @@ class AffiliateService
 
     public function generate()
     {
-        $generatedCharges = 0;
+        $generatedCharges = [];
         $repo = $this->dm->getRepository(AffiliateCompany::class);
         $affiliates = $repo->findAll();
 
@@ -83,13 +83,11 @@ class AffiliateService
                     $charge->setUser($user);
                     $this->dm->persist($charge);
                     $affiliate->addConfirmedUsers($user);
-                    $generatedCharges++;
+                    $generatedCharges[] = $charge;
                 }
             }
         }
-
         $this->dm->flush();
-
         return $generatedCharges;
     }
 
