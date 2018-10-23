@@ -118,9 +118,9 @@ class PhoneRepository extends DocumentRepository
     public function alreadyExists($make, $model, $memory)
     {
         return $this->createQueryBuilder()
-                ->field('make')->equals($make)
-                ->field('model')->equals($model)
-                ->field('memory')->equals((int) $memory)
+                ->field('make')->equals(new \MongoRegex('/'. $make . '/i'))
+                ->field('model')->equals(new \MongoRegex('/'. $model . '/i'))
+                ->field('memory')->equals(floatval($memory))
                 ->getQuery()
                 ->execute()
                 ->count() > 0;
