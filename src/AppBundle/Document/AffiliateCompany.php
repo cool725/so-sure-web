@@ -102,7 +102,7 @@ class AffiliateCompany extends Company
         return $this->campaignSource;
     }
 
-    public function setCampaignSource(String $campaignSource)
+    public function setCampaignSource($campaignSource)
     {
         $this->campaignSource = $campaignSource;
     }
@@ -112,7 +112,7 @@ class AffiliateCompany extends Company
         return $this->leadSource;
     }
 
-    public function setLeadSource(String $leadSource)
+    public function setLeadSource($leadSource)
     {
         $this->leadSource = $leadSource;
     }
@@ -122,7 +122,7 @@ class AffiliateCompany extends Company
         return $this->leadSourceDetails;
     }
 
-    public function setLeadSourceDetails(String $leadSourceDetails)
+    public function setLeadSourceDetails($leadSourceDetails)
     {
         $this->leadSourceDetails = $leadSourceDetails;
     }

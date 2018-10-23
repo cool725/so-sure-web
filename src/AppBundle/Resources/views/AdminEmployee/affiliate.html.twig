@@ -34,7 +34,9 @@
         </tr>
         {% for company in companies %}
             <tr>
-                <td width="20%">{{ company.name }}</td>
+                <td width="20%">
+                        <a href="{{ path('admin_affiliate_charge', {'id': company.id }) }}">{{ company.name }}</a>
+                </td>
                 <td width="10%">£{{ company.cpa|number_format(2, '.', ',') }}</td>
                 <td width="10%">{{ company.days }}</td>
                 <td width="10%">{{ company.campaignSource }}</td>

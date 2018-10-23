@@ -13,7 +13,7 @@ class ChargeRepository extends DocumentRepository
     use DateTrait;
 
     public function findMonthly(\DateTime $date = null, $type = null, $excludeInvoiced = false,
-        $affiliateCompany = null)
+        $affiliate = null)
     {
         if (!$date) {
             $date = new \DateTime();
@@ -35,8 +35,8 @@ class ChargeRepository extends DocumentRepository
             $qb->field('invoice')->exists(false);
         }
 
-        if ($type == 'affiliate' && $affiliateCompany) {
-            $qb->field('affiliate')->equals($affiliate->getId());
+        if ($type == 'affiliate' && $affiliate) {
+            $qb->field('affiliate')->references($affiliate);
         }
 
         return $qb->sort('createdDate', 'asc')

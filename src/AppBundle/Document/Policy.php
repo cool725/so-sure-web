@@ -2686,6 +2686,13 @@ abstract class Policy
         return $this->getStart()->diff($date)->days <= 30;
     }
 
+    public function daysToMaturation($days)
+    {
+        $now = new \DateTime();
+        $now = $days - ($now->diff($this->getStart()))->d;
+        return ($now >= 0) ? $now : 0;
+    }
+
     public function isPolicyOldEnough($days, \DateTime $date = null)
     {
         if (!$this->getStart()) {
@@ -4307,7 +4314,7 @@ abstract class Policy
                 return null;
             }
         }
-        
+
         // All Scheduled day must match the billing day
         if ($verifyBillingDay) {
             foreach ($scheduledPayments as $scheduledPayment) {

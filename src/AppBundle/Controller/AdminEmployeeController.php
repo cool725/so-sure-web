@@ -21,6 +21,7 @@ use AppBundle\Service\PolicyService;
 use AppBundle\Service\ReceperioService;
 use AppBundle\Service\ReportingService;
 use AppBundle\Service\SalvaExportService;
+use AppBundle\Service\AffiliateService;
 use Gedmo\Loggable\Document\Repository\LogEntryRepository;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
@@ -2536,11 +2537,50 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
     }
 
     /**
-     * @Route("/affiliatecharge/{id}", name="admin_affiliate_charge")
-     * @Template
+     * @Route("/affiliate/charge/{id}/{year}/{month}", name="admin_affiliate_charge")
+     * @Template("AppBundle:AdminEmployee:affiliateCharge.html.twig")
      */
-    public function affiliateChargeAction()
+    public function affiliateChargeAction(Request $request, $id, $year = null, $month = null)
     {
-        return ['affiliate' => ['name' => 'this is a real affiliate I MEAN It']];
+        $now = new \DateTime();
+        $year = $year ?: $now->format('Y');
+        $month = $month ?: $now->format('m');
+        $date = \DateTime::createFromFormat("Y-m-d", sprintf('%d-%d-01', $year, $month));
+
+        $dm = $this->getManager();
+        $affiliateRepo = $dm->getRepository(AffiliateCompany::class);
+        $chargeRepo = $dm->getRepository(Charge::class);
+        $affiliate = $affiliateRepo->find($id);
+        if ($affiliate) {
+            $charges = $chargeRepo->findMonthly($date, 'affiliate', false, $affiliate);
+            return ['affiliate' => $affiliate,
+                'charges' => $charges,
+                'cost' => $affiliate->getCpa() * count($charges),
+                'month' => $month,
+                'year' => $year,
+            ];
+        } else {
+            return ['error' => 'Invalid URL, given ID does not correspond to an affiliate.'];
+        }
+    }
+
+    /**
+     * @Route("/affiliate/immature/{id}", name="admin_affiliate_immature")
+     * @Template("AppBundle:AdminEmployee:affiliateCharge.html.twig")
+     */
+    public function affiliateImmatureAction(Request $request, $id)
+    {
+        $dm = $this->getManager();
+        $affiliateRepo = $dm->getRepository(AffiliateCompany::class);
+        $affiliate = $affiliateRepo->find($id);
+        $affiliateService = $this->get("app.affiliate");
+        if ($affiliate) {
+            return [
+                'affiliate' => $affiliate,
+                'immatureUsers' => $affiliateService->getMatchingUsers($affiliate, false)
+            ];
+        } else {
+            return ['error' => 'Invalid URL, given ID does not correspond to an affiliate.'];
+        }
     }
 }
