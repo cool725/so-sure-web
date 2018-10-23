@@ -1,19 +1,17 @@
-<div class="modal fade"
+<div class="modal modal-fullscreen"
      id="onboarding-modal"
-     tabindex="-1" role="dialog"
      aria-labelledby="onboarding-modal"
-     aria-hidden="true">
-    <div class="modal-dialog modal-onboarding modal-lg modal-dialog-centered" role="document">
-        <div class="modal-content">
-            <div class="modal-header modal-onboarding-header">
-                <h5 class="modal-title">
-                    {# Welcome #}
-                </h5>
+     tabindex="-1"
+     role="dialog">
+    <div class="modal-dialog modal-fullscreen-dialog modal-onboarding" role="document">
+        <div class="modal-content modal-fullscreen-content">
+            <div class="modal-header modal-fullscreen-header">
+                {# <h5 class="modal-title">Modal title</h5> #}
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <i class="fal fa-times text-zaffre"></i>
                 </button>
             </div>
-            <div class="modal-body modal-onboarding-body">
+            <div class="modal-body modal-fullscreen-body d-flex align-items-center justify-content-center">
                 <div id="onboarding-carousel"
                      class="carousel slide"
                      data-ride="carousel"
@@ -23,40 +21,37 @@
                         {% if app.session.has('oauth2Flow') and app.session.get('oauth2Flow') == 'starling' %}
                             {% set starling = true %}
                             <div class="carousel-item active">
-                                <div class="d-lg-flex align-items-lg-center px-5 pb-5">
+                                <div class="px-5 pb-5">
                                     <div class="modal-onboarding__image">
                                         <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_app.png" alt="so-sure - Download the app">
                                     </div>
                                     <div class="modal-onboarding__body ml-lg-3">
                                         <h2 class="h3 text-primary mb-3">Starling</h2>
-                                        {# <p class="mb-lg-5">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi sed ex ut lacus efficitur tincidunt sed et odio. Cras dictum tortor molestie orci ullamcorper.</p>
-                                        <a href="#" class="btn btn-primary btn-blue-gradient btn-block-xs mr-lg-2">Send</a> #}
                                     </div>
                                 </div>
                             </div>
                         {% endif %}
                         <div class="carousel-item {% if not starling %}active{% endif %}">
-                            <div class="d-lg-flex align-items-lg-center px-5 pb-5">
+                            <div class="px-5 pb-5">
                                 <div class="modal-onboarding__image">
                                     <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_app.png" alt="so-sure - Download the app">
                                 </div>
                                 <div class="modal-onboarding__body ml-lg-3">
                                     <h2 class="h3 text-primary mb-3">Download the so-sure app and lorem ipsum dolor</h2>
                                     <p class="mb-lg-5">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi sed ex ut lacus efficitur tincidunt sed et odio. Cras dictum tortor molestie orci ullamcorper.</p>
-                                    <a href="#" class="btn btn-primary btn-blue-gradient btn-block-xs mr-lg-2">Send</a>
+                                    <a href="#" class="btn btn-primary btn-block-xs mr-lg-2">Send</a>
                                 </div>
                             </div>
                         </div>
                         <div class="carousel-item">
-                            <div class="d-lg-flex align-items-lg-center px-5 pb-5">
+                            <div class="px-5 pb-5">
                                 <div class="modal-onboarding__image">
                                     <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_phone-qr.png" alt="so-sure - Verify your phone">
                                 </div>
                                 <div class="modal-onboarding__body ml-lg-3">
                                     <h2 class="h3 text-primary mb-3">Verify your phone &amp; reduce  your excess</h2>
                                     <p class="mb-lg-5">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi sed ex ut lacus efficitur tincidunt sed et odio. Cras dictum tortor molestie orci ullamcorper.</p>
-                                    <a href="#" class="btn btn-primary btn-blue-gradient btn-block-xs mr-lg-2">Verify Phone</a>
-                                    {# TODO: Update video url #}
+                                    <a href="#" class="btn btn-primary btn-block-xs mr-lg-2">Verify Phone</a>
                                     <a href="#"
                                        class="btn btn-outline-primary watch-video btn-block-xs"
                                        data-event="watch-video-index-hero"
@@ -70,15 +65,14 @@
                             </div>
                         </div>
                         <div class="carousel-item">
-                            <div class="d-lg-flex align-items-lg-center px-5 pb-5">
+                            <div class="px-5 pb-5">
                                 <div class="modal-onboarding__image">
                                     <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_friends-connect.png" alt="so-sure - Invite your friends and get  rewarded">
                                 </div>
                                 <div class="modal-onboarding__body ml-lg-3">
                                     <h2 class="h3 text-primary mb-3">Invite your friends and get  rewarded up to &pound;100!</h2>
                                     <p class="mb-lg-5">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi sed ex ut lacus efficitur tincidunt sed et odio. Cras dictum tortor molestie orci ullamcorper.</p>
-                                    <a href="#" class="btn btn-primary btn-blue-gradient btn-block-xs mr-lg-2">Verify Phone</a>
-                                    {# TODO: Update video url #}
+                                    <a href="#" class="btn btn-primary btn-block-xs mr-lg-2">Verify Phone</a>
                                     <a href="#"
                                        class="btn btn-outline-primary watch-video btn-block-xs"
                                        data-event="watch-video-index-hero"
@@ -103,6 +97,48 @@
                         {% endif %}
                     </ol>
                 </div>
+            </div>
+            <div class="modal-footer modal-fullscreen-footer justify-content-center">
+                <div class="onboarding-indicators-spacer"></div>
+                <div class="onboarding-controls d-flex align-items-center">
+                    <a href="#onboarding-carousel"
+                       id="onboarding-prev-btn"
+                       class="btn btn-outline-grey d-flex btn-circle justify-content-center align-items-center disabled"
+                       role="button"
+                       data-slide="prev">
+                        <span class="sr-only">back</span>
+                        <i class="far fa-arrow-left"></i></a>
+                    <a href="#onboarding-carousel"
+                       id="onboarding-next-btn"
+                       class="btn btn-primary ml-4"
+                       role="button"
+                       data-slide="next">Next</a>
+                    <a href="#"
+                       id="onboarding-get-started-btn"
+                       class="btn btn-success  ml-4 hide-controls"
+                       role="button"
+                       data-dismiss="modal"
+                       aria-label="Close">Get Started </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{# <div class="modal fade"
+     id="onboarding-modal"
+     tabindex="-1" role="dialog"
+     aria-labelledby="onboarding-modal"
+     aria-hidden="true">
+    <div class="modal-dialog modal-onboarding modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header modal-onboarding-header">
+                <h5 class="modal-title"></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <i class="fal fa-times text-zaffre"></i>
+                </button>
+            </div>
+            <div class="modal-body modal-onboarding-body">
+
             </div>
             <div class="modal-footer modal-onboarding-footer justify-content-between">
                 <div class="onboarding-indicators-spacer"></div>
@@ -130,3 +166,4 @@
         </div>
     </div>
 </div>
+ #}

@@ -17,6 +17,7 @@
     }
 }
 
+// Video modal
 .modal-video {
 
     .modal-body {
@@ -41,31 +42,16 @@
         position: static;
     }
 
-    &.modal-dialog {
-
-        @include media-breakpoint-down(xs) {
-            margin: 0;
-        }
-    }
-
-    .modal-content {
-        min-height: 100vh;
-
-        @include media-breakpoint-up(md) {
-            min-height: inherit;
-        }
-    }
-
-    &-header {
-        background: none;
-    }
-
-    &-body {
+    .carousel-item {
         text-align: center;
-        padding: 0;
+    }
 
-        @include media-breakpoint-up(lg) {
-            text-align: left;
+    .carousel-indicators {
+        margin: 0;
+        // left: 32px; right: auto; bottom: -46px;
+
+        li {
+            @include border-radius(12px);
         }
     }
 
@@ -83,8 +69,6 @@
     &-footer {
         position: relative;
         padding: 1rem 2rem;
-        background-color: $selago;
-        @include  border-bottom-radius(10px);
     }
 
     .hide-controls {
@@ -92,11 +76,21 @@
     }
 }
 
-.carousel-indicators {
-    margin: 0;
-    left: 32px; right: auto; bottom: -46px;
+// Fullscreen modal
+.modal-fullscreen {
 
-    li {
-        @include border-radius(12px);
+    &-dialog {
+        min-width: 100%;
+        margin: 0;
+    }
+
+    &-content {
+        min-height: 100vh;
+        @include border-radius(0);
+    }
+
+    &-header {
+        background: none;
+        @include border-radius(0);
     }
 }
