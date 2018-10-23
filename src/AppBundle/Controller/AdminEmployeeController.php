@@ -2497,8 +2497,6 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                         $address->setLine2($this->getDataString($companyForm->getData(), 'address2'));
                         $address->setLine3($this->getDataString($companyForm->getData(), 'address3'));
                         $address->setCity($this->getDataString($companyForm->getData(), 'city'));
-                        // The postcode constructor is what validates, and when it is incorrect it throws an
-                        // exception with no message, so here we catch and release it with a message
                         $postcode = $this->getDataString($companyForm->getData(), 'postcode');
                         try {
                             $address->setPostcode($postcode);
