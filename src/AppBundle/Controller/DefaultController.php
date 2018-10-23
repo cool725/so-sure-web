@@ -126,11 +126,11 @@ class DefaultController extends BaseController
     }
 
     /**
-     * @Route("/reward-pot", name="reward_pot", options={"sitemap"={"priority":"0.5","changefreq":"daily"}})
+     * @Route("/social-insurance", name="social_insurance", options={"sitemap"={"priority":"0.5","changefreq":"daily"}})
      */
-    public function rewardPot()
+    public function socialInsurance()
     {
-        return $this->render('AppBundle:Default:rewardPot.html.twig');
+        return $this->render('AppBundle:Default:socialInsurance.html.twig');
     }
 
     /**

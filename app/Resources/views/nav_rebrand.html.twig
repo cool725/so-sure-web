@@ -8,9 +8,9 @@
     {% else %}
         <ul class="nav navbar-nav flex-row align-items-center">
             <li class="nav-item d-none d-xl-block pr-xl-5">
-                <a href="{{ path('reward_pot') }}"
-                   class="nav-link {{ app.request.get('_route') == 'reward_pot' ? 'nav-active' }}">
-                   Reward Pot
+                <a href="{{ path('social_insurance') }}"
+                   class="nav-link {{ app.request.get('_route') == 'social_insurance' ? 'nav-active' }}">
+                   Social Insurance
                 </a>
             </li>
             <li class="nav-item d-none d-xl-block pr-xl-5">
@@ -85,7 +85,7 @@
                 </li>
             {% endif %}
             <li>
-                <a href="{{ path('reward_pot') }}" class="h5">Reward Pot</a>
+                <a href="{{ path('social_insurance') }}" class="h5">Social Insurance</a>
             </li>
             <li>
                 <a href="{{ path('claim') }}" class="h5">Make a Claim</a>
