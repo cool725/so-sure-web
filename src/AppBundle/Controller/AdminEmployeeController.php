@@ -2540,7 +2540,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
      * @Route("/affiliate/charge/{id}/{year}/{month}", name="admin_affiliate_charge")
      * @Template("AppBundle:AdminEmployee:affiliateCharge.html.twig")
      */
-    public function affiliateChargeAction(Request $request, $id, $year = null, $month = null)
+    public function affiliateChargeAction($id, $year = null, $month = null)
     {
         $now = new \DateTime();
         $year = $year ?: $now->format('Y');
@@ -2568,7 +2568,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
      * @Route("/affiliate/immature/{id}", name="admin_affiliate_immature")
      * @Template("AppBundle:AdminEmployee:affiliateCharge.html.twig")
      */
-    public function affiliateImmatureAction(Request $request, $id)
+    public function affiliateImmatureAction($id)
     {
         $dm = $this->getManager();
         $affiliateRepo = $dm->getRepository(AffiliateCompany::class);

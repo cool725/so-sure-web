@@ -12,9 +12,12 @@ class ChargeRepository extends DocumentRepository
 {
     use DateTrait;
 
-    public function findMonthly(\DateTime $date = null, $type = null, $excludeInvoiced = false,
-        $affiliate = null)
-    {
+    public function findMonthly(
+        \DateTime $date = null,
+        $type = null,
+        $excludeInvoiced = false,
+        $affiliate = null
+    ) {
         if (!$date) {
             $date = new \DateTime();
         }
