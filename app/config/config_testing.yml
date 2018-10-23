@@ -3,7 +3,7 @@ imports:
 
 framework:
     # 10.* required for the elb load balancing health check
-    trusted_hosts: ['testing.wearesosure.com', '10\.\d+\.\d+\.\d+']
+    trusted_hosts: ['testing.wearesosure.com', 'waterloo.testing.wearesosure.com', 'monument.testing.wearesosure.com','10\.\d+\.\d+\.\d+']
     router:
         resource: "%kernel.root_dir%/config/routing_errors.yml"
         strict_requirements: true
