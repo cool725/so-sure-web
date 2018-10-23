@@ -137,7 +137,7 @@ class AffiliateServiceTest extends WebTestCase
         $startCharges = count(self::$chargeRepo->findMonthly(null, 'affiliate'));
         $affiliate = $this->createTestAffiliate('Foo', 4.5, 30, '8 Foo Bar', 'FooBarTown', 'foobar');
         $user = $this->createTestUser('31 days ago', 'testGenerateAffiliateCampaign', 'foobar');
-        $this->assertEquals(1, self::$affiliateService->generate());
+        $this->assertEquals(1, count(self::$affiliateService->generate()));
         $this->assertEquals($startCharges + 1, count(self::$chargeRepo->findMonthly(null, 'affiliate')));
     }
 
@@ -147,10 +147,10 @@ class AffiliateServiceTest extends WebTestCase
         $affiliate = $this->createTestAffiliate('Foo', 4.5, 30, '8 Foo Bar', 'FooBarTown', '', 'foobar');
         $user = $this->createTestUser('31 days ago', 'testGenerateAffiliateLead', 'foobar');
         $charges = self::$affiliateService->generate();
-        $this->assertEquals(1, $charges);
-        $charges = self::$affiliateService->generate();
-        $this->assertEquals(0, $charges);
+        $this->assertEquals(1, count($charges));
+        $this->assertEquals(0, count(self::$affiliateService->generate()));
         $this->assertEquals($startCharges + 1, count(self::$chargeRepo->findMonthly(null, 'affiliate')));
+        $this->assertEquals(4.5, $charges[0]->getAmount());
     }
 
     public function testGetMatchingUsers()
@@ -168,11 +168,14 @@ class AffiliateServiceTest extends WebTestCase
         $this->assertEquals(4, count(self::$affiliateService->getMatchingUsers($affiliate)));
         $this->assertEquals(2, count(self::$affiliateService->getMatchingUsers($affiliate2)));
         $this->assertEquals(0, count(self::$affiliateService->getMatchingUsers($affiliate, true)));
-        self::$affiliateService->generate();
+        $charges = self::$affiliateService->generate();
         $this->assertEquals(3, count(self::$affiliateService->getMatchingUsers($affiliate, true)));
         $this->assertEquals(1, count(self::$affiliateService->getMatchingUsers($affiliate)));
         $this->assertEquals(1, count(self::$affiliateService->getMatchingUsers($affiliate2, true)));
         $this->assertEquals(1, count(self::$affiliateService->getMatchingUsers($affiliate2)));
         $this->assertEquals($startCharges + 4, count(self::$chargeRepo->findMonthly(null, 'affiliate')));
+        foreach ($charges as $charge) {
+            $this->assertContains($charge->getAmount(), [2.5, 4.5]);
+        }
     }
 }

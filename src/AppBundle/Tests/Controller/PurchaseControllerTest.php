@@ -60,13 +60,7 @@ class PurchaseControllerTest extends BaseControllerTest
 
     public function testPurchaseOkNew()
     {
-        $phone = self::getRandomPhone(self::$dm);
-        // set phone in session
-        $crawler = self::$client->request(
-            'GET',
-            self::$router->generate('quote_phone', ['id' => $phone->getId()])
-        );
-        $crawler = self::$client->followRedirect();
+        $phone = $this->getRandomPhoneAndSetSession();
 
         $email = self::generateEmail('testPurchaseNew', $this);
         $crawler = $this->createPurchase(
@@ -95,7 +89,7 @@ class PurchaseControllerTest extends BaseControllerTest
 
     public function testPurchaseUserPhoneSpaceNew()
     {
-        $phone = $this->setRandomPhone();
+        $phone = $this->getRandomPhoneAndSetSession();
 
         $crawler = $this->createPurchase(
             self::generateEmail('testPurchaseUserPhoneSpaceNew', $this),
@@ -110,7 +104,7 @@ class PurchaseControllerTest extends BaseControllerTest
 
     public function testPurchaseExistingUserDiffDetailsNew()
     {
-        $phone = $this->setRandomPhone();
+        $phone = $this->getRandomPhoneAndSetSession();
 
         $user = self::createUser(
             self::$userManager,
@@ -126,7 +120,7 @@ class PurchaseControllerTest extends BaseControllerTest
 
     public function testPurchaseExistingUserWithPolicyDiffDetailsNew()
     {
-        $phone = $this->setRandomPhone();
+        $phone = $this->getRandomPhoneAndSetSession();
 
         $user = self::createUser(
             self::$userManager,
@@ -156,13 +150,7 @@ class PurchaseControllerTest extends BaseControllerTest
 
     public function testPurchaseExistingUserSameDetailsNew()
     {
-        $phone = self::getRandomPhone(self::$dm);
-        // set phone in session
-        $crawler = self::$client->request(
-            'GET',
-            self::$router->generate('quote_phone', ['id' => $phone->getId()])
-        );
-        $crawler = self::$client->followRedirect();
+        $phone = $this->getRandomPhoneAndSetSession();
 
         $user = self::createUser(
             self::$userManager,
@@ -178,13 +166,7 @@ class PurchaseControllerTest extends BaseControllerTest
 
     public function testPurchaseExistingUserSameDetailsWithPartialPolicyNew()
     {
-        $phone = self::getRandomPhone(self::$dm);
-        // set phone in session
-        $crawler = self::$client->request(
-            'GET',
-            self::$router->generate('quote_phone', ['id' => $phone->getId()])
-        );
-        $crawler = self::$client->followRedirect();
+        $phone = $this->getRandomPhoneAndSetSession();
 
         $user = self::createUser(
             self::$userManager,
@@ -202,13 +184,7 @@ class PurchaseControllerTest extends BaseControllerTest
 
     public function testPurchaseExistingUserSameDetailsWithMultiplePartialPolicyNew()
     {
-        $phone = self::getRandomPhone(self::$dm);
-        // set phone in session
-        $crawler = self::$client->request(
-            'GET',
-            self::$router->generate('quote_phone', ['id' => $phone->getId()])
-        );
-        $crawler = self::$client->followRedirect();
+        $phone = $this->getRandomPhoneAndSetSession();
 
         $user = self::createUser(
             self::$userManager,
@@ -263,7 +239,7 @@ class PurchaseControllerTest extends BaseControllerTest
 
     public function testPurchaseAddressNew()
     {
-        $phone = $this->setRandomPhone();
+        $phone = $this->getRandomPhoneAndSetSession();
 
         $crawler = $this->createPurchase(
             self::generateEmail('testPurchaseAddressNew', $this),
@@ -277,7 +253,7 @@ class PurchaseControllerTest extends BaseControllerTest
 
     public function testPurchasePhone()
     {
-        $phone = $this->setRandomPhone();
+        $phone = $this->getRandomPhoneAndSetSession();
 
         $crawler = $this->createPurchase(
             self::generateEmail('testPurchasePhoneNew', $this),
@@ -313,7 +289,7 @@ class PurchaseControllerTest extends BaseControllerTest
         $feature = $this->getContainer(true)->get('app.feature');
         $this->assertTrue($feature->isEnabled(Feature::FEATURE_BACS), 'Bacs feature disabled');
 
-        $phone = $this->setRandomPhone();
+        $phone = $this->getRandomPhoneAndSetSession();
 
         $crawler = $this->createPurchase(
             self::generateEmail('testPurchasePhoneBacs', $this),
@@ -368,6 +344,69 @@ class PurchaseControllerTest extends BaseControllerTest
         self::verifyResponse(200);
     }
 
+    public function testPurchasePhoneBacsInvalidAccountNumber()
+    {
+        /** @var FeatureService $feature */
+        $feature = $this->getContainer(true)->get('app.feature');
+        $this->assertTrue($feature->isEnabled(Feature::FEATURE_BACS), 'Bacs feature disabled');
+
+        $phone = $this->getRandomPhoneAndSetSession();
+
+        $crawler = $this->createPurchase(
+            self::generateEmail('testPurchasePhoneBacsInvalidAccountNumber', $this),
+            'foo bar',
+            new \DateTime('1980-01-01')
+        );
+        self::verifyResponse(302, null, $crawler);
+        $this->assertTrue($this->isClientResponseRedirect());
+        self::$client->followRedirect();
+        $this->assertContains('/purchase/step-phone', self::$client->getHistory()->current()->getUri());
+
+        $crawler = $this->setPhone($phone);
+        //print $crawler->html();
+        self::verifyResponse(302, null, $crawler);
+        $crawler = self::$client->followRedirect();
+        $this->assertContains('/purchase/step-pledge', self::$client->getHistory()->current()->getUri());
+
+        //print $crawler->html();
+        $crawler = $this->agreePledge($crawler);
+        //print $crawler->html();
+        self::verifyResponse(302, null, $crawler);
+        $crawler = self::$client->followRedirect();
+
+        $policy = $this->getPolicyFromPaymentUrl();
+        $url = sprintf('%s?force=bacs', self::$client->getHistory()->current()->getUri());
+        $crawler = self::$client->request('GET', $url);
+        $this->assertNotContains(
+            'judo',
+            $crawler->html(),
+            sprintf('%s Payment page is referencing judopay', self::$client->getHistory()->current()->getUri())
+        );
+        //print $crawler->html();
+        //print $url;
+
+        $crawler = $this->setPayment($crawler, $phone);
+        //print $crawler->html();
+        self::verifyResponse(302, null, $crawler);
+        $crawler = self::$client->followRedirect();
+        $this->assertContains('/purchase/step-payment/', self::$client->getHistory()->current()->getUri());
+        $this->assertContains('/monthly', self::$client->getHistory()->current()->getUri());
+
+        $crawler = $this->setBacs($crawler, $policy, PCAService::TEST_ACCOUNT_NUMBER_INVALID_ACCOUNT_NUMBER);
+        self::verifyResponse(200);
+        //print $crawler->html();
+
+        $this->assertTrue($crawler->selectButton('bacs_form[save]')->count() > 0);
+        $this->assertTrue($crawler->selectButton('bacs_confirm_form[save]')->count() == 0);
+
+        $crawler = $this->setBacs($crawler, $policy, PCAService::TEST_ACCOUNT_NUMBER_OK);
+        self::verifyResponse(200);
+        //print $crawler->html();
+
+        $this->assertTrue($crawler->selectButton('bacs_form[save]')->count() == 0);
+        $this->assertTrue($crawler->selectButton('bacs_confirm_form[save]')->count() > 0);
+    }
+
     private function getPolicyFromPaymentUrl()
     {
         $urlData = explode('/', self::$client->getHistory()->current()->getUri());
@@ -385,7 +424,7 @@ class PurchaseControllerTest extends BaseControllerTest
 
     public function testPurchasePhoneNoPledge()
     {
-        $phone = $this->setRandomPhone();
+        $phone = $this->getRandomPhoneAndSetSession();
 
         $crawler = $this->createPurchase(
             self::generateEmail('testPurchasePhoneNoPledge', $this),
@@ -441,11 +480,7 @@ class PurchaseControllerTest extends BaseControllerTest
         //$phone = self::getRandomPhone(static::$dm);
 
         // set phone in session
-        $crawler = self::$client->request(
-            'GET',
-            self::$router->generate('quote_phone', ['id' => $phone->getId()])
-        );
-        $crawler = self::$client->followRedirect();
+        $this->setPhoneSession($phone);
 
         $crawler = $this->createPurchase(
             self::generateEmail('testPurchasePhoneImeiSpaceNineSixtyEightNew', $this),
@@ -477,7 +512,7 @@ class PurchaseControllerTest extends BaseControllerTest
 
     public function testPurchasePhoneImeiSpaceNew()
     {
-        $phone = $this->setRandomPhone();
+        $phone = $this->getRandomPhoneAndSetSession();
 
         $crawler = $this->createPurchase(
             self::generateEmail('testPurchasePhoneImeiSpaceNew', $this),
@@ -514,7 +549,7 @@ class PurchaseControllerTest extends BaseControllerTest
         self::$dm->persist($lostPhone);
         self::$dm->flush();
 
-        $phone = $this->setRandomPhone();
+        $phone = $this->getRandomPhoneAndSetSession();
 
         $crawler = $this->createPurchase(
             self::generateEmail('testPurchasePhoneLostImei', $this),
@@ -533,7 +568,7 @@ class PurchaseControllerTest extends BaseControllerTest
 
     public function testPurchaseChangePhone()
     {
-        $phone = $this->setRandomPhone();
+        $phone = $this->getRandomPhoneAndSetSession();
 
         $crawler = $this->createPurchase(
             self::generateEmail('testPurchaseChangePhone', $this),
@@ -598,14 +633,7 @@ class PurchaseControllerTest extends BaseControllerTest
 
     public function testPurchasePhoneImeiDashNew()
     {
-        $phone = self::getRandomPhone(static::$dm);
-
-        // set phone in session
-        $crawler = self::$client->request(
-            'GET',
-            self::$router->generate('quote_phone', ['id' => $phone->getId()])
-        );
-        $crawler = self::$client->followRedirect();
+        $phone = $this->getRandomPhoneAndSetSession();
 
         $crawler = $this->createPurchase(
             self::generateEmail('testPurchasePhoneImeiDashNew', $this),
@@ -637,14 +665,7 @@ class PurchaseControllerTest extends BaseControllerTest
 
     public function testPurchasePhoneImeiSlashNew()
     {
-        $phone = self::getRandomPhone(static::$dm);
-
-        // set phone in session
-        $crawler = self::$client->request(
-            'GET',
-            self::$router->generate('quote_phone', ['id' => $phone->getId()])
-        );
-        $crawler = self::$client->followRedirect();
+        $phone = $this->getRandomPhoneAndSetSession();
 
         $crawler = $this->createPurchase(
             self::generateEmail('testPurchasePhoneImeiSlashNew', $this),
@@ -676,14 +697,7 @@ class PurchaseControllerTest extends BaseControllerTest
 
     public function testPurchasePhoneImeiS7New()
     {
-        $phone = self::getRandomPhone(static::$dm);
-
-        // set phone in session
-        $crawler = self::$client->request(
-            'GET',
-            self::$router->generate('quote_phone', ['id' => $phone->getId()])
-        );
-        $crawler = self::$client->followRedirect();
+        $phone = $this->getRandomPhoneAndSetSession();
 
         $crawler = $this->createPurchase(
             self::generateEmail('testPurchasePhoneImeiS7New', $this),
@@ -722,14 +736,7 @@ class PurchaseControllerTest extends BaseControllerTest
 
     public function testPurchaseReviewWithAcceptNew()
     {
-        $phone = self::getRandomPhone(static::$dm);
-
-        // set phone in session
-        $crawler = self::$client->request(
-            'GET',
-            self::$router->generate('quote_phone', ['id' => $phone->getId()])
-        );
-        $crawler = self::$client->followRedirect();
+        $phone = $this->getRandomPhoneAndSetSession();
 
         $crawler = $this->createPurchase(
             self::generateEmail('testPurchaseReviewRequiresAcceptNew', $this),
@@ -760,14 +767,7 @@ class PurchaseControllerTest extends BaseControllerTest
 
     public function testPurchaseReviewWithInvalidSerial()
     {
-        $phone = self::getRandomPhone(static::$dm, 'Apple');
-
-        // set phone in session
-        $crawler = self::$client->request(
-            'GET',
-            self::$router->generate('quote_phone', ['id' => $phone->getId()])
-        );
-        $crawler = self::$client->followRedirect();
+        $phone = $this->getRandomPhoneAndSetSession('Apple');
 
         $crawler = $this->createPurchase(
             self::generateEmail('testPurchaseReviewWithInvalidSerial', $this),
@@ -994,7 +994,7 @@ class PurchaseControllerTest extends BaseControllerTest
 
         $this->login($email, $password, 'user');
 
-        $phone2 = $this->setRandomPhone();
+        $phone2 = $this->getRandomPhoneAndSetSession();
         $this->setPhone($phone2);
         self::verifyResponse(302);
         $crawler = self::$client->followRedirect();
@@ -1029,7 +1029,7 @@ class PurchaseControllerTest extends BaseControllerTest
     public function testLeadSource()
     {
         $email = self::generateEmail('testLeadSource', $this);
-        $this->setRandomPhone();
+        $this->getRandomPhoneAndSetSession();
         $crawler = self::$client->request('GET', '/purchase/?force_result=new');
         self::verifyResponse(200);
 
@@ -1063,7 +1063,7 @@ class PurchaseControllerTest extends BaseControllerTest
     {
         $email = self::generateEmail('testLeadSourceMissingParam', $this);
 
-        $this->setRandomPhone();
+        $this->getRandomPhoneAndSetSession();
         $crawler = self::$client->request('GET', '/purchase/?force_result=new');
         self::verifyResponse(200);
 
@@ -1087,7 +1087,7 @@ class PurchaseControllerTest extends BaseControllerTest
     public function testLeadSourceInvalidCsrf()
     {
         $email = self::generateEmail('testLeadSourceInvalidCsrf', $this);
-        $this->setRandomPhone();
+        $this->getRandomPhoneAndSetSession();
         $crawler = self::$client->request('GET', '/purchase/?force_result=new');
         self::verifyResponse(200);
 
@@ -1112,7 +1112,7 @@ class PurchaseControllerTest extends BaseControllerTest
     public function testLeadSourceBadName()
     {
         $email = self::generateEmail('testLeadSourceBadName', $this);
-        $this->setRandomPhone();
+        $this->getRandomPhoneAndSetSession();
         $crawler = self::$client->request('GET', '/purchase/?force_result=new');
         self::verifyResponse(200);
 
@@ -1174,7 +1174,7 @@ class PurchaseControllerTest extends BaseControllerTest
     }
 
     private function setPhone(
-        $phone,
+        Phone $phone,
         $imei = null,
         $crawler = null,
         $serialNumber = null
@@ -1254,13 +1254,13 @@ class PurchaseControllerTest extends BaseControllerTest
         return $crawler;
     }
 
-    private function setBacs(Crawler $crawler, Policy $policy)
+    private function setBacs(Crawler $crawler, Policy $policy, $accountNumber = PCAService::TEST_ACCOUNT_NUMBER_OK)
     {
         //print $crawler->html();
         $form = $crawler->selectButton('bacs_form[save]')->form();
         $form['bacs_form[accountName]'] = $policy->getUser()->getName();
         $form['bacs_form[sortCode]'] = PCAService::TEST_SORT_CODE;
-        $form['bacs_form[accountNumber]'] = PCAService::TEST_ACCOUNT_NUMBER_OK;
+        $form['bacs_form[accountNumber]'] = $accountNumber;
         $form['bacs_form[soleSignature]'] = true;
         $crawler = self::$client->submit($form);
 
@@ -1304,22 +1304,9 @@ class PurchaseControllerTest extends BaseControllerTest
         return $crawler;
     }
     
-    private function setRandomPhone($make = null)
-    {
-        $phone = self::getRandomPhone(self::$dm, $make);
-        // set phone in session
-        $crawler = self::$client->request(
-            'GET',
-            self::$router->generate('quote_phone', ['id' => $phone->getId()])
-        );
-        self::$client->followRedirect();
-
-        return $phone;
-    }
-
     public function testLeadInvalidEmail()
     {
-        $this->setRandomPhone();
+        $this->getRandomPhoneAndSetSession();
         $crawler = self::$client->request('GET', '/purchase/?force_result=new');
         self::verifyResponse(200);
 
@@ -1345,7 +1332,7 @@ class PurchaseControllerTest extends BaseControllerTest
     public function testLeadInvalidName()
     {
         $email = self::generateEmail('testLeadInvalidName', $this);
-        $this->setRandomPhone();
+        $this->getRandomPhoneAndSetSession();
         $crawler = self::$client->request('GET', '/purchase/?force_result=new');
         self::verifyResponse(200);
 

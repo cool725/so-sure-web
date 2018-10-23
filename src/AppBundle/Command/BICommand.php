@@ -2,12 +2,15 @@
 
 namespace AppBundle\Command;
 
+use AppBundle\Document\Connection\Connection;
 use AppBundle\Document\Phone;
 use AppBundle\Repository\ClaimRepository;
 use AppBundle\Repository\PhonePolicyRepository;
 use AppBundle\Repository\PhoneRepository;
 use AppBundle\Repository\UserRepository;
+use Aws\S3\S3Client;
 use CensusBundle\Service\SearchService;
+use Doctrine\ODM\MongoDB\DocumentManager;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
@@ -23,8 +26,38 @@ use AppBundle\Document\Invitation\Invitation;
 use AppBundle\Document\Connection\StandardConnection;
 use AppBundle\Classes\SoSure;
 
-class BICommand extends BaseCommand
+class BICommand extends ContainerAwareCommand
 {
+    /** @var S3Client */
+    protected $s3;
+
+    /** @var string */
+    protected $environment;
+
+    /** @var DocumentManager  */
+    protected $dm;
+
+    /** @var LoggerInterface */
+    protected $logger;
+
+    /** @var SearchService */
+    protected $searchService;
+
+    public function __construct(
+        S3Client $s3,
+        DocumentManager $dm,
+        $environment,
+        LoggerInterface $logger,
+        SearchService $searchService
+    ) {
+        parent::__construct();
+        $this->s3 = $s3;
+        $this->dm = $dm;
+        $this->environment = $environment;
+        $this->logger = $logger;
+        $this->searchService = $searchService;
+    }
+
     protected function configure()
     {
         $this
@@ -110,7 +143,7 @@ class BICommand extends BaseCommand
     private function exportPhones($skipS3)
     {
         /** @var PhoneRepository $repo */
-        $repo = $this->getManager()->getRepository(Phone::class);
+        $repo = $this->dm->getRepository(Phone::class);
         $phones = $repo->findActive()->getQuery()->execute();
         $lines = [];
         $lines[] = implode(',', [
@@ -139,10 +172,8 @@ class BICommand extends BaseCommand
 
     private function exportClaims($skipS3)
     {
-        /** @var SearchService $search */
-        $search = $this->getContainer()->get('census.search');
         /** @var ClaimRepository $repo */
-        $repo = $this->getManager()->getRepository(Claim::class);
+        $repo = $this->dm->getRepository(Claim::class);
         $claims = $repo->findAll();
         $lines = [];
         $lines[] = implode(',', [
@@ -172,20 +203,19 @@ class BICommand extends BaseCommand
             '"Claim Final Suspicion"',
             '"Claim Replacement Received Date"',
             '"Claim handling team"',
+            '"Total cost of claim"',
         ]);
         foreach ($claims as $claim) {
             /** @var Claim $claim */
             $policy = $claim->getPolicy();
             // mainly for dev use
             if (!$policy) {
-                /** @var LoggerInterface $logger */
-                $logger = $this->getContainer()->get('logger');
-                $logger->error(sprintf('Missing policy for claim %s', $claim->getId()));
+                $this->logger->error(sprintf('Missing policy for claim %s', $claim->getId()));
                 continue;
             }
             $user = $policy->getUser();
-            $census = $search->findNearest($user->getBillingAddress()->getPostcode());
-            $income = $search->findIncome($user->getBillingAddress()->getPostcode());
+            $census = $this->searchService->findNearest($user->getBillingAddress()->getPostcode());
+            $income = $this->searchService->findIncome($user->getBillingAddress()->getPostcode());
             $lines[] = implode(',', [
                 sprintf('"%s"', $policy->getPolicyNumber()),
                 sprintf('"%s"', $policy->getStart()->format('Y-m-d H:i:s')),
@@ -229,6 +259,7 @@ class BICommand extends BaseCommand
                         ''
                 ),
                 sprintf('"%s"', $claim->getHandlingTeam()),
+                sprintf('"%0.2f"', $claim->getTotalIncurred()),
             ]);
         }
         if (!$skipS3) {
@@ -240,10 +271,8 @@ class BICommand extends BaseCommand
 
     private function exportPolicies($prefix, $skipS3)
     {
-        /** @var SearchService $search */
-        $search = $this->getContainer()->get('census.search');
         /** @var PhonePolicyRepository $repo */
-        $repo = $this->getManager()->getRepository(PhonePolicy::class);
+        $repo = $this->dm->getRepository(PhonePolicy::class);
         $policies = $repo->findAllStartedPolicies($prefix);
         $lines = [];
         $lines[] = implode(',', [
@@ -290,8 +319,8 @@ class BICommand extends BaseCommand
         foreach ($policies as $policy) {
             /** @var Policy $policy */
             $user = $policy->getUser();
-            $census = $search->findNearest($user->getBillingAddress()->getPostcode());
-            $income = $search->findIncome($user->getBillingAddress()->getPostcode());
+            $census = $this->searchService->findNearest($user->getBillingAddress()->getPostcode());
+            $income = $this->searchService->findIncome($user->getBillingAddress()->getPostcode());
             $lines[] = implode(',', [
                 sprintf('"%s"', $policy->getPolicyNumber()),
                 sprintf('"%d"', $user->getAge()),
@@ -354,10 +383,8 @@ class BICommand extends BaseCommand
 
     private function exportUsers($skipS3)
     {
-        /** @var SearchService $search */
-        $search = $this->getContainer()->get('census.search');
         /** @var UserRepository $repo */
-        $repo = $this->getManager()->getRepository(User::class);
+        $repo = $this->dm->getRepository(User::class);
         $users = $repo->findAll();
         $lines = [];
         $lines[] = implode(',', [
@@ -373,11 +400,12 @@ class BICommand extends BaseCommand
             '"Latest Campaign Source"',
         ]);
         foreach ($users as $user) {
+            /** @var User $user */
             if (!$user->getBillingAddress()) {
                 continue;
             }
-            $census = $search->findNearest($user->getBillingAddress()->getPostcode());
-            $income = $search->findIncome($user->getBillingAddress()->getPostcode());
+            $census = $this->searchService->findNearest($user->getBillingAddress()->getPostcode());
+            $income = $this->searchService->findIncome($user->getBillingAddress()->getPostcode());
             $lines[] = implode(',', [
                 sprintf('"%d"', $user->getAge()),
                 sprintf('"%s"', $user->getBillingAddress()->getPostcode()),
@@ -400,7 +428,7 @@ class BICommand extends BaseCommand
 
     private function exportInvitations($skipS3)
     {
-        $repo = $this->getManager()->getRepository(Invitation::class);
+        $repo = $this->dm->getRepository(Invitation::class);
         $invitations = $repo->findAll();
         $lines = [];
         $lines[] = implode(',', [
@@ -410,6 +438,7 @@ class BICommand extends BaseCommand
             '"Accepted Date"',
         ]);
         foreach ($invitations as $invitation) {
+            /** @var Invitation $invitation */
             $lines[] = implode(',', [
                 sprintf('"%s"', $invitation->getPolicy() ? $invitation->getPolicy()->getPolicyNumber() : ''),
                 sprintf('"%s"', $invitation->getCreated() ? $invitation->getCreated()->format('Y-m-d H:i:s') : ''),
@@ -426,7 +455,7 @@ class BICommand extends BaseCommand
 
     private function exportConnections($skipS3)
     {
-        $repo = $this->getManager()->getRepository(StandardConnection::class);
+        $repo = $this->dm->getRepository(StandardConnection::class);
         $connections = $repo->findAll();
         $lines = [];
         $lines[] = implode(',', [
@@ -437,6 +466,7 @@ class BICommand extends BaseCommand
             '"Connection Date"',
         ]);
         foreach ($connections as $connection) {
+            /** @var Connection $connection */
             // @codingStandardsIgnoreStart
             $lines[] = implode(',', [
                 sprintf('"%s"', $connection->getSourcePolicy() ? $connection->getSourcePolicy()->getPolicyNumber() : ''),
@@ -464,9 +494,9 @@ class BICommand extends BaseCommand
             throw new \Exception($filename . ' could not be processed into a tmp file.');
         }
 
-        $s3Key = sprintf('%s/bi/%s', $this->getEnvironment(), $filename);
+        $s3Key = sprintf('%s/bi/%s', $this->environment, $filename);
 
-        $result = $this->getS3()->putObject(array(
+        $result = $this->s3->putObject(array(
             'Bucket' => 'admin.so-sure.com',
             'Key'    => $s3Key,
             'SourceFile' => $tmpFile,

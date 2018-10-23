@@ -357,20 +357,8 @@ class MixpanelService
         return $data['total'];
     }
 
-    public function deleteOldUsers($days = null)
+    private function runDelete($query)
     {
-        if (!$days) {
-            $days = 90;
-        }
-        $data = null;
-        $time = new \DateTime();
-        $time = $time->sub(new \DateInterval(sprintf('P%dD', $days)));
-        $query = [
-            'where' => sprintf(
-                'datetime(%s) > user["$last_seen"] or not defined (user["$last_seen"])',
-                $time->format('U')
-            ),
-        ];
         $data = $this->mixpanelData->data('engage', $query);
         $count = 0;
         if ($data) {
@@ -379,6 +367,34 @@ class MixpanelService
                 $count++;
             }
         }
+
+        return $count;
+    }
+
+    private function runCount($query)
+    {
+        $data = $this->mixpanelData->data('engage', $query);
+
+        return $data['total'];
+    }
+
+    public function deleteOldUsers($days = null)
+    {
+        if (!$days) {
+            $days = 90;
+        }
+        $data = null;
+        $count = 0;
+
+        $time = new \DateTime();
+        $time = $time->sub(new \DateInterval(sprintf('P%dD', $days)));
+        $query = [
+            'where' => sprintf(
+                'datetime(%s) > user["$last_seen"] or not defined (user["$last_seen"])',
+                $time->format('U')
+            ),
+        ];
+        $count += $this->runDelete($query);
 
         // Although facebook should be allowed, there seems to be a 'preview' mode which causes havoc
         // with our sixpack tests and causes a huge increase (30k+ users over a few week period)
@@ -412,14 +428,7 @@ class MixpanelService
             ]
         ]];
         // @codingStandardsIgnoreEnd
-        $data = $this->mixpanelData->data('engage', $query);
-        if ($data) {
-            $count = 0;
-            foreach ($data['results'] as $user) {
-                $this->queueDelete($user['$distinct_id'], 0);
-                $count++;
-            }
-        }
+        $count += $this->runDelete($query);
 
         // Although facebook should be allowed, there seems to be a 'preview' mode which causes havoc
         // with our sixpack tests and causes a huge increase (30k+ users over a few week period)
@@ -459,14 +468,28 @@ class MixpanelService
             ]];
         // @codingStandardsIgnoreEnd
         //print_r($query);
-        $data = $this->mixpanelData->data('engage', $query);
-        if ($data) {
-            $count = 0;
-            foreach ($data['results'] as $user) {
-                $this->queueDelete($user['$distinct_id'], 0);
-                $count++;
-            }
-        }
+        $count += $this->runDelete($query);
+
+        // Change in behaviour - temporarily delete happy app user agent
+        $now = new \DateTime();
+        // @codingStandardsIgnoreStart
+        $query = [
+            'selector' => sprintf(
+                '(datetime(%s - 86400) > user["$last_seen"] and behaviors["behavior_11118"] == 1)',
+                $now->format('U')
+            ),
+            'behaviors' => [[
+                "window" => "90d",
+                "name" => "behavior_11118",
+                "event_selectors" => [[
+                    "event" => "Home Page",
+                    "selector" => "(\"HappyApps\" in event[\"User Agent\"])"
+                ]]
+            ]
+            ]];
+        // @codingStandardsIgnoreEnd
+        $count += $this->runDelete($query);
+        //$count += $this->runCount($query);
 
         return ['count' => $count, 'total' => $data['total']];
     }

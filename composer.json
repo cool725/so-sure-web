@@ -12,6 +12,7 @@
     },
     "require": {
         "php": ">=7.0",
+        "ext-json": "*",
         "symfony/symfony": "~3.4",
         "doctrine/orm": "^2.4.8",
         "doctrine/doctrine-bundle": "^1.4",
@@ -44,8 +45,8 @@
         "oneup/flysystem-bundle": "^3.0",
         "league/flysystem-aws-s3-v3": "^1.0.13",
         "alcaeus/mongo-php-adapter": "^1.0",
-        "doctrine/mongodb-odm": "^1.1",
-        "doctrine/mongodb-odm-bundle": "^3.2",
+        "doctrine/mongodb-odm": "^1.2",
+        "doctrine/mongodb-odm-bundle": "^3.5",
         "knplabs/knp-snappy-bundle": "^1.4",
         "dpn/xml-sitemap-bundle": "2.1.0.1",
         "domnikl/statsd": "~2.0",

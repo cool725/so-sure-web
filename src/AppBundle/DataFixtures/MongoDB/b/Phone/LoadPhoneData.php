@@ -18,13 +18,24 @@ abstract class LoadPhoneData implements ContainerAwareInterface
      */
     protected $container;
 
+    protected $expectedImportException;
+
+    public function setExpectedImportException()
+    {
+        $this->expectedImportException = true;
+    }
+
     public function setContainer(ContainerInterface $container = null)
     {
         $this->container = $container;
     }
 
-    protected function loadCsv(ObjectManager $manager, $filename, $date = null)
-    {
+    protected function loadCsv(
+        ObjectManager $manager,
+        $filename,
+        $date = null,
+        $relativePath = 'src/AppBundle/DataFixtures/PhoneData'
+    ) {
         if (!$this->container) {
             throw new \Exception('missing container');
         }
@@ -33,8 +44,9 @@ abstract class LoadPhoneData implements ContainerAwareInterface
             $date = new \DateTime('2016-01-01');
         }
         $file = sprintf(
-            "%s/../src/AppBundle/DataFixtures/PhoneData/%s",
+            "%s/../%s/%s",
             $this->container->getParameter('kernel.root_dir'),
+            $relativePath,
             $filename
         );
         $row = 0;
@@ -210,7 +222,12 @@ abstract class LoadPhoneData implements ContainerAwareInterface
             foreach ($devices as $device) {
                 if (mb_stripos($device, "‘") !== false || mb_stripos($device, "’") !== false) {
                     throw new \Exception(sprintf('Invalid apple quote for device %s', $device));
+                } elseif (mb_strlen(trim($device)) == 0) {
+                    throw new \Exception(sprintf('Invalid device for %s %s', $data[0], $data[1]));
                 }
+            }
+            if (count($devices) == 0) {
+                throw new \Exception(sprintf('Invalid device for %s %s', $data[0], $data[1]));
             }
 
             // check if the phone is already in the database
@@ -291,7 +308,9 @@ abstract class LoadPhoneData implements ContainerAwareInterface
 
             return $phone;
         } catch (\Exception $e) {
-            print sprintf('Ex: %s. Failed to import %s', $e->getMessage(), json_encode($data));
+            if (!$this->expectedImportException) {
+                print sprintf('Ex: %s. Failed to import %s', $e->getMessage(), json_encode($data));
+            }
             throw $e;
         }
 

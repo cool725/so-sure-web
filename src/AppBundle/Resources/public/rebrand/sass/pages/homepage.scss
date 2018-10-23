@@ -182,27 +182,39 @@
 }
 
 .comparison {
+    position: relative;
     background-color: $pattens-blue;
 
-    .table-list {
+    // .table-list {
+    //     position: relative;
+
+    //     @include media-breakpoint-up(md) {
+    //         width: 520px;
+    //     }
+
+    //     @include media-breakpoint-up(lg) {
+
+    //         &__insurers {
+    //             transform: translateX(25px);
+    //             z-index: 10;
+    //         }
+
+    //         &__so-sure {
+    //             transform: translateX(-25px);
+    //             z-index: 11;
+    //         }
+    //     }
+    // }
+
+    .table-comparison  {
         position: relative;
+        z-index: 4;
+    }
 
-        @include media-breakpoint-up(md) {
-            width: 520px;
-        }
-
-        @include media-breakpoint-up(lg) {
-
-            &__insurers {
-                transform: translateX(25px);
-                z-index: 10;
-            }
-
-            &__so-sure {
-                transform: translateX(-25px);
-                z-index: 11;
-            }
-        }
+    svg {
+        position: absolute;
+        top: -20%; left: 0;
+        z-index: 1;
     }
 }
 
@@ -240,5 +252,21 @@
 
     @include media-breakpoint-up(fk) {
         background-position: right 50px;
+    }
+}
+
+.banner {
+    position: relative;
+    text-align: center;
+
+    @include blue-gradient;
+
+    &__close {
+        position: absolute;
+        top: 2rem; right: 2rem;
+    }
+
+    @include media-breakpoint-up(lg) {
+        text-align: left;
     }
 }

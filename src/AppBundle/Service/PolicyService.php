@@ -881,21 +881,14 @@ class PolicyService
         // vs renewal which will have the number of payments requested
         $isInitialPurchase = $numPayments === null;
         if (!$date) {
-            if (!$policy->getStart()) {
+            if (!$policy->getStartForBilling()) {
                 throw new \Exception('Unable to generate payments if policy does not have a start date');
             }
-            $date = clone $policy->getStart();
-        } else {
-            $date = clone $date;
+            $date = clone $policy->getStartForBilling();
         }
 
         // To determine any payments made
         $initialDate = clone $date;
-
-        // To allow billing on same date every month, 28th is max allowable day on month
-        if ($date->format('d') > 28) {
-            $date->sub(new \DateInterval(sprintf('P%dD', $date->format('d') - 28)));
-        }
 
         $paymentItem = null;
         if (!$numPayments) {
@@ -940,6 +933,7 @@ class PolicyService
         $numScheduledPayments = $numPayments - $numPaidPayments;
         for ($i = 1; $i <= $numScheduledPayments; $i++) {
             $scheduledDate = clone $date;
+            $scheduledDate = $this->adjustDayForBilling($scheduledDate, true);
             // initial purchase should start at 1 month from initial purchase
             $scheduledDate->add(new \DateInterval(sprintf('P%dM', $numPaidPayments > 0 ? $i : $i - 1)));
 
@@ -2184,7 +2178,8 @@ class PolicyService
             $policyPremium = $phonePolicy->getPremium();
             if (!$amount) {
                 $currentPhonePrice = $phonePolicy->getPhone()->getCurrentPhonePrice($date);
-                if ($currentPhonePrice->getMonthlyPremiumPrice() != $policyPremium->getMonthlyPremiumPrice()) {
+                if ($currentPhonePrice &&
+                    $currentPhonePrice->getMonthlyPremiumPrice() != $policyPremium->getMonthlyPremiumPrice()) {
                     $newPremium = $currentPhonePrice->createPremium();
                     $phonePolicy->setPremium($newPremium);
                     $this->dm->flush();

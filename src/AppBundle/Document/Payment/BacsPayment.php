@@ -165,8 +165,8 @@ class BacsPayment extends Payment
 
     public function setPolicyStatusActiveIfUnpaid()
     {
-        if ($this->getPolicy() && $this->getPolicy()->getStatus() == Policy::STATUS_UNPAID) {
-            $this->getPolicy()->setStatus(Policy::STATUS_ACTIVE);
+        if ($this->getPolicy()) {
+            $this->getPolicy()->setPolicyStatusActiveIfUnpaid();
         }
     }
 
@@ -199,13 +199,13 @@ class BacsPayment extends Payment
         }
     }
 
-    public function approve(\DateTime $date = null)
+    public function approve(\DateTime $date = null, $ignoreReversedDate = false)
     {
         if (!$date) {
             $date = new \DateTime();
         }
 
-        if (!$this->canAction($date)) {
+        if (!$this->canAction($date) && !$ignoreReversedDate) {
             throw new \Exception(sprintf(
                 'Attempting to action before reveral date (%s) is past',
                 $this->getBacsReversedDate()->format('d m Y')
