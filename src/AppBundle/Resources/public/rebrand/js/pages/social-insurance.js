@@ -1,6 +1,6 @@
 // rewardpot.js
 
-require('../../sass/pages/rewardpot.scss');
+require('../../sass/pages/social-insurance.scss');
 
 // Require BS component(s)
 require('bootstrap/js/dist/carousel');

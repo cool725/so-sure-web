@@ -30,7 +30,7 @@ Encore
     .addEntry('welcome', './src/AppBundle/Resources/public/rebrand/js/pages/welcome.js')
     .addEntry('landing', './src/AppBundle/Resources/public/rebrand/js/pages/landing.js')
     .addEntry('faq', './src/AppBundle/Resources/public/rebrand/js/pages/faq.js')
-    .addEntry('rewardpot', './src/AppBundle/Resources/public/rebrand/js/pages/rewardpot.js')
+    .addEntry('social-insurance', './src/AppBundle/Resources/public/rebrand/js/pages/social-insurance.js')
     .addEntry('contact', './src/AppBundle/Resources/public/rebrand/js/pages/contact.js')
 
     // allow legacy applications to use $/jQuery as a global variable

@@ -36,8 +36,8 @@
         position: absolute;
         bottom: 0; right: -150px;
 
-        @include media-breakpoint-up(xl) {
-
+        @include media-breakpoint-up(fk) {
+            right: 500px;
         }
     }
 
@@ -103,6 +103,10 @@
     &__background {
         position: absolute;
         right: 0; bottom: -80px;
+
+        @include media-breakpoint-up(fk) {
+            right: 500px;
+        }
     }
 }
 
@@ -134,6 +138,10 @@
     &__background {
         position: absolute;
         left: -20px; bottom: 100px;
+
+        @include media-breakpoint-up(fk) {
+            left: 500px;
+        }
     }
 }
 
@@ -287,6 +295,6 @@
     }
 
     @include media-breakpoint-up(fk) {
-        background-position: right 50px;
+        background-position: 1400px 50px;
     }
 }

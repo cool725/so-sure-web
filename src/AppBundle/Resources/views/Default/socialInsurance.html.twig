@@ -9,7 +9,7 @@
 {% endblock %}
 
 {% block cssPage %}
-    <link rel="stylesheet" href="{{ asset('css-js/rewardpot.css') }}">
+    <link rel="stylesheet" href="{{ asset('css-js/social-insurance.css') }}">
 {% endblock %}
 
 {% block body %}
@@ -92,7 +92,8 @@
             <a href="#" class="btn btn-primary btn-block-xs mt-3 get-a-quote">Get Insured in minutes</a>
         </div>
         <div class="intro__background d-none d-lg-block">
-            <img src="{{ cdn_url }}/images/rebrand/misc/so-sure_money-right-cut.png" alt="so-sure - Money Back" width="180px">
+            <img src="{{ cdn_url }}/images/rebrand/misc/so-sure_money-right-cut.png" alt="so-sure - Money Back" width="180px" class="d-fk-none">
+            <img src="{{ cdn_url }}/images/rebrand/misc/so-sure_money-right.png" alt="so-sure - Money Back" width="250px" class="d-none d-fk-inline">
         </div>
     </section>
 
@@ -312,5 +313,5 @@
 {% endblock %}
 
 {% block javascriptsPage %}
-    <script src="{{ asset('css-js/rewardpot.js') }}"></script>
+    <script src="{{ asset('css-js/social-insurance.js') }}"></script>
 {% endblock %}
