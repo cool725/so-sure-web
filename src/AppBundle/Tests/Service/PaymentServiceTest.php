@@ -45,6 +45,9 @@ class PaymentServiceTest extends WebTestCase
     use \AppBundle\Tests\UserClassTrait;
     use \AppBundle\Document\DateTrait;
 
+    /** @var \Symfony\Bundle\FrameworkBundle\Client */
+    protected static $client;
+
     protected static $container;
     /** @var DocumentManager */
     protected static $dm;
@@ -52,9 +55,16 @@ class PaymentServiceTest extends WebTestCase
     /** @var PaymentService */
     protected static $paymentService;
     protected static $redis;
+    protected static $fraudService;
+    /** @var $routerService */
+    protected static $routerService;
 
     public static function setUpBeforeClass()
     {
+        /** @var \Symfony\Bundle\FrameworkBundle\Client $client */
+        $client = self::createClient();
+        self::$client = $client;
+
         //start the symfony kernel
         $kernel = static::createKernel();
         $kernel->boot();
@@ -75,6 +85,9 @@ class PaymentServiceTest extends WebTestCase
         $paymentService = self::$container->get('app.payment');
         self::$paymentService = $paymentService;
         self::$redis = self::$container->get('snc_redis.default');
+
+        self::$fraudService = self::$container->get('app.fraud');
+        self::$routerService = self::$container->get('app.router');
     }
 
     public function tearDown()
@@ -115,6 +128,37 @@ class PaymentServiceTest extends WebTestCase
         $this->assertLessThan(10, $bankAcccount->getInitialNotificationDate()->diff(new \DateTime)->days);
         $this->assertEquals($policy->getBilling(), $bankAcccount->getStandardNotificationDate());
         $this->assertTrue($bankAcccount->isFirstPayment());
+    }
+
+    public function testConfirmBacsDuplicate()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testConfirmBacsDuplicate', $this),
+            'bar',
+            null,
+            static::$dm
+        );
+
+        $policy = static::initPolicy(
+            $user,
+            static::$dm,
+            $this->getRandomPhone(static::$dm),
+            null,
+            false
+        );
+
+        static::$policyService->create($policy, null, true, 12);
+
+        $bacs = new BacsPaymentMethod();
+        $bacs->setBankAccount(new BankAccount());
+
+        $mailer = $this->createMailer($this->exactly(2));
+        static::$paymentService->setMailerMailer($mailer);
+
+        static::$paymentService->confirmBacs($policy, $bacs, $policy->getStart());
+
+        $this->assertGreaterThan(0, self::$fraudService->getDuplicateBankAccounts($policy));
     }
 
     public function testConfirmBacsDifferentPayer()
@@ -208,5 +252,16 @@ class PaymentServiceTest extends WebTestCase
             ->method('dispatch');
 
         return $dispatcher;
+    }
+
+    private function createMailer($count)
+    {
+        $mailer = $this->getMockBuilder('Swift_Mailer')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $mailer->expects($count)
+            ->method('send');
+
+        return $mailer;
     }
 }
