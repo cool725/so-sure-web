@@ -124,6 +124,8 @@ class AffiliateServiceTest extends WebTestCase
         $user->setAttribution($attribution);
         $user->setLeadSource('scode');
         $user->setLeadSourceDetails($lead);
+        $user->setFirstName($email);
+        $user->setLastName($email);
         self::$dm->persist($policy);
         self::$dm->persist($user);
         self::$dm->flush();
