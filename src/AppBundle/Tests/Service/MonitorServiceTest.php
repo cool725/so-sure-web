@@ -154,6 +154,9 @@ class MonitorServiceTest extends WebTestCase
         self::$dm->flush();
     }
 
+    /**
+     * @expectedException \Exception
+     */
     public function testSalvaPolicy()
     {
         $policy = new SalvaPhonePolicy();
@@ -161,29 +164,26 @@ class MonitorServiceTest extends WebTestCase
         self::$dm->persist($policy);
         self::$dm->flush();
 
-        $this->expectException(MonitorException::class);
-
-        self::$monitor->findSalvaPolicy();
-
-        self::$dm->remove($policy);
-        self::$dm->flush();
+        self::$monitor->salvaPolicy();
     }
 
+    /**
+     * @expectedException \Exception
+     */
     public function testTestSalvaPolicy()
     {
         $policy = new SalvaPhonePolicy();
         $policy->setPolicyNumber('INVALID/2018/55' . str_pad(random_int(0, 99999), 5, '0'));
+        $policy->setPolicyNumber((new PhonePolicy())->getPolicyNumber());
         self::$dm->persist($policy);
         self::$dm->flush();
 
-        $this->expectException(MonitorException::class);
-
         self::$monitor->testSalvaPolicy();
-
-        self::$dm->remove($policy);
-        self::$dm->flush();
     }
 
+    /**
+     * @expectedException \Exception
+     */
     public function testSalvaStatus()
     {
         $policy = new SalvaPhonePolicy();
@@ -192,45 +192,30 @@ class MonitorServiceTest extends WebTestCase
         self::$dm->persist($policy);
         self::$dm->flush();
 
-        $this->expectException(MonitorException::class);
-
         self::$monitor->salvaStatus();
-
-        self::$dm->remove($policy);
-        self::$dm->flush();
     }
 
-    public function testPolicyFiles()
-    {
-        $policy = new SalvaPhonePolicy();
-        $policy->setPolicyNumber('Mob/2018/55' . str_pad(random_int(0, 99999), 5, '0'));
-        self::$dm->persist($policy);
-        self::$dm->flush();
-
-        $this->expectException(MonitorException::class);
-
-        self::$monitor->policyFiles();
-
-        self::$dm->remove($policy);
-        self::$dm->flush();
-    }
-
+    /**
+     * @expectedException \Exception
+     */
     public function testPolicyPending()
     {
+        $user = new User();
+        $user->setEmail(self::generateEmail('foo', $this));
         $policy = new SalvaPhonePolicy();
         $policy->setPolicyNumber('Mob/2018/55' . str_pad(random_int(0, 99999), 5, '0'));
         $policy->setStatus('pending');
+        $policy->setUser($user);
+
         self::$dm->persist($policy);
         self::$dm->flush();
 
-        $this->expectException(MonitorException::class);
-
         self::$monitor->policyPending();
-
-        self::$dm->remove($policy);
-        self::$dm->flush();
     }
 
+    /**
+     * @expectedException \Exception
+     */
     public function testDuplicateInvites()
     {
         $inviteOne = new EmailInvitation();
@@ -248,8 +233,6 @@ class MonitorServiceTest extends WebTestCase
         self::$dm->persist($inviteOne);
         self::$dm->persist($inviteTwo);
         self::$dm->flush();
-
-        $this->expectException(MonitorException::class);
 
         self::$monitor->duplicateInvites();
     }

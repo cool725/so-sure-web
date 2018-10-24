@@ -631,7 +631,7 @@ class MonitorService
 
         if (count($policies) > 0) {
             throw new MonitorException(
-                "Policy {$policies[0]->getSalvaPolicyNumber()} has more than 0 salva policy results"
+                "Policy {$policies[0]->getPolicyNumber()} has more than 0 salva policy results"
             );
         }
     }
@@ -644,9 +644,9 @@ class MonitorService
             'salvaPolicyResults' => ['$lte' => ['$size' => 0]]
         ]);
 
-        if (count($policies) > 0) {
+        if (count($policies) == 0) {
             throw new MonitorException(
-                "Policy {$policies[0]->getSalvaPolicyNumber()} is invalid"
+                "Failed to find any policies..."
             );
         }
     }
@@ -656,12 +656,16 @@ class MonitorService
         $repo = $this->dm->getRepository(Policy::class);
         $policies = $repo->findBy([
             'policyNumber' => new \MongoRegex('/Mob\/*/'),
-            'salvaStatus' => ['$nin' => [null, 'active', 'cancelled']]
+            'salvaStatus' => ['$nin' => [
+                null,
+                SalvaPhonePolicy::SALVA_STATUS_ACTIVE,
+                SalvaPhonePolicy::SALVA_STATUS_CANCELLED]
+            ]
         ]);
 
         if (count($policies) > 0) {
             throw new MonitorException(
-                "Policy {$policies[0]->getSalvaPolicyNumber()} is pending review"
+                "Policy {$policies[0]->getPolicyNumber()} is pending review"
             );
         }
     }
@@ -671,12 +675,12 @@ class MonitorService
         $repo = $this->dm->getRepository(Policy::class);
         $policies = $repo->findBy([
             'policyNumber' => new \MongoRegex('/Mob\/*/'),
-            'status' => 'pending'
+            'status' => SalvaPhonePolicy::SALVA_STATUS_PENDING
         ]);
 
         if (count($policies) > 0) {
             throw new MonitorException(
-                "Expected 0 got over 0"
+                "Policy {$policies[0]->getPolicyNumber()} with email {$policies[0]->getUser()->getEmail()} is pending"
             );
         }
     }
@@ -703,9 +707,9 @@ class MonitorService
                 ->gt(1)
             ->execute();
 
-        if (count($builder) > 0) {
+        if (count($result) > 0) {
             throw new MonitorException(
-                "Expected 0 got over 0"
+                "Found duplicate Invites on email {$result[0]->getEmail()}"
             );
         }
     }
