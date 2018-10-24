@@ -1721,8 +1721,18 @@ class ApiAuthControllerTest extends BaseApiControllerTest
             'device' => 'iPhone11,0',
             'memory' => 32,
         ]]);
+        $data = $this->verifyResponse(404, ApiErrorCode::ERROR_NOT_FOUND);
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['phone_policy' => [
+            'make' => 'Apple',
+            'device' => 'iPhone11,2',
+            'memory' => 64,
+        ]]);
         $data = $this->verifyResponse(422, ApiErrorCode::ERROR_POLICY_UNABLE_TO_UDPATE);
 
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
+        $policyData = $this->verifyResponse(200);
+        $url = sprintf("/api/v1/auth/policy/%s", $policyData['id']);
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['phone_policy' => [
             'make' => 'Apple',
             'device' => 'iPhone11,2',
@@ -1735,14 +1745,14 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         /** @var User $user */
         $user = $userRepo->find($user->getId());
         $policies = $user->getPolicies();
-        $this->assertEquals(1, count($policies));
-        $this->assertNotNull($policies[0]->getPhone());
-        $this->assertEquals('Apple', $policies[0]->getPhone()->getMake());
-        $this->assertEquals('iPhone XS', $policies[0]->getPhone()->getModel());
-        $this->assertEquals(64, $policies[0]->getPhone()->getMemory());
+        $this->assertEquals(2, count($policies));
+        $this->assertNotNull($policies[1]->getPhone());
+        $this->assertEquals('Apple', $policies[1]->getPhone()->getMake());
+        $this->assertEquals('iPhone XS', $policies[1]->getPhone()->getModel());
+        $this->assertEquals(64, $policies[1]->getPhone()->getMemory());
         $this->assertEquals(
-            $policies[0]->getPhone()->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
-            $policies[0]->getPremium()->getMonthlyPremiumPrice()
+            $policies[1]->getPhone()->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
+            $policies[1]->getPremium()->getMonthlyPremiumPrice()
         );
     }
 

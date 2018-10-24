@@ -656,8 +656,8 @@ class ApiAuthController extends BaseController
 
             $needUpdate = false;
             if (isset($data['phone_policy'])) {
-                if (isset($data['phone_policy']['make']) &&
-                    isset($data['phone_policy']['device']) &&
+                if (isset($data['phone_policy']['make']) ||
+                    isset($data['phone_policy']['device']) ||
                     isset($data['phone_policy']['memory'])) {
                     if (!$this->validateFields($data['phone_policy'], ['make', 'device', 'memory'])) {
                         return $this->getErrorJsonResponse(
@@ -674,15 +674,23 @@ class ApiAuthController extends BaseController
                     );
                     if (!$phone) {
                         return $this->getErrorJsonResponse(
-                            ApiErrorCode::ERROR_POLICY_UNABLE_TO_UDPATE,
+                            ApiErrorCode::ERROR_NOT_FOUND,
                             'Unable to provide policy for this phone',
-                            422
+                            404
                         );
                     }
                     if (!$phone->getActive()) {
                         return $this->getErrorJsonResponse(
                             ApiErrorCode::ERROR_POLICY_UNABLE_TO_UDPATE,
                             'Unable to provide policy for this phone',
+                            422
+                        );
+                    }
+                    
+                    if ($policy->getStatus() != null && $policy->getStatus() != Policy::STATUS_PENDING) {
+                        return $this->getErrorJsonResponse(
+                            ApiErrorCode::ERROR_POLICY_UNABLE_TO_UDPATE,
+                            'Unable to change phone for this policy',
                             422
                         );
                     }
