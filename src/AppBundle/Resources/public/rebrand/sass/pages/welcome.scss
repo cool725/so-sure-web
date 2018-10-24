@@ -12,6 +12,36 @@ body {
     // @include blue-gradient;
 }
 
+.onboarding {
+    overflow: hidden;
+
+    .carousel {
+        height: 100vh;
+        position: static;
+    }
+
+    .carousel-item {
+        // height: 100vh;
+        text-align: center;
+    }
+
+    // Overide indicators
+    .carousel-indicators {
+        position: static;
+        margin: 0;
+    }
+
+    &__item {
+        // height: 100vh;
+    }
+
+    &__controls-mobile {
+        position: absolute;
+        bottom: 0; left: 0; right: 0;
+        background-color: $selago;
+    }
+}
+
 // .qpw {
 
 //     h1 {

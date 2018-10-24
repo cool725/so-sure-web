@@ -110,7 +110,9 @@
 
         {% include '::flash_rebrand.html.twig' %}
 
-        {% include '::dev_bar_rebrand.html.twig' %}
+        {% if hide_devbar is not defined or not hide_devbar %}
+            {% include '::dev_bar_rebrand.html.twig' %}
+        {% endif %}
 
         <main id="content" class="w-100 flex-grow-1">
             {% block body %}{% endblock %}
