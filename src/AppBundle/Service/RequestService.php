@@ -373,6 +373,9 @@ class RequestService
         if (mb_stripos($userAgentDetails->ua->family, 'crawler') !== false) {
             return true;
         }
+        if (mb_stripos($userAgentDetails->ua->family, 'crawler') !== false) {
+            return true;
+        }
         //if (mb_stripos($userAgentDetails->ua->family, 'facebook') !== false) {
         //    return true;
         //}
@@ -389,6 +392,7 @@ class RequestService
             'Google',
             'ia_archiver',
             'SimplePie',
+            'YandexVideoParser',
         ])) {
             return true;
         }
