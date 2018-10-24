@@ -4,10 +4,12 @@ namespace AppBundle\Service;
 use AppBundle\Classes\Salva;
 use AppBundle\Document\Cashback;
 use AppBundle\Document\Claim;
+use AppBundle\Document\Connection\Connection;
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\File\AccessPayFile;
 use AppBundle\Document\File\DaviesFile;
 use AppBundle\Document\File\DirectGroupFile;
+use AppBundle\Document\Invitation\Invitation;
 use AppBundle\Document\Form\Bacs;
 use AppBundle\Document\MultiPay;
 use AppBundle\Document\Payment\BacsPayment;
@@ -15,6 +17,7 @@ use AppBundle\Document\Payment\Payment;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Policy;
 use AppBundle\Document\PolicyTerms;
+use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\User;
 use AppBundle\Exception\MonitorException;
 use AppBundle\Repository\BacsPaymentRepository;
@@ -630,4 +633,99 @@ class MonitorService
             ]
         );
     }
+
+    public function salvaPolicy()
+    {
+        $repo = $this->dm->getRepository(Policy::class);
+        $policies = $repo->findBy([
+            'policyNumber' => new \MongoRegex('/Mob\/*/'),
+            'salvaPolicyResults' => ['$lte' => ['$size' => 0]]
+        ]);
+
+        if (count($policies) > 0) {
+            throw new MonitorException(
+                "Policy {$policies[0]->getPolicyNumber()} has more than 0 salva policy results"
+            );
+        }
+    }
+
+    public function testSalvaPolicy()
+    {
+        $repo = $this->dm->getRepository(Policy::class);
+        $policies = $repo->findBy([
+            'policyNumber' => new \MongoRegex('/INVALID\/*/'),
+            'salvaPolicyResults' => ['$lte' => ['$size' => 0]]
+        ]);
+
+        if (count($policies) == 0) {
+            throw new MonitorException(
+                "Failed to find any policies..."
+            );
+        }
+    }
+
+    public function salvaStatus()
+    {
+        $repo = $this->dm->getRepository(Policy::class);
+        $policies = $repo->findBy([
+            'policyNumber' => new \MongoRegex('/Mob\/*/'),
+            'salvaStatus' => ['$nin' => [
+                null,
+                SalvaPhonePolicy::SALVA_STATUS_ACTIVE,
+                SalvaPhonePolicy::SALVA_STATUS_CANCELLED]
+            ]
+        ]);
+
+        if (count($policies) > 0) {
+            throw new MonitorException(
+                "Policy {$policies[0]->getPolicyNumber()} is pending review"
+            );
+        }
+    }
+
+    public function policyPending()
+    {
+        $repo = $this->dm->getRepository(Policy::class);
+        $policies = $repo->findBy([
+            'policyNumber' => new \MongoRegex('/Mob\/*/'),
+            'status' => SalvaPhonePolicy::SALVA_STATUS_PENDING
+        ]);
+
+        if (count($policies) > 0) {
+            throw new MonitorException(
+                "Policy {$policies[0]->getPolicyNumber()} with email {$policies[0]->getUser()->getEmail()} is pending"
+            );
+        }
+    }
+
+    public function duplicateInvites()
+    {
+        $collection = $this->dm->getDocumentCollection(Invitation::class);
+        $builder = $collection->createAggregationBuilder();
+
+        $result = $builder
+            ->group()
+                ->field('_id')
+                ->expression(
+                    $builder->expr()
+                        ->field('email')
+                        ->expression('$email')
+                        ->field('policy')
+                        ->expression('$policy')
+                )
+                ->field('count')
+                ->sum(1)
+            ->match()
+                ->field('count')
+                ->gt(1)
+            ->execute();
+
+        if (count($result) > 0) {
+            throw new MonitorException(
+                "Found duplicate Invites on email {$result[0]->getEmail()}"
+            );
+        }
+    }
+
+    //TODO: so-sure-user-role, so-sure-user-roles, policy-files
 }
