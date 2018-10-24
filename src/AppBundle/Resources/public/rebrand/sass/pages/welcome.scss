@@ -16,23 +16,23 @@ body {
     overflow: hidden;
 
     .carousel {
-        height: 100vh;
+        // height: 100vh;
         position: static;
     }
 
     .carousel-item {
-        // height: 100vh;
+        height: 100vh;
         text-align: center;
+
+        &.active {
+            display: flex;
+        }
     }
 
     // Overide indicators
     .carousel-indicators {
         position: static;
         margin: 0;
-    }
-
-    &__item {
-        // height: 100vh;
     }
 
     &__controls-mobile {
