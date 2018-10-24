@@ -1,4 +1,4 @@
-// welcome.js
+// welcome.js (oboarding)
 
 require('../../sass/pages/welcome.scss');
 
@@ -81,11 +81,11 @@ $(function() {
         // TODO - Show this after onboarding
         // $('#starling-modal').modal('show');
     // } else {
-    $('#onboarding-modal').modal({
-        show: true,
-        keyboard: false,
-        backdrop: 'static'
-    });
+    // $('#onboarding-modal').modal({
+    //     show: true,
+    //     keyboard: false,
+    //     backdrop: 'static'
+    // });
     // }
 
 });

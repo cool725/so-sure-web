@@ -1,4 +1,4 @@
-// quotepage.scss
+// quotepage.scss (oboarding)
 
 @import "../vendor/bs4/functions";
 @import "../vendor/bs4/variables";
@@ -8,50 +8,50 @@
 @import "../abstracts/variables";
 
 body {
-    background-color: $crayon-blue;
-    @include blue-gradient;
+    // background-color: $crayon-blue;
+    // @include blue-gradient;
 }
 
-.qpw {
+// .qpw {
 
-    h1 {
-        // TODO: This could be done better
-        border: none;
-    }
+//     h1 {
+//         // TODO: This could be done better
+//         border: none;
+//     }
 
-    &__main {
-        padding-top: 1.5rem;
+//     &__main {
+//         padding-top: 1.5rem;
 
-        @include media-breakpoint-up(lg) {
-            padding-top: 12rem;
-        }
-    }
+//         @include media-breakpoint-up(lg) {
+//             padding-top: 12rem;
+//         }
+//     }
 
-    &__sub__container {
-        margin-top: 3.4rem;
+//     &__sub__container {
+//         margin-top: 3.4rem;
 
-        @include media-breakpoint-up(lg) {
-            margin-top: 0;
-        }
-    }
+//         @include media-breakpoint-up(lg) {
+//             margin-top: 0;
+//         }
+//     }
 
-    &__curve {
-        transform: translateY(-1px);
+//     &__curve {
+//         transform: translateY(-1px);
 
-        @include media-breakpoint-up(lg) {
-            transform: none;
-        }
-    }
+//         @include media-breakpoint-up(lg) {
+//             transform: none;
+//         }
+//     }
 
-    &__sub {
-        max-width: 400px;
-        margin: 0 auto;
-        text-align: center;
-        padding-top: 2em;
+//     &__sub {
+//         max-width: 400px;
+//         margin: 0 auto;
+//         text-align: center;
+//         padding-top: 2em;
 
-        @include media-breakpoint-up(lg) {
-            padding-top: 12rem;
-        }
-    }
-}
+//         @include media-breakpoint-up(lg) {
+//             padding-top: 12rem;
+//         }
+//     }
+// }
 

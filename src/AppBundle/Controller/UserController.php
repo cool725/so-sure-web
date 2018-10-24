@@ -1269,8 +1269,9 @@ class UserController extends BaseController
             'oauth2FlowParams' => $oauth2FlowParams,
         );
 
-        return $this->render('AppBundle:User:welcome.html.twig', $data);
+        return $this->render('AppBundle:User:onboarding.html.twig', $data);
     }
+
     /**
      * @Route("/payment-details", name="user_payment_details")
      * @Route("/payment-details/bacs", name="user_payment_details_bacs")
