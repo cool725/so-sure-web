@@ -19,6 +19,8 @@
             <h3>Error: {{ error }}</h3>
         {% else %}
 
+            <h1 class="row">{{ affiliate.name }}</h1>
+
             <!-- Navigation Tabs -->
             <ul id="tabs" class="nav nav-tabs nav-justified" role="tablist">
                 <li class="nav-item {% if charges is defined %}active{% endif %}">
@@ -32,7 +34,7 @@
             <!-- charges tab -->
             {% if charges is defined %}
                 <div class="row">
-                    <h1 class="col-md-6">{{ affiliate.name }} charges for {{month}} / {{year}}</h1>
+                    <h2 class="col-md-6">Charges for {{month}} / {{year}}</h2>
 
                     <!-- configuration form -->
                     <!-- method="POST" is actually a work around so the form does not add ? to end of url,
@@ -57,7 +59,7 @@
 
                 <!-- Summary Table -->
                 <div class="row">
-                    <h2>Summary</h2>
+                    <h3>Summary</h3>
                     <table class="table table-striped">
                         <thead>
                             <tr><th>CPA</th><th>Total Charges</th><th>Total Cost</th></tr>
@@ -73,7 +75,7 @@
 
                 <!-- paid charges table -->
                 <div class="row">
-                    <h2>Charges</h2>
+                    <h3>Charges</h3>
                     <div class="table-responsive">
                         <table class="table table-striped">
                             <thead><tr><th>Date</th><th>User</th></tr></thead>
@@ -98,7 +100,7 @@
             <!-- immature users table -->
             {% if immatureUsers is defined %}
                 <div class="row">
-                    <h1>{{ affiliate.name }} Pending Aquisitions</h1>
+                    <h2>Pending Aquisitions</h2>
                     <div class="table-responsive">
                         <table class="table table-striped">
                             <thead><tr><th>Total Pending Aquisitions</th><th>Total Cost Pending</th></tr></thead>
