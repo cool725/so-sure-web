@@ -113,7 +113,7 @@ class AffiliateServiceTest extends WebTestCase
         return $affiliate;
     }
 
-    private function createTestUser($policyAge, $email, $source)
+    private function createTestUser($policyAge, $email, $source = '', $lead = '')
     {
         $policy = self::createUserPolicy(true, new \DateTime($policyAge));
         $policy->getUser()->setEmail(static::generateEmail($email, $this));
@@ -122,6 +122,8 @@ class AffiliateServiceTest extends WebTestCase
         $attribution = new Attribution();
         $attribution->setCampaignSource($source);
         $user->setAttribution($attribution);
+        $user->setLeadSource('scode');
+        $user->setLeadSourceDetails($lead);
         self::$dm->persist($policy);
         self::$dm->persist($user);
         self::$dm->flush();
@@ -135,22 +137,27 @@ class AffiliateServiceTest extends WebTestCase
     public function testGenerateAffiliateCampaign()
     {
         $startCharges = count(self::$chargeRepo->findMonthly(null, 'affiliate'));
-        $affiliate = $this->createTestAffiliate('Foo', 4.5, 30, '8 Foo Bar', 'FooBarTown', 'foobar');
-        $user = $this->createTestUser('31 days ago', 'testGenerateAffiliateCampaign', 'foobar');
-        $this->assertEquals(1, self::$affiliateService->generate());
-        $this->assertEquals($startCharges + 1, count(self::$chargeRepo->findMonthly(null, 'affiliate')));
+        $affiliate = $this->createTestAffiliate('foo', 4.5, 30, '8 Foo Bar', 'FooBarTown', 'fooAd');
+        $user = $this->createTestUser('31 days ago', 'testGenerateAffiliateCampaign', 'fooAd');
+        $this->assertEquals(1, count(self::$affiliateService->generate()));
+        $charges = self::$chargeRepo->findMonthly(null, 'affiliate', false, $affiliate);
+        $n = 0;
+        foreach ($charges as $charge) {
+            $this->assertEquals($affiliate, $charge->getAffiliate());
+            $n++;
+        }
+        $this->assertEquals(1, $n);
     }
 
     public function testGenerateAffiliateLead()
     {
-        $startCharges = count(self::$chargeRepo->findMonthly(null, 'affiliate'));
-        $affiliate = $this->createTestAffiliate('Foo', 4.5, 30, '8 Foo Bar', 'FooBarTown', '', 'foobar');
-        $user = $this->createTestUser('31 days ago', 'testGenerateAffiliateLead', 'foobar');
+        $affiliate = $this->createTestAffiliate('bar', 4.5, 30, '8 Foo Bar', 'FooBarTown', '', 'barLead');
+        $user = $this->createTestUser('31 days ago', 'testGenerateAffiliateLead', '', 'barLead');
         $charges = self::$affiliateService->generate();
-        $this->assertEquals(1, $charges);
+        $this->assertEquals(1, count($charges));
+        $this->assertEquals($affiliate, $charges[0]->getAffiliate());
         $charges = self::$affiliateService->generate();
-        $this->assertEquals(0, $charges);
-        $this->assertEquals($startCharges + 1, count(self::$chargeRepo->findMonthly(null, 'affiliate')));
+        $this->assertEquals(0, count($charges));
     }
 
     public function testGetMatchingUsers()
