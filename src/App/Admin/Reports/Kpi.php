@@ -21,12 +21,12 @@ class Kpi implements KpiInterface
     private $policyRepo;
     private $statsRepo;
 
-    public function __construct(DocumentManager $documentManager, ReportingService $reportingService)
+    public function __construct(DocumentManager $dm, ReportingService $reportingService)
     {
         $this->reporting = $reportingService;
 
-        $this->statsRepo = $documentManager->getRepository(Stats::class);
-        $this->policyRepo = $documentManager->getRepository(PhonePolicy::class);
+        $this->statsRepo = $dm->getRepository(Stats::class);
+        $this->policyRepo = $dm->getRepository(PhonePolicy::class);
     }
 
     public function collectWeekRanges(DateTime $now, int $numWeeks): array

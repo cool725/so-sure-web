@@ -272,6 +272,12 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     protected $company;
 
     /**
+     * @MongoDB\ReferenceOne(targetDocument="AffiliateCompany", inversedBy="confirmedUsers")
+     * @Gedmo\Versioned
+     */
+    protected $affiliate;
+
+    /**
      * @MongoDB\ReferenceMany(targetDocument="Policy", mappedBy="user")
      */
     protected $policies;
@@ -577,6 +583,16 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     public function setCompany(Company $company)
     {
         $this->company = $company;
+    }
+
+    public function getAffiliate()
+    {
+        return $this->affiliate;
+    }
+
+    public function setAffiliate(AffiliateCompany $affiliate)
+    {
+        $this->affiliate = $affiliate;
     }
 
     public function addPolicy(Policy $policy)
@@ -1016,6 +1032,18 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         }
 
         return $policies;
+    }
+
+    public function isAffiliateCandidate($days)
+    {
+        foreach ($this->getValidPolicies(true) as $policy) {
+            /** @var Policy $policy */
+            if ($policy->isPolicyOldEnough($days)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public function getValidPoliciesWithoutOpenedClaim($includeUnpaid = false)

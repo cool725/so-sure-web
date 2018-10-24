@@ -13,6 +13,15 @@ use AppBundle\Classes\DaviesHandlerClaim;
 
 class ClaimsNotifyPolicyPendingCancellationCommand extends ContainerAwareCommand
 {
+    /** @var PolicyService  */
+    protected $policyService;
+
+    public function __construct(PolicyService $policyService)
+    {
+        parent::__construct();
+        $this->policyService = $policyService;
+    }
+
     protected function configure()
     {
         $this
@@ -37,9 +46,7 @@ class ClaimsNotifyPolicyPendingCancellationCommand extends ContainerAwareCommand
     {
         $prefix = $input->getOption('prefix');
         $days = $input->getOption('days');
-        /** @var PolicyService $policyService */
-        $policyService = $this->getContainer()->get('app.policy');
-        $count = $policyService->notifyPendingCancellations($prefix, $days);
+        $count = $this->policyService->notifyPendingCancellations($prefix, $days);
         $output->writeln(sprintf('%d policies with open claims will be cancelled. Email report sent.', $count));
     }
 }

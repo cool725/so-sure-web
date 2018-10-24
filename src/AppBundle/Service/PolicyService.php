@@ -2178,7 +2178,8 @@ class PolicyService
             $policyPremium = $phonePolicy->getPremium();
             if (!$amount) {
                 $currentPhonePrice = $phonePolicy->getPhone()->getCurrentPhonePrice($date);
-                if ($currentPhonePrice->getMonthlyPremiumPrice() != $policyPremium->getMonthlyPremiumPrice()) {
+                if ($currentPhonePrice &&
+                    $currentPhonePrice->getMonthlyPremiumPrice() != $policyPremium->getMonthlyPremiumPrice()) {
                     $newPremium = $currentPhonePrice->createPremium();
                     $phonePolicy->setPremium($newPremium);
                     $this->dm->flush();

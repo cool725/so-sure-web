@@ -13,6 +13,15 @@ use AppBundle\Classes\Brightstar;
 
 class BrightstarCommand extends ContainerAwareCommand
 {
+    /** @var BrightstarService */
+    protected $brightstarService;
+
+    public function __construct(BrightstarService $brightstarService)
+    {
+        parent::__construct();
+        $this->brightstarService = $brightstarService;
+    }
+
     protected function configure()
     {
         $this
@@ -47,13 +56,11 @@ class BrightstarCommand extends ContainerAwareCommand
             ));
         }
 
-        /** @var BrightstarService $davies */
-        $davies = $this->getContainer()->get('app.brightstar');
         if ($file) {
-            $lines = $davies->importFile($file, $sheetName);
+            $lines = $this->brightstarService->importFile($file, $sheetName);
             $output->writeln(implode(PHP_EOL, $lines));
         } else {
-            $lines = $davies->import($sheetName);
+            $lines = $this->brightstarService->import($sheetName);
             $output->writeln(implode(PHP_EOL, $lines));
         }
         $output->writeln('Finished');

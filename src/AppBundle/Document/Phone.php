@@ -46,6 +46,7 @@ class Phone
 
     /**
      * @AppAssert\AlphanumericSpaceDot()
+     * @Assert\Regex(pattern="/^[a-zA-Z]+$/")  // must match quote_make_model_memory requirements
      * @Assert\Length(min="1", max="50")
      * @MongoDB\Field(type="string")
      */
@@ -74,6 +75,7 @@ class Phone
 
     /**
      * @AppAssert\Token()
+     * @Assert\Regex(pattern="/^[\+\-\.a-zA-Z0-9() ]+$/") // must match quote_make_model_memory requirements
      * @Assert\Length(min="1", max="50")
      * @MongoDB\Field(type="string")
      */

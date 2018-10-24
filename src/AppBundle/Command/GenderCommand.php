@@ -17,6 +17,15 @@ use AppBundle\Classes\SoSure;
 
 class GenderCommand extends ContainerAwareCommand
 {
+    /** @var GenderizeService */
+    protected $genderizeService;
+
+    public function __construct(GenderizeService $genderizeService)
+    {
+        parent::__construct();
+        $this->genderizeService = $genderizeService;
+    }
+
     protected function configure()
     {
         $this
@@ -43,9 +52,7 @@ class GenderCommand extends ContainerAwareCommand
     {
         $process = $input->getOption('process');
         $threshold = $input->getOption('threshold');
-        /** @var GenderizeService $gender */
-        $gender = $this->getContainer()->get('app.gender');
-        $data = $gender->run($process, $threshold);
+        $data = $this->genderizeService->run($process, $threshold);
         $output->write(json_encode($data, JSON_PRETTY_PRINT));
     }
 }
