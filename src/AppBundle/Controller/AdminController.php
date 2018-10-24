@@ -34,6 +34,8 @@ use AppBundle\Service\SequenceService;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\HttpFoundation\File\File;
@@ -1147,25 +1149,54 @@ class AdminController extends BaseController
 
     /**
      * @Route("/charge", name="admin_charge")
-     * @Route("/charge/{year}/{month}", name="admin_charge_date")
      * @Template
      */
-    public function chargeAction(Request $request, $year = null, $month = null)
+    public function chargeAction(Request $request)
     {
-        $now = new \DateTime();
-        if (!$year) {
-            $year = $now->format('Y');
-        }
-        if (!$month) {
-            $month = $now->format('m');
-        }
-        $date = \DateTime::createFromFormat("Y-m-d", sprintf('%d-%d-01', $year, $month));
+        $form = $this->createFormBuilder()
+            ->add('type', ChoiceType::class, [
+                'choices' => [
+                    'All' => 'all',
+                    'Address' => Charge::TYPE_ADDRESS,
+                    'SMS' => Charge::TYPE_SMS,
+                    'GSMA' => Charge::TYPE_GSMA,
+                    'Make and Model' => Charge::TYPE_MAKEMODEL,
+                    'Claims Check' => Charge::TYPE_CLAIMSCHECK,
+                    'Claims Damage' => Charge::TYPE_CLAIMSDAMAGE,
+                    'Bank Account' => Charge::TYPE_BANK_ACCOUNT,
+                    'Affiliate' => Charge::TYPE_AFFILIATE
+                ],
+                'attr' => ['class' => 'form-control']
+            ])->add('month', DateType::class, [
+                'widget' => 'single_text',
+                'format' => 'MM-yyyy',
+                'html5' => false,
+                'attr' => ['class' => 'form-control', 'autocomplete' => 'off']
+            ])->add('build', SubmitType::class, [
+                'label' => 'Build Report',
+                'attr' => ['class' => 'btn btn-info']
+            ])->setMethod('GET')
+            ->getForm();
 
-        $type = $request->get('type') ?: null;
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $data = $form->getData();
+            $date = $form->get('month')->getData();
+            $type = $data['type'];
+            if ($type == 'all') {
+                $type = null;
+            }
+        } else {
+            $date = new \DateTime();
+            $type = null;
+        }
+
+        $year = $date->format('Y');
+        $month = $date->format('m');
 
         $dm = $this->getManager();
         $repo = $dm->getRepository(Charge::class);
-        $charges = $repo->findMonthly($date, $type, false);
+        $charges = $repo->findMonthly($date, $type);
         $summary = [];
         foreach ($charges as $charge) {
             if (!isset($summary[$charge->getType()])) {
@@ -1174,24 +1205,12 @@ class AdminController extends BaseController
             $summary[$charge->getType()] += $charge->getAmount();
         }
 
-        // Maybe I should rewrite this function with form builder.
-
         return [
             'year' => $year,
             'month' => $month,
             'charges' => $charges,
             'summary' => $summary,
-            'types' => [
-                Charge::TYPE_ADDRESS => 'Address',
-                Charge::TYPE_SMS => 'SMS',
-                Charge::TYPE_GSMA => 'GSMA',
-                Charge::TYPE_MAKEMODEL => 'Make and Model',
-                Charge::TYPE_CLAIMSCHECK => 'Claims Check',
-                Charge::TYPE_CLAIMSDAMAGE => 'Claims Damage',
-                Charge::TYPE_BANK_ACCOUNT => 'Bank Account',
-                Charge::TYPE_AFFILIATE => 'Affiliate'
-            ],
-            'selectedType' => $type
+            'form' => $form->createView()
         ];
     }
 
