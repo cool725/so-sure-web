@@ -134,11 +134,17 @@ class BaseControllerTest extends WebTestCase
         }
 
         if (!$errorMessage) {
-            $errorMessage = self::$client->getHistory()->current()->getUri();
             if ($crawler) {
                 $errorMessage = sprintf("%s %s", $errorMessage, $crawler->html());
             }
         }
+
+        $errorMessage = sprintf(
+            '%s%s%s',
+            $errorMessage,
+            PHP_EOL,
+            self::$client->getHistory()->current()->getUri()
+        );
 
         $this->assertEquals($statusCode, $this->getClientResponseStatusCode(), $errorMessage);
         if ($errorCode) {
