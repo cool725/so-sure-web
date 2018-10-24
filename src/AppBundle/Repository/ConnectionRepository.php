@@ -153,7 +153,7 @@ class ConnectionRepository extends BaseDocumentRepository
             ],
         ];
 
-        $data = $collection->aggregate($ops);
+        $data = $collection->aggregate($ops, ['cursor' => true]);
         return count($data['result']);
     }
 
@@ -188,7 +188,7 @@ class ConnectionRepository extends BaseDocumentRepository
             ]
         ];
 
-        $data = $collection->aggregate($ops);
+        $data = $collection->aggregate($ops, ['cursor' => true]);
 
         return $data['result'][0]['avgConnectHours'];
     }

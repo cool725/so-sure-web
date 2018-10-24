@@ -13,6 +13,15 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class DebugMetadataCommand extends ContainerAwareCommand
 {
+    /** @var ValidatorInterface */
+    protected $validator;
+
+    public function __construct(ValidatorInterface $validator)
+    {
+        parent::__construct();
+        $this->validator = $validator;
+    }
+
     protected function configure()
     {
         $this
@@ -29,9 +38,7 @@ class DebugMetadataCommand extends ContainerAwareCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $name = $input->getArgument('name');
-        /** @var ValidatorInterface $validator */
-        $validator = $this->getContainer()->get('validator');
-        $metadata = $validator->getMetadataFor($name);
+        $metadata = $this->validator->getMetadataFor($name);
         print_r($metadata);
     }
 }

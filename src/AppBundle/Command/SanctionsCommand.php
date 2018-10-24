@@ -4,6 +4,7 @@ namespace AppBundle\Command;
 
 use AppBundle\Repository\UserRepository;
 use AppBundle\Service\SanctionsService;
+use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -17,9 +18,22 @@ use AppBundle\Document\DateTrait;
 use AppBundle\Validator\Constraints\AlphanumericSpaceDotValidator;
 use GuzzleHttp\Client;
 
-class SanctionsCommand extends BaseCommand
+class SanctionsCommand extends ContainerAwareCommand
 {
     use DateTrait;
+
+    /** @var DocumentManager */
+    protected $dm;
+
+    /** @var SanctionsService  */
+    protected $sanctionsService;
+
+    public function __construct(DocumentManager $dm, SanctionsService $sanctionsService)
+    {
+        parent::__construct();
+        $this->dm = $dm;
+        $this->sanctionsService = $sanctionsService;
+    }
 
     protected function configure()
     {
@@ -93,11 +107,8 @@ class SanctionsCommand extends BaseCommand
 
     protected function checkUsers($userId = null)
     {
-        $dm = $this->getManager();
-        /** @var SanctionsService $sanctions */
-        $sanctions = $this->getContainer()->get('app.sanctions');
         /** @var UserRepository $userRepo */
-        $userRepo = $dm->getRepository(User::class);
+        $userRepo = $this->dm->getRepository(User::class);
         if ($userId) {
             $users = [];
             $users[] = $userRepo->find($userId);
@@ -106,24 +117,21 @@ class SanctionsCommand extends BaseCommand
         }
         $count = 0;
         foreach ($users as $user) {
-            $matches = $sanctions->checkUser($user, true);
+            $matches = $this->sanctionsService->checkUser($user, true);
             if ($matches) {
                 print sprintf('%s %s', $user->getName(), json_encode($matches)) . PHP_EOL;
             }
             $count++;
             if ($count % 1000 == 0) {
-                $dm->flush();
+                $this->dm->flush();
             }
         }
-        $dm->flush();
+        $this->dm->flush();
     }
 
     protected function checkCompanies($companyId = null)
     {
-        $dm = $this->getManager();
-        /** @var SanctionsService $sanctions */
-        $sanctions = $this->getContainer()->get('app.sanctions');
-        $companyRepo = $dm->getRepository(Company::class);
+        $companyRepo = $this->dm->getRepository(Company::class);
         if ($companyId) {
             $companies = [];
             $companies[] = $companyRepo->find($companyId);
@@ -132,17 +140,16 @@ class SanctionsCommand extends BaseCommand
         }
         foreach ($companies as $company) {
             /** @var Company $company */
-            $matches = $sanctions->checkCompany($company, true);
+            $matches = $this->sanctionsService->checkCompany($company, true);
             if ($matches) {
                 print sprintf('%s %s', $company->getName(), json_encode($matches)) . PHP_EOL;
             }
         }
-        $dm->flush();
+        $this->dm->flush();
     }
 
     protected function ukTreasury($file)
     {
-        $dm = $this->getManager();
         $row = 0;
         $date = null;
         if (($handle = fopen($file, "r")) !== false) {
@@ -150,21 +157,21 @@ class SanctionsCommand extends BaseCommand
                 if ($row == 0) {
                     $date = $this->startOfDay(\DateTime::createFromFormat("d/m/Y", $data[1]));
                 } elseif ($row > 1) {
-                    $this->addUpdateSanctions($dm, $data, $date);
+                    $this->addUpdateSanctions($data, $date);
                 }
                 if ($row % 1000 == 0) {
-                    $dm->flush();
+                    $this->dm->flush();
                 }
                 $row++;
             }
             fclose($handle);
         }
-        $dm->flush();
+        $this->dm->flush();
 
         return $row;
     }
     
-    protected function addUpdateSanctions($dm, $data, $date)
+    protected function addUpdateSanctions($data, $date)
     {
         $validator = new AlphanumericSpaceDotValidator();
 
@@ -180,7 +187,7 @@ class SanctionsCommand extends BaseCommand
         }
         // company vs person
         if ($data[1] == '' && !$birthday) {
-            $dm->createQueryBuilder(Sanctions::class)
+            $this->dm->createQueryBuilder(Sanctions::class)
             ->findAndUpdate()
             ->upsert(true)
             ->field('company')->equals($lastName)
@@ -194,7 +201,7 @@ class SanctionsCommand extends BaseCommand
             ->getQuery()
             ->execute();
         } else {
-            $dm->createQueryBuilder(Sanctions::class)
+            $this->dm->createQueryBuilder(Sanctions::class)
             ->findAndUpdate()
             ->upsert(true)
             ->field('firstName')->equals($firstName)

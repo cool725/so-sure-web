@@ -183,7 +183,9 @@ class ReportingService
         // Doesn't make sense to exclude as will skew all figures
         // $connectionRepo->setExcludedPolicyIds($excludedPolicyIds);
 
-        $pot = $policyRepo->getPotValues()[0];
+        $values = $policyRepo->getPotValues();
+        //\Doctrine\Common\Util\Debug::dump($values);
+        $pot = $values ? $values[0] : null;
         $data['totalPot'] = $pot['potValue'];
         $data['totalPromoPot'] = $pot['promoPotValue'];
 

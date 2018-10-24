@@ -95,7 +95,7 @@
 }
 
 .expanding-cardbox__icon {
-    background: url('#{$cdn_url}/images/rebrand/icns/so-sure_tick-icn.svg') no-repeat 1.3rem 1.25rem;
+    background: $white url('#{$cdn_url}/images/rebrand/icns/so-sure_tick-icn.svg') no-repeat 1.3rem 1.25rem;
     background-size: 2rem;
 
     .expanding-cardbox__title {
