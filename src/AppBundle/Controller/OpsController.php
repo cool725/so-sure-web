@@ -544,6 +544,7 @@ class OpsController extends BaseController
                 'sxt.cdn.skype.com',
                 'cdn.joinhoney.com',
                 'mozbar.moz.com',
+                'gjtrack.ucweb.com',
             ])) {
                 $logger->debug(sprintf('Content-Security-Policy called with ignore host: %s', $host));
 

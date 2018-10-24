@@ -20,11 +20,11 @@ class ApiKeyControllerTest extends BaseApiControllerTest
     /**
      *
      */
-    public function testQuoteUnknown()
+    public function testQuoteKeyAll()
     {
         $cognitoIdentityId = $this->getUnauthIdentity();
         $crawler = self::$client->request('GET', '/api/v1/key/quote');
-        $data = $this->verifyResponse(400, ApiErrorCode::ERROR_MISSING_PARAM);
+        $data = $this->verifyResponse(200);
     }
 
     public function testQuoteMake()

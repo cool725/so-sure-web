@@ -11,6 +11,15 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class MonitorCommand extends ContainerAwareCommand
 {
+    /** @var MonitorService */
+    protected $monitorService;
+
+    public function __construct(MonitorService $monitorService)
+    {
+        parent::__construct();
+        $this->monitorService = $monitorService;
+    }
+
     protected function configure()
     {
         $this
@@ -27,9 +36,7 @@ class MonitorCommand extends ContainerAwareCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $name = $input->getArgument('name');
-        /** @var MonitorService $monitor */
-        $monitor = $this->getContainer()->get('app.monitor');
-        $message = $monitor->run($name);
+        $message = $this->monitorService->run($name);
         $output->writeln($message);
     }
 }

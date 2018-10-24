@@ -79,9 +79,9 @@ class JudopayServiceTest extends WebTestCase
         $user->setBirthday(new \DateTime('1980-01-01'));
         $address = new Address();
         $address->setType(Address::TYPE_BILLING);
-        $address->setLine1('10 Finsbury Square');
+        $address->setLine1('5 Martin Lane');
         $address->setCity('London');
-        $address->setPostcode('EC1V 1RS');
+        $address->setPostcode('EC4R 0DP');
         $user->setBillingAddress($address);
 
         static::$dm->persist($address);
@@ -89,7 +89,7 @@ class JudopayServiceTest extends WebTestCase
 
         return $user;
     }
-    
+
     public function testJudoPaymentPolicyNoReload()
     {
         $user = $this->createValidUser(static::generateEmail('testJudoPaymentPolicyNoReload', $this));

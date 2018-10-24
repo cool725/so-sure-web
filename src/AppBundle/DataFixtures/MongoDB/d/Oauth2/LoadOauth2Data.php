@@ -63,6 +63,8 @@ class LoadOauth2Data implements FixtureInterface, ContainerAwareInterface
             [
                 'http://dev.so-sure.net:40080/ops/pages',
                 'https://testing.wearesosure.com/ops/pages',
+                'https://waterloo.testing.wearesosure.com/ops/pages',
+                'https://monument.testing.wearesosure.com/ops/pages',
                 'https://staging.wearesosure.com/ops/pages',
                 'http://dev.so-sure.net:40080/oauth/v2/auth',
                 'http://dev.so-sure.net:40080/',
