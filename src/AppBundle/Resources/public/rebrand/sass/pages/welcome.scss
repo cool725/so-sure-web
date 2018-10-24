@@ -35,6 +35,10 @@ body {
         margin: 0;
     }
 
+    &__item {
+        height: 100vh;
+    }
+
     &__controls-mobile {
         position: absolute;
         bottom: 0; left: 0; right: 0;
