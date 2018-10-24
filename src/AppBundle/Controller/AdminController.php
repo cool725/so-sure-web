@@ -1167,15 +1167,18 @@ class AdminController extends BaseController
                     'Affiliate' => Charge::TYPE_AFFILIATE
                 ],
                 'attr' => ['class' => 'form-control']
-            ])->add('month', DateType::class, [
+            ])
+            ->add('month', DateType::class, [
                 'widget' => 'single_text',
                 'format' => 'MM-yyyy',
                 'html5' => false,
                 'attr' => ['class' => 'form-control', 'autocomplete' => 'off']
-            ])->add('build', SubmitType::class, [
+            ])
+            ->add('build', SubmitType::class, [
                 'label' => 'Build Report',
                 'attr' => ['class' => 'btn btn-info']
-            ])->setMethod('GET')
+            ])
+            ->setMethod('GET')
             ->getForm();
 
         $form->handleRequest($request);
