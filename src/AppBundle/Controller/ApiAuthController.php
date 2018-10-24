@@ -681,12 +681,12 @@ class ApiAuthController extends BaseController
                     }
                     if (!$phone->getActive()) {
                         return $this->getErrorJsonResponse(
-                            ApiErrorCode::ERROR_POLICY_UNABLE_TO_UDPATE,
+                            ApiErrorCode::ERROR_NOT_FOUND,
                             'Unable to provide policy for this phone',
-                            422
+                            404
                         );
                     }
-                    
+
                     if ($policy->getStatus() != null && $policy->getStatus() != Policy::STATUS_PENDING) {
                         return $this->getErrorJsonResponse(
                             ApiErrorCode::ERROR_POLICY_UNABLE_TO_UDPATE,
