@@ -184,7 +184,7 @@ class ReportingService
         // $connectionRepo->setExcludedPolicyIds($excludedPolicyIds);
 
         $values = $policyRepo->getPotValues();
-        \Doctrine\Common\Util\Debug::dump($values);
+        //\Doctrine\Common\Util\Debug::dump($values);
         $pot = $values ? $values[0] : null;
         $data['totalPot'] = $pot['potValue'];
         $data['totalPromoPot'] = $pot['promoPotValue'];

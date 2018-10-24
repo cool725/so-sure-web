@@ -2,6 +2,7 @@
 
 namespace AppBundle\Tests\Service;
 
+use AppBundle\Service\RequestService;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 /**
@@ -13,6 +14,7 @@ class RequestServiceTest extends WebTestCase
     use \AppBundle\Tests\PhingKernelClassTrait;
     use \AppBundle\Tests\UserClassTrait;
     protected static $container;
+    /** @var RequestService */
     protected static $requestService;
     protected static $client;
 
@@ -27,9 +29,9 @@ class RequestServiceTest extends WebTestCase
          //get the DI container
          self::$container = $kernel->getContainer();
 
-         //now we can instantiate our service (if you want a fresh one for
-         //each test method, do this in setUp() instead
-         self::$requestService = self::$container->get('app.request');
+        /** @var RequestService */
+         $requestService = self::$container->get('app.request');
+        self::$requestService = $requestService;
     }
 
     public function tearDown()
@@ -162,6 +164,7 @@ class RequestServiceTest extends WebTestCase
             'Go-http-client/1.1',
             'Mozilla/5.0 (compatible; Google-Apps-Script)',
             'HappyApps-WebCheck/1.0',
+            'Mozilla/5.0 (compatible; YandexVideoParser/1.0; +http://yandex.com/bots)',
             //'Mozilla/5.0 (Linux; Android 8.0.0; SM-G950F Build/R16NW; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/66.0.3359.158 Mobile Safari/537.36 [FB_IAB/FB4A;FBAV/172.0.0.66.93;]' // facebook
         ];
         // @codingStandardsIgnoreEnd
