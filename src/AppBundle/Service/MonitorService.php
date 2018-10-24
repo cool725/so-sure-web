@@ -8,6 +8,7 @@ use AppBundle\Document\DateTrait;
 use AppBundle\Document\File\AccessPayFile;
 use AppBundle\Document\File\DaviesFile;
 use AppBundle\Document\File\DirectGroupFile;
+use AppBundle\Document\Form\Bacs;
 use AppBundle\Document\MultiPay;
 use AppBundle\Document\Payment\BacsPayment;
 use AppBundle\Document\Payment\Payment;
@@ -502,14 +503,26 @@ class MonitorService
 
         /** @var BacsPayment[] $unpaid */
         $unpaid = $paymentsRepo->findUnprocessedPaymentsOlderThanDays(
-            [BacsPayment::STATUS_PENDING, BacsPayment::STATUS_GENERATED],
-            1
+            [BacsPayment::STATUS_PENDING],
+            BacsPayment::DAYS_PROCESSING
         );
 
         /** @noinspection LoopWhichDoesNotLoopInspection */
         foreach ($unpaid as $payment) {
             /** @var BacsPayment $payment */
-            throw new MonitorException('There are pending/generated bacs payments waiting: ' . $payment->getId());
+            throw new MonitorException('There are pending bacs payments waiting: ' . $payment->getId());
+        }
+
+        /** @var BacsPayment[] $unpaid */
+        $unpaid = $paymentsRepo->findUnprocessedPaymentsOlderThanDays(
+            [BacsPayment::STATUS_GENERATED],
+            BacsPayment::DAYS_REVERSE
+        );
+
+        /** @noinspection LoopWhichDoesNotLoopInspection */
+        foreach ($unpaid as $payment) {
+            /** @var BacsPayment $payment */
+            throw new MonitorException('There are generated bacs payments waiting: ' . $payment->getId());
         }
     }
 
