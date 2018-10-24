@@ -55,7 +55,7 @@ abstract class LoadPhoneData implements ContainerAwareInterface
             while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
                 if ($row > 0) {
                     if ($phone = $this->newPhoneFromRow($manager, $data, $date)) {
-                        $newPhones[$phone->getDevices()[0]] = $phone;
+                        $newPhones[$phone->getModelMemory()] = $phone;
                     }
                 }
                 if ($row % 1000 == 0) {
