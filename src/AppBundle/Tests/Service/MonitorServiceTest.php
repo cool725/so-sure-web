@@ -10,7 +10,7 @@ use AppBundle\Exception\MonitorException;
 use AppBundle\Repository\Invitation\InvitationRepository;
 use AppBundle\Service\MonitorService;
 use Exception;
-use MongoDBODMProxies\__CG__\AppBundle\Document\Invitation\EmailInvitation;
+use AppBundle\Document\Invitation\EmailInvitation;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\Claim;
 
