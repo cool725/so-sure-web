@@ -4,38 +4,40 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "c7149a594f6dcb99a6ca8adafd0514c6",
-    "content-hash": "d126c380f2f670c70457cd6a11f6260f",
+    "hash": "a15e1ce78cdb7dd837ae235dd292dbe8",
+    "content-hash": "9c18a51891e53afc9c1dbdce52416ec3",
     "packages": [
         {
             "name": "alcaeus/mongo-php-adapter",
-            "version": "1.0.7",
+            "version": "1.1.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/alcaeus/mongo-php-adapter.git",
-                "reference": "57bbf534e27161d720a7689cefd6829db9a8eacb"
+                "reference": "4f21e1fdc21eee0e35bdaf854ecc3c58179d1ef7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/alcaeus/mongo-php-adapter/zipball/57bbf534e27161d720a7689cefd6829db9a8eacb",
-                "reference": "57bbf534e27161d720a7689cefd6829db9a8eacb",
+                "url": "https://api.github.com/repos/alcaeus/mongo-php-adapter/zipball/4f21e1fdc21eee0e35bdaf854ecc3c58179d1ef7",
+                "reference": "4f21e1fdc21eee0e35bdaf854ecc3c58179d1ef7",
                 "shasum": ""
             },
             "require": {
                 "ext-hash": "*",
+                "ext-mongodb": "^1.2.0",
                 "mongodb/mongodb": "^1.0.1",
-                "php": "^5.5 || ^7.0"
+                "php": "^5.6 || ^7.0"
             },
             "provide": {
-                "ext-mongo": "1.6.13"
+                "ext-mongo": "1.6.14"
             },
             "require-dev": {
-                "phpunit/phpunit": "^4.8 || ^5.0"
+                "phpunit/phpunit": "^5.7.27 || ^6.0 || ^7.0",
+                "squizlabs/php_codesniffer": "^3.2"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.0.x-dev"
+                    "dev-master": "1.1.x-dev"
                 }
             },
             "autoload": {
@@ -68,7 +70,7 @@
                 "database",
                 "mongodb"
             ],
-            "time": "2016-07-03 16:16:40"
+            "time": "2018-03-05 20:40:55"
         },
         {
             "name": "aws/aws-sdk-php",
@@ -10154,5 +10156,8 @@
         "php": ">=7.0",
         "ext-json": "*"
     },
-    "platform-dev": []
+    "platform-dev": [],
+    "platform-overrides": {
+        "ext-mongo": "1.6.16"
+    }
 }
