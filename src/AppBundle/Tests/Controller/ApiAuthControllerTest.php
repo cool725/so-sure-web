@@ -1709,6 +1709,41 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $policies = $user->getPolicies();
         $this->assertEquals(1, count($policies));
         $this->assertEquals('MLLN2B/A', $policies[0]->getModelNumber());
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['phone_policy' => [
+            'make' => 'Apple',
+            'device' => 'iPhone11,2',
+        ]]);
+        $data = $this->verifyResponse(400, ApiErrorCode::ERROR_MISSING_PARAM);
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['phone_policy' => [
+            'make' => 'Apple',
+            'device' => 'iPhone11,0',
+            'memory' => 32,
+        ]]);
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_POLICY_UNABLE_TO_UDPATE);
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['phone_policy' => [
+            'make' => 'Apple',
+            'device' => 'iPhone11,2',
+            'memory' => 64,
+        ]]);
+        $data = $this->verifyResponse(200);
+
+        $dm = $this->getDocumentManager(true);
+        $userRepo = $dm->getRepository(User::class);
+        /** @var User $user */
+        $user = $userRepo->find($user->getId());
+        $policies = $user->getPolicies();
+        $this->assertEquals(1, count($policies));
+        $this->assertNotNull($policies[0]->getPhone());
+        $this->assertEquals('Apple', $policies[0]->getPhone()->getMake());
+        $this->assertEquals('iPhone XS', $policies[0]->getPhone()->getModel());
+        $this->assertEquals(64, $policies[0]->getPhone()->getMemory());
+        $this->assertEquals(
+            $policies[0]->getPhone()->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
+            $policies[0]->getPremium()->getMonthlyPremiumPrice()
+        );
     }
 
     public function testPostPolicyUnknownId()
