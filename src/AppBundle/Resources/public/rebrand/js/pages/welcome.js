@@ -77,11 +77,15 @@ $(function() {
     });
 
     // Show Starling Welcome
-    if ($('#starling-modal').length) {
+    // if ($('#starling-modal').length) {
         // TODO - Show this after onboarding
-        $('#starling-modal').modal('show');
-    } else {
-        $('#onboarding-modal').modal('show');
-    }
+        // $('#starling-modal').modal('show');
+    // } else {
+    $('#onboarding-modal').modal({
+        show: true,
+        keyboard: false,
+        backdrop: 'static'
+    });
+    // }
 
 });
