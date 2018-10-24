@@ -23,6 +23,19 @@ class PolicyBreakdownCommand extends ContainerAwareCommand
     use DateTrait;
     use CurrencyTrait;
 
+    /** @var PolicyService */
+    protected $policyService;
+
+    /** @var MailerService */
+    protected $mailerService;
+
+    public function __construct(PolicyService $policyService, MailerService $mailerService)
+    {
+        parent::__construct();
+        $this->policyService = $policyService;
+        $this->mailerService = $mailerService;
+    }
+
     protected function configure()
     {
         $this
@@ -44,13 +57,9 @@ class PolicyBreakdownCommand extends ContainerAwareCommand
             unlink($tmpFile);
         }
 
-        /** @var PolicyService $policyService */
-        $policyService = $this->getContainer()->get('app.policy');
-        $policyService->getBreakdownPdf($tmpFile);
+        $this->policyService->getBreakdownPdf($tmpFile);
 
-        /** @var MailerService $mailer */
-        $mailer = $this->getContainer()->get('app.mailer');
-        $mailer->sendTemplate(
+        $this->mailerService->sendTemplate(
             sprintf('so-sure Policy Breakdown Report'),
             ['patrick@so-sure.com','dylan@so-sure.com'],
             'AppBundle:Email:claimsHandler/breakdown.html.twig',

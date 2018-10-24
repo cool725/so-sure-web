@@ -75,6 +75,15 @@ trait CurrencyTrait
         return abs($float1 - $float2) < 0.00001;
     }
 
+    public function areEqualToSixDp($float1, $float2)
+    {
+        if (null === $float1 || null === $float2) {
+            return false;
+        }
+
+        return abs($float1 - $float2) < 0.0000001;
+    }
+
     public function greaterThanZero($float)
     {
         return $float > 0 && !$this->areEqualToTwoDp(0, $float);

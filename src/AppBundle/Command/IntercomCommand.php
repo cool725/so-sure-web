@@ -2,6 +2,7 @@
 
 namespace AppBundle\Command;
 
+use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -12,8 +13,21 @@ use AppBundle\Document\User;
 use AppBundle\Document\Invitation\EmailInvitation;
 use AppBundle\Service\IntercomService;
 
-class IntercomCommand extends BaseCommand
+class IntercomCommand extends ContainerAwareCommand
 {
+    /** @var DocumentManager  */
+    protected $dm;
+
+    /** @var IntercomService  */
+    protected $intercom;
+
+    public function __construct(DocumentManager $dm, IntercomService $intercomService)
+    {
+        parent::__construct();
+        $this->dm = $dm;
+        $this->intercom = $intercomService;
+    }
+
     protected function configure()
     {
         $this
@@ -110,31 +124,28 @@ class IntercomCommand extends BaseCommand
         $pendingInvites = true === $input->getOption('pending-invites');
         $countQueue = true === $input->getOption('count-queue');
 
-        /** @var IntercomService $intercom */
-        $intercom = $this->getContainer()->get('app.intercom');
-
         if ($email) {
             $user = $this->getUser($email);
 
             if ($requeue) {
-                $resp = $intercom->queue($user);
+                $resp = $this->intercom->queue($user);
                 $output->writeln(sprintf('User %s was requeued', $user->getId()));
             } else {
-                $resp = $intercom->update($user, true, $undelete);
+                $resp = $this->intercom->update($user, true, $undelete);
                 $output->writeln(json_encode($resp, JSON_PRETTY_PRINT));
             }
         } elseif ($convertLead) {
             $user = $this->getUser($convertLead);
-            $resp = $intercom->convertLead($user);
+            $resp = $this->intercom->convertLead($user);
             $output->writeln(json_encode($resp, JSON_PRETTY_PRINT));
         } elseif ($clear) {
-            $intercom->clearQueue();
+            $this->intercom->clearQueue();
             $output->writeln(sprintf("Queue is cleared"));
         } elseif ($countQueue) {
-            $count = $intercom->countQueue();
+            $count = $this->intercom->countQueue();
             $output->writeln(sprintf("%d in queue", $count));
         } elseif ($show) {
-            $data = $intercom->getQueueData($process);
+            $data = $this->intercom->getQueueData($process);
             $output->writeln(sprintf("Queue Size: %d", count($data)));
             foreach ($data as $line) {
                 $output->writeln(json_encode(unserialize($line), JSON_PRETTY_PRINT));
@@ -142,28 +153,28 @@ class IntercomCommand extends BaseCommand
         } elseif ($requeue) {
             $count = 0;
             foreach ($this->getAllUsers() as $user) {
-                $intercom->queue($user);
+                $this->intercom->queue($user);
                 $count++;
             }
             $output->writeln(sprintf("Queued %d Users", $count));
         } elseif ($maintenance) {
-            $output->writeln(implode(PHP_EOL, $intercom->maintenance()));
+            $output->writeln(implode(PHP_EOL, $this->intercom->maintenance()));
             $output->writeln(sprintf("Finished running maintenance"));
         } elseif ($leadMaintenance) {
-            $output->writeln(implode(PHP_EOL, $intercom->leadsMaintenance()));
+            $output->writeln(implode(PHP_EOL, $this->intercom->leadsMaintenance()));
             $output->writeln(sprintf("Finished running lead maintenance"));
         } elseif ($userMaintenance) {
-            $output->writeln(implode(PHP_EOL, $intercom->usersMaintenance()));
+            $output->writeln(implode(PHP_EOL, $this->intercom->usersMaintenance()));
             $output->writeln(sprintf("Finished running user maintenance"));
         } elseif ($pendingInvites) {
             $count = 0;
             foreach ($this->getPendingInvites() as $invitation) {
-                $intercom->queueInvitation($invitation, IntercomService::QUEUE_EVENT_INVITATION_PENDING);
+                $this->intercom->queueInvitation($invitation, IntercomService::QUEUE_EVENT_INVITATION_PENDING);
                 $count++;
             }
             $output->writeln(sprintf("Queued %d Pending Invitations", $count));
         } else {
-            $count = $intercom->process($process);
+            $count = $this->intercom->process($process);
             $output->writeln(sprintf("Sent %s updates", $count));
         }
     }
@@ -195,14 +206,14 @@ class IntercomCommand extends BaseCommand
 
     private function getUserRepository()
     {
-        $repo = $this->getManager()->getRepository(User::class);
+        $repo = $this->dm->getRepository(User::class);
 
         return $repo;
     }
 
     private function getEmailInvitationRepository()
     {
-        $repo = $this->getManager()->getRepository(EmailInvitation::class);
+        $repo = $this->dm->getRepository(EmailInvitation::class);
 
         return $repo;
     }

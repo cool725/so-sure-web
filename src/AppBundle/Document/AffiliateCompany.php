@@ -21,7 +21,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
 class AffiliateCompany extends Company
 {
     /**
-     * @MongoDB\ReferenceMany(targetDocument="User", mappedBy="affiliateCompany")
+     * @MongoDB\ReferenceMany(targetDocument="User", mappedBy="affiliate")
      */
     protected $confirmedUsers;
 

@@ -2,6 +2,7 @@
 
 namespace AppBundle\Tests\Controller;
 
+use AppBundle\Document\Phone;
 use AppBundle\Service\JudopayService;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Predis\Client;
@@ -25,13 +26,14 @@ class BaseControllerTest extends WebTestCase
     protected static $dm;
     protected static $identity;
     protected static $jwt;
-    /** @var Router */
-    protected static $router;
 
     /** @var Client */
     protected static $redis;
     protected static $invitationService;
     protected static $rootDir;
+
+    /** @var Router */
+    protected static $router;
 
     /** @var JudopayService */
     protected static $judopayService;
@@ -425,5 +427,28 @@ class BaseControllerTest extends WebTestCase
         }
 
         return null;
+    }
+
+    protected function getRandomPhoneAndSetSession($make = null)
+    {
+        /** @var Phone $phone */
+        $phone = self::getRandomPhone(static::$dm, $make);
+
+        $this->setPhoneSession($phone);
+
+        return $phone;
+    }
+
+    protected function setPhoneSession(Phone $phone)
+    {
+        $this->assertNotNull($phone);
+        // set phone in session
+        $crawler = static::$client->request(
+            'GET',
+            static::$router->generate('quote_phone', ['id' => $phone->getId()])
+        );
+        self::verifyResponse(301);
+        $crawler = self::$client->followRedirect();
+        self::verifyResponse(200);
     }
 }

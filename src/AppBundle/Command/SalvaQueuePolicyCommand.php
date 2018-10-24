@@ -4,6 +4,7 @@ namespace AppBundle\Command;
 
 use AppBundle\Repository\PhonePolicyRepository;
 use AppBundle\Service\SalvaExportService;
+use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -12,8 +13,21 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Helper\Table;
 use AppBundle\Document\SalvaPhonePolicy;
 
-class SalvaQueuePolicyCommand extends BaseCommand
+class SalvaQueuePolicyCommand extends ContainerAwareCommand
 {
+    /** @var DocumentManager  */
+    protected $dm;
+
+    /** @var SalvaExportService  */
+    protected $salvaExportService;
+
+    public function __construct(DocumentManager $dm, SalvaExportService $salvaExportService)
+    {
+        parent::__construct();
+        $this->dm = $dm;
+        $this->salvaExportService = $salvaExportService;
+    }
+
     protected function configure()
     {
         $this
@@ -79,8 +93,6 @@ class SalvaQueuePolicyCommand extends BaseCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        /** @var SalvaExportService $salva */
-        $salva = $this->getContainer()->get('app.salva');
         $policyNumber = $input->getOption('policyNumber');
         $prefix = $input->getOption('prefix');
         $cancel = $input->getOption('cancel');
@@ -96,40 +108,39 @@ class SalvaQueuePolicyCommand extends BaseCommand
         }
 
         if ($policyNumber) {
-            $dm = $this->getManager();
             /** @var PhonePolicyRepository $repo */
-            $repo = $dm->getRepository(SalvaPhonePolicy::class);
+            $repo = $this->dm->getRepository(SalvaPhonePolicy::class);
             /** @var SalvaPhonePolicy $phonePolicy */
             $phonePolicy = $repo->findOneBy(['policyNumber' => $policyNumber]);
 
             if ($cancel) {
-                $responseId = $salva->cancelPolicy($phonePolicy, $cancel, $version);
+                $responseId = $this->salvaExportService->cancelPolicy($phonePolicy, $cancel, $version);
                 $output->writeln(sprintf(
                     "Policy %s was successfully cancelled. Response %s",
                     $policyNumber,
                     $responseId
                 ));
             } elseif ($requeue) {
-                $salva->queue($phonePolicy, $requeue, 0);
+                $this->salvaExportService->queue($phonePolicy, $requeue, 0);
                 $output->writeln(sprintf("Policy %s was successfully requeued for %s.", $policyNumber, $requeue));
             } else {
                 if (!$phonePolicy) {
                     throw new \Exception(sprintf('Unable to find Policy %s', $policyNumber));
                 }
-                $responseId = $salva->sendPolicy($phonePolicy);
+                $responseId = $this->salvaExportService->sendPolicy($phonePolicy);
                 $output->writeln(sprintf("Policy %s was successfully send. Response %s", $policyNumber, $responseId));
             }
         } elseif ($clear) {
-            $salva->clearQueue();
+            $this->salvaExportService->clearQueue();
             $output->writeln(sprintf("Queue is cleared"));
         } elseif ($show) {
-            $data = $salva->getQueueData($process);
+            $data = $this->salvaExportService->getQueueData($process);
             $output->writeln(sprintf("Queue Size: %d", count($data)));
             foreach ($data as $line) {
                 $output->writeln(json_encode(unserialize($line), JSON_PRETTY_PRINT));
             }
         } else {
-            $count = $salva->process($process, $prefix);
+            $count = $this->salvaExportService->process($process, $prefix);
             $output->writeln(sprintf("Sent %s policy updates", $count));
         }
     }

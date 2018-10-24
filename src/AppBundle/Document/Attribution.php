@@ -3,6 +3,7 @@
 
 namespace AppBundle\Document;
 
+use AppBundle\Interfaces\EqualsInterface;
 use FOS\UserBundle\Document\User as BaseUser;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Gedmo\Mapping\Annotation as Gedmo;
@@ -16,7 +17,7 @@ use AppBundle\Validator\Constraints\AlphanumericSpaceDotPipeValidator;
  * @MongoDB\EmbeddedDocument
  * @Gedmo\Loggable
  */
-class Attribution
+class Attribution implements EqualsInterface
 {
     const SOURCE_UNTRACKED = 'untracked';
     const SOURCE_ACCOUNT_KIT = 'www.accountkit.com';

@@ -2,6 +2,7 @@
 
 namespace AppBundle\Command;
 
+use AppBundle\Document\Feature;
 use AppBundle\Service\FeatureService;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
@@ -15,6 +16,15 @@ use AppBundle\Document\Claim;
 
 class FeatureCommand extends ContainerAwareCommand
 {
+    /** @var FeatureService */
+    protected $featureService;
+
+    public function __construct(FeatureService $featureService)
+    {
+        parent::__construct();
+        $this->featureService = $featureService;
+    }
+
     protected function configure()
     {
         $this
@@ -42,9 +52,7 @@ class FeatureCommand extends ContainerAwareCommand
             $enabled = filter_var($input->getArgument('enabled'), FILTER_VALIDATE_BOOLEAN);
         }
 
-        /** @var FeatureService $feature */
-        $feature = $this->getContainer()->get('app.feature');
-        $feature->setEnabled($name, $enabled);
+        $this->featureService->setEnabled($name, $enabled);
         $output->writeln(sprintf('%s %s feature flag', $enabled ? 'Enabled' : 'Disabled', $name));
     }
 }

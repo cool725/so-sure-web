@@ -1010,10 +1010,11 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                 if ($payPolicyForm->isValid()) {
                     $date = new \DateTime();
                     $phone = $policy->getPhone();
-                    if ($payPolicyForm->get('monthly')->isClicked()) {
-                        $amount = $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(null, $date);
-                    } elseif ($payPolicyForm->get('yearly')->isClicked()) {
-                        $amount = $phone->getCurrentPhonePrice()->getYearlyPremiumPrice(null, $date);
+                    $currentPrice = $phone->getCurrentPhonePrice();
+                    if ($currentPrice && $payPolicyForm->get('monthly')->isClicked()) {
+                        $amount = $currentPrice->getMonthlyPremiumPrice(null, $date);
+                    } elseif ($currentPrice && $payPolicyForm->get('yearly')->isClicked()) {
+                        $amount = $currentPrice->getYearlyPremiumPrice(null, $date);
                     } else {
                         throw new \Exception('1 or 12 payments only');
                     }
@@ -2498,12 +2499,11 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                         $address->setLine2($this->getDataString($companyForm->getData(), 'address2'));
                         $address->setLine3($this->getDataString($companyForm->getData(), 'address3'));
                         $address->setCity($this->getDataString($companyForm->getData(), 'city'));
-                        // The postcode constructor is what validates, and when it is incorrect it throws an
-                        // exception with no message, so here we catch and release it with a message
+                        $postcode = $this->getDataString($companyForm->getData(), 'postcode');
                         try {
-                            $address->setPostcode($this->getDataString($companyForm->getData(), 'postcode'));
+                            $address->setPostcode($postcode);
                         } catch (\InvalidArgumentException $e) {
-                            throw new \InvalidArgumentException("Invalid Postcode Given.");
+                            throw new \InvalidArgumentException("{$postcode} is not a valid post code.");
                         }
                         $company->setAddress($address);
                         $company->setDays($this->getDataString($companyForm->getData(), 'days'));

@@ -1301,7 +1301,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         for ($i = 1; $i <= $limit + 1; $i++) {
             $user = self::createUser(
                 self::$userManager,
-                self::generateEmail('rate-limit-email-' + $i, $this),
+                self::generateEmail(sprintf('rate-limit-email-%d', $i), $this),
                 'foo'
             );
             $cognitoIdentityId = $this->getAuthUser($user);
@@ -2012,11 +2012,13 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $validFrom->sub(new \DateInterval('PT1H'));
 
         $price = new PhonePrice();
-        $price->setGwp($phone->getCurrentPhonePrice()->getGwp()+1);
+        if ($currentPrice) {
+            $price->setGwp($currentPrice->getGwp() + 1);
+            $currentPrice->setValidTo($validFrom);
+        }
         $price->setValidFrom($validFrom);
         $phone->addPhonePrice($price);
 
-        $currentPrice->setValidTo($validFrom);
 
         $dm->flush();
 
@@ -3097,6 +3099,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $url = sprintf("/api/v1/auth/policy/%s/invitation?debug=true", $inviterPolicyId);
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+            'action' => 'accept',
             'facebook_id' => $invitee->getFacebookId()
         ]);
         $data = $this->verifyResponse(200);

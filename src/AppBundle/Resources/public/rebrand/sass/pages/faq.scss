@@ -90,6 +90,11 @@ body {
         }
     }
 
+    &__sub {
+        width: 100%;
+        padding-top: 8rem;
+    }
+
     &__nav {
         position: fixed;
         top: 10rem;
