@@ -155,6 +155,7 @@ class ValidatePolicyCommand extends ContainerAwareCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $lines = [];
+        $csvData = [];
         $policies = [];
         $date = $input->getOption('date');
         $prefix = $input->getOption('prefix');
@@ -240,7 +241,16 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                         'unpaid' => $unpaid,
                         'validateCancelled' => !$skipCancelled,
                     ];
+                    $prevLines = $lines;
                     $this->validatePolicy($policy, $policies, $lines, $data);
+                    $newLines = array_diff($lines, $prevLines);
+                    $adjustedNewLines = [];
+                    foreach ($newLines as $item) {
+                        if (mb_stripos($item, '<a ') === false) {
+                            $adjustedNewLines[] = $item;
+                        }
+                    }
+                    $csvData[$policy->getPolicyNumber()] = $adjustedNewLines;
                 }
 
                 $lines[] = '';
@@ -293,16 +303,33 @@ class ValidatePolicyCommand extends ContainerAwareCommand
             }
 
             if (!$skipEmail) {
-                $this->mailerService->send(
-                    'Policy Validation & Pending Cancellations',
-                    'tech+ops@so-sure.com',
-                    implode('<br />', $lines)
-                );
+                $this->sendEmail($lines, $csvData);
             }
 
             $output->writeln(implode(PHP_EOL, $lines));
             $output->writeln('Finished');
         }
+    }
+
+    private function sendEmail($lines, $data)
+    {
+        $tmpFile = sprintf('%s/%s', sys_get_temp_dir(), 'sosure-policy-validation.csv');
+        $csvLine = [];
+        foreach ($data as $policyNumber => $errors) {
+            foreach ($errors as $error) {
+                $csvLine[] = sprintf('"%s", "%s"', $policyNumber, str_replace('"', "''", $error));
+            }
+        }
+        $csvData = implode(PHP_EOL, $csvLine);
+        file_put_contents($tmpFile, $csvData);
+
+        $this->mailerService->send(
+            'Policy Validation & Pending Cancellations',
+            'tech+ops@so-sure.com',
+            implode('<br />', $lines),
+            null,
+            [$tmpFile]
+        );
     }
 
     private function validatePolicy(Policy $policy, &$policies, &$lines, $data)
