@@ -3,9 +3,14 @@
 namespace AppBundle\Tests\Service;
 
 use AppBundle\Document\DateTrait;
+use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\SalvaPhonePolicy;
+use AppBundle\Document\User;
 use AppBundle\Exception\MonitorException;
+use AppBundle\Repository\Invitation\InvitationRepository;
 use AppBundle\Service\MonitorService;
 use Exception;
+use MongoDBODMProxies\__CG__\AppBundle\Document\Invitation\EmailInvitation;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\Claim;
 
@@ -23,18 +28,18 @@ class MonitorServiceTest extends WebTestCase
 
     public static function setUpBeforeClass()
     {
-         //start the symfony kernel
-         $kernel = static::createKernel();
-         $kernel->boot();
+        //start the symfony kernel
+        $kernel = static::createKernel();
+        $kernel->boot();
 
-         //get the DI container
-         self::$container = $kernel->getContainer();
+        //get the DI container
+        self::$container = $kernel->getContainer();
 
-         //now we can instantiate our service (if you want a fresh one for
-         //each test method, do this in setUp() instead
-         self::$dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        //now we can instantiate our service (if you want a fresh one for
+        //each test method, do this in setUp() instead
+        self::$dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
         /** @var MonitorService $monitor */
-         self::$monitor = self::$container->get('app.monitor');
+        self::$monitor = self::$container->get('app.monitor');
     }
 
     public function tearDown()
@@ -51,7 +56,7 @@ class MonitorServiceTest extends WebTestCase
             ->getQuery()
             ->execute();
     }
-    
+
     public function testClaimsSettledUnprocessedOk()
     {
         // should not be throwing an exception
@@ -147,5 +152,105 @@ class MonitorServiceTest extends WebTestCase
         // try to clean up, and remove the record
         self::$dm->remove($claim);
         self::$dm->flush();
+    }
+
+    public function testSalvaPolicy()
+    {
+        $policy = new SalvaPhonePolicy();
+        $policy->setPolicyNumber('Mob/2018/55' . str_pad(random_int(0, 99999), 5, '0'));
+        self::$dm->persist($policy);
+        self::$dm->flush();
+
+        $this->expectException(MonitorException::class);
+
+        self::$monitor->findSalvaPolicy();
+
+        self::$dm->remove($policy);
+        self::$dm->flush();
+    }
+
+    public function testTestSalvaPolicy()
+    {
+        $policy = new SalvaPhonePolicy();
+        $policy->setPolicyNumber('INVALID/2018/55' . str_pad(random_int(0, 99999), 5, '0'));
+        self::$dm->persist($policy);
+        self::$dm->flush();
+
+        $this->expectException(MonitorException::class);
+
+        self::$monitor->testSalvaPolicy();
+
+        self::$dm->remove($policy);
+        self::$dm->flush();
+    }
+
+    public function testSalvaStatus()
+    {
+        $policy = new SalvaPhonePolicy();
+        $policy->setPolicyNumber('Mob/2018/55' . str_pad(random_int(0, 99999), 5, '0'));
+        $policy->setSalvaStatus('pending');
+        self::$dm->persist($policy);
+        self::$dm->flush();
+
+        $this->expectException(MonitorException::class);
+
+        self::$monitor->salvaStatus();
+
+        self::$dm->remove($policy);
+        self::$dm->flush();
+    }
+
+    public function testPolicyFiles()
+    {
+        $policy = new SalvaPhonePolicy();
+        $policy->setPolicyNumber('Mob/2018/55' . str_pad(random_int(0, 99999), 5, '0'));
+        self::$dm->persist($policy);
+        self::$dm->flush();
+
+        $this->expectException(MonitorException::class);
+
+        self::$monitor->policyFiles();
+
+        self::$dm->remove($policy);
+        self::$dm->flush();
+    }
+
+    public function testPolicyPending()
+    {
+        $policy = new SalvaPhonePolicy();
+        $policy->setPolicyNumber('Mob/2018/55' . str_pad(random_int(0, 99999), 5, '0'));
+        $policy->setStatus('pending');
+        self::$dm->persist($policy);
+        self::$dm->flush();
+
+        $this->expectException(MonitorException::class);
+
+        self::$monitor->policyPending();
+
+        self::$dm->remove($policy);
+        self::$dm->flush();
+    }
+
+    public function testDuplicateInvites()
+    {
+        $inviteOne = new EmailInvitation();
+        $inviteTwo = new EmailInvitation();
+        $policy = self::createUserPolicy();
+
+        $inviteOne->setEmail(self::generateEmail('foobar', $this));
+        $inviteOne->setPolicy($policy);
+
+        $inviteTwo->setEmail(self::generateEmail('foobar', $this));
+        $inviteTwo->setPolicy($policy);
+
+        self::$dm->persist($policy->getUser());
+        self::$dm->persist($policy);
+        self::$dm->persist($inviteOne);
+        self::$dm->persist($inviteTwo);
+        self::$dm->flush();
+
+        $this->expectException(MonitorException::class);
+
+        self::$monitor->duplicateInvites();
     }
 }
