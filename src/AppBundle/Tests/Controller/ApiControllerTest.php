@@ -847,11 +847,11 @@ class ApiControllerTest extends BaseApiControllerTest
     {
         $cognitoIdentityId = $this->getUnauthIdentity();
         $user = static::createUser(self::$userManager, static::generateEmail('badtoken', $this), 'bar');
-        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/token', array(
-            'token' => $user->getToken() + 'bad',
+        static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/token', array(
+            'token' => sprintf('%s-bad', $user->getToken()),
             'cognito_id' => '123'
         ));
-        $data = $this->verifyResponse(403);
+        $this->verifyResponse(403);
     }
 
     public function testTokenMissing()
