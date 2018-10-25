@@ -259,7 +259,7 @@ abstract class SftpService
             $this->loginSftp();
         }
         $files = $this->sftp->nlist('.', false);
-        if ($files !== false) {
+        if ($files === false) {
             throw new \Exception(sprintf(
                 'List folder Failed. Msg: %s',
                 $this->sftp->getLastSFTPError()
