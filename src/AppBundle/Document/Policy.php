@@ -2702,7 +2702,7 @@ abstract class Policy
         return $this->getStart()->diff($date)->days <= 30;
     }
 
-    public function daysToMaturation($days)
+    public function daysToAquisition($days)
     {
         $now = new \DateTime();
         $now = $days - ($now->diff($this->getStart()))->d;

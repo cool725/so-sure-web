@@ -26,8 +26,8 @@
                 <li class="nav-item {% if charges is defined %}active{% endif %}">
                     <a href="{{ path('admin_affiliate_charge', {'id': affiliate.id}) }}">Monthly Charges</a>
                 </li>
-                <li class="nav-item {% if immatureUsers is defined %}active{% endif %}">
-                    <a href="{{ path('admin_affiliate_immature', {'id': affiliate.id}) }}">Pending Aquisitions</a>
+                <li class="nav-item {% if pending is defined %}active{% endif %}">
+                    <a href="{{ path('admin_affiliate_pending', {'id': affiliate.id}) }}">Pending Aquisitions</a>
                 </li>
             </ul>
 
@@ -97,8 +97,8 @@
             {% endif %}
 
 
-            <!-- immature users table -->
-            {% if immatureUsers is defined %}
+            <!-- pending users table -->
+            {% if pending is defined %}
                 <div class="row">
                     <h2>Pending Aquisitions</h2>
                     <div class="table-responsive">
@@ -106,8 +106,8 @@
                             <thead><tr><th>Total Pending Aquisitions</th><th>Total Cost Pending</th></tr></thead>
                             <tbody>
                                 <tr>
-                                    <td>{{ immatureUsers|length }}</td>
-                                    <td>£{{ immatureUsers|length * affiliate.cpa }}</td>
+                                    <td>{{ pending|length }}</td>
+                                    <td>£{{ pending|length * affiliate.cpa }}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -116,13 +116,13 @@
                     <h2>Details</h2>
                     <div class="table-responsive">
                         <table class="table table-striped">
-                            <thead><tr><th>User</th><th>Start Date</th><th>Days Until Maturation</th></tr></thead>
+                            <thead><tr><th>User</th><th>Start Date</th><th>Days Until Aquisition</th></tr></thead>
                             <tbody>
-                                {% for user in immatureUsers %}
+                                {% for user in pending %}
                                     <tr>
                                         <td><a href="{{ path('admin_user', {'id': user.id }) }}">{{ user.name }}</a></td>
                                         <td>{{ user.getFirstPolicy.getStart|date }}</td>
-                                        <td>{{ user.getFirstPolicy.daysToMaturation(affiliate.days) }}</td>
+                                        <td>{{ user.getFirstPolicy.daysToAquisition(affiliate.days) }}</td>
                                     </tr>
                                 {% endfor %}
                             </tbody>

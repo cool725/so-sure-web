@@ -2565,10 +2565,10 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
     }
 
     /**
-     * @Route("/affiliate/immature/{id}", name="admin_affiliate_immature")
+     * @Route("/affiliate/pending/{id}", name="admin_affiliate_pending")
      * @Template("AppBundle:AdminEmployee:affiliateCharge.html.twig")
      */
-    public function affiliateImmatureAction($id)
+    public function affiliatePendingAction($id)
     {
         $dm = $this->getManager();
         $affiliateRepo = $dm->getRepository(AffiliateCompany::class);
@@ -2577,7 +2577,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         if ($affiliate) {
             return [
                 'affiliate' => $affiliate,
-                'immatureUsers' => $affiliateService->getMatchingUsers($affiliate, false)
+                'pending' => $affiliateService->getMatchingUsers($affiliate, false)
             ];
         } else {
             return ['error' => 'Invalid URL, given ID does not correspond to an affiliate.'];

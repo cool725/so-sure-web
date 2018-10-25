@@ -11,6 +11,7 @@ use AppBundle\Document\File\SalvaPaymentFile;
 use AppBundle\Document\Payment\BacsIndemnityPayment;
 use AppBundle\Document\Sequence;
 use AppBundle\Document\ValidatorTrait;
+use AppBundle\Form\Type\ChargeReportType;
 use AppBundle\Form\Type\BacsMandatesType;
 use AppBundle\Form\Type\UploadFileType;
 use AppBundle\Form\Type\ReconciliationFileType;
@@ -1153,38 +1154,11 @@ class AdminController extends BaseController
      */
     public function chargeAction(Request $request)
     {
-        $form = $this->createFormBuilder()
-            ->add('type', ChoiceType::class, [
-                'choices' => [
-                    'All' => 'all',
-                    'Address' => Charge::TYPE_ADDRESS,
-                    'SMS' => Charge::TYPE_SMS,
-                    'GSMA' => Charge::TYPE_GSMA,
-                    'Make and Model' => Charge::TYPE_MAKEMODEL,
-                    'Claims Check' => Charge::TYPE_CLAIMSCHECK,
-                    'Claims Damage' => Charge::TYPE_CLAIMSDAMAGE,
-                    'Bank Account' => Charge::TYPE_BANK_ACCOUNT,
-                    'Affiliate' => Charge::TYPE_AFFILIATE
-                ],
-                'attr' => ['class' => 'form-control']
-            ])
-            ->add('month', DateType::class, [
-                'widget' => 'single_text',
-                'format' => 'MM-yyyy',
-                'html5' => false,
-                'attr' => ['class' => 'form-control', 'autocomplete' => 'off']
-            ])
-            ->add('build', SubmitType::class, [
-                'label' => 'Build Report',
-                'attr' => ['class' => 'btn btn-info']
-            ])
-            ->setMethod('GET')
-            ->getForm();
-
+        $form = $this->createForm(ChargeReportType::class);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $data = $form->getData();
-            $date = $form->get('month')->getData();
+            $date = $form->get('date')->getData();
             $type = $data['type'];
             if ($type == 'all') {
                 $type = null;

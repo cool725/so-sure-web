@@ -7,7 +7,4 @@ $(function() {
         showTodayButton: true,
         useCurrent: false
     });
-    if (picker.data("DateTimePicker").getDate() == '') {
-        picker.data("DateTimePicker").date(new Date());
-    }
 });
