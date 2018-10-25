@@ -52,6 +52,11 @@ body {
 
         &__btn {
             font-family: $g-bold;
+
+            &:hover,
+            &:focus {
+                text-decoration: none;
+            }
         }
     }
 }
