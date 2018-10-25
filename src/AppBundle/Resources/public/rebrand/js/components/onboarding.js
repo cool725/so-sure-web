@@ -2,6 +2,26 @@
 
 $(function() {
 
+    const carousel    = $('#onboarding-carousel'),
+          totalSlides = $('.carousel-item').length;
+
+          console.log(totalSlides);
+
+    carousel.on('slide.bs.carousel', function(e){
+
+        if (e.to > 1) {
+            $('#onboarding-btn--next').addClass('btn-hide');
+            $('#onboarding-btn--skip').removeClass('btn-hide');
+        }
+
+        if (e.to == 4) {
+            $('#onboarding-btn--skip').addClass('btn-hide');
+            $('#onboarding-btn--login').removeClass('btn-hide');
+        }
+
+    });
+
+
     // const carousel    = $('#onboarding-carousel'),
     //       indicators  = $('.onboarding-indicators li'),
     //       // Get the number of slides to set when to show the controls correctly

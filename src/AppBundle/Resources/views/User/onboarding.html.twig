@@ -39,7 +39,7 @@
 
     <section class="onboarding">
         <div id="onboarding-carousel"
-             class="carousel slide carousel-fade d-flex align-items-center"
+             class="carousel slide d-flex align-items-center"
              data-ride="carousel"
              data-interval="false"
              data-wrap="false">
@@ -50,7 +50,7 @@
                             <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_phone-smile.png" alt="so-sure - Welcome" width="180px">
                         </div>
                         <div class="onboarding__body">
-                            <h2 class="h3 text-primary mb-3">{{ policy.user.firstname }}, You're all covered 🎉</h2>
+                            <h2 class="h4 text-primary mb-3">{{ policy.user.firstname }}, You're all covered 🎉</h2>
                             <p class="mb-4">Thanks for choosing so-sure, your payment is setup. You’ll shortly receive a text link to download our app. Through the app you can reduce excess and earn cashback. Lorem ipsum dolor sit amet adipiscing elit.</p>
                             {% if device_category() == 'Mobile' %}
                                 {% if policy.phone.iTunes %}
@@ -85,7 +85,7 @@
                             <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_phone-qr.png" alt="so-sure - Verify your phone" width="180px">
                         </div>
                         <div class="onboarding__body ml-lg-3">
-                            <h2 class="h3 text-primary mb-3">Reduce your excess by 60%</h2>
+                            <h2 class="h4 text-primary mb-3">Reduce your excess by 60%</h2>
                             <p class="mb-4">After downloading the so-sure app you’ll be able to use our in-app validation to reduce your excess. Nulla sed quam risus. Suspendisse potenti. Maecenas molestie egestas amet scelerisque enim rutrum et.</p>
                             {% if device_category() == 'Mobile' %}
                                 {% if policy.phone.iTunes %}
@@ -120,7 +120,7 @@
                             <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_friends-connect.png" alt="so-sure - Invite your friends and get  rewarded" width="180px">
                         </div>
                         <div class="onboarding__body ml-lg-3">
-                            <h2 class="h3 text-primary mb-3">Invite friends and earn &pound;100</h2>
+                            <h2 class="h4 text-primary mb-3">Invite friends and earn &pound;100</h2>
                             <p class="mb-4">For every person you connect with, we’ll add £10 to your reward pot. If neither of you claim, your cash will be returned at the end of the policy year. For more information on how it works watch our video lorem ipsum.</p>
                             <a href="#onboarding-carousel"
                                class="btn btn-success btn-block-xs"
@@ -141,7 +141,7 @@
                                    class="btn btn-outline-grey"
                                    role="button"
                                    data-target="#onboarding-carousel"
-                                   data-slide-to="5">Skip step</a>
+                                   data-slide-to="4">Skip step</a>
                             {% endif %}
                         </div>
                     </div>
@@ -149,10 +149,10 @@
                 <div class="carousel-item">
                     <div class="onboarding__item p-4">
                         <div class="onboarding__image">
-                            <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_friends-connect.png" alt="so-sure - Invite your friends and get  rewarded">
+                            <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_reward-pot.png" alt="so-sure - Choose how you’d like to invite" width="180px">
                         </div>
                         <div class="onboarding__body ml-lg-3">
-                            <h2 class="h3 text-primary mb-3">Invite your friends and get  rewarded up to &pound;100!</h2>
+                            <h2 class="h4 text-primary mb-3">Choose how you’d like to invite</h2>
                             {# <p class="mb-lg-5">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi sed ex ut lacus efficitur tincidunt sed et odio. Cras dictum tortor molestie orci ullamcorper.</p> #}
                             {# <a href="#" class="btn btn-primary btn-block-xs mr-lg-2">Verify Phone</a> #}
                         </div>
@@ -160,11 +160,9 @@
                 </div>
                 <div class="carousel-item">
                     <div class="onboarding__item p-4">
-                        <div class="onboarding__image">
-                            <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_friends-connect.png" alt="so-sure - Invite your friends and get  rewarded">
-                        </div>
                         <div class="onboarding__body ml-lg-3">
-                            <h2 class="h3 text-primary mb-3">Invite your friends and get  rewarded up to &pound;100!</h2>
+                            <h2 class="h3 text-primary mb-3">Thanks for choosing <span class="text-nowrap">so-sure</span> 😊</h2>
+                            <p class="mb-4">Entesque dolor praesent volutpat elit vehicula pretium placerat. Nam download app sagittis, hendrerit lore in hac habitasse platea.</p>
                             {# <p class="mb-lg-5">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi sed ex ut lacus efficitur tincidunt sed et odio. Cras dictum tortor molestie orci ullamcorper.</p> #}
                             {# <a href="#" class="btn btn-primary btn-block-xs mr-lg-2">Verify Phone</a> #}
                         </div>
@@ -182,17 +180,23 @@
                         <li data-target="#onboarding-carousel"></li>
                     </ol>
                     <a href="#onboarding-carousel"
-                       id="onboarding-btn"
+                       id="onboarding-btn--next"
                        class="onboarding-controls__btn"
                        role="button"
                        data-slide="next">
                        NEXT</a>
-                    <a href="#onboarding-carousel"
-                       id="onboarding-btn"
-                       class="onboarding-controls__btn opacity-50"
+                    <a href="#"
+                       id="onboarding-btn--skip"
+                       class="onboarding-controls__btn opacity-50 btn-hide"
                        role="button"
-                       data-slide-to="5">
+                       data-target="#onboarding-carousel"
+                       data-slide-to="4">
                        SKIP</a>
+                    <a href="{{ path('fos_user_security_login') }}"
+                       id="onboarding-btn--login"
+                       class="onboarding-controls__btn btn-hide"
+                       role="button">
+                       LOGIN</a>
                 </div>
             {% endif %}
         </div>

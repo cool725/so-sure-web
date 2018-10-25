@@ -9,7 +9,7 @@ framework:
     profiler: { only_exceptions: false }
 
 web_profiler:
-    toolbar: true
+    toolbar: false
     intercept_redirects: false
 
 monolog:
@@ -18,17 +18,17 @@ monolog:
             type:   stream
             path:   "%kernel.logs_dir%/salva.log"
             level:  info
-            channels: ["salva"]            
+            channels: ["salva"]
         davies:
             type:   stream
             path:   "%kernel.logs_dir%/davies.log"
             level:  info
-            channels: ["davies"]            
+            channels: ["davies"]
         receperio:
             type:   stream
             path:   "%kernel.logs_dir%/receperio.log"
             level:  info
-            channels: ["receperio"]            
+            channels: ["receperio"]
         main:
             formatter: "app.logger.lineformatter"
             type:   stream
