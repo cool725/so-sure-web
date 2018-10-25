@@ -4331,7 +4331,12 @@ abstract class Policy
             $cancellationDate = clone $this->getPolicyExpirationDate($date);
             // 4 payment retries - 7, 14, 21, 28; should be 30 days unpaid before cancellation
             // 2 days diff + 2 on either side
-            $cancellationDate = $cancellationDate->sub(new \DateInterval('P4D'));
+            if ($this->getUser()->hasJudoPaymentMethod()) {
+                $cancellationDate = $cancellationDate->sub(new \DateInterval('P4D'));
+            } elseif ($this->getUser()->hasBacsPaymentMethod()) {
+                // currently not rescheduling with bacs, 15 days to avoid some incorrect notifications
+                $cancellationDate = $cancellationDate->sub(new \DateInterval('P15D'));
+            }
             if ($cancellationDate <= $date) {
                 return null;
             }
