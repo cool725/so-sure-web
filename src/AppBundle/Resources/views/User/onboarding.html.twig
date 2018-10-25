@@ -11,7 +11,7 @@
 {% block title %}Welcome to Social Insurance{% endblock %}
 
 {% block cssPage %}
-    <link rel="stylesheet" href="{{ asset('css-js/welcome.css') }}">
+    <link rel="stylesheet" href="{{ asset('css-js/onboarding.css') }}">
 {% endblock %}
 
 {% block gtm_data %}
@@ -37,9 +37,9 @@
 
 {% block body %}
 
-    <section class="onboarding">
+    <section class="onboarding pt-5">
         <div id="onboarding-carousel"
-             class="carousel slide d-flex align-items-center"
+             class="carousel slide d-flex align-items-md-center"
              data-ride="carousel"
              data-interval="false"
              data-wrap="false">
@@ -152,9 +152,25 @@
                             <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_reward-pot.png" alt="so-sure - Choose how you’d like to invite" width="180px">
                         </div>
                         <div class="onboarding__body ml-lg-3">
-                            <h2 class="h4 text-primary mb-3">Choose how you’d like to invite</h2>
-                            {# <p class="mb-lg-5">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi sed ex ut lacus efficitur tincidunt sed et odio. Cras dictum tortor molestie orci ullamcorper.</p> #}
-                            {# <a href="#" class="btn btn-primary btn-block-xs mr-lg-2">Verify Phone</a> #}
+                            <h2 class="h4 text-primary mb-4">Choose how you’d like to invite</h2>
+                            <h5 class="text-left text-zaffre">📨 Invite via email</h5>
+                            {{ form_start(email_form, {'attr': {'autocomplete': 'nope'}}) }}
+                                <div class="custom-input-with-btn mb-4">
+                                    {{ form_widget(email_form.email, {'attr': {'placeholder': 'Enter email address', 'class': 'form-control'}}) }}
+                                    {{ form_widget(email_form.submit, {'label': 'invite', 'attr': {'class': 'btn btn-success btn-square btn-sm'}}) }}
+                                </div>
+                                {{ form_errors(email_form.email) }}
+                            {{ form_end(email_form) }}
+                            <h5 class="text-left text-zaffre">🔗 Share this link</h5>
+                            <div class="custom-input-with-btn mb-4">
+                                <input name="scode" id="scode" readonly="readonly" type="text" class="form-control" value="{{ policy.standardSCode.shareLink }}">
+                                <button class="btn btn-primary btn-copy btn-square  btn-sm sosure-track"
+                                    data-clipboard-target="#scode"
+                                    data-toggle="tooltip"
+                                    data-placement="top"
+                                    data-event="user-welcome-copy-scode"
+                                        >copy</button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -163,8 +179,7 @@
                         <div class="onboarding__body ml-lg-3">
                             <h2 class="h3 text-primary mb-3">Thanks for choosing <span class="text-nowrap">so-sure</span> 😊</h2>
                             <p class="mb-4">Entesque dolor praesent volutpat elit vehicula pretium placerat. Nam download app sagittis, hendrerit lore in hac habitasse platea.</p>
-                            {# <p class="mb-lg-5">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi sed ex ut lacus efficitur tincidunt sed et odio. Cras dictum tortor molestie orci ullamcorper.</p> #}
-                            {# <a href="#" class="btn btn-primary btn-block-xs mr-lg-2">Verify Phone</a> #}
+
                         </div>
                     </div>
                 </div>
@@ -218,5 +233,5 @@
 {% endblock %}
 
 {% block javascriptsPage %}
-    <script src="{{ asset('css-js/welcome.js') }}"></script>
+    <script src="{{ asset('css-js/onboarding.js') }}"></script>
 {% endblock %}

@@ -7,7 +7,7 @@ require('bootstrap/js/dist/tooltip');
 require('bootstrap/js/dist/carousel');
 
 // Require components;
-require('../components/onboarding.js');
+// require('../components/onboarding.js');
 let Clipboard = require('clipboard');
 
 $(function() {

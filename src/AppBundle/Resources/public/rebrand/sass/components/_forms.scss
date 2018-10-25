@@ -163,3 +163,22 @@ label {
         }
     }
 }
+
+// Custom Input with button
+// TODO: This could be done better - buttons need more thought
+.custom-input-with-btn {
+    position: relative;
+
+    .form-control {
+        height: 55px;
+        padding-right: 80px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .btn {
+        position: absolute;
+        top: 8px; right: 8px;
+    }
+}

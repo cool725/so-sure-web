@@ -1261,12 +1261,39 @@ class UserController extends BaseController
             parse_str($query, $oauth2FlowParams);
         }
 
+        $emailInvitiation = new EmailInvitation();
+        $emailInvitationForm = $this->get('form.factory')
+            ->createNamedBuilder('email', EmailInvitationType::class, $emailInvitiation)
+            ->getForm();
+
+        if ($request->request->has('email')) {
+            $emailInvitationForm->handleRequest($request);
+            if ($emailInvitationForm->isSubmitted() && $emailInvitationForm->isValid()) {
+                try {
+                    $invitationService->inviteByEmail($policy, $emailInvitiation->getEmail());
+                    $this->addFlash(
+                        'success',
+                        sprintf('%s was invited', $emailInvitiation->getEmail())
+                    );
+                } catch (SelfInviteException $e) {
+                    $this->addFlash('error', 'Sorry, you are not able to invite yourself');
+                } catch (\Exception $e) {
+                    $msg = sprintf('Sorry, there was an error inviting %s', $emailInvitiation->getEmail());
+                    $this->get('logger')->error($msg, ['exception' => $e]);
+                    $this->addFlash('error', $msg);
+                }
+
+                return new RedirectResponse($this->generateUrl('user_policy', ['policyId' => $policy->getId()]));
+            }
+        }
+
         $data = array(
             'cancel_url' => $this->generateUrl('purchase_cancel_damaged', ['id' => $user->getLatestPolicy()->getId()]),
             'policy_key' => $this->getParameter('policy_key'),
             'policy' => $user->getLatestPolicy(),
             'has_visited_welcome_page' => $pageVisited,
             'oauth2FlowParams' => $oauth2FlowParams,
+            'email_form' => $emailInvitationForm->createView(),
         );
 
         return $this->render('AppBundle:User:onboarding.html.twig', $data);

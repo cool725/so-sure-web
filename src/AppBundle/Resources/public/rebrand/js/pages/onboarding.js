@@ -1,11 +1,19 @@
-// modalOnboarding.js
+// onboarding.js
+
+require('../../sass/pages/onboarding.scss');
+
+// Require BS component(s)
+require('bootstrap/js/dist/tooltip');
+require('bootstrap/js/dist/carousel');
+
+// Require components
 
 $(function() {
 
     const carousel    = $('#onboarding-carousel'),
           totalSlides = $('.carousel-item').length;
 
-          console.log(totalSlides);
+          // console.log(totalSlides);
 
     carousel.on('slide.bs.carousel', function(e){
 
