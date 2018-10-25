@@ -333,7 +333,6 @@ class SalvaExportServiceTest extends WebTestCase
         sleep(1);
         
         $now = new \DateTime();
-        $now = $now->sub(new \DateInterval('PT1S'));
         $chargeback = new ChargebackPayment();
         $chargeback->setDate($now);
         $chargeback->setSource(Payment::SOURCE_ADMIN);
