@@ -7,8 +7,10 @@ use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\User;
 use AppBundle\Exception\MonitorException;
+use AppBundle\Form\Type\UserRoleType;
 use AppBundle\Repository\Invitation\InvitationRepository;
 use AppBundle\Service\MonitorService;
+use Doctrine\Tests\Common\DataFixtures\TestDocument\Role;
 use Exception;
 use AppBundle\Document\Invitation\EmailInvitation;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -170,7 +172,7 @@ class MonitorServiceTest extends WebTestCase
     /**
      * @expectedException \Exception
      */
-    public function testTestSalvaPolicy()
+    public function testInvalidPolicy()
     {
         $policy = new SalvaPhonePolicy();
         $policy->setPolicyNumber('INVALID/2018/55' . str_pad(random_int(0, 99999), 5, '0'));
@@ -178,7 +180,7 @@ class MonitorServiceTest extends WebTestCase
         self::$dm->persist($policy);
         self::$dm->flush();
 
-        self::$monitor->testSalvaPolicy();
+        self::$monitor->invalidPolicy();
     }
 
     /**
@@ -198,10 +200,25 @@ class MonitorServiceTest extends WebTestCase
     /**
      * @expectedException \Exception
      */
+    public function testPolicyFiles()
+    {
+        $user = new User();
+        $policy = new SalvaPhonePolicy();
+        $policy->setPolicyNumber('Mob/2018/55' . str_pad(random_int(0, 99999), 5, '0'));
+        $policy->setUser($user);
+
+        self::$dm->persist($policy);
+        self::$dm->flush();
+
+        self::$monitor->policyFiles();
+    }
+
+    /**
+     * @expectedException \Exception
+     */
     public function testPolicyPending()
     {
         $user = new User();
-        $user->setEmail(self::generateEmail('foo', $this));
         $policy = new SalvaPhonePolicy();
         $policy->setPolicyNumber('Mob/2018/55' . str_pad(random_int(0, 99999), 5, '0'));
         $policy->setStatus('pending');
@@ -235,5 +252,37 @@ class MonitorServiceTest extends WebTestCase
         self::$dm->flush();
 
         self::$monitor->duplicateInvites();
+    }
+
+    /**
+     * @expectedException \Exception
+     */
+    public function testCheckAllUserRolePriv()
+    {
+        $database = self::$dm->getConnection()->selectDatabase('so-sure');
+
+        $database->command([
+            'createRole' => 'so-sure-user',
+            'privileges' => [
+                ['resource' => ['db' => 'so-sure', 'collection' => 'Phone'], 'actions' => ['find' , 'update', 'remove']]
+            ],
+            'roles' => []
+        ]);
+
+        $database->command([
+            'createUser' => 'SOSUREUSER',
+            'pwd' => 'sosure',
+            'roles' => ['so-sure-user']
+        ]);
+
+        self::$monitor->checkAllUserRolePriv();
+
+        $database->command([
+            'dropUser' => 'SOSUREUSER'
+        ]);
+
+        $database->command([
+            'dropRole' => 'so-sure-user'
+        ]);
     }
 }
