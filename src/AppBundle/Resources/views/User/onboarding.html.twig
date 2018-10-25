@@ -3,7 +3,7 @@
 {# Set vars #}
 {% set body_class = 'oboarding' %}
 {% set onboarding_mode = true %}
-{% set include_emoji = 1 %}
+{% set include_emoji = true %}
 {% set intercom_enabled = false %}
 {# {% set starling = false %} #}
 {% set hide_devbar = true %}
@@ -39,53 +39,86 @@
 
     <section class="onboarding">
         <div id="onboarding-carousel"
-             class="carousel slide"
+             class="carousel slide carousel-fade d-flex align-items-center"
              data-ride="carousel"
              data-interval="false"
              data-wrap="false">
             <div class="carousel-inner">
                 <div class="carousel-item active">
-                    <div class="onboarding__item">
-                        <div class="modal-onboarding__image">
-                            <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_app.png" alt="so-sure - Download the app">
+                    <div class="onboarding__item p-4">
+                        <div class="onboarding__image">
+                            <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_phone-smile.png" alt="so-sure - Download the app" width="180px">
                         </div>
-                        <div class="modal-onboarding__body">
-                            <h2 class="h3 text-primary mb-3">Download the so-sure app and lorem ipsum dolor</h2>
-                            <p class="mb-lg-5">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi sed ex ut lacus efficitur tincidunt sed et odio. Cras dictum tortor molestie orci ullamcorper.</p>
-                            <a href="#" class="btn btn-primary btn-block-xs mr-lg-2">Send</a>
+                        <div class="onboarding__body">
+                            <h2 class="h3 text-primary mb-3">{{ policy.user.firstname }}, You're all covered 🎉</h2>
+                            <p class="mb-4">Thanks for choosing so-sure, your payment is setup. You’ll shortly receive a text link to download our app. Through the app you can reduce excess and earn cashback. Lorem ipsum dolor sit amet adipiscing elit.</p>
+                            {% if device_category() == 'Mobile' %}
+                                {% if policy.phone.iTunes %}
+                                    itunes
+                                {% endif %}
+                                {% if policy.phone.googlePlay %}
+                                    android
+                                {% endif %}
+                                {# <a href="#" class="btn btn-primary btn-block-xs mr-lg-2">Send</a> #}
+                            {% else %}
+                                <a href="#onboarding-carousel"
+                                   class="btn btn-primary"
+                                   role="button"
+                                   data-slide="next">Next</a>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
-                <div class="carousel-item onboarding__item">
-                    <div class="modal-onboarding__image">
-                        <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_phone-qr.png" alt="so-sure - Verify your phone">
-                    </div>
-                    <div class="modal-onboarding__body ml-lg-3">
-                        <h2 class="h3 text-primary mb-3">Verify your phone &amp; reduce  your excess</h2>
-                        <p class="mb-lg-5">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi sed ex ut lacus efficitur tincidunt sed et odio. Cras dictum tortor molestie orci ullamcorper.</p>
-                        <a href="#" class="btn btn-primary btn-block-xs mr-lg-2">Verify Phone</a>
+                <div class="carousel-item">
+                    <div class="onboarding__item p-4">
+                        <div class="onboarding__image">
+                            <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_phone-qr.png" alt="so-sure - Verify your phone">
+                        </div>
+                        <div class="onboarding__body ml-lg-3">
+                            <h2 class="h3 text-primary mb-3">Verify your phone &amp; reduce  your excess</h2>
+                            {# <p class="mb-lg-5">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi sed ex ut lacus efficitur tincidunt sed et odio. Cras dictum tortor molestie orci ullamcorper.</p> #}
+                            {# <a href="#" class="btn btn-primary btn-block-xs mr-lg-2">Verify Phone</a> #}
+                        </div>
                     </div>
                 </div>
-                <div class="carousel-item onboarding__item">
-                    <div class="modal-onboarding__image">
-                        <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_friends-connect.png" alt="so-sure - Invite your friends and get  rewarded">
+                <div class="carousel-item">
+                    <div class="onboarding__item p-4">
+                        <div class="onboarding__image">
+                            <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_phone-qr.png" alt="so-sure - Verify your phone">
+                        </div>
+                        <div class="onboarding__body ml-lg-3">
+                            <h2 class="h3 text-primary mb-3">Verify your phone &amp; reduce  your excess</h2>
+                            {# <p class="mb-lg-5">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi sed ex ut lacus efficitur tincidunt sed et odio. Cras dictum tortor molestie orci ullamcorper.</p> #}
+                            {# <a href="#" class="btn btn-primary btn-block-xs mr-lg-2">Verify Phone</a> #}
+                        </div>
                     </div>
-                    <div class="modal-onboarding__body ml-lg-3">
-                        <h2 class="h3 text-primary mb-3">Invite your friends and get  rewarded up to &pound;100!</h2>
-                        <p class="mb-lg-5">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi sed ex ut lacus efficitur tincidunt sed et odio. Cras dictum tortor molestie orci ullamcorper.</p>
-                        <a href="#" class="btn btn-primary btn-block-xs mr-lg-2">Verify Phone</a>
+                </div>
+                <div class="carousel-item">
+                    <div class="onboarding__item p-4">
+                        <div class="onboarding__image">
+                            <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_friends-connect.png" alt="so-sure - Invite your friends and get  rewarded">
+                        </div>
+                        <div class="onboarding__body ml-lg-3">
+                            <h2 class="h3 text-primary mb-3">Invite your friends and get  rewarded up to &pound;100!</h2>
+                            {# <p class="mb-lg-5">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi sed ex ut lacus efficitur tincidunt sed et odio. Cras dictum tortor molestie orci ullamcorper.</p> #}
+                            {# <a href="#" class="btn btn-primary btn-block-xs mr-lg-2">Verify Phone</a> #}
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="onboarding__controls-mobile p-4 d-flex justify-content-between align-items-center">
+            <div class="onboarding-controls__mobile p-4 d-flex justify-content-between align-items-center">
                 <ol class="carousel-indicators">
                     <li data-target="#onboarding-carousel"
-                        data-slide-to="0"
                         class="active"></li>
-                    <li data-target="#onboarding-carousel" data-slide-to="1"></li>
-                    <li data-target="#onboarding-carousel" data-slide-to="2"></li>
+                    <li data-target="#onboarding-carousel"></li>
+                    <li data-target="#onboarding-carousel"></li>
                 </ol>
-                <a href="#">Next</a>
+                <a href="#onboarding-carousel"
+                   id="onboarding-btn"
+                   class="onboarding-controls__btn"
+                   role="button"
+                   data-slide="next">
+                   NEXT</a>
             </div>
         </div>
     </section>

@@ -6,6 +6,7 @@
 @import "../abstracts/mixins";
 @import "../abstracts/palette";
 @import "../abstracts/variables";
+@import "../base/fonts";
 
 body {
     // background-color: $crayon-blue;
@@ -15,34 +16,43 @@ body {
 .onboarding {
     overflow: hidden;
 
+    // Allow us to position the indicators outside
     .carousel {
-        // height: 100vh;
+        height: 100vh;
         position: static;
     }
 
-    .carousel-item {
-        // height: 100vh;
-        text-align: center;
+    // .carousel-item {
 
-        &.active {
-            // display: flex;
-        }
-    }
+    //     &.active {
+    //     }
+    // }
 
     // Overide indicators
     .carousel-indicators {
         position: static;
         margin: 0;
+
+        li {
+            @include border-radius(12px);
+        }
     }
 
     &__item {
-        height: 100vh;
+        text-align: center;
     }
 
-    &__controls-mobile {
-        position: absolute;
-        bottom: 0; left: 0; right: 0;
-        background-color: $selago;
+    &-controls {
+
+        &__mobile {
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            background-color: $selago;
+        }
+
+        &__btn {
+            font-family: $g-bold;
+        }
     }
 }
 
