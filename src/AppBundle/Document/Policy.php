@@ -3895,6 +3895,7 @@ abstract class Policy
             $reward = new SoSurePotRewardPayment();
             $reward->setDate(clone $dateNotNull);
             $reward->setAmount($this->toTwoDp($promoPotValue - $promoPotReward->getAmount()));
+            $reward->setNotes('Adjustment to Pot as claim was settled');
             $this->addPayment($reward);
         }
 
@@ -3905,6 +3906,7 @@ abstract class Policy
             $reward = new PotRewardPayment();
             $reward->setDate(clone $dateNotNull);
             $reward->setAmount($this->toTwoDp($standardPotValue - $potReward->getAmount()));
+            $reward->setNotes('Adjustment to Pot as claim was settled');
             $this->addPayment($reward);
         }
 
