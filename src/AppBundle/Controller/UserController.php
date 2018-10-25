@@ -1287,6 +1287,13 @@ class UserController extends BaseController
             }
         }
 
+        $sixpack = $this->get('app.sixpack');
+        $shareExperimentText = $sixpack->getText(
+            SixpackService::EXPIRED_EXPERIMENT_SHARE_MESSAGE,
+            SixpackService::ALTERNATIVES_SHARE_MESSAGE_SIMPLE,
+            [$policy->getStandardSCode()->getShareLink(), $policy->getStandardSCode()->getCode()]
+        );
+
         $data = array(
             'cancel_url' => $this->generateUrl('purchase_cancel_damaged', ['id' => $user->getLatestPolicy()->getId()]),
             'policy_key' => $this->getParameter('policy_key'),
@@ -1294,6 +1301,7 @@ class UserController extends BaseController
             'has_visited_welcome_page' => $pageVisited,
             'oauth2FlowParams' => $oauth2FlowParams,
             'email_form' => $emailInvitationForm->createView(),
+            'share_experiment_text' => $shareExperimentText,
         );
 
         return $this->render('AppBundle:User:onboarding.html.twig', $data);

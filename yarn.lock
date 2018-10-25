@@ -4077,6 +4077,10 @@ jsprim@^1.2.2:
     json-schema "0.2.3"
     verror "1.10.0"
 
+"jssocials@https://github.com/so-sure/jssocials":
+  version "1.5.0"
+  resolved "https://github.com/so-sure/jssocials#dfde48aba32ecf500a8b183121b19f430eff8649"
+
 killable@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/killable/-/killable-1.0.0.tgz#da8b84bd47de5395878f95d64d02f2449fe05e6b"

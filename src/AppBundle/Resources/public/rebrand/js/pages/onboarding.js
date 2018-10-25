@@ -7,6 +7,7 @@ require('bootstrap/js/dist/tooltip');
 require('bootstrap/js/dist/carousel');
 
 // Require components
+require('jssocials');
 
 $(function() {
 
@@ -29,6 +30,24 @@ $(function() {
 
     });
 
+    // Copy scode
+
+    // Social Sharing
+    // Share buttons
+    $('#onboarding-btn--share').jsSocials({
+        shares: ['whatsapp', 'twitter', 'facebook'],
+        url: $(this).data('share-link'),
+        text: $(this).data('share-text'),
+        shareIn: 'popup',
+        showLabel: false,
+        showCount: false,
+        on: {
+            click: function(e) {
+                console.log(this.share);
+                sosure.track.byInvite(this.share);
+            }
+        }
+    });
 
     // const carousel    = $('#onboarding-carousel'),
     //       indicators  = $('.onboarding-indicators li'),
