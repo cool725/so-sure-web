@@ -2046,7 +2046,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     {
         if ($this->affiliate) {
             return static::AQUISITION_COMPLETED;
-        } elseif ($this->hasActivePolicy()) {
+        } elseif ($this->hasActivePolicy() || $this->hasUnpaidPolicy()) {
             return static::AQUISITION_PENDING;
         } elseif ($this->hasPolicy()) {
             return static::AQUISITION_LOST;
