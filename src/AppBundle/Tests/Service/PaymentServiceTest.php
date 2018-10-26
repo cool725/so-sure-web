@@ -53,7 +53,7 @@ class PaymentServiceTest extends WebTestCase
     protected static $paymentService;
     protected static $redis;
     protected static $fraudService;
-    /** @var $routerService */
+    /** @var RouterService */
     protected static $routerService;
 
     public static function setUpBeforeClass()
