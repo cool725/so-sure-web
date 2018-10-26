@@ -52,6 +52,7 @@ class PurchaseStepPledgeType extends AbstractType
         $builder
             ->add('agreedDamage', CheckboxType::class, ['required' => $this->required])
             ->add('agreedAgeLocation', CheckboxType::class, ['required' => $this->required])
+            ->add('agreedExcess', CheckboxType::class, ['required' => $this->required])
             ->add('agreedTerms', CheckboxType::class, ['required' => $this->required])
             ->add('next', SubmitType::class)
         ;

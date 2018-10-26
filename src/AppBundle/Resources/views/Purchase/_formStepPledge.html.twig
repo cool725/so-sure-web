@@ -32,6 +32,13 @@
             <div class="with-errors">{{ form_errors(purchase_form.agreedAgeLocation) }}</div>
         </div>
         <div class="form-group">
+            {{ form_widget(purchase_form.agreedExcess, {
+                'label': 'I understand the standard excess is £150, and only reduced when validated with the so-sure app (£50 for damage/breakdown &£70 for loss/theft)',
+                'attr': {'class':'custom-control-input'}}
+            ) }}
+            <div class="with-errors">{{ form_errors(purchase_form.agreedAgeLocation) }}</div>
+        </div>
+        <div class="form-group">
             {{ form_widget(purchase_form.agreedTerms, {
                 'label': 'I have read & understood the so-sure policy document',
                 'attr': {'class':'custom-control-input'}}

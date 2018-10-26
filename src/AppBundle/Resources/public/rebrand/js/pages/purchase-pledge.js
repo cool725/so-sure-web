@@ -44,6 +44,9 @@ sosure.purchaseStepPledge = (function() {
                 "purchase_form[agreedAgeLocation]": {
                     required: ''
                 },
+                "purchase_form[agreedExcess]": {
+                    required: ''
+                },
                 "purchase_form[agreedTerms]": {
                     required: ''
                 }
