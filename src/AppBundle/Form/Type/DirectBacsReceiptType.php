@@ -3,6 +3,8 @@
 namespace AppBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\RadioType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
@@ -20,6 +22,7 @@ class DirectBacsReceiptType extends AbstractType
         $years = [$year, $year - 1];
         $builder
             ->add('date', DateType::class, ['required' => true, 'years' => $years])
+            ->add('manual', CheckboxType::class, ['required' => false])
             ->add('amount', TextType::class, ['required' => true])
             ->add('totalCommission', TextType::class, ['required' => true])
             ->add('notes', TextType::class, ['required' => true])

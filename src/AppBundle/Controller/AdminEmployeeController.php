@@ -724,10 +724,9 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             } elseif ($request->request->has('bacs_form')) {
                 $bacsForm->handleRequest($request);
                 if ($bacsForm->isValid()) {
-                    if ($bacsPayment->getAmount() < 0) {
-                        // refunds should be scheduled
+                    // non-manual payments should be scheduled
+                    if (!$bacsPayment->isManual()) {
                         $bacsPayment->setStatus(BacsPayment::STATUS_PENDING);
-                        $bacsPayment->setManual(false);
                         if (!$policy->getUser()->hasBacsPaymentMethod()) {
                             $this->get('logger')->warning(sprintf(
                                 'Payment (Policy %s) is scheduled, however no bacs account for user',
