@@ -189,6 +189,10 @@ class ApiController extends BaseController
 
             $intercomHash = $this->get('app.intercom')->getApiUserHash($user);
 
+            if (!$user->getFirstLoginInApp()) {
+                $user->setFirstLoginInApp(new \DateTime());
+            }
+
             $response = $user->toApiArray($intercomHash, $identityId, $token);
             $this->get('logger')->info(sprintf('loginAction Resp %s', json_encode($response)));
 
@@ -674,6 +678,7 @@ class ApiController extends BaseController
             }
             $user->setBirthday($birthday);
             $user->setIdentityLog($this->getIdentityLog($request));
+            $user->setFirstLoginInApp(new \DateTime());
             if ($this->isDataStringPresent($data, 'scode')) {
                 $scodeRepo = $dm->getRepository(SCode::class);
                 $scode = $scodeRepo->findOneBy(['code' => $this->getDataString($data, 'scode')]);

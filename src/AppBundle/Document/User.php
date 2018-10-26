@@ -401,6 +401,13 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
      */
     protected $handlingTeam;
 
+    /**
+     * @Assert\DateTime()
+     * @MongoDB\Field(type="date")
+     * @Gedmo\Versioned
+     */
+    protected $firstLoginInApp;
+
     public function __construct()
     {
         parent::__construct();
@@ -1846,6 +1853,16 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         }
 
         return 500 / 12;
+    }
+
+    public function getFirstLoginInApp()
+    {
+        return $this->firstLoginInApp;
+    }
+
+    public function setFirstLoginInApp($firstLoginInApp)
+    {
+        $this->firstLoginInApp = $firstLoginInApp;
     }
 
     public function hasValidDetails()
