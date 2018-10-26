@@ -28,6 +28,7 @@ use AppBundle\Repository\PhonePolicyRepository;
 use AppBundle\Repository\PolicyRepository;
 use AppBundle\Repository\UserRepository;
 use Doctrine\ODM\MongoDB\DocumentManager;
+use PHPUnit\Framework\Error\Error;
 use Psr\Log\LoggerInterface;
 
 class MonitorService
@@ -652,6 +653,7 @@ class MonitorService
     public function invalidPolicy()
     {
         $repo = $this->dm->getRepository(Policy::class);
+
         $policies = $repo->findBy([
             'policyNumber' => new \MongoRegex('/INVALID\/*/'),
             'salvaPolicyResults' => ['$lte' => ['$size' => 0]]
@@ -679,7 +681,7 @@ class MonitorService
         if (count($policies) > 0) {
             foreach ($policies as $policy) {
                 throw new MonitorException(
-                    "Policy {$policy[0]->getPolicyNumber()} is pending review"
+                    "Policy {$policy->getPolicyNumber()} is pending review"
                 );
             }
         }
@@ -690,10 +692,13 @@ class MonitorService
         $repo = $this->dm->getRepository(Policy::class);
         $policyFiles = $repo->findBy([
             'policyNumber' => new \MongoRegex('/Mob\/*/'),
-            '$or' => [['policyFiles' => ['$not' => null]], ['policyFiles' => ['$size' => 0]]]
+            '$or' => [
+                ['policyFiles' => null],
+                ['policyFiles' => ['$size' => 0]]
+            ]
         ]);
 
-        if (count($policyFiles > 0)) {
+        if (count($policyFiles) > 0) {
             foreach ($policyFiles as $policy) {
                 throw new MonitorException(
                     "Policy {$policy->getPolicyNumber()} has no files"
@@ -707,13 +712,15 @@ class MonitorService
         $repo = $this->dm->getRepository(Policy::class);
         $policies = $repo->findBy([
             'policyNumber' => new \MongoRegex('/Mob\/*/'),
-            'status' => SalvaPhonePolicy::SALVA_STATUS_PENDING
+            'status' => Policy::STATUS_PENDING
         ]);
 
         if (count($policies) > 0) {
-            throw new MonitorException(
-                "Policy {$policies[0]->getPolicyNumber()} with email {$policies[0]->getUser()->getEmail()} is pending"
-            );
+            foreach ($policies as $policy) {
+                throw new MonitorException(
+                    "Policy {$policy->getPolicyNumber()} with email {$policy->getUser()->getEmail()} is pending"
+                );
+            }
         }
     }
 
@@ -741,9 +748,15 @@ class MonitorService
 
         if (count($results) > 0) {
             foreach ($results as $result) {
-                throw new MonitorException(
-                    "Found duplicate Invites on email {$result[0]->getEmail()}"
-                );
+                try {
+                    throw new MonitorException(
+                        "Found duplicate Invites on email {$result->getEmail()}"
+                    );
+                } catch (\Error $e) {
+                    throw new MonitorException(
+                        "Found duplicate Invites without details"
+                    );
+                }
             }
         }
     }
@@ -791,6 +804,24 @@ class MonitorService
 
         foreach ($collections as $col) {
             $this->checkSoSureRole($col);
+        }
+    }
+
+    public function checkExpiration()
+    {
+        $results = $this->dm->createQueryBuilder(Policy::class)
+            ->field('status')
+            ->in([Policy::STATUS_UNPAID, Policy::STATUS_ACTIVE])
+            ->field('end')
+            ->lt(new \DateTime())
+            ->getQuery()
+            ->execute();
+
+        foreach ($results as $result) {
+            throw new MonitorException(
+                "Policy {$result->getPolicyNumber()} is active/unpaid but expired!" . PHP_EOL .
+                "Expired since {$result->getEnd()->format('Y-M-D H:m')} !"
+            );
         }
     }
 }

@@ -4,6 +4,7 @@ namespace AppBundle\Tests\Service;
 
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\Policy;
 use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\User;
 use AppBundle\Exception\MonitorException;
@@ -15,6 +16,7 @@ use Exception;
 use AppBundle\Document\Invitation\EmailInvitation;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\Claim;
+use Symfony\Component\Validator\Constraints\Date;
 
 /**
  * @group functional-nonet
@@ -52,7 +54,13 @@ class MonitorServiceTest extends WebTestCase
 
     public function tearDown()
     {
-        // block tearDown from running, because setUpBeforeClass
+        parent::tearDown();
+
+        $qb = static::$dm->createQueryBuilder(Policy::class);
+
+        $qb->remove()
+            ->getQuery()
+            ->execute();
     }
 
     public function setUp()
@@ -164,8 +172,8 @@ class MonitorServiceTest extends WebTestCase
      */
     public function testSalvaPolicy()
     {
-        $policy = self::createUserPolicy();
-        $policy->create(rand(1, 999999), 'Mob', null, rand(1, 999999));
+        $policy = new SalvaPhonePolicy();
+        $policy->setPolicyNumber($this->getRandomPolicyNumber('Mob'));
 
         self::$dm->persist($policy);
         self::$dm->flush();
@@ -178,8 +186,10 @@ class MonitorServiceTest extends WebTestCase
      */
     public function testInvalidPolicy()
     {
-        $policy = self::createUserPolicy();
-        $policy->create(rand(1, 999999), 'INVALID', null, rand(1, 999999));
+        $policy = new SalvaPhonePolicy();
+        $policy->setPolicyNumber($this->getRandomPolicyNumber('INVALID'));
+        $policy->addSalvaPolicyResults('0', SalvaPhonePolicy::RESULT_TYPE_CREATE, []);
+
         self::$dm->persist($policy);
         self::$dm->flush();
 
@@ -191,8 +201,8 @@ class MonitorServiceTest extends WebTestCase
      */
     public function testSalvaStatus()
     {
-        $policy = self::createUserPolicy();
-        $policy->create(rand(1, 999999), 'Mob', null, rand(1, 999999));
+        $policy = new SalvaPhonePolicy();
+        $policy->setPolicyNumber($this->getRandomPolicyNumber('Mob'));
         $policy->setSalvaStatus('pending');
 
         self::$dm->persist($policy);
@@ -206,8 +216,8 @@ class MonitorServiceTest extends WebTestCase
      */
     public function testPolicyFiles()
     {
-        $policy = self::createUserPolicy();
-        $policy->create(rand(1, 999999), 'Mob', null, rand(1, 999999));
+        $policy = new SalvaPhonePolicy();
+        $policy->setPolicyNumber($this->getRandomPolicyNumber('Mob'));
 
         self::$dm->persist($policy);
         self::$dm->flush();
@@ -220,11 +230,18 @@ class MonitorServiceTest extends WebTestCase
      */
     public function testPolicyPending()
     {
-        $policy = self::createUserPolicy();
-        $policy->create(rand(1, 999999), 'Mob', null, rand(1, 999999));
-        $policy->setStatus('pending');
+        $policy = new SalvaPhonePolicy();
+        $policy->setPolicyNumber($this->getRandomPolicyNumber('Mob'));
+
+        $user = new User();
+        $user->setEmail(self::generateEmail('pending', $this));
+
+        $policy->setUser($user);
+        $policy->setStatus(Policy::STATUS_PENDING);
 
         self::$dm->persist($policy);
+        self::$dm->persist($policy->getUser());
+
         self::$dm->flush();
 
         self::$monitor->policyPending();
@@ -237,16 +254,21 @@ class MonitorServiceTest extends WebTestCase
     {
         $inviteOne = new EmailInvitation();
         $inviteTwo = new EmailInvitation();
-        $policy = self::createUserPolicy();
 
-        $inviteOne->setEmail(self::generateEmail('foobar', $this));
+        $user = new User();
+        $user->setEmail('foo@bar.com');
+
+        $policy = new SalvaPhonePolicy();
+        $policy->setUser($user);
+
+        $inviteOne->setEmail($user->getEmail());
         $inviteOne->setPolicy($policy);
 
-        $inviteTwo->setEmail(self::generateEmail('foobar', $this));
+        $inviteTwo->setEmail($user->getEmail());
         $inviteTwo->setPolicy($policy);
 
-        self::$dm->persist($policy->getUser());
         self::$dm->persist($policy);
+        self::$dm->persist($user);
         self::$dm->persist($inviteOne);
         self::$dm->persist($inviteTwo);
         self::$dm->flush();
@@ -284,5 +306,25 @@ class MonitorServiceTest extends WebTestCase
         $database->command([
             'dropRole' => 'so-sure-user'
         ]);
+    }
+
+    /**
+     * @expectedException \AppBundle\Exception\MonitorException
+     */
+    public function testCheckExpiration()
+    {
+        $policy = new SalvaPhonePolicy();
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        $policy->setEnd((new \DateTime())->sub(new \DateInterval('P1D')));
+
+        self::$dm->persist($policy);
+        self::$dm->flush();
+
+        self::$monitor->checkExpiration();
+    }
+
+    private function getRandomPolicyNumber($prefix)
+    {
+        return sprintf($prefix . '/2018/55' . str_pad(random_int(0, 99999), 5, '0'));
     }
 }
