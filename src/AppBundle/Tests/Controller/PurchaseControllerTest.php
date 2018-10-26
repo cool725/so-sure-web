@@ -279,7 +279,10 @@ class PurchaseControllerTest extends BaseControllerTest
         $this->assertContains('/purchase/step-payment', self::$client->getHistory()->current()->getUri());
 
         $crawler = $this->setPayment($crawler, $phone);
-        self::verifyResponse(200);
+        self::verifyResponse(302);
+        $crawler = self::$client->followRedirect();
+        $link = $crawler->filter('#web-pay-submit')->first()->link();
+        $crawler = self::$client->click($link);
         $this->verifyPurchaseReady($crawler);
     }
 
@@ -506,7 +509,10 @@ class PurchaseControllerTest extends BaseControllerTest
         $this->assertContains('/purchase/step-payment', self::$client->getHistory()->current()->getUri());
 
         $crawler = $this->setPayment($crawler, $phone);
-        self::verifyResponse(200);
+        self::verifyResponse(302);
+        $crawler = self::$client->followRedirect();
+        $link = $crawler->filter('#web-pay-submit')->first()->link();
+        $crawler = self::$client->click($link);
         $this->verifyPurchaseReady($crawler);
     }
 
@@ -538,7 +544,10 @@ class PurchaseControllerTest extends BaseControllerTest
         $this->assertContains('/purchase/step-payment', self::$client->getHistory()->current()->getUri());
 
         $crawler = $this->setPayment($crawler, $phone);
-        self::verifyResponse(200);
+        self::verifyResponse(302);
+        $crawler = self::$client->followRedirect();
+        $link = $crawler->filter('#web-pay-submit')->first()->link();
+        $crawler = self::$client->click($link);
         $this->verifyPurchaseReady($crawler);
     }
 
@@ -659,7 +668,10 @@ class PurchaseControllerTest extends BaseControllerTest
         $this->assertContains('/purchase/step-payment', self::$client->getHistory()->current()->getUri());
 
         $crawler = $this->setPayment($crawler, $phone);
-        self::verifyResponse(200);
+        self::verifyResponse(302);
+        $crawler = self::$client->followRedirect();
+        $link = $crawler->filter('#web-pay-submit')->first()->link();
+        $crawler = self::$client->click($link);
         $this->verifyPurchaseReady($crawler);
     }
 
@@ -691,7 +703,10 @@ class PurchaseControllerTest extends BaseControllerTest
         $this->assertContains('/purchase/step-payment', self::$client->getHistory()->current()->getUri());
 
         $crawler = $this->setPayment($crawler, $phone);
-        self::verifyResponse(200);
+        self::verifyResponse(302);
+        $crawler = self::$client->followRedirect();
+        $link = $crawler->filter('#web-pay-submit')->first()->link();
+        $crawler = self::$client->click($link);
         $this->verifyPurchaseReady($crawler);
     }
 
@@ -723,7 +738,10 @@ class PurchaseControllerTest extends BaseControllerTest
         $this->assertContains('/purchase/step-payment', self::$client->getHistory()->current()->getUri());
 
         $crawler = $this->setPayment($crawler, $phone);
-        self::verifyResponse(200);
+        self::verifyResponse(302);
+        $crawler = self::$client->followRedirect();
+        $link = $crawler->filter('#web-pay-submit')->first()->link();
+        $crawler = self::$client->click($link);
         $this->verifyPurchaseReady($crawler);
     }
 
@@ -761,7 +779,10 @@ class PurchaseControllerTest extends BaseControllerTest
         $this->assertContains('/purchase/step-payment', self::$client->getHistory()->current()->getUri());
 
         $crawler = $this->setPayment($crawler, $phone);
-        self::verifyResponse(200);
+        self::verifyResponse(302);
+        $crawler = self::$client->followRedirect();
+        $link = $crawler->filter('#web-pay-submit')->first()->link();
+        $crawler = self::$client->click($link);
         $this->verifyPurchaseReady($crawler);
     }
 
@@ -1303,7 +1324,7 @@ class PurchaseControllerTest extends BaseControllerTest
 
         return $crawler;
     }
-    
+
     public function testLeadInvalidEmail()
     {
         $this->getRandomPhoneAndSetSession();
