@@ -45,6 +45,18 @@ body {
         overflow-y: scroll;
         // This is nasty
         padding-bottom: 150px;
+
+        @include media-breakpoint-up(lg) {
+            width: 80%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        @include media-breakpoint-up(xl) {
+            width: 60%;
+        }
     }
 
     &-controls {
@@ -57,10 +69,13 @@ body {
 
         &__btn {
             font-family: $g-bold;
+            color: $dodger-blue;
 
             &:hover,
-            &:focus {
+            &:focus,
+            &:active {
                 text-decoration: none;
+                color: $dodger-blue
             }
         }
     }

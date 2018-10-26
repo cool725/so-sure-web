@@ -39,13 +39,13 @@
 
     <section class="onboarding pt-5">
         <div id="onboarding-carousel"
-             class="carousel slide d-flex align-items-md-center"
+             class="carousel slide"
              data-ride="carousel"
              data-interval="false"
              data-wrap="false">
             <div class="carousel-inner">
                 <div class="carousel-item active">
-                    <div class="onboarding__item p-4">
+                    <div class="onboarding__item pt-4 px-4 mx-lg-auto">
                         <div class="onboarding__image">
                             <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_phone-smile.png" alt="so-sure - Welcome" width="180px">
                         </div>
@@ -69,22 +69,25 @@
                                        rel="noopener">
                                         Download our App</a>
                                 {% endif %}
-                                {# <a href="#" class="btn btn-primary btn-block-xs mr-lg-2">Send</a> #}
                             {% else %}
                                 <a href="#onboarding-carousel"
                                    class="btn btn-primary"
                                    role="button"
-                                   data-slide="next">Next</a>
+                                   data-slide="next">Next <i class="far fa-long-arrow-right fa-lg ml-2"></i></a>
+
+                                <div class="mt-4">
+                                    <a href="#" class="link-subtle">Re-send my app link</a>
+                                </div>
                             {% endif %}
                         </div>
                     </div>
                 </div>
                 <div class="carousel-item">
-                    <div class="onboarding__item pt-4 px-4">
+                    <div class="onboarding__item pt-4 px-4 mx-lg-auto">
                         <div class="onboarding__image">
                             <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_phone-qr.png" alt="so-sure - Verify your phone" width="180px">
                         </div>
-                        <div class="onboarding__body ml-lg-3">
+                        <div class="onboarding__body">
                             <h2 class="h4 text-primary mb-3">Reduce your excess by 60%</h2>
                             <p class="mb-4">After downloading the so-sure app you’ll be able to use our in-app validation to reduce your excess. Nulla sed quam risus. Suspendisse potenti. Maecenas molestie egestas amet scelerisque enim rutrum et.</p>
                             {% if device_category() == 'Mobile' %}
@@ -104,28 +107,31 @@
                                        rel="noopener">
                                         Download our App</a>
                                 {% endif %}
-                                {# <a href="#" class="btn btn-primary btn-block-xs mr-lg-2">Send</a> #}
                             {% else %}
                                 <a href="#onboarding-carousel"
                                    class="btn btn-primary"
                                    role="button"
-                                   data-slide="next">Next</a>
+                                   data-slide="next">Next <i class="far fa-long-arrow-right fa-lg ml-2"></i></a>
+
+                                <div class="mt-4">
+                                    <a href="#" class="link-subtle">Re-send my app link</a>
+                                </div>
                             {% endif %}
                         </div>
                     </div>
                 </div>
                 <div class="carousel-item">
-                    <div class="onboarding__item pt-4 px-4">
+                    <div class="onboarding__item pt-4 px-4 mx-lg-auto">
                         <div class="onboarding__image">
                             <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_friends-connect.png" alt="so-sure - Invite your friends and get  rewarded" width="180px">
                         </div>
-                        <div class="onboarding__body ml-lg-3">
+                        <div class="onboarding__body">
                             <h2 class="h4 text-primary mb-3">Invite friends and earn &pound;100</h2>
                             <p class="mb-4">For every person you connect with, we’ll add £10 to your reward pot. If neither of you claim, your cash will be returned at the end of the policy year. For more information on how it works watch our video lorem ipsum.</p>
                             <a href="#onboarding-carousel"
                                class="btn btn-success btn-block-xs"
                                role="button"
-                               data-slide="next">Let's get inviting</a>
+                               data-slide="next">Let's get inviting <i class="far fa-long-arrow-right fa-lg ml-2"></i></a>
                             {% if device_category() == 'Mobile' %}
 {#                                 <a href="#"
                                    class="btn btn-outline-primary watch-video btn-block-xs"
@@ -138,93 +144,122 @@
                                 </a> #}
                             {% else %}
                                 <a href="#"
-                                   class="btn btn-outline-grey"
+                                   class="btn btn-outline-grey ml-md-2 opacity-50"
                                    role="button"
                                    data-target="#onboarding-carousel"
                                    data-slide-to="4">Skip step</a>
+
+                                <div class="mt-4">
+                                    <a href="#" class="link-subtle">Re-send my app link</a>
+                                </div>
                             {% endif %}
                         </div>
                     </div>
                 </div>
                 <div class="carousel-item">
-                    <div class="onboarding__item pt-4 px-4">
+                    <div class="onboarding__item pt-4 px-4 mx-lg-auto">
                         <div class="onboarding__image">
                             <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_reward-pot.png" alt="so-sure - Choose how you’d like to invite" width="180px">
                         </div>
-                        <div class="onboarding__body ml-lg-3">
+                        <div class="onboarding__body">
                             <h2 class="h4 text-primary mb-4">Choose how you’d like to invite</h2>
-                            <h5 class="text-left text-zaffre">📨 Invite via email</h5>
-                            {{ form_start(email_form, {'attr': {'autocomplete': 'nope'}}) }}
-                                <div class="custom-input-with-btn mb-4">
-                                    {{ form_widget(email_form.email, {'attr': {'placeholder': 'Enter email address', 'class': 'form-control'}}) }}
-                                    {{ form_widget(email_form.submit, {'label': 'invite', 'attr': {'class': 'btn btn-success btn-square btn-sm'}}) }}
+                            <div class="d-lg-flex">
+                                <h5 class="text-left text-zaffre d-lg-none">📨 Invite via email</h5>
+                                {{ form_start(email_form, {'attr': {'autocomplete': 'nope'}}) }}
+                                    <div class="custom-input-with-btn mb-4">
+                                        {{ form_widget(email_form.email, {'attr': {'placeholder': 'Enter email address', 'class': 'form-control'}}) }}
+                                        {{ form_widget(email_form.submit, {'label': 'invite', 'attr': {'class': 'btn btn-success btn-square btn-sm'}}) }}
+                                    </div>
+                                    {{ form_errors(email_form.email) }}
+                                {{ form_end(email_form) }}
+                                <h5 class="text-left text-zaffre d-lg-none">🔗 Share this link</h5>
+                                <div class="custom-input-with-btn mb-4 ml-lg-4">
+                                    <input name="scode" id="scode" readonly="readonly" type="text" class="form-control" value="{{ policy.standardSCode.shareLink }}">
+                                    <button class="btn btn-primary btn-copy btn-square  btn-sm sosure-track"
+                                        data-clipboard-target="#scode"
+                                        data-toggle="tooltip"
+                                        data-placement="top"
+                                        data-event="user-welcome-copy-scode"
+                                            >copy</button>
                                 </div>
-                                {{ form_errors(email_form.email) }}
-                            {{ form_end(email_form) }}
-                            <h5 class="text-left text-zaffre">🔗 Share this link</h5>
-                            <div class="custom-input-with-btn mb-4">
-                                <input name="scode" id="scode" readonly="readonly" type="text" class="form-control" value="{{ policy.standardSCode.shareLink }}">
-                                <button class="btn btn-primary btn-copy btn-square  btn-sm sosure-track"
-                                    data-clipboard-target="#scode"
-                                    data-toggle="tooltip"
-                                    data-placement="top"
-                                    data-event="user-welcome-copy-scode"
-                                        >copy</button>
                             </div>
                         </div>
-                        <h5 class="text-primary">Invite via social</h5>
-                        <div id="onboarding-btn--share"
-                             data-share-link="{{ policy.standardSCode.shareLink }}"
-                             data-share-text="{{ share_experiment_text }}">
+                        <div class="d-lg-flex align-items-lg-center mt-lg-3">
+                            <h5 class="text-zaffre mr-lg-3 mb-lg-0">Invite via social:</h5>
+                            {# TODO: Rework icons #}
+                            <div id="onboarding-btn--share"
+                                 data-share-link="{{ policy.standardSCode.shareLink }}"
+                                 data-share-text="{{ share_experiment_text }}">
+                            </div>
                         </div>
+                        {% if device_category() == 'Mobile' %}
+
+                        {% else %}
+                            <div class="mt-4">
+                                <a href="#"
+                                   class="btn btn-outline-grey ml-md-2 opacity-50"
+                                   role="button"
+                                   data-target="#onboarding-carousel"
+                                   data-slide-to="4">Skip step</a>
+                            </div>
+                        {% endif %}
                     </div>
                 </div>
                 <div class="carousel-item">
-                    <div class="onboarding__item pt-4 px-4">
-                        <div class="onboarding__body ml-lg-3">
+                    <div class="onboarding__item pt-4 px-4 mx-lg-auto">
+                        <div class="onboarding__body">
                             <h2 class="h3 text-primary mb-3">Thanks for choosing <span class="text-nowrap">so-sure</span> 😊</h2>
                             <p class="mb-4">Entesque dolor praesent volutpat elit vehicula pretium placerat. Nam download app sagittis, hendrerit lore in hac habitasse platea.</p>
                             <div class="summary-cardbox">
                                 <div class="summary-cardbox__header">
                                     <h4 class="text-primary mb-0">Policy Summary</h4>
                                 </div>
-                                <div class="summary-cardbox__body">
-                                    <h5 class="text-primary">Phone:</h5>
-                                    <p>{{ policy.phone.make }} {{ policy.phone.model }} ({{ policy.phone.memory }}GB)</p>
-                                    <h5 class="text-primary">Policy number:</h5>
-                                    <p>{{ policy.policyNumber }}</p>
-                                    <h5 class="text-primary">Cost:</h5>
-                                    <p>
-                                        {% if policy.getPremiumPlan == 'monthly'%}
-                                            &pound;{{ policy.premium.monthlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }} per month
-                                        {% elseif policy.getPremiumPlan == 'yearly' %}
-                                            &pound;{{ policy.premium.yearlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }} a year
-                                        {% else %}
-                                            Unknown
-                                        {% endif %}
-                                    </p>
-                                    <h5 class="text-primary">Start/End Date:</h5>
-                                    <p>{{ policy.start|date('d/m/y', 'Europe/London') }} - {{ policy.end|date('d/m/y', 'Europe/London') }}</p>
+                                <div class="summary-cardbox__body d-lg-flex align-items-lg-center">
+                                    <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_holding-phone.png" alt="so-sure - super quick cover" width="160px" class="d-none d-lg-inline mr-4">
+                                    <div class="summary-cardbox__body-sub">
+                                        <div class="row">
+                                            <div class="col-lg-6">
+                                                <h5 class="text-primary">Phone:</h5>
+                                                <p>{{ policy.phone.make }} {{ policy.phone.model }} ({{ policy.phone.memory }}GB)</p>
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <h5 class="text-primary">Policy number:</h5>
+                                                <p>{{ policy.policyNumber }}</p>
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <h5 class="text-primary">Cost:</h5>
+                                                <p>
+                                                    {% if policy.getPremiumPlan == 'monthly'%}
+                                                        &pound;{{ policy.premium.monthlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }} per month
+                                                    {% elseif policy.getPremiumPlan == 'yearly' %}
+                                                        &pound;{{ policy.premium.yearlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }} a year
+                                                    {% else %}
+                                                        Unknown
+                                                    {% endif %}
+                                                </p>
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <h5 class="text-primary">Start/End Date:</h5>
+                                                <p>{{ policy.start|date('d/m/y', 'Europe/London') }} - {{ policy.end|date('d/m/y', 'Europe/London') }}</p>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="summary-cardbox__cta">
                                     <a href="#">Download policy details <i class="fal fa-download ml-2"></i></a>
                                 </div>
                             </div>
-
-{# <div class="card">
-  <div class="card-header">
-    Featured
-  </div>
-  <div class="card-body">
-    <h5 class="card-title">Special title treatment</h5>
-    <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
-    <a href="#" class="btn btn-primary">Go somewhere</a>
-  </div>
-    <div class="card-footer text-muted">
-    2 days ago
-  </div>
-</div> #}
                         </div>
+                        {% if device_category() == 'Mobile' %}
+
+                        {% else %}
+                            <div class="mt-5">
+                                <a href="{{ path('fos_user_security_login') }}"
+                                   class="btn btn-outline-primary"
+                                   role="button">
+                                   Customer login <i class="far fa-long-arrow-right fa-lg ml-2"></i></a>
+                            </div>
+                        {% endif %}
                     </div>
                 </div>
             </div>

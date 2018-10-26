@@ -122,7 +122,7 @@
     @include border-radius(0.85rem);
 
     &__header {
-        padding: 0.75rem 1.25rem;
+        padding: 1rem 1.25rem;
         border-bottom: 2px solid $selago;
     }
 
@@ -136,7 +136,7 @@
         a {
             text-align: center;
             display: block;
-            padding: 0.75rem 1.25rem;
+            padding: 1rem 1.25rem;
             margin: 0 -1px -1px;
             font-family: $g-medium;
             background-color: $dodger-blue;
