@@ -13,6 +13,15 @@ use AppBundle\Document\PhonePolicy;
 
 class ReceperioQueueCommand extends ContainerAwareCommand
 {
+    /** @var ReceperioService  */
+    protected $receperioService;
+
+    public function __construct(ReceperioService $receperioService)
+    {
+        parent::__construct();
+        $this->receperioService = $receperioService;
+    }
+
     protected function configure()
     {
         $this
@@ -42,28 +51,30 @@ class ReceperioQueueCommand extends ContainerAwareCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        /** @var ReceperioService $receperio */
-        $receperio = $this->getContainer()->get('app.imei');
         $clear = true === $input->getOption('clear');
         $show = true === $input->getOption('show');
         $process = $input->getOption('process');
 
         if ($clear) {
             if ($process > 0) {
-                $receperio->clearQueue($process);
+                $this->receperioService->clearQueue($process);
                 $output->writeln(sprintf("Queue is cleared of %d messages", $process));
             } else {
-                $receperio->clearQueue();
+                $this->receperioService->clearQueue();
                 $output->writeln(sprintf("Queue is cleared"));
             }
         } elseif ($show) {
-            $data = $receperio->getQueueData($process);
-            $output->writeln(sprintf("Queue Size: %d (%d shown)", $receperio->getQueueSize(), count($data)));
+            $data = $this->receperioService->getQueueData($process);
+            $output->writeln(sprintf(
+                "Queue Size: %d (%d shown)",
+                $this->receperioService->getQueueSize(),
+                count($data)
+            ));
             foreach ($data as $line) {
                 $output->writeln(json_encode(unserialize($line), JSON_PRETTY_PRINT));
             }
         } else {
-            $count = $receperio->process($process);
+            $count = $this->receperioService->process($process);
             $output->writeln(sprintf("Reprocessed %d checks", $count));
         }
     }

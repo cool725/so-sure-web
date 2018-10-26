@@ -61,6 +61,10 @@ class Salva
         '59c0bfe778537e2c68430cd7', // policy not fully paid
         '59327f0687fda67ea6788977', // debt collector did not fully collect
         '59d47a1496a9626f3c3b8650', // unresolved claim on policy - ignore
+        '59e39831e388097cdd74f567', // not fully paid policy; logic is slightly off, but ignore policy for now
+        '59ee52cb7a3db4298324d7b1', // not fully paid policy; logic is slightly off, but ignore policy for now
+        '59ef69bb7a3db40bfd2a7a67', // not fully paid policy; logic is slightly off, but ignore policy for now
+        '5a5770754ea92e22451bbef7', // not fully paid policy; logic is slightly off, but ignore policy for now
     ];
 
     public function sumBrokerFee($months, $includeFinalCommission)

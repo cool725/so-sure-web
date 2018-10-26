@@ -6,6 +6,7 @@ use AppBundle\Annotation\DataChange;
 use AppBundle\Document\BacsPaymentMethod;
 use AppBundle\Document\BankAccount;
 use AppBundle\Document\CurrencyTrait;
+use AppBundle\Interfaces\EqualsInterface;
 use Doctrine\Common\Annotations\Reader;
 use Doctrine\ODM\MongoDB\Event\PreUpdateEventArgs;
 use Symfony\Component\PropertyAccess\PropertyAccess;
@@ -76,6 +77,10 @@ class BaseDoctrineListener
             }
 
             if ($compare == self::COMPARE_EQUAL) {
+                if (is_float($oldValue)) {
+                    return $this->areEqualToSixDp($oldValue, $newValue);
+                }
+
                 return $oldValue !== $newValue;
             } elseif ($compare == self::COMPARE_CASE_INSENSITIVE) {
                 return mb_strtolower($oldValue) !== mb_strtolower($newValue);
@@ -86,8 +91,10 @@ class BaseDoctrineListener
                     return false;
                 } elseif (!$oldValue && $newValue) {
                     return true;
-                } else {
+                } elseif ($oldValue instanceof EqualsInterface) {
                     return !$oldValue->equals($newValue);
+                } else {
+                    return null;
                 }
             } elseif ($compare == self::COMPARE_INCREASE) {
                 return $oldValue < $newValue;

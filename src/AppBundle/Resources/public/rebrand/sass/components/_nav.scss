@@ -26,9 +26,29 @@
     }
 }
 
+@include media-breakpoint-up(lg) {
+    .navbar-so-sure {
+
+        .nav-active {
+            position: relative;
+
+            &:before {
+                width: 100%; height: 4px;
+                content: '';
+                background-color: $deep-sky-blue-b;;
+                position: absolute;
+                left: 0; top: -0.55rem;
+            }
+            // border-top: 2px solid $deep-sky-blue-b;
+        }
+    }
+}
+
 // Pages we have the same gradient for the 'hero' add here
 .home,
-.landing {
+.landing,
+.social-insurance,
+.error-page {
     .navbar-so-sure {
         background-image: none;
     }

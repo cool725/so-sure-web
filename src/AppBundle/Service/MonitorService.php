@@ -4,16 +4,20 @@ namespace AppBundle\Service;
 use AppBundle\Classes\Salva;
 use AppBundle\Document\Cashback;
 use AppBundle\Document\Claim;
+use AppBundle\Document\Connection\Connection;
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\File\AccessPayFile;
 use AppBundle\Document\File\DaviesFile;
 use AppBundle\Document\File\DirectGroupFile;
+use AppBundle\Document\Invitation\Invitation;
+use AppBundle\Document\Form\Bacs;
 use AppBundle\Document\MultiPay;
 use AppBundle\Document\Payment\BacsPayment;
 use AppBundle\Document\Payment\Payment;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Policy;
 use AppBundle\Document\PolicyTerms;
+use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\User;
 use AppBundle\Exception\MonitorException;
 use AppBundle\Repository\BacsPaymentRepository;
@@ -471,11 +475,25 @@ class MonitorService
 
     public function bacsPayments()
     {
+        $twoDays = new \DateTime();
+        $twoDays = $this->subBusinessDays($twoDays, 2);
         /** @var BacsPaymentRepository $paymentsRepo */
         $paymentsRepo = $this->dm->getRepository(BacsPayment::class);
         foreach ($paymentsRepo->findPayments(new \DateTime()) as $payment) {
             /** @var BacsPayment $payment */
-            if ($payment->canAction(new \DateTime()) && $payment->getSource() != Payment::SOURCE_ADMIN) {
+            if ($payment->getSource() == Payment::SOURCE_ADMIN) {
+                continue;
+            }
+
+            // TODO: Fixme
+            // There's a horrible hack on refund listener where payments must be successful for salva refund amounts
+            // to work out.
+            if ($payment->getAmount() < 0 && $payment->isSuccess() &&
+                $payment->getStatus() == BacsPayment::STATUS_PENDING && $payment->getDate() < $twoDays) {
+                continue;
+            }
+
+            if ($payment->canAction(new \DateTime())) {
                 throw new MonitorException(sprintf('There are bacs payments waiting actioning: %s', $payment->getId()));
             }
         }
@@ -488,14 +506,26 @@ class MonitorService
 
         /** @var BacsPayment[] $unpaid */
         $unpaid = $paymentsRepo->findUnprocessedPaymentsOlderThanDays(
-            [BacsPayment::STATUS_PENDING, BacsPayment::STATUS_GENERATED],
-            1
+            [BacsPayment::STATUS_PENDING],
+            BacsPayment::DAYS_PROCESSING
         );
 
         /** @noinspection LoopWhichDoesNotLoopInspection */
         foreach ($unpaid as $payment) {
             /** @var BacsPayment $payment */
-            throw new MonitorException('There are pending/generated bacs payments waiting: ' . $payment->getId());
+            throw new MonitorException('There are pending bacs payments waiting: ' . $payment->getId());
+        }
+
+        /** @var BacsPayment[] $unpaid */
+        $unpaid = $paymentsRepo->findUnprocessedPaymentsOlderThanDays(
+            [BacsPayment::STATUS_GENERATED],
+            BacsPayment::DAYS_REVERSE
+        );
+
+        /** @noinspection LoopWhichDoesNotLoopInspection */
+        foreach ($unpaid as $payment) {
+            /** @var BacsPayment $payment */
+            throw new MonitorException('There are generated bacs payments waiting: ' . $payment->getId());
         }
     }
 
@@ -525,6 +555,8 @@ class MonitorService
             new \MongoId('5aa6dec854e50f46ab3e8874'),
             new \MongoId('5ac61e7a7c62216654636bea'),
             new \MongoId('5ad5e80e75435e73e152874f'),
+            new \MongoId('5bd0381fedc29544427b31ab'),
+            new \MongoId('5bd03821edc29544427b31af'),
         ];
 
         $commissionValidationPolicyExclusions = [];
@@ -603,4 +635,99 @@ class MonitorService
             ]
         );
     }
+
+    public function salvaPolicy()
+    {
+        $repo = $this->dm->getRepository(Policy::class);
+        $policies = $repo->findBy([
+            'policyNumber' => new \MongoRegex('/Mob\/*/'),
+            'salvaPolicyResults' => ['$lte' => ['$size' => 0]]
+        ]);
+
+        if (count($policies) > 0) {
+            throw new MonitorException(
+                "Policy {$policies[0]->getPolicyNumber()} has more than 0 salva policy results"
+            );
+        }
+    }
+
+    public function testSalvaPolicy()
+    {
+        $repo = $this->dm->getRepository(Policy::class);
+        $policies = $repo->findBy([
+            'policyNumber' => new \MongoRegex('/INVALID\/*/'),
+            'salvaPolicyResults' => ['$lte' => ['$size' => 0]]
+        ]);
+
+        if (count($policies) == 0) {
+            throw new MonitorException(
+                "Failed to find any policies..."
+            );
+        }
+    }
+
+    public function salvaStatus()
+    {
+        $repo = $this->dm->getRepository(Policy::class);
+        $policies = $repo->findBy([
+            'policyNumber' => new \MongoRegex('/Mob\/*/'),
+            'salvaStatus' => ['$nin' => [
+                null,
+                SalvaPhonePolicy::SALVA_STATUS_ACTIVE,
+                SalvaPhonePolicy::SALVA_STATUS_CANCELLED]
+            ]
+        ]);
+
+        if (count($policies) > 0) {
+            throw new MonitorException(
+                "Policy {$policies[0]->getPolicyNumber()} is pending review"
+            );
+        }
+    }
+
+    public function policyPending()
+    {
+        $repo = $this->dm->getRepository(Policy::class);
+        $policies = $repo->findBy([
+            'policyNumber' => new \MongoRegex('/Mob\/*/'),
+            'status' => SalvaPhonePolicy::SALVA_STATUS_PENDING
+        ]);
+
+        if (count($policies) > 0) {
+            throw new MonitorException(
+                "Policy {$policies[0]->getPolicyNumber()} with email {$policies[0]->getUser()->getEmail()} is pending"
+            );
+        }
+    }
+
+    public function duplicateInvites()
+    {
+        $collection = $this->dm->getDocumentCollection(Invitation::class);
+        $builder = $collection->createAggregationBuilder();
+
+        $result = $builder
+            ->group()
+                ->field('_id')
+                ->expression(
+                    $builder->expr()
+                        ->field('email')
+                        ->expression('$email')
+                        ->field('policy')
+                        ->expression('$policy')
+                )
+                ->field('count')
+                ->sum(1)
+            ->match()
+                ->field('count')
+                ->gt(1)
+            ->execute();
+
+        if (count($result) > 0) {
+            throw new MonitorException(
+                "Found duplicate Invites on email {$result[0]->getEmail()}"
+            );
+        }
+    }
+
+    //TODO: so-sure-user-role, so-sure-user-roles, policy-files
 }

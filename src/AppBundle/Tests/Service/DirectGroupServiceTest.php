@@ -1265,7 +1265,7 @@ class DirectGroupServiceTest extends WebTestCase
     {
         $policy = static::createUserPolicy(true);
         $claim = new Claim();
-        $claim->setApprovedDate(new \DateTime('2016-01-02'));
+        $claim->setApprovedDate(new \DateTime('2016-01-04'));
         $policy->addClaim($claim);
 
         $directGroupClaim = new DirectGroupHandlerClaim();

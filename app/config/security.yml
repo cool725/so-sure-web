@@ -31,6 +31,7 @@ security:
         oauth2_api:
             pattern:    ^/bearer-api
             fos_oauth: true
+            provider: fos_userbundle
             stateless: true
             anonymous: false
 
@@ -90,15 +91,13 @@ security:
         - { path: ^/admin/, role: ROLE_EMPLOYEE }
         - { path: ^/claims$, role: ROLE_CLAIMS, ips: [ "%davies_ip%" ] }
         - { path: ^/claims$, role: ROLE_CLAIMS, ips: [ "%directgroup_ip%" ] }
-        - { path: ^/claims$, role: ROLE_CLAIMS, ips: [ "%sosure_rwe_ip%" ] }
-        - { path: ^/claims$, role: ROLE_CLAIMS, ips: [ "%sosure_patrick_ip%" ] }
         - { path: ^/claims$, role: ROLE_CLAIMS, ips: [ "127.0.0.1" ] }
+        - { path: ^/claims$, role: ROLE_CLAIMS, ips: "%sosure_ips%" }
         - { path: ^/claims$, role: ROLE_NO_ACCESS }
         - { path: ^/claims/, role: ROLE_CLAIMS, ips: [ "%davies_ip%" ] }
         - { path: ^/claims/, role: ROLE_CLAIMS, ips: [ "%directgroup_ip%" ] }
-        - { path: ^/claims/, role: ROLE_CLAIMS, ips: [ "%sosure_rwe_ip%" ] }
-        - { path: ^/claims/, role: ROLE_CLAIMS, ips: [ "%sosure_patrick_ip%" ] }
         - { path: ^/claims/, role: ROLE_CLAIMS, ips: [ "127.0.0.1" ] }
+        - { path: ^/claims/, role: ROLE_CLAIMS, ips: "%sosure_ips%" }
         - { path: ^/claims/, role: ROLE_NO_ACCESS }
         - { path: ^/alpha$, role: ROLE_USER }
         - { path: ^/user$, role: ROLE_USER }

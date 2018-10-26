@@ -387,6 +387,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
 
         $policies = $policyRepo->findBy(['status' => Policy::STATUS_ACTIVE]);
         foreach ($policies as $policy) {
+            /** @var Policy $policy */
             if (count($policy->getClaims()) == 0 && count($policy->getUser()->getPolicies()) == 1) {
                 if (!$fraud && $policy->canCancel(Policy::CANCELLED_ACTUAL_FRAUD)) {
                     $fraud = true;
@@ -639,9 +640,9 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $policy->setPhone($phone);
         $policy->setImei($this->generateRandomImei());
         if ($picSure == self::PICSURE_NON_POLICY) {
-            $policy->init($user, $nonPicSureTerms);            
+            $policy->init($user, $nonPicSureTerms);
         } else {
-            $policy->init($user, $latestTerms);            
+            $policy->init($user, $latestTerms);
         }
         if (!$code) {
             $policy->createAddSCode($count);
@@ -891,7 +892,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             $submissionFile->addMetadata('credit-amount', $submissionFile->getMetadata()['credit-amount']+$amount*-1);
             $inputFile->addMetadata('credit-accepted-value', $inputFile->getMetadata()['credit-accepted-value']+$amount*-1);
         } else {
-            $submissionFile->addMetadata('debit-amount', $submissionFile->getMetadata()['debit-amount']+$amount);            
+            $submissionFile->addMetadata('debit-amount', $submissionFile->getMetadata()['debit-amount']+$amount);
             $inputFile->addMetadata('debit-accepted-value', $inputFile->getMetadata()['debit-accepted-value']+$amount);
         }
         $manager->persist($submissionFile);
@@ -1051,6 +1052,8 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $claim->setDescription($this->getRandomDescription($claim));
         $claim->setIncurred(array_sum([$claim->getClaimHandlingFees(), $claim->getTransactionFees(), $claim->getAccessories(),
             $phone->getReplacementPriceOrSuggestedReplacementPrice(), $claim->getUnauthorizedCalls()]));
+
+        $claim->setTotalIncurred($claim->getIncurred() + $claim->getClaimHandlingFees());
 
         $policy->addClaim($claim);
         $manager->persist($claim);

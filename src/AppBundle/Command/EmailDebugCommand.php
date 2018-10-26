@@ -11,6 +11,8 @@ use AppBundle\Service\JudopayService;
 use AppBundle\Service\MailerService;
 use AppBundle\Service\PolicyService;
 use AppBundle\Service\RouterService;
+use Doctrine\ODM\MongoDB\DocumentManager;
+use FOS\UserBundle\Mailer\Mailer;
 use Predis\Client;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
@@ -25,10 +27,51 @@ use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Cashback;
 use AppBundle\Document\Connection\StandardConnection;
 use AppBundle\Classes\SoSure;
+use Symfony\Component\Routing\Router;
 
-class EmailDebugCommand extends BaseCommand
+class EmailDebugCommand extends ContainerAwareCommand
 {
     use CurrencyTrait;
+
+    /** @var DocumentManager */
+    protected $dm;
+
+    /** @var string */
+    protected $environment;
+
+    /** @var PolicyService */
+    protected $policyService;
+
+    /** @var JudopayService */
+    protected $judopayService;
+
+    /** @var Client */
+    protected $redisMailer;
+
+    /** @var RouterService */
+    protected $routerService;
+
+    /** @var MailerService */
+    protected $mailerService;
+
+    public function __construct(
+        DocumentManager $dm,
+        $environment,
+        PolicyService $policyService,
+        JudopayService $judopayService,
+        Client $redisMailer,
+        RouterService $routerService,
+        MailerService $mailerService
+    ) {
+        parent::__construct();
+        $this->dm = $dm;
+        $this->environment = $environment;
+        $this->policyService = $policyService;
+        $this->judopayService = $judopayService;
+        $this->redisMailer = $redisMailer;
+        $this->routerService = $routerService;
+        $this->mailerService = $mailerService;
+    }
 
     protected function configure()
     {
@@ -64,11 +107,11 @@ class EmailDebugCommand extends BaseCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        /** @var Client $redis */
-        $redis = $this->getContainer()->get('snc_redis.mailer');
-        $output->writeln(sprintf('%d emails in queue (prior to this)', $redis->llen('swiftmailer')));
-        $env = $this->getContainer()->getParameter('kernel.environment');
-        if (!in_array($env, ['vagrant', 'staging', 'testing'])) {
+        $output->writeln(sprintf(
+            '%d emails in queue (prior to this)',
+            $this->redisMailer->llen('swiftmailer')
+        ));
+        if (!in_array($this->environment, ['vagrant', 'staging', 'testing'])) {
             throw new \Exception('Only able to run in vagrant/testing/staging environments');
         }
 
@@ -168,9 +211,8 @@ class EmailDebugCommand extends BaseCommand
         }
         $data = [];
         if (in_array($template, $templates['bacs'])) {
-            $dm = $this->getManager();
             /** @var UserRepository $repo */
-            $repo = $dm->getRepository(User::class);
+            $repo = $this->dm->getRepository(User::class);
             /** @var User $user */
             $user = $repo->findOneBy(['paymentMethod.type' => 'bacs']);
             $data = [
@@ -179,27 +221,24 @@ class EmailDebugCommand extends BaseCommand
                 'claimed' => $variation == 'cancelledClaimed' ? true : false,
             ];
         } elseif (in_array($template, $templates['cashback'])) {
-            $dm = $this->getManager();
             /** @var CashbackRepository $repo */
-            $repo = $dm->getRepository(Cashback::class);
+            $repo = $this->dm->getRepository(Cashback::class);
             /** @var Cashback $cashback */
             $cashback = $repo->findOneBy([]);
-            /** @var RouterService $router */
-            $router = $this->getContainer()->get('app.router');
             $data = [
                 'cashback' => $cashback,
-                'withdraw_url' => $router->generateUrl(
+                'withdraw_url' => $this->routerService->generateUrl(
                     'homepage',
                     []
                 ),
             ];
         } elseif (in_array($template, $templates['potReward'])) {
-            $dm = $this->getManager();
             /** @var PolicyRepository $repo */
-            $repo = $dm->getRepository(Policy::class);
+            $repo = $this->dm->getRepository(Policy::class);
             $policies = $repo->findBy(['nextPolicy' => ['$ne' => null]]);
             $policy = null;
             foreach ($policies as $checkPolicy) {
+                /** @var Policy $checkPolicy */
                 if ($variation && $checkPolicy->getNextPolicy()->getPremiumPlan() != $variation) {
                     continue;
                 }
@@ -214,19 +253,15 @@ class EmailDebugCommand extends BaseCommand
                 'additional_amount' => 10,
             ];
         } elseif (in_array($template, $templates['policyConnection'])) {
-            $dm = $this->getManager();
             /** @var ConnectionRepository $repo */
-            $repo = $dm->getRepository(StandardConnection::class);
+            $repo = $this->dm->getRepository(StandardConnection::class);
             /** @var StandardConnection $connection */
             $connection = $repo->findOneBy(['value' => ['$gt' => 0]]);
-            /** @var PolicyService $policyService */
-            $policyService = $this->getContainer()->get('app.policy');
 
-            return $policyService->connectionReduced($connection);
+            return $this->policyService->connectionReduced($connection);
         } elseif (in_array($template, $templates['policy'])) {
-            $dm = $this->getManager();
             /** @var PolicyRepository $repo */
-            $repo = $dm->getRepository(Policy::class);
+            $repo = $this->dm->getRepository(Policy::class);
             $policies = $repo->findBy(['status' => Policy::STATUS_ACTIVE]);
             $policy = null;
             foreach ($policies as $policy) {
@@ -235,14 +270,11 @@ class EmailDebugCommand extends BaseCommand
             if (!$policy) {
                 throw new \Exception('Unable to find matching policy');
             }
-            /** @var PolicyService $policyService */
-            $policyService = $this->getContainer()->get('app.policy');
 
-            return $policyService->resendPolicyEmail($policy);
+            return $this->policyService->resendPolicyEmail($policy);
         } elseif (in_array($template, $templates['policyFailedPayment'])) {
-            $dm = $this->getManager();
             /** @var PolicyRepository $repo */
-            $repo = $dm->getRepository(Policy::class);
+            $repo = $this->dm->getRepository(Policy::class);
             $policies = $repo->findBy(['status' => Policy::STATUS_ACTIVE]);
             $policy = null;
             foreach ($policies as $policy) {
@@ -251,14 +283,11 @@ class EmailDebugCommand extends BaseCommand
             if (!$policy) {
                 throw new \Exception('Unable to find matching policy');
             }
-            /** @var JudopayService $judopayService */
-            $judopayService = $this->getContainer()->get('app.judopay');
 
-            return $judopayService->failedPaymentEmail($policy);
+            return $this->judopayService->failedPaymentEmail($policy);
         } elseif (in_array($template, $templates['policyCancellation'])) {
-            $dm = $this->getManager();
             /** @var PolicyRepository $repo */
-            $repo = $dm->getRepository(Policy::class);
+            $repo = $this->dm->getRepository(Policy::class);
             $policies = $repo->findBy(['status' => Policy::STATUS_ACTIVE]);
             $policy = null;
             foreach ($policies as $policy) {
@@ -267,15 +296,12 @@ class EmailDebugCommand extends BaseCommand
             if (!$policy) {
                 throw new \Exception('Unable to find matching policy');
             }
-            /** @var PolicyService $policyService */
-            $policyService = $this->getContainer()->get('app.policy');
             $baseTemplate = sprintf('AppBundle:Email:%s', $template);
 
-            return $policyService->cancelledPolicyEmail($policy, $baseTemplate);
+            return $this->policyService->cancelledPolicyEmail($policy, $baseTemplate);
         } elseif (in_array($template, $templates['policyRenewal'])) {
-            $dm = $this->getManager();
             /** @var PolicyRepository $repo */
-            $repo = $dm->getRepository(Policy::class);
+            $repo = $this->dm->getRepository(Policy::class);
             $policies = $repo->findBy(['status' => Policy::STATUS_PENDING_RENEWAL]);
             $policy = null;
             foreach ($policies as $pendingRenewal) {
@@ -318,13 +344,11 @@ class EmailDebugCommand extends BaseCommand
                 !$policy->getNextPolicy()->getPremium()) {
                 throw new \Exception('Unable to find matching policy');
             }
-            /** @var PolicyService $policyService */
-            $policyService = $this->getContainer()->get('app.policy');
-            return $policyService->pendingRenewalEmail($policy);
+
+            return $this->policyService->pendingRenewalEmail($policy);
         } elseif (in_array($template, $templates['picsure'])) {
-            $dm = $this->getManager();
             /** @var PolicyRepository $repo */
-            $repo = $dm->getRepository(Policy::class);
+            $repo = $this->dm->getRepository(Policy::class);
             $policy = $repo->findOneBy(['status' => Policy::STATUS_ACTIVE]);
             $data = [
                 'policy' => $policy,
@@ -333,9 +357,7 @@ class EmailDebugCommand extends BaseCommand
             throw new \Exception(sprintf('Unsupported template %s for email debug. Add data', $template));
         }
 
-        /** @var MailerService $mailer */
-        $mailer = $this->getContainer()->get('app.mailer');
-        $mailer->sendTemplate(
+        $this->mailerService->sendTemplate(
             sprintf('sosure:email:debug %s', $template),
             $email,
             sprintf('AppBundle:Email:%s.html.twig', $template),

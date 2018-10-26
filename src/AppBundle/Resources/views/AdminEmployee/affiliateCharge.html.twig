@@ -1,0 +1,135 @@
+{% extends 'admin_claims_base.html.twig' %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {% javascripts
+        '@AppBundle/Resources/public/js/Admin/month.js'
+        '@AppBundle/Resources/public/js/staticTabs.js'
+
+    %}
+    <script src="{{ asset_url }}"></script>
+    {% endjavascripts %}
+{% endblock %}
+
+{% block body %}
+    <div class="container">
+
+        <!-- Error Message -->
+        {% if error is defined %}
+            <h3>Error: {{ error }}</h3>
+        {% else %}
+
+            <h1 class="row">{{ affiliate.name }}</h1>
+
+            <!-- Navigation Tabs -->
+            <ul id="tabs" class="nav nav-tabs nav-justified" role="tablist">
+                <li class="nav-item {% if charges is defined %}active{% endif %}">
+                    <a href="{{ path('admin_affiliate_charge', {'id': affiliate.id}) }}">Monthly Charges</a>
+                </li>
+                <li class="nav-item {% if pending is defined %}active{% endif %}">
+                    <a href="{{ path('admin_affiliate_pending', {'id': affiliate.id}) }}">Pending Aquisitions</a>
+                </li>
+            </ul>
+
+            <!-- charges tab -->
+            {% if charges is defined %}
+                <div class="row">
+                    <h2 class="col-md-6">Charges for {{month}} / {{year}}</h2>
+
+                    <!-- configuration form -->
+                    <!-- method="POST" is actually a work around so the form does not add ? to end of url,
+                         the form does not post anything -->
+                    <form id="monthForm" class="month-form form-inline" style="padding-top: 15px;" method="POST">
+                        <div class="form-group col-md-6">
+                            Report Month:
+                            <div class="input-group date month" data-url="{{ path('admin_affiliate_charge', {'id': affiliate.id}) }}">
+                                <input type='text' class="form-control" value="{{month}}-{{year}}" />
+                                <span class="input-group-addon">
+                                    <span class="fa fa-calendar"></span>
+                                </span>
+                            </div>
+                            <div class="input-group">
+                                <div class="input-group-btn">
+                                    <button class="btn btn-success"><i class="fa fa-arrow-right"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Summary Table -->
+                <div class="row">
+                    <h3>Summary</h3>
+                    <table class="table table-striped">
+                        <thead>
+                            <tr><th>CPA</th><th>Total Charges</th><th>Total Cost</th></tr>
+                        </thead>
+                        <tr>
+                            <td>£{{ affiliate.cpa|number_format(2, '.', ',') }}</td>
+                            <td>{{ charges|length }}</td>
+                            <td>£{{ cost|number_format(2, '.', ',') }}</td>
+                        </tr>
+                    </table>
+                </div>
+
+
+                <!-- paid charges table -->
+                <div class="row">
+                    <h3>Charges</h3>
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead><tr><th>Date</th><th>User</th></tr></thead>
+                            <tbody>
+                                {% for charge in charges %}
+                                    <tr>
+                                        <td>{{ charge.createdDate|date }}</td>
+                                        <td>
+                                            {% if charge.user %}
+                                                <a href="{{ path('admin_user', {'id': charge.user.id }) }}">{{ charge.user.name }}</a>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            {% endif %}
+
+
+            <!-- pending users table -->
+            {% if pending is defined %}
+                <div class="row">
+                    <h2>Pending Aquisitions</h2>
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead><tr><th>Total Pending Aquisitions</th><th>Total Cost Pending</th></tr></thead>
+                            <tbody>
+                                <tr>
+                                    <td>{{ pending|length }}</td>
+                                    <td>£{{ pending|length * affiliate.cpa }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h2>Details</h2>
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead><tr><th>User</th><th>Start Date</th><th>Days Until Aquisition</th></tr></thead>
+                            <tbody>
+                                {% for user in pending %}
+                                    <tr>
+                                        <td><a href="{{ path('admin_user', {'id': user.id }) }}">{{ user.name }}</a></td>
+                                        <td>{{ user.getFirstPolicy.getStart|date }}</td>
+                                        <td>{{ user.getFirstPolicy.daysToAquisition(affiliate.days) }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            {% endif %}
+        {% endif %}
+    </div>
+{% endblock %}

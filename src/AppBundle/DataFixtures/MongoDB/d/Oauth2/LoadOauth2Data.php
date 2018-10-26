@@ -63,6 +63,8 @@ class LoadOauth2Data implements FixtureInterface, ContainerAwareInterface
             [
                 'http://dev.so-sure.net:40080/ops/pages',
                 'https://testing.wearesosure.com/ops/pages',
+                'https://waterloo.testing.wearesosure.com/ops/pages',
+                'https://monument.testing.wearesosure.com/ops/pages',
                 'https://staging.wearesosure.com/ops/pages',
                 'http://dev.so-sure.net:40080/oauth/v2/auth',
                 'http://dev.so-sure.net:40080/',
@@ -73,11 +75,11 @@ class LoadOauth2Data implements FixtureInterface, ContainerAwareInterface
         /** @var UserManagerInterface $userManager */
         $userManager = $this->container->get('fos_user.user_manager');
         /** @var User $user */
-        $user = $userManager->findUserByEmail('alister@so-sure.com');
+        $user = $userManager->findUserByEmail('employee@so-sure.com');
         if (!$user) {
             throw new \RuntimeException('expected to have a valid user to attach to OauthAccessToken');
         }
-        $this->newOauth2AccessToken($manager, $client, $user, 'test-with-api-alister');
+        $this->newOauth2AccessToken($manager, $client, $user, 'test-with-api-employee');
 
         /** @var User $user */
         $user = $userManager->findUserByEmail('julien+apple@so-sure.com');

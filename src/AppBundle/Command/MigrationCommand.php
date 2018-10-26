@@ -5,6 +5,7 @@ namespace AppBundle\Command;
 use AppBundle\Document\Opt\EmailOptOut;
 use AppBundle\Document\Opt\OptOut;
 use AppBundle\Document\User;
+use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -16,9 +17,18 @@ use AppBundle\Document\Policy;
 use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\DateTrait;
 
-class MigrationCommand extends BaseCommand
+class MigrationCommand extends ContainerAwareCommand
 {
     use DateTrait;
+
+    /** @var DocumentManager  */
+    protected $dm;
+
+    public function __construct(DocumentManager $dm)
+    {
+        parent::__construct();
+        $this->dm = $dm;
+    }
 
     protected function configure()
     {
@@ -42,46 +52,46 @@ class MigrationCommand extends BaseCommand
 
     private function migrateOptOut()
     {
-        $repo = $this->getManager()->getRepository(EmailOptOut::class);
+        $repo = $this->dm->getRepository(EmailOptOut::class);
         $optOuts = $repo->findAll();
         $migrated = [];
         foreach ($optOuts as $optOut) {
             /** @var EmailOptOut $optOut */
             if ($optOut->getCategory() == 'aquire' || $optOut->getCategory() == 'retain') {
                 if (in_array($optOut->getEmail(), $migrated)) {
-                    $this->getManager()->remove($optOut);
+                    $this->dm->remove($optOut);
                 } else {
                     $optOut->setCategory(EmailOptOut::OPTOUT_CAT_MARKETING);
                     $migrated[] = $optOut->getEmail();
                 }
             } elseif ($optOut->getCategory() == 'weekly') {
-                $this->getManager()->remove($optOut);
+                $this->dm->remove($optOut);
             }
         }
-        $this->getManager()->flush();
+        $this->dm->flush();
     }
 
     private function migrateOptOutCat()
     {
-        $repo = $this->getManager()->getRepository(EmailOptOut::class);
+        $repo = $this->dm->getRepository(EmailOptOut::class);
         $optOuts = $repo->findAll();
         $migrated = [];
         foreach ($optOuts as $optOut) {
             /** @var EmailOptOut $optOut */
             if (array_key_exists($optOut->getEmail(), $migrated)) {
                 $migrated[$optOut->getEmail()]->addCategory($optOut->getCategory());
-                $this->getManager()->remove($optOut);
+                $this->dm->remove($optOut);
             } else {
                 $optOut->addCategory($optOut->getCategory());
                 $migrated[$optOut->getEmail()] = $optOut;
             }
         }
-        $this->getManager()->flush();
+        $this->dm->flush();
     }
 
     private function migrateOptOutAll()
     {
-        $repo = $this->getManager()->getRepository(EmailOptOut::class);
+        $repo = $this->dm->getRepository(EmailOptOut::class);
         $optOuts = $repo->findAll();
         $migrated = [];
         foreach ($optOuts as $optOut) {
@@ -92,6 +102,6 @@ class MigrationCommand extends BaseCommand
                 $optOut->addCategory(EmailOptOut::OPTOUT_CAT_INVITATIONS);
             }
         }
-        $this->getManager()->flush();
+        $this->dm->flush();
     }
 }

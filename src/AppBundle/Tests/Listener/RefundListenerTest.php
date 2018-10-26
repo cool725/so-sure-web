@@ -74,6 +74,21 @@ class RefundListenerTest extends WebTestCase
     {
     }
 
+    public function testRefundListenerCancelledNonPolicy()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testRefundListenerCancelledNonPolicy', $this),
+            'bar'
+        );
+        $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
+
+        $this->assertFalse($policy->isPolicy());
+
+        $listener = new RefundListener(static::$dm, static::$judopayService, static::$logger, 'test');
+        $listener->onPolicyCancelledEvent(new PolicyEvent($policy));
+    }
+
     public function testRefundListenerCancelled()
     {
         $user = static::createUser(
@@ -88,7 +103,7 @@ class RefundListenerTest extends WebTestCase
         static::$policyService->setEnvironment('test');
 
         $this->assertTrue($policy->isValidPolicy());
-        
+
         $listener = new RefundListener(static::$dm, static::$judopayService, static::$logger, 'test');
         $listener->onPolicyCancelledEvent(new PolicyEvent($policy));
     }

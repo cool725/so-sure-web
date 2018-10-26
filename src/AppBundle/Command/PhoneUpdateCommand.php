@@ -3,6 +3,7 @@
 namespace AppBundle\Command;
 
 use AppBundle\Document\Phone;
+use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -11,8 +12,17 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Helper\Table;
 use AppBundle\Classes\Brightstar;
 
-class PhoneUpdateCommand extends BaseCommand
+class PhoneUpdateCommand extends ContainerAwareCommand
 {
+    /** @var DocumentManager  */
+    protected $dm;
+
+    public function __construct(DocumentManager $dm)
+    {
+        parent::__construct();
+        $this->dm = $dm;
+    }
+
     protected function configure()
     {
         $this
@@ -23,10 +33,10 @@ class PhoneUpdateCommand extends BaseCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $dm = $this->getManager();
-        $repo = $dm->getRepository(Phone::class);
+        $repo = $this->dm->getRepository(Phone::class);
         $phones = $repo->findAll();
         foreach ($phones as $phone) {
+            /** @var Phone $phone */
             if ($phone->getMake() == "ALL") {
                 continue;
             }
@@ -37,7 +47,7 @@ class PhoneUpdateCommand extends BaseCommand
                 $phone->setAlternativeMakeCanonical($phone->getAlternativeMake());
             }
         }
-        $dm->flush();
+        $this->dm->flush();
 
         $output->writeln('Finished');
     }

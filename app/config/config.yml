@@ -20,7 +20,10 @@ parameters:
         - ROLE_ADMIN
         - ROLE_CLAIMS
         - ROLE_EMPLOYEE
-
+    sosure_ips:
+        - '82.16.104.75' # patrick
+        - '82.163.118.154' # so-sure ip @ frameworks
+        - '82.163.117.184' # frameworks ip
 
 framework:
     #esi:             ~
@@ -76,9 +79,7 @@ twig:
         consumer_payout: "17.2"
         ipt_rebate: "1.5"
         davies_ip: "%davies_ip%"
-        sosure_ips:
-          - "%sosure_rwe_ip%"
-          - "%sosure_patrick_ip%"
+        sosure_ips: "%sosure_ips%"
         environment: "%kernel.environment%"
         digits_consumer_key: "%digits_consumer_key%"
         form_client_validation: true
@@ -91,13 +92,16 @@ doctrine_mongodb:
     connections:
         default:
             server: "%mongodb_url%"
-            options: {}
+            options:
+                readPreference: "primaryPreferred"
         census:
             server: "%census_mongodb_url%"
-            options: {}
+            options:
+                readPreference: "primaryPreferred"
         picsureml:
             server: "%picsure_mongodb_url%"
-            options: {}
+            options:
+                readPreference: "primaryPreferred"
     default_database: "%mongodb_db%"
     document_managers:
         default:
@@ -779,6 +783,7 @@ nelmio_security:
                 - https://www.workable.com
                 - http://widget.trustpilot.com
                 - https://widget.trustpilot.com
+                - https://track.omguk.com
                 - 'data:'
                 - https://bat.bing.com
                 # https://en.wikipedia.org/wiki/List_of_Google_domains
@@ -1043,6 +1048,7 @@ nelmio_security:
                 - https://www.glassdoor.co.uk
                 - http://via.placeholder.com
                 - https://developer.starlingbank.com
+                - https://track.omguk.com
                 - 'data:'
                 # https://en.wikipedia.org/wiki/List_of_Google_domains
                 - https://www.google.com

@@ -2,10 +2,12 @@
 
 namespace AppBundle\Command;
 
+use AppBundle\Document\Policy;
 use AppBundle\Repository\ClaimRepository;
 use AppBundle\Repository\PhonePolicyRepository;
 use AppBundle\Service\BaseImeiService;
 use AppBundle\Service\ReceperioService;
+use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -16,8 +18,21 @@ use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Claim;
 
-class PolicyClaimCommand extends BaseCommand
+class PolicyClaimCommand extends ContainerAwareCommand
 {
+    /** @var DocumentManager  */
+    protected $dm;
+
+    /** @var ReceperioService  */
+    protected $imeiService;
+
+    public function __construct(DocumentManager $dm, ReceperioService $imeiService)
+    {
+        parent::__construct();
+        $this->dm = $dm;
+        $this->imeiService = $imeiService;
+    }
+
     protected function configure()
     {
         $this
@@ -47,8 +62,6 @@ class PolicyClaimCommand extends BaseCommand
         $policyId = $input->getArgument('policy-id');
         $claimId = $input->getArgument('claim-id');
         $imei = $input->getOption('imei');
-        /** @var ReceperioService $imeiService */
-        $imeiService = $this->getContainer()->get('app.imei');
 
         $policy = $this->getPolicy($policyId);
         if (!$policy) {
@@ -59,26 +72,40 @@ class PolicyClaimCommand extends BaseCommand
             throw new \Exception('Unable to find claim');
         }
 
-        if ($imeiService->policyClaim($policy, $claim->getType(), $claim, null, $imei)) {
+        if ($this->imeiService->policyClaim($policy, $claim->getType(), $claim, null, $imei)) {
             print sprintf("Claimscheck %s is good\n", $imei);
         } else {
             print sprintf("Claimscheck %s failed validation\n", $imei);
         }
     }
 
+    /**
+     * @param mixed $id
+     * @return PhonePolicy
+     * @throws \Doctrine\ODM\MongoDB\LockException
+     * @throws \Doctrine\ODM\MongoDB\Mapping\MappingException
+     */
     private function getPolicy($id)
     {
         /** @var PhonePolicyRepository $repo */
-        $repo = $this->getManager()->getRepository(PhonePolicy::class);
+        $repo = $this->dm->getRepository(PhonePolicy::class);
+        /** @var PhonePolicy $policy */
         $policy = $repo->find($id);
 
         return $policy;
     }
 
+    /**
+     * @param mixed $id
+     * @return Claim
+     * @throws \Doctrine\ODM\MongoDB\LockException
+     * @throws \Doctrine\ODM\MongoDB\Mapping\MappingException
+     */
     private function getClaim($id)
     {
         /** @var ClaimRepository $repo */
-        $repo = $this->getManager()->getRepository(Claim::class);
+        $repo = $this->dm->getRepository(Claim::class);
+        /** @var Claim $claim */
         $claim = $repo->find($id);
 
         return $claim;

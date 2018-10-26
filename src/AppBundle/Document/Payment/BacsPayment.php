@@ -19,6 +19,7 @@ class BacsPayment extends Payment
 {
     use DateTrait;
 
+    const DAYS_PROCESSING = 1;
     const DAYS_CREDIT = 2;
     const DAYS_REVERSE = 5;
 
@@ -165,8 +166,8 @@ class BacsPayment extends Payment
 
     public function setPolicyStatusActiveIfUnpaid()
     {
-        if ($this->getPolicy() && $this->getPolicy()->getStatus() == Policy::STATUS_UNPAID) {
-            $this->getPolicy()->setStatus(Policy::STATUS_ACTIVE);
+        if ($this->getPolicy()) {
+            $this->getPolicy()->setPolicyStatusActiveIfUnpaid();
         }
     }
 

@@ -124,7 +124,7 @@
     }
 
     @include media-breakpoint-up(fk) {
-        background-position: 120px 200px;
+        background-position: 500px 200px;
         background-size: 600px;
     }
 
@@ -167,6 +167,6 @@
     }
 
     @include media-breakpoint-up(fk) {
-        background-position: right 50px;
+        background-position: 1400px 50px;
     }
 }

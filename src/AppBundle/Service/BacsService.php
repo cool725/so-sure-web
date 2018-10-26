@@ -561,16 +561,21 @@ class BacsService
                     $debitPayment->setSerialNumber($submittedPayment->getSerialNumber());
                     $debitPayment->setDate($this->getNextBusinessDay($currentProcessingDate));
                     $debitPayment->setSource(Payment::SOURCE_SYSTEM);
+                    $debitPayment->setNotes('Arudd payment failure');
                     $policy->addPayment($debitPayment);
+
+                    // refund requires commission to be set, but probably isn't at this point in time
+                    if (!$submittedPayment->getTotalCommission()) {
+                        $submittedPayment->setCommission();
+                    }
                     $debitPayment->setRefundTotalCommission($submittedPayment->getTotalCommission());
                     $debitPayment->calculateSplit();
 
                     $submittedPayment->approve($currentProcessingDate, true);
 
                     // Set policy as unpaid if there's a payment failure
-                    if (!$policy->isPolicyPaidToDate() && $policy->getStatus() == Policy::STATUS_ACTIVE) {
-                        $policy->setStatus(Policy::STATUS_UNPAID);
-                    }
+                    $policy->setPolicyStatusUnpaidIfActive();
+
                     $this->dm->flush(null, array('w' => 'majority', 'j' => true));
                     $this->triggerPolicyEvent($policy, PolicyEvent::EVENT_UNPAID);
 
@@ -916,7 +921,11 @@ class BacsService
                 /** @var User $user */
                 $user = $repo->findOneBy(['paymentMethod.bankAccount.reference' => $reference]);
                 if (!$user) {
-                    throw new \Exception(sprintf('Unable to find user with reference %s', $reference));
+                    $error = sprintf('Unable to find user with reference %s. Unable to cancel mandate.', $reference);
+                    $results['errors'][] = $error;
+                    $this->logger->warning($error);
+
+                    continue;
                 }
 
                 $reason = $this->getReason($element);
@@ -942,7 +951,13 @@ class BacsService
                     /** @var BacsPaymentMethod $bacs */
                     $bacs = $user->getPaymentMethod();
                     $bacs->getBankAccount()->setMandateStatus(BankAccount::MANDATE_CANCELLED);
-                    $this->dm->flush();
+
+                    foreach ($user->getValidPolicies(true) as $policy) {
+                        /** @var Policy $policy */
+                        $policy->setPolicyStatusUnpaidIfActive();
+                    }
+
+                    $this->dm->flush(null, array('w' => 'majority', 'j' => true));
                     $results['cancelled-ddi']++;
                 } else {
                     throw new \Exception(sprintf('Unknown auddis reason %s', $reason));
@@ -1732,12 +1747,16 @@ class BacsService
         return $processed;
     }
 
+    /**
+     * @return Policy
+     */
     public function getPolicy($id)
     {
         if (!$id) {
             throw new \InvalidArgumentException('Missing policyId');
         }
         $repo = $this->dm->getRepository(Policy::class);
+        /** @var Policy $policy */
         $policy = $repo->find($id);
         if (!$policy) {
             throw new \InvalidArgumentException(sprintf('Unable to find policyId: %s', $id));

@@ -187,6 +187,7 @@ class PaymentService
         if ($policy->isDifferentPayer()) {
             $policy->setPayer($policy->getUser());
         }
+        $policy->setPolicyStatusActiveIfUnpaid();
         $this->dm->flush();
 
         $this->mailer->sendTemplate(

@@ -268,10 +268,13 @@ class ScheduledPayment
             return true;
         }
 
+        $diff = $this->getScheduled()->diff($this->policy->getBilling());
+        $adjustedBilling = clone $this->policy->getBilling();
+        $adjustedBilling = $adjustedBilling->add(new \DateInterval(sprintf('P%dM', $diff->m)));
+
         // Hack for a off by one hour timezone issue between billing & scheduled
         // TODO: Fix scheduled times
-        // TODO: THIS WILL NEVER WORKD AS BILLING IS NOT ADJUSTED FOR CURRENT MONTH
-        $diff = $this->getScheduled()->diff($this->policy->getBilling());
+        $diff = $this->getScheduled()->diff($adjustedBilling);
         if ($diff->d == 0 && $diff->h <= 1) {
             return true;
         }

@@ -866,7 +866,7 @@
                 </tr>
                 {% if is_granted('ROLE_ADMIN') %}
                 <tr>
-                    <td><i class="fa fa-lock" title="Admin only"></i> pic-sure</td>
+                    <td>pic-sure</td>
                     <td>
                         {% if policy.policyTerms.isPicSureEnabled %}
                             Status: {% if policy.picSureStatus %}{{ policy.picSureStatus }}{% else %}Not started{% endif %}
