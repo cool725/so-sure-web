@@ -184,7 +184,46 @@
                         <div class="onboarding__body ml-lg-3">
                             <h2 class="h3 text-primary mb-3">Thanks for choosing <span class="text-nowrap">so-sure</span> 😊</h2>
                             <p class="mb-4">Entesque dolor praesent volutpat elit vehicula pretium placerat. Nam download app sagittis, hendrerit lore in hac habitasse platea.</p>
+                            <div class="summary-cardbox">
+                                <div class="summary-cardbox__header">
+                                    <h4 class="text-primary mb-0">Policy Summary</h4>
+                                </div>
+                                <div class="summary-cardbox__body">
+                                    <h5 class="text-primary">Phone:</h5>
+                                    <p>{{ policy.phone.make }} {{ policy.phone.model }} ({{ policy.phone.memory }}GB)</p>
+                                    <h5 class="text-primary">Policy number:</h5>
+                                    <p>{{ policy.policyNumber }}</p>
+                                    <h5 class="text-primary">Cost:</h5>
+                                    <p>
+                                        {% if policy.getPremiumPlan == 'monthly'%}
+                                            &pound;{{ policy.premium.monthlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }} per month
+                                        {% elseif policy.getPremiumPlan == 'yearly' %}
+                                            &pound;{{ policy.premium.yearlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }} a year
+                                        {% else %}
+                                            Unknown
+                                        {% endif %}
+                                    </p>
+                                    <h5 class="text-primary">Start/End Date:</h5>
+                                    <p>{{ policy.start|date('d/m/y', 'Europe/London') }} - {{ policy.end|date('d/m/y', 'Europe/London') }}</p>
+                                </div>
+                                <div class="summary-cardbox__cta">
+                                    <a href="#">Download policy details <i class="fal fa-download ml-2"></i></a>
+                                </div>
+                            </div>
 
+{# <div class="card">
+  <div class="card-header">
+    Featured
+  </div>
+  <div class="card-body">
+    <h5 class="card-title">Special title treatment</h5>
+    <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+    <a href="#" class="btn btn-primary">Go somewhere</a>
+  </div>
+    <div class="card-footer text-muted">
+    2 days ago
+  </div>
+</div> #}
                         </div>
                     </div>
                 </div>

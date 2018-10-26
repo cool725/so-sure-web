@@ -45,6 +45,9 @@ $(function() {
 
     clipboard.on('success', function(e) {
         $('.btn-copy').tooltip('show');
+        setTimeout(function() {
+            $('.btn-copy').tooltip('hide');
+        }, 1500);
     });
 
     // Social Sharing
