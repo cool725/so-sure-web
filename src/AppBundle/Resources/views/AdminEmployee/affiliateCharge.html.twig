@@ -29,6 +29,12 @@
                 <li class="nav-item {% if pending is defined %}active{% endif %}">
                     <a href="{{ path('admin_affiliate_pending', {'id': affiliate.id}) }}">Pending Aquisitions</a>
                 </li>
+                <li class="nav-item {% if potential is defined %}active{% endif %}">
+                    <a href="{{ path('admin_affiliate_potential', {'id': affiliate.id}) }}">Potential Aquisitions</a>
+                </li>
+                <li class="nav-item {% if lost is defined %}active{% endif %}">
+                    <a href="{{ path('admin_affiliate_lost', {'id': affiliate.id}) }}">Lost Aquisitions</a>
+                </li>
             </ul>
 
             <!-- charges tab -->
@@ -103,9 +109,10 @@
                     <h2>Pending Aquisitions</h2>
                     <div class="table-responsive">
                         <table class="table table-striped">
-                            <thead><tr><th>Total Pending Aquisitions</th><th>Total Cost Pending</th></tr></thead>
+                            <thead><tr><th>CPA</th><th>Total Pending Aquisitions</th><th>Total Cost Pending</th></tr></thead>
                             <tbody>
                                 <tr>
+                                    <td>£{{ affiliate.cpa|number_format(2, '.', ',') }}</td>
                                     <td>{{ pending|length }}</td>
                                     <td>£{{ pending|length * affiliate.cpa }}</td>
                                 </tr>
@@ -124,6 +131,57 @@
                                         <td>{{ user.getFirstPolicy.getStart|date }}</td>
                                         <td>{{ user.getFirstPolicy.daysToAquisition(affiliate.days) }}</td>
                                     </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            {% endif %}
+
+            <!-- lost users table -->
+            {% if potential is defined %}
+                <div class="row">
+                    <h2>Potential Aquisitions</h2>
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead><tr><th>Total Potential Aquisitions</th></tr></thead>
+                            <tbody><tr><td>{{ potential|length }}</td></tr></tbody>
+                        </table>
+                    </div>
+                    <h3>Details</h3>
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead><tr><th>User</th></tr></thead>
+                            <tbody>
+                                {% for user in potential %}
+                                    <tr>
+                                        <td><a href="{{ path('admin_user', {'id': user.id }) }}">{{ user.name }}</a></td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            {% endif %}
+
+            <!-- lost users table -->
+            {% if lost is defined %}
+                <div class="row">
+                    <h2>Lost Aquisitions</h2>
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead><tr><th>Total Lost Aquisitions</th></tr></thead>
+                            <tbody><tr><td>{{ lost|length }}</td></tr></tbody>
+                        </table>
+                    </div>
+
+                    <h3>Details</h3>
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead><tr><th>User</th></tr></thead>
+                            <tbody>
+                                {% for user in lost %}
+                                    <tr><td><a href="{{ path('admin_user', {'id': user.id }) }}">{{ user.name }}</a></td></tr>
                                 {% endfor %}
                             </tbody>
                         </table>

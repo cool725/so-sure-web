@@ -484,6 +484,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         $bacsPayment->setSuccess(true);
         $bacsPayment->setDate(new \DateTime());
         $bacsPayment->setAmount($policy->getPremium()->getYearlyPremiumPrice());
+        $bacsPayment->setTotalCommission(Salva::YEARLY_TOTAL_COMMISSION);
 
         $bacsForm = $this->get('form.factory')
             ->createNamedBuilder('bacs_form', DirectBacsReceiptType::class, $bacsPayment)
@@ -723,24 +724,18 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             } elseif ($request->request->has('bacs_form')) {
                 $bacsForm->handleRequest($request);
                 if ($bacsForm->isValid()) {
-                    if ($this->areEqualToTwoDp(
-                        $bacsPayment->getAmount(),
-                        $policy->getPremium()->getMonthlyPremiumPrice()
-                    )) {
-                        $bacsPayment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
-                    } elseif ($this->areEqualToTwoDp(
-                        $bacsPayment->getAmount(),
-                        $policy->getPremium()->getYearlyPremiumPrice()
-                    )) {
-                        $bacsPayment->setTotalCommission(Salva::YEARLY_TOTAL_COMMISSION);
-                    } else {
-                        $this->get('logger')->warning(sprintf(
-                            'Unable to determine commission on bacs payment for policy %s',
-                            $policy->getId()
-                        ));
+                    // non-manual payments should be scheduled
+                    if (!$bacsPayment->isManual()) {
+                        $bacsPayment->setStatus(BacsPayment::STATUS_PENDING);
+                        if (!$policy->getUser()->hasBacsPaymentMethod()) {
+                            $this->get('logger')->warning(sprintf(
+                                'Payment (Policy %s) is scheduled, however no bacs account for user',
+                                $policy->getId()
+                            ));
+                        }
                     }
-
                     $policy->addPayment($bacsPayment);
+
                     $dm->flush();
                     $this->addFlash(
                         'success',
@@ -2577,7 +2572,47 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         if ($affiliate) {
             return [
                 'affiliate' => $affiliate,
-                'pending' => $affiliateService->getMatchingUsers($affiliate, false)
+                'pending' => $affiliateService->getMatchingUsers($affiliate, [User::AQUISITION_PENDING])
+            ];
+        } else {
+            return ['error' => 'Invalid URL, given ID does not correspond to an affiliate.'];
+        }
+    }
+
+    /**
+     * @Route("/affiliate/potential/{id}", name="admin_affiliate_potential")
+     * @Template("AppBundle:AdminEmployee:affiliateCharge.html.twig")
+     */
+    public function affiliatePotentialAction($id)
+    {
+        $dm = $this->getManager();
+        $affiliateRepo = $dm->getRepository(AffiliateCompany::class);
+        $affiliate = $affiliateRepo->find($id);
+        $affiliateService = $this->get("app.affiliate");
+        if ($affiliate) {
+            return [
+                'affiliate' => $affiliate,
+                'potential' => $affiliateService->getMatchingUsers($affiliate, [User::AQUISITION_POTENTIAL])
+            ];
+        } else {
+            return ['error' => 'Invalid URL, given ID does not correspond to an affiliate.'];
+        }
+    }
+
+    /**
+     * @Route("/affiliate/lost/{id}", name="admin_affiliate_lost")
+     * @Template("AppBundle:AdminEmployee:affiliateCharge.html.twig")
+     */
+    public function affiliateLostAction($id)
+    {
+        $dm = $this->getManager();
+        $affiliateRepo = $dm->getRepository(AffiliateCompany::class);
+        $affiliate = $affiliateRepo->find($id);
+        $affiliateService = $this->get("app.affiliate");
+        if ($affiliate) {
+            return [
+                'affiliate' => $affiliate,
+                'lost' => $affiliateService->getMatchingUsers($affiliate, [User::AQUISITION_LOST])
             ];
         } else {
             return ['error' => 'Invalid URL, given ID does not correspond to an affiliate.'];
