@@ -40,7 +40,11 @@ body {
     }
 
     &__item {
+        height: 100vh;
         text-align: center;
+        overflow-y: scroll;
+        // This is nasty
+        padding-bottom: 150px;
     }
 
     &-controls {

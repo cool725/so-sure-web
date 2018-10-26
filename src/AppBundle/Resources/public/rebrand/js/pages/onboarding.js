@@ -8,6 +8,7 @@ require('bootstrap/js/dist/carousel');
 
 // Require components
 require('jssocials');
+let Clipboard = require('clipboard');
 
 $(function() {
 
@@ -31,6 +32,20 @@ $(function() {
     });
 
     // Copy scode
+    let clipboard = new Clipboard('.btn-copy');
+
+    clipboard.on('click', function(e) {
+        e.preventDefault();
+    });
+
+    $('.btn-copy').tooltip({
+        'title':   'copied',
+        'trigger': 'manual'
+    });
+
+    clipboard.on('success', function(e) {
+        $('.btn-copy').tooltip('show');
+    });
 
     // Social Sharing
     // Share buttons
