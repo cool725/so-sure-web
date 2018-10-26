@@ -4077,9 +4077,9 @@ jsprim@^1.2.2:
     json-schema "0.2.3"
     verror "1.10.0"
 
-"jssocials@https://github.com/so-sure/jssocials":
+"jssocials@https://github.com/so-sure/jssocials#master":
   version "1.5.0"
-  resolved "https://github.com/so-sure/jssocials#dfde48aba32ecf500a8b183121b19f430eff8649"
+  resolved "https://github.com/so-sure/jssocials#adb91e2e317f3aba97c22afc4ca32fc4951f2460"
 
 killable@^1.0.0:
   version "1.0.0"
