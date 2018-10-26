@@ -2473,7 +2473,7 @@ abstract class Policy
         return $this->toTwoDp($this->getTotalCommissionPaid() - $this->getTotalCommissionPaid($payments));
     }
 
-    public function getTotalCommissionPaid($payments = null)
+    public function getTotalCommissionPaid($payments = null, $includePending = false)
     {
         $totalCommission = 0;
         if (!$this->isPolicy()) {
@@ -2485,6 +2485,9 @@ abstract class Policy
 
         foreach ($payments as $payment) {
             if ($payment->isSuccess()) {
+                $totalCommission += $payment->getTotalCommission();
+            } elseif ($includePending && $payment instanceof BacsPayment &&
+                $payment->getStatus() == BacsPayment::STATUS_PENDING) {
                 $totalCommission += $payment->getTotalCommission();
             }
         }
@@ -2547,18 +2550,44 @@ abstract class Policy
         return $this->toTwoDp($this->getPremium()->getYearlyPremiumPrice() - $this->getPremiumPaid());
     }
 
-    public function getPendingBacsPaymentsTotal()
+    public function getPendingBacsPayments($includePending = false)
     {
-        $total = 0;
+        $payments = [];
+        $statuses = [BacsPayment::STATUS_SUBMITTED, BacsPayment::STATUS_GENERATED];
+        if ($includePending) {
+            $statuses[] = BacsPayment::STATUS_PENDING;
+        }
         $payments = $this->getPaymentsByType(BacsPayment::class);
         foreach ($payments as $payment) {
             /** @var BacsPayment $payment */
-            if (in_array($payment->getStatus(), [BacsPayment::STATUS_SUBMITTED, BacsPayment::STATUS_GENERATED])) {
-                $total += $payment->getAmount();
+            if (in_array($payment->getStatus(), $statuses)) {
+                $payments[] = $payment;
             }
         }
 
+        return $payments;
+    }
+
+    public function getPendingBacsPaymentsTotal($includePending = false)
+    {
+        $total = 0;
+        foreach ($this->getPendingBacsPayments($includePending) as $payment) {
+            /** @var BacsPayment $payment */
+            $total += $payment->getAmount();
+        }
+
         return $total;
+    }
+
+    public function getPendingBacsPaymentsTotalCommission($includePending = false)
+    {
+        $totalCommission = 0;
+        foreach ($this->getPendingBacsPayments($includePending) as $payment) {
+            /** @var BacsPayment $payment */
+            $totalCommission += $payment->getTotalCommission();
+        }
+
+        return $totalCommission;
     }
 
     public function isInitialPayment(\DateTime $date = null)
@@ -4248,7 +4277,7 @@ abstract class Policy
         }
         if ($this->getStatus() == self::STATUS_RENEWAL) {
             return $this->getStart() > $date;
-        } elseif ($this->isPolicyPaidToDate($date, true)) {
+        } elseif ($this->isPolicyPaidToDate($date, true, false, true)) {
             return $this->getStatus() == self::STATUS_ACTIVE;
         } elseif ($bankAccount && ($bankAccount->isMandateInProgress() ||
                 ($bankAccount->isMandateSuccess() && $bankAccount->isBeforeInitialNotificationDate()))) {
@@ -4258,13 +4287,23 @@ abstract class Policy
         }
     }
 
-    public function isPolicyPaidToDate(\DateTime $date = null, $includePendingBacs = false, $firstDayIsUnpaid = false)
-    {
+    public function isPolicyPaidToDate(
+        \DateTime $date = null,
+        $includePendingBacs = false,
+        $firstDayIsUnpaid = false,
+        $includeFuturePayments = false
+    ) {
         if (!$this->isPolicy()) {
             return null;
         }
 
-        $totalPaid = $this->getTotalSuccessfulPayments($date, true);
+        if ($includeFuturePayments) {
+            $futureDate = clone $date;
+            $futureDate = $futureDate->add(new \DateInterval('P1D'));
+            $totalPaid = $this->getTotalSuccessfulPayments($futureDate, true);
+        } else {
+            $totalPaid = $this->getTotalSuccessfulPayments($date, true);
+        }
         if ($includePendingBacs) {
             $totalPaid += $this->getPendingBacsPaymentsTotal();
         }
@@ -4732,7 +4771,7 @@ abstract class Policy
         print $this->getTotalCommissionPaid() . PHP_EOL;
         */
 
-        $diff = abs($this->getTotalCommissionPaid() - $expectedCommission);
+        $diff = abs($this->getTotalCommissionPaid(null, true) - $expectedCommission);
 
         return $diff <= $allowedVariance;
     }
