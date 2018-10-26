@@ -2,12 +2,23 @@
 
 namespace AppBundle\Command;
 
+use Doctrine\ODM\MongoDB\DocumentManager;
+use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use AppBundle\Document\User;
 
-class NormalisePostcodeCommand extends BaseCommand
+class NormalisePostcodeCommand extends ContainerAwareCommand
 {
+    /** @var DocumentManager  */
+    protected $dm;
+
+    public function __construct(DocumentManager $dm)
+    {
+        parent::__construct();
+        $this->dm = $dm;
+    }
+
     protected function configure()
     {
         $this
@@ -19,7 +30,7 @@ class NormalisePostcodeCommand extends BaseCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $output->writeln('Normalize postcode data for all billing addresses');
-        $repo = $this->getManager()->getRepository(User::class);
+        $repo = $this->dm->getRepository(User::class);
         $users = $repo->findAll();
         $output->writeln(sprintf('Processing %s users', count($users)));
         $totalProcessed = 0;
@@ -34,11 +45,11 @@ class NormalisePostcodeCommand extends BaseCommand
                 $user->getBillingAddress()->setPostcode($postcode);
             }
             if ($flushCounter % 1000 == 0) {
-                $repo->getDocumentManager()->flush();
+                $this->dm->flush();
             }
         }
         if ($flushCounter > 0) {
-            $repo->getDocumentManager()->flush();
+            $this->dm->flush();
         }
         $output->writeln(
             sprintf(

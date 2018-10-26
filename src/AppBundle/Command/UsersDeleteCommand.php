@@ -8,6 +8,7 @@ use AppBundle\Security\FOSUBUserProvider;
 use AppBundle\Service\JudopayService;
 use AppBundle\Service\MailerService;
 use AppBundle\Service\PolicyService;
+use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -21,8 +22,25 @@ use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Document\Payment\Payment;
 use AppBundle\Document\User;
 
-class UsersDeleteCommand extends BaseCommand
+class UsersDeleteCommand extends ContainerAwareCommand
 {
+    /** @var DocumentManager  */
+    protected $dm;
+
+    /** @var FOSUBUserProvider */
+    protected $userService;
+
+    /** @var MailerService */
+    protected $mailerService;
+
+    public function __construct(DocumentManager $dm, FOSUBUserProvider $userService, MailerService $mailerService)
+    {
+        parent::__construct();
+        $this->dm = $dm;
+        $this->userService = $userService;
+        $this->mailerService = $mailerService;
+    }
+
     protected function configure()
     {
         $this
@@ -65,12 +83,10 @@ class UsersDeleteCommand extends BaseCommand
 
         // TODO: Resync optin with users
 
-        /** @var FOSUBUserProvider $fosUser */
-        $fosUser = $this->getContainer()->get('app.user');
-        $fosUser->resyncOpts();
+        $this->userService->resyncOpts();
 
         /** @var UserRepository $repo */
-        $repo = $this->getManager()->getRepository(User::class);
+        $repo = $this->dm->getRepository(User::class);
         $users = $repo->findBy(['created' => ['$lte' => $seventeenMonths]]);
         $output->writeln(sprintf('%d users are 17 months after creation', count($users)));
         foreach ($users as $user) {
@@ -97,7 +113,7 @@ class UsersDeleteCommand extends BaseCommand
             }
 
             if (!$skipDelete && $user->shouldDelete()) {
-                $fosUser->deleteUser($user, false);
+                $this->userService->deleteUser($user, false);
                 $output->writeln(sprintf(
                     'Deleted user %s (%s)',
                     $user->getEmail(),
@@ -106,7 +122,7 @@ class UsersDeleteCommand extends BaseCommand
             }
         }
 
-        $this->getManager()->flush();
+        $this->dm->flush();
 
         $output->writeln('Finished');
     }
@@ -114,9 +130,7 @@ class UsersDeleteCommand extends BaseCommand
     private function emailPendingDeletion(User $user)
     {
         $hash = SoSure::encodeCommunicationsHash($user->getEmail());
-        /** @var MailerService $mailer */
-        $mailer = $this->getContainer()->get('app.mailer');
-        $mailer->sendTemplate(
+        $this->mailerService->sendTemplate(
             'Sorry to see you go',
             $user->getEmail(),
             'AppBundle:Email:user/pendingDeletion.html.twig',

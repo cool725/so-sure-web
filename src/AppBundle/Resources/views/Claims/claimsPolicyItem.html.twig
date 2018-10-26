@@ -866,7 +866,7 @@
                 </tr>
                 {% if is_granted('ROLE_ADMIN') %}
                 <tr>
-                    <td><i class="fa fa-lock" title="Admin only"></i> pic-sure</td>
+                    <td>pic-sure</td>
                     <td>
                         {% if policy.policyTerms.isPicSureEnabled %}
                             Status: {% if policy.picSureStatus %}{{ policy.picSureStatus }}{% else %}Not started{% endif %}
@@ -1392,26 +1392,65 @@
           <div class="modal-body">
             <div class="row">
                 <div class="col-md-12">
-                    <div class="form-group">
-                        {{ form_label(bacs_form.date) }}
-                        {{ form_errors(bacs_form.date) }}
-                        {{ form_widget(bacs_form.date) }}
+                    <div class="row">
+                        <div class="form-group col-sm-2">
+                            {{ form_label(bacs_form.date) }}
+                        </div>
+                        <div class="form-group col-sm-10">
+                            {{ form_errors(bacs_form.date) }}
+                            {{ form_widget(bacs_form.date) }}
+                        </div>
                     </div>
-                    <div class="form-group">
-                        {{ form_label(bacs_form.amount) }} (£{{ policy.premium.monthlyPremiumPrice| number_format(2, '.', ',') }} / £{{ policy.premium.yearlyPremiumPrice| number_format(2, '.', ',') }})
-                        {{ form_errors(bacs_form.amount) }}
-                        {{ form_widget(bacs_form.amount, {'attr': {'placeholder': 'Amount to credit policy'}}) }}
-                        <strong>WARNING! - If not using a monthly or yearly amount, a manual addition to the bac payment commission in the database is required</strong>
+                    <div class="row">
+                        <div class="form-group col-sm-2">
+                            {{ form_label(bacs_form.manual) }}
+                        </div>
+                        <div class="form-group col-sm-10">
+                            {{ form_errors(bacs_form.manual) }}
+                            {{ form_widget(bacs_form.manual) }}<br>
+                            <strong>Manual payments if received directly (invoiced) vs non-manual if the system attempts to use our bacs system</strong>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        {{ form_label(bacs_form.reference) }}
-                        {{ form_errors(bacs_form.reference) }}
-                        {{ form_widget(bacs_form.reference) }}
+                    <div class="row">
+                        <div class="form-group col-sm-2">
+                            {{ form_label(bacs_form.amount) }}
+                        </div>
+                        <div class="form-group col-sm-10">
+                            {{ form_errors(bacs_form.amount) }}
+                            {{ form_widget(bacs_form.amount, {'attr': {'placeholder': 'Amount to credit policy'}}) }}
+                            (£{{ policy.premium.monthlyPremiumPrice| number_format(2, '.', ',') }} / £{{ policy.premium.yearlyPremiumPrice| number_format(2, '.', ',') }})
+                            <br><strong>
+                                Non-manual payments will be scheduled assuming users have bacs details
+                            </strong>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        {{ form_label(bacs_form.notes) }}
-                        {{ form_errors(bacs_form.notes) }}
-                        {{ form_widget(bacs_form.notes, {'attr': {'placeholder': 'Total amount of bacs transfer'}}) }}
+                    <div class="row">
+                        <div class="form-group col-sm-2">
+                            {{ form_label(bacs_form.totalCommission, 'Total Commission') }}
+                        </div>
+                        <div class="form-group col-sm-10">
+                            {{ form_errors(bacs_form.totalCommission) }}
+                            {{ form_widget(bacs_form.totalCommission) }}<br>
+                            <strong>£10.72 for annual or £0.89 / month</strong>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-sm-2">
+                            {{ form_label(bacs_form.reference) }}
+                        </div>
+                        <div class="form-group col-sm-10">
+                            {{ form_errors(bacs_form.reference) }}
+                            {{ form_widget(bacs_form.reference) }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-sm-2">
+                            {{ form_label(bacs_form.notes) }}
+                        </div>
+                        <div class="form-group col-sm-10">
+                            {{ form_errors(bacs_form.notes) }}
+                            {{ form_widget(bacs_form.notes, {'attr': {'placeholder': 'Total amount of bacs transfer'}}) }}
+                        </div>
                     </div>
                 </div>
             </div>

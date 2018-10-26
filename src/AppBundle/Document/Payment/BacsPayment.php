@@ -19,6 +19,7 @@ class BacsPayment extends Payment
 {
     use DateTrait;
 
+    const DAYS_PROCESSING = 1;
     const DAYS_CREDIT = 2;
     const DAYS_REVERSE = 5;
 

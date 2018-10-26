@@ -123,12 +123,13 @@ class SearchService
 
     public function findIncome($code, $excluded = null)
     {
+        if (!$excluded) {
+            $excluded = [];
+        }
+
         $outputArea = $this->findOutputArea($code);
         if (!$outputArea) {
             if (count($excluded) < 3) {
-                if (!$excluded) {
-                    $excluded = [];
-                }
                 $excluded = array_merge($excluded, [$code]);
                 if ($nearest = $this->findNearestPostcode($code, $excluded)) {
                     return $this->findIncome($nearest->getPostcode(), $excluded);

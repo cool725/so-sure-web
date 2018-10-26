@@ -1,0 +1,10 @@
+version: 0.0
+os: linux
+files:
+  - source: /
+    destination: /tmp/codedeploy
+hooks:
+  AfterInstall:
+    - location: deploy-testing-monument.sh
+      timeout: 1200
+      runas: root

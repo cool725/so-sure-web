@@ -11,8 +11,8 @@ services:
         autoconfigure: false # Automatically registers your services as commands, event subscribers, etc.
         public: true
 
-    app.user:
-        class: AppBundle\Security\FOSUBUserProvider
+    AppBundle\Security\FOSUBUserProvider:
+        public: false
         arguments: ["@fos_user.user_manager",{facebook: facebookId, google: googleId, starling: starlingId, accountkit: id}]
         calls:
             - [setFacebook, ['@app.facebook']]
@@ -25,8 +25,11 @@ services:
             - [setMixpanel, ['@app.mixpanel']]
             - [setMailer, ['@app.mailer']]
 
-    app.user.cognitoidentity:
-        class: AppBundle\Security\CognitoIdentityUserProvider
+    app.user:
+        alias: AppBundle\Security\FOSUBUserProvider
+        public: true
+
+    AppBundle\Security\CognitoIdentityUserProvider:
         autowire: false
         autoconfigure: false
         arguments:
@@ -39,14 +42,20 @@ services:
             - "@app.facebook"
             - "%kernel.environment%"
 
-    app.user.cognitoidentity.authenticator:
-        class: AppBundle\Security\CognitoIdentityAuthenticator
+    app.user.cognitoidentity:
+        alias: AppBundle\Security\CognitoIdentityUserProvider
+        public: true
+
+    AppBundle\Security\CognitoIdentityAuthenticator:
         arguments:
             - "@security.http_utils"
             - "@logger"
 
-    app.facebook:
-        class: AppBundle\Service\FacebookService
+    app.user.cognitoidentity.authenticator:
+        alias: AppBundle\Security\CognitoIdentityAuthenticator
+        public: true
+
+    AppBundle\Service\FacebookService:
         arguments:
             - "@logger"
             - "@router"
@@ -54,28 +63,44 @@ services:
             - "%fb_secret%"
             - "%account_kit_secret%"
 
-    app.google:
-        class: AppBundle\Service\GoogleService
+    app.facebook:
+        alias: AppBundle\Service\FacebookService
+        public: true
+
+    AppBundle\Service\GoogleService:
         arguments:
             - "@logger"
             - "%google_clientid%"
 
-    app.mailchimp.prelaunch:
-        class: AppBundle\Service\MailchimpService
+    app.google:
+        alias: AppBundle\Service\GoogleService
+        public: true
+
+    AppBundle\Service\MailchimpService:
         arguments:
             - "@logger"
             - "%mailchimp_apikey%"
             - "%mailchimp_prelaunch_list%"
             - "%kernel.environment%"
 
+    app.mailchimp.prelaunch:
+        alias: AppBundle\Service\MailchimpService
+        public: true
+
     app.fraud:
-        class: AppBundle\Service\FraudService
+        alias: AppBundle\Service\FraudService
+        public: true
+
+    AppBundle\Service\FraudService:
         arguments:
             - "@doctrine_mongodb.odm.default_document_manager"
             - "@logger"
 
     app.judopay:
-        class: AppBundle\Service\JudopayService
+        alias: AppBundle\Service\JudopayService
+        public: true
+
+    AppBundle\Service\JudopayService:
         arguments:
             - "@doctrine_mongodb.odm.default_document_manager"
             - "@logger"
@@ -93,7 +118,10 @@ services:
             - "@app.feature"
 
     app.payment:
-        class: AppBundle\Service\PaymentService
+        alias: AppBundle\Service\PaymentService
+        public: true
+
+    AppBundle\Service\PaymentService:
         arguments:
             - "@app.judopay"
             - "@app.router"
@@ -107,19 +135,27 @@ services:
             - "@event_dispatcher"
 
     app.barclays:
-        class: AppBundle\Service\BarclaysService
+        alias: AppBundle\Service\BarclaysService
+        public: true
+
+    AppBundle\Service\BarclaysService:
         arguments:
             - "@doctrine_mongodb.odm.default_document_manager"
             - "@logger"
 
     app.lloyds:
-        class: AppBundle\Service\LloydsService
+        alias: AppBundle\Service\LloydsService
+        public: true
+
+    AppBundle\Service\LloydsService:
         arguments:
             - "@doctrine_mongodb.odm.default_document_manager"
             - "@logger"
 
     app.user.launch:
-        class: AppBundle\Service\LaunchUserService
+        alias: AppBundle\Service\LaunchUserService
+
+    AppBundle\Service\LaunchUserService:
         arguments:
             - "@doctrine_mongodb.odm.default_document_manager"
             - "@logger"
@@ -130,7 +166,10 @@ services:
             - "@app.shortlink"
 
     app.invitation:
-        class: AppBundle\Service\InvitationService
+        alias: AppBundle\Service\InvitationService
+        public: true
+
+    AppBundle\Service\InvitationService:
         arguments:
             - "@doctrine_mongodb.odm.default_document_manager"
             - "@logger"
@@ -145,7 +184,10 @@ services:
             - "@app.mixpanel"
 
     app.scode:
-        class: AppBundle\Service\SCodeService
+        alias: AppBundle\Service\SCodeService
+        public: true
+
+    AppBundle\Service\SCodeService:
         arguments:
             - "@doctrine_mongodb.odm.default_document_manager"
             - "@logger"
@@ -153,8 +195,17 @@ services:
             - "@app.shortlink"
             - "@app.branch"
 
+    app.affiliate:
+        class: AppBundle\Service\AffiliateService
+        arguments:
+            - "@doctrine_mongodb.odm.default_document_manager"
+            - "@logger"
+
     app.bacs:
-        class: AppBundle\Service\BacsService
+        alias: AppBundle\Service\BacsService
+        public: true
+
+    AppBundle\Service\BacsService:
         arguments:
             - "@doctrine_mongodb.odm.default_document_manager"
             - "@logger"
@@ -172,14 +223,20 @@ services:
             - "@event_dispatcher"
 
     app.push:
-        class: AppBundle\Service\PushService
+        alias: AppBundle\Service\PushService
+        public: true
+
+    AppBundle\Service\PushService:
         arguments:
             - "@logger"
             - "@aws.sns"
             - "@statsd"
 
     app.claims:
-        class: AppBundle\Service\ClaimsService
+        alias: AppBundle\Service\ClaimsService
+        public: true
+
+    AppBundle\Service\ClaimsService:
         arguments:
             - "@doctrine_mongodb.odm.default_document_manager"
             - "@logger"
@@ -192,7 +249,10 @@ services:
             - "@app.feature"
 
     app.shortlink:
-        class: AppBundle\Service\ShortLinkService
+        alias: AppBundle\Service\ShortLinkService
+        public: true
+
+    AppBundle\Service\ShortLinkService:
         arguments:
             - "@logger"
             - "%google_appname%"
@@ -200,7 +260,10 @@ services:
             - "@statsd"
 
     app.intercom:
-        class: AppBundle\Service\IntercomService
+        alias: AppBundle\Service\IntercomService
+        public: true
+
+    AppBundle\Service\IntercomService:
         arguments:
             - "@doctrine_mongodb.odm.default_document_manager"
             - "@logger"
@@ -213,7 +276,10 @@ services:
             - "@router"
 
     app.address:
-        class: AppBundle\Service\PCAService
+        alias: AppBundle\Service\PCAService
+        public: true
+
+    AppBundle\Service\PCAService:
         arguments:
             - "@doctrine_mongodb.odm.default_document_manager"
             - "@logger"
@@ -223,7 +289,10 @@ services:
             - "@census.search"
 
     app.geoip:
-        class: AppBundle\Service\MaxMindIpService
+        alias: AppBundle\Service\MaxMindIpService
+        public: true
+
+    AppBundle\Service\MaxMindIpService:
         arguments:
             - "@logger"
             - "%geoip_city_db%"
@@ -231,7 +300,10 @@ services:
             - "@statsd"
 
     app.cognito.identity:
-        class: AppBundle\Service\CognitoIdentityService
+        alias: AppBundle\Service\CognitoIdentityService
+        public: true
+
+    AppBundle\Service\CognitoIdentityService:
         arguments:
             - "@logger"
             - "@doctrine_mongodb.odm.default_document_manager"
@@ -241,8 +313,11 @@ services:
             - "%kernel.environment%"
 
     base.imei:
+        alias: AppBundle\Service\BaseImeiService
+
+    AppBundle\Service\BaseImeiService:
         abstract: true
-        class: AppBundle\Service\BaseImeiService
+        public: true
         calls:
             - [setLogger, ['@monolog.logger.receperio']]
             - [setDm, ['@doctrine_mongodb.odm.default_document_manager']]
@@ -250,11 +325,13 @@ services:
             - [setRedis, ['@snc_redis.default']]
 
     app.imei:
+        alias: AppBundle\Service\ReceperioService
+
+    AppBundle\Service\ReceperioService:
         parent: base.imei
         autowire: false
         autoconfigure: false
         public: true
-        class: AppBundle\Service\ReceperioService
         calls:
             - [setSecretKey, ['%receperio_secretkey%']]
             - [setStoreId, ['%receperio_storeid%']]
@@ -264,13 +341,19 @@ services:
             - [setStatsd, ['@statsd']]
 
     app.sanctions:
-        class: AppBundle\Service\SanctionsService
+        alias: AppBundle\Service\SanctionsService
+        public: true
+
+    AppBundle\Service\SanctionsService:
         arguments:
             - "@doctrine_mongodb.odm.default_document_manager"
             - "@logger"
 
     app.sms:
-        class: AppBundle\Service\SmsService
+        alias: AppBundle\Service\SmsService
+        public: true
+
+    AppBundle\Service\SmsService:
         arguments:
             - "@doctrine_mongodb.odm.default_document_manager"
             - "@logger"
@@ -283,7 +366,10 @@ services:
             - "%kernel.environment%"
 
     app.branch:
-        class: AppBundle\Service\BranchService
+        alias: AppBundle\Service\BranchService
+        public: true
+
+    AppBundle\Service\BranchService:
         arguments:
             - "@logger"
             - "@app.router"
@@ -296,7 +382,10 @@ services:
             - "%apple_app_download%"
 
     app.request:
-        class: AppBundle\Service\RequestService
+        alias: AppBundle\Service\RequestService
+        public: true
+
+    AppBundle\Service\RequestService:
         arguments:
             - "@request_stack"
             - "@logger"
@@ -311,7 +400,6 @@ services:
             - "@app.branch"
             - "@logger"
             - "@app.request"
-        public: true
         tags:
             - { name: twig.extension }
 
@@ -370,12 +458,18 @@ services:
             - { name: twig.extension }
 
     app.excel:
-        class: AppBundle\Service\ExcelService
+        alias: AppBundle\Service\ExcelService
+        public: true
+
+    AppBundle\Service\ExcelService:
         arguments:
             - "@logger"
 
     app.salva:
-        class: AppBundle\Service\SalvaExportService
+        alias: AppBundle\Service\SalvaExportService
+        public: true
+
+    AppBundle\Service\SalvaExportService:
         arguments:
             - "@doctrine_mongodb.odm.default_document_manager"
             - "@logger"
@@ -391,8 +485,12 @@ services:
             - { name: monolog.logger, channel: salva }
 
     base.s3email:
+        alias: AppBundle\Service\S3EmailService
+        public: true
+
+    AppBundle\Service\S3EmailService:
         abstract: true
-        class: AppBundle\Service\S3EmailService
+        public: true
         calls:
             - [setLogger, ['@monolog.logger.receperio']]
             - [setDm, ['@doctrine_mongodb.odm.default_document_manager']]
@@ -401,8 +499,12 @@ services:
             - [setEnvironment, ['%kernel.environment%']]
 
     base.sftp:
+        alias: AppBundle\Service\SftpService
+        public: true
+
+    AppBundle\Service\SftpService:
         abstract: true
-        class: AppBundle\Service\SftpService
+        public: true
         calls:
             - [setLogger, ['@monolog.logger.receperio']]
             - [setDm, ['@doctrine_mongodb.odm.default_document_manager']]
@@ -411,11 +513,14 @@ services:
             - [setEnvironment, ['%kernel.environment%']]
 
     app.davies:
+        alias: AppBundle\Service\DaviesService
+        public: true
+
+    AppBundle\Service\DaviesService:
         parent: base.s3email
         autowire: false
         autoconfigure: false
         public: true
-        class: AppBundle\Service\DaviesService
         calls:
             - [setClaims, ['@app.claims']]
             - [setMailer, ['@app.mailer']]
@@ -427,11 +532,14 @@ services:
             - { name: monolog.logger, channel: davies }
 
     app.directgroup:
+        alias: AppBundle\Service\DirectGroupService
+        public: true
+
+    AppBundle\Service\DirectGroupService:
         parent: base.sftp
         autowire: false
         autoconfigure: false
         public: true
-        class: AppBundle\Service\DirectGroupService
         calls:
             - [setClaims, ['@app.claims']]
             - [setMailer, ['@app.mailer']]
@@ -447,11 +555,14 @@ services:
             - { name: monolog.logger, channel: directgroup }
 
     app.brightstar:
+        alias: AppBundle\Service\BrightstarService
+        public: true
+
+    AppBundle\Service\BrightstarService:
         parent: base.s3email
         autowire: false
         autoconfigure: false
         public: true
-        class: AppBundle\Service\BrightstarService
         calls:
             - [setBucket, ['ops.so-sure.com']]
             - [setPath, ['brightstar-report']]
@@ -460,19 +571,28 @@ services:
             - { name: monolog.logger, channel: davies }
 
     app.jwt:
-        class: AppBundle\Service\JWTService
+        alias: AppBundle\Service\JWTService
+        public: true
+
+    AppBundle\Service\JWTService:
         arguments:
             - "@logger"
             - "%api_secret%"
 
     app.sequence:
-        class: AppBundle\Service\SequenceService
+        alias: AppBundle\Service\SequenceService
+        public: true
+
+    AppBundle\Service\SequenceService:
         arguments:
             - "@doctrine_mongodb.odm.default_document_manager"
             - "@logger"
 
     app.policy:
-        class: AppBundle\Service\PolicyService
+        alias: AppBundle\Service\PolicyService
+        public: true
+
+    AppBundle\Service\PolicyService:
         arguments:
             - "@doctrine_mongodb.odm.default_document_manager"
             - "@logger"
@@ -499,14 +619,20 @@ services:
             - "@app.feature"
 
     app.quote:
-        class: AppBundle\Service\QuoteService
+        alias: AppBundle\Service\QuoteService
+        public: true
+
+    AppBundle\Service\QuoteService:
         arguments:
             - "@app.mailer"
             - "@doctrine_mongodb.odm.default_document_manager"
             - "@snc_redis.default"
 
     app.invoice:
-        class: AppBundle\Service\InvoiceService
+        alias: AppBundle\Service\InvoiceService
+        public: true
+
+    AppBundle\Service\InvoiceService:
         arguments:
             - "@doctrine_mongodb.odm.default_document_manager"
             - "@logger"
@@ -519,7 +645,10 @@ services:
             - "@aws.s3"
 
     app.mailer:
-        class: AppBundle\Service\MailerService
+        alias: AppBundle\Service\MailerService
+        public: true
+
+    AppBundle\Service\MailerService:
         arguments:
             - "@mailer"
             - "@swiftmailer.transport.real"
@@ -529,13 +658,19 @@ services:
             - "%default_sender_name%"
 
     app.router:
-        class: AppBundle\Service\RouterService
+        alias: AppBundle\Service\RouterService
+        public: true
+
+    AppBundle\Service\RouterService:
         arguments:
             - "@router"
             - "%web_base_url%"
 
     app.ratelimit:
-        class: AppBundle\Service\RateLimitService
+        alias: AppBundle\Service\RateLimitService
+        public: true
+
+    AppBundle\Service\RateLimitService:
         arguments:
             - "@snc_redis.default"
             - "@logger"
@@ -554,29 +689,40 @@ services:
             - "sosure"
 
     app.stats:
-        class: AppBundle\Service\StatsService
+        alias: AppBundle\Service\StatsService
+        public: true
+
+    AppBundle\Service\StatsService:
         arguments:
             - "@doctrine_mongodb.odm.default_document_manager"
             - "@snc_redis.default"
             - "@logger"
 
     app.phone:
-        class: AppBundle\Service\PhoneService
+        alias: AppBundle\Service\PhoneService
+        public: true
+
+    AppBundle\Service\PhoneService:
         arguments:
             - "@logger"
 
     app.logger.rollbar:
-        class: AppBundle\Classes\Rollbar
+        alias: AppBundle\Classes\Rollbar
+        public: true
+
+    AppBundle\Classes\Rollbar:
         arguments:
             - access_token: '%rollbar_access_token%'
 
     app.logger.rollbar-security:
-        class: AppBundle\Classes\Rollbar
-        arguments:
-            - access_token: '%rollbar_access_token%'
+        alias: AppBundle\Classes\Rollbar
+        public: true
 
     app.logger.lineformatter:
-        class: Monolog\Formatter\LineFormatter
+        alias: Monolog\Formatter\LineFormatter
+        public: true
+
+    Monolog\Formatter\LineFormatter:
         calls:
             - [includeStacktraces]
 
@@ -603,7 +749,10 @@ services:
                 credentials: "@aws.credentials"
 
     aws.s3:
-        class: Aws\S3\S3Client
+        alias: Aws\S3\S3Client
+        public: true
+
+    Aws\S3\S3Client:
         arguments:
             -
                 version: "latest"
@@ -619,7 +768,10 @@ services:
             - 443
 
     app.monitor:
-        class: AppBundle\Service\MonitorService
+        alias: AppBundle\Service\MonitorService
+        public: true
+
+    AppBundle\Service\MonitorService:
         arguments:
             - "@doctrine_mongodb.odm.default_document_manager"
             - "@logger"
@@ -629,7 +781,10 @@ services:
             - "@app.judopay"
 
     app.annie:
-        class: AppBundle\Service\AppAnnieService
+        alias: AppBundle\Service\AppAnnieService
+        public: true
+
+    AppBundle\Service\AppAnnieService:
         arguments:
             - "@doctrine_mongodb.odm.default_document_manager"
             - "@logger"
@@ -647,7 +802,10 @@ services:
             - "@snc_redis.default"
 
     app.mixpanel:
-        class: AppBundle\Service\MixpanelService
+        alias: AppBundle\Service\MixpanelService
+        public: true
+
+    AppBundle\Service\MixpanelService:
         arguments:
             - "@doctrine_mongodb.odm.default_document_manager"
             - "@logger"
@@ -659,7 +817,10 @@ services:
             - "@census.search"
 
     app.sixpack:
-        class: AppBundle\Service\SixpackService
+        alias: AppBundle\Service\SixpackService
+        public: true
+
+    AppBundle\Service\SixpackService:
         arguments:
             - "@doctrine_mongodb.odm.default_document_manager"
             - "@logger"
@@ -668,7 +829,10 @@ services:
             - "@app.mixpanel"
 
     app.feature:
-        class: AppBundle\Service\FeatureService
+        alias: AppBundle\Service\FeatureService
+        public: true
+
+    AppBundle\Service\FeatureService:
         arguments:
             - "@doctrine_mongodb.odm.default_document_manager"
             - "@logger"
@@ -687,33 +851,51 @@ services:
         arguments: ['%mixpanel_apitoken%']
 
     app.voter.user:
-        class: AppBundle\Security\UserVoter
+        alias: AppBundle\Security\UserVoter
+        public: true
+
+    AppBundle\Security\UserVoter:
         tags:
             - { name: security.voter }
 
     app.voter.policy:
-        class: AppBundle\Security\PolicyVoter
+        alias: AppBundle\Security\PolicyVoter
+        public: true
+
+    AppBundle\Security\PolicyVoter:
         tags:
             - { name: security.voter }
 
     app.voter.claim:
-        class: AppBundle\Security\ClaimVoter
+        alias: AppBundle\Security\ClaimVoter
+        public: true
+
+    AppBundle\Security\ClaimVoter:
         tags:
             - { name: security.voter }
 
     app.voter.invitation:
-        class: AppBundle\Security\InvitationVoter
+        alias: AppBundle\Security\InvitationVoter
+        public: true
+
+    AppBundle\Security\InvitationVoter:
         tags:
             - { name: security.voter }
 
     app.voter.multiPay:
-        class: AppBundle\Security\MultiPayVoter
+        alias: AppBundle\Security\MultiPayVoter
+        public: true
+
+    AppBundle\Security\MultiPayVoter:
         tags:
             - { name: security.voter }
 
     base.doctrine:
+        alias: AppBundle\Listener\BaseDoctrineListener
+
+    AppBundle\Listener\BaseDoctrineListener:
         abstract: true
-        class: AppBundle\Listener\BaseDoctrineListener
+        public: true
         calls:
             - [setReader, ['@annotations.reader']]
 
@@ -763,7 +945,6 @@ services:
         class:   AppBundle\Listener\DoctrineClaimListener
         arguments:
             - "@event_dispatcher"
-            - "@annotation_reader"
         tags:
             -  { name: doctrine_mongodb.odm.event_listener, event: postPersist }
             -  { name: doctrine_mongodb.odm.event_listener, event: preUpdate  }
@@ -1300,12 +1481,18 @@ services:
             - { name: twig.extension }
 
     census.search:
-        class: CensusBundle\Service\SearchService
+        alias: CensusBundle\Service\SearchService
+        public: true
+
+    CensusBundle\Service\SearchService:
         arguments:
             - "@doctrine_mongodb.odm.census_document_manager"
 
     app.gender:
-        class: AppBundle\Service\GenderizeService
+        alias: AppBundle\Service\GenderizeService
+        public: true
+
+    AppBundle\Service\GenderizeService:
         arguments:
             - "@doctrine_mongodb.odm.default_document_manager"
             - "@logger"

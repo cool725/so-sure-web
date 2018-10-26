@@ -116,12 +116,8 @@ class DefaultControllerTest extends BaseControllerTest
         /** @var Phone $phone */
         $phone = $repo->findOneBy(['devices' => 'iPhone 6', 'memory' => 64]);
 
-        $crawler = self::$client->request('GET', self::$router->generate('quote_phone', [
-            'id' => $phone->getId()
-        ]));
-        self::verifyResponse(301);
-        $crawler = self::$client->followRedirect();
-        self::verifyResponse(200);
+        $this->setPhoneSession($phone);
+
         /** @var PhonePrice $price */
         $price = $phone->getCurrentPhonePrice();
         $this->assertContains(

@@ -1301,7 +1301,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         for ($i = 1; $i <= $limit + 1; $i++) {
             $user = self::createUser(
                 self::$userManager,
-                self::generateEmail('rate-limit-email-' + $i, $this),
+                self::generateEmail(sprintf('rate-limit-email-%d', $i), $this),
                 'foo'
             );
             $cognitoIdentityId = $this->getAuthUser($user);
@@ -1709,6 +1709,51 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $policies = $user->getPolicies();
         $this->assertEquals(1, count($policies));
         $this->assertEquals('MLLN2B/A', $policies[0]->getModelNumber());
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['phone_policy' => [
+            'make' => 'Apple',
+            'device' => 'iPhone11,2',
+        ]]);
+        $data = $this->verifyResponse(400, ApiErrorCode::ERROR_MISSING_PARAM);
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['phone_policy' => [
+            'make' => 'Apple',
+            'device' => 'iPhone11,0',
+            'memory' => 32,
+        ]]);
+        $data = $this->verifyResponse(404, ApiErrorCode::ERROR_NOT_FOUND);
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['phone_policy' => [
+            'make' => 'Apple',
+            'device' => 'iPhone11,2',
+            'memory' => 64,
+        ]]);
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_POLICY_UNABLE_TO_UDPATE);
+
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
+        $policyData = $this->verifyResponse(200);
+        $url = sprintf("/api/v1/auth/policy/%s", $policyData['id']);
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['phone_policy' => [
+            'make' => 'Apple',
+            'device' => 'iPhone11,2',
+            'memory' => 64,
+        ]]);
+        $data = $this->verifyResponse(200);
+
+        $dm = $this->getDocumentManager(true);
+        $userRepo = $dm->getRepository(User::class);
+        /** @var User $user */
+        $user = $userRepo->find($user->getId());
+        $policies = $user->getPolicies();
+        $this->assertEquals(2, count($policies));
+        $this->assertNotNull($policies[1]->getPhone());
+        $this->assertEquals('Apple', $policies[1]->getPhone()->getMake());
+        $this->assertEquals('iPhone XS', $policies[1]->getPhone()->getModel());
+        $this->assertEquals(64, $policies[1]->getPhone()->getMemory());
+        $this->assertEquals(
+            $policies[1]->getPhone()->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
+            $policies[1]->getPremium()->getMonthlyPremiumPrice()
+        );
     }
 
     public function testPostPolicyUnknownId()
@@ -2012,11 +2057,13 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $validFrom->sub(new \DateInterval('PT1H'));
 
         $price = new PhonePrice();
-        $price->setGwp($phone->getCurrentPhonePrice()->getGwp()+1);
+        if ($currentPrice) {
+            $price->setGwp($currentPrice->getGwp() + 1);
+            $currentPrice->setValidTo($validFrom);
+        }
         $price->setValidFrom($validFrom);
         $phone->addPhonePrice($price);
 
-        $currentPrice->setValidTo($validFrom);
 
         $dm->flush();
 
@@ -3097,6 +3144,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $url = sprintf("/api/v1/auth/policy/%s/invitation?debug=true", $inviterPolicyId);
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+            'action' => 'accept',
             'facebook_id' => $invitee->getFacebookId()
         ]);
         $data = $this->verifyResponse(200);

@@ -4,6 +4,7 @@ namespace AppBundle\Command;
 
 use AppBundle\Listener\SanctionsListener;
 use AppBundle\Service\MailerService;
+use Predis\Client;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -15,12 +16,28 @@ use AppBundle\Document\User;
 use AppBundle\Document\Company;
 use AppBundle\Document\DateTrait;
 use AppBundle\Validator\Constraints\AlphanumericSpaceDotValidator;
-use GuzzleHttp\Client;
 use Symfony\Component\Templating\EngineInterface;
 
 class SanctionsReportCommand extends ContainerAwareCommand
 {
     use DateTrait;
+
+    /** @var Client */
+    protected $redis;
+
+    /** @var MailerService */
+    protected $mailerService;
+
+    /** @var EngineInterface */
+    protected $templating;
+
+    public function __construct(Client $redis, MailerService $mailerService, EngineInterface $templating)
+    {
+        parent::__construct();
+        $this->redis = $redis;
+        $this->mailerService = $mailerService;
+        $this->templating = $templating;
+    }
 
     protected function configure()
     {
@@ -38,16 +55,12 @@ class SanctionsReportCommand extends ContainerAwareCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        /** @var \Predis\Client $redis */
-        $redis = $this->getContainer()->get('snc_redis.default');
-        /** @var MailerService $mailer */
-        $mailer = $this->getContainer()->get('app.mailer');
         $debug = $input->getOption('debug');
         $users = [];
         $companies = [];
 
         //fetch all items from redis
-        while ($sanction = unserialize($redis->lpop(SanctionsListener::SANCTIONS_LISTENER_REDIS_KEY))) {
+        while ($sanction = unserialize($this->redis->lpop(SanctionsListener::SANCTIONS_LISTENER_REDIS_KEY))) {
             if (isset($sanction['user'])) {
                 $users[] = $sanction;
                 continue;
@@ -56,7 +69,7 @@ class SanctionsReportCommand extends ContainerAwareCommand
         }
 
         $numSanctions = (count($users)+count($companies));
-        $mailer->sendTemplate(
+        $this->mailerService->sendTemplate(
             sprintf(
                 'Daily sanctions report for %s. Sanctions to verify %s',
                 date('m-d-Y'),
@@ -68,9 +81,7 @@ class SanctionsReportCommand extends ContainerAwareCommand
         );
 
         if ($debug) {
-            /** @var EngineInterface $templating */
-            $templating = $this->getContainer()->get('templating');
-            $email = $templating->render(
+            $email = $this->templating->render(
                 'AppBundle:Email:user/admin_sanctions.html.twig',
                 ['users' => $users, 'companies' => $companies]
             );

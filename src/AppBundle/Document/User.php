@@ -46,6 +46,11 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     const ROLE_CUSTOMER_SERVICES = 'ROLE_CUSTOMER_SERVICES';
     const ROLE_ADMIN = 'ROLE_ADMIN';
 
+    const AQUISITION_COMPLETED = 'completed'; // this is for aquisitions that have already happened.
+    const AQUISITION_PENDING = 'pending'; // This is for aquisitions that are on track to occur.
+    const AQUISITION_POTENTIAL = 'potential'; // this is for aquired users with no policy.
+    const AQUISITION_LOST = 'lost'; // this is for aquired users with a cancelled policy.
+
     /**
      * @MongoDB\Id
      */
@@ -63,7 +68,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
      * @MongoDB\ReferenceMany(targetDocument="User", mappedBy="referred")
      */
     protected $referrals;
-    
+
     /**
      * @MongoDB\ReferenceOne(targetDocument="User", inversedBy="referrals")
      * @Gedmo\Versioned
@@ -272,6 +277,12 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     protected $company;
 
     /**
+     * @MongoDB\ReferenceOne(targetDocument="AffiliateCompany", inversedBy="confirmedUsers")
+     * @Gedmo\Versioned
+     */
+    protected $affiliate;
+
+    /**
      * @MongoDB\ReferenceMany(targetDocument="Policy", mappedBy="user")
      */
     protected $policies;
@@ -422,7 +433,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     {
         $this->id = $id;
     }
-    
+
     public function isLocked()
     {
         return $this->locked;
@@ -577,6 +588,16 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     public function setCompany(Company $company)
     {
         $this->company = $company;
+    }
+
+    public function getAffiliate()
+    {
+        return $this->affiliate;
+    }
+
+    public function setAffiliate(AffiliateCompany $affiliate)
+    {
+        $this->affiliate = $affiliate;
     }
 
     public function addPolicy(Policy $policy)
@@ -1018,6 +1039,18 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         return $policies;
     }
 
+    public function isAffiliateCandidate($days)
+    {
+        foreach ($this->getValidPolicies(true) as $policy) {
+            /** @var Policy $policy */
+            if ($policy->isPolicyOldEnough($days)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public function getValidPoliciesWithoutOpenedClaim($includeUnpaid = false)
     {
         $policies = [];
@@ -1130,7 +1163,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
 
         return false;
     }
-    
+
     public function hasPolicyCancelledAndPaymentOwed()
     {
         foreach ($this->getAllPolicies() as $policy) {
@@ -2003,5 +2036,22 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
                 null,
             'has_mobile_number_verified' => $this->getMobileNumberVerified()
         ];
+    }
+
+    /**
+     * Tells you the what state the user is in regarding affiliate aquisition.
+     * @return string aquisition state name.
+     */
+    public function aquisitionStatus()
+    {
+        if ($this->affiliate) {
+            return static::AQUISITION_COMPLETED;
+        } elseif ($this->hasActivePolicy() || $this->hasUnpaidPolicy()) {
+            return static::AQUISITION_PENDING;
+        } elseif ($this->hasPolicy()) {
+            return static::AQUISITION_LOST;
+        } else {
+            return static::AQUISITION_POTENTIAL;
+        }
     }
 }

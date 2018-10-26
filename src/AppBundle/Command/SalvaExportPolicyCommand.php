@@ -13,6 +13,15 @@ use AppBundle\Classes\Premium;
 
 class SalvaExportPolicyCommand extends ContainerAwareCommand
 {
+    /** @var SalvaExportService */
+    protected $salvaExportService;
+
+    public function __construct(SalvaExportService $salvaExportService)
+    {
+        parent::__construct();
+        $this->salvaExportService = $salvaExportService;
+    }
+
     protected function configure()
     {
         $this
@@ -37,9 +46,7 @@ class SalvaExportPolicyCommand extends ContainerAwareCommand
     {
         $s3 = true === $input->getOption('s3');
         $date = new \DateTime($input->getOption('date'));
-        /** @var SalvaExportService $salva */
-        $salva = $this->getContainer()->get('app.salva');
-        $data = $salva->exportPolicies($s3, $date);
+        $data = $this->salvaExportService->exportPolicies($s3, $date);
         $output->write(implode(PHP_EOL, $data));
         $output->writeln('');
     }
