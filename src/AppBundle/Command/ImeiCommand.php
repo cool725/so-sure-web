@@ -6,6 +6,7 @@ use AppBundle\Repository\ClaimRepository;
 use AppBundle\Repository\PhonePolicyRepository;
 use AppBundle\Repository\PhoneRepository;
 use AppBundle\Service\ReceperioService;
+use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -16,8 +17,21 @@ use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Claim;
 
-class ImeiCommand extends BaseCommand
+class ImeiCommand extends ContainerAwareCommand
 {
+    /** @var DocumentManager  */
+    protected $dm;
+
+    /** @var ReceperioService */
+    protected $imeiService;
+
+    public function __construct(DocumentManager $dm, ReceperioService $imeiService)
+    {
+        parent::__construct();
+        $this->dm = $dm;
+        $this->imeiService = $imeiService;
+    }
+
     protected function configure()
     {
         $this
@@ -102,8 +116,6 @@ class ImeiCommand extends BaseCommand
         }
         $save = true === $input->getOption('save');
         $phone = $this->getPhone($device, $memory);
-        /** @var ReceperioService $imeiService */
-        $imeiService = $this->getContainer()->get('app.imei');
 
         $policy = null;
         if ($policyId) {
@@ -119,26 +131,26 @@ class ImeiCommand extends BaseCommand
         }
 
         if ($register !== null) {
-            if ($imeiService->registerClaims($policy, $claim, $imei, $register)) {
+            if ($this->imeiService->registerClaims($policy, $claim, $imei, $register)) {
                 print sprintf("Register claim for imei %s is good\n", $imei);
             } else {
                 print sprintf("Register claim for imei %s failed\n", $imei);
             }
         } elseif ($claimscheck) {
-            if ($imeiService->checkClaims($policy, $claim, $imei, null)) {
+            if ($this->imeiService->checkClaims($policy, $claim, $imei, null)) {
                 print sprintf("Claimscheck for imei %s is good\n", $imei);
             } else {
                 print sprintf("Claimscheck for imei %s failed validation\n", $imei);
             }
         } else {
             if ($save) {
-                if ($imeiService->reprocessImei($phone, $imei)) {
+                if ($this->imeiService->reprocessImei($phone, $imei)) {
                     print sprintf("Imei %s is good\n", $imei);
                 } else {
                     print sprintf("Imei %s failed validation\n", $imei);
                 }
             } else {
-                if ($imeiService->checkImei($phone, $imei)) {
+                if ($this->imeiService->checkImei($phone, $imei)) {
                     print sprintf("Imei %s is good\n", $imei);
                 } else {
                     print sprintf("Imei %s failed validation\n", $imei);
@@ -148,13 +160,13 @@ class ImeiCommand extends BaseCommand
 
         if ($serial) {
             if ($save) {
-                if ($imeiService->reprocessSerial($phone, $serial)) {
+                if ($this->imeiService->reprocessSerial($phone, $serial)) {
                     print sprintf("Serial %s is good\n", $serial);
                 } else {
                     print sprintf("Serial %s failed validation\n", $serial);
                 }
             } else {
-                if ($imeiService->checkSerial($phone, $serial, $imei)) {
+                if ($this->imeiService->checkSerial($phone, $serial, $imei)) {
                     print sprintf("Serial %s is good\n", $serial);
                 } else {
                     print sprintf("Serial %s failed validation\n", $serial);
@@ -166,7 +178,7 @@ class ImeiCommand extends BaseCommand
     private function getPolicyByImei($imei)
     {
         /** @var PhonePolicyRepository $repo */
-        $repo = $this->getManager()->getRepository(PhonePolicy::class);
+        $repo = $this->dm->getRepository(PhonePolicy::class);
         $policy = $repo->findOneBy(['imei' => $imei]);
         if (!$policy) {
             throw new \Exception('Unable to find policy');
@@ -178,7 +190,7 @@ class ImeiCommand extends BaseCommand
     private function getPolicy($policyId)
     {
         /** @var PhonePolicyRepository $repo */
-        $repo = $this->getManager()->getRepository(PhonePolicy::class);
+        $repo = $this->dm->getRepository(PhonePolicy::class);
         $policy = $repo->find($policyId);
         if (!$policy) {
             throw new \Exception('Unable to find policy');
@@ -190,7 +202,7 @@ class ImeiCommand extends BaseCommand
     private function getClaim($claimId)
     {
         /** @var ClaimRepository $repo */
-        $repo = $this->getManager()->getRepository(Claim::class);
+        $repo = $this->dm->getRepository(Claim::class);
         $claim = $repo->find($claimId);
         if (!$claim) {
             throw new \Exception('Unable to find claim');
@@ -202,7 +214,7 @@ class ImeiCommand extends BaseCommand
     private function getClaimByNumber($claimNumber)
     {
         /** @var ClaimRepository $repo */
-        $repo = $this->getManager()->getRepository(Claim::class);
+        $repo = $this->dm->getRepository(Claim::class);
         $claim = $repo->findOneBy(['number' => $claimNumber]);
         if (!$claim) {
             throw new \Exception('Unable to find claim');
@@ -215,7 +227,7 @@ class ImeiCommand extends BaseCommand
     {
         $phone = null;
         /** @var PhoneRepository $phoneRepo */
-        $phoneRepo = $this->getManager()->getRepository(Phone::class);
+        $phoneRepo = $this->dm->getRepository(Phone::class);
         if ($device && $memory) {
             $phone = $phoneRepo->findOneBy(['devices' => $device, 'memory' => (int)$memory]);
         } elseif ($device) {

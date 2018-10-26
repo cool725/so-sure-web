@@ -59,6 +59,14 @@ class RefundListener
     {
         $policy = $event->getPolicy();
 
+        if (!$policy->isPolicy()) {
+            $this->logger->error(sprintf(
+                'Cancelling non-policy %s. Manually refund any payments and cancel with Salva',
+                $policy->getId()
+            ));
+            return;
+        }
+
         // Cooloff cancellations should refund any so-sure payments
         if ($policy->getCancelledReason() == Policy::CANCELLED_COOLOFF) {
             $payments = $policy->getPayments();

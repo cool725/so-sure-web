@@ -796,9 +796,9 @@ class PurchaseController extends BaseController
         // Default to monthly payment
         if ('GET' === $request->getMethod()) {
             $price = $policy->getPhone()->getCurrentPhonePrice();
-            if ($user->allowedMonthlyPayments()) {
+            if ($price && $user->allowedMonthlyPayments()) {
                 $purchase->setAmount($price->getMonthlyPremiumPrice($user->getAdditionalPremium()));
-            } elseif ($user->allowedYearlyPayments()) {
+            } elseif ($price && $user->allowedYearlyPayments()) {
                 $purchase->setAmount($price->getYearlyPremiumPrice($user->getAdditionalPremium()));
             }
         }
@@ -845,14 +845,19 @@ class PurchaseController extends BaseController
 
                 if ($purchaseFormValid) {
                     if ($allowPayment) {
-                        $monthly = $this->areEqualToTwoDp(
-                            $purchase->getAmount(),
-                            $policy->getPhone()->getCurrentPhonePrice()->getMonthlyPremiumPrice()
-                        );
-                        $yearly = $this->areEqualToTwoDp(
-                            $purchase->getAmount(),
-                            $policy->getPhone()->getCurrentPhonePrice()->getYearlyPremiumPrice()
-                        );
+                        $currentPrice = $policy->getPhone()->getCurrentPhonePrice();
+                        $monthly = null;
+                        $yearly = null;
+                        if ($currentPrice) {
+                            $monthly = $this->areEqualToTwoDp(
+                                $purchase->getAmount(),
+                                $currentPrice->getMonthlyPremiumPrice()
+                            );
+                            $yearly = $this->areEqualToTwoDp(
+                                $purchase->getAmount(),
+                                $currentPrice->getYearlyPremiumPrice()
+                            );
+                        }
 
                         if ($monthly || $yearly) {
                             $price = $purchase->getPolicy()->getPhone()->getCurrentPhonePrice();

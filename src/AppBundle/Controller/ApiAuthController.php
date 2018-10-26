@@ -20,6 +20,7 @@ use AppBundle\Document\Address;
 use AppBundle\Document\Payment\Payment;
 use AppBundle\Document\Cashback;
 use AppBundle\Document\Phone;
+use AppBundle\Document\PhonePrice;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\Policy;
@@ -655,6 +656,61 @@ class ApiAuthController extends BaseController
 
             $needUpdate = false;
             if (isset($data['phone_policy'])) {
+                if (isset($data['phone_policy']['make']) ||
+                    isset($data['phone_policy']['device']) ||
+                    isset($data['phone_policy']['memory'])) {
+                    if (!$this->validateFields($data['phone_policy'], ['make', 'device', 'memory'])) {
+                        return $this->getErrorJsonResponse(
+                            ApiErrorCode::ERROR_MISSING_PARAM,
+                            'Missing parameters',
+                            400
+                        );
+                    }
+
+                    $phone = $this->getPhone(
+                        $this->getDataString($data['phone_policy'], 'make'),
+                        $this->getDataString($data['phone_policy'], 'device'),
+                        $this->getDataString($data['phone_policy'], 'memory')
+                    );
+                    if (!$phone) {
+                        return $this->getErrorJsonResponse(
+                            ApiErrorCode::ERROR_NOT_FOUND,
+                            'Unable to provide policy for this phone',
+                            404
+                        );
+                    }
+                    if (!$phone->getActive()) {
+                        return $this->getErrorJsonResponse(
+                            ApiErrorCode::ERROR_NOT_FOUND,
+                            'Unable to provide policy for this phone',
+                            404
+                        );
+                    }
+
+                    if ($policy->getStatus() != null && $policy->getStatus() != Policy::STATUS_PENDING) {
+                        return $this->getErrorJsonResponse(
+                            ApiErrorCode::ERROR_POLICY_UNABLE_TO_UDPATE,
+                            'Unable to change phone for this policy',
+                            422
+                        );
+                    }
+
+                    $policy->setPhone($phone);
+                    $policy->setPhoneData(json_encode([
+                        'make' => $this->getDataString($data['phone_policy'], 'make'),
+                        'device' => $this->getDataString($data['phone_policy'], 'device'),
+                        'memory' => $this->getDataString($data['phone_policy'], 'memory'),
+                    ]));
+                    $additionalPremium = null;
+                    if ($policy->getUser()) {
+                        $additionalPremium = $policy->getUser()->getAdditionalPremium();
+                    }
+                    /** @var PhonePrice $price */
+                    $price = $phone->getCurrentPhonePrice(null);
+                    $policy->setPremium($price->createPremium($additionalPremium, null));
+
+                    $needUpdate = true;
+                }
                 if (isset($data['phone_policy']['model_number'])) {
                     $modelNumber = $this->getDataString($data['phone_policy'], 'model_number');
                     $policy->setModelNumber($modelNumber);

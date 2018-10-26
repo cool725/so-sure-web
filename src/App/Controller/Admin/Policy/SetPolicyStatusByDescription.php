@@ -20,9 +20,9 @@ class SetPolicyStatusByDescription extends AbstractController
     /** @var DocumentManager */
     private $documentManager;
 
-    public function __construct(DocumentManager $documentManager)
+    public function __construct(DocumentManager $dm)
     {
-        $this->documentManager = $documentManager;
+        $this->documentManager = $dm;
     }
 
     public function __invoke($id, $policyNewStatus): Response

@@ -688,13 +688,14 @@ class DirectGroupService extends SftpService
 
         if (!$claim->getReplacementReceivedDate() && $directGroupClaim->replacementReceivedDate) {
             // We should be notified the next day when a replacement device is delivered
-            // so we can follow up with our customer. Unlikely to occur.
+            // so we can follow up with our customer.
+            // DG takes 3 days for some suppliers
             $ago = new \DateTime();
-            $ago = $this->subBusinessDays($ago, 1);
+            $ago = $this->subBusinessDays($ago, 3);
 
             if ($directGroupClaim->replacementReceivedDate < $ago) {
                 $msg = sprintf(
-                    'Claim %s has a delayed replacement date (%s) which is more than 1 business day ago (%s)',
+                    'Claim %s has a delayed replacement date (%s) which is more than 3 business days ago (%s)',
                     $directGroupClaim->claimNumber,
                     $directGroupClaim->replacementReceivedDate->format(\DateTime::ATOM),
                     $ago->format(\DateTime::ATOM)

@@ -7,6 +7,7 @@ use AppBundle\Document\JudoPaymentMethod;
 use AppBundle\Repository\PolicyRepository;
 use AppBundle\Repository\ScheduledPaymentRepository;
 use AppBundle\Service\PaymentService;
+use Doctrine\ODM\MongoDB\DocumentManager;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
@@ -17,8 +18,25 @@ use Symfony\Component\Console\Helper\Table;
 use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\Policy;
 
-class ScheduledPaymentCommand extends BaseCommand
+class ScheduledPaymentCommand extends ContainerAwareCommand
 {
+    /** @var DocumentManager  */
+    protected $dm;
+
+    /** @var LoggerInterface  */
+    protected $logger;
+
+    /** @var PaymentService */
+    protected $paymentService;
+
+    public function __construct(DocumentManager $dm, LoggerInterface $logger, PaymentService $paymentService)
+    {
+        parent::__construct();
+        $this->dm = $dm;
+        $this->logger = $logger;
+        $this->paymentService = $paymentService;
+    }
+
     protected function configure()
     {
         $this
@@ -83,16 +101,12 @@ class ScheduledPaymentCommand extends BaseCommand
             $scheduledDate = new \DateTime($date);
         }
 
-        /** @var LoggerInterface $logger */
-        $logger = $this->getContainer()->get('logger');
-        /** @var PaymentService $paymentService */
-        $paymentService = $this->getContainer()->get('app.payment');
         /** @var ScheduledPaymentRepository $repo */
-        $repo = $this->getManager()->getRepository(ScheduledPayment::class);
+        $repo = $this->dm->getRepository(ScheduledPayment::class);
         if ($id) {
             /** @var ScheduledPayment $scheduledPayment */
             $scheduledPayment = $repo->find($id);
-            $scheduledPayment = $paymentService->scheduledPayment(
+            $scheduledPayment = $this->paymentService->scheduledPayment(
                 $scheduledPayment,
                 $prefix,
                 $scheduledDate,
@@ -102,7 +116,7 @@ class ScheduledPaymentCommand extends BaseCommand
             //\Doctrine\Common\Util\Debug::dump($scheduledPayment);
         } elseif ($policyNumber) {
             /** @var PolicyRepository $policyRepo */
-            $policyRepo = $this->getManager()->getRepository(Policy::class);
+            $policyRepo = $this->dm->getRepository(Policy::class);
             /** @var Policy $policy */
             $policy = $policyRepo->findOneBy(['policyNumber' => $policyNumber]);
             if (!$policy) {
@@ -113,7 +127,7 @@ class ScheduledPaymentCommand extends BaseCommand
                 $this->displayScheduledPayment($scheduledPayment, $output);
             }
         } else {
-            $scheduledPayments = $paymentService->getAllValidScheduledPaymentsForType(
+            $scheduledPayments = $this->paymentService->getAllValidScheduledPaymentsForType(
                 $prefix,
                 JudoPaymentMethod::class
             );
@@ -121,11 +135,11 @@ class ScheduledPaymentCommand extends BaseCommand
                 /** @var ScheduledPayment $scheduledPayment */
                 try {
                     if (!$show) {
-                        $scheduledPayment = $paymentService->scheduledPayment($scheduledPayment, $prefix);
+                        $scheduledPayment = $this->paymentService->scheduledPayment($scheduledPayment, $prefix);
                     }
                     $this->displayScheduledPayment($scheduledPayment, $output);
                 } catch (\Exception $e) {
-                    $logger->error($e->getMessage());
+                    $this->logger->error($e->getMessage());
                     $output->writeln($e->getMessage());
                     $this->displayScheduledPayment($scheduledPayment, $output);
                 }
@@ -133,7 +147,7 @@ class ScheduledPaymentCommand extends BaseCommand
         }
     }
 
-    protected function displayScheduledPayment(ScheduledPayment $scheduledPayment, $output)
+    protected function displayScheduledPayment(ScheduledPayment $scheduledPayment, OutputInterface $output)
     {
         $output->writeln(sprintf(
             'Policy %s Status %s SId %s Scheduled %s Amount %s Status %s Paid %s',

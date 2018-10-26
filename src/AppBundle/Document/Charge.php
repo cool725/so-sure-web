@@ -23,6 +23,7 @@ class Charge
     const TYPE_CLAIMSCHECK = 'claimscheck';
     const TYPE_CLAIMSDAMAGE = 'claimsdamage';
     const TYPE_BANK_ACCOUNT = 'bank-account';
+    const TYPE_AFFILIATE = 'affiliate';
 
     public static $prices = [
         self::TYPE_ADDRESS => 0.037, // ex vat
@@ -47,8 +48,8 @@ class Charge
     protected $createdDate;
 
     /**
-     * @Assert\Choice({"address", "sms", "gsma", "makemodel", "claimscheck", "claimsdamage", "bank-account"},
-     *     strict=true)
+     * @Assert\Choice({"address", "sms", "gsma", "makemodel", "claimscheck", "claimsdamage", "bank-account",
+     *     "affiliate"}, strict=true)
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
@@ -59,6 +60,12 @@ class Charge
      * @Gedmo\Versioned
      */
     protected $user;
+
+    /**
+     * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\AffiliateCompany")
+     * @Gedmo\Versioned
+     */
+    protected $affiliate;
 
     /**
      * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\Policy")
@@ -129,6 +136,16 @@ class Charge
         $this->user = $user;
     }
 
+    public function getAffiliate()
+    {
+        return $this->affiliate;
+    }
+
+    public function setAffiliate($affiliate)
+    {
+        $this->affiliate = $affiliate;
+    }
+
     public function getPolicy()
     {
         return $this->policy;
@@ -167,7 +184,9 @@ class Charge
     public function setType($type)
     {
         $this->type = $type;
-        $this->setAmount(self::$prices[$type]);
+        if (isset(self::$prices[$type])) {
+            $this->setAmount(self::$prices[$type]);
+        }
     }
 
     public function getAmount()

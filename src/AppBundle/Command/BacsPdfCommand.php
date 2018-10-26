@@ -13,6 +13,7 @@ use AppBundle\Repository\UserRepository;
 use AppBundle\Service\BacsService;
 use AppBundle\Service\PaymentService;
 use AppBundle\Service\SequenceService;
+use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
@@ -21,9 +22,18 @@ use AppBundle\Document\User;
 use phpseclib\Net\SFTP;
 use phpseclib\Crypt\RSA;
 
-class BacsPdfCommand extends BaseCommand
+class BacsPdfCommand extends ContainerAwareCommand
 {
     use DateTrait;
+
+    /** @var BacsService  */
+    protected $bacsService;
+
+    public function __construct(BacsService $bacsService)
+    {
+        parent::__construct();
+        $this->bacsService = $bacsService;
+    }
 
     protected function configure()
     {
@@ -71,23 +81,20 @@ class BacsPdfCommand extends BaseCommand
         $process = $input->getOption('process');
         $requeue = $input->getOption('requeue');
 
-        /** @var BacsService $bacsService */
-        $bacsService = $this->getContainer()->get('app.bacs');
-
         if ($clear) {
-            $bacsService->clearQueue();
+            $this->bacsService->clearQueue();
             $output->writeln(sprintf("Queue is cleared"));
         } elseif ($show) {
-            $data = $bacsService->getQueueData($process);
+            $data = $this->bacsService->getQueueData($process);
             $output->writeln(sprintf("Queue Size: %d", count($data)));
             foreach ($data as $line) {
                 $output->writeln(json_encode(unserialize($line), JSON_PRETTY_PRINT));
             }
         } elseif ($requeue) {
-            $bacsService->queueBacsCreated($bacsService->getPolicy($requeue));
+            $this->bacsService->queueBacsCreated($this->bacsService->getPolicy($requeue));
             $output->writeln(sprintf("Requeued policy for bacs pdf"));
         } else {
-            $count = $bacsService->process($process);
+            $count = $this->bacsService->process($process);
             $output->writeln(sprintf("Processed %s bacs instructions", $count));
         }
 

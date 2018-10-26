@@ -37,10 +37,6 @@ class ApiKeyController extends BaseController
     public function quoteAction(Request $request)
     {
         try {
-            if (!$this->validateQueryFields($request, ['make'])) {
-                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
-            }
-
             $make = $this->getRequestString($request, 'make');
             $model = $this->getRequestString($request, 'model');
 
@@ -51,6 +47,8 @@ class ApiKeyController extends BaseController
                 $query = ['make' => $make, 'model' => $model, 'active' => true];
             } elseif ($make) {
                 $query = ['make' => $make, 'active' => true];
+            } else {
+                $query = ['active' => true];
             }
 
             $phones = $repo->findBy($query);

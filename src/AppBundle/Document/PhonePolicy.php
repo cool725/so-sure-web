@@ -83,6 +83,7 @@ class PhonePolicy extends Policy
     /**
      * @MongoDB\ReferenceOne(targetDocument="Phone")
      * @Gedmo\Versioned
+     * @var Phone
      */
     protected $phone;
 
@@ -208,6 +209,9 @@ class PhonePolicy extends Policy
      */
     protected $picSureCircumvention;
 
+    /**
+     * @return Phone
+     */
     public function getPhone()
     {
         return $this->phone;
