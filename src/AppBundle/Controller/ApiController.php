@@ -191,6 +191,7 @@ class ApiController extends BaseController
 
             if (!$user->getFirstLoginInApp()) {
                 $user->setFirstLoginInApp(new \DateTime());
+                $dm->flush();
             }
 
             $response = $user->toApiArray($intercomHash, $identityId, $token);
