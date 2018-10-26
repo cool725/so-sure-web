@@ -21,6 +21,7 @@ class DirectBacsReceiptType extends AbstractType
         $builder
             ->add('date', DateType::class, ['required' => true, 'years' => $years])
             ->add('amount', TextType::class, ['required' => true])
+            ->add('totalCommission', TextType::class, ['required' => true])
             ->add('notes', TextType::class, ['required' => true])
             ->add('reference', TextType::class, ['required' => true])
             ->add('save', SubmitType::class)
