@@ -38,15 +38,4 @@ class ClaimTest extends \PHPUnit\Framework\TestCase
         // test is if the above generates an exception
         $this->assertTrue(true);
     }
-
-    public function testSetStatusWarranty()
-    {
-        $claim = new Claim();
-        $claim->setType(Claim::TYPE_WARRANTY);
-
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Unable to use approved with Warranty Types.');
-
-        $claim->setStatus(Claim::STATUS_APPROVED);
-    }
 }

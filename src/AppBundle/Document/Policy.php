@@ -2473,7 +2473,7 @@ abstract class Policy
         return $this->toTwoDp($this->getTotalCommissionPaid() - $this->getTotalCommissionPaid($payments));
     }
 
-    public function getTotalCommissionPaid($payments = null)
+    public function getTotalCommissionPaid($payments = null, $includePending = false)
     {
         $totalCommission = 0;
         if (!$this->isPolicy()) {
@@ -2485,6 +2485,9 @@ abstract class Policy
 
         foreach ($payments as $payment) {
             if ($payment->isSuccess()) {
+                $totalCommission += $payment->getTotalCommission();
+            } elseif ($includePending && $payment instanceof BacsPayment &&
+                $payment->getStatus() == BacsPayment::STATUS_PENDING) {
                 $totalCommission += $payment->getTotalCommission();
             }
         }
@@ -2547,18 +2550,44 @@ abstract class Policy
         return $this->toTwoDp($this->getPremium()->getYearlyPremiumPrice() - $this->getPremiumPaid());
     }
 
-    public function getPendingBacsPaymentsTotal()
+    public function getPendingBacsPayments($includePending = false)
     {
-        $total = 0;
+        $pendingPayments = [];
+        $statuses = [BacsPayment::STATUS_SUBMITTED, BacsPayment::STATUS_GENERATED];
+        if ($includePending) {
+            $statuses[] = BacsPayment::STATUS_PENDING;
+        }
         $payments = $this->getPaymentsByType(BacsPayment::class);
         foreach ($payments as $payment) {
             /** @var BacsPayment $payment */
-            if (in_array($payment->getStatus(), [BacsPayment::STATUS_SUBMITTED, BacsPayment::STATUS_GENERATED])) {
-                $total += $payment->getAmount();
+            if (in_array($payment->getStatus(), $statuses)) {
+                $pendingPayments[] = $payment;
             }
         }
 
+        return $pendingPayments;
+    }
+
+    public function getPendingBacsPaymentsTotal($includePending = false)
+    {
+        $total = 0;
+        foreach ($this->getPendingBacsPayments($includePending) as $payment) {
+            /** @var BacsPayment $payment */
+            $total += $payment->getAmount();
+        }
+
         return $total;
+    }
+
+    public function getPendingBacsPaymentsTotalCommission($includePending = false)
+    {
+        $totalCommission = 0;
+        foreach ($this->getPendingBacsPayments($includePending) as $payment) {
+            /** @var BacsPayment $payment */
+            $totalCommission += $payment->getTotalCommission();
+        }
+
+        return $totalCommission;
     }
 
     public function isInitialPayment(\DateTime $date = null)
@@ -2700,6 +2729,13 @@ abstract class Policy
         }
 
         return $this->getStart()->diff($date)->days <= 30;
+    }
+
+    public function daysToAquisition($days)
+    {
+        $now = new \DateTime();
+        $now = $days - ($now->diff($this->getStart()))->d;
+        return ($now >= 0) ? $now : 0;
     }
 
     public function isPolicyOldEnough($days, \DateTime $date = null)
@@ -3895,6 +3931,7 @@ abstract class Policy
             $reward = new SoSurePotRewardPayment();
             $reward->setDate(clone $dateNotNull);
             $reward->setAmount($this->toTwoDp($promoPotValue - $promoPotReward->getAmount()));
+            $reward->setNotes('Adjustment to Pot as claim was settled');
             $this->addPayment($reward);
         }
 
@@ -3905,6 +3942,7 @@ abstract class Policy
             $reward = new PotRewardPayment();
             $reward->setDate(clone $dateNotNull);
             $reward->setAmount($this->toTwoDp($standardPotValue - $potReward->getAmount()));
+            $reward->setNotes('Adjustment to Pot as claim was settled');
             $this->addPayment($reward);
         }
 
@@ -4239,7 +4277,7 @@ abstract class Policy
         }
         if ($this->getStatus() == self::STATUS_RENEWAL) {
             return $this->getStart() > $date;
-        } elseif ($this->isPolicyPaidToDate($date, true)) {
+        } elseif ($this->isPolicyPaidToDate($date, true, false, true)) {
             return $this->getStatus() == self::STATUS_ACTIVE;
         } elseif ($bankAccount && ($bankAccount->isMandateInProgress() ||
                 ($bankAccount->isMandateSuccess() && $bankAccount->isBeforeInitialNotificationDate()))) {
@@ -4249,13 +4287,26 @@ abstract class Policy
         }
     }
 
-    public function isPolicyPaidToDate(\DateTime $date = null, $includePendingBacs = false, $firstDayIsUnpaid = false)
-    {
+    public function isPolicyPaidToDate(
+        \DateTime $date = null,
+        $includePendingBacs = false,
+        $firstDayIsUnpaid = false,
+        $includeFuturePayments = false
+    ) {
         if (!$this->isPolicy()) {
             return null;
         }
+        if (!$date) {
+            $date = new \DateTime();
+        }
 
-        $totalPaid = $this->getTotalSuccessfulPayments($date, true);
+        if ($includeFuturePayments) {
+            $futureDate = clone $date;
+            $futureDate = $futureDate->add(new \DateInterval('P1D'));
+            $totalPaid = $this->getTotalSuccessfulPayments($futureDate, true);
+        } else {
+            $totalPaid = $this->getTotalSuccessfulPayments($date, true);
+        }
         if ($includePendingBacs) {
             $totalPaid += $this->getPendingBacsPaymentsTotal();
         }
@@ -4322,12 +4373,17 @@ abstract class Policy
             $cancellationDate = clone $this->getPolicyExpirationDate($date);
             // 4 payment retries - 7, 14, 21, 28; should be 30 days unpaid before cancellation
             // 2 days diff + 2 on either side
-            $cancellationDate = $cancellationDate->sub(new \DateInterval('P4D'));
+            if ($this->getUser()->hasJudoPaymentMethod()) {
+                $cancellationDate = $cancellationDate->sub(new \DateInterval('P4D'));
+            } elseif ($this->getUser()->hasBacsPaymentMethod()) {
+                // currently not rescheduling with bacs, 15 days to avoid some incorrect notifications
+                $cancellationDate = $cancellationDate->sub(new \DateInterval('P15D'));
+            }
             if ($cancellationDate <= $date) {
                 return null;
             }
         }
-        
+
         // All Scheduled day must match the billing day
         if ($verifyBillingDay) {
             foreach ($scheduledPayments as $scheduledPayment) {
@@ -4723,7 +4779,7 @@ abstract class Policy
         print $this->getTotalCommissionPaid() . PHP_EOL;
         */
 
-        $diff = abs($this->getTotalCommissionPaid() - $expectedCommission);
+        $diff = abs($this->getTotalCommissionPaid(null, true) - $expectedCommission);
 
         return $diff <= $allowedVariance;
     }

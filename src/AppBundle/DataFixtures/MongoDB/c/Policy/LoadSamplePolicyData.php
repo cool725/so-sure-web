@@ -387,6 +387,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
 
         $policies = $policyRepo->findBy(['status' => Policy::STATUS_ACTIVE]);
         foreach ($policies as $policy) {
+            /** @var Policy $policy */
             if (count($policy->getClaims()) == 0 && count($policy->getUser()->getPolicies()) == 1) {
                 if (!$fraud && $policy->canCancel(Policy::CANCELLED_ACTUAL_FRAUD)) {
                     $fraud = true;

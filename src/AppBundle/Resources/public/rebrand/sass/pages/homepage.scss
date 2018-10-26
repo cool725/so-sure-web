@@ -108,7 +108,7 @@
     }
 
     @include media-breakpoint-up(fk) {
-        background-position: 220px 200px;
+        background-position: 500px 200px;
         background-size: 600px;
     }
 
@@ -123,6 +123,10 @@
     @include media-breakpoint-up(lg) {
         background: $white url('#{$cdn_url}/images/rebrand/homepage/so-sure_why-illustration.png ') no-repeat -220px 440px;
         background-size: 480px;
+    }
+
+    @include media-breakpoint-up(fk) {
+        background-position: 500px 440px;
     }
 }
 
@@ -241,17 +245,17 @@
     @include media-breakpoint-up(lg) {
         padding-bottom: inherit;
         margin-bottom: 0;
-        background: $white url('#{$cdn_url}/images/rebrand/homepage/so-sure_reviews-image.png') no-repeat 800px 50px;
+        background: $white url('#{$cdn_url}/images/rebrand/homepage/so-sure_reviews-image.png') no-repeat 800px 70px;
         background-size: 600px;
     }
 
     @include media-breakpoint-up(xl) {
-        background-position: 940px 50px;
+        background-position: 940px 70px;
         background-size: 700px;
     }
 
     @include media-breakpoint-up(fk) {
-        background-position: right 50px;
+        background-position: 1400px 70px;
     }
 }
 
