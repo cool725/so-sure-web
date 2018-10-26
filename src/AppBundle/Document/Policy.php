@@ -2552,7 +2552,7 @@ abstract class Policy
 
     public function getPendingBacsPayments($includePending = false)
     {
-        $payments = [];
+        $pendingPayments = [];
         $statuses = [BacsPayment::STATUS_SUBMITTED, BacsPayment::STATUS_GENERATED];
         if ($includePending) {
             $statuses[] = BacsPayment::STATUS_PENDING;
@@ -2561,11 +2561,11 @@ abstract class Policy
         foreach ($payments as $payment) {
             /** @var BacsPayment $payment */
             if (in_array($payment->getStatus(), $statuses)) {
-                $payments[] = $payment;
+                $pendingPayments[] = $payment;
             }
         }
 
-        return $payments;
+        return $pendingPayments;
     }
 
     public function getPendingBacsPaymentsTotal($includePending = false)
