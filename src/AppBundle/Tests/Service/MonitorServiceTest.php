@@ -157,12 +157,13 @@ class MonitorServiceTest extends WebTestCase
     }
 
     /**
-     * @expectedException \Exception
+     * @expectedException \AppBundle\Exception\MonitorException
      */
     public function testSalvaPolicy()
     {
-        $policy = new SalvaPhonePolicy();
-        $policy->setPolicyNumber('Mob/2018/55' . str_pad(random_int(0, 99999), 5, '0'));
+        $policy = self::createUserPolicy();
+        $policy->create(rand(1, 999999), 'Mob', null, rand(1, 999999));
+
         self::$dm->persist($policy);
         self::$dm->flush();
 
@@ -170,13 +171,13 @@ class MonitorServiceTest extends WebTestCase
     }
 
     /**
-     * @expectedException \Exception
+     * @expectedException \AppBundle\Exception\MonitorException
      */
     public function testInvalidPolicy()
     {
-        $policy = new SalvaPhonePolicy();
-        $policy->setPolicyNumber('INVALID/2018/55' . str_pad(random_int(0, 99999), 5, '0'));
-        $policy->setPolicyNumber((new PhonePolicy())->getPolicyNumber());
+        $policy = self::createUserPolicy();
+        $policy->create(rand(1, 999999), 'INVALID', null, rand(1, 999999));
+
         self::$dm->persist($policy);
         self::$dm->flush();
 
@@ -184,13 +185,14 @@ class MonitorServiceTest extends WebTestCase
     }
 
     /**
-     * @expectedException \Exception
+     * @expectedException \AppBundle\Exception\MonitorException
      */
     public function testSalvaStatus()
     {
-        $policy = new SalvaPhonePolicy();
-        $policy->setPolicyNumber('Mob/2018/55' . str_pad(random_int(0, 99999), 5, '0'));
+        $policy = self::createUserPolicy();
+        $policy->create(rand(1, 999999), 'Mob', null, rand(1, 999999));
         $policy->setSalvaStatus('pending');
+
         self::$dm->persist($policy);
         self::$dm->flush();
 
@@ -198,14 +200,12 @@ class MonitorServiceTest extends WebTestCase
     }
 
     /**
-     * @expectedException \Exception
+     * @expectedException \AppBundle\Exception\MonitorException
      */
     public function testPolicyFiles()
     {
-        $user = new User();
-        $policy = new SalvaPhonePolicy();
-        $policy->setPolicyNumber('Mob/2018/55' . str_pad(random_int(0, 99999), 5, '0'));
-        $policy->setUser($user);
+        $policy = self::createUserPolicy();
+        $policy->create(rand(1, 999999), 'Mob', null, rand(1, 999999));
 
         self::$dm->persist($policy);
         self::$dm->flush();
@@ -214,15 +214,13 @@ class MonitorServiceTest extends WebTestCase
     }
 
     /**
-     * @expectedException \Exception
+     * @expectedException \AppBundle\Exception\MonitorException
      */
     public function testPolicyPending()
     {
-        $user = new User();
-        $policy = new SalvaPhonePolicy();
-        $policy->setPolicyNumber('Mob/2018/55' . str_pad(random_int(0, 99999), 5, '0'));
+        $policy = self::createUserPolicy();
+        $policy->create(rand(1, 999999), 'Mob', null, rand(1, 999999));
         $policy->setStatus('pending');
-        $policy->setUser($user);
 
         self::$dm->persist($policy);
         self::$dm->flush();
@@ -231,7 +229,7 @@ class MonitorServiceTest extends WebTestCase
     }
 
     /**
-     * @expectedException \Exception
+     * @expectedException \AppBundle\Exception\MonitorException
      */
     public function testDuplicateInvites()
     {
@@ -255,7 +253,7 @@ class MonitorServiceTest extends WebTestCase
     }
 
     /**
-     * @expectedException \Exception
+     * @expectedException \AppBundle\Exception\MonitorException
      */
     public function testCheckAllUserRolePriv()
     {
