@@ -16,6 +16,8 @@ use AppBundle\Document\Claim;
 
 /**
  * @group functional-nonet
+ *
+ * \\AppBundle\\Tests\\Service\\MonitorServiceTest
  */
 class MonitorServiceTest extends WebTestCase
 {
@@ -24,6 +26,8 @@ class MonitorServiceTest extends WebTestCase
     use DateTrait;
 
     protected static $container;
+
+    /** @var MonitorService */
     protected static $monitor;
 
     public static function setUpBeforeClass()
@@ -38,8 +42,10 @@ class MonitorServiceTest extends WebTestCase
         //now we can instantiate our service (if you want a fresh one for
         //each test method, do this in setUp() instead
         self::$dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+
         /** @var MonitorService $monitor */
-        self::$monitor = self::$container->get('app.monitor');
+        $monitor = self::$container->get('app.monitor');
+        self::$monitor = $monitor;
     }
 
     public function tearDown()
@@ -126,9 +132,6 @@ class MonitorServiceTest extends WebTestCase
         $this->assertTrue(true, 'monitoring old submitted claims with no results succeeds');
     }
 
-    /**
-     * @group functional-nonet
-     */
     public function testExpectedFailOldSubmittedClaimsFunctional()
     {
         $daysAgo = $this->subBusinessDays(new \DateTime(), 3);
@@ -155,7 +158,7 @@ class MonitorServiceTest extends WebTestCase
     }
 
     /**
-     * @expectedException \Exception
+     * @expectedException \AppBundle\Exception\MonitorException
      */
     public function testSalvaPolicy()
     {
@@ -168,13 +171,12 @@ class MonitorServiceTest extends WebTestCase
     }
 
     /**
-     * @expectedException \Exception
+     * @expectedException \AppBundle\Exception\MonitorException
      */
     public function testTestSalvaPolicy()
     {
         $policy = new SalvaPhonePolicy();
         $policy->setPolicyNumber('INVALID/2018/55' . str_pad(random_int(0, 99999), 5, '0'));
-        $policy->setPolicyNumber((new PhonePolicy())->getPolicyNumber());
         self::$dm->persist($policy);
         self::$dm->flush();
 
@@ -182,7 +184,7 @@ class MonitorServiceTest extends WebTestCase
     }
 
     /**
-     * @expectedException \Exception
+     * @expectedException \AppBundle\Exception\MonitorException
      */
     public function testSalvaStatus()
     {
@@ -196,7 +198,7 @@ class MonitorServiceTest extends WebTestCase
     }
 
     /**
-     * @expectedException \Exception
+     * @expectedException \AppBundle\Exception\MonitorException
      */
     public function testPolicyPending()
     {
@@ -214,7 +216,7 @@ class MonitorServiceTest extends WebTestCase
     }
 
     /**
-     * @expectedException \Exception
+     * @expectedException \AppBundle\Exception\MonitorException
      */
     public function testDuplicateInvites()
     {

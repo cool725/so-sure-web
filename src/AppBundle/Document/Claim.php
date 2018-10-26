@@ -905,16 +905,6 @@ class Claim
             throw new \Exception(sprintf('Status must be a valid status, not %s', $status));
         }
 
-        // TODO: Was STATUS_DECLINED as well, but claim 77557421061 is declined - mistake in data?
-        if (in_array($this->getType(), [self::TYPE_WARRANTY]) &&
-            in_array($status, [self::STATUS_APPROVED])) {
-            throw new \InvalidArgumentException(sprintf(
-                'Unable to use approved with Warranty Types. %s/%s',
-                $this->getNumber(),
-                $this->getId()
-            ));
-        }
-
         // Don't trust davies enough with data - changing from approved / settled to declined / withdrawn
         // can have financial and pot reward implications and needs to be checked
         if (in_array($this->status, [self::STATUS_APPROVED, self::STATUS_SETTLED]) &&
