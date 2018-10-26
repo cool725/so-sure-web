@@ -484,6 +484,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         $bacsPayment->setSuccess(true);
         $bacsPayment->setDate(new \DateTime());
         $bacsPayment->setAmount($policy->getPremium()->getYearlyPremiumPrice());
+        $bacsPayment->setTotalCommission(Salva::YEARLY_TOTAL_COMMISSION);
 
         $bacsForm = $this->get('form.factory')
             ->createNamedBuilder('bacs_form', DirectBacsReceiptType::class, $bacsPayment)
@@ -723,24 +724,18 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             } elseif ($request->request->has('bacs_form')) {
                 $bacsForm->handleRequest($request);
                 if ($bacsForm->isValid()) {
-                    if ($this->areEqualToTwoDp(
-                        $bacsPayment->getAmount(),
-                        $policy->getPremium()->getMonthlyPremiumPrice()
-                    )) {
-                        $bacsPayment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
-                    } elseif ($this->areEqualToTwoDp(
-                        $bacsPayment->getAmount(),
-                        $policy->getPremium()->getYearlyPremiumPrice()
-                    )) {
-                        $bacsPayment->setTotalCommission(Salva::YEARLY_TOTAL_COMMISSION);
-                    } else {
-                        $this->get('logger')->warning(sprintf(
-                            'Unable to determine commission on bacs payment for policy %s',
-                            $policy->getId()
-                        ));
+                    // non-manual payments should be scheduled
+                    if (!$bacsPayment->isManual()) {
+                        $bacsPayment->setStatus(BacsPayment::STATUS_PENDING);
+                        if (!$policy->getUser()->hasBacsPaymentMethod()) {
+                            $this->get('logger')->warning(sprintf(
+                                'Payment (Policy %s) is scheduled, however no bacs account for user',
+                                $policy->getId()
+                            ));
+                        }
                     }
-
                     $policy->addPayment($bacsPayment);
+
                     $dm->flush();
                     $this->addFlash(
                         'success',
