@@ -727,6 +727,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                     if ($bacsPayment->getAmount() < 0) {
                         // refunds should be scheduled
                         $bacsPayment->setStatus(BacsPayment::STATUS_PENDING);
+                        $bacsPayment->setManual(false);
                         if (!$policy->getUser()->hasBacsPaymentMethod()) {
                             $this->get('logger')->warning(sprintf(
                                 'Payment (Policy %s) is scheduled, however no bacs account for user',
