@@ -127,7 +127,19 @@
                         </div>
                         <div class="onboarding__body">
                             <h2 class="h4 text-primary mb-3">Invite friends and earn &pound;100</h2>
-                            <p class="mb-4">For every person you connect with, we’ll add £10 to your reward pot. If neither of you claim, your cash will be returned at the end of the policy year. For more information on how it works watch our video lorem ipsum.</p>
+                            {% if device_category() == 'Mobile' %}
+                                <p class="mb-4">For every person you connect with, we’ll add £10 to your reward pot. If neither of you claim, your cash will be returned at the end of the policy year. For more information on how it works watch our video lorem ipsum.</p>
+                            {% else %}
+                                <p class="mb-4">For every person you connect with, we’ll add £10 to your reward pot. If neither of you claim, your cash will be returned at the end of the policy year. For more information on how it works
+                                <a href="#"
+                                   class="watch-video"
+                                   data-event="watch-video-index-hero"
+                                   data-toggle="modal"
+                                   data-target="#sosure-video-modal"
+                                   data-src="https://www.youtube.com/embed/QEskwqsNgrQ">
+                                    <u>watch our video</u>
+                                </a>lorem ipsum.</p>
+                            {% endif %}
                             <a href="#onboarding-carousel"
                                class="btn btn-success btn-block-xs"
                                role="button"
