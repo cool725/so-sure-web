@@ -484,6 +484,58 @@ class FOSUBUserProviderTest extends WebTestCase
         $this->assertPolicyExists(self::$container, $policy);
     }
 
+    public function testResolveDuplicateUsersSoSureCom()
+    {
+        $email = 'testResolveDuplicateUsersSoSure@so-sure.com';
+        $user = static::createUser(
+            static::$userManager,
+            $email,
+            'bar',
+            static::$dm
+        );
+        $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
+        static::$policyService->setEnvironment('prod');
+        static::$policyService->create($policy);
+        static::$policyService->setEnvironment('test');
+        $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
+
+        $this->assertFalse(static::$userService->resolveDuplicateUsers(
+            null,
+            $email,
+            null,
+            null,
+            null
+        ));
+        $this->assertUserExists(self::$container, $user);
+        $this->assertPolicyExists(self::$container, $policy);
+    }
+
+    public function testResolveDuplicateUsersSoSureNet()
+    {
+        $email = 'testResolveDuplicateUsersSoSure@so-sure.net';
+        $user = static::createUser(
+            static::$userManager,
+            $email,
+            'bar',
+            static::$dm
+        );
+        $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
+        static::$policyService->setEnvironment('prod');
+        static::$policyService->create($policy);
+        static::$policyService->setEnvironment('test');
+        $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
+
+        $this->assertFalse(static::$userService->resolveDuplicateUsers(
+            null,
+            $email,
+            null,
+            null,
+            null
+        ));
+        $this->assertUserExists(self::$container, $user);
+        $this->assertPolicyExists(self::$container, $policy);
+    }
+
     protected function createResourceOwnerMock($resourceOwnerName = null)
     {
         $resourceOwnerMock = $this->getMockBuilder('HWI\Bundle\OAuthBundle\OAuth\ResourceOwnerInterface')

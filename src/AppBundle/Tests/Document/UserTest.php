@@ -264,7 +264,7 @@ class UserTest extends \PHPUnit\Framework\TestCase
     public function testHasSoSureEmail()
     {
         $user = new User();
-        $user->setEmailCanonical('foo@so-sure.com');
+        $user->setEmailCanonical('foo@sO-sure.com');
         $this->assertTrue($user->hasSoSureEmail());
 
         $user2 = new User();
@@ -273,7 +273,22 @@ class UserTest extends \PHPUnit\Framework\TestCase
 
         $user3 = new User();
         $user3->setEmailCanonical('foo@so-sure.net');
-        $this->assertTrue($user3->hasSoSureEmail());
+        $this->assertFalse($user3->hasSoSureEmail());
+    }
+
+    public function testHasSoSureRewardsEmail()
+    {
+        $user = new User();
+        $user->setEmailCanonical('foo@so-sure.com');
+        $this->assertFalse($user->hasSoSureRewardsEmail());
+
+        $user2 = new User();
+        $user2->setEmailCanonical('foo@notsosure.com');
+        $this->assertFalse($user2->hasSoSureRewardsEmail());
+
+        $user3 = new User();
+        $user3->setEmailCanonical('foo@sO-sure.net');
+        $this->assertTrue($user3->hasSoSureRewardsEmail());
     }
 
     public function testImageUrlFacebook()
