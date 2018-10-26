@@ -1797,6 +1797,11 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         return SoSure::hasSoSureEmail($this->getEmailCanonical());
     }
 
+    public function hasSoSureRewardsEmail()
+    {
+        return SoSure::hasSoSureRewardsEmail($this->getEmailCanonical());
+    }
+
     public function getImageUrl($size = 100)
     {
         if ($this->getFacebookId()) {
@@ -1957,7 +1962,8 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
 
     public function shouldDelete(\DateTime $date = null)
     {
-        if ($this->hasClaimsRole() || $this->hasEmployeeRole() || $this->hasSoSureEmail()) {
+        if ($this->hasClaimsRole() || $this->hasEmployeeRole() ||
+            $this->hasSoSureEmail() || $this->hasSoSureRewardsEmail()) {
             return false;
         }
 
