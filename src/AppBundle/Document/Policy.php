@@ -4296,6 +4296,9 @@ abstract class Policy
         if (!$this->isPolicy()) {
             return null;
         }
+        if (!$date) {
+            $date = new \DateTime();
+        }
 
         if ($includeFuturePayments) {
             $futureDate = clone $date;
