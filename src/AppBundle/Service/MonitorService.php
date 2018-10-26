@@ -28,7 +28,6 @@ use AppBundle\Repository\PhonePolicyRepository;
 use AppBundle\Repository\PolicyRepository;
 use AppBundle\Repository\UserRepository;
 use Doctrine\ODM\MongoDB\DocumentManager;
-use PHPUnit\Framework\Error\Error;
 use Psr\Log\LoggerInterface;
 
 class MonitorService
@@ -750,15 +749,9 @@ class MonitorService
 
         if (count($results) > 0) {
             foreach ($results as $result) {
-                try {
-                    throw new MonitorException(
-                        "Found duplicate Invites on email {$result->getEmail()}"
-                    );
-                } catch (\Error $e) {
-                    throw new MonitorException(
-                        "Found duplicate Invites without details"
-                    );
-                }
+                throw new MonitorException(
+                    "Found duplicate Invites on email {$result->getEmail()}"
+                );  
             }
         }
     }
