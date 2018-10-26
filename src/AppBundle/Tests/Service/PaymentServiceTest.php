@@ -45,9 +45,6 @@ class PaymentServiceTest extends WebTestCase
     use \AppBundle\Tests\UserClassTrait;
     use \AppBundle\Document\DateTrait;
 
-    /** @var \Symfony\Bundle\FrameworkBundle\Client */
-    protected static $client;
-
     protected static $container;
     /** @var DocumentManager */
     protected static $dm;
@@ -61,10 +58,6 @@ class PaymentServiceTest extends WebTestCase
 
     public static function setUpBeforeClass()
     {
-        /** @var \Symfony\Bundle\FrameworkBundle\Client $client */
-        $client = self::createClient();
-        self::$client = $client;
-
         //start the symfony kernel
         $kernel = static::createKernel();
         $kernel->boot();
