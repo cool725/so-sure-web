@@ -103,7 +103,6 @@ class AffiliateService
                 'attribution.campaignSource' => $affiliate->getCampaignSource()
             ]);
         }
-
         if (mb_strlen($affiliate->getLeadSource()) > 0 && mb_strlen($affiliate->getLeadSourceDetails()) > 0) {
             $leadUsers = $userRepo->findBy([
                 'leadSource' => $affiliate->getLeadSource(),
@@ -111,11 +110,14 @@ class AffiliateService
             ]);
         }
 
-        $all = array_merge($campaignUsers, $leadUsers);
         $users = [];
-        foreach ($all as $user) {
-            $s = $user->aquisitionStatus();
-            if (in_array($s, $status)) {
+        foreach ($campaignUsers as $user) {
+            if (in_array($user->aquisitionStatus(), $status)) {
+                $users[] = $user;
+            }
+        }
+        foreach ($leadUsers as $user) {
+            if (in_array($user->aquisitionStatus(), $status)) {
                 $users[] = $user;
             }
         }
