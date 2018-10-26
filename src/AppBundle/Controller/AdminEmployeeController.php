@@ -2577,7 +2577,47 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         if ($affiliate) {
             return [
                 'affiliate' => $affiliate,
-                'pending' => $affiliateService->getMatchingUsers($affiliate, false)
+                'pending' => $affiliateService->getMatchingUsers($affiliate, [User::AQUISITION_PENDING])
+            ];
+        } else {
+            return ['error' => 'Invalid URL, given ID does not correspond to an affiliate.'];
+        }
+    }
+
+    /**
+     * @Route("/affiliate/potential/{id}", name="admin_affiliate_potential")
+     * @Template("AppBundle:AdminEmployee:affiliateCharge.html.twig")
+     */
+    public function affiliatePotentialAction($id)
+    {
+        $dm = $this->getManager();
+        $affiliateRepo = $dm->getRepository(AffiliateCompany::class);
+        $affiliate = $affiliateRepo->find($id);
+        $affiliateService = $this->get("app.affiliate");
+        if ($affiliate) {
+            return [
+                'affiliate' => $affiliate,
+                'potential' => $affiliateService->getMatchingUsers($affiliate, [User::AQUISITION_POTENTIAL])
+            ];
+        } else {
+            return ['error' => 'Invalid URL, given ID does not correspond to an affiliate.'];
+        }
+    }
+
+    /**
+     * @Route("/affiliate/lost/{id}", name="admin_affiliate_lost")
+     * @Template("AppBundle:AdminEmployee:affiliateCharge.html.twig")
+     */
+    public function affiliateLostAction($id)
+    {
+        $dm = $this->getManager();
+        $affiliateRepo = $dm->getRepository(AffiliateCompany::class);
+        $affiliate = $affiliateRepo->find($id);
+        $affiliateService = $this->get("app.affiliate");
+        if ($affiliate) {
+            return [
+                'affiliate' => $affiliate,
+                'lost' => $affiliateService->getMatchingUsers($affiliate, [User::AQUISITION_LOST])
             ];
         } else {
             return ['error' => 'Invalid URL, given ID does not correspond to an affiliate.'];

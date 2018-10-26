@@ -92,28 +92,34 @@ class AffiliateService
         return $generatedCharges;
     }
 
-    public function getMatchingUsers(AffiliateCompany $affiliate, $confirmed = false)
+    public function getMatchingUsers(AffiliateCompany $affiliate, $status = [User::AQUISITION_PENDING])
     {
         $campaignUsers = [];
         $leadUsers = [];
         $userRepo = $this->dm->getRepository(User::class);
-        $matchOperator = $confirmed ? '$ne' : '$eq';
 
         if (mb_strlen($affiliate->getCampaignSource()) > 0) {
             $campaignUsers = $userRepo->findBy([
-                'attribution.campaignSource' => $affiliate->getCampaignSource(),
-                'affiliate' => [$matchOperator => null],
+                'attribution.campaignSource' => $affiliate->getCampaignSource()
             ]);
         }
 
         if (mb_strlen($affiliate->getLeadSource()) > 0 && mb_strlen($affiliate->getLeadSourceDetails()) > 0) {
             $leadUsers = $userRepo->findBy([
                 'leadSource' => $affiliate->getLeadSource(),
-                'leadSourceDetails' => $affiliate->getLeadSourceDetails(),
-                'affiliate' => [$matchOperator => null],
+                'leadSourceDetails' => $affiliate->getLeadSourceDetails()
             ]);
         }
 
-        return array_merge($campaignUsers, $leadUsers);
+        $all = array_merge($campaignUsers, $leadUsers);
+        $users = [];
+        foreach ($all as $user) {
+            $s = $user->aquisitionStatus();
+            if (in_array($s, $status)) {
+                $users[] = $user;
+            }
+        }
+
+        return $users;
     }
 }
