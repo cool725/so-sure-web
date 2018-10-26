@@ -109,6 +109,28 @@ class ApiControllerTest extends BaseApiControllerTest
         $this->assertTrue(mb_strlen($data['cognito_token']['token']) > 10);
         $this->assertTrue(mb_strlen($data['intercom_token']['android_hash']) > 10, json_encode($data));
         $this->assertTrue(mb_strlen($data['intercom_token']['ios_hash']) > 10);
+
+        /** @var DocumentManager $dm */
+        $dm = $this->getDocumentManager(true);
+        /** @var UserRepository $repo */
+        $repo = $dm->getRepository(User::class);
+        /** @var User $user */
+        $user = $repo->findOneBy(['emailCanonical' => 'foo@api.bar.com']);
+        $this->assertNotNull($user);
+        $firstLogin = $user->getFirstLoginInApp();
+        $this->assertNotNull($firstLogin);
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/login', array('email_user' => [
+            'email' => 'foo@api.bar.com',
+            'password' => 'bar'
+        ]));
+        $data = $this->verifyResponse(200);
+
+        $repo = $dm->getRepository(User::class);
+        /** @var User $user */
+        $user = $repo->findOneBy(['emailCanonical' => 'foo@api.bar.com']);
+        $this->assertNotNull($user);
+        $this->assertEquals($firstLogin, $user->getFirstLoginInApp());
     }
 
     public function testRateLimitLoginLocksUser()
@@ -958,6 +980,7 @@ class ApiControllerTest extends BaseApiControllerTest
         $this->assertEquals('Bar', $user->getLastName());
         $this->assertTrue(mb_strlen($data['intercom_token']['android_hash']) > 10, json_encode($data));
         $this->assertTrue(mb_strlen($data['intercom_token']['ios_hash']) > 10);
+        $this->assertNotNull($user->getFirstLoginInApp());
     }
 
     public function testUserBadName()

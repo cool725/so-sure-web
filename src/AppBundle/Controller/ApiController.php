@@ -651,6 +651,7 @@ class ApiController extends BaseController
 
                 $userManager = $this->get('fos_user.user_manager');
                 $user = $userManager->createUser();
+                $user->setFirstLoginInApp(new \DateTime());
             }
 
             $user->setEnabled(true);
@@ -678,7 +679,6 @@ class ApiController extends BaseController
             }
             $user->setBirthday($birthday);
             $user->setIdentityLog($this->getIdentityLog($request));
-            $user->setFirstLoginInApp(new \DateTime());
             if ($this->isDataStringPresent($data, 'scode')) {
                 $scodeRepo = $dm->getRepository(SCode::class);
                 $scode = $scodeRepo->findOneBy(['code' => $this->getDataString($data, 'scode')]);
