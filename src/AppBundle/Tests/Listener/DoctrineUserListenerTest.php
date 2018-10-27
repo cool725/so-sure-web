@@ -68,7 +68,10 @@ class DoctrineUserListenerTest extends WebTestCase
         static::$dm->persist($user);
         $listener = new DoctrineUserListener(null, static::$logger);
 
-        $changeSet = ['confirmationToken' => ['123', null], 'passwordRequestedAt' => [\DateTime::createFromFormat('U', time()), null]];
+        $changeSet = [
+            'confirmationToken' => ['123', null],
+            'passwordRequestedAt' => [\DateTime::createFromFormat('U', time()), null]
+        ];
         $events = new PreUpdateEventArgs($user, self::$dm, $changeSet);
         $listener->preUpdate($events);
 

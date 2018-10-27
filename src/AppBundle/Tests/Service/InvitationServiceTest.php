@@ -2190,7 +2190,10 @@ class InvitationServiceTest extends WebTestCase
 
     public function testAddReward()
     {
-        $policy = $this->createAndLink(static::generateEmail('testAddReward-A', $this), \DateTime::createFromFormat('U', time()));
+        $policy = $this->createAndLink(
+            static::generateEmail('testAddReward-A', $this),
+            \DateTime::createFromFormat('U', time())
+        );
         $this->createAndLink(
             static::generateEmail('testAddReward-B', $this),
             \DateTime::createFromFormat('U', time()),

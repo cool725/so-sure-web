@@ -1657,11 +1657,16 @@ class PolicyService
         }
 
         if ($policy->isRenewed() && $policy->hasAdjustedRewardPotPayment()) {
-            $outstanding = $policy->getNextPolicy()->getOutstandingPremiumToDate($date ? $date : \DateTime::createFromFormat('U', time()), true);
+            $outstanding = $policy->getNextPolicy()->getOutstandingPremiumToDate(
+                $date ? $date : \DateTime::createFromFormat('U', time()),
+                true
+            );
             $this->regenerateScheduledPayments($policy->getNextPolicy(), $date, null, $outstanding);
 
             // bill for outstanding payments due
-            $outstanding = $policy->getNextPolicy()->getOutstandingUserPremiumToDate($date ? $date : \DateTime::createFromFormat('U', time()));
+            $outstanding = $policy->getNextPolicy()->getOutstandingUserPremiumToDate(
+                $date ? $date : \DateTime::createFromFormat('U', time())
+            );
             $scheduledPayment = new ScheduledPayment();
             $scheduledPayment->setStatus(ScheduledPayment::STATUS_SCHEDULED);
             $scheduledPayment->setScheduled($date ? $date : \DateTime::createFromFormat('U', time()));

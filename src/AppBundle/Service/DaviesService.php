@@ -590,7 +590,8 @@ class DaviesService extends S3EmailService
         }
         if ($approvedDate) {
             $fiveBusinessDays = $this->addBusinessDays($approvedDate, 5);
-            if ($daviesClaim->isPhoneReplacementCostCorrect() === false && $fiveBusinessDays < \DateTime::createFromFormat('U', time())) {
+            if ($daviesClaim->isPhoneReplacementCostCorrect() === false &&
+                $fiveBusinessDays < \DateTime::createFromFormat('U', time())) {
                 $msg = sprintf(
                     'Claim %s does not have the correct phone replacement cost. Expected > 0 Actual %0.2f',
                     $daviesClaim->claimNumber,
