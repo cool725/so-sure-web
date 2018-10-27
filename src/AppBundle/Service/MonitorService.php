@@ -751,7 +751,7 @@ class MonitorService
             foreach ($results as $result) {
                 throw new MonitorException(
                     "Found duplicate Invites on email {$result->getEmail()}"
-                );  
+                );
             }
         }
     }
