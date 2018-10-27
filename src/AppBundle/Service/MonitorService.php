@@ -776,20 +776,31 @@ class MonitorService
                 'showPrivileges' => true]
         );
 
-        $privileges = $res['roles'][0]['privileges'];
+        $foundPriv = false;
+        if ($res['roles'] && count($res['roles']) > 0) {
+            $privileges = $res['roles'][0]['privileges'];
 
-        foreach ($privileges as $priv) {
-            $find = in_array('find', $priv['actions']);
-            $update = in_array('update', $priv['actions']);
-            $remove = in_array('remove', $priv['actions']);
-
-            if (($update and $remove) or $find) {
+            foreach ($privileges as $priv) {
                 if ($col->getName() === $priv['resource']['collection']) {
-                    throw new MonitorException(
-                        "Found action in {$priv['resource']['collection']}"
-                    );
+                    $foundPriv = true;
+
+                    $find = in_array('find', $priv['actions']);
+                    $update = in_array('update', $priv['actions']);
+                    $remove = in_array('remove', $priv['actions']);
+
+                    if (!($update and $remove) && !$find) {
+                        throw new MonitorException(
+                            "Missing find/update-remove privledge for {$col->getName()}"
+                        );
+                    }
                 }
             }
+        }
+
+        if (!$foundPriv) {
+            throw new MonitorException(
+                "Missing privledges for {$col->getName()}"
+            );
         }
     }
 
