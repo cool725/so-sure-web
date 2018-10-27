@@ -137,6 +137,7 @@ class AffiliateServiceTest extends WebTestCase
     private function createLonelyTestUser($name, $affiliateLead)
     {
         $user = new User();
+        $user->setEmail(static::generateEmail($name, $this));
         $user->setFirstName($name);
         $user->setLastName($name);
         $attribution = new Attribution();
