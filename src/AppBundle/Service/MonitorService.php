@@ -61,7 +61,7 @@ class MonitorService
      * @param JudopayService  $judopay
      */
     public function __construct(
-        DocumentManager  $dm,
+        DocumentManager $dm,
         LoggerInterface $logger,
         \Predis\Client $redis,
         IntercomService $intercom,
@@ -646,14 +646,15 @@ class MonitorService
 
         if (count($policies) > 0) {
             throw new MonitorException(
-                "Policy {$policies[0]->getPolicyNumber()} has more than 0 salva policy results"
+                "Policy {$policies[0]->getPolicyNumber()} has no salva policy results!"
             );
         }
     }
 
-    public function testSalvaPolicy()
+    public function invalidPolicy()
     {
         $repo = $this->dm->getRepository(Policy::class);
+
         $policies = $repo->findBy([
             'policyNumber' => new \MongoRegex('/INVALID\/*/'),
             'salvaPolicyResults' => ['$lte' => ['$size' => 0]]
@@ -661,7 +662,7 @@ class MonitorService
 
         if (count($policies) == 0) {
             throw new MonitorException(
-                "Failed to find any policies..."
+                "Failed to find any policies!"
             );
         }
     }
@@ -679,9 +680,31 @@ class MonitorService
         ]);
 
         if (count($policies) > 0) {
-            throw new MonitorException(
-                "Policy {$policies[0]->getPolicyNumber()} is pending review"
-            );
+            foreach ($policies as $policy) {
+                throw new MonitorException(
+                    "Policy {$policy->getPolicyNumber()} is pending review"
+                );
+            }
+        }
+    }
+
+    public function policyFiles()
+    {
+        $repo = $this->dm->getRepository(Policy::class);
+        $policyFiles = $repo->findBy([
+            'policyNumber' => new \MongoRegex('/Mob\/*/'),
+            '$or' => [
+                ['policyFiles' => null],
+                ['policyFiles' => ['$size' => 0]]
+            ]
+        ]);
+
+        if (count($policyFiles) > 0) {
+            foreach ($policyFiles as $policy) {
+                throw new MonitorException(
+                    "Policy {$policy->getPolicyNumber()} has no files"
+                );
+            }
         }
     }
 
@@ -690,13 +713,15 @@ class MonitorService
         $repo = $this->dm->getRepository(Policy::class);
         $policies = $repo->findBy([
             'policyNumber' => new \MongoRegex('/Mob\/*/'),
-            'status' => SalvaPhonePolicy::SALVA_STATUS_PENDING
+            'status' => Policy::STATUS_PENDING
         ]);
 
         if (count($policies) > 0) {
-            throw new MonitorException(
-                "Policy {$policies[0]->getPolicyNumber()} with email {$policies[0]->getUser()->getEmail()} is pending"
-            );
+            foreach ($policies as $policy) {
+                throw new MonitorException(
+                    "Policy {$policy->getPolicyNumber()} with email {$policy->getUser()->getEmail()} is pending"
+                );
+            }
         }
     }
 
@@ -705,29 +730,93 @@ class MonitorService
         $collection = $this->dm->getDocumentCollection(Invitation::class);
         $builder = $collection->createAggregationBuilder();
 
-        $result = $builder
+        $results = $builder
             ->group()
-                ->field('_id')
-                ->expression(
-                    $builder->expr()
-                        ->field('email')
-                        ->expression('$email')
-                        ->field('policy')
-                        ->expression('$policy')
-                )
-                ->field('count')
-                ->sum(1)
+            ->field('_id')
+            ->expression(
+                $builder->expr()
+                    ->field('email')
+                    ->expression('$email')
+                    ->field('policy')
+                    ->expression('$policy')
+            )
+            ->field('count')
+            ->sum(1)
             ->match()
-                ->field('count')
-                ->gt(1)
+            ->field('count')
+            ->gt(1)
             ->execute();
 
-        if (count($result) > 0) {
-            throw new MonitorException(
-                "Found duplicate Invites on email {$result[0]->getEmail()}"
-            );
+        if (count($results) > 0) {
+            foreach ($results as $result) {
+                throw new MonitorException(
+                    "Found duplicate Invites on email {$result->getEmail()}"
+                );
+            }
         }
     }
 
-    //TODO: so-sure-user-role, so-sure-user-roles, policy-files
+    public function checkSoSureRoles()
+    {
+        $collections = $this->dm->getConnection()->selectDatabase('so-sure')->listCollections();
+
+        if (count($collections) == 0) {
+            throw new MonitorException(
+                "No collections found in so-sure database!"
+            );
+        }
+
+        return $collections;
+    }
+
+    public function checkSoSureRole($col)
+    {
+        $res = $this->dm->getConnection()->selectDatabase('so-sure')->command(
+            ['rolesInfo' => 'so-sure-user',
+                'showPrivileges' => true]
+        );
+
+        $privileges = $res['roles'][0]['privileges'];
+
+        foreach ($privileges as $priv) {
+            $find = in_array('find', $priv['actions']);
+            $update = in_array('update', $priv['actions']);
+            $remove = in_array('remove', $priv['actions']);
+
+            if (($update and $remove) or $find) {
+                if ($col->getName() === $priv['resource']['collection']) {
+                    throw new MonitorException(
+                        "Found action in {$priv['resource']['collection']}"
+                    );
+                }
+            }
+        }
+    }
+
+    public function checkAllUserRolePriv()
+    {
+        $collections = $this->checkSoSureRoles();
+
+        foreach ($collections as $col) {
+            $this->checkSoSureRole($col);
+        }
+    }
+
+    public function checkExpiration()
+    {
+        $results = $this->dm->createQueryBuilder(Policy::class)
+            ->field('status')
+            ->in([Policy::STATUS_UNPAID, Policy::STATUS_ACTIVE])
+            ->field('end')
+            ->lt(new \DateTime())
+            ->getQuery()
+            ->execute();
+
+        foreach ($results as $result) {
+            throw new MonitorException(
+                "Policy {$result->getPolicyNumber()} is active/unpaid but expired!" . PHP_EOL .
+                "Expired since {$result->getEnd()->format('Y-M-D H:m')} !"
+            );
+        }
+    }
 }
