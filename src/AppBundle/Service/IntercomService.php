@@ -167,7 +167,7 @@ class IntercomService
             usleep(100000);
         } elseif ($rateLimit['remaining']) {
             $reset = $rateLimit['reset_at'];
-            $now = new \DateTime();
+            $now = \DateTime::createFromFormat('U', time());
             if ($reset > $now) {
                 $diff = $now->diff($reset);
                 $this->logger->debug(sprintf(
@@ -604,7 +604,7 @@ class IntercomService
     private function sendEvent(User $user, $event, $data, \DateTime $date = null)
     {
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
 
         $data['event_name'] = $event;
@@ -622,7 +622,7 @@ class IntercomService
     private function sendMessage(User $user = null, Lead $lead = null, $data = null, \DateTime $date = null)
     {
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
 
         if ($user) {
@@ -645,7 +645,7 @@ class IntercomService
     private function sendLeadEvent(Lead $lead, $event, $data, \DateTime $date = null)
     {
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
 
         $data['event_name'] = $event;
@@ -684,7 +684,7 @@ class IntercomService
                 }
 
                 // Requeue anything not yet ready to process
-                $now = new \DateTime();
+                $now = \DateTime::createFromFormat('U', time());
                 if (isset($data['processTime'])
                     && $data['processTime'] > $now->format('U')) {
                     $this->redis->rpush(self::KEY_INTERCOM_QUEUE, serialize($data));
@@ -1099,7 +1099,7 @@ class IntercomService
 
             $this->queueLead($lead, self::QUEUE_LEAD);
 
-            $now = new \DateTime();
+            $now = \DateTime::createFromFormat('U', time());
             $now = $now->add(new \DateInterval('PT5M'));
             $data['processTime'] = $now->format('U');
             $data['leadId'] = $lead->getId();
@@ -1130,7 +1130,7 @@ class IntercomService
         $output = [];
         $count = 0;
         $scroll = null;
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         while ($count < self::MAX_SCROLL_RECORDS) {
             $output[] = sprintf('Checking Leads - Scroll: %s / Count: %d', $scroll, $count);
             //print sprintf('Checking Leads - %s', $scroll) . PHP_EOL;
@@ -1209,7 +1209,7 @@ class IntercomService
         $output = [];
         $count = 0;
         $scroll = null;
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         while ($count < self::MAX_SCROLL_RECORDS) {
             $output[] = sprintf('Checking Users - Scroll: %s / Count: %d', $scroll, $count);
             // print sprintf('Checking Users - %s', $scroll) . PHP_EOL;

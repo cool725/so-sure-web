@@ -174,7 +174,7 @@ class InvoiceService
 
     public function getS3Key($filename)
     {
-        $date = new \DateTime();
+        $date = \DateTime::createFromFormat('U', time());
         return sprintf('%s/invoice/%s/%s', $this->environment, $date->format('Y'), $filename);
     }
 

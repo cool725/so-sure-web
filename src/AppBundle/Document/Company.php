@@ -65,7 +65,7 @@ abstract class Company
 
     public function __construct()
     {
-        $this->created = new \DateTime();
+        $this->created = \DateTime::createFromFormat('U', time());
     }
 
     public function getId()
@@ -112,7 +112,7 @@ abstract class Company
     public function addSanctionsCheck(\DateTime $date = null)
     {
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
         $timestamp = $date->format('U');
         $this->sanctionsChecks[] = $timestamp;

@@ -121,7 +121,7 @@ abstract class Invitation
 
     public function __construct()
     {
-        $this->created = new \DateTime();
+        $this->created = \DateTime::createFromFormat('U', time());
         $this->reinvitedCount = 0;
     }
 
@@ -279,7 +279,7 @@ abstract class Invitation
     public function canReinvite(\DateTime $date = null)
     {
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
 
         if (!$this->getPolicy() || !in_array($this->getPolicy()->getStatus(), [
@@ -296,7 +296,7 @@ abstract class Invitation
     public function invite(\DateTime $date = null)
     {
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
         $this->setNextReinvited($date->add(new \DateInterval('P1D')));
     }
@@ -308,7 +308,7 @@ abstract class Invitation
         }
 
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
         $this->setLastReinvited($date);
         if ($this->getReinvitedCount() < $this->getMaxReinvitations()) {

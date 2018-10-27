@@ -90,7 +90,7 @@ class SalvaManualPolicyCommand extends ContainerAwareCommand
         if ($date) {
             $date = new \DateTime($date);
         } else {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
 
         $phone = $this->getPhone($device, $memory);

@@ -443,12 +443,12 @@ class ApiControllerTest extends BaseApiControllerTest
 
     public function testQuoteA0001()
     {
-        $start = new \DateTime();
+        $start = \DateTime::createFromFormat('U', time());
         $start->add(new \DateInterval('P1D'));
 
         $crawler = self::$client->request('GET', '/api/v1/quote?device=A0001');
 
-        $end = new \DateTime();
+        $end = \DateTime::createFromFormat('U', time());
         $end->add(new \DateInterval('P1D'));
 
         $data = $this->verifyResponse(200);
@@ -621,7 +621,7 @@ class ApiControllerTest extends BaseApiControllerTest
         $url = '/api/v1/quote?device=A0001&memory=63&rooted=true&debug=true&_method=GET';
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
         $data = $this->verifyResponse(422);
-        $date = new \DateTime();
+        $date = \DateTime::createFromFormat('U', time());
         $deviceKey = sprintf('stats:%s:query:%s', $date->format('Y-m-d'), 'A0001');
         $this->assertGreaterThan(0, self::$redis->get($deviceKey));
         $this->assertGreaterThan(0, self::$redis->get('stats:rooted:A0001'));
@@ -1166,7 +1166,7 @@ class ApiControllerTest extends BaseApiControllerTest
         $this->assertTrue($user != null);
         $this->assertNull($user->getLastLogin());
 
-        $user->setLastLogin(new \DateTime());
+        $user->setLastLogin(\DateTime::createFromFormat('U', time()));
         $user->setPreLaunch(true);
         self::$dm->flush();
 
@@ -1252,7 +1252,7 @@ class ApiControllerTest extends BaseApiControllerTest
     public function testUserTooYoung()
     {
         $cognitoIdentityId = $this->getUnauthIdentity();
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/user', array(
             'email' => static::generateEmail('young-birthday', $this),
             'birthday' => sprintf('%d-01-01T00:00:00Z', $now->format('Y')),

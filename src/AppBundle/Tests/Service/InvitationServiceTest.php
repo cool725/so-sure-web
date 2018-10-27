@@ -258,7 +258,7 @@ class InvitationServiceTest extends WebTestCase
 
 
         // allow reinvites
-        $before = new \DateTime();
+        $before = \DateTime::createFromFormat('U', time());
         $before = $before->sub(new \DateInterval('PT1S'));
         $invitation->setNextReinvited($before);
         static::$dm->flush();
@@ -457,7 +457,7 @@ class InvitationServiceTest extends WebTestCase
         $policy->setStatus(Policy::STATUS_ACTIVE);
         $invitation = self::$invitationService->inviteByEmail($policy, static::generateEmail('invite1', $this));
         $this->assertTrue($invitation instanceof EmailInvitation);
-        $invitation->setRejected(new \DateTime());
+        $invitation->setRejected(\DateTime::createFromFormat('U', time()));
         static::$dm->flush();
 
         self::$invitationService->inviteByEmail($policy, static::generateEmail('invite1', $this));
@@ -474,7 +474,7 @@ class InvitationServiceTest extends WebTestCase
         $policy->setStatus(Policy::STATUS_ACTIVE);
         $invitation = self::$invitationService->inviteByEmail($policy, static::generateEmail('invite-dup1', $this));
         $this->assertTrue($invitation instanceof EmailInvitation);
-        $invitation->setCancelled(new \DateTime());
+        $invitation->setCancelled(\DateTime::createFromFormat('U', time()));
         static::$dm->flush();
 
         $invite = self::$invitationService->inviteByEmail($policy, static::generateEmail('invite-dup1', $this));
@@ -613,7 +613,7 @@ class InvitationServiceTest extends WebTestCase
         $policy->setStatus(Policy::STATUS_ACTIVE);
         $invitation = self::$invitationService->inviteBySms($policy, $mobile);
         $this->assertTrue($invitation instanceof SmsInvitation);
-        $invitation->setRejected(new \DateTime());
+        $invitation->setRejected(\DateTime::createFromFormat('U', time()));
         static::$dm->flush();
 
         self::$invitationService->inviteBySms($policy, self::transformMobile($mobile));
@@ -631,7 +631,7 @@ class InvitationServiceTest extends WebTestCase
         $policy->setStatus(Policy::STATUS_ACTIVE);
         $invitation = self::$invitationService->inviteBySms($policy, $mobile);
         $this->assertTrue($invitation instanceof SmsInvitation);
-        $invitation->setCancelled(new \DateTime());
+        $invitation->setCancelled(\DateTime::createFromFormat('U', time()));
         static::$dm->flush();
 
         $invite = self::$invitationService->inviteBySms($policy, self::transformMobile($mobile));
@@ -2190,10 +2190,10 @@ class InvitationServiceTest extends WebTestCase
 
     public function testAddReward()
     {
-        $policy = $this->createAndLink(static::generateEmail('testAddReward-A', $this), new \DateTime());
+        $policy = $this->createAndLink(static::generateEmail('testAddReward-A', $this), \DateTime::createFromFormat('U', time()));
         $this->createAndLink(
             static::generateEmail('testAddReward-B', $this),
-            new \DateTime(),
+            \DateTime::createFromFormat('U', time()),
             static::generateEmail('testAddReward-A', $this),
             $policy
         );

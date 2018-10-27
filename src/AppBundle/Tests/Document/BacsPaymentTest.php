@@ -128,7 +128,7 @@ class BacsPaymentTest extends \PHPUnit\Framework\TestCase
         $policy->setPremium($premium);
 
         $policy->addPayment($bacs);
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         $bacs->approve();
 
         $this->assertEquals(Bacs::MANDATE_SUCCESS, $bacs->getStatus());

@@ -34,7 +34,7 @@ trait ExcelTrait
             }
 
             $minDate = new \DateTime(SoSure::POLICY_START);
-            $now = new \DateTime();
+            $now = \DateTime::createFromFormat('U', time());
 
             if ($nullIfTooEarly && $origin < $minDate) {
                 return null;

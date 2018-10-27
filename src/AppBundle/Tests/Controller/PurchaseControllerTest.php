@@ -76,7 +76,7 @@ class PurchaseControllerTest extends BaseControllerTest
         $userRepo = $dm->getRepository(User::class);
         /** @var User $user */
         $user = $userRepo->findOneBy(['emailCanonical' => mb_strtolower($email)]);
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
 
         $this->assertNotNull($user->getIdentityLog());
         $diff = $user->getIdentityLog()->getDate()->diff($now);

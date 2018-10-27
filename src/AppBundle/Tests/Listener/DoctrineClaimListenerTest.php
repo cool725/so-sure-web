@@ -167,7 +167,7 @@ class DoctrineClaimListenerTest extends WebTestCase
         $save = self::$directGroupService->saveClaim($dg, true);
         $this->assertTrue($save);
 
-        $expectedUnderwriterUpdated = new \DateTime();
+        $expectedUnderwriterUpdated = \DateTime::createFromFormat('U', time());
 
         sleep(1);
 
@@ -184,7 +184,7 @@ class DoctrineClaimListenerTest extends WebTestCase
         $updatedClaim = $repo->find($claim->getId());
         $this->assertNotNull($updatedClaim->getUnderwriterLastUpdated());
 
-        $this->assertEquals($expectedUnderwriterUpdated, $updatedClaim->getUnderwriterLastUpdated());
+        $this->assertEquals($expectedUnderwriterUpdated, $updatedClaim->getUnderwriterLastUpdated(), null, 1);
     }
 
     public function testClaimsListenerActualDavies()
@@ -220,7 +220,7 @@ class DoctrineClaimListenerTest extends WebTestCase
         $save = self::$daviesService->saveClaim($davies, true);
         $this->assertTrue($save);
 
-        $expectedUnderwriterUpdated = new \DateTime();
+        $expectedUnderwriterUpdated = \DateTime::createFromFormat('U', time());
 
         sleep(1);
 
@@ -237,7 +237,7 @@ class DoctrineClaimListenerTest extends WebTestCase
         $updatedClaim = $repo->find($claim->getId());
         $this->assertNotNull($updatedClaim->getUnderwriterLastUpdated());
 
-        $this->assertEquals($expectedUnderwriterUpdated, $updatedClaim->getUnderwriterLastUpdated());
+        $this->assertEquals($expectedUnderwriterUpdated, $updatedClaim->getUnderwriterLastUpdated(), null, 1);
     }
 
     private function createClaimEventListener(Claim $claim, $count, $eventTypes)

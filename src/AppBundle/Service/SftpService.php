@@ -295,7 +295,7 @@ abstract class SftpService
 
     public function uploadS3($file, $name, $folder)
     {
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         $extension = sprintf('.%s', pathinfo($name, PATHINFO_EXTENSION));
         $s3Key = sprintf(
             '%s/%s/%d/%s-%s%s',

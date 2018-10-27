@@ -86,14 +86,14 @@ class PhonePolicyTest extends WebTestCase
     {
         $policy = new SalvaPhonePolicy();
         $this->assertNull($policy->getStatusUpdated());
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         $policy->setStatus(Policy::STATUS_ACTIVE);
-        $this->assertEquals($now, $policy->getStatusUpdated());
+        $this->assertEquals($now, $policy->getStatusUpdated(), null, 1);
         sleep(1);
         $policy->setStatus(Policy::STATUS_ACTIVE);
-        $this->assertEquals($now, $policy->getStatusUpdated());
+        $this->assertEquals($now, $policy->getStatusUpdated(), null, 1);
         $policy->setStatus(Policy::STATUS_UNPAID);
-        $this->assertNotEquals($now, $policy->getStatusUpdated());
+        $this->assertNotEquals($now, $policy->getStatusUpdated(), null, 0);
     }
 
     public function testCanAdjustPicSureStatusForClaim()
@@ -665,7 +665,7 @@ class PhonePolicyTest extends WebTestCase
         $this->assertEquals(10, $policyB->getPotValue());
 
         $claimA = new Claim();
-        $claimA->setLossDate(new \DateTime());
+        $claimA->setLossDate(\DateTime::createFromFormat('U', time()));
         //$claimA->setRecordedDate(new \DateTime("2016-01-01"));
         $claimA->setStatus(Claim::STATUS_SETTLED);
         //$claimA->setClosedDate(new \DateTime("2016-01-01"));
@@ -695,7 +695,7 @@ class PhonePolicyTest extends WebTestCase
 
         $policy = static::createUserPolicy(true);
         $policy->getUser()->setEmail(static::generateEmail('testGetRiskPolicyRewardConnection-user', $this));
-        $policy->setStart(new \DateTime());
+        $policy->setStart(\DateTime::createFromFormat('U', time()));
         static::$dm->persist($policy);
         static::$dm->persist($policy->getUser());
 
@@ -708,14 +708,14 @@ class PhonePolicyTest extends WebTestCase
 
     public function testGetRiskReasonPolicyRenewed()
     {
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         $yearAgo = clone $now;
         $yearAgo = $yearAgo->sub(new \DateInterval('P1Y'));
         $policyPrev = static::createUserPolicy(true);
         $policyPrev->setStart($yearAgo);
         $policy = static::createUserPolicy(true);
         $policy->getUser()->setEmail(static::generateEmail('testGetRiskReasonPolicyRenewed', $this));
-        $policy->setStart(new \DateTime());
+        $policy->setStart(\DateTime::createFromFormat('U', time()));
         $policyPrev->link($policy);
         static::$dm->persist($policyPrev);
         static::$dm->persist($policy);
@@ -866,7 +866,7 @@ class PhonePolicyTest extends WebTestCase
         $this->assertEquals(30, $policy->calculatePotValue());
 
         $claim = new Claim();
-        $claim->setLossDate(new \DateTime());
+        $claim->setLossDate(\DateTime::createFromFormat('U', time()));
         $claim->setType(Claim::TYPE_LOSS);
         $claim->setStatus(Claim::STATUS_SETTLED);
         $linkedPolicies[0]->addClaim($claim);
@@ -886,7 +886,7 @@ class PhonePolicyTest extends WebTestCase
         $this->assertEquals(40, $policy->calculatePotValue());
 
         $claim = new Claim();
-        $claim->setLossDate(new \DateTime());
+        $claim->setLossDate(\DateTime::createFromFormat('U', time()));
         $claim->setType(Claim::TYPE_LOSS);
         $claim->setStatus(Claim::STATUS_SETTLED);
         $linkedPolicies[0]->addClaim($claim);
@@ -925,13 +925,13 @@ class PhonePolicyTest extends WebTestCase
         $this->assertEquals(40, $policy->calculatePotValue());
 
         $claimA = new Claim();
-        $claimA->setLossDate(new \DateTime());
+        $claimA->setLossDate(\DateTime::createFromFormat('U', time()));
         $claimA->setType(Claim::TYPE_LOSS);
         $claimA->setStatus(Claim::STATUS_SETTLED);
         $linkedPolicies[0]->addClaim($claimA);
 
         $claimB = new Claim();
-        $claimB->setLossDate(new \DateTime());
+        $claimB->setLossDate(\DateTime::createFromFormat('U', time()));
         $claimB->setType(Claim::TYPE_LOSS);
         $claimB->setStatus(Claim::STATUS_SETTLED);
         $linkedPolicies[1]->addClaim($claimB);
@@ -1330,7 +1330,7 @@ class PhonePolicyTest extends WebTestCase
 
         $this->assertEquals(SalvaPhonePolicy::STATUS_CANCELLED, $policyA->getStatus());
         $this->assertEquals(SalvaPhonePolicy::CANCELLED_USER_REQUESTED, $policyA->getCancelledReason());
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         $this->assertEquals($now->format('y-M-d'), $policyA->getEnd()->format('y-M-d'));
         $this->assertFalse($policyA->getUser()->isLocked());
 
@@ -1964,7 +1964,7 @@ class PhonePolicyTest extends WebTestCase
         $policy->setStart(new \DateTime("2016-01-01"));
         $this->assertEquals(sprintf('%s/1', $policy->getPolicyNumber()), $policy->getSalvaPolicyNumber());
 
-        $policy->incrementSalvaPolicyNumber(new \DateTime());
+        $policy->incrementSalvaPolicyNumber(\DateTime::createFromFormat('U', time()));
         $this->assertEquals(sprintf('%s/2', $policy->getPolicyNumber()), $policy->getSalvaPolicyNumber());
     }
 
@@ -2762,7 +2762,7 @@ class PhonePolicyTest extends WebTestCase
         $this->assertFalse($policy->getUser()->getAnalytics()['hasOutstandingPicSurePolicy']);
 
         $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_APPROVED);
-        $this->assertEquals(new \DateTime(), $policy->getPicSureApprovedDate());
+        $this->assertEquals(\DateTime::createFromFormat('U', time()), $policy->getPicSureApprovedDate(), null, 1);
         $this->assertFalse($policy->getUser()->getAnalytics()['hasOutstandingPicSurePolicy']);
     }
 
@@ -5122,14 +5122,14 @@ class PhonePolicyTest extends WebTestCase
 
         $policy->init($user, static::getLatestPolicyTerms(self::$dm));
 
-        $issueDate = new \DateTime();
+        $issueDate = \DateTime::createFromFormat('U', time());
         $policy->create(rand(1, 999999), null, $date, rand(1, 9999));
         $policy->setStatus(Policy::STATUS_ACTIVE);
 
         $issueDate2 = clone $issueDate;
         $issueDate2->add(new \DateInterval('PT1S'));
 
-        $this->assertEquals($date, $policy->getStart());
+        $this->assertEquals($date, $policy->getStart(), null, 1);
         $this->assertTrue($policy->getIssueDate() == $issueDate || $policy->getIssueDate() == $issueDate2);
 
         return $policy;

@@ -322,7 +322,7 @@ class DefaultControllerTest extends BaseControllerTest
             $phone,
             self::$dm
         );
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         $policy = self::initPolicy($user, self::$dm, $phone, null, true, true);
         $policy->setStatus(Policy::STATUS_CANCELLED);
         $policy->setStart($now);
@@ -352,7 +352,7 @@ class DefaultControllerTest extends BaseControllerTest
             $phone,
             self::$dm
         );
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         $policy = self::initPolicy($user, self::$dm, $phone, null, true, true);
         $policy->setStatus(Policy::STATUS_ACTIVE);
         $policy->setStart($now);

@@ -107,7 +107,7 @@ class Cashback
 
     public function __construct()
     {
-        $this->createdDate = new \DateTime();
+        $this->createdDate = \DateTime::createFromFormat('U', time());
     }
 
     public function getId()

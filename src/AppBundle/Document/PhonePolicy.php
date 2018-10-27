@@ -285,7 +285,7 @@ class PhonePolicy extends Policy
     public function adjustImei($imei, $setReplacementDate = true)
     {
         if ($setReplacementDate && $this->imei && $imei != $this->imei) {
-            $this->setImeiReplacementDate(new \DateTime());
+            $this->setImeiReplacementDate(\DateTime::createFromFormat('U', time()));
         }
         $this->setImei($imei);
 
@@ -438,7 +438,7 @@ class PhonePolicy extends Policy
             return;
         }
 
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         $data = [
             'certId' => $certId,
             'response' => $response,
@@ -752,13 +752,13 @@ class PhonePolicy extends Policy
     {
         $this->picSureStatus = $picSureStatus;
         if ($picSureStatus == self::PICSURE_STATUS_APPROVED && !$this->getPicSureApprovedDate()) {
-            $this->setPicSureApprovedDate(new \DateTime());
+            $this->setPicSureApprovedDate(\DateTime::createFromFormat('U', time()));
         }
 
         $picsureFiles = $this->getPolicyFilesByType(PicSureFile::class);
         if (count($picsureFiles) > 0) {
             $picsureFiles[0]->addMetadata('picsure-status', $picSureStatus);
-            $now = new \DateTime();
+            $now = \DateTime::createFromFormat('U', time());
             $picsureFiles[0]->addMetadata('picsure-status-date', $now->format(\DateTime::ATOM));
             if ($user) {
                 $picsureFiles[0]->addMetadata('picsure-status-user-name', $user->getName());

@@ -218,7 +218,7 @@ class SalvaExportService
     public function exportPolicies($s3, \DateTime $date = null)
     {
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
             $date->setTimezone(new \DateTimeZone(Salva::SALVA_TIMEZONE));
         }
 
@@ -267,7 +267,7 @@ class SalvaExportService
     public function exportPayments($uploadS3, \DateTime $date = null, SalvaPaymentFile $paymentFile = null)
     {
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
             $date->setTimezone(new \DateTimeZone(Salva::SALVA_TIMEZONE));
         }
 
@@ -329,7 +329,7 @@ class SalvaExportService
     public function exportClaims($s3, \DateTime $date = null, $days = null)
     {
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
             $date->setTimezone(new \DateTimeZone(Salva::SALVA_TIMEZONE));
         }
 
@@ -374,7 +374,7 @@ class SalvaExportService
     public function exportRenewals($s3, \DateTime $date = null)
     {
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
             $date->setTimezone(new \DateTimeZone(Salva::SALVA_TIMEZONE));
         }
 
@@ -823,7 +823,7 @@ class SalvaExportService
     public function incrementPolicyNumber(SalvaPhonePolicy $policy, \DateTime $date = null)
     {
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
         $date->setTimezone(new \DateTimeZone(Salva::SALVA_TIMEZONE));
         $policy->incrementSalvaPolicyNumber($date);

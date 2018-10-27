@@ -123,7 +123,7 @@ class MonitorServiceTest extends WebTestCase
 
     public function testExpectedFailOldSubmittedClaimsUnit()
     {
-        $daysAgo = $this->subBusinessDays(new \DateTime(), 3);
+        $daysAgo = $this->subBusinessDays(\DateTime::createFromFormat('U', time()), 3);
 
         // add a record that will make the monitor fail
         $claim = new Claim();
@@ -144,7 +144,7 @@ class MonitorServiceTest extends WebTestCase
 
     public function testExpectedFailOldSubmittedClaimsFunctional()
     {
-        $daysAgo = $this->subBusinessDays(new \DateTime(), 3);
+        $daysAgo = $this->subBusinessDays(\DateTime::createFromFormat('U', time()), 3);
 
         // add a record that will make the monitor fail
         $claim = new Claim();
@@ -316,7 +316,7 @@ class MonitorServiceTest extends WebTestCase
     {
         $policy = new SalvaPhonePolicy();
         $policy->setStatus(Policy::STATUS_ACTIVE);
-        $policy->setEnd((new \DateTime())->sub(new \DateInterval('P1D')));
+        $policy->setEnd((\DateTime::createFromFormat('U', time()))->sub(new \DateInterval('P1D')));
 
         self::$dm->persist($policy);
         self::$dm->flush();

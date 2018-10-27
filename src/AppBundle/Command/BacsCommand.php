@@ -128,7 +128,7 @@ class BacsCommand extends ContainerAwareCommand
         if ($date) {
             $processingDate = new \DateTime($date);
         } else {
-            $processingDate = new \DateTime();
+            $processingDate = \DateTime::createFromFormat('U', time());
             $processingDate = $this->addBusinessDays($processingDate, 1);
         }
         $output->writeln(sprintf('Using processing date %s', $processingDate->format('d/M/Y')));
@@ -232,7 +232,7 @@ class BacsCommand extends ContainerAwareCommand
             $skipS3 = true;
         }
 
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         $filename = sprintf('%s-%s.csv', $processingDate->format('Ymd'), $now->format('U'));
         if (!$skipSftp) {
             $files = $this->uploadSftp(implode(PHP_EOL, $lines), $filename, true);
@@ -303,7 +303,7 @@ class BacsCommand extends ContainerAwareCommand
             $skipS3 = true;
         }
 
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         $creditFilename = sprintf('credits-%s-%s.csv', $processingDate->format('Ymd'), $now->format('U'));
         if (!$skipSftp) {
             $files = $this->uploadSftp(implode(PHP_EOL, $creditPayments), $creditFilename, false);
