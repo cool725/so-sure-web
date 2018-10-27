@@ -54,7 +54,116 @@ set -e
 SCRIPT
 
 Vagrant.configure("2") do |config|
-  config.vm.define "dev1604", primary: true, autostart: true do |dev1604_config|
+  # will fail the first time. Run the following:
+  # vagrant ssh; sudo apt-get install ifupdown
+  # exit; vagrant halt; vagrant up --provision
+  #
+  # there may be an additional error about unable to read from remote git repo
+  # copy your ssh id_rsa key to source folder; then vagrant ssh; cp /vagrant/id_rsa ~/.ssh/id_rsa
+  # exit; vagrant halt; vagrant up --provision
+  config.vm.define "dev1804", primary: true, autostart: true do |dev1804_config|
+    dev1804_config.vm.box = "geerlingguy/ubuntu1804"
+    dev1804_config.vm.box_check_update = false
+    dev1804_config.vm.network "forwarded_port", guest: 80, host: 40080 # apache sosure website
+    dev1804_config.vm.network "forwarded_port", guest: 27017, host: 47017 # mongodb
+    dev1804_config.vm.network "forwarded_port", guest: 5000, host: 5000 # sixpack
+    dev1804_config.vm.network "forwarded_port", guest: 5001, host: 5001 # sixpack-web
+    dev1804_config.vm.network "private_network", ip: "10.0.4.2"
+    #dev1804_config.vm.synced_folder ".", "/vagrant", owner: "www-data"
+    dev1804_config.vm.synced_folder ".", "/vagrant", nfs: true, mount_options: ['rw,vers=3,tcp,fsc,actimeo=1']
+    #dev1804_config.vm.synced_folder ".", "/vagrant"
+    dev1804_config.ssh.forward_agent = true
+    dev1804_config.vm.provision "shell",
+    	inline: $script
+
+    dev1804_config.vm.provision "shell",
+    	inline: $github_ops,
+		privileged: false
+
+    # Patch for https://github.com/mitchellh/vagrant/issues/6793
+    dev1804_config.vm.provision "shell" do |s|
+        s.inline = '[[ ! -f $1 ]] || grep -F -q "$2" $1 || sed -i "/__main__/a \\    $2" $1'
+        s.args = ['/usr/bin/ansible-galaxy', "if sys.argv == ['/usr/bin/ansible-galaxy', '--help']: sys.argv.insert(1, 'info')"]
+    end
+
+    dev1804_config.vm.provision "ansible_local" do |a|
+        a.playbook = "vagrant1804.yml"
+        a.provisioning_path = "/var/ops/ansible"
+        a.inventory_path = "/var/ops/ansible/vagrant_inventory"
+        a.limit = "vagrant"
+        a.install = false
+    end
+
+    dev1804_config.vm.provision "shell",
+    	inline: $deploy
+
+    dev1804_config.vm.provider "virtualbox" do |v|
+      v.customize ["modifyvm", :id, "--memory", 1200]
+      v.customize ["modifyvm", :id, "--cpus", 1]
+
+      # Virtualbox has issues with symlinks - https://www.virtualbox.org/ticket/10085#comment:12
+      v.customize ["setextradata", :id, "VBoxInternal2/SharedFoldersEnableSymlinksCreate/vagrant", "1"]
+
+      # if you ever need the gui
+      # v.gui = true
+
+      # This setting makes it so that network access from the vagrant guest is able to
+      # resolve connections using the hosts VPN connection
+      # it means we can DNS resolve internal.vpn domains
+      v.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
+      v.customize ["modifyvm", :id, "--natdnsproxy1", "on"]
+    end
+  end
+
+  config.vm.define "dev1804_nonfs", primary: false, autostart: false do |dev1804_nonfs_config|
+    dev1804_nonfs_config.vm.box = "geerlingguy/ubuntu1804"
+    dev1804_nonfs_config.vm.network "forwarded_port", guest: 80, host: 40080 # apache sosure website
+    dev1804_nonfs_config.vm.network "forwarded_port", guest: 27017, host: 47017 # mongodb
+    dev1804_nonfs_config.vm.network "forwarded_port", guest: 5000, host: 5000 # sixpack
+    dev1804_nonfs_config.vm.network "forwarded_port", guest: 5001, host: 5001 # sixpack-web
+    dev1804_nonfs_config.vm.network "private_network", ip: "10.0.4.2"
+    dev1804_nonfs_config.vm.synced_folder ".", "/vagrant"
+    dev1804_nonfs_config.ssh.forward_agent = true
+
+    dev1804_nonfs_config.vm.provision "shell",
+    	inline: $script
+
+    # Patch for https://github.com/mitchellh/vagrant/issues/6793
+    dev1804_nonfs_config.vm.provision "shell" do |s|
+        s.inline = '[[ ! -f $1 ]] || grep -F -q "$2" $1 || sed -i "/__main__/a \\    $2" $1'
+        s.args = ['/usr/bin/ansible-galaxy', "if sys.argv == ['/usr/bin/ansible-galaxy', '--help']: sys.argv.insert(1, 'info')"]
+    end
+
+    dev1804_nonfs_config.vm.provision "ansible_local" do |a|
+        a.playbook = "vagrant1804.yml"
+        a.provisioning_path = "/vagrant/ops/ansible"
+        a.inventory_path = "/vagrant/ops/ansible/vagrant_inventory"
+        a.limit = "vagrant"
+        a.install = false
+    end
+
+    dev1804_nonfs_config.vm.provision "shell",
+    	inline: $deploy
+
+    dev1804_nonfs_config.vm.provider "virtualbox" do |v|
+      v.customize ["modifyvm", :id, "--memory", 1200]
+      v.customize ["modifyvm", :id, "--cpus", 1]
+
+      # Virtualbox has issues with symlinks - https://www.virtualbox.org/ticket/10085#comment:12
+      v.customize ["setextradata", :id, "VBoxInternal2/SharedFoldersEnableSymlinksCreate/vagrant", "1"]
+
+      # if you ever need the gui
+      # v.gui = true
+
+      # This setting makes it so that network access from the vagrant guest is able to
+      # resolve connections using the hosts VPN connection
+      # it means we can DNS resolve internal.vpn domains
+      v.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
+      v.customize ["modifyvm", :id, "--natdnsproxy1", "on"]
+    end
+  end
+
+  config.vm.define "dev1604", primary: false, autostart: false do |dev1604_config|
 	# https://github.com/geerlingguy/packer-ubuntu-1604/issues/1
 	# edit /etc/network/interfaces and remove
 	#   auto eth1
@@ -158,6 +267,11 @@ Vagrant.configure("2") do |config|
       v.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
       v.customize ["modifyvm", :id, "--natdnsproxy1", "on"]
     end      
+  end
+
+  config.vm.define "ubuntu1804", autostart: false do |ubuntu1804_config|
+    ubuntu1804_config.vm.box = "geerlingguy/ubuntu1804"
+    ubuntu1804_config.ssh.forward_agent = true
   end
 
   config.vm.define "ubuntu1604", autostart: false do |ubuntu1604_config|
