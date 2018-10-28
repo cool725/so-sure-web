@@ -30,6 +30,7 @@ class DaviesServiceTest extends WebTestCase
     protected static $container;
     /** @var DocumentManager */
     protected static $dm;
+    /** @var DaviesService */
     protected static $daviesService;
     protected static $phoneA;
     protected static $phoneB;
@@ -45,7 +46,9 @@ class DaviesServiceTest extends WebTestCase
 
          //now we can instantiate our service (if you want a fresh one for
          //each test method, do this in setUp() instead
-         self::$daviesService = self::$container->get('app.davies');
+        /** @var DaviesService */
+         $daviesService = self::$container->get('app.davies');
+         self::$daviesService = $daviesService;
 
         /** @var DocumentManager */
         $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
