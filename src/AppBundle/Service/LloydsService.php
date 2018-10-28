@@ -234,7 +234,7 @@ class LloydsService
 
                     // In the case where we're in Jan processing for Dec of previous year, as the above
                     // doesn't have a year it will assume Dec of current year (e.g. in the future)
-                    if ($processedDate > new \DateTime()) {
+                    if ($processedDate > \DateTime::createFromFormat('U', time())) {
                         $processedDate = $processedDate->sub(new \DateInterval('P1Y'));
                     }
 

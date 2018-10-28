@@ -34,7 +34,7 @@ class ImeiUploadFile extends UploadFile
      */
     public function getS3FileName()
     {
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
 
         return sprintf(
             'imei/%s/imei-%d-%02d-%02d-%s',

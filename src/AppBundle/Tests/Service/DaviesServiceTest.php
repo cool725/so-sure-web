@@ -30,6 +30,7 @@ class DaviesServiceTest extends WebTestCase
     protected static $container;
     /** @var DocumentManager */
     protected static $dm;
+    /** @var DaviesService */
     protected static $daviesService;
     protected static $phoneA;
     protected static $phoneB;
@@ -45,7 +46,9 @@ class DaviesServiceTest extends WebTestCase
 
          //now we can instantiate our service (if you want a fresh one for
          //each test method, do this in setUp() instead
-         self::$daviesService = self::$container->get('app.davies');
+        /** @var DaviesService */
+         $daviesService = self::$container->get('app.davies');
+         self::$daviesService = $daviesService;
 
         /** @var DocumentManager */
         $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
@@ -262,7 +265,7 @@ class DaviesServiceTest extends WebTestCase
         $daviesOpen->lossDate = new \DateTime('2017-02-01');
         static::$dm->flush();
 
-        $this->assertFalse(self::$daviesService->saveClaim($daviesOpen, $claimOpen));
+        $this->assertFalse(self::$daviesService->saveClaim($daviesOpen, false));
         $this->insureSoSureActionExists('/Skipping davies import/');
     }
 
@@ -283,7 +286,7 @@ class DaviesServiceTest extends WebTestCase
         static::$dm->persist($claimOpen);
         static::$dm->flush();
 
-        $this->assertFalse(self::$daviesService->saveClaim($daviesOpen, $claimOpen));
+        $this->assertFalse(self::$daviesService->saveClaim($daviesOpen, false));
         $this->insureSoSureActionExists('/Skipping davies import/');
     }
 
@@ -918,7 +921,7 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim->policyNumber = $policy->getPolicyNumber();
         $daviesClaim->insuredName = 'Mr foo bar';
         $daviesClaim->riskPostCode = 'se152sz';
-        $yesterday = new \DateTime();
+        $yesterday = \DateTime::createFromFormat('U', time());
         $yesterday = $yesterday->sub(new \DateInterval('P1D'));
         $daviesClaim->dateClosed = $yesterday;
 
@@ -938,7 +941,7 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim->policyNumber = $policy->getPolicyNumber();
         $daviesClaim->insuredName = 'Mr foo bar';
         $daviesClaim->riskPostCode = 'se152sz';
-        $fiveDaysAgo = new \DateTime();
+        $fiveDaysAgo = \DateTime::createFromFormat('U', time());
         $fiveDaysAgo = $fiveDaysAgo->sub(new \DateInterval('P5D'));
         $daviesClaim->dateClosed = $fiveDaysAgo;
 
@@ -1138,7 +1141,7 @@ class DaviesServiceTest extends WebTestCase
         $claim = new Claim();
         $policy->addClaim($claim);
 
-        $twelveDaysAgo = new \DateTime();
+        $twelveDaysAgo = \DateTime::createFromFormat('U', time());
         $twelveDaysAgo = $twelveDaysAgo->sub(new \DateInterval('P12D'));
         $daviesClaim = new DaviesHandlerClaim();
         $daviesClaim->claimNumber = 1;
@@ -1168,7 +1171,7 @@ class DaviesServiceTest extends WebTestCase
         $claim = new Claim();
         $policy->addClaim($claim);
 
-        $fourDaysAgo = new \DateTime();
+        $fourDaysAgo = \DateTime::createFromFormat('U', time());
         $fourDaysAgo = $fourDaysAgo->sub(new \DateInterval('P4D'));
         $daviesClaim = new DaviesHandlerClaim();
         $daviesClaim->claimNumber = 1;
@@ -1472,7 +1475,7 @@ class DaviesServiceTest extends WebTestCase
         $policy = static::createUserPolicy(true);
         $claim = new Claim();
         // 2 weeks
-        $twoWeekAgo = new \DateTime();
+        $twoWeekAgo = \DateTime::createFromFormat('U', time());
         $twoWeekAgo = $twoWeekAgo->sub(new \DateInterval('P14D'));
         $claim->setApprovedDate($twoWeekAgo);
         $policy->addClaim($claim);
@@ -1532,7 +1535,7 @@ class DaviesServiceTest extends WebTestCase
         self::$daviesService->clearErrors();
         self::$daviesService->clearSoSureActions();
 
-        $daviesClaim->replacementReceivedDate = new \DateTime();
+        $daviesClaim->replacementReceivedDate = \DateTime::createFromFormat('U', time());
         self::$daviesService->validateClaimDetails($claim, $daviesClaim);
         $this->insureErrorExists('/the replacement data not recorded/');
         $this->insureErrorDoesNotExist('/received date/');
@@ -1780,7 +1783,7 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim->lossType = DaviesHandlerClaim::TYPE_LOSS;
         static::$daviesService->saveClaim($daviesClaim, false);
         $this->assertEquals(Claim::STATUS_APPROVED, $claim->getStatus());
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         $yesterday = $this->subBusinessDays($now, 1);
         $this->assertEquals($yesterday, $claim->getApprovedDate());
     }
@@ -1809,7 +1812,7 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim->status = DaviesHandlerClaim::STATUS_OPEN;
         $daviesClaim->lossType = DaviesHandlerClaim::TYPE_LOSS;
         static::$daviesService->saveClaim($daviesClaim, false);
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         $yesterday = $this->subBusinessDays($now, 1);
         $this->assertEquals($yesterday, $claim->getApprovedDate());
     }
@@ -1994,7 +1997,7 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim->replacementMake = 'Apple';
         $daviesClaim->replacementModel = 'iPhone 4';
         $daviesClaim->replacementImei = 'invalid';
-        $daviesClaim->replacementReceivedDate = new \DateTime();
+        $daviesClaim->replacementReceivedDate = \DateTime::createFromFormat('U', time());
         $this->assertFalse(static::$daviesService->saveClaim($daviesClaim, false));
         $this->assertEquals(
             0,
@@ -2037,7 +2040,7 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim->replacementMake = 'Apple';
         $daviesClaim->replacementModel = 'iPhone 4';
         $daviesClaim->replacementImei = $this->generateRandomImei();
-        $daviesClaim->replacementReceivedDate = new \DateTime();
+        $daviesClaim->replacementReceivedDate = \DateTime::createFromFormat('U', time());
         $this->assertTrue(static::$daviesService->saveClaim($daviesClaim, false));
         $this->assertEquals(
             0,
@@ -2082,7 +2085,7 @@ class DaviesServiceTest extends WebTestCase
         // $daviesClaim->replacementImei = 'Unable to obtain';
         $daviesClaim->unobtainableFields[] = 'replacementImei';
 
-        $daviesClaim->replacementReceivedDate = new \DateTime();
+        $daviesClaim->replacementReceivedDate = \DateTime::createFromFormat('U', time());
         $this->assertTrue(static::$daviesService->saveClaim($daviesClaim, false));
         $this->assertEquals(
             0,
@@ -2107,7 +2110,7 @@ class DaviesServiceTest extends WebTestCase
         $claim->setStatus(Claim::STATUS_APPROVED);
         $claim->setHandlingTeam(Claim::TEAM_DAVIES);
 
-        $yesterday = new \DateTime();
+        $yesterday = \DateTime::createFromFormat('U', time());
         $yesterday = $yesterday->sub(new \DateInterval('P1D'));
         $claim->setRecordedDate($yesterday);
 
@@ -2146,7 +2149,7 @@ class DaviesServiceTest extends WebTestCase
         $claim1->setHandlingTeam(Claim::TEAM_DAVIES);
         $policy->addClaim($claim1);
 
-        $yesterday = new \DateTime();
+        $yesterday = \DateTime::createFromFormat('U', time());
         $yesterday = $yesterday->sub(new \DateInterval('P1D'));
         $claim2 = new Claim();
         $claim2->setRecordedDate($yesterday);
@@ -2173,7 +2176,7 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim->replacementMake = 'Apple';
         $daviesClaim->replacementModel = 'iPhone 4';
         $daviesClaim->replacementImei = '123 Bx11lt';
-        $daviesClaim->replacementReceivedDate = new \DateTime();
+        $daviesClaim->replacementReceivedDate = \DateTime::createFromFormat('U', time());
         $daviesClaim->phoneReplacementCost = 100;
         $daviesClaim->incurred = 100;
         $daviesClaims = array($daviesClaim);
@@ -2193,7 +2196,7 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim->replacementMake = 'Apple';
         $daviesClaim->replacementModel = 'iPhone 4';
         $daviesClaim->replacementImei = '123 Bx11lt';
-        $daviesClaim->replacementReceivedDate = new \DateTime();
+        $daviesClaim->replacementReceivedDate = \DateTime::createFromFormat('U', time());
         $daviesClaims = array($daviesClaim);
 
         static::$daviesService->saveClaims('', $daviesClaims);
@@ -2232,7 +2235,7 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim->replacementMake = 'Apple';
         $daviesClaim->replacementModel = 'iPhone 4';
         //$daviesClaim->replacementImei = $this->generateRandomImei();
-        $daviesClaim->replacementReceivedDate = new \DateTime();
+        $daviesClaim->replacementReceivedDate = \DateTime::createFromFormat('U', time());
         $this->assertTrue(static::$daviesService->saveClaim($daviesClaim, false));
         $this->assertEquals(
             1,
@@ -2296,7 +2299,7 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim->replacementMake = 'Apple';
         $daviesClaim->replacementModel = 'iPhone 4';
         //$daviesClaim->replacementImei = $this->generateRandomImei();
-        $daviesClaim->replacementReceivedDate = new \DateTime();
+        $daviesClaim->replacementReceivedDate = \DateTime::createFromFormat('U', time());
         $this->assertTrue(static::$daviesService->saveClaim($daviesClaim, false));
         $this->assertEquals(
             1,

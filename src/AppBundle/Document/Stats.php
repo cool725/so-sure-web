@@ -92,7 +92,7 @@ class Stats
 
     public function __construct()
     {
-        $this->date = new \DateTime();
+        $this->date = \DateTime::createFromFormat('U', time());
     }
 
     public function getId()

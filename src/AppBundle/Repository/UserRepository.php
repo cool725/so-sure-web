@@ -191,7 +191,7 @@ class UserRepository extends DocumentRepository
     public function findPendingMandates(\DateTime $date = null)
     {
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
         $date = $this->endOfDay($date);
 

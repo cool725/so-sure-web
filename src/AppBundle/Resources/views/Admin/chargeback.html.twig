@@ -13,7 +13,7 @@
 <div class="container" style="margin-bottom: 50px">
 
 <div class="row">
-    <div class="col-md-6">
+    <div class="col-md-5">
         <h1>
             {% if app.request.get('_route') == "admin_chargeback" %}
                 Unassigned Chargebacks
@@ -38,15 +38,25 @@
             </div>
         </div>
     </div>
-    <div class="col-md-2">
+    <div class="col-md-1">
         <div class="form-group" style="padding-top: 15px;">
             <div class="btn-group">
                 <button type="button" class="btn btn-info" data-toggle="modal" data-target="#newChargebackModal"
-                    > Add Chargeback</button>
+                    > Add</button>
             </div>
         </div>
     </div>
     </form>
+    <div class="col-md-3">
+        <div class="form-group" style="padding-top: 15px;">
+            <form action="https://portal.judopay.com/payments/history?SearchQueryType=1&AppName=&DeviceId=&From=&To=&AppId=0" method="GET">
+                <input type="text" name="SearchQuery" placeholder="Last 4 digits" style="width: 100px;">
+                <input type="hidden" name="SearchQueryType" value="1">
+                <button type="submit" class="btn btn-success">Query Judo</button>
+            </form>
+        </div>
+    </div>
+
 </div>
     {% if chargebacks|length == 0 %}
     <div class="row-fluid">

@@ -616,7 +616,7 @@ class JudopayServiceTest extends WebTestCase
         /** @var ScheduledPayment $scheduledPayment */
         $scheduledPayment = $policy->getScheduledPayments()[0];
         $scheduledPayment->setAmount($scheduledPayment->getAmount() + 1);
-        $nextMonth = new \DateTime();
+        $nextMonth = \DateTime::createFromFormat('U', time());
         $nextMonth = $this->convertTimezone($nextMonth, new \DateTimeZone(SoSure::TIMEZONE));
         $nextMonth = $nextMonth->add(new \DateInterval('P1M'));
 
@@ -672,7 +672,7 @@ class JudopayServiceTest extends WebTestCase
         $this->assertEquals($policy->getPremium()->getMonthlyPremiumPrice(), $policy->getPremiumPaid());
         $scheduledPayment = $policy->getScheduledPayments()[0];
         $scheduledPayment->setAmount($scheduledPayment->getAmount() + 1);
-        $nextMonth = new \DateTime();
+        $nextMonth = \DateTime::createFromFormat('U', time());
         $nextMonth = $this->convertTimezone($nextMonth, new \DateTimeZone(SoSure::TIMEZONE));
         $nextMonth = $nextMonth->add(new \DateInterval('P1M'));
 
@@ -728,7 +728,7 @@ class JudopayServiceTest extends WebTestCase
         $this->assertFalse($policy->getUser()->hasValidPaymentMethod());
 
         $scheduledPayment = $policy->getScheduledPayments()[0];
-        $nextMonth = new \DateTime();
+        $nextMonth = \DateTime::createFromFormat('U', time());
         $nextMonth = $this->convertTimezone($nextMonth, new \DateTimeZone(SoSure::TIMEZONE));
         $nextMonth = $nextMonth->add(new \DateInterval('P1M'));
 
@@ -776,7 +776,7 @@ class JudopayServiceTest extends WebTestCase
         $this->assertFalse($policy->getUser()->hasValidPaymentMethod());
 
         $scheduledPayment = $policy->getScheduledPayments()[0];
-        $nextMonth = new \DateTime();
+        $nextMonth = \DateTime::createFromFormat('U', time());
         $nextMonth = $this->convertTimezone($nextMonth, new \DateTimeZone(SoSure::TIMEZONE));
         $nextMonth = $nextMonth->add(new \DateInterval('P1M'));
 
@@ -929,7 +929,7 @@ class JudopayServiceTest extends WebTestCase
         $this->assertEquals(11, count($policy->getScheduledPayments()));
 
         $initialScheduledPayment = $policy->getNextScheduledPayment();
-        $initialScheduledPayment->setScheduled(new \DateTime());
+        $initialScheduledPayment->setScheduled(\DateTime::createFromFormat('U', time()));
         self::$judopay->scheduledPayment($initialScheduledPayment, 'TEST');
     }
 
@@ -1435,7 +1435,7 @@ class JudopayServiceTest extends WebTestCase
 
         $discount = new PolicyDiscountPayment();
         $discount->setAmount(10);
-        $discount->setDate(new \DateTime());
+        $discount->setDate(\DateTime::createFromFormat('U', time()));
         $policy->addPayment($discount);
         $policy->getPremium()->setAnnualDiscount($discount->getAmount());
 

@@ -84,7 +84,7 @@ abstract class Opt
 
     public function __construct()
     {
-        $this->created = new \DateTime();
+        $this->created = \DateTime::createFromFormat('U', time());
     }
 
     public function getId()
@@ -125,7 +125,7 @@ abstract class Opt
     public function setCategories($categories)
     {
         if ($this->categories != $categories) {
-            $this->setUpdated(new \DateTime());
+            $this->setUpdated(\DateTime::createFromFormat('U', time()));
         }
         $this->categories = $categories;
     }
@@ -134,7 +134,7 @@ abstract class Opt
     {
         if (!in_array($category, $this->categories)) {
             $this->categories[] = $category;
-            $this->setUpdated(new \DateTime());
+            $this->setUpdated(\DateTime::createFromFormat('U', time()));
         }
     }
 
@@ -146,7 +146,7 @@ abstract class Opt
     public function setNotes($notes)
     {
         if ($this->notes != $notes) {
-            $this->setUpdated(new \DateTime());
+            $this->setUpdated(\DateTime::createFromFormat('U', time()));
         }
         $this->notes = $notes;
     }
@@ -159,7 +159,7 @@ abstract class Opt
     public function setLocation($location)
     {
         if ($this->location != $location) {
-            $this->setUpdated(new \DateTime());
+            $this->setUpdated(\DateTime::createFromFormat('U', time()));
         }
         $this->location = $location;
     }

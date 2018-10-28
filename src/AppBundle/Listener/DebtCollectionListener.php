@@ -43,7 +43,7 @@ class DebtCollectionListener
 
             $debtCollection = new DebtCollectionPayment();
             $debtCollection->setAmount($amount);
-            $debtCollection->setDate(new \DateTime());
+            $debtCollection->setDate(\DateTime::createFromFormat('U', time()));
             $debtCollection->setNotes(sprintf(
                 'Debt collection fee from %s',
                 $event->getPayment()->getPolicy()->getDebtCollector()

@@ -30,7 +30,7 @@ class BacsReportAruddFile extends UploadFile
      */
     public function getS3FileName()
     {
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
 
         return sprintf(
             'arudd-%d-%02d-%s',
