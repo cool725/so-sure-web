@@ -668,6 +668,7 @@ class PurchaseController extends BaseController
      */
     public function purchaseStepPledgeAction(Request $request, $id)
     {
+        set_time_limit(120);
         /** @var User $user */
         $user = $this->getUser();
         if (!$user) {
