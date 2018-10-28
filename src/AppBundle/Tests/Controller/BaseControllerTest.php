@@ -51,6 +51,9 @@ class BaseControllerTest extends WebTestCase
         if (!self::$container) {
             throw new \Exception('unable to find container');
         }
+
+        set_time_limit(720);
+
         self::$identity = self::$container->get('app.cognito.identity');
 
         /** @var DocumentManager */
