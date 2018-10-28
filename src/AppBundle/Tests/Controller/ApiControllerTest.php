@@ -789,10 +789,7 @@ class ApiControllerTest extends BaseApiControllerTest
 
         static::$dm->flush();
 
-        $dm = $this->getDocumentManager(true);
-        $repo = $dm->getRepository(SCode::class);
-        /** @var SCode $sCode */
-        $sCode = $repo->findOneBy(['active' => true, 'type' => SCode::TYPE_STANDARD]);
+        $sCode = $policy->getStandardSCode();
         $this->assertNotNull($sCode);
 
         $cognitoIdentityId = $this->getUnauthIdentity();

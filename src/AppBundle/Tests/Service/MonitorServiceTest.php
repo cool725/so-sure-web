@@ -55,22 +55,11 @@ class MonitorServiceTest extends WebTestCase
     public function tearDown()
     {
         parent::tearDown();
-
-        $qb = static::$dm->createQueryBuilder(Policy::class);
-
-        $qb->remove()
-            ->getQuery()
-            ->execute();
     }
 
     public function setUp()
     {
         parent::setUp();
-
-        $qb = static::$dm->createQueryBuilder(Claim::class);
-        $qb->remove()
-            ->getQuery()
-            ->execute();
     }
 
     public function testClaimsSettledUnprocessedOk()
