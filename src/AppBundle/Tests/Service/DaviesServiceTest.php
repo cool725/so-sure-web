@@ -265,7 +265,7 @@ class DaviesServiceTest extends WebTestCase
         $daviesOpen->lossDate = new \DateTime('2017-02-01');
         static::$dm->flush();
 
-        $this->assertFalse(self::$daviesService->saveClaim($daviesOpen, $claimOpen));
+        $this->assertFalse(self::$daviesService->saveClaim($daviesOpen, false));
         $this->insureSoSureActionExists('/Skipping davies import/');
     }
 
@@ -286,7 +286,7 @@ class DaviesServiceTest extends WebTestCase
         static::$dm->persist($claimOpen);
         static::$dm->flush();
 
-        $this->assertFalse(self::$daviesService->saveClaim($daviesOpen, $claimOpen));
+        $this->assertFalse(self::$daviesService->saveClaim($daviesOpen, false));
         $this->insureSoSureActionExists('/Skipping davies import/');
     }
 

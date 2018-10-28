@@ -184,7 +184,7 @@ class DoctrineClaimListenerTest extends WebTestCase
         $updatedClaim = $repo->find($claim->getId());
         $this->assertNotNull($updatedClaim->getUnderwriterLastUpdated());
 
-        $this->assertEquals($expectedUnderwriterUpdated, $updatedClaim->getUnderwriterLastUpdated(), null, 1);
+        $this->assertEquals($expectedUnderwriterUpdated, $updatedClaim->getUnderwriterLastUpdated(), '', 1);
     }
 
     public function testClaimsListenerActualDavies()
@@ -237,7 +237,7 @@ class DoctrineClaimListenerTest extends WebTestCase
         $updatedClaim = $repo->find($claim->getId());
         $this->assertNotNull($updatedClaim->getUnderwriterLastUpdated());
 
-        $this->assertEquals($expectedUnderwriterUpdated, $updatedClaim->getUnderwriterLastUpdated(), null, 1);
+        $this->assertEquals($expectedUnderwriterUpdated, $updatedClaim->getUnderwriterLastUpdated(), '', 1);
     }
 
     private function createClaimEventListener(Claim $claim, $count, $eventTypes)

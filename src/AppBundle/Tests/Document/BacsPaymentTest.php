@@ -135,7 +135,7 @@ class BacsPaymentTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($bacs->isSuccess());
         $this->assertEquals(ScheduledPayment::STATUS_SUCCESS, $bacs->getScheduledPayment()->getStatus());
 
-        $this->assertEquals($now, $bankAccount->getLastSuccessfulPaymentDate(), null, 1);
+        $this->assertEquals($now, $bankAccount->getLastSuccessfulPaymentDate(), '', 1);
     }
 
     /**

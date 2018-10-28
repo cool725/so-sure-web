@@ -88,12 +88,12 @@ class PhonePolicyTest extends WebTestCase
         $this->assertNull($policy->getStatusUpdated());
         $now = \DateTime::createFromFormat('U', time());
         $policy->setStatus(Policy::STATUS_ACTIVE);
-        $this->assertEquals($now, $policy->getStatusUpdated(), null, 1);
+        $this->assertEquals($now, $policy->getStatusUpdated(), '', 1);
         sleep(1);
         $policy->setStatus(Policy::STATUS_ACTIVE);
-        $this->assertEquals($now, $policy->getStatusUpdated(), null, 1);
+        $this->assertEquals($now, $policy->getStatusUpdated(), '', 1);
         $policy->setStatus(Policy::STATUS_UNPAID);
-        $this->assertNotEquals($now, $policy->getStatusUpdated(), null, 0);
+        $this->assertNotEquals($now, $policy->getStatusUpdated(), '', 0);
     }
 
     public function testCanAdjustPicSureStatusForClaim()
@@ -2762,7 +2762,12 @@ class PhonePolicyTest extends WebTestCase
         $this->assertFalse($policy->getUser()->getAnalytics()['hasOutstandingPicSurePolicy']);
 
         $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_APPROVED);
-        $this->assertEquals(\DateTime::createFromFormat('U', time()), $policy->getPicSureApprovedDate(), null, 1);
+        $this->assertEquals(
+            \DateTime::createFromFormat('U', time()),
+            $policy->getPicSureApprovedDate(),
+            '',
+            1
+        );
         $this->assertFalse($policy->getUser()->getAnalytics()['hasOutstandingPicSurePolicy']);
     }
 
@@ -5129,7 +5134,7 @@ class PhonePolicyTest extends WebTestCase
         $issueDate2 = clone $issueDate;
         $issueDate2->add(new \DateInterval('PT1S'));
 
-        $this->assertEquals($date, $policy->getStart(), null, 1);
+        $this->assertEquals($date, $policy->getStart(), '', 1);
         $this->assertTrue($policy->getIssueDate() == $issueDate || $policy->getIssueDate() == $issueDate2);
 
         return $policy;
