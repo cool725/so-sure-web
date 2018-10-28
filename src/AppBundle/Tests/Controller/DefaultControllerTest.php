@@ -219,6 +219,9 @@ class DefaultControllerTest extends BaseControllerTest
         $this->expectFlashSuccess($crawler, 'receive an email shortly');
 
         self::$client->enableProfiler();
+        if (!self::$client->getProfile()) {
+            throw new \Exception('Profiler must be enabled');
+        }
         $crawler = self::$client->request('GET', '/communications');
         $form = $crawler->selectButton('form[decline]')->form();
         $form['form[email]'] = $email2;
