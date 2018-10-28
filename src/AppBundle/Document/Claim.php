@@ -754,7 +754,7 @@ class Claim
 
     public function __construct()
     {
-        $this->recordedDate = new \DateTime();
+        $this->recordedDate = \DateTime::createFromFormat('U', time());
     }
 
     public function getId()

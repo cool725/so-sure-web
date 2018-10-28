@@ -7,7 +7,7 @@ trait CurrencyTrait
     public function getCurrentVatRate(\DateTime $date = null)
     {
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
 
         return 0.2;
@@ -16,7 +16,7 @@ trait CurrencyTrait
     public function getCurrentIptRate(\DateTime $date = null)
     {
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
 
         if ($date < new \DateTime('2016-10-01')) {

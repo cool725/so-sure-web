@@ -146,12 +146,12 @@ class SalvaPhonePolicy extends PhonePolicy
         if ($resultType == self::RESULT_TYPE_CANCEL) {
             $version--;
         }
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         $key = sprintf('%d-%s-%s', $version, $resultType, $now->format('U'));
 
         $this->salvaPolicyResults[$key] = serialize(array_merge([
             'responseId' => $responseId,
-            'time' => new \DateTime()
+            'time' => \DateTime::createFromFormat('U', time())
         ], $details));
     }
 
@@ -212,7 +212,7 @@ class SalvaPhonePolicy extends PhonePolicy
     public function incrementSalvaPolicyNumber(\DateTime $date = null)
     {
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
 
         $version = $this->getLatestSalvaPolicyNumberVersion();
@@ -248,7 +248,7 @@ class SalvaPhonePolicy extends PhonePolicy
     public function getSalvaVersion(\DateTime $date = null)
     {
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
 
         $versions = $this->getSalvaPolicyNumbers();

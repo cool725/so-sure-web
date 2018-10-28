@@ -248,7 +248,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             $phones = $phones->field('suggestedReplacement')->exists(false);
             $phones = $phones->field('replacementPrice')->lte(0);
         } elseif ($rules == 'retired') {
-            $retired = new \DateTime();
+            $retired = \DateTime::createFromFormat('U', time());
             $retired->sub(new \DateInterval(sprintf('P%dM', Phone::MONTHS_RETIREMENT + 1)));
             $phones = $phones->field('releaseDate')->lte($retired);
         } elseif ($rules == 'loss') {
@@ -271,7 +271,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             $replacementPhones = clone $phones;
             $phones = $phones->field('replacementPrice')->lte(0);
             $phones = $phones->field('initialPrice')->gte(300);
-            $year = new \DateTime();
+            $year = \DateTime::createFromFormat('U', time());
             $year->sub(new \DateInterval('P1Y'));
             $phones = $phones->field('releaseDate')->gte($year);
 
@@ -295,7 +295,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         $phones = $phones->sort('memory', 'asc');
         $pager = $this->pager($request, $phones);
 
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         $oneDay = $this->addBusinessDays($now, 1);
         return [
             'phones' => $pager->getCurrentPageResults(),
@@ -482,7 +482,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         $bacsPayment->setManual(true);
         $bacsPayment->setStatus(BacsPayment::STATUS_SUCCESS);
         $bacsPayment->setSuccess(true);
-        $bacsPayment->setDate(new \DateTime());
+        $bacsPayment->setDate(\DateTime::createFromFormat('U', time()));
         $bacsPayment->setAmount($policy->getPremium()->getYearlyPremiumPrice());
         $bacsPayment->setTotalCommission(Salva::YEARLY_TOTAL_COMMISSION);
 
@@ -884,7 +884,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                     if ($chargeback = $chargebacks->getChargeback()) {
                         // To appear for the correct account month, should be when we assign
                         // the chargeback to the policy
-                        $chargeback->setDate(new \DateTime());
+                        $chargeback->setDate(\DateTime::createFromFormat('U', time()));
 
                         if ($this->areEqualToTwoDp(
                             $chargeback->getAmount(),
@@ -972,7 +972,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                         } else {
                             throw new \Exception('Unknown button click');
                         }
-                        $policy->setPicSureApprovedDate(new \DateTime());
+                        $policy->setPicSureApprovedDate(\DateTime::createFromFormat('U', time()));
                         $dm->flush();
                         $this->addFlash(
                             'success',
@@ -1003,7 +1003,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             } elseif ($request->request->has('pay_policy_form')) {
                 $payPolicyForm->handleRequest($request);
                 if ($payPolicyForm->isValid()) {
-                    $date = new \DateTime();
+                    $date = \DateTime::createFromFormat('U', time());
                     $phone = $policy->getPhone();
                     $currentPrice = $phone->getCurrentPhonePrice();
                     if ($currentPrice && $payPolicyForm->get('monthly')->isClicked()) {
@@ -1117,7 +1117,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             }
         }
         $checks = $fraudService->runChecks($policy);
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
 
         /** @var LogEntryRepository $logRepo */
         $logRepo = $this->getManager()->getRepository(LogEntry::class);
@@ -1175,7 +1175,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             'suggested_cancellation_date' => $now->add(new \DateInterval('P30D')),
             'claim_types' => Claim::$claimTypes,
             'phones' => $dm->getRepository(Phone::class)->findActive()->getQuery()->execute(),
-            'now' => new \DateTime(),
+            'now' => \DateTime::createFromFormat('U', time()),
             'previousPicSureStatus' => $previousPicSureStatus,
             'hadInvalidPicSureStatus' => $hadInvalidPicSureStatus,
         ];
@@ -1277,7 +1277,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                     }
 
                     $this->container->get('fos_user.mailer')->sendResettingEmailMessage($user);
-                    $user->setPasswordRequestedAt(new \DateTime());
+                    $user->setPasswordRequestedAt(\DateTime::createFromFormat('U', time()));
                     $this->get('fos_user.user_manager')->updateUser($user);
 
                     $this->addFlash(
@@ -1586,7 +1586,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
      */
     public function adminScheduledPaymentsAction($year = null, $month = null)
     {
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         if (!$year) {
             $year = $now->format('Y');
         }
@@ -1636,7 +1636,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
     public function adminQuarterlyPLAction(Request $request, $year = null, $month = null)
     {
         if ($request->get('_route') == "admin_quarterly_pl") {
-            $now = new \DateTime();
+            $now = \DateTime::createFromFormat('U', time());
             $now = $now->sub(new \DateInterval('P1Y'));
             return new RedirectResponse($this->generateUrl('admin_quarterly_pl_date', [
                 'year' => $now->format('Y'),
@@ -1665,7 +1665,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
     public function adminUnderWritingAction(Request $request, $year = null, $month = null)
     {
         if ($request->get('_route') == "admin_underwriting") {
-            $now = new \DateTime();
+            $now = \DateTime::createFromFormat('U', time());
             $now = $now->sub(new \DateInterval('P1Y'));
             return new RedirectResponse($this->generateUrl('admin_underwriting_date', [
                 'year' => $now->format('Y'),
@@ -2137,7 +2137,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
     public function breakdownPrintAction()
     {
         $policyService = $this->get('app.policy');
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
 
         return new Response(
             $policyService->getBreakdownPdf(),
@@ -2243,7 +2243,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
      */
     public function paymentsAction($year = null, $month = null)
     {
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         if (!$year) {
             $year = $now->format('Y');
         }
@@ -2537,7 +2537,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
      */
     public function affiliateChargeAction($id, $year = null, $month = null)
     {
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         $year = $year ?: $now->format('Y');
         $month = $month ?: $now->format('m');
         $date = \DateTime::createFromFormat("Y-m-d", sprintf('%d-%d-01', $year, $month));

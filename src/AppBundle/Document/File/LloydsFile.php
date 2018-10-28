@@ -76,7 +76,7 @@ class LloydsFile extends UploadFile
      */
     public function getS3FileName()
     {
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
 
         return sprintf(
             'banking/lloyds-%d-%02d-%s',

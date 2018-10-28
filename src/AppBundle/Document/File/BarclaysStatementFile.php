@@ -42,7 +42,7 @@ class BarclaysStatementFile extends UploadFile
      */
     public function getS3FileName()
     {
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
 
         return sprintf(
             'banking/barclays-statement-%d-%02d-%s',

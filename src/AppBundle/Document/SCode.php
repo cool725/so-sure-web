@@ -86,7 +86,7 @@ class SCode
 
     public function __construct()
     {
-        $this->createdDate = new \DateTime();
+        $this->createdDate = \DateTime::createFromFormat('U', time());
         $this->active = true;
         $this->setType(self::TYPE_STANDARD);
         $this->generateRandomCode();

@@ -122,7 +122,7 @@ class InvitationServiceAdditionalTest extends WebTestCase
         /** @var EmailInvitationRepository $emailInvitationRepo */
         $emailInvitationRepo = static::$dm->getRepository(EmailInvitation::class);
         $count = count($emailInvitationRepo->findSystemReinvitations());
-        $future = new \DateTime();
+        $future = \DateTime::createFromFormat('U', time());
         $future->add(new \DateInterval('P3D'));
         $this->assertEquals($count + 1, count($emailInvitationRepo->findSystemReinvitations($future)));
 
@@ -212,7 +212,7 @@ class InvitationServiceAdditionalTest extends WebTestCase
         /** @var EmailInvitationRepository $emailInvitationRepo */
         $emailInvitationRepo = static::$dm->getRepository(EmailInvitation::class);
         $count = count($emailInvitationRepo->findSystemReinvitations());
-        $future = new \DateTime();
+        $future = \DateTime::createFromFormat('U', time());
         $future->add(new \DateInterval('P3D'));
         $this->assertEquals($count + 1, count($emailInvitationRepo->findSystemReinvitations($future)));
 
@@ -267,11 +267,11 @@ class InvitationServiceAdditionalTest extends WebTestCase
         /** @var EmailInvitationRepository $emailInvitationRepo */
         $emailInvitationRepo = static::$dm->getRepository(EmailInvitation::class);
         $count = count($emailInvitationRepo->findSystemReinvitations());
-        $future = new \DateTime();
+        $future = \DateTime::createFromFormat('U', time());
         $future->add(new \DateInterval('P3D'));
         $this->assertEquals($count + 1, count($emailInvitationRepo->findSystemReinvitations($future)));
         
-        $invitation->setAccepted(new \DateTime());
+        $invitation->setAccepted(\DateTime::createFromFormat('U', time()));
         static::$dm->flush();
         $this->assertEquals($count, count($emailInvitationRepo->findSystemReinvitations($future)));
 
@@ -296,7 +296,7 @@ class InvitationServiceAdditionalTest extends WebTestCase
         /** @var EmailInvitationRepository $emailInvitationRepo */
         $emailInvitationRepo = static::$dm->getRepository(EmailInvitation::class);
         $count = count($emailInvitationRepo->findSystemReinvitations());
-        $future = new \DateTime();
+        $future = \DateTime::createFromFormat('U', time());
         $future->add(new \DateInterval('P3D'));
         $this->assertEquals($count + 1, count($emailInvitationRepo->findSystemReinvitations($future)));
 
@@ -324,7 +324,7 @@ class InvitationServiceAdditionalTest extends WebTestCase
         /** @var EmailInvitationRepository $emailInvitationRepo */
         $emailInvitationRepo = static::$dm->getRepository(EmailInvitation::class);
         $count = count($emailInvitationRepo->findSystemReinvitations());
-        $future = new \DateTime();
+        $future = \DateTime::createFromFormat('U', time());
         $future->add(new \DateInterval('P3D'));
         $this->assertEquals($count + 1, count($emailInvitationRepo->findSystemReinvitations($future)));
 

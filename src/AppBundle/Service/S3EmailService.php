@@ -208,7 +208,7 @@ abstract class S3EmailService
 
     public function moveS3($sourceKey, $folder)
     {
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         $destKey = str_replace(
             sprintf('/%s/', self::UNPROCESSED_FOLDER),
             sprintf('/%s/%d/', $folder, $now->format('Y')),

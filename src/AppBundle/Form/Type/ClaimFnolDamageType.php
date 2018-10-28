@@ -113,7 +113,7 @@ class ClaimFnolDamageType extends AbstractType
             /** @var ClaimFnolDamage $data */
             $data = $event->getData();
 
-            $now = new \DateTime();
+            $now = \DateTime::createFromFormat('U', time());
             $timestamp = $now->format('U');
 
             /** @var UploadedFile $filename */

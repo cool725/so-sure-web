@@ -76,7 +76,7 @@ class PolicyPayCommand extends ContainerAwareCommand
         $payments = $input->getOption('payments');
         $customerRef = $input->getOption('customer-ref');
         $policyId = $input->getOption('id');
-        $date = new \DateTime();
+        $date = \DateTime::createFromFormat('U', time());
 
         $policy = null;
         $user = null;

@@ -444,7 +444,7 @@ class PolicyService
         $this->statsd->startTiming("policy.create");
         try {
             if (!$date) {
-                $date = new \DateTime();
+                $date = \DateTime::createFromFormat('U', time());
             }
             $user = $policy->getUser();
 
@@ -976,9 +976,9 @@ class PolicyService
             ], ['loggedAt' => 'desc']);
             $now = $date;
             if (!$now) {
-                $now = new \DateTime();
+                $now = \DateTime::createFromFormat('U', time());
             }
-            $loggedAt = new \DateTime();
+            $loggedAt = \DateTime::createFromFormat('U', time());
             if ($history) {
                 $loggedAt = $history->getLoggedAt();
             }
@@ -1095,7 +1095,7 @@ class PolicyService
                 $attachmentFiles,
                 $bcc
             );
-            $policy->setLastEmailed(new \DateTime());
+            $policy->setLastEmailed(\DateTime::createFromFormat('U', time()));
         } catch (\Exception $e) {
             $this->logger->error(
                 sprintf('Failed sending policy email to %s', $policy->getUser()->getEmail()),
@@ -1276,7 +1276,7 @@ class PolicyService
 
     public function getBreakdownPdf($file = null)
     {
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         $this->snappyPdf->setOption('orientation', 'Portrait');
         $this->snappyPdf->setOption('page-size', 'A4');
         $html = $this->templating->render('AppBundle:Pdf:policyBreakdown.html.twig', [
@@ -1489,7 +1489,7 @@ class PolicyService
     public function fullyExpireExpiredClaimablePolicies($prefix, $dryRun = false, \DateTime $date = null)
     {
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
         $fullyExpired = [];
         /** @var PolicyRepository $policyRepo */
@@ -1542,9 +1542,9 @@ class PolicyService
         /** @var PhonePolicyRepository $phonePolicyRepo */
         $phonePolicyRepo = $this->dm->getRepository(PhonePolicy::class);
 
-        $activationDate = new \DateTime();
+        $activationDate = \DateTime::createFromFormat('U', time());
         $activationDate = $activationDate->sub(SoSure::getActivationInterval());
-        $hardActivationDate = new \DateTime();
+        $hardActivationDate = \DateTime::createFromFormat('U', time());
         $hardActivationDate = $hardActivationDate->sub(SoSure::getHardActivationInterval());
 
         $metrics = [
@@ -1575,7 +1575,7 @@ class PolicyService
 
     public function cashbackReminder($dryRun)
     {
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         $cashback = [];
         /** @var CashbackRepository $cashbackRepo */
         $cashbackRepo = $this->dm->getRepository(Cashback::class);
@@ -1657,14 +1657,19 @@ class PolicyService
         }
 
         if ($policy->isRenewed() && $policy->hasAdjustedRewardPotPayment()) {
-            $outstanding = $policy->getNextPolicy()->getOutstandingPremiumToDate($date ? $date : new \DateTime(), true);
+            $outstanding = $policy->getNextPolicy()->getOutstandingPremiumToDate(
+                $date ? $date : \DateTime::createFromFormat('U', time()),
+                true
+            );
             $this->regenerateScheduledPayments($policy->getNextPolicy(), $date, null, $outstanding);
 
             // bill for outstanding payments due
-            $outstanding = $policy->getNextPolicy()->getOutstandingUserPremiumToDate($date ? $date : new \DateTime());
+            $outstanding = $policy->getNextPolicy()->getOutstandingUserPremiumToDate(
+                $date ? $date : \DateTime::createFromFormat('U', time())
+            );
             $scheduledPayment = new ScheduledPayment();
             $scheduledPayment->setStatus(ScheduledPayment::STATUS_SCHEDULED);
-            $scheduledPayment->setScheduled($date ? $date : new \DateTime());
+            $scheduledPayment->setScheduled($date ? $date : \DateTime::createFromFormat('U', time()));
             $scheduledPayment->setAmount($outstanding);
             $policy->getNextPolicy()->addScheduledPayment($scheduledPayment);
             $this->dm->flush();
@@ -1765,7 +1770,7 @@ class PolicyService
         }
         /** @var PolicyRepository $policyRepo */
         $policyRepo = $this->dm->getRepository(Policy::class);
-        $date = new \DateTime();
+        $date = \DateTime::createFromFormat('U', time());
         $date = $date->add(new \DateInterval(sprintf('P%dD', $days)));
 
         $pendingCancellationPolicies = $policyRepo->findPoliciesForPendingCancellation($prefix, false, $date);
@@ -1942,7 +1947,7 @@ class PolicyService
         \DateTime $date = null
     ) {
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
 
         $newPolicy = $policy->getNextPolicy();
@@ -1998,7 +2003,7 @@ class PolicyService
     public function declineRenew(Policy $policy, Cashback $cashback = null, \DateTime $date = null)
     {
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
 
         $newPolicy = $policy->getNextPolicy();
@@ -2026,7 +2031,7 @@ class PolicyService
     public function repurchase(Policy $policy, \DateTime $date = null)
     {
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
 
         if (!$policy->canRepurchase()) {
@@ -2098,7 +2103,7 @@ class PolicyService
             return;
         }
 
-        $cashback->setDate(new \DateTime());
+        $cashback->setDate(\DateTime::createFromFormat('U', time()));
         $cashback->setStatus($status);
         $this->dm->flush();
 
@@ -2170,7 +2175,7 @@ class PolicyService
         /** @var PhonePolicy $phonePolicy */
         $phonePolicy = $policy;
         if (!$date) {
-            $date =  new \DateTime();
+            $date =  \DateTime::createFromFormat('U', time());
         }
         if ((!$phonePolicy->getStatus() ||
             in_array($phonePolicy->getStatus(), [Policy::STATUS_PENDING, Policy::STATUS_MULTIPAY_REJECTED]))

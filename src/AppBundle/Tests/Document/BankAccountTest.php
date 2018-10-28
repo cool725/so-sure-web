@@ -278,8 +278,8 @@ class BankAccountTest extends \PHPUnit\Framework\TestCase
 
     public function testShouldCancelMandate()
     {
-        $date = new \DateTime();
-        $thirteenMonths = new \DateTime();
+        $date = \DateTime::createFromFormat('U', time());
+        $thirteenMonths = \DateTime::createFromFormat('U', time());
         $thirteenMonths = $thirteenMonths->add(new \DateInterval('P13M'));
 
         $bankAccount = new BankAccount();
@@ -317,7 +317,7 @@ class BankAccountTest extends \PHPUnit\Framework\TestCase
             $bankAccount->allowedProcessing(new \DateTime('2018-03-08'))
         );
 
-        $thirteenMonths = new \DateTime();
+        $thirteenMonths = \DateTime::createFromFormat('U', time());
         $thirteenMonths = $thirteenMonths->add(new \DateInterval('P13M'));
         $this->assertFalse($bankAccount->allowedProcessing($thirteenMonths));
     }
