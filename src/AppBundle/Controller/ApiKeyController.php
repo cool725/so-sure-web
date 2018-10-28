@@ -63,7 +63,7 @@ class ApiKeyController extends BaseController
                 // If there is an end date, then quote should be valid until then
                 $quoteValidTo = $currentPhonePrice->getValidTo();
                 if (!$quoteValidTo) {
-                    $quoteValidTo = new \DateTime();
+                    $quoteValidTo = \DateTime::createFromFormat('U', time());
                     $quoteValidTo->add(new \DateInterval('P1D'));
                 }
 

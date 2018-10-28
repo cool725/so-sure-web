@@ -44,7 +44,7 @@ class StatsCommand extends ContainerAwareCommand
     private function kpiPicsure($date = null)
     {
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
 
         $data = $this->reportingService->getPicSureData();
@@ -82,7 +82,7 @@ class StatsCommand extends ContainerAwareCommand
     private function cancelledAndPaymentOwed($date = null)
     {
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
 
         $data = $this->reportingService->getCancelledAndPaymentOwed();

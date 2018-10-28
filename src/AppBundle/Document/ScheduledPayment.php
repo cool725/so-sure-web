@@ -84,7 +84,7 @@ class ScheduledPayment
 
     public function __construct()
     {
-        $this->created = new \DateTime();
+        $this->created = \DateTime::createFromFormat('U', time());
         $this->type = self::TYPE_SCHEDULED;
     }
 
@@ -174,7 +174,7 @@ class ScheduledPayment
     public function reschedule($date = null, $days = 7)
     {
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         } else {
             $date = clone $date;
         }
@@ -193,7 +193,7 @@ class ScheduledPayment
     public function adminReschedule(\DateTime $date = null)
     {
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
             $date = $this->addBusinessDays($date, 1);
         } else {
             $date = clone $date;
@@ -219,7 +219,7 @@ class ScheduledPayment
     public function canBeRun(\DateTime $date = null)
     {
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
 
         return $this->getScheduled() <= $date;

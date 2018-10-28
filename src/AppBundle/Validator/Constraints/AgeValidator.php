@@ -32,7 +32,7 @@ class AgeValidator extends ConstraintValidator
         }
 
         if ($birthday) {
-            $now = new \DateTime();
+            $now = \DateTime::createFromFormat('U', time());
             $diff = $now->diff($birthday);
         }
 

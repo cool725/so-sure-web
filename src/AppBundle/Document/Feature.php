@@ -72,7 +72,7 @@ class Feature
 
     public function __construct()
     {
-        $this->created = new \DateTime();
+        $this->created = \DateTime::createFromFormat('U', time());
     }
 
     public function getId()

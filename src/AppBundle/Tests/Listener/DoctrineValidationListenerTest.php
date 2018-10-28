@@ -52,7 +52,10 @@ class DoctrineValidationListenerTest extends WebTestCase
 
         $listener = $this->createObjectEventListener($user, $this->once(), ObjectEvent::EVENT_VALIDATE);
 
-        $changeSet = ['confirmationToken' => ['123', null], 'passwordRequestedAt' => [new \DateTime(), null]];
+        $changeSet = [
+            'confirmationToken' => ['123', null],
+            'passwordRequestedAt' => [\DateTime::createFromFormat('U', time()), null]
+        ];
         $events = new PreUpdateEventArgs($user, self::$dm, $changeSet);
         $listener->preUpdate($events);
     }

@@ -88,7 +88,7 @@ class SCodeCommand extends ContainerAwareCommand
         $updateSource = $input->getOption('update-source');
         $updateDate = $input->getOption('update-date') ?
             new \DateTime($input->getOption('update-date')) :
-            new \DateTime();
+            \DateTime::createFromFormat('U', time());
         $updateDate = $this->startOfDay($updateDate);
 
         /** @var PolicyRepository $policyRepo */
@@ -147,7 +147,7 @@ class SCodeCommand extends ContainerAwareCommand
                 $this->branchService->update($scode->getShareLink(), [
                     '$desktop_url' => $this->routerService->generateUrl('scode', ['code' => $scode->getCode()]),
                 ]);
-                $scode->setUpdatedDate(new \DateTime());
+                $scode->setUpdatedDate(\DateTime::createFromFormat('U', time()));
             } else {
                 $output->writeln(sprintf('%s is not a branch url', $scode->getShareLink()));
             }

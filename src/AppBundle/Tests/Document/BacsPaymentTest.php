@@ -128,14 +128,14 @@ class BacsPaymentTest extends \PHPUnit\Framework\TestCase
         $policy->setPremium($premium);
 
         $policy->addPayment($bacs);
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         $bacs->approve();
 
         $this->assertEquals(Bacs::MANDATE_SUCCESS, $bacs->getStatus());
         $this->assertTrue($bacs->isSuccess());
         $this->assertEquals(ScheduledPayment::STATUS_SUCCESS, $bacs->getScheduledPayment()->getStatus());
 
-        $this->assertEquals($now, $bankAccount->getLastSuccessfulPaymentDate());
+        $this->assertEquals($now, $bankAccount->getLastSuccessfulPaymentDate(), '', 1);
     }
 
     /**

@@ -915,7 +915,7 @@ class PurchaseController extends BaseController
         $requestService = $this->get('app.request');
         $template = 'AppBundle:Purchase:purchaseStepPayment.html.twig';
 
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         $billingDate = $this->adjustDayForBilling($now);
 
         $data = array(
@@ -1262,7 +1262,7 @@ class PurchaseController extends BaseController
         }
 
         if (!$policy->hasViewedCancellationPage()) {
-            $policy->setViewedCancellationPage(new \DateTime());
+            $policy->setViewedCancellationPage(\DateTime::createFromFormat('U', time()));
             $dm->flush();
         }
         $cancelForm = $this->get('form.factory')
@@ -1292,7 +1292,7 @@ class PurchaseController extends BaseController
                     // @codingStandardsIgnoreEnd
 
                     if (!$policy->hasRequestedCancellation()) {
-                        $policy->setRequestedCancellation(new \DateTime());
+                        $policy->setRequestedCancellation(\DateTime::createFromFormat('U', time()));
                         $policy->setRequestedCancellationReason($reason);
                         $dm->flush();
                         $intercom = $this->get('app.intercom');

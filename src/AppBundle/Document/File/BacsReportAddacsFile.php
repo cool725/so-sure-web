@@ -30,7 +30,7 @@ class BacsReportAddacsFile extends UploadFile
      */
     public function getS3FileName()
     {
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
 
         return sprintf(
             'addacs-%d-%02d-%s',
