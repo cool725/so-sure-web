@@ -20,8 +20,8 @@ framework:
     session:
         storage_id: session.storage.mock_file
     profiler:
-        collect: true
-        enabled: true
+        collect: false
+        enabled: false
 
 web_profiler:
     toolbar: false
@@ -35,10 +35,3 @@ doctrine_mongodb:
     document_managers:
         census:
           database: census-test
-
-swiftmailer:
-    default_mailer: default
-    mailers:
-        default:
-            transport:  null
-            delivery_address: "non-prod-web@so-sure.com"
