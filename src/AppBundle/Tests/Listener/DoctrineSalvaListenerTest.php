@@ -107,7 +107,7 @@ class DoctrineSalvaListenerTest extends WebTestCase
         $this->runPreUpdateUser($user, $policy, $this->once(), ['lastName' => ['foo', 'bar']]);
         $this->runPreUpdateUser($user, $policy, $this->never(), ['email' => ['foo@', 'bar@']]);
     }
-    
+
     public function testSalvaPreUpdateUnpaid()
     {
         $user = static::createUser(

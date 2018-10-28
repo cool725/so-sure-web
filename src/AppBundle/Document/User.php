@@ -415,7 +415,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         $this->policies = new \Doctrine\Common\Collections\ArrayCollection();
         $this->namedPolicies = new \Doctrine\Common\Collections\ArrayCollection();
         $this->multipays = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->created = new \DateTime();
+        $this->created = \DateTime::createFromFormat('U', time());
         $this->resetToken();
     }
 
@@ -742,7 +742,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     public function passwordChange($oldPassword, $oldSalt, \DateTime $date = null)
     {
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
 
         $this->previousPasswords[$date->format('U')] = ['password' => $oldPassword, 'salt' => $oldSalt];
@@ -785,7 +785,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     public function isPasswordChangeRequired(\DateTime $date = null)
     {
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
 
         if (!$this->hasEmployeeRole() && !$this->hasClaimsRole()) {
@@ -1705,7 +1705,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
             return null;
         }
 
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         $diff = $now->diff($this->getBirthday());
 
         return $diff->y;
@@ -1753,7 +1753,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     public function isTrustedComputer($token)
     {
         if (isset($this->trusted[$token])) {
-            $now = new \DateTime();
+            $now = \DateTime::createFromFormat('U', time());
             $validUntil = new \DateTime($this->trusted[$token]);
             return $now < $validUntil;
         }
@@ -1764,7 +1764,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     public function addSanctionsCheck(\DateTime $date = null)
     {
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
         $timestamp = $date->format('U');
         $this->sanctionsChecks[] = $timestamp;
@@ -1922,7 +1922,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     public function canDelete(\DateTime $date = null)
     {
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
 
         // If the user has ever had a policy other than partial, we are unable to delete (unless after 7.5 years)
@@ -1972,7 +1972,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         }
 
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
 
         return $date >= $this->getShouldDeleteDate();
@@ -1989,7 +1989,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         }
 
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
 
         $diff = $date->diff($this->getShouldDeleteDate());

@@ -72,13 +72,13 @@ class UsersDeleteCommand extends ContainerAwareCommand
         $skipEmail = true === $input->getOption('skip-email');
         $skipDelete = true === $input->getOption('skip-delete');
         $notifyAll = true === $input->getOption('notify-all');
-        $date = new \DateTime();
+        $date = \DateTime::createFromFormat('U', time());
 
-        $now = new \DateTime();
-        $oneMonth = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
+        $oneMonth = \DateTime::createFromFormat('U', time());
         $oneMonth = $oneMonth->add(new \DateInterval('P1M'));
 
-        $seventeenMonths = new \DateTime();
+        $seventeenMonths = \DateTime::createFromFormat('U', time());
         $seventeenMonths = $seventeenMonths->sub(new \DateInterval('P17M'));
 
         // TODO: Resync optin with users

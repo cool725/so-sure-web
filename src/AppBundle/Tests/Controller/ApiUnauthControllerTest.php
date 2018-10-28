@@ -95,7 +95,7 @@ class ApiUnauthControllerTest extends BaseApiControllerTest
         $cognitoIdentityId = $this->getUnauthIdentity();
         $user = static::createUser(self::$userManager, static::generateEmail('unauth-badtoken', $this), 'bar');
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/unauth/token', array(
-            'token' => $user->getToken() + 'bad',
+            'token' => sprintf('%s-bad', $user->getToken()),
             'cognito_id' => self::$identity->getId(),
         ));
         $data = $this->verifyResponse(403);

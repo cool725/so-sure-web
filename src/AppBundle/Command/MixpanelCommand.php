@@ -92,7 +92,7 @@ class MixpanelCommand extends ContainerAwareCommand
             $this->mixpanelService->queueTrackWithUser($user, "button clicked", array("label" => "sign-up"));
             $output->writeln(sprintf('Queued test event'));
         } elseif ($action == 'data') {
-            $end = new \DateTime();
+            $end = \DateTime::createFromFormat('U', time());
             $end->sub(new \DateInterval(sprintf('P%dD', $end->format('N'))));
             $start = clone $end;
             $start->sub(new \DateInterval('P6D'));

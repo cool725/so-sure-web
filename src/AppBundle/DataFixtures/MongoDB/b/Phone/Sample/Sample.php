@@ -28,7 +28,7 @@ class Sample extends LoadPhoneData implements FixtureInterface
         $phone->setOs(Phone::OS_IOS);
         $price = new PhonePrice();
         $price->setGwp(5);
-        $price->setValidFrom(new \DateTime());
+        $price->setValidFrom(\DateTime::createFromFormat('U', time()));
         $phone->addPhonePrice($price);
         $manager->persist($phone);
 

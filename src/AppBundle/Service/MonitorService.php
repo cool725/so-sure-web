@@ -112,7 +112,7 @@ class MonitorService
         /** @var ClaimRepository $repo */
         $repo = $this->dm->getRepository(Claim::class);
         $claims = $repo->findMissingReceivedDate();
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         foreach ($claims as $claim) {
             /** @var Claim $claim */
             $replacementDate = $claim->getPolicy()->getImeiReplacementDate();
@@ -226,7 +226,7 @@ class MonitorService
             throw new MonitorException('Unable to find any successful imports');
         }
 
-        $now = $this->startOfDay(new \DateTime());
+        $now = $this->startOfDay(\DateTime::createFromFormat('U', time()));
         $diff = $now->diff($successFile->getCreated());
         if ($diff->days >= 1) {
             $fileDateTime = $successFile->getCreated()->format(\DateTime::ATOM);
@@ -246,11 +246,11 @@ class MonitorService
     {
         /** @var PhonePolicyRepository $repo */
         $repo = $this->dm->getRepository(PhonePolicy::class);
-        $oneDay = new \DateTime();
+        $oneDay = \DateTime::createFromFormat('U', time());
         $oneDay = $oneDay->sub(new \DateInterval('P1D'));
 
         // delay 10 minutes to allow time to sync
-        $tenMinutes = new \DateTime();
+        $tenMinutes = \DateTime::createFromFormat('U', time());
         $tenMinutes = $tenMinutes->sub(new \DateInterval('PT10M'));
         $updatedPolicies = $repo->findAllStatusUpdatedPolicies($oneDay, $tenMinutes);
         $errors = [];
@@ -442,7 +442,7 @@ class MonitorService
     public function bankHolidays(\DateTime $date = null)
     {
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
         $holidays = DateTrait::getBankHolidays();
         usort($holidays, function ($a, $b) {
@@ -475,11 +475,11 @@ class MonitorService
 
     public function bacsPayments()
     {
-        $twoDays = new \DateTime();
+        $twoDays = \DateTime::createFromFormat('U', time());
         $twoDays = $this->subBusinessDays($twoDays, 2);
         /** @var BacsPaymentRepository $paymentsRepo */
         $paymentsRepo = $this->dm->getRepository(BacsPayment::class);
-        foreach ($paymentsRepo->findPayments(new \DateTime()) as $payment) {
+        foreach ($paymentsRepo->findPayments(\DateTime::createFromFormat('U', time())) as $payment) {
             /** @var BacsPayment $payment */
             if ($payment->getSource() == Payment::SOURCE_ADMIN) {
                 continue;
@@ -493,7 +493,7 @@ class MonitorService
                 continue;
             }
 
-            if ($payment->canAction(new \DateTime())) {
+            if ($payment->canAction(\DateTime::createFromFormat('U', time()))) {
                 throw new MonitorException(sprintf('There are bacs payments waiting actioning: %s', $payment->getId()));
             }
         }
@@ -534,7 +534,7 @@ class MonitorService
         /** @var PolicyRepository $repo */
         $repo = $this->dm->getRepository(Policy::class);
         $policies = $repo->findBy(['status' => Policy::STATUS_PENDING]);
-        $oneHourAgo = new \DateTime();
+        $oneHourAgo = \DateTime::createFromFormat('U', time());
         $oneHourAgo = $oneHourAgo->sub(new \DateInterval('PT1H'));
         foreach ($policies as $policy) {
             /** @var Policy $policy */
@@ -626,7 +626,7 @@ class MonitorService
     {
         /** @var ClaimRepository $claimRepository */
         $claimRepository = $this->dm->getRepository(Claim::class);
-        $twoBusinessDaysAgo = $this->subBusinessDays(new \DateTime(), $businessDaysOld);
+        $twoBusinessDaysAgo = $this->subBusinessDays(\DateTime::createFromFormat('U', time()), $businessDaysOld);
 
         return $claimRepository->findBy(
             [
@@ -819,7 +819,7 @@ class MonitorService
             ->field('status')
             ->in([Policy::STATUS_UNPAID, Policy::STATUS_ACTIVE])
             ->field('end')
-            ->lt(new \DateTime())
+            ->lt(\DateTime::createFromFormat('U', time()))
             ->getQuery()
             ->execute();
 

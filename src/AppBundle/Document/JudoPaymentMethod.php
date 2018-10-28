@@ -187,7 +187,7 @@ class JudoPaymentMethod extends PaymentMethod
     public function isCardExpired(\DateTime $date = null)
     {
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
 
         $end = $this->getCardEndDateAsDate();

@@ -25,7 +25,7 @@ class EmailOptIn extends Opt
     public function setEmail($email)
     {
         if ($this->email != mb_strtolower($email)) {
-            $this->setUpdated(new \DateTime());
+            $this->setUpdated(\DateTime::createFromFormat('U', time()));
         }
         $this->email = mb_strtolower($email);
     }

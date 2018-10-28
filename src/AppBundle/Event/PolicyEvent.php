@@ -35,7 +35,7 @@ class PolicyEvent extends Event
     {
         $this->policy = $policy;
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
         $this->date = $date;
     }

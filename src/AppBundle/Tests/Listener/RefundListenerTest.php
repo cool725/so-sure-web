@@ -218,7 +218,7 @@ class RefundListenerTest extends WebTestCase
 
     public function testRefundListenerClaimNoRefundYearly()
     {
-        $oneMonthAgo = new \DateTime();
+        $oneMonthAgo = \DateTime::createFromFormat('U', time());
         $oneMonthAgo = $oneMonthAgo->sub(new \DateInterval('P1M'));
         $user = static::createUser(
             static::$userManager,
@@ -249,7 +249,7 @@ class RefundListenerTest extends WebTestCase
 
         $policy->setCancelledReason(PhonePolicy::CANCELLED_USER_REQUESTED);
         $policy->setStatus(PhonePolicy::STATUS_CANCELLED);
-        $policy->setEnd(new \DateTime());
+        $policy->setEnd(\DateTime::createFromFormat('U', time()));
         static::$dm->flush();
 
         $listener = new RefundListener(static::$dm, static::$judopayService, static::$logger, 'test');
@@ -297,7 +297,7 @@ class RefundListenerTest extends WebTestCase
         $policy->setStatus(PhonePolicy::STATUS_CANCELLED);
         static::$dm->flush();
 
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         $listener = new RefundListener(static::$dm, static::$judopayService, static::$logger, 'test');
         $listener->onPolicyCancelledEvent(new PolicyEvent($policy));
 
@@ -353,7 +353,7 @@ class RefundListenerTest extends WebTestCase
         $policy->setStatus(PhonePolicy::STATUS_CANCELLED);
         static::$dm->flush();
 
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         $listener = new RefundListener(static::$dm, static::$judopayService, static::$logger, 'test');
         $listener->onPolicyCancelledEvent(new PolicyEvent($policy));
 
