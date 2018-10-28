@@ -2431,7 +2431,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
 
         $receiptId = $judopay->testPay(
             $user,
-            $data['id'] + rand(1, 999999),
+            sprintf("%s%d", $data['id'], rand(1, 999999)),
             '7.15', // gwp 6.38 was 6.99 (9.5% ipt), now 7.02 (10% ipt), now 7.15 (12%)
             self::$JUDO_TEST_CARD_NUM,
             self::$JUDO_TEST_CARD_EXP,

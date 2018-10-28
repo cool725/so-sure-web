@@ -787,8 +787,6 @@ class ApiControllerTest extends BaseApiControllerTest
         static::$dm->persist($policy);
         static::$dm->flush();
 
-        static::$dm->flush();
-
         $sCode = $policy->getStandardSCode();
         $this->assertNotNull($sCode);
 
