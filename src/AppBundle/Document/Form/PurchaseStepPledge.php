@@ -109,6 +109,7 @@ class PurchaseStepPledge
 
     public function areAllAgreed()
     {
-        return $this->getAgreedAgeLocation() && $this->getAgreedDamage() && $this->getAgreedExcess() && $this->getAgreedTerms();
+        return $this->getAgreedAgeLocation() && $this->getAgreedDamage()
+        && $this->getAgreedExcess() && $this->getAgreedTerms();
     }
 }
