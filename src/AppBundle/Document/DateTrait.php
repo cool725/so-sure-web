@@ -84,7 +84,7 @@ trait DateTrait
     public function startOfYear(\DateTime $date = null)
     {
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
         $startYear = new \DateTime(sprintf('%d-01-01 00:00:00', $date->format('Y')));
 
@@ -122,7 +122,7 @@ trait DateTrait
     public function startOfDay(\DateTime $date = null)
     {
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
         $startMonth = new \DateTime(
             sprintf('%d-%d-%d 00:00:00', $date->format('Y'), $date->format('m'), $date->format('d')),
@@ -135,7 +135,7 @@ trait DateTrait
     public function endOfDay(\DateTime $date = null)
     {
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
         $startDay = $this->startOfDay($date);
         $nextDay = clone $startDay;
@@ -160,7 +160,7 @@ trait DateTrait
     public function getCurrentOrNextBusinessDay(\DateTime $date, \DateTime $now = null)
     {
         if (!$now) {
-            $now = new \DateTime();
+            $now = \DateTime::createFromFormat('U', time());
         }
 
         // make sure we don't run in the past
@@ -180,7 +180,7 @@ trait DateTrait
     public function getCurrentOrPreviousBusinessDay(\DateTime $date, \DateTime $now = null)
     {
         if (!$now) {
-            $now = new \DateTime();
+            $now = \DateTime::createFromFormat('U', time());
         }
 
         // make sure we don't run in the past
@@ -200,7 +200,7 @@ trait DateTrait
     public function getNextBusinessDay(\DateTime $date, \DateTime $now = null)
     {
         if (!$now) {
-            $now = new \DateTime();
+            $now = \DateTime::createFromFormat('U', time());
         }
 
         // make sure we don't run in the past

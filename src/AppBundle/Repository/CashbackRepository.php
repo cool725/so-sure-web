@@ -24,7 +24,7 @@ class CashbackRepository extends DocumentRepository
     }
     public function getLateCashback(int $daysLate = 14)
     {
-        $dateOlder = new \DateTime();
+        $dateOlder = \DateTime::createFromFormat('U', time());
         $dateOlder->sub(new \DateInterval(sprintf('P%sD', $daysLate)));
 
         return $this->createQueryBuilder()

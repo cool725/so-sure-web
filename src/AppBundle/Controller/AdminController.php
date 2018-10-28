@@ -460,7 +460,7 @@ class AdminController extends BaseController
         // default 30s for prod is no longer enough
         set_time_limit(180);
 
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         if (!$year) {
             $year = $now->format('Y');
         }
@@ -493,7 +493,7 @@ class AdminController extends BaseController
      */
     public function bacsAction(Request $request, $year = null, $month = null)
     {
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         if (!$year) {
             $year = $now->format('Y');
         }
@@ -659,7 +659,7 @@ class AdminController extends BaseController
                 if ($approvePaymentsForm->isSubmitted() && $approvePaymentsForm->isValid()) {
                     /** @var BacsService $bacsService */
                     $bacsService = $this->get('app.bacs');
-                    $bacsService->approvePayments(new \DateTime());
+                    $bacsService->approvePayments(\DateTime::createFromFormat('U', time()));
                     $this->addFlash(
                         'success',
                         'Approved outstanding payments'
@@ -858,7 +858,7 @@ class AdminController extends BaseController
         // default 30s for prod is no longer enough
         set_time_limit(180);
 
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         if (!$year) {
             $year = $now->format('Y');
         }
@@ -1164,7 +1164,7 @@ class AdminController extends BaseController
                 $type = null;
             }
         } else {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
             $type = null;
         }
 
@@ -1289,7 +1289,7 @@ class AdminController extends BaseController
      */
     public function cashbackAction(Request $request, $year = null, $month = null)
     {
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         if (!$year) {
             $year = $now->format('Y');
         }
@@ -1329,7 +1329,7 @@ class AdminController extends BaseController
      */
     public function chargebackAction(Request $request, $year = null, $month = null)
     {
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         if (!$year) {
             $year = $now->format('Y');
         }

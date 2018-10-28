@@ -300,8 +300,8 @@ class ReceperioServiceTest extends WebTestCase
         self::$imei->policyClaim($policy, Claim::TYPE_DAMAGE, $claim);
         $this->assertTrue(true);
 
-        $now = new \DateTime();
-        $yesterday = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
+        $yesterday = \DateTime::createFromFormat('U', time());
         $yesterday = $yesterday->sub(new \DateInterval('P1D'));
         $claim->setRecordedDate($yesterday);
         $policy->setImeiReplacementDate($now);

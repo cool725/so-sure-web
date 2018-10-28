@@ -50,7 +50,7 @@ class TestCommand extends ContainerAwareCommand
     {
         // $this->testBirthday();
         $claim = new Claim();
-        $claim->setNotificationDate(new \DateTime());
+        $claim->setNotificationDate(\DateTime::createFromFormat('U', time()));
         print_r($this->getDataChangeAnnotation($claim, 'salva'));
         $output->writeln('Finished');
     }

@@ -112,7 +112,7 @@ class ClaimsService
         $claim->setTimeToReach($claimFnol->getTimeToReach());
         $claim->setSignature($claimFnol->getSignature());
         $claim->setStatus(Claim::STATUS_FNOL);
-        $claim->setNotificationDate(new \DateTime());
+        $claim->setNotificationDate(\DateTime::createFromFormat('U', time()));
 
         return $claim;
     }
@@ -146,7 +146,7 @@ class ClaimsService
             $claim->addFile($pictureOfPhone);
         }
         if ($submit) {
-            $claim->setSubmissionDate(new \DateTime());
+            $claim->setSubmissionDate(\DateTime::createFromFormat('U', time()));
             $claim->setStatus(Claim::STATUS_SUBMITTED);
             if ($this->featureService->isEnabled(Feature::FEATURE_CLAIMS_DEFAULT_DIRECT_GROUP)) {
                 $claim->setHandlingTeam(Claim::TEAM_DIRECT_GROUP);
@@ -203,7 +203,7 @@ class ClaimsService
         }
 
         if ($submit) {
-            $claim->setSubmissionDate(new \DateTime());
+            $claim->setSubmissionDate(\DateTime::createFromFormat('U', time()));
             $claim->setStatus(Claim::STATUS_SUBMITTED);
             if ($this->featureService->isEnabled(Feature::FEATURE_CLAIMS_DEFAULT_DIRECT_GROUP)) {
                 $claim->setHandlingTeam(Claim::TEAM_DIRECT_GROUP);
@@ -357,13 +357,13 @@ class ClaimsService
     {
         if ($claim->getStatus() == Claim::STATUS_APPROVED &&
             $claim->getApprovedDate() &&
-            $claim->getApprovedDate()->diff(new \DateTime())->days < 2) {
+            $claim->getApprovedDate()->diff(\DateTime::createFromFormat('U', time()))->days < 2) {
             /** @var PhonePolicy $policy */
             $policy = $claim->getPolicy();
             if ($policy->getPicSureStatus() == PhonePolicy::PICSURE_STATUS_APPROVED
                 && $policy->getPicSureApprovedDate()) {
                 $picSureApprovedDate = $policy->getPicSureApprovedDate();
-                $diff = $picSureApprovedDate->diff(new \DateTime());
+                $diff = $picSureApprovedDate->diff(\DateTime::createFromFormat('U', time()));
                 if ($diff->days < 30) {
                     try {
                         $subject = 'Pic-sure validated claim needs review';

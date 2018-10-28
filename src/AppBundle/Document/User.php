@@ -46,6 +46,11 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     const ROLE_CUSTOMER_SERVICES = 'ROLE_CUSTOMER_SERVICES';
     const ROLE_ADMIN = 'ROLE_ADMIN';
 
+    const AQUISITION_COMPLETED = 'completed'; // this is for aquisitions that have already happened.
+    const AQUISITION_PENDING = 'pending'; // This is for aquisitions that are on track to occur.
+    const AQUISITION_POTENTIAL = 'potential'; // this is for aquired users with no policy.
+    const AQUISITION_LOST = 'lost'; // this is for aquired users with a cancelled policy.
+
     /**
      * @MongoDB\Id
      */
@@ -63,7 +68,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
      * @MongoDB\ReferenceMany(targetDocument="User", mappedBy="referred")
      */
     protected $referrals;
-    
+
     /**
      * @MongoDB\ReferenceOne(targetDocument="User", inversedBy="referrals")
      * @Gedmo\Versioned
@@ -417,7 +422,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         $this->policies = new \Doctrine\Common\Collections\ArrayCollection();
         $this->namedPolicies = new \Doctrine\Common\Collections\ArrayCollection();
         $this->multipays = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->created = new \DateTime();
+        $this->created = \DateTime::createFromFormat('U', time());
         $this->resetToken();
     }
 
@@ -435,7 +440,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     {
         $this->id = $id;
     }
-    
+
     public function isLocked()
     {
         return $this->locked;
@@ -744,7 +749,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     public function passwordChange($oldPassword, $oldSalt, \DateTime $date = null)
     {
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
 
         $this->previousPasswords[$date->format('U')] = ['password' => $oldPassword, 'salt' => $oldSalt];
@@ -787,7 +792,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     public function isPasswordChangeRequired(\DateTime $date = null)
     {
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
 
         if (!$this->hasEmployeeRole() && !$this->hasClaimsRole()) {
@@ -1165,7 +1170,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
 
         return false;
     }
-    
+
     public function hasPolicyCancelledAndPaymentOwed()
     {
         foreach ($this->getAllPolicies() as $policy) {
@@ -1707,7 +1712,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
             return null;
         }
 
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         $diff = $now->diff($this->getBirthday());
 
         return $diff->y;
@@ -1755,7 +1760,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     public function isTrustedComputer($token)
     {
         if (isset($this->trusted[$token])) {
-            $now = new \DateTime();
+            $now = \DateTime::createFromFormat('U', time());
             $validUntil = new \DateTime($this->trusted[$token]);
             return $now < $validUntil;
         }
@@ -1766,7 +1771,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     public function addSanctionsCheck(\DateTime $date = null)
     {
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
         $timestamp = $date->format('U');
         $this->sanctionsChecks[] = $timestamp;
@@ -1797,6 +1802,11 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     public function hasSoSureEmail()
     {
         return SoSure::hasSoSureEmail($this->getEmailCanonical());
+    }
+
+    public function hasSoSureRewardsEmail()
+    {
+        return SoSure::hasSoSureRewardsEmail($this->getEmailCanonical());
     }
 
     public function getImageUrl($size = 100)
@@ -1929,7 +1939,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     public function canDelete(\DateTime $date = null)
     {
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
 
         // If the user has ever had a policy other than partial, we are unable to delete (unless after 7.5 years)
@@ -1969,7 +1979,8 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
 
     public function shouldDelete(\DateTime $date = null)
     {
-        if ($this->hasClaimsRole() || $this->hasEmployeeRole() || $this->hasSoSureEmail()) {
+        if ($this->hasClaimsRole() || $this->hasEmployeeRole() ||
+            $this->hasSoSureEmail() || $this->hasSoSureRewardsEmail()) {
             return false;
         }
 
@@ -1978,7 +1989,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         }
 
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
 
         return $date >= $this->getShouldDeleteDate();
@@ -1995,7 +2006,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         }
 
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
 
         $diff = $date->diff($this->getShouldDeleteDate());
@@ -2048,5 +2059,22 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
                 null,
             'has_mobile_number_verified' => $this->getMobileNumberVerified()
         ];
+    }
+
+    /**
+     * Tells you the what state the user is in regarding affiliate aquisition.
+     * @return string aquisition state name.
+     */
+    public function aquisitionStatus()
+    {
+        if ($this->affiliate) {
+            return static::AQUISITION_COMPLETED;
+        } elseif ($this->hasActivePolicy() || $this->hasUnpaidPolicy()) {
+            return static::AQUISITION_PENDING;
+        } elseif ($this->hasPolicy()) {
+            return static::AQUISITION_LOST;
+        } else {
+            return static::AQUISITION_POTENTIAL;
+        }
     }
 }

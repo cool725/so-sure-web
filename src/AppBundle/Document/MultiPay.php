@@ -74,7 +74,7 @@ class MultiPay
 
     public function __construct()
     {
-        $this->createdDate = new \DateTime();
+        $this->createdDate = \DateTime::createFromFormat('U', time());
         $this->status = self::STATUS_REQUESTED;
     }
 
@@ -107,7 +107,7 @@ class MultiPay
     {
         $this->status = $status;
         if (in_array($status, [self::STATUS_ACCEPTED, self::STATUS_REJECTED])) {
-            $this->actionDate = new \DateTime();
+            $this->actionDate = \DateTime::createFromFormat('U', time());
         }
     }
 

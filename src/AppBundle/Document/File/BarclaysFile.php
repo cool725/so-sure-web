@@ -36,7 +36,7 @@ class BarclaysFile extends DailyTransactionUploadFile
      */
     public function getS3FileName()
     {
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
 
         return sprintf(
             'banking/barclays-%d-%02d-%s',

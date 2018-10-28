@@ -85,7 +85,7 @@ class UserControllerTest extends BaseControllerTest
             $phone,
             self::$dm
         );
-        $cliffDate = new \DateTime();
+        $cliffDate = \DateTime::createFromFormat('U', time());
         $cliffDate = $cliffDate->sub(new \DateInterval('P14D'));
         $cliffDate = $cliffDate->sub(new \DateInterval('PT2S'));
         $policy = self::initPolicy($user, self::$dm, $phone, $cliffDate, true, true);
@@ -115,7 +115,7 @@ class UserControllerTest extends BaseControllerTest
             $phone,
             self::$dm
         );
-        $cliffDate = new \DateTime();
+        $cliffDate = \DateTime::createFromFormat('U', time());
         $cliffDate = $cliffDate->sub(new \DateInterval('P60D'));
         $cliffDate = $cliffDate->sub(new \DateInterval('PT1H'));
         $policy = self::initPolicy($user, self::$dm, $phone, $cliffDate, true, true);
@@ -146,7 +146,7 @@ class UserControllerTest extends BaseControllerTest
             $phone,
             self::$dm
         );
-        $cliffDate = new \DateTime();
+        $cliffDate = \DateTime::createFromFormat('U', time());
         $policy = self::initPolicy($user, self::$dm, $phone, null, true, true);
         $policy->setStatus(Policy::STATUS_ACTIVE);
         self::$dm->flush();
@@ -532,9 +532,9 @@ class UserControllerTest extends BaseControllerTest
             self::$dm
         );
         self::setBacsPaymentMethod($user, BankAccount::MANDATE_PENDING_APPROVAL);
-        $oneMonthAgo = new \DateTime();
+        $oneMonthAgo = \DateTime::createFromFormat('U', time());
         $oneMonthAgo = $oneMonthAgo->sub(new \DateInterval('P1M'));
-        $twoMonthsAgo = new \DateTime();
+        $twoMonthsAgo = \DateTime::createFromFormat('U', time());
         $twoMonthsAgo = $twoMonthsAgo->sub(new \DateInterval('P2M'));
         $policy = self::initPolicy($user, self::$dm, $phone, $twoMonthsAgo, false, true);
         $policy->setStatus(Policy::STATUS_UNPAID);
@@ -567,9 +567,9 @@ class UserControllerTest extends BaseControllerTest
             self::$dm
         );
         self::setBacsPaymentMethod($user, BankAccount::MANDATE_CANCELLED);
-        $oneMonthAgo = new \DateTime();
+        $oneMonthAgo = \DateTime::createFromFormat('U', time());
         $oneMonthAgo = $oneMonthAgo->sub(new \DateInterval('P1M'));
-        $twoMonthsAgo = new \DateTime();
+        $twoMonthsAgo = \DateTime::createFromFormat('U', time());
         $twoMonthsAgo = $twoMonthsAgo->sub(new \DateInterval('P2M'));
         $policy = self::initPolicy($user, self::$dm, $phone, $twoMonthsAgo, false, true);
         $policy->setStatus(Policy::STATUS_UNPAID);
@@ -612,9 +612,9 @@ class UserControllerTest extends BaseControllerTest
             self::$dm
         );
         self::setBacsPaymentMethod($user, BankAccount::MANDATE_SUCCESS);
-        $oneMonthAgo = new \DateTime();
+        $oneMonthAgo = \DateTime::createFromFormat('U', time());
         $oneMonthAgo = $oneMonthAgo->sub(new \DateInterval('P1M'));
-        $twoMonthsAgo = new \DateTime();
+        $twoMonthsAgo = \DateTime::createFromFormat('U', time());
         $twoMonthsAgo = $twoMonthsAgo->sub(new \DateInterval('P2M'));
         $policy = self::initPolicy($user, self::$dm, $phone, $twoMonthsAgo, false, true);
         $policy->setStatus(Policy::STATUS_UNPAID);
@@ -647,9 +647,9 @@ class UserControllerTest extends BaseControllerTest
             self::$dm
         );
         self::setBacsPaymentMethod($user, BankAccount::MANDATE_SUCCESS);
-        $oneMonthAgo = new \DateTime();
+        $oneMonthAgo = \DateTime::createFromFormat('U', time());
         $oneMonthAgo = $oneMonthAgo->sub(new \DateInterval('P1M'));
-        $twoMonthsAgo = new \DateTime();
+        $twoMonthsAgo = \DateTime::createFromFormat('U', time());
         $twoMonthsAgo = $twoMonthsAgo->sub(new \DateInterval('P2M'));
         $policy = self::initPolicy($user, self::$dm, $phone, $twoMonthsAgo, false, true);
         $policy->setStatus(Policy::STATUS_UNPAID);
@@ -715,9 +715,9 @@ class UserControllerTest extends BaseControllerTest
             self::$dm
         );
         self::setBacsPaymentMethod($user, BankAccount::MANDATE_SUCCESS);
-        $oneMonthAgo = new \DateTime();
+        $oneMonthAgo = \DateTime::createFromFormat('U', time());
         $oneMonthAgo = $oneMonthAgo->sub(new \DateInterval('P1M'));
-        $twoMonthsAgo = new \DateTime();
+        $twoMonthsAgo = \DateTime::createFromFormat('U', time());
         $twoMonthsAgo = $twoMonthsAgo->sub(new \DateInterval('P2M'));
         $policy = self::initPolicy($user, self::$dm, $phone, $twoMonthsAgo, false, true);
         $policy->setStatus(Policy::STATUS_UNPAID);
@@ -782,9 +782,9 @@ class UserControllerTest extends BaseControllerTest
             self::$dm
         );
         self::setBacsPaymentMethod($user, BankAccount::MANDATE_SUCCESS);
-        $oneMonthAgo = new \DateTime();
+        $oneMonthAgo = \DateTime::createFromFormat('U', time());
         $oneMonthAgo = $oneMonthAgo->sub(new \DateInterval('P1M'));
-        $twoMonthsAgo = new \DateTime();
+        $twoMonthsAgo = \DateTime::createFromFormat('U', time());
         $twoMonthsAgo = $twoMonthsAgo->sub(new \DateInterval('P2M'));
         $policy = self::initPolicy($user, self::$dm, $phone, $twoMonthsAgo, false, true);
         $policy->setStatus(Policy::STATUS_UNPAID);
@@ -858,9 +858,9 @@ class UserControllerTest extends BaseControllerTest
             self::$dm
         );
         self::setPaymentMethod($user);
-        $oneMonthAgo = new \DateTime();
+        $oneMonthAgo = \DateTime::createFromFormat('U', time());
         $oneMonthAgo = $oneMonthAgo->sub(new \DateInterval('P1M'));
-        $twoMonthsAgo = new \DateTime();
+        $twoMonthsAgo = \DateTime::createFromFormat('U', time());
         $twoMonthsAgo = $twoMonthsAgo->sub(new \DateInterval('P2M'));
         $policy = self::initPolicy($user, self::$dm, $phone, $twoMonthsAgo, true, true);
         $policy->setStatus(Policy::STATUS_UNPAID);
@@ -891,7 +891,7 @@ class UserControllerTest extends BaseControllerTest
             self::$dm
         );
         self::setPaymentMethod($user);
-        $oneMonthTwoWeeksAgo = new \DateTime();
+        $oneMonthTwoWeeksAgo = \DateTime::createFromFormat('U', time());
         $oneMonthTwoWeeksAgo = $oneMonthTwoWeeksAgo->sub(new \DateInterval('P45D'));
         $policy = self::initPolicy($user, self::$dm, $phone, $oneMonthTwoWeeksAgo, true, true);
         $policy->setStatus(Policy::STATUS_UNPAID);
@@ -929,9 +929,9 @@ class UserControllerTest extends BaseControllerTest
             self::$dm
         );
         self::setPaymentMethod($user);
-        $oneMonthAgo = new \DateTime();
+        $oneMonthAgo = \DateTime::createFromFormat('U', time());
         $oneMonthAgo = $oneMonthAgo->sub(new \DateInterval('P1M'));
-        $twoMonthsAgo = new \DateTime();
+        $twoMonthsAgo = \DateTime::createFromFormat('U', time());
         $twoMonthsAgo = $twoMonthsAgo->sub(new \DateInterval('P2M'));
         $policy = self::initPolicy($user, self::$dm, $phone, $twoMonthsAgo, true, true);
         $policy->setStatus(Policy::STATUS_UNPAID);
@@ -970,9 +970,9 @@ class UserControllerTest extends BaseControllerTest
             self::$dm
         );
         self::setPaymentMethod($user);
-        $oneMonthAgo = new \DateTime();
+        $oneMonthAgo = \DateTime::createFromFormat('U', time());
         $oneMonthAgo = $oneMonthAgo->sub(new \DateInterval('P1M'));
-        $oneMonthTwoWeeksAgo = new \DateTime();
+        $oneMonthTwoWeeksAgo = \DateTime::createFromFormat('U', time());
         $oneMonthTwoWeeksAgo = $oneMonthTwoWeeksAgo->sub(new \DateInterval('P45D'));
         $policy = self::initPolicy($user, self::$dm, $phone, $oneMonthTwoWeeksAgo, true, true);
         $policy->setStatus(Policy::STATUS_UNPAID);
@@ -1018,9 +1018,9 @@ class UserControllerTest extends BaseControllerTest
             self::$dm
         );
         self::setPaymentMethod($user, '0116');
-        $oneMonthAgo = new \DateTime();
+        $oneMonthAgo = \DateTime::createFromFormat('U', time());
         $oneMonthAgo = $oneMonthAgo->sub(new \DateInterval('P1M'));
-        $twoMonthsAgo = new \DateTime();
+        $twoMonthsAgo = \DateTime::createFromFormat('U', time());
         $twoMonthsAgo = $twoMonthsAgo->sub(new \DateInterval('P2M'));
         $policy = self::initPolicy($user, self::$dm, $phone, $twoMonthsAgo, true, true);
         $policy->setStatus(Policy::STATUS_UNPAID);
@@ -1051,7 +1051,7 @@ class UserControllerTest extends BaseControllerTest
             self::$dm
         );
         self::setPaymentMethod($user, '0116');
-        $oneMonthTwoWeeksAgo = new \DateTime();
+        $oneMonthTwoWeeksAgo = \DateTime::createFromFormat('U', time());
         $oneMonthTwoWeeksAgo = $oneMonthTwoWeeksAgo->sub(new \DateInterval('P45D'));
         $policy = self::initPolicy($user, self::$dm, $phone, $oneMonthTwoWeeksAgo, true, true);
         $policy->setStatus(Policy::STATUS_UNPAID);
@@ -1207,7 +1207,7 @@ class UserControllerTest extends BaseControllerTest
             $phone,
             self::$dm
         );
-        $date = new \DateTime();
+        $date = \DateTime::createFromFormat('U', time());
         $date = $date->sub(new \DateInterval('P350D'));
         $policy = self::initPolicy($user, self::$dm, $phone, $date, true, true, false);
         $policy->setStatus(Policy::STATUS_ACTIVE);
@@ -1215,7 +1215,7 @@ class UserControllerTest extends BaseControllerTest
 
         $this->assertFalse($policy->isRenewed());
 
-        $tomorrow = new \DateTime();
+        $tomorrow = \DateTime::createFromFormat('U', time());
         $tomorrow = $tomorrow->add(new \DateInterval('P1D'));
         $renewalPolicy = $this->getRenewalPolicy($policy, false, $tomorrow);
         static::$dm->persist($renewalPolicy);
@@ -1250,7 +1250,7 @@ class UserControllerTest extends BaseControllerTest
             $phone,
             self::$dm
         );
-        $date = new \DateTime();
+        $date = \DateTime::createFromFormat('U', time());
         $date = $date->sub(new \DateInterval('P350D'));
         $policy = self::initPolicy($user, self::$dm, $phone, $date, true, true, false);
         $policy->setStatus(Policy::STATUS_ACTIVE);
@@ -1258,7 +1258,7 @@ class UserControllerTest extends BaseControllerTest
 
         $this->assertFalse($policy->isRenewed());
 
-        $tomorrow = new \DateTime();
+        $tomorrow = \DateTime::createFromFormat('U', time());
         $tomorrow = $tomorrow->add(new \DateInterval('P1D'));
         $renewalPolicy = $this->getRenewalPolicy($policy, false, $tomorrow);
         static::$dm->persist($renewalPolicy);
@@ -1293,7 +1293,7 @@ class UserControllerTest extends BaseControllerTest
             $phone,
             self::$dm
         );
-        $date = new \DateTime();
+        $date = \DateTime::createFromFormat('U', time());
         $date = $date->sub(new \DateInterval('P350D'));
         $policy = self::initPolicy($user, self::$dm, $phone, $date, true, true, false);
         $policy->setStatus(Policy::STATUS_ACTIVE);
@@ -1301,7 +1301,7 @@ class UserControllerTest extends BaseControllerTest
 
         $this->assertFalse($policy->isRenewed());
 
-        $tomorrow = new \DateTime();
+        $tomorrow = \DateTime::createFromFormat('U', time());
         $tomorrow = $tomorrow->add(new \DateInterval('P1D'));
         $renewalPolicy = $this->getRenewalPolicy($policy, false, $tomorrow);
         static::$dm->persist($renewalPolicy);
@@ -1345,7 +1345,7 @@ class UserControllerTest extends BaseControllerTest
             $phone,
             self::$dm
         );
-        $date = new \DateTime();
+        $date = \DateTime::createFromFormat('U', time());
         $date = $date->sub(new \DateInterval('P350D'));
         $policyA = self::initPolicy($userA, self::$dm, $phone, $date, true, true, false);
         $policyB = self::initPolicy($userB, self::$dm, $phone, $date, true, true, false);
@@ -1358,7 +1358,7 @@ class UserControllerTest extends BaseControllerTest
 
         self::connectPolicies(self::$invitationService, $policyA, $policyB, $date);
 
-        $tomorrow = new \DateTime();
+        $tomorrow = \DateTime::createFromFormat('U', time());
         $tomorrow = $tomorrow->add(new \DateInterval('P1D'));
         $renewalPolicyA = $this->getRenewalPolicy($policyA, false, $tomorrow);
         $renewalPolicyB = $this->getRenewalPolicy($policyB, false, $tomorrow);
@@ -1412,7 +1412,7 @@ class UserControllerTest extends BaseControllerTest
             $phone,
             self::$dm
         );
-        $date = new \DateTime();
+        $date = \DateTime::createFromFormat('U', time());
         $date = $date->sub(new \DateInterval('P350D'));
         $policyA = self::initPolicy($userA, self::$dm, $phone, $date, true, true, false);
         $policyB = self::initPolicy($userB, self::$dm, $phone, $date, true, true, false);
@@ -1424,7 +1424,7 @@ class UserControllerTest extends BaseControllerTest
         $this->assertFalse($policyB->isRenewed());
 
         self::connectPolicies(self::$invitationService, $policyA, $policyB, $date);
-        $tomorrow = new \DateTime();
+        $tomorrow = \DateTime::createFromFormat('U', time());
         $tomorrow = $tomorrow->add(new \DateInterval('P1D'));
         $renewalPolicyA = $this->getRenewalPolicy($policyA, false, $tomorrow);
         $renewalPolicyB = $this->getRenewalPolicy($policyB, false, $tomorrow);
@@ -1482,7 +1482,7 @@ class UserControllerTest extends BaseControllerTest
         $this->login($email, 'bar', 'login');
         $this->assertTrue(self::$redis->exists($key) == 1);
 
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         $now = $now->sub(new \DateInterval(('PT1S')));
         for ($i = 1; $i <= 25; $i++) {
             self::$redis->zadd($key, [serialize(array($email, $now->getTimestamp())) => $now->getTimestamp()]);
@@ -1698,7 +1698,7 @@ class UserControllerTest extends BaseControllerTest
             $phone,
             self::$dm
         );
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         $policy = self::initPolicy($user, self::$dm, $phone, null, true, true);
         $policy->setStatus(Policy::STATUS_CANCELLED);
         $policy->setStart($now);
@@ -1722,7 +1722,7 @@ class UserControllerTest extends BaseControllerTest
             $phone,
             self::$dm
         );
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         $policy = self::initPolicy($user, self::$dm, $phone, null, true, true);
         $policy->setStatus(Policy::STATUS_CANCELLED);
         $policy->setStart($now);
@@ -1751,7 +1751,7 @@ class UserControllerTest extends BaseControllerTest
             $phone,
             self::$dm
         );
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         $policy = self::initPolicy($user, self::$dm, $phone, null, true, true);
         $policy->setStatus(Policy::STATUS_ACTIVE);
         $policy->setStart($now);
@@ -1773,7 +1773,7 @@ class UserControllerTest extends BaseControllerTest
             $phone,
             self::$dm
         );
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         $policy = self::initPolicy($user, self::$dm, $phone, null, true, true);
         $policy->setStatus(Policy::STATUS_ACTIVE);
         $policy->setStart($now);
@@ -1798,7 +1798,7 @@ class UserControllerTest extends BaseControllerTest
             $phone,
             self::$dm
         );
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         $policy = self::initPolicy($user, self::$dm, $phone, null, true, true);
         $policy->setStatus(Policy::STATUS_ACTIVE);
         $policy->setStart($now);
@@ -1826,8 +1826,8 @@ class UserControllerTest extends BaseControllerTest
             $phone,
             self::$dm
         );
-        $now = new \DateTime();
-        $twoMonthAgo = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
+        $twoMonthAgo = \DateTime::createFromFormat('U', time());
         $twoMonthAgo = $twoMonthAgo->sub(new \DateInterval('P2M'));
         $policy = self::initPolicy($user, self::$dm, $phone, $twoMonthAgo, true, true);
         $policy->setStatus(Policy::STATUS_ACTIVE);
@@ -1857,8 +1857,8 @@ class UserControllerTest extends BaseControllerTest
             $phone,
             self::$dm
         );
-        $now = new \DateTime();
-        $twoMonthAgo = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
+        $twoMonthAgo = \DateTime::createFromFormat('U', time());
         $twoMonthAgo = $twoMonthAgo->sub(new \DateInterval('P2M'));
         $policy = self::initPolicy($user, self::$dm, $phone, $twoMonthAgo, true, true);
         $policy->setStatus(Policy::STATUS_ACTIVE);
@@ -1872,8 +1872,8 @@ class UserControllerTest extends BaseControllerTest
             $phone,
             self::$dm
         );
-        $now = new \DateTime();
-        $twoMonthAgo = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
+        $twoMonthAgo = \DateTime::createFromFormat('U', time());
         $twoMonthAgo = $twoMonthAgo->sub(new \DateInterval('P2M'));
         $policy2 = self::initPolicy($user2, self::$dm, $phone, $twoMonthAgo, true, true);
         $policy2->setStatus(Policy::STATUS_ACTIVE);
@@ -1905,7 +1905,7 @@ class UserControllerTest extends BaseControllerTest
             $phone,
             self::$dm
         );
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         $policy = self::initPolicy($user, self::$dm, $phone, null, true, true);
         $policy->setStatus(Policy::STATUS_ACTIVE);
         $policy->setStart($now);
@@ -1932,8 +1932,8 @@ class UserControllerTest extends BaseControllerTest
             $phone,
             self::$dm
         );
-        $now = new \DateTime();
-        $twoMonthAgo = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
+        $twoMonthAgo = \DateTime::createFromFormat('U', time());
         $twoMonthAgo = $twoMonthAgo->sub(new \DateInterval('P2M'));
         $policy = self::initPolicy($user, self::$dm, $phone, $twoMonthAgo, true, true);
         $policy->setStatus(Policy::STATUS_ACTIVE);
@@ -1961,8 +1961,8 @@ class UserControllerTest extends BaseControllerTest
             $phone,
             self::$dm
         );
-        $now = new \DateTime();
-        $twoMonthAgo = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
+        $twoMonthAgo = \DateTime::createFromFormat('U', time());
         $twoMonthAgo = $twoMonthAgo->sub(new \DateInterval('P2M'));
         $policy = self::initPolicy($user, self::$dm, $phone, $twoMonthAgo, true, true);
         $policy->setStatus(Policy::STATUS_ACTIVE);
@@ -2004,7 +2004,7 @@ class UserControllerTest extends BaseControllerTest
             $phone,
             self::$dm
         );
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         $policy = self::initPolicy($user, self::$dm, $phone, null, true, true);
         $policy->setStatus(Policy::STATUS_ACTIVE);
         $policy->setStart($now);
@@ -2031,8 +2031,8 @@ class UserControllerTest extends BaseControllerTest
             $phone,
             self::$dm
         );
-        $now = new \DateTime();
-        $twoMonthAgo = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
+        $twoMonthAgo = \DateTime::createFromFormat('U', time());
         $twoMonthAgo = $twoMonthAgo->sub(new \DateInterval('P2M'));
         $policy = self::initPolicy($user, self::$dm, $phone, $twoMonthAgo, true, true);
         $policy->setStatus(Policy::STATUS_ACTIVE);
@@ -2060,8 +2060,8 @@ class UserControllerTest extends BaseControllerTest
             $phone,
             self::$dm
         );
-        $now = new \DateTime();
-        $twoMonthAgo = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
+        $twoMonthAgo = \DateTime::createFromFormat('U', time());
         $twoMonthAgo = $twoMonthAgo->sub(new \DateInterval('P2M'));
         $policy = self::initPolicy($user, self::$dm, $phone, $twoMonthAgo, true, true);
         $policy->setStatus(Policy::STATUS_ACTIVE);
@@ -2103,7 +2103,7 @@ class UserControllerTest extends BaseControllerTest
             $phone,
             self::$dm
         );
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         $policy = self::initPolicy($user, self::$dm, $phone, null, true, true);
         $policy->setStatus(Policy::STATUS_ACTIVE);
         $policy->setStart($now);
@@ -2132,8 +2132,8 @@ class UserControllerTest extends BaseControllerTest
             $phone,
             self::$dm
         );
-        $now = new \DateTime();
-        $twoMonthAgo = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
+        $twoMonthAgo = \DateTime::createFromFormat('U', time());
         $twoMonthAgo = $twoMonthAgo->sub(new \DateInterval('P2M'));
         $policy = self::initPolicy($user, self::$dm, $phone, $twoMonthAgo, true, true);
         $policy->setStatus(Policy::STATUS_ACTIVE);
@@ -2177,7 +2177,7 @@ class UserControllerTest extends BaseControllerTest
             $phone,
             self::$dm
         );
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         $policy = self::initPolicy($user, self::$dm, $phone, null, true, true);
         $policy->setStatus(Policy::STATUS_ACTIVE);
         $policy->setStart($now);
@@ -2206,8 +2206,8 @@ class UserControllerTest extends BaseControllerTest
             $phone,
             self::$dm
         );
-        $now = new \DateTime();
-        $twoMonthAgo = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
+        $twoMonthAgo = \DateTime::createFromFormat('U', time());
         $twoMonthAgo = $twoMonthAgo->sub(new \DateInterval('P2M'));
         $policy = self::initPolicy($user, self::$dm, $phone, $twoMonthAgo, true, true);
         $policy->setStatus(Policy::STATUS_ACTIVE);
@@ -2251,7 +2251,7 @@ class UserControllerTest extends BaseControllerTest
             $phone,
             self::$dm
         );
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         $policy = self::initPolicy($user, self::$dm, $phone, null, true, true);
         $policy->setStatus(Policy::STATUS_ACTIVE);
         $policy->setStart($now);
@@ -2280,8 +2280,8 @@ class UserControllerTest extends BaseControllerTest
             $phone,
             self::$dm
         );
-        $now = new \DateTime();
-        $twoMonthAgo = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
+        $twoMonthAgo = \DateTime::createFromFormat('U', time());
         $twoMonthAgo = $twoMonthAgo->sub(new \DateInterval('P2M'));
         $policy = self::initPolicy($user, self::$dm, $phone, $twoMonthAgo, true, true);
         $policy->setStatus(Policy::STATUS_ACTIVE);

@@ -254,7 +254,7 @@ class ApiController extends BaseController
             $cognitoId = $this->getCognitoIdentityId($request);
             $stats->quote(
                 $cognitoId,
-                new \DateTime(),
+                \DateTime::createFromFormat('U', time()),
                 $device,
                 $memory,
                 $deviceFound,
@@ -436,7 +436,7 @@ class ApiController extends BaseController
             }
 
             $this->container->get('fos_user.mailer')->sendResettingEmailMessage($user);
-            $user->setPasswordRequestedAt(new \DateTime());
+            $user->setPasswordRequestedAt(\DateTime::createFromFormat('U', time()));
             $this->get('fos_user.user_manager')->updateUser($user);
 
             // If resetting password, clear the login rate limit
@@ -623,7 +623,7 @@ class ApiController extends BaseController
                 $user = $repo->findOneBy(['emailCanonical' => mb_strtolower($this->getDataString($data, 'email'))]);
                 if ($user && $user->isPreLaunch() && !$user->getLastLogin() && count($user->getPolicies()) == 0) {
                     $user->resetToken();
-                    $user->setLastLogin(new \DateTime());
+                    $user->setLastLogin(\DateTime::createFromFormat('U', time()));
                 } else {
                     return $this->getErrorJsonResponse(
                         ApiErrorCode::ERROR_USER_EXISTS,
