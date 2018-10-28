@@ -1092,7 +1092,7 @@ class PurchaseControllerTest extends BaseControllerTest
         self::verifyResponse(200);
 
         $link = $crawler->filter('#step--validate');
-        $csrfToken = $link->attr('data-csrf') + '.';
+        $csrfToken = sprintf('%s.', $link->attr('data-csrf'));
 
         $crawler = self::$client->request(
             'POST',

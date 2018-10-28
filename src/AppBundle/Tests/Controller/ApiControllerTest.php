@@ -780,10 +780,19 @@ class ApiControllerTest extends BaseApiControllerTest
      */
     public function testGetSCode()
     {
+        $policy = static::createUserPolicy(true);
+        $policy->getUser()->setEmail(static::generateEmail('testGetSCode', $this));
+        $policy->createAddSCode(rand(1, 999999));
+        static::$dm->persist($policy->getUser());
+        static::$dm->persist($policy);
+        static::$dm->flush();
+
+        static::$dm->flush();
+
         $dm = $this->getDocumentManager(true);
         $repo = $dm->getRepository(SCode::class);
         /** @var SCode $sCode */
-        $sCode = $repo->findOneBy(['active' => true, 'type' => 'standard']);
+        $sCode = $repo->findOneBy(['active' => true, 'type' => SCode::TYPE_STANDARD]);
         $this->assertNotNull($sCode);
 
         $cognitoIdentityId = $this->getUnauthIdentity();
