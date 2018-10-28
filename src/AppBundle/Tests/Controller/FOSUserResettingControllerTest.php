@@ -35,6 +35,9 @@ class FOSUserResettingControllerTest extends BaseControllerTest
         self::$client->enableProfiler();
         $crawler = self::$client->submit($form);
         self::verifyResponse(302);
+        if (!self::$client->getProfile()) {
+            throw new \Exception('Profiler must be enabled');
+        }
         /** @var EventDataCollector $eventDataCollector */
         $eventDataCollector = self::$client->getProfile() ?
             self::$client->getProfile()->getCollector('events') :

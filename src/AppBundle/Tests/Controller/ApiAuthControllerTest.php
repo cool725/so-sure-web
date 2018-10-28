@@ -3130,7 +3130,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
             self::generateEmail('testNewFacebookInvitation-invitee', $this),
             'foo'
         );
-        $invitee->setFacebookId(rand(1, 999999));
+        $invitee->setFacebookId(rand(10000, 999999));
         static::$dm->persist($invitee);
         static::$dm->flush();
         $cognitoIdentityId = $this->getAuthUser($invitee);
@@ -5336,7 +5336,9 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
         $data = $this->verifyResponse(200);
 
-        $this->assertNotNull(self::$client->getProfile());
+        if (!self::$client->getProfile()) {
+            throw new \Exception('Profiler must be enabled');
+        }
         if (self::$client->getProfile()) {
             /** @var EventDataCollector $eventDataCollector */
             $eventDataCollector = self::$client->getProfile()->getCollector('events');
