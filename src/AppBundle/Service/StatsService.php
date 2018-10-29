@@ -92,7 +92,7 @@ class StatsService
     public function increment($name, $date = null, $overwrite = false)
     {
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
 
         $repo = $this->dm->getRepository(Stats::class);

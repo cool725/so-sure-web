@@ -219,6 +219,9 @@ class DefaultControllerTest extends BaseControllerTest
         $this->expectFlashSuccess($crawler, 'receive an email shortly');
 
         self::$client->enableProfiler();
+        if (!self::$client->getProfile()) {
+            throw new \Exception('Profiler must be enabled');
+        }
         $crawler = self::$client->request('GET', '/communications');
         $form = $crawler->selectButton('form[decline]')->form();
         $form['form[email]'] = $email2;
@@ -322,7 +325,7 @@ class DefaultControllerTest extends BaseControllerTest
             $phone,
             self::$dm
         );
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         $policy = self::initPolicy($user, self::$dm, $phone, null, true, true);
         $policy->setStatus(Policy::STATUS_CANCELLED);
         $policy->setStart($now);
@@ -352,7 +355,7 @@ class DefaultControllerTest extends BaseControllerTest
             $phone,
             self::$dm
         );
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         $policy = self::initPolicy($user, self::$dm, $phone, null, true, true);
         $policy->setStatus(Policy::STATUS_ACTIVE);
         $policy->setStart($now);

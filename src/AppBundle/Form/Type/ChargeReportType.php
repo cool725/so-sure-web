@@ -31,7 +31,7 @@ class ChargeReportType extends AbstractType
             ->add('date', DateType::class, [
                 'widget' => 'single_text',
                 'format' => 'MM-yyyy',
-                'data' => new \DateTime(),
+                'data' => \DateTime::createFromFormat('U', time()),
                 'html5' => false,
                 'attr' => ['class' => 'form-control', 'autocomplete' => 'off']
             ])

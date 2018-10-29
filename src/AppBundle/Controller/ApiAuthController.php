@@ -811,7 +811,7 @@ class ApiAuthController extends BaseController
                 // due to validate object call later
                 $cashback->setPolicy($policy);
                 $cashback->setStatus(Cashback::STATUS_PENDING_CLAIMABLE);
-                $cashback->setDate(new \DateTime());
+                $cashback->setDate(\DateTime::createFromFormat('U', time()));
             }
             $cashback->setAccountName($this->getDataString($data, 'account_name'));
             $cashback->setSortcode($this->getDataString($data, 'sort_code'));
@@ -1525,7 +1525,7 @@ class ApiAuthController extends BaseController
             $cashback = null;
             if (isset($data['cashback'])) {
                 $cashback = new Cashback();
-                $cashback->setDate(new \DateTime());
+                $cashback->setDate(\DateTime::createFromFormat('U', time()));
                 $cashback->setAccountName($this->getDataString($data['cashback'], 'account_name'));
                 $cashback->setSortCode($this->getDataString($data['cashback'], 'sort_code'));
                 $cashback->setAccountNumber($this->getDataString($data['cashback'], 'account_number'));
@@ -1918,7 +1918,7 @@ class ApiAuthController extends BaseController
             $intercomHash = $this->get('app.intercom')->getApiUserHash($user);
 
             foreach ($user->getValidPolicies(true) as $policy) {
-                $now = new \DateTime();
+                $now = \DateTime::createFromFormat('U', time());
                 if ($policy->getStart() > new \DateTime('2017-02-01') &&
                     $policy->getStart() < new \DateTime('2017-04-01') &&
                     $now < new \DateTime('2017-04-01') &&

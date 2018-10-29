@@ -41,7 +41,7 @@ class PolicyRepository extends BaseDocumentRepository
     public function findPoliciesForPendingCancellation($policyPrefix, $includeFuture, \DateTime $date = null)
     {
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
 
         $qb = $this->createQueryBuilder()
@@ -65,7 +65,7 @@ class PolicyRepository extends BaseDocumentRepository
     public function findPoliciesForPendingRenewal($policyPrefix, \DateTime $date = null)
     {
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
         $renewalDate = clone $date;
         $renewalDate = $renewalDate->add(new \DateInterval(sprintf('P%dD', Policy::RENEWAL_DAYS)));
@@ -88,7 +88,7 @@ class PolicyRepository extends BaseDocumentRepository
     public function findPoliciesForExpiration($policyPrefix, \DateTime $date = null)
     {
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
 
         $qb = $this->createQueryBuilder()
@@ -107,7 +107,7 @@ class PolicyRepository extends BaseDocumentRepository
     public function findPoliciesForFullExpiration($policyPrefix, \DateTime $date = null)
     {
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
             $date = $date->sub(new \DateInterval('P28D'));
         }
 
@@ -127,7 +127,7 @@ class PolicyRepository extends BaseDocumentRepository
     public function findRenewalPoliciesForActivation($policyPrefix, \DateTime $date = null)
     {
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
 
         $qb = $this->createQueryBuilder()
@@ -145,7 +145,7 @@ class PolicyRepository extends BaseDocumentRepository
     public function findPendingRenewalPoliciesForRenewed(\DateTime $date = null)
     {
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
 
         $qb = $this->createQueryBuilder()
@@ -162,7 +162,7 @@ class PolicyRepository extends BaseDocumentRepository
     public function findDeclinedRenewalPoliciesForUnRenewed(\DateTime $date = null)
     {
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
 
         $qb = $this->createQueryBuilder()
@@ -178,9 +178,9 @@ class PolicyRepository extends BaseDocumentRepository
 
     public function getWeeklyEmail($environment)
     {
-        $lastWeek = new \DateTime();
+        $lastWeek = \DateTime::createFromFormat('U', time());
         $lastWeek->sub(new \DateInterval('P1W'));
-        $sixtyDays = new \DateTime();
+        $sixtyDays = \DateTime::createFromFormat('U', time());
         $sixtyDays->sub(new \DateInterval('P60D'));
         $policy = new PhonePolicy();
 

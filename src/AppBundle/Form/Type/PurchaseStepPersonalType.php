@@ -44,7 +44,7 @@ class PurchaseStepPersonalType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $years = [];
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         for ($year = (int) $now->format('Y'); $year >= $now->format('Y') - AgeValidator::MAX_AGE; $year--) {
             $years[] = $year;
         }

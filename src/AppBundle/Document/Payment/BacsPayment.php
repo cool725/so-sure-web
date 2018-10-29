@@ -148,7 +148,7 @@ class BacsPayment extends Payment
     public function submit(\DateTime $date = null)
     {
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
 
         // if payment has already been scheduled for submission in the future (e.g. scheduled payment a few days in
@@ -183,7 +183,7 @@ class BacsPayment extends Payment
     public function canAction(\DateTime $date = null)
     {
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
 
         // already completed
@@ -203,7 +203,7 @@ class BacsPayment extends Payment
     public function approve(\DateTime $date = null, $ignoreReversedDate = false)
     {
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
 
         if (!$this->canAction($date) && !$ignoreReversedDate) {
@@ -238,7 +238,7 @@ class BacsPayment extends Payment
     public function reject(\DateTime $date = null)
     {
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
 
         if (!$this->canAction($date)) {

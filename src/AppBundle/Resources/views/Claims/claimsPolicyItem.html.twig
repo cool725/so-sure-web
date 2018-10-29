@@ -232,7 +232,13 @@
                             policy.payerOrUser.paymentMethod.getType == "judo" %}
                             <tr>
                                 <td>Card</td>
-                                <td class="{% if policy.payerOrUser.paymentMethod.isCardExpired %}danger{% endif %}">{{ policy.payerOrUser.paymentMethod }}</td>
+                                <td class="{% if policy.payerOrUser.paymentMethod.isCardExpired %}danger{% endif %}">
+                                    {{ policy.payerOrUser.paymentMethod }}
+                                    <a title="Judopay" href="https://portal.judopay.com/payments/history?SearchQuery={{ policy.payerOrUser.id }}&SearchQueryType=0&AppName=&DeviceId=&From=&To=&AppId=0" target="_blank">
+                                        <i class="fa fa-external-link"></i>
+                                    </a>
+                                </td>
+
                             </tr>
                         {% elseif policy.isPolicy and policy.payerOrUser.paymentMethod and
                             policy.payerOrUser.paymentMethod.getType == "bacs" %}

@@ -35,6 +35,9 @@ class FOSUserResettingControllerTest extends BaseControllerTest
         self::$client->enableProfiler();
         $crawler = self::$client->submit($form);
         self::verifyResponse(302);
+        if (!self::$client->getProfile()) {
+            throw new \Exception('Profiler must be enabled');
+        }
         /** @var EventDataCollector $eventDataCollector */
         $eventDataCollector = self::$client->getProfile() ?
             self::$client->getProfile()->getCollector('events') :
@@ -50,7 +53,7 @@ class FOSUserResettingControllerTest extends BaseControllerTest
         $userRepo = $dm->getRepository(User::class);
         /** @var User $user */
         $user = $userRepo->findOneBy(['emailCanonical' => 'patrick@so-sure.com']);
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         $this->assertNotNull($user->getLatestWebIdentityLog());
         $diff = $user->getLatestWebIdentityLog()->getDate()->diff($now);
         $this->assertTrue($diff->days == 0 && $diff->h == 0 && $diff->i == 0);
@@ -273,7 +276,7 @@ class FOSUserResettingControllerTest extends BaseControllerTest
             $email,
             'foo'
         );
-        $ninetyDaysAgo = new \DateTime();
+        $ninetyDaysAgo = \DateTime::createFromFormat('U', time());
         $ninetyDaysAgo = $ninetyDaysAgo->sub(new \DateInterval('P90D'));
         $user->passwordChange('foo', 'bar', $ninetyDaysAgo);
         $user->addRole('ROLE_ADMIN');

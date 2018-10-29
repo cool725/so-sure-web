@@ -84,7 +84,7 @@ class IdentityLog
 
     public function __construct()
     {
-        $this->setDate(new \DateTime());
+        $this->setDate(\DateTime::createFromFormat('U', time()));
     }
 
     public function getDate()

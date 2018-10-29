@@ -48,7 +48,7 @@ class ReinviteCommand extends ContainerAwareCommand
     {
         $date = $input->getOption('date');
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         } else {
             $date = new \DateTime($date);
         }

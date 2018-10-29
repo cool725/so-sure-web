@@ -527,7 +527,7 @@ abstract class Policy
 
     public function __construct()
     {
-        $this->created = new \DateTime();
+        $this->created = \DateTime::createFromFormat('U', time());
         $this->payments = new \Doctrine\Common\Collections\ArrayCollection();
         $this->invitations = new \Doctrine\Common\Collections\ArrayCollection();
         $this->claims = new \Doctrine\Common\Collections\ArrayCollection();
@@ -1163,7 +1163,7 @@ abstract class Policy
     public function setStatus($status)
     {
         if ($status != $this->status) {
-            $this->setStatusUpdated(new \DateTime());
+            $this->setStatusUpdated(\DateTime::createFromFormat('U', time()));
         }
         $this->status = $status;
     }
@@ -1897,7 +1897,7 @@ abstract class Policy
 
     public function addNote($note)
     {
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         $this->notes[$now->getTimestamp()] = $note;
     }
 
@@ -1919,7 +1919,7 @@ abstract class Policy
             return 'white';
         }
 
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         $latest = \DateTime::createFromFormat('U', $this->getLatestNoteTimestamp());
         $diff = $now->diff($latest);
 
@@ -2026,9 +2026,9 @@ abstract class Policy
 
     public function create($seq, $prefix = null, \DateTime $startDate = null, $scodeCount = 1)
     {
-        $issueDate = new \DateTime();
+        $issueDate = \DateTime::createFromFormat('U', time());
         if (!$startDate) {
-            $startDate = new \DateTime();
+            $startDate = \DateTime::createFromFormat('U', time());
             // No longer necessary to start 10 minutes in the future
             // $startDate->add(new \DateInterval('PT10M'));
         }
@@ -2408,7 +2408,7 @@ abstract class Policy
             throw new \Exception('Unable to determine days in policy as policy is not valid');
         }
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
         $date = $this->endOfDay($date);
 
@@ -2653,7 +2653,7 @@ abstract class Policy
         }
 
         if ($date == null) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
 
         if ($this->getPendingCancellation()) {
@@ -2712,7 +2712,7 @@ abstract class Policy
         }
 
         if ($date == null) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
 
         return $this->getStart()->diff($date)->days <= 21;
@@ -2725,7 +2725,7 @@ abstract class Policy
         }
 
         if ($date == null) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
 
         return $this->getStart()->diff($date)->days <= 30;
@@ -2733,7 +2733,7 @@ abstract class Policy
 
     public function daysToAquisition($days)
     {
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         $now = $days - ($now->diff($this->getStart()))->d;
         return ($now >= 0) ? $now : 0;
     }
@@ -2745,7 +2745,7 @@ abstract class Policy
         }
 
         if ($date == null) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
 
         /** @var \DateTime $start */
@@ -2768,7 +2768,7 @@ abstract class Policy
         }
 
         if ($date == null) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
 
         return $date->diff($this->getEnd())->days <= 30;
@@ -2781,7 +2781,7 @@ abstract class Policy
         }
 
         if ($date == null) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
 
         return $this->getStart()->diff($date)->days < 60;
@@ -2794,7 +2794,7 @@ abstract class Policy
         }
 
         if ($date == null) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
 
         return $this->getStart() > $date;
@@ -3050,7 +3050,7 @@ abstract class Policy
         }
 
         if ($date == null) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
 
         if ($extended) {
@@ -3063,7 +3063,7 @@ abstract class Policy
     public function hasEndedInLast30Days($date = null)
     {
         if ($date == null) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
 
         return $this->getEnd()->diff($date)->days < 30;
@@ -3085,7 +3085,7 @@ abstract class Policy
         }
 
         if ($date == null) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
 
         return $date >= $this->getPolicyExpirationDate($date);
@@ -3098,7 +3098,7 @@ abstract class Policy
         }
 
         if ($date == null) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
 
         return $date >= $this->getEnd();
@@ -3125,7 +3125,7 @@ abstract class Policy
         }
 
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
 
         // Yearly payments are a bit different
@@ -3194,7 +3194,7 @@ abstract class Policy
         }
 
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
 
         $diff = $this->getPolicyExpirationDate()->diff($date);
@@ -3234,7 +3234,7 @@ abstract class Policy
     public function hasNetworkClaimedInLast30Days($date = null, $includeOpen = false)
     {
         if ($date == null) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
 
         foreach ($this->getNetworkClaims(true, $includeOpen) as $claim) {
@@ -3355,7 +3355,7 @@ abstract class Policy
             return null;
         }
 
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
 
         $days = $now->diff($this->getStart())->days;
         if ($now < $this->getStart()) {
@@ -3448,7 +3448,7 @@ abstract class Policy
         }
 
         if ($date == null) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
         $this->setStatus(Policy::STATUS_CANCELLED);
         $this->setCancelledReason($reason);
@@ -3491,7 +3491,7 @@ abstract class Policy
     public function isRenewalAllowed($autoRenew = false, \DateTime $date = null)
     {
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
 
         if (!in_array($this->getStatus(), [
@@ -3524,7 +3524,7 @@ abstract class Policy
     public function isUnRenewalAllowed(\DateTime $date = null)
     {
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
 
         if (!in_array($this->getStatus(), [
@@ -3544,7 +3544,7 @@ abstract class Policy
     public function declineRenew(\DateTime $date = null)
     {
         if ($date == null) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
 
         if (!in_array($this->getStatus(), [
@@ -3562,7 +3562,7 @@ abstract class Policy
     public function renew($discount, $autoRenew = false, \DateTime $date = null)
     {
         if ($date == null) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
 
         // For autorenewals, no need to warn if previous policy was cancelled
@@ -3624,7 +3624,7 @@ abstract class Policy
     public function activate(\DateTime $date = null)
     {
         if ($date == null) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
 
         if (!in_array($this->getStatus(), [
@@ -3694,7 +3694,7 @@ abstract class Policy
     public function createPendingRenewal(PolicyTerms $terms, \DateTime $date = null)
     {
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
 
         if (!$this->canCreatePendingRenewal($date)) {
@@ -3717,7 +3717,7 @@ abstract class Policy
     public function createRepurchase(PolicyTerms $terms, \DateTime $date = null)
     {
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
 
         if (!$this->canRepurchase()) {
@@ -3748,7 +3748,7 @@ abstract class Policy
     public function expire(\DateTime $date = null)
     {
         if ($date == null) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
         /** @var \DateTime $dateNotNull */
         $dateNotNull = $date;
@@ -3885,7 +3885,7 @@ abstract class Policy
     public function fullyExpire(\DateTime $date = null)
     {
         if ($date == null) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
         /** @var \DateTime $dateNotNull */
         $dateNotNull = $date;
@@ -3999,7 +3999,7 @@ abstract class Policy
 
     public function getCurrentConnectionValues()
     {
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         $now = $now->format('U');
         foreach ($this->getConnectionValues('U') as $connectionValue) {
             if ($now >= $connectionValue['start_date'] && $now <= $connectionValue['end_date']) {
@@ -4016,7 +4016,7 @@ abstract class Policy
         if (!$this->isPolicy() || !$this->getStart()) {
             return $connectionValues;
         }
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         $startDate = $this->getStart();
         if ($startDate && $startDate > $now) {
             $startDate = $now;
@@ -4085,7 +4085,7 @@ abstract class Policy
     public function getTotalSuccessfulPayments(\DateTime $date = null, $applyPartialDiscounts = null)
     {
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
         $totalPaid = 0;
         $numberOfPayments = 0;
@@ -4113,7 +4113,7 @@ abstract class Policy
     public function getTotalSuccessfulUserPayments(\DateTime $date = null)
     {
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
         $totalPaid = 0;
         foreach ($this->getSuccessfulUserPayments() as $payment) {
@@ -4128,7 +4128,7 @@ abstract class Policy
     public function getTotalSuccessfulStandardPayments($includeDiscounts = false, \DateTime $date = null)
     {
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
         $totalPaid = 0;
         foreach ($this->getSuccessfulStandardPayments() as $payment) {
@@ -4149,7 +4149,7 @@ abstract class Policy
         }
 
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
         //$date->setTimezone(new \DateTimeZone(self::TIMEZONE));
         $date = $this->adjustDayForBilling($date, true);
@@ -4248,7 +4248,7 @@ abstract class Policy
             return null;
         }
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
 
         $ignoredStatuses = [
@@ -4297,7 +4297,7 @@ abstract class Policy
             return null;
         }
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
 
         if ($includeFuturePayments) {
@@ -4340,7 +4340,7 @@ abstract class Policy
         }
 
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
 
         // payment on day 0
@@ -4745,7 +4745,7 @@ abstract class Policy
             $expectedCommission = $salva->sumBrokerFee($numPayments, $numPayments == 12);
         } else {
             if (!$date) {
-                $date = new \DateTime();
+                $date = \DateTime::createFromFormat('U', time());
             }
             // policy is not active (above if statement)
             // so at most we should only be calculating to the end of the policy
@@ -4826,7 +4826,7 @@ abstract class Policy
         }
 
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
 
         if ($this->isActive(true)) {
@@ -5094,7 +5094,7 @@ abstract class Policy
     public function canBacsPaymentBeMadeInTime(\DateTime $date = null)
     {
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
 
         $expirationDate = $this->getCurrentOrPreviousBusinessDay($this->getPolicyExpirationDate());

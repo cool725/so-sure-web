@@ -76,7 +76,7 @@ class PurchaseControllerTest extends BaseControllerTest
         $userRepo = $dm->getRepository(User::class);
         /** @var User $user */
         $user = $userRepo->findOneBy(['emailCanonical' => mb_strtolower($email)]);
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
 
         $this->assertNotNull($user->getIdentityLog());
         $diff = $user->getIdentityLog()->getDate()->diff($now);
@@ -1092,7 +1092,7 @@ class PurchaseControllerTest extends BaseControllerTest
         self::verifyResponse(200);
 
         $link = $crawler->filter('#step--validate');
-        $csrfToken = $link->attr('data-csrf') + '.';
+        $csrfToken = sprintf('%s.', $link->attr('data-csrf'));
 
         $crawler = self::$client->request(
             'POST',

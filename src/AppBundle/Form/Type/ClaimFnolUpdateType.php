@@ -89,7 +89,7 @@ class ClaimFnolUpdateType extends AbstractType
             /** @var ClaimFnolUpdate $data */
             $data = $event->getData();
 
-            $now = new \DateTime();
+            $now = \DateTime::createFromFormat('U', time());
             $timestamp = $now->format('U');
 
             if ($filename = $data->getProofOfUsage()) {

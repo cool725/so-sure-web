@@ -74,6 +74,10 @@ trait ImeiTrait
      */
     protected function isLuhn($n)
     {
+        if (!is_numeric($n)) {
+            return false;
+        }
+
         $str = '';
         foreach (str_split(strrev((string) $n)) as $i => $d) {
             $str .= $i %2 !== 0 ? $d * 2 : $d;

@@ -928,7 +928,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
 
         $discount = new PolicyDiscountPayment();
         $discount->setAmount(10);
-        $discount->setDate(new \DateTime());
+        $discount->setDate(\DateTime::createFromFormat('U', time()));
         $policy->addPayment($discount);
         $policy->getPremium()->setAnnualDiscount($discount->getAmount());
         static::$dm->flush();
@@ -1612,7 +1612,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $this->clearRateLimit();
         $userYoung = self::createUser(self::$userManager, self::generateEmail('young', $this), 'foo');
 
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         $userYoung->setBirthday(new \DateTime(sprintf("%d-01-01", $now->format('Y'))));
         self::$dm->flush();
         $cognitoIdentityId = $this->getAuthUser($userYoung);
@@ -1999,7 +1999,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $this->assertEquals($data['id'], $policyData['id']);
 
         $promoCode = null;
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         if ($now->format('Y-m') == '2016-11') {
             $promoCode = Policy::PROMO_FREE_NOV;
         } elseif ($now->format('Y-m') == '2016-12') {
@@ -2053,7 +2053,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
 
         $currentPrice = $phone->getCurrentPhonePrice();
 
-        $validFrom = new \DateTime();
+        $validFrom = \DateTime::createFromFormat('U', time());
         $validFrom->sub(new \DateInterval('PT1H'));
 
         $price = new PhonePrice();
@@ -2431,7 +2431,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
 
         $receiptId = $judopay->testPay(
             $user,
-            $data['id'] + rand(1, 999999),
+            sprintf("%s%d", $data['id'], rand(1, 999999)),
             '7.15', // gwp 6.38 was 6.99 (9.5% ipt), now 7.02 (10% ipt), now 7.15 (12%)
             self::$JUDO_TEST_CARD_NUM,
             self::$JUDO_TEST_CARD_EXP,
@@ -3130,7 +3130,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
             self::generateEmail('testNewFacebookInvitation-invitee', $this),
             'foo'
         );
-        $invitee->setFacebookId(rand(1, 999999));
+        $invitee->setFacebookId(rand(10000, 999999));
         static::$dm->persist($invitee);
         static::$dm->flush();
         $cognitoIdentityId = $this->getAuthUser($invitee);
@@ -3514,7 +3514,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $cognitoIdentityIdA = $this->getAuthUser($userA);
         $cognitoIdentityIdB = $this->getAuthUser($userB);
 
-        $lastYear = new \DateTime();
+        $lastYear = \DateTime::createFromFormat('U', time());
         $lastYear = $lastYear->sub(new \DateInterval('P350D'));
         $policyA = static::initPolicy(
             $userA,
@@ -3552,13 +3552,13 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         
         $renewalPolicyA = static::$policyService->createPendingRenewal(
             $policyA,
-            new \DateTime()
+            \DateTime::createFromFormat('U', time())
         );
         $this->assertEquals(Policy::STATUS_PENDING_RENEWAL, $renewalPolicyA->getStatus());
 
         $renewalPolicyB = static::$policyService->createPendingRenewal(
             $policyB,
-            new \DateTime()
+            \DateTime::createFromFormat('U', time())
         );
         $this->assertEquals(Policy::STATUS_PENDING_RENEWAL, $renewalPolicyB->getStatus());
 
@@ -3629,7 +3629,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         );
         $cognitoIdentityIdA = $this->getAuthUser($userA);
 
-        $lastYear = new \DateTime();
+        $lastYear = \DateTime::createFromFormat('U', time());
         $lastYear = $lastYear->sub(new \DateInterval('P350D'));
         $policyA = static::initPolicy(
             $userA,
@@ -3650,7 +3650,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
                 'foo'
             );
             $cognitoIdentityIdB = $this->getAuthUser($userB);
-            $lastYear = new \DateTime();
+            $lastYear = \DateTime::createFromFormat('U', time());
             $lastYear = $lastYear->sub(new \DateInterval('P290D'));
             $policyB = static::initPolicy(
                 $userB,
@@ -3680,7 +3680,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
 
         $renewalPolicyA = static::$policyService->createPendingRenewal(
             $policyA,
-            new \DateTime()
+            \DateTime::createFromFormat('U', time())
         );
         $this->assertEquals(Policy::STATUS_PENDING_RENEWAL, $renewalPolicyA->getStatus());
 
@@ -3731,7 +3731,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         );
         $cognitoIdentityId = $this->getAuthUser($user);
 
-        $lastYear = new \DateTime();
+        $lastYear = \DateTime::createFromFormat('U', time());
         $lastYear = $lastYear->sub(new \DateInterval('P350D'));
         $policy = static::initPolicy(
             $user,
@@ -3751,7 +3751,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
 
         $renewalPolicy = static::$policyService->createPendingRenewal(
             $policy,
-            new \DateTime()
+            \DateTime::createFromFormat('U', time())
         );
         $this->assertEquals(Policy::STATUS_PENDING_RENEWAL, $renewalPolicy->getStatus());
 
@@ -3788,7 +3788,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         );
         $cognitoIdentityId = $this->getAuthUser($user);
 
-        $lastYear = new \DateTime();
+        $lastYear = \DateTime::createFromFormat('U', time());
         $lastYear = $lastYear->sub(new \DateInterval('P350D'));
         $policy = static::initPolicy(
             $user,
@@ -3808,7 +3808,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
 
         $renewalPolicy = static::$policyService->createPendingRenewal(
             $policy,
-            new \DateTime()
+            \DateTime::createFromFormat('U', time())
         );
         $this->assertEquals(Policy::STATUS_PENDING_RENEWAL, $renewalPolicy->getStatus());
 
@@ -3848,7 +3848,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         );
         $cognitoIdentityId = $this->getAuthUser($user);
 
-        $lastYear = new \DateTime();
+        $lastYear = \DateTime::createFromFormat('U', time());
         $lastYear = $lastYear->sub(new \DateInterval('P350D'));
         $policy = static::initPolicy(
             $user,
@@ -3868,7 +3868,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
 
         $renewalPolicy = static::$policyService->createPendingRenewal(
             $policy,
-            new \DateTime()
+            \DateTime::createFromFormat('U', time())
         );
         $this->assertEquals(Policy::STATUS_PENDING_RENEWAL, $renewalPolicy->getStatus());
 
@@ -4729,7 +4729,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
 
     public function testUpdateUserTooYoung()
     {
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         $cognitoIdentityId = $this->getAuthUser(self::$testUser3);
         $url = sprintf('/api/v1/auth/user/%s', self::$testUser3->getId());
         $data = [
@@ -5336,7 +5336,9 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
         $data = $this->verifyResponse(200);
 
-        $this->assertNotNull(self::$client->getProfile());
+        if (!self::$client->getProfile()) {
+            throw new \Exception('Profiler must be enabled');
+        }
         if (self::$client->getProfile()) {
             /** @var EventDataCollector $eventDataCollector */
             $eventDataCollector = self::$client->getProfile()->getCollector('events');

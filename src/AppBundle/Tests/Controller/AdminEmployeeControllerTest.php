@@ -38,9 +38,9 @@ class AdminEmployeeControllerTest extends BaseControllerTest
     public function testDebtCollectorEmails()
     {
         // start policy 45 days ago
-        $date = new \DateTime();
+        $date = \DateTime::createFromFormat('U', time());
         $date->sub(new \DateInterval('P91D'));
-        $dateClaim = new \DateTime();
+        $dateClaim = \DateTime::createFromFormat('U', time());
         $dateClaim->sub(new \DateInterval('P90D'));
         $email = $this->generateEmail('testDebtCollectorEmails', $this);
 
