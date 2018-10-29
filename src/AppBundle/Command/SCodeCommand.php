@@ -6,6 +6,7 @@ use AppBundle\Repository\PolicyRepository;
 use AppBundle\Repository\SCodeRepository;
 use AppBundle\Service\BranchService;
 use AppBundle\Service\RouterService;
+use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -17,9 +18,35 @@ use AppBundle\Document\Policy;
 use AppBundle\Document\SCode;
 use AppBundle\Document\DateTrait;
 
-class SCodeCommand extends BaseCommand
+class SCodeCommand extends ContainerAwareCommand
 {
     use DateTrait;
+
+    /** @var DocumentManager  */
+    protected $dm;
+
+    /** @var RouterService */
+    protected $routerService;
+
+    /** @var BranchService */
+    protected $branchService;
+
+    /** @var string */
+    protected $branchDomain;
+
+    public function __construct(
+        DocumentManager $dm,
+        RouterService $routerService,
+        BranchService $branchService,
+        $branchDomain
+    ) {
+        parent::__construct();
+        $this->dm = $dm;
+        $this->routerService = $routerService;
+        $this->branchService = $branchService;
+        $this->branchDomain = $branchDomain;
+    }
+
 
     protected function configure()
     {
@@ -61,14 +88,13 @@ class SCodeCommand extends BaseCommand
         $updateSource = $input->getOption('update-source');
         $updateDate = $input->getOption('update-date') ?
             new \DateTime($input->getOption('update-date')) :
-            new \DateTime();
+            \DateTime::createFromFormat('U', time());
         $updateDate = $this->startOfDay($updateDate);
 
-        $dm = $this->getManager();
         /** @var PolicyRepository $policyRepo */
-        $policyRepo = $dm->getRepository(Policy::class);
+        $policyRepo = $this->dm->getRepository(Policy::class);
         /** @var SCodeRepository $scodeRepo */
-        $scodeRepo = $dm->getRepository(SCode::class);
+        $scodeRepo = $this->dm->getRepository(SCode::class);
 
         if ($policyNumber) {
             /** @var Policy $policy */
@@ -79,17 +105,18 @@ class SCodeCommand extends BaseCommand
             $scode = $policy->getStandardSCode();
             $this->printSCode($output, $scode);
             $this->updateSCode($output, $scode, $updateType, $policyNumber);
-            $dm->flush();
+            $this->dm->flush();
         } else {
             if ($updateSource == 'google') {
                 $scodes = $scodeRepo->getLinkPrefix('https://goo.gl');
             } elseif ($updateSource == 'branch') {
-                $scodes = $scodeRepo->getLinkPrefix($this->getContainer()->getParameter('branch_domain'));
+                $scodes = $scodeRepo->getLinkPrefix($this->branchDomain);
             } else {
                 $scodes = $scodeRepo->findAll();
             }
             $count = 1;
             foreach ($scodes as $scode) {
+                /** @var SCode $scode */
                 if ($scode->getUpdatedDate() && $scode->getUpdatedDate() >= $updateDate) {
                     continue;
                 }
@@ -97,34 +124,30 @@ class SCodeCommand extends BaseCommand
                     $this->updateSCode($output, $scode, $updateType);
                 }
                 if ($count % 100 == 0) {
-                    $dm->flush();
+                    $this->dm->flush();
                 }
             }
-            $dm->flush();
+            $this->dm->flush();
         }
 
         $output->writeln(implode(PHP_EOL, $lines));
         $output->writeln('Finished');
     }
 
-    private function updateSCode($output, $scode, $updateType, $policyNumber = null)
+    private function updateSCode(OutputInterface $output, SCode $scode, $updateType, $policyNumber = null)
     {
         if (!$scode) {
             throw new \Exception(sprintf('Unable to find scode for policy %s', $policyNumber));
         }
-        /** @var BranchService $branch */
-        $branch = $this->getContainer()->get('app.branch');
-        /** @var RouterService $routerService */
-        $routerService = $this->getContainer()->get('app.router');
         if ($updateType == 'db') {
-            $shareLink = $branch->generateSCode($scode->getCode());
+            $shareLink = $this->branchService->generateSCode($scode->getCode());
             $scode->setShareLink($shareLink);
         } elseif ($updateType == 'branch') {
-            if (mb_stripos($scode->getShareLink(), $this->getContainer()->getParameter('branch_domain')) !== false) {
-                $branch->update($scode->getShareLink(), [
-                    '$desktop_url' => $routerService->generateUrl('scode', ['code' => $scode->getCode()]),
+            if (mb_stripos($scode->getShareLink(), $this->branchDomain) !== false) {
+                $this->branchService->update($scode->getShareLink(), [
+                    '$desktop_url' => $this->routerService->generateUrl('scode', ['code' => $scode->getCode()]),
                 ]);
-                $scode->setUpdatedDate(new \DateTime());
+                $scode->setUpdatedDate(\DateTime::createFromFormat('U', time()));
             } else {
                 $output->writeln(sprintf('%s is not a branch url', $scode->getShareLink()));
             }
@@ -134,7 +157,7 @@ class SCodeCommand extends BaseCommand
         $this->printSCode($output, $scode);
     }
 
-    private function printSCode($output, $scode)
+    private function printSCode(OutputInterface $output, SCode $scode)
     {
         $output->writeln(sprintf(
             '%s %s %s',

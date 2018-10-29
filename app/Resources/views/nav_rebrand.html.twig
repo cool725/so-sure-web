@@ -30,16 +30,19 @@
     {% else %}
         <ul class="nav navbar-nav flex-row align-items-center">
             <li class="nav-item d-none d-xl-block pr-xl-5">
-                <a href="{{ path('claim') }}" class="nav-link">Make a claim</a>
+                <a href="{{ path('claim') }}"
+                   class="nav-link {{ app.request.get('_route') == 'claim' ? 'nav-active' }}">
+                    Make a Claim
+                </a>
             </li>
             <li class="nav-item d-none d-xl-block pr-xl-5">
-                <a href="{{ path('faq') }}" class="nav-link">FAQs</a>
+                <a href="{{ path('faq') }}"
+                   class="nav-link {{ app.request.get('_route') == 'faq' ? 'nav-active' }}">
+                   FAQs
+                </a>
             </li>
             <li class="nav-item d-none d-xl-block pr-xl-5">
                 <a href="https://blog.wearesosure.com" target="_blank" class="nav-link">Blog</a>
-            </li>
-            <li class="nav-item d-none d-xl-block pr-xl-5">
-                <a href="{{ path('about_how_to_contact_so_sure') }}" class="nav-link">Contact</a>
             </li>
             {% if app.user is not null and app.user %}
                 <li class="nav-item d-none d-xl-block pr-xl-5">
@@ -79,7 +82,7 @@
             </li>
         </ul>
     {% endif %}
-    <div id="menu" class="menu d-flex flex-column d-lg-none">
+    <div id="menu" class="menu d-flex flex-column d-xl-none">
         <ul class="list-unstyled align-self-stretch menu__links">
             {% if app.user is not null and app.user %}
                 <li>
@@ -95,7 +98,7 @@
                 </li>
             {% endif %}
             <li>
-                <a href="{{ path('claim') }}" class="h5">Make a claim</a>
+                <a href="{{ path('claim') }}" class="h5">Make a Claim</a>
             </li>
             <li>
                 <a href="{{ path('faq') }}" class="h5">FAQs</a>

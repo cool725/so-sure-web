@@ -274,7 +274,7 @@ class OpsController extends BaseController
             if (!$validPolicyMonthly->hasMonetaryClaimed() &&
                 $validPolicyMonthly->getPremiumPlan() == Policy::PLAN_MONTHLY &&
                 count($validPolicyMonthly->getUser()->getValidPolicies(true)) == 1 &&
-                $validPolicyMonthly->isPolicyPaidToDate(new \DateTime())) {
+                $validPolicyMonthly->isPolicyPaidToDate(\DateTime::createFromFormat('U', time()))) {
                 break;
             } else {
                 $validPolicyMonthly = null;
@@ -285,7 +285,7 @@ class OpsController extends BaseController
             if (!$unpaidValidPolicyMonthly->hasMonetaryClaimed() &&
                 $unpaidValidPolicyMonthly->getPremiumPlan() == Policy::PLAN_MONTHLY &&
                 count($unpaidValidPolicyMonthly->getUser()->getValidPolicies(true)) == 1 &&
-                !$unpaidValidPolicyMonthly->isPolicyPaidToDate(new \DateTime())) {
+                !$unpaidValidPolicyMonthly->isPolicyPaidToDate(\DateTime::createFromFormat('U', time()))) {
                 break;
             } else {
                 $unpaidValidPolicyMonthly = null;
@@ -544,6 +544,7 @@ class OpsController extends BaseController
                 'sxt.cdn.skype.com',
                 'cdn.joinhoney.com',
                 'mozbar.moz.com',
+                'gjtrack.ucweb.com',
             ])) {
                 $logger->debug(sprintf('Content-Security-Policy called with ignore host: %s', $host));
 
@@ -613,7 +614,7 @@ class OpsController extends BaseController
     {
         $logger = $this->get('logger');
         $data = json_decode($request->getContent(), true);
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         $data['browser'] = $request->headers->get('User-Agent');
         $this->get('snc_redis.default')->hset('client-validation', json_encode($data), $now->format('U'));
         $logger->debug(sprintf('Validation Endpoint %s', json_encode($data)));

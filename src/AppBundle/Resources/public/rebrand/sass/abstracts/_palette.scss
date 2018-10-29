@@ -32,6 +32,7 @@ $pale-cornflower-blue: #a8d1f7; // < $blue-x
 $facebook: #3B5998;
 $google:   #DF4A32;
 $starling: #593FA7;
+$twitter:  #00aced;
 
 // Extend Theme colours and overide primary BS colour
 $theme-colors: (
@@ -60,6 +61,7 @@ $theme-colors: (
     "facebook":             $facebook,
     "google":               $google,
     "starling":             $starling,
+    "twitter":              $twitter,
 );
 
 // Bootstrap overides
@@ -94,8 +96,16 @@ $dark:          $haiti;
 }
 
 // Opacity
+.opacity-25 {
+    opacity: 0.25;
+}
+
 .opacity-50 {
     opacity: 0.5;
+}
+
+.opacity-75 {
+    opacity: 0.75;
 }
 
 a.text-hover-white {

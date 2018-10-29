@@ -387,7 +387,7 @@ class ReceperioService extends BaseImeiService
                 $data = json_decode($response, true);
                 $this->redis->setex($key, self::DUEDILIGENCE_CACHE_TIME, serialize($data));
 
-                $now = new \DateTime();
+                $now = \DateTime::createFromFormat('U', time());
                 $logKey = sprintf(
                     'receperio:duediligence:%s:%s:%s',
                     $this->storeId,
@@ -591,7 +591,7 @@ class ReceperioService extends BaseImeiService
                 $data = json_decode($response, true);
                 $this->redis->setex($key, self::CLAIMSCHECK_CACHE_TIME, serialize($data));
 
-                $now = new \DateTime();
+                $now = \DateTime::createFromFormat('U', time());
                 $logKey = sprintf(
                     'receperio:claimscheck:%s:%s:%s',
                     $this->storeId,
@@ -832,7 +832,7 @@ class ReceperioService extends BaseImeiService
                 $data = json_decode($response, true);
                 $this->redis->setex($key, self::MAKEMODEL_CACHE_TIME, serialize($data));
 
-                $now = new \DateTime();
+                $now = \DateTime::createFromFormat('U', time());
                 $logKey = sprintf('receperio:makemodel:%s:%s:%s', $this->storeId, $now->format('Y'), $now->format('d'));
                 $this->redis->zincrby($logKey, 1, $serialNumber);
 

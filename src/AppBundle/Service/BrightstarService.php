@@ -80,7 +80,7 @@ class BrightstarService extends S3EmailService
 
     public function validateClaimDetails(Claim $claim, Brightstar $brightstar)
     {
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         $warningDate = $this->addBusinessDays($brightstar->orderDate, 3);
 
         $policy = $claim->getPolicy();

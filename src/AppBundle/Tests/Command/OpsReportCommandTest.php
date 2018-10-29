@@ -17,6 +17,7 @@ class OpsReportCommandTest extends KernelTestCase
     protected static $redis;
     protected static $kernel;
     protected static $client;
+    protected static $mailer;
 
     public static function setUpBeforeClass()
     {
@@ -32,13 +33,15 @@ class OpsReportCommandTest extends KernelTestCase
         //now we can instantiate our service (if you want a fresh one for
         //each test method, do this in setUp() instead
         self::$redis = self::$container->get('snc_redis.default');
+
+        self::$mailer = self::$container->get('app.mailer');
     }
 
     public function callCommand($expectedOutput)
     {
 
         $application = new Application(self::$kernel);
-        $application->add(new OpsReportCommand());
+        $application->add(new OpsReportCommand(self::$mailer, self::$redis));
         $command = $application->find('sosure:ops:report');
         $commandTester = new CommandTester($command);
         $commandTester->execute(array(
@@ -60,7 +63,7 @@ class OpsReportCommandTest extends KernelTestCase
             ],
             'browser' => 'Internal'
         ];
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         self::$redis->hset('client-validation', json_encode($data), $now->format('U'));
         $this->callCommand('no validation');
     }
@@ -75,7 +78,7 @@ class OpsReportCommandTest extends KernelTestCase
             ],
             'browser' => 'Internal'
         ];
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         self::$redis->hset('client-validation', json_encode($data), $now->format('U'));
         $this->callCommand('found validation');
     }
@@ -89,7 +92,7 @@ class OpsReportCommandTest extends KernelTestCase
             ],
             'browser' => 'Internal'
         ];
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         self::$redis->hset('client-validation', json_encode($data), $now->format('U'));
         $this->callCommand('no validation');
     }
@@ -100,7 +103,7 @@ class OpsReportCommandTest extends KernelTestCase
             'url' => '/testurl3',
             'browser' => 'Internal'
         ];
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         self::$redis->hset('client-validation', json_encode($data), $now->format('U'));
         $this->callCommand('no validation');
     }

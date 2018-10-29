@@ -27,7 +27,7 @@ class JudoFile extends DailyTransactionUploadFile
      */
     public function getS3FileName()
     {
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
 
         return sprintf(
             'banking/judo-%d-%02d-%s',

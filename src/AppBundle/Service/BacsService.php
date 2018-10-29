@@ -299,7 +299,7 @@ class BacsService
     {
         $tmpFile = $file->move(sys_get_temp_dir());
 
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         $sftpFilename = sprintf('%s-%s.csv', $now->format('Ymd'), $now->format('U'));
 
         $fileData = file_get_contents($tmpFile);
@@ -360,7 +360,7 @@ class BacsService
         $folder = 'bacs-report'
     ) {
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
 
         $encTempFile = sprintf('%s/enc-%s', sys_get_temp_dir(), $filename);
@@ -921,7 +921,11 @@ class BacsService
                 /** @var User $user */
                 $user = $repo->findOneBy(['paymentMethod.bankAccount.reference' => $reference]);
                 if (!$user) {
-                    throw new \Exception(sprintf('Unable to find user with reference %s', $reference));
+                    $error = sprintf('Unable to find user with reference %s. Unable to cancel mandate.', $reference);
+                    $results['errors'][] = $error;
+                    $this->logger->warning($error);
+
+                    continue;
                 }
 
                 $reason = $this->getReason($element);
@@ -992,7 +996,7 @@ class BacsService
     public function bacsFileSubmitted(AccessPayFile $file)
     {
         $file->setStatus(AccessPayFile::STATUS_SUBMITTED);
-        $file->setSubmittedDate(new \DateTime());
+        $file->setSubmittedDate(\DateTime::createFromFormat('U', time()));
         $paymentRepo = $this->dm->getRepository(BacsPayment::class);
 
         $payments = $paymentRepo->findBy([
@@ -1202,7 +1206,7 @@ class BacsService
         $source = Payment::SOURCE_TOKEN
     ) {
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
 
         if (!$amount) {
@@ -1265,7 +1269,7 @@ class BacsService
         }
 
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
 
         $advanceDate = clone $date;
@@ -1332,7 +1336,7 @@ class BacsService
                 $paymentMethod->getBankAccount()->setMandateSerialNumber($serialNumber);
 
                 // do not attempt to take payment until 2 business days after to allow for mandate
-                $initialPaymentSubmissionDate = new \DateTime();
+                $initialPaymentSubmissionDate = \DateTime::createFromFormat('U', time());
                 $initialPaymentSubmissionDate = $this->addBusinessDays($initialPaymentSubmissionDate, 2);
                 $paymentMethod->getBankAccount()->setInitialPaymentSubmissionDate($initialPaymentSubmissionDate);
             }
@@ -1548,8 +1552,9 @@ class BacsService
 
         $this->generatePaymentsDebits($prefix, $date, $metadata, $update);
 
+        /** @var BacsPaymentRepository $repo */
         $repo = $this->dm->getRepository(BacsPayment::class);
-        $payments = $repo->findBy(['status' => BacsPayment::STATUS_PENDING]);
+        $payments = $repo->getAllPendingDebits();
         foreach ($payments as $payment) {
             /** @var BacsPayment $payment */
             $policy = $payment->getPolicy();
@@ -1743,12 +1748,16 @@ class BacsService
         return $processed;
     }
 
+    /**
+     * @return Policy
+     */
     public function getPolicy($id)
     {
         if (!$id) {
             throw new \InvalidArgumentException('Missing policyId');
         }
         $repo = $this->dm->getRepository(Policy::class);
+        /** @var Policy $policy */
         $policy = $repo->find($id);
         if (!$policy) {
             throw new \InvalidArgumentException(sprintf('Unable to find policyId: %s', $id));
@@ -1759,7 +1768,7 @@ class BacsService
 
     public function generateBacsPdf(Policy $policy)
     {
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         /** @var BacsPaymentMethod $paymentMethod */
         $paymentMethod = $policy->getUser()->getPaymentMethod();
         $bankAccount = $paymentMethod->getBankAccount();
@@ -1791,7 +1800,7 @@ class BacsService
             $tmpFile
         );
 
-        $date = new \DateTime();
+        $date = \DateTime::createFromFormat('U', time());
         $ddNotificationFile = new DirectDebitNotificationFile();
         $ddNotificationFile->setBucket(self::S3_POLICY_BUCKET);
         $ddNotificationFile->setKeyFormat(

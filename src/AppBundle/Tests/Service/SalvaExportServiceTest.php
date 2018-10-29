@@ -114,7 +114,7 @@ class SalvaExportServiceTest extends WebTestCase
         $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
         $policy->setStatus(SalvaPhonePolicy::STATUS_PENDING);
 
-        $issueDate = new \DateTime();
+        $issueDate = \DateTime::createFromFormat('U', time());
         $issueDate->setTimezone(new \DateTimeZone('Europe/London'));
         static::$policyService->create($policy);
         $issueDate2 = clone $issueDate;
@@ -152,9 +152,9 @@ class SalvaExportServiceTest extends WebTestCase
         $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
         $policy->setStatus(SalvaPhonePolicy::STATUS_PENDING);
 
-        $futureDate = new \DateTime();
+        $futureDate = \DateTime::createFromFormat('U', time());
         $futureDate = $futureDate->add(new \DateInterval('P20D'));
-        $issueDate = new \DateTime();
+        $issueDate = \DateTime::createFromFormat('U', time());
         static::$policyService->create($policy, $futureDate);
         $issueDate2 = clone $issueDate;
         $issueDate2->add(new \DateInterval('PT1S'));
@@ -303,7 +303,7 @@ class SalvaExportServiceTest extends WebTestCase
 
     public function testPaymentsCashback()
     {
-        $ago = new \DateTime();
+        $ago = \DateTime::createFromFormat('U', time());
         $ago = $ago->sub(new \DateInterval('P1D'));
 
         $user = static::createUser(
@@ -316,10 +316,10 @@ class SalvaExportServiceTest extends WebTestCase
             $user,
             static::$dm,
             $this->getRandomPhone(static::$dm),
-            new \DateTime(),
+            \DateTime::createFromFormat('U', time()),
             true
         );
-//        static::addJudoPayPayment(self::$judopay, $policy, new \DateTime());
+//        static::addJudoPayPayment(self::$judopay, $policy, \DateTime::createFromFormat('U', time()));
 
         $policy->setStatus(Policy::STATUS_PENDING);
         static::$policyService->setEnvironment('prod');
@@ -332,8 +332,7 @@ class SalvaExportServiceTest extends WebTestCase
         // build server delay
         sleep(1);
         
-        $now = new \DateTime();
-        $now = $now->sub(new \DateInterval('PT1S'));
+        $now = \DateTime::createFromFormat('U', time());
         $chargeback = new ChargebackPayment();
         $chargeback->setDate($now);
         $chargeback->setSource(Payment::SOURCE_ADMIN);
@@ -413,14 +412,14 @@ class SalvaExportServiceTest extends WebTestCase
             $user,
             static::$dm,
             $this->getRandomPhone(static::$dm),
-            new \DateTime(),
+            \DateTime::createFromFormat('U', time()),
             true
         );
-        static::addJudoPayPayment(self::$judopay, $policy, new \DateTime());
+        static::addJudoPayPayment(self::$judopay, $policy, \DateTime::createFromFormat('U', time()));
 
         $policy->setStatus(Policy::STATUS_PENDING);
         static::$policyService->setEnvironment('prod');
-        static::$policyService->create($policy, new \DateTime(), true);
+        static::$policyService->create($policy, \DateTime::createFromFormat('U', time()), true);
         static::$policyService->setEnvironment('test');
         static::$dm->flush();
 
@@ -471,7 +470,7 @@ class SalvaExportServiceTest extends WebTestCase
             $user,
             static::$dm,
             $this->getRandomPhone(static::$dm),
-            new \DateTime(),
+            \DateTime::createFromFormat('U', time()),
             true
         );
         $policy->setSalvaStatus(SalvaPhonePolicy::SALVA_STATUS_WAIT_CANCELLED);

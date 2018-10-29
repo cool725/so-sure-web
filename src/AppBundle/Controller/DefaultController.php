@@ -126,6 +126,14 @@ class DefaultController extends BaseController
     }
 
     /**
+     * @Route("/social-insurance", name="social_insurance", options={"sitemap"={"priority":"0.5","changefreq":"daily"}})
+     */
+    public function socialInsurance()
+    {
+        return $this->render('AppBundle:Default:socialInsurance.html.twig');
+    }
+
+    /**
      * @Route("/eb", name="eb")
      * @Template
      */

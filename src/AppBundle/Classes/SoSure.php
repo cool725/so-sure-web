@@ -21,7 +21,12 @@ class SoSure
 
     public static function hasSoSureEmail($email)
     {
-        return mb_stripos($email, '@so-sure.com') !== false || mb_stripos($email, '@so-sure.net') !== false;
+        return mb_stripos($email, '@so-sure.com') !== false;
+    }
+
+    public static function hasSoSureRewardsEmail($email)
+    {
+        return mb_stripos($email, '@so-sure.net') !== false;
     }
 
     // make sure uppper case/normalised
@@ -34,7 +39,8 @@ class SoSure
     // OL11 1QA added 21/3/18 due to suspecion of fraud
     // WN1 2XD added 23/4/18 due to suspected fraud for Mob/2018/5503304
     // TW15 1LN added 1/5/18 due to attempting to insure an already damaged phone
-    public static $yearlyOnlyPostcodes = ['TN15 7LY', 'PE21 7TB', 'OL11 1QA', 'WN1 2XD', 'TW15 1LN'];
+    // CB6 1DD added 23/8/18 reason unknown
+    public static $yearlyOnlyPostcodes = ['TN15 7LY', 'PE21 7TB', 'OL11 1QA', 'WN1 2XD', 'TW15 1LN', 'CB6 1DD'];
 
     public static function getActivationInterval()
     {

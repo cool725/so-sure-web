@@ -28,7 +28,7 @@ class SmsOptOut extends Opt
     public function setMobile($mobile)
     {
         if ($this->mobile != $this->normalizeUkMobile($mobile)) {
-            $this->setUpdated(new \DateTime());
+            $this->setUpdated(\DateTime::createFromFormat('U', time()));
         }
         $this->mobile = $this->normalizeUkMobile($mobile);
     }

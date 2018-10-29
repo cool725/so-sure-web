@@ -7,7 +7,7 @@ trait CurrencyTrait
     public function getCurrentVatRate(\DateTime $date = null)
     {
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
 
         return 0.2;
@@ -16,7 +16,7 @@ trait CurrencyTrait
     public function getCurrentIptRate(\DateTime $date = null)
     {
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
 
         if ($date < new \DateTime('2016-10-01')) {
@@ -73,6 +73,15 @@ trait CurrencyTrait
         }
 
         return abs($float1 - $float2) < 0.00001;
+    }
+
+    public function areEqualToSixDp($float1, $float2)
+    {
+        if (null === $float1 || null === $float2) {
+            return false;
+        }
+
+        return abs($float1 - $float2) < 0.0000001;
     }
 
     public function greaterThanZero($float)

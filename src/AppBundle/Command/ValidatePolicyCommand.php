@@ -11,6 +11,8 @@ use AppBundle\Repository\PolicyRepository;
 use AppBundle\Service\MailerService;
 use AppBundle\Service\PolicyService;
 use AppBundle\Service\RouterService;
+use Aws\S3\S3Client;
+use Doctrine\ODM\MongoDB\DocumentManager;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
@@ -24,10 +26,45 @@ use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\File\PicSureFile;
 use AppBundle\Document\ScheduledPayment;
 
-class ValidatePolicyCommand extends BaseCommand
+class ValidatePolicyCommand extends ContainerAwareCommand
 {
     use CurrencyTrait;
     use DateTrait;
+
+    /** @var PolicyService */
+    protected $policyService;
+
+    /** @var DocumentManager */
+    protected $dm;
+
+    /** @var S3Client */
+    protected $s3;
+
+    /** @var MailerService  */
+    protected $mailerService;
+
+    /** @var RouterService */
+    protected $routerService;
+
+    /** @var LoggerInterface */
+    protected $logger;
+
+    public function __construct(
+        PolicyService $policyService,
+        DocumentManager $dm,
+        S3Client $s3,
+        MailerService $mailerService,
+        RouterService $routerService,
+        LoggerInterface $logger
+    ) {
+        parent::__construct();
+        $this->policyService = $policyService;
+        $this->dm = $dm;
+        $this->s3 = $s3;
+        $this->mailerService = $mailerService;
+        $this->routerService = $routerService;
+        $this->logger = $logger;
+    }
 
     protected function configure()
     {
@@ -118,6 +155,7 @@ class ValidatePolicyCommand extends BaseCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $lines = [];
+        $csvData = [];
         $policies = [];
         $date = $input->getOption('date');
         $prefix = $input->getOption('prefix');
@@ -145,11 +183,8 @@ class ValidatePolicyCommand extends BaseCommand
         } elseif ($resyncPicsureMetadata) {
             $this->resyncPicsureMetadata();
         } else {
-            /** @var PolicyService $policyService */
-            $policyService = $this->getContainer()->get('app.policy');
-            $dm = $this->getManager();
             /** @var PolicyRepository $policyRepo */
-            $policyRepo = $dm->getRepository(Policy::class);
+            $policyRepo = $this->dm->getRepository(Policy::class);
 
             if ($policyNumber || $policyId) {
                 /** @var Policy $policy */
@@ -165,7 +200,7 @@ class ValidatePolicyCommand extends BaseCommand
                     throw new \Exception(sprintf('Unable to find policy for %s', $policyNumber));
                 }
                 if ($create) {
-                    $policyService->create($policy, null, true);
+                    $this->policyService->create($policy, null, true);
                     $output->writeln(sprintf('Policy %s created', $policy->getPolicyNumber()));
                     return;
                 }
@@ -185,7 +220,7 @@ class ValidatePolicyCommand extends BaseCommand
                 ];
                 $this->validatePolicy($policy, $policies, $lines, $data);
                 if ($updatePotValue || $adjustScheduledPayments) {
-                    $dm->flush();
+                    $this->dm->flush();
                 }
             } else {
                 $policies = $policyRepo->findAll();
@@ -206,7 +241,16 @@ class ValidatePolicyCommand extends BaseCommand
                         'unpaid' => $unpaid,
                         'validateCancelled' => !$skipCancelled,
                     ];
+                    $prevLines = $lines;
                     $this->validatePolicy($policy, $policies, $lines, $data);
+                    $newLines = array_diff($lines, $prevLines);
+                    $adjustedNewLines = [];
+                    foreach ($newLines as $item) {
+                        if (mb_stripos($item, '<a ') === false) {
+                            $adjustedNewLines[] = $item;
+                        }
+                    }
+                    $csvData[$policy->getPolicyNumber()] = $adjustedNewLines;
                 }
 
                 $lines[] = '';
@@ -215,10 +259,9 @@ class ValidatePolicyCommand extends BaseCommand
                 $lines[] = 'Pending Cancellations';
                 $lines[] = '-------------';
                 $lines[] = '';
-                /** @var PolicyService $policyService */
-                $policyService = $this->getContainer()->get('app.policy');
-                $pending = $policyService->getPoliciesPendingCancellation(true, $prefix);
+                $pending = $this->policyService->getPoliciesPendingCancellation(true, $prefix);
                 foreach ($pending as $policy) {
+                    /** @var Policy $policy */
                     $lines[] = sprintf(
                         'Policy %s is pending cancellation on %s',
                         $policy->getPolicyNumber(),
@@ -243,9 +286,10 @@ class ValidatePolicyCommand extends BaseCommand
                 $lines[] = 'Wait Claims';
                 $lines[] = '-------------';
                 $lines[] = '';
-                $repo = $dm->getRepository(Policy::class);
+                $repo = $this->dm->getRepository(Policy::class);
                 $waitClaimPolicies = $repo->findBy(['status' => Policy::STATUS_EXPIRED_WAIT_CLAIM]);
                 foreach ($waitClaimPolicies as $policy) {
+                    /** @var Policy $policy */
                     $lines[] = sprintf(
                         'Policy %s is expired with an active claim that needs resolving ASAP',
                         $policy->getPolicyNumber()
@@ -259,18 +303,33 @@ class ValidatePolicyCommand extends BaseCommand
             }
 
             if (!$skipEmail) {
-                /** @var MailerService $mailer */
-                $mailer = $this->getContainer()->get('app.mailer');
-                $mailer->send(
-                    'Policy Validation & Pending Cancellations',
-                    'tech+ops@so-sure.com',
-                    implode('<br />', $lines)
-                );
+                $this->sendEmail($lines, $csvData);
             }
 
             $output->writeln(implode(PHP_EOL, $lines));
             $output->writeln('Finished');
         }
+    }
+
+    private function sendEmail($lines, $data)
+    {
+        $tmpFile = sprintf('%s/%s', sys_get_temp_dir(), 'sosure-policy-validation.csv');
+        $csvLine = [];
+        foreach ($data as $policyNumber => $errors) {
+            foreach ($errors as $error) {
+                $csvLine[] = sprintf('"%s", "%s"', $policyNumber, str_replace('"', "''", $error));
+            }
+        }
+        $csvData = implode(PHP_EOL, $csvLine);
+        file_put_contents($tmpFile, $csvData);
+
+        $this->mailerService->send(
+            'Policy Validation & Pending Cancellations',
+            'tech+ops@so-sure.com',
+            implode('<br />', $lines),
+            null,
+            [$tmpFile]
+        );
     }
 
     private function validatePolicy(Policy $policy, &$policies, &$lines, $data)
@@ -281,7 +340,7 @@ class ValidatePolicyCommand extends BaseCommand
         try {
             $closeToExpiration = false;
             if ($policy->getPolicyExpirationDate()) {
-                $date = $data['validateDate'] ? $data['validateDate'] : new \DateTime();
+                $date = $data['validateDate'] ? $data['validateDate'] : \DateTime::createFromFormat('U', time());
                 $diff = $date->diff($policy->getPolicyExpirationDate());
                 $closeToExpiration = $diff->days < 14 && $diff->invert == 0;
             }
@@ -332,15 +391,14 @@ class ValidatePolicyCommand extends BaseCommand
             ) === false) {
                 if ($data['adjustScheduledPayments']) {
                     $this->header($policy, $policies, $lines);
-                    /** @var PolicyService $policyService */
-                    $policyService = $this->getContainer()->get('app.policy');
-                    if ($policyService->adjustScheduledPayments($policy)) {
+                    if ($this->policyService->adjustScheduledPayments($policy)) {
                         $lines[] = sprintf(
                             'Adjusted Incorrect scheduled payments for policy %s',
                             $policy->getPolicyNumber()
                         );
                     } else {
-                        $policy = $this->getManager()->merge($policy);
+                        /** @var Policy $policy */
+                        $policy = $this->dm->merge($policy);
                         $lines[] = sprintf(
                             'WARNING!! Failed to adjusted Incorrect scheduled payments for policy %s',
                             $policy->getPolicyNumber()
@@ -387,9 +445,7 @@ class ValidatePolicyCommand extends BaseCommand
 
             if ($data['validate-premiums'] && (!$policy->getStatus() ||
                 in_array($policy->getStatus(), [Policy::STATUS_PENDING, Policy::STATUS_MULTIPAY_REJECTED]))) {
-                /** @var PolicyService $policyService */
-                $policyService = $this->getContainer()->get('app.policy');
-                if ($policyService->validatePremium($policy)) {
+                if ($this->policyService->validatePremium($policy)) {
                     $this->header($policy, $policies, $lines);
                     $lines[] = sprintf(
                         'WARNING!! - Policy %s has its premium updated',
@@ -413,8 +469,11 @@ class ValidatePolicyCommand extends BaseCommand
             }
             $refund = $policy->getRefundAmount();
             $refundCommission = $policy->getRefundCommissionAmount();
+            $pendingBacsTotal = $policy->getPendingBacsPaymentsTotal(true);
+            $pendingBacsTotalCommission = $policy->getPendingBacsPaymentsTotalCommission(true);
             if (!in_array($policy->getId(), Salva::$refundValidationExclusions) &&
-                ($this->greaterThanZero($refund) || $this->greaterThanZero($refundCommission))) {
+                (($this->greaterThanZero($refund) && $refund > $pendingBacsTotal) ||
+                ($this->greaterThanZero($refundCommission) && $refundCommission > $pendingBacsTotalCommission))) {
                 $this->header($policy, $policies, $lines);
                 $lines[] = sprintf(
                     'Warning!! Refund Due. Refund %f / Commission %f',
@@ -425,8 +484,12 @@ class ValidatePolicyCommand extends BaseCommand
             // bacs checks are only necessary on active policies
             if ($policy->getUser()->hasBacsPaymentMethod() && $policy->isActive(true)) {
                 $bacsPayments = count($policy->getPaymentsByType(BacsPayment::class));
-                $bankAccount = $policy->getUser()->getBacsPaymentMethod()->getBankAccount();
-                if ($bankAccount->getMandateStatus() == BankAccount::MANDATE_SUCCESS) {
+                $bacsPaymentMethod = $policy->getUser()->getBacsPaymentMethod();
+                $bankAccount = null;
+                if ($bacsPaymentMethod) {
+                    $bankAccount = $bacsPaymentMethod->getBankAccount();
+                }
+                if ($bankAccount && $bankAccount->getMandateStatus() == BankAccount::MANDATE_SUCCESS) {
                     $isFirstPayment = $bankAccount->isFirstPayment();
                     if ($bacsPayments >= 1 && $isFirstPayment) {
                         $this->header($policy, $policies, $lines);
@@ -435,7 +498,7 @@ class ValidatePolicyCommand extends BaseCommand
                         $this->header($policy, $policies, $lines);
                         $lines[] = 'Warning!! No bacs payments, yet bank does not have first payment flag set';
                     }
-                    $now = new \DateTime();
+                    $now = \DateTime::createFromFormat('U', time());
 
                     if ($bankAccount->isAfterInitialNotificationDate()) {
                         if ($bacsPayments == 0) {
@@ -454,16 +517,14 @@ class ValidatePolicyCommand extends BaseCommand
         }
     }
 
-    private function header($policy, &$policies, &$lines)
+    private function header(Policy $policy, &$policies, &$lines)
     {
-        /** @var RouterService $routerService */
-        $routerService = $this->getContainer()->get('app.router');
         if (!isset($policies[$policy->getId()])) {
             $lines[] = '';
             $lines[] = sprintf(
                 '%s (<a href="%s">Admin</a>)',
                 $policy->getPolicyNumber() ? $policy->getPolicyNumber() : $policy->getId(),
-                $routerService->generateUrl('admin_policy', ['id' => $policy->getId()])
+                $this->routerService->generateUrl('admin_policy', ['id' => $policy->getId()])
             );
             $lines[] = '---';
             $policies[$policy->getId()] = true;
@@ -498,7 +559,7 @@ class ValidatePolicyCommand extends BaseCommand
         );
     }
 
-    private function failurePaymentMessage($policy, $prefix, $date)
+    private function failurePaymentMessage(Policy $policy, $prefix, $date)
     {
         $totalPaid = $policy->getTotalSuccessfulPayments($date);
         $expectedPaid = $policy->getTotalExpectedPaidToDate($date);
@@ -509,7 +570,7 @@ class ValidatePolicyCommand extends BaseCommand
         );
     }
 
-    private function failureIptRateMessage($policy)
+    private function failureIptRateMessage(Policy $policy)
     {
         return sprintf(
             'Unexpected ipt rate %0.2f (Expected %0.2f)',
@@ -518,7 +579,7 @@ class ValidatePolicyCommand extends BaseCommand
         );
     }
 
-    private function failurePotValueMessage($policy)
+    private function failurePotValueMessage(Policy $policy)
     {
         return sprintf(
             'Pot Value £%0.2f Expected £%0.2f Promo Pot Value £%0.2f Expected £%0.2f',
@@ -550,7 +611,7 @@ class ValidatePolicyCommand extends BaseCommand
 
     private function resyncPicsureStatus()
     {
-        $policyRepo = $this->getManager()->getRepository(PhonePolicy::class);
+        $policyRepo = $this->dm->getRepository(PhonePolicy::class);
 
         $picsurePolicies = $policyRepo->findBy(
             ['picSureStatus' => ['$in' => [PhonePolicy::PICSURE_STATUS_APPROVED,
@@ -559,6 +620,7 @@ class ValidatePolicyCommand extends BaseCommand
         );
 
         foreach ($picsurePolicies as $policy) {
+            /** @var PhonePolicy $policy */
             $files = $policy->getPolicyPicSureFiles();
             if (count($files) > 0) {
                 $metadata = $files[0]->getMetadata();
@@ -567,15 +629,13 @@ class ValidatePolicyCommand extends BaseCommand
                 }
             }
         }
-        $this->getManager()->flush();
+        $this->dm->flush();
     }
 
     private function resyncPicsureMetadata()
     {
-        /** @var \Aws\S3\S3Client */
-        $s3 = $this->getContainer()->get('aws.s3');
-        $policyRepo = $this->getManager()->getRepository(PhonePolicy::class);
-        $filesRepo = $this->getManager()->getRepository(PicSureFile::class);
+        $policyRepo = $this->dm->getRepository(PhonePolicy::class);
+        $filesRepo = $this->dm->getRepository(PicSureFile::class);
         $picsureFiles = $filesRepo->findAll();
 
         $picsurePolicies = $policyRepo->findBy(
@@ -586,10 +646,11 @@ class ValidatePolicyCommand extends BaseCommand
         );
 
         foreach ($picsurePolicies as $policy) {
+            /** @var PhonePolicy $policy */
             $files = $policy->getPolicyPicSureFiles();
             if (count($files) > 0) {
                 foreach ($files as $file) {
-                    $result = $s3->getObject(array(
+                    $result = $this->s3->getObject(array(
                         'Bucket' => $file->getBucket(),
                         'Key'    => $file->getKey(),
                     ));
@@ -608,9 +669,7 @@ class ValidatePolicyCommand extends BaseCommand
                             $file->addMetadata('picsure-suspected-fraud', $result['Metadata']['suspected-fraud']);
                             if ($result['Metadata']['suspected-fraud'] === "1") {
                                 $policy->setPicSureCircumvention(true);
-                                /** @var LoggerInterface $logger */
-                                $logger = $this->getContainer()->get('logger');
-                                $logger->error(sprintf(
+                                $this->logger->error(sprintf(
                                     'Detected pic-sure circumvention attempt for policy %s',
                                     $policy->getId()
                                 ));
@@ -622,6 +681,6 @@ class ValidatePolicyCommand extends BaseCommand
                 }
             }
         }
-        $this->getManager()->flush();
+        $this->dm->flush();
     }
 }

@@ -214,8 +214,8 @@ abstract class Payment
 
     public function __construct()
     {
-        $this->created = new \DateTime();
-        $this->date = new \DateTime();
+        $this->created = \DateTime::createFromFormat('U', time());
+        $this->date = \DateTime::createFromFormat('U', time());
     }
 
     public function getId()

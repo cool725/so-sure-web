@@ -13,6 +13,15 @@ use AppBundle\Document\User;
 
 class StatsdCommand extends ContainerAwareCommand
 {
+    /** @var Client */
+    protected $statsdClient;
+
+    public function __construct(Client $statsdClient)
+    {
+        parent::__construct();
+        $this->statsdClient = $statsdClient;
+    }
+
     protected function configure()
     {
         $this
@@ -30,8 +39,6 @@ class StatsdCommand extends ContainerAwareCommand
     {
         $name = $input->getArgument('name');
 
-        /** @var Client $statsd */
-        $statsd = $this->getContainer()->get('statsd');
-        $statsd->increment($name);
+        $this->statsdClient->increment($name);
     }
 }

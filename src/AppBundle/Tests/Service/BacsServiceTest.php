@@ -86,7 +86,7 @@ class BacsServiceTest extends WebTestCase
     private function setValidBacsPaymentMethod(User $user, $reference = null, \DateTime $date = null)
     {
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
         $bankAccount = new BankAccount();
         $bankAccount->setMandateStatus(BankAccount::MANDATE_SUCCESS);
@@ -138,7 +138,7 @@ class BacsServiceTest extends WebTestCase
 
     public function testExportPaymentsDebits()
     {
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         $user = static::createUser(
             static::$userManager,
             static::generateEmail('testExportPaymentsDebits', $this),
@@ -197,7 +197,7 @@ class BacsServiceTest extends WebTestCase
 
     public function testExportPaymentsDebitsPreventExpirationAfter()
     {
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         $user = static::createUser(
             static::$userManager,
             static::generateEmail('testExportPaymentsDebitsPreventExpirationAfter', $this),

@@ -1,0 +1,321 @@
+{% extends 'base_rebrand.html.twig' %}
+
+{# Set vars #}
+{% set body_class = 'social-insurance' %}
+
+{% block title %}so-sure - Reward Pot{% endblock %}
+{% block meta %}
+    <meta name="description" content="Social mobile phone insurance that's better and up to 80% cheaper when you connect with friends and don't claim. Download our app now to see how much you could save."/>
+{% endblock %}
+
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/social-insurance.css') }}">
+{% endblock %}
+
+{% block body %}
+
+    <section class="hero">
+        <div class="container container-xtra">
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="hero__intro">
+                        <h1 class="mb-4 text-white">
+                            <span class="sub">An insurance company,</span><br>
+                            giving you money back.<br>
+                            <span class="sub">Sorry, what!?</span>
+                        </h1>
+                        <p class="mb-4 text-white">By joining forces with your most careful friends and family, you could see up to 80% of your insurance premium reimbursed to you every year. Yes, really!</p>
+                    </div>
+                    <div class="hero__controls mb-5">
+                        <a href="#" class="btn btn-white btn-block-xs mr-sm-2 get-a-quote">Get a Quote</a>
+                        {# TODO: Add video to page simply use the embed url from youtube and replace the data attr #}
+{#                         <a href="#"
+                           class="btn btn-outline-white watch-video btn-block-xs"
+                           data-event="watch-video-index-hero"
+                           data-toggle="modal"
+                           data-target="#sosure-video-modal"
+                           data-src="https://www.youtube.com/embed/QEskwqsNgrQ">
+                            <i class="far fa-play-circle fa-lg opacity-50 mr-1"></i>
+                            How it works
+                        </a> #}
+                    </div>
+                </div>
+            </div>
+            <div class="hero__illustration-mobile d-block d-lg-none text-center">
+                <img src="{{ cdn_url }}/images/rebrand/rewardpot/so-sure_hero-illustration-reward-pot-mobile.png" alt="so-sure - social insurance" class="img-fluid opacity-75">
+            </div>
+        </div>
+        <div class="hero__illustration-desktop d-none d-lg-block">
+            <img src="{{ cdn_url }}/images/rebrand/rewardpot/so-sure_hero-illustration-reward-pot-desktop.png" alt="so-sure - social insurance" class="img-fluid">
+        </div>
+    </section>
+
+    <section class="cred">
+        <div class="container container-xtra py-4 d-lg-flex align-items-center justify-content-between">
+            <img src="{{ cdn_url }}/images/rebrand/credbar/so-sure_credbar-trustpilot.png" alt="Trustpilot">
+            <img src="{{ cdn_url }}/images/rebrand/credbar/so-sure_credbar-money.png" alt="Money">
+            <img src="{{ cdn_url }}/images/rebrand/credbar/so-sure_credbar-gocompare.png" alt="GoCompare">
+            <img src="{{ cdn_url }}/images/rebrand/credbar/so-sure_credbar-theguardian.png" alt="The Guardian">
+            <img src="{{ cdn_url }}/images/rebrand/credbar/so-sure_credbar-ft.png" alt="The Financial Times">
+        </div>
+    </section>
+
+    <section class="intro py-lg-5">
+        <div class="container container-xtra py-5">
+            <h2 class="h3 mb-5 text-primary">Here’s how it works</h2>
+            <div class="row">
+                <div class="col-lg-4">
+                    <div class="intro__step">
+                        <div class="intro__number d-flex justify-content-center align-items-center h4 text-primary">1</div>
+                        <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_connect.png" alt="so-sure - Start Connecting" width="180px">
+                    </div>
+                    <h5 class="text-primary">Start Connecting</h5>
+                    <p class="mb-5 text-zaffre">Invite as many people as you want. Your mum, dad, grandparents, or your mate Bob. You then decide who you want to connect to. Do you know who's really careful 😉?</p>
+                </div>
+                <div class="col-lg-4">
+                    <div class="intro__step">
+                        <div class="intro__number d-flex justify-content-center align-items-center h4 text-primary">2</div>
+                        <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_holding-phone.png" alt="so-sure - Be careful" width="180px">
+                    </div>
+                    <h5 class="text-primary">Be Careful</h5>
+                    <p class="mb-5 text-zaffre">Easy as that, don't break or lose your phone, or make any claims throughout the policy year. Oh, and make sure your connections do the same</p>
+                </div>
+                <div class="col-lg-4">
+                    <div class="intro__step">
+                        <div class="intro__number d-flex justify-content-center align-items-center h4 text-primary">3</div>
+                        <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_reward-pot.png" alt="so-sure - Get Rewarded" width="180px">
+                    </div>
+                    <h5 class="text-primary">Get Rewarded</h5>
+                    <p class="mb-2 text-zaffre">At the end of the year, when you and your connections haven’t claimed, your
+                    <a href="#what-is-the-reward-pot-text"
+                       data-cardbox-target="#what-is-the-reward-pot"
+                       data-cardbox-anchor="#what-is-the-reward-pot-text">Reward Pot</a>
+                    is paid out to you</p>
+                </div>
+            </div>
+            <a href="#" class="btn btn-primary btn-block-xs mt-3 get-a-quote">Get Insured in minutes</a>
+        </div>
+        <div class="intro__background d-none d-lg-block">
+            <img src="{{ cdn_url }}/images/rebrand/misc/so-sure_money-right-cut.png" alt="so-sure - Money Back" width="180px" class="d-fk-none">
+            <img src="{{ cdn_url }}/images/rebrand/misc/so-sure_money-right.png" alt="so-sure - Money Back" width="250px" class="d-none d-fk-inline">
+        </div>
+    </section>
+
+    <section class="history">
+        <div class="container container-xtra py-5">
+            <div class="d-lg-flex align-items-lg-center py-lg-5">
+                <div class="history__img">
+                    <img src="{{ cdn_url }}/images/rebrand/rewardpot/so-sure_insurance-history.png" alt="so-sure - Where it all started" class="img-fluid">
+                </div>
+                <div class="history__text mb-5 ml-lg-5">
+                    <h2 class="h3 mb-4 text-primary">Where it all started</h2>
+                    <p class="mb-5 text-zaffre">Insurance back in the 17th century was built for the people, but the focus slowly shifted to profits - often at the expense of the customer. We're restoring insurance back to its origins. We think you should pay for insurance when you need it and get some money back when you don't. Connecting with your friends and family is a great place to start.</p>
+                    {# TODO: Add video to page simply use the embed url from youtube and replace the data attr #}
+                    {# <a href="#"
+                       class="btn btn-primary watch-video btn-block-xs"
+                       data-event="watch-video-index-hero"
+                       data-toggle="modal"
+                       data-target="#sosure-video-modal"
+                       data-src="https://www.youtube.com/embed/QEskwqsNgrQ">
+                        <i class="far fa-play-circle fa-lg opacity-50 mr-1"></i>
+                        How it works
+                    </a> #}
+                </div>
+            </div>
+            <div class="d-lg-flex align-items-lg-center py-lg-5">
+                <div class="history__img order-lg-2">
+                    <img src="{{ cdn_url }}/images/rebrand/rewardpot/so-sure_reward-pot.png" alt="so-sure - When can I access the cash" class="img-fluid">
+                </div>
+                <div class="history__text mr-lg-5 order-lg-1">
+                    <h2 class="h3 mb-4 text-primary">When can I access the cash?</h2>
+                    <p class="mb-5 text-zaffre">Great question. If your connections don’t claim during the year, the reward pot will be paid out to everyone at the end of each person’s policy year. Some of customers use the money to reduce their monthly payments in the next policy year, and others spend it on themselves 🍾</p>
+                    <a href="#" class="btn btn-primary btn-block-xs mr-sm-2 get-a-quote">Get a Quote</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="faq py-lg-5">
+        <div class="container container-xtra py-5">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="text-center text-lg-left">
+                        <h2 class="h3 mb-3 text-primary">Reward Pot <br><span class="sub">FAQs</span></h2>
+                        <p class="mb-4">Here's the top questions we get asked.</p>
+                        <a href="{{ path('faq') }}#social-insurance-and-reward-pot" class="btn btn-primary btn-block-xs mx-auto mb-5">I have more Q's</a>
+                    </div>
+                </div>
+                <div class="col-md-8">
+                    <div id="what-is-the-reward-pot" class="expanding-cardbox expanding-cardbox-white mb-4">
+                        <div class="expanding-cardbox__body">
+                            <h5 class="expanding-cardbox__title text-zaffre mb-0">
+                                What is the Reward Pot? <i class="far fa-chevron-down text-dodger-blue fa-lg"></i>
+                            </h5>
+                            <div class="expanding-cardbox__expand text-zaffre mt-4">
+                                <p id="what-is-the-reward-pot-text">The reward pot is basically a <mark>group no claims bonus</mark>. For each person that buys insurance with us and connects together, for example You buy a policy and invite your mum to buy. She buys a policy and then you connect, each of you receive up to &pound;10 into your reward pots.</p>
+
+                                <div class="h6">4 people connected to you = &pound;40 in your reward pot, &pound;10 in each of theirs.</div>
+
+                                <div class="h6">8 people connected = &pound;80 in your reward pot, &pound;10 in each of theirs.</div>
+
+                                <p class="mb-0">If neither you nor your connected friends claim, we will payout to you the value of your reward pot at the end of the policy year.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="expanding-cardbox expanding-cardbox-white mb-4">
+                        <div class="expanding-cardbox__body">
+                            <h5 class="expanding-cardbox__title text-zaffre mb-0">
+                                Is the money back with the reward pot guaranteed? <i class="far fa-chevron-down text-dodger-blue fa-lg"></i>
+                            </h5>
+                            <div class="expanding-cardbox__expand text-zaffre mt-4">
+                                It depends on if you and your social circle make a claim. If none of you claim the money is guaranteed, however if someone makes a claim there may be no money left in the reward pot.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="expanding-cardbox expanding-cardbox-white mb-4">
+                        <div class="expanding-cardbox__body">
+                            <h5 class="expanding-cardbox__title text-zaffre mb-0">
+                                Can anyone connect to anyone? <i class="far fa-chevron-down text-dodger-blue fa-lg"></i>
+                            </h5>
+                            <div class="expanding-cardbox__expand text-zaffre mt-4">
+                                Yes, that is the beauty of social insurance, you can have as many connections as they like until your reward pot is worth 80% of the value of your insurance premium. For example if policy is &pound;100, you can have maximum 8 connections (&pound;80 / 80%).
+                            </div>
+                        </div>
+                    </div>
+                    <div class="expanding-cardbox expanding-cardbox-white mb-4">
+                        <div class="expanding-cardbox__body">
+                            <h5 class="expanding-cardbox__title text-zaffre mb-0">
+                                How do I make connections to people? <i class="far fa-chevron-down text-dodger-blue fa-lg"></i>
+                            </h5>
+                            <div class="expanding-cardbox__expand text-zaffre mt-4">
+                                Once you buy a policy its super easy to make connections either through our app or via SMS, email or WhatsApp.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="expanding-cardbox expanding-cardbox-white mb-4">
+                        <div class="expanding-cardbox__body">
+                            <h5 class="expanding-cardbox__title text-zaffre mb-0">
+                                Do I need to connect to get money back? <i class="far fa-chevron-down text-dodger-blue fa-lg"></i>
+                            </h5>
+                            <div class="expanding-cardbox__expand text-zaffre mt-4">
+                                Yes, we exist to make insurance better and with us that means being social and connecting in groups of careful people.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="expanding-cardbox expanding-cardbox-white mb-4">
+                        <div class="expanding-cardbox__body">
+                            <h5 class="expanding-cardbox__title text-zaffre mb-0">
+                                Do I need to connect to have so-sure's insurance policy? <i class="far fa-chevron-down text-dodger-blue fa-lg"></i>
+                            </h5>
+                            <div class="expanding-cardbox__expand text-zaffre mt-4">
+                                No, if you want to fly solo that is completely fine, you will still have fantastic cover and great customer service should you need to make a claim.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="faq__background d-none d-md-block">
+            <img src="{{ cdn_url }}/images/rebrand/misc/so-sure_money-left.png" alt="so-sure - Money Back" width="250px">
+        </div>
+    </section>
+
+    <section class="reviews py-lg-5">
+        <div class="container container-xtra py-5">
+            <div class="row">
+                <div class="col-lg-6">
+                    <h2 class="h3 mb-4 text-zaffre text-center text-lg-left">Don't just take our <br class="d-inline d-sm-none"> word for it!</h2>
+                    <div id="reviews_carousel"
+                         class="carousel slide carousel-fade"
+                         data-ride="carousel"
+                         data-interval="false">
+                        <div class="carousel-inner">
+                            <div class="carousel-item active">
+                                <div class="reviews__item text-center text-lg-left">
+                                    <span class="mt-2">
+                                        <i class="fas fa-star fa-lg text-primary"></i>
+                                        <i class="fas fa-star fa-lg text-primary"></i>
+                                        <i class="fas fa-star fa-lg text-primary"></i>
+                                        <i class="fas fa-star fa-lg text-primary"></i>
+                                        <i class="fas fa-star fa-lg text-primary"></i>
+                                    </span>
+                                    <p class="lead py-4">"I got &pound;80 quid back at the end of the year! I used it to reduce my monthly payments to almost nothing!"</p>
+                                    <div class="reviews__footer mb-4">
+                                        <span class="h5 text-zaffre mr-2">Mark</span> <strong class="text-primary">|</strong> <span class="ml-2">so-sure customer</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="carousel-item">
+                                <div class="reviews__item text-center text-lg-left">
+                                    <span class="mt-2">
+                                        <i class="fas fa-star fa-lg text-primary"></i>
+                                        <i class="fas fa-star fa-lg text-primary"></i>
+                                        <i class="fas fa-star fa-lg text-primary"></i>
+                                        <i class="fas fa-star fa-lg text-primary"></i>
+                                        <i class="fas fa-star fa-lg text-primary"></i>
+                                    </span>
+                                    <p class="lead py-4">"Thanks so sure, me and my husband didnt claim and we both got &pound;40 back, we totally forgot about it so it was a really nice surprise"</p>
+                                    <div class="reviews__footer mb-4">
+                                        <span class="h5 text-zaffre mr-2">Fiona</span> <strong class="text-primary">|</strong> <span class="ml-2">so-sure customer</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="carousel-item">
+                                <div class="reviews__item text-center text-lg-left">
+                                    <span class="mt-2">
+                                        <i class="fas fa-star fa-lg text-primary"></i>
+                                        <i class="fas fa-star fa-lg text-primary"></i>
+                                        <i class="fas fa-star fa-lg text-primary"></i>
+                                        <i class="fas fa-star fa-lg text-primary"></i>
+                                        <i class="fas fa-star fa-lg text-primary"></i>
+                                    </span>
+                                    <p class="lead py-4">"Great to get some money back, nice one - highly recommend"</p>
+                                    <div class="reviews__footer mb-4">
+                                        <span class="h5 text-zaffre mr-2">Roddy</span> <strong class="text-primary">|</strong> <span class="ml-2">so-sure customer</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="reviews__controls text-center text-lg-left">
+                        <ul class="list-inline">
+                            <li class="list-inline-item">
+                                <a href="#reviews_carousel"
+                                   class="reviews__controls__prev pr-1"
+                                   role="button"
+                                   data-slide="prev">
+                                   <i class="far fa-long-arrow-alt-left fa-2x"></i>
+                                   <span class="sr-only">prev</span>
+                                </a>
+                            </li>
+                            <li class="list-inline-item">
+                                <a href="#reviews_carousel"
+                                   class="reviews__controls__next pl-1"
+                                   role="button"
+                                   data-slide="next">
+                                    <i class="far fa-long-arrow-alt-right fa-2x"></i>
+                                    <span class="sr-only">next</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+{#     <section class="banner blue-gradient py-5">
+        <div class="container container-xtra">
+            <div class="d-lg-flex justify-content-lg-between align-items-lg-center">
+            </div>
+        </div>
+    </section> #}
+
+    {# Page Modals #}
+    {% include 'AppBundle::Default/_modalVideo.html.twig' %}
+
+{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/social-insurance.js') }}"></script>
+{% endblock %}
