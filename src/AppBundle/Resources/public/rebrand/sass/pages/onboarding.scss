@@ -9,8 +9,6 @@
 @import "../base/fonts";
 
 body {
-    // background-color: $crayon-blue;
-    // @include blue-gradient;
     overflow: hidden;
 }
 
@@ -22,12 +20,6 @@ body {
         height: 100vh;
         position: static;
     }
-
-    // .carousel-item {
-
-    //     &.active {
-    //     }
-    // }
 
     // Overide indicators
     .carousel-indicators {
@@ -80,47 +72,3 @@ body {
         }
     }
 }
-
-// .qpw {
-
-//     h1 {
-//         // TODO: This could be done better
-//         border: none;
-//     }
-
-//     &__main {
-//         padding-top: 1.5rem;
-
-//         @include media-breakpoint-up(lg) {
-//             padding-top: 12rem;
-//         }
-//     }
-
-//     &__sub__container {
-//         margin-top: 3.4rem;
-
-//         @include media-breakpoint-up(lg) {
-//             margin-top: 0;
-//         }
-//     }
-
-//     &__curve {
-//         transform: translateY(-1px);
-
-//         @include media-breakpoint-up(lg) {
-//             transform: none;
-//         }
-//     }
-
-//     &__sub {
-//         max-width: 400px;
-//         margin: 0 auto;
-//         text-align: center;
-//         padding-top: 2em;
-
-//         @include media-breakpoint-up(lg) {
-//             padding-top: 12rem;
-//         }
-//     }
-// }
-
