@@ -5,13 +5,11 @@ use AppBundle\Document\Claim;
 use AppBundle\Document\CurrencyTrait;
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\ImeiTrait;
-use AppBundle\Document\PhoneTrait;
 
 class DaviesHandlerClaim extends HandlerClaim
 {
     use CurrencyTrait;
     use DateTrait;
-    use PhoneTrait;
     use ImeiTrait;
     use ExcelTrait;
 

@@ -5,14 +5,12 @@ use AppBundle\Document\Claim;
 use AppBundle\Document\CurrencyTrait;
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\ImeiTrait;
-use AppBundle\Document\PhoneTrait;
 
 class DirectGroupHandlerClaim extends HandlerClaim
 {
     use CurrencyTrait;
     use DateTrait;
     use ImeiTrait;
-    use PhoneTrait;
     use ExcelTrait;
 
     const SHEET_NAME_V1 = 'Report';

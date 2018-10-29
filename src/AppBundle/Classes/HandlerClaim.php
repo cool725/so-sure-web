@@ -5,9 +5,11 @@ use AppBundle\Document\Claim;
 use AppBundle\Document\CurrencyTrait;
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\ImeiTrait;
+use AppBundle\Document\PhoneTrait;
 
 abstract class HandlerClaim
 {
+    use PhoneTrait;
     use CurrencyTrait;
 
     const TYPE_LOSS = 'Loss';
@@ -205,14 +207,14 @@ abstract class HandlerClaim
     /**
      * Determines if a given value corresponds to what the claim handler gives when data has not yet
      * been provided but may be in the future.
-     * @param string value is the given value
+     * @param string $value is the given value
      * @return boolean true iff the value corresponds to absent data
      */
     abstract public function isNullableValue($value);
 
     /**
      * Determines if a given value corresponds to what the claim handler gives when data is not available.
-     * @param string value is the given value
+     * @param string $value is the given value
      * @return boolean true iff the value corresponds to unavailable data.
      */
     abstract public function isUnobtainableValue($value);
