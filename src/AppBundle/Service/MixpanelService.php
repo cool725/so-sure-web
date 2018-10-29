@@ -386,7 +386,7 @@ class MixpanelService
         $data = null;
         $count = 0;
 
-        $time = new \DateTime();
+        $time = \DateTime::createFromFormat('U', time());
         $time = $time->sub(new \DateInterval(sprintf('P%dD', $days)));
         $query = [
             'where' => sprintf(
@@ -399,7 +399,7 @@ class MixpanelService
         // Although facebook should be allowed, there seems to be a 'preview' mode which causes havoc
         // with our sixpack tests and causes a huge increase (30k+ users over a few week period)
         // so delete any users over 1 day old with a facebook brower that have just 1 sixpack experiment
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         // @codingStandardsIgnoreStart
         $query = [
             'selector' => sprintf(
@@ -433,7 +433,7 @@ class MixpanelService
         // Although facebook should be allowed, there seems to be a 'preview' mode which causes havoc
         // with our sixpack tests and causes a huge increase (30k+ users over a few week period)
         // so delete any users over 1 day old with a facebook brower that have just 1 sixpack experiment
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         // @codingStandardsIgnoreStart
         $query = [
             'selector' => sprintf(
@@ -471,7 +471,7 @@ class MixpanelService
         $count += $this->runDelete($query);
 
         // Change in behaviour - temporarily delete happy app user agent
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         // @codingStandardsIgnoreStart
         $query = [
             'selector' => sprintf(
@@ -562,7 +562,7 @@ class MixpanelService
                 }
 
                 // Requeue anything not yet ready to process
-                $now = new \DateTime();
+                $now = \DateTime::createFromFormat('U', time());
                 if (isset($data['properties']) && isset($data['properties']['processTime'])
                     && $data['properties']['processTime'] > $now->format('U')) {
                     $requeued++;
@@ -666,7 +666,7 @@ class MixpanelService
         }
 
         if ($action == self::QUEUE_TRACK) {
-            $now = new \DateTime();
+            $now = \DateTime::createFromFormat('U', time());
             $properties = array_merge($properties, ['time' => $now->getTimestamp()]);
         }
 
@@ -975,7 +975,7 @@ class MixpanelService
         if ($delayMinutes === null) {
             $delayMinutes = 2;
         }
-        $processTime = new \DateTime();
+        $processTime = \DateTime::createFromFormat('U', time());
         if ($delayMinutes > 0) {
             $processTime = $processTime->add(new \DateInterval(sprintf('PT%dM', $delayMinutes)));
         }

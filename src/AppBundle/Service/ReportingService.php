@@ -759,7 +759,7 @@ class ReportingService
         $start = new \DateTime('2016-09-12');
         $total = 0;
         if (!$end) {
-            $end = new \DateTime();
+            $end = \DateTime::createFromFormat('U', time());
         }
         $weeks = floor($end->diff($start)->days / 7);
         for ($i = 1; $i <= $weeks; $i++) {
@@ -936,7 +936,7 @@ class ReportingService
     public function getUnderWritingReporting(\DateTime $date, \DateTime $now = null)
     {
         if (!$now) {
-            $now = new \DateTime();
+            $now = \DateTime::createFromFormat('U', time());
         }
         $start = $this->startOfMonth($date);
         $end = $this->endOfMonth($date);
@@ -993,7 +993,7 @@ class ReportingService
     public function getQuarterlyPL(\DateTime $date, \DateTime $now = null)
     {
         if (!$now) {
-            $now = new \DateTime();
+            $now = \DateTime::createFromFormat('U', time());
         }
         list($start, $end) = $this->getQuarterlyPLDates($date);
         $policies = $this->getAllStartedPolicies($start, $end);

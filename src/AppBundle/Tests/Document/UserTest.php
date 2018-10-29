@@ -54,7 +54,7 @@ class UserTest extends \PHPUnit\Framework\TestCase
         $user->setBirthday(new \DateTime("1800-01-01"));
         $this->assertFalse($user->hasValidDetails());
 
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         $user->setBirthday(new \DateTime(sprintf("%d-01-01", $now->format('Y'))));
         $this->assertFalse($user->hasValidDetails());
     }
@@ -198,7 +198,7 @@ class UserTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($user->isPasswordChangeRequired());
         $this->assertFalse($user->isCredentialsNonExpired());
 
-        $eightyNineDaysAgo = new \DateTime();
+        $eightyNineDaysAgo = \DateTime::createFromFormat('U', time());
         $eightyNineDaysAgo = $eightyNineDaysAgo->sub(new \DateInterval('P89D'));
         $user->passwordChange('a', 'b', $eightyNineDaysAgo);
         $this->assertFalse($user->isPasswordChangeRequired());

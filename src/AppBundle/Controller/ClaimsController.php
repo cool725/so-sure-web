@@ -317,7 +317,7 @@ class ClaimsController extends BaseController
             'oa' => $oa,
             'claim_types' => Claim::$claimTypes,
             'phones' => $dm->getRepository(Phone::class)->findActive()->getQuery()->execute(),
-            'now' => new \DateTime(),
+            'now' => \DateTime::createFromFormat('U', time()),
             'claim' => $claim,
             'previousPicSureStatus' => $previousPicSureStatus,
         ];

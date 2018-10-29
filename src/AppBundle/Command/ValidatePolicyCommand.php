@@ -340,7 +340,7 @@ class ValidatePolicyCommand extends ContainerAwareCommand
         try {
             $closeToExpiration = false;
             if ($policy->getPolicyExpirationDate()) {
-                $date = $data['validateDate'] ? $data['validateDate'] : new \DateTime();
+                $date = $data['validateDate'] ? $data['validateDate'] : \DateTime::createFromFormat('U', time());
                 $diff = $date->diff($policy->getPolicyExpirationDate());
                 $closeToExpiration = $diff->days < 14 && $diff->invert == 0;
             }
@@ -498,7 +498,7 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                         $this->header($policy, $policies, $lines);
                         $lines[] = 'Warning!! No bacs payments, yet bank does not have first payment flag set';
                     }
-                    $now = new \DateTime();
+                    $now = \DateTime::createFromFormat('U', time());
 
                     if ($bankAccount->isAfterInitialNotificationDate()) {
                         if ($bacsPayments == 0) {

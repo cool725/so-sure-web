@@ -19,7 +19,7 @@ class SCodeInvitationRepository extends DocumentRepository
     public function findSystemReinvitations(\DateTime $date = null)
     {
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
 
         $threeDays = clone $date;
@@ -42,7 +42,7 @@ class SCodeInvitationRepository extends DocumentRepository
     public function findPendingInvitations(\DateTime $date = null)
     {
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
 
         $oneDay = clone $date;

@@ -55,22 +55,11 @@ class MonitorServiceTest extends WebTestCase
     public function tearDown()
     {
         parent::tearDown();
-
-        $qb = static::$dm->createQueryBuilder(Policy::class);
-
-        $qb->remove()
-            ->getQuery()
-            ->execute();
     }
 
     public function setUp()
     {
         parent::setUp();
-
-        $qb = static::$dm->createQueryBuilder(Claim::class);
-        $qb->remove()
-            ->getQuery()
-            ->execute();
     }
 
     public function testClaimsSettledUnprocessedOk()
@@ -123,7 +112,7 @@ class MonitorServiceTest extends WebTestCase
 
     public function testExpectedFailOldSubmittedClaimsUnit()
     {
-        $daysAgo = $this->subBusinessDays(new \DateTime(), 3);
+        $daysAgo = $this->subBusinessDays(\DateTime::createFromFormat('U', time()), 3);
 
         // add a record that will make the monitor fail
         $claim = new Claim();
@@ -144,7 +133,7 @@ class MonitorServiceTest extends WebTestCase
 
     public function testExpectedFailOldSubmittedClaimsFunctional()
     {
-        $daysAgo = $this->subBusinessDays(new \DateTime(), 3);
+        $daysAgo = $this->subBusinessDays(\DateTime::createFromFormat('U', time()), 3);
 
         // add a record that will make the monitor fail
         $claim = new Claim();
@@ -316,7 +305,7 @@ class MonitorServiceTest extends WebTestCase
     {
         $policy = new SalvaPhonePolicy();
         $policy->setStatus(Policy::STATUS_ACTIVE);
-        $policy->setEnd((new \DateTime())->sub(new \DateInterval('P1D')));
+        $policy->setEnd((\DateTime::createFromFormat('U', time()))->sub(new \DateInterval('P1D')));
 
         self::$dm->persist($policy);
         self::$dm->flush();

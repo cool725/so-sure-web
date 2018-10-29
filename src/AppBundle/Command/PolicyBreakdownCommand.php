@@ -46,7 +46,7 @@ class PolicyBreakdownCommand extends ContainerAwareCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         $filename = sprintf("so-sure-policy-breakdown-%s.pdf", $now->format('Y-m-d'));
         $tmpFile = sprintf(
             "%s/%s",

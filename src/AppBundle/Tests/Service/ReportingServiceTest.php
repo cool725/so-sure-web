@@ -41,7 +41,7 @@ class ReportingServiceTest extends WebTestCase
 
     public function testGetAllPaymentTotals()
     {
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         $existing = self::$reporting->getAllPaymentTotals(false, $now);
         
         $user = static::createUser(
@@ -76,7 +76,7 @@ class ReportingServiceTest extends WebTestCase
 
     public function testGetAllPaymentTotalsAdjusted()
     {
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         $existing = self::$reporting->getAllPaymentTotals(false, $now);
 
         $user = static::createUser(
