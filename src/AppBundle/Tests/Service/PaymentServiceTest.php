@@ -82,13 +82,13 @@ class PaymentServiceTest extends WebTestCase
         self::$paymentService = $paymentService;
         self::$redis = self::$container->get('snc_redis.default');
 
-        /** @var fraudService $fraudService */
+        /** @var FraudService $fraudService */
         $fraudService = self::$container->get('app.fraud');
-        static::$fraudService = $fraudService;
+        self::$fraudService = $fraudService;
 
-        /** @var routerService $routerService */
+        /** @var RouterService $routerService */
         $routerService = self::$container->get('app.router');
-        static::$routerService = $routerService;
+        self::$routerService = $routerService;
     }
 
     public function tearDown()
