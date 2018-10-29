@@ -776,6 +776,19 @@ class PhonePolicy extends Policy
         ]);
     }
 
+    public function isPicSureValidatedIncludingClaim(Claim $claim)
+    {
+        $validated = $this->isPicSureValidated();
+
+        // After the initial import, once the pic-sure status changes to CLAIM-APPROVED
+        // we need to check to see if the claim is the same
+        if ($validated && $this->getPicSureClaimApprovedClaim() && $claim->getId()) {
+            $validated = $this->getPicSureClaimApprovedClaim()->getId() != $claim->getId();
+        }
+
+        return $validated;
+    }
+
     public function canAdjustPicSureStatusForClaim()
     {
         if (in_array($this->getPicSureStatus(), [
@@ -829,9 +842,11 @@ class PhonePolicy extends Policy
         }
     }
 
-    public function getExcessValue($type)
+    public function getExcessValue($type, Claim $claim = null)
     {
-        return Claim::getExcessValue($type, $this->isPicSureValidated(), $this->isPicSurePolicy());
+        $validated = $this->isPicSureValidated($claim);
+
+        return Claim::getExcessValue($type, $validated, $this->isPicSurePolicy());
     }
 
     public function toApiArray()
