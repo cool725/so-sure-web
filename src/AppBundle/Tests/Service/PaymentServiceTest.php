@@ -6,7 +6,9 @@ use AppBundle\Document\BacsPaymentMethod;
 use AppBundle\Document\BankAccount;
 use AppBundle\Repository\PolicyRepository;
 use AppBundle\Service\BacsService;
+use AppBundle\Service\FraudService;
 use AppBundle\Service\PaymentService;
+use AppBundle\Service\RouterService;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\User;
 use AppBundle\Document\Address;
@@ -51,10 +53,11 @@ class PaymentServiceTest extends WebTestCase
     protected static $policyRepo;
     /** @var PaymentService */
     protected static $paymentService;
-    protected static $redis;
+    /** @var FraudService */
     protected static $fraudService;
     /** @var RouterService */
     protected static $routerService;
+    protected static $redis;
 
     public static function setUpBeforeClass()
     {
@@ -79,8 +82,13 @@ class PaymentServiceTest extends WebTestCase
         self::$paymentService = $paymentService;
         self::$redis = self::$container->get('snc_redis.default');
 
-        self::$fraudService = self::$container->get('app.fraud');
-        self::$routerService = self::$container->get('app.router');
+        /** @var fraudService $fraudService */
+        $fraudService = self::$container->get('app.fraud');
+        self::$fraudService = $fraudService;
+
+        /** @var routerService $routerService */
+        $routerService = self::$container->get('app.router');
+        self::$routerService = $routerService;
     }
 
     public function tearDown()
