@@ -26,6 +26,9 @@ class PaymentService
     /** @var JudopayService $judopay */
     protected $judopay;
 
+    /** @var RouterService */
+    protected $routerService;
+
     /** @var LoggerInterface $logger */
     protected $logger;
 
@@ -58,6 +61,7 @@ class PaymentService
     /**
      * PaymentService constructor.
      * @param JudopayService           $judopay
+     * @param RouterService            $routerService
      * @param LoggerInterface          $logger
      * @param DocumentManager          $dm
      * @param SequenceService          $sequenceService
@@ -69,6 +73,7 @@ class PaymentService
      */
     public function __construct(
         JudopayService $judopay,
+        RouterService $routerService,
         LoggerInterface $logger,
         DocumentManager $dm,
         SequenceService $sequenceService,
@@ -79,6 +84,7 @@ class PaymentService
         EventDispatcherInterface $dispatcher
     ) {
         $this->judopay = $judopay;
+        $this->routerService = $routerService;
         $this->logger = $logger;
         $this->dm = $dm;
         $this->mailer = $mailer;
@@ -87,6 +93,11 @@ class PaymentService
         $this->fraudService = $fraudService;
         $this->templating = $templating;
         $this->dispatcher = $dispatcher;
+    }
+
+    public function setMailerMailer($mailer)
+    {
+        $this->mailer->setMailer($mailer);
     }
 
     public function getAllValidScheduledPaymentsForType($prefix, $type, \DateTime $scheduledDate = null)
@@ -205,7 +216,11 @@ class PaymentService
             $this->mailer->send(
                 'Duplicate bank account',
                 'tech@so-sure.com',
-                sprintf('Check %s / %s', $policy->getPolicyNumber(), $policy->getId())
+                sprintf(
+                    'Check <a href="%s">duplicate bank account</a>, ID: %s',
+                    $this->routerService->generateUrl('admin_policy', ['id' => $policy->getId()]),
+                    $policy->getId()
+                )
             );
         }
 
