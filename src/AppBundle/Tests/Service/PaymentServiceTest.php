@@ -84,11 +84,11 @@ class PaymentServiceTest extends WebTestCase
 
         /** @var fraudService $fraudService */
         $fraudService = self::$container->get('app.fraud');
-        self::$fraudService = $fraudService;
+        static::$fraudService = $fraudService;
 
         /** @var routerService $routerService */
         $routerService = self::$container->get('app.router');
-        self::$routerService = $routerService;
+        static::$routerService = $routerService;
     }
 
     public function tearDown()
