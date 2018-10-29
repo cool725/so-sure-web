@@ -71,4 +71,54 @@ body {
             }
         }
     }
+
+    &-nav {
+        &__desktop {
+            display: flex;
+        }
+
+        &__number{
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px; height: 32px;
+            border: 2px solid darken($selago, 10%);
+            @include border-radius(50%);
+
+            transition: background-color 500ms ease;
+        }
+
+        &__inner {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-grow: 1;
+            flex-basis: 0;
+            background-color: $selago;
+            color: darken($selago, 10%);
+            border-left: 1px solid darken($selago, 5%);
+            border-right: 1px solid darken($selago, 5%);
+
+            transition: background-color 500ms ease;
+
+            &:first-of-type {
+                border-left: none;
+            }
+
+            &:last-of-type {
+                border-right: none;
+            }
+
+            &.active {
+                background-color: rgba(0, 146, 255, 0.3);
+                color: $dodger-blue;
+
+                .onboarding-nav__number {
+                    background-color: $white;
+                    border: none;
+                    box-shadow: 0 0 0 7px rgba(37, 147, 243, 0.15);
+                }
+            }
+        }
+    }
 }

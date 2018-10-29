@@ -1,4 +1,15 @@
-<nav id="main-nav" class="navbar {% if quote_mode is defined and quote_mode == true %}navbar-so-sure-quote{% else %}navbar-so-sure{% endif %} fixed-top justify-content-between flex-nowrap flex-row pl-lg-5">
+<nav id="main-nav"
+     class="navbar
+     {% if quote_mode is defined and quote_mode == true %}
+        navbar-so-sure-quote
+    {% else %}
+        navbar-so-sure
+    {% endif %}
+    {% if onboarding_mode is defined and onboarding_mode == true %}
+    {% else %}
+        fixed-top
+    {% endif %}
+        justify-content-between flex-nowrap flex-row pl-lg-5">
     <a href="/" class="navbar-brand show-in-nav show-in-quote">
         <div class="navbar-brand__logo"></div>
         <span class="sr-only">so-sure</span>

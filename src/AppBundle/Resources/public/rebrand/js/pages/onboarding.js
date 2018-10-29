@@ -12,21 +12,47 @@ let Clipboard = require('clipboard');
 
 $(function() {
 
-    const carousel    = $('#onboarding-carousel'),
-          totalSlides = $('.carousel-item').length;
+    const carousel = $('#onboarding-carousel'),
+          onNavMb  = $('.onboarding-controls__mobile'),
+          onbNavDt = $('.onboarding-nav__desktop');
+          // totalSlides = $('.carousel-item').length;
 
           // console.log(totalSlides);
 
+    // TODO: Make dynamic
     carousel.on('slide.bs.carousel', function(e){
 
-        if (e.to > 1) {
-            $('#onboarding-btn--next').addClass('btn-hide');
-            $('#onboarding-btn--skip').removeClass('btn-hide');
+        if (onNavMb.length) {
+            // If slide is greater than one add skip button
+            if (e.to > 1) {
+                $('#onboarding-btn--next').addClass('btn-hide');
+                $('#onboarding-btn--skip').removeClass('btn-hide');
+            }
+
+            // If slide is last slide add login
+            if (e.to == 4) {
+                $('#onboarding-btn--skip').addClass('btn-hide');
+                $('#onboarding-btn--login').removeClass('btn-hide');
+            }
         }
 
-        if (e.to == 4) {
-            $('#onboarding-btn--skip').addClass('btn-hide');
-            $('#onboarding-btn--login').removeClass('btn-hide');
+        if (onbNavDt.length) {
+
+            let activeItem = $('.onboarding-nav__inner.active');
+
+            let nextItem = (activeItem) =>  {
+                activeItem.removeClass('active').next().addClass('active');
+            }
+
+            if (e.to == 1) {
+                nextItem(activeItem);
+            }
+            if (e.to == 2) {
+                nextItem(activeItem);
+            }
+            if (e.to == 4) {
+                nextItem(activeItem);
+            }
         }
 
     });
@@ -66,30 +92,6 @@ $(function() {
             }
         }
     });
-
-    // const carousel    = $('#onboarding-carousel'),
-    //       indicators  = $('.onboarding-indicators li'),
-    //       // Get the number of slides to set when to show the controls correctly
-    //       totalSlides = $('.carousel-item').length - 1;
-
-    // carousel.on('slide.bs.carousel', function(e){
-
-    //     // Adjust controls dependant on slide
-    //     if (e.to >= 1) {
-    //         $('#onboarding-prev-btn').removeClass('disabled');
-    //     } else {
-    //         $('#onboarding-prev-btn').addClass('disabled');
-    //     }
-
-    //     if (e.to == totalSlides) {
-    //         $('#onboarding-next-btn').addClass('hide-controls');
-    //         $('#onboarding-get-started-btn').removeClass('hide-controls');
-    //     } else {
-    //         $('#onboarding-next-btn').removeClass('hide-controls');
-    //         $('#onboarding-get-started-btn').addClass('hide-controls');
-    //     }
-
-    // });
 
 });
 
