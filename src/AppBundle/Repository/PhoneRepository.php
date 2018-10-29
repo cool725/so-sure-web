@@ -117,12 +117,45 @@ class PhoneRepository extends DocumentRepository
 
     public function alreadyExists($make, $model, $memory)
     {
+        if (!$this->inArrayInsensitive($make, $this->findActiveMakes())) {
+            return false;
+        }
+
+        if (!in_array($make, $this->findActiveMakes())) {
+            $db_make = $this->inArrayInsensitive($make, $this->findActiveMakes());
+
+            throw new \Exception(sprintf(
+                "The device make (%s) is in the database but with using different letter casing! (%s)", $make, $db_make));
+        }
+
+        $models = [];
+        foreach ($this->findActiveModels($make) as $db_model) {
+            $models[$db_model->getModel()] = $db_model->getModel();
+        }
+
+        if (!$this->inArrayInsensitive($model, $models)) {
+            return false;
+        }
+
+        if (!in_array($model, $models)) {
+            $db_model = $this->inArrayInsensitive($model, $models);
+
+            throw new \Exception(sprintf(
+                "The model (%s) is in the database but but with using different letter casing! (%s)", $model, $db_model
+            ));
+        }
+
         return $this->createQueryBuilder()
-                ->field('make')->equals(new \MongoRegex('/'. $make . '/i'))
-                ->field('model')->equals(new \MongoRegex('/'. $model . '/i'))
+                ->field('make')->equals($make)
+                ->field('model')->equals($model)
                 ->field('memory')->equals(floatval($memory))
                 ->getQuery()
                 ->execute()
                 ->count() > 0;
+    }
+
+    private function inArrayInsensitive($needle, $haystack)
+    {
+        return array_search(mb_strtolower($needle), array_map('mb_strtolower', $haystack));
     }
 }
