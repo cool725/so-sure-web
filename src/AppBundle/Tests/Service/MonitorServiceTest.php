@@ -156,29 +156,33 @@ class MonitorServiceTest extends WebTestCase
         self::$dm->flush();
     }
 
-    /*
-     * expectedException \AppBundle\Exception\MonitorException
+    /**
+     * @expectedException \AppBundle\Exception\MonitorException
+     */
     public function testSalvaPolicy()
     {
-        $policy = new SalvaPhonePolicy();
-        $policy->setPolicyNumber($this->getRandomPolicyNumber('Mob'));
+        $policy = self::createUserPolicy(true);
+        $policy->getUser()->setEmail(static::generateEmail('salva', $this));
+        $policy->setPolicyNumber(self::setRandomPolicyNumber('Mob'));
 
+        self::$dm->persist($policy->getUser());
         self::$dm->persist($policy);
         self::$dm->flush();
 
         self::$monitor->salvaPolicy();
     }
-    */
 
     /**
      * @expectedException \AppBundle\Exception\MonitorException
      */
     public function testInvalidPolicy()
     {
-        $policy = new SalvaPhonePolicy();
-        $policy->setPolicyNumber($this->getRandomPolicyNumber('INVALID'));
+        $policy = self::createUserPolicy(true);
+        $policy->getUser()->setEmail(static::generateEmail('invalid', $this));
+        $policy->setPolicyNumber(self::setRandomPolicyNumber('INVALID'));
         $policy->addSalvaPolicyResults('0', SalvaPhonePolicy::RESULT_TYPE_CREATE, []);
 
+        self::$dm->persist($policy->getUser());
         self::$dm->persist($policy);
         self::$dm->flush();
 
@@ -190,10 +194,12 @@ class MonitorServiceTest extends WebTestCase
      */
     public function testSalvaStatus()
     {
-        $policy = new SalvaPhonePolicy();
-        $policy->setPolicyNumber($this->getRandomPolicyNumber('Mob'));
+        $policy = self::createUserPolicy(true);
+        $policy->getUser()->setEmail(static::generateEmail('salvastatus', $this));
+        $policy->setPolicyNumber(self::setRandomPolicyNumber('Mob'));
         $policy->setSalvaStatus('pending');
 
+        self::$dm->persist($policy->getUser());
         self::$dm->persist($policy);
         self::$dm->flush();
 
@@ -205,9 +211,11 @@ class MonitorServiceTest extends WebTestCase
      */
     public function testPolicyFiles()
     {
-        $policy = new SalvaPhonePolicy();
-        $policy->setPolicyNumber($this->getRandomPolicyNumber('Mob'));
+        $policy = self::createUserPolicy(true);
+        $policy->getUser()->setEmail(static::generateEmail('policy', $this));
+        $policy->setPolicyNumber(self::setRandomPolicyNumber('Mob'));
 
+        self::$dm->persist($policy->getUser());
         self::$dm->persist($policy);
         self::$dm->flush();
 
@@ -219,17 +227,14 @@ class MonitorServiceTest extends WebTestCase
 
     public function testPolicyPending()
     {
-        $policy = new SalvaPhonePolicy();
-        $policy->setPolicyNumber($this->getRandomPolicyNumber('Mob'));
-
-        $user = new User();
-        $user->setEmail(self::generateEmail('pending', $this));
+        $policy = self::createUserPolicy(true, new \DateTime(), true);
+        $policy->setPolicyNumber(self::setRandomPolicyNumber('Mob'));
 
         $policy->setUser($user);
         $policy->setStatus(Policy::STATUS_PENDING);
 
-        self::$dm->persist($policy);
         self::$dm->persist($policy->getUser());
+        self::$dm->persist($policy);
 
         self::$dm->flush();
 
@@ -271,6 +276,7 @@ class MonitorServiceTest extends WebTestCase
      */
     public function testCheckAllUserRolePriv()
     {
+        // TODO: Do not hard-code database
         $database = self::$dm->getConnection()->selectDatabase('so-sure');
 
         $database->command([
@@ -311,10 +317,5 @@ class MonitorServiceTest extends WebTestCase
         self::$dm->flush();
 
         self::$monitor->checkExpiration();
-    }
-
-    private function getRandomPolicyNumber($prefix)
-    {
-        return sprintf($prefix . '/2018/55' . str_pad(random_int(0, 99999), 5, '0'));
     }
 }
