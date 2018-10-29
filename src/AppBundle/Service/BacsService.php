@@ -1552,8 +1552,9 @@ class BacsService
 
         $this->generatePaymentsDebits($prefix, $date, $metadata, $update);
 
+        /** @var BacsPaymentRepository $repo */
         $repo = $this->dm->getRepository(BacsPayment::class);
-        $payments = $repo->findBy(['status' => BacsPayment::STATUS_PENDING]);
+        $payments = $repo->getAllPendingDebits();
         foreach ($payments as $payment) {
             /** @var BacsPayment $payment */
             $policy = $payment->getPolicy();
