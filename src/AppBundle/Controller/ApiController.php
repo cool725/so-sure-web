@@ -189,6 +189,11 @@ class ApiController extends BaseController
 
             $intercomHash = $this->get('app.intercom')->getApiUserHash($user);
 
+            if (!$user->getFirstLoginInApp()) {
+                $user->setFirstLoginInApp(new \DateTime());
+                $dm->flush();
+            }
+
             $response = $user->toApiArray($intercomHash, $identityId, $token);
             $this->get('logger')->info(sprintf('loginAction Resp %s', json_encode($response)));
 
@@ -647,6 +652,7 @@ class ApiController extends BaseController
 
                 $userManager = $this->get('fos_user.user_manager');
                 $user = $userManager->createUser();
+                $user->setFirstLoginInApp(new \DateTime());
             }
 
             $user->setEnabled(true);
