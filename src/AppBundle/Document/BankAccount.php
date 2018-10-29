@@ -174,7 +174,7 @@ class BankAccount
     public function __construct()
     {
         $this->setMandateStatus(self::MANDATE_PENDING_INIT);
-        $this->created = new \DateTime();
+        $this->created = \DateTime::createFromFormat('U', time());
         $this->annual = false;
     }
 
@@ -406,7 +406,7 @@ class BankAccount
     public function isAfterInitialNotificationDate(\DateTime $date = null)
     {
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
 
         if (!$this->getInitialNotificationDate()) {
@@ -435,7 +435,7 @@ class BankAccount
     public function allowedSubmission(\DateTime $now = null)
     {
         if (!$now) {
-            $now = new \DateTime();
+            $now = \DateTime::createFromFormat('U', time());
         }
         $now = $this->startOfDay($now);
 
@@ -474,7 +474,7 @@ class BankAccount
     public function allowedInitialProcessing(\DateTime $processingDate = null)
     {
         if (!$processingDate) {
-            $processingDate = new \DateTime();
+            $processingDate = \DateTime::createFromFormat('U', time());
             $processingDate = $this->addBusinessDays($processingDate, 1);
         }
         $processingDate = $this->startOfDay($processingDate);
@@ -495,7 +495,7 @@ class BankAccount
     public function allowedStandardProcessing(\DateTime $processingDate = null)
     {
         if (!$processingDate) {
-            $processingDate = new \DateTime();
+            $processingDate = \DateTime::createFromFormat('U', time());
             $processingDate = $this->addBusinessDays($processingDate, 1);
         }
         $processingDate = $this->startOfDay($processingDate);

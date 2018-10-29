@@ -754,7 +754,7 @@ class Claim
 
     public function __construct()
     {
-        $this->recordedDate = new \DateTime();
+        $this->recordedDate = \DateTime::createFromFormat('U', time());
     }
 
     public function getId()
@@ -1842,7 +1842,7 @@ class Claim
         /** @var PhonePolicy $phonePolicy */
         $phonePolicy = $this->getPolicy();
         $picSureEnabled = $phonePolicy->isPicSurePolicy();
-        $picSureValidated = $phonePolicy->isPicSureValidated();
+        $picSureValidated = $phonePolicy->isPicSureValidatedIncludingClaim($this);
 
         return self::getExcessValue($this->getType(), $picSureValidated, $picSureEnabled);
     }

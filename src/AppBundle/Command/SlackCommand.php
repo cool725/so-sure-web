@@ -115,7 +115,7 @@ class SlackCommand extends ContainerAwareCommand
         $policies = $repo->findAll();
 
         $lines = [];
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         foreach ($policies as $policy) {
             /** @var Policy $policy */
             if (!$policy->isPolicy() || !$policy->isCancelledAndPaymentOwed()) {
@@ -149,7 +149,7 @@ class SlackCommand extends ContainerAwareCommand
         $policies = $repo->getUnpaidPolicies();
 
         $lines = [];
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         foreach ($policies as $policy) {
             /** @var Policy $policy */
             $diff = $now->diff($policy->getPolicyExpirationDate());
@@ -193,7 +193,7 @@ class SlackCommand extends ContainerAwareCommand
         $policies = $repo->findBy(['status' => Policy::STATUS_DECLINED_RENEWAL]);
 
         $lines = [];
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         foreach ($policies as $policy) {
             /** @var Policy $policy */
             $diff = $now->diff($policy->getRenewalExpiration());
@@ -232,7 +232,7 @@ class SlackCommand extends ContainerAwareCommand
         $targetEnd = new \DateTime('2018-06-30');
         $dowOffset = 0;
 
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         $dow = $now->diff($start)->days % 7;
         $offset = $dow - $dowOffset >= 0 ? $dow - $dowOffset : (7 - $dowOffset) + $dow;
         $start = clone $now;
@@ -250,9 +250,9 @@ class SlackCommand extends ContainerAwareCommand
         );
         $growthTarget = 3750;
 
-        $yesterday = new \DateTime();
+        $yesterday = \DateTime::createFromFormat('U', time());
         $yesterday->sub(new \DateInterval('P1D'));
-        $oneWeekAgo = new \DateTime();
+        $oneWeekAgo = \DateTime::createFromFormat('U', time());
         $oneWeekAgo->sub(new \DateInterval('P7D'));
 
         $total = $repo->countAllActivePolicies();

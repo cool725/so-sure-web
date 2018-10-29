@@ -468,7 +468,7 @@ abstract class BaseController extends Controller
                 422
             );
         }
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         $diff = $now->diff($birthday);
         if ($diff->y > AgeValidator::MAX_AGE) {
             return $this->getErrorJsonResponse(

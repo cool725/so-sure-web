@@ -64,7 +64,7 @@ class LeadsCommand extends ContainerAwareCommand
         $userRepo = $this->dm->getRepository(User::class);
         /** @var DocumentRepository $leadsRepo */
         $leadsRepo = $this->dm->getRepository(Lead::class);
-        $yesterday = new \DateTime();
+        $yesterday = \DateTime::createFromFormat('U', time());
         $yesterday = $yesterday->sub(new \DateInterval(('P1D')));
         $leads = $leadsRepo->findBy(['email' => ['$ne' => null], 'created' => ['$lte' => $yesterday]]);
         $count = 0;

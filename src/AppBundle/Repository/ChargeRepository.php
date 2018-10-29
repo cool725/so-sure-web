@@ -19,7 +19,7 @@ class ChargeRepository extends DocumentRepository
         $affiliate = null
     ) {
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
         $start = $this->startOfMonth($date);
         $end = $this->endOfMonth($date);

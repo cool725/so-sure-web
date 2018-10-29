@@ -189,6 +189,11 @@ class ApiController extends BaseController
 
             $intercomHash = $this->get('app.intercom')->getApiUserHash($user);
 
+            if (!$user->getFirstLoginInApp()) {
+                $user->setFirstLoginInApp(new \DateTime());
+                $dm->flush();
+            }
+
             $response = $user->toApiArray($intercomHash, $identityId, $token);
             $this->get('logger')->info(sprintf('loginAction Resp %s', json_encode($response)));
 
@@ -249,7 +254,7 @@ class ApiController extends BaseController
             $cognitoId = $this->getCognitoIdentityId($request);
             $stats->quote(
                 $cognitoId,
-                new \DateTime(),
+                \DateTime::createFromFormat('U', time()),
                 $device,
                 $memory,
                 $deviceFound,
@@ -431,7 +436,7 @@ class ApiController extends BaseController
             }
 
             $this->container->get('fos_user.mailer')->sendResettingEmailMessage($user);
-            $user->setPasswordRequestedAt(new \DateTime());
+            $user->setPasswordRequestedAt(\DateTime::createFromFormat('U', time()));
             $this->get('fos_user.user_manager')->updateUser($user);
 
             // If resetting password, clear the login rate limit
@@ -618,7 +623,7 @@ class ApiController extends BaseController
                 $user = $repo->findOneBy(['emailCanonical' => mb_strtolower($this->getDataString($data, 'email'))]);
                 if ($user && $user->isPreLaunch() && !$user->getLastLogin() && count($user->getPolicies()) == 0) {
                     $user->resetToken();
-                    $user->setLastLogin(new \DateTime());
+                    $user->setLastLogin(\DateTime::createFromFormat('U', time()));
                 } else {
                     return $this->getErrorJsonResponse(
                         ApiErrorCode::ERROR_USER_EXISTS,
@@ -647,6 +652,7 @@ class ApiController extends BaseController
 
                 $userManager = $this->get('fos_user.user_manager');
                 $user = $userManager->createUser();
+                $user->setFirstLoginInApp(new \DateTime());
             }
 
             $user->setEnabled(true);

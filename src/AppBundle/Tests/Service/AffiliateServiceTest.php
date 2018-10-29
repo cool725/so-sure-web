@@ -16,6 +16,7 @@ use AppBundle\Document\Lead;
 use AppBundle\Document\Address;
 use AppBundle\Document\SCode;
 use AppBundle\Document\Policy;
+use AppBundle\Document\PhonePremium;
 use AppBundle\Document\Claim;
 use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePolicy;
@@ -118,6 +119,7 @@ class AffiliateServiceTest extends WebTestCase
         $policy = self::createUserPolicy(true, new \DateTime($policyAge));
         $policy->getUser()->setEmail(static::generateEmail($email, $this));
         $policy->setStatus(Policy::STATUS_ACTIVE);
+        $policy->setImei(self::generateRandomImei());
         $user = $policy->getUser();
         $attribution = new Attribution();
         $attribution->setCampaignSource($source);
@@ -129,6 +131,21 @@ class AffiliateServiceTest extends WebTestCase
         self::$dm->persist($policy);
         self::$dm->persist($user);
         self::$dm->flush();
+        return $user;
+    }
+
+    private function createLonelyTestUser($name, $affiliateLead)
+    {
+        $user = new User();
+        $user->setEmail(static::generateEmail($name, $this));
+        $user->setFirstName($name);
+        $user->setLastName($name);
+        $attribution = new Attribution();
+        $attribution->setCampaignSource($affiliateLead);
+        $user->setAttribution($attribution);
+        self::$dm->persist($user);
+        self::$dm->flush();
+        return $user;
     }
 
     public function tearDown()
@@ -170,19 +187,41 @@ class AffiliateServiceTest extends WebTestCase
         $this->assertEquals(0, count(self::$affiliateService->getMatchingUsers($affiliate)));
         $this->createTestUser('31 days ago', 'aaa', 'foobAds');
         $this->createTestUser('61 days ago', 'bbb', 'foobAds');
-        $this->createTestUser('91 days ago', 'ccc', 'foobAds');
-        $this->createTestUser('1 day ago', 'ddd', 'foobAds');
+        $john = $this->createLonelyTestUser('johnno', 'foobAds');
+        $firstGuy = $this->createTestUser('91 days ago', 'ccc', 'foobAds');
+        $secondGuy = $this->createTestUser('1 day ago', 'ddd', 'foobAds');
         $this->createTestUser('3 days ago', 'eee', 'barfAds');
         $this->createTestUser('70 days ago', 'fff', 'barfAds');
+
         $this->assertEquals(4, count(self::$affiliateService->getMatchingUsers($affiliate)));
         $this->assertEquals(2, count(self::$affiliateService->getMatchingUsers($affiliate2)));
-        $this->assertEquals(0, count(self::$affiliateService->getMatchingUsers($affiliate, true)));
+        $this->assertEquals(
+            0,
+            count(self::$affiliateService->getMatchingUsers($affiliate, [User::AQUISITION_COMPLETED]))
+        );
+        $this->assertEquals(
+            1,
+            count(self::$affiliateService->getMatchingUsers($affiliate, [USER::AQUISITION_POTENTIAL]))
+        );
+
+        $firstGuy->getFirstPolicy()->setStatus(Policy::STATUS_CANCELLED);
+        $secondGuy->getFirstPolicy()->setStatus(Policy::STATUS_CANCELLED);
+        $this->assertEquals(2, count(self::$affiliateService->getMatchingUsers($affiliate)));
+        $this->assertEquals(2, count(self::$affiliateService->getMatchingUsers($affiliate, [User::AQUISITION_LOST])));
+
+
         $charges = self::$affiliateService->generate();
-        $this->assertEquals(3, count(self::$affiliateService->getMatchingUsers($affiliate, true)));
-        $this->assertEquals(1, count(self::$affiliateService->getMatchingUsers($affiliate)));
-        $this->assertEquals(1, count(self::$affiliateService->getMatchingUsers($affiliate2, true)));
+        $this->assertEquals(
+            2,
+            count(self::$affiliateService->getMatchingUsers($affiliate, [User::AQUISITION_COMPLETED]))
+        );
+        $this->assertEquals(0, count(self::$affiliateService->getMatchingUsers($affiliate)));
+        $this->assertEquals(
+            1,
+            count(self::$affiliateService->getMatchingUsers($affiliate2, [User::AQUISITION_COMPLETED]))
+        );
         $this->assertEquals(1, count(self::$affiliateService->getMatchingUsers($affiliate2)));
-        $this->assertEquals($startCharges + 4, count(self::$chargeRepo->findMonthly(null, 'affiliate')));
+        $this->assertEquals($startCharges + 3, count(self::$chargeRepo->findMonthly(null, 'affiliate')));
         foreach ($charges as $charge) {
             $this->assertContains($charge->getAmount(), [2.5, 4.5]);
         }

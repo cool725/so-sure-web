@@ -63,7 +63,7 @@ class OpsReportCommandTest extends KernelTestCase
             ],
             'browser' => 'Internal'
         ];
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         self::$redis->hset('client-validation', json_encode($data), $now->format('U'));
         $this->callCommand('no validation');
     }
@@ -78,7 +78,7 @@ class OpsReportCommandTest extends KernelTestCase
             ],
             'browser' => 'Internal'
         ];
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         self::$redis->hset('client-validation', json_encode($data), $now->format('U'));
         $this->callCommand('found validation');
     }
@@ -92,7 +92,7 @@ class OpsReportCommandTest extends KernelTestCase
             ],
             'browser' => 'Internal'
         ];
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         self::$redis->hset('client-validation', json_encode($data), $now->format('U'));
         $this->callCommand('no validation');
     }
@@ -103,7 +103,7 @@ class OpsReportCommandTest extends KernelTestCase
             'url' => '/testurl3',
             'browser' => 'Internal'
         ];
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         self::$redis->hset('client-validation', json_encode($data), $now->format('U'));
         $this->callCommand('no validation');
     }

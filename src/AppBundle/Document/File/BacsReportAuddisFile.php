@@ -30,7 +30,7 @@ class BacsReportAuddisFile extends UploadFile
      */
     public function getS3FileName()
     {
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
 
         return sprintf(
             'auddis-%d-%02d-%s',
