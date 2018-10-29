@@ -125,7 +125,10 @@ class PhoneRepository extends DocumentRepository
             $db_make = $this->inArrayInsensitive($make, $this->findActiveMakes());
 
             throw new \Exception(sprintf(
-                "The device make (%s) is in the database but with using different letter casing! (%s)", $make, $db_make));
+                "The device make (%s) is in the database but with using different letter casing! (%s)",
+                $make,
+                $db_make)
+            );
         }
 
         $models = [];
@@ -141,8 +144,10 @@ class PhoneRepository extends DocumentRepository
             $db_model = $this->inArrayInsensitive($model, $models);
 
             throw new \Exception(sprintf(
-                "The model (%s) is in the database but but with using different letter casing! (%s)", $model, $db_model
-            ));
+                "The model (%s) is in the database but with using different letter casing! (%s)",
+                $model,
+                $db_model)
+            );
         }
 
         return $this->createQueryBuilder()
