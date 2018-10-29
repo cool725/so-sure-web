@@ -229,9 +229,7 @@
                                  data-share-text="{{ share_experiment_text }}">
                             </div>
                         </div>
-                        {% if device_category() == 'Mobile' %}
-
-                        {% else %}
+                        {% if device_category() == 'Desktop' or device_category() == 'Tablet'  %}
                             <div class="mt-4">
                                 <a href="#"
                                    class="btn btn-outline-grey ml-md-2 opacity-50"
@@ -286,9 +284,7 @@
                                 </div>
                             </div>
                         </div>
-                        {% if device_category() == 'Mobile' %}
-
-                        {% else %}
+                        {% if device_category() == 'Desktop' or device_category() == 'Tablet'  %}
                             <div class="mt-5">
                                 <a href="{{ path('fos_user_security_login') }}"
                                    class="btn btn-outline-primary"
