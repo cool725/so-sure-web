@@ -842,11 +842,9 @@ class PhonePolicy extends Policy
         }
     }
 
-    public function getExcessValue($type, Claim $claim = null)
+    public function getExcessValue($type)
     {
-        $validated = $this->isPicSureValidated($claim);
-
-        return Claim::getExcessValue($type, $validated, $this->isPicSurePolicy());
+        return Claim::getExcessValue($type, $this->isPicSureValidated(), $this->isPicSurePolicy());
     }
 
     public function toApiArray()
