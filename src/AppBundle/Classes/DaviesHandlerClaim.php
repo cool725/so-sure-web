@@ -5,11 +5,13 @@ use AppBundle\Document\Claim;
 use AppBundle\Document\CurrencyTrait;
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\ImeiTrait;
+use AppBundle\Document\PhoneTrait;
 
 class DaviesHandlerClaim extends HandlerClaim
 {
     use CurrencyTrait;
     use DateTrait;
+    use PhoneTrait;
     use ImeiTrait;
     use ExcelTrait;
 
@@ -265,7 +267,7 @@ class DaviesHandlerClaim extends HandlerClaim
             $this->brightstarProductNumber = $this->nullIfBlank($data[++$i]);
             $this->replacementMake = $this->nullIfBlank($data[++$i]);
             $this->replacementModel = $this->nullIfBlank($data[++$i]);
-            $this->replacementImei = $this->nullIfBlank($data[++$i], 'replacementImei', $this);
+            $this->replacementImei = $this->nullImeiIfBlank($data[++$i]);
             $this->replacementReceivedDate = $this->excelDate($data[++$i], false, true);
 
             if (in_array($columns, [self::COLUMN_COUNT_V6, self::COLUMN_COUNT_V7, self::COLUMN_COUNT_V8])) {
@@ -278,7 +280,6 @@ class DaviesHandlerClaim extends HandlerClaim
                 $this->reciperoFee = $this->nullIfBlank($data[++$i]);
                 $this->transactionFees = $this->nullIfBlank($data[++$i]);
                 $this->feesReserve = $this->nullIfBlank($data[++$i]);
-
                 $this->reserved = $this->nullIfBlank($data[++$i]);
                 $this->incurred = $this->nullIfBlank($data[++$i]);
                 $this->handlingFees = $this->nullIfBlank($data[++$i]);
@@ -386,20 +387,6 @@ class DaviesHandlerClaim extends HandlerClaim
         return $claim;
     }
 
-    protected function nullIfBlank($field, $fieldName = null, $ref = null)
-    {
-        if (!$field || $this->isNullableValue($field)) {
-            return null;
-        } elseif ($this->isUnobtainableValue($field)) {
-            if ($fieldName && $ref) {
-                $ref->unobtainableFields[] = $fieldName;
-            }
-
-            return null;
-        }
-
-        return str_replace('£', '', trim($field));
-    }
 
     protected function isSuspicious($field)
     {
@@ -416,7 +403,7 @@ class DaviesHandlerClaim extends HandlerClaim
         return null;
     }
 
-    protected function isNullableValue($value)
+    public function isNullableValue($value)
     {
         // possible values that Davies might use as placeholders
         // when a field is required by their system, but not yet known
@@ -424,7 +411,7 @@ class DaviesHandlerClaim extends HandlerClaim
             'N/A', 'n/a', 'NA', 'na', '#N/A', 'Not Applicable']);
     }
 
-    protected function isUnobtainableValue($value)
+    public function isUnobtainableValue($value)
     {
         // possible values that Davies might use as placeholders
         // when a field is required by their system, but data will never be provided

@@ -175,6 +175,47 @@ abstract class HandlerClaim
         return null;
     }
 
+    protected function nullIfBlank($field, $fieldName = null, $ref = null)
+    {
+        if (!$field || $this->isNullableValue($field)) {
+            return null;
+        } elseif ($this->isUnobtainableValue($field)) {
+            if ($fieldName && $ref) {
+                $ref->unobtainableFields[] = $fieldName;
+            }
+            return null;
+        }
+        return str_replace('_x000D_', PHP_EOL, str_replace('£', '', trim($field)));
+    }
+
+    /**
+     * Reads an IMEI value from the data array, and if it has a junk value returns null
+     * @param object $field is the field to be read from the array
+     * @return object the field if it is an IMEI, or null if it is junk
+     */
+    protected function nullImeiIfBlank($field)
+    {
+        $imei = $this->nullIfBlank($field, 'replacementImei', $this);
+        if ($imei) {
+            $imei = $this->normalizeImei($imei);
+        }
+        return $imei;
+    }
+
+    /**
+     * Determines if a given value corresponds to what the claim handler gives when data has not yet
+     * been provided but may be in the future.
+     * @param string value is the given value
+     * @return boolean true iff the value corresponds to absent data
+     */
+    abstract public function isNullableValue($value);
+
+    /**
+     * Determines if a given value corresponds to what the claim handler gives when data is not available.
+     * @param string value is the given value
+     * @return boolean true iff the value corresponds to unavailable data.
+     */
+    abstract public function isUnobtainableValue($value);
     abstract public function hasError();
     abstract public function getClaimType();
     abstract public function getReplacementPhoneDetails();

@@ -36,7 +36,7 @@ class DaviesHandlerClaimTest extends \PHPUnit\Framework\TestCase
             '42794',
             'Samsung',
             'S6',
-            '149358212660892',
+            '14935 82126608 92',
             '42794',
             '£250.49',
             '£5.29',
@@ -312,7 +312,6 @@ class DaviesHandlerClaimTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(0.02, $davies->accessories);
         $this->assertEquals(0.04, $davies->unauthorizedCalls);
         $this->assertEquals(-35, $davies->incurred);
-
         $this->assertNull($davies->replacementImei);
         $this->assertEquals(1, count($davies->unobtainableFields));
         $this->assertEquals('replacementImei', $davies->unobtainableFields[0]);

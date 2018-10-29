@@ -5,12 +5,14 @@ use AppBundle\Document\Claim;
 use AppBundle\Document\CurrencyTrait;
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\ImeiTrait;
+use AppBundle\Document\PhoneTrait;
 
 class DirectGroupHandlerClaim extends HandlerClaim
 {
     use CurrencyTrait;
     use DateTrait;
     use ImeiTrait;
+    use PhoneTrait;
     use ExcelTrait;
 
     const SHEET_NAME_V1 = 'Report';
@@ -283,7 +285,7 @@ class DirectGroupHandlerClaim extends HandlerClaim
             $this->replacementReceivedDate = $this->excelDate($data[++$i]);
             $this->replacementMake = $this->nullIfBlank($data[++$i]);
             $this->replacementModel = $this->nullIfBlank($data[++$i]);
-            $this->replacementImei = $this->nullIfBlank($data[++$i], 'replacementImei', $this);
+            $this->replacementImei = $this->nullIfBlank($this->normalizeImei($data[++$i]), 'replacementImei', $this);
             $this->shippingAddress = $this->nullIfBlank($data[++$i]);
             $this->phoneReplacementCost = $this->nullIfBlank($data[++$i]);
             $this->phoneReplacementCostReserve = $this->nullIfBlank($data[++$i]);
@@ -313,29 +315,14 @@ class DirectGroupHandlerClaim extends HandlerClaim
         return true;
     }
 
-    protected function nullIfBlank($field, $fieldName = null, $ref = null)
-    {
-        if (!$field || $this->isNullableValue($field)) {
-            return null;
-        } elseif ($this->isUnobtainableValue($field)) {
-            if ($fieldName && $ref) {
-                $ref->unobtainableFields[] = $fieldName;
-            }
-
-            return null;
-        }
-
-        return str_replace('_x000D_', PHP_EOL, str_replace('£', '', trim($field)));
-    }
-
-    protected function isNullableValue($value)
+    public function isNullableValue($value)
     {
         // possible values that Direct Group might use as placeholders
         // when a field is required by their system, but not yet known
         return in_array(trim($value), ['']);
     }
 
-    protected function isUnobtainableValue($value)
+    public function isUnobtainableValue($value)
     {
         // possible values that Direct Group might use as placeholders
         // when a field is required by their system, but data will never be provided
