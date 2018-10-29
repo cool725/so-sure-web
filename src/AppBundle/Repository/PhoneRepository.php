@@ -115,41 +115,52 @@ class PhoneRepository extends DocumentRepository
             ->execute();
     }
 
+    public function checkMake($make)
+    {
+        $qb = $this->createQueryBuilder()
+            ->field('makeCanonical')
+            ->equals(mb_strtolower($make))
+            ->distinct('make')
+            ->getQuery()
+            ->execute();
+
+        foreach ($qb as $db_make) {
+            if ($db_make !== $make) {
+                throw new \Exception(sprintf(
+                    "The device make (%s) is in the database but with using different letter casing! (%s)",
+                    $db_make,
+                    $make
+                ));
+            }
+        }
+
+        return false;
+    }
+
+    public function checkModel($model)
+    {
+        $qb = $this->createQueryBuilder()
+            ->field('modelCanonical')
+            ->equals(mb_strtolower($model))
+            ->distinct('model')
+            ->getQuery()
+            ->execute();
+
+        foreach ($qb as $db_model) {
+            if ($db_model !== $model) {
+                throw new \Exception(sprintf(
+                    "The model (%s) is in the database but with using different letter casing! (%s)",
+                    $db_model,
+                    $model
+                ));
+            }
+        }
+
+        return false;
+    }
+
     public function alreadyExists($make, $model, $memory)
     {
-        if (!$this->inArrayInsensitive($make, $this->findActiveMakes())) {
-            return false;
-        }
-
-        if (!in_array($make, $this->findActiveMakes())) {
-            $db_make = $this->inArrayInsensitive($make, $this->findActiveMakes());
-
-            throw new \Exception(sprintf(
-                "The device make (%s) is in the database but with using different letter casing! (%s)",
-                $make,
-                $db_make)
-            );
-        }
-
-        $models = [];
-        foreach ($this->findActiveModels($make) as $db_model) {
-            $models[$db_model->getModel()] = $db_model->getModel();
-        }
-
-        if (!$this->inArrayInsensitive($model, $models)) {
-            return false;
-        }
-
-        if (!in_array($model, $models)) {
-            $db_model = $this->inArrayInsensitive($model, $models);
-
-            throw new \Exception(sprintf(
-                "The model (%s) is in the database but with using different letter casing! (%s)",
-                $model,
-                $db_model)
-            );
-        }
-
         return $this->createQueryBuilder()
                 ->field('make')->equals($make)
                 ->field('model')->equals($model)
@@ -157,10 +168,5 @@ class PhoneRepository extends DocumentRepository
                 ->getQuery()
                 ->execute()
                 ->count() > 0;
-    }
-
-    private function inArrayInsensitive($needle, $haystack)
-    {
-        return array_search(mb_strtolower($needle), array_map('mb_strtolower', $haystack));
     }
 }
