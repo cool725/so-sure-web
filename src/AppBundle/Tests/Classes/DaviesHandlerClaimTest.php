@@ -135,7 +135,7 @@ class DaviesHandlerClaimTest extends \PHPUnit\Framework\TestCase
             'TBC',
             'Samsung',
             'Galaxy S7 edge (32 GB)',
-            '149358212660892',
+            '14-93  5821   26-608   92',
             'TBC',
             '£0.01',
             '£700.00',
