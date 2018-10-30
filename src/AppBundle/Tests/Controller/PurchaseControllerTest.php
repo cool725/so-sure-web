@@ -1242,7 +1242,7 @@ class PurchaseControllerTest extends BaseControllerTest
     private function agreePledge(Crawler $crawler, $agreed = 1)
     {
         $form = $crawler->selectButton('purchase_form[next]')->form();
-        $agreedCheckboxes = ['agreedDamage', 'agreedAgeLocation', 'agreedTerms'];
+        $agreedCheckboxes = ['agreedDamage', 'agreedAgeLocation', 'agreedExcess', 'agreedTerms'];
         foreach ($agreedCheckboxes as $checkbox) {
             if ($agreed) {
                 try {

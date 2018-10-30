@@ -124,6 +124,7 @@ services:
     AppBundle\Service\PaymentService:
         arguments:
             - "@app.judopay"
+            - "@app.router"
             - "@logger"
             - "@doctrine_mongodb.odm.default_document_manager"
             - "@app.sequence"
