@@ -99,11 +99,11 @@ class CognitoIdentityAuthenticator implements SimplePreAuthenticatorInterface, A
     public function getCognitoIdentitySdk($requestContent)
     {
         $userAgent = $this->getCognitoIdentityUserAgent($requestContent);
-        if ($userAgent && mb_stripos($userAgent, 'aws-sdk-android') === false) {
+        if ($userAgent && mb_stripos($userAgent, 'aws-sdk-android') !== false) {
             return IdentityLog::SDK_ANDROID;
-        } elseif ($userAgent && mb_stripos($userAgent, 'aws-sdk-iOS') === false) {
+        } elseif ($userAgent && mb_stripos($userAgent, 'aws-sdk-iOS') !== false) {
             return IdentityLog::SDK_IOS;
-        } elseif ($userAgent && mb_stripos($userAgent, 'aws-sdk-javascript') === false) {
+        } elseif ($userAgent && mb_stripos($userAgent, 'aws-sdk-javascript') !== false) {
             // TODO: Test this when released
             return IdentityLog::SDK_JAVASCRIPT;
         }
