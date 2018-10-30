@@ -106,7 +106,7 @@ class BacsPayment extends Payment
 
     public function isOneOffPayment()
     {
-        return $this->isOneOffPayment();
+        return $this->oneOffPayment;
     }
 
     public function setIsOneOffPayment($oneOffPayment)
