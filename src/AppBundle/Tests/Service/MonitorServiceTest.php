@@ -3,6 +3,7 @@
 namespace AppBundle\Tests\Service;
 
 use AppBundle\Document\DateTrait;
+use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Policy;
 use AppBundle\Document\SalvaPhonePolicy;
@@ -10,10 +11,12 @@ use AppBundle\Document\User;
 use AppBundle\Exception\MonitorException;
 use AppBundle\Form\Type\UserRoleType;
 use AppBundle\Repository\Invitation\InvitationRepository;
+use AppBundle\Service\InvitationService;
 use AppBundle\Service\MonitorService;
 use Doctrine\Tests\Common\DataFixtures\TestDocument\Role;
 use Exception;
 use AppBundle\Document\Invitation\EmailInvitation;
+use FOS\UserBundle\Model\UserManager;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\Claim;
 use Symfony\Component\Validator\Constraints\Date;
@@ -31,8 +34,14 @@ class MonitorServiceTest extends WebTestCase
 
     protected static $container;
 
+    /** @var Phone */
+    protected static $phone;
+
     /** @var MonitorService */
     protected static $monitor;
+
+    /** @var InvitationService */
+    protected static $invitationService;
 
     public static function setUpBeforeClass()
     {
@@ -46,6 +55,16 @@ class MonitorServiceTest extends WebTestCase
         //now we can instantiate our service (if you want a fresh one for
         //each test method, do this in setUp() instead
         self::$dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+
+        /** @var InvitationService invitationService */
+        $invitationService = self::$container->get('app.invitation');
+        $invitationService->setDebug(true);
+        self::$invitationService = $invitationService;
+
+        self::$invitationService->setEnvironment('test');
+
+        /** @var UserManager userManager */
+        self::$userManager = self::$container->get('fos_user.user_manager');
 
         /** @var MonitorService $monitor */
         $monitor = self::$container->get('app.monitor');
@@ -222,15 +241,14 @@ class MonitorServiceTest extends WebTestCase
         self::$monitor->policyFiles();
     }
 
-    /*
-     * expectedException \AppBundle\Exception\MonitorException
-
+    /**
+     * @expectedException \AppBundle\Exception\MonitorException
+     */
     public function testPolicyPending()
     {
-        $policy = self::createUserPolicy(true, new \DateTime(), true);
+        $policy = self::createUserPolicy(true);
+        $policy->getUser()->setEmail(static::generateEmail('pending', $this));
         $policy->setPolicyNumber(self::setRandomPolicyNumber('Mob'));
-
-        $policy->setUser($user);
         $policy->setStatus(Policy::STATUS_PENDING);
 
         self::$dm->persist($policy->getUser());
@@ -240,36 +258,41 @@ class MonitorServiceTest extends WebTestCase
 
         self::$monitor->policyPending();
     }
-    */
 
-    /*
-     * expectedException \AppBundle\Exception\MonitorException
+    /**
+     * @expectedException \AppBundle\Exception\MonitorException
+     */
     public function testDuplicateInvites()
     {
-        $inviteOne = new EmailInvitation();
-        $inviteTwo = new EmailInvitation();
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testDuplicateInvites', $this),
+            'bar'
+        );
 
-        $user = new User();
-        $user->setEmail('foo@bar.com');
+        $policy = self::initPolicy($user, self::$dm, $this->getRandomPhone(self::$dm), null, false, true);
+        $policy->setStatus(Policy::STATUS_ACTIVE);
 
-        $policy = new SalvaPhonePolicy();
-        $policy->setUser($user);
+        $invitationOne = self::$invitationService->inviteByEmail(
+            $policy,
+            self::generateEmail('testDuplicateInvites-invite-one', $this)
+        );
 
-        $inviteOne->setEmail($user->getEmail());
-        $inviteOne->setPolicy($policy);
+        $invitationTwo = self::$invitationService->inviteByEmail(
+            $policy,
+            self::generateEmail('testDuplicateInvites-invite-two', $this)
+        );
 
-        $inviteTwo->setEmail($user->getEmail());
-        $inviteTwo->setPolicy($policy);
+        $invitationTwo->setEmail(self::generateEmail('testDuplicateInvites-invite-one', $this));
 
+        self::$dm->persist($policy->getUser());
         self::$dm->persist($policy);
-        self::$dm->persist($user);
-        self::$dm->persist($inviteOne);
-        self::$dm->persist($inviteTwo);
+        self::$dm->persist($invitationOne);
+        self::$dm->persist($invitationTwo);
         self::$dm->flush();
 
         self::$monitor->duplicateInvites();
     }
-    */
 
     /**
      * @expectedException \AppBundle\Exception\MonitorException
@@ -309,10 +332,13 @@ class MonitorServiceTest extends WebTestCase
      */
     public function testCheckExpiration()
     {
-        $policy = new SalvaPhonePolicy();
+        $policy = self::createUserPolicy(true);
+        $policy->getUser()->setEmail(static::generateEmail('expired', $this));
+        $policy->setPolicyNumber(self::setRandomPolicyNumber('Mob'));
         $policy->setStatus(Policy::STATUS_ACTIVE);
         $policy->setEnd((\DateTime::createFromFormat('U', time()))->sub(new \DateInterval('P1D')));
 
+        self::$dm->persist($policy->getUser());
         self::$dm->persist($policy);
         self::$dm->flush();
 

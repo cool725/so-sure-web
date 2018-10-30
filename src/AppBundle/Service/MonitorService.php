@@ -750,7 +750,7 @@ class MonitorService
         if (count($results) > 0) {
             foreach ($results as $result) {
                 throw new MonitorException(
-                    "Found duplicate Invites on email {$result->getEmail()}"
+                    "Found duplicate Invites on email {$result['_id']['email']}"
                 );
             }
         }
