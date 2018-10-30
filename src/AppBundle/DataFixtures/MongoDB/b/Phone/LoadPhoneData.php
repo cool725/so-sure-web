@@ -232,8 +232,26 @@ abstract class LoadPhoneData implements ContainerAwareInterface
 
             // check if the phone is already in the database
             $repo = $manager->getRepository(Phone::class);
-            $repo->checkMake($data[0]);
-            $repo->checkModel($data[1]);
+
+            foreach ($repo->findMatchingMakes($data[0]) as $make) {
+                if ($make !== $data[0]) {
+                    throw new \Exception(sprintf(
+                        "The device make (%s) is in the database but with using different letter casing! (%s)",
+                        $make,
+                        $data[0]
+                    ));
+                }
+            }
+
+            foreach ($repo->findMatchingModels($data[0], $data[1]) as $model) {
+                if ($model !== $data[1]) {
+                    throw new \Exception(sprintf(
+                            "The model (%s) is in the database but with using different letter casing! (%s)",
+                        $model,
+                        $data[1]
+                    ));
+                }
+            }
 
             if ($repo->alreadyExists($data[0], $data[1], $data[3])) {
                 throw new \Exception(sprintf('The device %s / %s / %sGB is already in the database', $data[0], $data[1], $data[3]));

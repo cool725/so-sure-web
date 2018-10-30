@@ -115,48 +115,26 @@ class PhoneRepository extends DocumentRepository
             ->execute();
     }
 
-    public function checkMake($make)
+    public function findMatchingMakes($make)
     {
-        $qb = $this->createQueryBuilder()
+        return $qb = $this->createQueryBuilder()
             ->field('makeCanonical')
             ->equals(mb_strtolower($make))
             ->distinct('make')
             ->getQuery()
             ->execute();
-
-        foreach ($qb as $db_make) {
-            if ($db_make !== $make) {
-                throw new \Exception(sprintf(
-                    "The device make (%s) is in the database but with using different letter casing! (%s)",
-                    $db_make,
-                    $make
-                ));
-            }
-        }
-
-        return false;
     }
 
-    public function checkModel($model)
+    public function findMatchingModels($make, $model)
     {
-        $qb = $this->createQueryBuilder()
+        return $qb = $this->createQueryBuilder()
+            ->field('makeCanonical')
+            ->equals(mb_strtolower($make))
             ->field('modelCanonical')
             ->equals(mb_strtolower($model))
             ->distinct('model')
             ->getQuery()
             ->execute();
-
-        foreach ($qb as $db_model) {
-            if ($db_model !== $model) {
-                throw new \Exception(sprintf(
-                    "The model (%s) is in the database but with using different letter casing! (%s)",
-                    $db_model,
-                    $model
-                ));
-            }
-        }
-
-        return false;
     }
 
     public function alreadyExists($make, $model, $memory)
