@@ -281,8 +281,10 @@ class PurchaseControllerTest extends BaseControllerTest
         $crawler = $this->setPayment($crawler, $phone);
         self::verifyResponse(302);
         $crawler = self::$client->followRedirect();
-        $link = $crawler->filter('#web-pay-submit')->first()->link();
-        $crawler = self::$client->click($link);
+
+        $form = $crawler->selectButton('Click Here')->form();
+        $crawler = self::$client->submit($form);
+        self::verifyResponse(200);
         $this->verifyPurchaseReady($crawler);
     }
 
@@ -511,8 +513,10 @@ class PurchaseControllerTest extends BaseControllerTest
         $crawler = $this->setPayment($crawler, $phone);
         self::verifyResponse(302);
         $crawler = self::$client->followRedirect();
-        $link = $crawler->filter('#web-pay-submit')->first()->link();
-        $crawler = self::$client->click($link);
+
+        $form = $crawler->selectButton('Click Here')->form();
+        $crawler = self::$client->submit($form);
+        self::verifyResponse(200);
         $this->verifyPurchaseReady($crawler);
     }
 
@@ -546,8 +550,10 @@ class PurchaseControllerTest extends BaseControllerTest
         $crawler = $this->setPayment($crawler, $phone);
         self::verifyResponse(302);
         $crawler = self::$client->followRedirect();
-        $link = $crawler->filter('#web-pay-submit')->first()->link();
-        $crawler = self::$client->click($link);
+
+        $form = $crawler->selectButton('Click Here')->form();
+        $crawler = self::$client->submit($form);
+        self::verifyResponse(200);
         $this->verifyPurchaseReady($crawler);
     }
 
@@ -670,8 +676,10 @@ class PurchaseControllerTest extends BaseControllerTest
         $crawler = $this->setPayment($crawler, $phone);
         self::verifyResponse(302);
         $crawler = self::$client->followRedirect();
-        $link = $crawler->filter('#web-pay-submit')->first()->link();
-        $crawler = self::$client->click($link);
+
+        $form = $crawler->selectButton('Click Here')->form();
+        $crawler = self::$client->submit($form);
+        self::verifyResponse(200);
         $this->verifyPurchaseReady($crawler);
     }
 
@@ -705,8 +713,10 @@ class PurchaseControllerTest extends BaseControllerTest
         $crawler = $this->setPayment($crawler, $phone);
         self::verifyResponse(302);
         $crawler = self::$client->followRedirect();
-        $link = $crawler->filter('#web-pay-submit')->first()->link();
-        $crawler = self::$client->click($link);
+
+        $form = $crawler->selectButton('Click Here')->form();
+        $crawler = self::$client->submit($form);
+        self::verifyResponse(200);
         $this->verifyPurchaseReady($crawler);
     }
 
@@ -740,8 +750,10 @@ class PurchaseControllerTest extends BaseControllerTest
         $crawler = $this->setPayment($crawler, $phone);
         self::verifyResponse(302);
         $crawler = self::$client->followRedirect();
-        $link = $crawler->filter('#web-pay-submit')->first()->link();
-        $crawler = self::$client->click($link);
+
+        $form = $crawler->selectButton('Click Here')->form();
+        $crawler = self::$client->submit($form);
+        self::verifyResponse(200);
         $this->verifyPurchaseReady($crawler);
     }
 
@@ -781,8 +793,10 @@ class PurchaseControllerTest extends BaseControllerTest
         $crawler = $this->setPayment($crawler, $phone);
         self::verifyResponse(302);
         $crawler = self::$client->followRedirect();
-        $link = $crawler->filter('#web-pay-submit')->first()->link();
-        $crawler = self::$client->click($link);
+
+        $form = $crawler->selectButton('Click Here')->form();
+        $crawler = self::$client->submit($form);
+        self::verifyResponse(200);
         $this->verifyPurchaseReady($crawler);
     }
 

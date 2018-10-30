@@ -28,7 +28,7 @@ sosure.purchaseStepBacs = (function() {
         self.isIE = !!navigator.userAgent.match(/Trident/g) || !!navigator.userAgent.match(/MSIE/g);
         self.loader = $('#so-sure-loader');
         self.webPay = $('#webpay-form');
-        self.webPayBtn = $('#web-pay-submit');
+        self.webPayBtn = $('#to_judo_form_submit');
         if (self.form.data('client-validation') && !self.isIE) {
             self.addValidation();
         }
@@ -92,21 +92,21 @@ sosure.purchaseStepBacs = (function() {
     return self;
 })();
 
-$(function(){
+function goToJudo() {
+    // Show loading overlay
+    sosure.purchaseStepBacs.loader.show();
 
-    sosure.purchaseStepBacs.init();
-
-    sosure.purchaseStepBacs.webPayBtn.on('click', function() {
-
-        if ($.trim($('#Reference').val()).length > 0) {
-            // Show loading overlay
-            sosure.purchaseStepBacs.loader.show();
-
-            // Add tracking
-            let name = $(this).data('event');
-            trackByName(name, function() {
-                sosure.purchaseStepBacs.webPay.submit();
-            });
-        }
+    // Add tracking
+    // TODO: this currently does not work.
+    // TODO: see common/track.js to see the track by name function, it seems to get make it track when the below
+    //       function occurs or something, but I don/'t know what the name variable should be right now.
+    let name = $(this).data('event');
+    trackByName(name, function() {
+        sosure.purchaseStepBacs.webPay.submit();
     });
+}
+
+$(function() {
+    sosure.purchaseStepBacs.init();
+    sosure.purchaseStepBacs.webPayBtn.on('click', goToJudo);
 });
