@@ -283,7 +283,7 @@ class DirectGroupHandlerClaim extends HandlerClaim
             $this->replacementReceivedDate = $this->excelDate($data[++$i]);
             $this->replacementMake = $this->nullIfBlank($data[++$i]);
             $this->replacementModel = $this->nullIfBlank($data[++$i]);
-            $this->replacementImei = $this->nullIfBlank($this->normalizeImei($data[++$i]), 'replacementImei', $this);
+            $this->replacementImei = $this->nullImeiIfBlank($data[++$i]);
             $this->shippingAddress = $this->nullIfBlank($data[++$i]);
             $this->phoneReplacementCost = $this->nullIfBlank($data[++$i]);
             $this->phoneReplacementCostReserve = $this->nullIfBlank($data[++$i]);

@@ -191,8 +191,8 @@ abstract class HandlerClaim
     }
 
     /**
-     * Reads an IMEI value from the data array, and if it has a junk value returns null
-     * @param object $field is the field to be read from the array
+     * Reads an IMEI value, and if it has a junk value returns null
+     * @param object $field is the variable to be read
      * @return object the field if it is an IMEI, or null if it is junk
      */
     protected function nullImeiIfBlank($field)
