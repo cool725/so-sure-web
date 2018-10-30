@@ -152,7 +152,7 @@ abstract class BaseController extends Controller
         /** @var CognitoIdentityAuthenticator $auth */
         $auth = $this->get('app.user.cognitoidentity.authenticator');
 
-        return $auth->getCognitoIdentityIp($request->getContent());
+        return $auth->getCognitoIdentityIp((string) $request->getContent());
     }
 
     protected function getCognitoIdentitySdk(Request $request)
@@ -160,7 +160,7 @@ abstract class BaseController extends Controller
         /** @var CognitoIdentityAuthenticator $auth */
         $auth = $this->get('app.user.cognitoidentity.authenticator');
 
-        return $auth->getCognitoIdentitySdk($request->getContent());
+        return $auth->getCognitoIdentitySdk((string) $request->getContent());
     }
 
     protected function getCognitoIdToken(User $user, Request $request)
