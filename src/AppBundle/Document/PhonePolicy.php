@@ -733,15 +733,15 @@ class PhonePolicy extends Policy
             foreach ($this->getClaims() as $claim) {
                 /** @var Claim $claim */
                 if (in_array(
-                        $claim->getStatus(),
-                        array(
-                            Claim::STATUS_FNOL,
-                            Claim::STATUS_SUBMITTED,
-                            Claim::STATUS_INREVIEW,
-                            Claim::STATUS_APPROVED,
-                            Claim::STATUS_SETTLED,
-                        )
-                    ) && !$claim->isIgnoreWarningFlagSet(Claim::WARNING_FLAG_CLAIMS_ALLOW_PICSURE_REDO)) {
+                    $claim->getStatus(),
+                    [
+                        Claim::STATUS_FNOL,
+                        Claim::STATUS_SUBMITTED,
+                        Claim::STATUS_INREVIEW,
+                        Claim::STATUS_APPROVED,
+                        Claim::STATUS_SETTLED,
+                    ]
+                ) && !$claim->isIgnoreWarningFlagSet(Claim::WARNING_FLAG_CLAIMS_ALLOW_PICSURE_REDO)) {
                     $status = self::PICSURE_STATUS_CLAIM_PREVENTED;
                     break;
                 }
