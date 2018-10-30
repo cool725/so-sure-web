@@ -97,11 +97,7 @@ function goToJudo() {
     sosure.purchaseStepBacs.loader.show();
 
     // Add tracking
-    // TODO: this currently does not work.
-    // TODO: see common/track.js to see the track by name function, it seems to get make it track when the below
-    //       function occurs or something, but I don/'t know what the name variable should be right now.
-    let name = $(this).data('event');
-    trackByName(name, function() {
+    trackByName("purchase-bacs-web-pay", function() {
         sosure.purchaseStepBacs.webPay.submit();
     });
 }
