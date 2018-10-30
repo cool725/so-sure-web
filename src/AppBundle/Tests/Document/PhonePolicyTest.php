@@ -131,6 +131,91 @@ class PhonePolicyTest extends WebTestCase
         $this->assertFalse($policy->canAdjustPicSureStatusForClaim());
     }
 
+    public function testPicSureStatusWithClaimsPicSureRedo()
+    {
+        $policy = static::createUserPolicy(true);
+        $policy->getUser()->setEmail(static::generateEmail('testPicSureStatusWithClaimsPicSureRedo', $this));
+        static::$dm->persist($policy->getUser());
+        static::$dm->persist($policy);
+        static::$dm->flush();
+        $this->assertNotNull($policy->getId());
+
+        $claimA = new Claim();
+        $policy->addClaim($claimA);
+
+        $claimA->setStatus(Claim::STATUS_FNOL);
+        $this->assertEquals(
+            PhonePolicy::PICSURE_STATUS_CLAIM_PREVENTED,
+            $policy->getPicSureStatusWithClaims()
+        );
+
+        $claimA->setStatus(Claim::STATUS_SUBMITTED);
+        $this->assertEquals(
+            PhonePolicy::PICSURE_STATUS_CLAIM_PREVENTED,
+            $policy->getPicSureStatusWithClaims()
+        );
+
+        $claimA->setStatus(Claim::STATUS_INREVIEW);
+        $this->assertEquals(
+            PhonePolicy::PICSURE_STATUS_CLAIM_PREVENTED,
+            $policy->getPicSureStatusWithClaims()
+        );
+
+        $claimA->setStatus(Claim::STATUS_DECLINED);
+        $this->assertNull($policy->getPicSureStatusWithClaims());
+
+        $claimA->setStatus(Claim::STATUS_WITHDRAWN);
+        $this->assertNull($policy->getPicSureStatusWithClaims());
+
+        $claimA->setStatus(Claim::STATUS_APPROVED);
+        $this->assertEquals(
+            PhonePolicy::PICSURE_STATUS_CLAIM_PREVENTED,
+            $policy->getPicSureStatusWithClaims()
+        );
+
+        $claimB = new Claim();
+        $policy->addClaim($claimB);
+
+        $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_INVALID);
+        $claimA->setIgnoreWarningFlags(Claim::WARNING_FLAG_CLAIMS_ALLOW_PICSURE_REDO);
+
+        $claimB->setStatus(Claim::STATUS_FNOL);
+        $this->assertEquals(
+            PhonePolicy::PICSURE_STATUS_CLAIM_PREVENTED,
+            $policy->getPicSureStatusWithClaims()
+        );
+
+        $claimB->setStatus(Claim::STATUS_SUBMITTED);
+        $this->assertEquals(
+            PhonePolicy::PICSURE_STATUS_CLAIM_PREVENTED,
+            $policy->getPicSureStatusWithClaims()
+        );
+
+        $claimB->setStatus(Claim::STATUS_INREVIEW);
+        $this->assertEquals(
+            PhonePolicy::PICSURE_STATUS_CLAIM_PREVENTED,
+            $policy->getPicSureStatusWithClaims()
+        );
+
+        $claimB->setStatus(Claim::STATUS_DECLINED);
+        $this->assertEquals(
+            PhonePolicy::PICSURE_STATUS_INVALID,
+            $policy->getPicSureStatusWithClaims()
+        );
+
+        $claimB->setStatus(Claim::STATUS_WITHDRAWN);
+        $this->assertEquals(
+            PhonePolicy::PICSURE_STATUS_INVALID,
+            $policy->getPicSureStatusWithClaims()
+        );
+
+        $claimB->setStatus(Claim::STATUS_APPROVED);
+        $this->assertEquals(
+            PhonePolicy::PICSURE_STATUS_CLAIM_PREVENTED,
+            $policy->getPicSureStatusWithClaims()
+        );
+    }
+
     public function testPicSureStatusWithClaims()
     {
         $policy = static::createUserPolicy(true);
@@ -168,48 +253,15 @@ class PhonePolicyTest extends WebTestCase
         $this->assertNull($policy->getPicSureStatusWithClaims());
 
         $claimA->setStatus(Claim::STATUS_APPROVED);
-        $this->assertNull($policy->getPicSureStatusWithClaims());
+        $this->assertEquals(
+            PhonePolicy::PICSURE_STATUS_CLAIM_PREVENTED,
+            $policy->getPicSureStatusWithClaims()
+        );
 
         $claimB = new Claim();
         $policy->addClaim($claimB);
 
         $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_INVALID);
-
-        $claimB->setStatus(Claim::STATUS_FNOL);
-        $this->assertEquals(
-            PhonePolicy::PICSURE_STATUS_CLAIM_PREVENTED,
-            $policy->getPicSureStatusWithClaims()
-        );
-
-        $claimB->setStatus(Claim::STATUS_SUBMITTED);
-        $this->assertEquals(
-            PhonePolicy::PICSURE_STATUS_CLAIM_PREVENTED,
-            $policy->getPicSureStatusWithClaims()
-        );
-
-        $claimB->setStatus(Claim::STATUS_INREVIEW);
-        $this->assertEquals(
-            PhonePolicy::PICSURE_STATUS_CLAIM_PREVENTED,
-            $policy->getPicSureStatusWithClaims()
-        );
-
-        $claimB->setStatus(Claim::STATUS_DECLINED);
-        $this->assertEquals(
-            PhonePolicy::PICSURE_STATUS_INVALID,
-            $policy->getPicSureStatusWithClaims()
-        );
-
-        $claimB->setStatus(Claim::STATUS_WITHDRAWN);
-        $this->assertEquals(
-            PhonePolicy::PICSURE_STATUS_INVALID,
-            $policy->getPicSureStatusWithClaims()
-        );
-
-        $claimB->setStatus(Claim::STATUS_APPROVED);
-        $this->assertEquals(
-            PhonePolicy::PICSURE_STATUS_INVALID,
-            $policy->getPicSureStatusWithClaims()
-        );
 
         $claimStatus = array(
             Claim::STATUS_FNOL,
@@ -220,6 +272,14 @@ class PhonePolicyTest extends WebTestCase
             Claim::STATUS_APPROVED,
             Claim::STATUS_SETTLED
         );
+
+        foreach ($claimStatus as $status) {
+            $claimB->setStatus($status);
+            $this->assertEquals(
+                PhonePolicy::PICSURE_STATUS_CLAIM_PREVENTED,
+                $policy->getPicSureStatusWithClaims()
+            );
+        }
 
         $claimC = new Claim();
         $policy->addClaim($claimC);
