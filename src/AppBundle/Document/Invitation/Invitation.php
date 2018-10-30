@@ -17,7 +17,8 @@ use AppBundle\Validator\Constraints as AppAssert;
  *          "email"="EmailInvitation",
  *          "sms"="SmsInvitation",
  *          "scode"="SCodeInvitation",
- *          "facebook"="FacebookInvitation"
+ *          "facebook"="FacebookInvitation",
+ *          "appNative"="AppNativeShareInvitation"
  * })
  * @MongoDB\Index(keys={"email"="asc", "mobile"="asc", "policy.id"="asc"}, sparse="true")
  */
@@ -244,7 +245,7 @@ abstract class Invitation
         return $this->policy;
     }
 
-    public function setPolicy($policy)
+    public function setPolicy(Policy $policy)
     {
         $this->policy = $policy;
         $policy->getUser()->addSentInvitation($this);

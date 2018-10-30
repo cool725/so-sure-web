@@ -1,6 +1,7 @@
 <?php
 namespace AppBundle\Service;
 
+use AppBundle\Document\Invitation\AppNativeShareInvitation;
 use AppBundle\Repository\ConnectionRepository;
 use AppBundle\Repository\Invitation\EmailInvitationRepository;
 use AppBundle\Repository\Invitation\FacebookInvitationRepository;
@@ -504,7 +505,17 @@ class InvitationService
 
         $this->validatePolicy($policy);
         $this->validateSoSurePolicyEmail($policy, $user->getEmail());
-        $this->validateNotConnectedByUser($policy, $user);
+        try {
+            $this->validateNotConnectedByUser($policy, $user);
+        } catch (SelfInviteException $e) {
+            $appNativeShare = new AppNativeShareInvitation();
+            $appNativeShare->setPolicy($policy);
+
+            $this->dm->persist($appNativeShare);
+            $this->dm->flush();
+
+            throw $e;
+        }
 
         if ($scode->isReward()) {
             $this->addReward($policy, $scode->getReward());

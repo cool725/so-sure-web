@@ -1300,6 +1300,22 @@ class InvitationServiceTest extends WebTestCase
     }
 
     /**
+     * @expectedException AppBundle\Exception\SelfInviteException
+     */
+    public function testSCodeInvitationSelf()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testSCodeInvitationSelf', $this),
+            'bar'
+        );
+        $policy = static::initPolicy($user, static::$dm, static::$phone, null, false, true);
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+
+        $invitation = self::$invitationService->inviteBySCode($policy, $policy->getStandardSCode()->getCode());
+    }
+
+    /**
      * @expectedException AppBundle\Exception\FullPotException
      */
     public function testEmailInvitationPotFilled()
