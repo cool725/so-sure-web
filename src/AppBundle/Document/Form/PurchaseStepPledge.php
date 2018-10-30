@@ -37,6 +37,12 @@ class PurchaseStepPledge
 
     /**
      * @var boolean
+     * @Assert\IsTrue(message="You must confirm that you understand our excess policy")
+     */
+    protected $agreedExcess;
+
+    /**
+     * @var boolean
      * @Assert\IsTrue(message="You must agree to our terms")
      */
     protected $agreedTerms;
@@ -81,6 +87,16 @@ class PurchaseStepPledge
         $this->agreedAgeLocation = $agreedAgeLocation;
     }
 
+    public function getAgreedExcess()
+    {
+        return $this->agreedExcess;
+    }
+
+    public function setAgreedExcess($agreedExcess)
+    {
+        $this->agreedExcess = $agreedExcess;
+    }
+
     public function getAgreedTerms()
     {
         return $this->agreedTerms;
@@ -93,6 +109,7 @@ class PurchaseStepPledge
 
     public function areAllAgreed()
     {
-        return $this->getAgreedAgeLocation() && $this->getAgreedDamage() && $this->getAgreedTerms();
+        return $this->getAgreedAgeLocation() && $this->getAgreedDamage()
+        && $this->getAgreedExcess() && $this->getAgreedTerms();
     }
 }

@@ -47,6 +47,7 @@ class Claim
     const WARNING_FLAG_CLAIMS_INCORRECT_EXCESS = 'claim-incorrect-excess';
     const WARNING_FLAG_CLAIMS_IMEI_MISMATCH = 'claim-imei-mismatch';
     const WARNING_FLAG_CLAIMS_HANDLING_TEAM = 'claim-handling-team';
+    const WARNING_FLAG_CLAIMS_ALLOW_PICSURE_REDO = 'claim-allow-picsure-redo';
 
     const WARNING_FLAG_BRIGHTSTAR_NAME_MATCH = 'brightstar-name-match';
     const WARNING_FLAG_BRIGHTSTAR_POSTCODE = 'brighstar-postcode';
@@ -163,6 +164,7 @@ class Claim
         self::WARNING_FLAG_CLAIMS_INCORRECT_EXCESS => self::WARNING_FLAG_CLAIMS_INCORRECT_EXCESS,
         self::WARNING_FLAG_CLAIMS_IMEI_MISMATCH => self::WARNING_FLAG_CLAIMS_IMEI_MISMATCH,
         self::WARNING_FLAG_CLAIMS_HANDLING_TEAM => self::WARNING_FLAG_CLAIMS_HANDLING_TEAM,
+        self::WARNING_FLAG_CLAIMS_ALLOW_PICSURE_REDO => self::WARNING_FLAG_CLAIMS_ALLOW_PICSURE_REDO,
     ];
 
     public static $claimTypes = [
