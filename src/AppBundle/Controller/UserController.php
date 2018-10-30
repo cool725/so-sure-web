@@ -5,6 +5,7 @@ namespace AppBundle\Controller;
 use AppBundle\Document\CurrencyTrait;
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\Payment\BacsPayment;
+use AppBundle\Document\Payment\Payment;
 use AppBundle\Document\ScheduledPayment;
 use AppBundle\Security\UserVoter;
 use AppBundle\Security\ClaimVoter;
@@ -1132,7 +1133,7 @@ class UserController extends BaseController
 
             /** @var BacsService $bacsService */
             $bacsService = $this->get('app.bacs');
-            $bacsService->bacsPayment($policy, $notes, $amount);
+            $bacsService->bacsPayment($policy, $notes, $amount, null, true, Payment::SOURCE_WEB);
 
             $this->getManager()->flush();
 

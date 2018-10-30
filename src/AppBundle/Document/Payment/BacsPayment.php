@@ -31,11 +31,20 @@ class BacsPayment extends Payment
     const STATUS_SKIPPED = 'skipped';
 
     /**
+     * A bacs payment outside the system (e.g. manually sent by the customer)
      * @Assert\Type("bool")
      * @MongoDB\Field(type="boolean")
      * @Gedmo\Versioned
      */
     protected $manual;
+
+    /**
+     * A user can advise us to take payment immediately as a one-off payment, thereby skipping any date checks
+     * @Assert\Type("bool")
+     * @MongoDB\Field(type="boolean")
+     * @Gedmo\Versioned
+     */
+    protected $oneOffPayment;
 
     /**
      * @Assert\Choice({
@@ -93,6 +102,16 @@ class BacsPayment extends Payment
     public function setManual($manual)
     {
         $this->manual = $manual;
+    }
+
+    public function isOneOffPayment()
+    {
+        return $this->isOneOffPayment();
+    }
+
+    public function setIsOneOffPayment($oneOffPayment)
+    {
+        $this->oneOffPayment = $oneOffPayment;
     }
 
     public function getStatus()
