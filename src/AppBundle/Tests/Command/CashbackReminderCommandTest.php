@@ -4,15 +4,11 @@ namespace AppBundle\Tests\Command;
 
 use AppBundle\Command\OpsReportCommand;
 use AppBundle\Document\Cashback;
-use AppBundle\Document\CustomerCompany;
 use AppBundle\Document\Policy;
-use AppBundle\Document\Sanctions;
-use AppBundle\Listener\SanctionsListener;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use AppBundle\Tests\Controller\BaseControllerTest;
 use Symfony\Component\Console\Tester\CommandTester;
-use AppBundle\Document\User;
 
 /**
  * @group functional-net
@@ -70,7 +66,8 @@ class CashbackReminderCommandTest extends BaseControllerTest
 
         $this->callCommand(
             [
-                ''
+                'Found',
+                'cashback pending policies. Mail sent'
             ]
         );
     }
