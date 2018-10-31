@@ -36,14 +36,16 @@ class MixpanelListener
     {
         $policy = $event->getPolicy();
         $source = 'Unknown';
+        $type = 'Unknown';
         if ($payment = $policy->getLastSuccessfulUserPaymentCredit()) {
             $source = $payment->getSourceForClaims();
+            $type = $payment->getType();
         }
         $this->mixpanel->queueTrackWithUser($policy->getUser(), MixpanelService::EVENT_PURCHASE_POLICY, [
             'Payment Option' => $policy->getPremiumPlan(),
             'Policy Id' => $policy->getId(),
             'Payment Source' => $source,
-            'Payment Type' => $policy->getType()
+            'Payment Type' => $type
         ]);
     }
 
