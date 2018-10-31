@@ -366,7 +366,7 @@ trait UserClassTrait
         $bacs = new BacsPaymentMethod();
         $bankAccount = new BankAccount();
         $bankAccount->setMandateStatus($mandateStatus);
-        $bankAccount->setReference(random_int(1, 999999));
+        $bankAccount->setReference(sprintf('TESTREF-%d', random_int(1, 999999)));
         $bacs->setBankAccount($bankAccount);
         $user->setPaymentMethod($bacs);
     }
