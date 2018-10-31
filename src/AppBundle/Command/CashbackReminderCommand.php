@@ -34,8 +34,6 @@ class CashbackReminderCommand extends BaseCommand
         /** @var MailerService $mailer */
         $mailer = $this->getContainer()->get('app.mailer');
 
-        $debug = $input->getOption('dry-run');
-
         $results = $dm->createQueryBuilder(Cashback::class)
             ->field('status')
             ->equals(Cashback::STATUS_PENDING_PAYMENT)
@@ -44,17 +42,14 @@ class CashbackReminderCommand extends BaseCommand
 
         $policies = [];
         foreach ($results as $result) {
-            $policies[] = sprintf("Policy %s with status %s is pending cashback payment", $result->getPolicy()->getPolicyNumber(), $result->getPolicy()->getStatus());
+            $policies[] = sprintf(
+                "Policy %s with status %s is pending cashback payment",
+                $result->getPolicy()->getPolicyNumber(),
+                $result->getPolicy()->getStatus()
+            );
         }
 
-        $mailer->sendTemplate(
-            'Biweekly cashback report',
-            ['dylan@so-sure.com', 'patrick@so-sure.com'],
-            'AppBundle:Email:policy/cashbackReminder.html.twig',
-            ['policies' => $policies]
-        );
-
-        if ($debug) {
+        if ($input->getOption('dry-run')) {
             /** @var EngineInterface $templating */
             $templating = $this->getContainer()->get('templating');
             $email = $templating->render(
@@ -63,8 +58,15 @@ class CashbackReminderCommand extends BaseCommand
             );
 
             $output->writeln($email);
-        }
+        } else {
+            $mailer->sendTemplate(
+                'Biweekly cashback report',
+                ['dylan@so-sure.com', 'patrick@so-sure.com'],
+                'AppBundle:Email:policy/cashbackReminder.html.twig',
+                ['policies' => $policies]
+            );
 
-        $output->writeln(json_encode($policies, JSON_PRETTY_PRINT));
+            $output->writeln(sprintf('Found %s cashback pending policies. Mail sent', count($policies)));
+        }
     }
 }
