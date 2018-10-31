@@ -43,6 +43,7 @@ class MixpanelListener
             'Payment Option' => $policy->getPremiumPlan(),
             'Policy Id' => $policy->getId(),
             'Payment Source' => $source,
+            'Payment Type' => $policy->getType()
         ]);
     }
 
