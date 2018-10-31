@@ -241,8 +241,12 @@ abstract class SftpService
     private function loginSftp()
     {
         $this->sftp = new SFTP($this->server);
+        $this->sftp->enableQuietMode();
         if (!$this->sftp->login($this->username, $this->password)) {
-            throw new \Exception('Login Failed');
+            throw new \Exception(sprintf(
+                'Login Failed. Msg: %s',
+                $this->sftp->getLastSFTPError()
+            ));
         }
     }
 
@@ -255,6 +259,12 @@ abstract class SftpService
             $this->loginSftp();
         }
         $files = $this->sftp->nlist('.', false);
+        if ($files === false) {
+            throw new \Exception(sprintf(
+                'List folder Failed. Msg: %s',
+                $this->sftp->getLastSFTPError()
+            ));
+        }
         $list = [];
         foreach ($files as $file) {
             if (mb_stripos($file, $extension) !== false) {
@@ -271,12 +281,21 @@ abstract class SftpService
             $this->loginSftp();
         }
 
-        $this->sftp->rename($file, sprintf('%s/%s', $folder, $file));
+        // it may take too long to process the file - if it fails, try logging in again
+        if (!$this->sftp->rename($file, sprintf('%s/%s', $folder, $file))) {
+            $this->loginSftp();
+            if (!$this->sftp->rename($file, sprintf('%s/%s', $folder, $file))) {
+                throw new \Exception(sprintf(
+                    'Login Failed. Msg: %s',
+                    $this->sftp->getLastSFTPError()
+                ));
+            }
+        }
     }
 
     public function uploadS3($file, $name, $folder)
     {
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         $extension = sprintf('.%s', pathinfo($name, PATHINFO_EXTENSION));
         $s3Key = sprintf(
             '%s/%s/%d/%s-%s%s',
@@ -317,7 +336,13 @@ abstract class SftpService
         }
         $tempFile = $this->generateTempFile();
 
-        $this->sftp->get($file, $tempFile);
+        if ($this->sftp->get($file, $tempFile) === false) {
+            throw new \Exception(sprintf(
+                'Failed to download file %s. Msg: %s',
+                $file,
+                $this->sftp->getLastSFTPError()
+            ));
+        }
 
         return $tempFile;
     }

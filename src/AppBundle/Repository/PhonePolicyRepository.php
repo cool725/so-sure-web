@@ -75,7 +75,7 @@ class PhonePolicyRepository extends PolicyRepository
         $policyDiscountPresent = null
     ) {
         if (!$endDate) {
-            $endDate = new \DateTime();
+            $endDate = \DateTime::createFromFormat('U', time());
         }
 
         $policy = new PhonePolicy();
@@ -107,7 +107,7 @@ class PhonePolicyRepository extends PolicyRepository
     public function findPoliciesForRewardPotLiability(\DateTime $date = null)
     {
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
         $policy = new PhonePolicy();
 
@@ -130,7 +130,7 @@ class PhonePolicyRepository extends PolicyRepository
     public function countAllNewPolicies(\DateTime $endDate = null, \DateTime $startDate = null, $metric = null)
     {
         if (!$endDate) {
-            $endDate = new \DateTime();
+            $endDate = \DateTime::createFromFormat('U', time());
         }
 
         $policy = new PhonePolicy();
@@ -171,7 +171,7 @@ class PhonePolicyRepository extends PolicyRepository
         $excludeMetric = null
     ) {
         if (!$endDate) {
-            $endDate = new \DateTime();
+            $endDate = \DateTime::createFromFormat('U', time());
         }
         if (!$prefix) {
             $policy = new PhonePolicy();
@@ -208,7 +208,7 @@ class PhonePolicyRepository extends PolicyRepository
     public function findAllStartedPolicies($prefix = null, \DateTime $startDate = null, \DateTime $endDate = null)
     {
         if (!$endDate) {
-            $endDate = new \DateTime();
+            $endDate = \DateTime::createFromFormat('U', time());
         }
 
         if (!$prefix) {
@@ -245,7 +245,7 @@ class PhonePolicyRepository extends PolicyRepository
     public function findAllNewPolicies($leadSource = null, \DateTime $startDate = null, \DateTime $endDate = null)
     {
         if (!$endDate) {
-            $endDate = new \DateTime();
+            $endDate = \DateTime::createFromFormat('U', time());
         }
 
         $policy = new PhonePolicy();
@@ -269,7 +269,7 @@ class PhonePolicyRepository extends PolicyRepository
     public function findAllStatusUpdatedPolicies(\DateTime $startDate = null, \DateTime $endDate = null)
     {
         if (!$endDate) {
-            $endDate = new \DateTime();
+            $endDate = \DateTime::createFromFormat('U', time());
         }
 
         $policy = new PhonePolicy();
@@ -322,7 +322,7 @@ class PhonePolicyRepository extends PolicyRepository
         $metric = null
     ) {
         if (!$endDate) {
-            $endDate = new \DateTime();
+            $endDate = \DateTime::createFromFormat('U', time());
         }
 
         $policy = new PhonePolicy();
@@ -434,7 +434,8 @@ class PhonePolicyRepository extends PolicyRepository
                     ->sum('$potValue')
                     ->field('promoPotValue')
                     ->sum('$promoPotValue')
-                ->execute();
+                ->execute(['cursor' => true])
+                ->toArray();
     }
 
     public function getActiveInvalidPolicies()

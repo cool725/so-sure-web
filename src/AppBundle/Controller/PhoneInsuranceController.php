@@ -319,7 +319,7 @@ class PhoneInsuranceController extends BaseController
                         } else {
                             $lead = $existingLead;
                         }
-                        $days = new \DateTime();
+                        $days = \DateTime::createFromFormat('U', time());
                         $days = $days->add(new \DateInterval(sprintf('P%dD', 7)));
                         $mailer = $this->get('app.mailer');
                         $mailer->sendTemplate(

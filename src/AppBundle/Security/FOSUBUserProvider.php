@@ -398,7 +398,7 @@ class FOSUBUserProvider extends BaseClass
             }
 
             // don't delete so-sure accounts
-            if ($duplicate->hasSoSureEmail()) {
+            if ($duplicate->hasSoSureEmail() || $duplicate->hasSoSureRewardsEmail()) {
                 continue;
             }
 

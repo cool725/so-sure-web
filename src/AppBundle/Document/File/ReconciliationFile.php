@@ -45,7 +45,7 @@ class ReconciliationFile extends UploadFile
      */
     public function getS3FileName()
     {
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
 
         return sprintf(
             'banking/reconciliation-%d-%02d-%s',

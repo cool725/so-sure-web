@@ -54,7 +54,7 @@ class UserTest extends \PHPUnit\Framework\TestCase
         $user->setBirthday(new \DateTime("1800-01-01"));
         $this->assertFalse($user->hasValidDetails());
 
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         $user->setBirthday(new \DateTime(sprintf("%d-01-01", $now->format('Y'))));
         $this->assertFalse($user->hasValidDetails());
     }
@@ -198,7 +198,7 @@ class UserTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($user->isPasswordChangeRequired());
         $this->assertFalse($user->isCredentialsNonExpired());
 
-        $eightyNineDaysAgo = new \DateTime();
+        $eightyNineDaysAgo = \DateTime::createFromFormat('U', time());
         $eightyNineDaysAgo = $eightyNineDaysAgo->sub(new \DateInterval('P89D'));
         $user->passwordChange('a', 'b', $eightyNineDaysAgo);
         $this->assertFalse($user->isPasswordChangeRequired());
@@ -264,7 +264,7 @@ class UserTest extends \PHPUnit\Framework\TestCase
     public function testHasSoSureEmail()
     {
         $user = new User();
-        $user->setEmailCanonical('foo@so-sure.com');
+        $user->setEmailCanonical('foo@sO-sure.com');
         $this->assertTrue($user->hasSoSureEmail());
 
         $user2 = new User();
@@ -273,7 +273,22 @@ class UserTest extends \PHPUnit\Framework\TestCase
 
         $user3 = new User();
         $user3->setEmailCanonical('foo@so-sure.net');
-        $this->assertTrue($user3->hasSoSureEmail());
+        $this->assertFalse($user3->hasSoSureEmail());
+    }
+
+    public function testHasSoSureRewardsEmail()
+    {
+        $user = new User();
+        $user->setEmailCanonical('foo@so-sure.com');
+        $this->assertFalse($user->hasSoSureRewardsEmail());
+
+        $user2 = new User();
+        $user2->setEmailCanonical('foo@notsosure.com');
+        $this->assertFalse($user2->hasSoSureRewardsEmail());
+
+        $user3 = new User();
+        $user3->setEmailCanonical('foo@sO-sure.net');
+        $this->assertTrue($user3->hasSoSureRewardsEmail());
     }
 
     public function testImageUrlFacebook()

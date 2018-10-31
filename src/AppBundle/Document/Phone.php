@@ -46,6 +46,7 @@ class Phone
 
     /**
      * @AppAssert\AlphanumericSpaceDot()
+     * @Assert\Regex(pattern="/^[a-zA-Z]+$/")  // must match quote_make_model_memory requirements
      * @Assert\Length(min="1", max="50")
      * @MongoDB\Field(type="string")
      */
@@ -74,6 +75,7 @@ class Phone
 
     /**
      * @AppAssert\Token()
+     * @Assert\Regex(pattern="/^[\+\-\.a-zA-Z0-9() ]+$/") // must match quote_make_model_memory requirements
      * @Assert\Length(min="1", max="50")
      * @MongoDB\Field(type="string")
      */
@@ -258,7 +260,7 @@ class Phone
         \DateTime $date = null
     ) {
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
         $this->active = true;
         $this->setMake($make);
@@ -695,7 +697,7 @@ class Phone
             return null;
         }
 
-        $diff = $this->getReleaseDate()->diff(new \DateTime());
+        $diff = $this->getReleaseDate()->diff(\DateTime::createFromFormat('U', time()));
         return $diff->y * 12 + $diff->m;
     }
 
@@ -793,7 +795,7 @@ class Phone
     public function getCurrentPhonePrice(\DateTime $date = null)
     {
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
 
         foreach ($this->getPhonePrices() as $phonePrice) {
@@ -810,7 +812,7 @@ class Phone
     public function getPreviousPhonePrices(\DateTime $date = null)
     {
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
         $previous = [];
 
@@ -851,7 +853,7 @@ class Phone
     public function getFuturePhonePrices(\DateTime $date = null)
     {
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
         $future = [];
 
@@ -866,7 +868,7 @@ class Phone
 
     public function getRecentPhonePrices(int $minutes)
     {
-        $date =  new \DateTime();
+        $date =  \DateTime::createFromFormat('U', time());
         $date->sub(new \DateInterval(sprintf('PT%dM', $minutes)));
 
         $recent = [];
@@ -1013,7 +1015,7 @@ class Phone
         // If there is an end date, then quote should be valid until then
         $quoteValidTo = $currentPhonePrice->getValidTo();
         if (!$quoteValidTo) {
-            $quoteValidTo = new \DateTime();
+            $quoteValidTo = \DateTime::createFromFormat('U', time());
             $quoteValidTo->add(new \DateInterval('P1D'));
         }
 
@@ -1099,7 +1101,7 @@ class Phone
 
     public function isUnderWarranty()
     {
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         if ($now < $this->getWarrantyEarlist()) {
             return self::WARRANTY_LIKELY;
         } elseif ($now < $this->getWarrantyLatest()) {

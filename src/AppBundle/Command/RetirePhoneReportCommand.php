@@ -5,6 +5,7 @@ namespace AppBundle\Command;
 use AppBundle\Document\Phone;
 use AppBundle\Repository\PhoneRepository;
 use AppBundle\Service\MailerService;
+use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -14,8 +15,21 @@ use Symfony\Component\Console\Helper\Table;
 use AppBundle\Classes\Premium;
 use Symfony\Component\HttpFoundation\Request;
 
-class RetirePhoneReportCommand extends BaseCommand
+class RetirePhoneReportCommand extends ContainerAwareCommand
 {
+    /** @var DocumentManager  */
+    protected $dm;
+
+    /** @var MailerService */
+    protected $mailerService;
+
+    public function __construct(DocumentManager $dm, MailerService $mailerService)
+    {
+        parent::__construct();
+        $this->dm = $dm;
+        $this->mailerService = $mailerService;
+    }
+
     protected function configure()
     {
         $this
@@ -33,10 +47,8 @@ class RetirePhoneReportCommand extends BaseCommand
     {
         $retire = [];
         $debug = $input->getOption('debug');
-        /** @var MailerService $mailer */
-        $mailer = $this->getContainer()->get('app.mailer');
         /** @var PhoneRepository $repoPhone */
-        $repoPhone = $this->getManager()->getRepository(Phone::class);
+        $repoPhone = $this->dm->getRepository(Phone::class);
         $phones = $repoPhone->findActive()->getQuery()->execute();
         foreach ($phones as $phone) {
             /** @var Phone $phone */
@@ -53,7 +65,11 @@ class RetirePhoneReportCommand extends BaseCommand
         }
         $join = (count($retire) > 0) ? join("<br/>\n", $retire) : 'No phones should be retired.<br/>';
         $message = sprintf("Phones that should be retired:<br/><br/>\n\n%s", $join);
-        $mailer->send('Phones that should be retired report', 'tech+ops@so-sure.com', $message);
+        $this->mailerService->send(
+            'Phones that should be retired report',
+            'tech+ops@so-sure.com',
+            $message
+        );
         if ($debug) {
             $output->writeln($message);
         }

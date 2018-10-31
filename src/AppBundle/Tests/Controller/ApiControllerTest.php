@@ -109,6 +109,28 @@ class ApiControllerTest extends BaseApiControllerTest
         $this->assertTrue(mb_strlen($data['cognito_token']['token']) > 10);
         $this->assertTrue(mb_strlen($data['intercom_token']['android_hash']) > 10, json_encode($data));
         $this->assertTrue(mb_strlen($data['intercom_token']['ios_hash']) > 10);
+
+        /** @var DocumentManager $dm */
+        $dm = $this->getDocumentManager(true);
+        /** @var UserRepository $repo */
+        $repo = $dm->getRepository(User::class);
+        /** @var User $user */
+        $user = $repo->findOneBy(['emailCanonical' => 'foo@api.bar.com']);
+        $this->assertNotNull($user);
+        $firstLogin = $user->getFirstLoginInApp();
+        $this->assertNotNull($firstLogin);
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/login', array('email_user' => [
+            'email' => 'foo@api.bar.com',
+            'password' => 'bar'
+        ]));
+        $data = $this->verifyResponse(200);
+
+        $repo = $dm->getRepository(User::class);
+        /** @var User $user */
+        $user = $repo->findOneBy(['emailCanonical' => 'foo@api.bar.com']);
+        $this->assertNotNull($user);
+        $this->assertEquals($firstLogin, $user->getFirstLoginInApp());
     }
 
     public function testRateLimitLoginLocksUser()
@@ -443,12 +465,12 @@ class ApiControllerTest extends BaseApiControllerTest
 
     public function testQuoteA0001()
     {
-        $start = new \DateTime();
+        $start = \DateTime::createFromFormat('U', time());
         $start->add(new \DateInterval('P1D'));
 
         $crawler = self::$client->request('GET', '/api/v1/quote?device=A0001');
 
-        $end = new \DateTime();
+        $end = \DateTime::createFromFormat('U', time());
         $end->add(new \DateInterval('P1D'));
 
         $data = $this->verifyResponse(200);
@@ -621,7 +643,7 @@ class ApiControllerTest extends BaseApiControllerTest
         $url = '/api/v1/quote?device=A0001&memory=63&rooted=true&debug=true&_method=GET';
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
         $data = $this->verifyResponse(422);
-        $date = new \DateTime();
+        $date = \DateTime::createFromFormat('U', time());
         $deviceKey = sprintf('stats:%s:query:%s', $date->format('Y-m-d'), 'A0001');
         $this->assertGreaterThan(0, self::$redis->get($deviceKey));
         $this->assertGreaterThan(0, self::$redis->get('stats:rooted:A0001'));
@@ -780,10 +802,14 @@ class ApiControllerTest extends BaseApiControllerTest
      */
     public function testGetSCode()
     {
-        $dm = $this->getDocumentManager(true);
-        $repo = $dm->getRepository(SCode::class);
-        /** @var SCode $sCode */
-        $sCode = $repo->findOneBy(['active' => true, 'type' => 'standard']);
+        $policy = static::createUserPolicy(true);
+        $policy->getUser()->setEmail(static::generateEmail('testGetSCode', $this));
+        $policy->createAddSCode(rand(1, 999999));
+        static::$dm->persist($policy->getUser());
+        static::$dm->persist($policy);
+        static::$dm->flush();
+
+        $sCode = $policy->getStandardSCode();
         $this->assertNotNull($sCode);
 
         $cognitoIdentityId = $this->getUnauthIdentity();
@@ -847,11 +873,11 @@ class ApiControllerTest extends BaseApiControllerTest
     {
         $cognitoIdentityId = $this->getUnauthIdentity();
         $user = static::createUser(self::$userManager, static::generateEmail('badtoken', $this), 'bar');
-        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/token', array(
-            'token' => $user->getToken() + 'bad',
+        static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/token', array(
+            'token' => sprintf('%s-bad', $user->getToken()),
             'cognito_id' => '123'
         ));
-        $data = $this->verifyResponse(403);
+        $this->verifyResponse(403);
     }
 
     public function testTokenMissing()
@@ -958,6 +984,7 @@ class ApiControllerTest extends BaseApiControllerTest
         $this->assertEquals('Bar', $user->getLastName());
         $this->assertTrue(mb_strlen($data['intercom_token']['android_hash']) > 10, json_encode($data));
         $this->assertTrue(mb_strlen($data['intercom_token']['ios_hash']) > 10);
+        $this->assertNotNull($user->getFirstLoginInApp());
     }
 
     public function testUserBadName()
@@ -1166,7 +1193,7 @@ class ApiControllerTest extends BaseApiControllerTest
         $this->assertTrue($user != null);
         $this->assertNull($user->getLastLogin());
 
-        $user->setLastLogin(new \DateTime());
+        $user->setLastLogin(\DateTime::createFromFormat('U', time()));
         $user->setPreLaunch(true);
         self::$dm->flush();
 
@@ -1252,7 +1279,7 @@ class ApiControllerTest extends BaseApiControllerTest
     public function testUserTooYoung()
     {
         $cognitoIdentityId = $this->getUnauthIdentity();
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/user', array(
             'email' => static::generateEmail('young-birthday', $this),
             'birthday' => sprintf('%d-01-01T00:00:00Z', $now->format('Y')),

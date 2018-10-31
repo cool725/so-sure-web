@@ -233,7 +233,7 @@ class JudopayService
             $payment = $repo->findOneBy(['receipt' => $receiptId]);
 
             $created = new \DateTime($receipt['createdAt']);
-            $now = new \DateTime();
+            $now = \DateTime::createFromFormat('U', time());
             $diff = $now->getTimestamp() - $created->getTimestamp();
             // allow a few (5) minutes before warning if missing receipt
             if ($diff < 300) {
@@ -554,7 +554,7 @@ class JudopayService
         // "2018-02-22T22:46:10.9625+00:00"
         $created = \DateTime::createFromFormat("Y-m-d\TH:i:s.uP", $transactionDetails['createdAt']);
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
         $diff = $date->diff($created);
         if ($diff->days > 0 || $diff->h >= self::MAX_HOUR_DELAY_FOR_RECEIPTS) {
@@ -889,7 +889,7 @@ class JudopayService
     public function processScheduledPaymentResult(ScheduledPayment $scheduledPayment, $payment, \DateTime $date = null)
     {
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
 
         $policy = $scheduledPayment->getPolicy();
@@ -984,7 +984,7 @@ class JudopayService
     public function cardExpiringEmail(Policy $policy, \DateTime $date = null)
     {
         if (!$date) {
-            $nextMonth = new \DateTime();
+            $nextMonth = \DateTime::createFromFormat('U', time());
         } else {
             $nextMonth = clone $date;
         }
@@ -1135,7 +1135,7 @@ class JudopayService
         \DateTime $date = null
     ) {
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
         foreach ($policy->getAllPayments() as $payment) {
             $diff = $date->diff($payment->getDate());
@@ -1284,7 +1284,7 @@ class JudopayService
 
         /** @var Judopay\Model $webPreAuth */
         $webPreAuth = $this->webClient->getModel('WebPayments\Preauth');
-        $date = new \DateTime();
+        $date = \DateTime::createFromFormat('U', time());
         $paymentRef = sprintf('%s-%s', $user->getId(), $date->format('Ym'));
 
         // populate the required data fields.
@@ -1359,7 +1359,13 @@ class JudopayService
         try {
             $refundModelDetails = $refundModel->create();
         } catch (\Exception $e) {
-            $this->logger->error(sprintf('Error running refund %s', $refund->getId()), ['exception' => $e]);
+            $this->logger->error(sprintf(
+                'Error running refund %s (%0.2f >? %0.2f) Data: %s',
+                $refund->getId(),
+                $this->toTwoDp(abs($refund->getAmount())),
+                $payment->getAmount(),
+                json_encode($data)
+            ), ['exception' => $e]);
 
             throw $e;
         }

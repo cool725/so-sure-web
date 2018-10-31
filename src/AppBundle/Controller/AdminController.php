@@ -2,6 +2,7 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Document\AffiliateCompany;
 use AppBundle\Document\ArrayToApiArrayTrait;
 use AppBundle\Document\BacsPaymentMethod;
 use AppBundle\Document\File\AccessPayFile;
@@ -10,6 +11,7 @@ use AppBundle\Document\File\SalvaPaymentFile;
 use AppBundle\Document\Payment\BacsIndemnityPayment;
 use AppBundle\Document\Sequence;
 use AppBundle\Document\ValidatorTrait;
+use AppBundle\Form\Type\ChargeReportType;
 use AppBundle\Form\Type\BacsMandatesType;
 use AppBundle\Form\Type\UploadFileType;
 use AppBundle\Form\Type\ReconciliationFileType;
@@ -33,6 +35,8 @@ use AppBundle\Service\SequenceService;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\HttpFoundation\File\File;
@@ -187,7 +191,7 @@ class AdminController extends BaseController
 
         return new RedirectResponse($this->generateUrl('admin_phones'));
     }
-    
+
     /**
      * @Route("/phone/{id}/price", name="admin_phone_price")
      * @Method({"POST"})
@@ -456,7 +460,7 @@ class AdminController extends BaseController
         // default 30s for prod is no longer enough
         set_time_limit(180);
 
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         if (!$year) {
             $year = $now->format('Y');
         }
@@ -489,7 +493,7 @@ class AdminController extends BaseController
      */
     public function bacsAction(Request $request, $year = null, $month = null)
     {
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         if (!$year) {
             $year = $now->format('Y');
         }
@@ -655,7 +659,7 @@ class AdminController extends BaseController
                 if ($approvePaymentsForm->isSubmitted() && $approvePaymentsForm->isValid()) {
                     /** @var BacsService $bacsService */
                     $bacsService = $this->get('app.bacs');
-                    $bacsService->approvePayments(new \DateTime());
+                    $bacsService->approvePayments(\DateTime::createFromFormat('U', time()));
                     $this->addFlash(
                         'success',
                         'Approved outstanding payments'
@@ -854,7 +858,7 @@ class AdminController extends BaseController
         // default 30s for prod is no longer enough
         set_time_limit(180);
 
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         if (!$year) {
             $year = $now->format('Y');
         }
@@ -1146,23 +1150,30 @@ class AdminController extends BaseController
 
     /**
      * @Route("/charge", name="admin_charge")
-     * @Route("/charge/{year}/{month}", name="admin_charge_date")
      * @Template
      */
-    public function chargeAction($year = null, $month = null)
+    public function chargeAction(Request $request)
     {
-        $now = new \DateTime();
-        if (!$year) {
-            $year = $now->format('Y');
+        $form = $this->createForm(ChargeReportType::class);
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $data = $form->getData();
+            $date = $form->get('date')->getData();
+            $type = $data['type'];
+            if ($type == 'all') {
+                $type = null;
+            }
+        } else {
+            $date = \DateTime::createFromFormat('U', time());
+            $type = null;
         }
-        if (!$month) {
-            $month = $now->format('m');
-        }
-        $date = \DateTime::createFromFormat("Y-m-d", sprintf('%d-%d-01', $year, $month));
+
+        $year = $date->format('Y');
+        $month = $date->format('m');
 
         $dm = $this->getManager();
         $repo = $dm->getRepository(Charge::class);
-        $charges = $repo->findMonthly($date);
+        $charges = $repo->findMonthly($date, $type);
         $summary = [];
         foreach ($charges as $charge) {
             if (!isset($summary[$charge->getType()])) {
@@ -1176,6 +1187,7 @@ class AdminController extends BaseController
             'month' => $month,
             'charges' => $charges,
             'summary' => $summary,
+            'form' => $form->createView()
         ];
     }
 
@@ -1277,7 +1289,7 @@ class AdminController extends BaseController
      */
     public function cashbackAction(Request $request, $year = null, $month = null)
     {
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         if (!$year) {
             $year = $now->format('Y');
         }
@@ -1317,7 +1329,7 @@ class AdminController extends BaseController
      */
     public function chargebackAction(Request $request, $year = null, $month = null)
     {
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         if (!$year) {
             $year = $now->format('Y');
         }

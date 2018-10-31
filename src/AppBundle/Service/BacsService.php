@@ -299,7 +299,7 @@ class BacsService
     {
         $tmpFile = $file->move(sys_get_temp_dir());
 
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         $sftpFilename = sprintf('%s-%s.csv', $now->format('Ymd'), $now->format('U'));
 
         $fileData = file_get_contents($tmpFile);
@@ -360,7 +360,7 @@ class BacsService
         $folder = 'bacs-report'
     ) {
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
 
         $encTempFile = sprintf('%s/enc-%s', sys_get_temp_dir(), $filename);
@@ -996,7 +996,7 @@ class BacsService
     public function bacsFileSubmitted(AccessPayFile $file)
     {
         $file->setStatus(AccessPayFile::STATUS_SUBMITTED);
-        $file->setSubmittedDate(new \DateTime());
+        $file->setSubmittedDate(\DateTime::createFromFormat('U', time()));
         $paymentRepo = $this->dm->getRepository(BacsPayment::class);
 
         $payments = $paymentRepo->findBy([
@@ -1206,7 +1206,7 @@ class BacsService
         $source = Payment::SOURCE_TOKEN
     ) {
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
 
         if (!$amount) {
@@ -1221,6 +1221,11 @@ class BacsService
         $payment->setUser($policy->getUser());
         $payment->setStatus(BacsPayment::STATUS_PENDING);
         $payment->setSource($source);
+
+        // Admin or user source is always a one off payment
+        if (in_array($source, [Payment::SOURCE_ADMIN, Payment::SOURCE_WEB])) {
+            $payment->setIsOneOffPayment(true);
+        }
 
         if (!$user->hasValidPaymentMethod()) {
             $payment->setStatus(BacsPayment::STATUS_SKIPPED);
@@ -1269,7 +1274,7 @@ class BacsService
         }
 
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
 
         $advanceDate = clone $date;
@@ -1336,7 +1341,7 @@ class BacsService
                 $paymentMethod->getBankAccount()->setMandateSerialNumber($serialNumber);
 
                 // do not attempt to take payment until 2 business days after to allow for mandate
-                $initialPaymentSubmissionDate = new \DateTime();
+                $initialPaymentSubmissionDate = \DateTime::createFromFormat('U', time());
                 $initialPaymentSubmissionDate = $this->addBusinessDays($initialPaymentSubmissionDate, 2);
                 $paymentMethod->getBankAccount()->setInitialPaymentSubmissionDate($initialPaymentSubmissionDate);
             }
@@ -1552,8 +1557,9 @@ class BacsService
 
         $this->generatePaymentsDebits($prefix, $date, $metadata, $update);
 
+        /** @var BacsPaymentRepository $repo */
         $repo = $this->dm->getRepository(BacsPayment::class);
-        $payments = $repo->findBy(['status' => BacsPayment::STATUS_PENDING]);
+        $payments = $repo->getAllPendingDebits();
         foreach ($payments as $payment) {
             /** @var BacsPayment $payment */
             $policy = $payment->getPolicy();
@@ -1561,9 +1567,12 @@ class BacsService
             $bacs = $payment->getPolicy()->getUser()->getPaymentMethod();
             $bankAccount = $bacs->getBankAccount();
 
-            // If admin/user has rescheduled, then allow payment to go through, but should be manually approved
-            $ignoreNotEnoughTime = in_array($payment->getSource(), [Payment::SOURCE_ADMIN]);
-            $validate = $this->validateBacs($policy, $payment->getDate(), $payment->getId(), $ignoreNotEnoughTime);
+            $validate = $this->validateBacs(
+                $policy,
+                $payment->getDate(),
+                $payment->getId(),
+                $payment->isOneOffPayment()
+            );
             // rescheduling doesn't make sense in context of already generated payments
             if (in_array($validate, [self::VALIDATE_SKIP, self::VALIDATE_RESCHEDULE])) {
                 continue;
@@ -1747,12 +1756,16 @@ class BacsService
         return $processed;
     }
 
+    /**
+     * @return Policy
+     */
     public function getPolicy($id)
     {
         if (!$id) {
             throw new \InvalidArgumentException('Missing policyId');
         }
         $repo = $this->dm->getRepository(Policy::class);
+        /** @var Policy $policy */
         $policy = $repo->find($id);
         if (!$policy) {
             throw new \InvalidArgumentException(sprintf('Unable to find policyId: %s', $id));
@@ -1763,7 +1776,7 @@ class BacsService
 
     public function generateBacsPdf(Policy $policy)
     {
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         /** @var BacsPaymentMethod $paymentMethod */
         $paymentMethod = $policy->getUser()->getPaymentMethod();
         $bankAccount = $paymentMethod->getBankAccount();
@@ -1795,7 +1808,7 @@ class BacsService
             $tmpFile
         );
 
-        $date = new \DateTime();
+        $date = \DateTime::createFromFormat('U', time());
         $ddNotificationFile = new DirectDebitNotificationFile();
         $ddNotificationFile->setBucket(self::S3_POLICY_BUCKET);
         $ddNotificationFile->setKeyFormat(

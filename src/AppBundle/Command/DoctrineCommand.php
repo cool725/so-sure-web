@@ -11,8 +11,21 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Helper\Table;
 use AppBundle\Classes\Premium;
 
-class DoctrineCommand extends BaseCommand
+class DoctrineCommand extends ContainerAwareCommand
 {
+    /** @var DocumentManager  */
+    protected $dm;
+
+    /** @var DocumentManager */
+    protected $censusDm;
+
+    public function __construct(DocumentManager $dm, DocumentManager $censusDm)
+    {
+        parent::__construct();
+        $this->dm = $dm;
+        $this->censusDm = $censusDm;
+    }
+
     protected function configure()
     {
         $this
@@ -23,10 +36,7 @@ class DoctrineCommand extends BaseCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->getManager()->getSchemaManager()->ensureIndexes();
-
-        /** @var DocumentManager $censusDm */
-        $censusDm = $this->getContainer()->get('doctrine_mongodb.odm.census_document_manager');
-        $censusDm->getSchemaManager()->ensureIndexes();
+        $this->dm->getSchemaManager()->ensureIndexes();
+        $this->censusDm->getSchemaManager()->ensureIndexes();
     }
 }

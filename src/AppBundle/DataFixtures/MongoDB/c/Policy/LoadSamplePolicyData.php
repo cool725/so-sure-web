@@ -169,9 +169,9 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         foreach ($preExpireYearlyUsers as $user) {
             $phones[] = $user->getPolicies()[0]->getPhone();
         }
-        $sixMonthsAgo = new \DateTime();
+        $sixMonthsAgo = \DateTime::createFromFormat('U', time());
         $sixMonthsAgo = $sixMonthsAgo->sub(new \DateInterval('P6M'));
-        $sevenMonthsAgo = new \DateTime();
+        $sevenMonthsAgo = \DateTime::createFromFormat('U', time());
         $sevenMonthsAgo = $sevenMonthsAgo->sub(new \DateInterval('P7M'));
         $adjusted = [];
         for ($i = 0; $i < 5; $i++) {
@@ -387,6 +387,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
 
         $policies = $policyRepo->findBy(['status' => Policy::STATUS_ACTIVE]);
         foreach ($policies as $policy) {
+            /** @var Policy $policy */
             if (count($policy->getClaims()) == 0 && count($policy->getUser()->getPolicies()) == 1) {
                 if (!$fraud && $policy->canCancel(Policy::CANCELLED_ACTUAL_FRAUD)) {
                     $fraud = true;
@@ -536,7 +537,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             } elseif ($status == 4) {
                 $bankAccount->setMandateStatus(BankAccount::MANDATE_SUCCESS);
             }
-            $initialPaymentSubmissionDate = new \DateTime();
+            $initialPaymentSubmissionDate = \DateTime::createFromFormat('U', time());
             $initialPaymentSubmissionDate = $this->addBusinessDays($initialPaymentSubmissionDate, 2);
             $bankAccount->setInitialPaymentSubmissionDate($initialPaymentSubmissionDate);
 
@@ -628,7 +629,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         /** @var PolicyTerms $nonPicSureTerms */
         $nonPicSureTerms = $policyTermsRepo->findOneBy(['version' => 'Version 1 June 2016']);
 
-        $startDate = new \DateTime();
+        $startDate = \DateTime::createFromFormat('U', time());
         if ($days === null) {
             $days = sprintf("P%dD", random_int(0, 120));
         } else {
@@ -789,7 +790,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         }
         $env = $this->container->getParameter('kernel.environment');
         $policy->create(-5000 + $count, mb_strtoupper($env), $startDate);
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         $policy->setStatus(SalvaPhonePolicy::STATUS_ACTIVE);
         if ($picSure == self::PICSURE_RANDOM) {
             $picSureStatus = null;
@@ -1000,7 +1001,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             $claim->setHandlingTeam(Claim::TEAM_DAVIES);
         }
 
-        $date = new \DateTime();
+        $date = \DateTime::createFromFormat('U', time());
         $date->sub(new \DateInterval(sprintf('P%dD', random_int(5,15))));
         $claim->setLossDate(clone $date);
         $date->add(new \DateInterval(sprintf('P%dD', random_int(0,4))));
@@ -1041,12 +1042,12 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             $claim->setReplacementPhone($phone);
             $claim->setReplacementImei($this->generateRandomImei());
             if (random_int(0, 1) == 0) {
-                $claim->setReplacementReceivedDate(new \DateTime());
+                $claim->setReplacementReceivedDate(\DateTime::createFromFormat('U', time()));
             }
             $claim->setPhoneReplacementCost($phone->getReplacementPriceOrSuggestedReplacementPrice());
             $claim->setUnauthorizedCalls(random_int(0, 20000) / 100);
             $claim->setAccessories(random_int(0, 20000) / 100);
-            $claim->setClosedDate(new \DateTime());
+            $claim->setClosedDate(\DateTime::createFromFormat('U', time()));
         }
         $claim->setDescription($this->getRandomDescription($claim));
         $claim->setIncurred(array_sum([$claim->getClaimHandlingFees(), $claim->getTransactionFees(), $claim->getAccessories(),

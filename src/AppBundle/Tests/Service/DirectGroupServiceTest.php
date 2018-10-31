@@ -837,7 +837,7 @@ class DirectGroupServiceTest extends WebTestCase
         $directGroupClaim->policyNumber = $policy->getPolicyNumber();
         $directGroupClaim->insuredName = 'Mr foo bar';
         $directGroupClaim->riskPostCode = 'se152sz';
-        $yesterday = new \DateTime();
+        $yesterday = \DateTime::createFromFormat('U', time());
         $yesterday = $yesterday->sub(new \DateInterval('P1D'));
         $directGroupClaim->dateClosed = $yesterday;
 
@@ -857,7 +857,7 @@ class DirectGroupServiceTest extends WebTestCase
         $directGroupClaim->policyNumber = $policy->getPolicyNumber();
         $directGroupClaim->insuredName = 'Mr foo bar';
         $directGroupClaim->riskPostCode = 'se152sz';
-        $fiveDaysAgo = new \DateTime();
+        $fiveDaysAgo = \DateTime::createFromFormat('U', time());
         $fiveDaysAgo = $fiveDaysAgo->sub(new \DateInterval('P5D'));
         $directGroupClaim->dateClosed = $fiveDaysAgo;
 
@@ -1033,7 +1033,7 @@ class DirectGroupServiceTest extends WebTestCase
         $claim = new Claim();
         $policy->addClaim($claim);
 
-        $twelveDaysAgo = new \DateTime();
+        $twelveDaysAgo = \DateTime::createFromFormat('U', time());
         $twelveDaysAgo = $twelveDaysAgo->sub(new \DateInterval('P12D'));
         $directGroupClaim = new DirectGroupHandlerClaim();
         $directGroupClaim->claimNumber = 1;
@@ -1065,7 +1065,7 @@ class DirectGroupServiceTest extends WebTestCase
         $claim = new Claim();
         $policy->addClaim($claim);
 
-        $fourDaysAgo = new \DateTime();
+        $fourDaysAgo = \DateTime::createFromFormat('U', time());
         $fourDaysAgo = $fourDaysAgo->sub(new \DateInterval('P4D'));
         $directGroupClaim = new DirectGroupHandlerClaim();
         $directGroupClaim->claimNumber = 1;
@@ -1265,7 +1265,7 @@ class DirectGroupServiceTest extends WebTestCase
     {
         $policy = static::createUserPolicy(true);
         $claim = new Claim();
-        $claim->setApprovedDate(new \DateTime('2016-01-02'));
+        $claim->setApprovedDate(new \DateTime('2016-01-04'));
         $policy->addClaim($claim);
 
         $directGroupClaim = new DirectGroupHandlerClaim();
@@ -1327,7 +1327,7 @@ class DirectGroupServiceTest extends WebTestCase
         $policy = static::createUserPolicy(true);
         $claim = new Claim();
         // 2 weeks
-        $twoWeekAgo = new \DateTime();
+        $twoWeekAgo = \DateTime::createFromFormat('U', time());
         $twoWeekAgo = $twoWeekAgo->sub(new \DateInterval('P14D'));
         $claim->setApprovedDate($twoWeekAgo);
         $policy->addClaim($claim);
@@ -1372,7 +1372,7 @@ class DirectGroupServiceTest extends WebTestCase
         self::$directGroupService->clearErrors();
         self::$directGroupService->clearSoSureActions();
 
-        $directGroupClaim->replacementReceivedDate = new \DateTime();
+        $directGroupClaim->replacementReceivedDate = \DateTime::createFromFormat('U', time());
         self::$directGroupService->validateClaimDetails($claim, $directGroupClaim);
         $this->insureErrorExists('/the replacement data not recorded/');
         $this->insureErrorDoesNotExist('/received date/');
@@ -1516,7 +1516,7 @@ class DirectGroupServiceTest extends WebTestCase
         $directGroupClaim->status = DirectGroupHandlerClaim::STATUS_OPEN;
         $directGroupClaim->lossType = DirectGroupHandlerClaim::TYPE_LOSS;
 
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         $yesterday = $this->subBusinessDays($now, 1);
         static::$directGroupService->saveClaim($directGroupClaim, false);
 
@@ -1548,7 +1548,7 @@ class DirectGroupServiceTest extends WebTestCase
         $directGroupClaim->status = DirectGroupHandlerClaim::STATUS_OPEN;
         $directGroupClaim->lossType = DirectGroupHandlerClaim::TYPE_LOSS;
 
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         $yesterday = $this->subBusinessDays($now, 1);
         static::$directGroupService->saveClaim($directGroupClaim, false);
         $this->assertEquals($yesterday, $claim->getApprovedDate());
@@ -1736,7 +1736,7 @@ class DirectGroupServiceTest extends WebTestCase
         $directGroupClaim->replacementMake = 'Apple';
         $directGroupClaim->replacementModel = 'iPhone 4';
         $directGroupClaim->replacementImei = 'invalid';
-        $directGroupClaim->replacementReceivedDate = new \DateTime();
+        $directGroupClaim->replacementReceivedDate = \DateTime::createFromFormat('U', time());
         $this->assertFalse(static::$directGroupService->saveClaim($directGroupClaim, false));
         $this->assertEquals(
             0,
@@ -1779,7 +1779,7 @@ class DirectGroupServiceTest extends WebTestCase
         $directGroupClaim->replacementMake = 'Apple';
         $directGroupClaim->replacementModel = 'iPhone 4';
         $directGroupClaim->replacementImei = $this->generateRandomImei();
-        $directGroupClaim->replacementReceivedDate = new \DateTime();
+        $directGroupClaim->replacementReceivedDate = \DateTime::createFromFormat('U', time());
         $this->assertTrue(static::$directGroupService->saveClaim($directGroupClaim, false));
         $this->assertEquals(
             0,
@@ -1824,7 +1824,7 @@ class DirectGroupServiceTest extends WebTestCase
         // $directGroupClaim->replacementImei = 'Unable to obtain';
         $directGroupClaim->unobtainableFields[] = 'replacementImei';
 
-        $directGroupClaim->replacementReceivedDate = new \DateTime();
+        $directGroupClaim->replacementReceivedDate = \DateTime::createFromFormat('U', time());
         $this->assertTrue(static::$directGroupService->saveClaim($directGroupClaim, false));
         $this->assertEquals(
             0,
@@ -1849,7 +1849,7 @@ class DirectGroupServiceTest extends WebTestCase
         $claim->setStatus(Claim::STATUS_APPROVED);
         $claim->setHandlingTeam(Claim::TEAM_DIRECT_GROUP);
 
-        $yesterday = new \DateTime();
+        $yesterday = \DateTime::createFromFormat('U', time());
         $yesterday = $yesterday->sub(new \DateInterval('P1D'));
         $claim->setRecordedDate($yesterday);
 
@@ -1908,7 +1908,7 @@ class DirectGroupServiceTest extends WebTestCase
         $directGroupClaim->replacementMake = 'Apple';
         $directGroupClaim->replacementModel = 'iPhone 4';
         //$directGroupClaim->replacementImei = $this->generateRandomImei();
-        $directGroupClaim->replacementReceivedDate = new \DateTime();
+        $directGroupClaim->replacementReceivedDate = \DateTime::createFromFormat('U', time());
         $this->assertTrue(static::$directGroupService->saveClaim($directGroupClaim, false));
         $this->assertEquals(
             2,
@@ -1971,7 +1971,7 @@ class DirectGroupServiceTest extends WebTestCase
         $directGroupClaim->replacementMake = 'Apple';
         $directGroupClaim->replacementModel = 'iPhone 4';
         //$directGroupClaim->replacementImei = $this->generateRandomImei();
-        $directGroupClaim->replacementReceivedDate = new \DateTime();
+        $directGroupClaim->replacementReceivedDate = \DateTime::createFromFormat('U', time());
         $this->assertTrue(static::$directGroupService->saveClaim($directGroupClaim, false));
         $this->assertEquals(
             2,
@@ -1997,7 +1997,7 @@ class DirectGroupServiceTest extends WebTestCase
         $claim1->setHandlingTeam(Claim::TEAM_DIRECT_GROUP);
         $policy->addClaim($claim1);
 
-        $yesterday = new \DateTime();
+        $yesterday = \DateTime::createFromFormat('U', time());
         $yesterday = $yesterday->sub(new \DateInterval('P1D'));
         $claim2 = new Claim();
         $claim2->setRecordedDate($yesterday);
@@ -2024,7 +2024,7 @@ class DirectGroupServiceTest extends WebTestCase
         $directGroupClaim->replacementMake = 'Apple';
         $directGroupClaim->replacementModel = 'iPhone 4';
         $directGroupClaim->replacementImei = '123 Bx11lt';
-        $directGroupClaim->replacementReceivedDate = new \DateTime();
+        $directGroupClaim->replacementReceivedDate = \DateTime::createFromFormat('U', time());
         $directGroupClaim->phoneReplacementCost = 250;
         $directGroupClaim->excess = 150;
         $directGroupClaim->totalIncurred = 100;
@@ -2045,7 +2045,7 @@ class DirectGroupServiceTest extends WebTestCase
         $directGroupClaim->replacementMake = 'Apple';
         $directGroupClaim->replacementModel = 'iPhone 4';
         $directGroupClaim->replacementImei = '123 Bx11lt';
-        $directGroupClaim->replacementReceivedDate = new \DateTime();
+        $directGroupClaim->replacementReceivedDate = \DateTime::createFromFormat('U', time());
         $directGroupClaims = array($directGroupClaim);
 
         static::$directGroupService->saveClaims('', $directGroupClaims);

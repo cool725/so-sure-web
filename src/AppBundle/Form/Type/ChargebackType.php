@@ -17,7 +17,7 @@ class ChargebackType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         $year = $now->format('Y');
         $years = [$year, $year - 1];
 

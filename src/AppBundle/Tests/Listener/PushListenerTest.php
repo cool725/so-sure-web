@@ -76,7 +76,7 @@ class PushListenerTest extends WebTestCase
         $user->setEnabled(true);
         $user->setLocked(false);
 
-        $start = new \DateTime();
+        $start = \DateTime::createFromFormat('U', time());
         $start = $start->sub(new \DateInterval('P360D'));
 
         $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), $start, true);
@@ -92,7 +92,7 @@ class PushListenerTest extends WebTestCase
         $this->assertTrue($policy->isValidPolicy());
         $this->assertTrue($policy->getUser()->canRenewPolicy($policy));
 
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         self::$policyService->createPendingRenewal($policy, $now);
     }
 

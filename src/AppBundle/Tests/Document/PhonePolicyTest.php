@@ -86,14 +86,14 @@ class PhonePolicyTest extends WebTestCase
     {
         $policy = new SalvaPhonePolicy();
         $this->assertNull($policy->getStatusUpdated());
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         $policy->setStatus(Policy::STATUS_ACTIVE);
-        $this->assertEquals($now, $policy->getStatusUpdated());
+        $this->assertEquals($now, $policy->getStatusUpdated(), '', 1);
         sleep(1);
         $policy->setStatus(Policy::STATUS_ACTIVE);
-        $this->assertEquals($now, $policy->getStatusUpdated());
+        $this->assertEquals($now, $policy->getStatusUpdated(), '', 1);
         $policy->setStatus(Policy::STATUS_UNPAID);
-        $this->assertNotEquals($now, $policy->getStatusUpdated());
+        $this->assertNotEquals($now, $policy->getStatusUpdated(), '', 0);
     }
 
     public function testCanAdjustPicSureStatusForClaim()
@@ -129,6 +129,91 @@ class PhonePolicyTest extends WebTestCase
 
         $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_DISABLED);
         $this->assertFalse($policy->canAdjustPicSureStatusForClaim());
+    }
+
+    public function testPicSureStatusWithClaimsPicSureRedo()
+    {
+        $policy = static::createUserPolicy(true);
+        $policy->getUser()->setEmail(static::generateEmail('testPicSureStatusWithClaimsPicSureRedo', $this));
+        static::$dm->persist($policy->getUser());
+        static::$dm->persist($policy);
+        static::$dm->flush();
+        $this->assertNotNull($policy->getId());
+
+        $claimA = new Claim();
+        $policy->addClaim($claimA);
+
+        $claimA->setStatus(Claim::STATUS_FNOL);
+        $this->assertEquals(
+            PhonePolicy::PICSURE_STATUS_CLAIM_PREVENTED,
+            $policy->getPicSureStatusWithClaims()
+        );
+
+        $claimA->setStatus(Claim::STATUS_SUBMITTED);
+        $this->assertEquals(
+            PhonePolicy::PICSURE_STATUS_CLAIM_PREVENTED,
+            $policy->getPicSureStatusWithClaims()
+        );
+
+        $claimA->setStatus(Claim::STATUS_INREVIEW);
+        $this->assertEquals(
+            PhonePolicy::PICSURE_STATUS_CLAIM_PREVENTED,
+            $policy->getPicSureStatusWithClaims()
+        );
+
+        $claimA->setStatus(Claim::STATUS_DECLINED);
+        $this->assertNull($policy->getPicSureStatusWithClaims());
+
+        $claimA->setStatus(Claim::STATUS_WITHDRAWN);
+        $this->assertNull($policy->getPicSureStatusWithClaims());
+
+        $claimA->setStatus(Claim::STATUS_APPROVED);
+        $this->assertEquals(
+            PhonePolicy::PICSURE_STATUS_CLAIM_PREVENTED,
+            $policy->getPicSureStatusWithClaims()
+        );
+
+        $claimB = new Claim();
+        $policy->addClaim($claimB);
+
+        $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_INVALID);
+        $claimA->setIgnoreWarningFlags(Claim::WARNING_FLAG_CLAIMS_ALLOW_PICSURE_REDO);
+
+        $claimB->setStatus(Claim::STATUS_FNOL);
+        $this->assertEquals(
+            PhonePolicy::PICSURE_STATUS_CLAIM_PREVENTED,
+            $policy->getPicSureStatusWithClaims()
+        );
+
+        $claimB->setStatus(Claim::STATUS_SUBMITTED);
+        $this->assertEquals(
+            PhonePolicy::PICSURE_STATUS_CLAIM_PREVENTED,
+            $policy->getPicSureStatusWithClaims()
+        );
+
+        $claimB->setStatus(Claim::STATUS_INREVIEW);
+        $this->assertEquals(
+            PhonePolicy::PICSURE_STATUS_CLAIM_PREVENTED,
+            $policy->getPicSureStatusWithClaims()
+        );
+
+        $claimB->setStatus(Claim::STATUS_DECLINED);
+        $this->assertEquals(
+            PhonePolicy::PICSURE_STATUS_INVALID,
+            $policy->getPicSureStatusWithClaims()
+        );
+
+        $claimB->setStatus(Claim::STATUS_WITHDRAWN);
+        $this->assertEquals(
+            PhonePolicy::PICSURE_STATUS_INVALID,
+            $policy->getPicSureStatusWithClaims()
+        );
+
+        $claimB->setStatus(Claim::STATUS_APPROVED);
+        $this->assertEquals(
+            PhonePolicy::PICSURE_STATUS_CLAIM_PREVENTED,
+            $policy->getPicSureStatusWithClaims()
+        );
     }
 
     public function testPicSureStatusWithClaims()
@@ -168,48 +253,15 @@ class PhonePolicyTest extends WebTestCase
         $this->assertNull($policy->getPicSureStatusWithClaims());
 
         $claimA->setStatus(Claim::STATUS_APPROVED);
-        $this->assertNull($policy->getPicSureStatusWithClaims());
+        $this->assertEquals(
+            PhonePolicy::PICSURE_STATUS_CLAIM_PREVENTED,
+            $policy->getPicSureStatusWithClaims()
+        );
 
         $claimB = new Claim();
         $policy->addClaim($claimB);
 
         $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_INVALID);
-
-        $claimB->setStatus(Claim::STATUS_FNOL);
-        $this->assertEquals(
-            PhonePolicy::PICSURE_STATUS_CLAIM_PREVENTED,
-            $policy->getPicSureStatusWithClaims()
-        );
-
-        $claimB->setStatus(Claim::STATUS_SUBMITTED);
-        $this->assertEquals(
-            PhonePolicy::PICSURE_STATUS_CLAIM_PREVENTED,
-            $policy->getPicSureStatusWithClaims()
-        );
-
-        $claimB->setStatus(Claim::STATUS_INREVIEW);
-        $this->assertEquals(
-            PhonePolicy::PICSURE_STATUS_CLAIM_PREVENTED,
-            $policy->getPicSureStatusWithClaims()
-        );
-
-        $claimB->setStatus(Claim::STATUS_DECLINED);
-        $this->assertEquals(
-            PhonePolicy::PICSURE_STATUS_INVALID,
-            $policy->getPicSureStatusWithClaims()
-        );
-
-        $claimB->setStatus(Claim::STATUS_WITHDRAWN);
-        $this->assertEquals(
-            PhonePolicy::PICSURE_STATUS_INVALID,
-            $policy->getPicSureStatusWithClaims()
-        );
-
-        $claimB->setStatus(Claim::STATUS_APPROVED);
-        $this->assertEquals(
-            PhonePolicy::PICSURE_STATUS_INVALID,
-            $policy->getPicSureStatusWithClaims()
-        );
 
         $claimStatus = array(
             Claim::STATUS_FNOL,
@@ -220,6 +272,14 @@ class PhonePolicyTest extends WebTestCase
             Claim::STATUS_APPROVED,
             Claim::STATUS_SETTLED
         );
+
+        foreach ($claimStatus as $status) {
+            $claimB->setStatus($status);
+            $this->assertEquals(
+                PhonePolicy::PICSURE_STATUS_CLAIM_PREVENTED,
+                $policy->getPicSureStatusWithClaims()
+            );
+        }
 
         $claimC = new Claim();
         $policy->addClaim($claimC);
@@ -665,7 +725,7 @@ class PhonePolicyTest extends WebTestCase
         $this->assertEquals(10, $policyB->getPotValue());
 
         $claimA = new Claim();
-        $claimA->setLossDate(new \DateTime());
+        $claimA->setLossDate(\DateTime::createFromFormat('U', time()));
         //$claimA->setRecordedDate(new \DateTime("2016-01-01"));
         $claimA->setStatus(Claim::STATUS_SETTLED);
         //$claimA->setClosedDate(new \DateTime("2016-01-01"));
@@ -695,7 +755,7 @@ class PhonePolicyTest extends WebTestCase
 
         $policy = static::createUserPolicy(true);
         $policy->getUser()->setEmail(static::generateEmail('testGetRiskPolicyRewardConnection-user', $this));
-        $policy->setStart(new \DateTime());
+        $policy->setStart(\DateTime::createFromFormat('U', time()));
         static::$dm->persist($policy);
         static::$dm->persist($policy->getUser());
 
@@ -708,14 +768,14 @@ class PhonePolicyTest extends WebTestCase
 
     public function testGetRiskReasonPolicyRenewed()
     {
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         $yearAgo = clone $now;
         $yearAgo = $yearAgo->sub(new \DateInterval('P1Y'));
         $policyPrev = static::createUserPolicy(true);
         $policyPrev->setStart($yearAgo);
         $policy = static::createUserPolicy(true);
         $policy->getUser()->setEmail(static::generateEmail('testGetRiskReasonPolicyRenewed', $this));
-        $policy->setStart(new \DateTime());
+        $policy->setStart(\DateTime::createFromFormat('U', time()));
         $policyPrev->link($policy);
         static::$dm->persist($policyPrev);
         static::$dm->persist($policy);
@@ -866,7 +926,7 @@ class PhonePolicyTest extends WebTestCase
         $this->assertEquals(30, $policy->calculatePotValue());
 
         $claim = new Claim();
-        $claim->setLossDate(new \DateTime());
+        $claim->setLossDate(\DateTime::createFromFormat('U', time()));
         $claim->setType(Claim::TYPE_LOSS);
         $claim->setStatus(Claim::STATUS_SETTLED);
         $linkedPolicies[0]->addClaim($claim);
@@ -886,7 +946,7 @@ class PhonePolicyTest extends WebTestCase
         $this->assertEquals(40, $policy->calculatePotValue());
 
         $claim = new Claim();
-        $claim->setLossDate(new \DateTime());
+        $claim->setLossDate(\DateTime::createFromFormat('U', time()));
         $claim->setType(Claim::TYPE_LOSS);
         $claim->setStatus(Claim::STATUS_SETTLED);
         $linkedPolicies[0]->addClaim($claim);
@@ -925,13 +985,13 @@ class PhonePolicyTest extends WebTestCase
         $this->assertEquals(40, $policy->calculatePotValue());
 
         $claimA = new Claim();
-        $claimA->setLossDate(new \DateTime());
+        $claimA->setLossDate(\DateTime::createFromFormat('U', time()));
         $claimA->setType(Claim::TYPE_LOSS);
         $claimA->setStatus(Claim::STATUS_SETTLED);
         $linkedPolicies[0]->addClaim($claimA);
 
         $claimB = new Claim();
-        $claimB->setLossDate(new \DateTime());
+        $claimB->setLossDate(\DateTime::createFromFormat('U', time()));
         $claimB->setType(Claim::TYPE_LOSS);
         $claimB->setStatus(Claim::STATUS_SETTLED);
         $linkedPolicies[1]->addClaim($claimB);
@@ -1330,7 +1390,7 @@ class PhonePolicyTest extends WebTestCase
 
         $this->assertEquals(SalvaPhonePolicy::STATUS_CANCELLED, $policyA->getStatus());
         $this->assertEquals(SalvaPhonePolicy::CANCELLED_USER_REQUESTED, $policyA->getCancelledReason());
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         $this->assertEquals($now->format('y-M-d'), $policyA->getEnd()->format('y-M-d'));
         $this->assertFalse($policyA->getUser()->isLocked());
 
@@ -1964,7 +2024,7 @@ class PhonePolicyTest extends WebTestCase
         $policy->setStart(new \DateTime("2016-01-01"));
         $this->assertEquals(sprintf('%s/1', $policy->getPolicyNumber()), $policy->getSalvaPolicyNumber());
 
-        $policy->incrementSalvaPolicyNumber(new \DateTime());
+        $policy->incrementSalvaPolicyNumber(\DateTime::createFromFormat('U', time()));
         $this->assertEquals(sprintf('%s/2', $policy->getPolicyNumber()), $policy->getSalvaPolicyNumber());
     }
 
@@ -2762,7 +2822,12 @@ class PhonePolicyTest extends WebTestCase
         $this->assertFalse($policy->getUser()->getAnalytics()['hasOutstandingPicSurePolicy']);
 
         $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_APPROVED);
-        $this->assertEquals(new \DateTime(), $policy->getPicSureApprovedDate());
+        $this->assertEquals(
+            \DateTime::createFromFormat('U', time()),
+            $policy->getPicSureApprovedDate(),
+            '',
+            1
+        );
         $this->assertFalse($policy->getUser()->getAnalytics()['hasOutstandingPicSurePolicy']);
     }
 
@@ -5122,14 +5187,14 @@ class PhonePolicyTest extends WebTestCase
 
         $policy->init($user, static::getLatestPolicyTerms(self::$dm));
 
-        $issueDate = new \DateTime();
+        $issueDate = \DateTime::createFromFormat('U', time());
         $policy->create(rand(1, 999999), null, $date, rand(1, 9999));
         $policy->setStatus(Policy::STATUS_ACTIVE);
 
         $issueDate2 = clone $issueDate;
         $issueDate2->add(new \DateInterval('PT1S'));
 
-        $this->assertEquals($date, $policy->getStart());
+        $this->assertEquals($date, $policy->getStart(), '', 1);
         $this->assertTrue($policy->getIssueDate() == $issueDate || $policy->getIssueDate() == $issueDate2);
 
         return $policy;

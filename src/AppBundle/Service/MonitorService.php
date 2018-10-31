@@ -4,16 +4,20 @@ namespace AppBundle\Service;
 use AppBundle\Classes\Salva;
 use AppBundle\Document\Cashback;
 use AppBundle\Document\Claim;
+use AppBundle\Document\Connection\Connection;
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\File\AccessPayFile;
 use AppBundle\Document\File\DaviesFile;
 use AppBundle\Document\File\DirectGroupFile;
+use AppBundle\Document\Invitation\Invitation;
+use AppBundle\Document\Form\Bacs;
 use AppBundle\Document\MultiPay;
 use AppBundle\Document\Payment\BacsPayment;
 use AppBundle\Document\Payment\Payment;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Policy;
 use AppBundle\Document\PolicyTerms;
+use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\User;
 use AppBundle\Exception\MonitorException;
 use AppBundle\Repository\BacsPaymentRepository;
@@ -57,7 +61,7 @@ class MonitorService
      * @param JudopayService  $judopay
      */
     public function __construct(
-        DocumentManager  $dm,
+        DocumentManager $dm,
         LoggerInterface $logger,
         \Predis\Client $redis,
         IntercomService $intercom,
@@ -108,7 +112,7 @@ class MonitorService
         /** @var ClaimRepository $repo */
         $repo = $this->dm->getRepository(Claim::class);
         $claims = $repo->findMissingReceivedDate();
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         foreach ($claims as $claim) {
             /** @var Claim $claim */
             $replacementDate = $claim->getPolicy()->getImeiReplacementDate();
@@ -222,7 +226,7 @@ class MonitorService
             throw new MonitorException('Unable to find any successful imports');
         }
 
-        $now = $this->startOfDay(new \DateTime());
+        $now = $this->startOfDay(\DateTime::createFromFormat('U', time()));
         $diff = $now->diff($successFile->getCreated());
         if ($diff->days >= 1) {
             $fileDateTime = $successFile->getCreated()->format(\DateTime::ATOM);
@@ -242,11 +246,11 @@ class MonitorService
     {
         /** @var PhonePolicyRepository $repo */
         $repo = $this->dm->getRepository(PhonePolicy::class);
-        $oneDay = new \DateTime();
+        $oneDay = \DateTime::createFromFormat('U', time());
         $oneDay = $oneDay->sub(new \DateInterval('P1D'));
 
         // delay 10 minutes to allow time to sync
-        $tenMinutes = new \DateTime();
+        $tenMinutes = \DateTime::createFromFormat('U', time());
         $tenMinutes = $tenMinutes->sub(new \DateInterval('PT10M'));
         $updatedPolicies = $repo->findAllStatusUpdatedPolicies($oneDay, $tenMinutes);
         $errors = [];
@@ -438,7 +442,7 @@ class MonitorService
     public function bankHolidays(\DateTime $date = null)
     {
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
         $holidays = DateTrait::getBankHolidays();
         usort($holidays, function ($a, $b) {
@@ -471,11 +475,11 @@ class MonitorService
 
     public function bacsPayments()
     {
-        $twoDays = new \DateTime();
+        $twoDays = \DateTime::createFromFormat('U', time());
         $twoDays = $this->subBusinessDays($twoDays, 2);
         /** @var BacsPaymentRepository $paymentsRepo */
         $paymentsRepo = $this->dm->getRepository(BacsPayment::class);
-        foreach ($paymentsRepo->findPayments(new \DateTime()) as $payment) {
+        foreach ($paymentsRepo->findPayments(\DateTime::createFromFormat('U', time())) as $payment) {
             /** @var BacsPayment $payment */
             if ($payment->getSource() == Payment::SOURCE_ADMIN) {
                 continue;
@@ -489,7 +493,7 @@ class MonitorService
                 continue;
             }
 
-            if ($payment->canAction(new \DateTime())) {
+            if ($payment->canAction(\DateTime::createFromFormat('U', time()))) {
                 throw new MonitorException(sprintf('There are bacs payments waiting actioning: %s', $payment->getId()));
             }
         }
@@ -502,14 +506,26 @@ class MonitorService
 
         /** @var BacsPayment[] $unpaid */
         $unpaid = $paymentsRepo->findUnprocessedPaymentsOlderThanDays(
-            [BacsPayment::STATUS_PENDING, BacsPayment::STATUS_GENERATED],
-            1
+            [BacsPayment::STATUS_PENDING],
+            BacsPayment::DAYS_PROCESSING
         );
 
         /** @noinspection LoopWhichDoesNotLoopInspection */
         foreach ($unpaid as $payment) {
             /** @var BacsPayment $payment */
-            throw new MonitorException('There are pending/generated bacs payments waiting: ' . $payment->getId());
+            throw new MonitorException('There are pending bacs payments waiting: ' . $payment->getId());
+        }
+
+        /** @var BacsPayment[] $unpaid */
+        $unpaid = $paymentsRepo->findUnprocessedPaymentsOlderThanDays(
+            [BacsPayment::STATUS_GENERATED],
+            BacsPayment::DAYS_REVERSE
+        );
+
+        /** @noinspection LoopWhichDoesNotLoopInspection */
+        foreach ($unpaid as $payment) {
+            /** @var BacsPayment $payment */
+            throw new MonitorException('There are generated bacs payments waiting: ' . $payment->getId());
         }
     }
 
@@ -518,7 +534,7 @@ class MonitorService
         /** @var PolicyRepository $repo */
         $repo = $this->dm->getRepository(Policy::class);
         $policies = $repo->findBy(['status' => Policy::STATUS_PENDING]);
-        $oneHourAgo = new \DateTime();
+        $oneHourAgo = \DateTime::createFromFormat('U', time());
         $oneHourAgo = $oneHourAgo->sub(new \DateInterval('PT1H'));
         foreach ($policies as $policy) {
             /** @var Policy $policy */
@@ -539,6 +555,8 @@ class MonitorService
             new \MongoId('5aa6dec854e50f46ab3e8874'),
             new \MongoId('5ac61e7a7c62216654636bea'),
             new \MongoId('5ad5e80e75435e73e152874f'),
+            new \MongoId('5bd0381fedc29544427b31ab'),
+            new \MongoId('5bd03821edc29544427b31af'),
         ];
 
         $commissionValidationPolicyExclusions = [];
@@ -608,7 +626,7 @@ class MonitorService
     {
         /** @var ClaimRepository $claimRepository */
         $claimRepository = $this->dm->getRepository(Claim::class);
-        $twoBusinessDaysAgo = $this->subBusinessDays(new \DateTime(), $businessDaysOld);
+        $twoBusinessDaysAgo = $this->subBusinessDays(\DateTime::createFromFormat('U', time()), $businessDaysOld);
 
         return $claimRepository->findBy(
             [
@@ -616,5 +634,200 @@ class MonitorService
                 'statusLastUpdated' => ['$lte' => $twoBusinessDaysAgo],
             ]
         );
+    }
+
+    public function salvaPolicy()
+    {
+        $repo = $this->dm->getRepository(Policy::class);
+        $policies = $repo->findBy([
+            'policyNumber' => new \MongoRegex('/Mob\/*/'),
+            'salvaPolicyResults' => ['$lte' => ['$size' => 0]]
+        ]);
+
+        if (count($policies) > 0) {
+            throw new MonitorException(
+                "Policy {$policies[0]->getPolicyNumber()} has no salva policy results!"
+            );
+        }
+    }
+
+    public function invalidPolicy()
+    {
+        $repo = $this->dm->getRepository(Policy::class);
+
+        $policies = $repo->findBy([
+            'policyNumber' => new \MongoRegex('/INVALID\/*/'),
+            'salvaPolicyResults' => ['$lte' => ['$size' => 0]]
+        ]);
+
+        if (count($policies) == 0) {
+            throw new MonitorException(
+                "Failed to find any policies!"
+            );
+        }
+    }
+
+    public function salvaStatus()
+    {
+        $repo = $this->dm->getRepository(Policy::class);
+        $policies = $repo->findBy([
+            'policyNumber' => new \MongoRegex('/Mob\/*/'),
+            'salvaStatus' => ['$nin' => [
+                null,
+                SalvaPhonePolicy::SALVA_STATUS_ACTIVE,
+                SalvaPhonePolicy::SALVA_STATUS_CANCELLED]
+            ]
+        ]);
+
+        if (count($policies) > 0) {
+            foreach ($policies as $policy) {
+                throw new MonitorException(
+                    "Policy {$policy->getPolicyNumber()} is pending review"
+                );
+            }
+        }
+    }
+
+    public function policyFiles()
+    {
+        $repo = $this->dm->getRepository(Policy::class);
+        $policyFiles = $repo->findBy([
+            'policyNumber' => new \MongoRegex('/Mob\/*/'),
+            '$or' => [
+                ['policyFiles' => null],
+                ['policyFiles' => ['$size' => 0]]
+            ]
+        ]);
+
+        if (count($policyFiles) > 0) {
+            foreach ($policyFiles as $policy) {
+                throw new MonitorException(
+                    "Policy {$policy->getPolicyNumber()} has no files"
+                );
+            }
+        }
+    }
+
+    public function policyPending()
+    {
+        $repo = $this->dm->getRepository(Policy::class);
+        $policies = $repo->findBy([
+            'policyNumber' => new \MongoRegex('/Mob\/*/'),
+            'status' => Policy::STATUS_PENDING
+        ]);
+
+        if (count($policies) > 0) {
+            foreach ($policies as $policy) {
+                throw new MonitorException(
+                    "Policy {$policy->getPolicyNumber()} with email {$policy->getUser()->getEmail()} is pending"
+                );
+            }
+        }
+    }
+
+    public function duplicateInvites()
+    {
+        $collection = $this->dm->getDocumentCollection(Invitation::class);
+        $builder = $collection->createAggregationBuilder();
+
+        $results = $builder
+            ->group()
+            ->field('_id')
+            ->expression(
+                $builder->expr()
+                    ->field('email')
+                    ->expression('$email')
+                    ->field('policy')
+                    ->expression('$policy')
+            )
+            ->field('count')
+            ->sum(1)
+            ->match()
+            ->field('count')
+            ->gt(1)
+            ->execute();
+
+        if (count($results) > 0) {
+            foreach ($results as $result) {
+                throw new MonitorException(
+                    "Found duplicate Invites on email {$result->getEmail()}"
+                );
+            }
+        }
+    }
+
+    public function checkSoSureRoles()
+    {
+        $collections = $this->dm->getConnection()->selectDatabase('so-sure')->listCollections();
+
+        if (count($collections) == 0) {
+            throw new MonitorException(
+                "No collections found in so-sure database!"
+            );
+        }
+
+        return $collections;
+    }
+
+    public function checkSoSureRole($col)
+    {
+        $res = $this->dm->getConnection()->selectDatabase('so-sure')->command(
+            ['rolesInfo' => 'so-sure-user',
+                'showPrivileges' => true]
+        );
+
+        $foundPriv = false;
+        if ($res['roles'] && count($res['roles']) > 0) {
+            $privileges = $res['roles'][0]['privileges'];
+
+            foreach ($privileges as $priv) {
+                if ($col->getName() === $priv['resource']['collection']) {
+                    $foundPriv = true;
+
+                    $find = in_array('find', $priv['actions']);
+                    $update = in_array('update', $priv['actions']);
+                    $remove = in_array('remove', $priv['actions']);
+
+                    if (!($update and $remove) && !$find) {
+                        throw new MonitorException(
+                            "Missing find/update-remove privledge for {$col->getName()}"
+                        );
+                    }
+                }
+            }
+        }
+
+        if (!$foundPriv) {
+            throw new MonitorException(
+                "Missing privledges for {$col->getName()}"
+            );
+        }
+    }
+
+    public function checkAllUserRolePriv()
+    {
+        $collections = $this->checkSoSureRoles();
+
+        foreach ($collections as $col) {
+            $this->checkSoSureRole($col);
+        }
+    }
+
+    public function checkExpiration()
+    {
+        $results = $this->dm->createQueryBuilder(Policy::class)
+            ->field('status')
+            ->in([Policy::STATUS_UNPAID, Policy::STATUS_ACTIVE])
+            ->field('end')
+            ->lt(\DateTime::createFromFormat('U', time()))
+            ->getQuery()
+            ->execute();
+
+        foreach ($results as $result) {
+            throw new MonitorException(
+                "Policy {$result->getPolicyNumber()} is active/unpaid but expired!" . PHP_EOL .
+                "Expired since {$result->getEnd()->format('Y-M-D H:m')} !"
+            );
+        }
     }
 }

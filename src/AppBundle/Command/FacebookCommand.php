@@ -13,6 +13,15 @@ use AppBundle\Classes\Premium;
 
 class FacebookCommand extends ContainerAwareCommand
 {
+    /** @var FacebookService */
+    protected $facebookService;
+
+    public function __construct(FacebookService $facebookService)
+    {
+        parent::__construct();
+        $this->facebookService = $facebookService;
+    }
+
     protected function configure()
     {
         $this
@@ -36,9 +45,7 @@ class FacebookCommand extends ContainerAwareCommand
         $id = $input->getArgument('id');
         $token = $input->getArgument('token');
 
-        /** @var FacebookService $fb */
-        $fb = $this->getContainer()->get('app.facebook');
-        $result = $fb->validateTokenId($id, $token);
+        $result = $this->facebookService->validateTokenId($id, $token);
 
         $output->writeln(sprintf('Validated: %s', $result ? 'yes' : 'no'));
     }

@@ -2,7 +2,11 @@
 
 namespace AppBundle\Command;
 
+use AppBundle\Document\Invitation\Invitation;
+use AppBundle\Repository\Invitation\EmailInvitationRepository;
 use AppBundle\Service\InvitationService;
+use AppBundle\Service\InvoiceService;
+use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -11,8 +15,21 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Helper\Table;
 use AppBundle\Document\Invitation\EmailInvitation;
 
-class ReinviteCommand extends BaseCommand
+class ReinviteCommand extends ContainerAwareCommand
 {
+    /** @var DocumentManager  */
+    protected $dm;
+
+    /** @var InvitationService */
+    protected $invitationService;
+
+    public function __construct(DocumentManager $dm, InvitationService $invitationService)
+    {
+        parent::__construct();
+        $this->dm = $dm;
+        $this->invitationService = $invitationService;
+    }
+
     protected function configure()
     {
         $this
@@ -31,19 +48,19 @@ class ReinviteCommand extends BaseCommand
     {
         $date = $input->getOption('date');
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         } else {
             $date = new \DateTime($date);
         }
 
-        /** @var InvitationService $invitationService */
-        $invitationService = $this->getContainer()->get('app.invitation');
-        $repo = $this->getManager()->getRepository(EmailInvitation::class);
+        /** @var EmailInvitationRepository $repo */
+        $repo = $this->dm->getRepository(EmailInvitation::class);
         $invitations = $repo->findSystemReinvitations($date);
 
         foreach ($invitations as $invitation) {
+            /** @var EmailInvitation $invitation */
             print sprintf("Reinviting %s\n", $invitation->getEmail());
-            $invitationService->reinvite($invitation);
+            $this->invitationService->reinvite($invitation);
         }
     }
 }

@@ -92,13 +92,16 @@ doctrine_mongodb:
     connections:
         default:
             server: "%mongodb_url%"
-            options: {}
+            options:
+                readPreference: "primaryPreferred"
         census:
             server: "%census_mongodb_url%"
-            options: {}
+            options:
+                readPreference: "primaryPreferred"
         picsureml:
             server: "%picsure_mongodb_url%"
-            options: {}
+            options:
+                readPreference: "primaryPreferred"
     default_database: "%mongodb_db%"
     document_managers:
         default:
