@@ -836,10 +836,6 @@ class PurchaseController extends BaseController
         //$purchase->setAgreed(true);
         $purchase->setNew(true);
 
-        /** @var Form $toJudoForm */
-        $toJudoForm =  $this->get("form.factory")
-            ->createNamedBuilder('to_judo_form', PurchaseStepToJudoType::class)
-            ->getForm();
         /** @var Form $purchaseForm */
         $purchaseForm = $this->get('form.factory')
             ->createNamedBuilder('purchase_form', PurchaseStepPaymentType::class, $purchase)

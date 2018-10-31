@@ -21,3 +21,16 @@ body {
 
 }
 
+
+// Button to switch over to judo from bacs used to be a link, but had to be
+// made into a button, so to maintain the design, css can be used to make
+// it look like a link
+.linkButton {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    font: inherit;
+    text-decoration: underline;
+    color: $dodger-blue;
+}
