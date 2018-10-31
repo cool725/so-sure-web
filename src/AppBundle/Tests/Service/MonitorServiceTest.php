@@ -284,8 +284,8 @@ class MonitorServiceTest extends WebTestCase
         );
 
         /*
-         * Generating two invites on the same email throws an error, changing one of the invites' email after
-         * creation does not
+         * Generating two invites on the same email throws an error
+         * Changing one of the invites' email after creation does not
          */
         $invitationTwo->setEmail(self::generateEmail('testDuplicateInvites-invite-one', $this));
 
