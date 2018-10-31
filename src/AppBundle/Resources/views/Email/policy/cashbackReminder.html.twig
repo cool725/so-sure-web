@@ -1,5 +1,12 @@
-<h1>Cashback payment reminder</h1>
+{% block body %}
+<h1>Cashback Reminder</h1>
 
-{% for policy in policies %}
-	<li>{{ policy }}</li>
-{% endfor %}
+{% if policies is not empty %}
+	{% for policy in policies %}
+		<li>{{ policy }}</li>
+	{% endfor %}
+
+{% else %}
+<p>There are no cashbacks to process!</p>
+{% endif %}
+{% endblock %}

@@ -4,19 +4,10 @@ namespace AppBundle\Command;
 
 use AppBundle\Document\Cashback;
 use AppBundle\Service\MailerService;
-use AppBundle\Service\PolicyService;
 use Doctrine\ODM\MongoDB\DocumentManager;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Helper\Table;
-use AppBundle\Document\User;
-use AppBundle\Document\Claim;
-use AppBundle\Document\Policy;
-use AppBundle\Document\PhonePolicy;
-use AppBundle\Classes\SoSure;
 use Symfony\Component\Templating\EngineInterface;
 
 class CashbackReminderCommand extends BaseCommand
@@ -74,6 +65,6 @@ class CashbackReminderCommand extends BaseCommand
             $output->writeln($email);
         }
 
-        $output->writeln(json_encode($results, JSON_PRETTY_PRINT));
+        $output->writeln(json_encode($policies, JSON_PRETTY_PRINT));
     }
 }
