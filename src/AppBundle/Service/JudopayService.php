@@ -1360,10 +1360,11 @@ class JudopayService
             $refundModelDetails = $refundModel->create();
         } catch (\Exception $e) {
             $this->logger->error(sprintf(
-                'Error running refund %s (%0.2f >? %0.2f)',
+                'Error running refund %s (%0.2f >? %0.2f) Data: %s',
                 $refund->getId(),
-                $amount,
-                $payment->getAmount()
+                $this->toTwoDp(abs($refund->getAmount())),
+                $payment->getAmount(),
+                json_encode($data)
             ), ['exception' => $e]);
 
             throw $e;
