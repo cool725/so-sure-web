@@ -3,6 +3,7 @@
 namespace AppBundle\Command;
 
 use AppBundle\Document\Cashback;
+use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use AppBundle\Service\MailerService;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Component\Console\Input\InputInterface;
