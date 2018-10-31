@@ -13,6 +13,15 @@ use AppBundle\Classes\Premium;
 
 class RateLimitCommand extends ContainerAwareCommand
 {
+    /** @var RateLimitService  */
+    protected $rateLimitService;
+
+    public function __construct(RateLimitService $rateLimitService)
+    {
+        parent::__construct();
+        $this->rateLimitService = $rateLimitService;
+    }
+
     protected function configure()
     {
         $this
@@ -39,11 +48,9 @@ class RateLimitCommand extends ContainerAwareCommand
         $type = $input->getArgument('type');
         $clear = true === $input->getOption('clear');
 
-        /** @var RateLimitService $rateLimit */
-        $rateLimit = $this->getContainer()->get('app.ratelimit');
-        $output->writeln(json_encode($rateLimit->show($type), JSON_PRETTY_PRINT));
+        $output->writeln(json_encode($this->rateLimitService->show($type), JSON_PRETTY_PRINT));
         if ($clear) {
-            $rateLimit->clearByType($type);
+            $this->rateLimitService->clearByType($type);
             $output->writeln('Rate limits cleared');
         }
     }

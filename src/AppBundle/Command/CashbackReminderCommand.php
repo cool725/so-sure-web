@@ -10,8 +10,17 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Templating\EngineInterface;
 
-class CashbackReminderCommand extends BaseCommand
+class CashbackReminderCommand extends ContainerAwareCommand
 {
+    /** @var PolicyService */
+    protected $policyService;
+
+    public function __construct(PolicyService $policyService)
+    {
+        parent::__construct();
+        $this->policyService = $policyService;
+    }
+
     protected function configure()
     {
         $this

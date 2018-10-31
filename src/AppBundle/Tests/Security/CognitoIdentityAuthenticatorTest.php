@@ -2,6 +2,7 @@
 
 namespace AppBundle\Tests\Security;
 
+use AppBundle\Document\IdentityLog;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use AppBundle\Security\CognitoIdentityAuthenticator;
@@ -14,25 +15,26 @@ class CognitoIdentityAuthenticatorTest extends WebTestCase
     use \AppBundle\Tests\PhingKernelClassTrait;
     use \AppBundle\Tests\UserClassTrait;
     protected static $container;
+    /** @var CognitoIdentityAuthenticator */
     protected static $auth;
     protected static $userProvider;
     protected static $cognito;
 
     public static function setUpBeforeClass()
     {
-         //start the symfony kernel
-         $kernel = static::createKernel();
-         $kernel->boot();
+        //start the symfony kernel
+        $kernel = static::createKernel();
+        $kernel->boot();
 
-         //get the DI container
-         self::$container = $kernel->getContainer();
+        //get the DI container
+        self::$container = $kernel->getContainer();
 
-         //now we can instantiate our service (if you want a fresh one for
-         //each test method, do this in setUp() instead
-         self::$auth = self::$container->get('app.user.cognitoidentity.authenticator');
-         self::$userManager = self::$container->get('fos_user.user_manager');
-         self::$userProvider = self::$container->get('app.user.cognitoidentity');
-         self::$cognito = self::$container->get('app.cognito.identity');
+        /** @var CognitoIdentityAuthenticator */
+        $auth = self::$container->get('app.user.cognitoidentity.authenticator');
+        self::$auth = $auth;
+        self::$userManager = self::$container->get('fos_user.user_manager');
+        self::$userProvider = self::$container->get('app.user.cognitoidentity');
+        self::$cognito = self::$container->get('app.cognito.identity');
     }
 
     public function tearDown()
@@ -157,6 +159,31 @@ class CognitoIdentityAuthenticatorTest extends WebTestCase
         $ip = self::$auth->getCognitoIdentityIp($body);
 
         $this->assertEquals("62.253.24.189", $ip);
+    }
+
+    public function testGetCognitoIdentityUserAgent()
+    {
+        $userAgent = "aws-sdk-iOS/2.6.31 iOS/12.0.1 en_GB";
+        $identity = "eu-west-1:85376078-5f1f-43b8-8529-9021bb2096a4";
+        $body = json_encode(["body" => [], "cognitoIdentityId" => $identity, "userAgent" => $userAgent]);
+        $detectedUserAgent = self::$auth->getCognitoIdentityUserAgent($body);
+
+        $this->assertEquals($userAgent, $detectedUserAgent);
+    }
+
+    public function testGetCognitoIdentitySdk()
+    {
+        $userAgentIOS = "aws-sdk-iOS/2.6.31 iOS/12.0.1 en_GB";
+        $userAgentAndroid = "aws-sdk-android/2.6.23 Linux/4.4.111-14315050-QB19732135 Dalvik/2.1.0/0 en_GB c";
+        $identity = "eu-west-1:85376078-5f1f-43b8-8529-9021bb2096a4";
+
+        $body = json_encode(["body" => [], "cognitoIdentityId" => $identity, "userAgent" => $userAgentIOS]);
+        $sdk = self::$auth->getCognitoIdentitySdk($body);
+        $this->assertEquals(IdentityLog::SDK_IOS, $sdk);
+
+        $body = json_encode(["body" => [], "cognitoIdentityId" => $identity, "userAgent" => $userAgentAndroid]);
+        $sdk = self::$auth->getCognitoIdentitySdk($body);
+        $this->assertEquals(IdentityLog::SDK_ANDROID, $sdk);
     }
 
     private function getAuthRequest($cognitoIdentityId)

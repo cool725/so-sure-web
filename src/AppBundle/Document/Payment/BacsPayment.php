@@ -19,6 +19,7 @@ class BacsPayment extends Payment
 {
     use DateTrait;
 
+    const DAYS_PROCESSING = 1;
     const DAYS_CREDIT = 2;
     const DAYS_REVERSE = 5;
 
@@ -30,11 +31,20 @@ class BacsPayment extends Payment
     const STATUS_SKIPPED = 'skipped';
 
     /**
+     * A bacs payment outside the system (e.g. manually sent by the customer)
      * @Assert\Type("bool")
      * @MongoDB\Field(type="boolean")
      * @Gedmo\Versioned
      */
     protected $manual;
+
+    /**
+     * A user can advise us to take payment immediately as a one-off payment, thereby skipping any date checks
+     * @Assert\Type("bool")
+     * @MongoDB\Field(type="boolean")
+     * @Gedmo\Versioned
+     */
+    protected $oneOffPayment;
 
     /**
      * @Assert\Choice({
@@ -94,6 +104,16 @@ class BacsPayment extends Payment
         $this->manual = $manual;
     }
 
+    public function isOneOffPayment()
+    {
+        return $this->oneOffPayment;
+    }
+
+    public function setIsOneOffPayment($oneOffPayment)
+    {
+        $this->oneOffPayment = $oneOffPayment;
+    }
+
     public function getStatus()
     {
         return $this->status;
@@ -147,7 +167,7 @@ class BacsPayment extends Payment
     public function submit(\DateTime $date = null)
     {
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
 
         // if payment has already been scheduled for submission in the future (e.g. scheduled payment a few days in
@@ -182,7 +202,7 @@ class BacsPayment extends Payment
     public function canAction(\DateTime $date = null)
     {
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
 
         // already completed
@@ -202,7 +222,7 @@ class BacsPayment extends Payment
     public function approve(\DateTime $date = null, $ignoreReversedDate = false)
     {
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
 
         if (!$this->canAction($date) && !$ignoreReversedDate) {
@@ -237,7 +257,7 @@ class BacsPayment extends Payment
     public function reject(\DateTime $date = null)
     {
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
 
         if (!$this->canAction($date)) {

@@ -8,6 +8,7 @@ use AppBundle\Security\FOSUBUserProvider;
 use AppBundle\Service\JudopayService;
 use AppBundle\Service\MailerService;
 use AppBundle\Service\PolicyService;
+use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -21,8 +22,21 @@ use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Document\Payment\Payment;
 use AppBundle\Document\User;
 
-class UsersEmailCommand extends BaseCommand
+class UsersEmailCommand extends ContainerAwareCommand
 {
+    /** @var DocumentManager  */
+    protected $dm;
+
+    /** @var MailerService */
+    protected $mailerService;
+
+    public function __construct(DocumentManager $dm, MailerService $mailerService)
+    {
+        parent::__construct();
+        $this->dm = $dm;
+        $this->mailerService = $mailerService;
+    }
+
     protected function configure()
     {
         $this
@@ -48,7 +62,7 @@ class UsersEmailCommand extends BaseCommand
         $skipEmail = true === $input->getOption('skip-email');
         $from = $input->getOption('from');
         /** @var UserRepository $repo */
-        $repo = $this->getManager()->getRepository(User::class);
+        $repo = $this->dm->getRepository(User::class);
         $users = $repo->findAll();
         $output->writeln(sprintf('%d users', count($users)));
         $process = true;
@@ -56,6 +70,7 @@ class UsersEmailCommand extends BaseCommand
             $process = false;
         }
         foreach ($users as $user) {
+            /** @var User $user */
             if ($from && $user->getId() == $from) {
                 $process = true;
             }
@@ -64,7 +79,6 @@ class UsersEmailCommand extends BaseCommand
                 continue;
             }
 
-            /** @var User $user */
             try {
                 if (!$skipEmail) {
                     $this->emailUser($user);
@@ -81,9 +95,7 @@ class UsersEmailCommand extends BaseCommand
     private function emailUser(User $user)
     {
         $hash = SoSure::encodeCommunicationsHash($user->getEmail());
-        /** @var MailerService $mailer */
-        $mailer = $this->getContainer()->get('app.mailer');
-        $mailer->sendTemplate(
+        $this->mailerService->sendTemplate(
             'Updated Privacy Policy',
             $user->getEmail(),
             'AppBundle:Email:user/updatedPrivacyPolicy.html.twig',

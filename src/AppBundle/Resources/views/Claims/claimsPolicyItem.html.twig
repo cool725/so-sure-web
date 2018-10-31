@@ -232,7 +232,13 @@
                             policy.payerOrUser.paymentMethod.getType == "judo" %}
                             <tr>
                                 <td>Card</td>
-                                <td class="{% if policy.payerOrUser.paymentMethod.isCardExpired %}danger{% endif %}">{{ policy.payerOrUser.paymentMethod }}</td>
+                                <td class="{% if policy.payerOrUser.paymentMethod.isCardExpired %}danger{% endif %}">
+                                    {{ policy.payerOrUser.paymentMethod }}
+                                    <a title="Judopay" href="https://portal.judopay.com/payments/history?SearchQuery={{ policy.payerOrUser.id }}&SearchQueryType=0&AppName=&DeviceId=&From=&To=&AppId=0" target="_blank">
+                                        <i class="fa fa-external-link"></i>
+                                    </a>
+                                </td>
+
                             </tr>
                         {% elseif policy.isPolicy and policy.payerOrUser.paymentMethod and
                             policy.payerOrUser.paymentMethod.getType == "bacs" %}
@@ -866,7 +872,7 @@
                 </tr>
                 {% if is_granted('ROLE_ADMIN') %}
                 <tr>
-                    <td><i class="fa fa-lock" title="Admin only"></i> pic-sure</td>
+                    <td>pic-sure</td>
                     <td>
                         {% if policy.policyTerms.isPicSureEnabled %}
                             Status: {% if policy.picSureStatus %}{{ policy.picSureStatus }}{% else %}Not started{% endif %}
@@ -1155,15 +1161,17 @@
                             {% if payment.type == 'judo' %}
                                 <i class="fa fa-credit-card" title="JudoPay"></i>
                             {% elseif payment.type == 'sosure' %}
-                                <i class="fa fa-smile-o"" title="so-sure Credit/Debit"></i>
+                                <i class="fa fa-smile-o" title="so-sure Credit/Debit"></i>
                             {% elseif payment.type == 'bacs' %}
-                                <i class="fa fa-bank"" title="BACS"></i>
+                                <i class="fa fa-bank" title="BACS"></i>
+                            {% elseif payment.type == 'bacsIndemnity' %}
+                                <i class="fa fa-bank text-danger" title="BACS Indemnity Chargeback"></i>
                             {% elseif payment.type == 'chargeback' %}
-                                <i class="fa fa-reply"" title="Barclays Chargeback"></i>
+                                <i class="fa fa-credit-card text-danger" title="Barclays Chargeback"></i>
                             {% elseif payment.type == 'potReward' %}
-                                <i class="fa fa-gbp"" title="Pot Reward"></i>
+                                <i class="fa fa-gbp" title="Pot Reward"></i>
                             {% elseif payment.type == 'sosurePotReward' %}
-                                <i class="fa fa-gbp"" title="so-sure Pot Reward"></i>
+                                <i class="fa fa-gbp" title="so-sure Pot Reward"></i>
                             {% else %}
                                 <i class="fa fa-question" title="Type: {{ payment.type }}"></i>
                             {% endif %}
@@ -1179,12 +1187,12 @@
                                 <i class="fa fa-android" title="Android Payment"></i>
                             {% elseif payment.source == 'sosure' %}
                                 <i class="fa fa-exchange" title="so-sure Auto Payment (not scheduled)"></i>
-                            {% elseif payment.source == 'system' %}
-                                <i class="fa fa-exchange" title="so-sure Auto Payment (not scheduled)"></i>
                             {% elseif payment.source == 'admin' %}
                                 <i class="fa fa-user-plus" title="so-sure Admin"></i>
+                            {% elseif payment.source == 'system' %}
+                                <i class="fa fa-exchange" title="so-sure Auto Payment (deprecated type)"></i>
                             {% elseif payment.source == 'bacs' %}
-                                <i class="fa fa-bank" title="BACS"></i>
+                                <i class="fa fa-bank" title="BACS (deprecated type)"></i>
                             {% else %}
                                 <i class="fa fa-question" title="Source: {{ payment.source }}"></i>
                             {% endif %}
@@ -1210,6 +1218,9 @@
                                 <i class="fa clock-o text-warning" title="Pending payment result"></i>
                             {% else %}
                                 <i class="fa fa-minus text-danger"></i>
+                            {% endif %}</i>
+                            {%  if payment.notes is defined and payment.notes %}
+                                <i class="fa fa-sticky-note-o" title="{{ payment.notes }}"></i>
                             {% endif %}
                             {%  if payment.status is defined and payment.status %}
                                 ({{  payment.status }})
@@ -1392,26 +1403,65 @@
           <div class="modal-body">
             <div class="row">
                 <div class="col-md-12">
-                    <div class="form-group">
-                        {{ form_label(bacs_form.date) }}
-                        {{ form_errors(bacs_form.date) }}
-                        {{ form_widget(bacs_form.date) }}
+                    <div class="row">
+                        <div class="form-group col-sm-2">
+                            {{ form_label(bacs_form.date) }}
+                        </div>
+                        <div class="form-group col-sm-10">
+                            {{ form_errors(bacs_form.date) }}
+                            {{ form_widget(bacs_form.date) }}
+                        </div>
                     </div>
-                    <div class="form-group">
-                        {{ form_label(bacs_form.amount) }} (£{{ policy.premium.monthlyPremiumPrice| number_format(2, '.', ',') }} / £{{ policy.premium.yearlyPremiumPrice| number_format(2, '.', ',') }})
-                        {{ form_errors(bacs_form.amount) }}
-                        {{ form_widget(bacs_form.amount, {'attr': {'placeholder': 'Amount to credit policy'}}) }}
-                        <strong>WARNING! - If not using a monthly or yearly amount, a manual addition to the bac payment commission in the database is required</strong>
+                    <div class="row">
+                        <div class="form-group col-sm-2">
+                            {{ form_label(bacs_form.manual) }}
+                        </div>
+                        <div class="form-group col-sm-10">
+                            {{ form_errors(bacs_form.manual) }}
+                            {{ form_widget(bacs_form.manual) }}<br>
+                            <strong>Manual payments if received directly (invoiced) vs non-manual if the system attempts to use our bacs system</strong>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        {{ form_label(bacs_form.reference) }}
-                        {{ form_errors(bacs_form.reference) }}
-                        {{ form_widget(bacs_form.reference) }}
+                    <div class="row">
+                        <div class="form-group col-sm-2">
+                            {{ form_label(bacs_form.amount) }}
+                        </div>
+                        <div class="form-group col-sm-10">
+                            {{ form_errors(bacs_form.amount) }}
+                            {{ form_widget(bacs_form.amount, {'attr': {'placeholder': 'Amount to credit policy'}}) }}
+                            (£{{ policy.premium.monthlyPremiumPrice| number_format(2, '.', ',') }} / £{{ policy.premium.yearlyPremiumPrice| number_format(2, '.', ',') }})
+                            <br><strong>
+                                Non-manual payments will be scheduled assuming users have bacs details
+                            </strong>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        {{ form_label(bacs_form.notes) }}
-                        {{ form_errors(bacs_form.notes) }}
-                        {{ form_widget(bacs_form.notes, {'attr': {'placeholder': 'Total amount of bacs transfer'}}) }}
+                    <div class="row">
+                        <div class="form-group col-sm-2">
+                            {{ form_label(bacs_form.totalCommission, 'Total Commission') }}
+                        </div>
+                        <div class="form-group col-sm-10">
+                            {{ form_errors(bacs_form.totalCommission) }}
+                            {{ form_widget(bacs_form.totalCommission) }}<br>
+                            <strong>£10.72 for annual or £0.89 / month</strong>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-sm-2">
+                            {{ form_label(bacs_form.reference) }}
+                        </div>
+                        <div class="form-group col-sm-10">
+                            {{ form_errors(bacs_form.reference) }}
+                            {{ form_widget(bacs_form.reference) }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-sm-2">
+                            {{ form_label(bacs_form.notes) }}
+                        </div>
+                        <div class="form-group col-sm-10">
+                            {{ form_errors(bacs_form.notes) }}
+                            {{ form_widget(bacs_form.notes, {'attr': {'placeholder': 'Total amount of bacs transfer'}}) }}
+                        </div>
                     </div>
                 </div>
             </div>

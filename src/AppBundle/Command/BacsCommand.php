@@ -6,6 +6,7 @@ use AppBundle\Document\BacsPaymentMethod;
 use AppBundle\Document\BankAccount;
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\File\AccessPayFile;
+use AppBundle\Document\Form\Bacs;
 use AppBundle\Document\Payment\BacsPayment;
 use AppBundle\Document\ScheduledPayment;
 use AppBundle\Repository\PaymentRepository;
@@ -14,6 +15,8 @@ use AppBundle\Service\BacsService;
 use AppBundle\Service\MailerService;
 use AppBundle\Service\PaymentService;
 use AppBundle\Service\SequenceService;
+use Doctrine\ODM\MongoDB\DocumentManager;
+use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
@@ -22,10 +25,35 @@ use AppBundle\Document\User;
 use phpseclib\Net\SFTP;
 use phpseclib\Crypt\RSA;
 
-class BacsCommand extends BaseCommand
+class BacsCommand extends ContainerAwareCommand
 {
     use DateTrait;
     const S3_BUCKET = 'admin.so-sure.com';
+
+    /** @var DocumentManager  */
+    protected $dm;
+
+    /** @var BacsService  */
+    protected $bacsService;
+
+    /** @var SequenceService */
+    protected $sequenceService;
+
+    /** @var MailerService  */
+    protected $mailerService;
+
+    public function __construct(
+        DocumentManager $dm,
+        BacsService $bacsService,
+        SequenceService $sequenceService,
+        MailerService $mailerService
+    ) {
+        parent::__construct();
+        $this->dm = $dm;
+        $this->bacsService = $bacsService;
+        $this->sequenceService = $sequenceService;
+        $this->mailerService = $mailerService;
+    }
 
     protected function configure()
     {
@@ -100,19 +128,17 @@ class BacsCommand extends BaseCommand
         if ($date) {
             $processingDate = new \DateTime($date);
         } else {
-            $processingDate = new \DateTime();
+            $processingDate = \DateTime::createFromFormat('U', time());
             $processingDate = $this->addBusinessDays($processingDate, 1);
         }
         $output->writeln(sprintf('Using processing date %s', $processingDate->format('d/M/Y')));
-        /** @var BacsService $bacsService */
-        $bacsService = $this->getContainer()->get('app.bacs');
 
         if ($debug) {
-            $output->writeln($bacsService->getHeader());
+            $output->writeln($this->bacsService->getHeader());
         }
 
         $debitPayments = [];
-        $runDebits = $bacsService->hasMandateOrPaymentDebit($prefix, $processingDate);
+        $runDebits = $this->bacsService->hasMandateOrPaymentDebit($prefix, $processingDate);
         if ($onlyCredits) {
             $runDebits = false;
         }
@@ -121,7 +147,7 @@ class BacsCommand extends BaseCommand
         }
 
         $creditPayments = [];
-        $runCredits = $bacsService->hasPaymentCredit();
+        $runCredits = $this->bacsService->hasPaymentCredit();
         if ($onlyDebits) {
             $runCredits = false;
         }
@@ -134,9 +160,7 @@ class BacsCommand extends BaseCommand
         }
 
         if (!$skipEmail) {
-            /** @var MailerService $mailer */
-            $mailer = $this->getContainer()->get('app.mailer');
-            $mailer->send(
+            $this->mailerService->send(
                 'Bacs File(s) Ready to Process',
                 'bacs@so-sure.com',
                 sprintf(
@@ -162,11 +186,10 @@ class BacsCommand extends BaseCommand
             $output->writeln('Debug option is set. Skipping sftp & s3 upload');
         }
 
-        /** @var BacsService $bacsService */
-        $bacsService = $this->getContainer()->get('app.bacs');
-        /** @var SequenceService $sequenceService */
-        $sequenceService = $this->getContainer()->get('app.sequence');
-        $serialNumber = $sequenceService->getSequenceId(SequenceService::SEQUENCE_BACS_SERIAL_NUMBER, !$debug);
+        $serialNumber = $this->sequenceService->getSequenceId(
+            SequenceService::SEQUENCE_BACS_SERIAL_NUMBER,
+            !$debug
+        );
         $serialNumber = AccessPayFile::formatSerialNumber($serialNumber);
         $output->writeln(sprintf('Using serial number %s', $serialNumber));
 
@@ -175,21 +198,21 @@ class BacsCommand extends BaseCommand
         ];
 
         $output->writeln('Exporting Mandate Cancellations');
-        $mandateCancellations = $bacsService->exportMandateCancellations($processingDate);
+        $mandateCancellations = $this->bacsService->exportMandateCancellations($processingDate);
         $data['ddi-cancellations'] = count($mandateCancellations);
         if ($debug) {
             $output->writeln(json_encode($mandateCancellations, JSON_PRETTY_PRINT));
         }
 
         $output->writeln('Exporting Mandates');
-        $mandates = $bacsService->exportMandates($processingDate, $serialNumber, false, !$debug);
+        $mandates = $this->bacsService->exportMandates($processingDate, $serialNumber, false, !$debug);
         $data['ddi'] = count($mandates);
         if ($debug) {
             $output->writeln(json_encode($mandates, JSON_PRETTY_PRINT));
         }
 
         $output->writeln('Exporting Debit Payments');
-        $debitPayments = $bacsService->exportPaymentsDebits(
+        $debitPayments = $this->bacsService->exportPaymentsDebits(
             $prefix,
             $processingDate,
             $serialNumber,
@@ -209,7 +232,7 @@ class BacsCommand extends BaseCommand
             $skipS3 = true;
         }
 
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         $filename = sprintf('%s-%s.csv', $processingDate->format('Ymd'), $now->format('U'));
         if (!$skipSftp) {
             $files = $this->uploadSftp(implode(PHP_EOL, $lines), $filename, true);
@@ -230,7 +253,7 @@ class BacsCommand extends BaseCommand
         }
 
         if (!$debug) {
-            $this->getManager()->flush();
+            $this->dm->flush();
             $output->writeln('Saved changes to db.');
         }
 
@@ -250,11 +273,10 @@ class BacsCommand extends BaseCommand
         }
         //$prefix = $input->getArgument('prefix');
 
-        /** @var BacsService $bacsService */
-        $bacsService = $this->getContainer()->get('app.bacs');
-        /** @var SequenceService $sequenceService */
-        $sequenceService = $this->getContainer()->get('app.sequence');
-        $serialNumber = $sequenceService->getSequenceId(SequenceService::SEQUENCE_BACS_SERIAL_NUMBER, !$debug);
+        $serialNumber = $this->sequenceService->getSequenceId(
+            SequenceService::SEQUENCE_BACS_SERIAL_NUMBER,
+            !$debug
+        );
         $serialNumber = AccessPayFile::formatSerialNumber($serialNumber);
         $output->writeln(sprintf('Using serial number %s', $serialNumber));
 
@@ -263,7 +285,7 @@ class BacsCommand extends BaseCommand
         ];
 
         $output->writeln('Exporting Credit Payments');
-        $creditPayments = $bacsService->exportPaymentsCredits(
+        $creditPayments = $this->bacsService->exportPaymentsCredits(
             $processingDate,
             $serialNumber,
             $data,
@@ -281,7 +303,7 @@ class BacsCommand extends BaseCommand
             $skipS3 = true;
         }
 
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         $creditFilename = sprintf('credits-%s-%s.csv', $processingDate->format('Ymd'), $now->format('U'));
         if (!$skipSftp) {
             $files = $this->uploadSftp(implode(PHP_EOL, $creditPayments), $creditFilename, false);
@@ -302,7 +324,7 @@ class BacsCommand extends BaseCommand
         }
 
         if (!$debug) {
-            $this->getManager()->flush();
+            $this->dm->flush();
             $output->writeln('Saved changes to db.');
         }
 
@@ -318,9 +340,7 @@ class BacsCommand extends BaseCommand
      */
     public function uploadSftp($data, $filename, $debit = true)
     {
-        /** @var BacsService $bacs */
-        $bacs =  $this->getContainer()->get('app.bacs');
-        return $bacs->uploadSftp($data, $filename, $debit);
+        return $this->bacsService->uploadSftp($data, $filename, $debit);
     }
 
     public function uploadS3($data, $filename, $serialNumber, \DateTime $date, $metadata = null)
@@ -331,9 +351,7 @@ class BacsCommand extends BaseCommand
         $uploadFile = new AccessPayFile();
         $uploadFile->setSerialNumber($serialNumber);
 
-        /** @var BacsService $bacs */
-        $bacs =  $this->getContainer()->get('app.bacs');
-        $s3Key = $bacs->uploadS3($tmpFile, $filename, $uploadFile, $date, $metadata, 'bacs');
+        $s3Key = $this->bacsService->uploadS3($tmpFile, $filename, $uploadFile, $date, $metadata, 'bacs');
 
         return $s3Key;
     }

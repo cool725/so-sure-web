@@ -79,7 +79,7 @@ class DaviesService extends S3EmailService
         $dbClaims = [];
         $processedClaims = [];
         $repoClaims = $this->dm->getRepository(Claim::class);
-        $startOfToday = new \DateTime();
+        $startOfToday = \DateTime::createFromFormat('U', time());
         $startOfToday = $this->startOfDay($startOfToday);
         $findAllClaims = $repoClaims->findBy([
             'recordedDate' => ['$lt' => $startOfToday],
@@ -352,7 +352,7 @@ class DaviesService extends S3EmailService
             && !$claim->getApprovedDate()) {
             // for claims without replacement date, the replacement should have occurred yesterday
             // for cases where its been forgotten, the business day should be 1 day prior to the received date
-            $yesterday = new \DateTime();
+            $yesterday = \DateTime::createFromFormat('U', time());
             if ($daviesClaim->replacementReceivedDate) {
                 $yesterday = clone $daviesClaim->replacementReceivedDate;
             }
@@ -463,7 +463,7 @@ class DaviesService extends S3EmailService
             ));
         }
 
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         if ($daviesClaim->isOpen() || ($daviesClaim->dateClosed && $daviesClaim->dateClosed->diff($now)->days < 5)) {
             // lower case & remove title
             $daviesInsuredName = mb_strtolower($daviesClaim->insuredName);
@@ -590,7 +590,8 @@ class DaviesService extends S3EmailService
         }
         if ($approvedDate) {
             $fiveBusinessDays = $this->addBusinessDays($approvedDate, 5);
-            if ($daviesClaim->isPhoneReplacementCostCorrect() === false && $fiveBusinessDays < new \DateTime()) {
+            if ($daviesClaim->isPhoneReplacementCostCorrect() === false &&
+                $fiveBusinessDays < \DateTime::createFromFormat('U', time())) {
                 $msg = sprintf(
                     'Claim %s does not have the correct phone replacement cost. Expected > 0 Actual %0.2f',
                     $daviesClaim->claimNumber,
@@ -623,7 +624,7 @@ class DaviesService extends S3EmailService
         if (!$claim->getReplacementReceivedDate() && $daviesClaim->replacementReceivedDate) {
             // We should be notified the next day when a replacement device is delivered
             // so we can follow up with our customer. Unlikely to occur.
-            $ago = new \DateTime();
+            $ago = \DateTime::createFromFormat('U', time());
             $ago = $this->subBusinessDays($ago, 1);
 
             if ($daviesClaim->replacementReceivedDate < $ago) {
@@ -637,7 +638,7 @@ class DaviesService extends S3EmailService
             }
         }
 
-        $twoWeekAgo = new \DateTime();
+        $twoWeekAgo = \DateTime::createFromFormat('U', time());
         $twoWeekAgo = $twoWeekAgo->sub(new \DateInterval('P2W'));
         if ($claim->getApprovedDate() && in_array($daviesClaim->getClaimStatus(), [
             Claim::STATUS_DECLINED,
@@ -707,7 +708,7 @@ class DaviesService extends S3EmailService
             $this->errors[$daviesClaim->claimNumber][] = $msg;
         }
 
-        $threeMonthsAgo = new \DateTime();
+        $threeMonthsAgo = \DateTime::createFromFormat('U', time());
         $threeMonthsAgo = $threeMonthsAgo->sub(new \DateInterval('P3M'));
         if ($daviesClaim->isOpen() && $daviesClaim->replacementReceivedDate &&
             $daviesClaim->replacementReceivedDate < $threeMonthsAgo) {
@@ -835,7 +836,7 @@ class DaviesService extends S3EmailService
                 ));
             }
 
-            $now = new \DateTime();
+            $now = \DateTime::createFromFormat('U', time());
             // no set time of day when the report is sent, so for this, just assume the day, not time
             $replacementDay = $this->startOfDay(clone $policy->getImeiReplacementDate());
             $twoBusinessDays = $this->addBusinessDays($replacementDay, 2);

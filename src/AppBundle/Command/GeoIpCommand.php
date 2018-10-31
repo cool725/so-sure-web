@@ -13,6 +13,15 @@ use AppBundle\Document\User;
 
 class GeoIpCommand extends ContainerAwareCommand
 {
+    /** @var MaxMindIpService */
+    protected $maxMindIpService;
+
+    public function __construct(MaxMindIpService $maxMindIpService)
+    {
+        parent::__construct();
+        $this->maxMindIpService = $maxMindIpService;
+    }
+
     protected function configure()
     {
         $this
@@ -37,8 +46,6 @@ class GeoIpCommand extends ContainerAwareCommand
         $ip = $input->getArgument('ip');
         $queryType = $input->getOption('query-type');
 
-        /** @var MaxMindIpService $geoip */
-        $geoip = $this->getContainer()->get('app.geoip');
-        $output->writeln(json_encode($geoip->find($ip, $queryType)));
+        $output->writeln(json_encode($this->maxMindIpService->find($ip, $queryType)));
     }
 }

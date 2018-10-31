@@ -2,6 +2,7 @@
 
 namespace AppBundle\Command;
 
+use AppBundle\Service\AppAnnieService;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -12,6 +13,14 @@ use AppBundle\Document\User;
 
 class AppAnnieCommand extends ContainerAwareCommand
 {
+    protected $appAnnieService;
+
+    public function __construct(AppAnnieService $appAnnieService)
+    {
+        parent::__construct();
+        $this->appAnnieService = $appAnnieService;
+    }
+
     protected function configure()
     {
         $this
@@ -68,19 +77,13 @@ class AppAnnieCommand extends ContainerAwareCommand
             $skipSave = true;
         }
 
-        $appAnnie = $this->getAppAnnie();
         $output->writeln(sprintf('Checking %s', $date->format(\DateTime::ATOM)));
-        $results = $appAnnie->run($date, $endDate, !$skipSave, $ignoreZero);
+        $results = $this->appAnnieService->run($date, $endDate, !$skipSave, $ignoreZero);
         if ($debug) {
             $output->writeln(json_encode($results, JSON_PRETTY_PRINT));
         } else {
             $output->writeln(sprintf("Apple %d", $results['apple']['downloads']));
             $output->writeln(sprintf("Google %d", $results['google']['downloads']));
         }
-    }
-    
-    private function getAppAnnie()
-    {
-        return $this->getContainer()->get('app.annie');
     }
 }

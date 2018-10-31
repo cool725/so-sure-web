@@ -14,6 +14,15 @@ use AppBundle\Classes\Premium;
 
 class EmailClearSpoolCommand extends ContainerAwareCommand
 {
+    /** @var Client  */
+    protected $redisMailer;
+
+    public function __construct(Client $redisMailer)
+    {
+        parent::__construct();
+        $this->redisMailer = $redisMailer;
+    }
+
     protected function configure()
     {
         $this
@@ -24,10 +33,11 @@ class EmailClearSpoolCommand extends ContainerAwareCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        /** @var Client $redis */
-        $redis = $this->getContainer()->get('snc_redis.mailer');
-        $output->writeln(sprintf('%d emails in queue (prior to this)', $redis->llen('swiftmailer')));
+        $output->writeln(sprintf(
+            '%d emails in queue (prior to this)',
+            $this->redisMailer->llen('swiftmailer')
+        ));
 
-        $redis->del(['swiftmailer']);
+        $this->redisMailer->del(['swiftmailer']);
     }
 }

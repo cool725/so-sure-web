@@ -5,6 +5,7 @@ namespace AppBundle\Controller;
 use AppBundle\Document\CurrencyTrait;
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\Payment\BacsPayment;
+use AppBundle\Document\Payment\Payment;
 use AppBundle\Document\ScheduledPayment;
 use AppBundle\Security\UserVoter;
 use AppBundle\Security\ClaimVoter;
@@ -697,7 +698,7 @@ class UserController extends BaseController
             ->createNamedBuilder('renew_cashback_form', RenewCashbackType::class, $renewCashback)
             ->getForm();
         $cashback = new Cashback();
-        $cashback->setDate(new \DateTime());
+        $cashback->setDate(\DateTime::createFromFormat('U', time()));
         $cashback->setPolicy($policy);
         $cashback->setStatus(Cashback::STATUS_PENDING_CLAIMABLE);
         $cashbackForm = $this->get('form.factory')
@@ -1122,7 +1123,7 @@ class UserController extends BaseController
                 ));
             }
 
-            $now = new \DateTime();
+            $now = \DateTime::createFromFormat('U', time());
             $notes = sprintf(
                 'User manually confirmed payment for £%0.2f on %s from ip: %s',
                 $amount,
@@ -1132,7 +1133,7 @@ class UserController extends BaseController
 
             /** @var BacsService $bacsService */
             $bacsService = $this->get('app.bacs');
-            $bacsService->bacsPayment($policy, $notes, $amount);
+            $bacsService->bacsPayment($policy, $notes, $amount, null, true, Payment::SOURCE_WEB);
 
             $this->getManager()->flush();
 
@@ -1239,7 +1240,7 @@ class UserController extends BaseController
 
         $pageVisited = $policy->getVisitedWelcomePage() ? true : false;
         if ($policy->getVisitedWelcomePage() === null) {
-            $policy->setVisitedWelcomePage(new \DateTime());
+            $policy->setVisitedWelcomePage(\DateTime::createFromFormat('U', time()));
             $dm->flush($policy);
         }
 

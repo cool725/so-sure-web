@@ -796,9 +796,9 @@ class PurchaseController extends BaseController
         // Default to monthly payment
         if ('GET' === $request->getMethod()) {
             $price = $policy->getPhone()->getCurrentPhonePrice();
-            if ($user->allowedMonthlyPayments()) {
+            if ($price && $user->allowedMonthlyPayments()) {
                 $purchase->setAmount($price->getMonthlyPremiumPrice($user->getAdditionalPremium()));
-            } elseif ($user->allowedYearlyPayments()) {
+            } elseif ($price && $user->allowedYearlyPayments()) {
                 $purchase->setAmount($price->getYearlyPremiumPrice($user->getAdditionalPremium()));
             }
         }
@@ -845,14 +845,19 @@ class PurchaseController extends BaseController
 
                 if ($purchaseFormValid) {
                     if ($allowPayment) {
-                        $monthly = $this->areEqualToTwoDp(
-                            $purchase->getAmount(),
-                            $policy->getPhone()->getCurrentPhonePrice()->getMonthlyPremiumPrice()
-                        );
-                        $yearly = $this->areEqualToTwoDp(
-                            $purchase->getAmount(),
-                            $policy->getPhone()->getCurrentPhonePrice()->getYearlyPremiumPrice()
-                        );
+                        $currentPrice = $policy->getPhone()->getCurrentPhonePrice();
+                        $monthly = null;
+                        $yearly = null;
+                        if ($currentPrice) {
+                            $monthly = $this->areEqualToTwoDp(
+                                $purchase->getAmount(),
+                                $currentPrice->getMonthlyPremiumPrice()
+                            );
+                            $yearly = $this->areEqualToTwoDp(
+                                $purchase->getAmount(),
+                                $currentPrice->getYearlyPremiumPrice()
+                            );
+                        }
 
                         if ($monthly || $yearly) {
                             $price = $purchase->getPolicy()->getPhone()->getCurrentPhonePrice();
@@ -910,7 +915,7 @@ class PurchaseController extends BaseController
         $requestService = $this->get('app.request');
         $template = 'AppBundle:Purchase:purchaseStepPayment.html.twig';
 
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         $billingDate = $this->adjustDayForBilling($now);
 
         $data = array(
@@ -1257,7 +1262,7 @@ class PurchaseController extends BaseController
         }
 
         if (!$policy->hasViewedCancellationPage()) {
-            $policy->setViewedCancellationPage(new \DateTime());
+            $policy->setViewedCancellationPage(\DateTime::createFromFormat('U', time()));
             $dm->flush();
         }
         $cancelForm = $this->get('form.factory')
@@ -1287,7 +1292,7 @@ class PurchaseController extends BaseController
                     // @codingStandardsIgnoreEnd
 
                     if (!$policy->hasRequestedCancellation()) {
-                        $policy->setRequestedCancellation(new \DateTime());
+                        $policy->setRequestedCancellation(\DateTime::createFromFormat('U', time()));
                         $policy->setRequestedCancellationReason($reason);
                         $dm->flush();
                         $intercom = $this->get('app.intercom');

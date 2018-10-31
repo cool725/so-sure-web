@@ -13,6 +13,15 @@ use AppBundle\Classes\Premium;
 
 class AddressCommand extends ContainerAwareCommand
 {
+    /** @var PCAService */
+    protected $pcaService;
+
+    public function __construct(PCAService $pcaService)
+    {
+        parent::__construct();
+        $this->pcaService = $pcaService;
+    }
+
     protected function configure()
     {
         $this
@@ -58,21 +67,19 @@ class AddressCommand extends ContainerAwareCommand
         $useAddress = true === $input->getOption('address');
         $validate = true === $input->getOption('validate');
         $id = $input->getOption('id');
-        /** @var PCAService $address */
-        $address = $this->getContainer()->get('app.address');
         if ($id) {
-            if ($addressData = $address->retreive($id)) {
+            if ($addressData = $this->pcaService->retreive($id)) {
                 $output->writeln(json_encode($addressData->toApiArray()));
             }
         } elseif ($useAddress) {
-            if ($addresses = $address->getAddress($postcode, $number)) {
+            if ($addresses = $this->pcaService->getAddress($postcode, $number)) {
                 $output->writeln(json_encode($addresses->toApiArray()));
             }
         } elseif ($validate) {
-            $result = $address->validatePostcode($postcode, true);
+            $result = $this->pcaService->validatePostcode($postcode, true);
             $output->writeln(sprintf('%s validation: %s', $postcode, $result ? 'true' : 'false'));
         } else {
-            $addresses = $address->find($postcode, $number);
+            $addresses = $this->pcaService->find($postcode, $number);
             $output->writeln(json_encode($addresses));
         }
     }

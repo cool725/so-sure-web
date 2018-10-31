@@ -15,7 +15,7 @@ class ScheduledPaymentRepository extends BaseDocumentRepository
     public function findScheduled(\DateTime $date = null)
     {
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
 
         return $this->createQueryBuilder()
@@ -29,7 +29,7 @@ class ScheduledPaymentRepository extends BaseDocumentRepository
     public function findMonthlyScheduled(\DateTime $date = null)
     {
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
         $start = $this->startOfMonth($date);
         $end = $this->endOfMonth($date);
@@ -81,6 +81,7 @@ class ScheduledPaymentRepository extends BaseDocumentRepository
                     ->field('total')
                     ->sum('$amount')
                 ->sort('_id', 'desc')
-                ->execute();
+            ->execute(['cursor' => true])
+            ->toArray();
     }
 }

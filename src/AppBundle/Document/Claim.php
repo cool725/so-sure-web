@@ -47,6 +47,7 @@ class Claim
     const WARNING_FLAG_CLAIMS_INCORRECT_EXCESS = 'claim-incorrect-excess';
     const WARNING_FLAG_CLAIMS_IMEI_MISMATCH = 'claim-imei-mismatch';
     const WARNING_FLAG_CLAIMS_HANDLING_TEAM = 'claim-handling-team';
+    const WARNING_FLAG_CLAIMS_ALLOW_PICSURE_REDO = 'claim-allow-picsure-redo';
 
     const WARNING_FLAG_BRIGHTSTAR_NAME_MATCH = 'brightstar-name-match';
     const WARNING_FLAG_BRIGHTSTAR_POSTCODE = 'brighstar-postcode';
@@ -163,6 +164,7 @@ class Claim
         self::WARNING_FLAG_CLAIMS_INCORRECT_EXCESS => self::WARNING_FLAG_CLAIMS_INCORRECT_EXCESS,
         self::WARNING_FLAG_CLAIMS_IMEI_MISMATCH => self::WARNING_FLAG_CLAIMS_IMEI_MISMATCH,
         self::WARNING_FLAG_CLAIMS_HANDLING_TEAM => self::WARNING_FLAG_CLAIMS_HANDLING_TEAM,
+        self::WARNING_FLAG_CLAIMS_ALLOW_PICSURE_REDO => self::WARNING_FLAG_CLAIMS_ALLOW_PICSURE_REDO,
     ];
 
     public static $claimTypes = [
@@ -754,7 +756,7 @@ class Claim
 
     public function __construct()
     {
-        $this->recordedDate = new \DateTime();
+        $this->recordedDate = \DateTime::createFromFormat('U', time());
     }
 
     public function getId()
@@ -903,16 +905,6 @@ class Claim
             self::STATUS_WITHDRAWN,
         ])) {
             throw new \Exception(sprintf('Status must be a valid status, not %s', $status));
-        }
-
-        // TODO: Was STATUS_DECLINED as well, but claim 77557421061 is declined - mistake in data?
-        if (in_array($this->getType(), [self::TYPE_WARRANTY]) &&
-            in_array($status, [self::STATUS_APPROVED])) {
-            throw new \InvalidArgumentException(sprintf(
-                'Unable to use approved with Warranty Types. %s/%s',
-                $this->getNumber(),
-                $this->getId()
-            ));
         }
 
         // Don't trust davies enough with data - changing from approved / settled to declined / withdrawn
@@ -1852,7 +1844,7 @@ class Claim
         /** @var PhonePolicy $phonePolicy */
         $phonePolicy = $this->getPolicy();
         $picSureEnabled = $phonePolicy->isPicSurePolicy();
-        $picSureValidated = $phonePolicy->isPicSureValidated();
+        $picSureValidated = $phonePolicy->isPicSureValidatedIncludingClaim($this);
 
         return self::getExcessValue($this->getType(), $picSureValidated, $picSureEnabled);
     }

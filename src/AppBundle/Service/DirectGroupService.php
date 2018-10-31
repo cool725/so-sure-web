@@ -79,7 +79,7 @@ class DirectGroupService extends SftpService
         $dbClaims = [];
         $processedClaims = [];
         $repoClaims = $this->dm->getRepository(Claim::class);
-        $startOfToday = new \DateTime();
+        $startOfToday = \DateTime::createFromFormat('U', time());
         $startOfToday = $this->startOfDay($startOfToday);
         $findAllClaims = $repoClaims->findBy([
             'recordedDate' => ['$lt' => $startOfToday],
@@ -433,7 +433,7 @@ class DirectGroupService extends SftpService
             && !$claim->getApprovedDate()) {
             // for claims without replacement date, the replacement should have occurred yesterday
             // for cases where its been forgotten, the business day should be 1 day prior to the received date
-            $yesterday = new \DateTime();
+            $yesterday = \DateTime::createFromFormat('U', time());
             if ($directGroupClaim->replacementReceivedDate) {
                 $yesterday = clone $directGroupClaim->replacementReceivedDate;
             }
@@ -544,7 +544,7 @@ class DirectGroupService extends SftpService
             ));
         }
 
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         if ($directGroupClaim->isOpen() ||
             ($directGroupClaim->dateClosed && $directGroupClaim->dateClosed->diff($now)->days < 5)) {
             // lower case & remove title
@@ -688,13 +688,14 @@ class DirectGroupService extends SftpService
 
         if (!$claim->getReplacementReceivedDate() && $directGroupClaim->replacementReceivedDate) {
             // We should be notified the next day when a replacement device is delivered
-            // so we can follow up with our customer. Unlikely to occur.
-            $ago = new \DateTime();
-            $ago = $this->subBusinessDays($ago, 1);
+            // so we can follow up with our customer.
+            // DG takes 3 days for some suppliers
+            $ago = \DateTime::createFromFormat('U', time());
+            $ago = $this->subBusinessDays($ago, 3);
 
             if ($directGroupClaim->replacementReceivedDate < $ago) {
                 $msg = sprintf(
-                    'Claim %s has a delayed replacement date (%s) which is more than 1 business day ago (%s)',
+                    'Claim %s has a delayed replacement date (%s) which is more than 3 business days ago (%s)',
                     $directGroupClaim->claimNumber,
                     $directGroupClaim->replacementReceivedDate->format(\DateTime::ATOM),
                     $ago->format(\DateTime::ATOM)
@@ -703,7 +704,7 @@ class DirectGroupService extends SftpService
             }
         }
 
-        $twoWeekAgo = new \DateTime();
+        $twoWeekAgo = \DateTime::createFromFormat('U', time());
         $twoWeekAgo = $twoWeekAgo->sub(new \DateInterval('P2W'));
         if ($claim->getApprovedDate() && in_array($directGroupClaim->getClaimStatus(), [
             Claim::STATUS_DECLINED,
@@ -773,7 +774,7 @@ class DirectGroupService extends SftpService
             $this->errors[$directGroupClaim->claimNumber][] = $msg;
         }
 
-        $threeMonthsAgo = new \DateTime();
+        $threeMonthsAgo = \DateTime::createFromFormat('U', time());
         $threeMonthsAgo = $threeMonthsAgo->sub(new \DateInterval('P3M'));
         if ($directGroupClaim->isOpen() && $directGroupClaim->replacementReceivedDate &&
             $directGroupClaim->replacementReceivedDate < $threeMonthsAgo) {
@@ -880,7 +881,7 @@ class DirectGroupService extends SftpService
                 ));
             }
 
-            $now = new \DateTime();
+            $now = \DateTime::createFromFormat('U', time());
             // no set time of day when the report is sent, so for this, just assume the day, not time
             $replacementDay = $this->startOfDay(clone $policy->getImeiReplacementDate());
             $twoBusinessDays = $this->addBusinessDays($replacementDay, 2);

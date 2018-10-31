@@ -861,7 +861,7 @@ class PolicyServiceTest extends WebTestCase
      */
     public function testPolicyUnpaidUnableToChangeBilling()
     {
-        $pastDue = new \DateTime();
+        $pastDue = \DateTime::createFromFormat('U', time());
         $pastDue = $pastDue->sub(new \DateInterval('P35D'));
         $user = static::createUser(
             static::$userManager,
@@ -883,7 +883,7 @@ class PolicyServiceTest extends WebTestCase
         $this->assertFalse($policy->isPolicyPaidToDate());
         $this->assertNotNull($policy->getBilling());
 
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         $billingDate = $this->setDayOfMonth($now, '15');
         $policy->setBilling($billingDate);
     }
@@ -1273,10 +1273,10 @@ class PolicyServiceTest extends WebTestCase
 
     public function testPoliciesPendingCancellation()
     {
-        $yesterday = new \DateTime();
+        $yesterday = \DateTime::createFromFormat('U', time());
         $yesterday = $yesterday->sub(new \DateInterval('P1D'));
-        $now = new \DateTime();
-        $tomorrow = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
+        $tomorrow = \DateTime::createFromFormat('U', time());
         $tomorrow = $tomorrow->add(new \DateInterval('P1D'));
 
         $userFuture = static::createUser(
@@ -3892,7 +3892,7 @@ class PolicyServiceTest extends WebTestCase
     private function getCashback($policy)
     {
         $cashback = new Cashback();
-        $cashback->setDate(new \DateTime());
+        $cashback->setDate(\DateTime::createFromFormat('U', time()));
         $cashback->setStatus(Cashback::STATUS_PENDING_CLAIMABLE);
         $cashback->setAccountName('foo');
         $cashback->setSortCode('123456');
@@ -4421,7 +4421,7 @@ class PolicyServiceTest extends WebTestCase
         $this->assertEquals(Policy::STATUS_PENDING_RENEWAL, $renewalPolicyB->getStatus());
 
         $cashbackB = new Cashback();
-        $cashbackB->setDate(new \DateTime());
+        $cashbackB->setDate(\DateTime::createFromFormat('U', time()));
         $cashbackB->setStatus(Cashback::STATUS_PENDING_CLAIMABLE);
         $cashbackB->setAccountName('foo bar');
         $cashbackB->setSortCode('123456');
@@ -4459,7 +4459,7 @@ class PolicyServiceTest extends WebTestCase
         $this->assertEquals(10, $policyB->getPotValue());
 
         $cashbackB = new Cashback();
-        $cashbackB->setDate(new \DateTime());
+        $cashbackB->setDate(\DateTime::createFromFormat('U', time()));
         $cashbackB->setStatus(Cashback::STATUS_PENDING_CLAIMABLE);
         $cashbackB->setAccountName('foo bar');
         $cashbackB->setSortCode('123456');
@@ -4911,7 +4911,7 @@ class PolicyServiceTest extends WebTestCase
             $policy->getPremium()->getMonthlyPremiumPrice()
         );
 
-        $validFrom = new \DateTime();
+        $validFrom = \DateTime::createFromFormat('U', time());
         $validFrom->sub(new \DateInterval('PT1H'));
 
         $currentPrice = $phone->getCurrentPhonePrice();
@@ -4952,7 +4952,7 @@ class PolicyServiceTest extends WebTestCase
 
         $policy->setPremiumInstallments(12);
 
-        $validFrom = new \DateTime();
+        $validFrom = \DateTime::createFromFormat('U', time());
         $validFrom->sub(new \DateInterval('PT10M'));
 
         $currentPrice = $phone->getCurrentPhonePrice();
@@ -4997,7 +4997,7 @@ class PolicyServiceTest extends WebTestCase
 
         $policy->setPremiumInstallments(1);
 
-        $validFrom = new \DateTime();
+        $validFrom = \DateTime::createFromFormat('U', time());
         $validFrom->sub(new \DateInterval('PT10M'));
 
         $currentPrice = $phone->getCurrentPhonePrice();
@@ -5042,7 +5042,7 @@ class PolicyServiceTest extends WebTestCase
 
         $policy->setPremiumInstallments(12);
 
-        $validFrom = new \DateTime();
+        $validFrom = \DateTime::createFromFormat('U', time());
         $validFrom->sub(new \DateInterval('PT1H'));
 
         $currentPrice = $phone->getCurrentPhonePrice();
@@ -5087,7 +5087,7 @@ class PolicyServiceTest extends WebTestCase
 
         $policy->setPremiumInstallments(1);
 
-        $validFrom = new \DateTime();
+        $validFrom = \DateTime::createFromFormat('U', time());
         $validFrom->sub(new \DateInterval('PT1H'));
 
         $currentPrice = $phone->getCurrentPhonePrice();
@@ -5132,7 +5132,7 @@ class PolicyServiceTest extends WebTestCase
 
         $policy->setPremiumInstallments(12);
 
-        $validFrom = new \DateTime();
+        $validFrom = \DateTime::createFromFormat('U', time());
         $validFrom->add(new \DateInterval('PT3H'));
 
         $currentPrice = $phone->getCurrentPhonePrice();
@@ -5177,7 +5177,7 @@ class PolicyServiceTest extends WebTestCase
 
         $policy->setPremiumInstallments(1);
 
-        $validFrom = new \DateTime();
+        $validFrom = \DateTime::createFromFormat('U', time());
         $validFrom->add(new \DateInterval('PT3H'));
 
         $currentPrice = $phone->getCurrentPhonePrice();
@@ -5225,7 +5225,7 @@ class PolicyServiceTest extends WebTestCase
 
         $policy->setPremiumInstallments(12);
 
-        $validFrom = new \DateTime();
+        $validFrom = \DateTime::createFromFormat('U', time());
         $validFrom->sub(new \DateInterval('PT1H'));
 
         $currentPrice = $phone->getCurrentPhonePrice();
@@ -5267,7 +5267,7 @@ class PolicyServiceTest extends WebTestCase
 
         $policy->setPremiumInstallments(1);
 
-        $validFrom = new \DateTime();
+        $validFrom = \DateTime::createFromFormat('U', time());
         $validFrom->sub(new \DateInterval('PT1H'));
 
         $currentPrice = $phone->getCurrentPhonePrice();

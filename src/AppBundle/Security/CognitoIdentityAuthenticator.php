@@ -2,6 +2,7 @@
 
 namespace AppBundle\Security;
 
+use AppBundle\Document\IdentityLog;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Authentication\Token\PreAuthenticatedToken;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -70,7 +71,46 @@ class CognitoIdentityAuthenticator implements SimplePreAuthenticatorInterface, A
             return null;
         }
     }
-    
+
+    /**
+     * @param string $requestContent
+     *
+     * @return string|null
+     */
+    public function getCognitoIdentityUserAgent($requestContent)
+    {
+        try {
+            $identity = $this->parseIdentity($requestContent);
+            if (!$identity || !isset($identity['userAgent'])) {
+                return null;
+            }
+
+            return $identity['userAgent'];
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
+
+    /**
+     * @param string $requestContent
+     *
+     * @return string|null
+     */
+    public function getCognitoIdentitySdk($requestContent)
+    {
+        $userAgent = $this->getCognitoIdentityUserAgent($requestContent);
+        if ($userAgent && mb_stripos($userAgent, 'aws-sdk-android') !== false) {
+            return IdentityLog::SDK_ANDROID;
+        } elseif ($userAgent && mb_stripos($userAgent, 'aws-sdk-iOS') !== false) {
+            return IdentityLog::SDK_IOS;
+        } elseif ($userAgent && mb_stripos($userAgent, 'aws-sdk-javascript') !== false) {
+            // TODO: Test this when released
+            return IdentityLog::SDK_JAVASCRIPT;
+        }
+
+        return IdentityLog::SDK_UNKNOWN;
+    }
+
     protected function parseIdentity($requestContent)
     {
         try {

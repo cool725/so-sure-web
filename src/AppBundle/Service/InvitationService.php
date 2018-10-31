@@ -395,7 +395,7 @@ class InvitationService
                 'Invitation Method' => 'email',
             ]);
             $this->mixpanel->queuePersonIncrement('Number of Invites Sent', 1, $invitation->getInviter());
-            $now = new \DateTime();
+            $now = \DateTime::createFromFormat('U', time());
             $this->mixpanel->queuePersonProperties([
                 'Last Invite Sent' => $now->format(\DateTime::ATOM),
             ], false, $invitation->getInviter());
@@ -467,7 +467,7 @@ class InvitationService
                 'Invitation Method' => 'sms',
             ]);
             $this->mixpanel->queuePersonIncrement('Number of Invites Sent', 1, $invitation->getInviter());
-            $now = new \DateTime();
+            $now = \DateTime::createFromFormat('U', time());
             $this->mixpanel->queuePersonProperties([
                 'Last Invite Sent' => $now->format(\DateTime::ATOM),
             ], false, $invitation->getInviter());
@@ -559,7 +559,7 @@ class InvitationService
             $invitation->invite();
 
             if ($scode->isReward()) {
-                $invitation->setAccepted(new \DateTime());
+                $invitation->setAccepted(\DateTime::createFromFormat('U', time()));
             }
             $this->dm->persist($invitation);
             $this->dm->flush();
@@ -588,7 +588,7 @@ class InvitationService
                 'Invitation Method' => 'scode',
             ]);
             $this->mixpanel->queuePersonIncrement('Number of Invites Sent', 1, $invitation->getInviter());
-            $now = new \DateTime();
+            $now = \DateTime::createFromFormat('U', time());
             $this->mixpanel->queuePersonProperties([
                 'Last Invite Sent' => $now->format(\DateTime::ATOM),
             ], false, $invitation->getInviter());
@@ -600,7 +600,7 @@ class InvitationService
     private function setSCodeLeadSource(SCode $scode, Policy $policy, User $user, \DateTime $date = null)
     {
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
         $date->sub(new \DateInterval('P1D'));
 
@@ -697,7 +697,7 @@ class InvitationService
             'Invitation Method' => 'facebook',
         ]);
         $this->mixpanel->queuePersonIncrement('Number of Invites Sent', 1, $invitation->getInviter());
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         $this->mixpanel->queuePersonProperties([
             'Last Invite Sent' => $now->format(\DateTime::ATOM),
         ], false, $invitation->getInviter());
@@ -952,7 +952,7 @@ class InvitationService
     public function accept(Invitation $invitation, Policy $inviteePolicy, \DateTime $date = null, $skipSend = false)
     {
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
 
         if ($invitation->isProcessed()) {
@@ -1023,7 +1023,7 @@ class InvitationService
             $this->dispatcher->dispatch(ConnectionEvent::EVENT_CONNECTED, new ConnectionEvent($inviterConnection));
         }
 
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         $this->mixpanel->queueTrackWithUser($invitation->getInviter(), MixpanelService::EVENT_CONNECTION_COMPLETE, [
             'Connection Value' => $inviterConnection->getTotalValue(),
             'Policy Id' => $inviterPolicy->getId(),
@@ -1048,7 +1048,7 @@ class InvitationService
     public function connect(Policy $policyA, Policy $policyB, \DateTime $date = null)
     {
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
 
         $this->validatePolicy($policyA);
@@ -1123,7 +1123,7 @@ class InvitationService
             throw new ProcessedException("Invitation has already been processed");
         }
 
-        $invitation->setRejected(new \DateTime());
+        $invitation->setRejected(\DateTime::createFromFormat('U', time()));
         $this->dm->flush();
 
         // Notify inviter of rejection
@@ -1137,7 +1137,7 @@ class InvitationService
             throw new ProcessedException("Invitation has already been processed");
         }
 
-        $invitation->setCancelled(new \DateTime());
+        $invitation->setCancelled(\DateTime::createFromFormat('U', time()));
         $this->dm->flush();
 
         $this->sendEvent($invitation, InvitationEvent::EVENT_CANCELLED);
@@ -1233,7 +1233,7 @@ class InvitationService
         $invitations = $inviteRepo->findBy(['email' => mb_strtolower($email)]);
         foreach ($invitations as $invitation) {
             if (!$invitation->isProcessed()) {
-                $invitation->setRejected(new \DateTime());
+                $invitation->setRejected(\DateTime::createFromFormat('U', time()));
             }
         }
         $this->dm->flush();

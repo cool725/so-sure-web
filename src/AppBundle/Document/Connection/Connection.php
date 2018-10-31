@@ -131,7 +131,7 @@ class Connection
 
     public function __construct()
     {
-        $this->date = new \DateTime();
+        $this->date = \DateTime::createFromFormat('U', time());
     }
 
     public function getId()
@@ -324,7 +324,7 @@ class Connection
         }
 
         if (!$date) {
-            $date = new \DateTime();
+            $date = \DateTime::createFromFormat('U', time());
         }
         $diff = $date->diff($this->getDate());
         // print $date->format(\DateTime::ATOM) . PHP_EOL;

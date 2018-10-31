@@ -21,6 +21,7 @@ use AppBundle\Service\PolicyService;
 use AppBundle\Service\ReceperioService;
 use AppBundle\Service\ReportingService;
 use AppBundle\Service\SalvaExportService;
+use AppBundle\Service\AffiliateService;
 use Gedmo\Loggable\Document\Repository\LogEntryRepository;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
@@ -29,6 +30,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Symfony\Component\Validator\Constraints as Assert;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Gedmo\Loggable\Document\LogEntry;
 use AppBundle\Classes\ClientUrl;
@@ -111,6 +113,7 @@ use AppBundle\Service\PushService;
 use AppBundle\Event\PicsureEvent;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
@@ -123,6 +126,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use CensusBundle\Document\Postcode;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
+use Symfony\Component\Validator\Constraints\Choice;
 
 /**
  * @Route("/admin")
@@ -244,7 +248,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             $phones = $phones->field('suggestedReplacement')->exists(false);
             $phones = $phones->field('replacementPrice')->lte(0);
         } elseif ($rules == 'retired') {
-            $retired = new \DateTime();
+            $retired = \DateTime::createFromFormat('U', time());
             $retired->sub(new \DateInterval(sprintf('P%dM', Phone::MONTHS_RETIREMENT + 1)));
             $phones = $phones->field('releaseDate')->lte($retired);
         } elseif ($rules == 'loss') {
@@ -267,7 +271,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             $replacementPhones = clone $phones;
             $phones = $phones->field('replacementPrice')->lte(0);
             $phones = $phones->field('initialPrice')->gte(300);
-            $year = new \DateTime();
+            $year = \DateTime::createFromFormat('U', time());
             $year->sub(new \DateInterval('P1Y'));
             $phones = $phones->field('releaseDate')->gte($year);
 
@@ -291,7 +295,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         $phones = $phones->sort('memory', 'asc');
         $pager = $this->pager($request, $phones);
 
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         $oneDay = $this->addBusinessDays($now, 1);
         return [
             'phones' => $pager->getCurrentPageResults(),
@@ -478,8 +482,9 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         $bacsPayment->setManual(true);
         $bacsPayment->setStatus(BacsPayment::STATUS_SUCCESS);
         $bacsPayment->setSuccess(true);
-        $bacsPayment->setDate(new \DateTime());
+        $bacsPayment->setDate(\DateTime::createFromFormat('U', time()));
         $bacsPayment->setAmount($policy->getPremium()->getYearlyPremiumPrice());
+        $bacsPayment->setTotalCommission(Salva::YEARLY_TOTAL_COMMISSION);
 
         $bacsForm = $this->get('form.factory')
             ->createNamedBuilder('bacs_form', DirectBacsReceiptType::class, $bacsPayment)
@@ -719,24 +724,18 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             } elseif ($request->request->has('bacs_form')) {
                 $bacsForm->handleRequest($request);
                 if ($bacsForm->isValid()) {
-                    if ($this->areEqualToTwoDp(
-                        $bacsPayment->getAmount(),
-                        $policy->getPremium()->getMonthlyPremiumPrice()
-                    )) {
-                        $bacsPayment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
-                    } elseif ($this->areEqualToTwoDp(
-                        $bacsPayment->getAmount(),
-                        $policy->getPremium()->getYearlyPremiumPrice()
-                    )) {
-                        $bacsPayment->setTotalCommission(Salva::YEARLY_TOTAL_COMMISSION);
-                    } else {
-                        $this->get('logger')->warning(sprintf(
-                            'Unable to determine commission on bacs payment for policy %s',
-                            $policy->getId()
-                        ));
+                    // non-manual payments should be scheduled
+                    if (!$bacsPayment->isManual()) {
+                        $bacsPayment->setStatus(BacsPayment::STATUS_PENDING);
+                        if (!$policy->getUser()->hasBacsPaymentMethod()) {
+                            $this->get('logger')->warning(sprintf(
+                                'Payment (Policy %s) is scheduled, however no bacs account for user',
+                                $policy->getId()
+                            ));
+                        }
                     }
-
                     $policy->addPayment($bacsPayment);
+
                     $dm->flush();
                     $this->addFlash(
                         'success',
@@ -885,7 +884,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                     if ($chargeback = $chargebacks->getChargeback()) {
                         // To appear for the correct account month, should be when we assign
                         // the chargeback to the policy
-                        $chargeback->setDate(new \DateTime());
+                        $chargeback->setDate(\DateTime::createFromFormat('U', time()));
 
                         if ($this->areEqualToTwoDp(
                             $chargeback->getAmount(),
@@ -973,7 +972,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                         } else {
                             throw new \Exception('Unknown button click');
                         }
-                        $policy->setPicSureApprovedDate(new \DateTime());
+                        $policy->setPicSureApprovedDate(\DateTime::createFromFormat('U', time()));
                         $dm->flush();
                         $this->addFlash(
                             'success',
@@ -1004,12 +1003,13 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             } elseif ($request->request->has('pay_policy_form')) {
                 $payPolicyForm->handleRequest($request);
                 if ($payPolicyForm->isValid()) {
-                    $date = new \DateTime();
+                    $date = \DateTime::createFromFormat('U', time());
                     $phone = $policy->getPhone();
-                    if ($payPolicyForm->get('monthly')->isClicked()) {
-                        $amount = $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(null, $date);
-                    } elseif ($payPolicyForm->get('yearly')->isClicked()) {
-                        $amount = $phone->getCurrentPhonePrice()->getYearlyPremiumPrice(null, $date);
+                    $currentPrice = $phone->getCurrentPhonePrice();
+                    if ($currentPrice && $payPolicyForm->get('monthly')->isClicked()) {
+                        $amount = $currentPrice->getMonthlyPremiumPrice(null, $date);
+                    } elseif ($currentPrice && $payPolicyForm->get('yearly')->isClicked()) {
+                        $amount = $currentPrice->getYearlyPremiumPrice(null, $date);
                     } else {
                         throw new \Exception('1 or 12 payments only');
                     }
@@ -1117,7 +1117,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             }
         }
         $checks = $fraudService->runChecks($policy);
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
 
         /** @var LogEntryRepository $logRepo */
         $logRepo = $this->getManager()->getRepository(LogEntry::class);
@@ -1175,7 +1175,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             'suggested_cancellation_date' => $now->add(new \DateInterval('P30D')),
             'claim_types' => Claim::$claimTypes,
             'phones' => $dm->getRepository(Phone::class)->findActive()->getQuery()->execute(),
-            'now' => new \DateTime(),
+            'now' => \DateTime::createFromFormat('U', time()),
             'previousPicSureStatus' => $previousPicSureStatus,
             'hadInvalidPicSureStatus' => $hadInvalidPicSureStatus,
         ];
@@ -1277,7 +1277,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                     }
 
                     $this->container->get('fos_user.mailer')->sendResettingEmailMessage($user);
-                    $user->setPasswordRequestedAt(new \DateTime());
+                    $user->setPasswordRequestedAt(\DateTime::createFromFormat('U', time()));
                     $this->get('fos_user.user_manager')->updateUser($user);
 
                     $this->addFlash(
@@ -1501,7 +1501,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                 }
             }
         }
-        
+
         return [
             'user' => $user,
             'reset_form' => $resetForm->createView(),
@@ -1586,7 +1586,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
      */
     public function adminScheduledPaymentsAction($year = null, $month = null)
     {
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         if (!$year) {
             $year = $now->format('Y');
         }
@@ -1636,7 +1636,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
     public function adminQuarterlyPLAction(Request $request, $year = null, $month = null)
     {
         if ($request->get('_route') == "admin_quarterly_pl") {
-            $now = new \DateTime();
+            $now = \DateTime::createFromFormat('U', time());
             $now = $now->sub(new \DateInterval('P1Y'));
             return new RedirectResponse($this->generateUrl('admin_quarterly_pl_date', [
                 'year' => $now->format('Y'),
@@ -1665,7 +1665,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
     public function adminUnderWritingAction(Request $request, $year = null, $month = null)
     {
         if ($request->get('_route') == "admin_underwriting") {
-            $now = new \DateTime();
+            $now = \DateTime::createFromFormat('U', time());
             $now = $now->sub(new \DateInterval('P1Y'));
             return new RedirectResponse($this->generateUrl('admin_underwriting_date', [
                 'year' => $now->format('Y'),
@@ -1847,7 +1847,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                     'detected_imei' => 'a123',
                     'suggested_imei' => 'a456',
                     'bucket' => 'a',
-                    'key' => 'key', 
+                    'key' => 'key',
                 ]));
         */
         $imeis = [];
@@ -2137,7 +2137,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
     public function breakdownPrintAction()
     {
         $policyService = $this->get('app.policy');
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
 
         return new Response(
             $policyService->getBreakdownPdf(),
@@ -2243,7 +2243,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
      */
     public function paymentsAction($year = null, $month = null)
     {
-        $now = new \DateTime();
+        $now = \DateTime::createFromFormat('U', time());
         if (!$year) {
             $year = $now->format('Y');
         }
@@ -2455,6 +2455,12 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             90 => 90
         ];
 
+        $lead_sources = [
+            'invitation' => 'invitation',
+            'scode' => 'scode',
+            'affiliate' => 'affiliate'
+        ];
+
         $companyForm = $this->get('form.factory')
             ->createNamedBuilder('companyForm')
             ->add('name', TextType::class)
@@ -2463,9 +2469,11 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             ->add('address3', TextType::class, ['required' => false])
             ->add('city', TextType::class)
             ->add('postcode', TextType::class)
-            ->add('cpa', TextType::class)
-            ->add('days', ChoiceType::class, ['required' => true,
-                                                'choices' => $time_range])
+            ->add('cpa', NumberType::class, ['constraints' => [new Assert\Range(['min' => 0, 'max' => 20])]])
+            ->add('days', ChoiceType::class, ['required' => true, 'choices' => $time_range])
+            ->add('campaignSource', TextType::class, ['required' => false])
+            ->add('leadSource', ChoiceType::class, ['required' => false, 'choices' => $lead_sources])
+            ->add('leadSourceDetails', TextType::class, ['required' => false ])
             ->add('next', SubmitType::class)
             ->getForm();
 
@@ -2486,15 +2494,23 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                         $address->setLine2($this->getDataString($companyForm->getData(), 'address2'));
                         $address->setLine3($this->getDataString($companyForm->getData(), 'address3'));
                         $address->setCity($this->getDataString($companyForm->getData(), 'city'));
-                        $address->setPostcode($this->getDataString($companyForm->getData(), 'postcode'));
+                        $postcode = $this->getDataString($companyForm->getData(), 'postcode');
+                        try {
+                            $address->setPostcode($postcode);
+                        } catch (\InvalidArgumentException $e) {
+                            throw new \InvalidArgumentException("{$postcode} is not a valid post code.");
+                        }
                         $company->setAddress($address);
-                        $company->setCPA($this->getDataString($companyForm->getData(), 'cpa'));
                         $company->setDays($this->getDataString($companyForm->getData(), 'days'));
+                        $company->setCampaignSource($this->getDataString($companyForm->getData(), 'campaignSource'));
+                        $company->setLeadSource($this->getDataString($companyForm->getData(), 'leadSource'));
+                        $company->setLeadSourceDetails(
+                            $this->getDataString($companyForm->getData(), 'leadSourceDetails')
+                        );
+                        $company->setCPA($this->getDataString($companyForm->getData(), 'cpa'));
                         $dm->persist($company);
                         $dm->flush();
-                        $this->addFlash('success', sprintf(
-                            'Added affiliate'
-                        ));
+                        $this->addFlash('success', 'Added affiliate');
 
                         return new RedirectResponse($this->generateUrl('admin_affiliate'));
                     } else {
@@ -2513,5 +2529,93 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             'companies' => $companies,
             'companyForm' => $companyForm->createView(),
         ];
+    }
+
+    /**
+     * @Route("/affiliate/charge/{id}/{year}/{month}", name="admin_affiliate_charge")
+     * @Template("AppBundle:AdminEmployee:affiliateCharge.html.twig")
+     */
+    public function affiliateChargeAction($id, $year = null, $month = null)
+    {
+        $now = \DateTime::createFromFormat('U', time());
+        $year = $year ?: $now->format('Y');
+        $month = $month ?: $now->format('m');
+        $date = \DateTime::createFromFormat("Y-m-d", sprintf('%d-%d-01', $year, $month));
+
+        $dm = $this->getManager();
+        $affiliateRepo = $dm->getRepository(AffiliateCompany::class);
+        $chargeRepo = $dm->getRepository(Charge::class);
+        $affiliate = $affiliateRepo->find($id);
+        if ($affiliate) {
+            $charges = $chargeRepo->findMonthly($date, 'affiliate', false, $affiliate);
+            return ['affiliate' => $affiliate,
+                'charges' => $charges,
+                'cost' => $affiliate->getCpa() * count($charges),
+                'month' => $month,
+                'year' => $year,
+            ];
+        } else {
+            return ['error' => 'Invalid URL, given ID does not correspond to an affiliate.'];
+        }
+    }
+
+    /**
+     * @Route("/affiliate/pending/{id}", name="admin_affiliate_pending")
+     * @Template("AppBundle:AdminEmployee:affiliateCharge.html.twig")
+     */
+    public function affiliatePendingAction($id)
+    {
+        $dm = $this->getManager();
+        $affiliateRepo = $dm->getRepository(AffiliateCompany::class);
+        $affiliate = $affiliateRepo->find($id);
+        $affiliateService = $this->get("app.affiliate");
+        if ($affiliate) {
+            return [
+                'affiliate' => $affiliate,
+                'pending' => $affiliateService->getMatchingUsers($affiliate, [User::AQUISITION_PENDING])
+            ];
+        } else {
+            return ['error' => 'Invalid URL, given ID does not correspond to an affiliate.'];
+        }
+    }
+
+    /**
+     * @Route("/affiliate/potential/{id}", name="admin_affiliate_potential")
+     * @Template("AppBundle:AdminEmployee:affiliateCharge.html.twig")
+     */
+    public function affiliatePotentialAction($id)
+    {
+        $dm = $this->getManager();
+        $affiliateRepo = $dm->getRepository(AffiliateCompany::class);
+        $affiliate = $affiliateRepo->find($id);
+        $affiliateService = $this->get("app.affiliate");
+        if ($affiliate) {
+            return [
+                'affiliate' => $affiliate,
+                'potential' => $affiliateService->getMatchingUsers($affiliate, [User::AQUISITION_POTENTIAL])
+            ];
+        } else {
+            return ['error' => 'Invalid URL, given ID does not correspond to an affiliate.'];
+        }
+    }
+
+    /**
+     * @Route("/affiliate/lost/{id}", name="admin_affiliate_lost")
+     * @Template("AppBundle:AdminEmployee:affiliateCharge.html.twig")
+     */
+    public function affiliateLostAction($id)
+    {
+        $dm = $this->getManager();
+        $affiliateRepo = $dm->getRepository(AffiliateCompany::class);
+        $affiliate = $affiliateRepo->find($id);
+        $affiliateService = $this->get("app.affiliate");
+        if ($affiliate) {
+            return [
+                'affiliate' => $affiliate,
+                'lost' => $affiliateService->getMatchingUsers($affiliate, [User::AQUISITION_LOST])
+            ];
+        } else {
+            return ['error' => 'Invalid URL, given ID does not correspond to an affiliate.'];
+        }
     }
 }
