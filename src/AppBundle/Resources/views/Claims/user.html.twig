@@ -41,7 +41,7 @@
                         {% endif %}
                     </td>
                 </tr>
-                {% if user.confirmationToken is not empty %}
+                {% if user.confirmationToken is not empty and is_granted('ROLE_EMPLOYEE') %}
                     <tr>
                         <td>Confirmation Link</td>
                         <td>
