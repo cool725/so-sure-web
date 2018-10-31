@@ -13,6 +13,12 @@ use AppBundle\Validator\Constraints as AppAssert;
  */
 class IdentityLog
 {
+    const SDK_ANDROID = 'android';
+    const SDK_IOS = 'ios';
+    const SDK_JAVASCRIPT = 'javascript';
+    const SDK_WEB = 'web';
+    const SDK_UNKNOWN = 'unknown';
+
     /**
      * @Assert\DateTime()
      * @MongoDB\Field(type="date")
@@ -50,6 +56,14 @@ class IdentityLog
      * @Gedmo\Versioned
      */
     protected $platform;
+
+    /**
+     * @AppAssert\Alphanumeric()
+     * @Assert\Length(min="0", max="50")
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
+    protected $sdk;
 
     /**
      * @AppAssert\AlphanumericSpaceDot()
@@ -155,6 +169,16 @@ class IdentityLog
     public function setPlatform($platform)
     {
         $this->platform = $platform;
+    }
+
+    public function getSdk()
+    {
+        return $this->sdk;
+    }
+
+    public function setSdk($sdk)
+    {
+        $this->sdk = $sdk;
     }
     
     public function getVersion()
