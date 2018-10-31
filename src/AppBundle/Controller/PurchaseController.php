@@ -557,6 +557,8 @@ class PurchaseController extends BaseController
         /** @var PhoneRepository $phoneRepo */
         $phoneRepo = $dm->getRepository(Phone::class);
 
+        $judoFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_JUDO);
+
         /** @var PhonePolicy $policy */
         $policy = $policyRepo->find($id);
         if (!$policy) {
@@ -585,9 +587,13 @@ class PurchaseController extends BaseController
         /** @var PolicyService $policyService */
         $policyService = $this->get('app.policy');
         /** @var Form $toJudoForm */
-        $toJudoForm =  $this->get("form.factory")
-            ->createNamedBuilder('to_judo_form', PurchaseStepToJudoType::class)
-            ->getForm();
+        $toJudoForm = null;
+        if ($judoFeature) {
+            $toJudoForm =  $this->get("form.factory")
+                ->createNamedBuilder('to_judo_form', PurchaseStepToJudoType::class)
+                ->getForm();
+        }
+
         /** @var FormInterface $bacsForm */
         $bacsForm = $this->get('form.factory')
             ->createNamedBuilder('bacs_form', BacsType::class, $bacs)
@@ -665,7 +671,6 @@ class PurchaseController extends BaseController
             'policy' => $policy,
             'is_postback' => 'POST' === $request->getMethod(),
             'step' => 4,
-            'to_judo_form' => $toJudoForm->createView(),
             'bacs_form' => $bacsForm->createView(),
             'bacs_confirm_form' => $bacsConfirmForm->createView(),
             'bacs' => $bacs
@@ -674,6 +679,10 @@ class PurchaseController extends BaseController
         if ($webpay) {
             $data['webpay_action'] = $webpay ? $webpay['post_url'] : null;
             $data['webpay_reference'] = $webpay ? $webpay['payment']->getReference() : null;
+        }
+
+        if ($toJudoForm) {
+            $data['to_judo_form'] = $toJudoForm->createView();
         }
 
 
