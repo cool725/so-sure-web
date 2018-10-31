@@ -55,9 +55,18 @@ trait UserClassTrait
     public static $JUDO_TEST_CARD2_EXP = '12/20';
     public static $JUDO_TEST_CARD2_PIN = '452';
 
-    public static function generateEmail($name, $caller)
+    public static function generateEmail($name, $caller, $rand = false)
     {
-        return sprintf('%s@%s.so-sure.net', $name, str_replace("\\", ".", get_class($caller)));
+        if ($rand) {
+            return sprintf(
+                '%s-%d@%s.so-sure.net',
+                $name,
+                random_int(0, 999999),
+                str_replace("\\", ".", get_class($caller))
+            );
+        } else {
+            return sprintf('%s@%s.so-sure.net', $name, str_replace("\\", ".", get_class($caller)));
+        }
     }
 
     public static function createUserPolicy($init = false, $date = null, $setId = false)

@@ -4386,8 +4386,23 @@ abstract class Policy
 
         // All Scheduled day must match the billing day
         if ($verifyBillingDay) {
+            $initialNotificationDate = null;
+            if ($this->getUser()->getBacsPaymentMethod()) {
+                if ($bankAccount = $this->getUser()->getBacsPaymentMethod()->getBankAccount()) {
+                    $initialNotificationDate = $bankAccount->getInitialNotificationDate();
+                }
+            }
             foreach ($scheduledPayments as $scheduledPayment) {
                 /** @var ScheduledPayment $scheduledPayment */
+
+                // for bacs, we may have a different scheduled payment for the first notification date
+                $initialNotificationDateDiff = $initialNotificationDate != null ?
+                    $initialNotificationDate->diff($scheduledPayment->getScheduled()) :
+                    null;
+                if ($initialNotificationDateDiff && $initialNotificationDateDiff->d == 0) {
+                   continue;
+                }
+
                 if ($scheduledPayment->hasCorrectBillingDay() === false) {
                     /*
                     $diff = $scheduledPayment->getScheduled()->diff($this->getBilling());
