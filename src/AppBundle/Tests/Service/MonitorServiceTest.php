@@ -182,7 +182,7 @@ class MonitorServiceTest extends WebTestCase
     {
         $policy = self::createUserPolicy(true);
         $policy->getUser()->setEmail(static::generateEmail('salva', $this));
-        $policy->setPolicyNumber(self::setRandomPolicyNumber('Mob'));
+        $policy->setPolicyNumber(self::getRandomPolicyNumber('Mob'));
 
         self::$dm->persist($policy->getUser());
         self::$dm->persist($policy);
@@ -198,7 +198,7 @@ class MonitorServiceTest extends WebTestCase
     {
         $policy = self::createUserPolicy(true);
         $policy->getUser()->setEmail(static::generateEmail('invalid', $this));
-        $policy->setPolicyNumber(self::setRandomPolicyNumber('INVALID'));
+        $policy->setPolicyNumber(self::getRandomPolicyNumber('INVALID'));
         $policy->addSalvaPolicyResults('0', SalvaPhonePolicy::RESULT_TYPE_CREATE, []);
 
         self::$dm->persist($policy->getUser());
@@ -215,7 +215,7 @@ class MonitorServiceTest extends WebTestCase
     {
         $policy = self::createUserPolicy(true);
         $policy->getUser()->setEmail(static::generateEmail('salvastatus', $this));
-        $policy->setPolicyNumber(self::setRandomPolicyNumber('Mob'));
+        $policy->setPolicyNumber(self::getRandomPolicyNumber('Mob'));
         $policy->setSalvaStatus('pending');
 
         self::$dm->persist($policy->getUser());
@@ -232,7 +232,7 @@ class MonitorServiceTest extends WebTestCase
     {
         $policy = self::createUserPolicy(true);
         $policy->getUser()->setEmail(static::generateEmail('policy', $this));
-        $policy->setPolicyNumber(self::setRandomPolicyNumber('Mob'));
+        $policy->setPolicyNumber(self::getRandomPolicyNumber('Mob'));
 
         self::$dm->persist($policy->getUser());
         self::$dm->persist($policy);
@@ -248,7 +248,7 @@ class MonitorServiceTest extends WebTestCase
     {
         $policy = self::createUserPolicy(true);
         $policy->getUser()->setEmail(static::generateEmail('pending', $this));
-        $policy->setPolicyNumber(self::setRandomPolicyNumber('Mob'));
+        $policy->setPolicyNumber(self::getRandomPolicyNumber('Mob'));
         $policy->setStatus(Policy::STATUS_PENDING);
 
         self::$dm->persist($policy->getUser());
@@ -283,6 +283,10 @@ class MonitorServiceTest extends WebTestCase
             self::generateEmail('testDuplicateInvites-invite-two', $this)
         );
 
+        /*
+         * Generating two invites on the same email throws an error, changing one of the invites' email after
+         * creation does not
+         */
         $invitationTwo->setEmail(self::generateEmail('testDuplicateInvites-invite-one', $this));
 
         self::$dm->persist($policy->getUser());
@@ -334,7 +338,7 @@ class MonitorServiceTest extends WebTestCase
     {
         $policy = self::createUserPolicy(true);
         $policy->getUser()->setEmail(static::generateEmail('expired', $this));
-        $policy->setPolicyNumber(self::setRandomPolicyNumber('Mob'));
+        $policy->setPolicyNumber(self::getRandomPolicyNumber('Mob'));
         $policy->setStatus(Policy::STATUS_ACTIVE);
         $policy->setEnd((\DateTime::createFromFormat('U', time()))->sub(new \DateInterval('P1D')));
 

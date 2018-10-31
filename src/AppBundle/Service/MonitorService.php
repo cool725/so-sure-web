@@ -745,7 +745,7 @@ class MonitorService
             ->match()
             ->field('count')
             ->gt(1)
-            ->execute();
+            ->execute(['cursor' => []]);
 
         if (count($results) > 0) {
             foreach ($results as $result) {

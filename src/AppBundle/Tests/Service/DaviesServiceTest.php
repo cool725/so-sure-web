@@ -219,7 +219,7 @@ class DaviesServiceTest extends WebTestCase
         $policyOpen = static::createUserPolicy(true);
         $policyOpen->getUser()->setEmail(static::generateEmail('testSaveClaimsClosed-Open', $this));
         $claimOpen = new Claim();
-        $claimOpen->setNumber($this->getRandomPolicyNumber());
+        $claimOpen->setNumber(self::getRandomPolicyNumber('TEST'));
         $policyOpen->addClaim($claimOpen);
         $daviesOpen = new DaviesHandlerClaim();
         $daviesOpen->policyNumber = $policyOpen->getPolicyNumber();
@@ -230,7 +230,7 @@ class DaviesServiceTest extends WebTestCase
         $policyClosed = static::createUserPolicy(true);
         $policyClosed->getUser()->setEmail(static::generateEmail('testSaveClaimsClosed-Closed', $this));
         $claimClosed = new Claim();
-        $claimClosed->setNumber($this->getRandomPolicyNumber());
+        $claimClosed->setNumber(self::getRandomPolicyNumber('TEST'));
         $policyClosed->addClaim($claimClosed);
         $daviesClosed = new DaviesHandlerClaim();
         $daviesClosed->policyNumber = $policyClosed->getPolicyNumber();
@@ -250,7 +250,7 @@ class DaviesServiceTest extends WebTestCase
         $policyOpen = static::createUserPolicy(true);
         $policyOpen->getUser()->setEmail(static::generateEmail('testSaveClaimsDirectGroup', $this));
         $claimOpen = new Claim();
-        $claimOpen->setNumber($this->getRandomPolicyNumber());
+        $claimOpen->setNumber(self::getRandomPolicyNumber('TEST'));
         $claimOpen->setHandlingTeam(Claim::TEAM_DIRECT_GROUP);
         $policyOpen->addClaim($claimOpen);
         static::$dm->persist($policyOpen->getUser());
@@ -274,7 +274,7 @@ class DaviesServiceTest extends WebTestCase
         $policyOpen = static::createUserPolicy(true);
         $policyOpen->getUser()->setEmail(static::generateEmail('testSaveClaimsNoHandlingTeam', $this));
         $claimOpen = new Claim();
-        $claimOpen->setNumber($this->getRandomPolicyNumber());
+        $claimOpen->setNumber(self::getRandomPolicyNumber('TEST'));
         $policyOpen->addClaim($claimOpen);
         $daviesOpen = new DaviesHandlerClaim();
         $daviesOpen->policyNumber = $policyOpen->getPolicyNumber();
@@ -295,7 +295,7 @@ class DaviesServiceTest extends WebTestCase
         $policyOpen = static::createUserPolicy(true);
         $policyOpen->getUser()->setEmail(static::generateEmail('testSaveClaimsOpen-Open', $this));
         $claimOpen = new Claim();
-        $claimOpen->setNumber($this->getRandomPolicyNumber());
+        $claimOpen->setNumber(self::getRandomPolicyNumber('TEST'));
         $policyOpen->addClaim($claimOpen);
         $daviesOpen = new DaviesHandlerClaim();
         $daviesOpen->policyNumber = $policyOpen->getPolicyNumber();
@@ -546,15 +546,10 @@ class DaviesServiceTest extends WebTestCase
         return sprintf('%6d', rand(1, 999999));
     }
 
-    private function getRandomPolicyNumber()
-    {
-        return sprintf('TEST/2017/%6d', rand(1, 999999));
-    }
-
     public function testSaveClaimsOpenClosed()
     {
         $daviesOpen = new DaviesHandlerClaim();
-        $daviesOpen->policyNumber = $this->getRandomPolicyNumber();
+        $daviesOpen->policyNumber = self::getRandomPolicyNumber('TEST');
         $daviesOpen->claimNumber = 'a';
         $daviesOpen->status = 'Open';
         $daviesOpen->lossDate = new \DateTime('2017-01-01');
@@ -617,7 +612,7 @@ class DaviesServiceTest extends WebTestCase
     public function testSaveClaimsClosedOpen()
     {
         $daviesOpen = new DaviesHandlerClaim();
-        $daviesOpen->policyNumber = $this->getRandomPolicyNumber();
+        $daviesOpen->policyNumber = self::getRandomPolicyNumber('TEST');
         $daviesOpen->claimNumber = 'a';
         $daviesOpen->status = 'Open';
         $daviesOpen->lossDate = new \DateTime('2017-02-01');
