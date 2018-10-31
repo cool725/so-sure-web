@@ -4400,7 +4400,7 @@ abstract class Policy
                     $initialNotificationDate->diff($scheduledPayment->getScheduled()) :
                     null;
                 if ($initialNotificationDateDiff && $initialNotificationDateDiff->d == 0) {
-                   continue;
+                    continue;
                 }
 
                 if ($scheduledPayment->hasCorrectBillingDay() === false) {
