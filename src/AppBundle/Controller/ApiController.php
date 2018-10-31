@@ -753,7 +753,7 @@ class ApiController extends BaseController
                         'version' => $version,
                         'uuid' => $uuid,
                         'device' => $device,
-                        'memory' => $memory
+                        'memory' => $memory,
             ];
 
             $redis = $this->get('snc_redis.default');
