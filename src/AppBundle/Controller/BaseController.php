@@ -8,8 +8,11 @@ use AppBundle\Form\Type\ClaimSearchType;
 use AppBundle\Repository\ClaimRepository;
 use AppBundle\Repository\File\S3FileRepository;
 use AppBundle\Repository\PhoneRepository;
+use AppBundle\Security\CognitoIdentityAuthenticator;
+use AppBundle\Service\MaxMindIpService;
 use AppBundle\Service\QuoteService;
 use Doctrine\ODM\MongoDB\Query\Builder;
+use Doctrine\ORM\Mapping\Id;
 use Doctrine\ORM\QueryBuilder;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -146,9 +149,18 @@ abstract class BaseController extends Controller
 
     protected function getCognitoIdentityIp(Request $request)
     {
+        /** @var CognitoIdentityAuthenticator $auth */
         $auth = $this->get('app.user.cognitoidentity.authenticator');
 
-        return $auth->getCognitoIdentityIp($request->getContent());
+        return $auth->getCognitoIdentityIp((string) $request->getContent());
+    }
+
+    protected function getCognitoIdentitySdk(Request $request)
+    {
+        /** @var CognitoIdentityAuthenticator $auth */
+        $auth = $this->get('app.user.cognitoidentity.authenticator');
+
+        return $auth->getCognitoIdentitySdk((string) $request->getContent());
     }
 
     protected function getCognitoIdToken(User $user, Request $request)
@@ -528,6 +540,7 @@ abstract class BaseController extends Controller
         // https://forums.aws.amazon.com/thread.jspa?messageID=673393
         $clientIp = $this->getCognitoIdentityIp($request);
 
+        /** @var MaxMindIpService $geoip */
         $geoip = $this->get('app.geoip');
         $cognitoIdentityId = $this->getCognitoIdentityId($request);
         $identityLog = $geoip->getIdentityLog($clientIp, $cognitoIdentityId);
@@ -540,6 +553,10 @@ abstract class BaseController extends Controller
                 $identityLog->setPhone($this->getPhone(null, $additional['device'], $additional['memory'], true));
             }
         }
+        $sdk = $this->getCognitoIdentitySdk($request);
+        if ($sdk != IdentityLog::SDK_UNKNOWN) {
+            $identityLog->setSdk($sdk);
+        }
 
         return $identityLog;
     }
@@ -548,6 +565,7 @@ abstract class BaseController extends Controller
     {
         $identityLog = new IdentityLog();
         $identityLog->setIp($request->getClientIp());
+        $identityLog->setSdk(IdentityLog::SDK_WEB);
 
         return $identityLog;
     }

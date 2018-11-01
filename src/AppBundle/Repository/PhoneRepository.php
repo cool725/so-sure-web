@@ -115,12 +115,34 @@ class PhoneRepository extends DocumentRepository
             ->execute();
     }
 
+    public function findMatchingMakes($make)
+    {
+        return $qb = $this->createQueryBuilder()
+            ->field('makeCanonical')
+            ->equals(mb_strtolower($make))
+            ->distinct('make')
+            ->getQuery()
+            ->execute();
+    }
+
+    public function findMatchingModels($make, $model)
+    {
+        return $qb = $this->createQueryBuilder()
+            ->field('makeCanonical')
+            ->equals(mb_strtolower($make))
+            ->field('modelCanonical')
+            ->equals(mb_strtolower($model))
+            ->distinct('model')
+            ->getQuery()
+            ->execute();
+    }
+
     public function alreadyExists($make, $model, $memory)
     {
         return $this->createQueryBuilder()
                 ->field('make')->equals($make)
                 ->field('model')->equals($model)
-                ->field('memory')->equals((int) $memory)
+                ->field('memory')->equals(floatval($memory))
                 ->getQuery()
                 ->execute()
                 ->count() > 0;
