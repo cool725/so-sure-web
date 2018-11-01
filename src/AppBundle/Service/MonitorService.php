@@ -507,7 +507,9 @@ class MonitorService
             }
         }
 
-        return $errors;
+        if (count($errors) > 0) {
+            throw new MonitorException(json_encode($errors, JSON_PRETTY_PRINT));
+        }
     }
 
     public function bacsPendingPayments()
