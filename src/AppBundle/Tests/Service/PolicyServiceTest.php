@@ -488,6 +488,7 @@ class PolicyServiceTest extends WebTestCase
         $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), $date);
         $phone = $policy->getPhone();
         static::$paymentService->confirmBacs($policy, $user->getBacsPaymentMethod(), $date);
+        $user->getBacsPaymentMethod()->getBankAccount()->setInitialPaymentSubmissionDate($date);
 
         $payment = new BacsPayment();
         $payment->setAmount($phone->getCurrentPhonePrice($date)->getMonthlyPremiumPrice(null, $date));
