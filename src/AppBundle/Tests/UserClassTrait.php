@@ -4,6 +4,7 @@ namespace AppBundle\Tests;
 
 use AppBundle\Document\BacsPaymentMethod;
 use AppBundle\Document\BankAccount;
+use AppBundle\Document\Cashback;
 use AppBundle\Document\JudoPaymentMethod;
 use AppBundle\Document\User;
 use AppBundle\Document\Phone;
@@ -237,6 +238,30 @@ trait UserClassTrait
             $dm->flush();
         }
         return $policy;
+    }
+
+    /**
+     * @param \DateTime $date
+     *
+     * @return Cashback
+     */
+    public static function createCashback($date = null, $status = null)
+    {
+        $cashback = new Cashback();
+
+        $cashback->setAccountName('foobar');
+        $cashback->setAccountNumber(str_pad(rand(0, 99999999), 8));
+        $cashback->setSortCode(str_pad(rand(0, 999999), 6));
+
+        if ($date) {
+            $cashback->setDate($date);
+        }
+
+        if ($status) {
+            $cashback->setStatus($status);
+        }
+
+        return $cashback;
     }
 
     public static function addJudoPayPayment(

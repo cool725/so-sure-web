@@ -1,12 +1,19 @@
 {% block body %}
-<h1>Cashback Reminder</h1>
+<h1>
+    <a href="{{ url('admin_policies') }}">
+        Cashback Reminder
+    </a>
+</h1>
 
 {% if policies is not empty %}
-	{% for policy in policies %}
-		<li>{{ policy }}</li>
-	{% endfor %}
+
+    {% for policy in policies %}
+        <li>Policy <a href="{{ url('admin_policy', {'id': policy.id }) }}">{{ policy.number }}</a> has status {{ policy.status }}</li>
+    {% endfor %}
 
 {% else %}
-<p>There are no cashbacks to process!</p>
+
+    <p>There are no cashbacks to process!</p>
+
 {% endif %}
 {% endblock %}

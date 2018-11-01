@@ -3,6 +3,7 @@
 namespace AppBundle\Command;
 
 use AppBundle\Document\Cashback;
+use AppBundle\Document\Policy;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use AppBundle\Service\MailerService;
 use Doctrine\ODM\MongoDB\DocumentManager;
@@ -13,13 +14,17 @@ use Symfony\Component\Templating\EngineInterface;
 
 class CashbackReminderCommand extends ContainerAwareCommand
 {
-    /** @var PolicyService */
-    protected $policyService;
+    /** @var DocumentManager */
+    protected $dm;
 
-    public function __construct(PolicyService $policyService)
+    /** @var MailerService */
+    protected $mailer;
+
+    public function __construct(DocumentManager $dm, MailerService $mailer)
     {
         parent::__construct();
-        $this->policyService = $policyService;
+        $this->dm = $dm;
+        $this->mailer = $mailer;
     }
 
     protected function configure()
@@ -38,45 +43,36 @@ class CashbackReminderCommand extends ContainerAwareCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        /** @var DocumentManager $dm */
-        $dm = $this->getManager();
 
-        /** @var MailerService $mailer */
-        $mailer = $this->getContainer()->get('app.mailer');
-
-        $results = $dm->createQueryBuilder(Cashback::class)
+        $results = $this->dm->createQueryBuilder(Cashback::class)
             ->field('status')
             ->equals(Cashback::STATUS_PENDING_PAYMENT)
             ->getQuery()
             ->execute();
 
-        $policies = [];
+        $cashbacks = [];
         foreach ($results as $result) {
-            $policies[] = sprintf(
-                "Policy %s with status %s is pending cashback payment",
-                $result->getPolicy()->getPolicyNumber(),
-                $result->getPolicy()->getStatus()
-            );
+            /** @var Cashback $result */
+            $cashbacks[] = [
+                'id' => $result->getPolicy()->getId(),
+                'number' => $result->getPolicy()->getPolicyNumber(),
+                'status' => $result->getPolicy()->getStatus()
+            ];
         }
 
         if ($input->getOption('dry-run')) {
-            /** @var EngineInterface $templating */
-            $templating = $this->getContainer()->get('templating');
-            $email = $templating->render(
-                'AppBundle:Email:policy/cashbackReminder.html.twig',
-                ['policies' => $policies]
-            );
-
-            $output->writeln($email);
+            foreach ($cashbacks as $cashback) {
+                $output->writeln("Policy {$cashback['number']} found with status {$cashback['status']}");
+            }
         } else {
-            $mailer->sendTemplate(
+            $this->mailer->sendTemplate(
                 'Biweekly cashback report',
                 ['dylan@so-sure.com', 'patrick@so-sure.com'],
                 'AppBundle:Email:policy/cashbackReminder.html.twig',
-                ['policies' => $policies]
+                ['policies' => $cashbacks]
             );
 
-            $output->writeln(sprintf('Found %s cashback pending policies. Mail sent', count($policies)));
+            $output->writeln(sprintf('Found %s cashback pending policies. Mail sent', count($cashbacks)));
         }
     }
 }

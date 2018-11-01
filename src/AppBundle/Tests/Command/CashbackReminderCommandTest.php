@@ -6,6 +6,7 @@ use AppBundle\Command\OpsReportCommand;
 use AppBundle\Document\Cashback;
 use AppBundle\Document\Policy;
 use Doctrine\ODM\MongoDB\DocumentManager;
+use PhpParser\Node\Scalar\String_;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use AppBundle\Tests\Controller\BaseControllerTest;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -31,12 +32,12 @@ class CashbackReminderCommandTest extends BaseControllerTest
     public function callCommand($expectedOutput)
     {
         $application = new Application(self::$kernel);
-        $application->add(new OpsReportCommand());
+        $application->add(new OpsReportCommand(self::$container->get('app.mailer'), self::$redis));
         $command = $application->find('sosure:cashback:reminder');
         $commandTester = new CommandTester($command);
         $commandTester->execute(array(
             'command' => $command->getName(),
-            '--dry-run',
+            '--dry-run' => 1,
         ));
         $output = $commandTester->getDisplay();
         foreach ($expectedOutput as $item) {
@@ -50,14 +51,13 @@ class CashbackReminderCommandTest extends BaseControllerTest
         $policy->getUser()->setEmail(self::generateEmail('foobar', $this));
         $policy->setStatus(Policy::STATUS_EXPIRED);
 
-        /** @var Cashback $cashback */
         $cashback = new Cashback();
         $cashback->setAccountName('foobar');
         $cashback->setAccountNumber('12345678');
         $cashback->setSortCode('123456');
         $cashback->setStatus(Cashback::STATUS_PENDING_PAYMENT);
 
-        self::$policyService->cashback($policy, $cashback);
+        $policy->setCashback($cashback);
 
         self::$dm->persist($cashback);
         self::$dm->persist($policy->getUser());
@@ -66,8 +66,8 @@ class CashbackReminderCommandTest extends BaseControllerTest
 
         $this->callCommand(
             [
-                'Found',
-                'cashback pending policies. Mail sent'
+                'Policy',
+                'found with status'
             ]
         );
     }
