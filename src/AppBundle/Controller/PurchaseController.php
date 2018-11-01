@@ -557,7 +557,7 @@ class PurchaseController extends BaseController
         /** @var PhoneRepository $phoneRepo */
         $phoneRepo = $dm->getRepository(Phone::class);
 
-        $judoFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_JUDO);
+        $judoFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_CARD_OPTION_WITH_BACS);
 
         /** @var PhonePolicy $policy */
         $policy = $policyRepo->find($id);
@@ -645,7 +645,7 @@ class PurchaseController extends BaseController
                     return $this->redirectToRoute('user_welcome_policy_id', ['id' => $policy->getId()]);
                 }
             } elseif ($request->request->has('to_judo_form')) {
-                $template = 'AppBundle:Purchase:purchaseStepPaymentJudo.html.twig';
+                $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_BACS_TO_CARD, []);
                 $webpay = $this->get('app.judopay')->webpay(
                     $policy,
                     $amount,

@@ -10,8 +10,6 @@ require('jquery-validation');
 require('jquery-mask-plugin');
 require('../../../js/Default/jqueryValidatorMethods.js');
 
-import trackByName from '../common/track.js';
-
 const sosure = sosure || {};
 
 sosure.purchaseStepBacs = (function() {
@@ -92,17 +90,14 @@ sosure.purchaseStepBacs = (function() {
     return self;
 })();
 
-function goToJudo() {
-    // Show loading overlay
-    sosure.purchaseStepBacs.loader.show();
-
-    // Add tracking
-    trackByName("purchase-bacs-web-pay", function() {
-        sosure.purchaseStepBacs.webPay.submit();
-    });
-}
-
 $(function() {
     sosure.purchaseStepBacs.init();
-    sosure.purchaseStepBacs.webPayBtn.on('click', goToJudo);
+    sosure.purchaseStepBacs.webPayBtn.on('click', function() {
+        sosure.purchaseStepBacs.loader.show();
+    });
+    let webpay = $('#webpay-form');
+    if (webpay.length) {
+        sosure.purchaseStepBacs.loader.show();
+        webpay.submit();
+    }
 });

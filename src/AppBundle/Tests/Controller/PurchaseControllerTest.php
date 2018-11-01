@@ -45,10 +45,16 @@ class PurchaseControllerTest extends BaseControllerTest
 
     protected static $rootDir;
 
+    /** @var FeatureService */
+    protected static $featureService;
+
     public static function setUpBeforeClass()
     {
         parent::setUpBeforeClass();
         self::$rootDir = self::$container->getParameter('kernel.root_dir');
+        /** @var FeatureService $featureService */
+        self::$featureService = self::$container->get('app.feature');
+        self::$featureService->setEnabled(Feature::FEATURE_CARD_OPTION_WITH_BACS, true);
     }
 
     public function tearDown()
@@ -278,11 +284,24 @@ class PurchaseControllerTest extends BaseControllerTest
         $crawler = self::$client->followRedirect();
         $this->assertContains('/purchase/step-payment', self::$client->getHistory()->current()->getUri());
 
+        // test without the judo flag
+        self::$featureService->setEnabled(Feature::FEATURE_CARD_OPTION_WITH_BACS, false);
         $crawler = $this->setPayment($crawler, $phone);
         self::verifyResponse(302);
         $crawler = self::$client->followRedirect();
+        $cardButton = $crawler->selectButton('to_judo_form[submit]');
+        $this->assertTrue($cardButton->count() == 0);
 
-        $form = $crawler->selectButton('Click Here')->form();
+        // test with the judo flag
+        self::$featureService->setEnabled(Feature::FEATURE_CARD_OPTION_WITH_BACS, true);
+        self::$client->back(); // takes us back to the redirect notice
+        $crawler = self::$client->back(); // takes us back to the payment page
+        $crawler = $this->setPayment($crawler, $phone);
+        self::verifyResponse(302);
+        $crawler = self::$client->followRedirect();
+        $cardButton = $crawler->selectButton('to_judo_form[submit]');
+        $this->assertTrue($cardButton->count() == 1);
+        $form = $cardButton->form();
         $crawler = self::$client->submit($form);
         self::verifyResponse(200);
         $this->verifyPurchaseReady($crawler);
@@ -514,7 +533,8 @@ class PurchaseControllerTest extends BaseControllerTest
         self::verifyResponse(302);
         $crawler = self::$client->followRedirect();
 
-        $form = $crawler->selectButton('Click Here')->form();
+        $cardButton = $crawler->selectButton('to_judo_form[submit]');
+        $form = $cardButton->form();
         $crawler = self::$client->submit($form);
         self::verifyResponse(200);
         $this->verifyPurchaseReady($crawler);
@@ -551,7 +571,8 @@ class PurchaseControllerTest extends BaseControllerTest
         self::verifyResponse(302);
         $crawler = self::$client->followRedirect();
 
-        $form = $crawler->selectButton('Click Here')->form();
+        $cardButton = $crawler->selectButton('to_judo_form[submit]');
+        $form = $cardButton->form();
         $crawler = self::$client->submit($form);
         self::verifyResponse(200);
         $this->verifyPurchaseReady($crawler);
@@ -677,7 +698,8 @@ class PurchaseControllerTest extends BaseControllerTest
         self::verifyResponse(302);
         $crawler = self::$client->followRedirect();
 
-        $form = $crawler->selectButton('Click Here')->form();
+        $cardButton = $crawler->selectButton('to_judo_form[submit]');
+        $form = $cardButton->form();
         $crawler = self::$client->submit($form);
         self::verifyResponse(200);
         $this->verifyPurchaseReady($crawler);
@@ -714,7 +736,8 @@ class PurchaseControllerTest extends BaseControllerTest
         self::verifyResponse(302);
         $crawler = self::$client->followRedirect();
 
-        $form = $crawler->selectButton('Click Here')->form();
+        $cardButton = $crawler->selectButton('to_judo_form[submit]');
+        $form = $cardButton->form();
         $crawler = self::$client->submit($form);
         self::verifyResponse(200);
         $this->verifyPurchaseReady($crawler);
@@ -751,7 +774,8 @@ class PurchaseControllerTest extends BaseControllerTest
         self::verifyResponse(302);
         $crawler = self::$client->followRedirect();
 
-        $form = $crawler->selectButton('Click Here')->form();
+        $cardButton = $crawler->selectButton('to_judo_form[submit]');
+        $form = $cardButton->form();
         $crawler = self::$client->submit($form);
         self::verifyResponse(200);
         $this->verifyPurchaseReady($crawler);
@@ -794,7 +818,8 @@ class PurchaseControllerTest extends BaseControllerTest
         self::verifyResponse(302);
         $crawler = self::$client->followRedirect();
 
-        $form = $crawler->selectButton('Click Here')->form();
+        $cardButton = $crawler->selectButton('to_judo_form[submit]');
+        $form = $cardButton->form();
         $crawler = self::$client->submit($form);
         self::verifyResponse(200);
         $this->verifyPurchaseReady($crawler);
