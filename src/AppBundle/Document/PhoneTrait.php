@@ -14,7 +14,7 @@ trait PhoneTrait
         } elseif (preg_match("/^00447\d{9,9}/", $mobile)) {
             $mobile = sprintf("+44%s", mb_substr($mobile, 4));
         }
-        
+
         return $mobile;
     }
 
