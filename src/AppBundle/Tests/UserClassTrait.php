@@ -361,12 +361,17 @@ trait UserClassTrait
         return $payment;
     }
 
-    public static function setBacsPaymentMethod(User $user, $mandateStatus = BankAccount::MANDATE_SUCCESS)
-    {
+    public static function setBacsPaymentMethod(
+        User $user,
+        $mandateStatus = BankAccount::MANDATE_SUCCESS,
+        $randomReference = false
+    ) {
         $bacs = new BacsPaymentMethod();
         $bankAccount = new BankAccount();
         $bankAccount->setMandateStatus($mandateStatus);
-        $bankAccount->setReference(sprintf('TESTREF-%d', random_int(1, 999999)));
+        if ($randomReference) {
+            $bankAccount->setReference(sprintf('TESTREF-%d', random_int(1, 999999)));
+        }
         $bacs->setBankAccount($bankAccount);
         $user->setPaymentMethod($bacs);
     }

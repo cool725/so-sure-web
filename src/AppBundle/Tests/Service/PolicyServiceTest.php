@@ -2,6 +2,7 @@
 
 namespace AppBundle\Tests\Service;
 
+use AppBundle\Document\BankAccount;
 use AppBundle\Document\CustomerCompany;
 use AppBundle\Document\Form\Bacs;
 use AppBundle\Document\Payment\PolicyDiscountPayment;
@@ -478,12 +479,12 @@ class PolicyServiceTest extends WebTestCase
         $date = new \DateTime();
         $user = static::createUser(
             static::$userManager,
-            static::generateEmail('testAreScheduledPaymentsCorrectBacs', $this),
+            static::generateEmail('testAreScheduledPaymentsCorrectBacs', $this, true),
             'bar',
             null,
             static::$dm
         );
-        static::setBacsPaymentMethod($user);
+        static::setBacsPaymentMethod($user, BankAccount::MANDATE_SUCCESS, true);
         $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), $date);
         $phone = $policy->getPhone();
         static::$paymentService->confirmBacs($policy, $user->getBacsPaymentMethod(), $date);
