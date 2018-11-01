@@ -30,13 +30,20 @@ class MonitorCommand extends ContainerAwareCommand
                 InputArgument::REQUIRED,
                 'Name of monitor'
             )
+            ->addOption(
+                'details',
+                null,
+                InputOption::VALUE_NONE,
+                'Detailed output'
+            )
         ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $name = $input->getArgument('name');
-        $message = $this->monitorService->run($name);
-        $output->writeln($message);
+        $details = true === $input->getOption('details');
+        $message = $this->monitorService->run($name, $details);
+        $output->writeln(json_encode($message, JSON_PRETTY_PRINT));
     }
 }
