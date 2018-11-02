@@ -2262,7 +2262,9 @@ class InvitationServiceTest extends WebTestCase
                 $inviteeEmail
             );
             $this->assertTrue($invitation instanceof EmailInvitation);
-            self::$invitationService->accept($invitation, $policy, $date);
+            if ($policy) {
+                self::$invitationService->accept($invitation, $policy, $date);
+            }
         }
 
         return $newPolicy;

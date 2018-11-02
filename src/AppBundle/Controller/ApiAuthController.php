@@ -975,7 +975,8 @@ class ApiAuthController extends BaseController
                 } elseif ($mobile && $this->isValidUkMobile($mobile)) {
                     $invitation = $invitationService->inviteBySms($policy, $mobile, $name, $skipSend);
                 } elseif ($scode && SCode::isValidSCode($scode)) {
-                    $invitation = $invitationService->inviteBySCode($policy, $scode);
+                    $sdk = $this->getCognitoIdentitySdk($request);
+                    $invitation = $invitationService->inviteBySCode($policy, $scode, null, $sdk);
                 } elseif ($facebookId && mb_strlen($facebookId) > 5 && mb_strlen($facebookId) < 150) {
                     $invitation = $invitationService->inviteByFacebookId($policy, $facebookId);
                 } else {
