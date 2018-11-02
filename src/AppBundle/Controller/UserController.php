@@ -1628,6 +1628,10 @@ class UserController extends BaseController
         $policyRepo = $dm->getRepository(Policy::class);
         $policy = $policyRepo->find($policyId);
 
+        if (!$policy) {
+            return $this->redirectToRoute('user_claim');
+        }
+
         $claim = $policy->getLatestFnolSubmittedInReviewClaim();
 
         if ($claim === null) {
@@ -1660,6 +1664,10 @@ class UserController extends BaseController
         $policyRepo = $dm->getRepository(Policy::class);
         /** @var Policy $policy */
         $policy = $policyRepo->find($policyId);
+
+        if (!$policy) {
+            return $this->redirectToRoute('user_claim');
+        }
 
         $claim = $policy->getLatestFnolSubmittedInReviewClaim();
 
@@ -1725,6 +1733,10 @@ class UserController extends BaseController
         $policyRepo = $dm->getRepository(Policy::class);
         /** @var Policy $policy */
         $policy = $policyRepo->find($policyId);
+
+        if (!$policy) {
+            return $this->redirectToRoute('user_claim');
+        }
 
         $claim = $policy->getLatestFnolClaim();
 
@@ -1794,6 +1806,10 @@ class UserController extends BaseController
         $dm = $this->getManager();
         $policyRepo = $dm->getRepository(Policy::class);
         $policy = $policyRepo->find($policyId);
+
+        if (!$policy) {
+            return $this->redirectToRoute('user_claim');
+        }
 
         $claim = $policy->getLatestFnolClaim();
 
