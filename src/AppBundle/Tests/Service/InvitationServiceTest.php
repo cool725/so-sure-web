@@ -2,6 +2,7 @@
 
 namespace AppBundle\Tests\Service;
 
+use AppBundle\Document\IdentityLog;
 use AppBundle\Exception\SelfInviteException;
 use AppBundle\Repository\PolicyRepository;
 use AppBundle\Service\RouterService;
@@ -1317,6 +1318,22 @@ class InvitationServiceTest extends WebTestCase
         $exceptionThrown = false;
         try {
             $invitation = self::$invitationService->inviteBySCode($policy, $policy->getStandardSCode()->getCode());
+        } catch (SelfInviteException $e) {
+            $exceptionThrown = true;
+        }
+
+        $this->assertTrue($exceptionThrown);
+        $updatedPolicy = $this->assertPolicyExists(self::$container, $policy);
+        $this->assertCount(0, $updatedPolicy->getSentInvitations(false));
+
+        $exceptionThrown = false;
+        try {
+            $invitation = self::$invitationService->inviteBySCode(
+                $policy,
+                $policy->getStandardSCode()->getCode(),
+                null,
+                IdentityLog::SDK_ANDROID
+            );
         } catch (SelfInviteException $e) {
             $exceptionThrown = true;
         }
