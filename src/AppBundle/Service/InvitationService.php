@@ -367,7 +367,7 @@ class InvitationService
         if (!$invitation) {
             $invitation = new EmailInvitation();
             $invitation->setEmail($email);
-            $invitation->setPolicy($policy);
+            $policy->addInvitation($invitation);
             $invitation->setName($name);
             $this->setInvitee($invitation);
             $invitation->invite();
@@ -444,7 +444,7 @@ class InvitationService
         if (!$invitation) {
             $invitation = new SmsInvitation();
             $invitation->setMobile($mobile);
-            $invitation->setPolicy($policy);
+            $policy->addInvitation($invitation);
             $invitation->setName($name);
             $this->setInvitee($invitation);
             $invitation->invite();
@@ -509,7 +509,7 @@ class InvitationService
             $this->validateNotConnectedByUser($policy, $user);
         } catch (SelfInviteException $e) {
             $appNativeShare = new AppNativeShareInvitation();
-            $appNativeShare->setPolicy($policy);
+            $policy->addInvitation($appNativeShare);
 
             $this->dm->persist($appNativeShare);
             $this->dm->flush();
@@ -564,7 +564,7 @@ class InvitationService
             $invitation = new SCodeInvitation();
             $invitation->setEmail($user->getEmail());
             $invitation->setSCode($scode);
-            $invitation->setPolicy($policy);
+            $policy->addInvitation($invitation);
             $invitation->setName($user->getName());
             $this->setInvitee($invitation, $user);
             $invitation->invite();
@@ -680,7 +680,7 @@ class InvitationService
             $invitation = new FacebookInvitation();
             $invitation->setFacebookId($facebookId);
             $invitation->setEmail($user->getEmail());
-            $invitation->setPolicy($policy);
+            $policy->addInvitation($invitation);
             $invitation->setName($user->getName());
             $this->setInvitee($invitation, $user);
             $invitation->invite();

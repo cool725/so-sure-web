@@ -3260,6 +3260,31 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $data = $this->verifyResponse(422, ApiErrorCode::ERROR_INVITATION_SELF_INVITATION);
     }
 
+    public function testUnableToInviteSelfScode()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testUnableToInviteSelfScode', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
+        $policyData = $this->verifyResponse(200);
+
+        $this->payPolicy($user, $policyData['id']);
+        $url = sprintf("/api/v1/auth/policy/%s/invitation?debug=true", $policyData['id']);
+
+        $repo = static::$dm->getRepository(Policy::class);
+        $policy = $repo->find($policyData['id']);
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+            'scode' => $policy->getStandardSCode()->getCode()
+        ]);
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_INVITATION_SELF_INVITATION);
+
+        $updatedPolicy = $this->assertPolicyExists(self::$container, $policy);
+        $this->assertCount(1, $updatedPolicy->getSentInvitations(false));
+    }
+
     public function testUnableToCrossInvite()
     {
         $user = self::createUser(

@@ -50,7 +50,7 @@ class InvitationTest extends WebTestCase
         $user->addPolicy($policy);
         $policy->setStatus(Policy::STATUS_ACTIVE);
         $invitation = new EmailInvitation();
-        $invitation->setPolicy($policy);
+        $policy->addInvitation($invitation);
         $this->assertEquals(0, $invitation->getReinvitedCount());
         $date = new \DateTime('2016-01-01');
         $invitation->invite($date);
@@ -65,7 +65,7 @@ class InvitationTest extends WebTestCase
         $user->addPolicy($policy);
         $policy->setStatus(Policy::STATUS_ACTIVE);
         $invitation = new EmailInvitation();
-        $invitation->setPolicy($policy);
+        $policy->addInvitation($invitation);
         $invitation->invite();
         $this->assertFalse($invitation->canReinvite());
     }
@@ -77,7 +77,7 @@ class InvitationTest extends WebTestCase
         $user->addPolicy($policy);
         $policy->setStatus(Policy::STATUS_ACTIVE);
         $invitation = new EmailInvitation();
-        $invitation->setPolicy($policy);
+        $policy->addInvitation($invitation);
         $this->assertEquals(0, $invitation->getReinvitedCount());
         $date = new \DateTime('2016-01-01');
         for ($i = 0; $i < $invitation->getMaxReinvitations(); $i++) {
@@ -104,7 +104,7 @@ class InvitationTest extends WebTestCase
         $user->addPolicy($policy);
         $policy->setStatus(Policy::STATUS_ACTIVE);
         $invitation = new EmailInvitation();
-        $invitation->setPolicy($policy);
+        $policy->addInvitation($invitation);
         $this->assertEquals(0, $invitation->getReinvitedCount());
         $invitation->reinvite();
         $invitation->reinvite();
@@ -120,7 +120,7 @@ class InvitationTest extends WebTestCase
         $user->addPolicy($policy);
         $policy->setStatus(Policy::STATUS_CANCELLED);
         $invitation = new EmailInvitation();
-        $invitation->setPolicy($policy);
+        $policy->addInvitation($invitation);
         $this->assertEquals(0, $invitation->getReinvitedCount());
         $invitation->reinvite();
     }
@@ -220,7 +220,7 @@ class InvitationTest extends WebTestCase
         $invitationA = new EmailInvitation();
         $invitationA->setName('Foo Bar');
         $invitationA->setEmail('testNonDuplicateEmail@bar.com');
-        $invitationA->setPolicy($policyA);
+        $policyA->addInvitation($invitationA);
         self::$dm->persist($userA);
         self::$dm->persist($policyA);
         self::$dm->persist($invitationA);
@@ -234,7 +234,7 @@ class InvitationTest extends WebTestCase
         $invitationB = new EmailInvitation();
         $invitationB->setName('Foo Bar');
         $invitationB->setEmail('testNonDuplicateEmail@bar.com');
-        $invitationB->setPolicy($policyB);
+        $policyB->addInvitation($invitationB);
         self::$dm->persist($userB);
         self::$dm->persist($policyB);
         self::$dm->persist($invitationB);
@@ -243,7 +243,7 @@ class InvitationTest extends WebTestCase
         $invitationC = new EmailInvitation();
         $invitationC->setName('Foo Bar');
         $invitationC->setEmail('testNonDuplicateEmail-different@bar.com');
-        $invitationC->setPolicy($policyB);
+        $policyB->addInvitation($invitationC);
         self::$dm->persist($invitationC);
         self::$dm->flush();
 
@@ -274,7 +274,7 @@ class InvitationTest extends WebTestCase
         $invitationB = new SmsInvitation();
         $invitationB->setName('Foo Bar');
         $invitationB->setMobile('+447775740402');
-        $invitationB->setPolicy($policyB);
+        $policyB->addInvitation($invitationB);
         self::$dm->persist($userB);
         self::$dm->persist($policyB);
         self::$dm->persist($invitationB);
@@ -283,7 +283,7 @@ class InvitationTest extends WebTestCase
         $invitationC = new SmsInvitation();
         $invitationC->setName('Foo Bar');
         $invitationC->setMobile('+447775740403');
-        $invitationC->setPolicy($policyB);
+        $policyB->addInvitation($invitationC);
         self::$dm->persist($invitationC);
         self::$dm->flush();
 

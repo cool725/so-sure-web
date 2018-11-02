@@ -2,6 +2,7 @@
 
 namespace AppBundle\Tests\Service;
 
+use AppBundle\Exception\SelfInviteException;
 use AppBundle\Repository\PolicyRepository;
 use AppBundle\Service\RouterService;
 use FOS\UserBundle\Model\UserManagerInterface;
@@ -51,6 +52,8 @@ class InvitationServiceTest extends WebTestCase
     /** @var DocumentManager */
     protected static $dm;
     protected static $userRepo;
+
+    /** @var InvitationService */
     protected static $invitationService;
     protected static $phone2;
     protected static $scodeService;
@@ -1299,9 +1302,6 @@ class InvitationServiceTest extends WebTestCase
         $invitation = self::$invitationService->inviteByEmail($policy, static::generateEmail('user9', $this));
     }
 
-    /**
-     * @expectedException AppBundle\Exception\SelfInviteException
-     */
     public function testSCodeInvitationSelf()
     {
         $user = static::createUser(
@@ -1312,7 +1312,18 @@ class InvitationServiceTest extends WebTestCase
         $policy = static::initPolicy($user, static::$dm, static::$phone, null, false, true);
         $policy->setStatus(Policy::STATUS_ACTIVE);
 
-        $invitation = self::$invitationService->inviteBySCode($policy, $policy->getStandardSCode()->getCode());
+        $this->assertCount(0, $policy->getSentInvitations(false));
+
+        $exceptionThrown = false;
+        try {
+            $invitation = self::$invitationService->inviteBySCode($policy, $policy->getStandardSCode()->getCode());
+        } catch (SelfInviteException $e) {
+            $exceptionThrown = true;
+        }
+
+        $this->assertTrue($exceptionThrown);
+        $updatedPolicy = $this->assertPolicyExists(self::$container, $policy);
+        $this->assertCount(1, $updatedPolicy->getSentInvitations(false));
     }
 
     /**

@@ -248,7 +248,6 @@ abstract class Invitation
     public function setPolicy(Policy $policy)
     {
         $this->policy = $policy;
-        $policy->getUser()->addSentInvitation($this);
         //$this->setInviter($policy->getUser());
     }
 

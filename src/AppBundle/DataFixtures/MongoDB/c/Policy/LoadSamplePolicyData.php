@@ -824,7 +824,6 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         if ($sendInvitation) {
             $invitation = new EmailInvitation();
             $invitation->setInviter($user);
-            $invitation->setPolicy($policy);
             $invitation->setEmail($this->faker->email);
             $rand = random_int(0, 2);
             if ($rand == 0) {
@@ -832,6 +831,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             } elseif ($rand == 1) {
                 $invitation->setRejected($policy->getStart());
             }
+            $policy->addInvitation($invitation);
             $manager->persist($invitation);
         }
 
@@ -911,7 +911,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
 
         $invitation = new EmailInvitation();
         $invitation->setInviter($userA);
-        $invitation->setPolicy($policyA);
+        $policyA->addInvitiation($invitation);
         $invitation->setEmail($userB->getEmail());
         $invitation->setInvitee($userB);
         if ($accepted) {

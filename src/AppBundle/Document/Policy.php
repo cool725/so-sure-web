@@ -2,10 +2,12 @@
 
 namespace AppBundle\Document;
 
+use AppBundle\Document\Invitation\Invitation;
 use AppBundle\Document\Payment\BacsIndemnityPayment;
 use AppBundle\Document\Payment\BacsPayment;
 use AppBundle\Document\Payment\ChargebackPayment;
 use AppBundle\Document\Payment\JudoPayment;
+use AppBundle\Service\InvitationService;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Doctrine\ODM\MongoDB\PersistentCollection;
@@ -1668,6 +1670,14 @@ abstract class Policy
         }
 
         return $this->getInvitations();
+    }
+
+    public function addInvitation(Invitation $invitation)
+    {
+        $invitation->setPolicy($this);
+        $this->getUser()->addSentInvitation($invitation);
+
+        $this->invitations[] = $invitation;
     }
 
     public function setPremium(Premium $premium)
