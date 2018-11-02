@@ -703,12 +703,17 @@ class UserControllerTest extends BaseControllerTest
 
         $this->assertEquals(Policy::UNPAID_BACS_PAYMENT_PENDING, $updatedPolicy->getUnpaidReason());
         $payment = $updatedPolicy->getLastPaymentCredit();
-        $this->assertTrue($payment instanceof BacsPayment);
-        // user doesn't have a valid payment method, so status will be skipped instead of pending
-        $this->assertEquals(BacsPayment::STATUS_SKIPPED, $payment->getStatus());
-        $this->assertNotNull($payment->getIdentityLog());
-        $this->assertEquals(IdentityLog::SDK_WEB, $payment->getIdentityLog()->getSdk());
-        $this->assertNotNull($payment->getIdentityLog()->getIp());
+        $this->assertNotNull($payment);
+        if ($payment) {
+            $this->assertTrue($payment instanceof BacsPayment);
+            /** @var BacsPayment $bacsPayment */
+            $bacsPayment = $payment;
+            // user doesn't have a valid payment method, so status will be skipped instead of pending
+            $this->assertEquals(BacsPayment::STATUS_SKIPPED, $bacsPayment->getStatus());
+            $this->assertNotNull($payment->getIdentityLog());
+            $this->assertEquals(IdentityLog::SDK_WEB, $payment->getIdentityLog()->getSdk());
+            $this->assertNotNull($payment->getIdentityLog()->getIp());
+        }
     }
 
     public function testUserUnpaidPolicyBacsPaymentMissing()

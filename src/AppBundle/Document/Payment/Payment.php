@@ -5,6 +5,7 @@ namespace AppBundle\Document\Payment;
 use AppBundle\Classes\Salva;
 use AppBundle\Classes\SoSure;
 use AppBundle\Document\DateTrait;
+use AppBundle\Document\IdentityLog;
 use AppBundle\Document\Policy;
 use FOS\UserBundle\Document\User as BaseUser;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
@@ -215,6 +216,7 @@ abstract class Payment
     /**
      * @MongoDB\EmbedOne(targetDocument="AppBundle\Document\IdentityLog")
      * @Gedmo\Versioned
+     * @var IdentityLog
      */
     protected $identityLog;
 
@@ -340,6 +342,9 @@ abstract class Payment
     abstract public function isSuccess();
     abstract public function isUserPayment();
 
+    /**
+     * @return IdentityLog
+     */
     public function getIdentityLog()
     {
         return $this->identityLog;
