@@ -645,7 +645,10 @@ class PurchaseController extends BaseController
                     return $this->redirectToRoute('user_welcome_policy_id', ['id' => $policy->getId()]);
                 }
             } elseif ($request->request->has('to_judo_form')) {
-                $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_BACS_TO_CARD, []);
+                $this->get('app.mixpanel')->queueTrack(
+                    MixpanelService::EVENT_TEST,
+                    ['Test Name' => 'Bacs to Card']
+                );
                 $webpay = $this->get('app.judopay')->webpay(
                     $policy,
                     $amount,
