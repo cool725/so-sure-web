@@ -115,14 +115,16 @@ class MaxMindIpService
         return $coordinates;
     }
 
-    public function getIdentityLog($ip, $cognitoId)
+    public function getIdentityLog($ip, $cognitoId = null)
     {
         $this->find($ip);
         $identityLog = new IdentityLog();
         $identityLog->setIp($this->ip);
         $identityLog->setCountry($this->getCountry());
         $identityLog->setLoc($this->getCoordinates());
-        $identityLog->setCognitoId($cognitoId);
+        if ($cognitoId) {
+            $identityLog->setCognitoId($cognitoId);
+        }
 
         $this->find($ip, self::QUERY_COUNTRY);
         if ($identityLog->getCountry() != $this->getCountry()) {

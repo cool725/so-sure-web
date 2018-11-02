@@ -1117,7 +1117,7 @@ class UserController extends BaseController
             $formAmount = $form->getData()['amount'];
             if (!$this->areEqualToTwoDp($formAmount, $amount)) {
                 throw new \Exception(sprintf(
-                    'User requested bacs payment amount changed inbetween form submission (%0.2f/%0.2f',
+                    'User requested bacs payment amount changed inbetween form submission (%0.2f/%0.2f)',
                     $formAmount,
                     $amount
                 ));
@@ -1125,15 +1125,15 @@ class UserController extends BaseController
 
             $now = \DateTime::createFromFormat('U', time());
             $notes = sprintf(
-                'User manually confirmed payment for £%0.2f on %s from ip: %s',
+                'User manually confirmed payment for £%0.2f on %s',
                 $amount,
-                $now->format(\DateTime::ATOM),
-                $request->getClientIp()
+                $now->format(\DateTime::ATOM)
             );
 
             /** @var BacsService $bacsService */
             $bacsService = $this->get('app.bacs');
-            $bacsService->bacsPayment($policy, $notes, $amount, null, true, Payment::SOURCE_WEB);
+            $payment = $bacsService->bacsPayment($policy, $notes, $amount, null, true, Payment::SOURCE_WEB);
+            $payment->setIdentityLog($this->getIdentityLogWeb($request));
 
             $this->getManager()->flush();
 
@@ -1628,6 +1628,10 @@ class UserController extends BaseController
         $policyRepo = $dm->getRepository(Policy::class);
         $policy = $policyRepo->find($policyId);
 
+        if (!$policy) {
+            return $this->redirectToRoute('user_claim');
+        }
+
         $claim = $policy->getLatestFnolSubmittedInReviewClaim();
 
         if ($claim === null) {
@@ -1660,6 +1664,10 @@ class UserController extends BaseController
         $policyRepo = $dm->getRepository(Policy::class);
         /** @var Policy $policy */
         $policy = $policyRepo->find($policyId);
+
+        if (!$policy) {
+            return $this->redirectToRoute('user_claim');
+        }
 
         $claim = $policy->getLatestFnolSubmittedInReviewClaim();
 
@@ -1725,6 +1733,10 @@ class UserController extends BaseController
         $policyRepo = $dm->getRepository(Policy::class);
         /** @var Policy $policy */
         $policy = $policyRepo->find($policyId);
+
+        if (!$policy) {
+            return $this->redirectToRoute('user_claim');
+        }
 
         $claim = $policy->getLatestFnolClaim();
 
@@ -1794,6 +1806,10 @@ class UserController extends BaseController
         $dm = $this->getManager();
         $policyRepo = $dm->getRepository(Policy::class);
         $policy = $policyRepo->find($policyId);
+
+        if (!$policy) {
+            return $this->redirectToRoute('user_claim');
+        }
 
         $claim = $policy->getLatestFnolClaim();
 
