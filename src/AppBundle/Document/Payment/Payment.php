@@ -212,6 +212,12 @@ abstract class Payment
      */
     protected $success;
 
+    /**
+     * @MongoDB\EmbedOne(targetDocument="IdentityLog")
+     * @Gedmo\Versioned
+     */
+    protected $identityLog;
+
     public function __construct()
     {
         $this->created = \DateTime::createFromFormat('U', time());
@@ -333,6 +339,16 @@ abstract class Payment
 
     abstract public function isSuccess();
     abstract public function isUserPayment();
+
+    public function getIdentityLog()
+    {
+        return $this->identityLog;
+    }
+
+    public function setIdentityLog($identityLog)
+    {
+        $this->identityLog = $identityLog;
+    }
 
     public function isFee()
     {

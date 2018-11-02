@@ -1125,15 +1125,15 @@ class UserController extends BaseController
 
             $now = \DateTime::createFromFormat('U', time());
             $notes = sprintf(
-                'User manually confirmed payment for £%0.2f on %s from ip: %s',
+                'User manually confirmed payment for £%0.2f on %s',
                 $amount,
-                $now->format(\DateTime::ATOM),
-                $request->getClientIp()
+                $now->format(\DateTime::ATOM)
             );
 
             /** @var BacsService $bacsService */
             $bacsService = $this->get('app.bacs');
-            $bacsService->bacsPayment($policy, $notes, $amount, null, true, Payment::SOURCE_WEB);
+            $payment = $bacsService->bacsPayment($policy, $notes, $amount, null, true, Payment::SOURCE_WEB);
+            $payment->setIdentityLog($this->getIdentityLogWeb($request));
 
             $this->getManager()->flush();
 
