@@ -50,29 +50,23 @@ class CashbackReminderCommand extends ContainerAwareCommand
             ->getQuery()
             ->execute();
 
-        $cashbacks = [];
-        foreach ($results as $result) {
-            /** @var Cashback $result */
-            $cashbacks[] = [
-                'id' => $result->getPolicy()->getId(),
-                'number' => $result->getPolicy()->getPolicyNumber(),
-                'status' => $result->getPolicy()->getStatus()
-            ];
-        }
-
         if ($input->getOption('dry-run')) {
-            foreach ($cashbacks as $cashback) {
-                $output->writeln("Policy {$cashback['number']} found with status {$cashback['status']}");
+            foreach ($results as $result) {
+                $output->writeln(sprintf(
+                    "Policy %s found with status %s",
+                    $result->getPolicy()->getPolicyNumber(),
+                    $result->getPolicy()->getStatus()
+                ));
             }
         } else {
             $this->mailer->sendTemplate(
                 'Biweekly cashback report',
                 ['dylan@so-sure.com', 'patrick@so-sure.com'],
                 'AppBundle:Email:policy/cashbackReminder.html.twig',
-                ['policies' => $cashbacks]
+                ['results' => $results]
             );
 
-            $output->writeln(sprintf('Found %s cashback pending policies. Mail sent', count($cashbacks)));
+            $output->writeln(sprintf('Found %s cashback pending policies. Mail sent', count($results)));
         }
     }
 }

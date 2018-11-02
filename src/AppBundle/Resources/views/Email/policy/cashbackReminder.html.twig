@@ -5,10 +5,11 @@
     </a>
 </h1>
 
-{% if policies is not empty %}
+{% if results is not empty %}
 
-    {% for policy in policies %}
-        <li>Policy <a href="{{ url('admin_policy', {'id': policy.id }) }}">{{ policy.number }}</a> has status {{ policy.status }}</li>
+    {% for result in results %}
+        <li>Policy <a href="{{ url('admin_policy', {'id': result.policy.id }) }}">{{ result.policy.policyNumber }}</a> has
+            status {{ result.policy.status }}</li>
     {% endfor %}
 
 {% else %}
