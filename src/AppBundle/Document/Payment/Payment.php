@@ -213,7 +213,7 @@ abstract class Payment
     protected $success;
 
     /**
-     * @MongoDB\EmbedOne(targetDocument="IdentityLog")
+     * @MongoDB\EmbedOne(targetDocument="AppBundle\Document\IdentityLog")
      * @Gedmo\Versioned
      */
     protected $identityLog;

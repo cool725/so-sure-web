@@ -1117,7 +1117,7 @@ class UserController extends BaseController
             $formAmount = $form->getData()['amount'];
             if (!$this->areEqualToTwoDp($formAmount, $amount)) {
                 throw new \Exception(sprintf(
-                    'User requested bacs payment amount changed inbetween form submission (%0.2f/%0.2f',
+                    'User requested bacs payment amount changed inbetween form submission (%0.2f/%0.2f)',
                     $formAmount,
                     $amount
                 ));

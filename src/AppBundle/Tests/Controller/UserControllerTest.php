@@ -6,9 +6,11 @@ use AppBundle\Classes\Salva;
 use AppBundle\Document\BankAccount;
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\Feature;
+use AppBundle\Document\IdentityLog;
 use AppBundle\Document\Payment\BacsPayment;
 use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Document\PhonePolicy;
+use AppBundle\Repository\BacsPaymentRepository;
 use AppBundle\Service\FeatureService;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\User;
@@ -700,6 +702,13 @@ class UserControllerTest extends BaseControllerTest
         $updatedPolicy = $repo->find($policy->getId());
 
         $this->assertEquals(Policy::UNPAID_BACS_PAYMENT_PENDING, $updatedPolicy->getUnpaidReason());
+        $payment = $updatedPolicy->getLastPaymentCredit();
+        $this->assertTrue($payment instanceof BacsPayment);
+        // user doesn't have a valid payment method, so status will be skipped instead of pending
+        $this->assertEquals(BacsPayment::STATUS_SKIPPED, $payment->getStatus());
+        $this->assertNotNull($payment->getIdentityLog());
+        $this->assertEquals(IdentityLog::SDK_WEB, $payment->getIdentityLog()->getSdk());
+        $this->assertNotNull($payment->getIdentityLog()->getIp());
     }
 
     public function testUserUnpaidPolicyBacsPaymentMissing()
