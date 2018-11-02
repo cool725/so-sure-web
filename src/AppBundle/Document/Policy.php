@@ -5113,12 +5113,14 @@ abstract class Policy
         }
 
         $expirationDate = $this->getCurrentOrPreviousBusinessDay($this->getPolicyExpirationDate());
-        $expirationDate = static::subBusinessDays($expirationDate, BacsPayment::DAYS_REVERSE + 1);
+        // 2 additional days: 1 day to account for it possibly being after the bacs submission time for the day
+        // and 1 day to account for policy expiration occurring before the bacs file for the day being uploaded
+        $expirationDate = static::subBusinessDays($expirationDate, BacsPayment::DAYS_REVERSE + 2);
 
         //print $date->format(\DateTime::ATOM);
         //print $expirationDate->format(\DateTime::ATOM);
 
-        return $expirationDate >= $date;
+        return $this->startOfDay($expirationDate) >= $this->startOfDay($date);
     }
 
     public function isFacebookUserInvited($facebookId)
