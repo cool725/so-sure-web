@@ -13,10 +13,12 @@ use AppBundle\Form\Type\UserRoleType;
 use AppBundle\Repository\Invitation\InvitationRepository;
 use AppBundle\Service\InvitationService;
 use AppBundle\Service\MonitorService;
+use Doctrine\Tests\Common\DataFixtures\ContactFixture;
 use Doctrine\Tests\Common\DataFixtures\TestDocument\Role;
 use Exception;
 use AppBundle\Document\Invitation\EmailInvitation;
 use FOS\UserBundle\Model\UserManager;
+use Pimple\Container;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\Claim;
 use Symfony\Component\Validator\Constraints\Date;
@@ -303,8 +305,8 @@ class MonitorServiceTest extends WebTestCase
      */
     public function testCheckAllUserRolePriv()
     {
-        // TODO: Do not hard-code database
-        $database = self::$dm->getConnection()->selectDatabase('so-sure');
+        $db_name = self::$container->getParameter('mongodb_db');
+        $database = self::$dm->getConnection()->selectDatabase($db_name);
 
         $database->command([
             'createRole' => 'so-sure-user',
