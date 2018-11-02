@@ -624,10 +624,11 @@ class PurchaseController extends BaseController
                         ->getForm();
                     $template = 'AppBundle:Purchase:purchaseStepPaymentBacs.html.twig';
                 } elseif ($bacsConfirmForm->isValid()) {
-                    $policyService->create($policy, null, true);
+                    $identityLog = $this->getIdentityLogWeb($request);
+                    $policyService->create($policy, null, true, null, $identityLog);
                     $paymentService->confirmBacs(
                         $policy,
-                        $bacsConfirm->transformBacsPaymentMethod($this->getIdentityLogWeb($request))
+                        $bacsConfirm->transformBacsPaymentMethod($identityLog)
                     );
 
                     $this->addFlash(

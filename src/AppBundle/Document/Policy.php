@@ -433,6 +433,7 @@ abstract class Policy
     /**
      * @MongoDB\EmbedOne(targetDocument="IdentityLog")
      * @Gedmo\Versioned
+     * @var IdentityLog
      */
     protected $identityLog;
 
@@ -900,6 +901,50 @@ abstract class Policy
         });
 
         return $payments;
+    }
+
+    public function getPurchaseSdk()
+    {
+        // Going forward there should always be a sdk associated with the identity log, however previously, not the case
+        if ($this->getIdentityLog() && $this->getIdentityLog()->getSdk()) {
+            return $this->getIdentityLog()->getSdk();
+        }
+
+        $source = $this->getFirstSuccessfulUserPaymentCredit();
+        if ($source) {
+            switch ($source) {
+                case Payment::SOURCE_WEB:
+                case Payment::SOURCE_WEB_API:
+                    return IdentityLog::SDK_WEB;
+                case Payment::SOURCE_TOKEN:
+                case Payment::SOURCE_SYSTEM:
+                case Payment::SOURCE_BACS:
+                    // historically, bacs was only implemented on the web, so anything related to bacs payments
+                    // should be web (new sdk identity log should resolve future requests better)
+                    // as bacs was usually associated with token payments, system & token should be assumed to be bacs
+                    return IdentityLog::SDK_WEB;
+                case Payment::SOURCE_MOBILE:
+                    if ($this instanceof PhonePolicy) {
+                        /** @var Phone $phone */
+                        $phone = $this->getPhone();
+                        if ($phone->isApple()) {
+                            return IdentityLog::SDK_IOS;
+                        } else {
+                            return IdentityLog::SDK_ANDROID;
+                        }
+                    }
+
+                    return IdentityLog::SDK_UNKNOWN;
+                case Payment::SOURCE_APPLE_PAY:
+                    return IdentityLog::SDK_IOS;
+                case Payment::SOURCE_ANDROID_PAY:
+                    return IdentityLog::SDK_ANDROID;
+                default:
+                    return IdentityLog::SDK_UNKNOWN;
+            }
+        }
+
+        return IdentityLog::SDK_UNKNOWN;
     }
 
     /**
@@ -1683,6 +1728,9 @@ abstract class Policy
         return $this->premium;
     }
 
+    /**
+     * @return IdentityLog
+     */
     public function getIdentityLog()
     {
         return $this->identityLog;
