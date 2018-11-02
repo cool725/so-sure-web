@@ -56,9 +56,18 @@ trait UserClassTrait
     public static $JUDO_TEST_CARD2_EXP = '12/20';
     public static $JUDO_TEST_CARD2_PIN = '452';
 
-    public static function generateEmail($name, $caller)
+    public static function generateEmail($name, $caller, $rand = false)
     {
-        return sprintf('%s@%s.so-sure.net', $name, str_replace("\\", ".", get_class($caller)));
+        if ($rand) {
+            return sprintf(
+                '%s-%d@%s.so-sure.net',
+                $name,
+                random_int(0, 999999),
+                str_replace("\\", ".", get_class($caller))
+            );
+        } else {
+            return sprintf('%s@%s.so-sure.net', $name, str_replace("\\", ".", get_class($caller)));
+        }
     }
 
     public static function createUserPolicy($init = false, $date = null, $setId = false)
@@ -377,11 +386,17 @@ trait UserClassTrait
         return $payment;
     }
 
-    public static function setBacsPaymentMethod(User $user, $mandateStatus = BankAccount::MANDATE_SUCCESS)
-    {
+    public static function setBacsPaymentMethod(
+        User $user,
+        $mandateStatus = BankAccount::MANDATE_SUCCESS,
+        $randomReference = false
+    ) {
         $bacs = new BacsPaymentMethod();
         $bankAccount = new BankAccount();
         $bankAccount->setMandateStatus($mandateStatus);
+        if ($randomReference) {
+            $bankAccount->setReference(sprintf('TESTREF-%d', random_int(1, 999999)));
+        }
         $bacs->setBankAccount($bankAccount);
         $user->setPaymentMethod($bacs);
     }

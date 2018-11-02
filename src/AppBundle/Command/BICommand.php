@@ -315,6 +315,7 @@ class BICommand extends ContainerAwareCommand
             '"Past Due Amount (Bad Debt Only)"',
             '"Has previous policy"',
             '"Payment Method"',
+            '"Expected Unpaid Cancellation Date"',
         ]);
         foreach ($policies as $policy) {
             /** @var Policy $policy */
@@ -371,6 +372,12 @@ class BICommand extends ContainerAwareCommand
                 sprintf(
                     '"%s"',
                     $policy->getUser()->hasPaymentMethod() ? $policy->getUser()->getPaymentMethod()->getType() : null
+                ),
+                sprintf(
+                    '"%s"',
+                    $policy->getStatus() == Policy::STATUS_UNPAID ?
+                        $policy->getPolicyExpirationDate()->format('Y-m-d') :
+                        null
                 ),
             ]);
         }
