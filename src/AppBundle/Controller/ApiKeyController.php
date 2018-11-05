@@ -102,15 +102,16 @@ class ApiKeyController extends BaseController
 
     /**
      * @Route("/monitor/{name}", name="api_key_monitor")
+     * @Route("/monitor/{name}/details", name="api_key_monitor_details")
      * @Method({"GET"})
      */
-    public function monitorAction($name)
+    public function monitorAction(Request $request, $name)
     {
         // monitor/api-monitor-intercomPolicyPremium : CheckHttp CRITICAL: Request timed out is occurring frequently
         set_time_limit(60);
         try {
             $monitor = $this->get('app.monitor');
-            $message = $monitor->run($name);
+            $message = $monitor->run($name, $request->get('_route') == 'api_key_monitor_details');
 
             return $this->getErrorJsonResponse(ApiErrorCode::SUCCESS, $message, 200);
         } catch (MonitorException $ex) {

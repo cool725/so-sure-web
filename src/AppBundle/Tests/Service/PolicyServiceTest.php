@@ -2,11 +2,13 @@
 
 namespace AppBundle\Tests\Service;
 
+use AppBundle\Document\BankAccount;
 use AppBundle\Document\CustomerCompany;
 use AppBundle\Document\Form\Bacs;
 use AppBundle\Document\Payment\PolicyDiscountPayment;
 use AppBundle\Exception\GeoRestrictedException;
 use AppBundle\Exception\InvalidUserDetailsException;
+use AppBundle\Service\PaymentService;
 use AppBundle\Service\PolicyService;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\User;
@@ -53,6 +55,9 @@ class PolicyServiceTest extends WebTestCase
     protected static $policyRepo;
     protected static $judopay;
 
+    /** @var PaymentService */
+    protected static $paymentService;
+
     public static function setUpBeforeClass()
     {
         //start the symfony kernel
@@ -75,6 +80,10 @@ class PolicyServiceTest extends WebTestCase
         self::$policyService->setDispatcher(null);
 
         self::$judopay = self::$container->get('app.judopay');
+
+        /** @var PaymentService $paymentService */
+        $paymentService = self::$container->get('app.payment');
+        self::$paymentService = $paymentService;
 
         $phoneRepo = self::$dm->getRepository(Phone::class);
         self::$phone = $phoneRepo->findOneBy(['devices' => 'iPhone 5', 'memory' => 64]);
@@ -463,6 +472,47 @@ class PolicyServiceTest extends WebTestCase
                 $this->assertTrue($policy->arePolicyScheduledPaymentsCorrect(true));
             }
         }
+    }
+
+    public function testAreScheduledPaymentsCorrectBacs()
+    {
+        $date = new \DateTime();
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testAreScheduledPaymentsCorrectBacs', $this, true),
+            'bar',
+            null,
+            static::$dm
+        );
+        static::setBacsPaymentMethod($user, BankAccount::MANDATE_SUCCESS, true);
+        $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), $date);
+        $phone = $policy->getPhone();
+        static::$paymentService->confirmBacs($policy, $user->getBacsPaymentMethod(), $date);
+        $user->getBacsPaymentMethod()->getBankAccount()->setInitialPaymentSubmissionDate($date);
+
+        $payment = new BacsPayment();
+        $payment->setAmount($phone->getCurrentPhonePrice($date)->getMonthlyPremiumPrice(null, $date));
+        $payment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
+        $payment->setDate($date);
+        $payment->setSuccess(true);
+        $policy->addPayment($payment);
+
+        static::$policyService->create($policy, $date);
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+
+        $scheduledPayment = $policy->getScheduledPayments()[1];
+        $scheduledPayment->setScheduled($user->getBacsPaymentMethod()->getBankAccount()->getInitialNotificationDate());
+        static::$dm->flush();
+
+        $this->assertNotEquals(
+            $date,
+            $user->getBacsPaymentMethod()->getBankAccount()->getInitialNotificationDate(),
+            '',
+            1
+        );
+
+        $updatedPolicy = static::$policyRepo->find($policy->getId());
+        $this->assertTrue($policy->arePolicyScheduledPaymentsCorrect(true));
     }
 
     /**

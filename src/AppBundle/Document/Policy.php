@@ -4386,8 +4386,23 @@ abstract class Policy
 
         // All Scheduled day must match the billing day
         if ($verifyBillingDay) {
+            $initialNotificationDate = null;
+            if ($this->getUser()->getBacsPaymentMethod()) {
+                if ($bankAccount = $this->getUser()->getBacsPaymentMethod()->getBankAccount()) {
+                    $initialNotificationDate = $bankAccount->getInitialNotificationDate();
+                }
+            }
             foreach ($scheduledPayments as $scheduledPayment) {
                 /** @var ScheduledPayment $scheduledPayment */
+
+                // for bacs, we may have a different scheduled payment for the first notification date
+                $initialNotificationDateDiff = $initialNotificationDate != null ?
+                    $initialNotificationDate->diff($scheduledPayment->getScheduled()) :
+                    null;
+                if ($initialNotificationDateDiff && $initialNotificationDateDiff->d == 0) {
+                    continue;
+                }
+
                 if ($scheduledPayment->hasCorrectBillingDay() === false) {
                     /*
                     $diff = $scheduledPayment->getScheduled()->diff($this->getBilling());
@@ -5098,12 +5113,14 @@ abstract class Policy
         }
 
         $expirationDate = $this->getCurrentOrPreviousBusinessDay($this->getPolicyExpirationDate());
-        $expirationDate = static::subBusinessDays($expirationDate, BacsPayment::DAYS_REVERSE + 1);
+        // 2 additional days: 1 day to account for it possibly being after the bacs submission time for the day
+        // and 1 day to account for policy expiration occurring before the bacs file for the day being uploaded
+        $expirationDate = static::subBusinessDays($expirationDate, BacsPayment::DAYS_REVERSE + 2);
 
         //print $date->format(\DateTime::ATOM);
         //print $expirationDate->format(\DateTime::ATOM);
 
-        return $expirationDate >= $date;
+        return $this->startOfDay($expirationDate) >= $this->startOfDay($date);
     }
 
     public function isFacebookUserInvited($facebookId)

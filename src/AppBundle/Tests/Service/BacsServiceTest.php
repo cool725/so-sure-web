@@ -159,6 +159,8 @@ class BacsServiceTest extends WebTestCase
 
         $bacs = $this->setValidBacsPaymentMethod($policy->getUser(), null, $now);
         self::$paymentService->confirmBacs($policy, $bacs);
+
+        $bacs->getBankAccount()->setInitialPaymentSubmissionDate($now);
         static::$dm->flush();
 
         $oneMonth = clone $now;
@@ -218,6 +220,8 @@ class BacsServiceTest extends WebTestCase
 
         $bacs = $this->setValidBacsPaymentMethod($policy->getUser(), null, $now);
         self::$paymentService->confirmBacs($policy, $bacs);
+
+        $bacs->getBankAccount()->setInitialPaymentSubmissionDate($now);
         static::$dm->flush();
 
         $expire = clone $policy->getPolicyExpirationDate();
