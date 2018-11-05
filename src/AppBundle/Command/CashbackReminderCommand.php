@@ -43,6 +43,8 @@ class CashbackReminderCommand extends ContainerAwareCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $dryRun = true === $input->getOption('dry-run');
+        $lines = $this->policyService->cashbackReminder($dryRun);
 
         $results = $this->dm->createQueryBuilder(Cashback::class)
             ->field('status')
@@ -50,7 +52,7 @@ class CashbackReminderCommand extends ContainerAwareCommand
             ->getQuery()
             ->execute();
 
-        if ($input->getOption('dry-run')) {
+        if ($dryRun) {
             foreach ($results as $result) {
                 $output->writeln(sprintf(
                     "Policy %s found with status %s",
@@ -67,6 +69,8 @@ class CashbackReminderCommand extends ContainerAwareCommand
             );
 
             $output->writeln(sprintf('Found %s cashback pending policies. Mail sent', count($results)));
+
+            $output->writeln(json_encode($lines, JSON_PRETTY_PRINT));
         }
     }
 }
