@@ -62,7 +62,7 @@ class CashbackReminderCommand extends ContainerAwareCommand
             $this->mailer->sendTemplate(
                 'Biweekly cashback report',
                 ['dylan@so-sure.com', 'patrick@so-sure.com'],
-                'AppBundle:Email:policy/cashbackReminder.html.twig',
+                'AppBundle:Email:cashback/cashbackReminder.html.twig',
                 ['results' => $results]
             );
 
