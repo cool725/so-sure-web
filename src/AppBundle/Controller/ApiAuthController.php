@@ -1110,6 +1110,7 @@ class ApiAuthController extends BaseController
             } elseif (isset($data['braintree'])) {
                 throw new \Exception('Braintree is no longer supported');
             } elseif ($judoData) {
+                /** @var JudopayService $judo */
                 $judo = $this->get('app.judopay');
                 $judo->add(
                     $policy,
@@ -1117,7 +1118,9 @@ class ApiAuthController extends BaseController
                     $this->getDataString($judoData, 'consumer_token'),
                     $this->getDataString($judoData, 'card_token'),
                     Payment::SOURCE_MOBILE,
-                    $this->getDataString($judoData, 'device_dna')
+                    $this->getDataString($judoData, 'device_dna'),
+                    null,
+                    $this->getIdentityLog($request)
                 );
             } elseif ($existingData) {
                 if (!$policy->getUser()->hasValidPaymentMethod()) {
