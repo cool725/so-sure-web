@@ -11,8 +11,19 @@
         Pay via Direct Debit
         <span class="sub h5">(Recommended)</span>
     </h4>
-    <p class="mb-4"><smalll class="text-zaffre">💳 Prefer to pay by card? <a href="#" id="web-pay-submit" data-event="pay-by-card-bacs-page"><u>Click here</u></a>
-    </smalll></p>
+
+    {% if to_judo_form is defined %}
+        <p class="mb-4">
+            <smalll class="text-zaffre">
+                💳 Prefer to pay by card?
+                {% block to_judo_form %}
+                    {{ form_start(to_judo_form) }}
+                    {{ form_widget(to_judo_form.submit, {'label': 'Click here', 'attr': {'class': 'linkButton'}}) }}
+                    {{ form_end(to_judo_form) }}
+                {% endblock to_judo_form %}
+            </smalll>
+        </p>
+    {% endif %}
 
     <div class="form-group {% if form_errors(bacs_form.accountName) %}has-error{% endif %}">
         <label for="bacs_form[accountName]">
@@ -91,9 +102,6 @@
 
 {{ form_end(bacs_form) }}
 
-<form action="{{ webpay_action }}" method="post" id="webpay-form">
-    <input id="Reference" name="Reference" type="hidden" value="{{ webpay_reference }}">
-</form>
 
 <div id="so-sure-loader" class="loader">
     <div class="loader__inner d-flex align-items-center flex-column justify-content-center">
@@ -104,4 +112,3 @@
 </div>
 
 {% include 'AppBundle::Purchase/_directDebitModal.html.twig' %}
-

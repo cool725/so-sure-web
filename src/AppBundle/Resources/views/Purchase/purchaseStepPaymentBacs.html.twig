@@ -18,6 +18,12 @@
 
 {% block body %}
 
+    {% if webpay_action is defined %}
+        <form action="{{ webpay_action }}" method="post" id="webpay-form">
+            <input id="Reference" name="Reference" type="hidden" value="{{ webpay_reference }}">
+        </form>
+    {% endif %}
+
     <section class="qpw">
         <div class="d-lg-flex">
 
@@ -122,7 +128,6 @@
 
     {# Page Modals
     {% include 'AppBundle::PhoneInsurance/_policyInfoModals.html.twig' %}
-
 {% endblock %}
 
 {% block footer %}

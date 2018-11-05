@@ -13,6 +13,7 @@ use AppBundle\Form\Type\BacsConfirmType;
 use AppBundle\Form\Type\BacsType;
 use AppBundle\Form\Type\PurchaseStepPaymentType;
 use AppBundle\Form\Type\PurchaseStepPledgeType;
+use AppBundle\Form\Type\PurchaseStepToJudoType;
 use AppBundle\Repository\JudoPaymentRepository;
 use AppBundle\Repository\PaymentRepository;
 use AppBundle\Repository\PhoneRepository;
@@ -525,6 +526,7 @@ class PurchaseController extends BaseController
         return $this->render($template, $data);
     }
 
+
     /**
      * Note that any changes to actual path routes need to be reflected in the Google Analytics Goals
      *   as these will impact Adwords
@@ -552,6 +554,10 @@ class PurchaseController extends BaseController
         $dm = $this->getManager();
         /** @var PolicyRepository $policyRepo */
         $policyRepo = $dm->getRepository(Policy::class);
+        /** @var PhoneRepository $phoneRepo */
+        $phoneRepo = $dm->getRepository(Phone::class);
+
+        $judoFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_CARD_OPTION_WITH_BACS);
 
         /** @var PhonePolicy $policy */
         $policy = $policyRepo->find($id);
@@ -580,6 +586,14 @@ class PurchaseController extends BaseController
         $paymentService = $this->get('app.payment');
         /** @var PolicyService $policyService */
         $policyService = $this->get('app.policy');
+        /** @var Form $toJudoForm */
+        $toJudoForm = null;
+        if ($judoFeature) {
+            $toJudoForm =  $this->get("form.factory")
+                ->createNamedBuilder('to_judo_form', PurchaseStepToJudoType::class)
+                ->getForm();
+        }
+
         /** @var FormInterface $bacsForm */
         $bacsForm = $this->get('form.factory')
             ->createNamedBuilder('bacs_form', BacsType::class, $bacs)
@@ -589,15 +603,8 @@ class PurchaseController extends BaseController
             ->createNamedBuilder('bacs_confirm_form', BacsConfirmType::class, $bacsConfirm)
             ->getForm();
 
-        $webpay = $this->get('app.judopay')->webpay(
-            $policy,
-            $amount,
-            $request->getClientIp(),
-            $request->headers->get('User-Agent'),
-            JudopayService::WEB_TYPE_STANDARD
-        );
-
         $template = null;
+        $webpay = null;
         if ('POST' === $request->getMethod()) {
             if ($request->request->has('bacs_form')) {
                 $bacsForm->handleRequest($request);
@@ -637,6 +644,18 @@ class PurchaseController extends BaseController
 
                     return $this->redirectToRoute('user_welcome_policy_id', ['id' => $policy->getId()]);
                 }
+            } elseif ($request->request->has('to_judo_form')) {
+                $this->get('app.mixpanel')->queueTrack(
+                    MixpanelService::EVENT_TEST,
+                    ['Test Name' => 'Bacs to Card']
+                );
+                $webpay = $this->get('app.judopay')->webpay(
+                    $policy,
+                    $amount,
+                    $request->getClientIp(),
+                    $request->headers->get('User-Agent'),
+                    JudopayService::WEB_TYPE_STANDARD
+                );
             }
         }
 
@@ -644,16 +663,30 @@ class PurchaseController extends BaseController
             $template = 'AppBundle:Purchase:purchaseStepPaymentBacs.html.twig';
         }
 
+        $phone = $policy->getPhone();
+
         $data = array(
+            'phone' => $phone,
+            'phones' => $phone ? $phoneRepo->findBy(
+                ['active' => true, 'make' => $phone->getMake(), 'model' => $phone->getModel()],
+                ['memory' => 'asc']
+            ): null,
             'policy' => $policy,
             'is_postback' => 'POST' === $request->getMethod(),
             'step' => 4,
             'bacs_form' => $bacsForm->createView(),
             'bacs_confirm_form' => $bacsConfirmForm->createView(),
-            'bacs' => $bacs,
-            'webpay_action' => $webpay ? $webpay['post_url'] : null,
-            'webpay_reference' => $webpay ? $webpay['payment']->getReference() : null,
+            'bacs' => $bacs
         );
+
+        if ($webpay) {
+            $data['webpay_action'] = $webpay ? $webpay['post_url'] : null;
+            $data['webpay_reference'] = $webpay ? $webpay['payment']->getReference() : null;
+        }
+
+        if ($toJudoForm) {
+            $data['to_judo_form'] = $toJudoForm->createView();
+        }
 
 
         return $this->render($template, $data);
@@ -813,12 +846,7 @@ class PurchaseController extends BaseController
         $webpay = null;
         $allowPayment = true;
 
-        $paymentProviderTest = $this->sixpack(
-            $request,
-            SixpackService::EXPERIMENT_PURCHASE_FLOW_BACS,
-            ['judo', 'bacs'],
-            SixpackService::LOG_MIXPANEL_CONVERSION
-        );
+        $paymentProviderTest = 'bacs';
 
         $bacsFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_BACS);
         // For now, only allow 1 policy with bacs
@@ -829,7 +857,6 @@ class PurchaseController extends BaseController
             $paymentProviderTest = 'judo';
         }
 
-        //$this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_POSTCODE);
         if ('POST' === $request->getMethod()) {
             if ($request->request->has('purchase_form')) {
                 $purchaseForm->handleRequest($request);

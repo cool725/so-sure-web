@@ -19,6 +19,7 @@ class Feature
     const FEATURE_STARLING = 'starling';
     const FEATURE_SALVA_POLICY_UPDATE = 'salva-policy-update';
     const FEATURE_BACS = 'bacs';
+    const FEATURE_CARD_OPTION_WITH_BACS = 'card-option-with-bacs';
     const FEATURE_APP_IOS_IMEI_VALIDATION_COLOUR = 'app-ios-imei-validation-colour';
     const FEATURE_APP_PICSURE_ACCELEROMETER = 'app-picsure-accelerometer';
     const FEATURE_APP_PICSURE_DOTCODE = 'app-picsure-dotcode';
@@ -34,6 +35,7 @@ class Feature
         self::FEATURE_STARLING,
         self::FEATURE_SALVA_POLICY_UPDATE,
         self::FEATURE_BACS,
+        self::FEATURE_CARD_OPTION_WITH_BACS,
         self::FEATURE_APP_IOS_IMEI_VALIDATION_COLOUR,
         self::FEATURE_APP_PICSURE_ACCELEROMETER,
         self::FEATURE_APP_PICSURE_DOTCODE,

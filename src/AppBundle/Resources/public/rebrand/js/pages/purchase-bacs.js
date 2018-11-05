@@ -10,8 +10,6 @@ require('jquery-validation');
 require('jquery-mask-plugin');
 require('../../../js/Default/jqueryValidatorMethods.js');
 
-import trackByName from '../common/track.js';
-
 const sosure = sosure || {};
 
 sosure.purchaseStepBacs = (function() {
@@ -28,7 +26,7 @@ sosure.purchaseStepBacs = (function() {
         self.isIE = !!navigator.userAgent.match(/Trident/g) || !!navigator.userAgent.match(/MSIE/g);
         self.loader = $('#so-sure-loader');
         self.webPay = $('#webpay-form');
-        self.webPayBtn = $('#web-pay-submit');
+        self.webPayBtn = $('#to_judo_form_submit');
         if (self.form.data('client-validation') && !self.isIE) {
             self.addValidation();
         }
@@ -92,21 +90,14 @@ sosure.purchaseStepBacs = (function() {
     return self;
 })();
 
-$(function(){
-
+$(function() {
     sosure.purchaseStepBacs.init();
-
     sosure.purchaseStepBacs.webPayBtn.on('click', function() {
-
-        if ($.trim($('#Reference').val()).length > 0) {
-            // Show loading overlay
-            sosure.purchaseStepBacs.loader.show();
-
-            // Add tracking
-            let name = $(this).data('event');
-            trackByName(name, function() {
-                sosure.purchaseStepBacs.webPay.submit();
-            });
-        }
+        sosure.purchaseStepBacs.loader.show();
     });
+    let webpay = $('#webpay-form');
+    if (webpay.length) {
+        sosure.purchaseStepBacs.loader.show();
+        webpay.submit();
+    }
 });

@@ -21,3 +21,14 @@ body {
 
 }
 
+// Styles a button to look like a link.
+// In some cases existing btn-link does not work.
+.linkButton {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    font: inherit;
+    text-decoration: underline;
+    color: $dodger-blue;
+}
