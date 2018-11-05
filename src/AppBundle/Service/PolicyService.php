@@ -1612,6 +1612,29 @@ class PolicyService
         return $cashback;
     }
 
+    public function cashbackPending($dryRun)
+    {
+        $cashbacks = [];
+
+        $cashbackRepo = $this->dm->getRepository(Cashback::class);
+        $cashbackItems = $cashbackRepo->findBy(['status' => Cashback::STATUS_PENDING_PAYMENT]);
+
+        foreach ($cashbackItems as $cashbackItem) {
+            $cashbacks[$cashbackItem->getId()] = $cashbackItem->getPolicy()->getPolicyNumber();
+        }
+
+        if (!$dryRun) {
+            $this->mailer->sendTemplate(
+                'Biweekly cashback report',
+                ['dylan@so-sure.com', 'patrick@so-sure.com'],
+                'AppBundle:Email:cashback/cashback_reminder.html.twig',
+                ['results' => $cashbacks]
+            );
+        }
+
+        return $cashbacks;
+    }
+
     /**
      * @param Policy    $policy
      * @param \DateTime $date

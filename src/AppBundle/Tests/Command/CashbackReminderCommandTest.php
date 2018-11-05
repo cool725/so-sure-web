@@ -37,7 +37,7 @@ class CashbackReminderCommandTest extends BaseControllerTest
         $commandTester = new CommandTester($command);
         $commandTester->execute(array(
             'command' => $command->getName(),
-            '--dry-run' => 1,
+            '--dry-run' => true,
         ));
         $output = $commandTester->getDisplay();
         foreach ($expectedOutput as $item) {
@@ -61,7 +61,7 @@ class CashbackReminderCommandTest extends BaseControllerTest
         $this->callCommand(
             [
                 'Policy',
-                'found with status'
+                'found with pending status'
             ]
         );
     }

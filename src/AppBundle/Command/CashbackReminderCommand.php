@@ -4,6 +4,7 @@ namespace AppBundle\Command;
 
 use AppBundle\Document\Cashback;
 use AppBundle\Document\Policy;
+use AppBundle\Service\PolicyService;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use AppBundle\Service\MailerService;
 use Doctrine\ODM\MongoDB\DocumentManager;
@@ -17,13 +18,17 @@ class CashbackReminderCommand extends ContainerAwareCommand
     /** @var DocumentManager */
     protected $dm;
 
+    /** @var PolicyService */
+    protected $policyService;
+
     /** @var MailerService */
     protected $mailer;
 
-    public function __construct(DocumentManager $dm, MailerService $mailer)
+    public function __construct(DocumentManager $dm, PolicyService $policyService, MailerService $mailer)
     {
         parent::__construct();
         $this->dm = $dm;
+        $this->policyService = $policyService;
         $this->mailer = $mailer;
     }
 
@@ -45,32 +50,19 @@ class CashbackReminderCommand extends ContainerAwareCommand
     {
         $dryRun = true === $input->getOption('dry-run');
         $lines = $this->policyService->cashbackReminder($dryRun);
-
-        $results = $this->dm->createQueryBuilder(Cashback::class)
-            ->field('status')
-            ->equals(Cashback::STATUS_PENDING_PAYMENT)
-            ->getQuery()
-            ->execute();
+        $cashbacks = $this->policyService->cashbackPending($dryRun);
 
         if ($dryRun) {
-            foreach ($results as $result) {
+            foreach ($cashbacks as $cashback) {
                 $output->writeln(sprintf(
-                    "Policy %s found with status %s",
-                    $result->getPolicy()->getPolicyNumber(),
-                    $result->getPolicy()->getStatus()
+                    "Policy %s found with pending status",
+                    $cashback
                 ));
             }
-        } else {
-            $this->mailer->sendTemplate(
-                'Biweekly cashback report',
-                ['dylan@so-sure.com', 'patrick@so-sure.com'],
-                'AppBundle:Email:cashback/cashbackReminder.html.twig',
-                ['results' => $results]
-            );
-
-            $output->writeln(sprintf('Found %s cashback pending policies. Mail sent', count($results)));
 
             $output->writeln(json_encode($lines, JSON_PRETTY_PRINT));
         }
+
+        $output->writeln(sprintf('Found %s cashback pending policies. Mail sent', count($cashbacks)));
     }
 }
