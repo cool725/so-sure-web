@@ -545,6 +545,7 @@ class OpsController extends BaseController
                 'cdn.joinhoney.com',
                 'mozbar.moz.com',
                 'gjtrack.ucweb.com',
+                'www.nectar.com'
             ])) {
                 $logger->debug(sprintf('Content-Security-Policy called with ignore host: %s', $host));
 

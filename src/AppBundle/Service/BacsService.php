@@ -1222,6 +1222,11 @@ class BacsService
         $payment->setStatus(BacsPayment::STATUS_PENDING);
         $payment->setSource($source);
 
+        // Admin or user source is always a one off payment
+        if (in_array($source, [Payment::SOURCE_ADMIN, Payment::SOURCE_WEB])) {
+            $payment->setIsOneOffPayment(true);
+        }
+
         if (!$user->hasValidPaymentMethod()) {
             $payment->setStatus(BacsPayment::STATUS_SKIPPED);
             $this->logger->warning(sprintf(
@@ -1562,9 +1567,12 @@ class BacsService
             $bacs = $payment->getPolicy()->getUser()->getPaymentMethod();
             $bankAccount = $bacs->getBankAccount();
 
-            // If admin/user has rescheduled, then allow payment to go through, but should be manually approved
-            $ignoreNotEnoughTime = in_array($payment->getSource(), [Payment::SOURCE_ADMIN]);
-            $validate = $this->validateBacs($policy, $payment->getDate(), $payment->getId(), $ignoreNotEnoughTime);
+            $validate = $this->validateBacs(
+                $policy,
+                $payment->getDate(),
+                $payment->getId(),
+                $payment->isOneOffPayment()
+            );
             // rescheduling doesn't make sense in context of already generated payments
             if (in_array($validate, [self::VALIDATE_SKIP, self::VALIDATE_RESCHEDULE])) {
                 continue;

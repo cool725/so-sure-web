@@ -41,6 +41,16 @@
                         {% endif %}
                     </td>
                 </tr>
+                {% if user.confirmationToken is not empty and is_granted('ROLE_EMPLOYEE') %}
+                    <tr>
+                        <td>Confirmation Link</td>
+                        <td>
+                            <p>{{ url('fos_user_resetting_reset', {'token': user.confirmationToken}) }}</p>
+                            <p>Requested at {{ user.passwordRequestedAt|date("H:i d/m/Y") }}</p>
+                        </td>
+                        <td></td>
+                    </tr>
+                {% endif %}
                 <tr>
                     <td>Name</td>
                     <td>{{ user.name }}
@@ -58,6 +68,7 @@
                 <tr>
                     <td>Gender</td>
                     <td>{{ user.gender }}</td>
+                    <td></td>
                 </tr>
                 <tr>
                     <td>Birthday</td>
@@ -109,7 +120,7 @@
                         ><i class="fa fa-edit"></i> Edit User Address</button>
                         {% endif %}
                     </td>
-                </tr>             
+                </tr>
                 <tr>
                     <td>User Status</td>
                     <td>
@@ -545,7 +556,7 @@
           <div class="modal-footer">
                 {{ form_widget(role_form.save, {'label': 'Update Roles', 'attr': {'class': 'btn btn-success'}}) }}
           </div>
-            {{ form_end(role_form) }} 
+            {{ form_end(role_form) }}
         </div>
       </div>
     </div>
