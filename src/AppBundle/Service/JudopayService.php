@@ -1140,7 +1140,7 @@ class JudopayService
         foreach ($policy->getAllPayments() as $payment) {
             $diff = $date->diff($payment->getDate());
             if ($payment instanceof JudoPayment && $payment->getAmount() > 0 &&
-                $diff->days == 0) {
+                $diff->days == 0 && $payment->getSource() == Payment::SOURCE_TOKEN) {
                 $msg = sprintf(
                     'Attempting to run addition payment for policy %s on the same day. %s',
                     $policy->getId(),
