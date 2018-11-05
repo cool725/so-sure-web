@@ -76,7 +76,9 @@ use Facebook\Facebook;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use AppBundle\Exception\DuplicateInvitationException;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use AppBundle\Exception\ValidationException;
 
 use AppBundle\Exception\RateLimitException;
@@ -1511,6 +1513,29 @@ class UserController extends BaseController
             'email_form' => $userEmailForm->createView(),
             'policy' => $policy,
         ];
+    }
+
+    /**
+     * @Route("/policy-pdf/{policyId}", name="user_policy_pdf")
+     */
+    public function policyDetailsPdfAction($policyId = null)
+    {
+        $policyService = $this->get('app.policy');
+        $user = $this->getUser();
+        $dm = $this->getManager();
+        $policyRepo = $dm->getRepository(Policy::class);
+        if ($policyId) {
+            $policy = $policyRepo->find($policyId);
+        } else {
+            $policy = $user->getLatestPolicy();
+        }
+        $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
+
+        $response = new BinaryFileResponse($policyService->generatePolicyTerms($policy, true));
+        $response->headers->set('Content-Type', 'application/pdf');
+        $response->setContentDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT, 'yourPolicy.pdf');
+
+        return $response;
     }
 
     /**
