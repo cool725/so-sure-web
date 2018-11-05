@@ -50,7 +50,7 @@ class DirectGroupHandlerClaimTest extends \PHPUnit\Framework\TestCase
             '42794',
             'Samsung',
             'S6',
-            '149358212660892',
+            '14935 8212660 892',
             '123 foo st',
             '£250.49',
             '£5.29',

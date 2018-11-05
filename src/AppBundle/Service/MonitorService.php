@@ -77,9 +77,13 @@ class MonitorService
         $this->judopay = $judopay;
     }
 
-    public function run($name)
+    public function run($name, $details = null)
     {
         if (method_exists($this, $name)) {
+            if ($details) {
+                return call_user_func([$this, $name], $details);
+            }
+
             return call_user_func([$this, $name]);
         }
 
@@ -474,8 +478,9 @@ class MonitorService
         }
     }
 
-    public function bacsPayments()
+    public function bacsPayments($details = false)
     {
+        $errors = [];
         $twoDays = \DateTime::createFromFormat('U', time());
         $twoDays = $this->subBusinessDays($twoDays, 2);
         /** @var BacsPaymentRepository $paymentsRepo */
@@ -495,8 +500,16 @@ class MonitorService
             }
 
             if ($payment->canAction(\DateTime::createFromFormat('U', time()))) {
-                throw new MonitorException(sprintf('There are bacs payments waiting actioning: %s', $payment->getId()));
+                $msg = sprintf('There are bacs payments waiting actioning: %s', $payment->getId());
+                $errors[] = $msg;
+                if (!$details) {
+                    throw new MonitorException($msg);
+                }
             }
+        }
+
+        if (count($errors) > 0) {
+            throw new MonitorException(json_encode($errors, JSON_PRETTY_PRINT));
         }
     }
 

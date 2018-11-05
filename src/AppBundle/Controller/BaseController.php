@@ -563,8 +563,9 @@ abstract class BaseController extends Controller
 
     protected function getIdentityLogWeb(Request $request)
     {
-        $identityLog = new IdentityLog();
-        $identityLog->setIp($request->getClientIp());
+        /** @var MaxMindIpService $geoip */
+        $geoip = $this->get('app.geoip');
+        $identityLog = $geoip->getIdentityLog($request->getClientIp());
         $identityLog->setSdk(IdentityLog::SDK_WEB);
 
         return $identityLog;

@@ -541,7 +541,7 @@ class MixpanelService
 
         return $stats;
     }
-    
+
     public function process($max)
     {
         $requeued = 0;
