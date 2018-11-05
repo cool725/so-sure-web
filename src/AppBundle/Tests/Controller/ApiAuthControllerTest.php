@@ -2,6 +2,7 @@
 
 namespace AppBundle\Tests\Controller;
 
+use AppBundle\Document\IdentityLog;
 use AppBundle\Repository\Invitation\EmailInvitationRepository;
 use AppBundle\Service\JudopayService;
 use PhpParser\Node\Expr\AssignOp\Mul;
@@ -3258,6 +3259,70 @@ class ApiAuthControllerTest extends BaseApiControllerTest
             'name' => 'Invitation Name',
         ]);
         $data = $this->verifyResponse(422, ApiErrorCode::ERROR_INVITATION_SELF_INVITATION);
+    }
+
+    public function testUnableToInviteSelfScodeApp()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testUnableToInviteSelfScodeApp', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
+        $policyData = $this->verifyResponse(200);
+
+        $this->payPolicy($user, $policyData['id']);
+        $url = sprintf("/api/v1/auth/policy/%s/invitation?debug=true", $policyData['id']);
+
+        $repo = static::$dm->getRepository(Policy::class);
+        /** @var Policy $policy */
+        $policy = $repo->find($policyData['id']);
+        $this->assertNotNull($policy);
+        if ($policy) {
+            $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+                'scode' => $policy->getStandardSCode() ? $policy->getStandardSCode()->getCode() : null
+            ]);
+            $data = $this->verifyResponse(422, ApiErrorCode::ERROR_INVITATION_SELF_INVITATION);
+
+            $updatedPolicy = $this->assertPolicyExists(self::$container, $policy);
+            $this->assertCount(1, $updatedPolicy->getSentInvitations(false));
+        }
+    }
+
+    public function testUnableToInviteSelfScodeJs()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testUnableToInviteSelfScodeJs', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
+        $policyData = $this->verifyResponse(200);
+
+        $this->payPolicy($user, $policyData['id']);
+        $url = sprintf("/api/v1/auth/policy/%s/invitation?debug=true", $policyData['id']);
+
+        $repo = static::$dm->getRepository(Policy::class);
+        /** @var Policy $policy */
+        $policy = $repo->find($policyData['id']);
+        $this->assertNotNull($policy);
+        if ($policy) {
+            $crawler = static::postRequest(
+                self::$client,
+                $cognitoIdentityId,
+                $url,
+                [
+                    'scode' => $policy->getStandardSCode() ? $policy->getStandardSCode()->getCode() : null
+                ],
+                IdentityLog::SDK_JAVASCRIPT
+            );
+            $data = $this->verifyResponse(422, ApiErrorCode::ERROR_INVITATION_SELF_INVITATION);
+
+            $updatedPolicy = $this->assertPolicyExists(self::$container, $policy);
+            $this->assertCount(0, $updatedPolicy->getSentInvitations(false));
+        }
     }
 
     public function testUnableToCrossInvite()
