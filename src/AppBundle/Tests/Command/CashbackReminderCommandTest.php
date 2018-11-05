@@ -51,9 +51,7 @@ class CashbackReminderCommandTest extends BaseControllerTest
         $policy->getUser()->setEmail(self::generateEmail('foobar', $this));
         $policy->setStatus(Policy::STATUS_EXPIRED);
 
-        $cashback = self::createCashback(new \DateTime(), Cashback::STATUS_PENDING_PAYMENT);
-
-        $policy->setCashback($cashback);
+        $cashback = self::createCashback($policy, new \DateTime(), Cashback::STATUS_PENDING_PAYMENT);
 
         self::$dm->persist($cashback);
         self::$dm->persist($policy->getUser());
