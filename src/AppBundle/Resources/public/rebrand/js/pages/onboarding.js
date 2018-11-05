@@ -11,51 +11,52 @@ require('jssocials');
 let Clipboard = require('clipboard');
 
 $(function() {
+    const carousel = $('#onboarding-carousel');
+    const onNavMb  = $('.onboarding-controls__mobile');
+    const onNavDt = $('.onboarding-nav__desktop');
 
-    const carousel = $('#onboarding-carousel'),
-          onNavMb  = $('.onboarding-controls__mobile'),
-          onbNavDt = $('.onboarding-nav__desktop');
-          // totalSlides = $('.carousel-item').length;
+    let slide = function(e) {
+        const slides = [
+            [null, 'next'],
+            ['prev', 'next'],
+            ['prev', 4],
+            [1, 4],
+            [2, 'login']
+        ];
 
-          // console.log(totalSlides);
-
-    // TODO: Make dynamic
-    carousel.on('slide.bs.carousel', function(e){
-
+        // Mobile navigation
         if (onNavMb.length) {
-            // If slide is greater than one add skip button
-            if (e.to > 1) {
-                $('#onboarding-btn--next').addClass('btn-hide');
-                $('#onboarding-btn--skip').removeClass('btn-hide');
-            }
+            let slide = slides[e.to];
+            let prev = $('#onboarding-btn--prev');
+            let next = $('#onboarding-btn--next');
+            let login = $('#onboarding-btn--login');
+            let skip = [$('#onboarding-btn--prev-skip'), $('#onboarding-btn--skip')];
 
-            // If slide is last slide add login
-            if (e.to == 4) {
-                $('#onboarding-btn--skip').addClass('btn-hide');
-                $('#onboarding-btn--login').removeClass('btn-hide');
-            }
-        }
-
-        if (onbNavDt.length) {
-
-            let activeItem = $('.onboarding-nav__inner.active');
-
-            let nextItem = (activeItem) =>  {
-                activeItem.removeClass('active').next().addClass('active');
-            }
-
-            if (e.to == 1) {
-                nextItem(activeItem);
-            }
-            if (e.to == 2) {
-                nextItem(activeItem);
-            }
-            if (e.to == 4) {
-                nextItem(activeItem);
+            prev.toggleClass('btn-hide', slide[0] != 'prev');
+            next.toggleClass('btn-hide', slide[1] != 'next');
+            login.toggleClass('btn-hide', slide[1] != 'login');
+            for (let i = 0; i < 2; i++) {
+                if (typeof slide[i] == 'number') {
+                    skip[i].removeClass('btn-hide');
+                    skip[i].attr('data-slide-to', slide[i])
+                } else {
+                    skip[i].addClass('btn-hide');
+                }
             }
         }
 
-    });
+        // Desktop navigation
+        if (onNavDt.length) {
+            onNavDt.children().each(function() {
+                let link = $(this).find("a");
+                $(this).toggleClass('active', link.attr("data-slide-to") == e.to);
+            })
+        }
+    }
+
+    // when the carousel is triggered control the navigation buttons and set them at start
+    carousel.on('slide.bs.carousel', slide);
+    slide({"to": 0});
 
     // Copy scode
     let clipboard = new Clipboard('.btn-copy');
@@ -94,6 +95,3 @@ $(function() {
     });
 
 });
-
-
-

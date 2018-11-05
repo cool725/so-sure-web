@@ -94,6 +94,7 @@ use AppBundle\Exception\InvalidPremiumException;
 use AppBundle\Exception\InvalidUserDetailsException;
 use AppBundle\Exception\GeoRestrictedException;
 use AppBundle\Exception\DuplicateImeiException;
+use AppBundle\Exception\DuplicateInvitationException;
 use AppBundle\Exception\LostStolenImeiException;
 use AppBundle\Exception\InvalidImeiException;
 use AppBundle\Exception\ImeiBlacklistedException;
@@ -1219,6 +1220,7 @@ class UserController extends BaseController
     {
         $dm = $this->getManager();
         $user = $this->getUser();
+        $invitationService = $this->get('app.invitation');
 
         if (!$user->hasActivePolicy() && !$user->hasUnpaidPolicy()) {
             return new RedirectResponse($this->generateUrl('user_invalid_policy'));
@@ -1530,6 +1532,8 @@ class UserController extends BaseController
             $policy = $user->getLatestPolicy();
         }
         $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
+
+        // TODO: see what happens when the user is not authenticated / details are wrong
 
         $response = new BinaryFileResponse($policyService->generatePolicyTerms($policy, true));
         $response->headers->set('Content-Type', 'application/pdf');
