@@ -2,6 +2,8 @@
 
 namespace AppBundle\Tests\Service;
 
+use AppBundle\Document\IdentityLog;
+use AppBundle\Exception\SelfInviteException;
 use AppBundle\Repository\PolicyRepository;
 use AppBundle\Service\RouterService;
 use FOS\UserBundle\Model\UserManagerInterface;
@@ -51,6 +53,8 @@ class InvitationServiceTest extends WebTestCase
     /** @var DocumentManager */
     protected static $dm;
     protected static $userRepo;
+
+    /** @var InvitationService */
     protected static $invitationService;
     protected static $phone2;
     protected static $scodeService;
@@ -1299,6 +1303,46 @@ class InvitationServiceTest extends WebTestCase
         $invitation = self::$invitationService->inviteByEmail($policy, static::generateEmail('user9', $this));
     }
 
+    public function testSCodeInvitationSelf()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testSCodeInvitationSelf', $this),
+            'bar'
+        );
+        $policy = static::initPolicy($user, static::$dm, static::$phone, null, false, true);
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+
+        $this->assertCount(0, $policy->getSentInvitations(false));
+
+        $exceptionThrown = false;
+        try {
+            $invitation = self::$invitationService->inviteBySCode($policy, $policy->getStandardSCode()->getCode());
+        } catch (SelfInviteException $e) {
+            $exceptionThrown = true;
+        }
+
+        $this->assertTrue($exceptionThrown);
+        $updatedPolicy = $this->assertPolicyExists(self::$container, $policy);
+        $this->assertCount(0, $updatedPolicy->getSentInvitations(false));
+
+        $exceptionThrown = false;
+        try {
+            $invitation = self::$invitationService->inviteBySCode(
+                $policy,
+                $policy->getStandardSCode()->getCode(),
+                null,
+                IdentityLog::SDK_ANDROID
+            );
+        } catch (SelfInviteException $e) {
+            $exceptionThrown = true;
+        }
+
+        $this->assertTrue($exceptionThrown);
+        $updatedPolicy = $this->assertPolicyExists(self::$container, $policy);
+        $this->assertCount(1, $updatedPolicy->getSentInvitations(false));
+    }
+
     /**
      * @expectedException AppBundle\Exception\FullPotException
      */
@@ -2235,7 +2279,9 @@ class InvitationServiceTest extends WebTestCase
                 $inviteeEmail
             );
             $this->assertTrue($invitation instanceof EmailInvitation);
-            self::$invitationService->accept($invitation, $policy, $date);
+            if ($policy) {
+                self::$invitationService->accept($invitation, $policy, $date);
+            }
         }
 
         return $newPolicy;
