@@ -4,6 +4,7 @@ namespace AppBundle\Service;
 use AppBundle\Classes\SoSure;
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\File\JudoFile;
+use AppBundle\Document\IdentityLog;
 use AppBundle\Repository\JudoPaymentRepository;
 use AppBundle\Repository\ScheduledPaymentRepository;
 use Psr\Log\LoggerInterface;
@@ -291,13 +292,14 @@ class JudopayService
     }
 
     /**
-     * @param Policy    $policy
-     * @param string    $receiptId
-     * @param string    $consumerToken
-     * @param string    $cardToken     Can be null if card is declined
-     * @param string    $source        Source of the payment
-     * @param string    $deviceDna     Optional device dna data (json encoded) for judoshield
-     * @param \DateTime $date
+     * @param Policy      $policy
+     * @param string      $receiptId
+     * @param string      $consumerToken
+     * @param string      $cardToken     Can be null if card is declined
+     * @param string      $source        Source of the payment
+     * @param string      $deviceDna     Optional device dna data (json encoded) for judoshield
+     * @param \DateTime   $date
+     * @param IdentityLog $identityLog
      */
     public function add(
         Policy $policy,
@@ -306,7 +308,8 @@ class JudopayService
         $cardToken,
         $source,
         $deviceDna = null,
-        \DateTime $date = null
+        \DateTime $date = null,
+        IdentityLog $identityLog = null
     ) {
         $this->statsd->startTiming("judopay.add");
         // doesn't make sense to add payments for expired policies
@@ -349,7 +352,7 @@ class JudopayService
                 $date
             );
 
-            $this->policyService->create($policy, $date, true);
+            $this->policyService->create($policy, $date, true, null, $identityLog);
             $this->dm->flush();
         } else {
             // Existing policy - add payment + prevent duplicate billing

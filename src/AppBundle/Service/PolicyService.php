@@ -439,8 +439,13 @@ class PolicyService
         }
     }
 
-    public function create(Policy $policy, \DateTime $date = null, $setActive = false, $numPayments = null)
-    {
+    public function create(
+        Policy $policy,
+        \DateTime $date = null,
+        $setActive = false,
+        $numPayments = null,
+        IdentityLog $identityLog = null
+    ) {
         $this->statsd->startTiming("policy.create");
         try {
             if (!$date) {
@@ -513,6 +518,9 @@ class PolicyService
             }
 
             $this->setPromoCode($policy);
+            if ($identityLog) {
+                $policy->setIdentityLog($identityLog);
+            }
 
             $this->dm->flush();
 
