@@ -1,0 +1,46 @@
+<div class="modal fade" id="confirmModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document" style="width: 50%">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+              aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title">Changing IMEI</h4>
+      </div>
+      <div class="modal-body">
+        <h3>Warning</h3>
+        <p id="confirm-msg"></p>
+
+        {% if is_granted('ROLE_CUSTOMER_SERVICES') %}
+          <tr id="update-button-row">
+            <td>
+              <button type="button" class="btn" data-dismiss="modal">Cancel</button>
+            </td>
+            <td>
+              <button id="update-button" class="btn btn-danger">Update</button>
+            </td>
+          </tr>
+        {% endif %}
+        </table>
+      </div>
+      <div class="modal-footer">
+
+        {% if is_granted('ROLE_CUSTOMER_SERVICES') %}
+          <form id="change-imei-form" method="POST" action="{{ path('admin_claims_delete_claim') }}">
+            <input type="hidden" name="id" id="claims-detail-delete-id"></input>
+            <input type="hidden" name="token" value="{{ csrf_token('default') }}"></input>
+          </form>
+        {% endif %}
+
+        <button type="button" class="btn-xs btn-black-hollow" data-dismiss="modal">Close</button>
+        </form>
+        {% if is_granted('ROLE_CUSTOMER_SERVICES') %}
+          <form id="delete-claim-form" method="POST" action="{{ path('admin_claims_delete_claim') }}">
+            <input type="hidden" name="id" id="claims-detail-delete-id"></input>
+            <input type="hidden" name="token" value="{{ csrf_token('default') }}"></input>
+          </form>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>

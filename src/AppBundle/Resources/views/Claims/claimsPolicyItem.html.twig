@@ -1042,6 +1042,7 @@
                 {% endif %}
             </table>
             {% if is_granted('ROLE_CUSTOMER_SERVICES') %}
+
             <h3>Update Policy</h3>
             <table class="table table-striped">
                 <tr>
@@ -1065,6 +1066,12 @@
                 <tr>
                     <td>Imei</td>
                     <td>
+                      <button type="button" class="btn btn-link"
+                              data-toggle="modal"
+                              data-target="#confirmModal"
+                              data-checkboxes="{'Are you sure?', 'This is right?', 'Check again'}"
+                              data-confirm-msg="Are you sure you want to update this imei? This should only be done if the phone imei was incorrectly entered
+          or post claim once the IMEI has changed. This will trigger a Salva Policy Update.">Open Modal</button>
                       {{ form_start(imei_form, {'attr': {'class': 'form-inline'}}) }}
                       <div class="form-group">
                           {{ form_errors(imei_form.imei) }}
@@ -1392,6 +1399,8 @@
     {% endif %}
 
     {% include 'AppBundle::Claims/claimsModal.html.twig' with {'route': 'admin_policy', 'policyId': policy.id  } %}
+
+    {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'admin_policy', 'policyId': policy.id  } %}
 
     {% if is_granted('ROLE_ADMIN') %}
     <div class="modal fade" id="bacsModal" tabindex="-1" role="dialog">
