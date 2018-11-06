@@ -27,6 +27,12 @@ $kernel = new AppKernel('testing', false);
 // When using the HttpCache, you need to call the method in your front controller instead of relying on the configuration parameter
 //Request::enableHttpMethodParameterOverride();
 $request = Request::createFromGlobals();
+Request::setTrustedProxies(
+// trust *all* requests
+    array('127.0.0.1', $request->server->get('REMOTE_ADDR')),
+    // if you're using ELB, otherwise use a constant from above
+    Request::HEADER_X_FORWARDED_AWS_ELB
+);
 $response = $kernel->handle($request);
 $response->send();
 $kernel->terminate($request, $response);
