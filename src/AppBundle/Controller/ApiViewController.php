@@ -13,7 +13,6 @@ use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Policy;
 use AppBundle\Document\Feature;
-use AppBundle\Form\Type\PhoneType;
 use AppBundle\Document\PolicyTerms;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Response;

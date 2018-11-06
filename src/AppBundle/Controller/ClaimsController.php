@@ -21,7 +21,6 @@ use AppBundle\Document\Policy;
 use AppBundle\Document\User;
 use AppBundle\Document\Form\ClaimsCheck;
 use AppBundle\Document\Form\CrimeRef;
-use AppBundle\Form\Type\PhoneType;
 use AppBundle\Form\Type\NoteType;
 use AppBundle\Form\Type\ClaimType;
 use AppBundle\Form\Type\ClaimCrimeRefType;

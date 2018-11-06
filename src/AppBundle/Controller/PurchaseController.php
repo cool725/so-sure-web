@@ -67,7 +67,6 @@ use AppBundle\Document\Form\PurchaseStepPhone;
 
 use AppBundle\Form\Type\ImeiUploadFileType;
 use AppBundle\Form\Type\BasicUserType;
-use AppBundle\Form\Type\PhoneType;
 use AppBundle\Form\Type\PurchaseStepPersonalAddressType;
 use AppBundle\Form\Type\PurchaseStepPersonalAddressDropdownType;
 use AppBundle\Form\Type\PurchaseStepPersonalType;
