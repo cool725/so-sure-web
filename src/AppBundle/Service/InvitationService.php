@@ -1,6 +1,8 @@
 <?php
 namespace AppBundle\Service;
 
+use AppBundle\Document\IdentityLog;
+use AppBundle\Document\Invitation\AppNativeShareInvitation;
 use AppBundle\Repository\ConnectionRepository;
 use AppBundle\Repository\Invitation\EmailInvitationRepository;
 use AppBundle\Repository\Invitation\FacebookInvitationRepository;
@@ -10,6 +12,7 @@ use AppBundle\Repository\OptOut\EmailOptOutRepository;
 use AppBundle\Repository\OptOut\SmsOptOutRepository;
 use AppBundle\Repository\SCodeRepository;
 use AppBundle\Repository\UserRepository;
+use Doctrine\ORM\Mapping\Id;
 use Psr\Log\LoggerInterface;
 
 use AppBundle\Classes\SoSure;
@@ -366,7 +369,7 @@ class InvitationService
         if (!$invitation) {
             $invitation = new EmailInvitation();
             $invitation->setEmail($email);
-            $invitation->setPolicy($policy);
+            $policy->addInvitation($invitation);
             $invitation->setName($name);
             $this->setInvitee($invitation);
             $invitation->invite();
@@ -443,7 +446,7 @@ class InvitationService
         if (!$invitation) {
             $invitation = new SmsInvitation();
             $invitation->setMobile($mobile);
-            $invitation->setPolicy($policy);
+            $policy->addInvitation($invitation);
             $invitation->setName($name);
             $this->setInvitee($invitation);
             $invitation->invite();
@@ -476,7 +479,7 @@ class InvitationService
         return $invitation;
     }
 
-    public function inviteBySCode(Policy $policy, $code, \DateTime $date = null)
+    public function inviteBySCode(Policy $policy, $code, \DateTime $date = null, $sdk = IdentityLog::SDK_UNKNOWN)
     {
         // check scode for url and resolve
         $code = $this->resolveSCode($code);
@@ -504,7 +507,19 @@ class InvitationService
 
         $this->validatePolicy($policy);
         $this->validateSoSurePolicyEmail($policy, $user->getEmail());
-        $this->validateNotConnectedByUser($policy, $user);
+        try {
+            $this->validateNotConnectedByUser($policy, $user);
+        } catch (SelfInviteException $e) {
+            if (in_array($sdk, [IdentityLog::SDK_ANDROID, IdentityLog::SDK_IOS])) {
+                $appNativeShare = new AppNativeShareInvitation();
+                $policy->addInvitation($appNativeShare);
+
+                $this->dm->persist($appNativeShare);
+                $this->dm->flush();
+            }
+
+            throw $e;
+        }
 
         if ($scode->isReward()) {
             $this->addReward($policy, $scode->getReward());
@@ -553,7 +568,7 @@ class InvitationService
             $invitation = new SCodeInvitation();
             $invitation->setEmail($user->getEmail());
             $invitation->setSCode($scode);
-            $invitation->setPolicy($policy);
+            $policy->addInvitation($invitation);
             $invitation->setName($user->getName());
             $this->setInvitee($invitation, $user);
             $invitation->invite();
@@ -669,7 +684,7 @@ class InvitationService
             $invitation = new FacebookInvitation();
             $invitation->setFacebookId($facebookId);
             $invitation->setEmail($user->getEmail());
-            $invitation->setPolicy($policy);
+            $policy->addInvitation($invitation);
             $invitation->setName($user->getName());
             $this->setInvitee($invitation, $user);
             $invitation->invite();

@@ -3,7 +3,13 @@ imports:
 
 framework:
     # 10.* required for the elb load balancing health check
-    trusted_hosts: ['api.staging.so-sure.net','staging.wearesosure.com', '10\.\d+\.\d+\.\d+']
+    # 127.0.0.1/localhost required for varnish health check
+    trusted_hosts:
+        - 'api.staging.so-sure.net'
+        - 'staging.wearesosure.com'
+        - '127.0.0.1'
+        - 'localhost'
+        - '10\.\d+\.\d+\.\d+'
     router:
         resource: "%kernel.root_dir%/config/routing_errors.yml"
         strict_requirements: true
@@ -17,7 +23,6 @@ framework:
 #        metadata_cache_driver: apc
 #        result_cache_driver: apc
 #        query_cache_driver: apc
-framework:
     session:
         cookie_secure: true
 

@@ -4,6 +4,7 @@ namespace AppBundle\Tests;
 
 use AppBundle\Document\BacsPaymentMethod;
 use AppBundle\Document\BankAccount;
+use AppBundle\Document\IdentityLog;
 use AppBundle\Document\JudoPaymentMethod;
 use AppBundle\Document\User;
 use AppBundle\Document\Phone;
@@ -21,7 +22,9 @@ use AppBundle\Document\Connection\StandardConnection;
 use AppBundle\Document\Connection\RenewalConnection;
 use AppBundle\Classes\Salva;
 use AppBundle\Document\PhonePolicy;
+use AppBundle\Security\CognitoIdentityAuthenticator;
 use AppBundle\Security\FOSUBUserProvider;
+use AppBundle\Service\CognitoIdentityService;
 use AppBundle\Service\PolicyService;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use FOS\UserBundle\Model\UserManagerInterface;
@@ -434,19 +437,19 @@ trait UserClassTrait
         return $identityId;
     }
 
-    public static function postRequest($client, $cognitoIdentityId, $url, $body)
+    public static function postRequest($client, $cognitoIdentityId, $url, $body, $sdk = IdentityLog::SDK_IOS)
     {
-        return self::cognitoRequest($client, $cognitoIdentityId, $url, $body, "POST");
+        return self::cognitoRequest($client, $cognitoIdentityId, $url, $body, "POST", $sdk);
     }
 
-    public static function putRequest($client, $cognitoIdentityId, $url, $body)
+    public static function putRequest($client, $cognitoIdentityId, $url, $body, $sdk = IdentityLog::SDK_IOS)
     {
-        return self::cognitoRequest($client, $cognitoIdentityId, $url, $body, "PUT");
+        return self::cognitoRequest($client, $cognitoIdentityId, $url, $body, "PUT", $sdk);
     }
 
-    public static function deleteRequest($client, $cognitoIdentityId, $url, $body)
+    public static function deleteRequest($client, $cognitoIdentityId, $url, $body, $sdk = IdentityLog::SDK_IOS)
     {
-        return self::cognitoRequest($client, $cognitoIdentityId, $url, $body, "DELETE");
+        return self::cognitoRequest($client, $cognitoIdentityId, $url, $body, "DELETE", $sdk);
     }
 
     public static function clearEmail($container)
@@ -455,8 +458,23 @@ trait UserClassTrait
         $redis->del('swiftmailer');
     }
 
-    private static function cognitoRequest($client, $cognitoIdentityId, $url, $body, $method)
-    {
+    private static function cognitoRequest(
+        $client,
+        $cognitoIdentityId,
+        $url,
+        $body,
+        $method,
+        $sdk = IdentityLog::SDK_IOS
+    ) {
+        $userAgent = '';
+        if ($sdk == IdentityLog::SDK_IOS) {
+            $userAgent = CognitoIdentityAuthenticator::USER_AGENT_IOS;
+        } elseif ($sdk == IdentityLog::SDK_ANDROID) {
+            $userAgent = CognitoIdentityAuthenticator::USER_AGENT_ANDROID;
+        } elseif ($sdk == IdentityLog::SDK_JAVASCRIPT) {
+            $userAgent = CognitoIdentityAuthenticator::USER_AGENT_JAVASCRIPT;
+        }
+
         return $client->request(
             $method,
             $url,
@@ -469,6 +487,7 @@ trait UserClassTrait
                 'body' => $body,
                 'cognitoIdentityId' => $cognitoIdentityId,
                 'sourceIp' => '62.253.24.189',
+                'userAgent' => $userAgent,
             ))
         );
     }

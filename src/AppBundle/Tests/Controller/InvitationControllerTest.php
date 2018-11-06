@@ -45,7 +45,7 @@ class InvitationControllerTest extends BaseControllerTest
         $policy->setStatus(Policy::STATUS_ACTIVE);
 
         $invitation = new EmailInvitation();
-        $invitation->setPolicy($policy);
+        $policy->addInvitation($invitation);
         $invitation->setStatus(EmailInvitation::STATUS_SENT);
         $invitation->setEmail($emailInvitee);
         self::$dm->persist($invitation);
