@@ -49,8 +49,11 @@ $(function() {
         if (onNavDt.length) {
             onNavDt.children().each(function() {
                 let link = $(this).find("a");
-                $(this).toggleClass('active', link.attr("data-slide-to") == e.to);
-            })
+                $(this).toggleClass(
+                    'active',
+                    link.attr("data-slide-to") == e.to || link.attr("data-secondary-page") == e.to
+                );
+            });
         }
     }
 
