@@ -6,6 +6,7 @@ use AppBundle\Document\CurrencyTrait;
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\Payment\BacsPayment;
 use AppBundle\Document\ScheduledPayment;
+use AppBundle\Document\File\PolicyTermsFile;
 use AppBundle\Security\UserVoter;
 use AppBundle\Security\ClaimVoter;
 use AppBundle\Service\BacsService;
@@ -1298,10 +1299,15 @@ class UserController extends BaseController
             [$policy->getStandardSCode()->getShareLink(), $policy->getStandardSCode()->getCode()]
         );
 
+        foreach ($policy->getPolicyFiles() as $file) {
+            echo "aaa";
+        }
+
         $data = array(
             'cancel_url' => $this->generateUrl('purchase_cancel_damaged', ['id' => $user->getLatestPolicy()->getId()]),
             'policy_key' => $this->getParameter('policy_key'),
-            'policy' => $user->getLatestPolicy(),
+            'policy' => $policy,
+            'policy_terms_file' => $policy->getPolicyTermsFiles()[0],
             'has_visited_welcome_page' => $pageVisited,
             'oauth2FlowParams' => $oauth2FlowParams,
             'email_form' => $emailInvitationForm->createView(),
@@ -1517,30 +1523,6 @@ class UserController extends BaseController
         ];
     }
 
-    /**
-     * @Route("/policy-pdf/{policyId}", name="user_policy_pdf")
-     */
-    public function policyDetailsPdfAction($policyId = null)
-    {
-        $policyService = $this->get('app.policy');
-        $user = $this->getUser();
-        $dm = $this->getManager();
-        $policyRepo = $dm->getRepository(Policy::class);
-        if ($policyId) {
-            $policy = $policyRepo->find($policyId);
-        } else {
-            $policy = $user->getLatestPolicy();
-        }
-        $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
-
-        // TODO: see what happens when the user is not authenticated / details are wrong
-
-        $response = new BinaryFileResponse($policyService->generatePolicyTerms($policy, true));
-        $response->headers->set('Content-Type', 'application/pdf');
-        $response->setContentDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT, 'yourPolicy.pdf');
-
-        return $response;
-    }
 
     /**
      * @Route("/list", name="user_policy_list")
