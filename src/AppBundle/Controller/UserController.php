@@ -1222,6 +1222,7 @@ class UserController extends BaseController
         $dm = $this->getManager();
         $user = $this->getUser();
         $invitationService = $this->get('app.invitation');
+        $policyService = $this->get('app.policy');
 
         if (!$user->hasActivePolicy() && !$user->hasUnpaidPolicy()) {
             return new RedirectResponse($this->generateUrl('user_invalid_policy'));
@@ -1299,8 +1300,12 @@ class UserController extends BaseController
             [$policy->getStandardSCode()->getShareLink(), $policy->getStandardSCode()->getCode()]
         );
 
+        // if the policy file has not been generated, then that must be done before we can let them download.
         $policyTermsFile = $policy->getLatestPolicyTermsFile();
-        echo $policyTermsFile;
+        if (!$policyTermsFile) {
+            $policyService->generatePolicyTerms($policy);
+            $policyTermsFile = $policy->getLatestPolicyTermsFile();
+        }
 
         $data = array(
             'cancel_url' => $this->generateUrl('purchase_cancel_damaged', ['id' => $user->getLatestPolicy()->getId()]),

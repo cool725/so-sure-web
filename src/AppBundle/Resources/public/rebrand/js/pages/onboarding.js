@@ -46,6 +46,8 @@ $(function() {
         }
 
         // Desktop navigation
+        // IDEA: If I were using this more I could change the data-secondary-page thing so be a maximum and allow
+        //       each navigation button to represent a range of slides.
         onNavDt.children().each(function() {
             let link = $(this).find("a");
             $(this).toggleClass(
