@@ -1299,15 +1299,14 @@ class UserController extends BaseController
             [$policy->getStandardSCode()->getShareLink(), $policy->getStandardSCode()->getCode()]
         );
 
-        foreach ($policy->getPolicyFiles() as $file) {
-            echo "aaa";
-        }
+        $policyTermsFile = $policy->getLatestPolicyTermsFile();
+        echo $policyTermsFile;
 
         $data = array(
             'cancel_url' => $this->generateUrl('purchase_cancel_damaged', ['id' => $user->getLatestPolicy()->getId()]),
             'policy_key' => $this->getParameter('policy_key'),
             'policy' => $policy,
-            'policy_terms_file' => $policy->getPolicyTermsFiles()[0],
+            'policy_terms_file' => $policyTermsFile,
             'has_visited_welcome_page' => $pageVisited,
             'oauth2FlowParams' => $oauth2FlowParams,
             'email_form' => $emailInvitationForm->createView(),

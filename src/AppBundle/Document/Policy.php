@@ -1864,6 +1864,20 @@ abstract class Policy
         return $this->getPolicyFilesByType(PolicyTermsFile::class);
     }
 
+    /**
+     * Returns the most recent policy terms file object that this policy is linked to
+     * @return PolicyTermsFile the file
+     * @throws \InvalidArgumentException if there are no files
+     */
+    public function getLatestPolicyTermsFile()
+    {
+        foreach ($this->getPolicyTermsFiles() as $file) {
+            return $file;
+        }
+        // TODO: bit of a random error to throw, maybe I should just return null or something.
+        throw new \InvalidArgumentException("There are no policy terms files for policy {$this->id}");
+    }
+
     public function addPolicyFile(S3File $file)
     {
         $this->policyFiles[] = $file;
