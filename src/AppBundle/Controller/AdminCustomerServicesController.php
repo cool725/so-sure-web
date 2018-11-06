@@ -75,7 +75,6 @@ use AppBundle\Form\Type\ClaimType;
 use AppBundle\Form\Type\CashbackSearchType;
 use AppBundle\Form\Type\ClaimFlagsType;
 use AppBundle\Form\Type\ChargebackType;
-use AppBundle\Form\Type\PhoneType;
 use AppBundle\Form\Type\ImeiType;
 use AppBundle\Form\Type\NoteType;
 use AppBundle\Form\Type\EmailOptOutType;

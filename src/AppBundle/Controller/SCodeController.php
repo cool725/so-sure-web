@@ -12,7 +12,6 @@ use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\SCode;
 use AppBundle\Service\MixpanelService;
 use AppBundle\Service\SixpackService;
-use AppBundle\Form\Type\PhoneType;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
