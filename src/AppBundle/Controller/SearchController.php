@@ -35,7 +35,6 @@ use Symfony\Component\HttpFoundation\Response;
 // use AppBundle\Form\Type\LeadEmailType;
 // use AppBundle\Form\Type\RegisterUserType;
 use AppBundle\Form\Type\PhoneMakeType;
-// use AppBundle\Form\Type\PhoneType;
 // use AppBundle\Form\Type\SmsAppLinkType;
 // use AppBundle\Form\Type\ClaimFnolType;
 

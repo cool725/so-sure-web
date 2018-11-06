@@ -1174,7 +1174,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             'user_history' => $this->getUserHistory($policy->getUser()->getId()),
             'suggested_cancellation_date' => $now->add(new \DateInterval('P30D')),
             'claim_types' => Claim::$claimTypes,
-            'phones' => $dm->getRepository(Phone::class)->findActive()->getQuery()->execute(),
+            'phones' => $dm->getRepository(Phone::class)->findActiveInactive()->getQuery()->execute(),
             'now' => \DateTime::createFromFormat('U', time()),
             'previousPicSureStatus' => $previousPicSureStatus,
             'hadInvalidPicSureStatus' => $hadInvalidPicSureStatus,

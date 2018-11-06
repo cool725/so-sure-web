@@ -10,7 +10,6 @@ use AppBundle\Document\Invitation\Invitation;
 use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Service\MixpanelService;
-use AppBundle\Form\Type\PhoneType;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;

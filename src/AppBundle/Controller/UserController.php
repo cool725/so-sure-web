@@ -43,7 +43,6 @@ use AppBundle\Document\Form\ClaimFnolTheftLoss;
 use AppBundle\Document\Form\ClaimFnolUpdate;
 use AppBundle\Form\Type\BacsType;
 use AppBundle\Form\Type\BacsConfirmType;
-use AppBundle\Form\Type\PhoneType;
 use AppBundle\Form\Type\EmailInvitationType;
 use AppBundle\Form\Type\UserEmailType;
 use AppBundle\Form\Type\SCodeInvitationType;

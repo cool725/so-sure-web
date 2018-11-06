@@ -20,7 +20,7 @@ class PhoneType extends AbstractType
                     'placeholder' => 'Select your device',
                     'class' => 'AppBundle:Phone',
                     'query_builder' => function (PhoneRepository $dr) {
-                        return $dr->findActive();
+                        return $dr->findActiveInactive();
                     }
             ])
             ->add('next', SubmitType::class)

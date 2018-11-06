@@ -9,7 +9,6 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use AppBundle\Form\Type\LaunchType;
-use AppBundle\Form\Type\PhoneType;
 
 use AppBundle\Document\Address;
 use AppBundle\Document\Phone;
