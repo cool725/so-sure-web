@@ -2,34 +2,21 @@
 
 namespace AppBundle\Command;
 
-use AppBundle\Document\Cashback;
-use AppBundle\Document\Policy;
 use AppBundle\Service\PolicyService;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
-use AppBundle\Service\MailerService;
-use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Templating\EngineInterface;
 
 class CashbackReminderCommand extends ContainerAwareCommand
 {
-    /** @var DocumentManager */
-    protected $dm;
-
     /** @var PolicyService */
     protected $policyService;
 
-    /** @var MailerService */
-    protected $mailer;
-
-    public function __construct(DocumentManager $dm, PolicyService $policyService, MailerService $mailer)
+    public function __construct(PolicyService $policyService)
     {
         parent::__construct();
-        $this->dm = $dm;
         $this->policyService = $policyService;
-        $this->mailer = $mailer;
     }
 
     protected function configure()
