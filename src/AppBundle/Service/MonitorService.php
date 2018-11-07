@@ -29,6 +29,7 @@ use AppBundle\Repository\PolicyRepository;
 use AppBundle\Repository\UserRepository;
 use Doctrine\MongoDB\LoggableCollection;
 use Doctrine\ODM\MongoDB\DocumentManager;
+use MongoDB\Collection;
 use Psr\Log\LoggerInterface;
 
 class MonitorService
@@ -771,9 +772,17 @@ class MonitorService
         }
     }
 
+    /**
+     * @return \Doctrine\MongoDB\Database
+     */
+    public function getDocumentDatabase()
+    {
+        return $this->dm->getDocumentDatabase(Policy::class);
+    }
+
     public function checkSoSureRoles()
     {
-        $collections = $this->dm->getDocumentCollections();
+        $collections = $this->getDocumentDatabase()->listCollections();
 
         if (count($collections) == 0) {
             throw new MonitorException(
@@ -784,11 +793,9 @@ class MonitorService
         return $collections;
     }
 
-    public function checkSoSureRole($col)
+    public function checkSoSureRole(\MongoCollection $col)
     {
-        $db_name = $col->getDatabase()->getName();
-
-        $res = $this->dm->getConnection()->selectDatabase($db_name)->command([
+        $res = $this->getDocumentDatabase()->command([
             'rolesInfo' => 'so-sure-user',
             'showPrivileges' => true
             ]);

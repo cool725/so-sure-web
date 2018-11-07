@@ -305,8 +305,7 @@ class MonitorServiceTest extends WebTestCase
      */
     public function testCheckAllUserRolePriv()
     {
-        $dbName = self::$container->getParameter('mongodb_db');
-        $database = self::$dm->getConnection()->selectDatabase($dbName);
+        $database = self::$monitor->getDocumentDatabase();
 
         $database->command([
             'createRole' => 'so-sure-user',
