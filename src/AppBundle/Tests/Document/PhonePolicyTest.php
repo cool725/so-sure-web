@@ -3330,8 +3330,8 @@ class PhonePolicyTest extends WebTestCase
         self::setBacsPaymentMethod($policy->getUser(), BankAccount::MANDATE_PENDING_APPROVAL);
 
         $this->assertEquals(new \DateTime('2018-10-31'), $policy->getPolicyExpirationDate(new \DateTime('2018-09-01')));
-        $this->assertTrue($policy->canBacsPaymentBeMadeInTime(new \DateTime('2018-10-24')));
-        $this->assertFalse($policy->canBacsPaymentBeMadeInTime(new \DateTime('2018-10-25')));
+        $this->assertTrue($policy->canBacsPaymentBeMadeInTime(new \DateTime('2018-10-21')));
+        $this->assertFalse($policy->canBacsPaymentBeMadeInTime(new \DateTime('2018-10-22')));
     }
 
     public function testPolicyRenewalUnpaidExpirationDateYearly()
