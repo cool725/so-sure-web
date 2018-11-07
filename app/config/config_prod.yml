@@ -3,7 +3,14 @@ imports:
 
 framework:
     # 10.* required for the elb load balancing health check
-    trusted_hosts: ['wearesosure.com', '10\.\d+\.\d+\.\d+', 'api.so-sure.net', 'api.prod.so-sure.net']
+    # 127.0.0.1/localhost required for varnish health check
+    trusted_hosts:
+        - 'wearesosure.com'
+        - '10\.\d+\.\d+\.\d+'
+        - 'api.so-sure.net'
+        - 'api.prod.so-sure.net'
+        - '127.0.0.1'
+        - 'localhost'
     session:
         cookie_secure: true
 #    validation:
