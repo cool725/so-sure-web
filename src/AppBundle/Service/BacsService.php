@@ -1660,7 +1660,10 @@ class BacsService
 
             $bankAccount = $bacs->getBankAccount();
 
-            $metadata['credit-amount'] += $payment->getAmount();
+            // amount will be -, but bacs credit needs +
+            $normalisedPaymentAmount = 0 - $payment->getAmount();
+
+            $metadata['credit-amount'] += $normalisedPaymentAmount;
             $lines[] = implode(',', [
                 sprintf('"%s"', $date->format('d/m/y')),
                 '"Credit"',
@@ -1668,7 +1671,7 @@ class BacsService
                 sprintf('"%s"', $bankAccount->getAccountName()),
                 sprintf('"%s"', $bankAccount->getSortCode()),
                 sprintf('"%s"', $bankAccount->getAccountNumber()),
-                sprintf('"%0.2f"', 0 - $payment->getAmount()), // amount will be -, but bacs credit needs +
+                sprintf('"%0.2f"', $normalisedPaymentAmount),
                 sprintf('"%s"', $bankAccount->getReference()),
                 sprintf('"%s"', $payment->getPolicy()->getUser()->getId()),
                 sprintf('"%s"', $payment->getPolicy()->getId()),
