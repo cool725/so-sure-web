@@ -5170,13 +5170,15 @@ abstract class Policy
             $date = \DateTime::createFromFormat('U', time());
         }
 
-        $expirationDate = $this->getCurrentOrPreviousBusinessDay($this->getPolicyExpirationDate());
+        //print $this->getPolicyExpirationDate()->format(\DateTime::ATOM) . PHP_EOL;
+        $expirationDate = $this->getCurrentOrPreviousBusinessDay($this->getPolicyExpirationDate(), $date);
+        //print $expirationDate->format(\DateTime::ATOM) . PHP_EOL;
         // 2 additional days: 1 day to account for it possibly being after the bacs submission time for the day
         // and 1 day to account for policy expiration occurring before the bacs file for the day being uploaded
         $expirationDate = static::subBusinessDays($expirationDate, BacsPayment::DAYS_REVERSE + 2);
 
-        //print $date->format(\DateTime::ATOM);
-        //print $expirationDate->format(\DateTime::ATOM);
+        //print $date->format(\DateTime::ATOM) . PHP_EOL;
+        //print $expirationDate->format(\DateTime::ATOM) . PHP_EOL;
 
         return $this->startOfDay($expirationDate) >= $this->startOfDay($date);
     }
