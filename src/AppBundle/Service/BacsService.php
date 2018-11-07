@@ -555,7 +555,6 @@ class BacsService
                     if ($bankAccount->isMandateInProgress() || $bankAccount->isMandateSuccess()) {
                         $activePendingMandate = true;
                     }
-
                 }
             }
             if ($activePendingMandate && mb_stripos($returnDescription, "INSTRUCTION CANCELLED") !== false) {
