@@ -379,6 +379,11 @@ trait UserClassTrait
         $user->setPaymentMethod($bacs);
     }
 
+    public static function getRandomPolicyNumber($prefix)
+    {
+        return sprintf($prefix . '/2018/55' . str_pad(random_int(0, 99999), 5, '0'));
+    }
+
     public static function addSoSureStandardPayment($policy, $date = null, $refund = true, $monthly = true)
     {
         if ($monthly) {

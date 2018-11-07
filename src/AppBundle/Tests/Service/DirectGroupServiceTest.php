@@ -221,7 +221,7 @@ class DirectGroupServiceTest extends WebTestCase
         $policyOpen = static::createUserPolicy(true);
         $policyOpen->getUser()->setEmail(static::generateEmail('testSaveClaimsClosed-Open', $this));
         $claimOpen = new Claim();
-        $claimOpen->setNumber($this->getRandomPolicyNumber());
+        $claimOpen->setNumber(self::getRandomPolicyNumber('TEST'));
         $policyOpen->addClaim($claimOpen);
         $dgOpen = new DirectGroupHandlerClaim();
         $dgOpen->policyNumber = $policyOpen->getPolicyNumber();
@@ -232,7 +232,7 @@ class DirectGroupServiceTest extends WebTestCase
         $policyClosed = static::createUserPolicy(true);
         $policyClosed->getUser()->setEmail(static::generateEmail('testSaveClaimsClosed-Closed', $this));
         $claimClosed = new Claim();
-        $claimClosed->setNumber($this->getRandomPolicyNumber());
+        $claimClosed->setNumber(self::getRandomPolicyNumber('TEST'));
         $policyClosed->addClaim($claimClosed);
         $daviesClosed = new DirectGroupHandlerClaim();
         $daviesClosed->policyNumber = $policyClosed->getPolicyNumber();
@@ -252,7 +252,7 @@ class DirectGroupServiceTest extends WebTestCase
         $policyOpen = static::createUserPolicy(true);
         $policyOpen->getUser()->setEmail(static::generateEmail('testSaveClaimsDavies', $this));
         $claimOpen = new Claim();
-        $claimOpen->setNumber($this->getRandomPolicyNumber());
+        $claimOpen->setNumber(self::getRandomPolicyNumber('TEST'));
         $claimOpen->setHandlingTeam(Claim::TEAM_DAVIES);
         $policyOpen->addClaim($claimOpen);
         static::$dm->persist($policyOpen->getUser());
@@ -276,7 +276,7 @@ class DirectGroupServiceTest extends WebTestCase
         $policyOpen = static::createUserPolicy(true);
         $policyOpen->getUser()->setEmail(static::generateEmail('testSaveClaimsNoHandlingTeam', $this));
         $claimOpen = new Claim();
-        $claimOpen->setNumber($this->getRandomPolicyNumber());
+        $claimOpen->setNumber(self::getRandomPolicyNumber('TEST'));
         $policyOpen->addClaim($claimOpen);
         $dgOpen = new DirectGroupHandlerClaim();
         $dgOpen->policyNumber = $policyOpen->getPolicyNumber();
@@ -297,7 +297,7 @@ class DirectGroupServiceTest extends WebTestCase
         $policyOpen = static::createUserPolicy(true);
         $policyOpen->getUser()->setEmail(static::generateEmail('testSaveClaimsOpen-Open', $this));
         $claimOpen = new Claim();
-        $claimOpen->setNumber($this->getRandomPolicyNumber());
+        $claimOpen->setNumber(self::getRandomPolicyNumber('TEST'));
         $policyOpen->addClaim($claimOpen);
         $dgOpen = new DirectGroupHandlerClaim();
         $dgOpen->policyNumber = $policyOpen->getPolicyNumber();
@@ -492,15 +492,10 @@ class DirectGroupServiceTest extends WebTestCase
         return sprintf('%6d', rand(1, 999999));
     }
 
-    private function getRandomPolicyNumber()
-    {
-        return sprintf('TEST/2017/%6d', rand(1, 999999));
-    }
-
     public function testSaveClaimsOpenClosed()
     {
         $dgOpen = new DirectGroupHandlerClaim();
-        $dgOpen->policyNumber = $this->getRandomPolicyNumber();
+        $dgOpen->policyNumber = self::getRandomPolicyNumber('TEST');
         $dgOpen->claimNumber = 'a';
         $dgOpen->status = 'Open';
         $dgOpen->lossDate = new \DateTime('2017-01-01');
@@ -563,7 +558,7 @@ class DirectGroupServiceTest extends WebTestCase
     public function testSaveClaimsClosedOpen()
     {
         $dgOpen = new DirectGroupHandlerClaim();
-        $dgOpen->policyNumber = $this->getRandomPolicyNumber();
+        $dgOpen->policyNumber = self::getRandomPolicyNumber('TEST');
         $dgOpen->claimNumber = 'a';
         $dgOpen->status = 'Open';
         $dgOpen->lossDate = new \DateTime('2017-02-01');
