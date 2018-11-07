@@ -492,6 +492,9 @@ class AdminController extends BaseController
      */
     public function bacsAction(Request $request, $year = null, $month = null)
     {
+        // default 30s for prod is no longer enough
+        set_time_limit(300);
+
         $now = \DateTime::createFromFormat('U', time());
         if (!$year) {
             $year = $now->format('Y');
