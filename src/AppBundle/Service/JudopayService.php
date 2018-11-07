@@ -4,6 +4,7 @@ namespace AppBundle\Service;
 use AppBundle\Classes\SoSure;
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\File\JudoFile;
+use AppBundle\Document\IdentityLog;
 use AppBundle\Repository\JudoPaymentRepository;
 use AppBundle\Repository\ScheduledPaymentRepository;
 use Psr\Log\LoggerInterface;
@@ -238,7 +239,8 @@ class JudopayService
             // allow a few (5) minutes before warning if missing receipt
             if ($diff < 300) {
                 $data['skipped-too-soon']++;
-            } elseif ($receipt['type'] == 'Payment' && $receipt['result'] == JudoPayment::RESULT_SUCCESS) {
+            } elseif (in_array($receipt['type'], ['Payment', 'Refund']) &&
+                $receipt['result'] == JudoPayment::RESULT_SUCCESS) {
                 if (!$payment) {
                     if ($logMissing) {
                         $this->logger->error(sprintf(
@@ -266,7 +268,8 @@ class JudopayService
                 } else {
                     $data['validated']++;
                 }
-            } elseif ($receipt['type'] == 'Payment' && $receipt['result'] != JudoPayment::RESULT_SUCCESS) {
+            } elseif (in_array($receipt['type'], ['Payment', 'Refund']) &&
+                $receipt['result'] != JudoPayment::RESULT_SUCCESS) {
                 // can ignore failed missing payments
                 // however if our db thinks it successful and judo says its not, that's problematic
                 if ($payment && $payment->isSuccess()) {
@@ -291,13 +294,14 @@ class JudopayService
     }
 
     /**
-     * @param Policy    $policy
-     * @param string    $receiptId
-     * @param string    $consumerToken
-     * @param string    $cardToken     Can be null if card is declined
-     * @param string    $source        Source of the payment
-     * @param string    $deviceDna     Optional device dna data (json encoded) for judoshield
-     * @param \DateTime $date
+     * @param Policy      $policy
+     * @param string      $receiptId
+     * @param string      $consumerToken
+     * @param string      $cardToken     Can be null if card is declined
+     * @param string      $source        Source of the payment
+     * @param string      $deviceDna     Optional device dna data (json encoded) for judoshield
+     * @param \DateTime   $date
+     * @param IdentityLog $identityLog
      */
     public function add(
         Policy $policy,
@@ -306,7 +310,8 @@ class JudopayService
         $cardToken,
         $source,
         $deviceDna = null,
-        \DateTime $date = null
+        \DateTime $date = null,
+        IdentityLog $identityLog = null
     ) {
         $this->statsd->startTiming("judopay.add");
         // doesn't make sense to add payments for expired policies
@@ -349,7 +354,7 @@ class JudopayService
                 $date
             );
 
-            $this->policyService->create($policy, $date, true);
+            $this->policyService->create($policy, $date, true, null, $identityLog);
             $this->dm->flush();
         } else {
             // Existing policy - add payment + prevent duplicate billing
@@ -1140,7 +1145,7 @@ class JudopayService
         foreach ($policy->getAllPayments() as $payment) {
             $diff = $date->diff($payment->getDate());
             if ($payment instanceof JudoPayment && $payment->getAmount() > 0 &&
-                $diff->days == 0) {
+                $diff->days == 0 && $payment->getSource() == Payment::SOURCE_TOKEN) {
                 $msg = sprintf(
                     'Attempting to run addition payment for policy %s on the same day. %s',
                     $policy->getId(),

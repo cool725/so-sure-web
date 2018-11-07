@@ -27,6 +27,7 @@ use AppBundle\Repository\PaymentRepository;
 use AppBundle\Repository\PhonePolicyRepository;
 use AppBundle\Repository\PolicyRepository;
 use AppBundle\Repository\UserRepository;
+use Doctrine\MongoDB\LoggableCollection;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Psr\Log\LoggerInterface;
 
@@ -758,20 +759,21 @@ class MonitorService
             ->match()
             ->field('count')
             ->gt(1)
-            ->execute();
+            ->execute(['cursor' => []]);
 
         if (count($results) > 0) {
             foreach ($results as $result) {
-                throw new MonitorException(
-                    "Found duplicate Invites on email {$result->getEmail()}"
-                );
+                throw new MonitorException(sprintf(
+                    "Found duplicate Invites on email %s",
+                    $result['_id']['email']
+                ));
             }
         }
     }
 
     public function checkSoSureRoles()
     {
-        $collections = $this->dm->getConnection()->selectDatabase('so-sure')->listCollections();
+        $collections = $this->dm->getDocumentCollections();
 
         if (count($collections) == 0) {
             throw new MonitorException(
@@ -784,10 +786,12 @@ class MonitorService
 
     public function checkSoSureRole($col)
     {
-        $res = $this->dm->getConnection()->selectDatabase('so-sure')->command(
-            ['rolesInfo' => 'so-sure-user',
-                'showPrivileges' => true]
-        );
+        $db_name = $col->getDatabase()->getName();
+
+        $res = $this->dm->getConnection()->selectDatabase($db_name)->command([
+            'rolesInfo' => 'so-sure-user',
+            'showPrivileges' => true
+            ]);
 
         $foundPriv = false;
         if ($res['roles'] && count($res['roles']) > 0) {

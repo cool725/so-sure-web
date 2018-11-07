@@ -3,6 +3,7 @@
 namespace AppBundle\Tests\Service;
 
 use AppBundle\Document\DateTrait;
+use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Policy;
 use AppBundle\Document\SalvaPhonePolicy;
@@ -10,10 +11,14 @@ use AppBundle\Document\User;
 use AppBundle\Exception\MonitorException;
 use AppBundle\Form\Type\UserRoleType;
 use AppBundle\Repository\Invitation\InvitationRepository;
+use AppBundle\Service\InvitationService;
 use AppBundle\Service\MonitorService;
+use Doctrine\Tests\Common\DataFixtures\ContactFixture;
 use Doctrine\Tests\Common\DataFixtures\TestDocument\Role;
 use Exception;
 use AppBundle\Document\Invitation\EmailInvitation;
+use FOS\UserBundle\Model\UserManager;
+use Pimple\Container;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\Claim;
 use Symfony\Component\Validator\Constraints\Date;
@@ -31,8 +36,14 @@ class MonitorServiceTest extends WebTestCase
 
     protected static $container;
 
+    /** @var Phone */
+    protected static $phone;
+
     /** @var MonitorService */
     protected static $monitor;
+
+    /** @var InvitationService */
+    protected static $invitationService;
 
     public static function setUpBeforeClass()
     {
@@ -46,6 +57,16 @@ class MonitorServiceTest extends WebTestCase
         //now we can instantiate our service (if you want a fresh one for
         //each test method, do this in setUp() instead
         self::$dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+
+        /** @var InvitationService invitationService */
+        $invitationService = self::$container->get('app.invitation');
+        $invitationService->setDebug(true);
+        self::$invitationService = $invitationService;
+
+        self::$invitationService->setEnvironment('test');
+
+        /** @var UserManager userManager */
+        self::$userManager = self::$container->get('fos_user.user_manager');
 
         /** @var MonitorService $monitor */
         $monitor = self::$container->get('app.monitor');
@@ -156,29 +177,33 @@ class MonitorServiceTest extends WebTestCase
         self::$dm->flush();
     }
 
-    /*
-     * expectedException \AppBundle\Exception\MonitorException
+    /**
+     * @expectedException \AppBundle\Exception\MonitorException
+     */
     public function testSalvaPolicy()
     {
-        $policy = new SalvaPhonePolicy();
-        $policy->setPolicyNumber($this->getRandomPolicyNumber('Mob'));
+        $policy = self::createUserPolicy(true);
+        $policy->getUser()->setEmail(static::generateEmail('salva', $this));
+        $policy->setPolicyNumber(self::getRandomPolicyNumber('Mob'));
 
+        self::$dm->persist($policy->getUser());
         self::$dm->persist($policy);
         self::$dm->flush();
 
         self::$monitor->salvaPolicy();
     }
-    */
 
     /**
      * @expectedException \AppBundle\Exception\MonitorException
      */
     public function testInvalidPolicy()
     {
-        $policy = new SalvaPhonePolicy();
-        $policy->setPolicyNumber($this->getRandomPolicyNumber('INVALID'));
+        $policy = self::createUserPolicy(true);
+        $policy->getUser()->setEmail(static::generateEmail('invalid', $this));
+        $policy->setPolicyNumber(self::getRandomPolicyNumber('INVALID'));
         $policy->addSalvaPolicyResults('0', SalvaPhonePolicy::RESULT_TYPE_CREATE, []);
 
+        self::$dm->persist($policy->getUser());
         self::$dm->persist($policy);
         self::$dm->flush();
 
@@ -190,10 +215,12 @@ class MonitorServiceTest extends WebTestCase
      */
     public function testSalvaStatus()
     {
-        $policy = new SalvaPhonePolicy();
-        $policy->setPolicyNumber($this->getRandomPolicyNumber('Mob'));
+        $policy = self::createUserPolicy(true);
+        $policy->getUser()->setEmail(static::generateEmail('salvastatus', $this));
+        $policy->setPolicyNumber(self::getRandomPolicyNumber('Mob'));
         $policy->setSalvaStatus('pending');
 
+        self::$dm->persist($policy->getUser());
         self::$dm->persist($policy);
         self::$dm->flush();
 
@@ -205,73 +232,81 @@ class MonitorServiceTest extends WebTestCase
      */
     public function testPolicyFiles()
     {
-        $policy = new SalvaPhonePolicy();
-        $policy->setPolicyNumber($this->getRandomPolicyNumber('Mob'));
+        $policy = self::createUserPolicy(true);
+        $policy->getUser()->setEmail(static::generateEmail('policy', $this));
+        $policy->setPolicyNumber(self::getRandomPolicyNumber('Mob'));
 
+        self::$dm->persist($policy->getUser());
         self::$dm->persist($policy);
         self::$dm->flush();
 
         self::$monitor->policyFiles();
     }
 
-    /*
-     * expectedException \AppBundle\Exception\MonitorException
-
+    /**
+     * @expectedException \AppBundle\Exception\MonitorException
+     */
     public function testPolicyPending()
     {
-        $policy = new SalvaPhonePolicy();
-        $policy->setPolicyNumber($this->getRandomPolicyNumber('Mob'));
-
-        $user = new User();
-        $user->setEmail(self::generateEmail('pending', $this));
-
-        $policy->setUser($user);
+        $policy = self::createUserPolicy(true);
+        $policy->getUser()->setEmail(static::generateEmail('pending', $this));
+        $policy->setPolicyNumber(self::getRandomPolicyNumber('Mob'));
         $policy->setStatus(Policy::STATUS_PENDING);
 
-        self::$dm->persist($policy);
         self::$dm->persist($policy->getUser());
+        self::$dm->persist($policy);
 
         self::$dm->flush();
 
         self::$monitor->policyPending();
     }
-    */
 
-    /*
-     * expectedException \AppBundle\Exception\MonitorException
+    /**
+     * @expectedException \AppBundle\Exception\MonitorException
+     */
     public function testDuplicateInvites()
     {
-        $inviteOne = new EmailInvitation();
-        $inviteTwo = new EmailInvitation();
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testDuplicateInvites', $this),
+            'bar'
+        );
 
-        $user = new User();
-        $user->setEmail('foo@bar.com');
+        $policy = self::initPolicy($user, self::$dm, $this->getRandomPhone(self::$dm), null, false, true);
+        $policy->setStatus(Policy::STATUS_ACTIVE);
 
-        $policy = new SalvaPhonePolicy();
-        $policy->setUser($user);
+        $invitationOne = self::$invitationService->inviteByEmail(
+            $policy,
+            self::generateEmail('testDuplicateInvites-invite-one', $this)
+        );
 
-        $inviteOne->setEmail($user->getEmail());
-        $inviteOne->setPolicy($policy);
+        $invitationTwo = self::$invitationService->inviteByEmail(
+            $policy,
+            self::generateEmail('testDuplicateInvites-invite-two', $this)
+        );
 
-        $inviteTwo->setEmail($user->getEmail());
-        $inviteTwo->setPolicy($policy);
+        /*
+         * Generating two invites on the same email throws an error
+         * Changing one of the invites' email after creation does not
+         */
+        $invitationTwo->setEmail(self::generateEmail('testDuplicateInvites-invite-one', $this));
 
+        self::$dm->persist($policy->getUser());
         self::$dm->persist($policy);
-        self::$dm->persist($user);
-        self::$dm->persist($inviteOne);
-        self::$dm->persist($inviteTwo);
+        self::$dm->persist($invitationOne);
+        self::$dm->persist($invitationTwo);
         self::$dm->flush();
 
         self::$monitor->duplicateInvites();
     }
-    */
 
     /**
      * @expectedException \AppBundle\Exception\MonitorException
      */
     public function testCheckAllUserRolePriv()
     {
-        $database = self::$dm->getConnection()->selectDatabase('so-sure');
+        $dbName = self::$container->getParameter('mongodb_db');
+        $database = self::$dm->getConnection()->selectDatabase($dbName);
 
         $database->command([
             'createRole' => 'so-sure-user',
@@ -303,18 +338,16 @@ class MonitorServiceTest extends WebTestCase
      */
     public function testCheckExpiration()
     {
-        $policy = new SalvaPhonePolicy();
+        $policy = self::createUserPolicy(true);
+        $policy->getUser()->setEmail(static::generateEmail('expired', $this));
+        $policy->setPolicyNumber(self::getRandomPolicyNumber('Mob'));
         $policy->setStatus(Policy::STATUS_ACTIVE);
         $policy->setEnd((\DateTime::createFromFormat('U', time()))->sub(new \DateInterval('P1D')));
 
+        self::$dm->persist($policy->getUser());
         self::$dm->persist($policy);
         self::$dm->flush();
 
         self::$monitor->checkExpiration();
-    }
-
-    private function getRandomPolicyNumber($prefix)
-    {
-        return sprintf($prefix . '/2018/55' . str_pad(random_int(0, 99999), 5, '0'));
     }
 }

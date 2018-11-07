@@ -305,7 +305,7 @@ class BICommand extends ContainerAwareCommand
             '"Invitations"',
             '"pic-sure Status"',
             '"Lead Source"',
-            '"First Payment Source"',
+            '"Purchase SDK"',
             '"Make/Model/Memory"',
             '"Reward Pot"',
             '"Premium Paid"',
@@ -358,9 +358,7 @@ class BICommand extends ContainerAwareCommand
                 sprintf('"%d"', count($policy->getInvitations())),
                 sprintf('"%s"', $policy->getPicSureStatus() ? $policy->getPicSureStatus() : 'unstarted'),
                 sprintf('"%s"', $policy->getLeadSource()),
-                // @codingStandardsIgnoreStart
-                sprintf('"%s"', $policy->getFirstSuccessfulUserPaymentCredit() ? $policy->getFirstSuccessfulUserPaymentCredit()->getSource() : ''),
-                // @codingStandardsIgnoreEnd
+                sprintf('"%s"', $policy->getPurchaseSdk()),
                 sprintf('"%s"', $policy->getPhone()->__toString()),
                 sprintf('"%0.2f"', $policy->getPotValue()),
                 sprintf('"%0.2f"', $policy->getPremiumPaid()),
