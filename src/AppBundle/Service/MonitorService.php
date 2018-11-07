@@ -773,7 +773,7 @@ class MonitorService
 
     public function checkSoSureRoles()
     {
-        $collections = $this->dm->getDocumentCollections();
+        $collections = $this->dm->getDocumentDatabase(Policy::class)->listCollections();
 
         if (count($collections) == 0) {
             throw new MonitorException(
