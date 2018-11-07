@@ -11,6 +11,29 @@ require('jssocials');
 let Clipboard = require('clipboard');
 
 $(function() {
+    // buttons to get link to app download sent to their phone via sms.
+    const smsButtons = $(".sms-btn");
+    let smsButtonClicked = false;
+    smsButtons.find("a").click(function() {
+        if (smsButtonClicked) {
+            return;
+        }
+        let label = $(this).parent().append("p").text("...");
+        $(this).remove();
+        smsButtonClicked = true;
+        $.ajax({
+            url: "/user/applinksms",
+            method: "POST",
+            success: function(data) {
+                label.text("Download link sent to your device.");
+            },
+            error: function(data) {
+                label.text(data.responseText);
+            }
+        });
+    }, );
+
+    // the slides on the carousel.
     const carousel = $('#onboarding-carousel');
     const onNavMb  = $('.onboarding-controls__mobile');
     const onNavDt = $('.onboarding-nav__desktop');
@@ -24,7 +47,7 @@ $(function() {
             [2, 'login']
         ];
 
-        // Mobile navigation
+        // Mobile navigation buttons.
         if (onNavMb.length) {
             let slide = slides[e.to];
             let prev = $('#onboarding-btn--prev');
@@ -45,7 +68,7 @@ $(function() {
             }
         }
 
-        // Desktop navigation
+        // Desktop navigation buttons.
         // IDEA: If I were using this more I could change the data-secondary-page thing so be a maximum and allow
         //       each navigation button to represent a range of slides.
         onNavDt.children().each(function() {
@@ -55,7 +78,12 @@ $(function() {
                 link.attr("data-slide-to") == e.to || link.attr("data-secondary-page") == e.to
             );
         });
-    }
+
+        // If one of the sms buttons have been pressed we can remove them.
+        if (smsButtonClicked) {
+            smsButtons.remove();
+        }
+    };
 
     // when the carousel is triggered control the navigation buttons and set them at start
     carousel.on('slide.bs.carousel', slide);
@@ -96,5 +124,4 @@ $(function() {
             }
         }
     });
-
 });

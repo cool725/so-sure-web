@@ -2365,11 +2365,18 @@ class ApiAuthController extends BaseController
 
             $sms = $this->get('app.sms');
             $code = $sms->setValidationCodeForUser($user);
-            if ($sms->sendTemplate($mobileNumber, 'AppBundle:Sms:validation-code.txt.twig', ['code' => $code])) {
+            $status = $sms->sendTemplate(
+                $mobileNumber,
+                'AppBundle:Sms:validation-code.txt.twig',
+                ['code' => $code],
+                $user->getLatestPolicy(),
+                Charge::TYPE_SMS_VERIFICATION
+            );
+
+            if ($status) {
                 return $this->getErrorJsonResponse(ApiErrorCode::SUCCESS, 'OK', 200);
             } else {
                 $this->get('logger')->error('Error sending SMS.', ['mobile' => $mobileNumber]);
-
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_USER_SEND_SMS, 'Error sending SMS', 422);
             }
         } catch (AccessDeniedException $e) {

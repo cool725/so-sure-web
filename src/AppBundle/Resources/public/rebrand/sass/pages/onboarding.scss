@@ -12,6 +12,8 @@ body {
     overflow: hidden;
 }
 
+
+
 .onboarding {
     overflow: hidden;
 
@@ -29,6 +31,15 @@ body {
         li {
             @include border-radius(12px);
         }
+    }
+
+    // bootstrap disabled link style did not look right so I created one here.
+    .dead-link {
+        cursor: inherit;
+        color: inherit;
+        text-decoration: none;
+        pointer-events: none;
+        color: currentColor;
     }
 
     &__item {

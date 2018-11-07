@@ -87,14 +87,37 @@ class SmsService
     }
 
     /**
-     * @param string $number
-     * @param string $message
-     *
-     * @return boolean
+     * Creates and persists an SMS charge record in the database in relation to a given policy
+     * @param Policy $policy is the policy that this charge is in relation to. The user and their details can be
+     *               inferred from this
+     * @param string $type is the type of sms charge being made as there are three different types.
      */
-    public function send($number, $message)
+    private function addCharge($policy, $type)
+    {
+        $charge = new Charge();
+        $charge->setType($type);
+        $charge->setUser($policy->getUser());
+        $charge->setPolicy($policy);
+        $charge->setDetails($policy->getUser()->getMobileNumber());
+        $this->dm->persist($charge);
+        $this->dm->flush();
+    }
+
+    /**
+     * Sends an SMS to any mobile phone number.
+     * @param string $number is the mobile phone number to send the SMS to.
+     * @param string $message is the message to be sent.
+     * @param string $chargePolicy optional, and describes the policy regarding which the text message has been sent.
+     *                             If it is not null then an sms charge is committed to the database for this SMS.
+     * @param string $type is the type of sms charge to be made if one is to be made.
+     * @return boolean true iff the sms was successfully sent.
+     */
+    public function send($number, $message, $chargePolicy = null, $type = Charge::TYPE_SMS_INVITATION)
     {
         if ($this->environment == "test") {
+            if ($chargePolicy) {
+                $this->addCharge($chargePolicy, $type);
+            }
             return true;
         }
         try {
@@ -114,29 +137,39 @@ class SmsService
             return false;
         }
 
+        if ($chargePolicy) {
+            $this->addCharge($chargePolicy, $type);
+        }
         return true;
     }
 
-    public function sendTemplate($number, $template, $data)
+    /**
+     * Sends an sms message conforming to a given template.
+     * @param string $number is the mobile number to be sent to.
+     * @param string $template is the filename of the template to be used.
+     * @param array  $data is an array containing the parameters used to render the template.
+     * @param Policy $chargePolicy is an optional policy for which an SMS charge object will be committed.
+     * @param string $type is the type of sms charge to be made if one is to be made.
+     * @return boolean true iff the sms was sent successfully.
+     */
+    public function sendTemplate($number, $template, $data, $chargePolicy = null, $type = Charge::TYPE_SMS_INVITATION)
     {
         $message = $this->templating->render($template, $data);
-
-        return $this->send($number, $message);
+        return $this->send($number, $message, $chargePolicy);
     }
 
-    public function sendUser(Policy $policy, $template, $data)
+    /**
+     * Sends an SMS message to a given user with a given template, and commits an SMS charge attributed to them.
+     * The SMS charge is not optional for this method.
+     * @param Policy $policy is the user's policy which the message regards.
+     * @param string $template is the filename of the template that will be used to render the message.
+     * @param array $data is the set of parameters that will be used to render the template.
+     * @param string $type is the type of sms charge to be made.
+     * @return true iff the sms is sent successfuly.
+     */
+    public function sendUser(Policy $policy, $template, $data, $type = Charge::TYPE_SMS_INVITATION)
     {
-        $user = $policy->getUser();
-        $this->sendTemplate($user->getMobileNumber(), $template, $data);
-
-        $charge = new Charge();
-        $charge->setType(Charge::TYPE_SMS);
-        $charge->setUser($user);
-        $charge->setPolicy($policy);
-        $charge->setDetails($user->getMobileNumber());
-
-        $this->dm->persist($charge);
-        $this->dm->flush();
+        return $this->sendTemplate($policy->getUser()->getMobileNumber(), $template, $data, $policy, $type);
     }
 
     public function setValidationCodeForUser($user)

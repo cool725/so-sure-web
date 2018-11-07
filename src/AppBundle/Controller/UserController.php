@@ -29,6 +29,7 @@ use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Policy;
 use AppBundle\Document\SCode;
 use AppBundle\Document\Cashback;
+use AppBundle\Document\Charge;
 use AppBundle\Document\Feature;
 use AppBundle\Document\User;
 use AppBundle\Document\BacsPaymentMethod;
@@ -1293,6 +1294,8 @@ class UserController extends BaseController
             }
         }
 
+        // TODO: this is not the right experiment text. Remember that this experiment has two conversion points so it
+        //       is a kpi or something.
         $sixpack = $this->get('app.sixpack');
         $shareExperimentText = $sixpack->getText(
             SixpackService::EXPIRED_EXPERIMENT_SHARE_MESSAGE,
@@ -1316,9 +1319,42 @@ class UserController extends BaseController
             'oauth2FlowParams' => $oauth2FlowParams,
             'email_form' => $emailInvitationForm->createView(),
             'share_experiment_text' => $shareExperimentText,
+            'user' => $user
         );
 
         return $this->render('AppBundle:User:onboarding.html.twig', $data);
+    }
+
+    /**
+     * @Route("/applinksms", name="app_link_sms")
+     * @Method({"POST"})
+     */
+    public function appLinkSmsAction(Request $request)
+    {
+        $dm = $this->getManager();
+        $chargeRepository = $dm->getRepository(Charge::class);
+        $smsService = $this->get('app.sms');
+        $branch = $this->get('app.twig.branch');
+        $user = $this->getUser();
+        $mobileNumber = $user->getMobileNumber();
+        $message = $this->get('templating')->render(
+            'AppBundle:Sms:text-me.txt.twig',
+            ['branch_pot_url' => $this->getParameter('branch_pot_url')]
+        );
+        if (!$user) {
+            return new Response("User not found.", 400);
+        } elseif (!$mobileNumber) {
+            return new Response("You do not have a mobile phone number set.", 400);
+        } elseif ($user->getFirstLoginInApp()) {
+            return new Response("You already have the app.", 400);
+        } elseif ($chargeRepository->findLastCharge($user, Charge::TYPE_SMS_DOWNLOAD)) {
+            return new Response("You have already been sent a download SMS.", 400);
+        } elseif ($smsService->send($mobileNumber, $message, $user->getLatestPolicy(), Charge::TYPE_SMS_DOWNLOAD)) {
+            // Sms has been successfully sent.
+            return new Response($message, 200);
+        } else {
+            return new Response("The SMS was not able to be sent.", 500);
+        }
     }
 
     /**

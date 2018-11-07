@@ -896,31 +896,25 @@ class InvitationService
         }
 
         if ($this->debug) {
-            // Useful for testing
-            $this->addSmsCharge($invitation);
-
+            // Adds the charge manually for testing purposes
+            $charge = new Charge();
+            $charge->setType(Charge::TYPE_SMS_INVITATION);
+            $charge->setUser($invitation->getInviter());
+            $charge->setPolicy($invitation->getPolicy());
+            $charge->setDetails($invitation->getMobile());
+            $this->dm->persist($charge);
+            $this->dm->flush();
             return;
         }
 
         $smsTemplate = sprintf('AppBundle:Sms:%s.txt.twig', $type);
-        if ($this->sms->sendTemplate($invitation->getMobile(), $smsTemplate, ['invitation' => $invitation])) {
-            $invitation->setStatus(SmsInvitation::STATUS_SENT);
-        } else {
-            $invitation->setStatus(SmsInvitation::STATUS_FAILED);
-        }
-
-        $this->addSmsCharge($invitation);
-    }
-
-    public function addSmsCharge(SmsInvitation $invitation)
-    {
-        $charge = new Charge();
-        $charge->setType(Charge::TYPE_SMS);
-        $charge->setUser($invitation->getInviter());
-        $charge->setPolicy($invitation->getPolicy());
-        $charge->setDetails($invitation->getMobile());
-        $this->dm->persist($charge);
-        $this->dm->flush();
+        $status = $this->sms->sendTemplate(
+            $invitation->getMobile(),
+            $smsTemplate,
+            ['invitation' => $invitation],
+            $invitation->getPolicy()
+        );
+        $invitation->setStatus($status ? (SmsInvitation::STATUS_SENT) : (SmsInvitation::STATUS_FAILED));
     }
 
     protected function validatePolicy(Policy $policy)

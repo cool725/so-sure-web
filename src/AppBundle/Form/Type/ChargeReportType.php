@@ -18,7 +18,9 @@ class ChargeReportType extends AbstractType
                 'choices' => [
                     'All' => 'all',
                     'Address' => Charge::TYPE_ADDRESS,
-                    'SMS' => Charge::TYPE_SMS,
+                    'SMS Verification' => Charge::TYPE_SMS_VERIFICATION,
+                    'SMS Invitation' => Charge::TYPE_SMS_INVITATION,
+                    'SMS Download' => Charge::TYPE_SMS_DOWNLOAD,
                     'GSMA' => Charge::TYPE_GSMA,
                     'Make and Model' => Charge::TYPE_MAKEMODEL,
                     'Claims Check' => Charge::TYPE_CLAIMSCHECK,
