@@ -537,6 +537,7 @@ class BacsService
             $results['records']++;
             $returnCode = $this->getReturnCode($element);
             $reference = $this->getReference($element, 'ref');
+            $returnDescription = $this->getNodeValue($element, 'returnDescription');
             $originalProcessingDate = $this->getOriginalProcessingDate($element);
             /** @var User $user */
             $user = $repo->findOneBy(['paymentMethod.bankAccount.reference' => $reference]);
@@ -545,6 +546,23 @@ class BacsService
                 $this->logger->error(sprintf('Unable to locate bacs reference %s', $reference));
 
                 continue;
+            }
+
+            $activePendingMandate = false;
+            $bacs = $user->getBacsPaymentMethod();
+            if ($bacs) {
+                if ($bankAccount = $bacs->getBankAccount()) {
+                    if ($bankAccount->isMandateInProgress() || $bankAccount->isMandateSuccess()) {
+                        $activePendingMandate = true;
+                    }
+
+                }
+            }
+            if ($activePendingMandate && mb_stripos($returnDescription, "INSTRUCTION CANCELLED") !== false) {
+                $this->logger->warning(sprintf(
+                    'User %s has an active or pending mandate, but an arudd indicating cancelled',
+                    $user->getId()
+                ));
             }
 
             $foundPayments = 0;
@@ -561,7 +579,11 @@ class BacsService
                     $debitPayment->setSerialNumber($submittedPayment->getSerialNumber());
                     $debitPayment->setDate($this->getNextBusinessDay($currentProcessingDate));
                     $debitPayment->setSource(Payment::SOURCE_SYSTEM);
-                    $debitPayment->setNotes('Arudd payment failure');
+                    $debitPayment->setNotes(sprintf(
+                        'Arudd payment failure: %s (%s)',
+                        $returnDescription,
+                        $returnCode
+                    ));
                     $policy->addPayment($debitPayment);
 
                     // refund requires commission to be set, but probably isn't at this point in time
