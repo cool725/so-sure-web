@@ -1375,9 +1375,17 @@ class JudopayService
             throw $e;
         }
 
+        // seems like in the past, potentially  the refund receipt is the same receipt id as the initial payment
+        // I'm not sure if this is still the case, however, we can add a prefix if it exists in the DB, just in case
+        $receiptId = $refundModelDetails["receiptId"];
+        $repo = $this->dm->getRepository(Payment::class);
+        $payment = $repo->findOneBy(['receiptId' => $receiptId]);
+        if ($payment) {
+            $receiptId = sprintf('R-%s', $receiptId);
+        }
+
         $refund->setReference($refundModelDetails["yourPaymentReference"]);
-        // as refund receipt is the same, add prefix to prevent duplciates in db, so we can have unique index
-        $refund->setReceipt(sprintf('R-%s', $refundModelDetails["receiptId"]));
+        $refund->setReceipt($receiptId);
         $refund->setAmount(0 - $refundModelDetails["amount"]);
         $refund->setResult($refundModelDetails["result"]);
         $refund->setMessage($refundModelDetails["message"]);
