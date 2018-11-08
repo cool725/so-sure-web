@@ -1186,7 +1186,10 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             $hadInvalidPicSureStatus = true;
         }
 
+        $user = $policy->getUser();
+
         return [
+            'user' => $user,
             'policy' => $policy,
             'cancel_form' => $cancelForm->createView(),
             'pending_cancel_form' => $pendingCancelForm->createView(),
@@ -1218,7 +1221,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             'fraud' => $checks,
             'policy_route' => 'admin_policy',
             'policy_history' => $this->getSalvaPhonePolicyHistory($policy->getId()),
-            'user_history' => $this->getUserHistory($policy->getUser()->getId()),
+            'user_history' => $this->getUserHistory($user->getId()),
             'suggested_cancellation_date' => $now->add(new \DateInterval('P30D')),
             'claim_types' => Claim::$claimTypes,
             'phones' => $dm->getRepository(Phone::class)->findActiveInactive()->getQuery()->execute(),
