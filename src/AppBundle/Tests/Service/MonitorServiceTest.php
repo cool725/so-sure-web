@@ -3,6 +3,7 @@
 namespace AppBundle\Tests\Service;
 
 use AppBundle\Document\DateTrait;
+use AppBundle\Document\Payment\BacsPayment;
 use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Policy;
@@ -348,5 +349,28 @@ class MonitorServiceTest extends WebTestCase
         self::$dm->flush();
 
         self::$monitor->checkExpiration();
+    }
+  
+    /**
+     * @expectedException \AppBundle\Exception\MonitorException
+     */
+    public function testCheckPastBacsPaymentsPending()
+    {
+        $past = \DateTime::createFromFormat('U', time())->sub(new \DateInterval('P1D'));
+
+        $policy = self::createUserPolicy(true);
+        $policy->getUser()->setEmail(static::generateEmail('bacsPayment', $this));
+
+        $bacsPayment = new BacsPayment();
+        $bacsPayment->submit($past);
+        $bacsPayment->setStatus(BacsPayment::STATUS_PENDING);
+        $bacsPayment->setPolicy($policy);
+
+        self::$dm->persist($policy->getUser());
+        self::$dm->persist($policy);
+        self::$dm->persist($bacsPayment);
+        self::$dm->flush();
+
+        self::$monitor->checkPastBacsPaymentsPending();
     }
 }

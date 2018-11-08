@@ -854,4 +854,24 @@ class MonitorService
             );
         }
     }
+
+    public function checkPastBacsPaymentsPending()
+    {
+        $results = $this->dm->createQueryBuilder(BacsPayment::class)
+            ->field('status')
+            ->equals(BacsPayment::STATUS_PENDING)
+            ->field('date')
+            ->lt(new \DateTime())
+            ->getQuery()
+            ->execute();
+
+        foreach ($results as $result) {
+            throw new MonitorException(sprintf(
+                "Bacs payment (%s) under policy number %s is pending and in the past (%s)",
+                $result->getId(),
+                $result->getPolicy()->getPolicyNumber(),
+                $result->getDate()->format('Y-M-d H:m')
+            ));
+        }
+    }
 }
