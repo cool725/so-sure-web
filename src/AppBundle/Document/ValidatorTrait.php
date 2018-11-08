@@ -8,24 +8,24 @@ use AppBundle\Validator\Constraints\AlphanumericValidator;
 
 trait ValidatorTrait
 {
-    protected function conformAlphanumericSpaceDotPipe($value, $length)
+    protected function conformAlphanumericSpaceDotPipe($value, $length, $minLength = 0)
     {
         $validator = new AlphanumericSpaceDotPipeValidator();
-
-        return $validator->conform(mb_substr($value, 0, $length));
+        $string = $validator->conform(mb_substr($value, 0, $length));
+        return strlen($string) > $minLength ? $string : nulll;
     }
 
-    protected function conformAlphanumericSpaceDot($value, $length)
+    protected function conformAlphanumericSpaceDot($value, $length, $minLength = 0)
     {
         $validator = new AlphanumericSpaceDotValidator();
-
-        return $validator->conform(mb_substr($value, 0, $length));
+        $string = $validator->conform(mb_substr($value, 0, $length));
+        return strlen($string) > $minLength ? $string : null;
     }
 
-    protected function conformAlphanumeric($value, $length)
+    protected function conformAlphanumeric($value, $length, $minLength = 0)
     {
         $validator = new AlphanumericValidator();
-
-        return $validator->conform(mb_substr($value, 0, $length));
+        $string = $validator->conform(mb_substr($value, 0, $length));
+        return strlen($string) > $minLength ? $string : null;
     }
 }

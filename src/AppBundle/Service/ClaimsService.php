@@ -101,7 +101,7 @@ class ClaimsService
     public function createClaim(ClaimFnol $claimFnol)
     {
         $claim = new Claim();
-        
+
         $claim->setType($claimFnol->getType());
         $claim->setIncidentDate($claimFnol->getWhen());
         $claim->setIncidentTime($claimFnol->getTime());
@@ -162,7 +162,7 @@ class ClaimsService
     public function updateTheftLossDocuments(Claim $claim, ClaimFnolTheftLoss $claimTheftLoss, $submit = false)
     {
         $claim->setHasContacted($claimTheftLoss->getHasContacted());
-        $claim->setContactedPlace($claimTheftLoss->getContactedPlace());
+        $claim->setContactedPlace($this->conformAlphanumericSpaceDot($claimTheftLoss->getContactedPlace(), 200, 4));
         $claim->setBlockedDate($claimTheftLoss->getBlockedDate());
         $claim->setReportedDate($claimTheftLoss->getReportedDate());
         $claim->setReportType($claimTheftLoss->getReportType());

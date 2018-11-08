@@ -4,12 +4,14 @@ namespace AppBundle\Document\Form;
 
 use AppBundle\Document\Claim;
 use AppBundle\Document\DateTrait;
+use AppBundle\Document\ValidatorTrait;
 use Symfony\Component\Validator\Constraints as Assert;
 use AppBundle\Validator\Constraints as AppAssert;
 
 class ClaimFnolTheftLoss
 {
     use DateTrait;
+    use ValidatorTrait;
 
     /**
      * @var Claim
@@ -96,7 +98,7 @@ class ClaimFnolTheftLoss
     {
         $this->blockedDate = $blockedDate;
     }
-    
+
     public function getReportedDate()
     {
         return $this->reportedDate;
@@ -121,7 +123,7 @@ class ClaimFnolTheftLoss
     {
         return $this->proofOfUsage;
     }
-    
+
     public function setProofOfUsage($proofOfUsage)
     {
         $this->proofOfUsage = $proofOfUsage;
@@ -131,7 +133,7 @@ class ClaimFnolTheftLoss
     {
         return $this->proofOfBarring;
     }
-    
+
     public function setProofOfBarring($proofOfBarring)
     {
         $this->proofOfBarring = $proofOfBarring;
@@ -141,7 +143,7 @@ class ClaimFnolTheftLoss
     {
         return $this->proofOfPurchase;
     }
-    
+
     public function setProofOfPurchase($proofOfPurchase)
     {
         $this->proofOfPurchase = $proofOfPurchase;
@@ -161,7 +163,7 @@ class ClaimFnolTheftLoss
     {
         return $this->crimeReferenceNumber;
     }
-    
+
     public function setCrimeReferenceNumber($crimeReferenceNumber)
     {
         $this->crimeReferenceNumber = $crimeReferenceNumber;
@@ -171,7 +173,7 @@ class ClaimFnolTheftLoss
     {
         return $this->force;
     }
-    
+
     public function setForce($force)
     {
         $this->force = $force;
@@ -258,7 +260,7 @@ class ClaimFnolTheftLoss
     {
         $this->claim = $claim;
         $this->hasContacted = $claim->getHasContacted();
-        $this->contactedPlace = $claim->getContactedPlace();
+        $this->contactedPlace = $this->conformAlphanumericSpaceDot($claim->getContactedPlace(), 200, 4);
         $this->blockedDate = $claim->getBlockedDate();
         $this->reportedDate = $claim->getReportedDate();
         $this->reportType = $claim->getReportType();
