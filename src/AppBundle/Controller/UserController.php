@@ -1294,13 +1294,21 @@ class UserController extends BaseController
             }
         }
 
-        // TODO: this is not the right experiment text. Remember that this experiment has two conversion points so it
-        //       is a kpi or something.
         $sixpack = $this->get('app.sixpack');
         $shareExperimentText = $sixpack->getText(
             SixpackService::EXPIRED_EXPERIMENT_SHARE_MESSAGE,
             SixpackService::ALTERNATIVES_SHARE_MESSAGE_SIMPLE,
             [$policy->getStandardSCode()->getShareLink(), $policy->getStandardSCode()->getCode()]
+        );
+
+        $smsExperiment = $sixpack->participate(
+            $sixpack::EXPERIMENT_APP_LINK_SMS, [
+                $sixpack::ALTERNATIVES_SMS_DOWNLOAD,
+                $sixpack::ALTERNATIVES_NO_SMS_DOWNLOAD
+            ],
+            $sixpack::LOG_MIXPANEL_NONE,
+            1,
+            $user->getId()
         );
 
         // if the policy file has not been generated, then that must be done before we can let them download.
@@ -1310,7 +1318,7 @@ class UserController extends BaseController
             $policyTermsFile = $policy->getLatestPolicyTermsFile();
         }
 
-        $data = array(
+        return $this->render('AppBundle:User:onboarding.html.twig', [
             'cancel_url' => $this->generateUrl('purchase_cancel_damaged', ['id' => $user->getLatestPolicy()->getId()]),
             'policy_key' => $this->getParameter('policy_key'),
             'policy' => $policy,
@@ -1318,11 +1326,10 @@ class UserController extends BaseController
             'has_visited_welcome_page' => $pageVisited,
             'oauth2FlowParams' => $oauth2FlowParams,
             'email_form' => $emailInvitationForm->createView(),
+            'user' => $user,
             'share_experiment_text' => $shareExperimentText,
-            'user' => $user
-        );
-
-        return $this->render('AppBundle:User:onboarding.html.twig', $data);
+            'sms_experiment' => $smsExperiment
+        ]);
     }
 
     /**
@@ -1350,7 +1357,13 @@ class UserController extends BaseController
         } elseif ($chargeRepository->findLastCharge($user, Charge::TYPE_SMS_DOWNLOAD)) {
             return new Response("You have already been sent a download SMS.", 400);
         } elseif ($smsService->send($mobileNumber, $message, $user->getLatestPolicy(), Charge::TYPE_SMS_DOWNLOAD)) {
-            // Sms has been successfully sent.
+            // Sms has been successfully sent. Fire off a sixpack kpi.
+            $sixpack = $this->get('app.sixpack');
+            $sixpack->convertByClientId(
+                $user->getId(),
+                $sixpack::EXPERIMENT_APP_LINK_SMS,
+                $sixpack::KPI_REQUEST_LINK_SMS
+            );
             return new Response($message, 200);
         } else {
             return new Response("The SMS was not able to be sent.", 500);

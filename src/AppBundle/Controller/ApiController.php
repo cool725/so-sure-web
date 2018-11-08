@@ -192,6 +192,12 @@ class ApiController extends BaseController
             if (!$user->getFirstLoginInApp()) {
                 $user->setFirstLoginInApp(new \DateTime());
                 $dm->flush();
+                $sixpack = $this->get('app.sixpack');
+                $sixpack->convertByClientId(
+                    $user->getId(),
+                    $sixpack::EXPERIMENT_APP_LINK_SMS,
+                    $sixpack::KPI_FIRST_LOGIN_APP
+                );
             }
 
             $response = $user->toApiArray($intercomHash, $identityId, $token);
