@@ -1421,6 +1421,8 @@ class UserController extends BaseController
         // or no point in swapping to bacs
         if ($bacsFeature && $policy->canBacsPaymentBeMadeInTime()) {
             $bacsFeature = false;
+            // TODO: it seems as though this would turn off the bacs features when it should leave it on and vice
+            //       versa.
         }
 
         /** @var PaymentService $paymentService */

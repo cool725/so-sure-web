@@ -192,6 +192,9 @@ class ApiController extends BaseController
             if (!$user->getFirstLoginInApp()) {
                 $user->setFirstLoginInApp(new \DateTime());
                 $dm->flush();
+
+                // user's first login in app is a KPI.
+                // TODO: need to make sure user is already from experiment
                 $sixpack = $this->get('app.sixpack');
                 $sixpack->convertByClientId(
                     $user->getId(),
