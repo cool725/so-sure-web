@@ -30,12 +30,31 @@ class CashbackReminderCommand extends ContainerAwareCommand
                 InputOption::VALUE_NONE,
                 'Do not email, just report on cashback email that would be sent'
             )
+            ->addOption(
+                'force',
+                null,
+                InputOption::VALUE_NONE,
+                'Do not check for 2 week interval, just email'
+            )
         ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $dryRun = true === $input->getOption('dry-run');
+        $dryRun = $input->getOption('dry-run');
+        $force = $input->getOption('force');
+
+        $date = \DateTime::createFromFormat('U', time())
+            ->format('W');
+
+        /*
+         * If the option to $force is not passed and $date is not evenly divisible
+         * do not run the command
+         */
+        if (!$force && ($date & 2)) {
+            return;
+        }
+
         $lines = $this->policyService->cashbackReminder($dryRun);
         $cashbacks = $this->policyService->cashbackPending($dryRun);
 

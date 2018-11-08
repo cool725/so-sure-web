@@ -1638,6 +1638,8 @@ class PolicyService
                 'AppBundle:Email:cashback/cashback_reminder.html.twig',
                 ['results' => $cashbacks]
             );
+        } else {
+            $this->
         }
 
         return $cashbacks;
