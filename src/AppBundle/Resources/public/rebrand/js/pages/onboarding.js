@@ -72,10 +72,9 @@ $(function() {
         // IDEA: If I were using this more I could change the data-secondary-page thing so be a maximum and allow
         //       each navigation button to represent a range of slides.
         onNavDt.children().each(function() {
-            let link = $(this).find("a");
             $(this).toggleClass(
                 'active',
-                link.attr("data-slide-to") == e.to || link.attr("data-secondary-page") == e.to
+                $(this).attr("data-slide-to") == e.to || $(this).attr("data-secondary-page") == e.to
             );
         });
 

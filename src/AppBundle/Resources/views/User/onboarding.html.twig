@@ -40,30 +40,31 @@
     <section class="onboarding">
         {% if device_category() == 'Desktop' or device_category() == 'Tablet'  %}
             <div class="onboarding-nav__desktop">
-                <div class="onboarding-nav__inner active py-4">
+                <a href="#onboarding-carousel"
+                    class="onboarding-nav__desktop py-4 active"
+                    data-slide-to="0">
                     <div class="onboarding-nav__number h6 mb-0">1</div>
-                    <a href="#onboarding-carousel" class="onboarding-controls__btn" data-slide-to="0">
-                        <div class="onboarding-nav__title h6 ml-3 mb-0">Welcome to so-sure</div>
-                    </a>
-                </div>
-                <div class="onboarding-nav__inner py-4">
+                    <div class="onboarding-nav__title h6 ml-3 mb-0">Welcome to so-sure</div>
+                </a>
+                <a href="#onboarding-carousel"
+                    class="onboarding-nav__desktop py-4"
+                    data-slide-to="1">
                     <div class="onboarding-nav__number h6 mb-0">2</div>
-                    <a href="#onboarding-carousel" class="onboarding-controls__btn" data-slide-to="1">
-                        <div class="onboarding-nav__title h6 ml-3 mb-0">Reduce Excess by 60%</div>
-                    </a>
-                </div>
-                <div class="onboarding-nav__inner py-4">
+                    <div class="onboarding-nav__title h6 ml-3 mb-0">Reduce Excess by 60%</div>
+                </a>
+                <a href="#onboarding-carousel"
+                    class="onboarding-nav__desktop py-4"
+                    data-slide-to="2"
+                    data-secondary-page="3">
                     <div class="onboarding-nav__number h6 mb-0">3</div>
-                    <a href="#onboarding-carousel" class="onboarding-controls__btn" data-slide-to="2" data-secondary-page="3">
-                        <div class="onboarding-nav__title h6 ml-3 mb-0">Invite and get cashback</div>
-                    </a>
-                </div>
-                <div class="onboarding-nav__inner py-4">
+                    <div class="onboarding-nav__title h6 ml-3 mb-0">Invite and get cashback</div>
+                </a>
+                <a href="#onboarding-carousel"
+                    class="onboarding-nav__desktop py-4"
+                    data-slide-to="4">
                     <div class="onboarding-nav__number h6 mb-0">4</div>
-                    <a href="#onboarding-carousel" class="onboarding-controls__btn" data-slide-to="4">
-                        <div class="onboarding-nav__title h6 ml-3 mb-0">Policy Details</div>
-                    </a>
-                </div>
+                    <div class="onboarding-nav__title h6 ml-3 mb-0">Policy Details</div>
+                </a>
             </div>
         {% endif %}
         <div id="onboarding-carousel"

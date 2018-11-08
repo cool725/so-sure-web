@@ -88,21 +88,6 @@ body {
     &-nav {
         &__desktop {
             display: flex;
-        }
-
-        &__number{
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 32px; height: 32px;
-            border: 2px solid darken($selago, 10%);
-            @include border-radius(50%);
-
-            transition: background-color 500ms ease;
-        }
-
-        &__inner {
-            display: block;
             align-items: center;
             justify-content: center;
             flex-grow: 1;
@@ -132,6 +117,25 @@ body {
                     box-shadow: 0 0 0 7px rgba(37, 147, 243, 0.15);
                 }
             }
+
+            &:hover,
+            &:focus,
+            &:active {
+                text-decoration: none;
+                color: $dodger-blue
+            }
         }
+
+        &__number{
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px; height: 32px;
+            border: 2px solid darken($selago, 10%);
+            @include border-radius(50%);
+
+            transition: background-color 500ms ease;
+        }
+
     }
 }
