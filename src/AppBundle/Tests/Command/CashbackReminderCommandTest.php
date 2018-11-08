@@ -22,10 +22,6 @@ class CashbackReminderCommandTest extends BaseControllerTest
         /** @var DocumentManager $dm */
         $dm = $this->getDocumentManager();
         self::$dm = $dm;
-
-        /** @var PolicyService $policyService */
-        $policyService = self::$container->get('app.policy');
-        self::$policyService = $policyService;
     }
 
     public function callCommand($expectedOutput)
