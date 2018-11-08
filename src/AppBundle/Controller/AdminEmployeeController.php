@@ -2298,6 +2298,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             $month = $now->format('m');
         }
         $date = \DateTime::createFromFormat("Y-m-d", sprintf('%d-%d-01', $year, $month));
+        /** @var ReportingService $reporting */
         $reporting = $this->get('app.reporting');
         $data = $reporting->payments($date);
 
