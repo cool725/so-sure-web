@@ -803,14 +803,16 @@ class ReportingService
             }
         }
         foreach ($payments as $payment) {
+            /** @var Payment $payment */
             if (!$payment->getSource() || !$payment->getAmount() || $payment->getAmount() <= 0) {
                 continue;
             }
+
             $day = $payment->getDate()->format('j');
             if ($payment->isSuccess()) {
                 $data[$day][$payment->getSource()]['success']++;
 
-                if ($payment->getSource() == Payment::SOURCE_WEB) {
+                if ($payment instanceof JudoPayment && $payment->getSource() == Payment::SOURCE_WEB) {
                     if ($payment->getWebType()) {
                         $data[$day][sprintf('web-%s', $payment->getWebType())]['success']++;
                     }
@@ -821,7 +823,7 @@ class ReportingService
             } else {
                 $data[$day][$payment->getSource()]['failure']++;
 
-                if ($payment->getSource() == Payment::SOURCE_WEB) {
+                if ($payment instanceof JudoPayment && $payment->getSource() == Payment::SOURCE_WEB) {
                     if ($payment->getWebType()) {
                         $data[$day][sprintf('web-%s', $payment->getWebType())]['failure']++;
                     }
