@@ -1636,10 +1636,8 @@ class PolicyService
                 'Biweekly cashback report',
                 ['dylan@so-sure.com', 'patrick@so-sure.com'],
                 'AppBundle:Email:cashback/cashback_reminder.html.twig',
-                ['results' => $cashbacks]
+                ['cashbacks' => $cashbacks]
             );
-        } else {
-            $this->
         }
 
         return $cashbacks;

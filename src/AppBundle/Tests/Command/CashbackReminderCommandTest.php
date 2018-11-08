@@ -6,7 +6,6 @@ use AppBundle\Command\OpsReportCommand;
 use AppBundle\Document\Cashback;
 use AppBundle\Document\Policy;
 use Doctrine\ODM\MongoDB\DocumentManager;
-use PhpParser\Node\Scalar\String_;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use AppBundle\Tests\Controller\BaseControllerTest;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -38,11 +37,21 @@ class CashbackReminderCommandTest extends BaseControllerTest
         $commandTester->execute(array(
             'command' => $command->getName(),
             '--dry-run' => true,
+            '--force' => true
         ));
         $output = $commandTester->getDisplay();
         foreach ($expectedOutput as $item) {
             $this->assertContains($item, $output);
         }
+    }
+
+    public function testCashbackReminderNoCashbacks()
+    {
+        $expected = [
+            'Found 0 cashback pending policies. Mail sent'
+        ];
+
+        $this->callCommand($expected);
     }
 
     public function testCashbackReminder()
@@ -58,11 +67,11 @@ class CashbackReminderCommandTest extends BaseControllerTest
         self::$dm->persist($policy);
         self::$dm->flush();
 
-        $this->callCommand(
-            [
-                'Policy',
-                'found with pending status'
-            ]
-        );
+        $expected = [
+            'Policy',
+            'found with pending status'
+        ];
+
+        $this->callCommand($expected);
     }
 }
