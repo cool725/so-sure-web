@@ -653,7 +653,14 @@ class BacsService
         $payments = $repo->findSubmittedPayments($this->endOfDay($date));
         foreach ($payments as $payment) {
             /** @var BacsPayment $payment */
-            $payment->approve();
+            try {
+                $payment->approve();
+            } catch (\Exception $e) {
+                $this->logger->error(
+                    sprintf('Skipping payment %s approval', $payment->getId()),
+                    ['exception' => $e]
+                );
+            }
         }
         $this->dm->flush();
     }
