@@ -13,47 +13,9 @@
         <table class="table" id="checkboxes">
         </table>
 
-        <table class="table table-striped">
-          <tbody>
-            <tr>
-              <td>Current IMEI</td>
-              <td id="imei"></td>
-            </tr>
+        {{ render(controller('AppBundle:AdminEmployee:imeiForm', {'id': policy.id})) }}
 
-            <tr>
-              <td>New IMEI</td>
-              <td>
-                <input type="text" placeholder="IMEI">
-              </td>
-            </tr>
-          </tbody>
         </table>
-        </table>
-      </div>
-      <div class="modal-footer">
-          <tr id="update-button-row">
-            <td>
-              <button type="button" class="btn" data-dismiss="modal">Cancel</button>
-            </td>
-            {% if is_granted('ROLE_CUSTOMER_SERVICES') %}
-            <td>
-              <button disabled id="imei-update-button" class="btn btn-danger">Update</button>
-            </td>
-            {% endif %}
-          </tr>
-        {% if is_granted('ROLE_CUSTOMER_SERVICES') %}
-          <form id="change-imei-form" method="POST" action="{{ path('admin_claims_delete_claim') }}">
-            <input type="hidden" name="id" id="claims-detail-delete-id"></input>
-            <input type="hidden" name="token" value="{{ csrf_token('default') }}"></input>
-          </form>
-        {% endif %}
-        </form>
-        {% if is_granted('ROLE_CUSTOMER_SERVICES') %}
-          <form id="delete-claim-form" method="POST" action="{{ path('admin_claims_delete_claim') }}">
-            <input type="hidden" name="id" id="claims-detail-delete-id"></input>
-            <input type="hidden" name="token" value="{{ csrf_token('default') }}"></input>
-          </form>
-        {% endif %}
       </div>
     </div>
   </div>

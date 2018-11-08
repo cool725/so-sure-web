@@ -1,0 +1,21 @@
+{% block body %}
+
+  <table class="table table-striped">
+    <tbody>
+    <tr>
+      <td>Current IMEI</td>
+      <td id="imei"></td>
+    </tr>
+
+    <tr>
+      <td>New IMEI</td>
+      <td>
+        {{ form_start(form, {'attr': {'class': 'form-inline'}}) }}
+          {{ form_widget(form.imei) }}
+          {{ form_widget(form.update, { 'attr': {'class': 'btn btn-danger', 'disabled': 'true'} }) }}
+        {{ form_end(form) }}
+      </td>
+    </tr>
+    </tbody>
+  </table>
+{% endblock %}

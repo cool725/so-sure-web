@@ -427,6 +427,52 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
     }
 
     /**
+     * @Route("/imei-form/{id}", name="imei_form")
+     * @Template
+     */
+    public function imeiFormAction(Request $request, $id = null)
+    {
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(PhonePolicy::class);
+        /** @var PhonePolicy $policy */
+        $policy = $repo->find($id);
+
+        if (!$policy) {
+            throw $this->createNotFoundException(sprintf('Policy %s not found', $id));
+        }
+
+        $imei = new Imei();
+        $imei->setPolicy($policy);
+        $imeiForm = $this->get('form.factory')
+            ->createNamedBuilder('imei_form', ImeiType::class, $imei)
+            ->setAction($this->generateUrl(
+                'imei_form',
+                ['id' => $id]
+            ))
+            ->getForm();
+
+        if ('POST' === $request->getMethod()) {
+            if ($request->request->has('imei_form')) {
+                $imeiForm->handleRequest($request);
+                if ($imeiForm->isValid()) {
+                    $policy->adjustImei($imei->getImei(), false);
+                    $dm->flush();
+                    $this->addFlash(
+                        'success',
+                        sprintf('Policy %s imei updated.', $policy->getPolicyNumber())
+                    );
+
+                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
+                }
+            }
+        }
+
+        return [
+            'form' => $imeiForm->createView()
+        ];
+    }
+
+    /**
      * @Route("/policy/{id}", name="admin_policy")
      * @Template("AppBundle::Admin/claimsPolicy.html.twig")
      */
@@ -458,11 +504,11 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         $noteForm = $this->get('form.factory')
             ->createNamedBuilder('note_form', NoteType::class)
             ->getForm();
-        $imei = new Imei();
-        $imei->setPolicy($policy);
-        $imeiForm = $this->get('form.factory')
-            ->createNamedBuilder('imei_form', ImeiType::class, $imei)
-            ->getForm();
+//        $imei = new Imei();
+//        $imei->setPolicy($policy);
+//        $imeiForm = $this->get('form.factory')
+//            ->createNamedBuilder('imei_form', ImeiType::class, $imei)
+//            ->getForm();
         $facebookForm = $this->get('form.factory')
             ->createNamedBuilder('facebook_form', FacebookType::class, $policy)
             ->getForm();
@@ -622,18 +668,18 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
 
                     return $this->redirectToRoute('admin_policy', ['id' => $id]);
                 }
-            } elseif ($request->request->has('imei_form')) {
-                $imeiForm->handleRequest($request);
-                if ($imeiForm->isValid()) {
-                    $policy->adjustImei($imei->getImei(), false);
-                    $dm->flush();
-                    $this->addFlash(
-                        'success',
-                        sprintf('Policy %s imei updated.', $policy->getPolicyNumber())
-                    );
-
-                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
-                }
+//            } elseif ($request->request->has('imei_form')) {
+//                $imeiForm->handleRequest($request);
+//                if ($imeiForm->isValid()) {
+//                    $policy->adjustImei($imei->getImei(), false);
+//                    $dm->flush();
+//                    $this->addFlash(
+//                        'success',
+//                        sprintf('Policy %s imei updated.', $policy->getPolicyNumber())
+//                    );
+//
+//                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
+//                }
             } elseif ($request->request->has('phone_form')) {
                 $phoneForm->handleRequest($request);
                 if ($phoneForm->isValid()) {
@@ -1144,7 +1190,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             'cancel_form' => $cancelForm->createView(),
             'pending_cancel_form' => $pendingCancelForm->createView(),
             'note_form' => $noteForm->createView(),
-            'imei_form' => $imeiForm->createView(),
+//            'imei_form' => $imeiForm->createView(),
             'phone_form' => $phoneForm->createView(),
             'formClaimFlags' => $claimFlags->createView(),
             'facebook_form' => $facebookForm->createView(),

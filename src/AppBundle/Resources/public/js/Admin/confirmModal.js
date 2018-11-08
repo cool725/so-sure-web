@@ -37,8 +37,8 @@ $('#confirmModal').on('show.bs.modal', function (event) {
 
 function checkAll(n) {
     if ($('#checkboxes input:checked').length === n) {
-        $('#imei-update-button').attr('disabled', false)
+        $('#imei_form_update').attr('disabled', false)
     } else {
-        $('#imei-update-button').attr('disabled', true)
+        $('#imei_form_update').attr('disabled', true)
     }
 }
