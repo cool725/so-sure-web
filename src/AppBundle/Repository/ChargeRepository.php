@@ -4,6 +4,8 @@ namespace AppBundle\Repository;
 
 use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\DateTrait;
+use AppBundle\Document\User;
+use AppBundle\Document\Charge;
 use AppBundle\Document\Policy;
 use AppBundle\Document\PhoneTrait;
 use Doctrine\ODM\MongoDB\DocumentRepository;
@@ -52,11 +54,11 @@ class ChargeRepository extends DocumentRepository
      * @param User   $user is the user for whom we are looking for charges.
      * @param string $type is the type of charges that we are looking for, and if it is left null then we are looking
      *               for all charges.
-     * @return Charge the most recent charge that matches the given type requirements or null if there is nothing.
+     * @return Charge|null the most recent charge that matches the given type requirements or null if there is nothing.
      */
     public function findLastCharge($user, $type = null)
     {
-        $chargeQuery = $this->createQueryBuilder('\Document\Charge')
+        $chargeQuery = $this->createQueryBuilder()
             ->field('user')->equals($user);
         if ($type) {
             $chargeQuery->field('type')->equals($type);

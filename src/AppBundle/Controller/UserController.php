@@ -1302,7 +1302,8 @@ class UserController extends BaseController
         );
 
         $smsExperiment = $sixpack->participate(
-            $sixpack::EXPERIMENT_APP_LINK_SMS, [
+            $sixpack::EXPERIMENT_APP_LINK_SMS,
+            [
                 $sixpack::ALTERNATIVES_SMS_DOWNLOAD,
                 $sixpack::ALTERNATIVES_NO_SMS_DOWNLOAD
             ],
@@ -1336,7 +1337,7 @@ class UserController extends BaseController
      * @Route("/applinksms", name="app_link_sms")
      * @Method({"POST"})
      */
-    public function appLinkSmsAction(Request $request)
+    public function appLinkSmsAction()
     {
         $dm = $this->getManager();
         $chargeRepository = $dm->getRepository(Charge::class);

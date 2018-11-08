@@ -1866,7 +1866,7 @@ abstract class Policy
 
     /**
      * Gives you the most recent policy terms file object that this policy is linked to
-     * @return PolicyTermsFile the file or null if there are no such files.
+     * @return PolicyTermsFile|null the file or null if there are no such files.
      */
     public function getLatestPolicyTermsFile()
     {

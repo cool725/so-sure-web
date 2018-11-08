@@ -88,9 +88,9 @@ class SmsService
 
     /**
      * Creates and persists an SMS charge record in the database in relation to a given policy
-     * @param Policy $policy is the policy that this charge is in relation to. The user and their details can be
-     *               inferred from this
-     * @param string $type is the type of sms charge being made as there are three different types.
+     * @param Policy $policy the policy that this charge is in relation to. The user and their details can be
+     *                       inferred from this
+     * @param string $type   the type of sms charge being made as there are three different types.
      */
     private function addCharge($policy, $type)
     {
@@ -105,12 +105,13 @@ class SmsService
 
     /**
      * Sends an SMS to any mobile phone number.
-     * @param string $number is the mobile phone number to send the SMS to.
-     * @param string $message is the message to be sent.
-     * @param string $chargePolicy optional, and describes the policy regarding which the text message has been sent.
-     *                             If it is not null then an sms charge is committed to the database for this SMS.
-     * @param string $type is the type of sms charge to be made if one is to be made.
-     * @return boolean true iff the sms was successfully sent.
+     * @param string      $number       the mobile phone number to send the SMS to.
+     * @param string      $message      the message to be sent.
+     * @param Policy|null $chargePolicy optional, and describes the policy regarding which the text message has been
+     *                                  sent. If it is not null then an sms charge is committed to the database for
+     *                                  this SMS.
+     * @param string      $type         the type of sms charge to be made if one is to be made.
+     * @return boolean                  true iff the sms was successfully sent.
      */
     public function send($number, $message, $chargePolicy = null, $type = Charge::TYPE_SMS_INVITATION)
     {
@@ -145,27 +146,27 @@ class SmsService
 
     /**
      * Sends an sms message conforming to a given template.
-     * @param string $number is the mobile number to be sent to.
-     * @param string $template is the filename of the template to be used.
-     * @param array  $data is an array containing the parameters used to render the template.
-     * @param Policy $chargePolicy is an optional policy for which an SMS charge object will be committed.
-     * @param string $type is the type of sms charge to be made if one is to be made.
-     * @return boolean true iff the sms was sent successfully.
+     * @param string      $number       the mobile number to be sent to.
+     * @param string      $template     the filename of the template to be used.
+     * @param array       $data         an array containing the parameters used to render the template.
+     * @param Policy|null $chargePolicy an optional policy for which an SMS charge object will be committed.
+     * @param string      $type         the type of sms charge to be made if one is to be made.
+     * @return boolean                  true iff the sms was sent successfully.
      */
     public function sendTemplate($number, $template, $data, $chargePolicy = null, $type = Charge::TYPE_SMS_INVITATION)
     {
         $message = $this->templating->render($template, $data);
-        return $this->send($number, $message, $chargePolicy);
+        return $this->send($number, $message, $chargePolicy, $type);
     }
 
     /**
      * Sends an SMS message to a given user with a given template, and commits an SMS charge attributed to them.
      * The SMS charge is not optional for this method.
-     * @param Policy $policy is the user's policy which the message regards.
-     * @param string $template is the filename of the template that will be used to render the message.
-     * @param array $data is the set of parameters that will be used to render the template.
-     * @param string $type is the type of sms charge to be made.
-     * @return true iff the sms is sent successfuly.
+     * @param Policy $policy   the user's policy which the message regards.
+     * @param string $template the filename of the template that will be used to render the message.
+     * @param array  $data     the set of parameters that will be used to render the template.
+     * @param string $type     the type of sms charge to be made.
+     * @return boolean         true iff the sms is sent successfuly.
      */
     public function sendUser(Policy $policy, $template, $data, $type = Charge::TYPE_SMS_INVITATION)
     {

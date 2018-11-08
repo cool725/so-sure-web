@@ -19,6 +19,7 @@ use AppBundle\Form\Type\PhoneType;
 use AppBundle\Document\Address;
 use AppBundle\Document\Payment\Payment;
 use AppBundle\Document\Cashback;
+use AppBundle\Document\Charge;
 use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePrice;
 use AppBundle\Document\PhonePolicy;

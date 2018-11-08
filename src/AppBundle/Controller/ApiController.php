@@ -193,8 +193,8 @@ class ApiController extends BaseController
                 $user->setFirstLoginInApp(new \DateTime());
                 $dm->flush();
 
-                // user's first login in app is a KPI.
-                // TODO: need to make sure user is already from experiment
+                // User's first login in app is a KPI in the sms link experiment.
+                // If they're not participating nothing will happen.
                 $sixpack = $this->get('app.sixpack');
                 $sixpack->convertByClientId(
                     $user->getId(),
