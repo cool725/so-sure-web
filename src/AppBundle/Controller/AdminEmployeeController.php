@@ -13,6 +13,7 @@ use AppBundle\Form\Type\PaymentRequestUploadFileType;
 use AppBundle\Form\Type\UploadFileType;
 use AppBundle\Form\Type\UserHandlingTeamType;
 use AppBundle\Repository\ClaimRepository;
+use AppBundle\Repository\PhoneRepository;
 use AppBundle\Security\FOSUBUserProvider;
 use AppBundle\Service\BacsService;
 use AppBundle\Service\FraudService;
@@ -20,6 +21,7 @@ use AppBundle\Service\JudopayService;
 use AppBundle\Service\PolicyService;
 use AppBundle\Service\ReceperioService;
 use AppBundle\Service\ReportingService;
+use AppBundle\Service\RouterService;
 use AppBundle\Service\SalvaExportService;
 use AppBundle\Service\AffiliateService;
 use Gedmo\Loggable\Document\Repository\LogEntryRepository;
@@ -306,6 +308,51 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             'additional_phones' => $additionalPhonesForm->createView(),
             'one_day' => $oneDay,
         ];
+    }
+
+    /**
+     * @Route("/phones/download", name="admin_phones_download")
+     */
+    public function adminPhonesDownload()
+    {
+        /** @var RouterService $router */
+        $router = $this->get('app.router');
+        /** @var PhoneRepository $repo */
+        $repo = $this->getManager()->getRepository(Phone::class);
+        $phones = $repo->findActive()->getQuery()->execute();
+
+        $lines = [];
+        foreach ($phones as $phone) {
+            /** @var Phone $phone */
+            $lines[] = sprintf(
+                '"%s", "%s"',
+                $phone->__toString(),
+                $router->generateUrl('purchase_phone_make_model_memory', [
+                    'make' => $phone->getMake(),
+                    'model' => $phone->getEncodedModel(),
+                    'memory' => $phone->getMemory()
+                ])
+            );
+        }
+        $data = implode(PHP_EOL, $lines);
+
+        $tmpFile = sprintf('%s/%s', sys_get_temp_dir(), 'so-sure-phones.csv');
+        file_put_contents($tmpFile, $data);
+
+        $headers = [
+            'Content-Type' => 'text/plain',
+            'Content-Disposition' => 'attachment; filename="so-sure-phones.csv"',
+        ];
+
+        return StreamedResponse::create(
+            function () use ($tmpFile) {
+                $stream = fopen($tmpFile, 'r');
+                echo stream_get_contents($stream);
+                flush();
+            },
+            200,
+            $headers
+        );
     }
 
     /**
