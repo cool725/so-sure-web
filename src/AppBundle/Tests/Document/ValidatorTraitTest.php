@@ -32,9 +32,9 @@ class ValidatorTraitTest extends \PHPUnit\Framework\TestCase
     public function testSmallerThanMinimum()
     {
         $string = "ab";
-        $this->assertNull($this->conformAlphanumeric($string, 100, 5, 1));
-        $this->assertNull($this->conformAlphanumericSpaceDot($string, 100, 5, 1));
-        $this->assertNull($this->conformAlphanumericSpaceDotPipe($string, 100, 5, 1));
+        $this->assertNull($this->conformAlphanumeric($string, 100, 5));
+        $this->assertNull($this->conformAlphanumericSpaceDot($string, 100, 5));
+        $this->assertNull($this->conformAlphanumericSpaceDotPipe($string, 100, 5));
     }
 
     /**
