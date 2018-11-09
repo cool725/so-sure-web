@@ -5,6 +5,7 @@ namespace AppBundle\Tests\Service;
 use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Repository\PolicyRepository;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use AppBundle\Exception\ValidationException;
 use AppBundle\Document\User;
 use AppBundle\Document\Claim;
 use AppBundle\Document\Policy;
@@ -605,6 +606,8 @@ class ClaimsServiceTest extends WebTestCase
         $update->setContactedPlace("hi||||||| how are you?");
         self::$claimsService->updateTheftLossDocuments($claim, $update);
         $this->assertEquals("hi how are you?", $claim->getContactedPlace());
+        self::$dm->persist($claim);
+        self::$dm->flush();
     }
 
     /**
@@ -617,16 +620,15 @@ class ClaimsServiceTest extends WebTestCase
         $claim->setType(Claim::TYPE_DAMAGE);
         $update = new ClaimFnolDamage();
         $update->setTypeDetails("water-damage");
-        $update->setMonthOfPurchase(" .");
-        $update->setYearOfPurchase("2000");
+        $update->setMonthOfPurchase(".");
+        $update->setYearOfPurchase("2014");
 
         $update->setTypeDetailsOther("|");
         self::$claimsService->updateDamageDocuments($claim, $update);
-        $this->assertEquals(null, $claim->getTypeDetailsOther());
-        $this->assertEquals("2000", $claim->getYearOfPurchase());
+        $this->assertNull($claim->getTypeDetailsOther());
         $this->assertNull($claim->getMonthOfPurchase());
 
-        $this->expectException(Exception::class);
+        self::$dm->persist($claim);
         self::$dm->flush();
 
         $update->setTypeDetailsOther("hi||||||");
@@ -634,8 +636,11 @@ class ClaimsServiceTest extends WebTestCase
         $this->assertEquals("hi", $claim->getTypeDetailsOther());
 
         $update->setTypeDetailsOther("hi||||||| how are you?");
+        $update->setMonthOfPurchase("JUNE");
         self::$claimsService->updateDamageDocuments($claim, $update);
         $this->assertEquals("hi how are you?", $claim->getTypeDetailsOther());
+        self::$dm->persist($claim);
+        self::$dm->flush();
 
     }
 }

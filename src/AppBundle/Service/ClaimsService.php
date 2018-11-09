@@ -121,8 +121,10 @@ class ClaimsService
     {
         $claim->setTypeDetails($claimDamage->getTypeDetails());
         $claim->setTypeDetailsOther($this->conformAlphanumericSpaceDot($claimDamage->getTypeDetailsOther(), 200, 1));
-        $claim->setMonthOfPurchase($claimDamage->getMonthOfPurchase());
-        $claim->setYearOfPurchase($claimDamage->getYearOfPurchase());
+        $claim->setMonthOfPurchase($this->conformAlphanumericSpaceDot($claimDamage->getMonthOfPurchase(), 200, 3));
+        $claim->setYearOfPurchase(
+            mb_strlen($claimDamage->getYearOfPurchase()) == 4 ? $claimDamage->getYearOfPurchase() : null
+        );
         $claim->setPhoneStatus($claimDamage->getPhoneStatus());
 
         if ($claimDamage->getProofOfUsage()) {
