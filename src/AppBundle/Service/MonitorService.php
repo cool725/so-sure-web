@@ -848,10 +848,12 @@ class MonitorService
             ->execute();
 
         foreach ($results as $result) {
-            throw new MonitorException(
-                "Policy {$result->getPolicyNumber()} is active/unpaid but expired!" . PHP_EOL .
-                "Expired since {$result->getEnd()->format('Y-M-D H:m')} !"
-            );
+            if (!$result->isPrefixInvalidPolicy()) {
+                throw new MonitorException(
+                    "Policy {$result->getPolicyNumber()} is active/unpaid but expired!" . PHP_EOL .
+                    "Expired since {$result->getEnd()->format('Y-M-D H:m')} !"
+                );
+            }
         }
     }
 
