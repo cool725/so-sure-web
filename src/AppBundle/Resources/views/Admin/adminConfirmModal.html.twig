@@ -5,11 +5,11 @@
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
               aria-hidden="true">&times;</span>
         </button>
-        <h4 class="modal-title">Warning: Changing IMEI</h4>
+        <h4 class="modal-title">Warning</h4>
       </div>
       <div class="modal-body">
 
-        {{ render(controller('AppBundle:AdminEmployee:imeiForm', {'id': policy.id})) }}
+        {{ render(controller(route, {'id': policy.id})) }}
 
       </div>
     </div>
