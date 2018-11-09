@@ -555,7 +555,12 @@ class AdminController extends BaseController
                 $uploadForm->handleRequest($request);
                 if ($uploadForm->isSubmitted() && $uploadForm->isValid()) {
                     $file = $uploadForm->getData()['file'];
-                    if ($bacs->processUpload($file)) {
+                    if ($bacs->isS3FilePresent($file->getClientOriginalName())) {
+                        $this->addFlash(
+                            'error',
+                            'File is already processed.'
+                        );
+                    } elseif ($bacs->processUpload($file)) {
                         $this->addFlash(
                             'success',
                             'Successfully uploaded & processed file'
@@ -563,7 +568,7 @@ class AdminController extends BaseController
                     } else {
                         $this->addFlash(
                             'error',
-                            'Unable to process file - see rollbar error message'
+                            'Unable to process file.'
                         );
                     }
 
