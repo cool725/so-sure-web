@@ -65,10 +65,9 @@ class CashbackReminderCommand extends ContainerAwareCommand
                     $cashback
                 ));
             }
-
-            $output->writeln(json_encode($lines, JSON_PRETTY_PRINT));
         }
 
+        $output->writeln(json_encode($lines, JSON_PRETTY_PRINT));
         $output->writeln(sprintf('Found %s cashback pending policies. Mail sent', count($cashbacks)));
     }
 }
