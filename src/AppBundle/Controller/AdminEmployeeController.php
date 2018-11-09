@@ -468,7 +468,8 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         }
 
         return [
-            'form' => $imeiForm->createView()
+            'form' => $imeiForm->createView(),
+            'policy' => $policy
         ];
     }
 

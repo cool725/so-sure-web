@@ -8,14 +8,9 @@
         <h4 class="modal-title">Warning: Changing IMEI</h4>
       </div>
       <div class="modal-body">
-        <p id="confirm-msg"></p>
-
-        <table class="table" id="checkboxes">
-        </table>
 
         {{ render(controller('AppBundle:AdminEmployee:imeiForm', {'id': policy.id})) }}
 
-        </table>
       </div>
     </div>
   </div>

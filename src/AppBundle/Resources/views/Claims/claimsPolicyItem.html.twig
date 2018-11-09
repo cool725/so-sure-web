@@ -1068,15 +1068,12 @@
                     <td>
                         <form class="form-inline">
                             <div class="form-group">
-                                {{ policy.imei }}
+                              {{ policy.imei }}
                             </div>
                             <button type="button" class="btn btn-danger"
                                     data-toggle="modal"
-                                    data-target="#confirmModal"
-                                    data-imei="{{ policy.imei }}"
-                                    data-checkboxes='["Have you double checked the IMEI number?", "Are you absolutely sure this needs to be done?", "Double checked everything again?"]'
-                                    data-confirm-msg="Are you sure you want to update this IMEI? This should only be done if the phone imei was incorrectly entered
-          or post claim once the IMEI has changed. This will trigger a Salva Policy Update.">Update</button>
+                                    data-target="#confirmModal">Update
+                            </button>
                         </form>
                     </td>
                 </tr>
@@ -1103,6 +1100,9 @@
                     </td>
                 </tr>
             </table>
+
+            {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'admin_policy', 'policy': policy  } %}
+
             {% endif %}
             {% if is_granted('ROLE_ADMIN') %}
             <h3>Company</h3>
@@ -1397,9 +1397,7 @@
         </div>
     {% endif %}
 
-    {% include 'AppBundle::Claims/claimsModal.html.twig' with {'route': 'admin_policy', 'policyId': policy.id  } %}
-
-    {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'admin_policy', 'policyId': policy.id  } %}
+    {% include 'AppBundle::Claims/claimsModal.html.twig' with {'route': 'admin_policy'} %}
 
     {% if is_granted('ROLE_ADMIN') %}
     <div class="modal fade" id="bacsModal" tabindex="-1" role="dialog">

@@ -1,21 +1,56 @@
 {% block body %}
 
+  <p id="confirm-msg">
+    Are you sure you want to update this IMEI? This should only be done if the phone imei was incorrectly entered
+    or post claim once the IMEI has changed. This will trigger a Salva Policy Update.
+  </p>
+
+  {{ form_start(form, {'attr': {'class': 'form-inline'}}) }}
+  <table class="table" id="checkboxes">
+    <tbody>
+    <tr>
+      <td>
+        <input required type="checkbox" id="checkbox1">
+        <label for="checkbox1">Have you double checked the IMEI number?</label>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <input required type="checkbox" id="checkbox2">
+        <label for="checkbox2">Are you absolutely sure this needs to be done?</label>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <input required type="checkbox" id="checkbox3">
+        <label for="checkbox3">Double checked everything again?</label>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+
   <table class="table table-striped">
     <tbody>
     <tr>
       <td>Current IMEI</td>
-      <td id="imei"></td>
+      <td id="imei">
+        {{ policy.imei }}
+      </td>
     </tr>
 
     <tr>
       <td>New IMEI</td>
       <td>
-        {{ form_start(form, {'attr': {'class': 'form-inline'}}) }}
           {{ form_widget(form.imei) }}
-          {{ form_widget(form.update, { 'attr': {'class': 'btn btn-danger', 'disabled': 'true'} }) }}
-        {{ form_end(form) }}
       </td>
     </tr>
     </tbody>
   </table>
+
+  <div class="modal-footer">
+    {{ form_widget(form.update, { 'attr': {'class': 'btn btn-danger', 'disabled': 'true'} }) }}
+    <button type="button" class="btn btn-grey" data-dismiss="modal">Close</button>
+  </div>
+  {{ form_end(form) }}
+
 {% endblock %}
