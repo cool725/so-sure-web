@@ -2,6 +2,7 @@
 
 namespace AppBundle\Document;
 
+use AppBundle\Document\Invitation\AppNativeShareInvitation;
 use AppBundle\Document\Invitation\Invitation;
 use AppBundle\Document\Payment\BacsIndemnityPayment;
 use AppBundle\Document\Payment\BacsPayment;
@@ -3471,6 +3472,10 @@ abstract class Policy
     {
         $userId = $this->getUser() ? $this->getUser()->getId() : null;
         return array_filter($this->getInvitationsAsArray(), function ($invitation) use ($userId, $onlyProcessed) {
+            if ($invitation instanceof AppNativeShareInvitation) {
+                return false;
+            }
+
             if ($onlyProcessed && $invitation->isProcessed()) {
                 return false;
             }
