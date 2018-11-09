@@ -1186,6 +1186,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             $hadInvalidPicSureStatus = true;
         }
 
+
         return [
             'policy' => $policy,
             'cancel_form' => $cancelForm->createView(),
