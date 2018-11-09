@@ -1041,8 +1041,8 @@
                     {% endif %}
                 {% endif %}
             </table>
-            {% if is_granted('ROLE_CUSTOMER_SERVICES') %}
 
+            {% if is_granted('ROLE_CUSTOMER_SERVICES') %}
             <h3>Update Policy</h3>
             <table class="table table-striped">
                 <tr>
@@ -1089,8 +1089,9 @@
                         {{ form_end(phone_form) }}
                     </td>
                 </tr>
+                {% if is_granted('ROLE_ADMIN') %}
                 <tr>
-                    <td>Trigger Salva Policy Update</td>
+                    <td><i class="fa fa-lock" title="Admin only"></i> Trigger Salva Policy Update</td>
                     <td>
                         {{ form_start(salva_update_form, {'attr': {'class': 'form-inline'}}) }}
                         {{ form_widget(salva_update_form.update, {'label': 'Update', 'attr': {'class': 'btn btn-danger confirm-submit', 'data-confirm-msg': 'Are you sure you want to trigger an update with salva?'}}) }}
@@ -1099,6 +1100,7 @@
                         If the policy was manually adjusted, notify Salva of the new price.
                     </td>
                 </tr>
+                {% endif %}
             </table>
 
             {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:AdminEmployee:imeiForm', 'policy': policy} %}
