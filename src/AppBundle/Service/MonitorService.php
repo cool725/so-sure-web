@@ -766,7 +766,7 @@ class MonitorService
             foreach ($results as $result) {
                 throw new MonitorException(sprintf(
                     "Found duplicate Invites on email %s",
-                    $result['_id']['email']
+                    json_encode($result['_id'])
                 ));
             }
         }

@@ -1340,7 +1340,8 @@ class InvitationServiceTest extends WebTestCase
 
         $this->assertTrue($exceptionThrown);
         $updatedPolicy = $this->assertPolicyExists(self::$container, $policy);
-        $this->assertCount(1, $updatedPolicy->getSentInvitations(false));
+        $this->assertCount(0, $updatedPolicy->getSentInvitations(false));
+        $this->assertCount(1, $updatedPolicy->getInvitationsAsArray());
     }
 
     /**

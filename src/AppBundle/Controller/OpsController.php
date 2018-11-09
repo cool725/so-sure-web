@@ -44,9 +44,13 @@ class OpsController extends BaseController
      * @Route("/status", name="ops_status")
      * @Template
      */
-    public function statusAction()
+    public function statusAction(Request $request)
     {
         try {
+            if ($request->get('force') == 'fail') {
+                throw new \Exception('Force failed');
+            }
+
             $dm = $this->getManager();
             /** @var UserRepository $repo */
             $repo = $dm->getRepository(User::class);
@@ -68,6 +72,7 @@ class OpsController extends BaseController
         } catch (\Exception $e) {
             return new JsonResponse([
                 'status' => 'Error',
+                'details' => $e->getMessage(),
             ], 500);
         }
     }

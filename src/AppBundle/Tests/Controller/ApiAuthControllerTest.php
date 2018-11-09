@@ -3286,7 +3286,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
             $data = $this->verifyResponse(422, ApiErrorCode::ERROR_INVITATION_SELF_INVITATION);
 
             $updatedPolicy = $this->assertPolicyExists(self::$container, $policy);
-            $this->assertCount(1, $updatedPolicy->getSentInvitations(false));
+            $this->assertCount(0, $updatedPolicy->getSentInvitations(false));
         }
     }
 
