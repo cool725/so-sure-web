@@ -9,6 +9,7 @@ use AppBundle\Document\DateTrait;
 use AppBundle\Document\File\AccessPayFile;
 use AppBundle\Document\File\DaviesFile;
 use AppBundle\Document\File\DirectGroupFile;
+use AppBundle\Document\Invitation\EmailInvitation;
 use AppBundle\Document\Invitation\Invitation;
 use AppBundle\Document\Form\Bacs;
 use AppBundle\Document\MultiPay;
@@ -742,7 +743,7 @@ class MonitorService
 
     public function duplicateInvites()
     {
-        $collection = $this->dm->getDocumentCollection(Invitation::class);
+        $collection = $this->dm->getDocumentCollection(EmailInvitation::class);
         $builder = $collection->createAggregationBuilder();
 
         $results = $builder
