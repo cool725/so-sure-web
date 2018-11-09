@@ -783,11 +783,9 @@
             <table class="table table-striped">
             {% for item in policy_history %}
               <tr>
-                <td width="10%">{{ item.action }}</td>
+                <td width="10%">{{ item.action }}<br />{{ item.username|default("sytem") }}</td>
                 <td width="10%">{{ item.loggedAt|date('F j, Y H:i:s') }}</td>
                 <td width="80%">
-                    userFirstName => {{ user.firstName}}<br />
-                    userLastName => {{ user.lastName}}<br />
                     {% for key, value in item.data %}{{ key }} => {{ value|json_encode }}<br />{% endfor %}
                 </td>
               </tr>
