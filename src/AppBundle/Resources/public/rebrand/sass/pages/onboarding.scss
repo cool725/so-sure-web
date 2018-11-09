@@ -85,16 +85,6 @@ body {
         }
     }
 
-    &-content {
-        &__desktop {
-            color: red;
-        }
-
-        &__mobile {
-            color: green;
-        }
-    }
-
     &-nav {
         &__desktop {
             display: flex;
