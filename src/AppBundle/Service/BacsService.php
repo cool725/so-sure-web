@@ -244,6 +244,11 @@ class BacsService
         $uploadFile = null;
         $metadata = null;
         $date = null;
+
+        if ($this->isS3FilePresent($file->getClientOriginalName())) {
+            return false;
+        }
+
         if (mb_stripos($file->getClientOriginalName(), "ADDACS") !== false) {
             $metadata = $this->addacs($tmpFile);
             $uploadFile = new BacsReportAddacsFile();
@@ -351,6 +356,23 @@ class BacsService
         return $s3Key;
     }
 
+    public function getS3Key($filename, $folder = 'bacs-report')
+    {
+        $s3Key = sprintf('%s/%s/%s', $this->environment, $folder, $filename);
+
+        return $s3Key;
+    }
+
+    public function isS3FilePresent($filename, $folder = 'bacs-report')
+    {
+        $s3Key = $this->getS3Key($filename, $folder);
+
+        $repo = $this->dm->getRepository(UploadFile::class);
+        $existingFile = $repo->findOneBy(['bucket' => self::S3_ADMIN_BUCKET, 'key' => $s3Key]);
+
+        return $existingFile != null;
+    }
+
     public function uploadS3(
         $tmpFile,
         $filename,
@@ -366,11 +388,10 @@ class BacsService
         $encTempFile = sprintf('%s/enc-%s', sys_get_temp_dir(), $filename);
         \Defuse\Crypto\File::encryptFileWithPassword($tmpFile, $encTempFile, $this->fileEncryptionPassword);
         unlink($tmpFile);
-        $s3Key = sprintf('%s/%s/%s', $this->environment, $folder, $filename);
 
-        $repo = $this->dm->getRepository(UploadFile::class);
-        $existingFile = $repo->findOneBy(['bucket' => self::S3_ADMIN_BUCKET, 'key' => $s3Key]);
-        if ($existingFile) {
+        $s3Key = $this->getS3Key($filename, $folder);
+
+        if ($this->isS3FilePresent($filename, $folder)) {
             throw new \Exception(sprintf('File s3://%s/%s already exists', self::S3_ADMIN_BUCKET, $s3Key));
         }
 
