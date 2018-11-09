@@ -743,7 +743,7 @@ class MonitorService
 
     public function duplicateInvites()
     {
-        $collection = $this->dm->getDocumentCollection(EmailInvitation::class);
+        $collection = $this->dm->getDocumentCollection(Invitation::class);
         $builder = $collection->createAggregationBuilder();
 
         $results = $builder
@@ -755,6 +755,8 @@ class MonitorService
                     ->expression('$email')
                     ->field('policy')
                     ->expression('$policy')
+                    ->field('invitation_type')
+                    ->expression('email')
             )
             ->field('count')
             ->sum(1)
