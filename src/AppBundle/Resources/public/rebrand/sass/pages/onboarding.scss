@@ -86,7 +86,8 @@ body {
     }
 
     &-nav {
-        &__desktop {
+
+        &__link {
             display: flex;
             align-items: center;
             justify-content: center;
@@ -94,9 +95,8 @@ body {
             flex-basis: 0;
             background-color: $selago;
             color: darken($selago, 10%);
-            border-left: 1px solid darken($selago, 5%);
-            border-right: 1px solid darken($selago, 5%);
-
+            border-left: 0.03125rem solid darken($selago, 5%);
+            border-right: 0.03125rem solid darken($selago, 5%);
             transition: background-color 500ms ease;
 
             &:first-of-type {
@@ -107,22 +107,19 @@ body {
                 border-right: none;
             }
 
-            &.active {
+            &.active,
+            &:hover,
+            &:focus,
+            &:active {
                 background-color: rgba(0, 146, 255, 0.3);
                 color: $dodger-blue;
+                text-decoration: none;
 
                 .onboarding-nav__number {
                     background-color: $white;
                     border: none;
                     box-shadow: 0 0 0 7px rgba(37, 147, 243, 0.15);
                 }
-            }
-
-            &:hover,
-            &:focus,
-            &:active {
-                text-decoration: none;
-                color: $dodger-blue
             }
         }
 

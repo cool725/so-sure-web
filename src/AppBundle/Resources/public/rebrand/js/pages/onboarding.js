@@ -12,20 +12,20 @@ let Clipboard = require('clipboard');
 
 $(function() {
     // buttons to get link to app download sent to their phone via sms.
-    const smsButtons = $(".sms-btn");
+    const smsButtons = $('.sms-btn');
     let smsButtonClicked = false;
-    smsButtons.find("a").click(function() {
+    smsButtons.find('a').click(function() {
         if (smsButtonClicked) {
             return;
         }
-        let label = $(this).parent().append("p").text("...");
+        let label = $(this).parent().append('p').text('...');
         $(this).remove();
         smsButtonClicked = true;
         $.ajax({
-            url: "/user/applinksms",
-            method: "POST",
+            url: '/user/applinksms',
+            method: 'POST',
             success: function(data) {
-                label.text("Download link sent to your device.");
+                label.text('Download link sent to your device.');
             },
             error: function(data) {
                 label.text(data.responseText);
@@ -36,7 +36,7 @@ $(function() {
     // the slides on the carousel.
     const carousel = $('#onboarding-carousel');
     const onNavMb  = $('.onboarding-controls__mobile');
-    const onNavDt = $('.onboarding-nav__desktop');
+    const onNavDt  = $('.onboarding-nav__desktop');
 
     let slide = function(e) {
         const slides = [
@@ -50,14 +50,15 @@ $(function() {
         // Mobile navigation buttons.
         if (onNavMb.length) {
             let slide = slides[e.to];
-            let prev = $('#onboarding-btn--prev');
-            let next = $('#onboarding-btn--next');
+            let prev  = $('#onboarding-btn--prev');
+            let next  = $('#onboarding-btn--next');
             let login = $('#onboarding-btn--login');
-            let skip = [$('#onboarding-btn--prev-skip'), $('#onboarding-btn--skip')];
+            let skip  = [$('#onboarding-btn--prev-skip'), $('#onboarding-btn--skip')];
 
             prev.toggleClass('btn-hide', slide[0] != 'prev');
             next.toggleClass('btn-hide', slide[1] != 'next');
             login.toggleClass('btn-hide', slide[1] != 'login');
+
             for (let i = 0; i < 2; i++) {
                 if (typeof slide[i] == 'number') {
                     skip[i].removeClass('btn-hide');
@@ -70,11 +71,11 @@ $(function() {
 
         // Desktop navigation buttons.
         // IDEA: If I were using this more I could change the data-secondary-page thing so be a maximum and allow
-        //       each navigation button to represent a range of slides.
+        // each navigation button to represent a range of slides.
         onNavDt.children().each(function() {
             $(this).toggleClass(
                 'active',
-                $(this).attr("data-slide-to") == e.to || $(this).attr("data-secondary-page") == e.to
+                $(this).attr('data-slide-to') == e.to || $(this).attr('data-secondary-page') == e.to
             );
         });
 
@@ -86,7 +87,7 @@ $(function() {
 
     // when the carousel is triggered control the navigation buttons and set them at start
     carousel.on('slide.bs.carousel', slide);
-    slide({"to": 0});
+    slide({'to': 0});
 
     // Copy scode
     let clipboard = new Clipboard('.btn-copy');

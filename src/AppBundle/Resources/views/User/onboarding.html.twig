@@ -39,29 +39,33 @@
 
     <section class="onboarding">
         {% if device_category() == 'Desktop' or device_category() == 'Tablet'  %}
-            <div class="onboarding-nav__desktop">
-                <a href="#onboarding-carousel"
-                    class="onboarding-nav__desktop py-4 active"
-                    data-slide-to="0">
+            <div class="onboarding-nav__desktop d-flex">
+                <a href="#"
+                   class="onboarding-nav__link active py-4"
+                   data-slide-to="0"
+                   data-target="#onboarding-carousel">
                     <div class="onboarding-nav__number h6 mb-0">1</div>
                     <div class="onboarding-nav__title h6 ml-3 mb-0">Welcome to so-sure</div>
                 </a>
-                <a href="#onboarding-carousel"
-                    class="onboarding-nav__desktop py-4"
-                    data-slide-to="1">
+                <a href="#"
+                   class="onboarding-nav__link py-4"
+                   data-slide-to="1"
+                   data-target="#onboarding-carousel">
                     <div class="onboarding-nav__number h6 mb-0">2</div>
                     <div class="onboarding-nav__title h6 ml-3 mb-0">Reduce Excess by 60%</div>
                 </a>
-                <a href="#onboarding-carousel"
-                    class="onboarding-nav__desktop py-4"
-                    data-slide-to="2"
-                    data-secondary-page="3">
+                <a href="#"
+                   class="onboarding-nav__link py-4"
+                   data-slide-to="2"
+                   data-secondary-page="3"
+                   data-target="#onboarding-carousel">
                     <div class="onboarding-nav__number h6 mb-0">3</div>
                     <div class="onboarding-nav__title h6 ml-3 mb-0">Invite and get cashback</div>
                 </a>
-                <a href="#onboarding-carousel"
-                    class="onboarding-nav__desktop py-4"
-                    data-slide-to="4">
+                <a href="#"
+                   class="onboarding-nav__link py-4"
+                   data-slide-to="4"
+                   data-target="#onboarding-carousel">
                     <div class="onboarding-nav__number h6 mb-0">4</div>
                     <div class="onboarding-nav__title h6 ml-3 mb-0">Policy Details</div>
                 </a>
@@ -81,10 +85,7 @@
                         <div class="onboarding__body">
                             <h2 class="h4 text-primary mb-3">{{ policy.user.firstname }}, You're all covered 🎉</h2>
                                 {% if device_category() == 'Mobile' %}
-                                    <p class="mb-4">
-                                        Thanks for choosing so-sure, mobile PHONE US~ER your payment is setup. You’ll shortly receive a text link to download our app.
-                                        Through the app you can reduce excess and earn cashback. Lorem ipsum dolor sit amet adipiscing elit.
-                                    </p>
+                                    <p class="mb-4">Thanks for choosing so-sure, your payment is setup. You’ll shortly receive a text link to download our app. Through the app you can reduce excess and earn cashback. Lorem ipsum dolor sit amet adipiscing elit.</p>
                                     {% if policy.phone.iTunes %}
                                         <a href="{{ apple_download('onboarding-mobile-one') }}"
                                            class="btn btn-primary btn-block-xs ga-outbound-click"
@@ -102,13 +103,7 @@
                                             Download our App</a>
                                     {% endif %}
                                 {% else %}
-                                    <p class="mb-4">
-                                        Thanks for choosing so-sure,  MR COMPUETRE. your payment is setup. You’ll shortly receive a text link to download our app.
-                                        Through the app you can reduce excess and earn cashback. Lorem ipsum dolor sit amet adipiscing elit.
-                                    </p>
-                                    <p class="mb-4">
-                                        Unfortunately, our system has detected worms inside your computer, so it will now self destruct.
-                                    </p>
+                                    <p class="mb-4">Thanks for choosing so-sure, your payment is setup. You’ll shortly receive a text link to download our app. Through the app you can reduce excess and earn cashback. Lorem ipsum dolor sit amet adipiscing elit.</p>
                                     <a href="#"
                                        class="btn btn-primary"
                                        role="button"
@@ -132,10 +127,7 @@
                         <div class="onboarding__body">
                             <h2 class="h4 text-primary mb-3">Reduce your excess by 60%</h2>
                             {% if device_category() == 'Mobile' %}
-                                <p class="mb-4">
-                                    Thanks for choosing so-sure, mobile PHONE US~ER your payment is setup. You’ll shortly receive a text link to download our app.
-                                    Through the app you can reduce excess and earn cashback. Lorem ipsum dolor sit amet adipiscing elit.
-                                </p>
+                                <p class="mb-4">After downloading the so-sure app you’ll be able to use our in-app validation to reduce your excess. Nulla sed quam risus. Suspendisse potenti. Maecenas molestie egestas sapien, id scelerisque enim rutrum et.</p>
                                 {% if policy.phone.iTunes %}
                                     <a href="{{ apple_download('onboarding-mobile-one') }}"
                                        class="btn btn-primary btn-block-xs ga-outbound-click"
@@ -153,28 +145,22 @@
                                         Download our App</a>
                                 {% endif %}
                             {% else %}
-                                <p class="mb-4">
-                                    Thanks for choosing so-sure,  MR COMPUETRE. your payment is setup. You’ll shortly receive a text link to download our app.
-                                    Through the app you can reduce excess and earn cashback. Lorem ipsum dolor sit amet adipiscing elit.
-                                </p>
-                                <p class="mb-4">
-                                    Unfortunately, our system has detected worms inside your computer, so it will now self destruct.
-                                </p>
-                                <a href="#"
-                                   class="btn btn-primary"
-                                   role="button"
-                                   data-target="#onboarding-carousel"
-                                   data-slide="prev">
-                                   <i class="far fa-long-arrow-left fa-lg ml-2"></i>
-                                   Back
-                               </a>
-                                <a href="#"
-                                   class="btn btn-primary"
-                                   role="button"
-                                   data-target="#onboarding-carousel"
-                                   data-slide="next">
-                                   Next <i class="far fa-long-arrow-right fa-lg ml-2"></i>
-                               </a>
+                                <p class="mb-4">After downloading the so-sure app you’ll be able to use our in-app validation to reduce your excess. Nulla sed quam risus. Suspendisse potenti. Maecenas molestie egestas sapien, id scelerisque enim rutrum et.</p>
+                                <div class="d-flex justify-content-center">
+                                    <a href="#"
+                                       class="btn btn-outline-grey btn-circle d-flex justify-content-center align-items-center opacity-50"
+                                       role="button"
+                                       data-target="#onboarding-carousel"
+                                       data-slide="prev">
+                                        <i class="far fa-arrow-left"></i>
+                                        <span class="sr-only">Back</span></a>
+                                    <a href="#"
+                                       class="btn btn-primary ml-3"
+                                       role="button"
+                                       data-target="#onboarding-carousel"
+                                       data-slide="next">
+                                       Next <i class="far fa-long-arrow-right fa-lg ml-2"></i></a>
+                                </div>
                                 {% if sms_experiment == 'sms-download' %}
                                     <div class="mt-4 sms-btn">
                                         <a href="#" class="link-subtle sms-btn">Re-send my app link</a>
@@ -192,39 +178,12 @@
                         <div class="onboarding__body">
                             <h2 class="h4 text-primary mb-3">Invite friends and earn &pound;100</h2>
                             {% if device_category() == 'Mobile' %}
-                                <p class="mb-4">
-                                    you are on phone For every person you connect with, we’ll add £10 to your reward pot. If neither of you claim,
-                                    your cash will be returned at the end of the policy year. For more information on how it works watch our video lorem ipsum.
-                                </p>
-                            {% else %}
-                                <p class="mb-4">
-                                    you are on computerFor every person you connect with, we’ll add £10 to your reward pot. If neither of you claim, your cash will be returned at the end of
-                                    the policy year. For more information on how it works
-                                    <a href="#"
-                                       class="watch-video"
-                                       data-event="watch-video-index-hero"
-                                       data-toggle="modal"
-                                       data-target="#sosure-video-modal"
-                                       data-src="https://www.youtube.com/embed/QEskwqsNgrQ">
-                                        <u>watch our video</u>
-                                    </a>lorem ipsum.
-                                </p>
+                                <p class="mb-4">you are on phone For every person you connect with, we’ll add £10 to your reward pot. If neither of you claim, your cash will be returned at the end of the policy year. For more information on how it works watch our video lorem ipsum.</p>
                                 <a href="#"
-                                   class="btn btn-primary"
+                                   class="btn btn-success btn-block-xs"
                                    role="button"
                                    data-target="#onboarding-carousel"
-                                   data-slide="prev">
-                                   <i class="far fa-long-arrow-left fa-lg ml-2"></i>
-                                   Back
-                               </a>
-                            {% endif %}
-
-                            <a href="#"
-                               class="btn btn-success btn-block-xs"
-                               role="button"
-                               data-target="#onboarding-carousel"
-                               data-slide="next">Let's get inviting <i class="far fa-long-arrow-right fa-lg ml-2"></i></a>
-                            {% if device_category() == 'Mobile' %}
+                                   data-slide="next">Let's get inviting <i class="far fa-long-arrow-right fa-lg ml-2"></i></a>
                                 {# TODO: Add video once live - change the link to embed one #}
 {#                                 <a href="#"
                                    class="btn btn-outline-primary watch-video btn-block-xs"
@@ -236,19 +195,45 @@
                                     How it works
                                 </a> #}
                             {% else %}
+                                <p class="mb-4">you are on computerFor every person you connect with, we’ll add £10 to your reward pot. If neither of you claim, your cash will be returned at the end of the policy year. For more information on how it works
                                 <a href="#"
-                                   class="btn btn-outline-grey ml-md-2 opacity-50"
+                                   class="watch-video"
+                                   data-event="watch-video-index-hero"
+                                   data-toggle="modal"
+                                   data-target="#sosure-video-modal"
+                                   data-src="https://www.youtube.com/embed/QEskwqsNgrQ">
+                                    <u>watch our video</u>
+                                </a>lorem ipsum.</p>
+
+                                <div class="d-flex justify-content-center mb-4">
+                                    <a href="#"
+                                       class="btn btn-outline-grey btn-circle d-flex justify-content-center align-items-center opacity-50"
+                                       role="button"
+                                       data-target="#onboarding-carousel"
+                                       data-slide="prev">
+                                        <i class="far fa-arrow-left"></i>
+                                        <span class="sr-only">Back</span></a>
+                                    <a href="#"
+                                       class="btn btn-success ml-3"
+                                       role="button"
+                                       data-target="#onboarding-carousel"
+                                       data-slide="next">Let's get inviting <i class="far fa-long-arrow-right fa-lg ml-2"></i></a>
+
+                                </div>
+                                <a href="#"
+                                   class="link-subtle"
                                    role="button"
                                    data-target="#onboarding-carousel"
                                    data-slide-to="4">
-                                   Skip step
-                               </a>
-                               {% if sms_experiment == 'sms-download' %}
+                                   Skip step</a>
+
+                               {# {% if sms_experiment == 'sms-download' %}
                                    <div class="mt-4 sms-btn">
                                        <a href="#" class="link-subtle sms-btn">Re-send my app link</a>
                                    </div>
-                               {% endif %}
+                               {% endif %} #}
                             {% endif %}
+
                         </div>
                     </div>
                 </div>
@@ -276,8 +261,8 @@
                                         data-clipboard-target="#scode"
                                         data-toggle="tooltip"
                                         data-placement="top"
-                                        data-event="user-welcome-copy-scode"
-                                            >copy</button>
+                                        data-event="user-welcome-copy-scode">
+                                        copy</button>
                                 </div>
                             </div>
                         </div>
@@ -290,23 +275,21 @@
                             </div>
                         </div>
                         {% if device_category() == 'Desktop' or device_category() == 'Tablet'  %}
-                            <div>
+                            <div class="d-flex justify-content-center">
                                 <a href="#"
-                                   class="btn btn-primary"
+                                   class="btn btn-outline-grey btn-circle d-flex justify-content-center align-items-center opacity-50"
                                    role="button"
                                    data-target="#onboarding-carousel"
                                    data-slide="prev">
-                                   <i class="far fa-long-arrow-left fa-lg ml-2"></i>
-                                   Back
-                               </a>
+                                    <i class="far fa-arrow-left"></i>
+                                    <span class="sr-only">Back</span></a>
                                 <a href="#"
-                                   class="btn btn-outline-grey opacity-50"
+                                   class="btn btn-primary ml-3"
                                    role="button"
                                    data-target="#onboarding-carousel"
                                    data-slide-to="4">
-                                   Skip step
-                               </a>
-                           </div>
+                                   Next <i class="far fa-long-arrow-right fa-lg ml-2"></i></a>
+                            </div>
                         {% endif %}
                     </div>
                 </div>
@@ -352,23 +335,21 @@
                                 <div class="summary-cardbox__cta">
                                     <a href="{{ s3DownloadLink(policy_terms_file.bucket, policy_terms_file.key) }}">
                                         Download policy details
-                                        <i class="fal fa-download ml-2"></i>
-                                    </a>
+                                        <i class="fal fa-download ml-2"></i></a>
                                 </div>
                             </div>
                         </div>
                         {% if device_category() == 'Desktop' or device_category() == 'Tablet'  %}
-                            <div class="mt-5">
+                            <div class="d-flex justify-content-center mt-5">
                                 <a href="#"
-                                   class="btn btn-primary"
+                                   class="btn btn-outline-grey btn-circle d-flex justify-content-center align-items-center opacity-50"
                                    role="button"
                                    data-target="#onboarding-carousel"
                                    data-slide-to="2">
-                                   <i class="far fa-long-arrow-left fa-lg ml-2"></i>
-                                   Back
-                               </a>
+                                    <i class="far fa-arrow-left"></i>
+                                    <span class="sr-only">Back</span></a>
                                 <a href="{{ path('fos_user_security_login') }}"
-                                   class="btn btn-outline-primary"
+                                   class="btn btn-outline-primary ml-3"
                                    role="button">
                                    Customer login <i class="far fa-long-arrow-right fa-lg ml-2"></i></a>
                             </div>
@@ -378,6 +359,18 @@
             </div>
             {% if device_category() == 'Mobile' %}
                 <div class="onboarding-controls__mobile p-4 d-flex justify-content-between align-items-center">
+                    <a href="#onboarding-carousel"
+                       id="onboarding-btn--prev"
+                       class="onboarding-controls__btn"
+                       role="button"
+                       data-slide="prev">
+                       BACK</a>
+                   <a href="#onboarding-carousel"
+                      id="onboarding-btn--prev-skip"
+                      class="onboarding-controls__btn"
+                      role="button"
+                      data-slide-to="2">
+                      BACK</a>
                     <ol class="carousel-indicators">
                         <li data-target="#onboarding-carousel" class="active"></li>
                         <li data-target="#onboarding-carousel"></li>
@@ -386,40 +379,23 @@
                         <li data-target="#onboarding-carousel"></li>
                     </ol>
                     <a href="#onboarding-carousel"
-                       id="onboarding-btn--prev"
-                       class="onboarding-controls__btn"
-                       role="button"
-                       data-slide="prev">
-                       BACK
-                   </a>
-                   <a href="#onboarding-carousel"
-                      id="onboarding-btn--prev-skip"
-                      class="onboarding-controls__btn"
-                      role="button"
-                      data-slide-to="2">
-                      BACK
-                  </a>
-                    <a href="#onboarding-carousel"
                        id="onboarding-btn--next"
                        class="onboarding-controls__btn"
                        role="button"
                        data-slide="next">
-                       NEXT
-                   </a>
+                       NEXT</a>
                     <a href="#"
                        id="onboarding-btn--skip"
                        class="onboarding-controls__btn opacity-50 btn-hide"
                        role="button"
                        data-target="#onboarding-carousel"
                        data-slide-to="4">
-                       SKIP
-                   </a>
+                       SKIP</a>
                     <a href="{{ path('fos_user_security_login') }}"
                        id="onboarding-btn--login"
                        class="onboarding-controls__btn btn-hide"
                        role="button">
-                       LOGIN
-                   </a>
+                       LOGIN</a>
                 </div>
             {% endif %}
         </div>
