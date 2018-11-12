@@ -65,6 +65,10 @@ class AffiliateService
         $this->logger = $logger;
     }
 
+    /**
+     * Generates all new charges needed for all affiliate companies.
+     * @return array the list of all the charges that were just generated.
+     */
     public function generate()
     {
         $generatedCharges = [];
@@ -72,26 +76,94 @@ class AffiliateService
         $affiliates = $repo->findAll();
 
         foreach ($affiliates as $affiliate) {
-            /** @var AffiliateCompany $affiliate */
-            $users = $this->getMatchingUsers($affiliate);
-            foreach ($users as $user) {
-                /** @var User $user */
-                if ($user->isAffiliateCandidate($affiliate->getDays())) {
+            $model = $affiliate->getChargeModel();
+            if ($model == AffiliateCompany::MODEL_ONE_OFF) {
+                generateOneOffCharges($affiliate, $generatedCharges);
+            } else {
+                // NOTE: if you add more kinds of affiliate charge model then this will need to change.
+                generateOngoingCharges($affiliate, $generatedCharges);
+            }
+        }
+        return $generatedCharges;
+    }
+
+    /**
+     * Confirms and charges for all unconfirmed policies belonging to users belonging to the given affiliate, and
+     * confirms unconfirmed users at the same time.
+     * @param AffiliateCompany $affiliate is the affiliate company to run for.
+     * @return array of the charges made.
+     */
+    public function generateOngoingCharges($affiliate, $charges = null)
+    {
+        $policyRepo = $this->getRepository(Policy::class);
+        $users = $this->getMatchingUsers($affiliate, [User::AQUISITION_PENDING, User::AQUISITION_COMPLETED]);
+        $charges = [];
+        foreach ($users as $user) {
+            /** @var User $user */
+            if ($user->isAffiliateCandidate($affiliate->getDays())) {
+                $policies = $policyRepo->findBy(
+                    [
+                        "user" => $user,
+                        "affiliate" => null,
+                        "status" => ["$or" => ["active", "unpaid"]]
+                    ]
+                );
+                if (count($policies) > 0 && !$user->getAffiliate()) {
+                    $affiliate->addConfirmedUsers($user);
+                }
+                foreach ($policies as $policy) {
                     $charge = new Charge();
                     $charge->setType(Charge::TYPE_AFFILIATE);
                     $charge->setAmount($affiliate->getCPA());
                     $charge->setUser($user);
                     $charge->setAffiliate($affiliate);
                     $this->dm->persist($charge);
-                    $affiliate->addConfirmedUsers($user);
-                    $generatedCharges[] = $charge;
+                    $affiliate->addConfirmedPolicies($user);
+                    $charges[] = $charge;
+                    if ($charges) {
+                        $charges[] = $charge;
+                    }
                 }
             }
         }
         $this->dm->flush();
-        return $generatedCharges;
+        return $charges;
     }
 
+    /**
+     * Confirms and charges for all users that belong to the given affiliate but are not yet confirmed.
+     * @param AffiliateCompany $affiliate is the affiliate company to run for.
+     * @return array of all the charges made.
+     */
+    public function generateOneOffCharges($affiliate, $charges = null)
+    {
+        $users = $this->getMatchingUsers($affiliate);
+        $charges = [];
+        foreach ($users as $user) {
+            if ($user->isAffiliateCandidate($affiliate->getDays())) {
+                $charge = new Charge();
+                $charge->setType(Charge::TYPE_AFFILIATE);
+                $charge->setAmount($affiliate->getCPA());
+                $charge->setUser($user);
+                $charge->setAffiliate($affiliate);
+                $this->dm->persist($charge);
+                $affiliate->addConfirmedUsers($user);
+                if ($charges) {
+                    $charges[] = $charge;
+                }
+            }
+        }
+        $this->dm->flush();
+        return $charges;
+    }
+
+    /**
+     * Get all users that correspond to a given affiliate's campaign source or lead source fields, and within a given
+     * set of aquisition statuses.
+     * @param AffiliateCompany $affiliate is the affiliate company to find users for.
+     * @param array            $status    is the set of aquisition statuses within which all users must fall.
+     * @return array containing the users.
+     */
     public function getMatchingUsers(AffiliateCompany $affiliate, $status = [User::AQUISITION_PENDING])
     {
         $campaignUsers = [];

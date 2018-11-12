@@ -185,6 +185,11 @@ abstract class Policy
     protected $user;
 
     /**
+     * @MongoDB\ReferenceOne(targetDocument="AffiliateCompany", inversedBy="confirmedPolicies")
+     */
+    protected $affiliate;
+
+    /**
      * @MongoDB\ReferenceOne(targetDocument="Policy", inversedBy="previousPolicy")
      * @Gedmo\Versioned
      * @var Policy
@@ -990,6 +995,16 @@ abstract class Policy
     public function setUser(User $user)
     {
         $this->user = $user;
+    }
+
+    public function getAffiliate()
+    {
+        $return $this->affiliate;
+    }
+
+    public function setAffiliate(AffiliateCompany $affiliate)
+    {
+        $this->affiliate = $affiliate;
     }
 
     /**
