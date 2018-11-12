@@ -1,6 +1,7 @@
 <?php
 namespace AppBundle\Service;
 
+use AppBundle\Document\Feature;
 use Predis\Client;
 use Psr\Log\LoggerInterface;
 use AppBundle\Document\Policy;
