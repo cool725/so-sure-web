@@ -34,50 +34,91 @@ $(function() {
     }, );
 
     // the slides on the carousel.
-    const carousel = $('#onboarding-carousel');
-    const onNavMb  = $('.onboarding-controls__mobile');
-    const onNavDt  = $('.onboarding-nav__desktop');
+    const carousel = $('#onboarding-carousel'),
+          onNavMb  = $('.onboarding-controls__mobile'),
+          onNavDt  = $('.onboarding-nav__desktop');
 
     let slide = function(e) {
-        const slides = [
-            [null, 'next'],
-            ['prev', 'next'],
-            ['prev', 4],
-            [1, 4],
-            [2, 'login']
-        ];
+        // const slides = [
+        //     [null, 'next'],
+        //     ['prev', 'next'],
+        //     ['prev', 4],
+        //     [1, 4],
+        //     [2, 'login']
+        // ];
 
         // Mobile navigation buttons.
         if (onNavMb.length) {
-            let slide = slides[e.to];
-            let prev  = $('#onboarding-btn--prev');
-            let next  = $('#onboarding-btn--next');
-            let login = $('#onboarding-btn--login');
-            let skip  = [$('#onboarding-btn--prev-skip'), $('#onboarding-btn--skip')];
+            let btnLeft   = $('#onboarding-btn--left'),
+                btnRight  = $('#onboarding-btn--right'),
+                title     = $('#onboarding--title'),
+                loginPath = btnRight.data('href');
 
-            prev.toggleClass('btn-hide', slide[0] != 'prev');
-            next.toggleClass('btn-hide', slide[1] != 'next');
-            login.toggleClass('btn-hide', slide[1] != 'login');
-
-            for (let i = 0; i < 2; i++) {
-                if (typeof slide[i] == 'number') {
-                    skip[i].removeClass('btn-hide');
-                    skip[i].attr('data-slide-to', slide[i])
-                } else {
-                    skip[i].addClass('btn-hide');
-                }
+            switch(e.to) {
+                case 0:
+                    btnLeft.addClass('disabled')
+                           .removeAttr('data-slide-to');
+                    btnRight.attr('data-slide-to', 1);
+                    break;
+                case 1:
+                    btnLeft.removeClass('disabled')
+                           .attr('data-slide-to', 0);
+                    btnRight.removeClass('opacity-50')
+                            .attr('data-slide-to', 2)
+                            .text('NEXT');
+                    break;
+                case 2:
+                    btnLeft.attr('data-slide-to', 1);
+                    btnRight.addClass('opacity-50')
+                            .attr('href', '#')
+                            .attr('data-slide-to', 4)
+                            .text('SKIP');
+                    break;
+                case 3:
+                    btnLeft.attr('data-slide-to', 2);
+                    btnRight.removeClass('opacity-50')
+                            .attr('href', '#')
+                            .text('FINISH')
+                    break;
+                case 4:
+                    btnLeft.attr('data-slide-to', 2);
+                    btnRight.removeClass('opacity-50')
+                            .removeAttr('data-slide-to')
+                            .attr('href', loginPath)
+                            .text('LOGIN');
+                    break;
             }
+
+
+            // let prev  = $('#onboarding-btn--prev');
+            // let next  = $('#onboarding-btn--next');
+            // let login = $('#onboarding-btn--login');
+            // let skip  = [$('#onboarding-btn--prev-skip'), $('#onboarding-btn--skip')];
+
+            // prev.toggleClass('btn-hide', slide[0] != 'prev');
+            // next.toggleClass('btn-hide', slide[1] != 'next');
+            // login.toggleClass('btn-hide', slide[1] != 'login');
+
+            // for (let i = 0; i < 2; i++) {
+            //     if (typeof slide[i] == 'number') {
+            //         skip[i].removeClass('btn-hide');
+            //         skip[i].attr('data-slide-to', slide[i])
+            //     } else {
+            //         skip[i].addClass('btn-hide');
+            //     }
+            // }
         }
 
         // Desktop navigation buttons.
-        // IDEA: If I were using this more I could change the data-secondary-page thing so be a maximum and allow
-        // each navigation button to represent a range of slides.
-        onNavDt.children().each(function() {
-            $(this).toggleClass(
-                'active',
-                $(this).attr('data-slide-to') == e.to || $(this).attr('data-secondary-page') == e.to
-            );
-        });
+        if (onNavDt.length) {
+            // IDEA: If I were using this more I could change the data-secondary-page thing so be a maximum and allow each navigation button to represent a range of slides.
+            onNavDt.children().each(function() {
+                $(this).toggleClass(
+                    'active',
+                    $(this).attr('data-slide-to') == e.to || $(this).attr('data-secondary-page') == e.to
+                );
+            });
+        }
 
         // If one of the sms buttons have been pressed we can remove them.
         if (smsButtonClicked) {

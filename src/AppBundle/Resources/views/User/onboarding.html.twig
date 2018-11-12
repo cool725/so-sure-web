@@ -85,7 +85,7 @@
                         <div class="onboarding__body">
                             <h2 class="h4 text-primary mb-3">{{ policy.user.firstname }}, You're all covered 🎉</h2>
                                 {% if device_category() == 'Mobile' %}
-                                    <p class="mb-4">Thanks for choosing so-sure, your payment is setup. You’ll shortly receive a text link to download our app. Through the app you can reduce excess and earn cashback. Lorem ipsum dolor sit amet adipiscing elit.</p>
+                                    <p class="mb-5">Thanks for choosing so-sure, your payment is setup. You’ll shortly receive a text link to download our app. Through the app you can reduce excess and earn cashback. Lorem ipsum dolor sit amet adipiscing elit.</p>
                                     {% if policy.phone.iTunes %}
                                         <a href="{{ apple_download('onboarding-mobile-one') }}"
                                            class="btn btn-primary btn-block-xs ga-outbound-click"
@@ -127,7 +127,7 @@
                         <div class="onboarding__body">
                             <h2 class="h4 text-primary mb-3">Reduce your excess by 60%</h2>
                             {% if device_category() == 'Mobile' %}
-                                <p class="mb-4">After downloading the so-sure app you’ll be able to use our in-app validation to reduce your excess. Nulla sed quam risus. Suspendisse potenti. Maecenas molestie egestas sapien, id scelerisque enim rutrum et.</p>
+                                <p class="mb-5">After downloading the so-sure app you’ll be able to use our in-app validation to reduce your excess. Nulla sed quam risus. Suspendisse potenti. Maecenas molestie egestas sapien, id scelerisque enim rutrum et.</p>
                                 {% if policy.phone.iTunes %}
                                     <a href="{{ apple_download('onboarding-mobile-one') }}"
                                        class="btn btn-primary btn-block-xs ga-outbound-click"
@@ -178,14 +178,14 @@
                         <div class="onboarding__body">
                             <h2 class="h4 text-primary mb-3">Invite friends and earn &pound;100</h2>
                             {% if device_category() == 'Mobile' %}
-                                <p class="mb-4">you are on phone For every person you connect with, we’ll add £10 to your reward pot. If neither of you claim, your cash will be returned at the end of the policy year. For more information on how it works watch our video lorem ipsum.</p>
+                                <p class="mb-5">you are on phone For every person you connect with, we’ll add £10 to your reward pot. If neither of you claim, your cash will be returned at the end of the policy year. For more information on how it works watch our video lorem ipsum.</p>
                                 <a href="#"
                                    class="btn btn-success btn-block-xs"
                                    role="button"
                                    data-target="#onboarding-carousel"
                                    data-slide="next">Let's get inviting <i class="far fa-long-arrow-right fa-lg ml-2"></i></a>
                                 {# TODO: Add video once live - change the link to embed one #}
-{#                                 <a href="#"
+                                <a href="#"
                                    class="btn btn-outline-primary watch-video btn-block-xs"
                                    data-event="watch-video-index-hero"
                                    data-toggle="modal"
@@ -193,7 +193,7 @@
                                    data-src="https://www.youtube.com/embed/QEskwqsNgrQ">
                                     <i class="far fa-play-circle fa-lg opacity-50 mr-1"></i>
                                     How it works
-                                </a> #}
+                                </a>
                             {% else %}
                                 <p class="mb-4">you are on computerFor every person you connect with, we’ll add £10 to your reward pot. If neither of you claim, your cash will be returned at the end of the policy year. For more information on how it works
                                 <a href="#"
@@ -243,8 +243,8 @@
                             <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_reward-pot.png" alt="so-sure - Choose how you’d like to invite" width="180px">
                         </div>
                         <div class="onboarding__body">
-                            <h2 class="h4 text-primary mb-4">Choose how you’d like to invite</h2>
-                            <p class="mb-4">Entesque dolor praesent volutpat elit vehicula pretium placerat. Nam download app sagittis, hendrerit lore in hac habitasse platea.</p>
+                            <h2 class="h4 text-primary mb-3">Choose how you’d like to invite</h2>
+                            <p class="mb-5">Entesque dolor praesent volutpat elit vehicula pretium placerat. Nam download app sagittis, hendrerit lore in hac habitasse platea.</p>
                             <div class="d-lg-flex justify-content-lg-center">
                                 <h5 class="text-left text-zaffre d-lg-none">📨 Invite via email</h5>
                                 {{ form_start(email_form, {'attr': {'autocomplete': 'nope'}}) }}
@@ -284,11 +284,11 @@
                                     <i class="far fa-arrow-left"></i>
                                     <span class="sr-only">Back</span></a>
                                 <a href="#"
-                                   class="btn btn-primary ml-3"
+                                   class="btn btn-success ml-3"
                                    role="button"
                                    data-target="#onboarding-carousel"
                                    data-slide-to="4">
-                                   Next <i class="far fa-long-arrow-right fa-lg ml-2"></i></a>
+                                   Finish <i class="far fa-long-arrow-right fa-lg ml-2"></i></a></a>
                             </div>
                         {% endif %}
                     </div>
@@ -359,18 +359,12 @@
             </div>
             {% if device_category() == 'Mobile' %}
                 <div class="onboarding-controls__mobile p-4 d-flex justify-content-between align-items-center">
-                    <a href="#onboarding-carousel"
-                       id="onboarding-btn--prev"
-                       class="onboarding-controls__btn"
+                    <a href="#"
+                       id="onboarding-btn--left"
+                       class="onboarding-controls__btn disabled"
                        role="button"
-                       data-slide="prev">
+                       data-target="#onboarding-carousel">
                        BACK</a>
-                   <a href="#onboarding-carousel"
-                      id="onboarding-btn--prev-skip"
-                      class="onboarding-controls__btn"
-                      role="button"
-                      data-slide-to="2">
-                      BACK</a>
                     <ol class="carousel-indicators">
                         <li data-target="#onboarding-carousel" class="active"></li>
                         <li data-target="#onboarding-carousel"></li>
@@ -378,24 +372,13 @@
                         <li data-target="#onboarding-carousel"></li>
                         <li data-target="#onboarding-carousel"></li>
                     </ol>
-                    <a href="#onboarding-carousel"
-                       id="onboarding-btn--next"
+                    <a href="#"
+                       id="onboarding-btn--right"
                        class="onboarding-controls__btn"
                        role="button"
-                       data-slide="next">
+                       data-href="{{ path('fos_user_security_login') }}"
+                       data-target="#onboarding-carousel">
                        NEXT</a>
-                    <a href="#"
-                       id="onboarding-btn--skip"
-                       class="onboarding-controls__btn opacity-50 btn-hide"
-                       role="button"
-                       data-target="#onboarding-carousel"
-                       data-slide-to="4">
-                       SKIP</a>
-                    <a href="{{ path('fos_user_security_login') }}"
-                       id="onboarding-btn--login"
-                       class="onboarding-controls__btn btn-hide"
-                       role="button">
-                       LOGIN</a>
                 </div>
             {% endif %}
         </div>
