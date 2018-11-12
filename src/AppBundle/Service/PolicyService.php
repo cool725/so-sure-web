@@ -318,6 +318,7 @@ class PolicyService
             $this->validateUser($user);
             $this->validateImei($imei);
 
+            /*
             if ($identityLog && $identityLog->isSessionDataPresent()) {
                 if (!$this->rateLimit->allowedByDevice(
                     RateLimitService::DEVICE_TYPE_POLICY,
@@ -327,6 +328,7 @@ class PolicyService
                     throw new RateLimitException();
                 }
             }
+            */
 
             $checkmend = $this->checkImeiSerial($user, $phone, $imei, $serialNumber, $identityLog);
 
