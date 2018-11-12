@@ -999,7 +999,7 @@ abstract class Policy
 
     public function getAffiliate()
     {
-        $return $this->affiliate;
+        return $this->affiliate;
     }
 
     public function setAffiliate(AffiliateCompany $affiliate)
