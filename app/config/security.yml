@@ -89,8 +89,14 @@ security:
         - { path: ^/resetting, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/admin$, role: ROLE_EMPLOYEE }
         - { path: ^/admin/, role: ROLE_EMPLOYEE }
-        - { path: ^/claims$, role: ROLE_CLAIMS }
-        - { path: ^/claims/, role: ROLE_CLAIMS }
+        - { path: ^/claims$, role: ROLE_CLAIMS, ips: [ "%davies_ip%" ] }
+        - { path: ^/claims$, role: ROLE_CLAIMS, ips: [ "%directgroup_ip%" ] }
+        - { path: ^/claims$, role: ROLE_CLAIMS, ips: "%sosure_ips%" }
+        - { path: ^/claims$, role: ROLE_NO_ACCESS }
+        - { path: ^/claims/, role: ROLE_CLAIMS, ips: [ "%davies_ip%" ] }
+        - { path: ^/claims/, role: ROLE_CLAIMS, ips: [ "%directgroup_ip%" ] }
+        - { path: ^/claims/, role: ROLE_CLAIMS, ips: "%sosure_ips%" }
+        - { path: ^/claims/, role: ROLE_NO_ACCESS }
         - { path: ^/alpha$, role: ROLE_USER }
         - { path: ^/user$, role: ROLE_USER }
         - { path: ^/user/, role: ROLE_USER }
