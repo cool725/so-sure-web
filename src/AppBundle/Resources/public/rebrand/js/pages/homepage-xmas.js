@@ -11,12 +11,19 @@ $(function(){
     let snowIntensity = 50; // smaller number = more snowflakes;
 
     function snowFlake(){
-        var snowflake = this;
+        let snowflake = this;
+
         snowflake.x = (Math.random() * $(document).width());
         snowflake.size = (Math.random() * 35) + 10;
         snowflake.opacity = Math.random();
         snowflake.body = $('<span class="snowflake">*</span>');
-        snowflake.body.css({'font-size': this.size + 'px', 'left': this.x +'px', opacity: this.opacity });
+
+        snowflake.body.css({
+            'font-size': this.size + 'px',
+            'left': this.x +'px',
+            'opacity': this.opacity
+        });
+
         snowflake.fall = function(){
             let that = this;
             let $snowflake = this.body;
@@ -27,6 +34,7 @@ $(function(){
                 swingDirection = - swingDirection;
             }, 1000);
             let speed = (Math.random() * 3000) + 3000;
+
             $snowflake.animate({top: '100vh'}, speed, function(){
                 clearInterval(interval);
                 $snowflake.remove();
@@ -37,8 +45,10 @@ $(function(){
         snowflake.fall();
     }
 
-    let snow = window.setInterval(function () {
-        new snowFlake();
-    }, snowIntensity);
+    $('window').load(function() {
+        let snow = window.setInterval(function () {
+            new snowFlake();
+        }, snowIntensity);
+    });
 
 });
