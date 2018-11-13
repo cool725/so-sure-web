@@ -8,7 +8,7 @@ require('../../sass/pages/homepage-xmas.scss');
 
 $(function(){
 
-    let snowIntensity = 50; // smaller number = more snowflakes;
+    let snowIntensity = 200; // smaller number = more snowflakes;
 
     function snowFlake(){
         let snowflake = this;
@@ -45,10 +45,12 @@ $(function(){
         snowflake.fall();
     }
 
-    $('window').load(function() {
-        let snow = window.setInterval(function () {
-            new snowFlake();
-        }, snowIntensity);
+    let snow = window.setInterval(function () {
+        new snowFlake();
+    }, snowIntensity);
+
+    $(document).on('keypress', function() {
+        window.clearInterval(snow);
     });
 
 });
