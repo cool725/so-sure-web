@@ -45,7 +45,11 @@ body {
 
     &__body {
         font-weight: 300;
-        font-size: 0.98rem;
+
+        @include media-breakpoint-up(ss) {
+            font-size: 0.99rem;
+        }
+
     }
 
     &__item {
