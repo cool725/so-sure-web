@@ -9,7 +9,9 @@
 
     <h4 class="text-dodger-blue">
         Pay via Direct Debit
-        <span class="sub h5">(Recommended)</span>
+        {% if to_judo_form is defined %}
+            <span class="sub h5">(Recommended)</span>
+        {% endif %}
     </h4>
 
     {% if to_judo_form is defined %}
