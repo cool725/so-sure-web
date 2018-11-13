@@ -83,58 +83,151 @@ class AffiliateServiceTest extends WebTestCase
         $this->purge(Policy::class);
     }
 
-
     /**
-     * Tests that the generate works as intended when there are no affiliates.
+     * Tests that the AffiliateService::generate works as intended on a populated database.
+     * generate method works on the whole dataset at once so there is no need for dataproviders.
      */
-    public function testGenerateEmpty()
+    public function testGenerate()
     {
         $this->assertEmpty(self::$affiliateService->generate());
         $this->assertEquals(0, count(self::$chargeRepository->findBy([])));
     }
 
-    public function testGenerateCampaignSource()
+    /**
+     * Tests generating the ongoing charges for an ongoing affiliate on a populated database.
+     * @param string $affiliate is the name of the affiliate to test.
+     * @param array  $n         is the list of user's names for which charges will be made.
+     * @dataProvider generateOngoingChargesProvider
+     */
+    public function testGenerateOngoingCharges($affiliate, $users)
     {
-
-    }
-
-    public function testGenerateAffiliateLead()
-    {
-
-    }
-
-    public function testGenerateOngoingCharges()
-    {
-
-    }
-
-    public function testGenerateOneOffCharges()
-    {
-
+        $this->createState();
+        $charges = [];
+        self::$affiliateService->generateOngoingCharges($this->affiliate($affiliate), $charges);
+        $this->assertEquals(count($users), count($charges));
+        foreach ($users as $user) {
+            $policy = new Policy();
+            $policy->setStatus(Policy::STATUS_ACTIVE);
+            $policy->setUser($this->userByName(self::$dm, $user));
+            $policy->setStartDate(new \DateTime("200 days ago"));
+        }
+        self::$affiliateService->generateOngoingCharges($this->affiliate($affiliate), $charges);
+        $this->assertEquals(count($users) * 2, count($charges));
     }
 
     /**
-     * Tests getting matching users from all status groups when status groups are empty.
+     * Tests generating one off charges for a one off affiliate on a populated database.
+     * @param string $affiliate the name of the affiliate to test.
+     * @param int    $n         is the number of charges that should be made.
+     * @dataProvider generateOneOffChargesProvider
      */
-    public function testGetMatchingUsersEmpty()
+    public function testGenerateOneOffCharges($affiliate, $n)
     {
-        $this->assertEmpty(
-            self::$affiliateService->getMatchingUsers(
-                self::$affiliateService->findBy(["name" => "sourceAffiliateA"])
-            )
-        );
-
+        $this->createState();
+        $charges = [];
+        self::$affiliateService->generateOneOffCharges($this->affiliate($affiliate), $charges);
+        $this->assertEquals($n, count($charges));
     }
 
     /**
      * Tests getting matching users from all status groups when all status groups are populated.
+     * @param string $affiliate is the name of the affiliate to test on.
+     * @param array  $status    is an array of the statuses we are searching for.
+     * @param array  $expected  is an array of emails of the users who should be returned.
+     * @dataProvider getMatchingUsersProvider
      */
-    public function testGetMatchingUsersNormal()
+    public function testGetMatchingUsers($affiliate, $status, $expected)
     {
-
+        $this->createState();
+        $expectedUsers = $this->usersByName(self::$dm, $expected);
+        $users = self::$affiliateService->getMatchingUsers($this->affiliate($affiliate), $status);
+        $this->assertEquals(count($expectedUsers), count($users));
+        foreach($users as $user) {
+            $found = false;
+            $id = $user->getId();
+            foreach($expectedUsers as $expectedUser) {
+                if ($id == $expectedUser->getId()) {
+                    $found = true;
+                    break;
+                }
+            }
+            $this->assertTrue($found);
+        }
     }
 
+    /**
+     * Generates data to run testGenerateOngoingCharges.
+     * @return array containing the test data.
+     */
+    public static function generateOngoingChargesProvider()
+    {
+        return [["campaignC", 2]];
+    }
 
+    /**
+     * Generates data to run testGenerateOneOffCharges.
+     * @return array containing the test data.
+     */
+    public static function generateOneOffChargesProvider()
+    {
+        return [
+            ["campaignA", 3],
+            ["campaignB", 0],
+            ["leadA", 3]
+        ];
+    }
+
+    /**
+     * Generates the data to run testGetMatchingUsers.
+     * @return array with the test data.
+     */
+    public static function getMatchingUsersProvider()
+    {
+        return [
+            [
+                "campaignA",
+                [User::AQUISITION_PENDING],
+                ["tony", "bango", "tango", "snakeHandler", "wearingABigHat"]
+            ],
+            [
+                "campaignA",
+                [User::AQUISITION_POTENTIAL],
+                ["aaa", "bbb"]
+            ],
+            [
+                "campaignA",
+                [User::AQUISITION_LOST],
+                ["lostAGuy"]
+            ],
+            [
+                "campaignA",
+                [User::AQUISITION_COMPLETED],
+                ["completedAGuy"]
+            ],
+            [
+                "leadA",
+                [User::AQUISITION_PENDING, User::AQUISITION_POTENTIAL],
+                ["clove", "bone", "borb", "tonyAbbot", "shelf", "jellyfish", "eel"]
+            ],
+            [
+                "campaignB",
+                [User::AQUISITION_PENDING],
+                []
+            ]
+        ];
+    }
+
+    /**
+     * Find an affiliate by name.
+     * @param string $name is the name of the new user.
+     * @return AffiliateCompany the company found with that name or null if not found.
+     */
+    private static function affiliate($name)
+    {
+
+        $items = self::$affiliateRepository->findBy(["name" => $name]);
+        return reset($items);
+    }
 
     /**
      * Drops every document of type given from the database.
@@ -146,82 +239,123 @@ class AffiliateServiceTest extends WebTestCase
     }
 
     /**
-     * Creates a good state from which to test.
+     * Creates a good state in the database from which to test.
      */
-    private function createState()
+    private static function createState()
     {
-        $sourceA = $this->createTestAffiliate("sourceAffiliateA", 15.3, 30, "line 1", "london", "sourceA");
-        $sourceB = $this->createTestAffiliate("sourceAffiliateB", 0.2, 60, "line 1", "london", "sourceB");
-        $leadA = $this->createTestAffiliate("leadAffiliateA", 10.9, 90, "line 1", "london", "", "leadA");
-        $leadB = $this->createTestAffiliate("leadAffiliateB", 3.4, 30, "line 1", "london", "", "leadB");
+        $affiliate = self::createTestAffiliate("campaignA", 15.3, 30, "line 1", "london", "campaignA");
+        self::createTestAffiliate("campaignB", 2.3, 60, "line 1", "london", "campaignB");
+        self::createTestAffiliate("campaignC", 5.2, 30, "line 1", "london", "campaignC")->setChargeModel(AffiliateCompany::MODEL_ONGOING);
+        self::createTestAffiliate("leadA", 10.9, 90, "line 1", "london", "", "leadA");
+        self::createTestAffiliate("leadC", 8.1, 60, "line 1", "london", "", "leadC")->setChargeModel(AffiliateCompany::MODEL_ONGOING);
 
-        $this->createTestUser(10, "tony@qergre.com", "sourceA");
-        $this->createTestUser(20, "bango@qergre.com", "sourceA");
-        $this->createTestUser(30, "tango@qergre.com", "sourceA");
-        $this->createTestUser(40, "snakeHandler@qergre.com", "sourceA");
-        $this->createTestUser(50, "wearingAHat@qergre.com", "sourceA");
-        $this->createLonelyTestUser("sproingo", "sourceA");
-        $this->createLonelyTestUser("borakoef", "sourceA");
+        self::createTestUser("10 days ago", "tony", "campaignA");
+        self::createTestUser("20 days ago", "bango", "campaignA");
+        self::createTestUser("31 days ago", "tango", "campaignA");
+        self::createTestUser("40 days ago", "snakeHandler", "campaignA");
+        self::createTestUser("50 days ago", "wearingABigHat", "campaignA");
+        $completedAGuy = self::createTestUser("60 days ago", "completedAGuy", "campaignA");
+        $lostAGuy = self::createTestUser("60 days ago", "lostAGuy", "campaignA");
+        self::createLonelyTestUser("aaa", "campaignA");
+        self::createLonelyTestUser("bbb", "campaignA");
+        $affiliate->addConfirmedUsers($completedAGuy);
+        $lostAGuy->getLatestPolicy()->setStatus(Policy::STATUS_CANCELLED);
 
-        $this->createTestUser(33, "clove@qergre.com", "", "leadA");
-        $this->createTestUser(51, "bone@qergre.com", "", "leadA");
-        $this->createTestUser(95, "bberb@qergre.com", "", "leadA");
-        $this->createTestUser(101, "tonyAbbot@qergre.com", "", "leadA");
-        $this->createTestUser(123, "ujoireg@qergre.com", "", "leadA");
-        $this->createLonelyTestUser("jellyfish", "", "leadA");
-        $this->createLonelyTestUser("eel", "", "leadA");
+        self::createTestUser("10 days ago", "jack", "campaignC");
+        self::createTestUser("20 days ago", "john", "campaignC");
+        self::createTestUser("30 days ago", "barrel", "campaignC");
+        self::createTestUser("40 days ago", "smith", "campaignC");
+        self::createTestUser("50 days ago", "kalvin", "campaignC");
+        self::createLonelyTestUser("gabriel", "campaignC");
+        self::createLonelyTestUser("michael", "campaignC");
 
-        self::$dm->flush();
+        self::createTestUser("33 days ago", "clove", "", "leadA");
+        self::createTestUser("51 days ago", "bone", "", "leadA");
+        self::createTestUser("95 days ago", "borb", "", "leadA");
+        self::createTestUser("101 days ago", "tonyAbbot", "", "leadA");
+        self::createTestUser("123 days ago", "shelf", "", "leadA");
+        self::createLonelyTestUser("jellyfish", "", "leadA");
+        self::createLonelyTestUser("eel", "", "leadA");
     }
 
-    private function createTestAffiliate($name, $cpa, $days, $line1, $city, $source = '', $lead = '')
+    /**
+     * Creates an affiliate company.
+     * @param string $name   is the name of the affiliate.
+     * @param float  $cpa    is the cost per aquisition on this affiliate.
+     * @param int    $days   is the number of days it takes before a user from this affiliate is considered aquired.
+     * @param string $line1  is the first line of their address.
+     * @param string $city   is the city that the affiliate company is based in.
+     * @param string $source is the name of the affiliate company's campaign source if they have one.
+     * @param string $lead   is the name of the affiliate company's lead source.
+     * @return AffiliateCompany the new company.
+     */
+    private static function createTestAffiliate($name, $cpa, $days, $line1, $city, $source = '', $lead = '')
     {
         $affiliate = new AffiliateCompany();
         $address = new Address();
         $address->setLine1($line1);
         $address->setCity($city);
-        $address->setPostcode('SW1A 0PW');
+        $address->setPostcode("SW1A 0PW");
         $affiliate->setName($name);
         $affiliate->setAddress($address);
         $affiliate->setCPA($cpa);
         $affiliate->setDays($days);
         $affiliate->setCampaignSource($source);
-        $affiliate->setLeadSource('scode');
+        $affiliate->setLeadSource("scode");
         $affiliate->setLeadSourceDetails($lead);
         self::$dm->persist($affiliate);
+        self::$dm->flush();
         return $affiliate;
     }
 
-    private function createTestUser($policyAge, $email, $source = "", $lead = "")
+    /**
+     * Creates a test user with a policy.
+     * @param string $policyAge is the start date of the policy.
+     * @param string $name      is the first and last names and email address of the user.
+     * @param string $source    is the campaign source of the user.
+     * @param string $lead      is the lead source of the user.
+     * @return User the user that has now been created.
+     */
+    private static function createTestUser($policyAge, $name, $source = "", $lead = "")
     {
         $policy = self::createUserPolicy(true, new \DateTime($policyAge));
-        $policy->getUser()->setEmail(static::generateEmail($email, $this));
+        $policy->getUser()->setEmail(self::generateEmailClass($name, "affiliateServiceTest"));
         $policy->setStatus(Policy::STATUS_ACTIVE);
         $policy->setImei(self::generateRandomImei());
         $user = $policy->getUser();
         $attribution = new Attribution();
         $attribution->setCampaignSource($source);
         $user->setAttribution($attribution);
-        $user->setLeadSource('scode');
+        $user->setLeadSource("scode");
         $user->setLeadSourceDetails($lead);
-        $user->setFirstName($email);
-        $user->setLastName($email);
+        $user->setFirstName($name);
+        $user->setLastName($name);
         self::$dm->persist($policy);
         self::$dm->persist($user);
+        self::$dm->flush();
         return $user;
     }
 
-    private function createLonelyTestUser($name, $source = "", $lead = "")
+    /**
+     * Creates a test user with no policy.
+     * @param string $name  is the first and last names and email address of the user.
+     * @param string $source is the campaign source of the user.
+     * @param string $lead   is the lead source of the user.
+     * @return User the user that has now been created.
+     */
+    private static function createLonelyTestUser($name, $source = "", $lead = "")
     {
         $user = new User();
-        $user->setEmail(static::generateEmail($name, $this));
+        $user->setEmail(self::generateEmailClass($name, "affiliateServiceTest"));
         $user->setFirstName($name);
         $user->setLastName($name);
         $attribution = new Attribution();
         $attribution->setCampaignSource($source);
-        $attribution->setLeadSource($lead);
+        $user->setLeadSource("scode");
+        $user->setLeadSourceDetails($lead);
         $user->setAttribution($attribution);
         self::$dm->persist($user);
+        self::$dm->flush();
         return $user;
     }
 }

@@ -2,7 +2,6 @@
 namespace AppBundle\Service;
 
 use AppBundle\Document\AffiliateCompany;
-use AppBundle\Document\Charge;
 use AppBundle\Document\File\SalvaPaymentFile;
 use AppBundle\Document\Payment\BacsIndemnityPayment;
 use AppBundle\Repository\CashbackRepository;
@@ -28,6 +27,10 @@ use AppBundle\Document\Cashback;
 use AppBundle\Document\Lead;
 use AppBundle\Document\Payment\Payment;
 use AppBundle\Document\ScheduledPayment;
+use AppBundle\Document\PolicyTerms;
+use AppBundle\Document\User;
+use AppBundle\Document\Charge;
+use AppBundle\Document\Policy;
 use AppBundle\Document\CurrencyTrait;
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\Payment\BacsPayment;
@@ -39,8 +42,6 @@ use AppBundle\Document\Payment\PolicyDiscountPayment;
 use AppBundle\Document\Payment\PolicyDiscountRefundPayment;
 use AppBundle\Document\Payment\ChargebackPayment;
 use AppBundle\Document\Payment\DebtCollectionPayment;
-use AppBundle\Document\PolicyTerms;
-use AppBundle\Document\User;
 use DateInterval;
 use DateTime;
 use DateTimeZone;
@@ -79,8 +80,7 @@ class AffiliateService
             $model = $affiliate->getChargeModel();
             if ($model == AffiliateCompany::MODEL_ONE_OFF) {
                 generateOneOffCharges($affiliate, $generatedCharges);
-            } else {
-                // NOTE: if you add more kinds of affiliate charge model then this will need to change.
+            } elseif ($model == AffiliateCompany::MODEL_ONGOING) {
                 generateOngoingCharges($affiliate, $generatedCharges);
             }
         }
@@ -91,13 +91,13 @@ class AffiliateService
      * Confirms and charges for all unconfirmed policies belonging to users belonging to the given affiliate, and
      * confirms unconfirmed users at the same time.
      * @param AffiliateCompany $affiliate is the affiliate company to run for.
+     * @param array $charges is a reference to an array into which the charges added for reference.
      * @return array of the charges made.
      */
-    public function generateOngoingCharges($affiliate, $charges = null)
+    public function generateOngoingCharges($affiliate, & $charges = null)
     {
-        $policyRepo = $this->getRepository(Policy::class);
+        $policyRepo = $this->dm->getRepository(Policy::class);
         $users = $this->getMatchingUsers($affiliate, [User::AQUISITION_PENDING, User::AQUISITION_COMPLETED]);
-        $charges = [];
         foreach ($users as $user) {
             /** @var User $user */
             if ($user->isAffiliateCandidate($affiliate->getDays())) {
@@ -119,15 +119,13 @@ class AffiliateService
                     $charge->setAffiliate($affiliate);
                     $this->dm->persist($charge);
                     $affiliate->addConfirmedPolicies($user);
-                    $charges[] = $charge;
-                    if ($charges) {
+                    if (isset($charges)) {
                         $charges[] = $charge;
                     }
                 }
             }
         }
         $this->dm->flush();
-        return $charges;
     }
 
     /**
@@ -135,10 +133,9 @@ class AffiliateService
      * @param AffiliateCompany $affiliate is the affiliate company to run for.
      * @return array of all the charges made.
      */
-    public function generateOneOffCharges($affiliate, $charges = null)
+    public function generateOneOffCharges($affiliate, & $charges = null)
     {
         $users = $this->getMatchingUsers($affiliate);
-        $charges = [];
         foreach ($users as $user) {
             if ($user->isAffiliateCandidate($affiliate->getDays())) {
                 $charge = new Charge();
@@ -148,13 +145,12 @@ class AffiliateService
                 $charge->setAffiliate($affiliate);
                 $this->dm->persist($charge);
                 $affiliate->addConfirmedUsers($user);
-                if ($charges) {
+                if (isset($charges)) {
                     $charges[] = $charge;
                 }
             }
         }
         $this->dm->flush();
-        return $charges;
     }
 
     /**

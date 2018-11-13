@@ -60,15 +60,20 @@ trait UserClassTrait
 
     public static function generateEmail($name, $caller, $rand = false)
     {
+        return self::generateEmailClass($name, get_class($caller), $rand);
+    }
+
+    public static function generateEmailClass($name, $className, $rand = false)
+    {
         if ($rand) {
             return sprintf(
                 '%s-%d@%s.so-sure.net',
                 $name,
                 random_int(0, 999999),
-                str_replace("\\", ".", get_class($caller))
+                str_replace("\\", ".", $className)
             );
         } else {
-            return sprintf('%s@%s.so-sure.net', $name, str_replace("\\", ".", get_class($caller)));
+            return sprintf('%s@%s.so-sure.net', $name, str_replace("\\", ".", $className));
         }
     }
 
@@ -156,7 +161,7 @@ trait UserClassTrait
 
         return $mobile;
     }
-    
+
     public static function getRandomPhone(\Doctrine\ODM\MongoDB\DocumentManager $dm, $make = null)
     {
         $phoneRepo = $dm->getRepository(Phone::class);
@@ -399,7 +404,7 @@ trait UserClassTrait
         }
         self::addSoSurePayment($policy, $premium, $commission, $date);
     }
-    
+
     public static function addSoSurePayment($policy, $amount, $commission, $date = null)
     {
         $payment = new SoSurePayment();
@@ -782,5 +787,34 @@ trait UserClassTrait
         $repo = $dm->getRepository(Policy::class);
         $updatedPolicy = $repo->find($policy->getId());
         $this->assertNull($updatedPolicy);
+    }
+
+    /**
+     * Find a user by their name.
+     * @param DocumentManager $dm is the document manager to use in finding the user.
+     * @param string $name is the user's firstname by which wee shall find them.
+     * @return User the user that has been found.
+     */
+    protected function userByName($dm, $name)
+    {
+        $repo = $dm->getRepository(User::class);
+        $items = $repo->findBy(["firstName" => $name]);
+        return reset($items);
+    }
+
+    /**
+     * Find a list of users by their name.
+     * @param DocumentManager $dm is the document manager to use in finding the users.
+     * @param array $names is the list of firstnames by which we will find the list of users.
+     * @return array the list of users.
+     */
+    protected function usersByName($dm, $names)
+    {
+        $cursor = $dm->createQueryBuilder(User::class)->field("firstName")->in($names)->getQuery()->execute();
+        $list = [];
+        foreach ($cursor as $user) {
+            $list[] = $user;
+        }
+        return $list;
     }
 }
