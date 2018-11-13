@@ -8,6 +8,7 @@ use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Policy;
 use AppBundle\Document\SalvaPhonePolicy;
+use AppBundle\Document\SCode;
 use AppBundle\Document\User;
 use AppBundle\Exception\MonitorException;
 use AppBundle\Form\Type\UserRoleType;
@@ -265,11 +266,11 @@ class MonitorServiceTest extends WebTestCase
     /**
      * @expectedException \AppBundle\Exception\MonitorException
      */
-    public function testDuplicateInvites()
+    public function testDuplicateEmailInvites()
     {
         $user = self::createUser(
             self::$userManager,
-            self::generateEmail('testDuplicateInvites', $this),
+            self::generateEmail('testDuplicateEmailInvites', $this),
             'bar'
         );
 
@@ -278,27 +279,151 @@ class MonitorServiceTest extends WebTestCase
 
         $invitationOne = self::$invitationService->inviteByEmail(
             $policy,
-            self::generateEmail('testDuplicateInvites-invite-one', $this)
+            self::generateEmail('testDuplicateEmailInvites-invite-one', $this)
         );
 
         $invitationTwo = self::$invitationService->inviteByEmail(
             $policy,
-            self::generateEmail('testDuplicateInvites-invite-two', $this)
+            self::generateEmail('testDuplicateEmailInvites-invite-two', $this)
         );
 
         /*
          * Generating two invites on the same email throws an error
          * Changing one of the invites' email after creation does not
          */
-        $invitationTwo->setEmail(self::generateEmail('testDuplicateInvites-invite-one', $this));
+        $invitationTwo->setEmail(self::generateEmail('testDuplicateEmailInvites-invite-one', $this));
 
-        self::$dm->persist($policy->getUser());
-        self::$dm->persist($policy);
-        self::$dm->persist($invitationOne);
-        self::$dm->persist($invitationTwo);
         self::$dm->flush();
 
-        self::$monitor->duplicateInvites();
+        self::$monitor->duplicateEmailInvites();
+    }
+
+    /**
+     * @expectedException \AppBundle\Exception\MonitorException
+     */
+    public function testDuplicateSmsInvites()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testDuplicateSmsInvites', $this),
+            'bar'
+        );
+
+        $mobileNumber = self::generateRandomMobile();
+
+        $policy = self::initPolicy($user, self::$dm, $this->getRandomPhone(self::$dm), null, false, true);
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+
+        $invitationOne = self::$invitationService->inviteBySms(
+            $policy,
+            $mobileNumber,
+            null,
+            True
+        );
+
+        $invitationTwo = self::$invitationService->inviteBySms(
+            $policy,
+            $mobileNumber,
+            null,
+            True
+        );
+
+        self::$dm->flush();
+
+        self::$monitor->duplicateSmsInvites();
+    }
+
+    /**
+     * @expectedException \AppBundle\Exception\MonitorException
+     */
+    public function testDuplicateScodeInvites()
+    {
+        $userOne = self::createUser(
+            self::$userManager,
+            self::generateEmail('testDuplicateScodeInvites-One', $this),
+            'bar'
+        );
+
+        $userTwo = self::createUser(
+            self::$userManager,
+            self::generateEmail('testDuplicateScodeInvites-Two', $this),
+            'bar'
+        );
+
+        $policyOne = self::initPolicy($userOne, self::$dm, $this->getRandomPhone(self::$dm), null, false, true);
+        $policyOne->setStatus(Policy::STATUS_ACTIVE);
+
+        $policyTwo = self::initPolicy($userTwo, self::$dm, $this->getRandomPhone(self::$dm), null, false, true);
+        $policyTwo->setStatus(Policy::STATUS_ACTIVE);
+
+        $scodeOne = new SCode();
+        $scodeOne->setPolicy($policyTwo);
+
+        $scodeTwo = new SCode();
+        $scodeTwo->setPolicy($policyTwo);
+
+        self::$dm->persist($scodeOne);
+        self::$dm->persist($scodeTwo);
+        self::$dm->flush();
+
+        $invitationOne = self::$invitationService->inviteBySCode(
+            $policyOne,
+            $scodeOne->getCode()
+        );
+
+        $invitationTwo = self::$invitationService->inviteBySCode(
+            $policyOne,
+            $scodeTwo->getCode()
+        );
+
+        $invitationTwo->setSCode($scodeOne);
+
+        self::$dm->flush();
+
+        self::$monitor->duplicateScodeInvites();
+    }
+
+    /**
+     * @expectedException \AppBundle\Exception\MonitorException
+     */
+    public function testDuplicateFacebookInvites()
+    {
+        $userOne = self::createUser(
+            self::$userManager,
+            self::generateEmail('testDuplicateFacebookInvites-One', $this),
+            'bar'
+        );
+
+        $userTwo = self::createUser(
+            self::$userManager,
+            self::generateEmail('testDuplicateFacebookInvites-Two', $this),
+            'bar'
+        );
+
+        $policyOne = self::initPolicy($userOne, self::$dm, $this->getRandomPhone(self::$dm), null, false, true);
+        $policyOne->setStatus(Policy::STATUS_ACTIVE);
+
+        $policyTwo = self::initPolicy($userTwo, self::$dm, $this->getRandomPhone(self::$dm), null, false, true);
+        $policyTwo->setStatus(Policy::STATUS_ACTIVE);
+
+        $userOne->setFacebookId('12345');
+
+        self::$dm->persist($userOne);
+        self::$dm->flush();
+
+        $invitationOne = self::$invitationService->inviteByFacebookId(
+            $policyTwo,
+            '12345'
+        );
+
+        $invitationTwo = self::$invitationService->inviteByFacebookId(
+            $policyTwo,
+            '12345'
+        );
+
+        self::$dm->flush();
+
+        self::$monitor->duplicateFacebookInvites();
     }
 
     /**

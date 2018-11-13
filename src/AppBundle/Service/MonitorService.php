@@ -741,19 +741,81 @@ class MonitorService
         }
     }
 
-    public function duplicateInvites()
+    public function duplicateEmailInvites()
+    {
+        $results = $this->aggregate('email', 'email');
+
+        if (count($results) > 0) {
+            foreach ($results as $result) {
+                throw new MonitorException(sprintf(
+                    "Found duplicate invites on email, %s",
+                    json_encode($result)
+                ));
+            }
+        }
+    }
+
+    public function duplicateSmsInvites()
+    {
+        $results = $this->aggregate('sms', 'mobile');
+
+        if (count($results) > 0) {
+            foreach ($results as $result) {
+                throw new MonitorException(sprintf(
+                    "Found duplicate invites on sms, %s",
+                    json_encode($result)
+                ));
+            }
+        }
+    }
+
+    public function duplicateScodeInvites()
+    {
+        $results = $this->aggregate('scode', 'scode');
+
+        if (count($results) > 0) {
+            foreach ($results as $result) {
+                throw new MonitorException(sprintf(
+                    "Found duplicate invites on scode, %s",
+                    json_encode($result)
+                ));
+            }
+        }
+    }
+
+    public function duplicateFacebookInvites()
+    {
+        $results = $this->aggregate('facebook', 'facebookId');
+
+        if (count($results) > 0) {
+            foreach ($results as $result) {
+                throw new MonitorException(sprintf(
+                    "Found duplicate invites on facebook, %s",
+                    json_encode($result)
+                ));
+            }
+        }
+    }
+
+    /**
+     * @param string $type
+     * @param string $field
+     * @return \Doctrine\MongoDB\Iterator
+     * @throws \Doctrine\ODM\MongoDB\MongoDBException
+     */
+    public function aggregate($type, $field)
     {
         $collection = $this->dm->getDocumentCollection(Invitation::class);
         $builder = $collection->createAggregationBuilder();
 
         $results = $builder
             ->match()
-                ->field('invitation_type')->equals('email')
+                ->field('invitation_type')->equals($type)
             ->group()
                 ->field('_id')
                     ->expression(
                         $builder->expr()
-                            ->field('email')->expression('$email')
+                            ->field($field)->expression('$' . $field)
                             ->field('policy')->expression('$policy')
                     )
                 ->field('count')->sum(1)
@@ -761,14 +823,7 @@ class MonitorService
                 ->field('count')->gt(1)
             ->execute(['cursor' => []]);
 
-        if (count($results) > 0) {
-            foreach ($results as $result) {
-                throw new MonitorException(sprintf(
-                    "Found duplicate Invites on email %s",
-                    json_encode($result)
-                ));
-            }
-        }
+        return $results;
     }
 
     /**
