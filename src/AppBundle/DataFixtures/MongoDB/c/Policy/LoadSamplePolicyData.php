@@ -906,12 +906,14 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         if (count($userA->getPolicies()) == 0 || count($userB->getPolicies()) == 0) {
             return;
         }
+        /** @var Policy $policyA */
         $policyA = $userA->getPolicies()[0];
+        /** @var Policy $policyB */
         $policyB = $userB->getPolicies()[0];
 
         $invitation = new EmailInvitation();
         $invitation->setInviter($userA);
-        $policyA->addInvitiation($invitation);
+        $policyA->addInvitation($invitation);
         $invitation->setEmail($userB->getEmail());
         $invitation->setInvitee($userB);
         if ($accepted) {
