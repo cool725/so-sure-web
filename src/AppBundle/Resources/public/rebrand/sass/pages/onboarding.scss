@@ -41,6 +41,12 @@ body {
     //     pointer-events: none;
     //     color: currentColor;
     // }
+    //
+
+    &__body {
+        font-weight: 300;
+        font-size: 0.98rem;
+    }
 
     &__item {
         height: 100vh;

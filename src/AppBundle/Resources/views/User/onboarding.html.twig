@@ -85,7 +85,7 @@
                         <div class="onboarding__body">
                             <h2 class="h4 text-primary mb-3">{{ policy.user.firstname }}, You're all covered 🎉</h2>
                                 {% if device_category() == 'Mobile' %}
-                                    <p class="mb-5">Thanks for choosing so-sure, your payment is setup. You’ll shortly receive a text link to download our app. Through the app you can reduce excess and earn cashback. Lorem ipsum dolor sit amet adipiscing elit.</p>
+                                    <p class="mb-5">Thanks for choosing so-sure, your payment is all set up and your policy is now active. Download our app and <strong>reduce your excess by up to &pound;100</strong></p>
                                     {% if policy.phone.iTunes %}
                                         <a href="{{ apple_download('onboarding-mobile-one') }}"
                                            class="btn btn-primary btn-block-xs ga-outbound-click"
@@ -125,9 +125,9 @@
                             <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_phone-qr.png" alt="so-sure - Verify your phone" width="180px">
                         </div>
                         <div class="onboarding__body">
-                            <h2 class="h4 text-primary mb-3">Reduce your excess by 60%</h2>
+                            <h2 class="h4 text-primary mb-3">How to reduce your excess 📉</h2>
                             {% if device_category() == 'Mobile' %}
-                                <p class="mb-5">After downloading the so-sure app you’ll be able to use our in-app validation to reduce your excess. Nulla sed quam risus. Suspendisse potenti. Maecenas molestie egestas sapien, id scelerisque enim rutrum et.</p>
+                                <p class="mb-5">Download the so-sure app and validate your phone to reduce your excess to just <strong>&pound;50</strong> for accidental damage/breakdown and <strong>&pound;70</strong> for loss and theft. If you don't validate your phone, the excess is <strong>&pound;150 for all claims</strong>.</p>
                                 {% if policy.phone.iTunes %}
                                     <a href="{{ apple_download('onboarding-mobile-one') }}"
                                        class="btn btn-primary btn-block-xs ga-outbound-click"
@@ -176,16 +176,16 @@
                             <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_friends-connect.png" alt="so-sure - Invite your friends and get  rewarded" width="180px">
                         </div>
                         <div class="onboarding__body">
-                            <h2 class="h4 text-primary mb-3">Invite friends and earn &pound;100</h2>
+                            <h2 class="h4 text-primary mb-3">Get up to 80% money back 💰</h2>
                             {% if device_category() == 'Mobile' %}
-                                <p class="mb-5">you are on phone For every person you connect with, we’ll add £10 to your reward pot. If neither of you claim, your cash will be returned at the end of the policy year. For more information on how it works watch our video lorem ipsum.</p>
+                                <p class="mb-5">Invite as many people as you want. Connect with your mum, dad, grandparents, or your mate Bob. At the end of the year, <strong>when you and your connections haven’t claimed</strong>, your Reward Pot is paid out to you, simple!</p>
                                 <a href="#"
                                    class="btn btn-success btn-block-xs"
                                    role="button"
                                    data-target="#onboarding-carousel"
                                    data-slide="next">Let's get inviting <i class="far fa-long-arrow-right fa-lg ml-2"></i></a>
                                 {# TODO: Add video once live - change the link to embed one #}
-                                <a href="#"
+                                {# <a href="#"
                                    class="btn btn-outline-primary watch-video btn-block-xs"
                                    data-event="watch-video-index-hero"
                                    data-toggle="modal"
@@ -193,7 +193,7 @@
                                    data-src="https://www.youtube.com/embed/QEskwqsNgrQ">
                                     <i class="far fa-play-circle fa-lg opacity-50 mr-1"></i>
                                     How it works
-                                </a>
+                                </a> #}
                             {% else %}
                                 <p class="mb-4">you are on computerFor every person you connect with, we’ll add £10 to your reward pot. If neither of you claim, your cash will be returned at the end of the policy year. For more information on how it works
                                 <a href="#"
@@ -243,10 +243,14 @@
                             <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_reward-pot.png" alt="so-sure - Choose how you’d like to invite" width="180px">
                         </div>
                         <div class="onboarding__body">
-                            <h2 class="h4 text-primary mb-3">Choose how you’d like to invite</h2>
-                            <p class="mb-5">Entesque dolor praesent volutpat elit vehicula pretium placerat. Nam download app sagittis, hendrerit lore in hac habitasse platea.</p>
+                            {% if device_category() == 'Mobile' %}
+                                <h2 class="h4 text-primary mb-5">Choose how you’d like to invite</h2>
+                            {% else %}
+                                <h2 class="h4 text-primary mb-3">Choose how you’d like to invite</h2>
+                                <p class="mb-5">Entesque dolor praesent volutpat elit vehicula pretium placerat. Nam download app sagittis, hendrerit lore in hac habitasse platea.</p>
+                            {% endif %}
                             <div class="d-lg-flex justify-content-lg-center">
-                                <h5 class="text-left text-zaffre d-lg-none">📨 Invite via email</h5>
+                                <h5 class="text-zaffre d-lg-none">📨 Invite via email</h5>
                                 {{ form_start(email_form, {'attr': {'autocomplete': 'nope'}}) }}
                                     <div class="custom-input-with-btn mb-4">
                                         {{ form_widget(email_form.email, {'attr': {'placeholder': 'Enter email address', 'class': 'form-control'}}) }}
@@ -254,7 +258,7 @@
                                     </div>
                                     {{ form_errors(email_form.email) }}
                                 {{ form_end(email_form) }}
-                                <h5 class="text-left text-zaffre d-lg-none">🔗 Share this link</h5>
+                                <h5 class="text-zaffre d-lg-none">🔗 Share this link</h5>
                                 <div class="custom-input-with-btn mb-4 ml-lg-4">
                                     <input name="scode" id="scode" readonly="readonly" type="text" class="form-control" value="{{ policy.standardSCode.shareLink }}">
                                     <button class="btn btn-primary btn-copy btn-square  btn-sm sosure-track"
