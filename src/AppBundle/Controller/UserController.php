@@ -1301,15 +1301,16 @@ class UserController extends BaseController
             [$policy->getStandardSCode()->getShareLink(), $policy->getStandardSCode()->getCode()]
         );
 
-        $smsExperiment = $sixpack->participate(
+        $smsExperiment = $this->sixpack(
+            $request,
             $sixpack::EXPERIMENT_APP_LINK_SMS,
             [
                 $sixpack::ALTERNATIVES_SMS_DOWNLOAD,
                 $sixpack::ALTERNATIVES_NO_SMS_DOWNLOAD
             ],
             $sixpack::LOG_MIXPANEL_NONE,
-            1,
-            $user->getId()
+            $user->getId(),
+            1
         );
 
         // if the policy file has not been generated, then that must be done before we can let them download.
