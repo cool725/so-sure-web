@@ -39,13 +39,6 @@ $(function() {
           onNavDt  = $('.onboarding-nav__desktop');
 
     let slide = function(e) {
-        // const slides = [
-        //     [null, 'next'],
-        //     ['prev', 'next'],
-        //     ['prev', 4],
-        //     [1, 4],
-        //     [2, 'login']
-        // ];
 
         // Mobile navigation buttons.
         if (onNavMb.length) {
@@ -88,25 +81,6 @@ $(function() {
                             .text('LOGIN');
                     break;
             }
-
-
-            // let prev  = $('#onboarding-btn--prev');
-            // let next  = $('#onboarding-btn--next');
-            // let login = $('#onboarding-btn--login');
-            // let skip  = [$('#onboarding-btn--prev-skip'), $('#onboarding-btn--skip')];
-
-            // prev.toggleClass('btn-hide', slide[0] != 'prev');
-            // next.toggleClass('btn-hide', slide[1] != 'next');
-            // login.toggleClass('btn-hide', slide[1] != 'login');
-
-            // for (let i = 0; i < 2; i++) {
-            //     if (typeof slide[i] == 'number') {
-            //         skip[i].removeClass('btn-hide');
-            //         skip[i].attr('data-slide-to', slide[i])
-            //     } else {
-            //         skip[i].addClass('btn-hide');
-            //     }
-            // }
         }
 
         // Desktop navigation buttons.

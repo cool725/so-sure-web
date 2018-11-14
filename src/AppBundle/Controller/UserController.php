@@ -1289,8 +1289,6 @@ class UserController extends BaseController
                     $this->get('logger')->error($msg, ['exception' => $e]);
                     $this->addFlash('error', $msg);
                 }
-
-                return new RedirectResponse($this->generateUrl('user_policy', ['policyId' => $policy->getId()]));
             }
         }
 
