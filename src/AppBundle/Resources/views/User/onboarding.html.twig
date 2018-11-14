@@ -83,7 +83,7 @@
                             <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_phone-smile.png" alt="so-sure - Welcome" width="180px">
                         </div>
                         <div class="onboarding__body">
-                            <h2 class="h4 text-primary mb-3">{{ policy.user.firstname }}, You're all covered 🎉</h2>
+                            <h2 class="h4 text-primary mb-3">{{ policy.user.firstname }}, you're all covered 🎉</h2>
                                 {% if device_category() == 'Mobile' %}
                                     <p class="mb-5">Thanks for choosing so-sure, your payment is all set up and your policy is now active. Download our app and <strong>reduce your excess by up to &pound;100</strong></p>
                                     {% if policy.phone.iTunes %}
@@ -92,7 +92,7 @@
                                            data-clicklabel="iTunes"
                                            target="_blank"
                                            rel="noopener">
-                                            Download our App</a>
+                                            Download our App <i class="fab fa-apple ml-2 fa-lg"></i></a>
                                     {% endif %}
                                     {% if policy.phone.googlePlay %}
                                         <a href="{{ google_download('onboarding-mobile-one') }}"
@@ -100,7 +100,7 @@
                                            data-clicklabel="PlayStore"
                                            target="_blank"
                                            rel="noopener">
-                                            Download our App</a>
+                                            Download our App <i class="fab fa-android ml-2 fa-lg"></i></a>
                                     {% endif %}
                                 {% else %}
                                     <p class="mb-4">Thanks for choosing so-sure, your payment is setup. You’ll shortly receive a text link to download our app. Through the app you can reduce excess and earn cashback. Lorem ipsum dolor sit amet adipiscing elit.</p>
@@ -125,7 +125,7 @@
                             <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_phone-qr.png" alt="so-sure - Verify your phone" width="180px">
                         </div>
                         <div class="onboarding__body">
-                            <h2 class="h4 text-primary mb-3">How to reduce your excess 📉</h2>
+                            <h2 class="h4 text-primary mb-3">Reduce your excess 📉</h2>
                             {% if device_category() == 'Mobile' %}
                                 <p class="mb-5">Download the so-sure app and validate your phone to reduce your excess to just <strong>&pound;50</strong> for accidental damage/breakdown and <strong>&pound;70</strong> for loss and theft. If you don't validate your phone, the excess is <strong>&pound;150 for all claims</strong>.</p>
                                 {% if policy.phone.iTunes %}
@@ -134,7 +134,7 @@
                                        data-clicklabel="iTunes"
                                        target="_blank"
                                        rel="noopener">
-                                        Download our App</a>
+                                        Download our App <i class="fab fa-apple ml-2 fa-lg"></i></a>
                                 {% endif %}
                                 {% if policy.phone.googlePlay %}
                                     <a href="{{ google_download('onboarding-mobile-one') }}"
@@ -142,7 +142,7 @@
                                        data-clicklabel="PlayStore"
                                        target="_blank"
                                        rel="noopener">
-                                        Download our App</a>
+                                        Download our App <i class="fab fa-android ml-2 fa-lg"></i></a>
                                 {% endif %}
                             {% else %}
                                 <p class="mb-4">After downloading the so-sure app you’ll be able to use our in-app validation to reduce your excess. Nulla sed quam risus. Suspendisse potenti. Maecenas molestie egestas sapien, id scelerisque enim rutrum et.</p>
@@ -261,8 +261,9 @@
                                 <h5 class="text-zaffre d-lg-none">🔗 Share this link</h5>
                                 <div class="custom-input-with-btn mb-4 ml-lg-4">
                                     <input name="scode" id="scode" readonly="readonly" type="text" class="form-control" value="{{ policy.standardSCode.shareLink }}">
-                                    <button class="btn btn-primary btn-copy btn-square  btn-sm sosure-track"
-                                        data-clipboard-target="#scode"
+                                    <div id="scode-share" class="sr-only">Join me on so-sure, a new type of insurer that you can rely on. They protect you when you need to claim and together they'll reward us with cashback when we don't.<br><br>Here is my invite link: {{ policy.standardSCode.shareLink }}</div>
+                                    <button class="btn btn-primary btn-copy btn-square btn-sm sosure-track"
+                                        data-clipboard-target="#scode-share"
                                         data-toggle="tooltip"
                                         data-placement="top"
                                         data-event="user-welcome-copy-scode">
