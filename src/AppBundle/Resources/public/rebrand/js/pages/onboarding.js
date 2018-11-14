@@ -150,11 +150,13 @@ $(function() {
     });
 
     // Social Sharing
+    let onboardingShare = $('#onboarding-btn--share');
+    //
     // Share buttons
-    $('#onboarding-btn--share').jsSocials({
+    $(onboardingShare).jsSocials({
         shares: ['whatsapp', 'twitter', 'facebook'],
-        url: $(this).data('share-link'),
-        text: $(this).data('share-text'),
+        url: $(onboardingShare).data('share-link'),
+        text: $(onboardingShare).data('share-text'),
         shareIn: 'popup',
         showLabel: false,
         showCount: false,
