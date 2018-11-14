@@ -8,7 +8,8 @@ require('../../sass/pages/homepage-xmas.scss');
 
 $(function(){
 
-    let snowIntensity = 200; // smaller number = more snowflakes;
+    let snowIntensity = 400; // smaller number = more snowflakes;
+    let snowType = '*';
 
     function snowFlake(){
         let snowflake = this;
@@ -16,7 +17,7 @@ $(function(){
         snowflake.x = (Math.random() * $(document).width());
         snowflake.size = (Math.random() * 35) + 10;
         snowflake.opacity = Math.random();
-        snowflake.body = $('<span class="snowflake">*</span>');
+        snowflake.body = $('<span class="snowflake">' + snowType + '</span>');
 
         snowflake.body.css({
             'font-size': this.size + 'px',
@@ -49,8 +50,19 @@ $(function(){
         new snowFlake();
     }, snowIntensity);
 
-    $(document).on('keypress', function() {
+    $(document).on('keyup', function(e) {
+
         window.clearInterval(snow);
+
+        if(e.keyCode == 79){
+
+            window.setInterval(function () {
+                snowIntensity = 700;
+                snowType = '🍆';
+                new snowFlake();
+            }, snowIntensity);
+
+        }
     });
 
 });
