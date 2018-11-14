@@ -1072,7 +1072,7 @@
                             </div>
                             <button type="button" class="btn btn-danger"
                                     data-toggle="modal"
-                                    data-target="#confirmModal">Update
+                                    data-target="#imeiForm">Update
                             </button>
                         </form>
                     </td>
@@ -1103,7 +1103,7 @@
                 {% endif %}
             </table>
 
-            {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:AdminEmployee:imeiForm', 'policy': policy} %}
+            {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:AdminEmployee:imeiForm', 'policy': policy, 'id': 'imeiForm'} %}
 
             {% endif %}
             {% if is_granted('ROLE_ADMIN') %}
@@ -1399,7 +1399,7 @@
         </div>
     {% endif %}
 
-    {% include 'AppBundle::Claims/claimsModal.html.twig' with {'route': 'admin_policy'} %}
+    {% include 'AppBundle::Claims/claimsModal.html.twig' with {'route': 'admin_policy', 'policyId': policy.id} %}
 
     {% if is_granted('ROLE_ADMIN') %}
     <div class="modal fade" id="bacsModal" tabindex="-1" role="dialog">

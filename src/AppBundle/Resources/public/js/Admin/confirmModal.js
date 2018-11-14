@@ -1,4 +1,4 @@
-$('#confirmModal').on('show.bs.modal', function (event) {
+$('.confirmModal').on('show.bs.modal', function (event) {
     $('#checkboxes input').on('input', function (e) {
         checkAll($('#checkboxes input').length)
     });

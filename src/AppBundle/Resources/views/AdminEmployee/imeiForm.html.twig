@@ -29,6 +29,12 @@
     </tbody>
   </table>
 
+  <table class="table">
+    <tbody>
+
+    </tbody>
+  </table>
+
   <table class="table table-striped">
     <tbody>
     <tr>
@@ -44,8 +50,17 @@
           {{ form_widget(form.imei) }}
       </td>
     </tr>
+
+    <tr>
+      <td>Justification</td>
+      <td>
+        {{ form_widget(form.notes) }}
+      </td>
+    </tr>
     </tbody>
   </table>
+
+  </div>
 
   <div class="modal-footer">
     {{ form_widget(form.update, { 'attr': {'class': 'btn btn-danger', 'disabled': 'true'} }) }}

@@ -13,6 +13,7 @@ use AppBundle\Form\Type\PaymentRequestUploadFileType;
 use AppBundle\Form\Type\UploadFileType;
 use AppBundle\Form\Type\UserHandlingTeamType;
 use AppBundle\Repository\ClaimRepository;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use AppBundle\Security\FOSUBUserProvider;
 use AppBundle\Service\BacsService;
 use AppBundle\Service\FraudService;
@@ -441,10 +442,8 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             throw $this->createNotFoundException(sprintf('Policy %s not found', $id));
         }
 
-        $imei = new Imei();
-        $imei->setPolicy($policy);
         $imeiForm = $this->get('form.factory')
-            ->createNamedBuilder('imei_form', ImeiType::class, $imei)
+            ->createNamedBuilder('imei_form', ImeiType::class)
             ->setAction($this->generateUrl(
                 'imei_form',
                 ['id' => $id]
@@ -455,7 +454,14 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             if ($request->request->has('imei_form')) {
                 $imeiForm->handleRequest($request);
                 if ($imeiForm->isValid()) {
-                    $policy->adjustImei($imei->getImei(), false);
+                    $policy->adjustImei($imeiForm->getData()['imei'], false);
+
+                    $policy->addNote(json_encode([
+                        'user_id' => $this->getUser()->getId(),
+                        'name' => $this->getUser()->getName(),
+                        'notes' => $imeiForm->getData()['notes']
+                    ]));
+
                     $dm->flush();
                     $this->addFlash(
                         'success',

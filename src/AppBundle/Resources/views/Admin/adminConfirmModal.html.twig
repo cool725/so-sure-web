@@ -1,4 +1,4 @@
-<div class="modal fade" id="confirmModal" tabindex="-1" role="dialog">
+<div class="modal fade confirmModal" id="{{ id }}" tabindex="-1" role="dialog">
   <div class="modal-dialog" role="document" style="width: 50%">
     <div class="modal-content">
       <div class="modal-header">
@@ -10,8 +10,6 @@
       <div class="modal-body">
 
         {{ render(controller(route, {'id': policy.id})) }}
-
-      </div>
     </div>
   </div>
 </div>
