@@ -50,6 +50,12 @@ body {
             font-size: 0.99rem;
         }
 
+        @include media-breakpoint-up(lg) {
+            p {
+                max-width: 700px;
+            }
+        }
+
     }
 
     &__item {
