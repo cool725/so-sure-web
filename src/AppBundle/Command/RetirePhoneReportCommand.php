@@ -68,7 +68,10 @@ class RetirePhoneReportCommand extends ContainerAwareCommand
         $this->mailerService->send(
             'Phones that should be retired report',
             'tech+ops@so-sure.com',
-            $message
+            $message,
+            null,
+            null,
+            'marketing@so-sure.com'
         );
         if ($debug) {
             $output->writeln($message);
