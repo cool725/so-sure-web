@@ -811,6 +811,7 @@ trait UserClassTrait
     protected function usersByName($dm, $names)
     {
         $cursor = $dm->createQueryBuilder(User::class)->field("firstName")->in($names)->getQuery()->execute();
+        // QueryBuilder::toArray() gives an associative array which we do not want, so we convert to a normal array.
         $list = [];
         foreach ($cursor as $user) {
             $list[] = $user;

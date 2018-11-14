@@ -46,6 +46,12 @@ class AffiliateCompany extends Company
     protected $days;
 
     /**
+     * @Assert\Range(min=0,max=90)
+     * @MongoDB\Field(type="integer")
+     */
+    protected $renewalDays;
+
+    /**
      * @AppAssert\AlphanumericSpaceDot()
      * @Assert\Length(min="1", max="250")
      * @MongoDB\Field(type="string")
@@ -121,6 +127,16 @@ class AffiliateCompany extends Company
     public function getDays()
     {
         return $this->days;
+    }
+
+    public function setRenewalDays(int $renewalDays)
+    {
+        $this->renewalDays = $renewalDays;
+    }
+
+    public function getRenewalDays()
+    {
+        return $this->renewalDays;
     }
 
     public function getCampaignSource()

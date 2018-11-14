@@ -84,13 +84,40 @@ class AffiliateServiceTest extends WebTestCase
     }
 
     /**
-     * Tests that the AffiliateService::generate works as intended on a populated database.
+     * Tests that the AffiliateService::generate works as intended on a populated database and on no data.
      * generate method works on the whole dataset at once so there is no need for dataproviders.
      */
     public function testGenerate()
     {
+        // test on empty data.
         $this->assertEmpty(self::$affiliateService->generate());
         $this->assertEquals(0, count(self::$chargeRepository->findBy([])));
+
+        // test on proper data.
+        // 3 in campaignA, 2 in campaignC, 3 in leadA = 21.
+        $this->createState();
+        $charges = self::$affiliateService->generate();
+        $this->assertEquals(8, count($charges));
+        $this->assertEquals(8, count(self::$chargeRepository->findBy([])));
+        $this->assertEquals(21, self::sumCost($charges));
+
+        // test on second hand data
+        $this->assertEmpty(self::$affiliateService->generate());
+        $this->assertEquals(8, count(self::$chargeRepository->findBy([])));
+
+        // test on second hand data with all users getting a new 200 day aged policy.
+        $users = self::$userRepository->findBy([]);
+        foreach ($users as $user) {
+            $policy = new PhonePolicy();
+            $policy->setStatus(Policy::STATUS_ACTIVE);
+            $policy->setUser($this->userByName(self::$dm, $user));
+            $policy->setStartDate(new \DateTime("200 days ago"));
+        }
+        // 3 in leadA = 8.
+        $charges = self::$affiliateService->generate();
+        $this->assertEquals(3, count($charges));
+        $this->assertEquals(11, count(self::$chargeRepository->findBy([])));
+        $this->assertEquals(12, self::sumCost($charges));
     }
 
     /**
@@ -106,13 +133,14 @@ class AffiliateServiceTest extends WebTestCase
         self::$affiliateService->generateOngoingCharges($this->affiliate($affiliate), $charges);
         $this->assertEquals(count($users), count($charges));
         foreach ($users as $user) {
-            $policy = new Policy();
+            $policy = new PhonePolicy();
             $policy->setStatus(Policy::STATUS_ACTIVE);
             $policy->setUser($this->userByName(self::$dm, $user));
-            $policy->setStartDate(new \DateTime("200 days ago"));
+            $policy->setStart(new \DateTime("200 days ago"));
         }
+        $charges = [];
         self::$affiliateService->generateOngoingCharges($this->affiliate($affiliate), $charges);
-        $this->assertEquals(count($users) * 2, count($charges));
+        $this->assertEquals(count($users), count($charges));
     }
 
     /**
@@ -161,7 +189,7 @@ class AffiliateServiceTest extends WebTestCase
      */
     public static function generateOngoingChargesProvider()
     {
-        return [["campaignC", 2]];
+        return [["campaignC", ["barrel", "smith", "kalvin"]]];
     }
 
     /**
@@ -201,7 +229,7 @@ class AffiliateServiceTest extends WebTestCase
             ],
             [
                 "campaignA",
-                [User::AQUISITION_COMPLETED],
+                [User::AQUISITION_CONFIRMED],
                 ["completedAGuy"]
             ],
             [
@@ -218,13 +246,26 @@ class AffiliateServiceTest extends WebTestCase
     }
 
     /**
+     * Takes a list of charges and tells you the total cost of them
+     * @param array $charges is the list of charges.
+     * @return float total cost.
+     */
+    private static function sumCost($charges)
+    {
+        $sum = 0;
+        foreach ($charges as $charge) {
+            $sum += $charge->getAmount();
+        }
+        return $sum;
+    }
+
+    /**
      * Find an affiliate by name.
      * @param string $name is the name of the new user.
      * @return AffiliateCompany the company found with that name or null if not found.
      */
     private static function affiliate($name)
     {
-
         $items = self::$affiliateRepository->findBy(["name" => $name]);
         return reset($items);
     }
@@ -243,11 +284,10 @@ class AffiliateServiceTest extends WebTestCase
      */
     private static function createState()
     {
-        $affiliate = self::createTestAffiliate("campaignA", 15.3, 30, "line 1", "london", "campaignA");
-        self::createTestAffiliate("campaignB", 2.3, 60, "line 1", "london", "campaignB");
-        self::createTestAffiliate("campaignC", 5.2, 30, "line 1", "london", "campaignC")->setChargeModel(AffiliateCompany::MODEL_ONGOING);
-        self::createTestAffiliate("leadA", 10.9, 90, "line 1", "london", "", "leadA");
-        self::createTestAffiliate("leadC", 8.1, 60, "line 1", "london", "", "leadC")->setChargeModel(AffiliateCompany::MODEL_ONGOING);
+        $affiliate = self::createTestAffiliate("campaignA", 1, 30, "line 1", "london", "campaignA");
+        self::createTestAffiliate("campaignB", 2, 60, "line 1", "london", "campaignB");
+        self::createTestAffiliate("campaignC", 3, 30, "line 1", "london", "campaignC")->setChargeModel(AffiliateCompany::MODEL_ONGOING);
+        self::createTestAffiliate("leadA", 4, 90, "line 1", "london", "", "leadA");
 
         self::createTestUser("10 days ago", "tony", "campaignA");
         self::createTestUser("20 days ago", "bango", "campaignA");

@@ -73,15 +73,14 @@ class AffiliateService
     public function generate()
     {
         $generatedCharges = [];
-        $repo = $this->dm->getRepository(AffiliateCompany::class);
-        $affiliates = $repo->findAll();
+        $affiliates = $this->dm->getRepository(AffiliateCompany::class)->findAll();
 
         foreach ($affiliates as $affiliate) {
             $model = $affiliate->getChargeModel();
             if ($model == AffiliateCompany::MODEL_ONE_OFF) {
-                generateOneOffCharges($affiliate, $generatedCharges);
+                $this->generateOneOffCharges($affiliate, $generatedCharges);
             } elseif ($model == AffiliateCompany::MODEL_ONGOING) {
-                generateOngoingCharges($affiliate, $generatedCharges);
+                $this->generateOngoingCharges($affiliate, $generatedCharges);
             }
         }
         return $generatedCharges;
@@ -97,18 +96,16 @@ class AffiliateService
     public function generateOngoingCharges($affiliate, & $charges = null)
     {
         $policyRepo = $this->dm->getRepository(Policy::class);
-        $users = $this->getMatchingUsers($affiliate, [User::AQUISITION_PENDING, User::AQUISITION_COMPLETED]);
+        $users = $this->getMatchingUsers($affiliate, [User::AQUISITION_PENDING, User::AQUISITION_CONFIRMED]);
         foreach ($users as $user) {
             /** @var User $user */
             if ($user->isAffiliateCandidate($affiliate->getDays())) {
-                $policies = $policyRepo->findBy(
-                    [
-                        "user" => $user,
-                        "affiliate" => null,
-                        "status" => ["$or" => ["active", "unpaid"]]
-                    ]
-                );
-                if (count($policies) > 0 && !$user->getAffiliate()) {
+                $policies = $this->dm->createQueryBuilder(Policy::class)
+                    ->field("user")->references($user)
+                    ->field("affiliate")->equals(null)
+                    ->field("status")->in([Policy::STATUS_ACTIVE, Policy::STATUS_UNPAID])
+                    ->getQuery()->execute();
+                if (!$user->getAffiliate()) {
                     $affiliate->addConfirmedUsers($user);
                 }
                 foreach ($policies as $policy) {
@@ -118,7 +115,7 @@ class AffiliateService
                     $charge->setUser($user);
                     $charge->setAffiliate($affiliate);
                     $this->dm->persist($charge);
-                    $affiliate->addConfirmedPolicies($user);
+                    $affiliate->addConfirmedPolicies($policy);
                     if (isset($charges)) {
                         $charges[] = $charge;
                     }

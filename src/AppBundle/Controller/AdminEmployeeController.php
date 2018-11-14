@@ -2520,6 +2520,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             ->add('postcode', TextType::class)
             ->add('cpa', NumberType::class, ['constraints' => [new Assert\Range(['min' => 0, 'max' => 20])]])
             ->add('days', ChoiceType::class, ['required' => true, 'choices' => $time_range])
+            ->add('renewalDays', ChoiceType::class, ['required' => true, 'choices' => $time_range])
             ->add('campaignSource', TextType::class, ['required' => false])
             ->add('leadSource', ChoiceType::class, ['required' => false, 'choices' => $lead_sources])
             ->add('leadSourceDetails', TextType::class, ['required' => false ])
@@ -2551,6 +2552,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                         }
                         $company->setAddress($address);
                         $company->setDays($this->getDataString($companyForm->getData(), 'days'));
+                        $company->setRenewalDays($this->getDataString($companyForm->getData(), 'renewalDays'));
                         $company->setCampaignSource($this->getDataString($companyForm->getData(), 'campaignSource'));
                         $company->setLeadSource($this->getDataString($companyForm->getData(), 'leadSource'));
                         $company->setLeadSourceDetails(
