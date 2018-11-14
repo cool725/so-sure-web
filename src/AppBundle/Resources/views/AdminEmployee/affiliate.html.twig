@@ -43,24 +43,24 @@
                     <td width="10%">{{ company.leadSource }}</td>
                     <td width="10%">{{ company.leadSourceDetails }}</td>
                     <td width="40%">
-                            {% if company.sanctionsChecks|length == 0%}
-                                No checks run
+                        {% if company.sanctionsChecks|length == 0%}
+                            No checks run
+                        {% endif %}
+                        {% for check in company.sanctionsChecks %}
+                            Ran: {{ check|date }}
+                        {% endfor %}
+                        <br />
+                        {% if company.sanctionsMatches|length == 0%}
+                            No matches
+                        {% endif %}
+                        {% for match in company.sanctionsMatches %}
+                            {% if match.manuallyVerified %}
+                            Confirmed not match: <del>{{ match.sanctions.company }} ({{ match.distance }})</del>
+                            {% else %}
+                            Possible match: {{ match.sanctions.company }}  ({{ match.distance }})
                             {% endif %}
-                            {% for check in company.sanctionsChecks %}
-                                Ran: {{ check|date }}
-                            {% endfor %}
-                            <br />
-                            {% if company.sanctionsMatches|length == 0%}
-                                No matches
-                            {% endif %}
-                            {% for match in company.sanctionsMatches %}
-                                {% if match.manuallyVerified %}
-                                Confirmed not match: <del>{{ match.sanctions.company }} ({{ match.distance }})</del>
-                                {% else %}
-                                Possible match: {{ match.sanctions.company }}  ({{ match.distance }})
-                                {% endif %}
-                                <br>
-                            {% endfor %}
+                            <br>
+                        {% endfor %}
                     </td>
                 </tr>
             {% endfor %}

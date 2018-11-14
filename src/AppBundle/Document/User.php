@@ -47,7 +47,8 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     const ROLE_ADMIN = 'ROLE_ADMIN';
 
     const AQUISITION_CONFIRMED = 'confirmed'; // this is for aquired users who have been confirmed.
-    const AQUISITION_PENDING = 'pending'; // This is for aquisitions that are on track to be confirmed.
+    const AQUISITION_PENDING = 'pending'; // This is for aquisitions that can be confirmed at any time.
+    const AQUISITION_NEW = 'new'; // This is for aquisitions that have a valid policy but are too young.
     const AQUISITION_POTENTIAL = 'potential'; // this is for aquired users with no policy.
     const AQUISITION_LOST = 'lost'; // this is for aquired users with a cancelled policy.
 
@@ -2063,18 +2064,25 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
 
     /**
      * Tells you the what state the user is in regarding affiliate aquisition.
-     * @return string aquisition state name.
+     * @param int $days is the number of days before aquisition becomes pending.
+     * @return string aquisition state name. Check out AQUISITION_* .
      */
-    public function aquisitionStatus()
+    public function aquisitionStatus($days)
     {
         if ($this->affiliate) {
             return static::AQUISITION_CONFIRMED;
-        } elseif ($this->hasActivePolicy() || $this->hasUnpaidPolicy()) {
-            return static::AQUISITION_PENDING;
-        } elseif ($this->hasPolicy()) {
-            return static::AQUISITION_LOST;
-        } else {
+        }
+        $policy = $this->getFirstPolicy();
+        if (!$policy) {
             return static::AQUISITION_POTENTIAL;
         }
+        if (in_array($policy->getStatus(), [Policy::STATUS_ACTIVE, Policy::STATUS_UNPAID])) {
+            if ($policy->isPolicyOldEnough($days)) {
+                return static::AQUISITION_PENDING;
+            } else {
+                return static::AQUISITION_NEW;
+            }
+        }
+        return static::AQUISITION_LOST;
     }
 }

@@ -121,6 +121,13 @@ abstract class Policy
     const UNPAID_UNKNOWN = 'unpaid_unknown';
     const UNPAID_PAID = 'unpaid_paid';
 
+    // Used when a policy is not old enough to be confirmed as an affiliate aquisition.
+    const AQUISITION_POLICY_NEW = 'new';
+    // Used when a policy is old enough to be confirmed as an affiliate aquisition but it has not yet happened.
+    const AQUISITION_POLICY_PENDING = 'pending';
+    // Used when a policy has already been confirmed as an affiliate aquisition.
+    const AQUISITION_POLICY_CONFIRMED = 'confirmed';
+
     public static $unpaidReasons = [
         self::UNPAID_BACS_MANDATE_PENDING,
         self::UNPAID_BACS_MANDATE_INVALID,
@@ -5232,6 +5239,24 @@ abstract class Policy
             }
         }
         return $isConnected;
+    }
+
+    /**
+     * Tells you at what point in the aquisition process this policy is. This only really applies to affiliates that
+     * require ongoing charges for each new policy created, as affiliates which do not require ongoing charges do not
+     * maintain a list of confirmed policies since only the user needs to be confirmed.
+     * @param int $days is the number of days old the policy must be before it can be confirmed.
+     * @return string state the policy is in regarding aquisition. Check out AQUISITION_POLICY_* .
+     */
+    public function aquisitionStatus($days)
+    {
+        if ($this->affiliate) {
+            return static::AQUISITION_POLICY_CONFIRMED;
+        } elseif ($this->isPolicyOldEnough($days)) {
+            return static::AQUISITION_POLICY_PENDING;
+        } else {
+            return static::AQUISITION_POLICY_NEW;
+        }
     }
 
     protected function toApiArray()

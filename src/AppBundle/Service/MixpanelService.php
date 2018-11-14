@@ -298,6 +298,9 @@ class MixpanelService
                 }
 
                 if ($dataPresent) {
+                    // TODO: if mixpanel removes user due to inactivity, and then recreates them, then currently it
+                    //       could cause this field to be overwritten. We could fix this by making it that it only
+                    //       alters the attribution values for a user if the user does not already have any.
                     $user->setAttribution($attribution);
                 }
 

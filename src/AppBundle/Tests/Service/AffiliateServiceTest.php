@@ -85,7 +85,6 @@ class AffiliateServiceTest extends WebTestCase
 
     /**
      * Tests that the AffiliateService::generate works as intended on a populated database and on no data.
-     * generate method works on the whole dataset at once so there is no need for dataproviders.
      */
     public function testGenerate()
     {
@@ -121,33 +120,49 @@ class AffiliateServiceTest extends WebTestCase
     }
 
     /**
-     * Tests generating the ongoing charges for an ongoing affiliate on a populated database.
-     * @param string $affiliate is the name of the affiliate to test.
-     * @param array  $n         is the list of user's names for which charges will be made.
-     * @dataProvider generateOngoingChargesProvider
+     * Tests generating the ongoing charges for an ongoing affiliate.
      */
-    public function testGenerateOngoingCharges($affiliate, $users)
+    public function testGenerateOngoingCharges()
     {
+        // normal case, single charges to be made.
         $this->createState();
+        $affiliate = $this->affiliate("campaignC");
         $charges = [];
-        self::$affiliateService->generateOngoingCharges($this->affiliate($affiliate), $charges);
-        $this->assertEquals(count($users), count($charges));
-        foreach ($users as $user) {
-            $policy = new PhonePolicy();
-            $policy->setStatus(Policy::STATUS_ACTIVE);
-            $policy->setUser($this->userByName(self::$dm, $user));
-            $policy->setStart(new \DateTime("200 days ago"));
-        }
+        self::$affiliateService->generateOngoingCharges($affiliate, $charges);
+        $this->assertEquals(2, count($charges));
+
+        // done case, no charges to be made.
         $charges = [];
-        self::$affiliateService->generateOngoingCharges($this->affiliate($affiliate), $charges);
-        $this->assertEquals(count($users), count($charges));
+        self::$affiliateService->generateOngoingCharges($affiliate, $charges);
+        $this->assertEmpty($charges);
+
+        // normal case with previous data, single charges to be made.
+        $charges = [];
+        self::$affiliateService->generateOngoingCharges($affiliate, $charges);
+        $this->assertEquals(2, count($charges));
+
+        // late case, multiple charges per user to be made.
+        $charges = [];
+        self::$affiliateService->generateOngoingCharges($affiliate, $charges);
+        $this->assertEquals(4, count($charges));
+
+        // done case after multiple charges, no charges to be made.
+        $charges = [];
+        self::$affiliateService->generateOngoingCharges($affiliate, $charges);
+        $this->assertEmpty($charges);
+
+        // empty case, no charges to be made
+        self::purge(Policy::class);
+        $charges = [];
+        self::$affiliateService->generateOngoingCharges($affiliate, $charges);
+        $this->assertEmpty($charges);
     }
 
     /**
      * Tests generating one off charges for a one off affiliate on a populated database.
      * @param string $affiliate the name of the affiliate to test.
      * @param int    $n         is the number of charges that should be made.
-     * @dataProvider generateOneOffChargesProvider
+     * @dataProvider generateOneOffChargesProvider .
      */
     public function testGenerateOneOffCharges($affiliate, $n)
     {
@@ -158,11 +173,24 @@ class AffiliateServiceTest extends WebTestCase
     }
 
     /**
+     * Generates data to run testGenerateOneOffCharges.
+     * @return array containing the test data.
+     */
+    public static function generateOneOffChargesProvider()
+    {
+        return [
+            ["campaignA", 3],
+            ["campaignB", 0],
+            ["leadA", 3]
+        ];
+    }
+
+    /**
      * Tests getting matching users from all status groups when all status groups are populated.
      * @param string $affiliate is the name of the affiliate to test on.
      * @param array  $status    is an array of the statuses we are searching for.
      * @param array  $expected  is an array of emails of the users who should be returned.
-     * @dataProvider getMatchingUsersProvider
+     * @dataProvider getMatchingUsersProvider .
      */
     public function testGetMatchingUsers($affiliate, $status, $expected)
     {
@@ -181,28 +209,6 @@ class AffiliateServiceTest extends WebTestCase
             }
             $this->assertTrue($found);
         }
-    }
-
-    /**
-     * Generates data to run testGenerateOngoingCharges.
-     * @return array containing the test data.
-     */
-    public static function generateOngoingChargesProvider()
-    {
-        return [["campaignC", ["barrel", "smith", "kalvin"]]];
-    }
-
-    /**
-     * Generates data to run testGenerateOneOffCharges.
-     * @return array containing the test data.
-     */
-    public static function generateOneOffChargesProvider()
-    {
-        return [
-            ["campaignA", 3],
-            ["campaignB", 0],
-            ["leadA", 3]
-        ];
     }
 
     /**

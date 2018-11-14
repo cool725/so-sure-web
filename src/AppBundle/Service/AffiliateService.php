@@ -98,27 +98,22 @@ class AffiliateService
         $policyRepo = $this->dm->getRepository(Policy::class);
         $users = $this->getMatchingUsers($affiliate, [User::AQUISITION_PENDING, User::AQUISITION_CONFIRMED]);
         foreach ($users as $user) {
-            /** @var User $user */
-            if ($user->isAffiliateCandidate($affiliate->getDays())) {
-                $policies = $this->dm->createQueryBuilder(Policy::class)
-                    ->field("user")->references($user)
-                    ->field("affiliate")->equals(null)
-                    ->field("status")->in([Policy::STATUS_ACTIVE, Policy::STATUS_UNPAID])
-                    ->getQuery()->execute();
-                if (!$user->getAffiliate()) {
-                    $affiliate->addConfirmedUsers($user);
+            if (!$user->getAffiliate()) {
+                $affiliate->addConfirmedUsers($user);
+            }
+            for ($policy = $user->getFirstPolicy; $policy; $policy = $policy->getNextPolicy()) {
+                if ($policy->aquisitionStatus() != Policy::AQUISITION_POLICY_PENDING) {
+                    continue;
                 }
-                foreach ($policies as $policy) {
-                    $charge = new Charge();
-                    $charge->setType(Charge::TYPE_AFFILIATE);
-                    $charge->setAmount($affiliate->getCPA());
-                    $charge->setUser($user);
-                    $charge->setAffiliate($affiliate);
-                    $this->dm->persist($charge);
-                    $affiliate->addConfirmedPolicies($policy);
-                    if (isset($charges)) {
-                        $charges[] = $charge;
-                    }
+                $charge = new Charge();
+                $charge->setType(Charge::TYPE_AFFILIATE);
+                $charge->setAmount($affiliate->getCPA());
+                $charge->setUser($user);
+                $charge->setAffiliate($affiliate);
+                $this->dm->persist($charge);
+                $affiliate->addConfirmedPolicies($policy);
+                if (isset($charges)) {
+                    $charges[] = $charge;
                 }
             }
         }
@@ -134,17 +129,15 @@ class AffiliateService
     {
         $users = $this->getMatchingUsers($affiliate);
         foreach ($users as $user) {
-            if ($user->isAffiliateCandidate($affiliate->getDays())) {
-                $charge = new Charge();
-                $charge->setType(Charge::TYPE_AFFILIATE);
-                $charge->setAmount($affiliate->getCPA());
-                $charge->setUser($user);
-                $charge->setAffiliate($affiliate);
-                $this->dm->persist($charge);
-                $affiliate->addConfirmedUsers($user);
-                if (isset($charges)) {
-                    $charges[] = $charge;
-                }
+            $charge = new Charge();
+            $charge->setType(Charge::TYPE_AFFILIATE);
+            $charge->setAmount($affiliate->getCPA());
+            $charge->setUser($user);
+            $charge->setAffiliate($affiliate);
+            $this->dm->persist($charge);
+            $affiliate->addConfirmedUsers($user);
+            if (isset($charges)) {
+                $charges[] = $charge;
             }
         }
         $this->dm->flush();
