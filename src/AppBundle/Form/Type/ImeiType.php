@@ -19,7 +19,7 @@ class ImeiType extends AbstractType
     {
         $builder
             ->add('imei', TextType::class)
-            ->add('notes', TextareaType::class)
+            ->add('note', TextareaType::class)
             ->add('update', SubmitType::class)
         ;
     }

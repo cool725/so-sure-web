@@ -441,8 +441,10 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             throw $this->createNotFoundException(sprintf('Policy %s not found', $id));
         }
 
+        $imei = new Imei();
+        $imei->setPolicy($policy);
         $imeiForm = $this->get('form.factory')
-            ->createNamedBuilder('imei_form', ImeiType::class)
+            ->createNamedBuilder('imei_form', ImeiType::class, $imei)
             ->setAction($this->generateUrl(
                 'imei_form',
                 ['id' => $id]
@@ -453,12 +455,12 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             if ($request->request->has('imei_form')) {
                 $imeiForm->handleRequest($request);
                 if ($imeiForm->isValid()) {
-                    $policy->adjustImei($imeiForm->getData()['imei'], false);
+                    $policy->adjustImei($imei->getImei(), false);
 
                     $policy->addNote(json_encode([
                         'user_id' => $this->getUser()->getId(),
                         'name' => $this->getUser()->getName(),
-                        'notes' => $imeiForm->getData()['notes']
+                        'notes' => $imei->getNote()
                     ]));
 
                     $dm->flush();
