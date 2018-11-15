@@ -51,19 +51,13 @@ $(function(){
     }, snowIntensity);
 
     $(document).on('keyup', function(e) {
-
-        window.clearInterval(snow);
-
         if(e.keyCode == 79){
-
             window.clearInterval(snow);
-
             window.setInterval(function () {
                 snowIntensity = 1000;
                 snowType = '🍆';
                 new snowFlake();
             }, snowIntensity);
-
         } else {
             window.clearInterval(snow);
         }
