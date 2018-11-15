@@ -33,7 +33,7 @@ use AppBundle\Document\ScheduledPayment;
  *      "sosurePotReward"="SoSurePotRewardPayment",
  *      "debtCollection"="DebtCollectionPayment"
  * })
- * @Gedmo\Loggable
+ * @Gedmo\Loggable(logEntryClass="AppBundle\Document\LogEntry")
  */
 abstract class Payment
 {

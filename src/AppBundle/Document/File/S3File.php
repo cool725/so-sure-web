@@ -44,7 +44,7 @@ use AppBundle\Validator\Constraints as AppAssert;
  *      "damagePicture"="DamagePictureFile",
  *      "otherClaim"="OtherClaimFile"
  * })
- * @Gedmo\Loggable
+ * @Gedmo\Loggable(logEntryClass="AppBundle\Document\LogEntry")
  */
 class S3File
 {
