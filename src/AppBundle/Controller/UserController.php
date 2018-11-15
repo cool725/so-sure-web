@@ -1315,7 +1315,6 @@ class UserController extends BaseController
      */
     public function emailLink(Request $request)
     {
-        $invitationService = ;
         $user = $this->getUser();
         $email = $request->get("email");
         if (!$user) {
