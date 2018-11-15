@@ -310,6 +310,11 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     protected $opts = array();
 
     /**
+     * @MongoDB\ReferenceMany(targetDocument="Charge", mappedBy="user", cascade={"persist"})
+     */
+    protected $charges;
+
+    /**
      * @Assert\Type("bool")
      * @MongoDB\Field(type="boolean")
      * @Gedmo\Versioned
@@ -416,6 +421,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     public function __construct()
     {
         parent::__construct();
+        $this->charges = new \Doctrine\Common\Collections\ArrayCollection();
         $this->referrals = new \Doctrine\Common\Collections\ArrayCollection();
         $this->sentInvitations = new \Doctrine\Common\Collections\ArrayCollection();
         $this->receivedInvitations = new \Doctrine\Common\Collections\ArrayCollection();
@@ -557,6 +563,22 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     public function getLeadSourceDetails()
     {
         return $this->leadSourceDetails;
+    }
+
+    public function getCharges()
+    {
+        return $this->charges;
+    }
+
+    public function setCharges($charges)
+    {
+        $this->charges = $charges;
+    }
+
+    public function addCharge(Charge $charge)
+    {
+        $charge->setUser($this);
+        $this->charges[] = $charge;
     }
 
     /**

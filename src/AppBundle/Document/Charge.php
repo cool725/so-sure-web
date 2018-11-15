@@ -56,7 +56,7 @@ class Charge
     protected $type;
 
     /**
-     * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\User")
+     * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\User", inversedBy="charges")
      * @Gedmo\Versioned
      */
     protected $user;
