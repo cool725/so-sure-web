@@ -92,10 +92,12 @@ security:
         - { path: ^/claims$, role: ROLE_CLAIMS, ips: [ "%davies_ip%" ] }
         - { path: ^/claims$, role: ROLE_CLAIMS, ips: [ "%directgroup_ip%" ] }
         - { path: ^/claims$, role: ROLE_CLAIMS, ips: "%sosure_ips%" }
+        - { path: ^/claims$, role: ROLE_CLAIMS, ips: [ "127.0.0.1" ] } # required for functional tests
         - { path: ^/claims$, role: ROLE_NO_ACCESS }
         - { path: ^/claims/, role: ROLE_CLAIMS, ips: [ "%davies_ip%" ] }
         - { path: ^/claims/, role: ROLE_CLAIMS, ips: [ "%directgroup_ip%" ] }
         - { path: ^/claims/, role: ROLE_CLAIMS, ips: "%sosure_ips%" }
+        - { path: ^/claims/, role: ROLE_CLAIMS, ips: [ "127.0.0.1" ] } # required for functional tests
         - { path: ^/claims/, role: ROLE_NO_ACCESS }
         - { path: ^/alpha$, role: ROLE_USER }
         - { path: ^/user$, role: ROLE_USER }
