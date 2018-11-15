@@ -1,6 +1,7 @@
 <?php
 namespace AppBundle\Service;
 
+use AppBundle\Document\Feature;
 use Predis\Client;
 use Psr\Log\LoggerInterface;
 use AppBundle\Document\Policy;
@@ -80,16 +81,21 @@ class RateLimitService
 
     protected $environment;
 
+    /** @var FeatureService */
+    protected $featureService;
+
     /**
      * @param Client          $redis
      * @param LoggerInterface $logger
      * @param string          $environment
+     * @param FeatureService  $featureService
      */
-    public function __construct(Client $redis, LoggerInterface $logger, $environment)
+    public function __construct(Client $redis, LoggerInterface $logger, $environment, FeatureService $featureService)
     {
         $this->redis = $redis;
         $this->logger = $logger;
         $this->environment = $environment;
+        $this->featureService = $featureService;
     }
 
     /**
@@ -158,6 +164,10 @@ class RateLimitService
      */
     public function allowedByDevice($type, $ip, $cognitoId = null)
     {
+        if (!$this->featureService->isEnabled(Feature::FEATURE_RATE_LIMITING)) {
+            return true;
+        }
+
         $maxIpRequests = self::$maxIpRequests[$type];
         $maxCognitoRequests = self::$maxRequests[$type];
 
@@ -203,6 +213,10 @@ class RateLimitService
      */
     public function allowedByUser(User $user)
     {
+        if (!$this->featureService->isEnabled(Feature::FEATURE_RATE_LIMITING)) {
+            return true;
+        }
+
         $type = self::DEVICE_TYPE_USER_LOGIN;
         $userKey = sprintf(self::KEY_FORMAT, $type, $user->getId());
 

@@ -88,7 +88,7 @@ if [ "$SKIP_DB" == "0" ]; then
 fi
 
 # keep in sync with load.sh
-for feature in "renewal" "picsure" "bacs"
+for feature in "renewal" "picsure" "bacs" "rate-limiting"
 do
   app/console --env=test sosure:feature $feature true
 done
