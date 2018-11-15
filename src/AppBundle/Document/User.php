@@ -23,7 +23,7 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 /**
  * @MongoDB\Document(repositoryClass="AppBundle\Repository\UserRepository")
  * @MongoDB\Index(keys={"identity_log.loc"="2dsphere"}, sparse="true")
- * @Gedmo\Loggable
+ * @Gedmo\Loggable(logEntryClass="AppBundle\Document\LogEntry")
  */
 class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterface
 {

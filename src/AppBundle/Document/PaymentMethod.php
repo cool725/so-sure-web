@@ -14,7 +14,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * make sure to update getType() if adding
  * @MongoDB\DiscriminatorMap({"judo"="JudoPaymentMethod",
  *      "bacs"="BacsPaymentMethod"})
- * @Gedmo\Loggable
+ * @Gedmo\Loggable(logEntryClass="AppBundle\Document\LogEntry")
  */
 abstract class PaymentMethod
 {

@@ -11,7 +11,7 @@ use AppBundle\Document\Connection\Connection;
 
 /**
  * @MongoDB\Document()
- * @Gedmo\Loggable
+ * @Gedmo\Loggable(logEntryClass="AppBundle\Document\LogEntry")
  */
 class Reward
 {
