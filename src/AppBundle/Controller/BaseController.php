@@ -8,12 +8,16 @@ use AppBundle\Form\Type\ClaimSearchType;
 use AppBundle\Repository\ClaimRepository;
 use AppBundle\Repository\File\S3FileRepository;
 use AppBundle\Repository\PhoneRepository;
+use AppBundle\Repository\PolicyRepository;
+use AppBundle\Repository\UserRepository;
 use AppBundle\Security\CognitoIdentityAuthenticator;
 use AppBundle\Service\MaxMindIpService;
 use AppBundle\Service\QuoteService;
+use Doctrine\MongoDB\Cursor;
 use Doctrine\ODM\MongoDB\Query\Builder;
 use Doctrine\ORM\Mapping\Id;
 use Doctrine\ORM\QueryBuilder;
+use Pagerfanta\Adapter\MongoAdapter;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -28,7 +32,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\ControllerTrait;
 
 use Pagerfanta\Pagerfanta;
-use Pagerfanta\Adapter\DoctrineODMMongoDBAdapter;
+use AppBundle\Classes\DoctrineODMMongoDBAdapter;
 use Pagerfanta\Adapter\ArrayAdapter;
 
 use AppBundle\Document\User;
@@ -812,11 +816,15 @@ abstract class BaseController extends Controller
     protected function searchPolicies(Request $request, $includeInvalidPolicies = null)
     {
         $dm = $this->getManager();
+        /** @var UserRepository $userRepo */
         $userRepo = $dm->getRepository(User::class);
+        /** @var PolicyRepository $policyRepo */
         $policyRepo = $dm->getRepository(Policy::class);
 
-        $policiesQb = $policyRepo->createQueryBuilder();
-
+        /** @var Builder $policiesQb */
+        $policiesQb = $policyRepo->createQueryBuilder()
+            ->eagerCursor(true)
+            ->field('user')->prime(true);
         $form = $this->createForm(PolicySearchType::class, null, ['method' => 'GET']);
         $form->handleRequest($request);
         if ($includeInvalidPolicies === null) {
@@ -951,12 +959,9 @@ abstract class BaseController extends Controller
             });
             $pager = $this->arrayPager($request, $policies);
         } else {
-            $policies = $policiesQb->getQuery()->execute()->toArray();
-            // sort older to more recent
-            usort($policies, function ($a, $b) {
-                return $a->getStart() > $b->getStart();
-            });
-            $pager = $this->arrayPager($request, $policies);
+            $policiesQb = $policiesQb->sort('start', 'asc');
+            //$pager = $this->arrayPager($request, $policiesQb->getQuery()->execute()->toArray());
+            $pager = $this->pager($request, $policiesQb);
         }
 
         return [
