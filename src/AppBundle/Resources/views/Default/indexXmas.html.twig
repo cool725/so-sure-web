@@ -23,7 +23,7 @@
                 <div class="col-lg-6">
                     <div class="hero__intro">
                         {% if page_type == 'tastecard' %}
-                            <h1 class="mb-4 text-white">so-yummy!</h1>
+                            <h1 class="mb-4 text-white">so-yummy <br><span class="sub">FREE Taste Card worth &pound;80</span></h1>
                             <h4 class="text-zaffre">Get a FREE TasteCard worth £80 this Christmas when you buy a mobile phone policy with us</h4>
                             <p class="mb-4 text-white">
                                 It's coming up for the time of year when we eat, drink and be merry. And, its that time of year where your mobile phone gets lost, stolen or smashed 😱 <br>
@@ -66,12 +66,24 @@
                 </div>
                 <div class="col-lg-6 d-none d-lg-block">
                     <div class="hero__illustration">
-                        <img src="{{ cdn_url }}/images/rebrand/homepage/so-sure_hero-illustration-xmas-{{ random('123') }}.png" alt="so-sure - social insurance" class="img-fluid animated jackInTheBox">
+                        {% if page_type == 'tastecard' %}
+                            <img src="{{ cdn_url }}/images/rebrand/homepage/so-sure_hero-illustration-xmas-tastecard.png" alt="so-sure - social insurance" class="img-fluid animated jackInTheBox">
+                        {% elseif page_type == 'phonecase' %}
+                            <img src="{{ cdn_url }}/images/rebrand/homepage/so-sure_hero-illustration-xmas-2.png" alt="so-sure - social insurance" class="img-fluid animated jackInTheBox">
+                        {% else %}
+                            <img src="{{ cdn_url }}/images/rebrand/homepage/so-sure_hero-illustration-xmas-{{ random('123') }}.png" alt="so-sure - social insurance" class="img-fluid animated jackInTheBox">
+                        {% endif %}
                     </div>
                 </div>
             </div>
             <div class="hero__illustration  d-block d-lg-none">
-                <img src="{{ cdn_url }}/images/rebrand/homepage/so-sure_hero-illustration-xmas-{{ random('123') }}.png" alt="so-sure - social insurance" class="img-fluid animated jackInTheBox">
+                {% if page_type == 'tastecard' %}
+                    <img src="{{ cdn_url }}/images/rebrand/homepage/so-sure_hero-illustration-xmas-tastecard.png" alt="so-sure - social insurance" class="img-fluid animated jackInTheBox">
+                {% elseif page_type == 'phonecase' %}
+                    <img src="{{ cdn_url }}/images/rebrand/homepage/so-sure_hero-illustration-xmas-2.png" alt="so-sure - social insurance" class="img-fluid animated jackInTheBox">
+                {% else %}
+                    <img src="{{ cdn_url }}/images/rebrand/homepage/so-sure_hero-illustration-xmas-{{ random('123') }}.png" alt="so-sure - social insurance" class="img-fluid animated jackInTheBox">
+                {% endif %}
             </div>
         </div>
     </section>
