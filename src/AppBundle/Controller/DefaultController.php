@@ -1178,7 +1178,7 @@ class DefaultController extends BaseController
                     'Too many requests! Please try again later'
                 );
 
-                return new RedirectResponse($this->generateUrl('optout'));
+                return new RedirectResponse($this->generateUrl('homepage'));
             }
 
             $email = $form->getData()['email'];
@@ -1228,7 +1228,7 @@ class DefaultController extends BaseController
                 'Too many requests! Please try again later'
             );
 
-            return new RedirectResponse($this->generateUrl('optout'));
+            return new RedirectResponse($this->generateUrl('homepage'));
         }
 
         $email = SoSure::decodeCommunicationsHash($hash);
