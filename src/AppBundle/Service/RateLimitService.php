@@ -271,7 +271,7 @@ class RateLimitService
 
         // rate limit only for prod, or test
         if (!in_array($this->environment, ['prod', 'test'])) {
-//            return true;
+            return true;
         }
 
         if ($ip != filter_var(
