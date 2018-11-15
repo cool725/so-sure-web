@@ -8,6 +8,7 @@ require('bootstrap/js/dist/carousel');
 
 // Require components
 require('jquery-validation');
+require('../../../js/Default/jqueryValidatorMethods.js');
 require('jssocials');
 let Clipboard = require('clipboard');
 
@@ -44,7 +45,7 @@ $(function() {
 
 
     // the slides on the carousel.
-    const carousel = $('#onboarding-carousel'),
+    const carousel = $('#onboarding_carousel'),
           onNavMb  = $('.onboarding-controls__mobile'),
           onNavDt  = $('.onboarding-nav__desktop');
 
@@ -127,7 +128,7 @@ $(function() {
 
     // Social Sharing
     // NOTE: We use JSSOCIALS - see fork on github for more info
-    const onboardingShare = $('#onboarding-btn--share');
+    const onboardingShare = $('#onboarding_btn_share');
 
     // Share buttons
     $(onboardingShare).jsSocials({
@@ -147,72 +148,74 @@ $(function() {
 
     // Email Invite code
     // NOTE:
-    //
-    self.form.validate({
-        debug: true,
+    $('#invite_form').validate({
+        debug: false,
         // When to validate
         validClass: 'is-valid-ss',
         errorClass: 'is-invalid',
         onfocusout: false,
         onkeyup: false,
-        // onclick: false,
         rules: {
-
-        },
-        messages: {
-            // Leave validation messages blank as class gets added to the label
-            "purchase_form[agreedDamage]": {
-                required: ''
-            },
-            "purchase_form[agreedAgeLocation]": {
-                required: ''
-            },
-            "purchase_form[agreedExcess]": {
-                required: ''
-            },
-            "purchase_form[agreedTerms]": {
-                required: ''
+            'email_invite_input': {
+                required: {
+                    depends:function(){
+                        $(this).val($.trim($(this).val()));
+                        return true;
+                    }
+                },
+                email: true,
+                emaildomain: true
             }
         },
-
+        messages: {
+            'email_invite_input': {
+                required: 'Please enter a valid email',
+                email: 'Please enter a valid email',
+                emaildomain: "Please check you've entered a valid email"
+            }
+        },
         submitHandler: function(form) {
-            form.submit();
+            console.log('Form valid');
+            return false;
         }
     });
-    //
-    $('.btn-invite').on('click', function(e) {
-        e.preventDefault();
 
-        $.ajax({
-            url: '/user/inviteemail',
-            type: 'POST',
-            data: {email: $('.input-invite').val()},
-        })
-        .done(function(data) {
-            // console.log(data);
-            $('.btn-invite').tooltip({
-                'title':   'Your invite is on it\'s way 😀',
-                'trigger': 'manual'
-            }).tooltip('show');
+    if ($('#invite_form').valid() == true ) {
+        console.log('Valid check');
+    }
 
-            setTimeout(function() {
-                $('.btn-invite').tooltip('hide');
-            }, 1500);
+    // $('.btn-invite').on('click', function(e) {
+    //     e.preventDefault();
 
-            // Clear the input and suggest another one? TODO: Copy
-            $('.input-invite').val('').attr('placeholder', 'How about another one?');
-        })
-        .fail(function(data) {
-            console.log(data);
-            $('.btn-invite').tooltip({
-                'title':   'Something went wrong 😥',
-                'trigger': 'manual'
-            }).tooltip('show');
+    //     $.ajax({
+    //         url: '/user/inviteemail',
+    //         type: 'POST',
+    //         data: {email: $('.input-invite').val()},
+    //     })
+    //     .done(function(data) {
+    //         // console.log(data);
+    //         $('.btn-invite').tooltip({
+    //             'title':   'Your invite is on it\'s way 😀',
+    //             'trigger': 'manual'
+    //         }).tooltip('show');
 
-            setTimeout(function() {
-                $('.btn-invite').tooltip('hide');
-            }, 1500);
-        });
+    //         setTimeout(function() {
+    //             $('.btn-invite').tooltip('hide');
+    //         }, 1500);
 
-    });
+    //         // Clear the input and suggest another one? TODO: Copy
+    //         $('.input-invite').val('').attr('placeholder', 'How about another one?');
+    //     })
+    //     .fail(function(data) {
+    //         console.log(data);
+    //         $('.btn-invite').tooltip({
+    //             'title':   'Something went wrong 😥',
+    //             'trigger': 'manual'
+    //         }).tooltip('show');
+
+    //         setTimeout(function() {
+    //             $('.btn-invite').tooltip('hide');
+    //         }, 1500);
+    //     });
+    // });
 });
