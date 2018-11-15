@@ -278,8 +278,7 @@ class RateLimitService
             $ip,
             FILTER_VALIDATE_IP,
             FILTER_FLAG_NO_PRIV_RANGE |  FILTER_FLAG_NO_RES_RANGE
-            )
-        ) {
+        )) {
             $this->logger->warning(sprintf('Rate limit is using a private ip range (%s)', $ip));
         }
 
