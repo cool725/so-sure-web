@@ -1,34 +1,40 @@
 {% block body %}
 
+  {{ form_start(form, {'attr': {'class': 'form-inline'}}) }}
   <div class="modal-body">
     <div class="container-fluid">
       <div class="row">
         <div class="col">
-          <p id="confirm-msg">
-            Are you sure you want to update this IMEI? This should only be done if the phone imei was incorrectly
-            entered
-            or post claim once the IMEI has changed. This will trigger a Salva Policy Update.
-          </p>
+          <p>Are you sure you want to update this IMEI? Common cases for this would be:</p>
+          <ul>
+            <li>User mistyped their IMEI during purchase</li>
+            <li>User entered the 2nd IMEI number instead of the first in the case of a dual sim card</li>
+            <li>IMEI was updated by claims team but the system could not auto-update the imei number</li>
+            <li>Voucher was issued by the claims team</li>
+            <li>User had a warrenty issue that was handled outside the claims process - same make/model, just
+              different
+              imei.
+            </li>
+          </ul>
+          <p>This will trigger a Salva Policy Update.</p>
+          <p><strong>In many cases we would want to invalidate the pic-sure on the policy (not currently available
+              yet)</strong></p>
         </div>
       </div>
 
-      {{ form_start(form, {'attr': {'class': 'form-inline'}}) }}
-      <div class="row" id="checkboxes">
+      <div class="row" id="checkboxes" style="margin-bottom: 20px;">
         <div class="col">
           <input required type="checkbox" id="checkbox1">
-          <label for="checkbox1">Have you double checked the IMEI number?</label>
+          <label for="checkbox1">I've read the list of common reasons above</label>
         </div>
 
         <div class="col">
           <input required type="checkbox" id="checkbox2">
-          <label for="checkbox2">Are you absolutely sure this needs to be done?</label>
-        </div>
-
-        <div class="col">
-          <input required type="checkbox" id="checkbox3">
-          <label for="checkbox3">Double checked everything again?</label>
+          <label for="checkbox2">If it is not a common reason, I have verified the exception is allowed</label>
         </div>
       </div>
+
+      <br>
 
       <div class="row">
         <table class="table table-striped">
