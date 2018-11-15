@@ -12,6 +12,7 @@
 namespace AppBundle\Classes;
 
 use Doctrine\ODM\MongoDB\Query\Builder;
+use Pagerfanta\Adapter\AdapterInterface;
 
 /**
  * DoctrineODMMongoDBAdapter.
