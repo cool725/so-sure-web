@@ -1032,7 +1032,7 @@
                         <tr>
                             <td><i class="fa fa-lock" title="Admin only"></i> Refund Bacs</td>
                             <td>
-                                <button type="button" class="btn btn-info" data-toggle="modal" data-target="#bacsRefundModal"
+                                <button type="button" class="btn btn-warning" data-toggle="modal" data-target="#bacsRefundModal"
                                 >Refund</button>
                             </td>
                         </tr>
@@ -1510,11 +1510,13 @@
                                     {{ form_label(bacs_refund_form.amount) }}
                                     {{ form_errors(bacs_refund_form.amount) }}
                                     {{ form_widget(bacs_refund_form.amount) }}
+                                    <br>Enter positive figure <strong>£{{ policy.premium.monthlyPremiumPrice| number_format(2, '.', ',') }} / month or £{{ policy.premium.yearlyPremiumPrice| number_format(2, '.', ',') }} / year</strong>
                                 </div>
                                 <div class="form-group">
                                     {{ form_label(bacs_refund_form.totalCommission) }}
                                     {{ form_errors(bacs_refund_form.totalCommission) }}
                                     {{ form_widget(bacs_refund_form.totalCommission) }}
+                                    <br>Enter positive figure <strong>£0.89 / month or £10.72 for annual</strong>
                                 </div>
                                 <div class="form-group">
                                     {{ form_label(bacs_refund_form.notes) }}

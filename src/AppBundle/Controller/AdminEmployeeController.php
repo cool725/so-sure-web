@@ -606,6 +606,8 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             ->getForm();
         $bacsRefund = new BacsPayment();
         $bacsRefund->setPolicy($policy);
+        $bacsRefund->setAmount($policy->getPremiumInstallmentPrice(true));
+        $bacsRefund->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
         $bacsRefund->setStatus(BacsPayment::STATUS_PENDING);
         $bacsRefundForm = $this->get('form.factory')
             ->createNamedBuilder('bacs_refund_form', BacsCreditType::class, $bacsRefund)
