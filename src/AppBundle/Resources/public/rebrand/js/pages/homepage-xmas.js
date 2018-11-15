@@ -57,8 +57,18 @@ $(function(){
         if(e.keyCode == 79){
 
             window.setInterval(function () {
-                snowIntensity = 700;
+                snowIntensity = 1000;
                 snowType = '🍆';
+                new snowFlake();
+            }, snowIntensity);
+
+        }
+
+        if(e.keyCode == 83){
+
+            window.setInterval(function () {
+                snowIntensity = 400;
+                snowType = '*';
                 new snowFlake();
             }, snowIntensity);
 

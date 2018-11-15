@@ -94,10 +94,13 @@ class DefaultController extends BaseController
 
         $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE);
 
+        $pageType = 'xmas-homepage';
+
         $data = array(
             // Make sure to check homepage landing below too
-            'referral'    => $referral,
-            'phone'       => $this->getQuerystringPhone($request),
+            'referral'  => $referral,
+            'phone'     => $this->getQuerystringPhone($request),
+            'page_type' => $pageType,
         );
 
         // $template = 'AppBundle:Default:index.html.twig';
