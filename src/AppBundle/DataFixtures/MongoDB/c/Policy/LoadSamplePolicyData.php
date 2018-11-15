@@ -4,6 +4,7 @@ namespace AppBundle\DataFixtures\MongoDB\c\Policy;
 
 use AppBundle\Document\BacsPaymentMethod;
 use AppBundle\Document\BankAccount;
+use AppBundle\Document\Charge;
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\File\AccessPayFile;
 use AppBundle\Document\File\BacsReportInputFile;
@@ -548,6 +549,12 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         }
 
         $user->setPaymentMethod($paymentMethod);
+
+        if (random_int(0, 1) == 0) {
+            $charge = new Charge();
+            $charge->setType(Charge::TYPE_ADDRESS);
+            $user->addCharge($charge);
+        }
 
         return $user;
     }

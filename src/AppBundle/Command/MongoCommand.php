@@ -26,7 +26,7 @@ class MongoCommand extends ContainerAwareCommand
     {
         $this
             ->setName('sosure:mongo')
-            ->setDescription('Ensure Indexes are present')
+            ->setDescription('Update payer policies')
             ->addArgument(
                 'action',
                 InputArgument::REQUIRED,
