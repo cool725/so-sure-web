@@ -65,6 +65,7 @@ Vagrant.configure("2") do |config|
     dev1804_config.vm.box = "geerlingguy/ubuntu1804"
     dev1804_config.vm.box_check_update = false
     dev1804_config.vm.network "forwarded_port", guest: 80, host: 40080 # apache sosure website
+    dev1804_config.vm.network "forwarded_port", guest: 8008, host: 40088 # apache sosure website
     dev1804_config.vm.network "forwarded_port", guest: 27017, host: 47017 # mongodb
     dev1804_config.vm.network "forwarded_port", guest: 5000, host: 5000 # sixpack
     dev1804_config.vm.network "forwarded_port", guest: 5001, host: 5001 # sixpack-web
