@@ -821,7 +821,7 @@ abstract class BaseController extends Controller
         /** @var PolicyRepository $policyRepo */
         $policyRepo = $dm->getRepository(Policy::class);
 
-        /** @var QueryBuilder $policiesQb */
+        /** @var Builder $policiesQb */
         $policiesQb = $policyRepo->createQueryBuilder()
             ->eagerCursor(true)
             ->field('user')->prime(true);
