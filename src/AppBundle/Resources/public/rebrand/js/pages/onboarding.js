@@ -7,6 +7,7 @@ require('bootstrap/js/dist/tooltip');
 require('bootstrap/js/dist/carousel');
 
 // Require components
+require('jquery-validation');
 require('jssocials');
 let Clipboard = require('clipboard');
 
@@ -146,6 +147,39 @@ $(function() {
 
     // Email Invite code
     // NOTE:
+    //
+    self.form.validate({
+        debug: true,
+        // When to validate
+        validClass: 'is-valid-ss',
+        errorClass: 'is-invalid',
+        onfocusout: false,
+        onkeyup: false,
+        // onclick: false,
+        rules: {
+
+        },
+        messages: {
+            // Leave validation messages blank as class gets added to the label
+            "purchase_form[agreedDamage]": {
+                required: ''
+            },
+            "purchase_form[agreedAgeLocation]": {
+                required: ''
+            },
+            "purchase_form[agreedExcess]": {
+                required: ''
+            },
+            "purchase_form[agreedTerms]": {
+                required: ''
+            }
+        },
+
+        submitHandler: function(form) {
+            form.submit();
+        }
+    });
+    //
     $('.btn-invite').on('click', function(e) {
         e.preventDefault();
 
@@ -155,7 +189,7 @@ $(function() {
             data: {email: $('.input-invite').val()},
         })
         .done(function(data) {
-            console.log(data);
+            // console.log(data);
             $('.btn-invite').tooltip({
                 'title':   'Your invite is on it\'s way 😀',
                 'trigger': 'manual'
@@ -166,7 +200,7 @@ $(function() {
             }, 1500);
 
             // Clear the input and suggest another one? TODO: Copy
-            $('.input-invite').val().attr('placeholder', 'How about another one?');
+            $('.input-invite').val('').attr('placeholder', 'How about another one?');
         })
         .fail(function(data) {
             console.log(data);
