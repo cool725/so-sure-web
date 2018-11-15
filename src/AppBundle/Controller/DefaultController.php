@@ -107,6 +107,38 @@ class DefaultController extends BaseController
     }
 
     /**
+     * @Route("/free-taste-card", name="free_taste_card")
+     */
+    public function freeTasteCard()
+    {
+        $pageType = 'tastecard';
+
+        $data = array(
+            'page_type' => $pageType,
+        );
+
+        $template = 'AppBundle:Default:indexXmas.html.twig';
+
+        return $this->render($template, $data);
+    }
+
+    /**
+     * @Route("/free-phone-case", name="free_phone_case")
+     */
+    public function freePhoneCase()
+    {
+        $pageType = 'phonecase';
+
+        $data = array(
+            'page_type' => $pageType,
+        );
+
+        $template = 'AppBundle:Default:indexXmas.html.twig';
+
+        return $this->render($template, $data);
+    }
+
+    /**
      * @Route("/money", name="money")
      */
     public function moneyLanding()
