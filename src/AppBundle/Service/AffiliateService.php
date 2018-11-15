@@ -68,79 +68,69 @@ class AffiliateService
 
     /**
      * Generates all new charges needed for all affiliate companies.
+     * @param array $affiliates is the list of affiliates to generate for. Generally you will want all but it is easier
+     *                          to test when the method does not operate indiscriminately.
      * @return array the list of all the charges that were just generated.
      */
-    public function generate()
+    public function generate($affiliates)
     {
         $generatedCharges = [];
-        $affiliates = $this->dm->getRepository(AffiliateCompany::class)->findAll();
-
         foreach ($affiliates as $affiliate) {
             $model = $affiliate->getChargeModel();
             if ($model == AffiliateCompany::MODEL_ONE_OFF) {
-                $this->generateOneOffCharges($affiliate, $generatedCharges);
+                $users = $this->getMatchingUsers($affiliate);
+                foreach ($users as $user) {
+                    if (!$user->getLastCharge(Charge::CHARGE_AFFILIATE)) {
+                        $generatedCharges[] = $this->createCharge($affiliate, $user, $user->getValidPolicies()[0]);
+                    }
+                }
             } elseif ($model == AffiliateCompany::MODEL_ONGOING) {
-                $this->generateOngoingCharges($affiliate, $generatedCharges);
+                $users = $this->getMatchingUsers($affiliate);
+                foreach ($users as $user) {
+                    $policies = $user->getValidPolicies(true);
+                    if (count($policies) == 1) {
+                        // The user has only one active policy.
+                        if (
+                            ($user->getLastCharge(Charge::CHARGE_AFFILIATE) && chargeIsOldEnough) ||
+                            userOldEnoughForFirstCharge
+                        ) {
+                            // When the user has already made an affiliate charge before, but not recently.
+                            $generatedCharges[] = $this->createCharge($affiliate, $user, $policies[0]);
+                        }
+                    } else {
+                        // User has multiple active policies.
+                        $charge = $user->getLastCharge(Charge::CHARGE_AFFILIATE);
+
+                        if ($charge) {
+                            // Multiple active policies and there exist charges.
+                            foreach ($policies as $policy) {
+                                if ($policy->getStatus() == Policy::STATUS_RENEWAL) {
+                                    $previous = $policy->getPreviousPolicy();
+                                    if ($previous->getAffiliate()) {
+                                        // Previous policy has a charge.
+                                        if ($previous->oldEnough()) {
+                                            $generatedCharges[] = $this->createCharge($affiliate, $user, $policy);
+                                        }
+                                    } else {
+                                        warn(
+                                            "User ".$user->getEmail()." has previous affiliate charges but renewal ".
+                                            "policy ".$policy->getCode()." cannot find charges attributed to it's ".
+                                            "predecessor ".$previous->getCode()."."
+                                        );
+                                    }
+                                }
+                            }
+                        } else {
+                            warn(
+                                "User ".$user->getEmail()." has multiple active policies, but no affiliate charges ".
+                                "recorded."
+                            );
+                        }
+                    }
+                }
             }
         }
         return $generatedCharges;
-    }
-
-    /**
-     * Confirms and charges for all unconfirmed policies belonging to users belonging to the given affiliate, and
-     * confirms unconfirmed users at the same time.
-     * @param AffiliateCompany $affiliate is the affiliate company to run for.
-     * @param array $charges is a reference to an array into which the charges added for reference.
-     * @return array of the charges made.
-     */
-    public function generateOngoingCharges($affiliate, & $charges = null)
-    {
-        $policyRepo = $this->dm->getRepository(Policy::class);
-        $users = $this->getMatchingUsers($affiliate, [User::AQUISITION_PENDING, User::AQUISITION_CONFIRMED]);
-        foreach ($users as $user) {
-            if (!$user->getAffiliate()) {
-                $affiliate->addConfirmedUsers($user);
-            }
-            for ($policy = $user->getFirstPolicy; $policy; $policy = $policy->getNextPolicy()) {
-                if ($policy->aquisitionStatus() != Policy::AQUISITION_POLICY_PENDING) {
-                    continue;
-                }
-                $charge = new Charge();
-                $charge->setType(Charge::TYPE_AFFILIATE);
-                $charge->setAmount($affiliate->getCPA());
-                $charge->setUser($user);
-                $charge->setAffiliate($affiliate);
-                $this->dm->persist($charge);
-                $affiliate->addConfirmedPolicies($policy);
-                if (isset($charges)) {
-                    $charges[] = $charge;
-                }
-            }
-        }
-        $this->dm->flush();
-    }
-
-    /**
-     * Confirms and charges for all users that belong to the given affiliate but are not yet confirmed.
-     * @param AffiliateCompany $affiliate is the affiliate company to run for.
-     * @return array of all the charges made.
-     */
-    public function generateOneOffCharges($affiliate, & $charges = null)
-    {
-        $users = $this->getMatchingUsers($affiliate);
-        foreach ($users as $user) {
-            $charge = new Charge();
-            $charge->setType(Charge::TYPE_AFFILIATE);
-            $charge->setAmount($affiliate->getCPA());
-            $charge->setUser($user);
-            $charge->setAffiliate($affiliate);
-            $this->dm->persist($charge);
-            $affiliate->addConfirmedUsers($user);
-            if (isset($charges)) {
-                $charges[] = $charge;
-            }
-        }
-        $this->dm->flush();
     }
 
     /**
@@ -155,7 +145,6 @@ class AffiliateService
         $campaignUsers = [];
         $leadUsers = [];
         $userRepo = $this->dm->getRepository(User::class);
-
         if (mb_strlen($affiliate->getCampaignSource()) > 0) {
             $campaignUsers = $userRepo->findBy([
                 'attribution.campaignSource' => $affiliate->getCampaignSource()
@@ -167,19 +156,38 @@ class AffiliateService
                 'leadSourceDetails' => $affiliate->getLeadSourceDetails()
             ]);
         }
-
         $users = [];
         foreach ($campaignUsers as $user) {
-            if (in_array($user->aquisitionStatus(), $status)) {
+            if (in_array($user->aquisitionStatus($affiliate->getDays()), $status)) {
                 $users[] = $user;
             }
         }
         foreach ($leadUsers as $user) {
-            if (in_array($user->aquisitionStatus(), $status)) {
+            if (in_array($user->aquisitionStatus($affiliate->getDays()), $status)) {
                 $users[] = $user;
             }
         }
-
         return $users;
+    }
+
+    /**
+     * Creates an affiliate charge, associates it with the given user, and confirms the given policy with the
+     * affiliate company, then persists it all in the database. The cost of the charge is set as the affiliate's CPA
+     * property.
+     * @param AffiliateCompany $affiliate is the affiliate company who the charge is being made for.
+     * @param User             $user      is the user that the charge is made regarding.
+     * @param Policy           $policy    is the policy that the charge is made regarding.
+     * @return Charge the charge that has been created.
+     */
+    public function createCharge($affiliate, $user, $policy) {
+        $charge = new Charge();
+        $charge->setAmount($affiliate->getCPA());
+        $charge->setType(Charge::TYPE_AFFILIATE);
+        $charge->setCreatedDate(new \DateTime());
+        $charge->setUser($user);
+        $charge->setAffiliate($affiliate);
+        $charge->setPolicy($policy);
+        $affiliate->addConfirmedPolicies($policy);
+        return $charge;
     }
 }

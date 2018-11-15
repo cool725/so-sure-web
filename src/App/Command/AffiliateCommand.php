@@ -13,13 +13,14 @@ class AffiliateCommand extends ContainerAwareCommand
     const SERVICE_NAME = 'sosure:admin:affiliate';
     protected static $defaultName = self::SERVICE_NAME;
 
-    /** @var AffiliateService */
+    private $affiliateRepository;
     private $affiliateService;
 
-    public function __construct(AffiliateService $affiliateService)
+    public function __construct(AffiliateService $affiliateService, DocumentManager $dm)
     {
         parent::__construct();
         $this->affiliateService = $affiliateService;
+        $this->affiliateRepository = $dm->getRepository(AffiliateCompany::class);
     }
 
     protected function configure()
@@ -29,7 +30,8 @@ class AffiliateCommand extends ContainerAwareCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $charges = count($this->affiliateService->generate());
+        $affiliates = $this->affiliateRepository->findAll();
+        $charges = count($this->affiliateService->generate($affiliates));
         $output->writeln("{$charges} charges made.");
     }
 }

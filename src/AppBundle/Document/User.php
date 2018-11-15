@@ -46,9 +46,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     const ROLE_CUSTOMER_SERVICES = 'ROLE_CUSTOMER_SERVICES';
     const ROLE_ADMIN = 'ROLE_ADMIN';
 
-    const AQUISITION_CONFIRMED = 'confirmed'; // this is for aquired users who have been confirmed.
-    const AQUISITION_PENDING = 'pending'; // This is for aquisitions that can be confirmed at any time.
-    const AQUISITION_NEW = 'new'; // This is for aquisitions that have a valid policy but are too young.
+    const AQUISITION_PENDING = 'pending'; // This is for aquisitions that are active.
     const AQUISITION_POTENTIAL = 'potential'; // this is for aquired users with no policy.
     const AQUISITION_LOST = 'lost'; // this is for aquired users with a cancelled policy.
 
@@ -276,12 +274,6 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
      * @Gedmo\Versioned
      */
     protected $company;
-
-    /**
-     * @MongoDB\ReferenceOne(targetDocument="AffiliateCompany", inversedBy="confirmedUsers")
-     * @Gedmo\Versioned
-     */
-    protected $affiliate;
 
     /**
      * @MongoDB\ReferenceMany(targetDocument="Policy", mappedBy="user")
@@ -596,16 +588,6 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     public function setCompany(Company $company)
     {
         $this->company = $company;
-    }
-
-    public function getAffiliate()
-    {
-        return $this->affiliate;
-    }
-
-    public function setAffiliate(AffiliateCompany $affiliate)
-    {
-        $this->affiliate = $affiliate;
     }
 
     public function addPolicy(Policy $policy)
@@ -2069,20 +2051,12 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
      */
     public function aquisitionStatus($days)
     {
-        if ($this->affiliate) {
-            return static::AQUISITION_CONFIRMED;
-        }
-        $policy = $this->getFirstPolicy();
-        if (!$policy) {
+        if ($this->hasActivePolicy() || $this->hasUnpaidPolicy()) {
+            return static::AQUISITION_PENDING;
+        } elseif ($this->hasPolicy()) {
+            return static::AQUISITION_LOST;
+        } else {
             return static::AQUISITION_POTENTIAL;
         }
-        if (in_array($policy->getStatus(), [Policy::STATUS_ACTIVE, Policy::STATUS_UNPAID])) {
-            if ($policy->isPolicyOldEnough($days)) {
-                return static::AQUISITION_PENDING;
-            } else {
-                return static::AQUISITION_NEW;
-            }
-        }
-        return static::AQUISITION_LOST;
     }
 }

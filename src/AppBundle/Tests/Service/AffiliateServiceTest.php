@@ -73,116 +73,59 @@ class AffiliateServiceTest extends WebTestCase
         self::$chargeRepository = self::$dm->getRepository(Charge::class);
         self::$policyRepository = self::$dm->getRepository(Policy::class);
         self::$affiliateRepository = self::$dm->getRepository(AffiliateCompany::class);
-    }
 
-    public function setUp()
-    {
-        $this->purge(User::class);
-        $this->purge(AffiliateCompany::class);
-        $this->purge(Charge::class);
-        $this->purge(Policy::class);
+        $affiliate = self::createTestAffiliate("campaignA", 1, 30, "line 1", "london", "campaignA");
+        self::createTestAffiliate("campaignB", 2, 60, "line 1", "london", "campaignB");
+        self::createTestAffiliate("campaignC", 3, 30, "line 1", "london", "campaignC")->setChargeModel(AffiliateCompany::MODEL_ONGOING);
+        self::createTestAffiliate("leadA", 4, 90, "line 1", "london", "", "leadA");
+        self::createTestUser("20 days ago", "bango", "campaignA");
+        self::createTestUser("31 days ago", "tango", "campaignA");
+        self::createTestUser("50 days ago", "wearingABigHat", "campaignA");
+        $completedAGuy = self::createTestUser("60 days ago", "completedAGuy", "campaignA");
+        $lostAGuy = self::createTestUser("60 days ago", "lostAGuy", "campaignA");
+        self::createLonelyTestUser("aaa", "campaignA");
+        self::createLonelyTestUser("bbb", "campaignA");
+        $affiliate->addConfirmedPolicies($completedAGuy);
+        $lostAGuy->getLatestPolicy()->setStatus(Policy::STATUS_CANCELLED);
+        self::createTestUser("20 days ago", "john", "campaignC");
+        self::createTestUser("40 days ago", "smith", "campaignC");
+        $doublePolicyGuy = self::createTestUser("50 days ago", "kalvin", "campaignC");
+        self::createLonelyTestUser("gabriel", "campaignC");
+        self::createTestPolicy($doublePolicyGuy, new \DateTime("127 days ago"));
+        self::createTestUser("51 days ago", "bone", "", "leadA");
+        self::createTestUser("95 days ago", "borb", "", "leadA");
+        self::createTestUser("101 days ago", "tonyAbbot", "", "leadA");
+        self::createLonelyTestUser("jellyfish", "", "leadA");
     }
 
     /**
      * Tests that the AffiliateService::generate works as intended on a populated database and on no data.
+     * This test has gotta run first, because it runs before the database has been messed with.
+     * @group time-sensitive
      */
     public function testGenerate()
     {
-        // test on empty data.
-        $this->assertEmpty(self::$affiliateService->generate());
-        $this->assertEquals(0, count(self::$chargeRepository->findBy([])));
+        // test on no affiliates.
+        $this->assertEmpty(self::$affiliateService->generate([]));
 
-        // test on proper data.
-        // 3 in campaignA, 2 in campaignC, 3 in leadA = 21.
-        $this->createState();
-        $charges = self::$affiliateService->generate();
-        $this->assertEquals(8, count($charges));
-        $this->assertEquals(8, count(self::$chargeRepository->findBy([])));
-        $this->assertEquals(21, self::sumCost($charges));
+        // test on main data.
+        print ("yeeaaaea");
 
-        // test on second hand data
-        $this->assertEmpty(self::$affiliateService->generate());
-        $this->assertEquals(8, count(self::$chargeRepository->findBy([])));
+        sleep(100000);
 
-        // test on second hand data with all users getting a new 200 day aged policy.
-        $users = self::$userRepository->findBy([]);
-        foreach ($users as $user) {
-            $policy = new PhonePolicy();
-            $policy->setStatus(Policy::STATUS_ACTIVE);
-            $policy->setUser($this->userByName(self::$dm, $user));
-            $policy->setStartDate(new \DateTime("200 days ago"));
-        }
-        // 3 in leadA = 8.
-        $charges = self::$affiliateService->generate();
-        $this->assertEquals(3, count($charges));
-        $this->assertEquals(11, count(self::$chargeRepository->findBy([])));
-        $this->assertEquals(12, self::sumCost($charges));
+        print("yee");
     }
 
     /**
-     * Tests generating the ongoing charges for an ongoing affiliate.
+     * Tests the createCharge function.
      */
-    public function testGenerateOngoingCharges()
+    public function testCreateCharge()
     {
-        // normal case, single charges to be made.
-        $this->createState();
-        $affiliate = $this->affiliate("campaignC");
-        $charges = [];
-        self::$affiliateService->generateOngoingCharges($affiliate, $charges);
-        $this->assertEquals(2, count($charges));
-
-        // done case, no charges to be made.
-        $charges = [];
-        self::$affiliateService->generateOngoingCharges($affiliate, $charges);
-        $this->assertEmpty($charges);
-
-        // normal case with previous data, single charges to be made.
-        $charges = [];
-        self::$affiliateService->generateOngoingCharges($affiliate, $charges);
-        $this->assertEquals(2, count($charges));
-
-        // late case, multiple charges per user to be made.
-        $charges = [];
-        self::$affiliateService->generateOngoingCharges($affiliate, $charges);
-        $this->assertEquals(4, count($charges));
-
-        // done case after multiple charges, no charges to be made.
-        $charges = [];
-        self::$affiliateService->generateOngoingCharges($affiliate, $charges);
-        $this->assertEmpty($charges);
-
-        // empty case, no charges to be made
-        self::purge(Policy::class);
-        $charges = [];
-        self::$affiliateService->generateOngoingCharges($affiliate, $charges);
-        $this->assertEmpty($charges);
-    }
-
-    /**
-     * Tests generating one off charges for a one off affiliate on a populated database.
-     * @param string $affiliate the name of the affiliate to test.
-     * @param int    $n         is the number of charges that should be made.
-     * @dataProvider generateOneOffChargesProvider .
-     */
-    public function testGenerateOneOffCharges($affiliate, $n)
-    {
-        $this->createState();
-        $charges = [];
-        self::$affiliateService->generateOneOffCharges($this->affiliate($affiliate), $charges);
-        $this->assertEquals($n, count($charges));
-    }
-
-    /**
-     * Generates data to run testGenerateOneOffCharges.
-     * @return array containing the test data.
-     */
-    public static function generateOneOffChargesProvider()
-    {
-        return [
-            ["campaignA", 3],
-            ["campaignB", 0],
-            ["leadA", 3]
-        ];
+        // not that much to test really but make sure all the right things are set and try doing two on one user.
+        $affiliate = $this->affiliate("create_campaignA");
+        $user = $this->userByName("create_tony");
+        $policy = $user->getFirstPolicy();
+        $charge = self::$affiliateService->createCharge($affiliate, $user, $policy);
     }
 
     /**
@@ -277,54 +220,6 @@ class AffiliateServiceTest extends WebTestCase
     }
 
     /**
-     * Drops every document of type given from the database.
-     * @param class $class is the php class corresponding to the mongodb document collection to get dropped.
-     */
-    private function purge($class)
-    {
-        self::$dm->createQueryBuilder($class)->remove()->getQuery()->execute();
-    }
-
-    /**
-     * Creates a good state in the database from which to test.
-     */
-    private static function createState()
-    {
-        $affiliate = self::createTestAffiliate("campaignA", 1, 30, "line 1", "london", "campaignA");
-        self::createTestAffiliate("campaignB", 2, 60, "line 1", "london", "campaignB");
-        self::createTestAffiliate("campaignC", 3, 30, "line 1", "london", "campaignC")->setChargeModel(AffiliateCompany::MODEL_ONGOING);
-        self::createTestAffiliate("leadA", 4, 90, "line 1", "london", "", "leadA");
-
-        self::createTestUser("10 days ago", "tony", "campaignA");
-        self::createTestUser("20 days ago", "bango", "campaignA");
-        self::createTestUser("31 days ago", "tango", "campaignA");
-        self::createTestUser("40 days ago", "snakeHandler", "campaignA");
-        self::createTestUser("50 days ago", "wearingABigHat", "campaignA");
-        $completedAGuy = self::createTestUser("60 days ago", "completedAGuy", "campaignA");
-        $lostAGuy = self::createTestUser("60 days ago", "lostAGuy", "campaignA");
-        self::createLonelyTestUser("aaa", "campaignA");
-        self::createLonelyTestUser("bbb", "campaignA");
-        $affiliate->addConfirmedUsers($completedAGuy);
-        $lostAGuy->getLatestPolicy()->setStatus(Policy::STATUS_CANCELLED);
-
-        self::createTestUser("10 days ago", "jack", "campaignC");
-        self::createTestUser("20 days ago", "john", "campaignC");
-        self::createTestUser("30 days ago", "barrel", "campaignC");
-        self::createTestUser("40 days ago", "smith", "campaignC");
-        self::createTestUser("50 days ago", "kalvin", "campaignC");
-        self::createLonelyTestUser("gabriel", "campaignC");
-        self::createLonelyTestUser("michael", "campaignC");
-
-        self::createTestUser("33 days ago", "clove", "", "leadA");
-        self::createTestUser("51 days ago", "bone", "", "leadA");
-        self::createTestUser("95 days ago", "borb", "", "leadA");
-        self::createTestUser("101 days ago", "tonyAbbot", "", "leadA");
-        self::createTestUser("123 days ago", "shelf", "", "leadA");
-        self::createLonelyTestUser("jellyfish", "", "leadA");
-        self::createLonelyTestUser("eel", "", "leadA");
-    }
-
-    /**
      * Creates an affiliate company.
      * @param string $name   is the name of the affiliate.
      * @param float  $cpa    is the cost per aquisition on this affiliate.
@@ -403,5 +298,16 @@ class AffiliateServiceTest extends WebTestCase
         self::$dm->persist($user);
         self::$dm->flush();
         return $user;
+    }
+
+    private static function createTestPolicy($user, $date)
+    {
+        $policy = new PhonePolicy();
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        $policy->setUser($user);
+        $policy->setStart($date);
+        self::$dm->persist($policy);
+        self::$dm->flush();
+        return $policy;
     }
 }
