@@ -310,7 +310,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     protected $opts = array();
 
     /**
-     * @MongoDB\ReferenceMany(targetDocument="Charges", mappedBy="user", cascade={"persist"})
+     * @MongoDB\ReferenceMany(targetDocument="Charge", mappedBy="user", cascade={"persist"})
      */
     protected $charges;
 
