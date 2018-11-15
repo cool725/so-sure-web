@@ -992,7 +992,7 @@
                 {% endif %}
                 {% if is_granted('ROLE_CUSTOMER_SERVICES') %}
                 <tr>
-                    <td><i class="fa fa-lock" title="Admin only"></i> Pay Policy</td>
+                    <td>Pay Policy</td>
                     <td>
                         {% if not policy.payerOrUser.paymentMethod %}
                             Missing payment method
@@ -1039,11 +1039,12 @@
                     {% endif %}
                 {% endif %}
             </table>
-            {% if is_granted('ROLE_ADMIN') %}
+
+            {% if is_granted('ROLE_CUSTOMER_SERVICES') %}
             <h3>Update Policy</h3>
             <table class="table table-striped">
                 <tr>
-                    <td><i class="fa fa-lock" title="Admin only"></i> Recipero Make/Model Check</td>
+                    <td>Recipero Make/Model Check</td>
                     <td>{{ form_start(makemodel_form)}}
                         <span class="text-danger">
                         {{ form_errors(makemodel_form) }}
@@ -1061,19 +1062,21 @@
                     </td>
                 </tr>
                 <tr>
-                    <td><i class="fa fa-lock" title="Admin only"></i> Imei</td>
+                    <td>Imei</td>
                     <td>
-                      {{ form_start(imei_form, {'attr': {'class': 'form-inline'}}) }}
-                      <div class="form-group">
-                          {{ form_errors(imei_form.imei) }}
-                          {{ form_widget(imei_form.imei) }}
-                      </div>
-                      {{ form_widget(imei_form.update, {'label': 'Update', 'attr': {'class': 'btn btn-danger confirm-submit', 'data-confirm-msg': 'Are you sure you want to update this imei?  This should only be done if the phone imei was incorrectly entered or post claim once the IMEI has changed.  This will trigger a Salva Policy Update.'}}) }}
-                      {{ form_end(imei_form) }}
+                        <form class="form-inline">
+                            <div class="form-group">
+                              {{ policy.imei }}
+                            </div>
+                            <button type="button" class="btn btn-danger"
+                                    data-toggle="modal"
+                                    data-target="#imeiForm">Update
+                            </button>
+                        </form>
                     </td>
                 </tr>
                 <tr>
-                    <td><i class="fa fa-lock" title="Admin only"></i> Phone</td>
+                    <td>Phone</td>
                     <td>
                         {{ form_start(phone_form, {'attr': {'class': 'form-inline'}}) }}
                         <div class="form-group">
@@ -1084,6 +1087,7 @@
                         {{ form_end(phone_form) }}
                     </td>
                 </tr>
+                {% if is_granted('ROLE_ADMIN') %}
                 <tr>
                     <td><i class="fa fa-lock" title="Admin only"></i> Trigger Salva Policy Update</td>
                     <td>
@@ -1094,7 +1098,13 @@
                         If the policy was manually adjusted, notify Salva of the new price.
                     </td>
                 </tr>
+                {% endif %}
             </table>
+
+            {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:AdminEmployee:imeiForm', 'policy': policy, 'id': 'imeiForm'} %}
+
+            {% endif %}
+            {% if is_granted('ROLE_ADMIN') %}
             <h3>Company</h3>
             <table class="table table-striped">
                 <tr>
@@ -1387,7 +1397,7 @@
         </div>
     {% endif %}
 
-    {% include 'AppBundle::Claims/claimsModal.html.twig' with {'route': 'admin_policy', 'policyId': policy.id  } %}
+    {% include 'AppBundle::Claims/claimsModal.html.twig' with {'route': 'admin_policy', 'policyId': policy.id} %}
 
     {% if is_granted('ROLE_ADMIN') %}
     <div class="modal fade" id="bacsModal" tabindex="-1" role="dialog">
