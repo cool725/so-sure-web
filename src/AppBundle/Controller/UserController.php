@@ -1269,30 +1269,6 @@ class UserController extends BaseController
             parse_str($query, $oauth2FlowParams);
         }
 
-        $emailInvitiation = new EmailInvitation();
-        $emailInvitationForm = $this->get('form.factory')
-            ->createNamedBuilder('email', EmailInvitationType::class, $emailInvitiation)
-            ->getForm();
-
-        if ($request->request->has('email')) {
-            $emailInvitationForm->handleRequest($request);
-            if ($emailInvitationForm->isSubmitted() && $emailInvitationForm->isValid()) {
-                try {
-                    $invitationService->inviteByEmail($policy, $emailInvitiation->getEmail());
-                    $this->addFlash(
-                        'success',
-                        sprintf('%s was invited', $emailInvitiation->getEmail())
-                    );
-                } catch (SelfInviteException $e) {
-                    $this->addFlash('error', 'Sorry, you are not able to invite yourself');
-                } catch (\Exception $e) {
-                    $msg = sprintf('Sorry, there was an error inviting %s', $emailInvitiation->getEmail());
-                    $this->get('logger')->error($msg, ['exception' => $e]);
-                    $this->addFlash('error', $msg);
-                }
-            }
-        }
-
         $sixpack = $this->get('app.sixpack');
         $shareExperimentText = $sixpack->getText(
             SixpackService::EXPIRED_EXPERIMENT_SHARE_MESSAGE,
@@ -1339,7 +1315,7 @@ class UserController extends BaseController
      */
     public function emailLink(Request $request)
     {
-        $invitationService = $this->get("app.invitation");
+        $invitationService = ;
         $user = $this->getUser();
         $email = $request->get("email");
         if (!$user) {
@@ -1349,7 +1325,7 @@ class UserController extends BaseController
             return new Response("no-email", 400);
         }
         try {
-            $invitationService->inviteByEmail($user->getFirstPolicy(), $email);
+            $this->get("app.invitation")->inviteByEmail($user->getFirstPolicy(), $email);
             return new Response(200);
         } catch (InvalidPolicyException $e) {
             return new Response("invalid-policy", 400);
@@ -1358,6 +1334,7 @@ class UserController extends BaseController
         } catch (DuplicateInvitationException $e) {
             return new Response("duplicate", 400);
         } catch (\Exception $e) {
+            $this->get('logger')->error($msg, ['exception' => $e]);
             return new Response($e->getMessage(), 500);
         }
     }
