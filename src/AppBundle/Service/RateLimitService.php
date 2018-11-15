@@ -67,12 +67,6 @@ class RateLimitService
         self::DEVICE_TYPE_OPT => 14,
     ];
 
-    public static $excludedIps = [
-        "62.253.24.186", // runway east fin sq
-        "80.169.94.194", // runway east shoreditch
-        "86.3.184.79", // patrick home
-    ];
-
     /** @var LoggerInterface */
     protected $logger;
 
@@ -84,18 +78,27 @@ class RateLimitService
     /** @var FeatureService */
     protected $featureService;
 
+    protected $excludedIps;
+
     /**
      * @param Client          $redis
      * @param LoggerInterface $logger
      * @param string          $environment
      * @param FeatureService  $featureService
+     * @param array           $excludedIps
      */
-    public function __construct(Client $redis, LoggerInterface $logger, $environment, FeatureService $featureService)
-    {
+    public function __construct(
+        Client $redis,
+        LoggerInterface $logger,
+        $environment,
+        FeatureService $featureService,
+        $excludedIps
+    ) {
         $this->redis = $redis;
         $this->logger = $logger;
         $this->environment = $environment;
         $this->featureService = $featureService;
+        $this->excludedIps = $excludedIps;
     }
 
     /**
@@ -186,7 +189,7 @@ class RateLimitService
         }
 
         // ignore rate limiting for some ips
-        if (in_array($ip, self::$excludedIps)) {
+        if (in_array($ip, $this->excludedIps)) {
             return true;
         }
 
@@ -262,13 +265,21 @@ class RateLimitService
         $this->redis->expire($ipKey, self::$cacheTimes[$type]);
 
         // ignore rate limiting for some ips
-        if (in_array($ip, self::$excludedIps)) {
+        if (in_array($ip, $this->excludedIps)) {
             return true;
         }
 
         // rate limit only for prod, or test
         if (!in_array($this->environment, ['prod', 'test'])) {
-            return true;
+//            return true;
+        }
+
+        if ($ip != filter_var(
+            $ip,
+            FILTER_VALIDATE_IP,
+            FILTER_FLAG_NO_PRIV_RANGE |  FILTER_FLAG_NO_RES_RANGE
+            )) {
+            $this->logger->warning(sprintf('Rate limit is using a private ip range (%s)', $ip));
         }
 
         // ip should always be higher as may be multiple users behind a nat
