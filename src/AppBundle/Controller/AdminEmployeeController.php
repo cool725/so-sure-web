@@ -13,6 +13,7 @@ use AppBundle\Form\Type\PaymentRequestUploadFileType;
 use AppBundle\Form\Type\UploadFileType;
 use AppBundle\Form\Type\UserHandlingTeamType;
 use AppBundle\Repository\ClaimRepository;
+use AppBundle\Repository\PhonePolicyRepository;
 use AppBundle\Repository\PhoneRepository;
 use AppBundle\Security\FOSUBUserProvider;
 use AppBundle\Service\BacsService;
@@ -487,6 +488,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         $imeiService = $this->get('app.imei');
         $invitationService = $this->get('app.invitation');
         $dm = $this->getManager();
+        /** @var PhonePolicyRepository $repo */
         $repo = $dm->getRepository(PhonePolicy::class);
         /** @var PhonePolicy $policy */
         $policy = $repo->find($id);

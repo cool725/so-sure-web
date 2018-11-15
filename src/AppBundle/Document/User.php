@@ -283,7 +283,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     protected $affiliate;
 
     /**
-     * @MongoDB\ReferenceMany(targetDocument="Policy", mappedBy="user")
+     * @MongoDB\ReferenceMany(targetDocument="Policy", mappedBy="user", prime={"user"})
      */
     protected $policies;
 
