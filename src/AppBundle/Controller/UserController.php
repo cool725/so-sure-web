@@ -105,7 +105,6 @@ use AppBundle\Exception\InvalidEmailException;
 use AppBundle\Exception\DirectDebitBankException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-
 /**
  * @Route("/user")
  */
@@ -1302,7 +1301,6 @@ class UserController extends BaseController
             'policy_terms_file' => $policyTermsFile,
             'has_visited_welcome_page' => $pageVisited,
             'oauth2FlowParams' => $oauth2FlowParams,
-            'email_form' => $emailInvitationForm->createView(),
             'user' => $user,
             'share_experiment_text' => $shareExperimentText,
             'sms_experiment' => $smsExperiment
@@ -1313,7 +1311,7 @@ class UserController extends BaseController
      * @Route("/inviteemail", name="invite_email")
      * @Method({"POST"})
      */
-    public function emailLink(Request $request)
+    public function emailLinkAction(Request $request)
     {
         $user = $this->getUser();
         $email = $request->get("email");
@@ -1333,7 +1331,7 @@ class UserController extends BaseController
         } catch (DuplicateInvitationException $e) {
             return new Response("duplicate", 400);
         } catch (\Exception $e) {
-            $this->get('logger')->error($msg, ['exception' => $e]);
+            $this->get('logger')->error($e->getMessage(), ['exception' => $e]);
             return new Response($e->getMessage(), 500);
         }
     }
