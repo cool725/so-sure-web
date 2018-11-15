@@ -148,74 +148,70 @@ $(function() {
 
     // Email Invite code
     // NOTE:
-    $('#invite_form').validate({
-        debug: false,
-        // When to validate
-        validClass: 'is-valid-ss',
-        errorClass: 'is-invalid',
-        onfocusout: false,
-        onkeyup: false,
-        rules: {
-            'email_invite_input': {
-                required: {
-                    depends:function(){
-                        $(this).val($.trim($(this).val()));
-                        return true;
-                    }
-                },
-                email: true,
-                emaildomain: true
-            }
-        },
-        messages: {
-            'email_invite_input': {
-                required: 'Please enter a valid email',
-                email: 'Please enter a valid email',
-                emaildomain: "Please check you've entered a valid email"
-            }
-        },
-        submitHandler: function(form) {
-            console.log('Form valid');
-            return false;
-        }
-    });
-
-    if ($('#invite_form').valid() == true ) {
-        console.log('Valid check');
-    }
-
-    // $('.btn-invite').on('click', function(e) {
-    //     e.preventDefault();
-
-    //     $.ajax({
-    //         url: '/user/inviteemail',
-    //         type: 'POST',
-    //         data: {email: $('.input-invite').val()},
-    //     })
-    //     .done(function(data) {
-    //         // console.log(data);
-    //         $('.btn-invite').tooltip({
-    //             'title':   'Your invite is on it\'s way 😀',
-    //             'trigger': 'manual'
-    //         }).tooltip('show');
-
-    //         setTimeout(function() {
-    //             $('.btn-invite').tooltip('hide');
-    //         }, 1500);
-
-    //         // Clear the input and suggest another one? TODO: Copy
-    //         $('.input-invite').val('').attr('placeholder', 'How about another one?');
-    //     })
-    //     .fail(function(data) {
-    //         console.log(data);
-    //         $('.btn-invite').tooltip({
-    //             'title':   'Something went wrong 😥',
-    //             'trigger': 'manual'
-    //         }).tooltip('show');
-
-    //         setTimeout(function() {
-    //             $('.btn-invite').tooltip('hide');
-    //         }, 1500);
-    //     });
+    // $('#invite_form').validate({
+    //     debug: false,
+    //     // When to validate
+    //     validClass: 'is-valid-ss',
+    //     errorClass: 'is-invalid',
+    //     onfocusout: false,
+    //     onkeyup: false,
+    //     rules: {
+    //         'email_invite_input': {
+    //             required: {
+    //                 depends:function(){
+    //                     $(this).val($.trim($(this).val()));
+    //                     return true;
+    //                 }
+    //             },
+    //             email: true,
+    //             emaildomain: true
+    //         }
+    //     },
+    //     messages: {
+    //         'email_invite_input': {
+    //             required: 'Please enter a valid email',
+    //             email: 'Please enter a valid email',
+    //             emaildomain: "Please check you've entered a valid email"
+    //         }
+    //     },
+    //     submitHandler: function(form) {
+    //         console.log('Form valid');
+    //         return false;
+    //     }
     // });
+
+    $('.btn-invite').on('click', function(e) {
+        e.preventDefault();
+
+        $.ajax({
+            url: '/user/inviteemail',
+            type: 'POST',
+            data: {email: $('.input-invite').val()},
+        })
+        .done(function(data) {
+            // console.log(data);
+            $('.btn-invite').tooltip({
+                'title':   'Your invite is on it\'s way 😀',
+                'trigger': 'manual'
+            }).tooltip('show');
+
+            setTimeout(function() {
+                $('.btn-invite').tooltip('hide');
+            }, 1500);
+
+            // Clear the input and suggest another one? TODO: Copy
+            $('.input-invite').val('').attr('placeholder', 'How about another one?');
+        })
+        .fail(function(data) {
+            console.log(data);
+            $('.btn-invite').tooltip({
+                'title':   'Something went wrong 😥',
+                'trigger': 'manual'
+            }).tooltip('show');
+
+            setTimeout(function() {
+                $('.btn-invite').tooltip('hide');
+            }, 1500);
+        });
+    });
 });
