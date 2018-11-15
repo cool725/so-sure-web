@@ -150,12 +150,12 @@ $(function() {
         e.preventDefault();
 
         $.ajax({
-            // url: '/path/to/file',
-            // type: 'default GET (Other values: POST)',
-            // dataType: 'default: Intelligent Guess (Other values: xml, json, script, or html)',
-            // data: {param1: 'value1'},
+            url: '/user/inviteemail',
+            type: 'POST',
+            data: {email: $('.input-invite').val()},
         })
-        .done(function() {
+        .done(function(data) {
+            console.log(data);
             $('.btn-invite').tooltip({
                 'title':   'Your invite is on it\'s way 😀',
                 'trigger': 'manual'
@@ -168,7 +168,8 @@ $(function() {
             // Clear the input and suggest another one? TODO: Copy
             $('.input-invite').val().attr('placeholder', 'How about another one?');
         })
-        .fail(function() {
+        .fail(function(data) {
+            console.log(data);
             $('.btn-invite').tooltip({
                 'title':   'Something went wrong 😥',
                 'trigger': 'manual'
