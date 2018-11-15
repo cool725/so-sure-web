@@ -162,7 +162,8 @@ class ApiControllerTest extends BaseApiControllerTest
             static::$redis,
             static::$container->get('logger'),
             'test',
-            static::$container->get('app.feature')
+            static::$container->get('app.feature'),
+            static::$container->getParameter('sosure_ips')
         );
 
         $cognitoIdentityId = $this->getUnauthIdentity();
