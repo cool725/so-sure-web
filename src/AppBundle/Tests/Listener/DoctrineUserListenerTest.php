@@ -470,6 +470,7 @@ class DoctrineUserListenerTest extends WebTestCase
         /** @var DocumentManager $dm */
         $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
         $repo = $dm->getRepository(Charge::class);
+        /** @var Charge $updatedCharge */
         $updatedCharge = $repo->find($charge->getId());
         $this->assertNotNull($updatedCharge);
         if ($updatedCharge) {
