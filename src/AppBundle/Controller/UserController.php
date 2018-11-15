@@ -1317,12 +1317,11 @@ class UserController extends BaseController
         $email = $request->get("email");
         if (!$user) {
             return new Response("no-user", 400);
-        }
-        if (!$email) {
+        } elseif (!$email) {
             return new Response("no-email", 400);
         }
         try {
-            $this->get("app.invitation")->inviteByEmail($user->getFirstPolicy(), $email);
+            $this->get("app.invitation")->inviteByEmail($user->getLatestPolicy(), $email);
             return new Response(200);
         } catch (InvalidPolicyException $e) {
             return new Response("invalid-policy", 400);

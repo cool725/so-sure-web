@@ -245,13 +245,12 @@
                             <h2 class="h4 text-primary mb-4">Choose how you’d like to invite</h2>
                             <div class="d-lg-flex justify-content-lg-center">
                                 <h5 class="text-zaffre d-lg-none">📨 Invite via email</h5>
-                                {{ form_start(email_form, {'attr': {'autocomplete': 'nope'}}) }}
+                                <form autocomplete="nope">
                                     <div class="custom-input-with-btn mb-4">
-                                        {{ form_widget(email_form.email, {'attr': {'placeholder': 'Enter email address', 'class': 'form-control input-invite'}}) }}
-                                        {{ form_widget(email_form.submit, {'label': 'invite', 'attr': {'class': 'btn btn-success btn-square btn-invite btn-sm'}}) }}
+                                        <input type="text" class="form-control input-invite" placeholder="Enter email address" />
+                                        <button class="btn btn-success btn-square btn-invite btn-sm">Invite</button>
                                     </div>
-                                    {{ form_errors(email_form.email) }}
-                                {{ form_end(email_form) }}
+                                </form>
                                 <h5 class="text-zaffre d-lg-none">🔗 Share this link</h5>
                                 <div class="custom-input-with-btn mb-4 ml-lg-4">
                                     <input name="scode" id="scode" readonly="readonly" type="text" class="form-control" value="{{ policy.standardSCode.shareLink }}">
