@@ -895,24 +895,13 @@ class InvitationService
             return;
         }
 
-        if ($this->debug) {
-            // Adds the charge manually for testing purposes
-            $charge = new Charge();
-            $charge->setType(Charge::TYPE_SMS_INVITATION);
-            $charge->setUser($invitation->getInviter());
-            $charge->setPolicy($invitation->getPolicy());
-            $charge->setDetails($invitation->getMobile());
-            $this->dm->persist($charge);
-            $this->dm->flush();
-            return;
-        }
-
         $smsTemplate = sprintf('AppBundle:Sms:%s.txt.twig', $type);
         $status = $this->sms->sendTemplate(
             $invitation->getMobile(),
             $smsTemplate,
             ['invitation' => $invitation],
-            $invitation->getPolicy()
+            $invitation->getPolicy(),
+            $this->debug
         );
         $invitation->setStatus($status ? (SmsInvitation::STATUS_SENT) : (SmsInvitation::STATUS_FAILED));
     }

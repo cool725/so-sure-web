@@ -111,11 +111,12 @@ class SmsService
      *                                  sent. If it is not null then an sms charge is committed to the database for
      *                                  this SMS.
      * @param string      $type         the type of sms charge to be made if one is to be made.
+     * @param boolean     $fake         This causes just the charge to be filed and nothing to be sent.
      * @return boolean                  true iff the sms was successfully sent.
      */
-    public function send($number, $message, $chargePolicy = null, $type = Charge::TYPE_SMS_INVITATION)
+    public function send($number, $message, $chargePolicy = null, $type = Charge::TYPE_SMS_INVITATION, $fake = false)
     {
-        if ($this->environment == "test") {
+        if ($this->environment == "test" || $fake) {
             if ($chargePolicy) {
                 $this->addCharge($chargePolicy, $type);
             }
@@ -151,12 +152,19 @@ class SmsService
      * @param array       $data         an array containing the parameters used to render the template.
      * @param Policy|null $chargePolicy an optional policy for which an SMS charge object will be committed.
      * @param string      $type         the type of sms charge to be made if one is to be made.
+     * @param boolean     $fake         This causes just the charge to be filed and nothing to be sent.
      * @return boolean                  true iff the sms was sent successfully.
      */
-    public function sendTemplate($number, $template, $data, $chargePolicy = null, $type = Charge::TYPE_SMS_INVITATION)
-    {
+    public function sendTemplate(
+        $number,
+        $template,
+        $data,
+        $chargePolicy = null,
+        $type = Charge::TYPE_SMS_INVITATION,
+        $fake = false
+    ) {
         $message = $this->templating->render($template, $data);
-        return $this->send($number, $message, $chargePolicy, $type);
+        return $this->send($number, $message, $chargePolicy, $type, $fake);
     }
 
     /**
@@ -166,11 +174,12 @@ class SmsService
      * @param string $template the filename of the template that will be used to render the message.
      * @param array  $data     the set of parameters that will be used to render the template.
      * @param string $type     the type of sms charge to be made.
+     * @param boolean     $fake         This causes just the charge to be filed and nothing to be sent.
      * @return boolean         true iff the sms is sent successfuly.
      */
-    public function sendUser(Policy $policy, $template, $data, $type = Charge::TYPE_SMS_INVITATION)
+    public function sendUser(Policy $policy, $template, $data, $type = Charge::TYPE_SMS_INVITATION, $fake = false)
     {
-        return $this->sendTemplate($policy->getUser()->getMobileNumber(), $template, $data, $policy, $type);
+        return $this->sendTemplate($policy->getUser()->getMobileNumber(), $template, $data, $policy, $type, $fake);
     }
 
     public function setValidationCodeForUser($user)

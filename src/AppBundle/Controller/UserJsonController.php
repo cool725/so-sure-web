@@ -153,27 +153,29 @@ class UserJsonController extends BaseController
         $dm = $this->getManager();
         $chargeRepository = $dm->getRepository(Charge::class);
         $smsService = $this->get('app.sms');
-        $branch = $this->get('app.twig.branch');
         $user = $this->getUser();
         $mobileNumber = $user->getMobileNumber();
-        $message = $this->get('templating')->render(
-            'AppBundle:Sms:text-me.txt.twig',
-            ['branch_pot_url' => $this->getParameter('branch_pot_url')]
-        );
         if (!$user) {
             return new JsonResponse(["message" => "no-user"], 400);
         } elseif (!$mobileNumber) {
             return new JsonResponse(["message" => "no-number"], 400);
         } elseif ($user->getFirstLoginInApp()) {
             return new JsonResponse(["message" => "has-app"], 400);
-        } elseif ($chargeRepository->findLastCharge($user, Charge::TYPE_SMS_DOWNLOAD)) {
+        } elseif ($chargeRepository->findLastByUser($user, Charge::TYPE_SMS_DOWNLOAD)) {
             return new JsonResponse(["message" => "already-sent"], 400);
-        } elseif ($smsService->send($mobileNumber, $message, $user->getLatestPolicy(), Charge::TYPE_SMS_DOWNLOAD)) {
+        }
+        $message = $smsService->sendTemplate(
+            $mobileNumber, 'AppBundle:Sms:text-me.txt.twig',
+            ['branch_pot_url' => $this->getParameter('branch_pot_url')],
+            $user->getLatestPolicy(),
+            Charge::TYPE_SMS_DOWNLOAD
+        );
+         if ($message) {
             $sixpack = $this->get('app.sixpack');
             $sixpack->convertByClientId($user->getId(), $sixpack::EXPERIMENT_APP_LINK_SMS);
             return new Response($message, 200);
         } else {
-            return new Response("NO NO YEEEET", 500);
+            return new Response("no", 500);
         }
     }
 }
