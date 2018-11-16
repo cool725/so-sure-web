@@ -17,6 +17,7 @@ $(function() {
     // Send app link via SMS
     let smsButtonCont = $('.onboarding__send-app-link'),
         smsBtn        = $('.onboarding__send-app-link a'),
+        smsUrl        = smsBtn.data('path'),
         smsLoader     = smsBtn.next('span');
 
     smsBtn.on('click', function(e) {
@@ -27,7 +28,7 @@ $(function() {
         smsLoader.show();
 
         $.ajax({
-            url: '/user/applinksms',
+            url: smsUrl,
             method: 'POST',
         })
         .done(function() {
@@ -185,11 +186,13 @@ $(function() {
 
         if ($('#invite_form').valid()) {
 
+            let emailUrl = $(this).data('path');
+
             $(this).attr('disabled', 'disabled')
                    .html('<i class="fas fa-circle-notch fa-spin"></i>');
 
             $.ajax({
-                url: '/user/inviteemail',
+                url: emailUrl,
                 type: 'POST',
                 data: {email: $('.input-invite').val()},
             })

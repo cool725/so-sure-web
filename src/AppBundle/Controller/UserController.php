@@ -1297,7 +1297,6 @@ class UserController extends BaseController
             'has_visited_welcome_page' => $pageVisited,
             'oauth2FlowParams' => $oauth2FlowParams,
             'user' => $user,
-            'share_experiment_text' => $shareExperimentText,
             'sms_experiment' => $smsExperiment
         ]);
     }

@@ -116,7 +116,10 @@
 
                                     {% if sms_experiment == 'sms-download' %}
                                         <div class="mt-4 onboarding__send-app-link">
-                                            <a href="#" class="link-subtle btn-sms">Re-send my app link</a>
+                                            <a href="#"
+                                               class="link-subtle btn-sms"
+                                               data-path="/user/applinksms">
+                                              Re-send my app link</a>
                                             <span class="hideme"><i class="fas fa-circle-notch fa-spin"></i></span>
                                         </div>
                                     {% endif %}
@@ -168,7 +171,10 @@
                                 </div>
                                 {% if sms_experiment == 'sms-download' %}
                                     <div class="mt-4 onboarding__send-app-link">
-                                        <a href="#" class="link-subtle btn-sms">Re-send my app link</a>
+                                        <a href="#"
+                                           class="link-subtle btn-sms"
+                                           data-path="/user/applinksms">
+                                          Re-send my app link</a>
                                         <span class="hideme"><i class="fas fa-circle-notch fa-spin"></i></span>
                                     </div>
                                 {% endif %}
@@ -248,7 +254,8 @@
                                 <form id="invite_form" autocomplete="nope">
                                     <div class="custom-input-with-btn mb-4">
                                         <input type="text" class="form-control input-invite" placeholder="Enter email address" name="email_invite" />
-                                        <button class="btn btn-success btn-square btn-invite btn-sm">Invite</button>
+                                        <button class="btn btn-success btn-square btn-invite btn-sm"   data-path="/user/inviteemail">
+                                            Invite</button>
                                     </div>
                                 </form>
                                 <h5 class="text-zaffre d-lg-none">🔗 Share this link</h5>
