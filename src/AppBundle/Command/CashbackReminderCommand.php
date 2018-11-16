@@ -59,15 +59,11 @@ class CashbackReminderCommand extends ContainerAwareCommand
         $cashbacks = $this->policyService->cashbackPending($dryRun);
 
         if ($dryRun) {
-            foreach ($cashbacks as $cashback) {
-                $output->writeln(sprintf(
-                    "Policy %s found with pending status",
-                    $cashback
-                ));
-            }
+            $output->writeln(json_encode($cashbacks, JSON_PRETTY_PRINT));
         }
 
         $output->writeln(json_encode($lines, JSON_PRETTY_PRINT));
+        $output->writeln(sprintf('Found %s cashback policies with no status. Mail sent', count($cashbacks)));
         $output->writeln(sprintf('Found %s cashback pending policies. Mail sent', count($cashbacks)));
     }
 }

@@ -1624,6 +1624,7 @@ class PolicyService
     {
         $cashbacks = [];
 
+        /** @var CashbackRepository $cashbackRepo */
         $cashbackRepo = $this->dm->getRepository(Cashback::class);
         $cashbackItems = $cashbackRepo->findBy(['status' => Cashback::STATUS_PENDING_PAYMENT]);
 
