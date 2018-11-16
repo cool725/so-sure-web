@@ -133,8 +133,8 @@ $(function() {
     // Share buttons
     $(onboardingShare).jsSocials({
         shares: ['whatsapp', 'twitter', 'facebook'],
-        url:       $(onboardingShare).data('share-link'),
         text:      $(onboardingShare).data('share-text'),
+        url:       $(onboardingShare).data('share-link'),
         shareIn:   'popup',
         showLabel: false,
         showCount: false,

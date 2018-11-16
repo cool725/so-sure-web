@@ -1269,11 +1269,6 @@ class UserController extends BaseController
         }
 
         $sixpack = $this->get('app.sixpack');
-        $shareExperimentText = $sixpack->getText(
-            SixpackService::EXPIRED_EXPERIMENT_SHARE_MESSAGE,
-            SixpackService::ALTERNATIVES_SHARE_MESSAGE_SIMPLE,
-            [$policy->getStandardSCode()->getShareLink(), $policy->getStandardSCode()->getCode()]
-        );
 
         $smsExperiment = $this->sixpack(
             $request,
