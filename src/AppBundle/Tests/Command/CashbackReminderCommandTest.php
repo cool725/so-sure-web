@@ -41,15 +41,6 @@ class CashbackReminderCommandTest extends BaseControllerTest
         }
     }
 
-    public function testCashbackReminderNoCashbacks()
-    {
-        $expected = [
-            'Found 0 cashback pending policies. Mail sent'
-        ];
-
-        $this->callCommand($expected);
-    }
-
     public function testCashbackReminder()
     {
         $policy = self::createUserPolicy(true);
