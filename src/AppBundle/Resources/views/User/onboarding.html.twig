@@ -36,9 +36,6 @@
 {% endblock %}
 
 {% block body %}
-    <span id="smsApi" hidden="hidden"></span>
-    <span id="emailApi" hidden="hidden">{{ path("email_link_api") }}</span>
-
     <section class="onboarding">
         {% if device_category() == 'Desktop' or device_category() == 'Tablet'  %}
             <div class="onboarding-nav__desktop d-flex">
@@ -120,7 +117,7 @@
                                         <div class="mt-4 onboarding__send-app-link">
                                             <a href="#"
                                                class="link-subtle btn-sms"
-                                               data-path="{{ path('sms_link_api') }}">
+                                               data-path="{{ path('json_app_sms') }}">
                                               Re-send my app link</a>
                                             <span class="hideme"><i class="fas fa-circle-notch fa-spin"></i></span>
                                         </div>
@@ -175,7 +172,7 @@
                                     <div class="mt-4 onboarding__send-app-link">
                                         <a href="#"
                                            class="link-subtle btn-sms"
-                                           data-path="{{ path('sms_link_api') }}">
+                                           data-path="{{ path('json_app_sms') }}">
                                           Re-send my app link</a>
                                         <span class="hideme"><i class="fas fa-circle-notch fa-spin"></i></span>
                                     </div>
@@ -278,7 +275,7 @@
                                     <input type="hidden" name="csrf" value="{{ csrf_token('invite-email') }}" />
                                     <div class="custom-input-with-btn mb-4">
                                         <input type="text" class="form-control input-invite" placeholder="Enter email address" name="email_invite" />
-                                        <button class="btn btn-success btn-square btn-invite btn-sm"   data-path="{{ path('invite_email') }}">
+                                        <button class="btn btn-success btn-square btn-invite btn-sm" data-path="{{ path('json_invite_email') }}">
                                             Invite</button>
                                     </div>
                                 </form>

@@ -170,14 +170,10 @@ class UserJsonController extends BaseController
             return new JsonResponse(["message" => "already-sent"], 400);
         } elseif ($smsService->send($mobileNumber, $message, $user->getLatestPolicy(), Charge::TYPE_SMS_DOWNLOAD)) {
             $sixpack = $this->get('app.sixpack');
-            $sixpack->convertByClientId(
-                $user->getId(),
-                $sixpack::EXPERIMENT_APP_LINK_SMS,
-                $sixpack::KPI_REQUEST_LINK_SMS
-            );
+            $sixpack->convertByClientId($user->getId(), $sixpack::EXPERIMENT_APP_LINK_SMS);
             return new Response($message, 200);
         } else {
-            return new Response(500);
+            return new Response("NO NO YEEEET", 500);
         }
     }
 }

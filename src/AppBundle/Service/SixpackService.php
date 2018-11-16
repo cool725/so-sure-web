@@ -66,7 +66,6 @@ class SixpackService
     const KPI_RECEIVE_DETAILS = 'receive-details';
     const KPI_QUOTE = 'quote';
     const KPI_POLICY_PURCHASE = 'policy-purchase';
-    const KPI_REQUEST_LINK_SMS = 'request-app-link-sms';
     const KPI_FIRST_LOGIN_APP = 'first-login-app';
 
     const EXPIRED_EXPERIMENT_SHARE_MESSAGE = 'share-message';

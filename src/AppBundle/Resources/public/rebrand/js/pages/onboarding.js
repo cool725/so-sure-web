@@ -38,7 +38,8 @@ $(function() {
                 smsButtonCont.addClass('invisible');
             }, 1500);
         })
-        .fail(function() {
+        .fail(function(message) {
+            console.log(message);
             smsLoader.text('Something went wrong 😥');
         });
 
