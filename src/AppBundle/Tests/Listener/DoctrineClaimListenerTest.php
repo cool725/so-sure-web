@@ -135,10 +135,10 @@ class DoctrineClaimListenerTest extends WebTestCase
         $listener->postPersist($events);
     }
 
-    public function testClaimsListenerActualDG()
+    public function testClaimsListenerActualDGDiff()
     {
         $policy = static::createUserPolicy(true);
-        $policy->getUser()->setEmail(static::generateEmail('testClaimsListenerActualDG', $this));
+        $policy->getUser()->setEmail(static::generateEmail('testClaimsListenerActualDGDiff', $this));
         $claim = new Claim();
         $claim->setExcess(50);
         $claim->setIncurred(368.93);
@@ -164,10 +164,66 @@ class DoctrineClaimListenerTest extends WebTestCase
         $dg->phoneReplacementCost = $claim->getPhoneReplacementCost();
         $dg->handlingFees = $claim->getClaimHandlingFees();
         $dg->reserved = $claim->getReservedValue();
+        $dg->lossDescription = 'lossed phone';
         $save = self::$directGroupService->saveClaim($dg, true);
         $this->assertTrue($save);
 
         $expectedUnderwriterUpdated = \DateTime::createFromFormat('U', time());
+
+        static::$container->get('logger')->debug('--- Changed field ---');
+        static::$container->get('logger')->debug('--- for compare ---');
+
+        sleep(1);
+
+        $dgNew = clone $dg;
+        $dgNew->totalIncurred = $dgNew->totalIncurred + 0.0001;
+
+        $save = self::$directGroupService->saveClaim($dgNew, true);
+        $this->assertTrue($save);
+
+        $updatedClaim = $this->loadClaim($claim);
+        $this->assertNotNull($updatedClaim->getUnderwriterLastUpdated());
+
+        $this->assertNotEquals($expectedUnderwriterUpdated, $updatedClaim->getUnderwriterLastUpdated(), '', 0);
+    }
+
+    public function testClaimsListenerActualDGSame()
+    {
+        $policy = static::createUserPolicy(true);
+        $policy->getUser()->setEmail(static::generateEmail('testClaimsListenerActualDGSame', $this));
+        $claim = new Claim();
+        $claim->setExcess(50);
+        $claim->setIncurred(368.93);
+        $claim->setPhoneReplacementCost(403.67);
+        $claim->setClaimHandlingFees(15);
+        $claim->setReservedValue(10);
+        $claim->setNumber(rand(1, 999999));
+        $claim->setHandlingTeam(Claim::TEAM_DIRECT_GROUP);
+        $policy->addClaim($claim);
+        static::$dm->persist($policy);
+        static::$dm->persist($policy->getUser());
+        static::$dm->persist($claim);
+        static::$dm->flush();
+
+        $this->assertNull($claim->getUnderwriterLastUpdated());
+
+        $dg = new DirectGroupHandlerClaim();
+        $dg->insuredName = $policy->getUser()->getName();
+        $dg->policyNumber = $policy->getPolicyNumber();
+        $dg->incurred = $claim->getIncurred();
+        $dg->claimNumber = $claim->getNumber();
+        $dg->excess = $claim->getExcess();
+        $dg->phoneReplacementCost = $claim->getPhoneReplacementCost();
+        $dg->handlingFees = $claim->getClaimHandlingFees();
+        $dg->reserved = $claim->getReservedValue();
+        $dg->lossDescription = 'lossed phone';
+        $save = self::$directGroupService->saveClaim($dg, true);
+        $this->assertTrue($save);
+
+        $expectedUnderwriterUpdated = \DateTime::createFromFormat('U', time());
+
+        static::$container->get('logger')->debug('--- Changed field ---');
+        static::$container->get('logger')->debug('--- for compare ---');
 
         sleep(1);
 
@@ -177,11 +233,7 @@ class DoctrineClaimListenerTest extends WebTestCase
         $save = self::$directGroupService->saveClaim($dgNew, true);
         $this->assertTrue($save);
 
-        /** @var DocumentManager $dm */
-        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
-        $repo = $dm->getRepository(Claim::class);
-        /** @var Claim $updatedClaim */
-        $updatedClaim = $repo->find($claim->getId());
+        $updatedClaim = $this->loadClaim($claim);
         $this->assertNotNull($updatedClaim->getUnderwriterLastUpdated());
 
         $this->assertEquals($expectedUnderwriterUpdated, $updatedClaim->getUnderwriterLastUpdated(), '', 0);

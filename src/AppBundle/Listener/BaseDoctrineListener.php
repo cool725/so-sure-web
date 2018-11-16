@@ -96,17 +96,29 @@ class BaseDoctrineListener
             if ($compare == self::COMPARE_EQUAL) {
                 if (is_float($oldValue)) {
                     $result = !$this->areEqualToSixDp($oldValue, $newValue);
-                    $this->logger->debug(sprintf('Return %s for compare %s (float)', $result ? 'true' : 'false', $compare));
+                    $this->logger->debug(sprintf(
+                        'Return %s for compare %s (float)',
+                        $result ? 'true' : 'false',
+                        $compare
+                    ));
                     return $result;
                 }
                 if ($oldValue === null && is_string($newValue) && mb_strlen($newValue) == 0) {
                     $result = false;
-                    $this->logger->debug(sprintf('Return %s for compare %s (null/emptystring)', $result ? 'true' : 'false', $compare));
+                    $this->logger->debug(sprintf(
+                        'Return %s for compare %s (null/emptystring)',
+                        $result ? 'true' : 'false',
+                        $compare
+                    ));
                     return $result;
                 }
                 if ($newValue === null && is_string($oldValue) && mb_strlen($oldValue) == 0) {
                     $result = false;
-                    $this->logger->debug(sprintf('Return %s for compare %s (emptystring/null)', $result ? 'true' : 'false', $compare));
+                    $this->logger->debug(sprintf(
+                        'Return %s for compare %s (emptystring/null)',
+                        $result ? 'true' : 'false',
+                        $compare
+                    ));
                     return $result;
                 }
 
