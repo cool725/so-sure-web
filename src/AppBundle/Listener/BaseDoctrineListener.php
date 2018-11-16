@@ -9,7 +9,6 @@ use AppBundle\Document\CurrencyTrait;
 use AppBundle\Interfaces\EqualsInterface;
 use Doctrine\Common\Annotations\Reader;
 use Doctrine\ODM\MongoDB\Event\PreUpdateEventArgs;
-use Psr\Log\Test\LoggerInterfaceTest;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Psr\Log\LoggerInterface;
 
