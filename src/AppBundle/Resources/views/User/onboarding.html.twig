@@ -249,6 +249,16 @@
                         </div>
                         <div class="onboarding__body">
                             <h2 class="h4 text-primary mb-4">Choose how you’d like to invite</h2>
+                            {% if device_category() == 'Mobile' %}
+                                <div class="d-lg-flex align-items-lg-center mt-lg-3 mb-4">
+                                    <h5 class="text-zaffre mr-lg-3 mb-lg-0">Invite via social:</h5>
+                                    {# TODO: Rework icons #}
+                                    <div id="onboarding_btn_share"
+                                         data-share-link="{{ policy.standardSCode.shareLink }}"
+                                         data-share-text="Join me on so-sure, a new type of insurer that you can rely on. They protect you when you need to claim and together they'll reward us with cashback when we don't. Here is my invite link:">
+                                    </div>
+                                </div>
+                            {% endif %}
                             <div class="d-lg-flex justify-content-lg-center">
                                 <h5 class="text-zaffre d-lg-none">📨 Invite via email</h5>
                                 <form id="invite_form" autocomplete="nope">
@@ -271,15 +281,15 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="d-lg-flex align-items-lg-center mt-lg-3 mb-4">
-                            <h5 class="text-zaffre mr-lg-3 mb-lg-0">Invite via social:</h5>
-                            {# TODO: Rework icons #}
-                            <div id="onboarding_btn_share"
-                                 data-share-link="{{ policy.standardSCode.shareLink }}"
-                                 data-share-text="Join me on so-sure, a new type of insurer that you can rely on. They protect you when you need to claim and together they'll reward us with cashback when we don't. Here is my invite link:">
-                            </div>
-                        </div>
                         {% if device_category() == 'Desktop' or device_category() == 'Tablet'  %}
+                            <div class="d-lg-flex align-items-lg-center mt-lg-3 mb-4">
+                                <h5 class="text-zaffre mr-lg-3 mb-lg-0">Invite via social:</h5>
+                                {# TODO: Rework icons #}
+                                <div id="onboarding_btn_share"
+                                     data-share-link="{{ policy.standardSCode.shareLink }}"
+                                     data-share-text="Join me on so-sure, a new type of insurer that you can rely on. They protect you when you need to claim and together they'll reward us with cashback when we don't. Here is my invite link:">
+                                </div>
+                            </div>
                             <div class="d-flex justify-content-center">
                                 <a href="#"
                                    class="btn btn-outline-grey btn-circle d-flex justify-content-center align-items-center opacity-50"
