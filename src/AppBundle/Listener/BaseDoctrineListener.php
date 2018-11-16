@@ -81,12 +81,16 @@ class BaseDoctrineListener
             $oldValue = $eventArgs->getOldValue($field);
             $newValue = $eventArgs->getNewValue($field);
 
-            $this->logger->debug(sprintf(
-                'Changed field %s from %s to %s',
-                $field,
-                json_encode($oldValue),
-                json_encode($newValue)
-            ));
+            /*
+            if ($this->logger) {
+                $this->logger->debug(sprintf(
+                    'Changed field %s from %s to %s',
+                    $field,
+                    json_encode($oldValue),
+                    json_encode($newValue)
+                ));
+            }
+            */
 
             if ($mustExist && mb_strlen(trim($oldValue)) == 0) {
                 return false;
@@ -95,72 +99,124 @@ class BaseDoctrineListener
             if ($compare == self::COMPARE_EQUAL) {
                 if (is_float($oldValue)) {
                     $result = !$this->areEqualToSixDp($oldValue, $newValue);
-                    $this->logger->debug(sprintf(
-                        'Return %s for compare %s (float)',
-                        $result ? 'true' : 'false',
-                        $compare
-                    ));
+                    /*
+                    if ($this->logger) {
+                        $this->logger->debug(sprintf(
+                            'Return %s for compare %s (float)',
+                            $result ? 'true' : 'false',
+                            $compare
+                        ));
+                    }
+                    */
                     return $result;
                 }
                 if ($oldValue === null && is_string($newValue) && mb_strlen($newValue) == 0) {
                     $result = false;
-                    $this->logger->debug(sprintf(
-                        'Return %s for compare %s (null/emptystring)',
-                        $result ? 'true' : 'false',
-                        $compare
-                    ));
+                    /*
+                    if ($this->logger) {
+                        $this->logger->debug(sprintf(
+                            'Return %s for compare %s (null/emptystring)',
+                            $result ? 'true' : 'false',
+                            $compare
+                        ));
+                    }
+                    */
                     return $result;
                 }
                 if ($newValue === null && is_string($oldValue) && mb_strlen($oldValue) == 0) {
                     $result = false;
-                    $this->logger->debug(sprintf(
-                        'Return %s for compare %s (emptystring/null)',
-                        $result ? 'true' : 'false',
-                        $compare
-                    ));
+                    /*
+                    if ($this->logger) {
+                        $this->logger->debug(sprintf(
+                            'Return %s for compare %s (emptystring/null)',
+                            $result ? 'true' : 'false',
+                            $compare
+                        ));
+                    }
+                    */
                     return $result;
                 }
 
                 $result = $oldValue !== $newValue;
-                $this->logger->debug(sprintf('Return %s for compare %s', $result ? 'true' : 'false', $compare));
+                /*
+                if ($this->logger) {
+                    $this->logger->debug(sprintf('Return %s for compare %s', $result ? 'true' : 'false', $compare));
+                }
+                */
                 return $result;
             } elseif ($compare == self::COMPARE_CASE_INSENSITIVE) {
                 $result = mb_strtolower($oldValue) !== mb_strtolower($newValue);
-                $this->logger->debug(sprintf('Return %s for compare %s', $result ? 'true' : 'false', $compare));
+                /*
+                if ($this->logger) {
+                    $this->logger->debug(sprintf('Return %s for compare %s', $result ? 'true' : 'false', $compare));
+                }
+                */
                 return $result;
             } elseif ($compare == self::COMPARE_OBJECT_SERIALIZE) {
                 $result = serialize($oldValue) == serialize($newValue);
-                $this->logger->debug(sprintf('Return %s for compare %s', $result ? 'true' : 'false', $compare));
+                /*
+                if ($this->logger) {
+                    $this->logger->debug(sprintf('Return %s for compare %s', $result ? 'true' : 'false', $compare));
+                }
+                */
                 return $result;
             } elseif ($compare == self::COMPARE_OBJECT_EQUALS) {
                 if (!$oldValue && !$newValue) {
                     $result = false;
-                    $this->logger->debug(sprintf('Return %s for compare %s', $result ? 'true' : 'false', $compare));
+                    /*
+                    if ($this->logger) {
+                        $this->logger->debug(sprintf('Return %s for compare %s', $result ? 'true' : 'false', $compare));
+                    }
+                    */
                     return $result;
                 } elseif (!$oldValue && $newValue) {
                     $result = true;
-                    $this->logger->debug(sprintf('Return %s for compare %s', $result ? 'true' : 'false', $compare));
+                    /*
+                    if ($this->logger) {
+                        $this->logger->debug(sprintf('Return %s for compare %s', $result ? 'true' : 'false', $compare));
+                    }
+                    */
                     return $result;
                 } elseif ($oldValue instanceof EqualsInterface) {
                     $result = !$oldValue->equals($newValue);
-                    $this->logger->debug(sprintf('Return %s for compare %s', $result ? 'true' : 'false', $compare));
+                    /*
+                    if ($this->logger) {
+                        $this->logger->debug(sprintf('Return %s for compare %s', $result ? 'true' : 'false', $compare));
+                    }
+                    */
                     return $result;
                 } else {
                     $result = null;
-                    $this->logger->debug(sprintf('Return %s for compare %s', $result ? 'true' : 'false', $compare));
+                    /*
+                    if ($this->logger) {
+                        $this->logger->debug(sprintf('Return %s for compare %s', $result ? 'true' : 'false', $compare));
+                    }
+                    */
                     return $result;
                 }
             } elseif ($compare == self::COMPARE_INCREASE) {
                 $result = $oldValue < $newValue;
-                $this->logger->debug(sprintf('Return %s for compare %s', $result ? 'true' : 'false', $compare));
+                /*
+                if ($this->logger) {
+                    $this->logger->debug(sprintf('Return %s for compare %s', $result ? 'true' : 'false', $compare));
+                }
+                */
                 return $result;
             } elseif ($compare == self::COMPARE_DECREASE) {
                 $result = $oldValue > $newValue;
-                $this->logger->debug(sprintf('Return %s for compare %s', $result ? 'true' : 'false', $compare));
+                /*
+                if ($this->logger) {
+                    $this->logger->debug(sprintf('Return %s for compare %s', $result ? 'true' : 'false', $compare));
+                }
+                */
                 return $result;
             } elseif ($compare == self::COMPARE_TO_NULL) {
                 $result = $newValue === null;
-                $this->logger->debug(sprintf('Return %s for compare %s', $result ? 'true' : 'false', $compare));
+                /*
+                if ($this->logger) {
+                    $this->logger->debug(sprintf('Return %s for compare %s', $result ? 'true' : 'false', $compare));
+                }
+                */
                 return $result;
             } elseif ($compare == self::COMPARE_BACS) {
                 if (!$oldValue instanceof BacsPaymentMethod || !$newValue instanceof BacsPaymentMethod) {

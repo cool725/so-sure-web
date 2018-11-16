@@ -48,7 +48,11 @@ class DoctrineClaimListener extends BaseDoctrineListener
         }
 
         if ($this->hasDataChangedByCategory($eventArgs, DataChange::CATEGORY_SALVA_CLAIM)) {
-            $this->logger->debug('Update for Changed field underwriterLastUpdated');
+            /*
+            if ($this->logger) {
+                $this->logger->debug('Update for Changed field underwriterLastUpdated');
+            }
+            */
             $claim->setUnderwriterLastUpdated(\DateTime::createFromFormat('U', time()));
             $this->recalulateChangeSet($eventArgs, $claim);
         }
