@@ -260,14 +260,6 @@
                                 </div>
                             {% endif %}
                             <div class="d-lg-flex justify-content-lg-center">
-                                <h5 class="text-zaffre d-lg-none">📨 Invite via email</h5>
-                                <form id="invite_form" autocomplete="nope">
-                                    <div class="custom-input-with-btn mb-4">
-                                        <input type="text" class="form-control input-invite" placeholder="Enter email address" name="email_invite" />
-                                        <button class="btn btn-success btn-square btn-invite btn-sm"   data-path="/user/inviteemail">
-                                            Invite</button>
-                                    </div>
-                                </form>
                                 <h5 class="text-zaffre d-lg-none">🔗 Share this link</h5>
                                 <div class="custom-input-with-btn mb-4 ml-lg-4">
                                     <input name="scode" id="scode" readonly="readonly" type="text" class="form-control" value="{{ policy.standardSCode.shareLink }}">
@@ -279,6 +271,14 @@
                                         data-event="user-welcome-copy-scode">
                                         copy</button>
                                 </div>
+                                <h5 class="text-zaffre d-lg-none">📨 Invite via email</h5>
+                                <form id="invite_form" autocomplete="nope">
+                                    <div class="custom-input-with-btn mb-4">
+                                        <input type="text" class="form-control input-invite" placeholder="Enter email address" name="email_invite" />
+                                        <button class="btn btn-success btn-square btn-invite btn-sm"   data-path="/user/inviteemail">
+                                            Invite</button>
+                                    </div>
+                                </form>
                             </div>
                         </div>
                         {% if device_category() == 'Desktop' or device_category() == 'Tablet'  %}
