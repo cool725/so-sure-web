@@ -106,7 +106,7 @@
                                     {% if sms_experiment == 'sms-download' %}
                                         <p class="mb-5">Thanks for choosing so-sure, you'll shortly recieve a confirmation email and a text link to download our app but for now your payment is all set up and your policy is active.</p>
                                     {% else %}
-                                        <p class="mb-5">Thanks for choosing so-sure, you'll shortly recieve a confirmation email but for now your payment is all set up and your policy is active.</p>
+                                        <p class="mb-5">Thanks for choosing so-sure, you'll shortly recieve a confirmation email but for now your payment is all set up and your phone is insured.</p>
                                     {% endif %}
                                     <a href="#"
                                        class="btn btn-primary"
@@ -135,7 +135,7 @@
                         <div class="onboarding__body">
                             <h2 class="h4 text-primary mb-3">Reduce your excess 📉</h2>
                             {% if device_category() == 'Mobile' %}
-                                <p class="mb-5">Download the so-sure app and validate your phone to reduce your excess to just <strong>&pound;50</strong> for accidental damage/breakdown and <strong>&pound;70</strong> for loss and theft. If you don't validate your phone, the excess is <strong>&pound;150 for all claims</strong>.</p>
+                                <p class="mb-5">Download the so-sure app and validate your phone to reduce your excess to just <strong>&pound;50 for accidental damage/breakdown</strong> and <strong>&pound;70 for loss and theft</strong>. <strong>If you don't validate your phone, the excess is &pound;150 for all claims</strong>.</p>
                                 {% if policy.phone.iTunes %}
                                     <a href="{{ apple_download('onboarding-mobile-one') }}"
                                        class="btn btn-primary btn-block-xs ga-outbound-click"
@@ -153,7 +153,7 @@
                                         Download our App <i class="fab fa-android ml-2 fa-lg"></i></a>
                                 {% endif %}
                             {% else %}
-                                <p class="mb-5">Download the so-sure app and validate your phone to reduce your excess to just <strong>&pound;50</strong> for accidental damage/breakdown and <strong>&pound;70</strong> for loss and theft. If you don't validate your phone, the excess is <strong>&pound;150 for all claims</strong>.</p>
+                                <p class="mb-5">Download the so-sure app and validate your phone to reduce your excess to just <strong>&pound;50 for accidental damage/breakdown</strong> and <strong>&pound;70 for loss and theft</strong>. <strong>If you don't validate your phone, the excess is &pound;150 for all claims</strong>.</p>
                                 <div class="d-flex justify-content-center">
                                     <a href="#"
                                        class="btn btn-outline-grey btn-circle d-flex justify-content-center align-items-center opacity-50"
