@@ -46,6 +46,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     const ROLE_CUSTOMER_SERVICES = 'ROLE_CUSTOMER_SERVICES';
     const ROLE_ADMIN = 'ROLE_ADMIN';
 
+    const AQUISITION_NEW = 'new'; // This is for aquisitions that are active but too new to go
     const AQUISITION_PENDING = 'pending'; // This is for aquisitions that are active.
     const AQUISITION_POTENTIAL = 'potential'; // this is for aquired users with no policy.
     const AQUISITION_LOST = 'lost'; // this is for aquired users with a cancelled policy.
@@ -2052,7 +2053,12 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     public function aquisitionStatus($days)
     {
         if ($this->hasActivePolicy() || $this->hasUnpaidPolicy()) {
-            return static::AQUISITION_PENDING;
+            if ($this->isAffiliateCandidate($days)) {
+                return static::AQUISITION_PENDING;
+            } else {
+                return static::AQUISITION_NEW;
+            }
+
         } elseif ($this->hasPolicy()) {
             return static::AQUISITION_LOST;
         } else {

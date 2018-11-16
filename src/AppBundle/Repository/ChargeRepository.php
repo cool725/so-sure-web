@@ -12,6 +12,14 @@ class ChargeRepository extends DocumentRepository
 {
     use DateTrait;
 
+    /**
+     * Gives you a list of charges matching the following conditions within the given month.
+     * @param DateTime         $date            is a date falling within the chosen month and defaults to now.
+     * @param string|array     $type            is the type or types of charges to look for, and defaults to all.
+     * @param boolean          $excludeInvoiced says whether or not charges with an invoice should be excluded.
+     * @param AffiliateCompany $affiliate       is an optional affiliate company that all charges must have if present.
+     * @return MongoCursor the result set of all the matching charges.
+     */
     public function findMonthly(
         \DateTime $date = null,
         $type = null,
@@ -45,5 +53,23 @@ class ChargeRepository extends DocumentRepository
         return $qb->sort('createdDate', 'asc')
             ->getQuery()
             ->execute();
+    }
+
+    /**
+     * Gives you the last charge made regarding a given user matching a given set of types, or null if there are no
+     * charges matching the given user and types
+     * @param User         $user is the user that the charge must be linked to.
+     * @param string|array $type is a typename or an array of the possible types that the last found charge can be of.
+     * @return Charge|null the charge found if there is one or null.
+     */
+    public function findLastByUser($user, $type = null)
+    {
+        $qb = $this->createQueryBuilder()->field("user")->references($user);
+        if (is_array($type)) {
+            $qb->field("type")->in($type);
+        } elseif ($type) {
+            $qb->field("type")->equals($type);
+        }
+        return $qb->sort("createdDate", "desc")->getQuery()->execute()->getSingleResult();
     }
 }

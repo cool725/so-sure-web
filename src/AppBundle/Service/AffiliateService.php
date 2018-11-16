@@ -54,6 +54,9 @@ class AffiliateService
     /** @var LoggerInterface */
     protected $logger;
 
+    /** @var ChargeRepository */
+    protected $chargeRepository;
+
     /**
      * @param DocumentManager $dm
      * @param LoggerInterface $logger
@@ -64,6 +67,7 @@ class AffiliateService
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
+        $this->chargeRepository = $dm->getRepository(Charge::class);
     }
 
     /**
@@ -78,59 +82,72 @@ class AffiliateService
         foreach ($affiliates as $affiliate) {
             $model = $affiliate->getChargeModel();
             if ($model == AffiliateCompany::MODEL_ONE_OFF) {
-                $users = $this->getMatchingUsers($affiliate);
-                foreach ($users as $user) {
-                    if (!$user->getLastCharge(Charge::CHARGE_AFFILIATE)) {
-                        $generatedCharges[] = $this->createCharge($affiliate, $user, $user->getValidPolicies()[0]);
-                    }
-                }
+                $this->oneOffCharges($affiliate, $generatedCharges);
             } elseif ($model == AffiliateCompany::MODEL_ONGOING) {
-                $users = $this->getMatchingUsers($affiliate);
-                foreach ($users as $user) {
-                    $policies = $user->getValidPolicies(true);
-                    if (count($policies) == 1) {
-                        // The user has only one active policy.
-                        if (
-                            ($user->getLastCharge(Charge::CHARGE_AFFILIATE) && chargeIsOldEnough) ||
-                            userOldEnoughForFirstCharge
-                        ) {
-                            // When the user has already made an affiliate charge before, but not recently.
-                            $generatedCharges[] = $this->createCharge($affiliate, $user, $policies[0]);
-                        }
-                    } else {
-                        // User has multiple active policies.
-                        $charge = $user->getLastCharge(Charge::CHARGE_AFFILIATE);
+                $this->ongoingCharges($affiliate, $generatedCharges);
+            }
+        }
+        return $generatedCharges;
+    }
 
-                        if ($charge) {
-                            // Multiple active policies and there exist charges.
-                            foreach ($policies as $policy) {
-                                if ($policy->getStatus() == Policy::STATUS_RENEWAL) {
-                                    $previous = $policy->getPreviousPolicy();
-                                    if ($previous->getAffiliate()) {
-                                        // Previous policy has a charge.
-                                        if ($previous->oldEnough()) {
-                                            $generatedCharges[] = $this->createCharge($affiliate, $user, $policy);
-                                        }
-                                    } else {
-                                        warn(
-                                            "User ".$user->getEmail()." has previous affiliate charges but renewal ".
-                                            "policy ".$policy->getCode()." cannot find charges attributed to it's ".
-                                            "predecessor ".$previous->getCode()."."
-                                        );
-                                    }
-                                }
+    /**
+     * Performs one off charges logic for a given affiliate.
+     * @param AffiliateCompany $affiliate        is the affiliate we are performing one off charges for.
+     * @param array            $generatedCharges is an optional reference to an array in which generated charges can go.
+     */
+    public function oneOffCharges($affiliate, & $generatedCharges = null)
+    {
+        $users = $this->getMatchingUsers($affiliate);
+        foreach ($users as $user) {
+            if (!$this->chargeRepository->findLastByUser($user, Charge::TYPE_AFFILIATE)) {
+                $generatedCharges[] = $this->createCharge($affiliate, $user, $user->getValidPolicies()[0]);
+            }
+        }
+    }
+
+    /**
+     * Performs ongoing charges logic for an affiliate.
+     * @param AffiliateCompany $affiliate        is the affiliate company that is performing ongoing charges.
+     * @param array            $generatedCharges is an optional reference to an array in which generated charges can go.
+     */
+    public function ongoingCharges($affiliate, & $generatedCharges = null)
+    {
+        $renewalWait = DateTime::createFromFormat('U', time())
+            ->sub(new DateInterval("P1y"))
+            ->add(new DateInterval("P".$affiliate->getRenewalDays()."D"));
+        $users = $this->getMatchingUsers($affiliate);
+        foreach ($users as $user) {
+            $policies = $user->getValidPolicies(true);
+            $charge = $this->chargeRepository->findLastByUser($user, Charge::TYPE_AFFILIATE);
+            if (count($policies) == 1) {
+                if (($charge && $charge->getCreatedDate() < $renewalWait) ||
+                    $user->isAffiliateCandidate($affiliate->getDays())
+                ) {
+                    $generatedCharges[] = $this->createCharge($affiliate, $user, $policies[0]);
+                }
+            } elseif ($charge) {
+                foreach ($policies as $policy) {
+                    if ($policy->getStatus() == Policy::STATUS_RENEWAL) {
+                        $previous = $policy->getPreviousPolicy();
+                        if ($previous->getAffiliate()) {
+                            if ($policy->oldEnough($affiliate->getRenewalDays())) {
+                                $generatedCharges[] = $this->createCharge($affiliate, $user, $policy);
                             }
                         } else {
-                            warn(
-                                "User ".$user->getEmail()." has multiple active policies, but no affiliate charges ".
-                                "recorded."
+                            $this->logger->error(
+                                "User ".$user->getEmail()." has previous affiliate charges but renewal policy ".
+                                $policy->getCode()." cannot find charges attributed to it's predecessor ".
+                                $previous->getCode()."."
                             );
                         }
                     }
                 }
+            } else {
+                $this->logger->error(
+                    "User ".$user->getEmail()." has multiple active policies, but no affiliate charges recorded."
+                );
             }
         }
-        return $generatedCharges;
     }
 
     /**
@@ -179,15 +196,18 @@ class AffiliateService
      * @param Policy           $policy    is the policy that the charge is made regarding.
      * @return Charge the charge that has been created.
      */
-    public function createCharge($affiliate, $user, $policy) {
+    private function createCharge($affiliate, $user, $policy)
+    {
         $charge = new Charge();
         $charge->setAmount($affiliate->getCPA());
         $charge->setType(Charge::TYPE_AFFILIATE);
-        $charge->setCreatedDate(new \DateTime());
+        $charge->setCreatedDate(DateTime::createFromFormat('U', time()));
         $charge->setUser($user);
         $charge->setAffiliate($affiliate);
         $charge->setPolicy($policy);
         $affiliate->addConfirmedPolicies($policy);
+        $this->dm->persist($charge);
+        $this->dm->flush();
         return $charge;
     }
 }

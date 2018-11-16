@@ -788,34 +788,4 @@ trait UserClassTrait
         $updatedPolicy = $repo->find($policy->getId());
         $this->assertNull($updatedPolicy);
     }
-
-    /**
-     * Find a user by their name.
-     * @param DocumentManager $dm is the document manager to use in finding the user.
-     * @param string $name is the user's firstname by which wee shall find them.
-     * @return User the user that has been found.
-     */
-    protected function userByName($dm, $name)
-    {
-        $repo = $dm->getRepository(User::class);
-        $items = $repo->findBy(["firstName" => $name]);
-        return reset($items);
-    }
-
-    /**
-     * Find a list of users by their name.
-     * @param DocumentManager $dm is the document manager to use in finding the users.
-     * @param array $names is the list of firstnames by which we will find the list of users.
-     * @return array the list of users.
-     */
-    protected function usersByName($dm, $names)
-    {
-        $cursor = $dm->createQueryBuilder(User::class)->field("firstName")->in($names)->getQuery()->execute();
-        // QueryBuilder::toArray() gives an associative array which we do not want, so we convert to a normal array.
-        $list = [];
-        foreach ($cursor as $user) {
-            $list[] = $user;
-        }
-        return $list;
-    }
 }

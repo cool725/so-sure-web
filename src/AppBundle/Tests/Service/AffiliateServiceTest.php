@@ -9,6 +9,7 @@ use AppBundle\Repository\UserRepository;
 use AppBundle\Repository\ChargeRepository;
 use AppBundle\Service\AffiliateService;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Bridge\PhpUnit\ClockMock;
 use Doctrine\ODM\MongoDB\DocumentManager;
 
 use AppBundle\Document\User;
@@ -73,29 +74,6 @@ class AffiliateServiceTest extends WebTestCase
         self::$chargeRepository = self::$dm->getRepository(Charge::class);
         self::$policyRepository = self::$dm->getRepository(Policy::class);
         self::$affiliateRepository = self::$dm->getRepository(AffiliateCompany::class);
-
-        $affiliate = self::createTestAffiliate("campaignA", 1, 30, "line 1", "london", "campaignA");
-        self::createTestAffiliate("campaignB", 2, 60, "line 1", "london", "campaignB");
-        self::createTestAffiliate("campaignC", 3, 30, "line 1", "london", "campaignC")->setChargeModel(AffiliateCompany::MODEL_ONGOING);
-        self::createTestAffiliate("leadA", 4, 90, "line 1", "london", "", "leadA");
-        self::createTestUser("20 days ago", "bango", "campaignA");
-        self::createTestUser("31 days ago", "tango", "campaignA");
-        self::createTestUser("50 days ago", "wearingABigHat", "campaignA");
-        $completedAGuy = self::createTestUser("60 days ago", "completedAGuy", "campaignA");
-        $lostAGuy = self::createTestUser("60 days ago", "lostAGuy", "campaignA");
-        self::createLonelyTestUser("aaa", "campaignA");
-        self::createLonelyTestUser("bbb", "campaignA");
-        $affiliate->addConfirmedPolicies($completedAGuy);
-        $lostAGuy->getLatestPolicy()->setStatus(Policy::STATUS_CANCELLED);
-        self::createTestUser("20 days ago", "john", "campaignC");
-        self::createTestUser("40 days ago", "smith", "campaignC");
-        $doublePolicyGuy = self::createTestUser("50 days ago", "kalvin", "campaignC");
-        self::createLonelyTestUser("gabriel", "campaignC");
-        self::createTestPolicy($doublePolicyGuy, new \DateTime("127 days ago"));
-        self::createTestUser("51 days ago", "bone", "", "leadA");
-        self::createTestUser("95 days ago", "borb", "", "leadA");
-        self::createTestUser("101 days ago", "tonyAbbot", "", "leadA");
-        self::createLonelyTestUser("jellyfish", "", "leadA");
     }
 
     /**
@@ -105,27 +83,24 @@ class AffiliateServiceTest extends WebTestCase
      */
     public function testGenerate()
     {
-        // test on no affiliates.
+        // test on nothing.
         $this->assertEmpty(self::$affiliateService->generate([]));
 
-        // test on main data.
-        print ("yeeaaaea");
+        // test on normal data.
+        $data = $this->createState();
+        $this->assertEquals(3, count(self::$affiliateService->generate([$data["affiliate"]])));
 
-        sleep(100000);
+        //test on pre loved data.
+        $this->assertEquals(0, count(self::$affiliateService->generate([$data["affiliate"]])));
+        sleep(60 * 60 * 24 * 30);
+        $this->assertEquals(2, count(self::$affiliateService->generate([$data["affiliate"]])));
+        sleep(60 * 60 * 24 * 365);
+        $this->assertEquals(0, count(self::$affiliateService->generate([$data["affiliate"]])));
 
-        print("yee");
-    }
-
-    /**
-     * Tests the createCharge function.
-     */
-    public function testCreateCharge()
-    {
-        // not that much to test really but make sure all the right things are set and try doing two on one user.
-        $affiliate = $this->affiliate("create_campaignA");
-        $user = $this->userByName("create_tony");
-        $policy = $user->getFirstPolicy();
-        $charge = self::$affiliateService->createCharge($affiliate, $user, $policy);
+        // switch to ongoing and create new policies in the future.
+        $data["affiliate"]->setChargeModel(AffiliateCompany::MODEL_ONGOING);
+        $this->assertEquals(5, count(self::$affiliateService->generate([$data["affiliate"]])));
+        $this->assertEquals(0, count(self::$affiliateService->generate([$data["affiliate"]])));
     }
 
     /**
@@ -209,14 +184,31 @@ class AffiliateServiceTest extends WebTestCase
     }
 
     /**
-     * Find an affiliate by name.
-     * @param string $name is the name of the new user.
-     * @return AffiliateCompany the company found with that name or null if not found.
+     * Every time you call this function it generates a bunch of unique but also predictable data and puts it into the
+     * database.
+     * @return array an associative array with all the things held by the non unique part of their name.
      */
-    private static function affiliate($name)
+    private static function createState()
     {
-        $items = self::$affiliateRepository->findBy(["name" => $name]);
-        return reset($items);
+        $prefix = uniqid();
+        $affiliate = self::createTestAffiliate(
+            "{$prefix}campaign",
+            1,
+            30,
+            "line 1",
+            "london",
+            "{$prefix}campaign",
+            "{$prefix}lead"
+        );
+        return [
+            "affiliate" => $affiliate,
+            "bango" => self::createTestUser("10 days ago", "{$prefix}bango", "{$prefix}campaign"),
+            "tango" => self::createTestUser("20 days ago", "{$prefix}tango", "{$prefix}campaign"),
+            "hat" => self::createTestUser("30 days ago", "{$prefix}hat", "{$prefix}campaign"),
+            "borb" => self::createTestUser("40 days ago", "{$prefix}borb", "", "{$prefix}campaign"),
+            "tonyAbbot" => self::createTestUser("50 days ago", "{$prefix}tonyAbbot", "", "{$prefix}campaign"),
+            "prefix" => $prefix
+        ];
     }
 
     /**
@@ -244,6 +236,7 @@ class AffiliateServiceTest extends WebTestCase
         $affiliate->setCampaignSource($source);
         $affiliate->setLeadSource("scode");
         $affiliate->setLeadSourceDetails($lead);
+        $affiliate->setChargeModel(AffiliateCompany::MODEL_ONE_OFF);
         self::$dm->persist($affiliate);
         self::$dm->flush();
         return $affiliate;

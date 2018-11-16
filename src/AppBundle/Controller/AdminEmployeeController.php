@@ -2497,17 +2497,19 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
      */
     public function affiliateAction(Request $request)
     {
-
         $time_range = [
             30 => 30,
             60 => 60,
             90 => 90
         ];
-
         $lead_sources = [
             'invitation' => 'invitation',
             'scode' => 'scode',
             'affiliate' => 'affiliate'
+        ];
+        $charge_models = [
+            "One off Charges" => AffiliateCompany::MODEL_ONE_OFF,
+            "Ongoing Charges" => AffiliateCompany::MODEL_ONGOING
         ];
 
         $companyForm = $this->get('form.factory')
@@ -2522,6 +2524,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             ->add('days', ChoiceType::class, ['required' => true, 'choices' => $time_range])
             ->add('renewalDays', ChoiceType::class, ['required' => true, 'choices' => $time_range])
             ->add('campaignSource', TextType::class, ['required' => false])
+            ->add('chargeModel', ChoiceType::class, ['choices' => $charge_models])
             ->add('leadSource', ChoiceType::class, ['required' => false, 'choices' => $lead_sources])
             ->add('leadSourceDetails', TextType::class, ['required' => false ])
             ->add('next', SubmitType::class)
