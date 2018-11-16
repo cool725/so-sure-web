@@ -71,7 +71,8 @@ class PhoneInsuranceControllerTest extends BaseControllerTest
         // should be redirected to redirect url
         $this->assertEquals(302, $this->getClientResponseStatusCode());
         $this->assertEquals('/purchase', $this->getClientResponseTargetUrl());
-        self::$client->followRedirect();
+        $crawler = self::$client->followRedirect();
+        $this->assertContains('Apple iPhone 7', $crawler->html());
     }
 
     public function testSessionPurchasePhoneNotFound()

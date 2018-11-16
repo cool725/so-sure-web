@@ -4,6 +4,7 @@ namespace AppBundle\Tests\Listener;
 
 use AppBundle\Document\BacsPaymentMethod;
 use AppBundle\Document\BankAccount;
+use AppBundle\Document\Charge;
 use AppBundle\Event\BacsEvent;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Psr\Log\LoggerInterface;
@@ -450,6 +451,11 @@ class DoctrineUserListenerTest extends WebTestCase
             'bar'
         );
         $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
+        $charge = new Charge();
+        $user->addCharge($charge);
+        $charge->setAmount(100);
+        static::$dm->persist($charge);
+        static::$dm->flush();
 
         $exception = false;
         try {
@@ -460,5 +466,16 @@ class DoctrineUserListenerTest extends WebTestCase
         }
         $this->assertFalse($exception);
         $this->assertUserDoesNotExist(self::$container, $user);
+
+        /** @var DocumentManager $dm */
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        $repo = $dm->getRepository(Charge::class);
+        /** @var Charge $updatedCharge */
+        $updatedCharge = $repo->find($charge->getId());
+        $this->assertNotNull($updatedCharge);
+        if ($updatedCharge) {
+            $this->assertEquals(100, $updatedCharge->getAmount());
+            $this->assertNull($updatedCharge->getUser());
+        }
     }
 }

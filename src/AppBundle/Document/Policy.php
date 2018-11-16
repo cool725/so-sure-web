@@ -2,6 +2,7 @@
 
 namespace AppBundle\Document;
 
+use AppBundle\Document\Invitation\AppNativeShareInvitation;
 use AppBundle\Document\Invitation\Invitation;
 use AppBundle\Document\Payment\BacsIndemnityPayment;
 use AppBundle\Document\Payment\BacsPayment;
@@ -35,7 +36,7 @@ use AppBundle\Exception\ClaimException;
  * @MongoDB\InheritanceType("SINGLE_COLLECTION")
  * @MongoDB\DiscriminatorField("policy_type")
  * @MongoDB\DiscriminatorMap({"phone"="PhonePolicy","salva-phone"="SalvaPhonePolicy"})
- * @Gedmo\Loggable
+ * @Gedmo\Loggable(logEntryClass="AppBundle\Document\LogEntry")
  */
 abstract class Policy
 {
@@ -1875,7 +1876,8 @@ abstract class Policy
     public function setPolicyStatusUnpaidIfActive($checkUnpaidStatus = true, \DateTime $date = null)
     {
         if ($this->getStatus() == self::STATUS_ACTIVE) {
-            if (!$checkUnpaidStatus || ($checkUnpaidStatus && !$this->isPolicyPaidToDate($date))) {
+            if (!$checkUnpaidStatus || ($checkUnpaidStatus &&
+                !$this->isPolicyPaidToDate($date, true, false, true))) {
                 $this->setStatus(self::STATUS_UNPAID);
             }
         }
@@ -3471,6 +3473,10 @@ abstract class Policy
     {
         $userId = $this->getUser() ? $this->getUser()->getId() : null;
         return array_filter($this->getInvitationsAsArray(), function ($invitation) use ($userId, $onlyProcessed) {
+            if ($invitation instanceof AppNativeShareInvitation) {
+                return false;
+            }
+
             if ($onlyProcessed && $invitation->isProcessed()) {
                 return false;
             }
@@ -4220,12 +4226,14 @@ abstract class Policy
             if ($months > 12) {
                 $months = 12;
             }
+
             /*
             print PHP_EOL;
             print $date->format(\DateTime::ATOM) . PHP_EOL;
             print $this->getBilling()->format(\DateTime::ATOM) . PHP_EOL;
             print $months . PHP_EOL;
             */
+
             $expectedPaid = $this->getPremium()->getAdjustedStandardMonthlyPremiumPrice() * $months;
         } else {
             throw new \Exception('Unknown premium plan');
@@ -4360,7 +4368,7 @@ abstract class Policy
 
         if ($includeFuturePayments) {
             $futureDate = clone $date;
-            $futureDate = $futureDate->add(new \DateInterval('P1D'));
+            $futureDate = $this->endOfDay($this->getNextBusinessDay($futureDate));
             $totalPaid = $this->getTotalSuccessfulPayments($futureDate, true);
         } else {
             $totalPaid = $this->getTotalSuccessfulPayments($date, true);
@@ -4369,10 +4377,12 @@ abstract class Policy
             $totalPaid += $this->getPendingBacsPaymentsTotal();
         }
         $expectedPaid = $this->getTotalExpectedPaidToDate($date, $firstDayIsUnpaid);
-        // print sprintf("%f =? %f", $totalPaid, $expectedPaid) . PHP_EOL;
 
         // >= doesn't quite allow for minor float differences
-        return $this->areEqualToTwoDp($expectedPaid, $totalPaid) || $totalPaid > $expectedPaid;
+        $result = $this->areEqualToTwoDp($expectedPaid, $totalPaid) || $totalPaid > $expectedPaid;
+        //print sprintf("%f =? %f return %s%s", $totalPaid, $expectedPaid, $result ? 'true': 'false', PHP_EOL);
+
+        return $result;
     }
 
     public function getOutstandingScheduledPaymentsAmount()
@@ -5170,13 +5180,15 @@ abstract class Policy
             $date = \DateTime::createFromFormat('U', time());
         }
 
-        $expirationDate = $this->getCurrentOrPreviousBusinessDay($this->getPolicyExpirationDate());
+        //print $this->getPolicyExpirationDate()->format(\DateTime::ATOM) . PHP_EOL;
+        $expirationDate = $this->getCurrentOrPreviousBusinessDay($this->getPolicyExpirationDate(), $date);
+        //print $expirationDate->format(\DateTime::ATOM) . PHP_EOL;
         // 2 additional days: 1 day to account for it possibly being after the bacs submission time for the day
         // and 1 day to account for policy expiration occurring before the bacs file for the day being uploaded
         $expirationDate = static::subBusinessDays($expirationDate, BacsPayment::DAYS_REVERSE + 2);
 
-        //print $date->format(\DateTime::ATOM);
-        //print $expirationDate->format(\DateTime::ATOM);
+        //print $date->format(\DateTime::ATOM) . PHP_EOL;
+        //print $expirationDate->format(\DateTime::ATOM) . PHP_EOL;
 
         return $this->startOfDay($expirationDate) >= $this->startOfDay($date);
     }

@@ -494,9 +494,10 @@
                                         {% if lastSubmittedPayment[file.serialNumber] is not defined or lastSubmittedPayment[file.serialNumber] < payment.submittedDate %}
                                             {% set lastSubmittedPayment = lastSubmittedPayment|merge({ (file.serialNumber): payment.submittedDate}) %}
                                         {% endif %}
-                                        {% set paymentAmount = paymentAmount + payment.amount * -1.0 %}
+                                        {% set paymentAmount = paymentAmount + payment.amount %}
                                     {% endif %}
                                 {% endfor %}
+                                {% set paymentAmount = 0 - paymentAmount %}
 
                                 {% set reportAmount = 0 %}
                                 {% for inputFile in inputIncPrevMonth %}
@@ -514,7 +515,7 @@
                                     <td width="25%">
                                         <span title="{{ file.metadata|json_encode }}">
                                         {% if file.metadata %}
-                                            {{ (0 - creditAmount)|number_format(2, '.', ',') }}
+                                            {{ creditAmount|number_format(2, '.', ',') }}
                                         {% else %}
                                             -
                                         {% endif %}
@@ -522,7 +523,7 @@
                                     </td>
 
                                     {% set color = '' %}
-                                    {% if equal_to_two_dp(0 - creditAmount, paymentAmount) %}
+                                    {% if equal_to_two_dp(creditAmount, paymentAmount) %}
                                         {% set color = 'success' %}
                                     {% else %}
                                         {% set color = 'danger' %}
@@ -536,7 +537,7 @@
                                     </td>
 
                                     {% set delay = false %}
-                                    {% if equal_to_two_dp(0 - creditAmount, reportAmount) and equal_to_two_dp(paymentAmount, reportAmount)  %}
+                                    {% if equal_to_two_dp(creditAmount, reportAmount) and equal_to_two_dp(paymentAmount, reportAmount)  %}
                                         {% set color = 'success' %}
                                     {% elseif lastSubmittedPayment[file.serialNumber] is defined and lastSubmittedPayment[file.serialNumber]|date > 'now'|date %}
                                         {% set color = 'warning' %}

@@ -244,6 +244,11 @@ class BacsService
         $uploadFile = null;
         $metadata = null;
         $date = null;
+
+        if ($this->isS3FilePresent($file->getClientOriginalName())) {
+            return false;
+        }
+
         if (mb_stripos($file->getClientOriginalName(), "ADDACS") !== false) {
             $metadata = $this->addacs($tmpFile);
             $uploadFile = new BacsReportAddacsFile();
@@ -351,6 +356,23 @@ class BacsService
         return $s3Key;
     }
 
+    public function getS3Key($filename, $folder = 'bacs-report')
+    {
+        $s3Key = sprintf('%s/%s/%s', $this->environment, $folder, $filename);
+
+        return $s3Key;
+    }
+
+    public function isS3FilePresent($filename, $folder = 'bacs-report')
+    {
+        $s3Key = $this->getS3Key($filename, $folder);
+
+        $repo = $this->dm->getRepository(UploadFile::class);
+        $existingFile = $repo->findOneBy(['bucket' => self::S3_ADMIN_BUCKET, 'key' => $s3Key]);
+
+        return $existingFile != null;
+    }
+
     public function uploadS3(
         $tmpFile,
         $filename,
@@ -366,11 +388,10 @@ class BacsService
         $encTempFile = sprintf('%s/enc-%s', sys_get_temp_dir(), $filename);
         \Defuse\Crypto\File::encryptFileWithPassword($tmpFile, $encTempFile, $this->fileEncryptionPassword);
         unlink($tmpFile);
-        $s3Key = sprintf('%s/%s/%s', $this->environment, $folder, $filename);
 
-        $repo = $this->dm->getRepository(UploadFile::class);
-        $existingFile = $repo->findOneBy(['bucket' => self::S3_ADMIN_BUCKET, 'key' => $s3Key]);
-        if ($existingFile) {
+        $s3Key = $this->getS3Key($filename, $folder);
+
+        if ($this->isS3FilePresent($filename, $folder)) {
             throw new \Exception(sprintf('File s3://%s/%s already exists', self::S3_ADMIN_BUCKET, $s3Key));
         }
 
@@ -537,6 +558,7 @@ class BacsService
             $results['records']++;
             $returnCode = $this->getReturnCode($element);
             $reference = $this->getReference($element, 'ref');
+            $returnDescription = $this->getNodeValue($element, 'returnDescription');
             $originalProcessingDate = $this->getOriginalProcessingDate($element);
             /** @var User $user */
             $user = $repo->findOneBy(['paymentMethod.bankAccount.reference' => $reference]);
@@ -545,6 +567,22 @@ class BacsService
                 $this->logger->error(sprintf('Unable to locate bacs reference %s', $reference));
 
                 continue;
+            }
+
+            $activePendingMandate = false;
+            $bacs = $user->getBacsPaymentMethod();
+            if ($bacs) {
+                if ($bankAccount = $bacs->getBankAccount()) {
+                    if ($bankAccount->isMandateInProgress() || $bankAccount->isMandateSuccess()) {
+                        $activePendingMandate = true;
+                    }
+                }
+            }
+            if ($activePendingMandate && mb_stripos($returnDescription, "INSTRUCTION CANCELLED") !== false) {
+                $this->logger->warning(sprintf(
+                    'User %s has an active or pending mandate, but an arudd indicating cancelled',
+                    $user->getId()
+                ));
             }
 
             $foundPayments = 0;
@@ -561,7 +599,11 @@ class BacsService
                     $debitPayment->setSerialNumber($submittedPayment->getSerialNumber());
                     $debitPayment->setDate($this->getNextBusinessDay($currentProcessingDate));
                     $debitPayment->setSource(Payment::SOURCE_SYSTEM);
-                    $debitPayment->setNotes('Arudd payment failure');
+                    $debitPayment->setNotes(sprintf(
+                        'Arudd payment failure: %s (%s)',
+                        $returnDescription,
+                        $returnCode
+                    ));
                     $policy->addPayment($debitPayment);
 
                     // refund requires commission to be set, but probably isn't at this point in time
@@ -632,7 +674,14 @@ class BacsService
         $payments = $repo->findSubmittedPayments($this->endOfDay($date));
         foreach ($payments as $payment) {
             /** @var BacsPayment $payment */
-            $payment->approve();
+            try {
+                $payment->approve();
+            } catch (\Exception $e) {
+                $this->logger->error(
+                    sprintf('Skipping payment %s approval', $payment->getId()),
+                    ['exception' => $e]
+                );
+            }
         }
         $this->dm->flush();
     }
@@ -1660,7 +1709,10 @@ class BacsService
 
             $bankAccount = $bacs->getBankAccount();
 
-            $metadata['credit-amount'] += $payment->getAmount();
+            // amount will be -, but bacs credit needs +
+            $normalisedPaymentAmount = 0 - $payment->getAmount();
+
+            $metadata['credit-amount'] += $normalisedPaymentAmount;
             $lines[] = implode(',', [
                 sprintf('"%s"', $date->format('d/m/y')),
                 '"Credit"',
@@ -1668,7 +1720,7 @@ class BacsService
                 sprintf('"%s"', $bankAccount->getAccountName()),
                 sprintf('"%s"', $bankAccount->getSortCode()),
                 sprintf('"%s"', $bankAccount->getAccountNumber()),
-                sprintf('"%0.2f"', 0 - $payment->getAmount()), // amount will be -, but bacs credit needs +
+                sprintf('"%0.2f"', $normalisedPaymentAmount),
                 sprintf('"%s"', $bankAccount->getReference()),
                 sprintf('"%s"', $payment->getPolicy()->getUser()->getId()),
                 sprintf('"%s"', $payment->getPolicy()->getId()),

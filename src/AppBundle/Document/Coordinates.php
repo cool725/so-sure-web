@@ -10,7 +10,7 @@ use AppBundle\Exception\ValidationException;
 
 /**
  * @MongoDB\EmbeddedDocument
- * @Gedmo\Loggable
+ * @Gedmo\Loggable(logEntryClass="AppBundle\Document\LogEntry")
  */
 class Coordinates
 {

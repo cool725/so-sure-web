@@ -13,7 +13,7 @@ use AppBundle\Validator\Constraints as AppAssert;
 
 /**
  * @MongoDB\Document(repositoryClass="AppBundle\Repository\BacsPaymentRepository")
- * @Gedmo\Loggable
+ * @Gedmo\Loggable(logEntryClass="AppBundle\Document\LogEntry")
  */
 class BacsPayment extends Payment
 {
@@ -227,7 +227,8 @@ class BacsPayment extends Payment
 
         if (!$this->canAction($date) && !$ignoreReversedDate) {
             throw new \Exception(sprintf(
-                'Attempting to action before reveral date (%s) is past',
+                'Attempting to action payment %s before reversal date (%s) is past',
+                $this->getId(),
                 $this->getBacsReversedDate()->format('d m Y')
             ));
         }

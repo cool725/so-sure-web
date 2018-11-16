@@ -39,7 +39,7 @@ if [ "$PREFIX" != "" ]; then
 fi
 
 # keep in sync with run-test-functional.sh
-for feature in "renewal" "picsure" "bacs"
+for feature in "renewal" "picsure" "bacs" "rate-limiting"
 do
   sudo app/console --env=$ENV sosure:feature $feature true
 done

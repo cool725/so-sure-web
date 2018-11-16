@@ -9,6 +9,7 @@ use AppBundle\Document\DateTrait;
 use AppBundle\Document\File\AccessPayFile;
 use AppBundle\Document\File\DaviesFile;
 use AppBundle\Document\File\DirectGroupFile;
+use AppBundle\Document\Invitation\EmailInvitation;
 use AppBundle\Document\Invitation\Invitation;
 use AppBundle\Document\Form\Bacs;
 use AppBundle\Document\MultiPay;
@@ -29,6 +30,7 @@ use AppBundle\Repository\PolicyRepository;
 use AppBundle\Repository\UserRepository;
 use Doctrine\MongoDB\LoggableCollection;
 use Doctrine\ODM\MongoDB\DocumentManager;
+use MongoDB\Collection;
 use Psr\Log\LoggerInterface;
 
 class MonitorService
@@ -745,35 +747,41 @@ class MonitorService
         $builder = $collection->createAggregationBuilder();
 
         $results = $builder
-            ->group()
-            ->field('_id')
-            ->expression(
-                $builder->expr()
-                    ->field('email')
-                    ->expression('$email')
-                    ->field('policy')
-                    ->expression('$policy')
-            )
-            ->field('count')
-            ->sum(1)
             ->match()
-            ->field('count')
-            ->gt(1)
+                ->field('invitation_type')->equals('email')
+            ->group()
+                ->field('_id')
+                    ->expression(
+                        $builder->expr()
+                            ->field('email')->expression('$email')
+                            ->field('policy')->expression('$policy')
+                    )
+                ->field('count')->sum(1)
+            ->match()
+                ->field('count')->gt(1)
             ->execute(['cursor' => []]);
 
         if (count($results) > 0) {
             foreach ($results as $result) {
                 throw new MonitorException(sprintf(
                     "Found duplicate Invites on email %s",
-                    $result['_id']['email']
+                    json_encode($result)
                 ));
             }
         }
     }
 
+    /**
+     * @return \Doctrine\MongoDB\Database
+     */
+    public function getDocumentDatabase()
+    {
+        return $this->dm->getDocumentDatabase(Policy::class);
+    }
+
     public function checkSoSureRoles()
     {
-        $collections = $this->dm->getDocumentCollections();
+        $collections = $this->getDocumentDatabase()->listCollections();
 
         if (count($collections) == 0) {
             throw new MonitorException(
@@ -784,11 +792,9 @@ class MonitorService
         return $collections;
     }
 
-    public function checkSoSureRole($col)
+    public function checkSoSureRole(\MongoCollection $col)
     {
-        $db_name = $col->getDatabase()->getName();
-
-        $res = $this->dm->getConnection()->selectDatabase($db_name)->command([
+        $res = $this->getDocumentDatabase()->command([
             'rolesInfo' => 'so-sure-user',
             'showPrivileges' => true
             ]);
@@ -841,10 +847,32 @@ class MonitorService
             ->execute();
 
         foreach ($results as $result) {
-            throw new MonitorException(
-                "Policy {$result->getPolicyNumber()} is active/unpaid but expired!" . PHP_EOL .
-                "Expired since {$result->getEnd()->format('Y-M-D H:m')} !"
-            );
+            if (!$result->isPrefixInvalidPolicy()) {
+                throw new MonitorException(
+                    "Policy {$result->getPolicyNumber()} is active/unpaid but expired!" . PHP_EOL .
+                    "Expired since {$result->getEnd()->format('Y-M-D H:m')} !"
+                );
+            }
+        }
+    }
+
+    public function checkPastBacsPaymentsPending()
+    {
+        $results = $this->dm->createQueryBuilder(BacsPayment::class)
+            ->field('status')
+            ->equals(BacsPayment::STATUS_PENDING)
+            ->field('date')
+            ->lt(new \DateTime())
+            ->getQuery()
+            ->execute();
+
+        foreach ($results as $result) {
+            throw new MonitorException(sprintf(
+                "Bacs payment (%s) under policy number %s is pending and in the past (%s)",
+                $result->getId(),
+                $result->getPolicy()->getPolicyNumber(),
+                $result->getDate()->format('Y-M-d H:m')
+            ));
         }
     }
 }

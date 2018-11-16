@@ -13,7 +13,7 @@ use VasilDakov\Postcode\Postcode;
 
 /**
  * @MongoDB\EmbeddedDocument
- * @Gedmo\Loggable
+ * @Gedmo\Loggable(logEntryClass="AppBundle\Document\LogEntry")
  */
 class BankAccount
 {

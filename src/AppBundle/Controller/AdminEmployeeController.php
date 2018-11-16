@@ -13,6 +13,8 @@ use AppBundle\Form\Type\PaymentRequestUploadFileType;
 use AppBundle\Form\Type\UploadFileType;
 use AppBundle\Form\Type\UserHandlingTeamType;
 use AppBundle\Repository\ClaimRepository;
+use AppBundle\Repository\PhonePolicyRepository;
+use AppBundle\Repository\PhoneRepository;
 use AppBundle\Security\FOSUBUserProvider;
 use AppBundle\Service\BacsService;
 use AppBundle\Service\FraudService;
@@ -20,6 +22,7 @@ use AppBundle\Service\JudopayService;
 use AppBundle\Service\PolicyService;
 use AppBundle\Service\ReceperioService;
 use AppBundle\Service\ReportingService;
+use AppBundle\Service\RouterService;
 use AppBundle\Service\SalvaExportService;
 use AppBundle\Service\AffiliateService;
 use Gedmo\Loggable\Document\Repository\LogEntryRepository;
@@ -309,6 +312,51 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
     }
 
     /**
+     * @Route("/phones/download", name="admin_phones_download")
+     */
+    public function adminPhonesDownload()
+    {
+        /** @var RouterService $router */
+        $router = $this->get('app.router');
+        /** @var PhoneRepository $repo */
+        $repo = $this->getManager()->getRepository(Phone::class);
+        $phones = $repo->findActive()->getQuery()->execute();
+
+        $lines = [];
+        foreach ($phones as $phone) {
+            /** @var Phone $phone */
+            $lines[] = sprintf(
+                '"%s", "%s"',
+                $phone->__toString(),
+                $router->generateUrl('purchase_phone_make_model_memory', [
+                    'make' => $phone->getMake(),
+                    'model' => $phone->getEncodedModel(),
+                    'memory' => $phone->getMemory()
+                ])
+            );
+        }
+        $data = implode(PHP_EOL, $lines);
+
+        $tmpFile = sprintf('%s/%s', sys_get_temp_dir(), 'so-sure-phones.csv');
+        file_put_contents($tmpFile, $data);
+
+        $headers = [
+            'Content-Type' => 'text/plain',
+            'Content-Disposition' => 'attachment; filename="so-sure-phones.csv"',
+        ];
+
+        return StreamedResponse::create(
+            function () use ($tmpFile) {
+                $stream = fopen($tmpFile, 'r');
+                echo stream_get_contents($stream);
+                flush();
+            },
+            200,
+            $headers
+        );
+    }
+
+    /**
      * @Route("/policies", name="admin_policies")
      * @Template("AppBundle::Claims/claimsPolicies.html.twig")
      */
@@ -427,6 +475,60 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
     }
 
     /**
+     * @Route("/imei-form/{id}", name="imei_form")
+     * @Template
+     */
+    public function imeiFormAction(Request $request, $id = null)
+    {
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(PhonePolicy::class);
+        /** @var PhonePolicy $policy */
+        $policy = $repo->find($id);
+
+        if (!$policy) {
+            throw $this->createNotFoundException(sprintf('Policy %s not found', $id));
+        }
+
+        $imei = new Imei();
+        $imei->setPolicy($policy);
+        $imeiForm = $this->get('form.factory')
+            ->createNamedBuilder('imei_form', ImeiType::class, $imei)
+            ->setAction($this->generateUrl(
+                'imei_form',
+                ['id' => $id]
+            ))
+            ->getForm();
+
+        if ('POST' === $request->getMethod()) {
+            if ($request->request->has('imei_form')) {
+                $imeiForm->handleRequest($request);
+                if ($imeiForm->isValid()) {
+                    $policy->adjustImei($imei->getImei(), false);
+
+                    $policy->addNote(json_encode([
+                        'user_id' => $this->getUser()->getId(),
+                        'name' => $this->getUser()->getName(),
+                        'notes' => $imei->getNote()
+                    ]));
+
+                    $dm->flush();
+                    $this->addFlash(
+                        'success',
+                        sprintf('Policy %s imei updated.', $policy->getPolicyNumber())
+                    );
+
+                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
+                }
+            }
+        }
+
+        return [
+            'form' => $imeiForm->createView(),
+            'policy' => $policy
+        ];
+    }
+
+    /**
      * @Route("/policy/{id}", name="admin_policy")
      * @Template("AppBundle::Admin/claimsPolicy.html.twig")
      */
@@ -440,6 +542,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         $imeiService = $this->get('app.imei');
         $invitationService = $this->get('app.invitation');
         $dm = $this->getManager();
+        /** @var PhonePolicyRepository $repo */
         $repo = $dm->getRepository(PhonePolicy::class);
         /** @var PhonePolicy $policy */
         $policy = $repo->find($id);
@@ -457,11 +560,6 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             ->getForm();
         $noteForm = $this->get('form.factory')
             ->createNamedBuilder('note_form', NoteType::class)
-            ->getForm();
-        $imei = new Imei();
-        $imei->setPolicy($policy);
-        $imeiForm = $this->get('form.factory')
-            ->createNamedBuilder('imei_form', ImeiType::class, $imei)
             ->getForm();
         $facebookForm = $this->get('form.factory')
             ->createNamedBuilder('facebook_form', FacebookType::class, $policy)
@@ -557,6 +655,8 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             ->getForm();
         $bacsRefund = new BacsPayment();
         $bacsRefund->setPolicy($policy);
+        $bacsRefund->setAmount($policy->getPremiumInstallmentPrice(true));
+        $bacsRefund->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
         $bacsRefund->setStatus(BacsPayment::STATUS_PENDING);
         $bacsRefundForm = $this->get('form.factory')
             ->createNamedBuilder('bacs_refund_form', BacsCreditType::class, $bacsRefund)
@@ -619,18 +719,6 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                         );
                     }
                     $dm->flush();
-
-                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
-                }
-            } elseif ($request->request->has('imei_form')) {
-                $imeiForm->handleRequest($request);
-                if ($imeiForm->isValid()) {
-                    $policy->adjustImei($imei->getImei(), false);
-                    $dm->flush();
-                    $this->addFlash(
-                        'success',
-                        sprintf('Policy %s imei updated.', $policy->getPolicyNumber())
-                    );
 
                     return $this->redirectToRoute('admin_policy', ['id' => $id]);
                 }
@@ -1139,12 +1227,12 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             $hadInvalidPicSureStatus = true;
         }
 
+
         return [
             'policy' => $policy,
             'cancel_form' => $cancelForm->createView(),
             'pending_cancel_form' => $pendingCancelForm->createView(),
             'note_form' => $noteForm->createView(),
-            'imei_form' => $imeiForm->createView(),
             'phone_form' => $phoneForm->createView(),
             'formClaimFlags' => $claimFlags->createView(),
             'facebook_form' => $facebookForm->createView(),
@@ -2251,6 +2339,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             $month = $now->format('m');
         }
         $date = \DateTime::createFromFormat("Y-m-d", sprintf('%d-%d-01', $year, $month));
+        /** @var ReportingService $reporting */
         $reporting = $this->get('app.reporting');
         $data = $reporting->payments($date);
 

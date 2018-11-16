@@ -9,7 +9,7 @@ use AppBundle\Validator\Constraints as AppAssert;
 
 /**
  * @MongoDB\Document(repositoryClass="AppBundle\Repository\ChargeRepository")
- * @Gedmo\Loggable
+ * @Gedmo\Loggable(logEntryClass="AppBundle\Document\LogEntry")
  */
 class Charge
 {
@@ -56,7 +56,7 @@ class Charge
     protected $type;
 
     /**
-     * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\User")
+     * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\User", inversedBy="charges")
      * @Gedmo\Versioned
      */
     protected $user;

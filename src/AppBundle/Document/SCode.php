@@ -9,7 +9,7 @@ use AppBundle\Validator\Constraints as AppAssert;
 
 /**
  * @MongoDB\Document(repositoryClass="AppBundle\Repository\SCodeRepository")
- * @Gedmo\Loggable
+ * @Gedmo\Loggable(logEntryClass="AppBundle\Document\LogEntry")
  * @MongoDB\Index(keys={"code"="asc", "reward.id"="asc", "policy.id"="asc"}, sparse="true", unique="true")
  */
 class SCode

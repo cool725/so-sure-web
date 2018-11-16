@@ -54,22 +54,23 @@
       <div class="col-sm-5">
         <h4 class="text-center"><strong>Phones</strong></h4>
       </div>
-      <div class="col-sm-2">
-        <button class="btn btn-success"  data-toggle="modal" data-target="#newPhoneModal">
-          <i class="fa fa-plus"></i> Add upcoming phone
-        </button>
-      </div>
-      {% if is_granted('ROLE_ADMIN') %}
-      <div class="col-sm-3">
-        <button class="btn btn-success pull-right"  data-toggle="modal" data-target="#additionalPhonesModal">
-          <i class="fa fa-refresh"></i> Load additional phones
-        </button>
-      </div>
-      {% endif %}
-      <div class="col-sm-2">
-          <button class="btn btn-success"  data-toggle="modal" data-target="#checkPriceModal">
-              Calculate Premium
-          </button>
+      <div class="col-sm-7">
+          <div class="btn-group" role="group" aria-label="Basic example">
+            <button class="btn btn-success"  data-toggle="modal" data-target="#newPhoneModal">
+              <i class="fa fa-plus"></i> Upcoming phone
+            </button>
+            {% if is_granted('ROLE_ADMIN') %}
+              <button class="btn btn-success"  data-toggle="modal" data-target="#additionalPhonesModal">
+                  <i class="fa fa-refresh"></i> Import phones
+              </button>
+            {% endif %}
+            <button class="btn btn-success"  data-toggle="modal" data-target="#checkPriceModal">
+              <i class="fa fa-calculator"></i> Premium
+            </button>
+              <a href="{{ path('admin_phones_download') }}" target="_blank" class="btn btn-success">
+                  <i class="fa fa-download"></i> Phone Links
+              </a>
+          </div>
       </div>
     </div>
     <div class="row">
