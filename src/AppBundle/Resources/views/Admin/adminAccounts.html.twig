@@ -37,6 +37,11 @@
                     </a>
                 </div>
             </div>
+            <div class="input-group" style="margin-left: 10px;">
+                {{ form_start(salvaForm) }}
+                {{ form_widget(salvaForm.export, {'attr': {'class': "btn btn-warning"}}) }}
+                {{ form_end(salvaForm) }}
+            </div>
         </div>
     </div>
     </form>
