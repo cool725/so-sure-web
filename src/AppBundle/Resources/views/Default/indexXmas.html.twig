@@ -90,11 +90,19 @@
 
     <section class="cred">
         <div class="container container-xtra py-4 d-lg-flex align-items-center justify-content-between">
-            <img src="{{ cdn_url }}/images/rebrand/credbar/so-sure_credbar-trustpilot.png" alt="Trustpilot">
-            <img src="{{ cdn_url }}/images/rebrand/credbar/so-sure_credbar-money.png" alt="Money">
-            <img src="{{ cdn_url }}/images/rebrand/credbar/so-sure_credbar-gocompare.png" alt="GoCompare">
-            <img src="{{ cdn_url }}/images/rebrand/credbar/so-sure_credbar-theguardian.png" alt="The Guardian">
-            <img src="{{ cdn_url }}/images/rebrand/credbar/so-sure_credbar-ft.png" alt="The Financial Times">
+            {% if page_type == 'tastecard' %}
+                <img src="{{ cdn_url }}/images/rebrand/credbar/tastecard/so-sure_credbar-frankie-and-bennys.png" alt="Frankie &amp; Bennys">
+                <img src="{{ cdn_url }}/images/rebrand/credbar/tastecard/so-sure_credbar-zizzi.png" alt="Zizzi">
+                <img src="{{ cdn_url }}/images/rebrand/credbar/tastecard/so-sure_credbar-strada.png" alt="Strada">
+                <img src="{{ cdn_url }}/images/rebrand/credbar/tastecard/so-sure_credbar-giraffe.png" alt="giraffe">
+                <img src="{{ cdn_url }}/images/rebrand/credbar/tastecard/so-sure_credbar-bella-italia.png" alt="Bella Italia">
+            {% else %}
+                <img src="{{ cdn_url }}/images/rebrand/credbar/so-sure_credbar-trustpilot.png" alt="Trustpilot">
+                <img src="{{ cdn_url }}/images/rebrand/credbar/so-sure_credbar-money.png" alt="Money">
+                <img src="{{ cdn_url }}/images/rebrand/credbar/so-sure_credbar-gocompare.png" alt="GoCompare">
+                <img src="{{ cdn_url }}/images/rebrand/credbar/so-sure_credbar-theguardian.png" alt="The Guardian">
+                <img src="{{ cdn_url }}/images/rebrand/credbar/so-sure_credbar-ft.png" alt="The Financial Times">
+            {% endif %}
         </div>
     </section>
 
