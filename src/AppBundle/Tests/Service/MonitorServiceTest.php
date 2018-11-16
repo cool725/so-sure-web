@@ -318,14 +318,14 @@ class MonitorServiceTest extends WebTestCase
             $policy,
             $mobileNumber,
             null,
-            True
+            true
         );
 
         $invitationTwo = self::$invitationService->inviteBySms(
             $policy,
             $mobileNumber,
             null,
-            True
+            true
         );
 
         self::$dm->flush();
