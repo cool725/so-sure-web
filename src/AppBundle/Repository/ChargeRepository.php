@@ -48,28 +48,4 @@ class ChargeRepository extends DocumentRepository
             ->getQuery()
             ->execute();
     }
-
-    /**
-     * Finds the most recent charge that has been made in the name of a user, optionally of a given type.
-     * @param User   $user is the user for whom we are looking for charges.
-     * @param string $type is the type of charges that we are looking for, and if it is left null then we are looking
-     *               for all charges.
-     * @return Charge|null the most recent charge that matches the given type requirements or null if there is nothing.
-     */
-    public function findLastCharge($user, $type = null)
-    {
-        $chargeQuery = $this->createQueryBuilder()
-            ->field('user')->equals($user);
-        if ($type) {
-            $chargeQuery->field('type')->equals($type);
-        }
-        $charges = $chargeQuery->sort('createdDate', 'DESC')
-            ->limit(1)
-            ->getQuery()->execute();
-        if (count($charges) > 0) {
-            return $charges->getSingleResult();
-        } else {
-            return null;
-        }
-    }
 }

@@ -1268,16 +1268,14 @@ class UserController extends BaseController
             parse_str($query, $oauth2FlowParams);
         }
 
-        $sixpack = $this->get('app.sixpack');
-
         $smsExperiment = $this->sixpack(
             $request,
-            $sixpack::EXPERIMENT_APP_LINK_SMS,
+            SixpackService::EXPERIMENT_APP_LINK_SMS,
             [
-                $sixpack::ALTERNATIVES_SMS_DOWNLOAD,
-                $sixpack::ALTERNATIVES_NO_SMS_DOWNLOAD
+                SixpackService::ALTERNATIVES_SMS_DOWNLOAD,
+                SixpackService::ALTERNATIVES_NO_SMS_DOWNLOAD
             ],
-            $sixpack::LOG_MIXPANEL_NONE,
+            SixpackService::LOG_MIXPANEL_NONE,
             $user->getId(),
             1
         );
@@ -1310,22 +1308,25 @@ class UserController extends BaseController
         $user = $this->getUser();
         $email = $request->get("email");
         if (!$user) {
-            return new Response("no-user", 400);
+            return new JsonResponse(["message" => "no-user"], 400);
         } elseif (!$email) {
-            return new Response("no-email", 400);
+            return new JsonResponse(["message" => "no-email"], 400);
+        } elseif (!$this->isCsrfTokenValid('invite-email', $request->request->get('csrf'))) {
+            return new JsonResponse(["message" => "invalid-csrf"]);
         }
+        $this->denyAccessUnlessGranted(UserVoter::VIEW, $user);
         try {
             $this->get("app.invitation")->inviteByEmail($user->getLatestPolicy(), $email);
             return new Response(200);
         } catch (InvalidPolicyException $e) {
-            return new Response("invalid-policy", 400);
+            return new JsonResponse(["message" => "invalid-policy"], 400);
         } catch (SelfInviteException $e) {
-            return new Response("self-invite", 400);
+            return new JsonResponse(["message" => "self-invite"], 400);
         } catch (DuplicateInvitationException $e) {
-            return new Response("duplicate", 400);
+            return new JsonResponse(["message" => "duplicate"], 400);
         } catch (\Exception $e) {
             $this->get('logger')->error($e->getMessage(), ['exception' => $e]);
-            return new Response($e->getMessage(), 500);
+            return new JsonResponse(["message" => $e->getMessage()], 500);
         }
     }
 
@@ -1346,15 +1347,14 @@ class UserController extends BaseController
             ['branch_pot_url' => $this->getParameter('branch_pot_url')]
         );
         if (!$user) {
-            return new Response("User not found.", 400);
+            return new JsonResponse(["message" => "no-user"], 400);
         } elseif (!$mobileNumber) {
-            return new Response("You do not have a mobile phone number set.", 400);
+            return new JsonResponse(["message" => "no-number"], 400);
         } elseif ($user->getFirstLoginInApp()) {
-            return new Response("You already have the app.", 400);
+            return new JsonResponse(["message" => "has-app"], 400);
         } elseif ($chargeRepository->findLastCharge($user, Charge::TYPE_SMS_DOWNLOAD)) {
-            return new Response("You have already been sent a download SMS.", 400);
+            return new JsonResponse(["message" => "already-sent"], 400);
         } elseif ($smsService->send($mobileNumber, $message, $user->getLatestPolicy(), Charge::TYPE_SMS_DOWNLOAD)) {
-            // Sms has been successfully sent. Fire off a sixpack kpi.
             $sixpack = $this->get('app.sixpack');
             $sixpack->convertByClientId(
                 $user->getId(),
@@ -1363,7 +1363,7 @@ class UserController extends BaseController
             );
             return new Response($message, 200);
         } else {
-            return new Response("The SMS was not able to be sent.", 500);
+            return new Response(500);
         }
     }
 
