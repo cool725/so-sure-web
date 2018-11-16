@@ -279,22 +279,25 @@
                     <td>Total Incurred</td>
                     <td id='claims-detail-total-incurred'></td>
                 </tr>
-                {% if is_granted('ROLE_CUSTOMER_SERVICES') %}
                 <tr id="update-button-row">
+                    {% if is_granted('ROLE_ADMIN') %}
                     <td>
                         <button id="delete-button" id="delete-claim"  type="button" class="btn btn-danger">Delete Claim</button>
                     </td>
+                    {% endif %}
+
+                    {% if is_granted('ROLE_CUSTOMER_SERVICES') %}
                     <td>
                         <button id="update-button" class="btn btn-success">Save Updates</button>
                     </td>
+                    {% endif %}
                 </tr>
-                {% endif %}
             </table>
           </div>
           <div class="modal-footer">
               <button type="button" class="btn-xs btn-black-hollow" data-dismiss="modal">Close</button>
         </form>
-            {% if is_granted('ROLE_CUSTOMER_SERVICES') %}
+            {% if is_granted('ROLE_ADMIN') %}
             <form id="delete-claim-form" method="POST" action="{{ path('admin_claims_delete_claim') }}">
                 <input type="hidden" name="id" id="claims-detail-delete-id"></input>
                 <input type="hidden" name="token" value="{{  csrf_token('default') }}"></input>
