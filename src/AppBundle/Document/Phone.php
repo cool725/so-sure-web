@@ -260,6 +260,7 @@ class Phone
         $make,
         $model,
         $premium,
+        PolicyTerms $policyTerms,
         $memory = null,
         $devices = null,
         $initialPrice = null,
@@ -285,6 +286,8 @@ class Phone
                 $phonePrice = new PhonePrice();
                 $phonePrice->setValidFrom($date);
                 $this->addPhonePrice($phonePrice);
+                $phonePrice->setExcess($policyTerms->getDefaultExcess());
+                $phonePrice->setPicSureExcess($policyTerms->getDefaultPicSureExcess());
             }
             $phonePrice->setMonthlyPremiumPrice($premium, $date);
         }

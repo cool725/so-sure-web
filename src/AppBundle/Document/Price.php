@@ -2,6 +2,7 @@
 
 namespace AppBundle\Document;
 
+use AppBundle\Document\Excess\Excess;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Symfony\Component\Validator\Constraints as Assert;
 use AppBundle\Validator\Constraints as AppAssert;
@@ -40,6 +41,13 @@ abstract class Price
      * @MongoDB\Field(type="string")
      */
     protected $notes;
+
+    /**
+     * @MongoDB\EmbedOne(targetDocument="AppBundle\Document\Excess\Excess")
+     * @Gedmo\Versioned
+     * @var Excess|null
+     */
+    protected $excess;
 
     public function __construct()
     {
@@ -139,6 +147,16 @@ abstract class Price
         $this->notes = $notes;
     }
 
+    public function getExcess()
+    {
+        return $this->excess;
+    }
+
+    public function setExcess(Excess $excess)
+    {
+        $this->excess = $excess;
+    }
+
     abstract public function createPremium($additionalGwp = null, \DateTime $date = null);
 
     protected function populatePremium(Premium $premium, $additionalGwp = null, \DateTime $date = null)
@@ -150,6 +168,7 @@ abstract class Price
         $premium->setGwp($this->toTwoDp($gwp));
         $premium->setIpt($this->calculateIpt($gwp, $date));
         $premium->setIptRate($this->getCurrentIptRate($date));
+        $premium->setExcess($this->getExcess());
     }
 
     public function toApiArray(\DateTime $date = null)

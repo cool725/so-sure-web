@@ -2,6 +2,7 @@
 
 namespace AppBundle\Document;
 
+use AppBundle\Document\Excess\PhoneExcess;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 
 /**
@@ -10,6 +11,23 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 class PhonePrice extends Price
 {
     use CurrencyTrait;
+
+    /**
+     * @MongoDB\EmbedOne(targetDocument="AppBundle\Document\Excess\PhoneExcess")
+     * @Gedmo\Versioned
+     * @var PhoneExcess|null
+     */
+    protected $picSureExcess;
+
+    public function setPicSureExcess(PhoneExcess $phoneExcess)
+    {
+        $this->picSureExcess = $phoneExcess;
+    }
+
+    public function getPicSureExcess()
+    {
+        return $this->picSureExcess;
+    }
 
     public function getMaxPot($isPromoLaunch = false)
     {
@@ -34,6 +52,7 @@ class PhonePrice extends Price
     {
         $premium = new PhonePremium();
         $this->populatePremium($premium, $additionalGwp, $date);
+        $premium->setPicSureExcess($this->getPicSureExcess());
 
         return $premium;
     }
