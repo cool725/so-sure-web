@@ -7,9 +7,11 @@ use AppBundle\Classes\Salva;
 use AppBundle\Classes\SoSure;
 use Symfony\Component\Validator\Constraints as Assert;
 use AppBundle\Validator\Constraints as AppAssert;
+use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
  * @MongoDB\Document(repositoryClass="AppBundle\Repository\PhoneRepository")
+ * @Gedmo\Loggable(logEntryClass="AppBundle\Document\LogEntry")
  */
 class Phone
 {

@@ -4,9 +4,11 @@ namespace AppBundle\Document;
 
 use AppBundle\Document\Excess\PhoneExcess;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
+use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
  * @MongoDB\EmbeddedDocument
+ * @Gedmo\Loggable(logEntryClass="AppBundle\Document\LogEntry")
  */
 class PhonePrice extends Price
 {
@@ -52,7 +54,9 @@ class PhonePrice extends Price
     {
         $premium = new PhonePremium();
         $this->populatePremium($premium, $additionalGwp, $date);
-        $premium->setPicSureExcess($this->getPicSureExcess());
+        if ($this->getPicSureExcess()) {
+            $premium->setPicSureExcess($this->getPicSureExcess());
+        }
 
         return $premium;
     }

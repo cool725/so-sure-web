@@ -6,12 +6,14 @@ use AppBundle\Document\Excess\Excess;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Symfony\Component\Validator\Constraints as Assert;
 use AppBundle\Validator\Constraints as AppAssert;
+use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
  * @MongoDB\EmbeddedDocument
  * @MongoDB\InheritanceType("SINGLE_COLLECTION")
  * @MongoDB\DiscriminatorField("type")
  * @MongoDB\DiscriminatorMap({"phone"="AppBundle\Document\PhonePrice"})
+ * @Gedmo\Loggable(logEntryClass="AppBundle\Document\LogEntry")
  */
 abstract class Price
 {
@@ -168,7 +170,9 @@ abstract class Price
         $premium->setGwp($this->toTwoDp($gwp));
         $premium->setIpt($this->calculateIpt($gwp, $date));
         $premium->setIptRate($this->getCurrentIptRate($date));
-        $premium->setExcess($this->getExcess());
+        if ($this->getExcess()) {
+            $premium->setExcess($this->getExcess());
+        }
     }
 
     public function toApiArray(\DateTime $date = null)
