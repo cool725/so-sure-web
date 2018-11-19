@@ -106,7 +106,6 @@ use AppBundle\Exception\DirectDebitBankException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 
-
 /**
  * @Route("/user/json")
  * @Security("has_role('ROLE_USER')")
@@ -168,12 +167,13 @@ class UserJsonController extends BaseController
             return new JsonResponse(["message" => "already-sent"], 400);
         }
         $message = $smsService->sendTemplate(
-            $mobileNumber, 'AppBundle:Sms:text-me.txt.twig',
+            $mobileNumber,
+            'AppBundle:Sms:text-me.txt.twig',
             ['branch_pot_url' => $this->getParameter('branch_pot_url')],
             $user->getLatestPolicy(),
             Charge::TYPE_SMS_DOWNLOAD
         );
-         if ($message) {
+        if ($message) {
             $sixpack = $this->get('app.sixpack');
             $sixpack->convertByClientId($user->getId(), $sixpack::EXPERIMENT_APP_LINK_SMS);
             return new Response($message, 200);

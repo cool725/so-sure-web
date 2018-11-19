@@ -170,12 +170,12 @@ class SmsService
     /**
      * Sends an SMS message to a given user with a given template, and commits an SMS charge attributed to them.
      * The SMS charge is not optional for this method.
-     * @param Policy $policy   the user's policy which the message regards.
-     * @param string $template the filename of the template that will be used to render the message.
-     * @param array  $data     the set of parameters that will be used to render the template.
-     * @param string $type     the type of sms charge to be made.
-     * @param boolean     $fake         This causes just the charge to be filed and nothing to be sent.
-     * @return boolean         true iff the sms is sent successfuly.
+     * @param Policy  $policy   the user's policy which the message regards.
+     * @param string  $template the filename of the template that will be used to render the message.
+     * @param array   $data     the set of parameters that will be used to render the template.
+     * @param string  $type     the type of sms charge to be made.
+     * @param boolean $fake     This causes just the charge to be filed and nothing to be sent.
+     * @return boolean true iff the sms is sent successfuly.
      */
     public function sendUser(Policy $policy, $template, $data, $type = Charge::TYPE_SMS_INVITATION, $fake = false)
     {

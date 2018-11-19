@@ -901,6 +901,7 @@ class InvitationService
             $smsTemplate,
             ['invitation' => $invitation],
             $invitation->getPolicy(),
+            $type,
             $this->debug
         );
         $invitation->setStatus($status ? (SmsInvitation::STATUS_SENT) : (SmsInvitation::STATUS_FAILED));
