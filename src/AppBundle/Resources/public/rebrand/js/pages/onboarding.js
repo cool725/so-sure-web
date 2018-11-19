@@ -39,8 +39,7 @@ $(function() {
             }, 1500);
         })
         .fail(function(message) {
-            console.log(message);
-            smsLoader.text('Something went wrong 😥');
+            smsLoader.text('Sorry, we were unable to send you a sms. You can try again later, or just go the App Store/Play Store and search for so-sure 😥');
         });
 
     });
@@ -142,7 +141,6 @@ $(function() {
         showCount: false,
         on: {
             click: function(e) {
-                console.log(this.share);
                 sosure.track.byInvite(this.share);
             }
         }
@@ -214,9 +212,8 @@ $(function() {
                 $('.input-invite').val('').attr('placeholder', 'Send another?');
             })
             .fail(function(data) {
-                // console.log(data);
                 $('.btn-invite').tooltip({
-                    'title':   'Something went wrong 😥',
+                    'title':   'Sorry, we were unable to send your invitation. Please try again later 😥',
                     'trigger': 'manual'
                 }).tooltip('show');
 
@@ -228,13 +225,6 @@ $(function() {
             });
         }
     });
-
-
-
-
-
-
-
 
     let policyFile = null;
     function downloadPolicy() {
@@ -251,14 +241,14 @@ $(function() {
             } else {
                 setTimeout(downloadPolicy, 500);
             }
-        })
-        .fail(function() {
-            setTimeout(downloadPolicy, 500);
         });
     };
+
     downloadPolicy();
 
-    $('#policyDownload').on('click', function() {
+    $('#policy_download').on('click', function(e) {
+        e.preventDefault();
+
         if (policyFile) {
             window.open(policyFile);
         }

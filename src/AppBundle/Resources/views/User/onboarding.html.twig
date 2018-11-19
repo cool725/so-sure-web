@@ -260,7 +260,7 @@
                             {% endif %}
                             <div class="d-lg-flex justify-content-lg-center">
                                 <h5 class="text-zaffre d-lg-none">🔗 Share this link</h5>
-                                <div class="custom-input-with-btn mb-4 ml-lg-4">
+                                <div class="custom-input-with-btn mb-4">
                                     <input name="scode" id="scode" readonly="readonly" type="text" class="form-control" value="{{ policy.standardSCode.shareLink }}">
                                     <div id="scode_share" class="sr-only">Join me on so-sure, a new type of insurer that you can rely on. They protect you when you need to claim and together they'll reward us with cashback when we don't.<br><br>Here is my invite link: {{ policy.standardSCode.shareLink }}</div>
                                     <button class="btn btn-primary btn-copy btn-square btn-sm sosure-track"
@@ -273,7 +273,7 @@
                                 <h5 class="text-zaffre d-lg-none">📨 Invite via email</h5>
                                 <form id="invite_form" autocomplete="nope">
                                     <input type="hidden" name="csrf" value="{{ csrf_token('invite-email') }}" />
-                                    <div class="custom-input-with-btn mb-4">
+                                    <div class="custom-input-with-btn mb-4  ml-lg-4">
                                         <input type="text" class="form-control input-invite" placeholder="Enter email address" name="email_invite" />
                                         <button class="btn btn-success btn-square btn-invite btn-sm" data-path="{{ path('json_invite_email') }}">
                                             Invite</button>
@@ -348,7 +348,7 @@
                                     </div>
                                 </div>
                                 <div class="summary-cardbox__cta">
-                                    <a id="policyDownload" href="#" data-path="{{ path('json_policyterms') }}">
+                                    <a id="policy_download" href="#" data-path="{{ path('json_policyterms') }}">
                                         Preparing Policy Details
                                         <i class="fas fa-circle-notch fa-spin"></i></a>
                                 </div>
