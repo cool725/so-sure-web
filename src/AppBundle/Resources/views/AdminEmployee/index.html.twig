@@ -16,7 +16,7 @@
         <div class="container">
             <div class="row">
                 <div class="col-md">
-                    <h5 class="mb-4">General</h3>
+                    <h5 class="mb-2">General</h3>
                     <div class="list-group">
                         <a class="list-group-item list-group-item-action"
                            href="{{ path('admin_policies') }}">
@@ -46,26 +46,32 @@
                     </div>
                 </div>
                 <div class="col-md">
-                    <h5 class="mb-4">Reporting</h3>
+                    <h5 class="mb-2">Reporting</h3>
                     <div class="list-group">
+                        <a class="list-group-item list-group-item-action"
+                           href="{{ path('admin_kpi') }}">
+                           <i class="fal fa-balance-scale mr-3"></i> KPI</a>
+                        <a class="list-group-item list-group-item-action"
+                           href="{{ path('admin_reports') }}">
+                            <i class="fal fa-area-chart mr-3"></i> Reports</a>
                     </div>
                 </div>
-                {# {% if is_granted('ROLE_ADMIN') %}
+                {% if is_granted('ROLE_ADMIN') %}
                     <div class="col-md">
-                        <h5 class="mb-4">Accounts</h3>
+                        <h5 class="mb-2">Accounts</h3>
                         <div class="list-group">
                         </div>
                     </div>
                 {% endif %}
                 {% if is_granted('ROLE_EMPLOYEE') %}
                     <div class="col-md">
-                        <h5 class="mb-4">System</h3>
+                        <h5 class="mb-2">System</h3>
                         <div class="list-group">
                             {% if is_granted('ROLE_ADMIN') %}
                             {% endif %}
                         </div>
                     </div>
-                {% endif %} #}
+                {% endif %}
             </div>
         </div>
     </section>
