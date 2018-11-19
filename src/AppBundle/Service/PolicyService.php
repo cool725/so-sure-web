@@ -1416,28 +1416,28 @@ class PolicyService
         $policyRepo = $this->dm->getRepository(Policy::class);
         $policies = $policyRepo->findBy(['status' => Policy::STATUS_UNPAID]);
         foreach ($policies as $policy) {
-            /** @var Policy $policy */
-            if ($policy->shouldExpirePolicy() && $policy->shouldCancelPolicy($prefix)) {
+            try {
+                /** @var Policy $policy */
+                if ($policy->shouldExpirePolicy() && $policy->shouldCancelPolicy($prefix)) {
+                    $msg = sprintf(
+                        'Skipping Cancelling Policy as it should be expired %s / %s',
+                        $policy->getPolicyNumber(),
+                        $policy->getId()
+                    );
+                    $this->logger->error($msg);
+                } elseif ($policy->shouldCancelPolicy($prefix)) {
+                    $cancelled[$policy->getId()] = $policy->getPolicyNumber();
+                    if (!$dryRun) {
+                        $this->cancel($policy, Policy::CANCELLED_UNPAID, true, null, $skipUnpaidMinTimeframeCheck);
+                    }
+                }
+            } catch (\Exception $e) {
                 $msg = sprintf(
-                    'Skipping Cancelling Policy as it should be expired %s / %s',
+                    'Error Cancelling Policy %s / %s',
                     $policy->getPolicyNumber(),
                     $policy->getId()
                 );
-                $this->logger->error($msg);
-            } elseif ($policy->shouldCancelPolicy($prefix)) {
-                $cancelled[$policy->getId()] = $policy->getPolicyNumber();
-                if (!$dryRun) {
-                    try {
-                        $this->cancel($policy, Policy::CANCELLED_UNPAID, true, null, $skipUnpaidMinTimeframeCheck);
-                    } catch (\Exception $e) {
-                        $msg = sprintf(
-                            'Error Cancelling Policy %s / %s',
-                            $policy->getPolicyNumber(),
-                            $policy->getId()
-                        );
-                        $this->logger->error($msg, ['exception' => $e]);
-                    }
-                }
+                $this->logger->error($msg, ['exception' => $e]);
             }
         }
 
@@ -1764,7 +1764,16 @@ class PolicyService
             if ($policy->canCreatePendingRenewal($date)) {
                 $pendingRenewal[$policy->getId()] = $policy->getPolicyNumber();
                 if (!$dryRun) {
-                    $this->createPendingRenewal($policy, $date);
+                    try {
+                        $this->createPendingRenewal($policy, $date);
+                    } catch (\Exception $e) {
+                        $msg = sprintf(
+                            'Error creating pending renewal Policy %s / %s',
+                            $policy->getPolicyNumber(),
+                            $policy->getId()
+                        );
+                        $this->logger->error($msg, ['exception' => $e]);
+                    }
                 }
             }
         }
