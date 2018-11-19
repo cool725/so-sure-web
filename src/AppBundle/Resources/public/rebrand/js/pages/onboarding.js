@@ -229,13 +229,16 @@ $(function() {
         }
     });
 
-    let downloading = false;
+
+
+
+
+
+
+
+    let policyFile = null;
     function downloadPolicy() {
-        if (downloading) {
-            return;
-        }
-        downloading = true;
-        $(this).html('<i class="fas fa-circle-notch fa-spin"></i>');
+
         $.ajax({
             url: $(this).data('path'),
             type: 'POST',
@@ -243,23 +246,21 @@ $(function() {
         })
         .done(function(data, status) {
             if (data.file) {
-                window.open(data.file);
-                $(this).tooltip('hide').html('Download policy details<i class="fal fa-download ml-2"></i></a>');
-                downloading = false;
+                policyFile = data.file
+                $(this).html('Download your policy details <i class="fal fa-download ml-2"></i>');
             } else {
                 setTimeout(downloadPolicy, 500);
             }
         })
         .fail(function() {
-            $(this).tooltip({
-                'title':   'Something went wrong 😥',
-                'trigger': 'manual'
-            }).tooltip('show');
-            setTimeout(function(owner) {
-                owner.tooltip('hide').html('Download policy details<i class="fal fa-download ml-2"></i></a>');
-            }, 1000, $(this));
+            setTimeout(downloadPolicy, 500);
         });
     };
+    downloadPolicy();
 
-    $('#policyDownload').on('click', downloadPolicy);
+    $('#policyDownload').on('click', function() {
+        if (policyFile) {
+            window.open(policyFile);
+        }
+    });
 });
