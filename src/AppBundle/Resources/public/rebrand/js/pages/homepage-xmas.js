@@ -8,22 +8,16 @@ require('../../sass/pages/homepage-xmas.scss');
 
 $(function(){
 
-    let snowflakes = [],
-        moveAngle = 0,
-        snowType = '*',
-        animationInterval;
+    let snowIntensity = 400; // smaller number = more snowflakes;
+    let snowType = '*';
 
-    getRandomNumber = (min, max) => {
-        return Math.floor(Math.random() * (max - min + 1)) + min;
-    }
-
-    createSnowflake = () => {
+    function snowFlake(){
         let snowflake = this;
 
-        snowflake.body = $('<span class="snowflake">' + snowType + '</span>');
         snowflake.x = (Math.random() * $(document).width());
         snowflake.size = (Math.random() * 35) + 10;
         snowflake.opacity = Math.random();
+        snowflake.body = $('<span class="snowflake">' + snowType + '</span>');
 
         snowflake.body.css({
             'font-size': this.size + 'px',
@@ -31,84 +25,45 @@ $(function(){
             'opacity': this.opacity
         });
 
-        return snowflake;
-    }
+        snowflake.fall = function(){
+            let that = this;
+            let $snowflake = this.body;
+            let swingDirection = 1;
+            let swingWave = Math.random() * 100;
+            let interval = setInterval(function(){
+                $snowflake.css({left: that.x + (swingDirection * swingWave)});
+                swingDirection = - swingDirection;
+            }, 1000);
+            let speed = (Math.random() * 3000) + 3000;
 
-    moveSnowflakes = () => {
-        let l = snowflakes.length,
-            i;
-
-        moveAngle += 0.01;
-
-        for(i = 0; i < l; i ++){
-            moveSnowflakes(snowflakes[i]);
+            $snowflake.animate({top: '100vh'}, speed, function(){
+                clearInterval(interval);
+                $snowflake.remove();
+            });
         }
+
+        $('body').append(snowflake.body);
+        snowflake.fall();
     }
 
-    moveSnowflake = (snowflake) => {
-        let style  = snowflake.style,
-            height = window.innerHeight,
-            radius,
-            top;
-    }
+    let snow = window.setInterval(function () {
+        new snowFlake();
+    }, snowIntensity);
 
+    $(document).on('keyup', function(e) {
 
-    // let snowIntensity = 400; // smaller number = more snowflakes;
-    // let snowType = '*';
+        // if(e.keyCode == 79){
 
-    // function snowFlake(){
-    //     let snowflake = this;
+            window.clearInterval(snow);
 
-    //     snowflake.x = (Math.random() * $(document).width());
-    //     snowflake.size = (Math.random() * 35) + 10;
-    //     snowflake.opacity = Math.random();
-    //     snowflake.body = $('<span class="snowflake">' + snowType + '</span>');
+        //     window.setInterval(function () {
+        //         snowIntensity = 2000;
+        //         snowType = '🍆';
+        //         new snowFlake();
+        //     }, snowIntensity);
+        // }
+    });
 
-    //     snowflake.body.css({
-    //         'font-size': this.size + 'px',
-    //         'left': this.x +'px',
-    //         'opacity': this.opacity
-    //     });
-
-    //     snowflake.fall = function(){
-    //         let that = this;
-    //         let $snowflake = this.body;
-    //         let swingDirection = 1;
-    //         let swingWave = Math.random() * 100;
-    //         let interval = setInterval(function(){
-    //             $snowflake.css({left: that.x + (swingDirection * swingWave)});
-    //             swingDirection = - swingDirection;
-    //         }, 1000);
-    //         let speed = (Math.random() * 3000) + 3000;
-
-    //         $snowflake.animate({top: '100vh'}, speed, function(){
-    //             clearInterval(interval);
-    //             $snowflake.remove();
-    //         });
-    //     }
-
-    //     $('body').append(snowflake.body);
-    //     snowflake.fall();
-    // }
-
-    // let snow = window.setInterval(function () {
-    //     new snowFlake();
-    // }, snowIntensity);
-
-    // $(document).on('keyup', function(e) {
-
-    //     // if(e.keyCode == 79){
-
-    //         window.clearInterval(snow);
-
-    //     //     window.setInterval(function () {
-    //     //         snowIntensity = 2000;
-    //     //         snowType = '🍆';
-    //     //         new snowFlake();
-    //     //     }, snowIntensity);
-    //     // }
-    // });
-    //
 
 
 });
