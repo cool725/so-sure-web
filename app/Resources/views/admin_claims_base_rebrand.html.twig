@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+        <meta name="referrer" content="origin" />
+
+        <title>{% block title %}so-sure{% endblock %}</title>
+
+        {% block meta %}{% endblock %}
+
+        <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.2.0/css/all.css" integrity="sha384-TXfwrfuHVznxCssTxWoPZjhcss/hp38gEOH8UPZG/JcXonvBQ6SlsIF49wUzsGno" crossorigin="anonymous">
+
+        {% if include_emoji is defined and include_emoji == 1 %}
+            <script src="https://twemoji.maxcdn.com/2/twemoji.min.js?2.2.3"></script>
+        {% endif %}
+
+        <link rel="stylesheet" href="{{ asset('css-js/global.css') }}">
+
+        {% block cssPage %}{% endblock %}
+
+        {% include '::meta_rebrand.html.twig' %}
+
+
+        {% block remotestylesheets %}{% endblock %}
+        {% block metaend %}{% endblock %}
+    </head>
+    <body class="d-flex flex-column {% if body_class is defined %}{{ body_class }}{% endif %}">
+
+        {% block nav %}
+            {% if hide_nav is not defined or not hide_nav %}
+                {% include '::nav_rebrand.html.twig' %}
+            {% endif %}
+        {% endblock %}
+
+        {% include '::flash_rebrand.html.twig' %}
+
+        {% include '::dev_bar_rebrand.html.twig' %}
+
+        <main id="content" class="w-100 flex-grow-1">
+            {% block body %}{% endblock %}
+        </main>
+
+        {% block footer %}
+            {% if hide_footer is not defined or not hide_footer %}
+                {% include '::footer_rebrand.html.twig' %}
+            {% endif %}
+        {% endblock %}
+
+        {% include '::footer_data.html.twig' %}
+
+        <script src="{{ asset('css-js/runtime.js') }}"></script>
+        <script src="{{ asset('css-js/vendor.js') }}"></script>
+
+        {% if hide_cookie_warning is not defined or not hide_cookie_warning %}
+            <script src="{{ asset('css-js/cookie.js') }}"></script>
+        {% endif %}
+
+        <script src="{{ asset('css-js/global.js') }}"></script>
+
+        {% block javascriptsPage %}{% endblock %}
+    </body>
+</html>
