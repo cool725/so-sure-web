@@ -198,7 +198,7 @@ class UserJsonController extends BaseController
         $policyService = $this->get("app.policy");
         $policyTermsFile = $policy->getLatestPolicyTermsFile();
         if (!$policyTermsFile) {
-            return new JsonResponse(["message" => "not-generated"], 204);
+            return new JsonResponse(["message" => "not-generated"], 200);
         }
         $file = $s3->s3DownloadLink($policyTermsFile->getBucket(), $policyTermsFile->getKey());
         return new JsonResponse(["file" => "{$file}"]);
