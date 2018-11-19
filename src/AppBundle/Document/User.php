@@ -2073,7 +2073,6 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
             } else {
                 return static::AQUISITION_NEW;
             }
-
         } elseif ($this->hasPolicy()) {
             return static::AQUISITION_LOST;
         } else {

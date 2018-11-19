@@ -90,10 +90,6 @@ class AffiliateServiceTest extends WebTestCase
         //test on pre loved data.
         $this->assertEquals(0, count(self::$affiliateService->generate([$data["affiliate"]])));
         sleep(60 * 60 * 24 * 21);
-
-
-        print ($data["bango"]->getLatestPolicy()->isPolicyOldEnough(30)) ? "yeah\n" : "nah\n";
-
         $this->assertEquals(2, count(self::$affiliateService->generate([$data["affiliate"]])));
         sleep(60 * 60 * 24 * 365);
         $this->assertEquals(0, count(self::$affiliateService->generate([$data["affiliate"]])));
@@ -102,75 +98,51 @@ class AffiliateServiceTest extends WebTestCase
         $this->assertEquals(5, count(self::$affiliateService->generate([$data["affiliate"]])));
         $this->assertEquals(0, count(self::$affiliateService->generate([$data["affiliate"]])));
         // test on multiple affiliates at the same time.
-        $data1 = $this->createState();
-        $data2 = $this->createState();
-        $this->assertEquals(6, count(self::$affiliateService->generate([$data1["affiliate"], $data2["affiliate"]])));
+        $affiliateB = $this->createState()["affiliate"];
+        $affiliateC = $this->createState()["affiliate"];
+        $this->assertEquals(6, count(self::$affiliateService->generate([$affiliateB, $affiliateC])));
+    }
+
+    public function testOneOffCharges()
+    {
+        $data = $this->createState();
+        $charges = [];
+        self::$affiliateService->oneOffCharges($data["affiliate"], $charges);
+        $this->assertEquals(3, count($charges));
+        $this->assertEquals(3.6, self::sumCost($charges));
+        $charges = [];
+        self::$affiliateService->oneOffCharges($data["affiliate"], $charges);
+        $this->assertEquals(0, count($charges));
+        $this->assertEquals(0, self::sumCost($charges));
     }
 
     /**
      * Tests getting matching users from all status groups when all status groups are populated.
-     * @param string $affiliate is the name of the affiliate to test on.
-     * @param array  $status    is an array of the statuses we are searching for.
-     * @param array  $expected  is an array of emails of the users who should be returned.
-     * @dataProvider getMatchingUsersProvider .
+     * @dataProvider testGetMatchingUsersProvider
      */
-    public function testGetMatchingUsers($affiliate, $status, $expected)
+    public function testGetMatchingUsers($count, $states)
     {
-        $this->createState();
-        $expectedUsers = $this->usersByName(self::$dm, $expected);
-        $users = self::$affiliateService->getMatchingUsers($this->affiliate($affiliate), $status);
-        $this->assertEquals(count($expectedUsers), count($users));
-        foreach($users as $user) {
-            $found = false;
-            $id = $user->getId();
-            foreach($expectedUsers as $expectedUser) {
-                if ($id == $expectedUser->getId()) {
-                    $found = true;
-                    break;
-                }
-            }
-            $this->assertTrue($found);
-        }
+        $data = $this->createState();
+        $this->assertEquals(
+            2,
+            count(self::$affiliateService->getMatchingUsers($data["affiliate"], [User::AQUISITION_NEW]))
+        );
     }
 
     /**
-     * Generates the data to run testGetMatchingUsers.
-     * @return array with the test data.
+     * Provides data for test get matching users.
      */
-    public static function getMatchingUsersProvider()
-    {
+    private function testGetMatchingUsersProvider() {
         return [
-            [
-                "campaignA",
-                [User::AQUISITION_PENDING],
-                ["tony", "bango", "tango", "snakeHandler", "wearingABigHat"]
-            ],
-            [
-                "campaignA",
-                [User::AQUISITION_POTENTIAL],
-                ["aaa", "bbb"]
-            ],
-            [
-                "campaignA",
-                [User::AQUISITION_LOST],
-                ["lostAGuy"]
-            ],
-            [
-                "campaignA",
-                [User::AQUISITION_CONFIRMED],
-                ["completedAGuy"]
-            ],
-            [
-                "leadA",
-                [User::AQUISITION_PENDING, User::AQUISITION_POTENTIAL],
-                ["clove", "bone", "borb", "tonyAbbot", "shelf", "jellyfish", "eel"]
-            ],
-            [
-                "campaignB",
-                [User::AQUISITION_PENDING],
-                []
-            ]
-        ];
+            [3, [User::AQUISITION_NEW, User::AQUISITION_LOST]],
+            [4, [User::AQUISITION_PENDING, User::AQUISITION_POTENTIAL]],
+            [2, [User::AQUISITION_LOST, User::AQUISITION_POTENTIAL]],
+            [5, [User::AQUISITION_NEW, User::AQUISITION_PENDING]],
+            [1, [User::AQUISITION_LOST]],
+            [1, [User::AQUISITION_POTENTIAL]],
+            [2, [User::AQUISITION_NEW]],
+            [3, [User::AQUISITION_PENDING]]
+        ]
     }
 
     /**
@@ -197,20 +169,24 @@ class AffiliateServiceTest extends WebTestCase
         $prefix = uniqid();
         $affiliate = self::createTestAffiliate(
             "{$prefix}campaign",
-            1,
+            1.2,
             30,
             "line 1",
             "london",
             "{$prefix}campaign",
             "{$prefix}lead"
         );
+        $cancel =  self::createTestUser("P40D", "{$prefix}cancel", "{$prefix}campaign");
+        $cancel->getLatestPolicy()->setStatus(Policy::STATUS_CANCELLED);
         return [
             "affiliate" => $affiliate,
             "bango" => self::createTestUser("P10D", "{$prefix}bango", "{$prefix}campaign"),
-            "tango" => self::createTestUser("P20D", "{$prefix}tango", "{$prefix}campaign"),
+            "tango" => self::createTestUser("P20D", "{$prefix}tango", "", "{$prefix}lead"),
             "hat" => self::createTestUser("P30D", "{$prefix}hat", "{$prefix}campaign"),
-            "borb" => self::createTestUser("P40D", "{$prefix}borb", "{$prefix}campaign"),
+            "borb" => self::createTestUser("P40D", "{$prefix}borb", "", "{$prefix}lead"),
             "tonyAbbot" => self::createTestUser("P50D", "{$prefix}tonyAbbot", "{$prefix}campaign"),
+            "camel" => self::createLonelyTestUser("{$prefix}camel", "", "{$prefix}lead"),
+            "cancel" => $cancel,
             "prefix" => $prefix
         ];
     }
@@ -279,7 +255,7 @@ class AffiliateServiceTest extends WebTestCase
 
     /**
      * Creates a test user with no policy.
-     * @param string $name  is the first and last names and email address of the user.
+     * @param string $name   is the first and last names and email address of the user.
      * @param string $source is the campaign source of the user.
      * @param string $lead   is the lead source of the user.
      * @return User the user that has now been created.
@@ -300,6 +276,11 @@ class AffiliateServiceTest extends WebTestCase
         return $user;
     }
 
+    /**
+     * Creates a new policy for a given user and gives it a given start date.
+     * @param User      $user is the user to add the new policy to.
+     * @param \DateTime $date is the date to set the policy's start date at.
+     */
     private static function createTestPolicy($user, $date)
     {
         $policy = new PhonePolicy();
