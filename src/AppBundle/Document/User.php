@@ -1053,7 +1053,6 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
                 return true;
             }
         }
-
         return false;
     }
 

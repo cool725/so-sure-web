@@ -116,22 +116,16 @@ class AffiliateService
             ->sub(new DateInterval("P1Y"))
             ->add(new DateInterval("P".($affiliate->getRenewalDays() ?: 0)."D"));
         $users = $this->getMatchingUsers($affiliate);
-        print "=============================\n";
         foreach ($users as $user) {
-            print $user->getEmail();
             $policies = $user->getValidPolicies(true);
             $charge = $this->chargeRepository->findLastByUser($user, Charge::TYPE_AFFILIATE);
             if (count($policies) == 1) {
-                print " 1 policy \n";
                 if (($charge && $charge->getCreatedDate() < $renewalWait) ||
-                    $user->isAffiliateCandidate($affiliate->getDays())
+                    ($user->isAffiliateCandidate($affiliate->getDays()) && !$user->getAffiliate())
                 ) {
-                    print("charge and it's older than a year or so or affiliate candidate\n");
-                    print $charge->getCreatedDate()->format('Y-m-d H:i:s');
                     $generatedCharges[] = $this->createCharge($affiliate, $user, $policies[0]);
                 }
             } elseif ($charge) {
-                print " many policies and charge ";
                 foreach ($policies as $policy) {
                     if ($policy->getStatus() == Policy::STATUS_RENEWAL) {
                         $previous = $policy->getPreviousPolicy();
