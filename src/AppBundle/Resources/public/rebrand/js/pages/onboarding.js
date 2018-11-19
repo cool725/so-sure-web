@@ -228,18 +228,16 @@ $(function() {
 
     let policyFile = null;
     function downloadPolicy() {
-
         $.ajax({
-            url: $(this).data('path'),
-            type: 'POST',
-            context: this
+            url: $('#policy_download').data('path'),
+            type: 'POST'
         })
         .done(function(data, status) {
             if (data.file) {
                 policyFile = data.file
-                $(this).html('Download your policy details <i class="fal fa-download ml-2"></i>');
+                $('#policy_download').html('Download your policy details <i class="fal fa-download ml-2"></i>');
             } else {
-                setTimeout(downloadPolicy, 500);
+                setTimeout(downloadPolicy, 11000);
             }
         });
     };
