@@ -1,310 +1,132 @@
-    <div class="modal fade" id="claimsModal" tabindex="-1" role="dialog">
-      <div class="modal-dialog" role="document" style="width: 50%">
+<div class="modal" id="claimsModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
         <div class="modal-content">
-        {% if policyId is defined and policyId %}
-            <form id="phone-alternative-form" method="post" action="{{ path('admin_claims_update_claim_policy', {'route': route, 'policyId': policyId}) }}">
-        {% else %}
-            <form id="phone-alternative-form" method="post" action="{{ path('admin_claims_update_claim', {'route': route}) }}">
-        {% endif %}
-            <input type="hidden" name="id" id="claims-detail-id"></input>
-            <input type="hidden" name="token" value="{{  csrf_token('default') }}"></input>
             <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            {% if is_granted('ROLE_CUSTOMER_SERVICES') %}
-                <h4>Claim: <input type="text" name="claims-detail-number" readonly="true" id="claims-detail-number"/>
-                    <label for="change-claim-number" >(change)</label><input type="checkbox" id="change-claim-number" name="change-claim-number">
-
-                    <button class="btn btn-blue-hollow btn-copy"
-                            data-clipboard-target="#claims-detail-number"
-                            data-toggle="tooltip"
-                            data-placement="bottom"
-                            title="Copy to clipboard"
-                    ><i class="fa fa-clipboard"></i>
-                    </button>
-                </h4>
-            {% else %}
-                <h4 class="modal-title">Claim: Unknown</h4>
-            {% endif %}
-          </div>
-          <div class="modal-body">
-            <h3>General</h3>
-            <table class="table table-striped">
-                <tr>
-                    <td>Policy</td>
-                    <td id='claims-detail-policy'></td>
-                </tr>
-                <tr>
-                    <td>Type
-                    {% if claim_types is defined%}
-                      <td>
-                          <select disabled="disabled" name="claim-type" id="claims-detail-type">
-                              {% for type in claim_types %}
-                                  <option value="{{ type }}">{{ type }}</option>
-                              {% endfor %}
-                          </select>
-                          {% if is_granted('ROLE_CUSTOMER_SERVICES') %}
-                          <label>(change)</label>
-                          <input type="checkbox" id="change-claim-type" name="change-claim-type"></td>
-                          {% endif %}
-                      </td>
-                    {% endif %}
-
-                <tr>
-                    <td>Status</td>
-                    <td id='claims-detail-status'></td>
-                </tr>
-                <tr {% if app.user.handlingTeam == 'davies' %}class="hidden"{% endif %}>
-                    <td>Claim Handling Team</td>
-                    <td id='claims-detail-handling-team'></td>
-                </tr>
-                <tr>
-                    <td>Number to reach</td>
-                    <td id='claims-detail-number-to-reach'></td>
-                </tr>
-                <tr>
-                    <td>Time to reach</td>
-                    <td id='claims-detail-time-to-reach'></td>
-                </tr>
-                <tr>
-                    <td>Initial Suspicion</td>
-                    <td id='claims-detail-initial-suspicion'></td>
-                </tr>
-                <tr>
-                    <td>Final Suspicion</td>
-                    <td id='claims-detail-final-suspicion'></td>
-                </tr>
-                <tr>
-                    <td>Incident Date</td>
-                    <td id='claims-detail-incident-date'></td>
-                </tr>
-                <tr>
-                    <td>Incident Location</td>
-                    <td id='claims-detail-incident-location'></td>
-                </tr>
-                <tr>
-                    <td>Description</td>
-                    <td id='claims-detail-description'></td>
-                </tr>
-                <tr>
-                    <td>Notes</td>
-                    <td id='claims-detail-notes'></td>
-                </tr>
-            </table>
-            <div id='claims-damage'>
-                <h3>Damage</h3>
-                <table class="table table-striped">
-                    <tr>
-                        <td>Details</td>
-                        <td id='claims-detail-type-details'></td>
-                    </tr>
-                    <tr>
-                        <td>Bought on</td>
-                        <td id='claims-detail-bought'></td>
-                    </tr>
-                    <tr>
-                        <td>Condition</td>
-                        <td id='claims-detail-phone-status'></td>
-                    </tr>
-                    <tr>
-                        <td>Proof of usages</td>
-                        <td id='claims-detail-damage-proof-usages'></td>
-                    </tr>
-                    <tr>
-                        <td>Pictures of phone</td>
-                        <td id='claims-detail-pictures-phone'></td>
-                    </tr>
-                    <tr>
-                        <td>Others</td>
-                        <td id='claims-detail-damage-others'></td>
-                    </tr>
-                </table>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">Claim: ''</h4>
             </div>
-            <div id='claims-theftloss'>
-                <h3>Theft/Lost</h3>
-                <table class="table table-striped">
-                    <tr>
-                        <td>Contacted</td>
-                        <td id='claims-detail-contacted'></td>
-                    </tr>
-                    <tr>
-                        <td>Network</td>
-                        <td id='claims-detail-network'></td>
-                    </tr>
-                    <tr>
-                        <td>Blocked</td>
-                        <td id='claims-detail-blocked'></td>
-                    </tr>
-                    <tr>
-                        <td>Reported on</td>
-                        <td id='claims-detail-reported'></td>
-                    </tr>
-                    <tr>
-                        <td>Reported to</td>
-                        <td id='claims-detail-reported-to'></td>
-                    </tr>
-                    <tr>
-                        <td>Proof of usage</td>
-                        <td id='claims-detail-theftloss-proof-usages'></td>
-                    </tr>
-                    <tr>
-                        <td>Proof of barring</td>
-                        <td id='claims-detail-proof-barrings'></td>
-                    </tr>
-                    <tr>
-                        <td>Proof of purchase</td>
-                        <td id='claims-detail-proof-purchases'></td>
-                    </tr>
-                    <tr id='claims-detail-proof-losses-container'>
-                        <td>Proof of loss</td>
-                        <td id='claims-detail-proof-losses'></td>
-                    </tr>
-                    <tr>
-                        <td>Other</td>
-                        <td id='claims-detail-theftloss-others'></td>
-                    </tr>
-                    <tr id='claims-detail-crime-reference-container'>
-                        <td>Crime reference number</td>
-                        <td id='claims-detail-crime-reference'></td>
-                    </tr>
-                    <tr id='claims-detail-policy-report-container'>
-                        <td>Police report</td>
-                        <td id='claims-detail-policy-report'></td>
-                    </tr>
-                </table>
+
+            <ul class="nav nav-tabs" id="myTab" role="tablist">
+                <li class="nav-item active">
+                    <a class="nav-link" id="general-tab" data-toggle="tab" href="#general" role="tab"
+                       aria-controls="general"
+                       aria-selected="true">General</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="profile-tab" data-toggle="tab" href="#damage" role="tab"
+                       aria-controls="damage"
+                       aria-selected="false">Damage</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="replacement-tab" data-toggle="tab" href="#replacement" role="tab"
+                       aria-controls="replacement"
+                       aria-selected="false">Replacement Phone</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="dates-tab" data-toggle="tab" href="#dates" role="tab"
+                       aria-controls="dates"
+                       aria-selected="false">Dates</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="amounts-tab" data-toggle="tab" href="#amounts" role="tab"
+                       aria-controls="amounts"
+                       aria-selected="false">Amounts</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="update-tab" data-toggle="tab" href="#update" role="tab"
+                       aria-controls="update"
+                       aria-selected="false">Update</a>
+                </li>
+            </ul>
+
+            <div class="modal-body">
+
+                <div class="container-fluid">
+
+                    <div class="tab-content" id="tab-content">
+                        <div class="tab-pane fade in active" id="general" role="tabpanel"
+                             aria-labelledby="general-tab">
+                            <table class="table table-striped">
+                                <tr>
+                                    <td>Policy</td>
+                                    <td id='claims-detail-policy'></td>
+                                </tr>
+                                <tr>
+                                    <td>Type</td>
+                                    <td id="claims-type"></td>
+                                <tr>
+                                    <td>Status</td>
+                                    <td id='claims-detail-status'></td>
+                                </tr>
+                                <tr>
+                                    <td>Claim Handling Team</td>
+                                    <td id='claims-detail-handling-team'></td>
+                                </tr>
+                                <tr>
+                                    <td>Number to reach</td>
+                                    <td id='claims-detail-number-to-reach'></td>
+                                </tr>
+                                <tr>
+                                    <td>Time to reach</td>
+                                    <td id='claims-detail-time-to-reach'></td>
+                                </tr>
+                                <tr>
+                                    <td>Initial Suspicion</td>
+                                    <td id='claims-detail-initial-suspicion'></td>
+                                </tr>
+                                <tr>
+                                    <td>Final Suspicion</td>
+                                    <td id='claims-detail-final-suspicion'></td>
+                                </tr>
+                                <tr>
+                                    <td>Incident Date</td>
+                                    <td id='claims-detail-incident-date'></td>
+                                </tr>
+                                <tr>
+                                    <td>Incident Location</td>
+                                    <td id='claims-detail-incident-location'></td>
+                                </tr>
+                                <tr>
+                                    <td>Description</td>
+                                    <td id='claims-detail-description'></td>
+                                </tr>
+                                <tr>
+                                    <td>Notes</td>
+                                    <td id='claims-detail-notes'></td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <div class="tab-pane fade" id="damage" role="tabpanel" aria-labelledby="damage-tab">
+                            damage
+                        </div>
+
+                        <div class="tab-pane fade" id="replacement" role="tabpanel" aria-labelledby="replacement-tab">
+                            replacement
+                        </div>
+
+                        <div class="tab-pane fade" id="dates" role="tabpanel" aria-labelledby="dates-tab">
+                            dates
+                        </div>
+
+                        <div class="tab-pane fade" id="amounts" role="tabpanel" aria-labelledby="amounts-tab">
+                            amounts
+                        </div>
+
+                        <div class="tab-pane fade" id="update" role="tabpanel" aria-labelledby="update-tab">
+                            update
+                        </div>
+                    </div>
+
+                </div>
             </div>
-            <h3>Replacement Phone</h3>
-            <table class="table table-striped">
-                <tr>
-                    <td>Replacement IMEI</td>
-                    <td id='claims-detail-replacement-imei'></td>
-                </tr>
-                <tr>
-                    <td>Replacement Phone Details
-                    </td>
-                    <td id='claims-detail-replacement-phone-details'>
-                </tr>
-                <tr>
-                    <td>
-                        Replacement phone
-                    </td>
-                    <td>
-                        {% if phones is defined%}
-                            <select disabled="disabled" name="replacement-phone" id="claims-detail-replacement-phone">
-                                    <option value="">-- Select a phone --</option>
-                                {% for phone in phones %}
-                                    <option value="{{ phone.id }}">{{ phone }}</option>
-                                {% endfor %}
-                            </select>
-                            {% if is_granted('ROLE_CUSTOMER_SERVICES') %}
-                            <label>(change)</label>
-                            <input type="checkbox" name='update-replacement-phone' id="update-replacement-phone"/>
-                            {% endif %}
-                        {% endif %}
-                    </td>
-                </tr>
-                <tr>
-                    <td>Insured phone</td>
-                    <td id='claims-detail-policy-phone'></td>
-                </tr>
-            </table>
-            <h3>Dates</h3>
-            <table class="table table-striped">
-                <tr>
-                    <td>Loss</td>
-                    <td id='claims-detail-loss'></td>
-                </tr>
-                <tr>
-                    <td>Notification</td>
-                    <td id='claims-detail-notification'></td>
-                </tr>
-                <tr>
-                    <td>Recorded</td>
-                    <td id='claims-detail-recorded'></td>
-                </tr>
-                <tr>
-                    <td>Submitted</td>
-                    <td id='claims-detail-submitted'></td>
-                </tr>
-                <tr>
-                    <td>Approved
-                    </td>
-                        <td>
-                            <input type="text" name="approved-date" readonly="readonly" id="claims-detail-approved"/>
-                            {% if is_granted('ROLE_CUSTOMER_SERVICES') %}
-                            <label>(change)</label>
-                            <input type="checkbox" id="change-approved-date" name="change-approved-date">
-                            {% endif %}
-                        </td>
-                </tr>
-                <tr>
-                    <td>Replacement Received</td>
-                    <td id='claims-detail-replacement'></td>
-                </tr>
-                <tr>
-                    <td>Closed</td>
-                    <td id='claims-detail-closed'></td>
-                </tr>
-            </table>
-            <h3>Amounts</h3>
-            <table class="table table-striped">
-                <tr>
-                    <td>Excess</td>
-                    <td id='claims-detail-excess'></td>
-                </tr>
-                <tr>
-                    <td>Unauthorized Calls</td>
-                    <td id='claims-detail-unauthorized-calls'></td>
-                </tr>
-                <tr>
-                    <td>Accessories</td>
-                    <td id='claims-detail-accessories'></td>
-                </tr>
-                <tr>
-                    <td>Phone Replacement Cost</td>
-                    <td id='claims-detail-replacement-cost'></td>
-                </tr>
-                <tr>
-                    <td>Transaction Fees</td>
-                    <td id='claims-detail-transaction'></td>
-                </tr>
-                <tr>
-                    <td>Claim Handling Fees</td>
-                    <td id='claims-detail-handling'></td>
-                </tr>
-                <tr>
-                    <td>Reserved</td>
-                    <td id='claims-detail-reserved'></td>
-                </tr>
-                <tr>
-                    <td>Total Incurred</td>
-                    <td id='claims-detail-total-incurred'></td>
-                </tr>
-                <tr id="update-button-row">
-                    {% if is_granted('ROLE_ADMIN') %}
-                    <td>
-                        <button id="delete-button" id="delete-claim"  type="button" class="btn btn-danger">Delete Claim</button>
-                    </td>
-                    {% endif %}
 
-                    {% if is_granted('ROLE_CUSTOMER_SERVICES') %}
-                    <td>
-                        <button id="update-button" class="btn btn-success">Save Updates</button>
-                    </td>
-                    {% endif %}
-                </tr>
-            </table>
-          </div>
-          <div class="modal-footer">
-              <button type="button" class="btn-xs btn-black-hollow" data-dismiss="modal">Close</button>
-        </form>
-            {% if is_granted('ROLE_ADMIN') %}
-            <form id="delete-claim-form" method="POST" action="{{ path('admin_claims_delete_claim') }}">
-                <input type="hidden" name="id" id="claims-detail-delete-id"></input>
-                <input type="hidden" name="token" value="{{  csrf_token('default') }}"></input>
-            </form>
-            {% endif %}
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary">Save stuff</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
         </div>
-
-        </div>
-      </div>
     </div>
+</div>

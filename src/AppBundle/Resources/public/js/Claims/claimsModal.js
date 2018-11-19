@@ -43,6 +43,18 @@ $('#claimsModal').on('show.bs.modal', function (event) {
     var documents = button.data('documents');
     var modal = $(this);
 
+
+    $.ajax({
+        url: "/"
+    })
+        .done(function (data) {
+            alert(JSON.stringify(data));
+        })
+        .fail(function (jqXHR, textStatus) {
+            alert("error: " + textStatus);
+        });
+
+
     if (claim) {
         if ($('#claims-detail-number')) {
             modal.find('#claims-detail-number').val(claim.number);

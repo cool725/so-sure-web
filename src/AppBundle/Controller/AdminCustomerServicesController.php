@@ -187,6 +187,60 @@ class AdminCustomerServicesController extends BaseController
     }
 
     /**
+     * @Route("/claims/update-claim/{route}/{id}", name="admin_claims_update_claim_policy")
+     * @Method({"POST"})
+     */
+    public function claimsUpdateForm(Request $request, $id = null)
+    {
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(Claim::class);
+        /** @var Claim $claim */
+        $claim = $repo->find($id);
+
+        if (!$claim) {
+            throw $this->createNotFoundException(sprintf('Claim for policy %s not found', $id));
+        }
+
+        $imei = new Imei();
+        $imei->setPolicy($policy);
+        $imeiForm = $this->get('form.factory')
+            ->createNamedBuilder('imei_form', ImeiType::class, $imei)
+            ->setAction($this->generateUrl(
+                'imei_form',
+                ['id' => $id]
+            ))
+            ->getForm();
+
+        if ('POST' === $request->getMethod()) {
+            if ($request->request->has('imei_form')) {
+                $imeiForm->handleRequest($request);
+                if ($imeiForm->isValid()) {
+                    $policy->adjustImei($imei->getImei(), false);
+
+                    $policy->addNote(json_encode([
+                        'user_id' => $this->getUser()->getId(),
+                        'name' => $this->getUser()->getName(),
+                        'notes' => $imei->getNote()
+                    ]));
+
+                    $dm->flush();
+                    $this->addFlash(
+                        'success',
+                        sprintf('Policy %s imei updated.', $policy->getPolicyNumber())
+                    );
+
+                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
+                }
+            }
+        }
+
+        return [
+            'form' => $imeiForm->createView(),
+            'policy' => $policy
+        ];
+    }
+
+    /**
      * @Route("/claim/flag/{id}", name="admin_claim_flags")
      * @Method({"POST"})
      */
