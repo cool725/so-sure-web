@@ -172,7 +172,7 @@ class ClaimsController extends BaseController
                             $this->addFlash('success', sprintf(
                                 'Claim %s is updated. Excess is £%d',
                                 $claim->getNumber(),
-                                $claim->getExpectedExcess()
+                                $claim->getExpectedExcessValue()
                             ));
 
                             return $this->redirectToRoute('claims_policy', ['id' => $id]);
@@ -183,7 +183,7 @@ class ClaimsController extends BaseController
                         $this->addFlash('success', sprintf(
                             'Claim %s is added. Excess is £%d',
                             $claim->getNumber(),
-                            $claim->getExpectedExcess()
+                            $claim->getExpectedExcessValue()
                         ));
 
                         return $this->redirectToRoute('claims_policy', ['id' => $id]);

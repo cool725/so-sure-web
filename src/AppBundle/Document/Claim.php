@@ -2,6 +2,7 @@
 
 namespace AppBundle\Document;
 
+use AppBundle\Document\Excess\Excess;
 use AppBundle\Document\File\ProofOfLossFile;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Gedmo\Mapping\Annotation as Gedmo;
@@ -753,6 +754,13 @@ class Claim
      * @Gedmo\Versioned
      */
     protected $supplierStatus;
+
+    /**
+     * @MongoDB\EmbedOne(targetDocument="AppBundle\Document\Excess\Excess")
+     * @Gedmo\Versioned
+     * @var Excess|null
+     */
+    protected $expectedExcess;
 
     public function __construct()
     {
@@ -1693,6 +1701,18 @@ class Claim
         return false;
     }
 
+    /*
+    public function getExpectedExcess()
+    {
+        return $this->expectedExcess;
+    }
+
+    public function setExpectedExcess(Excess $excess)
+    {
+        $this->expectedExcess = $excess;
+    }
+    */
+
     public static function sumClaims($claims)
     {
         $data = [
@@ -1833,7 +1853,7 @@ class Claim
         ];
     }
 
-    public function getExpectedExcess()
+    public function getExpectedExcessValue()
     {
         if (in_array($this->getStatus(), [
             Claim::STATUS_DECLINED,

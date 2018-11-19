@@ -4911,6 +4911,11 @@ abstract class Policy
             $this->areEqualToTwoDp($this->getPromoPotValue(), $this->calculatePotValue(true));
     }
 
+    public function getExcess()
+    {
+        return $this->getPremium()->getExcess();
+    }
+
     public function getExpectedCommission(\DateTime $date = null)
     {
         $salva = new Salva();

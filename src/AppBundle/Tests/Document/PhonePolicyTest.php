@@ -343,7 +343,7 @@ class PhonePolicyTest extends WebTestCase
     {
         $policy = new SalvaPhonePolicy();
         $phone = new Phone();
-        $phone->init('foo', 'bar', 7.29, 1.50, self::getLatestPolicyTerms(static::$dm));
+        $phone->init('foo', 'bar', 7.29, self::getLatestPolicyTerms(static::$dm), 1.50);
         $policy->setPhone($phone);
 
         $policyApi = $policy->toApiArray();
