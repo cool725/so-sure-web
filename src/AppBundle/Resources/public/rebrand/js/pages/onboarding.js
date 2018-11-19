@@ -229,12 +229,11 @@ $(function() {
     let policyFile = null;
     function downloadPolicy() {
         $.ajax({
-            url: $('#policy_download').data('path'),
-            type: 'POST'
+            url: $('#policy_download').data('path')
         })
         .done(function(data, status) {
             if (data.file) {
-                policyFile = data.file
+                policyFile = data.file;
                 $('#policy_download').html('Download your policy details <i class="fal fa-download ml-2"></i>');
             } else {
                 setTimeout(downloadPolicy, 11000);

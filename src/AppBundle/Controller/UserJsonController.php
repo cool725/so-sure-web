@@ -185,7 +185,7 @@ class UserJsonController extends BaseController
 
     /**
      * @Route("/app/policyterms", name="json_policyterms")
-     * @Method({"POST"})
+     * @Method({"GET"})
      */
     public function policyTermsAction()
     {
