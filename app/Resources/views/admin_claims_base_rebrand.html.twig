@@ -16,6 +16,7 @@
         {% endif %}
 
         <link rel="stylesheet" href="{{ asset('css-js/global.css') }}">
+        <link rel="stylesheet" href="{{ asset('css-js/admin.css') }}">
 
         {% block cssPage %}{% endblock %}
 
@@ -28,6 +29,7 @@
     <body class="d-flex flex-column {% if body_class is defined %}{{ body_class }}{% endif %}">
 
         {% block nav %}
+            {# TODO: Switch to user area nav when made #}
             {% if hide_nav is not defined or not hide_nav %}
                 {% include '::nav_rebrand.html.twig' %}
             {% endif %}
@@ -51,12 +53,8 @@
 
         <script src="{{ asset('css-js/runtime.js') }}"></script>
         <script src="{{ asset('css-js/vendor.js') }}"></script>
-
-        {% if hide_cookie_warning is not defined or not hide_cookie_warning %}
-            <script src="{{ asset('css-js/cookie.js') }}"></script>
-        {% endif %}
-
         <script src="{{ asset('css-js/global.js') }}"></script>
+        <script src="{{ asset('css-js/admin.js') }}"></script>
 
         {% block javascriptsPage %}{% endblock %}
     </body>
