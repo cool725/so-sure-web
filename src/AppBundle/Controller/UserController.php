@@ -1280,18 +1280,10 @@ class UserController extends BaseController
             1
         );
 
-        // if the policy file has not been generated, then that must be done before we can let them download.
-        $policyTermsFile = $policy->getLatestPolicyTermsFile();
-        if (!$policyTermsFile) {
-            $policyService->generatePolicyTerms($policy);
-            $policyTermsFile = $policy->getLatestPolicyTermsFile();
-        }
-
         return $this->render('AppBundle:User:onboarding.html.twig', [
             'cancel_url' => $this->generateUrl('purchase_cancel_damaged', ['id' => $user->getLatestPolicy()->getId()]),
             'policy_key' => $this->getParameter('policy_key'),
             'policy' => $policy,
-            'policy_terms_file' => $policyTermsFile,
             'has_visited_welcome_page' => $pageVisited,
             'oauth2FlowParams' => $oauth2FlowParams,
             'user' => $user,

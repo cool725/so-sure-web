@@ -104,9 +104,12 @@ use AppBundle\Exception\ImeiPhoneMismatchException;
 use AppBundle\Exception\InvalidEmailException;
 use AppBundle\Exception\DirectDebitBankException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
+
 
 /**
  * @Route("/user/json")
+ * @Security("has_role('ROLE_USER')")
  */
 class UserJsonController extends BaseController
 {
@@ -177,5 +180,27 @@ class UserJsonController extends BaseController
         } else {
             return new Response("no", 500);
         }
+    }
+
+    /**
+     * @Route("/app/policyfile", name="json_policyfile")
+     * @Method({"POST"})
+     */
+    public function policyTermsAction()
+    {
+        $user = $this->getUser();
+        if (!$user) {
+            return new Response(400);
+        }
+        $s3 = $this->get("app.twig.s3");
+        $policy = $user->getLatestPolicy();
+        $policyService = $this->get("app.policy");
+        $policyTermsFile = $policy->getLatestPolicyTermsFile();
+        if (!$policyTermsFile) {
+            $policyService->generatePolicyTerms($policy);
+            $policyTermsFile = $policy->getLatestPolicyTermsFile();
+        }
+        $file = $s3->s3DownloadLink($policyTermsFile->getBucket(), $policyTermsFile->getKey());
+        return new JsonResponse(["file" => "{$file}"]);
     }
 }
