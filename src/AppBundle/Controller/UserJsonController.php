@@ -184,7 +184,7 @@ class UserJsonController extends BaseController
     }
 
     /**
-     * @Route("/app/policyfile", name="json_policyfile")
+     * @Route("/app/policyterms", name="json_policyterms")
      * @Method({"POST"})
      */
     public function policyTermsAction()
@@ -198,8 +198,7 @@ class UserJsonController extends BaseController
         $policyService = $this->get("app.policy");
         $policyTermsFile = $policy->getLatestPolicyTermsFile();
         if (!$policyTermsFile) {
-            $policyService->generatePolicyTerms($policy);
-            $policyTermsFile = $policy->getLatestPolicyTermsFile();
+            return new JsonResponse(["message" => "not-generated"], 204);
         }
         $file = $s3->s3DownloadLink($policyTermsFile->getBucket(), $policyTermsFile->getKey());
         return new JsonResponse(["file" => "{$file}"]);
