@@ -113,19 +113,25 @@ class AffiliateService
     public function ongoingCharges($affiliate, & $generatedCharges = null)
     {
         $renewalWait = DateTime::createFromFormat('U', time())
-            ->sub(new DateInterval("P1y"))
-            ->add(new DateInterval("P".$affiliate->getRenewalDays()."D"));
+            ->sub(new DateInterval("P1Y"))
+            ->add(new DateInterval("P".($affiliate->getRenewalDays() ?: 0)."D"));
         $users = $this->getMatchingUsers($affiliate);
+        print "=============================\n";
         foreach ($users as $user) {
+            print $user->getEmail();
             $policies = $user->getValidPolicies(true);
             $charge = $this->chargeRepository->findLastByUser($user, Charge::TYPE_AFFILIATE);
             if (count($policies) == 1) {
+                print " 1 policy \n";
                 if (($charge && $charge->getCreatedDate() < $renewalWait) ||
                     $user->isAffiliateCandidate($affiliate->getDays())
                 ) {
+                    print("charge and it's older than a year or so or affiliate candidate\n");
+                    print $charge->getCreatedDate()->format('Y-m-d H:i:s');
                     $generatedCharges[] = $this->createCharge($affiliate, $user, $policies[0]);
                 }
             } elseif ($charge) {
+                print " many policies and charge ";
                 foreach ($policies as $policy) {
                     if ($policy->getStatus() == Policy::STATUS_RENEWAL) {
                         $previous = $policy->getPreviousPolicy();
@@ -143,6 +149,7 @@ class AffiliateService
                     }
                 }
             } else {
+                print (" many policy no charge");
                 $this->logger->error(
                     "User ".$user->getEmail()." has multiple active policies, but no affiliate charges recorded."
                 );
@@ -174,13 +181,14 @@ class AffiliateService
             ]);
         }
         $users = [];
+        $date = \DateTime::createFromFormat('U', time());
         foreach ($campaignUsers as $user) {
-            if (in_array($user->aquisitionStatus($affiliate->getDays()), $status)) {
+            if (in_array($user->aquisitionStatus($affiliate->getDays(), $date), $status)) {
                 $users[] = $user;
             }
         }
         foreach ($leadUsers as $user) {
-            if (in_array($user->aquisitionStatus($affiliate->getDays()), $status)) {
+            if (in_array($user->aquisitionStatus($affiliate->getDays(), $date), $status)) {
                 $users[] = $user;
             }
         }
@@ -205,6 +213,9 @@ class AffiliateService
         $charge->setUser($user);
         $charge->setAffiliate($affiliate);
         $charge->setPolicy($policy);
+        if (!$user->getAffiliate()) {
+            $affiliate->addConfirmedUsers($user);
+        }
         $affiliate->addConfirmedPolicies($policy);
         $this->dm->persist($charge);
         $this->dm->flush();

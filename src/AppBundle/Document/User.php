@@ -91,6 +91,11 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     protected $leadSourceDetails;
 
     /**
+     * @MongoDB\ReferenceOne(targetDocument="AffiliateCompany", inversedBy="confirmedPolicies")
+     */
+    protected $affiliate;
+
+    /**
      * @MongoDB\EmbedOne(targetDocument="Address")
      * @Gedmo\Versioned
      */
@@ -551,6 +556,16 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     public function getLeadSourceDetails()
     {
         return $this->leadSourceDetails;
+    }
+
+    public function getAffiliate()
+    {
+        return $this->affiliate;
+    }
+
+    public function setAffiliate(AffiliateCompany $affiliate)
+    {
+        $this->affiliate = $affiliate;
     }
 
     /**
@@ -1030,11 +1045,11 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         return $policies;
     }
 
-    public function isAffiliateCandidate($days)
+    public function isAffiliateCandidate($days, $date = null)
     {
         foreach ($this->getValidPolicies(true) as $policy) {
             /** @var Policy $policy */
-            if ($policy->isPolicyOldEnough($days)) {
+            if ($policy->isPolicyOldEnough($days, $date)) {
                 return true;
             }
         }
@@ -2047,13 +2062,14 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
 
     /**
      * Tells you the what state the user is in regarding affiliate aquisition.
-     * @param int $days is the number of days before aquisition becomes pending.
+     * @param int       $days is the number of days before aquisition becomes pending.
+     * @param \DateTime $date is the date that we are measuring from, defaulting to now.
      * @return string aquisition state name. Check out AQUISITION_* .
      */
-    public function aquisitionStatus($days)
+    public function aquisitionStatus($days, $date = null)
     {
         if ($this->hasActivePolicy() || $this->hasUnpaidPolicy()) {
-            if ($this->isAffiliateCandidate($days)) {
+            if ($this->isAffiliateCandidate($days, $date)) {
                 return static::AQUISITION_PENDING;
             } else {
                 return static::AQUISITION_NEW;

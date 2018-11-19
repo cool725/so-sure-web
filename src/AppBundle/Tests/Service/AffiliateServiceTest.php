@@ -65,7 +65,6 @@ class AffiliateServiceTest extends WebTestCase
     {
         $kernel = static::createKernel();
         $kernel->boot();
-
         self::$container = $kernel->getContainer();
         self::$userManager = self::$container->get('fos_user.user_manager');
         self::$affiliateService = self::$container->get('app.affiliate');
@@ -85,22 +84,27 @@ class AffiliateServiceTest extends WebTestCase
     {
         // test on nothing.
         $this->assertEmpty(self::$affiliateService->generate([]));
-
         // test on normal data.
         $data = $this->createState();
         $this->assertEquals(3, count(self::$affiliateService->generate([$data["affiliate"]])));
-
         //test on pre loved data.
         $this->assertEquals(0, count(self::$affiliateService->generate([$data["affiliate"]])));
-        sleep(60 * 60 * 24 * 30);
+        sleep(60 * 60 * 24 * 21);
+
+
+        print ($data["bango"]->getLatestPolicy()->isPolicyOldEnough(30)) ? "yeah\n" : "nah\n";
+
         $this->assertEquals(2, count(self::$affiliateService->generate([$data["affiliate"]])));
         sleep(60 * 60 * 24 * 365);
         $this->assertEquals(0, count(self::$affiliateService->generate([$data["affiliate"]])));
-
         // switch to ongoing and create new policies in the future.
         $data["affiliate"]->setChargeModel(AffiliateCompany::MODEL_ONGOING);
         $this->assertEquals(5, count(self::$affiliateService->generate([$data["affiliate"]])));
         $this->assertEquals(0, count(self::$affiliateService->generate([$data["affiliate"]])));
+        // test on multiple affiliates at the same time.
+        $data1 = $this->createState();
+        $data2 = $this->createState();
+        $this->assertEquals(6, count(self::$affiliateService->generate([$data1["affiliate"], $data2["affiliate"]])));
     }
 
     /**
@@ -202,11 +206,11 @@ class AffiliateServiceTest extends WebTestCase
         );
         return [
             "affiliate" => $affiliate,
-            "bango" => self::createTestUser("10 days ago", "{$prefix}bango", "{$prefix}campaign"),
-            "tango" => self::createTestUser("20 days ago", "{$prefix}tango", "{$prefix}campaign"),
-            "hat" => self::createTestUser("30 days ago", "{$prefix}hat", "{$prefix}campaign"),
-            "borb" => self::createTestUser("40 days ago", "{$prefix}borb", "", "{$prefix}campaign"),
-            "tonyAbbot" => self::createTestUser("50 days ago", "{$prefix}tonyAbbot", "", "{$prefix}campaign"),
+            "bango" => self::createTestUser("P10D", "{$prefix}bango", "{$prefix}campaign"),
+            "tango" => self::createTestUser("P20D", "{$prefix}tango", "{$prefix}campaign"),
+            "hat" => self::createTestUser("P30D", "{$prefix}hat", "{$prefix}campaign"),
+            "borb" => self::createTestUser("P40D", "{$prefix}borb", "{$prefix}campaign"),
+            "tonyAbbot" => self::createTestUser("P50D", "{$prefix}tonyAbbot", "{$prefix}campaign"),
             "prefix" => $prefix
         ];
     }
@@ -233,6 +237,7 @@ class AffiliateServiceTest extends WebTestCase
         $affiliate->setAddress($address);
         $affiliate->setCPA($cpa);
         $affiliate->setDays($days);
+        $affiliate->setRenewalDays($days);
         $affiliate->setCampaignSource($source);
         $affiliate->setLeadSource("scode");
         $affiliate->setLeadSourceDetails($lead);
@@ -252,7 +257,9 @@ class AffiliateServiceTest extends WebTestCase
      */
     private static function createTestUser($policyAge, $name, $source = "", $lead = "")
     {
-        $policy = self::createUserPolicy(true, new \DateTime($policyAge));
+        $time = \DateTime::createFromFormat('U', time());
+        $time->sub(new \DateInterval($policyAge));
+        $policy = self::createUserPolicy(true, $time);
         $policy->getUser()->setEmail(self::generateEmailClass($name, "affiliateServiceTest"));
         $policy->setStatus(Policy::STATUS_ACTIVE);
         $policy->setImei(self::generateRandomImei());

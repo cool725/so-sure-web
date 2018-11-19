@@ -24,6 +24,11 @@ class AffiliateCompany extends Company
     const MODEL_ONE_OFF = 'one-off';
 
     /**
+     * @MongoDB\ReferenceMany(targetDocument="User", mappedBy="affiliate")
+     */
+    protected $confirmedUsers;
+
+    /**
      * @MongoDB\ReferenceMany(targetDocument="Policy", mappedBy="affiliate")
      */
     protected $confirmedPolicies;
@@ -80,6 +85,17 @@ class AffiliateCompany extends Company
     {
         parent::__construct();
         $this->confirmedUsers = new ArrayCollection();
+    }
+
+    public function getConfirmedUsers()
+    {
+        return $this->confirmedUsers;
+    }
+
+    public function addConfirmedUsers(User $user)
+    {
+        $this->confirmedUsers[] = $user;
+        $user->setAffiliate($this);
     }
 
     public function getConfirmedPolicies()
