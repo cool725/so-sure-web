@@ -3,6 +3,15 @@
 {# Set vars #}
 {% set body_class = 'home' %}
 
+{# Set image #}
+{% set hero_image = 'so-sure_hero-illustration-xmas-1.png' %}
+{% set hero_rand = random('123') %}
+{% if hero_rand == 2 %}
+    {% set hero_image = 'so-sure_hero-illustration-xmas-2.png' %}
+{% elseif hero_rand == 3 %}
+    {% set hero_image = 'so-sure_hero-illustration-xmas-3.png' %}
+{% endif %}
+
 {% block title %}so-sure - Welcome to Social Insurance{% endblock %}
 {% block meta %}
     <meta name="description" content="Social mobile phone insurance that's better and up to 80% cheaper when you connect with friends and don't claim. Download our app now to see how much you could save."/>
@@ -14,8 +23,6 @@
 {% endblock %}
 
 {% block body %}
-
-    {# <canvas id="snow" class="snow"></canvas> #}
 
     <section class="hero">
         <div class="container container-xtra">
@@ -71,7 +78,7 @@
                         {% elseif page_type == 'phonecase' %}
                             <img src="{{ cdn_url }}/images/rebrand/homepage/so-sure_hero-illustration-xmas-2.png" alt="so-sure - social insurance" class="img-fluid animated jackInTheBox">
                         {% else %}
-                            <img src="{{ cdn_url }}/images/rebrand/homepage/so-sure_hero-illustration-xmas-{{ random('123') }}.png" alt="so-sure - social insurance" class="img-fluid animated jackInTheBox">
+                            <img src="{{ cdn_url }}/images/rebrand/homepage/{{ hero_image }}" alt="so-sure - social insurance" class="img-fluid animated jackInTheBox">
                         {% endif %}
                     </div>
                 </div>
@@ -82,7 +89,7 @@
                 {% elseif page_type == 'phonecase' %}
                     <img src="{{ cdn_url }}/images/rebrand/homepage/so-sure_hero-illustration-xmas-2.png" alt="so-sure - social insurance" class="img-fluid animated jackInTheBox">
                 {% else %}
-                    <img src="{{ cdn_url }}/images/rebrand/homepage/so-sure_hero-illustration-xmas-{{ random('123') }}.png" alt="so-sure - social insurance" class="img-fluid animated jackInTheBox">
+                    <img src="{{ cdn_url }}/images/rebrand/homepage/{{ hero_image }}" alt="so-sure - social insurance" class="img-fluid animated jackInTheBox">
                 {% endif %}
             </div>
         </div>
@@ -112,8 +119,8 @@
                 {# TODO: Needs copy #}
                 <div class="col-md-6 col-lg-4">
                     <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_phone-smile.png" alt="so-sure - Simple Terms &amp; Conditions" width="180px">
-                    <h5 class="text-primary">24-72 hour replacement</h5>
-                    <p class="mb-5">We aim to get you back up and running quickly after your claim is approved</p>
+                    <h5 class="text-primary">24-72 hour replace or repair</h5>
+                    <p class="mb-5">We aim to replace or repair your phone within 24-72 hours after your claim is approved</p>
                 </div>
                 <div class="col-md-6 col-lg-4">
                     <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_wallet-cashback.png" alt="so-sure - Up to 40% cheaper"width="180px">
@@ -269,10 +276,10 @@
                     <div class="expanding-cardbox expanding-cardbox__icon mb-4">
                         <div class="expanding-cardbox__body">
                             <h5 class="expanding-cardbox__title mb-0">
-                                24-72 hour replacement/repair <i class="far fa-chevron-down text-dodger-blue fa-lg"></i>
+                                Aim for 24-72 hour replace or repair <i class="far fa-chevron-down text-dodger-blue fa-lg"></i>
                             </h5>
                             <div class="expanding-cardbox__expand mt-4">
-                                We understand it’s stressful to be without your phone, that’s why we aim to get you back up and running quickly after your claim is approved.
+                                We understand it's stressful to be without your phone, that’s why we aim to get you back up and running quickly after your claim is approved. While we aim for 24-72 hours, some repairs may take a little longer.
                             </div>
                         </div>
                     </div>
@@ -282,7 +289,7 @@
                                 Up to 80% money back <i class="far fa-chevron-down text-dodger-blue fa-lg"></i>
                             </h5>
                             <div class="expanding-cardbox__expand mt-4">
-                                We reward our careful customers.  If you and your connections don’t make a claim we return up to 80% of your premium back at the end of every policy year.
+                                We reward our careful customers. If you and your connections don't make a claim we return up to 80% of your premium back at the end of every policy year.
                             </div>
                         </div>
                     </div>

@@ -58,7 +58,7 @@ $(function(){
 
             let snow = window.setInterval(function () {
                 snowIntensity = 4000;
-                snowType = '🍆';
+                snowType = '📱';
                 new snowFlake();
             }, snowIntensity);
 
