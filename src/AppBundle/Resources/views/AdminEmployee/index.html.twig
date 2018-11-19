@@ -1,140 +1,78 @@
 {% extends 'admin_claims_base_rebrand.html.twig' %}
 
+{# Set vars #}
+{% set body_class = 'admin-home' %}
+
+{% block title %}so-sure - admin home{% endblock %}
+{% block meta %}{% endblock %}
+
+{% block cssPage %}
+   {#  <link rel="stylesheet" href="{{ asset('css-js/homepage.css') }}"> #}
+{% endblock %}
+
 {% block body %}
-    {% set style = "text-align: center; height: 100px; margin-bottom: 20px; padding-top: 30px; font-size: 24px; vertical-align: middle; border-radius: 5px; border: solid 1px;" %}
-<div class="container" style="margin-bottom: 50px; margin-top: 70px;"  >
-    <h3><i class="fa fa-question-circle" title="Actually Random Imei of the second, but...This imei passes luhn, and should only be used for test purposes"></i>
-        Random Imei of the day: {{ randomImei }}</h3>
 
-    <div class="row">
-        <div class="col-md-12">
-            <h3>General</h3>
+    <section class="p-4 mb-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md">
+                    <h5 class="mb-4">General</h3>
+                    <div class="list-group">
+                        <a class="list-group-item list-group-item-action"
+                           href="{{ path('admin_policies') }}">
+                            <i class="fal fa-file-pdf mr-3"></i> Policies</a>
+                        <a class="list-group-item list-group-item-action"
+                           href="{{ path('admin_users') }}">
+                            <i class="fal fa-users mr-3"></i> Users</a>
+                        <a class="list-group-item list-group-item-action"
+                           href="{{ path('admin_connections') }}">
+                            <i class="fal fa-handshake-alt mr-3"></i> Connections</a>
+                        <a class="list-group-item list-group-item-action"
+                           href="{{ path('admin_scheduled_payments') }}">
+                           <i class="fal fa-calendar mr-3"></i> Scheduled Payments</a>
+                        <a class="list-group-item list-group-item-action"
+                           href="{{ path('admin_policy_breakdown') }}">
+                           <i class="fab fa-apple"></i>
+                           <i class="fab fa-android mr-3"></i> Policy Breakdown</a>
+                        <a class="list-group-item list-group-item-action"
+                           href="{{ path('admin_payments') }}">
+                            <i class="fal fa-pound-sign mr-3"></i> Payments</a>
+                        <a class="list-group-item list-group-item-action"
+                           href="{{ path('admin_quarterly_pl') }}">
+                           <i class="fal fa-chart-pie mr-3"></i> Quarterly P&amp;L</a>
+                        <a class="list-group-item list-group-item-action"
+                           href="{{ path('admin_underwriting') }}">
+                            <i class="fal fa-chart-bar mr-3"></i>Underwriting</a>
+                    </div>
+                </div>
+                <div class="col-md">
+                    <h5 class="mb-4">Reporting</h3>
+                    <div class="list-group">
+                    </div>
+                </div>
+                {# {% if is_granted('ROLE_ADMIN') %}
+                    <div class="col-md">
+                        <h5 class="mb-4">Accounts</h3>
+                        <div class="list-group">
+                        </div>
+                    </div>
+                {% endif %}
+                {% if is_granted('ROLE_EMPLOYEE') %}
+                    <div class="col-md">
+                        <h5 class="mb-4">System</h3>
+                        <div class="list-group">
+                            {% if is_granted('ROLE_ADMIN') %}
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endif %} #}
+            </div>
         </div>
-    </div>
-    <div class="row">
-        <div class="col-md-3 col-md-offset-1" style="{{ style }};">
-            <a href="{{ path('admin_policies') }}"><i class="fa fa-file-pdf-o fa-large"></i> Policies</a>
-        </div>
-        <div class="col-md-3 col-md-offset-1" style="{{ style }};">
-            <a href="{{ path('admin_users') }}"><i class="fa fa-users fa-large"></i> Users</a>
-        </div>
-        <div class="col-md-3 col-md-offset-1" style="{{ style }};">
-            <a href="{{ path('admin_company') }}"><i class="fa fa-briefcase fa-large"></i> Companies</a>
-        </div>
-        <div class="col-md-3 col-md-offset-1" style="{{ style }};">
-            <a href="{{ path('admin_phones') }}"><i class="fa fa-mobile fa-large"></i> Phones</a>
-        </div>
-        <div class="col-md-3 col-md-offset-1" style="{{ style }};">
-            <a href="{{ path('admin_claims') }}"><i class="fa fa-exchange fa-large"></i> Claims</a>
-        </div>
-        <div class="col-md-3 col-md-offset-1" style="{{ style }};">
-            <a href="{{ path('admin_rewards') }}"><i class="fa fa-thumbs-up fa-large"></i> Rewards</a>
-        </div>
-        <div class="col-md-3 col-md-offset-1" style="{{ style }};">
-            <a href="{{ path('admin_picsure') }}"><i class="fa fa-photo fa-large"></i> pic-sure</a>
-        </div>
-        <div class="col-md-3 col-md-offset-1" style="{{ style }};">
-            <a href="{{ path('admin_imei') }}"><i class="fa fa-search fa-large"></i> IMEI Lookup</a>
-        </div>
-        <div class="col-md-3 col-md-offset-1" style="{{ style }};">
-            <a href="{{ path('admin_detected_imei') }}"><i class="fa fa-bullseye fa-large"></i> Detected IMEI</a>
-        </div>
-        <div class="col-md-3 col-md-offset-1" style="{{ style }};">
-            <a href="{{ path('admin_affiliate') }}"><i class="fa fa-trophy fa-large"></i> Affiliates</a>
-        </div>
-    </div>
+    </section>
+    {# Page Modals #}
 
-    <div class="row">
-        <div class="col-md-12">
-            <h3>Reporting</h3>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-md-3 col-md-offset-1" style="{{ style }};">
-            <a href="{{ path('admin_kpi') }}"><i class="fa fa-balance-scale fa-large"></i> KPI</a>
-        </div>
-        <div class="col-md-3 col-md-offset-1" style="{{ style }};">
-            <a href="{{ path('admin_reports') }}"><i class="fa fa-area-chart fa-large"></i> Reports</a>
-        </div>
-        <div class="col-md-3 col-md-offset-1" style="{{ style }};">
-            <a href="{{ path('admin_connections') }}"><i class="fa fa-handshake-o fa-large"></i> Connections</a>
-        </div>
-        <div class="col-md-3 col-md-offset-1" style="{{ style }};">
-            <a href="{{ path('admin_optout') }}"><i class="fa fa-envelope fa-large"></i> OptOuts</a>
-        </div>
-        <div class="col-md-3 col-md-offset-1" style="{{ style }};">
-            <a href="{{ path('admin_scheduled_payments') }}"><i class="fa fa-calendar fa-large"></i> Scheduled Payments</a>
-        </div>
-        <div class="col-md-3 col-md-offset-1" style="{{ style }};">
-            <a href="{{ path('admin_policy_breakdown') }}"><i class="fa fa-apple fa-large"></i> <i class="fa fa-android fa-large"></i> Policy Breakdown</a>
-        </div>
-        <div class="col-md-3 col-md-offset-1" style="{{ style }};">
-            <a href="{{ path('admin_payments') }}"><i class="fa fa-gbp fa-large"></i> Payments</a>
-        </div>
-        <div class="col-md-3 col-md-offset-1" style="{{ style }};">
-            <a href="{{ path('admin_quarterly_pl') }}"><i class="fa fa-pie-chart fa-large"></i> Quarterly P&L</a>
-        </div>
-        <div class="col-md-3 col-md-offset-1" style="{{ style }};">
-            <a href="{{ path('admin_underwriting') }}"><i class="fa fa-bar-chart fa-large"></i> Underwriting</a>
-        </div>
-    </div>
+{% endblock %}
 
-    {% if is_granted('ROLE_ADMIN') %}
-        <div class="row">
-            <div class="col-md-12">
-                <h3>Accounts</h3>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-3 col-md-offset-1" style="{{ style }};">
-                <a href="{{ path('admin_accounts') }}"><i class="fa fa-money fa-large"></i> Accounts</a>
-            </div>
-            <div class="col-md-3 col-md-offset-1" style="{{ style }};">
-                <a href="{{ path('admin_banking') }}"><i class="fa fa-bank fa-large"></i> Banking</a>
-            </div>
-            <div class="col-md-3 col-md-offset-1" style="{{ style }};">
-                <a href="{{ path('admin_charge') }}"><i class="fa fa-credit-card fa-large"></i> Charges</a>
-            </div>
-            <div class="col-md-3 col-md-offset-1" style="{{ style }};">
-                <a href="{{ path('admin_invoices') }}"><i class="fa fa-file fa-large"></i> Invoices</a>
-            </div>
-            <div class="col-md-3 col-md-offset-1" style="{{ style }};">
-                <a href="{{ path('admin_cashback') }}"><i class="fa fa-handshake-o fa-large"></i> Cashback</a>
-            </div>
-            <div class="col-md-3 col-md-offset-1" style="{{ style }};">
-                <a href="{{ path('admin_chargeback') }}"><i class="fa fa-reply fa-large"></i> Chargebacks</a>
-            </div>
-            <div class="col-md-3 col-md-offset-1" style="{{ style }};">
-                <a href="{{ path('admin_bacs') }}"><i class="fa fa-sliders fa-large"></i> Bacs</a>
-            </div>
-        </div>
-    {% endif %}
-
-    {% if is_granted('ROLE_EMPLOYEE') %}
-        <div class="row">
-            <div class="col-md-12">
-                <h3>System</h3>
-            </div>
-        </div>
-        <div class="row">
-            {% if is_granted('ROLE_ADMIN') %}
-                <div class="col-md-3 col-md-offset-1" style="{{ style }};">
-                    <a href="{{ path('admin_admin_users') }}"><i class="fa fa-lock fa-large"></i> Admin Users</a>
-                </div>
-                <div class="col-md-3 col-md-offset-1" style="{{ style }};">
-                    <a href="{{ path('admin_rate_limits') }}"><i class="fa fa-hand-stop-o fa-large"></i> Rate Limits</a>
-                </div>
-                <div class="col-md-3 col-md-offset-1" style="{{ style }};">
-                    <a href="{{ path('admin_feature_flags') }}"><i class="fa fa-flag fa-large"></i> Feature Flags</a>
-                </div>
-                <div class="col-md-3 col-md-offset-1" style="{{ style }};">
-                    <a href="{{ path('admin_picsure_ml') }}"><i class="fa fa-photo fa-large"></i> Picsure ML</a>
-                </div>
-            {% endif %}
-            <div class="col-md-3 col-md-offset-1" style="{{ style }};">
-                <a href="{{ path('admin_sixpack_tests') }}"><i class="fa fa-comments fa-large"></i> Running tests</a>
-            </div>
-        </div>
-    {% endif %}
-</div>
+{% block javascriptsPage %}
+    {# <script src="{{ asset('css-js/homepage.js') }}"></script> #}
 {% endblock %}
