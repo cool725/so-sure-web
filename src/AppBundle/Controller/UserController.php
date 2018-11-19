@@ -1272,8 +1272,8 @@ class UserController extends BaseController
             $request,
             SixpackService::EXPERIMENT_APP_LINK_SMS,
             [
-                SixpackService::ALTERNATIVES_SMS_DOWNLOAD,
                 SixpackService::ALTERNATIVES_NO_SMS_DOWNLOAD
+                SixpackService::ALTERNATIVES_SMS_DOWNLOAD,
             ],
             SixpackService::LOG_MIXPANEL_NONE,
             $user->getId(),
