@@ -894,14 +894,13 @@ class InvitationService
             $invitation->setStatus(SmsInvitation::STATUS_SKIPPED);
             return;
         }
-
         $smsTemplate = sprintf('AppBundle:Sms:%s.txt.twig', $type);
         $status = $this->sms->sendTemplate(
             $invitation->getMobile(),
             $smsTemplate,
             ['invitation' => $invitation],
             $invitation->getPolicy(),
-            $type,
+            Charge::TYPE_SMS_INVITATION,
             $this->debug
         );
         $invitation->setStatus($status ? (SmsInvitation::STATUS_SENT) : (SmsInvitation::STATUS_FAILED));

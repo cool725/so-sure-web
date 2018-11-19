@@ -7,6 +7,7 @@ use AppBundle\Document\DateTrait;
 use AppBundle\Document\Payment\BacsPayment;
 use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\File\PolicyTermsFile;
+use AppBundle\Classes\ApiErrorCode;
 use AppBundle\Security\UserVoter;
 use AppBundle\Security\ClaimVoter;
 use AppBundle\Service\BacsService;
@@ -63,6 +64,7 @@ use AppBundle\Form\Type\ClaimFnolConfirmType;
 use AppBundle\Form\Type\ClaimFnolDamageType;
 use AppBundle\Form\Type\ClaimFnolTheftLossType;
 use AppBundle\Form\Type\ClaimFnolUpdateType;
+
 
 use AppBundle\Service\FacebookService;
 use AppBundle\Security\InvitationVoter;
