@@ -3,7 +3,7 @@
 ### Tick box after approval. Only one box per section is necessary.
 
 Frontend
-* [ ] Copy checked - inc complience
+* [ ] Copy checked - inc compliance
 * [ ] Browser tested - Pass on to frontend if user facing
 
 Misc
