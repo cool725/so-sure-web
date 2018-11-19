@@ -8,7 +8,7 @@ require('../../sass/pages/homepage-xmas.scss');
 
 $(function(){
 
-    let snowIntensity = 400; // smaller number = more snowflakes;
+    let snowIntensity = 800; // smaller number = more snowflakes;
     let snowType = '*';
 
     function snowFlake(){
@@ -33,7 +33,7 @@ $(function(){
             let interval = setInterval(function(){
                 $snowflake.css({left: that.x + (swingDirection * swingWave)});
                 swingDirection = - swingDirection;
-            }, 1000);
+            }, 2000);
             let speed = (Math.random() * 3000) + 3000;
 
             $snowflake.animate({top: '100vh'}, speed, function(){
@@ -52,16 +52,21 @@ $(function(){
 
     $(document).on('keyup', function(e) {
 
-        // if(e.keyCode == 79){
+        if(e.keyCode == 79){
 
             window.clearInterval(snow);
 
-        //     window.setInterval(function () {
-        //         snowIntensity = 2000;
-        //         snowType = '🍆';
-        //         new snowFlake();
-        //     }, snowIntensity);
-        // }
+            let snow = window.setInterval(function () {
+                snowIntensity = 4000;
+                snowType = '🍆';
+                new snowFlake();
+            }, snowIntensity);
+
+        } else {
+
+            window.clearInterval(snow);
+
+        }
     });
 
 
