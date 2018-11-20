@@ -94,13 +94,54 @@ class DefaultController extends BaseController
 
         $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE);
 
+        $pageType = 'xmas-homepage';
+
         $data = array(
             // Make sure to check homepage landing below too
-            'referral'    => $referral,
-            'phone'       => $this->getQuerystringPhone($request),
+            'referral'  => $referral,
+            'phone'     => $this->getQuerystringPhone($request),
+            'page_type' => $pageType,
         );
 
-        $template = 'AppBundle:Default:index.html.twig';
+        // $template = 'AppBundle:Default:index.html.twig';
+        $template = 'AppBundle:Default:indexXmas.html.twig';
+
+        return $this->render($template, $data);
+    }
+
+    /**
+     * @Route("/free-taste-card", name="free_taste_card")
+     */
+    public function freeTasteCard()
+    {
+        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE);
+
+        $pageType = 'tastecard';
+
+        $data = array(
+            'page_type' => $pageType,
+        );
+
+
+        $template = 'AppBundle:Default:indexXmas.html.twig';
+
+        return $this->render($template, $data);
+    }
+
+    /**
+     * @Route("/free-phone-case", name="free_phone_case")
+     */
+    public function freePhoneCase()
+    {
+        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE);
+
+        $pageType = 'phonecase';
+
+        $data = array(
+            'page_type' => $pageType,
+        );
+
+        $template = 'AppBundle:Default:indexXmas.html.twig';
 
         return $this->render($template, $data);
     }
