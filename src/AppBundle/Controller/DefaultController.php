@@ -114,9 +114,7 @@ class DefaultController extends BaseController
      */
     public function freeTasteCard()
     {
-        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_LANDING_PAGE, [
-            'Page' => $request->get('_route'),
-        ]);
+        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE);
 
         $pageType = 'tastecard';
 
@@ -135,9 +133,7 @@ class DefaultController extends BaseController
      */
     public function freePhoneCase()
     {
-        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_LANDING_PAGE, [
-            'Page' => $request->get('_route'),
-        ]);
+        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE);
 
         $pageType = 'phonecase';
 
