@@ -95,7 +95,7 @@ class AffiliateService
      * @param AffiliateCompany $affiliate        is the affiliate we are performing one off charges for.
      * @param array            $generatedCharges is an optional reference to an array in which generated charges can go.
      */
-    public function oneOffCharges($affiliate, & $generatedCharges = null)
+    public function oneOffCharges($affiliate, & $generatedCharges = [])
     {
         $users = $this->getMatchingUsers($affiliate);
         foreach ($users as $user) {
@@ -103,6 +103,7 @@ class AffiliateService
                 $generatedCharges[] = $this->createCharge($affiliate, $user, $user->getValidPolicies()[0]);
             }
         }
+        return $generatedCharges;
     }
 
     /**
@@ -110,9 +111,10 @@ class AffiliateService
      * @param AffiliateCompany $affiliate        is the affiliate company that is performing ongoing charges.
      * @param array            $generatedCharges is an optional reference to an array in which generated charges can go.
      */
-    public function ongoingCharges($affiliate, & $generatedCharges = null)
+    public function ongoingCharges($affiliate, & $generatedCharges = [])
     {
-        $renewalWait = DateTime::createFromFormat('U', time())
+        $date = DateTime::createFromFormat('U', time());
+        $renewalWait = $date
             ->sub(new DateInterval("P1Y"))
             ->add(new DateInterval("P".($affiliate->getRenewalDays() ?: 0)."D"));
         $users = $this->getMatchingUsers($affiliate);
@@ -120,35 +122,36 @@ class AffiliateService
             $policies = $user->getValidPolicies(true);
             $charge = $this->chargeRepository->findLastByUser($user, Charge::TYPE_AFFILIATE);
             if (count($policies) == 1) {
-                if (($charge && $charge->getCreatedDate() < $renewalWait) ||
-                    ($user->isAffiliateCandidate($affiliate->getDays()) && !$user->getAffiliate())
-                ) {
+                if (($charge && $charge->getCreatedDate() < $renewalWait) || !$user->getAffiliate()) {
                     $generatedCharges[] = $this->createCharge($affiliate, $user, $policies[0]);
                 }
             } elseif ($charge) {
                 foreach ($policies as $policy) {
-                    if ($policy->getStatus() == Policy::STATUS_RENEWAL) {
-                        $previous = $policy->getPreviousPolicy();
+                    $previous = $policy->getPreviousPolicy();
+                    if ($previous && !$policy->hasNextPolicy()) {
                         if ($previous->getAffiliate()) {
-                            if ($policy->oldEnough($affiliate->getRenewalDays())) {
+                            if ($policy->isPolicyOldEnough($affiliate->getRenewalDays(), $date) &&
+                                !$policy->getAffiliate()) {
                                 $generatedCharges[] = $this->createCharge($affiliate, $user, $policy);
                             }
                         } else {
                             $this->logger->error(
                                 "User ".$user->getEmail()." has previous affiliate charges but renewal policy ".
-                                $policy->getCode()." cannot find charges attributed to it's predecessor ".
-                                $previous->getCode()."."
+                                $policy->getId()." cannot find charges attributed to it's predecessor ".
+                                $previous->getId()."."
                             );
+                            return null;
                         }
                     }
                 }
             } else {
-                print (" many policy no charge");
                 $this->logger->error(
                     "User ".$user->getEmail()." has multiple active policies, but no affiliate charges recorded."
                 );
+                return null;
             }
         }
+        return $generatedCharges;
     }
 
     /**
@@ -210,7 +213,9 @@ class AffiliateService
         if (!$user->getAffiliate()) {
             $affiliate->addConfirmedUsers($user);
         }
-        $affiliate->addConfirmedPolicies($policy);
+        if (!$policy->getAffiliate()) {
+            $affiliate->addConfirmedPolicies($policy);
+        }
         $this->dm->persist($charge);
         $this->dm->flush();
         return $charge;

@@ -103,6 +103,56 @@ class AffiliateServiceTest extends WebTestCase
         $this->assertEquals(6, count(self::$affiliateService->generate([$affiliateB, $affiliateC])));
     }
 
+    /**
+     * Tests that the affiliate service generates ongoing charges when they should.
+     * @group time-sensitive
+     */
+    public function testOngoingCharges()
+    {
+        $data = $this->createState();
+        $affiliate = $data["affiliate"];
+        $users = [$data["bango"], $data["tango"], $data["borb"], $data["tonyAbbot"], $data["hat"]];
+        // test for solitary policy no charges and show charges reference array works.
+        $charges = [];
+        self::$affiliateService->ongoingCharges($affiliate, $charges);
+        $this->assertEquals(3, count($charges));
+        sleep(60 * 60 * 24 * 30);
+        $this->assertEquals(2, count(self::$affiliateService->ongoingCharges($affiliate)));
+        // test for solitary policy charges a year ago.
+        sleep(60 * 60 * 24 * 334);
+        $this->assertEquals(3, count(self::$affiliateService->ongoingCharges($affiliate)));
+        sleep(60 * 60 * 24 * 30);
+        $this->assertEquals(2, count(self::$affiliateService->ongoingCharges($affiliate)));
+        // test for renewal policy with previous having charges.
+        foreach ($users as $user) {
+            self::renewal($user);
+            self::createTestPolicy($user);
+        }
+        $this->assertEmpty(self::$affiliateService->ongoingCharges($affiliate));
+        sleep(60 * 60 * 24 * 395);
+        $this->assertEquals(5, count(self::$affiliateService->ongoingCharges($affiliate)));
+        $this->assertEmpty(self::$affiliateService->ongoingCharges($affiliate));
+        // test for renewal policy with previous having no charges but user having charges.
+        foreach ($users as $user) {
+            self::renewal($user);
+            self::renewal($user);
+        }
+        $this->assertNull(self::$affiliateService->ongoingCharges($affiliate));
+        // test for multiple policies and no charges warning.
+        foreach ($users as $user) {
+            $charges = self::$chargeRepository->findBy(["user" => $user]);
+            foreach ($charges as $charge) {
+                self::$dm->remove($charge);
+            }
+            self::$dm->flush();
+        }
+        $this->assertNull(self::$affiliateService->ongoingCharges($affiliate));
+    }
+
+    /**
+     * Tests generating one off charges.
+     * @group time-sensitive
+     */
     public function testOneOffCharges()
     {
         $data = $this->createState();
@@ -110,29 +160,34 @@ class AffiliateServiceTest extends WebTestCase
         self::$affiliateService->oneOffCharges($data["affiliate"], $charges);
         $this->assertEquals(3, count($charges));
         $this->assertEquals(3.6, self::sumCost($charges));
-        $charges = [];
-        self::$affiliateService->oneOffCharges($data["affiliate"], $charges);
+        $charges = self::$affiliateService->oneOffCharges($data["affiliate"]);
         $this->assertEquals(0, count($charges));
         $this->assertEquals(0, self::sumCost($charges));
+        sleep(60 * 60 * 24 * 365);
+        $charges = [];
+        self::$affiliateService->oneOffCharges($data["affiliate"], $charges);
+        $this->assertEquals(2, count($charges));
+        $this->assertEquals(2.4, self::sumCost($charges));
     }
 
     /**
      * Tests getting matching users from all status groups when all status groups are populated.
-     * @dataProvider testGetMatchingUsersProvider
+     * @dataProvider getMatchingUsersProvider
      */
     public function testGetMatchingUsers($count, $states)
     {
         $data = $this->createState();
         $this->assertEquals(
-            2,
-            count(self::$affiliateService->getMatchingUsers($data["affiliate"], [User::AQUISITION_NEW]))
+            $count,
+            count(self::$affiliateService->getMatchingUsers($data["affiliate"], $states))
         );
     }
 
     /**
      * Provides data for test get matching users.
      */
-    private function testGetMatchingUsersProvider() {
+    public function getMatchingUsersProvider()
+    {
         return [
             [3, [User::AQUISITION_NEW, User::AQUISITION_LOST]],
             [4, [User::AQUISITION_PENDING, User::AQUISITION_POTENTIAL]],
@@ -142,7 +197,7 @@ class AffiliateServiceTest extends WebTestCase
             [1, [User::AQUISITION_POTENTIAL]],
             [2, [User::AQUISITION_NEW]],
             [3, [User::AQUISITION_PENDING]]
-        ]
+        ];
     }
 
     /**
@@ -233,7 +288,7 @@ class AffiliateServiceTest extends WebTestCase
      */
     private static function createTestUser($policyAge, $name, $source = "", $lead = "")
     {
-        $time = \DateTime::createFromFormat('U', time());
+        $time = \DateTime::createFromFormat("U", time());
         $time->sub(new \DateInterval($policyAge));
         $policy = self::createUserPolicy(true, $time);
         $policy->getUser()->setEmail(self::generateEmailClass($name, "affiliateServiceTest"));
@@ -278,17 +333,38 @@ class AffiliateServiceTest extends WebTestCase
 
     /**
      * Creates a new policy for a given user and gives it a given start date.
-     * @param User      $user is the user to add the new policy to.
-     * @param \DateTime $date is the date to set the policy's start date at.
+     * @param User $user is the user to add the new policy to.
+     * @return Policy the new policy created.
      */
-    private static function createTestPolicy($user, $date)
+    private static function createTestPolicy($user)
     {
         $policy = new PhonePolicy();
         $policy->setStatus(Policy::STATUS_ACTIVE);
         $policy->setUser($user);
-        $policy->setStart($date);
+        $policy->setStart(\DateTime::createFromFormat('U', time()));
+        $user->addPolicy($policy);
         self::$dm->persist($policy);
         self::$dm->flush();
         return $policy;
+    }
+
+    /**
+     * Adds a new policy to the given user which is a renewal of their last policy.
+     * @param User $user is the user who must have an existing policy for this to work.
+     * @return Policy the policy that was just created.
+     */
+    private static function renewal($user)
+    {
+        $policy = $user->getLatestPolicy();
+        $policy->setStatus(Policy::STATUS_RENEWAL);
+        $renewal = new PhonePolicy();
+        $renewal->setUser($user);
+        $renewal->setStart(\DateTime::createFromFormat("U", time()));
+        $renewal->setStatus(Policy::STATUS_ACTIVE);
+        $policy->link($renewal);
+        $user->addPolicy($renewal);
+        self::$dm->persist($renewal);
+        self::$dm->flush();
+        return $renewal;
     }
 }
