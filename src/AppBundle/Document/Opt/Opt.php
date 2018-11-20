@@ -14,7 +14,7 @@ use AppBundle\Validator\Constraints as AppAssert;
  * @MongoDB\InheritanceType("SINGLE_COLLECTION")
  * @MongoDB\DiscriminatorField("optout_type")
  * @MongoDB\DiscriminatorMap({"email"="EmailOptOut", "sms"="SmsOptOut", "optinEmail"="EmailOptIn"})
- * @Gedmo\Loggable
+ * @Gedmo\Loggable(logEntryClass="AppBundle\Document\LogEntry")
  */
 abstract class Opt
 {

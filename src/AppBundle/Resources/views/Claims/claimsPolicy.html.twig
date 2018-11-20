@@ -115,6 +115,10 @@
                     </div>
                 </div>
                 {{ form_end(formClaim) }}
+            {% if policy.policyTerms.isRepairEnabled %}
+                <hr>
+                <h4>Damage claim? Policy terms allow for repair.</h4>
+            {% endif %}
             </div>
             {% if app.user.handlingTeam != 'direct-group' %}
             <div role="tabpanel" class="tab-pane {% if policy.hasOpenClaim and not claim.type %}active"{% endif %}" id="claimscheck">
@@ -153,6 +157,9 @@
                 </div>
                 {{ form_end(formClaimsCheck) }}
                 <hr>
+                {% if policy.policyTerms.isRepairEnabled %}
+                    <h4>Damage claim? Policy terms allow for repair.</h4>
+                {% endif %}
                 {% if oa %}
                     {% if oa.isLondon %}
                         <h4>Damage claim? User is in Greater London - consider using Trinity Maxwell. </h4>

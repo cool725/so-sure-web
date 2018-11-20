@@ -3,6 +3,7 @@
 namespace AppBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -18,6 +19,7 @@ class ImeiType extends AbstractType
     {
         $builder
             ->add('imei', TextType::class)
+            ->add('note', TextareaType::class)
             ->add('update', SubmitType::class)
         ;
     }
@@ -25,7 +27,6 @@ class ImeiType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(array(
-            'data_class' => 'AppBundle\Document\Form\Imei',
         ));
     }
 }

@@ -675,6 +675,8 @@ services:
             - "@snc_redis.default"
             - "@logger"
             - "%kernel.environment%"
+            - "@app.feature"
+            - "%sosure_ips%"
 
     statsd_client:
         class: Domnikl\Statsd\Connection\UdpSocket
@@ -898,6 +900,7 @@ services:
         public: true
         calls:
             - [setReader, ['@annotations.reader']]
+            - [setLogger, ['@logger']]
 
     doctrine.listener.invitation:
         class:   AppBundle\Listener\DoctrineInvitationListener

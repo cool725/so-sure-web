@@ -135,10 +135,10 @@ class DoctrineClaimListenerTest extends WebTestCase
         $listener->postPersist($events);
     }
 
-    public function testClaimsListenerActualDG()
+    public function testClaimsListenerActualDGDiff()
     {
         $policy = static::createUserPolicy(true);
-        $policy->getUser()->setEmail(static::generateEmail('testClaimsListenerActualDG', $this));
+        $policy->getUser()->setEmail(static::generateEmail('testClaimsListenerActualDGDiff', $this));
         $claim = new Claim();
         $claim->setExcess(50);
         $claim->setIncurred(368.93);
@@ -164,10 +164,66 @@ class DoctrineClaimListenerTest extends WebTestCase
         $dg->phoneReplacementCost = $claim->getPhoneReplacementCost();
         $dg->handlingFees = $claim->getClaimHandlingFees();
         $dg->reserved = $claim->getReservedValue();
+        $dg->lossDescription = 'lossed phone';
         $save = self::$directGroupService->saveClaim($dg, true);
         $this->assertTrue($save);
 
         $expectedUnderwriterUpdated = \DateTime::createFromFormat('U', time());
+
+        static::$container->get('logger')->debug('--- Changed field ---');
+        static::$container->get('logger')->debug('--- for compare ---');
+
+        sleep(1);
+
+        $dgNew = clone $dg;
+        $dgNew->totalIncurred = $dgNew->totalIncurred + 0.0001;
+
+        $save = self::$directGroupService->saveClaim($dgNew, true);
+        $this->assertTrue($save);
+
+        $updatedClaim = $this->loadClaim($claim);
+        $this->assertNotNull($updatedClaim->getUnderwriterLastUpdated());
+
+        $this->assertNotEquals($expectedUnderwriterUpdated, $updatedClaim->getUnderwriterLastUpdated(), '', 0);
+    }
+
+    public function testClaimsListenerActualDGSame()
+    {
+        $policy = static::createUserPolicy(true);
+        $policy->getUser()->setEmail(static::generateEmail('testClaimsListenerActualDGSame', $this));
+        $claim = new Claim();
+        $claim->setExcess(50);
+        $claim->setIncurred(368.93);
+        $claim->setPhoneReplacementCost(403.67);
+        $claim->setClaimHandlingFees(15);
+        $claim->setReservedValue(10);
+        $claim->setNumber(rand(1, 999999));
+        $claim->setHandlingTeam(Claim::TEAM_DIRECT_GROUP);
+        $policy->addClaim($claim);
+        static::$dm->persist($policy);
+        static::$dm->persist($policy->getUser());
+        static::$dm->persist($claim);
+        static::$dm->flush();
+
+        $this->assertNull($claim->getUnderwriterLastUpdated());
+
+        $dg = new DirectGroupHandlerClaim();
+        $dg->insuredName = $policy->getUser()->getName();
+        $dg->policyNumber = $policy->getPolicyNumber();
+        $dg->incurred = $claim->getIncurred();
+        $dg->claimNumber = $claim->getNumber();
+        $dg->excess = $claim->getExcess();
+        $dg->phoneReplacementCost = $claim->getPhoneReplacementCost();
+        $dg->handlingFees = $claim->getClaimHandlingFees();
+        $dg->reserved = $claim->getReservedValue();
+        $dg->lossDescription = 'lossed phone';
+        $save = self::$directGroupService->saveClaim($dg, true);
+        $this->assertTrue($save);
+
+        $expectedUnderwriterUpdated = \DateTime::createFromFormat('U', time());
+
+        static::$container->get('logger')->debug('--- Changed field ---');
+        static::$container->get('logger')->debug('--- for compare ---');
 
         sleep(1);
 
@@ -177,20 +233,16 @@ class DoctrineClaimListenerTest extends WebTestCase
         $save = self::$directGroupService->saveClaim($dgNew, true);
         $this->assertTrue($save);
 
-        /** @var DocumentManager $dm */
-        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
-        $repo = $dm->getRepository(Claim::class);
-        /** @var Claim $updatedClaim */
-        $updatedClaim = $repo->find($claim->getId());
+        $updatedClaim = $this->loadClaim($claim);
         $this->assertNotNull($updatedClaim->getUnderwriterLastUpdated());
 
-        $this->assertEquals($expectedUnderwriterUpdated, $updatedClaim->getUnderwriterLastUpdated(), '', 1);
+        $this->assertEquals($expectedUnderwriterUpdated, $updatedClaim->getUnderwriterLastUpdated(), '', 0);
     }
 
-    public function testClaimsListenerActualDavies()
+    public function testClaimsListenerActualDaviesDiff()
     {
         $policy = static::createUserPolicy(true);
-        $policy->getUser()->setEmail(static::generateEmail('testClaimsListenerActualDavies', $this));
+        $policy->getUser()->setEmail(static::generateEmail('testClaimsListenerActualDaviesDiff', $this));
         $claim = new Claim();
         $claim->setExcess(50);
         $claim->setIncurred(368.93);
@@ -222,22 +274,87 @@ class DoctrineClaimListenerTest extends WebTestCase
 
         $expectedUnderwriterUpdated = \DateTime::createFromFormat('U', time());
 
+        static::$container->get('logger')->debug('--- Changed field ---');
+        static::$container->get('logger')->debug('--- for compare ---');
+
         sleep(1);
 
         $daviesNew = clone $davies;
-        $daviesNew->incurred = $davies->incurred + 0.000001;
+        $daviesNew->incurred = $davies->incurred + 0.0001;
 
         $save = self::$daviesService->saveClaim($daviesNew, true);
         $this->assertTrue($save);
 
+        $updatedClaim = $this->loadClaim($claim);
+        $this->assertNotNull($updatedClaim->getUnderwriterLastUpdated());
+
+        $this->assertNotEquals($expectedUnderwriterUpdated, $updatedClaim->getUnderwriterLastUpdated(), '', 0);
+    }
+
+    public function testClaimsListenerActualDaviesSame()
+    {
+        $policy = static::createUserPolicy(true);
+        $policy->getUser()->setEmail(static::generateEmail('testClaimsListenerActualDaviesSame', $this));
+        $claim = new Claim();
+        $claim->setExcess(50);
+        $claim->setIncurred(368.93);
+        $claim->setPhoneReplacementCost(403.67);
+        $claim->setTransactionFees(0.24);
+        $claim->setClaimHandlingFees(15);
+        $claim->setReservedValue(10);
+        $claim->setNumber(rand(1, 999999));
+        $claim->setHandlingTeam(Claim::TEAM_DAVIES);
+        $policy->addClaim($claim);
+        static::$dm->persist($policy);
+        static::$dm->persist($policy->getUser());
+        static::$dm->persist($claim);
+        static::$dm->flush();
+
+        $davies = new DaviesHandlerClaim();
+        $davies->status = 'open';
+        $davies->insuredName = $policy->getUser()->getName();
+        $davies->policyNumber = $policy->getPolicyNumber();
+        $davies->incurred = $claim->getIncurred();
+        $davies->claimNumber = $claim->getNumber();
+        $davies->excess = $claim->getExcess();
+        $davies->phoneReplacementCost = $claim->getPhoneReplacementCost();
+        $davies->handlingFees = $claim->getClaimHandlingFees();
+        $davies->reserved = $claim->getReservedValue();
+        $davies->transactionFees = $claim->getTransactionFees();
+        $save = self::$daviesService->saveClaim($davies, true);
+        $this->assertTrue($save);
+
+        $expectedUnderwriterUpdated = \DateTime::createFromFormat('U', time());
+
+        static::$container->get('logger')->debug('--- Changed field ---');
+        static::$container->get('logger')->debug('--- for compare ---');
+
+        sleep(1);
+
+        $daviesNew = clone $davies;
+
+        $save = self::$daviesService->saveClaim($daviesNew, true);
+        $this->assertTrue($save);
+
+        $updatedClaim = $this->loadClaim($claim);
+        $this->assertNotNull($updatedClaim->getUnderwriterLastUpdated());
+
+        $this->assertEquals($expectedUnderwriterUpdated, $updatedClaim->getUnderwriterLastUpdated(), '', 0);
+    }
+
+    /**
+     * @param Claim $claim
+     * @return Claim
+     */
+    private function loadClaim(Claim $claim)
+    {
         /** @var DocumentManager $dm */
         $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
         $repo = $dm->getRepository(Claim::class);
         /** @var Claim $updatedClaim */
         $updatedClaim = $repo->find($claim->getId());
-        $this->assertNotNull($updatedClaim->getUnderwriterLastUpdated());
 
-        $this->assertEquals($expectedUnderwriterUpdated, $updatedClaim->getUnderwriterLastUpdated(), '', 1);
+        return $updatedClaim;
     }
 
     private function createClaimEventListener(Claim $claim, $count, $eventTypes)

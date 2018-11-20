@@ -12,7 +12,7 @@ use AppBundle\Document\File\PicSureFile;
 
 /**
  * @MongoDB\Document(repositoryClass="AppBundle\Repository\PhonePolicyRepository")
- * @Gedmo\Loggable
+ * @Gedmo\Loggable(logEntryClass="AppBundle\Document\LogEntry")
  */
 class PhonePolicy extends Policy
 {

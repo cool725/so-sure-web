@@ -98,4 +98,27 @@ class PolicyTerms extends PolicyDocument
             self::VERSION_5,
         ]);
     }
+
+    /**
+     * Can we send phone off to repair?
+     * "repair or replace your phone within  24 to 72 hours"
+     *
+     * @return bool
+     */
+    public function isRepairEnabled()
+    {
+        // assuming that repair will always be enabled going forward
+        return !in_array($this->getVersion(), [
+            self::VERSION_0,
+            self::VERSION_1,
+            self::VERSION_2,
+            self::VERSION_3,
+            self::VERSION_4,
+            self::VERSION_5,
+            self::VERSION_6,
+            self::VERSION_7,
+            self::VERSION_8,
+            self::VERSION_9,
+        ]);
+    }
 }

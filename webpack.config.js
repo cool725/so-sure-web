@@ -34,6 +34,9 @@ Encore
     .addEntry('social-insurance', './src/AppBundle/Resources/public/rebrand/js/pages/social-insurance.js')
     .addEntry('contact', './src/AppBundle/Resources/public/rebrand/js/pages/contact.js')
 
+    // Admin files
+    .addEntry('admin', './src/AppBundle/Resources/public/rebrand/js/pages/admin/admin.js')
+
     // allow legacy applications to use $/jQuery as a global variable
     .autoProvidejQuery()
 
