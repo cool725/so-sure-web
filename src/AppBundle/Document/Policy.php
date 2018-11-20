@@ -4735,7 +4735,9 @@ abstract class Policy
         }
 
         if (!$this->isAdditionalClaimLostTheftApprovedAllowed()) {
-            $warnings[] = sprintf('Policy already has 2 lost/theft claims. No further lost/theft claims are allowed');
+            // @codingStandardsIgnoreStart
+            $warnings[] = sprintf('Policy already has 2 lost/theft claims. No further lost/theft claims are allowed, however, allow any in-progress FNOL claims');
+            // @codingStandardsIgnoreEnd
         }
 
         if ($this->getPendingCancellation()) {
