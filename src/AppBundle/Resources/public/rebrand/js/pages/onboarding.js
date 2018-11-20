@@ -197,10 +197,13 @@ $(function() {
             $.ajax({
                 url: emailUrl,
                 type: 'POST',
-                data: {email: $('.input-invite').val()},
+                data: {
+                    email: $('.input-invite').val(),
+                    csrf: $('#email-csrf').val()
+                }
             })
             .done(function(data) {
-                // console.log(data);
+                console.log(data);
                 $('.btn-invite').tooltip({
                     'title':   'Your invite is on it\'s way 😀',
                     'trigger': 'manual'
