@@ -24,7 +24,6 @@ $(function() {
         e.preventDefault();
 
         $(this).hide();
-
         smsLoader.show();
 
         $.ajax({
@@ -35,15 +34,12 @@ $(function() {
             smsLoader.text('Download link sent to your device 😀');
             setTimeout(function() {
                 // Hide all the sms links - use invisble so we dont jump the content
-                smsButtonCont.addClass('invisible');
+                smsButtonCont.addClass('invisble');
             }, 2500);
         })
         .fail(function(message) {
-            smsLoader.text('Sorry, we were unable to send you a sms. You can try again later, or just go the App Store/Play Store and search for so-sure 😥');
-            setTimeout(function() {
-                // Hide all the sms links - use invisble so we dont jump the content
-                smsButtonCont.addClass('invisible');
-            }, 2500);
+            $(this).show();
+            smsLoader.hide();
         });
 
     });
