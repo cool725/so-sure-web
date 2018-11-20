@@ -4079,7 +4079,7 @@ jsprim@^1.2.2:
 
 "jssocials@git://github.com/so-sure/jssocials.git#master":
   version "1.5.0"
-  resolved "git://github.com/so-sure/jssocials.git#adb91e2e317f3aba97c22afc4ca32fc4951f2460"
+  resolved "git://github.com/so-sure/jssocials.git#d8b97aed647b54c72fd3cca6beb409c1e430b977"
 
 killable@^1.0.0:
   version "1.0.0"
