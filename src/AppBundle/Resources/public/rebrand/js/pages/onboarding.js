@@ -36,10 +36,14 @@ $(function() {
             setTimeout(function() {
                 // Hide all the sms links - use invisble so we dont jump the content
                 smsButtonCont.addClass('invisible');
-            }, 1500);
+            }, 2500);
         })
         .fail(function(message) {
             smsLoader.text('Sorry, we were unable to send you a sms. You can try again later, or just go the App Store/Play Store and search for so-sure 😥');
+            setTimeout(function() {
+                // Hide all the sms links - use invisble so we dont jump the content
+                smsButtonCont.addClass('invisible');
+            }, 2500);
         });
 
     });
@@ -234,7 +238,7 @@ $(function() {
         .done(function(data, status) {
             if (data.file) {
                 policyFile = data.file;
-                $('#policy_download').html('Download your policy details <i class="fal fa-download ml-2"></i>');
+                $('#policy_download').html('Download your policy details <i class="fal fa-download ml-2"></i>').removeClass('disabled');
             } else {
                 setTimeout(downloadPolicy, 11000);
             }

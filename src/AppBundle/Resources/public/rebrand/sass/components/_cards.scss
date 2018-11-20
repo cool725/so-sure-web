@@ -163,6 +163,18 @@
             &:active {
                 background-color: darken($dodger-blue, 8%);
             }
+
+            &.disabled {
+                pointer-events: none;
+
+                &:hover,
+                &:focus,
+                &:active {
+                    background-color: $dodger-blue;
+                    outline: 0;
+                    text-decoration: none;
+                }
+            }
         }
     }
 }
