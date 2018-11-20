@@ -32,7 +32,7 @@ $(function() {
             method: 'POST',
         })
         .done(function() {
-            smsLoader.text('Download link sent to your deivce 😀');
+            smsLoader.text('Download link sent to your device 😀');
             setTimeout(function() {
                 // Hide all the sms links - use invisble so we dont jump the content
                 smsButtonCont.addClass('invisible');
