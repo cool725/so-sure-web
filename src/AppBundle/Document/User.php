@@ -579,6 +579,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     public function setAffiliate(AffiliateCompany $affiliate)
     {
         $this->affiliate = $affiliate;
+    }
 
     public function getCharges()
     {
