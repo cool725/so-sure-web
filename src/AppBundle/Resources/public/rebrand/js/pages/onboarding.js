@@ -199,7 +199,10 @@ $(function() {
             $.ajax({
                 url: emailUrl,
                 type: 'POST',
-                data: {email: $('.input-invite').val()},
+                data: {
+                    email: $('.input-invite').val(),
+                    csrf: $('#email-csrf').val()
+                }
             })
             .done(function(data) {
                 // console.log(data);
