@@ -586,17 +586,17 @@ class AdminController extends BaseController
                     if ($bacs->isS3FilePresent($file->getClientOriginalName())) {
                         $this->addFlash(
                             'error',
-                            'File is already processed.'
+                            sprintf('File is already processed (%s).', $file->getClientOriginalName())
                         );
                     } elseif ($bacs->processUpload($file)) {
                         $this->addFlash(
                             'success',
-                            'Successfully uploaded & processed file'
+                            sprintf('Successfully uploaded & processed file (%s)', $file->getClientOriginalName())
                         );
                     } else {
                         $this->addFlash(
                             'error',
-                            'Unable to process file.'
+                            sprintf('Unable to process file (%s).', $file->getClientOriginalName())
                         );
                     }
 
