@@ -68,7 +68,9 @@ class AffiliateServiceTest extends WebTestCase
         self::$container = $kernel->getContainer();
         self::$userManager = self::$container->get('fos_user.user_manager');
         self::$affiliateService = self::$container->get('app.affiliate');
-        self::$dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        /** @var DocumentManager $dm */
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        self::$dm = $dm;
         self::$userRepository = self::$dm->getRepository(User::class);
         self::$chargeRepository = self::$dm->getRepository(Charge::class);
         self::$policyRepository = self::$dm->getRepository(Policy::class);
@@ -232,7 +234,10 @@ class AffiliateServiceTest extends WebTestCase
             "{$prefix}lead"
         );
         $cancel =  self::createTestUser("P40D", "{$prefix}cancel", "{$prefix}campaign");
-        $cancel->getLatestPolicy()->setStatus(Policy::STATUS_CANCELLED);
+        $policy = $cancel->getLatestPolicy();
+        if ($policy) {
+            $policy->setStatus(Policy::STATUS_CANCELLED);
+        }
         return [
             "affiliate" => $affiliate,
             "bango" => self::createTestUser("P10D", "{$prefix}bango", "{$prefix}campaign"),
@@ -351,11 +356,14 @@ class AffiliateServiceTest extends WebTestCase
     /**
      * Adds a new policy to the given user which is a renewal of their last policy.
      * @param User $user is the user who must have an existing policy for this to work.
-     * @return Policy the policy that was just created.
+     * @return Policy|null the policy that was just created.
      */
     private static function renewal($user)
     {
         $policy = $user->getLatestPolicy();
+        if (!$policy) {
+            return null;
+        }
         $policy->setStatus(Policy::STATUS_RENEWAL);
         $renewal = new PhonePolicy();
         $renewal->setUser($user);

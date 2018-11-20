@@ -4,6 +4,7 @@ namespace AppBundle\Service;
 use AppBundle\Document\AffiliateCompany;
 use AppBundle\Document\File\SalvaPaymentFile;
 use AppBundle\Document\Payment\BacsIndemnityPayment;
+use AppBundle\Repository\ChargeRepository;
 use AppBundle\Repository\CashbackRepository;
 use AppBundle\Repository\ClaimRepository;
 use AppBundle\Repository\ConnectionRepository;
@@ -48,18 +49,14 @@ use DateTimeZone;
 
 class AffiliateService
 {
-    /** @var DocumentManager */
     protected $dm;
-
-    /** @var LoggerInterface */
     protected $logger;
-
-    /** @var ChargeRepository */
     protected $chargeRepository;
 
     /**
-     * @param DocumentManager $dm
-     * @param LoggerInterface $logger
+     * Builds the affiliate service and sends in it's dependencies as arguments.
+     * @param DocumentManager $dm     is the document manager.
+     * @param LoggerInterface $logger is the logger.
      */
     public function __construct(
         DocumentManager $dm,
@@ -67,6 +64,7 @@ class AffiliateService
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
+        /** @var ChargeRepository $chargeRepository */
         $this->chargeRepository = $dm->getRepository(Charge::class);
     }
 
