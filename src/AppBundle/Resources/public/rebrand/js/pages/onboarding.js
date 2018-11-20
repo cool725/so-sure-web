@@ -205,7 +205,7 @@ $(function() {
                 }
             })
             .done(function(data) {
-                console.log(data);
+                // console.log(data);
                 $('.btn-invite').tooltip({
                     'title':   'Your invite is on it\'s way 😀',
                     'trigger': 'manual'
