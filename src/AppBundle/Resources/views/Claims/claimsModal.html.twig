@@ -5,7 +5,7 @@
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
-                <h4 class="modal-title">Claim: ''</h4>
+                <h4 class="modal-title">Claim: ...</h4>
             </div>
 
             <ul class="nav nav-tabs" id="myTab" role="tablist">
@@ -100,23 +100,163 @@
                         </div>
 
                         <div class="tab-pane fade" id="damage" role="tabpanel" aria-labelledby="damage-tab">
-                            damage
+                            <table class="table table-striped">
+                                <tr>
+                                    <td>Details</td>
+                                    <td id='claims-detail-type-details'></td>
+                                </tr>
+                                <tr>
+                                    <td>Bought on</td>
+                                    <td id='claims-detail-bought'></td>
+                                </tr>
+                                <tr>
+                                    <td>Condition</td>
+                                    <td id='claims-detail-phone-status'></td>
+                                </tr>
+                                <tr>
+                                    <td>Proof of usages</td>
+                                    <td id='claims-detail-damage-proof-usages'></td>
+                                </tr>
+                                <tr>
+                                    <td>Pictures of phone</td>
+                                    <td id='claims-detail-pictures-phone'></td>
+                                </tr>
+                                <tr>
+                                    <td>Others</td>
+                                    <td id='claims-detail-damage-others'></td>
+                                </tr>
+                            </table>
                         </div>
 
                         <div class="tab-pane fade" id="replacement" role="tabpanel" aria-labelledby="replacement-tab">
-                            replacement
+                            <table class="table table-striped">
+                                <tr>
+                                    <td>Contacted</td>
+                                    <td id='claims-detail-contacted'></td>
+                                </tr>
+                                <tr>
+                                    <td>Network</td>
+                                    <td id='claims-detail-network'></td>
+                                </tr>
+                                <tr>
+                                    <td>Blocked</td>
+                                    <td id='claims-detail-blocked'></td>
+                                </tr>
+                                <tr>
+                                    <td>Reported on</td>
+                                    <td id='claims-detail-reported'></td>
+                                </tr>
+                                <tr>
+                                    <td>Reported to</td>
+                                    <td id='claims-detail-reported-to'></td>
+                                </tr>
+                                <tr>
+                                    <td>Proof of usage</td>
+                                    <td id='claims-detail-theftloss-proof-usages'></td>
+                                </tr>
+                                <tr>
+                                    <td>Proof of barring</td>
+                                    <td id='claims-detail-proof-barrings'></td>
+                                </tr>
+                                <tr>
+                                    <td>Proof of purchase</td>
+                                    <td id='claims-detail-proof-purchases'></td>
+                                </tr>
+                                <tr id='claims-detail-proof-losses-container'>
+                                    <td>Proof of loss</td>
+                                    <td id='claims-detail-proof-losses'></td>
+                                </tr>
+                                <tr>
+                                    <td>Other</td>
+                                    <td id='claims-detail-theftloss-others'></td>
+                                </tr>
+                                <tr id='claims-detail-crime-reference-container'>
+                                    <td>Crime reference number</td>
+                                    <td id='claims-detail-crime-reference'></td>
+                                </tr>
+                                <tr id='claims-detail-policy-report-container'>
+                                    <td>Police report</td>
+                                    <td id='claims-detail-policy-report'></td>
+                                </tr>
+                            </table>
                         </div>
 
                         <div class="tab-pane fade" id="dates" role="tabpanel" aria-labelledby="dates-tab">
-                            dates
+                            <table class="table table-striped">
+                                <tr>
+                                    <td>Loss</td>
+                                    <td id='claims-detail-loss'></td>
+                                </tr>
+                                <tr>
+                                    <td>Notification</td>
+                                    <td id='claims-detail-notification'></td>
+                                </tr>
+                                <tr>
+                                    <td>Recorded</td>
+                                    <td id='claims-detail-recorded'></td>
+                                </tr>
+                                <tr>
+                                    <td>Submitted</td>
+                                    <td id='claims-detail-submitted'></td>
+                                </tr>
+                                <tr>
+                                    <td>Approved
+                                    </td>
+                                    <td>
+                                        <input type="text" name="approved-date" readonly="readonly"
+                                               id="claims-detail-approved"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Replacement Received</td>
+                                    <td id='claims-detail-replacement'></td>
+                                </tr>
+                                <tr>
+                                    <td>Closed</td>
+                                    <td id='claims-detail-closed'></td>
+                                </tr>
+                            </table>
                         </div>
 
                         <div class="tab-pane fade" id="amounts" role="tabpanel" aria-labelledby="amounts-tab">
-                            amounts
+                            <table class="table table-striped">
+                                <tr>
+                                    <td>Excess</td>
+                                    <td id='claims-detail-excess'></td>
+                                </tr>
+                                <tr>
+                                    <td>Unauthorized Calls</td>
+                                    <td id='claims-detail-unauthorized-calls'></td>
+                                </tr>
+                                <tr>
+                                    <td>Accessories</td>
+                                    <td id='claims-detail-accessories'></td>
+                                </tr>
+                                <tr>
+                                    <td>Phone Replacement Cost</td>
+                                    <td id='claims-detail-replacement-cost'></td>
+                                </tr>
+                                <tr>
+                                    <td>Transaction Fees</td>
+                                    <td id='claims-detail-transaction'></td>
+                                </tr>
+                                <tr>
+                                    <td>Claim Handling Fees</td>
+                                    <td id='claims-detail-handling'></td>
+                                </tr>
+                                <tr>
+                                    <td>Reserved</td>
+                                    <td id='claims-detail-reserved'></td>
+                                </tr>
+                                <tr>
+                                    <td>Total Incurred</td>
+                                    <td id='claims-detail-total-incurred'></td>
+                                </tr>
+                            </table>
                         </div>
 
                         <div class="tab-pane fade" id="update" role="tabpanel" aria-labelledby="update-tab">
-                            update
+                            <div id="update_form_thingy"></div>
                         </div>
                     </div>
 
