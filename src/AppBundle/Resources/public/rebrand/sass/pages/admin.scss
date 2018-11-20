@@ -3,3 +3,17 @@
 body {
     padding-top: 5rem;
 }
+
+// Menus
+.admin-list-group {
+
+    a {
+        display: flex;
+        align-items: center;
+        justify-content: start;
+
+        i {
+            width: 1.2rem;
+        }
+    }
+}
