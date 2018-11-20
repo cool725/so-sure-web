@@ -114,11 +114,16 @@ class DefaultController extends BaseController
      */
     public function freeTasteCard()
     {
+        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_LANDING_PAGE, [
+            'Page' => $request->get('_route'),
+        ]);
+
         $pageType = 'tastecard';
 
         $data = array(
             'page_type' => $pageType,
         );
+
 
         $template = 'AppBundle:Default:indexXmas.html.twig';
 
@@ -130,6 +135,10 @@ class DefaultController extends BaseController
      */
     public function freePhoneCase()
     {
+        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_LANDING_PAGE, [
+            'Page' => $request->get('_route'),
+        ]);
+
         $pageType = 'phonecase';
 
         $data = array(
