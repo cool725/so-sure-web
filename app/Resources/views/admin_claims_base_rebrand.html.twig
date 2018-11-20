@@ -43,11 +43,7 @@
             {% block body %}{% endblock %}
         </main>
 
-        {% block footer %}
-            {% if hide_footer is not defined or not hide_footer %}
-                {% include '::footer_rebrand.html.twig' %}
-            {% endif %}
-        {% endblock %}
+        {% block footer %}{% endblock %}
 
         {% include '::footer_data.html.twig' %}
 
