@@ -7,10 +7,22 @@
 @import "../abstracts/palette";
 @import "../abstracts/variables";
 
+// Lets add a snow layer rather than using body
+.snow {
+    width: 100vw; height: 100vh;
+    position: fixed;
+    background: none;
+    pointer-events: none;
+    top: 0; left: 0;
+    overflow: hidden;
+    z-index: 1030;
+}
+
 .snowflake{
     position:absolute;
     top: -40px;
     transition: left 5s;
+    pointer-events: none;
     opacity: 1;
     z-index: 1030;
     color: $white;

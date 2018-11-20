@@ -24,17 +24,18 @@
 
 {% block body %}
 
+    <div class="snow"></div>
+
     <section class="hero">
         <div class="container container-xtra">
             <div class="row">
                 <div class="col-lg-6">
                     <div class="hero__intro">
                         {% if page_type == 'tastecard' %}
-                            <h1 class="mb-4 text-white">so-yummy <br><span class="sub">FREE Taste Card worth &pound;80</span></h1>
-                            <h4 class="text-zaffre">Get a FREE TasteCard worth £80 this Christmas when you buy a mobile phone policy with us</h4>
+                            <h1 class="mb-4 text-white">soo-yummy <br><span class="sub">FREE tastecard worth &pound;79.99</span></h1>
+                            <h4 class="text-zaffre">Get a FREE TasteCard this Christmas when you buy a policy and share with 5 friends</h4>
                             <p class="mb-4 text-white">
-                                It's coming up for the time of year when we eat, drink and be merry. And, its that time of year where your mobile phone gets lost, stolen or smashed 😱 <br>
-                                So what are you waiting for, get your mobile protected, and fill your boot <br>
+                                So what are you waiting for, get your mobile protected this Christmas.<br>
                                 <a href="#"
                                    class="text-white"
                                    data-toggle="modal"
@@ -599,7 +600,7 @@
          tabindex="-1" role="dialog"
          aria-labelledby="taste_card_terms"
          aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Terms &amp; Conditions</h5>
@@ -609,8 +610,11 @@
                 </div>
                 <div class="modal-body text-center text-sm-left">
                     {% if page_type == 'tastecard' %}
-                        <p>Taste Card per so-sure customer. Code for the free Taste Card only issued 30 days after the policy purchase date and only if customer has made no claims. Money for the Taste Card will be revoked if customer cancels policy within 4 months.</p>
-                        <p>Promotion valid from 19th -31st December. so-sure reserves the right to cancel or amend the promotion and these terms and conditions without notice and at anytime.</p>
+                        <p>Terms and conditions apply: 1 tastecard per new so-sure policyholder (ie have a least one so-sure policy) that shares with 5 friends. Sharing must be done while being logged into the so-sure website as a customer either by web or app as sharing actions are tracked. Promotion valid from 19th November 2018 until 31st January 2019.</p>
+                        <p>Code for the free tastecard will be issued 30 days after the policy purchase date and will remain active for 365 days as long the customer’s policy remains active. If the policy is cancelled, so will the Tastecard. All digital cards are personalised to each individual which makes them non-transferrable and not for re-sale.</p>
+                        <p>Promotion valid from 19th November 2018 to the 31st January 2019 so-sure reserves the right to cancel or amend the promotion and these terms and conditions without notice and at any time.</p>
+                        <p>This offer is available to UK residents only. The RRP of a full annual membership to tastecard is &pound;79.99 but you will receive this free of charge as per the terms and conditions stated above. Membership is digital only, an email will be sent following redemption to provide instructions on how to access membership. If you wish to renew your Tastecard when it expires, you need to buy a new code from tastecard.</p>
+                        <p>By redeeming the code provided, you agree to these terms and conditions.</p>
                     {% elseif page_type == 'phonecase' %}
                         <p>1 case per so-sure customer. Code for the free Layer Case only issued 14 days after the policy purchase date and only if customer has made no claims.</p>
                         <p>Promotion valid from 19th -31st December. so-sure reserves the right to cancel or amend the promotion and these terms and conditions without notice and at anytime.</p>

@@ -8,7 +8,7 @@ require('../../sass/pages/homepage-xmas.scss');
 
 $(function(){
 
-    let snowIntensity = 800; // smaller number = more snowflakes;
+    let snowIntensity = 600; // smaller number = more snowflakes;
     let snowType = '*';
 
     function snowFlake(){
@@ -42,7 +42,7 @@ $(function(){
             });
         }
 
-        $('body').append(snowflake.body);
+        $('.snow').append(snowflake.body);
         snowflake.fall();
     }
 
@@ -52,19 +52,30 @@ $(function(){
 
     $(document).on('keyup', function(e) {
 
+        let egg,
+            phone;
+
+        window.clearInterval(snow, egg, phone);
+
         if(e.keyCode == 79){
 
-            window.clearInterval(snow);
+            let egg = window.setInterval(function () {
+                snowIntensity = 4000;
+                snowType = '🍆';
+                new snowFlake();
+            }, snowIntensity);
 
-            let snow = window.setInterval(function () {
+        } else if(e.keyCode == 80) {
+
+            let phone = window.setInterval(function () {
                 snowIntensity = 4000;
                 snowType = '📱';
                 new snowFlake();
             }, snowIntensity);
 
-        } else {
+        } else if(e.keyCode == 81) {
 
-            window.clearInterval(snow);
+            $('.snow').fadeOut();
 
         }
     });

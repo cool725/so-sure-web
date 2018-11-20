@@ -109,37 +109,37 @@ class DefaultController extends BaseController
         return $this->render($template, $data);
     }
 
-    // /**
-    //  * @Route("/free-taste-card", name="free_taste_card")
-    //  */
-    // public function freeTasteCard()
-    // {
-    //     $pageType = 'tastecard';
+    /**
+     * @Route("/free-taste-card", name="free_taste_card")
+     */
+    public function freeTasteCard()
+    {
+        $pageType = 'tastecard';
 
-    //     $data = array(
-    //         'page_type' => $pageType,
-    //     );
+        $data = array(
+            'page_type' => $pageType,
+        );
 
-    //     $template = 'AppBundle:Default:indexXmas.html.twig';
+        $template = 'AppBundle:Default:indexXmas.html.twig';
 
-    //     return $this->render($template, $data);
-    // }
+        return $this->render($template, $data);
+    }
 
-    // /**
-    //  * @Route("/free-phone-case", name="free_phone_case")
-    //  */
-    // public function freePhoneCase()
-    // {
-    //     $pageType = 'phonecase';
+    /**
+     * @Route("/free-phone-case", name="free_phone_case")
+     */
+    public function freePhoneCase()
+    {
+        $pageType = 'phonecase';
 
-    //     $data = array(
-    //         'page_type' => $pageType,
-    //     );
+        $data = array(
+            'page_type' => $pageType,
+        );
 
-    //     $template = 'AppBundle:Default:indexXmas.html.twig';
+        $template = 'AppBundle:Default:indexXmas.html.twig';
 
-    //     return $this->render($template, $data);
-    // }
+        return $this->render($template, $data);
+    }
 
     /**
      * @Route("/money", name="money")
