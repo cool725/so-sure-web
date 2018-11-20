@@ -282,13 +282,6 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     protected $company;
 
     /**
-     * @MongoDB\ReferenceMany(targetDocument="Policy", mappedBy="user")
-     * @MongoDB\ReferenceOne(targetDocument="AffiliateCompany", inversedBy="confirmedUsers")
-     * @Gedmo\Versioned
-     */
-    protected $affiliate;
-
-    /**
      * @MongoDB\ReferenceMany(targetDocument="Policy", mappedBy="user", prime={"user"})
      */
     protected $policies;
