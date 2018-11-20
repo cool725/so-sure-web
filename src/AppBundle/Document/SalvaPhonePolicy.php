@@ -10,7 +10,7 @@ use AppBundle\Classes\Salva;
 
 /**
  * @MongoDB\Document(repositoryClass="AppBundle\Repository\PhonePolicyRepository")
- * @Gedmo\Loggable
+ * @Gedmo\Loggable(logEntryClass="AppBundle\Document\LogEntry")
  */
 class SalvaPhonePolicy extends PhonePolicy
 {

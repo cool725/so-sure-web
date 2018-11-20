@@ -25,6 +25,7 @@ class Feature
     const FEATURE_APP_PICSURE_DOTCODE = 'app-picsure-dotcode';
     const FEATURE_APP_FACEBOOK_USERFRIENDS_PERMISSION = 'app-facebook-userfriends-permission';
     const FEATURE_CLAIMS_DEFAULT_DIRECT_GROUP = 'claims-default-direct-group';
+    const FEATURE_RATE_LIMITING = 'rate-limiting';
 
     public static $features = [
         self::FEATURE_QUOTE_LEAD,
@@ -41,6 +42,7 @@ class Feature
         self::FEATURE_APP_PICSURE_DOTCODE,
         self::FEATURE_APP_FACEBOOK_USERFRIENDS_PERMISSION,
         self::FEATURE_CLAIMS_DEFAULT_DIRECT_GROUP,
+        self::FEATURE_RATE_LIMITING,
     ];
 
     /**

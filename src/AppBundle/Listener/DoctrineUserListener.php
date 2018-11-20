@@ -4,6 +4,8 @@ namespace AppBundle\Listener;
 
 use AppBundle\Document\BacsPaymentMethod;
 use AppBundle\Document\BankAccount;
+use AppBundle\Document\Charge;
+use AppBundle\Document\Invitation\Invitation;
 use AppBundle\Document\PaymentMethod;
 use AppBundle\Event\BacsEvent;
 use Doctrine\ODM\MongoDB\Event\PreUpdateEventArgs;
@@ -131,13 +133,28 @@ class DoctrineUserListener extends BaseDoctrineListener
     {
         /** @var User $document */
         $document = $eventArgs->getDocument();
-        if ($document instanceof User) {
-            if (count($document->getCreatedPolicies()) > 0) {
-                throw new \Exception(sprintf(
-                    'Unable to delete user %s w/non-partial policy',
-                    $document->getId()
-                ));
-            }
+        if (!$document instanceof User) {
+            return;
+        }
+
+        /** @var User $user */
+        $user = $document;
+
+        if (count($user->getCreatedPolicies()) > 0) {
+            throw new \Exception(sprintf(
+                'Unable to delete user %s w/non-partial policy',
+                $user->getId()
+            ));
+        }
+
+        foreach ($user->getSentInvitations() as $sentInvitation) {
+            /** @var Invitation $sentInvitation */
+            $sentInvitation->setInviter(null);
+        }
+
+        foreach ($user->getCharges() as $charge) {
+            /** @var Charge $charge */
+            $charge->setUser(null);
         }
     }
 

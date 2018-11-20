@@ -4,6 +4,7 @@ namespace AppBundle\Tests\Document;
 
 use AppBundle\Document\BankAccount;
 use AppBundle\Document\Connection\Connection;
+use AppBundle\Document\DateTrait;
 use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\Claim;
 use AppBundle\Document\Connection\StandardConnection;
@@ -38,6 +39,7 @@ class PhonePolicyTest extends WebTestCase
 {
     use \AppBundle\Tests\PhingKernelClassTrait;
     use UserClassTrait;
+    use DateTrait;
 
     protected static $container;
     protected static $invitationService;
@@ -5309,6 +5311,49 @@ class PhonePolicyTest extends WebTestCase
         $this->assertEquals(Policy::STATUS_UNPAID, $policy->getStatus());
 
         $policy->setStatus(Policy::STATUS_ACTIVE);
+        $policy->setPolicyStatusUnpaidIfActive(true);
+        $this->assertEquals(Policy::STATUS_UNPAID, $policy->getStatus());
+    }
+
+    public function testSetPolicyStatusUnpaidIfActiveBacs()
+    {
+        $date = \DateTime::createFromFormat('U', time());
+        $date = $date->sub(new \DateInterval('P2M'));
+        $now = new \DateTime();
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testSetPolicyStatusUnpaidIfActiveBacs', $this),
+            'bar'
+        );
+        $policy = static::initPolicy($user, static::$dm, static::$phone, $date, true);
+        static::$policyService->setEnvironment('prod');
+        static::$policyService->create($policy, $date, true);
+        static::$policyService->setEnvironment('test');
+        static::$dm->flush();
+
+        $this->assertTrue($policy->isPolicyPaidToDate($date, true));
+        $this->assertFalse($policy->isPolicyPaidToDate($now, true));
+
+        $policy->setPolicyStatusUnpaidIfActive(true);
+        $this->assertEquals(Policy::STATUS_UNPAID, $policy->getStatus());
+
+        self::addBacsPayPayment($policy, $now);
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        static::$dm->flush();
+        $this->assertTrue($policy->isPolicyPaidToDate($now, true));
+        $this->assertTrue($policy->isPolicyPaidToDate($date));
+
+        self::addBacsPayment(
+            $policy,
+            (0 - $policy->getPremium()->getMonthlyPremiumPrice()),
+            (0 - Salva::MONTHLY_TOTAL_COMMISSION),
+            $this->getNextBusinessDay($now),
+            false
+        );
+        static::$dm->flush();
+
+        $this->assertTrue($policy->isPolicyPaidToDate($now));
+        $this->assertFalse($policy->isPolicyPaidToDate($now, true, false, true));
         $policy->setPolicyStatusUnpaidIfActive(true);
         $this->assertEquals(Policy::STATUS_UNPAID, $policy->getStatus());
     }

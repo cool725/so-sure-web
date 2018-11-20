@@ -15,7 +15,7 @@ use AppBundle\Validator\Constraints\AlphanumericSpaceDotPipeValidator;
 
 /**
  * @MongoDB\EmbeddedDocument
- * @Gedmo\Loggable
+ * @Gedmo\Loggable(logEntryClass="AppBundle\Document\LogEntry")
  */
 class Attribution implements EqualsInterface
 {

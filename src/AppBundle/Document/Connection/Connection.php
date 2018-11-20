@@ -13,7 +13,7 @@ use AppBundle\Document\CurrencyTrait;
 
 /**
  * @MongoDB\Document(repositoryClass="AppBundle\Repository\ConnectionRepository")
- * @Gedmo\Loggable
+ * @Gedmo\Loggable(logEntryClass="AppBundle\Document\LogEntry")
  * @MongoDB\InheritanceType("SINGLE_COLLECTION")
  * @MongoDB\DiscriminatorField("type")
  * @MongoDB\DiscriminatorMap({

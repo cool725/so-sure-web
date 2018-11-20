@@ -355,7 +355,6 @@ class ReceperioService extends BaseImeiService
 
         $this->identityLog = $identityLog;
 
-        /*
         if ($identityLog && $identityLog->isSessionDataPresent()) {
             if (!$this->rateLimit->allowedByDevice(
                 RateLimitService::DEVICE_TYPE_IMEI,
@@ -365,7 +364,6 @@ class ReceperioService extends BaseImeiService
                 throw new RateLimitException();
             }
         }
-        */
 
         if ($this->getEnvironment() != 'prod') {
             $this->responseData = 'imei';
@@ -663,7 +661,6 @@ class ReceperioService extends BaseImeiService
         IdentityLog $identityLog = null,
         $warnMismatch = true
     ) {
-        /*
         if ($identityLog && $identityLog->isSessionDataPresent()) {
             if (!$this->rateLimit->allowedByDevice(
                 RateLimitService::DEVICE_TYPE_SERIAL,
@@ -673,7 +670,6 @@ class ReceperioService extends BaseImeiService
                 throw new RateLimitException();
             }
         }
-        */
 
         $this->identityLog = $identityLog;
 

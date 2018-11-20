@@ -11,7 +11,7 @@ use AppBundle\Classes\SoSure;
 
 /**
  * @MongoDB\Document(repositoryClass="AppBundle\Repository\ScheduledPaymentRepository")
- * @Gedmo\Loggable
+ * @Gedmo\Loggable(logEntryClass="AppBundle\Document\LogEntry")
  */
 class ScheduledPayment
 {

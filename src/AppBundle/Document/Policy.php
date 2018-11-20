@@ -36,7 +36,7 @@ use AppBundle\Exception\ClaimException;
  * @MongoDB\InheritanceType("SINGLE_COLLECTION")
  * @MongoDB\DiscriminatorField("policy_type")
  * @MongoDB\DiscriminatorMap({"phone"="PhonePolicy","salva-phone"="SalvaPhonePolicy"})
- * @Gedmo\Loggable
+ * @Gedmo\Loggable(logEntryClass="AppBundle\Document\LogEntry")
  */
 abstract class Policy
 {
@@ -1891,7 +1891,8 @@ abstract class Policy
     public function setPolicyStatusUnpaidIfActive($checkUnpaidStatus = true, \DateTime $date = null)
     {
         if ($this->getStatus() == self::STATUS_ACTIVE) {
-            if (!$checkUnpaidStatus || ($checkUnpaidStatus && !$this->isPolicyPaidToDate($date))) {
+            if (!$checkUnpaidStatus || ($checkUnpaidStatus &&
+                !$this->isPolicyPaidToDate($date, true, false, true))) {
                 $this->setStatus(self::STATUS_UNPAID);
             }
         }
@@ -4240,12 +4241,14 @@ abstract class Policy
             if ($months > 12) {
                 $months = 12;
             }
+
             /*
             print PHP_EOL;
             print $date->format(\DateTime::ATOM) . PHP_EOL;
             print $this->getBilling()->format(\DateTime::ATOM) . PHP_EOL;
             print $months . PHP_EOL;
             */
+
             $expectedPaid = $this->getPremium()->getAdjustedStandardMonthlyPremiumPrice() * $months;
         } else {
             throw new \Exception('Unknown premium plan');
@@ -4380,7 +4383,7 @@ abstract class Policy
 
         if ($includeFuturePayments) {
             $futureDate = clone $date;
-            $futureDate = $futureDate->add(new \DateInterval('P1D'));
+            $futureDate = $this->endOfDay($this->getNextBusinessDay($futureDate));
             $totalPaid = $this->getTotalSuccessfulPayments($futureDate, true);
         } else {
             $totalPaid = $this->getTotalSuccessfulPayments($date, true);
@@ -4389,10 +4392,12 @@ abstract class Policy
             $totalPaid += $this->getPendingBacsPaymentsTotal();
         }
         $expectedPaid = $this->getTotalExpectedPaidToDate($date, $firstDayIsUnpaid);
-        // print sprintf("%f =? %f", $totalPaid, $expectedPaid) . PHP_EOL;
 
         // >= doesn't quite allow for minor float differences
-        return $this->areEqualToTwoDp($expectedPaid, $totalPaid) || $totalPaid > $expectedPaid;
+        $result = $this->areEqualToTwoDp($expectedPaid, $totalPaid) || $totalPaid > $expectedPaid;
+        //print sprintf("%f =? %f return %s%s", $totalPaid, $expectedPaid, $result ? 'true': 'false', PHP_EOL);
+
+        return $result;
     }
 
     public function getOutstandingScheduledPaymentsAmount()

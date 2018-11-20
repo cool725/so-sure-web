@@ -4,6 +4,7 @@ namespace AppBundle\DataFixtures\MongoDB\c\Policy;
 
 use AppBundle\Document\BacsPaymentMethod;
 use AppBundle\Document\BankAccount;
+use AppBundle\Document\Charge;
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\File\AccessPayFile;
 use AppBundle\Document\File\BacsReportInputFile;
@@ -549,6 +550,12 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
 
         $user->setPaymentMethod($paymentMethod);
 
+        if (random_int(0, 1) == 0) {
+            $charge = new Charge();
+            $charge->setType(Charge::TYPE_ADDRESS);
+            $user->addCharge($charge);
+        }
+
         return $user;
     }
 
@@ -906,12 +913,14 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         if (count($userA->getPolicies()) == 0 || count($userB->getPolicies()) == 0) {
             return;
         }
+        /** @var Policy $policyA */
         $policyA = $userA->getPolicies()[0];
+        /** @var Policy $policyB */
         $policyB = $userB->getPolicies()[0];
 
         $invitation = new EmailInvitation();
         $invitation->setInviter($userA);
-        $policyA->addInvitiation($invitation);
+        $policyA->addInvitation($invitation);
         $invitation->setEmail($userB->getEmail());
         $invitation->setInvitee($userB);
         if ($accepted) {

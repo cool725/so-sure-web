@@ -16,7 +16,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
  *      "customer"="CustomerCompany",
  *      "affiliate"="AffiliateCompany",
  * })
- * @Gedmo\Loggable
+ * @Gedmo\Loggable(logEntryClass="AppBundle\Document\LogEntry")
  */
 abstract class Company
 {

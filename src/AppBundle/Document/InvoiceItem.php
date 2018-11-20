@@ -11,7 +11,7 @@ use AppBundle\Validator\Constraints as AppAssert;
 
 /**
  * @MongoDB\EmbeddedDocument
- * @Gedmo\Loggable
+ * @Gedmo\Loggable(logEntryClass="AppBundle\Document\LogEntry")
  */
 class InvoiceItem
 {

@@ -9,7 +9,9 @@
 
     <h4 class="text-dodger-blue">
         Pay via Direct Debit
-        <span class="sub h5">(Recommended)</span>
+        {% if to_judo_form is defined %}
+            <span class="sub h5">(Recommended)</span>
+        {% endif %}
     </h4>
 
     {% if to_judo_form is defined %}
@@ -18,7 +20,7 @@
                 💳 Prefer to pay by card?
                 {% block to_judo_form %}
                     {{ form_start(to_judo_form) }}
-                    {{ form_widget(to_judo_form.submit, {'label': 'Click here', 'attr': {'class': 'linkButton'}}) }}
+                    {{ form_widget(to_judo_form.submit, {'label': 'Click here', 'attr': {'class': 'btn-simple-link'}}) }}
                     {{ form_end(to_judo_form) }}
                 {% endblock to_judo_form %}
             </smalll>

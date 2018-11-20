@@ -15,7 +15,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
  * @MongoDB\Document
- * @Gedmo\Loggable
+ * @Gedmo\Loggable(logEntryClass="AppBundle\Document\LogEntry")
  */
 class CustomerCompany extends Company
 {

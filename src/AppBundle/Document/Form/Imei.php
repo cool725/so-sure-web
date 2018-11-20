@@ -16,6 +16,8 @@ class Imei
      */
     protected $policy;
 
+    protected $note;
+
     protected $imei;
 
     public function getImei()
@@ -39,5 +41,15 @@ class Imei
         $phonePolicy = $policy;
         $this->policy = $phonePolicy;
         $this->setImei($phonePolicy->getImei());
+    }
+
+    public function getNote()
+    {
+        return $this->note;
+    }
+
+    public function setNote($note)
+    {
+        $this->note = $note;
     }
 }
