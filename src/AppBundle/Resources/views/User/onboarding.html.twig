@@ -66,7 +66,7 @@
                    data-slide-to="4"
                    data-target="#onboarding_carousel">
                     <div class="onboarding-nav__number h6 mb-0">4</div>
-                    <div class="onboarding-nav__title h6 ml-3 mb-0">Policy Details</div>
+                    <div class="onboarding-nav__title h6 ml-3 mb-0">Policy details</div>
                 </a>
             </div>
         {% endif %}
@@ -84,7 +84,7 @@
                         <div class="onboarding__body">
                             <h2 class="h4 text-primary mb-3">{{ policy.user.firstname }}, you're all covered 🎉</h2>
                                 {% if device_category() == 'Mobile' %}
-                                    <p class="mb-5">Thanks for choosing so-sure, you'll shortly recieve a confirmation email but for now your payment is all set up and your policy is active. Download our app and <strong>reduce your excess by up to &pound;100</strong>.</p>
+                                    <p class="mb-5">Thanks for choosing so-sure, you'll shortly receive a confirmation email but for now your payment is all set up and your policy is active. Download our app and <strong>reduce your excess by up to &pound;100</strong>.</p>
                                     {% if policy.phone.iTunes %}
                                         <a href="{{ apple_download('onboarding-mobile-one') }}"
                                            class="btn btn-primary btn-block-xs ga-outbound-click"
@@ -102,7 +102,7 @@
                                             Download our App <i class="fab fa-android ml-2 fa-lg"></i></a>
                                     {% endif %}
                                 {% else %}
-                                    <p class="mb-5">Thanks for choosing so-sure, you'll shortly recieve a confirmation email but for now your payment is all set up and your phone is insured. Download our app and <strong>reduce your excess by up to &pound;100</strong>.</p>
+                                    <p class="mb-5">Thanks for choosing so-sure, you'll shortly receive a confirmation email but for now your payment is all set up and your phone is insured. Download our app and <strong>reduce your excess by up to &pound;100</strong>.</p>
                                     <a href="#"
                                        class="btn btn-primary"
                                        role="button"
@@ -286,7 +286,7 @@
                                     {# TODO: Rework icons #}
                                     <div id="onboarding_btn_share"
                                          data-share-link="{{ policy.standardSCode.shareLink }}"
-                                         data-share-text="Join me on so-sure, a new type of insurer that you can rely on. They protect you when you need to claim and together they'll reward us with cashback when we don't. Here is my invite link:">
+                                         data-share-text="Hey, I just insured my mobile phone with so-sure. They give you 80% of your cash-back if we are connected and dont claim! Here's the link to check them out:">
                                     </div>
                                 </div>
                             {% endif %}
