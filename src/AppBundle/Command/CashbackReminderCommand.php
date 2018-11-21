@@ -2,6 +2,7 @@
 
 namespace AppBundle\Command;
 
+use AppBundle\Document\Cashback;
 use AppBundle\Service\PolicyService;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
@@ -25,6 +26,12 @@ class CashbackReminderCommand extends ContainerAwareCommand
             ->setName('sosure:cashback:reminder')
             ->setDescription('Send email reminders about cashback')
             ->addOption(
+                'missing',
+                null,
+                InputOption::VALUE_NONE,
+                'Check for missing status instead of pending'
+            )
+            ->addOption(
                 'dry-run',
                 null,
                 InputOption::VALUE_NONE,
@@ -43,27 +50,26 @@ class CashbackReminderCommand extends ContainerAwareCommand
     {
         $dryRun = $input->getOption('dry-run');
         $force = $input->getOption('force');
+        $status = $input->getOption('missing');
 
-        $date = \DateTime::createFromFormat('U', time())
-            ->format('W');
+        if ($status) {
+            $lines = $this->policyService->cashbackReminder($dryRun);
+        } else {
+            $date = \DateTime::createFromFormat('U', time())
+                ->format('W');
 
-        /*
-         * If the option to $force is not passed and $date is not evenly divisible
-         * do not run the command
-         */
-        if (!$force && ($date & 2)) {
-            return;
-        }
+            /*
+            * If the option to $force is not passed and $date is not evenly divisible
+            * do not run the command
+            */
+            if (!$force && ($date & 2)) {
+                return;
+            }
 
-        $lines = $this->policyService->cashbackReminder($dryRun);
-        $cashbacks = $this->policyService->cashbackPending($dryRun);
-
-        if ($dryRun) {
-            $output->writeln(json_encode($cashbacks, JSON_PRETTY_PRINT));
+            $lines = $this->policyService->cashbackPending($dryRun);
         }
 
         $output->writeln(json_encode($lines, JSON_PRETTY_PRINT));
-        $output->writeln(sprintf('Found %s cashback policies with no status. Mail sent', count($cashbacks)));
-        $output->writeln(sprintf('Found %s cashback pending policies. Mail sent', count($cashbacks)));
+        $output->writeln(sprintf('Found %s matching policies, email sent.', count($lines)));
     }
 }
