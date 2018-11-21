@@ -106,8 +106,8 @@
                     <tbody>
                     {% for claim in claims %}
                         <tr>
-                            <td><button type="button" class="btn btn-link" data-toggle="modal" data-target="#claimsModal"
-                            data-claim='{{ claim.toModalArray|json_encode }}' data-documents='{{ s3DownloadLinks(claim)|json_encode }}'>
+                            <td>
+                                <button type="button" class="btn btn-link" data-id="{{ claim.id }}" data-toggle="modal" data-target="#claimsModal">
                                 {% if claim.number %}{{ claim.number }}{% else %}N/A{% endif %}</button>
                             </td>
                             <td>

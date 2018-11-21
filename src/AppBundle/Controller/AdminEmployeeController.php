@@ -484,13 +484,9 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         /** @var Claim $claim */
         $claim = $repo->find($id);
 
-        if (!$claim) {
-            throw $this->createNotFoundException(sprintf('Policy %s not found', $id));
-        }
-
-        $res = new JsonResponse($claim->toModalArray());
-
-        return $res;
+        return $this->render('AppBundle:Claims:claimsModalBody.html.twig', [
+           'claim' => $claim->toModalArray()
+        ]);
     }
 
     /**

@@ -37,19 +37,42 @@ clipboard.on('success', function(event) {
     setTimeout(function() { $('.btn-copy').tooltip('hide'); }, 1500);
 });
 
-$('#claimsModalsss').on('show.bs.modal', function (event) {
-    var button = $(event.relatedTarget); // Button that triggered the modal
-    var documents = button.data('documents');
-    var claim;
-    var modal = $(this);
+let ajax;
 
-    var ajax = $.ajax({
-        url:'http://dev.so-sure.net:40080/admin/claim-info/general/' + button.data('id'),
-        type: "GET"
-    });
+$('#claimsModal').on('hide.bs.modal', function (event) {
+    let modal = $(this);
+
+    ajax.abort();
+
+    modal.find('.modal-content').html(
+        '<div class="modal-body">\
+            <div class="container-fluid">\
+                <div class="row text-center">\
+                    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>\
+                </div>\
+                <div class="row text-center">\
+                    <h3>Loading...</h3>\
+                </div>\
+            </div>\
+        </div>'
+    );
 });
 
 $('#claimsModal').on('show.bs.modal', function (event) {
+    let button = $(event.relatedTarget);
+    let modal = $(this);
+
+    ajax = $.ajax({
+        url:'http://dev.so-sure.net:40080/admin/claim-info/' + button.data('id'),
+        type: "GET"
+    });
+
+    ajax.success(function (form) {
+        modal.find('.modal-content').html(form);
+    });
+});
+
+$('#claimsModalssss').on('show.bs.modal', function (event) {
     var button = $(event.relatedTarget); // Button that triggered the modal
     var documents = button.data('documents');
     var modal = $(this);
@@ -59,13 +82,8 @@ $('#claimsModal').on('show.bs.modal', function (event) {
         type: "GET"
     });
 
-    var update = $.ajax({
-        url:'http://dev.so-sure.net:40080/admin/claim-update/' + button.data('id'),
-        type: "GET"
-    });
-
-    update.success(function (form) {
-        modal.find('#update_form_thingy').append(form)
+    ajax.success(function (form) {
+        modal.find('.modal-content').html(form);
     });
 
     ajax.success(function (claim) {
@@ -90,7 +108,7 @@ $('#claimsModal').on('show.bs.modal', function (event) {
             }
             modal.find('#claims-detail-status').html(status);
             modal.find('#claims-detail-handling-team').text(claim.handlingTeam);
-            modal.find('#claims-detail-number-to-reach').text(claim.phoneToReach);
+            modal.find('#claims-detail-number-to-reach').text(claim.detail-time-to-reach);
             modal.find('#claims-detail-time-to-reach').text(claim.timeToReach);
             modal.find('#claims-detail-initial-suspicion').text(claim.initialSuspicion);
             modal.find('#claims-detail-final-suspicion').text(claim.finalSuspicion);
@@ -105,7 +123,7 @@ $('#claimsModal').on('show.bs.modal', function (event) {
             if (claim.type == 'damage') {
                 modal.find('#claims-damage').show();
                 if (claim.typeDetails == 'other') {
-                    modal.find('#claims-detail-type-details').text(claim.typeDetailsOther);
+                    modal.find('#claims-detail-type-details').text(claim.phone-status);
                 }
                 else {
                     modal.find('#claims-detail-type-details').text(claim.typeDetails);

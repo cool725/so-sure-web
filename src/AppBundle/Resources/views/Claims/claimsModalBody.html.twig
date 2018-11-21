@@ -1,0 +1,311 @@
+<div class="modal-content">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title">Claim: {{ claim.number }}</h4>
+
+        <ul class="nav nav-pills" id="myTab" role="tablist">
+            <li class="nav-item active">
+                <a class="nav-link" id="general-tab" data-toggle="tab" href="#general" role="tab"
+                   aria-controls="general"
+                   aria-selected="true">General</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="profile-tab" data-toggle="tab" href="#damage" role="tab"
+                   aria-controls="damage"
+                   aria-selected="false">Damage</a>
+            </li>
+            {% if claim.type == 'theft' or claim.type == 'loss' %}
+            <li class="nav-item">
+                <a class="nav-link" id="theftloss-tab" data-toggle="tab" href="#theftloss" role="tab"
+                   aria-controls="theftloss"
+                   aria-selected="false">Theft/Loss</a>
+            </li>
+            {% endif %}
+            <li class="nav-item">
+                <a class="nav-link" id="details-tab" data-toggle="tab" href="#details" role="tab"
+                   aria-controls="details"
+                   aria-selected="false">Details</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="costs-tab" data-toggle="tab" href="#costs" role="tab"
+                   aria-controls="amounts"
+                   aria-selected="false">Costs</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="update-tab" data-toggle="tab" href="#update" role="tab"
+                   aria-controls="update"
+                   aria-selected="false">Update</a>
+            </li>
+        </ul>
+    </div>
+
+
+    <div class="modal-body">
+        <div class="tab-content" id="tab-content">
+            <div class="tab-pane fade in active" id="general" role="tabpanel"
+                 aria-labelledby="general-tab">
+                <table class="table table-bordered table-striped">
+                    <tr>
+                        <td>Policy</td>
+                        <td>{{ claim.policyNumber|default('N/A') }}</td>
+                    </tr>
+                    <tr>
+                        <td>Type</td>
+                        <td>{{ claim.type|default('') }}</td>
+                    <tr>
+                        <td>Status</td>
+
+                        {% if claim.status == 'fnol' %}
+                        <td class="text-warning" title="Claim not yet submitted to claims handler">
+                            {{ claim.status|default('') }}
+                            {{ claim.daviesStatus|default('') }}
+                        </td>
+                        {% else %}
+                        <td>
+                            {{ claim.status|default('') }}
+                            {{ claim.daviesStatus|default('') }}
+                        </td>
+                        {% endif %}
+                    </tr>
+                    <tr>
+                        <td>Claim Handling Team</td>
+                        <td>{{ claim.handlingTeam|default('') }}</td>
+                    </tr>
+                    <tr>
+                        <td>Number to reach</td>
+                        <td>{{ claim.phoneToReach|default('') }}</td>
+                    </tr>
+                    <tr>
+                        <td>Time to reach</td>
+                        <td>{{ claim.timeToReach|default('') }}</td>
+                    </tr>
+                    <tr>
+                        <td>Initial Suspicion</td>
+                        <td>{{ claim.initialSuspicion|default('') }}</td>
+                    </tr>
+                    <tr>
+                        <td>Final Suspicion</td>
+                        <td>{{ claim.finalSuspicion|default('') }}</td>
+                    </tr>
+                    <tr>
+                        <td>Incident Date</td>
+                        <td>{{ claim.incidentDate|default('') }}</td>
+                    </tr>
+                    <tr>
+                        <td>Incident Location</td>
+                        <td>{{ claim.location|default('') }}</td>
+                    </tr>
+                    <tr>
+                        <td>Description</td>
+                        <td>{{ claim.description|default('') }}</td>
+                    </tr>
+                    <tr>
+                        <td>Notes</td>
+                        <td>{{ claim.notes|default('') }}</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="tab-pane fade" id="damage" role="tabpanel" aria-labelledby="damage-tab">
+                <table class="table table-bordered table-striped">
+                    <tr>
+                        <td>Details</td>
+                        <td>{{ claim.typeDetailsOther|default('') }}</td>
+                    </tr>
+                    <tr>
+                        <td>Bought on</td>
+                        <td>{{ claim.monthOfPurchase|default('') }} {{ claim.yearOfPurchase|default('') }}</td>
+                    </tr>
+                    <tr>
+                        <td>Condition</td>
+                        <td>{{ claim.phoneStatus|default('') }}</td>
+                    </tr>
+                    <tr>
+                        <td>Proof of usages</td>
+                        <td id='claims-detail-damage-proof-usages'></td>
+                    </tr>
+                    <tr>
+                        <td>Pictures of phone</td>
+                        <td id='claims-detail-pictures-phone'></td>
+                    </tr>
+                    <tr>
+                        <td>Others</td>
+                        <td id='claims-detail-damage-others'></td>
+                    </tr>
+                </table>
+            </div>
+
+            {% if claim.type == 'theft' or claim.type == 'loss' %}
+                <div class="tab-pane fade" id="theftloss" role="tabpanel" aria-labelledby="theftloss-tab">
+                    <table class="table table-bordered table-striped">
+                        <tr>
+                            <td>Contacted</td>
+                            <td>{{ claim.hasContacted|default('') }}</td>
+                        </tr>
+                        <tr>
+                            <td>Network</td>
+                            <td>{{ claim.network|default('') }}</td>
+                        </tr>
+                        <tr>
+                            <td>Blocked</td>
+                            <td>{{ claim.blockedDate|default('') }}</td>
+                        </tr>
+                        <tr>
+                            <td>Reported on</td>
+                            <td>{{ claim.reportedDate|default('') }}</td>
+                        </tr>
+                        <tr>
+                            <td>Reported to</td>
+                            <td>{{ claim.reportType|default('') }}</td>
+                        </tr>
+                        <tr>
+                            <td>Proof of usage</td>
+                            <td id='claims-detail-theftloss-proof-usages'></td>
+                        </tr>
+                        <tr>
+                            <td>Proof of barring</td>
+                            <td id='claims-detail-proof-barrings'></td>
+                        </tr>
+                        <tr>
+                            <td>Proof of purchase</td>
+                            <td id='claims-detail-proof-purchases'></td>
+                        </tr>
+                        <tr id='claims-detail-proof-losses-container'>
+                            <td>Proof of loss</td>
+                            <td id='claims-detail-proof-losses'></td>
+                        </tr>
+                        <tr>
+                            <td>Other</td>
+                            <td id='claims-detail-theftloss-others'></td>
+                        </tr>
+                        <tr id='claims-detail-crime-reference-container'>
+                            <td>Crime reference number</td>
+                            <td>{{ claim.crimeRef|default('') }}</td>
+                        </tr>
+                        <tr id='claims-detail-policy-report-container'>
+                            <td>Police report</td>
+                            <td>{{ claim.force|default('') }}</td>
+                        </tr>
+                    </table>
+                </div>
+            {% endif %}
+
+            <div class="tab-pane fade" id="details" role="tabpanel" aria-labelledby="details-tab">
+                <table class="table table-bordered table-striped">
+                    <tr>
+                        <td>Loss</td>
+                        <td>{{ claim.lossDate|default('') }}</td>
+                    </tr>
+                    <tr>
+                        <td>Notification</td>
+                        <td>{{ claim.notificationDate|default('') }}</td>
+                    </tr>
+                    <tr>
+                        <td>Recorded</td>
+                        <td>{{ claim.recordedDate|default('') }}</td>
+                    </tr>
+                    <tr>
+                        <td>Submitted</td>
+                        <td>{{ claim.submittedDate|default('') }}</td>
+                    </tr>
+                    <tr>
+                        <td>Approved</td>
+                        <td>{{ claim.approvedDate|default('') }}</td>
+                        {#<td>#}
+                        {#<input type="text" name="approved-date" readonly="readonly"#}
+                        {#id="claims-detail-approved"/>#}
+                        {#</td>#}
+                    </tr>
+                    <tr>
+                        <td>Replacement Received</td>
+                        <td>{{ claim.replacementReceivedDate|default('') }}</td>
+                    </tr>
+                    <tr>
+                        <td>Closed</td>
+                        <td>{{ claim.closedDate|default('') }}</td>
+                    </tr>
+                </table>
+
+                <table class="table table-bordered table-striped">
+                    <tr>
+                        <td>Replacement IMEI</td>
+                        <td>{{ claim.replacementImei|default('') }}</td>
+                    </tr>
+                    <tr>
+                        <td>Replacement Phone Details
+                        </td>
+                        <td>{{ claim.replacementPhoneDetails|default('') }}</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Replacement phone
+                        </td>
+                        <td>{{ claim.force|default('') }}</td>
+
+                        {% if phones is defined %}
+                            <select disabled="disabled" name="replacement-phone" id="claims-detail-replacement-phone">
+                                <option value="">-- Select a phone --</option>
+                                {% for phone in phones %}
+                                    <option value="{{ phone.id }}">{{ phone }}</option>
+                                {% endfor %}
+                            </select>
+                        {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Insured phone</td>
+                        <td>{{ claim.policyPhone|default('') }}</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="tab-pane fade" id="costs" role="tabpanel" aria-labelledby="costs-tab">
+                <table class="table table-bordered table-striped">
+                    <tr>
+                        <td>Excess</td>
+                        <td>{{ claim.excess|default('') }}</td>
+                    </tr>
+                    <tr>
+                        <td>Unauthorized Calls</td>
+                        <td>{{ claim.unauthorizedCalls|default('') }}</td>
+                    </tr>
+                    <tr>
+                        <td>Accessories</td>
+                        <td>{{ claim.accessories|default('') }}</td>
+                    </tr>
+                    <tr>
+                        <td>Phone Replacement Cost</td>
+                        <td>{{ claim.phoneReplacementCost|default('') }}</td>
+                    </tr>
+                    <tr>
+                        <td>Transaction Fees</td>
+                        <td>{{ claim.transactionFees|default('') }}</td>
+                    </tr>
+                    <tr>
+                        <td>Claim Handling Fees</td>
+                        <td>{{ claim.claimHandlingFees|default('') }}</td>
+                    </tr>
+                    <tr>
+                        <td>Reserved</td>
+                        <td>{{ claim.reservedValue|default('') }}</td>
+                    </tr>
+                    <tr>
+                        <td>Total Incurred</td>
+                        <td>{{ claim.totalIncurred|default('') }}</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="tab-pane fade" id="update" role="tabpanel" aria-labelledby="update-tab">
+                <div id="update_form_thingy"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        <button type="button" class="btn btn-primary">Save stuff</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+    </div>
+</div>
