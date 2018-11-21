@@ -266,8 +266,10 @@ class AdminController extends BaseController
         if ($editPhone) {
             $phones = $repo->findBy(['make' => $editPhone->getMake(), 'model' => $editPhone->getModel()]);
             foreach ($phones as $phone) {
+                /** @var Phone $phone */
                 $phone->setDescription($request->get('description'));
                 $phone->setFunFacts($request->get('fun-facts'));
+                $phone->setCanonicalPath($request->get('canonical-path'));
             }
             $dm->flush();
             $this->addFlash(
