@@ -96,12 +96,14 @@ class DefaultController extends BaseController
 
         $pageType = 'xmas-homepage';
 
-        // TODO: Add logic for promo
+        // Blackfriday Promo
         // Start: Friday 23rd November 12am
         // End: Monday 26th November 12am
-        $promo = false;
+        $now   = \DateTime::createFromFormat('U', time());
+        $start = new \DateTime('2018-11-23 00:00:00', new \DateTimezone(SoSure::TIMEZONE));
+        $end   = new \DateTime('2018-11-26 23:59:59', new \DateTimezone(SoSure::TIMEZONE));
 
-        if ($promo) {
+        if ($now >= $start && $now <= $end) {
             $pageType = 'blackfriday';
         }
 
