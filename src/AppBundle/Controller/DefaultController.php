@@ -96,6 +96,15 @@ class DefaultController extends BaseController
 
         $pageType = 'xmas-homepage';
 
+        // TODO: Add logic for promo
+        // Start: Friday 23rd November 12am
+        // End: Monday 26th November 12am
+        $promo = false;
+
+        if ($promo) {
+            $pageType = 'blackfriday';
+        }
+
         $data = array(
             // Make sure to check homepage landing below too
             'referral'  => $referral,
