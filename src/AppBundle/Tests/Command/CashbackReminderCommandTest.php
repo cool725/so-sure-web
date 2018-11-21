@@ -24,6 +24,23 @@ class CashbackReminderCommandTest extends BaseControllerTest
         self::$dm = $dm;
     }
 
+    public function callCommand($expectedOutput)
+    {
+        $application = new Application(self::$kernel);
+        $application->add(new OpsReportCommand(self::$container->get('app.mailer'), self::$redis));
+        $command = $application->find('sosure:cashback:reminder');
+        $commandTester = new CommandTester($command);
+        $commandTester->execute(array(
+            'command' => $command->getName(),
+            '--dry-run' => true,
+            '--force' => true
+        ));
+        $output = $commandTester->getDisplay();
+        foreach ($expectedOutput as $item) {
+            $this->assertContains($item, $output);
+        }
+    }
+
     public function testCashbackReminder()
     {
         $policy = self::createUserPolicy(true);
@@ -43,23 +60,5 @@ class CashbackReminderCommandTest extends BaseControllerTest
         ];
 
         $this->callCommand($expected);
-    }
-
-    public function callCommand($expectedOutput, $checkMissing)
-    {
-        $application = new Application(self::$kernel);
-        $application->add(new OpsReportCommand(self::$container->get('app.mailer'), self::$redis));
-        $command = $application->find('sosure:cashback:reminder');
-        $commandTester = new CommandTester($command);
-        $commandTester->execute(array(
-            'command' => $command->getName(),
-            '--dry-run' => true,
-            '--force' => true,
-            '--missing' => $checkMissing
-        ));
-        $output = $commandTester->getDisplay();
-        foreach ($expectedOutput as $item) {
-            $this->assertContains($item, $output);
-        }
     }
 }
