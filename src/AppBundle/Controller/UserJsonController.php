@@ -177,7 +177,7 @@ class UserJsonController extends BaseController
         if ($message) {
             $sixpack = $this->get('app.sixpack');
             $sixpack->convertByClientId($user->getId(), $sixpack::EXPERIMENT_APP_LINK_SMS);
-            return new Response($message, 200);
+            return new Response("sent", 200);
         } else {
             return new Response("no", 500);
         }
