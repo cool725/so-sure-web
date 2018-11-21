@@ -416,7 +416,7 @@ services:
         class: AppBundle\Service\S3TwigExtension
         arguments:
             - "@aws.s3"
-        public: false
+        public: true
         tags:
             - { name: twig.extension }
 

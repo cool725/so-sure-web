@@ -1924,6 +1924,18 @@ abstract class Policy
         return $this->getPolicyFilesByType(PolicyTermsFile::class);
     }
 
+    /**
+     * Gives you the most recent policy terms file object that this policy is linked to
+     * @return PolicyTermsFile|null the file or null if there are no such files.
+     */
+    public function getLatestPolicyTermsFile()
+    {
+        foreach ($this->getPolicyTermsFiles() as $file) {
+            return $file;
+        }
+        return null;
+    }
+
     public function addPolicyFile(S3File $file)
     {
         $this->policyFiles[] = $file;
