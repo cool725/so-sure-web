@@ -124,17 +124,17 @@ class UserJsonController extends BaseController
     {
         $user = $this->getUser();
         $email = $request->get("email");
-        if (!$user) {
-            return new JsonResponse(["message" => "no-user"], 400);
-        } elseif (!$email) {
+        if (!$email) {
             return new JsonResponse(["message" => "no-email"], 400);
-        } elseif (!$this->isCsrfTokenValid('invite-email', $request->request->get('csrf'))) {
-            return new JsonResponse(["message" => "invalid-csrf"]);
+        } elseif (!$this->isCsrfTokenValid("invite-email", $request->request->get('csrf'))) {
+            return new JsonResponse(["message" => "invalid-csrf"], 400);
         }
         $this->denyAccessUnlessGranted(UserVoter::VIEW, $user);
         try {
             $this->get("app.invitation")->inviteByEmail($user->getLatestPolicy(), $email);
             return new Response(200);
+        } catch (AccessDeniedException $e) {
+            return new JsonResponse(["message" => "access-denied"], 400);
         } catch (InvalidPolicyException $e) {
             return new JsonResponse(["message" => "invalid-policy"], 400);
         } catch (SelfInviteException $e) {
@@ -158,28 +158,26 @@ class UserJsonController extends BaseController
         $smsService = $this->get('app.sms');
         $user = $this->getUser();
         $mobileNumber = $user->getMobileNumber();
-        if (!$user) {
-            return new JsonResponse(["message" => "no-user"], 400);
-        } elseif (!$mobileNumber) {
+        if (!$mobileNumber) {
             return new JsonResponse(["message" => "no-number"], 400);
         } elseif ($user->getFirstLoginInApp()) {
             return new JsonResponse(["message" => "has-app"], 400);
         } elseif ($chargeRepository->findLastByUser($user, Charge::TYPE_SMS_DOWNLOAD)) {
             return new JsonResponse(["message" => "already-sent"], 400);
         }
-        $message = $smsService->sendTemplate(
+        $sent = $smsService->sendTemplate(
             $mobileNumber,
             'AppBundle:Sms:text-me.txt.twig',
             ['branch_pot_url' => $this->getParameter('branch_pot_url')],
             $user->getLatestPolicy(),
             Charge::TYPE_SMS_DOWNLOAD
         );
-        if ($message) {
+        if ($sent) {
             $sixpack = $this->get('app.sixpack');
             $sixpack->convertByClientId($user->getId(), $sixpack::EXPERIMENT_APP_LINK_SMS);
-            return new Response("sent", 200);
+            return new Response(200);
         } else {
-            return new Response("no", 500);
+            return new Response(500);
         }
     }
 
@@ -190,11 +188,11 @@ class UserJsonController extends BaseController
     public function policyTermsAction()
     {
         $user = $this->getUser();
-        if (!$user) {
-            return new Response(400);
-        }
         $s3 = $this->get("app.twig.s3");
         $policy = $user->getLatestPolicy();
+        if (!$policy) {
+            return Response(400);
+        }
         $policyService = $this->get("app.policy");
         $policyTermsFile = $policy->getLatestPolicyTermsFile();
         if (!$policyTermsFile) {
