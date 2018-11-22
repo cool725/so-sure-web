@@ -138,8 +138,6 @@ class UserJsonController extends BaseController
         try {
             $this->get("app.invitation")->inviteByEmail($user->getLatestPolicy(), $email);
             return new Response(200);
-        } catch (AccessDeniedException $e) {
-            return new JsonResponse(["message" => "access-denied"], 400);
         } catch (InvalidPolicyException $e) {
             return new JsonResponse(["message" => "invalid-policy"], 400);
         } catch (SelfInviteException $e) {
@@ -198,7 +196,7 @@ class UserJsonController extends BaseController
         $s3 = $this->get("app.twig.s3");
         $policy = $user->getLatestPolicy();
         if (!$policy) {
-            return Response(400);
+            return new Response(400);
         }
         $policyService = $this->get("app.policy");
         $policyTermsFile = $policy->getLatestPolicyTermsFile();

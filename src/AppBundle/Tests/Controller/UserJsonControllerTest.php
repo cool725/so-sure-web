@@ -14,6 +14,7 @@ use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\BrowserKit\Cookie;
 use Symfony\Bundle\FrameworkBundle\Client;
 use AppBundle\Controller\UserJsonController;
+use Doctrine\ODM\MongoDB\DocumentManager;
 
 /**
  * @group functional-net
@@ -33,22 +34,28 @@ class UserJsonControllerTest extends WebTestCase
     {
         static::$client = static::createClient();
         static::$container = static::$client->getContainer();
-        static::$dm = static::$container->get('doctrine_mongodb.odm.default_document_manager');
-        static::$userRepository = static::$dm->getRepository(User::class);
-        static::$csrfService = static::$container->get("security.csrf.token_manager");
+        if (static::$container) {
+            /** @var DocumentManager static::$dm */
+            $dm = static::$container->get('doctrine_mongodb.odm.default_document_manager');
+            static::$dm = $dm;
+            static::$userRepository = static::$dm->getRepository(User::class);
+            static::$csrfService = static::$container->get("security.csrf.token_manager");
+        } else {
+            throw new \Exception("Container could not get got.");
+        }
     }
 
     /**
      * Tests the invite email action for all error messages and success and makes sure it sends the emails and does
      * CSRF protection right etc. All of the things that are done to modify the user are undone at the end so the user
      * remains the same after the execution of the function.
-     * @param int       $status    is the status we desire.
-     * @param string    $content   is the content we desire.
-     * @param boolean   $login     is whether or not we should make the session be logged in.
-     * @param string    $email     is the email in the request.
-     * @param string    $csrf      is the csrf token to put in the request.
-     * @param string    $addRole   gives a role to add to the user.
-     * @param boolean   $addPolicy tells whether to add a new valid policy to the user.
+     * @param int     $status    is the status we desire.
+     * @param string  $content   is the content we desire.
+     * @param boolean $login     is whether or not we should make the session be logged in.
+     * @param string  $email     is the email in the request.
+     * @param string  $csrf      is the csrf token to put in the request.
+     * @param string  $addRole   gives a role to add to the user.
+     * @param boolean $addPolicy tells whether to add a new valid policy to the user.
      *
      * @dataProvider inviteEmailActionProvider
      */
@@ -64,7 +71,7 @@ class UserJsonControllerTest extends WebTestCase
         $data = [];
         if ($csrf == "csrf") {
             $data["csrf"] = static::$csrfService->getToken("invite-email")->getValue();
-        } elseif($csrf) {
+        } elseif ($csrf) {
             $data["csrf"] = $csrf;
         }
         $user = null;
@@ -76,7 +83,7 @@ class UserJsonControllerTest extends WebTestCase
             }
             if ($addPolicy) {
                 $policy = $this->initPolicy($user, static::$dm);
-                $user->addPolicy($policy, "07123456789", null, false, true);
+                $user->addPolicy($policy);
                 $policy->setPolicyNumber("{$addPolicy}/2018/".time());
                 $policy->setStatus(Policy::STATUS_ACTIVE);
                 $policy->setPhone($this->getRandomPhone(static::$dm));
@@ -86,7 +93,7 @@ class UserJsonControllerTest extends WebTestCase
                 $policy->setPremium($premium);
             }
         }
-        if ($email == "email") {
+        if ($email == "email" && $user) {
             $data["email"] = $user->getEmail();
         } elseif ($email) {
             $data["email"] = $email;
@@ -97,7 +104,7 @@ class UserJsonControllerTest extends WebTestCase
         }
         $this->assertEquals($status, static::$client->getResponse()->getStatusCode());
         if ($user && $addRole) {
-            $user->removeRole(0);
+            $user->removeRole($addRole);
         }
         if ($policy) {
             $policy->setStatus(Policy::STATUS_CANCELLED);
@@ -124,12 +131,12 @@ class UserJsonControllerTest extends WebTestCase
 
     /**
      * Tests the app sms action to make sure it emits desired values when given a given input and state.
-     * @param int       $status    is the expected response status.
-     * @param string    $content   is the expected response content.
-     * @param boolean   $login     determines whether to login a user before making the request.
-     * @param string    $number    is an optional mobile phone number to set on the user if there is one.
-     * @param boolean   $usedApp   determines whether to set the user as having used the app if there is one.
-     * @param boolean   $presend   determines whether to send a text message from the user prior to testing.
+     * @param int     $status  is the expected response status.
+     * @param string  $content is the expected response content.
+     * @param boolean $login   determines whether to login a user before making the request.
+     * @param string  $number  is an optional mobile phone number to set on the user if there is one.
+     * @param boolean $usedApp determines whether to set the user as having used the app if there is one.
+     * @param boolean $presend determines whether to send a text message from the user prior to testing.
      *
      * @dataProvider appSmsActionProvider
      */
@@ -139,10 +146,10 @@ class UserJsonControllerTest extends WebTestCase
         $login = false,
         $number = null,
         $usedApp = false,
-        $presend = false,
-        $addPolicy = false
+        $presend = false
     ) {
         $user = null;
+        $charge = null;
         if ($login) {
             $user = static::login();
             if ($number) {
@@ -164,14 +171,14 @@ class UserJsonControllerTest extends WebTestCase
         if ($content) {
             $this->assertEquals($content, static::$client->getResponse()->getContent());
         }
-        if ($login) {
+        if ($user) {
             if ($number) {
                 $user->setMobileNumber(null);
             }
             if ($usedApp) {
                 $user->setFirstLoginInApp(null);
             }
-            if ($presend) {
+            if ($charge) {
                 static::$dm->remove($charge);
                 static::$dm->flush();
             }
