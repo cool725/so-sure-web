@@ -485,7 +485,8 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         $claim = $repo->find($id);
 
         return $this->render('AppBundle:Claims:claimsModalBody.html.twig', [
-           'claim' => $claim->toModalArray()
+            'claim' => $claim->toModalArray(),
+            'claimClass' => $claim
         ]);
     }
 

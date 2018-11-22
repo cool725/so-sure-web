@@ -3,7 +3,8 @@
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
         </button>
-        <h4 class="modal-title">Claim: {{ claim.number }}</h4>
+
+        <h4 class="modal-title">Claim: {{ claim.number|default('N/A') }}</h4>
 
         <ul class="nav nav-pills" id="myTab" role="tablist">
             <li class="nav-item active">
@@ -11,17 +12,18 @@
                    aria-controls="general"
                    aria-selected="true">General</a>
             </li>
-            <li class="nav-item">
-                <a class="nav-link" id="profile-tab" data-toggle="tab" href="#damage" role="tab"
-                   aria-controls="damage"
-                   aria-selected="false">Damage</a>
-            </li>
-            {% if claim.type == 'theft' or claim.type == 'loss' %}
-            <li class="nav-item">
-                <a class="nav-link" id="theftloss-tab" data-toggle="tab" href="#theftloss" role="tab"
-                   aria-controls="theftloss"
-                   aria-selected="false">Theft/Loss</a>
-            </li>
+            {% if claim.type == 'damage' %}
+                <li class="nav-item">
+                    <a class="nav-link" id="profile-tab" data-toggle="tab" href="#damage" role="tab"
+                       aria-controls="damage"
+                       aria-selected="false">Damage</a>
+                </li>
+            {% elseif claim.type == 'theft' or claim.type == 'loss' %}
+                <li class="nav-item">
+                    <a class="nav-link" id="theftloss-tab" data-toggle="tab" href="#theftloss" role="tab"
+                       aria-controls="theftloss"
+                       aria-selected="false">Theft/Loss</a>
+                </li>
             {% endif %}
             <li class="nav-item">
                 <a class="nav-link" id="details-tab" data-toggle="tab" href="#details" role="tab"
@@ -58,15 +60,15 @@
                         <td>Status</td>
 
                         {% if claim.status == 'fnol' %}
-                        <td class="text-warning" title="Claim not yet submitted to claims handler">
-                            {{ claim.status|default('') }}
-                            {{ claim.daviesStatus|default('') }}
-                        </td>
+                            <td class="text-warning" title="Claim not yet submitted to claims handler">
+                                {{ claim.status|default('') }}
+                                {{ claim.daviesStatus|default('') }}
+                            </td>
                         {% else %}
-                        <td>
-                            {{ claim.status|default('') }}
-                            {{ claim.daviesStatus|default('') }}
-                        </td>
+                            <td>
+                                {{ claim.status|default('') }}
+                                {{ claim.daviesStatus|default('') }}
+                            </td>
                         {% endif %}
                     </tr>
                     <tr>
@@ -91,7 +93,7 @@
                     </tr>
                     <tr>
                         <td>Incident Date</td>
-                        <td>{{ claim.incidentDate|default('') }}</td>
+                        <td>{{ (claim.incidentDate|date('d-m-Y'))|default('') }} at {{ claim.incidentTime|default('') }}</td>
                     </tr>
                     <tr>
                         <td>Incident Location</td>
@@ -108,41 +110,119 @@
                 </table>
             </div>
 
-            <div class="tab-pane fade" id="damage" role="tabpanel" aria-labelledby="damage-tab">
-                <table class="table table-bordered table-striped">
-                    <tr>
-                        <td>Details</td>
-                        <td>{{ claim.typeDetailsOther|default('') }}</td>
-                    </tr>
-                    <tr>
-                        <td>Bought on</td>
-                        <td>{{ claim.monthOfPurchase|default('') }} {{ claim.yearOfPurchase|default('') }}</td>
-                    </tr>
-                    <tr>
-                        <td>Condition</td>
-                        <td>{{ claim.phoneStatus|default('') }}</td>
-                    </tr>
-                    <tr>
-                        <td>Proof of usages</td>
-                        <td id='claims-detail-damage-proof-usages'></td>
-                    </tr>
-                    <tr>
-                        <td>Pictures of phone</td>
-                        <td id='claims-detail-pictures-phone'></td>
-                    </tr>
-                    <tr>
-                        <td>Others</td>
-                        <td id='claims-detail-damage-others'></td>
-                    </tr>
-                </table>
-            </div>
+            {% if claim.type == 'damage' %}
+                {% set documents = s3DownloadLinks(claimClass) %}
+                <div class="tab-pane fade" id="damage" role="tabpanel" aria-labelledby="damage-tab">
+                    <table class="table table-bordered table-striped">
+                        <tr>
+                            <td>Details</td>
+                            {% if claim.typeDetails == 'other' %}
+                                <td>{{ claim.typeDetailsOther|default('') }}</td>
+                            {% else %}
+                                <td>{{ claim.typeDetails|default('') }}</td>
+                            {% endif %}
+                        </tr>
+                        <tr>
+                            <td>Bought on</td>
+                            <td>{{ claim.monthOfPurchase|default('') }} / {{ claim.yearOfPurchase|default('') }}</td>
+                        </tr>
+                        <tr>
+                            <td>Condition</td>
+                            <td>{{ claim.phoneStatus|default('') }}</td>
+                        </tr>
+                        <tr>
+                            <td>Proof of usages</td>
 
-            {% if claim.type == 'theft' or claim.type == 'loss' %}
+                            {% if claim.needProofOfUsage %}
+
+                                {% if documents %}
+
+                                    {% if documents.proofOfUsages|length > 0 %}
+                                        <td>
+                                        {% for document in documents %}
+                                            <p>
+                                                {{ document.filename }}
+                                                <img class="img-preview" src="{{ document.url }}"/>
+                                                <a href="{{ document.url_download }}">
+                                                    <i class="fa fa-download"></i>
+                                                </a>
+                                            </p>
+                                        {% endfor %}
+                                        </td>
+                                    {% else %}
+                                        <td>None uploaded yet</td>
+                                    {% endif %}
+
+                                {% endif %}
+
+                            {% else %}
+                                <td>Not Requested</td>
+                            {% endif %}
+                        </tr>
+                        <tr>
+                            <td>Pictures of phone</td>
+
+                            {% if claim.needPictureOfPhone %}
+
+                                {% if documents %}
+
+                                    {% if documents.damagePictures|length > 0 %}
+                                        <td>
+                                            {% for document in documents %}
+                                                <p>
+                                                    {{ document.filename }}
+                                                    <img class="img-preview" src="{{ document.url }}"/>
+                                                    <a href="{{ document.url_download }}">
+                                                        <i class="fa fa-download"></i>
+                                                    </a>
+                                                </p>
+                                            {% endfor %}
+                                        </td>
+                                    {% else %}
+                                        <td>None uploaded yet</td>
+                                    {% endif %}
+
+                                {% endif %}
+
+                            {% else %}
+                                <td>Not Requested</td>
+                            {% endif %}
+                        </tr>
+                        <tr>
+                            <td>Others</td>
+                            {% if documents %}
+
+                                {% if documents.others|length > 0 %}
+                                    <td>
+                                        {% for document in documents %}
+                                            <p>
+                                                {{ document.filename }}
+                                                <img class="img-preview" src="{{ document.url }}"/>
+                                                <a href="{{ document.url_download }}">
+                                                    <i class="fa fa-download"></i>
+                                                </a>
+                                            </p>
+                                        {% endfor %}
+                                    </td>
+                                {% else %}
+                                    <td>None uploaded yet</td>
+                                {% endif %}
+
+                            {% endif %}
+                        </tr>
+                    </table>
+                </div>
+            {% elseif claim.type == 'theft' or claim.type == 'loss' %}
+                {% set documents = s3DownloadLinks(claimClass) %}
                 <div class="tab-pane fade" id="theftloss" role="tabpanel" aria-labelledby="theftloss-tab">
                     <table class="table table-bordered table-striped">
                         <tr>
                             <td>Contacted</td>
-                            <td>{{ claim.hasContacted|default('') }}</td>
+                            {% if claim.hasContacted %}
+                                <td>{{ claim.contactedPlace }}</td>
+                            {% else %}
+                                <td>N/A</td>
+                            {% endif %}
                         </tr>
                         <tr>
                             <td>Network</td>
@@ -150,11 +230,11 @@
                         </tr>
                         <tr>
                             <td>Blocked</td>
-                            <td>{{ claim.blockedDate|default('') }}</td>
+                            <td>{{ (claim.blockedDate|date('d-m-Y'))|default('') }}</td>
                         </tr>
                         <tr>
                             <td>Reported on</td>
-                            <td>{{ claim.reportedDate|default('') }}</td>
+                            <td>{{ (claim.reportedDate|date('d-m-Y'))|default('') }}</td>
                         </tr>
                         <tr>
                             <td>Reported to</td>
@@ -162,31 +242,160 @@
                         </tr>
                         <tr>
                             <td>Proof of usage</td>
-                            <td id='claims-detail-theftloss-proof-usages'></td>
+
+                            {% if claim.needProofOfUsage %}
+
+                                {% if documents %}
+
+                                    {% if documents.proofOfUsages|length > 0 %}
+                                        <td>
+                                            {% for document in documents %}
+                                                <p>
+                                                    {{ document.filename }}
+                                                    <img class="img-preview" src="{{ document.url }}"/>
+                                                    <a href="{{ document.url_download }}">
+                                                        <i class="fa fa-download"></i>
+                                                    </a>
+                                                </p>
+                                            {% endfor %}
+                                        </td>
+                                    {% else %}
+                                        <td>Not uploaded yet</td>
+                                    {% endif %}
+
+                                {% endif %}
+
+                            {% else %}
+                                <td>Not Requested</td>
+                            {% endif %}
                         </tr>
                         <tr>
                             <td>Proof of barring</td>
-                            <td id='claims-detail-proof-barrings'></td>
+
+                            {% if claim.needProofOfBarring %}
+
+                                {% if documents %}
+
+                                    {% if documents.proofOfBarrings|length > 0 %}
+                                        <td>
+                                            {% for document in documents %}
+                                                <p>
+                                                    {{ document.filename }}
+                                                    <img class="img-preview" src="{{ document.url }}"/>
+                                                    <a href="{{ document.url_download }}">
+                                                        <i class="fa fa-download"></i>
+                                                    </a>
+                                                </p>
+                                            {% endfor %}
+                                        </td>
+                                    {% else %}
+                                        <td>Not uploaded yet</td>
+                                    {% endif %}
+
+                                {% endif %}
+
+                            {% else %}
+                                <td>Not Requested</td>
+                            {% endif %}
                         </tr>
                         <tr>
                             <td>Proof of purchase</td>
-                            <td id='claims-detail-proof-purchases'></td>
+
+                            {% if claim.needProofOfPurchase %}
+
+                                {% if documents %}
+
+                                    {% if documents.proofOfPurchases|length > 0 %}
+                                        <td>
+                                            {% for document in documents %}
+                                                <p>
+                                                    {{ document.filename }}
+                                                    <img class="img-preview" src="{{ document.url }}"/>
+                                                    <a href="{{ document.url_download }}">
+                                                        <i class="fa fa-download"></i>
+                                                    </a>
+                                                </p>
+                                            {% endfor %}
+                                        </td>
+                                    {% else %}
+                                        <td>Not uploaded yet</td>
+                                    {% endif %}
+
+                                {% endif %}
+
+                            {% else %}
+                                <td>Not Requested</td>
+                            {% endif %}
                         </tr>
-                        <tr id='claims-detail-proof-losses-container'>
+                        {% if claim.type == "loss" %}
+                        <tr>
                             <td>Proof of loss</td>
-                            <td id='claims-detail-proof-losses'></td>
+
+                            {% if claim.needProofOfLoss %}
+
+                                {% if documents %}
+
+                                    {% if documents.proofOfLosses|length > 0 %}
+                                        <td>
+                                            {% for document in documents %}
+                                                <p>
+                                                    {{ document.filename }}
+                                                    <img class="img-preview" src="{{ document.url }}"/>
+                                                    <a href="{{ document.url_download }}">
+                                                        <i class="fa fa-download"></i>
+                                                    </a>
+                                                </p>
+                                            {% endfor %}
+                                        </td>
+                                    {% else %}
+                                        <td>Not uploaded yet</td>
+                                    {% endif %}
+
+                                {% endif %}
+
+                            {% else %}
+                                <td>Not Requested</td>
+                            {% endif %}
                         </tr>
+                        {% endif %}
                         <tr>
                             <td>Other</td>
-                            <td id='claims-detail-theftloss-others'></td>
+
+                            {% if documents %}
+
+                                {% if documents.others|length > 0 %}
+                                    <td>
+                                        {% for document in documents %}
+                                            <p>
+                                                {{ document.filename }}
+                                                <img class="img-preview" src="{{ document.url }}"/>
+                                                <a href="{{ document.url_download }}">
+                                                    <i class="fa fa-download"></i>
+                                                </a>
+                                            </p>
+                                        {% endfor %}
+                                    </td>
+                                {% else %}
+                                    <td>None uploaded yet</td>
+                                {% endif %}
+
+                            {% endif %}
                         </tr>
-                        <tr id='claims-detail-crime-reference-container'>
-                            <td>Crime reference number</td>
-                            <td>{{ claim.crimeRef|default('') }}</td>
-                        </tr>
-                        <tr id='claims-detail-policy-report-container'>
-                            <td>Police report</td>
-                            <td>{{ claim.force|default('') }}</td>
+                        <tr>
+                            {% if claim.type == 'theft' %}
+                                <td>Crime reference number</td>
+                            {% else %}
+                                <td>Police report</td>
+                            {% endif %}
+
+                            {% if claim.validCrimeRef %}
+                                <td>{{ claim.crimeRef|default('') }} / {{ claim.force|default('') }}</td>
+                            {% else %}
+                                <td>
+                                    <i class="fa fa-warning" title="Invalid crime reference"></i>
+                                    {{ claim.crimeRef|default('') }} / {{ claim.force|default('') }}
+                                </td>
+                            {% endif %}
                         </tr>
                     </table>
                 </div>
@@ -196,42 +405,45 @@
                 <table class="table table-bordered table-striped">
                     <tr>
                         <td>Loss</td>
-                        <td>{{ claim.lossDate|default('') }}</td>
+                        <td>{{ (claim.lossDate|date('d-m-Y'))|default('') }}</td>
                     </tr>
                     <tr>
                         <td>Notification</td>
-                        <td>{{ claim.notificationDate|default('') }}</td>
+                        <td>{{ (claim.notificationDate|date('d-m-Y'))|default('') }}</td>
                     </tr>
                     <tr>
                         <td>Recorded</td>
-                        <td>{{ claim.recordedDate|default('') }}</td>
+                        <td>{{ (claim.recordedDate|date('d-m-Y'))|default('') }}</td>
                     </tr>
                     <tr>
                         <td>Submitted</td>
-                        <td>{{ claim.submittedDate|default('') }}</td>
+                        <td>{{ (claim.submittedDate|date('d-m-Y'))|default('') }}</td>
                     </tr>
                     <tr>
                         <td>Approved</td>
-                        <td>{{ claim.approvedDate|default('') }}</td>
-                        {#<td>#}
-                        {#<input type="text" name="approved-date" readonly="readonly"#}
-                        {#id="claims-detail-approved"/>#}
-                        {#</td>#}
+                        <td>{{ (claim.approvedDate|date('d-m-Y'))|default('') }}</td>
                     </tr>
                     <tr>
                         <td>Replacement Received</td>
-                        <td>{{ claim.replacementReceivedDate|default('') }}</td>
+                        <td>{{ (claim.replacementReceivedDate|date('d-m-Y'))|default('') }}</td>
                     </tr>
                     <tr>
                         <td>Closed</td>
-                        <td>{{ claim.closedDate|default('') }}</td>
+                        <td>{{ (claim.closedDate|date('d-m-Y'))|default('') }}</td>
                     </tr>
                 </table>
 
                 <table class="table table-bordered table-striped">
                     <tr>
                         <td>Replacement IMEI</td>
-                        <td>{{ claim.replacementImei|default('') }}</td>
+                        {% if claim.validReplacementImei %}
+                            <td>{{ claim.replacementImei|default('') }}</td>
+                        {% else %}
+                            <td>
+                                <i class="fa fa-warning" title="Invalid IMEI Number (Luhn Failure)"></i>
+                                <s>{{ claim.replacementImei|default('') }}</s>
+                            </td>
+                        {% endif %}
                     </tr>
                     <tr>
                         <td>Replacement Phone Details
@@ -305,7 +517,7 @@
     </div>
 
     <div class="modal-footer">
-        <button type="button" class="btn btn-primary">Save stuff</button>
+        <button type="button" class="btn btn-primary">Save Changes</button>
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
     </div>
 </div>
