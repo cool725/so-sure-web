@@ -12,11 +12,11 @@
 
 {% block body %}
 
-    <section class="p-4 mb-5">
+    <section class="py-4 px-md-4">
         <div class="container-fluid">
             {# TODO: Heading area #}
             <div class="d-lg-flex align-items-lg-center justify-content-lg-between mb-3">
-                <h1 class="h2"><span class="sub">Admin IMEI Lookup</span></h1>
+                <h1 class="h2">Admin IMEI Lookup</h1>
             </div>
             {# TODO: Controls area #}
             <div class="card card-page-filter mb-5">
@@ -34,13 +34,13 @@
                 </div>
             </div>
             {# TODO: Content area #}
-            <h2 class="h3">History</h2>
+            <h2 class="h3 mb-3">History</h2>
             {% if not history or history|length == 0 %}
                 <p class="mb-5">No records found</p>
             {% else %}
                 <div class="table-responsive-sm mb-5">
-                    <table class="table table-striped">
-                        <thead class="thead-dark">
+                    <table class="table">
+                        <thead class="thead-light">
                             <tr>
                                 <th>Version</th>
                                 <th>Policy</th>
@@ -64,13 +64,13 @@
                 </div>
             {% endif %}
 
-            <h2 class="h3">Charges</h2>
+            <h2 class="h3 mb-3">Charges</h2>
             {% if not charges or charges|length == 0 %}
                 <p class="mb-5">No records found</p>
             {% else %}
                 <div class="table-responsive-sm mb-5">
-                    <table class="table table-striped">
-                        <thead class="thead-dark">>
+                    <table class="table">
+                        <thead class="thead-light">
                             <tr>
                                 <th>Charge</th>
                                 <th>Policy</th>
