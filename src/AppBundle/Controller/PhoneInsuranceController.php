@@ -500,6 +500,7 @@ class PhoneInsuranceController extends BaseController
             'comparision'     => $phone->getComparisions(),
             'comparision_max' => $maxComparision,
             'coming_soon'     => $phone->getCurrentPhonePrice() ? false : true,
+            'web_base_url'    => $this->getParameter('web_base_url'),
             // 'slider_test'     => 'slide-me',
             // 'replacement'     => $replacement,
         );

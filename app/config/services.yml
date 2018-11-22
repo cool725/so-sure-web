@@ -1469,7 +1469,7 @@ services:
         arguments:
             - "@doctrine_mongodb.odm.default_document_manager"
             - "@logger"
-            - "@router"
+            - "@app.router"
         tags:
             - { name: dpn_xml_sitemap.generator }
 
