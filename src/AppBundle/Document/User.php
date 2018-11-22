@@ -23,7 +23,7 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 /**
  * @MongoDB\Document(repositoryClass="AppBundle\Repository\UserRepository")
  * @MongoDB\Index(keys={"identity_log.loc"="2dsphere"}, sparse="true")
- * @Gedmo\Loggable
+ * @Gedmo\Loggable(logEntryClass="AppBundle\Document\LogEntry")
  */
 class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterface
 {
@@ -283,7 +283,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     protected $affiliate;
 
     /**
-     * @MongoDB\ReferenceMany(targetDocument="Policy", mappedBy="user")
+     * @MongoDB\ReferenceMany(targetDocument="Policy", mappedBy="user", prime={"user"})
      */
     protected $policies;
 
@@ -308,6 +308,11 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
      * @MongoDB\ReferenceMany(targetDocument="AppBundle\Document\Opt\Opt", mappedBy="user")
      */
     protected $opts = array();
+
+    /**
+     * @MongoDB\ReferenceMany(targetDocument="Charge", mappedBy="user", cascade={"persist"})
+     */
+    protected $charges;
 
     /**
      * @Assert\Type("bool")
@@ -416,6 +421,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     public function __construct()
     {
         parent::__construct();
+        $this->charges = new \Doctrine\Common\Collections\ArrayCollection();
         $this->referrals = new \Doctrine\Common\Collections\ArrayCollection();
         $this->sentInvitations = new \Doctrine\Common\Collections\ArrayCollection();
         $this->receivedInvitations = new \Doctrine\Common\Collections\ArrayCollection();
@@ -557,6 +563,22 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     public function getLeadSourceDetails()
     {
         return $this->leadSourceDetails;
+    }
+
+    public function getCharges()
+    {
+        return $this->charges;
+    }
+
+    public function setCharges($charges)
+    {
+        $this->charges = $charges;
+    }
+
+    public function addCharge(Charge $charge)
+    {
+        $charge->setUser($this);
+        $this->charges[] = $charge;
     }
 
     /**

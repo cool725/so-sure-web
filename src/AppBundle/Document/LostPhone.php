@@ -9,7 +9,7 @@ use AppBundle\Validator\Constraints as AppAssert;
 
 /**
  * @MongoDB\Document()
- * @Gedmo\Loggable
+ * @Gedmo\Loggable(logEntryClass="AppBundle\Document\LogEntry")
  */
 class LostPhone
 {

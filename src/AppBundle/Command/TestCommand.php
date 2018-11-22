@@ -3,6 +3,8 @@
 namespace AppBundle\Command;
 
 use AppBundle\Annotation\DataChange;
+use AppBundle\Classes\NoOp;
+use AppBundle\Document\Charge;
 use AppBundle\Document\Claim;
 use AppBundle\Document\Opt\EmailOptOut;
 use AppBundle\Document\Opt\OptOut;
@@ -49,9 +51,27 @@ class TestCommand extends ContainerAwareCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         // $this->testBirthday();
+        /*
         $claim = new Claim();
         $claim->setNotificationDate(\DateTime::createFromFormat('U', time()));
         print_r($this->getDataChangeAnnotation($claim, 'salva'));
+        */
+
+        $repo = $this->dm->getRepository(Charge::class);
+        foreach ($repo->findAll() as $charge) {
+            /** @var Charge $charge */
+            try {
+                $user = $charge->getUser();
+                if ($user) {
+                    NoOp::ignore([$user->getName()]);
+                }
+            } catch (\Exception $e) {
+                $output->writeln(sprintf('Removing orphaned user for charge %s', $charge->getId()));
+                $charge->setUser(null);
+                $this->dm->flush();
+            }
+        }
+
         $output->writeln('Finished');
     }
 

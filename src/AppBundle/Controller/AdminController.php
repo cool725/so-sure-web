@@ -31,6 +31,7 @@ use AppBundle\Service\BarclaysService;
 use AppBundle\Service\LloydsService;
 use AppBundle\Service\MailerService;
 use AppBundle\Service\ReportingService;
+use AppBundle\Service\SalvaExportService;
 use AppBundle\Service\SequenceService;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
@@ -265,8 +266,10 @@ class AdminController extends BaseController
         if ($editPhone) {
             $phones = $repo->findBy(['make' => $editPhone->getMake(), 'model' => $editPhone->getModel()]);
             foreach ($phones as $phone) {
+                /** @var Phone $phone */
                 $phone->setDescription($request->get('description'));
                 $phone->setFunFacts($request->get('fun-facts'));
+                $phone->setCanonicalPath($request->get('canonical-path'));
             }
             $dm->flush();
             $this->addFlash(
@@ -454,7 +457,7 @@ class AdminController extends BaseController
      * @Route("/accounts/{year}/{month}", name="admin_accounts_date")
      * @Template
      */
-    public function adminAccountsAction($year = null, $month = null)
+    public function adminAccountsAction(Request $request, $year = null, $month = null)
     {
         // default 30s for prod is no longer enough
         set_time_limit(180);
@@ -467,6 +470,32 @@ class AdminController extends BaseController
             $month = $now->format('m');
         }
         $date = \DateTime::createFromFormat("Y-m-d", sprintf('%d-%d-01', $year, $month));
+
+        $salvaForm = $this->get('form.factory')
+            ->createNamedBuilder('salva_form')
+            ->add('export', SubmitType::class)
+            ->getForm();
+        if ('POST' === $request->getMethod()) {
+            if ($request->request->has('salva_form')) {
+                $salvaForm->handleRequest($request);
+                if ($salvaForm->isValid()) {
+                    // default 30s for prod is no longer enough
+                    set_time_limit(300);
+
+                    /** @var SalvaExportService $salva */
+                    $salva = $this->get('app.salva');
+                    $salva->exportPayments(true);
+                    $this->addFlash(
+                        'success',
+                        'Re-exported Salva Payments File to S3'
+                    );
+                    return new RedirectResponse($this->generateUrl('admin_accounts_date', [
+                        'year' => $year,
+                        'month' => $month
+                    ]));
+                }
+            }
+        }
 
         $dm = $this->getManager();
         $s3FileRepo = $dm->getRepository(S3File::class);
@@ -482,6 +511,7 @@ class AdminController extends BaseController
             'rewardPotLiability' => $reportingService->getRewardPotLiability($date),
             'rewardPromoPotLiability' => $reportingService->getRewardPotLiability($date, true),
             'files' => $s3FileRepo->getAllFiles($date),
+            'salvaForm' => $salvaForm->createView(),
         ];
     }
 
@@ -555,15 +585,20 @@ class AdminController extends BaseController
                 $uploadForm->handleRequest($request);
                 if ($uploadForm->isSubmitted() && $uploadForm->isValid()) {
                     $file = $uploadForm->getData()['file'];
-                    if ($bacs->processUpload($file)) {
+                    if ($bacs->isS3FilePresent($file->getClientOriginalName())) {
+                        $this->addFlash(
+                            'error',
+                            sprintf('File is already processed (%s).', $file->getClientOriginalName())
+                        );
+                    } elseif ($bacs->processUpload($file)) {
                         $this->addFlash(
                             'success',
-                            'Successfully uploaded & processed file'
+                            sprintf('Successfully uploaded & processed file (%s)', $file->getClientOriginalName())
                         );
                     } else {
                         $this->addFlash(
                             'error',
-                            'Unable to process file - see rollbar error message'
+                            sprintf('Unable to process file (%s).', $file->getClientOriginalName())
                         );
                     }
 

@@ -3,9 +3,11 @@
 // W/B
 $white:     #ffffff;
 $lynch:     #687296;
-$dark:     #170B38;
+$dark:      #170B38;
 
 $white:                #ffffff; // < $white
+$link-water:           #c7d8f2;
+$selago:               #dee9fa;
 $lily-white:           #e5f4ff; // < $bb-1
 $pattens-blue:         #e0efff; // < $pattens-blue
 $tangerine:            #fd7b3d; // + $tangerine
@@ -35,6 +37,8 @@ $twitter:  #00aced;
 // Extend Theme colours and overide primary BS colour
 $theme-colors: (
     "white":                $white,
+    "link-water":           $link-water,
+    "selago":               $selago,
     "lily-white":           $lily-white,
     "tangerine":            $tangerine,
     "jacarta":              $jacarta,

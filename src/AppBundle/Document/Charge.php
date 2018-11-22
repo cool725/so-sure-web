@@ -9,7 +9,7 @@ use AppBundle\Validator\Constraints as AppAssert;
 
 /**
  * @MongoDB\Document(repositoryClass="AppBundle\Repository\ChargeRepository")
- * @Gedmo\Loggable
+ * @Gedmo\Loggable(logEntryClass="AppBundle\Document\LogEntry")
  */
 class Charge
 {
@@ -17,22 +17,26 @@ class Charge
 
     // sync with $type choices
     const TYPE_ADDRESS = 'address';
-    const TYPE_SMS = 'sms';
     const TYPE_GSMA = 'gsma';
     const TYPE_MAKEMODEL = 'makemodel';
     const TYPE_CLAIMSCHECK = 'claimscheck';
     const TYPE_CLAIMSDAMAGE = 'claimsdamage';
     const TYPE_BANK_ACCOUNT = 'bank-account';
     const TYPE_AFFILIATE = 'affiliate';
+    const TYPE_SMS_INVITATION = 'sms-invitation';
+    const TYPE_SMS_VERIFICATION = 'sms-verification';
+    const TYPE_SMS_DOWNLOAD = 'sms-download';
 
     public static $prices = [
         self::TYPE_ADDRESS => 0.037, // ex vat
-        self::TYPE_SMS => 0.03, // $0.03 (not vat)
         self::TYPE_GSMA => 0.02, // ex vat
         self::TYPE_MAKEMODEL => 0.05, // ex vat
         self::TYPE_CLAIMSCHECK => 0.9, // ex vat
         self::TYPE_CLAIMSDAMAGE => 0.02, // ex vat
         self::TYPE_BANK_ACCOUNT => 0.037, // ex vat
+        self::TYPE_SMS_INVITATION => 0.03, // ex vat
+        self::TYPE_SMS_VERIFICATION => 0.03, // ex vat
+        self::TYPE_SMS_DOWNLOAD => 0.03 // ex vat
     ];
 
     /**
@@ -48,15 +52,15 @@ class Charge
     protected $createdDate;
 
     /**
-     * @Assert\Choice({"address", "sms", "gsma", "makemodel", "claimscheck", "claimsdamage", "bank-account",
-     *     "affiliate"}, strict=true)
+     * @Assert\Choice({"address", "gsma", "makemodel", "claimscheck", "claimsdamage", "bank-account", "affiliate",
+     *    "sms-invitation", "sms-verification", "sms-download"}, strict=true)
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
     protected $type;
 
     /**
-     * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\User")
+     * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\User", inversedBy="charges")
      * @Gedmo\Versioned
      */
     protected $user;

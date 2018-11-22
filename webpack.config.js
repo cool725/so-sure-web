@@ -20,6 +20,7 @@ Encore
     .addEntry('error', './src/AppBundle/Resources/public/rebrand/js/pages/error.js')
     .addEntry('login', './src/AppBundle/Resources/public/rebrand/js/pages/login.js')
     .addEntry('homepage', './src/AppBundle/Resources/public/rebrand/js/pages/homepage.js')
+    .addEntry('homepage-xmas', './src/AppBundle/Resources/public/rebrand/js/pages/homepage-xmas.js')
     .addEntry('quotepage', './src/AppBundle/Resources/public/rebrand/js/pages/quotepage.js')
     .addEntry('purchase', './src/AppBundle/Resources/public/rebrand/js/pages/purchase.js')
     .addEntry('purchase-personal', './src/AppBundle/Resources/public/rebrand/js/pages/purchase-personal.js')
@@ -27,11 +28,14 @@ Encore
     .addEntry('purchase-pledge', './src/AppBundle/Resources/public/rebrand/js/pages/purchase-pledge.js')
     .addEntry('purchase-payment', './src/AppBundle/Resources/public/rebrand/js/pages/purchase-payment.js')
     .addEntry('purchase-bacs', './src/AppBundle/Resources/public/rebrand/js/pages/purchase-bacs.js')
-    .addEntry('welcome', './src/AppBundle/Resources/public/rebrand/js/pages/welcome.js')
     .addEntry('landing', './src/AppBundle/Resources/public/rebrand/js/pages/landing.js')
     .addEntry('faq', './src/AppBundle/Resources/public/rebrand/js/pages/faq.js')
+    .addEntry('onboarding', './src/AppBundle/Resources/public/rebrand/js/pages/onboarding.js')
     .addEntry('social-insurance', './src/AppBundle/Resources/public/rebrand/js/pages/social-insurance.js')
     .addEntry('contact', './src/AppBundle/Resources/public/rebrand/js/pages/contact.js')
+
+    // Admin files
+    .addEntry('admin', './src/AppBundle/Resources/public/rebrand/js/pages/admin/admin.js')
 
     // allow legacy applications to use $/jQuery as a global variable
     .autoProvidejQuery()

@@ -18,7 +18,7 @@ use AppBundle\Annotation\DataChange;
 
 /**
  * @MongoDB\Document(repositoryClass="AppBundle\Repository\ClaimRepository")
- * @Gedmo\Loggable
+ * @Gedmo\Loggable(logEntryClass="AppBundle\Document\LogEntry")
  */
 class Claim
 {

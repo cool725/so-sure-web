@@ -15,7 +15,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
  * @MongoDB\InheritanceType("SINGLE_COLLECTION")
  * @MongoDB\DiscriminatorField("type")
  * @MongoDB\DiscriminatorMap({"phone"="AppBundle\Document\PhonePremium"})
- * @Gedmo\Loggable
+ * @Gedmo\Loggable(logEntryClass="AppBundle\Document\LogEntry")
  */
 abstract class Premium implements EqualsInterface
 {

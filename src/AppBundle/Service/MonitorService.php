@@ -9,6 +9,7 @@ use AppBundle\Document\DateTrait;
 use AppBundle\Document\File\AccessPayFile;
 use AppBundle\Document\File\DaviesFile;
 use AppBundle\Document\File\DirectGroupFile;
+use AppBundle\Document\Invitation\EmailInvitation;
 use AppBundle\Document\Invitation\Invitation;
 use AppBundle\Document\Form\Bacs;
 use AppBundle\Document\MultiPay;
@@ -740,36 +741,89 @@ class MonitorService
         }
     }
 
-    public function duplicateInvites()
+    public function duplicateEmailInvites()
+    {
+        $results = $this->aggregate('email', 'email');
+
+        if (count($results) > 0) {
+            foreach ($results as $result) {
+                throw new MonitorException(sprintf(
+                    "Found duplicate invites on email, %s",
+                    json_encode($result)
+                ));
+            }
+        }
+    }
+
+    public function duplicateSmsInvites()
+    {
+        $results = $this->aggregate('sms', 'mobile');
+
+        if (count($results) > 0) {
+            foreach ($results as $result) {
+                throw new MonitorException(sprintf(
+                    "Found duplicate invites on sms, %s",
+                    json_encode($result)
+                ));
+            }
+        }
+    }
+
+    public function duplicateScodeInvites()
+    {
+        $results = $this->aggregate('scode', 'scode');
+
+        if (count($results) > 0) {
+            foreach ($results as $result) {
+                throw new MonitorException(sprintf(
+                    "Found duplicate invites on scode, %s",
+                    json_encode($result)
+                ));
+            }
+        }
+    }
+
+    public function duplicateFacebookInvites()
+    {
+        $results = $this->aggregate('facebook', 'facebookId');
+
+        if (count($results) > 0) {
+            foreach ($results as $result) {
+                throw new MonitorException(sprintf(
+                    "Found duplicate invites on facebook, %s",
+                    json_encode($result)
+                ));
+            }
+        }
+    }
+
+    /**
+     * @param string $type
+     * @param string $field
+     * @return \Doctrine\MongoDB\Iterator
+     * @throws \Doctrine\ODM\MongoDB\MongoDBException
+     */
+    public function aggregate($type, $field)
     {
         $collection = $this->dm->getDocumentCollection(Invitation::class);
         $builder = $collection->createAggregationBuilder();
 
         $results = $builder
-            ->group()
-            ->field('_id')
-            ->expression(
-                $builder->expr()
-                    ->field('email')
-                    ->expression('$email')
-                    ->field('policy')
-                    ->expression('$policy')
-            )
-            ->field('count')
-            ->sum(1)
             ->match()
-            ->field('count')
-            ->gt(1)
+                ->field('invitation_type')->equals($type)
+            ->group()
+                ->field('_id')
+                    ->expression(
+                        $builder->expr()
+                            ->field($field)->expression('$' . $field)
+                            ->field('policy')->expression('$policy')
+                    )
+                ->field('count')->sum(1)
+            ->match()
+                ->field('count')->gt(1)
             ->execute(['cursor' => []]);
 
-        if (count($results) > 0) {
-            foreach ($results as $result) {
-                throw new MonitorException(sprintf(
-                    "Found duplicate Invites on email %s",
-                    json_encode($result['_id'])
-                ));
-            }
-        }
+        return $results;
     }
 
     /**
@@ -848,10 +902,12 @@ class MonitorService
             ->execute();
 
         foreach ($results as $result) {
-            throw new MonitorException(
-                "Policy {$result->getPolicyNumber()} is active/unpaid but expired!" . PHP_EOL .
-                "Expired since {$result->getEnd()->format('Y-M-D H:m')} !"
-            );
+            if (!$result->isPrefixInvalidPolicy()) {
+                throw new MonitorException(
+                    "Policy {$result->getPolicyNumber()} is active/unpaid but expired!" . PHP_EOL .
+                    "Expired since {$result->getEnd()->format('Y-M-D H:m')} !"
+                );
+            }
         }
     }
 

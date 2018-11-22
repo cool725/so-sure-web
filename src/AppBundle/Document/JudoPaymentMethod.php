@@ -10,7 +10,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
  * @MongoDB\EmbeddedDocument
- * @Gedmo\Loggable
+ * @Gedmo\Loggable(logEntryClass="AppBundle\Document\LogEntry")
 */
 class JudoPaymentMethod extends PaymentMethod
 {

@@ -10,6 +10,7 @@ use AppBundle\Interfaces\EqualsInterface;
 use Doctrine\Common\Annotations\Reader;
 use Doctrine\ODM\MongoDB\Event\PreUpdateEventArgs;
 use Symfony\Component\PropertyAccess\PropertyAccess;
+use Psr\Log\LoggerInterface;
 
 class BaseDoctrineListener
 {
@@ -18,9 +19,17 @@ class BaseDoctrineListener
     /** @var Reader */
     protected $reader;
 
+    /** @var LoggerInterface */
+    protected $logger;
+
     public function setReader(Reader $reader)
     {
         $this->reader = $reader;
+    }
+
+    public function setLogger(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
     }
 
     const COMPARE_EQUAL = 'equal';
@@ -72,36 +81,143 @@ class BaseDoctrineListener
             $oldValue = $eventArgs->getOldValue($field);
             $newValue = $eventArgs->getNewValue($field);
 
+            /*
+            if ($this->logger) {
+                $this->logger->debug(sprintf(
+                    'Changed field %s from %s to %s',
+                    $field,
+                    json_encode($oldValue),
+                    json_encode($newValue)
+                ));
+            }
+            */
+
             if ($mustExist && mb_strlen(trim($oldValue)) == 0) {
                 return false;
             }
 
             if ($compare == self::COMPARE_EQUAL) {
                 if (is_float($oldValue)) {
-                    return $this->areEqualToSixDp($oldValue, $newValue);
+                    $result = !$this->areEqualToSixDp($oldValue, $newValue);
+                    /*
+                    if ($this->logger) {
+                        $this->logger->debug(sprintf(
+                            'Return %s for compare %s (float)',
+                            $result ? 'true' : 'false',
+                            $compare
+                        ));
+                    }
+                    */
+                    return $result;
+                }
+                if ($oldValue === null && is_string($newValue) && mb_strlen($newValue) == 0) {
+                    $result = false;
+                    /*
+                    if ($this->logger) {
+                        $this->logger->debug(sprintf(
+                            'Return %s for compare %s (null/emptystring)',
+                            $result ? 'true' : 'false',
+                            $compare
+                        ));
+                    }
+                    */
+                    return $result;
+                }
+                if ($newValue === null && is_string($oldValue) && mb_strlen($oldValue) == 0) {
+                    $result = false;
+                    /*
+                    if ($this->logger) {
+                        $this->logger->debug(sprintf(
+                            'Return %s for compare %s (emptystring/null)',
+                            $result ? 'true' : 'false',
+                            $compare
+                        ));
+                    }
+                    */
+                    return $result;
                 }
 
-                return $oldValue !== $newValue;
+                $result = $oldValue !== $newValue;
+                /*
+                if ($this->logger) {
+                    $this->logger->debug(sprintf('Return %s for compare %s', $result ? 'true' : 'false', $compare));
+                }
+                */
+                return $result;
             } elseif ($compare == self::COMPARE_CASE_INSENSITIVE) {
-                return mb_strtolower($oldValue) !== mb_strtolower($newValue);
+                $result = mb_strtolower($oldValue) !== mb_strtolower($newValue);
+                /*
+                if ($this->logger) {
+                    $this->logger->debug(sprintf('Return %s for compare %s', $result ? 'true' : 'false', $compare));
+                }
+                */
+                return $result;
             } elseif ($compare == self::COMPARE_OBJECT_SERIALIZE) {
-                return serialize($oldValue) == serialize($newValue);
+                $result = serialize($oldValue) == serialize($newValue);
+                /*
+                if ($this->logger) {
+                    $this->logger->debug(sprintf('Return %s for compare %s', $result ? 'true' : 'false', $compare));
+                }
+                */
+                return $result;
             } elseif ($compare == self::COMPARE_OBJECT_EQUALS) {
                 if (!$oldValue && !$newValue) {
-                    return false;
+                    $result = false;
+                    /*
+                    if ($this->logger) {
+                        $this->logger->debug(sprintf('Return %s for compare %s', $result ? 'true' : 'false', $compare));
+                    }
+                    */
+                    return $result;
                 } elseif (!$oldValue && $newValue) {
-                    return true;
+                    $result = true;
+                    /*
+                    if ($this->logger) {
+                        $this->logger->debug(sprintf('Return %s for compare %s', $result ? 'true' : 'false', $compare));
+                    }
+                    */
+                    return $result;
                 } elseif ($oldValue instanceof EqualsInterface) {
-                    return !$oldValue->equals($newValue);
+                    $result = !$oldValue->equals($newValue);
+                    /*
+                    if ($this->logger) {
+                        $this->logger->debug(sprintf('Return %s for compare %s', $result ? 'true' : 'false', $compare));
+                    }
+                    */
+                    return $result;
                 } else {
-                    return null;
+                    $result = null;
+                    /*
+                    if ($this->logger) {
+                        $this->logger->debug(sprintf('Return %s for compare %s', $result ? 'true' : 'false', $compare));
+                    }
+                    */
+                    return $result;
                 }
             } elseif ($compare == self::COMPARE_INCREASE) {
-                return $oldValue < $newValue;
+                $result = $oldValue < $newValue;
+                /*
+                if ($this->logger) {
+                    $this->logger->debug(sprintf('Return %s for compare %s', $result ? 'true' : 'false', $compare));
+                }
+                */
+                return $result;
             } elseif ($compare == self::COMPARE_DECREASE) {
-                return $oldValue > $newValue;
+                $result = $oldValue > $newValue;
+                /*
+                if ($this->logger) {
+                    $this->logger->debug(sprintf('Return %s for compare %s', $result ? 'true' : 'false', $compare));
+                }
+                */
+                return $result;
             } elseif ($compare == self::COMPARE_TO_NULL) {
-                return $newValue === null;
+                $result = $newValue === null;
+                /*
+                if ($this->logger) {
+                    $this->logger->debug(sprintf('Return %s for compare %s', $result ? 'true' : 'false', $compare));
+                }
+                */
+                return $result;
             } elseif ($compare == self::COMPARE_BACS) {
                 if (!$oldValue instanceof BacsPaymentMethod || !$newValue instanceof BacsPaymentMethod) {
                     return false;

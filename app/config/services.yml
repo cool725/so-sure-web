@@ -416,7 +416,7 @@ services:
         class: AppBundle\Service\S3TwigExtension
         arguments:
             - "@aws.s3"
-        public: false
+        public: true
         tags:
             - { name: twig.extension }
 
@@ -675,6 +675,8 @@ services:
             - "@snc_redis.default"
             - "@logger"
             - "%kernel.environment%"
+            - "@app.feature"
+            - "%sosure_ips%"
 
     statsd_client:
         class: Domnikl\Statsd\Connection\UdpSocket
@@ -898,6 +900,7 @@ services:
         public: true
         calls:
             - [setReader, ['@annotations.reader']]
+            - [setLogger, ['@logger']]
 
     doctrine.listener.invitation:
         class:   AppBundle\Listener\DoctrineInvitationListener
@@ -1466,7 +1469,7 @@ services:
         arguments:
             - "@doctrine_mongodb.odm.default_document_manager"
             - "@logger"
-            - "@router"
+            - "@app.router"
         tags:
             - { name: dpn_xml_sitemap.generator }
 

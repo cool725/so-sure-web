@@ -66,6 +66,7 @@ $('#detailsModal').on('show.bs.modal', function (event) {
     modal.find('.modal-title').text('Edit ' + phone.make + ' ' + phone.model + ' ' + phone.memory + 'GB');
     modal.find('#details-description').val(phone.description);
     modal.find('#details-fun-facts').val(phone.funFacts);
+    modal.find('#details-canonical-path').val(phone.canonicalPath);
   }
 });
 

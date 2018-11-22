@@ -156,10 +156,12 @@
                             </a></td>
                             <td>{{ policy.status }}
                                 {% if policy.status == "cancelled" %} / {{ policy.cancelledReason }}{% endif %}
+                                {# starting to impact on query time - as value is questionable, can be removed for now
                                 {% if policy.hasPolicyExpirationDate and policy.status == "unpaid" %} / {{ policy.policyExpirationDate | date('d M Y H:i', 'Europe/London') }}{% endif %}
+                                #}
                             </td>
                             <td>{{ policy.age }} {% if policy.getPremiumPlan == 'yearly' %}<i class="fa fa-calendar" title="Yearly plan"></i>{% endif %}
-                                {% if policy.nextPolicy %}<a href="{{ path(policy_route, {'id': policy.nextPolicy.id}) }}" title="Next policy {{ policy.nextPolicy.status }}"><i class="fa fa-arrow-right"></i> </a>{% endif %}
+                                {% if policy.nextPolicy %}<a href="{{ path(policy_route, {'id': policy.nextPolicy.id}) }}" title="Next policy"><i class="fa fa-arrow-right"></i> </a>{% endif %}
                             </td>
                             <td>{{ policy.user.firstname }} {{ policy.user.lastname }}</td>
                             <td>

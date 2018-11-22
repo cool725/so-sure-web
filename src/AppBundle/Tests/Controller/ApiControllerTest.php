@@ -158,7 +158,13 @@ class ApiControllerTest extends BaseApiControllerTest
 
     public function testSuccessLoginDoesNotLocksUser()
     {
-        $rateLimit = new RateLimitService(static::$redis, static::$container->get('logger'), 'test');
+        $rateLimit = new RateLimitService(
+            static::$redis,
+            static::$container->get('logger'),
+            'test',
+            static::$container->get('app.feature'),
+            static::$container->getParameter('sosure_ips')
+        );
 
         $cognitoIdentityId = $this->getUnauthIdentity();
         $user = static::createUser(self::$userManager, static::generateEmail('rate-limit-login-ok', $this), 'bar');

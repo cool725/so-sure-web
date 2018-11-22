@@ -36,7 +36,7 @@ use AppBundle\Exception\ClaimException;
  * @MongoDB\InheritanceType("SINGLE_COLLECTION")
  * @MongoDB\DiscriminatorField("policy_type")
  * @MongoDB\DiscriminatorMap({"phone"="PhonePolicy","salva-phone"="SalvaPhonePolicy"})
- * @Gedmo\Loggable
+ * @Gedmo\Loggable(logEntryClass="AppBundle\Document\LogEntry")
  */
 abstract class Policy
 {
@@ -1876,7 +1876,8 @@ abstract class Policy
     public function setPolicyStatusUnpaidIfActive($checkUnpaidStatus = true, \DateTime $date = null)
     {
         if ($this->getStatus() == self::STATUS_ACTIVE) {
-            if (!$checkUnpaidStatus || ($checkUnpaidStatus && !$this->isPolicyPaidToDate($date))) {
+            if (!$checkUnpaidStatus || ($checkUnpaidStatus &&
+                !$this->isPolicyPaidToDate($date, true, false, true))) {
                 $this->setStatus(self::STATUS_UNPAID);
             }
         }
@@ -1921,6 +1922,18 @@ abstract class Policy
     public function getPolicyTermsFiles()
     {
         return $this->getPolicyFilesByType(PolicyTermsFile::class);
+    }
+
+    /**
+     * Gives you the most recent policy terms file object that this policy is linked to
+     * @return PolicyTermsFile|null the file or null if there are no such files.
+     */
+    public function getLatestPolicyTermsFile()
+    {
+        foreach ($this->getPolicyTermsFiles() as $file) {
+            return $file;
+        }
+        return null;
     }
 
     public function addPolicyFile(S3File $file)
@@ -4225,12 +4238,14 @@ abstract class Policy
             if ($months > 12) {
                 $months = 12;
             }
+
             /*
             print PHP_EOL;
             print $date->format(\DateTime::ATOM) . PHP_EOL;
             print $this->getBilling()->format(\DateTime::ATOM) . PHP_EOL;
             print $months . PHP_EOL;
             */
+
             $expectedPaid = $this->getPremium()->getAdjustedStandardMonthlyPremiumPrice() * $months;
         } else {
             throw new \Exception('Unknown premium plan');
@@ -4365,7 +4380,7 @@ abstract class Policy
 
         if ($includeFuturePayments) {
             $futureDate = clone $date;
-            $futureDate = $futureDate->add(new \DateInterval('P1D'));
+            $futureDate = $this->endOfDay($this->getNextBusinessDay($futureDate));
             $totalPaid = $this->getTotalSuccessfulPayments($futureDate, true);
         } else {
             $totalPaid = $this->getTotalSuccessfulPayments($date, true);
@@ -4374,10 +4389,12 @@ abstract class Policy
             $totalPaid += $this->getPendingBacsPaymentsTotal();
         }
         $expectedPaid = $this->getTotalExpectedPaidToDate($date, $firstDayIsUnpaid);
-        // print sprintf("%f =? %f", $totalPaid, $expectedPaid) . PHP_EOL;
 
         // >= doesn't quite allow for minor float differences
-        return $this->areEqualToTwoDp($expectedPaid, $totalPaid) || $totalPaid > $expectedPaid;
+        $result = $this->areEqualToTwoDp($expectedPaid, $totalPaid) || $totalPaid > $expectedPaid;
+        //print sprintf("%f =? %f return %s%s", $totalPaid, $expectedPaid, $result ? 'true': 'false', PHP_EOL);
+
+        return $result;
     }
 
     public function getOutstandingScheduledPaymentsAmount()
@@ -4730,7 +4747,9 @@ abstract class Policy
         }
 
         if (!$this->isAdditionalClaimLostTheftApprovedAllowed()) {
-            $warnings[] = sprintf('Policy already has 2 lost/theft claims. No further lost/theft claims are allowed');
+            // @codingStandardsIgnoreStart
+            $warnings[] = sprintf('Policy already has 2 lost/theft claims. No further lost/theft claims are allowed, however, allow any in-progress FNOL claims');
+            // @codingStandardsIgnoreEnd
         }
 
         if ($this->getPendingCancellation()) {

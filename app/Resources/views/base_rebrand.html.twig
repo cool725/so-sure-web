@@ -9,9 +9,13 @@
 
         {% block meta %}{% endblock %}
 
+        {% if use_fa_cdn %}
         <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.2.0/css/all.css" integrity="sha384-TXfwrfuHVznxCssTxWoPZjhcss/hp38gEOH8UPZG/JcXonvBQ6SlsIF49wUzsGno" crossorigin="anonymous">
+        {% else %}
+        <link rel="stylesheet" href="/assets/fontawesome-pro-5.5.0-web/css/all.min.css" crossorigin="anonymous">
+        {% endif %}
 
-        {% if include_emoji is defined and include_emoji == 1 %}
+        {% if include_emoji is defined and include_emoji == true %}
             <script src="https://twemoji.maxcdn.com/2/twemoji.min.js?2.2.3"></script>
         {% endif %}
 
@@ -110,7 +114,9 @@
 
         {% include '::flash_rebrand.html.twig' %}
 
-        {% include '::dev_bar_rebrand.html.twig' %}
+        {% if hide_devbar is not defined or not hide_devbar %}
+            {% include '::dev_bar_rebrand.html.twig' %}
+        {% endif %}
 
         <main id="content" class="w-100 flex-grow-1">
             {% block body %}{% endblock %}
