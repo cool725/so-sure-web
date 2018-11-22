@@ -51,7 +51,6 @@ $input-btn-padding-x:            1.2rem;
 $input-btn-padding-y:            .6rem;
 $input-color:                    $zaffre;
 
-
 $input-group-addon-color:        $white;
 $input-group-addon-bg:           $dodger-blue;
 $input-group-addon-border-color: $dodger-blue;
@@ -69,6 +68,13 @@ $dropdown-link-hover-bg:         rgba(37, 147, 243, 0.1);
 
 $dropdown-link-active-color:     $zaffre;
 $dropdown-link-active-bg:        rgba(37, 147, 243, 0.2);
+
+// Tables
+$table-head-bg:                  rgba(37, 147, 243, 0.03);
+$table-head-color:               $zaffre;
+
+// use #{$cdn_url}
+$cdn_url: "https://cdn.so-sure.com";
 
 // Hamburgers
 $hamburger-padding-x:            15px;
