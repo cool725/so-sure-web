@@ -32,6 +32,7 @@ class SixpackService
     const EXPERIMENT_EBAY_LANDING_1 = 'ebay-landing-1';
     const EXPERIMENT_EBAY_LANDING_2 = 'ebay-landing-2';
     const EXPERIMENT_SOCIAL_AD_LANDING = 'ad-landing-quotepage';
+    const EXPERIMENT_APP_LINK_SMS = 'app-link-sms';
     // Exp 1
     //
     // Exp 2
@@ -55,6 +56,8 @@ class SixpackService
     // Exp 11
 
     const ALTERNATIVES_SHARE_MESSAGE_SIMPLE = 'simple';
+    const ALTERNATIVES_SMS_DOWNLOAD = 'sms-download';
+    const ALTERNATIVES_NO_SMS_DOWNLOAD = 'no-sms-download';
     const ALTERNATIVES_APP_SHARE_METHOD_NATIVE = 'native';
     const ALTERNATIVES_APP_SHARE_METHOD_API = 'api';
     const ALTERNATIVES_APP_PICSURE_REQUEST_LOCATION = 'request-location';
@@ -63,6 +66,7 @@ class SixpackService
     const KPI_RECEIVE_DETAILS = 'receive-details';
     const KPI_QUOTE = 'quote';
     const KPI_POLICY_PURCHASE = 'policy-purchase';
+    const KPI_FIRST_LOGIN_APP = 'first-login-app';
 
     const EXPIRED_EXPERIMENT_SHARE_MESSAGE = 'share-message';
 

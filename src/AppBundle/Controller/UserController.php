@@ -7,6 +7,7 @@ use AppBundle\Document\DateTrait;
 use AppBundle\Document\Payment\BacsPayment;
 use AppBundle\Document\Payment\Payment;
 use AppBundle\Document\ScheduledPayment;
+use AppBundle\Document\File\PolicyTermsFile;
 use AppBundle\Security\UserVoter;
 use AppBundle\Security\ClaimVoter;
 use AppBundle\Service\BacsService;
@@ -29,6 +30,7 @@ use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Policy;
 use AppBundle\Document\SCode;
 use AppBundle\Document\Cashback;
+use AppBundle\Document\Charge;
 use AppBundle\Document\Feature;
 use AppBundle\Document\User;
 use AppBundle\Document\BacsPaymentMethod;
@@ -76,7 +78,9 @@ use Facebook\Facebook;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use AppBundle\Exception\DuplicateInvitationException;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use AppBundle\Exception\ValidationException;
 
 use AppBundle\Exception\RateLimitException;
@@ -92,6 +96,7 @@ use AppBundle\Exception\InvalidPremiumException;
 use AppBundle\Exception\InvalidUserDetailsException;
 use AppBundle\Exception\GeoRestrictedException;
 use AppBundle\Exception\DuplicateImeiException;
+use AppBundle\Exception\DuplicateInvitationException;
 use AppBundle\Exception\LostStolenImeiException;
 use AppBundle\Exception\InvalidImeiException;
 use AppBundle\Exception\ImeiBlacklistedException;
@@ -1217,6 +1222,8 @@ class UserController extends BaseController
     {
         $dm = $this->getManager();
         $user = $this->getUser();
+        $invitationService = $this->get('app.invitation');
+        $policyService = $this->get('app.policy');
 
         if (!$user->hasActivePolicy() && !$user->hasUnpaidPolicy()) {
             return new RedirectResponse($this->generateUrl('user_invalid_policy'));
@@ -1261,16 +1268,29 @@ class UserController extends BaseController
             parse_str($query, $oauth2FlowParams);
         }
 
-        $data = array(
-            'cancel_url' => $this->generateUrl('purchase_cancel_damaged', ['id' => $user->getLatestPolicy()->getId()]),
-            'policy_key' => $this->getParameter('policy_key'),
-            'policy' => $user->getLatestPolicy(),
-            'has_visited_welcome_page' => $pageVisited,
-            'oauth2FlowParams' => $oauth2FlowParams,
+        $smsExperiment = $this->sixpack(
+            $request,
+            SixpackService::EXPERIMENT_APP_LINK_SMS,
+            [
+                SixpackService::ALTERNATIVES_NO_SMS_DOWNLOAD,
+                SixpackService::ALTERNATIVES_SMS_DOWNLOAD
+            ],
+            SixpackService::LOG_MIXPANEL_NONE,
+            $user->getId(),
+            1
         );
 
-        return $this->render('AppBundle:User:welcome.html.twig', $data);
+        return $this->render('AppBundle:User:onboarding.html.twig', [
+            'cancel_url' => $this->generateUrl('purchase_cancel_damaged', ['id' => $user->getLatestPolicy()->getId()]),
+            'policy_key' => $this->getParameter('policy_key'),
+            'policy' => $policy,
+            'has_visited_welcome_page' => $pageVisited,
+            'oauth2FlowParams' => $oauth2FlowParams,
+            'user' => $user,
+            'sms_experiment' => $smsExperiment
+        ]);
     }
+
     /**
      * @Route("/payment-details", name="user_payment_details")
      * @Route("/payment-details/bacs", name="user_payment_details_bacs")
@@ -1322,6 +1342,8 @@ class UserController extends BaseController
         // or no point in swapping to bacs
         if ($bacsFeature && $policy->canBacsPaymentBeMadeInTime()) {
             $bacsFeature = false;
+            // TODO: it seems as though this would turn off the bacs features when it should leave it on and vice
+            //       versa.
         }
 
         /** @var PaymentService $paymentService */
@@ -1476,6 +1498,7 @@ class UserController extends BaseController
             'policy' => $policy,
         ];
     }
+
 
     /**
      * @Route("/list", name="user_policy_list")

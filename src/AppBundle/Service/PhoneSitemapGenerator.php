@@ -18,13 +18,13 @@ class PhoneSitemapGenerator implements GeneratorInterface
     /** @var LoggerInterface */
     protected $logger;
 
-    /** @var RouterInterface  */
+    /** @var RouterService  */
     protected $router;
 
     public function __construct(
         DocumentManager  $dm,
         LoggerInterface $logger,
-        RouterInterface $router
+        RouterService $router
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
@@ -52,9 +52,9 @@ class PhoneSitemapGenerator implements GeneratorInterface
         }
 
         foreach ($makes as $make) {
-            $url = $this->router->generate('quote_make', [
+            $url = $this->router->generateUrl('quote_make', [
                 'make' => $make,
-            ], UrlGeneratorInterface::ABSOLUTE_URL);
+            ]);
 
             $item = new Entry($url, null, 'weekly', 0.7);
             $item->setDescription($make);
@@ -64,10 +64,14 @@ class PhoneSitemapGenerator implements GeneratorInterface
         $phones = $repo->findActive()->getQuery()->execute();
         foreach ($phones as $phone) {
             /** @var Phone $phone */
-            $url = $this->router->generate('quote_make_model', [
-                'make' => $phone->getMakeCanonical(),
-                'model' => $phone->getEncodedModelCanonical()
-            ], UrlGeneratorInterface::ABSOLUTE_URL);
+            if ($phone->getCanonicalPath() && mb_strlen($phone->getCanonicalPath()) > 0) {
+                $url = $this->router->generateUrlFromPath($phone->getCanonicalPath());
+            } else {
+                $url = $this->router->generateUrl('quote_make_model', [
+                    'make' => $phone->getMakeCanonical(),
+                    'model' => $phone->getEncodedModelCanonical()
+                ]);
+            }
 
             $item = new Entry($url, null, 'weekly', 0.7);
             $item->setDescription($phone->getMakeWithAlternative() . ' ' . $phone->getModel() . ' insurance');

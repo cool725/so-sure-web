@@ -96,7 +96,7 @@ class ClaimFnolTheftLoss
     {
         $this->blockedDate = $blockedDate;
     }
-    
+
     public function getReportedDate()
     {
         return $this->reportedDate;
@@ -121,7 +121,7 @@ class ClaimFnolTheftLoss
     {
         return $this->proofOfUsage;
     }
-    
+
     public function setProofOfUsage($proofOfUsage)
     {
         $this->proofOfUsage = $proofOfUsage;
@@ -131,7 +131,7 @@ class ClaimFnolTheftLoss
     {
         return $this->proofOfBarring;
     }
-    
+
     public function setProofOfBarring($proofOfBarring)
     {
         $this->proofOfBarring = $proofOfBarring;
@@ -141,7 +141,7 @@ class ClaimFnolTheftLoss
     {
         return $this->proofOfPurchase;
     }
-    
+
     public function setProofOfPurchase($proofOfPurchase)
     {
         $this->proofOfPurchase = $proofOfPurchase;
@@ -161,7 +161,7 @@ class ClaimFnolTheftLoss
     {
         return $this->crimeReferenceNumber;
     }
-    
+
     public function setCrimeReferenceNumber($crimeReferenceNumber)
     {
         $this->crimeReferenceNumber = $crimeReferenceNumber;
@@ -171,7 +171,7 @@ class ClaimFnolTheftLoss
     {
         return $this->force;
     }
-    
+
     public function setForce($force)
     {
         $this->force = $force;

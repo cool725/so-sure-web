@@ -23,4 +23,8 @@ gulp.task('default', function() {
     // Animate.css > vendor
     gulp.src('node_modules/animate.css/animate.css')
         .pipe(gulp.dest('src/AppBundle/Resources/public/rebrand/sass/vendor'));
+
+    // JSSocials
+    gulp.src(['node_modules/jssocials/dist/jssocials.css', 'node_modules/jssocials/dist/jssocials-theme-flat.css'])
+        .pipe(gulp.dest('src/AppBundle/Resources/public/rebrand/sass/vendor'));
 });

@@ -1,0 +1,160 @@
+// quotepage.scss (oboarding)
+
+@import "../vendor/bs4/functions";
+@import "../vendor/bs4/variables";
+@import "../vendor/bs4/mixins/breakpoints";
+@import "../abstracts/mixins";
+@import "../abstracts/palette";
+@import "../abstracts/variables";
+@import "../base/fonts";
+
+body {
+    overflow: hidden;
+}
+
+.onboarding {
+    overflow: hidden;
+
+    // Allow us to position the indicators outside
+    .carousel {
+        height: 100vh;
+        position: static;
+    }
+
+    // Overide indicators
+    .carousel-indicators {
+        position: static;
+        margin: 0;
+
+        li {
+            @include border-radius(12px);
+        }
+    }
+
+    &__body {
+        font-weight: 300;
+
+        @include media-breakpoint-up(ss) {
+            font-size: 0.99rem;
+        }
+
+        @include media-breakpoint-up(lg) {
+            p {
+                max-width: 700px;
+                margin-left: auto;
+                margin-right: auto;
+            }
+        }
+
+    }
+
+    &__item {
+        height: 100vh;
+        text-align: center;
+        overflow-y: scroll;
+        // This is nasty
+        padding-bottom: 150px;
+
+        @include media-breakpoint-up(lg) {
+            width: 80%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        @include media-breakpoint-up(xl) {
+            width: 60%;
+        }
+    }
+
+    &-controls {
+
+        &__mobile {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            // Use a fixed height for consistency
+            height: 56px;
+            background-color: $selago;
+        }
+
+        &__btn {
+            // As we modify the text we want spacing in the controls to be consistent
+            width: 60px;
+            font-family: $g-bold;
+            color: $dodger-blue;
+
+            &.disabled {
+                opacity: 0.5;
+                cursor: not-allowed;
+            }
+
+            &:first-of-type {
+                text-align: left;
+            }
+
+            &:last-of-type {
+                text-align: right;
+            }
+
+            &:hover,
+            &:focus,
+            &:active {
+                text-decoration: none;
+                color: $dodger-blue
+            }
+        }
+    }
+
+    &-nav {
+
+        &__link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-grow: 1;
+            flex-basis: 0;
+            background-color: $selago;
+            color: darken($selago, 10%);
+            border-left: 0.03125rem solid darken($selago, 5%);
+            border-right: 0.03125rem solid darken($selago, 5%);
+            transition: background-color 500ms ease;
+
+            &:first-of-type {
+                border-left: none;
+            }
+
+            &:last-of-type {
+                border-right: none;
+            }
+
+            &.active,
+            &:hover,
+            &:focus,
+            &:active {
+                background-color: rgba(0, 146, 255, 0.3);
+                color: $dodger-blue;
+                text-decoration: none;
+
+                .onboarding-nav__number {
+                    background-color: $white;
+                    border: none;
+                    box-shadow: 0 0 0 7px rgba(37, 147, 243, 0.15);
+                }
+            }
+        }
+
+        &__number{
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px; height: 32px;
+            border: 2px solid darken($selago, 10%);
+            @include border-radius(50%);
+
+            transition: background-color 500ms ease;
+        }
+
+    }
+}
