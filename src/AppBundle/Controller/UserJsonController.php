@@ -123,13 +123,17 @@ class UserJsonController extends BaseController
     public function inviteEmailAction(Request $request)
     {
         $user = $this->getUser();
+        $policy = $user->getLatestPolicy();
         $email = $request->get("email");
         if (!$email) {
             return new JsonResponse(["message" => "no-email"], 400);
         } elseif (!$this->isCsrfTokenValid("invite-email", $request->request->get('csrf'))) {
             return new JsonResponse(["message" => "invalid-csrf"], 400);
+        } elseif (!$policy) {
+            return new JsonResponse(["message" => "no-policy"], 400);
         }
         $this->denyAccessUnlessGranted(UserVoter::VIEW, $user);
+
         try {
             $this->get("app.invitation")->inviteByEmail($user->getLatestPolicy(), $email);
             return new Response(200);
