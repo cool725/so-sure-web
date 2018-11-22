@@ -7,9 +7,7 @@ Frontend
 * [ ] Browser tested - Pass on to frontend if user facing
 
 Testing
-* [ ] Check if test(s) are affected?
-(If yes)
-* [ ] Test(s) updated
+* [ ] Functional Test Failed? Manually verify results
 
 Misc
 * [ ] Add to Releases Calendar (might have impact on conversion)
