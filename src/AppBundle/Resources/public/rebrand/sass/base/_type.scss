@@ -17,6 +17,12 @@ h1, h2, h3, h4, h5, h6,
 a,
 strong {
     font-family: $g-medium;
+
+    &.no-style {
+        &:hover {
+            text-decoration: none;
+        }
+    }
 }
 
 .opacity-05 {
