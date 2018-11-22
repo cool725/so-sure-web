@@ -147,13 +147,11 @@ class DoctrineUserListenerTest extends WebTestCase
         $listener->preUpdate($events);
         $listenerLink->preUpdate($events);
 
-        $listener = $this->createUserEventListener($user, $this->atLeastOnce(), UserEvent::EVENT_UPDATED_INTERCOM, $email);
-        $listenerLink = $this->createUserEventListener($user, $this->atLeastOnce(), UserEvent::EVENT_UPDATED_INVITATION_LINK, $email);
+        $listener = $this->createUserEmailEventListeners($user, $email);
 
         $changeSet = ['email' => [$email, $emailNew]];
         $events = new PreUpdateEventArgs($user, self::$dm, $changeSet);
         $listener->preUpdate($events);
-        $listenerLink->preUpdate($events);
     }
 
     private function account($email)
@@ -347,7 +345,7 @@ class DoctrineUserListenerTest extends WebTestCase
         $listener->preUpdate($events);
     }
 
-    private function createUserEventListener($user, $count, $eventType, $oldEmail = null)
+    private function createUserEventListener($user, $count, $eventType)
     {
         $event = new UserEvent($user);
 
@@ -357,14 +355,27 @@ class DoctrineUserListenerTest extends WebTestCase
         $dispatcher->expects($count)
                      ->method('dispatch')
                      ->with($eventType, $event);
-        if ($oldEmail) {
-            /*
-            $emailEvent = new UserEmailEvent($user, $oldEmail);
-            $dispatcher->expects($this->atLeastOnce())
-                ->method('dispatch')
-                ->with(UserEmailEvent::EVENT_CHANGED, $emailEvent);
-            */
-        }
+
+        $listener = new DoctrineUserListener($dispatcher, static::$logger);
+        $listener->setReader(static::$container->get('annotations.reader'));
+
+        return $listener;
+    }
+
+    private function createUserEmailEventListeners($user, $oldEmail)
+    {
+        $event = new UserEvent($user);
+
+        $dispatcher = $this->getMockBuilder('EventDispatcherInterface')
+            ->setMethods(array('dispatch'))
+            ->getMock();
+        $dispatcher->expects($this->exactly(3))
+            ->method('dispatch')
+            ->withConsecutive(
+                [UserEmailEvent::EVENT_CHANGED, new UserEmailEvent($user, $oldEmail)],
+                [UserEvent::EVENT_UPDATED_INTERCOM, $event],
+                [UserEvent::EVENT_UPDATED_INVITATION_LINK, $event]
+            );
 
         $listener = new DoctrineUserListener($dispatcher, static::$logger);
         $listener->setReader(static::$container->get('annotations.reader'));
