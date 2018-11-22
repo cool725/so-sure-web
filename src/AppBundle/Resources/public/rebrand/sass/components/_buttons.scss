@@ -14,7 +14,8 @@
 // Remove box-shadow on outline buttons
 a[class*="btn-outline-"],
 .btn-circle,
-.btn-square {
+.btn-square,
+button[class*="btn-outline-"] {
     box-shadow: none;
 }
 
