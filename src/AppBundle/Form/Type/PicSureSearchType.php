@@ -37,7 +37,7 @@ class PicSureSearchType extends BaseType
             ->add('status', ChoiceType::class, [
                 'required' => true,
                 'multiple' => false,
-                'expanded' => true,
+                'expanded' => false,
                 'choices' => [
                     PhonePolicy::PICSURE_STATUS_MANUAL => PhonePolicy::PICSURE_STATUS_MANUAL,
                     PhonePolicy::PICSURE_STATUS_INVALID => PhonePolicy::PICSURE_STATUS_INVALID,
