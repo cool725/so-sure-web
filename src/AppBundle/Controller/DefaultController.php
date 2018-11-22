@@ -100,8 +100,8 @@ class DefaultController extends BaseController
         // Start: Friday 23rd November Mighnight
         // End: Monday 26th November Mighnight
         $now   = \DateTime::createFromFormat('U', time());
-        $start = new \DateTime('2018-11-23 00:00:00', new \DateTimezone(SoSure::TIMEZONE));
-        $end   = new \DateTime('2018-11-26 23:59:59', new \DateTimezone(SoSure::TIMEZONE));
+        $start = new \DateTime('2018-11-23 00:00:00', new \DateTimeZone(SoSure::TIMEZONE));
+        $end   = new \DateTime('2018-11-26 23:59:59', new \DateTimeZone(SoSure::TIMEZONE));
 
         if ($now >= $start && $now <= $end) {
             $pageType = 'blackfriday';
