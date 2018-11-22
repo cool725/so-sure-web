@@ -1583,7 +1583,7 @@ class PolicyService
         return $lines;
     }
 
-    public function cashbackReminder($dryRun)
+    public function cashbackMissingReminder($dryRun)
     {
         $now = \DateTime::createFromFormat('U', time());
         $cashback = [];
@@ -1620,7 +1620,7 @@ class PolicyService
         return $cashback;
     }
 
-    public function cashbackPending($dryRun)
+    public function cashbackPendingReminder($dryRun)
     {
         $cashbacks = [];
 

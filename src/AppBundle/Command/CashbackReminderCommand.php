@@ -52,7 +52,7 @@ class CashbackReminderCommand extends ContainerAwareCommand
         $status = $input->getArgument('status');
 
         if ($status == Cashback::STATUS_MISSING) {
-            $lines = $this->policyService->cashbackReminder($dryRun);
+            $lines = $this->policyService->cashbackMissingReminder($dryRun);
         } elseif ($status == Cashback::STATUS_PENDING_PAYMENT) {
             $date = \DateTime::createFromFormat('U', time())
                 ->format('W');
@@ -66,7 +66,7 @@ class CashbackReminderCommand extends ContainerAwareCommand
                 return;
             }
 
-            $lines = $this->policyService->cashbackPending($dryRun);
+            $lines = $this->policyService->cashbackPendingReminder($dryRun);
         }
 
         $output->writeln(json_encode($lines, JSON_PRETTY_PRINT));

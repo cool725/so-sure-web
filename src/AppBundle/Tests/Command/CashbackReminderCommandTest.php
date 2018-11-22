@@ -42,10 +42,10 @@ class CashbackReminderCommandTest extends BaseControllerTest
         }
     }
 
-    public function testCashbackReminderMissing()
+    public function testCashbackMissingReminder()
     {
         $policy = self::createUserPolicy(true);
-        $policy->getUser()->setEmail(self::generateEmail('testCashbackReminderMissing', $this));
+        $policy->getUser()->setEmail(self::generateEmail('testCashbackMissingReminder', $this));
         $policy->setStatus(Policy::STATUS_EXPIRED);
 
         $cashback = self::createCashback($policy, new \DateTime(), Cashback::STATUS_MISSING);
@@ -63,10 +63,10 @@ class CashbackReminderCommandTest extends BaseControllerTest
         $this->callCommand($expected, 'missing');
     }
 
-    public function testCashbackReminderPending()
+    public function testCashbackPendingReminder()
     {
         $policy = self::createUserPolicy(true);
-        $policy->getUser()->setEmail(self::generateEmail('testCashbackReminderPending', $this));
+        $policy->getUser()->setEmail(self::generateEmail('testCashbackPendingReminder', $this));
         $policy->setStatus(Policy::STATUS_EXPIRED);
 
         $cashback = self::createCashback($policy, new \DateTime(), Cashback::STATUS_PENDING_PAYMENT);
