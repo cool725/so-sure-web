@@ -2,6 +2,7 @@
 
 namespace AppBundle\Listener;
 
+use AppBundle\Annotation\DataChange;
 use AppBundle\Document\BacsPaymentMethod;
 use AppBundle\Document\BankAccount;
 use AppBundle\Document\Charge;
@@ -50,7 +51,7 @@ class DoctrineUserListener extends BaseDoctrineListener
             $eventArgs,
             User::class,
             ['email'],
-            self::COMPARE_CASE_INSENSITIVE,
+            DataChange::COMPARE_CASE_INSENSITIVE,
             true
         )) {
             $event = new UserEmailEvent($user, $eventArgs->getOldValue('email'));
@@ -61,8 +62,8 @@ class DoctrineUserListener extends BaseDoctrineListener
         // then the user has reset their password using their token.
         // This was most likely received by email and if so, then their email should be valid
         // TODO: Figure out how to handle a manual process
-        if ($this->hasDataChanged($eventArgs, User::class, ['confirmationToken'], self::COMPARE_TO_NULL) &&
-            $this->hasDataChanged($eventArgs, User::class, ['passwordRequestedAt'], self::COMPARE_TO_NULL)) {
+        if ($this->hasDataChanged($eventArgs, User::class, ['confirmationToken'], DataChange::COMPARE_TO_NULL) &&
+            $this->hasDataChanged($eventArgs, User::class, ['passwordRequestedAt'], DataChange::COMPARE_TO_NULL)) {
             $user->setEmailVerified(true);
 
             // Email Verified probably isn't in the original changeset, so recalculate
@@ -73,7 +74,7 @@ class DoctrineUserListener extends BaseDoctrineListener
             $eventArgs,
             User::class,
             ['password'],
-            self::COMPARE_CASE_INSENSITIVE,
+            DataChange::COMPARE_CASE_INSENSITIVE,
             true
         )) {
             if ($eventArgs->hasChangedField('salt')) {
@@ -92,7 +93,7 @@ class DoctrineUserListener extends BaseDoctrineListener
             $eventArgs,
             User::class,
             ['firstName', 'lastName'],
-            self::COMPARE_EQUAL,
+            DataChange::COMPARE_EQUAL,
             true
         )) {
             $this->triggerEvent($user, UserEvent::EVENT_NAME_UPDATED);
@@ -102,7 +103,7 @@ class DoctrineUserListener extends BaseDoctrineListener
             $eventArgs,
             User::class,
             ['paymentMethod'],
-            self::COMPARE_BACS
+            DataChange::COMPARE_BACS
         )) {
             /** @var BacsPaymentMethod $paymentMethod */
             $paymentMethod = $user->getPaymentMethod();
@@ -119,13 +120,13 @@ class DoctrineUserListener extends BaseDoctrineListener
             $event = new BacsEvent($bankAccount, $user->getId());
             $this->dispatcher->dispatch(BacsEvent::EVENT_UPDATED, $event);
         }
-    }
 
-    public function postUpdate(LifecycleEventArgs $eventArgs)
-    {
-        $document = $eventArgs->getDocument();
-        if ($document instanceof User) {
-            $this->triggerEvent($document, UserEvent::EVENT_UPDATED);
+        if ($this->hasDataChangedByCategory($eventArgs, DataChange::CATEGORY_INTERCOM)) {
+            $this->triggerEvent($user, UserEvent::EVENT_UPDATED_INTERCOM);
+        }
+
+        if ($this->hasDataChangedByCategory($eventArgs, DataChange::CATEGORY_INVITATION_LINK)) {
+            $this->triggerEvent($user, UserEvent::EVENT_UPDATED_INVITATION_LINK);
         }
     }
 
