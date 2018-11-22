@@ -7,3 +7,8 @@ require('../../../sass/pages/admin.scss');
 
 // Require components
 // e.g. require('../components/banner.js');
+require('@fancyapps/fancybox');
+
+$('[data-fancybox="gallery"]').fancybox({
+    // Options will go here
+});
