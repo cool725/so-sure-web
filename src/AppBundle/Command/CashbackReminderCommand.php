@@ -5,6 +5,7 @@ namespace AppBundle\Command;
 use AppBundle\Document\Cashback;
 use AppBundle\Service\PolicyService;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -24,37 +25,35 @@ class CashbackReminderCommand extends ContainerAwareCommand
     {
         $this
             ->setName('sosure:cashback:reminder')
-            ->setDescription('Send email reminders about cashback')
-            ->addOption(
-                'missing',
-                null,
-                InputOption::VALUE_NONE,
+            ->setDescription('Send email reminders about cashback status')
+            ->addArgument(
+                'status',
+                InputArgument::REQUIRED,
                 'Check for missing status instead of pending'
             )
             ->addOption(
                 'dry-run',
                 null,
                 InputOption::VALUE_NONE,
-                'Do not email, just report on cashback email that would be sent'
+                'Do not email, just report on the email that would be sent'
             )
             ->addOption(
                 'force',
                 null,
                 InputOption::VALUE_NONE,
-                'Do not check for 2 week interval, just email'
-            )
-        ;
+                'Do not check for 2 week interval'
+            );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $dryRun = $input->getOption('dry-run');
         $force = $input->getOption('force');
-        $status = $input->getOption('missing');
+        $status = $input->getArgument('status');
 
-        if ($status) {
+        if ($status == Cashback::STATUS_MISSING) {
             $lines = $this->policyService->cashbackReminder($dryRun);
-        } else {
+        } elseif ($status == Cashback::STATUS_PENDING_PAYMENT) {
             $date = \DateTime::createFromFormat('U', time())
                 ->format('W');
 
@@ -63,6 +62,7 @@ class CashbackReminderCommand extends ContainerAwareCommand
             * do not run the command
             */
             if (!$force && ($date & 2)) {
+                $output->writeln("Week not evenly divisible, not running this week");
                 return;
             }
 
@@ -70,6 +70,6 @@ class CashbackReminderCommand extends ContainerAwareCommand
         }
 
         $output->writeln(json_encode($lines, JSON_PRETTY_PRINT));
-        $output->writeln(sprintf('Found %s matching policies, email sent.', count($lines)));
+        $output->writeln(sprintf('Found %s matching policies, email sent', count($lines)));
     }
 }

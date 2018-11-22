@@ -24,7 +24,7 @@ class CashbackReminderCommandTest extends BaseControllerTest
         self::$dm = $dm;
     }
 
-    public function callCommand($expectedOutput)
+    public function callCommand($expectedOutput, String $status)
     {
         $application = new Application(self::$kernel);
         $application->add(new OpsReportCommand(self::$container->get('app.mailer'), self::$redis));
@@ -32,6 +32,7 @@ class CashbackReminderCommandTest extends BaseControllerTest
         $commandTester = new CommandTester($command);
         $commandTester->execute(array(
             'command' => $command->getName(),
+            'status' => $status,
             '--dry-run' => true,
             '--force' => true
         ));
@@ -41,10 +42,31 @@ class CashbackReminderCommandTest extends BaseControllerTest
         }
     }
 
-    public function testCashbackReminder()
+    public function testCashbackReminderMissing()
     {
         $policy = self::createUserPolicy(true);
-        $policy->getUser()->setEmail(self::generateEmail('testCashbackReminder', $this));
+        $policy->getUser()->setEmail(self::generateEmail('testCashbackReminderMissing', $this));
+        $policy->setStatus(Policy::STATUS_EXPIRED);
+
+        $cashback = self::createCashback($policy, new \DateTime(), Cashback::STATUS_MISSING);
+
+        self::$dm->persist($cashback);
+        self::$dm->persist($policy->getUser());
+        self::$dm->persist($policy);
+        self::$dm->flush();
+
+        $expected = [
+            'Found',
+            'matching policies, email sent'
+        ];
+
+        $this->callCommand($expected, 'missing');
+    }
+
+    public function testCashbackReminderPending()
+    {
+        $policy = self::createUserPolicy(true);
+        $policy->getUser()->setEmail(self::generateEmail('testCashbackReminderPending', $this));
         $policy->setStatus(Policy::STATUS_EXPIRED);
 
         $cashback = self::createCashback($policy, new \DateTime(), Cashback::STATUS_PENDING_PAYMENT);
@@ -56,9 +78,9 @@ class CashbackReminderCommandTest extends BaseControllerTest
 
         $expected = [
             'Found',
-            'matching policies, email sent.'
+            'matching policies, email sent'
         ];
 
-        $this->callCommand($expected);
+        $this->callCommand($expected, 'pending-payment');
     }
 }
