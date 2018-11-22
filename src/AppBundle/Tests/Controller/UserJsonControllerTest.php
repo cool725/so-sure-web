@@ -3,12 +3,14 @@
 namespace AppBundle\Tests\Controller;
 
 use AppBundle\Document\User;
+use AppBundle\Document\Policy;
+use AppBundle\Document\PhonePolicy;
+use AppBundle\Tests\UserClassTrait;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\BrowserKit\Cookie;
 use Symfony\Bundle\FrameworkBundle\Client;
 use AppBundle\Controller\UserJsonController;
-
 
 /**
  * @group functional-net
@@ -17,9 +19,10 @@ use AppBundle\Controller\UserJsonController;
  */
 class UserJsonControllerTest extends WebTestCase
 {
+    use UserClassTrait;
+
     private static $client;
     private static $container;
-    private static $dm;
     private static $userRepository;
     private static $csrfService;
 
@@ -59,12 +62,10 @@ class UserJsonControllerTest extends WebTestCase
         if ($email) {
             $data["email"] = $email;
         }
-        if ($csrf) {
-            if ($csrf == "csrf") {
-                $data["csrf"] = static::$csrfService->getToken("invite-email")->getValue();
-            } else {
-                $data["csrf"] = $csrf;
-            }
+        if ($csrf == "csrf") {
+            $data["csrf"] = static::$csrfService->getToken("invite-email")->getValue();
+        } elseif($csrf) {
+            $data["csrf"] = $csrf;
         }
         $user = null;
         $policy = null;
@@ -74,23 +75,23 @@ class UserJsonControllerTest extends WebTestCase
                 $user->addRole($addRole);
             }
             if ($addPolicy) {
-                $policy = new PhonePolicy();
-                $user->addPolicy($policy);
+                $policy = $this->initPolicy($user, static::$dm);
+                $policy->setStatus(Policy::STATUS_ACTIVE);
+                $user->addPolicy($policy, "07123456789", null, false, true);
+                $policy->setPolicyNumber("TEST");
+                static::$dm->flush();
             }
         }
-
-
         static::$client->request("POST", "/user/json/invite/email", $data);
         $this->assertEquals($status, static::$client->getResponse()->getStatusCode());
         if ($content) {
             $this->assertEquals($content, static::$client->getResponse()->getContent());
         }
-
-        if ($user) {
-            if ($addRole) {
-                $user->removeRole(0);
-            }
-            //$user->removePolicy($policy);
+        if ($user && $addRole) {
+            $user->removeRole(0);
+        }
+        if ($policy) {
+            $policy->setStatus(Policy::STATUS_CANCELLED);
         }
     }
 
@@ -105,6 +106,7 @@ class UserJsonControllerTest extends WebTestCase
             [400, "{\"message\":\"invalid-csrf\"}", true, "dalygbarron@gmail.com"],
             [400, "{\"message\":\"invalid-csrf\"}", true, "dalygbarron@gmail.com", "junkCsrf"],
             [400, "{\"message\":\"no-policy\"}", true, "dalygbarron@gmail.com", "csrf"],
+            [400, "{\"message\":\"invalid-policy\"}", true, "dalygbarron@gmail.com", "csrf", null, true],
             [400, "{\"message\":\"access-denied\"}", true, "dalygbarron@gmail.com", "csrf", "junkRole", true],
             [400, "{\"message\":\"self-invite\"}", true, "daly@so-sure.com", "csrf", null, true],
             [200, "{\"message\":\"\"}", true, "dalygbarron@gmail.com", "csrf", null, true],

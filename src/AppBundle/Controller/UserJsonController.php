@@ -140,7 +140,7 @@ class UserJsonController extends BaseController
         } catch (AccessDeniedException $e) {
             return new JsonResponse(["message" => "access-denied"], 400);
         } catch (InvalidPolicyException $e) {
-            return new JsonResponse(["message" => "invalid-policy"], 400);
+            return new JsonResponse(["message" => "invalid-policy", "c" => $e->getMessage()], 400);
         } catch (SelfInviteException $e) {
             return new JsonResponse(["message" => "self-invite"], 400);
         } catch (DuplicateInvitationException $e) {
