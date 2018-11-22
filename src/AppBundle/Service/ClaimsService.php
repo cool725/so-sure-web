@@ -101,7 +101,7 @@ class ClaimsService
     public function createClaim(ClaimFnol $claimFnol)
     {
         $claim = new Claim();
-        
+
         $claim->setType($claimFnol->getType());
         $claim->setIncidentDate($claimFnol->getWhen());
         $claim->setIncidentTime($claimFnol->getTime());
@@ -120,11 +120,11 @@ class ClaimsService
     public function updateDamageDocuments(Claim $claim, ClaimFnolDamage $claimDamage, $submit = false)
     {
         $claim->setTypeDetails($claimDamage->getTypeDetails());
-        $claim->setTypeDetailsOther(
-            $this->conformAlphanumericSpaceDot($claimDamage->getTypeDetailsOther(), 200)
+        $claim->setTypeDetailsOther($this->conformAlphanumericSpaceDot($claimDamage->getTypeDetailsOther(), 200, 1));
+        $claim->setMonthOfPurchase($this->conformAlphanumericSpaceDot($claimDamage->getMonthOfPurchase(), 200, 3));
+        $claim->setYearOfPurchase(
+            mb_strlen($claimDamage->getYearOfPurchase()) == 4 ? $claimDamage->getYearOfPurchase() : null
         );
-        $claim->setMonthOfPurchase($claimDamage->getMonthOfPurchase());
-        $claim->setYearOfPurchase($claimDamage->getYearOfPurchase());
         $claim->setPhoneStatus($claimDamage->getPhoneStatus());
 
         if ($claimDamage->getProofOfUsage()) {
@@ -162,7 +162,7 @@ class ClaimsService
     public function updateTheftLossDocuments(Claim $claim, ClaimFnolTheftLoss $claimTheftLoss, $submit = false)
     {
         $claim->setHasContacted($claimTheftLoss->getHasContacted());
-        $claim->setContactedPlace($claimTheftLoss->getContactedPlace());
+        $claim->setContactedPlace($this->conformAlphanumericSpaceDot($claimTheftLoss->getContactedPlace(), 200, 4));
         $claim->setBlockedDate($claimTheftLoss->getBlockedDate());
         $claim->setReportedDate($claimTheftLoss->getReportedDate());
         $claim->setReportType($claimTheftLoss->getReportType());
