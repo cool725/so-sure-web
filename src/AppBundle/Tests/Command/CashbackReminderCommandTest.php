@@ -83,4 +83,14 @@ class CashbackReminderCommandTest extends BaseControllerTest
 
         $this->callCommand($expected, 'pending-payment');
     }
+
+    public function testCashbackReminderHelp()
+    {
+        $expected = [
+            Cashback::STATUS_MISSING,
+            Cashback::STATUS_PENDING_PAYMENT
+        ];
+
+        $this->callCommand($expected, 'testCashbackReminderHelp');
+    }
 }
