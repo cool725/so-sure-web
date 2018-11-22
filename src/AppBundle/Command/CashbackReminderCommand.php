@@ -69,6 +69,11 @@ class CashbackReminderCommand extends ContainerAwareCommand
             $lines = $this->policyService->cashbackPendingReminder($dryRun);
         } else {
             $output->writeln("Status not found, not continuing");
+            $output->writeln(sprintf(
+                "Supported arguments: %s %s",
+                Cashback::STATUS_MISSING,
+                Cashback::STATUS_PENDING_PAYMENT
+            ));
             return;
         }
 
