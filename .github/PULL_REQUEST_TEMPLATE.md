@@ -6,6 +6,10 @@ Frontend
 * [ ] Copy checked - inc compliance
 * [ ] Browser tested - Pass on to frontend if user facing
 
+Testing
+* [ ] Check if test are affected?
+* [ ] (If yes) Update tests
+
 Misc
 * [ ] Add to Releases Calendar (might have impact on conversion)
 
