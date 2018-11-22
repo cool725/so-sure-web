@@ -4,7 +4,10 @@ namespace AppBundle\Tests\Controller;
 
 use AppBundle\Document\User;
 use AppBundle\Document\Policy;
+use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\PhonePremium;
+use AppBundle\Document\Charge;
 use AppBundle\Tests\UserClassTrait;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
@@ -59,9 +62,6 @@ class UserJsonControllerTest extends WebTestCase
         $addPolicy = false
     ) {
         $data = [];
-        if ($email) {
-            $data["email"] = $email;
-        }
         if ($csrf == "csrf") {
             $data["csrf"] = static::$csrfService->getToken("invite-email")->getValue();
         } elseif($csrf) {
@@ -76,17 +76,26 @@ class UserJsonControllerTest extends WebTestCase
             }
             if ($addPolicy) {
                 $policy = $this->initPolicy($user, static::$dm);
-                $policy->setStatus(Policy::STATUS_ACTIVE);
                 $user->addPolicy($policy, "07123456789", null, false, true);
-                $policy->setPolicyNumber("TEST");
-                static::$dm->flush();
+                $policy->setPolicyNumber("{$addPolicy}/2018/".time());
+                $policy->setStatus(Policy::STATUS_ACTIVE);
+                $policy->setPhone($this->getRandomPhone(static::$dm));
+                $premium = new PhonePremium();
+                $premium->setGwp(200);
+                $premium->setIpt(200);
+                $policy->setPremium($premium);
             }
         }
+        if ($email == "email") {
+            $data["email"] = $user->getEmail();
+        } elseif ($email) {
+            $data["email"] = $email;
+        }
         static::$client->request("POST", "/user/json/invite/email", $data);
-        $this->assertEquals($status, static::$client->getResponse()->getStatusCode());
         if ($content) {
             $this->assertEquals($content, static::$client->getResponse()->getContent());
         }
+        $this->assertEquals($status, static::$client->getResponse()->getStatusCode());
         if ($user && $addRole) {
             $user->removeRole(0);
         }
@@ -106,11 +115,10 @@ class UserJsonControllerTest extends WebTestCase
             [400, "{\"message\":\"invalid-csrf\"}", true, "dalygbarron@gmail.com"],
             [400, "{\"message\":\"invalid-csrf\"}", true, "dalygbarron@gmail.com", "junkCsrf"],
             [400, "{\"message\":\"no-policy\"}", true, "dalygbarron@gmail.com", "csrf"],
-            [400, "{\"message\":\"invalid-policy\"}", true, "dalygbarron@gmail.com", "csrf", null, true],
-            [400, "{\"message\":\"access-denied\"}", true, "dalygbarron@gmail.com", "csrf", "junkRole", true],
-            [400, "{\"message\":\"self-invite\"}", true, "daly@so-sure.com", "csrf", null, true],
-            [200, "{\"message\":\"\"}", true, "dalygbarron@gmail.com", "csrf", null, true],
-            [400, "{\"message\":\"duplicate\"}", true, "dalygbarron@gmail.com", "csrf", null, true]
+            [400, "{\"message\":\"invalid-policy\"}", true, "dalygbarron@gmail.com", "csrf", null, "JUNK"],
+            [400, "{\"message\":\"self-invite\"}", true, "email", "csrf", null, "TEST"],
+            [200, null, true, "successfulinvite@gmail.com", "csrf", null, "TEST"],
+            [400, "{\"message\":\"duplicate\"}", true, "successfulinvite@gmail.com", "csrf", null, "TEST"]
         ];
     }
 
@@ -131,7 +139,8 @@ class UserJsonControllerTest extends WebTestCase
         $login = false,
         $number = null,
         $usedApp = false,
-        $presend = false
+        $presend = false,
+        $addPolicy = false
     ) {
         $user = null;
         if ($login) {
@@ -143,7 +152,11 @@ class UserJsonControllerTest extends WebTestCase
                 $user->setFirstLoginInApp(new \DateTime());
             }
             if ($presend) {
-                // pre send the junk
+                $charge = new Charge();
+                $charge->setType(Charge::TYPE_SMS_DOWNLOAD);
+                $charge->setUser($user);
+                static::$dm->persist($charge);
+                static::$dm->flush();
             }
         }
         static::$client->request("POST", "/user/json/app/sms");
@@ -159,7 +172,8 @@ class UserJsonControllerTest extends WebTestCase
                 $user->setFirstLoginInApp(null);
             }
             if ($presend) {
-                // unsend the junk
+                static::$dm->remove($charge);
+                static::$dm->flush();
             }
         }
     }
@@ -172,10 +186,9 @@ class UserJsonControllerTest extends WebTestCase
         return [
             [302],
             [400, "{\"message\":\"no-number\"}", true],
-            [400, "{\"message\":\"has-app\"}", true, "07123456789"],
-            [400, "{\"message\":\"has-app\"}", true, "junkNumber"],
+            [400, "{\"message\":\"has-app\"}", true, "07123456789", true],
             [200, null, true, "07123456789"],
-            [400, "{\"message\":\"already-sent\"}", true, "07123456789"]
+            [400, "{\"message\":\"already-sent\"}", true, "07123456789", false, true]
         ];
 
     }
@@ -186,12 +199,20 @@ class UserJsonControllerTest extends WebTestCase
     public function testPolicyTermsAction()
     {
         // no user.
-
-        // no policy.
-
+        static::$client->request("GET", "/user/json/policyterms");
+        $this->assertEquals(302, static::$client->getResponse()->getStatusCode());
         // file not yet generated.
-
+        $user = static::login();
+        static::$client->request("GET", "/user/json/policyterms");
+        $this->assertEquals(200, static::$client->getResponse()->getStatusCode());
+        $this->assertEquals("{\"message\":\"not-generated\"}", static::$client->getResponse()->getContent());
         // file ready.
+        $policy = $user->getLatestPolicy();
+        static::$container->get("app.policy")->generatePolicyTerms($policy);
+        static::$dm->flush();
+        static::$client->request("GET", "/user/json/policyterms");
+        $this->assertEquals(200, static::$client->getResponse()->getStatusCode());
+        $this->assertContains("\"file\"", static::$client->getResponse()->getContent());
     }
 
     /**
@@ -200,15 +221,14 @@ class UserJsonControllerTest extends WebTestCase
      */
     private static function login()
     {
-        self::$client->restart();
+        $user = self::$userRepository->findBy([])[0];
         $session = self::$container->get("session");
         $firewall = "main";
-        $token = new UsernamePasswordToken("daly@so-sure.com", "w3ares0sure!", $firewall, []);
+        $token = new UsernamePasswordToken($user->getEmail(), "w3ares0sure!", $firewall, []);
         $session->set("_security_".$firewall, serialize($token));
         $session->save();
         $cookie = new Cookie($session->getName(), $session->getId());
         self::$client->getCookieJar()->set($cookie);
-        $user = self::$userRepository->findBy(["username" => $token->getUser()])[0];
         return $user;
     }
 }

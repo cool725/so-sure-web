@@ -64,7 +64,6 @@ use AppBundle\Form\Type\ClaimFnolDamageType;
 use AppBundle\Form\Type\ClaimFnolTheftLossType;
 use AppBundle\Form\Type\ClaimFnolUpdateType;
 
-
 use AppBundle\Service\FacebookService;
 use AppBundle\Security\InvitationVoter;
 use AppBundle\Service\MixpanelService;
@@ -84,10 +83,10 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use AppBundle\Exception\ValidationException;
 
+use AppBundle\Exception\FullPotException;
 use AppBundle\Exception\RateLimitException;
 use AppBundle\Exception\ProcessedException;
 use AppBundle\Exception\SelfInviteException;
-use AppBundle\Exception\FullPotException;
 use AppBundle\Exception\InvalidPolicyException;
 use AppBundle\Exception\OptOutException;
 use AppBundle\Exception\ConnectedInvitationException;
@@ -131,6 +130,8 @@ class UserJsonController extends BaseController
             return new JsonResponse(["message" => "invalid-csrf"], 400);
         } elseif (!$policy) {
             return new JsonResponse(["message" => "no-policy"], 400);
+        } elseif ($user->getEmail() == $email) {
+            return new JsonResponse(["message" => "self-invite"], 400);
         }
         $this->denyAccessUnlessGranted(UserVoter::VIEW, $user);
 
@@ -140,11 +141,13 @@ class UserJsonController extends BaseController
         } catch (AccessDeniedException $e) {
             return new JsonResponse(["message" => "access-denied"], 400);
         } catch (InvalidPolicyException $e) {
-            return new JsonResponse(["message" => "invalid-policy", "c" => $e->getMessage()], 400);
+            return new JsonResponse(["message" => "invalid-policy"], 400);
         } catch (SelfInviteException $e) {
             return new JsonResponse(["message" => "self-invite"], 400);
         } catch (DuplicateInvitationException $e) {
             return new JsonResponse(["message" => "duplicate"], 400);
+        } catch (FullPotException $e) {
+            return new JsonResponse(["message" => "full-pot"], 400);
         } catch (\Exception $e) {
             $this->get('logger')->error($e->getMessage(), ['exception' => $e]);
             return new JsonResponse(["message" => $e->getMessage()], 500);
@@ -186,7 +189,7 @@ class UserJsonController extends BaseController
     }
 
     /**
-     * @Route("/app/policyterms", name="json_policyterms")
+     * @Route("/policyterms", name="json_policyterms")
      * @Method({"GET"})
      */
     public function policyTermsAction()
