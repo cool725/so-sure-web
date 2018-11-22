@@ -587,7 +587,7 @@ class UserControllerTest extends BaseControllerTest
         $this->validateUnpaidRescheduleBacsForm($crawler, false);
         $this->validateUnpaidBacsSetupLink($crawler, false);
         $this->validateUnpaidBacsUpdateLink($crawler, false);
-        $this->assertContains('Invalid Mandate', $crawler->html());
+        $this->assertContains('Invalid Direct Debit', $crawler->html());
 
         $payment = static::addBacsPayPayment($policy, $oneMonthAgo, true);
         self::$dm->flush();
@@ -598,7 +598,7 @@ class UserControllerTest extends BaseControllerTest
         $this->validateUnpaidRescheduleBacsForm($crawler, false);
         $this->validateUnpaidBacsSetupLink($crawler, false);
         $this->validateUnpaidBacsUpdateLink($crawler, true);
-        $this->assertContains('Invalid Mandate', $crawler->html());
+        $this->assertContains('Invalid Direct Debit', $crawler->html());
     }
 
     public function testUserUnpaidPolicyBacsPaymentPending()
