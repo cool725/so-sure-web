@@ -6,6 +6,7 @@ use AppBundle\Document\BacsPaymentMethod;
 use AppBundle\Document\BankAccount;
 use AppBundle\Document\Charge;
 use AppBundle\Event\BacsEvent;
+use Doctrine\Common\Annotations\Reader;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -357,7 +358,9 @@ class DoctrineUserListenerTest extends WebTestCase
                      ->with($eventType, $event);
 
         $listener = new DoctrineUserListener($dispatcher, static::$logger);
-        $listener->setReader(static::$container->get('annotations.reader'));
+        /** @var Reader $reader */
+        $reader = static::$container->get('annotations.reader');
+        $listener->setReader($reader);
 
         return $listener;
     }
@@ -378,7 +381,9 @@ class DoctrineUserListenerTest extends WebTestCase
             );
 
         $listener = new DoctrineUserListener($dispatcher, static::$logger);
-        $listener->setReader(static::$container->get('annotations.reader'));
+        /** @var Reader $reader */
+        $reader = static::$container->get('annotations.reader');
+        $listener->setReader($reader);
 
         return $listener;
     }
