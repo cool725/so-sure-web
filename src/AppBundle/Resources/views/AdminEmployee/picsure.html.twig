@@ -128,8 +128,6 @@
                                                data-submit="{{ path('admin_picsure_invalid', {'id': policy.id}) }}">Invalid</a>
                                             <a class="btn btn-danger  btn-square btn-sm"
                                                href="{{ path('admin_picsure_reject', {'id': policy.id}) }}">Damaged</a>
-                                        {% elseif policy.picSureStatus == 'approved' %}
-                                            <small>Approved at: {{ policy.picSureApprovedDate | date}}</small>
                                         {% else %}
                                             <small>-</small>
                                         {% endif %}
