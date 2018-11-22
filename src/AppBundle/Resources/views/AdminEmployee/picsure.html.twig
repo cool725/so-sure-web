@@ -123,7 +123,7 @@
                                             <a href="#"
                                                class="btn btn-warning btn-square btn-sm mr-2"
                                                data-toggle="modal"
-                                               data-target="#invalidModal"
+                                               data-target="#invalid_modal"
                                                data-policy-number="{{ policy.policyNumber }}"
                                                data-submit="{{ path('admin_picsure_invalid', {'id': policy.id}) }}">Invalid</a>
                                             <a class="btn btn-danger  btn-square btn-sm"
@@ -143,9 +143,51 @@
     </section>
 
     {# Page Modals #}
+    <div class="modal fade"
+         id="invalid_modal"
+         tabindex="-1" role="dialog"
+         aria-labelledby="policy_24_72_hours"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Invalid pic-sure</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <i class="fal fa-times text-white"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="invalid-picsure-form" method="post">
+                        <div class="form-group">
+                            <label for="message">Choose feedback:</label>
+                            <select id="invalid_picsure_options" class="form-control">
+                                <option value="1 Message to send to user">1 Message to send to user</option>
+                                <option value="2 Message to send to user">2 Message to send to user</option>
+                                <option value="3 Message to send to user">3 Message to send to user</option>
+                                <option value="4 Message to send to user">4 Message to send to user</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="message">Message to send to user:</label>
+                            <textarea type="text"
+                                      class="form-control"
+                                      id="message"
+                                      name="message"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <button type="button"
+                                    class="btn btn-outline-primary btn-square btn-sm"
+                                    data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-success btn-square btn-sm">Invalidate pic-sure</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 
 {% endblock %}
 
 {% block javascriptsPage %}
-    {# <script src="{{ asset('css-js/homepage.js') }}"></script> #}
+    <script src="{{ asset('css-js/picsure.js') }}"></script>
 {% endblock %}
