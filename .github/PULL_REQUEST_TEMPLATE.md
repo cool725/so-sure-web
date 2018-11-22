@@ -7,8 +7,9 @@ Frontend
 * [ ] Browser tested - Pass on to frontend if user facing
 
 Testing
-* [ ] Check if test are affected?
-* [ ] (If yes) Update tests
+* [ ] Check if test(s) are affected?
+(If yes)
+* [ ] Test(s) updated
 
 Misc
 * [ ] Add to Releases Calendar (might have impact on conversion)
