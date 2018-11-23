@@ -838,7 +838,8 @@ class ReportingService
                 $data[$day][$payment->getSource()]['total'];
             $data[$day][$payment->getSource()]['failure_percent'] = $data[$day][$payment->getSource()]['failure'] /
                 $data[$day][$payment->getSource()]['total'];
-            if ($payment->getSource() == Payment::SOURCE_WEB && $payment->getWebType()) {
+            if ($payment instanceof JudoPayment && $payment->getSource() == Payment::SOURCE_WEB &&
+                $payment->getWebType()) {
                 $webSource = sprintf('web-%s', $payment->getWebType());
                 $data[$day][$webSource]['total']++;
                 $data[$day][$webSource]['success_percent'] = $data[$day][$webSource]['success'] /
