@@ -31,4 +31,14 @@ $(function(){
         $('#message').val(option);
     });
 
+    // Add options for fancybox
+    $('[data-fancybox]').fancybox({
+        buttons : [
+            'zoom',
+            'download',
+            'thumbs',
+            'close'
+        ]
+    });
+
 });
