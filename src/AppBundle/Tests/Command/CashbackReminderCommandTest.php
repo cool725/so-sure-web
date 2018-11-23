@@ -50,6 +50,7 @@ class CashbackReminderCommandTest extends BaseControllerTest
 
         $cashback = self::createCashback($policy, new \DateTime(), Cashback::STATUS_MISSING);
 
+        self::$dm->persist($policy->getPhone());
         self::$dm->persist($cashback);
         self::$dm->persist($policy->getUser());
         self::$dm->persist($policy);
@@ -71,6 +72,7 @@ class CashbackReminderCommandTest extends BaseControllerTest
 
         $cashback = self::createCashback($policy, new \DateTime(), Cashback::STATUS_PENDING_PAYMENT);
 
+        self::$dm->persist($policy->getPhone());
         self::$dm->persist($cashback);
         self::$dm->persist($policy->getUser());
         self::$dm->persist($policy);
