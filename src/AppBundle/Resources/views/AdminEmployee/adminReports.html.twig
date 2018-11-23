@@ -528,40 +528,79 @@
             {% if cumulative is defined %}
                 <div class="row">
                     <h1>Cumulative Policies</h1>
+                    <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                        <label class="btn btn-secondary active">
+                            <input data-column="openColumn" class="columnBtn" type="checkbox" checked autocomplete="off">
+                            Open
+                        </label>
+                        <label class="btn btn-secondary active">
+                            <input data-column="newColumn" class="columnBtn" type="checkbox" checked autocomplete="off">
+                            New
+                        </label>
+                        <label class="btn btn-secondary active">
+                            <input data-column="expiredColumn" class="columnBtn" type="checkbox" checked autocomplete="off">
+                            Expired
+                        </label>
+                        <label class="btn btn-secondary active">
+                            <input data-column="cancelledColumn" class="columnBtn" type="checkbox" checked autocomplete="off">
+                            Cancelled
+                        </label>
+                        <label class="btn btn-secondary active">
+                            <input data-column="cumulativeColumn" class="columnBtn" type="checkbox" checked autocomplete="off">
+                            Active at Close
+                        </label>
+                        <label class="btn btn-secondary active">
+                            <input data-column="upgradesColumn" class="columnBtn" type="checkbox" checked autocomplete="off">
+                            Upgrades
+                        </label>
+                        <label class="btn btn-secondary active">
+                            <input data-column="newAdjustedColumn" class="columnBtn" type="checkbox" checked autocomplete="off">
+                            New Adjusted
+                        </label>
+                        <label class="btn btn-secondary active">
+                            <input data-column="endingAdjustedColumn" class="columnBtn" type="checkbox" checked autocomplete="off">
+                            Cancelled Adjusted
+                        </label>
+                        <label class="btn btn-secondary active">
+                            <input data-column="runningTotalAdjustedColumn" class="columnBtn" type="checkbox" checked autocomplete="off">
+                            Active at Close Adjusted
+                        </label>
+                    </div>
                     <div class="table-responsive">
                         <table class="table table-striped">
                             <thead>
                                 <tr>
                                     <th>Month</th>
                                     <!-- Dylan Method -->
-                                    <th>Open</th>
-                                    <th>New</th>
-                                    <th>Expired</th>
-                                    <th>Cancelled</th>
-                                    <th>Cumulative Policies at Close</th>
+                                    <th class="openColumn">Open</th>
+                                    <th class="newColumn">New</th>
+                                    <th class="expiredColumn">Expired</th>
+                                    <th class="cancelledColumn">Cancelled</th>
+                                    <th class="cumulativeColumn">Tallied Active Policies at Close</th>
                                     <!-- ReportingService Method -->
-                                    <th>Upgrades</th>
-                                    <th>New Policies (Adjusted for Upgrade)</th>
-                                    <th>Ending / Cancelled Policies (Adjusted for Upgrade)</th>
+                                    <th class="upgradesColumn">Upgrades</th>
+                                    <th class="newAdjustedColumn">New Policies (Adjusted for Upgrade)</th>
+                                    <th class="endingAdjustedColumn">Ending / Cancelled Policies (Adjusted for Upgrade)</th>
+                                    <th class="runningTotalAdjustedColumn">Total Active Policies at Close (Adjusted for Upgrade)</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for month, content in cumulative %}
-                                <tr>
-                                    <td>{{ month }}</td>
+                                <tr {% if content.bad is defined %}class="warning"{% endif %}>
+                                    <td><strong>{{ month }}</strong></td>
                                     <!-- Dylan Method -->
-                                    <td>{{ content.open }}</td>
-                                    <td>{{ content.new }}</td>
-                                    <td>{{ content.expired }}</td>
-                                    <td>{{ content.cancelled }}</td>
-                                    <td>{{ content.close }}</td>
+                                    <td class="openColumn">{{ content.open }}</td>
+                                    <td class="newColumn">{{ content.new }}</td>
+                                    <td class="expiredColumn">{{ content.expired }}</td>
+                                    <td class="cancelledColumn">{{ content.cancelled }}</td>
+                                    <td class="cumulativeColumn">{{ content.close }}</td>
                                     <!-- ReportingService Method -->
-                                    <td>{{ content.upgrade }}</td>
-                                    <td>??</td>
-                                    <td>??</td>
+                                    <td class="upgradesColumn">{{ content.upgrade }}</td>
+                                    <td class="newAdjustedColumn">{{ content.newAdjusted }}</td>
+                                    <td class="endingAdjustedColumn">{{ content.endingAdjusted }}</td>
+                                    <td class="runningTotalAdjustedColumn">{{ content.newTotal }}</td>
                                 </tr>
                                 {% endfor %}
-
                             </tbody>
                         </table>
                     </div>

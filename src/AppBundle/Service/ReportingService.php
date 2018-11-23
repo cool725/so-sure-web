@@ -168,7 +168,7 @@ class ReportingService
                 $rolling12MonthClaims[] = $claim;
             }
         }
-        $data['fnol30Claims'] = 100 * $fnol30Claims / $totalClaims;
+        $data['fnol30Claims'] = $totalClaims ? 100 * $fnol30Claims / $totalClaims : "-";
 
         $data['claimAttribution'] = Claim::attributeClaims($approvedClaims);
         $data['claimAttributionText'] = $this->arrayToString($data['claimAttribution']);
@@ -1241,10 +1241,11 @@ class ReportingService
             $endOfMonth = $this->endOfMonth($start);
             $month = [];
             $month["open"] = $runningTotal;
-            $month["new"] = $policyRepo->countAllNewPolicies($start, $endOfMonth);
-            $month["expired"] = $policyRepo->countAllEndingPolicies(null, $end, $start);
+            $month["new"] = $policyRepo->countAllNewPolicies($endOfMonth, $start);
+            $month["expired"] = $policyRepo->countAllEndingPolicies(null, $start, $endOfMonth, true);
             $month["cancelled"] = 0; // TODO: at the moment expired contains all ending policies
-            $runningTotal += $month["open"] - $month["expired"] - $month["cancelled"];
+            $runningTotal += $month["new"];
+            $runningTotal -= $month["expired"] + $month["cancelled"];
             $month["close"] = $runningTotal;
             $month["upgrade"] = $policyRepo->countAllEndingPolicies(
                 Policy::CANCELLED_UPGRADE,
@@ -1252,6 +1253,16 @@ class ReportingService
                 $endOfMonth,
                 false
             );
+
+            $month["newTotal"] = $policyRepo->countAllNewPolicies($endOfMonth) -
+                $policyRepo->countAllEndingPolicies(null, null, $endOfMonth) -
+                $policyRepo->countAllEndingPolicies(Policy::CANCELLED_UPGRADE, null, $endOfMonth, false);
+
+            $month["newAdjusted"] = $month["new"] - $month["upgrade"];
+            $month["endingAdjusted"] = $month["expired"] - $month["upgrade"];
+            if ($month["close"] != $month["newTotal"]) {
+                $month["bad"] = true;
+            }
             $report[$start->format("F Y")] = $month;
             $start->add(new \DateInterval("P1M"));
         }

@@ -52,7 +52,7 @@ class ReportController extends AbstractController
 
         $report["claims"] = $this->reporting->report($start, $end, false);
         if ($month) {
-            $report["month"] = $start->format("F");
+            $report["month"] = $start->format("F Y");
         } else {
             $report["start"] = $start->format("d/m/Y");
             $report["end"] = $end->format("d/m/Y");
@@ -87,7 +87,8 @@ class ReportController extends AbstractController
     public function cumulativeReportAction()
     {
         $end = new \DateTime();
-        $start = $this->startOfYear($end);
+        $start = (new \DateTime())->sub(new \DateInterval("P3Y"));
+
         $report["cumulative"] = $this->reporting->getCumulativePolicies($start, $end);
         return $this->render("AppBundle:AdminEmployee:adminReports.html.twig", $report);
     }
