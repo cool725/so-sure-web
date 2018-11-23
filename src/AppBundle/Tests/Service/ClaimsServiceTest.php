@@ -5,12 +5,15 @@ namespace AppBundle\Tests\Service;
 use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Repository\PolicyRepository;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use AppBundle\Exception\ValidationException;
 use AppBundle\Document\User;
 use AppBundle\Document\Claim;
 use AppBundle\Document\Policy;
 use AppBundle\Document\Reward;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\LostPhone;
+use AppBundle\Document\Form\ClaimFnolTheftLoss;
+use AppBundle\Document\Form\ClaimFnolDamage;
 use Doctrine\ODM\MongoDB\DocumentManager;
 
 /**
@@ -95,7 +98,7 @@ class ClaimsServiceTest extends WebTestCase
         );
         $phoneA = static::getRandomPhone(static::$dm);
         $policyA = static::initPolicy($userA, static::$dm, $phoneA, null, true, true);
-        
+
         $userB = static::createUser(
             static::$userManager,
             static::generateEmail('dup-b', $this),
@@ -129,7 +132,7 @@ class ClaimsServiceTest extends WebTestCase
         );
         $phoneA = static::getRandomPhone(static::$dm);
         $policyA = static::initPolicy($userA, static::$dm, $phoneA, null, true, true);
-        
+
         $userB = static::createUser(
             static::$userManager,
             static::generateEmail('testDuplicateUpdateClaim-b', $this),
@@ -576,5 +579,68 @@ class ClaimsServiceTest extends WebTestCase
         self::$claimsService->sendUniqueLoginLink($user, true);
         $userId = self::$claimsService->getUserIdFromLoginLinkToken($token);
         $this->assertEquals($userId, $user->getId());
+    }
+
+    /**
+     * Make sure the claim service can update theft/loss claim right and deal with missing and faulty data from user.
+     */
+    public function testUpdateTheftLossDocuments()
+    {
+        $claim = new Claim();
+        $claim->setStatus(Claim::STATUS_APPROVED);
+        $claim->setType(Claim::TYPE_THEFT);
+        $update = new ClaimFnolTheftLoss();
+        $update->setHasContacted(true);
+        $update->setBlockedDate(new \DateTime());
+        $update->setReportedDate(new \DateTime());
+        $update->setReportType("online");
+
+        $update->setContactedPlace("hi");
+        self::$claimsService->updateTheftLossDocuments($claim, $update);
+        $this->assertEquals(null, $claim->getContactedPlace());
+
+        $update->setContactedPlace("hi||||||");
+        self::$claimsService->updateTheftLossDocuments($claim, $update);
+        $this->assertEquals(null, $claim->getContactedPlace());
+
+        $update->setContactedPlace("hi||||||| how are you?");
+        self::$claimsService->updateTheftLossDocuments($claim, $update);
+        $this->assertEquals("hi how are you?", $claim->getContactedPlace());
+        self::$dm->persist($claim);
+        self::$dm->flush();
+    }
+
+    /**
+     * Make sure the claim service can update damage claim right and deal with missing and faulty data from user.
+     */
+    public function testUpdateDamageDocuments()
+    {
+        $claim = new Claim();
+        $claim->setStatus(Claim::STATUS_APPROVED);
+        $claim->setType(Claim::TYPE_DAMAGE);
+        $update = new ClaimFnolDamage();
+        $update->setTypeDetails("water-damage");
+        $update->setMonthOfPurchase(".");
+        $update->setYearOfPurchase("2014");
+
+        $update->setTypeDetailsOther("|");
+        self::$claimsService->updateDamageDocuments($claim, $update);
+        $this->assertNull($claim->getTypeDetailsOther());
+        $this->assertNull($claim->getMonthOfPurchase());
+
+        self::$dm->persist($claim);
+        self::$dm->flush();
+
+        $update->setTypeDetailsOther("hi||||||");
+        self::$claimsService->updateDamageDocuments($claim, $update);
+        $this->assertEquals("hi", $claim->getTypeDetailsOther());
+
+        $update->setTypeDetailsOther("hi||||||| how are you?");
+        $update->setMonthOfPurchase("JUNE");
+        self::$claimsService->updateDamageDocuments($claim, $update);
+        $this->assertEquals("hi how are you?", $claim->getTypeDetailsOther());
+        self::$dm->persist($claim);
+        self::$dm->flush();
+
     }
 }
