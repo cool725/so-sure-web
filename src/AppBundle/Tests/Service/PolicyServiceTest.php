@@ -116,6 +116,33 @@ class PolicyServiceTest extends WebTestCase
         $this->assertEquals(Policy::STATUS_CANCELLED, $updatedPolicy->getStatus());
     }
 
+    /**
+     * @expectedException \Exception
+     */
+    public function testCancelInProgressPolicy()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testCancelInProgressPolicy', $this),
+            'bar',
+            null,
+            static::$dm
+        );
+
+        /* Create a policy that has a null status */
+        $policy = static::initPolicy(
+            $user,
+            static::$dm,
+            $this->getRandomPhone(static::$dm),
+            null,
+            false,
+            false
+        );
+
+        $this->assertNull($policy->getStatus());
+        static::$policyService->cancel($policy, Policy::CANCELLED_USER_REQUESTED);
+    }
+
     public function testCreatePolicyHasLaunchPromoCode()
     {
         $user = static::createUser(

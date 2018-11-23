@@ -3072,8 +3072,12 @@ abstract class Policy
             self::STATUS_CANCELLED,
             self::STATUS_EXPIRED,
             self::STATUS_EXPIRED_CLAIMABLE,
-            self::STATUS_EXPIRED_WAIT_CLAIM,
+            self::STATUS_EXPIRED_WAIT_CLAIM
         ])) {
+            return false;
+        }
+
+        if (!$this->isPolicy()) {
             return false;
         }
 
