@@ -7,3 +7,7 @@ require('../../../sass/pages/admin.scss');
 
 // Require components
 // e.g. require('../components/banner.js');
+
+$(function(){
+
+});

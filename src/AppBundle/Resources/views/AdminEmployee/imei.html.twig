@@ -1,121 +1,121 @@
-{% extends 'admin_claims_base.html.twig' %}
+{% extends 'admin_claims_base_rebrand.html.twig' %}
 
-{% block stylesheets %}
-    {{ parent() }}
-    {% stylesheets output='css/*.css'
-    '@AppBundle/Resources/public/sass/page/admin.scss'
- %}<link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
+{# Set vars #}
+{% set body_class = 'admin-imei' %}
+
+{% block title %}so-sure - Admin IMEI lookup{% endblock %}
+{% block meta %}{% endblock %}
+
+{% block cssPage %}
+   {#  <link rel="stylesheet" href="{{ asset('css-js/homepage.css') }}"> #}
 {% endblock %}
 
 {% block body %}
-<div class="container">
-    <div class="bg-info" style="border-radius: 10px; padding: 10px;">
-    <h4 class="text-center"><strong>Search IMEI</strong></h4>
-    {{ form_start(form, {'attr': {'class': 'form-inline'}})  }}
-        <div class="row">
-            <div class="form-group col-sm-10">
-                {{ form_label(form.imei, 'IMEI', {'label_attr': {'class': 'col-sm-2'}}) }}
-                {{ form_errors(form.imei) }}
-                {{ form_widget(form.imei, {'attr': {'class': 'col-sm-10'}}) }}
-            </div>
-            <div class="form-group">
-              <div class="col-sm-2 text-center">
-                {{ form_widget(form.search, {'label': 'Search', 'attr': {'class': 'btn btn-success'}}) }}
-              </div>
-            </div>
-        </div>
-    {{ form_end(form) }}
-    </div>
 
-    <h2>History</h2>
-    {% if not history or history|length == 0 %}
-    <div class="row-fluid">
-        <h3>No records found</h3>
-    </div>
-    {% else %}
-    <div class="row-fluid">
-        <div class="col-md-11">
-            <div class="table-responsive">
-                <table class="table table-striped">
-                    <thead>
-                    <tr>
-                        <th>Version</th>
-                        <th>Policy</th>
-                        <th>Version Date</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {% for record in history %}
-                        <tr>
-                            <td>{{ record.version }}</td>
-                            <td>
-                                <a href="{{ path('admin_policy', {'id': record.objectId }) }}">{% if record.data.policyNumber %}{{ record.data.policyNumber }} / {% endif %}{{ record.objectId }}</a>
-                            </td>
-                            <td>
-                                {{ record.loggedAt | date}}
-                            </td>
-                        </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
+    <section class="py-4 px-md-4">
+        <div class="container-fluid">
+            {# TODO: Heading area #}
+            <div class="d-lg-flex align-items-lg-center justify-content-lg-between mb-3">
+                <h1 class="h2">Admin IMEI Lookup</h1>
             </div>
-        </div>
-    </div>
-    {% endif %}
+            {# TODO: Controls area #}
+            <div class="card card-page-filter mb-5">
+                <div class="card-body">
+                    {{ form_start(form, {'attr': {'class': 'form-inline'}})  }}
+                        <div class="form-group">
+                            {{ form_label(form.imei, 'Search IMEI: ', {'label_attr': {'class': 'mr-md-2'}}) }}
+                            {{ form_widget(form.imei, {'attr': {'class': 'form-control mr-md-2'}}) }}
+                            <div class="with-errors">{{ form_errors(form.imei) }}</div>
+                        </div>
+                        <div class="form-group">
+                            {{ form_widget(form.search, {'label': 'Search', 'attr': {'class': 'btn btn-success btn-square ml-md-2'}}) }}
+                        </div>
+                    {{ form_end(form) }}
+                </div>
+            </div>
+            {# TODO: Content area #}
+            <h2 class="h3 mb-3">History</h2>
+            {% if not history or history|length == 0 %}
+                <p class="mb-5">No records found</p>
+            {% else %}
+                <div class="table-responsive-sm mb-5">
+                    <table class="table">
+                        <thead class="thead-light">
+                            <tr>
+                                <th>Version</th>
+                                <th>Policy</th>
+                                <th>Version Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for record in history %}
+                            <tr>
+                                <td>{{ record.version }}</td>
+                                <td>
+                                    <a href="{{ path('admin_policy', {'id': record.objectId }) }}">{% if record.data.policyNumber %}{{ record.data.policyNumber }} / {% endif %}{{ record.objectId }}</a>
+                                </td>
+                                <td>
+                                    {{ record.loggedAt | date}}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% endif %}
 
-    <h2>Charges</h2>
-    {% if not charges or charges|length == 0 %}
-    <div class="row-fluid">
-        <h3>No records found</h3>
-    </div>
-    {% else %}
-    <div class="row-fluid">
-        <div class="col-md-11">
-            <div class="table-responsive">
-                <table class="table table-striped">
-                    <thead>
-                    <tr>
-                        <th>Charge</th>
-                        <th>Policy</th>
-                        <th>User</th>
-                        <th>Charge Date</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {% for charge in charges %}
-                        <tr>
-                            <td>{{ charge.type }}</td>
-                            <td>
-                                {% if charge.policy %}
-                                <a href="{{ path('admin_policy', {'id': charge.policy.id }) }}">{% if charge.policy.policyNumber %}{{ charge.policy.policyNumber }} / {% endif %}{{ charge.policy.id }}</a>
-                                {% else %}
-                                    -
-                                {% endif %}
-                            </td>
-                            <td>
-                                {% if charge.user %}
-                                    {% if charge.user.id %}
-                                        <a href="{{ path('admin_user', {'id': charge.user.id }) }}">{{ charge.user.name }}</a>
-                                    {% else  %}
-                                            {{ charge.user.name }}
+            <h2 class="h3 mb-3">Charges</h2>
+            {% if not charges or charges|length == 0 %}
+                <p class="mb-5">No records found</p>
+            {% else %}
+                <div class="table-responsive-sm mb-5">
+                    <table class="table">
+                        <thead class="thead-light">
+                            <tr>
+                                <th>Charge</th>
+                                <th>Policy</th>
+                                <th>User</th>
+                                <th>Charge Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for charge in charges %}
+                            <tr>
+                                <td>{{ charge.type }}</td>
+                                <td>
+                                    {% if charge.policy %}
+                                    <a href="{{ path('admin_policy', {'id': charge.policy.id }) }}">{% if charge.policy.policyNumber %}{{ charge.policy.policyNumber }} / {% endif %}{{ charge.policy.id }}</a>
+                                    {% else %}
+                                        -
                                     {% endif %}
-                                {% else %}
-                                    -
-                                {% endif %}
-                            </td>
-                            <td>
-                                {{ charge.createdDate | date}}
-                            </td>
-                        </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+                                </td>
+                                <td>
+                                    {% if charge.user %}
+                                        {% if charge.user.id %}
+                                            <a href="{{ path('admin_user', {'id': charge.user.id }) }}">{{ charge.user.name }}</a>
+                                        {% else  %}
+                                                {{ charge.user.name }}
+                                        {% endif %}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {{ charge.createdDate | date}}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% endif %}
         </div>
-    </div>
-    {% endif %}
+    </section>
 
-</div>
+    {# Page Modals #}
 
+{% endblock %}
 
+{% block javascriptsPage %}
+    {# <script src="{{ asset('css-js/homepage.js') }}"></script> #}
 {% endblock %}
