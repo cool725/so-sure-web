@@ -41,26 +41,26 @@
                         <thead class="thead-light">
                             <tr>
                                 <th>User</th>
-                                <th>Fraud check</th>
-                                <th>Submitted image(s)</th>
                                 <th>Status</th>
-                                <th>Machine learning</th>
+                                <th>Submitted image(s)</th>
                                 <th>Actions</th>
+                                <th>Machine learning</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for policy in policies %}
+                                {# TODO: Set table row colour based of ML score eventually #}
                                 <tr>
                                     {# Policy #}
                                     <td><a href="{{ path('admin_policy', {'id': policy.id}) }}">{{ policy.policyNumber }}</a></td>
                                     {# Fraud Check #}
                                     <td>
                                         {% if policy.picSureCircumvention is null %}
-                                            <small><i class="fal fa-clock"></i> Pre anti-fraud check</small>
+                                            <i class="fal fa-clock"></i> Pre anti-fraud check
                                         {% elseif policy.picSureCircumvention == true %}
-                                            <small><i class="fal fa-exclamation-triangle"></i> Possible Fraud (i.e. too many attempts to do pic-sure and imei upload was too long, check events in mixpanel) </small>
+                                            <i class="fal fa-exclamation-triangle"></i> Possible Fraud <br><small>i.e. too many attempts to do pic-sure and imei upload was too long, check events in mixpanel</small>
                                         {% elseif policy.picSureCircumvention == false %}
-                                            <small><i class="fal fa-thumbs-up"></i> No Fraud Detected</small>
+                                            <i class="fal fa-thumbs-up"></i> No Fraud Detected
                                         {% endif %}
                                     </td>
                                     {# Submitted image(s) #}
@@ -69,49 +69,10 @@
                                             {% if policy.picSureStatus == 'manual' %}
                                                 <a href="{{ path('admin_picsure_image', {'file': file.key }) }}"
                                                    class="no-style"
-                                                   data-fancybox
+                                                   data-fancybox="{{ policy.policyNumber }}"
                                                    data-caption="{{ policy.policyNumber }}">
                                                     <img src="{{ path('admin_picsure_image', {'file': file.key }) }}" width="40px" height="40px">
                                                 </a>
-                                            {% endif %}
-                                        {% endfor %}
-                                    </td>
-                                    {# Status #}
-                                    <td>
-                                        {% for file in policy.getPolicyPicSureFiles %}
-                                            {% if 'picsure-status' in file.getMetadata()|keys %}
-                                                <small>
-                                                    File Status: {{ file.getMetadata()['picsure-status'] }}
-                                                    {% if 'picsure-status-date' in file.getMetadata()|keys %}
-                                                        on {{ file.getMetadata()['picsure-status-date'] }}
-                                                    {%  endif %}
-                                                    {% if 'picsure-status-user-name' in file.getMetadata()|keys %}
-                                                        by {{ file.getMetadata()['picsure-status-user-name'] }}
-                                                    {% endif %}
-                                                </small>
-                                            {% endif %}
-                                        {% endfor %}
-                                    </td>
-                                    {# Machine learning scoree #}
-                                    <td>
-                                        {% for file in policy.getPolicyPicSureFiles %}
-                                            {% if 'picsure-ml-score' in file.getMetadata()|keys %}
-                                                <small>
-                                                    {{ file.getMetadata()['picsure-ml-status']|capitalize }} with confidence {{ file.getMetadata()['picsure-ml-confidence']*100.0|number_format(2, '.', ',') }}&percnt;
-                                                </small>
-                                            {% else %}
-                                                <small>
-                                          {#           {% if 'undamaged' in file.getMetadata()['picsure-ml-score']|keys %}
-                                                        undamaged ({{ (file.getMetadata()['picsure-ml-score']['undamaged']*100.0)|number_format(0, '.', ',') }}&percnt;)
-                                                    {% endif %}
-                                                    {% if 'invalid' in file.getMetadata()['picsure-ml-score']|keys %}
-                                                        invalid ({{ (file.getMetadata()['picsure-ml-score']['invalid']*100.0)|number_format(0, '.', ',') }}&percnt;)
-                                                    {% endif %}
-                                                    {% if 'damaged' in file.getMetadata()['picsure-ml-score']|keys %}
-                                                        damaged ({{ (file.getMetadata()['picsure-ml-score']['damaged']*100.0)|number_format(0, '.', ',') }}&percnt;)
-                                                    {% endif %} #}
-                                                </small>
-                                                <a href="{{ path('admin_picsure_ml_predict', {'id': file.getId()}) }}" class="btn btn-outline-primary btn-square btn-sm"><i class="fal fa-sync-alt"></i> <span class="sr-only">Re-run</span></a>
                                             {% endif %}
                                         {% endfor %}
                                     </td>
@@ -131,6 +92,35 @@
                                         {% else %}
                                             <small>-</small>
                                         {% endif %}
+                                    </td>
+                                    {# Machine learning score #}
+                                    {# TODO: Run through with Jules #}
+                                    <td>
+                                        {% for file in policy.getPolicyPicSureFiles %}
+                                            {% if 'picsure-status' in file.getMetadata()|keys %}
+
+                                                File Status: {{ file.getMetadata()['picsure-status'] }} {% if 'picsure-status-date' in file.getMetadata()|keys %} on {{ file.getMetadata()['picsure-status-date'] }} {%  endif %}
+                                                {% if 'picsure-status-user-name' in file.getMetadata()|keys %} by {{ file.getMetadata()['picsure-status-user-name'] }}
+                                                {% endif %}
+
+                                                {% if 'picsure-ml-status' in file.getMetadata()|keys and 'picsure-ml-confidence' in file.getMetadata()|keys %}
+                                                    {{ file.getMetadata()['picsure-ml-status']|capitalize }} with confidence {{ file.getMetadata()['picsure-ml-confidence']*100.0|number_format(2, '.', ',') }}&percnt;
+                                                {% else %}
+                                                    {% if 'undamaged' in file.getMetadata()['picsure-ml-score']|keys %}
+                                                        undamaged ({{ (file.getMetadata()['picsure-ml-score']['undamaged']*100.0)|number_format(0, '.', ',') }}&percnt;)
+                                                    {% endif %}
+                                                    {% if 'invalid' in file.getMetadata()['picsure-ml-score']|keys %}
+                                                        invalid ({{ (file.getMetadata()['picsure-ml-score']['invalid']*100.0)|number_format(0, '.', ',') }}&percnt;)
+                                                    {% endif %}
+                                                    {% if 'damaged' in file.getMetadata()['picsure-ml-score']|keys %}
+                                                        damaged ({{ (file.getMetadata()['picsure-ml-score']['damaged']*100.0)|number_format(0, '.', ',') }}&percnt;)
+                                                    {% endif %}
+                                                {% endif %}
+
+                                                <a class="btn btn-default-outline btn-square" href="{{ path('admin_picsure_ml_predict', {'id': file.getId()}) }}"><i class="fal fa-sync-alt"></i> <span class="sr-only">Re-run</span></a>
+
+                                            {% endif %}
+                                        {% endfor %}
                                     </td>
                                 </tr>
                             {% endfor %}
@@ -161,10 +151,12 @@
                         <div class="form-group">
                             <label for="message">Choose feedback:</label>
                             <select id="invalid_picsure_options" class="form-control">
-                                <option value="1 Message to send to user">1 Message to send to user</option>
-                                <option value="2 Message to send to user">2 Message to send to user</option>
-                                <option value="3 Message to send to user">3 Message to send to user</option>
-                                <option value="4 Message to send to user">4 Message to send to user</option>
+                                <option value="Keep screen edge clear of fingers for validation">Keep screen edge clear of fingers for validation</option>
+                                <option value="Phone to far from mirror for validation">Phone to far from mirror for validation</option>
+                                <option value="Do you have a screen protector on? Please remove for validation">Do you have a screen protector on? Please remove for validation</option>
+                                <option value="Whole phone needs to be visible for validation">Whole phone needs to be visible for validation</option>
+                                <option value="Reflective surface not clean enough for validation">Reflective surface not clean enough for validation</option>
+                                <option value="🍆 cannot be validated">🍆 cannot be validated</option>
                             </select>
                         </div>
                         <div class="form-group">
@@ -175,10 +167,7 @@
                                       name="message"></textarea>
                         </div>
                         <div class="form-group">
-                            <button type="button"
-                                    class="btn btn-outline-primary btn-square btn-sm"
-                                    data-dismiss="modal">Close</button>
-                            <button type="submit" class="btn btn-success btn-square btn-sm">Invalidate pic-sure</button>
+                            <button type="submit" class="btn btn-success btn-square">Invalidate pic-sure</button>
                         </div>
                     </form>
                 </div>
@@ -192,29 +181,6 @@
     </div>
     {% endif %}
 
-    <div class="modal fade"
-         id="invalidModal"
-         tabindex="-1"
-         role="dialog">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <form id="invalid-picsure-form" method="post">
-                    <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                        <h4 class="modal-title">Invalid pic-sure</h4>
-                    </div>
-                    <div class="modal-body">
-                        <h3>Optional additional message to send to user:</h3>
-                        <textarea type="text" class="form-control" id="message" name="message"></textarea>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-success">Invalidate pic-sure</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
 
 {% endblock %}
 
