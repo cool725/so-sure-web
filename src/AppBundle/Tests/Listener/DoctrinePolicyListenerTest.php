@@ -5,6 +5,7 @@ namespace AppBundle\Tests\Listener;
 use AppBundle\Classes\Premium;
 use AppBundle\Document\Address;
 use AppBundle\Document\PhonePremium;
+use Doctrine\Common\Annotations\Reader;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\DependencyInjection\Container;
@@ -207,6 +208,9 @@ class DoctrinePolicyListenerTest extends WebTestCase
                      ->with($eventType, $event);
 
         $listener = new DoctrinePolicyListener($dispatcher);
+        /** @var Reader $reader */
+        $reader = static::$container->get('annotations.reader');
+        $listener->setReader($reader);
 
         return $listener;
     }

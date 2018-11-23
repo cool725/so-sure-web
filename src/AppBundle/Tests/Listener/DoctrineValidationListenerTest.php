@@ -14,6 +14,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * @group functional-nonet
+ * AppBundle\\Tests\\Listener\\DoctrineValidationListenerTest
  */
 class DoctrineValidationListenerTest extends WebTestCase
 {
