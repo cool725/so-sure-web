@@ -511,7 +511,35 @@
             </div>
 
             <div class="tab-pane fade" id="update" role="tabpanel" aria-labelledby="update-tab">
-                <div id="update_form_thingy"></div>
+                {{ form_start(form) }}
+                <table class="table table-bordered table-striped">
+                    <tr>
+                        <td>Claim Number</td>
+                        <td>{{ form_widget(form.number) }}</td>
+                    </tr>
+
+                    <tr>
+                        <td>Type</td>
+                        <td>{{ form_widget(form.type) }}</td>
+                    </tr>
+
+                    <tr>
+                        <td>Replacement Phone</td>
+                        <td>{{ form_widget(form.replacementPhone) }}</td>
+                    </tr>
+
+                    <tr>
+                        <td>Approved Date</td>
+                        <td>{{ form_widget(form.approvedDate) }}</td>
+                    </tr>
+
+                    <tr>
+                        <td>Notes</td>
+                        <td>{{ form_widget(form.notes) }}</td>
+                    </tr>
+                </table>
+
+                {{ form_end(form) }}
             </div>
         </div>
     </div>
