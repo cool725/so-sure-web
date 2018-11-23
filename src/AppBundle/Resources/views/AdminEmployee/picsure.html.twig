@@ -85,7 +85,6 @@
                                                             {% if 'damaged' in file.getMetadata()['picsure-ml-score']|keys %}
                                                                 damaged ({{ (file.getMetadata()['picsure-ml-score']['damaged']*100.0)|number_format(0, '.', ',') }}&percnt;)
                                                             {% endif %}
-                                                            <a class="btn btn-default-outline btn-square" href="{{ path('admin_picsure_ml_predict', {'id': file.getId()}) }}"><i class="fal fa-sync-alt"></i> <span class="sr-only">Re-run</span></a>
                                                         {% endif %}
                                                     {% endif %}
                                                    ">
@@ -106,9 +105,12 @@
                                                data-submit="{{ path('admin_picsure_invalid', {'id': policy.id}) }}">Invalid</a>
                                             <a class="btn btn-danger  btn-square btn-sm"
                                                href="{{ path('admin_picsure_reject', {'id': policy.id}) }}">Damaged</a>
-                                        {% else %}
-                                            <small>No action needed</small>
                                         {% endif %}
+                                        {% for file in policy.getPolicyPicSureFiles %}
+                                            {% if 'picsure-ml-score' in file.getMetadata()|keys %}
+                                                <a class="btn btn-default-outline btn-square" href="{{ path('admin_picsure_ml_predict', {'id': file.getId()}) }}"><i class="fal fa-sync-alt"></i> <span class="sr-only">Re-run ml</span></a>
+                                            {% endif %}
+                                        {% endfor %}
                                     </td>
                                 </tr>
                             {% endfor %}
