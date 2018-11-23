@@ -2,5 +2,6 @@
  * from the bootstrap listeners */
 $('#tabs li a').off();
 
-
-$('.expiredColumn').hide();
+$('.columnBtn').change(function() {
+    $("."+$(this).data("column")).toggle($(this).prop("checked"));
+});

@@ -1243,7 +1243,7 @@ class ReportingService
             $month["open"] = $runningTotal;
             $month["new"] = $policyRepo->countAllNewPolicies($endOfMonth, $start);
             $month["expired"] = $policyRepo->countAllEndingPolicies(null, $start, $endOfMonth, true);
-            $month["cancelled"] = 0; // TODO: at the moment expired contains all ending policies
+            $month["cancelled"] = 0; // TODO: at the moment expired contains all ending policies or something.
             $runningTotal += $month["new"];
             $runningTotal -= $month["expired"] + $month["cancelled"];
             $month["close"] = $runningTotal;
