@@ -37,25 +37,28 @@ class ReportController extends AbstractController
      */
     public function claimsReportAction(Request $request)
     {
-        $period = $request->get('period');
+        $period = $request->get("period");
         $period = isset($period) ? $period : ReportingService::REPORT_PERIODS_DEFAULT;
-        $report = ['period' => $period];
-        $report['periods'] = array_keys(ReportingService::REPORT_PERIODS);
+        $report = ["period" => $period];
+        $report["periods"] = array_keys(ReportingService::REPORT_PERIODS);
 
         // Get the start and end dates for the given period.
         try {
-            list($start, $end) = ReportingService::getLastPeriod($period);
+            list($start, $end, $month) = ReportingService::getLastPeriod($period);
         } catch (\InvalidArgumentException $e) {
-            $report['error'] = "Invalid URL, period {$period} does not exist.";
-            $report['period'] = ReportingService::REPORT_PERIODS_DEFAULT;
-            return $this->render('AppBundle:AdminEmployee:adminReports.html.twig', $report);
+            $this->addFlash("error", "Invalid URL, {$period} is not a valid reporting period.");
+            list($start, $end, $month) = ReportingService::getLastPeriod(ReportingService::REPORT_PERIODS_DEFAULT);
         }
 
-        $report['claims'] = $this->reporting->report($start, $end, false);
-        $report['start'] = $start->format('Y-m-d');
-        $report['end'] = $end->format('Y-m-d');
+        $report["claims"] = $this->reporting->report($start, $end, false);
+        if ($month) {
+            $report["month"] = $start->format("F");
+        } else {
+            $report["start"] = $start->format("d/m/Y");
+            $report["end"] = $end->format("d/m/Y");
+        }
 
-        return $this->render('AppBundle:AdminEmployee:adminReports.html.twig', $report);
+        return $this->render("AppBundle:AdminEmployee:adminReports.html.twig", $report);
     }
 
     /**
@@ -63,8 +66,8 @@ class ReportController extends AbstractController
      */
     public function connectionsReportAction()
     {
-        $report['connections'] = $this->reporting->connectionReport();
-        return $this->render('AppBundle:AdminEmployee:adminReports.html.twig', $report);
+        $report["connections"] = $this->reporting->connectionReport();
+        return $this->render("AppBundle:AdminEmployee:adminReports.html.twig", $report);
     }
 
     /**
@@ -72,7 +75,20 @@ class ReportController extends AbstractController
      */
     public function scheduledReportAction()
     {
-        $report['scheduledPayments'] = $this->reporting->getScheduledPayments();
-        return $this->render('AppBundle:AdminEmployee:adminReports.html.twig', $report);
+        $report["scheduledPayments"] = $this->reporting->getScheduledPayments();
+        return $this->render("AppBundle:AdminEmployee:adminReports.html.twig", $report);
+    }
+
+    /**
+     * This action returns a page with policy data generated in the same style as used by Dylan side by side with data
+     * generated in the same style as used in the main claims report.
+     * @Route("/admin/reports/cumulative", name="admin_reports_cumulative")
+     */
+    public function cumulativeReportAction()
+    {
+        $end = new \DateTime();
+        $start = $this->startOfYear($end);
+        $report["cumulative"] = $this->reporting->getCumulativePolicies($start, $end);
+        return $this->render("AppBundle:AdminEmployee:adminReports.html.twig", $report);
     }
 }

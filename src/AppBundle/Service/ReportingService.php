@@ -48,10 +48,12 @@ class ReportingService
 {
     const REPORT_KEY_FORMAT = 'Report:%s:%s:%s';
     const REPORT_CACHE_TIME = 3600;
-
-    const REPORT_PERIODS = ['last 7 days' => ['start' => '7 days ago', 'end' => 'now'],
+    const REPORT_PERIODS = [
+        'last 7 days' => ['start' => '7 days ago', 'end' => 'now'],
         'month to date' => ['start' => 'first day of this month', 'end' => 'now'],
-        'last month' => ['start' => 'first day of last month', 'end' => 'first day of this month']];
+        'last month' => ['start' => 'first day of -1 month', 'end' => 'first day of this month', 'month' => true],
+        'month before last' => ['start' => 'first day of -2 month', 'end' => 'first day of -1 month', 'month' => true]
+    ];
     const REPORT_PERIODS_DEFAULT = 'last 7 days';
 
     use DateTrait;
@@ -1222,12 +1224,47 @@ class ReportingService
     }
 
     /**
+     * Creates a report in the cumulative style used by dylan, and monthly values calculated in the way that we use
+     * side by side over a series of months.
+     * @param \DateTime $start is the starting month.
+     * @param \DateTime $end   is the ending month.
+     * @return array containing the full report.
+     */
+    public function getCumulativePolicies($start, $end)
+    {
+        /** @var PhonePolicyRepository $policyRepo */
+        $policyRepo = $this->dm->getRepository(PhonePolicy::class);
+        $report = [];
+        $start = $this->startOfMonth($start);
+        $runningTotal = $policyRepo->countAllNewPolicies($start);
+        while ($start < $end) {
+            $endOfMonth = $this->endOfMonth($start);
+            $month = [];
+            $month["open"] = $runningTotal;
+            $month["new"] = $policyRepo->countAllNewPolicies($start, $endOfMonth);
+            $month["expired"] = $policyRepo->countAllEndingPolicies(null, $end, $start);
+            $month["cancelled"] = 0; // TODO: at the moment expired contains all ending policies
+            $runningTotal += $month["open"] - $month["expired"] - $month["cancelled"];
+            $month["close"] = $runningTotal;
+            $month["upgrade"] = $policyRepo->countAllEndingPolicies(
+                Policy::CANCELLED_UPGRADE,
+                $start,
+                $endOfMonth,
+                false
+            );
+            $report[$start->format("F Y")] = $month;
+            $start->add(new \DateInterval("P1M"));
+        }
+        return $report;
+    }
+
+    /**
      * gives you a period of time with an optional starting date and an optional
      * ending date, start date is rounded to the beginning of the given day, and
       * end date is rounded to the end of the preceding day.
      * @param string $period is the string name of a period as defined in
      *                       REPORT_PERIODS constant
-     * @return array containing the new start and end dates.
+     * @return array containing the new start and end dates and a boolean telling you if this period is a whole month.
      */
     public static function getLastPeriod($period): array
     {
@@ -1236,11 +1273,14 @@ class ReportingService
                 "{$period} is not a valid period as defined in ReportingService::REPORT_PERIODS"
             );
         }
+        $month = false;
+        if (array_key_exists('month', static::REPORT_PERIODS[$period])) {
+            $month = static::REPORT_PERIODS[$period]["month"];
+        }
         $start = new DateTime(static::REPORT_PERIODS[$period]['start'], new DateTimeZone(SoSure::TIMEZONE));
         $end = new DateTime(static::REPORT_PERIODS[$period]['end'], new DateTimeZone(SoSure::TIMEZONE));
         $start->setTime(0, 0, 0);
         $end->setTime(0, 0, -1);
-
-        return [$start, $end];
+        return [$start, $end, $month];
     }
 }
