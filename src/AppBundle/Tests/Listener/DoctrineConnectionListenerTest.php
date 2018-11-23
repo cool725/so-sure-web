@@ -2,6 +2,7 @@
 
 namespace AppBundle\Tests\Listener;
 
+use Doctrine\Common\Annotations\Reader;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
@@ -110,6 +111,9 @@ class DoctrineConnectionListenerTest extends WebTestCase
         }
 
         $listener = new DoctrineConnectionListener($dispatcher);
+        /** @var Reader $reader */
+        $reader = static::$container->get('annotations.reader');
+        $listener->setReader($reader);
 
         return $listener;
     }

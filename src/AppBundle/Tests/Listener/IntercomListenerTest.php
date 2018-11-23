@@ -2,6 +2,7 @@
 
 namespace AppBundle\Tests\Listener;
 
+use AppBundle\Document\Charge;
 use AppBundle\Document\File\PicSureFile;
 use AppBundle\Event\PicsureEvent;
 use Doctrine\ODM\MongoDB\DocumentManager;
@@ -35,6 +36,8 @@ use AppBundle\Service\IntercomService;
 
 /**
  * @group functional-net
+ *
+ * AppBundle\\Tests\\Listener\\IntercomListenerTest
  */
 class IntercomListenerTest extends WebTestCase
 {
@@ -72,6 +75,33 @@ class IntercomListenerTest extends WebTestCase
     {
     }
 
+    public function testIntercomUserChargeActual()
+    {
+        static::$redis->del(IntercomService::KEY_INTERCOM_QUEUE);
+        $this->assertEquals(0, static::$redis->llen(IntercomService::KEY_INTERCOM_QUEUE));
+
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testIntercomUserChargeActual', $this),
+            'bar'
+        );
+        // create + update
+        $this->assertEquals(2, static::$redis->llen(IntercomService::KEY_INTERCOM_QUEUE));
+        $data = unserialize(static::$redis->lpop(IntercomService::KEY_INTERCOM_QUEUE));
+        $this->assertEquals($user->getId(), $data['userId']);
+        $data = unserialize(static::$redis->lpop(IntercomService::KEY_INTERCOM_QUEUE));
+        $this->assertEquals($user->getId(), $data['userId']);
+
+        $charge = new Charge();
+        $charge->setType(Charge::TYPE_GSMA);
+        $charge->setUser($user);
+        static::$dm->flush();
+
+        $charge->setUser(null);
+        static::$dm->flush();
+        $this->assertEquals(0, static::$redis->llen(IntercomService::KEY_INTERCOM_QUEUE));
+    }
+
     public function testIntercomPolicyActual()
     {
         static::$redis->del(IntercomService::KEY_INTERCOM_QUEUE);
@@ -96,9 +126,9 @@ class IntercomListenerTest extends WebTestCase
             new \DateTime('2016-01-01'),
             true
         );
-        $this->assertEquals(1, static::$redis->llen(IntercomService::KEY_INTERCOM_QUEUE));
-        $data = unserialize(static::$redis->lpop(IntercomService::KEY_INTERCOM_QUEUE));
-        $this->assertEquals($user->getId(), $data['userId']);
+        $this->assertEquals(0, static::$redis->llen(IntercomService::KEY_INTERCOM_QUEUE));
+        //$data = unserialize(static::$redis->lpop(IntercomService::KEY_INTERCOM_QUEUE));
+        //$this->assertEquals($user->getId(), $data['userId']);
 
         $policy->setStatus(PhonePolicy::STATUS_PENDING);
         static::$policyService->setEnvironment('prod');

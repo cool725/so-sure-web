@@ -2,6 +2,7 @@
 
 namespace AppBundle\Tests\Listener;
 
+use Doctrine\Common\Annotations\Reader;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
@@ -191,6 +192,9 @@ class DoctrineSalvaListenerTest extends WebTestCase
                      ->with($eventType, $event);
 
         $listener = new DoctrineSalvaListener($dispatcher, 'test', static::$container->get('logger'));
+        /** @var Reader $reader */
+        $reader = static::$container->get('annotations.reader');
+        $listener->setReader($reader);
 
         return $listener;
     }

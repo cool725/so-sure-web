@@ -930,7 +930,6 @@ services:
         tags:
             -  { name: doctrine_mongodb.odm.event_listener, event: postPersist }
             -  { name: doctrine_mongodb.odm.event_listener, event: preUpdate  }
-            -  { name: doctrine_mongodb.odm.event_listener, event: postUpdate  }
             -  { name: doctrine_mongodb.odm.event_listener, event: preRemove  }
 
     doctrine.listener.company:
@@ -1019,7 +1018,7 @@ services:
             - "@app.user"
         tags:
             -  { name: kernel.event_listener, event: event.user.created, method: onUserCreatedEvent }
-            -  { name: kernel.event_listener, event: event.user.updated, method: onUserUpdatedEvent }
+            -  { name: kernel.event_listener, event: event.user.updated.invitation-link, method: onUserUpdatedEvent }
             -  { name: kernel.event_listener, event: event.user.email.changed, method: onUserEmailChangedEvent }
             -  { name: kernel.event_listener, event: event.user.password.changed, method: onUserPasswordChangedEvent }
 
@@ -1052,7 +1051,7 @@ services:
         tags:
             -  { name: kernel.event_listener, event: event.lead.updated, method: onLeadUpdatedEvent }
             -  { name: kernel.event_listener, event: event.user.created, method: onUserCreatedEvent }
-            -  { name: kernel.event_listener, event: event.user.updated, method: onUserUpdatedEvent }
+            -  { name: kernel.event_listener, event: event.user.updated.intercom, method: onUserUpdatedEvent }
             -  { name: kernel.event_listener, event: event.policy.created, method: onPolicyCreatedEvent }
             -  { name: kernel.event_listener, event: event.policy.pot, method: onPolicyPotEvent }
             -  { name: kernel.event_listener, event: event.policy.cancelled, method: onPolicyCancelledEvent }

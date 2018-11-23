@@ -8,7 +8,8 @@ use AppBundle\Document\User;
 class UserEvent extends Event
 {
     const EVENT_CREATED = 'event.user.created';
-    const EVENT_UPDATED = 'event.user.updated';
+    const EVENT_UPDATED_INTERCOM = 'event.user.updated.intercom';
+    const EVENT_UPDATED_INVITATION_LINK = 'event.user.updated.invitation-link';
     const EVENT_NAME_UPDATED = 'event.user.name.updated';
     const EVENT_PASSWORD_CHANGED = 'event.user.password.changed';
 
