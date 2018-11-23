@@ -29,7 +29,7 @@ class CashbackReminderCommand extends ContainerAwareCommand
             ->addArgument(
                 'status',
                 InputArgument::REQUIRED,
-                'Check for missing status instead of pending'
+                'Run without argument to see options'
             )
             ->addOption(
                 'dry-run',
