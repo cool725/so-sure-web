@@ -36,7 +36,7 @@
             {% if policies|length == 0 %}
                 <p class="mb-5">No records found</p>
             {% else %}
-                <div class="table-responsive-sm mb-5">
+                <div class="table-responsive-sm">
                     <table class="table">
                         <thead class="thead-light">
                             <tr>
@@ -129,6 +129,12 @@
                 </div>
             {% endif %}
 
+            {% if policies.count > 0 %}
+                <div class="d-flex justify-content-center mb-5">
+                    {{ pagerfanta(pager, 'twitter_bootstrap4') }}
+                </div>
+            {% endif %}
+
         </div>
     </section>
 
@@ -174,13 +180,6 @@
             </div>
         </div>
     </div>
-
-    {% if policies.count > 0 %}
-    <div class="pagerfanta text-center">
-        {{ pagerfanta(pager, 'twitter_bootstrap4') }}
-    </div>
-    {% endif %}
-
 
 {% endblock %}
 
