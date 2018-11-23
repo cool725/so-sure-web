@@ -56,14 +56,25 @@
                         {% elseif page_type == 'blackfriday' %}
                             <h1 class="mb-4 text-white">Mobile Insurance <br><span class="sub">Black Friday Special</span></h1>
                             <h4 class="text-zaffre">Free Phone Case worth &pound;19</h4>
-                            <p class="mb-4 text-white">This Black Friday (until midnight Monday) when you buy a policy, you'll get a FREE phone case of your choice from our partners at <a href="https://www.layercase.co.uk/" target="_blank" class="text-white"><u>LayerCase</u></a>.<br>
-                                <a href="#"
-                                   class="text-white"
-                                   data-toggle="modal"
-                                   data-target="#xmas_terms"
-                                   role="button"><small><u>Terms &amp; Conditions</u></small>
-                                </a>
-                            </p>
+                            <p class="text-white">This Black Friday (until midnight Monday) when you buy a policy, you'll get a FREE phone case of your choice from our partners at <a href="https://www.layercase.co.uk/" target="_blank" class="text-white"><u>LayerCase</u></a>.</p>
+                            <ul class="list-inline mb-4">
+                                <li class="list-inline-item">
+                                    <a href="#"
+                                       class="text-white"
+                                       data-toggle="modal"
+                                       data-target="#black_friday_how_it_works"
+                                       role="button"><small><u>How it works</u></small>
+                                    </a>
+                                </li>
+                                <li class="list-inline-item">
+                                    <a href="#"
+                                       class="text-white"
+                                       data-toggle="modal"
+                                       data-target="#xmas_terms"
+                                       role="button"><small><u>Terms &amp; Conditions</u></small>
+                                    </a>
+                                </li>
+                            </ul>
                         {% else %}
                             <h1 class="mb-4 text-white">A phone is for life... <br><span class="sub">not just for Christmas</span></h1>
                             <h4 class="text-zaffre">Our insurance is a real Christmas cracker</h4>
@@ -607,6 +618,32 @@
 
     {# Page Modals #}
     <div class="modal fade"
+         id="black_friday_how_it_works"
+         tabindex="-1" role="dialog"
+         aria-labelledby="taste_card_terms"
+         aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        Black Friday - How it works?
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <i class="fal fa-times text-white"></i>
+                    </button>
+                </div>
+                <div class="modal-body text-center text-sm-left">
+                    <h5>How it works</h5>
+                    <p>Free phone case unique codes will be given out to you 14-16 days after you have purchased your policy with us. We will issue the codes via the email address you have used on your policy document.</p>
+                    <p>Once you have your code, simply visit <a href="https://www.layercase.co.uk/" target="_blank">www.LayerCase.co.uk</a>, pick the case you want and enter your unique code. You can pick any phone case you like, dependant on Layercase's availability.</p>
+                    <p>If for some reason you don't hear from us (unlikely) then just ping us a message on our live chat and we will get back to you asap.</p>
+                    <p>Enjoy your peace of mind now that your phone is double protected :)</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade"
          id="xmas_terms"
          tabindex="-1" role="dialog"
          aria-labelledby="taste_card_terms"
@@ -627,7 +664,7 @@
                         <i class="fal fa-times text-white"></i>
                     </button>
                 </div>
-                <div class="modal-body text-center text-sm-left">
+                <div class="modal-body">
                     {% if page_type == 'tastecard' %}
                         <h5>Terms and conditions</h5>
                         <p>1 tastecard per new so-sure policyholder (ie have a least one so-sure policy) that shares with 5 friends. Sharing must be done while being logged into the so-sure website as a customer either by web or app as sharing actions are tracked.  Sharing with 5 friends must be completed within 7 days of the promotion ending.</p>
@@ -640,11 +677,6 @@
                         <p>1 case per new so-sure customer. Code for the free Layer Case only issued 14-16 days after the policy purchase date and only if customer has made no claims.</p>
                         <p>Promotion valid from 19th-31st December. so-sure reserves the right to cancel or amend the promotion and these terms and conditions without notice and at anytime.</p>
                     {% elseif page_type == 'blackfriday' %}
-                        <h5>How it works</h5>
-                        <p>Free phone case unique codes will be given out to you 14-16 days after you have purchased your policy with us. We will issue the codes via the email address you have used on your policy document.</p>
-                        <p>Once you have your code, simply visit <a href="https://www.layercase.co.uk/" target="_blank">www.LayerCase.co.uk</a>, pick the case you want and enter your unique code. You can pick any phone case you like, dependant on Layercase's availability.</p>
-                        <p>If for some reason you don't hear from us (unlikely) then just ping us a message on our live chat and we will get back to you asap.</p>
-                        <p>Enjoy your peace of mind now that your phone is double protected :)</p>
                         <h5>Here's a reminder of the terms and conditions:</h5>
                         <p><strong>1 case per new so-sure customer. Code for the free Layer Case only issued 14-16 days after the policy purchase date and only if customer has made no claims.</strong></p>
                         <p>Promotion valid from the 23rd November to the 26th of November. so-sure reserves the right to cancel or amend the promotion and these terms and conditions without notice and at anytime.</p>

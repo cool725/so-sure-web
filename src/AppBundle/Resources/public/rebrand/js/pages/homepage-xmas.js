@@ -8,7 +8,7 @@ require('../../sass/pages/homepage-xmas.scss');
 
 $(function(){
 
-    let snowIntensity = 600; // smaller number = more snowflakes;
+    let snowIntensity = 300; // smaller number = more snowflakes;
     let snowType = '*';
 
     function snowFlake(){
