@@ -30,7 +30,7 @@
         "judopay/judopay-sdk": "2.0.1.2",
         "aws/aws-sdk-php": "^3.15",
         "jms/security-extra-bundle": "^1.6",
-        "white-october/pagerfanta-bundle": "^1.0",
+        "white-october/pagerfanta-bundle": "^1.2",
         "geoip2/geoip2": "^2.0",
         "jmikola/geojson": "^1.0",
         "plivo/plivo-php": "^1.1",
