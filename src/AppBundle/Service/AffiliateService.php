@@ -70,19 +70,19 @@ class AffiliateService
 
     /**
      * Generates all new charges needed for all affiliate companies.
-     * @param array $affiliates is the list of affiliates to generate for. Generally you will want all but it is easier
-     *                          to test when the method does not operate indiscriminately.
+     * @param array     $affiliates is the list of affiliates to generate for.
+     * @param \DateTime $date       is the time and date to be considered as current.
      * @return array the list of all the charges that were just generated.
      */
-    public function generate($affiliates)
+    public function generate($affiliates, $date)
     {
         $generatedCharges = [];
         foreach ($affiliates as $affiliate) {
             $model = $affiliate->getChargeModel();
             if ($model == AffiliateCompany::MODEL_ONE_OFF) {
-                $this->oneOffCharges($affiliate, $generatedCharges);
+                $this->oneOffCharges($affiliate, $date, $generatedCharges);
             } elseif ($model == AffiliateCompany::MODEL_ONGOING) {
-                $this->ongoingCharges($affiliate, $generatedCharges);
+                $this->ongoingCharges($affiliate, $date, $generatedCharges);
             }
         }
         return $generatedCharges;
@@ -91,14 +91,16 @@ class AffiliateService
     /**
      * Performs one off charges logic for a given affiliate.
      * @param AffiliateCompany $affiliate        is the affiliate we are performing one off charges for.
+     * @param \DateTime        $date             is the time and date to be considered as current.
      * @param array            $generatedCharges is an optional reference to an array in which generated charges can go.
+     * @return array the generated charges array.
      */
-    public function oneOffCharges($affiliate, & $generatedCharges = [])
+    public function oneOffCharges($affiliate, $date, & $generatedCharges = [])
     {
-        $users = $this->getMatchingUsers($affiliate);
+        $users = $this->getMatchingUsers($affiliate, $date);
         foreach ($users as $user) {
             if (!$this->chargeRepository->findLastByUser($user, Charge::TYPE_AFFILIATE)) {
-                $generatedCharges[] = $this->createCharge($affiliate, $user, $user->getValidPolicies()[0]);
+                $generatedCharges[] = $this->createCharge($affiliate, $user, $user->getValidPolicies()[0], $date);
             }
         }
         return $generatedCharges;
@@ -107,21 +109,22 @@ class AffiliateService
     /**
      * Performs ongoing charges logic for an affiliate.
      * @param AffiliateCompany $affiliate        is the affiliate company that is performing ongoing charges.
+     * @param \DateTime        $date             is the time and date to be considered as current.
      * @param array            $generatedCharges is an optional reference to an array in which generated charges can go.
+     * @return array|null the generated charges array, or null if the current state is ambiguous and a notice has been
+     *                    logged.
      */
-    public function ongoingCharges($affiliate, & $generatedCharges = [])
+    public function ongoingCharges($affiliate, $date, & $generatedCharges = [])
     {
-        $date = DateTime::createFromFormat('U', time());
-        $renewalWait = $date
-            ->sub(new DateInterval("P1Y"))
-            ->add(new DateInterval("P".($affiliate->getRenewalDays() ?: 0)."D"));
-        $users = $this->getMatchingUsers($affiliate);
+        $renewalWait = clone $date;
+        $renewalWait->sub(new DateInterval("P1Y"))->add(new DateInterval("P".($affiliate->getRenewalDays() ?: 0)."D"));
+        $users = $this->getMatchingUsers($affiliate, $date);
         foreach ($users as $user) {
             $policies = $user->getValidPolicies(true);
             $charge = $this->chargeRepository->findLastByUser($user, Charge::TYPE_AFFILIATE);
             if (count($policies) == 1) {
                 if (($charge && $charge->getCreatedDate() < $renewalWait) || !$user->getAffiliate()) {
-                    $generatedCharges[] = $this->createCharge($affiliate, $user, $policies[0]);
+                    $generatedCharges[] = $this->createCharge($affiliate, $user, $policies[0], $date);
                 }
             } elseif ($charge) {
                 foreach ($policies as $policy) {
@@ -130,7 +133,7 @@ class AffiliateService
                         if ($previous->getAffiliate()) {
                             if ($policy->isPolicyOldEnough($affiliate->getRenewalDays(), $date) &&
                                 !$policy->getAffiliate()) {
-                                $generatedCharges[] = $this->createCharge($affiliate, $user, $policy);
+                                $generatedCharges[] = $this->createCharge($affiliate, $user, $policy, $date);
                             }
                         } else {
                             $this->logger->error(
@@ -156,10 +159,11 @@ class AffiliateService
      * Get all users that correspond to a given affiliate's campaign source or lead source fields, and within a given
      * set of aquisition statuses.
      * @param AffiliateCompany $affiliate is the affiliate company to find users for.
+     * @param \DateTime        $date      is the time and date to be considered as current.
      * @param array            $status    is the set of aquisition statuses within which all users must fall.
      * @return array containing the users.
      */
-    public function getMatchingUsers(AffiliateCompany $affiliate, $status = [User::AQUISITION_PENDING])
+    public function getMatchingUsers(AffiliateCompany $affiliate, $date, $status = [User::AQUISITION_PENDING])
     {
         $campaignUsers = [];
         $leadUsers = [];
@@ -176,7 +180,6 @@ class AffiliateService
             ]);
         }
         $users = [];
-        $date = \DateTime::createFromFormat('U', time());
         foreach ($campaignUsers as $user) {
             if (in_array($user->aquisitionStatus($affiliate->getDays(), $date), $status)) {
                 $users[] = $user;
@@ -197,14 +200,15 @@ class AffiliateService
      * @param AffiliateCompany $affiliate is the affiliate company who the charge is being made for.
      * @param User             $user      is the user that the charge is made regarding.
      * @param Policy           $policy    is the policy that the charge is made regarding.
+     * @param \DateTime        $date      is the time and date to be considered as current.
      * @return Charge the charge that has been created.
      */
-    private function createCharge($affiliate, $user, $policy)
+    private function createCharge($affiliate, $user, $policy, $date)
     {
         $charge = new Charge();
         $charge->setAmount($affiliate->getCPA());
         $charge->setType(Charge::TYPE_AFFILIATE);
-        $charge->setCreatedDate(DateTime::createFromFormat('U', time()));
+        $charge->setCreatedDate(clone $date);
         $charge->setUser($user);
         $charge->setAffiliate($affiliate);
         $charge->setPolicy($policy);

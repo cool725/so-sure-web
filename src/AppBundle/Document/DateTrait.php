@@ -340,4 +340,14 @@ trait DateTrait
 
         return $adjustedDate;
     }
+
+    /**
+     * Moves a date N days into the future.
+     * @param \DateTime $date is the starting date.
+     * @param int       $days is the number of days to move ahead.
+     */
+    public static function jumpDays($date, $days)
+    {
+        $date->add(new \DateInterval("P{$days}D"));
+    }
 }

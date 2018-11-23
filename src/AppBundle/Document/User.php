@@ -1067,7 +1067,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         return $policies;
     }
 
-    public function isAffiliateCandidate($days, $date = null)
+    public function isAffiliateCandidate($days, $date)
     {
         foreach ($this->getValidPolicies(true) as $policy) {
             /** @var Policy $policy */
@@ -2084,10 +2084,10 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     /**
      * Tells you the what state the user is in regarding affiliate aquisition.
      * @param int       $days is the number of days before aquisition becomes pending.
-     * @param \DateTime $date is the date that we are measuring from, defaulting to now.
+     * @param \DateTime $date is the date that we are measuring from.
      * @return string aquisition state name. Check out AQUISITION_* .
      */
-    public function aquisitionStatus($days, $date = null)
+    public function aquisitionStatus($days, $date)
     {
         if ($this->hasActivePolicy() || $this->hasUnpaidPolicy()) {
             if ($this->isAffiliateCandidate($days, $date)) {

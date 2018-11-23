@@ -52,6 +52,7 @@ class AffiliateServiceTest extends WebTestCase
 {
     use \AppBundle\Tests\PhingKernelClassTrait;
     use \AppBundle\Tests\UserClassTrait;
+    use \AppBundle\Document\DateTrait;
 
     protected static $container;
     protected static $affiliateService;
@@ -84,62 +85,63 @@ class AffiliateServiceTest extends WebTestCase
      */
     public function testGenerate()
     {
+        $date = new \DateTime();
         // test on nothing.
-        $this->assertEmpty(self::$affiliateService->generate([]));
+        $this->assertEmpty(self::$affiliateService->generate([], $date));
         // test on normal data.
-        $data = $this->createState();
-        $this->assertEquals(3, count(self::$affiliateService->generate([$data["affiliate"]])));
+        $data = $this->createState($date);
+        $this->assertEquals(3, count(self::$affiliateService->generate([$data["affiliate"]], $date)));
         //test on pre loved data.
-        $this->assertEquals(0, count(self::$affiliateService->generate([$data["affiliate"]])));
-        sleep(60 * 60 * 24 * 21);
-        $this->assertEquals(2, count(self::$affiliateService->generate([$data["affiliate"]])));
-        sleep(60 * 60 * 24 * 365);
-        $this->assertEquals(0, count(self::$affiliateService->generate([$data["affiliate"]])));
+        $this->assertEquals(0, count(self::$affiliateService->generate([$data["affiliate"]], $date)));
+        static::jumpDays($date, 21);
+        $this->assertEquals(2, count(self::$affiliateService->generate([$data["affiliate"]], $date)));
+        static::jumpDays($date, 365);
+        $this->assertEquals(0, count(self::$affiliateService->generate([$data["affiliate"]], $date)));
         // switch to ongoing and create new policies in the future.
         $data["affiliate"]->setChargeModel(AffiliateCompany::MODEL_ONGOING);
-        $this->assertEquals(5, count(self::$affiliateService->generate([$data["affiliate"]])));
-        $this->assertEquals(0, count(self::$affiliateService->generate([$data["affiliate"]])));
+        $this->assertEquals(5, count(self::$affiliateService->generate([$data["affiliate"]], $date)));
+        $this->assertEquals(0, count(self::$affiliateService->generate([$data["affiliate"]], $date)));
         // test on multiple affiliates at the same time.
-        $affiliateB = $this->createState()["affiliate"];
-        $affiliateC = $this->createState()["affiliate"];
-        $this->assertEquals(6, count(self::$affiliateService->generate([$affiliateB, $affiliateC])));
+        $affiliateB = $this->createState($date)["affiliate"];
+        $affiliateC = $this->createState($date)["affiliate"];
+        $this->assertEquals(6, count(self::$affiliateService->generate([$affiliateB, $affiliateC], $date)));
     }
 
     /**
      * Tests that the affiliate service generates ongoing charges when they should.
-     * @group time-sensitive
      */
     public function testOngoingCharges()
     {
-        $data = $this->createState();
+        $date = new \DateTime();
+        $data = $this->createState($date);
         $affiliate = $data["affiliate"];
         $users = [$data["bango"], $data["tango"], $data["borb"], $data["tonyAbbot"], $data["hat"]];
         // test for solitary policy no charges and show charges reference array works.
         $charges = [];
-        self::$affiliateService->ongoingCharges($affiliate, $charges);
+        self::$affiliateService->ongoingCharges($affiliate, $date, $charges);
         $this->assertEquals(3, count($charges));
-        sleep(60 * 60 * 24 * 30);
-        $this->assertEquals(2, count(self::$affiliateService->ongoingCharges($affiliate)));
+        static::jumpDays($date, 30);
+        $this->assertEquals(2, count(self::$affiliateService->ongoingCharges($affiliate, $date)));
         // test for solitary policy charges a year ago.
-        sleep(60 * 60 * 24 * 334);
-        $this->assertEquals(3, count(self::$affiliateService->ongoingCharges($affiliate)));
-        sleep(60 * 60 * 24 * 30);
-        $this->assertEquals(2, count(self::$affiliateService->ongoingCharges($affiliate)));
+        static::jumpDays($date, 334);
+        $this->assertEquals(3, count(self::$affiliateService->ongoingCharges($affiliate, $date)));
+        static::jumpDays($date, 30);
+        $this->assertEquals(2, count(self::$affiliateService->ongoingCharges($affiliate, $date)));
         // test for renewal policy with previous having charges.
         foreach ($users as $user) {
-            self::renewal($user);
-            self::createTestPolicy($user);
+            self::renewal($user, $date);
+            self::createTestPolicy($user, $date);
         }
-        $this->assertEmpty(self::$affiliateService->ongoingCharges($affiliate));
-        sleep(60 * 60 * 24 * 395);
-        $this->assertEquals(5, count(self::$affiliateService->ongoingCharges($affiliate)));
-        $this->assertEmpty(self::$affiliateService->ongoingCharges($affiliate));
+        $this->assertEmpty(self::$affiliateService->ongoingCharges($affiliate, $date));
+        static::jumpDays($date, 395);
+        $this->assertEquals(5, count(self::$affiliateService->ongoingCharges($affiliate, $date)));
+        $this->assertEmpty(self::$affiliateService->ongoingCharges($affiliate, $date));
         // test for renewal policy with previous having no charges but user having charges.
         foreach ($users as $user) {
-            self::renewal($user);
-            self::renewal($user);
+            self::renewal($user, $date);
+            self::renewal($user, $date);
         }
-        $this->assertNull(self::$affiliateService->ongoingCharges($affiliate));
+        $this->assertNull(self::$affiliateService->ongoingCharges($affiliate, $date));
         // test for multiple policies and no charges warning.
         foreach ($users as $user) {
             $charges = self::$chargeRepository->findBy(["user" => $user]);
@@ -148,7 +150,7 @@ class AffiliateServiceTest extends WebTestCase
             }
             self::$dm->flush();
         }
-        $this->assertNull(self::$affiliateService->ongoingCharges($affiliate));
+        $this->assertNull(self::$affiliateService->ongoingCharges($affiliate, $date));
     }
 
     /**
@@ -157,17 +159,18 @@ class AffiliateServiceTest extends WebTestCase
      */
     public function testOneOffCharges()
     {
-        $data = $this->createState();
+        $date = new \DateTime();
+        $data = $this->createState($date);
         $charges = [];
-        self::$affiliateService->oneOffCharges($data["affiliate"], $charges);
+        self::$affiliateService->oneOffCharges($data["affiliate"], $date, $charges);
         $this->assertEquals(3, count($charges));
         $this->assertEquals(3.6, self::sumCost($charges));
-        $charges = self::$affiliateService->oneOffCharges($data["affiliate"]);
+        $charges = self::$affiliateService->oneOffCharges($data["affiliate"], $date);
         $this->assertEquals(0, count($charges));
         $this->assertEquals(0, self::sumCost($charges));
-        sleep(60 * 60 * 24 * 365);
+        static::jumpDays($date, 365);
         $charges = [];
-        self::$affiliateService->oneOffCharges($data["affiliate"], $charges);
+        self::$affiliateService->oneOffCharges($data["affiliate"], $date, $charges);
         $this->assertEquals(2, count($charges));
         $this->assertEquals(2.4, self::sumCost($charges));
     }
@@ -178,10 +181,11 @@ class AffiliateServiceTest extends WebTestCase
      */
     public function testGetMatchingUsers($count, $states)
     {
-        $data = $this->createState();
+        $date = new \DateTime();
+        $data = $this->createState($date);
         $this->assertEquals(
             $count,
-            count(self::$affiliateService->getMatchingUsers($data["affiliate"], $states))
+            count(self::$affiliateService->getMatchingUsers($data["affiliate"], $date, $states))
         );
     }
 
@@ -219,9 +223,10 @@ class AffiliateServiceTest extends WebTestCase
     /**
      * Every time you call this function it generates a bunch of unique but also predictable data and puts it into the
      * database.
+     * @param \DateTime $date is the date to set everything as having been made at.
      * @return array an associative array with all the things held by the non unique part of their name.
      */
-    private static function createState()
+    private static function createState($date)
     {
         $prefix = uniqid();
         $affiliate = self::createTestAffiliate(
@@ -233,18 +238,18 @@ class AffiliateServiceTest extends WebTestCase
             "{$prefix}campaign",
             "{$prefix}lead"
         );
-        $cancel =  self::createTestUser("P40D", "{$prefix}cancel", "{$prefix}campaign");
+        $cancel =  self::createTestUser("P40D", "{$prefix}cancel", $date, "{$prefix}campaign");
         $policy = $cancel->getLatestPolicy();
         if ($policy) {
             $policy->setStatus(Policy::STATUS_CANCELLED);
         }
         return [
             "affiliate" => $affiliate,
-            "bango" => self::createTestUser("P10D", "{$prefix}bango", "{$prefix}campaign"),
-            "tango" => self::createTestUser("P20D", "{$prefix}tango", "", "{$prefix}lead"),
-            "hat" => self::createTestUser("P30D", "{$prefix}hat", "{$prefix}campaign"),
-            "borb" => self::createTestUser("P40D", "{$prefix}borb", "", "{$prefix}lead"),
-            "tonyAbbot" => self::createTestUser("P50D", "{$prefix}tonyAbbot", "{$prefix}campaign"),
+            "bango" => self::createTestUser("P10D", "{$prefix}bango", $date, "{$prefix}campaign"),
+            "tango" => self::createTestUser("P20D", "{$prefix}tango", $date, "", "{$prefix}lead"),
+            "hat" => self::createTestUser("P30D", "{$prefix}hat", $date, "{$prefix}campaign"),
+            "borb" => self::createTestUser("P40D", "{$prefix}borb", $date, "", "{$prefix}lead"),
+            "tonyAbbot" => self::createTestUser("P50D", "{$prefix}tonyAbbot", $date, "{$prefix}campaign"),
             "camel" => self::createLonelyTestUser("{$prefix}camel", "", "{$prefix}lead"),
             "cancel" => $cancel,
             "prefix" => $prefix
@@ -285,17 +290,17 @@ class AffiliateServiceTest extends WebTestCase
 
     /**
      * Creates a test user with a policy.
-     * @param string $policyAge is the start date of the policy.
-     * @param string $name      is the first and last names and email address of the user.
-     * @param string $source    is the campaign source of the user.
-     * @param string $lead      is the lead source of the user.
+     * @param string    $policyAge is the start date of the policy.
+     * @param string    $name      is the first and last names and email address of the user.
+     * @param \DateTime $date      is the date which the user was created policyAge days before.
+     * @param string    $source    is the campaign source of the user.
+     * @param string    $lead      is the lead source of the user.
      * @return User the user that has now been created.
      */
-    private static function createTestUser($policyAge, $name, $source = "", $lead = "")
+    private static function createTestUser($policyAge, $name, $date, $source = "", $lead = "")
     {
-        $time = \DateTime::createFromFormat("U", time());
-        $time->sub(new \DateInterval($policyAge));
-        $policy = self::createUserPolicy(true, $time);
+        $time = clone $date;
+        $policy = self::createUserPolicy(true, $time->sub(new \DateInterval($policyAge)));
         $policy->getUser()->setEmail(self::generateEmailClass($name, "affiliateServiceTest"));
         $policy->setStatus(Policy::STATUS_ACTIVE);
         $policy->setImei(self::generateRandomImei());
@@ -338,15 +343,16 @@ class AffiliateServiceTest extends WebTestCase
 
     /**
      * Creates a new policy for a given user and gives it a given start date.
-     * @param User $user is the user to add the new policy to.
+     * @param User      $user is the user to add the new policy to.
+     * @param \DateTime $date is the date to set the creation of the policy to have occurred at.
      * @return Policy the new policy created.
      */
-    private static function createTestPolicy($user)
+    private static function createTestPolicy($user, $date)
     {
         $policy = new PhonePolicy();
         $policy->setStatus(Policy::STATUS_ACTIVE);
         $policy->setUser($user);
-        $policy->setStart(\DateTime::createFromFormat('U', time()));
+        $policy->setStart(clone $date);
         $user->addPolicy($policy);
         self::$dm->persist($policy);
         self::$dm->flush();
@@ -355,10 +361,11 @@ class AffiliateServiceTest extends WebTestCase
 
     /**
      * Adds a new policy to the given user which is a renewal of their last policy.
-     * @param User $user is the user who must have an existing policy for this to work.
+     * @param User      $user is the user who must have an existing policy for this to work.
+     * @param \DateTime $date is the date to set the renewal to have occured at.
      * @return Policy|null the policy that was just created.
      */
-    private static function renewal($user)
+    private static function renewal($user, $date)
     {
         $policy = $user->getLatestPolicy();
         if (!$policy) {
@@ -367,7 +374,7 @@ class AffiliateServiceTest extends WebTestCase
         $policy->setStatus(Policy::STATUS_RENEWAL);
         $renewal = new PhonePolicy();
         $renewal->setUser($user);
-        $renewal->setStart(\DateTime::createFromFormat("U", time()));
+        $renewal->setStart(clone $date);
         $renewal->setStatus(Policy::STATUS_ACTIVE);
         $policy->link($renewal);
         $user->addPolicy($renewal);
