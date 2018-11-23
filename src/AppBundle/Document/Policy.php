@@ -4401,6 +4401,23 @@ abstract class Policy
         return $result;
     }
 
+    public function hasScheduledPaymentInCurrentMonth(\DateTime $date = null)
+    {
+        if (!$date) {
+            $date = \DateTime::createFromFormat('U', time());
+        }
+
+        $nextPayment = $this->getNextScheduledPayment() ? $this->getNextScheduledPayment()->getScheduled() : false;
+
+        if ($nextPayment) {
+            if ($nextPayment->format('m Y') == $date->format('m Y')) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public function getOutstandingScheduledPaymentsAmount()
     {
         $scheduledPayments = $this->getAllScheduledPayments(ScheduledPayment::STATUS_SCHEDULED);

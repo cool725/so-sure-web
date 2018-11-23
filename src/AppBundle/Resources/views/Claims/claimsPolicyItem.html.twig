@@ -805,8 +805,14 @@
                         {% if policy.premiumPlan == 'monthly' %}
                             {{ form_start(billing_form, {'attr': {'class': 'form-inline'}}) }}
                             {{ form_widget(billing_form.day) }}
-                            {{ form_widget(billing_form.update, {'label': 'Change billing date', 'attr': {'class': 'btn btn-danger confirm-submit'}}) }}
-                            {{ form_end(billing_form) }}
+
+                            {% if policy.hasScheduledPaymentInCurrentMonth %}
+                                {{ form_widget(billing_form.update, {'label': 'Change billing date', 'attr': {'class': 'btn btn-danger confirm-date'}}) }}
+                            {% else %}
+                                {{ form_widget(billing_form.update, {'label': 'Change billing date', 'attr': {'class': 'btn btn-danger confirm-submit'}}) }}
+                            {% endif %}
+
+                                {{ form_end(billing_form) }}
                             {% if not policy.isPolicyPaidToDate %}<strong>Policy must be paid to date before update is allowed</strong>{% endif %}
                         {% else %}
                             Policy either does not yet exist, or is an annual policy. Billing date change is not allowed.
