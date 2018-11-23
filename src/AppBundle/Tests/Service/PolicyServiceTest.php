@@ -965,6 +965,38 @@ class PolicyServiceTest extends WebTestCase
         $policy->setBilling($billingDate);
     }
 
+    public function testHasScheduledPaymentInCurrentMonth()
+    {
+        $date = \DateTime::createFromFormat('U', time());
+
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testHasScheduledPaymentInCurrentMonth', $this),
+            'foo',
+            static::$dm
+        );
+
+        $policy = static::initPolicy(
+            $user,
+            static::$dm,
+            $this->getRandomPhone(static::$dm),
+            $date,
+            true,
+            true
+        );
+
+        $this->assertNotNull($policy->getStatus());
+        $this->assertFalse($policy->hasScheduledPaymentInCurrentMonth($date));
+
+        $scheduledPayment = new ScheduledPayment();
+        $scheduledPayment->setStatus(ScheduledPayment::STATUS_SCHEDULED);
+        $scheduledPayment->setScheduled(\DateTime::createFromFormat('U', time()));
+
+        $policy->addScheduledPayment($scheduledPayment);
+
+        $this->assertTrue($policy->hasScheduledPaymentInCurrentMonth($date));
+    }
+
     public function testAdjustScheduledPaymentsEarlierDate()
     {
         $user = static::createUser(
