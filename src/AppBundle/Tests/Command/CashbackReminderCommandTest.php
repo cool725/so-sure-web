@@ -44,15 +44,26 @@ class CashbackReminderCommandTest extends BaseControllerTest
 
     public function testCashbackMissingReminder()
     {
-        $policy = self::createUserPolicy(true);
-        $policy->getUser()->setEmail(self::generateEmail('testCashbackMissingReminder', $this));
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testCashbackMissingReminder', $this),
+            'foo',
+            null,
+            static::$dm
+        );
+
+        $policy = static::initPolicy(
+            $user,
+            static::$dm,
+            null,
+            null
+        );
+
         $policy->setStatus(Policy::STATUS_EXPIRED);
+        $cashback = self::createCashback($policy, \DateTime::createFromFormat('U', time()), Cashback::STATUS_MISSING);
 
-        $cashback = self::createCashback($policy, new \DateTime(), Cashback::STATUS_MISSING);
-
-        self::$dm->persist($policy->getPhone());
         self::$dm->persist($cashback);
-        self::$dm->persist($policy->getUser());
+        self::$dm->persist($user);
         self::$dm->persist($policy);
         self::$dm->flush();
 
@@ -66,15 +77,30 @@ class CashbackReminderCommandTest extends BaseControllerTest
 
     public function testCashbackPendingReminder()
     {
-        $policy = self::createUserPolicy(true);
-        $policy->getUser()->setEmail(self::generateEmail('testCashbackPendingReminder', $this));
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testCashbackPendingReminder', $this),
+            'foo',
+            null,
+            static::$dm
+        );
+
+        $policy = static::initPolicy(
+            $user,
+            static::$dm,
+            null,
+            null
+        );
+
         $policy->setStatus(Policy::STATUS_EXPIRED);
+        $cashback = self::createCashback(
+            $policy,
+            \DateTime::createFromFormat('U', time()),
+            Cashback::STATUS_PENDING_PAYMENT
+        );
 
-        $cashback = self::createCashback($policy, new \DateTime(), Cashback::STATUS_PENDING_PAYMENT);
-
-        self::$dm->persist($policy->getPhone());
         self::$dm->persist($cashback);
-        self::$dm->persist($policy->getUser());
+        self::$dm->persist($user);
         self::$dm->persist($policy);
         self::$dm->flush();
 
