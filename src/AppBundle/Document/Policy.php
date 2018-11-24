@@ -4,6 +4,9 @@ namespace AppBundle\Document;
 
 use AppBundle\Document\Invitation\AppNativeShareInvitation;
 use AppBundle\Document\Invitation\Invitation;
+use AppBundle\Document\Note\CallNote;
+use AppBundle\Document\Note\Note;
+use AppBundle\Document\Note\StandardNote;
 use AppBundle\Document\Payment\BacsIndemnityPayment;
 use AppBundle\Document\Payment\BacsPayment;
 use AppBundle\Document\Payment\ChargebackPayment;
@@ -488,6 +491,11 @@ abstract class Policy
     protected $notes = array();
 
     /**
+     * @MongoDB\EmbedMany(targetDocument="AppBundle\Document\Note\Note")
+     */
+    protected $notesList = array();
+
+    /**
      * @Assert\DateTime()
      * @MongoDB\Field(type="date")
      * @Gedmo\Versioned
@@ -539,6 +547,7 @@ abstract class Policy
         $this->acceptedConnections = new \Doctrine\Common\Collections\ArrayCollection();
         $this->acceptedConnectionsRenewal = new \Doctrine\Common\Collections\ArrayCollection();
         $this->scheduledPayments = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->notesList = new \Doctrine\Common\Collections\ArrayCollection();
         $this->potValue = 0;
     }
 
@@ -1967,12 +1976,48 @@ abstract class Policy
         return $this->notes;
     }
 
-    public function addNote($note)
+    public function removeNote($time)
     {
-        $now = \DateTime::createFromFormat('U', time());
-        $this->notes[$now->getTimestamp()] = $note;
+        unset($this->notes[$time]);
     }
 
+    public function getNotesList()
+    {
+        return $this->notesList;
+    }
+
+    public function addNoteDetails($notes, User $user = null, \DateTime $date = null)
+    {
+        $note = new StandardNote();
+        $note->setNotes($notes);
+        if ($user) {
+            $note->setUser($user);
+        }
+        if ($date) {
+            $note->setDate($date);
+        }
+        $this->notesList[] = $note;
+    }
+
+    public function addNoteCalled(
+        User $user,
+        $contacted,
+        $callResult,
+        $notes,
+        $voicemail = null,
+        $emailed = null,
+        $sms = null
+    ) {
+        $note = new CallNote();
+        $note->setUser($user);
+        $note->setResult($callResult);
+        $note->setVoicemail($voicemail);
+        $note->setEmailed($emailed);
+        $note->setSms($sms);
+        $this->notesList[] = $note;
+    }
+
+    // TODO: Adjust
     public function getLatestNoteTimestamp()
     {
         $timestamp = 0;
@@ -1985,6 +2030,7 @@ abstract class Policy
         return $timestamp;
     }
 
+    // TODO: Adjust
     public function getLatestNoteTimestampColour()
     {
         if (count($this->getNotes()) == 0) {

@@ -505,11 +505,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                 if ($imeiForm->isValid()) {
                     $policy->adjustImei($imei->getImei(), false);
 
-                    $policy->addNote(json_encode([
-                        'user_id' => $this->getUser()->getId(),
-                        'name' => $this->getUser()->getName(),
-                        'notes' => $imei->getNote()
-                    ]));
+                    $policy->addNoteDetails($this->getUser(), $imei->getNote());
 
                     $dm->flush();
                     $this->addFlash(
@@ -737,11 +733,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             } elseif ($request->request->has('note_form')) {
                 $noteForm->handleRequest($request);
                 if ($noteForm->isValid()) {
-                    $policy->addNote(json_encode([
-                        'user_id' => $this->getUser()->getId(),
-                        'name' => $this->getUser()->getName(),
-                        'notes' => $noteForm->getData()['notes']
-                    ]));
+                    $policy->addNoteDetails($this->getUser(), $noteForm->getData()['notes']);
                     $dm->flush();
                     $this->addFlash(
                         'success',

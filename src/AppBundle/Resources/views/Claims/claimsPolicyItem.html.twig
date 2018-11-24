@@ -377,13 +377,16 @@
                 </div>
                 <div class="col-md-5">
                     <h2>Notes</h2>
-                    {% for time,note in policy.notes %}
-                        {% set note_decoded = note|json_decode() %}
+                    {% for note in policy.notesList %}
                       <div class="row">
-                        <b>{{ time|date }} by {{ note_decoded.name }}</b>
+                        <b>{{ note.date|date }} by {{ note.userName }}</b>
                       </div>
                       <div class="row">
-                        {{ note_decoded.notes }}
+                          {% if note.type == 'call' %}
+                            Call result: {{ note.result }} Actions: {{ note.actions }}  Additional details: {{ note.notes }}
+                          {% else %}
+                            {{ note.notes }}
+                          {% endif %}
                       </div>
                     {% endfor %}
                     <hr class="strong">

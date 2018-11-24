@@ -866,6 +866,19 @@ abstract class BaseController extends Controller
             $policiesQb = $policiesQb->addAnd(
                 $policiesQb->expr()->field('cancelledReason')->notIn([Policy::CANCELLED_UPGRADE])
             );
+        } elseif ($status == 'call') {
+            $policiesQb = $policiesQb->addAnd(
+                $policiesQb->expr()->field('status')->in([Policy::STATUS_UNPAID])
+            );
+        } elseif ($status == 'called') {
+            $policiesQb = $policiesQb->addAnd(
+                $policiesQb->expr()->field('notesList.type')->equals('call')
+            );
+            $oneWeekAgo = \DateTime::createFromFormat('U', time());
+            $oneWeekAgo = $oneWeekAgo->sub(new \DateInterval('P7D'));
+            $policiesQb = $policiesQb->addAnd(
+                $policiesQb->expr()->field('notesList.date')->gte($oneWeekAgo)
+            );
         } elseif ($status == Policy::STATUS_EXPIRED_CLAIMABLE) {
             $policiesQb = $policiesQb->addAnd(
                 $policiesQb->expr()->field('status')->in([Policy::STATUS_EXPIRED_CLAIMABLE])
@@ -952,6 +965,18 @@ abstract class BaseController extends Controller
             $policies = $policiesQb->getQuery()->execute()->toArray();
             $policies = array_filter($policies, function ($policy) {
                 return $policy->isCancelledAndPaymentOwed();
+            });
+            // sort older to more recent
+            usort($policies, function ($a, $b) {
+                return $a->getPolicyExpirationDate() > $b->getPolicyExpirationDate();
+            });
+            $pager = $this->arrayPager($request, $policies);
+        } elseif ($status == 'call') {
+            $policies = $policiesQb->getQuery()->execute()->toArray();
+            $policies = array_filter($policies, function ($policy) {
+                /** @var Policy $policy */
+                // TODO 14 days & no calls or 7 days & 1 call
+                return $policy->getPolicyExpirationDateDays() <= 14;
             });
             // sort older to more recent
             usort($policies, function ($a, $b) {

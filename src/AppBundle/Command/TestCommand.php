@@ -51,12 +51,49 @@ class TestCommand extends ContainerAwareCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         // $this->testBirthday();
-        /*
-        $claim = new Claim();
-        $claim->setNotificationDate(\DateTime::createFromFormat('U', time()));
-        print_r($this->getDataChangeAnnotation($claim, 'salva'));
-        */
+        // $this->removeOrphanUsersOnCharges($output);
 
+        $this->updateNotes();
+
+        $output->writeln('Finished');
+    }
+
+    private function updateNotes()
+    {
+        $repo = $this->dm->getRepository(Policy::class);
+        $userRepo = $this->dm->getRepository(User::class);
+        $polices = $repo->findAll();
+        foreach ($polices as $policy) {
+            try {
+                $updated = false;
+                /** @var Policy $policy */
+                $notes = $policy->getNotes();
+                foreach ($notes as $time => $note) {
+                    $date = \DateTime::createFromFormat('U', $time);
+                    try {
+                        $details = json_decode($note, true);
+                        $user = $userRepo->find($details['user_id']);
+                        $policy->addNoteDetails($details['notes'], $user, $date);
+                    } catch (\Exception $e) {
+                        if (is_string($note)) {
+                            $policy->addNoteDetails($note, null, $date);
+                        }
+                    }
+                    $policy->removeNote($time);
+                    $updated = true;
+                }
+
+                if ($updated) {
+                    $this->dm->flush();
+                }
+            } catch(\Exception $e) {
+                throw new \Exception(sprintf('Error in policy %s. Ex: %s', $policy->getId(), $e->getMessage()));
+            }
+        }
+    }
+
+    private function removeOrphanUsersOnCharges(OutputInterface $output)
+    {
         $repo = $this->dm->getRepository(Charge::class);
         foreach ($repo->findAll() as $charge) {
             /** @var Charge $charge */
@@ -71,8 +108,6 @@ class TestCommand extends ContainerAwareCommand
                 $this->dm->flush();
             }
         }
-
-        $output->writeln('Finished');
     }
 
     private function testBirthday()
