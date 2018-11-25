@@ -30,7 +30,7 @@ class CallNote extends Note
     const RESULT_UPGRADE = 'UPGRADE';
     const RESULT_LOST = 'Lost';
 
-    public $results = [
+    public static $results = [
         self::RESULT_NO_ANSWER => self::RESULT_NO_ANSWER,
         self::RESULT_WILL_PAY => self::RESULT_WILL_PAY,
         self::RESULT_NOT_CONNECTED => self::RESULT_NOT_CONNECTED,

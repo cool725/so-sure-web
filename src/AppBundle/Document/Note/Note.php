@@ -23,6 +23,9 @@ use AppBundle\Document\CurrencyTrait;
  */
 abstract class Note
 {
+    const TYPE_CALL = 'call';
+    const TYPE_STANDARD = 'standard';
+
     /**
      * @Assert\DateTime()
      * @MongoDB\Field(type="date")
@@ -97,11 +100,11 @@ abstract class Note
     public function getType()
     {
         if ($this instanceof StandardNote) {
-            return 'standard';
+            return self::TYPE_STANDARD;
         } elseif ($this instanceof CallNote) {
-            return 'call';
+            return self::TYPE_CALL;
         }
 
-        return 'unknown';
+        return null;
     }
 }

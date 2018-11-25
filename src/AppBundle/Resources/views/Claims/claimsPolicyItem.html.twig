@@ -383,7 +383,9 @@
                       </div>
                       <div class="row">
                           {% if note.type == 'call' %}
-                            Call result: {{ note.result }} Actions: {{ note.actions }}  Additional details: {{ note.notes }}
+                              Call result: <strong>{{ note.result }}</strong><br>
+                              Additional Actions: <strong>{% if note.actions|length == 0 %}n/a{% else %}{{ note.actions }}{% endif %}</strong><br>
+                              Additional Details: <strong>{% if note.notes|length == 0 %}n/a{% else %}{{ note.notes }}{% endif %}</strong>
                           {% else %}
                             {{ note.notes }}
                           {% endif %}

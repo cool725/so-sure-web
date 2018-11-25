@@ -975,8 +975,20 @@ abstract class BaseController extends Controller
             $policies = $policiesQb->getQuery()->execute()->toArray();
             $policies = array_filter($policies, function ($policy) {
                 /** @var Policy $policy */
-                // TODO 14 days & no calls or 7 days & 1 call
-                return $policy->getPolicyExpirationDateDays() <= 14;
+                $fourteenDays = \DateTime::createFromFormat('U', time());
+                $fourteenDays = $fourteenDays->sub(new \DateInterval('P14D'));
+                $sevenDays = \DateTime::createFromFormat('U', time());
+                $sevenDays = $fourteenDays->sub(new \DateInterval('P7D'));
+
+                // 14 days & no calls or 7 days & at most 1 call
+                if ($policy->getPolicyExpirationDateDays() <= 14 && $policy->getNoteCalledCount($fourteenDays) == 0) {
+                    return true;
+                } elseif ($policy->getPolicyExpirationDateDays() <= 7 &&
+                    $policy->getNoteCalledCount($fourteenDays) <= 1) {
+                    return true;
+                } else {
+                    return false;
+                }
             });
             // sort older to more recent
             usort($policies, function ($a, $b) {
@@ -992,7 +1004,8 @@ abstract class BaseController extends Controller
         return [
             'policies' => $pager->getCurrentPageResults(),
             'pager' => $pager,
-            'form' => $form->createView()
+            'form' => $form->createView(),
+            'status' => $status,
         ];
     }
 

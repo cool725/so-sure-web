@@ -6,15 +6,18 @@ use AppBundle\Document\AffiliateCompany;
 use AppBundle\Document\BacsPaymentMethod;
 use AppBundle\Document\File\PaymentRequestUploadFile;
 use AppBundle\Document\JudoPaymentMethod;
+use AppBundle\Document\Note\CallNote;
 use AppBundle\Exception\PaymentDeclinedException;
 use AppBundle\Form\Type\AdminEmailOptOutType;
 use AppBundle\Form\Type\BacsCreditType;
+use AppBundle\Form\Type\CallNoteType;
 use AppBundle\Form\Type\PaymentRequestUploadFileType;
 use AppBundle\Form\Type\UploadFileType;
 use AppBundle\Form\Type\UserHandlingTeamType;
 use AppBundle\Repository\ClaimRepository;
 use AppBundle\Repository\PhonePolicyRepository;
 use AppBundle\Repository\PhoneRepository;
+use AppBundle\Repository\PolicyRepository;
 use AppBundle\Security\FOSUBUserProvider;
 use AppBundle\Service\BacsService;
 use AppBundle\Service\FraudService;
@@ -362,13 +365,40 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
      */
     public function adminPoliciesAction(Request $request)
     {
+        $callNote = new \AppBundle\Document\Form\CallNote();
+        $callNote->setUser($this->getUser());
+        $callForm = $this->get('form.factory')
+            ->createNamedBuilder('call_form', CallNoteType::class, $callNote)
+            ->getForm();
+        if ('POST' === $request->getMethod()) {
+            if ($request->request->has('call_form')) {
+                $callForm->handleRequest($request);
+                if ($callForm->isValid()) {
+                    /** @var PolicyRepository $repo */
+                    $repo = $this->getManager()->getRepository(Policy::class);
+                    /** @var Policy $policy */
+                    $policy = $repo->find($callNote->getPolicyId());
+                    if ($policy) {
+                        $policy->addNotesList($callNote->toCallNote());
+                        $this->getManager()->flush();
+
+                        $this->addFlash('success', 'Recorded call');
+                    } else {
+                        $this->addFlash('error', 'Unable to record call');
+                    }
+
+                    return new RedirectResponse($request->getUri());
+                }
+            }
+        }
         try {
             $data = $this->searchPolicies($request);
         } catch (RedirectException $e) {
             return new RedirectResponse($e->getMessage());
         }
         return array_merge($data, [
-            'policy_route' => 'admin_policy'
+            'policy_route' => 'admin_policy',
+            'call_form' => $callForm->createView(),
         ]);
     }
 
@@ -520,7 +550,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
 
         return [
             'form' => $imeiForm->createView(),
-            'policy' => $policy
+            'policy' => $policy,
         ];
     }
 

@@ -1986,6 +1986,11 @@ abstract class Policy
         return $this->notesList;
     }
 
+    public function addNotesList(Note $note)
+    {
+        $this->notesList[] = $note;
+    }
+
     public function addNoteDetails($notes, User $user = null, \DateTime $date = null)
     {
         $note = new StandardNote();
@@ -1996,49 +2001,47 @@ abstract class Policy
         if ($date) {
             $note->setDate($date);
         }
-        $this->notesList[] = $note;
+        $this->addNotesList($note);
     }
 
-    public function addNoteCalled(
-        User $user,
-        $contacted,
-        $callResult,
-        $notes,
-        $voicemail = null,
-        $emailed = null,
-        $sms = null
-    ) {
-        $note = new CallNote();
-        $note->setUser($user);
-        $note->setResult($callResult);
-        $note->setVoicemail($voicemail);
-        $note->setEmailed($emailed);
-        $note->setSms($sms);
-        $this->notesList[] = $note;
-    }
-
-    // TODO: Adjust
-    public function getLatestNoteTimestamp()
+    public function getNoteCalledCount(\DateTime $date)
     {
-        $timestamp = 0;
-        foreach ($this->getNotes() as $noteTimestamp => $note) {
-            if ($noteTimestamp > $timestamp) {
-                $timestamp = $noteTimestamp;
-            }
+        $notes = $this->getNotesList()->toArray();
+        if (count($notes) == 0) {
+            return 0;
         }
 
-        return $timestamp;
+        $notes = array_filter($notes, function($note) use ($date) {
+            /** @var Note $note */
+            return $note->getType() == Note::TYPE_CALL && $note->getDate() >= $date;
+        });
+
+        return count($notes);
     }
 
-    // TODO: Adjust
+    private function getLatestNotesDate()
+    {
+        $notes = $this->getNotesList()->toArray();
+        if (count($notes) == 0) {
+            return null;
+        }
+
+        // sort more recent to older
+        usort($notes, function ($a, $b) {
+            return $a->getDate() < $b->getDate();
+        });
+
+        return $notes[0]->getDate();
+    }
+
     public function getLatestNoteTimestampColour()
     {
-        if (count($this->getNotes()) == 0) {
+        $latest = $this->getLatestNotesDate();
+        if (!$latest) {
             return 'white';
         }
 
         $now = \DateTime::createFromFormat('U', time());
-        $latest = \DateTime::createFromFormat('U', $this->getLatestNoteTimestamp());
         $diff = $now->diff($latest);
 
         if ($diff->days > 30) {
