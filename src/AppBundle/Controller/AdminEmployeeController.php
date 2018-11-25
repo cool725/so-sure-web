@@ -7,6 +7,7 @@ use AppBundle\Document\BacsPaymentMethod;
 use AppBundle\Document\File\PaymentRequestUploadFile;
 use AppBundle\Document\JudoPaymentMethod;
 use AppBundle\Document\Note\CallNote;
+use AppBundle\Document\Note\Note;
 use AppBundle\Exception\PaymentDeclinedException;
 use AppBundle\Form\Type\AdminEmailOptOutType;
 use AppBundle\Form\Type\BacsCreditType;
@@ -28,7 +29,9 @@ use AppBundle\Service\ReportingService;
 use AppBundle\Service\RouterService;
 use AppBundle\Service\SalvaExportService;
 use AppBundle\Service\AffiliateService;
+use Doctrine\ODM\MongoDB\Query\Builder;
 use Gedmo\Loggable\Document\Repository\LogEntryRepository;
+use Grpc\Call;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -400,6 +403,121 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             'policy_route' => 'admin_policy',
             'call_form' => $callForm->createView(),
         ]);
+    }
+
+    /**
+     * @Route("/policies/called-list", name="admin_policies_called_list")
+     */
+    public function adminPoliciesCalledListAction(Request $request)
+    {
+        $dm = $this->getManager();
+        /** @var PolicyRepository $policyRepo */
+        $policyRepo = $dm->getRepository(Policy::class);
+
+        /** @var Builder $policiesQb */
+        $policiesQb = $policyRepo->createQueryBuilder()
+            ->eagerCursor(true)
+            ->field('user')->prime(true);
+        $policiesQb = $policiesQb->addAnd(
+            $policiesQb->expr()->field('notesList.type')->equals('call')
+        );
+
+        $now = new \DateTime();
+        $year = $now->format('Y');
+        $weekNum = $now->format('W');
+
+        $startWeek = new \DateTime();
+        $startWeek->setISODate($year, $weekNum - 1);
+        $endWeek = new \DateTime();
+        $endWeek->setISODate($year, $weekNum);
+        if ($request->get('week') == 'now') {
+            $startWeek = new \DateTime();
+            $startWeek->setISODate($year, $weekNum);
+            $endWeek = new \DateTime();
+            $endWeek->setISODate($year, $weekNum + 1);
+        }
+
+        $policiesQb = $policiesQb->addAnd(
+            $policiesQb->expr()->field('notesList.date')->gte($startWeek)
+        );
+        $policiesQb = $policiesQb->addAnd(
+            $policiesQb->expr()->field('notesList.date')->lt($endWeek)
+        );
+        $policies = $policiesQb->getQuery()->execute();
+
+        $response = new StreamedResponse();
+        $response->setCallback(function () use ($policies) {
+            $handle = fopen('php://output', 'w+');
+
+            // Add the header of the CSV file
+            fputcsv($handle, [
+                'Date',
+                'Name',
+                'Email',
+                'Policy Number',
+                'Phone Number',
+                'Claim',
+                'Cost of claims',
+                'Termination Date',
+                'Days Before Termination',
+                'Present status',
+                'Call',
+                'Note',
+                'Voicemail',
+                'Other Actions',
+                'All actions',
+                'Category',
+                'Termination week number',
+                'Call week number',
+                'Call month',
+                'Cancellation month',
+            ]);
+            foreach ($policies as $policy) {
+                /** @var Policy $policy */
+                /** @var CallNote $note */
+                $note = $policy->getLatestNoteByType(Note::TYPE_CALL);
+                $approvedClaims = $policy->getApprovedClaims(true);
+                $claimsCost = 0;
+                foreach ($approvedClaims as $approvedClaim) {
+                    /** @var Claim $approvedClaim */
+                    $claimsCost += $approvedClaim->getTotalIncurred();
+                }
+                $line = [
+                    $note->getDate()->format('Y-m-d'),
+                    $policy->getUser()->getName(),
+                    $policy->getUser()->getEmail(),
+                    $policy->getPolicyNumber(),
+                    $policy->getUser()->getMobileNumber(),
+                    count($approvedClaims),
+                    $claimsCost,
+                    $policy->getPolicyExpirationDate()->format('Y-m-d'),
+                    'FORMULA',
+                    $policy->getStatus(),
+                    'Yes',
+                    $note->getResult(),
+                    $note->getVoicemail() ? 'Yes' : '',
+                    $note->getOtherActions(),
+                    $note->getActions(true),
+                    $note->getCategory(),
+                    $policy->getPolicyExpirationDate()->format('W'),
+                    $note->getDate()->format('W'),
+                    $note->getDate()->format('M'),
+                    $policy->getPolicyExpirationDate()->format('M'),
+                ];
+                fputcsv(
+                    $handle, // The file pointer
+                    $line
+                );
+            }
+
+            fclose($handle);
+        });
+
+        $response->setStatusCode(200);
+        $response->headers->set('Content-Type', 'text/csv; charset=utf-8');
+        $response->headers->set('Content-Disposition', 'attachment; filename="so-sure-connections.csv"');
+
+        return $response;
     }
 
     /**

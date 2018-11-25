@@ -2019,6 +2019,25 @@ abstract class Policy
         return count($notes);
     }
 
+    public function getLatestNoteByType($type)
+    {
+        $notes = $this->getNotesList()->toArray();
+        $notes = array_filter($notes, function ($note) use ($type) {
+            /** @var Note $note */
+            return $note->getType() == $type;
+        });
+        if (count($notes) == 0) {
+            return null;
+        }
+
+        // sort more recent to older
+        usort($notes, function ($a, $b) {
+            return $a->getDate() < $b->getDate();
+        });
+
+        return $notes[0];
+    }
+
     private function getLatestNotesDate()
     {
         $notes = $this->getNotesList()->toArray();

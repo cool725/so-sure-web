@@ -122,10 +122,20 @@
 
     </div>
     {{ form_end(form) }}
-    <h2>{{ pager.nbResults }} Results</h2>
-    <p>
-      <em>Tip: Simply click on the policy number to view that person's details.</em>
-    </p>
+    <div class="row-fluid">
+        <div class="col-sm-6">
+            <h2>{{ pager.nbResults }} Results</h2>
+            <p>
+                <em>Tip: Simply click on the policy number to view that person's details.</em>
+            </p>
+        </div>
+        <div class="col-sm-6" class="pull-right" style="margin-top: 20px">
+            {% if is_granted('ROLE_EMPLOYEE') and (status == 'call' or status == 'called') %}
+                <a href="{{ path('admin_policies_called_list') }}" title="Download last week" target="_blank"><i class="fa fa-2x fa-download"></i> </a>
+                <a href="{{ path('admin_policies_called_list', {'week': 'now'}) }}" title="Download this week" target="_blank"><i class="fa fa-2x fa-clock-o"></i> </a>
+            {% endif %}
+        </div>
+    </div>
     {% if policies|length == 0 %}
     <div class="row-fluid">
         <h2>No policies found</h2>
