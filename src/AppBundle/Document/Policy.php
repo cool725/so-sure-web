@@ -2011,7 +2011,7 @@ abstract class Policy
             return 0;
         }
 
-        $notes = array_filter($notes, function($note) use ($date) {
+        $notes = array_filter($notes, function ($note) use ($date) {
             /** @var Note $note */
             return $note->getType() == Note::TYPE_CALL && $note->getDate() >= $date;
         });

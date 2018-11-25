@@ -86,7 +86,7 @@ class TestCommand extends ContainerAwareCommand
                 if ($updated) {
                     $this->dm->flush();
                 }
-            } catch(\Exception $e) {
+            } catch (\Exception $e) {
                 throw new \Exception(sprintf('Error in policy %s. Ex: %s', $policy->getId(), $e->getMessage()));
             }
         }
