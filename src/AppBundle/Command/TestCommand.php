@@ -9,6 +9,7 @@ use AppBundle\Document\Claim;
 use AppBundle\Document\Opt\EmailOptOut;
 use AppBundle\Document\Opt\OptOut;
 use AppBundle\Document\User;
+use AppBundle\Validator\Constraints\AlphanumericSpaceDotValidator;
 use Doctrine\Common\Annotations\Reader;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
@@ -63,6 +64,7 @@ class TestCommand extends ContainerAwareCommand
         $repo = $this->dm->getRepository(Policy::class);
         $userRepo = $this->dm->getRepository(User::class);
         $polices = $repo->findAll();
+        $validator = new AlphanumericSpaceDotValidator();
         foreach ($polices as $policy) {
             try {
                 $updated = false;
@@ -73,10 +75,10 @@ class TestCommand extends ContainerAwareCommand
                     try {
                         $details = json_decode($note, true);
                         $user = $userRepo->find($details['user_id']);
-                        $policy->addNoteDetails($details['notes'], $user, $date);
+                        $policy->addNoteDetails($validator->conform($details['notes']), $user, $date);
                     } catch (\Exception $e) {
                         if (is_string($note)) {
-                            $policy->addNoteDetails($note, null, $date);
+                            $policy->addNoteDetails($validator->conform($note), null, $date);
                         }
                     }
                     $policy->removeNote($time);
