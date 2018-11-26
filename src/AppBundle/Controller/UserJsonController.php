@@ -134,10 +134,9 @@ class UserJsonController extends BaseController
             return new JsonResponse(["message" => "self-invite"], 400);
         }
         $this->denyAccessUnlessGranted(UserVoter::VIEW, $user);
-
         try {
-            $this->get("app.invitation")->inviteByEmail($user->getLatestPolicy(), $email);
-            return new Response(200);
+            $this->get("app.invitation")->inviteByEmail($policy, $email);
+            return new JsonResponse(["message" => "success"], 200);
         } catch (InvalidPolicyException $e) {
             return new JsonResponse(["message" => "invalid-policy"], 400);
         } catch (SelfInviteException $e) {
@@ -180,9 +179,9 @@ class UserJsonController extends BaseController
         if ($sent) {
             $sixpack = $this->get('app.sixpack');
             $sixpack->convertByClientId($user->getId(), $sixpack::EXPERIMENT_APP_LINK_SMS);
-            return new Response(200);
+            return new JsonResponse(["message" => "success"], 200);
         } else {
-            return new Response(500);
+            return new JsonResponse(["message" => "failure"] ,500);
         }
     }
 
@@ -196,7 +195,7 @@ class UserJsonController extends BaseController
         $s3 = $this->get("app.twig.s3");
         $policy = $user->getLatestPolicy();
         if (!$policy) {
-            return new Response(400);
+            return new JsonResponse(["message" => "no-policy"], 400);
         }
         $policyService = $this->get("app.policy");
         $policyTermsFile = $policy->getLatestPolicyTermsFile();
