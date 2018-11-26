@@ -154,39 +154,8 @@
         </div>
     </section>
 
-    <section class="claims py-lg-5">
-        <div class="container container-xtra py-5">
-            <h2 class="h3 mb-3 text-primary">Our hassle-free claims process</h2>
-            <p class="mb-4">Need to claim, here's what happens</p>
-            <div class="row">
-                <div class="col-md-6 col-lg-4">
-                    <div class="claims__step">
-                        <div class="claims__number d-flex justify-content-center align-items-center h4 text-primary">1</div>
-                        <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_make-a-claim.png" alt="so-sure - Make a claim" width="180px">
-                    </div>
-                    <h5 class="text-primary">Launch your claim online</h5>
-                    <p class="mb-5">Is your phone lost, stolen or broken? Claiming with so-sure is easy, fast and pain-free. Get started using our online claims portal below</p>
-                </div>
-                <div class="col-md-6 col-lg-4">
-                    <div class="claims__step">
-                        <div class="claims__number d-flex justify-content-center align-items-center h4 text-primary">2</div>
-                        <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_claims-team.png" alt="so-sure - Review claim" width="180px">
-                    </div>
-                    <h5 class="text-primary">Review Claim</h5>
-                    <p class="mb-5">Our UK based claims team will review your claim and reach out with a request for any further details or documents</p>
-                </div>
-                <div class="col-md-6 col-lg-4">
-                    <div class="claims__step">
-                        <div class="claims__number d-flex justify-content-center align-items-center h4 text-primary">3</div>
-                        <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_delivery.png" alt="so-sure - Approve claim" width="180px">
-                    </div>
-                    <h5 class="text-primary">Approve Claim</h5>
-                    <p class="mb-2">Once approved, we take your excess payment over the phone and aim to repair or replace your phone within 24-72 hours</p>
-                </div>
-            </div>
-            <a href="{{ path('claim') }}" class="btn btn-primary btn-block-xs mt-3">Open the claims portal</a>
-        </div>
-    </section>
+    {# Claims Process #}
+    {% include 'AppBundle::Default/CommonSections/_claimsProcess.html.twig' %}
 
 {#     <section class="comparison py-lg-5">
         <div class="container container-xtra pb-5">
@@ -240,89 +209,8 @@
         </button>
     </section>
 
-    <section class="reviews py-lg-5">
-        <div class="container container-xtra py-5">
-            <div class="row">
-                <div class="col-lg-6">
-                    <h2 class="h3 mb-4 text-center text-lg-left">Don't just take our <br class="d-inline d-sm-none"> word for it!</h2>
-                    <div id="reviews_carousel"
-                         class="carousel slide carousel-fade"
-                         data-ride="carousel"
-                         data-interval="false">
-                        <div class="carousel-inner">
-                            <div class="carousel-item active">
-                                <div class="reviews__item text-center text-lg-left">
-                                    <span class="mt-2">
-                                        <i class="fas fa-star fa-lg text-primary"></i>
-                                        <i class="fas fa-star fa-lg text-primary"></i>
-                                        <i class="fas fa-star fa-lg text-primary"></i>
-                                        <i class="fas fa-star fa-lg text-primary"></i>
-                                        <i class="fas fa-star fa-lg text-primary"></i>
-                                    </span>
-                                    <p class="lead py-4">"My so-sure claim was super fast and everyone was really friendly! Based on previous phone insurance experiences, I can honestly say this truly is a revolution"</p>
-                                    <div class="reviews__footer mb-4">
-                                        <span class="h5 mr-2">Nick B</span> <strong>|</strong> <span class="ml-2">so-sure customer</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="carousel-item">
-                                <div class="reviews__item text-center text-lg-left">
-                                    <span class="mt-2">
-                                        <i class="fas fa-star fa-lg text-primary"></i>
-                                        <i class="fas fa-star fa-lg text-primary"></i>
-                                        <i class="fas fa-star fa-lg text-primary"></i>
-                                        <i class="fas fa-star fa-lg text-primary"></i>
-                                        <i class="fas fa-star fa-lg text-primary"></i>
-                                    </span>
-                                    <p class="lead py-4 text-zaffre">"Very happy with these guys, my phone was badly cracked after a fall, they picked it up, repaired it good as new in 2 days!  Claims team very nice, would highly recommend"</p>
-                                    <div class="reviews__footer mb-4">
-                                        <span class="h5 mr-2">Tommy P</span> <strong>|</strong> <span class="ml-2">so-sure customer</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="carousel-item">
-                                <div class="reviews__item text-center text-lg-left">
-                                    <span class="mt-2">
-                                        <i class="fas fa-star fa-lg text-primary"></i>
-                                        <i class="fas fa-star fa-lg text-primary"></i>
-                                        <i class="fas fa-star fa-lg text-primary"></i>
-                                        <i class="fas fa-star fa-lg text-primary"></i>
-                                        <i class="fas fa-star fa-lg text-primary"></i>
-                                    </span>
-                                    <p class="lead py-4">"Only paid 50 quid excess for my iphone X which is fab, app is really easy to use and a lady called kitti was very helpful in the claim and getting me my new phone"</p>
-                                    <div class="reviews__footer mb-4">
-                                        <span class="h5 mr-2">Paulo R</span> <strong>|</strong> <span class="ml-2">so-sure customer</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="reviews__controls text-center text-lg-left">
-                        <ul class="list-inline">
-                            <li class="list-inline-item">
-                                <a href="#reviews_carousel"
-                                   class="reviews__controls__prev pr-1"
-                                   role="button"
-                                   data-slide="prev">
-                                   <i class="far fa-long-arrow-alt-left fa-2x"></i>
-                                   <span class="sr-only">prev</span>
-                                </a>
-                            </li>
-                            <li class="list-inline-item">
-                                <a href="#reviews_carousel"
-                                   class="reviews__controls__next pl-1"
-                                   role="button"
-                                   data-slide="next">
-                                    <i class="far fa-long-arrow-alt-right fa-2x"></i>
-                                    <span class="sr-only">next</span>
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+    {# Reviews #}
+    {% include 'AppBundle::Default/CommonSections/_reviews.html.twig' %}
 
     <section class="banner py-5">
         <div class="container container-xtra">

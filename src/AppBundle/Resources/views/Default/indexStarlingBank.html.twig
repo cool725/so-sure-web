@@ -55,22 +55,19 @@
                 <div class="col-md-4">
                     <div class="why__container">
                         <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_phone-smile.png" alt="so-sure - 24-72 hour replacement" width="180px">
-                        <h4 class="text-dodger-blue">24-72 hour replacement</h4>
-                        {# <p>We understand it’s stressful to be without your phone, that’s why we aim to get you back up and running quickly after your claim is approved</p> #}
+                        <h4 class="text-dodger-blue">24-72 hour replace or repair</h4>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="why__container">
                         <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_wallet-cashback.png" alt="so-sure - Up to 80% money back"width="180px">
                         <h4 class="text-dodger-blue">Up to 80% money back</h4>
-                        {# <p>We reward our careful customers. If you and your connections don’t make a claim we return up to 80% of your premium back at the end of every policy year</p> #}
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="why__container">
                         <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_phone-qr.png" alt="so-sure - Low excess from just £50" width="180px">
                         <h4 class="text-dodger-blue">Low excess from just &pound;50</h4>
-                        {# <p>Our excess is as low as &pound;50 for accidental damage and &pound;70 for loss and theft when you validate your phone with our anti-fraud technology. If you don't validate your phone with our app, the excess is &pound;150</p> #}
                     </div>
                 </div>
             </div>
@@ -86,87 +83,8 @@
     {# We do things differently #}
     {% include 'AppBundle::Default/CommonSections/_weDoThingsDifferently.html.twig' %}
 
-    <section class="reviews py-lg-5">
-        <div class="container container-xtra py-5">
-            <div class="row">
-                <div class="col-lg-6">
-                    <h2 class="h3 mb-4 text-zaffre text-center text-lg-left">Don't just take our <br class="d-inline d-sm-none"> word for it!</h2>
-                    <div id="reviews_carousel"
-                         class="carousel slide carousel-fade"
-                         data-ride="carousel"
-                         data-interval="false">
-                        <div class="carousel-inner">
-                            <div class="carousel-item active">
-                                <div class="reviews__item text-center text-lg-left">
-                                    <span class="mt-2">
-                                        <i class="fas fa-star fa-lg text-primary"></i>
-                                        <i class="fas fa-star fa-lg text-primary"></i>
-                                        <i class="fas fa-star fa-lg text-primary"></i>
-                                        <i class="fas fa-star fa-lg text-primary"></i>
-                                        <i class="fas fa-star fa-lg text-primary"></i>
-                                    </span>
-                                    <p class="lead py-4">"My so-sure claim was super fast and everyone was really friendly! Based on previous phone insurance experiences, I can honestly say this truly is a revolution"</p>
-                                    <div class="reviews__footer mb-4">
-                                        <span class="h5 text-zaffre mr-2">Nick B</span> <strong class="text-primary">|</strong> <span class="ml-2">so-sure customer</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="carousel-item">
-                                <div class="reviews__item text-center text-lg-left">
-                                    <span class="mt-2">
-                                        <i class="fas fa-star fa-lg text-primary"></i>
-                                        <i class="fas fa-star fa-lg text-primary"></i>
-                                        <i class="fas fa-star fa-lg text-primary"></i>
-                                        <i class="fas fa-star fa-lg text-primary"></i>
-                                        <i class="fas fa-star fa-lg text-primary"></i>
-                                    </span>
-                                    <p class="lead py-4">"Very happy with these guys, my phone was badly cracked after a fall, they picked it up, repaired it good as new in 2 days!  Claims team very nice, would highly recommend"</p>
-                                    <div class="reviews__footer mb-4">
-                                        <span class="h5 text-zaffre mr-2">Tommy P</span> <strong class="text-primary">|</strong> <span class="ml-2">so-sure customer</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="carousel-item">
-                                <div class="reviews__item text-center text-lg-left">
-                                    <span class="mt-2">
-                                        <i class="fas fa-star fa-lg text-primary"></i>
-                                        <i class="fas fa-star fa-lg text-primary"></i>
-                                        <i class="fas fa-star fa-lg text-primary"></i>
-                                        <i class="fas fa-star fa-lg text-primary"></i>
-                                        <i class="fas fa-star fa-lg text-primary"></i>
-                                    </span>
-                                    <p class="lead py-4">"Only paid 50 quid excess for my iphone X which is fab, app is really easy to use and a lady called kitti was very helpful in the claim and getting me my new phone"</p>
-                                    <div class="reviews__footer mb-4">
-                                        <span class="h5 text-zaffre mr-2">Paulo R</span> <strong class="text-primary">|</strong> <span class="ml-2">so-sure customer</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="reviews__controls text-center text-lg-left">
-                        <ul class="list-inline">
-                            <li class="list-inline-item">
-                                <a href="#reviews_carousel"
-                                   class="reviews__controls__prev pr-1"
-                                   role="button"
-                                   data-slide="prev">
-                                   <i class="far fa-long-arrow-alt-left fa-2x"></i>
-                                </a>
-                            </li>
-                            <li class="list-inline-item">
-                                <a href="#reviews_carousel"
-                                   class="reviews__controls__next pl-1"
-                                   role="button"
-                                   data-slide="next">
-                                    <i class="far fa-long-arrow-alt-right fa-2x"></i>
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+    {# Reviews #}
+    {% include 'AppBundle::Default/CommonSections/_reviews.html.twig' %}
 
     {# Page Modals #}
     {% include 'AppBundle::PhoneInsurance/_policyInfoModals.html.twig' %}
