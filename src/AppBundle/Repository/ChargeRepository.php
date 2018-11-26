@@ -9,8 +9,6 @@ use AppBundle\Document\User;
 use AppBundle\Document\Charge;
 use AppBundle\Document\Policy;
 use AppBundle\Document\PhoneTrait;
-use AppBundle\Document\Charge;
-use AppBundle\Document\User;
 use Doctrine\ODM\MongoDB\DocumentRepository;
 use Doctrine\ODM\MongoDB\Cursor;
 
