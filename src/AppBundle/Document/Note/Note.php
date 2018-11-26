@@ -36,7 +36,7 @@ abstract class Note
 
     /**
      * @AppAssert\AlphanumericSpaceDot()
-     * @Assert\Length(min="1", max="500")
+     * @Assert\Length(min="1", max="2500")
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
