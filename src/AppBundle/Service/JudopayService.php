@@ -831,7 +831,7 @@ class JudopayService
             $payment = $this->tokenPay(
                 $policy,
                 $scheduledPayment->getAmount(),
-                $scheduledPayment->getType(),
+                $scheduledPayment->getNotes() ?: $scheduledPayment->getType(),
                 $abortOnMultipleSameDayPayment,
                 $date
             );

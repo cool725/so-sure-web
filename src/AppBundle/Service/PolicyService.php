@@ -1705,6 +1705,9 @@ class PolicyService
             $scheduledPayment->setStatus(ScheduledPayment::STATUS_SCHEDULED);
             $scheduledPayment->setScheduled($date ? $date : \DateTime::createFromFormat('U', time()));
             $scheduledPayment->setAmount($outstanding);
+            $scheduledPayment->setNotes(sprintf(
+                'Claw-back applied discount (discount was removed following success claim for previous policy)'
+            ));
             $policy->getNextPolicy()->addScheduledPayment($scheduledPayment);
             $this->dm->flush();
             //\Doctrine\Common\Util\Debug::dump($scheduledPayment);
