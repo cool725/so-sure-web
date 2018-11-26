@@ -13,7 +13,6 @@ use AppBundle\Form\Type\AdminEmailOptOutType;
 use AppBundle\Form\Type\BacsCreditType;
 use AppBundle\Form\Type\CallNoteType;
 use AppBundle\Form\Type\PaymentRequestUploadFileType;
-use AppBundle\Form\Type\SalvaRequeueType;
 use AppBundle\Form\Type\UploadFileType;
 use AppBundle\Form\Type\UserHandlingTeamType;
 use AppBundle\Repository\ClaimRepository;
@@ -701,6 +700,10 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             if ($request->request->has('salva_requeue_form')) {
                 $salvaRequeueForm->handleRequest($request);
                 if ($salvaRequeueForm->isValid()) {
+                    /** @var SalvaExportService $salvaService */
+                    $salvaService = $this->get('app.salva');
+
+                    $salvaService->queue($policy, SalvaExportService::QUEUE_UPDATED, 0);
 
                     $this->addFlash(
                         'success',
