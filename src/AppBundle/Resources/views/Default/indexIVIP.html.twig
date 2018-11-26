@@ -3,7 +3,7 @@
 {# Set vars #}
 {% set body_class = 'landing' %}
 
-{% block title %}so-sure - Welcome to Social Insurance with money.co.uk{% endblock %}
+{% block title %}so-sure - Welcome to Social Insurance with iVIP{% endblock %}
 {% block meta %}
     <meta name="description" content="Social mobile phone insurance that's better and up to 80% cheaper when you connect with friends and don't claim. Download our app now to see how much you could save."/>
 {% endblock %}
@@ -18,19 +18,15 @@
         <div class="container container-xtra">
             <div class="hero__intro">
                 <h1 class="mb-2 text-white">Mobile Insurance that's Simply Better</h1>
-                <p class="lead text-columbia-blue-e mb-5">See how we measure up</p>
+                <p class="lead text-columbia-blue-e mb-4">in partnership with</p>
+                <img src="{{ cdn_url }}/images/rebrand/partnerships/so-sure_ivip_logo.svg" alt="iVIP" width="220px" class="d-block mb-2 mb-lg-5 mx-auto">
             </div>
-            <div class="hero__controls">
-                <a href="#" class="btn btn btn-outline-columbia-blue-e btn-block-xs get-a-quote  mb-5">Get Insured  <i class="far fa-arrow-right fa-sm ml-2"></i></a>
+            <div class="hero__controls mb-4">
+                <a href="#" class="btn btn-success btn-block-xs get-a-quote">Get Insured <i class="far fa-arrow-right fa-sm ml-2"></i></a>
             </div>
             {% include 'AppBundle::Default/_comparisonTable.html.twig' %}
             <p class="updated-text mt-2"><em class="text-center"><small>Information checked on September 1st 2018</small></em>
-            <div class="hero__partner-logo d-flex justify-content-center align-items-center mt-5">
-                <h6 class="text-zaffre mr-3">As seen on:</h6>
-                <img src="{{ cdn_url }}/images/moneycouk.png" alt="money.co.uk" width="120px">
-            </div>
         </div>
-        </p>
         <svg class="d-none d-md-block" preserveAspectRatio="xMinYMin meet" viewBox="0 0 750 77" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
             <defs></defs>
             <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -48,8 +44,8 @@
         </div>
     </section>
 
-    <section class="why pb-lg-5">
-        <div class="container container-xtra pb-5">
+    <section class="why py-lg-5">
+        <div class="container container-xtra py-5">
             <div class="row">
                 <div class="col-md-4">
                     <div class="why__container">

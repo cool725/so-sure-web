@@ -166,6 +166,14 @@ class DefaultController extends BaseController
     }
 
     /**
+     * @Route("/ivip", name="ivip")
+     */
+    public function ivipLanding()
+    {
+        return $this->render('AppBundle:Default:indexIVIP.html.twig');
+    }
+
+    /**
      * @Route("/starling-bank", name="starling_bank")
      * @Template
      */
