@@ -1123,7 +1123,7 @@
                     <td>
                         {{ policy.salvaStatus }}
                         <button type="button" class="btn btn-danger" data-toggle="modal"
-                                data-target="#salvaStatusModal">Change Status</button>
+                                data-target="#salvaStatusForm">Change Status</button>
                     </td>
                 </tr>
                 {% endif %}
@@ -1131,6 +1131,7 @@
 
             {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:AdminEmployee:imeiForm', 'policy': policy, 'id': 'imeiForm'} %}
             {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:AdminEmployee:salvaRequeueForm', 'policy': policy, 'id': 'salvaRequeueForm'} %}
+            {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:AdminEmployee:salvaStatusForm', 'policy': policy, 'id': 'salvaStatusForm'} %}
 
             {% endif %}
             {% if is_granted('ROLE_ADMIN') %}

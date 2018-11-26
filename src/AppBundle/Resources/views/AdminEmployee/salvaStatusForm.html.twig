@@ -5,13 +5,13 @@
         <div class="container-fluid">
             <div class="form-group row">
                 <p>Salva Status</p>
-                <input type="text" readonly class="form-control-plaintext" value="{{ policy.salvaStatus }}">
+                {{ form_widget(form.status, {'attr': {'class': 'custom-select'}}) }}
             </div>
         </div>
     </div>
 
     <div class="modal-footer">
-        {{ form_widget(form.requeue, { 'attr': {'class': 'btn btn-danger'} }) }}
+        {{ form_widget(form.update, { 'attr': {'class': 'btn btn-danger'} }) }}
         <button type="button" class="btn btn-grey" data-dismiss="modal">Close</button>
     </div>
     {{ form_end(form) }}

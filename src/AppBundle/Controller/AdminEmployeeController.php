@@ -703,13 +703,76 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                     /** @var SalvaExportService $salvaService */
                     $salvaService = $this->get('app.salva');
 
-                    $salvaService->queue($policy, SalvaExportService::QUEUE_UPDATED, 0);
+                    $result = $salvaService->queue($policy, SalvaExportService::QUEUE_UPDATED, 0);
+
+                    if ($result) {
+                        $this->addFlash(
+                            'success',
+                            sprintf('Sucessfully requeued salva policy: %s', $policy->getPolicyNumber())
+                        );
+                    } else {
+
+                        $this->addFlash(
+                            'error',
+                            sprintf('Could not requeue salva policy: %s', $policy->getPolicyNumber())
+                        );
+                    }
 
                     $this->addFlash(
                         'success',
                         sprintf('Requeued salva policy: %s', $policy->getPolicyNumber())
                     );
 
+                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
+                }
+            }
+        }
+
+        return [
+            'form' => $salvaRequeueForm->createView(),
+            'policy' => $policy,
+        ];
+    }
+
+    /**
+     * @Route("/salva-status/{id}", name="salva_status_form")
+     * @Template
+     */
+    public function salvaStatusFormAction(Request $request, $id = null)
+    {
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(PhonePolicy::class);
+        /** @var PhonePolicy $policy */
+        $policy = $repo->find($id);
+
+        if (!$policy) {
+            throw $this->createNotFoundException(sprintf('Policy %s not found', $id));
+        }
+
+        $salvaRequeueForm = $this->get('form.factory')
+            ->createNamedBuilder('salva_status_form')
+            ->add('status', ChoiceType::class, [
+                'choices' => [
+                    'cancelled' => SalvaPhonePolicy::SALVA_STATUS_CANCELLED,
+                    'wait-cancelled' => SalvaPhonePolicy::SALVA_STATUS_WAIT_CANCELLED,
+                    'pending-cancelled' => SalvaPhonePolicy::SALVA_STATUS_PENDING_CANCELLED
+                ],
+                'placeholder' => 'Chose a status'
+            ])
+            ->add('update', SubmitType::class)
+            ->setAction($this->generateUrl(
+                'salva_status_form',
+                ['id' => $id]
+            ))
+            ->getForm();
+
+        if ('POST' === $request->getMethod()) {
+            if ($request->request->has('salva_status_form')) {
+                $salvaRequeueForm->handleRequest($request);
+                if ($salvaRequeueForm->isValid()) {
+                    $policy->setSalvaStatus($salvaRequeueForm->getData()['status']);
+
+                    $dm->flush();
                     return $this->redirectToRoute('admin_policy', ['id' => $id]);
                 }
             }
