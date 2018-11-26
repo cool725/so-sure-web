@@ -1472,7 +1472,7 @@ class BacsService
 
             $payment = $this->bacsPayment(
                 $scheduledPayment->getPolicy(),
-                'Scheduled Payment',
+                $scheduledPayment->getNotes() ?: 'Scheduled Payment',
                 $scheduledPayment->getAmount(),
                 $scheduledDate,
                 $update,

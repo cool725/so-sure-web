@@ -266,7 +266,7 @@ class ClaimsController extends BaseController
             } elseif ($request->request->has('note_form')) {
                 $noteForm->handleRequest($request);
                 if ($noteForm->isValid()) {
-                    $policy->addNoteDetails($this->getUser(), $noteForm->getData()['notes']);
+                    $policy->addNoteDetails($noteForm->getData()['notes'], $this->getUser());
                     $dm->flush();
                     $this->addFlash(
                         'success',
