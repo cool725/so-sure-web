@@ -125,29 +125,28 @@ class UserJsonController extends BaseController
         $policy = $user->getLatestPolicy();
         $email = $request->get("email");
         if (!$email) {
-            return new JsonResponse(["message" => "no-email"], 400);
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, "Email parameter missing.");
         } elseif (!$this->isCsrfTokenValid("invite-email", $request->request->get('csrf'))) {
-            return new JsonResponse(["message" => "invalid-csrf"], 400);
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, "Invalid CSRF token.");
         } elseif (!$policy) {
-            return new JsonResponse(["message" => "no-policy"], 400);
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, "User lacks policy.");
         } elseif ($user->getEmail() == $email) {
-            return new JsonResponse(["message" => "self-invite"], 400);
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVITATION_SELF_INVITATION, "Self invitation.");
         }
         $this->denyAccessUnlessGranted(UserVoter::VIEW, $user);
         try {
             $this->get("app.invitation")->inviteByEmail($policy, $email);
-            return new JsonResponse(["message" => "success"], 200);
+            return $this->getSuccessJsonResponse("Email invitation sent.");
         } catch (InvalidPolicyException $e) {
-            return new JsonResponse(["message" => "invalid-policy"], 400);
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_POLICY_INVALID_VALIDATION, "Invalid policy.");
         } catch (SelfInviteException $e) {
-            return new JsonResponse(["message" => "self-invite"], 400);
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVITATION_SELF_INVITATION, "Self invitation.");
         } catch (DuplicateInvitationException $e) {
-            return new JsonResponse(["message" => "duplicate"], 400);
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVITATION_DUPLICATE, "Duplicate invitation.");
         } catch (FullPotException $e) {
-            return new JsonResponse(["message" => "full-pot"], 400);
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVITATION_MAXPOT, "User's pot full.");
         } catch (\Exception $e) {
-            $this->get('logger')->error($e->getMessage(), ['exception' => $e]);
-            return new JsonResponse(["message" => $e->getMessage()], 500);
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, $e->getMessage());
         }
     }
 
@@ -163,11 +162,11 @@ class UserJsonController extends BaseController
         $user = $this->getUser();
         $mobileNumber = $user->getMobileNumber();
         if (!$mobileNumber) {
-            return new JsonResponse(["message" => "no-number"], 400);
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, "User lacks phone number.");
         } elseif ($user->getFirstLoginInApp()) {
-            return new JsonResponse(["message" => "has-app"], 400);
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, "User already has app.");
         } elseif ($chargeRepository->findLastByUser($user, Charge::TYPE_SMS_DOWNLOAD)) {
-            return new JsonResponse(["message" => "already-sent"], 400);
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, "User already sent sms.");
         }
         $sent = $smsService->sendTemplate(
             $mobileNumber,
@@ -179,9 +178,9 @@ class UserJsonController extends BaseController
         if ($sent) {
             $sixpack = $this->get('app.sixpack');
             $sixpack->convertByClientId($user->getId(), $sixpack::EXPERIMENT_APP_LINK_SMS);
-            return new JsonResponse(["message" => "success"], 200);
+            return $this->getSuccessJsonResponse("Sms invitation sent.");
         } else {
-            return new JsonResponse(["message" => "failure"] ,500);
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, "Sms could not be sent.");
         }
     }
 
@@ -195,14 +194,21 @@ class UserJsonController extends BaseController
         $s3 = $this->get("app.twig.s3");
         $policy = $user->getLatestPolicy();
         if (!$policy) {
-            return new JsonResponse(["message" => "no-policy"], 400);
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, "User lacks policy.");
         }
         $policyService = $this->get("app.policy");
         $policyTermsFile = $policy->getLatestPolicyTermsFile();
         if (!$policyTermsFile) {
-            return new JsonResponse(["message" => "not-generated"], 200);
+            return new JsonResponse(["description" => "File not yet generated.", "code" => ApiErrorCode::SUCCESS], 200);
         }
         $file = $s3->s3DownloadLink($policyTermsFile->getBucket(), $policyTermsFile->getKey());
-        return new JsonResponse(["file" => "{$file}"]);
+        return new JsonResponse(
+            [
+                "file" => "{$file}",
+                "description" => "not-generated",
+                "code" => ApiErrorCode::SUCCESS
+            ],
+            200
+        );
     }
 }

@@ -8,6 +8,7 @@ use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\PhonePremium;
 use AppBundle\Document\Charge;
+use AppBundle\Classes\ApiErrorCode;
 use AppBundle\Tests\UserClassTrait;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
@@ -21,12 +22,10 @@ use Doctrine\ODM\MongoDB\DocumentManager;
  *
  * AppBundle\\Tests\\Controller\\UserJsonControllerTest
  */
-class UserJsonControllerTest extends WebTestCase
+class UserJsonControllerTest extends BaseControllerTest
 {
     use UserClassTrait;
 
-    private static $client;
-    private static $container;
     private static $userRepository;
     private static $csrfService;
 
@@ -50,7 +49,7 @@ class UserJsonControllerTest extends WebTestCase
      * CSRF protection right etc. All of the things that are done to modify the user are undone at the end so the user
      * remains the same after the execution of the function.
      * @param int     $status    is the status we desire.
-     * @param string  $content   is the content we desire.
+     * @param string  $code      is the ApiErrorCode we want to get or null if none.
      * @param boolean $login     is whether or not we should make the session be logged in.
      * @param string  $email     is the email in the request.
      * @param string  $csrf      is the csrf token to put in the request.
@@ -61,13 +60,14 @@ class UserJsonControllerTest extends WebTestCase
      */
     public function testInviteEmailAction(
         $status,
-        $content = null,
+        $code = null,
         $login = true,
         $email = null,
         $csrf = null,
         $addRole = null,
         $addPolicy = false
     ) {
+        // setting up for test.
         $data = [];
         if ($csrf == "csrf") {
             $data["csrf"] = static::$csrfService->getToken("invite-email")->getValue();
@@ -77,20 +77,15 @@ class UserJsonControllerTest extends WebTestCase
         $user = null;
         $policy = null;
         if ($login) {
-            $user = static::login();
+            $user = static::loginUser();
             if ($addRole) {
                 $user->addRole($addRole);
             }
             if ($addPolicy) {
-                $policy = $this->initPolicy($user, static::$dm);
+                $policy = $this->initPolicy($user, static::$dm, static::getRandomPhone(static::$dm));
                 $user->addPolicy($policy);
-                $policy->setPolicyNumber("{$addPolicy}/2018/".time());
+                $policy->setPolicyNumber(static::getRandomPolicyNumber($addPolicy));
                 $policy->setStatus(Policy::STATUS_ACTIVE);
-                $policy->setPhone($this->getRandomPhone(static::$dm));
-                $premium = new PhonePremium();
-                $premium->setGwp(200);
-                $premium->setIpt(200);
-                $policy->setPremium($premium);
             }
         }
         if ($email == "email" && $user) {
@@ -98,11 +93,10 @@ class UserJsonControllerTest extends WebTestCase
         } elseif ($email) {
             $data["email"] = $email;
         }
+        // Actual test.
         static::$client->request("POST", "/user/json/invite/email", $data);
-        if ($content) {
-            $this->assertEquals($content, static::$client->getResponse()->getContent());
-        }
-        $this->assertEquals($status, static::$client->getResponse()->getStatusCode());
+        $this->verifyResponse($status, $code);
+        // deleting all the stuff so the next test works.
         if ($user && $addRole) {
             $user->removeRole($addRole);
         }
@@ -118,21 +112,21 @@ class UserJsonControllerTest extends WebTestCase
     {
         return [
             [302, null, false],
-            [400, "{\"message\":\"no-email\"}", true],
-            [400, "{\"message\":\"invalid-csrf\"}", true, "dalygbarron@gmail.com"],
-            [400, "{\"message\":\"invalid-csrf\"}", true, "dalygbarron@gmail.com", "junkCsrf"],
-            [400, "{\"message\":\"no-policy\"}", true, "dalygbarron@gmail.com", "csrf"],
-            [400, "{\"message\":\"invalid-policy\"}", true, "dalygbarron@gmail.com", "csrf", null, "JUNK"],
-            [400, "{\"message\":\"self-invite\"}", true, "email", "csrf", null, "TEST"],
-            [200, null, true, "successfulinvite@gmail.com", "csrf", null, "TEST"],
-            [400, "{\"message\":\"duplicate\"}", true, "successfulinvite@gmail.com", "csrf", null, "TEST"]
+            [422, ApiErrorCode::ERROR_MISSING_PARAM, true],
+            [422, ApiErrorCode::ERROR_MISSING_PARAM, true, "dalygbarron@gmail.com"],
+            [422, ApiErrorCode::ERROR_MISSING_PARAM, true, "dalygbarron@gmail.com", "junkCsrf"],
+            [422, ApiErrorCode::ERROR_MISSING_PARAM, true, "dalygbarron@gmail.com", "csrf"],
+            [422, ApiErrorCode::ERROR_POLICY_INVALID_VALIDATION, true, "dalygbarron@gmail.com", "csrf", null, "JUNK"],
+            [422, ApiErrorCode::ERROR_INVITATION_SELF_INVITATION, true, "email", "csrf", null, "TEST"],
+            [200, ApiErrorCode::SUCCESS, true, "successfulinvite@gmail.com", "csrf", null, "TEST"],
+            [422, ApiErrorCode::ERROR_INVITATION_DUPLICATE, true, "successfulinvite@gmail.com", "csrf", null, "TEST"]
         ];
     }
 
     /**
      * Tests the app sms action to make sure it emits desired values when given a given input and state.
      * @param int     $status  is the expected response status.
-     * @param string  $content is the expected response content.
+     * @param string  $code    is the apierrorcode that we want to get or null for none.
      * @param boolean $login   determines whether to login a user before making the request.
      * @param string  $number  is an optional mobile phone number to set on the user if there is one.
      * @param boolean $usedApp determines whether to set the user as having used the app if there is one.
@@ -142,7 +136,7 @@ class UserJsonControllerTest extends WebTestCase
      */
     public function testAppSmsAction(
         $status,
-        $content = null,
+        $code = null,
         $login = false,
         $number = null,
         $usedApp = false,
@@ -151,7 +145,7 @@ class UserJsonControllerTest extends WebTestCase
         $user = null;
         $charge = null;
         if ($login) {
-            $user = static::login();
+            $user = static::loginUser();
             if ($number) {
                 $user->setMobileNumber($number);
             }
@@ -167,10 +161,7 @@ class UserJsonControllerTest extends WebTestCase
             }
         }
         static::$client->request("POST", "/user/json/app/sms");
-        $this->assertEquals($status, static::$client->getResponse()->getStatusCode());
-        if ($content) {
-            $this->assertEquals($content, static::$client->getResponse()->getContent());
-        }
+        $this->verifyResponse($status, $code);
         if ($user) {
             if ($number) {
                 $user->setMobileNumber(null);
@@ -192,10 +183,10 @@ class UserJsonControllerTest extends WebTestCase
     {
         return [
             [302],
-            [400, "{\"message\":\"no-number\"}", true],
-            [400, "{\"message\":\"has-app\"}", true, "07123456789", true],
+            [422, ApiErrorCode::ERROR_MISSING_PARAM, true],
+            [422, ApiErrorCode::ERROR_ACCESS_DENIED, true, "07123456789", true],
             [200, null, true, "07123456789"],
-            [400, "{\"message\":\"already-sent\"}", true, "07123456789", false, true]
+            [422, ApiErrorCode::ERROR_ACCESS_DENIED, true, "07123456789", false, true]
         ];
 
     }
@@ -207,26 +198,27 @@ class UserJsonControllerTest extends WebTestCase
     {
         // no user.
         static::$client->request("GET", "/user/json/policyterms");
-        $this->assertEquals(302, static::$client->getResponse()->getStatusCode());
+        $this->verifyResponse(302);
         // file not yet generated.
-        $user = static::login();
+        $user = static::loginUser();
         static::$client->request("GET", "/user/json/policyterms");
-        $this->assertEquals(200, static::$client->getResponse()->getStatusCode());
-        $this->assertEquals("{\"message\":\"not-generated\"}", static::$client->getResponse()->getContent());
+        $data = $this->verifyResponse(200, ApiErrorCode::SUCCESS);
+        $this->assertEquals("File not yet generated.", $data["description"]);
         // file ready.
         $policy = $user->getLatestPolicy();
         static::$container->get("app.policy")->generatePolicyTerms($policy);
         static::$dm->flush();
         static::$client->request("GET", "/user/json/policyterms");
-        $this->assertEquals(200, static::$client->getResponse()->getStatusCode());
-        $this->assertContains("\"file\"", static::$client->getResponse()->getContent());
+        $data = $this->verifyResponse(200, ApiErrorCode::SUCCESS);
+        $this->assertContains("file", $data);
     }
 
     /**
      * Log the current session in.
+     * NOTE: BaseController::login does not seem to work with CSRF service while in functional tests.
      * @return User the user that we just logged in with.
      */
-    private static function login()
+    private static function loginUser()
     {
         $user = self::$userRepository->findBy([])[0];
         $session = self::$container->get("session");
