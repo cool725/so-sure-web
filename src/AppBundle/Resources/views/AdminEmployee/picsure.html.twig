@@ -51,9 +51,9 @@
                                     {# Fraud Check #}
                                     <td width="25%">
                                         {% if policy.picSureCircumvention is null %}
-                                            <i class="fal fa-clock"></i> Pre anti-fraud check
+                                            <i class="fal fa-clock fa-lg" title="Pre anti-fraud check"></i>
                                         {% elseif policy.picSureCircumvention == true %}
-                                            <i class="fal fa-exclamation-triangle"></i> Possible Fraud <br><small>i.e. too many attempts to do pic-sure and imei upload was too long, check events in mixpanel</small>
+                                            <i class="fal fa-exclamation-triangle fa-lg" title="Possible Fraud i.e. too many attempts to do pic-sure and imei upload was too long, check events in mixpanel"></i>
                                         {% elseif policy.picSureCircumvention == false %}
                                             <i class="fal fa-thumbs-up"></i> No Fraud Detected
                                         {% endif %}
