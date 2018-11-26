@@ -679,7 +679,7 @@ class Claim
 
     /**
      * @Assert\Length(min="4", max="4")
-     * @Assert\Range(min="2015", max="2050")
+     * @Assert\Range(min="2013", max="2050")
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */

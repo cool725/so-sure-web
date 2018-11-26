@@ -12,7 +12,11 @@
 {% block meta %}
     <meta name="description" content="Social mobile phone insurance that's better and up to 80% cheaper when you connect with friends and don't claim. Download our app now to see how much you could save."/>
     <meta name="description" content="For a small monthly fee your phone is covered for theft, loss, accidental damage and unauthorised usage."/>
+    {% if phone.canonicalPath|length > 0 %}
+    <link rel="canonical" href="{{ web_base_url }}{{ phone.canonicalPath }}" />
+    {% else %}
     <link rel="canonical" href="{{ url('quote_make_model', {'make': phone.makeCanonical, 'model': phone.encodedModelCanonical}) }}" />
+    {% endif %}
 {% endblock %}
 
 {% block cssPage %}

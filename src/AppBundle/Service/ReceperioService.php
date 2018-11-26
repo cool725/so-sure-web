@@ -711,6 +711,7 @@ class ReceperioService extends BaseImeiService
                     ReciperoManualProcessException::EMPTY_MAKES,
                     ReciperoManualProcessException::NO_MODEL_REFERENCE,
                     ReciperoManualProcessException::MAKE_MODEL_MEMORY_MISMATCH,
+                    ReciperoManualProcessException::DEVICE_NOT_FOUND
                 ])) {
                     // Don't pass exception as param (string ok) here. Message missing/confusing in rollbar
                     $this->logger->error(

@@ -2,6 +2,7 @@
 
 namespace AppBundle\Listener;
 
+use AppBundle\Annotation\DataChange;
 use Doctrine\ODM\MongoDB\Event\PreUpdateEventArgs;
 use Doctrine\ODM\MongoDB\Event\LifecycleEventArgs;
 use AppBundle\Document\User;
@@ -69,7 +70,7 @@ class DoctrineSalvaListener extends BaseDoctrineListener
                 $eventArgs,
                 SalvaPhonePolicy::class,
                 ['premium'],
-                self::COMPARE_OBJECT_EQUALS
+                DataChange::COMPARE_OBJECT_EQUALS
             )) {
                 /** @var SalvaPhonePolicy $policy */
                 $policy = $document;

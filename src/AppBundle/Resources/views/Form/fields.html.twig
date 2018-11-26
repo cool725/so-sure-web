@@ -33,7 +33,7 @@
     {% set label = name|humanize %}
 {% endif %}
     <label  for="{{ id }}">
-        <input type="radio" {{ block('widget_attributes') }}{% if value is defined %} value="{{ value }}"{% endif %}{% if checked %} checked="checked"{% endif %} />{{ label|trans({}, translation_domain) }}
+        <input type="radio" {{ block('widget_attributes') }}{% if value is defined %} value="{{ value }}"{% endif %}{% if checked %} checked="checked"{% endif %} /> {{ label|trans({}, translation_domain) }}
     </label>
 {% endspaceless %}
 {% endblock radio_widget %}

@@ -82,7 +82,7 @@ class ClaimFnolDamage
     {
         $this->monthOfPurchase = $monthOfPurchase;
     }
-    
+
     public function getYearOfPurchase()
     {
         return $this->yearOfPurchase;
@@ -107,7 +107,7 @@ class ClaimFnolDamage
     {
         return $this->proofOfUsage;
     }
-    
+
     public function setProofOfUsage($proofOfUsage)
     {
         $this->proofOfUsage = $proofOfUsage;
@@ -127,7 +127,7 @@ class ClaimFnolDamage
     {
         return $this->pictureOfPhone;
     }
-    
+
     public function setPictureOfPhone($pictureOfPhone)
     {
         $this->pictureOfPhone = $pictureOfPhone;
