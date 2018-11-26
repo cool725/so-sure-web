@@ -40,8 +40,16 @@ class ReportController extends AbstractController
         $period = $request->get("period");
         $period = isset($period) ? $period : ReportingService::REPORT_PERIODS_DEFAULT;
         $report = ["period" => $period];
-        $report["periods"] = array_keys(ReportingService::REPORT_PERIODS);
-
+        // Setting up the period options.
+        $report["periods"] = [];
+        foreach (ReportingService::REPORT_PERIODS as $key => $periodChoice) {
+            if (array_key_exists("month", $periodChoice)) {
+                $start = (new \DateTime($periodChoice["start"]))->format("F Y");
+                $report["periods"][$start] = $key;
+            } else {
+                $report["periods"][$key] = $key;
+            }
+        }
         // Get the start and end dates for the given period.
         try {
             list($start, $end, $month) = ReportingService::getLastPeriod($period);
@@ -49,15 +57,14 @@ class ReportController extends AbstractController
             $this->addFlash("error", "Invalid URL, {$period} is not a valid reporting period.");
             list($start, $end, $month) = ReportingService::getLastPeriod(ReportingService::REPORT_PERIODS_DEFAULT);
         }
-
         $report["claims"] = $this->reporting->report($start, $end, false);
+        // Format the reporting date depending on it's type.
         if ($month) {
             $report["month"] = $start->format("F Y");
         } else {
             $report["start"] = $start->format("d/m/Y");
             $report["end"] = $end->format("d/m/Y");
         }
-
         return $this->render("AppBundle:AdminEmployee:adminReports.html.twig", $report);
     }
 
@@ -86,10 +93,15 @@ class ReportController extends AbstractController
      */
     public function cumulativeReportAction()
     {
+        $oldest = new \DateTime();
         $end = new \DateTime();
-        $start = (new \DateTime())->sub(new \DateInterval("P3Y"));
-
-        $report["cumulative"] = $this->reporting->getCumulativePolicies($start, $end);
+        foreach (ReportingService::REPORT_PERIODS as $period => $dates) {
+            $start = ReportingService::getLastPeriod($period)[0];
+            if ($start < $oldest) {
+                $oldest = $start;
+            }
+        }
+        $report["cumulative"] = $this->reporting->getCumulativePolicies($oldest, $end);
         return $this->render("AppBundle:AdminEmployee:adminReports.html.twig", $report);
     }
 }

@@ -50,9 +50,11 @@ class ReportingService
     const REPORT_CACHE_TIME = 3600;
     const REPORT_PERIODS = [
         'last 7 days' => ['start' => '7 days ago', 'end' => 'now'],
-        'month to date' => ['start' => 'first day of this month', 'end' => 'now'],
+        'current month to date' => ['start' => 'first day of this month', 'end' => 'now'],
         'last month' => ['start' => 'first day of -1 month', 'end' => 'first day of this month', 'month' => true],
-        'month before last' => ['start' => 'first day of -2 month', 'end' => 'first day of -1 month', 'month' => true]
+        'two months ago' => ['start' => 'first day of -2 month', 'end' => 'first day of -1 month', 'month' => true],
+        'three months ago' => ['start' => 'first day of -3 month', 'end' => 'first day of -2 month', 'month' => true],
+        'four months ago' => ['start' => 'first day of -4 month', 'end' => 'first day of -3 month', 'month' => true]
     ];
     const REPORT_PERIODS_DEFAULT = 'last 7 days';
 
@@ -1226,26 +1228,39 @@ class ReportingService
     /**
      * Creates a report in the cumulative style used by dylan, and monthly values calculated in the way that we use
      * side by side over a series of months.
-     * @param \DateTime $start is the starting month.
-     * @param \DateTime $end   is the ending month.
+     * @param \DateTime $start    is the starting month.
+     * @param \DateTime $end      is the ending month.
+     * @param boolean   $useCache says whether we should try to load from the cache or just skip that.
      * @return array containing the full report.
      */
-    public function getCumulativePolicies($start, $end)
+    public function getCumulativePolicies($start, $end, $useCache = true)
     {
+        $start = $this->startOfMonth($start);
+        $end = $this->startOfMonth($end);
+        $redisKey = sprintf(
+            self::REPORT_KEY_FORMAT,
+            $start->format('Y-m-d.hi'),
+            $end->format('Y-m-d.hi'),
+            "cumulative"
+        );
+        if ($useCache === true && $this->redis->exists($redisKey)) {
+            return unserialize($this->redis->get($redisKey));
+        }
         /** @var PhonePolicyRepository $policyRepo */
         $policyRepo = $this->dm->getRepository(PhonePolicy::class);
         $report = [];
-        $start = $this->startOfMonth($start);
-        $runningTotal = $policyRepo->countAllNewPolicies($start);
+        $runningTotal = $policyRepo->countAllNewPolicies($start) - (
+            $policyRepo->countAllEndingPolicies(null, null, $start) -
+            $policyRepo->countAllEndingPolicies(Policy::CANCELLED_UPGRADE, null, $start, false)
+        );
         while ($start < $end) {
             $endOfMonth = $this->endOfMonth($start);
             $month = [];
             $month["open"] = $runningTotal;
             $month["new"] = $policyRepo->countAllNewPolicies($endOfMonth, $start);
             $month["expired"] = $policyRepo->countAllEndingPolicies(null, $start, $endOfMonth, true);
-            $month["cancelled"] = 0; // TODO: at the moment expired contains all ending policies or something.
             $runningTotal += $month["new"];
-            $runningTotal -= $month["expired"] + $month["cancelled"];
+            $runningTotal -= $month["expired"];
             $month["close"] = $runningTotal;
             $month["upgrade"] = $policyRepo->countAllEndingPolicies(
                 Policy::CANCELLED_UPGRADE,
@@ -1253,11 +1268,10 @@ class ReportingService
                 $endOfMonth,
                 false
             );
-
-            $month["newTotal"] = $policyRepo->countAllNewPolicies($endOfMonth) -
+            $month["newTotal"] = $policyRepo->countAllNewPolicies($endOfMonth) - (
                 $policyRepo->countAllEndingPolicies(null, null, $endOfMonth) -
-                $policyRepo->countAllEndingPolicies(Policy::CANCELLED_UPGRADE, null, $endOfMonth, false);
-
+                $policyRepo->countAllEndingPolicies(Policy::CANCELLED_UPGRADE, null, $endOfMonth, false)
+            );
             $month["newAdjusted"] = $month["new"] - $month["upgrade"];
             $month["endingAdjusted"] = $month["expired"] - $month["upgrade"];
             if ($month["close"] != $month["newTotal"]) {
@@ -1266,6 +1280,7 @@ class ReportingService
             $report[$start->format("F Y")] = $month;
             $start->add(new \DateInterval("P1M"));
         }
+        $this->redis->setex($redisKey, self::REPORT_CACHE_TIME, serialize($report));
         return $report;
     }
 
@@ -1291,7 +1306,7 @@ class ReportingService
         $start = new DateTime(static::REPORT_PERIODS[$period]['start'], new DateTimeZone(SoSure::TIMEZONE));
         $end = new DateTime(static::REPORT_PERIODS[$period]['end'], new DateTimeZone(SoSure::TIMEZONE));
         $start->setTime(0, 0, 0);
-        $end->setTime(0, 0, -1);
+        $end->setTime(0, 0, 0);
         return [$start, $end, $month];
     }
 }
