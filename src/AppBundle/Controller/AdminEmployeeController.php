@@ -13,6 +13,7 @@ use AppBundle\Form\Type\AdminEmailOptOutType;
 use AppBundle\Form\Type\BacsCreditType;
 use AppBundle\Form\Type\CallNoteType;
 use AppBundle\Form\Type\PaymentRequestUploadFileType;
+use AppBundle\Form\Type\SalvaRequeueType;
 use AppBundle\Form\Type\UploadFileType;
 use AppBundle\Form\Type\UserHandlingTeamType;
 use AppBundle\Repository\ClaimRepository;
@@ -668,6 +669,51 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
 
         return [
             'form' => $imeiForm->createView(),
+            'policy' => $policy,
+        ];
+    }
+
+    /**
+     * @Route("/salva-requeue/{id}", name="salva_requeue_form")
+     * @Template
+     */
+    public function salvaRequeueFormAction(Request $request, $id = null)
+    {
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(PhonePolicy::class);
+        /** @var PhonePolicy $policy */
+        $policy = $repo->find($id);
+
+        if (!$policy) {
+            throw $this->createNotFoundException(sprintf('Policy %s not found', $id));
+        }
+
+        $salvaRequeueForm = $this->get('form.factory')
+            ->createNamedBuilder('salva_requeue_form')
+            ->add('requeue', SubmitType::class)
+            ->setAction($this->generateUrl(
+                'salva_requeue_form',
+                ['id' => $id]
+            ))
+            ->getForm();
+
+        if ('POST' === $request->getMethod()) {
+            if ($request->request->has('salva_requeue_form')) {
+                $salvaRequeueForm->handleRequest($request);
+                if ($salvaRequeueForm->isValid()) {
+
+                    $this->addFlash(
+                        'success',
+                        sprintf('Requeued salva policy: %s', $policy->getPolicyNumber())
+                    );
+
+                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
+                }
+            }
+        }
+
+        return [
+            'form' => $salvaRequeueForm->createView(),
             'policy' => $policy,
         ];
     }

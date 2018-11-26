@@ -1,0 +1,19 @@
+{% block body %}
+
+    {{ form_start(form, {'attr': {'class': 'form-inline'}}) }}
+    <div class="modal-body">
+        <div class="container-fluid">
+            <div class="form-group row">
+                <p>Salva Status</p>
+                <input type="text" readonly class="form-control-plaintext" value="{{ policy.salvaStatus }}">
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        {{ form_widget(form.requeue, { 'attr': {'class': 'btn btn-danger', 'disabled': 'true'} }) }}
+        <button type="button" class="btn btn-grey" data-dismiss="modal">Close</button>
+    </div>
+    {{ form_end(form) }}
+
+{% endblock %}
