@@ -703,6 +703,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                     /** @var SalvaExportService $salvaService */
                     $salvaService = $this->get('app.salva');
 
+                    // TODO: multiple choices
                     $result = $salvaService->queue($policy, SalvaExportService::QUEUE_UPDATED, 0);
 
                     if ($result) {
@@ -753,11 +754,11 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             ->createNamedBuilder('salva_status_form')
             ->add('status', ChoiceType::class, [
                 'choices' => [
-                    'cancelled' => SalvaPhonePolicy::SALVA_STATUS_CANCELLED,
                     'wait-cancelled' => SalvaPhonePolicy::SALVA_STATUS_WAIT_CANCELLED,
-                    'pending-cancelled' => SalvaPhonePolicy::SALVA_STATUS_PENDING_CANCELLED
+                    'pending-cancelled' => SalvaPhonePolicy::SALVA_STATUS_PENDING_CANCELLED,
+                    'pending-update' => SalvaPhonePolicy::SALVA_STATUS_PENDING_UPDATE
                 ],
-                'placeholder' => 'Chose a status'
+                'placeholder' => 'Choose a status'
             ])
             ->add('update', SubmitType::class)
             ->setAction($this->generateUrl(
