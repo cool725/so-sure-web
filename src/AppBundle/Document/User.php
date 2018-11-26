@@ -19,6 +19,7 @@ use Scheb\TwoFactorBundle\Model\TrustedComputerInterface;
 use AppBundle\Validator\Constraints\AgeValidator;
 use VasilDakov\Postcode\Postcode;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use AppBundle\Annotation\DataChange;
 
 /**
  * @MongoDB\Document(repositoryClass="AppBundle\Repository\UserRepository")
@@ -59,6 +60,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     /**
      * @Assert\Email(strict=false)
      * @Gedmo\Versioned
+     * @DataChange(categories="intercom,invitation-link", comparison="case-insensitive")
      */
     protected $email;
 
@@ -142,6 +144,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
      * @Assert\Length(min="1", max="50")
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
+     * @DataChange(categories="intercom")
      */
     protected $firstName;
 
@@ -150,6 +153,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
      * @Assert\Length(min="1", max="50")
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
+     * @DataChange(categories="intercom")
      */
     protected $lastName;
 
@@ -244,6 +248,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
      * @MongoDB\EmbedOne(targetDocument="PaymentMethod")
      * @Gedmo\Versioned
      * @var PaymentMethod
+     * @DataChange(categories="intercom")
      */
     protected $paymentMethod;
 
@@ -251,6 +256,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
      * @AppAssert\Mobile()
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
+     * @DataChange(categories="intercom,invitation-link")
      */
     protected $mobileNumber;
 

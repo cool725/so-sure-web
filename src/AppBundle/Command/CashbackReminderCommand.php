@@ -2,18 +2,13 @@
 
 namespace AppBundle\Command;
 
+use AppBundle\Document\Cashback;
 use AppBundle\Service\PolicyService;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Helper\Table;
-use AppBundle\Document\User;
-use AppBundle\Document\Claim;
-use AppBundle\Document\Policy;
-use AppBundle\Document\PhonePolicy;
-use AppBundle\Classes\SoSure;
 
 class CashbackReminderCommand extends ContainerAwareCommand
 {
@@ -30,20 +25,59 @@ class CashbackReminderCommand extends ContainerAwareCommand
     {
         $this
             ->setName('sosure:cashback:reminder')
-            ->setDescription('Send email reminders about cashback')
+            ->setDescription('Send email reminders about cashback status')
+            ->addArgument(
+                'status',
+                InputArgument::REQUIRED,
+                'Run without argument to see options'
+            )
             ->addOption(
                 'dry-run',
                 null,
                 InputOption::VALUE_NONE,
-                'Do not email, just report on cashback email that would be sent'
+                'Do not email, just report on the email that would be sent'
             )
-        ;
+            ->addOption(
+                'force',
+                null,
+                InputOption::VALUE_NONE,
+                'Do not check for 2 week interval'
+            );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $dryRun = true === $input->getOption('dry-run');
-        $lines = $this->policyService->cashbackReminder($dryRun);
+        $dryRun = $input->getOption('dry-run');
+        $force = $input->getOption('force');
+        $status = $input->getArgument('status');
+
+        if ($status == Cashback::STATUS_MISSING) {
+            $lines = $this->policyService->cashbackMissingReminder($dryRun);
+        } elseif ($status == Cashback::STATUS_PENDING_PAYMENT) {
+            $date = \DateTime::createFromFormat('U', time())
+                ->format('W');
+
+            /*
+            * If the option to $force is not passed and $date is not evenly divisible
+            * do not run the command
+            */
+            if (!$force && ($date & 2)) {
+                $output->writeln("Week not evenly divisible, not running this week");
+                return;
+            }
+
+            $lines = $this->policyService->cashbackPendingReminder($dryRun);
+        } else {
+            $output->writeln("Status not found, not continuing");
+            $output->writeln(sprintf(
+                "Supported arguments: %s %s",
+                Cashback::STATUS_MISSING,
+                Cashback::STATUS_PENDING_PAYMENT
+            ));
+            return;
+        }
+
         $output->writeln(json_encode($lines, JSON_PRETTY_PRINT));
+        $output->writeln(sprintf('Found %s matching policies, email sent', count($lines)));
     }
 }

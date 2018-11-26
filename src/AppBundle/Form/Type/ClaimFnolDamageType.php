@@ -47,6 +47,12 @@ class ClaimFnolDamageType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        $years = [];
+        $currentYear = date('Y');
+        for ($i = 2013; $i <= $currentYear; $i++) {
+            $years[$i] = $i;
+        }
+
         $builder
             ->add('typeDetails', ChoiceType::class, [
                 'required' => false,
@@ -77,7 +83,11 @@ class ClaimFnolDamageType extends AbstractType
                     'December' => 'December',
                 ],
             ])
-            ->add('yearOfPurchase', TextType::class, ['required' => false])
+            ->add('yearOfPurchase', ChoiceType::class, [
+                'required' => false,
+                'placeholder' => 'Year Bought...',
+                'choices' => $years
+            ])
             ->add('phoneStatus', ChoiceType::class, [
                 'required' => false,
                 'placeholder' => 'Please choose...',

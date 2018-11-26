@@ -1,0 +1,694 @@
+{% extends 'base_rebrand.html.twig' %}
+
+{# Set vars #}
+{% set body_class = 'home' %}
+
+{# Set image #}
+{% set hero_image = 'so-sure_hero-illustration-xmas-1.png' %}
+{% set hero_rand = random('123') %}
+{% if hero_rand == 2 %}
+    {% set hero_image = 'so-sure_hero-illustration-xmas-2.png' %}
+{% elseif hero_rand == 3 %}
+    {% set hero_image = 'so-sure_hero-illustration-xmas-3.png' %}
+{% endif %}
+
+{% block title %}so-sure - Welcome to Social Insurance{% endblock %}
+{% block meta %}
+    <meta name="description" content="Social mobile phone insurance that's better and up to 80% cheaper when you connect with friends and don't claim. Download our app now to see how much you could save."/>
+{% endblock %}
+
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/homepage.css') }}">
+    <link rel="stylesheet" href="{{ asset('css-js/homepage-xmas.css') }}">
+{% endblock %}
+
+{% block body %}
+
+    <div class="snow"></div>
+
+    <section class="hero">
+        <div class="container container-xtra">
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="hero__intro">
+                        {% if page_type == 'tastecard' %}
+                            <h1 class="mb-4 text-white">soo-yummy <br><span class="sub">FREE tastecard worth &pound;79.99</span></h1>
+                            <h4 class="text-zaffre">Get a FREE tastecard this Christmas when you buy a policy and share with 5 friends</h4>
+                            <p class="mb-4 text-white">
+                                So what are you waiting for, get your mobile protected this Christmas.<br>
+                                <a href="#"
+                                   class="text-white"
+                                   data-toggle="modal"
+                                   data-target="#xmas_terms"
+                                   role="button"><small><u>Terms &amp; Conditions</u></small></a>
+                            </p>
+                        {% elseif page_type == 'phonecase' %}
+                            <h1 class="mb-4 text-white">Double Protection <br><span class="sub">for your Mobile </span></h1>
+                            <h4 class="text-zaffre">We're giving away FREE cases of your choice worth £19 from our partners at <a href="https://www.layercase.co.uk/" target="_blank" class="text-zaffre h4"><u>LayerCase</u></a>. Hurry while stock lasts!</h4>
+                            <p class="mb-4 text-white">
+                                <a href="#"
+                                   class="text-white"
+                                   data-toggle="modal"
+                                   data-target="#xmas_terms"
+                                   role="button"><small><u>Terms &amp; Conditions</u></small>
+                                </a>
+                           </p>
+                        {% elseif page_type == 'blackfriday' %}
+                            <h1 class="mb-4 text-white">Mobile Insurance <br><span class="sub">Black Friday Special</span></h1>
+                            <h4 class="text-zaffre">Free Phone Case worth &pound;19</h4>
+                            <p class="text-white">This Black Friday (until midnight Monday) when you buy a policy, you'll get a FREE phone case of your choice from our partners at <a href="https://www.layercase.co.uk/" target="_blank" class="text-white"><u>LayerCase</u></a>.</p>
+                            <ul class="list-inline mb-4">
+                                <li class="list-inline-item">
+                                    <a href="#"
+                                       class="text-white"
+                                       data-toggle="modal"
+                                       data-target="#black_friday_how_it_works"
+                                       role="button"><small><u>How it works</u></small>
+                                    </a>
+                                </li>
+                                <li class="list-inline-item">
+                                    <a href="#"
+                                       class="text-white"
+                                       data-toggle="modal"
+                                       data-target="#xmas_terms"
+                                       role="button"><small><u>Terms &amp; Conditions</u></small>
+                                    </a>
+                                </li>
+                            </ul>
+                        {% else %}
+                            <h1 class="mb-4 text-white">A phone is for life... <br><span class="sub">not just for Christmas</span></h1>
+                            <h4 class="text-zaffre">Our insurance is a real Christmas cracker</h4>
+                            <p class="mb-4 text-white">We're a new type of insurer that you can rely on. We protect you when you need to claim and reward you when you don't.</p>
+                        {% endif %}
+                    </div>
+                    <div class="hero__controls pb-3">
+                        <a href="#" class="btn btn-white btn-block-xs mr-sm-2 get-a-quote">Get a Quote</a>
+                        <a href="#"
+                           class="btn btn-outline-white watch-video btn-block-xs"
+                           data-event="watch-video-index-hero"
+                           data-toggle="modal"
+                           data-target="#sosure-video-modal"
+                           data-src="https://www.youtube.com/embed/QEskwqsNgrQ">
+                            <i class="far fa-play-circle fa-lg opacity-50 mr-1"></i>
+                            Watch our Video
+                        </a>
+                    </div>
+                </div>
+                <div class="col-lg-6 d-none d-lg-block">
+                    <div class="hero__illustration">
+                        {% if page_type == 'tastecard' %}
+                            <img src="{{ cdn_url }}/images/rebrand/homepage/so-sure_hero-illustration-xmas-tastecard.png" alt="so-sure - social insurance" class="img-fluid animated jackInTheBox">
+                        {% elseif page_type == 'phonecase' %}
+                            <img src="{{ cdn_url }}/images/rebrand/homepage/so-sure_hero-illustration-xmas-2.png" alt="so-sure - social insurance" class="img-fluid animated jackInTheBox">
+                        {% else %}
+                            <img src="{{ cdn_url }}/images/rebrand/homepage/{{ hero_image }}" alt="so-sure - social insurance" class="img-fluid animated jackInTheBox">
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="hero__illustration  d-block d-lg-none">
+                {% if page_type == 'tastecard' %}
+                    <img src="{{ cdn_url }}/images/rebrand/homepage/so-sure_hero-illustration-xmas-tastecard.png" alt="so-sure - social insurance" class="img-fluid animated jackInTheBox">
+                {% elseif page_type == 'phonecase' %}
+                    <img src="{{ cdn_url }}/images/rebrand/homepage/so-sure_hero-illustration-xmas-2.png" alt="so-sure - social insurance" class="img-fluid animated jackInTheBox">
+                {% else %}
+                    <img src="{{ cdn_url }}/images/rebrand/homepage/{{ hero_image }}" alt="so-sure - social insurance" class="img-fluid animated jackInTheBox">
+                {% endif %}
+            </div>
+        </div>
+    </section>
+
+    <section class="cred">
+        <div class="container container-xtra py-4 d-lg-flex align-items-center justify-content-between">
+            {% if page_type == 'tastecard' %}
+                <img src="{{ cdn_url }}/images/rebrand/credbar/tastecard/so-sure_credbar-frankie-and-bennys.png" alt="Frankie &amp; Bennys">
+                <img src="{{ cdn_url }}/images/rebrand/credbar/tastecard/so-sure_credbar-zizzi.png" alt="Zizzi">
+                <img src="{{ cdn_url }}/images/rebrand/credbar/tastecard/so-sure_credbar-strada.png" alt="Strada">
+                <img src="{{ cdn_url }}/images/rebrand/credbar/tastecard/so-sure_credbar-giraffe.png" alt="giraffe">
+                <img src="{{ cdn_url }}/images/rebrand/credbar/tastecard/so-sure_credbar-bella-italia.png" alt="Bella Italia">
+            {% else %}
+                <img src="{{ cdn_url }}/images/rebrand/credbar/so-sure_credbar-trustpilot.png" alt="Trustpilot">
+                <img src="{{ cdn_url }}/images/rebrand/credbar/so-sure_credbar-money.png" alt="Money">
+                <img src="{{ cdn_url }}/images/rebrand/credbar/so-sure_credbar-gocompare.png" alt="GoCompare">
+                <img src="{{ cdn_url }}/images/rebrand/credbar/so-sure_credbar-theguardian.png" alt="The Guardian">
+                <img src="{{ cdn_url }}/images/rebrand/credbar/so-sure_credbar-ft.png" alt="The Financial Times">
+            {% endif %}
+        </div>
+    </section>
+
+    <section class="intro py-lg-5">
+        <div class="container container-xtra py-5">
+            <div class="row">
+                {# TODO: Needs copy #}
+                <div class="col-md-6 col-lg-4">
+                    <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_phone-smile.png" alt="so-sure - Simple Terms &amp; Conditions" width="180px">
+                    <h5 class="text-primary">24-72 hour replace or repair</h5>
+                    <p class="mb-5">We aim to replace or repair your phone within 24-72 hours after your claim is approved</p>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_wallet-cashback.png" alt="so-sure - Up to 40% cheaper"width="180px">
+                    <h5 class="text-primary">Up to 80% money back</h5>
+                    <p class="mb-5">Connect with friends and get rewarded when you and your connections don't claim</p>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_phone-qr.png" alt="so-sure - super quick cover" width="180px">
+                    <h5 class="text-primary">Low excess from just &pound;50</h5>
+                    <p class="mb-5">Download the so-sure app and validate your phone to reduce your excess</p>
+                </div>
+            </div>
+            <a href="#" class="btn btn-primary btn-block-xs get-a-quote mb-5">Insure your phone in minutes</a>
+        </div>
+    </section>
+
+    <section class="cover py-lg-5">
+        <div class="container container-xtra pt-5">
+            <h2 class="h3 mb-3 text-primary text-center">Relax, we’ve got you covered</h2>
+            <p class="mb-4 text-center">We replace and repair hundreds of customer phones every month, here's a look at what's covered</p>
+            <div class="cover__illustration__mobile text-center d-block d-lg-none">
+                <img src="{{ cdn_url }}/images/rebrand/homepage/so-sure_cover-illustration-mobile.png" alt="" width="220px">
+            </div>
+            <div class="cover__desktop d-none d-lg-block">
+                <div class="row">
+                    <div class="col-lg-4">
+                        <ul class="list-unstyled text-right cover__list">
+                            <li class="media">
+                                <div class="media-body mb-5">
+                                    <h5>International travel</h5>
+                                    90 days of globe trotting, from backpacking to business you're covered
+                                </div>
+                                <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_travel-icn.svg" alt="so-sure - Travel Cover" width="50px" class="ml-3">
+                            </li>
+                            <li class="media">
+                                <div class="media-body mb-5">
+                                    <h5>Out-of-warranty breakdowns</h5>
+                                    Phone breaks out of warranty, no worries you're covered
+                                </div>
+                                <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_out-of-warranty-icn.svg" alt="so-sure - Out of Warranty Breakdown" width="50px" class="ml-3">
+                            </li>
+                            <li class="media">
+                                <div class="media-body mb-5">
+                                    <h5>Phones up to three years old</h5>
+                                    We're one of the only insurers that covers phones up to 3 years old
+                                </div>
+                                <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_old-phones-icn.svg" alt="so-sure - Phone up to three years old" width="50px" class="ml-3">
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="col-lg-4 text-center">
+                        <img src="{{ cdn_url }}/images/rebrand/homepage/so-sure_cover-illustration-desktop.png " alt="so-sure - social insurance" class="img-fluid">
+                    </div>
+                    <div class="col-lg-4">
+                        <ul class="list-unstyled cover__list">
+                            <li class="media">
+                                <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_accidental-damage-icn.svg" alt="so-sure - Accidental damage" width="50px" class="mr-3">
+                                <div class="media-body mb-5">
+                                    <h5>Accidental damage</h5>
+                                    Don't worry we can usually repair this device so its a good as new
+                                </div>
+                            </li>
+                            <li class="media">
+                                <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_theft-loss-icn.svg" alt="so-sure - Theft or loss" width="50px" class="mr-3">
+                                <div class="media-body mb-5">
+                                    <h5>Theft or loss</h5>
+                                    Phones been snatched, don't stress we've got your back
+                                </div>
+                            </li>
+                            <li class="media">
+                                <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_broken-phone-icn.svg" alt="so-sure - Broken headphone jack" width="50px" class="mr-3">
+                                <div class="media-body">
+                                    <h5>Accessories</h5>
+                                    No tunes, no problem. You're covered up to the value of &pound;100 inc. VAT
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <svg class="d-block d-lg-none" preserveAspectRatio="xMinYMin meet" viewBox="0 0 750 77" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+            <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                <g transform="translate(0.000000, -72.000000)" fill="#E0EFFD">
+                    <g transform="translate(-4700.000000, -8443.000000)">
+                        <path d="M4700,8515 C4824,8551 4948.66667,8569 5074,8569 C5199.33333,8569 5324.66667,8551 5450,8515 L5450,8592 L4700,8592 L4700,8515 Z" id="Rectangle"></path>
+                    </g>
+                </g>
+            </g>
+        </svg>
+    </section>
+
+    <section class="cover__mobile d-block d-lg-none">
+        <div class="container container-xtra py-5">
+            <ul class="list-unstyled">
+                <li class="media">
+                    <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_travel-icn.svg" alt="so-sure - Travel Cover" width="50px" class="mr-3">
+                    <div class="media-body mb-5">
+                        <h5>International travel</h5>
+                        90 days of globe trotting covered
+                    </div>
+                </li>
+                <li class="media">
+                    <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_out-of-warranty-icn.svg" alt="so-sure - Out of Warranty Breakdown" width="50px" class="mr-3">
+                    <div class="media-body mb-5">
+                        <h5>Out-of-warranty breakdowns</h5>
+                        Phone breaks out of warranty, no worries you're covered
+                    </div>
+                </li>
+                <li class="media">
+                    <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_old-phones-icn.svg" alt="so-sure - Phones up to three years old" width="50px" class="mr-3">
+                    <div class="media-body mb-5">
+                        <h5>Phones up to three years old</h5>
+                        We're one of the only insurers that covers phones up to 3 years old
+                    </div>
+                </li>
+                <li class="media">
+                    <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_accidental-damage-icn.svg" alt="so-sure - Accidental damage" width="50px" class="mr-3">
+                    <div class="media-body mb-5">
+                        <h5>Accidental damage</h5>
+                        Don't worry we can usually repair this device so it’s as good as new
+                    </div>
+                </li>
+                <li class="media">
+                    <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_theft-loss-icn.svg" alt="so-sure - Theft or loss" width="50px" class="mr-3">
+                    <div class="media-body mb-5">
+                        <h5>Theft or loss</h5>
+                        Phones been snatched, don't stress we've got your back
+                    </div>
+                </li>
+                <li class="media">
+                    <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_broken-phone-icn.svg" alt="so-sure - Broken headphone jack" width="50px" class="mr-3">
+                    <div class="media-body">
+                        <h5>Accessories</h5>
+                        No tunes, no problem. You're covered up to the value of &pound;100 inc. VAT
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </section>
+
+    <section class="differently py-lg-5">
+        <div class="container container-xtra py-5">
+            <h2 class="h3 mb-3 text-primary text-center">We do things differently</h2>
+            <p class="mb-5 text-center">Our insurance is simple and hassle free so you don't need to worry, we've got you covered</p>
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="differently__illustration__mobile d-block d-lg-none my-5">
+                        <img src="{{ cdn_url }}/images/rebrand/homepage/so-sure_intro-illustration.png" alt="so-sure - pic-sure" class="img-fluid">
+                    </div>
+                </div>
+                <div class="col-lg-6 pb-lg-5">
+                    <div class="expanding-cardbox expanding-cardbox__icon mb-4">
+                        <div class="expanding-cardbox__body">
+                            <h5 class="expanding-cardbox__title mb-0">
+                                Aim for 24-72 hour replace or repair <i class="far fa-chevron-down text-dodger-blue fa-lg"></i>
+                            </h5>
+                            <div class="expanding-cardbox__expand mt-4">
+                                We understand it's stressful to be without your phone, that’s why we aim to get you back up and running quickly after your claim is approved. While we aim for 24-72 hours, some repairs may take a little longer.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="expanding-cardbox expanding-cardbox__icon mb-4">
+                        <div class="expanding-cardbox__body">
+                            <h5 class="expanding-cardbox__title mb-0">
+                                Up to 80% money back <i class="far fa-chevron-down text-dodger-blue fa-lg"></i>
+                            </h5>
+                            <div class="expanding-cardbox__expand mt-4">
+                                We reward our careful customers. If you and your connections don't make a claim we return up to 80% of your premium back at the end of every policy year.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="expanding-cardbox expanding-cardbox__icon mb-4">
+                        <div class="expanding-cardbox__body">
+                            <h5 class="expanding-cardbox__title mb-0">
+                                Low excess from just &pound;50 with our app <i class="far fa-chevron-down text-dodger-blue fa-lg"></i>
+                            </h5>
+                            <div class="expanding-cardbox__expand mt-4">
+                                When validating your phone through our app’s and pic-sure technology it vastly reduces your excess, removes the need for proof of purchase and gives you a speedier claims process.
+                                <br><br>
+                                Your excess is just &pound;50 for accidental damage/breakdown, &pound;70 for loss and theft. Until you validate your phone through our app, the excess is &pound;150 for all claims. What are you waiting for?
+                            </div>
+                        </div>
+                    </div>
+                    <div class="expanding-cardbox expanding-cardbox__icon mb-4">
+                        <div class="expanding-cardbox__body">
+                            <h5 class="expanding-cardbox__title mb-0">
+                                Insuring second hand phones <i class="far fa-chevron-down text-dodger-blue fa-lg"></i>
+                            </h5>
+                            <div class="expanding-cardbox__expand mt-4">
+                                We're one of the only ones in the UK that insure older phones and second hand devices.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="expanding-cardbox expanding-cardbox__icon mb-4">
+                        <div class="expanding-cardbox__body">
+                            <h5 class="expanding-cardbox__title mb-0">
+                                We decline less than 3.5% of claims* <i class="far fa-chevron-down text-dodger-blue fa-lg"></i>
+                            </h5>
+                            <div class="expanding-cardbox__expand mt-4">
+                                We have our customers backs and we're here to protect you when you need us. That's what insurance is for after all. <br><br>
+                                <small>*as of July 18</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="reward py-lg-5">
+        <div class="container container-xtra py-5">
+            <div class="row">
+                <div class="col-lg-4">
+                    <div class="text-center text-lg-left">
+                        <h2 class="h3 mb-3 text-primary">Money back when you don't claim</h2>
+                        <p class="mb-4">We are the only mobile phone insurer to offer money back if you and your friends don't claim. What's stopping you? Join the social insurance revolution now!</p>
+                        <a href="{{ path('faq') }}#social-insurance-and-reward-pot" class="btn btn-primary btn-block-xs mx-auto mb-5">Tell me more</a>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <div class="cardbox cardbox-400 mb-5 mx-auto text-center d-none d-lg-block">
+                        <div class="cardbox__body">
+                            <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_holding-phone.png" alt="so-sure - how it works"width="180px">
+                            <h5 class="cardbox__title text-dodger-blue">How it works</h5>
+                            <div class="cardbox__text">If you and your friends take good care of your phones and don’t need to claim, we’ll give you up to 80% of your premium back at the end of your policy year</div>
+                        </div>
+                    </div>
+                    <div class="d-block d-lg-none text-center">
+                        <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_holding-phone.png" alt="so-sure - how it works"width="180px">
+                        <h5 class="text-primary">How it works</h5>
+                        <p class="mb-5">If you and your friends take good care of your phones and don't need to claim, we’ll give you up to 80% of your premium back at the end of your policy year</p>
+                    </div>
+                    <div class="cardbox cardbox-400 mb-5 mx-auto text-center d-none d-lg-block">
+                        <div class="cardbox__body">
+                            <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_broken-phone.png" alt="so-sure - be careful" width="180px">
+                            <h5 class="cardbox__title text-dodger-blue">Be careful</h5>
+                            <div class="cardbox__text">Make a pact with your connections to take good care of your phones throughout the policy period and make no claims</div>
+                        </div>
+                    </div>
+                    <div class="d-block d-lg-none text-center">
+                        <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_friends-connect.png" alt="so-sure - connect" width="180px">
+                        <h5 class="text-primary">Connect</h5>
+                        <p class="mb-5">For every person you connect with, we'll add up to &pound;10 to your reward pot. If neither of you make a claim, your cash will be returned to you at the end of the policy year</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <div class="cardbox cardbox-400 mb-5 mx-auto text-center d-none d-lg-block">
+                        <div class="cardbox__body">
+                            <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_friends-connect.png" alt="so-sure - connect" width="180px">
+                            <h5 class="cardbox__title text-dodger-blue">Connect</h5>
+                            <div class="cardbox__text">For every person you connect with, we'll add up to &pound;10 to your reward pot. If neither of you make a claim, your cash will be returned to you at the end of the policy year</div>
+                        </div>
+                    </div>
+                    <div class="d-block d-lg-none text-center">
+                        <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_broken-phone.png" alt="so-sure - be careful" width="180px">
+                        <h5 class="text-primary">Be careful</h5>
+                        <p class="mb-5">Make a pact with your connections to take good care of your phones throughout the policy period and make no claims</p>
+                    </div>
+                    <div class="cardbox cardbox-400 mx-auto text-center d-none d-lg-block">
+                        <div class="cardbox__body">
+                            <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_rewards.png" alt="so-sure - get rewarded" width="180px">
+                            <h5 class="cardbox__title text-dodger-blue">Get rewarded</h5>
+                            <div class="cardbox__text">At the end of the policy year, when you and your connections haven’t claimed, your Reward Pot is paid out to you in full. Hooray!</div>
+                        </div>
+                    </div>
+                    <div class="d-block d-lg-none text-center">
+                        <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_rewards.png" alt="so-sure - get rewarded" width="180px">
+                        <h5 class="text-primary">Get rewarded</h5>
+                        <p class="mb-5">At the end of the policy year, when you and your connections haven’t claimed, your Reward Pot is paid out to you in full. Hooray!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="claims py-lg-5">
+        <div class="container container-xtra py-5">
+            <h2 class="h3 mb-3 text-primary">Our hassle-free claims process</h2>
+            <p class="mb-4">Need to claim, here's what happens</p>
+            <div class="row">
+                <div class="col-md-6 col-lg-4">
+                    <div class="claims__step">
+                        <div class="claims__number d-flex justify-content-center align-items-center h4 text-primary">1</div>
+                        <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_make-a-claim.png" alt="so-sure - Make a claim" width="180px">
+                    </div>
+                    <h5 class="text-primary">Launch your claim online</h5>
+                    <p class="mb-5">Is your phone lost, stolen or broken? Claiming with so-sure is easy, fast and pain-free. Get started using our online claims portal below</p>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <div class="claims__step">
+                        <div class="claims__number d-flex justify-content-center align-items-center h4 text-primary">2</div>
+                        <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_claims-team.png" alt="so-sure - Review claim" width="180px">
+                    </div>
+                    <h5 class="text-primary">Review Claim</h5>
+                    <p class="mb-5">Our UK based claims team will review your claim and reach out with a request for any further details or documents</p>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <div class="claims__step">
+                        <div class="claims__number d-flex justify-content-center align-items-center h4 text-primary">3</div>
+                        <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_delivery.png" alt="so-sure - Approve claim" width="180px">
+                    </div>
+                    <h5 class="text-primary">Approve Claim</h5>
+                    <p class="mb-2">Once approved, we take your excess payment over the phone and aim to repair/replace your phone within 24-72 hours</p>
+                </div>
+            </div>
+            <a href="{{ path('claim') }}" class="btn btn-primary btn-block-xs mt-3">Open the claims portal</a>
+        </div>
+    </section>
+
+{#     <section class="comparison py-lg-5">
+        <div class="container container-xtra pb-5">
+            <h2 class="h3 mb-3 text-primary text-center">What makes so-sure better than the rest?</h2>
+            <p class="text-center mb-4">Our customers love us – that's why thousands of customers have joined the so-sure family</p>
+            <div class="d-lg-flex justify-content-center">
+                {% include 'AppBundle::Default/_comparisonTable.html.twig' %}
+            </div>
+        </div>
+        <svg class="d-none d-md-block" preserveAspectRatio="xMinYMin meet" viewBox="0 0 1440 1027" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+            <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" opacity="0.04">
+                <g id="1.0-so-sure-(Home)" fill="#2594F4">
+                    <g id="---BG---" transform="translate(-4239.000000, -5387.000000)">
+                        <g id="BG---Cover" transform="translate(0.000000, 1602.000000)">
+                            <path d="M2571.43615,2110.73107 L1374.06037,49.762743 L41.0337493,823.071658 L1584.69969,3490.60315 C2312.86402,4747.48359 3921.32333,5175.68467 5177.35483,4447.04231 C5233.49241,4414.47608 5288.96002,4379.57319 5343.57463,4342.33852 C5508.38912,4230.04096 5655.36259,4101.22155 5785.18791,3960.1481 C4690.38897,4212.919 3513.66648,3739.10459 2920.69056,2715.57402 L2571.43615,2110.73107 Z" id="Combined-Shape" style="mix-blend-mode: multiply;" transform="translate(2913.110828, 2426.007002) rotate(-1.000000) translate(-2913.110828, -2426.007002) "></path>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </svg>
+    </section> #}
+
+    <section class="banner banner-dismissible">
+        <div class="container py-5">
+            <div class="d-lg-flex align-items-lg-center">
+                <div class="banner__image">
+                    <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon-home.png" alt="so-sure - how it works"width="250px">
+                </div>
+                <div class="banner__text ml-lg-4">
+                    <h2 class="text-white">Home Insurance Coming 2019</h2>
+                    <p class="text-columbia-blue-e lead mb-0">Take our survey to be in for a chance to <strong>win a phone cover</strong></p>
+                    <p class="text-columbia-blue-e mb-4"><small>*Limited time only, offer ends December 31st 2018, 1 per customer.</small></p>
+                    <a href="https://sosure.typeform.com/to/CdsghS"
+                       target="_blank"
+                       class="btn btn-white sosure-track"
+                       data-event="take-survey-banner-clicked"
+                       data-event-url="https://sosure.typeform.com/to/CdsghS"
+                       data-event-blank="true">
+                        Take Survey
+                        <i class="far fa-long-arrow-right fa-lg ml-2"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <button type="button"
+                class="banner__close close text-white"
+                data-dismiss="banner"
+                data-event="take-survey-banner-closed"
+                aria-label="Close">
+            <i class="fal fa-times fa-lg"></i>
+        </button>
+    </section>
+
+    <section class="reviews py-lg-5">
+        <div class="container container-xtra py-5">
+            <div class="row">
+                <div class="col-lg-6">
+                    <h2 class="h3 mb-4 text-center text-lg-left">Don't just take our <br class="d-inline d-sm-none"> word for it!</h2>
+                    <div id="reviews_carousel"
+                         class="carousel slide carousel-fade"
+                         data-ride="carousel"
+                         data-interval="false">
+                        <div class="carousel-inner">
+                            <div class="carousel-item active">
+                                <div class="reviews__item text-center text-lg-left">
+                                    <span class="mt-2">
+                                        <i class="fas fa-star fa-lg text-primary"></i>
+                                        <i class="fas fa-star fa-lg text-primary"></i>
+                                        <i class="fas fa-star fa-lg text-primary"></i>
+                                        <i class="fas fa-star fa-lg text-primary"></i>
+                                        <i class="fas fa-star fa-lg text-primary"></i>
+                                    </span>
+                                    <p class="lead py-4">"My so-sure claim was super fast and everyone was really friendly! Based on previous phone insurance experiences, I can honestly say this truly is a revolution"</p>
+                                    <div class="reviews__footer mb-4">
+                                        <span class="h5 mr-2">Nick B</span> <strong>|</strong> <span class="ml-2">so-sure customer</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="carousel-item">
+                                <div class="reviews__item text-center text-lg-left">
+                                    <span class="mt-2">
+                                        <i class="fas fa-star fa-lg text-primary"></i>
+                                        <i class="fas fa-star fa-lg text-primary"></i>
+                                        <i class="fas fa-star fa-lg text-primary"></i>
+                                        <i class="fas fa-star fa-lg text-primary"></i>
+                                        <i class="fas fa-star fa-lg text-primary"></i>
+                                    </span>
+                                    <p class="lead py-4 text-zaffre">"Very happy with these guys, my phone was badly cracked after a fall, they picked it up, repaired it good as new in 2 days!  Claims team very nice, would highly recommend"</p>
+                                    <div class="reviews__footer mb-4">
+                                        <span class="h5 mr-2">Tommy P</span> <strong>|</strong> <span class="ml-2">so-sure customer</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="carousel-item">
+                                <div class="reviews__item text-center text-lg-left">
+                                    <span class="mt-2">
+                                        <i class="fas fa-star fa-lg text-primary"></i>
+                                        <i class="fas fa-star fa-lg text-primary"></i>
+                                        <i class="fas fa-star fa-lg text-primary"></i>
+                                        <i class="fas fa-star fa-lg text-primary"></i>
+                                        <i class="fas fa-star fa-lg text-primary"></i>
+                                    </span>
+                                    <p class="lead py-4">"Only paid 50 quid excess for my iphone X which is fab, app is really easy to use and a lady called kitti was very helpful in the claim and getting me my new phone"</p>
+                                    <div class="reviews__footer mb-4">
+                                        <span class="h5 mr-2">Paulo R</span> <strong>|</strong> <span class="ml-2">so-sure customer</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="reviews__controls text-center text-lg-left">
+                        <ul class="list-inline">
+                            <li class="list-inline-item">
+                                <a href="#reviews_carousel"
+                                   class="reviews__controls__prev pr-1"
+                                   role="button"
+                                   data-slide="prev">
+                                   <i class="far fa-long-arrow-alt-left fa-2x"></i>
+                                   <span class="sr-only">prev</span>
+                                </a>
+                            </li>
+                            <li class="list-inline-item">
+                                <a href="#reviews_carousel"
+                                   class="reviews__controls__next pl-1"
+                                   role="button"
+                                   data-slide="next">
+                                    <i class="far fa-long-arrow-alt-right fa-2x"></i>
+                                    <span class="sr-only">next</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="banner py-5">
+        <div class="container container-xtra">
+            <div class="d-lg-flex justify-content-lg-between align-items-lg-center">
+                <div class="mb-4 mb-lg-0 d-lg-flex align-items-lg-center">
+                    <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_app-icn.svg" class="d-none d-lg-inline">
+                    <div class="banner__text text-center text-lg-left ml-lg-4">
+                        <h4 class="text-white">Mobile insurance designed for you</h4>
+                        <p class="lead text-white">Cover your phone in minutes </p>
+                    </div>
+                </div>
+                <div class="banner__controls text-center text-lg-left">
+                    <a href="#"
+                       class="btn btn-outline-white watch-video btn-block-xs mr-sm-2"
+                       data-event="watch-video-index-bottom-banner"
+                       data-toggle="modal"
+                       data-target="#sosure-video-modal"
+                       data-src="https://www.youtube.com/embed/QEskwqsNgrQ">
+                        <i class="far fa-play-circle fa-lg opacity-50 mr-1"></i>
+                        Watch our Video
+                    </a>
+                    <a href="#" class="btn btn-white btn-block-xs get-a-quote">Get a Quote</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {# Page Modals #}
+    <div class="modal fade"
+         id="black_friday_how_it_works"
+         tabindex="-1" role="dialog"
+         aria-labelledby="taste_card_terms"
+         aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        Black Friday - How it works?
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <i class="fal fa-times text-white"></i>
+                    </button>
+                </div>
+                <div class="modal-body text-center text-sm-left">
+                    <h5>How it works</h5>
+                    <p>Free phone case unique codes will be given out to you 14-16 days after you have purchased your policy with us. We will issue the codes via the email address you have used on your policy document.</p>
+                    <p>Once you have your code, simply visit <a href="https://www.layercase.co.uk/" target="_blank">www.LayerCase.co.uk</a>, pick the case you want and enter your unique code. You can pick any phone case you like, dependant on Layercase's availability.</p>
+                    <p>If for some reason you don't hear from us (unlikely) then just ping us a message on our live chat and we will get back to you asap.</p>
+                    <p>Enjoy your peace of mind now that your phone is double protected :)</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade"
+         id="xmas_terms"
+         tabindex="-1" role="dialog"
+         aria-labelledby="taste_card_terms"
+         aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        {% if page_type == 'tastecard' %}
+                            Free tastecard
+                        {% elseif page_type == 'phonecase' %}
+                            Free phone case
+                        {% elseif page_type == 'blackfriday' %}
+                            Black Friday free phone case
+                        {% endif %}
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <i class="fal fa-times text-white"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    {% if page_type == 'tastecard' %}
+                        <h5>Terms and conditions</h5>
+                        <p>1 tastecard per new so-sure policyholder (ie have a least one so-sure policy) that shares with 5 friends. Sharing must be done while being logged into the so-sure website as a customer either by web or app as sharing actions are tracked.  Sharing with 5 friends must be completed within 7 days of the promotion ending.</p>
+                        <p>Code for the free tastecard will be issued 30-35 days after the policy purchase date and will remain active for 365 days as long the customer’s policy remains active. If the policy is cancelled, so will the Tastecard. All digital cards are personalised to each individual which makes them non-transferrable and not for re-sale.</p>
+                        <p>This offer is available to UK residents only. The RRP of a full annual membership to tastecard is &pound;79.99 but you will receive this free of charge as per the terms and conditions stated above. Membership is digital only, an email will be sent following redemption to provide instructions on how to access membership. If you wish to renew your Tastecard when it expires, you need to buy a new code from tastecard.</p>
+                        <p>By redeeming the code provided, you agree to these terms and conditions.</p>
+                        <p>Promotion valid from 19th November 2018 until 31st January 2019</p>
+                    {% elseif page_type == 'phonecase' %}
+                        <h5>Terms and conditions</h5>
+                        <p>1 case per new so-sure customer. Code for the free Layer Case only issued 14-16 days after the policy purchase date and only if customer has made no claims.</p>
+                        <p>Promotion valid from 19th-31st December. so-sure reserves the right to cancel or amend the promotion and these terms and conditions without notice and at anytime.</p>
+                    {% elseif page_type == 'blackfriday' %}
+                        <h5>Here's a reminder of the terms and conditions:</h5>
+                        <p><strong>1 case per new so-sure customer. Code for the free Layer Case only issued 14-16 days after the policy purchase date and only if customer has made no claims.</strong></p>
+                        <p>Promotion valid from the 23rd November to the 26th of November. so-sure reserves the right to cancel or amend the promotion and these terms and conditions without notice and at anytime.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/homepage.js') }}"></script>
+    <script src="{{ asset('css-js/homepage-xmas.js') }}"></script>
+{% endblock %}

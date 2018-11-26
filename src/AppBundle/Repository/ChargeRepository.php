@@ -5,6 +5,8 @@ namespace AppBundle\Repository;
 use AppBundle\Document\AffiliateCompany;
 use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\DateTrait;
+use AppBundle\Document\User;
+use AppBundle\Document\Charge;
 use AppBundle\Document\Policy;
 use AppBundle\Document\PhoneTrait;
 use AppBundle\Document\Charge;

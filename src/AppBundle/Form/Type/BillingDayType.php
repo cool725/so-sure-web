@@ -46,7 +46,7 @@ class BillingDayType extends AbstractType
                 'disabled' => !$enabled,
                 'attr' => ['title' => $enabled ?
                     null :
-                    'Policy must be paid to date, not within cooloff period, and user does not have bacs enabled'
+                    'Policy must be paid to date, not within cooloff period, and user cannot have bacs enabled'
                 ]
             ])
         ;

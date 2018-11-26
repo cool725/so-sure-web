@@ -116,6 +116,33 @@ class PolicyServiceTest extends WebTestCase
         $this->assertEquals(Policy::STATUS_CANCELLED, $updatedPolicy->getStatus());
     }
 
+    /**
+     * @expectedException \Exception
+     */
+    public function testCancelInProgressPolicy()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testCancelInProgressPolicy', $this),
+            'bar',
+            null,
+            static::$dm
+        );
+
+        /* Create a policy that has a null status */
+        $policy = static::initPolicy(
+            $user,
+            static::$dm,
+            $this->getRandomPhone(static::$dm),
+            null,
+            false,
+            false
+        );
+
+        $this->assertNull($policy->getStatus());
+        static::$policyService->cancel($policy, Policy::CANCELLED_USER_REQUESTED);
+    }
+
     public function testCreatePolicyHasLaunchPromoCode()
     {
         $user = static::createUser(
@@ -936,6 +963,38 @@ class PolicyServiceTest extends WebTestCase
         $now = \DateTime::createFromFormat('U', time());
         $billingDate = $this->setDayOfMonth($now, '15');
         $policy->setBilling($billingDate);
+    }
+
+    public function testHasScheduledPaymentInCurrentMonth()
+    {
+        $date = \DateTime::createFromFormat('U', time());
+
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testHasScheduledPaymentInCurrentMonth', $this),
+            'foo',
+            static::$dm
+        );
+
+        $policy = static::initPolicy(
+            $user,
+            static::$dm,
+            $this->getRandomPhone(static::$dm),
+            $date,
+            true,
+            true
+        );
+
+        $this->assertNotNull($policy->getStatus());
+        $this->assertFalse($policy->hasScheduledPaymentInCurrentMonth($date));
+
+        $scheduledPayment = new ScheduledPayment();
+        $scheduledPayment->setStatus(ScheduledPayment::STATUS_SCHEDULED);
+        $scheduledPayment->setScheduled(\DateTime::createFromFormat('U', time()));
+
+        $policy->addScheduledPayment($scheduledPayment);
+
+        $this->assertTrue($policy->hasScheduledPaymentInCurrentMonth($date));
     }
 
     public function testAdjustScheduledPaymentsEarlierDate()

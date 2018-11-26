@@ -1583,7 +1583,7 @@ class PolicyService
         return $lines;
     }
 
-    public function cashbackReminder($dryRun)
+    public function cashbackMissingReminder($dryRun)
     {
         $now = \DateTime::createFromFormat('U', time());
         $cashback = [];
@@ -1618,6 +1618,30 @@ class PolicyService
         }
 
         return $cashback;
+    }
+
+    public function cashbackPendingReminder($dryRun)
+    {
+        $cashbacks = [];
+
+        /** @var CashbackRepository $cashbackRepo */
+        $cashbackRepo = $this->dm->getRepository(Cashback::class);
+        $cashbackItems = $cashbackRepo->findBy(['status' => Cashback::STATUS_PENDING_PAYMENT]);
+
+        foreach ($cashbackItems as $cashbackItem) {
+            $cashbacks[$cashbackItem->getId()] = $cashbackItem->getPolicy()->getPolicyNumber();
+        }
+
+        if (!$dryRun) {
+            $this->mailer->sendTemplate(
+                'Biweekly cashback report',
+                ['dylan@so-sure.com', 'patrick@so-sure.com'],
+                'AppBundle:Email:cashback/cashback_reminder.html.twig',
+                ['cashbacks' => $cashbacks]
+            );
+        }
+
+        return $cashbacks;
     }
 
     /**

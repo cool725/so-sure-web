@@ -1828,6 +1828,16 @@ class BacsService
 
     public function generateBacsPdf(Policy $policy)
     {
+        if (!$policy->getUser()->hasBacsPaymentMethod()) {
+            $this->logger->error(sprintf(
+                'Policy %s/%s does not have a bacs payment method for generating bacs pdf',
+                $policy->getPolicyNumber(),
+                $policy->getId()
+            ));
+
+            return;
+        }
+
         $now = \DateTime::createFromFormat('U', time());
         /** @var BacsPaymentMethod $paymentMethod */
         $paymentMethod = $policy->getUser()->getPaymentMethod();

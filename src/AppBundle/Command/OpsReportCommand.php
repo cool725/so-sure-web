@@ -131,7 +131,7 @@ class OpsReportCommand extends ContainerAwareCommand
         if (!$html) {
             $html = 'No client validation failures';
         }
-        $this->mailerService->send('Client Validation Failures', 'tech+ops@so-sure.com', $html);
+        $this->mailerService->send('Client Validation Failures', ['tech+ops@so-sure.com', 'olly@so-sure.com'], $html);
         return count($items) > 0 ? 'found validation failures' : 'no validation failures';
     }
 }

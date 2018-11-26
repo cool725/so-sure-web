@@ -94,13 +94,65 @@ class DefaultController extends BaseController
 
         $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE);
 
+        $pageType = 'xmas-homepage';
+
+        // Blackfriday Promo
+        // Start: Friday 23rd November Mighnight
+        // End: Monday 26th November Mighnight
+        $now   = \DateTime::createFromFormat('U', time());
+        $start = new \DateTime('2018-11-23 00:00:00', new \DateTimeZone(SoSure::TIMEZONE));
+        $end   = new \DateTime('2018-11-26 23:59:59', new \DateTimeZone(SoSure::TIMEZONE));
+
+        if ($now >= $start && $now <= $end) {
+            $pageType = 'blackfriday';
+        }
+
         $data = array(
             // Make sure to check homepage landing below too
-            'referral'    => $referral,
-            'phone'       => $this->getQuerystringPhone($request),
+            'referral'  => $referral,
+            'phone'     => $this->getQuerystringPhone($request),
+            'page_type' => $pageType,
         );
 
-        $template = 'AppBundle:Default:index.html.twig';
+        // $template = 'AppBundle:Default:index.html.twig';
+        $template = 'AppBundle:Default:indexXmas.html.twig';
+
+        return $this->render($template, $data);
+    }
+
+    /**
+     * @Route("/free-taste-card", name="free_taste_card")
+     */
+    public function freeTasteCard()
+    {
+        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE);
+
+        $pageType = 'tastecard';
+
+        $data = array(
+            'page_type' => $pageType,
+        );
+
+
+        $template = 'AppBundle:Default:indexXmas.html.twig';
+
+        return $this->render($template, $data);
+    }
+
+    /**
+     * @Route("/free-phone-case", name="free_phone_case")
+     */
+    public function freePhoneCase()
+    {
+        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE);
+
+        $pageType = 'phonecase';
+
+        $data = array(
+            'page_type' => $pageType,
+        );
+
+        $template = 'AppBundle:Default:indexXmas.html.twig';
 
         return $this->render($template, $data);
     }

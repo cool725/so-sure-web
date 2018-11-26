@@ -17,6 +17,20 @@ $('.confirm-submit').on("click",function(e) {
     }
 });
 
+$('.confirm-date').on("click", function (e) {
+    var today = new Date();
+
+    if (today.getDate() > $('#billing_form_day').val()) {
+        if (!confirm("You are moving the billing date to a day BEFORE today. This will trigger a payment immediately as this month's payment has not yet been billed. Please confirm with the user prior to doing so. Are you sure you wish to trigger the payment now?")) {
+            e.preventDefault();
+        }
+    } else {
+        if (!confirm("Are you sure?")) {
+            e.preventDefault();
+        }
+    }
+});
+
 $(document).ready(function(){
     $('.datetimepicker').datetimepicker({
         format: "DD-MM-YYYY HH:mm",

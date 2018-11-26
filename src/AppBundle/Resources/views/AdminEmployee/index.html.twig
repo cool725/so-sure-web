@@ -1,140 +1,190 @@
-{% extends 'admin_claims_base.html.twig' %}
+{% extends 'admin_claims_base_rebrand.html.twig' %}
+
+{# Set vars #}
+{% set body_class = 'admin-home' %}
+
+{% block title %}so-sure - admin home{% endblock %}
+{% block meta %}{% endblock %}
+
+{% block cssPage %}
+   {#  <link rel="stylesheet" href="{{ asset('css-js/homepage.css') }}"> #}
+{% endblock %}
 
 {% block body %}
-    {% set style = "text-align: center; height: 100px; margin-bottom: 20px; padding-top: 30px; font-size: 24px; vertical-align: middle; border-radius: 5px; border: solid 1px;" %}
-<div class="container" style="margin-bottom: 50px; margin-top: 70px;"  >
-    <h3><i class="fa fa-question-circle" title="Actually Random Imei of the second, but...This imei passes luhn, and should only be used for test purposes"></i>
-        Random Imei of the day: {{ randomImei }}</h3>
 
-    <div class="row">
-        <div class="col-md-12">
-            <h3>General</h3>
+    <section class="py-4 px-md-4">
+        <div class="container-fluid">
+            <div class="d-lg-flex align-items-lg-center justify-content-lg-between mb-3">
+                <h1 class="h2">Admin Home</h1>
+                <form action="" class="form-inline">
+                    <div class="form-group">
+                        {# TODO: Add copy #}
+                        <label for="" class="mr-3">
+                            <i class="far fa-info-circle mr-2" title="Actually Random Imei of the second, but...This imei passes luhn, and should only be used for test purposes"></i> Random IMEI of the day:
+                        </label>
+                        <input type="text" value="{{ randomImei }}" class="form-control">
+                    </div>
+                </form>
+            </div>
+            <div class="row">
+                <div class="col-md">
+                    <h5 class="mb-4">General</h3>
+                    <div class="list-group admin-list-group mb-4">
+                        <a class="list-group-item list-group-item-action"
+                           href="{{ path('admin_policies') }}">
+                            <i class="fal fa-file-pdf fa-fw mr-3"></i> Policies
+                        </a>
+                        <a class="list-group-item list-group-item-action"
+                           href="{{ path('admin_users') }}">
+                            <i class="fal fa-users fa-fw mr-3"></i> Users
+                        </a>
+                        <a class="list-group-item list-group-item-action"
+                           href="{{ path('admin_company') }}">
+                           <i class="fal fa-briefcase fa-fw mr-3"></i> Companies
+                        </a>
+                        <a class="list-group-item list-group-item-action"
+                           href="{{ path('admin_phones') }}">
+                            <i class="fal fa-mobile fa-fw mr-3"></i> Phones
+                        </a>
+                        <a class="list-group-item list-group-item-action"
+                           href="{{ path('admin_claims') }}">
+                            <i class="fal fa-exchange fa-fw mr-3"></i> Claims
+                        </a>
+                        <a class="list-group-item list-group-item-action"
+                           href="{{ path('admin_rewards') }}">
+                            <i class="fal fa-thumbs-up fa-fw mr-3"></i> Rewards
+                        </a>
+                        <a class="list-group-item list-group-item-action"
+                           href="{{ path('admin_picsure') }}">
+                            <i class="fal fa-qrcode fa-fw mr-3"></i> pic-sure
+                        </a>
+                        <a class="list-group-item list-group-item-action"
+                           href="{{ path('admin_imei') }}">
+                            <i class="fal fa-search fa-fw mr-3"></i> IMEI Lookup
+                        </a>
+                        <a class="list-group-item list-group-item-action"
+                           href="{{ path('admin_detected_imei') }}">
+                            <i class="fal fa-bullseye fa-fw mr-3"></i> Detected IMEI
+                        </a>
+                        <a class="list-group-item list-group-item-action"
+                           href="{{ path('admin_affiliate') }}">
+                            <i class="fal fa-trophy fa-fw mr-3"></i> Affiliates
+                        </a>
+                    </div>
+                </div>
+                <div class="col-md">
+                    <h5 class="mb-4">Reporting</h3>
+                    <div class="list-group admin-list-group mb-4">
+                        <a class="list-group-item list-group-item-action"
+                           href="{{ path('admin_kpi') }}">
+                           <i class="fal fa-balance-scale fa-fw mr-3"></i> KPI
+                        </a>
+                        <a class="list-group-item list-group-item-action"
+                           href="{{ path('admin_reports') }}">
+                            <i class="fal fa-chart-area fa-fw mr-3"></i> Reports
+                        </a>
+                        <a class="list-group-item list-group-item-action"
+                           href="{{ path('admin_connections') }}">
+                            <i class="fal fa-handshake fa-fw mr-3"></i> Connections
+                        </a>
+                        <a class="list-group-item list-group-item-action"
+                           href="{{ path('admin_optout') }}">
+                           <i class="fal fa-envelope-square fa-fw mr-3"></i> OptOuts
+                        </a>
+                        <a class="list-group-item list-group-item-action"
+                           href="{{ path('admin_scheduled_payments') }}">
+                           <i class="fal fa-calendar-check fa-fw mr-3"></i> Scheduled Payments
+                        </a>
+                        <a class="list-group-item list-group-item-action"
+                           href="{{ path('admin_policy_breakdown') }}">
+                           <i class="fab fa-apple fa-fw mr-3"></i> Policy Breakdown
+                        </a>
+                        <a class="list-group-item list-group-item-action"
+                           href="{{ path('admin_payments') }}">
+                           <i class="fal fa-pound-sign fa-fw mr-3"></i> Payments
+                        </a>
+                        <a class="list-group-item list-group-item-action"
+                           href="{{ path('admin_quarterly_pl') }}">
+                           <i class="fal fa-chart-pie fa-fw mr-3"></i> Quarterly P&amp;L
+                        </a>
+                        <a class="list-group-item list-group-item-action"
+                           href="{{ path('admin_underwriting') }}">
+                           <i class="fal fa-chart-bar fa-fw mr-3"></i> Underwriting
+                        </a>
+                    </div>
+                </div>
+                {% if is_granted('ROLE_ADMIN') %}
+                    <div class="col-md">
+                        <h5 class="mb-4">Accounts</h3>
+                        <div class="list-group admin-list-group mb-4">
+                            <a class="list-group-item list-group-item-action"
+                               href="{{ path('admin_accounts') }}">
+                               <i class="fal fa-money-bill-wave-alt fa-fw mr-3"></i> Accounts
+                            </a>
+                            <a class="list-group-item list-group-item-action"
+                               href="{{ path('admin_banking') }}">
+                               <i class="fal fa-university fa-fw mr-3"></i> Banking
+                            </a>
+                            <a class="list-group-item list-group-item-action"
+                               href="{{ path('admin_charge') }}">
+                               <i class="fal fa-credit-card-front fa-fw mr-3"></i> Charges
+                            </a>
+                            <a class="list-group-item list-group-item-action"
+                               href="{{ path('admin_invoices') }}">
+                               <i class="fal fa-file-invoice fa-fw mr-3"></i> Invoices
+                            </a>
+                            <a class="list-group-item list-group-item-action"
+                               href="{{ path('admin_cashback') }}">
+                               <i class="fal fa-hand-holding-usd fa-fw mr-3"></i> Cashback
+                            </a>
+                            <a class="list-group-item list-group-item-action"
+                               href="{{ path('admin_chargeback') }}">
+                               <i class="fal fa-reply fa-fw mr-3"></i> Chargebacks
+                            </a>
+                            <a class="list-group-item list-group-item-action"
+                               href="{{ path('admin_bacs') }}">
+                               <i class="fal fa-sliders-h fa-fw mr-3"></i> Bacs
+                            </a>
+                        </div>
+                    </div>
+                {% endif %}
+                {% if is_granted('ROLE_EMPLOYEE') %}
+                    <div class="col-md">
+                        <h5 class="mb-4">System</h3>
+                        <div class="list-group admin-list-group mb-4">
+                            {% if is_granted('ROLE_ADMIN') %}
+                                <a class="list-group-item list-group-item-action"
+                                   href="{{ path('admin_admin_users') }}">
+                                   <i class="fal fa-user-lock fa-fw mr-3"></i> Admin Users
+                                </a>
+                                <a class="list-group-item list-group-item-action"
+                                   href="{{ path('admin_rate_limits') }}">
+                                   <i class="fal fa-hand-paper fa-fw mr-3"></i> Rate Limits
+                                </a>
+                                <a class="list-group-item list-group-item-action"
+                                   href="{{ path('admin_feature_flags') }}">
+                                   <i class="fal fa-flag fa-fw mr-3"></i> Feature Flags
+                                </a>
+                                <a class="list-group-item list-group-item-action"
+                                   href="{{ path('admin_picsure_ml') }}">
+                                   <i class="fal fa-robot fa-fw mr-3"></i> Picsure ML
+                                </a>
+                            {% endif %}
+                            <a class="list-group-item list-group-item-action"
+                               href="{{ path('admin_sixpack_tests') }}">
+                               <i class="fal fa-vial fa-fw mr-3"></i> Running tests
+                            </a>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
         </div>
-    </div>
-    <div class="row">
-        <div class="col-md-3 col-md-offset-1" style="{{ style }};">
-            <a href="{{ path('admin_policies') }}"><i class="fa fa-file-pdf-o fa-large"></i> Policies</a>
-        </div>
-        <div class="col-md-3 col-md-offset-1" style="{{ style }};">
-            <a href="{{ path('admin_users') }}"><i class="fa fa-users fa-large"></i> Users</a>
-        </div>
-        <div class="col-md-3 col-md-offset-1" style="{{ style }};">
-            <a href="{{ path('admin_company') }}"><i class="fa fa-briefcase fa-large"></i> Companies</a>
-        </div>
-        <div class="col-md-3 col-md-offset-1" style="{{ style }};">
-            <a href="{{ path('admin_phones') }}"><i class="fa fa-mobile fa-large"></i> Phones</a>
-        </div>
-        <div class="col-md-3 col-md-offset-1" style="{{ style }};">
-            <a href="{{ path('admin_claims') }}"><i class="fa fa-exchange fa-large"></i> Claims</a>
-        </div>
-        <div class="col-md-3 col-md-offset-1" style="{{ style }};">
-            <a href="{{ path('admin_rewards') }}"><i class="fa fa-thumbs-up fa-large"></i> Rewards</a>
-        </div>
-        <div class="col-md-3 col-md-offset-1" style="{{ style }};">
-            <a href="{{ path('admin_picsure') }}"><i class="fa fa-photo fa-large"></i> pic-sure</a>
-        </div>
-        <div class="col-md-3 col-md-offset-1" style="{{ style }};">
-            <a href="{{ path('admin_imei') }}"><i class="fa fa-search fa-large"></i> IMEI Lookup</a>
-        </div>
-        <div class="col-md-3 col-md-offset-1" style="{{ style }};">
-            <a href="{{ path('admin_detected_imei') }}"><i class="fa fa-bullseye fa-large"></i> Detected IMEI</a>
-        </div>
-        <div class="col-md-3 col-md-offset-1" style="{{ style }};">
-            <a href="{{ path('admin_affiliate') }}"><i class="fa fa-trophy fa-large"></i> Affiliates</a>
-        </div>
-    </div>
+    </section>
 
-    <div class="row">
-        <div class="col-md-12">
-            <h3>Reporting</h3>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-md-3 col-md-offset-1" style="{{ style }};">
-            <a href="{{ path('admin_kpi') }}"><i class="fa fa-balance-scale fa-large"></i> KPI</a>
-        </div>
-        <div class="col-md-3 col-md-offset-1" style="{{ style }};">
-            <a href="{{ path('admin_reports') }}"><i class="fa fa-area-chart fa-large"></i> Reports</a>
-        </div>
-        <div class="col-md-3 col-md-offset-1" style="{{ style }};">
-            <a href="{{ path('admin_connections') }}"><i class="fa fa-handshake-o fa-large"></i> Connections</a>
-        </div>
-        <div class="col-md-3 col-md-offset-1" style="{{ style }};">
-            <a href="{{ path('admin_optout') }}"><i class="fa fa-envelope fa-large"></i> OptOuts</a>
-        </div>
-        <div class="col-md-3 col-md-offset-1" style="{{ style }};">
-            <a href="{{ path('admin_scheduled_payments') }}"><i class="fa fa-calendar fa-large"></i> Scheduled Payments</a>
-        </div>
-        <div class="col-md-3 col-md-offset-1" style="{{ style }};">
-            <a href="{{ path('admin_policy_breakdown') }}"><i class="fa fa-apple fa-large"></i> <i class="fa fa-android fa-large"></i> Policy Breakdown</a>
-        </div>
-        <div class="col-md-3 col-md-offset-1" style="{{ style }};">
-            <a href="{{ path('admin_payments') }}"><i class="fa fa-gbp fa-large"></i> Payments</a>
-        </div>
-        <div class="col-md-3 col-md-offset-1" style="{{ style }};">
-            <a href="{{ path('admin_quarterly_pl') }}"><i class="fa fa-pie-chart fa-large"></i> Quarterly P&L</a>
-        </div>
-        <div class="col-md-3 col-md-offset-1" style="{{ style }};">
-            <a href="{{ path('admin_underwriting') }}"><i class="fa fa-bar-chart fa-large"></i> Underwriting</a>
-        </div>
-    </div>
+    {# Page Modals #}
 
-    {% if is_granted('ROLE_ADMIN') %}
-        <div class="row">
-            <div class="col-md-12">
-                <h3>Accounts</h3>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-3 col-md-offset-1" style="{{ style }};">
-                <a href="{{ path('admin_accounts') }}"><i class="fa fa-money fa-large"></i> Accounts</a>
-            </div>
-            <div class="col-md-3 col-md-offset-1" style="{{ style }};">
-                <a href="{{ path('admin_banking') }}"><i class="fa fa-bank fa-large"></i> Banking</a>
-            </div>
-            <div class="col-md-3 col-md-offset-1" style="{{ style }};">
-                <a href="{{ path('admin_charge') }}"><i class="fa fa-credit-card fa-large"></i> Charges</a>
-            </div>
-            <div class="col-md-3 col-md-offset-1" style="{{ style }};">
-                <a href="{{ path('admin_invoices') }}"><i class="fa fa-file fa-large"></i> Invoices</a>
-            </div>
-            <div class="col-md-3 col-md-offset-1" style="{{ style }};">
-                <a href="{{ path('admin_cashback') }}"><i class="fa fa-handshake-o fa-large"></i> Cashback</a>
-            </div>
-            <div class="col-md-3 col-md-offset-1" style="{{ style }};">
-                <a href="{{ path('admin_chargeback') }}"><i class="fa fa-reply fa-large"></i> Chargebacks</a>
-            </div>
-            <div class="col-md-3 col-md-offset-1" style="{{ style }};">
-                <a href="{{ path('admin_bacs') }}"><i class="fa fa-sliders fa-large"></i> Bacs</a>
-            </div>
-        </div>
-    {% endif %}
+{% endblock %}
 
-    {% if is_granted('ROLE_EMPLOYEE') %}
-        <div class="row">
-            <div class="col-md-12">
-                <h3>System</h3>
-            </div>
-        </div>
-        <div class="row">
-            {% if is_granted('ROLE_ADMIN') %}
-                <div class="col-md-3 col-md-offset-1" style="{{ style }};">
-                    <a href="{{ path('admin_admin_users') }}"><i class="fa fa-lock fa-large"></i> Admin Users</a>
-                </div>
-                <div class="col-md-3 col-md-offset-1" style="{{ style }};">
-                    <a href="{{ path('admin_rate_limits') }}"><i class="fa fa-hand-stop-o fa-large"></i> Rate Limits</a>
-                </div>
-                <div class="col-md-3 col-md-offset-1" style="{{ style }};">
-                    <a href="{{ path('admin_feature_flags') }}"><i class="fa fa-flag fa-large"></i> Feature Flags</a>
-                </div>
-                <div class="col-md-3 col-md-offset-1" style="{{ style }};">
-                    <a href="{{ path('admin_picsure_ml') }}"><i class="fa fa-photo fa-large"></i> Picsure ML</a>
-                </div>
-            {% endif %}
-            <div class="col-md-3 col-md-offset-1" style="{{ style }};">
-                <a href="{{ path('admin_sixpack_tests') }}"><i class="fa fa-comments fa-large"></i> Running tests</a>
-            </div>
-        </div>
-    {% endif %}
-</div>
+{% block javascriptsPage %}
+    {# <script src="{{ asset('css-js/homepage.js') }}"></script> #}
 {% endblock %}

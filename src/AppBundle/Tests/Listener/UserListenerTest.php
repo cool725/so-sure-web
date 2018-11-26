@@ -18,6 +18,8 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * @group functional-net
+ *
+ * \\AppBundle\\Tests\\Listener\\UserListenerTest
  */
 class UserListenerTest extends WebTestCase
 {

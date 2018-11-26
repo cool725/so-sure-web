@@ -1,7 +1,7 @@
 {% extends 'base.html.twig' %}
 
 {# Set vars #}
-{% set include_emoji = 1 %}
+{% set include_emoji = true %}
 
 {% block meta %}
     <link rel="canonical" href="{{ url('insure_make_model', {'make': phone.make, 'model': phone.encodedModel}) }}" />
