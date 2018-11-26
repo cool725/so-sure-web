@@ -810,6 +810,15 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             ->createNamedBuilder('salva_update_form')
             ->add('update', SubmitType::class)
             ->getForm();
+        $setTasteCardForm = $this->get('form.factory')
+            ->createNamedBuilder('set_taste_card_form')
+            ->add('number', TextType::class)
+            ->add('submit', SubmitType::class)
+            ->getForm();
+        $resendTasteCardForm = $this->get('form.factory')
+            ->createNamedBuilder('resend_taste_card_form')
+            ->add('submit', SubmitType::class)
+            ->getForm();
 
         if ('POST' === $request->getMethod()) {
             if ($request->request->has('cancel_form')) {
@@ -1343,6 +1352,21 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
 
                     $this->addFlash('success', 'Queued Salva Policy Update');
                 }
+            } elseif ($request->request->has('set_taste_card_form')) {
+                $setTasteCardForm->handleRequest($request);
+                if ($setTasteCardForm->isValid()) {
+                    $policyService = $this->get("app.policy");
+                    // TODO: do actual validation with the validator service thingo.
+                    $policy->setTasteCard($setTasteCardForm->get("number")->getData());
+                    $policyService->tasteCardEmail($policy);
+                    $this->addFlash("success", "Tastecard is now set");
+                }
+            } elseif ($request->request->has("resend_taste_card_form")) {
+                $resendTasteCardForm->handleRequest($request);
+                if ($resendTasteCardForm->isValid()) {
+                    $policyService->tasteCardEmail($policy);
+                    $this->addFlash('success', 'Tastecard notification has been resent.');
+                }
             }
         }
         $checks = $fraudService->runChecks($policy);
@@ -1397,6 +1421,8 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             'run_scheduled_payment_form' => $runScheduledPaymentForm->createView(),
             'bacs_refund_form' => $bacsRefundForm->createView(),
             'salva_update_form' => $salvaUpdateForm->createView(),
+            'set_taste_card_form' => $setTasteCardForm->createView(),
+            'resend_taste_card_form' => $resendTasteCardForm->createView(),
             'fraud' => $checks,
             'policy_route' => 'admin_policy',
             'policy_history' => $this->getSalvaPhonePolicyHistory($policy->getId()),

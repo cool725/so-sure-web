@@ -1,0 +1,13 @@
+{% extends 'AppBundle:Email:base.html.twig' %}
+{% import "AppBundle:Email:macros.html.twig" as macros %}
+{% block title %}You have now got a taste card.{% endblock %}
+{% block body %}
+	{{ macros.start_table() }}
+		<div style="font-size: 14px; text-align: left;">
+		   <div style="font-size: 14px; text-align: center;">
+               <p>You have got a taste card now and there is nothing you can do about it.</p>
+               <p>The number of your taste card is <strong>{{ policy.tasteCard }}</strong></p>
+		   </div>
+		</div>
+	{{ macros.end_table() }}
+{% endblock %}

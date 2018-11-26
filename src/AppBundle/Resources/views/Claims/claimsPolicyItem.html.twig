@@ -372,6 +372,21 @@
                                 {% endif %}
                             </td>
                         </tr>
+                        <tr>
+                            <td>Tastecard</td>
+                            <td>
+                                <p>
+                                    {{ form_start(set_taste_card_form) }}
+                                    {{ form_widget(set_taste_card_form) }}
+                                    {{ form_end(set_taste_card_form) }}
+                                </p>
+                                <p>
+                                    {{ form_start(resend_taste_card_form) }}
+                                    {{ form_widget(resend_taste_card_form) }}
+                                    {{ form_end(resend_taste_card_form) }}
+                                </p>
+                            </td>
+                        </tr>
                         {% endif %}
                     </table>
                 </div>

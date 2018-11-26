@@ -537,6 +537,14 @@ abstract class Policy
      */
     protected $metrics;
 
+    /**
+     * @AppAssert\Alphanumeric()
+     * @Assert\Length(min="8", max="16") TODO: find out how long these things actually are.
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
+    protected $tasteCard;
+
     public function __construct()
     {
         $this->created = \DateTime::createFromFormat('U', time());
@@ -1320,6 +1328,16 @@ abstract class Policy
     public function addMetric($metric)
     {
         $this->metrics[] = $metric;
+    }
+
+    public function getTasteCard()
+    {
+        return $this->tasteCard;
+    }
+
+    public function setTasteCard($tasteCard)
+    {
+        $this->tasteCard = $tasteCard;
     }
 
     public function getStandardConnections()
