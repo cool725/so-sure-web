@@ -1109,10 +1109,30 @@
                         If the policy was manually adjusted, notify Salva of the new price.
                     </td>
                 </tr>
+
+                <tr>
+                    <td><i class="fa fa-lock" title="Admin only"></i> Requeue Salva Policy</td>
+                    <td>
+                        <button type="button" class="btn btn-danger" data-toggle="modal"
+                                data-target="#salvaRequeueForm">Requeue
+                        </button>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td><i class="fa fa-lock" title="Admin only"></i> Salva Status</td>
+                    <td>
+                        {{ policy.salvaStatus }}
+                        <button type="button" class="btn btn-danger" data-toggle="modal"
+                                data-target="#salvaStatusForm">Change Status</button>
+                    </td>
+                </tr>
                 {% endif %}
             </table>
 
             {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:AdminEmployee:imeiForm', 'policy': policy, 'id': 'imeiForm'} %}
+            {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:Admin:salvaRequeueForm', 'policy': policy, 'id': 'salvaRequeueForm'} %}
+            {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:Admin:salvaStatusForm', 'policy': policy, 'id': 'salvaStatusForm'} %}
 
             {% endif %}
             {% if is_granted('ROLE_ADMIN') %}
