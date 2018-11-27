@@ -696,7 +696,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                     SalvaExportService::QUEUE_CANCELLED,
                     SalvaExportService::QUEUE_CREATED
                 ],
-                'choice_label' => function($choice, $key, $value) {
+                'choice_label' => function ($choice, $key, $value) {
                     return $value;
                 },
                 'placeholder' => 'Choose a reason',
@@ -723,7 +723,6 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                             sprintf('Sucessfully requeued salva policy: %s', $policy->getPolicyNumber())
                         );
                     } else {
-
                         $this->addFlash(
                             'error',
                             sprintf('Could not requeue salva policy: %s', $policy->getPolicyNumber())
@@ -770,7 +769,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                     SalvaPhonePolicy::SALVA_STATUS_PENDING_REPLACEMENT_CREATE,
                     SalvaPhonePolicy::SALVA_STATUS_SKIPPED
                 ],
-                'choice_label' => function($choice, $key, $value) {
+                'choice_label' => function ($choice, $key, $value) {
                     return $value;
                 },
                 'preferred_choices' => [
