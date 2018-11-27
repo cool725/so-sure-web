@@ -1,12 +1,25 @@
 {% extends 'AppBundle:Email:base.html.twig' %}
 {% import "AppBundle:Email:macros.html.twig" as macros %}
-{% block title %}You have now got a taste card.{% endblock %}
+{% block title %}Your new Taste Card.{% endblock %}
 {% block body %}
 	{{ macros.start_table() }}
 		<div style="font-size: 14px; text-align: left;">
 		   <div style="font-size: 14px; text-align: center;">
-               <p>You have got a taste card now and there is nothing you can do about it.</p>
-               <p>The number of your taste card is <strong>{{ policy.tasteCard }}</strong></p>
+               <p>We have given you a Taste Card.</p>
+			   <p>This lets you go to restaurants for cheap etc etc.
+               <p>
+				   Your new Taste Card number is <strong>{{ policy.tasteCard }}</strong>.
+			   </p>
+			   <p>
+				   Just download the Taste Card official app for
+				   <a href="https://itunes.apple.com/gb/app/tastecard/id346753790">IOS</a>,
+				   <a href="https://play.google.com/store/apps/details?id=novoda.tastecard">Android</a>,
+				   or <a href="https://www.windowsphone.com/en-gb/store/app/tastecard/0d0e3af7-912b-4fba-a6f6-6abf6bbed6c8">Windows Phone</a>,
+				   make an account, and then register your new Taste Card number and enjoy the discounts.
+			   </p>
+			   <p>
+				   If you have any problems or questions then do not hesitate to contact us at <a href="support@wearesosure.com">support@wearesosure.com</a>.
+			   </p>
 		   </div>
 		</div>
 	{{ macros.end_table() }}

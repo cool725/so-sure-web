@@ -6,7 +6,7 @@
 		<div style="font-size: 14px; text-align: left;">
 		   <div style="font-size: 14px; text-align: center;">
                 <p>
-                    Policy <strong>{{ policy.policyNumber }}</strong> was cancelled with a taste card
+                    Policy <strong><a href="{{ url('admin_policy', {'id': policy.id}) }}">{{ policy.policyNumber }}</a></strong> was cancelled with a taste card
                     <strong>{{ policy.tasteCard }}</strong>.
                 </p>
 		   </div>
