@@ -37,8 +37,7 @@ class AffiliateCommand extends ContainerAwareCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $affiliates = $this->affiliateRepository->findAll();
-        $charges = count($this->affiliateService->generate($affiliates, new \DateTime()));
+        $charges = count($this->affiliateService->generate());
         $output->writeln("{$charges} charges made.");
     }
 }

@@ -70,12 +70,18 @@ class AffiliateService
 
     /**
      * Generates all new charges needed for all affiliate companies.
-     * @param array     $affiliates is the list of affiliates to generate for.
+     * @param array     $affiliates is the list of affiliates to generate for or null to get all affiliates.
      * @param \DateTime $date       is the time and date to be considered as current.
      * @return array the list of all the charges that were just generated.
      */
-    public function generate($affiliates, $date)
+    public function generate($affiliates = null, $date = null)
     {
+        if (!$affiliates) {
+            $affiliates = $this->affiliateRepository->findAll();
+        }
+        if (!$date) {
+            $date = new \DateTime();
+        }
         $generatedCharges = [];
         foreach ($affiliates as $affiliate) {
             $model = $affiliate->getChargeModel();
