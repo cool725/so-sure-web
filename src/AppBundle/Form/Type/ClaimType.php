@@ -20,6 +20,7 @@ use AppBundle\Service\ReceperioService;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormEvent;
 use Doctrine\Bundle\MongoDBBundle\Form\Type\DocumentType;
+use Symfony\Component\VarDumper\Cloner\Data;
 
 class ClaimType extends AbstractType
 {
@@ -31,7 +32,7 @@ class ClaimType extends AbstractType
     protected $dm;
 
     /**
-     * @param DocumentManager $dm
+     * @param DocumentManager  $dm
      * @param ReceperioService $receperio
      */
     public function __construct(DocumentManager $dm, ReceperioService $receperio)
@@ -50,7 +51,6 @@ class ClaimType extends AbstractType
                 },
                 'placeholder' => 'Choose a phone'
             ])
-            ->add('approvedDate', DateType::class)
             ->add('shouldCancelPolicy', CheckboxType::class, ['required' => false])
             ->add('notes', TextareaType::class, ['required' => false])
             ->add('update', SubmitType::class)
@@ -87,6 +87,10 @@ class ClaimType extends AbstractType
                 'data' => $claim->getNumber(),
                 'mapped' => false,
                 'trim' => true
+            ]);
+
+            $form->add('approvedDate', DateType::class, [
+                'data' => $claim->getApprovedDate() ? $claim->getApprovedDate() : \DateTime::createFromFormat('U', time())
             ]);
         });
 
