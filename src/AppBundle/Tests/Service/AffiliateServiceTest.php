@@ -176,34 +176,113 @@ class AffiliateServiceTest extends WebTestCase
     }
 
     /**
-     * Tests getting matching users from all status groups when all status groups are populated.
-     * @dataProvider getMatchingUsersProvider
+     * Tests that getting new users with getMatchingUsers works.
      */
-    public function testGetMatchingUsers($count, $states)
+    public function testGetNewUsers()
     {
-        $date = new \DateTime();
-        $data = $this->createState($date);
-        $this->assertEquals(
-            $count,
-            count(self::$affiliateService->getMatchingUsers($data["affiliate"], $date, $states))
+        $data = $this->createState(new \DateTime());
+        $this->checkUsers(
+            [$data["bango"], $data["tango"]],
+            static::$affiliateService->getMatchingUsers($data["affiliate"], null, [User::AQUISITION_NEW])
+        );
+        $this->checkUsers(
+            [],
+            static::$affiliateService->getMatchingUsers(
+                $data["affiliate"],
+                new \DateTime("+30 days"),
+                [User::AQUISITION_NEW]
+            )
+        );
+        $this->checkUsers(
+            [$data["bango"], $data["tango"], $data["hat"], $data["borb"], $data["tonyAbbot"]],
+            static::$affiliateService->getMatchingUsers(
+                $data["affiliate"],
+                new \DateTime("30 days ago"),
+                [User::AQUISITION_NEW]
+            )
         );
     }
 
     /**
-     * Provides data for test get matching users.
+     * Tests that getting pending users works with get matching users.
      */
-    public function getMatchingUsersProvider()
+    public function testGetPendingUsers()
     {
-        return [
-            [3, [User::AQUISITION_NEW, User::AQUISITION_LOST]],
-            [4, [User::AQUISITION_PENDING, User::AQUISITION_POTENTIAL]],
-            [2, [User::AQUISITION_LOST, User::AQUISITION_POTENTIAL]],
-            [5, [User::AQUISITION_NEW, User::AQUISITION_PENDING]],
-            [1, [User::AQUISITION_LOST]],
-            [1, [User::AQUISITION_POTENTIAL]],
-            [2, [User::AQUISITION_NEW]],
-            [3, [User::AQUISITION_PENDING]]
-        ];
+        $data = $this->createState(new \DateTime());
+        $this->checkUsers(
+            [$data["hat"], $data["borb"], $data["tonyAbbot"]],
+            static::$affiliateService->getMatchingUsers($data["affiliate"])
+        );
+        $this->checkUsers(
+            [],
+            static::$affiliateService->getMatchingUsers($data["affiliate"], new \DateTime("30 days ago"))
+        );
+    }
+
+    /**
+     * Tests that getting lost users works with get matching users.
+     */
+    public function testGetLostUsers()
+    {
+        $data = $this->createState(new \DateTime());
+        $this->checkUsers(
+            [$data["cancel"]],
+            static::$affiliateService->getMatchingUsers(
+                $data["affiliate"],
+                new \DateTime(),
+                [User::AQUISITION_LOST]
+            )
+        );
+    }
+
+    /**
+     * Tests that getting potential users works with get matching users.
+     */
+    public function testGetPotentialUsers()
+    {
+        $data = $this->createState(new \DateTime());
+        $this->checkUsers(
+            [$data["camel"]],
+            static::$affiliateService->getMatchingUsers(
+                $data["affiliate"],
+                new \DateTime(),
+                [User::AQUISITION_POTENTIAL]
+            )
+        );
+    }
+
+    /**
+     * Tests getting combinations of aquisition states with get matching users.
+     */
+    public function testGetMatchingUsers()
+    {
+        $data = $this->createState(new \DateTime());
+        // New or Pending.
+        $this->checkUsers(
+            [$data["bango"], $data["tango"], $data["hat"], $data["borb"], $data["tonyAbbot"]],
+            static::$affiliateService->getMatchingUsers(
+                $data["affiliate"],
+                new \DateTime("+30 days"),
+                [User::AQUISITION_NEW, User::AQUISITION_PENDING]
+            )
+        );
+        $this->checkUsers(
+            [$data["bango"], $data["tango"], $data["hat"], $data["borb"], $data["tonyAbbot"]],
+            static::$affiliateService->getMatchingUsers(
+                $data["affiliate"],
+                new \DateTime("30 days ago"),
+                [User::AQUISITION_NEW, User::AQUISITION_PENDING]
+            )
+        );
+        // Potential or Lost.
+        $this->checkUsers(
+            [$data["cancel"], $data["camel"]],
+            static::$affiliateService->getMatchingUsers(
+                $data["affiliate"],
+                new \DateTime("+100 days"),
+                [User::AQUISITION_LOST, User::AQUISITION_POTENTIAL]
+            )
+        );
     }
 
     /**
@@ -381,5 +460,20 @@ class AffiliateServiceTest extends WebTestCase
         self::$dm->persist($renewal);
         self::$dm->flush();
         return $renewal;
+    }
+
+    /**
+     * Checks if the two arrays have the same elements.
+     * @param array $expected contains the expected array.
+     * @param array $got      contains the array you got.
+     */
+    protected function checkUsers($expected, $got)
+    {
+        foreach ($expected as $user) {
+            $this->assertContains($user, $got);
+        }
+        foreach ($got as $user) {
+            $this->assertContains($user, $expected);
+        }
     }
 }

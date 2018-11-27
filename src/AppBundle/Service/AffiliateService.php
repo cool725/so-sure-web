@@ -79,7 +79,7 @@ class AffiliateService
      */
     public function generate($affiliates = null, $date = null)
     {
-        if (!$affiliates) {
+        if ($affiliates === null) {
             $affiliates = $this->affiliateRepository->findAll();
         }
         if (!$date) {
@@ -94,7 +94,7 @@ class AffiliateService
                 $this->ongoingCharges($affiliate, $date, $generatedCharges);
             } else {
                 $this->logger->error(
-                    "Trying to charge for affiliate ".$affiliate.getName()." which lacks charge model."
+                    "Trying to charge for affiliate ".($affiliate->getName())." which lacks charge model."
                 );
             }
         }
@@ -137,7 +137,7 @@ class AffiliateService
             $policies = $user->getValidPolicies(true);
             $charge = $this->chargeRepository->findLastByUser($user, Charge::TYPE_AFFILIATE);
             if (count($policies) == 1) {
-                if (($charge && $charge->getCreatedDate() < $renewalWait) || !$user->getAffiliate()) {
+                if (($charge && $charge->getCreatedDate() < $renewalWait) || !$charge) {
                     $generatedCharges[] = $this->createCharge($affiliate, $user, $policies[0], $date);
                 }
             } elseif ($charge) {
@@ -182,6 +182,9 @@ class AffiliateService
         $campaignUsers = [];
         $leadUsers = [];
         $userRepo = $this->dm->getRepository(User::class);
+        if (!$date) {
+            $date = new \DateTime();
+        }
         if (mb_strlen($affiliate->getCampaignSource()) > 0) {
             $campaignUsers = $userRepo->findBy([
                 'attribution.campaignSource' => $affiliate->getCampaignSource()
@@ -194,9 +197,6 @@ class AffiliateService
             ]);
         }
         $users = [];
-        if (!$date) {
-            $date = new \DateTime();
-        }
         foreach ($campaignUsers as $user) {
             if (in_array($user->aquisitionStatus($affiliate->getDays(), $date), $status)) {
                 $users[] = $user;
@@ -229,9 +229,6 @@ class AffiliateService
         $charge->setUser($user);
         $charge->setAffiliate($affiliate);
         $charge->setPolicy($policy);
-        if (!$user->getAffiliate()) {
-            $affiliate->addConfirmedUsers($user);
-        }
         if (!$policy->getAffiliate()) {
             $affiliate->addConfirmedPolicies($policy);
         }

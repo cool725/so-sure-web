@@ -93,11 +93,6 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     protected $leadSourceDetails;
 
     /**
-     * @MongoDB\ReferenceOne(targetDocument="AffiliateCompany", inversedBy="confirmedPolicies")
-     */
-    protected $affiliate;
-
-    /**
      * @MongoDB\EmbedOne(targetDocument="Address")
      * @Gedmo\Versioned
      */
@@ -568,16 +563,6 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     public function getLeadSourceDetails()
     {
         return $this->leadSourceDetails;
-    }
-
-    public function getAffiliate()
-    {
-        return $this->affiliate;
-    }
-
-    public function setAffiliate(AffiliateCompany $affiliate)
-    {
-        $this->affiliate = $affiliate;
     }
 
     public function getCharges()
