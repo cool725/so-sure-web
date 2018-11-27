@@ -38,6 +38,9 @@ Encore
     .addEntry('admin', './src/AppBundle/Resources/public/rebrand/js/pages/admin/admin.js')
     .addEntry('picsure', './src/AppBundle/Resources/public/rebrand/js/pages/admin/picsure.js')
 
+    // User area files
+    .addEntry('user-unpaid', './src/AppBundle/Resources/public/rebrand/js/pages/user/user-unpaid.js')
+
     // allow legacy applications to use $/jQuery as a global variable
     .autoProvidejQuery()
 
