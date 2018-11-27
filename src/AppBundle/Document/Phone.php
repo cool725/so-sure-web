@@ -244,6 +244,14 @@ class Phone
      */
     protected $newHighDemand;
 
+    /**
+     * If set, then use this path for the canonical link
+     *
+     * @Assert\Length(min="1", max="200")
+     * @MongoDB\Field(type="string")
+     */
+    protected $canonicalPath;
+
     public function __construct()
     {
     }
@@ -691,6 +699,16 @@ class Phone
         $this->newHighDemand = $newHighDemand;
     }
 
+    public function setCanonicalPath($canonicalPath)
+    {
+        $this->canonicalPath = $canonicalPath;
+    }
+
+    public function getCanonicalPath()
+    {
+        return $this->canonicalPath;
+    }
+
     public function getMonthAge()
     {
         if (!$this->getReleaseDate()) {
@@ -988,6 +1006,7 @@ class Phone
             'memory' => $this->getMemory(),
             'description' => $this->getDescription(),
             'funFacts' => $this->getFunFacts(),
+            'canonicalPath' => $this->getCanonicalPath(),
         ];
     }
 

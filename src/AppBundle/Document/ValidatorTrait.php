@@ -8,24 +8,24 @@ use AppBundle\Validator\Constraints\AlphanumericValidator;
 
 trait ValidatorTrait
 {
-    protected function conformAlphanumericSpaceDotPipe($value, $length)
-    {
-        $validator = new AlphanumericSpaceDotPipeValidator();
-
-        return $validator->conform(mb_substr($value, 0, $length));
-    }
-
-    protected function conformAlphanumericSpaceDot($value, $length)
-    {
-        $validator = new AlphanumericSpaceDotValidator();
-
-        return $validator->conform(mb_substr($value, 0, $length));
-    }
-
-    protected function conformAlphanumeric($value, $length)
+    protected function conformAlphanumeric($value, $length, $minLength = 0)
     {
         $validator = new AlphanumericValidator();
+        $string = mb_substr($validator->conform($value), 0, $length);
+        return mb_strlen($string) >= $minLength ? $string : null;
+    }
 
-        return $validator->conform(mb_substr($value, 0, $length));
+    protected function conformAlphanumericSpaceDot($value, $length, $minLength = 0)
+    {
+        $validator = new AlphanumericSpaceDotValidator();
+        $string = mb_substr($validator->conform($value), 0, $length);
+        return mb_strlen($string) >= $minLength ? $string : null;
+    }
+
+    protected function conformAlphanumericSpaceDotPipe($value, $length, $minLength = 0)
+    {
+        $validator = new AlphanumericSpaceDotPipeValidator();
+        $string = mb_substr($validator->conform($value), 0, $length);
+        return mb_strlen($string) >= $minLength ? $string : null;
     }
 }

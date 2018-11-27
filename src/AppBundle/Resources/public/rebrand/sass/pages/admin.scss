@@ -1,4 +1,6 @@
 // admin.scss
+//
+@import "../vendor/jquery.fancybox.css";
 
 body {
     padding-top: 5rem;
@@ -16,4 +18,9 @@ body {
             // width: 1.2rem;
         }
     }
+}
+
+// Fitering
+.card-page-filter {
+    background-color: rgba(37, 147, 243, 0.03);
 }

@@ -20,7 +20,7 @@
     <section class="section--pad">
         <div class="container">
             <div class="row">
-                <div class="col-md-12">
+                <div class="col-md-6 col-md-offset-3">
                     {% set show_judo = false %}
                     {% set show_bacs_setup = false %}
                     {% set show_bacs_retry = false %}
@@ -37,15 +37,15 @@
                     {% elseif unpaid_reason == 'unpaid_bacs_payment_pending' %}
                         {# PAYMENT MENDING #}
                         <h1 class="text-center">Payment is processing</h1>
-                        <p class="lead text-center">Your BACS mandate has been setup, and we are currently processing your payment.</p>
+                        <p class="lead text-center">Your Direct Debit mandate has been setup, and we are currently processing your payment.</p>
                     {% elseif unpaid_reason == 'unpaid_bacs_mandate_invalid' %}
                         {# MANDATE FAILED OR CANCELLED #}
                         {% set show_bacs_setup = true %}
                         {% if not policy.canBacsPaymentBeMadeInTime %}
                             {% set show_judo = true %}
                         {% endif %}
-                        <h1 class="text-center">Invalid Mandate</h1>
-                        <p class="lead text-center">Your BACS mandate is either cancelled or failed.</p>
+                        <h1 class="text-center">Invalid Direct Debit</h1>
+                        <p class="lead text-center">Your Direct Debit mandate is either cancelled or failed.</p>
                     {% elseif unpaid_reason == 'unpaid_bacs_payment_failed' %}
                         {# PAYMENT FAILED #}
                         {% set show_bacs_retry = true %}
@@ -53,7 +53,7 @@
                             {% set show_judo = true %}
                         {% endif %}
                         <h1 class="text-center">Payment failed</h1>
-                        <p class="lead text-center">Your last bacs payment failed and your policy is in danger of being cancelled.</p>
+                        <p class="lead text-center">Your last Direct Debit payment failed and your policy is in danger of being cancelled.</p>
                     {% elseif unpaid_reason == 'unpaid_bacs_payment_missing' %}
                         {# PAYMENT MISSING #}
                         {% set show_bacs_retry = true %}
@@ -61,28 +61,31 @@
                             {% set show_judo = true %}
                         {% endif %}
                         <h1 class="text-center">Payment missing</h1>
-                        <p class="lead text-center">Your account is not paid to date and your policy is in danger of being cancelled.</p>
+                        <p class="lead text-center">Your account has not been paid up to date and your policy is in danger of being cancelled.</p>
                     {% elseif unpaid_reason == 'unpaid_judo_card_expired' %}
                         {% set show_judo = true %}
                         {% if policy.canBacsPaymentBeMadeInTime and bacs_feature %}
                             {% set show_bacs_setup = true %}
                         {% endif %}
                         <h1 class="text-center">Card Expired</h1>
-                        <p class="lead text-center">Your card is expired and we were unable to bill you. Your policy is not up to date on your payments. Click below to pay the outstanding due of £{{ amount|number_format(2, '.', ',') }}.</p>
+                        <p class="lead text-center">Your card has expired and we were unable to bill you. Your policy is not up to date on your payments.</p>
+                        <p class="lead text-center">Click below to pay the outstanding amount due of <strong>&pound;{{ amount|number_format(2, '.', ',') }}</strong>.</p>
                     {% elseif unpaid_reason == 'unpaid_judo_payment_failed' %}
                         {% set show_judo = true %}
                         {% if policy.canBacsPaymentBeMadeInTime and bacs_feature %}
                             {% set show_bacs_setup = true %}
                         {% endif %}
                         <h1 class="text-center">Unpaid Policy</h1>
-                        <p class="lead text-center">Your policy is not up to date on your payments. Click below to pay the outstanding due of £{{ amount|number_format(2, '.', ',') }}.</p>
+                        <p class="lead text-center">Your policy is not up to date on your payments.</p>
+                        <p>Click below to pay the outstanding amount due of <strong>&pound;{{ amount|number_format(2, '.', ',') }}</strong>.</p>
                     {% elseif unpaid_reason == 'unpaid_judo_payment_missing' %}
                         {% set show_judo = true %}
                         {% if policy.canBacsPaymentBeMadeInTime and bacs_feature %}
                             {% set show_bacs_setup = true %}
                         {% endif %}
                         <h1 class="text-center">Unpaid Policy</h1>
-                        <p class="lead text-center">Your policy is not up to date on your payments. Click below to pay the outstanding due of £{{ amount|number_format(2, '.', ',') }}.</p>
+                        <p class="lead text-center">Your policy is not up to date on your payments.</p>
+                        <p>Click below to pay the outstanding amount due of <strong>&pound;{{ amount|number_format(2, '.', ',') }}</strong>.</p>
                     {% else %}
                         {# UNPAID_BACS_UNKNOWN, UNPAID_JUDO_UNKNOWN, UNPAID_UNKNOWN #}
                         <h1 class="text-center">Unknown payment problem</h1>
@@ -93,12 +96,12 @@
                         <p class="lead text-center">
                             {% if policy.canBacsPaymentBeMadeInTime %}
                                 {% if not app.user.hasBacsPaymentMethod %}
-                                    <a id="setup-bacs-link" href="{{ path('user_payment_details_bacs') }}" class="btn btn-green btn-block btn-pad ">Change to direct debit</a>
+                                    <a id="setup-bacs-link" href="{{ path('user_payment_details_bacs') }}" class="btn btn-green btn-pad ">Change to Direct Debit</a>
                                 {% else %}
-                                    <a id="update-bacs-link" href="{{ path('user_payment_details_bacs') }}" class="btn btn-green btn-block btn-pad ">Update direct debit details</a>
+                                    <a id="update-bacs-link" href="{{ path('user_payment_details_bacs') }}" class="btn btn-green btn-pad ">Update Direct Debit details</a>
                                 {% endif %}
                             {% else %}
-                                Sorry, there is not enough time to setup a bacs mandate and take payment before your policy will expire.
+                                Sorry, there is not enough time to setup a Direct Debit mandate and take payment before your policy will expire.
                                 {% if not show_judo %}
                                     Please <a href="mailto:support@wearesosure.com" class="open-intercom">contact us</a>.
                                 {% endif %}
@@ -110,7 +113,7 @@
                         {% if policy.canBacsPaymentBeMadeInTime %}
                             <p class="lead text-center">
                                 {# TODO: Do we need to check mandate status here? #}
-                                We need your permission to take £{{ amount|number_format(2, '.', ',') }} from your account ({{ app.user.paymentMethod.bankAccount }}).
+                                We need your permission to take &pound;{{ amount|number_format(2, '.', ',') }} from your account ({{ app.user.paymentMethod.bankAccount }}).
                                 Once you have given us permission, your payment will be scheduled as soon as possible (within 3 business days).
                             </p>
                             <div class="row">
@@ -138,7 +141,7 @@
                                 <form action="{{ webpay_action }}" method="post" id="webpay-form" class="text-center">
                                     <div class="form-group">
                                         <input  id="Reference" name="Reference" type="hidden" value="{{ webpay_reference }}">
-                                        <input type="submit" class="btn {% if show_bacs_setup %}btn-default{% else %}btn-green{% endif %} btn-pad " value="Proceed to card payment">
+                                        <input type="submit" class="btn {% if show_bacs_setup %}btn-link{% else %}btn-green btn-pad{% endif %}" value="Pay by card">
                                     </div>
                                 </form>
                             </div>

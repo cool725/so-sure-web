@@ -144,12 +144,12 @@ $(function() {
         url:       $(onboardingShare).data('share-link'),
         shareIn:   'popup',
         showLabel: false,
-        showCount: false,
-        on: {
-            click: function(e) {
-                sosure.track.byInvite(this.share);
-            }
-        }
+        showCount: false
+        // on: {
+        //     click: function(e) {
+        //         sosure.track.byInvite(this.share);
+        //     }
+        // }
     });
 
     // Email Invite code

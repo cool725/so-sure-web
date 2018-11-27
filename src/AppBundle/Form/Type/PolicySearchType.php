@@ -53,6 +53,8 @@ class PolicySearchType extends BaseType
             Policy::STATUS_UNPAID => Policy::STATUS_UNPAID,
             Policy::STATUS_PENDING_RENEWAL => Policy::STATUS_PENDING_RENEWAL,
             Policy::STATUS_RENEWAL => Policy::STATUS_RENEWAL,
+            'Unpaid Call List' => 'call',
+            'Called in last week' => 'called',
             'Past Due (cancelled polices w/claim)' => 'past-due',
         ];
         $builder

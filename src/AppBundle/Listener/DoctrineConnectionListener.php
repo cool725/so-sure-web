@@ -2,6 +2,7 @@
 
 namespace AppBundle\Listener;
 
+use AppBundle\Annotation\DataChange;
 use Doctrine\ODM\MongoDB\Event\PreUpdateEventArgs;
 use Doctrine\ODM\MongoDB\Event\LifecycleEventArgs;
 use AppBundle\Document\Connection\StandardConnection;
@@ -26,7 +27,7 @@ class DoctrineConnectionListener extends BaseDoctrineListener
             $eventArgs,
             StandardConnection::class,
             ['value', 'promoValue'],
-            self::COMPARE_DECREASE
+            DataChange::COMPARE_DECREASE
         )) {
             /** @var StandardConnection $document */
             $document = $eventArgs->getDocument();

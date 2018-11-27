@@ -377,13 +377,18 @@
                 </div>
                 <div class="col-md-5">
                     <h2>Notes</h2>
-                    {% for time,note in policy.notes %}
-                        {% set note_decoded = note|json_decode() %}
+                    {% for note in policy.notesList %}
                       <div class="row">
-                        <b>{{ time|date }} by {{ note_decoded.name }}</b>
+                        <b>{{ note.date|date }} by {{ note.userName }}</b>
                       </div>
                       <div class="row">
-                        {{ note_decoded.notes }}
+                          {% if note.type == 'call' %}
+                              Call result: <strong>{{ note.result }}</strong><br>
+                              Additional Actions: <strong>{% if note.actions|length == 0 %}n/a{% else %}{{ note.actions }}{% endif %}</strong><br>
+                              Additional Details: <strong>{% if note.notes|length == 0 %}n/a{% else %}{{ note.notes }}{% endif %}</strong>
+                          {% else %}
+                            {{ note.notes }}
+                          {% endif %}
                       </div>
                     {% endfor %}
                     <hr class="strong">
@@ -805,8 +810,14 @@
                         {% if policy.premiumPlan == 'monthly' %}
                             {{ form_start(billing_form, {'attr': {'class': 'form-inline'}}) }}
                             {{ form_widget(billing_form.day) }}
-                            {{ form_widget(billing_form.update, {'label': 'Change billing date', 'attr': {'class': 'btn btn-danger confirm-submit'}}) }}
-                            {{ form_end(billing_form) }}
+
+                            {% if policy.hasScheduledPaymentInCurrentMonth %}
+                                {{ form_widget(billing_form.update, {'label': 'Change billing date', 'attr': {'class': 'btn btn-danger confirm-date'}}) }}
+                            {% else %}
+                                {{ form_widget(billing_form.update, {'label': 'Change billing date', 'attr': {'class': 'btn btn-danger confirm-submit'}}) }}
+                            {% endif %}
+
+                                {{ form_end(billing_form) }}
                             {% if not policy.isPolicyPaidToDate %}<strong>Policy must be paid to date before update is allowed</strong>{% endif %}
                         {% else %}
                             Policy either does not yet exist, or is an annual policy. Billing date change is not allowed.
@@ -1098,10 +1109,30 @@
                         If the policy was manually adjusted, notify Salva of the new price.
                     </td>
                 </tr>
+
+                <tr>
+                    <td><i class="fa fa-lock" title="Admin only"></i> Requeue Salva Policy</td>
+                    <td>
+                        <button type="button" class="btn btn-danger" data-toggle="modal"
+                                data-target="#salvaRequeueForm">Requeue
+                        </button>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td><i class="fa fa-lock" title="Admin only"></i> Salva Status</td>
+                    <td>
+                        {{ policy.salvaStatus }}
+                        <button type="button" class="btn btn-danger" data-toggle="modal"
+                                data-target="#salvaStatusForm">Change Status</button>
+                    </td>
+                </tr>
                 {% endif %}
             </table>
 
             {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:AdminEmployee:imeiForm', 'policy': policy, 'id': 'imeiForm'} %}
+            {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:Admin:salvaRequeueForm', 'policy': policy, 'id': 'salvaRequeueForm'} %}
+            {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:Admin:salvaStatusForm', 'policy': policy, 'id': 'salvaStatusForm'} %}
 
             {% endif %}
             {% if is_granted('ROLE_ADMIN') %}

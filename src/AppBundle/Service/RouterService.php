@@ -48,4 +48,13 @@ class RouterService
             $this->router->generate($route, $params)
         );
     }
+
+    public function generateUrlFromPath($path)
+    {
+        return sprintf(
+            "%s%s",
+            $this->baseUrl,
+            $path
+        );
+    }
 }

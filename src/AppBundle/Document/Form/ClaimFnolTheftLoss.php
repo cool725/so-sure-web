@@ -4,12 +4,14 @@ namespace AppBundle\Document\Form;
 
 use AppBundle\Document\Claim;
 use AppBundle\Document\DateTrait;
+use AppBundle\Document\ValidatorTrait;
 use Symfony\Component\Validator\Constraints as Assert;
 use AppBundle\Validator\Constraints as AppAssert;
 
 class ClaimFnolTheftLoss
 {
     use DateTrait;
+    use ValidatorTrait;
 
     /**
      * @var Claim
@@ -258,7 +260,7 @@ class ClaimFnolTheftLoss
     {
         $this->claim = $claim;
         $this->hasContacted = $claim->getHasContacted();
-        $this->contactedPlace = $claim->getContactedPlace();
+        $this->contactedPlace = $this->conformAlphanumericSpaceDot($claim->getContactedPlace(), 200, 4);
         $this->blockedDate = $claim->getBlockedDate();
         $this->reportedDate = $claim->getReportedDate();
         $this->reportType = $claim->getReportType();
