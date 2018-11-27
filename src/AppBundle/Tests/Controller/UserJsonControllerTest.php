@@ -11,8 +11,6 @@ use AppBundle\Document\Charge;
 use AppBundle\Classes\ApiErrorCode;
 use AppBundle\Tests\UserClassTrait;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
-use Symfony\Component\BrowserKit\Cookie;
 use Symfony\Bundle\FrameworkBundle\Client;
 use AppBundle\Controller\UserJsonController;
 use Doctrine\ODM\MongoDB\DocumentManager;
@@ -77,7 +75,8 @@ class UserJsonControllerTest extends BaseControllerTest
         $user = null;
         $policy = null;
         if ($login) {
-            $user = static::loginUser();
+            $this->tokenLogin("daly@so-sure.com", "w3ares0sure!");
+            $user = static::$userRepository->findBy(["email" => "daly@so-sure.com"])[0];
             if ($addRole) {
                 $user->addRole($addRole);
             }
@@ -88,9 +87,7 @@ class UserJsonControllerTest extends BaseControllerTest
                 $policy->setStatus(Policy::STATUS_ACTIVE);
             }
         }
-        if ($email == "email" && $user) {
-            $data["email"] = $user->getEmail();
-        } elseif ($email) {
+        if ($email) {
             $data["email"] = $email;
         }
         // Actual test.
@@ -117,7 +114,7 @@ class UserJsonControllerTest extends BaseControllerTest
             [422, ApiErrorCode::ERROR_MISSING_PARAM, true, "dalygbarron@gmail.com", "junkCsrf"],
             [422, ApiErrorCode::ERROR_MISSING_PARAM, true, "dalygbarron@gmail.com", "csrf"],
             [422, ApiErrorCode::ERROR_POLICY_INVALID_VALIDATION, true, "dalygbarron@gmail.com", "csrf", null, "JUNK"],
-            [422, ApiErrorCode::ERROR_INVITATION_SELF_INVITATION, true, "email", "csrf", null, "TEST"],
+            [422, ApiErrorCode::ERROR_INVITATION_SELF_INVITATION, true, "daly@so-sure.com", "csrf", null, "TEST"],
             [200, ApiErrorCode::SUCCESS, true, "successfulinvite@gmail.com", "csrf", null, "TEST"],
             [422, ApiErrorCode::ERROR_INVITATION_DUPLICATE, true, "successfulinvite@gmail.com", "csrf", null, "TEST"]
         ];
@@ -145,7 +142,8 @@ class UserJsonControllerTest extends BaseControllerTest
         $user = null;
         $charge = null;
         if ($login) {
-            $user = static::loginUser();
+            $this->tokenLogin("daly@so-sure.com", "w3ares0sure!");
+            $user = static::$userRepository->findBy(["email" => "daly@so-sure.com"])[0];
             if ($number) {
                 $user->setMobileNumber($number);
             }
@@ -200,34 +198,18 @@ class UserJsonControllerTest extends BaseControllerTest
         static::$client->request("GET", "/user/json/policyterms");
         $this->verifyResponse(302);
         // file not yet generated.
-        $user = static::loginUser();
+        $this->tokenLogin("daly@so-sure.com", "w3ares0sure!");
+
         static::$client->request("GET", "/user/json/policyterms");
         $data = $this->verifyResponse(200, ApiErrorCode::SUCCESS);
         $this->assertEquals("File not yet generated.", $data["description"]);
         // file ready.
+        $user = static::$userRepository->findBy(["email" => "daly@so-sure.com"])[0];
         $policy = $user->getLatestPolicy();
         static::$container->get("app.policy")->generatePolicyTerms($policy);
         static::$dm->flush();
         static::$client->request("GET", "/user/json/policyterms");
         $data = $this->verifyResponse(200, ApiErrorCode::SUCCESS);
         $this->assertContains("file", $data);
-    }
-
-    /**
-     * Log the current session in.
-     * NOTE: BaseController::login does not seem to work with CSRF service while in functional tests.
-     * @return User the user that we just logged in with.
-     */
-    private static function loginUser()
-    {
-        $user = self::$userRepository->findBy([])[0];
-        $session = self::$container->get("session");
-        $firewall = "main";
-        $token = new UsernamePasswordToken($user->getEmail(), "w3ares0sure!", $firewall, []);
-        $session->set("_security_".$firewall, serialize($token));
-        $session->save();
-        $cookie = new Cookie($session->getName(), $session->getId());
-        self::$client->getCookieJar()->set($cookie);
-        return $user;
     }
 }

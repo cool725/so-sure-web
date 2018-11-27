@@ -205,7 +205,7 @@ class UserJsonController extends BaseController
         return new JsonResponse(
             [
                 "file" => "{$file}",
-                "description" => "not-generated",
+                "description" => "File download available.",
                 "code" => ApiErrorCode::SUCCESS
             ],
             200
