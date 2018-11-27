@@ -29,15 +29,11 @@ class ClaimType extends AbstractType
      */
     private $receperio;
 
-    protected $dm;
-
     /**
-     * @param DocumentManager  $dm
      * @param ReceperioService $receperio
      */
-    public function __construct(DocumentManager $dm, ReceperioService $receperio)
+    public function __construct(ReceperioService $receperio)
     {
-        $this->dm = $dm;
         $this->receperio = $receperio;
     }
 
