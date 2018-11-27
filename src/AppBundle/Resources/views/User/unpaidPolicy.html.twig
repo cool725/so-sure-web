@@ -45,7 +45,6 @@
 
                     {# ALREADY PAID #}
                     <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_phone-smile.png" alt="so-sure" width="180px">
-
                     <h1 class="h2 mb-4">Policy paid up to date</h1>
                     <p>Return to your <a href="{{ path('user_home') }}">user homepage</a>.</p>
                     {# END - ALREADY PAID #}
@@ -55,7 +54,6 @@
 
                     {# MANDATE PENDING #}
                     <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_phone-smile.png" alt="so-sure" width="180px">
-
                     <h1 class="h2 mb-4">Direct Debit setup pending</h1>
                     <p>We're currently setting up your direct debit. Please come back in a few days.</p>
                     {# END - MANDATE PENDING #}
@@ -78,8 +76,6 @@
                         {% set judo_btn_text = 'Pay by card' %}
                     {% endif %}
                     <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_broken-phone.png" alt="so-sure" width="180px">
-
-
                     <h1 class="h2 mb-4">Direct Debit invalid </h1>
                     <p>Your Direct Debit is either cancelled or has failed.</p>
                     {# END - MANDATE FAILED OR CANCELLED #}
@@ -93,7 +89,6 @@
                         {% set judo_btn_text = 'Pay by card' %}
                     {% endif %}
                     <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_broken-phone.png" alt="so-sure" width="180px">
-
                     <h1 class="h2 mb-4">Payment failed</h1>
                     <p class="lead">Your last Direct Debit payment failed and your policy is in danger of being cancelled.</p>
                     {# END - PAYMENT FAILED #}
@@ -107,7 +102,6 @@
                         {% set judo_btn_text = 'Pay by card' %}
                     {% endif %}
                     <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_broken-phone.png" alt="so-sure" width="180px">
-
                     <h1 class="h2 mb-4">Payment missing</h1>
                     <p class="lead">Your account has not been paid up to date and your policy is in danger of being cancelled.</p>
                     {# END - PAYMENT MISSING #}
@@ -121,7 +115,6 @@
                         {% set show_bacs_setup = true %}
                     {% endif %}
                     <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_broken-phone.png" alt="so-sure" width="180px">
-
                     {% if show_bacs_setup %}
                         <h1 class="h2 mb-4">Update your payment details</h1>
                         <p>Your card ending <strong>XXXX</strong> has expired and we were unable to take payment of <strong>&pound;{{ amount|number_format(2, '.', ',') }}</strong>.</p>
@@ -145,7 +138,6 @@
                         {% set show_bacs_setup = true %}
                     {% endif %}
                     <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_broken-phone.png" alt="so-sure" width="180px">
-
                     {% if show_bacs_setup %}
                         <h1 class="h2 mb-4">Update your payment details</h1>
                         <p>We were unable to take payment of <strong>&pound;{{ amount|number_format(2, '.', ',') }}</strong> because your card ending <strong>XXXX</strong> was declined.</p>
@@ -169,7 +161,6 @@
                         {% set show_bacs_setup = true %}
                     {% endif %}
                     <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_broken-phone.png" alt="so-sure" width="180px">
-
                     {% if show_bacs_setup %}
                         <h1 class="h2 mb-4">Update your payment details</h1>
                         <p>We were unable to take payment of <strong>&pound;{{ amount|number_format(2, '.', ',') }}</strong> because your card ending <strong>XXXX</strong> was declined.</p>
@@ -189,7 +180,6 @@
 
                     {# UNPAID_BACS_UNKNOWN, UNPAID_JUDO_UNKNOWN, UNPAID_UNKNOWN #}
                     <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_broken-phone.png" alt="so-sure" width="180px">
-
                     <h1 class="h2">Payment problem</h1>
                     <p>Please <a href="mailto:support@wearesosure.com" class="open-intercom">contact us</a>.</p>
                     {# END - UNPAID_BACS_UNKNOWN, UNPAID_JUDO_UNKNOWN, UNPAID_UNKNOWN #}
