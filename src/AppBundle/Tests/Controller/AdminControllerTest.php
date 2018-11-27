@@ -15,6 +15,7 @@ use AppBundle\DataFixtures\MongoDB\b\User\LoadUserData;
 
 /**
  * @group functional-net
+ * AppBundle\\Tests\\Controller\\AdminControllerTest
  */
 class AdminControllerTest extends BaseControllerTest
 {
@@ -23,6 +24,7 @@ class AdminControllerTest extends BaseControllerTest
 
     public function tearDown()
     {
+        self::$client->getCookieJar()->clear();
     }
 
     public function setUp()
@@ -105,7 +107,7 @@ class AdminControllerTest extends BaseControllerTest
         // make one claim just in case no claim was created and page is empty
         $user = static::createUser(
             static::$userManager,
-            static::generateEmail('testAdminClaimUpdateForm'.rand(), $this),
+            static::generateEmail('testAdminClaimDelete'.rand(), $this),
             'bar'
         );
         $phone = static::getRandomPhone(self::$dm);
@@ -151,7 +153,7 @@ class AdminControllerTest extends BaseControllerTest
         // make one claim just in case no claim was created and page is empty
         $user = static::createUser(
             static::$userManager,
-            static::generateEmail('testAdminClaimUpdateForm'.rand(), $this),
+            static::generateEmail('testClaimsClaimDelete'.rand(), $this),
             'bar'
         );
         $phone = static::getRandomPhone(self::$dm);
