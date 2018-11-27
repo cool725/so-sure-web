@@ -466,7 +466,6 @@ class BaseControllerTest extends WebTestCase
     /**
      * Log the current session in using a token instead of by manipulating forms. This login method behaves better with
      * the CSRF service and is faster.
-     * @return User the user that we just logged in with.
      */
     protected function tokenLogin($email, $password)
     {
