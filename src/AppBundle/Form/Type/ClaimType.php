@@ -2,6 +2,8 @@
 
 namespace AppBundle\Form\Type;
 
+use AppBundle\Document\Phone;
+use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -26,23 +28,32 @@ class ClaimType extends AbstractType
      */
     private $receperio;
 
+    protected $dm;
+
     /**
+     * @param DocumentManager $dm
      * @param ReceperioService $receperio
      */
-    public function __construct(ReceperioService $receperio)
+    public function __construct(DocumentManager $dm, ReceperioService $receperio)
     {
+        $this->dm = $dm;
         $this->receperio = $receperio;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('number', TextType::class)
-            ->add('replacementPhone', ChoiceType::class)
+            ->add('replacementPhone', ChoiceType::class, [
+                'choices' => $this->dm->getRepository(Phone::class)->findActiveInactive()->getQuery()->execute(),
+                'choice_label' => function ($phone, $key, $value) {
+                    return $phone->getName();
+                },
+                'placeholder' => 'Choose a phone'
+            ])
             ->add('approvedDate', DateType::class)
             ->add('shouldCancelPolicy', CheckboxType::class, ['required' => false])
             ->add('notes', TextareaType::class, ['required' => false])
-            ->add('record', SubmitType::class)
+            ->add('update', SubmitType::class)
         ;
 
         $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
@@ -71,6 +82,20 @@ class ClaimType extends AbstractType
                 'choices' => $choices,
                 'disabled' => $claim->getType() == null ? false : true,
             ]);
+
+            $form->add('number', TextType::class, [
+                'data' => $claim->getNumber(),
+                'mapped' => false,
+                'trim' => true
+            ]);
+        });
+
+        $builder->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event) {
+            /** @var Claim $claim */
+            $claim = $event->getData();
+            $form = $event->getForm();
+
+            $claim->setNumber($form->get('number')->getData(), true);
         });
     }
 

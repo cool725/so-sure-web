@@ -31,6 +31,16 @@ $('.btn-copy').click(function (e) {
     e.preventDefault();
 });
 
+$('#today').click(function (e) {
+    let date = new Date();
+
+    console.log("this");
+
+    console.log(date.getDate());
+    console.log(date.getMonth());
+    console.log(date.getFullYear());
+});
+
 clipboard.on('success', function (event) {
     console.log(event);
     $('.btn-copy').tooltip('show');
@@ -64,10 +74,8 @@ $('#claimsModal').on('show.bs.modal', function (event) {
     let button = $(event.relatedTarget);
     let modal = $(this);
 
-    console.log("this");
-
     ajax = $.ajax({
-        url: '/admin/claim-info/' + button.data('id'),
+        url: '/admin/claims-form/' + button.data('id'),
         type: "GET"
     });
 

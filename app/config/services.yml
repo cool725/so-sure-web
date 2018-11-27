@@ -1360,7 +1360,7 @@ services:
 
     app.form.type.claim:
         class: AppBundle\Form\Type\ClaimType
-        arguments: ["@app.imei"]
+        arguments: ["@doctrine_mongodb.odm.default_document_manager", "@app.imei"]
         tags:
             - { name: form.type }
 

@@ -475,35 +475,38 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
     }
 
     /**
-     * @Route("/claim-info/{id}", name="claim_info")
+     * @Route("/claims-form/{id}", name="claims_form")
      */
-    public function claimInfoAction(Request $request, $id = null)
+    public function claimsFormAction(Request $request, $id = null)
     {
         $dm = $this->getManager();
         $repo = $dm->getRepository(Claim::class);
         /** @var Claim $claim */
         $claim = $repo->find($id);
 
-        $claimForm = $this->get('form.factory')
-            ->createNamedBuilder('claim_update', ClaimType::class, $claim)
+        $claimsForm = $this->get('form.factory')
+            ->createNamedBuilder('claims_form', ClaimType::class, $claim)
             ->setAction($this->generateUrl(
-                'claim_info',
+                'claims_form',
                 ['id' => $id]
             ))
             ->getForm();
 
         if ('POST' === $request->getMethod()) {
-            if ($request->request->has('claim_update')) {
-                $claimForm->handleRequest($request);
-                if ($claimForm->isValid()) {
-
+            if ($request->request->has('claims_form')) {
+                $claimsForm->handleRequest($request);
+                if ($claimsForm->isValid()) {
                     $dm->flush();
                     $this->addFlash(
                         'success',
-                        sprintf('Claim %s imei updated.', $claim->getPolicyNumber())
+                        sprintf('Claim %s updated', $claim->getNumber())
                     );
 
-                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
+                    if ($claim->getPolicy()) {
+                        return $this->redirectToRoute('admin_policy', ['id' => $claim->getPolicy()->getId()]);
+                    } else {
+                        return $this->redirectToRoute('admin_claims', ['id' => $id]);
+                    }
                 }
             }
         }
@@ -511,54 +514,9 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         return $this->render('AppBundle:Claims:claimsModalBody.html.twig', [
             'claim' => $claim->toModalArray(),
             'claimClass' => $claim,
-            'form' => $claimForm->createView()
+            'form' => $claimsForm->createView()
         ]);
     }
-
-//    /**
-//     * @Route("/claim-update/{id}", name="claim_update")
-//     * @Template
-//     */
-//    public function claimUpdateAction(Request $request, $id = null)
-//    {
-//        $dm = $this->getManager();
-//        $repo = $dm->getRepository(Claim::class);
-//        /** @var Claim $claim */
-//        $claim = $repo->find($id);
-//
-//        if (!$claim) {
-//            throw $this->createNotFoundException(sprintf('Policy %s not found', $id));
-//        }
-//
-//        $claimForm = $this->get('form.factory')
-//            ->createNamedBuilder('claim_update', ClaimType::class, $claim)
-//            ->setAction($this->generateUrl(
-//                'claim_update',
-//                ['id' => $id]
-//            ))
-//            ->getForm();
-//
-//        if ('POST' === $request->getMethod()) {
-//            if ($request->request->has('claim_update')) {
-//                $claimForm->handleRequest($request);
-//                if ($claimForm->isValid()) {
-//
-//                    $dm->flush();
-//                    $this->addFlash(
-//                        'success',
-//                        sprintf('Claim %s imei updated.', $claim->getPolicyNumber())
-//                    );
-//
-//                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
-//                }
-//            }
-//        }
-//
-//        return [
-//            'form' => $claimForm->createView(),
-//            'policy' => $claim
-//        ];
-//    }
 
     /**
      * @Route("/imei-form/{id}", name="imei_form")
