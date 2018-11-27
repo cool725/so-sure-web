@@ -57,7 +57,7 @@
                     <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_phone-smile.png" alt="so-sure" width="180px">
 
                     <h1 class="h2 mb-4">Payment processing</h1>
-                    <p>Your Direct Debit has been setup, and we are currently processing your payment.</p>
+                    <p>Your Direct Debit has been setup and we are currently processing your payment.</p>
                     {# END - MANDATE PENDING #}
 
                 {% elseif unpaid_reason == 'unpaid_bacs_payment_pending' %}
@@ -66,7 +66,7 @@
                     <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_phone-smile.png" alt="so-sure" width="180px">
 
                     <h1 class="h2 mb-4">Payment is processing</h1>
-                    <p>Your Direct Debit has been setup, and we are currently processing your payment.</p>
+                    <p>Your Direct Debit has been setup and we are currently processing your payment.</p>
                     {# END - PAYMENT PENDING #}
 
                 {% elseif unpaid_reason == 'unpaid_bacs_mandate_invalid' %}
@@ -75,14 +75,14 @@
                     {% set show_bacs_setup = true %}
                     {% if not policy.canBacsPaymentBeMadeInTime %}
                         {% set show_judo = true %}
+                        {% set judo_btn_text = 'Pay by card' %}
                     {% endif %}
                     <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_broken-phone.png" alt="so-sure" width="180px">
 
-                    {% set judo_btn_text = 'Pay by card' %}
 
                     <h1 class="h2 mb-4">Invalid Direct Debit</h1>
                     <p>Your Direct Debit is either cancelled or failed.</p>
-                    <p>Sorry, there is not enough time to setup a Direct Debit and take a payment before your policy will expire.</p>
+                    <p>Sorry, there is not enough time to setup a Direct Debit before your policy will expire.</p>
                     {# END - MANDATE FAILED OR CANCELLED #}
 
                 {% elseif unpaid_reason == 'unpaid_bacs_payment_failed' %}
@@ -91,6 +91,7 @@
                     {% set show_bacs_retry = true %}
                     {% if not policy.canBacsPaymentBeMadeInTime %}
                         {% set show_judo = true %}
+                        {% set judo_btn_text = 'Pay by card' %}
                     {% endif %}
                     <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_broken-phone.png" alt="so-sure" width="180px">
 
@@ -104,11 +105,13 @@
                     {% set show_bacs_retry = true %}
                     {% if not policy.canBacsPaymentBeMadeInTime %}
                         {% set show_judo = true %}
+                        {% set judo_btn_text = 'Pay by card' %}
                     {% endif %}
                     <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_broken-phone.png" alt="so-sure" width="180px">
 
-                    <h1 class="h2  mb-4"></h1>
-                    <p class="lead"></p>
+                    <h1 class="h2 mb-4">Payment missing</h1>
+                    <p class="lead">Your account has not been paid up to date and your policy is in danger of being cancelled.</p>
+                    {# END - PAYMENT MISSING #}
 
                 {# CARD / JUDO PAY #}
                 {% elseif unpaid_reason == 'unpaid_judo_card_expired' %}
@@ -184,11 +187,14 @@
                     {# END - PAYMENT MISSING #}
 
                 {% else %}
+
                     {# UNPAID_BACS_UNKNOWN, UNPAID_JUDO_UNKNOWN, UNPAID_UNKNOWN #}
                     <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_broken-phone.png" alt="so-sure" width="180px">
 
-                    <h1 class="h2"></h1>
-                    <p class="lead"></p>
+                    <h1 class="h2">Payment problem</h1>
+                    <p>Please <a href="mailto:support@wearesosure.com" class="open-intercom">contact us</a>.</p>
+                    {# END - UNPAID_BACS_UNKNOWN, UNPAID_JUDO_UNKNOWN, UNPAID_UNKNOWN #}
+
                 {% endif %}
             </div>
         </div>
