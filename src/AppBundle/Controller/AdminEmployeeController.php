@@ -690,6 +690,15 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         $salvaRequeueForm = $this->get('form.factory')
             ->createNamedBuilder('salva_requeue_form')
             ->add('requeue', SubmitType::class)
+            ->add('reason', ChoiceType::class, [
+                'choices' => [
+                    SalvaExportService::QUEUE_UPDATED => SalvaExportService::QUEUE_UPDATED,
+                    SalvaExportService::QUEUE_CANCELLED => SalvaExportService::QUEUE_CANCELLED,
+                    SalvaExportService::QUEUE_CREATED => SalvaExportService::QUEUE_CREATED
+                ],
+                'placeholder' => 'Choose a reason',
+                'required' => true
+            ])
             ->setAction($this->generateUrl(
                 'salva_requeue_form',
                 ['id' => $id]
@@ -703,8 +712,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                     /** @var SalvaExportService $salvaService */
                     $salvaService = $this->get('app.salva');
 
-                    // TODO: multiple choices
-                    $result = $salvaService->queue($policy, SalvaExportService::QUEUE_UPDATED, 0);
+                    $result = $salvaService->queue($policy, $salvaRequeueForm->getData()['reason'], 0);
 
                     if ($result) {
                         $this->addFlash(
@@ -718,11 +726,6 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                             sprintf('Could not requeue salva policy: %s', $policy->getPolicyNumber())
                         );
                     }
-
-                    $this->addFlash(
-                        'success',
-                        sprintf('Requeued salva policy: %s', $policy->getPolicyNumber())
-                    );
 
                     return $this->redirectToRoute('admin_policy', ['id' => $id]);
                 }
@@ -754,11 +757,25 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             ->createNamedBuilder('salva_status_form')
             ->add('status', ChoiceType::class, [
                 'choices' => [
-                    'wait-cancelled' => SalvaPhonePolicy::SALVA_STATUS_WAIT_CANCELLED,
-                    'pending-cancelled' => SalvaPhonePolicy::SALVA_STATUS_PENDING_CANCELLED,
-                    'pending-update' => SalvaPhonePolicy::SALVA_STATUS_PENDING_UPDATE
+                    SalvaPhonePolicy::SALVA_STATUS_PENDING_UPDATE,
+                    SalvaPhonePolicy::SALVA_STATUS_PENDING ,
+                    SalvaPhonePolicy::SALVA_STATUS_PENDING_CANCELLED,
+                    SalvaPhonePolicy::SALVA_STATUS_CANCELLED,
+                    SalvaPhonePolicy::SALVA_STATUS_WAIT_CANCELLED,
+                    SalvaPhonePolicy::SALVA_STATUS_ACTIVE,
+                    SalvaPhonePolicy::SALVA_STATUS_PENDING_REPLACEMENT_CANCEL,
+                    SalvaPhonePolicy::SALVA_STATUS_PENDING_REPLACEMENT_CREATE,
+                    SalvaPhonePolicy::SALVA_STATUS_SKIPPED
                 ],
-                'placeholder' => 'Choose a status'
+                'choice_label' => function($choice, $key, $value) {
+                    return $value;
+                },
+                'preferred_choices' => [
+                    SalvaPhonePolicy::SALVA_STATUS_WAIT_CANCELLED,
+                    SalvaPhonePolicy::SALVA_STATUS_PENDING_CANCELLED
+                ],
+                'placeholder' => 'Choose a status',
+                'required' => true
             ])
             ->add('update', SubmitType::class)
             ->setAction($this->generateUrl(
@@ -772,6 +789,11 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                 $salvaRequeueForm->handleRequest($request);
                 if ($salvaRequeueForm->isValid()) {
                     $policy->setSalvaStatus($salvaRequeueForm->getData()['status']);
+
+                    $this->addFlash(
+                        'success',
+                        sprintf('Changed salva status to %s', $policy->getSalvaStatus())
+                    );
 
                     $dm->flush();
                     return $this->redirectToRoute('admin_policy', ['id' => $id]);
