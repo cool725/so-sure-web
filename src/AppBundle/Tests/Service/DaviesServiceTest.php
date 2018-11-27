@@ -2,6 +2,7 @@
 
 namespace AppBundle\Tests\Service;
 
+use AppBundle\Classes\DirectGroupHandlerClaim;
 use AppBundle\Document\Policy;
 use AppBundle\Service\DaviesService;
 use Doctrine\ODM\MongoDB\DocumentManager;
@@ -310,6 +311,70 @@ class DaviesServiceTest extends WebTestCase
         $this->assertEquals(1, count(self::$daviesService->getWarnings()));
 
         $this->insureWarningExists('/multiple open claims against policy/');
+    }
+
+    public function testSaveClaimsOpenDG()
+    {
+        $verifyTest = false;
+
+        $policyOpen = static::createUserPolicy(true);
+        $policyOpen->getUser()->setEmail(static::generateEmail('testSaveClaimsOpenDG', $this));
+        $initialImei = $policyOpen->getImei();
+        $claimOpen = new Claim();
+        $claimOpen->setStatus(Claim::STATUS_APPROVED);
+        $claimOpen->setNumber(self::getRandomPolicyNumber('TEST'));
+        $claimOpen->setHandlingTeam(Claim::TEAM_DAVIES);
+        $policyOpen->addClaim($claimOpen);
+
+        $claimOpen2 = new Claim();
+        $claimOpen2->setNumber(self::getRandomPolicyNumber('TEST'));
+        $claimOpen2->setStatus(Claim::STATUS_APPROVED);
+        $claimOpen2->setReplacementImei(static::generateRandomImei());
+        $claimOpen2->setHandlingTeam(Claim::TEAM_DIRECT_GROUP);
+
+        if (!$verifyTest) {
+            $policyOpen->addClaim($claimOpen2);
+        }
+
+        static::$dm->persist($policyOpen->getUser());
+        static::$dm->persist($policyOpen);
+        static::$dm->persist($claimOpen);
+        static::$dm->persist($claimOpen2);
+        static::$dm->flush();
+        self::$daviesService->clearErrors();
+
+        $now = \DateTime::createFromFormat('U', time());
+        $daviesOpen = new DaviesHandlerClaim();
+        $daviesOpen->policyNumber = $policyOpen->getPolicyNumber();
+        $daviesOpen->claimNumber = $claimOpen->getNumber();
+        $daviesOpen->insuredName = $policyOpen->getUser()->getName();
+        $daviesOpen->status = 'Open';
+        $daviesOpen->lossDate = new \DateTime('2017-02-01');
+        $daviesOpen->replacementImei = static::generateRandomImei();
+        $daviesOpen->replacementReceivedDate = $now;
+        $daviesOpen->replacementMake = 'foo';
+        $daviesOpen->replacementModel = 'bar';
+        $daviesOpen->phoneReplacementCost = 100;
+        $daviesOpen->incurred = 100;
+        $daviesOpen->initialSuspicion = false;
+        $daviesOpen->finalSuspicion = false;
+        $daviesOpen->lossDescription = 'foo bar';
+
+        $this->assertEquals(0, count(self::$daviesService->getWarnings()));
+        self::$daviesService->saveClaims(1, [$daviesOpen]);
+        //print_r(self::$daviesService->getErrors());
+        //print_r(self::$daviesService->getWarnings());
+        $this->assertEquals(0, count(self::$daviesService->getErrors()));
+        $this->assertEquals(0, count(self::$daviesService->getWarnings()));
+        $this->assertEquals(0, count(self::$daviesService->getSoSureActions()));
+
+        $updatedPolicy = $this->assertPolicyExists(static::$container, $policyOpen);
+
+        if ($verifyTest) {
+            $this->assertEquals($daviesOpen->replacementImei, $updatedPolicy->getImei());
+        } else {
+            $this->assertEquals($initialImei, $updatedPolicy->getImei());
+        }
     }
 
     public function testUpdateClaimNoFinalFlag()

@@ -285,7 +285,7 @@ class DirectGroupService extends ExcelSftpService
             if ($policy) {
                 foreach ($policy->getClaims() as $claim) {
                     /** @var Claim $claim */
-                    // 2 options - either db claim is closed or davies claim is closed
+                    // 3 options - either db claim is closed or dg claim is closed, or both are open
                     $logError = false;
                     $preventImeiUpdate = false;
                     if (!$claim->isOpen() &&
@@ -303,6 +303,9 @@ class DirectGroupService extends ExcelSftpService
                         if ($claim->getHandlingTeam() == Claim::TEAM_DIRECT_GROUP) {
                             $logError = true;
                         }
+                    } elseif ($claim->isOpen() && $directGroupClaim->isOpen() &&
+                        $claim->getNumber() != $directGroupClaim->claimNumber) {
+                        $preventImeiUpdate = true;
                     }
 
                     if ($preventImeiUpdate) {
