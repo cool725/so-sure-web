@@ -486,6 +486,13 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
 
         $claimsForm = $this->get('form.factory')
             ->createNamedBuilder('claims_form', ClaimType::class, $claim)
+            ->add('replacementPhone', ChoiceType::class, [
+                'choices' => $dm->getRepository(Phone::class)->findActiveInactive()->getQuery()->execute(),
+                'choice_label' => function ($phone, $key, $value) {
+                    return $phone->getName();
+                },
+                'placeholder' => 'Choose a phone'
+            ])
             ->setAction($this->generateUrl(
                 'claims_form',
                 ['id' => $id]

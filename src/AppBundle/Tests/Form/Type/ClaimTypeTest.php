@@ -40,7 +40,7 @@ class ClaimTypeTest extends FormTypeTest
 
     protected function getExtensions()
     {
-        $claim = new ClaimType($this->dm, $this->reciperoService);
+        $claim = new ClaimType($this->reciperoService);
 
         return [
             new PreloadedExtension([$claim], []),

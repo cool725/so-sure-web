@@ -3,6 +3,7 @@
 namespace AppBundle\Form\Type;
 
 use AppBundle\Document\Phone;
+use AppBundle\Repository\PhoneRepository;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
@@ -40,12 +41,8 @@ class ClaimType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('replacementPhone', ChoiceType::class, [
-                'choices' => $this->dm->getRepository(Phone::class)->findActiveInactive()->getQuery()->execute(),
-                'choice_label' => function ($phone, $key, $value) {
-                    return $phone->getName();
-                },
-                'placeholder' => 'Choose a phone'
+            ->add('replacementImei', NumberType::class, [
+
             ])
             ->add('shouldCancelPolicy', CheckboxType::class, ['required' => false])
             ->add('notes', TextareaType::class, ['required' => false])
@@ -75,8 +72,7 @@ class ClaimType extends AbstractType
             ]);
             $form->add('type', ChoiceType::class, [
                 'placeholder' => 'Select Claim Type',
-                'choices' => $choices,
-                'disabled' => $claim->getType() == null ? false : true,
+                'choices' => $choices
             ]);
 
             $form->add('number', TextType::class, [
@@ -86,7 +82,8 @@ class ClaimType extends AbstractType
             ]);
 
             $form->add('approvedDate', DateType::class, [
-                'data' => $claim->getApprovedDate() ? $claim->getApprovedDate() : \DateTime::createFromFormat('U', time())
+                'data' =>
+                    $claim->getApprovedDate() ? $claim->getApprovedDate() : \DateTime::createFromFormat('U', time())
             ]);
         });
 
