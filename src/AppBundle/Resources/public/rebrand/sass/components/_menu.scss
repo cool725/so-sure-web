@@ -14,7 +14,7 @@
     &__links {
         width: 100%;
         display: none;
-        flex: 1;
+        flex: 2;
         margin: 0;
         overflow-y: scroll;
 
@@ -56,11 +56,11 @@
             display: block;
             padding: 1rem 2rem;
             color: $white;
-            background-color: $crayon-blue;
+            background-color: $ufo-green;
 
             &:hover, &:focus {
-                color: $columbia-blue-e;
-                background-color: $dodger-blue;
+                color: $white;
+                background-color: darken($ufo-green, 10%);
                 text-decoration: none;
             }
         }
