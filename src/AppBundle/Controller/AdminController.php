@@ -1429,8 +1429,8 @@ class AdminController extends BaseController
     public function salvaRequeueFormAction(Request $request, $id = null)
     {
         $dm = $this->getManager();
-        $repo = $dm->getRepository(PhonePolicy::class);
-        /** @var PhonePolicy $policy */
+        $repo = $dm->getRepository(SalvaPhonePolicy::class);
+        /** @var SalvaPhonePolicy $policy */
         $policy = $repo->find($id);
 
         if (!$policy) {
@@ -1484,8 +1484,8 @@ class AdminController extends BaseController
     public function salvaStatusFormAction(Request $request, $id = null)
     {
         $dm = $this->getManager();
-        $repo = $dm->getRepository(PhonePolicy::class);
-        /** @var PhonePolicy $policy */
+        $repo = $dm->getRepository(SalvaPhonePolicy::class);
+        /** @var SalvaPhonePolicy $policy */
         $policy = $repo->find($id);
 
         if (!$policy) {
