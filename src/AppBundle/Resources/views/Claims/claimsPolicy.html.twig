@@ -160,13 +160,13 @@
                 {% if policy.policyTerms.isRepairEnabled %}
                     <h4>Damage claim? Policy terms allow for repair.</h4>
                 {% endif %}
-                {% if oa %}
-                    {% if oa.isLondon %}
-                        <h4>Damage claim? User is in Greater London - consider using Trinity Maxwell. </h4>
-                    {% elseif oa.isHomeCounty %}
-                        <h4>Damage claim? User is in a Home County - ask if working in Central London and consider using Trinity Maxwell. </h4>
-                    {% endif %}
-                {% endif %}
+                {#{% if oa %}#}
+                    {#{% if oa.isLondon %}#}
+                        {#<h4>Damage claim? User is in Greater London - consider using Trinity Maxwell. </h4>#}
+                    {#{% elseif oa.isHomeCounty %}#}
+                        {#<h4>Damage claim? User is in a Home County - ask if working in Central London and consider using Trinity Maxwell. </h4>#}
+                    {#{% endif %}#}
+                {#{% endif %}#}
             </div>
             {% endif %}
             <div role="tabpanel" class="tab-pane" id="crimeref">
