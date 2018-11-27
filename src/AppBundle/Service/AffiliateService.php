@@ -52,6 +52,7 @@ class AffiliateService
     protected $dm;
     protected $logger;
     protected $chargeRepository;
+    protected $affiliateRepository;
 
     /**
      * Builds the affiliate service and sends in it's dependencies as arguments.
@@ -66,6 +67,8 @@ class AffiliateService
         $this->logger = $logger;
         /** @var ChargeRepository $chargeRepository */
         $this->chargeRepository = $dm->getRepository(Charge::class);
+        /** @var affiliateRepository $affiliateRepository */
+        $this->affiliateRepository = $dm->getRepository(AffiliateCompany::class);
     }
 
     /**
@@ -89,6 +92,10 @@ class AffiliateService
                 $this->oneOffCharges($affiliate, $date, $generatedCharges);
             } elseif ($model == AffiliateCompany::MODEL_ONGOING) {
                 $this->ongoingCharges($affiliate, $date, $generatedCharges);
+            } else {
+                $this->logger->error(
+                    "Trying to charge for affiliate ".$affiliate.getName()." which lacks charge model."
+                );
             }
         }
         return $generatedCharges;
@@ -122,8 +129,9 @@ class AffiliateService
      */
     public function ongoingCharges($affiliate, $date, & $generatedCharges = [])
     {
+        $renewalDays = new DateInterval("P".($affiliate->getRenewalDays() ?: 0)."D");
         $renewalWait = clone $date;
-        $renewalWait->sub(new DateInterval("P1Y"))->add(new DateInterval("P".($affiliate->getRenewalDays() ?: 0)."D"));
+        $renewalWait->sub(new DateInterval("P1Y"))->add($renewalDays);
         $users = $this->getMatchingUsers($affiliate, $date);
         foreach ($users as $user) {
             $policies = $user->getValidPolicies(true);
@@ -169,7 +177,7 @@ class AffiliateService
      * @param array            $status    is the set of aquisition statuses within which all users must fall.
      * @return array containing the users.
      */
-    public function getMatchingUsers(AffiliateCompany $affiliate, $date, $status = [User::AQUISITION_PENDING])
+    public function getMatchingUsers(AffiliateCompany $affiliate, $date = null, $status = [User::AQUISITION_PENDING])
     {
         $campaignUsers = [];
         $leadUsers = [];
@@ -186,6 +194,9 @@ class AffiliateService
             ]);
         }
         $users = [];
+        if (!$date) {
+            $date = new \DateTime();
+        }
         foreach ($campaignUsers as $user) {
             if (in_array($user->aquisitionStatus($affiliate->getDays(), $date), $status)) {
                 $users[] = $user;

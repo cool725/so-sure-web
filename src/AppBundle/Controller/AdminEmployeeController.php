@@ -2679,6 +2679,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
     public function affiliateAction(Request $request)
     {
         $time_range = [
+            14 => 14,
             30 => 30,
             60 => 60,
             90 => 90

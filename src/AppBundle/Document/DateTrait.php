@@ -346,7 +346,7 @@ trait DateTrait
      * @param \DateTime $date is the starting date.
      * @param int       $days is the number of days to move ahead.
      */
-    public static function jumpDays($date, $days)
+    public static function addDays($date, $days)
     {
         $date->add(new \DateInterval("P{$days}D"));
     }

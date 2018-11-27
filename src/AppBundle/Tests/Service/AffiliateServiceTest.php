@@ -93,9 +93,9 @@ class AffiliateServiceTest extends WebTestCase
         $this->assertEquals(3, count(self::$affiliateService->generate([$data["affiliate"]], $date)));
         //test on pre loved data.
         $this->assertEquals(0, count(self::$affiliateService->generate([$data["affiliate"]], $date)));
-        static::jumpDays($date, 21);
+        static::addDays($date, 21);
         $this->assertEquals(2, count(self::$affiliateService->generate([$data["affiliate"]], $date)));
-        static::jumpDays($date, 365);
+        static::addDays($date, 365);
         $this->assertEquals(0, count(self::$affiliateService->generate([$data["affiliate"]], $date)));
         // switch to ongoing and create new policies in the future.
         $data["affiliate"]->setChargeModel(AffiliateCompany::MODEL_ONGOING);
@@ -120,12 +120,12 @@ class AffiliateServiceTest extends WebTestCase
         $charges = [];
         self::$affiliateService->ongoingCharges($affiliate, $date, $charges);
         $this->assertEquals(3, count($charges));
-        static::jumpDays($date, 30);
+        static::addDays($date, 30);
         $this->assertEquals(2, count(self::$affiliateService->ongoingCharges($affiliate, $date)));
         // test for solitary policy charges a year ago.
-        static::jumpDays($date, 334);
+        static::addDays($date, 334);
         $this->assertEquals(3, count(self::$affiliateService->ongoingCharges($affiliate, $date)));
-        static::jumpDays($date, 30);
+        static::addDays($date, 30);
         $this->assertEquals(2, count(self::$affiliateService->ongoingCharges($affiliate, $date)));
         // test for renewal policy with previous having charges.
         foreach ($users as $user) {
@@ -133,7 +133,7 @@ class AffiliateServiceTest extends WebTestCase
             self::createTestPolicy($user, $date);
         }
         $this->assertEmpty(self::$affiliateService->ongoingCharges($affiliate, $date));
-        static::jumpDays($date, 395);
+        static::addDays($date, 395);
         $this->assertEquals(5, count(self::$affiliateService->ongoingCharges($affiliate, $date)));
         $this->assertEmpty(self::$affiliateService->ongoingCharges($affiliate, $date));
         // test for renewal policy with previous having no charges but user having charges.
@@ -168,7 +168,7 @@ class AffiliateServiceTest extends WebTestCase
         $charges = self::$affiliateService->oneOffCharges($data["affiliate"], $date);
         $this->assertEquals(0, count($charges));
         $this->assertEquals(0, self::sumCost($charges));
-        static::jumpDays($date, 365);
+        static::addDays($date, 365);
         $charges = [];
         self::$affiliateService->oneOffCharges($data["affiliate"], $date, $charges);
         $this->assertEquals(2, count($charges));

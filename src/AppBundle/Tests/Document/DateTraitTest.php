@@ -262,12 +262,12 @@ class DateTraitTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testJumpDays()
+    public function testaddDays()
     {
         $now = new \DateTime('2018-03-28 00:00');
-        static::jumpDays($now, 1);
+        static::addDays($now, 1);
         $this->assertEquals(new \DateTime('2018-03-29 00:00'), $now);
-        static::jumpDays($now, 32);
+        static::addDays($now, 32);
         $this->assertEquals(new \DateTime('2018-04-30 00:00'), $now);
     }
 }
