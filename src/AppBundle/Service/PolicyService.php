@@ -1023,7 +1023,6 @@ class PolicyService
         }
         $policy->cancel($reason, $date);
         $this->dm->flush();
-
         $this->cancelledPolicyEmail($policy);
         $this->cancelledPolicySms($policy);
         if (count($policy->getConnections()) > 0 && $reason == Policy::CANCELLED_UPGRADE) {
@@ -1032,6 +1031,9 @@ class PolicyService
                 $policy->getPolicyNumber(),
                 $policy->getId()
             ));
+        }
+        if ($policy->getTasteCard()) {
+            $this->cancelledPolicyWithTasteCardEmail($policy);
         }
 
         $this->dispatchEvent(PolicyEvent::EVENT_CANCELLED, new PolicyEvent($policy));
@@ -1159,6 +1161,22 @@ class PolicyService
                 'AppBundle:Email:policy/tasteCard.html.twig',
                 ['policy' => $policy],
                 'AppBundle:Email:policy/tasteCard.txt.twig',
+                ['policy' => $policy],
+                null,
+                'bcc@so-sure.com'
+            );
+        }
+    }
+
+    public function cancelledPolicyWithTasteCardEmail($policy)
+    {
+        if ($this->mailer) {
+            $this->mailer->sendTemplate(
+                "Policy with TasteCard cancelled",
+                "marketing@so-sure.com",
+                'AppBundle:Email:policy/cancelledWithTasteCard.html.twig',
+                ['policy' => $policy],
+                'AppBundle:Email:policy/cancelledWithTasteCard.txt.twig',
                 ['policy' => $policy],
                 null,
                 'bcc@so-sure.com'

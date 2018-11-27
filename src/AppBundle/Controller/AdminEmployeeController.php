@@ -29,6 +29,7 @@ use AppBundle\Service\ReportingService;
 use AppBundle\Service\RouterService;
 use AppBundle\Service\SalvaExportService;
 use AppBundle\Service\AffiliateService;
+use AppBundle\Document\ValidatorTrait;
 use Doctrine\ODM\MongoDB\Query\Builder;
 use Gedmo\Loggable\Document\Repository\LogEntryRepository;
 use Grpc\Call;
@@ -147,6 +148,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
     use CurrencyTrait;
     use ImeiTrait;
     use ContainerAwareTrait;
+    use ValidatorTrait;
 
     /**
      * @Route("", name="admin_home")
@@ -1356,10 +1358,15 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                 $setTasteCardForm->handleRequest($request);
                 if ($setTasteCardForm->isValid()) {
                     $policyService = $this->get("app.policy");
-                    // TODO: do actual validation with the validator service thingo.
-                    $policy->setTasteCard($setTasteCardForm->get("number")->getData());
-                    $policyService->tasteCardEmail($policy);
-                    $this->addFlash("success", "Tastecard is now set");
+                    $tasteCard = $this->conformAlphanumeric($setTasteCardForm->get("number")->getData(), 16, 8);
+                    if (!$tasteCard) {
+                        $this->addFlash("error", "Invalid tastecard number");
+                    } else {
+                        $policy->setTasteCard($tasteCard);
+                        $dm->flush();
+                        $policyService->tasteCardEmail($policy);
+                        $this->addFlash("success", "Tastecard is now set");
+                    }
                 }
             } elseif ($request->request->has("resend_taste_card_form")) {
                 $resendTasteCardForm->handleRequest($request);

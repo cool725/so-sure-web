@@ -373,17 +373,23 @@
                             </td>
                         </tr>
                         <tr>
-                            <td>Tastecard</td>
+                            <td>TasteCard</td>
                             <td>
                                 <p>
-                                    {{ form_start(set_taste_card_form) }}
-                                    {{ form_widget(set_taste_card_form) }}
-                                    {{ form_end(set_taste_card_form) }}
+                                    {% if policy.tasteCard is defined %}
+                                        {{ form_start(resend_taste_card_form, {'attr': {'class': 'form-inline'}}) }}
+                                        <strong>{{ policy.tasteCard }}</strong>
+                                        {{ form_widget(resend_taste_card_form.submit, {'label': 'Resend TasteCard Notification', 'attr': {'class': 'btn-small btn-danger confirm-submit', 'data-confirm-msg': 'Resend TasteCard notification email?'}}) }}
+                                        {{ form_end(resend_taste_card_form) }}
+                                    {% else %}
+                                        No current Taste Card number.
+                                    {% endif %}
                                 </p>
                                 <p>
-                                    {{ form_start(resend_taste_card_form) }}
-                                    {{ form_widget(resend_taste_card_form) }}
-                                    {{ form_end(resend_taste_card_form) }}
+                                    {{ form_start(set_taste_card_form, {'attr': {'class': 'form-inline'}}) }}
+                                    {{ form_widget(set_taste_card_form.number, {'attr': {'placeholder': 'New TasteCard number', 'class': 'form-control', 'autocomplete': 'disabled'}}) }}
+                                    {{ form_widget(set_taste_card_form.submit, {'label': 'Update', 'attr': {'class': 'btn-small btn-danger confirm-submit', 'data-confirm-msg': 'Set TasteCard number?'}}) }}
+                                    {{ form_end(set_taste_card_form) }}
                                 </p>
                             </td>
                         </tr>
