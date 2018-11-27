@@ -376,7 +376,7 @@
                             <td>TasteCard</td>
                             <td>
                                 <p>
-                                    {% if policy.tasteCard is defined %}
+                                    {% if policy.tasteCard != null %}
                                         {{ form_start(resend_taste_card_form, {'attr': {'class': 'form-inline'}}) }}
                                         <strong>{{ policy.tasteCard }}</strong>
                                         {{ form_widget(resend_taste_card_form.submit, {'label': 'Resend TasteCard Notification', 'attr': {'class': 'btn-small btn-danger confirm-submit', 'data-confirm-msg': 'Resend TasteCard notification email?'}}) }}

@@ -1168,6 +1168,10 @@ class PolicyService
         }
     }
 
+    /**
+     * Sends an email to marketing to notify them that a policy has been cancelled while holding a TasteCard.
+     * @param Policy $policy is the policy getting cancelled.
+     */
     public function cancelledPolicyWithTasteCardEmail($policy)
     {
         if ($this->mailer) {
