@@ -64,8 +64,10 @@ $('#claimsModal').on('show.bs.modal', function (event) {
     let button = $(event.relatedTarget);
     let modal = $(this);
 
+    console.log("this");
+
     ajax = $.ajax({
-        url: 'http://dev.so-sure.net:40080/admin/claim-info/' + button.data('id'),
+        url: '/admin/claim-info/' + button.data('id'),
         type: "GET"
     });
 
