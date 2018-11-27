@@ -692,10 +692,13 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             ->add('requeue', SubmitType::class)
             ->add('reason', ChoiceType::class, [
                 'choices' => [
-                    SalvaExportService::QUEUE_UPDATED => SalvaExportService::QUEUE_UPDATED,
-                    SalvaExportService::QUEUE_CANCELLED => SalvaExportService::QUEUE_CANCELLED,
-                    SalvaExportService::QUEUE_CREATED => SalvaExportService::QUEUE_CREATED
+                    SalvaExportService::QUEUE_UPDATED,
+                    SalvaExportService::QUEUE_CANCELLED,
+                    SalvaExportService::QUEUE_CREATED
                 ],
+                'choice_label' => function($choice, $key, $value) {
+                    return $value;
+                },
                 'placeholder' => 'Choose a reason',
                 'required' => true
             ])
