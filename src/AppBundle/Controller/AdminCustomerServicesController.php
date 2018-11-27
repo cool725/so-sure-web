@@ -188,7 +188,7 @@ class AdminCustomerServicesController extends BaseController
 
     /**
      * @Route("/claims/update-claim/{route}/{id}", name="admin_claims_update_claim_policy")
-     * @Method({"POST"})
+     * @Template()
      */
     public function claimsUpdateForm(Request $request, $id = null)
     {
@@ -198,11 +198,9 @@ class AdminCustomerServicesController extends BaseController
         $claim = $repo->find($id);
 
         if (!$claim) {
-            throw $this->createNotFoundException(sprintf('Claim for policy %s not found', $id));
+            throw $this->createNotFoundException(sprintf('Claim %s not found', $id));
         }
 
-        $imei = new Imei();
-        $imei->setPolicy($policy);
         $imeiForm = $this->get('form.factory')
             ->createNamedBuilder('imei_form', ImeiType::class, $imei)
             ->setAction($this->generateUrl(
@@ -215,13 +213,6 @@ class AdminCustomerServicesController extends BaseController
             if ($request->request->has('imei_form')) {
                 $imeiForm->handleRequest($request);
                 if ($imeiForm->isValid()) {
-                    $policy->adjustImei($imei->getImei(), false);
-
-                    $policy->addNote(json_encode([
-                        'user_id' => $this->getUser()->getId(),
-                        'name' => $this->getUser()->getName(),
-                        'notes' => $imei->getNote()
-                    ]));
 
                     $dm->flush();
                     $this->addFlash(
