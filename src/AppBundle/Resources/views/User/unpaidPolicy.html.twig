@@ -46,8 +46,8 @@
                     {# ALREADY PAID #}
                     <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_phone-smile.png" alt="so-sure" width="180px">
 
-                    <h1 class="h2 mb-4">Direct Debit setup pending</h1>
-                    <p>We're currently setting up your direct debit. Please come back in a few days.</p>
+                    <h1 class="h2 mb-4">Policy paid up to date</h1>
+                    <p>Return to your <a href="{{ path('user_home') }}">user homepage</a>.</p>
                     {# END - ALREADY PAID #}
 
                 {# DIRECT DEBIT / BACS #}
@@ -56,8 +56,8 @@
                     {# MANDATE PENDING #}
                     <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_phone-smile.png" alt="so-sure" width="180px">
 
-                    <h1 class="h2 mb-4">Payment processing</h1>
-                    <p>Your Direct Debit has been setup and we are currently processing your payment.</p>
+                    <h1 class="h2 mb-4">Direct Debit setup pending</h1>
+                    <p>We're currently setting up your direct debit. Please come back in a few days.</p>
                     {# END - MANDATE PENDING #}
 
                 {% elseif unpaid_reason == 'unpaid_bacs_payment_pending' %}
@@ -66,7 +66,7 @@
                     <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_phone-smile.png" alt="so-sure" width="180px">
 
                     <h1 class="h2 mb-4">Payment is processing</h1>
-                    <p>Your Direct Debit has been setup and we are currently processing your payment.</p>
+                    <p>We are currently processing your Direct Debit payment.</p>
                     {# END - PAYMENT PENDING #}
 
                 {% elseif unpaid_reason == 'unpaid_bacs_mandate_invalid' %}
@@ -80,9 +80,8 @@
                     <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_broken-phone.png" alt="so-sure" width="180px">
 
 
-                    <h1 class="h2 mb-4">Invalid Direct Debit</h1>
-                    <p>Your Direct Debit is either cancelled or failed.</p>
-                    <p>Sorry, there is not enough time to setup a Direct Debit before your policy will expire.</p>
+                    <h1 class="h2 mb-4">Direct Debit invalid </h1>
+                    <p>Your Direct Debit is either cancelled or has failed.</p>
                     {# END - MANDATE FAILED OR CANCELLED #}
 
                 {% elseif unpaid_reason == 'unpaid_bacs_payment_failed' %}
