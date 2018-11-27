@@ -1158,9 +1158,9 @@ class PolicyService
             $this->mailer->sendTemplate(
                 "Your new Taste Card from So-Sure",
                 $policy->getUser()->getEmail(),
-                'AppBundle:Email:policy/tasteCard.html.twig',
+                'AppBundle:Email:policy/email_new_taste_card.html.twig',
                 ['policy' => $policy],
-                'AppBundle:Email:policy/tasteCard.txt.twig',
+                'AppBundle:Email:policy/email_new_taste_card.txt.twig',
                 ['policy' => $policy],
                 null,
                 'bcc@so-sure.com'
