@@ -43,7 +43,7 @@ class SalvaStatusType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(array(
-            'data_class' => 'AppBundle\Document\Policy',
+            'data_class' => 'AppBundle\Document\SalvaPhonePolicy',
         ));
     }
 }
