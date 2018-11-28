@@ -1022,6 +1022,13 @@ services:
             -  { name: kernel.event_listener, event: event.user.email.changed, method: onUserEmailChangedEvent }
             -  { name: kernel.event_listener, event: event.user.password.changed, method: onUserPasswordChangedEvent }
 
+    app.listener.tasteCard:
+        class: AppBundle\Listener\TasteCardListener
+        arguments:
+            - "@app.mailer"
+        tags:
+            - { name: kernel.event_listener, event: event.policy.cancelled, method: onPolicyCancelledEvent }
+
     app.listener.bacs:
         class:   AppBundle\Listener\BacsListener
         arguments:

@@ -539,7 +539,7 @@ abstract class Policy
 
     /**
      * @AppAssert\Alphanumeric()
-     * @Assert\Length(min="8", max="16") TODO: find out how long these things actually are.
+     * @Assert\Length(min="10", max="10")
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */

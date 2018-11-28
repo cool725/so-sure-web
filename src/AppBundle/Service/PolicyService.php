@@ -976,8 +976,6 @@ class PolicyService
         \DateTime $date = null,
         $skipUnpaidMinTimeframeCheck = false
     ) {
-        // TODO: this is where policies are cancelled and we need to make it that it checks if there is a taste card
-        // TODO: and if there is then we send an email to marketing.
         if ($reason == Policy::CANCELLED_UNPAID && !$skipUnpaidMinTimeframeCheck) {
             /** @var LogEntryRepository $logRepo */
             $logRepo = $this->dm->getRepository(LogEntry::class);
@@ -1031,9 +1029,6 @@ class PolicyService
                 $policy->getPolicyNumber(),
                 $policy->getId()
             ));
-        }
-        if ($policy->getTasteCard()) {
-            $this->cancelledPolicyWithTasteCardEmail($policy);
         }
 
         $this->dispatchEvent(PolicyEvent::EVENT_CANCELLED, new PolicyEvent($policy));
@@ -1161,26 +1156,6 @@ class PolicyService
                 'AppBundle:Email:policy/email_new_taste_card.html.twig',
                 ['policy' => $policy],
                 'AppBundle:Email:policy/email_new_taste_card.txt.twig',
-                ['policy' => $policy],
-                null,
-                'bcc@so-sure.com'
-            );
-        }
-    }
-
-    /**
-     * Sends an email to marketing to notify them that a policy has been cancelled while holding a TasteCard.
-     * @param Policy $policy is the policy getting cancelled.
-     */
-    public function cancelledPolicyWithTasteCardEmail($policy)
-    {
-        if ($this->mailer) {
-            $this->mailer->sendTemplate(
-                "Policy with TasteCard cancelled",
-                "marketing@so-sure.com",
-                'AppBundle:Email:policy/cancelledWithTasteCard.html.twig',
-                ['policy' => $policy],
-                'AppBundle:Email:policy/cancelledWithTasteCard.txt.twig',
                 ['policy' => $policy],
                 null,
                 'bcc@so-sure.com'
