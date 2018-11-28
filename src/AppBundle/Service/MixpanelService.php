@@ -296,14 +296,16 @@ class MixpanelService
                     $attribution->setDeviceOS($data['Device OS']);
                     $dataPresent = true;
                 }
-
-                if ($dataPresent) {
-                    // TODO: if mixpanel removes user due to inactivity, and then recreates them, then currently it
-                    //       could cause this field to be overwritten. We could fix this by making it that it only
-                    //       alters the attribution values for a user if the user does not already have any.
-                    $user->setAttribution($attribution);
+                // Only set the attribution if the user lacks one, but if they do lack one we must set it whether there
+                // is data or not.
+                if (!$user->getAttribution()) {
+                    if ($dataPresent) {
+                        $user->setAttribution($attribution);
+                    } else {
+                        $attribution->setCampaignSource(Attribution::SOURCE_UNTRACKED);
+                        $user->setAttribution($attribution);
+                    }
                 }
-
                 $latestAttribution = new Attribution();
                 $dataPresent = false;
                 if (isset($data['Latest Campaign Name'])) {
