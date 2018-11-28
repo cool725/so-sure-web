@@ -77,7 +77,7 @@ class AffiliateService
      * @param \DateTime $date       is the time and date to be considered as current.
      * @return array the list of all the charges that were just generated.
      */
-    public function generate($affiliates = null, $date = null)
+    public function generate($affiliates = null, \DateTime $date = null)
     {
         if ($affiliates === null) {
             $affiliates = $this->affiliateRepository->findAll();
@@ -108,7 +108,7 @@ class AffiliateService
      * @param array            $generatedCharges is an optional reference to an array in which generated charges can go.
      * @return array the generated charges array.
      */
-    public function oneOffCharges($affiliate, $date, & $generatedCharges = [])
+    public function oneOffCharges($affiliate, \DateTime $date, & $generatedCharges = [])
     {
         $users = $this->getMatchingUsers($affiliate, $date);
         foreach ($users as $user) {
@@ -127,7 +127,7 @@ class AffiliateService
      * @return array|null the generated charges array, or null if the current state is ambiguous and a notice has been
      *                    logged.
      */
-    public function ongoingCharges($affiliate, $date, & $generatedCharges = [])
+    public function ongoingCharges($affiliate, \DateTime $date, & $generatedCharges = [])
     {
         $renewalDays = new DateInterval("P".($affiliate->getRenewalDays() ?: 0)."D");
         $renewalWait = clone $date;
@@ -177,8 +177,11 @@ class AffiliateService
      * @param array            $status    is the set of aquisition statuses within which all users must fall.
      * @return array containing the users.
      */
-    public function getMatchingUsers(AffiliateCompany $affiliate, $date = null, $status = [User::AQUISITION_PENDING])
-    {
+    public function getMatchingUsers(
+        AffiliateCompany $affiliate,
+        \DateTime $date = null,
+        $status = [User::AQUISITION_PENDING]
+    ) {
         $campaignUsers = [];
         $leadUsers = [];
         $userRepo = $this->dm->getRepository(User::class);
@@ -220,7 +223,7 @@ class AffiliateService
      * @param \DateTime        $date      is the time and date to be considered as current.
      * @return Charge the charge that has been created.
      */
-    private function createCharge($affiliate, $user, $policy, $date)
+    private function createCharge($affiliate, $user, $policy, \DateTime $date)
     {
         $charge = new Charge();
         $charge->setAmount($affiliate->getCPA());

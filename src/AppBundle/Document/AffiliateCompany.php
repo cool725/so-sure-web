@@ -79,7 +79,7 @@ class AffiliateCompany extends Company
     public function __construct()
     {
         parent::__construct();
-        $this->confirmedUsers = new ArrayCollection();
+        $this->confirmedPolicies = new ArrayCollection();
     }
 
     public function getConfirmedPolicies()

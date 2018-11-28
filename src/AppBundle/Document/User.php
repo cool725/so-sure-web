@@ -2078,7 +2078,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
      * @param \DateTime $date is the date that we are measuring from.
      * @return string aquisition state name. Check out AQUISITION_* .
      */
-    public function aquisitionStatus($days, $date)
+    public function aquisitionStatus($days, \DateTime $date)
     {
         if ($this->hasActivePolicy() || $this->hasUnpaidPolicy()) {
             if ($this->isAffiliateCandidate($days, $date)) {

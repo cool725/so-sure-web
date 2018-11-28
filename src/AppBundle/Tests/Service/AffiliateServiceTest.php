@@ -163,15 +163,15 @@ class AffiliateServiceTest extends WebTestCase
         $charges = [];
         self::$affiliateService->oneOffCharges($data["affiliate"], $date, $charges);
         $this->assertEquals(3, count($charges));
-        $this->assertEquals(3.6, self::sumCost($charges));
+        $this->assertEquals(3.6, Charge::sumCost($charges));
         $charges = self::$affiliateService->oneOffCharges($data["affiliate"], $date);
         $this->assertEquals(0, count($charges));
-        $this->assertEquals(0, self::sumCost($charges));
+        $this->assertEquals(0, Charge::sumCost($charges));
         static::addDays($date, 365);
         $charges = [];
         self::$affiliateService->oneOffCharges($data["affiliate"], $date, $charges);
         $this->assertEquals(2, count($charges));
-        $this->assertEquals(2.4, self::sumCost($charges));
+        $this->assertEquals(2.4, Charge::sumCost($charges));
     }
 
     /**
@@ -282,20 +282,6 @@ class AffiliateServiceTest extends WebTestCase
                 [User::AQUISITION_LOST, User::AQUISITION_POTENTIAL]
             )
         );
-    }
-
-    /**
-     * Takes a list of charges and tells you the total cost of them
-     * @param array $charges is the list of charges.
-     * @return float total cost.
-     */
-    private static function sumCost($charges)
-    {
-        $sum = 0;
-        foreach ($charges as $charge) {
-            $sum += $charge->getAmount();
-        }
-        return $sum;
     }
 
     /**
