@@ -68,12 +68,12 @@ class AdminControllerTest extends BaseControllerTest
         $phone = static::getRandomPhone(self::$dm);
         $policy = static::initPolicy($user, self::$dm, $phone, null, true, true);
         $claim = new Claim();
-        $claim->setPolicy($policy);
         $claim->setNumber('TEST/789');
         $claim->setProcessed(false);
         $claim->setStatus(Claim::STATUS_APPROVED);
         $claim->setApprovedDate(new \DateTime('-2 days'));
         $claim->setType(Claim::TYPE_THEFT);
+        $policy->addClaim($claim);
         self::$dm->persist($claim);
         self::$dm->flush();
 
@@ -115,13 +115,13 @@ class AdminControllerTest extends BaseControllerTest
         $charge = new Charge();
         $charge->setAmount(0.02);
         $claim = new Claim();
-        $claim->setPolicy($policy);
         $claim->setNumber('TEST/456');
         $claim->setProcessed(false);
         $claim->setStatus(Claim::STATUS_APPROVED);
         $claim->setApprovedDate(new \DateTime('-2 days'));
         $claim->setType(Claim::TYPE_THEFT);
         $claim->addCharge($charge);
+        $policy->addClaim($claim);
         self::$dm->persist($claim);
         self::$dm->flush();
         $claimId = $claim->getId();
@@ -159,12 +159,12 @@ class AdminControllerTest extends BaseControllerTest
         $phone = static::getRandomPhone(self::$dm);
         $policy = static::initPolicy($user, self::$dm, $phone, null, true, true);
         $claim = new Claim();
-        $claim->setPolicy($policy);
         $claim->setNumber('TEST/123');
         $claim->setProcessed(false);
         $claim->setStatus(Claim::STATUS_APPROVED);
         $claim->setApprovedDate(new \DateTime('-2 days'));
         $claim->setType(Claim::TYPE_THEFT);
+        $policy->addClaim($claim);
         self::$dm->persist($claim);
         self::$dm->flush();
         $claimId = $claim->getId();
