@@ -146,6 +146,7 @@ class AdminCustomerServicesController extends BaseController
         }
         $dm = $this->getManager();
         $repo = $dm->getRepository(Claim::class);
+        /** @var Claim $claim */
         $claim = $repo->find($request->get('id'));
         if (!$claim) {
             throw $this->createNotFoundException('Claim not found');

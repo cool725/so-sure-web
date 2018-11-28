@@ -18,6 +18,7 @@ class PhoneInsuranceControllerTest extends BaseControllerTest
 
     public function tearDown()
     {
+        self::$client->getCookieJar()->clear();
     }
 
     public function testPhoneSearchPhoneInsuranceByPhoneName()
