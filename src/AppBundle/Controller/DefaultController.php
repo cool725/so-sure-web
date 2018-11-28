@@ -125,7 +125,7 @@ class DefaultController extends BaseController
      */
     public function freeTasteCard()
     {
-        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE);
+        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE, ['page' => 'tastecard']);
 
         $pageType = 'tastecard';
 
@@ -144,7 +144,7 @@ class DefaultController extends BaseController
      */
     public function freePhoneCase()
     {
-        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE);
+        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE, ['page' => 'freephonecase']);
 
         $pageType = 'phonecase';
 
@@ -162,7 +162,19 @@ class DefaultController extends BaseController
      */
     public function moneyLanding()
     {
+        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE, ['page' => 'money']);
+
         return $this->render('AppBundle:Default:indexMoney.html.twig');
+    }
+
+    /**
+     * @Route("/ivip", name="ivip")
+     */
+    public function ivipLanding()
+    {
+        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE, ['page' => 'ivip']);
+
+        return $this->render('AppBundle:Default:indexIVIP.html.twig');
     }
 
     /**
@@ -171,6 +183,8 @@ class DefaultController extends BaseController
      */
     public function starlingLanding(Request $request)
     {
+        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE, ['page' => 'starling']);
+
         $this->starlingOAuthSession($request);
 
         return $this->render('AppBundle:Default:indexStarlingBank.html.twig');
@@ -181,6 +195,7 @@ class DefaultController extends BaseController
      */
     public function socialInsurance()
     {
+        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE, ['page' => 'social-insurance']);
         return $this->render('AppBundle:Default:socialInsurance.html.twig');
     }
 
