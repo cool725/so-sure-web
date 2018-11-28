@@ -828,7 +828,11 @@ abstract class BaseController extends Controller
         $form = $this->createForm(PolicySearchType::class, null, ['method' => 'GET']);
         $form->handleRequest($request);
         if ($includeInvalidPolicies === null) {
-            $includeInvalidPolicies = $form->get('invalid')->getData();
+            if (!empty($form->getData('id'))) {
+                $includeInvalidPolicies = true;
+            } else {
+                $includeInvalidPolicies = $form->get('invalid')->getData();
+            }
         }
         $sosure = $form->get('sosure')->getData();
         if ($sosure) {
