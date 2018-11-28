@@ -12,6 +12,7 @@ use AppBundle\Exception\PaymentDeclinedException;
 use AppBundle\Form\Type\AdminEmailOptOutType;
 use AppBundle\Form\Type\BacsCreditType;
 use AppBundle\Form\Type\CallNoteType;
+use AppBundle\Form\Type\LinkClaimType;
 use AppBundle\Form\Type\PaymentRequestUploadFileType;
 use AppBundle\Form\Type\UploadFileType;
 use AppBundle\Form\Type\UserHandlingTeamType;
@@ -671,6 +672,80 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             'policy' => $policy,
         ];
     }
+
+    /**
+     * @Route("/link-claim/{id}", name="link_claim_form")
+     * @Template
+     */
+    public function linkClaimFormAction(Request $request, $id = null)
+    {
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(PhonePolicy::class);
+        /** @var PhonePolicy $policy */
+        $policy = $repo->find($id);
+
+        if (!$policy) {
+            throw $this->createNotFoundException(sprintf('Policy %s not found', $id));
+        }
+
+        $linkClaimform = $this->get('form.factory')
+            ->createNamedBuilder('link_claim_form', LinkClaimType::class)
+            ->setAction($this->generateUrl(
+                'link_claim_form',
+                ['id' => $id]
+            ))
+            ->getForm();
+
+        if ('POST' === $request->getMethod()) {
+            if ($request->request->has('link_claim_form')) {
+                $linkClaimform->handleRequest($request);
+                if ($linkClaimform->isValid()) {
+                    /** @var ClaimRepository $repo */
+                    $repo = $dm->getRepository(Claim::class);
+                    $qb =  $repo->createQueryBuilder();
+
+                    $qb->addOr($qb->expr()->field('_id')->equals($linkClaimform->getData()['id']));
+                    $qb->addOr($qb->expr()->field('_id')->exists(true));
+
+                    $qb->addOr($qb->expr()->field('number')->equals($linkClaimform->getData()['number']));
+                    $qb->addOr($qb->expr()->field('number')->exists(true));
+
+                    $res = $qb->getQuery()->getSingleResult();
+
+                    if (count($res) > 1) {
+                        $this->addFlash(
+                            'error',
+                            sprintf('More than one claim found, please specify more information')
+                        );
+
+                        return $this->redirectToRoute('admin_policy', ['id' => $id]);
+                    }
+
+                    $policy->addLinkedClaim($res);
+
+                    $policy->addNoteDetails(
+                        $linkClaimform->getData()['note'],
+                        $this->getUser()
+                    );
+
+                    $dm->persist($policy);
+                    $dm->flush();
+                    $this->addFlash(
+                        'success',
+                        sprintf('Policy %s successfully linked with claim: %s', $policy->getPolicyNumber(), $linkClaimform->getData()['number'])
+                    );
+
+                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
+                }
+            }
+        }
+
+        return [
+            'form' => $linkClaimform->createView(),
+            'policy' => $policy,
+        ];
+    }
+
 
     /**
      * @Route("/policy/{id}", name="admin_policy")

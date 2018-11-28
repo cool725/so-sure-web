@@ -587,7 +587,13 @@
             <h4>No claims</h4>
             {% endif %}
             <hr />
-            <h4>Linked Claims (e.g. Policy Upgrade)</h4>
+            <h4>
+                Linked Claims (e.g. Policy Upgrade)
+                <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#linkClaimForm">
+                    <span class="glyphicon glyphicon-new-window" aria-hidden="true"></span>
+                    Link Claim
+                </button>
+            </h4>
             {% if policy.linkedClaims|length > 0 %}
                 <table class="table table-striped">
                     <tr>
@@ -1575,3 +1581,5 @@
             </div>
         </div>
     {% endif %}
+
+    {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:AdminEmployee:linkClaimForm', 'policy': policy, 'id': 'linkClaimForm'} %}
