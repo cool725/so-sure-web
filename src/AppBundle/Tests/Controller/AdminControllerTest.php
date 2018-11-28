@@ -181,7 +181,7 @@ class AdminControllerTest extends BaseControllerTest
 
         // there are two definitions of the form on the page
         $form = $crawler->filter('form[id="phone-alternative-form"]');
-        $this->assertEquals(2, count($form));
+        $this->assertEquals(1, count($form));
 
         $form = $crawler->filter('form[id="somefakeid"]');
         $this->assertEquals(0, count($form));
