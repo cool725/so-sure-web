@@ -13,16 +13,28 @@
     @include blue-gradient;
     overflow: hidden;
 
-    .container {
-        max-width: 700px;
-        margin-left: auto;
-        margin-right: auto;
-    }
-
     &__inner {
         width: 100%;
         position: relative;
         z-index: 4;
+    }
+
+    &__card {
+        max-width: 450px;
+        margin-left: auto;
+        margin-right: auto;
+        background-color: $white;
+        box-shadow: 0 15px 30px 0 rgba(8,27,154,0.08),
+                    0 5px 15px 0 rgba(8,27,154,0.08);
+        @include border-radius(15px);
+
+        &__body {
+            padding: 2rem;
+
+            form {
+                margin-bottom: 0;
+            }
+        }
     }
 
     &:before {
@@ -42,6 +54,37 @@
         }
     }
 
+
+    // Backgrounds
+    &__phone__background {
+        width: 352px; height: 467px;
+        position: absolute;
+        bottom: -200px; right: -106px;
+
+        background: transparent url('#{$cdn_url}/images/rebrand/login/so-sure_login-phone-smile.png') no-repeat;
+        background-size: 352px;
+
+        @include media-breakpoint-up(lg) {
+            top: 50px; left: -106px;
+        }
+    }
+
+    &__money__background {
+        @include media-breakpoint-up(lg) {
+            width: 367px; height: 342px;
+            position: absolute;
+            left: 55%; top: 50%;
+
+            background: transparent url('#{$cdn_url}/images/rebrand/login/so-sure_login-money.png') no-repeat;
+            background-size: 367px;
+        }
+    }
+
+    .staff,
+    .info {
+        display: none;
+    }
+
     // Adjustments for small phones
     // @media (max-width: 320px) {
     //     width: auto; height: auto;
@@ -52,13 +95,4 @@
     //         background-image: none;
     //     }
     // }
-}
-
-// TODO: Fix
-.form-control {
-    background-color: $white;
-
-    &:focus {
-        background-color: $white;
-    }
 }

@@ -16,53 +16,69 @@
 {% block body %}
 
     <section class="portal d-flex align-items-center">
-        <div class="container">
-            <div class="portal__inner">
+        <div class="portal__inner">
 
-                <img src="{{ cdn_url }}/images/rebrand/logo/so-sure_logo-white-dark.svg" width="200px" class="mb-4 d-block mx-auto" alt="so-sure">
+            <img src="{{ cdn_url }}/images/rebrand/logo/so-sure_logo-white-dark.svg" width="200px" class="mb-4 d-block mx-auto" alt="so-sure">
 
-                {{ form_start(lead_form, {'attr': {
-                    'data-toggle': 'validator',
-                    'class': 'validate-form form-400',
-                    'data-client-validation': form_client_validation,
-                    'autocomplete': 'off'
-                }}) }}
-                    <div class="form-group">
-                        {{ form_label(lead_form.submittedBy, 'Who is entering?') }}
-                        {{ form_widget(lead_form.submittedBy) }}
-                        <div class="with-errors">{{ form_errors(lead_form.submittedBy) }}</div>
-                    </div>
-                    <div class="form-group">
-                        {{ form_label(lead_form.name, 'Name') }}
-                        {{ form_widget(lead_form.name, {'attr':{'class':'form-control'}}) }}
-                        <div class="with-errors">{{ form_errors(lead_form.name) }}</div>
-                    </div>
-                    <div class="form-group">
-                        {{ form_label(lead_form.email, 'Email address') }}
-                        {{ form_widget(lead_form.email, {'attr':{'class':'form-control'}}) }}
-                        <div class="with-errors">{{ form_errors(lead_form.email) }}</div>
-                    </div>
-                    <div class="form-group">
-                        {{ form_label(lead_form.make, 'Make') }}
-                        {{ form_widget(lead_form.make, {'attr':{'class':'form-control'}}) }}
-                        <div class="with-errors">{{ form_errors(lead_form.make) }}</div>
-                    </div>
-                    <div class="form-group">
-                        {{ form_label(lead_form.model, 'Model') }}
-                        {{ form_widget(lead_form.model, {'attr':{'class':'form-control'}}) }}
-                        <div class="with-errors">{{ form_errors(lead_form.model) }}</div>
-                    </div>
-                    <div class="form-group">
-                        {{ form_label(lead_form.memory, 'Storage') }}
-                        {{ form_widget(lead_form.memory, {'attr':{'class':'form-control'}}) }}
-                        <div class="with-errors">{{ form_errors(lead_form.memory) }}</div>
-                    </div>
-                    <div class="form-group text-center">
-                        {{ form_widget(lead_form.submit, {'attr':{'class':'btn btn-success'}}) }}
-                    </div>
-                {{ form_end(lead_form) }}
+            <div class="portal__card">
+                <div class="portal__card__body">
+                    {{ form_start(lead_form, {'attr': {
+                        'data-toggle': 'validator',
+                        'class': 'validate-form form-400',
+                        'data-client-validation': form_client_validation,
+                        'autocomplete': 'off'
+                    }}) }}
+
+                        <h3 class="text-center mb-4">Customer information portal</h3>
+                        <div class="who">
+                            <div class="form-group">
+                                {{ form_label(lead_form.submittedBy, 'Who is entering?') }}
+                                {{ form_widget(lead_form.submittedBy, {'attr': { 'class': ''}}) }}
+                                <div class="with-errors">{{ form_errors(lead_form.submittedBy) }}</div>
+                            </div>
+                            <div class="form-group">
+                                <a href="#" class="btn btn-primary btn-square">Begin</a>
+                            </div>
+                        </div>
+                        <div class="info">
+                            <div class="form-text staff">Spicy jalapeno bacon ipsum dolor amet meatloaf pork belly shankle tri-tip strip steak filet mignon hamburger drumstick spare ribs ham kielbasa ribeye. Jowl corned beef ham, turkey salami filet mignon pig bacon ground round frankfurter meatball strip steak. </div>
+                            <div class="form-text customer">Spicy jalapeno bacon ipsum dolor amet meatloaf pork belly shankle tri-tip strip steak filet mignon hamburger drumstick spare ribs ham kielbasa ribeye. Jowl corned beef ham, turkey salami filet mignon pig bacon ground round frankfurter meatball strip steak. </div>
+                            <div class="form-group">
+                                {{ form_label(lead_form.name, 'Name') }}
+                                {{ form_widget(lead_form.name, {'attr':{'class':'form-control'}}) }}
+                                <div class="with-errors">{{ form_errors(lead_form.name) }}</div>
+                            </div>
+                            <div class="form-group">
+                                {{ form_label(lead_form.email, 'Email address') }}
+                                {{ form_widget(lead_form.email, {'attr':{'class':'form-control'}}) }}
+                                <div class="with-errors">{{ form_errors(lead_form.email) }}</div>
+                            </div>
+                            <div class="form-group">
+                                {{ form_label(lead_form.make, 'Make') }}
+                                {{ form_widget(lead_form.make, {'attr':{'class':'form-control'}}) }}
+                                <div class="with-errors">{{ form_errors(lead_form.make) }}</div>
+                            </div>
+                            <div class="form-group">
+                                {{ form_label(lead_form.model, 'Model') }}
+                                {{ form_widget(lead_form.model, {'attr':{'class':'form-control'}}) }}
+                                <div class="with-errors">{{ form_errors(lead_form.model) }}</div>
+                            </div>
+                            <div class="form-group">
+                                {{ form_label(lead_form.memory, 'Storage') }}
+                                {{ form_widget(lead_form.memory, {'attr':{'class':'form-control'}}) }}
+                                <div class="with-errors">{{ form_errors(lead_form.memory) }}</div>
+                            </div>
+                            <div class="form-group">
+                                {{ form_widget(lead_form.submit, {'attr':{'class':'btn btn-success btn-square'}}) }}
+                            </div>
+                        </div>
+                    {{ form_end(lead_form) }}
+                </div>
             </div>
         </div>
+
+        <span class="portal__phone__background animated fadeInLeft"></span>
+        <span class="portal__money__background animated jackInTheBox"></span>
     </section>
 
 
