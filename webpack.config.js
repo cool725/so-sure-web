@@ -38,6 +38,9 @@ Encore
     .addEntry('admin', './src/AppBundle/Resources/public/rebrand/js/pages/admin/admin.js')
     .addEntry('picsure', './src/AppBundle/Resources/public/rebrand/js/pages/admin/picsure.js')
 
+    // Portal
+    .addEntry('portal', './src/AppBundle/Resources/public/rebrand/js/pages/portal.js')
+
     // allow legacy applications to use $/jQuery as a global variable
     .autoProvidejQuery()
 
