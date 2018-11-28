@@ -1171,9 +1171,9 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                             'bcc@so-sure.com'
                         );
 
-                        $mailer->sendTemplate(
+                        $mailer->sendTemplateToUser(
                             $customerSubject,
-                            $policy->getUser()->getEmail(),
+                            $policy->getUser(),
                             'AppBundle:Email:policy/debtCollectionCustomer.html.twig',
                             ['policy' => $policy],
                             'AppBundle:Email:policy/debtCollectionCustomer.txt.twig',
@@ -2517,9 +2517,9 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_APPROVED, $this->getUser());
             $dm->flush();
             $mailer = $this->get('app.mailer');
-            $mailer->sendTemplate(
+            $mailer->sendTemplateToUser(
                 'pic-sure is successfully validated',
-                $policy->getUser()->getEmail(),
+                $policy->getUser(),
                 'AppBundle:Email:picsure/accepted.html.twig',
                 ['policy' => $policy],
                 'AppBundle:Email:picsure/accepted.txt.twig',
@@ -2552,9 +2552,9 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_REJECTED, $this->getUser());
             $dm->flush();
             $mailer = $this->get('app.mailer');
-            $mailer->sendTemplate(
+            $mailer->sendTemplateToUser(
                 'pic-sure failed to validate your phone',
-                $policy->getUser()->getEmail(),
+                $policy->getUser(),
                 'AppBundle:Email:picsure/rejected.html.twig',
                 ['policy' => $policy],
                 'AppBundle:Email:picsure/rejected.txt.twig',
@@ -2599,9 +2599,9 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_INVALID, $this->getUser());
             $dm->flush();
             $mailer = $this->get('app.mailer');
-            $mailer->sendTemplate(
+            $mailer->sendTemplateToUser(
                 'Sorry, we need another pic-sure',
-                $policy->getUser()->getEmail(),
+                $policy->getUser(),
                 'AppBundle:Email:picsure/invalid.html.twig',
                 ['policy' => $policy, 'additional_message' => $request->get('message')],
                 'AppBundle:Email:picsure/invalid.txt.twig',

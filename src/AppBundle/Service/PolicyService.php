@@ -1095,9 +1095,9 @@ class PolicyService
         }
 
         try {
-            $this->mailer->sendTemplate(
+            $this->mailer->sendTemplateToUser(
                 sprintf('Your so-sure policy %s', $policy->getPolicyNumber()),
-                $policy->getUser()->getEmail(),
+                $policy->getUser(),
                 sprintf('%s.html.twig', $baseTemplate),
                 ['policy' => $policy],
                 sprintf('%s.txt.twig', $baseTemplate),
@@ -1132,9 +1132,9 @@ class PolicyService
         $htmlTemplate = sprintf("%s.html.twig", $baseTemplate);
         $textTemplate = sprintf("%s.txt.twig", $baseTemplate);
 
-        $this->mailer->sendTemplate(
+        $this->mailer->sendTemplateToUser(
             sprintf('Your so-sure policy %s is now cancelled', $policy->getPolicyNumber()),
-            $policy->getUser()->getEmail(),
+            $policy->getUser(),
             $htmlTemplate,
             ['policy' => $policy],
             $textTemplate,
@@ -1202,9 +1202,9 @@ class PolicyService
         $policy = $connection->getSourcePolicy();
         // User who caused the reduction
         $causalUser = $connection->getLinkedPolicy()->getUser();
-        $this->mailer->sendTemplate(
+        $this->mailer->sendTemplateToUser(
             sprintf('Important Information about your so-sure Reward Pot'),
-            $policy->getUser()->getEmail(),
+            $policy->getUser(),
             'AppBundle:Email:policy/connectionReduction.html.twig',
             ['connection' => $connection, 'policy' => $policy, 'causalUser' => $causalUser],
             'AppBundle:Email:policy/connectionReduction.txt.twig',
@@ -1239,9 +1239,9 @@ class PolicyService
         $htmlTemplate = sprintf("%s.html.twig", $baseTemplate);
         $textTemplate = sprintf("%s.txt.twig", $baseTemplate);
 
-        $this->mailer->sendTemplate(
+        $this->mailer->sendTemplateToUser(
             $subject,
-            $policy->getUser()->getEmail(),
+            $policy->getUser(),
             $htmlTemplate,
             ['policy' => $policy],
             $textTemplate,
@@ -1729,9 +1729,9 @@ class PolicyService
         $textTemplate = sprintf("%s.txt.twig", $baseTemplate);
 
         $subject = sprintf('Important information about your Reward Pot');
-        $this->mailer->sendTemplate(
+        $this->mailer->sendTemplateToUser(
             $subject,
-            $policy->getUser()->getEmail(),
+            $policy->getUser(),
             $htmlTemplate,
             ['policy' => $policy, 'additional_amount' => $additionalAmount],
             $textTemplate,
@@ -1958,9 +1958,9 @@ class PolicyService
             ),
             'start_date' => $this->endOfDay($policy->getEnd()),
         ];
-        $this->mailer->sendTemplate(
+        $this->mailer->sendTemplateToUser(
             $subject,
-            $policy->getUser()->getEmail(),
+            $policy->getUser(),
             $htmlTemplate,
             $data,
             $textTemplate,
@@ -2205,9 +2205,9 @@ class PolicyService
                 ['id' => $cashback->getId()]
             ),
         ];
-        $this->mailer->sendTemplate(
+        $this->mailer->sendTemplateToUser(
             $subject,
-            $cashback->getPolicy()->getUser()->getEmail(),
+            $cashback->getPolicy()->getUser(),
             $htmlTemplate,
             $data,
             $textTemplate,

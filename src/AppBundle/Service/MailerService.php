@@ -2,6 +2,7 @@
 namespace AppBundle\Service;
 
 use AppBundle\Document\Opt\OptOut;
+use AppBundle\Document\User;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Templating\EngineInterface;
 
@@ -38,10 +39,15 @@ class MailerService
     }
 
     /**
-     * An array of html templates that should trigger an analytics event (e.g. Mixpanel)
+     * An array of campaigns that should trigger an analytics event (e.g. Mixpanel)
      * @var array
      */
-    public static $analyticsHtmlTemplates = [
+    public static $analyticsCampaigns = [
+        'policy/cardExpiring',
+        'policy/failedPayment',
+        'policy/failedPaymentFinal',
+        'policy/failedPaymentWithClaim',
+        'policy/failedPaymentWithClaimFinal',
     ];
 
     /**
@@ -71,18 +77,8 @@ class MailerService
         $this->mixpanelService = $mixpanelService;
     }
 
-    public function sendTemplate(
-        $subject,
-        $to,
-        $htmlTemplate,
-        $htmlData,
-        $textTemplate = null,
-        $textData = null,
-        $attachmentFiles = null,
-        $bcc = null,
-        $from = null
-    ) {
-        $this->addUnsubsribeHash($to, $htmlData);
+    private function getCampaign($htmlTemplate)
+    {
         // print $subject;
         // base campaign on template name
         // AppBundle:Email:quote/priceGuarentee.html.twig
@@ -93,8 +89,56 @@ class MailerService
         }
         $campaign = explode('.', $campaign)[0];
 
-        if (in_array($htmlTemplate, self::$analyticsHtmlTemplates)) {
-            $this->mixpanelService->qu
+        return $campaign;
+    }
+
+    public function sendTemplateToUser(
+        $subject,
+        User $user,
+        $htmlTemplate,
+        $htmlData,
+        $textTemplate = null,
+        $textData = null,
+        $attachmentFiles = null,
+        $bcc = null,
+        $from = null
+    ) {
+        return $this->sendTemplate(
+            $subject,
+            $user->getEmail(),
+            $htmlTemplate,
+            $htmlData,
+            $textTemplate,
+            $textData,
+            $attachmentFiles,
+            $bcc,
+            $from,
+            $user
+        );
+    }
+
+    public function sendTemplate(
+        $subject,
+        $to,
+        $htmlTemplate,
+        $htmlData,
+        $textTemplate = null,
+        $textData = null,
+        $attachmentFiles = null,
+        $bcc = null,
+        $from = null,
+        User $user = null
+    ) {
+        $this->addUnsubsribeHash($to, $htmlData);
+
+        $campaign = $this->getCampaign($htmlTemplate);
+
+        if ($user && in_array($campaign, self::$analyticsCampaigns)) {
+            $this->mixpanelService->queueTrackWithUser(
+                $user,
+                MixpanelService::EVENT_EMAIL,
+                ['campaign' => $campaign]
+            );
         }
 
         if ($textTemplate && $textData) {
