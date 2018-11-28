@@ -30,6 +30,7 @@ use AppBundle\Service\RouterService;
 use AppBundle\Service\SalvaExportService;
 use AppBundle\Service\AffiliateService;
 use Doctrine\ODM\MongoDB\Query\Builder;
+use Faker\Calculator\Luhn;
 use Gedmo\Loggable\Document\Repository\LogEntryRepository;
 use Grpc\Call;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -651,15 +652,23 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             if ($request->request->has('imei_form')) {
                 $imeiForm->handleRequest($request);
                 if ($imeiForm->isValid()) {
-                    $policy->adjustImei($imei->getImei(), false);
+                    if (Luhn::isValid($imei->getImei())) {
+                        $policy->adjustImei($imei->getImei(), false);
 
-                    $policy->addNoteDetails($imei->getNote(), $this->getUser());
+                        $this->addFlash(
+                            'success',
+                            sprintf('Policy %s IMEI updated', $policy->getPolicyNumber())
+                        );
+
+                        $policy->addNoteDetails($imei->getNote(), $this->getUser());
+                    } else {
+                        $this->addFlash(
+                            'error',
+                            sprintf('%s is not a valid IMEI number', $imei->getImei())
+                        );
+                    }
 
                     $dm->flush();
-                    $this->addFlash(
-                        'success',
-                        sprintf('Policy %s imei updated.', $policy->getPolicyNumber())
-                    );
 
                     return $this->redirectToRoute('admin_policy', ['id' => $id]);
                 }

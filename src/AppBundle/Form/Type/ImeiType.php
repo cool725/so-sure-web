@@ -18,7 +18,12 @@ class ImeiType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('imei', TextType::class)
+            ->add('imei', TextType::class, [
+                'attr' => [
+                    'pattern' => '[0-9]{15}',
+                    'title' => '15 digit number'
+                ]
+            ])
             ->add('note', TextareaType::class)
             ->add('update', SubmitType::class)
         ;
