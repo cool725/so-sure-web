@@ -29,10 +29,20 @@ class MailerService
     /** @var string */
     protected $defaultSenderName;
 
+    /** @var MixpanelService */
+    protected $mixpanelService;
+
     public function setMailer($mailer)
     {
         $this->mailer = $mailer;
     }
+
+    /**
+     * An array of html templates that should trigger an analytics event (e.g. Mixpanel)
+     * @var array
+     */
+    public static $analyticsHtmlTemplates = [
+    ];
 
     /**
      * @param \Swift_Mailer    $mailer
@@ -41,6 +51,7 @@ class MailerService
      * @param RouterService    $routerService
      * @param string           $defaultSenderAddress
      * @param string           $defaultSenderName
+     * @param MixpanelService  $mixpanelService
      */
     public function __construct(
         \Swift_Mailer $mailer,
@@ -48,7 +59,8 @@ class MailerService
         EngineInterface $templating,
         RouterService $routerService,
         $defaultSenderAddress,
-        $defaultSenderName
+        $defaultSenderName,
+        MixpanelService $mixpanelService
     ) {
         $this->mailer = $mailer;
         $this->smtp = $smtp;
@@ -56,6 +68,7 @@ class MailerService
         $this->routerService = $routerService;
         $this->defaultSenderAddress = $defaultSenderAddress;
         $this->defaultSenderName = $defaultSenderName;
+        $this->mixpanelService = $mixpanelService;
     }
 
     public function sendTemplate(
@@ -79,6 +92,10 @@ class MailerService
             $campaign = $campaignItems[count($campaignItems) - 1];
         }
         $campaign = explode('.', $campaign)[0];
+
+        if (in_array($htmlTemplate, self::$analyticsHtmlTemplates)) {
+            $this->mixpanelService->qu
+        }
 
         if ($textTemplate && $textData) {
             $this->addUnsubsribeHash($to, $textData);
