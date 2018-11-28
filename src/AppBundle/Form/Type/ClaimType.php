@@ -42,10 +42,17 @@ class ClaimType extends AbstractType
     {
         $builder
             ->add('replacementImei', NumberType::class, [
-
+                'attr' => [
+                    'pattern' => '[0-9]{15}',
+                    'title' => '15 digit number'
+                ]
             ])
-            ->add('shouldCancelPolicy', CheckboxType::class, ['required' => false])
-            ->add('notes', TextareaType::class, ['required' => false])
+            ->add('shouldCancelPolicy', CheckboxType::class, [
+                'required' => false,
+            ])
+            ->add('notes', TextareaType::class, [
+                'required' => false
+            ])
             ->add('update', SubmitType::class)
         ;
 

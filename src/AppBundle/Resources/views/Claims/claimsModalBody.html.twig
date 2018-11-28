@@ -80,7 +80,11 @@
                             <label>Claim Handling Team</label>
                             <p>{{ claim.handlingTeam|default('N/A') }}</p>
                         </div>
+                    </div>
 
+                    <hr>
+
+                    <div class="row">
                         <div class="col-xs-6">
                             <label>Number to reach</label>
                             <p>{{ claim.phoneToReach|default('N/A') }}</p>
@@ -152,6 +156,20 @@
                                 <p>{{ claim.phoneStatus|default('N/A') }}</p>
                             </div>
 
+                            <div class="col-xs-6">
+                                <label>Condition</label>
+                                <p>{{ claim.phoneStatus|default('N/A') }}</p>
+                            </div>
+
+                            <div class="col-xs-6">
+                                <label>Condition</label>
+                                <p>{{ claim.phoneStatus|default('N/A') }}</p>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <div class="row">
                             <div class="col-xs-12">
                                 <label>Proof of Usages</label>
                                 {% if claim.needProofOfUsage %}
@@ -216,16 +234,6 @@
                                     {% endif %}
                                 {% endif %}
                             </div>
-
-                            <div class="col-xs-6">
-                                <label>Condition</label>
-                                <p>{{ claim.phoneStatus|default('N/A') }}</p>
-                            </div>
-
-                            <div class="col-xs-6">
-                                <label>Condition</label>
-                                <p>{{ claim.phoneStatus|default('N/A') }}</p>
-                            </div>
                         </div>
                     </div>
                 {% elseif claim.type == 'theft' or claim.type == 'loss' %}
@@ -262,6 +270,27 @@
                                 <p>{{ claim.reportType|default('N/A') }}</p>
                             </div>
 
+                            <div class="col-xs-6">
+                                {% if claim.type == 'theft' %}
+                                    <label>Crime reference number</label>
+                                {% else %}
+                                    <label>Police report</label>
+                                {% endif %}
+
+                                {% if claim.validCrimeRef %}
+                                    <p>{{ claim.crimeRef|default('N/A') }} / {{ claim.force|default('N/A') }}</p>
+                                {% else %}
+                                    <p>
+                                        <i class="fa fa-warning" title="Invalid crime reference"></i>
+                                        {{ claim.crimeRef|default('N/A') }} / {{ claim.force|default('N/A') }}
+                                    </p>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <div class="row">
                             <div class="col-xs-12">
                                 <label>Proof of Usage</label>
                                 {% if claim.needProofOfUsage %}
@@ -372,23 +401,6 @@
                                     {% else %}
                                         <p>None uploaded yet</p>
                                     {% endif %}
-                                {% endif %}
-                            </div>
-
-                            <div class="col-xs-6">
-                                {% if claim.type == 'theft' %}
-                                    <label>Crime reference number</label>
-                                {% else %}
-                                    <label>Police report</label>
-                                {% endif %}
-
-                                {% if claim.validCrimeRef %}
-                                    <p>{{ claim.crimeRef|default('N/A') }} / {{ claim.force|default('N/A') }}</p>
-                                {% else %}
-                                    <p>
-                                        <i class="fa fa-warning" title="Invalid crime reference"></i>
-                                        {{ claim.crimeRef|default('N/A') }} / {{ claim.force|default('N/A') }}
-                                    </p>
                                 {% endif %}
                             </div>
                         </div>
@@ -504,13 +516,18 @@
                     </div>
 
                     <div class="form-group">
-                        <label>Replacement Phone</label>
-                        {{ form_widget(form.replacementPhone, {'attr': {'class': 'form-control'}}) }}
+                        <label>Type</label>
+                        {{ form_widget(form.type, {'attr': {'class': 'form-control'}}) }}
                     </div>
 
                     <div class="form-group">
-                        <label>Type</label>
-                        {{ form_widget(form.type, {'attr': {'class': 'form-control'}}) }}
+                        <label>Replacement IMEI</label>
+                        {{ form_widget(form.replacementImei, {'attr': {'class': 'form-control'}}) }}
+                    </div>
+
+                    <div class="form-group">
+                        <label>Replacement Phone</label>
+                        {{ form_widget(form.replacementPhone, {'attr': {'class': 'form-control'}}) }}
                     </div>
 
                     <div class="form-group">
@@ -520,12 +537,6 @@
                             {{ form_widget(form.approvedDate.month,{'attr': {'class': 'form-control'}}) }}
                             {{ form_widget(form.approvedDate.year,{'attr': {'class': 'form-control'}}) }}
                         </div>
-                    </div>
-
-                    <div class="checkbox">
-                        <label>
-                            {{ form_widget(form.shouldCancelPolicy) }} Should Cancel Policy?
-                        </label>
                     </div>
 
                     <div class="form-group">

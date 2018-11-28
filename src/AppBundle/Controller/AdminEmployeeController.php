@@ -493,6 +493,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                 },
                 'placeholder' => 'Choose a phone'
             ])
+            ->remove('shouldCancelPolicy')
             ->setAction($this->generateUrl(
                 'claims_form',
                 ['id' => $id]
