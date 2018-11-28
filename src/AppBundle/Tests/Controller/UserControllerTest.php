@@ -306,7 +306,7 @@ class UserControllerTest extends BaseControllerTest
         $form['email[email]'] = $inviteeEmail;
         $crawler = self::$client->submit($form);
         self::verifyResponse(302);
-        print $crawler->html();
+        //print $crawler->html();
 
         $this->logout();
 
@@ -318,6 +318,7 @@ class UserControllerTest extends BaseControllerTest
         $form['email[email]'] = $email;
         $crawler = self::$client->submit($form);
         self::verifyResponse(302);
+        $this->expectFlashError($crawler, 'has a claim');
     }
 
     public function testUserSCode()
