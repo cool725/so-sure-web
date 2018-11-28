@@ -31,16 +31,6 @@ $('.btn-copy').click(function (e) {
     e.preventDefault();
 });
 
-$('#today').click(function (e) {
-    let date = new Date();
-
-    console.log("this");
-
-    console.log(date.getDate());
-    console.log(date.getMonth());
-    console.log(date.getFullYear());
-});
-
 clipboard.on('success', function (event) {
     console.log(event);
     $('.btn-copy').tooltip('show');
@@ -49,10 +39,10 @@ clipboard.on('success', function (event) {
     }, 1500);
 });
 
-let ajax;
+var ajax;
 
 $('#claimsModal').on('hide.bs.modal', function (event) {
-    let modal = $(this);
+    var modal = $(this);
 
     ajax.abort();
 
@@ -71,8 +61,8 @@ $('#claimsModal').on('hide.bs.modal', function (event) {
 });
 
 $('#claimsModal').on('show.bs.modal', function (event) {
-    let button = $(event.relatedTarget);
-    let modal = $(this);
+    var button = $(event.relatedTarget);
+    var modal = $(this);
 
     ajax = $.ajax({
         url: '/admin/claims-form/' + button.data('id'),
