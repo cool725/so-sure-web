@@ -35,6 +35,7 @@ use Grpc\Call;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -652,8 +653,11 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                 $imeiForm->handleRequest($request);
                 if ($imeiForm->isValid()) {
                     $policy->adjustImei($imei->getImei(), false);
-
-                    $policy->addNoteDetails($this->getUser(), $imei->getNote());
+                  
+                    $policy->addNoteDetails(
+                        $imei->getNote(),
+                        $this->getUser()
+                    );
 
                     $dm->flush();
                     $this->addFlash(
@@ -669,6 +673,78 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         return [
             'form' => $imeiForm->createView(),
             'policy' => $policy,
+        ];
+    }
+
+    /**
+     * @Route("/picsure-form/{id}", name="picsure_form")
+     * @Template
+     */
+    public function picsureFormAction(Request $request, $id = null)
+    {
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(PhonePolicy::class);
+        /** @var PhonePolicy $policy */
+        $policy = $repo->find($id);
+
+        if (!$policy) {
+            throw $this->createNotFoundException(sprintf('Policy %s not found', $id));
+        }
+
+        $picsureForm = $this->get('form.factory')
+            ->createNamedBuilder('picsure_form')
+            ->add('approve', SubmitType::class)
+            ->add('preapprove', SubmitType::class)
+            ->add('invalidate', SubmitType::class)
+            ->add('note', TextareaType::class)
+            ->setAction($this->generateUrl(
+                'picsure_form',
+                ['id' => $id]
+            ))
+            ->getForm();
+
+        if ('POST' === $request->getMethod()) {
+            if ($request->request->has('picsure_form')) {
+                $picsureForm->handleRequest($request);
+                if ($picsureForm->isValid()) {
+                    if ($policy->getPolicyTerms()->isPicSureEnabled() && !$policy->isPicSureValidated()) {
+                        if ($picsureForm->get('approve')->isClicked()) {
+                            $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_APPROVED, $this->getUser());
+                            $policy->setPicSureApprovedDate(\DateTime::createFromFormat('U', time()));
+                        } elseif ($picsureForm->get('preapprove')->isClicked()) {
+                            $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_PREAPPROVED, $this->getUser());
+                            $policy->setPicSureApprovedDate(\DateTime::createFromFormat('U', time()));
+                        } elseif ($picsureForm->get('invalidate')->isClicked()) {
+                            $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_INVALID, $this->getUser());
+                        } else {
+                            throw new \Exception('Unknown button click');
+                        }
+
+                        $policy->addNoteDetails(
+                            $picsureForm->getData()['note'],
+                            $this->getUser()
+                        );
+
+                        $dm->flush();
+                        $this->addFlash(
+                            'success',
+                            sprintf('Set pic-sure to %s', $policy->getPicSureStatus())
+                        );
+                    } else {
+                        $this->addFlash(
+                            'error',
+                            'Policy is not a pic-sure policy or policy is already pic-sure (pre)approved'
+                        );
+                    }
+
+                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
+                }
+            }
+        }
+
+        return [
+            'form' => $picsureForm->createView(),
+            'policy' => $policy
         ];
     }
 
@@ -775,11 +851,6 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         $debtForm = $this->get('form.factory')
             ->createNamedBuilder('debt_form')->add('debt', SubmitType::class)
             ->getForm();
-        $picsureForm = $this->get('form.factory')
-            ->createNamedBuilder('picsure_form')
-            ->add('approve', SubmitType::class)
-            ->add('preapprove', SubmitType::class)
-            ->getForm();
         $swapPaymentPlanForm = $this->get('form.factory')
             ->createNamedBuilder('swap_payment_plan_form')->add('swap', SubmitType::class)
             ->getForm();
@@ -881,7 +952,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             } elseif ($request->request->has('note_form')) {
                 $noteForm->handleRequest($request);
                 if ($noteForm->isValid()) {
-                    $policy->addNoteDetails($this->getUser(), $noteForm->getData()['notes']);
+                    $policy->addNoteDetails($noteForm->getData()['notes'], $this->getUser());
                     $dm->flush();
                     $this->addFlash(
                         'success',
@@ -1190,32 +1261,6 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
 
                     return $this->redirectToRoute('admin_policy', ['id' => $id]);
                 }
-            } elseif ($request->request->has('picsure_form')) {
-                $picsureForm->handleRequest($request);
-                if ($picsureForm->isValid()) {
-                    if ($policy->getPolicyTerms()->isPicSureEnabled() && !$policy->isPicSureValidated()) {
-                        if ($picsureForm->get('approve')->isClicked()) {
-                            $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_APPROVED, $this->getUser());
-                        } elseif ($picsureForm->get('preapprove')->isClicked()) {
-                            $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_PREAPPROVED, $this->getUser());
-                        } else {
-                            throw new \Exception('Unknown button click');
-                        }
-                        $policy->setPicSureApprovedDate(\DateTime::createFromFormat('U', time()));
-                        $dm->flush();
-                        $this->addFlash(
-                            'success',
-                            sprintf('Set pic-sure to %s', $policy->getPicSureStatus())
-                        );
-                    } else {
-                        $this->addFlash(
-                            'error',
-                            'Policy is not a pic-sure policy or policy is already pic-sure (pre)approved'
-                        );
-                    }
-
-                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
-                }
             } elseif ($request->request->has('swap_payment_plan_form')) {
                 $swapPaymentPlanForm->handleRequest($request);
                 if ($swapPaymentPlanForm->isValid()) {
@@ -1390,7 +1435,6 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             'makemodel_form' => $makeModelForm->createView(),
             'chargebacks_form' => $chargebacksForm->createView(),
             'debt_form' => $debtForm->createView(),
-            'picsure_form' => $picsureForm->createView(),
             'swap_payment_plan_form' => $swapPaymentPlanForm->createView(),
             'pay_policy_form' => $payPolicyForm->createView(),
             'cancel_direct_debit_form' => $cancelDirectDebitForm->createView(),
