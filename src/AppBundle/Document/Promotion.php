@@ -10,24 +10,27 @@ use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
  * Represents a promotion which allows selected policies to earn a reward under some condition.
- * @MongoDB\Document(repositoryClass="AppBundle\Repository\PromotionRepository")
+ * @MongoDB\Document
  * @Gedmo\Loggable(logEntryClass="AppBundle\Document\LogEntry")
  */
 class Promotion
 {
-    // Make no claims for conditionDays days to receive reward.
     const CONDITION_NO_CLAIMS = "no-claims";
-    // Make conditionEvents invitations within conditionDays days to receive reward.
     const CONDITION_INVITES = "invites";
-    // Don't cancel your policy for conditionDays days to receive reward.
     const CONDITION_NONE = "none";
-
-    // Assign a taste card to the policy as a reward.
+    const CONDITIONS = [
+        "No Claims in period" => self::CONDITION_NO_CLAIMS,
+        "Make x Invitations" => self::CONDITION_INVITES,
+        "Reward automatically" => self::CONDITION_NONE
+    ];
     const REWARD_TASTE_CARD = "taste-card";
-    // Add balance to the reward pot as a reward.
     const REWARD_POT = "pot";
-    // Send the policy holder a phone case as a reward.
     const REWARD_PHONE_CASE = "phone-case";
+    const REWARDS = [
+        "Taste Card" => self::REWARD_TASTE_CARD,
+        "Reward Pot Balance" => self::REWARD_POT,
+        "Free Phone Case" => self::REWARD_PHONE_CASE
+    ];
 
     /**
      * @MongoDB\Id(strategy="auto")
@@ -103,7 +106,6 @@ class Promotion
      */
     public function __construct()
     {
-        parent::__construct();
         $this->confirmedUsers = new ArrayCollection();
     }
 
@@ -150,12 +152,12 @@ class Promotion
 
     public function getCondition()
     {
-        return $this->active;
+        return $this->condition;
     }
 
-    public function setCondition($active)
+    public function setCondition($condition)
     {
-        $this->activec = $active;
+        $this->condition = $condition;
     }
 
     public function getReward()

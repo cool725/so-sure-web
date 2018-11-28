@@ -3,6 +3,8 @@
 namespace AppBundle\Controller;
 
 use AppBundle\Document\AffiliateCompany;
+use AppBundle\Document\Promotion;
+use AppBundle\Document\Participation;
 use AppBundle\Document\BacsPaymentMethod;
 use AppBundle\Document\File\PaymentRequestUploadFile;
 use AppBundle\Document\JudoPaymentMethod;
@@ -2847,5 +2849,69 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         } else {
             return ['error' => 'Invalid URL, given ID does not correspond to an affiliate.'];
         }
+    }
+
+    /**
+     * @Route("/promotions", name="admin_promotions")
+     * @Template("AppBundle:AdminEmployee:promotions.html.twig")
+     */
+    public function promotionsAction(Request $request)
+    {
+        $dm = $this->getManager();
+        $promotionRepository = $dm->getRepository(Promotion::class);
+        $promotionForm = $this->get('form.factory')
+            ->createNamedBuilder('promotionForm')
+            ->add('name', TextType::class)
+            ->add('condition', ChoiceType::class, ['choices' => Promotion::CONDITIONS])
+            ->add('reward', ChoiceType::class, ['choices' => Promotion::REWARDS])
+            ->add('conditionDays', NumberType::class, ['constraints' => [new Assert\Range(['min' => 0, 'max' => 90])]])
+            ->add('conditionEvents', NumberType::class, ['constraints' => [new Assert\Range(['min' => 1, 'max' => 50])], 'required' => false])
+            ->add('rewardAmount', NumberType::class, ['constraints' => [new Assert\Range(['min' => 1, 'max' => 50])], 'required' => false])
+            ->add('next', SubmitType::class)
+            ->getForm();
+        try {
+            if ('POST' === $request->getMethod()) {
+                if ($request->request->has('promotionForm')) {
+                    $promotionForm->handleRequest($request);
+                    if ($promotionForm->isValid()) {
+                        $promotion = new Promotion();
+                        $promotion->setName($this->getDataString($promotionForm->getData(), 'name'));
+                        $promotion->setCondition($this->getDataString($promotionForm->getData(), 'condition'));
+                        $promotion->setReward($this->getDataString($promotionForm->getData(), 'reward'));
+                        $promotion->setConditionDays($this->getDataString($promotionForm->getData(), 'conditionDays'));
+                        $promotion->setConditionEvents($this->getDataString($promotionForm->getData(), 'conditionEvents'));
+                        $promotion->setRewardAmount($this->getDataString($promotionForm->getData(), 'rewardAmount'));
+                        $promotion->setStart(new \DateTime());
+                        $promotion->setActive(true);
+                        $dm->persist($promotion);
+                        $dm->flush();
+                        $this->addFlash('success', 'Added Promotion');
+                        return new RedirectResponse($this->generateUrl('admin_promotions'));
+                    } else {
+                        throw new \InvalidArgumentException(sprintf(
+                            'Unable to add company. %s',
+                            (string) $promotionForm->getErrors()
+                        ));
+                    }
+                }
+            }
+        } catch (\InvalidArgumentException $e) {
+            $this->addFlash('error', $e->getMessage());
+        }
+        // TODO: order them so that inactive come after active, but beside that it's ordered by newness.
+        $promotions = $promotionRepository->findAll();
+        return ["promotions" => $promotions, "promotionForm" => $promotionForm->createView()];
+    }
+
+    /**
+     * @Route("/promotion/{id}", name="admin_promotion")
+     * @Template("AppBundle:AdminEmployee:promotion.html.twig")
+     */
+    public function promotionAction($id)
+    {
+        $dm = $this->getManager();
+        $promotionRepository = $dm->getRepository(Promotion::class);
+        $promotion = $promotionRepository->find($id);
+        return ["promotion" => $promotion];
     }
 }

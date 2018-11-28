@@ -1,0 +1,76 @@
+{% extends 'admin_claims_base.html.twig' %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {% javascripts
+        '@AppBundle/Resources/public/js/AdminEmployee/company.js'
+    %}
+    <script src="{{ asset_url }}"></script>
+    {% endjavascripts %}
+{% endblock %}
+
+{% block body %}
+<div class="container" style="margin-bottom: 50px">
+    <div class="row">
+        <div class="col-md-8">
+            <h2>Promotion - {{ promotion.name }}</h2>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <h3>Parameters</h3>
+            <table class="table">
+                <tr>
+                    <td>Start</td>
+                    <td>Activity</td>
+                    <td>Condition</td>
+                    <td>Reward</td>
+                    <td>Period</td>
+                </tr>
+                <tr>
+                    <td>date</td>
+                    <td>{{ promotion.active ? 'Active' : 'Inactive'}}</td>
+                    <td>{{ promotion.condition }}</td>
+                    <td>{{ promotion.reward }}</td>
+                    <td>{{ promotion.conditionDays }}</td>
+                </tr>
+
+            </table>
+        </div>
+    </div>
+    <div class="row" style="margin-top: 20px">
+        <div class="col-md-12">
+            <h3>Policies</h3>
+            <table class="table table-striped" width="100%">
+                <tr>
+                    <th>User</th>
+                    <th>Policy</th>
+                    <th>Start</th>
+                </tr>
+                {% for participation in promotion.participating %}
+                    <tr class="{% if not promotion.active %}warning{% endif %}">
+                        <td>{{ participation.policy.user.email }}</td>
+                        <td>{{ participation.policy.policyCode }}</td>
+                        <td>the date</td>
+
+                        {#
+                        <td><a href="{{ path('admin_promotion', {'id': promotion.id }) }}">{{ promotion.name }}</a></td>
+                        <td>{{ promotion.conditionDays }} days</td>
+                        <td>
+                            <strong>{{ promotion.condition }}</strong>
+                            {% if promotion.condition == 'invites' %} - {{ promotion.conditionEvents }} needed{% endif %}
+                        </td>
+                        <td>
+                            <strong>{{ promotion.reward }}</strong>
+                            {% if promotion.reward == 'pot' %} £{{ promotion.rewardAmount }}{% endif %}
+                        </td>
+                        #}
+
+
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
