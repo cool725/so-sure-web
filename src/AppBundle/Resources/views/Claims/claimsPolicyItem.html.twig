@@ -1127,12 +1127,22 @@
                                 data-target="#salvaStatusForm">Change Status</button>
                     </td>
                 </tr>
+
+                <tr>
+                    <td><i class="fa fa-lock" title="Admin only"></i> Policy Status</td>
+                    <td>
+                        {{ policy.status }}
+                        <button type="button" class="btn btn-danger" data-toggle="modal"
+                                data-target="#policyStatusForm">Change Status</button>
+                    </td>
+                </tr>
                 {% endif %}
             </table>
 
             {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:AdminEmployee:imeiForm', 'policy': policy, 'id': 'imeiForm'} %}
             {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:Admin:salvaRequeueForm', 'policy': policy, 'id': 'salvaRequeueForm'} %}
             {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:Admin:salvaStatusForm', 'policy': policy, 'id': 'salvaStatusForm'} %}
+            {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:Admin:policyStatusForm', 'policy': policy, 'id': 'policyStatusForm'} %}
 
             {% endif %}
             {% if is_granted('ROLE_ADMIN') %}
