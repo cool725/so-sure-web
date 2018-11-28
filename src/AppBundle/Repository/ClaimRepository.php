@@ -26,6 +26,7 @@ class ClaimRepository extends DocumentRepository
         $qb->field('notificationDate')->notEqual(null);
         $qb->field('status')->notIn([Claim::STATUS_FNOL, Claim::STATUS_SUBMITTED, null]);
         $qb->field('number')->notEqual(null);
+        $qb->sort('underwriterLastUpdated', 'desc');
 
         /*
          * Aleks requested to see all claims for the time being...
