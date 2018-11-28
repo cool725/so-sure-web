@@ -3,6 +3,7 @@
 namespace AppBundle\Tests\Service;
 
 use AppBundle\Repository\UserRepository;
+use AppBundle\Service\MixpanelService;
 use AppBundle\Service\RouterService;
 use FOS\UserBundle\Model\UserManager;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -79,13 +80,16 @@ class InvitationServicePaidTest extends WebTestCase
         $templating = self::$container->get('templating');
         /** @var RouterService $router */
         $router = self::$container->get('app.router');
+        /** @var MixpanelService $mixpanelService */
+        $mixpanelService = self::$container->get('app.mixpanel');
         $mailer = new MailerService(
             new \Swift_Mailer($transport),
             $transport,
             $templating,
             $router,
             'foo@foo.com',
-            'bar'
+            'bar',
+            $mixpanelService
         );
         /** @var InvitationService invitationService */
         $invitationService = self::$container->get('app.invitation');
