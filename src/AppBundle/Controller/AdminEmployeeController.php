@@ -2693,7 +2693,6 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             "One off Charges" => AffiliateCompany::MODEL_ONE_OFF,
             "Ongoing Charges" => AffiliateCompany::MODEL_ONGOING
         ];
-
         $companyForm = $this->get('form.factory')
             ->createNamedBuilder('companyForm')
             ->add('name', TextType::class)
@@ -2711,12 +2710,10 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             ->add('leadSourceDetails', TextType::class, ['required' => false ])
             ->add('next', SubmitType::class)
             ->getForm();
-
         $dm = $this->getManager();
         $companyRepo = $dm->getRepository(AffiliateCompany::class);
         $userRepo = $dm->getRepository(User::class);
         $companies = $companyRepo->findAll();
-
         try {
             if ('POST' === $request->getMethod()) {
                 if ($request->request->has('companyForm')) {
@@ -2760,7 +2757,6 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         } catch (\InvalidArgumentException $e) {
             $this->addFlash('error', $e->getMessage());
         }
-
         return [
             'companies' => $companies,
             'companyForm' => $companyForm->createView(),

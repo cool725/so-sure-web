@@ -9,7 +9,6 @@ use AppBundle\Repository\UserRepository;
 use AppBundle\Repository\ChargeRepository;
 use AppBundle\Service\AffiliateService;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Bridge\PhpUnit\ClockMock;
 use Doctrine\ODM\MongoDB\DocumentManager;
 
 use AppBundle\Document\User;
