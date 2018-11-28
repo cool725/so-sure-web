@@ -298,7 +298,7 @@ class UserControllerTest extends BaseControllerTest
         $this->assertTrue($inviteePolicy->getUser()->hasActivePolicy());
         $this->assertTrue($inviteePolicy->hasMonetaryClaimed());
 
-        $this->login($email, $password, 'user/');
+        $this->login($email, $password, 'user');
 
         $crawler = self::$client->request('GET', sprintf('/user/%s', $policy->getId()));
         self::verifyResponse(200);
@@ -310,15 +310,16 @@ class UserControllerTest extends BaseControllerTest
 
         $this->logout();
 
-        $this->login($inviteeEmail, $password, 'user/');
+        $this->login($inviteeEmail, $password, 'user');
 
         $crawler = self::$client->request('GET', sprintf('/user/%s', $inviteePolicy->getId()));
         self::verifyResponse(200);
-        $form = $crawler->selectButton('email[submit]')->form();
-        $form['email[email]'] = $email;
+        $form = $crawler->selectButton('Accept')->form();
         $crawler = self::$client->submit($form);
         self::verifyResponse(302);
-        $this->expectFlashError($crawler, 'has a claim');
+        $crawler = self::$client->followRedirect();
+        //print $crawler->html();
+        $this->expectFlashWarning($crawler, 'have a claim');
     }
 
     public function testUserSCode()
