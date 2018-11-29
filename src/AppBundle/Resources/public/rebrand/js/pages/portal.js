@@ -34,22 +34,41 @@ sosure.affPortal = (function() {
             onkeyup: false,
             // onclick: false,
             rules: {
-
+                "lead_form[name]": {
+                    required: true,
+                    fullName: true
+                },
+                "lead_form[email]": {
+                    required: {
+                        depends:function(){
+                            $(this).val($.trim($(this).val()));
+                            return true;
+                        }
+                    },
+                    email: true,
+                    emaildomain: true
+                },
+                "lead_form[phone]": {
+                    required: true
+                },
+                "lead_form[terms]": {
+                    required: true
+                }
             },
             messages: {
-                // Leave validation messages blank as class gets added to the label
-                // "purchase_form[agreedDamage]": {
-                //     required: ''
-                // },
-                // "purchase_form[agreedAgeLocation]": {
-                //     required: ''
-                // },
-                // "purchase_form[agreedExcess]": {
-                //     required: ''
-                // },
-                // "purchase_form[agreedTerms]": {
-                //     required: ''
-                // }
+                "lead_form[name]": {
+                    required: 'Please enter your full name e.g "John Smith"',
+                    fullName: 'Please enter your first and last name  e.g "John Smith"'
+                },
+                "lead_form[email]": {
+                    required: 'Please enter a valid email address.'
+                },
+                "lead_form[phone]": {
+                    required: 'Please select a device'
+                },
+                "lead_form[terms]": {
+                    required: ''
+                }
             },
 
             submitHandler: function(form) {
@@ -62,8 +81,8 @@ sosure.affPortal = (function() {
 })();
 
 $(function() {
-    // sosure.affPortal.init();
-    //
+    sosure.affPortal.init();
+
     let whosEntering = false,
         who = null,
         labelTxt = null;
