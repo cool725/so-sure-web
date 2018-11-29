@@ -65,6 +65,8 @@ class MixpanelService
     const EVENT_DECLINE_RENEW = 'Decline Renew Policy';
     const EVENT_SIXPACK = 'Sixpack Experiment';
 
+    const EVENT_EMAIL = 'Email Sent';
+
     const CUSTOM_TOTAL_SITE_VISITORS = '$custom_event:379938';
     const CUSTOM_QUOTE_PAGE_UK = '$custom_event:458980';
 

@@ -926,7 +926,7 @@ class InvitationService
         $prefix = $policy->getPolicyPrefix($this->environment);
         if (!$policy->isValidPolicy($prefix)) {
             throw new InvalidPolicyException(sprintf(
-                'Policy must be pending/active before inviting/connecting (%s)',
+                "Policy must be pending/active before inviting/connecting (%s)",
                 $policy->getPolicyNumber()
             ));
         }

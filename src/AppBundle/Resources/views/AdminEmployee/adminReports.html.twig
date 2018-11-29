@@ -12,12 +12,10 @@
 {% block body %}
     <div class='container'>
         <h2>so-sure Reports</h2>
-
         <!-- Error Message -->
         {% if error is defined %}
             <h3>Error: {{ error }}</h3>
         {% else %}
-
             <!-- Navigation Tabs -->
             <ul id="tabs" class="nav nav-tabs nav-justified" role="tablist">
                 <li class="nav-item {% if claims is defined %}active{% endif %}">
@@ -29,8 +27,10 @@
                 <li class="nav-item {% if scheduledPayments is defined %}active{% endif %}">
                     <a href="{{ path('admin_reports_scheduled') }}">Scheduled Payments report</a>
                 </li>
+                <li class="nav-item {% if cumulative is defined %}active{% endif %}">
+                    <a href="{{ path('admin_reports_cumulative') }}">Cumulative Policies Report</a>
+                </li>
             </ul>
-
             <!-- claims report tab -->
             {% if claims is defined %}
                 <div class="row">
@@ -40,16 +40,20 @@
                             <div class="form-group">
                                 Reporting Period:
                                 <select name='period' action='' method='GET' onchange='this.form.submit()'>
-                                    {% for item in periods %}
+                                    {% for key, item in periods %}
                                         <option value='{{ item }}'
                                             {% if period == item %}
                                             selected='selected'
                                             {% endif %}>
-                                            {{ item }}
+                                            {{ key }}
                                         </option>
                                     {% endfor %}
                                 </select>
-                                {{ start }} to {{ end }}
+                                {% if month is defined %}
+                                    <strong>{{ month }}</strong>
+                                {% else %}
+                                    <strong>{{ start }}</strong> to <strong>{{ end }}</strong>
+                                {% endif %}
                             </div>
                         </div>
                     </form>
@@ -60,7 +64,6 @@
                         {% endfor %}
                         {% if claims.excluded_policies|length == 0 %}n/a{% endif %}
                     </h3>
-
                     <div class="table-responsive">
                         <table class="table table-striped">
                             <thead>
@@ -439,8 +442,6 @@
                     </div>
                 </div>
             {% endif %}
-
-
             <!-- connections report tab -->
             {% if connections is defined %}
                 <div class="row">
@@ -488,12 +489,13 @@
                     </div>
                 </div>
             {% endif %}
-
-
             <!-- scheduled payments report tab -->
             {% if scheduledPayments is defined %}
                 <div class="row">
-                    <h1 title="{% if scheduledPayments.dataFetchedAt is defined %}Generated at {{ scheduledPayments.dataFetchedAt|date }}{% endif %}">Monthly Billing</h1>
+                    <h1>Monthly Billing</h1>
+                    {% if scheduledPayments.dataFetchedAt is defined %}
+                        <small>Generated at {{ scheduledPayments.dataFetchedAt|date }}</small>
+                    {% endif %}
                     <div class="table-responsive">
                         <table class="table table-striped">
                             <thead>
@@ -521,6 +523,80 @@
                             </tbody>
                         </table>
                     </div>
+                </div>
+            {% endif %}
+            {% if cumulative is defined %}
+                <div class="row">
+                    <h1>Cumulative Policies</h1>
+                    <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                        <label class="btn btn-primary active">
+                            <input data-column="openColumn" class="columnBtn" type="checkbox" checked autocomplete="off">
+                            Open
+                        </label>
+                        <label class="btn btn-primary active">
+                            <input data-column="newColumn" class="columnBtn" type="checkbox" checked autocomplete="off">
+                            New
+                        </label>
+                        <label class="btn btn-primary active">
+                            <input data-column="expiredColumn" class="columnBtn" type="checkbox" checked autocomplete="off">
+                            Expired / Cancelled
+                        </label>
+                        <label class="btn btn-primary active">
+                            <input data-column="cumulativeColumn" class="columnBtn" type="checkbox" checked autocomplete="off">
+                            Close
+                        </label>
+                        <label class="btn btn-primary active">
+                            <input data-column="upgradesColumn" class="columnBtn" type="checkbox" checked autocomplete="off">
+                            Upgrades
+                        </label>
+                        <label class="btn btn-primary active">
+                            <input data-column="newAdjustedColumn" class="columnBtn" type="checkbox" checked autocomplete="off">
+                            New Adjusted
+                        </label>
+                        <label class="btn btn-primary active">
+                            <input data-column="endingAdjustedColumn" class="columnBtn" type="checkbox" checked autocomplete="off">
+                            Expired / Cancelled Adjusted
+                        </label>
+                        <label class="btn btn-primary active">
+                            <input data-column="runningTotalAdjustedColumn" class="columnBtn" type="checkbox" checked autocomplete="off">
+                            Active at Close Adjusted
+                        </label>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Month</th>
+                                    <th class="openColumn">Open</th>
+                                    <th class="newColumn">New</th>
+                                    <th class="expiredColumn">Expired / Cancelled</th>
+                                    <th class="cumulativeColumn">Close (and with adjusted starting point)</th>
+                                    <th class="upgradesColumn">Upgrades</th>
+                                    <th class="newAdjustedColumn">New Policies (Adjusted)</th>
+                                    <th class="endingAdjustedColumn">Ending / Cancelled Policies (Adjusted)</th>
+                                    <th class="runningTotalAdjustedColumn">Total Active Policies at Close (Adjusted)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for month, content in cumulative %}
+                                <tr {% if content.bad is defined %}class="warning"{% endif %}>
+                                    <td><strong>{{ month }}</strong></td>
+                                    <!-- Dylan Method -->
+                                    <td class="openColumn">{{ content.open }}</td>
+                                    <td class="newColumn">{{ content.new }}</td>
+                                    <td class="expiredColumn">{{ content.expired }}</td>
+                                    <td class="cumulativeColumn">{{ content.close }} ({{ content.closeAdjusted }})</td>
+                                    <!-- ReportingService Method -->
+                                    <td class="upgradesColumn">{{ content.upgrade }}</td>
+                                    <td class="newAdjustedColumn">{{ content.newAdjusted }}</td>
+                                    <td class="endingAdjustedColumn">{{ content.endingAdjusted }}</td>
+                                    <td class="runningTotalAdjustedColumn">{{ content.newTotal }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
                 </div>
             {% endif %}
         {% endif %}
