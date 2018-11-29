@@ -170,7 +170,12 @@ class PhoneTest extends \PHPUnit\Framework\TestCase
         $phone->init('Apple', 'Binder', 9, static::$policyTerms, 32, ['binder'], 5000);
         $this->assertNull($phone->getSalvaBinderMonthlyPremium());
         $this->assertNull($phone->getSalvaMiniumumBinderMonthlyPremium());
-        $phone->changePrice(9, \DateTime::createFromFormat('U', time()));
+        $phone->changePrice(
+            9,
+            \DateTime::createFromFormat('U', time()),
+            static::$policyTerms->getDefaultExcess(),
+            static::$policyTerms->getDefaultPicSureExcess()
+        );
     }
 
     public function testChangePriceOneDay()
@@ -182,7 +187,12 @@ class PhoneTest extends \PHPUnit\Framework\TestCase
         $future = \DateTime::createFromFormat('U', time());
         // TODO: 1 day fails on 26.10.18 as BST is ending. Fix calc at somepoint in the future
         $future = $this->addBusinessDays($future, 2);
-        $phone->changePrice(9, $future);
+        $phone->changePrice(
+            9,
+            $future,
+            static::$policyTerms->getDefaultExcess(),
+            static::$policyTerms->getDefaultPicSureExcess()
+        );
     }
 
     /**
@@ -197,7 +207,12 @@ class PhoneTest extends \PHPUnit\Framework\TestCase
         $future = \DateTime::createFromFormat('U', time());
         $future = $this->addBusinessDays($future, 1);
         $future = $future->sub(new \DateInterval('PT1S'));
-        $phone->changePrice(9, $future);
+        $phone->changePrice(
+            9,
+            $future,
+            static::$policyTerms->getDefaultExcess(),
+            static::$policyTerms->getDefaultPicSureExcess()
+        );
     }
 
     /**
@@ -209,7 +224,12 @@ class PhoneTest extends \PHPUnit\Framework\TestCase
         $phone->init('Apple', 'Immediate', 9, static::$policyTerms, 32, ['time'], 500);
         $this->assertNotNull($phone->getSalvaBinderMonthlyPremium());
         $this->assertNotNull($phone->getSalvaMiniumumBinderMonthlyPremium());
-        $phone->changePrice(9, \DateTime::createFromFormat('U', time()));
+        $phone->changePrice(
+            9,
+            \DateTime::createFromFormat('U', time()),
+            static::$policyTerms->getDefaultExcess(),
+            static::$policyTerms->getDefaultPicSureExcess()
+        );
     }
 
     /**
@@ -223,7 +243,12 @@ class PhoneTest extends \PHPUnit\Framework\TestCase
         $this->assertNotNull($phone->getSalvaMiniumumBinderMonthlyPremium());
         $past = \DateTime::createFromFormat('U', time());
         $past = $past->sub(new \DateInterval('P7D'));
-        $phone->changePrice(9, $past);
+        $phone->changePrice(
+            9,
+            $past,
+            static::$policyTerms->getDefaultExcess(),
+            static::$policyTerms->getDefaultPicSureExcess()
+        );
     }
 
     /**

@@ -1230,6 +1230,8 @@ class Phone
     public function changePrice(
         $gwp,
         \DateTime $from,
+        PhoneExcess $excess,
+        PhoneExcess $picSureExcess,
         \DateTime $to = null,
         $notes = null,
         \DateTime $date = null
