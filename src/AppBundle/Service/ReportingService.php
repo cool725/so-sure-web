@@ -1259,7 +1259,6 @@ class ReportingService
             $runningTotal += $month["new"];
             $runningTotal -= $month["expired"];
             $month["close"] = $runningTotal;
-            $month["closeAdjusted"] = $runningTotal - $startAdjustment;
             $month["upgrade"] = $policyRepo->countAllEndingPolicies(
                 Policy::CANCELLED_UPGRADE,
                 $start,
