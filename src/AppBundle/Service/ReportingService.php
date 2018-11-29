@@ -1250,8 +1250,6 @@ class ReportingService
         $policyRepo = $this->dm->getRepository(PhonePolicy::class);
         $report = [];
         $runningTotal = $policyRepo->countAllNewPolicies($start);
-        $startAdjustment = $policyRepo->countAllEndingPolicies(null, null, $start) -
-            $policyRepo->countAllEndingPolicies(Policy::CANCELLED_UPGRADE, null, $start, false);
         while ($start < $end) {
             $endOfMonth = $this->endOfMonth($start);
             $month = [];
