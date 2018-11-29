@@ -2,11 +2,7 @@
 
 namespace AppBundle\Form\Type;
 
-use AppBundle\Document\Phone;
-use AppBundle\Repository\PhoneRepository;
-use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -21,7 +17,6 @@ use AppBundle\Service\ReceperioService;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormEvent;
 use Doctrine\Bundle\MongoDBBundle\Form\Type\DocumentType;
-use Symfony\Component\VarDumper\Cloner\Data;
 
 class ClaimType extends AbstractType
 {
@@ -41,19 +36,10 @@ class ClaimType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('replacementImei', NumberType::class, [
-                'attr' => [
-                    'pattern' => '[0-9]{15}',
-                    'title' => '15 digit number'
-                ]
-            ])
-            ->add('shouldCancelPolicy', CheckboxType::class, [
-                'required' => false,
-            ])
-            ->add('notes', TextareaType::class, [
-                'required' => false
-            ])
-            ->add('update', SubmitType::class)
+            ->add('number', TextType::class)
+            ->add('shouldCancelPolicy', CheckboxType::class, ['required' => false])
+            ->add('notes', TextareaType::class, ['required' => false])
+            ->add('record', SubmitType::class)
         ;
 
         $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
@@ -79,27 +65,9 @@ class ClaimType extends AbstractType
             ]);
             $form->add('type', ChoiceType::class, [
                 'placeholder' => 'Select Claim Type',
-                'choices' => $choices
+                'choices' => $choices,
+                'disabled' => $claim->getType() == null ? false : true,
             ]);
-
-            $form->add('number', TextType::class, [
-                'data' => $claim->getNumber(),
-                'mapped' => false,
-                'trim' => true
-            ]);
-
-            $form->add('approvedDate', DateType::class, [
-                'data' =>
-                    $claim->getApprovedDate() ? $claim->getApprovedDate() : \DateTime::createFromFormat('U', time())
-            ]);
-        });
-
-        $builder->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event) {
-            /** @var Claim $claim */
-            $claim = $event->getData();
-            $form = $event->getForm();
-
-            $claim->setNumber($form->get('number')->getData(), true);
         });
     }
 
