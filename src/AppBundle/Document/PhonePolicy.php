@@ -243,6 +243,25 @@ class PhonePolicy extends Policy
             /** @var PhonePrice $price */
             $price = $phone->getCurrentPhonePrice($date);
             $this->setPremium($price->createPremium($additionalPremium, $date));
+            // in the normal flow we should have policy terms before setting the phone
+            // however, many test cases do not have it
+            if ($this->getPolicyTerms()) {
+                $this->validateAllowedExcess();
+            }
+        }
+    }
+
+    public function validateAllowedExcess()
+    {
+        parent::validateAllowedExcess();
+
+        /** @var PhonePremium $phonePremium */
+        $phonePremium = $this->getPremium();
+        if (!$this->getPolicyTerms()->isAllowedPicSureExcess($phonePremium->getPicSureExcess())) {
+            throw new \Exception(sprint(
+                'Unable to set phone for policy %s as pic-sure excess values do not match policy terms.',
+                $this->getId()
+            ));
         }
     }
 

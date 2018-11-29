@@ -2130,6 +2130,12 @@ abstract class Policy
             $company->addPolicy($this);
         }
         $this->setPolicyTerms($terms);
+
+        // in the normal flow we should have policy terms before setting the phone
+        // however, many test cases do not have it
+        if ($this->getPremium()) {
+            $this->validateAllowedExcess();
+        }
     }
 
     public function isCreateAllowed(\DateTime $date = null)
@@ -5258,6 +5264,16 @@ abstract class Policy
         }
 
         return false;
+    }
+
+    public function validateAllowedExcess()
+    {
+        if (!$this->getPolicyTerms()->isAllowedExcess($this->getPremium()->getExcess())) {
+            throw new \Exception(sprint(
+                'Unable to set phone for policy %s as excess values do not match policy terms.',
+                $this->getId()
+            ));
+        }
     }
 
     public function hasManualBacsPayment()

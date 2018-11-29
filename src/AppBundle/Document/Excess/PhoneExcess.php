@@ -121,4 +121,13 @@ class PhoneExcess extends Excess
             'detail' => $this->__toString(),
         ];
     }
+
+    public function equal(PhoneExcess $excess)
+    {
+        return $this->areEqualToTwoDp($this->getTheft(), $excess->getTheft()) &&
+            $this->areEqualToTwoDp($this->getLoss(), $excess->getLoss()) &&
+            $this->areEqualToTwoDp($this->getDamage(), $excess->getDamage()) &&
+            $this->areEqualToTwoDp($this->getWarranty(), $excess->getWarranty()) &&
+            $this->areEqualToTwoDp($this->getExtendedWarranty(), $excess->getExtendedWarranty());
+    }
 }

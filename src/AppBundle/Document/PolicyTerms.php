@@ -188,4 +188,26 @@ class PolicyTerms extends PolicyDocument
             return null;
         }
     }
+
+    public function isAllowedExcess(PhoneExcess $excess)
+    {
+        foreach ($this->getAllowedExcesses() as $allowedExcess) {
+            if ($allowedExcess->equal($excess)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public function isAllowedPicSureExcess(PhoneExcess $excess)
+    {
+        foreach ($this->getAllowedPicSureExcesses() as $allowedExcess) {
+            if ($allowedExcess->equal($excess)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

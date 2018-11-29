@@ -38,11 +38,11 @@ $('#phoneModal').on('show.bs.modal', function (event) {
         { title: 'Valid From', data: 'valid_from' },
         { title: 'Valid To', data: 'valid_to' },
         { title: 'GWP', data: 'gwp' },
-        { title: 'Premium (current)', data: 'premium' },
-        { title: 'Initial Premium', data: 'initial_premium' },
-        { title: 'Final Premium', data: 'final_premium' },
-        { title: 'Excess', data: 'excess_detail' },
-        { title: 'picsure Excess', data: 'picsure_excess_detail' },
+        { title: 'Premium (current ipt rate)', data: 'premium' },
+        { title: 'Premium (ipt rate @ from date)', data: 'initial_premium' },
+        { title: 'Premium (ipt rate @ to date)', data: 'final_premium' },
+        { title: 'Excess (Damage/Theft)', data: 'excess_detail' },
+        { title: 'picsure approved Excess (Damage/Theft)', data: 'picsure_excess_detail' },
         { title: 'Notes', data: 'notes' }
       ]
     });
