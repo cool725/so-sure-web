@@ -65,7 +65,7 @@ class PolicyTerms extends PolicyDocument
         $phoneExcess->setWarranty(50);
         $phoneExcess->setExtendedWarranty(50);
         $phoneExcess->setLoss(70);
-        $phoneExcess->setDamage(70);
+        $phoneExcess->setTheft(70);
 
         return $phoneExcess;
     }
@@ -77,7 +77,7 @@ class PolicyTerms extends PolicyDocument
         $phoneExcess->setWarranty(150);
         $phoneExcess->setExtendedWarranty(150);
         $phoneExcess->setLoss(150);
-        $phoneExcess->setDamage(150);
+        $phoneExcess->setTheft(150);
 
         return $phoneExcess;
     }
