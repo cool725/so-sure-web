@@ -77,11 +77,14 @@ class PhoneTest extends \PHPUnit\Framework\TestCase
         $phone->init('Apple', 'iPhone 6', 6.990001, static::$nonPicSurePolicyTerms, 1.5);
         /** @var PhonePrice $price */
         $price = $phone->getCurrentPhonePrice();
-        $this->assertEquals(50, $price->getPhoneExcess()->getDamage());
-        $this->assertEquals(50, $price->getPhoneExcess()->getWarranty());
-        $this->assertEquals(50, $price->getPhoneExcess()->getExtendedWarranty());
-        $this->assertEquals(70, $price->getPhoneExcess()->getTheft());
-        $this->assertEquals(70, $price->getPhoneExcess()->getLoss());
+        $this->assertNotNull($price->getPhoneExcess());
+        if ($price->getPhoneExcess()) {
+            $this->assertEquals(50, $price->getPhoneExcess()->getDamage());
+            $this->assertEquals(50, $price->getPhoneExcess()->getWarranty());
+            $this->assertEquals(50, $price->getPhoneExcess()->getExtendedWarranty());
+            $this->assertEquals(70, $price->getPhoneExcess()->getTheft());
+            $this->assertEquals(70, $price->getPhoneExcess()->getLoss());
+        }
         $this->assertNull($price->getPicSureExcess());
     }
 
@@ -91,17 +94,24 @@ class PhoneTest extends \PHPUnit\Framework\TestCase
         $phone->init('Apple', 'iPhone 6', 6.990001, static::$policyTerms, 1.5);
         /** @var PhonePrice $price */
         $price = $phone->getCurrentPhonePrice();
-        $this->assertEquals(50, $price->getPicSureExcess()->getDamage());
-        $this->assertEquals(50, $price->getPicSureExcess()->getWarranty());
-        $this->assertEquals(50, $price->getPicSureExcess()->getExtendedWarranty());
-        $this->assertEquals(70, $price->getPicSureExcess()->getTheft());
-        $this->assertEquals(70, $price->getPicSureExcess()->getLoss());
 
-        $this->assertEquals(150, $price->getPhoneExcess()->getDamage());
-        $this->assertEquals(150, $price->getPhoneExcess()->getWarranty());
-        $this->assertEquals(150, $price->getPhoneExcess()->getExtendedWarranty());
-        $this->assertEquals(150, $price->getPhoneExcess()->getTheft());
-        $this->assertEquals(150, $price->getPhoneExcess()->getLoss());
+        $this->assertNotNull($price->getPicSureExcess());
+        if ($price->getPicSureExcess()) {
+            $this->assertEquals(50, $price->getPicSureExcess()->getDamage());
+            $this->assertEquals(50, $price->getPicSureExcess()->getWarranty());
+            $this->assertEquals(50, $price->getPicSureExcess()->getExtendedWarranty());
+            $this->assertEquals(70, $price->getPicSureExcess()->getTheft());
+            $this->assertEquals(70, $price->getPicSureExcess()->getLoss());
+        }
+
+        $this->assertNotNull($price->getPhoneExcess());
+        if ($price->getPhoneExcess()) {
+            $this->assertEquals(150, $price->getPhoneExcess()->getDamage());
+            $this->assertEquals(150, $price->getPhoneExcess()->getWarranty());
+            $this->assertEquals(150, $price->getPhoneExcess()->getExtendedWarranty());
+            $this->assertEquals(150, $price->getPhoneExcess()->getTheft());
+            $this->assertEquals(150, $price->getPhoneExcess()->getLoss());
+        }
     }
 
     public function testGetCurrentPhonePrice()
