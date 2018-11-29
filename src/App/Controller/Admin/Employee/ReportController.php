@@ -93,15 +93,9 @@ class ReportController extends AbstractController
      */
     public function cumulativeReportAction()
     {
-        $oldest = new \DateTime();
-        $end = new \DateTime();
-        foreach (ReportingService::REPORT_PERIODS as $period => $dates) {
-            $start = ReportingService::getLastPeriod($period)[0];
-            if ($start < $oldest) {
-                $oldest = $start;
-            }
-        }
-        $report["cumulative"] = $this->reporting->getCumulativePolicies($oldest, $end);
+        $start = new \DateTime();
+        $start->setDate(2016, 9, 1);
+        $report["cumulative"] = $this->reporting->getCumulativePolicies($start, new \DateTime());
         return $this->render("AppBundle:AdminEmployee:adminReports.html.twig", $report);
     }
 }
