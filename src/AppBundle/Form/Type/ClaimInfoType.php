@@ -3,25 +3,20 @@
 namespace AppBundle\Form\Type;
 
 use AppBundle\Document\Phone;
-use AppBundle\Repository\PhoneRepository;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Doctrine\ODM\MongoDB\DocumentRepository;
 use AppBundle\Document\Claim;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Service\ReceperioService;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormEvent;
-use Doctrine\Bundle\MongoDBBundle\Form\Type\DocumentType;
-use Symfony\Component\VarDumper\Cloner\Data;
 
 class ClaimInfoType extends AbstractType
 {
@@ -71,8 +66,7 @@ class ClaimInfoType extends AbstractType
             ->add('notes', TextareaType::class, [
                 'required' => false
             ])
-            ->add('update', SubmitType::class)
-        ;
+            ->add('update', SubmitType::class);
 
         $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
             /** @var Claim $claim */
@@ -113,7 +107,7 @@ class ClaimInfoType extends AbstractType
             $form->get('number')->setData($claim->getNumber());
         });
 
-        $builder->addEventListener(FormEvents::POST_SUBMIT, function(FormEvent $event) {
+        $builder->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event) {
             $entity = $event->getForm()->getData();
             $entity->setNumber($event->getForm()->get('number')->getData(), true);
         });
