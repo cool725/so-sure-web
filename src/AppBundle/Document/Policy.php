@@ -5268,6 +5268,10 @@ abstract class Policy
 
     public function validateAllowedExcess()
     {
+        if (!$this->getPremium() || !$this->getPremium()->getExcess()) {
+            return;
+        }
+
         if (!$this->getPolicyTerms()->isAllowedExcess($this->getPremium()->getExcess())) {
             throw new \Exception(sprintf(
                 'Unable to set phone for policy %s as excess values do not match policy terms.',

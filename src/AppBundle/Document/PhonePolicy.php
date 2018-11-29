@@ -257,6 +257,10 @@ class PhonePolicy extends Policy
 
         /** @var PhonePremium $phonePremium */
         $phonePremium = $this->getPremium();
+        if (!$phonePremium || !$phonePremium->getPicSureExcess()) {
+            return;
+        }
+
         if ($this->getPolicyTerms()->isPicSureEnabled() &&
             !$this->getPolicyTerms()->isAllowedPicSureExcess($phonePremium->getPicSureExcess())) {
             throw new \Exception(sprintf(
