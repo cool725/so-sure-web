@@ -24,13 +24,10 @@ class LeadPortalType extends AbstractType
     private $required;
 
     /**
-     * @param boolean $required
+     * @var RequestStack
      */
-    public function __construct($required)
-    {
+    private $requestStack;
 
-        $this->required = $required;
-    }
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {

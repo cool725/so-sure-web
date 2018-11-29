@@ -75,7 +75,6 @@ class LeadPortal
 
     /**
      * @var string
-     * @AppAssert\Phone()
      * @Assert\Length(min="1", max="100")
      * @Assert\NotBlank(message="This value is required.")
      */
