@@ -1305,6 +1305,9 @@ class Phone
             }
         }
 
+        $price->setExcess($excess);
+        $price->setPicSureExcess($picSureExcess);
+
         $this->addPhonePrice($price);
     }
 }
