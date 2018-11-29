@@ -19,29 +19,28 @@
     <div class="row">
         <div class="col-md-12">
             <h3>Parameters</h3>
-            <table class="table">
+            <table class="table table-striped">
                 <tr>
-                    <td>Start</td>
-                    <td>Activity</td>
-                    <td>Condition</td>
-                    <td>Reward</td>
-                    <td>Period</td>
+                    <th>Start</th>
+                    <th>Activity Status</th>
+                    <th>Reward Condition</th>
+                    <th>Reward</th>
+                    <th>Period</th>
                 </tr>
                 <tr>
                     <td>date</td>
                     <td>{{ promotion.active ? 'Active' : 'Inactive'}}</td>
                     <td>{{ promotion.condition }}</td>
                     <td>{{ promotion.reward }}</td>
-                    <td>{{ promotion.conditionDays }}</td>
+                    <td>{{ promotion.period }}</td>
                 </tr>
-
             </table>
         </div>
     </div>
     <div class="row" style="margin-top: 20px">
         <div class="col-md-12">
             <h3>Policies</h3>
-            <table class="table table-striped" width="100%">
+            <table class="table table-striped">
                 <tr>
                     <th>User</th>
                     <th>Policy</th>

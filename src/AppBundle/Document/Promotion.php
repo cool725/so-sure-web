@@ -85,7 +85,7 @@ class Promotion
      * @Assert\Range(min=0,max=90)
      * @MongoDB\Field(type="integer")
      */
-    protected $conditionDays;
+    protected $period;
 
     /**
      * If condition requires a number of events to occur (eg invites) this stores that number.
@@ -181,14 +181,14 @@ class Promotion
         $participation->setPromotion($this);
     }
 
-    public function getConditionDays()
+    public function getPeriod()
     {
-        return $this->conditionDays;
+        return $this->period;
     }
 
-    public function setConditionDays($conditionDays)
+    public function setPeriod($period)
     {
-        $this->conditionDays = $conditionDays;
+        $this->period = $period;
     }
 
     public function getConditionEvents()

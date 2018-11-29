@@ -19,8 +19,6 @@ class Participation
     const STATUS_ACTIVE = "active";
     // Promotion conditions were fulfilled and reward given.
     const STATUS_COMPLETED = "completed";
-    // Reward could not be given.
-    const STATUS_INVALID = "invalid";
     // Promotion conditions were not fulfilled and reward was not given.
     const STATUS_FAILED = "failed";
 

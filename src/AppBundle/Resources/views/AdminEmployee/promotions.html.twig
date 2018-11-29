@@ -32,7 +32,7 @@
         {% for promotion in promotions %}
             <tr class="{% if not promotion.active %}warning{% endif %}">
                 <td><a href="{{ path('admin_promotion', {'id': promotion.id }) }}">{{ promotion.name }}</a></td>
-                <td>{{ promotion.conditionDays }} days</td>
+                <td>{{ promotion.period }} days</td>
                 <td>
                     <strong>{{ promotion.condition }}</strong>
                     {% if promotion.condition == 'invites' %} - {{ promotion.conditionEvents }} needed{% endif %}
