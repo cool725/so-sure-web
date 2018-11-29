@@ -2,6 +2,8 @@
 
 namespace AppBundle\Document;
 
+use AppBundle\Document\Excess\PhoneExcess;
+use AppBundle\Tests\Document\PhoneExcessTest;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use AppBundle\Classes\Salva;
 use AppBundle\Classes\SoSure;
@@ -1225,8 +1227,13 @@ class Phone
         return $maxComparision;
     }
 
-    public function changePrice($gwp, \DateTime $from, \DateTime $to = null, $notes = null, \DateTime $date = null)
-    {
+    public function changePrice(
+        $gwp,
+        \DateTime $from,
+        \DateTime $to = null,
+        $notes = null,
+        \DateTime $date = null
+    ) {
         if (!$date) {
             $date = new \DateTime('now', new \DateTimeZone(SoSure::TIMEZONE));
         }

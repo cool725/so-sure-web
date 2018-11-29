@@ -104,6 +104,16 @@ class PhoneExcess extends Excess
     public function __toString()
     {
         return sprintf(
+            '£%0.0f Damage / £%0.0f Theft / £%0.0f Loss',
+            $this->getDamage(),
+            $this->getTheft(),
+            $this->getLoss()
+        );
+    }
+
+    public function shortDescription()
+    {
+        return sprintf(
             '%0.0f / %0.0f',
             $this->getDamage(),
             $this->getTheft()
@@ -118,7 +128,7 @@ class PhoneExcess extends Excess
             'warranty' => $this->toTwoDp($this->getWarranty()),
             'extendedWarranty' => $this->toTwoDp($this->getExtendedWarranty()),
             'damage' => $this->toTwoDp($this->getDamage()),
-            'detail' => $this->__toString(),
+            'detail' => $this->shortDescription(),
         ];
     }
 

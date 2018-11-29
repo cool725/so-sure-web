@@ -93,8 +93,10 @@ class TestCommand extends ContainerAwareCommand
             $terms = $policy->getPolicyTerms();
             /** @var PhonePremium $premium */
             $premium = $policy->getPremium();
-            $premium->setExcess($terms->getDefaultExcess());
-            $premium->setPicSureExcess($terms->getDefaultPicSureExcess());
+            if ($premium) {
+                $premium->setExcess($terms->getDefaultExcess());
+                $premium->setPicSureExcess($terms->getDefaultPicSureExcess());
+            }
         }
 
         $this->dm->flush();
