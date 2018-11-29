@@ -45,7 +45,7 @@ class PromotionService
             $promotions = $promotionRepository->findBy([]);
         }
         foreach ($promotions as $promotion) {
-            $participations = $promotion->getParticipations();
+            $participations = $promotion->getParticipating();
             foreach ($participations as $participation) {
                 if ($participation->getStatus() != Participation::STATUS_ACTIVE) {
                     // TODO: this will turn into a waste of time when there are a heap of completed participations.
@@ -57,7 +57,7 @@ class PromotionService
                 // TODO: maybe there is another case like this if reward pot is too full or something but I will have to
                 //       check that with someone later. If so I will add a function.
                 // TODO: This will mail every day which is not good. We have got to bring back invalid promotion status.
-                if ($participation->getReward == Promotion::REWARD_TASTE_CARD && $policy->getTasteCard()) {
+                if ($promotion->getReward() == Promotion::REWARD_TASTE_CARD && $policy->getTasteCard()) {
                     $this->mailerService->sendTemplate(
                         "Promotion Reward Is Invalid",
                         "marketing@so-sure.com",

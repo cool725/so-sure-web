@@ -6,6 +6,7 @@ use AppBundle\Document\Promotion;
 use AppBundle\Document\Participation;
 use AppBundle\Document\Policy;
 use AppBundle\Document\User;
+use AppBundle\Document\DateTrait;
 use AppBundle\Service\PromotionService;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Doctrine\ODM\MongoDB\DocumentManager;
@@ -22,6 +23,7 @@ class PromotionServiceTest extends WebTestCase
 {
     use \AppBundle\Tests\PhingKernelClassTrait;
     use \AppBundle\Tests\UserClassTrait;
+    use DateTrait;
 
     protected static $container;
     /** @var PromotionService */
@@ -72,7 +74,7 @@ class PromotionServiceTest extends WebTestCase
     /**
      * Tests the promotion service generate method.
      */
-    public function testGenerate()
+    public function testGenerateSuccess()
     {
         $promotion = $this->createTestPromotion(
             "free!!! phone case!!!!!!!!!",
@@ -90,27 +92,27 @@ class PromotionServiceTest extends WebTestCase
         $this->addDays($date, 5);
         $bParticipation = $this->participate($promotion, $b, new \DateTime());
         $mock = $this->mockMailerSend(0);
-        static::$promotionService->endParticipation($aParticipation);
-        $promotionService->generate([$promotion], $date);
+        static::$promotionService->generate([$promotion], $date);
         $mock->__phpunit_verify();
         $this->assertEquals(Participation::STATUS_ACTIVE, $aParticipation->getStatus());
         $this->assertEquals(Participation::STATUS_ACTIVE, $bParticipation->getStatus());
         // no condition and period passed.
         $this->addDays($date, 30);
         $mock = $this->mockMailerSend(1);
-        static::$promotionService->endParticipation($aParticipation);
-        $promotionService->generate([$promotion], $date);
+        static::$promotionService->generate([$promotion], $date);
         $mock->__phpunit_verify();
         $this->assertEquals(Participation::STATUS_COMPLETED, $aParticipation->getStatus());
         $this->assertEquals(Participation::STATUS_ACTIVE, $bParticipation->getStatus());
         $this->addDays($date, 5);
         $mock = $this->mockMailerSend(1);
-        static::$promotionService->endParticipation($aParticipation);
-        $promotionService->generate([$promotion], $date);
+        static::$promotionService->generate([$promotion], $date);
         $mock->__phpunit_verify();
         $this->assertEquals(Participation::STATUS_COMPLETED, $aParticipation->getStatus());
         $this->assertEquals(Participation::STATUS_COMPLETED, $bParticipation->getStatus());
-        //
+    }
+
+    public function testGenerateInvalid()
+    {
 
     }
 
@@ -126,6 +128,7 @@ class PromotionServiceTest extends WebTestCase
         $participation = new Participation();
         $participation->setPolicy($policy);
         $participation->setStart(clone $date);
+        $participation->setStatus(Participation::STATUS_ACTIVE);
         $promotion->addParticipating($participation);
         return $participation;
     }
