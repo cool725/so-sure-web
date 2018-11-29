@@ -850,7 +850,7 @@ class PhonePolicy extends Policy
         return Claim::getExcessValue($type, $this->isPicSureValidated(), $this->isPicSurePolicy());
     }
 
-    public function getExcess()
+    public function getCurrentExcess()
     {
         /** @var PhonePremium $phonePremium */
         $phonePremium = $this->getPremium();

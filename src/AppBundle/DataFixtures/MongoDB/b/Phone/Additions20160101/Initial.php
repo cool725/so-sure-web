@@ -16,6 +16,10 @@ class Initial extends LoadPhoneData implements FixtureInterface
 {
     public function load(ObjectManager $manager)
     {
+        if (!$this->container) {
+            throw new \Exception('missing container');
+        }
+
         /** @var DocumentManager $dm */
         $dm = $this->container->get('doctrine_mongodb.odm.default_document_manager');
         $policyTermsRepo = $dm->getRepository(PolicyTerms::class);
