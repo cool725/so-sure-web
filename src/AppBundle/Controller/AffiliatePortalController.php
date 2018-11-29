@@ -21,7 +21,7 @@ class AffiliatePortalController extends BaseController
     /**
      * @Route("/helloz", name="helloz")
      */
-    public function hellozAction(Request $request)
+    public function hellozAction()
     {
         $lead = new LeadPortal();
         $lead->setSource(LeadPortal::SOURCE_HELLO_Z);
