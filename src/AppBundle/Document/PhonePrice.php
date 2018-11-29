@@ -21,7 +21,7 @@ class PhonePrice extends Price
      */
     protected $picSureExcess;
 
-    public function setPicSureExcess(PhoneExcess $phoneExcess)
+    public function setPicSureExcess(PhoneExcess $phoneExcess = null)
     {
         $this->picSureExcess = $phoneExcess;
     }

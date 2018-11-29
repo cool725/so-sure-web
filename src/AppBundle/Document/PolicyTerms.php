@@ -171,6 +171,9 @@ class PolicyTerms extends PolicyDocument
         }
     }
 
+    /**
+     * @return PhoneExcess
+     */
     public function getDefaultExcess()
     {
         if ($this->isPicSureEnabled()) {

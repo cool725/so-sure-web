@@ -3,6 +3,7 @@
 namespace AppBundle\Document;
 
 use AppBundle\Document\Excess\Excess;
+use AppBundle\Document\Excess\PhoneExcess;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Symfony\Component\Validator\Constraints as Assert;
 use AppBundle\Validator\Constraints as AppAssert;
@@ -149,9 +150,24 @@ abstract class Price
         $this->notes = $notes;
     }
 
+    /**
+     * @return Excess|null
+     */
     public function getExcess()
     {
         return $this->excess;
+    }
+
+    /**
+     * @return PhoneExcess|null
+     */
+    public function getPhoneExcess()
+    {
+        if ($this->excess instanceof PhoneExcess) {
+            return $this->excess;
+        }
+
+        return null;
     }
 
     public function setExcess(Excess $excess)
