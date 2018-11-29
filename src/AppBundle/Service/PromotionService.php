@@ -56,11 +56,12 @@ class PromotionService
                 // check for existing tastecard to invalidate.
                 // TODO: maybe there is another case like this if reward pot is too full or something but I will have to
                 //       check that with someone later. If so I will add a function.
+                // TODO: This will mail every day which is not good. We have got to bring back invalid promotion status.
                 if ($participation->getReward == Promotion::REWARD_TASTE_CARD && $policy->getTasteCard()) {
-                    $mailerService->sendTemplate(
+                    $this->mailerService->sendTemplate(
                         "Promotion Reward Is Invalid",
                         "marketing@so-sure.com",
-                        "AppBundle:Email:promotion/rewardEarned.html.twig",
+                        "AppBundle:Email:promotion/rewardInvalid.html.twig",
                         ["participation" => $participation]
                     );
                     continue;
@@ -115,9 +116,9 @@ class PromotionService
     public function endParticipation($participation, $status = Participation::STATUS_COMPLETED)
     {
         $participation->setStatus($status);
-        $dm->flush();
+        $this->dm->flush();
         if ($status == Participation::STATUS_COMPLETED) {
-            $mailerService->sendTemplate(
+            $this->mailerService->sendTemplate(
                 "Promotion Reward Earned",
                 "marketing@so-sure.com",
                 "AppBundle:Email:promotion/rewardEarned.html.twig",

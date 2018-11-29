@@ -10,45 +10,155 @@ use AppBundle\Service\PromotionService;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use AppBundle\Service\MailerService;
+use Psr\Log\LoggerInterface;
+
 
 /**
  * @group functional-nonet
  *
  * AppBundle\\Tests\\Service\\SCodeServiceTest
  */
-class AffiliateServiceTest extends WebTestCase
+class PromotionServiceTest extends WebTestCase
 {
     use \AppBundle\Tests\PhingKernelClassTrait;
     use \AppBundle\Tests\UserClassTrait;
+
     protected static $container;
-    /** @var DocumentManager */
-    protected static $dm;
     /** @var PromotionService */
     protected static $promotionService;
 
     public static function setUpBeforeClass()
     {
-        //start the symfony kernel
         $kernel = static::createKernel();
         $kernel->boot();
-
-        //get the DI container
-        self::$container = $kernel->getContainer();
-
-        //now we can instantiate our service (if you want a fresh one for
-        //each test method, do this in setUp() instead
+        static::$container = $kernel->getContainer();
+        /** @var PromotionService $affiliateService */
+        $promotionService = static::$container->get('app.promotion');
+        static::$promotionService = $promotionService;
         /** @var DocumentManager */
         $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
         self::$dm = $dm;
-        /** @var AffiliateService $affiliateService */
-        $promotionService = self::$container->get('app.promotion');
-        self::$promotionService = $promotionService;
     }
 
-    public function setUp()
+    /**
+     * Tests the promotion service end participation function for completed participations and failed ones as well.
+     */
+    public function testEndParticipation()
     {
-        /** @var DocumentManager */
-        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
-        self::$dm = $dm;
+        $promotion = $this->createTestPromotion(
+            "free taste card",
+            Promotion::CONDITION_INVITES,
+            Promotion::REWARD_TASTE_CARD,
+            30,
+            1,
+            0
+        );
+        $a = $this->createUserPolicy();
+        $b = $this->createUserPolicy();
+        $aParticipation = $this->participate($promotion, $a, new \DateTime());
+        $bParticipation = $this->participate($promotion, $b, new \DateTime());
+        // Test completed participation.
+        $mock = $this->mockMailerSend(1);
+        static::$promotionService->endParticipation($aParticipation);
+        $this->assertEquals(Participation::STATUS_COMPLETED, $aParticipation->getStatus());
+        $mock->__phpunit_verify();
+        // Test failed participation.
+        $mock = $this->mockMailerSend(0);
+        static::$promotionService->endParticipation($bParticipation, Participation::STATUS_FAILED);
+        $this->assertEquals(Participation::STATUS_FAILED, $bParticipation->getStatus());
+        $mock->__phpunit_verify();
+    }
+
+    /**
+     * Tests the promotion service generate method.
+     */
+    public function testGenerate()
+    {
+        $promotion = $this->createTestPromotion(
+            "free!!! phone case!!!!!!!!!",
+            Promotion::CONDITION_NONE,
+            Promotion::REWARD_TASTE_CARD,
+            30,
+            1,
+            0
+        );
+        $a = $this->createUserPolicy();
+        $b = $this->createUserPolicy();
+        $date = new \DateTime();
+        // no condition and period not passed.
+        $aParticipation = $this->participate($promotion, $a, $date);
+        $this->addDays($date, 5);
+        $bParticipation = $this->participate($promotion, $b, new \DateTime());
+        $mock = $this->mockMailerSend(0);
+        static::$promotionService->endParticipation($aParticipation);
+        $promotionService->generate([$promotion], $date);
+        $mock->__phpunit_verify();
+        $this->assertEquals(Participation::STATUS_ACTIVE, $aParticipation->getStatus());
+        $this->assertEquals(Participation::STATUS_ACTIVE, $bParticipation->getStatus());
+        // no condition and period passed.
+        $this->addDays($date, 30);
+        $mock = $this->mockMailerSend(1);
+        static::$promotionService->endParticipation($aParticipation);
+        $promotionService->generate([$promotion], $date);
+        $mock->__phpunit_verify();
+        $this->assertEquals(Participation::STATUS_COMPLETED, $aParticipation->getStatus());
+        $this->assertEquals(Participation::STATUS_ACTIVE, $bParticipation->getStatus());
+        $this->addDays($date, 5);
+        $mock = $this->mockMailerSend(1);
+        static::$promotionService->endParticipation($aParticipation);
+        $promotionService->generate([$promotion], $date);
+        $mock->__phpunit_verify();
+        $this->assertEquals(Participation::STATUS_COMPLETED, $aParticipation->getStatus());
+        $this->assertEquals(Participation::STATUS_COMPLETED, $bParticipation->getStatus());
+        //
+
+    }
+
+    /**
+     * Enters a policy into a promotion at a given time.
+     * @param Promotion $promotion is the promotion.
+     * @param Policy    $policy    is the policy.
+     * @param \DateTime $date      is the date of entry.
+     * @return Participation the new particiation.
+     */
+    private function participate($promotion, $policy, $date)
+    {
+        $participation = new Participation();
+        $participation->setPolicy($policy);
+        $participation->setStart(clone $date);
+        $promotion->addParticipating($participation);
+        return $participation;
+    }
+
+    /**
+     * Creates a promotion object for a nice test.
+     * @param String $name      is the name of the promotion.
+     * @param String $condition is the condition constant that this promotion uses.
+     * @param String $reward    is the reward constant that this promotion gives.
+     * @param int    $period    is the maximum number of days that you can be active in the promotion for.
+     * @param int    $events    is the number of events required by the condition.
+     * @param float  $amount    is the quantity of the reward if it is a reward that needs a quantity.
+     * @return Promotion the new promotion.
+     */
+    private function createTestPromotion($name, $condition, $reward, $period, $events = 0, $amount = 0)
+    {
+        $promotion = new Promotion();
+        $promotion->setName($name);
+        $promotion->setStart(new \DateTime());
+        $promotion->setActive(true);
+        $promotion->setCondition($condition);
+        $promotion->setReward($reward);
+        $promotion->setPeriod($period);
+        $promotion->setConditionEvents($events);
+        $promotion->setRewardAmount($amount);
+        return $promotion;
+    }
+
+    private function mockMailerSend($times)
+    {
+        $mailer = $this->createMock(MailerService::class);
+        $mailer->expects($this->exactly($times))->method('sendTemplate');
+        static::$promotionService = new PromotionService(static::$dm, $mailer, $this->createMock(LoggerInterface::class));
+        return $mailer;
     }
 }
