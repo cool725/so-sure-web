@@ -29,22 +29,40 @@
                         'autocomplete': 'off'
                     }}) }}
 
-                        <h3 class="text-center mb-4">Customer information portal</h3>
                         <div class="who">
-                            <div class="form-group">
-                                {{ form_label(lead_form.submittedBy, 'Who is entering?') }}
-                                {{ form_widget(lead_form.submittedBy, {'attr': { 'class': ''}}) }}
+                            <h4 class="text-center mb-4">Customer information portal</h4>
+                            <div class="form-group text-center mb-4">
+                                {{ form_widget(lead_form.submittedBy, {'attr': {
+                                    'class': 'form-control',
+                                    'data-customer': 'I have read & understood the terms & conditions below',
+                                    'data-staff': 'I have read the terms & conditions to the customer and they agree'
+                                }}) }}
                                 <div class="with-errors">{{ form_errors(lead_form.submittedBy) }}</div>
                             </div>
-                            <div class="form-group">
-                                <a href="#" class="btn btn-primary btn-square">Begin</a>
+                            <div class="form-group text-center mb-4">
+                                <a id="begin_btn" href="#" class="btn btn-primary btn-square">Begin</a>
+                            </div>
+                            <div class="form-group text-center">
+                                <h5 class="text-center text-muted mb-4">OR</h5>
+                                <h5 class="text-center">Download the app 🎉</h5>
+                                <img src="{{ cdn_url }}/images/qr/so-sure_qr-code-app-download.png " alt="Download the app">
                             </div>
                         </div>
-                        <div class="info">
-                            <div class="form-text staff">Spicy jalapeno bacon ipsum dolor amet meatloaf pork belly shankle tri-tip strip steak filet mignon hamburger drumstick spare ribs ham kielbasa ribeye. Jowl corned beef ham, turkey salami filet mignon pig bacon ground round frankfurter meatball strip steak. </div>
-                            <div class="form-text customer">Spicy jalapeno bacon ipsum dolor amet meatloaf pork belly shankle tri-tip strip steak filet mignon hamburger drumstick spare ribs ham kielbasa ribeye. Jowl corned beef ham, turkey salami filet mignon pig bacon ground round frankfurter meatball strip steak. </div>
+                        <div class="info hideme">
+                            <div class="staff hideme">
+                                <h4 class="text-center mb-4">Staff entry portal</h4>
+                                <ul>
+                                    <li>Ask....</li>
+                                    <li>Ask....</li>
+                                    <li>Ask....</li>
+                                </ul>
+                            </div>
+                            <div class="customer hideme">
+                                <h4 class="text-center mb-4">Customer portal</h4>
+                                <p>Spicy jalapeno bacon ipsum dolor amet meatloaf pork belly shankle tri-tip strip steak filet mignon hamburger drumstick spare ribs ham kielbasa ribeye.</p>
+                            </div>
                             <div class="form-group">
-                                {{ form_label(lead_form.name, 'Name') }}
+                                {{ form_label(lead_form.name, 'Full name') }}
                                 {{ form_widget(lead_form.name, {'attr':{'class':'form-control'}}) }}
                                 <div class="with-errors">{{ form_errors(lead_form.name) }}</div>
                             </div>
@@ -54,21 +72,25 @@
                                 <div class="with-errors">{{ form_errors(lead_form.email) }}</div>
                             </div>
                             <div class="form-group">
-                                {{ form_label(lead_form.make, 'Make') }}
-                                {{ form_widget(lead_form.make, {'attr':{'class':'form-control'}}) }}
-                                <div class="with-errors">{{ form_errors(lead_form.make) }}</div>
+                                {{ form_label(lead_form.phone, 'Phone') }}
+                                {{ form_widget(lead_form.phone, {'attr':{'class':'form-control'}}) }}
+                                <div class="with-errors">{{ form_errors(lead_form.phone) }}</div>
                             </div>
                             <div class="form-group">
-                                {{ form_label(lead_form.model, 'Model') }}
-                                {{ form_widget(lead_form.model, {'attr':{'class':'form-control'}}) }}
-                                <div class="with-errors">{{ form_errors(lead_form.model) }}</div>
+                                {{ form_widget(lead_form.terms, {
+                                    'label': 'I have read & understood the terms & conditions below',
+                                    'attr': {
+                                        'class':'custom-control-input'
+                                    }}
+                                ) }}
+                                <div class="with-errors">{{ form_errors(lead_form.terms) }}</div>
                             </div>
-                            <div class="form-group">
-                                {{ form_label(lead_form.memory, 'Storage') }}
-                                {{ form_widget(lead_form.memory, {'attr':{'class':'form-control'}}) }}
-                                <div class="with-errors">{{ form_errors(lead_form.memory) }}</div>
-                            </div>
-                            <div class="form-group">
+                            <div class="form-group d-flex justify-content-between align-items-center mb-0">
+                                <a id="restart_btn" href="#" class="btn btn-outline-primary btn-square">Back</a>
+                                <a href="#"
+                                   class="btn-simple-link "
+                                   data-toggle="modal"
+                                   data-target="#customer_portal_terms"><small>Terms &amp; Conditions</small></a>
                                 {{ form_widget(lead_form.submit, {'attr':{'class':'btn btn-success btn-square'}}) }}
                             </div>
                         </div>
@@ -83,6 +105,27 @@
 
 
     {# Page Modals #}
+    <div class="modal fade"
+         id="customer_portal_terms"
+         tabindex="-1" role="dialog"
+         aria-labelledby="customer_portal_terms"
+         aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Terms &amp; Conditions</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <i class="fal fa-times text-white"></i>
+                    </button>
+                </div>
+                <div class="modal-body text-center text-sm-left">
+                    <div class="row">
+                        Terms
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
 {% endblock %}
 

@@ -62,6 +62,62 @@ sosure.affPortal = (function() {
 })();
 
 $(function() {
-    sosure.affPortal.init();
+    // sosure.affPortal.init();
+    //
+    let whosEntering = false,
+        who = null,
+        labelTxt = null;
 
+    let staff = (labelTxt) => {
+        $('.who').addClass('hideme');
+        $('.info').removeClass('hideme').find('.staff').removeClass('hideme');
+        $('#lead_form_terms_label').text(labelTxt);
+    }
+
+    let customer = (labelTxt) => {
+        $('.who').addClass('hideme');
+        $('.info').removeClass('hideme').find('.customer').removeClass('hideme');
+        $('#lead_form_terms_label').text(labelTxt);
+    }
+
+    let back = () => {
+        $('.info').addClass('hideme').find('.staff, .customer').addClass('hideme');
+        $('.who').removeClass('hideme');
+        $('#lead_form_submittedBy').val(0);
+    }
+
+    $('#lead_form_submittedBy').on('change', function(e) {
+        who = $(this).val();
+        staffTxt = $(this).attr('data-staff');
+        customerTxt = $(this).attr('data-customer');
+
+        if (who == 1) {
+            whosEntering = true;
+            labelTxt = customerTxt;
+        } else if (who == 2) {
+            whosEntering = true;
+            labelTxt = staffTxt;
+        } else {
+            whosEntering = false;
+        }
+    });
+
+
+    $('#begin_btn').on('click', function(e) {
+        e.preventDefault();
+
+        if (who == 1) {
+            customer(labelTxt);
+        }
+
+        if (who == 2) {
+            staff(labelTxt);
+        }
+    });
+
+    $('#restart_btn').on('click', function(e) {
+        e.preventDefault();
+
+        back();
+    });
 });

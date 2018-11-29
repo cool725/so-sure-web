@@ -22,7 +22,7 @@
 {% endif %}
 <div class="custom-control custom-checkbox">
     <input type="checkbox" {{ block('widget_attributes') }}{% if value is defined %} value="{{ value }}"{% endif %}{% if checked %} checked="checked"{% endif %} class="custom-control-input" id="{{ id }}">
-    <label class="custom-control-label" for="{{ id }}">{% autoescape false %}{{ label|trans({}, translation_domain) }}{% endautoescape %}</label>
+    <label id="{{ id }}_label" class="custom-control-label" for="{{ id }}">{% autoescape false %}{{ label|trans({}, translation_domain) }}{% endautoescape %}</label>
 </div>
 {% endspaceless %}
 {% endblock checkbox_widget %}
