@@ -17,6 +17,7 @@
     }
 }
 
+// Video modal
 .modal-video {
 
     .modal-body {
@@ -32,4 +33,64 @@
         }
     }
 
+}
+
+// Includes Carousel component
+.modal-onboarding {
+
+    .carousel {
+        position: static;
+    }
+
+    .carousel-item {
+        text-align: center;
+    }
+
+    .carousel-indicators {
+        margin: 0;
+        // left: 32px; right: auto; bottom: -46px;
+
+        li {
+            @include border-radius(12px);
+        }
+    }
+
+    &__image {
+
+        img {
+            width: 120px;
+
+            @include media-breakpoint-up(lg) {
+                width: 280px;
+            }
+        }
+    }
+
+    &-footer {
+        position: relative;
+        padding: 1rem 2rem;
+    }
+
+    .hide-controls {
+        display: none;
+    }
+}
+
+// Fullscreen modal
+.modal-fullscreen {
+
+    &-dialog {
+        min-width: 100%;
+        margin: 0;
+    }
+
+    &-content {
+        min-height: 100vh;
+        @include border-radius(0);
+    }
+
+    &-header {
+        background: none;
+        @include border-radius(0);
+    }
 }

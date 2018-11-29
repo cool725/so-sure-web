@@ -828,7 +828,11 @@ abstract class BaseController extends Controller
         $form = $this->createForm(PolicySearchType::class, null, ['method' => 'GET']);
         $form->handleRequest($request);
         if ($includeInvalidPolicies === null) {
-            $includeInvalidPolicies = $form->get('invalid')->getData();
+            if (!empty($form->getData('id'))) {
+                $includeInvalidPolicies = true;
+            } else {
+                $includeInvalidPolicies = $form->get('invalid')->getData();
+            }
         }
         $sosure = $form->get('sosure')->getData();
         if ($sosure) {
@@ -865,6 +869,19 @@ abstract class BaseController extends Controller
             );
             $policiesQb = $policiesQb->addAnd(
                 $policiesQb->expr()->field('cancelledReason')->notIn([Policy::CANCELLED_UPGRADE])
+            );
+        } elseif ($status == 'call') {
+            $policiesQb = $policiesQb->addAnd(
+                $policiesQb->expr()->field('status')->in([Policy::STATUS_UNPAID])
+            );
+        } elseif ($status == 'called') {
+            $policiesQb = $policiesQb->addAnd(
+                $policiesQb->expr()->field('notesList.type')->equals('call')
+            );
+            $oneWeekAgo = \DateTime::createFromFormat('U', time());
+            $oneWeekAgo = $oneWeekAgo->sub(new \DateInterval('P7D'));
+            $policiesQb = $policiesQb->addAnd(
+                $policiesQb->expr()->field('notesList.date')->gte($oneWeekAgo)
             );
         } elseif ($status == Policy::STATUS_EXPIRED_CLAIMABLE) {
             $policiesQb = $policiesQb->addAnd(
@@ -958,6 +975,30 @@ abstract class BaseController extends Controller
                 return $a->getPolicyExpirationDate() > $b->getPolicyExpirationDate();
             });
             $pager = $this->arrayPager($request, $policies);
+        } elseif ($status == 'call') {
+            $policies = $policiesQb->getQuery()->execute()->toArray();
+            $policies = array_filter($policies, function ($policy) {
+                /** @var Policy $policy */
+                $fourteenDays = \DateTime::createFromFormat('U', time());
+                $fourteenDays = $fourteenDays->sub(new \DateInterval('P14D'));
+                $sevenDays = \DateTime::createFromFormat('U', time());
+                $sevenDays = $fourteenDays->sub(new \DateInterval('P7D'));
+
+                // 14 days & no calls or 7 days & at most 1 call
+                if ($policy->getPolicyExpirationDateDays() <= 14 && $policy->getNoteCalledCount($fourteenDays) == 0) {
+                    return true;
+                } elseif ($policy->getPolicyExpirationDateDays() <= 7 &&
+                    $policy->getNoteCalledCount($fourteenDays) <= 1) {
+                    return true;
+                } else {
+                    return false;
+                }
+            });
+            // sort older to more recent
+            usort($policies, function ($a, $b) {
+                return $a->getPolicyExpirationDate() > $b->getPolicyExpirationDate();
+            });
+            $pager = $this->arrayPager($request, $policies);
         } else {
             $policiesQb = $policiesQb->sort('start', 'asc');
             //$pager = $this->arrayPager($request, $policiesQb->getQuery()->execute()->toArray());
@@ -967,7 +1008,8 @@ abstract class BaseController extends Controller
         return [
             'policies' => $pager->getCurrentPageResults(),
             'pager' => $pager,
-            'form' => $form->createView()
+            'form' => $form->createView(),
+            'status' => $status,
         ];
     }
 

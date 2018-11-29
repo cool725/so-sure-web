@@ -101,7 +101,7 @@ class ClaimsService
     public function createClaim(ClaimFnol $claimFnol)
     {
         $claim = new Claim();
-        
+
         $claim->setType($claimFnol->getType());
         $claim->setIncidentDate($claimFnol->getWhen());
         $claim->setIncidentTime($claimFnol->getTime());
@@ -120,11 +120,11 @@ class ClaimsService
     public function updateDamageDocuments(Claim $claim, ClaimFnolDamage $claimDamage, $submit = false)
     {
         $claim->setTypeDetails($claimDamage->getTypeDetails());
-        $claim->setTypeDetailsOther(
-            $this->conformAlphanumericSpaceDot($claimDamage->getTypeDetailsOther(), 200)
+        $claim->setTypeDetailsOther($this->conformAlphanumericSpaceDot($claimDamage->getTypeDetailsOther(), 200, 1));
+        $claim->setMonthOfPurchase($this->conformAlphanumericSpaceDot($claimDamage->getMonthOfPurchase(), 200, 3));
+        $claim->setYearOfPurchase(
+            mb_strlen($claimDamage->getYearOfPurchase()) == 4 ? $claimDamage->getYearOfPurchase() : null
         );
-        $claim->setMonthOfPurchase($claimDamage->getMonthOfPurchase());
-        $claim->setYearOfPurchase($claimDamage->getYearOfPurchase());
         $claim->setPhoneStatus($claimDamage->getPhoneStatus());
 
         if ($claimDamage->getProofOfUsage()) {
@@ -162,7 +162,7 @@ class ClaimsService
     public function updateTheftLossDocuments(Claim $claim, ClaimFnolTheftLoss $claimTheftLoss, $submit = false)
     {
         $claim->setHasContacted($claimTheftLoss->getHasContacted());
-        $claim->setContactedPlace($claimTheftLoss->getContactedPlace());
+        $claim->setContactedPlace($this->conformAlphanumericSpaceDot($claimTheftLoss->getContactedPlace(), 200, 4));
         $claim->setBlockedDate($claimTheftLoss->getBlockedDate());
         $claim->setReportedDate($claimTheftLoss->getReportedDate());
         $claim->setReportType($claimTheftLoss->getReportType());
@@ -430,9 +430,9 @@ class ClaimsService
                 $templateText = "AppBundle:Email:claim/self.txt.twig";
             }
 
-            $this->mailer->sendTemplate(
+            $this->mailer->sendTemplateToUser(
                 $subject,
-                $policy->getUser()->getEmail(),
+                $policy->getUser(),
                 $templateHtml,
                 ['claim' => $claim, 'policy' => $policy],
                 $templateText,
@@ -468,9 +468,9 @@ class ClaimsService
 
     public function notifyFnolSubmission(Claim $claim)
     {
-        $this->mailer->sendTemplate(
+        $this->mailer->sendTemplateToUser(
             'ATTENTION: You have an unfinished claim with so-sure',
-            $claim->getPolicy()->getUser()->getEmail(),
+            $claim->getPolicy()->getUser(),
             'AppBundle:Email:claim/fnolInitialResponse.html.twig',
             ['data' => $claim],
             'AppBundle:Email:claim/fnolInitialResponse.txt.twig',
@@ -524,9 +524,9 @@ class ClaimsService
             'bcc@so-sure.com'
         );
 
-        $this->mailer->sendTemplate(
+        $this->mailer->sendTemplateToUser(
             'Your claim with so-sure',
-            $claim->getPolicy()->getUser()->getEmail(),
+            $claim->getPolicy()->getUser(),
             'AppBundle:Email:claim/fnolResponse.html.twig',
             ['data' => $claim],
             'AppBundle:Email:claim/fnolResponse.txt.twig',
@@ -579,18 +579,18 @@ class ClaimsService
             ];
 
             if ($isUpdate) {
-                $this->mailer->sendTemplate(
+                $this->mailer->sendTemplateToUser(
                     'Your link to review your claim',
-                    $user->getEmail(),
+                    $user,
                     "AppBundle:Email:claim/loginLinkUpdate.html.twig",
                     $data,
                     "AppBundle:Email:claim/loginLinkUpdate.txt.twig",
                     $data
                 );
             } else {
-                $this->mailer->sendTemplate(
+                $this->mailer->sendTemplateToUser(
                     'Your link to proceed with your claim',
-                    $user->getEmail(),
+                    $user,
                     "AppBundle:Email:claim/loginLink.html.twig",
                     $data,
                     "AppBundle:Email:claim/loginLink.txt.twig",

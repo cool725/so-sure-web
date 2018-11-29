@@ -767,9 +767,9 @@ class BacsService
         $htmlTemplate = sprintf("%s.html.twig", $baseTemplate);
         $textTemplate = sprintf("%s.txt.twig", $baseTemplate);
 
-        $this->mailer->sendTemplate(
+        $this->mailer->sendTemplateToUser(
             $subject,
-            $policy->getUser()->getEmail(),
+            $policy->getUser(),
             $htmlTemplate,
             ['policy' => $policy],
             $textTemplate,
@@ -793,9 +793,9 @@ class BacsService
         $templateText = sprintf('%s.txt.twig', $baseTemplate);
 
         $claimed = $user->getAvgPolicyClaims() > 0;
-        $this->mailerService->sendTemplate(
+        $this->mailerService->sendTemplateToUser(
             'Your Direct Debit Cancellation',
-            $user->getEmail(),
+            $user,
             $templateHtml,
             ['user' => $user, 'claimed' => $claimed],
             $templateText,
@@ -817,9 +817,9 @@ class BacsService
         $templateHtml = sprintf('%s.html.twig', $baseTemplate);
         $templateText = sprintf('%s.txt.twig', $baseTemplate);
 
-        $this->mailerService->sendTemplate(
+        $this->mailerService->sendTemplateToUser(
             'Your recent name change',
-            $user->getEmail(),
+            $user,
             $templateHtml,
             ['user' => $user],
             $templateText,
@@ -1472,7 +1472,7 @@ class BacsService
 
             $payment = $this->bacsPayment(
                 $scheduledPayment->getPolicy(),
-                'Scheduled Payment',
+                $scheduledPayment->getNotes() ?: 'Scheduled Payment',
                 $scheduledPayment->getAmount(),
                 $scheduledDate,
                 $update,
@@ -1828,6 +1828,16 @@ class BacsService
 
     public function generateBacsPdf(Policy $policy)
     {
+        if (!$policy->getUser()->hasBacsPaymentMethod()) {
+            $this->logger->error(sprintf(
+                'Policy %s/%s does not have a bacs payment method for generating bacs pdf',
+                $policy->getPolicyNumber(),
+                $policy->getId()
+            ));
+
+            return;
+        }
+
         $now = \DateTime::createFromFormat('U', time());
         /** @var BacsPaymentMethod $paymentMethod */
         $paymentMethod = $policy->getUser()->getPaymentMethod();

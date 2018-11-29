@@ -13,6 +13,8 @@ use AppBundle\Document\Sequence;
 use AppBundle\Document\ValidatorTrait;
 use AppBundle\Form\Type\ChargeReportType;
 use AppBundle\Form\Type\BacsMandatesType;
+use AppBundle\Form\Type\SalvaRequeueType;
+use AppBundle\Form\Type\SalvaStatusType;
 use AppBundle\Form\Type\UploadFileType;
 use AppBundle\Form\Type\ReconciliationFileType;
 use AppBundle\Form\Type\SequenceType;
@@ -31,6 +33,7 @@ use AppBundle\Service\BarclaysService;
 use AppBundle\Service\LloydsService;
 use AppBundle\Service\MailerService;
 use AppBundle\Service\ReportingService;
+use AppBundle\Service\SalvaExportService;
 use AppBundle\Service\SequenceService;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
@@ -265,8 +268,10 @@ class AdminController extends BaseController
         if ($editPhone) {
             $phones = $repo->findBy(['make' => $editPhone->getMake(), 'model' => $editPhone->getModel()]);
             foreach ($phones as $phone) {
+                /** @var Phone $phone */
                 $phone->setDescription($request->get('description'));
                 $phone->setFunFacts($request->get('fun-facts'));
+                $phone->setCanonicalPath($request->get('canonical-path'));
             }
             $dm->flush();
             $this->addFlash(
@@ -454,7 +459,7 @@ class AdminController extends BaseController
      * @Route("/accounts/{year}/{month}", name="admin_accounts_date")
      * @Template
      */
-    public function adminAccountsAction($year = null, $month = null)
+    public function adminAccountsAction(Request $request, $year = null, $month = null)
     {
         // default 30s for prod is no longer enough
         set_time_limit(180);
@@ -467,6 +472,32 @@ class AdminController extends BaseController
             $month = $now->format('m');
         }
         $date = \DateTime::createFromFormat("Y-m-d", sprintf('%d-%d-01', $year, $month));
+
+        $salvaForm = $this->get('form.factory')
+            ->createNamedBuilder('salva_form')
+            ->add('export', SubmitType::class)
+            ->getForm();
+        if ('POST' === $request->getMethod()) {
+            if ($request->request->has('salva_form')) {
+                $salvaForm->handleRequest($request);
+                if ($salvaForm->isValid()) {
+                    // default 30s for prod is no longer enough
+                    set_time_limit(300);
+
+                    /** @var SalvaExportService $salva */
+                    $salva = $this->get('app.salva');
+                    $salva->exportPayments(true);
+                    $this->addFlash(
+                        'success',
+                        'Re-exported Salva Payments File to S3'
+                    );
+                    return new RedirectResponse($this->generateUrl('admin_accounts_date', [
+                        'year' => $year,
+                        'month' => $month
+                    ]));
+                }
+            }
+        }
 
         $dm = $this->getManager();
         $s3FileRepo = $dm->getRepository(S3File::class);
@@ -482,6 +513,7 @@ class AdminController extends BaseController
             'rewardPotLiability' => $reportingService->getRewardPotLiability($date),
             'rewardPromoPotLiability' => $reportingService->getRewardPotLiability($date, true),
             'files' => $s3FileRepo->getAllFiles($date),
+            'salvaForm' => $salvaForm->createView(),
         ];
     }
 
@@ -558,17 +590,17 @@ class AdminController extends BaseController
                     if ($bacs->isS3FilePresent($file->getClientOriginalName())) {
                         $this->addFlash(
                             'error',
-                            'File is already processed.'
+                            sprintf('File is already processed (%s).', $file->getClientOriginalName())
                         );
                     } elseif ($bacs->processUpload($file)) {
                         $this->addFlash(
                             'success',
-                            'Successfully uploaded & processed file'
+                            sprintf('Successfully uploaded & processed file (%s)', $file->getClientOriginalName())
                         );
                     } else {
                         $this->addFlash(
                             'error',
-                            'Unable to process file.'
+                            sprintf('Unable to process file (%s).', $file->getClientOriginalName())
                         );
                     }
 
@@ -1387,6 +1419,105 @@ class AdminController extends BaseController
             'month' => $month,
             'chargebacks' => $qb->getQuery()->execute(),
             'chargeback_form' => $chargebackForm->createView(),
+        ];
+    }
+
+    /**
+     * @Route("/salva-requeue/{id}", name="salva_requeue_form")
+     * @Template
+     */
+    public function salvaRequeueFormAction(Request $request, $id = null)
+    {
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(SalvaPhonePolicy::class);
+        /** @var SalvaPhonePolicy $policy */
+        $policy = $repo->find($id);
+
+        if (!$policy) {
+            throw $this->createNotFoundException(sprintf('Policy %s not found', $id));
+        }
+
+        $salvaRequeueForm = $this->get('form.factory')
+            ->createNamedBuilder('salva_requeue_form', SalvaRequeueType::class)
+            ->setAction($this->generateUrl(
+                'salva_requeue_form',
+                ['id' => $id]
+            ))
+            ->getForm();
+
+        if ('POST' === $request->getMethod()) {
+            if ($request->request->has('salva_requeue_form')) {
+                $salvaRequeueForm->handleRequest($request);
+                if ($salvaRequeueForm->isValid()) {
+                    /** @var SalvaExportService $salvaService */
+                    $salvaService = $this->get('app.salva');
+
+                    $result = $salvaService->queue($policy, $salvaRequeueForm->getData()['reason']);
+
+                    if ($result) {
+                        $this->addFlash(
+                            'success',
+                            sprintf('Sucessfully requeued salva policy: %s', $policy->getPolicyNumber())
+                        );
+                    } else {
+                        $this->addFlash(
+                            'error',
+                            sprintf('Could not requeue salva policy: %s', $policy->getPolicyNumber())
+                        );
+                    }
+
+                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
+                }
+            }
+        }
+
+        return [
+            'form' => $salvaRequeueForm->createView(),
+            'policy' => $policy,
+        ];
+    }
+
+    /**
+     * @Route("/salva-status/{id}", name="salva_status_form")
+     * @Template
+     */
+    public function salvaStatusFormAction(Request $request, $id = null)
+    {
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(SalvaPhonePolicy::class);
+        /** @var SalvaPhonePolicy $policy */
+        $policy = $repo->find($id);
+
+        if (!$policy) {
+            throw $this->createNotFoundException(sprintf('Policy %s not found', $id));
+        }
+
+        $salvaRequeueForm = $this->get('form.factory')
+            ->createNamedBuilder('salva_status_form', SalvaStatusType::class, $policy)
+            ->setAction($this->generateUrl(
+                'salva_status_form',
+                ['id' => $id]
+            ))
+            ->getForm();
+
+        if ('POST' === $request->getMethod()) {
+            if ($request->request->has('salva_status_form')) {
+                $salvaRequeueForm->handleRequest($request);
+                if ($salvaRequeueForm->isValid()) {
+                    $this->addFlash(
+                        'success',
+                        sprintf('Changed salva status to %s', $policy->getSalvaStatus())
+                    );
+
+                    $dm->flush();
+                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
+                }
+            }
+        }
+
+        return [
+            'form' => $salvaRequeueForm->createView(),
+            'policy' => $policy,
         ];
     }
 }

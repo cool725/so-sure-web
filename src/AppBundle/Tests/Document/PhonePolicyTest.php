@@ -2305,6 +2305,9 @@ class PhonePolicyTest extends WebTestCase
         $policy = new SalvaPhonePolicy();
         $policy->setPhone(static::$phone);
 
+        /* Policy is in progress, shouldn't cancel */
+        $this->assertFalse($policy->canCancel(null));
+
         $user = new User();
         $user->setEmail(static::generateEmail('can-cancel-policy', $this));
         self::addAddress($user);
@@ -2315,6 +2318,9 @@ class PhonePolicyTest extends WebTestCase
         $this->assertFalse($policy->canCancel(Policy::CANCELLED_COOLOFF, new \DateTime("2016-01-31")));
         $this->assertTrue($policy->canCancel(Policy::CANCELLED_USER_REQUESTED, new \DateTime("2016-01-15")));
         $this->assertFalse($policy->canCancel(Policy::CANCELLED_BADRISK));
+
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        $this->assertTrue($policy->canCancel(null));
 
         // open claim should disallow any cancellations
         $claim = new Claim();
@@ -2449,6 +2455,28 @@ class PhonePolicyTest extends WebTestCase
         $policy->setEnd(new \DateTime("2016-12-31 23:59"));
         $policy->setStatus(Policy::STATUS_EXPIRED_WAIT_CLAIM);
         $this->assertFalse($policy->canCancel(Policy::STATUS_EXPIRED_WAIT_CLAIM, new \DateTime("2016-01-01")));
+    }
+
+    public function testCanCancelPolicyNullStatus()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testCanCancelPolicyNullStatus', $this),
+            'bar',
+            null,
+            static::$dm
+        );
+
+        $policy = static::initPolicy(
+            $user,
+            static::$dm,
+            $this->getRandomPhone(static::$dm),
+            null,
+            false,
+            false
+        );
+
+        $this->assertFalse($policy->canCancel(null));
     }
 
     public function testIsWithinCooloffPeriod()

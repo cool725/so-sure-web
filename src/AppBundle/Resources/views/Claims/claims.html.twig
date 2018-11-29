@@ -104,7 +104,7 @@
                     </tr>
                     </thead>
                     <tbody>
-                    {% for claim in claims %}
+                    {% for claim in claims if claim.policy %}
                         <tr>
                             <td>
                                 <button type="button" class="btn btn-link" data-id="{{ claim.id }}" data-toggle="modal" data-target="#claimsModal">

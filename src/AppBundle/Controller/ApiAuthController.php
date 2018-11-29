@@ -19,6 +19,7 @@ use AppBundle\Form\Type\LaunchType;
 use AppBundle\Document\Address;
 use AppBundle\Document\Payment\Payment;
 use AppBundle\Document\Cashback;
+use AppBundle\Document\Charge;
 use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePrice;
 use AppBundle\Document\PhonePolicy;
@@ -1731,9 +1732,9 @@ class ApiAuthController extends BaseController
                 }
                 try {
                     $mailer = $this->get('app.mailer');
-                    $mailer->sendTemplate(
+                    $mailer->sendTemplateToUser(
                         sprintf('%s has requested you pay for their policy', $multiPay->getPayee()->getName()),
-                        $multiPay->getPayer()->getEmail(),
+                        $multiPay->getPayer(),
                         'AppBundle:Email:policy/multiPayRequest.html.twig',
                         ['multiPay' => $multiPay],
                         'AppBundle:Email:policy/multiPayRequest.txt.twig',
@@ -2370,11 +2371,18 @@ class ApiAuthController extends BaseController
 
             $sms = $this->get('app.sms');
             $code = $sms->setValidationCodeForUser($user);
-            if ($sms->sendTemplate($mobileNumber, 'AppBundle:Sms:validation-code.txt.twig', ['code' => $code])) {
+            $status = $sms->sendTemplate(
+                $mobileNumber,
+                'AppBundle:Sms:validation-code.txt.twig',
+                ['code' => $code],
+                $user->getLatestPolicy(),
+                Charge::TYPE_SMS_VERIFICATION
+            );
+
+            if ($status) {
                 return $this->getErrorJsonResponse(ApiErrorCode::SUCCESS, 'OK', 200);
             } else {
                 $this->get('logger')->error('Error sending SMS.', ['mobile' => $mobileNumber]);
-
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_USER_SEND_SMS, 'Error sending SMS', 422);
             }
         } catch (AccessDeniedException $e) {

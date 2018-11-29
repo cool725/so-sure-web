@@ -1,10 +1,32 @@
-<nav id="main-nav" class="navbar {% if quote_mode is defined and quote_mode == 1 %}navbar-so-sure-quote{% else %}navbar-so-sure{% endif %} fixed-top justify-content-between flex-nowrap flex-row pl-lg-5">
+<nav id="main-nav"
+     class="navbar
+     {% if quote_mode is defined and quote_mode == true %}
+        navbar-so-sure-quote
+    {% else %}
+        navbar-so-sure
+    {% endif %}
+    {% if onboarding_mode is defined and onboarding_mode == true %}
+    {% else %}
+        fixed-top
+    {% endif %}
+        justify-content-between flex-nowrap flex-row pl-lg-5">
     <a href="/" class="navbar-brand show-in-nav show-in-quote">
         <div class="navbar-brand__logo"></div>
         <span class="sr-only">so-sure</span>
     </a>
-    {% if quote_mode is defined and quote_mode == 1 %}
+
+    {% if quote_mode is defined and quote_mode == true %}
         {# Hide the nav #}
+    {% elseif onboarding_mode is defined and onboarding_mode == true %}
+        {# TODO: Kind dont want to show them that they are logged in just push them to their account if they click it - redirect? #}
+        <ul class="nav navbar-nav flex-row align-items-center">
+            <li class="nav-item d-none d-xl-block pr-xl-5">
+                <a href="{{ path('fos_user_security_login') }}"
+                   class="nav-link user-link">
+                   Customer log in <i class="far fa-arrow-right fa-sm ml-2"></i>
+                </a>
+            </li>
+        </ul>
     {% else %}
         <ul class="nav navbar-nav flex-row align-items-center">
             <li class="nav-item d-none d-xl-block pr-xl-5">
@@ -91,7 +113,7 @@
         <div class="p-5 align-self-stretch menu__buttons">
             <a href="#" class="btn btn-primary btn-block mb-3 get-a-quote">Get insured</a>
             <a href="#"
-               class="btn btn-outline-white watch-video btn-block-xs"
+               class="btn btn-outline-white watch-video btn-block"
                data-event="watch-video-mobile-menu"
                data-toggle="modal"
                data-target="#sosure-video-modal"

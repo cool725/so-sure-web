@@ -122,3 +122,59 @@
         border: 2px solid $columbia-blue-e;
     }
 }
+
+// Summary Style Cardbox
+.summary-cardbox {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    border: 2px solid $selago;
+    @include border-radius(0.85rem);
+
+    &__header {
+        padding: 1rem 1.25rem;
+        border-bottom: 2px solid $selago;
+    }
+
+    &__body {
+        flex: 1 1 auto;
+        padding: 1.25rem;
+        background-color: lighten($selago, 5%);
+    }
+
+    &__cta {
+        a {
+            text-align: center;
+            display: block;
+            padding: 1rem 1.25rem;
+            margin: 0 -1px -1px;
+            font-family: $g-medium;
+            background-color: $dodger-blue;
+            color: $white;
+            cursor: pointer;
+            @include border-bottom-radius(0.85rem);
+
+            &:hover, &:focus {
+                outline: 0;
+                text-decoration: none;
+                background-color: darken($dodger-blue, 5%);
+            }
+
+            &:active {
+                background-color: darken($dodger-blue, 8%);
+            }
+
+            &.disabled {
+                pointer-events: none;
+
+                &:hover,
+                &:focus,
+                &:active {
+                    background-color: $dodger-blue;
+                    outline: 0;
+                    text-decoration: none;
+                }
+            }
+        }
+    }
+}

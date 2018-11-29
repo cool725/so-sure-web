@@ -22,6 +22,7 @@
     "webpack-notifier": "^1.6.0"
   },
   "dependencies": {
+    "@fancyapps/fancybox": "^3.5.2",
     "@fortawesome/fontawesome-free": "^5.1.1",
     "animate.css": "^3.7.0",
     "babel-core": "^7.0.0-bridge.0",
@@ -37,6 +38,7 @@
     "jquery": "^3.3.1",
     "jquery-mask-plugin": "^1.14.15",
     "jquery-validation": "^1.17.0",
+    "jssocials": "git://github.com/so-sure/jssocials.git#master",
     "popper.js": "^1.14.3",
     "viewerjs": "^1.2.0"
   }

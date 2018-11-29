@@ -95,9 +95,9 @@ class UsersEmailCommand extends ContainerAwareCommand
     private function emailUser(User $user)
     {
         $hash = SoSure::encodeCommunicationsHash($user->getEmail());
-        $this->mailerService->sendTemplate(
+        $this->mailerService->sendTemplateToUser(
             'Updated Privacy Policy',
-            $user->getEmail(),
+            $user,
             'AppBundle:Email:user/updatedPrivacyPolicy.html.twig',
             ['user' => $user, 'hash' => $hash],
             'AppBundle:Email:user/updatedPrivacyPolicy.txt.twig',

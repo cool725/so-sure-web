@@ -405,6 +405,18 @@
               </div>
             </div>
           </div>
+            <div class="row">
+                <div class="col-sm-8 col-offset-2">
+                    <div class="form-group">
+                        <label for="details-canonical-path" class="control-label col-sm-2">Canonical Path</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="control-label" id="details-canonical-path" name="canonical-path" placeholder="/mobile-insurance/iphone-7" style="width:100%;text-align: left;"></input><br>
+                            This will set the canonical path on the quote page as well as adjust the sitemap entries.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
           <div class="modal-footer">
             <input type="hidden" name="token" value="{{ csrf_token('default') }}" />
             <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>

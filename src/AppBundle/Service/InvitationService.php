@@ -909,33 +909,16 @@ class InvitationService
             $invitation->setStatus(SmsInvitation::STATUS_SKIPPED);
             return;
         }
-
-        if ($this->debug) {
-            // Useful for testing
-            $this->addSmsCharge($invitation);
-
-            return;
-        }
-
         $smsTemplate = sprintf('AppBundle:Sms:%s.txt.twig', $type);
-        if ($this->sms->sendTemplate($invitation->getMobile(), $smsTemplate, ['invitation' => $invitation])) {
-            $invitation->setStatus(SmsInvitation::STATUS_SENT);
-        } else {
-            $invitation->setStatus(SmsInvitation::STATUS_FAILED);
-        }
-
-        $this->addSmsCharge($invitation);
-    }
-
-    public function addSmsCharge(SmsInvitation $invitation)
-    {
-        $charge = new Charge();
-        $charge->setType(Charge::TYPE_SMS);
-        $charge->setUser($invitation->getInviter());
-        $charge->setPolicy($invitation->getPolicy());
-        $charge->setDetails($invitation->getMobile());
-        $this->dm->persist($charge);
-        $this->dm->flush();
+        $status = $this->sms->sendTemplate(
+            $invitation->getMobile(),
+            $smsTemplate,
+            ['invitation' => $invitation],
+            $invitation->getPolicy(),
+            Charge::TYPE_SMS_INVITATION,
+            $this->debug
+        );
+        $invitation->setStatus($status ? (SmsInvitation::STATUS_SENT) : (SmsInvitation::STATUS_FAILED));
     }
 
     protected function validatePolicy(Policy $policy)
@@ -943,7 +926,7 @@ class InvitationService
         $prefix = $policy->getPolicyPrefix($this->environment);
         if (!$policy->isValidPolicy($prefix)) {
             throw new InvalidPolicyException(sprintf(
-                'Policy must be pending/active before inviting/connecting (%s)',
+                "Policy must be pending/active before inviting/connecting (%s)",
                 $policy->getPolicyNumber()
             ));
         }

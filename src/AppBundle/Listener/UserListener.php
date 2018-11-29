@@ -101,7 +101,7 @@ class UserListener
      */
     public function onUserUpdatedEvent(UserEvent $event)
     {
-        $this->onUserCreatedUpdated($event);
+        $this->onUserCreatedUpdated($event, true);
     }
 
     /**
@@ -117,19 +117,19 @@ class UserListener
         }
     }
 
-    private function onUserCreatedUpdated(UserEvent $event)
+    private function onUserCreatedUpdated(UserEvent $event, $uow = false)
     {
         $user = $event->getUser();
         $email = $user->getEmailCanonical();
         $mobile = $user->getMobileNumber();
-        $flush = false;
+        $update = false;
 
         if ($email) {
             $emailInvitationRepo = $this->dm->getRepository(EmailInvitation::class);
             $invitations = $emailInvitationRepo->findBy(['email' => $email, 'invitee' => null]);
             foreach ($invitations as $invitation) {
                 $user->addReceivedInvitation($invitation);
-                $flush = true;
+                $update = true;
             }
         }
 
@@ -138,12 +138,18 @@ class UserListener
             $invitations = $smsInvitationRepo->findBy(['mobile' => $mobile, 'invitee' => null]);
             foreach ($invitations as $invitation) {
                 $user->addReceivedInvitation($invitation);
-                $flush = true;
+                $update = true;
             }
         }
 
-        if ($flush) {
-            $this->dm->flush();
+        if ($update) {
+            if ($uow) {
+                $uow = $this->dm->getUnitOfWork();
+                $meta = $this->dm->getClassMetadata(User::class);
+                $uow->recomputeSingleDocumentChangeSet($meta, $user);
+            } else {
+                $this->dm->flush();
+            }
         }
     }
 }

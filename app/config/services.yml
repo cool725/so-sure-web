@@ -416,7 +416,7 @@ services:
         class: AppBundle\Service\S3TwigExtension
         arguments:
             - "@aws.s3"
-        public: false
+        public: true
         tags:
             - { name: twig.extension }
 
@@ -656,6 +656,7 @@ services:
             - "@app.router"
             - "%default_sender_address%"
             - "%default_sender_name%"
+            - "@app.mixpanel"
 
     app.router:
         alias: AppBundle\Service\RouterService
@@ -900,6 +901,7 @@ services:
         public: true
         calls:
             - [setReader, ['@annotations.reader']]
+            - [setLogger, ['@logger']]
 
     doctrine.listener.invitation:
         class:   AppBundle\Listener\DoctrineInvitationListener
@@ -929,7 +931,6 @@ services:
         tags:
             -  { name: doctrine_mongodb.odm.event_listener, event: postPersist }
             -  { name: doctrine_mongodb.odm.event_listener, event: preUpdate  }
-            -  { name: doctrine_mongodb.odm.event_listener, event: postUpdate  }
             -  { name: doctrine_mongodb.odm.event_listener, event: preRemove  }
 
     doctrine.listener.company:
@@ -1018,7 +1019,7 @@ services:
             - "@app.user"
         tags:
             -  { name: kernel.event_listener, event: event.user.created, method: onUserCreatedEvent }
-            -  { name: kernel.event_listener, event: event.user.updated, method: onUserUpdatedEvent }
+            -  { name: kernel.event_listener, event: event.user.updated.invitation-link, method: onUserUpdatedEvent }
             -  { name: kernel.event_listener, event: event.user.email.changed, method: onUserEmailChangedEvent }
             -  { name: kernel.event_listener, event: event.user.password.changed, method: onUserPasswordChangedEvent }
 
@@ -1051,7 +1052,7 @@ services:
         tags:
             -  { name: kernel.event_listener, event: event.lead.updated, method: onLeadUpdatedEvent }
             -  { name: kernel.event_listener, event: event.user.created, method: onUserCreatedEvent }
-            -  { name: kernel.event_listener, event: event.user.updated, method: onUserUpdatedEvent }
+            -  { name: kernel.event_listener, event: event.user.updated.intercom, method: onUserUpdatedEvent }
             -  { name: kernel.event_listener, event: event.policy.created, method: onPolicyCreatedEvent }
             -  { name: kernel.event_listener, event: event.policy.pot, method: onPolicyPotEvent }
             -  { name: kernel.event_listener, event: event.policy.cancelled, method: onPolicyCancelledEvent }
@@ -1474,7 +1475,7 @@ services:
         arguments:
             - "@doctrine_mongodb.odm.default_document_manager"
             - "@logger"
-            - "@router"
+            - "@app.router"
         tags:
             - { name: dpn_xml_sitemap.generator }
 

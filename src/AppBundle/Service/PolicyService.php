@@ -1095,9 +1095,9 @@ class PolicyService
         }
 
         try {
-            $this->mailer->sendTemplate(
+            $this->mailer->sendTemplateToUser(
                 sprintf('Your so-sure policy %s', $policy->getPolicyNumber()),
-                $policy->getUser()->getEmail(),
+                $policy->getUser(),
                 sprintf('%s.html.twig', $baseTemplate),
                 ['policy' => $policy],
                 sprintf('%s.txt.twig', $baseTemplate),
@@ -1132,9 +1132,9 @@ class PolicyService
         $htmlTemplate = sprintf("%s.html.twig", $baseTemplate);
         $textTemplate = sprintf("%s.txt.twig", $baseTemplate);
 
-        $this->mailer->sendTemplate(
+        $this->mailer->sendTemplateToUser(
             sprintf('Your so-sure policy %s is now cancelled', $policy->getPolicyNumber()),
-            $policy->getUser()->getEmail(),
+            $policy->getUser(),
             $htmlTemplate,
             ['policy' => $policy],
             $textTemplate,
@@ -1202,9 +1202,9 @@ class PolicyService
         $policy = $connection->getSourcePolicy();
         // User who caused the reduction
         $causalUser = $connection->getLinkedPolicy()->getUser();
-        $this->mailer->sendTemplate(
+        $this->mailer->sendTemplateToUser(
             sprintf('Important Information about your so-sure Reward Pot'),
-            $policy->getUser()->getEmail(),
+            $policy->getUser(),
             'AppBundle:Email:policy/connectionReduction.html.twig',
             ['connection' => $connection, 'policy' => $policy, 'causalUser' => $causalUser],
             'AppBundle:Email:policy/connectionReduction.txt.twig',
@@ -1239,9 +1239,9 @@ class PolicyService
         $htmlTemplate = sprintf("%s.html.twig", $baseTemplate);
         $textTemplate = sprintf("%s.txt.twig", $baseTemplate);
 
-        $this->mailer->sendTemplate(
+        $this->mailer->sendTemplateToUser(
             $subject,
-            $policy->getUser()->getEmail(),
+            $policy->getUser(),
             $htmlTemplate,
             ['policy' => $policy],
             $textTemplate,
@@ -1416,28 +1416,28 @@ class PolicyService
         $policyRepo = $this->dm->getRepository(Policy::class);
         $policies = $policyRepo->findBy(['status' => Policy::STATUS_UNPAID]);
         foreach ($policies as $policy) {
-            /** @var Policy $policy */
-            if ($policy->shouldExpirePolicy() && $policy->shouldCancelPolicy($prefix)) {
+            try {
+                /** @var Policy $policy */
+                if ($policy->shouldExpirePolicy() && $policy->shouldCancelPolicy($prefix)) {
+                    $msg = sprintf(
+                        'Skipping Cancelling Policy as it should be expired %s / %s',
+                        $policy->getPolicyNumber(),
+                        $policy->getId()
+                    );
+                    $this->logger->error($msg);
+                } elseif ($policy->shouldCancelPolicy($prefix)) {
+                    $cancelled[$policy->getId()] = $policy->getPolicyNumber();
+                    if (!$dryRun) {
+                        $this->cancel($policy, Policy::CANCELLED_UNPAID, true, null, $skipUnpaidMinTimeframeCheck);
+                    }
+                }
+            } catch (\Exception $e) {
                 $msg = sprintf(
-                    'Skipping Cancelling Policy as it should be expired %s / %s',
+                    'Error Cancelling Policy %s / %s',
                     $policy->getPolicyNumber(),
                     $policy->getId()
                 );
-                $this->logger->error($msg);
-            } elseif ($policy->shouldCancelPolicy($prefix)) {
-                $cancelled[$policy->getId()] = $policy->getPolicyNumber();
-                if (!$dryRun) {
-                    try {
-                        $this->cancel($policy, Policy::CANCELLED_UNPAID, true, null, $skipUnpaidMinTimeframeCheck);
-                    } catch (\Exception $e) {
-                        $msg = sprintf(
-                            'Error Cancelling Policy %s / %s',
-                            $policy->getPolicyNumber(),
-                            $policy->getId()
-                        );
-                        $this->logger->error($msg, ['exception' => $e]);
-                    }
-                }
+                $this->logger->error($msg, ['exception' => $e]);
             }
         }
 
@@ -1583,7 +1583,7 @@ class PolicyService
         return $lines;
     }
 
-    public function cashbackReminder($dryRun)
+    public function cashbackMissingReminder($dryRun)
     {
         $now = \DateTime::createFromFormat('U', time());
         $cashback = [];
@@ -1618,6 +1618,30 @@ class PolicyService
         }
 
         return $cashback;
+    }
+
+    public function cashbackPendingReminder($dryRun)
+    {
+        $cashbacks = [];
+
+        /** @var CashbackRepository $cashbackRepo */
+        $cashbackRepo = $this->dm->getRepository(Cashback::class);
+        $cashbackItems = $cashbackRepo->findBy(['status' => Cashback::STATUS_PENDING_PAYMENT]);
+
+        foreach ($cashbackItems as $cashbackItem) {
+            $cashbacks[$cashbackItem->getId()] = $cashbackItem->getPolicy()->getPolicyNumber();
+        }
+
+        if (!$dryRun) {
+            $this->mailer->sendTemplate(
+                'Biweekly cashback report',
+                ['dylan@so-sure.com', 'patrick@so-sure.com'],
+                'AppBundle:Email:cashback/cashback_reminder.html.twig',
+                ['cashbacks' => $cashbacks]
+            );
+        }
+
+        return $cashbacks;
     }
 
     /**
@@ -1681,6 +1705,9 @@ class PolicyService
             $scheduledPayment->setStatus(ScheduledPayment::STATUS_SCHEDULED);
             $scheduledPayment->setScheduled($date ? $date : \DateTime::createFromFormat('U', time()));
             $scheduledPayment->setAmount($outstanding);
+            $scheduledPayment->setNotes(sprintf(
+                'Claw-back applied discount (discount was removed following success claim for previous policy)'
+            ));
             $policy->getNextPolicy()->addScheduledPayment($scheduledPayment);
             $this->dm->flush();
             //\Doctrine\Common\Util\Debug::dump($scheduledPayment);
@@ -1702,9 +1729,9 @@ class PolicyService
         $textTemplate = sprintf("%s.txt.twig", $baseTemplate);
 
         $subject = sprintf('Important information about your Reward Pot');
-        $this->mailer->sendTemplate(
+        $this->mailer->sendTemplateToUser(
             $subject,
-            $policy->getUser()->getEmail(),
+            $policy->getUser(),
             $htmlTemplate,
             ['policy' => $policy, 'additional_amount' => $additionalAmount],
             $textTemplate,
@@ -1764,7 +1791,16 @@ class PolicyService
             if ($policy->canCreatePendingRenewal($date)) {
                 $pendingRenewal[$policy->getId()] = $policy->getPolicyNumber();
                 if (!$dryRun) {
-                    $this->createPendingRenewal($policy, $date);
+                    try {
+                        $this->createPendingRenewal($policy, $date);
+                    } catch (\Exception $e) {
+                        $msg = sprintf(
+                            'Error creating pending renewal Policy %s / %s',
+                            $policy->getPolicyNumber(),
+                            $policy->getId()
+                        );
+                        $this->logger->error($msg, ['exception' => $e]);
+                    }
                 }
             }
         }
@@ -1922,9 +1958,9 @@ class PolicyService
             ),
             'start_date' => $this->endOfDay($policy->getEnd()),
         ];
-        $this->mailer->sendTemplate(
+        $this->mailer->sendTemplateToUser(
             $subject,
-            $policy->getUser()->getEmail(),
+            $policy->getUser(),
             $htmlTemplate,
             $data,
             $textTemplate,
@@ -2169,9 +2205,9 @@ class PolicyService
                 ['id' => $cashback->getId()]
             ),
         ];
-        $this->mailer->sendTemplate(
+        $this->mailer->sendTemplateToUser(
             $subject,
-            $cashback->getPolicy()->getUser()->getEmail(),
+            $cashback->getPolicy()->getUser(),
             $htmlTemplate,
             $data,
             $textTemplate,

@@ -94,13 +94,65 @@ class DefaultController extends BaseController
 
         $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE);
 
+        $pageType = 'xmas-homepage';
+
+        // Blackfriday Promo
+        // Start: Friday 23rd November Mighnight
+        // End: Monday 26th November Mighnight
+        $now   = \DateTime::createFromFormat('U', time());
+        $start = new \DateTime('2018-11-23 00:00:00', new \DateTimeZone(SoSure::TIMEZONE));
+        $end   = new \DateTime('2018-11-26 23:59:59', new \DateTimeZone(SoSure::TIMEZONE));
+
+        if ($now >= $start && $now <= $end) {
+            $pageType = 'blackfriday';
+        }
+
         $data = array(
             // Make sure to check homepage landing below too
-            'referral'    => $referral,
-            'phone'       => $this->getQuerystringPhone($request),
+            'referral'  => $referral,
+            'phone'     => $this->getQuerystringPhone($request),
+            'page_type' => $pageType,
         );
 
-        $template = 'AppBundle:Default:index.html.twig';
+        // $template = 'AppBundle:Default:index.html.twig';
+        $template = 'AppBundle:Default:indexXmas.html.twig';
+
+        return $this->render($template, $data);
+    }
+
+    /**
+     * @Route("/free-taste-card", name="free_taste_card")
+     */
+    public function freeTasteCard()
+    {
+        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE, ['page' => 'tastecard']);
+
+        $pageType = 'tastecard';
+
+        $data = array(
+            'page_type' => $pageType,
+        );
+
+
+        $template = 'AppBundle:Default:indexXmas.html.twig';
+
+        return $this->render($template, $data);
+    }
+
+    /**
+     * @Route("/free-phone-case", name="free_phone_case")
+     */
+    public function freePhoneCase()
+    {
+        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE, ['page' => 'freephonecase']);
+
+        $pageType = 'phonecase';
+
+        $data = array(
+            'page_type' => $pageType,
+        );
+
+        $template = 'AppBundle:Default:indexXmas.html.twig';
 
         return $this->render($template, $data);
     }
@@ -110,7 +162,19 @@ class DefaultController extends BaseController
      */
     public function moneyLanding()
     {
+        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE, ['page' => 'money']);
+
         return $this->render('AppBundle:Default:indexMoney.html.twig');
+    }
+
+    /**
+     * @Route("/ivip", name="ivip")
+     */
+    public function ivipLanding()
+    {
+        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE, ['page' => 'ivip']);
+
+        return $this->render('AppBundle:Default:indexIVIP.html.twig');
     }
 
     /**
@@ -119,6 +183,8 @@ class DefaultController extends BaseController
      */
     public function starlingLanding(Request $request)
     {
+        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE, ['page' => 'starling']);
+
         $this->starlingOAuthSession($request);
 
         return $this->render('AppBundle:Default:indexStarlingBank.html.twig');
@@ -129,6 +195,7 @@ class DefaultController extends BaseController
      */
     public function socialInsurance()
     {
+        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE, ['page' => 'social-insurance']);
         return $this->render('AppBundle:Default:socialInsurance.html.twig');
     }
 

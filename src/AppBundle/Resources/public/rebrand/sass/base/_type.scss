@@ -17,9 +17,26 @@ h1, h2, h3, h4, h5, h6,
 a,
 strong {
     font-family: $g-medium;
+
+    &.no-style {
+        &:hover {
+            text-decoration: none;
+        }
+    }
 }
 
 .opacity-05 {
     opacity: 0.5;
 }
 
+.link-subtle {
+    font-size: 90%;
+    text-decoration: underline;
+    opacity: 0.5;
+
+    &:hover,
+    &:focus {
+        text-decoration: none;
+        opacity: 0.8;
+    }
+}

@@ -1,9 +1,13 @@
 // variables.scss
 // Note: copy and overide boostrap variables here!
 
+// use #{$cdn_url}
+$cdn_url: "https://cdn.so-sure.com";
+
 // Breakpoints extend for 4k
 $grid-breakpoints: (
   xs:  0,
+  ss:  375px,
   sm:  576px,
   md:  768px,
   lg:  992px,
@@ -11,6 +15,9 @@ $grid-breakpoints: (
   fl:  1600px,
   fk:  2200px,
 );
+
+// Color - see _palette.scss
+$link-color:                    $zaffre;
 
 // Fonts
 $font-size-base:                 0.88rem;
@@ -44,7 +51,6 @@ $input-btn-padding-x:            1.2rem;
 $input-btn-padding-y:            .6rem;
 $input-color:                    $zaffre;
 
-
 $input-group-addon-color:        $white;
 $input-group-addon-bg:           $dodger-blue;
 $input-group-addon-border-color: $dodger-blue;
@@ -63,14 +69,30 @@ $dropdown-link-hover-bg:         rgba(37, 147, 243, 0.1);
 $dropdown-link-active-color:     $zaffre;
 $dropdown-link-active-bg:        rgba(37, 147, 243, 0.2);
 
-// use #{$cdn_url}
+// Tables
+$table-head-bg:                  rgba(37, 147, 243, 0.03);
+$table-head-color:               $zaffre;
+
 $cdn_url: "https://cdn.so-sure.com";
 
 // Hamburgers
-$hamburger-padding-x                       : 15px;
-$hamburger-padding-y                       : 15px;
-$hamburger-layer-width                     : 25px;
-$hamburger-layer-height                    : 3px;
-$hamburger-layer-spacing                   : 5px;
-$hamburger-layer-color                     : $columbia-blue-e;
-$hamburger-layer-border-radius             : 2px;
+$hamburger-padding-x:            15px;
+$hamburger-padding-y:            15px;
+$hamburger-layer-width:          25px;
+$hamburger-layer-height:         3px;
+$hamburger-layer-spacing:        5px;
+$hamburger-layer-color:          $columbia-blue-e;
+$hamburger-layer-border-radius:  2px;
+
+// Carousel
+$carousel-indicator-width:       12px;
+$carousel-indicator-height:      12px;
+$carousel-indicator-spacer:      5px;
+$carousel-indicator-active-bg:   $dodger-blue;
+
+// Tooltips
+$tooltip-bg:                     $crayon-blue;
+
+// Tables
+$table-head-bg:                  rgba(37, 147, 243, 0.03);
+$table-head-color:               $zaffre;
