@@ -75,33 +75,23 @@ class LeadPortal
 
     /**
      * @var string
-     * @AppAssert\Make()
+     * @AppAssert\Phone()
      * @Assert\Length(min="1", max="100")
      * @Assert\NotBlank(message="This value is required.")
      */
-    protected $make;
-
-    /**
-     * @var string
-     * @AppAssert\Model()
-     * @Assert\Length(min="1", max="100")
-     * @Assert\NotBlank(message="This value is required.")
-     */
-    protected $model;
-
-    /**
-     * @var string
-     * @AppAssert\Memory()
-     * @Assert\Length(min="1", max="100")
-     * @Assert\NotBlank(message="This value is required.")
-     */
-    protected $memory;
+    protected $phone;
 
     /**
      * @Assert\Choice({"text-me", "launch-usa", "buy", "save-quote", "purchase-flow", "contact-us"}, strict=true)
      * @MongoDB\Field(type="string")
      */
     protected $source;
+
+    /**
+     * @var boolean
+     * @Assert\IsTrue(message="You must agree to our terms")
+     */
+    protected $terms;
 
 
     public function __construct()
@@ -174,34 +164,14 @@ class LeadPortal
         }
     }
 
-    public function getMake()
+    public function getPhone()
     {
-        return $this->make;
+        return $this->phone;
     }
 
-    public function setMake($make)
+    public function setPhone($phone)
     {
-        $this->make = $make;
-    }
-
-    public function getModel()
-    {
-        return $this->model;
-    }
-
-    public function setModel($model)
-    {
-        $this->model = $model;
-    }
-
-    public function getMemory()
-    {
-        return $this->memory;
-    }
-
-    public function setMemory($memory)
-    {
-        $this->memory = $memory;
+        $this->phone = $phone;
     }
 
     public function getSource()
@@ -214,6 +184,15 @@ class LeadPortal
         $this->source = $source;
     }
 
+    public function getTerms()
+    {
+        return $this->terms;
+    }
+
+    public function setTerms($terms)
+    {
+        $this->terms = $terms;
+    }
     // public function populateUser(User $user)
     // {
         // $user->setEmail($this->getEmail());

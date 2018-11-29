@@ -8,6 +8,7 @@ use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -44,19 +45,20 @@ class LeadPortalType extends AbstractType
                 'required' => $this->required,
                 'placeholder' => false,
                 'choices' => array(
+                    'Choose a user to begin...' => null,
                     'Customer' => 'customer',
                     'Staff' => 'staff'
                 ),
-                'expanded' => true,
+                // 'expanded' => true,
                 'multiple' => false,
             ])
             ->add('firstName', HiddenType::class, ['required' => false])
             ->add('lastName', HiddenType::class, ['required' => false])
             ->add('name', TextType::class, ['required' => $this->required])
             ->add('email', EmailType::class, ['required' => $this->required])
-            ->add('make', ChoiceType::class, ['required' => $this->required])
-            ->add('model', ChoiceType::class, ['required' => $this->required])
-            ->add('memory', ChoiceType::class, ['required' => $this->required])
+            ->add('phone', ChoiceType::class, ['required' => $this->required])
+            ->add('phone', ChoiceType::class, ['required' => $this->required])
+            ->add('terms', CheckboxType::class, ['required' => $this->required])
             ->add('submit', SubmitType::class);
     }
 
