@@ -186,7 +186,7 @@ class PhoneTest extends \PHPUnit\Framework\TestCase
         $this->assertNotNull($phone->getSalvaMiniumumBinderMonthlyPremium());
         $this->assertNotNull($phone->getCurrentPhonePrice());
         if ($phone->getCurrentPhonePrice()) {
-            $excess = $phone->getCurrentPhonePrice()->getExcess();
+            $excess = $phone->getCurrentPhonePrice()->getPhoneExcess();
             $this->assertNotNull($excess);
             if ($excess) {
                 $this->assertTrue($excess->equal(PolicyTerms::getLowExcess()));
@@ -205,7 +205,7 @@ class PhoneTest extends \PHPUnit\Framework\TestCase
 
         $this->assertNotNull($phone->getCurrentPhonePrice($future));
         if ($phone->getCurrentPhonePrice($future)) {
-            $excess = $phone->getCurrentPhonePrice($future)->getExcess();
+            $excess = $phone->getCurrentPhonePrice($future)->getPhoneExcess();
             $this->assertNotNull($excess);
             if ($excess) {
                 $this->assertTrue($excess->equal(PolicyTerms::getHighExcess()));
