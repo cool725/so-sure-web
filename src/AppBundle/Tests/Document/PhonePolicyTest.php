@@ -615,6 +615,37 @@ class PhonePolicyTest extends WebTestCase
         $this->assertEquals(SalvaPhonePolicy::RISK_LEVEL_HIGH, $policyA->getRisk());
     }
 
+    /**
+     * @expectedException \Exception
+     */
+    public function testSetPhoneDisallowedExcess()
+    {
+        $user = new User();
+        $user->setEmail(static::generateEmail('testGetRiskPolicyPendingCancellation', $this));
+        self::$dm->persist($user);
+        self::addAddress($user);
+
+        $phone = new Phone();
+        $oldTerms = new PolicyTerms();
+        $oldTerms->setVersion(PolicyTerms::VERSION_1);
+        $phone->init('foo', 'bar', 5, $oldTerms);
+
+        $policy = new SalvaPhonePolicy();
+        $policy->init($user, self::getLatestPolicyTerms(static::$dm));
+        $policy->setPhone($phone);
+    }
+
+    public function testGetCurrentExcess()
+    {
+        $policy = static::createUserPolicy(true);
+        $this->assertEquals(150, $policy->getCurrentExcess()->getTheft());
+        $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_APPROVED);
+        $this->assertEquals(70, $policy->getCurrentExcess()->getTheft());
+
+        $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_REJECTED);
+        $this->assertEquals(150, $policy->getCurrentExcess()->getTheft());
+    }
+
     public function testGetRiskPolicyPendingCancellation()
     {
         $user = new User();
