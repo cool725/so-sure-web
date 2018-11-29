@@ -184,8 +184,14 @@ class PhoneTest extends \PHPUnit\Framework\TestCase
         $phone->init('Apple', 'Price', 9, static::$nonPicSurePolicyTerms, 32, ['time'], 500);
         $this->assertNotNull($phone->getSalvaBinderMonthlyPremium());
         $this->assertNotNull($phone->getSalvaMiniumumBinderMonthlyPremium());
-        $excess = $phone->getCurrentPhonePrice()->getExcess();
-        $this->assertTrue($excess->equal(PolicyTerms::getLowExcess()));
+        $this->assertNotNull($phone->getCurrentPhonePrice());
+        if ($phone->getCurrentPhonePrice()) {
+            $excess = $phone->getCurrentPhonePrice()->getExcess();
+            $this->assertNotNull($excess);
+            if ($excess) {
+                $this->assertTrue($excess->equal(PolicyTerms::getLowExcess()));
+            }
+        }
 
         $future = \DateTime::createFromFormat('U', time());
         // TODO: 1 day fails on 26.10.18 as BST is ending. Fix calc at somepoint in the future
@@ -197,8 +203,14 @@ class PhoneTest extends \PHPUnit\Framework\TestCase
             static::$policyTerms->getDefaultPicSureExcess()
         );
 
-        $excess = $phone->getCurrentPhonePrice($future)->getExcess();
-        $this->assertTrue($excess->equal(PolicyTerms::getHighExcess()));
+        $this->assertNotNull($phone->getCurrentPhonePrice($future));
+        if ($phone->getCurrentPhonePrice($future)) {
+            $excess = $phone->getCurrentPhonePrice($future)->getExcess();
+            $this->assertNotNull($excess);
+            if ($excess) {
+                $this->assertTrue($excess->equal(PolicyTerms::getHighExcess()));
+            }
+        }
     }
 
     /**
