@@ -9,6 +9,7 @@ use AppBundle\Document\JudoPaymentMethod;
 use AppBundle\Exception\PaymentDeclinedException;
 use AppBundle\Form\Type\AdminEmailOptOutType;
 use AppBundle\Form\Type\BacsCreditType;
+use AppBundle\Form\Type\ClaimInfoType;
 use AppBundle\Form\Type\PaymentRequestUploadFileType;
 use AppBundle\Form\Type\UploadFileType;
 use AppBundle\Form\Type\UserHandlingTeamType;
@@ -485,15 +486,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         $claim = $repo->find($id);
 
         $claimsForm = $this->get('form.factory')
-            ->createNamedBuilder('claims_form', ClaimType::class, $claim)
-            ->add('replacementPhone', ChoiceType::class, [
-                'choices' => $dm->getRepository(Phone::class)->findActiveInactive()->getQuery()->execute(),
-                'choice_label' => function ($phone, $key, $value) {
-                    return $phone->getName();
-                },
-                'placeholder' => 'Choose a phone'
-            ])
-            ->remove('shouldCancelPolicy')
+            ->createNamedBuilder('claims_form', ClaimInfoType::class, $claim)
             ->setAction($this->generateUrl(
                 'claims_form',
                 ['id' => $id]
@@ -520,8 +513,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         }
 
         return $this->render('AppBundle:Claims:claimsModalBody.html.twig', [
-            'claim' => $claim->toModalArray(),
-            'claimClass' => $claim,
+            'claim' => $claim,
             'form' => $claimsForm->createView()
         ]);
     }

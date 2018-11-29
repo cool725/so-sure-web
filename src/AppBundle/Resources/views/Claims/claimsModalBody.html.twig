@@ -131,7 +131,7 @@
                 </div>
 
                 {% if claim.type == 'damage' %}
-                    {% set documents = s3DownloadLinks(claimClass) %}
+                    {% set documents = s3DownloadLinks(claim) %}
                     <div class="tab-pane fade" id="damage" role="tabpanel" aria-labelledby="damage-tab">
                         <div class="row">
                             <div class="col-xs-6">
@@ -237,7 +237,7 @@
                         </div>
                     </div>
                 {% elseif claim.type == 'theft' or claim.type == 'loss' %}
-                    {% set documents = s3DownloadLinks(claimClass) %}
+                    {% set documents = s3DownloadLinks(claim) %}
                     <div class="tab-pane fade" id="theftloss" role="tabpanel" aria-labelledby="theftloss-tab">
 
                         <div class="row">
@@ -426,7 +426,7 @@
 
                         <div class="col-xs-6">
                             <label>Submitted</label>
-                            <p>{{ claim.submittedDate ? claim.submittedDate|date('d-m-Y') : 'N/A' }}</p>
+                            <p>{{ claim.submissionDate ? claim.submissionDate|date('d-m-Y') : 'N/A' }}</p>
                         </div>
 
                         <div class="col-xs-6">
@@ -450,7 +450,7 @@
                     <div class="row">
                         <div class="col-xs-6">
                             <label>Replacement IMEI</label>
-                            {% if claim.validReplacementImei %}
+                            {% if claim.isImei(claim.replacementImei) %}
                                 <p>{{ claim.replacementImei|default('N/A') }}</p>
                             {% else %}
                                 <p>
@@ -467,7 +467,7 @@
 
                         <div class="col-xs-6">
                             <label>Insured Phone</label>
-                            <p>{{ claim.policyPhone|default('N/A') }}</p>
+                            <p>{{ claim.policy.phone.__toString()|default('N/A') }}</p>
                         </div>
                     </div>
                 </div>
