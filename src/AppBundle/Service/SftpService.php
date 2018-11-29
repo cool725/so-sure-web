@@ -28,20 +28,8 @@ class SftpService
     const LOGIN_KEYFILE = 'keyfile';
     const LOGIN_KEYFILE_PASSWORD = 'keyfile-password';
 
-    /** @var DocumentManager */
-    protected $dm;
-
     /** @var LoggerInterface */
     protected $logger;
-
-    /** @var S3Client */
-    protected $s3;
-
-    /** @var string */
-    protected $bucket;
-
-    /** @var string */
-    protected $path;
 
     /** @var string */
     protected $server;
@@ -55,36 +43,20 @@ class SftpService
     /** @var string */
     protected $keyFile;
 
-    /** @var string */
-    protected $zipPassword;
-
-    /** @var string */
-    protected $environment;
-
     /** @var SFTP */
     protected $sftp;
 
     public function __construct(
-        DocumentManager $dm,
         LoggerInterface $logger,
-        S3Client $s3,
-        $environment,
-        $bucket,
-        $pathPrefix,
-        array $sftpDetails,
-        $zipPassword
+        array $sftpDetails
     ) {
-        $this->dm = $dm;
         $this->logger = $logger;
-        $this->s3 = $s3;
-        $this->environment = $environment;
-        $this->bucket = $bucket;
-        $this->path = sprintf('%s/%s', $pathPrefix, $this->environment);
         $this->server = $sftpDetails[0];
         $this->username = $sftpDetails[1];
         $this->password = $sftpDetails[2];
         $this->keyFile = $sftpDetails[3];
-        $this->zipPassword = $zipPassword;
+        $this->baseFolder = $sftpDetails[4];
+        $this->recursive = filter_var($sftpDetails[5], FILTER_VALIDATE_BOOLEAN);
     }
 
     private function getLoginType()
@@ -140,7 +112,7 @@ class SftpService
         if (!$this->sftp) {
             $this->loginSftp();
         }
-        $files = $this->sftp->nlist('.', true);
+        $files = $this->sftp->nlist($this->baseFolder, $this->recursive);
         if ($files === false) {
             throw new \Exception(sprintf(
                 'List folder Failed. Msg: %s',
@@ -175,39 +147,9 @@ class SftpService
         }
     }
 
-    public function uploadS3($file, $name, $folder, S3File $s3File)
-    {
-        $now = \DateTime::createFromFormat('U', time());
-        $extension = sprintf('.%s', pathinfo($name, PATHINFO_EXTENSION));
-        $s3Key = sprintf(
-            '%s/%s/%d/%s-%s%s',
-            $this->path,
-            $folder,
-            $now->format('Y'),
-            basename($name, $extension),
-            $now->format('U'),
-            $extension
-        );
-        $result = $this->s3->putObject(array(
-            'Bucket' => $this->bucket,
-            'Key'    => $s3Key,
-            'SourceFile' => $file,
-        ));
-
-        $s3File->setBucket($this->bucket);
-        $s3File->setKey($s3Key);
-        if ($s3File instanceof DirectGroupFile) {
-            $s3File->setSuccess($folder == self::PROCESSED_FOLDER);
-        }
-        $this->dm->persist($file);
-        $this->dm->flush();
-
-        return $s3Key;
-    }
-
     public function generateTempFile()
     {
-        $tempFile = tempnam(sys_get_temp_dir(), "s3email");
+        $tempFile = tempnam(sys_get_temp_dir(), "sftp-");
 
         return $tempFile;
     }
@@ -228,28 +170,5 @@ class SftpService
         }
 
         return $tempFile;
-    }
-
-    public function unzipFile($file, $extension = '.xlsx')
-    {
-        $files = [];
-
-        $zip = new \ZipArchive();
-        if ($zip->open($file) === true) {
-            if ($zip->setPassword($this->zipPassword)) {
-                if (!$zip->extractTo(sys_get_temp_dir())) {
-                    throw new \Exception("Extraction failed (wrong password?)");
-                }
-                for ($i = 0; $i < $zip->numFiles; $i++) {
-                    if (mb_stripos($zip->getNameIndex($i), $extension) !== false) {
-                        $files[] = sprintf('%s/%s', sys_get_temp_dir(), $zip->getNameIndex($i));
-                    }
-                }
-            }
-
-            $zip->close();
-        }
-
-        return $files;
     }
 }

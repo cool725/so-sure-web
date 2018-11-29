@@ -560,14 +560,8 @@ services:
         autoconfigure: false
         public: true
         arguments:
-            - "@doctrine_mongodb.odm.default_document_manager"
             - "@logger"
-            - "@aws.s3"
-            - "%kernel.environment"
-            - "ops.so-sure.com"
-            - "directgroup-report"
-            - ["%directgroup_sftp_server%", "%directgroup_sftp_username%", "%directgroup_sftp_password%", ""]
-            - "%directgroup_zip_password%"
+            - ["%directgroup_sftp_server%", "%directgroup_sftp_username%", "%directgroup_sftp_password%", "", ".", "false"]
         tags:
         - { name: monolog.logger, channel: directgroup }
 
@@ -577,14 +571,17 @@ services:
         autoconfigure: false
         public: true
         arguments:
-        - "@doctrine_mongodb.odm.default_document_manager"
         - "@logger"
-        - "@aws.s3"
-        - "%kernel.environment"
-        - "ops.so-sure.com"
-        - "bacs-download-reports"
-        - ["%sosure_sftp_server%", "%sosure_sftp_username%", "", "%sosure_sftp_keyfile%"]
-        - ""
+        - ["%sosure_sftp_server%", "%sosure_sftp_username%", "", "%sosure_sftp_keyfile%", "sftp", "true"]
+
+    app.sftp.accesspay:
+        class: AppBundle\Service\SftpService
+        autowire: false
+        autoconfigure: false
+        public: true
+        arguments:
+        - "@logger"
+        - ["%accesspay_server%", "%accesspay_username%", "%accesspay_password%", "%accesspay_keyfile%", ".", "false"]
 
     app.brightstar:
         alias: AppBundle\Service\BrightstarService
