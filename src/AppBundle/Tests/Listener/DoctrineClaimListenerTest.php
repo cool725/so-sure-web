@@ -6,7 +6,7 @@ use AppBundle\Classes\DaviesHandlerClaim;
 use AppBundle\Classes\DirectGroupHandlerClaim;
 use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Service\DaviesService;
-use AppBundle\Service\DirectGroupService;
+use AppBundle\Service\DirectGroupServiceExcel;
 use AppBundle\Tests\Service\DaviesServiceTest;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ODM\MongoDB\DocumentManager;
@@ -33,7 +33,7 @@ class DoctrineClaimListenerTest extends WebTestCase
     /** @var DocumentManager */
     protected static $dm;
     protected static $testUser;
-    /** @var DirectGroupService */
+    /** @var DirectGroupServiceExcel */
     protected static $directGroupService;
     /** @var DaviesService */
     protected static $daviesService;
@@ -53,7 +53,7 @@ class DoctrineClaimListenerTest extends WebTestCase
         $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
         self::$dm = $dm;
         self::$userManager = self::$container->get('fos_user.user_manager');
-        /** @var DirectGroupService $directGroupService */
+        /** @var DirectGroupServiceExcel $directGroupService */
         $directGroupService = self::$container->get('app.directgroup');
         self::$directGroupService = $directGroupService;
 

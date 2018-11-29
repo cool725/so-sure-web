@@ -19,7 +19,7 @@ use AppBundle\Validator\Constraints\AlphanumericSpaceDotValidator;
 use AppBundle\Exception\ValidationException;
 use AppBundle\Repository\ClaimRepository;
 
-class DirectGroupService extends SftpService
+class DirectGroupService extends ExcelSftpService
 {
     use CurrencyTrait;
     use DateTrait;

@@ -19,6 +19,7 @@ services:
             $statsdClient: "@statsd"
             $slackClient: "@nexy_slack.client"
             $branchDomain: "%branch_domain%"
+            $sosureSftpService: "@app.sftp.sosure"
 
 
     # makes classes in src/AppBundle available to be used as services

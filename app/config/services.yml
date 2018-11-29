@@ -498,11 +498,11 @@ services:
             - [setS3, ['@aws.s3']]
             - [setEnvironment, ['%kernel.environment%']]
 
-    base.sftp:
-        alias: AppBundle\Service\SftpService
+    base.excelsftp:
+        alias: AppBundle\Service\ExcelSftpService
         public: true
 
-    AppBundle\Service\SftpService:
+    AppBundle\Service\ExcelSftpService:
         abstract: true
         public: true
         calls:
@@ -536,7 +536,7 @@ services:
         public: true
 
     AppBundle\Service\DirectGroupService:
-        parent: base.sftp
+        parent: base.excelsftp
         autowire: false
         autoconfigure: false
         public: true
@@ -553,6 +553,38 @@ services:
             - [setZipPassword, ['%directgroup_zip_password%']]
         tags:
             - { name: monolog.logger, channel: directgroup }
+
+    app.sftp.directgroup:
+        class: AppBundle\Service\SftpService
+        autowire: false
+        autoconfigure: false
+        public: true
+        arguments:
+            - "@doctrine_mongodb.odm.default_document_manager"
+            - "@logger"
+            - "@aws.s3"
+            - "%kernel.environment"
+            - "ops.so-sure.com"
+            - "directgroup-report"
+            - ["%directgroup_sftp_server%", "%directgroup_sftp_username%", "%directgroup_sftp_password%", ""]
+            - "%directgroup_zip_password%"
+        tags:
+        - { name: monolog.logger, channel: directgroup }
+
+    app.sftp.sosure:
+        class: AppBundle\Service\SftpService
+        autowire: false
+        autoconfigure: false
+        public: true
+        arguments:
+        - "@doctrine_mongodb.odm.default_document_manager"
+        - "@logger"
+        - "@aws.s3"
+        - "%kernel.environment"
+        - "ops.so-sure.com"
+        - "bacs-download-reports"
+        - ["%sosure_sftp_server%", "%sosure_sftp_username%", "", "%sosure_sftp_keyfile%"]
+        - ""
 
     app.brightstar:
         alias: AppBundle\Service\BrightstarService
