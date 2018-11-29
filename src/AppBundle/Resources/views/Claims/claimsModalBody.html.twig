@@ -53,7 +53,7 @@
                     <div class="row">
                         <div class="col-xs-6">
                             <label>Policy</label>
-                            <p>{{ claim.policyNumber|default('N/A') }}</p>
+                            <p>{{ claim.policy.policyNumber|default('N/A') }}</p>
                         </div>
 
                         <div class="col-xs-6">
@@ -137,7 +137,7 @@
                             <div class="col-xs-6">
                                 <label>Details</label>
                                 {% if claim.typeDetails == 'other' %}
-                                    <p>{{ claim.typeDetailsOther|default('N/A') }}</td>
+                                    <p>{{ claim.typeDetailsOther|default('N/A') }}</p>
                                 {% else %}
                                     <p>{{ claim.typeDetails|default('N/A') }}</p>
                                 {% endif %}
@@ -435,7 +435,7 @@
                         </div>
 
                         <div class="col-xs-6">
-                            <label>Replacement Recieved</label>
+                            <label>Replacement Received</label>
                             <p>{{ claim.replacementReceivedDate ? claim.replacementReceivedDate|date('d-m-Y') : 'N/A' }}</p>
                         </div>
 
