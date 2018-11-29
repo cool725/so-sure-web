@@ -192,9 +192,10 @@ class PolicyTerms extends PolicyDocument
         }
     }
 
-    public function isAllowedExcess(PhoneExcess $excess)
+    public function isAllowedExcess(PhoneExcess $excess = null)
     {
         foreach ($this->getAllowedExcesses() as $allowedExcess) {
+            /** @var PhoneExcess $allowedExcess */
             if ($allowedExcess->equal($excess)) {
                 return true;
             }
@@ -203,9 +204,10 @@ class PolicyTerms extends PolicyDocument
         return false;
     }
 
-    public function isAllowedPicSureExcess(PhoneExcess $excess)
+    public function isAllowedPicSureExcess(PhoneExcess $excess = null)
     {
         foreach ($this->getAllowedPicSureExcesses() as $allowedExcess) {
+            /** @var PhoneExcess $allowedExcess */
             if ($allowedExcess->equal($excess)) {
                 return true;
             }

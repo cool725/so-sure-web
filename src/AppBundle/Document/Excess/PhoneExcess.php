@@ -132,8 +132,12 @@ class PhoneExcess extends Excess
         ];
     }
 
-    public function equal(PhoneExcess $excess)
+    public function equal(PhoneExcess $excess = null)
     {
+        if (!$excess) {
+            return false;
+        }
+
         return $this->areEqualToTwoDp($this->getTheft(), $excess->getTheft()) &&
             $this->areEqualToTwoDp($this->getLoss(), $excess->getLoss()) &&
             $this->areEqualToTwoDp($this->getDamage(), $excess->getDamage()) &&
