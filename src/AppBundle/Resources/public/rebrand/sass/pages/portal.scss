@@ -11,7 +11,7 @@
     width: 100vw; height: 100vh;
     position: relative;
     @include blue-gradient;
-    overflow: hidden;
+    overflow-y: scroll;
 
     &__inner {
         width: 100%;
@@ -46,6 +46,10 @@
         background-image: url('#{$cdn_url}/images/rebrand/misc/so-sure_swoosh-hero-background-mobile.svg');
         background-size: cover;
         opacity: 0.44;
+    }
+
+    @include media-breakpoint-up(md) {
+        overflow: hidden;
     }
 
     @include media-breakpoint-up(lg) {

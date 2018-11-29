@@ -16,85 +16,87 @@
 {% block body %}
 
     <section class="portal d-flex align-items-center">
-        <div class="portal__inner">
+        <div class="container">
+            <div class="portal__inner">
 
-            <img src="{{ cdn_url }}/images/rebrand/logo/so-sure_logo-white-dark.svg" width="200px" class="mb-4 d-block mx-auto" alt="so-sure">
+                <img src="{{ cdn_url }}/images/rebrand/logo/so-sure_logo-white-dark.svg" width="200px" class="mb-4 d-block mx-auto" alt="so-sure">
 
-            <div class="portal__card">
-                <div class="portal__card__body">
-                    {{ form_start(lead_form, {'attr': {
-                        'data-toggle': 'validator',
-                        'class': 'validate-form form-400',
-                        'data-client-validation': form_client_validation,
-                        'autocomplete': 'off'
-                    }}) }}
+                <div class="portal__card">
+                    <div class="portal__card__body">
+                        {{ form_start(lead_form, {'attr': {
+                            'data-toggle': 'validator',
+                            'class': 'validate-form form-400',
+                            'data-client-validation': form_client_validation,
+                            'autocomplete': 'off'
+                        }}) }}
 
-                        <div class="who">
-                            <h4 class="text-center mb-4">Customer information portal</h4>
-                            <div class="form-group text-center mb-4">
-                                {{ form_widget(lead_form.submittedBy, {'attr': {
-                                    'class': 'form-control',
-                                    'data-customer': 'I have read & understood the terms & conditions below',
-                                    'data-staff': 'I have read the terms & conditions to the customer and they agree'
-                                }}) }}
-                                <div class="with-errors">{{ form_errors(lead_form.submittedBy) }}</div>
+                            <div class="who">
+                                <h4 class="text-center mb-4">Customer information portal</h4>
+                                <div class="form-group text-center mb-4">
+                                    {{ form_widget(lead_form.submittedBy, {'attr': {
+                                        'class': 'form-control',
+                                        'data-customer': 'I have read & understood the terms & conditions below',
+                                        'data-staff': 'I have read the terms & conditions to the customer and they agree'
+                                    }}) }}
+                                    <div class="with-errors">{{ form_errors(lead_form.submittedBy) }}</div>
+                                </div>
+                                <div class="form-group text-center mb-4">
+                                    <a id="begin_btn" href="#" class="btn btn-primary btn-square">Begin</a>
+                                </div>
+                                <div class="form-group text-center">
+                                    <h5 class="text-center text-muted mb-4">OR</h5>
+                                    <h5 class="text-center">Download the app 🎉</h5>
+                                    <img src="{{ cdn_url }}/images/qr/so-sure_qr-code-app-download.png " alt="Download the app">
+                                </div>
                             </div>
-                            <div class="form-group text-center mb-4">
-                                <a id="begin_btn" href="#" class="btn btn-primary btn-square">Begin</a>
+                            <div class="info hideme">
+                                <div class="staff hideme">
+                                    <h4 class="text-center mb-4">Staff entry portal</h4>
+                                    <ul>
+                                        <li>Ask....</li>
+                                        <li>Ask....</li>
+                                        <li>Ask....</li>
+                                    </ul>
+                                </div>
+                                <div class="customer hideme">
+                                    <h4 class="text-center mb-4">Customer portal</h4>
+                                    <p>Spicy jalapeno bacon ipsum dolor amet meatloaf pork belly shankle tri-tip strip steak filet mignon hamburger drumstick spare ribs ham kielbasa ribeye.</p>
+                                </div>
+                                <div class="form-group">
+                                    {{ form_label(lead_form.name, 'Full name') }}
+                                    {{ form_widget(lead_form.name, {'attr':{'class':'form-control'}}) }}
+                                    <div class="with-errors">{{ form_errors(lead_form.name) }}</div>
+                                </div>
+                                <div class="form-group">
+                                    {{ form_label(lead_form.email, 'Email address') }}
+                                    {{ form_widget(lead_form.email, {'attr':{'class':'form-control'}}) }}
+                                    <div class="with-errors">{{ form_errors(lead_form.email) }}</div>
+                                </div>
+                                <div class="form-group">
+                                    {{ form_label(lead_form.phone, 'Phone') }}
+                                    {{ form_widget(lead_form.phone, {'attr':{'class':'form-control'}}) }}
+                                    <div class="with-errors">{{ form_errors(lead_form.phone) }}</div>
+                                </div>
+                                <div class="form-group">
+                                    {{ form_widget(lead_form.terms, {
+                                        'label': 'I have read & understood the terms & conditions below',
+                                        'attr': {
+                                            'class':'custom-control-input'
+                                        }}
+                                    ) }}
+                                    <div class="with-errors">{{ form_errors(lead_form.terms) }}</div>
+                                </div>
+                                <div class="form-group d-flex justify-content-between align-items-center mb-0">
+                                    <a id="restart_btn" href="#" class="btn btn-outline-primary btn-square">Back</a>
+                                    <a href="#"
+                                       class="btn-simple-link "
+                                       data-toggle="modal"
+                                       data-target="#customer_portal_terms"><small>Terms &amp; Conditions</small></a>
+                                    {{ form_widget(lead_form.submit, {'attr':{'class':'btn btn-success btn-square'}}) }}
+                                </div>
                             </div>
-                            <div class="form-group text-center">
-                                <h5 class="text-center text-muted mb-4">OR</h5>
-                                <h5 class="text-center">Download the app 🎉</h5>
-                                <img src="{{ cdn_url }}/images/qr/so-sure_qr-code-app-download.png " alt="Download the app">
-                            </div>
-                        </div>
-                        <div class="info hideme">
-                            <div class="staff hideme">
-                                <h4 class="text-center mb-4">Staff entry portal</h4>
-                                <ul>
-                                    <li>Ask....</li>
-                                    <li>Ask....</li>
-                                    <li>Ask....</li>
-                                </ul>
-                            </div>
-                            <div class="customer hideme">
-                                <h4 class="text-center mb-4">Customer portal</h4>
-                                <p>Spicy jalapeno bacon ipsum dolor amet meatloaf pork belly shankle tri-tip strip steak filet mignon hamburger drumstick spare ribs ham kielbasa ribeye.</p>
-                            </div>
-                            <div class="form-group">
-                                {{ form_label(lead_form.name, 'Full name') }}
-                                {{ form_widget(lead_form.name, {'attr':{'class':'form-control'}}) }}
-                                <div class="with-errors">{{ form_errors(lead_form.name) }}</div>
-                            </div>
-                            <div class="form-group">
-                                {{ form_label(lead_form.email, 'Email address') }}
-                                {{ form_widget(lead_form.email, {'attr':{'class':'form-control'}}) }}
-                                <div class="with-errors">{{ form_errors(lead_form.email) }}</div>
-                            </div>
-                            <div class="form-group">
-                                {{ form_label(lead_form.phone, 'Phone') }}
-                                {{ form_widget(lead_form.phone, {'attr':{'class':'form-control'}}) }}
-                                <div class="with-errors">{{ form_errors(lead_form.phone) }}</div>
-                            </div>
-                            <div class="form-group">
-                                {{ form_widget(lead_form.terms, {
-                                    'label': 'I have read & understood the terms & conditions below',
-                                    'attr': {
-                                        'class':'custom-control-input'
-                                    }}
-                                ) }}
-                                <div class="with-errors">{{ form_errors(lead_form.terms) }}</div>
-                            </div>
-                            <div class="form-group d-flex justify-content-between align-items-center mb-0">
-                                <a id="restart_btn" href="#" class="btn btn-outline-primary btn-square">Back</a>
-                                <a href="#"
-                                   class="btn-simple-link "
-                                   data-toggle="modal"
-                                   data-target="#customer_portal_terms"><small>Terms &amp; Conditions</small></a>
-                                {{ form_widget(lead_form.submit, {'attr':{'class':'btn btn-success btn-square'}}) }}
-                            </div>
-                        </div>
-                    {{ form_end(lead_form) }}
+                        {{ form_end(lead_form) }}
+                    </div>
                 </div>
             </div>
         </div>
