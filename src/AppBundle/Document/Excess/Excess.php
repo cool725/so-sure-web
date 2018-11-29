@@ -18,4 +18,5 @@ use AppBundle\Validator\Constraints as AppAssert;
  */
 abstract class Excess
 {
+    public abstract function toApiArray();
 }

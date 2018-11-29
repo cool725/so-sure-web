@@ -2,6 +2,7 @@
 
 namespace AppBundle\Document\Excess;
 
+use AppBundle\Document\CurrencyTrait;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -13,6 +14,8 @@ use AppBundle\Validator\Constraints as AppAssert;
  */
 class PhoneExcess extends Excess
 {
+    use CurrencyTrait;
+
     /**
      * @Assert\Range(min=0,max=200)
      * @MongoDB\Field(type="float")
@@ -96,5 +99,26 @@ class PhoneExcess extends Excess
     public function setTheft($theft)
     {
         $this->theft = $theft;
+    }
+
+    public function __toString()
+    {
+        return sprintf(
+            '%0.0f / %0.0f',
+            $this->getDamage(),
+            $this->getTheft()
+        );
+    }
+
+    public function toApiArray()
+    {
+        return [
+            'loss' => $this->toTwoDp($this->getLoss()),
+            'theft' => $this->toTwoDp($this->getTheft()),
+            'warranty' => $this->toTwoDp($this->getWarranty()),
+            'extendedWarranty' => $this->toTwoDp($this->getExtendedWarranty()),
+            'damage' => $this->toTwoDp($this->getDamage()),
+            'detail' => $this->__toString(),
+        ];
     }
 }

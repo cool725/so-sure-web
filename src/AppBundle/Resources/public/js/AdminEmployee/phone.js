@@ -41,18 +41,27 @@ $('#phoneModal').on('show.bs.modal', function (event) {
         { title: 'Premium (current)', data: 'premium' },
         { title: 'Initial Premium', data: 'initial_premium' },
         { title: 'Final Premium', data: 'final_premium' },
+        { title: 'Excess', data: 'excess_detail' },
+        { title: 'picsure Excess', data: 'picsure_excess_detail' },
         { title: 'Notes', data: 'notes' }
       ]
     });
     modal.find('.modal-title').text(phone.make + ' ' + phone.model + ' ' + phone.memory + 'GB');
     modal.find('#phone-gwp').val(phone.gwp);
     modal.find('#phone-salva').html('£' + salva_standard + ' / £' + salva_min);
+    modal.find('#phone-desired-premium').val('');
 
     modal.find('#phone-gwp').keyup(function() {
       monthly = (modal.find('#phone-gwp').val() * ipt_rate).toFixed(2);
       modal.find('#phone-premium').val(monthly);
     });
     modal.find('#phone-gwp').keyup();
+
+    modal.find('#phone-desired-premium-btn').on('click', function(e) {
+        monthly = (modal.find('#phone-desired-premium').val() / ipt_rate).toFixed(2);
+        $('#phone-gwp').val(monthly)
+        modal.find('#phone-gwp').keyup();
+    });
   }
 });
 

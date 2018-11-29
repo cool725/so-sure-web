@@ -4911,7 +4911,7 @@ abstract class Policy
             $this->areEqualToTwoDp($this->getPromoPotValue(), $this->calculatePotValue(true));
     }
 
-    public function getExcess()
+    public function getCurrentExcess()
     {
         return $this->getPremium()->getExcess();
     }

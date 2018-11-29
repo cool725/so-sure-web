@@ -1701,7 +1701,6 @@ class Claim
         return false;
     }
 
-    /*
     public function getExpectedExcess()
     {
         return $this->expectedExcess;
@@ -1711,7 +1710,6 @@ class Claim
     {
         $this->expectedExcess = $excess;
     }
-    */
 
     public static function sumClaims($claims)
     {

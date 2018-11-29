@@ -60,4 +60,12 @@ class PhonePrice extends Price
 
         return $premium;
     }
+
+    public function toPriceArray(\DateTime $date = null)
+    {
+        return array_merge(parent::toPriceArray($date), [
+            'picsure_excess' => $this->getPicSureExcess() ? $this->getPicSureExcess()->toApiArray() : null,
+            'picsure_excess_detail' => $this->getPicSureExcess() ? $this->getPicSureExcess()->toApiArray()['detail'] : '??',
+        ]);
+    }
 }
