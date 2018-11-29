@@ -257,7 +257,8 @@ class PhonePolicy extends Policy
 
         /** @var PhonePremium $phonePremium */
         $phonePremium = $this->getPremium();
-        if (!$this->getPolicyTerms()->isAllowedPicSureExcess($phonePremium->getPicSureExcess())) {
+        if ($this->getPolicyTerms()->isPicSureEnabled() &&
+            !$this->getPolicyTerms()->isAllowedPicSureExcess($phonePremium->getPicSureExcess())) {
             throw new \Exception(sprintf(
                 'Unable to set phone for policy %s as pic-sure excess values do not match policy terms.',
                 $this->getId()

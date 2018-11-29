@@ -65,7 +65,8 @@ class PhonePrice extends Price
     {
         return array_merge(parent::toPriceArray($date), [
             'picsure_excess' => $this->getPicSureExcess() ? $this->getPicSureExcess()->toApiArray() : null,
-            'picsure_excess_detail' => $this->getPicSureExcess() ? $this->getPicSureExcess()->toApiArray()['detail'] : '??',
+            'picsure_excess_detail' =>
+                $this->getPicSureExcess() ? $this->getPicSureExcess()->toApiArray()['detail'] : '??',
         ]);
     }
 }

@@ -5,6 +5,7 @@ namespace AppBundle\Tests\Document;
 use AppBundle\Document\BankAccount;
 use AppBundle\Document\Connection\Connection;
 use AppBundle\Document\DateTrait;
+use AppBundle\Document\PhonePremium;
 use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\Claim;
 use AppBundle\Document\Connection\StandardConnection;
@@ -644,6 +645,61 @@ class PhonePolicyTest extends WebTestCase
 
         $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_REJECTED);
         $this->assertEquals(150, $policy->getCurrentExcess()->getTheft());
+    }
+
+    /**
+     * @expectedException \Exception
+     */
+    public function testInitWithPremiumNonPicSure()
+    {
+        $terms = new PolicyTerms();
+        $terms->setVersion(PolicyTerms::VERSION_1);
+
+        $premium = new PhonePremium();
+        $premium->setExcess(PolicyTerms::getHighExcess());
+
+        $user = new User();
+        $user->setEmail(static::generateEmail('testInitWithPremiumNonPicSure', $this));
+        $policy = new PhonePolicy();
+        $policy->setPremium($premium);
+        $policy->init($user, $terms);
+        $this->assertTrue(true);
+    }
+
+    public function testInitWithPremiumAllowed()
+    {
+        $terms = new PolicyTerms();
+        $terms->setVersion(PolicyTerms::VERSION_10);
+
+        $premium = new PhonePremium();
+        $premium->setExcess(PolicyTerms::getHighExcess());
+        $premium->setPicSureExcess(PolicyTerms::getLowExcess());
+
+        $user = new User();
+        $user->setEmail(static::generateEmail('testInitWithPremiumAllowed', $this));
+        $policy = new PhonePolicy();
+        $policy->setPremium($premium);
+        $policy->init($user, $terms);
+        $this->assertTrue(true);
+    }
+
+    /**
+     * @expectedException \Exception
+     */
+    public function testInitWithPremiumException()
+    {
+        $terms = new PolicyTerms();
+        $terms->setVersion(PolicyTerms::VERSION_10);
+
+        $premium = new PhonePremium();
+        $premium->setExcess(PolicyTerms::getLowExcess());
+        $premium->setPicSureExcess(PolicyTerms::getLowExcess());
+
+        $user = new User();
+        $user->setEmail(static::generateEmail('testInitWithPremiumException', $this));
+        $policy = new PhonePolicy();
+        $policy->setPremium($premium);
+        $policy->init($user, $terms);
     }
 
     public function testGetRiskPolicyPendingCancellation()
