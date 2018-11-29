@@ -636,7 +636,7 @@
                         </td>
                         <td style="width: 10%;">{{ claim.type }}</td>
                         <td style="width: 10%;">{{ claim.status }}</td>
-                        <td style="width: 10%;">£{{ claim.expectedExcess }}</td>
+                        <td style="width: 10%;">£{{ claim.expectedExcessValue }}</td>
                         <td style="width: 10%;">£{{ claim.totalChargesWithVat|number_format(2, '.', ',') }}</td>
                         <td style="width: 10%;">{% if claim.fnolRisk %}{{ claim.fnolRisk }}{% else %}??{% endif %} / {% if claim.fnolRiskReason %}{{ claim.fnolRiskReason }}{% else %}??{% endif %}</td>
                         <td  style="width: 10%;" class="{% if claim.crimeRef|length > 0 %}{% if claim.validCrimeRef %}success{% elseif not claim.validCrimeRef %}danger{% endif %}{% endif %}">
