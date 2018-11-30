@@ -499,7 +499,7 @@ class OpsController extends BaseController
                 'Shared Bundle' => $event,
             ]);
         } elseif ($request->get('_route') == 'ops_track_location') {
-            $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_LOCATION_METHOD, [
+            $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_INVITE_LOCATION, [
                 'Invitation Method' => 'web',
                 'Shared Bundle' => $event,
             ]);
