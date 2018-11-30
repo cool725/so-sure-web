@@ -36,10 +36,10 @@
                     <table class="table">
                         <thead class="thead-light">
                             <tr>
-                                <th width="25%">User</th>
-                                <th width="25%">Status</th>
-                                <th width="25%">Submitted</th>
-                                <th width="25%">Actions</th>
+                                <th width="30%">User</th>
+                                <th width="10%">Status</th>
+                                <th width="30%">Submitted</th>
+                                <th width="30%">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -55,7 +55,7 @@
                                         {% elseif policy.picSureCircumvention == true %}
                                             <i class="fal fa-exclamation-triangle fa-lg" title="Possible Fraud i.e. too many attempts to do pic-sure and imei upload was too long, check events in mixpanel"></i>
                                         {% elseif policy.picSureCircumvention == false %}
-                                            <i class="fal fa-thumbs-up"></i> No Fraud Detected
+                                            <i class="fal fa-thumbs-up fa-lg" title="No Fraud Detected"></i>
                                         {% endif %}
                                     </td>
                                     {# Submitted image(s) #}
