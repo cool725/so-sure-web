@@ -608,9 +608,8 @@
                             {{ claim.policy.policyNumber }}
                         </a></td>
                         <td style="width: 10%;" id="claim_{{ claim.id }}">
-                            <button type="button" class="btn btn-link" data-toggle="modal" data-target="#claimsModal"
-                            data-claim='{{ claim.toModalArray|json_encode }}'>
-                                {{ claim.number }}</button>
+                            <button type="button" class="btn btn-link" data-id="{{ claim.id }}" data-toggle="modal" data-target="#claimsModal">
+                                {% if claim.number %}{{ claim.number }}{% else %}N/A{% endif %}</button>
                         </td>
                         <td style="width: 10%;">{{ claim.type }}</td>
                         <td style="width: 10%;">{{ claim.status }}</td>
