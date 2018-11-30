@@ -221,6 +221,8 @@ services:
             - ["%accesspay_server%", "%accesspay_username%", "%accesspay_password%", "%accesspay_keyfile%"]
             - "@app.mailer"
             - "@event_dispatcher"
+            - "@app.sftp.sosure"
+            - "@app.sftp.accesspay"
 
     app.push:
         alias: AppBundle\Service\PushService
@@ -498,11 +500,11 @@ services:
             - [setS3, ['@aws.s3']]
             - [setEnvironment, ['%kernel.environment%']]
 
-    base.sftp:
-        alias: AppBundle\Service\SftpService
+    base.excelsftp:
+        alias: AppBundle\Service\ExcelSftpService
         public: true
 
-    AppBundle\Service\SftpService:
+    AppBundle\Service\ExcelSftpService:
         abstract: true
         public: true
         calls:
@@ -536,7 +538,7 @@ services:
         public: true
 
     AppBundle\Service\DirectGroupService:
-        parent: base.sftp
+        parent: base.excelsftp
         autowire: false
         autoconfigure: false
         public: true
@@ -553,6 +555,35 @@ services:
             - [setZipPassword, ['%directgroup_zip_password%']]
         tags:
             - { name: monolog.logger, channel: directgroup }
+
+    app.sftp.directgroup:
+        class: AppBundle\Service\SftpService
+        autowire: false
+        autoconfigure: false
+        public: true
+        arguments:
+            - "@logger"
+            - ["%directgroup_sftp_server%", "%directgroup_sftp_username%", "%directgroup_sftp_password%", "", ".", "false"]
+        tags:
+        - { name: monolog.logger, channel: directgroup }
+
+    app.sftp.sosure:
+        class: AppBundle\Service\SftpService
+        autowire: false
+        autoconfigure: false
+        public: true
+        arguments:
+        - "@logger"
+        - ["%sosure_sftp_server%", "%sosure_sftp_username%", "%sosure_sftp_password%", "%sosure_sftp_keyfile%", "sftp", "true"]
+
+    app.sftp.accesspay:
+        class: AppBundle\Service\SftpService
+        autowire: false
+        autoconfigure: false
+        public: true
+        arguments:
+        - "@logger"
+        - ["%accesspay_server%", "%accesspay_username%", "%accesspay_password%", "%accesspay_keyfile%", ".", "false"]
 
     app.brightstar:
         alias: AppBundle\Service\BrightstarService
