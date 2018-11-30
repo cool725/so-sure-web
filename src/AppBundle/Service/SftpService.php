@@ -102,6 +102,10 @@ class SftpService
                 $this->sftp->getLastSFTPError()
             ));
         }
+
+        if ($this->baseFolder) {
+            $this->sftp->chdir($this->baseFolder);
+        }
     }
 
     /**
@@ -112,7 +116,7 @@ class SftpService
         if (!$this->sftp) {
             $this->loginSftp();
         }
-        $files = $this->sftp->nlist($this->baseFolder, $this->recursive);
+        $files = $this->sftp->nlist('.', $this->recursive);
         if ($files === false) {
             throw new \Exception(sprintf(
                 'List folder Failed. Msg: %s',
@@ -121,7 +125,11 @@ class SftpService
         }
         $list = [];
         foreach ($files as $file) {
-            if (mb_stripos($file, $extension) !== false) {
+            $isProcessed = mb_stripos($file, self::PROCESSED_FOLDER) !== false;
+            $isFailed = mb_stripos($file, self::FAILED_FOLDER) !== false;
+            $hasExtension = mb_stripos($file, $extension) !== false;
+
+            if ($hasExtension && !$isProcessed && !$isFailed) {
                 $list[] = $file;
             }
         }
@@ -129,21 +137,36 @@ class SftpService
         return $list;
     }
 
-    public function moveSftp($file, $folder)
+    public function moveSftp($file, $success)
+    {
+        $this->moveSftpToFolder($file, $success ? self::PROCESSED_FOLDER : self::FAILED_FOLDER);
+    }
+
+    public function moveSftpToFolder($file, $folder)
     {
         if (!$this->sftp) {
             $this->loginSftp();
         }
 
+        $newFile = sprintf('%s/%s', $folder, basename($file));
+
         // it may take too long to process the file - if it fails, try logging in again
-        if (!$this->sftp->rename($file, sprintf('%s/%s', $folder, $file))) {
+        if (!$this->sftp->rename($file, $newFile)) {
             $this->loginSftp();
-            if (!$this->sftp->rename($file, sprintf('%s/%s', $folder, $file))) {
+            $this->sftp->delete($newFile, false);
+            if (!$this->sftp->rename($file, $newFile)) {
                 throw new \Exception(sprintf(
-                    'Login Failed. Msg: %s',
+                    'Failed to move %s to %s. (Login Failed?) Msg: %s',
+                    $file,
+                    $newFile,
                     $this->sftp->getLastSFTPError()
                 ));
             }
+        }
+
+        $hasSubfolder = basename($file) != $file;
+        if ($hasSubfolder) {
+            $this->sftp->rmdir(pathinfo($file, PATHINFO_DIRNAME));
         }
     }
 

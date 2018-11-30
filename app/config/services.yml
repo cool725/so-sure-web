@@ -221,6 +221,8 @@ services:
             - ["%accesspay_server%", "%accesspay_username%", "%accesspay_password%", "%accesspay_keyfile%"]
             - "@app.mailer"
             - "@event_dispatcher"
+            - "@app.sftp.sosure"
+            - "@app.sftp.accesspay"
 
     app.push:
         alias: AppBundle\Service\PushService
