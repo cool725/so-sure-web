@@ -489,11 +489,17 @@ class OpsController extends BaseController
     /**
      * @Route("/track/invite/{event}", name="ops_track_invite")
      * @Route("/track/{event}", name="ops_track")
+     * @Route("/track/{location}/{event}", name="ops_track_location")
      */
     public function trackAction(Request $request, $event)
     {
         if ($request->get('_route') == 'ops_track_invite') {
             $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_INVITE, [
+                'Invitation Method' => 'web',
+                'Shared Bundle' => $event,
+            ]);
+        } elseif ($request->get('_route') == 'ops_track_location') {
+            $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_LOCATION_METHOD, [
                 'Invitation Method' => 'web',
                 'Shared Bundle' => $event,
             ]);

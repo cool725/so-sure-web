@@ -64,6 +64,7 @@ class MixpanelService
     const EVENT_CASHBACK = 'Cashback';
     const EVENT_DECLINE_RENEW = 'Decline Renew Policy';
     const EVENT_SIXPACK = 'Sixpack Experiment';
+    const EVENT_LOCATION_METHOD = 'Invite Location Menthod';
 
     const EVENT_EMAIL = 'Email Sent';
 
@@ -90,6 +91,7 @@ class MixpanelService
         self::EVENT_POLICY_READY => Stats::MIXPANEL_POLICY_READY,
         self::EVENT_PURCHASE_POLICY => Stats::MIXPANEL_PURCHASE_POLICY,
         self::EVENT_INVITE => Stats::MIXPANEL_INVITE_SOMEONE,
+        self::EVENT_LOCATION_METHOD => Stats::MIXPANEL_INVITE_SOMEONE,
         self::CUSTOM_CPC_QUOTE_PAGE_UK => Stats::MIXPANEL_CPC_QUOTES_UK,
         self::CUSTOM_CPC_MANUFACTURER_PAGE_UK => Stats::MIXPANEL_CPC_MANUFACTURER_UK,
         self::CUSTOM_CPC_COMPETITOR_PAGE_UK => Stats::MIXPANEL_CPC_COMPETITORS_UK,
