@@ -3,6 +3,7 @@
 namespace AppBundle\Document;
 
 use AppBundle\Classes\Salva;
+use AppBundle\Document\Excess\Excess;
 use AppBundle\Interfaces\EqualsInterface;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Symfony\Component\Form\PreloadedExtension;
@@ -48,6 +49,13 @@ abstract class Premium implements EqualsInterface
      * @Gedmo\Versioned
      */
     protected $annualDiscount;
+
+    /**
+     * @MongoDB\EmbedOne(targetDocument="AppBundle\Document\Excess\Excess")
+     * @Gedmo\Versioned
+     * @var Excess|null
+     */
+    protected $excess;
 
     public function __construct()
     {
@@ -172,6 +180,16 @@ abstract class Premium implements EqualsInterface
     public function getYearlyIptActual()
     {
         return $this->getYearlyGwpActual() * $this->getIptRate();
+    }
+
+    public function getExcess()
+    {
+        return $this->excess;
+    }
+
+    public function setExcess(Excess $excess)
+    {
+        $this->excess = $excess;
     }
 
     public function isEvenlyDivisible($amount, $accountInitial = false)

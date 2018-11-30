@@ -656,6 +656,7 @@ services:
             - "@app.router"
             - "%default_sender_address%"
             - "%default_sender_name%"
+            - "@app.mixpanel"
 
     app.router:
         alias: AppBundle\Service\RouterService

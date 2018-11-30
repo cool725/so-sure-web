@@ -831,7 +831,7 @@ class JudopayService
             $payment = $this->tokenPay(
                 $policy,
                 $scheduledPayment->getAmount(),
-                $scheduledPayment->getType(),
+                $scheduledPayment->getNotes() ?: $scheduledPayment->getType(),
                 $abortOnMultipleSameDayPayment,
                 $date
             );
@@ -1002,9 +1002,9 @@ class JudopayService
         $htmlTemplate = sprintf("%s.html.twig", $baseTemplate);
         $textTemplate = sprintf("%s.txt.twig", $baseTemplate);
 
-        $this->mailer->sendTemplate(
+        $this->mailer->sendTemplateToUser(
             sprintf('Your card is expiring next month'),
-            $policy->getPayerOrUser()->getEmail(),
+            $policy->getPayerOrUser(),
             $htmlTemplate,
             ['policy' => $policy],
             $textTemplate,
@@ -1038,9 +1038,9 @@ class JudopayService
         $htmlTemplate = sprintf("%s.html.twig", $baseTemplate);
         $textTemplate = sprintf("%s.txt.twig", $baseTemplate);
 
-        $this->mailer->sendTemplate(
+        $this->mailer->sendTemplateToUser(
             $subject,
-            $policy->getUser()->getEmail(),
+            $policy->getUser(),
             $htmlTemplate,
             ['policy' => $policy, 'next' => $next],
             $textTemplate,

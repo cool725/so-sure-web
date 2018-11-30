@@ -558,7 +558,7 @@ class DaviesService extends S3EmailService
             $msg = sprintf(
                 'Claim %s does not have the correct excess value. Expected %0.2f Actual %0.2f for %s/%s',
                 $daviesClaim->claimNumber,
-                $daviesClaim->getExpectedExcess($validated, $phonePolicy->isPicSurePolicy()),
+                $daviesClaim->getExpectedExcessValue($validated, $phonePolicy->isPicSurePolicy()),
                 $daviesClaim->excess,
                 $daviesClaim->getClaimType(),
                 $daviesClaim->getClaimStatus()

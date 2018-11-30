@@ -2148,6 +2148,12 @@ abstract class Policy
             $company->addPolicy($this);
         }
         $this->setPolicyTerms($terms);
+
+        // in the normal flow we should have policy terms before setting the phone
+        // however, many test cases do not have it
+        if ($this->getPremium()) {
+            $this->validateAllowedExcess();
+        }
     }
 
     public function isCreateAllowed(\DateTime $date = null)
@@ -4482,7 +4488,7 @@ abstract class Policy
 
         // >= doesn't quite allow for minor float differences
         $result = $this->areEqualToTwoDp($expectedPaid, $totalPaid) || $totalPaid > $expectedPaid;
-        //print sprintf("%f =? %f return %s%s", $totalPaid, $expectedPaid, $result ? 'true': 'false', PHP_EOL);
+        // print sprintf("%f =? %f return %s%s", $totalPaid, $expectedPaid, $result ? 'true': 'false', PHP_EOL);
 
         return $result;
     }
@@ -4929,6 +4935,11 @@ abstract class Policy
             $this->areEqualToTwoDp($this->getPromoPotValue(), $this->calculatePotValue(true));
     }
 
+    public function getCurrentExcess()
+    {
+        return $this->getPremium()->getExcess();
+    }
+
     public function getExpectedCommission(\DateTime $date = null)
     {
         $salva = new Salva();
@@ -5271,6 +5282,20 @@ abstract class Policy
         }
 
         return false;
+    }
+
+    public function validateAllowedExcess()
+    {
+        if (!$this->getPremium() || !$this->getPremium()->getExcess()) {
+            return;
+        }
+
+        if (!$this->getPolicyTerms()->isAllowedExcess($this->getPremium()->getExcess())) {
+            throw new \Exception(sprintf(
+                'Unable to set phone for policy %s as excess values do not match policy terms.',
+                $this->getId()
+            ));
+        }
     }
 
     public function hasManualBacsPayment()
