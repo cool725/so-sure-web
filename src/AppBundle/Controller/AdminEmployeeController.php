@@ -702,26 +702,38 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                 if ($linkClaimform->isValid()) {
                     /** @var ClaimRepository $repo */
                     $repo = $dm->getRepository(Claim::class);
-                    $qb =  $repo->createQueryBuilder();
+                    $qb = $repo->createQueryBuilder();
 
-                    $qb->addOr($qb->expr()->field('_id')->equals($linkClaimform->getData()['id']));
-                    $qb->addOr($qb->expr()->field('_id')->exists(true));
+                    $claimId = $linkClaimform->get('id')->getData();
+                    $claimNumber = $linkClaimform->get('number')->getData();
 
-                    $qb->addOr($qb->expr()->field('number')->equals($linkClaimform->getData()['number']));
-                    $qb->addOr($qb->expr()->field('number')->exists(true));
+                    if ($claimId != null) {
+                        $qb->addAnd($qb->expr()->field('_id')->equals($claimId));
+                    }
 
-                    $res = $qb->getQuery()->getSingleResult();
+                    if ($claimNumber != null) {
+                        $qb->addAnd($qb->expr()->field('number')->equals($claimNumber));
+                    }
 
-                    if (count($res) > 1) {
+                    $res = $qb->getQuery()->execute();
+
+                    if ($res->count() > 1) {
                         $this->addFlash(
                             'error',
-                            sprintf('More than one claim found, please specify more information')
+                            sprintf('Too many matches, please be more specific')
+                        );
+
+                        return $this->redirectToRoute('admin_policy', ['id' => $id]);
+                    } elseif ($res->count() === 0) {
+                        $this->addFlash(
+                            'error',
+                            sprintf('No claim matched')
                         );
 
                         return $this->redirectToRoute('admin_policy', ['id' => $id]);
                     }
 
-                    $policy->addLinkedClaim($res);
+                    $policy->addLinkedClaim($res->getSingleResult());
 
                     $policy->addNoteDetails(
                         $linkClaimform->getData()['note'],
@@ -732,7 +744,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                     $dm->flush();
                     $this->addFlash(
                         'success',
-                        sprintf('Policy %s successfully linked with claim: %s', $policy->getPolicyNumber(), $linkClaimform->getData()['number'])
+                        sprintf('Policy %s successfully linked with claim: %s', $policy->getPolicyNumber(), $linkClaimform->get('number')->getData())
                     );
 
                     return $this->redirectToRoute('admin_policy', ['id' => $id]);
