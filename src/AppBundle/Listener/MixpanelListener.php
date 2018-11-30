@@ -104,4 +104,15 @@ class MixpanelListener
             'Amount' => $policy->getCashback() ? $policy->getCashback()->getAmount() : 0,
         ]);
     }
+
+    public function onPolicyStatusEvent(PolicyEvent $event)
+    {
+        $policy = $event->getPolicy();
+
+        $this->mixpanel->queueTrackWithUser($policy->getUser(), MixpanelService::EVENT_POLICY_STATUS, [
+            'Policy Id' => $policy->getId(),
+            'Status' => $policy->getStatus(),
+            'Previous Status' => $event->getPreviousStatus(),
+        ]);
+    }
 }
