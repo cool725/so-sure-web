@@ -1358,7 +1358,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                 $setTasteCardForm->handleRequest($request);
                 if ($setTasteCardForm->isValid()) {
                     $policyService = $this->get("app.policy");
-                    $tasteCard = $this->conformAlphanumeric($setTasteCardForm->get("number")->getData(), 16, 8);
+                    $tasteCard = $this->conformAlphanumeric($setTasteCardForm->get("number")->getData(), 10, 10);
                     if (!$tasteCard) {
                         $this->addFlash("error", "Invalid tastecard number");
                     } else {
