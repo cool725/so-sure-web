@@ -4,6 +4,7 @@ namespace AppBundle\Controller;
 
 use AppBundle\Document\File\S3File;
 use AppBundle\Document\PhonePolicy;
+use AppBundle\Form\Type\ClaimInfoType;
 use AppBundle\Form\Type\ClaimSearchType;
 use AppBundle\Repository\File\S3FileRepository;
 use AppBundle\Service\ClaimsService;
@@ -316,6 +317,49 @@ class ClaimsController extends BaseController
             'claim' => $claim,
             'previousPicSureStatus' => $previousPicSureStatus,
         ];
+    }
+
+    /**
+     * @Route("/claims-form/{id}", name="claims_form")
+     */
+    public function claimsFormAction(Request $request, $id = null)
+    {
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(Claim::class);
+        /** @var Claim $claim */
+        $claim = $repo->find($id);
+
+        $claimsForm = $this->get('form.factory')
+            ->createNamedBuilder('claims_form', ClaimInfoType::class, $claim)
+            ->setAction($this->generateUrl(
+                'claims_form',
+                ['id' => $id]
+            ))
+            ->getForm();
+
+        if ('POST' === $request->getMethod()) {
+            if ($request->request->has('claims_form')) {
+                $claimsForm->handleRequest($request);
+                if ($claimsForm->isValid()) {
+                    $dm->flush();
+                    $this->addFlash(
+                        'success',
+                        sprintf('Claim %s updated', $claim->getNumber())
+                    );
+
+                    if ($claim->getPolicy()) {
+                        return $this->redirectToRoute('admin_policy', ['id' => $claim->getPolicy()->getId()]);
+                    } else {
+                        return $this->redirectToRoute('admin_claims', ['id' => $id]);
+                    }
+                }
+            }
+        }
+
+        return $this->render('AppBundle:Claims:claimsModalBody.html.twig', [
+            'claim' => $claim,
+            'form' => $claimsForm->createView()
+        ]);
     }
 
     /**

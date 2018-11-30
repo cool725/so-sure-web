@@ -65,7 +65,7 @@ $('#claimsModal').on('show.bs.modal', function (event) {
     var modal = $(this);
 
     ajax = $.ajax({
-        url: '/admin/claims-form/' + button.data('id'),
+        url: button.data('route'),
         type: "GET"
     });
 
