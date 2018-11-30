@@ -136,6 +136,23 @@
                                     <td>Policy Dates</td>
                                     <td>{{ policy.start | date('d M Y H:i', 'Europe/London') }} - {{ policy.end | date('d M Y H:i', 'Europe/London') }}</td>
                                 </tr>
+                                <tr>
+                                    <td>Taste Card</td>
+                                    <td>
+                                        <p>
+                                            {% if policy.tasteCard is defined %}
+                                                <strong>{{ policy.tasteCard }}</strong>
+                                            {% else %}
+                                                No TasteCard.
+                                            {% endif %}
+                                        </p>
+                                        <p>
+                                            <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#tasteCardForm">
+                                                Update
+                                            </button>
+                                        </p>
+                                    </td>
+                                </tr>
                                 {% endif %}
                             </table>
                         </div>
@@ -608,7 +625,7 @@
                     </div>
                 </div>
             </div>
-
+            {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:AdminEmployee:tasteCardForm', 'policy': policy, 'id': 'tasteCardForm'} %}
         </div>
         <div role="tabpanel" class="tab-pane" id="claims">
             <h4>Claims</h4>
