@@ -574,7 +574,7 @@ services:
         public: true
         arguments:
         - "@logger"
-        - ["%sosure_sftp_server%", "%sosure_sftp_username%", "", "%sosure_sftp_keyfile%", "sftp", "true"]
+        - ["%sosure_sftp_server%", "%sosure_sftp_username%", "%sosure_sftp_password%", "%sosure_sftp_keyfile%", "sftp", "true"]
 
     app.sftp.accesspay:
         class: AppBundle\Service\SftpService
