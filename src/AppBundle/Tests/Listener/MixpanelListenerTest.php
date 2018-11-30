@@ -285,7 +285,7 @@ class MixpanelListenerTest extends WebTestCase
         $policy = new PhonePolicy();
         $policy->setUser($user);
         $policy->setId(rand(1, 99999));
-        $policy->getStatus(Policy::STATUS_ACTIVE);
+        $policy->setStatus(Policy::STATUS_ACTIVE);
 
         static::$redis->del(MixpanelService::KEY_MIXPANEL_QUEUE);
         $this->assertEquals(0, static::$redis->llen(MixpanelService::KEY_MIXPANEL_QUEUE));
@@ -293,7 +293,7 @@ class MixpanelListenerTest extends WebTestCase
         $listener = new MixpanelListener(static::$mixpanelService);
         static::$requestService->setEnvironment('prod');
         $event = new PolicyEvent($policy);
-        $event->getPreviousStatus(Policy::STATUS_UNPAID);
+        $event->setPreviousStatus(Policy::STATUS_UNPAID);
         $listener->onPolicyStatusEvent($event);
         static::$requestService->setEnvironment('test');
 
