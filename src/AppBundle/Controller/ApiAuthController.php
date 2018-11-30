@@ -1732,9 +1732,9 @@ class ApiAuthController extends BaseController
                 }
                 try {
                     $mailer = $this->get('app.mailer');
-                    $mailer->sendTemplate(
+                    $mailer->sendTemplateToUser(
                         sprintf('%s has requested you pay for their policy', $multiPay->getPayee()->getName()),
-                        $multiPay->getPayer()->getEmail(),
+                        $multiPay->getPayer(),
                         'AppBundle:Email:policy/multiPayRequest.html.twig',
                         ['multiPay' => $multiPay],
                         'AppBundle:Email:policy/multiPayRequest.txt.twig',

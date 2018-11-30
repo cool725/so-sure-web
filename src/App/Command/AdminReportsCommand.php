@@ -54,11 +54,17 @@ class AdminReportsCommand extends ContainerAwareCommand
         $this->kpiReport->getReportsByWeekRanges($weekRanges, true);
     }
 
+    /**
+     * Runs the claims reports that need caching so that they get cached.
+     */
     private function cacheClaimsMainReport()
     {
         foreach (ReportingService::REPORT_PERIODS as $period => $dates) {
             list($start, $end) = ReportingService::getLastPeriod($period);
             $this->reporting->report($start, $end, false, false);
         }
+        $startDate = new \DateTime();
+        $startDate->setDate(2016, 9, 1);
+        $this->reporting->getCumulativePolicies($startDate, new \DateTime(), false);
     }
 }

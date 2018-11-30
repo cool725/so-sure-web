@@ -12,6 +12,7 @@ use AppBundle\Security\UserVoter;
 use AppBundle\Security\ClaimVoter;
 use AppBundle\Service\BacsService;
 use AppBundle\Service\ClaimsService;
+use AppBundle\Service\InvitationService;
 use AppBundle\Service\PaymentService;
 use AppBundle\Service\PCAService;
 use AppBundle\Service\PolicyService;
@@ -176,6 +177,7 @@ class UserController extends BaseController
             $scode = $scodeRepo->findOneBy(['code' => $session->get('scode'), 'active' => true]);
         }
 
+        /** @var InvitationService $invitationService */
         $invitationService = $this->get('app.invitation');
         $emailInvitiation = new EmailInvitation();
         $emailInvitationForm = $this->get('form.factory')
@@ -219,11 +221,18 @@ class UserController extends BaseController
                 foreach ($user->getUnprocessedReceivedInvitations() as $invitation) {
                     if ($invitationForm->get(sprintf('accept_%s', $invitation->getId()))->isClicked()) {
                         $this->denyAccessUnlessGranted(InvitationVoter::ACCEPT, $invitation);
-                        $connection = $invitationService->accept($invitation, $policy);
-                        $this->addFlash(
-                            'success',
-                            sprintf("You're now connected with %s", $invitation->getInviter()->getName())
-                        );
+                        try {
+                            $connection = $invitationService->accept($invitation, $policy);
+                            $this->addFlash(
+                                'success',
+                                sprintf("You're now connected with %s", $invitation->getInviter()->getName())
+                            );
+                        } catch (ClaimException $e) {
+                            $this->addFlash(
+                                'warning',
+                                sprintf("You or your friend have a claim and are unable to connect.")
+                            );
+                        }
 
                         return new RedirectResponse(
                             $this->generateUrl('user_policy', ['policyId' => $policy->getId()])
@@ -277,11 +286,18 @@ class UserController extends BaseController
                 foreach ($policy->getUnconnectedUserPolicies() as $unconnectedPolicy) {
                     $buttonName = sprintf('connect_%s', $unconnectedPolicy->getId());
                     if ($unconnectedUserPolicyForm->get($buttonName)->isClicked()) {
-                        $invitationService->connect($policy, $unconnectedPolicy);
-                        $this->addFlash(
-                            'success',
-                            sprintf("You're now connected with %s", $unconnectedPolicy->getDefaultName())
-                        );
+                        try {
+                            $invitationService->connect($policy, $unconnectedPolicy);
+                            $this->addFlash(
+                                'success',
+                                sprintf("You're now connected with %s", $unconnectedPolicy->getDefaultName())
+                            );
+                        } catch (ClaimException $e) {
+                            $this->addFlash(
+                                'warning',
+                                sprintf("You or your friend have a claim and are unable to connect.")
+                            );
+                        }
 
                         return new RedirectResponse(
                             $this->generateUrl('user_policy', ['policyId' => $policy->getId()])

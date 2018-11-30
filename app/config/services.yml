@@ -663,6 +663,7 @@ services:
             - "@app.router"
             - "%default_sender_address%"
             - "%default_sender_name%"
+            - "@app.mixpanel"
 
     app.router:
         alias: AppBundle\Service\RouterService
@@ -1028,6 +1029,13 @@ services:
             -  { name: kernel.event_listener, event: event.user.updated.invitation-link, method: onUserUpdatedEvent }
             -  { name: kernel.event_listener, event: event.user.email.changed, method: onUserEmailChangedEvent }
             -  { name: kernel.event_listener, event: event.user.password.changed, method: onUserPasswordChangedEvent }
+
+    app.listener.tasteCard:
+        class: AppBundle\Listener\TasteCardListener
+        arguments:
+            - "@app.mailer"
+        tags:
+            - { name: kernel.event_listener, event: event.policy.cancelled, method: onPolicyCancelledEvent }
 
     app.listener.bacs:
         class:   AppBundle\Listener\BacsListener

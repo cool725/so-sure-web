@@ -104,11 +104,13 @@
                     </tr>
                     </thead>
                     <tbody>
-                    {% for claim in claims %}
+                    {% for claim in claims if claim.policy %}
                         <tr>
-                            <td><button type="button" class="btn btn-link" data-toggle="modal" data-target="#claimsModal"
-                            data-claim='{{ claim.toModalArray|json_encode }}' data-documents='{{ s3DownloadLinks(claim)|json_encode }}'>
-                                {% if claim.number %}{{ claim.number }}{% else %}N/A{% endif %}</button>
+                            <td>
+                                <button type="button" class="btn btn-link" data-toggle="modal" data-target="#claimsModal"
+                                    data-claim='{{ claim.toModalArray|json_encode }}' data-documents='{{ s3DownloadLinks(claim)|json_encode }}'>
+                                        {% if claim.number %}{{ claim.number }}{% else %}N/A{% endif %}
+                                </button>
                             </td>
                             <td>
                                 {% if is_granted('ROLE_EMPLOYEE') %}
