@@ -2298,25 +2298,35 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             ->add("number", TextType::class)
             ->add("update", SubmitType::class)
             ->add("resend", SubmitType::class)
+            ->setAction($this->generateUrl(
+                'tastecard_form',
+                ['id' => $id]
+            ))
             ->getForm();
         $dm = $this->getManager();
         $policyRepository = $dm->getRepository(Policy::class);
         $policy = $policyRepository->find($id);
-        if ($request->request->has("tastecard_form")) {
-            $tasteCardForm->handleRequest($request);
-            if ($tasteCardForm->isValid()) {
-                $policyService = $this->get("app.policy");
-                if ($tasteCardForm->get("update")) {
-                    $tasteCard = $this->conformAlphanumeric($tasteCardForm->get("number")->getData(), 10, 10);
-                    $policy->setTasteCard($tasteCard);
-                    $dm->flush();
-                    $policyService->tasteCardEmail($policy);
-                    $this->addFlash("success", "Tastecard is now set");
-                } elseif ($tasteCardForm->get("resend")) {
-                    $policyService->tasteCardEmail($policy);
-                    $this->addFlash('success', 'Tastecard notification has been resent.');
+        if ('POST' === $request->getMethod()) {
+            if ($request->request->has("tastecard_form")) {
+                $tasteCardForm->handleRequest($request);
+                if ($tasteCardForm->isValid()) {
+                    $policyService = $this->get("app.policy");
+                    if ($tasteCardForm->get("update")) {
+                        $tasteCard = $this->conformAlphanumeric($tasteCardForm->get("number")->getData(), 10, 10);
+                        if ($tasteCard) {
+                            $policy->setTasteCard($tasteCard);
+                            $dm->flush();
+                            $policyService->tasteCardEmail($policy);
+                            $this->addFlash("success", "Tastecard is now set.");
+                        } else {
+                            $this->addFlash("error", "Tastecard number must be 10 alphanumeric characters.");
+                        }
+                    } elseif ($tasteCardForm->get("resend")) {
+                        $policyService->tasteCardEmail($policy);
+                        $this->addFlash('success', 'Tastecard notification has been resent.');
+                    }
+                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
                 }
-                // TODO: redirect back to here.
             }
         }
         return [
