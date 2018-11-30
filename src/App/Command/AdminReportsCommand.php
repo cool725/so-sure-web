@@ -59,14 +59,12 @@ class AdminReportsCommand extends ContainerAwareCommand
      */
     private function cacheClaimsMainReport()
     {
-        $oldest = new \DateTime();
         foreach (ReportingService::REPORT_PERIODS as $period => $dates) {
             list($start, $end) = ReportingService::getLastPeriod($period);
             $this->reporting->report($start, $end, false, false);
-            if ($start < $oldest) {
-                $oldest = $start;
-            }
         }
-        $this->reporting->getCumulativePolicies($oldest, new \DateTime(), false);
+        $startDate = new \DateTime();
+        $startDate->setDate(2016, 9, 1);
+        $this->reporting->getCumulativePolicies($startDate, new \DateTime(), false);
     }
 }

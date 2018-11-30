@@ -233,9 +233,12 @@ class OpsController extends BaseController
             'status' => Policy::STATUS_ACTIVE,
             'picSureStatus' => PhonePolicy::PICSURE_STATUS_REJECTED,
         ]);
-        $nonPicSurePolicy = $policyRepo->findOneBy([
-            'policyTerms.$id' => ['$ne' => new \MongoId($picSureRejectedPolicy->getPolicyTerms()->getId())],
-        ]);
+        $nonPicSurePolicy = null;
+        if ($picSureRejectedPolicy) {
+            $nonPicSurePolicy = $policyRepo->findOneBy([
+                'policyTerms.$id' => ['$ne' => new \MongoId($picSureRejectedPolicy->getPolicyTerms()->getId())],
+            ]);
+        }
         $unpaidPolicies = $policyRepo->findBy([
             'status' => Policy::STATUS_UNPAID,
         ]);

@@ -2,6 +2,7 @@
 
 namespace AppBundle\Document;
 
+use AppBundle\Document\Excess\PhoneExcess;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 
 /**
@@ -56,6 +57,30 @@ class PolicyTerms extends PolicyDocument
         self::VERSION_9 => '9',
         self::VERSION_10 => '10',
     ];
+
+    public static function getLowExcess()
+    {
+        $phoneExcess = new PhoneExcess();
+        $phoneExcess->setDamage(50);
+        $phoneExcess->setWarranty(50);
+        $phoneExcess->setExtendedWarranty(50);
+        $phoneExcess->setLoss(70);
+        $phoneExcess->setTheft(70);
+
+        return $phoneExcess;
+    }
+
+    public static function getHighExcess()
+    {
+        $phoneExcess = new PhoneExcess();
+        $phoneExcess->setDamage(150);
+        $phoneExcess->setWarranty(150);
+        $phoneExcess->setExtendedWarranty(150);
+        $phoneExcess->setLoss(150);
+        $phoneExcess->setTheft(150);
+
+        return $phoneExcess;
+    }
 
     public function getVersionNumber()
     {
@@ -120,5 +145,74 @@ class PolicyTerms extends PolicyDocument
             self::VERSION_8,
             self::VERSION_9,
         ]);
+    }
+
+    public function getAllowedExcesses()
+    {
+        if ($this->isPicSureEnabled()) {
+            return [
+                static::getHighExcess()
+            ];
+        } else {
+            return [
+                static::getLowExcess()
+            ];
+        }
+    }
+
+    public function getAllowedPicSureExcesses()
+    {
+        if ($this->isPicSureEnabled()) {
+            return [
+                static::getLowExcess()
+            ];
+        } else {
+            return [];
+        }
+    }
+
+    /**
+     * @return PhoneExcess
+     */
+    public function getDefaultExcess()
+    {
+        if ($this->isPicSureEnabled()) {
+            return static::getHighExcess();
+        } else {
+            return static::getLowExcess();
+        }
+    }
+
+    public function getDefaultPicSureExcess()
+    {
+        if ($this->isPicSureEnabled()) {
+            return static::getLowExcess();
+        } else {
+            return null;
+        }
+    }
+
+    public function isAllowedExcess(PhoneExcess $excess = null)
+    {
+        foreach ($this->getAllowedExcesses() as $allowedExcess) {
+            /** @var PhoneExcess $allowedExcess */
+            if ($allowedExcess->equal($excess)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public function isAllowedPicSureExcess(PhoneExcess $excess = null)
+    {
+        foreach ($this->getAllowedPicSureExcesses() as $allowedExcess) {
+            /** @var PhoneExcess $allowedExcess */
+            if ($allowedExcess->equal($excess)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
