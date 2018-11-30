@@ -47,9 +47,9 @@
                                 {# TODO: Set table row colour based of ML score eventually #}
                                 <tr>
                                     {# Policy #}
-                                    <td width="25%"><a href="{{ path('admin_policy', {'id': policy.id}) }}">{{ policy.policyNumber }}</a></td>
+                                    <td width="30%"><a href="{{ path('admin_policy', {'id': policy.id}) }}">{{ policy.policyNumber }}</a></td>
                                     {# Fraud Check #}
-                                    <td width="25%">
+                                    <td width="10%">
                                         {% if policy.picSureCircumvention is null %}
                                             <i class="fal fa-clock fa-lg" title="Pre anti-fraud check"></i>
                                         {% elseif policy.picSureCircumvention == true %}
@@ -59,7 +59,7 @@
                                         {% endif %}
                                     </td>
                                     {# Submitted image(s) #}
-                                    <td width="25%">
+                                    <td width="30%">
                                         {% for file in policy.getPolicyPicSureFiles %}
                                             {% if policy.picSureStatus == 'manual' %}
                                                 <a href="{{ path('admin_picsure_image', {'file': file.key }) }}"
@@ -89,7 +89,7 @@
                                             {% endif %}
                                         {% endfor %}
                                     </td>
-                                    <td width="25%">
+                                    <td width="30%">
                                         {% if policy.picSureStatus == 'manual' %}
                                             <a class="btn btn-success btn-square btn-sm mb-1 mr-md-2"
                                                href="{{ path('admin_picsure_approve', {'id': policy.id}) }}">Approve</a>
