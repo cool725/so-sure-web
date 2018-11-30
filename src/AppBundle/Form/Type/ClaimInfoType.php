@@ -91,6 +91,7 @@ class ClaimInfoType extends AbstractType
             ]);
             $form->add('type', ChoiceType::class, [
                 'placeholder' => 'Select Claim Type',
+                'mapped' => false,
                 'choices' => $choices
             ]);
         });
@@ -105,11 +106,13 @@ class ClaimInfoType extends AbstractType
             $form = $event->getForm();
 
             $form->get('number')->setData($claim->getNumber());
+            $form->get('type')->setData($claim->getType());
         });
 
         $builder->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event) {
-            $entity = $event->getForm()->getData();
-            $entity->setNumber($event->getForm()->get('number')->getData(), true);
+            $claim = $event->getForm()->getData();
+            $claim->setNumber($event->getForm()->get('number')->getData(), true);
+            $claim->setType($event->getForm()->get('type')->getData(), true);
         });
     }
 
