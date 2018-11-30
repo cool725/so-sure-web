@@ -43,6 +43,12 @@ class SftpService
     /** @var string */
     protected $keyFile;
 
+    /** @var string */
+    protected $baseFolder;
+
+    /** @var boolean */
+    protected $recursive;
+
     /** @var SFTP */
     protected $sftp;
 

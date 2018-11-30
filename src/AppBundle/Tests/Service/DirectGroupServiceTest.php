@@ -5,6 +5,7 @@ namespace AppBundle\Tests\Service;
 use AppBundle\Classes\DirectGroupHandlerClaim;
 use AppBundle\Document\Policy;
 use AppBundle\Service\DaviesService;
+use AppBundle\Service\DirectGroupService;
 use AppBundle\Service\DirectGroupServiceExcel;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -30,7 +31,7 @@ class DirectGroupServiceTest extends WebTestCase
     protected static $container;
     /** @var DocumentManager */
     protected static $dm;
-    /** @var DirectGroupServiceExcel */
+    /** @var DirectGroupService */
     protected static $directGroupService;
     protected static $phoneA;
     protected static $phoneB;
@@ -46,7 +47,7 @@ class DirectGroupServiceTest extends WebTestCase
 
         //now we can instantiate our service (if you want a fresh one for
         //each test method, do this in setUp() instead
-        /** @var DirectGroupServiceExcel $directGroupService */
+        /** @var DirectGroupService $directGroupService */
         $directGroupService = self::$container->get('app.directgroup');
         self::$directGroupService = $directGroupService;
 
