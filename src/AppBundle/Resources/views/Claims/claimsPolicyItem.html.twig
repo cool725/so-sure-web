@@ -886,10 +886,10 @@
                         {% if policy.policyTerms.isPicSureEnabled %}
                             Status: {% if policy.picSureStatus %}{{ policy.picSureStatus }}{% else %}Not started{% endif %}
                             {% if not policy.isPicSureValidated %}
-                                {{ form_start(picsure_form)}}
-                                {{ form_widget(picsure_form.approve, {'attr': {'class': 'btn btn-danger confirm-submit', 'data-confirm-msg': 'Are you sure you want to approve pic-sure?'}})}}
-                                {{ form_widget(picsure_form.preapprove, {'attr': {'class': 'btn btn-danger confirm-submit', 'data-confirm-msg': 'Are you sure you want to pre-approve pic-sure?'}})}}
-                                {{ form_end(picsure_form)}}
+                                <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#picsureForm">
+                                    <span class="glyphicon glyphicon-new-window" aria-hidden="true"></span>
+                                    Change Status
+                                </button>
                             {% endif %}
                         {% else %}
                             Non pic-sure policy
@@ -1079,9 +1079,9 @@
                             <div class="form-group">
                               {{ policy.imei }}
                             </div>
-                            <button type="button" class="btn btn-danger"
-                                    data-toggle="modal"
-                                    data-target="#imeiForm">Update
+                            <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#imeiForm">
+                                <span class="glyphicon glyphicon-new-window" aria-hidden="true"></span>
+                                Update
                             </button>
                         </form>
                     </td>
@@ -1113,8 +1113,9 @@
                 <tr>
                     <td><i class="fa fa-lock" title="Admin only"></i> Requeue Salva Policy</td>
                     <td>
-                        <button type="button" class="btn btn-danger" data-toggle="modal"
-                                data-target="#salvaRequeueForm">Requeue
+                        <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#salvaRequeueForm">
+                            <span class="glyphicon glyphicon-new-window" aria-hidden="true"></span>
+                            Requeue
                         </button>
                     </td>
                 </tr>
@@ -1123,14 +1124,17 @@
                     <td><i class="fa fa-lock" title="Admin only"></i> Salva Status</td>
                     <td>
                         {{ policy.salvaStatus }}
-                        <button type="button" class="btn btn-danger" data-toggle="modal"
-                                data-target="#salvaStatusForm">Change Status</button>
+                        <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#salvaStatusForm">
+                            <span class="glyphicon glyphicon-new-window" aria-hidden="true"></span>
+                            Change Status
+                        </button>
                     </td>
                 </tr>
                 {% endif %}
             </table>
 
             {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:AdminEmployee:imeiForm', 'policy': policy, 'id': 'imeiForm'} %}
+            {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:AdminEmployee:picsureForm', 'policy': policy, 'id': 'picsureForm'} %}
             {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:Admin:salvaRequeueForm', 'policy': policy, 'id': 'salvaRequeueForm'} %}
             {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:Admin:salvaStatusForm', 'policy': policy, 'id': 'salvaStatusForm'} %}
 

@@ -137,7 +137,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $this->assertEquals("Flat 6", $data['line1']);
         $this->assertEquals("RG4 7RG", $data['postcode']);
         */
-        $this->assertEquals("Lock Keepers Cottage", $data['line1']);
+        $this->assertEquals("Lock View", $data['line1']);
         $this->assertEquals("WR5 3DA", $data['postcode']);
     }
 
