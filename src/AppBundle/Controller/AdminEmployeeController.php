@@ -315,6 +315,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             'makes' => $makes,
             'additional_phones' => $additionalPhonesForm->createView(),
             'one_day' => $oneDay,
+            'policyTerms' => $this->getLatestPolicyTerms(),
         ];
     }
 
