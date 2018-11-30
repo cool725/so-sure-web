@@ -149,12 +149,14 @@ class DoctrinePolicyListenerTest extends WebTestCase
         $this->runPreUpdateStatus(
             $policy,
             $this->once(),
-            ['status' => [PhonePolicy::STATUS_ACTIVE, PhonePolicy::STATUS_UNPAID]]
+            ['status' => [PhonePolicy::STATUS_ACTIVE, PhonePolicy::STATUS_UNPAID]],
+            PhonePolicy::STATUS_ACTIVE
         );
         $this->runPreUpdateStatus(
             $policy,
             $this->never(),
-            ['status' => [PhonePolicy::STATUS_ACTIVE, PhonePolicy::STATUS_ACTIVE]]
+            ['status' => [PhonePolicy::STATUS_ACTIVE, PhonePolicy::STATUS_ACTIVE]],
+            PhonePolicy::STATUS_ACTIVE
         );
     }
 
@@ -223,16 +225,19 @@ class DoctrinePolicyListenerTest extends WebTestCase
         $listener->preUpdate($events);
     }
 
-    private function runPreUpdateStatus($policy, $count, $changeSet)
+    private function runPreUpdateStatus($policy, $count, $changeSet, $previousStatus)
     {
-        $listener = $this->createListener($policy, $count, PolicyEvent::EVENT_UPDATED_STATUS);
+        $listener = $this->createListener($policy, $count, PolicyEvent::EVENT_UPDATED_STATUS, $previousStatus);
         $events = new PreUpdateEventArgs($policy, self::$dm, $changeSet);
         $listener->preUpdate($events);
     }
 
-    private function createListener($policy, $count, $eventType)
+    private function createListener($policy, $count, $eventType, $previousStatus = null)
     {
         $event = new PolicyEvent($policy);
+        if ($previousStatus) {
+            $event->setPreviousStatus($previousStatus);
+        }
 
         $dispatcher = $this->getMockBuilder('EventDispatcherInterface')
                          ->setMethods(array('dispatch'))
