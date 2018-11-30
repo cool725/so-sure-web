@@ -4470,7 +4470,7 @@ abstract class Policy
 
         // >= doesn't quite allow for minor float differences
         $result = $this->areEqualToTwoDp($expectedPaid, $totalPaid) || $totalPaid > $expectedPaid;
-        //print sprintf("%f =? %f return %s%s", $totalPaid, $expectedPaid, $result ? 'true': 'false', PHP_EOL);
+        // print sprintf("%f =? %f return %s%s", $totalPaid, $expectedPaid, $result ? 'true': 'false', PHP_EOL);
 
         return $result;
     }
