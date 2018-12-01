@@ -58,6 +58,16 @@ class DoctrinePolicyListener extends BaseDoctrineListener
         )) {
             $this->triggerEvent($document, PolicyEvent::EVENT_UPDATED_BILLING);
         }
+
+        if ($this->hasDataChanged(
+            $eventArgs,
+            Policy::class,
+            ['status'],
+            DataChange::COMPARE_EQUAL,
+            true
+        )) {
+            $this->triggerEvent($document, PolicyEvent::EVENT_UPDATED_STATUS, $eventArgs->getOldValue('status'));
+        }
     }
 
     public function preRemove(LifecycleEventArgs $eventArgs)
@@ -71,9 +81,12 @@ class DoctrinePolicyListener extends BaseDoctrineListener
         }
     }
 
-    private function triggerEvent(Policy $policy, $eventType)
+    private function triggerEvent(Policy $policy, $eventType, $previousStatus = null)
     {
         $event = new PolicyEvent($policy);
+        if ($previousStatus) {
+            $event->setPreviousStatus($previousStatus);
+        }
         $this->dispatcher->dispatch($eventType, $event);
     }
 }

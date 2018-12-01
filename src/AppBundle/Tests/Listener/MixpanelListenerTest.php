@@ -2,6 +2,7 @@
 
 namespace AppBundle\Tests\Listener;
 
+use AppBundle\Document\Policy;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
@@ -137,7 +138,7 @@ class MixpanelListenerTest extends WebTestCase
         $this->assertEquals(3, static::$redis->llen(MixpanelService::KEY_MIXPANEL_QUEUE));
         $data = unserialize(static::$redis->lpop(MixpanelService::KEY_MIXPANEL_QUEUE));
         $this->assertEquals(MixpanelService::QUEUE_PERSON_PROPERTIES, $data['action']);
-        
+
         $data = unserialize(static::$redis->lpop(MixpanelService::KEY_MIXPANEL_QUEUE));
         $this->assertEquals(MixpanelService::QUEUE_ATTRIBUTION, $data['action']);
 
@@ -272,5 +273,40 @@ class MixpanelListenerTest extends WebTestCase
         $data = unserialize(static::$redis->lpop(MixpanelService::KEY_MIXPANEL_QUEUE));
         $this->assertEquals(MixpanelService::QUEUE_TRACK, $data['action']);
         $this->assertEquals(MixpanelService::EVENT_DECLINE_RENEW, $data['event']);
+    }
+
+    public function testMixpanelOnPolicyStatusEvent()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testMixpanelOnPolicyStatusEvent', $this),
+            'bar'
+        );
+        $policy = new PhonePolicy();
+        $policy->setUser($user);
+        $policy->setId(rand(1, 99999));
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+
+        static::$redis->del(MixpanelService::KEY_MIXPANEL_QUEUE);
+        $this->assertEquals(0, static::$redis->llen(MixpanelService::KEY_MIXPANEL_QUEUE));
+
+        $listener = new MixpanelListener(static::$mixpanelService);
+        static::$requestService->setEnvironment('prod');
+        $event = new PolicyEvent($policy);
+        $event->setPreviousStatus(Policy::STATUS_UNPAID);
+        $listener->onPolicyStatusEvent($event);
+        static::$requestService->setEnvironment('test');
+
+        // Expect a user update + a policy cancel event
+        $this->assertEquals(3, static::$redis->llen(MixpanelService::KEY_MIXPANEL_QUEUE));
+        $data = unserialize(static::$redis->lpop(MixpanelService::KEY_MIXPANEL_QUEUE));
+        $this->assertEquals(MixpanelService::QUEUE_PERSON_PROPERTIES, $data['action']);
+
+        $data = unserialize(static::$redis->lpop(MixpanelService::KEY_MIXPANEL_QUEUE));
+        $this->assertEquals(MixpanelService::QUEUE_ATTRIBUTION, $data['action']);
+
+        $data = unserialize(static::$redis->lpop(MixpanelService::KEY_MIXPANEL_QUEUE));
+        $this->assertEquals(MixpanelService::QUEUE_TRACK, $data['action']);
+        $this->assertEquals(MixpanelService::EVENT_POLICY_STATUS, $data['event']);
     }
 }

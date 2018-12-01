@@ -1126,6 +1126,7 @@ services:
             -  { name: kernel.event_listener, event: event.policy.renewed, method: onPolicyRenewedEvent }
             -  { name: kernel.event_listener, event: event.policy.cashback, method: onPolicyCashbackEvent }
             -  { name: kernel.event_listener, event: event.policy.declined-renewal, method: onPolicyDeclineRenewedEvent }
+            -  { name: kernel.event_listener, event: event.policy.updated-status, method: onPolicyStatusEvent }
 
     app.listener.sixpack:
         class:   AppBundle\Listener\SixpackListener
