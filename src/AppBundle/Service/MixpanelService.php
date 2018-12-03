@@ -67,6 +67,7 @@ class MixpanelService
     const EVENT_POLICY_STATUS = 'Policy Status Change';
 
     const EVENT_EMAIL = 'Email Sent';
+    const EVENT_SMS = 'Sms Sent';
 
     const CUSTOM_TOTAL_SITE_VISITORS = '$custom_event:379938';
     const CUSTOM_QUOTE_PAGE_UK = '$custom_event:458980';
@@ -909,6 +910,7 @@ class MixpanelService
         } else {
             $userId = $this->requestService->getTrackingId();
         }
+        print $userId;
 
         if (!$properties) {
             $properties = [];
@@ -939,6 +941,7 @@ class MixpanelService
             $properties['Device Category'] = $this->requestService->getDeviceCategory();
             $properties['Device OS'] = $this->requestService->getDeviceOS();
         }
+        print 'queue';
         $this->queue(self::QUEUE_TRACK, $userId, $properties, $event);
 
         // Special case for logins - bump login count
