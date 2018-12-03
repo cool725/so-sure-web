@@ -516,7 +516,9 @@ class OpsController extends BaseController
                 'Location' => $location,
             ]);
         } else {
-            $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_TEST, ['Test Name' => $event]);
+            $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_TEST, [
+                'Test Name' => $event
+            ]);
         }
 
         return $this->getErrorJsonResponse(ApiErrorCode::SUCCESS, 'Queued', 200);

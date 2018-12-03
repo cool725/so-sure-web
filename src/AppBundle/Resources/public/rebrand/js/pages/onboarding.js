@@ -150,7 +150,8 @@ $(function() {
         showCount: false,
         on: {
             click: function(e) {
-                tracking(this.share);
+                let location = 'oboarding';
+                tracking(this.share, 'locationinvite', location);
             }
         }
     });

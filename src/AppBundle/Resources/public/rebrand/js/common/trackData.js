@@ -3,18 +3,32 @@
 const tracking = (name, type, location, callback) => {
     let url;
 
+    // Track by invite
     if (type == 'invite') {
-        // If by invite
         url = '/ops/track/invite/' + name;
-    } else if (type == 'location') {
-        // If Invite location
+
+    // Track by invite & location
+    } else if (type == 'locationinvite') {
         url = '/ops/track/invite/' + name + '/' + location;
+
+    // Track by scode used & location
+    } else if (type == 'scode') {
+        url = '/ops/track/scode/' + location;
+
+    // Track by onboarding & location
+    } else if (type == 'onboarding') {
+        url = '/ops/track/onboarding/' + location;
+
+
+    // Track name
     } else {
         // Default
         url = '/ops/track/' + name;
     }
 
     $.get(url).always(callback);
+
+    console.log(callback);
 }
 
 export default tracking;
