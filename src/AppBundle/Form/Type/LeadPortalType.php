@@ -2,6 +2,10 @@
 
 namespace AppBundle\Form\Type;
 
+use AppBundle\Document\Phone;
+use AppBundle\Repository\PhoneRepository;
+use Doctrine\Bundle\MongoDBBundle\Form\Type\DocumentType;
+use function foo\func;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -34,21 +38,27 @@ class LeadPortalType extends AbstractType
         $builder
             ->add('submittedBy', ChoiceType::class, [
                 'required' => $this->required,
-                'placeholder' => false,
                 'choices' => array(
-                    'Choose a user to begin...' => null,
                     'Customer' => 'customer',
                     'Staff' => 'staff'
                 ),
-                // 'expanded' => true,
+                'placeholder' => 'Choose a user to begin...',
                 'multiple' => false,
             ])
             ->add('firstName', HiddenType::class, ['required' => false])
             ->add('lastName', HiddenType::class, ['required' => false])
             ->add('name', TextType::class, ['required' => $this->required])
             ->add('email', EmailType::class, ['required' => $this->required])
-            ->add('phone', ChoiceType::class, ['required' => $this->required])
-            ->add('phone', ChoiceType::class, ['required' => $this->required])
+            ->add('phone', DocumentType::class, [
+                'placeholder' => 'Select your device',
+                'class' => 'AppBundle:Phone',
+                'query_builder' => function (PhoneRepository $dr) {
+                    return $dr->findActive();
+                },
+                'preferred_choices' => function (Phone $phone) {
+                    return $phone->isHighlight();
+                },
+            ])
             ->add('terms', CheckboxType::class, ['required' => $this->required])
             ->add('submit', SubmitType::class);
     }

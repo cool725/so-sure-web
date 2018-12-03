@@ -102,7 +102,7 @@ $(function() {
     let back = () => {
         $('.info').addClass('hideme').find('.staff, .customer').addClass('hideme');
         $('.who').removeClass('hideme');
-        $('#lead_form_submittedBy').val(0);
+        $('#lead_form_submittedBy').prop('selectedIndex', 0);
     }
 
     $('#lead_form_submittedBy').on('change', function(e) {
@@ -110,10 +110,10 @@ $(function() {
         staffTxt = $(this).attr('data-staff');
         customerTxt = $(this).attr('data-customer');
 
-        if (who == 1) {
+        if (who === 'customer') {
             whosEntering = true;
             labelTxt = customerTxt;
-        } else if (who == 2) {
+        } else if (who === 'staff') {
             whosEntering = true;
             labelTxt = staffTxt;
         } else {
@@ -125,11 +125,11 @@ $(function() {
     $('#begin_btn').on('click', function(e) {
         e.preventDefault();
 
-        if (who == 1) {
+        if (who === 'customer') {
             customer(labelTxt);
         }
 
-        if (who == 2) {
+        if (who === 'staff') {
             staff(labelTxt);
         }
     });
