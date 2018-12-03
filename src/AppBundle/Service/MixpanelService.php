@@ -65,6 +65,8 @@ class MixpanelService
     const EVENT_DECLINE_RENEW = 'Decline Renew Policy';
     const EVENT_SIXPACK = 'Sixpack Experiment';
     const EVENT_INVITE_LOCATION = 'Invite Location Via Method';
+    const EVENT_INVITE_SCODE_LOCATION = 'Invite Via Scode';
+    const EVENT_ONBOARDING_LOCATION = 'Track Onboarding Interaction';
 
     const EVENT_EMAIL = 'Email Sent';
 
@@ -92,6 +94,7 @@ class MixpanelService
         self::EVENT_PURCHASE_POLICY => Stats::MIXPANEL_PURCHASE_POLICY,
         self::EVENT_INVITE => Stats::MIXPANEL_INVITE_SOMEONE,
         self::EVENT_INVITE_LOCATION => Stats::MIXPANEL_INVITE_SOMEONE,
+        self::EVENT_INVITE_SCODE_LOCATION => Stats::MIXPANEL_INVITE_SOMEONE,
         self::CUSTOM_CPC_QUOTE_PAGE_UK => Stats::MIXPANEL_CPC_QUOTES_UK,
         self::CUSTOM_CPC_MANUFACTURER_PAGE_UK => Stats::MIXPANEL_CPC_MANUFACTURER_UK,
         self::CUSTOM_CPC_COMPETITOR_PAGE_UK => Stats::MIXPANEL_CPC_COMPETITORS_UK,

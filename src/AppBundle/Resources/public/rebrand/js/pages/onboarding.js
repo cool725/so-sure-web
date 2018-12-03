@@ -10,7 +10,10 @@ require('bootstrap/js/dist/carousel');
 require('jquery-validation');
 require('../../../js/Default/jqueryValidatorMethods.js');
 require('jssocials');
+
 let Clipboard = require('clipboard');
+
+import tracking from '../common/trackData.js';
 
 $(function() {
 
@@ -144,12 +147,12 @@ $(function() {
         url:       $(onboardingShare).data('share-link'),
         shareIn:   'popup',
         showLabel: false,
-        showCount: false
-        // on: {
-        //     click: function(e) {
-        //         sosure.track.byInvite(this.share);
-        //     }
-        // }
+        showCount: false,
+        on: {
+            click: function(e) {
+                tracking(this.share);
+            }
+        }
     });
 
     // Email Invite code

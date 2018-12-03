@@ -7,8 +7,8 @@ const tracking = (name, type, location, callback) => {
         // If by invite
         url = '/ops/track/invite/' + name;
     } else if (type == 'location') {
-        // If location
-        url = '/ops/track/location/' + location + '/' + name;
+        // If Invite location
+        url = '/ops/track/invite/' + name + '/' + location;
     } else {
         // Default
         url = '/ops/track/' + name;
