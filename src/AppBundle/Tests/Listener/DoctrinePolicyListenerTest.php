@@ -131,6 +131,35 @@ class DoctrinePolicyListenerTest extends WebTestCase
         $this->runPreUpdateBilling($policy, $this->never(), ['billing' => [$address, $address]]);
     }
 
+    public function testPolicyPreUpdateStatus()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testPolicyPreUpdateStatus', $this),
+            'bar'
+        );
+        $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
+        static::$policyService->setEnvironment('prod');
+        static::$policyService->create($policy);
+        static::$policyService->setEnvironment('test');
+        $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
+
+        $this->assertTrue($policy->isValidPolicy());
+
+        $this->runPreUpdateStatus(
+            $policy,
+            $this->once(),
+            ['status' => [PhonePolicy::STATUS_ACTIVE, PhonePolicy::STATUS_UNPAID]],
+            PhonePolicy::STATUS_ACTIVE
+        );
+        $this->runPreUpdateStatus(
+            $policy,
+            $this->never(),
+            ['status' => [PhonePolicy::STATUS_ACTIVE, PhonePolicy::STATUS_ACTIVE]],
+            PhonePolicy::STATUS_ACTIVE
+        );
+    }
+
     public function testPolicyPreRemove()
     {
         $user = static::createUser(
@@ -196,9 +225,19 @@ class DoctrinePolicyListenerTest extends WebTestCase
         $listener->preUpdate($events);
     }
 
-    private function createListener($policy, $count, $eventType)
+    private function runPreUpdateStatus($policy, $count, $changeSet, $previousStatus)
+    {
+        $listener = $this->createListener($policy, $count, PolicyEvent::EVENT_UPDATED_STATUS, $previousStatus);
+        $events = new PreUpdateEventArgs($policy, self::$dm, $changeSet);
+        $listener->preUpdate($events);
+    }
+
+    private function createListener($policy, $count, $eventType, $previousStatus = null)
     {
         $event = new PolicyEvent($policy);
+        if ($previousStatus) {
+            $event->setPreviousStatus($previousStatus);
+        }
 
         $dispatcher = $this->getMockBuilder('EventDispatcherInterface')
                          ->setMethods(array('dispatch'))

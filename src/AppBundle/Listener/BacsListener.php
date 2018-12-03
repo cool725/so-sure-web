@@ -79,8 +79,7 @@ class BacsListener
     public function onBankAccountChangedEvent(BacsEvent $event)
     {
         $bankAccount = $event->getBankAccount();
-        $id = $event->getId();
-        $this->bacsService->queueCancelBankAccount($bankAccount, $id);
+        $this->bacsService->queueCancelBankAccount($bankAccount, $event->getUser()->getId());
     }
 
     public function onPolicyBacsCreated(PolicyEvent $event)

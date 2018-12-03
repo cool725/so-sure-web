@@ -2,15 +2,19 @@
 
 namespace AppBundle\Document;
 
+use AppBundle\Document\Excess\Excess;
+use AppBundle\Document\Excess\PhoneExcess;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Symfony\Component\Validator\Constraints as Assert;
 use AppBundle\Validator\Constraints as AppAssert;
+use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
  * @MongoDB\EmbeddedDocument
  * @MongoDB\InheritanceType("SINGLE_COLLECTION")
  * @MongoDB\DiscriminatorField("type")
  * @MongoDB\DiscriminatorMap({"phone"="AppBundle\Document\PhonePrice"})
+ * @Gedmo\Loggable(logEntryClass="AppBundle\Document\LogEntry")
  */
 abstract class Price
 {
@@ -40,6 +44,13 @@ abstract class Price
      * @MongoDB\Field(type="string")
      */
     protected $notes;
+
+    /**
+     * @MongoDB\EmbedOne(targetDocument="AppBundle\Document\Excess\Excess")
+     * @Gedmo\Versioned
+     * @var Excess|null
+     */
+    protected $excess;
 
     public function __construct()
     {
@@ -139,6 +150,31 @@ abstract class Price
         $this->notes = $notes;
     }
 
+    /**
+     * @return Excess|null
+     */
+    public function getExcess()
+    {
+        return $this->excess;
+    }
+
+    /**
+     * @return PhoneExcess|null
+     */
+    public function getPhoneExcess()
+    {
+        if ($this->excess instanceof PhoneExcess) {
+            return $this->excess;
+        }
+
+        return null;
+    }
+
+    public function setExcess(Excess $excess)
+    {
+        $this->excess = $excess;
+    }
+
     abstract public function createPremium($additionalGwp = null, \DateTime $date = null);
 
     protected function populatePremium(Premium $premium, $additionalGwp = null, \DateTime $date = null)
@@ -150,6 +186,9 @@ abstract class Price
         $premium->setGwp($this->toTwoDp($gwp));
         $premium->setIpt($this->calculateIpt($gwp, $date));
         $premium->setIptRate($this->getCurrentIptRate($date));
+        if ($this->getExcess()) {
+            $premium->setExcess($this->getExcess());
+        }
     }
 
     public function toApiArray(\DateTime $date = null)
@@ -168,6 +207,8 @@ abstract class Price
         return array_merge($this->toApiArray($date), [
             'initial_premium' => $this->getMonthlyPremiumPrice(null, $this->getValidFrom()),
             'final_premium' => $this->getValidTo() ? $this->getMonthlyPremiumPrice(null, $this->getValidTo()) : null,
+            'excess' => $this->getExcess() ? $this->getExcess()->toApiArray() : null,
+            'excess_detail' => $this->getExcess() ? $this->getExcess()->toApiArray()['detail'] : '??',
         ]);
     }
 }

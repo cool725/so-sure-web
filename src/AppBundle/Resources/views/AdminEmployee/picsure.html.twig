@@ -36,10 +36,10 @@
                     <table class="table">
                         <thead class="thead-light">
                             <tr>
-                                <th width="25%">User</th>
-                                <th width="25%">Status</th>
-                                <th width="25%">Submitted</th>
-                                <th width="25%">Actions</th>
+                                <th width="30%">User</th>
+                                <th width="10%">Status</th>
+                                <th width="30%">Submitted</th>
+                                <th width="30%">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -47,19 +47,19 @@
                                 {# TODO: Set table row colour based of ML score eventually #}
                                 <tr>
                                     {# Policy #}
-                                    <td width="25%"><a href="{{ path('admin_policy', {'id': policy.id}) }}">{{ policy.policyNumber }}</a></td>
+                                    <td width="30%"><a href="{{ path('admin_policy', {'id': policy.id}) }}">{{ policy.policyNumber }}</a></td>
                                     {# Fraud Check #}
-                                    <td width="25%">
+                                    <td width="10%">
                                         {% if policy.picSureCircumvention is null %}
                                             <i class="fal fa-clock fa-lg" title="Pre anti-fraud check"></i>
                                         {% elseif policy.picSureCircumvention == true %}
                                             <i class="fal fa-exclamation-triangle fa-lg" title="Possible Fraud i.e. too many attempts to do pic-sure and imei upload was too long, check events in mixpanel"></i>
                                         {% elseif policy.picSureCircumvention == false %}
-                                            <i class="fal fa-thumbs-up"></i> No Fraud Detected
+                                            <i class="fal fa-thumbs-up fa-lg" title="No Fraud Detected"></i>
                                         {% endif %}
                                     </td>
                                     {# Submitted image(s) #}
-                                    <td width="25%">
+                                    <td width="30%">
                                         {% for file in policy.getPolicyPicSureFiles %}
                                             {% if policy.picSureStatus == 'manual' %}
                                                 <a href="{{ path('admin_picsure_image', {'file': file.key }) }}"
@@ -89,7 +89,7 @@
                                             {% endif %}
                                         {% endfor %}
                                     </td>
-                                    <td width="25%">
+                                    <td width="30%">
                                         {% if policy.picSureStatus == 'manual' %}
                                             <a class="btn btn-success btn-square btn-sm mb-1 mr-md-2"
                                                href="{{ path('admin_picsure_approve', {'id': policy.id}) }}">Approve</a>

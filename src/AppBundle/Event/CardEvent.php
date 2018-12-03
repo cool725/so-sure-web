@@ -7,29 +7,20 @@ use AppBundle\Document\User;
 use Symfony\Component\EventDispatcher\Event;
 use AppBundle\Document\Claim;
 
-class BacsEvent extends Event
+class CardEvent extends Event
 {
-    const EVENT_UPDATED = 'event.bacs.updated';
+    const EVENT_UPDATED = 'event.card.updated';
 
     /** @var User */
     protected $user;
 
-    /** @var BankAccount */
-    protected $bankAccount;
-
-    public function __construct(User $user, BankAccount $bankAccount)
+    public function __construct(User $user)
     {
         $this->user = $user;
-        $this->bankAccount = $bankAccount;
     }
 
     public function getUser()
     {
         return $this->user;
-    }
-
-    public function getBankAccount()
-    {
-        return $this->bankAccount;
     }
 }
