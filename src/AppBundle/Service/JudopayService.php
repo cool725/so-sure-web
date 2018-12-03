@@ -2,6 +2,7 @@
 namespace AppBundle\Service;
 
 use AppBundle\Classes\SoSure;
+use AppBundle\Document\Charge;
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\File\JudoFile;
 use AppBundle\Document\IdentityLog;
@@ -1062,7 +1063,7 @@ class JudopayService
         if (!$next) {
             $smsTemplate = 'AppBundle:Sms:failedPaymentFinal.txt.twig';
         }
-        $this->sms->sendUser($policy, $smsTemplate, ['policy' => $policy, 'next' => $next]);
+        $this->sms->sendUser($policy, $smsTemplate, ['policy' => $policy, 'next' => $next], Charge::TYPE_SMS_PAYMENT);
     }
 
     public function runTokenPayment(User $user, $amount, $paymentRef, $policyId, $customerRef = null)

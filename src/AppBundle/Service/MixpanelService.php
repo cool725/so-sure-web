@@ -68,6 +68,7 @@ class MixpanelService
     const EVENT_PAYMENT_METHOD_CHANGED = 'Payment Method Changed';
 
     const EVENT_EMAIL = 'Email Sent';
+    const EVENT_SMS = 'Sms Sent';
 
     const CUSTOM_TOTAL_SITE_VISITORS = '$custom_event:379938';
     const CUSTOM_QUOTE_PAGE_UK = '$custom_event:458980';
