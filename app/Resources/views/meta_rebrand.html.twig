@@ -28,8 +28,13 @@
 <meta name="msapplication-square310x310logo" content="{{ cdn_url }}/images/rebrand/favicons/ms-icon-310x310.png" />
 
 <meta property="fb:app_id" content="{{ fb_appid }}" />
-<meta property="og:url" content="{{ app.request.uri }}" />
 <meta property="og:type" content="website" />
+
+{% if og_url is defined %}
+    <meta property="og:url" content="{{ og_url }}" />
+{% else %}
+    <meta property="og:url" content="{{ app.request.uri }}" />
+{% endif %}
 
 {% if og_title is defined %}
   <meta property="og:title" content="{{ og_title }}" />
