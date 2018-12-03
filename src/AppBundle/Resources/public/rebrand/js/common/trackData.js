@@ -15,18 +15,17 @@ const tracking = (name, type, location, callback) => {
     } else if (type == 'scode') {
         url = '/ops/track/scode/' + location;
 
-        console.log(name, type, location);
-
-    // Track by onboarding & location
+    // Track by onboarding & name
     } else if (type == 'onboarding') {
-        url = '/ops/track/onboarding/' + location;
-
+        url = '/ops/track/onboarding/' + name;
 
     // Track name
     } else {
         // Default
         url = '/ops/track/' + name;
     }
+
+    console.log(name, type, location);
 
     $.get(url).always(callback);
 }

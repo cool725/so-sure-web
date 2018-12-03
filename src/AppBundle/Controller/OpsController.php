@@ -491,7 +491,7 @@ class OpsController extends BaseController
      * @Route("/track/invite/{event}", name="ops_track_invite")
      * @Route("/track/invite/{event}/{location}/", name="ops_track_invite_location")
      * @Route("/track/scode/{location}/", name="ops_scode_location")
-     * @Route("/track/onboarding/{location}/", name="ops_onboarding_location")
+     * @Route("/track/onboarding/{event}/", name="ops_onboarding_event")
      */
     public function trackAction(Request $request, $event = null, $location = null)
     {
@@ -511,7 +511,7 @@ class OpsController extends BaseController
                 'Invitation Method' => 'scode',
                 'Location' => $location,
             ]);
-        } elseif ($request->get('_route') == 'ops_onboarding_location') {
+        } elseif ($request->get('_route') == 'ops_onboarding_event') {
             $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_ONBOARDING_LOCATION, [
                 'Location' => $location,
             ]);

@@ -104,6 +104,8 @@ $(function() {
             }
         }
 
+        tracking('page-' + e.to, 'onboarding');
+
         // Desktop navigation buttons.
         if (onNavDt.length) {
             // IDEA: If I were using this more I could change the data-secondary-page thing so be a maximum and allow each navigation button to represent a range of slides.
@@ -131,7 +133,7 @@ $(function() {
     clipboard.on('success', function(e) {
         $('.btn-copy').tooltip({'title':   'Copied 😀','trigger': 'manual'}).tooltip('show');
 
-        tracking('scode', 'scode', 'oboarding');
+        tracking('', 'scode', 'oboarding');
 
         setTimeout(function() {
             $('.btn-copy').tooltip('hide');
