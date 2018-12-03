@@ -1127,6 +1127,9 @@ services:
             -  { name: kernel.event_listener, event: event.policy.cashback, method: onPolicyCashbackEvent }
             -  { name: kernel.event_listener, event: event.policy.declined-renewal, method: onPolicyDeclineRenewedEvent }
             -  { name: kernel.event_listener, event: event.policy.updated-status, method: onPolicyStatusEvent }
+            -  { name: kernel.event_listener, event: event.card.updated, method: onCardUpdatedEvent }
+            -  { name: kernel.event_listener, event: event.bacs.updated, method: onBacsUpdatedEvent }
+            -  { name: kernel.event_listener, event: event.user.payment-method.changed, method: onUserPaymentMethodChangedEvent }
 
     app.listener.sixpack:
         class:   AppBundle\Listener\SixpackListener

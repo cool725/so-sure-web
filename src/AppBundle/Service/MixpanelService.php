@@ -65,6 +65,7 @@ class MixpanelService
     const EVENT_DECLINE_RENEW = 'Decline Renew Policy';
     const EVENT_SIXPACK = 'Sixpack Experiment';
     const EVENT_POLICY_STATUS = 'Policy Status Change';
+    const EVENT_PAYMENT_METHOD_CHANGED = 'Payment Method Changed';
 
     const EVENT_EMAIL = 'Email Sent';
 
