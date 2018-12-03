@@ -21,7 +21,6 @@ use Symfony\Component\Form\FormEvent;
 
 class LeadPortalType extends AbstractType
 {
-
     /**
      * @var boolean
      */
@@ -31,7 +30,6 @@ class LeadPortalType extends AbstractType
      * @var RequestStack
      */
     private $requestStack;
-
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
@@ -44,11 +42,14 @@ class LeadPortalType extends AbstractType
                 ),
                 'placeholder' => 'Choose a user to begin...',
                 'multiple' => false,
+                'mapped' => false,
             ])
-            ->add('firstName', HiddenType::class, ['required' => false])
-            ->add('lastName', HiddenType::class, ['required' => false])
-            ->add('name', TextType::class, ['required' => $this->required])
-            ->add('email', EmailType::class, ['required' => $this->required])
+            ->add('name', TextType::class, [
+                'required' => $this->required
+            ])
+            ->add('email', EmailType::class, [
+                'required' => $this->required
+            ])
             ->add('phone', DocumentType::class, [
                 'placeholder' => 'Select your device',
                 'class' => 'AppBundle:Phone',
@@ -59,14 +60,17 @@ class LeadPortalType extends AbstractType
                     return $phone->isHighlight();
                 },
             ])
-            ->add('terms', CheckboxType::class, ['required' => $this->required])
+            ->add('terms', CheckboxType::class, [
+                'required' => $this->required,
+                'mapped' => false
+            ])
             ->add('submit', SubmitType::class);
     }
 
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(array(
-            'data_class' => 'AppBundle\Document\LeadPortal',
+            'data_class' => 'AppBundle\Document\Lead',
         ));
     }
 }

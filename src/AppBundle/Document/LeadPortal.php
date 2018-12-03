@@ -192,6 +192,7 @@ class LeadPortal
     {
         $this->terms = $terms;
     }
+
     // public function populateUser(User $user)
     // {
         // $user->setEmail($this->getEmail());

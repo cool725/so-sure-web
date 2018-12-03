@@ -101,6 +101,7 @@ security:
         - { path: ^/claims/, role: ROLE_NO_ACCESS }
         - { path: ^/alpha$, role: ROLE_USER }
         - { path: ^/user$, role: ROLE_USER }
+        - { path: ^/helloz$, role: IS_AUTHENTICATED_ANONYMOUSLY, ips: "%sosure_ips%" }
         - { path: ^/user/, role: ROLE_USER }
         - { path: ^/bearer-api, roles: [ IS_AUTHENTICATED_FULLY ] }
         - { path: ^/api, access: "isApiPort(8080)" }

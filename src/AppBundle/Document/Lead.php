@@ -5,9 +5,11 @@ namespace AppBundle\Document;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Symfony\Component\Validator\Constraints as Assert;
 use AppBundle\Validator\Constraints as AppAssert;
+use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
  * @MongoDB\Document
+ * @Gedmo\Loggable(logEntryClass="AppBundle\Document\LogEntry")
  */
 class Lead
 {
@@ -58,6 +60,13 @@ class Lead
     protected $name;
 
     /**
+     * @MongoDB\ReferenceOne(targetDocument="Phone")
+     * @Gedmo\Versioned
+     * @var Phone
+     */
+    protected $phone;
+
+    /**
      * @Assert\Choice({"text-me", "launch-usa", "buy", "save-quote", "purchase-flow", "contact-us"}, strict=true)
      * @MongoDB\Field(type="string")
      */
@@ -73,6 +82,16 @@ class Lead
     public function __construct()
     {
         $this->created = \DateTime::createFromFormat('U', time());
+    }
+
+    public function getPhone()
+    {
+        return $this->phone;
+    }
+
+    public function setPhone(Phone $phone)
+    {
+        $this->phone = $phone;
     }
 
     public function getId()
