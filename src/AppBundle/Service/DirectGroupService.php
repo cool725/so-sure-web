@@ -19,7 +19,7 @@ use AppBundle\Validator\Constraints\AlphanumericSpaceDotValidator;
 use AppBundle\Exception\ValidationException;
 use AppBundle\Repository\ClaimRepository;
 
-class DirectGroupService extends SftpService
+class DirectGroupService extends ExcelSftpService
 {
     use CurrencyTrait;
     use DateTrait;
@@ -635,7 +635,7 @@ class DirectGroupService extends SftpService
             $msg = sprintf(
                 'Claim %s does not have the correct excess value. Expected %0.2f Actual %0.2f for %s/%s/%s/%s',
                 $directGroupClaim->claimNumber,
-                $directGroupClaim->getExpectedExcess($validated, $phonePolicy->isPicSurePolicy()),
+                $directGroupClaim->getExpectedExcessValue($validated, $phonePolicy->isPicSurePolicy()),
                 $directGroupClaim->excess,
                 $directGroupClaim->getClaimType(),
                 $directGroupClaim->getClaimStatus(),

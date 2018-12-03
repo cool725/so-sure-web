@@ -2,6 +2,7 @@
 namespace AppBundle\Service;
 
 use AppBundle\Classes\SoSure;
+use AppBundle\Document\Charge;
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\File\JudoFile;
 use AppBundle\Document\IdentityLog;
@@ -1002,9 +1003,9 @@ class JudopayService
         $htmlTemplate = sprintf("%s.html.twig", $baseTemplate);
         $textTemplate = sprintf("%s.txt.twig", $baseTemplate);
 
-        $this->mailer->sendTemplate(
+        $this->mailer->sendTemplateToUser(
             sprintf('Your card is expiring next month'),
-            $policy->getPayerOrUser()->getEmail(),
+            $policy->getPayerOrUser(),
             $htmlTemplate,
             ['policy' => $policy],
             $textTemplate,
@@ -1038,9 +1039,9 @@ class JudopayService
         $htmlTemplate = sprintf("%s.html.twig", $baseTemplate);
         $textTemplate = sprintf("%s.txt.twig", $baseTemplate);
 
-        $this->mailer->sendTemplate(
+        $this->mailer->sendTemplateToUser(
             $subject,
-            $policy->getUser()->getEmail(),
+            $policy->getUser(),
             $htmlTemplate,
             ['policy' => $policy, 'next' => $next],
             $textTemplate,
@@ -1062,7 +1063,7 @@ class JudopayService
         if (!$next) {
             $smsTemplate = 'AppBundle:Sms:failedPaymentFinal.txt.twig';
         }
-        $this->sms->sendUser($policy, $smsTemplate, ['policy' => $policy, 'next' => $next]);
+        $this->sms->sendUser($policy, $smsTemplate, ['policy' => $policy, 'next' => $next], Charge::TYPE_SMS_PAYMENT);
     }
 
     public function runTokenPayment(User $user, $amount, $paymentRef, $policyId, $customerRef = null)

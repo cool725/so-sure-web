@@ -313,7 +313,7 @@ class InvitationService
         }
     }
 
-    public function inviteByEmail(Policy $policy, $email, $name = null, $skipSend = null)
+    public function inviteByEmail(Policy $policy, $email, $name = null, $skipSend = null, $location = null)
     {
         $this->validatePolicy($policy);
         $this->validateSoSurePolicyEmail($policy, $email);
@@ -394,9 +394,13 @@ class InvitationService
             }
             $this->sendPush($invitation, PushService::MESSAGE_INVITATION);
             $this->sendEvent($invitation, InvitationEvent::EVENT_INVITED);
-            $this->mixpanel->queueTrackWithUser($invitation->getInviter(), MixpanelService::EVENT_INVITE, [
+            $data = [
                 'Invitation Method' => 'email',
-            ]);
+            ];
+            if ($location) {
+                $data['Location'] = $location;
+            }
+            $this->mixpanel->queueTrackWithUser($invitation->getInviter(), MixpanelService::EVENT_INVITE, $data);
             $this->mixpanel->queuePersonIncrement('Number of Invites Sent', 1, $invitation->getInviter());
             $now = \DateTime::createFromFormat('U', time());
             $this->mixpanel->queuePersonProperties([
@@ -926,7 +930,7 @@ class InvitationService
         $prefix = $policy->getPolicyPrefix($this->environment);
         if (!$policy->isValidPolicy($prefix)) {
             throw new InvalidPolicyException(sprintf(
-                'Policy must be pending/active before inviting/connecting (%s)',
+                "Policy must be pending/active before inviting/connecting (%s)",
                 $policy->getPolicyNumber()
             ));
         }
