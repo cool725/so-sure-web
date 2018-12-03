@@ -218,7 +218,15 @@ class AdminController extends BaseController
             }
             $notes = $this->conformAlphanumericSpaceDot($this->getRequestString($request, 'notes'), 1500);
             try {
-                $phone->changePrice($gwp, $from, $to, $notes);
+                $policyTerms = $this->getLatestPolicyTerms();
+                $phone->changePrice(
+                    $gwp,
+                    $from,
+                    $policyTerms->getDefaultExcess(),
+                    $policyTerms->getDefaultPicSureExcess(),
+                    $to,
+                    $notes
+                );
             } catch (\Exception $e) {
                 $this->addFlash('error', $e->getMessage());
 

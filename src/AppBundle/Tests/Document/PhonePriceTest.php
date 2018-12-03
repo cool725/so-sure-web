@@ -3,6 +3,7 @@
 namespace AppBundle\Tests\Document;
 
 use AppBundle\Document\PhonePrice;
+use AppBundle\Document\PolicyTerms;
 
 /**
  * @group unit
@@ -59,6 +60,18 @@ class PhonePriceTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(46.67, $premium->getGwp());
         $this->assertEquals(5.60, $premium->getIpt());
         $this->assertEquals(0.12, $premium->getIptRate());
+    }
+
+    public function testCreatePremiumExcess()
+    {
+        $phonePrice = new PhonePrice();
+        $phonePrice->setGwp(5);
+        $phonePrice->setExcess(PolicyTerms::getHighExcess());
+        $phonePrice->setPicSureExcess(PolicyTerms::getLowExcess());
+        $date = new \DateTime('2017-06-01');
+        $premium = $phonePrice->createPremium(41.67, $date);
+        $this->assertTrue($premium->getPicSureExcess()->equal(PolicyTerms::getLowExcess()));
+        $this->assertTrue($premium->getExcess()->equal(PolicyTerms::getHighExcess()));
     }
 
     public function testGetAdjustedPremiumPrices()
