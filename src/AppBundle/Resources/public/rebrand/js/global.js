@@ -7,7 +7,6 @@ require('bootstrap/js/dist/modal');
 require('bootstrap/js/dist/alert');
 
 // Require components
-require('./common/track.js');
 require('./common/trackData.js');
 require('./common/fbLogin.js');
 require('./common/toggleText.js');
