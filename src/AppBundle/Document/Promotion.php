@@ -106,7 +106,7 @@ class Promotion
      */
     public function __construct()
     {
-        $this->confirmedUsers = new ArrayCollection();
+        $this->participating = new ArrayCollection();
     }
 
     public function getId()
@@ -116,8 +116,7 @@ class Promotion
 
     public function setId($id)
     {
-        $this->id = id;
-
+        $this->id = $id;
     }
 
     public function getName()

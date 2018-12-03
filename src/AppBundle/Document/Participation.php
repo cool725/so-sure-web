@@ -21,6 +21,8 @@ class Participation
     const STATUS_COMPLETED = "completed";
     // Promotion conditions were not fulfilled and reward was not given.
     const STATUS_FAILED = "failed";
+    // Promotion reward can't be given because they already have the reward.
+    const STATUS_INVALID = "invalid";
 
     /**
      * @MongoDB\Id(strategy="auto")
@@ -87,7 +89,7 @@ class Participation
 
     public function getStart()
     {
-        return $start;
+        return $this->start;
     }
 
     public function setStart($start)
@@ -104,6 +106,4 @@ class Participation
     {
         $this->status = $status;
     }
-
-
 }

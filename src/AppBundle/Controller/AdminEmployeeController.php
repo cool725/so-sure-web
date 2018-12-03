@@ -2959,9 +2959,17 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             ->add('name', TextType::class)
             ->add('condition', ChoiceType::class, ['choices' => Promotion::CONDITIONS])
             ->add('reward', ChoiceType::class, ['choices' => Promotion::REWARDS])
-            ->add('conditionDays', NumberType::class, ['constraints' => [new Assert\Range(['min' => 0, 'max' => 90])]])
-            ->add('conditionEvents', NumberType::class, ['constraints' => [new Assert\Range(['min' => 1, 'max' => 50])], 'required' => false])
-            ->add('rewardAmount', NumberType::class, ['constraints' => [new Assert\Range(['min' => 1, 'max' => 50])], 'required' => false])
+            ->add('period', NumberType::class, ['constraints' => [new Assert\Range(['min' => 0, 'max' => 90])]])
+            ->add(
+                'conditionEvents',
+                NumberType::class,
+                ['constraints' => [new Assert\Range(['min' => 1, 'max' => 50])], 'required' => false]
+            )
+            ->add(
+                'rewardAmount',
+                NumberType::class,
+                ['constraints' => [new Assert\Range(['min' => 1, 'max' => 50])], 'required' => false]
+            )
             ->add('next', SubmitType::class)
             ->getForm();
         try {
@@ -2973,8 +2981,10 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                         $promotion->setName($this->getDataString($promotionForm->getData(), 'name'));
                         $promotion->setCondition($this->getDataString($promotionForm->getData(), 'condition'));
                         $promotion->setReward($this->getDataString($promotionForm->getData(), 'reward'));
-                        $promotion->setConditionDays($this->getDataString($promotionForm->getData(), 'conditionDays'));
-                        $promotion->setConditionEvents($this->getDataString($promotionForm->getData(), 'conditionEvents'));
+                        $promotion->setPeriod($this->getDataString($promotionForm->getData(), 'period'));
+                        $promotion->setConditionEvents(
+                            $this->getDataString($promotionForm->getData(), 'conditionEvents')
+                        );
                         $promotion->setRewardAmount($this->getDataString($promotionForm->getData(), 'rewardAmount'));
                         $promotion->setStart(new \DateTime());
                         $promotion->setActive(true);

@@ -4,6 +4,8 @@ namespace AppBundle\Service;
 use AppBundle\Document\Promotion;
 use AppBundle\Document\Participation;
 use AppBundle\Document\Policy;
+use AppBundle\Document\Invitation\Invitation;
+use AppBundle\Repository\Invitation\InvitationRepository;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Psr\Log\LoggerInterface;
 
@@ -21,9 +23,9 @@ class PromotionService
 
     /**
      * Builds service and injects dependencies.
-     * @param DocumentManager $dm is the document manager.
-     * @param MailerService $mailerService is the mail sender.
-     * @param LoggerInterface $logger is the logger.
+     * @param DocumentManager $dm            is the document manager.
+     * @param MailerService   $mailerService is the mail sender.
+     * @param LoggerInterface $logger        is the logger.
      */
     public function __construct(DocumentManager $dm, MailerService $mailerService, LoggerInterface $logger)
     {
@@ -42,7 +44,10 @@ class PromotionService
     public function generate($promotions = null, \DateTime $date = null)
     {
         if ($promotions === null) {
-            $promotions = $promotionRepository->findBy([]);
+            $promotions = $this->dm->getRepository(Promotion::class)->findBy([]);
+        }
+        if (!$date) {
+            $date = new \DateTime();
         }
         foreach ($promotions as $promotion) {
             $participations = $promotion->getParticipating();
@@ -56,17 +61,11 @@ class PromotionService
                 // check for existing tastecard to invalidate.
                 // TODO: maybe there is another case like this if reward pot is too full or something but I will have to
                 //       check that with someone later. If so I will add a function.
-                // TODO: This will mail every day which is not good. We have got to bring back invalid promotion status.
                 if ($promotion->getReward() == Promotion::REWARD_TASTE_CARD && $policy->getTasteCard()) {
-                    $this->mailerService->sendTemplate(
-                        "Promotion Reward Is Invalid",
-                        "marketing@so-sure.com",
-                        "AppBundle:Email:promotion/rewardInvalid.html.twig",
-                        ["participation" => $participation]
-                    );
+                    $this->endParticipation($participation, Participation::STATUS_INVALID);
                     continue;
                 }
-                $this->checkConditions($participation);
+                $this->checkConditions($participation, $date);
             }
         }
     }
@@ -84,28 +83,30 @@ class PromotionService
         $condition = $promotion->getCondition();
         $interval = new \DateInterval("P".$promotion->getPeriod()."D");
         $end = (clone ($participation->getStart()))->add($interval);
-        $finished = $end < $date;
+        $finished = $end->diff($date)->invert == 0;
         $completed = 0;
         if ($condition == Promotion::CONDITION_NONE) {
             if ($finished) {
                 $this->endParticipation($participation);
             }
         } elseif ($condition == Promotion::CONDITION_NO_CLAIMS) {
-            if (!empty($policy->getClaimsInPeriod($participation->getStart(), $participation->getEnd()))) {
+            if (!empty($policy->getClaimsInPeriod($participation->getStart(), $end))) {
                 $this->endParticipation($participation, Participation::STATUS_FAILED);
             } elseif ($finished) {
                 $this->endParticipation($participation);
                 $completed++;
             }
         } elseif ($condition == Promotion::CONDITION_INVITES) {
-            $invites = $policy->getUser()->getInvitesInPeriod($participation->getStart(), $end);
+            /** @var InvitationRepository $invitationRepository */
+            $invitationRepository = $this->dm->getRepository(Invitation::class);
+            $invites = $invitationRepository->count([$policy], $participation->getStart(), $end);
             if ($invites >= $promotion->getConditionEvents()) {
                 $this->endParticipation($participation);
             } elseif ($finished) {
                 $this->endParticipation($participation, Participation::STATUS_FAILED);
             }
         } else {
-            $this->logger->error("Mystery promotion condition: {$condition}");
+            $this->logger->error("Invalid promotion condition: {$condition}.");
         }
     }
 
@@ -123,6 +124,16 @@ class PromotionService
                 "marketing@so-sure.com",
                 "AppBundle:Email:promotion/rewardEarned.html.twig",
                 ["participation" => $participation]
+            );
+        } elseif ($status == Participation::STATUS_INVALID) {
+            $this->mailerService->sendTemplate(
+                "Promotion Reward Cannot Be Awarded",
+                "marketing@so-sure.com",
+                "AppBundle:Email:promotion/rewardInvalid.html.twig",
+                [
+                    "participation" => $participation,
+                    "reason" => "Promotion reward is a tastecard, but user already has a tastecard."
+                ]
             );
         }
     }

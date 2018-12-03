@@ -32,7 +32,7 @@ class PromotionCommand extends ContainerAwareCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $rewards = count($this->promotionService->generate());
+        $rewards = $this->promotionService->generate();
         $output->writeln("{$rewards} rewards were given.");
     }
 }
