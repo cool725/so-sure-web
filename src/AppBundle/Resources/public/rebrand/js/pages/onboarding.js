@@ -104,7 +104,7 @@ $(function() {
             }
         }
 
-        tracking('page-' + e.to, 'onboarding');
+        tracking('', 'onboarding', 'page-' + e.to);
 
         // Desktop navigation buttons.
         if (onNavDt.length) {
@@ -154,7 +154,7 @@ $(function() {
         showCount: false,
         on: {
             click: function(e) {
-                let location = 'oboarding';
+                let location = 'onboarding';
                 tracking(this.share, 'locationinvite', location);
             }
         }

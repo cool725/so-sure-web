@@ -17,7 +17,7 @@ const tracking = (name, type, location, callback) => {
 
     // Track by onboarding & name
     } else if (type == 'onboarding') {
-        url = '/ops/track/onboarding/' + name;
+        url = '/ops/track/onboarding/' + location;
 
     // Track name
     } else {
