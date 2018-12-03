@@ -12,10 +12,12 @@ use AppBundle\Security\UserVoter;
 use AppBundle\Security\ClaimVoter;
 use AppBundle\Service\BacsService;
 use AppBundle\Service\ClaimsService;
+use AppBundle\Service\InvitationService;
 use AppBundle\Service\PaymentService;
 use AppBundle\Service\PCAService;
 use AppBundle\Service\PolicyService;
 use AppBundle\Service\SequenceService;
+use AppBundle\Service\SmsService;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -135,7 +137,9 @@ class UserJsonController extends BaseController
         }
         $this->denyAccessUnlessGranted(UserVoter::VIEW, $user);
         try {
-            $this->get("app.invitation")->inviteByEmail($policy, $email);
+            /** @var InvitationService $invitationService */
+            $invitationService = $this->get("app.invitation");
+            $invitationService->inviteByEmail($policy, $email, null, null, 'Onboarding');
             return $this->getSuccessJsonResponse("Email invitation sent.");
         } catch (InvalidPolicyException $e) {
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_POLICY_INVALID_VALIDATION, "Invalid policy.");
@@ -158,6 +162,7 @@ class UserJsonController extends BaseController
     {
         $dm = $this->getManager();
         $chargeRepository = $dm->getRepository(Charge::class);
+        /** @var SmsService $smsService */
         $smsService = $this->get('app.sms');
         $user = $this->getUser();
         $mobileNumber = $user->getMobileNumber();
@@ -178,6 +183,11 @@ class UserJsonController extends BaseController
         if ($sent) {
             $sixpack = $this->get('app.sixpack');
             $sixpack->convertByClientId($user->getId(), $sixpack::EXPERIMENT_APP_LINK_SMS);
+
+            /** @var MixpanelService $mixpanel */
+            $mixpanel = $this->get('app.mixpanel');
+            $mixpanel->queueTrackWithUser($user, MixpanelService::EVENT_TEST, ['Test Name' => 'SMS Download Link']);
+
             return $this->getSuccessJsonResponse("Sms invitation sent.");
         } else {
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, "Sms could not be sent.");
