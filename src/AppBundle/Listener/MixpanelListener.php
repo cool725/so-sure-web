@@ -2,9 +2,13 @@
 
 namespace AppBundle\Listener;
 
+use AppBundle\Document\BacsPaymentMethod;
 use AppBundle\Document\User;
+use AppBundle\Event\BacsEvent;
+use AppBundle\Event\CardEvent;
 use AppBundle\Event\PaymentEvent;
 use AppBundle\Event\PolicyEvent;
+use AppBundle\Event\UserEvent;
 use AppBundle\Event\UserPaymentEvent;
 use AppBundle\Service\MixpanelService;
 use Doctrine\ODM\MongoDB\DocumentManager;
@@ -113,6 +117,33 @@ class MixpanelListener
             'Policy Id' => $policy->getId(),
             'Status' => $policy->getStatus(),
             'Previous Status' => $event->getPreviousStatus(),
+        ]);
+    }
+
+    public function onCardUpdatedEvent(CardEvent $event)
+    {
+        $user = $event->getUser();
+        $this->mixpanel->queueTrackWithUser($user, MixpanelService::EVENT_PAYMENT_METHOD_CHANGED, [
+            'Previous Payment Method' => 'judo',
+            'Payment Method' => 'judo',
+        ]);
+    }
+
+    public function onBacsUpdatedEvent(BacsEvent $event)
+    {
+        $user = $event->getUser();
+        $this->mixpanel->queueTrackWithUser($user, MixpanelService::EVENT_PAYMENT_METHOD_CHANGED, [
+            'Previous Payment Method' => 'bacs',
+            'Payment Method' => 'bacs',
+        ]);
+    }
+
+    public function onUserPaymentMethodChangedEvent(UserEvent $event)
+    {
+        $user = $event->getUser();
+        $this->mixpanel->queueTrackWithUser($user, MixpanelService::EVENT_PAYMENT_METHOD_CHANGED, [
+            'Previous Payment Method' => $event->getPreviousPaymentMethod(),
+            'Payment Method' => $user->getPaymentMethod() ? $user->getPaymentMethod()->getType() : null,
         ]);
     }
 }
