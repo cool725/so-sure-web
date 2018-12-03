@@ -366,6 +366,7 @@ services:
             - "@templating"
             - "@snc_redis.default"
             - "%kernel.environment%"
+            - "@app.mixpanel"
 
     app.branch:
         alias: AppBundle\Service\BranchService
