@@ -92,28 +92,35 @@
                         <tr>
                             <td>Policy Status</td>
                             <td>
-                                {{ policy.status }} {% if not policy.isPolicy %}Pre-pending{% endif %}
-                                {% if policy.cancelledReason %}
-                                    / {{ policy.cancelledReason }}
-                                {% endif %}
-                                {% if policy.getRequestedCancellationReason %}
-                                    / {{ policy.getRequestedCancellationReason }}
-                                {% endif %}
-                                {% if is_granted('ROLE_ADMIN') %}
-                                    {% set settable_alternative_status = null %}
-                                    {% if policy.status == 'active' %}
-                                        {% set settable_alternative_status = 'unpaid' %}
-                                    {% endif %}
-                                    {% if policy.status == 'unpaid' %}
-                                        {% set settable_alternative_status = 'active' %}
-                                    {% endif %}
-                                    {% if settable_alternative_status %}
-                                        <a class="btn btn-sm btn-danger confirm-submit" data-confirm-msg="Are you sure you want to change the policy status?"
-                                            href="{{ path('admin_policy_set_status', { id: policy.id, policyNewStatus: settable_alternative_status}) }}">
-                                            set as  {{ settable_alternative_status }}</a>
-                                    {% endif %}
-                                {% endif %}
+                                {{ policy.status }}
+                                <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#policyStatusForm">
+                                    <span class="glyphicon glyphicon-new-window" aria-hidden="true"></span>
+                                    Change Status
+                                </button>
                             </td>
+                            {#<td>#}
+                                {#{{ policy.status }} {% if not policy.isPolicy %}Pre-pending{% endif %}#}
+                                {#{% if policy.cancelledReason %}#}
+                                    {#/ {{ policy.cancelledReason }}#}
+                                {#{% endif %}#}
+                                {#{% if policy.getRequestedCancellationReason %}#}
+                                    {#/ {{ policy.getRequestedCancellationReason }}#}
+                                {#{% endif %}#}
+                                {#{% if is_granted('ROLE_ADMIN') %}#}
+                                    {#{% set settable_alternative_status = null %}#}
+                                    {#{% if policy.status == 'active' %}#}
+                                        {#{% set settable_alternative_status = 'unpaid' %}#}
+                                    {#{% endif %}#}
+                                    {#{% if policy.status == 'unpaid' %}#}
+                                        {#{% set settable_alternative_status = 'active' %}#}
+                                    {#{% endif %}#}
+                                    {#{% if settable_alternative_status %}#}
+                                        {#<a class="btn btn-sm btn-danger confirm-submit" data-confirm-msg="Are you sure you want to change the policy status?"#}
+                                            {#href="{{ path('admin_policy_set_status', { id: policy.id, policyNewStatus: settable_alternative_status}) }}">#}
+                                            {#set as  {{ settable_alternative_status }}</a>#}
+                                    {#{% endif %}#}
+                                {#{% endif %}#}
+                            {#</td>#}
                         </tr>
                         {% if policy.isPolicy %}
                         <tr>
@@ -1130,15 +1137,6 @@
                         </button>
                     </td>
                 </tr>
-
-                <tr>
-                    <td><i class="fa fa-lock" title="Admin only"></i> Policy Status</td>
-                    <td>
-                        {{ policy.status }}
-                        <button type="button" class="btn btn-danger" data-toggle="modal"
-                                data-target="#policyStatusForm">Change Status</button>
-                    </td>
-                </tr>
                 {% endif %}
             </table>
 
@@ -1146,7 +1144,6 @@
             {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:AdminEmployee:picsureForm', 'policy': policy, 'id': 'picsureForm'} %}
             {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:Admin:salvaRequeueForm', 'policy': policy, 'id': 'salvaRequeueForm'} %}
             {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:Admin:salvaStatusForm', 'policy': policy, 'id': 'salvaStatusForm'} %}
-            {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:Admin:policyStatusForm', 'policy': policy, 'id': 'policyStatusForm'} %}
 
             {% endif %}
             {% if is_granted('ROLE_ADMIN') %}
@@ -1589,3 +1586,5 @@
             </div>
         </div>
     {% endif %}
+
+    {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:Admin:policyStatusForm', 'policy': policy, 'id': 'policyStatusForm'} %}
