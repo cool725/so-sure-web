@@ -81,7 +81,7 @@ class SmsServiceTest extends WebTestCase
         static::$requestService->setEnvironment('prod');
         static::$sms->sendTemplate(
             static::generateRandomMobile(),
-            'AppBundle:Sms:failedPayment-1.txt.twig',
+            'AppBundle:Sms:card/failedPayment-2.txt.twig',
             ['policy' => $policy],
             $policy,
             Charge::TYPE_SMS_PAYMENT,

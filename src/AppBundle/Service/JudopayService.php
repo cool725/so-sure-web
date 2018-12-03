@@ -1022,6 +1022,11 @@ class JudopayService
      */
     public function failedPaymentEmail(Policy $policy, $failedPayments, \DateTime $next = null)
     {
+        // email only supported for 1, 2, 3, & 4
+        if ($failedPayments < 1 || $failedPayments > 4) {
+            return;
+        }
+
         $subject = sprintf('Payment failure for your so-sure policy %s', $policy->getPolicyNumber());
         if ($policy->hasMonetaryClaimed(true, true)) {
             $baseTemplate = sprintf('AppBundle:Email:card/failedPaymentWithClaim');
@@ -1050,6 +1055,11 @@ class JudopayService
     private function failedPaymentSms(Policy $policy, $failedPayments, \DateTime $next = null)
     {
         if ($this->environment != 'prod') {
+            return;
+        }
+
+        // sms only supported for 2, 3, & 4
+        if ($failedPayments < 2 || $failedPayments > 4) {
             return;
         }
 
