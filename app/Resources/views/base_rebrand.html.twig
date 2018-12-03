@@ -7,8 +7,6 @@
 
         <title>{% block title %}so-sure{% endblock %}</title>
 
-        {% block meta %}{% endblock %}
-
         {% if use_fa_cdn %}
             <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.2.0/css/all.css" integrity="sha384-TXfwrfuHVznxCssTxWoPZjhcss/hp38gEOH8UPZG/JcXonvBQ6SlsIF49wUzsGno" crossorigin="anonymous">
         {% else %}
@@ -24,6 +22,8 @@
         {% block cssPage %}{% endblock %}
 
         {% include '::meta_rebrand.html.twig' %}
+
+        {% block meta %}{% endblock %}
 
         <script>
             var dataLayer = window.dataLayer = window.dataLayer || [];
