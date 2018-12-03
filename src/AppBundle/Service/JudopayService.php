@@ -1017,6 +1017,7 @@ class JudopayService
 
     /**
      * @param Policy    $policy
+     * @param int       $failedPayments
      * @param \DateTime $next
      */
     public function failedPaymentEmail(Policy $policy, $failedPayments, \DateTime $next = null)
@@ -1043,6 +1044,7 @@ class JudopayService
 
     /**
      * @param Policy    $policy
+     * @param int       $failedPayments
      * @param \DateTime $next
      */
     private function failedPaymentSms(Policy $policy, $failedPayments, \DateTime $next = null)
