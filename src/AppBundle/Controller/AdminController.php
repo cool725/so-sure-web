@@ -1531,7 +1531,7 @@ class AdminController extends BaseController
     }
 
     /**
-     * @Route("/polic-status/{id}", name="policy_status_form")
+     * @Route("/policy-status/{id}", name="policy_status_form")
      * @Template
      */
     public function policyStatusFormAction(Request $request, $id = null)
