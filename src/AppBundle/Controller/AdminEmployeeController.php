@@ -2311,17 +2311,17 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                 $tasteCardForm->handleRequest($request);
                 if ($tasteCardForm->isValid()) {
                     $policyService = $this->get("app.policy");
-                    if ($tasteCardForm->get("update")) {
+                    if ($tasteCardForm->getClickedButton()->getName() === "update") {
                         $tasteCard = $this->conformAlphanumeric($tasteCardForm->get("number")->getData(), 10, 10);
                         if ($tasteCard) {
                             $policy->setTasteCard($tasteCard);
                             $dm->flush();
                             $policyService->tasteCardEmail($policy);
-                            $this->addFlash("success", "Tastecard is now set.");
+                            $this->addFlash("success", "Tastecard set to {$tasteCard}.");
                         } else {
                             $this->addFlash("error", "Tastecard number must be 10 alphanumeric characters.");
                         }
-                    } elseif ($tasteCardForm->get("resend")) {
+                    } elseif ($tasteCardForm->getClickedButton()->getName() === "resend") {
                         $policyService->tasteCardEmail($policy);
                         $this->addFlash('success', 'Tastecard notification has been resent.');
                     }

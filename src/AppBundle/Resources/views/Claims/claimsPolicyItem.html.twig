@@ -136,23 +136,6 @@
                                     <td>Policy Dates</td>
                                     <td>{{ policy.start | date('d M Y H:i', 'Europe/London') }} - {{ policy.end | date('d M Y H:i', 'Europe/London') }}</td>
                                 </tr>
-                                <tr>
-                                    <td>Taste Card</td>
-                                    <td>
-                                        <p>
-                                            {% if policy.tasteCard is defined %}
-                                                <strong>{{ policy.tasteCard }}</strong>
-                                            {% else %}
-                                                No TasteCard.
-                                            {% endif %}
-                                        </p>
-                                        <p>
-                                            <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#tasteCardForm">
-                                                Update
-                                            </button>
-                                        </p>
-                                    </td>
-                                </tr>
                                 {% endif %}
                             </table>
                         </div>
@@ -625,7 +608,7 @@
                     </div>
                 </div>
             </div>
-            {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:AdminEmployee:tasteCardForm', 'policy': policy, 'id': 'tasteCardForm'} %}
+
         </div>
         <div role="tabpanel" class="tab-pane" id="claims">
             <h4>Claims</h4>
@@ -945,6 +928,23 @@
                         {{ form_end(resend_email_form) }}
                       </td>
                 </tr>
+                <tr>
+                    <td>Taste Card</td>
+                    <td>
+                        <p>
+                            {% if policy.tasteCard is defined %}
+                                <strong>{{ policy.tasteCard }}</strong>
+                            {% else %}
+                                No TasteCard.
+                            {% endif %}
+                        </p>
+                        <p>
+                            <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#tasteCardForm">
+                                Update
+                            </button>
+                        </p>
+                    </td>
+                </tr>
             </table>
             <h3>Photos</h3>
             <table class="table table-striped">
@@ -1236,6 +1236,7 @@
 
             {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:AdminEmployee:imeiForm', 'policy': policy, 'id': 'imeiForm'} %}
             {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:AdminEmployee:picsureForm', 'policy': policy, 'id': 'picsureForm'} %}
+            {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:AdminEmployee:tasteCardForm', 'policy': policy, 'id': 'tasteCardForm'} %}
             {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:Admin:salvaRequeueForm', 'policy': policy, 'id': 'salvaRequeueForm'} %}
             {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:Admin:salvaStatusForm', 'policy': policy, 'id': 'salvaStatusForm'} %}
 
