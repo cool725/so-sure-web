@@ -626,7 +626,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
     }
 
     /**
-     * @Route("/claims-form/{id}", name="claims_form")
+     * @Route("/claims-form/{id}", name="admin_claims_form")
      */
     public function claimsFormAction(Request $request, $id = null)
     {
@@ -638,7 +638,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         $claimsForm = $this->get('form.factory')
             ->createNamedBuilder('claims_form', ClaimInfoType::class, $claim)
             ->setAction($this->generateUrl(
-                'claims_form',
+                'admin_claims_form',
                 ['id' => $id]
             ))
             ->getForm();

@@ -320,7 +320,7 @@ class ClaimsController extends BaseController
     }
 
     /**
-     * @Route("/claims-form/{id}", name="claims_form")
+     * @Route("/claims-form/{id}", name="claims_claims_form")
      */
     public function claimsFormAction(Request $request, $id = null)
     {
@@ -332,7 +332,7 @@ class ClaimsController extends BaseController
         $claimsForm = $this->get('form.factory')
             ->createNamedBuilder('claims_form', ClaimInfoType::class, $claim)
             ->setAction($this->generateUrl(
-                'claims_form',
+                'claims_claims_form',
                 ['id' => $id]
             ))
             ->getForm();
@@ -347,11 +347,7 @@ class ClaimsController extends BaseController
                         sprintf('Claim %s updated', $claim->getNumber())
                     );
 
-                    if ($claim->getPolicy()) {
-                        return $this->redirectToRoute('admin_policy', ['id' => $claim->getPolicy()->getId()]);
-                    } else {
-                        return $this->redirectToRoute('admin_claims', ['id' => $id]);
-                    }
+                    return $this->redirectToRoute('claims_claims');
                 }
             }
         }
