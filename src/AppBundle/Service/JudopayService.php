@@ -965,16 +965,16 @@ class JudopayService
                     // intercom campaign should be handling addition if its the same payment problem
                     \AppBundle\Classes\NoOp::ignore([]);
                 } else {
-                    $this->failedPaymentEmail($policy, $next);
+                    $this->failedPaymentEmail($policy, $failedPayments, $next);
                 }
             } else {
-                $this->failedPaymentEmail($policy, $next);
+                $this->failedPaymentEmail($policy, $failedPayments, $next);
             }
 
             // Sms is quite invasive and occasionlly a failed payment will just work the next time
             // so allow 1 failed payment before sending sms
             if ($failedPayments > 1) {
-                $this->failedPaymentSms($policy, $next);
+                $this->failedPaymentSms($policy, $failedPayments, $next);
             }
         }
     }
@@ -999,7 +999,7 @@ class JudopayService
             return false;
         }
 
-        $baseTemplate = sprintf('AppBundle:Email:policy/cardExpiring');
+        $baseTemplate = sprintf('AppBundle:Email:card/cardExpiring');
         $htmlTemplate = sprintf("%s.html.twig", $baseTemplate);
         $textTemplate = sprintf("%s.txt.twig", $baseTemplate);
 
@@ -1019,25 +1019,17 @@ class JudopayService
      * @param Policy    $policy
      * @param \DateTime $next
      */
-    public function failedPaymentEmail(Policy $policy, \DateTime $next = null)
+    public function failedPaymentEmail(Policy $policy, $failedPayments, \DateTime $next = null)
     {
         $subject = sprintf('Payment failure for your so-sure policy %s', $policy->getPolicyNumber());
         if ($policy->hasMonetaryClaimed(true, true)) {
-            $baseTemplate = sprintf('AppBundle:Email:policy/failedPaymentWithClaim');
-
-            if (!$next) {
-                $baseTemplate = sprintf('AppBundle:Email:policy/failedPaymentWithClaimFinal');
-            }
+            $baseTemplate = sprintf('AppBundle:Email:card/failedPaymentWithClaim');
         } else {
-            $baseTemplate = sprintf('AppBundle:Email:policy/failedPayment');
-
-            if (!$next) {
-                $baseTemplate = sprintf('AppBundle:Email:policy/failedPaymentFinal');
-            }
+            $baseTemplate = sprintf('AppBundle:Email:card/failedPayment');
         }
 
-        $htmlTemplate = sprintf("%s.html.twig", $baseTemplate);
-        $textTemplate = sprintf("%s.txt.twig", $baseTemplate);
+        $htmlTemplate = sprintf("%s-%d.html.twig", $baseTemplate, $failedPayments);
+        $textTemplate = sprintf("%s-%d.txt.twig", $baseTemplate, $failedPayments);
 
         $this->mailer->sendTemplateToUser(
             $subject,
@@ -1053,16 +1045,13 @@ class JudopayService
      * @param Policy    $policy
      * @param \DateTime $next
      */
-    private function failedPaymentSms(Policy $policy, \DateTime $next = null)
+    private function failedPaymentSms(Policy $policy, $failedPayments, \DateTime $next = null)
     {
         if ($this->environment != 'prod') {
             return;
         }
 
-        $smsTemplate = 'AppBundle:Sms:failedPayment.txt.twig';
-        if (!$next) {
-            $smsTemplate = 'AppBundle:Sms:failedPaymentFinal.txt.twig';
-        }
+        $smsTemplate = sprintf('AppBundle:Sms:card/failedPayment-%d.txt.twig', $failedPayments);
         $this->sms->sendUser($policy, $smsTemplate, ['policy' => $policy, 'next' => $next], Charge::TYPE_SMS_PAYMENT);
     }
 
