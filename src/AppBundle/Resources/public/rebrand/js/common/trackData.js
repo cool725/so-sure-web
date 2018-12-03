@@ -15,6 +15,8 @@ const tracking = (name, type, location, callback) => {
     } else if (type == 'scode') {
         url = '/ops/track/scode/' + location;
 
+        console.log(name, type, location);
+
     // Track by onboarding & location
     } else if (type == 'onboarding') {
         url = '/ops/track/onboarding/' + location;
@@ -27,8 +29,6 @@ const tracking = (name, type, location, callback) => {
     }
 
     $.get(url).always(callback);
-
-    console.log(callback);
 }
 
 export default tracking;

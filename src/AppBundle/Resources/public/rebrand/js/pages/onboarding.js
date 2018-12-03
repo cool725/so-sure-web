@@ -131,6 +131,8 @@ $(function() {
     clipboard.on('success', function(e) {
         $('.btn-copy').tooltip({'title':   'Copied 😀','trigger': 'manual'}).tooltip('show');
 
+        tracking('scode', 'scode', 'oboarding');
+
         setTimeout(function() {
             $('.btn-copy').tooltip('hide');
         }, 1500);
