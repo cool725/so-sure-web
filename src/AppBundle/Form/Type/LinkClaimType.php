@@ -18,7 +18,7 @@ class LinkClaimType extends AbstractType
                 'required' => false
             ])
             ->add('number', TextType::class, [
-                'required' => true
+                'required' => false
             ])
             ->add('note', TextareaType::class)
             ->add('submit', SubmitType::class)
