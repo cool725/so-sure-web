@@ -15,22 +15,16 @@ sosure.track = (function() {
     self.byLocationInvite = function (name, location, callback) {
         var url = '/ops/track/invite/' + name + '/' + location;
         $.get(url, callback);
-
-        console.log(name + ' ' + location);
     }
 
     self.byScode = function (location, callback) {
         var url = '/ops/track/scode/' + location;
         $.get(url, callback);
-
-        console.log(location);
     }
 
     self.byScode = function (location, callback) {
         var url = '/ops/track/scode/' + location;
         $.get(url, callback);
-
-        console.log(location);
     }
 
     return self;
