@@ -46,11 +46,20 @@ class Promotion
     protected $name;
 
     /**
+     * Stores the date at which the promotion was created.
      * @Assert\DateTime()
      * @MongoDB\Field(type="date")
      * @Gedmo\Versioned
      */
     protected $start;
+
+    /**
+     * Stores the date at which the promotion was made inactive.
+     * @Assert\DateTime()
+     * @MongoDB\Field(type="date")
+     * @Gedmo\Versioned
+     */
+    protected $end;
 
     /**
      * Stores whether the promotion is considered ongoing or concluded.
@@ -147,6 +156,9 @@ class Promotion
     public function setActive($active)
     {
         $this->active = $active;
+        if (!$active) {
+            $this->end = new \DateTime();
+        }
     }
 
     public function getCondition()
