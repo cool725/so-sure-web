@@ -71,7 +71,7 @@ class SmsServiceTest extends WebTestCase
 
     public function testSendTemplateCampaign()
     {
-        static::$redis->del(MixpanelService::KEY_MIXPANEL_QUEUE);
+        static::$redis->del([MixpanelService::KEY_MIXPANEL_QUEUE]);
 
         $policy = static::createUserPolicy(true);
         static::$dm->persist($policy);
