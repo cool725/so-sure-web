@@ -98,6 +98,7 @@ class AffiliateService
                 );
             }
         }
+        $this->dm->flush();
         return $generatedCharges;
     }
 
@@ -108,7 +109,7 @@ class AffiliateService
      * @param array            $generatedCharges is an optional reference to an array in which generated charges can go.
      * @return array the generated charges array.
      */
-    public function oneOffCharges($affiliate, \DateTime $date, & $generatedCharges = [])
+    public function oneOffCharges(AffiliateCompany $affiliate, \DateTime $date, & $generatedCharges = [])
     {
         $users = $this->getMatchingUsers($affiliate, $date);
         foreach ($users as $user) {
@@ -127,18 +128,20 @@ class AffiliateService
      * @return array|null the generated charges array, or null if the current state is ambiguous and a notice has been
      *                    logged.
      */
-    public function ongoingCharges($affiliate, \DateTime $date, & $generatedCharges = [])
+    public function ongoingCharges(AffiliateCompany $affiliate, \DateTime $date, & $generatedCharges = [])
     {
-        $renewalDays = new DateInterval("P".($affiliate->getRenewalDays() ?: 0)."D");
+        $days = ($affiliate->getRenewalDays() ?: 0) - ($affiliate->getDays() ?: 0);
+        $renewalDays = new DateInterval("P{$days}D");
         $renewalWait = clone $date;
-        $renewalWait->sub(new DateInterval("P1Y"))->add($renewalDays);
+        $renewalWait->sub(new DateInterval("P1Y"))->sub($renewalDays);
         $users = $this->getMatchingUsers($affiliate, $date);
         foreach ($users as $user) {
             $policies = $user->getValidPolicies(true);
             $charge = $this->chargeRepository->findLastByUser($user, Charge::TYPE_AFFILIATE);
             if (count($policies) == 1) {
                 if (($charge && $charge->getCreatedDate() < $renewalWait) || !$charge) {
-                    $generatedCharges[] = $this->createCharge($affiliate, $user, $policies[0], $date);
+                    $charge = $this->createCharge($affiliate, $user, $policies[0], $date);
+                    $generatedCharges[] = $charge;
                 }
             } elseif ($charge) {
                 foreach ($policies as $policy) {
@@ -147,7 +150,8 @@ class AffiliateService
                         if ($previous->getAffiliate()) {
                             if ($policy->isPolicyOldEnough($affiliate->getRenewalDays(), $date) &&
                                 !$policy->getAffiliate()) {
-                                $generatedCharges[] = $this->createCharge($affiliate, $user, $policy, $date);
+                                $charge = $this->createCharge($affiliate, $user, $policy, $date);
+                                $generatedCharges[] = $charge;
                             }
                         } else {
                             $this->logger->error(
@@ -223,7 +227,7 @@ class AffiliateService
      * @param \DateTime        $date      is the time and date to be considered as current.
      * @return Charge the charge that has been created.
      */
-    private function createCharge($affiliate, $user, $policy, \DateTime $date)
+    private function createCharge(AffiliateCompany $affiliate, User $user, Policy $policy, \DateTime $date)
     {
         $charge = new Charge();
         $charge->setAmount($affiliate->getCPA());
@@ -232,11 +236,11 @@ class AffiliateService
         $charge->setUser($user);
         $charge->setAffiliate($affiliate);
         $charge->setPolicy($policy);
-        if (!$policy->getAffiliate()) {
+        if ($policy->getAffiliate() === null) {
             $affiliate->addConfirmedPolicies($policy);
         }
         $this->dm->persist($charge);
-        $this->dm->flush();
+        $this->dm->persist($affiliate);
         return $charge;
     }
 }

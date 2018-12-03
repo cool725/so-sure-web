@@ -15,19 +15,16 @@ class AffiliateCommand extends ContainerAwareCommand
     const SERVICE_NAME = 'sosure:admin:affiliate';
     protected static $defaultName = self::SERVICE_NAME;
 
-    private $affiliateRepository;
     private $affiliateService;
 
     /**
      * Sets up the AffiliateCommand with it's dependencies.
      * @param AffiliateService $affiliateService is the affiliate service.
-     * @param DocumentManager  $dm               is the database document manager.
      */
-    public function __construct(AffiliateService $affiliateService, DocumentManager $dm)
+    public function __construct(AffiliateService $affiliateService)
     {
         parent::__construct();
         $this->affiliateService = $affiliateService;
-        $this->affiliateRepository = $dm->getRepository(AffiliateCompany::class);
     }
 
     protected function configure()

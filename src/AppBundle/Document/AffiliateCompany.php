@@ -113,9 +113,13 @@ class AffiliateCompany extends Company
         return $this->days;
     }
 
-    public function setRenewalDays(int $renewalDays)
+    public function setRenewalDays($renewalDays)
     {
-        $this->renewalDays = $renewalDays;
+        if ($renewalDays === null) {
+            $this->renewalDays = 0;
+        } else {
+            $this->renewalDays = $renewalDays;
+        }
     }
 
     public function getRenewalDays()

@@ -1058,7 +1058,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         return $policies;
     }
 
-    public function isAffiliateCandidate($days, $date)
+    public function isAffiliateCandidate($days, \DateTime $date)
     {
         foreach ($this->getValidPolicies(true) as $policy) {
             /** @var Policy $policy */
