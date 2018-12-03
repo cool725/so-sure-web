@@ -43,28 +43,19 @@ class PromotionService
      */
     public function generate($promotions = null, \DateTime $date = null)
     {
-        if ($promotions === null) {
-            $promotions = $this->dm->getRepository(Promotion::class)->findBy([]);
-        }
         if (!$date) {
             $date = new \DateTime();
         }
-        foreach ($promotions as $promotion) {
-            $participations = $promotion->getParticipating();
-            foreach ($participations as $participation) {
-                if ($participation->getStatus() != Participation::STATUS_ACTIVE) {
-                    // TODO: this will turn into a waste of time when there are a heap of completed participations.
-                    //       I could make a query to get only the active ones.
-                    continue;
-                }
-                $policy = $participation->getPolicy();
-                // check for existing tastecard to invalidate.
-                // TODO: maybe there is another case like this if reward pot is too full or something but I will have to
-                //       check that with someone later. If so I will add a function.
-                if ($promotion->getReward() == Promotion::REWARD_TASTE_CARD && $policy->getTasteCard()) {
-                    $this->endParticipation($participation, Participation::STATUS_INVALID);
-                    continue;
-                }
+        $participationRepository = $this->dm->getRepository(Participation::class);
+        $participations = $participationRepository->findByStatus(Participation::STATUS_ACTIVE, $promotions);
+        foreach ($participations as $participation) {
+            $policy = $participation->getPolicy();
+            if ($participation->getPromotion()->getReward() == Promotion::REWARD_TASTE_CARD &&
+                $policy->getTasteCard()
+            ) {
+                // NOTE: if more conditions of failure emerge then this should become a function.
+                $this->endParticipation($participation, Participation::STATUS_INVALID);
+            } else {
                 $this->checkConditions($participation, $date);
             }
         }
