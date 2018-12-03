@@ -707,11 +707,11 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                     $claimId = $linkClaimform->get('id')->getData();
                     $claimNumber = $linkClaimform->get('number')->getData();
 
-                    if ($claimId != null) {
+                    if ($claimId) {
                         $qb->addAnd($qb->expr()->field('_id')->equals($claimId));
                     }
 
-                    if ($claimNumber != null) {
+                    if ($claimNumber) {
                         $qb->addAnd($qb->expr()->field('number')->equals($claimNumber));
                     }
 
@@ -720,11 +720,13 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                     if ($res->count() > 1) {
                         $this->addFlash(
                             'error',
-                            sprintf('Too many matches, please be more specific')
+                            sprintf('Too many matches, please specify more details')
                         );
 
                         return $this->redirectToRoute('admin_policy', ['id' => $id]);
-                    } elseif ($res->count() === 0) {
+                    }
+
+                    if ($res->count() === 0) {
                         $this->addFlash(
                             'error',
                             sprintf('No claim matched')
