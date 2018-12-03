@@ -73,7 +73,7 @@ class BacsReportCommand extends ContainerAwareCommand
             $this->mailerService->send(
                 'Bacs Report Input',
                 'tech+ops@so-sure.com',
-                sprintf('Bacs Report Input Results: %s', $data)
+                sprintf('Bacs Report Input Results:<br /> %s', nl2br($data))
             );
         } else {
             $output->writeln('Nothing to process');
