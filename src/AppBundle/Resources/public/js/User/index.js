@@ -62,7 +62,7 @@ $(function(){
     clipboard.on('success', function(event) {
         $('.btn-copy').tooltip('show');
 
-        sosure.track.byScode('user-home');
+        sosure.track.byScodeCopied('user-home');
 
         setTimeout(function() { $('.btn-copy').tooltip('hide'); }, 1500);
     });
@@ -77,7 +77,7 @@ $(function(){
         showCount: false,
         on: {
             click: function(e) {
-                sosure.track.byLocationInvite(this.share, 'user-home');
+                sosure.track.byInvite(this.share, 'user-home');
             }
         }
     });

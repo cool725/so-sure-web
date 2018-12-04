@@ -3,16 +3,12 @@
 const tracking = (name, type, location, callback) => {
     let url;
 
-    // Track by invite
-    if (type == 'invite') {
-        url = '/ops/track/invite/' + name;
-
     // Track by invite & location
-    } else if (type == 'locationinvite') {
+    if (type == 'invite') {
         url = '/ops/track/invite/' + name + '/' + location;
 
     // Track by scode used & location
-    } else if (type == 'scode') {
+    } else if (type == 'scodecopied') {
         url = '/ops/track/scode/' + location;
 
     // Track by onboarding & name

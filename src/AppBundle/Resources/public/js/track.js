@@ -12,18 +12,13 @@ sosure.track = (function() {
         $.get(url, callback);
     }
 
-    self.byLocationInvite = function (name, location, callback) {
+    self.byInvite = function (name, location, callback) {
         var url = '/ops/track/invite/' + name + '/' + location;
         $.get(url, callback);
     }
 
-    self.byScode = function (location, callback) {
-        var url = '/ops/track/scode/' + location;
-        $.get(url, callback);
-    }
-
-    self.byScode = function (location, callback) {
-        var url = '/ops/track/scode/' + location;
+    self.byScodeCopied = function (location, callback) {
+        var url = '/ops/track/scodecopied/' + location;
         $.get(url, callback);
     }
 

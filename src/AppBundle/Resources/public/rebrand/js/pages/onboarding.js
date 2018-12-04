@@ -133,7 +133,7 @@ $(function() {
     clipboard.on('success', function(e) {
         $('.btn-copy').tooltip({'title':   'Copied 😀','trigger': 'manual'}).tooltip('show');
 
-        tracking('', 'scode', 'oboarding');
+        tracking('', 'scodecopied', 'onboarding');
 
         setTimeout(function() {
             $('.btn-copy').tooltip('hide');
@@ -155,7 +155,7 @@ $(function() {
         on: {
             click: function(e) {
                 let location = 'onboarding';
-                tracking(this.share, 'locationinvite', location);
+                tracking(this.share, 'invite', location);
             }
         }
     });
