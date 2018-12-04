@@ -2,14 +2,16 @@
 
 namespace AppBundle\Tests\Listener;
 
-use Doctrine\ODM\MongoDB\DocumentManager;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Component\HttpFoundation\Request;
-use AppBundle\Listener\TasteCardListener;
-use AppBundle\Document\User;
-use AppBundle\Tests\UserClassTrait;
 use AppBundle\Document\Policy;
+use AppBundle\Document\User;
+use AppBundle\Document\PhonePremium;
+use AppBundle\Event\PolicyEvent;
+use AppBundle\Listener\TasteCardListener;
 use AppBundle\Service\MailerService;
+use AppBundle\Tests\UserClassTrait;
+use Doctrine\ODM\MongoDB\DocumentManager;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use PHPUnit\Framework\MockObject\MockObject;
 
 /**
@@ -49,8 +51,8 @@ class TasteCardListenerTest extends WebTestCase
         $a = $this->createPersistentUser();
         $b = $this->createPersistentUser();
         $a->setTasteCard($tasteCard);
-        static::$policyService->cancel($a, Policy::CANCELLED_COOLOFF);
-        static::$policyService->cancel($b, Policy::CANCELLED_COOLOFF);
+        static::$policyService->cancel($a, Policy::CANCELLED_DISPOSSESSION);
+        static::$policyService->cancel($b, Policy::CANCELLED_DISPOSSESSION);
         $aEvent = new PolicyEvent($a);
         $bEvent = new PolicyEvent($b);
         // no tastecard so no email.
@@ -63,6 +65,8 @@ class TasteCardListenerTest extends WebTestCase
         $tasteCardListener = new TasteCardListener($mailerService);
         $tasteCardListener->onPolicyCancelledEvent($aEvent);
         $mailerService->__phpunit_verify();
+        // Test is for mailer. This is just so the test is not reported as risky.
+        $this->assertEquals(1, 1);
     }
 
     /**
@@ -71,7 +75,9 @@ class TasteCardListenerTest extends WebTestCase
      */
     private function createPersistentUser()
     {
-        $policy = $this->createUserPolicy();
+        $policy = self::createUserPolicy(true, new \DateTime());
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        $policy->setImei(self::generateRandomImei());
         $user = $policy->getUser();
         $user->setFirstName(uniqid());
         $user->setLastName(uniqid());
