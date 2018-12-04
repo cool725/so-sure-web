@@ -204,7 +204,7 @@ class BICommand extends ContainerAwareCommand
             '"Claim Replacement Received Date"',
             '"Claim handling team"',
             '"Total cost of claim"',
-            '"Claim Close Date"'
+            '"Claim Closed Date"'
         ]);
         foreach ($claims as $claim) {
             /** @var Claim $claim */
