@@ -119,8 +119,9 @@ class PromotionServiceTest extends WebTestCase
         $this->assertEquals(Participation::STATUS_ACTIVE, $bParticipation->getStatus());
         $this->addDays($date, 5);
         $mock = $this->mockMailerSend(1);
-        static::$promotionService->generate([$promotion], $date);
+        $changes = static::$promotionService->generate([$promotion], $date);
         $mock->__phpunit_verify();
+        $this->assertEquals(1, $changes[Participation::STATUS_COMPLETED]);
         $this->assertEquals(Participation::STATUS_COMPLETED, $aParticipation->getStatus());
         $this->assertEquals(Participation::STATUS_COMPLETED, $bParticipation->getStatus());
         // Make sure once it's all done no more stuff happens.
@@ -137,8 +138,9 @@ class PromotionServiceTest extends WebTestCase
         $this->addDays($date, 5);
         $c->setTasteCard("asdfghjklp");
         $mock = $this->mockMailerSend(1);
-        static::$promotionService->generate([$promotion], $date);
+        $changes = static::$promotionService->generate([$promotion], $date);
         $mock->__phpunit_verify();
+        $this->assertEquals(1, $changes[Participation::STATUS_INVALID]);
         $this->assertEquals(Participation::STATUS_INVALID, $cParticipation->getStatus());
         // Add a failure.
         $d = $this->createPersistentUser();
@@ -149,8 +151,9 @@ class PromotionServiceTest extends WebTestCase
         $this->assertEquals(Participation::STATUS_ACTIVE, $dParticipation->getStatus());
         $this->claim($d, $date);
         $mock = $this->mockMailerSend(0);
-        static::$promotionService->generate([$promotion], $date);
+        $changes = static::$promotionService->generate([$promotion], $date);
         $mock->__phpunit_verify();
+        $this->assertEquals(1, $changes[Participation::STATUS_FAILED]);
         $this->assertEquals(Participation::STATUS_FAILED, $dParticipation->getStatus());
     }
 

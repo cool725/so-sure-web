@@ -48,6 +48,7 @@ class PromotionService
         }
         $participationRepository = $this->dm->getRepository(Participation::class);
         $participations = $participationRepository->findByStatus(Participation::STATUS_ACTIVE, $promotions);
+        $endings = [];
         foreach ($participations as $participation) {
             $policy = $participation->getPolicy();
             if ($participation->getPromotion()->getReward() == Promotion::REWARD_TASTE_CARD &&
@@ -55,10 +56,12 @@ class PromotionService
             ) {
                 // NOTE: if more conditions of failure emerge then this should become a function.
                 $this->endParticipation($participation, Participation::STATUS_INVALID);
+                $this->addEnding(Participation::STATUS_INVALID, $endings);
             } else {
-                $this->checkConditions($participation, $date);
+                $this->addEnding($this->checkConditions($participation, $date), $endings);
             }
         }
+        return $endings;
     }
 
     /**
@@ -75,30 +78,29 @@ class PromotionService
         $interval = new \DateInterval("P".$promotion->getPeriod()."D");
         $end = (clone ($participation->getStart()))->add($interval);
         $finished = $end->diff($date)->invert == 0;
-        $completed = 0;
         if ($condition == Promotion::CONDITION_NONE) {
             if ($finished) {
-                $this->endParticipation($participation);
+                return $this->endParticipation($participation);
             }
         } elseif ($condition == Promotion::CONDITION_NO_CLAIMS) {
             if (!empty($policy->getClaimsInPeriod($participation->getStart(), $end))) {
-                $this->endParticipation($participation, Participation::STATUS_FAILED);
+                return $this->endParticipation($participation, Participation::STATUS_FAILED);
             } elseif ($finished) {
-                $this->endParticipation($participation);
-                $completed++;
+                return $this->endParticipation($participation);
             }
         } elseif ($condition == Promotion::CONDITION_INVITES) {
             /** @var InvitationRepository $invitationRepository */
             $invitationRepository = $this->dm->getRepository(Invitation::class);
             $invites = $invitationRepository->count([$policy], $participation->getStart(), $end);
             if ($invites >= $promotion->getConditionEvents()) {
-                $this->endParticipation($participation);
+                return $this->endParticipation($participation);
             } elseif ($finished) {
-                $this->endParticipation($participation, Participation::STATUS_FAILED);
+                return $this->endParticipation($participation, Participation::STATUS_FAILED);
             }
         } else {
             $this->logger->error("Invalid promotion condition: {$condition}.");
         }
+        return null;
     }
 
     /**
@@ -126,6 +128,24 @@ class PromotionService
                     "reason" => "Promotion reward is a tastecard, but user already has a tastecard."
                 ]
             );
+        }
+        return $status;
+    }
+
+    /**
+     * Takes a string and an associative array and if the string is already a key then it incrememnts the value under
+     * that key, and if it is not yet a key then it adds it with the value 1.
+     * @param String $status  is the key value.
+     * @param array  $endings is the associative array to add status to.
+     */
+    private function addEnding($status, & $endings)
+    {
+        if ($status) {
+            if (array_key_exists($status, $endings)) {
+                $endings[$status]++;
+            } else {
+                $endings[$status] = 1;
+            }
         }
     }
 }
