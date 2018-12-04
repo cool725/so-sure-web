@@ -494,7 +494,9 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                     $policy->getUser()->getMobileNumber(),
                     count($approvedClaims),
                     $claimsCost,
-                    $policy->getPolicyExpirationDate()->format('Y-m-d'),
+                    $policy->getPolicyExpirationDate() ?
+                        $policy->getPolicyExpirationDate()->format('Y-m-d') :
+                        null,
                     'FORMULA',
                     $policy->getStatus(),
                     'Yes',
@@ -503,10 +505,10 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                     $note->getOtherActions(),
                     $note->getActions(true),
                     $note->getCategory(),
-                    $policy->getPolicyExpirationDate()->format('W'),
+                    $policy->getPolicyExpirationDate() ? $policy->getPolicyExpirationDate()->format('W') : null,
                     $note->getDate()->format('W'),
                     $note->getDate()->format('M'),
-                    $policy->getPolicyExpirationDate()->format('M'),
+                    $policy->getPolicyExpirationDate() ? $policy->getPolicyExpirationDate()->format('M') : null,
                 ];
                 fputcsv(
                     $handle, // The file pointer
