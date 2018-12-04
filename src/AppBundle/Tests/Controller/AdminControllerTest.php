@@ -7,6 +7,7 @@ use AppBundle\Document\Claim;
 use AppBundle\Document\Charge;
 use AppBundle\Document\CurrencyTrait;
 use AppBundle\DataFixtures\MongoDB\b\User\LoadUserData;
+use AppBundle\Document\Policy;
 
 /**
  * @group functional-net
@@ -135,9 +136,6 @@ class AdminControllerTest extends BaseControllerTest
         $crawler = self::$client->request('GET', '/admin/policy/' . $newPolicy->getId());
         self::verifyResponse(200);
 
-        $button = $crawler->filter('button[data-target="#linkClaimForm"]')->first();
-        $this->assertTrue(isset($button));
-
         $form = $crawler->selectButton('link_claim_form_submit')->form();
 
         $form['link_claim_form[id]'] = $claim->getId();
@@ -149,12 +147,12 @@ class AdminControllerTest extends BaseControllerTest
         self::verifyResponse(200);
 
         $dm = $this->getDocumentManager(true);
-        $repoPolicy = $dm->getRepository(PhonePolicy::class);
-        /** @var PhonePolicy $policy */
+        $repoPolicy = $dm->getRepository(Policy::class);
+        /** @var Policy $updatedPolicy */
         $updatedPolicy = $repoPolicy->find($newPolicy->getId());
 
         $repoClaim = $dm->getRepository(Claim::class);
-        /** @var Claim $claim */
+        /** @var Claim $updatedClaim */
         $updatedClaim = $repoClaim->find($claim->getId());
 
         $linkedClaims = $policy->getLinkedClaims();
