@@ -8,6 +8,7 @@ use Predis\Client;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Psr\Log\LoggerInterface;
 use Doctrine\ODM\MongoDB\DocumentManager;
+use Doctrine\ODM\MongoDB\Id;
 use AppBundle\Document\User;
 use AppBundle\Document\Policy;
 use AppBundle\Document\Stats;
@@ -1006,16 +1007,18 @@ class MixpanelService
     /**
      * If the given user's attribution is null then it gets set to an empty attribution object so it will not be
      * edited in the future.
-     * @param MongoId $userId is the id of the user we are freezing.
+     * @param String $userId is the id of the user we are freezing.
      */
     public function freezeAttribution($userId)
     {
         $userRepository = $this->dm->getRepository(User::class);
+        /** @var User $user */
         $user = $userRepository->find($userId);
-        // If the user has gotten an attribution before this is run then there is nothing to do.
-        if ($user->getAttribution) {
+        // If the user has gotten an attribution before this is run or if they don't exist then there is nothing to do.
+        if (!$user || $user->getAttribution()) {
             return;
         }
+        $attribution = new Attribution();
         $attribution->setCampaignSource(Attribution::SOURCE_UNTRACKED);
         $user->setAttribution($attribution);
         $this->dm->persist($attribution);
