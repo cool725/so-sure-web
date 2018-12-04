@@ -825,7 +825,11 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                     $dm->flush();
                     $this->addFlash(
                         'success',
-                        sprintf('Policy %s successfully linked with claim: %s', $policy->getPolicyNumber(), $linkClaimform->get('number')->getData())
+                        sprintf(
+                            'Policy %s successfully linked with claim: %s',
+                            $policy->getPolicyNumber(),
+                            $linkClaimform->get('number')->getData()
+                        )
                     );
 
                     return $this->redirectToRoute('admin_policy', ['id' => $id]);

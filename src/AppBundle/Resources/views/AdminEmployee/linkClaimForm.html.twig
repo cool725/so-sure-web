@@ -11,15 +11,14 @@
         <hr>
 
         <div class="row">
+            <div class="col-xs-12 col-md-6">
+                <label>Claim Number *</label>
+                {{ form_widget(form.number, {'attr': {'class': 'form-control'}}) }}
+            </div>
 
             <div class="col-xs-12 col-md-6">
                 <label>Claim ID *</label>
                 {{ form_widget(form.id, {'attr': {'class': 'form-control'}}) }}
-            </div>
-
-            <div class="col-xs-12 col-md-6">
-                <label>Claim Number *</label>
-                {{ form_widget(form.number, {'attr': {'class': 'form-control'}}) }}
             </div>
         </div>
 
