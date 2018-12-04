@@ -49,6 +49,7 @@ use DateTimeZone;
 
 class AffiliateService
 {
+    use DateTrait;
     protected $dm;
     protected $logger;
     protected $chargeRepository;
@@ -130,8 +131,7 @@ class AffiliateService
      */
     public function ongoingCharges(AffiliateCompany $affiliate, \DateTime $date, & $generatedCharges = [])
     {
-        $days = ($affiliate->getRenewalDays() ?: 0) - ($affiliate->getDays() ?: 0);
-        $renewalDays = new DateInterval("P{$days}D");
+        $renewalDays = static::intervalDays(($affiliate->getRenewalDays() ?: 0) - ($affiliate->getDays() ?: 0));
         $renewalWait = clone $date;
         $renewalWait->sub(new DateInterval("P1Y"))->sub($renewalDays);
         $users = $this->getMatchingUsers($affiliate, $date);
