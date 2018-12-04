@@ -8,6 +8,7 @@ use AppBundle\Document\File\PaymentRequestUploadFile;
 use AppBundle\Document\JudoPaymentMethod;
 use AppBundle\Document\Note\CallNote;
 use AppBundle\Document\Note\Note;
+use AppBundle\Document\ValidatorTrait;
 use AppBundle\Exception\PaymentDeclinedException;
 use AppBundle\Form\Type\AdminEmailOptOutType;
 use AppBundle\Form\Type\BacsCreditType;
@@ -148,6 +149,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
     use CurrencyTrait;
     use ImeiTrait;
     use ContainerAwareTrait;
+    use ValidatorTrait;
 
     /**
      * @Route("", name="admin_home")
@@ -953,7 +955,10 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             } elseif ($request->request->has('note_form')) {
                 $noteForm->handleRequest($request);
                 if ($noteForm->isValid()) {
-                    $policy->addNoteDetails($noteForm->getData()['notes'], $this->getUser());
+                    $policy->addNoteDetails(
+                        $this->conformAlphanumericSpaceDot($noteForm->getData()['notes'], 2500),
+                        $this->getUser()
+                    );
                     $dm->flush();
                     $this->addFlash(
                         'success',

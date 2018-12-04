@@ -284,7 +284,7 @@ class EmailDebugCommand extends ContainerAwareCommand
                 throw new \Exception('Unable to find matching policy');
             }
 
-            return $this->judopayService->failedPaymentEmail($policy);
+            return $this->judopayService->failedPaymentEmail($policy, 1);
         } elseif (in_array($template, $templates['policyCancellation'])) {
             /** @var PolicyRepository $repo */
             $repo = $this->dm->getRepository(Policy::class);

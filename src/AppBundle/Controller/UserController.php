@@ -200,7 +200,13 @@ class UserController extends BaseController
             $emailInvitationForm->handleRequest($request);
             if ($emailInvitationForm->isSubmitted() && $emailInvitationForm->isValid()) {
                 try {
-                    $invitationService->inviteByEmail($policy, $emailInvitiation->getEmail());
+                    $invitationService->inviteByEmail(
+                        $policy,
+                        $emailInvitiation->getEmail(),
+                        null,
+                        null,
+                        'User Home'
+                    );
                     $this->addFlash(
                         'success',
                         sprintf('%s was invited', $emailInvitiation->getEmail())

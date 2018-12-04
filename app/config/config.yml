@@ -66,7 +66,7 @@ twig:
         branch_key: "%branch_key%"
         drift_key: "%drift_key%"
         use_cdn: true
-        use_fa_cdn: false
+        use_fa_cdn: true
         #default_login_method: "accountkit"
         default_login_method: "accountkit"
         branch_pot_url: "%branch_pot_url%"
