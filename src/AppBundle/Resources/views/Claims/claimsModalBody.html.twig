@@ -1,52 +1,53 @@
 {{ form_start(form) }}
-<div class="modal-content">
-    <div class="modal-header">
+<div class="modal-content" style="border-radius: 6px;">
+    <div class="modal-header" style="border-top-left-radius: 6px; border-top-right-radius: 6px;">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
         </button>
 
         <h4 class="modal-title">Claim: {{ claim.number|default('N/A') }}</h4>
-
-        <ul class="nav nav-pills" id="myTab" role="tablist">
-            <li class="nav-item active">
-                <a class="nav-link" id="general-tab" data-toggle="tab" href="#general" role="tab"
-                   aria-controls="general"
-                   aria-selected="true">General</a>
-            </li>
-            {% if claim.type == 'damage' %}
-                <li class="nav-item">
-                    <a class="nav-link" id="profile-tab" data-toggle="tab" href="#damage" role="tab"
-                       aria-controls="damage"
-                       aria-selected="false">Damage</a>
-                </li>
-            {% elseif claim.type == 'theft' or claim.type == 'loss' %}
-                <li class="nav-item">
-                    <a class="nav-link" id="theftloss-tab" data-toggle="tab" href="#theftloss" role="tab"
-                       aria-controls="theftloss"
-                       aria-selected="false">Theft/Loss</a>
-                </li>
-            {% endif %}
-            <li class="nav-item">
-                <a class="nav-link" id="details-tab" data-toggle="tab" href="#details" role="tab"
-                   aria-controls="details"
-                   aria-selected="false">Details</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" id="costs-tab" data-toggle="tab" href="#costs" role="tab"
-                   aria-controls="amounts"
-                   aria-selected="false">Costs</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" id="update-tab" data-toggle="tab" href="#update" role="tab"
-                   aria-controls="update"
-                   aria-selected="false">Update</a>
-            </li>
-        </ul>
     </div>
-
 
     <div class="modal-body">
         <div class="container-fluid">
+            <ul class="nav nav-pills row" id="myTab" role="tablist">
+                <li class="nav-item active">
+                    <a class="nav-link" id="general-tab" data-toggle="tab" href="#general" role="tab"
+                       aria-controls="general"
+                       aria-selected="true">General</a>
+                </li>
+                {% if claim.type == 'damage' %}
+                    <li class="nav-item">
+                        <a class="nav-link" id="profile-tab" data-toggle="tab" href="#damage" role="tab"
+                           aria-controls="damage"
+                           aria-selected="false">Damage</a>
+                    </li>
+                {% elseif claim.type == 'theft' or claim.type == 'loss' %}
+                    <li class="nav-item">
+                        <a class="nav-link" id="theftloss-tab" data-toggle="tab" href="#theftloss" role="tab"
+                           aria-controls="theftloss"
+                           aria-selected="false">Theft/Loss</a>
+                    </li>
+                {% endif %}
+                <li class="nav-item">
+                    <a class="nav-link" id="details-tab" data-toggle="tab" href="#details" role="tab"
+                       aria-controls="details"
+                       aria-selected="false">Details</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="costs-tab" data-toggle="tab" href="#costs" role="tab"
+                       aria-controls="amounts"
+                       aria-selected="false">Costs</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="update-tab" data-toggle="tab" href="#update" role="tab"
+                       aria-controls="update"
+                       aria-selected="false">Update</a>
+                </li>
+            </ul>
+
+            <br>
+
             <div class="tab-content" id="tab-content">
                 <div class="tab-pane fade in active" id="general" role="tabpanel" aria-labelledby="general-tab">
 
