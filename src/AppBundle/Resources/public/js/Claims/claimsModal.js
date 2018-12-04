@@ -71,7 +71,7 @@ $('#claimsModal').on('show.bs.modal', function (event) {
     ajax.success(function (form) {
         modal.find('.modal-content').html(form);
 
-        $('#claims_form_approvedDate').datetimepicker({
+        modal.find('#claims_form_approvedDate').datetimepicker({
             format: 'DD-MM-YYYY'
         });
     });
