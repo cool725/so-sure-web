@@ -781,41 +781,12 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                 if ($linkClaimform->isValid()) {
                     /** @var ClaimRepository $repo */
                     $repo = $dm->getRepository(Claim::class);
-                    $qb = $repo->createQueryBuilder();
+                    $res = $repo->findClaimByDetails(
+                        $linkClaimform->get('id')->getData(),
+                        $linkClaimform->get('number')->getData()
+                    );
 
-                    $claimId = $linkClaimform->get('id')->getData();
-                    $claimNumber = $linkClaimform->get('number')->getData();
-
-                    if ($claimId) {
-                        $qb->addAnd($qb->expr()->field('_id')->equals($claimId));
-                    }
-
-                    if ($claimNumber) {
-                        $qb->addAnd($qb->expr()->field('number')->equals($claimNumber));
-                    }
-
-                    $res = $qb->getQuery()->execute();
-
-                    if ($res->count() > 1) {
-                        $this->addFlash(
-                            'error',
-                            sprintf('Too many matches, please specify more details')
-                        );
-
-                        return $this->redirectToRoute('admin_policy', ['id' => $id]);
-                    }
-
-                    if ($res->count() === 0) {
-                        $this->addFlash(
-                            'error',
-                            sprintf('No claim matched')
-                        );
-
-                        return $this->redirectToRoute('admin_policy', ['id' => $id]);
-                    }
-
-                    $policy->addLinkedClaim($res->getSingleResult());
-
+                    $policy->addLinkedClaim($res);
                     $policy->addNoteDetails(
                         sprintf(
                             'Linked Claim %s. Notes: %s',
