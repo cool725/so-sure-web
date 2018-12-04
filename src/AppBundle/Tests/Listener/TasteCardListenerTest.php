@@ -15,7 +15,7 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use PHPUnit\Framework\MockObject\MockObject;
 
 /**
- * @group functional-net
+ * @group functional-nonet
  */
 class TasteCardListenerTest extends WebTestCase
 {
@@ -47,7 +47,6 @@ class TasteCardListenerTest extends WebTestCase
     public function testOnPolicyCancelledEvent()
     {
         $tasteCard = "1234567890";
-        $mailerService = $this->createMock(MailerService::class);
         $a = $this->createPersistentUser();
         $b = $this->createPersistentUser();
         $a->setTasteCard($tasteCard);
@@ -56,17 +55,30 @@ class TasteCardListenerTest extends WebTestCase
         $aEvent = new PolicyEvent($a);
         $bEvent = new PolicyEvent($b);
         // no tastecard so no email.
-        $mailerService->expects($this->exactly(0))->method("sendTemplate");
-        $tasteCardListener = new TasteCardListener($mailerService);
-        $tasteCardListener->onPolicyCancelledEvent($bEvent);
-        $mailerService->__phpunit_verify();
+        $this->verifyEvent($bEvent, 0);
         // there is a tastecard so there should also be an email.
-        $mailerService->expects($this->exactly(1))->method("sendTemplate");
-        $tasteCardListener = new TasteCardListener($mailerService);
-        $tasteCardListener->onPolicyCancelledEvent($aEvent);
-        $mailerService->__phpunit_verify();
+        $this->verifyEvent($aEvent, 1);
         // Test is for mailer. This is just so the test is not reported as risky.
         $this->assertEquals(1, 1);
+    }
+
+    /**
+     * Verifies that the taste card listener service sends the right number of emails out on a given event.
+     * @param PolicyEvent $event       is the event being sent to the listener.
+     * @param int         $expectation is the number of emails we anticipate will be sent.
+     */
+    private function verifyEvent($event, $expectation)
+    {
+        /** @var MockObject $mailerService */
+        $mailerService = $this->createMock(MailerService::class);
+        $mailerService->expects($this->exactly($expectation))->method("sendTemplate");
+        /** @var MailerService $mailerService */
+        $mailerService = $mailerService;
+        $tasteCardListener = new TasteCardListener($mailerService);
+        $tasteCardListener->onPolicyCancelledEvent($event);
+        /** @var MockObject $mailerService */
+        $mailerService = $mailerService;
+        $mailerService->__phpunit_verify();
     }
 
     /**
