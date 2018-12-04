@@ -183,7 +183,6 @@ class BICommand extends ContainerAwareCommand
             '"Postcode"',
             '"Claim Type"',
             '"Claim Status"',
-            '"Claim Close Date"',
             '"Claim Location"',
             '"Policy Cancellation Date"',
             '"Policy Cancellation Type"',
@@ -205,6 +204,7 @@ class BICommand extends ContainerAwareCommand
             '"Claim Replacement Received Date"',
             '"Claim handling team"',
             '"Total cost of claim"',
+            '"Claim Close Date"'
         ]);
         foreach ($claims as $claim) {
             /** @var Claim $claim */
@@ -227,7 +227,6 @@ class BICommand extends ContainerAwareCommand
                 sprintf('"%s"', $user->getBillingAddress()->getPostcode()),
                 sprintf('"%s"', $claim->getType()),
                 sprintf('"%s"', $claim->getStatus()),
-                sprintf('"%s"', $claim->getClosedDate() ? $claim->getClosedDate()->format('Y-m-d') : ''),
                 sprintf('"%s"', $claim->getLocation()),
                 sprintf('"%s"', $policy->getCancelledReason() ? $policy->getEnd()->format('Y-m-d H:i:s') : ""),
                 sprintf('"%s"', $policy->getCancelledReason() ? $policy->getCancelledReason() : ""),
@@ -262,6 +261,7 @@ class BICommand extends ContainerAwareCommand
                 ),
                 sprintf('"%s"', $claim->getHandlingTeam()),
                 sprintf('"%0.2f"', $claim->getTotalIncurred()),
+                sprintf('"%s"', $claim->getClosedDate() ? $claim->getClosedDate()->format('Y-m-d') : '')
             ]);
         }
         if (!$skipS3) {
