@@ -817,7 +817,11 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                     $policy->addLinkedClaim($res->getSingleResult());
 
                     $policy->addNoteDetails(
-                        $linkClaimform->getData()['note'],
+                        sprintf(
+                            'Linked Claim %s. Notes: %s',
+                            $linkClaimform->get('number')->getData(),
+                            $linkClaimform->get('note')->getData()
+                        ),
                         $this->getUser()
                     );
 
