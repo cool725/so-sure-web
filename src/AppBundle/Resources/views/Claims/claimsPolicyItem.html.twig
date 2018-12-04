@@ -672,12 +672,15 @@
             {% endif %}
             <hr />
             <h4>
-                Linked Claims (e.g. Policy Upgrade)
                 {% if is_granted('ROLE_CUSTOMER_SERVICES') %}
+                <i class="fa fa-shield" title="Customer Service only"></i>
+                Linked Claims (e.g. Policy Upgrade)
                 <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#linkClaimForm">
                     <span class="glyphicon glyphicon-new-window" aria-hidden="true"></span>
                     Link Claim
                 </button>
+                {% else %}
+                Linked Claims (e.g. Policy Upgrade)
                 {% endif %}
             </h4>
             {% if policy.linkedClaims|length > 0 %}
