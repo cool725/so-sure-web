@@ -91,7 +91,8 @@ class AffiliateServiceTest extends WebTestCase
         $data = $this->createState($date);
         $this->assertEquals(3, count(self::$affiliateService->generate([$data["affiliate"]], $date)));
         $this->assertEquals($data["affiliate"], $data["hat"]->getLatestPolicy()->getAffiliate());
-        $this->assertIn($data["affiliate"]->getConfirmedPolicies(), $data["hat"]->getLatestPolicy());
+        // This assertion just makes sure the affiliate saves confirmed policies right.
+        $this->assertContains($data["hat"]->getLatestPolicy(), $data["affiliate"]->getConfirmedPolicies());
         //test on pre loved data.
         $this->assertEquals(0, count(self::$affiliateService->generate([$data["affiliate"]], $date)));
         static::addDays($date, 21);
@@ -180,12 +181,17 @@ class AffiliateServiceTest extends WebTestCase
         $charges = self::$affiliateService->oneOffCharges($data["affiliate"], $date);
         $this->assertEquals(0, count($charges));
         $this->assertEquals(0, Charge::sumCost($charges));
-        static::addDays($date, 365);
+        static::addDays($date, 20);
         $charges = [];
         self::$dm->flush();
         self::$affiliateService->oneOffCharges($data["affiliate"], $date, $charges);
         $this->assertEquals(2, count($charges));
         $this->assertEquals(2.4, Charge::sumCost($charges));
+        static::addDays($date, 400);
+        $charges = [];
+        self::$dm->flush();
+        self::$affiliateService->oneOffCharges($data["affiliate"], $date, $charges);
+        $this->assertEquals(0, count($charges));
     }
 
     /**

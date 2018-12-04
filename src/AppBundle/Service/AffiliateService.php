@@ -114,7 +114,7 @@ class AffiliateService
         $users = $this->getMatchingUsers($affiliate, $date);
         foreach ($users as $user) {
             if (!$this->chargeRepository->findLastByUser($user, Charge::TYPE_AFFILIATE)) {
-                $generatedCharges[] = $this->createCharge($affiliate, $user, $user->getValidPolicies()[0], $date);
+                $generatedCharges[] = $this->createCharge($affiliate, $user, $user->getFirstPolicy(), $date);
             }
         }
         return $generatedCharges;
