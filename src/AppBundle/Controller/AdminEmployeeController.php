@@ -760,7 +760,6 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
     {
         $dm = $this->getManager();
         $repo = $dm->getRepository(PhonePolicy::class);
-        /** @var  */
         /** @var PhonePolicy $policy */
         $policy = $repo->find($id);
 

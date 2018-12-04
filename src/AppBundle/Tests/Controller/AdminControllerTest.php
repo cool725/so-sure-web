@@ -2,15 +2,10 @@
 
 namespace AppBundle\Tests\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use AppBundle\Document\User;
-use AppBundle\Document\Phone;
-use AppBundle\Document\Lead;
-use AppBundle\Document\Policy;
+use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Claim;
 use AppBundle\Document\Charge;
 use AppBundle\Document\CurrencyTrait;
-use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 use AppBundle\DataFixtures\MongoDB\b\User\LoadUserData;
 
 /**
@@ -154,8 +149,8 @@ class AdminControllerTest extends BaseControllerTest
         self::verifyResponse(200);
 
         $dm = $this->getDocumentManager(true);
-        $repoPolicy = $dm->getRepository(Policy::class);
-        /** @var Policy $policy */
+        $repoPolicy = $dm->getRepository(PhonePolicy::class);
+        /** @var PhonePolicy $policy */
         $updatedPolicy = $repoPolicy->find($newPolicy->getId());
 
         $repoClaim = $dm->getRepository(Claim::class);
