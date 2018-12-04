@@ -663,8 +663,8 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         }
 
         return $this->render('AppBundle:Claims:claimsModalBody.html.twig', [
-            'claim' => $claim,
-            'form' => $claimsForm->createView()
+            'form' => $claimsForm->createView(),
+            'claim' => $claim
         ]);
     }
 

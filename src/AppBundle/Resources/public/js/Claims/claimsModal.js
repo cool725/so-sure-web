@@ -32,7 +32,6 @@ $('.btn-copy').click(function (e) {
 });
 
 clipboard.on('success', function (event) {
-    console.log(event);
     $('.btn-copy').tooltip('show');
     setTimeout(function () {
         $('.btn-copy').tooltip('hide');
@@ -71,6 +70,10 @@ $('#claimsModal').on('show.bs.modal', function (event) {
 
     ajax.success(function (form) {
         modal.find('.modal-content').html(form);
+
+        $('#claims_form_approvedDate').datetimepicker({
+            format: 'DD-MM-YYYY'
+        });
     });
 });
 

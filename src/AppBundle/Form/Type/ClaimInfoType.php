@@ -59,8 +59,7 @@ class ClaimInfoType extends AbstractType
                 'placeholder' => 'Choose a phone',
                 'required' => false
             ])
-            ->add('approvedDate', DateType::class, [
-                'placeholder' => ' ',
+            ->add('approvedDate', TextType::class, [
                 'required' => false
             ])
             ->add('notes', TextareaType::class, [

@@ -5,40 +5,88 @@
             <span aria-hidden="true">&times;</span>
         </button>
 
-        <h4 class="modal-title">Claim: {{ claim.number|default('N/A') }}</h4>
+        <h4 class="modal-title" style="padding-bottom: 0;">
+            {% if claim.finalSuspicion %}
+            <span class="text-danger">
+                Claim: {{ claim.number }}
+            </span>
+            {% elseif claim.initialSuspicion %}
+            <span class="text-warning">
+                Claim: {{ claim.number }}
+            </span>
+            {% else %}
+            <span class="text-info">
+                Claim: {{ claim.number }}
+            </span>
+            {% endif %}
+        </h4>
     </div>
-
     <div class="modal-body">
+
+        <div class="row">
+            <div class="col-xs-6">
+                <label>Policy</label>
+                <p>{{ claim.policy.policyNumber|default('N/A') }}</p>
+            </div>
+
+            <div class="col-xs-5">
+                <label>Type</label>
+                <p>{{ claim.type|default('N/A') }}</p>
+            </div>
+
+            <div class="col-xs-6">
+                <label>Status</label>
+                {% if claim.status == 'fnol' %}
+                    <p class="text-warning" title="Claim not yet submitted to claims handler">
+                        {{ claim.status|default('N/A') }}
+                        {{ claim.daviesStatus|default('N/A') }}
+                    </p>
+                {% else %}
+                    <p>
+                        {{ claim.status|default('N/A') }}
+                        {{ claim.daviesStatus|default('N/A') }}
+                    </p>
+                {% endif %}
+            </div>
+
+            <div class="col-xs-6">
+                <label>Claim Handling Team</label>
+                <p>{{ claim.handlingTeam|default('N/A') }}</p>
+            </div>
+        </div>
+
         <div class="container-fluid">
             <ul class="nav nav-pills row" id="myTab" role="tablist">
                 <li class="nav-item active">
-                    <a class="nav-link" id="general-tab" data-toggle="tab" href="#general" role="tab"
-                       aria-controls="general"
-                       aria-selected="true">General</a>
+                    <a class="nav-link" id="FNOL-tab" data-toggle="tab" href="#FNOL" role="tab"
+                       aria-controls="FNOL"
+                       aria-selected="true">FNOL</a>
                 </li>
-                {% if claim.type == 'damage' %}
-                    <li class="nav-item">
-                        <a class="nav-link" id="profile-tab" data-toggle="tab" href="#damage" role="tab"
-                           aria-controls="damage"
-                           aria-selected="false">Damage</a>
-                    </li>
-                {% elseif claim.type == 'theft' or claim.type == 'loss' %}
-                    <li class="nav-item">
-                        <a class="nav-link" id="theftloss-tab" data-toggle="tab" href="#theftloss" role="tab"
-                           aria-controls="theftloss"
-                           aria-selected="false">Theft/Loss</a>
-                    </li>
-                {% endif %}
+
+                <li class="nav-item">
+                    <a class="nav-link" id="files-tab" data-toggle="tab" href="#files" role="tab"
+                       aria-controls="files"
+                       aria-selected="false">Files</a>
+                </li>
+
                 <li class="nav-item">
                     <a class="nav-link" id="details-tab" data-toggle="tab" href="#details" role="tab"
                        aria-controls="details"
                        aria-selected="false">Details</a>
                 </li>
+
                 <li class="nav-item">
                     <a class="nav-link" id="costs-tab" data-toggle="tab" href="#costs" role="tab"
                        aria-controls="amounts"
                        aria-selected="false">Costs</a>
                 </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" id="notes-tab" data-toggle="tab" href="#notes" role="tab"
+                       aria-controls="notes"
+                       aria-selected="false">Notes ({{ claim.policy.notes|length }})</a>
+                </li>
+
                 <li class="nav-item">
                     <a class="nav-link" id="update-tab" data-toggle="tab" href="#update" role="tab"
                        aria-controls="update"
@@ -49,42 +97,7 @@
             <br>
 
             <div class="tab-content" id="tab-content">
-                <div class="tab-pane fade in active" id="general" role="tabpanel" aria-labelledby="general-tab">
-
-                    <div class="row">
-                        <div class="col-xs-6">
-                            <label>Policy</label>
-                            <p>{{ claim.policy.policyNumber|default('N/A') }}</p>
-                        </div>
-
-                        <div class="col-xs-6">
-                            <label>Type</label>
-                            <p>{{ claim.type|default('N/A') }}</p>
-                        </div>
-
-                        <div class="col-xs-6">
-                            <label>Status</label>
-                            {% if claim.status == 'fnol' %}
-                                <p class="text-warning" title="Claim not yet submitted to claims handler">
-                                    {{ claim.status|default('N/A') }}
-                                    {{ claim.daviesStatus|default('N/A') }}
-                                </p>
-                            {% else %}
-                                <p>
-                                    {{ claim.status|default('N/A') }}
-                                    {{ claim.daviesStatus|default('N/A') }}
-                                </p>
-                            {% endif %}
-                        </div>
-
-                        <div class="col-xs-6">
-                            <label>Claim Handling Team</label>
-                            <p>{{ claim.handlingTeam|default('N/A') }}</p>
-                        </div>
-                    </div>
-
-                    <hr>
-
+                <div class="tab-pane fade in active" id="FNOL" role="tabpanel" aria-labelledby="FNOL-tab">
                     <div class="row">
                         <div class="col-xs-6">
                             <label>Number to reach</label>
@@ -167,75 +180,6 @@
                                 <p>{{ claim.phoneStatus|default('N/A') }}</p>
                             </div>
                         </div>
-
-                        <hr>
-
-                        <div class="row">
-                            <div class="col-xs-12">
-                                <label>Proof of Usages</label>
-                                {% if claim.needProofOfUsage %}
-                                    {% if documents %}
-                                        {% if documents.proofOfUsages|length > 0 %}
-                                            {% for document in documents %}
-                                                <p>
-                                                    {{ document.filename }}
-                                                    <img class="img-preview" src="{{ document.url }}"/>
-                                                    <a href="{{ document.url_download }}">
-                                                        <i class="fa fa-download"></i>
-                                                    </a>
-                                                </p>
-                                            {% endfor %}
-                                        {% else %}
-                                            <p>None uploaded yet</p>
-                                        {% endif %}
-                                    {% endif %}
-                                {% else %}
-                                    <p>Not Requested</p>
-                                {% endif %}
-                            </div>
-
-                            <div class="col-xs-12">
-                                <label>Pictures of Phone</label>
-                                {% if claim.needPictureOfPhone %}
-                                    {% if documents %}
-                                        {% if documents.damagePictures|length > 0 %}
-                                            {% for document in documents %}
-                                                <p>
-                                                    {{ document.filename }}
-                                                    <img class="img-preview" src="{{ document.url }}"/>
-                                                    <a href="{{ document.url_download }}">
-                                                        <i class="fa fa-download"></i>
-                                                    </a>
-                                                </p>
-                                            {% endfor %}
-                                        {% else %}
-                                            <p>None uploaded yet</p>
-                                        {% endif %}
-                                    {% endif %}
-                                {% else %}
-                                    <p>Not Requested</p>
-                                {% endif %}
-                            </div>
-
-                            <div class="col-xs-12">
-                                <label>Others</label>
-                                {% if documents %}
-                                    {% if documents.others|length > 0 %}
-                                        {% for document in documents %}
-                                            <p>
-                                                {{ document.filename }}
-                                                <img class="img-preview" src="{{ document.url }}"/>
-                                                <a href="{{ document.url_download }}">
-                                                    <i class="fa fa-download"></i>
-                                                </a>
-                                            </p>
-                                        {% endfor %}
-                                    {% else %}
-                                        <p>None uploaded yet</p>
-                                    {% endif %}
-                                {% endif %}
-                            </div>
-                        </div>
                     </div>
                 {% elseif claim.type == 'theft' or claim.type == 'loss' %}
                     {% set documents = s3DownloadLinks(claim) %}
@@ -288,108 +232,17 @@
                                 {% endif %}
                             </div>
                         </div>
+                    </div>
+                {% endif %}
 
-                        <hr>
-
-                        <div class="row">
-                            <div class="col-xs-12">
-                                <label>Proof of Usage</label>
-                                {% if claim.needProofOfUsage %}
-                                    {% if documents %}
-                                        {% if documents.proofOfUsages|length > 0 %}
-                                            {% for document in documents %}
-                                                <p>
-                                                    {{ document.filename }}
-                                                    <img class="img-preview" src="{{ document.url }}"/>
-                                                    <a href="{{ document.url_download }}">
-                                                        <i class="fa fa-download"></i>
-                                                    </a>
-                                                </p>
-                                            {% endfor %}
-                                        {% else %}
-                                            <p>None uploaded yet</p>
-                                        {% endif %}
-                                    {% endif %}
-                                {% else %}
-                                    <p>Not Requested</p>
-                                {% endif %}
-                            </div>
-
-                            <div class="col-xs-12">
-                                <label>Proof of Barring</label>
-                                {% if claim.needProofOfBarring %}
-                                    {% if documents %}
-                                        {% if documents.proofOfBarrings|length > 0 %}
-                                            {% for document in documents %}
-                                                <p>
-                                                    {{ document.filename }}
-                                                    <img class="img-preview" src="{{ document.url }}"/>
-                                                    <a href="{{ document.url_download }}">
-                                                        <i class="fa fa-download"></i>
-                                                    </a>
-                                                </p>
-                                            {% endfor %}
-                                        {% else %}
-                                            <p>None uploaded yet</p>
-                                        {% endif %}
-                                    {% endif %}
-                                {% else %}
-                                    <p>Not Requested</p>
-                                {% endif %}
-                            </div>
-
-                            <div class="col-xs-12">
-                                <label>Proof of Purchase</label>
-                                {% if claim.needProofOfPurchase %}
-                                    {% if documents %}
-                                        {% if documents.proofOfPurchases|length > 0 %}
-                                            {% for document in documents %}
-                                                <p>
-                                                    {{ document.filename }}
-                                                    <img class="img-preview" src="{{ document.url }}"/>
-                                                    <a href="{{ document.url_download }}">
-                                                        <i class="fa fa-download"></i>
-                                                    </a>
-                                                </p>
-                                            {% endfor %}
-                                        {% else %}
-                                            <p>None uploaded yet</p>
-                                        {% endif %}
-                                    {% endif %}
-                                {% else %}
-                                    <p>Not Requested</p>
-                                {% endif %}
-                            </div>
-
-                            {% if claim.type == "loss" %}
-                                <div class="col-xs-12">
-                                    <label>Proof of loss</label>
-                                    {% if claim.needProofOfLoss %}
-                                        {% if documents %}
-                                            {% if documents.proofOfLosses|length > 0 %}
-                                                {% for document in documents %}
-                                                    <p>
-                                                        {{ document.filename }}
-                                                        <img class="img-preview" src="{{ document.url }}"/>
-                                                        <a href="{{ document.url_download }}">
-                                                            <i class="fa fa-download"></i>
-                                                        </a>
-                                                    </p>
-                                                {% endfor %}
-                                            {% else %}
-                                                <p>Not uploaded yet</p>
-                                            {% endif %}
-                                        {% endif %}
-                                    {% else %}
-                                        <p>Not Requested</p>
-                                    {% endif %}
-                                </div>
-                            {% endif %}
-
-                            <div class="col-xs-12">
-                                <label>Others</label>
+                <div class="tab-pane fade" id="files" role="tabpanel" aria-labelledby="files-tab">
+                    <div class="row">
+                        {% set documents = s3DownloadLinks(claim) %}
+                        <div class="col-xs-12">
+                            <label>Proof of Usage</label>
+                            {% if claim.needProofOfUsage %}
                                 {% if documents %}
-                                    {% if documents.others|length > 0 %}
+                                    {% if documents.proofOfUsages|length > 0 %}
                                         {% for document in documents %}
                                             <p>
                                                 {{ document.filename }}
@@ -403,10 +256,127 @@
                                         <p>None uploaded yet</p>
                                     {% endif %}
                                 {% endif %}
+                            {% else %}
+                                <p>Not Requested</p>
+                            {% endif %}
+                        </div>
+
+                        <div class="col-xs-12">
+                            <label>Proof of Barring</label>
+                            {% if claim.needProofOfBarring %}
+                                {% if documents %}
+                                    {% if documents.proofOfBarrings|length > 0 %}
+                                        {% for document in documents %}
+                                            <p>
+                                                {{ document.filename }}
+                                                <img class="img-preview" src="{{ document.url }}"/>
+                                                <a href="{{ document.url_download }}">
+                                                    <i class="fa fa-download"></i>
+                                                </a>
+                                            </p>
+                                        {% endfor %}
+                                    {% else %}
+                                        <p>None uploaded yet</p>
+                                    {% endif %}
+                                {% endif %}
+                            {% else %}
+                                <p>Not Requested</p>
+                            {% endif %}
+                        </div>
+
+                        <div class="col-xs-12">
+                            <label>Proof of Purchase</label>
+                            {% if claim.needProofOfPurchase %}
+                                {% if documents %}
+                                    {% if documents.proofOfPurchases|length > 0 %}
+                                        {% for document in documents %}
+                                            <p>
+                                                {{ document.filename }}
+                                                <img class="img-preview" src="{{ document.url }}"/>
+                                                <a href="{{ document.url_download }}">
+                                                    <i class="fa fa-download"></i>
+                                                </a>
+                                            </p>
+                                        {% endfor %}
+                                    {% else %}
+                                        <p>None uploaded yet</p>
+                                    {% endif %}
+                                {% endif %}
+                            {% else %}
+                                <p>Not Requested</p>
+                            {% endif %}
+                        </div>
+
+                        {% if claim.type == "loss" %}
+                            <div class="col-xs-12">
+                                <label>Proof of loss</label>
+                                {% if claim.needProofOfLoss %}
+                                    {% if documents %}
+                                        {% if documents.proofOfLosses|length > 0 %}
+                                            {% for document in documents %}
+                                                <p>
+                                                    {{ document.filename }}
+                                                    <img class="img-preview" src="{{ document.url }}"/>
+                                                    <a href="{{ document.url_download }}">
+                                                        <i class="fa fa-download"></i>
+                                                    </a>
+                                                </p>
+                                            {% endfor %}
+                                        {% else %}
+                                            <p>Not uploaded yet</p>
+                                        {% endif %}
+                                    {% endif %}
+                                {% else %}
+                                    <p>Not Requested</p>
+                                {% endif %}
                             </div>
+                        {% endif %}
+
+                        {% if claim.type == 'damage' %}
+                            <div class="col-xs-12">
+                                <label>Pictures of Phone</label>
+                                {% if claim.needPictureOfPhone %}
+                                    {% if documents %}
+                                        {% if documents.damagePictures|length > 0 %}
+                                            {% for document in documents %}
+                                                <p>
+                                                    {{ document.filename }}
+                                                    <img class="img-preview" src="{{ document.url }}"/>
+                                                    <a href="{{ document.url_download }}">
+                                                        <i class="fa fa-download"></i>
+                                                    </a>
+                                                </p>
+                                            {% endfor %}
+                                        {% else %}
+                                            <p>None uploaded yet</p>
+                                        {% endif %}
+                                    {% endif %}
+                                {% else %}
+                                    <p>Not Requested</p>
+                                {% endif %}
+                            </div>
+                        {% endif %}
+
+                        <div class="col-xs-12">
+                            <label>Others</label>
+                            {% if documents %}
+                                {% if documents.others|length > 0 %}
+                                    {% for document in documents %}
+                                        <p>
+                                            {{ document.filename }}
+                                            <img class="img-preview" src="{{ document.url }}"/>
+                                            <a href="{{ document.url_download }}">
+                                                <i class="fa fa-download"></i>
+                                            </a>
+                                        </p>
+                                    {% endfor %}
+                                {% else %}
+                                    <p>None uploaded yet</p>
+                                {% endif %}
+                            {% endif %}
                         </div>
                     </div>
-                {% endif %}
+                </div>
 
                 <div class="tab-pane fade" id="details" role="tabpanel" aria-labelledby="details-tab">
                     <div class="row">
@@ -531,12 +501,18 @@
                         {{ form_widget(form.replacementPhone, {'attr': {'class': 'form-control'}}) }}
                     </div>
 
+                    <div class="help-block row">
+                        {% if claim.replacementPhoneDetails %}
+                        <div class="col-xs-6">
+                            Phone: {{ claim.replacementPhoneDetails }}
+                        </div>
+                        {% endif %}
+                    </div>
+
                     <div class="form-group">
                         <label>Approved Date</label>
                         <div class="form-inline">
-                            {{ form_widget(form.approvedDate.day,{'attr': {'class': 'form-control'}}) }}
-                            {{ form_widget(form.approvedDate.month,{'attr': {'class': 'form-control'}}) }}
-                            {{ form_widget(form.approvedDate.year,{'attr': {'class': 'form-control'}}) }}
+                            {{ form_widget(form.approvedDate, {'attr': {'class': 'form-control'}}) }}
                         </div>
                     </div>
 
