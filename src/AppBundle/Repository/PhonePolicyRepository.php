@@ -511,9 +511,9 @@ class PhonePolicyRepository extends PolicyRepository
 
     /**
      * Finds all policies that ended between the given dates and with the given status.
-     * @param String $status is the status of the policies that we are looking for.
-     * @param \DateTime $start is the date that policies must have ended after if it's given.
-     * @param \DateTime $end is the date that policies must have ended before if it's given.
+     * @param String    $status is the status of the policies that we are looking for.
+     * @param \DateTime $start  is the date that policies must have ended after if it's given.
+     * @param \DateTime $end    is the date that policies must have ended before if it's given.
      * @return array containing all the found policies.
      */
     public function findEndingByStatus($status, \DateTime $start = null, \DateTime $end = null)
@@ -530,13 +530,13 @@ class PhonePolicyRepository extends PolicyRepository
 
     /**
      * Counts all policies that ended between the given dates and with the given status.
-     * @param String $status is the status of the policies that we are looking for.
-     * @param \DateTime $start is the date that the policies must have ended after if it's given.
-     * @param \DateTime $end is the date that policies must have ended before if it's given.
+     * @param String    $status is the status of the policies that we are looking for.
+     * @param \DateTime $start  is the date that the policies must have ended after if it's given.
+     * @param \DateTime $end    is the date that policies must have ended before if it's given.
      * @return int the number of policies that were found.
      */
     public function countEndingByStatus($status, \DateTime $start = null, \DateTime $end = null)
     {
-        return $this->findEndingByStatus($status, $start, $end)->count();
+        return count($this->findEndingByStatus($status, $start, $end));
     }
 }
