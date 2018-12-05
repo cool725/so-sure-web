@@ -2,6 +2,8 @@ $script = <<SCRIPT
 set -e
 export CACHE_DIR=/dev/shm/cache
 
+sudo apt-get install ifupdown
+
 # make sure paramters.yml exists
 if [ ! -f /vagrant/app/config/parameters.yml ]; then
   cp /vagrant/app/config/parameters.yml.dist /vagrant/app/config/parameters.yml

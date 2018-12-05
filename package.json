@@ -8,12 +8,13 @@
   "license": "proprietary",
   "private": true,
   "devDependencies": {
+    "@fortawesome/fontawesome-pro": "^5.5.0",
     "@symfony/webpack-encore": "git://github.com/symfony/webpack-encore.git#master",
     "babel-loader": "^7.1.5",
     "babel-preset-env": "^1.7.0",
     "concat-cli": "^4.0.0",
     "extract-text-webpack-plugin": "^4.0.0-beta.0",
-    "node-sass": "^4.9.2",
+    "node-sass": "^4.10.0",
     "sass-loader": "^7.0.3",
     "webpack": "^4.12.2",
     "webpack-cli": "^3.1.0",
@@ -22,6 +23,7 @@
     "webpack-notifier": "^1.6.0"
   },
   "dependencies": {
+    "@fancyapps/fancybox": "^3.5.2",
     "@fortawesome/fontawesome-free": "^5.1.1",
     "animate.css": "^3.7.0",
     "babel-core": "^7.0.0-bridge.0",

@@ -60,6 +60,7 @@
 {% endif %}
         </div>
     <div class="bg-danger text-center" style="border-radius: 10px; padding: 20px; margin-bottom: 20px;">
+        {% if policy.isPolicy() %}
         <div class="row">
             <div class="col-md-12 text-center">
                 <h3>Policy Cancellation</h3>
@@ -68,6 +69,7 @@
                 {% endif %}
             </div>
         </div>
+
         <div class="row">
             <div class="col-md-6">
                 <h4>Scheduled Policy Cancellation</h4>
@@ -246,6 +248,14 @@
                 </div>
             </div>
         </div>
+    {% else %}
+        <div class="row">
+            <div class="col-md-12 text-center">
+                <h3>Policy Cancellation</h3>
+                <h3>Policy cannot be cancelled (expired/invalid)</h3>
+            </div>
+        </div>
+    {% endif %}
     </div>
   {% endif %}
     {% include 'AppBundle::Claims/claimsPolicyItem.html.twig' %}

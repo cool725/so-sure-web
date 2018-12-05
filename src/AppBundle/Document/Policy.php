@@ -4,6 +4,9 @@ namespace AppBundle\Document;
 
 use AppBundle\Document\Invitation\AppNativeShareInvitation;
 use AppBundle\Document\Invitation\Invitation;
+use AppBundle\Document\Note\CallNote;
+use AppBundle\Document\Note\Note;
+use AppBundle\Document\Note\StandardNote;
 use AppBundle\Document\Payment\BacsIndemnityPayment;
 use AppBundle\Document\Payment\BacsPayment;
 use AppBundle\Document\Payment\ChargebackPayment;
@@ -352,6 +355,7 @@ abstract class Policy
      * @Assert\DateTime()
      * @MongoDB\Field(type="date")
      * @Gedmo\Versioned
+     * @MongoDB\Index(unique=false, sparse=true)
      */
     protected $start;
 
@@ -488,6 +492,11 @@ abstract class Policy
     protected $notes = array();
 
     /**
+     * @MongoDB\EmbedMany(targetDocument="AppBundle\Document\Note\Note")
+     */
+    protected $notesList = array();
+
+    /**
      * @Assert\DateTime()
      * @MongoDB\Field(type="date")
      * @Gedmo\Versioned
@@ -539,6 +548,7 @@ abstract class Policy
         $this->acceptedConnections = new \Doctrine\Common\Collections\ArrayCollection();
         $this->acceptedConnectionsRenewal = new \Doctrine\Common\Collections\ArrayCollection();
         $this->scheduledPayments = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->notesList = new \Doctrine\Common\Collections\ArrayCollection();
         $this->potValue = 0;
     }
 
@@ -1967,32 +1977,91 @@ abstract class Policy
         return $this->notes;
     }
 
-    public function addNote($note)
+    public function removeNote($time)
     {
-        $now = \DateTime::createFromFormat('U', time());
-        $this->notes[$now->getTimestamp()] = $note;
+        unset($this->notes[$time]);
     }
 
-    public function getLatestNoteTimestamp()
+    public function getNotesList()
     {
-        $timestamp = 0;
-        foreach ($this->getNotes() as $noteTimestamp => $note) {
-            if ($noteTimestamp > $timestamp) {
-                $timestamp = $noteTimestamp;
-            }
+        return $this->notesList;
+    }
+
+    public function addNotesList(Note $note)
+    {
+        $this->notesList[] = $note;
+    }
+
+    public function addNoteDetails($notes, User $user = null, \DateTime $date = null)
+    {
+        $note = new StandardNote();
+        $note->setNotes($notes);
+        if ($user) {
+            $note->setUser($user);
+        }
+        if ($date) {
+            $note->setDate($date);
+        }
+        $this->addNotesList($note);
+    }
+
+    public function getNoteCalledCount(\DateTime $date)
+    {
+        $notes = $this->getNotesList()->toArray();
+        if (count($notes) == 0) {
+            return 0;
         }
 
-        return $timestamp;
+        $notes = array_filter($notes, function ($note) use ($date) {
+            /** @var Note $note */
+            return $note->getType() == Note::TYPE_CALL && $note->getDate() >= $date;
+        });
+
+        return count($notes);
+    }
+
+    public function getLatestNoteByType($type)
+    {
+        $notes = $this->getNotesList()->toArray();
+        $notes = array_filter($notes, function ($note) use ($type) {
+            /** @var Note $note */
+            return $note->getType() == $type;
+        });
+        if (count($notes) == 0) {
+            return null;
+        }
+
+        // sort more recent to older
+        usort($notes, function ($a, $b) {
+            return $a->getDate() < $b->getDate();
+        });
+
+        return $notes[0];
+    }
+
+    private function getLatestNotesDate()
+    {
+        $notes = $this->getNotesList()->toArray();
+        if (count($notes) == 0) {
+            return null;
+        }
+
+        // sort more recent to older
+        usort($notes, function ($a, $b) {
+            return $a->getDate() < $b->getDate();
+        });
+
+        return $notes[0]->getDate();
     }
 
     public function getLatestNoteTimestampColour()
     {
-        if (count($this->getNotes()) == 0) {
+        $latest = $this->getLatestNotesDate();
+        if (!$latest) {
             return 'white';
         }
 
         $now = \DateTime::createFromFormat('U', time());
-        $latest = \DateTime::createFromFormat('U', $this->getLatestNoteTimestamp());
         $diff = $now->diff($latest);
 
         if ($diff->days > 30) {
@@ -2062,6 +2131,12 @@ abstract class Policy
             $company->addPolicy($this);
         }
         $this->setPolicyTerms($terms);
+
+        // in the normal flow we should have policy terms before setting the phone
+        // however, many test cases do not have it
+        if ($this->getPremium()) {
+            $this->validateAllowedExcess();
+        }
     }
 
     public function isCreateAllowed(\DateTime $date = null)
@@ -3072,8 +3147,12 @@ abstract class Policy
             self::STATUS_CANCELLED,
             self::STATUS_EXPIRED,
             self::STATUS_EXPIRED_CLAIMABLE,
-            self::STATUS_EXPIRED_WAIT_CLAIM,
+            self::STATUS_EXPIRED_WAIT_CLAIM
         ])) {
+            return false;
+        }
+
+        if (!$this->isPolicy()) {
             return false;
         }
 
@@ -4392,9 +4471,26 @@ abstract class Policy
 
         // >= doesn't quite allow for minor float differences
         $result = $this->areEqualToTwoDp($expectedPaid, $totalPaid) || $totalPaid > $expectedPaid;
-        //print sprintf("%f =? %f return %s%s", $totalPaid, $expectedPaid, $result ? 'true': 'false', PHP_EOL);
+        // print sprintf("%f =? %f return %s%s", $totalPaid, $expectedPaid, $result ? 'true': 'false', PHP_EOL);
 
         return $result;
+    }
+
+    public function hasScheduledPaymentInCurrentMonth(\DateTime $date = null)
+    {
+        if (!$date) {
+            $date = \DateTime::createFromFormat('U', time());
+        }
+
+        $nextPayment = $this->getNextScheduledPayment() ? $this->getNextScheduledPayment()->getScheduled() : false;
+
+        if ($nextPayment) {
+            if ($nextPayment->format('m Y') == $date->format('m Y')) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public function getOutstandingScheduledPaymentsAmount()
@@ -4822,6 +4918,11 @@ abstract class Policy
             $this->areEqualToTwoDp($this->getPromoPotValue(), $this->calculatePotValue(true));
     }
 
+    public function getCurrentExcess()
+    {
+        return $this->getPremium()->getExcess();
+    }
+
     public function getExpectedCommission(\DateTime $date = null)
     {
         $salva = new Salva();
@@ -5164,6 +5265,20 @@ abstract class Policy
         }
 
         return false;
+    }
+
+    public function validateAllowedExcess()
+    {
+        if (!$this->getPremium() || !$this->getPremium()->getExcess()) {
+            return;
+        }
+
+        if (!$this->getPolicyTerms()->isAllowedExcess($this->getPremium()->getExcess())) {
+            throw new \Exception(sprintf(
+                'Unable to set phone for policy %s as excess values do not match policy terms.',
+                $this->getId()
+            ));
+        }
     }
 
     public function hasManualBacsPayment()

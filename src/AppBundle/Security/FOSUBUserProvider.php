@@ -469,9 +469,9 @@ class FOSUBUserProvider extends BaseClass
         }
 
         if ($sendEmail) {
-            $this->mailer->sendTemplate(
+            $this->mailer->sendTemplateToUser(
                 'Goodbye',
-                $user->getEmail(),
+                $user,
                 'AppBundle:Email:user/deleted.html.twig',
                 ['user' => $user],
                 'AppBundle:Email:user/deleted.html.twig',

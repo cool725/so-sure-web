@@ -2,6 +2,7 @@
 
 namespace AppBundle\Listener;
 
+use AppBundle\Annotation\DataChange;
 use AppBundle\Document\CurrencyTrait;
 use Doctrine\ODM\MongoDB\Event\PreUpdateEventArgs;
 use Doctrine\ODM\MongoDB\Event\LifecycleEventArgs;
@@ -44,7 +45,7 @@ class DoctrinePolicyListener extends BaseDoctrineListener
             $eventArgs,
             Policy::class,
             ['premium'],
-            self::COMPARE_OBJECT_EQUALS
+            DataChange::COMPARE_OBJECT_EQUALS
         )) {
             $this->triggerEvent($document, PolicyEvent::EVENT_UPDATED_PREMIUM);
         }
@@ -53,9 +54,19 @@ class DoctrinePolicyListener extends BaseDoctrineListener
             $eventArgs,
             Policy::class,
             ['billing'],
-            self::COMPARE_OBJECT_EQUALS
+            DataChange::COMPARE_OBJECT_EQUALS
         )) {
             $this->triggerEvent($document, PolicyEvent::EVENT_UPDATED_BILLING);
+        }
+
+        if ($this->hasDataChanged(
+            $eventArgs,
+            Policy::class,
+            ['status'],
+            DataChange::COMPARE_EQUAL,
+            true
+        )) {
+            $this->triggerEvent($document, PolicyEvent::EVENT_UPDATED_STATUS, $eventArgs->getOldValue('status'));
         }
     }
 
@@ -70,9 +81,12 @@ class DoctrinePolicyListener extends BaseDoctrineListener
         }
     }
 
-    private function triggerEvent(Policy $policy, $eventType)
+    private function triggerEvent(Policy $policy, $eventType, $previousStatus = null)
     {
         $event = new PolicyEvent($policy);
+        if ($previousStatus) {
+            $event->setPreviousStatus($previousStatus);
+        }
         $this->dispatcher->dispatch($eventType, $event);
     }
 }

@@ -172,7 +172,7 @@ class ClaimsController extends BaseController
                             $this->addFlash('success', sprintf(
                                 'Claim %s is updated. Excess is £%d',
                                 $claim->getNumber(),
-                                $claim->getExpectedExcess()
+                                $claim->getExpectedExcessValue()
                             ));
 
                             return $this->redirectToRoute('claims_policy', ['id' => $id]);
@@ -183,7 +183,7 @@ class ClaimsController extends BaseController
                         $this->addFlash('success', sprintf(
                             'Claim %s is added. Excess is £%d',
                             $claim->getNumber(),
-                            $claim->getExpectedExcess()
+                            $claim->getExpectedExcessValue()
                         ));
 
                         return $this->redirectToRoute('claims_policy', ['id' => $id]);
@@ -266,11 +266,7 @@ class ClaimsController extends BaseController
             } elseif ($request->request->has('note_form')) {
                 $noteForm->handleRequest($request);
                 if ($noteForm->isValid()) {
-                    $policy->addNote(json_encode([
-                        'user_id' => $this->getUser()->getId(),
-                        'name' => $this->getUser()->getName(),
-                        'notes' => $noteForm->getData()['notes']
-                    ]));
+                    $policy->addNoteDetails($noteForm->getData()['notes'], $this->getUser());
                     $dm->flush();
                     $this->addFlash(
                         'success',

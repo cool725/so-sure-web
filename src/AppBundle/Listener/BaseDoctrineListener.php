@@ -6,6 +6,7 @@ use AppBundle\Annotation\DataChange;
 use AppBundle\Document\BacsPaymentMethod;
 use AppBundle\Document\BankAccount;
 use AppBundle\Document\CurrencyTrait;
+use AppBundle\Document\JudoPaymentMethod;
 use AppBundle\Interfaces\EqualsInterface;
 use Doctrine\Common\Annotations\Reader;
 use Doctrine\ODM\MongoDB\Event\PreUpdateEventArgs;
@@ -32,15 +33,6 @@ class BaseDoctrineListener
         $this->logger = $logger;
     }
 
-    const COMPARE_EQUAL = 'equal';
-    const COMPARE_CASE_INSENSITIVE = 'case-insensitive';
-    const COMPARE_INCREASE = 'increase';
-    const COMPARE_DECREASE = 'decrease';
-    const COMPARE_OBJECT_EQUALS = 'object-equals';
-    const COMPARE_OBJECT_SERIALIZE = 'object-serialize';
-    const COMPARE_TO_NULL = 'to-null';
-    const COMPARE_BACS = 'bacs';
-
     protected function recalulateChangeSet(PreUpdateEventArgs $eventArgs, $updatedDocument)
     {
         $dm = $eventArgs->getDocumentManager();
@@ -53,7 +45,7 @@ class BaseDoctrineListener
         PreUpdateEventArgs $eventArgs,
         $class,
         $fields,
-        $compare = self::COMPARE_EQUAL,
+        $compare = DataChange::COMPARE_EQUAL,
         $mustExist = false
     ) {
         foreach ($fields as $field) {
@@ -69,7 +61,7 @@ class BaseDoctrineListener
         PreUpdateEventArgs $eventArgs,
         $class,
         $field,
-        $compare = self::COMPARE_EQUAL,
+        $compare = DataChange::COMPARE_EQUAL,
         $mustExist = false
     ) {
         $document = $eventArgs->getDocument();
@@ -96,7 +88,7 @@ class BaseDoctrineListener
                 return false;
             }
 
-            if ($compare == self::COMPARE_EQUAL) {
+            if ($compare == DataChange::COMPARE_EQUAL) {
                 if (is_float($oldValue)) {
                     $result = !$this->areEqualToSixDp($oldValue, $newValue);
                     /*
@@ -144,7 +136,7 @@ class BaseDoctrineListener
                 }
                 */
                 return $result;
-            } elseif ($compare == self::COMPARE_CASE_INSENSITIVE) {
+            } elseif ($compare == DataChange::COMPARE_CASE_INSENSITIVE) {
                 $result = mb_strtolower($oldValue) !== mb_strtolower($newValue);
                 /*
                 if ($this->logger) {
@@ -152,7 +144,7 @@ class BaseDoctrineListener
                 }
                 */
                 return $result;
-            } elseif ($compare == self::COMPARE_OBJECT_SERIALIZE) {
+            } elseif ($compare == DataChange::COMPARE_OBJECT_SERIALIZE) {
                 $result = serialize($oldValue) == serialize($newValue);
                 /*
                 if ($this->logger) {
@@ -160,7 +152,7 @@ class BaseDoctrineListener
                 }
                 */
                 return $result;
-            } elseif ($compare == self::COMPARE_OBJECT_EQUALS) {
+            } elseif ($compare == DataChange::COMPARE_OBJECT_EQUALS) {
                 if (!$oldValue && !$newValue) {
                     $result = false;
                     /*
@@ -194,7 +186,7 @@ class BaseDoctrineListener
                     */
                     return $result;
                 }
-            } elseif ($compare == self::COMPARE_INCREASE) {
+            } elseif ($compare == DataChange::COMPARE_INCREASE) {
                 $result = $oldValue < $newValue;
                 /*
                 if ($this->logger) {
@@ -202,7 +194,7 @@ class BaseDoctrineListener
                 }
                 */
                 return $result;
-            } elseif ($compare == self::COMPARE_DECREASE) {
+            } elseif ($compare == DataChange::COMPARE_DECREASE) {
                 $result = $oldValue > $newValue;
                 /*
                 if ($this->logger) {
@@ -210,7 +202,7 @@ class BaseDoctrineListener
                 }
                 */
                 return $result;
-            } elseif ($compare == self::COMPARE_TO_NULL) {
+            } elseif ($compare == DataChange::COMPARE_TO_NULL) {
                 $result = $newValue === null;
                 /*
                 if ($this->logger) {
@@ -218,7 +210,7 @@ class BaseDoctrineListener
                 }
                 */
                 return $result;
-            } elseif ($compare == self::COMPARE_BACS) {
+            } elseif ($compare == DataChange::COMPARE_BACS) {
                 if (!$oldValue instanceof BacsPaymentMethod || !$newValue instanceof BacsPaymentMethod) {
                     return false;
                 }
@@ -239,6 +231,26 @@ class BaseDoctrineListener
                 }
 
                 return false;
+            } elseif ($compare == DataChange::COMPARE_JUDO) {
+                if (!$oldValue instanceof JudoPaymentMethod || !$newValue instanceof JudoPaymentMethod) {
+                    return false;
+                }
+
+                $result = $oldValue->getCardTokenHash() != $newValue->getCardTokenHash();
+
+                if ($this->logger) {
+                    $this->logger->debug(sprintf('Return %s for compare %s', $result ? 'true' : 'false', $compare));
+                }
+
+                return $result;
+            } elseif ($compare == DataChange::COMPARE_PAYMENT_METHOD_CHANGED) {
+                if ($oldValue instanceof JudoPaymentMethod && $newValue instanceof BacsPaymentMethod) {
+                    return true;
+                } elseif ($oldValue instanceof BacsPaymentMethod && $newValue instanceof JudoPaymentMethod) {
+                    return true;
+                } else {
+                    return false;
+                }
             } else {
                 throw new \Exception(sprintf('Unknown comparision %s', $compare));
             }
@@ -251,8 +263,8 @@ class BaseDoctrineListener
     {
         $document = $eventArgs->getDocument();
         $annotations = $this->getDataChangeAnnotation($document, $category);
-        foreach ($annotations as $property => $value) {
-            if ($this->hasDataFieldChanged($eventArgs, get_class($document), $property)) {
+        foreach ($annotations as $property => $data) {
+            if ($this->hasDataFieldChanged($eventArgs, get_class($document), $property, $data['comparison'])) {
                 return true;
             }
         }
@@ -276,7 +288,10 @@ class BaseDoctrineListener
             /** @var DataChange $propertyAnnotation */
             $propertyAnnotation = $this->reader->getPropertyAnnotation($property, DataChange::class);
             if ($propertyAnnotation && in_array($category, $propertyAnnotation->getCategories())) {
-                $items[$property->getName()] = $propertyAccessor->getValue($object, $property->getName());
+                $items[$property->getName()] = [
+                    'value' => $propertyAccessor->getValue($object, $property->getName()),
+                    'comparison' => $propertyAnnotation->getComparison() ?: DataChange::COMPARE_EQUAL,
+                ];
             }
         }
 

@@ -1,33 +1,52 @@
-{% extends 'base.html.twig' %}
+{% extends 'admin_claims_base_rebrand.html.twig' %}
+
+{# Set vars #}
+{% set body_class = 'admin-detected-imei' %}
+
+{% block title %}so-sure - Admin detected IMEI{% endblock %}
+{% block meta %}{% endblock %}
+
+{% block cssPage %}
+   {#  <link rel="stylesheet" href="{{ asset('css-js/homepage.css') }}"> #}
+{% endblock %}
 
 {% block body %}
-<div class="container" style="margin-bottom: 50px">
-<div class="row">
-    <div class="col-md-8">
-        <h2>Detected Imei</h2>
-    </div>
-</div>
 
-{% if imeis|length == 0 %}
-    <h4>No detected imeis</h4>
-{% endif %}
-{% for imei in imeis %}
-<div class="row">
-    <div class="col-md-3">
-        <h4>{{ imei['detected_imei'] }} (Suggested {{ imei['suggested_imei'] }}) </h4>
-    </div>
-    <div class="col-md-7">
-    </div>
-</div>
-<div class="row" style="margin-top: 20px;">
-    <div class="col-md-12 text-center">
-            <a href="{{ s3DownloadLink(imei['bucket'], imei['key']) }}" target="_blank">
-                <i class="fa fa-external-link"></i> {{ imei.key }}
-            </a>
-    </div>
-</div>
-<hr style="border-bottom: 3px solid black">
-{% endfor %}
-</div>
+    <section class="py-4 px-md-4">
+        <div class="container-fluid">
+            {# TODO: Heading area #}
+            <div class="d-lg-flex align-items-lg-center justify-content-lg-between mb-3">
+                <h1 class="h2">Detected IMEI</h1>
+            </div>
+            {% if imeis|length == 0 %}
+                <p class="mb-5">No records found</p>
+            {% else %}
+                <div class="table-responsive-sm mb-5">
+                    <table class="table table-striped">
+                        <thead class="thead-light">
+                            <tr>
+                                <th>Detected</th>
+                                <th>Suggested</th>
+                                <th>Link to file</th>
+                            </tr>
+                        </thead>
+                        {% for imei in imeis %}
+                            <tr>
+                                <td>{{ imei['detected_imei'] }}</td>
+                                <td>(Suggested {{ imei['suggested_imei'] }})</td>
+                                <td><a href="{{ s3DownloadLink(imei['bucket'], imei['key']) }}" target="_blank" title="{{ imei.key }}"><i class="fal fa-link mr-2"></i> See image</a></td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            {% endif %}
+        </div>
+    </section>
 
+    {# Page Modals #}
+
+{% endblock %}
+
+{% block javascriptsPage %}
+    {# <script src="{{ asset('css-js/homepage.js') }}"></script> #}
 {% endblock %}

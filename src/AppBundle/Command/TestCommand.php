@@ -8,7 +8,13 @@ use AppBundle\Document\Charge;
 use AppBundle\Document\Claim;
 use AppBundle\Document\Opt\EmailOptOut;
 use AppBundle\Document\Opt\OptOut;
+use AppBundle\Document\Phone;
+use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\PhonePremium;
+use AppBundle\Document\PhonePrice;
+use AppBundle\Document\PolicyTerms;
 use AppBundle\Document\User;
+use AppBundle\Validator\Constraints\AlphanumericSpaceDotValidator;
 use Doctrine\Common\Annotations\Reader;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
@@ -51,12 +57,88 @@ class TestCommand extends ContainerAwareCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         // $this->testBirthday();
-        /*
-        $claim = new Claim();
-        $claim->setNotificationDate(\DateTime::createFromFormat('U', time()));
-        print_r($this->getDataChangeAnnotation($claim, 'salva'));
-        */
+        // $this->removeOrphanUsersOnCharges($output);
+        // $this->updateNotes();
 
+        $this->updatePhoneExcess();
+        $this->updatePolicyExcess();
+
+        $output->writeln('Finished');
+    }
+
+    private function updatePhoneExcess()
+    {
+        // technically should compare the price dates to see if pic-sure excess should be set, but it doesn't add
+        // any current value and is time consuming
+        $repo = $this->dm->getRepository(Phone::class);
+        $phones = $repo->findAll();
+        foreach ($phones as $phone) {
+            /** @var Phone $phone */
+            foreach ($phone->getPhonePrices() as $price) {
+                /** @var PhonePrice $price */
+                $price->setExcess(PolicyTerms::getHighExcess());
+                $price->setPicSureExcess(PolicyTerms::getLowExcess());
+            }
+        }
+
+        $this->dm->flush();
+    }
+
+    private function updatePolicyExcess()
+    {
+        $repo = $this->dm->getRepository(PhonePolicy::class);
+        $policies = $repo->findAll();
+        foreach ($policies as $policy) {
+            /** @var PhonePolicy $policy */
+            $terms = $policy->getPolicyTerms();
+            /** @var PhonePremium $premium */
+            $premium = $policy->getPremium();
+            if ($premium) {
+                $premium->setExcess($terms->getDefaultExcess());
+                $premium->setPicSureExcess($terms->getDefaultPicSureExcess());
+            }
+        }
+
+        $this->dm->flush();
+    }
+
+    private function updateNotes()
+    {
+        $repo = $this->dm->getRepository(Policy::class);
+        $userRepo = $this->dm->getRepository(User::class);
+        $polices = $repo->findAll();
+        $validator = new AlphanumericSpaceDotValidator();
+        foreach ($polices as $policy) {
+            try {
+                $updated = false;
+                /** @var Policy $policy */
+                $notes = $policy->getNotes();
+                foreach ($notes as $time => $note) {
+                    $date = \DateTime::createFromFormat('U', $time);
+                    try {
+                        $details = json_decode($note, true);
+                        $user = $userRepo->find($details['user_id']);
+                        $policy->addNoteDetails($validator->conform($details['notes']), $user, $date);
+                    } catch (\Exception $e) {
+                        if (is_string($note)) {
+                            $policy->addNoteDetails($validator->conform($note), null, $date);
+                        }
+                    }
+                    $policy->removeNote($time);
+                    $updated = true;
+                }
+
+                if ($updated) {
+                    $this->dm->flush();
+                }
+            } catch (\Exception $e) {
+                throw new \Exception(sprintf('Error in policy %s. Ex: %s', $policy->getId(), $e->getMessage()));
+            }
+        }
+    }
+
+    private function removeOrphanUsersOnCharges(OutputInterface $output)
+    {
         $repo = $this->dm->getRepository(Charge::class);
         foreach ($repo->findAll() as $charge) {
             /** @var Charge $charge */
@@ -71,8 +153,6 @@ class TestCommand extends ContainerAwareCommand
                 $this->dm->flush();
             }
         }
-
-        $output->writeln('Finished');
     }
 
     private function testBirthday()

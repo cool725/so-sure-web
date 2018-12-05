@@ -6,15 +6,20 @@ use AppBundle\Document\AffiliateCompany;
 use AppBundle\Document\BacsPaymentMethod;
 use AppBundle\Document\File\PaymentRequestUploadFile;
 use AppBundle\Document\JudoPaymentMethod;
+use AppBundle\Document\Note\CallNote;
+use AppBundle\Document\Note\Note;
+use AppBundle\Document\ValidatorTrait;
 use AppBundle\Exception\PaymentDeclinedException;
 use AppBundle\Form\Type\AdminEmailOptOutType;
 use AppBundle\Form\Type\BacsCreditType;
+use AppBundle\Form\Type\CallNoteType;
 use AppBundle\Form\Type\PaymentRequestUploadFileType;
 use AppBundle\Form\Type\UploadFileType;
 use AppBundle\Form\Type\UserHandlingTeamType;
 use AppBundle\Repository\ClaimRepository;
 use AppBundle\Repository\PhonePolicyRepository;
 use AppBundle\Repository\PhoneRepository;
+use AppBundle\Repository\PolicyRepository;
 use AppBundle\Security\FOSUBUserProvider;
 use AppBundle\Service\BacsService;
 use AppBundle\Service\FraudService;
@@ -25,10 +30,13 @@ use AppBundle\Service\ReportingService;
 use AppBundle\Service\RouterService;
 use AppBundle\Service\SalvaExportService;
 use AppBundle\Service\AffiliateService;
+use Doctrine\ODM\MongoDB\Query\Builder;
 use Gedmo\Loggable\Document\Repository\LogEntryRepository;
+use Grpc\Call;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -141,6 +149,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
     use CurrencyTrait;
     use ImeiTrait;
     use ContainerAwareTrait;
+    use ValidatorTrait;
 
     /**
      * @Route("", name="admin_home")
@@ -308,6 +317,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             'makes' => $makes,
             'additional_phones' => $additionalPhonesForm->createView(),
             'one_day' => $oneDay,
+            'policyTerms' => $this->getLatestPolicyTerms(),
         ];
     }
 
@@ -362,14 +372,158 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
      */
     public function adminPoliciesAction(Request $request)
     {
+        $callNote = new \AppBundle\Document\Form\CallNote();
+        $callNote->setUser($this->getUser());
+        $callForm = $this->get('form.factory')
+            ->createNamedBuilder('call_form', CallNoteType::class, $callNote)
+            ->getForm();
+        if ('POST' === $request->getMethod()) {
+            if ($request->request->has('call_form')) {
+                $callForm->handleRequest($request);
+                if ($callForm->isValid()) {
+                    /** @var PolicyRepository $repo */
+                    $repo = $this->getManager()->getRepository(Policy::class);
+                    /** @var Policy $policy */
+                    $policy = $repo->find($callNote->getPolicyId());
+                    if ($policy) {
+                        $policy->addNotesList($callNote->toCallNote());
+                        $this->getManager()->flush();
+
+                        $this->addFlash('success', 'Recorded call');
+                    } else {
+                        $this->addFlash('error', 'Unable to record call');
+                    }
+
+                    return new RedirectResponse($request->getUri());
+                }
+            }
+        }
         try {
             $data = $this->searchPolicies($request);
         } catch (RedirectException $e) {
             return new RedirectResponse($e->getMessage());
         }
         return array_merge($data, [
-            'policy_route' => 'admin_policy'
+            'policy_route' => 'admin_policy',
+            'call_form' => $callForm->createView(),
         ]);
+    }
+
+    /**
+     * @Route("/policies/called-list", name="admin_policies_called_list")
+     */
+    public function adminPoliciesCalledListAction(Request $request)
+    {
+        $dm = $this->getManager();
+        /** @var PolicyRepository $policyRepo */
+        $policyRepo = $dm->getRepository(Policy::class);
+
+        /** @var Builder $policiesQb */
+        $policiesQb = $policyRepo->createQueryBuilder()
+            ->eagerCursor(true)
+            ->field('user')->prime(true);
+        $policiesQb = $policiesQb->addAnd(
+            $policiesQb->expr()->field('notesList.type')->equals('call')
+        );
+
+        $now = new \DateTime();
+        $year = $now->format('Y');
+        $weekNum = $now->format('W');
+
+        $startWeek = new \DateTime();
+        $startWeek->setISODate($year, $weekNum - 1);
+        $endWeek = new \DateTime();
+        $endWeek->setISODate($year, $weekNum);
+        if ($request->get('week') == 'now') {
+            $startWeek = new \DateTime();
+            $startWeek->setISODate($year, $weekNum);
+            $endWeek = new \DateTime();
+            $endWeek->setISODate($year, $weekNum + 1);
+        }
+
+        $policiesQb = $policiesQb->addAnd(
+            $policiesQb->expr()->field('notesList.date')->gte($startWeek)
+        );
+        $policiesQb = $policiesQb->addAnd(
+            $policiesQb->expr()->field('notesList.date')->lt($endWeek)
+        );
+        $policies = $policiesQb->getQuery()->execute();
+
+        $response = new StreamedResponse();
+        $response->setCallback(function () use ($policies) {
+            $handle = fopen('php://output', 'w+');
+
+            // Add the header of the CSV file
+            fputcsv($handle, [
+                'Date',
+                'Name',
+                'Email',
+                'Policy Number',
+                'Phone Number',
+                'Claim',
+                'Cost of claims',
+                'Termination Date',
+                'Days Before Termination',
+                'Present status',
+                'Call',
+                'Note',
+                'Voicemail',
+                'Other Actions',
+                'All actions',
+                'Category',
+                'Termination week number',
+                'Call week number',
+                'Call month',
+                'Cancellation month',
+            ]);
+            foreach ($policies as $policy) {
+                /** @var Policy $policy */
+                /** @var CallNote $note */
+                $note = $policy->getLatestNoteByType(Note::TYPE_CALL);
+                $approvedClaims = $policy->getApprovedClaims(true);
+                $claimsCost = 0;
+                foreach ($approvedClaims as $approvedClaim) {
+                    /** @var Claim $approvedClaim */
+                    $claimsCost += $approvedClaim->getTotalIncurred();
+                }
+                $line = [
+                    $note->getDate()->format('Y-m-d'),
+                    $policy->getUser()->getName(),
+                    $policy->getUser()->getEmail(),
+                    $policy->getPolicyNumber(),
+                    $policy->getUser()->getMobileNumber(),
+                    count($approvedClaims),
+                    $claimsCost,
+                    $policy->getPolicyExpirationDate() ?
+                        $policy->getPolicyExpirationDate()->format('Y-m-d') :
+                        null,
+                    'FORMULA',
+                    $policy->getStatus(),
+                    'Yes',
+                    $note->getResult(),
+                    $note->getVoicemail() ? 'Yes' : '',
+                    $note->getOtherActions(),
+                    $note->getActions(true),
+                    $note->getCategory(),
+                    $policy->getPolicyExpirationDate() ? $policy->getPolicyExpirationDate()->format('W') : null,
+                    $note->getDate()->format('W'),
+                    $note->getDate()->format('M'),
+                    $policy->getPolicyExpirationDate() ? $policy->getPolicyExpirationDate()->format('M') : null,
+                ];
+                fputcsv(
+                    $handle, // The file pointer
+                    $line
+                );
+            }
+
+            fclose($handle);
+        });
+
+        $response->setStatusCode(200);
+        $response->headers->set('Content-Type', 'text/csv; charset=utf-8');
+        $response->headers->set('Content-Disposition', 'attachment; filename="so-sure-connections.csv"');
+
+        return $response;
     }
 
     /**
@@ -504,12 +658,11 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                 $imeiForm->handleRequest($request);
                 if ($imeiForm->isValid()) {
                     $policy->adjustImei($imei->getImei(), false);
-
-                    $policy->addNote(json_encode([
-                        'user_id' => $this->getUser()->getId(),
-                        'name' => $this->getUser()->getName(),
-                        'notes' => $imei->getNote()
-                    ]));
+                  
+                    $policy->addNoteDetails(
+                        $imei->getNote(),
+                        $this->getUser()
+                    );
 
                     $dm->flush();
                     $this->addFlash(
@@ -524,6 +677,78 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
 
         return [
             'form' => $imeiForm->createView(),
+            'policy' => $policy,
+        ];
+    }
+
+    /**
+     * @Route("/picsure-form/{id}", name="picsure_form")
+     * @Template
+     */
+    public function picsureFormAction(Request $request, $id = null)
+    {
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(PhonePolicy::class);
+        /** @var PhonePolicy $policy */
+        $policy = $repo->find($id);
+
+        if (!$policy) {
+            throw $this->createNotFoundException(sprintf('Policy %s not found', $id));
+        }
+
+        $picsureForm = $this->get('form.factory')
+            ->createNamedBuilder('picsure_form')
+            ->add('approve', SubmitType::class)
+            ->add('preapprove', SubmitType::class)
+            ->add('invalidate', SubmitType::class)
+            ->add('note', TextareaType::class)
+            ->setAction($this->generateUrl(
+                'picsure_form',
+                ['id' => $id]
+            ))
+            ->getForm();
+
+        if ('POST' === $request->getMethod()) {
+            if ($request->request->has('picsure_form')) {
+                $picsureForm->handleRequest($request);
+                if ($picsureForm->isValid()) {
+                    if ($policy->getPolicyTerms()->isPicSureEnabled() && !$policy->isPicSureValidated()) {
+                        if ($picsureForm->get('approve')->isClicked()) {
+                            $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_APPROVED, $this->getUser());
+                            $policy->setPicSureApprovedDate(\DateTime::createFromFormat('U', time()));
+                        } elseif ($picsureForm->get('preapprove')->isClicked()) {
+                            $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_PREAPPROVED, $this->getUser());
+                            $policy->setPicSureApprovedDate(\DateTime::createFromFormat('U', time()));
+                        } elseif ($picsureForm->get('invalidate')->isClicked()) {
+                            $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_INVALID, $this->getUser());
+                        } else {
+                            throw new \Exception('Unknown button click');
+                        }
+
+                        $policy->addNoteDetails(
+                            $picsureForm->getData()['note'],
+                            $this->getUser()
+                        );
+
+                        $dm->flush();
+                        $this->addFlash(
+                            'success',
+                            sprintf('Set pic-sure to %s', $policy->getPicSureStatus())
+                        );
+                    } else {
+                        $this->addFlash(
+                            'error',
+                            'Policy is not a pic-sure policy or policy is already pic-sure (pre)approved'
+                        );
+                    }
+
+                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
+                }
+            }
+        }
+
+        return [
+            'form' => $picsureForm->createView(),
             'policy' => $policy
         ];
     }
@@ -631,11 +856,6 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         $debtForm = $this->get('form.factory')
             ->createNamedBuilder('debt_form')->add('debt', SubmitType::class)
             ->getForm();
-        $picsureForm = $this->get('form.factory')
-            ->createNamedBuilder('picsure_form')
-            ->add('approve', SubmitType::class)
-            ->add('preapprove', SubmitType::class)
-            ->getForm();
         $swapPaymentPlanForm = $this->get('form.factory')
             ->createNamedBuilder('swap_payment_plan_form')->add('swap', SubmitType::class)
             ->getForm();
@@ -737,11 +957,10 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             } elseif ($request->request->has('note_form')) {
                 $noteForm->handleRequest($request);
                 if ($noteForm->isValid()) {
-                    $policy->addNote(json_encode([
-                        'user_id' => $this->getUser()->getId(),
-                        'name' => $this->getUser()->getName(),
-                        'notes' => $noteForm->getData()['notes']
-                    ]));
+                    $policy->addNoteDetails(
+                        $this->conformAlphanumericSpaceDot($noteForm->getData()['notes'], 2500),
+                        $this->getUser()
+                    );
                     $dm->flush();
                     $this->addFlash(
                         'success',
@@ -1031,9 +1250,9 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                             'bcc@so-sure.com'
                         );
 
-                        $mailer->sendTemplate(
+                        $mailer->sendTemplateToUser(
                             $customerSubject,
-                            $policy->getUser()->getEmail(),
+                            $policy->getUser(),
                             'AppBundle:Email:policy/debtCollectionCustomer.html.twig',
                             ['policy' => $policy],
                             'AppBundle:Email:policy/debtCollectionCustomer.txt.twig',
@@ -1045,32 +1264,6 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                         $this->addFlash(
                             'success',
                             sprintf('Emailed debt collector and set flag on policy')
-                        );
-                    }
-
-                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
-                }
-            } elseif ($request->request->has('picsure_form')) {
-                $picsureForm->handleRequest($request);
-                if ($picsureForm->isValid()) {
-                    if ($policy->getPolicyTerms()->isPicSureEnabled() && !$policy->isPicSureValidated()) {
-                        if ($picsureForm->get('approve')->isClicked()) {
-                            $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_APPROVED, $this->getUser());
-                        } elseif ($picsureForm->get('preapprove')->isClicked()) {
-                            $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_PREAPPROVED, $this->getUser());
-                        } else {
-                            throw new \Exception('Unknown button click');
-                        }
-                        $policy->setPicSureApprovedDate(\DateTime::createFromFormat('U', time()));
-                        $dm->flush();
-                        $this->addFlash(
-                            'success',
-                            sprintf('Set pic-sure to %s', $policy->getPicSureStatus())
-                        );
-                    } else {
-                        $this->addFlash(
-                            'error',
-                            'Policy is not a pic-sure policy or policy is already pic-sure (pre)approved'
                         );
                     }
 
@@ -1250,7 +1443,6 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             'makemodel_form' => $makeModelForm->createView(),
             'chargebacks_form' => $chargebacksForm->createView(),
             'debt_form' => $debtForm->createView(),
-            'picsure_form' => $picsureForm->createView(),
             'swap_payment_plan_form' => $swapPaymentPlanForm->createView(),
             'pay_policy_form' => $payPolicyForm->createView(),
             'cancel_direct_debit_form' => $cancelDirectDebitForm->createView(),
@@ -2377,9 +2569,9 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_APPROVED, $this->getUser());
             $dm->flush();
             $mailer = $this->get('app.mailer');
-            $mailer->sendTemplate(
+            $mailer->sendTemplateToUser(
                 'pic-sure is successfully validated',
-                $policy->getUser()->getEmail(),
+                $policy->getUser(),
                 'AppBundle:Email:picsure/accepted.html.twig',
                 ['policy' => $policy],
                 'AppBundle:Email:picsure/accepted.txt.twig',
@@ -2412,9 +2604,9 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_REJECTED, $this->getUser());
             $dm->flush();
             $mailer = $this->get('app.mailer');
-            $mailer->sendTemplate(
+            $mailer->sendTemplateToUser(
                 'pic-sure failed to validate your phone',
-                $policy->getUser()->getEmail(),
+                $policy->getUser(),
                 'AppBundle:Email:picsure/rejected.html.twig',
                 ['policy' => $policy],
                 'AppBundle:Email:picsure/rejected.txt.twig',
@@ -2459,9 +2651,9 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_INVALID, $this->getUser());
             $dm->flush();
             $mailer = $this->get('app.mailer');
-            $mailer->sendTemplate(
+            $mailer->sendTemplateToUser(
                 'Sorry, we need another pic-sure',
-                $policy->getUser()->getEmail(),
+                $policy->getUser(),
                 'AppBundle:Email:picsure/invalid.html.twig',
                 ['policy' => $policy, 'additional_message' => $request->get('message')],
                 'AppBundle:Email:picsure/invalid.txt.twig',

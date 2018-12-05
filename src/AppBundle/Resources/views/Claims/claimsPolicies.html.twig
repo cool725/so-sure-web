@@ -7,6 +7,15 @@
  %}<link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
 {% endblock %}
 
+{% block javascripts %}
+    {{ parent() }}
+    {% javascripts
+        '@AppBundle/Resources/public/js/AdminEmployee/policies.js'
+    %}
+        <script src="{{ asset_url }}"></script>
+    {% endjavascripts %}
+{% endblock %}
+
 {% block body %}
 <div class="container" id="claim-handling">
     <h2>Search</h2>
@@ -113,15 +122,26 @@
 
     </div>
     {{ form_end(form) }}
-    <h2>{{ pager.nbResults }} Results</h2>
-    <p>
-      <em>Tip: Simply click on the policy number to view that person's details.</em>
-    </p>
+    <div class="row-fluid">
+        <div class="col-sm-6">
+            <h2>{{ pager.nbResults }} Results</h2>
+            <p>
+                <em>Tip: Simply click on the policy number to view that person's details.</em>
+            </p>
+        </div>
+        <div class="col-sm-6" class="pull-right" style="margin-top: 20px">
+            {% if is_granted('ROLE_EMPLOYEE') and (status == 'call' or status == 'called') %}
+                <a href="{{ path('admin_policies_called_list') }}" title="Download last week" target="_blank"><i class="fa fa-2x fa-download"></i> </a>
+                <a href="{{ path('admin_policies_called_list', {'week': 'now'}) }}" title="Download this week" target="_blank"><i class="fa fa-2x fa-clock-o"></i> </a>
+            {% endif %}
+        </div>
+    </div>
     {% if policies|length == 0 %}
     <div class="row-fluid">
         <h2>No policies found</h2>
     </div>
     {% else %}
+        <form>
     <div class="row-fluid">
         <div class="col-md-12">
           <div class="table-responsive">
@@ -138,6 +158,9 @@
                         <th>Pot Value</th>
                         <th># Notes</th>
                         <th>Debt collector</th>
+                        {% if is_granted('ROLE_EMPLOYEE') and status == 'call' %}
+                        <th>Call</th>
+                        {% endif %}
                         {#
                         <th>Facebook</th>
                         <th>User Status</th>
@@ -156,9 +179,10 @@
                             </a></td>
                             <td>{{ policy.status }}
                                 {% if policy.status == "cancelled" %} / {{ policy.cancelledReason }}{% endif %}
-                                {# starting to impact on query time - as value is questionable, can be removed for now
-                                {% if policy.hasPolicyExpirationDate and policy.status == "unpaid" %} / {{ policy.policyExpirationDate | date('d M Y H:i', 'Europe/London') }}{% endif %}
-                                #}
+                                {% if status == 'call' or status == 'called' %}
+                                    {# starting to impact on query time; for call for unpaid, its useful, but otherwise less important #}
+                                    {% if policy.hasPolicyExpirationDate and policy.status == "unpaid" %} / {{ policy.policyExpirationDate | date('d M Y H:i', 'Europe/London') }}{% endif %}
+                                {% endif %}
                             </td>
                             <td>{{ policy.age }} {% if policy.getPremiumPlan == 'yearly' %}<i class="fa fa-calendar" title="Yearly plan"></i>{% endif %}
                                 {% if policy.nextPolicy %}<a href="{{ path(policy_route, {'id': policy.nextPolicy.id}) }}" title="Next policy"><i class="fa fa-arrow-right"></i> </a>{% endif %}
@@ -178,8 +202,11 @@
                                 {{ policy.getClaimsText | raw}}
                             </td>
                             <td>£{{ policy.potValue }}</td>
-                            <td style="background-color: {{ policy.getLatestNoteTimestampColour }}">{{ policy.notes|length }}</td>
+                            <td style="background-color: {{ policy.getLatestNoteTimestampColour }}">{{ policy.notesList|length }}</td>
                             <td>{% if policy.debtCollector %}{{ policy.debtCollector }}{% else %}-{% endif %}</td>
+                            {% if is_granted('ROLE_EMPLOYEE') and status == 'call' %}
+                            <td><a href="#" data-toggle="modal" data-name="{{ policy.user.name }}" data-number="{{ policy.user.mobileNumber }}" data-policy-id="{{ policy.id }}" data-target="#callModal" class="btn btn-success">Call</a></td>
+                            {% endif %}
                             {#
                             <td>{% if policy.user.facebookId | length > 0 %}Yes{% else %}No{% endif %}</td>
                             <td>{% if policy.user.locked %}locked{% elseif policy.user.enabled %}enabled{% else %}disabled{%endif %}</td>
@@ -191,8 +218,8 @@
         </div>
       </div>
     </div>
+        </form>
     {% endif %}
-    </form>
 
     {% if policies|length > 0 %}
     <div class="pagerfanta text-center">
@@ -200,5 +227,55 @@
     </div>
     {% endif %}
     <div style="padding-bottom: 50px"></div>
+
+    {% if call_form is defined %}
+    <div class="modal fade" id="callModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">Record call</h4>
+                </div>
+                <div class="modal-body">
+                    <h4>Name: <span id="call-form-name"></span></h4>
+                    <h4>Number: <span id="call-form-number"></span></h4>
+                    {{ form_start(call_form, {'attr': {'id': 'call-form', 'class': 'form'}})  }}
+                    <div class="form-group">
+                        {{ form_label(call_form.result, 'Call Result') }}
+                        {{ form_errors(call_form.result) }}
+                        {{ form_widget(call_form.result) }}
+                    </div>
+                    <div class="form-group">
+                        {{ form_label(call_form.voicemail, 'Left Voicemail') }}
+                        {{ form_errors(call_form.voicemail) }}
+                        {{ form_widget(call_form.voicemail) }}
+                    </div>
+                    <div class="form-group">
+                        {{ form_label(call_form.emailed, 'Emailed') }}
+                        {{ form_errors(call_form.emailed) }}
+                        {{ form_widget(call_form.emailed) }}
+                    </div>
+                    <div class="form-group">
+                        {{ form_label(call_form.sms, 'Sent SMS') }}
+                        {{ form_errors(call_form.sms) }}
+                        {{ form_widget(call_form.sms) }}
+                    </div>
+                    <div class="form-group">
+                        {{ form_label(call_form.notes, 'Additional Notes') }}
+                        {{ form_errors(call_form.notes) }}
+                        {{ form_widget(call_form.notes, { 'attr': {'class': 'form-control', 'rows': '3'}}) }}
+                    </div>
+                    <div class="form-group">
+                        {{ form_widget(call_form.policyId) }}
+                        {{ form_widget(call_form.add, {'label': 'Record call', 'attr': {'class': 'btn btn-success'}})}}
+                    </div>
+
+                    {{ form_end(call_form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
 </div>
+
 {% endblock %}
