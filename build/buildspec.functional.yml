@@ -4,4 +4,4 @@ run-as: root
 phases:
   build:
     commands:
-      - run-test-functional.sh -l
+      - ./build/run-test-functional.sh -l
