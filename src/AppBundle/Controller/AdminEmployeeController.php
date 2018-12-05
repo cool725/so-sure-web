@@ -2432,6 +2432,37 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
     }
 
     /**
+     * @Route("/phone/{id}/details", name="admin_phone_details")
+     * @Method({"POST"})
+     */
+    public function phoneDetailsAction(Request $request, $id)
+    {
+        if (!$this->isCsrfTokenValid('default', $request->get('token'))) {
+            throw new \InvalidArgumentException('Invalid csrf token');
+        }
+
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(Phone::class);
+        $editPhone = $repo->find($id);
+        if ($editPhone) {
+            $phones = $repo->findBy(['make' => $editPhone->getMake(), 'model' => $editPhone->getModel()]);
+            foreach ($phones as $phone) {
+                /** @var Phone $phone */
+                $phone->setDescription($request->get('description'));
+                $phone->setFunFacts($request->get('fun-facts'));
+                $phone->setCanonicalPath($request->get('canonical-path'));
+            }
+            $dm->flush();
+            $this->addFlash(
+                'success',
+                'Your changes were saved!'
+            );
+        }
+
+        return new RedirectResponse($this->generateUrl('admin_phones'));
+    }
+
+    /**
      * @Route("/phone/{id}/higlight", name="admin_phone_highlight")
      * @Method({"POST"})
      */
