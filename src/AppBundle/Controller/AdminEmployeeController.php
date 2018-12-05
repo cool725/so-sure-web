@@ -30,7 +30,6 @@ use AppBundle\Service\ReportingService;
 use AppBundle\Service\RouterService;
 use AppBundle\Service\SalvaExportService;
 use AppBundle\Service\AffiliateService;
-use AppBundle\Document\ValidatorTrait;
 use Doctrine\ODM\MongoDB\Query\Builder;
 use Gedmo\Loggable\Document\Repository\LogEntryRepository;
 use Grpc\Call;
