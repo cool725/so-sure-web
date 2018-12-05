@@ -6,6 +6,7 @@ use AppBundle\Classes\DirectGroupHandlerClaim;
 use AppBundle\Document\Policy;
 use AppBundle\Service\DaviesService;
 use AppBundle\Service\DirectGroupService;
+use AppBundle\Service\DirectGroupServiceExcel;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;

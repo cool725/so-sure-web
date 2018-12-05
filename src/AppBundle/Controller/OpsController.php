@@ -502,7 +502,7 @@ class OpsController extends BaseController
             ]);
         } elseif ($request->get('_route') == 'ops_scodecopied_location') {
             $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_INVITE, [
-                'Invitation Method' => 'scodecopied',
+                'Invitation Method' => 'scode copied',
                 'Location' => $location,
             ]);
         } elseif ($request->get('_route') == 'ops_onboarding_location') {
