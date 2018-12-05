@@ -24,6 +24,8 @@ parameters:
         - '82.16.104.75' # patrick
         - '82.163.118.154' # so-sure ip @ frameworks
         - '82.163.117.184' # frameworks ip
+    pos_ips:
+        - '127.0.0.1' # Temp. HelloZ should go here
 
 framework:
     #esi:             ~

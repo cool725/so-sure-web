@@ -26,11 +26,6 @@ class LeadPortalType extends AbstractType
      */
     private $required;
 
-    /**
-     * @var RequestStack
-     */
-    private $requestStack;
-
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
