@@ -87,7 +87,7 @@ security:
         - { path: ^/login$, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/register, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/resetting, role: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/helloz$, role: IS_AUTHENTICATED_ANONYMOUSLY, ips: "%pos_ips%" }
+        - { path: ^/helloz, role: IS_AUTHENTICATED_ANONYMOUSLY, ips: "%pos_ips%" }
         - { path: ^/admin$, role: ROLE_EMPLOYEE }
         - { path: ^/admin/, role: ROLE_EMPLOYEE }
         - { path: ^/claims$, role: ROLE_CLAIMS, ips: [ "%davies_ip%" ] }

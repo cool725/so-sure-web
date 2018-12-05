@@ -21,29 +21,24 @@ use Symfony\Component\Form\FormEvent;
 
 class LeadPortalType extends AbstractType
 {
-    /**
-     * @var boolean
-     */
-    private $required;
-
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
             ->add('submittedBy', ChoiceType::class, [
-                'required' => $this->required,
+                'required' => true,
                 'choices' => array(
                     'Customer' => 'customer',
                     'Staff' => 'staff'
                 ),
                 'placeholder' => 'Choose a user to begin...',
                 'multiple' => false,
-                'mapped' => false,
+                'mapped' => false
             ])
             ->add('name', TextType::class, [
-                'required' => $this->required
+                'required' => true
             ])
             ->add('email', EmailType::class, [
-                'required' => $this->required
+                'required' => true
             ])
             ->add('phone', DocumentType::class, [
                 'placeholder' => 'Select your device',
@@ -56,7 +51,7 @@ class LeadPortalType extends AbstractType
                 },
             ])
             ->add('terms', CheckboxType::class, [
-                'required' => $this->required,
+                'required' => true,
                 'mapped' => false
             ])
             ->add('submit', SubmitType::class);
