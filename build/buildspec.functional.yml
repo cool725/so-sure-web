@@ -1,0 +1,7 @@
+version: 0.2
+os: linux
+run-as: root
+phases:
+  build:
+    commands:
+      - run-test-functional.sh -l
