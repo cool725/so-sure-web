@@ -8,6 +8,8 @@ use Symfony\Component\Templating\EngineInterface;
 
 class MailerService
 {
+    use RouterTrait;
+
     const EMAIL_WEEKLY = 'weekly';
 
     /** @var \Swift_Mailer */
@@ -43,11 +45,15 @@ class MailerService
      * @var array
      */
     public static $analyticsCampaigns = [
-        'policy/cardExpiring',
-        'policy/failedPayment',
-        'policy/failedPaymentFinal',
-        'policy/failedPaymentWithClaim',
-        'policy/failedPaymentWithClaimFinal',
+        'card/cardExpiring',
+        'card/failedPayment-1',
+        'card/failedPayment-2',
+        'card/failedPayment-3',
+        'card/failedPayment-4',
+        'policy/failedPaymentWithClaim-1',
+        'policy/failedPaymentWithClaim-2',
+        'policy/failedPaymentWithClaim-3',
+        'policy/failedPaymentWithClaim-4',
     ];
 
     /**
@@ -75,21 +81,6 @@ class MailerService
         $this->defaultSenderAddress = $defaultSenderAddress;
         $this->defaultSenderName = $defaultSenderName;
         $this->mixpanelService = $mixpanelService;
-    }
-
-    private function getCampaign($htmlTemplate)
-    {
-        // print $subject;
-        // base campaign on template name
-        // AppBundle:Email:quote/priceGuarentee.html.twig
-        $campaign = $htmlTemplate;
-        if (mb_stripos($campaign, ':')) {
-            $campaignItems = explode(':', $campaign);
-            $campaign = $campaignItems[count($campaignItems) - 1];
-        }
-        $campaign = explode('.', $campaign)[0];
-
-        return $campaign;
     }
 
     public function sendTemplateToUser(

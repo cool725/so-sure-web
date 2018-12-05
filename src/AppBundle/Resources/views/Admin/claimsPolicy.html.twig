@@ -60,7 +60,7 @@
 {% endif %}
         </div>
     <div class="bg-danger text-center" style="border-radius: 10px; padding: 20px; margin-bottom: 20px;">
-        {% if policy.canCancel(null) %}
+        {% if policy.isPolicy() %}
         <div class="row">
             <div class="col-md-12 text-center">
                 <h3>Policy Cancellation</h3>

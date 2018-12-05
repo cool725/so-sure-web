@@ -56,6 +56,7 @@
                         <p class="lead text-center">Your last Direct Debit payment failed and your policy is in danger of being cancelled.</p>
                     {% elseif unpaid_reason == 'unpaid_bacs_payment_missing' %}
                         {# PAYMENT MISSING #}
+                        {% set show_bacs_setup = true %}
                         {% set show_bacs_retry = true %}
                         {% if not policy.canBacsPaymentBeMadeInTime %}
                             {% set show_judo = true %}
@@ -92,23 +93,6 @@
                         <p class="lead text-center">Please <a href="mailto:support@wearesosure.com" class="open-intercom">contact us</a>.</p>
                     {% endif %}
 
-                    {% if show_bacs_setup %}
-                        <p class="lead text-center">
-                            {% if policy.canBacsPaymentBeMadeInTime %}
-                                {% if not app.user.hasBacsPaymentMethod %}
-                                    <a id="setup-bacs-link" href="{{ path('user_payment_details_bacs') }}" class="btn btn-green btn-pad ">Change to Direct Debit</a>
-                                {% else %}
-                                    <a id="update-bacs-link" href="{{ path('user_payment_details_bacs') }}" class="btn btn-green btn-pad ">Update Direct Debit details</a>
-                                {% endif %}
-                            {% else %}
-                                Sorry, there is not enough time to setup a Direct Debit mandate and take payment before your policy will expire.
-                                {% if not show_judo %}
-                                    Please <a href="mailto:support@wearesosure.com" class="open-intercom">contact us</a>.
-                                {% endif %}
-                            {% endif %}
-                        </p>
-                    {% endif %}
-
                     {% if show_bacs_retry %}
                         {% if policy.canBacsPaymentBeMadeInTime %}
                             <p class="lead text-center">
@@ -119,9 +103,9 @@
                             <div class="row">
                                 <div class="col-sm-12">
                                     {{ form_start(form, {'attr': {'id': 'reschedule-bacs-form', 'class': 'form-inline text-center'}})  }}
-                                        <div class="form-group">
-                                            {{ form_widget(form.reschedule, {'attr': {'class': 'btn btn-green btn-pad'}}) }}
-                                        </div>
+                                    <div class="form-group">
+                                        {{ form_widget(form.reschedule, {'attr': {'class': 'btn btn-green btn-pad'}}) }}
+                                    </div>
                                     {{ form_end(form) }}
                                 </div>
                             </div>
@@ -133,6 +117,23 @@
                                 {% endif %}
                             </p>
                         {% endif %}
+                    {% endif %}
+
+                    {% if show_bacs_setup %}
+                        <p class="lead text-center" style="margin-top: 20px;">
+                            {% if policy.canBacsPaymentBeMadeInTime %}
+                                {% if not app.user.hasBacsPaymentMethod %}
+                                    <a id="setup-bacs-link" href="{{ path('user_payment_details_bacs') }}" class="btn btn-green btn-pad ">Change to Direct Debit</a>
+                                {% else %}
+                                    <a id="update-bacs-link" href="{{ path('user_payment_details_bacs') }}" class="btn btn-green btn-pad ">Update Direct Debit details</a>
+                                {% endif %}
+                            {% elseif not show_bacs_retry %}
+                                Sorry, there is not enough time to setup a Direct Debit mandate and take payment before your policy will expire.
+                                {% if not show_judo %}
+                                    Please <a href="mailto:support@wearesosure.com" class="open-intercom">contact us</a>.
+                                {% endif %}
+                            {% endif %}
+                        </p>
                     {% endif %}
 
                     {% if show_judo and webpay_action and webpay_reference and amount > 0 %}

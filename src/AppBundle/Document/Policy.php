@@ -355,6 +355,7 @@ abstract class Policy
      * @Assert\DateTime()
      * @MongoDB\Field(type="date")
      * @Gedmo\Versioned
+     * @MongoDB\Index(unique=false, sparse=true)
      */
     protected $start;
 

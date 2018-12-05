@@ -8,6 +8,7 @@ use AppBundle\Document\File\PaymentRequestUploadFile;
 use AppBundle\Document\JudoPaymentMethod;
 use AppBundle\Document\Note\CallNote;
 use AppBundle\Document\Note\Note;
+use AppBundle\Document\ValidatorTrait;
 use AppBundle\Exception\PaymentDeclinedException;
 use AppBundle\Form\Type\AdminEmailOptOutType;
 use AppBundle\Form\Type\BacsCreditType;
@@ -494,7 +495,9 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                     $policy->getUser()->getMobileNumber(),
                     count($approvedClaims),
                     $claimsCost,
-                    $policy->getPolicyExpirationDate()->format('Y-m-d'),
+                    $policy->getPolicyExpirationDate() ?
+                        $policy->getPolicyExpirationDate()->format('Y-m-d') :
+                        null,
                     'FORMULA',
                     $policy->getStatus(),
                     'Yes',
@@ -503,10 +506,10 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                     $note->getOtherActions(),
                     $note->getActions(true),
                     $note->getCategory(),
-                    $policy->getPolicyExpirationDate()->format('W'),
+                    $policy->getPolicyExpirationDate() ? $policy->getPolicyExpirationDate()->format('W') : null,
                     $note->getDate()->format('W'),
                     $note->getDate()->format('M'),
-                    $policy->getPolicyExpirationDate()->format('M'),
+                    $policy->getPolicyExpirationDate() ? $policy->getPolicyExpirationDate()->format('M') : null,
                 ];
                 fputcsv(
                     $handle, // The file pointer
@@ -955,7 +958,10 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             } elseif ($request->request->has('note_form')) {
                 $noteForm->handleRequest($request);
                 if ($noteForm->isValid()) {
-                    $policy->addNoteDetails($noteForm->getData()['notes'], $this->getUser());
+                    $policy->addNoteDetails(
+                        $this->conformAlphanumericSpaceDot($noteForm->getData()['notes'], 2500),
+                        $this->getUser()
+                    );
                     $dm->flush();
                     $this->addFlash(
                         'success',
@@ -2472,6 +2478,37 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                     sprintf('attachment; filename="so-sure-policy-breakdown-%s.pdf"', $now->format('Y-m-d'))
             )
         );
+    }
+
+    /**
+     * @Route("/phone/{id}/details", name="admin_phone_details")
+     * @Method({"POST"})
+     */
+    public function phoneDetailsAction(Request $request, $id)
+    {
+        if (!$this->isCsrfTokenValid('default', $request->get('token'))) {
+            throw new \InvalidArgumentException('Invalid csrf token');
+        }
+
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(Phone::class);
+        $editPhone = $repo->find($id);
+        if ($editPhone) {
+            $phones = $repo->findBy(['make' => $editPhone->getMake(), 'model' => $editPhone->getModel()]);
+            foreach ($phones as $phone) {
+                /** @var Phone $phone */
+                $phone->setDescription($request->get('description'));
+                $phone->setFunFacts($request->get('fun-facts'));
+                $phone->setCanonicalPath($request->get('canonical-path'));
+            }
+            $dm->flush();
+            $this->addFlash(
+                'success',
+                'Your changes were saved!'
+            );
+        }
+
+        return new RedirectResponse($this->generateUrl('admin_phones'));
     }
 
     /**
