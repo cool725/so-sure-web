@@ -658,7 +658,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                 $imeiForm->handleRequest($request);
                 if ($imeiForm->isValid()) {
                     $policy->adjustImei($imei->getImei(), false);
-                  
+
                     $policy->addNoteDetails(
                         $imei->getNote(),
                         $this->getUser()
