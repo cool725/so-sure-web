@@ -9,7 +9,7 @@ const tracking = (name, type, location, callback) => {
 
     // Track by scode used & location
     } else if (type == 'scodecopied') {
-        url = '/ops/track/scode/' + location;
+        url = '/ops/track/scodecopied/' + location;
 
     // Track by onboarding & name
     } else if (type == 'onboarding') {
