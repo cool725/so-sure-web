@@ -1256,7 +1256,7 @@ class ReportingService
             $month = [];
             $month["open"] = $runningTotal;
             $month["new"] = $policyRepo->countAllNewPolicies($endOfMonth, $start);
-            $month["expired"] = $policyRepo->countAllEndingPolicies(null, $start, $endOfMonth, true);
+            $month["expired"] = $policyRepo->countAllEndingPolicies(null, $start, $endOfMonth, false);
             $runningTotal += $month["new"];
             $runningTotal -= $month["expired"];
             $month["close"] = $runningTotal;
@@ -1267,7 +1267,7 @@ class ReportingService
                 false
             );
             $month["newTotal"] = $policyRepo->countAllNewPolicies($endOfMonth) - (
-                $policyRepo->countAllEndingPolicies(null, null, $endOfMonth) -
+                $policyRepo->countAllEndingPolicies(null, null, $endOfMonth, false) -
                 $policyRepo->countAllEndingPolicies(Policy::CANCELLED_UPGRADE, null, $endOfMonth, false)
             );
             $month["newAdjusted"] = $month["new"] - $month["upgrade"];
