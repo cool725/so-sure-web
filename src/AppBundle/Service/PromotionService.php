@@ -3,6 +3,7 @@ namespace AppBundle\Service;
 
 use AppBundle\Document\Promotion;
 use AppBundle\Document\Participation;
+use AppBundle\Repository\ParticipationRepository;
 use AppBundle\Document\Policy;
 use AppBundle\Document\Invitation\Invitation;
 use AppBundle\Repository\Invitation\InvitationRepository;
@@ -46,6 +47,7 @@ class PromotionService
         if (!$date) {
             $date = new \DateTime();
         }
+        /** @var ParticipationRepository $participationRepository */
         $participationRepository = $this->dm->getRepository(Participation::class);
         $participations = $participationRepository->findByStatus(Participation::STATUS_ACTIVE, $promotions);
         $endings = [];
