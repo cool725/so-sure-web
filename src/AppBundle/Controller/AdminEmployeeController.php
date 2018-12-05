@@ -781,12 +781,22 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                 if ($linkClaimform->isValid()) {
                     /** @var ClaimRepository $repo */
                     $repo = $dm->getRepository(Claim::class);
-                    $res = $repo->findClaimByDetails(
+
+                    $claim = $repo->findClaimByDetails(
                         $linkClaimform->get('id')->getData(),
                         $linkClaimform->get('number')->getData()
                     );
 
-                    $policy->addLinkedClaim($res);
+                    if (!$claim) {
+                        $this->addFlash(
+                            'error',
+                            sprintf('No claim matched')
+                        );
+
+                        return $this->redirectToRoute('admin_policy', ['id' => $id]);
+                    }
+
+                    $policy->addLinkedClaim($claim);
                     $policy->addNoteDetails(
                         sprintf(
                             'Linked Claim %s. Notes: %s',
