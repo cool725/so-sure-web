@@ -433,7 +433,7 @@ class MonitorService
         }
     }
 
-    public function bacsSubmitted()
+    public function accessPayNotSubmitted()
     {
         $repo = $this->dm->getRepository(AccessPayFile::class);
         /** @var AccessPayFile $unsubmitted */
