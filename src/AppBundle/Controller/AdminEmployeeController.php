@@ -711,7 +711,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             if ($request->request->has('imei_form')) {
                 $imeiForm->handleRequest($request);
                 if ($imeiForm->isValid()) {
-                    $policy->setDetectedImei($imei->getImei(), false);
+                    $policy->setDetectedImei($imei->getImei());
 
                     $policy->addNoteDetails(
                         sprintf('Updated detected imei. Additional notes: %s', $imei->getNote()),
