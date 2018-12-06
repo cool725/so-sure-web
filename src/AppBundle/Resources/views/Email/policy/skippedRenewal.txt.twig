@@ -1,0 +1,14 @@
+{% extends 'AppBundle:Email:base.txt.twig' %}
+{% block body %}
+Your so-sure insurance is unable to be automatically renewed.
+
+**
+------------------------------------------------------------
+Dear {{ policy.user.name }},
+
+We emailed you a few week ago about automatically renewing your SO-SURE policy {{ policy.policyNumber }}.
+
+Unfortuantely, we were unable to automatically renew your policy as your previous policy was either cancelled or unpaid.
+
+If you have any questions, please don't hesitate to email us at support@wearesosure.com.
+{% endblock body %}
