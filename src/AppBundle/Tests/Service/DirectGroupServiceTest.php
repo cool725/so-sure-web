@@ -344,6 +344,8 @@ class DirectGroupServiceTest extends WebTestCase
         static::$dm->persist($claimOpen2);
         static::$dm->flush();
         self::$directGroupService->clearErrors();
+        self::$directGroupService->clearWarnings();
+        self::$directGroupService->clearSoSureActions();
 
         $now = \DateTime::createFromFormat('U', time());
         $dgOpen = new DirectGroupHandlerClaim();
