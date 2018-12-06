@@ -658,7 +658,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                 $imeiForm->handleRequest($request);
                 if ($imeiForm->isValid()) {
                     $policy->adjustImei($imei->getImei(), false);
-                  
+
                     $policy->addNoteDetails(
                         $imei->getNote(),
                         $this->getUser()
@@ -2289,6 +2289,54 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             'rewards' => $rewards,
             'connectForm' => $connectForm->createView(),
             'rewardForm' => $rewardForm->createView(),
+        ];
+    }
+
+    /**
+     * @Route("/tastecard-form/{id}", name="tastecard_form")
+     * @Template
+     */
+    public function tasteCardFormAction(Request $request, $id)
+    {
+        $tasteCardForm = $this->get("form.factory")
+            ->createNamedBuilder("tastecard_form")
+            ->add("number", TextType::class)
+            ->add("update", SubmitType::class)
+            ->add("resend", SubmitType::class)
+            ->setAction($this->generateUrl(
+                'tastecard_form',
+                ['id' => $id]
+            ))
+            ->getForm();
+        $dm = $this->getManager();
+        $policyRepository = $dm->getRepository(Policy::class);
+        $policy = $policyRepository->find($id);
+        if ('POST' === $request->getMethod()) {
+            if ($request->request->has("tastecard_form")) {
+                $tasteCardForm->handleRequest($request);
+                if ($tasteCardForm->isValid()) {
+                    $policyService = $this->get("app.policy");
+                    if ($tasteCardForm->getClickedButton()->getName() === "update") {
+                        $tasteCard = $this->conformAlphanumeric($tasteCardForm->get("number")->getData(), 10, 10);
+                        if ($tasteCard) {
+                            $policy->setTasteCard($tasteCard);
+                            $dm->flush();
+                            $policyService->tasteCardEmail($policy);
+                            $this->addFlash("success", "Tastecard set to {$tasteCard}.");
+                        } else {
+                            $this->addFlash("error", "Tastecard number must be 10 alphanumeric characters.");
+                        }
+                    } elseif ($tasteCardForm->getClickedButton()->getName() === "resend") {
+                        $policyService->tasteCardEmail($policy);
+                        $this->addFlash('success', 'Tastecard notification has been resent.');
+                    }
+                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
+                }
+            }
+        }
+        return [
+            "form" => $tasteCardForm->createView(),
+            "policy" => $policy
         ];
     }
 

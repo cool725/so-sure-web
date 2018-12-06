@@ -1021,7 +1021,6 @@ class PolicyService
         }
         $policy->cancel($reason, $date);
         $this->dm->flush();
-
         $this->cancelledPolicyEmail($policy);
         $this->cancelledPolicySms($policy);
         if (count($policy->getConnections()) > 0 && $reason == Policy::CANCELLED_UPGRADE) {
@@ -1142,6 +1141,26 @@ class PolicyService
             null,
             'bcc@so-sure.com'
         );
+    }
+
+    /**
+     * Sends the owner of given policy an email telling them that they have got a taste card now.
+     * @param Policy $policy is the policy that has now had a taste card added.
+     */
+    public function tasteCardEmail($policy)
+    {
+        if ($this->mailer) {
+            $this->mailer->sendTemplate(
+                "Your new Taste Card from So-Sure",
+                $policy->getUser()->getEmail(),
+                'AppBundle:Email:policy/email_new_taste_card.html.twig',
+                ['policy' => $policy],
+                'AppBundle:Email:policy/email_new_taste_card.txt.twig',
+                ['policy' => $policy],
+                null,
+                'bcc@so-sure.com'
+            );
+        }
     }
 
     /**
