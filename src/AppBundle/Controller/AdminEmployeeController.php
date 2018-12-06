@@ -2199,7 +2199,11 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             $imei = json_decode($storedImei, true);
             $imei['actualPolicy'] = $repo->findOneBy(['imei' => $imei['detected_imei']]);
             $imei['detectedPolicy'] = $repo->findOneBy(['detectedImei' => $imei['detected_imei']]);
-            $imei['suggestedPolicy'] = $repo->findOneBy(['imei' => $imei['suggested_imei']]);
+            if (mb_strlen($imei['suggested_imei']) > 0) {
+                $imei['suggestedPolicy'] = $repo->findOneBy(['imei' => $imei['suggested_imei']]);
+            } else {
+                $imei['suggestedPolicy'] = null;
+            }
             $imei['raw'] = $storedImei;
             $imeis[] = $imei;
         }
