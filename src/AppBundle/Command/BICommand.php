@@ -94,7 +94,7 @@ class BICommand extends ContainerAwareCommand
                 "timezone",
                 null,
                 InputOption::VALUE_REQUIRED,
-                "Choose a timezone to use for policies report [london, utc]"
+                "Choose a timezone to use for policies report"
             )
         ;
     }
