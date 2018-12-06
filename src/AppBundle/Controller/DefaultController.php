@@ -200,6 +200,41 @@ class DefaultController extends BaseController
     }
 
     /**
+     * @Route("/topcashback", name="topcashback")
+     * @Route("/vouchercodes", name="vouchercodes")
+     * @Route("/quidco", name="quidco")
+     */
+    public function affiliateLanding(Request $request)
+    {
+        $page = null;
+        $affiliate = null;
+
+        if ($request->get('_route') == 'topcashback') {
+            $page = 'topcashback';
+            $affiliate = 'TopCashback';
+
+        } elseif ($request->get('_route') == 'vouchercodes') {
+            $page = 'vouchercodes';
+            $affiliate = 'VoucherCodes';
+
+        } elseif ($request->get('_route') == 'quidco') {
+            $page = 'quidco';
+            $affiliate = 'Quidco';
+        }
+
+        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE, [
+            'page' => $page
+        ]);
+
+        $data = [
+            'affiliate_company' => $affiliate,
+            'affiliate_page' => $page,
+        ];
+
+        return $this->render('AppBundle:Default:indexAffiliate.html.twig', $data);
+    }
+
+    /**
      * @Route("/eb", name="eb")
      * @Template
      */
