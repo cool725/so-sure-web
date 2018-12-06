@@ -939,7 +939,7 @@ class MonitorService
         $imeis = [];
         if ($imei = $this->redis->lpop('DETECTED-IMEI')) {
             $imeis[] = json_decode($imei, true);
-            $this->redis->lpush('DETECTED-IMEI', $imei);
+            $this->redis->lpush('DETECTED-IMEI', [$imei]);
         }
         foreach ($imeis as $imei) {
             throw new MonitorException(

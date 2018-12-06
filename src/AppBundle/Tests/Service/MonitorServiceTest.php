@@ -506,8 +506,8 @@ class MonitorServiceTest extends WebTestCase
     public function testCheckDetectedImei()
     {
         $redis = self::$container->get('snc_redis.default');
-        $redis->lpush('DETECTED-IMEI', "479823749");
-        $redis->lpush('DETECTED-IMEI', "243598726345");
+        $redis->lpush("DETECTED-IMEI", "a");
         self::$monitor->checkDetectedImei();
+        $this->assertEquals("a", $redis->lpop("DETECTED-IMEI"));
     }
 }
