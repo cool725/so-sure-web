@@ -510,5 +510,6 @@ class MonitorServiceTest extends WebTestCase
         $this->expectException(MonitorException::class);
         self::$monitor->checkDetectedImei();
         $this->assertEquals("a", $redis->lpop("DETECTED-IMEI"));
+        self::$monitor->checkDetectedImei();
     }
 }
