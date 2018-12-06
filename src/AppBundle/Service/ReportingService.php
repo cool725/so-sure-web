@@ -57,11 +57,6 @@ class ReportingService
         'four months ago' => ['start' => 'first day of -4 month', 'end' => 'first day of -3 month', 'month' => true]
     ];
     const REPORT_PERIODS_DEFAULT = 'last 7 days';
-    const EXPIRATIONS = [
-        Policy::STATUS_EXPIRED,
-        Policy::STATUS_EXPIRED_CLAIMABLE,
-        Policy::STATUS_EXPIRED_WAIT_CLAIM
-    ];
 
     use DateTrait;
     use CurrencyTrait;
@@ -1261,7 +1256,7 @@ class ReportingService
             $month = [];
             $month["open"] = $runningTotal;
             $month["new"] = $policyRepo->countAllNewPolicies($endOfMonth, $start);
-            $month["expired"] = $policyRepo->countEndingByStatus(self::EXPIRATIONS, $start, $endOfMonth);
+            $month["expired"] = $policyRepo->countEndingByStatus(Policy::$expirationStates, $start, $endOfMonth);
             $month["cancelled"] = $policyRepo->countEndingByStatus(Policy::STATUS_CANCELLED, $start, $endOfMonth);
             $runningTotal += $month["new"];
             $runningTotal -= $month["expired"];
@@ -1320,7 +1315,7 @@ class ReportingService
         /** @var PhonePolicyRepository $policyRepo */
         $policyRepo = $this->dm->getRepository(PhonePolicy::class);
         return $policyRepo->countAllNewPolicies($date) - (
-            $policyRepo->countEndingByStatus(self::EXPIRATIONS, null, $date) +
+            $policyRepo->countEndingByStatus(Policy::$expirationStates, null, $date) +
             $policyRepo->countEndingByStatus(Policy::STATUS_CANCELLED, null, $date)
         );
     }

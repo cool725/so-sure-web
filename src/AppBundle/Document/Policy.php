@@ -168,6 +168,12 @@ abstract class Policy
         self::RISK_PENDING_CANCELLATION_POLICY => self::RISK_LEVEL_HIGH,
     ];
 
+    public static $expirationStates = [
+        Policy::STATUS_EXPIRED,
+        Policy::STATUS_EXPIRED_CLAIMABLE,
+        Policy::STATUS_EXPIRED_WAIT_CLAIM
+    ];
+
     /**
      * @MongoDB\Id(strategy="auto")
      */
@@ -3023,11 +3029,7 @@ abstract class Policy
 
     public function isExpired()
     {
-        return in_array($this->getStatus(), [
-            self::STATUS_EXPIRED,
-            self::STATUS_EXPIRED_CLAIMABLE,
-            self::STATUS_EXPIRED_WAIT_CLAIM,
-        ]);
+        return in_array($this->getStatus(), $expirationStates);
     }
 
     public function isUnrenewed()
