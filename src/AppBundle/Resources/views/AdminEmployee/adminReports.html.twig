@@ -535,10 +535,12 @@
                                     <th>Month</th>
                                     <th>Open Tally</th>
                                     <th>New (Adjusted)</th>
-                                    <th>Cancelled (Adjusted)</th>
                                     <th>Expired</th>
+                                    <th>Cancelled (Adjusted)</th>
                                     <th>Upgrades</th>
-                                    <th>Close Tally (Absolute)</th>
+                                    <th>Close Tally</th>
+                                    <th>Open Queried</th>
+                                    <th>Close Queried</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -547,10 +549,12 @@
                                     <td><strong>{{ month }}</strong></td>
                                     <td>{{ content.open }}</td>
                                     <td>{{ content.new }} ({{ content.newAdjusted }})</td>
-                                    <td>{{ content.cancelled }} ({{ content.cancelledAdjusted }})</td>
                                     <td>{{ content.expired }}</td>
+                                    <td>{{ content.cancelled }} ({{ content.cancelledAdjusted }})</td>
                                     <td>{{ content.upgrade }}</td>
-                                    <td>{{ content.close }} ({{ content.newTotal }})</td>
+                                    <td>{{ content.close }}</td>
+                                    <td>{{ content.queryOpen }}</td>
+                                    <td>{{ content.queryClose }}</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>

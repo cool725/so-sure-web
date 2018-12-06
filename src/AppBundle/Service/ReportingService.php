@@ -1256,7 +1256,7 @@ class ReportingService
             $month = [];
             $month["open"] = $runningTotal;
             $month["new"] = $policyRepo->countAllNewPolicies($endOfMonth, $start);
-            $month["expired"] = $policyRepo->countEndingByStatus(Policy::STATUS_EXPIRED, $start, $endOfMonth);
+            $month["expired"] = $policyRepo->countEndingByStatus(Policy::$expirationStatuses, $start, $endOfMonth);
             $month["cancelled"] = $policyRepo->countEndingByStatus(Policy::STATUS_CANCELLED, $start, $endOfMonth);
             $runningTotal += $month["new"];
             $runningTotal -= $month["expired"];
@@ -1270,7 +1270,8 @@ class ReportingService
             );
             $month["newAdjusted"] = $month["new"] - $month["upgrade"];
             $month["cancelledAdjusted"] = $month["cancelled"] - $month["upgrade"];
-            $month["newTotal"] = $this->totalAtPoint($endOfMonth);
+            $month["queryOpen"] = $this->totalAtPoint($start);
+            $month["queryClose"] = $this->totalAtPoint($endOfMonth);
             $report[$start->format("F Y")] = $month;
             $start->add(new \DateInterval("P1M"));
         }
@@ -1314,7 +1315,7 @@ class ReportingService
         /** @var PhonePolicyRepository $policyRepo */
         $policyRepo = $this->dm->getRepository(PhonePolicy::class);
         return $policyRepo->countAllNewPolicies($date) - (
-            $policyRepo->countEndingByStatus(Policy::STATUS_EXPIRED, null, $date) +
+            $policyRepo->countEndingByStatus(Policy::$expirationStatuses, null, $date) +
             $policyRepo->countEndingByStatus(Policy::STATUS_CANCELLED, null, $date)
         );
     }
