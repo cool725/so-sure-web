@@ -523,7 +523,7 @@ class PhonePolicyRepository extends PolicyRepository
             ->field("policyNumber")->equals(new \MongoRegex(sprintf('/^%s\//', $policy->getPolicyNumberPrefix())));
         if (is_array($status)) {
             $qb->field("status")->in($status);
-        } elseif($status) {
+        } elseif ($status) {
             $qb->field("status")->equals($status);
         }
         if ($start) {
