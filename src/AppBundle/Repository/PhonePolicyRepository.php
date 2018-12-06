@@ -511,14 +511,21 @@ class PhonePolicyRepository extends PolicyRepository
 
     /**
      * Finds all policies that ended between the given dates and with the given status.
-     * @param String    $status is the status of the policies that we are looking for.
-     * @param \DateTime $start  is the date that policies must have ended after if it's given.
-     * @param \DateTime $end    is the date that policies must have ended before if it's given.
+     * @param String|array $status is the status of the policies that we are looking for or null for no checking that.
+     * @param \DateTime    $start  is the date that policies must have ended after if it's given.
+     * @param \DateTime    $end    is the date that policies must have ended before if it's given.
      * @return array containing all the found policies.
      */
-    public function findEndingByStatus($status, \DateTime $start = null, \DateTime $end = null)
+    public function findEndingByStatus($status = null, \DateTime $start = null, \DateTime $end = null)
     {
-        $qb = $this->createQueryBuilder()->field("status")->equals($status);
+        $policy = new PhonePolicy();
+        $qb = $this->createQueryBuilder()
+            ->field("policyNumber")->equals(new \MongoRegex(sprintf('/^%s\//', $policy->getPolicyNumberPrefix())));
+        if (is_array($status)) {
+            $qb->field("status")->in($status);
+        } elseif($status) {
+            $qb->field("status")->equals($status);
+        }
         if ($start) {
             $qb->field("end")->gte($start);
         }
