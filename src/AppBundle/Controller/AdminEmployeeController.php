@@ -681,6 +681,59 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             'policy' => $policy,
         ];
     }
+    /**
+     * @Route("/detected-imei-form/{id}", name="detected_imei_form")
+     * @Template
+     */
+    public function detectedImeiFormAction(Request $request, $id = null)
+    {
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(PhonePolicy::class);
+        /** @var PhonePolicy $policy */
+        $policy = $repo->find($id);
+
+        if (!$policy) {
+            throw $this->createNotFoundException(sprintf('Policy %s not found', $id));
+        }
+
+        $imei = new Imei();
+        $imei->setPolicy($policy);
+        $imei->setImei($policy->getDetectedImei());
+        $imeiForm = $this->get('form.factory')
+            ->createNamedBuilder('imei_form', ImeiType::class, $imei)
+            ->setAction($this->generateUrl(
+                'detected_imei_form',
+                ['id' => $id]
+            ))
+            ->getForm();
+
+        if ('POST' === $request->getMethod()) {
+            if ($request->request->has('imei_form')) {
+                $imeiForm->handleRequest($request);
+                if ($imeiForm->isValid()) {
+                    $policy->setDetectedImei($imei->getImei(), false);
+
+                    $policy->addNoteDetails(
+                        sprintf('Updated detected imei. Additional notes: %s', $imei->getNote()),
+                        $this->getUser()
+                    );
+
+                    $dm->flush();
+                    $this->addFlash(
+                        'success',
+                        sprintf('Policy %s detected imei updated.', $policy->getPolicyNumber())
+                    );
+
+                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
+                }
+            }
+        }
+
+        return [
+            'form' => $imeiForm->createView(),
+            'policy' => $policy,
+        ];
+    }
 
     /**
      * @Route("/picsure-form/{id}", name="picsure_form")
@@ -2146,6 +2199,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             $imei = json_decode($storedImei, true);
             $imei['actualPolicy'] = $repo->findOneBy(['imei' => $imei['detected_imei']]);
             $imei['detectedPolicy'] = $repo->findOneBy(['detectedImei' => $imei['detected_imei']]);
+            $imei['suggestedPolicy'] = $repo->findOneBy(['imei' => $imei['suggested_imei']]);
             $imei['raw'] = $storedImei;
             $imeis[] = $imei;
         }

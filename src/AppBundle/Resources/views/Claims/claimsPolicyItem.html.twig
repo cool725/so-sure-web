@@ -1188,6 +1188,20 @@
                     </td>
                 </tr>
                 <tr>
+                    <td>Detected Imei</td>
+                    <td>
+                        <form class="form-inline">
+                            <div class="form-group">
+                                {{ policy.detectedImei }}
+                            </div>
+                            <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#detectedImeiForm">
+                                <span class="glyphicon glyphicon-new-window" aria-hidden="true"></span>
+                                Update
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                <tr>
                     <td>Phone</td>
                     <td>
                         {{ form_start(phone_form, {'attr': {'class': 'form-inline'}}) }}
@@ -1235,6 +1249,7 @@
             </table>
 
             {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:AdminEmployee:imeiForm', 'policy': policy, 'id': 'imeiForm'} %}
+            {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:AdminEmployee:detectedImeiForm', 'policy': policy, 'id': 'detectedImeiForm'} %}
             {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:AdminEmployee:picsureForm', 'policy': policy, 'id': 'picsureForm'} %}
             {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:AdminEmployee:tasteCardForm', 'policy': policy, 'id': 'tasteCardForm'} %}
             {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:Admin:salvaRequeueForm', 'policy': policy, 'id': 'salvaRequeueForm'} %}
