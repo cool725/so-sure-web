@@ -1250,15 +1250,17 @@ class ReportingService
         /** @var PhonePolicyRepository $policyRepo */
         $policyRepo = $this->dm->getRepository(PhonePolicy::class);
         $report = [];
-        $runningTotal = $policyRepo->countAllNewPolicies($start);
+        $runningTotal = $this->totalAtPoint($start);
         while ($start < $end) {
             $endOfMonth = $this->endOfMonth($start);
             $month = [];
             $month["open"] = $runningTotal;
             $month["new"] = $policyRepo->countAllNewPolicies($endOfMonth, $start);
-            $month["expired"] = $policyRepo->countAllEndingPolicies(null, $start, $endOfMonth, false);
+            $month["expired"] = $policyRepo->countEndingByStatus(Policy::STATUS_EXPIRED, $start, $endOfMonth);
+            $month["cancelled"] = $policyRepo->countEndingByStatus(Policy::STATUS_CANCELLED, $start, $endOfMonth);
             $runningTotal += $month["new"];
             $runningTotal -= $month["expired"];
+            $runningTotal -= $month["cancelled"];
             $month["close"] = $runningTotal;
             $month["upgrade"] = $policyRepo->countAllEndingPolicies(
                 Policy::CANCELLED_UPGRADE,
@@ -1266,15 +1268,9 @@ class ReportingService
                 $endOfMonth,
                 false
             );
-            $month["newTotal"] = $policyRepo->countAllNewPolicies($endOfMonth) - (
-                $policyRepo->countAllEndingPolicies(null, null, $endOfMonth, false) -
-                $policyRepo->countAllEndingPolicies(Policy::CANCELLED_UPGRADE, null, $endOfMonth, false)
-            );
             $month["newAdjusted"] = $month["new"] - $month["upgrade"];
-            $month["endingAdjusted"] = $month["expired"] - $month["upgrade"];
-            if ($month["close"] != $month["newTotal"]) {
-                $month["bad"] = true;
-            }
+            $month["cancelledAdjusted"] = $month["cancelled"] - $month["upgrade"];
+            $month["newTotal"] = $this->totalAtPoint($endOfMonth);
             $report[$start->format("F Y")] = $month;
             $start->add(new \DateInterval("P1M"));
         }
@@ -1306,5 +1302,20 @@ class ReportingService
         $start->setTime(0, 0, 0);
         $end->setTime(0, 0, 0);
         return [$start, $end, $month];
+    }
+
+    /**
+     * Gives you the total number of policies that are going.
+     * @param \DateTime $date is the date to look at.
+     * @return int the number of policies.
+     */
+    private function totalAtPoint(\DateTime $date)
+    {
+        /** @var PhonePolicyRepository $policyRepo */
+        $policyRepo = $this->dm->getRepository(PhonePolicy::class);
+        return $policyRepo->countAllNewPolicies($date) - (
+            $policyRepo->countEndingByStatus(Policy::STATUS_EXPIRED, null, $date) +
+            $policyRepo->countEndingByStatus(Policy::STATUS_CANCELLED, null, $date)
+        );
     }
 }
