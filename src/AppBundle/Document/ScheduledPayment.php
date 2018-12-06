@@ -82,6 +82,14 @@ class ScheduledPayment
      */
     protected $payment;
 
+    /**
+     * @AppAssert\AlphanumericSpaceDot()
+     * @Assert\Length(min="1", max="200")
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
+    protected $notes;
+
     public function __construct()
     {
         $this->created = \DateTime::createFromFormat('U', time());
@@ -164,6 +172,16 @@ class ScheduledPayment
     public function getPolicy()
     {
         return $this->policy;
+    }
+
+    public function setNotes($notes)
+    {
+        $this->notes = $notes;
+    }
+
+    public function getNotes()
+    {
+        return $this->notes;
     }
 
     public function cancel()

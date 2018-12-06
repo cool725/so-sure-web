@@ -186,7 +186,8 @@ class DaviesService extends S3EmailService
             }
         }
 
-        // Check for any claims in db that are closed that appear after an open claim
+        // Check for any claims in db that are closed that appear after an open claim,
+        // or any cases where there is more than 1 open claim
         foreach ($daviesClaims as $daviesClaim) {
             $repo = $this->dm->getRepository(Policy::class);
             /** @var Policy $policy */
@@ -194,7 +195,7 @@ class DaviesService extends S3EmailService
             if ($policy) {
                 foreach ($policy->getClaims() as $claim) {
                     /** @var Claim $claim */
-                    // 2 options - either db claim is closed or davies claim is closed
+                    // 3 options - either db claim is closed or davies claim is closed, or both are open
                     $logError = false;
                     $preventImeiUpdate = false;
                     if (!$claim->isOpen() &&
@@ -212,6 +213,9 @@ class DaviesService extends S3EmailService
                         if ($claim->getHandlingTeam() == Claim::TEAM_DAVIES) {
                             $logError = true;
                         }
+                    } elseif ($claim->isOpen() && $daviesClaim->isOpen() &&
+                        $claim->getNumber() != $daviesClaim->claimNumber) {
+                        $preventImeiUpdate = true;
                     }
 
                     if ($preventImeiUpdate) {
@@ -558,7 +562,7 @@ class DaviesService extends S3EmailService
             $msg = sprintf(
                 'Claim %s does not have the correct excess value. Expected %0.2f Actual %0.2f for %s/%s',
                 $daviesClaim->claimNumber,
-                $daviesClaim->getExpectedExcess($validated, $phonePolicy->isPicSurePolicy()),
+                $daviesClaim->getExpectedExcessValue($validated, $phonePolicy->isPicSurePolicy()),
                 $daviesClaim->excess,
                 $daviesClaim->getClaimType(),
                 $daviesClaim->getClaimStatus()

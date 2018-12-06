@@ -7,6 +7,7 @@ use AppBundle\Classes\DirectGroupHandlerClaim;
 use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Service\DaviesService;
 use AppBundle\Service\DirectGroupService;
+use AppBundle\Service\DirectGroupServiceExcel;
 use AppBundle\Tests\Service\DaviesServiceTest;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ODM\MongoDB\DocumentManager;

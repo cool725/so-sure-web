@@ -6,6 +6,11 @@
 
 {% block title %}so-sure - Join today and we'll reward you!{% endblock %}
 
+{# Set Meta #}
+{% set og_title = 'Sign up and save' %}
+{% set og_description = 'Hey, I just insured my mobile phone with so-sure. They give you 80% of your cashback if we are connected and don\'t claim!' %}
+{% set og_image = cdn_url ~ '/images/rebrand/og/so-sure_og-image-1.png' %}
+
 {% block stylesheets %}
     {{ parent() }}
     {% stylesheets output='css/*.css'

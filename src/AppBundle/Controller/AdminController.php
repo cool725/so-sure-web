@@ -13,6 +13,8 @@ use AppBundle\Document\Sequence;
 use AppBundle\Document\ValidatorTrait;
 use AppBundle\Form\Type\ChargeReportType;
 use AppBundle\Form\Type\BacsMandatesType;
+use AppBundle\Form\Type\SalvaRequeueType;
+use AppBundle\Form\Type\SalvaStatusType;
 use AppBundle\Form\Type\UploadFileType;
 use AppBundle\Form\Type\ReconciliationFileType;
 use AppBundle\Form\Type\SequenceType;
@@ -215,7 +217,15 @@ class AdminController extends BaseController
             }
             $notes = $this->conformAlphanumericSpaceDot($this->getRequestString($request, 'notes'), 1500);
             try {
-                $phone->changePrice($gwp, $from, $to, $notes);
+                $policyTerms = $this->getLatestPolicyTerms();
+                $phone->changePrice(
+                    $gwp,
+                    $from,
+                    $policyTerms->getDefaultExcess(),
+                    $policyTerms->getDefaultPicSureExcess(),
+                    $to,
+                    $notes
+                );
             } catch (\Exception $e) {
                 $this->addFlash('error', $e->getMessage());
 
@@ -244,37 +254,6 @@ class AdminController extends BaseController
                 null,
                 null,
                 'tech@so-sure.com'
-            );
-        }
-
-        return new RedirectResponse($this->generateUrl('admin_phones'));
-    }
-
-    /**
-     * @Route("/phone/{id}/details", name="admin_phone_details")
-     * @Method({"POST"})
-     */
-    public function phoneDetailsAction(Request $request, $id)
-    {
-        if (!$this->isCsrfTokenValid('default', $request->get('token'))) {
-            throw new \InvalidArgumentException('Invalid csrf token');
-        }
-
-        $dm = $this->getManager();
-        $repo = $dm->getRepository(Phone::class);
-        $editPhone = $repo->find($id);
-        if ($editPhone) {
-            $phones = $repo->findBy(['make' => $editPhone->getMake(), 'model' => $editPhone->getModel()]);
-            foreach ($phones as $phone) {
-                /** @var Phone $phone */
-                $phone->setDescription($request->get('description'));
-                $phone->setFunFacts($request->get('fun-facts'));
-                $phone->setCanonicalPath($request->get('canonical-path'));
-            }
-            $dm->flush();
-            $this->addFlash(
-                'success',
-                'Your changes were saved!'
             );
         }
 
@@ -1417,6 +1396,105 @@ class AdminController extends BaseController
             'month' => $month,
             'chargebacks' => $qb->getQuery()->execute(),
             'chargeback_form' => $chargebackForm->createView(),
+        ];
+    }
+
+    /**
+     * @Route("/salva-requeue/{id}", name="salva_requeue_form")
+     * @Template
+     */
+    public function salvaRequeueFormAction(Request $request, $id = null)
+    {
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(SalvaPhonePolicy::class);
+        /** @var SalvaPhonePolicy $policy */
+        $policy = $repo->find($id);
+
+        if (!$policy) {
+            throw $this->createNotFoundException(sprintf('Policy %s not found', $id));
+        }
+
+        $salvaRequeueForm = $this->get('form.factory')
+            ->createNamedBuilder('salva_requeue_form', SalvaRequeueType::class)
+            ->setAction($this->generateUrl(
+                'salva_requeue_form',
+                ['id' => $id]
+            ))
+            ->getForm();
+
+        if ('POST' === $request->getMethod()) {
+            if ($request->request->has('salva_requeue_form')) {
+                $salvaRequeueForm->handleRequest($request);
+                if ($salvaRequeueForm->isValid()) {
+                    /** @var SalvaExportService $salvaService */
+                    $salvaService = $this->get('app.salva');
+
+                    $result = $salvaService->queue($policy, $salvaRequeueForm->getData()['reason']);
+
+                    if ($result) {
+                        $this->addFlash(
+                            'success',
+                            sprintf('Sucessfully requeued salva policy: %s', $policy->getPolicyNumber())
+                        );
+                    } else {
+                        $this->addFlash(
+                            'error',
+                            sprintf('Could not requeue salva policy: %s', $policy->getPolicyNumber())
+                        );
+                    }
+
+                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
+                }
+            }
+        }
+
+        return [
+            'form' => $salvaRequeueForm->createView(),
+            'policy' => $policy,
+        ];
+    }
+
+    /**
+     * @Route("/salva-status/{id}", name="salva_status_form")
+     * @Template
+     */
+    public function salvaStatusFormAction(Request $request, $id = null)
+    {
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(SalvaPhonePolicy::class);
+        /** @var SalvaPhonePolicy $policy */
+        $policy = $repo->find($id);
+
+        if (!$policy) {
+            throw $this->createNotFoundException(sprintf('Policy %s not found', $id));
+        }
+
+        $salvaRequeueForm = $this->get('form.factory')
+            ->createNamedBuilder('salva_status_form', SalvaStatusType::class, $policy)
+            ->setAction($this->generateUrl(
+                'salva_status_form',
+                ['id' => $id]
+            ))
+            ->getForm();
+
+        if ('POST' === $request->getMethod()) {
+            if ($request->request->has('salva_status_form')) {
+                $salvaRequeueForm->handleRequest($request);
+                if ($salvaRequeueForm->isValid()) {
+                    $this->addFlash(
+                        'success',
+                        sprintf('Changed salva status to %s', $policy->getSalvaStatus())
+                    );
+
+                    $dm->flush();
+                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
+                }
+            }
+        }
+
+        return [
+            'form' => $salvaRequeueForm->createView(),
+            'policy' => $policy,
         ];
     }
 }

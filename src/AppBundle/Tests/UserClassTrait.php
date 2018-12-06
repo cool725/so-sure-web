@@ -101,6 +101,7 @@ trait UserClassTrait
                 throw new \Exception('Missing phone');
             }
             $policy->setPhone($phone, $date);
+            $policy->setImei(static::generateRandomImei());
             $policy->create(rand(1, 999999), 'TEST', $date, rand(1, 999999));
         }
 

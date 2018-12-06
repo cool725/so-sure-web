@@ -68,9 +68,7 @@ class ApiViewControllerTest extends BaseApiControllerTest
     {
         self::addAddress($user);
 
-        $policyTermsRepo = self::$dm->getRepository(PolicyTerms::class);
-        /** @var PolicyTerms $latestTerms */
-        $latestTerms = $policyTermsRepo->findOneBy(['latest' => true]);
+        $latestTerms = $this->getLatestPolicyTerms($this->getDocumentManager());
 
         $policy = new PhonePolicy();
         if ($promo) {

@@ -144,6 +144,12 @@ class BacsService
         $this->dispatcher = $dispatcher;
     }
 
+    /** @var SftpService */
+    protected $sosureSftpService;
+
+    /** @var SftpService */
+    protected $accesspaySftpService;
+
     /**
      * @param DocumentManager          $dm
      * @param LoggerInterface          $logger
@@ -159,6 +165,8 @@ class BacsService
      * @param array                    $accessPay
      * @param MailerService            $mailer
      * @param EventDispatcherInterface $dispatcher
+     * @param SftpService              $sosureSftpService
+     * @param SftpService              $accesspaySftpService
      */
     public function __construct(
         DocumentManager $dm,
@@ -174,7 +182,9 @@ class BacsService
         SequenceService $sequenceService,
         array $accessPay,
         MailerService $mailer,
-        EventDispatcherInterface $dispatcher
+        EventDispatcherInterface $dispatcher,
+        SftpService $sosureSftpService,
+        SftpService $accesspaySftpService
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
@@ -193,6 +203,8 @@ class BacsService
         $this->accessPayKeyFile = $accessPay[3];
         $this->mailer = $mailer;
         $this->dispatcher = $dispatcher;
+        $this->sosureSftpService = $sosureSftpService;
+        $this->accesspaySftpService = $accesspaySftpService;
     }
 
     /**
@@ -236,6 +248,56 @@ class BacsService
         }
 
         return null;
+    }
+
+    public function sftp()
+    {
+        $results = [];
+        $files = $this->sosureSftpService->listSftp();
+        foreach ($files as $file) {
+            $error = false;
+            $unzippedFile = null;
+            try {
+                $zip = $this->sosureSftpService->downloadFile($file);
+                $unzippedFiles = $this->unzipFile($zip);
+                // print_r($unzippedFiles);
+                foreach ($unzippedFiles as $unzippedFile) {
+                    $results[$file][$unzippedFile] = $this->input($unzippedFile);
+                }
+            } catch (\Exception $e) {
+                $error = true;
+                $this->logger->error(sprintf(
+                    'Failed processing file %s in %s',
+                    $unzippedFile,
+                    $file
+                ));
+            }
+
+            $this->sosureSftpService->moveSftp($file, !$error);
+        }
+
+        return $results;
+    }
+
+    public function unzipFile($file, $extension = '.xml')
+    {
+        $files = [];
+
+        $zip = new \ZipArchive();
+        if ($zip->open($file) === true) {
+            if (!$zip->extractTo(sys_get_temp_dir())) {
+                throw new \Exception("Extraction failed");
+            }
+            for ($i = 0; $i < $zip->numFiles; $i++) {
+                if (mb_stripos($zip->getNameIndex($i), $extension) !== false) {
+                    $files[] = sprintf('%s/%s', sys_get_temp_dir(), $zip->getNameIndex($i));
+                }
+            }
+
+            $zip->close();
+        }
+
+        return $files;
     }
 
     public function processUpload(UploadedFile $file)
@@ -767,9 +829,9 @@ class BacsService
         $htmlTemplate = sprintf("%s.html.twig", $baseTemplate);
         $textTemplate = sprintf("%s.txt.twig", $baseTemplate);
 
-        $this->mailer->sendTemplate(
+        $this->mailer->sendTemplateToUser(
             $subject,
-            $policy->getUser()->getEmail(),
+            $policy->getUser(),
             $htmlTemplate,
             ['policy' => $policy],
             $textTemplate,
@@ -793,9 +855,9 @@ class BacsService
         $templateText = sprintf('%s.txt.twig', $baseTemplate);
 
         $claimed = $user->getAvgPolicyClaims() > 0;
-        $this->mailerService->sendTemplate(
+        $this->mailerService->sendTemplateToUser(
             'Your Direct Debit Cancellation',
-            $user->getEmail(),
+            $user,
             $templateHtml,
             ['user' => $user, 'claimed' => $claimed],
             $templateText,
@@ -817,9 +879,9 @@ class BacsService
         $templateHtml = sprintf('%s.html.twig', $baseTemplate);
         $templateText = sprintf('%s.txt.twig', $baseTemplate);
 
-        $this->mailerService->sendTemplate(
+        $this->mailerService->sendTemplateToUser(
             'Your recent name change',
-            $user->getEmail(),
+            $user,
             $templateHtml,
             ['user' => $user],
             $templateText,
@@ -1472,7 +1534,7 @@ class BacsService
 
             $payment = $this->bacsPayment(
                 $scheduledPayment->getPolicy(),
-                'Scheduled Payment',
+                $scheduledPayment->getNotes() ?: 'Scheduled Payment',
                 $scheduledPayment->getAmount(),
                 $scheduledDate,
                 $update,

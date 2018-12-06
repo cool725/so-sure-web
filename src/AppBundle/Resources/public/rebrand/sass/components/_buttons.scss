@@ -122,7 +122,7 @@ button[class*="btn-outline-"] {
 }
 
 // Button block mobile only - make buttons full width xs < down
-@include media-breakpoint-down(xs) {
+@include media-breakpoint-down(ss) {
 
     .btn-block-xs {
         display: block;
