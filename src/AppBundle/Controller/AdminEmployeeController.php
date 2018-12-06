@@ -33,6 +33,7 @@ use AppBundle\Service\AffiliateService;
 use Doctrine\ODM\MongoDB\Query\Builder;
 use Gedmo\Loggable\Document\Repository\LogEntryRepository;
 use Grpc\Call;
+use Predis\Client;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -2122,23 +2123,57 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
      */
     public function detectedImeiAction()
     {
-        /*
-                $redis->lpush('DETECTED-IMEI', json_encode([
-                    'detected_imei' => 'a123',
-                    'suggested_imei' => 'a456',
-                    'bucket' => 'a',
-                    'key' => 'key',
-                ]));
-        */
         $redis = $this->get("snc_redis.default");
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(PhonePolicy::class);
+
+        /*
+        $debug = false;
+        if ($debug) {
+            $policy = $repo->findOneBy(['imei' => ['$ne' => null]]);
+            $redis->lpush('DETECTED-IMEI', json_encode([
+                'detected_imei' => $policy->getImei(),
+                'suggested_imei' => 'a456',
+                'bucket' => 'a',
+                'key' => 'key',
+            ]));
+        }
+        */
+
         $storedImeis = $redis->lrange("DETECTED-IMEI", 0, -1);
         $imeis = [];
         foreach ($storedImeis as $storedImei) {
-            $imeis[] = json_decode($storedImei, true);
+            $imei = json_decode($storedImei, true);
+            $imei['actualPolicy'] = $repo->findOneBy(['imei' => $imei['detected_imei']]);
+            $imei['detectedPolicy'] = $repo->findOneBy(['detectedImei' => $imei['detected_imei']]);
+            $imei['raw'] = $storedImei;
+            $imeis[] = $imei;
         }
+
         return [
             "imeis" => $imeis
         ];
+    }
+
+    /**
+     * @Route("/detected-imei/delete/{item}", name="admin_delete_detected_imei")
+     * @Template
+     */
+    public function deleteDetectedImeiAction($item)
+    {
+        /** @var Client $redis */
+        $redis = $this->get("snc_redis.default");
+        if ($redis->lrem('DETECTED-IMEI', 1, $item)) {
+            $this->addFlash('success', sprintf(
+                sprintf('Removed %s', $item)
+            ));
+        } else {
+            $this->addFlash('error', sprintf(
+                sprintf('Failed to remove %s', $item)
+            ));
+        }
+
+        return new RedirectResponse($this->generateUrl('admin_detected_imei'));
     }
 
     private function getConnectionData()

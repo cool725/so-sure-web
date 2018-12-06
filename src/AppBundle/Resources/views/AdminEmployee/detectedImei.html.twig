@@ -25,16 +25,26 @@
                     <table class="table table-striped">
                         <thead class="thead-light">
                             <tr>
+                                <th>Policy</th>
                                 <th>Detected</th>
                                 <th>Suggested</th>
                                 <th>Link to file</th>
+                                <th>Delete from queue</th>
                             </tr>
                         </thead>
                         {% for imei in imeis %}
                             <tr>
+                                <td>
+                                    {% if imei['actualPolicy'] %}<a href="{{ path('admin_policy', {'id':imei['actualPolicy'].id}) }}">{{ imei['actualPolicy'].policyNumber }}</a> <br>actual imei: {{ imei['actualPolicy'].imei  }}{% endif %}
+                                    {% if imei['detectedPolicy'] %}<a href="{{ path('admin_policy', {'id':imei['detectedPolicy'].id}) }}">{{ imei['detectedPolicy'].policyNumber }}</a> <br>detected imei: {{  imei['detectedPolicy'].detectedImei  }}{% endif %}
+                                    {% if not imei['actualPolicy'] and not imei['detectedPolicy'] %}Unable to locate{% endif %}
+                                </td>
                                 <td>{{ imei['detected_imei'] }}</td>
-                                <td>(Suggested {{ imei['suggested_imei'] }})</td>
+                                <td>{% if imei['suggested_imei']|length > 0  %} {{ imei['suggested_imei'] }}{% else %}n/a{% endif %}</td>
                                 <td><a href="{{ s3DownloadLink(imei['bucket'], imei['key']) }}" target="_blank" title="{{ imei.key }}"><i class="fal fa-link mr-2"></i> See image</a></td>
+                                <td>
+                                    <a href="{{ path('admin_delete_detected_imei', {'item': imei['raw']}) }}" class="btn btn-danger"><i class="fa fa-trash"></i></a>
+                                </td>
                             </tr>
                         {% endfor %}
                     </table>
