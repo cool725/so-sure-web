@@ -501,12 +501,13 @@ class MonitorServiceTest extends WebTestCase
 
     /**
      * Tests that monitor service can detect when there are wrongly detected imeis recorded.
-     * @expectedException \AppBundle\Exception\MonitorException
      */
     public function testCheckDetectedImei()
     {
         $redis = self::$container->get('snc_redis.default');
+        self::$monitor->checkDetectedImei();
         $redis->lpush("DETECTED-IMEI", "a");
+        $this->expectException(MonitorException::class);
         self::$monitor->checkDetectedImei();
         $this->assertEquals("a", $redis->lpop("DETECTED-IMEI"));
     }

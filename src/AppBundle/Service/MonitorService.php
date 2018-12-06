@@ -936,14 +936,9 @@ class MonitorService
      */
     public function checkDetectedImei()
     {
-        $imeis = [];
-        if ($imei = $this->redis->lpop('DETECTED-IMEI')) {
-            $imeis[] = json_decode($imei, true);
-            $this->redis->lpush('DETECTED-IMEI', [$imei]);
-        }
-        foreach ($imeis as $imei) {
+        if ($this->redis->exists("DETECTED-IMEI")) {
             throw new MonitorException(
-                "IMEI number Incorrectly detected {$imei}. https://wearesosure.com/admin/detected-imei"
+                "IMEI number Incorrectly detected. https://wearesosure.com/admin/detected-imei"
             );
         }
     }
