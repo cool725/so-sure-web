@@ -475,7 +475,7 @@ class MonitorServiceTest extends WebTestCase
 
         self::$monitor->checkExpiration();
     }
-  
+
     /**
      * @expectedException \AppBundle\Exception\MonitorException
      */
@@ -497,5 +497,17 @@ class MonitorServiceTest extends WebTestCase
         self::$dm->flush();
 
         self::$monitor->checkPastBacsPaymentsPending();
+    }
+
+    /**
+     * Tests that monitor service can detect when there are wrongly detected imeis recorded.
+     * @expectedException \AppBundle\Exception\MonitorException
+     */
+    public function testCheckDetectedImei()
+    {
+        $redis = self::$container->get('snc_redis.default');
+        $redis->lpush('DETECTED-IMEI', "479823749");
+        $redis->lpush('DETECTED-IMEI', "243598726345");
+        self::$monitor->checkDetectedImei();
     }
 }

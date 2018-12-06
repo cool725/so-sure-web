@@ -936,17 +936,15 @@ class MonitorService
      */
     public function checkDetectedImei()
     {
-        $redis = $this->get('snc_redis.default');
         $imeis = [];
-        if ($imei = $redis->lpop('DETECTED-IMEI')) {
+        if ($imei = $this->redis->lpop('DETECTED-IMEI')) {
             $imeis[] = json_decode($imei, true);
-            $redis->lpush('DETECTED-IMEI', $imei);
+            $this->redis->lpush('DETECTED-IMEI', $imei);
         }
         foreach ($imeis as $imei) {
-            throw new MonitorException("IMEI Incorrectly detected {$imei}. wearesosure");
+            throw new MonitorException(
+                "IMEI number Incorrectly detected {$imei}. https://wearesosure.com/admin/detected-imei"
+            );
         }
-
-
-
     }
 }
