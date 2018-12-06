@@ -511,9 +511,9 @@ class PhonePolicyRepository extends PolicyRepository
 
     /**
      * Finds all policies that ended between the given dates and with the given status.
-     * @param String|array $status is the status of the policies that we are looking for or null for no checking that.
-     * @param \DateTime    $start  is the date that policies must have ended after if it's given.
-     * @param \DateTime    $end    is the date that policies must have ended before if it's given.
+     * @param array|String|null $status is the status of the policies that we are looking for or null to not check.
+     * @param \DateTime         $start  is the date that policies must have ended after if it's given.
+     * @param \DateTime         $end    is the date that policies must have ended before if it's given.
      * @return array containing all the found policies.
      */
     public function findEndingByStatus($status = null, \DateTime $start = null, \DateTime $end = null)

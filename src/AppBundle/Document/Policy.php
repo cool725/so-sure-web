@@ -3029,7 +3029,7 @@ abstract class Policy
 
     public function isExpired()
     {
-        return in_array($this->getStatus(), $expirationStates);
+        return in_array($this->getStatus(), self::$expirationStates);
     }
 
     public function isUnrenewed()
