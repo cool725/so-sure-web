@@ -2122,7 +2122,6 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
      */
     public function detectedImeiAction()
     {
-        $redis = $this->get('snc_redis.default');
         /*
                 $redis->lpush('DETECTED-IMEI', json_encode([
                     'detected_imei' => 'a123',
@@ -2131,13 +2130,14 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                     'key' => 'key',
                 ]));
         */
+        $redis = $this->get("snc_redis.default");
+        $storedImeis = $redis->lrange("DETECTED-IMEI", 0, -1);
         $imeis = [];
-        if ($imei = $redis->lpop('DETECTED-IMEI')) {
-            $imeis[] = json_decode($imei, true);
-            $redis->lpush('DETECTED-IMEI', $imei);
+        foreach ($storedImeis as $storedImei) {
+            $imeis[] = json_decode($storedImei, true);
         }
         return [
-            'imeis' => $imeis,
+            "imeis" => $imeis
         ];
     }
 

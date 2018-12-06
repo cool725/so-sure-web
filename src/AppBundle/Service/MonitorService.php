@@ -930,4 +930,16 @@ class MonitorService
             ));
         }
     }
+
+    /**
+     * Checks for a detected IMEI and fires a monitor exception when one occurs.
+     */
+    public function checkDetectedImei()
+    {
+        if ($this->redis->exists("DETECTED-IMEI")) {
+            throw new MonitorException(
+                "IMEI number Incorrectly detected. https://wearesosure.com/admin/detected-imei"
+            );
+        }
+    }
 }
