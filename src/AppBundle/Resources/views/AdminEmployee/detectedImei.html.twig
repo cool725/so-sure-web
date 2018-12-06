@@ -42,7 +42,7 @@
                                     {% if imei['actualPolicy'] %}<a href="{{ path('admin_policy', {'id':imei['actualPolicy'].id}) }}">{{ imei['actualPolicy'].policyNumber }}</a> <br>actual imei: {{ imei['actualPolicy'].imei  }}<br>{% endif %}
                                     {% if imei['detectedPolicy'] %}<a href="{{ path('admin_policy', {'id':imei['detectedPolicy'].id}) }}">{{ imei['detectedPolicy'].policyNumber }}</a> <br>detected imei: {{  imei['detectedPolicy'].detectedImei  }}<br>{% endif %}
                                     {% if imei['suggestedPolicy'] %}<a href="{{ path('admin_policy', {'id':imei['suggestedPolicy'].id}) }}">{{ imei['suggestedPolicy'].policyNumber }}</a> <br>suggested imei: {{  imei['suggestedPolicy'].imei  }}<br>{% endif %}
-                                    {% if not imei['actualPolicy'] and not imei['detectedPolicy'] %}Unable to locate{% endif %}
+                                    {% if not imei['actualPolicy'] and not imei['detectedPolicy'] and not imei['suggestedPolicy'] %}Unable to locate{% endif %}
                                 </td>
                                 <td>{{ imei['detected_imei'] }}</td>
                                 <td>{% if imei['suggested_imei']|length > 0  %} {{ imei['suggested_imei'] }}{% else %}n/a{% endif %}</td>
