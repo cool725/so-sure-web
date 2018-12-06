@@ -203,11 +203,9 @@ class DefaultController extends BaseController
         if ($request->get('_route') == 'topcashback') {
             $page = 'topcashback';
             $affiliate = 'TopCashback';
-
         } elseif ($request->get('_route') == 'vouchercodes') {
             $page = 'vouchercodes';
             $affiliate = 'VoucherCodes';
-
         } elseif ($request->get('_route') == 'quidco') {
             $page = 'quidco';
             $affiliate = 'Quidco';
