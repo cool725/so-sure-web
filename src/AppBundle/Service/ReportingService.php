@@ -1275,7 +1275,8 @@ class ReportingService
             );
             $month["newAdjusted"] = $month["new"] - $month["upgrade"];
             $month["cancelledAdjusted"] = $month["cancelled"] - $month["upgrade"];
-            $month["newTotal"] = $this->totalAtPoint($endOfMonth);
+            $month["queryOpen"] = $this->totalAtPoint($start);
+            $month["queryClose"] = $this->totalAtPoint($endOfMonth);
             $report[$start->format("F Y")] = $month;
             $start->add(new \DateInterval("P1M"));
         }
