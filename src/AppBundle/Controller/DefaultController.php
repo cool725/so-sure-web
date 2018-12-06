@@ -168,16 +168,6 @@ class DefaultController extends BaseController
     }
 
     /**
-     * @Route("/ivip", name="ivip")
-     */
-    public function ivipLanding()
-    {
-        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE, ['page' => 'ivip']);
-
-        return $this->render('AppBundle:Default:indexIVIP.html.twig');
-    }
-
-    /**
      * @Route("/starling-bank", name="starling_bank")
      * @Template
      */
@@ -203,6 +193,7 @@ class DefaultController extends BaseController
      * @Route("/topcashback", name="topcashback")
      * @Route("/vouchercodes", name="vouchercodes")
      * @Route("/quidco", name="quidco")
+     * @Route("/ivip", name="ivip")
      */
     public function affiliateLanding(Request $request)
     {
@@ -220,6 +211,9 @@ class DefaultController extends BaseController
         } elseif ($request->get('_route') == 'quidco') {
             $page = 'quidco';
             $affiliate = 'Quidco';
+        } elseif ($request->get('_route') == 'ivip') {
+            $page = 'ivip';
+            $affiliate = 'iVIP';
         }
 
         $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE, [
