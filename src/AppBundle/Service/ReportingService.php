@@ -3,6 +3,7 @@ namespace AppBundle\Service;
 
 use AppBundle\Document\File\SalvaPaymentFile;
 use AppBundle\Document\Payment\BacsIndemnityPayment;
+use AppBundle\Document\Stats;
 use AppBundle\Repository\CashbackRepository;
 use AppBundle\Repository\ClaimRepository;
 use AppBundle\Repository\ConnectionRepository;
@@ -12,6 +13,7 @@ use AppBundle\Repository\PaymentRepository;
 use AppBundle\Repository\PhonePolicyRepository;
 use AppBundle\Repository\PhoneRepository;
 use AppBundle\Repository\ScheduledPaymentRepository;
+use AppBundle\Repository\StatsRepository;
 use AppBundle\Repository\UserRepository;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Predis\Client;
@@ -934,6 +936,18 @@ class ReportingService
             'salvaPaymentFile' => $this->getSalvaPaymentFile($date),
         ];
         // @codingStandardsIgnoreEnd
+    }
+
+    public function getStats(\DateTime $date)
+    {
+        $start = $this->startOfMonth($date);
+        $end = $this->endOfMonth($date);
+        /** @var StatsRepository $repo */
+        $repo = $this->dm->getRepository(Stats::class);
+        /** @var Stats[] $stats */
+        $stats = $repo->getStatsByRange($start, $end);
+
+        return Stats::sum($stats);
     }
 
     /**
