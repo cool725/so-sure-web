@@ -50,7 +50,7 @@ class PolicyRepository extends BaseDocumentRepository
                 Policy::STATUS_UNPAID
             ])
             ->field('policyNumber')->equals(new \MongoRegex(sprintf('/^%s\//', $policyPrefix)));
-        
+
         if ($includeFuture) {
             $qb = $qb->field('pendingCancellation')->notEqual(null);
         } else {

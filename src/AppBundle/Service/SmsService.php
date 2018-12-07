@@ -52,8 +52,9 @@ class SmsService
      * @var array
      */
     public static $analyticsCampaigns = [
-        'failedPayment',
-        'failedPaymentFinal',
+        'card/failedPayment-2',
+        'card/failedPayment-3',
+        'card/failedPayment-4',
     ];
 
     /**
