@@ -84,7 +84,10 @@ class AdminControllerTest extends BaseControllerTest
         // print_r($crawler->html());
         // get one phone from the page
         $route = '' . $crawler->filter('button[data-target="#claimsModal"]')->first()->attr('data-route');
-        $this->assertTrue(isset($route));
+
+        if (empty($route)) {
+            throw new \Exception('Claim route not found');
+        }
 
         $crawler = self::$client->request('GET', $route);
         self::verifyResponse(200);
