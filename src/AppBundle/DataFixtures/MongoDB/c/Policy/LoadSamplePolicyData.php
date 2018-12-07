@@ -193,12 +193,12 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             }
             $phone->changePrice(
                 $adjustedPrice,
-                $fiveMonthsAgo,
+                $sixMonthsAgo, //feb feb > jan
                 PolicyTerms::getHighExcess(),
                 PolicyTerms::getLowExcess(),
-                $sixMonthsAgo,
+                $fiveMonthsAgo, // mar mar > jan feb > mar
                 null,
-                $sevenMonthsAgo
+                $sevenMonthsAgo // jan
             );
         }
 

@@ -5299,8 +5299,10 @@ abstract class Policy
 
         if (!$this->getPolicyTerms()->isAllowedExcess($this->getPremium()->getExcess())) {
             throw new \Exception(sprintf(
-                'Unable to set phone for policy %s as excess values do not match policy terms.',
-                $this->getId()
+                'Unable to set phone for policy %s as excess (%s) values do not match policy terms (%s).',
+                $this->getId(),
+                $this->getPremium()->getExcess(),
+                json_encode($this->getPolicyTerms()->getAllowedExcesses())
             ));
         }
     }
