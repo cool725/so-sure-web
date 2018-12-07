@@ -108,10 +108,13 @@ class PromotionService
     /**
      * Set a participation as complete and email marketing to tell them to give the reward.
      * @param Participation $participation is the participation to complete.
+     * @param \DateTime     $date          is the date of the participation's completion.
+     * @param String        $status        is the status to set the participation as now having.
+     * @return String the status that you passed in for convenience.
      */
-    public function endParticipation($participation, $status = Participation::STATUS_COMPLETED)
+    public function endParticipation($participation, \DateTime $date, $status = Participation::STATUS_COMPLETED)
     {
-        $participation->setStatus($status);
+        $participation->endWith($status, $date);
         $this->dm->flush();
         if ($status == Participation::STATUS_COMPLETED) {
             $this->mailerService->sendTemplate(

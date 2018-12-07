@@ -545,6 +545,11 @@ abstract class Policy
      */
     protected $tasteCard;
 
+    /**
+     * @MongoDB\EmbedMany(targetDocument="Participation")
+     */
+    protected $participations;
+
     public function __construct()
     {
         $this->created = \DateTime::createFromFormat('U', time());
@@ -556,6 +561,7 @@ abstract class Policy
         $this->acceptedConnectionsRenewal = new \Doctrine\Common\Collections\ArrayCollection();
         $this->scheduledPayments = new \Doctrine\Common\Collections\ArrayCollection();
         $this->notesList = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->participations = new \Doctrine\Common\Collections\ArrayCollection();
         $this->potValue = 0;
     }
 
@@ -1338,6 +1344,17 @@ abstract class Policy
     public function setTasteCard($tasteCard)
     {
         $this->tasteCard = $tasteCard;
+    }
+
+    public function getParticipations()
+    {
+        return $this->participations;
+    }
+
+    public function addParticipation($participation)
+    {
+        $participation->setPolicy($this);
+        $this->participations[] = $participation;
     }
 
     public function getStandardConnections()

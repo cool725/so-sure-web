@@ -10,6 +10,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
  * Represents a policy's participation in a promotion.
+ * @MongoDB\EmbeddedDocument
  * @MongoDB\Document(repositoryClass="AppBundle\Repository\ParticipationRepository")
  * @Gedmo\Loggable(logEntryClass="AppBundle\Document\LogEntry")
  */
@@ -48,6 +49,13 @@ class Participation
      * @Gedmo\Versioned
      */
     protected $start;
+
+    /**
+     * @Assert\DateTime()
+     * @MongoDB\Field(type="date")
+     * @Gedmo\Versioned
+     */
+    protected $end;
 
     /**
      * Stores the condition requied for a policy to fulfill the promotion and receive a reward.
@@ -105,5 +113,16 @@ class Participation
     public function setStatus($status)
     {
         $this->status = $status;
+    }
+
+    /**
+     * Sets the end time and the status at the same time.
+     * @param String    $status is the status that the participation ended with.
+     * @param \DateTime $date   is the date of the participation's ending.
+     */
+    public function endWithStatus($status, $date)
+    {
+        $this->status = $status;
+        $this->end = clone $date;
     }
 }

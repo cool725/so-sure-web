@@ -35,7 +35,7 @@ class PromotionCommand extends ContainerAwareCommand
             ->addArgument(
                 "date",
                 InputArgument::OPTIONAL,
-                "date to confirm rewards up to. Format: d/m/Y"
+                "date to confirm rewards up to. Format: YYYYMMDD"
             )
             ->setHelp(
                 "Used to update the status of users participating in promotions. This consists of emailing internally ".
@@ -51,7 +51,7 @@ class PromotionCommand extends ContainerAwareCommand
         $dateString = $input->getArgument('date');
         $date = null;
         if ($dateString) {
-            $date = \DateTime::createFromFormat("d/m/Y", $dateString);
+            $date = \DateTime::createFromFormat("YYYYMMDD", $dateString);
             if (!$date) {
                 $output->writeln("<error>Invalid date format.</error>");
                 return;
