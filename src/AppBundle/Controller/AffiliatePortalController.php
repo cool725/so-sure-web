@@ -11,6 +11,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use AppBundle\Document\Lead;
 
+/**
+ * @Route("/pos")
+ */
 class AffiliatePortalController extends BaseController
 {
     /**
