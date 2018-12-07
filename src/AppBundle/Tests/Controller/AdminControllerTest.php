@@ -83,22 +83,25 @@ class AdminControllerTest extends BaseControllerTest
 
         // print_r($crawler->html());
         // get one phone from the page
-        $button = $crawler->filter('button[data-target="#claimsModal"]')->first()->attr('data-claim');
-        $this->assertTrue(isset($button));
+        $route = $crawler->filter('button[data-target="#claimsModal"]')->first()->attr('data-route');
+        $this->assertTrue(isset($route));
 
-        $claimData = json_decode($button, true);
+        $crawler = self::$client->request('GET', $route);
+        self::verifyResponse(200);
 
-        $form = $crawler->filter('form[id="phone-alternative-form"]')->form();
-        $form['id'] = $claimData['id'];
-        $form['approved-date'] = '2022-01-01';
-        $form['change-approved-date'] = 'on';
+        $form = $crawler->filter('form[name="claims_form"]')->form();
+
+        $form->setValues([
+            'claims_form[approvedDate]' => '2022-01-01',
+        ]);
+
         $crawler = self::$client->submit($form);
         self::verifyResponse(302);
 
         $dm = $this->getDocumentManager(true);
         $repoClaim = $dm->getRepository(Claim::class);
         /** @var Claim $newClaim */
-        $newClaim = $repoClaim->find($claimData['id']);
+        $newClaim = $repoClaim->find($claim->getId());
         $this->assertEquals('2022-01-01', $newClaim->getApprovedDate()->format('Y-m-d'));
     }
 
