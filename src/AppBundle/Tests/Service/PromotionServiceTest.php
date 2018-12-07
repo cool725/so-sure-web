@@ -62,12 +62,11 @@ class PromotionServiceTest extends WebTestCase
     public function testEndParticipation()
     {
         $promotion = $this->createTestPromotion(
-            "free taste card",
-            Promotion::CONDITION_INVITES,
-            Promotion::REWARD_TASTE_CARD,
+            "free!!! phone case!!!!!!!!!",
             30,
-            1,
-            0
+            0,
+            false,
+            Promotion::REWARD_TASTE_CARD
         );
         $a = $this->createPersistentUser();
         $b = $this->createPersistentUser();
@@ -75,12 +74,12 @@ class PromotionServiceTest extends WebTestCase
         $bParticipation = $this->participate($promotion, $b, new \DateTime());
         // Test completed participation.
         $mock = $this->mockMailerSend(1);
-        static::$promotionService->endParticipation($aParticipation);
+        static::$promotionService->endParticipation($aParticipation, new \DateTime);
         $this->assertEquals(Participation::STATUS_COMPLETED, $aParticipation->getStatus());
         $mock->__phpunit_verify();
         // Test failed participation.
         $mock = $this->mockMailerSend(0);
-        static::$promotionService->endParticipation($bParticipation, Participation::STATUS_FAILED);
+        static::$promotionService->endParticipation($bParticipation, new \DateTime(), Participation::STATUS_FAILED);
         $this->assertEquals(Participation::STATUS_FAILED, $bParticipation->getStatus());
         $mock->__phpunit_verify();
     }
@@ -92,11 +91,10 @@ class PromotionServiceTest extends WebTestCase
     {
         $promotion = $this->createTestPromotion(
             "free!!! phone case!!!!!!!!!",
-            Promotion::CONDITION_NO_CLAIMS,
-            Promotion::REWARD_TASTE_CARD,
             30,
-            1,
-            0
+            0,
+            false,
+            Promotion::REWARD_TASTE_CARD
         );
         $a = $this->createPersistentUser();
         $b = $this->createPersistentUser();
@@ -164,11 +162,10 @@ class PromotionServiceTest extends WebTestCase
     {
         $promotion = $this->createTestPromotion(
             "free!!! phone case!!!!!!!!!",
-            Promotion::CONDITION_NO_CLAIMS,
-            Promotion::REWARD_TASTE_CARD,
             30,
-            2,
-            0
+            0,
+            false,
+            Promotion::REWARD_TASTE_CARD
         );
         $a = $this->createPersistentUser();
         $b = $this->createPersistentUser();
@@ -193,7 +190,7 @@ class PromotionServiceTest extends WebTestCase
         $this->assertEquals(Participation::STATUS_COMPLETED, $aParticipation->getStatus());
         $this->assertEquals(Participation::STATUS_FAILED, $bParticipation->getStatus());
         // Check X invitations condition.
-        $promotion->setCondition(Promotion::CONDITION_INVITES);
+        $promotion->setConditionInvitations(2);
         $c = $this->createPersistentUser();
         $d = $this->createPersistentUser();
         $cParticipation = $this->participate($promotion, $c, $date);
@@ -212,9 +209,14 @@ class PromotionServiceTest extends WebTestCase
         $this->invite($d, static::generateEmail('aewrgreg', $this), $date);
         static::$promotionService->generate([$promotion], $date);
         $this->assertEquals(Participation::STATUS_FAILED, $cParticipation->getStatus());
+        $this->assertEquals(Participation::STATUS_ACTIVE, $dParticipation->getStatus());
+        $this->addDays($date, 10);
+        static::$promotionService->generate([$promotion], $date);
+        $this->assertEquals(Participation::STATUS_FAILED, $cParticipation->getStatus());
         $this->assertEquals(Participation::STATUS_COMPLETED, $dParticipation->getStatus());
         // Check no condition.
-        $promotion->setCondition(Promotion::CONDITION_NONE);
+        $promotion->setConditionInvitations(0);
+        $promotion->setConditionAllowClaims(true);
         $e = $this->createPersistentUser();
         $f = $this->createPersistentUser();
         $eParticipation = $this->participate($promotion, $e, $date);
@@ -224,6 +226,7 @@ class PromotionServiceTest extends WebTestCase
         static::$promotionService->generate([$promotion], $date);
         $this->assertEquals(Participation::STATUS_ACTIVE, $eParticipation->getStatus());
         $this->assertEquals(Participation::STATUS_ACTIVE, $fParticipation->getStatus());
+        $this->claim($e, $date);
         $this->addDays($date, 10);
         static::$promotionService->generate([$promotion], $date);
         $this->assertEquals(Participation::STATUS_COMPLETED, $eParticipation->getStatus());
@@ -307,24 +310,24 @@ class PromotionServiceTest extends WebTestCase
 
     /**
      * Creates a promotion object for a nice test.
-     * @param String $name      is the name of the promotion.
-     * @param String $condition is the condition constant that this promotion uses.
-     * @param String $reward    is the reward constant that this promotion gives.
-     * @param int    $period    is the maximum number of days that you can be active in the promotion for.
-     * @param int    $events    is the number of events required by the condition.
-     * @param float  $amount    is the quantity of the reward if it is a reward that needs a quantity.
+     * @param String $name        is the name of the promotion.
+     * @param int    $period      is the maximum number of days that you can be active in the promotion for.
+     * @param int    $invitations is the number of events required by the condition.
+     * @param bool   $claims      is the number of events required by the condition.
+     * @param String $reward      is the reward constant that this promotion gives.
+     * @param float  $amount      is the quantity of the reward if it is a reward that needs a quantity.
      * @return Promotion the new promotion.
      */
-    private function createTestPromotion($name, $condition, $reward, $period, $events = 0, $amount = 0)
+    private function createTestPromotion($name, $period, $invitations, $claims, $reward, $amount = 1.37)
     {
         $promotion = new Promotion();
         $promotion->setName($name);
         $promotion->setStart(new \DateTime());
         $promotion->setActive(true);
-        $promotion->setCondition($condition);
+        $promotion->setConditionPeriod($period);
+        $promotion->setConditionInvitations($invitations);
+        $promotion->setConditionAllowClaims($claims);
         $promotion->setReward($reward);
-        $promotion->setPeriod($period);
-        $promotion->setConditionEvents($events);
         $promotion->setRewardAmount($amount);
         static::$dm->persist($promotion);
         static::$dm->flush();

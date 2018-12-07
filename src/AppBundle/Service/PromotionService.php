@@ -57,7 +57,7 @@ class PromotionService
                 $policy->getTasteCard()
             ) {
                 // NOTE: if more conditions of failure emerge then this should become a function.
-                $this->endParticipation($participation, Participation::STATUS_INVALID);
+                $this->endParticipation($participation, $date, Participation::STATUS_INVALID);
                 $this->addEnding(Participation::STATUS_INVALID, $endings);
             } else {
                 $this->addEnding($this->checkConditions($participation, $date), $endings);
@@ -76,31 +76,21 @@ class PromotionService
     {
         $promotion = $participation->getPromotion();
         $policy = $participation->getPolicy();
-        $condition = $promotion->getCondition();
-        $interval = new \DateInterval("P".$promotion->getPeriod()."D");
+        $interval = new \DateInterval("P".$promotion->getConditionPeriod()."D");
         $end = (clone ($participation->getStart()))->add($interval);
         $finished = $end->diff($date)->invert == 0;
-        if ($condition == Promotion::CONDITION_NONE) {
-            if ($finished) {
-                return $this->endParticipation($participation);
+        $claims = $policy->getClaimsInPeriod($participation->getStart(), $end);
+        // Conditions.
+        if (!$promotion->getConditionAllowClaims() && count($claims) > 0) {
+            return $this->endParticipation($participation, $date, Participation::STATUS_FAILED);
+        }
+        if ($finished) {
+            $invites = $this->dm->getRepository(Invitation::class)->count([$policy], $participation->getStart(), $end);
+            if ($promotion->getConditionInvitations() > $invites) {
+                return $this->endParticipation($participation, $end, Participation::STATUS_FAILED);
+            } else {
+                return $this->endParticipation($participation, $end);
             }
-        } elseif ($condition == Promotion::CONDITION_NO_CLAIMS) {
-            if (!empty($policy->getClaimsInPeriod($participation->getStart(), $end))) {
-                return $this->endParticipation($participation, Participation::STATUS_FAILED);
-            } elseif ($finished) {
-                return $this->endParticipation($participation);
-            }
-        } elseif ($condition == Promotion::CONDITION_INVITES) {
-            /** @var InvitationRepository $invitationRepository */
-            $invitationRepository = $this->dm->getRepository(Invitation::class);
-            $invites = $invitationRepository->count([$policy], $participation->getStart(), $end);
-            if ($invites >= $promotion->getConditionEvents()) {
-                return $this->endParticipation($participation);
-            } elseif ($finished) {
-                return $this->endParticipation($participation, Participation::STATUS_FAILED);
-            }
-        } else {
-            $this->logger->error("Invalid promotion condition: {$condition}.");
         }
         return null;
     }
@@ -114,7 +104,7 @@ class PromotionService
      */
     public function endParticipation($participation, \DateTime $date, $status = Participation::STATUS_COMPLETED)
     {
-        $participation->endWith($status, $date);
+        $participation->endWithStatus($status, $date);
         $this->dm->flush();
         if ($status == Participation::STATUS_COMPLETED) {
             $this->mailerService->sendTemplate(
