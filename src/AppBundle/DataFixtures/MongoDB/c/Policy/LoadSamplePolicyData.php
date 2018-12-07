@@ -171,6 +171,8 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         foreach ($preExpireYearlyUsers as $user) {
             $phones[] = $user->getPolicies()[0]->getPhone();
         }
+        $fiveMonthsAgo = \DateTime::createFromFormat('U', time());
+        $fiveMonthsAgo = $fiveMonthsAgo->sub(new \DateInterval('P5M'));
         $sixMonthsAgo = \DateTime::createFromFormat('U', time());
         $sixMonthsAgo = $sixMonthsAgo->sub(new \DateInterval('P6M'));
         $sevenMonthsAgo = \DateTime::createFromFormat('U', time());
@@ -191,9 +193,11 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             }
             $phone->changePrice(
                 $adjustedPrice,
-                $sixMonthsAgo,
+                $fiveMonthsAgo,
                 PolicyTerms::getHighExcess(),
                 PolicyTerms::getLowExcess(),
+                $sixMonthsAgo,
+                null,
                 $sevenMonthsAgo
             );
         }
