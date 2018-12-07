@@ -431,6 +431,9 @@ class ValidatePolicyCommand extends ContainerAwareCommand
             if (!$policy->isActive(true)) {
                 $allowedVariance = Salva::MONTHLY_TOTAL_COMMISSION - 0.01;
             }
+            // any pending payments should be excluded from calcs
+            $pendingBacsTotalCommission = $policy->getPendingBacsPaymentsTotalCommission(true);
+            $allowedVariance += $pendingBacsTotalCommission;
 
             // depending on when the chargeback occurs, we may or may not want to exclude that amount
             // but if they both don't match, then its likely to be a problem
@@ -471,16 +474,24 @@ class ValidatePolicyCommand extends ContainerAwareCommand
             $refundCommission = $policy->getRefundCommissionAmount();
             $pendingBacsTotal = $policy->getPendingBacsPaymentsTotal(true);
             $pendingBacsTotalCommission = $policy->getPendingBacsPaymentsTotalCommission(true);
+            $refundMismatch =  $this->greaterThanZero($refund) && $refund > $pendingBacsTotal &&
+                !$this->areEqualToTwoDp($refund, $pendingBacsTotal);
+            $refundCommissionMismatch =  $this->greaterThanZero($refundCommission) &&
+                $refundCommission > $pendingBacsTotalCommission &&
+                !$this->areEqualToTwoDp($refundCommission, $pendingBacsTotalCommission);
+
             if (!in_array($policy->getId(), Salva::$refundValidationExclusions) &&
-                (($this->greaterThanZero($refund) && $refund > $pendingBacsTotal) ||
-                ($this->greaterThanZero($refundCommission) && $refundCommission > $pendingBacsTotalCommission))) {
+                ($refundMismatch ||$refundCommissionMismatch )) {
                 $this->header($policy, $policies, $lines);
                 $lines[] = sprintf(
-                    'Warning!! Refund Due. Refund %f / Commission %f',
+                    'Warning!! Refund Due. Refund %0.2f [Pending %0.2f] / Commission %0.2f [Pending %0.2f]',
                     $refund,
-                    $refundCommission
+                    $pendingBacsTotal,
+                    $refundCommission,
+                    $pendingBacsTotalCommission
                 );
             }
+
             // bacs checks are only necessary on active policies
             if ($policy->getUser()->hasBacsPaymentMethod() && $policy->isActive(true)) {
                 $bacsPayments = count($policy->getPaymentsByType(BacsPayment::class));
