@@ -83,7 +83,7 @@ class AdminControllerTest extends BaseControllerTest
 
         // print_r($crawler->html());
         // get one phone from the page
-        $route = $crawler->filter('button[data-target="#claimsModal"]')->first()->attr('data-route');
+        $route = '' . $crawler->filter('button[data-target="#claimsModal"]')->first()->attr('data-route');
         $this->assertTrue(isset($route));
 
         $crawler = self::$client->request('GET', $route);
