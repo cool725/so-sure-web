@@ -10,6 +10,7 @@ use AppBundle\Document\File\AccessPayFile;
 use AppBundle\Document\File\BacsReportInputFile;
 use AppBundle\Document\File\S3File;
 use AppBundle\Document\Payment\BacsPayment;
+use AppBundle\Document\PhonePremium;
 use AppBundle\Repository\PolicyRepository;
 use AppBundle\Service\PolicyService;
 use AppBundle\Service\RouterService;
@@ -176,16 +177,25 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $sevenMonthsAgo = $sevenMonthsAgo->sub(new \DateInterval('P7M'));
         $adjusted = [];
         for ($i = 0; $i < 5; $i++) {
+            /** @var Phone $phone */
             $phone = $phones[random_int(0, count($phones) - 1)];
             if (isset($adjusted[$phone->getId()])) {
                 continue;
             }
             $adjusted[] = $phone->getId();
-            $adjustedPrice = $phone->getCurrentPhonePrice()->getGwp() - 0.01;
-            if ($phone->getSalvaMiniumumBinderMonthlyPremium() < $phone->getCurrentPhonePrice()->getGwp() - 0.30) {
-                $adjustedPrice = $phone->getCurrentPhonePrice()->getGwp() - 0.30;
+            /** @var PhonePremium $currentPrice */
+            $currentPrice = $phone->getCurrentPhonePrice();
+            $adjustedPrice = $currentPrice->getGwp() - 0.01;
+            if ($phone->getSalvaMiniumumBinderMonthlyPremium() < $currentPrice->getGwp() - 0.30) {
+                $adjustedPrice = $currentPrice->getGwp() - 0.30;
             }
-            $phone->changePrice($adjustedPrice, $sixMonthsAgo, null, null, $sevenMonthsAgo);
+            $phone->changePrice(
+                $adjustedPrice,
+                $sixMonthsAgo,
+                PolicyTerms::getHighExcess(),
+                PolicyTerms::getLowExcess(),
+                $sevenMonthsAgo
+            );
         }
 
         // Sample user for apple

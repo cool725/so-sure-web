@@ -342,6 +342,8 @@ class DaviesServiceTest extends WebTestCase
         static::$dm->persist($claimOpen2);
         static::$dm->flush();
         self::$daviesService->clearErrors();
+        self::$daviesService->clearWarnings();
+        self::$daviesService->clearSoSureActions();
 
         $now = \DateTime::createFromFormat('U', time());
         $daviesOpen = new DaviesHandlerClaim();
