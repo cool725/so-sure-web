@@ -28,6 +28,8 @@ class Lead
     const LEAD_SOURCE_SCODE = 'scode';
     const LEAD_SOURCE_AFFILIATE = 'affiliate';
 
+    const AFFILIATE_HELLOZ = 'helloz';
+
     /**
      * @MongoDB\Id(strategy="auto")
      */
@@ -78,6 +80,12 @@ class Lead
      * @MongoDB\Field(type="string")
      */
     protected $source;
+
+    /**
+     * @Assert\Choice({"helloz"}, strict=true)
+     * @MongoDB\Field(type="string")
+     */
+    protected $affiliate;
 
     /**
      * @AppAssert\Token()
@@ -167,6 +175,16 @@ class Lead
         $this->source = $source;
     }
 
+    public function getAffiliate()
+    {
+        return $this->affiliate;
+    }
+
+    public function setAffiliate($affiliate)
+    {
+        $this->affiliate = $affiliate;
+    }
+
     public function getIntercomId()
     {
         return $this->intercomId;
@@ -180,6 +198,8 @@ class Lead
     public function populateUser(User $user)
     {
         $user->setEmail($this->getEmail());
+        $user->setEmailCanonical($this->getEmailCanonical());
+        $user->setLeadSource($this->getSource());
         $user->setCreated($this->getCreated());
         $user->setIntercomId($this->getIntercomId());
         // Commenting out as could cause duplicate mobile numbers, which could cause login issues
