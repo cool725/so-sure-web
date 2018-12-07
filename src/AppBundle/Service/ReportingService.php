@@ -3,6 +3,7 @@ namespace AppBundle\Service;
 
 use AppBundle\Document\File\SalvaPaymentFile;
 use AppBundle\Document\Payment\BacsIndemnityPayment;
+use AppBundle\Document\Stats;
 use AppBundle\Repository\CashbackRepository;
 use AppBundle\Repository\ClaimRepository;
 use AppBundle\Repository\ConnectionRepository;
@@ -12,6 +13,7 @@ use AppBundle\Repository\PaymentRepository;
 use AppBundle\Repository\PhonePolicyRepository;
 use AppBundle\Repository\PhoneRepository;
 use AppBundle\Repository\ScheduledPaymentRepository;
+use AppBundle\Repository\StatsRepository;
 use AppBundle\Repository\UserRepository;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Predis\Client;
@@ -936,6 +938,18 @@ class ReportingService
         // @codingStandardsIgnoreEnd
     }
 
+    public function getStats(\DateTime $date)
+    {
+        $start = $this->startOfMonth($date);
+        $end = $this->endOfMonth($date);
+        /** @var StatsRepository $repo */
+        $repo = $this->dm->getRepository(Stats::class);
+        /** @var Stats[] $stats */
+        $stats = $repo->getStatsByRange($start, $end);
+
+        return Stats::sum($stats);
+    }
+
     /**
      * @param \DateTime      $date Current date - will run report for previous year quarter
      * @param \DateTime|null $now  Optional - when is now
@@ -1256,7 +1270,7 @@ class ReportingService
             $month = [];
             $month["open"] = $runningTotal;
             $month["new"] = $policyRepo->countAllNewPolicies($endOfMonth, $start);
-            $month["expired"] = $policyRepo->countEndingByStatus(Policy::STATUS_EXPIRED, $start, $endOfMonth);
+            $month["expired"] = $policyRepo->countEndingByStatus(Policy::$expirationStatuses, $start, $endOfMonth);
             $month["cancelled"] = $policyRepo->countEndingByStatus(Policy::STATUS_CANCELLED, $start, $endOfMonth);
             $runningTotal += $month["new"];
             $runningTotal -= $month["expired"];
@@ -1270,7 +1284,8 @@ class ReportingService
             );
             $month["newAdjusted"] = $month["new"] - $month["upgrade"];
             $month["cancelledAdjusted"] = $month["cancelled"] - $month["upgrade"];
-            $month["newTotal"] = $this->totalAtPoint($endOfMonth);
+            $month["queryOpen"] = $this->totalAtPoint($start);
+            $month["queryClose"] = $this->totalAtPoint($endOfMonth);
             $report[$start->format("F Y")] = $month;
             $start->add(new \DateInterval("P1M"));
         }
@@ -1314,7 +1329,7 @@ class ReportingService
         /** @var PhonePolicyRepository $policyRepo */
         $policyRepo = $this->dm->getRepository(PhonePolicy::class);
         return $policyRepo->countAllNewPolicies($date) - (
-            $policyRepo->countEndingByStatus(Policy::STATUS_EXPIRED, null, $date) +
+            $policyRepo->countEndingByStatus(Policy::$expirationStatuses, null, $date) +
             $policyRepo->countEndingByStatus(Policy::STATUS_CANCELLED, null, $date)
         );
     }

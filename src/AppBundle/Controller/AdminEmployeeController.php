@@ -33,6 +33,7 @@ use AppBundle\Service\AffiliateService;
 use Doctrine\ODM\MongoDB\Query\Builder;
 use Gedmo\Loggable\Document\Repository\LogEntryRepository;
 use Grpc\Call;
+use Predis\Client;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -658,7 +659,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                 $imeiForm->handleRequest($request);
                 if ($imeiForm->isValid()) {
                     $policy->adjustImei($imei->getImei(), false);
-                  
+
                     $policy->addNoteDetails(
                         $imei->getNote(),
                         $this->getUser()
@@ -668,6 +669,59 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                     $this->addFlash(
                         'success',
                         sprintf('Policy %s imei updated.', $policy->getPolicyNumber())
+                    );
+
+                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
+                }
+            }
+        }
+
+        return [
+            'form' => $imeiForm->createView(),
+            'policy' => $policy,
+        ];
+    }
+    /**
+     * @Route("/detected-imei-form/{id}", name="detected_imei_form")
+     * @Template
+     */
+    public function detectedImeiFormAction(Request $request, $id = null)
+    {
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(PhonePolicy::class);
+        /** @var PhonePolicy $policy */
+        $policy = $repo->find($id);
+
+        if (!$policy) {
+            throw $this->createNotFoundException(sprintf('Policy %s not found', $id));
+        }
+
+        $imei = new Imei();
+        $imei->setPolicy($policy);
+        $imei->setImei($policy->getDetectedImei());
+        $imeiForm = $this->get('form.factory')
+            ->createNamedBuilder('imei_form', ImeiType::class, $imei)
+            ->setAction($this->generateUrl(
+                'detected_imei_form',
+                ['id' => $id]
+            ))
+            ->getForm();
+
+        if ('POST' === $request->getMethod()) {
+            if ($request->request->has('imei_form')) {
+                $imeiForm->handleRequest($request);
+                if ($imeiForm->isValid()) {
+                    $policy->setDetectedImei($imei->getImei());
+
+                    $policy->addNoteDetails(
+                        sprintf('Updated detected imei. Additional notes: %s', $imei->getNote()),
+                        $this->getUser()
+                    );
+
+                    $dm->flush();
+                    $this->addFlash(
+                        'success',
+                        sprintf('Policy %s detected imei updated.', $policy->getPolicyNumber())
                     );
 
                     return $this->redirectToRoute('admin_policy', ['id' => $id]);
@@ -2122,23 +2176,62 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
      */
     public function detectedImeiAction()
     {
-        $redis = $this->get('snc_redis.default');
+        $redis = $this->get("snc_redis.default");
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(PhonePolicy::class);
+
         /*
-                $redis->lpush('DETECTED-IMEI', json_encode([
-                    'detected_imei' => 'a123',
-                    'suggested_imei' => 'a456',
-                    'bucket' => 'a',
-                    'key' => 'key',
-                ]));
-        */
-        $imeis = [];
-        if ($imei = $redis->lpop('DETECTED-IMEI')) {
-            $imeis[] = json_decode($imei, true);
-            $redis->lpush('DETECTED-IMEI', $imei);
+        $debug = false;
+        if ($debug) {
+            $policy = $repo->findOneBy(['imei' => ['$ne' => null]]);
+            $redis->lpush('DETECTED-IMEI', json_encode([
+                'detected_imei' => $policy->getImei(),
+                'suggested_imei' => 'a456',
+                'bucket' => 'a',
+                'key' => 'key',
+            ]));
         }
+        */
+
+        $storedImeis = $redis->lrange("DETECTED-IMEI", 0, -1);
+        $imeis = [];
+        foreach ($storedImeis as $storedImei) {
+            $imei = json_decode($storedImei, true);
+            $imei['actualPolicy'] = $repo->findOneBy(['imei' => $imei['detected_imei']]);
+            $imei['detectedPolicy'] = $repo->findOneBy(['detectedImei' => $imei['detected_imei']]);
+            if (mb_strlen($imei['suggested_imei']) > 0) {
+                $imei['suggestedPolicy'] = $repo->findOneBy(['imei' => $imei['suggested_imei']]);
+            } else {
+                $imei['suggestedPolicy'] = null;
+            }
+            $imei['raw'] = $storedImei;
+            $imeis[] = $imei;
+        }
+
         return [
-            'imeis' => $imeis,
+            "imeis" => $imeis
         ];
+    }
+
+    /**
+     * @Route("/detected-imei/delete/{item}", name="admin_delete_detected_imei")
+     * @Template
+     */
+    public function deleteDetectedImeiAction($item)
+    {
+        /** @var Client $redis */
+        $redis = $this->get("snc_redis.default");
+        if ($redis->lrem('DETECTED-IMEI', 1, $item)) {
+            $this->addFlash('success', sprintf(
+                sprintf('Removed %s', $item)
+            ));
+        } else {
+            $this->addFlash('error', sprintf(
+                sprintf('Failed to remove %s', $item)
+            ));
+        }
+
+        return new RedirectResponse($this->generateUrl('admin_detected_imei'));
     }
 
     private function getConnectionData()
@@ -2289,6 +2382,54 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             'rewards' => $rewards,
             'connectForm' => $connectForm->createView(),
             'rewardForm' => $rewardForm->createView(),
+        ];
+    }
+
+    /**
+     * @Route("/tastecard-form/{id}", name="tastecard_form")
+     * @Template
+     */
+    public function tasteCardFormAction(Request $request, $id)
+    {
+        $tasteCardForm = $this->get("form.factory")
+            ->createNamedBuilder("tastecard_form")
+            ->add("number", TextType::class)
+            ->add("update", SubmitType::class)
+            ->add("resend", SubmitType::class)
+            ->setAction($this->generateUrl(
+                'tastecard_form',
+                ['id' => $id]
+            ))
+            ->getForm();
+        $dm = $this->getManager();
+        $policyRepository = $dm->getRepository(Policy::class);
+        $policy = $policyRepository->find($id);
+        if ('POST' === $request->getMethod()) {
+            if ($request->request->has("tastecard_form")) {
+                $tasteCardForm->handleRequest($request);
+                if ($tasteCardForm->isValid()) {
+                    $policyService = $this->get("app.policy");
+                    if ($tasteCardForm->getClickedButton()->getName() === "update") {
+                        $tasteCard = $this->conformAlphanumeric($tasteCardForm->get("number")->getData(), 10, 10);
+                        if ($tasteCard) {
+                            $policy->setTasteCard($tasteCard);
+                            $dm->flush();
+                            $policyService->tasteCardEmail($policy);
+                            $this->addFlash("success", "Tastecard set to {$tasteCard}.");
+                        } else {
+                            $this->addFlash("error", "Tastecard number must be 10 alphanumeric characters.");
+                        }
+                    } elseif ($tasteCardForm->getClickedButton()->getName() === "resend") {
+                        $policyService->tasteCardEmail($policy);
+                        $this->addFlash('success', 'Tastecard notification has been resent.');
+                    }
+                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
+                }
+            }
+        }
+        return [
+            "form" => $tasteCardForm->createView(),
+            "policy" => $policy
         ];
     }
 
