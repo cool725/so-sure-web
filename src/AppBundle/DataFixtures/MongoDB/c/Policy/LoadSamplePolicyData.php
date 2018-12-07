@@ -668,9 +668,9 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $policy->setPhone($phone, null, false);
         $policy->setImei($this->generateRandomImei());
         if ($picSure == self::PICSURE_NON_POLICY) {
-            $policy->init($user, $nonPicSureTerms);
+            $policy->init($user, $nonPicSureTerms,false);
         } else {
-            $policy->init($user, $latestTerms);
+            $policy->init($user, $latestTerms, false);
         }
         if (!$code) {
             $policy->createAddSCode($count);

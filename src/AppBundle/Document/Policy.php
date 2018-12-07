@@ -2148,7 +2148,7 @@ abstract class Policy
         return $nextDate;
     }
 
-    public function init(User $user, PolicyTerms $terms)
+    public function init(User $user, PolicyTerms $terms, $validateExcess = true)
     {
         $user->addPolicy($this);
         if ($company = $user->getCompany()) {
@@ -2158,7 +2158,7 @@ abstract class Policy
 
         // in the normal flow we should have policy terms before setting the phone
         // however, many test cases do not have it
-        if ($this->getPremium()) {
+        if ($this->getPremium() && $validateExcess) {
             $this->validateAllowedExcess();
         }
     }
