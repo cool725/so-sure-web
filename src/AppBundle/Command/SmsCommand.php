@@ -39,10 +39,10 @@ class SmsCommand extends ContainerAwareCommand
                 'policyNumber'
             )
             ->addOption(
-                'final',
+                'attempt',
                 null,
-                InputOption::VALUE_NONE,
-                'is final attempt'
+                InputOption::VALUE_REQUIRED,
+                '2 to 4'
             )
         ;
     }
@@ -50,9 +50,9 @@ class SmsCommand extends ContainerAwareCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $policyNumber = $input->getOption('policyNumber');
-        $finalAttempt = true === $input->getOption('final');
+        $attempt = true === $input->getOption('attempt');
 
-        if ($policyNumber) {
+        if ($policyNumber && $attempt) {
             $repo = $this->dm->getRepository(Policy::class);
             /** @var Policy $policy */
             $policy = $repo->findOneBy(['policyNumber' => $policyNumber]);
@@ -60,10 +60,7 @@ class SmsCommand extends ContainerAwareCommand
                 throw new \Exception(sprintf('Unable to find policy %s', $policyNumber));
             }
 
-            $smsTemplate = 'AppBundle:Sms:failedPayment.txt.twig';
-            if ($finalAttempt) {
-                $smsTemplate = 'AppBundle:Sms:failedPaymentFinal.txt.twig';
-            }
+            $smsTemplate = sprintf('AppBundle:Sms:card/failedPayment-%d.txt.twig', $attempt);
 
             $this->smsService->sendUser($policy, $smsTemplate, ['policy' => $policy]);
         } else {

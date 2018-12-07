@@ -60,10 +60,26 @@ class TestCommand extends ContainerAwareCommand
         // $this->removeOrphanUsersOnCharges($output);
         // $this->updateNotes();
 
-        $this->updatePhoneExcess();
-        $this->updatePolicyExcess();
+        //$this->updatePhoneExcess();
+        //$this->updatePolicyExcess();
+
+        $this->updateClaimExcess();
 
         $output->writeln('Finished');
+    }
+
+    private function updateClaimExcess()
+    {
+        $repo = $this->dm->getRepository(Claim::class);
+        $claims = $repo->findAll();
+        foreach ($claims as $claim) {
+            /** @var Claim $claim */
+            if ($claim->getPolicy()) {
+                $claim->setExpectedExcess($claim->getPolicy()->getCurrentExcess());
+            }
+        }
+
+        $this->dm->flush();
     }
 
     private function updatePhoneExcess()

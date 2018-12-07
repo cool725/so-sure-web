@@ -1,6 +1,6 @@
 // banner.js
 
-import trackByName from '../common/track.js';
+import tracking from '../common/trackData.js';
 
 $(function() {
 
@@ -10,8 +10,9 @@ $(function() {
 
         // Add tracking
         let name = $(this).data('event');
-        trackByName(name, function() {
-            close.parent().slideUp();
+
+        tracking(name, function() {
+             close.parent().slideUp();
         });
 
     });

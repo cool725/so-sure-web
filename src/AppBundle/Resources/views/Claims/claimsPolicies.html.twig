@@ -179,7 +179,7 @@
                             </a></td>
                             <td>{{ policy.status }}
                                 {% if policy.status == "cancelled" %} / {{ policy.cancelledReason }}{% endif %}
-                                {% if status == 'call' or status == 'called' or status == 'unpaid' %}
+                                {% if status == 'call' or status == 'called' %}
                                     {# starting to impact on query time; for call for unpaid, its useful, but otherwise less important #}
                                     {% if policy.hasPolicyExpirationDate and policy.status == "unpaid" %} / {{ policy.policyExpirationDate | date('d M Y H:i', 'Europe/London') }}{% endif %}
                                 {% endif %}

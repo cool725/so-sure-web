@@ -1269,6 +1269,32 @@ class PolicyService
         );
     }
 
+    /**
+     * @param Policy $policy
+     */
+    public function skippedRenewalEmail(Policy $policy)
+    {
+        if (!$this->mailer) {
+            return;
+        }
+
+        $baseTemplate = sprintf('AppBundle:Email:policy/skippedRenewal');
+        $subject = sprintf('Your so-sure policy %s is unable to be automatically renewed', $policy->getPolicyNumber());
+
+        $htmlTemplate = sprintf("%s.html.twig", $baseTemplate);
+        $textTemplate = sprintf("%s.txt.twig", $baseTemplate);
+
+        $this->mailer->sendTemplateToUser(
+            $subject,
+            $policy->getUser(),
+            $htmlTemplate,
+            ['policy' => $policy],
+            $textTemplate,
+            ['policy' => $policy],
+            null
+        );
+    }
+
     public function getBreakdownData()
     {
         /** @var PhonePolicyRepository $repo */
@@ -1997,6 +2023,8 @@ class PolicyService
             ));
             $policy->getNextPolicy()->setStatus(Policy::STATUS_UNRENEWED);
             $this->dm->flush();
+
+            $this->skippedRenewalEmail($policy);
 
             return false;
         } else {

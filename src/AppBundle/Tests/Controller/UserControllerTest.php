@@ -827,7 +827,7 @@ class UserControllerTest extends BaseControllerTest
         $this->validateUnpaidJudoForm($crawler, false);
         $this->validateUnpaidRescheduleBacsForm($crawler, true);
         $this->validateUnpaidBacsSetupLink($crawler, false);
-        $this->validateUnpaidBacsUpdateLink($crawler, false);
+        $this->validateUnpaidBacsUpdateLink($crawler, true);
         $this->assertContains('Payment missing', $crawler->html());
 
         $form = $crawler->selectButton('form[reschedule]')->form();
@@ -894,7 +894,7 @@ class UserControllerTest extends BaseControllerTest
         $this->validateUnpaidJudoForm($crawler, false);
         $this->validateUnpaidRescheduleBacsForm($crawler, true);
         $this->validateUnpaidBacsSetupLink($crawler, false);
-        $this->validateUnpaidBacsUpdateLink($crawler, false);
+        $this->validateUnpaidBacsUpdateLink($crawler, true);
         $this->assertContains('Payment missing', $crawler->html());
 
         $form = $crawler->selectButton('form[reschedule]')->form();

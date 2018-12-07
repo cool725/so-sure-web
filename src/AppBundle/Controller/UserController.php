@@ -200,7 +200,13 @@ class UserController extends BaseController
             $emailInvitationForm->handleRequest($request);
             if ($emailInvitationForm->isSubmitted() && $emailInvitationForm->isValid()) {
                 try {
-                    $invitationService->inviteByEmail($policy, $emailInvitiation->getEmail());
+                    $invitationService->inviteByEmail(
+                        $policy,
+                        $emailInvitiation->getEmail(),
+                        null,
+                        null,
+                        'User Home'
+                    );
                     $this->addFlash(
                         'success',
                         sprintf('%s was invited', $emailInvitiation->getEmail())
@@ -1356,10 +1362,8 @@ class UserController extends BaseController
         }
         // we need enough time for the bacs to be billed + reverse payment to be notified + 1 day internal processing
         // or no point in swapping to bacs
-        if ($bacsFeature && $policy->canBacsPaymentBeMadeInTime()) {
+        if ($bacsFeature && !$policy->canBacsPaymentBeMadeInTime()) {
             $bacsFeature = false;
-            // TODO: it seems as though this would turn off the bacs features when it should leave it on and vice
-            //       versa.
         }
 
         /** @var PaymentService $paymentService */
