@@ -40,6 +40,8 @@ class AffiliatePortalController extends BaseController
 
                 if ($leadForm->isValid()) {
                     $leadRepo = $dm->getRepository(Lead::class);
+
+                    /** @var Lead $existingLead */
                     $existingLead = $leadRepo->findOneBy([
                         'email' => mb_strtolower($lead->getEmail())
                     ]);
