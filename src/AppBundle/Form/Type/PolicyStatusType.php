@@ -7,6 +7,8 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class PolicyStatusType extends AbstractType
@@ -16,20 +18,9 @@ class PolicyStatusType extends AbstractType
         $builder
             ->add('status', ChoiceType::class, [
                 'choices' => [
-                    PhonePolicy::STATUS_CANCELLED,
                     PhonePolicy::STATUS_ACTIVE,
-                    PhonePolicy::STATUS_DECLINED_RENEWAL,
-                    PhonePolicy::STATUS_EXPIRED,
-                    PhonePolicy::STATUS_EXPIRED_CLAIMABLE,
-                    PhonePolicy::STATUS_EXPIRED_WAIT_CLAIM,
-                    PhonePolicy::STATUS_MULTIPAY_REJECTED,
-                    PhonePolicy::STATUS_MULTIPAY_REQUESTED,
-                    PhonePolicy::STATUS_PENDING,
-                    PhonePolicy::STATUS_PENDING_RENEWAL,
-                    PhonePolicy::STATUS_RENEWAL,
                     PhonePolicy::STATUS_UNPAID,
-                    PhonePolicy::STATUS_UNRENEWED,
-                    null => 'null'
+                    'null' => null
                 ],
                 'choice_label' => function ($choice, $key, $value) {
                     return $value;
@@ -43,6 +34,39 @@ class PolicyStatusType extends AbstractType
             ])
             ->add('update', SubmitType::class)
         ;
+
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
+            $form = $event->getForm();
+            /** @var PhonePolicy $phonePolicy */
+            $phonePolicy = $event->getData();
+
+            $choices[] = $phonePolicy->getStatus();
+
+            if ($phonePolicy->getStatus() === PhonePolicy::STATUS_ACTIVE) {
+                $choices[] = PhonePolicy::STATUS_UNPAID;
+            }
+
+            if ($phonePolicy->getStatus() === PhonePolicy::STATUS_UNPAID) {
+                $choices[] = PhonePolicy::STATUS_ACTIVE;
+            }
+
+            if ($phonePolicy->getStatus() === PhonePolicy::STATUS_PENDING) {
+                $choices[] = null;
+            }
+
+            if ($phonePolicy->getStatus() === null) {
+                $choices[] = PhonePolicy::STATUS_PENDING;
+            }
+
+            $form->add('status', ChoiceType::class, [
+                'choices' => $choices,
+                'choice_label' => function ($choice, $key, $value) {
+                    return $value;
+                },
+                'placeholder' => 'Choose a status',
+                'required' => true
+            ]);
+        });
     }
 
     public function configureOptions(OptionsResolver $resolver)
