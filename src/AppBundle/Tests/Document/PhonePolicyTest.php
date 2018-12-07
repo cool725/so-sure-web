@@ -636,15 +636,31 @@ class PhonePolicyTest extends WebTestCase
         $policy->setPhone($phone);
     }
 
-    public function testGetCurrentExcess()
+    public function testGetCurrentExcessAndPicSureStatus()
     {
         $policy = static::createUserPolicy(true);
+        $claim = new Claim();
+        $claim->setType(Claim::TYPE_WARRANTY);
+        $claim->setStatus(Claim::STATUS_INREVIEW);
+        $policy->addClaim($claim);
+
+        $this->assertCount(1, $policy->getClaims());
         $this->assertEquals(150, $policy->getCurrentExcess()->getTheft());
+        $this->assertEquals(150, $policy->getClaims()[0]->getExpectedExcess()->getTheft());
         $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_APPROVED);
         $this->assertEquals(70, $policy->getCurrentExcess()->getTheft());
+        $this->assertEquals(70, $policy->getClaims()[0]->getExpectedExcess()->getTheft());
 
         $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_REJECTED);
         $this->assertEquals(150, $policy->getCurrentExcess()->getTheft());
+        $this->assertEquals(150, $policy->getClaims()[0]->getExpectedExcess()->getTheft());
+
+        $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_MANUAL);
+        $claim->setStatus(Claim::STATUS_APPROVED);
+        $this->assertEquals(150, $policy->getClaims()[0]->getExpectedExcess()->getTheft());
+
+        $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_APPROVED);
+        $this->assertEquals(150, $policy->getClaims()[0]->getExpectedExcess()->getTheft());
     }
 
     /**

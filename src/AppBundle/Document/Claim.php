@@ -4,6 +4,7 @@ namespace AppBundle\Document;
 
 use AppBundle\Document\Excess\Excess;
 use AppBundle\Document\File\ProofOfLossFile;
+use AppBundle\Exception\ClaimException;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -834,6 +835,10 @@ class Claim
             $phonePolicy = $policy;
             $this->setFnolPicSureValidated($phonePolicy->isPicSureValidated());
         }
+        if (!$this->getExpectedExcess()) {
+            $this->setExpectedExcess($policy->getCurrentExcess());
+        }
+
         $this->policy = $policy;
     }
 
@@ -974,6 +979,21 @@ class Claim
     public function isOpen()
     {
         return in_array($this->getStatus(), [Claim::STATUS_APPROVED, Claim::STATUS_SUBMITTED, Claim::STATUS_INREVIEW]);
+    }
+
+    public function isClosed($includeApproved = false)
+    {
+        $closedStatuses = [
+            Claim::STATUS_DECLINED,
+            Claim::STATUS_PENDING_CLOSED,
+            Claim::STATUS_WITHDRAWN,
+            Claim::STATUS_SETTLED,
+        ];
+        if ($includeApproved) {
+            $closedStatuses[] = Claim::STATUS_APPROVED;
+        }
+
+        return in_array($this->getStatus(), $closedStatuses);
     }
 
     public function getDaviesStatus()
