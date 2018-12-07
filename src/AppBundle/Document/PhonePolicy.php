@@ -792,6 +792,13 @@ class PhonePolicy extends Policy
                 $picsureFiles[0]->addMetadata('picsure-status-user-id', $user->getId());
             }
         }
+
+        foreach ($this->getClaims() as $claim) {
+            /** @var Claim $claim */
+            if (!$claim->isClosed(true)) {
+                $claim->setExpectedExcess($this->getCurrentExcess());
+            }
+        }
     }
 
     public function isPicSureValidated()
@@ -878,6 +885,9 @@ class PhonePolicy extends Policy
     {
         /** @var PhonePremium $phonePremium */
         $phonePremium = $this->getPremium();
+        if (!$phonePremium) {
+            return null;
+        }
 
         if ($this->isPicSureValidated()) {
             return $phonePremium->getPicSureExcess();

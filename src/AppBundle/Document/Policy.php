@@ -4955,7 +4955,11 @@ abstract class Policy
 
     public function getCurrentExcess()
     {
-        return $this->getPremium()->getExcess();
+        if ($this->getPremium()) {
+            return $this->getPremium()->getExcess();
+        } else {
+            return null;
+        }
     }
 
     public function getExpectedCommission(\DateTime $date = null)

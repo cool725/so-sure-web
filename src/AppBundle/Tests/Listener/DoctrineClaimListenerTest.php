@@ -154,7 +154,10 @@ class DoctrineClaimListenerTest extends WebTestCase
         static::$dm->persist($claim);
         static::$dm->flush();
 
-        $this->assertNull($claim->getUnderwriterLastUpdated());
+        // Change inside the Claim::setPolicy does a doctrine update as well, which triggers the last updated
+        $expectedUnderwriterUpdated = \DateTime::createFromFormat('U', time());
+        $this->assertEquals($expectedUnderwriterUpdated, $claim->getUnderwriterLastUpdated(), '', 0);
+        // $this->assertNull($claim->getUnderwriterLastUpdated());
 
         $dg = new DirectGroupHandlerClaim();
         $dg->insuredName = $policy->getUser()->getName();
@@ -206,7 +209,10 @@ class DoctrineClaimListenerTest extends WebTestCase
         static::$dm->persist($claim);
         static::$dm->flush();
 
-        $this->assertNull($claim->getUnderwriterLastUpdated());
+        // Change inside the Claim::setPolicy does a doctrine update as well, which triggers the last updated
+        $expectedUnderwriterUpdated = \DateTime::createFromFormat('U', time());
+        $this->assertEquals($expectedUnderwriterUpdated, $claim->getUnderwriterLastUpdated(), '', 0);
+        // $this->assertNull($claim->getUnderwriterLastUpdated());
 
         $dg = new DirectGroupHandlerClaim();
         $dg->insuredName = $policy->getUser()->getName();
