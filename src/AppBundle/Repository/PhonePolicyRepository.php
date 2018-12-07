@@ -508,4 +508,42 @@ class PhonePolicyRepository extends PolicyRepository
             ->execute()
             ->count();
     }
+
+    /**
+     * Finds all policies that ended between the given dates and with the given status.
+     * @param array|String|null $status is the status of the policies that we are looking for or null to not check.
+     * @param \DateTime         $start  is the date that policies must have ended after if it's given.
+     * @param \DateTime         $end    is the date that policies must have ended before if it's given.
+     * @return array containing all the found policies.
+     */
+    public function findEndingByStatus($status = null, \DateTime $start = null, \DateTime $end = null)
+    {
+        $policy = new PhonePolicy();
+        $qb = $this->createQueryBuilder()
+            ->field("policyNumber")->equals(new \MongoRegex(sprintf('/^%s\//', $policy->getPolicyNumberPrefix())));
+        if (is_array($status)) {
+            $qb->field("status")->in($status);
+        } elseif ($status) {
+            $qb->field("status")->equals($status);
+        }
+        if ($start) {
+            $qb->field("end")->gte($start);
+        }
+        if ($end) {
+            $qb->field("end")->lt($end);
+        }
+        return $qb->getQuery()->execute();
+    }
+
+    /**
+     * Counts all policies that ended between the given dates and with the given status.
+     * @param String    $status is the status of the policies that we are looking for.
+     * @param \DateTime $start  is the date that the policies must have ended after if it's given.
+     * @param \DateTime $end    is the date that policies must have ended before if it's given.
+     * @return int the number of policies that were found.
+     */
+    public function countEndingByStatus($status, \DateTime $start = null, \DateTime $end = null)
+    {
+        return count($this->findEndingByStatus($status, $start, $end));
+    }
 }

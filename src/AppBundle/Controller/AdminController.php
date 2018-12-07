@@ -262,37 +262,6 @@ class AdminController extends BaseController
     }
 
     /**
-     * @Route("/phone/{id}/details", name="admin_phone_details")
-     * @Method({"POST"})
-     */
-    public function phoneDetailsAction(Request $request, $id)
-    {
-        if (!$this->isCsrfTokenValid('default', $request->get('token'))) {
-            throw new \InvalidArgumentException('Invalid csrf token');
-        }
-
-        $dm = $this->getManager();
-        $repo = $dm->getRepository(Phone::class);
-        $editPhone = $repo->find($id);
-        if ($editPhone) {
-            $phones = $repo->findBy(['make' => $editPhone->getMake(), 'model' => $editPhone->getModel()]);
-            foreach ($phones as $phone) {
-                /** @var Phone $phone */
-                $phone->setDescription($request->get('description'));
-                $phone->setFunFacts($request->get('fun-facts'));
-                $phone->setCanonicalPath($request->get('canonical-path'));
-            }
-            $dm->flush();
-            $this->addFlash(
-                'success',
-                'Your changes were saved!'
-            );
-        }
-
-        return new RedirectResponse($this->generateUrl('admin_phones'));
-    }
-
-    /**
      * @Route("/phone/{id}/active", name="admin_phone_active")
      * @Method({"POST"})
      */
@@ -443,6 +412,8 @@ class AdminController extends BaseController
         $snappyPdf->setOption('page-size', 'A4');
         /** @var ReportingService $reportingService */
         $reportingService = $this->get('app.reporting');
+
+
         $html = $templating->render('AppBundle:Pdf:adminAccounts.html.twig', [
             'year' => $year,
             'month' => $month,
@@ -451,6 +422,8 @@ class AdminController extends BaseController
             'activePoliciesWithDiscount' => $reportingService->getActivePoliciesWithPolicyDiscountCount($date),
             'rewardPotLiability' => $reportingService->getRewardPotLiability($date),
             'rewardPromoPotLiability' => $reportingService->getRewardPotLiability($date, true),
+            'stats' => $reportingService->getStats($date),
+            'print' => true,
         ]);
 
         return new Response(
@@ -523,6 +496,8 @@ class AdminController extends BaseController
             'rewardPromoPotLiability' => $reportingService->getRewardPotLiability($date, true),
             'files' => $s3FileRepo->getAllFiles($date),
             'salvaForm' => $salvaForm->createView(),
+            'stats' => $reportingService->getStats($date),
+            'print' => false,
         ];
     }
 

@@ -45,11 +45,15 @@ class MailerService
      * @var array
      */
     public static $analyticsCampaigns = [
-        'policy/cardExpiring',
-        'policy/failedPayment',
-        'policy/failedPaymentFinal',
-        'policy/failedPaymentWithClaim',
-        'policy/failedPaymentWithClaimFinal',
+        'card/cardExpiring',
+        'card/failedPayment-1',
+        'card/failedPayment-2',
+        'card/failedPayment-3',
+        'card/failedPayment-4',
+        'policy/failedPaymentWithClaim-1',
+        'policy/failedPaymentWithClaim-2',
+        'policy/failedPaymentWithClaim-3',
+        'policy/failedPaymentWithClaim-4',
     ];
 
     /**

@@ -64,6 +64,7 @@ class MixpanelService
     const EVENT_CASHBACK = 'Cashback';
     const EVENT_DECLINE_RENEW = 'Decline Renew Policy';
     const EVENT_SIXPACK = 'Sixpack Experiment';
+    const EVENT_ONBOARDING = 'Track Onboarding Interaction';
     const EVENT_POLICY_STATUS = 'Policy Status Change';
     const EVENT_PAYMENT_METHOD_CHANGED = 'Payment Method Changed';
 

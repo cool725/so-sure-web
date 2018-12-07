@@ -168,6 +168,12 @@ abstract class Policy
         self::RISK_PENDING_CANCELLATION_POLICY => self::RISK_LEVEL_HIGH,
     ];
 
+    public static $expirationStatuses = [
+        Policy::STATUS_EXPIRED,
+        Policy::STATUS_EXPIRED_CLAIMABLE,
+        Policy::STATUS_EXPIRED_WAIT_CLAIM
+    ];
+
     /**
      * @MongoDB\Id(strategy="auto")
      */
@@ -355,6 +361,7 @@ abstract class Policy
      * @Assert\DateTime()
      * @MongoDB\Field(type="date")
      * @Gedmo\Versioned
+     * @MongoDB\Index(unique=false, sparse=true)
      */
     protected $start;
 
@@ -536,6 +543,14 @@ abstract class Policy
      * @Gedmo\Versioned
      */
     protected $metrics;
+
+    /**
+     * @AppAssert\Alphanumeric()
+     * @Assert\Length(min="10", max="10")
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
+    protected $tasteCard;
 
     public function __construct()
     {
@@ -1320,6 +1335,16 @@ abstract class Policy
     public function addMetric($metric)
     {
         $this->metrics[] = $metric;
+    }
+
+    public function getTasteCard()
+    {
+        return $this->tasteCard;
+    }
+
+    public function setTasteCard($tasteCard)
+    {
+        $this->tasteCard = $tasteCard;
     }
 
     public function getStandardConnections()
@@ -3022,11 +3047,7 @@ abstract class Policy
 
     public function isExpired()
     {
-        return in_array($this->getStatus(), [
-            self::STATUS_EXPIRED,
-            self::STATUS_EXPIRED_CLAIMABLE,
-            self::STATUS_EXPIRED_WAIT_CLAIM,
-        ]);
+        return in_array($this->getStatus(), self::$expirationStatuses);
     }
 
     public function isUnrenewed()
@@ -4919,7 +4940,11 @@ abstract class Policy
 
     public function getCurrentExcess()
     {
-        return $this->getPremium()->getExcess();
+        if ($this->getPremium()) {
+            return $this->getPremium()->getExcess();
+        } else {
+            return null;
+        }
     }
 
     public function getExpectedCommission(\DateTime $date = null)
