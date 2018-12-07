@@ -10,12 +10,32 @@
                     <span class="td-swap td-active">
                         Protect Your Bubble
                     </span>
-                    <span class="td-swap">
-                        Gadget <br> Cover
-                    </span>
-                    <span class="td-swap">
-                        Loveit<br>coverit <br>.co.uk
-                    </span>
+                    {% if table_content is defined and table_content == 'topcashback' %}
+                        <span class="td-swap">
+                            Gadget <br> Cover
+                        </span>
+                        <span class="td-swap">
+                            Simplesurance
+                        </span>
+                    {% elseif table_content is defined and table_content == 'quidco' %}
+                        <span class="td-swap">
+                            Gadget <br> Cover
+                        </span>
+                        <span class="td-swap">
+                            CloudCover
+                        </span>
+                    {% elseif table_content is defined and table_content == 'vouchercodes' %}
+                        <span class="td-swap">
+                            Endsleigh
+                        </span>
+                    {% else %}
+                        <span class="td-swap">
+                            Gadget <br> Cover
+                        </span>
+                        <span class="td-swap">
+                            Loveit<br>coverit <br>.co.uk
+                        </span>
+                    {% endif %}
                 </div>
                 <a href="#" class="td-next-btn"><i class="fal fa-angle-right fa-3x text-columbia-blue-e"></i></a>
             </th>
@@ -43,12 +63,32 @@
                     <span class="td-swap td-active">
                         <strong>1 - 5</strong> days <div>depending on stock</div>
                     </span>
-                    <span class="td-swap">
-                        <strong>5 - 7</strong> <div>working days</div>
-                    </span>
-                    <span class="td-swap">
-                        <strong>1 - 5</strong> <div>working days</div>
-                    </span>
+                    {% if table_content is defined and table_content == 'topcashback' %}
+                        <span class="td-swap">
+                            <strong>5 - 7</strong> <div>working days</div>
+                        </span>
+                        <span class="td-swap">
+                            <strong>3 - 5</strong> <div>working days</div>
+                        </span>
+                    {% elseif table_content is defined and table_content == 'quidco' %}
+                        <span class="td-swap">
+                            <strong>5 - 7</strong> <div>working days</div>
+                        </span>
+                        <span class="td-swap">
+                            <strong>3 - 5</strong> <div>working days</div>
+                        </span>
+                    {% elseif table_content is defined and table_content == 'vouchercodes' %}
+                        <span class="td-swap">
+                            <strong>1 - 5</strong> <div>working days</div>
+                        </span>
+                    {% else %}
+                        <span class="td-swap">
+                            <strong>5 - 7</strong> <div>working days</div>
+                        </span>
+                        <span class="td-swap">
+                            <strong>1 - 5</strong> <div>working days</div>
+                        </span>
+                    {% endif %}
                 </div>
             </td>
         </tr>
@@ -73,12 +113,32 @@
                     <span class="td-swap td-active">
                         <i class="far fa-times fa-2x"></i>
                     </span>
-                    <span class="td-swap">
-                        <i class="far fa-times fa-2x"></i>
-                    </span>
-                    <span class="td-swap">
-                        <i class="far fa-times fa-2x"></i>
-                    </span>
+                    {% if table_content is defined and table_content == 'topcashback' %}
+                        <span class="td-swap">
+                            <i class="far fa-times fa-2x"></i>
+                        </span>
+                        <span class="td-swap">
+                            <i class="far fa-times fa-2x"></i>
+                        </span>
+                    {% elseif table_content is defined and table_content == 'quidco' %}
+                        <span class="td-swap">
+                            <i class="far fa-times fa-2x"></i>
+                        </span>
+                        <span class="td-swap">
+                            <i class="far fa-times fa-2x"></i>
+                        </span>
+                    {% elseif table_content is defined and table_content == 'vouchercodes' %}
+                        <span class="td-swap">
+                            <i class="far fa-times fa-2x"></i>
+                        </span>
+                    {% else %}
+                        <span class="td-swap">
+                            <i class="far fa-times fa-2x"></i>
+                        </span>
+                        <span class="td-swap">
+                            <i class="far fa-times fa-2x"></i>
+                        </span>
+                    {% endif %}
                 </div>
             </td>
         </tr>
@@ -103,12 +163,32 @@
                     <span class="td-swap td-active">
                         <i class="far fa-times fa-2x"></i>
                     </span>
-                    <span class="td-swap">
-                        <i class="far fa-times fa-2x"></i>
-                    </span>
-                    <span class="td-swap">
-                        <i class="far fa-times fa-2x"></i>
-                    </span>
+                    {% if table_content is defined and table_content == 'topcashback' %}
+                        <span class="td-swap">
+                            <i class="far fa-times fa-2x"></i>
+                        </span>
+                        <span class="td-swap">
+                            <i class="far fa-times fa-2x"></i>
+                        </span>
+                    {% elseif table_content is defined and table_content == 'quidco' %}
+                        <span class="td-swap">
+                            <i class="far fa-times fa-2x"></i>
+                        </span>
+                        <span class="td-swap">
+                            <i class="far fa-times fa-2x"></i>
+                        </span>
+                    {% elseif table_content is defined and table_content == 'vouchercodes' %}
+                        <span class="td-swap">
+                            <i class="far fa-check fa-2x"></i>
+                        </span>
+                    {% else %}
+                        <span class="td-swap">
+                            <i class="far fa-times fa-2x"></i>
+                        </span>
+                        <span class="td-swap">
+                            <i class="far fa-times fa-2x"></i>
+                        </span>
+                    {% endif %}
                 </div>
             </td>
         </tr>
@@ -126,12 +206,32 @@
                     <span class="td-swap td-active">
                         <i class="far fa-times fa-2x"></i>
                     </span>
-                    <span class="td-swap">
-                        <i class="far fa-times fa-2x"></i>
-                    </span>
-                    <span class="td-swap">
-                        <i class="far fa-times fa-2x"></i>
-                    </span>
+                    {% if table_content is defined and table_content == 'topcashback' %}
+                        <span class="td-swap">
+                            <i class="far fa-times fa-2x"></i>
+                        </span>
+                        <span class="td-swap">
+                            <i class="far fa-times fa-2x"></i>
+                        </span>
+                    {% elseif table_content is defined and table_content == 'quidco' %}
+                        <span class="td-swap">
+                            <i class="far fa-times fa-2x"></i>
+                        </span>
+                        <span class="td-swap">
+                            <i class="far fa-times fa-2x"></i>
+                        </span>
+                    {% elseif table_content is defined and table_content == 'vouchercodes' %}
+                        <span class="td-swap">
+                            <i class="far fa-check fa-2x"></i>
+                        </span>
+                    {% else %}
+                        <span class="td-swap">
+                            <i class="far fa-times fa-2x"></i>
+                        </span>
+                        <span class="td-swap">
+                            <i class="far fa-times fa-2x"></i>
+                        </span>
+                    {% endif %}
                 </div>
             </td>
         </tr>
@@ -149,12 +249,32 @@
                     <span class="td-swap td-active">
                         <strong>6 months</strong> <div>from purchase</div>
                     </span>
-                    <span class="td-swap">
-                        <strong>18 months</strong> <div>from purchase</div>
-                    </span>
-                    <span class="td-swap">
-                        <strong>3 years</strong> <div>from purchase</div>
-                    </span>
+                    {% if table_content is defined and table_content == 'topcashback' %}
+                        <span class="td-swap">
+                            <strong>18 months</strong> <div>from purchase</div>
+                        </span>
+                        <span class="td-swap">
+                            <strong>6 months</strong> <div>from purchase</div>
+                        </span>
+                    {% elseif table_content is defined and table_content == 'quidco' %}
+                        <span class="td-swap">
+                            <strong>18 months</strong> <div>from purchase</div>
+                        </span>
+                        <span class="td-swap">
+                            <strong>6 months</strong> <div>from purchase</div>
+                        </span>
+                    {% elseif table_content is defined and table_content == 'vouchercodes' %}
+                        <span class="td-swap">
+                            <strong>3 years</strong> <div>from purchase</div>
+                        </span>
+                    {% else %}
+                        <span class="td-swap">
+                            <strong>18 months</strong> <div>from purchase</div>
+                        </span>
+                        <span class="td-swap">
+                            <strong>3 years</strong> <div>from purchase</div>
+                        </span>
+                    {% endif %}
                 </div>
             </td>
         </tr>
@@ -179,12 +299,32 @@
                     <span class="td-swap td-active">
                         <i class="far fa-times fa-2x"></i>
                     </span>
-                    <span class="td-swap">
-                        <i class="far fa-times fa-2x"></i>
-                    </span>
-                    <span class="td-swap">
-                       <i class="far fa-times fa-2x"></i>
-                    </span>
+                    {% if table_content is defined and table_content == 'topcashback' %}
+                        <span class="td-swap">
+                            <i class="far fa-times fa-2x"></i>
+                        </span>
+                        <span class="td-swap">
+                            <i class="far fa-times fa-2x"></i>
+                        </span>
+                    {% elseif table_content is defined and table_content == 'quidco' %}
+                        <span class="td-swap">
+                            <i class="far fa-times fa-2x"></i>
+                        </span>
+                        <span class="td-swap">
+                            <i class="far fa-times fa-2x"></i>
+                        </span>
+                    {% elseif table_content is defined and table_content == 'vouchercodes' %}
+                        <span class="td-swap">
+                            <i class="far fa-times fa-2x"></i>
+                        </span>
+                    {% else %}
+                        <span class="td-swap">
+                            <i class="far fa-times fa-2x"></i>
+                        </span>
+                        <span class="td-swap">
+                           <i class="far fa-times fa-2x"></i>
+                        </span>
+                    {% endif %}
                 </div>
             </td>
         </tr>
@@ -208,14 +348,38 @@
                         <i class="fas fa-star"></i>
                         <i class="fas fa-star"></i>
                     </span>
-                    <span class="td-swap">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                    </span>
-                    <span class="td-swap">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                    </span>
+                    {% if table_content is defined and table_content == 'topcashback' %}
+                        <span class="td-swap">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </span>
+                        <span class="td-swap">
+                            <i class="fas fa-star"></i>
+                        </span>
+                    {% elseif table_content is defined and table_content == 'quidco' %}
+                        <span class="td-swap">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </span>
+                        <span class="td-swap">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </span>
+                    {% elseif table_content is defined and table_content == 'vouchercodes' %}
+                        <span class="td-swap">
+                            <i class="fas fa-star"></i>
+                        </span>
+                    {% else %}
+                        <span class="td-swap">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </span>
+                        <span class="td-swap">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </span>
+                    {% endif %}
                 </div>
             </td>
         </tr>
@@ -224,12 +388,30 @@
 <table class="table-comparison light-table d-none d-md-block mx-auto mt-lg-5 animated fadeInUp">
     <thead>
         <tr>
-            <th width="24%" class="wh text-left"><span class="h5 text-primary">Features</span></th>
-            <th width="19%" class="blue-gradient"><img src="{{ cdn_url }}/images/rebrand/logo/so-sure_logo-white-dark.svg" class="img-fluid" alt="so-sure"></th>
-            <th width="19%" class="b4 bs-l">Protect Your Bubble</th>
-            <th width="19%" class="b4">Gadget <br> Cover</th>
-            <th width="19%" class="b4">Loveit <br> coverIt.co.uk</th>
-        </tr>
+            {% if table_content is defined and table_content == 'topcashback' %}
+                <th width="24%" class="wh text-left"><span class="h5 text-primary">Features</span></th>
+                <th width="19%" class="blue-gradient"><img src="{{ cdn_url }}/images/rebrand/logo/so-sure_logo-white-dark.svg" class="img-fluid" alt="so-sure"></th>
+                <th width="19%" class="b4 bs-l">Protect Your Bubble</th>
+                <th width="19%" class="b4">Gadget <br> Cover</th>
+                <th width="19%" class="b4">Simplesurance</th>
+            {% elseif table_content is defined and table_content == 'quidco' %}
+                <th width="24%" class="wh text-left"><span class="h5 text-primary">Features</span></th>
+                <th width="19%" class="blue-gradient"><img src="{{ cdn_url }}/images/rebrand/logo/so-sure_logo-white-dark.svg" class="img-fluid" alt="so-sure"></th>
+                <th width="19%" class="b4 bs-l">Protect Your Bubble</th>
+                <th width="19%" class="b4">Gadget <br> Cover</th>
+                <th width="19%" class="b4">CloudCover</th>
+            {% elseif table_content is defined and table_content == 'vouchercodes' %}
+                <th width="40%" class="wh text-left"><span class="h5 text-primary">Features</span></th>
+                <th width="20%" class="blue-gradient"><img src="{{ cdn_url }}/images/rebrand/logo/so-sure_logo-white-dark.svg" class="img-fluid" alt="so-sure"></th>
+                <th width="20%" class="b4 bs-l">Protect Your Bubble</th>
+                <th width="20%" class="b4">Endsleigh</th>
+            {% else %}
+                <th width="24%" class="wh text-left"><span class="h5 text-primary">Features</span></th>
+                <th width="19%" class="blue-gradient"><img src="{{ cdn_url }}/images/rebrand/logo/so-sure_logo-white-dark.svg" class="img-fluid" alt="so-sure"></th>
+                <th width="19%" class="b4 bs-l">Protect Your Bubble</th>
+                <th width="19%" class="b4">Gadget <br> Cover</th>
+                <th width="19%" class="b4">Loveit <br> coverIt.co.uk</th>
+            {% endif %}
     </thead>
     <tbody>
         <tr>
@@ -245,8 +427,18 @@
                 </a>
             </td>
             <td class="bb1 bs-l"><strong>1 - 5</strong> days <div>depending on stock</div></td>
-            <td class="bb1"><strong>5 - 7</strong> <div>working days</div></td>
-            <td class="bb1"><strong>1 - 5</strong> <div>working days</div></td>
+            {% if table_content is defined and table_content == 'topcashback' %}
+                <td class="bb1"><strong>5 - 7</strong> <div>working days</div></td>
+                <td class="bb1"><strong>3 - 5</strong> <div>working days</div></td>
+            {% elseif table_content is defined and table_content == 'quidco' %}
+                <td class="bb1"><strong>5 - 7</strong> <div>working days</div></td>
+                <td class="bb1"><strong>3 - 5</strong> <div>working days</div></td>
+            {% elseif table_content is defined and table_content == 'vouchercodes' %}
+                <td class="bb1"><strong>1 - 5</strong> <div>working days</div></td>
+            {% else %}
+                <td class="bb1"><strong>5 - 7</strong> <div>working days</div></td>
+                <td class="bb1"><strong>1 - 5</strong> <div>working days</div></td>
+            {% endif %}
         </tr>
         <tr>
             <td class="wh text-left"><strong>Up to 80% Cashback at end of policy year</strong></td>
@@ -261,8 +453,18 @@
                 </a>
             </td>
             <td class="wh bs-l"><i class="far fa-times fa-2x"></i></td>
-            <td class="wh"><i class="far fa-times fa-2x"></i></td>
-            <td class="wh"><i class="far fa-times fa-2x"></i></td>
+            {% if table_content is defined and table_content == 'topcashback' %}
+                <td class="wh"><i class="far fa-times fa-2x"></i></td>
+                <td class="wh"><i class="far fa-times fa-2x"></i></td>
+            {% elseif table_content is defined and table_content == 'quidco' %}
+                <td class="wh"><i class="far fa-times fa-2x"></i></td>
+                <td class="wh"><i class="far fa-times fa-2x"></i></td>
+            {% elseif table_content is defined and table_content == 'vouchercodes' %}
+                <td class="wh"><i class="far fa-times fa-2x"></i></td>
+            {% else %}
+                <td class="wh"><i class="far fa-times fa-2x"></i></td>
+                <td class="wh"><i class="far fa-times fa-2x"></i></td>
+            {% endif %}
         </tr>
         <tr>
             <td class="bb1 text-left">
@@ -279,8 +481,18 @@
                 </a>
             </td>
             <td class="bb1 bs-l"><i class="far fa-times fa-2x"></i></td>
-            <td class="bb1"><i class="far fa-times fa-2x"></i></td>
-            <td class="bb1"><i class="far fa-times fa-2x"></i></td>
+            {% if table_content is defined and table_content == 'topcashback' %}
+                <td class="bb1"><i class="far fa-times fa-2x"></i></td>
+                <td class="bb1"><i class="far fa-times fa-2x"></i></td>
+            {% elseif table_content is defined and table_content == 'quidco' %}
+                <td class="bb1"><i class="far fa-times fa-2x"></i></td>
+                <td class="bb1"><i class="far fa-times fa-2x"></i></td>
+            {% elseif table_content is defined and table_content == 'vouchercodes' %}
+                <td class="bb1"><i class="far fa-check fa-2x"></i></td>
+            {% else %}
+                <td class="bb1"><i class="far fa-times fa-2x"></i></td>
+                <td class="bb1"><i class="far fa-times fa-2x"></i></td>
+            {% endif %}
         </tr>
         <tr>
             <td class="wh text-left"><strong>Insure second hand phones</strong></td>
@@ -288,15 +500,35 @@
                 <i class="far fa-check fa-2x"></i>
             </td>
             <td class="wh bs-l"><i class="far fa-times fa-2x"></i></td>
-            <td class="wh"><i class="far fa-times fa-2x"></i></td>
-            <td class="wh"><i class="far fa-times fa-2x"></i></td>
+            {% if table_content is defined and table_content == 'topcashback' %}
+                <td class="wh"><i class="far fa-times fa-2x"></i></td>
+                <td class="wh"><i class="far fa-times fa-2x"></i></td>
+            {% elseif table_content is defined and table_content == 'quidco' %}
+                <td class="wh"><i class="far fa-times fa-2x"></i></td>
+                <td class="wh"><i class="far fa-times fa-2x"></i></td>
+            {% elseif table_content is defined and table_content == 'vouchercodes' %}
+                <td class="wh"><i class="far fa-check fa-2x"></i></td>
+            {% else %}
+                <td class="wh"><i class="far fa-times fa-2x"></i></td>
+                <td class="wh"><i class="far fa-times fa-2x"></i></td>
+            {% endif %}
         </tr>
         <tr>
             <td class="bb1 text-left"><strong>Cover for phones purchased up to</strong></td>
             <td class="b2"><strong>3 years</strong> <div>from purchase</div></td>
             <td class="bb1 bs-l"><strong>6 months</strong> <div>from purchase</div></td>
-            <td class="bb1"><strong>18 months</strong> <div>from purchase</div></td>
-            <td class="bb1"><strong>3 years</strong> <div>from purchase</div></td>
+            {% if table_content is defined and table_content == 'topcashback' %}
+                <td class="bb1"><strong>18 months</strong> <div>from purchase</div></td>
+                <td class="bb1"><strong>6 months</strong> <div>from purchase</div></td>
+            {% elseif table_content is defined and table_content == 'quidco' %}
+                <td class="bb1"><strong>18 months</strong> <div>from purchase</div></td>
+                <td class="bb1"><strong>6 months</strong> <div>from purchase</div></td>
+            {% elseif table_content is defined and table_content == 'vouchercodes' %}
+                <td class="bb1"><strong>3 years</strong> <div>from purchase</div></td>
+            {% else %}
+                <td class="bb1"><strong>18 months</strong> <div>from purchase</div></td>
+                <td class="bb1"><strong>3 years</strong> <div>from purchase</div></td>
+            {% endif %}
         </tr>
         <tr>
             <td class="wh text-left"><strong>Save up to £100 off your excess</strong></td>
@@ -311,8 +543,18 @@
                 </a>
             </td>
             <td class="wh bs-l"><i class="far fa-times fa-2x"></i></td>
-            <td class="wh"><i class="far fa-times fa-2x"></i></td>
-            <td class="wh"><i class="far fa-times fa-2x"></i></td>
+            {% if table_content is defined and table_content == 'topcashback' %}
+                <td class="wh"><i class="far fa-times fa-2x"></i></td>
+                <td class="wh"><i class="far fa-times fa-2x"></i></td>
+            {% elseif table_content is defined and table_content == 'quidco' %}
+                <td class="wh"><i class="far fa-times fa-2x"></i></td>
+                <td class="wh"><i class="far fa-times fa-2x"></i></td>
+            {% elseif table_content is defined and table_content == 'vouchercodes' %}
+                <td class="wh"><i class="far fa-times fa-2x"></i></td>
+            {% else %}
+                <td class="wh"><i class="far fa-times fa-2x"></i></td>
+                <td class="wh"><i class="far fa-times fa-2x"></i></td>
+            {% endif %}
         </tr>
         <tr>
             <td class="bb1 text-left"><strong>Trustpilot rating</strong></td>
@@ -328,14 +570,38 @@
                 <i class="fas fa-star"></i>
                 <i class="fas fa-star"></i>
             </td>
-            <td class="bb1">
-                <i class="fas fa-star"></i>
-                <i class="fas fa-star"></i>
-            </td>
-            <td class="bb1">
-                <i class="fas fa-star"></i>
-                <i class="fas fa-star"></i>
-            </td>
+            {% if table_content is defined and table_content == 'topcashback' %}
+                <td class="bb1">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                </td>
+                <td class="bb1">
+                    <i class="fas fa-star"></i>
+                </td>
+            {% elseif table_content is defined and table_content == 'quidco' %}
+                <td class="bb1">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                </td>
+                <td class="bb1">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                </td>
+            {% elseif table_content is defined and table_content == 'vouchercodes' %}
+                <td class="bb1">
+                    <i class="fas fa-star"></i>
+                </td>
+            {% else %}
+                <td class="bb1">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                </td>
+                <td class="bb1">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                </td>
+                {% endif %}
         </tr>
     </tbody>
 </table>

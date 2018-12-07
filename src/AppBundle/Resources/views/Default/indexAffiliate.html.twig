@@ -3,7 +3,7 @@
 {# Set vars #}
 {% set body_class = 'landing' %}
 
-{% block title %}so-sure - Welcome to Social Insurance with iVIP{% endblock %}
+{% block title %}so-sure - Welcome to Social Insurance with {{ affiliate_company }}{% endblock %}
 {% block meta %}
     <meta name="description" content="Social mobile phone insurance that's better and up to 80% cheaper when you connect with friends and don't claim. Download our app now to see how much you could save."/>
 {% endblock %}
@@ -18,14 +18,22 @@
         <div class="container container-xtra">
             <div class="hero__intro">
                 <h1 class="mb-2 text-white h2">Mobile Insurance that's Simply Better</h1>
-                <p class="lead text-columbia-blue-e mb-5">in partnership with</p>
-                <img src="{{ cdn_url }}/images/rebrand/partnerships/so-sure_ivip_logo.svg" alt="iVIP" width="220px" class="d-block mb-5 mx-auto">
+                <p class="lead text-columbia-blue-e mb-2">affiliated with</p>
+                {% if affiliate_page == 'topcashback' %}
+                    <img src="{{ cdn_url }}/images/rebrand/partnerships/so-sure_topcashback_logo.svg" alt="TopCashback" width="220px" class="d-block mb-4 mx-auto">
+                {% elseif affiliate_page == 'vouchercodes' %}
+                    <img src="{{ cdn_url }}/images/rebrand/partnerships/so-sure_vouchercodes_logo.svg" alt="iVIP" width="280px" class="d-block mb-4 mx-auto">
+                {% elseif affiliate_page == 'quidco' %}
+                    <img src="{{ cdn_url }}/images/rebrand/partnerships/so-sure_quidco_logo.svg" alt="Quidco" width="160px" class="d-block mb-4 mx-auto">
+                {% elseif affiliate_page == 'ivip' %}
+                    <img src="{{ cdn_url }}/images/rebrand/partnerships/so-sure_ivip_logo.svg" alt="iVIP" width="200px" class="d-block mt-4 mb-5 mx-auto">
+                {% endif %}
             </div>
             <div class="hero__controls mb-5">
                 <a href="#" class="btn btn-success btn-block-xs get-a-quote">Get Insured <i class="far fa-arrow-right fa-sm ml-2"></i></a>
             </div>
-            {% include 'AppBundle::Default/_comparisonTable.html.twig' %}
-            <p class="updated-text mt-2"><em class="text-center"><small>Information checked on September 1st 2018</small></em>
+            {% include 'AppBundle::Default/_comparisonTable.html.twig' with {'table_content': affiliate_page } %}
+            <p class="updated-text mt-2"><em class="text-center"><small>Information checked on  November 18 2018</small></em>
         </div>
         <svg class="d-none d-md-block" preserveAspectRatio="xMinYMin meet" viewBox="0 0 750 77" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
             <defs></defs>
