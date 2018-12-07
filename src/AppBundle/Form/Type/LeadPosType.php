@@ -14,7 +14,7 @@ use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class LeadPortalType extends AbstractType
+class LeadPosType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {

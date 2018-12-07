@@ -1,0 +1,98 @@
+<?php
+
+namespace AppBundle\Tests\Controller;
+
+use AppBundle\Document\CurrencyTrait;
+use AppBundle\Document\Lead;
+
+/**
+ * @group functional-net
+ */
+class PosControllerTest extends BaseControllerTest
+{
+    use \AppBundle\Tests\PhingKernelClassTrait;
+    use CurrencyTrait;
+
+    public function tearDown()
+    {
+    }
+
+    public function setUp()
+    {
+        parent::setUp();
+        $this->clearRateLimit();
+    }
+
+    public function testHellozAction()
+    {
+        $url = sprintf('/pos/helloz');
+        $crawler = self::$client->request('GET', $url);
+        self::verifyResponse(200);
+    }
+
+    public function testHellozSubmit()
+    {
+        $url = sprintf('/pos/helloz');
+        $crawler = self::$client->request('GET', $url);
+        self::verifyResponse(200);
+
+        $form = $crawler->selectButton('lead_form_submit')->form();
+
+        $email =  self::generateEmail('testHellozSubmit'.rand(), $this);
+        $form->setValues([
+            'lead_form[submittedBy]' => 'customer',
+            'lead_form[name]' => 'Helloz Test',
+            'lead_form[email]' => $email,
+            'lead_form[phone]' => self::getRandomPhone(self::$dm)->getId()
+        ]);
+
+        $crawler = self::$client->submit($form);
+        self::verifyResponse(200);
+
+        $lead = self::$dm->getRepository(Lead::class)->findBy([
+            'email' => $email
+        ]);
+
+        $this->assertEquals(1, count($lead));
+    }
+
+    public function testHellozSubmitDuplicate()
+    {
+        $url = sprintf('/pos/helloz');
+        $crawler = self::$client->request('GET', $url);
+        self::verifyResponse(200);
+
+        $form = $crawler->selectButton('lead_form_submit')->form();
+
+        $email =  self::generateEmail('testHellozSubmitDuplicate'.rand(), $this);
+        $phone = self::getRandomPhone(self::$dm)->getId();
+        $form->setValues([
+            'lead_form[submittedBy]' => 'customer',
+            'lead_form[name]' => 'Helloz Test',
+            'lead_form[email]' => $email,
+            'lead_form[phone]' => $phone
+        ]);
+
+        $crawler = self::$client->submit($form);
+        self::verifyResponse(200);
+
+        $form = $crawler->selectButton('lead_form_submit')->form();
+
+        $form->setValues([
+            'lead_form[submittedBy]' => 'customer',
+            'lead_form[name]' => 'Helloz Test',
+            'lead_form[email]' => $email,
+            'lead_form[phone]' => $phone
+        ]);
+
+        $crawler = self::$client->submit($form);
+        self::verifyResponse(200);
+
+        $lead = self::$dm->getRepository(Lead::class)->findBy([
+            'email' => $email
+        ]);
+
+        /* Assert 1 as duplicate leads should not be persisted onto the DB */
+        $this->assertEquals(1, count($lead));
+    }
+}

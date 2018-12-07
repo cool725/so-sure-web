@@ -2,9 +2,7 @@
 
 namespace AppBundle\Controller;
 
-use AppBundle\Form\Type\LeadPortalType;
-
-use AppBundle\Service\IntercomService;
+use AppBundle\Form\Type\LeadPosType;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\Request;
@@ -14,7 +12,7 @@ use AppBundle\Document\Lead;
 /**
  * @Route("/pos")
  */
-class AffiliatePortalController extends BaseController
+class PosController extends BaseController
 {
     /**
      * @Route("/helloz", name="helloz")
@@ -28,7 +26,7 @@ class AffiliatePortalController extends BaseController
         $lead = new Lead();
         $lead->setSource(Lead::LEAD_SOURCE_AFFILIATE);
         $leadForm = $this->get('form.factory')
-            ->createNamedBuilder('lead_form', LeadPortalType::class, $lead)
+            ->createNamedBuilder('lead_form', LeadPosType::class, $lead)
             ->getForm();
 
         if ('POST' === $request->getMethod()) {
@@ -38,7 +36,7 @@ class AffiliatePortalController extends BaseController
                 if ($leadForm->isValid()) {
                     $leadRepo = $dm->getRepository(Lead::class);
                     $existingLead = $leadRepo->findOneBy([
-                        'email' => mb_strtolower($lead->getEmail())
+                        'emailCanonical' => $lead->getEmailCanonical()
                     ]);
 
                     if (!$existingLead) {

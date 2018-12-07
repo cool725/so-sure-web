@@ -52,6 +52,12 @@ class Lead
     protected $email;
 
     /**
+     * @Assert\Email()
+     * @MongoDB\Field(type="string")
+     */
+    protected $emailCanonical;
+
+    /**
      * @var string
      * @AppAssert\FullName()
      * @Assert\Length(min="1", max="100")
@@ -67,7 +73,8 @@ class Lead
     protected $phone;
 
     /**
-     * @Assert\Choice({"text-me", "launch-usa", "buy", "save-quote", "purchase-flow", "contact-us"}, strict=true)
+     * @Assert\Choice({"text-me", "launch-usa", "buy", "save-quote", "purchase-flow",
+     *                 "contact-us", "affiliate"}, strict=true)
      * @MongoDB\Field(type="string")
      */
     protected $source;
@@ -121,7 +128,18 @@ class Lead
 
     public function setEmail($email)
     {
-        $this->email = mb_strtolower($email);
+        $this->emailCanonical = mb_convert_case($email, MB_CASE_LOWER);
+        $this->email = $email;
+    }
+
+    public function getEmailCanonical()
+    {
+        return $this->emailCanonical;
+    }
+
+    public function setEmailCanonical($emailCanonical)
+    {
+        $this->emailCanonical = $emailCanonical;
     }
 
     public function hasEmail()
