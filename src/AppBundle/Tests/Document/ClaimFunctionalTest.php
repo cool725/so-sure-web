@@ -66,5 +66,4 @@ class ClaimFunctionalTest extends WebTestCase
         $this->assertEquals(150, $policy->getCurrentExcess()->getTheft());
         $this->assertEquals(150, $claim->getExpectedExcess()->getTheft());
     }
-
 }
