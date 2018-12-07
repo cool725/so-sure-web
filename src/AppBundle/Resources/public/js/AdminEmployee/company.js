@@ -10,8 +10,8 @@ $(function(){
       }
     });
 
-    let chargeModel = $('#companyForm_chargeModel');
-    let renewalDays = $('#companyForm_renewalDays').parent().parent();
+    var chargeModel = $('#companyForm_chargeModel');
+    var renewalDays = $('#companyForm_renewalDays').parent().parent();
     renewalDays.hide();
     chargeModel.change(function() {
         if ($(this).val() == "one-off") {
