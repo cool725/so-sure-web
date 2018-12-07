@@ -2214,11 +2214,13 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
     }
 
     /**
-     * @Route("/detected-imei/delete/{item}", name="admin_delete_detected_imei")
+     * @Route("/detected-imei/delete", name="admin_delete_detected_imei")
      * @Template
+     * @Method("POST")
      */
-    public function deleteDetectedImeiAction($item)
+    public function deleteDetectedImeiAction(Request $request)
     {
+        $item = $request->request->get("item");
         /** @var Client $redis */
         $redis = $this->get("snc_redis.default");
         if ($redis->lrem('DETECTED-IMEI', 1, $item)) {
