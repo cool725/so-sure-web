@@ -48,7 +48,12 @@
                                 <td>{% if imei['suggested_imei']|length > 0  %} {{ imei['suggested_imei'] }}{% else %}n/a{% endif %}</td>
                                 <td><a href="{{ s3DownloadLink(imei['bucket'], imei['key']) }}" target="_blank" title="{{ imei.key }}"><i class="fal fa-link mr-2"></i> See image</a></td>
                                 <td>
-                                    <a href="{{ path('admin_delete_detected_imei', {'item': imei['raw']}) }}" class="btn btn-danger"><i class="fa fa-trash"></i></a>
+                                    <form id="delete" action="{{ path('admin_delete_detected_imei') }}" method="POST">
+                                        <input type="hidden" name="item" value="{{ imei['raw'] }}">
+                                        <button type="submit" value="Submit" class="btn btn-danger">
+                                            <i class="fa fa-trash" aria-hidden="true"></i>
+                                        </button>
+                                    </form>
                                 </td>
                             </tr>
                         {% endfor %}
