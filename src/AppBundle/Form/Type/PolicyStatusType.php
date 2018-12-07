@@ -20,14 +20,14 @@ class PolicyStatusType extends AbstractType
                 'choices' => [
                     PhonePolicy::STATUS_ACTIVE,
                     PhonePolicy::STATUS_UNPAID,
-                    'null' => null
+                    null => 'null'
                 ],
                 'choice_label' => function ($choice, $key, $value) {
-                    return $value;
+                    return $choice;
                 },
                 'preferred_choices' => [
                     PhonePolicy::STATUS_PENDING,
-                    'null',
+                    'null'
                 ],
                 'placeholder' => 'Choose a status',
                 'required' => true
@@ -40,29 +40,34 @@ class PolicyStatusType extends AbstractType
             /** @var PhonePolicy $phonePolicy */
             $phonePolicy = $event->getData();
 
-            $choices[] = $phonePolicy->getStatus();
+            if (!$phonePolicy->getStatus()) {
+                $choices['null'] = null;
+            } else {
+                $choices[$phonePolicy->getStatus()] = $phonePolicy->getStatus();
+            }
 
             if ($phonePolicy->getStatus() === PhonePolicy::STATUS_ACTIVE) {
-                $choices[] = PhonePolicy::STATUS_UNPAID;
+                $choices[PhonePolicy::STATUS_UNPAID] = PhonePolicy::STATUS_UNPAID;
             }
 
             if ($phonePolicy->getStatus() === PhonePolicy::STATUS_UNPAID) {
-                $choices[] = PhonePolicy::STATUS_ACTIVE;
+                $choices[PhonePolicy::STATUS_ACTIVE] = PhonePolicy::STATUS_ACTIVE;
             }
 
             if ($phonePolicy->getStatus() === PhonePolicy::STATUS_PENDING) {
-                $choices[] = null;
+                $choices['null'] = null;
             }
 
             if ($phonePolicy->getStatus() === null) {
-                $choices[] = PhonePolicy::STATUS_PENDING;
+                $choices[PhonePolicy::STATUS_PENDING] = PhonePolicy::STATUS_PENDING;
             }
 
             $form->add('status', ChoiceType::class, [
                 'choices' => $choices,
                 'choice_label' => function ($choice, $key, $value) {
-                    return $value;
+                    return $key;
                 },
+                'preferred_choices' => $phonePolicy->getStatus() ?? 'null',
                 'placeholder' => 'Choose a status',
                 'required' => true
             ]);
