@@ -1009,7 +1009,9 @@ class JudopayService
             $htmlTemplate,
             ['policy' => $policy],
             $textTemplate,
-            ['policy' => $policy]
+            ['policy' => $policy],
+            null,
+            'bcc@so-sure.com'
         );
 
         return true;
@@ -1043,7 +1045,9 @@ class JudopayService
             $htmlTemplate,
             ['policy' => $policy, 'next' => $next],
             $textTemplate,
-            ['policy' => $policy, 'next' => $next]
+            ['policy' => $policy, 'next' => $next],
+            null,
+            'bcc@so-sure.com'
         );
     }
 
