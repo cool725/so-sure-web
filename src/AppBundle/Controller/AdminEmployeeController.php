@@ -17,6 +17,7 @@ use AppBundle\Form\Type\CallNoteType;
 use AppBundle\Form\Type\PaymentRequestUploadFileType;
 use AppBundle\Form\Type\UploadFileType;
 use AppBundle\Form\Type\UserHandlingTeamType;
+use AppBundle\Form\Type\PromotionType;
 use AppBundle\Repository\ClaimRepository;
 use AppBundle\Repository\PhonePolicyRepository;
 use AppBundle\Repository\PhoneRepository;
@@ -2953,57 +2954,21 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
     public function promotionsAction(Request $request)
     {
         $dm = $this->getManager();
-        $promotionRepository = $dm->getRepository(Promotion::class);
         $promotionForm = $this->get('form.factory')
-            ->createNamedBuilder('promotionForm')
-            ->add('name', TextType::class)
-            ->add('condition', ChoiceType::class, ['choices' => Promotion::CONDITIONS])
-            ->add('reward', ChoiceType::class, ['choices' => Promotion::REWARDS])
-            ->add('period', NumberType::class, ['constraints' => [new Assert\Range(['min' => 0, 'max' => 90])]])
-            ->add(
-                'conditionEvents',
-                NumberType::class,
-                ['constraints' => [new Assert\Range(['min' => 1, 'max' => 50])], 'required' => false]
-            )
-            ->add(
-                'rewardAmount',
-                NumberType::class,
-                ['constraints' => [new Assert\Range(['min' => 1, 'max' => 50])], 'required' => false]
-            )
-            ->add('next', SubmitType::class)
+            ->createNamedBuilder('promotionForm', PromotionType::class, null, ['method' => 'POST'])
             ->getForm();
-        try {
-            if ('POST' === $request->getMethod()) {
-                if ($request->request->has('promotionForm')) {
-                    $promotionForm->handleRequest($request);
-                    if ($promotionForm->isValid()) {
-                        $promotion = new Promotion();
-                        $promotion->setName($this->getDataString($promotionForm->getData(), 'name'));
-                        $promotion->setCondition($this->getDataString($promotionForm->getData(), 'condition'));
-                        $promotion->setReward($this->getDataString($promotionForm->getData(), 'reward'));
-                        $promotion->setPeriod($this->getDataString($promotionForm->getData(), 'period'));
-                        $promotion->setConditionEvents(
-                            $this->getDataString($promotionForm->getData(), 'conditionEvents')
-                        );
-                        $promotion->setRewardAmount($this->getDataString($promotionForm->getData(), 'rewardAmount'));
-                        $promotion->setStart(new \DateTime());
-                        $promotion->setActive(true);
-                        $dm->persist($promotion);
-                        $dm->flush();
-                        $this->addFlash('success', 'Added Promotion');
-                        return new RedirectResponse($this->generateUrl('admin_promotions'));
-                    } else {
-                        throw new \InvalidArgumentException(sprintf(
-                            'Unable to add company. %s',
-                            (string) $promotionForm->getErrors()
-                        ));
-                    }
-                }
-            }
-        } catch (\InvalidArgumentException $e) {
-            $this->addFlash('error', $e->getMessage());
+        $promotionForm->handleRequest($request);
+        if ($promotionForm->isSubmitted() && $promotionForm->isValid()) {
+            $promotion = $promotionForm->getData();
+            $promotion->setStart(new \DateTime());
+            $promotion->setActive(true);
+            $dm->persist($promotion);
+            $dm->flush();
+            $this->addFlash('success', 'Added Promotion');
+            return new RedirectResponse($this->generateUrl('admin_promotions'));
         }
         // TODO: order them so that inactive come after active, but beside that it's ordered by newness.
+        $promotionRepository = $dm->getRepository(Promotion::class);
         $promotions = $promotionRepository->findAll();
         return ["promotions" => $promotions, "promotionForm" => $promotionForm->createView()];
     }

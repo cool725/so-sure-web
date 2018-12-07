@@ -22,17 +22,22 @@
             <table class="table table-striped">
                 <tr>
                     <th>Start</th>
-                    <th>Activity Status</th>
-                    <th>Reward Condition</th>
-                    <th>Reward</th>
+                    <th>Active</th>
                     <th>Period</th>
+                    <th>Required Invitations</th>
+                    <th>Claims</th>
+                    <th>Reward</th>
                 </tr>
                 <tr>
-                    <td>date</td>
+                    <td>{{ promotion.start|date("d/m/Y")}}</td>
                     <td>{{ promotion.active ? 'Active' : 'Inactive'}}</td>
-                    <td>{{ promotion.condition }}</td>
-                    <td>{{ promotion.reward }}</td>
-                    <td>{{ promotion.period }}</td>
+                    <td>{{ promotion.conditionPeriod }}</td>
+                    <td>{{ promotion.conditionInvitations }}</td>
+                    <td>{{ promotion.conditionAllowClaims ? 'Allowed' : 'Not Allowed' }}</td>
+                    <td>
+                        <strong>{{ promotion.reward }}</strong>
+                        {% if promotion.reward == 'pot' %}£{{ promotion.rewardAmount }}{% endif %}
+                    </td>
                 </tr>
             </table>
         </div>
@@ -45,27 +50,14 @@
                     <th>User</th>
                     <th>Policy</th>
                     <th>Start</th>
+                    <th>Status</th>
                 </tr>
                 {% for participation in promotion.participating %}
                     <tr class="{% if not promotion.active %}warning{% endif %}">
-                        <td>{{ participation.policy.user.email }}</td>
-                        <td>{{ participation.policy.policyCode }}</td>
-                        <td>the date</td>
-
-                        {#
-                        <td><a href="{{ path('admin_promotion', {'id': promotion.id }) }}">{{ promotion.name }}</a></td>
-                        <td>{{ promotion.conditionDays }} days</td>
-                        <td>
-                            <strong>{{ promotion.condition }}</strong>
-                            {% if promotion.condition == 'invites' %} - {{ promotion.conditionEvents }} needed{% endif %}
-                        </td>
-                        <td>
-                            <strong>{{ promotion.reward }}</strong>
-                            {% if promotion.reward == 'pot' %} £{{ promotion.rewardAmount }}{% endif %}
-                        </td>
-                        #}
-
-
+                        <td><a href="{{ path('admin_user', {'id': participation.policy.user.id }) }}">{{ participation.policy.user.name }}</a></td>
+                        <td><a href="{{ path('admin_policy', {'id': participation.policy.id }) }}">{{ participation.policy.policyNumber ?: 'N/A' }}</a></td>
+                        <td>{{ participation.start|date("d/m/Y H:i") }}</td>
+                        <td>{{ participation.status }}</td>
                     </tr>
                 {% endfor %}
             </table>

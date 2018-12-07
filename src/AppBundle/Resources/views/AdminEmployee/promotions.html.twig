@@ -26,17 +26,16 @@
         <tr>
             <th>Name</th>
             <th>Period</th>
-            <th>Condition</th>
+            <th>Invites Required</th>
+            <th>Claims</th>
             <th>Reward</th>
         </tr>
         {% for promotion in promotions %}
             <tr class="{% if not promotion.active %}warning{% endif %}">
                 <td><a href="{{ path('admin_promotion', {'id': promotion.id }) }}">{{ promotion.name }}</a></td>
-                <td>{{ promotion.period }} days</td>
-                <td>
-                    <strong>{{ promotion.condition }}</strong>
-                    {% if promotion.condition == 'invites' %} - {{ promotion.conditionEvents }} needed{% endif %}
-                </td>
+                <td>{{ promotion.conditionPeriod }} days</td>
+                <td>{{ promotion.conditionInvitations }}</td>
+                <td>{% if promotion.conditionAllowClaims %}Allowed{% else %}Not Allowed{% endif %}</td>
                 <td>
                     <strong>{{ promotion.reward }}</strong>
                     {% if promotion.reward == 'pot' %} £{{ promotion.rewardAmount }}{% endif %}
@@ -62,24 +61,24 @@
                     {{ form_errors(promotionForm.name) }}
                 </div>
                 <div class="form-group row">
-                    {{ form_label(promotionForm.condition, 'Reward Condition', {'label_attr': {'class': 'col-sm-2 col-form-label'}}) }}
-                    <div class="col-sm-10">{{ form_widget(promotionForm.condition, {'attr': {'class': 'form-control'}}) }}</div>
-                    {{ form_errors(promotionForm.condition) }}
+                    {{ form_label(promotionForm.conditionPeriod, 'Period', {'label_attr': {'class': 'col-sm-2 col-form-label'}}) }}
+                    <div class="col-sm-10">{{ form_widget(promotionForm.conditionPeriod, {'attr': {'class': 'form-control'}}) }}</div>
+                    {{ form_errors(promotionForm.conditionPeriod) }}
+                </div>
+                <div class="form-group row">
+                    {{ form_label(promotionForm.conditionInvitations, 'Required Invitations', {'label_attr': {'class': 'col-sm-2 col-form-label'}}) }}
+                    <div class="col-sm-10">{{ form_widget(promotionForm.conditionInvitations, {'attr': {'class': 'form-control'}}) }}</div>
+                    {{ form_errors(promotionForm.conditionInvitations) }}
+                </div>
+                <div class="form-group row">
+                    {{ form_label(promotionForm.conditionAllowClaims, 'Allow Claims', {'label_attr': {'class': 'col-sm-2 col-form-label'}}) }}
+                    <div class="col-sm-10">{{ form_widget(promotionForm.conditionAllowClaims, {'attr': {'class': 'form-control'}}) }}</div>
+                    {{ form_errors(promotionForm.conditionAllowClaims) }}
                 </div>
                 <div class="form-group row">
                     {{ form_label(promotionForm.reward, 'Reward', {'label_attr': {'class': 'col-sm-2 col-form-label'}}) }}
                     <div class="col-sm-10">{{ form_widget(promotionForm.reward, {'attr': {'class': 'form-control'}}) }}</div>
                     {{ form_errors(promotionForm.reward) }}
-                </div>
-                <div class="form-group row">
-                    {{ form_label(promotionForm.conditionDays, 'Period', {'label_attr': {'class': 'col-sm-2 col-form-label'}}) }}
-                    <div class="col-sm-10">{{ form_widget(promotionForm.conditionDays, {'attr': {'class': 'form-control'}}) }}</div>
-                    {{ form_errors(promotionForm.conditionDays) }}
-                </div>
-                <div class="form-group row">
-                    {{ form_label(promotionForm.conditionEvents, 'Required Events', {'label_attr': {'class': 'col-sm-2 col-form-label'}}) }}
-                    <div class="col-sm-10">{{ form_widget(promotionForm.conditionEvents, {'attr': {'class': 'form-control'}}) }}</div>
-                    {{ form_errors(promotionForm.conditionEvents) }}
                 </div>
                 <div class="form-group row">
                     {{ form_label(promotionForm.rewardAmount, 'Reward Amount', {'label_attr': {'class': 'col-sm-2 col-form-label'}}) }}
