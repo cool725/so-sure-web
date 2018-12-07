@@ -5302,7 +5302,9 @@ abstract class Policy
                 'Unable to set phone for policy %s as excess (%s) values do not match policy terms (%s).',
                 $this->getId(),
                 $this->getPremium()->getExcess(),
-                json_encode($this->getPolicyTerms()->getAllowedExcesses())
+                count($this->getPolicyTerms()->getAllowedExcesses()) > 0 ?
+                    $this->getPolicyTerms()->getAllowedExcesses()[0]->__toString() :
+                    'missing'
             ));
         }
     }
