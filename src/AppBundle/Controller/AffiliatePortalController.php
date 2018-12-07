@@ -25,9 +25,6 @@ class AffiliatePortalController extends BaseController
         /** @var DocumentManager $dm */
         $dm = $this->getManager();
 
-        /** @var IntercomService $intercomService */
-        $intercomService = $this->get('app.intercom');
-
         $lead = new Lead();
         $lead->setSource(Lead::LEAD_SOURCE_AFFILIATE);
         $leadForm = $this->get('form.factory')
@@ -40,8 +37,6 @@ class AffiliatePortalController extends BaseController
 
                 if ($leadForm->isValid()) {
                     $leadRepo = $dm->getRepository(Lead::class);
-
-                    /** @var Lead $existingLead */
                     $existingLead = $leadRepo->findOneBy([
                         'email' => mb_strtolower($lead->getEmail())
                     ]);
@@ -49,11 +44,7 @@ class AffiliatePortalController extends BaseController
                     if (!$existingLead) {
                         $dm->persist($lead);
                         $dm->flush();
-                    } else {
-                        $lead = $existingLead;
                     }
-
-                    $intercomService->queueLead($lead, IntercomService::QUEUE_LEAD);
                 }
             }
         }

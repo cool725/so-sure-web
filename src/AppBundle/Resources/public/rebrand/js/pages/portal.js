@@ -135,6 +135,8 @@ $(function() {
     });
 
     $('#restart_btn').on('click', function(e) {
+        who = $(this);
+        who.closest('form')[0].reset();
         e.preventDefault();
 
         back();
