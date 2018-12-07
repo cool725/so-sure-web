@@ -84,7 +84,7 @@
                 <li class="nav-item">
                     <a class="nav-link" id="notes-tab" data-toggle="tab" href="#notes" role="tab"
                        aria-controls="notes"
-                       aria-selected="false">Notes ({{ claim.policy.notes|length }})</a>
+                       aria-selected="false">Notes</a>
                 </li>
 
                 <li class="nav-item">
@@ -135,11 +135,6 @@
                         <div class="col-xs-6">
                             <label>Description</label>
                             <p>{{ claim.description|default('N/A') }}</p>
-                        </div>
-
-                        <div class="col-xs-6">
-                            <label>Notes</label>
-                            <p>{{ claim.notes|default('N/A') }}</p>
                         </div>
                     </div>
                 </div>
@@ -439,6 +434,14 @@
                         <div class="col-xs-6">
                             <label>Insured Phone</label>
                             <p>{{ claim.policy.phone.__toString()|default('N/A') }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="notes" role="tabpanel" aria-labelledby="notes-tab">
+                    <div class="row">
+                        <div class="form-group">
+                            {{ claims.notes|default(' ') }}
                         </div>
                     </div>
                 </div>
