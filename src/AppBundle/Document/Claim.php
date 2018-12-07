@@ -835,7 +835,7 @@ class Claim
             $phonePolicy = $policy;
             $this->setFnolPicSureValidated($phonePolicy->isPicSureValidated());
         }
-        if (!$this->getExpectedExcess()) {
+        if (!$this->getExpectedExcess() && $policy->getCurrentExcess()) {
             $this->setExpectedExcess($policy->getCurrentExcess());
         }
 

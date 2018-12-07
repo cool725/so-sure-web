@@ -885,6 +885,9 @@ class PhonePolicy extends Policy
     {
         /** @var PhonePremium $phonePremium */
         $phonePremium = $this->getPremium();
+        if (!$phonePremium) {
+            return null;
+        }
 
         if ($this->isPicSureValidated()) {
             return $phonePremium->getPicSureExcess();
