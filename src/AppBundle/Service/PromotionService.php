@@ -85,7 +85,9 @@ class PromotionService
             return $this->endParticipation($participation, $date, Participation::STATUS_FAILED);
         }
         if ($finished) {
-            $invites = $this->dm->getRepository(Invitation::class)->count([$policy], $participation->getStart(), $end);
+            /** @var InvitationRepository $invitationRepository */
+            $invitationRepository = $this->dm->getRepository(Invitation::class);
+            $invites = $invitationRepository->count([$policy], $participation->getStart(), $end);
             if ($promotion->getConditionInvitations() > $invites) {
                 return $this->endParticipation($participation, $end, Participation::STATUS_FAILED);
             } else {
