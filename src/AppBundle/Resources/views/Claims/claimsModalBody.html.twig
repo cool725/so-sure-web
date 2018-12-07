@@ -82,8 +82,8 @@
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link" id="notes-tab" data-toggle="tab" href="#notes" role="tab"
-                       aria-controls="notes"
+                    <a class="nav-link" id="claimNotes-tab" data-toggle="tab" href="#claimNotes" role="tab"
+                       aria-controls="claimNotes"
                        aria-selected="false">Notes</a>
                 </li>
 
@@ -438,10 +438,10 @@
                     </div>
                 </div>
 
-                <div class="tab-pane fade" id="notes" role="tabpanel" aria-labelledby="notes-tab">
+                <div class="tab-pane fade" id="claimNotes" role="tabpanel" aria-labelledby="claimNotes-tab">
                     <div class="row">
-                        <div class="form-group">
-                            {{ claim.notes|default(' ') }}
+                        <div class="col-xs-12">
+                            {{ claim.notes|default('There are no notes on file') }}
                         </div>
                     </div>
                 </div>
