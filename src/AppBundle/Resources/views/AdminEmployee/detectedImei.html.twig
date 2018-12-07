@@ -50,10 +50,10 @@
                                 <td>
                                     <form id="delete" action="{{ path('admin_delete_detected_imei') }}" method="POST">
                                         <input type="hidden" name="item" value="{{ imei['raw'] }}">
+                                        <button type="submit" value="Submit" class="btn btn-danger">
+                                            <i class="fa fa-trash" aria-hidden="true"></i>
+                                        </button>
                                     </form>
-                                    <button type="submit" form="delete" value="Submit" class="btn btn-danger">
-                                        <i class="fa fa-trash" aria-hidden="true"></i>
-                                    </button>
                                 </td>
                             </tr>
                         {% endfor %}
