@@ -119,7 +119,9 @@ class PicsureMLService
             throw new \Exception('Error downloading S3 file '.$file->getKey());
         }
 
-        $process = new Process('python /var/ops/scripts/image/deep-learning/predict.py /tmp/'.$file->getFilename());
+        $process = new Process(
+            '/usr/bin/python /var/ops/scripts/image/deep-learning/predict.py /tmp/'.$file->getFilename()
+        );
         $process->run();
 
         if (!$process->isSuccessful()) {
