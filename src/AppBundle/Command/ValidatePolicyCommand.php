@@ -433,7 +433,7 @@ class ValidatePolicyCommand extends ContainerAwareCommand
             }
             // any pending payments should be excluded from calcs
             $pendingBacsTotalCommission = $policy->getPendingBacsPaymentsTotalCommission(true);
-            $allowedVariance += $pendingBacsTotalCommission;
+            $allowedVariance += abs($pendingBacsTotalCommission);
 
             // depending on when the chargeback occurs, we may or may not want to exclude that amount
             // but if they both don't match, then its likely to be a problem
@@ -472,8 +472,8 @@ class ValidatePolicyCommand extends ContainerAwareCommand
             }
             $refund = $policy->getRefundAmount();
             $refundCommission = $policy->getRefundCommissionAmount();
-            $pendingBacsTotal = $policy->getPendingBacsPaymentsTotal(true);
-            $pendingBacsTotalCommission = $policy->getPendingBacsPaymentsTotalCommission(true);
+            $pendingBacsTotal = abs($policy->getPendingBacsPaymentsTotal(true));
+            $pendingBacsTotalCommission = abs($policy->getPendingBacsPaymentsTotalCommission(true));
             $refundMismatch =  $this->greaterThanZero($refund) && $refund > $pendingBacsTotal &&
                 !$this->areEqualToTwoDp($refund, $pendingBacsTotal);
             $refundCommissionMismatch =  $this->greaterThanZero($refundCommission) &&
