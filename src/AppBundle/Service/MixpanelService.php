@@ -393,7 +393,7 @@ class MixpanelService
         $count = 0;
         $count += $this->deleteOldUsersByDays($days);
         $count += $this->deleteNoValueUsers(14);
-        $count += $this->deleteOldUsersByNoEvents($days);
+        $count += $this->deleteOldUsersByNoEvents();
         $count += $this->deleteFacebookPreview();
         $count += $this->deleteSixpack();
         $count += $this->deleteHappyApp();
