@@ -64,9 +64,11 @@ class ClaimInfoType extends AbstractType
                 'widget' => 'single_text',
                 'required' => false
             ])
-            ->add('notes', TextareaType::class, [
-                'required' => false
+            /*
+            ->add('justification', TextareaType::class, [
+                'required' => true
             ])
+            */
             ->add('update', SubmitType::class);
 
         $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {

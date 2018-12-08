@@ -1,4 +1,3 @@
-{{ form_start(form) }}
 <div class="modal-content" style="border-radius: 6px;">
     <div class="modal-header" style="border-top-left-radius: 6px; border-top-right-radius: 6px;">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -87,11 +86,13 @@
                        aria-selected="false">Notes</a>
                 </li>
 
+                {% if form is defined %}
                 <li class="nav-item">
                     <a class="nav-link" id="update-tab" data-toggle="tab" href="#update" role="tab"
                        aria-controls="update"
                        aria-selected="false">Update</a>
                 </li>
+                {% endif %}
             </ul>
 
             <br>
@@ -438,14 +439,6 @@
                     </div>
                 </div>
 
-                <div class="tab-pane fade" id="claimNotes" role="tabpanel" aria-labelledby="claimNotes-tab">
-                    <div class="row">
-                        <div class="col-xs-12">
-                            {{ claim.notes|default('There are no notes on file') }}
-                        </div>
-                    </div>
-                </div>
-
                 <div class="tab-pane fade" id="costs" role="tabpanel" aria-labelledby="costs-tab">
                     <table class="table .table-condensed">
                         <tr>
@@ -483,49 +476,50 @@
                     </table>
                 </div>
 
-                <div class="tab-pane fade" id="update" role="tabpanel" aria-labelledby="update-tab">
+                <div class="tab-pane fade" id="claimNotes" role="tabpanel" aria-labelledby="claimNotes-tab">
+                    {{ form_start(claim_note_form) }}
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <div class="form-group">
+                                <label>Notes</label>
+                                {{ form_widget(claim_note_form.notes, {'attr': {'class': 'form-control'}}) }}
+                            </div>
+                        </div>
+                    </div>
                     <div class="form-group">
-                        <label><i class="fa fa-lock" title="Admin only"></i> Claim Number</label>
-                        {% if is_granted('ROLE_ADMIN') %}
+                        {{ form_widget(claim_note_form.update, {'attr': {'class': 'btn btn-success'}}) }}
+                    </div>
+                    {{ form_end(claim_note_form) }}
+                </div>
+
+                {% if form is defined %}
+                <div class="tab-pane fade" id="update" role="tabpanel" aria-labelledby="update-tab">
+                    {{ form_start(form) }}
+                    <div class="form-group">
+                        <label><i class="fa fa-shield" title="Requires customer service role"></i> Claim Number</label>
                             {{ form_widget(form.number, {'attr': {'class': 'form-control'}}) }}
-                        {% else %}
-                            {{ claim.number }}
-                        {% endif %}
                     </div>
 
                     <div class="form-group">
-                        <label><i class="fa fa-lock" title="Admin only"></i> Type</label>
-                        {% if is_granted('ROLE_ADMIN') %}
+                        <label><i class="fa fa-shield" title="Requires customer service role"></i> Claim Type</label>
                             {{ form_widget(form.type, {'attr': {'class': 'form-control'}}) }}
-                        {% else %}
-                            {{ claim.type }}
-                        {% endif %}
                     </div>
 
                     <div class="form-group">
                         <label><i class="fa fa-shield" title="Requires customer service role"></i> Replacement IMEI</label>
-                        {% if is_granted('ROLE_CUSTOMER_SERVICES') %}
                             {{ form_widget(form.replacementImei, {'attr': {'class': 'form-control'}}) }}
-                        {% else %}
-                            {{ claim.replacementImei }}
-                        {% endif %}
                     </div>
 
                     <div class="form-group">
                         <label><i class="fa fa-shield" title="Requires customer service role"></i> Replacement Phone</label>
-                        {% if is_granted('ROLE_CUSTOMER_SERVICES') %}
                             {{ form_widget(form.replacementPhone, {'attr': {'class': 'form-control'}}) }}
-                        {% else %}
-                            {{ claim.replacementPhone }}
-                        {% endif %}
                     </div>
 
                     <div class="help-block row">
-                        {% if claim.replacementPhoneDetails %}
-                        <div class="col-xs-6">
-                            Phone: {{ claim.replacementPhoneDetails }}
+                        <div class="col-xs-12">
+                            Insured Phone: {{ claim.policy.phone }}<br>
+                            Replacement Phone: {{ claim.replacementPhoneDetails }}
                         </div>
-                        {% endif %}
                     </div>
 
                     <div class="form-group">
@@ -537,18 +531,28 @@
                         {% endif %}
                     </div>
 
-                    <div class="form-group">
-                        <label>Notes</label>
-                        {{ form_widget(form.notes, {'attr': {'class': 'form-control'}}) }}
+                    {#
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <div class="form-group">
+                                <label>Justification</label>
+                                {{ form_widget(form.justification, {'attr': {'class': 'form-control'}}) }}
+                            </div>
+                        </div>
                     </div>
+                    #}
+
+                    <div class="form-group">
+                        {{ form_widget(form.update, {'attr': {'class': 'btn btn-success'}}) }}
+                    </div>
+                    {{ form_end(form) }}
                 </div>
+                {% endif %}
             </div>
         </div>
     </div>
 
     <div class="modal-footer">
-        {{ form_widget(form.update, {'attr': {'class': 'btn btn-success'}}) }}
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
     </div>
 </div>
-{{ form_end(form, {'render_rest': false}) }}

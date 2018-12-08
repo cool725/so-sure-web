@@ -60,11 +60,11 @@
                 <p class="text-center"><strong>Record Claim
                 {% if claim.type %}
                     {% if is_granted('ROLE_EMPLOYEE') %}
-                    [<button type="button" class="btn btn-link" data-route="/admin/claims-form/{{ claim.id }}" data-toggle="modal" data-target="#claimsModal">
+                    [<button type="button" class="btn btn-link" data-route="{{ path('admin_claims_form_policy', {'id': claim.id}) }}" data-toggle="modal" data-target="#claimsModal">
                         {% if claim.number %}{{ claim.number }}{% else %}N/A{% endif %} FNOL Details
                     </button>]
                     {% elseif is_granted('ROLE_CLAIMS') %}
-                    [<button type="button" class="btn btn-link" data-route="/claims/claims-form/{{ claim.id }}" data-toggle="modal" data-target="#claimsModal">
+                    [<button type="button" class="btn btn-link" data-route="{{ path('claim_claims_form_policy', {'id': claim.id}) }}" data-toggle="modal" data-target="#claimsModal">
                         {% if claim.number %}{{ claim.number }}{% else %}N/A{% endif %} FNOL Details
                     </button>]
                     {% endif %}

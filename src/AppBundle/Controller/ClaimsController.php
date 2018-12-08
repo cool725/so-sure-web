@@ -5,6 +5,7 @@ namespace AppBundle\Controller;
 use AppBundle\Document\File\S3File;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Form\Type\ClaimInfoType;
+use AppBundle\Form\Type\ClaimNoteType;
 use AppBundle\Form\Type\ClaimSearchType;
 use AppBundle\Repository\File\S3FileRepository;
 use AppBundle\Service\ClaimsService;
@@ -320,7 +321,8 @@ class ClaimsController extends BaseController
     }
 
     /**
-     * @Route("/claims-form/{id}", name="claims_claims_form")
+     * @Route("/claims-form/{id}/policy", name="claims_claims_form_policy")
+     * @Route("/claims-form/{id}/claims", name="claims_claims_form_claims")
      */
     public function claimsFormAction(Request $request, $id = null)
     {
@@ -329,32 +331,36 @@ class ClaimsController extends BaseController
         /** @var Claim $claim */
         $claim = $repo->find($id);
 
-        $claimsForm = $this->get('form.factory')
-            ->createNamedBuilder('claims_form', ClaimInfoType::class, $claim)
+        $claimsNoteForm = $this->get('form.factory')
+            ->createNamedBuilder('claims_note_form', ClaimNoteType::class, $claim)
             ->setAction($this->generateUrl(
-                'claims_claims_form',
+                $request->get('_route'),
                 ['id' => $id]
             ))
             ->getForm();
 
         if ('POST' === $request->getMethod()) {
-            if ($request->request->has('claims_form')) {
-                $claimsForm->handleRequest($request);
-                if ($claimsForm->isValid()) {
+            if ($request->request->has('claims_note_form')) {
+                $claimsNoteForm->handleRequest($request);
+                if ($claimsNoteForm->isValid()) {
                     $dm->flush();
                     $this->addFlash(
                         'success',
                         sprintf('Claim %s updated', $claim->getNumber())
                     );
-
-                    return $this->redirectToRoute('claims_claims');
                 }
+            }
+
+            if ($request->get('_route') == 'claims_claims_form_policy') {
+                return $this->redirectToRoute('claims_policy', ['id' => $claim->getPolicy()->getId()]);
+            } else {
+                return $this->redirectToRoute('claims_claims');
             }
         }
 
         return $this->render('AppBundle:Claims:claimsModalBody.html.twig', [
             'claim' => $claim,
-            'form' => $claimsForm->createView()
+            'claim_note_form' => $claimsNoteForm->createView(),
         ]);
     }
 
