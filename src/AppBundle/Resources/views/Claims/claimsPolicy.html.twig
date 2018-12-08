@@ -64,7 +64,7 @@
                         {% if claim.number %}{{ claim.number }}{% else %}N/A{% endif %} FNOL Details
                     </button>]
                     {% elseif is_granted('ROLE_CLAIMS') %}
-                    [<button type="button" class="btn btn-link" data-route="{{ path('claim_claims_form_policy', {'id': claim.id}) }}" data-toggle="modal" data-target="#claimsModal">
+                    [<button type="button" class="btn btn-link" data-route="{{ path('claims_claims_form_policy', {'id': claim.id}) }}" data-toggle="modal" data-target="#claimsModal">
                         {% if claim.number %}{{ claim.number }}{% else %}N/A{% endif %} FNOL Details
                     </button>]
                     {% endif %}

@@ -74,6 +74,12 @@ $('#claimsModal').on('show.bs.modal', function (event) {
         modal.find('#claims_form_approvedDate').datetimepicker({
             format: 'DD-MM-YYYY'
         });
+
+        modal.find("#delete-claim").click(function(){
+            if (confirm('Are you sure you want to delete this claim?')) {
+                $("#delete-claim-form").submit();
+            }
+        });
     });
 });
 

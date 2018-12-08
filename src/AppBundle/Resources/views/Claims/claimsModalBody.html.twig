@@ -48,10 +48,12 @@
                 {% endif %}
             </div>
 
-            <div class="col-xs-6">
-                <label>Claim Handling Team</label>
-                <p>{{ claim.handlingTeam|default('N/A') }}</p>
-            </div>
+            {% if app.user.handlingTeam != 'davies' %}
+                <div class="col-xs-6">
+                    <label>Claim Handling Team</label>
+                    <p>{{ claim.handlingTeam|default('N/A') }}</p>
+                    </div>
+            {% endif %}
         </div>
 
         <div class="container-fluid">
@@ -553,6 +555,21 @@
     </div>
 
     <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <div class="col-xs-6">
+        {% if is_granted('ROLE_ADMIN') %}
+            <button id="delete-claim" type="button" class="btn btn-danger">Delete Claim</button>
+        {% endif %}
+        </div>
+        <div class="col-xs-6">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
     </div>
+
+    {% if is_granted('ROLE_ADMIN') %}
+    <form id="delete-claim-form" method="POST" action="{{ path('admin_claims_delete_claim') }}">
+        <input type="hidden" name="id" value="{{ claim.id }}" />
+        <input type="hidden" name="token" value="{{  csrf_token('default') }}" />
+    </form>
+    {% endif %}
+
 </div>
