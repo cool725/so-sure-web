@@ -289,7 +289,15 @@ class EmailDebugCommand extends ContainerAwareCommand
             $policy = null;
             foreach ($policies as $policy) {
                 /** @var Policy $policy */
-                if ($policy->getUser()->hasJudoPaymentMethod()) {
+                if (!$policy->getUser()->hasJudoPaymentMethod()) {
+                    continue;
+                }
+
+                if ($template != 'card/failedPaymentWithClaim') {
+                    break;
+                }
+
+                if ($policy->hasMonetaryClaimed(true, true)) {
                     break;
                 }
             }
