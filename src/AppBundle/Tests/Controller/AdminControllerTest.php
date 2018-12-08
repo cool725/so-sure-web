@@ -83,7 +83,7 @@ class AdminControllerTest extends BaseControllerTest
 
         // print_r($crawler->html());
         // get one phone from the page
-        $route = '' . $crawler->filter('button[data-target="#claimsModal"]')->first()->attr('data-route');
+        $route = $crawler->filter('button[data-target="#claimsModal"]')->first()->attr('data-route');
 
         if (empty($route)) {
             throw new \Exception('Claim route not found');
@@ -134,7 +134,7 @@ class AdminControllerTest extends BaseControllerTest
         $this->assertNotNull($charge->getClaim());
 
         $this->login('patrick@so-sure.com', LoadUserData::DEFAULT_PASSWORD, 'admin');
-        $crawler = self::$client->request('GET', '/admin/claims');
+        $crawler = self::$client->request('GET', sprintf('/admin/claims-form/%s/policy', $claimId));
         self::verifyResponse(200);
         $form = $crawler->filter('form[id="delete-claim-form"]')->form();
         $form['id'] = $claimId;
