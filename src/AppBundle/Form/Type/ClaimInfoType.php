@@ -3,6 +3,8 @@
 namespace AppBundle\Form\Type;
 
 use AppBundle\Document\Phone;
+use AppBundle\Repository\PhoneRepository;
+use Doctrine\Bundle\MongoDBBundle\Form\Type\DocumentType;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
@@ -51,6 +53,17 @@ class ClaimInfoType extends AbstractType
                 ],
                 'required' => false
             ])
+            ->add('replacementPhone', DocumentType::class, [
+                'placeholder' => 'Select the replacement device',
+                'class' => 'AppBundle:Phone',
+                'required' => false,
+                'choice_label' => 'getNameFormSafe',
+                'choice_value' => 'id',
+                'query_builder' => function (PhoneRepository $dr) {
+                    return $dr->findActiveInactive();
+                }
+            ])
+            /*
             ->add('replacementPhone', ChoiceType::class, [
                 'choices' => $this->dm->getRepository(Phone::class)->findActiveInactive()->getQuery()->execute(),
                 'choice_label' => function ($phone, $key, $value) {
@@ -59,6 +72,7 @@ class ClaimInfoType extends AbstractType
                 'placeholder' => 'Choose a phone',
                 'required' => false
             ])
+            */
             ->add('approvedDate', DateType::class, [
                 'html5' => false,
                 'widget' => 'single_text',

@@ -72,13 +72,18 @@ $('#claimsModal').on('show.bs.modal', function (event) {
         modal.find('.modal-content').html(form);
 
         modal.find('#claims_form_approvedDate').datetimepicker({
-            format: 'DD-MM-YYYY'
+            format: 'YYYY-MM-DD'
         });
 
         modal.find("#delete-claim").click(function(){
             if (confirm('Are you sure you want to delete this claim?')) {
                 $("#delete-claim-form").submit();
             }
+        });
+
+        modal.find('.set-replacement-phone').click(function() {
+            var id = $('.set-replacement-phone').data('id');
+            $('#claims_form_replacementPhone').val(id).prop('selected', true);;
         });
     });
 });
