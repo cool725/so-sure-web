@@ -664,7 +664,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                 } else {
                     $this->addFlash(
                         'error',
-                        sprintf('Failed to update Claim', $claim->getNumber())
+                        sprintf('Failed to update Claim %s', $claim->getNumber())
                     );
                 }
             } elseif ($request->request->has('claims_note_form')) {
@@ -678,7 +678,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                 } else {
                     $this->addFlash(
                         'error',
-                        sprintf('Failed to update Claim', $claim->getNumber())
+                        sprintf('Failed to update Claim %s', $claim->getNumber())
                     );
                 }
             }
