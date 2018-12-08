@@ -115,20 +115,10 @@
                                         {% if policy.getRequestedCancellationReason %}
                                             / {{ policy.getRequestedCancellationReason }}
                                         {% endif %}
-                                        {% if is_granted('ROLE_ADMIN') %}
-                                            {% set settable_alternative_status = null %}
-                                            {% if policy.status == 'active' %}
-                                                {% set settable_alternative_status = 'unpaid' %}
-                                            {% endif %}
-                                            {% if policy.status == 'unpaid' %}
-                                                {% set settable_alternative_status = 'active' %}
-                                            {% endif %}
-                                            {% if settable_alternative_status %}
-                                                <a class="btn btn-sm btn-danger confirm-submit" data-confirm-msg="Are you sure you want to change the policy status?"
-                                                    href="{{ path('admin_policy_set_status', { id: policy.id, policyNewStatus: settable_alternative_status}) }}">
-                                                    set as  {{ settable_alternative_status }}</a>
-                                            {% endif %}
-                                        {% endif %}
+                                        <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#policyStatusForm">
+                                            <span class="glyphicon glyphicon-new-window" aria-hidden="true"></span>
+                                            Change Status
+                                        </button>
                                     </td>
                                 </tr>
                                 {% if policy.isPolicy %}
@@ -1710,6 +1700,7 @@
         </div>
     {% endif %}
 
+    {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:Admin:policyStatusForm', 'policy': policy, 'id': 'policyStatusForm'} %}
     {% include 'AppBundle::Claims/claimsModal.html.twig' %}
     
 <div class="modal fade" id="policyNotesModal" tabindex="-1" role="dialog">

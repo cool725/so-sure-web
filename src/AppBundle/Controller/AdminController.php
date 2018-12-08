@@ -13,6 +13,7 @@ use AppBundle\Document\Sequence;
 use AppBundle\Document\ValidatorTrait;
 use AppBundle\Form\Type\ChargeReportType;
 use AppBundle\Form\Type\BacsMandatesType;
+use AppBundle\Form\Type\PolicyStatusType;
 use AppBundle\Form\Type\SalvaRequeueType;
 use AppBundle\Form\Type\SalvaStatusType;
 use AppBundle\Form\Type\UploadFileType;
@@ -1500,6 +1501,50 @@ class AdminController extends BaseController
 
         return [
             'form' => $salvaRequeueForm->createView(),
+            'policy' => $policy,
+        ];
+    }
+
+    /**
+     * @Route("/policy-status/{id}", name="policy_status_form")
+     * @Template
+     */
+    public function policyStatusFormAction(Request $request, $id = null)
+    {
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(PhonePolicy::class);
+        /** @var PhonePolicy $policy */
+        $policy = $repo->find($id);
+
+        if (!$policy) {
+            throw $this->createNotFoundException(sprintf('Policy %s not found', $id));
+        }
+
+        $policyStatusForm = $this->get('form.factory')
+            ->createNamedBuilder('policy_status_form', PolicyStatusType::class, $policy)
+            ->setAction($this->generateUrl(
+                'policy_status_form',
+                ['id' => $id]
+            ))
+            ->getForm();
+
+        if ('POST' === $request->getMethod()) {
+            if ($request->request->has('policy_status_form')) {
+                $policyStatusForm->handleRequest($request);
+                if ($policyStatusForm->isValid()) {
+                    $this->addFlash(
+                        'success',
+                        sprintf('Changed policy status to %s', $policy->getStatus())
+                    );
+
+                    $dm->flush();
+                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
+                }
+            }
+        }
+
+        return [
+            'form' => $policyStatusForm->createView(),
             'policy' => $policy,
         ];
     }
