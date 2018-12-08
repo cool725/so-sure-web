@@ -12,7 +12,9 @@ use AppBundle\Document\ValidatorTrait;
 use AppBundle\Exception\PaymentDeclinedException;
 use AppBundle\Form\Type\AdminEmailOptOutType;
 use AppBundle\Form\Type\BacsCreditType;
+use AppBundle\Form\Type\ClaimInfoType;
 use AppBundle\Form\Type\CallNoteType;
+use AppBundle\Form\Type\ClaimNoteType;
 use AppBundle\Form\Type\PaymentRequestUploadFileType;
 use AppBundle\Form\Type\UploadFileType;
 use AppBundle\Form\Type\UserHandlingTeamType;
@@ -627,6 +629,77 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             'email_form' => $emailForm->createView(),
             'sms_form' => $smsForm->createView(),
         ];
+    }
+
+    /**
+     * @Route("/claims-form/{id}/policy", name="admin_claims_form_policy")
+     * @Route("/claims-form/{id}/claims", name="admin_claims_form_claims")
+     */
+    public function claimsFormAction(Request $request, $id = null)
+    {
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(Claim::class);
+        /** @var Claim $claim */
+        $claim = $repo->find($id);
+
+        $claimsForm = $this->get('form.factory')
+            ->createNamedBuilder('claims_form', ClaimInfoType::class, $claim)
+            ->setAction($this->generateUrl(
+                $request->get('_route'),
+                ['id' => $id]
+            ))
+            ->getForm();
+        $claimsNoteForm = $this->get('form.factory')
+            ->createNamedBuilder('claims_note_form', ClaimNoteType::class, $claim)
+            ->setAction($this->generateUrl(
+                $request->get('_route'),
+                ['id' => $id]
+            ))
+            ->getForm();
+
+        if ('POST' === $request->getMethod()) {
+            if ($request->request->has('claims_form')) {
+                $claimsForm->handleRequest($request);
+                if ($claimsForm->isValid()) {
+                    $dm->flush();
+                    $this->addFlash(
+                        'success',
+                        sprintf('Claim %s updated', $claim->getNumber())
+                    );
+                } else {
+                    $this->addFlash(
+                        'error',
+                        sprintf('Failed to update Claim %s', $claim->getNumber())
+                    );
+                }
+            } elseif ($request->request->has('claims_note_form')) {
+                $claimsNoteForm->handleRequest($request);
+                if ($claimsNoteForm->isValid()) {
+                    $dm->flush();
+                    $this->addFlash(
+                        'success',
+                        sprintf('Claim %s updated', $claim->getNumber())
+                    );
+                } else {
+                    $this->addFlash(
+                        'error',
+                        sprintf('Failed to update Claim %s', $claim->getNumber())
+                    );
+                }
+            }
+
+            if ($request->get('_route') == 'admin_claims_form_policy') {
+                return $this->redirectToRoute('admin_policy', ['id' => $claim->getPolicy()->getId()]);
+            } else {
+                return $this->redirectToRoute('admin_claims');
+            }
+        }
+
+        return $this->render('AppBundle:Claims:claimsModalBody.html.twig', [
+            'form' => $claimsForm->createView(),
+            'claim' => $claim,
+            'claim_note_form' => $claimsNoteForm->createView(),
+        ]);
     }
 
     /**

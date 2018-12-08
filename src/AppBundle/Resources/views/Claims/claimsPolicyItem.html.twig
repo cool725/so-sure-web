@@ -625,14 +625,23 @@
                         <th>CrimeRef</th>
                         <th>Flags</th>
                         <th>Notes</th>
+                        {% if is_granted('ROLE_CUSTOMER_SERVICES') %}
+                        <th>Admin</th>
+                        {% endif %}
                     </tr>
                     {% for claim in policy.claims %}
                     <tr>
                         <td style="width: 20%;">{{ claim.recordedDate|date }}</td>
                         <td style="width: 10%;" id="claim_{{ claim.id }}">
-                            <button type="button" class="btn btn-link" data-toggle="modal" data-target="#claimsModal"
-                            data-claim='{{ claim.toModalArray()|json_encode }}' data-documents='{{ s3DownloadLinks(claim)|json_encode }}'>
-                                {% if claim.number %}{{ claim.number }}{% else %}N/A{% endif %}</button>
+                            {% if is_granted('ROLE_EMPLOYEE') %}
+                                <button type="button" class="btn btn-link" data-route="{{ path('admin_claims_form_policy', {'id': claim.id}) }}" data-toggle="modal" data-target="#claimsModal">
+                                    {% if claim.number %}{{ claim.number }}{% else %}N/A{% endif %}
+                                </button>
+                            {% elseif is_granted('ROLE_CLAIMS') %}
+                                <button type="button" class="btn btn-link" data-route="{{ path('claims_claims_form_policy', {'id': claim.id}) }}" data-toggle="modal" data-target="#claimsModal">
+                                    {% if claim.number %}{{ claim.number }}{% else %}N/A{% endif %}
+                                </button>
+                            {% endif %}
                         </td>
                         <td style="width: 10%;">{{ claim.type }}</td>
                         <td style="width: 10%;">{{ claim.status }}</td>
@@ -647,12 +656,11 @@
                             {% if claim.finalSuspicion %}Final suspicion;{% endif %}
                           {% if claim.shouldCancelPolicy %}Policy should be cancelled;{% endif %}
                         </td>
-                        <td style="width: 20%;">{{ claim.notes }}
-                            <button title="Edit notes" type="button" class="btn btn-primary"
-                                    data-toggle="modal" data-target="#notesModal"
-                                data-update="{% if is_granted('ROLE_EMPLOYEE') %}{{ path('admin_claim_notes', {'id': claim.id}) }}{% else %}{{ path('claims_notes', {'id': claim.id}) }}{% endif %}"
-                                data-notes="{{ claim.notes }}"><i class="fa fa-edit"></i></button>
-                              {% if is_granted('ROLE_CUSTOMER_SERVICES') %}
+                        <td style="width: 10%;">
+                            <span title="{{ claim.notes }}">{{ claim.notes|slice(0, 20) }}{% if claim.notes|length > 20 %}...{% endif %}</span>
+                        </td>
+                        {% if is_granted('ROLE_CUSTOMER_SERVICES') %}
+                        <td style="width: 10%;">
                             <button title="Flags" type="button" class="btn btn-primary"
                                     data-toggle="modal" data-target="#flagsModal"
                                     data-flags="{{ claim.ignoreWarningFlags|json_encode }}"
@@ -662,9 +670,10 @@
                                     data-toggle="modal" data-target="#withdrawModal"
                                     data-update="{{ path('admin_claim_withdraw', {'id': claim.id}) }}"
                             ><i class="fa fa-minus"></i></button>
-                            {% endif %}
                         </td>
+                        {% endif %}
                     </tr>
+
                     {% endfor %}
                 </table>
             {% else %}
@@ -692,9 +701,15 @@
                             {{ claim.policy.policyNumber }}
                         </a></td>
                         <td style="width: 10%;" id="claim_{{ claim.id }}">
-                            <button type="button" class="btn btn-link" data-toggle="modal" data-target="#claimsModal"
-                            data-claim='{{ claim.toModalArray|json_encode }}'>
-                                {{ claim.number }}</button>
+                            {% if is_granted('ROLE_EMPLOYEE') %}
+                                <button type="button" class="btn btn-link" data-route="{{ path('admin_claims_form_policy', {'id': claim.id}) }}" data-toggle="modal" data-target="#claimsModal">
+                                    {% if claim.number %}{{ claim.number }}{% else %}N/A{% endif %}
+                                </button>
+                            {% elseif is_granted('ROLE_CLAIMS') %}
+                                <button type="button" class="btn btn-link" data-route="{{ path('claims_claims_form_policy', {'id': claim.id}) }}" data-toggle="modal" data-target="#claimsModal">
+                                    {% if claim.number %}{{ claim.number }}{% else %}N/A{% endif %}
+                                </button>
+                            {% endif %}
                         </td>
                         <td style="width: 10%;">{{ claim.type }}</td>
                         <td style="width: 10%;">{{ claim.status }}</td>
@@ -1549,8 +1564,6 @@
         </div>
     {% endif %}
 
-    {% include 'AppBundle::Claims/claimsModal.html.twig' with {'route': 'admin_policy', 'policyId': policy.id} %}
-
     {% if is_granted('ROLE_ADMIN') %}
     <div class="modal fade" id="bacsModal" tabindex="-1" role="dialog">
       <div class="modal-dialog" role="document" style="width: 60%;">
@@ -1697,6 +1710,8 @@
         </div>
     {% endif %}
 
+    {% include 'AppBundle::Claims/claimsModal.html.twig' %}
+    
 <div class="modal fade" id="policyNotesModal" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
