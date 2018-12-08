@@ -2148,7 +2148,7 @@ abstract class Policy
         return $nextDate;
     }
 
-    public function init(User $user, PolicyTerms $terms)
+    public function init(User $user, PolicyTerms $terms, $validateExcess = true)
     {
         $user->addPolicy($this);
         if ($company = $user->getCompany()) {
@@ -2158,7 +2158,7 @@ abstract class Policy
 
         // in the normal flow we should have policy terms before setting the phone
         // however, many test cases do not have it
-        if ($this->getPremium()) {
+        if ($this->getPremium() && $validateExcess) {
             $this->validateAllowedExcess();
         }
     }
@@ -5299,8 +5299,12 @@ abstract class Policy
 
         if (!$this->getPolicyTerms()->isAllowedExcess($this->getPremium()->getExcess())) {
             throw new \Exception(sprintf(
-                'Unable to set phone for policy %s as excess values do not match policy terms.',
-                $this->getId()
+                'Unable to set phone for policy %s as excess (%s) values do not match policy terms (%s).',
+                $this->getId(),
+                $this->getPremium()->getExcess(),
+                count($this->getPolicyTerms()->getAllowedExcesses()) > 0 ?
+                    $this->getPolicyTerms()->getAllowedExcesses()[0]->__toString() :
+                    'missing'
             ));
         }
     }
