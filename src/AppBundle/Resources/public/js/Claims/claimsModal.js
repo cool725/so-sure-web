@@ -85,6 +85,11 @@ $('#claimsModal').on('show.bs.modal', function (event) {
             var id = $('.set-replacement-phone').data('id');
             $('#claims_form_replacementPhone').val(id).prop('selected', true);;
         });
+
+        modal.find('.img-preview').viewer({
+            inline: false,
+            navbar: false
+        });
     });
 });
 
