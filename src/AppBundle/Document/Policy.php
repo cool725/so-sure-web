@@ -4567,13 +4567,24 @@ abstract class Policy
             // once all the payment rescheduling has finished, there is a period of a few days where the scheduled
             // payments will not match; if this is the case, there is no need to alert on it
             $cancellationDate = clone $this->getPolicyExpirationDate($date);
-            // 4 payment retries - 7, 14, 21, 28; should be 30 days unpaid before cancellation
-            // 2 days diff + 2 on either side
-            if ($this->getUser()->hasJudoPaymentMethod()) {
-                $cancellationDate = $cancellationDate->sub(new \DateInterval('P4D'));
-            } elseif ($this->getUser()->hasBacsPaymentMethod()) {
-                // currently not rescheduling with bacs, 15 days to avoid some incorrect notifications
-                $cancellationDate = $cancellationDate->sub(new \DateInterval('P15D'));
+            if ($this->hasPreviousPolicy()) {
+                // 4 payment retries - 0, 7, 14, 21; should be 30 days unpaid before cancellation
+                // 9 days diff + 2 on either side
+                if ($this->getUser()->hasJudoPaymentMethod()) {
+                    $cancellationDate = $cancellationDate->sub(new \DateInterval('P11D'));
+                } elseif ($this->getUser()->hasBacsPaymentMethod()) {
+                    // currently not rescheduling with bacs, 15 days to avoid some incorrect notifications
+                    $cancellationDate = $cancellationDate->sub(new \DateInterval('P15D'));
+                }
+            } else {
+                // 4 payment retries - 7, 14, 21, 28; should be 30 days unpaid before cancellation
+                // 2 days diff + 2 on either side
+                if ($this->getUser()->hasJudoPaymentMethod()) {
+                    $cancellationDate = $cancellationDate->sub(new \DateInterval('P4D'));
+                } elseif ($this->getUser()->hasBacsPaymentMethod()) {
+                    // currently not rescheduling with bacs, 15 days to avoid some incorrect notifications
+                    $cancellationDate = $cancellationDate->sub(new \DateInterval('P15D'));
+                }
             }
             if ($cancellationDate <= $date) {
                 return null;
