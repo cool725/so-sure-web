@@ -25,7 +25,7 @@ class PosController extends BaseController
 
         $lead = new Lead();
         $lead->setSource(Lead::LEAD_SOURCE_AFFILIATE);
-        $lead->setAffiliate(Lead::AFFILIATE_HELLOZ);
+        $lead->getSourceDetails(Lead::SOURCE_HELLOZ);
         $leadForm = $this->get('form.factory')
             ->createNamedBuilder('lead_form', LeadPosType::class, $lead)
             ->getForm();
