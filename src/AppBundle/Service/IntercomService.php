@@ -485,6 +485,9 @@ class IntercomService
         if (mb_strlen($lead->getSource()) > 0) {
             $data['custom_attributes']['source'] = $lead->getSource();
         }
+        if (mb_strlen($lead->getSourceDetails() > 0)) {
+            $data['custom_attributes']['source_details'] = $lead->getSourceDetails();
+        }
         if ($lead->getIntercomId()) {
             $data['id'] = $lead->getIntercomId();
         }

@@ -28,8 +28,6 @@ class Lead
     const LEAD_SOURCE_SCODE = 'scode';
     const LEAD_SOURCE_AFFILIATE = 'affiliate';
 
-    const AFFILIATE_HELLOZ = 'helloz';
-
     /**
      * @MongoDB\Id(strategy="auto")
      */
@@ -82,10 +80,12 @@ class Lead
     protected $source;
 
     /**
-     * @Assert\Choice({"helloz"}, strict=true)
+     * @AppAssert\AlphanumericSpaceDot()
+     * @Assert\Length(min="1", max="250")
      * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
      */
-    protected $affiliate;
+    protected $sourceDetails;
 
     /**
      * @AppAssert\Token()
@@ -175,14 +175,15 @@ class Lead
         $this->source = $source;
     }
 
-    public function getAffiliate()
+    public function setSourceDetails($details)
     {
-        return $this->affiliate;
+        $validator = new AppAssert\AlphanumericSpaceDotValidator();
+        $this->sourceDetails = $validator->conform($details);
     }
 
-    public function setAffiliate($affiliate)
+    public function getSourceDetails()
     {
-        $this->affiliate = $affiliate;
+        return $this->sourceDetails;
     }
 
     public function getIntercomId()
