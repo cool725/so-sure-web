@@ -168,16 +168,6 @@ class DefaultController extends BaseController
     }
 
     /**
-     * @Route("/ivip", name="ivip")
-     */
-    public function ivipLanding()
-    {
-        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE, ['page' => 'ivip']);
-
-        return $this->render('AppBundle:Default:indexIVIP.html.twig');
-    }
-
-    /**
      * @Route("/starling-bank", name="starling_bank")
      * @Template
      */
@@ -197,6 +187,43 @@ class DefaultController extends BaseController
     {
         $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE, ['page' => 'social-insurance']);
         return $this->render('AppBundle:Default:socialInsurance.html.twig');
+    }
+
+    /**
+     * @Route("/topcashback", name="topcashback")
+     * @Route("/vouchercodes", name="vouchercodes")
+     * @Route("/quidco", name="quidco")
+     * @Route("/ivip", name="ivip")
+     */
+    public function affiliateLanding(Request $request)
+    {
+        $page = null;
+        $affiliate = null;
+
+        if ($request->get('_route') == 'topcashback') {
+            $page = 'topcashback';
+            $affiliate = 'TopCashback';
+        } elseif ($request->get('_route') == 'vouchercodes') {
+            $page = 'vouchercodes';
+            $affiliate = 'VoucherCodes';
+        } elseif ($request->get('_route') == 'quidco') {
+            $page = 'quidco';
+            $affiliate = 'Quidco';
+        } elseif ($request->get('_route') == 'ivip') {
+            $page = 'ivip';
+            $affiliate = 'iVIP';
+        }
+
+        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE, [
+            'page' => $page
+        ]);
+
+        $data = [
+            'affiliate_company' => $affiliate,
+            'affiliate_page' => $page,
+        ];
+
+        return $this->render('AppBundle:Default:indexAffiliate.html.twig', $data);
     }
 
     /**

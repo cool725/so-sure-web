@@ -6,6 +6,8 @@
               aria-hidden="true">&times;</span>
         </button>
         <h4 class="modal-title text-red">Warning</h4>
+            {% if title is defined %}{{ title }}{% else %}Warning{% endif %}
+        </h4>
       </div>
 
       {{ render(controller(route, {'id': policy.id})) }}

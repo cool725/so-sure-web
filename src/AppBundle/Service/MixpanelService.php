@@ -64,6 +64,7 @@ class MixpanelService
     const EVENT_CASHBACK = 'Cashback';
     const EVENT_DECLINE_RENEW = 'Decline Renew Policy';
     const EVENT_SIXPACK = 'Sixpack Experiment';
+    const EVENT_ONBOARDING = 'Track Onboarding Interaction';
     const EVENT_POLICY_STATUS = 'Policy Status Change';
     const EVENT_PAYMENT_METHOD_CHANGED = 'Payment Method Changed';
 
@@ -390,7 +391,18 @@ class MixpanelService
         }
         $data = null;
         $count = 0;
+        $count += $this->deleteOldUsersByDays($days);
+        $count += $this->deleteNoValueUsers(14);
+        //$count += $this->deleteOldUsersByNoEvents();
+        $count += $this->deleteFacebookPreview();
+        $count += $this->deleteSixpack();
+        $count += $this->deleteHappyApp();
 
+        return ['count' => $count, 'total' => $this->getUserCount()];
+    }
+
+    private function deleteOldUsersByDays($days)
+    {
         $time = \DateTime::createFromFormat('U', time());
         $time = $time->sub(new \DateInterval(sprintf('P%dD', $days)));
         $query = [
@@ -399,8 +411,85 @@ class MixpanelService
                 $time->format('U')
             ),
         ];
-        $count += $this->runDelete($query);
 
+        return $this->runDelete($query);
+    }
+
+    private function deleteNoValueUsers($days = 14)
+    {
+        // users are primarily for attribution
+        // if there is no attribution and no name, then there is little reason to keep around so long
+        $time = \DateTime::createFromFormat('U', time());
+        $time = $time->sub(new \DateInterval(sprintf('P%dD', $days)));
+        // @codingStandardsIgnoreStart
+        $query = [
+            'selector' => sprintf(
+                '(datetime(%s) > user["$last_seen"] and not defined(user["$first_name"]) and not defined(user["$last_name"]) and not defined(user["Campaign Source"]) and not defined(user["Campaign Name"]) and not defined(user["Referer"]) and not defined(user["Attribution Invitation Method"]))',
+                $time->format('U')
+            )
+            ];
+        // @codingStandardsIgnoreEnd
+        //print_r($query);
+
+        return $this->runDelete($query);
+    }
+
+    private function deleteOldUsersByNoEvents()
+    {
+        // not certain about this one...
+        $now = \DateTime::createFromFormat('U', time());
+        // @codingStandardsIgnoreStart
+        $query = [
+            'selector' => sprintf(
+                '(datetime(%s - 86400) > user["$last_seen"] and not defined(user["$last_name"]) and behaviors["behavior_11114"] == 0 and behaviors["behavior_11115"] == 0 and behaviors["behavior_11116"] == 0 and behaviors["behavior_11117"] == 0 and behaviors["behavior_11118"] == 0 and behaviors["behavior_11119"] == 0)',
+                $now->format('U')
+            ),
+            'behaviors' => [[
+                "window" => "90d",
+                "name" => "behavior_11114",
+                "event_selectors" => [[
+                    "event" => "Sixpack Experiment",
+                ]]
+            ], [
+                "window" => "90d",
+                "name" => "behavior_11115",
+                "event_selectors" => [[
+                    "event" => "Home Page"
+                ]]
+            ], [
+                "window" => "90d",
+                "name" => "behavior_11116",
+                "event_selectors" => [[
+                    "event" => "Quote Page"
+                ]]
+            ], [
+                "window" => "90d",
+                "name" => "behavior_11117",
+                "event_selectors" => [[
+                    "event" => "CPC Manufacturer Page"
+                ]]
+            ], [
+                "window" => "90d",
+                "name" => "behavior_11118",
+                "event_selectors" => [[
+                    "event" => "Invitation Page"
+                ]]
+            ], [
+                "window" => "90d",
+                "name" => "behavior_11119",
+                "event_selectors" => [[
+                    "event" => "Invite Someone"
+                ]]
+            ]
+            ]];
+        // @codingStandardsIgnoreEnd
+        //print_r($query);
+
+        return $this->runDelete($query);
+    }
+
+    private function deleteFacebookPreview()
+    {
         // Although facebook should be allowed, there seems to be a 'preview' mode which causes havoc
         // with our sixpack tests and causes a huge increase (30k+ users over a few week period)
         // so delete any users over 1 day old with a facebook brower that have just 1 sixpack experiment
@@ -431,13 +520,14 @@ class MixpanelService
                     "event" => "Click on the Buy Now Button"
                 ]]
             ]
-        ]];
+            ]];
         // @codingStandardsIgnoreEnd
-        $count += $this->runDelete($query);
 
-        // Although facebook should be allowed, there seems to be a 'preview' mode which causes havoc
-        // with our sixpack tests and causes a huge increase (30k+ users over a few week period)
-        // so delete any users over 1 day old with a facebook brower that have just 1 sixpack experiment
+        return $this->runDelete($query);
+    }
+
+    private function deleteSixpack()
+    {
         $now = \DateTime::createFromFormat('U', time());
         // @codingStandardsIgnoreStart
         $query = [
@@ -473,8 +563,12 @@ class MixpanelService
             ]];
         // @codingStandardsIgnoreEnd
         //print_r($query);
-        $count += $this->runDelete($query);
 
+        return $this->runDelete($query);
+    }
+
+    private function deleteHappyApp()
+    {
         // Change in behaviour - temporarily delete happy app user agent
         $now = \DateTime::createFromFormat('U', time());
         // @codingStandardsIgnoreStart
@@ -493,10 +587,8 @@ class MixpanelService
             ]
             ]];
         // @codingStandardsIgnoreEnd
-        $count += $this->runDelete($query);
-        //$count += $this->runCount($query);
 
-        return ['count' => $count, 'total' => $data['total']];
+        return $this->runDelete($query);
     }
 
     public function stats($start, $end)

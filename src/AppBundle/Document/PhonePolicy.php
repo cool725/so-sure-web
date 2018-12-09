@@ -227,7 +227,7 @@ class PhonePolicy extends Policy
         return $this->makeModelValidatedStatus;
     }
 
-    public function setPhone(Phone $phone, \DateTime $date = null)
+    public function setPhone(Phone $phone, \DateTime $date = null, $validateExcess = true)
     {
         $this->phone = $phone;
         if (!$phone->getCurrentPhonePrice()) {
@@ -245,7 +245,7 @@ class PhonePolicy extends Policy
             $this->setPremium($price->createPremium($additionalPremium, $date));
             // in the normal flow we should have policy terms before setting the phone
             // however, many test cases do not have it
-            if ($this->getPolicyTerms()) {
+            if ($this->getPolicyTerms() && $validateExcess) {
                 $this->validateAllowedExcess();
             }
         }
@@ -792,6 +792,13 @@ class PhonePolicy extends Policy
                 $picsureFiles[0]->addMetadata('picsure-status-user-id', $user->getId());
             }
         }
+
+        foreach ($this->getClaims() as $claim) {
+            /** @var Claim $claim */
+            if (!$claim->isClosed(true)) {
+                $claim->setExpectedExcess($this->getCurrentExcess());
+            }
+        }
     }
 
     public function isPicSureValidated()
@@ -878,6 +885,9 @@ class PhonePolicy extends Policy
     {
         /** @var PhonePremium $phonePremium */
         $phonePremium = $this->getPremium();
+        if (!$phonePremium) {
+            return null;
+        }
 
         if ($this->isPicSureValidated()) {
             return $phonePremium->getPicSureExcess();

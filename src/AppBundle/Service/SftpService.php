@@ -112,6 +112,14 @@ class SftpService
         if ($this->baseFolder) {
             $this->sftp->chdir($this->baseFolder);
         }
+
+        if (!file_exists(self::PROCESSED_FOLDER)) {
+            $this->sftp->mkdir(self::PROCESSED_FOLDER);
+        }
+
+        if (!file_exists(self::FAILED_FOLDER)) {
+            $this->sftp->mkdir(self::FAILED_FOLDER);
+        }
     }
 
     /**

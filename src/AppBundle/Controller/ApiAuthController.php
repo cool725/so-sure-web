@@ -78,6 +78,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Egulias\EmailValidator\EmailValidator;
+use Symfony\Component\Serializer\Tests\Fixtures\PropertySiblingHolder;
 
 /**
  * @Route("/api/v1/auth")
@@ -1327,12 +1328,20 @@ class ApiAuthController extends BaseController
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
             }
 
-            $repo = $dm->getRepository(Policy::class);
+            $repo = $dm->getRepository(PhonePolicy::class);
+            /** @var PhonePolicy $policy */
             $policy = $repo->find($id);
             if (!$policy) {
                 throw new NotFoundHttpException();
             }
             $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
+
+            /*
+            if ($policy->getPicSureStatusWithClaims() == PhonePolicy::PICSURE_STATUS_CLAIM_PREVENTED) {
+                throw new ClaimException('Unable to do pic-sure as claim is in progress');
+            }
+            */
+
             $s3 = $this->get('aws.s3');
             $result = $s3->getObject(array(
                 'Bucket' => $this->getDataString($data, 'bucket'),
@@ -1405,6 +1414,9 @@ class ApiAuthController extends BaseController
             );
 
             return new JsonResponse($policy->toApiArray());
+        } catch (ClaimException $ade) {
+            // TODO: Add new error code
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
         } catch (AccessDeniedException $ade) {
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
         } catch (\Aws\S3\Exception\S3Exception $e) {
