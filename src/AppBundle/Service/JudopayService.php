@@ -966,16 +966,24 @@ class JudopayService
                     \AppBundle\Classes\NoOp::ignore([]);
                 } else {
                     $this->failedPaymentEmail($policy, $failedPayments, $next);
+
+                    return true;
                 }
             } else {
                 $this->failedPaymentEmail($policy, $failedPayments, $next);
+
+                return true;
             }
 
             // Sms is quite invasive and occasionlly a failed payment will just work the next time
             // so allow 1 failed payment before sending sms
             if ($failedPayments > 1) {
                 $this->failedPaymentSms($policy, $failedPayments, $next);
+
+                return true;
             }
+
+            return false;
         }
     }
 
@@ -1021,12 +1029,14 @@ class JudopayService
      * @param Policy    $policy
      * @param int       $failedPayments
      * @param \DateTime $next
+     *
+     * @return boolean true if email sent, false if number of failed payments is above 1 but not exceeding 3
      */
     public function failedPaymentEmail(Policy $policy, $failedPayments, \DateTime $next = null)
     {
         // email only supported for 1, 2, 3, & 4
         if ($failedPayments < 1 || $failedPayments > 4) {
-            return;
+            return false;
         }
 
         $subject = sprintf('Payment failure for your so-sure policy %s', $policy->getPolicyNumber());
@@ -1051,6 +1061,8 @@ class JudopayService
             null,
             'bcc@so-sure.com'
         );
+
+        return true;
     }
 
     /**
