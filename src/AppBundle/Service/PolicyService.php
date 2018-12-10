@@ -1150,7 +1150,8 @@ class PolicyService
     public function tasteCardEmail($policy)
     {
         if (!$policy->getTasteCard()) {
-            $this->logger->error("Trying to notify of nonexistent tastecard.");
+            $id = $policy->getPolicyNumber();
+            $this->logger->error("Trying to notify policy {$id} of nonexistent tastecard.");
         } elseif ($this->mailer) {
             $this->mailer->sendTemplate(
                 "Your new Taste Card from So-Sure",
