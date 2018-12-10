@@ -59,9 +59,15 @@
                 <p></p>
                 <p class="text-center"><strong>Record Claim
                 {% if claim.type %}
-                        [<button type="button" class="btn btn-link" data-toggle="modal" data-target="#claimsModal"
-                                data-claim='{{ claim.toModalArray()|json_encode }}' data-documents='{{ s3DownloadLinks(claim)|json_encode }}'>
-                            FNOL Details</button>]
+                    {% if is_granted('ROLE_EMPLOYEE') %}
+                    [<button type="button" class="btn btn-link" data-route="{{ path('admin_claims_form_policy', {'id': claim.id}) }}" data-toggle="modal" data-target="#claimsModal">
+                        {% if claim.number %}{{ claim.number }}{% else %}N/A{% endif %} FNOL Details
+                    </button>]
+                    {% elseif is_granted('ROLE_CLAIMS') %}
+                    [<button type="button" class="btn btn-link" data-route="{{ path('claims_claims_form_policy', {'id': claim.id}) }}" data-toggle="modal" data-target="#claimsModal">
+                        {% if claim.number %}{{ claim.number }}{% else %}N/A{% endif %} FNOL Details
+                    </button>]
+                    {% endif %}
                 {% endif %}
                     </strong>
                 </p>
@@ -160,13 +166,13 @@
                 {% if policy.policyTerms.isRepairEnabled %}
                     <h4>Damage claim? Policy terms allow for repair.</h4>
                 {% endif %}
-                {% if oa %}
-                    {% if oa.isLondon %}
-                        <h4>Damage claim? User is in Greater London - consider using Trinity Maxwell. </h4>
-                    {% elseif oa.isHomeCounty %}
-                        <h4>Damage claim? User is in a Home County - ask if working in Central London and consider using Trinity Maxwell. </h4>
-                    {% endif %}
-                {% endif %}
+                {#{% if oa %}#}
+                    {#{% if oa.isLondon %}#}
+                        {#<h4>Damage claim? User is in Greater London - consider using Trinity Maxwell. </h4>#}
+                    {#{% elseif oa.isHomeCounty %}#}
+                        {#<h4>Damage claim? User is in a Home County - ask if working in Central London and consider using Trinity Maxwell. </h4>#}
+                    {#{% endif %}#}
+                {#{% endif %}#}
             </div>
             {% endif %}
             <div role="tabpanel" class="tab-pane" id="crimeref">

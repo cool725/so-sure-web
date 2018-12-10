@@ -6,6 +6,7 @@ use AppBundle\Classes\DirectGroupHandlerClaim;
 use AppBundle\Document\Policy;
 use AppBundle\Service\DaviesService;
 use AppBundle\Service\DirectGroupService;
+use AppBundle\Service\DirectGroupServiceExcel;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
@@ -312,6 +313,72 @@ class DirectGroupServiceTest extends WebTestCase
         $this->assertEquals(1, count(self::$directGroupService->getWarnings()));
 
         $this->insureWarningExists('/multiple open claims against policy/');
+    }
+
+    public function testSaveClaimsOpenDavies()
+    {
+        $verifyTest = false;
+
+        $policyOpen = static::createUserPolicy(true);
+        $policyOpen->getUser()->setEmail(static::generateEmail('testSaveClaimsOpenDavies', $this));
+        $initialImei = $policyOpen->getImei();
+        $claimOpen = new Claim();
+        $claimOpen->setStatus(Claim::STATUS_APPROVED);
+        $claimOpen->setNumber(self::getRandomPolicyNumber('TEST'));
+        $claimOpen->setHandlingTeam(Claim::TEAM_DAVIES);
+
+        if (!$verifyTest) {
+            $policyOpen->addClaim($claimOpen);
+        }
+
+        $claimOpen2 = new Claim();
+        $claimOpen2->setNumber(self::getRandomPolicyNumber('TEST'));
+        $claimOpen2->setStatus(Claim::STATUS_APPROVED);
+        $claimOpen2->setReplacementImei(static::generateRandomImei());
+        $claimOpen2->setHandlingTeam(Claim::TEAM_DIRECT_GROUP);
+        $policyOpen->addClaim($claimOpen2);
+
+        static::$dm->persist($policyOpen->getUser());
+        static::$dm->persist($policyOpen);
+        static::$dm->persist($claimOpen);
+        static::$dm->persist($claimOpen2);
+        static::$dm->flush();
+        self::$directGroupService->clearErrors();
+        self::$directGroupService->clearWarnings();
+        self::$directGroupService->clearSoSureActions();
+
+        $now = \DateTime::createFromFormat('U', time());
+        $dgOpen = new DirectGroupHandlerClaim();
+        $dgOpen->policyNumber = $policyOpen->getPolicyNumber();
+        $dgOpen->claimNumber = $claimOpen2->getNumber();
+        $dgOpen->insuredName = $policyOpen->getUser()->getName();
+        $dgOpen->status = 'Open';
+        $dgOpen->lossDate = new \DateTime('2017-02-01');
+        $dgOpen->replacementImei = static::generateRandomImei();
+        $dgOpen->replacementReceivedDate = $now;
+        $dgOpen->replacementMake = 'foo';
+        $dgOpen->replacementModel = 'bar';
+        $dgOpen->phoneReplacementCost = 100;
+        $dgOpen->totalIncurred = 100;
+        $dgOpen->initialSuspicion = false;
+        $dgOpen->finalSuspicion = false;
+        $dgOpen->lossDescription = 'foo bar';
+
+        $this->assertEquals(0, count(self::$directGroupService->getWarnings()));
+        self::$directGroupService->saveClaims(1, [$dgOpen]);
+        //print_r(self::$directGroupService->getErrors());
+        //print_r(self::$directGroupService->getWarnings());
+        $this->assertEquals(0, count(self::$directGroupService->getErrors()));
+        $this->assertEquals(0, count(self::$directGroupService->getWarnings()));
+        $this->assertEquals(0, count(self::$directGroupService->getSoSureActions()));
+
+        $updatedPolicy = $this->assertPolicyExists(static::$container, $policyOpen);
+
+        if ($verifyTest) {
+            $this->assertEquals($dgOpen->replacementImei, $updatedPolicy->getImei());
+        } else {
+            $this->assertEquals($initialImei, $updatedPolicy->getImei());
+        }
     }
 
     /**

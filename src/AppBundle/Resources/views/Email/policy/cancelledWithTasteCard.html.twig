@@ -1,0 +1,15 @@
+{% extends 'AppBundle:Email:base.html.twig' %}
+{% import "AppBundle:Email:macros.html.twig" as macros %}
+{% block title %}Policy cancelled with taste card.{% endblock %}
+{% block body %}
+	{{ macros.start_table() }}
+		<div style="font-size: 14px; text-align: left;">
+		   <div style="font-size: 14px; text-align: center;">
+                <p>
+                    Policy <strong><a href="{{ url('admin_policy', {'id': policy.id}) }}">{{ policy.policyNumber }}</a></strong> was cancelled with a taste card
+                    <strong>{{ policy.tasteCard }}</strong>.
+                </p>
+		   </div>
+		</div>
+	{{ macros.end_table() }}
+{% endblock %}

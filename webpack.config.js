@@ -14,6 +14,7 @@ Encore
     .createSharedEntry('vendor', './web/components/vendor.js')
 
     // List all files here
+    .addEntry('fontawesome', './src/AppBundle/Resources/public/rebrand/js/fontawesome.js')
     .addEntry('global', './src/AppBundle/Resources/public/rebrand/js/global.js')
     .addEntry('cookie', './src/AppBundle/Resources/public/rebrand/js/cookie.js')
     .addEntry('dev', './src/AppBundle/Resources/public/rebrand/js/dev.js')

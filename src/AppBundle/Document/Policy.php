@@ -168,6 +168,12 @@ abstract class Policy
         self::RISK_PENDING_CANCELLATION_POLICY => self::RISK_LEVEL_HIGH,
     ];
 
+    public static $expirationStatuses = [
+        Policy::STATUS_EXPIRED,
+        Policy::STATUS_EXPIRED_CLAIMABLE,
+        Policy::STATUS_EXPIRED_WAIT_CLAIM
+    ];
+
     /**
      * @MongoDB\Id(strategy="auto")
      */
@@ -355,6 +361,7 @@ abstract class Policy
      * @Assert\DateTime()
      * @MongoDB\Field(type="date")
      * @Gedmo\Versioned
+     * @MongoDB\Index(unique=false, sparse=true)
      */
     protected $start;
 
@@ -536,6 +543,14 @@ abstract class Policy
      * @Gedmo\Versioned
      */
     protected $metrics;
+
+    /**
+     * @AppAssert\Alphanumeric()
+     * @Assert\Length(min="10", max="10")
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
+    protected $tasteCard;
 
     public function __construct()
     {
@@ -1320,6 +1335,16 @@ abstract class Policy
     public function addMetric($metric)
     {
         $this->metrics[] = $metric;
+    }
+
+    public function getTasteCard()
+    {
+        return $this->tasteCard;
+    }
+
+    public function setTasteCard($tasteCard)
+    {
+        $this->tasteCard = $tasteCard;
     }
 
     public function getStandardConnections()
@@ -2123,13 +2148,19 @@ abstract class Policy
         return $nextDate;
     }
 
-    public function init(User $user, PolicyTerms $terms)
+    public function init(User $user, PolicyTerms $terms, $validateExcess = true)
     {
         $user->addPolicy($this);
         if ($company = $user->getCompany()) {
             $company->addPolicy($this);
         }
         $this->setPolicyTerms($terms);
+
+        // in the normal flow we should have policy terms before setting the phone
+        // however, many test cases do not have it
+        if ($this->getPremium() && $validateExcess) {
+            $this->validateAllowedExcess();
+        }
     }
 
     public function isCreateAllowed(\DateTime $date = null)
@@ -3016,11 +3047,7 @@ abstract class Policy
 
     public function isExpired()
     {
-        return in_array($this->getStatus(), [
-            self::STATUS_EXPIRED,
-            self::STATUS_EXPIRED_CLAIMABLE,
-            self::STATUS_EXPIRED_WAIT_CLAIM,
-        ]);
+        return in_array($this->getStatus(), self::$expirationStatuses);
     }
 
     public function isUnrenewed()
@@ -4464,7 +4491,7 @@ abstract class Policy
 
         // >= doesn't quite allow for minor float differences
         $result = $this->areEqualToTwoDp($expectedPaid, $totalPaid) || $totalPaid > $expectedPaid;
-        //print sprintf("%f =? %f return %s%s", $totalPaid, $expectedPaid, $result ? 'true': 'false', PHP_EOL);
+        // print sprintf("%f =? %f return %s%s", $totalPaid, $expectedPaid, $result ? 'true': 'false', PHP_EOL);
 
         return $result;
     }
@@ -4540,13 +4567,24 @@ abstract class Policy
             // once all the payment rescheduling has finished, there is a period of a few days where the scheduled
             // payments will not match; if this is the case, there is no need to alert on it
             $cancellationDate = clone $this->getPolicyExpirationDate($date);
-            // 4 payment retries - 7, 14, 21, 28; should be 30 days unpaid before cancellation
-            // 2 days diff + 2 on either side
-            if ($this->getUser()->hasJudoPaymentMethod()) {
-                $cancellationDate = $cancellationDate->sub(new \DateInterval('P4D'));
-            } elseif ($this->getUser()->hasBacsPaymentMethod()) {
-                // currently not rescheduling with bacs, 15 days to avoid some incorrect notifications
-                $cancellationDate = $cancellationDate->sub(new \DateInterval('P15D'));
+            if ($this->hasPreviousPolicy()) {
+                // 4 payment retries - 0, 7, 14, 21; should be 30 days unpaid before cancellation
+                // 9 days diff + 2 on either side
+                if ($this->getUser()->hasJudoPaymentMethod()) {
+                    $cancellationDate = $cancellationDate->sub(new \DateInterval('P11D'));
+                } elseif ($this->getUser()->hasBacsPaymentMethod()) {
+                    // currently not rescheduling with bacs, 15 days to avoid some incorrect notifications
+                    $cancellationDate = $cancellationDate->sub(new \DateInterval('P15D'));
+                }
+            } else {
+                // 4 payment retries - 7, 14, 21, 28; should be 30 days unpaid before cancellation
+                // 2 days diff + 2 on either side
+                if ($this->getUser()->hasJudoPaymentMethod()) {
+                    $cancellationDate = $cancellationDate->sub(new \DateInterval('P4D'));
+                } elseif ($this->getUser()->hasBacsPaymentMethod()) {
+                    // currently not rescheduling with bacs, 15 days to avoid some incorrect notifications
+                    $cancellationDate = $cancellationDate->sub(new \DateInterval('P15D'));
+                }
             }
             if ($cancellationDate <= $date) {
                 return null;
@@ -4911,6 +4949,15 @@ abstract class Policy
             $this->areEqualToTwoDp($this->getPromoPotValue(), $this->calculatePotValue(true));
     }
 
+    public function getCurrentExcess()
+    {
+        if ($this->getPremium()) {
+            return $this->getPremium()->getExcess();
+        } else {
+            return null;
+        }
+    }
+
     public function getExpectedCommission(\DateTime $date = null)
     {
         $salva = new Salva();
@@ -5253,6 +5300,24 @@ abstract class Policy
         }
 
         return false;
+    }
+
+    public function validateAllowedExcess()
+    {
+        if (!$this->getPremium() || !$this->getPremium()->getExcess()) {
+            return;
+        }
+
+        if (!$this->getPolicyTerms()->isAllowedExcess($this->getPremium()->getExcess())) {
+            throw new \Exception(sprintf(
+                'Unable to set phone for policy %s as excess (%s) values do not match policy terms (%s).',
+                $this->getId(),
+                $this->getPremium()->getExcess(),
+                count($this->getPolicyTerms()->getAllowedExcesses()) > 0 ?
+                    $this->getPolicyTerms()->getAllowedExcesses()[0]->__toString() :
+                    'missing'
+            ));
+        }
     }
 
     public function hasManualBacsPayment()

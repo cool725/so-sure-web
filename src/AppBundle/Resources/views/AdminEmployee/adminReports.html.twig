@@ -12,12 +12,10 @@
 {% block body %}
     <div class='container'>
         <h2>so-sure Reports</h2>
-
         <!-- Error Message -->
         {% if error is defined %}
             <h3>Error: {{ error }}</h3>
         {% else %}
-
             <!-- Navigation Tabs -->
             <ul id="tabs" class="nav nav-tabs nav-justified" role="tablist">
                 <li class="nav-item {% if claims is defined %}active{% endif %}">
@@ -29,8 +27,10 @@
                 <li class="nav-item {% if scheduledPayments is defined %}active{% endif %}">
                     <a href="{{ path('admin_reports_scheduled') }}">Scheduled Payments report</a>
                 </li>
+                <li class="nav-item {% if cumulative is defined %}active{% endif %}">
+                    <a href="{{ path('admin_reports_cumulative') }}">Cumulative Policies Report</a>
+                </li>
             </ul>
-
             <!-- claims report tab -->
             {% if claims is defined %}
                 <div class="row">
@@ -40,16 +40,20 @@
                             <div class="form-group">
                                 Reporting Period:
                                 <select name='period' action='' method='GET' onchange='this.form.submit()'>
-                                    {% for item in periods %}
+                                    {% for key, item in periods %}
                                         <option value='{{ item }}'
                                             {% if period == item %}
                                             selected='selected'
                                             {% endif %}>
-                                            {{ item }}
+                                            {{ key }}
                                         </option>
                                     {% endfor %}
                                 </select>
-                                {{ start }} to {{ end }}
+                                {% if month is defined %}
+                                    <strong>{{ month }}</strong>
+                                {% else %}
+                                    <strong>{{ start }}</strong> to <strong>{{ end }}</strong>
+                                {% endif %}
                             </div>
                         </div>
                     </form>
@@ -60,7 +64,6 @@
                         {% endfor %}
                         {% if claims.excluded_policies|length == 0 %}n/a{% endif %}
                     </h3>
-
                     <div class="table-responsive">
                         <table class="table table-striped">
                             <thead>
@@ -439,8 +442,6 @@
                     </div>
                 </div>
             {% endif %}
-
-
             <!-- connections report tab -->
             {% if connections is defined %}
                 <div class="row">
@@ -488,12 +489,13 @@
                     </div>
                 </div>
             {% endif %}
-
-
             <!-- scheduled payments report tab -->
             {% if scheduledPayments is defined %}
                 <div class="row">
-                    <h1 title="{% if scheduledPayments.dataFetchedAt is defined %}Generated at {{ scheduledPayments.dataFetchedAt|date }}{% endif %}">Monthly Billing</h1>
+                    <h1>Monthly Billing</h1>
+                    {% if scheduledPayments.dataFetchedAt is defined %}
+                        <small>Generated at {{ scheduledPayments.dataFetchedAt|date }}</small>
+                    {% endif %}
                     <div class="table-responsive">
                         <table class="table table-striped">
                             <thead>
@@ -521,6 +523,44 @@
                             </tbody>
                         </table>
                     </div>
+                </div>
+            {% endif %}
+            {% if cumulative is defined %}
+                <div class="row">
+                    <h1>Cumulative Policies</h1>
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Month</th>
+                                    <th>Open Tally</th>
+                                    <th>New (Adjusted)</th>
+                                    <th>Expired</th>
+                                    <th>Cancelled (Adjusted)</th>
+                                    <th>Upgrades</th>
+                                    <th>Close Tally</th>
+                                    <th>Open Queried</th>
+                                    <th>Close Queried</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for month, content in cumulative %}
+                                <tr>
+                                    <td><strong>{{ month }}</strong></td>
+                                    <td>{{ content.open }}</td>
+                                    <td>{{ content.new }} ({{ content.newAdjusted }})</td>
+                                    <td>{{ content.expired }}</td>
+                                    <td>{{ content.cancelled }} ({{ content.cancelledAdjusted }})</td>
+                                    <td>{{ content.upgrade }}</td>
+                                    <td>{{ content.close }}</td>
+                                    <td>{{ content.queryOpen }}</td>
+                                    <td>{{ content.queryClose }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
                 </div>
             {% endif %}
         {% endif %}

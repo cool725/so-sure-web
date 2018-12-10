@@ -204,6 +204,7 @@ class BICommand extends ContainerAwareCommand
             '"Claim Replacement Received Date"',
             '"Claim handling team"',
             '"Total cost of claim"',
+            '"Claim Closed Date"'
         ]);
         foreach ($claims as $claim) {
             /** @var Claim $claim */
@@ -260,6 +261,7 @@ class BICommand extends ContainerAwareCommand
                 ),
                 sprintf('"%s"', $claim->getHandlingTeam()),
                 sprintf('"%0.2f"', $claim->getTotalIncurred()),
+                sprintf('"%s"', $claim->getClosedDate() ? $claim->getClosedDate()->format('Y-m-d') : '')
             ]);
         }
         if (!$skipS3) {
