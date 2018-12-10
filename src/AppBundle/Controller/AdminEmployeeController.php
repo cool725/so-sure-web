@@ -307,7 +307,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             $phones = $phones->field('suggestedReplacement')->exists(true);
         }
         if ($make) {
-            $phones->field('makeCanonical')->equals(strtolower($make));
+            $phones->field('makeCanonical')->equals(mb_strtolower($make));
         }
         if ($model) {
             // regexp to search for each word so you don't have to get the model exactly right.
