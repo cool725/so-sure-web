@@ -68,7 +68,7 @@ class PosControllerTest extends BaseControllerTest
         ]);
 
         $crawler = self::$client->submit($form);
-        self::verifyResponse(200);
+        self::verifyResponse(302);
 
         $lead = self::$dm->getRepository(Lead::class)->findBy([
             'email' => $email
@@ -107,7 +107,7 @@ class PosControllerTest extends BaseControllerTest
         ]);
 
         $crawler = self::$client->submit($form);
-        self::verifyResponse(200);
+        self::verifyResponse(302);
 
         $lead = self::$dm->getRepository(Lead::class)->findBy([
             'email' => $email
