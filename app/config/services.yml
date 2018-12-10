@@ -1408,6 +1408,12 @@ services:
         tags:
             - { name: form.type }
 
+    app.form.type.claiminfo:
+        class: AppBundle\Form\Type\ClaimInfoType
+        arguments: ["@doctrine_mongodb.odm.default_document_manager", "@app.imei"]
+        tags:
+            - { name: form.type }
+
     app.form.type.claimcrimeref:
         class: AppBundle\Form\Type\ClaimCrimeRefType
         arguments: ["@app.imei"]
