@@ -996,9 +996,9 @@
                         {{ form_end(screen_upload_form)}}
                     </td>
                 </tr>
-                {% if is_granted('ROLE_ADMIN') %}
+                {% if is_granted('ROLE_CUSTOMER_SERVICES') %}
                 <tr>
-                    <td>pic-sure</td>
+                    <td><i class="fa fa-shield"></i> pic-sure status</td>
                     <td>
                         {% if policy.policyTerms.isPicSureEnabled %}
                             Status: {% if policy.picSureStatus %}{{ policy.picSureStatus }}{% else %}Not started{% endif %}
