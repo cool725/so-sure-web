@@ -25,14 +25,14 @@ class PosControllerTest extends BaseControllerTest
 
     public function testHellozAction()
     {
-        $url = sprintf('/pos/helloz');
+        $url = self::$router->generate('helloz');
         $crawler = self::$client->request('GET', $url);
         self::verifyResponse(200);
     }
 
     public function testHellozSubmit()
     {
-        $url = sprintf('/pos/helloz');
+        $url = self::$router->generate('helloz');
         $crawler = self::$client->request('GET', $url);
         self::verifyResponse(200);
 
@@ -58,7 +58,7 @@ class PosControllerTest extends BaseControllerTest
 
     public function testHellozSubmitDuplicate()
     {
-        $url = sprintf('/pos/helloz');
+        $url = self::$router->generate('helloz');
         $crawler = self::$client->request('GET', $url);
         self::verifyResponse(200);
 
