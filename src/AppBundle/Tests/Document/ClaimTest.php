@@ -3,6 +3,9 @@
 namespace AppBundle\Tests\Document;
 
 use AppBundle\Document\Claim;
+use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\PolicyTerms;
+use AppBundle\Tests\UserClassTrait;
 use DateTime;
 use Symfony\Bridge\PhpUnit\ClockMock;
 
@@ -11,6 +14,8 @@ use Symfony\Bridge\PhpUnit\ClockMock;
  */
 class ClaimTest extends \PHPUnit\Framework\TestCase
 {
+    use UserClassTrait;
+
     public function testSetStatus()
     {
         $claim = new Claim();
