@@ -73,9 +73,9 @@
                     {% set show_bacs_setup = true %}
                     {% if not policy.canBacsPaymentBeMadeInTime %}
                         {% set show_judo = true %}
-                        {% set judo_btn_text = 'Pay by card' %}
+                        {% set judo_btn_text = 'Proceed to card payment' %}
                     {% endif %}
-                    <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_broken-phone.png" alt="so-sure" width="180px">
+                    <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_card-reader.png" alt="so-sure" width="180px">
                     <h1 class="h2 mb-4">Direct Debit invalid </h1>
                     <p>Your Direct Debit is either cancelled or has failed.</p>
                     {# END - MANDATE FAILED OR CANCELLED #}
@@ -86,9 +86,9 @@
                     {% set show_bacs_retry = true %}
                     {% if not policy.canBacsPaymentBeMadeInTime %}
                         {% set show_judo = true %}
-                        {% set judo_btn_text = 'Pay by card' %}
+                        {% set judo_btn_text = 'Proceed to card payment' %}
                     {% endif %}
-                    <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_broken-phone.png" alt="so-sure" width="180px">
+                    <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_card-reader.png" alt="so-sure" width="180px">
                     <h1 class="h2 mb-4">Payment failed</h1>
                     <p class="lead">Your last Direct Debit payment failed and your policy is in danger of being cancelled.</p>
                     {# END - PAYMENT FAILED #}
@@ -99,9 +99,10 @@
                     {% set show_bacs_retry = true %}
                     {% if not policy.canBacsPaymentBeMadeInTime %}
                         {% set show_judo = true %}
-                        {% set judo_btn_text = 'Pay by card' %}
+                        {% set judo_btn_text = 'Proceed to card payment' %}
                     {% endif %}
-                    <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_broken-phone.png" alt="so-sure" width="180px">
+
+                    <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_card-reader.png" alt="so-sure" width="180px">
                     <h1 class="h2 mb-4">Payment missing</h1>
                     <p class="lead">Your account has not been paid up to date and your policy is in danger of being cancelled.</p>
                     {# END - PAYMENT MISSING #}
@@ -114,19 +115,22 @@
                     {% if policy.canBacsPaymentBeMadeInTime and bacs_feature %}
                         {% set show_bacs_setup = true %}
                     {% endif %}
-                    <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_broken-phone.png" alt="so-sure" width="180px">
+
+                    <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_card-reader.png" alt="so-sure" width="180px">
+
+                    <h1 class="h2 mb-4">Card Expired</h1>
+                    <p>We were unable to take payment because your card ending <strong>{{ policy.user.paymentMethod.cardLastFour }}</strong> has expired.</p>
+
                     {% if show_bacs_setup %}
-                        <h1 class="h2 mb-4">Update your payment details</h1>
-                        <p>Your card ending <strong>XXXX</strong> has expired and we were unable to take payment of <strong>&pound;{{ amount|number_format(2, '.', ',') }}</strong>.</p>
+                        {% set judo_btn_text = 'Continue to card payment' %}
+                        <p>To avoid your policy being cancelled update your card details and pay the outstanding balance now of <strong>&pound;{{ amount|number_format(2, '.', ',') }}</strong>.</p>
                         <p><strong>Why not switch to Direct Debit?</strong></p>
                         <img src="{{ cdn_url }}/images/direct-debit-logo.svg" alt="Direct Debit" width="120px" class="mb-4">
                         <p>It helps avoid a lot of the problems with debit/credit card payments…</p>
                         <p>…and only takes seconds to setup!</p>
                     {% else %}
-                        {% set judo_btn_text = 'Update my card details' %}
-                        <h1 class="h2 mb-4">Update your card details</h1>
-                        <p>Your card ending <strong>XXXX</strong> has expired and we were unable to take payment of <strong>&pound;{{ amount|number_format(2, '.', ',') }}</strong>.</p>
-                        <p>To avoid your policy being cancelled update your card details and pay the outstanding balance now.</p>
+                        {% set judo_btn_text = 'Proceed to card payment' %}
+                        <p>To avoid your policy being cancelled update your card details and pay the outstanding balance of <strong>&pound;{{ amount|number_format(2, '.', ',') }}</strong> now.</p>
                     {% endif %}
                     {# END - CARD EXPIRED #}
 
@@ -137,19 +141,21 @@
                     {% if policy.canBacsPaymentBeMadeInTime and bacs_feature %}
                         {% set show_bacs_setup = true %}
                     {% endif %}
-                    <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_broken-phone.png" alt="so-sure" width="180px">
+
+                    <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_card-reader.png" alt="so-sure" width="180px">
+                    <h1 class="h2 mb-4">Payment Failed</h1>
+                    <p>We were unable to take payment because your card ending <strong>{{ policy.user.paymentMethod.cardLastFour }}</strong> was declined.</p>
+                    <p>To avoid your policy being cancelled update your card details and pay the outstanding balance of <strong>&pound;{{ amount|number_format(2, '.', ',') }}</strong> now.</p>
+
                     {% if show_bacs_setup %}
-                        <h1 class="h2 mb-4">Update your payment details</h1>
-                        <p>We were unable to take payment of <strong>&pound;{{ amount|number_format(2, '.', ',') }}</strong> because your card ending <strong>XXXX</strong> was declined.</p>
+                        {% set judo_btn_text = 'Continue to card payment' %}
+                        <p>To avoid your policy being cancelled update your card details and pay the outstanding balance now of <strong>&pound;{{ amount|number_format(2, '.', ',') }}</strong>.</p>
                         <p><strong>Why not switch to Direct Debit?</strong></p>
                         <img src="{{ cdn_url }}/images/direct-debit-logo.svg" alt="Direct Debit" width="120px" class="mb-4">
                         <p>It helps avoid a lot of the problems with debit/credit card payments…</p>
                         <p>…and only takes seconds to setup!</p>
                     {% else %}
                         {% set judo_btn_text = 'Proceed to card payment' %}
-                        <h1 class="h2 mb-4">Update your card details</h1>
-                        <p>We were unable to take payment of <strong>&pound;{{ amount|number_format(2, '.', ',') }}</strong> because your card ending <strong>XXXX</strong> was declined.</p>
-                        <p>To avoid your policy being cancelled update your card details and pay the outstanding balance now.</p>
                     {% endif %}
                     {# END - PAYMENT FAILED #}
 
@@ -160,27 +166,29 @@
                     {% if policy.canBacsPaymentBeMadeInTime and bacs_feature %}
                         {% set show_bacs_setup = true %}
                     {% endif %}
-                    <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_broken-phone.png" alt="so-sure" width="180px">
+
+                    <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_card-reader.png" alt="so-sure" width="180px">
+                    <h1 class="h2 mb-4">Payment Failed</h1>
+                    <p>We were unable to take payment of <strong>&pound;{{ amount|number_format(2, '.', ',') }}</strong> because your account appears to missing payment details</p>
+                    <p>To avoid your policy being cancelled update your card details and pay the outstanding balance now.</p>
+
                     {% if show_bacs_setup %}
-                        <h1 class="h2 mb-4">Update your payment details</h1>
-                        <p>We were unable to take payment of <strong>&pound;{{ amount|number_format(2, '.', ',') }}</strong> because your card ending <strong>XXXX</strong> was declined.</p>
+                        {% set judo_btn_text = 'Continue to card payment' %}
+                        <p>To avoid your policy being cancelled update your card details and pay the outstanding balance now of <strong>&pound;{{ amount|number_format(2, '.', ',') }}</strong>.</p>
                         <p><strong>Why not switch to Direct Debit?</strong></p>
                         <img src="{{ cdn_url }}/images/direct-debit-logo.svg" alt="Direct Debit" width="120px" class="mb-4">
                         <p>It helps avoid a lot of the problems with debit/credit card payments…</p>
                         <p>…and only takes seconds to setup!</p>
                     {% else %}
                         {% set judo_btn_text = 'Proceed to card payment' %}
-                        <h1 class="h2 mb-4">Update your card details</h1>
-                        <p>We were unable to take payment of <strong>&pound;{{ amount|number_format(2, '.', ',') }}</strong> because your card ending <strong>XXXX</strong> was declined.</p>
-                        <p>To avoid your policy being cancelled update your card details and pay the outstanding balance now.</p>
                     {% endif %}
                     {# END - PAYMENT MISSING #}
 
                 {% else %}
 
                     {# UNPAID_BACS_UNKNOWN, UNPAID_JUDO_UNKNOWN, UNPAID_UNKNOWN #}
-                    <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_broken-phone.png" alt="so-sure" width="180px">
-                    <h1 class="h2">Payment problem</h1>
+                    <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_card-reader.png" alt="so-sure" width="180px">
+                    <h1 class="h2 mb-4">Payment problem</h1>
                     <p>Please <a href="mailto:support@wearesosure.com" class="open-intercom">contact us</a>.</p>
                     {# END - UNPAID_BACS_UNKNOWN, UNPAID_JUDO_UNKNOWN, UNPAID_UNKNOWN #}
 
