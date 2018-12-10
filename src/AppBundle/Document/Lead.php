@@ -204,6 +204,7 @@ class Lead
         $user->setEmail($this->getEmail());
         $user->setEmailCanonical($this->getEmailCanonical());
         $user->setLeadSource($this->getSource());
+        $user->setLeadSourceDetails($this->getSourceDetails());
         $user->setCreated($this->getCreated());
         $user->setIntercomId($this->getIntercomId());
         // Commenting out as could cause duplicate mobile numbers, which could cause login issues

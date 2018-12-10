@@ -485,8 +485,11 @@ class IntercomService
         if (mb_strlen($lead->getSource()) > 0) {
             $data['custom_attributes']['source'] = $lead->getSource();
         }
-        if (mb_strlen($lead->getSourceDetails() > 0)) {
-            $data['custom_attributes']['Affiliate'] = $lead->getSourceDetails();
+
+        if ($lead->getSource() === Lead::LEAD_SOURCE_AFFILIATE) {
+            if (mb_strlen($lead->getSourceDetails() > 0)) {
+                $data['custom_attributes']['Affiliate'] = $lead->getSourceDetails();
+            }
         }
         if ($lead->getIntercomId()) {
             $data['id'] = $lead->getIntercomId();
