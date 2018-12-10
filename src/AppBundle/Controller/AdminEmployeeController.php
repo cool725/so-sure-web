@@ -254,11 +254,12 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
 
         $searchForm->handleRequest($request);
         $data = $searchForm->get('os')->getData();
-
         $phones = $phones->field('os')->in($data);
         $data = filter_var($searchForm->get('active')->getData(), FILTER_VALIDATE_BOOLEAN);
         $phones = $phones->field('active')->equals($data);
         $rules = $searchForm->get('rules')->getData();
+        $make = $searchForm->get('make')->getData();
+        $model = $searchForm->get('model')->getData();
         if ($rules == 'missing') {
             $phones = $phones->field('suggestedReplacement')->exists(false);
             $phones = $phones->field('replacementPrice')->lte(0);
@@ -304,6 +305,18 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             $phones = $replacementPhones->field('id')->in($phoneIds);
         } elseif ($rules == 'replacement') {
             $phones = $phones->field('suggestedReplacement')->exists(true);
+        }
+        if ($make) {
+            $phones->field('makeCanonical')->equals(strtolower($make));
+        }
+        if ($model) {
+            // regexp to search for each word so you don't have to get the model exactly right.
+            $words = explode(' ', $model);
+            $wordString = '';
+            foreach ($words as $i => $word) {
+                $wordString .= "(?=.*?\b{$word}\b)";
+            }
+            $phones->field('model')->equals(new MongoRegex("/^{$wordString}.*$/i"));
         }
         $phones = $phones->sort('make', 'asc');
         $phones = $phones->sort('model', 'asc');
