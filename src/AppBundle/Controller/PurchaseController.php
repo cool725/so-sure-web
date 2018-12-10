@@ -1302,22 +1302,34 @@ class PurchaseController extends BaseController
                 if ($cancelForm->isValid()) {
                     $reason = $cancelForm->getData()['reason'];
                     $other = $cancelForm->getData()['othertxt'];
-
-                    // @codingStandardsIgnoreStart
-                    $body = sprintf(
-                        "This is a so-sure generated message. Policy: <a href='%s'>%s/%s</a> requested a cancellation via the site as phone was damaged (%s) prior to purchase. so-sure support team: Please contact the policy holder to get their reason(s) for cancelling before action. Additional comments: %s",
-                        $this->generateUrl(
-                            'admin_policy',
-                            ['id' => $policy->getId()],
-                            UrlGeneratorInterface::ABSOLUTE_URL
-                        ),
-                        $policy->getPolicyNumber(),
-                        $policy->getId(),
-                        $reason,
-                        $other
+                    $message;
+                    if ($policy->isWithinCooloffPeriod(null, false)) {
+                        $policy->cancel(CANCELLED_USER_REQUESTED);
+                        $dm->flush();
+                        $this->addFlash(
+                            "success",
+                            "You should receive an email confirming that your policy is now cancelled."
+                        );
+                        $message = "This is a so-sure generated message. Policy: <a href='%s'>%s/%s</a> was cancelled ".
+                        "via the site as per user request for reason \"%s\". so-sure support team: Please contact the ".
+                        "policy holder to get their reason(s) for cancelling. Additional comments: %s";
+                    } else {
+                        $this->addFlash(
+                            "success",
+                            "We have passed your request to our policy team. You should receive a cancellation email ".
+                            "once that is processed."
+                        );
+                        $message = "This is a so-sure generated message. Policy: <a href='%s'>%s/%s</a> requested a ".
+                        "cancellation via the site as phone was damaged (%s) prior to purchase. so-sure support team: ".
+                        "Please contact the policy holder to get their reason(s) for cancelling before action. ".
+                        "Additional comments: %s";
+                    }
+                    $url = $this->generateUrl(
+                        'admin_policy',
+                        ['id' => $policy->getId()],
+                        UrlGeneratorInterface::ABSOLUTE_URL
                     );
-                    // @codingStandardsIgnoreEnd
-
+                    $body = sprintf($message, $url, $policy->getPolicyNumber(), $policy->getId(), $reason, $other);
                     if (!$policy->hasRequestedCancellation()) {
                         $policy->setRequestedCancellation(\DateTime::createFromFormat('U', time()));
                         $policy->setRequestedCancellationReason($reason);
@@ -1330,13 +1342,6 @@ class PurchaseController extends BaseController
                         MixpanelService::EVENT_REQUEST_CANCEL_POLICY,
                         ['Policy Id' => $policy->getId(), 'Reason' => $reason]
                     );
-
-                    // @codingStandardsIgnoreStart
-                    $this->addFlash(
-                        'success',
-                        'We have passed your request to our policy team. You should receive a cancellation email once that is processed.'
-                    );
-                    // @codingStandardsIgnoreEnd
                     return $this->redirectToRoute('purchase_cancel_requested', ['id' => $id]);
                 }
             }
