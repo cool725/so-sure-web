@@ -1303,26 +1303,23 @@ class PurchaseController extends BaseController
                     $reason = $cancelForm->getData()['reason'];
                     $other = $cancelForm->getData()['othertxt'];
                     $message;
+                    $flash;
                     if ($policy->isWithinCooloffPeriod(null, false)) {
                         $policy->cancel(CANCELLED_USER_REQUESTED);
                         $dm->flush();
-                        $this->addFlash(
-                            "success",
-                            "You should receive an email confirming that your policy is now cancelled."
-                        );
+                        $flash = "You should receive an email confirming that your policy is now cancelled.";
                         $message = "This is a so-sure generated message. Policy: <a href='%s'>%s/%s</a> was cancelled ".
-                        "via the site as per user request for reason \"%s\". so-sure support team: Please contact the ".
-                        "policy holder to get their reason(s) for cancelling. Additional comments: %s";
+                            "via the site as per user request for reason \"%s\". so-sure support team: Please contact ".
+                            "the policy holder to get their reason(s) for cancelling. Additional comments: %s";
                     } else {
-                        $this->addFlash(
-                            "success",
-                            "We have passed your request to our policy team. You should receive a cancellation email ".
-                            "once that is processed."
-                        );
+                        $flash = "We have passed your request to our policy team. You should receive a cancellation ".
+                            "email once that is processed.";
+                        // TODO: this is the message as was written before. it always says prior damage is the reason.
+                        //       which I am unsure about.
                         $message = "This is a so-sure generated message. Policy: <a href='%s'>%s/%s</a> requested a ".
-                        "cancellation via the site as phone was damaged (%s) prior to purchase. so-sure support team: ".
-                        "Please contact the policy holder to get their reason(s) for cancelling before action. ".
-                        "Additional comments: %s";
+                            "cancellation via the site as phone was damaged (%s) prior to purchase. so-sure support ".
+                            "team: Please contact the policy holder to get their reason(s) for cancelling before ".
+                            "action. Additional comments: %s";
                     }
                     $url = $this->generateUrl(
                         'admin_policy',
@@ -1337,7 +1334,7 @@ class PurchaseController extends BaseController
                         $intercom = $this->get('app.intercom');
                         $intercom->queueMessage($policy->getUser()->getEmail(), $body);
                     }
-
+                    $this->addFlash("success", $flash);
                     $this->get('app.mixpanel')->queueTrack(
                         MixpanelService::EVENT_REQUEST_CANCEL_POLICY,
                         ['Policy Id' => $policy->getId(), 'Reason' => $reason]
