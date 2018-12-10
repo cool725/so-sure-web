@@ -1305,7 +1305,7 @@ class PurchaseController extends BaseController
                     $message;
                     $flash;
                     if ($policy->isWithinCooloffPeriod(null, false)) {
-                        $policy->cancel(CANCELLED_USER_REQUESTED);
+                        $policy->cancel(Policy::CANCELLED_USER_REQUESTED);
                         $dm->flush();
                         $flash = "You should receive an email confirming that your policy is now cancelled.";
                         $message = "This is a so-sure generated message. Policy: <a href='%s'>%s/%s</a> was cancelled ".
