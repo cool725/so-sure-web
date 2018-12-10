@@ -309,7 +309,7 @@ class BacsService
     public function processFile($file, $originalName = null)
     {
         if (!$originalName) {
-            $originalName = basename($originalName);
+            $originalName = basename($file);
         }
 
         $uploadFile = null;
