@@ -29,7 +29,7 @@ class Lead
     const LEAD_SOURCE_AFFILIATE = 'affiliate';
 
     // POS affiliate sources
-    const SOURCE_POS_HELLOZ = 'pos-helloz';
+    const SOURCE_POS_HELLOZ = 'HelloZ Pos';
 
     /**
      * @MongoDB\Id(strategy="auto")
