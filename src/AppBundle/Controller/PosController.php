@@ -53,6 +53,10 @@ class PosController extends BaseController
                             'Lead already exists'
                         ));
                     }
+                } else {
+                    $this->addFlash('error', sprintf(
+                        'Form is invalid'
+                    ));
                 }
             }
         }
