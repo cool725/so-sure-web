@@ -88,7 +88,7 @@ class AdminReportsCommand extends ContainerAwareCommand
         $lastMonth = $this->startOfPreviousMonth($date);
 
         $isProd = $this->environment == 'prod';
-        $this->reporting->getAllPaymentTotals($isProd,  $date, false);
-        $this->reporting->getAllPaymentTotals($isProd,  $lastMonth, false);
+        $this->reporting->getAllPaymentTotals($isProd, $date, false);
+        $this->reporting->getAllPaymentTotals($isProd, $lastMonth, false);
     }
 }
