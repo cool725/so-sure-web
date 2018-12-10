@@ -38,7 +38,7 @@ class PosControllerTest extends BaseControllerTest
 
         $form = $crawler->selectButton('lead_form_submit')->form();
 
-        $email =  self::generateEmail('testHellozSubmit'.rand(), $this);
+        $email =  self::generateEmail('testHellozSubmit', $this, true);
         $form->setValues([
             'lead_form[submittedBy]' => 'customer',
             'lead_form[name]' => 'Helloz Test',
@@ -64,7 +64,7 @@ class PosControllerTest extends BaseControllerTest
 
         $form = $crawler->selectButton('lead_form_submit')->form();
 
-        $email =  self::generateEmail('testHellozSubmitDuplicate'.rand(), $this);
+        $email =  self::generateEmail('testHellozSubmitDuplicate', $this, true);
         $phone = self::getRandomPhone(self::$dm)->getId();
         $form->setValues([
             'lead_form[submittedBy]' => 'customer',
