@@ -523,7 +523,7 @@
                         {% if is_granted('ROLE_ADMIN') %}
                             {{ form_widget(form.approvedDate, {'attr': {'class': 'form-control'}}) }}
                         {% else %}
-                            {{ claim.approvedDate }}
+                            {{ claim.approvedDate|date('d-m-Y') }}
                         {% endif %}
                     </div>
 
