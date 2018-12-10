@@ -5,6 +5,7 @@ namespace AppBundle\Controller;
 use AppBundle\Form\Type\LeadPosType;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use AppBundle\Document\Lead;
@@ -42,7 +43,7 @@ class PosController extends BaseController
 
                     if (!$existingLead) {
                         $this->addFlash('success', sprintf(
-                            'Successfully added lead %s',
+                            'Successfully added lead: %s',
                             $lead->getName()
                         ));
 
@@ -53,6 +54,8 @@ class PosController extends BaseController
                             'Lead already exists'
                         ));
                     }
+
+                    return new RedirectResponse($this->generateUrl('helloz'));
                 } else {
                     $this->addFlash('error', sprintf(
                         'Form is invalid'
