@@ -1,13 +1,11 @@
 {% extends 'base_portal.html.twig' %}
 {% form_theme lead_form with ['AppBundle:Form:fields.html.twig', 'AppBundle:Form:submit.html.twig'] %}
 
-
 {# Set vars #}
 {% set body_class = '' %}
 {% set quote_mode = true %}
 
 {% block title %}so-sure - Welcome to Social Insurance{% endblock %}
-
 
 {% block cssPage %}
     <link rel="stylesheet" href="{{ asset('css-js/portal.css') }}">

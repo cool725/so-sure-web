@@ -22,11 +22,6 @@
         <link rel="stylesheet" href="{{ asset('css-js/global.css') }}">
 
         {% block cssPage %}{% endblock %}
-
-        {% include '::meta_rebrand.html.twig' %}
-
-        {% block remotestylesheets %}{% endblock %}
-        {% block metaend %}{% endblock %}
     </head>
     <body class="d-flex flex-column {% if body_class is defined %}{{ body_class }}{% endif %}">
 
@@ -36,22 +31,10 @@
             {% block body %}{% endblock %}
         </main>
 
-        {# Site-wide Modals #}
-        {% include 'AppBundle::Default/_modalVideo.html.twig' %}
-
         {% include '::footer_data.html.twig' %}
 
         <script src="{{ asset('css-js/runtime.js') }}"></script>
         <script src="{{ asset('css-js/vendor.js') }}"></script>
-
-        {% if environment != 'prod' %}
-            <script src="{{ asset('css-js/dev.js') }}"></script>
-        {% endif %}
-
-        {% if hide_cookie_warning is not defined or not hide_cookie_warning %}
-            <script src="{{ asset('css-js/cookie.js') }}"></script>
-        {% endif %}
-
         <script src="{{ asset('css-js/global.js') }}"></script>
 
         {% block javascriptsPage %}{% endblock %}
