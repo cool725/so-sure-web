@@ -30,6 +30,27 @@ class PosControllerTest extends BaseControllerTest
         self::verifyResponse(200);
     }
 
+    public function testHellozActionLoggedIn()
+    {
+        $email = self::generateEmail('testHellozActionLoggedIn', $this, true);
+        $password = 'foo';
+        $phone = self::getRandomPhone(self::$dm);
+
+        $user = self::createUser(
+            self::$userManager,
+            $email,
+            $password,
+            $phone,
+            self::$dm
+        );
+
+        $this->login($email, $password);
+
+        $url = self::$router->generate('helloz');
+        $crawler = self::$client->request('GET', $url);
+        self::verifyResponse(200);
+    }
+
     public function testHellozSubmit()
     {
         $url = self::$router->generate('helloz');

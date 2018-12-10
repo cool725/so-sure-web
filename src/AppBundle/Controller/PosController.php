@@ -41,13 +41,17 @@ class PosController extends BaseController
                     ]);
 
                     if (!$existingLead) {
-                        $this->addFlash(sprintf(
+                        $this->addFlash('success', sprintf(
                             'Successfully added lead %s',
                             $lead->getName()
                         ));
 
                         $dm->persist($lead);
                         $dm->flush();
+                    } else {
+                        $this->addFlash('warning', sprintf(
+                            'Lead already exists'
+                        ));
                     }
                 }
             }
