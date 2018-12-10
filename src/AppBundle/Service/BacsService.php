@@ -266,11 +266,10 @@ class BacsService
                 }
             } catch (\Exception $e) {
                 $error = true;
-                $this->logger->error(sprintf(
-                    'Failed processing file %s in %s',
-                    $unzippedFile,
-                    $file
-                ));
+                $this->logger->error(
+                    sprintf('Failed processing file %s in %s', $unzippedFile, $file),
+                    ['exception' => $e]
+                );
             }
 
             $this->sosureSftpService->moveSftp($file, !$error);
@@ -310,7 +309,7 @@ class BacsService
     public function processFile($file, $originalName = null)
     {
         if (!$originalName) {
-            $originalName = $file;
+            $originalName = basename($originalName);
         }
 
         $uploadFile = null;
