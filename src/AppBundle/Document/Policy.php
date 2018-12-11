@@ -2184,7 +2184,7 @@ abstract class Policy
         return $nextDate;
     }
 
-    public function init(User $user, PolicyTerms $terms)
+    public function init(User $user, PolicyTerms $terms, $validateExcess = true)
     {
         $user->addPolicy($this);
         if ($company = $user->getCompany()) {
@@ -2194,7 +2194,7 @@ abstract class Policy
 
         // in the normal flow we should have policy terms before setting the phone
         // however, many test cases do not have it
-        if ($this->getPremium()) {
+        if ($this->getPremium() && $validateExcess) {
             $this->validateAllowedExcess();
         }
     }
@@ -4603,13 +4603,24 @@ abstract class Policy
             // once all the payment rescheduling has finished, there is a period of a few days where the scheduled
             // payments will not match; if this is the case, there is no need to alert on it
             $cancellationDate = clone $this->getPolicyExpirationDate($date);
-            // 4 payment retries - 7, 14, 21, 28; should be 30 days unpaid before cancellation
-            // 2 days diff + 2 on either side
-            if ($this->getUser()->hasJudoPaymentMethod()) {
-                $cancellationDate = $cancellationDate->sub(new \DateInterval('P4D'));
-            } elseif ($this->getUser()->hasBacsPaymentMethod()) {
-                // currently not rescheduling with bacs, 15 days to avoid some incorrect notifications
-                $cancellationDate = $cancellationDate->sub(new \DateInterval('P15D'));
+            if ($this->hasPreviousPolicy()) {
+                // 4 payment retries - 0, 7, 14, 21; should be 30 days unpaid before cancellation
+                // 9 days diff + 2 on either side
+                if ($this->getUser()->hasJudoPaymentMethod()) {
+                    $cancellationDate = $cancellationDate->sub(new \DateInterval('P11D'));
+                } elseif ($this->getUser()->hasBacsPaymentMethod()) {
+                    // currently not rescheduling with bacs, 15 days to avoid some incorrect notifications
+                    $cancellationDate = $cancellationDate->sub(new \DateInterval('P15D'));
+                }
+            } else {
+                // 4 payment retries - 7, 14, 21, 28; should be 30 days unpaid before cancellation
+                // 2 days diff + 2 on either side
+                if ($this->getUser()->hasJudoPaymentMethod()) {
+                    $cancellationDate = $cancellationDate->sub(new \DateInterval('P4D'));
+                } elseif ($this->getUser()->hasBacsPaymentMethod()) {
+                    // currently not rescheduling with bacs, 15 days to avoid some incorrect notifications
+                    $cancellationDate = $cancellationDate->sub(new \DateInterval('P15D'));
+                }
             }
             if ($cancellationDate <= $date) {
                 return null;
@@ -5335,8 +5346,12 @@ abstract class Policy
 
         if (!$this->getPolicyTerms()->isAllowedExcess($this->getPremium()->getExcess())) {
             throw new \Exception(sprintf(
-                'Unable to set phone for policy %s as excess values do not match policy terms.',
-                $this->getId()
+                'Unable to set phone for policy %s as excess (%s) values do not match policy terms (%s).',
+                $this->getId(),
+                $this->getPremium()->getExcess(),
+                count($this->getPolicyTerms()->getAllowedExcesses()) > 0 ?
+                    $this->getPolicyTerms()->getAllowedExcesses()[0]->__toString() :
+                    'missing'
             ));
         }
     }

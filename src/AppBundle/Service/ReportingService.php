@@ -902,8 +902,18 @@ class ReportingService
         return $rewardPotLiability;
     }
 
-    public function getAllPaymentTotals($isProd, \DateTime $date)
+    public function getAllPaymentTotals($isProd, \DateTime $date, $useCache = true)
     {
+        $redisKey = sprintf(
+            self::REPORT_KEY_FORMAT,
+            'allPaymentsTotal',
+            $isProd ? 'prod' : 'non-prod',
+            $date->format('Y-m-d')
+        );
+        if ($useCache === true && $this->redis->exists($redisKey)) {
+            return unserialize($this->redis->get($redisKey));
+        }
+
         $payments = $this->getPayments($date);
         $potRewardPayments = $this->getPayments($date, 'potReward');
         $potRewardPaymentsCashback = $this->getPayments($date, 'potReward', true);
@@ -916,7 +926,7 @@ class ReportingService
         $totalRunRate = $this->getTotalRunRateByDate($this->endOfMonth($date));
 
         // @codingStandardsIgnoreStart
-        return [
+        $data = [
             'all' => Payment::sumPayments($payments, $isProd),
             'judo' => Payment::sumPayments($payments, $isProd, JudoPayment::class),
             'sosure' => Payment::sumPayments($payments, $isProd, SoSurePayment::class),
@@ -936,6 +946,9 @@ class ReportingService
             'salvaPaymentFile' => $this->getSalvaPaymentFile($date),
         ];
         // @codingStandardsIgnoreEnd
+        $this->redis->setex($redisKey, self::REPORT_CACHE_TIME, serialize($data));
+
+        return $data;
     }
 
     public function getStats(\DateTime $date)
