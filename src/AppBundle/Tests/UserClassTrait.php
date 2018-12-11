@@ -158,7 +158,7 @@ trait UserClassTrait
 
         return $mobile;
     }
-    
+
     public static function getRandomPhone(\Doctrine\ODM\MongoDB\DocumentManager $dm, $make = null)
     {
         $phoneRepo = $dm->getRepository(Phone::class);
@@ -194,12 +194,13 @@ trait UserClassTrait
         $date = null,
         $addPayment = false,
         $createPolicy = false,
-        $monthly = true
+        $monthly = true,
+        $imei = null
     ) {
         self::addAddress($user);
 
         $policy = new SalvaPhonePolicy();
-        $policy->setImei(self::generateRandomImei());
+        $policy->setImei($imei ?: self::generateRandomImei());
         $policy->init($user, self::getLatestPolicyTerms($dm));
 
         if ($phone) {
@@ -433,7 +434,7 @@ trait UserClassTrait
         }
         self::addSoSurePayment($policy, $premium, $commission, $date);
     }
-    
+
     public static function addSoSurePayment($policy, $amount, $commission, $date = null)
     {
         $payment = new SoSurePayment();
