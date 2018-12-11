@@ -1360,6 +1360,17 @@ class JudopayServiceTest extends WebTestCase
         $this->assertTrue(self::$judopay->cardExpiringEmail($policy, new \DateTime('2020-12-15')));
     }
 
+    public function testFailedPaymentEmail()
+    {
+        $this->clearEmail(static::$container);
+        $user = $this->createValidUser(static::generateEmail('testFailedPaymentEmail', $this, true));
+        $phone = static::getRandomPhone(static::$dm);
+        $policy = static::initPolicy($user, static::$dm, $phone);
+        static::$dm->persist($policy);
+
+        $this->assertTrue(self::$judopay->failedPaymentEmail($policy, 1));
+    }
+
     public function testCardDetailsMissingEmail()
     {
         $this->clearEmail(static::$container);

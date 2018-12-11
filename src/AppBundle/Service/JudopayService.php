@@ -966,24 +966,16 @@ class JudopayService
                     \AppBundle\Classes\NoOp::ignore([]);
                 } else {
                     $this->failedPaymentEmail($policy, $failedPayments, $next);
-
-                    return true;
                 }
             } else {
                 $this->failedPaymentEmail($policy, $failedPayments, $next);
-
-                return true;
             }
 
             // Sms is quite invasive and occasionlly a failed payment will just work the next time
             // so allow 1 failed payment before sending sms
             if ($failedPayments > 1) {
                 $this->failedPaymentSms($policy, $failedPayments, $next);
-
-                return true;
             }
-
-            return false;
         }
     }
 
