@@ -1336,11 +1336,9 @@ class ApiAuthController extends BaseController
             }
             $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
 
-            /*
             if ($policy->getPicSureStatusWithClaims() == PhonePolicy::PICSURE_STATUS_CLAIM_PREVENTED) {
                 throw new ClaimException('Unable to do pic-sure as claim is in progress');
             }
-            */
 
             $s3 = $this->get('aws.s3');
             $result = $s3->getObject(array(
@@ -1414,9 +1412,12 @@ class ApiAuthController extends BaseController
             );
 
             return new JsonResponse($policy->toApiArray());
-        } catch (ClaimException $ade) {
-            // TODO: Add new error code
-            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
+        } catch (ClaimException $e) {
+            return $this->getErrorJsonResponse(
+                ApiErrorCode::ERROR_POLICY_PICSURE_DISALLOWED,
+                'pic-sure is not allowed',
+                422
+            );
         } catch (AccessDeniedException $ade) {
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
         } catch (\Aws\S3\Exception\S3Exception $e) {
