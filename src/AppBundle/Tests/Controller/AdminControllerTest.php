@@ -121,7 +121,7 @@ class AdminControllerTest extends BaseControllerTest
             true
         );
 
-        $newPolicy = $policy = self::initPolicy(
+        $newPolicy = self::initPolicy(
             $user,
             self::$dm,
             static::getRandomPhone(self::$dm),
@@ -161,11 +161,11 @@ class AdminControllerTest extends BaseControllerTest
         /** @var Claim $updatedClaim */
         $updatedClaim = $repoClaim->find($claim->getId());
 
-        $linkedClaims = $policy->getLinkedClaims();
+        $linkedClaims = $updatedPolicy->getLinkedClaims()->toArray();
         $linkedPolicy = $updatedClaim->getLinkedPolicy();
 
-        $this->assertEquals($policy, $linkedPolicy);
-        $this->assertTrue(in_array($updatedPolicy, $linkedClaims->toArray()));
+        $this->assertEquals($updatedPolicy, $linkedPolicy);
+        $this->assertTrue(in_array($updatedClaim, $linkedClaims));
     }
 
     public function testAdminClaimDelete()
