@@ -115,10 +115,12 @@
                                         {% if policy.getRequestedCancellationReason %}
                                             / {{ policy.getRequestedCancellationReason }}
                                         {% endif %}
+                                        {% if is_granted('ROLE_CUSTOMER_SERVICES') %}
                                         <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#policyStatusForm">
                                             <span class="glyphicon glyphicon-new-window" aria-hidden="true"></span>
                                             Change Status
                                         </button>
+                                        {% endif %}
                                     </td>
                                 </tr>
                                 {% if policy.isPolicy %}
@@ -1700,7 +1702,9 @@
         </div>
     {% endif %}
 
-    {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:Admin:policyStatusForm', 'policy': policy, 'id': 'policyStatusForm'} %}
+    {% if is_granted('ROLE_CUSTOMER_SERVICES') %}
+        {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:Admin:policyStatusForm', 'policy': policy, 'id': 'policyStatusForm'} %}
+    {% endif %}
     {% include 'AppBundle::Claims/claimsModal.html.twig' %}
     
 <div class="modal fade" id="policyNotesModal" tabindex="-1" role="dialog">
