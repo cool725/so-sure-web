@@ -124,11 +124,6 @@
 
                     {% if show_bacs_setup %}
                         {% set judo_btn_text = 'Continue to card payment' %}
-                        <p>To avoid your policy being cancelled update your card details and pay the outstanding balance now of <strong>&pound;{{ amount|number_format(2, '.', ',') }}</strong>.</p>
-                        <p><strong>Why not switch to Direct Debit?</strong></p>
-                        <img src="{{ cdn_url }}/images/direct-debit-logo.svg" alt="Direct Debit" width="120px" class="mb-4">
-                        <p>It helps avoid a lot of the problems with debit/credit card payments…</p>
-                        <p>…and only takes seconds to setup!</p>
                     {% else %}
                         {% set judo_btn_text = 'Proceed to card payment' %}
                         <p>To avoid your policy being cancelled update your card details and pay the outstanding balance of <strong>&pound;{{ amount|number_format(2, '.', ',') }}</strong> now.</p>
@@ -150,11 +145,6 @@
 
                     {% if show_bacs_setup %}
                         {% set judo_btn_text = 'Continue to card payment' %}
-                        <p>To avoid your policy being cancelled update your card details and pay the outstanding balance now of <strong>&pound;{{ amount|number_format(2, '.', ',') }}</strong>.</p>
-                        <p><strong>Why not switch to Direct Debit?</strong></p>
-                        <img src="{{ cdn_url }}/images/direct-debit-logo.svg" alt="Direct Debit" width="120px" class="mb-4">
-                        <p>It helps avoid a lot of the problems with debit/credit card payments…</p>
-                        <p>…and only takes seconds to setup!</p>
                     {% else %}
                         {% set judo_btn_text = 'Proceed to card payment' %}
                     {% endif %}
@@ -175,11 +165,6 @@
 
                     {% if show_bacs_setup %}
                         {% set judo_btn_text = 'Continue to card payment' %}
-                        <p>To avoid your policy being cancelled update your card details and pay the outstanding balance now of <strong>&pound;{{ amount|number_format(2, '.', ',') }}</strong>.</p>
-                        <p><strong>Why not switch to Direct Debit?</strong></p>
-                        <img src="{{ cdn_url }}/images/direct-debit-logo.svg" alt="Direct Debit" width="120px" class="mb-4">
-                        <p>It helps avoid a lot of the problems with debit/credit card payments…</p>
-                        <p>…and only takes seconds to setup!</p>
                     {% else %}
                         {% set judo_btn_text = 'Proceed to card payment' %}
                     {% endif %}
@@ -206,14 +191,17 @@
                     {% if policy.canBacsPaymentBeMadeInTime %}
                         <p>
                             {% if not app.user.hasBacsPaymentMethod %}
+                                <p>To avoid your policy being cancelled update your card details and pay the outstanding balance now of <strong>&pound;{{ amount|number_format(2, '.', ',') }}</strong>.</p>
+                                <p><strong>Why not switch to Direct Debit?</strong></p>
+                                <img src="{{ cdn_url }}/images/direct-debit-logo.svg" alt="Direct Debit" width="120px" class="mb-4">
+                                <p>It helps avoid a lot of the problems with debit/credit card payments…</p>
+                                <p>…and only takes seconds to setup!</p>
                                 <a id="setup-bacs-link" href="{{ path('user_payment_details_bacs') }}" class="btn btn-success">Switch to Direct Debit</a>
                             {% else %}
                                 <a id="update-bacs-link" href="{{ path('user_payment_details_bacs') }}" class="btn btn-success">Update Direct Debit details</a>
                             {% endif %}
                         </p>
-
                     {% else %}
-                        {# <p>Sorry, there is not enough time to setup a Direct Debit and take payment before your policy will expire.</p> #}
                         {% if not show_judo %}
                             <p>Please <a href="mailto:support@wearesosure.com" class="open-intercom">contact us</a>.</p>
                         {% endif %}
