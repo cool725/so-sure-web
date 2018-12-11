@@ -608,11 +608,6 @@ class DaviesServiceTest extends WebTestCase
         $this->insureWarningExists('/finalSuspicion/');
     }
 
-    private function getRandomClaimNumber()
-    {
-        return sprintf('%6d', rand(1, 999999));
-    }
-
     public function testSaveClaimsOpenClosed()
     {
         $daviesOpen = new DaviesHandlerClaim();

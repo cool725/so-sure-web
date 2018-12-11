@@ -179,6 +179,11 @@ trait UserClassTrait
         return $phone;
     }
 
+    public static function getRandomClaimNumber()
+    {
+        return sprintf('%6d', rand(1, 999999));
+    }
+
     public static function transformMobile($mobile)
     {
         return str_replace("+44", "0", $mobile);
