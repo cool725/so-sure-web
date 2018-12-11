@@ -342,13 +342,16 @@ trait DateTrait
     }
 
     /**
-     * Moves a date N days into the future.
+     * Returns a copy of a given date which is n days ahead of it.
      * @param \DateTime $date is the starting date.
      * @param int       $days is the number of days to move ahead.
+     * @return \DateTime the new date.
      */
     public static function addDays($date, $days)
     {
+        $date = clone $date;
         $date->add(new \DateInterval("P{$days}D"));
+        return $date;
     }
 
     /**
