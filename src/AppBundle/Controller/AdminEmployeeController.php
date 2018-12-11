@@ -935,7 +935,6 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                         $this->getUser()
                     );
 
-                    $dm->persist($policy);
                     $dm->flush();
 
                     $this->addFlash(

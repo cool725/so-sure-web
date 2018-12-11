@@ -164,8 +164,15 @@ class AdminControllerTest extends BaseControllerTest
         $linkedClaims = $updatedPolicy->getLinkedClaims()->toArray();
         $linkedPolicy = $updatedClaim->getLinkedPolicy();
 
-        $this->assertEquals($updatedPolicy, $linkedPolicy);
-        $this->assertTrue(in_array($updatedClaim, $linkedClaims));
+        /** @var Claim $linkedClaim */
+        foreach ($linkedClaims as $linkedClaim) {
+            if ($linkedClaim->getId() === $updatedClaim->getId()) {
+                $link = $linkedClaim;
+            }
+        }
+
+        $this->assertTrue(isset($link));
+        $this->assertEquals($updatedPolicy->getId(), $linkedPolicy->getId());
     }
 
     public function testAdminClaimDelete()
