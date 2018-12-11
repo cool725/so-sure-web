@@ -1710,9 +1710,11 @@
             </div>
         </div>
     {% endif %}
-    
+
     {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:Admin:policyStatusForm', 'policy': policy, 'id': 'policyStatusForm'} %}
-    {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:AdminEmployee:linkClaimForm', 'policy': policy, 'id': 'linkClaimForm'} %}
+    {% if is_granted('ROLE_CUSTOMER_SERVICES') %}
+        {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:AdminEmployee:linkClaimForm', 'policy': policy, 'id': 'linkClaimForm'} %}
+    {% endif %}
     {% include 'AppBundle::Claims/claimsModal.html.twig' %}
     
 <div class="modal fade" id="policyNotesModal" tabindex="-1" role="dialog">
