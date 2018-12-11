@@ -2507,7 +2507,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                         } else {
                             $this->addFlash("error", "Tastecard number must be 10 alphanumeric characters.");
                         }
-                    } elseif ($tasteCardForm->getClickedButton()->getName() === "resend") {
+                    } elseif ($tasteCardForm->getClickedButton()->getName() === "resend" && $policy->getTasteCard()) {
                         $policyService->tasteCardEmail($policy);
                         $this->addFlash('success', 'Tastecard notification has been resent.');
                     }
