@@ -351,6 +351,7 @@ trait DateTrait
         $date->add(new \DateInterval("P{$days}D"));
     }
 
+    /**
      * Converts a date into a formatted string in a given timezone. If the date is null then an empty string is given.
      * @param \DateTime|null $date     is the date to use. it's timezone is irrelevant as it just gets the timestamp.
      * @param \DateTimeZone  $timezone is the timezone to write this date in.
