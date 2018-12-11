@@ -171,6 +171,8 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         foreach ($preExpireYearlyUsers as $user) {
             $phones[] = $user->getPolicies()[0]->getPhone();
         }
+        $fiveMonthsAgo = \DateTime::createFromFormat('U', time());
+        $fiveMonthsAgo = $fiveMonthsAgo->sub(new \DateInterval('P5M'));
         $sixMonthsAgo = \DateTime::createFromFormat('U', time());
         $sixMonthsAgo = $sixMonthsAgo->sub(new \DateInterval('P6M'));
         $sevenMonthsAgo = \DateTime::createFromFormat('U', time());
@@ -191,10 +193,12 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             }
             $phone->changePrice(
                 $adjustedPrice,
-                $sixMonthsAgo,
+                $sixMonthsAgo, //feb feb > jan
                 PolicyTerms::getHighExcess(),
                 PolicyTerms::getLowExcess(),
-                $sevenMonthsAgo
+                null, // mar mar > jan feb > mar
+                null,
+                $sevenMonthsAgo // jan
             );
         }
 
@@ -646,6 +650,13 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         /** @var PolicyTerms $nonPicSureTerms */
         $nonPicSureTerms = $policyTermsRepo->findOneBy(['version' => 'Version 1 June 2016']);
 
+        if (!$latestTerms || count($latestTerms->getAllowedExcesses()) == 0) {
+            throw new \Exception('Missing latest terms');
+        }
+        if (!$nonPicSureTerms || count($nonPicSureTerms->getAllowedExcesses()) == 0) {
+            throw new \Exception('Missing non pic-sure terms');
+        }
+
         $startDate = \DateTime::createFromFormat('U', time());
         if ($days === null) {
             $days = sprintf("P%dD", random_int(0, 120));
@@ -654,12 +665,12 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         }
         $startDate->sub(new \DateInterval($days));
         $policy = new SalvaPhonePolicy();
-        $policy->setPhone($phone);
+        $policy->setPhone($phone, null, false);
         $policy->setImei($this->generateRandomImei());
         if ($picSure == self::PICSURE_NON_POLICY) {
-            $policy->init($user, $nonPicSureTerms);
+            $policy->init($user, $nonPicSureTerms,false);
         } else {
-            $policy->init($user, $latestTerms);
+            $policy->init($user, $latestTerms, false);
         }
         if (!$code) {
             $policy->createAddSCode($count);

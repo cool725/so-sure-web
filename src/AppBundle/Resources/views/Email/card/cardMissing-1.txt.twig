@@ -1,11 +1,9 @@
 
-Did you know your card is due to expire?
+Your payment failed
 
-{% if policy.user.paymentMethod.cardType is defined %}
-    Your card ending {{ policy.user.paymentMethod.cardLastFour }} will expire on {{ policy.user.paymentMethod.getCardEndDateAsDate | date('m/y', 'Europe/London') }}.
-{% endif %}
+We tried to take your monthly payment, but your account appears to be missing a payment method.
 
-Please update your payment details by clicking the link below.
+To keep your <strong>{{ policy.phone }}</strong> insured against loss, damage &amp; theft you need to update your payment details.
 
 Update my payment details: {{ branch_card_url }}
 

@@ -1,0 +1,25 @@
+{% block body %}
+
+    {{ form_start(form) }}
+    <div class="modal-body">
+        <div class="container-fluid">
+            <div class="form-group">
+                <div class="col">
+                    <p>Are you sure you want to change the Policy Status?</p>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Policy Status</label>
+                {{ form_widget(form.status, {'attr': {'class': 'form-control'}}) }}
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        {{ form_widget(form.update, { 'attr': {'class': 'btn btn-danger'} }) }}
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+    </div>
+    {{ form_end(form) }}
+
+{% endblock %}

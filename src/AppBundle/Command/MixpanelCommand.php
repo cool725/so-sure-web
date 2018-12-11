@@ -129,7 +129,11 @@ class MixpanelCommand extends ContainerAwareCommand
             $output->writeln(sprintf('Queued user delete'));
         } elseif ($action == 'delete-old-users') {
             $data = $this->mixpanelService->deleteOldUsers($days);
-            $output->writeln(sprintf("Queued %d users for deletion (of %d)", $data['count'], $data['total']));
+            $output->writeln(sprintf(
+                "Queued %d users for deletion (of %d total users)",
+                $data['count'],
+                $data['total']
+            ));
         } elseif ($action == 'count-users') {
             $total = $this->mixpanelService->getUserCount();
             $output->writeln(sprintf("%d Users", $total));
