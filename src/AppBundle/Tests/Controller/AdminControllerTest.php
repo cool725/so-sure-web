@@ -83,22 +83,28 @@ class AdminControllerTest extends BaseControllerTest
 
         // print_r($crawler->html());
         // get one phone from the page
-        $button = $crawler->filter('button[data-target="#claimsModal"]')->first()->attr('data-claim');
-        $this->assertTrue(isset($button));
+        $route = $crawler->filter('button[data-target="#claimsModal"]')->first()->attr('data-route');
 
-        $claimData = json_decode($button, true);
+        if (empty($route)) {
+            throw new \Exception('Claim route not found');
+        }
 
-        $form = $crawler->filter('form[id="phone-alternative-form"]')->form();
-        $form['id'] = $claimData['id'];
-        $form['approved-date'] = '2022-01-01';
-        $form['change-approved-date'] = 'on';
+        $crawler = self::$client->request('GET', $route);
+        self::verifyResponse(200);
+
+        $form = $crawler->filter('form[name="claims_form"]')->form();
+
+        $form->setValues([
+            'claims_form[approvedDate]' => '2022-01-01',
+        ]);
+
         $crawler = self::$client->submit($form);
         self::verifyResponse(302);
 
         $dm = $this->getDocumentManager(true);
         $repoClaim = $dm->getRepository(Claim::class);
         /** @var Claim $newClaim */
-        $newClaim = $repoClaim->find($claimData['id']);
+        $newClaim = $repoClaim->find($claim->getId());
         $this->assertEquals('2022-01-01', $newClaim->getApprovedDate()->format('Y-m-d'));
     }
 
@@ -128,7 +134,7 @@ class AdminControllerTest extends BaseControllerTest
         $this->assertNotNull($charge->getClaim());
 
         $this->login('patrick@so-sure.com', LoadUserData::DEFAULT_PASSWORD, 'admin');
-        $crawler = self::$client->request('GET', '/admin/claims');
+        $crawler = self::$client->request('GET', sprintf('/admin/claims-form/%s/policy', $claimId));
         self::verifyResponse(200);
         $form = $crawler->filter('form[id="delete-claim-form"]')->form();
         $form['id'] = $claimId;
@@ -183,7 +189,7 @@ class AdminControllerTest extends BaseControllerTest
 
         // there are two definitions of the form on the page
         $form = $crawler->filter('form[id="phone-alternative-form"]');
-        $this->assertEquals(2, count($form));
+        $this->assertEquals(1, count($form));
 
         $form = $crawler->filter('form[id="somefakeid"]');
         $this->assertEquals(0, count($form));

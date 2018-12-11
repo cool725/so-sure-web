@@ -2,14 +2,14 @@
 Payment failed for a second time!
 
 {% if policy.user.paymentMethod.cardType is defined %}
-Your card ending {{ policy.user.paymentMethod.cardLastFour }} was declined and we were unable to take your monthly payment of £{{ policy.premium.monthlyPremiumPrice }}
+We tried again to take your monthly payment of£{{ policy.premium.monthlyPremiumPrice }}, but your account appears to be missing a payment method.
 {% endif %}
 
-If you fail to make payment your policy will be cancelled in {{ policy.policyExpirationDateDays }} days
+If you fail to make payment, your policy will be cancelled in {{ policy.policyExpirationDateDays }} days
 
-To keep your {{ policy.phone }} insured against loss, damage & theft you need to update your payment details.
+To keep your {{ policy.phone }} insured against loss, damage &amp; theft you need to update your payment details.
 
-Update my payment details: {{ branch_payment_details_url }}
+Update my payment details: {{ branch_card_url }}
 
 Have a question or issue? contact us: {{ contact_us_url }}
 
