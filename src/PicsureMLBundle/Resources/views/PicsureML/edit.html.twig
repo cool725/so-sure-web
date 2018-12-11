@@ -42,7 +42,7 @@
         <div class="col-md-4">
             <div class="content-left">
                 <div class="text-right">
-                    {{ form_start(picsureml_edit_form)}}
+                    {{ form_start(picsureml_edit_form) }}
                     <div class="form-group">
                         {{ form_widget(picsureml_edit_form.previous, {'label': 'Previous', 'attr': {'class': 'btn btn-success'}}) }}
                         {{ form_widget(picsureml_edit_form.save, {'label': 'Save', 'attr': {'class': 'btn btn-success'}}) }}
@@ -84,7 +84,12 @@
                         {{ form_widget(picsureml_edit_form.versions) }}
                         {{ form_errors(picsureml_edit_form.versions) }}
                     </div>
-                    {{ form_end(picsureml_edit_form)}}
+                    <div class="form-group">
+                        {{ form_label(picsureml_edit_form.forDetection, 'For detection:') }}
+                        {{ form_widget(picsureml_edit_form.forDetection) }}
+                        {{ form_errors(picsureml_edit_form.forDetection) }}
+                    </div>
+                    {{ form_end(picsureml_edit_form) }}
                 </div>
             </div>
         </div>
