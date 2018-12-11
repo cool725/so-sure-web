@@ -3,6 +3,7 @@ namespace AppBundle\Service;
 
 use AppBundle\Document\File\SalvaPaymentFile;
 use AppBundle\Document\Payment\BacsIndemnityPayment;
+use AppBundle\Document\Stats;
 use AppBundle\Repository\CashbackRepository;
 use AppBundle\Repository\ClaimRepository;
 use AppBundle\Repository\ConnectionRepository;
@@ -12,6 +13,7 @@ use AppBundle\Repository\PaymentRepository;
 use AppBundle\Repository\PhonePolicyRepository;
 use AppBundle\Repository\PhoneRepository;
 use AppBundle\Repository\ScheduledPaymentRepository;
+use AppBundle\Repository\StatsRepository;
 use AppBundle\Repository\UserRepository;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Predis\Client;
@@ -900,8 +902,18 @@ class ReportingService
         return $rewardPotLiability;
     }
 
-    public function getAllPaymentTotals($isProd, \DateTime $date)
+    public function getAllPaymentTotals($isProd, \DateTime $date, $useCache = true)
     {
+        $redisKey = sprintf(
+            self::REPORT_KEY_FORMAT,
+            'allPaymentsTotal',
+            $isProd ? 'prod' : 'non-prod',
+            $date->format('Y-m-d')
+        );
+        if ($useCache === true && $this->redis->exists($redisKey)) {
+            return unserialize($this->redis->get($redisKey));
+        }
+
         $payments = $this->getPayments($date);
         $potRewardPayments = $this->getPayments($date, 'potReward');
         $potRewardPaymentsCashback = $this->getPayments($date, 'potReward', true);
@@ -914,7 +926,7 @@ class ReportingService
         $totalRunRate = $this->getTotalRunRateByDate($this->endOfMonth($date));
 
         // @codingStandardsIgnoreStart
-        return [
+        $data = [
             'all' => Payment::sumPayments($payments, $isProd),
             'judo' => Payment::sumPayments($payments, $isProd, JudoPayment::class),
             'sosure' => Payment::sumPayments($payments, $isProd, SoSurePayment::class),
@@ -934,6 +946,21 @@ class ReportingService
             'salvaPaymentFile' => $this->getSalvaPaymentFile($date),
         ];
         // @codingStandardsIgnoreEnd
+        $this->redis->setex($redisKey, self::REPORT_CACHE_TIME, serialize($data));
+
+        return $data;
+    }
+
+    public function getStats(\DateTime $date)
+    {
+        $start = $this->startOfMonth($date);
+        $end = $this->endOfMonth($date);
+        /** @var StatsRepository $repo */
+        $repo = $this->dm->getRepository(Stats::class);
+        /** @var Stats[] $stats */
+        $stats = $repo->getStatsByRange($start, $end);
+
+        return Stats::sum($stats);
     }
 
     /**
@@ -1250,15 +1277,17 @@ class ReportingService
         /** @var PhonePolicyRepository $policyRepo */
         $policyRepo = $this->dm->getRepository(PhonePolicy::class);
         $report = [];
-        $runningTotal = $policyRepo->countAllNewPolicies($start);
+        $runningTotal = $this->totalAtPoint($start);
         while ($start < $end) {
             $endOfMonth = $this->endOfMonth($start);
             $month = [];
             $month["open"] = $runningTotal;
             $month["new"] = $policyRepo->countAllNewPolicies($endOfMonth, $start);
-            $month["expired"] = $policyRepo->countAllEndingPolicies(null, $start, $endOfMonth, false);
+            $month["expired"] = $policyRepo->countEndingByStatus(Policy::$expirationStatuses, $start, $endOfMonth);
+            $month["cancelled"] = $policyRepo->countEndingByStatus(Policy::STATUS_CANCELLED, $start, $endOfMonth);
             $runningTotal += $month["new"];
             $runningTotal -= $month["expired"];
+            $runningTotal -= $month["cancelled"];
             $month["close"] = $runningTotal;
             $month["upgrade"] = $policyRepo->countAllEndingPolicies(
                 Policy::CANCELLED_UPGRADE,
@@ -1266,15 +1295,10 @@ class ReportingService
                 $endOfMonth,
                 false
             );
-            $month["newTotal"] = $policyRepo->countAllNewPolicies($endOfMonth) - (
-                $policyRepo->countAllEndingPolicies(null, null, $endOfMonth, false) -
-                $policyRepo->countAllEndingPolicies(Policy::CANCELLED_UPGRADE, null, $endOfMonth, false)
-            );
             $month["newAdjusted"] = $month["new"] - $month["upgrade"];
-            $month["endingAdjusted"] = $month["expired"] - $month["upgrade"];
-            if ($month["close"] != $month["newTotal"]) {
-                $month["bad"] = true;
-            }
+            $month["cancelledAdjusted"] = $month["cancelled"] - $month["upgrade"];
+            $month["queryOpen"] = $this->totalAtPoint($start);
+            $month["queryClose"] = $this->totalAtPoint($endOfMonth);
             $report[$start->format("F Y")] = $month;
             $start->add(new \DateInterval("P1M"));
         }
@@ -1306,5 +1330,20 @@ class ReportingService
         $start->setTime(0, 0, 0);
         $end->setTime(0, 0, 0);
         return [$start, $end, $month];
+    }
+
+    /**
+     * Gives you the total number of policies that are going.
+     * @param \DateTime $date is the date to look at.
+     * @return int the number of policies.
+     */
+    private function totalAtPoint(\DateTime $date)
+    {
+        /** @var PhonePolicyRepository $policyRepo */
+        $policyRepo = $this->dm->getRepository(PhonePolicy::class);
+        return $policyRepo->countAllNewPolicies($date) - (
+            $policyRepo->countEndingByStatus(Policy::$expirationStatuses, null, $date) +
+            $policyRepo->countEndingByStatus(Policy::STATUS_CANCELLED, null, $date)
+        );
     }
 }

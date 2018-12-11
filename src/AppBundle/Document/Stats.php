@@ -50,6 +50,13 @@ class Stats
     const KPI_CANCELLED_AND_PAYMENT_OWED = 'kpi-cancelled-payment-owed';
     const KPI_CANCELLED_AND_PAYMENT_PAID = 'kpi-cancelled-payment-paid';
 
+    const ACCOUNTS_AVG_PAYMENTS = 'accounts-avg-payments';
+    const ACCOUNTS_ACTIVE_POLICIES = 'accounts-active-policies';
+    const ACCOUNTS_ACTIVE_POLICIES_WITH_DISCOUNTS = 'accounts-active-policies-with-discounts';
+    const ACCOUNTS_REWARD_POT_LIABILITY_SALVA = 'accounts-reward-pot-liability-salva';
+    const ACCOUNTS_REWARD_POT_LIABILITY_SOSURE = 'accounts-reward-pot-liability-sosure';
+    const ACCOUNTS_ANNUAL_RUN_RATE = 'accounts-annual-run-rate';
+
     public static $allStats = [
         Stats::INSTALL_GOOGLE,
         Stats::INSTALL_APPLE,
@@ -75,6 +82,7 @@ class Stats
     /**
      * @Assert\DateTime()
      * @MongoDB\Field(type="date")
+     * @MongoDB\Index(unique=false, sparse=true)
      */
     protected $date;
 
@@ -143,5 +151,31 @@ class Stats
         }
 
         return false;
+    }
+
+    public static function sum($stats, $dashIfMissing = true)
+    {
+        $data = [];
+        foreach ($stats as $stat) {
+            /** @var Stats $stat */
+            if (!isset($data[$stat->getName()])) {
+                $data[$stat->getName()] = 0;
+            }
+            if (!$stat->isAbsolute()) {
+                $data[$stat->getName()] += $stat->getValue();
+            } else {
+                $data[$stat->getName()] = $stat->getValue();
+            }
+        }
+
+        if ($dashIfMissing) {
+            foreach (Stats::$allStats as $stat) {
+                if (!isset($data[$stat])) {
+                    $data[$stat] = '-';
+                }
+            }
+        }
+
+        return $data;
     }
 }

@@ -1,15 +1,24 @@
-{% extends 'AppBundle:Email:base.txt.twig' %}
-{% block body %}
-Your card is about to expire
 
-**
-------------------------------------------------------------
-Your {{ policy.user.paymentMethod }} will expire next month.
+Did you know your card is due to expire?
 
-Please update your payment details by clicking the button below.
+{% if policy.user.paymentMethod.cardType is defined %}
+    Your card ending {{ policy.user.paymentMethod.cardLastFour }} will expire on {{ policy.user.paymentMethod.getCardEndDateAsDate | date('m/y', 'Europe/London') }}.
+{% endif %}
 
-Update your Payment Details: {{ branch_card_url }}
+Please update your payment details by clicking the link below.
 
-You can also update your payment details at any time using our app - you'll find it under the Account tab.
+Update my payment details: {{ branch_card_url }}
 
-{% endblock body %}
+Have a question or issue? contact us: {{ contact_us_url }}
+
+============================================================
+** (http://www.twitter.com/wearesosure)
+** (https://www.facebook.com/wearesosure)
+** (http://wearesosure.com)
+** (http://blog.wearesosure.com)
+** (mailto:hello@wearesosure.com)
+
+Copyright {{ 'now'|date('Y') }} so-sure Limited, All rights reserved.
+
+Our mailing address is:
+so-sure, Martin House, 5 Martin Lane, London EC4R 0DP, United Kingdom

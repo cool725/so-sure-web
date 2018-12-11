@@ -300,7 +300,7 @@ class MonitorService
     public function mixpanelUserCount()
     {
         // acutal 100,000 for plan
-        $maxUsers = 90000;
+        $maxUsers = 99000;
         $total = 0;
         $count = 0;
         while ($total == 0) {
@@ -433,7 +433,7 @@ class MonitorService
         }
     }
 
-    public function bacsSubmitted()
+    public function accessPayNotSubmitted()
     {
         $repo = $this->dm->getRepository(AccessPayFile::class);
         /** @var AccessPayFile $unsubmitted */
@@ -928,6 +928,18 @@ class MonitorService
                 $result->getPolicy()->getPolicyNumber(),
                 $result->getDate()->format('Y-M-d H:m')
             ));
+        }
+    }
+
+    /**
+     * Checks for a detected IMEI and fires a monitor exception when one occurs.
+     */
+    public function checkDetectedImei()
+    {
+        if ($this->redis->exists("DETECTED-IMEI")) {
+            throw new MonitorException(
+                "IMEI number Incorrectly detected. https://wearesosure.com/admin/detected-imei"
+            );
         }
     }
 }

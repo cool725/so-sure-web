@@ -1362,10 +1362,8 @@ class UserController extends BaseController
         }
         // we need enough time for the bacs to be billed + reverse payment to be notified + 1 day internal processing
         // or no point in swapping to bacs
-        if ($bacsFeature && $policy->canBacsPaymentBeMadeInTime()) {
+        if ($bacsFeature && !$policy->canBacsPaymentBeMadeInTime()) {
             $bacsFeature = false;
-            // TODO: it seems as though this would turn off the bacs features when it should leave it on and vice
-            //       versa.
         }
 
         /** @var PaymentService $paymentService */
