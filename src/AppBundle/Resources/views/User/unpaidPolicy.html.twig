@@ -96,6 +96,7 @@
                 {% elseif unpaid_reason == 'unpaid_bacs_payment_missing' %}
 
                     {# PAYMENT MISSING #}
+                    {% set show_bacs_setup = true %}
                     {% set show_bacs_retry = true %}
                     {% if not policy.canBacsPaymentBeMadeInTime %}
                         {% set show_judo = true %}
