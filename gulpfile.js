@@ -25,8 +25,8 @@ gulp.task('default', function() {
         .pipe(gulp.dest('src/AppBundle/Resources/public/rebrand/sass/vendor'));
 
     // JSSocials
-    // gulp.src(['node_modules/jssocials/dist/jssocials.css', 'node_modules/jssocials/dist/jssocials-theme-flat.css'])
-    //     .pipe(gulp.dest('src/AppBundle/Resources/public/rebrand/sass/vendor'));
+    gulp.src(['node_modules/jssocials/dist/jssocials.css', 'node_modules/jssocials/dist/jssocials-theme-flat.css'])
+        .pipe(gulp.dest('src/AppBundle/Resources/public/rebrand/sass/vendor'));
 
     // Fancybox.css
     gulp.src(['node_modules/@fancyapps/fancybox/dist/jquery.fancybox.css'])
