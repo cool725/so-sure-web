@@ -313,7 +313,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             // regexp to search for each word so you don't have to get the model exactly right.
             $words = explode(' ', $model);
             $wordString = '';
-            foreach ($words as $i => $word) {
+            foreach ($words as $word) {
                 $wordString .= "(?=.*?\b{$word}\b)";
             }
             $phones->field('model')->equals(new MongoRegex("/^{$wordString}.*$/i"));
