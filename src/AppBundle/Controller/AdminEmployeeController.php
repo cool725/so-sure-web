@@ -741,7 +741,11 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                             sprintf('Policy %s IMEI updated', $policy->getPolicyNumber())
                         );
 
-                        $policy->addNoteDetails($imei->getNote(), $this->getUser());
+                        $policy->addNoteDetails(
+                            $imei->getNote(),
+                            $this->getUser(),
+                            'IMEI Change'
+                        );
                     } else {
                         $this->addFlash(
                             'error',
