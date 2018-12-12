@@ -285,6 +285,7 @@ class AffiliateServiceTest extends WebTestCase
                 [User::AQUISITION_NEW, User::AQUISITION_PENDING]
             )
         );
+        // Test that the remove charged users field works.
         static::createCharge($data["affiliate"], $data["tango"], $data["tango"]->getFirstPolicy(), new \DateTime());
         static::$dm->flush();
         $this->checkUsers(
@@ -305,6 +306,17 @@ class AffiliateServiceTest extends WebTestCase
                 [User::AQUISITION_LOST, User::AQUISITION_POTENTIAL]
             )
         );
+    }
+
+    /**
+     * Tests that the daysToAquisition function behaves as expected.
+     */
+    public function testDaysToAquisition()
+    {
+        $data = $this->createState(new \DateTime());
+        $this->assertEquals(20, static::$affiliateService->daysToAquisition($data["affiliate"], $data["bango"]));
+        $this->assertEquals(10, static::$affiliateService->daysToAquisition($data["affiliate"], $data["tango"]));
+        $this->assertEquals(0, static::$affiliateService->daysToAquisition($data["affiliate"], $data["hat"]));
     }
 
     /**

@@ -27,6 +27,7 @@
                 <th>Name</th>
                 <th>CPA</th>
                 <th>Days</th>
+                <th>Charge Model</th>
                 <th>Renewal Days</th>
                 <th>Campaign Source</th>
                 <th>Lead Source</th>
@@ -40,6 +41,7 @@
                     </td>
                     <td width="10%">£{{ company.cpa|number_format(2, '.', ',') }}</td>
                     <td width="10%">{{ company.days }}</td>
+                    <td width="10%">{{ company.chargeModel }}</td>
                     <td width="10%">{{ company.renewalDays }}</td>
                     <td width="10%">{{ company.campaignSource }}</td>
                     <td width="10%">{{ company.leadSource }}</td>

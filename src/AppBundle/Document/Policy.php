@@ -2917,13 +2917,6 @@ abstract class Policy
         return $this->getStart()->diff($date)->days <= 30;
     }
 
-    public function daysToAquisition($days)
-    {
-        $now = \DateTime::createFromFormat('U', time());
-        $now = $days - ($now->diff($this->getStart()))->d;
-        return ($now >= 0) ? $now : 0;
-    }
-
     public function isPolicyOldEnough($days, \DateTime $date = null)
     {
         if (!$this->getStart()) {

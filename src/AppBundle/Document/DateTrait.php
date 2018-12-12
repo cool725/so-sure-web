@@ -380,4 +380,23 @@ trait DateTrait
         }
         return static::convertTimezone($date, $timezone)->format($format);
     }
+
+    /**
+     * Gives the number of days the first date is from the second, with the second defaulting as being now.
+     * @param \DateTime $a is the first date.
+     * @param \DateTime $b is the second date which defaults to being now.
+     * @return the number of days by which the first date differs from the second, including negative numbers.
+     */
+    public static function daysFrom(\DateTime $a, \DateTime $b = null)
+    {
+        if (!$b) {
+            $b = new \DateTime();
+        }
+        $difference = $a->diff($b);
+        $days = $difference->d;
+        if ($difference->invert) {
+            $days *= -1;
+        }
+        return $days;
+    }
 }
