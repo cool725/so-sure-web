@@ -3189,7 +3189,11 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         if ($affiliate) {
             return [
                 'affiliate' => $affiliate,
-                'pending' => $affiliateService->getMatchingUsers($affiliate)
+                'pending' => $affiliateService->getMatchingUsers(
+                    $affiliate,
+                    [User::AQUISITION_NEW, User::AQUISITION_PENDING],
+                    $affiliate->getChargeModel() == Affiliate::CHARGE_MODEL_ONE_OFF
+                )
             ];
         } else {
             return ['error' => 'Invalid URL, given ID does not correspond to an affiliate.'];

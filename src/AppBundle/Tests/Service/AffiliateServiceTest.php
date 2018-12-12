@@ -285,13 +285,15 @@ class AffiliateServiceTest extends WebTestCase
                 [User::AQUISITION_NEW, User::AQUISITION_PENDING]
             )
         );
+        static::createCharge($data["affiliate"], $data["tango"], $data["tango"]->getFirstPolicy());
         $this->checkUsers(
-            [$data["bango"], $data["tango"], $data["hat"], $data["borb"], $data["tonyAbbot"]],
+            [$data["bango"], $data["hat"], $data["borb"], $data["tonyAbbot"]],
             static::$affiliateService->getMatchingUsers(
                 $data["affiliate"],
                 new \DateTime("30 days ago"),
                 [User::AQUISITION_NEW, User::AQUISITION_PENDING]
-            )
+            ),
+            true
         );
         // Potential or Lost.
         $this->checkUsers(
