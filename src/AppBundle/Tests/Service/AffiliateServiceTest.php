@@ -313,10 +313,96 @@ class AffiliateServiceTest extends WebTestCase
      */
     public function testDaysToAquisition()
     {
-        $data = $this->createState(new \DateTime());
-        $this->assertEquals(20, static::$affiliateService->daysToAquisition($data["affiliate"], $data["bango"]));
-        $this->assertEquals(10, static::$affiliateService->daysToAquisition($data["affiliate"], $data["tango"]));
-        $this->assertEquals(0, static::$affiliateService->daysToAquisition($data["affiliate"], $data["hat"]));
+        // Set a specific time so daylight savings doesn't make things go wonky.
+        // This part tests one off / first time part of the condition.
+        $date = new \DateTime('2018-07-05 05:12');
+        $data = $this->createState($date);
+        $data["affiliate"]->setChargeModel(AffiliateCompany::MODEL_ONGOING);
+        $this->assertEquals(
+            20,
+            static::$affiliateService->daysToAquisition($data["affiliate"], $data["bango"], $date)
+        );
+        $this->assertEquals(
+            10,
+            static::$affiliateService->daysToAquisition($data["affiliate"], $data["tango"], $date)
+        );
+        $this->assertEquals(
+            0,
+            static::$affiliateService->daysToAquisition($data["affiliate"], $data["hat"], $date)
+        );
+        $this->assertEquals(
+            -10,
+            static::$affiliateService->daysToAquisition($data["affiliate"], $data["borb"], $date)
+        );
+        $this->assertEquals(
+            -20,
+            static::$affiliateService->daysToAquisition($data["affiliate"], $data["tonyAbbot"], $date)
+        );
+        // This part tests the ongoing charges.
+        $date = new \DateTime('2018-07-25 05:12');
+        $this->assertEquals(
+            0,
+            static::$affiliateService->daysToAquisition($data["affiliate"], $data["bango"], $date)
+        );
+        $this->assertEquals(
+            -10,
+            static::$affiliateService->daysToAquisition($data["affiliate"], $data["tango"], $date)
+        );
+        $this->assertEquals(
+            -20,
+            static::$affiliateService->daysToAquisition($data["affiliate"], $data["hat"], $date)
+        );
+        $this->assertEquals(
+            -30,
+            static::$affiliateService->daysToAquisition($data["affiliate"], $data["borb"], $date)
+        );
+        $this->assertEquals(
+            -40,
+            static::$affiliateService->daysToAquisition($data["affiliate"], $data["tonyAbbot"], $date)
+        );
+        $date = new \DateTime('2019-07-25 05:12');
+        $this->assertEquals(
+            -365,
+            static::$affiliateService->daysToAquisition($data["affiliate"], $data["bango"], $date)
+        );
+        $this->assertEquals(
+            -375,
+            static::$affiliateService->daysToAquisition($data["affiliate"], $data["tango"], $date)
+        );
+        $this->assertEquals(
+            -385,
+            static::$affiliateService->daysToAquisition($data["affiliate"], $data["hat"], $date)
+        );
+        $this->assertEquals(
+            -395,
+            static::$affiliateService->daysToAquisition($data["affiliate"], $data["borb"], $date)
+        );
+        $this->assertEquals(
+            -405,
+            static::$affiliateService->daysToAquisition($data["affiliate"], $data["tonyAbbot"], $date)
+        );
+        $this->assertEquals(5, count(static::$affiliateService->generate([$data["affiliate"]], $date)));
+        $date = new \DateTime('2019-08-25 05:12');
+        $this->assertEquals(
+            -30,
+            static::$affiliateService->daysToAquisition($data["affiliate"], $data["bango"], $date)
+        );
+        $this->assertEquals(
+            -30,
+            static::$affiliateService->daysToAquisition($data["affiliate"], $data["tango"], $date)
+        );
+        $this->assertEquals(
+            -30,
+            static::$affiliateService->daysToAquisition($data["affiliate"], $data["hat"], $date)
+        );
+        $this->assertEquals(
+            -30,
+            static::$affiliateService->daysToAquisition($data["affiliate"], $data["borb"], $date)
+        );
+        $this->assertEquals(
+            -30,
+            static::$affiliateService->daysToAquisition($data["affiliate"], $data["tonyAbbot"], $date)
+        );
     }
 
     /**

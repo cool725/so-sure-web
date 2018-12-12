@@ -231,23 +231,25 @@ class AffiliateService
      * @param User             $user      is the user for whom we are checking.
      * @return int the number of days.
      */
-    public function daysToAquisition($affiliate, $user)
+    public function daysToAquisition($affiliate, $user, $now = null)
     {
+        if (!$now) {
+            $now = new \DateTime();
+        }
         $model = $affiliate->getChargeModel();
         $charge = $this->chargeRepository->findLastByUser($user, Charge::TYPE_AFFILIATE);
         $policy = $user->getFirstPolicy();
-        $now = new \DateTime();
         if ($model == AffiliateCompany::MODEL_ONE_OFF || !$charge) {
-            $now = $days - ($now->diff($policy->getStart()))->d;
-            return ($now >= 0) ? $now : 0;
+            $start = clone $policy->getStart();
+            $start->add(static::intervalDays($affiliate->getDays()));
+            return static::daysFrom($start, $now);
         } elseif ($model == AffiliateCompany::MODEL_ONGOING) {
             $dayDifference = ($affiliate->getRenewalDays() ?: 0) - ($affiliate->getDays() ?: 0);
             $chargeDate = clone $charge->getCreatedDate();
             $chargeDate->add(new \DateInterval("P1Y"));
-            return static::daysFrom($chargeDate) + $dayDifference;
-        } else {
-            return 0;
+            return static::daysFrom($chargeDate, $now) + $dayDifference;
         }
+        return 0;
     }
 
     /**
