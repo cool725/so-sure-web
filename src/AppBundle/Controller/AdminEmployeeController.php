@@ -1078,6 +1078,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             ->createNamedBuilder('run_scheduled_payment_form', PaymentRequestUploadFileType::class, $paymentRequestFile)
             ->getForm();
         $bacsRefund = new BacsPayment();
+        $bacsRefund->setDate($this->getNextBusinessDay($this->now()));
         $bacsRefund->setSource(Payment::SOURCE_ADMIN);
         $bacsRefund->setPolicy($policy);
         $bacsRefund->setAmount($policy->getPremiumInstallmentPrice(true));

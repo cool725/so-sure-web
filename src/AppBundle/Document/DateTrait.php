@@ -40,6 +40,11 @@ trait DateTrait
         return false;
     }
 
+    public function now()
+    {
+        return \DateTime::createFromFormat('U', time());
+    }
+
     public function startOfPreviousMonth(\DateTime $date = null)
     {
         $startMonth = $this->startOfMonth($date);
