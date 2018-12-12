@@ -14,6 +14,7 @@ use AppBundle\Form\Type\AdminEmailOptOutType;
 use AppBundle\Form\Type\BacsCreditType;
 use AppBundle\Form\Type\ClaimInfoType;
 use AppBundle\Form\Type\CallNoteType;
+use AppBundle\Form\Type\LinkClaimType;
 use AppBundle\Form\Type\ClaimNoteType;
 use AppBundle\Form\Type\PaymentRequestUploadFileType;
 use AppBundle\Form\Type\UploadFileType;
@@ -877,6 +878,82 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         return [
             'form' => $picsureForm->createView(),
             'policy' => $policy
+        ];
+    }
+
+    /**
+     * @Route("/link-claim/{id}", name="link_claim_form")
+     * @Template
+     */
+    public function linkClaimFormAction(Request $request, $id = null)
+    {
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(PhonePolicy::class);
+        /** @var PhonePolicy $policy */
+        $policy = $repo->find($id);
+
+        if (!$policy) {
+            throw $this->createNotFoundException(sprintf('Policy %s not found', $id));
+        }
+
+        $linkClaimform = $this->get('form.factory')
+            ->createNamedBuilder('link_claim_form', LinkClaimType::class)
+            ->setAction($this->generateUrl(
+                'link_claim_form',
+                ['id' => $id]
+            ))
+            ->getForm();
+
+        if ('POST' === $request->getMethod()) {
+            if ($request->request->has('link_claim_form')) {
+                $linkClaimform->handleRequest($request);
+                if ($linkClaimform->isValid()) {
+                    /** @var ClaimRepository $repo */
+                    $repo = $dm->getRepository(Claim::class);
+
+                    $claim = $repo->findClaimByDetails(
+                        $linkClaimform->get('id')->getData(),
+                        $linkClaimform->get('number')->getData()
+                    );
+
+                    if (!$claim) {
+                        $this->addFlash(
+                            'error',
+                            sprintf('No claim matched')
+                        );
+
+                        return $this->redirectToRoute('admin_policy', ['id' => $id]);
+                    }
+
+                    $policy->addLinkedClaim($claim);
+                    $policy->addNoteDetails(
+                        sprintf(
+                            'Linked Claim %s. Notes: %s',
+                            $linkClaimform->get('number')->getData(),
+                            $linkClaimform->get('note')->getData()
+                        ),
+                        $this->getUser()
+                    );
+
+                    $dm->flush();
+
+                    $this->addFlash(
+                        'success',
+                        sprintf(
+                            'Policy %s successfully linked with claim: %s',
+                            $policy->getPolicyNumber(),
+                            $linkClaimform->get('number')->getData()
+                        )
+                    );
+
+                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
+                }
+            }
+        }
+
+        return [
+            'form' => $linkClaimform->createView(),
+            'policy' => $policy,
         ];
     }
 

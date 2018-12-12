@@ -1,0 +1,39 @@
+{% block body %}
+
+    {{ form_start(form) }}
+    <div class="modal-body">
+        <div class="form-row">
+            <div class="col">
+                <p>Are you sure you want to link a claim with this policy?</p>
+            </div>
+        </div>
+
+        <hr>
+
+        <div class="row">
+            <div class="col-xs-12 col-md-6">
+                <label>Claim Number *</label>
+                {{ form_widget(form.number, {'attr': {'class': 'form-control'}}) }}
+            </div>
+
+            <div class="col-xs-12 col-md-6">
+                <label>Claim ID *</label>
+                {{ form_widget(form.id, {'attr': {'class': 'form-control'}}) }}
+            </div>
+        </div>
+
+        <div class="form-row">
+            <label>Justification</label>
+            {{ form_widget(form.note, {'attr': {'class': 'form_note form-control'}}) }}
+
+            <p class="help-block">*Only one of these is required</p>
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        {{ form_widget(form.submit, {'attr': {'class': 'btn btn-danger'}}) }}
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+    </div>
+    {{ form_end(form) }}
+
+{% endblock %}
