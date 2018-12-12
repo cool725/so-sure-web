@@ -21,8 +21,7 @@ use PicsureMLBundle\Document\Form\Search;
 use PicsureMLBundle\Document\Form\NewVersion;
 use PicsureMLBundle\Form\Type\SearchType;
 use PicsureMLBundle\Form\Type\NewVersionType;
-use PicsureMLBundle\Form\Type\LabelType;
-use PicsureMLBundle\Form\Type\AnnotateType;
+use PicsureMLBundle\Form\Type\EditType;
 
 /**
  * @Route("/admin")
@@ -66,6 +65,7 @@ class PicsureMLController extends BaseController
 
         $version = $search->getVersion();
         $label = $search->getLabel();
+        $forDetection = $search->getForDetection();
         $imagesPerPage = $search->getImagesPerPage();
 
         if ($imagesPerPage == null) {
@@ -82,6 +82,9 @@ class PicsureMLController extends BaseController
             } else {
                 $qb->field('label')->equals($label);
             }
+        }
+        if ($forDetection == true) {
+            $qb->field('forDetection')->equals(true);
         }
         $qb->sort('id', 'desc');
         $pager = $this->pager($request, $qb, $imagesPerPage);
@@ -114,27 +117,23 @@ class PicsureMLController extends BaseController
             throw $this->createNotFoundException(sprintf('Image not found %s', $id));
         }
 
-        $labelForm = $this->get('form.factory')
-            ->createNamedBuilder('picsureml_label_form', LabelType::class, $image)
-            ->getForm();
-
-        $annotateForm = $this->get('form.factory')
-            ->createNamedBuilder('picsureml_annotate_form', AnnotateType::class, $image)
+        $editForm = $this->get('form.factory')
+            ->createNamedBuilder('picsureml_edit_form', EditType::class, $image)
             ->getForm();
 
         if ('POST' === $request->getMethod()) {
-            if ($request->request->has('picsureml_label_form')) {
-                $labelForm->handleRequest($request);
-                if ($labelForm->isValid()) {
+            if ($request->request->has('picsureml_edit_form')) {
+                $editForm->handleRequest($request);
+                if ($editForm->isValid()) {
                     $dm->flush();
-                    if (array_key_exists('previous', $request->request->get('picsureml_label_form'))) {
+                    if (array_key_exists('previous', $request->request->get('picsureml_edit_form'))) {
                         $prevId = $repo->getPreviousImage($id);
                         if ($prevId) {
                             return $this->redirectToRoute('admin_picsure_ml_edit', ['id' => $prevId]);
                         } else {
                             return $this->redirectToRoute('admin_picsure_ml');
                         }
-                    } elseif (array_key_exists('next', $request->request->get('picsureml_label_form'))) {
+                    } elseif (array_key_exists('next', $request->request->get('picsureml_edit_form'))) {
                         $nextId = $repo->getNextImage($id);
                         if ($nextId) {
                             return $this->redirectToRoute('admin_picsure_ml_edit', ['id' => $nextId]);
@@ -143,18 +142,12 @@ class PicsureMLController extends BaseController
                         }
                     }
                 }
-            } elseif ($request->request->has('picsureml_annotate_form')) {
-                $annotateForm->handleRequest($request);
-                if ($annotateForm->isValid()) {
-                    $dm->flush();
-                }
             }
         }
 
         return [
             'image' => $image,
-            'picsureml_label_form' => $labelForm->createView(),
-            'picsureml_annotate_form' => $annotateForm->createView(),
+            'picsureml_edit_form' => $editForm->createView(),
         ];
     }
 
