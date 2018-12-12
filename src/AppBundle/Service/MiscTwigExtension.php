@@ -25,7 +25,7 @@ class MiscTwigExtension extends \Twig_Extension
     /**
      * @param RequestStack    $requestStack
      * @param LoggerInterface $logger
-     * @param $outer          $router
+     * @param Router          $router
      */
     public function __construct(
         RequestStack $requestStack,
