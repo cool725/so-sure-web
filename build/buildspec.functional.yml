@@ -5,7 +5,7 @@ phases:
   install:
     commands:
       - /usr/bin/redis-server --port 6379 &
-      - /usr/bin/mongod --dbpath /tmp --quiet --fork --logpath /tmp/mongo.log
+      - /usr/bin/mongod --dbpath /tmp --fork --logpath /tmp/mongo.log --logappend
       - /var/ops/ansible/create-parameters.sh build
       - /var/ops/scripts/install-vendors.sh -n -u jenkins $CODEBUILD_SRC_DIR test
       - /var/ops/scripts/create-folders.sh -n -u jenkins $CODEBUILD_SRC_DIR test
