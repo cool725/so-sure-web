@@ -40,7 +40,7 @@ class InvitationController extends BaseController
             } elseif  ($invitation->isRejected()) {
                 $flashType = 'error';
                 $flashMessage = 'Hmm, it looks like this invitation to join so-sure has already been declined';
-            } elseif  ($invitation->isRejected()) {
+            } elseif  ($invitation->isCancelled()) {
                 $flashType = 'error';
                 $flashMessage = 'Hmm, it looks like this invitation to join so-sure has already been cancelled';
             } else {
