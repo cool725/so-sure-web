@@ -447,6 +447,7 @@ services:
         arguments:
             - "@request_stack"
             - "@logger"
+            - "@router"
         public: false
         tags:
             - { name: twig.extension }
