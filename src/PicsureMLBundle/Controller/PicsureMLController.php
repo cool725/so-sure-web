@@ -65,6 +65,7 @@ class PicsureMLController extends BaseController
 
         $version = $search->getVersion();
         $label = $search->getLabel();
+        $forDetection = $search->getForDetection();
         $imagesPerPage = $search->getImagesPerPage();
 
         if ($imagesPerPage == null) {
@@ -81,6 +82,9 @@ class PicsureMLController extends BaseController
             } else {
                 $qb->field('label')->equals($label);
             }
+        }
+        if ($forDetection == true) {
+            $qb->field('forDetection')->equals(true);
         }
         $qb->sort('id', 'desc');
         $pager = $this->pager($request, $qb, $imagesPerPage);

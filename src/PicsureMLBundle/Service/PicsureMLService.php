@@ -274,7 +274,7 @@ class PicsureMLService
         $results = $qb->getQuery()->execute();
 
         foreach ($results as $result) {
-            if ($result->forDetection() && $result->hasAnnotation()) {
+            if ($result->getForDetection() && $result->hasAnnotation()) {
                 $annotations[] = sprintf(
                     "%s/%s %d %d %d %d",
                     $result->getBucket(),
