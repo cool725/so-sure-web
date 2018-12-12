@@ -68,7 +68,7 @@ sosure.purchaseStepBacs = (function() {
                 "bacs_form[accountName]": {
                     required: 'Please enter the name on the account',
                     fullName: 'Please enter your first and last name',
-                    equaequalToIgnoreCaselTo: 'The name on the account must match the policy holder'
+                    equalToIgnoreCase: 'The name on the account must match the policy holder'
                 },
                 "bacs_form[sortCode]": {
                     required: 'Please enter your sort code',
