@@ -285,15 +285,16 @@ class AffiliateServiceTest extends WebTestCase
                 [User::AQUISITION_NEW, User::AQUISITION_PENDING]
             )
         );
-        static::createCharge($data["affiliate"], $data["tango"], $data["tango"]->getFirstPolicy());
+        static::createCharge($data["affiliate"], $data["tango"], $data["tango"]->getFirstPolicy(), new \DateTime());
+        static::$dm->flush();
         $this->checkUsers(
             [$data["bango"], $data["hat"], $data["borb"], $data["tonyAbbot"]],
             static::$affiliateService->getMatchingUsers(
                 $data["affiliate"],
                 new \DateTime("30 days ago"),
-                [User::AQUISITION_NEW, User::AQUISITION_PENDING]
-            ),
-            true
+                [User::AQUISITION_NEW, User::AQUISITION_PENDING],
+                true
+            )
         );
         // Potential or Lost.
         $this->checkUsers(
@@ -482,5 +483,32 @@ class AffiliateServiceTest extends WebTestCase
         foreach ($got as $user) {
             $this->assertContains($user, $expected);
         }
+    }
+
+    /**
+     * Creates an affiliate charge, associates it with the given user, and confirms the given policy with the
+     * affiliate company, then persists it all in the database. The cost of the charge is set as the affiliate's CPA
+     * property.
+     * @param AffiliateCompany $affiliate is the affiliate company who the charge is being made for.
+     * @param User             $user      is the user that the charge is made regarding.
+     * @param Policy           $policy    is the policy that the charge is made regarding.
+     * @param \DateTime        $date      is the time and date to be considered as current.
+     * @return Charge the charge that has been created.
+     */
+    private function createCharge(AffiliateCompany $affiliate, User $user, Policy $policy, \DateTime $date)
+    {
+        $charge = new Charge();
+        $charge->setAmount($affiliate->getCPA());
+        $charge->setType(Charge::TYPE_AFFILIATE);
+        $charge->setCreatedDate(clone $date);
+        $charge->setUser($user);
+        $charge->setAffiliate($affiliate);
+        $charge->setPolicy($policy);
+        if ($policy->getAffiliate() === null) {
+            $affiliate->addConfirmedPolicies($policy);
+        }
+        static::$dm->persist($charge);
+        static::$dm->persist($affiliate);
+        return $charge;
     }
 }
