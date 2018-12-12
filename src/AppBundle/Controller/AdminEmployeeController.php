@@ -8,10 +8,14 @@ use AppBundle\Document\File\PaymentRequestUploadFile;
 use AppBundle\Document\JudoPaymentMethod;
 use AppBundle\Document\Note\CallNote;
 use AppBundle\Document\Note\Note;
+use AppBundle\Document\ValidatorTrait;
 use AppBundle\Exception\PaymentDeclinedException;
 use AppBundle\Form\Type\AdminEmailOptOutType;
 use AppBundle\Form\Type\BacsCreditType;
+use AppBundle\Form\Type\ClaimInfoType;
 use AppBundle\Form\Type\CallNoteType;
+use AppBundle\Form\Type\LinkClaimType;
+use AppBundle\Form\Type\ClaimNoteType;
 use AppBundle\Form\Type\PaymentRequestUploadFileType;
 use AppBundle\Form\Type\UploadFileType;
 use AppBundle\Form\Type\UserHandlingTeamType;
@@ -33,9 +37,11 @@ use Doctrine\ODM\MongoDB\Query\Builder;
 use Faker\Calculator\Luhn;
 use Gedmo\Loggable\Document\Repository\LogEntryRepository;
 use Grpc\Call;
+use Predis\Client;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -148,6 +154,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
     use CurrencyTrait;
     use ImeiTrait;
     use ContainerAwareTrait;
+    use ValidatorTrait;
 
     /**
      * @Route("", name="admin_home")
@@ -315,6 +322,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             'makes' => $makes,
             'additional_phones' => $additionalPhonesForm->createView(),
             'one_day' => $oneDay,
+            'policyTerms' => $this->getLatestPolicyTerms(),
         ];
     }
 
@@ -491,7 +499,9 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                     $policy->getUser()->getMobileNumber(),
                     count($approvedClaims),
                     $claimsCost,
-                    $policy->getPolicyExpirationDate()->format('Y-m-d'),
+                    $policy->getPolicyExpirationDate() ?
+                        $policy->getPolicyExpirationDate()->format('Y-m-d') :
+                        null,
                     'FORMULA',
                     $policy->getStatus(),
                     'Yes',
@@ -500,10 +510,10 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                     $note->getOtherActions(),
                     $note->getActions(true),
                     $note->getCategory(),
-                    $policy->getPolicyExpirationDate()->format('W'),
+                    $policy->getPolicyExpirationDate() ? $policy->getPolicyExpirationDate()->format('W') : null,
                     $note->getDate()->format('W'),
                     $note->getDate()->format('M'),
-                    $policy->getPolicyExpirationDate()->format('M'),
+                    $policy->getPolicyExpirationDate() ? $policy->getPolicyExpirationDate()->format('M') : null,
                 ];
                 fputcsv(
                     $handle, // The file pointer
@@ -624,6 +634,77 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
     }
 
     /**
+     * @Route("/claims-form/{id}/policy", name="admin_claims_form_policy")
+     * @Route("/claims-form/{id}/claims", name="admin_claims_form_claims")
+     */
+    public function claimsFormAction(Request $request, $id = null)
+    {
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(Claim::class);
+        /** @var Claim $claim */
+        $claim = $repo->find($id);
+
+        $claimsForm = $this->get('form.factory')
+            ->createNamedBuilder('claims_form', ClaimInfoType::class, $claim)
+            ->setAction($this->generateUrl(
+                $request->get('_route'),
+                ['id' => $id]
+            ))
+            ->getForm();
+        $claimsNoteForm = $this->get('form.factory')
+            ->createNamedBuilder('claims_note_form', ClaimNoteType::class, $claim)
+            ->setAction($this->generateUrl(
+                $request->get('_route'),
+                ['id' => $id]
+            ))
+            ->getForm();
+
+        if ('POST' === $request->getMethod()) {
+            if ($request->request->has('claims_form')) {
+                $claimsForm->handleRequest($request);
+                if ($claimsForm->isValid()) {
+                    $dm->flush();
+                    $this->addFlash(
+                        'success',
+                        sprintf('Claim %s updated', $claim->getNumber())
+                    );
+                } else {
+                    $this->addFlash(
+                        'error',
+                        sprintf('Failed to update Claim %s', $claim->getNumber())
+                    );
+                }
+            } elseif ($request->request->has('claims_note_form')) {
+                $claimsNoteForm->handleRequest($request);
+                if ($claimsNoteForm->isValid()) {
+                    $dm->flush();
+                    $this->addFlash(
+                        'success',
+                        sprintf('Claim %s updated', $claim->getNumber())
+                    );
+                } else {
+                    $this->addFlash(
+                        'error',
+                        sprintf('Failed to update Claim %s', $claim->getNumber())
+                    );
+                }
+            }
+
+            if ($request->get('_route') == 'admin_claims_form_policy') {
+                return $this->redirectToRoute('admin_policy', ['id' => $claim->getPolicy()->getId()]);
+            } else {
+                return $this->redirectToRoute('admin_claims');
+            }
+        }
+
+        return $this->render('AppBundle:Claims:claimsModalBody.html.twig', [
+            'form' => $claimsForm->createView(),
+            'claim' => $claim,
+            'claim_note_form' => $claimsNoteForm->createView(),
+        ]);
+    }
+
+    /**
      * @Route("/imei-form/{id}", name="imei_form")
      * @Template
      */
@@ -677,6 +758,207 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
 
         return [
             'form' => $imeiForm->createView(),
+            'policy' => $policy,
+        ];
+    }
+    /**
+     * @Route("/detected-imei-form/{id}", name="detected_imei_form")
+     * @Template
+     */
+    public function detectedImeiFormAction(Request $request, $id = null)
+    {
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(PhonePolicy::class);
+        /** @var PhonePolicy $policy */
+        $policy = $repo->find($id);
+
+        if (!$policy) {
+            throw $this->createNotFoundException(sprintf('Policy %s not found', $id));
+        }
+
+        $imei = new Imei();
+        $imei->setPolicy($policy);
+        $imei->setImei($policy->getDetectedImei());
+        $imeiForm = $this->get('form.factory')
+            ->createNamedBuilder('imei_form', ImeiType::class, $imei)
+            ->setAction($this->generateUrl(
+                'detected_imei_form',
+                ['id' => $id]
+            ))
+            ->getForm();
+
+        if ('POST' === $request->getMethod()) {
+            if ($request->request->has('imei_form')) {
+                $imeiForm->handleRequest($request);
+                if ($imeiForm->isValid()) {
+                    $policy->setDetectedImei($imei->getImei());
+
+                    $policy->addNoteDetails(
+                        sprintf('Updated detected imei. Additional notes: %s', $imei->getNote()),
+                        $this->getUser()
+                    );
+
+                    $dm->flush();
+                    $this->addFlash(
+                        'success',
+                        sprintf('Policy %s detected imei updated.', $policy->getPolicyNumber())
+                    );
+
+                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
+                }
+            }
+        }
+
+        return [
+            'form' => $imeiForm->createView(),
+            'policy' => $policy,
+        ];
+    }
+
+    /**
+     * @Route("/picsure-form/{id}", name="picsure_form")
+     * @Template
+     */
+    public function picsureFormAction(Request $request, $id = null)
+    {
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(PhonePolicy::class);
+        /** @var PhonePolicy $policy */
+        $policy = $repo->find($id);
+
+        if (!$policy) {
+            throw $this->createNotFoundException(sprintf('Policy %s not found', $id));
+        }
+
+        $picsureForm = $this->get('form.factory')
+            ->createNamedBuilder('picsure_form')
+            ->add('approve', SubmitType::class)
+            ->add('preapprove', SubmitType::class)
+            ->add('invalidate', SubmitType::class)
+            ->add('note', TextareaType::class)
+            ->setAction($this->generateUrl(
+                'picsure_form',
+                ['id' => $id]
+            ))
+            ->getForm();
+
+        if ('POST' === $request->getMethod()) {
+            if ($request->request->has('picsure_form')) {
+                $picsureForm->handleRequest($request);
+                if ($picsureForm->isValid()) {
+                    if ($policy->getPolicyTerms()->isPicSureEnabled() && !$policy->isPicSureValidated()) {
+                        if ($picsureForm->get('approve')->isClicked()) {
+                            $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_APPROVED, $this->getUser());
+                            $policy->setPicSureApprovedDate(\DateTime::createFromFormat('U', time()));
+                        } elseif ($picsureForm->get('preapprove')->isClicked()) {
+                            $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_PREAPPROVED, $this->getUser());
+                            $policy->setPicSureApprovedDate(\DateTime::createFromFormat('U', time()));
+                        } elseif ($picsureForm->get('invalidate')->isClicked()) {
+                            $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_INVALID, $this->getUser());
+                        } else {
+                            throw new \Exception('Unknown button click');
+                        }
+
+                        $policy->addNoteDetails(
+                            $picsureForm->getData()['note'],
+                            $this->getUser()
+                        );
+
+                        $dm->flush();
+                        $this->addFlash(
+                            'success',
+                            sprintf('Set pic-sure to %s', $policy->getPicSureStatus())
+                        );
+                    } else {
+                        $this->addFlash(
+                            'error',
+                            'Policy is not a pic-sure policy or policy is already pic-sure (pre)approved'
+                        );
+                    }
+
+                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
+                }
+            }
+        }
+
+        return [
+            'form' => $picsureForm->createView(),
+            'policy' => $policy
+        ];
+    }
+
+    /**
+     * @Route("/link-claim/{id}", name="link_claim_form")
+     * @Template
+     */
+    public function linkClaimFormAction(Request $request, $id = null)
+    {
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(PhonePolicy::class);
+        /** @var PhonePolicy $policy */
+        $policy = $repo->find($id);
+
+        if (!$policy) {
+            throw $this->createNotFoundException(sprintf('Policy %s not found', $id));
+        }
+
+        $linkClaimform = $this->get('form.factory')
+            ->createNamedBuilder('link_claim_form', LinkClaimType::class)
+            ->setAction($this->generateUrl(
+                'link_claim_form',
+                ['id' => $id]
+            ))
+            ->getForm();
+
+        if ('POST' === $request->getMethod()) {
+            if ($request->request->has('link_claim_form')) {
+                $linkClaimform->handleRequest($request);
+                if ($linkClaimform->isValid()) {
+                    /** @var ClaimRepository $repo */
+                    $repo = $dm->getRepository(Claim::class);
+
+                    $claim = $repo->findClaimByDetails(
+                        $linkClaimform->get('id')->getData(),
+                        $linkClaimform->get('number')->getData()
+                    );
+
+                    if (!$claim) {
+                        $this->addFlash(
+                            'error',
+                            sprintf('No claim matched')
+                        );
+
+                        return $this->redirectToRoute('admin_policy', ['id' => $id]);
+                    }
+
+                    $policy->addLinkedClaim($claim);
+                    $policy->addNoteDetails(
+                        sprintf(
+                            'Linked Claim %s. Notes: %s',
+                            $linkClaimform->get('number')->getData(),
+                            $linkClaimform->get('note')->getData()
+                        ),
+                        $this->getUser()
+                    );
+
+                    $dm->flush();
+
+                    $this->addFlash(
+                        'success',
+                        sprintf(
+                            'Policy %s successfully linked with claim: %s',
+                            $policy->getPolicyNumber(),
+                            $linkClaimform->get('number')->getData()
+                        )
+                    );
+
+                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
+                }
+            }
+        }
+
+        return [
+            'form' => $linkClaimform->createView(),
             'policy' => $policy,
         ];
     }
@@ -784,11 +1066,6 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         $debtForm = $this->get('form.factory')
             ->createNamedBuilder('debt_form')->add('debt', SubmitType::class)
             ->getForm();
-        $picsureForm = $this->get('form.factory')
-            ->createNamedBuilder('picsure_form')
-            ->add('approve', SubmitType::class)
-            ->add('preapprove', SubmitType::class)
-            ->getForm();
         $swapPaymentPlanForm = $this->get('form.factory')
             ->createNamedBuilder('swap_payment_plan_form')->add('swap', SubmitType::class)
             ->getForm();
@@ -890,7 +1167,10 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             } elseif ($request->request->has('note_form')) {
                 $noteForm->handleRequest($request);
                 if ($noteForm->isValid()) {
-                    $policy->addNoteDetails($noteForm->getData()['notes'], $this->getUser());
+                    $policy->addNoteDetails(
+                        $this->conformAlphanumericSpaceDot($noteForm->getData()['notes'], 2500),
+                        $this->getUser()
+                    );
                     $dm->flush();
                     $this->addFlash(
                         'success',
@@ -1180,9 +1460,9 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                             'bcc@so-sure.com'
                         );
 
-                        $mailer->sendTemplate(
+                        $mailer->sendTemplateToUser(
                             $customerSubject,
-                            $policy->getUser()->getEmail(),
+                            $policy->getUser(),
                             'AppBundle:Email:policy/debtCollectionCustomer.html.twig',
                             ['policy' => $policy],
                             'AppBundle:Email:policy/debtCollectionCustomer.txt.twig',
@@ -1194,32 +1474,6 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                         $this->addFlash(
                             'success',
                             sprintf('Emailed debt collector and set flag on policy')
-                        );
-                    }
-
-                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
-                }
-            } elseif ($request->request->has('picsure_form')) {
-                $picsureForm->handleRequest($request);
-                if ($picsureForm->isValid()) {
-                    if ($policy->getPolicyTerms()->isPicSureEnabled() && !$policy->isPicSureValidated()) {
-                        if ($picsureForm->get('approve')->isClicked()) {
-                            $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_APPROVED, $this->getUser());
-                        } elseif ($picsureForm->get('preapprove')->isClicked()) {
-                            $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_PREAPPROVED, $this->getUser());
-                        } else {
-                            throw new \Exception('Unknown button click');
-                        }
-                        $policy->setPicSureApprovedDate(\DateTime::createFromFormat('U', time()));
-                        $dm->flush();
-                        $this->addFlash(
-                            'success',
-                            sprintf('Set pic-sure to %s', $policy->getPicSureStatus())
-                        );
-                    } else {
-                        $this->addFlash(
-                            'error',
-                            'Policy is not a pic-sure policy or policy is already pic-sure (pre)approved'
                         );
                     }
 
@@ -1399,7 +1653,6 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             'makemodel_form' => $makeModelForm->createView(),
             'chargebacks_form' => $chargebacksForm->createView(),
             'debt_form' => $debtForm->createView(),
-            'picsure_form' => $picsureForm->createView(),
             'swap_payment_plan_form' => $swapPaymentPlanForm->createView(),
             'pay_policy_form' => $payPolicyForm->createView(),
             'cancel_direct_debit_form' => $cancelDirectDebitForm->createView(),
@@ -2079,23 +2332,64 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
      */
     public function detectedImeiAction()
     {
-        $redis = $this->get('snc_redis.default');
+        $redis = $this->get("snc_redis.default");
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(PhonePolicy::class);
+
         /*
-                $redis->lpush('DETECTED-IMEI', json_encode([
-                    'detected_imei' => 'a123',
-                    'suggested_imei' => 'a456',
-                    'bucket' => 'a',
-                    'key' => 'key',
-                ]));
-        */
-        $imeis = [];
-        if ($imei = $redis->lpop('DETECTED-IMEI')) {
-            $imeis[] = json_decode($imei, true);
-            $redis->lpush('DETECTED-IMEI', $imei);
+        $debug = false;
+        if ($debug) {
+            $policy = $repo->findOneBy(['imei' => ['$ne' => null]]);
+            $redis->lpush('DETECTED-IMEI', json_encode([
+                'detected_imei' => $policy->getImei(),
+                'suggested_imei' => 'a456',
+                'bucket' => 'a',
+                'key' => 'key',
+            ]));
         }
+        */
+
+        $storedImeis = $redis->lrange("DETECTED-IMEI", 0, -1);
+        $imeis = [];
+        foreach ($storedImeis as $storedImei) {
+            $imei = json_decode($storedImei, true);
+            $imei['actualPolicy'] = $repo->findOneBy(['imei' => $imei['detected_imei']]);
+            $imei['detectedPolicy'] = $repo->findOneBy(['detectedImei' => $imei['detected_imei']]);
+            if (mb_strlen($imei['suggested_imei']) > 0) {
+                $imei['suggestedPolicy'] = $repo->findOneBy(['imei' => $imei['suggested_imei']]);
+            } else {
+                $imei['suggestedPolicy'] = null;
+            }
+            $imei['raw'] = $storedImei;
+            $imeis[] = $imei;
+        }
+
         return [
-            'imeis' => $imeis,
+            "imeis" => $imeis
         ];
+    }
+
+    /**
+     * @Route("/detected-imei/delete", name="admin_delete_detected_imei")
+     * @Template
+     * @Method("POST")
+     */
+    public function deleteDetectedImeiAction(Request $request)
+    {
+        $item = $request->request->get("item");
+        /** @var Client $redis */
+        $redis = $this->get("snc_redis.default");
+        if ($redis->lrem('DETECTED-IMEI', 1, $item)) {
+            $this->addFlash('success', sprintf(
+                sprintf('Removed %s', $item)
+            ));
+        } else {
+            $this->addFlash('error', sprintf(
+                sprintf('Failed to remove %s', $item)
+            ));
+        }
+
+        return new RedirectResponse($this->generateUrl('admin_detected_imei'));
     }
 
     private function getConnectionData()
@@ -2250,6 +2544,54 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
     }
 
     /**
+     * @Route("/tastecard-form/{id}", name="tastecard_form")
+     * @Template
+     */
+    public function tasteCardFormAction(Request $request, $id)
+    {
+        $tasteCardForm = $this->get("form.factory")
+            ->createNamedBuilder("tastecard_form")
+            ->add("number", TextType::class)
+            ->add("update", SubmitType::class)
+            ->add("resend", SubmitType::class)
+            ->setAction($this->generateUrl(
+                'tastecard_form',
+                ['id' => $id]
+            ))
+            ->getForm();
+        $dm = $this->getManager();
+        $policyRepository = $dm->getRepository(Policy::class);
+        $policy = $policyRepository->find($id);
+        if ('POST' === $request->getMethod()) {
+            if ($request->request->has("tastecard_form")) {
+                $tasteCardForm->handleRequest($request);
+                if ($tasteCardForm->isValid()) {
+                    $policyService = $this->get("app.policy");
+                    if ($tasteCardForm->getClickedButton()->getName() === "update") {
+                        $tasteCard = $this->conformAlphanumeric($tasteCardForm->get("number")->getData(), 10, 10);
+                        if ($tasteCard) {
+                            $policy->setTasteCard($tasteCard);
+                            $dm->flush();
+                            $policyService->tasteCardEmail($policy);
+                            $this->addFlash("success", "Tastecard set to {$tasteCard}.");
+                        } else {
+                            $this->addFlash("error", "Tastecard number must be 10 alphanumeric characters.");
+                        }
+                    } elseif ($tasteCardForm->getClickedButton()->getName() === "resend" && $policy->getTasteCard()) {
+                        $policyService->tasteCardEmail($policy);
+                        $this->addFlash('success', 'Tastecard notification has been resent.');
+                    }
+                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
+                }
+            }
+        }
+        return [
+            "form" => $tasteCardForm->createView(),
+            "policy" => $policy
+        ];
+    }
+
+    /**
      * @Route("/company", name="admin_company")
      * @Template
      */
@@ -2386,6 +2728,37 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                     sprintf('attachment; filename="so-sure-policy-breakdown-%s.pdf"', $now->format('Y-m-d'))
             )
         );
+    }
+
+    /**
+     * @Route("/phone/{id}/details", name="admin_phone_details")
+     * @Method({"POST"})
+     */
+    public function phoneDetailsAction(Request $request, $id)
+    {
+        if (!$this->isCsrfTokenValid('default', $request->get('token'))) {
+            throw new \InvalidArgumentException('Invalid csrf token');
+        }
+
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(Phone::class);
+        $editPhone = $repo->find($id);
+        if ($editPhone) {
+            $phones = $repo->findBy(['make' => $editPhone->getMake(), 'model' => $editPhone->getModel()]);
+            foreach ($phones as $phone) {
+                /** @var Phone $phone */
+                $phone->setDescription($request->get('description'));
+                $phone->setFunFacts($request->get('fun-facts'));
+                $phone->setCanonicalPath($request->get('canonical-path'));
+            }
+            $dm->flush();
+            $this->addFlash(
+                'success',
+                'Your changes were saved!'
+            );
+        }
+
+        return new RedirectResponse($this->generateUrl('admin_phones'));
     }
 
     /**
@@ -2526,9 +2899,9 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_APPROVED, $this->getUser());
             $dm->flush();
             $mailer = $this->get('app.mailer');
-            $mailer->sendTemplate(
+            $mailer->sendTemplateToUser(
                 'pic-sure is successfully validated',
-                $policy->getUser()->getEmail(),
+                $policy->getUser(),
                 'AppBundle:Email:picsure/accepted.html.twig',
                 ['policy' => $policy],
                 'AppBundle:Email:picsure/accepted.txt.twig',
@@ -2561,9 +2934,9 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_REJECTED, $this->getUser());
             $dm->flush();
             $mailer = $this->get('app.mailer');
-            $mailer->sendTemplate(
+            $mailer->sendTemplateToUser(
                 'pic-sure failed to validate your phone',
-                $policy->getUser()->getEmail(),
+                $policy->getUser(),
                 'AppBundle:Email:picsure/rejected.html.twig',
                 ['policy' => $policy],
                 'AppBundle:Email:picsure/rejected.txt.twig',
@@ -2608,9 +2981,9 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_INVALID, $this->getUser());
             $dm->flush();
             $mailer = $this->get('app.mailer');
-            $mailer->sendTemplate(
+            $mailer->sendTemplateToUser(
                 'Sorry, we need another pic-sure',
-                $policy->getUser()->getEmail(),
+                $policy->getUser(),
                 'AppBundle:Email:picsure/invalid.html.twig',
                 ['policy' => $policy, 'additional_message' => $request->get('message')],
                 'AppBundle:Email:picsure/invalid.txt.twig',
@@ -2687,19 +3060,28 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
      */
     public function affiliateAction(Request $request)
     {
-
-        $time_range = [
+        $timeRanges = [
+            14 => 14,
             30 => 30,
             60 => 60,
             90 => 90
         ];
-
-        $lead_sources = [
+        $renewalTimeRanges = [
+            0 => 0,
+            14 => 14,
+            30 => 30,
+            60 => 60,
+            90 => 90
+        ];
+        $leadSources = [
             'invitation' => 'invitation',
             'scode' => 'scode',
             'affiliate' => 'affiliate'
         ];
-
+        $chargeModels = [
+            "One off Charges" => AffiliateCompany::MODEL_ONE_OFF,
+            "Ongoing Charges" => AffiliateCompany::MODEL_ONGOING
+        ];
         $companyForm = $this->get('form.factory')
             ->createNamedBuilder('companyForm')
             ->add('name', TextType::class)
@@ -2708,19 +3090,19 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             ->add('address3', TextType::class, ['required' => false])
             ->add('city', TextType::class)
             ->add('postcode', TextType::class)
+            ->add('chargeModel', ChoiceType::class, ['required' => true, 'choices' => $chargeModels])
             ->add('cpa', NumberType::class, ['constraints' => [new Assert\Range(['min' => 0, 'max' => 20])]])
-            ->add('days', ChoiceType::class, ['required' => true, 'choices' => $time_range])
+            ->add('days', ChoiceType::class, ['required' => true, 'choices' => $timeRanges])
+            ->add('renewalDays', ChoiceType::class, ['choices' => $renewalTimeRanges])
             ->add('campaignSource', TextType::class, ['required' => false])
-            ->add('leadSource', ChoiceType::class, ['required' => false, 'choices' => $lead_sources])
+            ->add('leadSource', ChoiceType::class, ['required' => false, 'choices' => $leadSources])
             ->add('leadSourceDetails', TextType::class, ['required' => false ])
             ->add('next', SubmitType::class)
             ->getForm();
-
         $dm = $this->getManager();
         $companyRepo = $dm->getRepository(AffiliateCompany::class);
         $userRepo = $dm->getRepository(User::class);
         $companies = $companyRepo->findAll();
-
         try {
             if ('POST' === $request->getMethod()) {
                 if ($request->request->has('companyForm')) {
@@ -2741,6 +3123,10 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                         }
                         $company->setAddress($address);
                         $company->setDays($this->getDataString($companyForm->getData(), 'days'));
+                        $company->setChargeModel($this->getDataString($companyForm->getData(), 'chargeModel'));
+                        if ($company->getChargeModel() == AffiliateCompany::MODEL_ONGOING) {
+                            $company->setRenewalDays($this->getDataString($companyForm->getData(), 'renewalDays'));
+                        }
                         $company->setCampaignSource($this->getDataString($companyForm->getData(), 'campaignSource'));
                         $company->setLeadSource($this->getDataString($companyForm->getData(), 'leadSource'));
                         $company->setLeadSourceDetails(
@@ -2750,7 +3136,6 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                         $dm->persist($company);
                         $dm->flush();
                         $this->addFlash('success', 'Added affiliate');
-
                         return new RedirectResponse($this->generateUrl('admin_affiliate'));
                     } else {
                         throw new \InvalidArgumentException(sprintf(
@@ -2763,7 +3148,6 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         } catch (\InvalidArgumentException $e) {
             $this->addFlash('error', $e->getMessage());
         }
-
         return [
             'companies' => $companies,
             'companyForm' => $companyForm->createView(),
@@ -2811,7 +3195,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         if ($affiliate) {
             return [
                 'affiliate' => $affiliate,
-                'pending' => $affiliateService->getMatchingUsers($affiliate, [User::AQUISITION_PENDING])
+                'pending' => $affiliateService->getMatchingUsers($affiliate)
             ];
         } else {
             return ['error' => 'Invalid URL, given ID does not correspond to an affiliate.'];
@@ -2831,7 +3215,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         if ($affiliate) {
             return [
                 'affiliate' => $affiliate,
-                'potential' => $affiliateService->getMatchingUsers($affiliate, [User::AQUISITION_POTENTIAL])
+                'potential' => $affiliateService->getMatchingUsers($affiliate, null, [User::AQUISITION_POTENTIAL])
             ];
         } else {
             return ['error' => 'Invalid URL, given ID does not correspond to an affiliate.'];
@@ -2851,7 +3235,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         if ($affiliate) {
             return [
                 'affiliate' => $affiliate,
-                'lost' => $affiliateService->getMatchingUsers($affiliate, [User::AQUISITION_LOST])
+                'lost' => $affiliateService->getMatchingUsers($affiliate, null, [User::AQUISITION_LOST])
             ];
         } else {
             return ['error' => 'Invalid URL, given ID does not correspond to an affiliate.'];

@@ -22,28 +22,24 @@
             {# TODO: Controls area #}
             <div class="card card-page-filter mb-5">
                 <div class="card-body">
-                     {{ form_start(picsure_search_form, {'attr': {'class': 'form-inline'}}) }}
-                        <div class="form-group">
-                            <label class="mr-md-2">Type: </label>
-                            {{ form_widget(picsure_search_form.status, {'attr': {'class': 'form-control'}}) }}
-                        </div>
-                        <div class="form-group">
-                            {{ form_widget(picsure_search_form.search, {'attr':{'class':'btn btn-success btn-square ml-md-2'}}) }}
-                        </div>
-                     {{ form_end(picsure_search_form) }}
+                    {{ form_start(picsure_search_form, {'attr': {'class': 'form-inline'}}) }}
+                        <label class="mr-md-2">Type: </label>
+                        {{ form_widget(picsure_search_form.status, {'attr': {'class': 'form-control'}}) }}
+                        {{ form_widget(picsure_search_form.search, {'attr':{'class':'btn btn-success btn-square btn-block-xs mt-2 mt-md-0 ml-md-2'}}) }}
+                    {{ form_end(picsure_search_form) }}
                 </div>
             </div>
             {% if policies|length == 0 %}
                 <p class="mb-5">No records found</p>
             {% else %}
                 <div class="table-responsive-sm">
-                    <table class="table">
+                    <table class="table table-striped">
                         <thead class="thead-light">
                             <tr>
-                                <th width="25%">User</th>
-                                <th width="25%">Status</th>
-                                <th width="25%">Submitted</th>
-                                <th width="25%">Actions</th>
+                                <th width="30%">User</th>
+                                <th width="10%">Status</th>
+                                <th width="30%">Submitted</th>
+                                <th width="30%">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -51,64 +47,76 @@
                                 {# TODO: Set table row colour based of ML score eventually #}
                                 <tr>
                                     {# Policy #}
-                                    <td><a href="{{ path('admin_policy', {'id': policy.id}) }}">{{ policy.policyNumber }}</a></td>
+                                    <td width="30%"><a href="{{ path('admin_policy', {'id': policy.id}) }}">{{ policy.policyNumber }}</a></td>
                                     {# Fraud Check #}
-                                    <td>
+                                    <td width="10%">
                                         {% if policy.picSureCircumvention is null %}
-                                            <i class="fal fa-clock"></i> Pre anti-fraud check
+                                            <i class="fal fa-clock fa-lg" title="Pre anti-fraud check" data-toggle="tooltip" data-placement="top"></i>
                                         {% elseif policy.picSureCircumvention == true %}
-                                            <i class="fal fa-exclamation-triangle"></i> Possible Fraud <br><small>i.e. too many attempts to do pic-sure and imei upload was too long, check events in mixpanel</small>
+                                            <i class="fal fa-exclamation-triangle fa-lg" title="Possible Fraud i.e. too many attempts to do pic-sure and imei upload was too long, check events in mixpanel" data-toggle="tooltip" data-placement="top"></i>
                                         {% elseif policy.picSureCircumvention == false %}
-                                            <i class="fal fa-thumbs-up"></i> No Fraud Detected
+                                            <i class="fal fa-thumbs-up fa-lg" title="No Fraud Detected" data-toggle="tooltip" data-placement="top"></i>
                                         {% endif %}
                                     </td>
                                     {# Submitted image(s) #}
-                                    <td>
+                                    <td width="30%">
                                         {% for file in policy.getPolicyPicSureFiles %}
-                                            {% if policy.picSureStatus == 'manual' %}
-                                                <a href="{{ path('admin_picsure_image', {'file': file.key }) }}"
-                                                   class="no-style"
-                                                   data-fancybox="{{ policy.policyNumber }}"
-                                                   data-caption="
-                                                    {% if 'picsure-status' in file.getMetadata()|keys %}
-                                                        {% if 'picsure-ml-status' in file.getMetadata()|keys and 'picsure-ml-confidence' in file.getMetadata()|keys %}
-                                                            {{ file.getMetadata()['picsure-ml-status']|capitalize }} with confidence {{ file.getMetadata()['picsure-ml-confidence']*100.0|number_format(2, '.', ',') }}&percnt;
-                                                        {% else %}
-                                                            {% if 'undamaged' in file.getMetadata()['picsure-ml-score']|keys %}
-                                                                undamaged ({{ (file.getMetadata()['picsure-ml-score']['undamaged']*100.0)|number_format(0, '.', ',') }}&percnt;)
-                                                            {% endif %}
+                                            <a href="{{ path('admin_picsure_image', {'file': file.key }) }}"
+                                               class="no-style"
+                                               data-fancybox="{{ policy.policyNumber }}"
+                                               data-caption="
+                                                {% if 'picsure-status' in file.getMetadata()|keys %}
+                                                    {% if 'picsure-ml-status' in file.getMetadata()|keys and 'picsure-ml-confidence' in file.getMetadata()|keys %}
+                                                        {{ file.getMetadata()['picsure-ml-status']|capitalize }} with confidence {{ file.getMetadata()['picsure-ml-confidence']*100.0|number_format(2, '.', ',') }}&percnt;
+                                                    {% else %}
+                                                        {% if 'undamaged' in file.getMetadata()['picsure-ml-score']|keys %}
+                                                            undamaged ({{ (file.getMetadata()['picsure-ml-score']['undamaged']*100.0)|number_format(0, '.', ',') }}&percnt;)
+                                                        {% endif %}
 
-                                                            {% if 'invalid' in file.getMetadata()['picsure-ml-score']|keys %}
-                                                                invalid ({{ (file.getMetadata()['picsure-ml-score']['invalid']*100.0)|number_format(0, '.', ',') }}&percnt;)
-                                                            {% endif %}
+                                                        {% if 'invalid' in file.getMetadata()['picsure-ml-score']|keys %}
+                                                            invalid ({{ (file.getMetadata()['picsure-ml-score']['invalid']*100.0)|number_format(0, '.', ',') }}&percnt;)
+                                                        {% endif %}
 
-                                                            {% if 'damaged' in file.getMetadata()['picsure-ml-score']|keys %}
-                                                                damaged ({{ (file.getMetadata()['picsure-ml-score']['damaged']*100.0)|number_format(0, '.', ',') }}&percnt;)
-                                                            {% endif %}
+                                                        {% if 'damaged' in file.getMetadata()['picsure-ml-score']|keys %}
+                                                            damaged ({{ (file.getMetadata()['picsure-ml-score']['damaged']*100.0)|number_format(0, '.', ',') }}&percnt;)
                                                         {% endif %}
                                                     {% endif %}
-                                                   ">
-                                                    <img src="{{ path('admin_picsure_image', {'file': file.key }) }}" width="40px" height="40px">
-                                                </a>
-                                            {% endif %}
+                                                {% endif %}
+                                               ">
+                                                <img src="{{ path('admin_picsure_image', {'file': file.key }) }}" width="40px" height="40px" class="mb-1">
+                                            </a>
                                         {% endfor %}
                                     </td>
-                                    <td>
+                                    <td width="30%">
                                         {% if policy.picSureStatus == 'manual' %}
-                                            <a class="btn btn-success btn-square btn-sm mr-2"
-                                               href="{{ path('admin_picsure_approve', {'id': policy.id}) }}">Approve</a>
+                                            <a href="{{ path('admin_picsure_approve', {'id': policy.id}) }}"
+                                               class="btn btn-success btn-square btn-sm mb-1 mr-md-2"
+                                               title="Approve pic-sure"
+                                               >
+                                               <i class="far fa-check fa-lg fa-fw"></i>
+                                               <span class="sr-only">Approve</span></a>
                                             <a href="#"
-                                               class="btn btn-warning btn-square btn-sm mr-2"
+                                               class="btn btn-warning btn-square btn-sm mb-1 mr-md-2"
+                                               title="Invalidate pic-sure"
                                                data-toggle="modal"
                                                data-target="#invalid_modal"
                                                data-policy-number="{{ policy.policyNumber }}"
-                                               data-submit="{{ path('admin_picsure_invalid', {'id': policy.id}) }}">Invalid</a>
-                                            <a class="btn btn-danger  btn-square btn-sm"
-                                               href="{{ path('admin_picsure_reject', {'id': policy.id}) }}">Damaged</a>
+                                               data-submit="{{ path('admin_picsure_invalid', {'id': policy.id}) }}">
+                                               <i class="far fa-exclamation-triangle fa-lg fa-fw"></i>
+                                               <span class="sr-only">Invalid</span></a>
+                                            <a href="{{ path('admin_picsure_reject', {'id': policy.id}) }}"
+                                               class="btn btn-danger btn-square btn-sm mb-1 mr-md-2"
+                                               title="Reject Damaged pic-sure"
+                                               >
+                                               <i class="far fa-times fa-lg fa-fw"></i>
+                                               <span class="sr-only">Damaged</span></a>
+                                        {% else %}
+                                            <span>-</span>
                                         {% endif %}
                                         {% for file in policy.getPolicyPicSureFiles %}
                                             {% if 'picsure-ml-score' in file.getMetadata()|keys %}
-                                                <a class="btn btn-default-outline btn-square" href="{{ path('admin_picsure_ml_predict', {'id': file.getId()}) }}"><i class="fal fa-sync-alt"></i> <span class="sr-only">Re-run ml</span></a>
+                                                {# TODO: Re-run should only appear for latest pic-sure submitted #}
+                                                {# <a class="btn btn-outline-primary btn-square mb-1 btn-sm" href="{{ path('admin_picsure_ml_predict', {'id': file.getId()}) }}"><i class="fal fa-sync-alt"></i> <span class="sr-only">Re-run ml</span></a> #}
                                             {% endif %}
                                         {% endfor %}
                                     </td>
@@ -147,6 +155,7 @@
                         <div class="form-group">
                             <label for="message">Choose feedback:</label>
                             <select id="invalid_picsure_options" class="form-control">
+                                <option value="">Please choose...</option>
                                 <option value="Keep screen edge clear of fingers for validation">Keep screen edge clear of fingers for validation</option>
                                 <option value="Phone to far from mirror for validation">Phone to far from mirror for validation</option>
                                 <option value="Do you have a screen protector on? Please remove for validation">Do you have a screen protector on? Please remove for validation</option>

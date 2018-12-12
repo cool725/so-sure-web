@@ -125,7 +125,7 @@ class DefaultController extends BaseController
      */
     public function freeTasteCard()
     {
-        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE);
+        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE, ['page' => 'tastecard']);
 
         $pageType = 'tastecard';
 
@@ -144,7 +144,7 @@ class DefaultController extends BaseController
      */
     public function freePhoneCase()
     {
-        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE);
+        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE, ['page' => 'freephonecase']);
 
         $pageType = 'phonecase';
 
@@ -162,6 +162,8 @@ class DefaultController extends BaseController
      */
     public function moneyLanding()
     {
+        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE, ['page' => 'money']);
+
         return $this->render('AppBundle:Default:indexMoney.html.twig');
     }
 
@@ -171,6 +173,8 @@ class DefaultController extends BaseController
      */
     public function starlingLanding(Request $request)
     {
+        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE, ['page' => 'starling']);
+
         $this->starlingOAuthSession($request);
 
         return $this->render('AppBundle:Default:indexStarlingBank.html.twig');
@@ -181,7 +185,45 @@ class DefaultController extends BaseController
      */
     public function socialInsurance()
     {
+        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE, ['page' => 'social-insurance']);
         return $this->render('AppBundle:Default:socialInsurance.html.twig');
+    }
+
+    /**
+     * @Route("/topcashback", name="topcashback")
+     * @Route("/vouchercodes", name="vouchercodes")
+     * @Route("/quidco", name="quidco")
+     * @Route("/ivip", name="ivip")
+     */
+    public function affiliateLanding(Request $request)
+    {
+        $page = null;
+        $affiliate = null;
+
+        if ($request->get('_route') == 'topcashback') {
+            $page = 'topcashback';
+            $affiliate = 'TopCashback';
+        } elseif ($request->get('_route') == 'vouchercodes') {
+            $page = 'vouchercodes';
+            $affiliate = 'VoucherCodes';
+        } elseif ($request->get('_route') == 'quidco') {
+            $page = 'quidco';
+            $affiliate = 'Quidco';
+        } elseif ($request->get('_route') == 'ivip') {
+            $page = 'ivip';
+            $affiliate = 'iVIP';
+        }
+
+        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE, [
+            'page' => $page
+        ]);
+
+        $data = [
+            'affiliate_company' => $affiliate,
+            'affiliate_page' => $page,
+        ];
+
+        return $this->render('AppBundle:Default:indexAffiliate.html.twig', $data);
     }
 
     /**
@@ -641,8 +683,10 @@ class DefaultController extends BaseController
     {
         /** @var User $user */
         $user = $this->getUser();
+
         // causes admin's (or claims) too much confusion to be redirected to a 404
-        if ($user && !$user->hasEmployeeRole() && !$user->hasClaimsRole()) {
+        if ($user && !$user->hasEmployeeRole() && !$user->hasClaimsRole()
+            && ($user->hasActivePolicy() || $user->hasUnpaidPolicy())) {
             return $this->redirectToRoute('user_claim');
         }
 

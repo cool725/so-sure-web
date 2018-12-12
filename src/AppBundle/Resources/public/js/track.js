@@ -12,8 +12,13 @@ sosure.track = (function() {
         $.get(url, callback);
     }
 
-    self.byInvite = function (name, callback) {
-        var url = '/ops/track/invite/' + name;
+    self.byInvite = function (name, location, callback) {
+        var url = '/ops/track/invite/' + name + '/' + location;
+        $.get(url, callback);
+    }
+
+    self.byScodeCopied = function (location, callback) {
+        var url = '/ops/track/scodecopied/' + location;
         $.get(url, callback);
     }
 
@@ -28,9 +33,9 @@ $(function(){
     $('.sosure-track').on('click', function(event) {
         event.preventDefault();
         var name = $(this).data('event');
-        var url = $(this).data('event-url'); 
+        var url = $(this).data('event-url');
         sosure.track.byName(name, function() {
-            if (url) {   
+            if (url) {
                 window.location = url;
             }
         });

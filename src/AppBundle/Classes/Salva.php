@@ -65,6 +65,7 @@ class Salva
         '59ee52cb7a3db4298324d7b1', // not fully paid policy; logic is slightly off, but ignore policy for now
         '59ef69bb7a3db40bfd2a7a67', // not fully paid policy; logic is slightly off, but ignore policy for now
         '5a5770754ea92e22451bbef7', // not fully paid policy; logic is slightly off, but ignore policy for now
+        '5bc30ac971f06f50e106e225', // full refund as duplicate policies purchased
     ];
 
     public function sumBrokerFee($months, $includeFinalCommission)

@@ -227,7 +227,7 @@ class PhonePolicy extends Policy
         return $this->makeModelValidatedStatus;
     }
 
-    public function setPhone(Phone $phone, \DateTime $date = null)
+    public function setPhone(Phone $phone, \DateTime $date = null, $validateExcess = true)
     {
         $this->phone = $phone;
         if (!$phone->getCurrentPhonePrice()) {
@@ -243,6 +243,30 @@ class PhonePolicy extends Policy
             /** @var PhonePrice $price */
             $price = $phone->getCurrentPhonePrice($date);
             $this->setPremium($price->createPremium($additionalPremium, $date));
+            // in the normal flow we should have policy terms before setting the phone
+            // however, many test cases do not have it
+            if ($this->getPolicyTerms() && $validateExcess) {
+                $this->validateAllowedExcess();
+            }
+        }
+    }
+
+    public function validateAllowedExcess()
+    {
+        parent::validateAllowedExcess();
+
+        /** @var PhonePremium $phonePremium */
+        $phonePremium = $this->getPremium();
+        if (!$phonePremium || !$phonePremium->getPicSureExcess()) {
+            return;
+        }
+
+        if ($this->getPolicyTerms()->isPicSureEnabled() &&
+            !$this->getPolicyTerms()->isAllowedPicSureExcess($phonePremium->getPicSureExcess())) {
+            throw new \Exception(sprintf(
+                'Unable to set phone for policy %s as pic-sure excess values do not match policy terms.',
+                $this->getId()
+            ));
         }
     }
 
@@ -768,6 +792,13 @@ class PhonePolicy extends Policy
                 $picsureFiles[0]->addMetadata('picsure-status-user-id', $user->getId());
             }
         }
+
+        foreach ($this->getClaims() as $claim) {
+            /** @var Claim $claim */
+            if (!$claim->isClosed(true)) {
+                $claim->setExpectedExcess($this->getCurrentExcess());
+            }
+        }
     }
 
     public function isPicSureValidated()
@@ -848,6 +879,21 @@ class PhonePolicy extends Policy
     public function getExcessValue($type)
     {
         return Claim::getExcessValue($type, $this->isPicSureValidated(), $this->isPicSurePolicy());
+    }
+
+    public function getCurrentExcess()
+    {
+        /** @var PhonePremium $phonePremium */
+        $phonePremium = $this->getPremium();
+        if (!$phonePremium) {
+            return null;
+        }
+
+        if ($this->isPicSureValidated()) {
+            return $phonePremium->getPicSureExcess();
+        } else {
+            return $phonePremium->getExcess();
+        }
     }
 
     public function toApiArray()

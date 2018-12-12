@@ -1,0 +1,24 @@
+
+Did you know your card is due to expire?
+
+{% if policy.user.paymentMethod.cardType is defined %}
+    Your card ending {{ policy.user.paymentMethod.cardLastFour }} will expire on {{ policy.user.paymentMethod.getCardEndDateAsDate | date('m/y', 'Europe/London') }}.
+{% endif %}
+
+Please update your payment details by clicking the link below.
+
+Update my payment details: {{ branch_card_url }}
+
+Have a question or issue? contact us: {{ contact_us_url }}
+
+============================================================
+** (http://www.twitter.com/wearesosure)
+** (https://www.facebook.com/wearesosure)
+** (http://wearesosure.com)
+** (http://blog.wearesosure.com)
+** (mailto:hello@wearesosure.com)
+
+Copyright {{ 'now'|date('Y') }} so-sure Limited, All rights reserved.
+
+Our mailing address is:
+so-sure, Martin House, 5 Martin Lane, London EC4R 0DP, United Kingdom

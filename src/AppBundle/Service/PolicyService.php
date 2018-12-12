@@ -1021,7 +1021,6 @@ class PolicyService
         }
         $policy->cancel($reason, $date);
         $this->dm->flush();
-
         $this->cancelledPolicyEmail($policy);
         $this->cancelledPolicySms($policy);
         if (count($policy->getConnections()) > 0 && $reason == Policy::CANCELLED_UPGRADE) {
@@ -1095,9 +1094,9 @@ class PolicyService
         }
 
         try {
-            $this->mailer->sendTemplate(
+            $this->mailer->sendTemplateToUser(
                 sprintf('Your so-sure policy %s', $policy->getPolicyNumber()),
-                $policy->getUser()->getEmail(),
+                $policy->getUser(),
                 sprintf('%s.html.twig', $baseTemplate),
                 ['policy' => $policy],
                 sprintf('%s.txt.twig', $baseTemplate),
@@ -1132,9 +1131,9 @@ class PolicyService
         $htmlTemplate = sprintf("%s.html.twig", $baseTemplate);
         $textTemplate = sprintf("%s.txt.twig", $baseTemplate);
 
-        $this->mailer->sendTemplate(
+        $this->mailer->sendTemplateToUser(
             sprintf('Your so-sure policy %s is now cancelled', $policy->getPolicyNumber()),
-            $policy->getUser()->getEmail(),
+            $policy->getUser(),
             $htmlTemplate,
             ['policy' => $policy],
             $textTemplate,
@@ -1142,6 +1141,29 @@ class PolicyService
             null,
             'bcc@so-sure.com'
         );
+    }
+
+    /**
+     * Sends the owner of given policy an email telling them that they have got a taste card now.
+     * @param Policy $policy is the policy that has now had a taste card added.
+     */
+    public function tasteCardEmail($policy)
+    {
+        if (!$policy->getTasteCard()) {
+            $policyNumber = $policy->getPolicyNumber();
+            $this->logger->error("Trying to notify policy {$policyNumber} of nonexistent tastecard.");
+        } elseif ($this->mailer) {
+            $this->mailer->sendTemplate(
+                "Your new Taste Card from So-Sure",
+                $policy->getUser()->getEmail(),
+                'AppBundle:Email:policy/email_new_taste_card.html.twig',
+                ['policy' => $policy],
+                'AppBundle:Email:policy/email_new_taste_card.txt.twig',
+                ['policy' => $policy],
+                null,
+                'bcc@so-sure.com'
+            );
+        }
     }
 
     /**
@@ -1202,9 +1224,9 @@ class PolicyService
         $policy = $connection->getSourcePolicy();
         // User who caused the reduction
         $causalUser = $connection->getLinkedPolicy()->getUser();
-        $this->mailer->sendTemplate(
+        $this->mailer->sendTemplateToUser(
             sprintf('Important Information about your so-sure Reward Pot'),
-            $policy->getUser()->getEmail(),
+            $policy->getUser(),
             'AppBundle:Email:policy/connectionReduction.html.twig',
             ['connection' => $connection, 'policy' => $policy, 'causalUser' => $causalUser],
             'AppBundle:Email:policy/connectionReduction.txt.twig',
@@ -1239,9 +1261,35 @@ class PolicyService
         $htmlTemplate = sprintf("%s.html.twig", $baseTemplate);
         $textTemplate = sprintf("%s.txt.twig", $baseTemplate);
 
-        $this->mailer->sendTemplate(
+        $this->mailer->sendTemplateToUser(
             $subject,
-            $policy->getUser()->getEmail(),
+            $policy->getUser(),
+            $htmlTemplate,
+            ['policy' => $policy],
+            $textTemplate,
+            ['policy' => $policy],
+            null
+        );
+    }
+
+    /**
+     * @param Policy $policy
+     */
+    public function skippedRenewalEmail(Policy $policy)
+    {
+        if (!$this->mailer) {
+            return;
+        }
+
+        $baseTemplate = sprintf('AppBundle:Email:policy/skippedRenewal');
+        $subject = sprintf('Your so-sure policy %s is unable to be automatically renewed', $policy->getPolicyNumber());
+
+        $htmlTemplate = sprintf("%s.html.twig", $baseTemplate);
+        $textTemplate = sprintf("%s.txt.twig", $baseTemplate);
+
+        $this->mailer->sendTemplateToUser(
+            $subject,
+            $policy->getUser(),
             $htmlTemplate,
             ['policy' => $policy],
             $textTemplate,
@@ -1729,9 +1777,9 @@ class PolicyService
         $textTemplate = sprintf("%s.txt.twig", $baseTemplate);
 
         $subject = sprintf('Important information about your Reward Pot');
-        $this->mailer->sendTemplate(
+        $this->mailer->sendTemplateToUser(
             $subject,
-            $policy->getUser()->getEmail(),
+            $policy->getUser(),
             $htmlTemplate,
             ['policy' => $policy, 'additional_amount' => $additionalAmount],
             $textTemplate,
@@ -1958,9 +2006,9 @@ class PolicyService
             ),
             'start_date' => $this->endOfDay($policy->getEnd()),
         ];
-        $this->mailer->sendTemplate(
+        $this->mailer->sendTemplateToUser(
             $subject,
-            $policy->getUser()->getEmail(),
+            $policy->getUser(),
             $htmlTemplate,
             $data,
             $textTemplate,
@@ -1978,6 +2026,8 @@ class PolicyService
             ));
             $policy->getNextPolicy()->setStatus(Policy::STATUS_UNRENEWED);
             $this->dm->flush();
+
+            $this->skippedRenewalEmail($policy);
 
             return false;
         } else {
@@ -2205,9 +2255,9 @@ class PolicyService
                 ['id' => $cashback->getId()]
             ),
         ];
-        $this->mailer->sendTemplate(
+        $this->mailer->sendTemplateToUser(
             $subject,
-            $cashback->getPolicy()->getUser()->getEmail(),
+            $cashback->getPolicy()->getUser(),
             $htmlTemplate,
             $data,
             $textTemplate,

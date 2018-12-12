@@ -2,11 +2,14 @@
 namespace AppBundle\Service;
 
 use AppBundle\Document\Opt\OptOut;
+use AppBundle\Document\User;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Templating\EngineInterface;
 
 class MailerService
 {
+    use RouterTrait;
+
     const EMAIL_WEEKLY = 'weekly';
 
     /** @var \Swift_Mailer */
@@ -29,10 +32,29 @@ class MailerService
     /** @var string */
     protected $defaultSenderName;
 
+    /** @var MixpanelService */
+    protected $mixpanelService;
+
     public function setMailer($mailer)
     {
         $this->mailer = $mailer;
     }
+
+    /**
+     * An array of campaigns that should trigger an analytics event (e.g. Mixpanel)
+     * @var array
+     */
+    public static $analyticsCampaigns = [
+        'card/cardExpiring',
+        'card/failedPayment-1',
+        'card/failedPayment-2',
+        'card/failedPayment-3',
+        'card/failedPayment-4',
+        'policy/failedPaymentWithClaim-1',
+        'policy/failedPaymentWithClaim-2',
+        'policy/failedPaymentWithClaim-3',
+        'policy/failedPaymentWithClaim-4',
+    ];
 
     /**
      * @param \Swift_Mailer    $mailer
@@ -41,6 +63,7 @@ class MailerService
      * @param RouterService    $routerService
      * @param string           $defaultSenderAddress
      * @param string           $defaultSenderName
+     * @param MixpanelService  $mixpanelService
      */
     public function __construct(
         \Swift_Mailer $mailer,
@@ -48,7 +71,8 @@ class MailerService
         EngineInterface $templating,
         RouterService $routerService,
         $defaultSenderAddress,
-        $defaultSenderName
+        $defaultSenderName,
+        MixpanelService $mixpanelService
     ) {
         $this->mailer = $mailer;
         $this->smtp = $smtp;
@@ -56,6 +80,32 @@ class MailerService
         $this->routerService = $routerService;
         $this->defaultSenderAddress = $defaultSenderAddress;
         $this->defaultSenderName = $defaultSenderName;
+        $this->mixpanelService = $mixpanelService;
+    }
+
+    public function sendTemplateToUser(
+        $subject,
+        User $user,
+        $htmlTemplate,
+        $htmlData,
+        $textTemplate = null,
+        $textData = null,
+        $attachmentFiles = null,
+        $bcc = null,
+        $from = null
+    ) {
+        return $this->sendTemplate(
+            $subject,
+            $user->getEmail(),
+            $htmlTemplate,
+            $htmlData,
+            $textTemplate,
+            $textData,
+            $attachmentFiles,
+            $bcc,
+            $from,
+            $user
+        );
     }
 
     public function sendTemplate(
@@ -67,18 +117,20 @@ class MailerService
         $textData = null,
         $attachmentFiles = null,
         $bcc = null,
-        $from = null
+        $from = null,
+        User $user = null
     ) {
         $this->addUnsubsribeHash($to, $htmlData);
-        // print $subject;
-        // base campaign on template name
-        // AppBundle:Email:quote/priceGuarentee.html.twig
-        $campaign = $htmlTemplate;
-        if (mb_stripos($campaign, ':')) {
-            $campaignItems = explode(':', $campaign);
-            $campaign = $campaignItems[count($campaignItems) - 1];
+
+        $campaign = $this->getCampaign($htmlTemplate);
+
+        if ($user && in_array($campaign, self::$analyticsCampaigns)) {
+            $this->mixpanelService->queueTrackWithUser(
+                $user,
+                MixpanelService::EVENT_EMAIL,
+                ['campaign' => $campaign]
+            );
         }
-        $campaign = explode('.', $campaign)[0];
 
         if ($textTemplate && $textData) {
             $this->addUnsubsribeHash($to, $textData);

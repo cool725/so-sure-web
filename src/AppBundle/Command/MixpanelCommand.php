@@ -40,7 +40,7 @@ class MixpanelCommand extends ContainerAwareCommand
             ->addArgument(
                 'action',
                 InputArgument::OPTIONAL,
-                'delete|delete-old-users|test|clear|show|sync|sync-all|data|attribution|count-users|count-queue (or blank for process)'
+                'delete|delete-old-users|test|clear|show|sync|sync-all|data|attribution|freeze-attribution|count-users|count-queue (or blank for process)'
             )
             // @codingStandardsIgnoreEnd
             ->addOption(
@@ -129,7 +129,11 @@ class MixpanelCommand extends ContainerAwareCommand
             $output->writeln(sprintf('Queued user delete'));
         } elseif ($action == 'delete-old-users') {
             $data = $this->mixpanelService->deleteOldUsers($days);
-            $output->writeln(sprintf("Queued %d users for deletion (of %d)", $data['count'], $data['total']));
+            $output->writeln(sprintf(
+                "Queued %d users for deletion (of %d total users)",
+                $data['count'],
+                $data['total']
+            ));
         } elseif ($action == 'count-users') {
             $total = $this->mixpanelService->getUserCount();
             $output->writeln(sprintf("%d Users", $total));
@@ -145,10 +149,30 @@ class MixpanelCommand extends ContainerAwareCommand
             foreach ($data as $line) {
                 $output->writeln(json_encode(unserialize($line), JSON_PRETTY_PRINT));
             }
+        } elseif ($action == 'freeze-attribution') {
+            $n = $this->freezeAttributions($days);
+            $output->writeln("Queued {$n} users to have blank attribution set.");
         } else {
             $data = $this->mixpanelService->process($process);
             $output->writeln(sprintf("Processed %d Requeued: %d", $data['processed'], $data['requeued']));
         }
+    }
+
+    /**
+     * Finds all the unattributed users who are more than a certain age old and queues them to get an empty attribution.
+     * @param int $days is the number of days old they must be to get an empty attribution.
+     * @return int the number of users who just got queued.
+     */
+    private function freezeAttributions($days)
+    {
+        $end = new \DateTime();
+        $end->sub(new \DateInterval("P{$days}D"));
+        $userRepository = $this->getUserRepository();
+        $users = $userRepository->findUnattributedUsers(null, $end);
+        foreach ($users as $user) {
+            $this->mixpanelService->queueFreezeAttribution($user);
+        }
+        return count($users);
     }
 
     /**

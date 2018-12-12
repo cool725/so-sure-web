@@ -201,9 +201,9 @@ class PaymentService
         $policy->setPolicyStatusActiveIfUnpaid();
         $this->dm->flush();
 
-        $this->mailer->sendTemplate(
+        $this->mailer->sendTemplateToUser(
             sprintf('Your Direct Debit Confirmation'),
-            $policy->getUser()->getEmail(),
+            $policy->getUser(),
             'AppBundle:Email:bacs/notification.html.twig',
             ['user' => $policy->getUser(), 'policy' => $policy],
             'AppBundle:Email:bacs/notification.txt.twig',
