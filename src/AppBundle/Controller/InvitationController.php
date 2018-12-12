@@ -10,6 +10,7 @@ use AppBundle\Document\Invitation\Invitation;
 use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Service\MixpanelService;
+use AppBundle\Service\SixpackService;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -37,10 +38,10 @@ class InvitationController extends BaseController
             if ($invitation->isAccepted()) {
                 $flashType = 'success';
                 $flashMessage = 'This invitation to join so-sure has already been accepted already';
-            } elseif  ($invitation->isRejected()) {
+            } elseif ($invitation->isRejected()) {
                 $flashType = 'error';
                 $flashMessage = 'Hmm, it looks like this invitation to join so-sure has already been declined';
-            } elseif  ($invitation->isCancelled()) {
+            } elseif ($invitation->isCancelled()) {
                 $flashType = 'error';
                 $flashMessage = 'Hmm, it looks like this invitation to join so-sure has already been cancelled';
             } else {
