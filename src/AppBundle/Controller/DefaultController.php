@@ -683,8 +683,10 @@ class DefaultController extends BaseController
     {
         /** @var User $user */
         $user = $this->getUser();
+
         // causes admin's (or claims) too much confusion to be redirected to a 404
-        if ($user && !$user->hasEmployeeRole() && !$user->hasClaimsRole()) {
+        if ($user && !$user->hasEmployeeRole() && !$user->hasClaimsRole()
+            && ($user->hasActivePolicy() || $user->hasUnpaidPolicy())) {
             return $this->redirectToRoute('user_claim');
         }
 
