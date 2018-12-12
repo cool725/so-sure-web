@@ -384,23 +384,45 @@ class AffiliateServiceTest extends WebTestCase
         $this->assertEquals(5, count(static::$affiliateService->generate([$data["affiliate"]], $date)));
         $date = new \DateTime('2019-08-25 05:12');
         $this->assertEquals(
-            -30,
+            335,
             static::$affiliateService->daysToAquisition($data["affiliate"], $data["bango"], $date)
         );
         $this->assertEquals(
-            -30,
+            335,
             static::$affiliateService->daysToAquisition($data["affiliate"], $data["tango"], $date)
         );
         $this->assertEquals(
-            -30,
+            335,
             static::$affiliateService->daysToAquisition($data["affiliate"], $data["hat"], $date)
         );
         $this->assertEquals(
-            -30,
+            335,
             static::$affiliateService->daysToAquisition($data["affiliate"], $data["borb"], $date)
         );
         $this->assertEquals(
-            -30,
+            335,
+            static::$affiliateService->daysToAquisition($data["affiliate"], $data["tonyAbbot"], $date)
+        );
+        // adding an extra day here to the 30 because 2020 is a leap year hell yeah.
+        $date = new \DateTime('2020-08-25 05:12');
+        $this->assertEquals(
+            -31,
+            static::$affiliateService->daysToAquisition($data["affiliate"], $data["bango"], $date)
+        );
+        $this->assertEquals(
+            -31,
+            static::$affiliateService->daysToAquisition($data["affiliate"], $data["tango"], $date)
+        );
+        $this->assertEquals(
+            -31,
+            static::$affiliateService->daysToAquisition($data["affiliate"], $data["hat"], $date)
+        );
+        $this->assertEquals(
+            -31,
+            static::$affiliateService->daysToAquisition($data["affiliate"], $data["borb"], $date)
+        );
+        $this->assertEquals(
+            -31,
             static::$affiliateService->daysToAquisition($data["affiliate"], $data["tonyAbbot"], $date)
         );
     }
