@@ -61,15 +61,20 @@ trait UserClassTrait
 
     public static function generateEmail($name, $caller, $rand = false)
     {
+        return self::generateEmailClass($name, get_class($caller), $rand);
+    }
+
+    public static function generateEmailClass($name, $className, $rand = false)
+    {
         if ($rand) {
             return sprintf(
                 '%s-%d@%s.so-sure.net',
                 $name,
                 random_int(0, 999999),
-                str_replace("\\", ".", get_class($caller))
+                str_replace("\\", ".", $className)
             );
         } else {
-            return sprintf('%s@%s.so-sure.net', $name, str_replace("\\", ".", get_class($caller)));
+            return sprintf('%s@%s.so-sure.net', $name, str_replace("\\", ".", $className));
         }
     }
 
@@ -158,7 +163,7 @@ trait UserClassTrait
 
         return $mobile;
     }
-    
+
     public static function getRandomPhone(\Doctrine\ODM\MongoDB\DocumentManager $dm, $make = null)
     {
         $phoneRepo = $dm->getRepository(Phone::class);
@@ -438,7 +443,7 @@ trait UserClassTrait
         }
         self::addSoSurePayment($policy, $premium, $commission, $date);
     }
-    
+
     public static function addSoSurePayment($policy, $amount, $commission, $date = null)
     {
         $payment = new SoSurePayment();

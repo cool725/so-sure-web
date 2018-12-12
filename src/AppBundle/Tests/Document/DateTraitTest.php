@@ -261,4 +261,13 @@ class DateTraitTest extends \PHPUnit\Framework\TestCase
             $this->getNextBusinessDay(new \DateTime('2018-03-22 00:00'), $now)
         );
     }
+
+    public function testaddDays()
+    {
+        $now = new \DateTime('2018-03-28 00:00');
+        $now = static::addDays($now, 1);
+        $this->assertEquals(new \DateTime('2018-03-29 00:00'), $now);
+        $now = static::addDays($now, 32);
+        $this->assertEquals(new \DateTime('2018-04-30 00:00'), $now);
+    }
 }

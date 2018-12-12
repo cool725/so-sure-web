@@ -2977,19 +2977,28 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
      */
     public function affiliateAction(Request $request)
     {
-
-        $time_range = [
+        $timeRanges = [
+            14 => 14,
             30 => 30,
             60 => 60,
             90 => 90
         ];
-
-        $lead_sources = [
+        $renewalTimeRanges = [
+            0 => 0,
+            14 => 14,
+            30 => 30,
+            60 => 60,
+            90 => 90
+        ];
+        $leadSources = [
             'invitation' => 'invitation',
             'scode' => 'scode',
             'affiliate' => 'affiliate'
         ];
-
+        $chargeModels = [
+            "One off Charges" => AffiliateCompany::MODEL_ONE_OFF,
+            "Ongoing Charges" => AffiliateCompany::MODEL_ONGOING
+        ];
         $companyForm = $this->get('form.factory')
             ->createNamedBuilder('companyForm')
             ->add('name', TextType::class)
@@ -2998,19 +3007,19 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             ->add('address3', TextType::class, ['required' => false])
             ->add('city', TextType::class)
             ->add('postcode', TextType::class)
+            ->add('chargeModel', ChoiceType::class, ['required' => true, 'choices' => $chargeModels])
             ->add('cpa', NumberType::class, ['constraints' => [new Assert\Range(['min' => 0, 'max' => 20])]])
-            ->add('days', ChoiceType::class, ['required' => true, 'choices' => $time_range])
+            ->add('days', ChoiceType::class, ['required' => true, 'choices' => $timeRanges])
+            ->add('renewalDays', ChoiceType::class, ['choices' => $renewalTimeRanges])
             ->add('campaignSource', TextType::class, ['required' => false])
-            ->add('leadSource', ChoiceType::class, ['required' => false, 'choices' => $lead_sources])
+            ->add('leadSource', ChoiceType::class, ['required' => false, 'choices' => $leadSources])
             ->add('leadSourceDetails', TextType::class, ['required' => false ])
             ->add('next', SubmitType::class)
             ->getForm();
-
         $dm = $this->getManager();
         $companyRepo = $dm->getRepository(AffiliateCompany::class);
         $userRepo = $dm->getRepository(User::class);
         $companies = $companyRepo->findAll();
-
         try {
             if ('POST' === $request->getMethod()) {
                 if ($request->request->has('companyForm')) {
@@ -3031,6 +3040,10 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                         }
                         $company->setAddress($address);
                         $company->setDays($this->getDataString($companyForm->getData(), 'days'));
+                        $company->setChargeModel($this->getDataString($companyForm->getData(), 'chargeModel'));
+                        if ($company->getChargeModel() == AffiliateCompany::MODEL_ONGOING) {
+                            $company->setRenewalDays($this->getDataString($companyForm->getData(), 'renewalDays'));
+                        }
                         $company->setCampaignSource($this->getDataString($companyForm->getData(), 'campaignSource'));
                         $company->setLeadSource($this->getDataString($companyForm->getData(), 'leadSource'));
                         $company->setLeadSourceDetails(
@@ -3040,7 +3053,6 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                         $dm->persist($company);
                         $dm->flush();
                         $this->addFlash('success', 'Added affiliate');
-
                         return new RedirectResponse($this->generateUrl('admin_affiliate'));
                     } else {
                         throw new \InvalidArgumentException(sprintf(
@@ -3053,7 +3065,6 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         } catch (\InvalidArgumentException $e) {
             $this->addFlash('error', $e->getMessage());
         }
-
         return [
             'companies' => $companies,
             'companyForm' => $companyForm->createView(),
@@ -3101,7 +3112,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         if ($affiliate) {
             return [
                 'affiliate' => $affiliate,
-                'pending' => $affiliateService->getMatchingUsers($affiliate, [User::AQUISITION_PENDING])
+                'pending' => $affiliateService->getMatchingUsers($affiliate)
             ];
         } else {
             return ['error' => 'Invalid URL, given ID does not correspond to an affiliate.'];
@@ -3121,7 +3132,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         if ($affiliate) {
             return [
                 'affiliate' => $affiliate,
-                'potential' => $affiliateService->getMatchingUsers($affiliate, [User::AQUISITION_POTENTIAL])
+                'potential' => $affiliateService->getMatchingUsers($affiliate, null, [User::AQUISITION_POTENTIAL])
             ];
         } else {
             return ['error' => 'Invalid URL, given ID does not correspond to an affiliate.'];
@@ -3141,7 +3152,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         if ($affiliate) {
             return [
                 'affiliate' => $affiliate,
-                'lost' => $affiliateService->getMatchingUsers($affiliate, [User::AQUISITION_LOST])
+                'lost' => $affiliateService->getMatchingUsers($affiliate, null, [User::AQUISITION_LOST])
             ];
         } else {
             return ['error' => 'Invalid URL, given ID does not correspond to an affiliate.'];
