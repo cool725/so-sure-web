@@ -34,9 +34,24 @@ class InvitationController extends BaseController
         $phoneRepo = $dm->getRepository(Phone::class);
 
         if ($invitation && $invitation->isSingleUse() && $invitation->isInviteeProcessed()) {
-            return $this->render('AppBundle:Invitation:processed.html.twig', [
-                'invitation' => $invitation,
-            ]);
+            if ($invitation->isAccepted()) {
+                $flashType = 'success';
+                $flashMessage = 'This invitation to join so-sure has already been accepted already';
+            } elseif  ($invitation->isRejected()) {
+                $flashType = 'error';
+                $flashMessage = 'Hmm, it looks like this invitation to join so-sure has already been declined';
+            } elseif  ($invitation->isRejected()) {
+                $flashType = 'error';
+                $flashMessage = 'Hmm, it looks like this invitation to join so-sure has already been cancelled';
+            } else {
+                $flashType = 'warning';
+                $flashMessage = 'Hmm, it looks like this invitation to join so-sure has already been processed';
+            }
+            $this->addFlash(
+                $flashType,
+                $flashMessage
+            );
+            return $this->redirectToRoute('invitation', ['id' => $id]);
         } elseif ($this->getUser() !== null) {
             return $this->redirect($this->getParameter('branch_share_url'));
         } elseif ($invitation && $invitation->isCancelled()) {
@@ -84,9 +99,16 @@ class InvitationController extends BaseController
             // @codingStandardsIgnoreEnd
         }
 
+        $landingText = $this->sixpack(
+            $request,
+            SixpackService::EXPERIMENT_SCODE_LANDING_TEXT,
+            ['email-landing-text-a', 'email-landing-text-b']
+        );
+
         return array(
             'invitation' => $invitation,
             'form' => $declineForm->createView(),
+            'landing_text' => $landingText,
         );
     }
 }
