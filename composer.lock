@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d09dbcbed57a0979d80a28f82a6f9228",
+    "content-hash": "8b7ad100f2c204a683c85e8d3cc6b6d9",
     "packages": [
         {
             "name": "alcaeus/mongo-php-adapter",
@@ -3304,16 +3304,16 @@
         },
         {
             "name": "judopay/judopay-sdk",
-            "version": "2.0.1.2",
+            "version": "2.0.1.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/so-sure/Judo-PHP.git",
-                "reference": "ef7769e4295eb62e0ac3abafaa85f558e0186ac6"
+                "reference": "040344788e721476ad7dff1e4eb579e222c3dec9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/so-sure/Judo-PHP/zipball/ef7769e4295eb62e0ac3abafaa85f558e0186ac6",
-                "reference": "ef7769e4295eb62e0ac3abafaa85f558e0186ac6",
+                "url": "https://api.github.com/repos/so-sure/Judo-PHP/zipball/040344788e721476ad7dff1e4eb579e222c3dec9",
+                "reference": "040344788e721476ad7dff1e4eb579e222c3dec9",
                 "shasum": ""
             },
             "require": {
@@ -3363,9 +3363,9 @@
                 "payment"
             ],
             "support": {
-                "source": "https://github.com/so-sure/Judo-PHP/tree/2.0.1.2"
+                "source": "https://github.com/so-sure/Judo-PHP/tree/2.0.1.5"
             },
-            "time": "2016-10-17T16:39:52+00:00"
+            "time": "2018-12-12T17:22:28+00:00"
         },
         {
             "name": "knplabs/knp-snappy",
@@ -10172,7 +10172,8 @@
     "prefer-lowest": false,
     "platform": {
         "php": ">=7.0",
-        "ext-json": "*"
+        "ext-json": "*",
+        "ext-zip": "*"
     },
     "platform-dev": [],
     "platform-overrides": {

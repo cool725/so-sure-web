@@ -28,7 +28,7 @@
         "drewm/mailchimp-api": "dev-api-v3",
         "google/apiclient": "^2.2",
         "staffim/rollbar-bundle": "*",
-        "judopay/judopay-sdk": "2.0.1.2",
+        "judopay/judopay-sdk": "2.0.1.5",
         "aws/aws-sdk-php": "^3.15",
         "jms/security-extra-bundle": "^1.6",
         "white-october/pagerfanta-bundle": "^1.2",
