@@ -1022,7 +1022,7 @@ class JudopayService
      * @param int       $failedPayments
      * @param \DateTime $next
      *
-     * @return boolean true if email sent, false if number of failed payments is above 1 but not exceeding 3
+     * @return bool|string false if $failedPayments does not fall in range of 1-4. $baseTemplate if successfully sent
      */
     public function failedPaymentEmail(Policy $policy, $failedPayments, \DateTime $next = null)
     {
@@ -1054,7 +1054,7 @@ class JudopayService
             'bcc@so-sure.com'
         );
 
-        return true;
+        return $baseTemplate;
     }
 
     /**
