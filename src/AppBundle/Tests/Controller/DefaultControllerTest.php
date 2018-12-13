@@ -114,7 +114,7 @@ class DefaultControllerTest extends BaseControllerTest
     {
         $repo = self::$dm->getRepository(Phone::class);
         /** @var Phone $phone */
-        $phone = $repo->findOneBy(['devices' => 'iPhone 6', 'memory' => 64]);
+        $phone = $repo->findOneBy(['devices' => 'iPhone 8', 'memory' => 64]);
 
         $this->setPhoneSession($phone);
 
@@ -280,7 +280,7 @@ class DefaultControllerTest extends BaseControllerTest
 
     public function testClaimAlreadyLogin()
     {
-        $email = self::generateEmail('testClaimAlreadyLogin', $this);
+        $email = self::generateEmail('testClaimAlreadyLogin', $this, true);
         $password = 'foo';
         $phone = self::getRandomPhone(self::$dm);
         $user = self::createUser(
@@ -290,6 +290,165 @@ class DefaultControllerTest extends BaseControllerTest
             $phone,
             self::$dm
         );
+
+        $policy = self::initPolicy(
+            $user,
+            self::$dm,
+            $phone,
+            null,
+            true,
+            true
+        );
+
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+
+        self::$dm->persist($policy);
+        self::$dm->flush();
+
+        $claimPage = self::$router->generate('claim');
+        $this->login($email, $password);
+        $crawler = self::$client->request('GET', $claimPage);
+        self::verifyResponse(302);
+        $this->assertTrue($this->isClientResponseRedirect(sprintf('/user/claim')));
+    }
+
+    public function testClaimAlreadyLoginAdmin()
+    {
+        $email = self::generateEmail('testClaimAlreadyLoginAdmin', $this, true);
+        $password = 'foo';
+        $phone = self::getRandomPhone(self::$dm);
+        $user = self::createUser(
+            self::$userManager,
+            $email,
+            $password,
+            $phone,
+            self::$dm
+        );
+
+        $user->addRole(User::ROLE_ADMIN);
+
+        $policy = self::initPolicy(
+            $user,
+            self::$dm,
+            $phone,
+            null,
+            true,
+            true
+        );
+
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+
+        self::$dm->persist($policy);
+        self::$dm->flush();
+
+        $claimPage = self::$router->generate('claim');
+        $this->login($email, $password);
+        $crawler = self::$client->request('GET', $claimPage);
+        self::verifyResponse(200);
+    }
+
+    public function testClaimAlreadyLoginClaims()
+    {
+        $email = self::generateEmail('testClaimAlreadyLoginClaims', $this, true);
+        $password = 'foo';
+        $phone = self::getRandomPhone(self::$dm);
+        $user = self::createUser(
+            self::$userManager,
+            $email,
+            $password,
+            $phone,
+            self::$dm
+        );
+
+        $user->addRole(User::ROLE_CLAIMS);
+
+        $policy = self::initPolicy(
+            $user,
+            self::$dm,
+            $phone,
+            null,
+            true,
+            true
+        );
+
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+
+        self::$dm->persist($policy);
+        self::$dm->flush();
+
+        $claimPage = self::$router->generate('claim');
+        $this->login($email, $password);
+        $crawler = self::$client->request('GET', $claimPage);
+        self::verifyResponse(200);
+    }
+
+    public function testClaimCancelledPolicy()
+    {
+        $email = self::generateEmail('testClaimCancelledPolicy', $this, true);
+        $password = 'foo';
+        $phone = self::getRandomPhone(self::$dm);
+        $user = self::createUser(
+            self::$userManager,
+            $email,
+            $password,
+            $phone,
+            self::$dm
+        );
+
+        $policy = self::initPolicy(
+            $user,
+            self::$dm,
+            $phone,
+            null,
+            true,
+            true
+        );
+
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        $policy->cancel(Policy::CANCELLED_COOLOFF);
+
+        self::$dm->persist($policy);
+        self::$dm->flush();
+
+        $claimPage = self::$router->generate('claim');
+        $this->login($email, $password);
+        $crawler = self::$client->request('GET', $claimPage);
+        self::verifyResponse(200);
+
+        $form = $crawler->selectButton('claim_email_form[submit]')->form();
+        $form['claim_email_form[email]'] = $email;
+        $crawler = self::$client->submit($form);
+
+        self::verifyResponse(200);
+        $this->expectFlashSuccess($crawler, 'email with further instructions');
+    }
+
+    public function testClaimUnpaidPolicy()
+    {
+        $email = self::generateEmail('testClaimUnpaidPolicy', $this, true);
+        $password = 'foo';
+        $phone = self::getRandomPhone(self::$dm);
+        $user = self::createUser(
+            self::$userManager,
+            $email,
+            $password,
+            $phone,
+            self::$dm
+        );
+
+        $policy = self::initPolicy(
+            $user,
+            self::$dm,
+            $phone,
+            null,
+            true,
+            true
+        );
+
+        $policy->setStatus(Policy::STATUS_UNPAID);
+
+        self::$dm->persist($policy);
+        self::$dm->flush();
 
         $claimPage = self::$router->generate('claim');
         $this->login($email, $password);
@@ -384,6 +543,20 @@ class DefaultControllerTest extends BaseControllerTest
             $phone,
             self::$dm
         );
+
+        $policy = self::initPolicy(
+            $user,
+            self::$dm,
+            $phone,
+            null,
+            true,
+            true
+        );
+
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+
+        self::$dm->persist($policy);
+        self::$dm->flush();
 
         $claimPage = self::$router->generate('claim_login_token');
         $this->login($email, $password);

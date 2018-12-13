@@ -4,8 +4,11 @@ namespace PicsureMLBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\ButtonType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Doctrine\ODM\MongoDB\DocumentRepository;
 use PicsureMLBundle\Document\TrainingData;
@@ -13,7 +16,7 @@ use PicsureMLBundle\Service\PicsureMLService;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormEvent;
 
-class LabelType extends AbstractType
+class EditType extends AbstractType
 {
 
     /**
@@ -44,6 +47,12 @@ class LabelType extends AbstractType
                 'multiple' => false,
                 'required' => false
             ])
+            ->add('x', TextType::class, ['required' => false])
+            ->add('y', TextType::class, ['required' => false])
+            ->add('width', TextType::class, ['required' => false])
+            ->add('height', TextType::class, ['required' => false])
+            ->add('forDetection', CheckboxType::class, ['required' => false])
+            ->add('clear', ButtonType::class)
             ->add('previous', SubmitType::class)
             ->add('save', SubmitType::class)
             ->add('next', SubmitType::class)
