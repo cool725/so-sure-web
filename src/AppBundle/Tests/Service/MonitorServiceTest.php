@@ -12,6 +12,7 @@ use AppBundle\Document\SCode;
 use AppBundle\Document\User;
 use AppBundle\Exception\MonitorException;
 use AppBundle\Form\Type\UserRoleType;
+use AppBundle\Repository\ClaimRepository;
 use AppBundle\Repository\Invitation\InvitationRepository;
 use AppBundle\Service\InvitationService;
 use AppBundle\Service\MonitorService;
@@ -87,6 +88,16 @@ class MonitorServiceTest extends WebTestCase
 
     public function testClaimsSettledUnprocessedOk()
     {
+        // Ensure any existing unprocessed claims are settled
+        /** @var ClaimRepository $repo */
+        $repo = static::$dm->getRepository(Claim::class);
+        $claims = $repo->findSettledUnprocessed();
+        foreach ($claims as $claim) {
+            /** @var Claim $claim */
+            $claim->setProcessed(true);
+        }
+        static::$dm->flush();
+
         // should not be throwing an exception
         self::$monitor->claimsSettledUnprocessed();
 
