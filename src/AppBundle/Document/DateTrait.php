@@ -377,7 +377,7 @@ trait DateTrait
      * @param String         $format   is the format to write the date out with.
      * @return String the date in the requested the format.
      */
-    public static function timezoneFormat(\DateTime $date, \DateTimeZone $timezone, $format)
+    public static function timezoneFormat($date, \DateTimeZone $timezone, $format)
     {
         if (!$date) {
             return "";

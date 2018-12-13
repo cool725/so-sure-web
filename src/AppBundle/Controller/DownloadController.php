@@ -2,6 +2,7 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Validator\Constraints\AlphanumericValidator;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -22,7 +23,14 @@ class DownloadController extends BaseController
      */
     public function appleAction($medium = null)
     {
+        $validator = new AlphanumericValidator();
+        $medium = $validator->conform($medium);
+
         $url = $this->get('app.twig.branch')->apple($medium);
+        if (!$url) {
+            throw $this->createNotFoundException('Invalid url');
+        }
+
         $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_APP_DOWNLOAD, [
             'Store' => 'Apple',
             'Location' => $medium,
@@ -37,7 +45,14 @@ class DownloadController extends BaseController
      */
     public function googleAction($medium = null)
     {
+        $validator = new AlphanumericValidator();
+        $medium = $validator->conform($medium);
+
         $url = $this->get('app.twig.branch')->google($medium);
+        if (!$url) {
+            throw $this->createNotFoundException('Invalid url');
+        }
+
         $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_APP_DOWNLOAD, [
             'Store' => 'Google',
             'Location' => $medium,
