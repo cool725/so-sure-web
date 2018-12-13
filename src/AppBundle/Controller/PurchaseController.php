@@ -1309,7 +1309,7 @@ class PurchaseController extends BaseController
                         $dm->flush();
                         $flash = "You should receive an email confirming that your policy is now cancelled.";
                         // @codingStandardsIgnoreStart
-                        $message = "This is a so-sure generated message. Policy: <a href='%s'>%s/%s</a> was cancelled via the site as per user request for reason \"%s\". so-sure support team: Please contact the policy holder to get their reason(s) for cancelling. Additional comments: %s";
+                        $message = "This is a so-sure generated message. Policy: <a href='%s'>%s/%s</a> was cancelled during cooloff as per user request for reason \"%s\". so-sure support team: Please contact the policy holder to get their reason(s) for cancelling. Additional comments: %s";
                     } else {
                         // @codingStandardsIgnoreStart
                         $flash = "We have passed your request to our policy team. You should receive a cancellation email once that is processed.";
