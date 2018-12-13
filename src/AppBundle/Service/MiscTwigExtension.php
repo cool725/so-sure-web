@@ -65,10 +65,10 @@ class MiscTwigExtension extends \Twig_Extension
         return pathinfo($path);
     }
 
-    public function routeExists($route)
+    public function routeExists($route, $params)
     {
         try {
-            $this->router->generate($route);
+            $this->router->generate($route, $params);
 
             return true;
         } catch (RouteNotFoundException $e) {

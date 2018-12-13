@@ -70,7 +70,8 @@
         "peerj/peerj-user-security-bundle": "^0.2",
         "phpseclib/phpseclib": "^2.0",
         "defuse/php-encryption": "^2.1",
-        "friendsofsymfony/oauth-server-bundle": "^1.6"
+        "friendsofsymfony/oauth-server-bundle": "^1.6",
+        "excelwebzone/recaptcha-bundle": "^1.5"
     },
     "require-dev": {
         "sensio/generator-bundle": "~3.0",
