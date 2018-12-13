@@ -167,11 +167,14 @@ trait UserClassTrait
     public static function getRandomPhone(\Doctrine\ODM\MongoDB\DocumentManager $dm, $make = null)
     {
         $phoneRepo = $dm->getRepository(Phone::class);
+        $query = [
+            'active' => true,
+            'devices' => ['$nin' => ['A0001', 'iPhone 6']]
+        ];
         if ($make) {
-            $phones = $phoneRepo->findBy(['active' => true, 'make' => $make, 'devices' => ['$ne' => 'A0001']]);
-        } else {
-            $phones = $phoneRepo->findBy(['active' => true, 'devices' => ['$ne' => 'A0001']]);
+            $query['make'] = $make;
         }
+        $phones = $phoneRepo->findBy($query);
         $phone = null;
         while ($phone == null) {
             $phone = $phones[rand(0, count($phones) - 1)];

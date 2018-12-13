@@ -114,7 +114,7 @@ class DefaultControllerTest extends BaseControllerTest
     {
         $repo = self::$dm->getRepository(Phone::class);
         /** @var Phone $phone */
-        $phone = $repo->findOneBy(['devices' => 'iPhone 6', 'memory' => 64]);
+        $phone = $repo->findOneBy(['devices' => 'iPhone 8', 'memory' => 64]);
 
         $this->setPhoneSession($phone);
 

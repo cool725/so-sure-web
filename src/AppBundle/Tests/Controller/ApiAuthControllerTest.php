@@ -1223,7 +1223,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy', ['phone_policy' => [
             'imei' => $imei,
             'make' => 'Apple',
-            'device' => 'iPhone 6',
+            'device' => 'iPhone 8',
             'memory' => 64,
             'rooted' => false,
             'validation_data' => $this->getValidationData($cognitoIdentityId, ['imei' => $imei]),
@@ -1242,7 +1242,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy', ['phone_policy' => [
             'imei' => $imei,
             'make' => 'Apple',
-            'device' => 'iPhone 6',
+            'device' => 'iPhone 8',
             'memory' => 64,
             'rooted' => false,
             'validation_data' => $this->getValidationData($cognitoIdentityId, ['imei' => $imei]),
@@ -1262,7 +1262,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy', ['phone_policy' => [
             'imei' => $imei,
             'make' => 'Apple',
-            'device' => 'iPhone 6',
+            'device' => 'iPhone 8',
             'memory' => 64,
             'rooted' => false,
             'validation_data' => $this->getValidationData($cognitoIdentityId, ['imei' => $imei]),
@@ -1289,7 +1289,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy', ['phone_policy' => [
             'imei' => $imei,
             'make' => 'Apple',
-            'device' => 'iPhone 6',
+            'device' => 'iPhone 8',
             'memory' => 64,
             'rooted' => false,
             'validation_data' => $this->getValidationData($cognitoIdentityId, ['imei' => $imei]),
@@ -1352,8 +1352,8 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy', ['phone_policy' => [
             'imei' => $imei,
             'make' => 'Apple',
-            'device' => 'iPhone 6',
-            'memory' => 512,
+            'device' => 'iPhone 8',
+            'memory' => 1024,
             'rooted' => false,
             'validation_data' => $this->getValidationData($cognitoIdentityId, ['imei' => $imei]),
         ]]);
@@ -1368,7 +1368,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy', ['phone_policy' => [
             'imei' => $imei,
             'make' => 'Apple',
-            'device' => 'iPhone 6',
+            'device' => 'iPhone 8',
             'memory' => 60,
             'rooted' => false,
             'validation_data' => $this->getValidationData($cognitoIdentityId, ['imei' => $imei]),
@@ -1624,7 +1624,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy', ['phone_policy' => [
             'imei' => $imei,
             'make' => 'Apple',
-            'device' => 'iPhone 6',
+            'device' => 'iPhone 8',
             'memory' => 64,
             'rooted' => false,
             'validation_data' => $this->getValidationData($cognitoIdentityId, ['imei' => $imei]),
