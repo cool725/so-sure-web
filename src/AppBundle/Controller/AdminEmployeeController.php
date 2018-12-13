@@ -3205,9 +3205,25 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         $affiliate = $affiliateRepo->find($id);
         $affiliateService = $this->get("app.affiliate");
         if ($affiliate) {
+            $pending = $affiliateService->getMatchingUsers(
+                $affiliate,
+                new \DateTime(),
+                [User::AQUISITION_NEW, User::AQUISITION_PENDING],
+                $affiliate->getChargeModel() == AffiliateCompany::MODEL_ONE_OFF
+            );
+            $days = [];
+            foreach ($pending as $user) {
+                $days[$user->getId()] = $affiliateService->daysToAquisition($affiliate, $user);
+            }
             return [
                 'affiliate' => $affiliate,
-                'pending' => $affiliateService->getMatchingUsers($affiliate)
+                'pending' => $affiliateService->getMatchingUsers(
+                    $affiliate,
+                    new \DateTime(),
+                    [User::AQUISITION_NEW, User::AQUISITION_PENDING],
+                    $affiliate->getChargeModel() == AffiliateCompany::MODEL_ONE_OFF
+                ),
+                'days' => $days
             ];
         } else {
             return ['error' => 'Invalid URL, given ID does not correspond to an affiliate.'];
