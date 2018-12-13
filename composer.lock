@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d09dbcbed57a0979d80a28f82a6f9228",
+    "content-hash": "b9986a0f213a96259a524b38ff2058ee",
     "packages": [
         {
             "name": "alcaeus/mongo-php-adapter",
@@ -1535,6 +1535,60 @@
             "time": "2018-08-16T20:49:45+00:00"
         },
         {
+            "name": "excelwebzone/recaptcha-bundle",
+            "version": "v1.5.12",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/excelwebzone/EWZRecaptchaBundle.git",
+                "reference": "110f85ad9c843d1b1bb51e90777b28b2034c7c17"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/excelwebzone/EWZRecaptchaBundle/zipball/110f85ad9c843d1b1bb51e90777b28b2034c7c17",
+                "reference": "110f85ad9c843d1b1bb51e90777b28b2034c7c17",
+                "shasum": ""
+            },
+            "require": {
+                "google/recaptcha": "^1.1",
+                "php": ">=5.6 || ^7.0",
+                "symfony/form": "^2.8 || ^3.0 || ^4.0",
+                "symfony/framework-bundle": "^2.8 || ^3.0 || ^4.0",
+                "symfony/security-bundle": "^2.8 || ^3.0 || ^4.0",
+                "symfony/validator": "^2.8 || ^3.0 || ^4.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^5 || ^6 || ^7"
+            },
+            "type": "symfony-bundle",
+            "extra": {
+                "symfony": {
+                    "allow-contrib": "true"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "EWZ\\Bundle\\RecaptchaBundle\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Michael H. Arieli",
+                    "email": "excelwebzone@gmail.com",
+                    "homepage": "http://excelwebzone.com/"
+                }
+            ],
+            "description": "This bundle provides easy reCAPTCHA form field integration",
+            "homepage": "https://github.com/excelwebzone/EWZRecaptchaBundle",
+            "keywords": [
+                "recaptcha"
+            ],
+            "time": "2018-11-30T20:00:00+00:00"
+        },
+        {
             "name": "facebook/graph-sdk",
             "version": "5.6.3",
             "source": {
@@ -2228,6 +2282,53 @@
                 "oauth2"
             ],
             "time": "2018-04-06T19:26:30+00:00"
+        },
+        {
+            "name": "google/recaptcha",
+            "version": "1.2.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/google/recaptcha.git",
+                "reference": "e7add3be59211482ecdb942288f52da64a35f61a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/google/recaptcha/zipball/e7add3be59211482ecdb942288f52da64a35f61a",
+                "reference": "e7add3be59211482ecdb942288f52da64a35f61a",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.5"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^2.2.20|^2.12",
+                "php-coveralls/php-coveralls": "^2.1",
+                "phpunit/phpunit": "^4.8.36|^5.7.27|^6.59|^7"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.2.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "ReCaptcha\\": "src/ReCaptcha"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "description": "Client library for reCAPTCHA, a free service that protects websites from spam and abuse.",
+            "homepage": "https://www.google.com/recaptcha/",
+            "keywords": [
+                "Abuse",
+                "captcha",
+                "recaptcha",
+                "spam"
+            ],
+            "time": "2018-08-05T09:31:53+00:00"
         },
         {
             "name": "guzzle/guzzle",
@@ -3304,16 +3405,16 @@
         },
         {
             "name": "judopay/judopay-sdk",
-            "version": "2.0.1.2",
+            "version": "2.0.1.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/so-sure/Judo-PHP.git",
-                "reference": "ef7769e4295eb62e0ac3abafaa85f558e0186ac6"
+                "reference": "040344788e721476ad7dff1e4eb579e222c3dec9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/so-sure/Judo-PHP/zipball/ef7769e4295eb62e0ac3abafaa85f558e0186ac6",
-                "reference": "ef7769e4295eb62e0ac3abafaa85f558e0186ac6",
+                "url": "https://api.github.com/repos/so-sure/Judo-PHP/zipball/040344788e721476ad7dff1e4eb579e222c3dec9",
+                "reference": "040344788e721476ad7dff1e4eb579e222c3dec9",
                 "shasum": ""
             },
             "require": {
@@ -3363,9 +3464,9 @@
                 "payment"
             ],
             "support": {
-                "source": "https://github.com/so-sure/Judo-PHP/tree/2.0.1.2"
+                "source": "https://github.com/so-sure/Judo-PHP/tree/2.0.1.5"
             },
-            "time": "2016-10-17T16:39:52+00:00"
+            "time": "2018-12-12T17:22:28+00:00"
         },
         {
             "name": "knplabs/knp-snappy",
@@ -10172,7 +10273,8 @@
     "prefer-lowest": false,
     "platform": {
         "php": ">=7.0",
-        "ext-json": "*"
+        "ext-json": "*",
+        "ext-zip": "*"
     },
     "platform-dev": [],
     "platform-overrides": {

@@ -439,7 +439,33 @@
                     <table class="table .table-condensed">
                         <tr>
                             <td>Excess</td>
-                            <td>{{ claim.excess|default('-') }}</td>
+                            <td>
+                                {% if equal_to_two_dp(claim.excess, claim.expectedExcessValue) %}
+                                    {{ claim.excess|default('-') }} <span title="Expected excess value" class="text-success"><i class="fa fa-check"></i></span>
+                                {% else %}
+                                    <span class="text-danger">
+                                        {{ claim.excess|default('-') }} <span title="Does not match Expected Excess Value" class="text-danger"><i class="fa fa-exclamation-triangle"></i></span>
+                                    </span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Expected Excess</td>
+                            <td>
+                                {% if equal_to_two_dp(claim.excess, claim.expectedExcessValue) %}
+                                    {{ claim.expectedExcessValue }}
+                                {% else %}
+                                    <span class="text-danger">
+                                        {{ claim.expectedExcessValue }}
+                                    </span>
+                                {% endif %}
+
+                                {% if not equal_to_two_dp(claim.expectedExcessValue, claim.expectedExcessValue(true)) %}
+                                    <span title="Warning excess does not matches older calculation of £{{ claim.expectedExcessValue(true)|number_format(2, '.', ',') }}">
+                                        <i class="fa fa-warning"></i>
+                                    </span>
+                                {% endif %}
+                            </td>
                         </tr>
                         <tr>
                             <td>Unauthorized Calls</td>

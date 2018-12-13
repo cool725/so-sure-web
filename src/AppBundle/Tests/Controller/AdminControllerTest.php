@@ -94,8 +94,10 @@ class AdminControllerTest extends BaseControllerTest
             'claims_form[approvedDate]' => '2022-01-01',
         ]);
 
-        $crawler = self::$client->submit($form);
+        self::$client->submit($form);
         self::verifyResponse(302);
+        $crawler = self::$client->followRedirect();
+        self::expectFlashSuccess($crawler, sprintf('Claim %s updated', $claim->getNumber()));
 
         $dm = $this->getDocumentManager(true);
         $repoClaim = $dm->getRepository(Claim::class);

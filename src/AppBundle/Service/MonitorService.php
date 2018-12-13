@@ -31,6 +31,7 @@ use AppBundle\Repository\UserRepository;
 use Doctrine\MongoDB\LoggableCollection;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use MongoDB\Collection;
+use Monolog\Handler\Mongo;
 use Psr\Log\LoggerInterface;
 
 class MonitorService
@@ -349,6 +350,41 @@ class MonitorService
                         $policy->getId()
                     ));
                 }
+            }
+        }
+    }
+
+    public function policyImeiOnMultiplePolicies()
+    {
+        $collection = $this->dm->getDocumentCollection(Policy::class);
+        $builder = $collection->createAggregationBuilder();
+
+        $results = $builder
+            ->match()
+                ->field('policyNumber')
+                ->equals(new \MongoRegex('/Mob\/*/'))
+                ->field('status')
+                ->in([Policy::STATUS_ACTIVE, Policy::STATUS_UNPAID])
+                ->field('imei')
+                ->exists(true)
+            ->group()
+                ->field('_id')
+                ->expression(
+                    $builder->expr()
+                        ->field('imei')->expression('$imei')
+                )
+                ->field('count')->sum(1)
+            ->match()
+                ->field('count')->gt(1)
+            ->execute(['cursor' => []]);
+
+        if (count($results) > 0) {
+            /** @var Policy $result */
+            foreach ($results as $result) {
+                throw new MonitorException(sprintf(
+                    "IMEI found on more than one policy, %s",
+                    json_encode($result)
+                ));
             }
         }
     }

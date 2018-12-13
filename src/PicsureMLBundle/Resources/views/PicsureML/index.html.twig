@@ -45,6 +45,10 @@
                     {{ form_label(picsureml_search_form.images_per_page) }}
                     {{ form_widget(picsureml_search_form.images_per_page) }}
                 </div>
+                <div id="picsureml_search_form_for_detection">
+                    {{ form_label(picsureml_search_form.forDetection) }}
+                    {{ form_widget(picsureml_search_form.forDetection) }}
+                </div>
             </div>
             <div class="col-md-2">
                 {{ form_widget(picsureml_search_form.search, {'attr':{'class':'btn btn-info'}}) }}
@@ -81,6 +85,11 @@
                         <span class="label label-warning">Invalid</span>
                     {% elseif image.label == "damaged" %}
                         <span class="label label-danger">Damaged</span>
+                    {% else %}
+                        <span class="label label-default">None</span>
+                    {% endif %}
+                    {% if image.forDetection %}
+                        <span class="label label-info"><i class="fa fa-check"></i></span>
                     {% endif %}
                 </a>                
             </div>

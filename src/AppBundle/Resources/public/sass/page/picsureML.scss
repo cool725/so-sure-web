@@ -55,6 +55,15 @@
 		}	
 	}
 
+	#picsureml_search_form_for_detection {
+		label {
+			padding: 12px 12px 12px 6px;
+		}
+		input {
+			max-width: 60px;
+		}
+	}
+
 	.picsure-image-edit {
 		img {
 			max-width: 100%;
