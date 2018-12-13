@@ -206,8 +206,8 @@ class AdminControllerTest extends BaseControllerTest
         self::verifyResponse(302);
 
         $dm = $this->getDocumentManager(true);
-        $repoPolicy = $dm->getRepository(Policy::class);
-        /** @var Policy $updatedPolicy */
+        $repoPolicy = $dm->getRepository(PhonePolicy::class);
+        /** @var PhonePolicy $updatedPolicy */
         $updatedPolicy = $repoPolicy->find($policy->getId());
 
         self::assertEquals($imei, $updatedPolicy->getImei());
@@ -246,8 +246,8 @@ class AdminControllerTest extends BaseControllerTest
         self::verifyResponse(302);
 
         $dm = $this->getDocumentManager(true);
-        $repoPolicy = $dm->getRepository(Policy::class);
-        /** @var Policy $updatedPolicy */
+        $repoPolicy = $dm->getRepository(PhonePolicy::class);
+        /** @var PhonePolicy $updatedPolicy */
         $updatedPolicy = $repoPolicy->find($policy->getId());
 
         self::assertEquals($imei, $updatedPolicy->getImei());
