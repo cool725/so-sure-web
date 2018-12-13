@@ -349,39 +349,6 @@ class PolicyServiceTest extends WebTestCase
     }
 
     /**
-     * @expectedException AppBundle\Exception\DuplicateImeiException
-     */
-    public function testCreatePolicyDuplicateImei()
-    {
-        $imei = self::generateRandomImei();
-        $user = static::createUser(
-            static::$userManager,
-            static::generateEmail('create-dup', $this),
-            'bar',
-            null,
-            static::$dm
-        );
-        $policy = static::initPolicy(
-            $user,
-            static::$dm,
-            $this->getRandomPhone(static::$dm),
-            new \DateTime('2016-01-01'),
-            true,
-            true,
-            $imei
-        );
-        $policy = static::initPolicy(
-            $user,
-            static::$dm,
-            $this->getRandomPhone(static::$dm),
-            new \DateTime('2016-01-01'),
-            true,
-            true,
-            $imei
-        );
-    }
-
-    /**
      * @expectedException AppBundle\Exception\InvalidPremiumException
      */
     public function testGenerateScheduledPaymentsInvalidAmount()

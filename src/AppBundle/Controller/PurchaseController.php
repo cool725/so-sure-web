@@ -1308,18 +1308,14 @@ class PurchaseController extends BaseController
                         $policy->cancel(Policy::CANCELLED_USER_REQUESTED);
                         $dm->flush();
                         $flash = "You should receive an email confirming that your policy is now cancelled.";
-                        $message = "This is a so-sure generated message. Policy: <a href='%s'>%s/%s</a> was cancelled ".
-                            "via the site as per user request for reason \"%s\". so-sure support team: Please contact ".
-                            "the policy holder to get their reason(s) for cancelling. Additional comments: %s";
+                        // @codingStandardsIgnoreStart
+                        $message = "This is a so-sure generated message. Policy: <a href='%s'>%s/%s</a> was cancelled via the site as per user request for reason \"%s\". so-sure support team: Please contact the policy holder to get their reason(s) for cancelling. Additional comments: %s";
                     } else {
-                        $flash = "We have passed your request to our policy team. You should receive a cancellation ".
-                            "email once that is processed.";
-                        // TODO: this is the message as was written before. it always says prior damage is the reason.
-                        //       which I am unsure about.
-                        $message = "This is a so-sure generated message. Policy: <a href='%s'>%s/%s</a> requested a ".
-                            "cancellation via the site as phone was damaged (%s) prior to purchase. so-sure support ".
-                            "team: Please contact the policy holder to get their reason(s) for cancelling before ".
-                            "action. Additional comments: %s";
+                        // @codingStandardsIgnoreStart
+                        $flash = "We have passed your request to our policy team. You should receive a cancellation email once that is processed.";
+                        // it always says their phone is damaged. Not sure why but that is how it was before.
+                        $message = "This is a so-sure generated message. Policy: <a href='%s'>%s/%s</a> requested a cancellation via the site as phone was damaged (%s) prior to purchase. so-sure support team: Please contact the policy holder to get their reason(s) for cancelling before action. Additional comments: %s";
+                        // @codingStandardsIgnoreEnd
                     }
                     $url = $this->generateUrl(
                         'admin_policy',

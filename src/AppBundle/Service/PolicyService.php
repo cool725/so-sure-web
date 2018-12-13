@@ -453,11 +453,6 @@ class PolicyService
             }
             $user = $policy->getUser();
 
-            // TODO: make this nice
-            if ($policy->getType() == "salva-phone") {
-                $this->validateImei($policy->getImei());
-            }
-
             $prefix = $policy->getPolicyPrefix($this->environment);
             if ($policy->isValidPolicy($prefix)) {
                 $this->logger->warning(sprintf('Policy %s is valid, but attempted to re-create', $policy->getId()));
