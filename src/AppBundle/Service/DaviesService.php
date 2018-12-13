@@ -545,11 +545,7 @@ class DaviesService extends S3EmailService
         // davies business process is to update this value once the invoice is recevied by the supplier
         // which should be at the same time the replacement imei is provided
         $negativeExcessAllowed = mb_strlen($daviesClaim->replacementImei) == 0;
-        $isExcessValueCorrect = $daviesClaim->isExcessValueCorrect(
-            $validated,
-            $phonePolicy->isPicSurePolicy(),
-            $negativeExcessAllowed
-        );
+        $isExcessValueCorrect = $daviesClaim->isExcessValueCorrect($claim, $negativeExcessAllowed);
 
         // many of davies excess figures are incorrect if withdrawn and no actual need to validate in those cases
         if (!$isExcessValueCorrect &&
@@ -562,7 +558,7 @@ class DaviesService extends S3EmailService
             $msg = sprintf(
                 'Claim %s does not have the correct excess value. Expected %0.2f Actual %0.2f for %s/%s',
                 $daviesClaim->claimNumber,
-                $daviesClaim->getExpectedExcessValue($validated, $phonePolicy->isPicSurePolicy()),
+                $daviesClaim->getExpectedExcessValue($claim),
                 $daviesClaim->excess,
                 $daviesClaim->getClaimType(),
                 $daviesClaim->getClaimStatus()

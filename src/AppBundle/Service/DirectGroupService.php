@@ -622,10 +622,7 @@ class DirectGroupService extends ExcelSftpService
             }
         }
 
-        $isExcessValueCorrect = $directGroupClaim->isExcessValueCorrect(
-            $validated,
-            $phonePolicy->isPicSurePolicy()
-        );
+        $isExcessValueCorrect = $directGroupClaim->isExcessValueCorrect($claim);
 
         // if withdrawn and no actual need to validate in those cases
         if (!$isExcessValueCorrect &&
