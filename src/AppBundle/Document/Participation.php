@@ -16,14 +16,11 @@ use Gedmo\Mapping\Annotation as Gedmo;
  */
 class Participation
 {
-    // Participation is in progress.
     const STATUS_ACTIVE = "active";
-    // Promotion conditions were fulfilled and reward given.
     const STATUS_COMPLETED = "completed";
-    // Promotion conditions were not fulfilled and reward was not given.
     const STATUS_FAILED = "failed";
-    // Promotion reward can't be given because they already have the reward.
     const STATUS_INVALID = "invalid";
+    const INVALID_EXISTING_TASTE_CARD = "existing-taste-card";
 
     /**
      * @MongoDB\Id(strategy="auto")

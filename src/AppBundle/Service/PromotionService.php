@@ -53,6 +53,13 @@ class PromotionService
         $endings = [];
         foreach ($participations as $participation) {
             $policy = $participation->getPolicy();
+
+
+
+
+
+
+
             if ($participation->getPromotion()->getReward() == Promotion::REWARD_TASTE_CARD &&
                 $policy->getTasteCard()
             ) {
@@ -60,19 +67,19 @@ class PromotionService
                 $this->endParticipation($participation, $date, Participation::STATUS_INVALID);
                 $this->addEnding(Participation::STATUS_INVALID, $endings);
             } else {
-                $this->addEnding($this->checkConditions($participation, $date), $endings);
+                $this->addEnding($this->rewardConditions($participation, $date), $endings);
             }
         }
         return $endings;
     }
 
     /**
-     * Checks if the given participation fulfills the conditions of it's promotion and if so it fires the reward and
-     * sets the status accordingly.
+     * Tells what the status of a participation should be set to.
      * @param Participation $participation is the participation which we are checking.
      * @param \DateTime     $date          is the date considered as current for the purposes of the conditions.
+     * @return String a participation status.
      */
-    public function checkConditions($participation, \DateTime $date)
+    public function rewardConditions($participation, \DateTime $date)
     {
         $promotion = $participation->getPromotion();
         $policy = $participation->getPolicy();
@@ -98,6 +105,21 @@ class PromotionService
     }
 
     /**
+     * Checks if a given participation is invalid.
+     * @param Participation $participation is the one we are checking on.
+     * @return String|null containing the participation's reason for invalidation or null if it's valid.
+     */
+    public function invalidationConditions($participation)
+    {
+        $promotion = $participation->getPromotion();
+        $policy = $participation->getPolicy();
+        if ($promotion->getReward() == Promotion::REWARD_TASTE_CARD && $policy->getTasteCard()) {
+            return Participation::INVALID_EXISTING_TASTE_CARD;
+        }
+        return null;
+    }
+
+    /**
      * Set a participation as complete and email marketing to tell them to give the reward.
      * @param Participation $participation is the participation to complete.
      * @param \DateTime     $date          is the date of the participation's completion.
@@ -116,33 +138,40 @@ class PromotionService
                 ["participation" => $participation]
             );
         } elseif ($status == Participation::STATUS_INVALID) {
+
+        }
+        return $status;
+    }
+
+    /**
+     * Makes a participation invalid and sends marketing an email based on the failure type.
+     * A failure type is probably necessary as opposed to just basing it on the reward type, as there could be in future
+     * a type of reward in which multiple kinds of failures can occur and it would affect the needed copy.
+     * @param Participation $participation is the participation to set as invalid.
+     * @param String        $reason        is the reason for invalidation from Participation::INVALID_*.
+     * @param \DateTime     $date          is the date to set the invalidation as having occured.
+     */
+    public function invalidateParticipation($participation, $reason, \DateTime $date)
+    {
+        $participation->endWithStatus(Participation::STATUS_INVALID, $date);
+        $this->dm->flush();
+        $message = null;
+        // Failure condition messages. NOTE: only one now, but more may be added.
+        switch ($failure) {
+            case Promotion::INVALID_EXISTING_TASTE_CARD:
+                $message = "Promotion reward is a tastecard, but user already has a tastecard.";
+                break;
+        }
+        if ($message) {
             $this->mailerService->sendTemplate(
                 "Promotion Reward Cannot Be Awarded",
                 "marketing@so-sure.com",
                 "AppBundle:Email:promotion/rewardInvalid.html.twig",
                 [
                     "participation" => $participation,
-                    "reason" => "Promotion reward is a tastecard, but user already has a tastecard."
+                    "reason" => $message
                 ]
             );
-        }
-        return $status;
-    }
-
-    /**
-     * Takes a string and an associative array and if the string is already a key then it incrememnts the value under
-     * that key, and if it is not yet a key then it adds it with the value 1.
-     * @param String $status  is the key value.
-     * @param array  $endings is the associative array to add status to.
-     */
-    private function addEnding($status, & $endings)
-    {
-        if ($status) {
-            if (array_key_exists($status, $endings)) {
-                $endings[$status]++;
-            } else {
-                $endings[$status] = 1;
-            }
         }
     }
 }
