@@ -3,6 +3,7 @@
 namespace AppBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
@@ -21,6 +22,18 @@ class ImeiType extends AbstractType
             ->add('imei', TextType::class)
             ->add('note', TextareaType::class)
             ->add('update', SubmitType::class)
+        ;
+
+        $builder
+            ->get('note')
+            ->addModelTransformer(new CallbackTransformer(
+                function ($note) {
+                    return $note;
+                },
+                function ($noteAlphanumeric) {
+                    return preg_replace("/[^A-Za-z0-9 ]/", '', $noteAlphanumeric);
+                }
+            ))
         ;
     }
 
