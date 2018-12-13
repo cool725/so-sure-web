@@ -736,6 +736,10 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                     if (Luhn::isValid($imei->getImei())) {
                         $policy->adjustImei($imei->getImei(), false);
 
+                        if ($imei->getPhone()) {
+                            $policy->setPhone($imei->getPhone());
+                        }
+
                         $this->addFlash(
                             'success',
                             sprintf('Policy %s IMEI updated', $policy->getPolicyNumber())

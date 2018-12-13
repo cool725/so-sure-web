@@ -35,46 +35,6 @@ class AdminEmployeeControllerTest extends BaseControllerTest
         self::$dm = $dm;
     }
 
-    public function testImeiFormAction()
-    {
-        $user = static::createUser(
-            static::$userManager,
-            static::generateEmail('testImeiFormAction', $this),
-            'bar'
-        );
-
-        $policy = self::initPolicy(
-            $user,
-            self::$dm,
-            static::getRandomPhone(self::$dm),
-            null,
-            true,
-            true
-        );
-
-        $this->login('mariusz@so-sure.com', LoadUserData::DEFAULT_PASSWORD, 'admin');
-
-        $crawler = self::$client->request('GET', '/admin/policy/' . $policy->getId());
-        self::verifyResponse(200);
-
-        $form = $crawler->selectButton('imei_form_update')->form();
-
-        $imei = self::generateRandomImei();
-        $form['imei_form[imei]'] = $imei;
-
-        $crawler = self::$client->submit($form);
-        self::verifyResponse(302);
-
-        $dm = $this->getDocumentManager(true);
-        $repoPolicy = $dm->getRepository(Policy::class);
-        /** @var Policy $policy */
-        $policy = $repoPolicy->findBy(
-            ['imei'  => $imei]
-        );
-
-        var_dump($policy);
-    }
-
     public function testDebtCollectorEmails()
     {
         // start policy 45 days ago
