@@ -21,7 +21,7 @@ class ApiExternalControllerTest extends BaseApiControllerTest
     {
         parent::setUpBeforeClass();
         $phoneRepo = self::$dm->getRepository(Phone::class);
-        self::$phone = $phoneRepo->findOneBy(['devices' => 'iPhone 6', 'memory' => 64]);
+        self::$phone = $phoneRepo->findOneBy(['devices' => 'iPhone 8', 'memory' => 64]);
     }
 
     // zendesk

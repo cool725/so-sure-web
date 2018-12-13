@@ -8,6 +8,7 @@ use Predis\Client;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Psr\Log\LoggerInterface;
 use Doctrine\ODM\MongoDB\DocumentManager;
+use Doctrine\ODM\MongoDB\Id;
 use AppBundle\Document\User;
 use AppBundle\Document\Policy;
 use AppBundle\Document\Stats;
@@ -32,6 +33,7 @@ class MixpanelService
     const QUEUE_ALIAS = 'alias';
     const QUEUE_ATTRIBUTION = 'attribution';
     const QUEUE_DELETE = 'delete';
+    const QUEUE_FREEZE_ATTRIBUTION = 'freeze-attribution';
 
     const EVENT_HOME_PAGE = 'Home Page';
     const EVENT_QUOTE_PAGE = 'Quote Page';
@@ -302,11 +304,10 @@ class MixpanelService
                     $attribution->setDeviceOS($data['Device OS']);
                     $dataPresent = true;
                 }
-
-                if ($dataPresent) {
+                // Only set the attribution if the user lacks one.
+                if (!$user->getAttribution() && $dataPresent) {
                     $user->setAttribution($attribution);
                 }
-
                 $latestAttribution = new Attribution();
                 $dataPresent = false;
                 if (isset($data['Latest Campaign Name'])) {
@@ -724,6 +725,11 @@ class MixpanelService
                     }
 
                     $this->delete($data['userId']);
+                } elseif ($action == self::QUEUE_FREEZE_ATTRIBUTION) {
+                    if (!isset($data['userId'])) {
+                        throw new \InvalidArgumentException(sprintf('Unknown message in queue %s', json_encode($data)));
+                    }
+                    $this->freezeAttribution($data['userId']);
                 } else {
                     throw new \InvalidArgumentException(sprintf('Unknown message in queue %s', json_encode($data)));
                 }
@@ -1084,6 +1090,36 @@ class MixpanelService
         /** @var \Producers_MixpanelPeople $people */
         $people = $this->mixpanel->people;
         $people->deleteUser($id);
+    }
+
+    /**
+     * Adds freezing user attribution to the queue of mixpanel actions.
+     * @param User $user is user whose attributes we must freeze.
+     */
+    public function queueFreezeAttribution($user)
+    {
+        $this->queue(self::QUEUE_FREEZE_ATTRIBUTION, $user->getId(), ['processTime' => new \DateTime()]);
+    }
+
+    /**
+     * If the given user's attribution is null then it gets set to an empty attribution object so it will not be
+     * edited in the future.
+     * @param String $userId is the id of the user we are freezing.
+     */
+    public function freezeAttribution($userId)
+    {
+        $userRepository = $this->dm->getRepository(User::class);
+        /** @var User $user */
+        $user = $userRepository->find($userId);
+        // If the user has gotten an attribution before this is run or if they don't exist then there is nothing to do.
+        if (!$user || $user->getAttribution()) {
+            return;
+        }
+        $attribution = new Attribution();
+        $attribution->setCampaignSource(Attribution::SOURCE_UNTRACKED);
+        $user->setAttribution($attribution);
+        $this->dm->persist($attribution);
+        $this->dm->flush();
     }
 
     private function transformUtm($setOnce = true)

@@ -683,8 +683,10 @@ class DefaultController extends BaseController
     {
         /** @var User $user */
         $user = $this->getUser();
+
         // causes admin's (or claims) too much confusion to be redirected to a 404
-        if ($user && !$user->hasEmployeeRole() && !$user->hasClaimsRole()) {
+        if ($user && !$user->hasEmployeeRole() && !$user->hasClaimsRole()
+            && ($user->hasActivePolicy() || $user->hasUnpaidPolicy())) {
             return $this->redirectToRoute('user_claim');
         }
 
@@ -816,8 +818,7 @@ class DefaultController extends BaseController
                 );
             } elseif (!$this->isValidUkMobile($ukMobileNumber)) {
                 $this->addFlash('error', sprintf(
-                    '%s does not appear to be a valid UK Mobile Number',
-                    $mobileNumber
+                    'Sorry, that number does not appear to be a valid UK Mobile Number'
                 ));
             } else {
                 $sms = $this->get('app.sms');
@@ -836,10 +837,10 @@ class DefaultController extends BaseController
                         'You should receive a download link shortly'
                     );
                 } else {
-                    $this->addFlash('error', sprintf(
-                        'Sorry, we had a problem sending a link to %s',
-                        $mobileNumber
-                    ));
+                    $this->addFlash(
+                        'error',
+                        'Sorry, we had a problem sending you a sms. Please download the so-sure app from your app store.'
+                    );
                 }
             }
         }

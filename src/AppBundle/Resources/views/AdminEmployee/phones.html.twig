@@ -85,12 +85,22 @@
             {{ form_errors(form.active) }}
             {{ form_widget(form.active, {'attr': {'class': 'col-sm-6'}}) }}
         </div>
-        <div class="form-group col-sm-4">
+        <div class="form-group col-sm-3">
             {{ form_label(form.rules, 'Business rules', {'label_attr': {'class': 'col-sm-6'}}) }}
             {{ form_errors(form.rules) }}
             {{ form_widget(form.rules, {'attr': {'class': 'col-sm-6'}}) }}
         </div>
-        <div class="form-group">
+        <div class="form-group col-sm-3">
+            {{ form_label(form.make, 'Make', {'label_attr': {'class': 'col-sm-4'}}) }}
+            {{ form_errors(form.make) }}
+            {{ form_widget(form.make, {'attr': {'class': 'col-sm-8'}}) }}
+        </div>
+        <div class="form-group col-sm-3">
+            {{ form_label(form.model, 'Model', {'label_attr': {'class': 'col-sm-4'}}) }}
+            {{ form_errors(form.model) }}
+            {{ form_widget(form.model, {'attr': {'class': 'col-sm-8'}}) }}
+        </div>
+        <div class="form-group col-sm-3">
           <div class="col-sm-2 col-sm-offset-3 text-center">
             {{ form_widget(form.search, {'label': 'Search', 'attr': {'class': 'btn btn-success'}}) }}
           </div>
@@ -617,6 +627,6 @@
         {{ form_end(additional_phones) }}
         </div>
       </div>
-    </div>  
-    {% endif %}  
+    </div>
+    {% endif %}
 {% endblock %}

@@ -40,6 +40,11 @@ trait DateTrait
         return false;
     }
 
+    public function now()
+    {
+        return \DateTime::createFromFormat('U', time());
+    }
+
     public function startOfPreviousMonth(\DateTime $date = null)
     {
         $startMonth = $this->startOfMonth($date);
@@ -351,6 +356,18 @@ trait DateTrait
     {
         $date = clone $date;
         return $date->add(new \DateInterval("P{$days}D"));
+    }
+
+    /**
+     * Creates a date interval over a given number of days and takes into account negative numbers.
+     * @param int $days is the number of days to make the interval cover.
+     * @return \DateInterval given number of days as an interval.
+     */
+    public static function intervalDays($days)
+    {
+        $interval = new \DateInterval("P".abs($days)."D");
+        $interval->invert = $days < 0 ? 1 : 0;
+        return $interval;
     }
 
     /**

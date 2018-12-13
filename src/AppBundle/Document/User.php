@@ -47,8 +47,8 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     const ROLE_CUSTOMER_SERVICES = 'ROLE_CUSTOMER_SERVICES';
     const ROLE_ADMIN = 'ROLE_ADMIN';
 
-    const AQUISITION_COMPLETED = 'completed'; // this is for aquisitions that have already happened.
-    const AQUISITION_PENDING = 'pending'; // This is for aquisitions that are on track to occur.
+    const AQUISITION_NEW = 'new'; // This is for aquisitions that are active but too new to go
+    const AQUISITION_PENDING = 'pending'; // This is for aquisitions that are active.
     const AQUISITION_POTENTIAL = 'potential'; // this is for aquired users with no policy.
     const AQUISITION_LOST = 'lost'; // this is for aquired users with a cancelled policy.
 
@@ -281,12 +281,6 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
      * @Gedmo\Versioned
      */
     protected $company;
-
-    /**
-     * @MongoDB\ReferenceOne(targetDocument="AffiliateCompany", inversedBy="confirmedUsers")
-     * @Gedmo\Versioned
-     */
-    protected $affiliate;
 
     /**
      * @MongoDB\ReferenceMany(targetDocument="Policy", mappedBy="user", prime={"user"})
@@ -623,16 +617,6 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     public function setCompany(Company $company)
     {
         $this->company = $company;
-    }
-
-    public function getAffiliate()
-    {
-        return $this->affiliate;
-    }
-
-    public function setAffiliate(AffiliateCompany $affiliate)
-    {
-        $this->affiliate = $affiliate;
     }
 
     public function addPolicy(Policy $policy)
@@ -1074,15 +1058,14 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         return $policies;
     }
 
-    public function isAffiliateCandidate($days)
+    public function isAffiliateCandidate($days, \DateTime $date)
     {
         foreach ($this->getValidPolicies(true) as $policy) {
             /** @var Policy $policy */
-            if ($policy->isPolicyOldEnough($days)) {
+            if ($policy->isPolicyOldEnough($days, $date)) {
                 return true;
             }
         }
-
         return false;
     }
 
@@ -2091,14 +2074,18 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
 
     /**
      * Tells you the what state the user is in regarding affiliate aquisition.
-     * @return string aquisition state name.
+     * @param int       $days is the number of days before aquisition becomes pending.
+     * @param \DateTime $date is the date that we are measuring from.
+     * @return string aquisition state name. Check out AQUISITION_* .
      */
-    public function aquisitionStatus()
+    public function aquisitionStatus($days, \DateTime $date)
     {
-        if ($this->affiliate) {
-            return static::AQUISITION_COMPLETED;
-        } elseif ($this->hasActivePolicy() || $this->hasUnpaidPolicy()) {
-            return static::AQUISITION_PENDING;
+        if ($this->hasActivePolicy() || $this->hasUnpaidPolicy()) {
+            if ($this->isAffiliateCandidate($days, $date)) {
+                return static::AQUISITION_PENDING;
+            } else {
+                return static::AQUISITION_NEW;
+            }
         } elseif ($this->hasPolicy()) {
             return static::AQUISITION_LOST;
         } else {

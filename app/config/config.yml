@@ -406,6 +406,8 @@ nelmio_security:
             browser_adaptive:
                 enabled: true
             report-uri: "%router.request_context.base_url%/ops/csp"
+            frame-ancestors:
+                - 'none'
             default-src:
                 - 'self'
                 - https://maxcdn.bootstrapcdn.com

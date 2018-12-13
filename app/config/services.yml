@@ -454,6 +454,7 @@ services:
         arguments:
             - "@request_stack"
             - "@logger"
+            - "@router"
         public: false
         tags:
             - { name: twig.extension }
@@ -1596,17 +1597,12 @@ services:
         tags:
             - { name: form.type }
 
-    picsureml.form.type.annotate:
-        class: PicsureMLBundle\Form\Type\AnnotateType
-        arguments: ["@request_stack", "%form_required%"]
-        tags:
-            - { name: form.type }
-
-    picsureml.form.type.label:
-        class: PicsureMLBundle\Form\Type\LabelType
+    picsureml.form.type.edit:
+        class: PicsureMLBundle\Form\Type\EditType
         arguments: ["@picsureml.picsureml", "%form_required%"]
         tags:
             - { name: form.type }
+
     twig.extension.text:
            class: Twig_Extensions_Extension_Text
            tags:
