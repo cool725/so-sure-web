@@ -57,34 +57,6 @@ class PromotionServiceTest extends WebTestCase
     }
 
     /**
-     * Tests the promotion service end participation function for completed participations and failed ones as well.
-     */
-    public function testEndParticipation()
-    {
-        $promotion = $this->createTestPromotion(
-            "free!!! phone case!!!!!!!!!",
-            30,
-            0,
-            false,
-            Promotion::REWARD_TASTE_CARD
-        );
-        $a = $this->createPersistentUser();
-        $b = $this->createPersistentUser();
-        $aParticipation = $this->participate($promotion, $a, new \DateTime());
-        $bParticipation = $this->participate($promotion, $b, new \DateTime());
-        // Test completed participation.
-        $mock = $this->mockMailerSend(1);
-        static::$promotionService->endParticipation($aParticipation, new \DateTime);
-        $this->assertEquals(Participation::STATUS_COMPLETED, $aParticipation->getStatus());
-        $mock->__phpunit_verify();
-        // Test failed participation.
-        $mock = $this->mockMailerSend(0);
-        static::$promotionService->endParticipation($bParticipation, new \DateTime(), Participation::STATUS_FAILED);
-        $this->assertEquals(Participation::STATUS_FAILED, $bParticipation->getStatus());
-        $mock->__phpunit_verify();
-    }
-
-    /**
      * Tests the promotion service generate method.
      */
     public function testGenerate()
@@ -101,7 +73,7 @@ class PromotionServiceTest extends WebTestCase
         $date = new \DateTime();
         // no condition and period not passed.
         $aParticipation = $this->participate($promotion, $a, $date);
-        $this->addDays($date, 5);
+        $date = $this->addDays($date, 5);
         $bParticipation = $this->participate($promotion, $b, $date);
         $mock = $this->mockMailerSend(0);
         static::$promotionService->generate([$promotion], $date);
@@ -109,13 +81,13 @@ class PromotionServiceTest extends WebTestCase
         $this->assertEquals(Participation::STATUS_ACTIVE, $aParticipation->getStatus());
         $this->assertEquals(Participation::STATUS_ACTIVE, $bParticipation->getStatus());
         // no condition and period passed.
-        $this->addDays($date, 25);
+        $date = $this->addDays($date, 25);
         $mock = $this->mockMailerSend(1);
         static::$promotionService->generate([$promotion], $date);
         $mock->__phpunit_verify();
         $this->assertEquals(Participation::STATUS_COMPLETED, $aParticipation->getStatus());
         $this->assertEquals(Participation::STATUS_ACTIVE, $bParticipation->getStatus());
-        $this->addDays($date, 5);
+        $date = $this->addDays($date, 5);
         $mock = $this->mockMailerSend(1);
         $changes = static::$promotionService->generate([$promotion], $date);
         $mock->__phpunit_verify();
@@ -123,17 +95,17 @@ class PromotionServiceTest extends WebTestCase
         $this->assertEquals(Participation::STATUS_COMPLETED, $aParticipation->getStatus());
         $this->assertEquals(Participation::STATUS_COMPLETED, $bParticipation->getStatus());
         // Make sure once it's all done no more stuff happens.
-        $this->addDays($date, 30);
+        $date = $this->addDays($date, 30);
         $mock = $this->mockMailerSend(0);
         static::$promotionService->generate([$promotion], $date);
         $mock->__phpunit_verify();
         // Add an invalid participation
         $c = $this->createPersistentUser();
         $cParticipation = $this->participate($promotion, $c, $date);
-        $this->addDays($date, 5);
+        $date = $this->addDays($date, 5);
         static::$promotionService->generate([$promotion], $date);
         $this->assertEquals(Participation::STATUS_ACTIVE, $cParticipation->getStatus());
-        $this->addDays($date, 5);
+        $date = $this->addDays($date, 5);
         $c->setTasteCard("asdfghjklp");
         $mock = $this->mockMailerSend(1);
         $changes = static::$promotionService->generate([$promotion], $date);
@@ -156,10 +128,112 @@ class PromotionServiceTest extends WebTestCase
     }
 
     /**
-     * Tests all condition forms and all outcomes those conditions can produce.
+     * Runs the rewardConditions method directly and tests that it outputs the right stuff.
      */
-    public function testCheckConditions()
+    public function testRewardConditions()
     {
+        $promotion = $this->createTestPromotion(
+            "free!!! phone case!!!!!!!!!",
+            30,
+            0,
+            true,
+            Promotion::REWARD_TASTE_CARD
+        );
+        $a = $this->createPersistentUser();
+        $b = $this->createPersistentUser();
+        $c = $this->createPersistentUser();
+        $date = new \DateTime("1208-02-05 17:33");
+        $aParticipation = $this->participate($promotion, $a, $date);
+        $bParticipation = $this->participate($promotion, $b, $date);
+        $cParticipation = $this->participate($promotion, $c, $date);
+        $this->claim($b, $date);
+        $this->invite($b, static::generateEmail('areg', $this), $date);
+        $this->invite($c, static::generateEmail('areg', $this), $date);
+        // no conditions
+        $this->assertNull(static::$promotionService->rewardConditions($aParticipation, $date));
+        $this->assertNull(static::$promotionService->rewardConditions($bParticipation, $date));
+        $this->assertNull(static::$promotionService->rewardConditions($cParticipation, $date));
+        $date = $this->addDays($date, 29);
+        $this->assertNull(static::$promotionService->rewardConditions($aParticipation, $date));
+        $this->assertNull(static::$promotionService->rewardConditions($bParticipation, $date));
+        $this->assertNull(static::$promotionService->rewardConditions($cParticipation, $date));
+        $date = $this->addDays($date, 1);
+        $this->assertEquals(
+            Participation::STATUS_COMPLETED,
+            static::$promotionService->rewardConditions($aParticipation, $date)
+        );
+        $this->assertEquals(
+            Participation::STATUS_COMPLETED,
+            static::$promotionService->rewardConditions($bParticipation, $date)
+        );
+        $this->assertEquals(
+            Participation::STATUS_COMPLETED,
+            static::$promotionService->rewardConditions($cParticipation, $date)
+        );
+        // add ban on claims.
+        $promotion->setConditionPeriod(40);
+        $promotion->setConditionAllowClaims(false);
+        $this->assertNull(static::$promotionService->rewardConditions($aParticipation, $date));
+        $this->assertEquals(
+            Participation::STATUS_FAILED,
+            static::$promotionService->rewardConditions($bParticipation, $date)
+        );
+        $this->assertNull(static::$promotionService->rewardConditions($cParticipation, $date));
+        // add mandatory invitation.
+        $promotion->setConditionInvitations(1);
+        $this->assertNull(static::$promotionService->rewardConditions($aParticipation, $date));
+        $this->assertEquals(
+            Participation::STATUS_FAILED,
+            static::$promotionService->rewardConditions($bParticipation, $date)
+        );
+        $this->assertNull(static::$promotionService->rewardConditions($cParticipation, $date));
+        $date = $this->addDays($date, 10);
+        $this->assertEquals(
+            Participation::STATUS_FAILED,
+            static::$promotionService->rewardConditions($aParticipation, $date)
+        );
+        $this->assertEquals(
+            Participation::STATUS_FAILED,
+            static::$promotionService->rewardConditions($bParticipation, $date)
+        );
+        $this->assertEquals(
+            Participation::STATUS_COMPLETED,
+            static::$promotionService->rewardConditions($cParticipation, $date)
+        );
+    }
+
+    /**
+     * Tests that the invalidation conditions function points out the right invalid participations.
+     */
+    public function testInvalidationConditions()
+    {
+        $promotion = $this->createTestPromotion(
+            "free!!! phone case!!!!!!!!!",
+            30,
+            0,
+            true,
+            Promotion::REWARD_TASTE_CARD
+        );
+        $date = new \DateTime("2018-05-19 11:02");
+        $a = $this->createPersistentUser();
+        $b = $this->createPersistentUser();
+        $aParticipation = $this->participate($promotion, $a, $date);
+        $bParticipation = $this->participate($promotion, $b, $date);
+        $this->assertNull(static::$promotionService->invalidationConditions($aParticipation));
+        $this->assertNull(static::$promotionService->invalidationConditions($bParticipation));
+        $a->setTasteCard("1234567890");
+        $this->assertEquals(
+            Participation::INVALID_EXISTING_TASTE_CARD,
+            static::$promotionService->invalidationConditions($aParticipation)
+        );
+    }
+
+    /**
+     * Tests the promotion service end participation function for completed participations and failed ones as well.
+     */
+    public function testEndParticipation()
+    {
+        $date = new \DateTime();
         $promotion = $this->createTestPromotion(
             "free!!! phone case!!!!!!!!!",
             30,
@@ -169,72 +243,46 @@ class PromotionServiceTest extends WebTestCase
         );
         $a = $this->createPersistentUser();
         $b = $this->createPersistentUser();
+        $aParticipation = $this->participate($promotion, $a, new \DateTime());
+        $bParticipation = $this->participate($promotion, $b, new \DateTime());
+        // Test completed participation.
+        $mock = $this->mockMailerSend(1);
+        static::$promotionService->endParticipation($aParticipation, Participation::STATUS_COMPLETED, $date);
+        $this->assertEquals(Participation::STATUS_COMPLETED, $aParticipation->getStatus());
+        $this->assertEquals($date, $aParticipation->getEnd());
+        $mock->__phpunit_verify();
+        // Test failed participation.
+        $mock = $this->mockMailerSend(0);
+        static::$promotionService->endParticipation($bParticipation, Participation::STATUS_FAILED, $date);
+        $this->assertEquals(Participation::STATUS_FAILED, $bParticipation->getStatus());
+        $this->assertEquals($date, $bParticipation->getEnd());
+        $mock->__phpunit_verify();
+    }
+
+    /**
+     * tests to make sure when you invalidate a participation the email sends and the status and date are set.
+     */
+    public function testInvalidateParticipation()
+    {
         $date = new \DateTime();
-        $aParticipation = $this->participate($promotion, $a, $date);
-        $this->addDays($date, 5);
-        $bParticipation = $this->participate($promotion, $b, $date);
-        // Check no claims condition.
-        static::$promotionService->generate([$promotion], $date);
-        $this->assertEquals(Participation::STATUS_ACTIVE, $aParticipation->getStatus());
-        $this->assertEquals(Participation::STATUS_ACTIVE, $bParticipation->getStatus());
-        $this->addDays($date, 25);
-        static::$promotionService->generate([$promotion], $date);
-        $this->assertEquals(Participation::STATUS_COMPLETED, $aParticipation->getStatus());
-        $this->assertEquals(Participation::STATUS_ACTIVE, $bParticipation->getStatus());
-        $this->claim($b, $date);
-        static::$promotionService->generate([$promotion], $date);
-        $this->assertEquals(Participation::STATUS_COMPLETED, $aParticipation->getStatus());
-        $this->assertEquals(Participation::STATUS_FAILED, $bParticipation->getStatus());
-        $this->addDays($date, 30);
-        static::$promotionService->generate([$promotion], $date);
-        $this->assertEquals(Participation::STATUS_COMPLETED, $aParticipation->getStatus());
-        $this->assertEquals(Participation::STATUS_FAILED, $bParticipation->getStatus());
-        // Check X invitations condition.
-        $promotion->setConditionInvitations(2);
-        $c = $this->createPersistentUser();
-        $d = $this->createPersistentUser();
-        $cParticipation = $this->participate($promotion, $c, $date);
-        $this->addDays($date, 10);
-        $dParticipation = $this->participate($promotion, $d, $date);
-        $this->addDays($date, 10);
-        static::$promotionService->generate([$promotion], $date);
-        $this->assertEquals(Participation::STATUS_ACTIVE, $cParticipation->getStatus());
-        $this->assertEquals(Participation::STATUS_ACTIVE, $dParticipation->getStatus());
-        $this->invite($c, static::generateEmail('areg', $this), $date);
-        $this->invite($d, static::generateEmail('areg', $this), $date);
-        $this->addDays($date, 10);
-        static::$promotionService->generate([$promotion], $date);
-        $this->assertEquals(Participation::STATUS_FAILED, $cParticipation->getStatus());
-        $this->assertEquals(Participation::STATUS_ACTIVE, $dParticipation->getStatus());
-        $this->invite($d, static::generateEmail('aewrgreg', $this), $date);
-        static::$promotionService->generate([$promotion], $date);
-        $this->assertEquals(Participation::STATUS_FAILED, $cParticipation->getStatus());
-        $this->assertEquals(Participation::STATUS_ACTIVE, $dParticipation->getStatus());
-        $this->addDays($date, 10);
-        static::$promotionService->generate([$promotion], $date);
-        $this->assertEquals(Participation::STATUS_FAILED, $cParticipation->getStatus());
-        $this->assertEquals(Participation::STATUS_COMPLETED, $dParticipation->getStatus());
-        // Check no condition.
-        $promotion->setConditionInvitations(0);
-        $promotion->setConditionAllowClaims(true);
-        $e = $this->createPersistentUser();
-        $f = $this->createPersistentUser();
-        $eParticipation = $this->participate($promotion, $e, $date);
-        $this->addDays($date, 10);
-        $fParticipation = $this->participate($promotion, $f, $date);
-        $this->addDays($date, 10);
-        static::$promotionService->generate([$promotion], $date);
-        $this->assertEquals(Participation::STATUS_ACTIVE, $eParticipation->getStatus());
-        $this->assertEquals(Participation::STATUS_ACTIVE, $fParticipation->getStatus());
-        $this->claim($e, $date);
-        $this->addDays($date, 10);
-        static::$promotionService->generate([$promotion], $date);
-        $this->assertEquals(Participation::STATUS_COMPLETED, $eParticipation->getStatus());
-        $this->assertEquals(Participation::STATUS_ACTIVE, $fParticipation->getStatus());
-        $this->addDays($date, 10);
-        static::$promotionService->generate([$promotion], $date);
-        $this->assertEquals(Participation::STATUS_COMPLETED, $eParticipation->getStatus());
-        $this->assertEquals(Participation::STATUS_COMPLETED, $fParticipation->getStatus());
+        $promotion = $this->createTestPromotion(
+            "free!!! phone case!!!!!!!!!",
+            30,
+            0,
+            false,
+            Promotion::REWARD_TASTE_CARD
+        );
+        $user = $this->createPersistentUser();
+        $participation = $this->participate($promotion, $user, new \DateTime());
+        $mock = $this->mockMailerSend(1);
+        static::$promotionService->invalidateParticipation(
+            $participation,
+            Participation::INVALID_EXISTING_TASTE_CARD,
+            $date
+        );
+        $this->assertEquals(Participation::STATUS_INVALID, $participation->getStatus());
+        $this->assertEquals($date, $participation->getEnd());
+        $mock->__phpunit_verify();
     }
 
     /**

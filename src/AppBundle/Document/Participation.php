@@ -97,9 +97,19 @@ class Participation
         return $this->start;
     }
 
-    public function setStart($start)
+    public function setStart(\DateTime $start)
     {
         $this->start = $start;
+    }
+
+    public function getEnd()
+    {
+        return $this->end;
+    }
+
+    public function setEnd(\DateTime $end)
+    {
+        $this->end = $end;
     }
 
     public function getStatus()

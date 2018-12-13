@@ -40,7 +40,7 @@ class PromotionService
      * and invalidates promotion participations that have failed or become impossible.
      * @param array|null $promotions is the list of promotions or null to load in those promotions.
      * @param \DateTime  $date       is the date that is to be considered as current for the evaluation of conditions.
-     * @return int number of promotions that have been completed.
+     * @return array associative and each key is a set status and the tally set to that. if not existent then 0.
      */
     public function generate($promotions = null, \DateTime $date = null)
     {
@@ -53,21 +53,20 @@ class PromotionService
         $endings = [];
         foreach ($participations as $participation) {
             $policy = $participation->getPolicy();
-
-
-
-
-
-
-
-            if ($participation->getPromotion()->getReward() == Promotion::REWARD_TASTE_CARD &&
-                $policy->getTasteCard()
-            ) {
-                // NOTE: if more conditions of failure emerge then this should become a function.
-                $this->endParticipation($participation, $date, Participation::STATUS_INVALID);
-                $this->addEnding(Participation::STATUS_INVALID, $endings);
+            $status = $this->invalidationConditions($participation);
+            if ($status) {
+                $this->invalidateParticipation($participation, $status, $date);
+                $status = Participation::STATUS_INVALID;
             } else {
-                $this->addEnding($this->rewardConditions($participation, $date), $endings);
+                $status = $this->rewardConditions($participation, $date);
+                if ($status) {
+                    $this->endParticipation($participation, $status, $date);
+                }
+            }
+            if ($status && array_key_exists($status, $endings)) {
+                $endings[$status]++;
+            } else {
+                $endings[$status] = 1;
             }
         }
         return $endings;
@@ -77,7 +76,7 @@ class PromotionService
      * Tells what the status of a participation should be set to.
      * @param Participation $participation is the participation which we are checking.
      * @param \DateTime     $date          is the date considered as current for the purposes of the conditions.
-     * @return String a participation status.
+     * @return String|null a participation status or null to keep it active.
      */
     public function rewardConditions($participation, \DateTime $date)
     {
@@ -89,16 +88,16 @@ class PromotionService
         $claims = $policy->getClaimsInPeriod($participation->getStart(), $end);
         // Conditions.
         if (!$promotion->getConditionAllowClaims() && count($claims) > 0) {
-            return $this->endParticipation($participation, $date, Participation::STATUS_FAILED);
+            return Participation::STATUS_FAILED;
         }
         if ($finished) {
             /** @var InvitationRepository $invitationRepository */
             $invitationRepository = $this->dm->getRepository(Invitation::class);
             $invites = $invitationRepository->count([$policy], $participation->getStart(), $end);
             if ($promotion->getConditionInvitations() > $invites) {
-                return $this->endParticipation($participation, $end, Participation::STATUS_FAILED);
+                return Participation::STATUS_FAILED;
             } else {
-                return $this->endParticipation($participation, $end);
+                return Participation::STATUS_COMPLETED;
             }
         }
         return null;
@@ -122,11 +121,11 @@ class PromotionService
     /**
      * Set a participation as complete and email marketing to tell them to give the reward.
      * @param Participation $participation is the participation to complete.
-     * @param \DateTime     $date          is the date of the participation's completion.
      * @param String        $status        is the status to set the participation as now having.
+     * @param \DateTime     $date          is the date of the participation's completion.
      * @return String the status that you passed in for convenience.
      */
-    public function endParticipation($participation, \DateTime $date, $status = Participation::STATUS_COMPLETED)
+    public function endParticipation($participation, $status, \DateTime $date)
     {
         $participation->endWithStatus($status, $date);
         $this->dm->flush();
@@ -137,8 +136,6 @@ class PromotionService
                 "AppBundle:Email:promotion/rewardEarned.html.twig",
                 ["participation" => $participation]
             );
-        } elseif ($status == Participation::STATUS_INVALID) {
-
         }
         return $status;
     }
@@ -157,8 +154,8 @@ class PromotionService
         $this->dm->flush();
         $message = null;
         // Failure condition messages. NOTE: only one now, but more may be added.
-        switch ($failure) {
-            case Promotion::INVALID_EXISTING_TASTE_CARD:
+        switch ($reason) {
+            case Participation::INVALID_EXISTING_TASTE_CARD:
                 $message = "Promotion reward is a tastecard, but user already has a tastecard.";
                 break;
         }
