@@ -1302,8 +1302,8 @@ class PurchaseController extends BaseController
                 if ($cancelForm->isValid()) {
                     $reason = $cancelForm->getData()['reason'];
                     $other = $cancelForm->getData()['othertxt'];
-                    $message;
-                    $flash;
+                    $message = null;
+                    $flash = null;
                     if ($policy->isWithinCooloffPeriod(null, false)) {
                         $policy->cancel(Policy::CANCELLED_USER_REQUESTED);
                         $dm->flush();
