@@ -20,6 +20,8 @@ class Imei
 
     protected $imei;
 
+    protected $phone;
+
     public function getImei()
     {
         return $this->imei;
@@ -51,5 +53,15 @@ class Imei
     public function setNote($note)
     {
         $this->note = $note;
+    }
+
+    public function getPhone()
+    {
+        return $this->phone;
+    }
+
+    public function setPhone($phone)
+    {
+        $this->phone = $phone;
     }
 }

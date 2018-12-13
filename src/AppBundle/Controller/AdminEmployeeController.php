@@ -744,7 +744,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                         $policy->addNoteDetails(
                             $imei->getNote(),
                             $this->getUser(),
-                            'IMEI Change'
+                            'IMEI details change'
                         );
                     } else {
                         $this->addFlash(

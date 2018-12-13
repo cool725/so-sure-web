@@ -45,6 +45,12 @@
             </div>
 
             <div class="form-row">
+                <label>Insured Phone *</label>
+                {{ form_widget(form.phone, {'attr': {'class': 'form-control'}}) }}
+                <p class="help-block">* Changing the insured phone will trigger a salva policy update</p>
+            </div>
+
+            <div class="form-row">
                 <label>Justification</label>
                 {{ form_widget(form.note, {'attr': {'class': 'form_note form-control'}}) }}
             </div>
