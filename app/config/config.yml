@@ -400,6 +400,11 @@ ewz_recaptcha:
     enabled:     true
 
 nelmio_security:
+    referrer_policy:
+        enabled: true
+        policies:
+        - 'no-referrer'
+        - 'strict-origin-when-cross-origin'
     csp:
         report_logger_service: monolog.logger.security
         content_types: ['text/html']
