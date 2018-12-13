@@ -211,7 +211,7 @@ class DoctrineClaimListenerTest extends WebTestCase
 
         // Change inside the Claim::setPolicy does a doctrine update as well, which triggers the last updated
         $expectedUnderwriterUpdated = \DateTime::createFromFormat('U', time());
-        $this->assertEquals($expectedUnderwriterUpdated, $claim->getUnderwriterLastUpdated(), '', 0);
+        $this->assertEquals($expectedUnderwriterUpdated, $claim->getUnderwriterLastUpdated(), 'initial', 0);
         // $this->assertNull($claim->getUnderwriterLastUpdated());
 
         $dg = new DirectGroupHandlerClaim();
@@ -243,7 +243,7 @@ class DoctrineClaimListenerTest extends WebTestCase
         $updatedClaim = $this->loadClaim($claim);
         $this->assertNotNull($updatedClaim->getUnderwriterLastUpdated());
 
-        $this->assertEquals($expectedUnderwriterUpdated, $updatedClaim->getUnderwriterLastUpdated(), '', 0);
+        $this->assertEquals($expectedUnderwriterUpdated, $updatedClaim->getUnderwriterLastUpdated(), 'final', 0);
     }
 
     public function testClaimsListenerActualDaviesDiff()

@@ -263,7 +263,29 @@ class DateTraitTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * Makes sure addDays can add arbitrary days in negative and positive and give the right dates out.
+     * Tests to make sure timezoneFormat works with and without proper dates given.
+     */
+    public function testTimezoneFormat()
+    {
+        $utc = new \DateTimeZone("UTC");
+        $london = new \DateTimeZone("/Europe/London");
+        $this->assertEquals("", static::timezoneFormat(null, $utc, "d/m/Y H:i"));
+        $this->assertEquals(
+            "01:23 2018-22-03",
+            static::timezoneFormat(new \DateTime('2018-03-22 01:23'), $utc, "H:i Y-d-m")
+        );
+        $this->assertEquals(
+            "20/04/2018 01:23",
+            static::timezoneFormat(new \DateTime('2018-04-20 00:23'), $london, "d/m/Y H:i")
+        );
+        $this->assertEquals(
+            "01/01/1970 01:00",
+            static::timezoneFormat(new \DateTime('1970-01-01 00:00'), $london, "d/m/Y H:i")
+        );
+    }
+
+    /**
+     * Tests to make sure addDays works as expected.
      */
     public function testaddDays()
     {

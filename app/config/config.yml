@@ -394,6 +394,11 @@ nexy_slack:
     # The Slack API Incoming WebHooks URL.
     endpoint:             "%slack_webhook%"
 
+ewz_recaptcha:
+    public_key:  "%recaptcha_public_key%"
+    private_key: "%recaptcha_private_key%"
+    enabled:     true
+
 nelmio_security:
     csp:
         report_logger_service: monolog.logger.security
@@ -406,6 +411,8 @@ nelmio_security:
             browser_adaptive:
                 enabled: true
             report-uri: "%router.request_context.base_url%/ops/csp"
+            frame-ancestors:
+                - 'none'
             default-src:
                 - 'self'
                 - https://maxcdn.bootstrapcdn.com
@@ -787,6 +794,7 @@ nelmio_security:
                 - https://track.omguk.com
                 - 'data:'
                 - https://bat.bing.com
+                - https://www.gstatic.com
                 # https://en.wikipedia.org/wiki/List_of_Google_domains
                 - https://www.google.com
                 - https://www.google.ac
