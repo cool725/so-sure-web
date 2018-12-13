@@ -369,7 +369,7 @@ class DaviesServiceTest extends WebTestCase
 
         $this->assertEquals(0, count(self::$daviesService->getWarnings()));
         self::$daviesService->saveClaims(1, [$daviesOpen]);
-            print_r(self::$daviesService->getErrors());
+        //print_r(self::$daviesService->getErrors());
         //print_r(self::$daviesService->getWarnings());
         $this->assertEquals(0, count(self::$daviesService->getErrors()));
         $this->assertEquals(0, count(self::$daviesService->getWarnings()));
