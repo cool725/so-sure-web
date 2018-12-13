@@ -77,7 +77,7 @@ class Participation
         return $this->promotion;
     }
 
-    public function setPromotion($promotion)
+    public function setPromotion(Promotion $promotion)
     {
         $this->promotion = $promotion;
     }
@@ -87,7 +87,7 @@ class Participation
         return $this->policy;
     }
 
-    public function setPolicy($policy)
+    public function setPolicy(Policy $policy)
     {
         $this->policy = $policy;
     }
