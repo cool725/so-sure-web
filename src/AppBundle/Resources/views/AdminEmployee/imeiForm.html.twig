@@ -30,16 +30,18 @@
                 </div>
             </div>
 
-            <div class="form-row">
-                <label>Current IMEI</label>
-                <p>{{ policy.imei }}</p>
-            </div>
-
             <hr>
 
-            <div class="form-row">
-                <label>New IMEI</label>
-                {{ form_widget(form.imei, {'attr': {'class': 'form-control'}}) }}
+            <div class="row">
+                <div class="col-xs-6">
+                    <label>Current IMEI</label>
+                    <p>{{ policy.imei }}</p>
+                </div>
+
+                <div class="col-xs-6">
+                    <label>New IMEI</label>
+                    {{ form_widget(form.imei, {'attr': {'class': 'form-control'}}) }}
+                </div>
             </div>
 
             <div class="form-row">

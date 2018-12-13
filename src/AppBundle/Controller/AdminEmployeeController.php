@@ -798,8 +798,9 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                     $policy->setDetectedImei($imei->getImei());
 
                     $policy->addNoteDetails(
-                        sprintf('Updated detected imei. Additional notes: %s', $imei->getNote()),
-                        $this->getUser()
+                        $imei->getNote(),
+                        $this->getUser(),
+                        'Detected IMEI Update'
                     );
 
                     $dm->flush();
@@ -865,7 +866,8 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
 
                         $policy->addNoteDetails(
                             $picsureForm->getData()['note'],
-                            $this->getUser()
+                            $this->getUser(),
+                            'Changed Pic-Sure status'
                         );
 
                         $dm->flush();
@@ -937,12 +939,9 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
 
                     $policy->addLinkedClaim($claim);
                     $policy->addNoteDetails(
-                        sprintf(
-                            'Linked Claim %s. Notes: %s',
-                            $linkClaimform->get('number')->getData(),
-                            $linkClaimform->get('note')->getData()
-                        ),
-                        $this->getUser()
+                        $linkClaimform->get('note')->getData(),
+                        $this->getUser(),
+                        sprintf('Linked Claim %s', $linkClaimform->get('number')->getData())
                     );
 
                     $dm->flush();
