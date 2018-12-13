@@ -6,6 +6,13 @@
 {% set show_bacs_setup = false %}
 {% set show_bacs_retry = false %}
 {% set judo_btn_text = 'Update my card details' %}
+{% if show_judo %}
+   {% if show_bacs_setup %}
+    {% set judo_btn_text = 'Continue to card payment' %}
+   {% else %}
+    {% set judo_btn_text = 'Proceed to card payment' %}
+   {% endif %}
+{% endif %}
 
 {% block title %}
     so-sure
@@ -73,7 +80,6 @@
                     {% set show_bacs_setup = true %}
                     {% if not policy.canBacsPaymentBeMadeInTime %}
                         {% set show_judo = true %}
-                        {% set judo_btn_text = 'Proceed to card payment' %}
                     {% endif %}
                     <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_card-reader.png" alt="so-sure" width="180px">
                     <h1 class="h2 mb-4">Direct Debit invalid </h1>
@@ -86,7 +92,6 @@
                     {% set show_bacs_retry = true %}
                     {% if not policy.canBacsPaymentBeMadeInTime %}
                         {% set show_judo = true %}
-                        {% set judo_btn_text = 'Proceed to card payment' %}
                     {% endif %}
                     <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_card-reader.png" alt="so-sure" width="180px">
                     <h1 class="h2 mb-4">Payment failed</h1>
@@ -100,7 +105,6 @@
                     {% set show_bacs_retry = true %}
                     {% if not policy.canBacsPaymentBeMadeInTime %}
                         {% set show_judo = true %}
-                        {% set judo_btn_text = 'Proceed to card payment' %}
                     {% endif %}
 
                     <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_card-reader.png" alt="so-sure" width="180px">
@@ -122,12 +126,10 @@
                     <h1 class="h2 mb-4">Card Expired</h1>
                     <p>We were unable to take payment because your card ending <strong>{{ policy.user.paymentMethod.cardLastFour }}</strong> has expired.</p>
 
-                    {% if show_bacs_setup %}
-                        {% set judo_btn_text = 'Continue to card payment' %}
-                    {% else %}
-                        {% set judo_btn_text = 'Proceed to card payment' %}
+                    {% if not show_bacs_setup %}
                         <p>To avoid your policy being cancelled update your card details and pay the outstanding balance of <strong>&pound;{{ amount|number_format(2, '.', ',') }}</strong> now.</p>
                     {% endif %}
+
                     {# END - CARD EXPIRED #}
 
                 {% elseif unpaid_reason == 'unpaid_judo_payment_failed' %}
@@ -142,12 +144,6 @@
                     <h1 class="h2 mb-4">Payment Failed</h1>
                     <p>We were unable to take payment because your card ending <strong>{{ policy.user.paymentMethod.cardLastFour }}</strong> was declined.</p>
                     <p>To avoid your policy being cancelled update your card details and pay the outstanding balance of <strong>&pound;{{ amount|number_format(2, '.', ',') }}</strong> now.</p>
-
-                    {% if show_bacs_setup %}
-                        {% set judo_btn_text = 'Continue to card payment' %}
-                    {% else %}
-                        {% set judo_btn_text = 'Proceed to card payment' %}
-                    {% endif %}
                     {# END - PAYMENT FAILED #}
 
                 {% elseif unpaid_reason == 'unpaid_judo_payment_missing' %}
@@ -162,12 +158,6 @@
                     <h1 class="h2 mb-4">Payment Failed</h1>
                     <p>We were unable to take payment of <strong>&pound;{{ amount|number_format(2, '.', ',') }}</strong> because your account appears to missing payment details</p>
                     <p>To avoid your policy being cancelled update your card details and pay the outstanding balance now.</p>
-
-                    {% if show_bacs_setup %}
-                        {% set judo_btn_text = 'Continue to card payment' %}
-                    {% else %}
-                        {% set judo_btn_text = 'Proceed to card payment' %}
-                    {% endif %}
                     {# END - PAYMENT MISSING #}
 
                 {% else %}
@@ -186,6 +176,24 @@
     <section class="d-flex flex-column justify-content-center align-items-center">
         <div class="container">
             <div class="text-center pb-5">
+                {# IF CAN RETRY BACS #}
+                {% if show_bacs_retry %}
+                    {% if policy.canBacsPaymentBeMadeInTime %}
+                        {# TODO: Do we need to check mandate status here? #}
+                        <p>We need your permission to take &pound;{{ amount|number_format(2, '.', ',') }} from your account ({{ app.user.paymentMethod.bankAccount }}). Once you have given us permission, your payment will be scheduled as soon as possible (within 3 business days).</p>
+                        {{ form_start(form, {'attr': {'id': 'reschedule-bacs-form'}})  }}
+                            <div class="form-group">
+                                {{ form_widget(form.reschedule, {'attr': {'class': 'btn btn-success'}}) }}
+                            </div>
+                        {{ form_end(form) }}
+                    {% else %}
+                        <p>Sorry, there is not enough time to retry a Direct Debit payment before your policy will expire.</p>
+                        {% if not show_judo %}
+                            <p>Please <a href="mailto:support@wearesosure.com" class="open-intercom">contact us</a>.</p>
+                        {% endif %}
+                    {% endif %}
+                {% endif %}
+                {# END - IF CAN RETRY BACS #}
                 {# IF CAN SETUP BACS #}
                 {% if show_bacs_setup %}
                     {% if policy.canBacsPaymentBeMadeInTime %}
@@ -208,24 +216,6 @@
                     {% endif %}
                 {% endif %}
                 {# END - IF CAN SETUP BACS #}
-                {# IF CAN RETRY BACS #}
-                {% if show_bacs_retry %}
-                    {% if policy.canBacsPaymentBeMadeInTime %}
-                        {# TODO: Do we need to check mandate status here? #}
-                        <p>We need your permission to take &pound;{{ amount|number_format(2, '.', ',') }} from your account ({{ app.user.paymentMethod.bankAccount }}). Once you have given us permission, your payment will be scheduled as soon as possible (within 3 business days).</p>
-                        {{ form_start(form, {'attr': {'id': 'reschedule-bacs-form'}})  }}
-                            <div class="form-group">
-                                {{ form_widget(form.reschedule, {'attr': {'class': 'btn btn-success'}}) }}
-                            </div>
-                        {{ form_end(form) }}
-                    {% else %}
-                        <p>Sorry, there is not enough time to retry a Direct Debit payment before your policy will expire.</p>
-                        {% if not show_judo %}
-                            <p>Please <a href="mailto:support@wearesosure.com" class="open-intercom">contact us</a>.</p>
-                        {% endif %}
-                    {% endif %}
-                {% endif %}
-                {# END - IF CAN RETRY BACS #}
                 {% if show_judo and webpay_action and webpay_reference and amount > 0 %}
                     <form action="{{ webpay_action }}" method="post" id="webpay-form">
                         <div class="form-group">
