@@ -35,8 +35,6 @@ class AdminEmployeeControllerTest extends BaseControllerTest
         self::$dm = $dm;
     }
 
-    public function test
-
     public function testDebtCollectorEmails()
     {
         // start policy 45 days ago
