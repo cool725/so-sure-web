@@ -714,7 +714,7 @@ class DaviesServiceTest extends WebTestCase
         $claim1->setHandlingTeam(Claim::TEAM_DAVIES);
         $policy1->addClaim($claim1);
         $claim1->setNumber('1');
-        $claim1->setType(Claim::TYPE_THEFT);
+        //$claim1->setType(Claim::TYPE_THEFT);
 
         $policy2 = static::createUserPolicy(true);
         $policy2->getUser()->setEmail(static::generateEmail('testSaveClaimsSaveException-2', $this));
@@ -735,6 +735,7 @@ class DaviesServiceTest extends WebTestCase
         $claim1Id = $claim1->getId();
         $claim2Id = $claim2->getId();
 
+        // expected error
         $daviesOpen1 = new DaviesHandlerClaim();
         $daviesOpen1->claimNumber = '1';
         $daviesOpen1->policyNumber = $policy1->getPolicyNumber();
@@ -743,8 +744,9 @@ class DaviesServiceTest extends WebTestCase
         $daviesOpen1->reserved = 1;
         $daviesOpen1->riskPostCode = 'BX1 1LT';
         $daviesOpen1->insuredName = 'Foo Bar';
-        $daviesOpen1->lossType = DaviesHandlerClaim::TYPE_THEFT;
+        //$daviesOpen1->lossType = DaviesHandlerClaim::TYPE_THEFT;
 
+        // should be saved
         $daviesOpen2 = new DaviesHandlerClaim();
         $daviesOpen2->claimNumber = '2';
         $daviesOpen2->policyNumber = $policy2->getPolicyNumber();
@@ -761,8 +763,9 @@ class DaviesServiceTest extends WebTestCase
 
         self::$daviesService->saveClaims(2, [$daviesOpen1, $daviesOpen2]);
 
-        print_r(self::$daviesService->getErrors());
+        // print_r(self::$daviesService->getErrors());
 
+        // Claims type does not match for claim 1 [Record import failed]
         $this->assertEquals(1, count(self::$daviesService->getErrors()));
 
         $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
@@ -804,6 +807,7 @@ class DaviesServiceTest extends WebTestCase
         $policy = new PhonePolicy();
         $user->addPolicy($policy);
         $claim = new Claim();
+        $claim->setType(Claim::TYPE_LOSS);
         $policy->addClaim($claim);
         $policy->setPolicyNumber('TEST/2017/123456');
 

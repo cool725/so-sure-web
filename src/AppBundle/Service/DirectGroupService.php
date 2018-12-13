@@ -635,7 +635,7 @@ class DirectGroupService extends ExcelSftpService
             $msg = sprintf(
                 'Claim %s does not have the correct excess value. Expected %0.2f Actual %0.2f for %s/%s/%s/%s',
                 $directGroupClaim->claimNumber,
-                $directGroupClaim->getExpectedExcessValue($validated, $phonePolicy->isPicSurePolicy()),
+                $directGroupClaim->getExpectedExcessValue($claim),
                 $directGroupClaim->excess,
                 $directGroupClaim->getClaimType(),
                 $directGroupClaim->getClaimStatus(),
