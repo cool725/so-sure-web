@@ -33,7 +33,7 @@
 
 {% if og_url is defined %}
     <meta property="og:url" content="{{ og_url }}" />
-{% else %}
+{% elseif route_exists(app.request.attributes.get('_route')) %}
     <meta property="og:url" content="{{ app.request.schemeAndHttpHost ~ path(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />
 {% endif %}
 {% if og_title is defined %}
