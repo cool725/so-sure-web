@@ -153,3 +153,6 @@ parameters:
     sosure_sftp_keyfile: ''
 
     expected_claim_frequency: 2
+
+    recaptcha_public_key: ""
+    recaptcha_private_key: ""
