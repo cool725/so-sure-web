@@ -84,6 +84,11 @@
                             {{ form_widget(contact_form.message, { 'attr': {'class': 'form-control', 'rows': '10', 'placeholder': 'Enter your message...'}}) }}
                         </div>
 
+                        <div class="form-group">
+                            {{ form_widget(contact_form.recaptcha) }}
+                            <div class="help-block with-errors">{{ form_errors(contact_form.recaptcha) }}</div>
+                        </div>
+
                         <div class="form-group text-right">
                             {{ form_widget(contact_form.submit, {
                                 'label': 'Contact us',

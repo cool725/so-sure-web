@@ -1,3 +1,5 @@
+{% form_theme lead_form '@EWZRecaptcha/Form/ewz_recaptcha_widget.html.twig' %}
+
 {% extends 'base.html.twig' %}
 
 {# Set vars #}
@@ -262,12 +264,14 @@
                                     <div class="form-group">
                                         <label for="">Name <span class="req">*</span></label>
                                         {{ form_widget(lead_form.name, { 'attr': {'class': 'form-control other-inputs'}}) }}
+                                        <div class="help-block with-errors">{{ form_errors(lead_form.name) }}</div>
                                     </div>
                                 </div>
                                 <div class="col-sm-6">
                                     <div class="form-group">
                                         <label for="">Company <span class="req">*</span></label>
                                         {{ form_widget(lead_form.company, { 'attr': {'class': 'form-control other-inputs'}}) }}
+                                        <div class="help-block with-errors">{{ form_errors(lead_form.company) }}</div>
                                     </div>
                                 </div>
                             </div>
@@ -276,12 +280,14 @@
                                     <div class="form-group">
                                         <label for="">Phone No. <span class="req">*</span></label>
                                         {{ form_widget(lead_form.phone, { 'attr': {'class': 'form-control other-inputs'}}) }}
+                                        <div class="help-block with-errors">{{ form_errors(lead_form.phone) }}</div>
                                     </div>
                                 </div>
                                 <div class="col-sm-6">
                                     <div class="form-group">
                                         <label for="">Email <span class="req">*</span></label>
                                         {{ form_widget(lead_form.email, { 'attr': {'class': 'form-control other-inputs'}}) }}
+                                        <div class="help-block with-errors">{{ form_errors(lead_form.email) }}</div>
                                     </div>
                                 </div>
                             </div>
@@ -289,11 +295,13 @@
                                 <div class="col-sm-6">
                                     <div class="form-group">
                                         {{ form_widget(lead_form.phones, { 'attr': {'class': 'form-control'}}) }}
+                                        <div class="help-block with-errors">{{ form_errors(lead_form.phones) }}</div>
                                     </div>
                                 </div>
                                 <div class="col-sm-6">
                                     <div class="form-group">
                                         {{ form_widget(lead_form.timeframe, { 'attr': {'class': 'form-control other-inputs'}}) }}
+                                        <div class="help-block with-errors">{{ form_errors(lead_form.timeframe) }}</div>
                                     </div>
                                 </div>
                             </div>
@@ -302,9 +310,20 @@
                                     <div class="form-group">
                                         <label for="">Your message <span class="req">*</span></label>
                                         {{ form_widget(lead_form.message, { 'attr': {'class': 'form-control other-inputs', 'rows': '15'}}) }}
+                                        <div class="help-block with-errors">{{ form_errors(lead_form.message) }}</div>
                                     </div>
                                 </div>
                             </div>
+
+                            <div class="row">
+                                <div class="col-md-5 col-md-offset-4">
+                                    <div class="form-group">
+                                        {{ form_widget(lead_form.recaptcha) }}
+                                        <div class="help-block with-errors">{{ form_errors(lead_form.recaptcha) }}</div>
+                                    </div>
+                                </div>
+                            </div>
+
                             <div class="row">
                                 <div class="col-md-12 text-center">
                                     <div class="form-group">
