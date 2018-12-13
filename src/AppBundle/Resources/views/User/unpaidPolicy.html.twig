@@ -179,7 +179,7 @@
 
                 {# IF CAN RETRY BACS #}
                 {% if show_bacs_retry %}
-                    {% if policy.canBacsPaymentBeMadeInTime and policy.user.hasBacsPaymentMethod and (policy.user.bacsPaymentMethod.bankAccount.isMandateSuccess policy.user.bacsPaymentMethod.bankAccount.isMandateInProgress) %}
+                    {% if policy.canBacsPaymentBeMadeInTime and policy.user.hasBacsPaymentMethod and (policy.user.bacsPaymentMethod.bankAccount.isMandateSuccess or policy.user.bacsPaymentMethod.bankAccount.isMandateInProgress) %}
                         <p>We need your permission to take &pound;{{ amount|number_format(2, '.', ',') }} from your account ({{ app.user.paymentMethod.bankAccount }}). Once you have given us permission, your payment will be scheduled as soon as possible (within 3 business days).</p>
                         {{ form_start(form, {'attr': {'id': 'reschedule-bacs-form'}})  }}
                             <div class="form-group">
