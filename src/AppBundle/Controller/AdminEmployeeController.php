@@ -1550,6 +1550,10 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                         );
                         // @codingStandardsIgnoreEnd
                     } catch (PaymentDeclinedException $e) {
+                        if ($policy->getStatus() === Policy::STATUS_PENDING) {
+                            $policy->setStatus(null);
+                        }
+
                         $this->addFlash(
                             'danger',
                             'Payment was declined'
