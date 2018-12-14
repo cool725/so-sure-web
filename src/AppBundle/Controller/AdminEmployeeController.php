@@ -1120,7 +1120,8 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                             $cancel->getCancellationReason(),
                             true,
                             null,
-                            true
+                            true,
+                            $cancel->getFullRefund()
                         );
                         $this->addFlash(
                             'success',
