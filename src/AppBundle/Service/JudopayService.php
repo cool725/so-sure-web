@@ -1011,7 +1011,7 @@ class JudopayService
             $textTemplate,
             ['policy' => $policy],
             null,
-            'bcc@so-sure.com'
+            $this->featureService->isEnabled(Feature::FEATURE_PAYMENTS_BCC) ? 'bcc@so-sure.com' : null
         );
 
         return true;
@@ -1051,7 +1051,7 @@ class JudopayService
             $textTemplate,
             ['policy' => $policy, 'next' => $next],
             null,
-            'bcc@so-sure.com'
+            $this->featureService->isEnabled(Feature::FEATURE_PAYMENTS_BCC) ? 'bcc@so-sure.com' : null
         );
 
         return $baseTemplate;
