@@ -114,7 +114,7 @@ trait UserClassTrait
      * @param string               $password
      * @param mixed                $phone
      * @param DocumentManager|null $dm
-     * @return User
+     * @return UserManagerInterface
      * @throws \Exception
      */
     public static function createUser(
