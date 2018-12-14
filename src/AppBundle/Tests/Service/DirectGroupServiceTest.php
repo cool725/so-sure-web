@@ -37,6 +37,12 @@ class DirectGroupServiceTest extends WebTestCase
     protected static $phoneA;
     protected static $phoneB;
 
+    /** @var PolicyTerms */
+    protected static $policyTerms;
+
+    /** @var PolicyTerms */
+    protected static $nonPicSurePolicyTerms;
+
     public static function setUpBeforeClass()
     {
         //start the symfony kernel
@@ -59,6 +65,12 @@ class DirectGroupServiceTest extends WebTestCase
         self::$phone = $phoneRepo->findOneBy(['devices' => 'iPhone 7', 'memory' => 64]);
         self::$phoneA = $phoneRepo->findOneBy(['devices' => 'iPhone 5', 'memory' => 64]);
         self::$phoneB = $phoneRepo->findOneBy(['devices' => 'A0001', 'memory' => 64]);
+
+        static::$policyTerms = new PolicyTerms();
+        static::$policyTerms->setVersion(PolicyTerms::VERSION_10);
+
+        static::$nonPicSurePolicyTerms = new PolicyTerms();
+        static::$nonPicSurePolicyTerms->setVersion(PolicyTerms::VERSION_1);
     }
 
     public function setUp()
@@ -421,7 +433,8 @@ class DirectGroupServiceTest extends WebTestCase
     {
         $policy = new PhonePolicy();
         $policy->setStatus(Policy::STATUS_ACTIVE);
-        $policy->setId('1');
+        $policy->setId(static::getRandomPolicyNumber('TEST'));
+        $policy->setPolicyTerms(static::$policyTerms);
         $policy->setPhone(self::getRandomPhone(self::$dm));
 
         $claim = new Claim();
@@ -452,7 +465,8 @@ class DirectGroupServiceTest extends WebTestCase
         $user->setLastName('Marulic');
         $policy = new PhonePolicy();
         $policy->setStatus(Policy::STATUS_ACTIVE);
-        $policy->setId('1');
+        $policy->setId(static::getRandomPolicyNumber('TEST'));
+        $policy->setPolicyTerms(static::$policyTerms);
         $policy->setUser($user);
         $policy->setPhone(self::getRandomPhone(self::$dm));
 
@@ -483,7 +497,8 @@ class DirectGroupServiceTest extends WebTestCase
         $user->setLastName('Marulic');
         $policy = new PhonePolicy();
         $policy->setStatus(Policy::STATUS_ACTIVE);
-        $policy->setId('1');
+        $policy->setId(static::getRandomPolicyNumber('TEST'));
+        $policy->setPolicyTerms(static::$policyTerms);
         $policy->setUser($user);
         $policy->setPhone(self::getRandomPhone(self::$dm));
 
@@ -514,7 +529,8 @@ class DirectGroupServiceTest extends WebTestCase
         $user->setLastName('Marulic');
         $policy = new PhonePolicy();
         $policy->setStatus(Policy::STATUS_ACTIVE);
-        $policy->setId('1');
+        $policy->setId(static::getRandomPolicyNumber('TEST'));
+        $policy->setPolicyTerms(static::$policyTerms);
         $policy->setUser($user);
         $policy->setPhone(self::getRandomPhone(self::$dm));
 
@@ -545,7 +561,8 @@ class DirectGroupServiceTest extends WebTestCase
         $user->setLastName('Marulic');
         $policy = new PhonePolicy();
         $policy->setStatus(Policy::STATUS_ACTIVE);
-        $policy->setId('1');
+        $policy->setId(static::getRandomPolicyNumber('TEST'));
+        $policy->setPolicyTerms(static::$policyTerms);
         $policy->setUser($user);
         $policy->setPhone(self::getRandomPhone(self::$dm));
 

@@ -103,6 +103,9 @@ trait UserClassTrait
             $policy->setPhone($phone, $date);
             $policy->setImei(static::generateRandomImei());
             $policy->create(rand(1, 999999), 'TEST', $date, rand(1, 999999));
+            if (!$policy->getCurrentExcess()) {
+                throw new \Exception('Missing current policy excess');
+            }
         }
 
         return $policy;
@@ -189,7 +192,7 @@ trait UserClassTrait
 
     public static function getRandomClaimNumber()
     {
-        return sprintf('%6d', rand(1, 999999));
+        return sprintf('%6d', random_int(1, 999999));
     }
 
     public static function transformMobile($mobile)

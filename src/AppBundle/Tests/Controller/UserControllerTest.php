@@ -576,7 +576,7 @@ class UserControllerTest extends BaseControllerTest
         $this->validateUnpaidRescheduleBacsForm($crawler, false);
         $this->validateUnpaidBacsSetupLink($crawler, false);
         $this->validateUnpaidBacsUpdateLink($crawler, false);
-        $this->assertContains('policy is paid to date', $crawler->html());
+        $this->assertContains('Policy paid up to date', $crawler->html());
 
         $crawler = self::$client->request('GET', '/user/invalid');
         self::verifyResponse(500);
