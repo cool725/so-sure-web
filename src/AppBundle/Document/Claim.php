@@ -1889,6 +1889,10 @@ class Claim
             return self::getExcessValue($this->getType(), $picSureValidated, $picSureEnabled);
         }
 
+        if (!$this->getExpectedExcess()) {
+            throw new \Exception(sprintf('Missing expected excess for claim %s', $this->getId()));
+        }
+
         return $this->getExpectedExcess()->getValue($this->getType());
     }
 
