@@ -4,6 +4,7 @@ namespace AppBundle\Tests\Service;
 
 use AppBundle\Classes\DirectGroupHandlerClaim;
 use AppBundle\Document\Policy;
+use AppBundle\Document\PolicyTerms;
 use AppBundle\Service\DaviesService;
 use AppBundle\Service\DirectGroupService;
 use AppBundle\Service\DirectGroupServiceExcel;
@@ -330,10 +331,12 @@ class DirectGroupServiceTest extends WebTestCase
 
         if (!$verifyTest) {
             $policyOpen->addClaim($claimOpen);
+        } else {
+            $claimOpen->setExpectedExcess(PolicyTerms::getHighExcess());
         }
 
         $claimOpen2 = new Claim();
-        $claimOpen->setType(Claim::TYPE_LOSS);
+        $claimOpen2->setType(Claim::TYPE_LOSS);
         $claimOpen2->setNumber(self::getRandomPolicyNumber('TEST'));
         $claimOpen2->setStatus(Claim::STATUS_APPROVED);
         $claimOpen2->setReplacementImei(static::generateRandomImei());
@@ -348,6 +351,10 @@ class DirectGroupServiceTest extends WebTestCase
         self::$directGroupService->clearErrors();
         self::$directGroupService->clearWarnings();
         self::$directGroupService->clearSoSureActions();
+
+        $this->assertNotNull($policyOpen->getCurrentExcess());
+        $this->assertNotNull($claimOpen->getExpectedExcess());
+        $this->assertNotNull($claimOpen2->getExpectedExcess());
 
         $now = \DateTime::createFromFormat('U', time());
         $dgOpen = new DirectGroupHandlerClaim();
