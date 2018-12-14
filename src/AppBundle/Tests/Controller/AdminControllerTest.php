@@ -97,7 +97,7 @@ class AdminControllerTest extends BaseControllerTest
         self::$client->submit($form);
         self::verifyResponse(302);
         $crawler = self::$client->followRedirect();
-        self::expectFlashSuccess($crawler, sprintf('Claim %s updated', $claim->getNumber()));
+        self::expectFlashSuccess($crawler, 'updated');
 
         $dm = $this->getDocumentManager(true);
         $repoClaim = $dm->getRepository(Claim::class);

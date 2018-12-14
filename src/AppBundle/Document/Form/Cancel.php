@@ -21,6 +21,9 @@ class Cancel
     /** @var boolean */
     protected $force;
 
+    /** @var boolean */
+    protected $fullRefund;
+
     public static function getEncodedCooloffReason($reason)
     {
         return sprintf('%s - %s', ucfirst(Policy::CANCELLED_COOLOFF), $reason);
@@ -93,5 +96,15 @@ class Cancel
     public function setForce($force)
     {
         $this->force = $force;
+    }
+
+    public function getFullRefund()
+    {
+        return $this->fullRefund;
+    }
+
+    public function setFullRefund($fullRefund)
+    {
+        $this->fullRefund = $fullRefund;
     }
 }

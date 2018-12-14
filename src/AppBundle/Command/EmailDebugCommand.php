@@ -149,6 +149,7 @@ class EmailDebugCommand extends ContainerAwareCommand
                 'card/failedPayment',
                 'card/failedPaymentWithClaim',
                 'card/cardExpiring',
+                'card/cardMissing',
             ],
             'policyCancellation' => [
                 'policy-cancellation/actual-fraud',
@@ -293,14 +294,21 @@ class EmailDebugCommand extends ContainerAwareCommand
                     continue;
                 }
 
-                if ($template != 'card/failedPaymentWithClaim') {
+                if ($template == 'card/failedPaymentWithClaim' &&
+                    $policy->hasMonetaryClaimed(true, true) &&
+                    $policy->getUser()->hasValidPaymentMethod()) {
                     break;
                 }
 
-                if ($policy->hasMonetaryClaimed(true, true)) {
+                if ($template == 'card/cardMissing' && !$policy->getUser()->hasValidPaymentMethod()) {
+                    break;
+                }
+
+                if ($template != 'card/cardMissing' && $policy->getUser()->hasValidPaymentMethod()) {
                     break;
                 }
             }
+
             if (!$policy) {
                 throw new \Exception('Unable to find matching policy');
             }

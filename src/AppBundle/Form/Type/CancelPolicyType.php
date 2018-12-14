@@ -3,19 +3,44 @@
 namespace AppBundle\Form\Type;
 
 use AppBundle\Document\Form\Cancel;
+use AppBundle\Document\User;
+use AppBundle\Service\RequestService;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\RadioType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Doctrine\ODM\MongoDB\DocumentRepository;
 use AppBundle\Document\Policy;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 
 class CancelPolicyType extends AbstractType
 {
+    /**
+     * @var boolean
+     */
+    private $required;
+
+    /**
+     * @var RequestService
+     */
+    private $requestService;
+
+    /**
+     * @param RequestService $requestService
+     * @param boolean        $required
+     */
+    public function __construct(RequestService $requestService, $required)
+    {
+        $this->requestService = $requestService;
+        $this->required = $required;
+    }
+
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         /** @var Policy $policy */
@@ -76,8 +101,28 @@ class CancelPolicyType extends AbstractType
                 'preferred_choices' => $preferred,
                 'placeholder' => $policy->hasOpenClaim() ? 'OPEN CLAIM - DO NOT CANCEL' : 'Cancellation reason'
             ])
+            ->add('cancellationReason', ChoiceType::class, [
+                'choices' => $data,
+                'preferred_choices' => $preferred,
+                'placeholder' => $policy->hasOpenClaim() ? 'OPEN CLAIM - DO NOT CANCEL' : 'Cancellation reason'
+            ])
             ->add('cancel', SubmitType::class)
         ;
+
+        /** @var User $user */
+        $user = $this->requestService->getUser();
+        if ($user && $user->hasRole(User::ROLE_ADMIN)) {
+            $builder->add('fullRefund', ChoiceType::class, [
+                'required' => $this->required,
+                'data' => false,
+                'choices' => [
+                    'Yes' => true,
+                    'No' => false,
+                ],
+                'expanded' => true,
+                'multiple' => false,
+            ]);
+        }
 
         if ($policy->hasOpenClaim()) {
             $builder->add('force', CheckboxType::class, [

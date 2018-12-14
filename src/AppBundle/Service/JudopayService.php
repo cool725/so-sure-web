@@ -1021,17 +1021,21 @@ class JudopayService
      * @param Policy    $policy
      * @param int       $failedPayments
      * @param \DateTime $next
+     *
+     * @return bool|string false if $failedPayments does not fall in range of 1-4. $baseTemplate if successfully sent
      */
     public function failedPaymentEmail(Policy $policy, $failedPayments, \DateTime $next = null)
     {
         // email only supported for 1, 2, 3, & 4
         if ($failedPayments < 1 || $failedPayments > 4) {
-            return;
+            return false;
         }
 
         $subject = sprintf('Payment failure for your so-sure policy %s', $policy->getPolicyNumber());
         if ($policy->hasMonetaryClaimed(true, true)) {
             $baseTemplate = sprintf('AppBundle:Email:card/failedPaymentWithClaim');
+        } elseif (!$policy->getUser()->hasValidPaymentMethod()) {
+            $baseTemplate = sprintf('AppBundle:Email:card/cardMissing');
         } else {
             $baseTemplate = sprintf('AppBundle:Email:card/failedPayment');
         }
@@ -1049,6 +1053,8 @@ class JudopayService
             null,
             'bcc@so-sure.com'
         );
+
+        return $baseTemplate;
     }
 
     /**
