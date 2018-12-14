@@ -733,6 +733,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         }
 
         $imei = new Imei();
+        $imei->setPhone($policy->getPhone());
         $imei->setPolicy($policy);
         $imeiForm = $this->get('form.factory')
             ->createNamedBuilder('imei_form', ImeiType::class, $imei)
@@ -763,14 +764,14 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                             $this->getUser(),
                             'IMEI details change'
                         );
+
+                        $dm->flush();
                     } else {
                         $this->addFlash(
                             'error',
                             sprintf('%s is not a valid IMEI number', $imei->getImei())
                         );
                     }
-
-                    $dm->flush();
 
                     return $this->redirectToRoute('admin_policy', ['id' => $id]);
                 }

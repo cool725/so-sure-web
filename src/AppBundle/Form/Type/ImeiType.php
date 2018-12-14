@@ -2,6 +2,7 @@
 
 namespace AppBundle\Form\Type;
 
+use AppBundle\Document\ValidatorTrait;
 use AppBundle\Repository\PhoneRepository;
 use Doctrine\Bundle\MongoDBBundle\Form\Type\DocumentType;
 use Symfony\Component\Form\AbstractType;
@@ -10,12 +11,11 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\FormEvents;
-use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ImeiType extends AbstractType
 {
+    use ValidatorTrait;
+
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
@@ -45,16 +45,10 @@ class ImeiType extends AbstractType
                 function ($note) {
                     return $note;
                 },
-                function ($noteAlphanumeric) {
-                    return preg_replace("/[^A-Za-z0-9 ]/", '', $noteAlphanumeric);
+                function ($noteConformAlphanumeric) {
+                    return $this->conformAlphanumericSpaceDotPipe($noteConformAlphanumeric, 2500, 1);
                 }
             ))
         ;
-    }
-
-    public function configureOptions(OptionsResolver $resolver)
-    {
-        $resolver->setDefaults(array(
-        ));
     }
 }
