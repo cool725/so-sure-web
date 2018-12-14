@@ -1022,14 +1022,7 @@ class PolicyService
             $this->dm->flush();
         }
 
-        /*
-        if ($fullRefund) {
-            $date = clone $policy->getStart();
-            $date = $date->sum(new \DateInterval('PT1m'));
-        }
-        */
-
-        $policy->cancel($reason, $date);
+        $policy->cancel($reason, $date, $fullRefund);
         $this->dm->flush();
         $this->cancelledPolicyEmail($policy);
         $this->cancelledPolicySms($policy);

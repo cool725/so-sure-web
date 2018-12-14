@@ -1244,6 +1244,12 @@ services:
         tags:
             - { name: form.type }
 
+    app.form.type.cancelpolicy:
+        class: AppBundle\Form\Type\CancelPolicyType
+        arguments: ["@app.request", "%kernel.environment%"]
+        tags:
+        - { name: form.type }
+
     app.form.type.policysearch:
         class: AppBundle\Form\Type\PolicySearchType
         arguments: ["@request_stack", "%kernel.environment%"]
