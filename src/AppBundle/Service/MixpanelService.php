@@ -393,6 +393,7 @@ class MixpanelService
         $data = null;
         $count = 0;
         $count += $this->deleteOldUsersByDays($days);
+        $count += $this->deleteQuotePageUsers();
         $count += $this->deleteNoValueUsers(14);
         //$count += $this->deleteOldUsersByNoEvents();
         $count += $this->deleteFacebookPreview();
@@ -431,6 +432,48 @@ class MixpanelService
             ];
         // @codingStandardsIgnoreEnd
         //print_r($query);
+
+        return $this->runDelete($query);
+    }
+
+    private function deleteQuotePageUsers()
+    {
+        $time = \DateTime::createFromFormat('U', time());
+        $time = $time->sub(new \DateInterval('P1D'));
+
+        // @codingStandardsIgnoreStart
+        $query = [
+            'selector' => sprintf(
+                '(datetime(%s - 86400) > user["$last_seen"] and not defined(user["$last_name"]) and behaviors["behavior_11111"] == 1 and behaviors["behavior_11112"] == 0 and behaviors["behavior_11113"] == 0 and behaviors["behavior_11114"] == 0)',
+                $time->format('U')
+            ),
+            'behaviors' => [[
+                "window" => "90d",
+                "name" => "behavior_11111",
+                "event_selectors" => [[
+                    "event" => "Quote Page"
+                ]]
+            ], [
+                "window" => "90d",
+                "name" => "behavior_11112",
+                "event_selectors" => [[
+                    "event" => "Home Page"
+                ]]
+            ], [
+                "window" => "90d",
+                "name" => "behavior_11113",
+                "event_selectors" => [[
+                    "event" => "Sixpack Experiment",
+                ]]
+            ], [
+                "window" => "90d",
+                "name" => "behavior_11114",
+                "event_selectors" => [[
+                    "event" => "Click on the Buy Now Button"
+                ]]
+            ]
+            ]];
+        // @codingStandardsIgnoreEnd
 
         return $this->runDelete($query);
     }
