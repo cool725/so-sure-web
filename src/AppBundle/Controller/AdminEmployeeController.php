@@ -14,6 +14,7 @@ use AppBundle\Form\Type\AdminEmailOptOutType;
 use AppBundle\Form\Type\BacsCreditType;
 use AppBundle\Form\Type\ClaimInfoType;
 use AppBundle\Form\Type\CallNoteType;
+use AppBundle\Form\Type\DetectedImeiType;
 use AppBundle\Form\Type\LinkClaimType;
 use AppBundle\Form\Type\ClaimNoteType;
 use AppBundle\Form\Type\PaymentRequestUploadFileType;
@@ -783,6 +784,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             'policy' => $policy,
         ];
     }
+    
     /**
      * @Route("/detected-imei-form/{id}", name="detected_imei_form")
      * @Template
@@ -802,7 +804,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         $imei->setPolicy($policy);
         $imei->setImei($policy->getDetectedImei());
         $imeiForm = $this->get('form.factory')
-            ->createNamedBuilder('imei_form', ImeiType::class, $imei)
+            ->createNamedBuilder('imei_form', DetectedImeiType::class, $imei)
             ->setAction($this->generateUrl(
                 'detected_imei_form',
                 ['id' => $id]
