@@ -1302,38 +1302,51 @@ class PurchaseController extends BaseController
                 if ($cancelForm->isValid()) {
                     $reason = $cancelForm->getData()['reason'];
                     $other = $cancelForm->getData()['othertxt'];
-                    $message = null;
                     $flash = null;
-                    if ($policy->isWithinCooloffPeriod(null, false)) {
-                        $policy->cancel(Policy::CANCELLED_USER_REQUESTED);
+                    $cooloff = $policy->isWithinCooloffPeriod(null, false);
+                    if ($cooloff) {
+                        if ($reason == Policy::COOLOFF_REASON_UNKNOWN) {
+                            $policy->setRequestedCancellationReason($other ?: $reason);
+                        } else {
+                            $policy->setRequestedCancellationReason($reason);
+                        }
+                        $policy->cancel(Policy::CANCELLED_COOLOFF);
                         $dm->flush();
                         $flash = "You should receive an email confirming that your policy is now cancelled.";
-                        // @codingStandardsIgnoreStart
-                        $message = "This is a so-sure generated message. Policy: <a href='%s'>%s/%s</a> was cancelled during cooloff as per user request for reason \"%s\". so-sure support team: Please contact the policy holder to get their reason(s) for cancelling. Additional comments: %s";
-                    } else {
+                        $this->get("app.stats")->increment(Stats::AUTO_CANCEL_IN_COOLOFF);
+                    } elseif (!$policy->hasRequestedCancellation()) {
                         // @codingStandardsIgnoreStart
                         $flash = "We have passed your request to our policy team. You should receive a cancellation email once that is processed.";
-                        // it always says their phone is damaged. Not sure why but that is how it was before.
                         $message = "This is a so-sure generated message. Policy: <a href='%s'>%s/%s</a> requested a cancellation via the site as phone was damaged (%s) prior to purchase. so-sure support team: Please contact the policy holder to get their reason(s) for cancelling before action. Additional comments: %s";
                         // @codingStandardsIgnoreEnd
-                    }
-                    $url = $this->generateUrl(
-                        'admin_policy',
-                        ['id' => $policy->getId()],
-                        UrlGeneratorInterface::ABSOLUTE_URL
-                    );
-                    $body = sprintf($message, $url, $policy->getPolicyNumber(), $policy->getId(), $reason, $other);
-                    if (!$policy->hasRequestedCancellation()) {
                         $policy->setRequestedCancellation(\DateTime::createFromFormat('U', time()));
                         $policy->setRequestedCancellationReason($reason);
                         $dm->flush();
                         $intercom = $this->get('app.intercom');
-                        $intercom->queueMessage($policy->getUser()->getEmail(), $body);
+                        $intercom->queueMessage(
+                            $policy->getUser()->getEmail(),
+                            sprintf(
+                                $message,
+                                $this->generateUrl(
+                                    'admin_policy',
+                                    ['id' => $policy->getId()],
+                                    UrlGeneratorInterface::ABSOLUTE_URL
+                                ),
+                                $policy->getPolicyNumber(),
+                                $policy->getId(),
+                                $reason,
+                                $other
+                            )
+                        );
                     }
                     $this->addFlash("success", $flash);
                     $this->get('app.mixpanel')->queueTrack(
                         MixpanelService::EVENT_REQUEST_CANCEL_POLICY,
-                        ['Policy Id' => $policy->getId(), 'Reason' => $reason]
+                        [
+                            'Policy Id' => $policy->getId(),
+                            'Reason' => $reason,
+                            'Auto Approved' => $cooloff
+                        ]
                     );
                     return $this->redirectToRoute('purchase_cancel_requested', ['id' => $id]);
                 }
