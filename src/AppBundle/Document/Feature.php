@@ -53,6 +53,7 @@ class Feature
         self::FEATURE_PAYMENTS_BCC,
     ];
 
+    // @codingStandardsIgnoreStart
     public static $descriptions = [
         self::FEATURE_QUOTE_LEAD => 'Display a save this quote w/email to user on quote page - unused?',
         self::FEATURE_RENEWAL => 'Create renewal policies - too integrated to turn off',
@@ -71,6 +72,7 @@ class Feature
         self::FEATURE_RATE_LIMITING => 'Use rate limiting functionality for various items including recipero imei checks and policy creation.',
         self::FEATURE_PAYMENTS_BCC => 'Bcc payment failure emails (and related) to bcc@so-sure.com',
     ];
+    // @codingStandardsIgnoreEnd
 
     /**
      * @MongoDB\Id(strategy="auto")
