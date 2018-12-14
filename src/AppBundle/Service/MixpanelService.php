@@ -453,7 +453,7 @@ class MixpanelService
                 "name" => "behavior_11111",
                 "event_selectors" => [[
                     "event" => "Quote Page",
-                    "selector" => "(\"Mozilla/4.0\" in event[\"User Agent\"])"
+                    "selector" => "(\"Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0)\" in event[\"User Agent\"])"
                 ]]
             ], [
                 "window" => "90d",
@@ -496,7 +496,7 @@ class MixpanelService
                 "name" => "behavior_11111",
                 "event_selectors" => [[
                     "event" => "Home Page",
-                    "selector" => "(\"Mozilla 4.0\" in event[\"User Agent\"])"
+                    "selector" => "(\"Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0)\" in event[\"User Agent\"])"
                 ]]
             ], [
                 "window" => "90d",
