@@ -1034,7 +1034,7 @@ class JudopayService
         $subject = sprintf('Payment failure for your so-sure policy %s', $policy->getPolicyNumber());
         if ($policy->hasMonetaryClaimed(true, true)) {
             $baseTemplate = sprintf('AppBundle:Email:card/failedPaymentWithClaim');
-        } elseif (!$policy->getUser()->hasValidPaymentMethod() && !$policy->getUser()) {
+        } elseif (!$policy->getUser()->hasValidPaymentMethod()) {
             $baseTemplate = sprintf('AppBundle:Email:card/cardMissing');
         } else {
             $baseTemplate = sprintf('AppBundle:Email:card/failedPayment');
