@@ -445,7 +445,7 @@ class MixpanelService
         // @codingStandardsIgnoreStart
         $query = [
             'selector' => sprintf(
-                '(not defined(user["$last_name"]) and behaviors["behavior_11111"] == 1 and behaviors["behavior_11112"] == 0 and behaviors["behavior_11113"] == 0 and behaviors["behavior_11114"] == 0)'
+                '(not defined(user["$last_name"]) and behaviors["behavior_11111"] > 0 and behaviors["behavior_11112"] == 0 and behaviors["behavior_11113"] == 0 and behaviors["behavior_11114"] == 0)'
             ),
             'behaviors' => [[
                 "window" => "90d",
@@ -487,7 +487,7 @@ class MixpanelService
         // @codingStandardsIgnoreStart
         $query = [
             'selector' => sprintf(
-                '(not defined(user["$last_name"]) and behaviors["behavior_11111"] == 1 and behaviors["behavior_11112"] == 0 and behaviors["behavior_11113"] == 0 and behaviors["behavior_11114"] == 0)'
+                '(not defined(user["$last_name"]) and behaviors["behavior_11111"] > 0 and behaviors["behavior_11112"] == 0 and behaviors["behavior_11113"] == 0 and behaviors["behavior_11114"] == 0)'
             ),
             'behaviors' => [[
                 "window" => "90d",
