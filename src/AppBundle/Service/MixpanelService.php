@@ -393,8 +393,8 @@ class MixpanelService
         $data = null;
         $count = 0;
         $count += $this->deleteOldUsersByDays($days);
-        $count += $this->deleteOldQuotePageUsers();
-        $count += $this->deleteOldHomePageUsers();
+        $count += $this->deleteQuotePageMissingBotUserAgentUser();
+        $count += $this->deleteHomepagePageMissingBotUserAgentUser();
         $count += $this->deleteNoValueUsers(14);
         //$count += $this->deleteOldUsersByNoEvents();
         $count += $this->deleteFacebookPreview();
@@ -437,7 +437,7 @@ class MixpanelService
         return $this->runDelete($query);
     }
 
-    private function deleteOldQuotePageUsers()
+    private function deleteQuotePageMissingBotUserAgentUser()
     {
         $time = \DateTime::createFromFormat('U', time());
         $time = $time->sub(new \DateInterval('P1D'));
@@ -445,7 +445,7 @@ class MixpanelService
         // @codingStandardsIgnoreStart
         $query = [
             'selector' => sprintf(
-                '(datetime(%s - 86400) > user["$last_seen"] and not defined(user["$last_name"]) and behaviors["behavior_11111"] == 1 and behaviors["behavior_11112"] == 0 and behaviors["behavior_11113"] == 0 and behaviors["behavior_11114"] == 0)',
+                '(datetime(%s) > user["$last_seen"] and not defined(user["$last_name"]) and behaviors["behavior_11111"] == 1 and behaviors["behavior_11112"] == 0 and behaviors["behavior_11113"] == 0 and behaviors["behavior_11114"] == 0)',
                 $time->format('U')
             ),
             'behaviors' => [[
@@ -480,7 +480,7 @@ class MixpanelService
         return $this->runDelete($query);
     }
 
-    private function deleteOldHomePageUsers()
+    private function deleteHomepagePageMissingBotUserAgentUser()
     {
         $time = \DateTime::createFromFormat('U', time());
         $time = $time->sub(new \DateInterval('P1D'));
@@ -488,7 +488,7 @@ class MixpanelService
         // @codingStandardsIgnoreStart
         $query = [
             'selector' => sprintf(
-                '(datetime(%s - 86400) > user["$last_seen"] and not defined(user["$last_name"]) and behaviors["behavior_11111"] == 1 and behaviors["behavior_11112"] == 0 and behaviors["behavior_11113"] == 0 and behaviors["behavior_11114"] == 0)',
+                '(datetime(%s) > user["$last_seen"] and not defined(user["$last_name"]) and behaviors["behavior_11111"] == 1 and behaviors["behavior_11112"] == 0 and behaviors["behavior_11113"] == 0 and behaviors["behavior_11114"] == 0)',
                 $time->format('U')
             ),
             'behaviors' => [[
