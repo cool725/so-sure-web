@@ -445,7 +445,7 @@ class MixpanelService
         // @codingStandardsIgnoreStart
         $query = [
             'selector' => sprintf(
-                '(datetime(%s) > user["$last_seen"] and not defined(user["$last_name"]) and behaviors["behavior_11111"] == 1 and behaviors["behavior_11112"] == 0 and behaviors["behavior_11113"] == 0 and behaviors["behavior_11114"] == 0)',
+                '(not defined(user["$last_name"]) and behaviors["behavior_11111"] == 1 and behaviors["behavior_11112"] == 0 and behaviors["behavior_11113"] == 0 and behaviors["behavior_11114"] == 0)',
                 $time->format('U')
             ),
             'behaviors' => [[
@@ -488,7 +488,7 @@ class MixpanelService
         // @codingStandardsIgnoreStart
         $query = [
             'selector' => sprintf(
-                '(datetime(%s) > user["$last_seen"] and not defined(user["$last_name"]) and behaviors["behavior_11111"] == 1 and behaviors["behavior_11112"] == 0 and behaviors["behavior_11113"] == 0 and behaviors["behavior_11114"] == 0)',
+                '(not defined(user["$last_name"]) and behaviors["behavior_11111"] == 1 and behaviors["behavior_11112"] == 0 and behaviors["behavior_11113"] == 0 and behaviors["behavior_11114"] == 0)',
                 $time->format('U')
             ),
             'behaviors' => [[
