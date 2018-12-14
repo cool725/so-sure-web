@@ -20,10 +20,13 @@ use Gedmo\Mapping\Annotation as Gedmo;
  */
 class AffiliateCompany extends Company
 {
+    const MODEL_ONGOING = 'ongoing';
+    const MODEL_ONE_OFF = 'one-off';
+
     /**
-     * @MongoDB\ReferenceMany(targetDocument="User", mappedBy="affiliate")
+     * @MongoDB\ReferenceMany(targetDocument="Policy", mappedBy="affiliate")
      */
-    protected $confirmedUsers;
+    protected $confirmedPolicies;
 
     /**
      * @Assert\Range(min=0,max=20)
@@ -36,6 +39,12 @@ class AffiliateCompany extends Company
      * @MongoDB\Field(type="integer")
      */
     protected $days;
+
+    /**
+     * @Assert\Range(min=0,max=90)
+     * @MongoDB\Field(type="integer")
+     */
+    protected $renewalDays;
 
     /**
      * @AppAssert\AlphanumericSpaceDot()
@@ -60,21 +69,28 @@ class AffiliateCompany extends Company
      */
     protected $leadSourceDetails;
 
+    /**
+     * @Assert\Choice({"ongoing", "one-off"}, strict=true)
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
+    protected $chargeModel;
+
     public function __construct()
     {
         parent::__construct();
-        $this->confirmedUsers = new ArrayCollection();
+        $this->confirmedPolicies = new ArrayCollection();
     }
 
-    public function getConfirmedUsers()
+    public function getConfirmedPolicies()
     {
-        return $this->confirmedUsers;
+        return $this->confirmedPolicies;
     }
 
-    public function addConfirmedUsers(User $user)
+    public function addConfirmedPolicies(Policy $policy)
     {
-        $this->confirmedUsers[] = $user;
-        $user->setAffiliate($this);
+        $this->confirmedPolicies[] = $policy;
+        $policy->setAffiliate($this);
     }
 
     public function setCPA(float $cpa)
@@ -95,6 +111,16 @@ class AffiliateCompany extends Company
     public function getDays()
     {
         return $this->days;
+    }
+
+    public function setRenewalDays($renewalDays)
+    {
+        $this->renewalDays = $renewalDays;
+    }
+
+    public function getRenewalDays()
+    {
+        return $this->renewalDays;
     }
 
     public function getCampaignSource()
@@ -125,5 +151,15 @@ class AffiliateCompany extends Company
     public function setLeadSourceDetails($leadSourceDetails)
     {
         $this->leadSourceDetails = $leadSourceDetails;
+    }
+
+    public function getChargeModel()
+    {
+        return $this->chargeModel;
+    }
+
+    public function setChargeModel($chargeModel)
+    {
+        $this->chargeModel = $chargeModel;
     }
 }

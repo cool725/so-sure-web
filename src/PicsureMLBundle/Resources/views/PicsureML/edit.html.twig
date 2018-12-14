@@ -1,4 +1,4 @@
-{% form_theme picsureml_label_form 'AppBundle:Form:fields.html.twig' %}
+{% form_theme picsureml_edit_form 'AppBundle:Form:fields.html.twig' %}
 {% extends 'base.html.twig' %}
 
 {% block stylesheets %}
@@ -42,51 +42,53 @@
         <div class="col-md-4">
             <div class="content-left">
                 <div class="text-right">
-                    {{ form_start(picsureml_label_form)}}
+                    {{ form_start(picsureml_edit_form) }}
                     <div class="form-group">
-                        {{ form_widget(picsureml_label_form.previous, {'label': 'Previous', 'attr': {'class': 'btn btn-success'}}) }}
-                        {{ form_widget(picsureml_label_form.save, {'label': 'Save', 'attr': {'class': 'btn btn-success'}}) }}
-                        {{ form_widget(picsureml_label_form.next, {'label': 'Next', 'attr': {'class': 'btn btn-success'}}) }}
+                        {{ form_widget(picsureml_edit_form.previous, {'label': 'Previous', 'attr': {'class': 'btn btn-success'}}) }}
+                        {{ form_widget(picsureml_edit_form.save, {'label': 'Save', 'attr': {'class': 'btn btn-success'}}) }}
+                        {{ form_widget(picsureml_edit_form.next, {'label': 'Next', 'attr': {'class': 'btn btn-success'}}) }}
                     </div>
                     <div class="form-group">
-                        {{ form_label(picsureml_label_form.label, 'Label:') }}
-                        {{ form_widget(picsureml_label_form.label) }}
-                        {{ form_errors(picsureml_label_form.label) }}
+                        {{ form_label(picsureml_edit_form.label, 'Label:') }}
+                        {{ form_widget(picsureml_edit_form.label) }}
+                        {{ form_errors(picsureml_edit_form.label) }}
                     </div>
-                    <div class="form-group">
-                        {{ form_label(picsureml_label_form.versions, 'Versions:') }}
-                        {{ form_widget(picsureml_label_form.versions) }}
-                        {{ form_errors(picsureml_label_form.versions) }}
-                    </div>
-                    {{ form_end(picsureml_label_form)}}
                     <br>
                     <h4>Annotations:</h4>
-                    {{ form_start(picsureml_annotate_form)}}
                     <div class="form-group">
-                        {{ form_label(picsureml_annotate_form.x) }}
-                        {{ form_errors(picsureml_annotate_form.x) }}
-                        {{ form_widget(picsureml_annotate_form.x) }}
+                        {{ form_label(picsureml_edit_form.x) }}
+                        {{ form_errors(picsureml_edit_form.x) }}
+                        {{ form_widget(picsureml_edit_form.x) }}
                     </div>
                     <div class="form-group">
-                        {{ form_label(picsureml_annotate_form.y) }}
-                        {{ form_errors(picsureml_annotate_form.y) }}
-                        {{ form_widget(picsureml_annotate_form.y) }}
+                        {{ form_label(picsureml_edit_form.y) }}
+                        {{ form_errors(picsureml_edit_form.y) }}
+                        {{ form_widget(picsureml_edit_form.y) }}
                     </div>
                     <div class="form-group">
-                        {{ form_label(picsureml_annotate_form.width) }}
-                        {{ form_errors(picsureml_annotate_form.width) }}
-                        {{ form_widget(picsureml_annotate_form.width) }}
+                        {{ form_label(picsureml_edit_form.width) }}
+                        {{ form_errors(picsureml_edit_form.width) }}
+                        {{ form_widget(picsureml_edit_form.width) }}
                     </div>
                     <div class="form-group">
-                        {{ form_label(picsureml_annotate_form.height) }}
-                        {{ form_errors(picsureml_annotate_form.height) }}
-                        {{ form_widget(picsureml_annotate_form.height) }}
+                        {{ form_label(picsureml_edit_form.height) }}
+                        {{ form_errors(picsureml_edit_form.height) }}
+                        {{ form_widget(picsureml_edit_form.height) }}
                     </div>
                     <div class="form-group">
-                        {{ form_widget(picsureml_annotate_form.annotate, {'label': 'Save', 'attr': {'class': 'btn btn-success'}}) }}
-                        {{ form_widget(picsureml_annotate_form.clear, {'label': 'Clear', 'attr': {'class': 'btn btn-primary'}}) }}
+                        {{ form_widget(picsureml_edit_form.clear, {'label': 'Clear', 'attr': {'class': 'btn btn-primary'}}) }}
                     </div>
-                    {{ form_end(picsureml_annotate_form)}}
+                    <br>
+                    <div class="form-group">
+                        {{ form_label(picsureml_edit_form.versions, 'Versions:') }}
+                        {{ form_widget(picsureml_edit_form.versions) }}
+                        {{ form_errors(picsureml_edit_form.versions) }}
+                    </div>
+                    <div class="form-group">
+                        {{ form_widget(picsureml_edit_form.forDetection, {'label': '&nbsp;use for detection'}) }}
+                        {{ form_errors(picsureml_edit_form.forDetection) }}
+                    </div>
+                    {{ form_end(picsureml_edit_form) }}
                 </div>
             </div>
         </div>

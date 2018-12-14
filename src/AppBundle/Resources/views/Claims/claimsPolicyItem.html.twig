@@ -115,10 +115,12 @@
                                         {% if policy.getRequestedCancellationReason %}
                                             / {{ policy.getRequestedCancellationReason }}
                                         {% endif %}
+                                        {% if is_granted('ROLE_CUSTOMER_SERVICES') %}
                                         <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#policyStatusForm">
                                             <span class="glyphicon glyphicon-new-window" aria-hidden="true"></span>
                                             Change Status
                                         </button>
+                                        {% endif %}
                                     </td>
                                 </tr>
                                 {% if policy.isPolicy %}
@@ -635,7 +637,17 @@
                         </td>
                         <td style="width: 10%;">{{ claim.type }}</td>
                         <td style="width: 10%;">{{ claim.status }}</td>
-                        <td style="width: 10%;">£{{ claim.expectedExcessValue }}</td>
+                        <td style="width: 10%;">
+                            {% if equal_to_two_dp(claim.expectedExcessValue, claim.expectedExcessValue(true)) %}
+                                <span title="Verified excess matches older calculation of £{{ claim.expectedExcessValue(true)|number_format(2, '.', ',') }}">
+                                    £{{ claim.expectedExcessValue }}
+                                </span>
+                            {% else %}
+                                <span class="text-danger" title="Warning excess does not matches older calculation of £{{ claim.expectedExcessValue(true)|number_format(2, '.', ',') }}">
+                                    £{{ claim.expectedExcessValue }}
+                                </span>
+                            {% endif %}
+                        </td>
                         <td style="width: 10%;">£{{ claim.totalChargesWithVat|number_format(2, '.', ',') }}</td>
                         <td style="width: 10%;">{% if claim.fnolRisk %}{{ claim.fnolRisk }}{% else %}??{% endif %} / {% if claim.fnolRiskReason %}{{ claim.fnolRiskReason }}{% else %}??{% endif %}</td>
                         <td  style="width: 10%;" class="{% if claim.crimeRef|length > 0 %}{% if claim.validCrimeRef %}success{% elseif not claim.validCrimeRef %}danger{% endif %}{% endif %}">
@@ -670,7 +682,18 @@
             <h4>No claims</h4>
             {% endif %}
             <hr />
-            <h4>Linked Claims (e.g. Policy Upgrade)</h4>
+            <h4>
+                {% if is_granted('ROLE_CUSTOMER_SERVICES') %}
+                <i class="fa fa-shield" title="Customer Service only"></i>
+                Linked Claims (e.g. Policy Upgrade)
+                <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#linkClaimForm">
+                    <span class="glyphicon glyphicon-new-window" aria-hidden="true"></span>
+                    Link Claim
+                </button>
+                {% else %}
+                Linked Claims (e.g. Policy Upgrade)
+                {% endif %}
+            </h4>
             {% if policy.linkedClaims|length > 0 %}
                 <table class="table table-striped">
                     <tr>
@@ -1700,7 +1723,10 @@
         </div>
     {% endif %}
 
-    {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:Admin:policyStatusForm', 'policy': policy, 'id': 'policyStatusForm'} %}
+    {% if is_granted('ROLE_CUSTOMER_SERVICES') %}
+        {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:AdminEmployee:linkClaimForm', 'policy': policy, 'id': 'linkClaimForm'} %}
+        {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:Admin:policyStatusForm', 'policy': policy, 'id': 'policyStatusForm'} %}
+    {% endif %}
     {% include 'AppBundle::Claims/claimsModal.html.twig' %}
     
 <div class="modal fade" id="policyNotesModal" tabindex="-1" role="dialog">

@@ -2,16 +2,12 @@
 
 namespace AppBundle\Tests\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use AppBundle\Document\User;
-use AppBundle\Document\Phone;
-use AppBundle\Document\Lead;
-use AppBundle\Document\Policy;
+use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Claim;
 use AppBundle\Document\Charge;
 use AppBundle\Document\CurrencyTrait;
-use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 use AppBundle\DataFixtures\MongoDB\b\User\LoadUserData;
+use AppBundle\Document\Policy;
 
 /**
  * @group functional-net
@@ -98,14 +94,87 @@ class AdminControllerTest extends BaseControllerTest
             'claims_form[approvedDate]' => '2022-01-01',
         ]);
 
-        $crawler = self::$client->submit($form);
+        self::$client->submit($form);
         self::verifyResponse(302);
+        $crawler = self::$client->followRedirect();
+        self::expectFlashSuccess($crawler, 'updated');
 
         $dm = $this->getDocumentManager(true);
         $repoClaim = $dm->getRepository(Claim::class);
         /** @var Claim $newClaim */
         $newClaim = $repoClaim->find($claim->getId());
         $this->assertEquals('2022-01-01', $newClaim->getApprovedDate()->format('Y-m-d'));
+    }
+
+    public function testAdminLinkClaimForm()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testAdminLinkClaimForm', $this),
+            'bar'
+        );
+
+        $oldPolicy = self::initPolicy(
+            $user,
+            self::$dm,
+            static::getRandomPhone(self::$dm),
+            null,
+            true,
+            true
+        );
+
+        $newPolicy = self::initPolicy(
+            $user,
+            self::$dm,
+            static::getRandomPhone(self::$dm),
+            null,
+            true,
+            true
+        );
+
+        $claim = new Claim();
+        $claim->setPolicy($oldPolicy);
+        $claim->setNumber('TEST/3213');
+        $claim->setType(Claim::TYPE_THEFT);
+        self::$dm->persist($claim);
+        self::$dm->flush();
+
+        $this->login('mariusz@so-sure.com', LoadUserData::DEFAULT_PASSWORD, 'admin');
+
+        $crawler = self::$client->request('GET', '/admin/policy/' . $newPolicy->getId());
+        self::verifyResponse(200);
+
+        $form = $crawler->selectButton('link_claim_form_submit')->form();
+
+        $form['link_claim_form[id]'] = $claim->getId();
+        $form['link_claim_form[number]'] = $claim->getNumber();
+        $form['link_claim_form[note]'] = 'A test justification';
+
+        self::$client->followRedirects();
+        $crawler = self::$client->submit($form);
+        self::verifyResponse(200);
+
+        $dm = $this->getDocumentManager(true);
+        $repoPolicy = $dm->getRepository(Policy::class);
+        /** @var Policy $updatedPolicy */
+        $updatedPolicy = $repoPolicy->find($newPolicy->getId());
+
+        $repoClaim = $dm->getRepository(Claim::class);
+        /** @var Claim $updatedClaim */
+        $updatedClaim = $repoClaim->find($claim->getId());
+
+        $linkedClaims = $updatedPolicy->getLinkedClaims()->toArray();
+        $linkedPolicy = $updatedClaim->getLinkedPolicy();
+
+        /** @var Claim $linkedClaim */
+        foreach ($linkedClaims as $linkedClaim) {
+            if ($linkedClaim->getId() === $updatedClaim->getId()) {
+                $link = $linkedClaim;
+            }
+        }
+
+        $this->assertTrue(isset($link));
+        $this->assertEquals($updatedPolicy->getId(), $linkedPolicy->getId());
     }
 
     public function testAdminClaimDelete()

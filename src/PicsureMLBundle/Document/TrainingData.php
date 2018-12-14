@@ -61,6 +61,12 @@ class TrainingData
      */
     protected $versions = array();
 
+    /**
+     * @Assert\Type("bool")
+     * @MongoDB\Field(type="boolean")
+     */
+    protected $forDetection;
+
     public function getId()
     {
         return $this->id;
@@ -154,6 +160,16 @@ class TrainingData
     public function getVersions()
     {
         return $this->versions;
+    }
+
+    public function setForDetection($forDetection)
+    {
+        $this->forDetection = $forDetection;
+    }
+
+    public function getForDetection()
+    {
+        return $this->forDetection;
     }
 
     public function hasAnnotation()

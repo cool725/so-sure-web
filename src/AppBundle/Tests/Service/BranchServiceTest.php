@@ -2,6 +2,7 @@
 
 namespace AppBundle\Tests\Service;
 
+use AppBundle\Service\BranchService;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Doctrine\ODM\MongoDB\DocumentManager;
 
@@ -40,6 +41,7 @@ class BranchServiceTest extends WebTestCase
     protected static $container;
     /** @var DocumentManager */
     protected static $dm;
+    /** @var BranchService */
     protected static $branch;
 
     public static function setUpBeforeClass()
@@ -56,7 +58,9 @@ class BranchServiceTest extends WebTestCase
         /** @var DocumentManager */
         $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
         self::$dm = $dm;
-        self::$branch = self::$container->get('app.branch');
+        /** @var BranchService $branch */
+        $branch = self::$container->get('app.branch');
+        self::$branch = $branch;
     }
 
     public function testBranchDiacritics()

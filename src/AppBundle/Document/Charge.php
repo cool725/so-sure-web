@@ -247,4 +247,18 @@ class Charge
             );
         }
     }
+
+    /**
+     * Takes a list of charges and tells you the total cost of them
+     * @param array $charges is the list of charges.
+     * @return float total cost.
+     */
+    public static function sumCost($charges)
+    {
+        $sum = 0;
+        foreach ($charges as $charge) {
+            $sum += $charge->getAmount();
+        }
+        return $sum;
+    }
 }

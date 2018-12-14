@@ -194,6 +194,11 @@ abstract class Policy
     protected $user;
 
     /**
+     * @MongoDB\ReferenceOne(targetDocument="AffiliateCompany", inversedBy="confirmedPolicies")
+     */
+    protected $affiliate;
+
+    /**
      * @MongoDB\ReferenceOne(targetDocument="Policy", inversedBy="previousPolicy")
      * @Gedmo\Versioned
      * @var Policy
@@ -1014,6 +1019,16 @@ abstract class Policy
     public function setUser(User $user)
     {
         $this->user = $user;
+    }
+
+    public function getAffiliate()
+    {
+        return $this->affiliate;
+    }
+
+    public function setAffiliate(AffiliateCompany $affiliate)
+    {
+        $this->affiliate = $affiliate;
     }
 
     /**
@@ -2900,13 +2915,6 @@ abstract class Policy
         }
 
         return $this->getStart()->diff($date)->days <= 30;
-    }
-
-    public function daysToAquisition($days)
-    {
-        $now = \DateTime::createFromFormat('U', time());
-        $now = $days - ($now->diff($this->getStart()))->d;
-        return ($now >= 0) ? $now : 0;
     }
 
     public function isPolicyOldEnough($days, \DateTime $date = null)
