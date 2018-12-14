@@ -348,6 +348,10 @@ class DefaultController extends BaseController
         $phoneMake = new PhoneMake();
         if ($id) {
             $phone = $phoneRepo->find($id);
+            if (!$phone) {
+                throw $this->createNotFoundException('Invalid id');
+            }
+            
             $phoneMake->setMake($phone->getMake());
         }
 
