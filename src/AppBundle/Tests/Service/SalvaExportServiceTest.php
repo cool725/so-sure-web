@@ -505,8 +505,12 @@ class SalvaExportServiceTest extends WebTestCase
         $policy = $this->createPolicy('testExportPaymentMonthEdge', $date);
         //print $date->format(\DateTime::ATOM) . PHP_EOL;
 
-        $this->addPaymentForMonth($policy, 1, $date);
-        $this->addPaymentForMonth($policy, 2, $date);
+
+        $oneMonthBefore = clone $date;
+        $oneMonthBefore = $oneMonthBefore->sub(new \DateInterval('P1M'));
+
+        $oneMonthPayment = $this->addPaymentForMonth($policy, 1, $date);
+        $twoMonthPayment = $this->addPaymentForMonth($policy, 2, $date);
 
         static::$dm->flush();
 
@@ -526,12 +530,12 @@ class SalvaExportServiceTest extends WebTestCase
         //$this->assertEquals(0, count($lines));
         //print_r($lines);
 
-        $lines = $this->exportPayments($updatedPolicy->getPolicyNumber(), $oneMonth);
+        $lines = $this->exportPayments($updatedPolicy->getPolicyNumber(), $oneMonthPayment->getDate());
         // New logic - dates are correct
         $this->assertEquals(1, count($lines));
         //print_r($lines);
 
-        $lines = $this->exportPayments($updatedPolicy->getPolicyNumber(), $twoMonths);
+        $lines = $this->exportPayments($updatedPolicy->getPolicyNumber(), $twoMonthPayment->getDate());
         // New logic - dates are correct
         $this->assertEquals(1, count($lines));
         //print_r($lines);
@@ -1098,7 +1102,7 @@ class SalvaExportServiceTest extends WebTestCase
             //print $oneMonth->format(\DateTime::ATOM) . PHP_EOL;
         $payment = self::addPayment(
             $policy,
-            $policy->getPremium($future)->getMonthlyPremiumPrice(),
+            $policy->getPremium()->getMonthlyPremiumPrice(),
             Salva::MONTHLY_TOTAL_COMMISSION,
             sprintf("%s%d", $policy->getId(), $month),
             $future
