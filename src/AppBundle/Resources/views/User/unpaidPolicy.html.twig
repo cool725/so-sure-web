@@ -6,13 +6,6 @@
 {% set show_bacs_setup = false %}
 {% set show_bacs_retry = false %}
 {% set judo_btn_text = 'Update my card details' %}
-{% if show_judo %}
-   {% if show_bacs_setup %}
-    {% set judo_btn_text = 'Continue to card payment' %}
-   {% else %}
-    {% set judo_btn_text = 'Proceed to card payment' %}
-   {% endif %}
-{% endif %}
 
 {% block title %}
     so-sure
@@ -172,6 +165,14 @@
             </div>
         </div>
     </section>
+
+    {% if show_judo %}
+        {% if show_bacs_setup %}
+            {% set judo_btn_text = 'Continue to card payment' %}
+        {% else %}
+            {% set judo_btn_text = 'Proceed to card payment' %}
+        {% endif %}
+    {% endif %}
 
     <section class="d-flex flex-column justify-content-center align-items-center">
         <div class="container">
