@@ -25,8 +25,10 @@ class PosIpListenerTest extends BaseControllerTest
     {
         $client = self::createClient();
 
+        $posIps = $client->getContainer()->getParameter('pos_ips');
+
         $crawler = self::$client->request('GET', '/', [], [], [
-            'REMOTE_ADDR' => '10.0.2.2'
+            'REMOTE_ADDR' => $posIps[0]
         ]);
         self::verifyResponse(403);
     }
@@ -35,8 +37,10 @@ class PosIpListenerTest extends BaseControllerTest
     {
         $client = self::createClient();
 
+        $posIps = $client->getContainer()->getParameter('pos_ips');
+
         $crawler = self::$client->request('GET', '/pos/helloz', [], [], [
-            'REMOTE_ADDR' => '10.0.2.2'
+            'REMOTE_ADDR' => $posIps[0]
         ]);
         self::verifyResponse(200);
     }

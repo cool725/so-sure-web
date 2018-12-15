@@ -19,7 +19,7 @@ class PosIpListener
     {
         $request  = $event->getRequest();
 
-        if (mb_strpos($request->getRequestUri(), '/pos/') !== 0 && in_array($request->getClientIp(), $this->posIps)) {
+        if (in_array($request->getClientIp(), $this->posIps) && mb_strpos($request->getRequestUri(), '/pos/') !== 0) {
             $event->setResponse(new Response('', 403));
         }
     }
