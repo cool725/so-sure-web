@@ -54,6 +54,7 @@ class AffiliateServiceTest extends WebTestCase
     use \AppBundle\Document\DateTrait;
 
     protected static $container;
+    /** @var AffiliateService */
     protected static $affiliateService;
     protected static $dm;
     protected static $userRepository;
@@ -67,7 +68,11 @@ class AffiliateServiceTest extends WebTestCase
         $kernel->boot();
         self::$container = $kernel->getContainer();
         self::$userManager = self::$container->get('fos_user.user_manager');
-        self::$affiliateService = self::$container->get('app.affiliate');
+
+        /** @var AffiliateService affiliateService */
+        $affiliateService = self::$container->get('app.affiliate');
+        self::$affiliateService = $affiliateService;
+
         /** @var DocumentManager $dm */
         $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
         self::$dm = $dm;
@@ -126,15 +131,15 @@ class AffiliateServiceTest extends WebTestCase
         $this->assertEquals(3, count($charges));
         $date = static::addDays($date, 30);
         self::$dm->flush();
-        $this->assertEquals(2, count(self::$affiliateService->ongoingCharges($affiliate, $date)));
+        $this->assertCount(2, self::$affiliateService->ongoingCharges($affiliate, $date));
 
         // test for solitary policy charges a year ago.
         $date = static::addDays($date, 365);
         self::$dm->flush();
-        $this->assertEquals(3, count(self::$affiliateService->ongoingCharges($affiliate, $date)));
+        $this->assertCount(3, self::$affiliateService->ongoingCharges($affiliate, $date));
         $date = static::addDays($date, 30);
         self::$dm->flush();
-        $this->assertEquals(2, count(self::$affiliateService->ongoingCharges($affiliate, $date)));
+        $this->assertCount(2, self::$affiliateService->ongoingCharges($affiliate, $date));
         // test for renewal policy with previous having charges.
         foreach ($users as $user) {
             self::renewal($user, $date);
@@ -144,7 +149,7 @@ class AffiliateServiceTest extends WebTestCase
         $this->assertEmpty(self::$affiliateService->ongoingCharges($affiliate, $date));
         $date = static::addDays($date, 395);
         self::$dm->flush();
-        $this->assertEquals(5, count(self::$affiliateService->ongoingCharges($affiliate, $date)));
+        $this->assertCount(5, self::$affiliateService->ongoingCharges($affiliate, $date));
         $this->assertEmpty(self::$affiliateService->ongoingCharges($affiliate, $date));
         // test for renewal policy with previous having no charges but user having charges.
         foreach ($users as $user) {

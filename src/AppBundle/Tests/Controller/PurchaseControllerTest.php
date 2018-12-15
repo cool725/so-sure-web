@@ -1113,9 +1113,9 @@ class PurchaseControllerTest extends BaseControllerTest
         $dm = $this->getDocumentManager(true);
         $leadRepo = $dm->getRepository(Lead::class);
         /** @var Lead $lead */
-        $lead = $leadRepo->findOneBy(['email' => mb_strtolower($email)]);
+        $lead = $leadRepo->findOneBy(['emailCanonical' => mb_strtolower($email)]);
         $this->assertNotNull($lead);
-        $this->assertEquals(mb_strtolower($email), $lead->getEmail());
+        $this->assertEquals(mb_strtolower($email), $lead->getEmailCanonical());
         $this->assertEquals('foo bar', $lead->getName());
     }
 
@@ -1193,12 +1193,12 @@ class PurchaseControllerTest extends BaseControllerTest
         );
         self::verifyResponse(200);
 
-        $dm = $this->getDocumentManager(true);
-        $leadRepo = $dm->getRepository(Lead::class);
+            $dm = $this->getDocumentManager(true);
+            $leadRepo = $dm->getRepository(Lead::class);
         /** @var Lead $lead */
-        $lead = $leadRepo->findOneBy(['email' => mb_strtolower($email)]);
+        $lead = $leadRepo->findOneBy(['emailCanonical' => mb_strtolower($email)]);
         $this->assertNotNull($lead);
-        $this->assertEquals(mb_strtolower($email), $lead->getEmail());
+        $this->assertEquals(mb_strtolower($email), $lead->getEmailCanonical());
         $this->assertNull($lead->getName());
     }
 

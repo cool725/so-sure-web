@@ -4,6 +4,7 @@ run-as: root
 phases:
   install:
     commands:
+      - ulimit -a
       - cd /var/ops; git pull origin master; cd $CODEBUILD_SRC_DIR
       - /usr/bin/redis-server --port 6379 &
       - /usr/bin/mongod --dbpath /tmp --fork --logpath /tmp/mongo.log --logappend
@@ -15,3 +16,6 @@ phases:
   build:
     commands:
       - ./build/run-test-functional.sh -l
+artifacts:
+  files:
+    - logs/test.log

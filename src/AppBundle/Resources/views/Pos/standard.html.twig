@@ -1,0 +1,147 @@
+{% extends 'base_portal.html.twig' %}
+{% form_theme lead_form with ['AppBundle:Form:fields.html.twig', 'AppBundle:Form:submit.html.twig'] %}
+
+{# Set vars #}
+{% set body_class = '' %}
+{% set quote_mode = true %}
+
+{% block title %}so-sure - Welcome to Social Insurance{% endblock %}
+
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/pos.css') }}">
+{% endblock %}
+
+{% block body %}
+
+    <section class="portal d-flex align-items-center">
+        <div class="container">
+            <div class="portal__inner">
+
+                <img src="{{ cdn_url }}/images/rebrand/logo/so-sure_logo-white-dark.svg" width="200px" class="mb-4 d-block mx-auto" alt="so-sure">
+
+                <div class="portal__card">
+                    <div class="portal__card__body">
+                        {{ form_start(lead_form, {'attr': {
+                            'data-toggle': 'validator',
+                            'class': 'validate-form form-400',
+                            'data-client-validation': form_client_validation,
+                            'autocomplete': 'off',
+                            'id': 'lead_form'
+                        }}) }}
+                            <div class="who">
+                                <h4 class="text-center mb-4">Register with so-sure</h4>
+                                <p class="text-center mb-4">Mobile insurance that’s simply better</p>
+                                <div class="form-group text-center mb-4">
+                                    {{ form_widget(lead_form.submittedBy, {'attr': {
+                                        'class': 'form-control'
+                                    }}) }}
+                                    <div class="with-errors">{{ form_errors(lead_form.submittedBy) }}</div>
+                                </div>
+                                <div class="form-group text-center mb-4">
+                                    <a id="begin_btn" href="#" class="btn btn-primary btn-square">Begin</a>
+                                </div>
+                                {#<div class="form-group text-center">#}
+                                    {#<h5 class="text-center text-muted mb-4">OR</h5>#}
+                                    {#<h5 class="text-center">Download the app 🎉</h5>#}
+                                    {#<img src="{{ cdn_url }}/images/qr/so-sure_qr-code-app-download.png " alt="Download the app">#}
+                                {#</div>#}
+                            </div>
+                            <div class="info hideme">
+                                <div class="staff hideme">
+                                    <h4 class="text-center mb-4">Customer Registration</h4>
+                                    <p class="text-center mb-4">Mobile insurance that’s simply better</p>
+                                    <ul>
+                                        <li><strong>Ensure that you are not selling so-sure.</strong></li>
+                                        <li>Ask the customer if they are interested in mobile phone insure.</li>
+                                        <li>Inform the customer if they provide their details, they will get an email shortly with more information.</li>
+                                    </ul>
+                                </div>
+                                <div class="customer hideme">
+                                    <h4 class="text-center mb-4">Register with so-sure</h4>
+                                    <p class="text-center mb-4">Mobile insurance that’s simply better</p>
+                                    <p>
+                                        Get covered for loss, theft, accidental damage and even international travel with our simple, low price and hassle-free mobile insurance.
+                                    </p>
+                                    <p>
+                                        To find out more about the benefits of so-sure cover, enter your details below!
+                                    </p>
+                                </div>
+                                <div class="form-group">
+                                    {{ form_label(lead_form.name, 'Full name') }}
+                                    {{ form_widget(lead_form.name, {'attr':{'class':'form-control'}}) }}
+                                    <div class="with-errors">{{ form_errors(lead_form.name) }}</div>
+                                </div>
+                                <div class="form-group">
+                                    {{ form_label(lead_form.email, 'Email address') }}
+                                    {{ form_widget(lead_form.email, {'attr':{'class':'form-control'}}) }}
+                                    <div class="with-errors">{{ form_errors(lead_form.email) }}</div>
+                                </div>
+
+                                <div class="form-group">
+                                    {{ form_label(lead_form.phone, 'Phone') }}
+                                    {{ form_widget(lead_form.phone, {'attr':{'class':'form-control'}}) }}
+                                    <div class="with-errors">{{ form_errors(lead_form.phone) }}</div>
+                                </div>
+
+                                <div class="form-group">
+                                    <div class="staff hideme">
+                                        <label class="required">Confirm verbally the customer wishes to receive marketing emails from so-sure</label>
+                                    </div>
+                                    <div class="customer {% if not form_errors(lead_form) %}hideme{% endif %}">
+                                        <label class="required">Learn more...</label>
+                                    </div>
+
+                                    <div class="form-group">
+                                    {{ form_widget(lead_form.optin, {
+                                        'label': 'Learn more'
+                                    }) }}
+                                    </div>
+                                    <div class="with-errors">{{ form_errors(lead_form.optin) }}</div>
+                                </div>
+                                <div class="form-group d-flex justify-content-between align-items-center mb-0">
+                                    <a id="restart_btn" href="#" class="btn btn-outline-primary btn-square">Back</a>
+                                    {{ form_widget(lead_form.state) }}
+                                    {{ form_widget(lead_form.submit, {'attr':{'class':'btn btn-success btn-square'}}) }}
+                                </div>
+                            </div>
+                        {{ form_end(lead_form) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <span class="portal__phone__background animated fadeInLeft"></span>
+        <span class="portal__money__background animated jackInTheBox"></span>
+    </section>
+
+
+    {# Page Modals #}
+    <div class="modal fade"
+         id="customer_portal_terms"
+         tabindex="-1" role="dialog"
+         aria-labelledby="customer_portal_terms"
+         aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Terms &amp; Conditions</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <i class="fal fa-times text-white"></i>
+                    </button>
+                </div>
+                <div class="modal-body text-center text-sm-left">
+                    <div class="row">
+                        Terms
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block footer %}{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/pos.js') }}"></script>
+{% endblock %}
