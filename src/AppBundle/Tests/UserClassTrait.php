@@ -185,10 +185,16 @@ trait UserClassTrait
         $phones = $phoneRepo->findBy($query);
         $phone = null;
         while ($phone == null) {
+            /** @var Phone $phone */
             $phone = $phones[rand(0, count($phones) - 1)];
             // Many tests rely on past dates, so ensure the date is ok for the past
             if (!$phone->getCurrentPhonePrice(new \DateTime('2016-01-01')) || $phone->getMake() == "ALL") {
                 $phone = null;
+                continue;
+            }
+            if (!$phone->getCurrentPhonePrice()->getExcess()) {
+                $phone = null;
+                continue;
             }
         }
 

@@ -495,10 +495,10 @@ class DaviesServiceTest extends WebTestCase
         $policy->setPhone(self::getRandomPhone(self::$dm));
 
         $claim = new Claim();
-        $claim->setPolicy($policy);
         $claim->setNumber(time());
         $claim->setStatus(Claim::STATUS_INREVIEW);
         $claim->setType(Claim::TYPE_LOSS);
+        $policy->addClaim($claim);
 
         $daviesClaim = new DaviesHandlerClaim();
         $daviesClaim->claimNumber = $claim->getNumber();
@@ -527,10 +527,10 @@ class DaviesServiceTest extends WebTestCase
         $policy->setPhone(self::getRandomPhone(self::$dm));
 
         $claim = new Claim();
-        $claim->setPolicy($policy);
         $claim->setNumber(time());
         $claim->setStatus(Claim::STATUS_INREVIEW);
         $claim->setType(Claim::TYPE_LOSS);
+        $policy->addClaim($claim);
 
         $daviesClaim = new DaviesHandlerClaim();
         $daviesClaim->claimNumber = $claim->getNumber();
@@ -559,10 +559,10 @@ class DaviesServiceTest extends WebTestCase
         $policy->setPhone(self::getRandomPhone(self::$dm));
 
         $claim = new Claim();
-        $claim->setPolicy($policy);
         $claim->setNumber(time());
         $claim->setStatus(Claim::STATUS_APPROVED);
         $claim->setType(Claim::TYPE_LOSS);
+        $policy->addClaim($claim);
 
         $daviesClaim = new DaviesHandlerClaim();
         $daviesClaim->claimNumber = $claim->getNumber();
@@ -591,10 +591,10 @@ class DaviesServiceTest extends WebTestCase
         $policy->setPhone(self::getRandomPhone(self::$dm));
 
         $claim = new Claim();
-        $claim->setPolicy($policy);
         $claim->setNumber(time());
         $claim->setStatus(Claim::STATUS_INREVIEW);
         $claim->setType(Claim::TYPE_LOSS);
+        $policy->addClaim($claim);
 
         $daviesClaim = new DaviesHandlerClaim();
         $daviesClaim->claimNumber = $claim->getNumber();
@@ -623,10 +623,10 @@ class DaviesServiceTest extends WebTestCase
         $policy->setPhone(self::getRandomPhone(self::$dm));
 
         $claim = new Claim();
-        $claim->setPolicy($policy);
         $claim->setNumber(time());
         $claim->setStatus(Claim::STATUS_APPROVED);
         $claim->setType(Claim::TYPE_LOSS);
+        $policy->addClaim($claim);
 
         $daviesClaim = new DaviesHandlerClaim();
         $daviesClaim->claimNumber = $claim->getNumber();

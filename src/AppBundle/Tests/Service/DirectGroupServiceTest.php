@@ -439,9 +439,9 @@ class DirectGroupServiceTest extends WebTestCase
 
         $claim = new Claim();
         $claim->setType(Claim::TYPE_LOSS);
-        $claim->setPolicy($policy);
         $claim->setNumber(time());
         $claim->setStatus(Claim::STATUS_SETTLED);
+        $policy->addClaim($claim);
 
         $directGroupClaim = new DirectGroupHandlerClaim();
         $directGroupClaim->claimNumber = $claim->getNumber();
@@ -472,9 +472,9 @@ class DirectGroupServiceTest extends WebTestCase
 
         $claim = new Claim();
         $claim->setType(Claim::TYPE_LOSS);
-        $claim->setPolicy($policy);
         $claim->setNumber(time());
         $claim->setStatus(Claim::STATUS_INREVIEW);
+        $policy->addClaim($claim);
 
         $directGroupClaim = new DirectGroupHandlerClaim();
         $directGroupClaim->claimNumber = $claim->getNumber();
@@ -504,9 +504,9 @@ class DirectGroupServiceTest extends WebTestCase
 
         $claim = new Claim();
         $claim->setType(Claim::TYPE_LOSS);
-        $claim->setPolicy($policy);
         $claim->setNumber(time());
         $claim->setStatus(Claim::STATUS_INREVIEW);
+        $policy->addClaim($claim);
 
         $directGroupClaim = new DirectGroupHandlerClaim();
         $directGroupClaim->claimNumber = $claim->getNumber();
@@ -536,9 +536,9 @@ class DirectGroupServiceTest extends WebTestCase
 
         $claim = new Claim();
         $claim->setType(Claim::TYPE_LOSS);
-        $claim->setPolicy($policy);
         $claim->setNumber(time());
         $claim->setStatus(Claim::STATUS_APPROVED);
+        $policy->addClaim($claim);
 
         $directGroupClaim = new DirectGroupHandlerClaim();
         $directGroupClaim->claimNumber = $claim->getNumber();
@@ -568,9 +568,9 @@ class DirectGroupServiceTest extends WebTestCase
 
         $claim = new Claim();
         $claim->setType(Claim::TYPE_LOSS);
-        $claim->setPolicy($policy);
         $claim->setNumber(time());
         $claim->setStatus(Claim::STATUS_INREVIEW);
+        $policy->addClaim($claim);
 
         $directGroupClaim = new DirectGroupHandlerClaim();
         $directGroupClaim->claimNumber = $claim->getNumber();
