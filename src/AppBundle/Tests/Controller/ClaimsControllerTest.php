@@ -206,7 +206,7 @@ class ClaimsControllerTest extends BaseControllerTest
         $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_APPROVED);
         self::$dm->flush();
         $this->assertTrue($policy->getUser()->hasActivePolicy());
-        $this->assertTrue($policy->getCurrentExcess());
+        $this->assertNotNull($policy->getCurrentExcess());
 
         $this->login('claims@so-sure.com', LoadUserData::DEFAULT_PASSWORD, 'claims/policies');
 
