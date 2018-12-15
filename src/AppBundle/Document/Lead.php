@@ -2,6 +2,7 @@
 
 namespace AppBundle\Document;
 
+use AppBundle\Document\Opt\Opt;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Symfony\Component\Validator\Constraints as Assert;
 use AppBundle\Validator\Constraints as AppAssert;
@@ -96,6 +97,11 @@ class Lead
      * @MongoDB\Field(type="string")
      */
     protected $intercomId;
+
+    /**
+     * @MongoDB\ReferenceMany(targetDocument="AppBundle\Document\Opt\Opt", mappedBy="lead", cascade={"persist"})
+     */
+    protected $opts = array();
 
     public function __construct()
     {
@@ -197,6 +203,17 @@ class Lead
     public function setIntercomId($intercomId)
     {
         $this->intercomId = $intercomId;
+    }
+
+    public function addOpt(Opt $opt)
+    {
+        $opt->setLead($this);
+        $this->opts[] = $opt;
+    }
+
+    public function getOpts()
+    {
+        return $this->opts;
     }
 
     public function populateUser(User $user)

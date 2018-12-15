@@ -1,6 +1,6 @@
 // faq.js
 
-require('../../sass/pages/portal.scss');
+require('../../sass/pages/pos.scss');
 
 // Require BS component(s)
 // require('bootstrap/js/dist/scrollspy');
@@ -11,7 +11,7 @@ require('../../../js/Default/jqueryValidatorMethods.js');
 
 const sosure = sosure || {};
 
-sosure.affPortal = (function() {
+sosure.pos = (function() {
     let self = {};
     self.form = null;
     self.isIE = null;
@@ -51,7 +51,7 @@ sosure.affPortal = (function() {
                 "lead_form[phone]": {
                     required: true
                 },
-                "lead_form[terms]": {
+                "lead_form[optin]": {
                     required: true
                 }
             },
@@ -66,8 +66,8 @@ sosure.affPortal = (function() {
                 "lead_form[phone]": {
                     required: 'Please select a device'
                 },
-                "lead_form[terms]": {
-                    required: ''
+                "lead_form[optin]": {
+                    required: 'Please choose if you wish to opt in to marketing emails'
                 }
             },
 
@@ -81,28 +81,39 @@ sosure.affPortal = (function() {
 })();
 
 $(function() {
-    sosure.affPortal.init();
+    sosure.pos.init();
 
     let whosEntering = false,
-        who = null,
-        labelTxt = null;
+        who = null;
 
-    let staff = (labelTxt) => {
+    let staff = () => {
         $('.who').addClass('hideme');
         $('.info').removeClass('hideme').find('.staff').removeClass('hideme');
-        $('#lead_form_terms_label').text(labelTxt);
+        $('#lead_form_state').val('staff');
+        //console.log($('#lead_form_state').val());
     }
 
-    let customer = (labelTxt) => {
+    let customer = () => {
         $('.who').addClass('hideme');
         $('.info').removeClass('hideme').find('.customer').removeClass('hideme');
-        $('#lead_form_terms_label').text(labelTxt);
+        $('#lead_form_state').val('customer');
+        //console.log($('#lead_form_state').val());
     }
 
     let back = () => {
         $('.info').addClass('hideme').find('.staff, .customer').addClass('hideme');
         $('.who').removeClass('hideme');
         $('#lead_form_submittedBy').prop('selectedIndex', 0);
+        $('#lead_form_state').val(null);
+        //console.log($('#lead_form_state').val());
+    }
+
+    let state = $('#lead_form_state').val();
+    //console.log($('#lead_form_state').val());
+    if (state == 'customer') {
+        customer();
+    } else if (state == 'staff') {
+        staff();
     }
 
     $('#lead_form_submittedBy').on('change', function(e) {
@@ -112,10 +123,8 @@ $(function() {
 
         if (who === 'customer') {
             whosEntering = true;
-            labelTxt = customerTxt;
         } else if (who === 'staff') {
             whosEntering = true;
-            labelTxt = staffTxt;
         } else {
             whosEntering = false;
         }
@@ -126,11 +135,11 @@ $(function() {
         e.preventDefault();
 
         if (who === 'customer') {
-            customer(labelTxt);
+            customer();
         }
 
         if (who === 'staff') {
-            staff(labelTxt);
+            staff();
         }
     });
 

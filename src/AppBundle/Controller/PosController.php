@@ -2,8 +2,10 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Document\Opt\EmailOptIn;
 use AppBundle\Form\Type\LeadPosType;
 use Doctrine\ODM\MongoDB\DocumentManager;
+use PharIo\Manifest\Email;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,20 +17,28 @@ use AppBundle\Document\Lead;
  */
 class PosController extends BaseController
 {
+    // TODO: Move to affiliate company flag
+    public static $pos = [
+        'helloz' => Lead::SOURCE_POS_HELLOZ,
+    ];
+
     /**
-     * @Route("/helloz", name="helloz")
+     * @Route("/{name}", name="pos_standard")
      * @Template()
      */
-    public function hellozAction(Request $request)
+    public function standardAction(Request $request, $name)
     {
+        if (!in_array($name, array_keys(self::$pos))) {
+            return $this->createNotFoundException('Unknown pos vendor');
+        }
         /** @var DocumentManager $dm */
         $dm = $this->getManager();
 
-        $lead = new Lead();
-        $lead->setSource(Lead::LEAD_SOURCE_AFFILIATE);
-        $lead->setSourceDetails(Lead::SOURCE_POS_HELLOZ);
+        $leadData = new \AppBundle\Document\Form\Lead();
+        $leadData->setSource(Lead::LEAD_SOURCE_AFFILIATE);
+        $leadData->setSourceDetails(self::$pos[$name]);
         $leadForm = $this->get('form.factory')
-            ->createNamedBuilder('lead_form', LeadPosType::class, $lead)
+            ->createNamedBuilder('lead_form', LeadPosType::class, $leadData)
             ->getForm();
 
         if ('POST' === $request->getMethod()) {
@@ -38,27 +48,35 @@ class PosController extends BaseController
                 if ($leadForm->isValid()) {
                     $leadRepo = $dm->getRepository(Lead::class);
                     $existingLead = $leadRepo->findOneBy([
-                        'emailCanonical' => $lead->getEmailCanonical()
+                        'emailCanonical' => $leadData->getEmailCanonical()
                     ]);
 
-                    if (!$existingLead) {
-                        $this->addFlash('success', sprintf(
-                            'Successfully added lead: %s',
-                            $lead->getName()
-                        ));
-
+                    if (!$existingLead && $leadData->getOptin()) {
+                        $lead = $leadData->toLead();
+                        $emailOptIn = new EmailOptIn();
+                        $emailOptIn->setEmail($lead->getEmail());
+                        $emailOptIn->addCategory(EmailOptIn::OPTIN_CAT_MARKETING);
+                        $emailOptIn->setLocation(EmailOptIn::OPT_LOCATION_POS);
+                        $emailOptIn->setIdentityLog($this->getIdentityLogWeb($request));
+                        $lead->addOpt($emailOptIn);
                         $dm->persist($lead);
                         $dm->flush();
+
+                        $this->addFlash('success', sprintf(
+                            'Successfully added lead: %s',
+                            $leadData->getName()
+                        ));
+
                     } else {
                         $this->addFlash('warning', sprintf(
                             'Lead already exists'
                         ));
                     }
 
-                    return new RedirectResponse($this->generateUrl('helloz'));
+                    return new RedirectResponse($this->generateUrl('pos_standard', ['name' => $name]));
                 } else {
                     $this->addFlash('error', sprintf(
-                        'Form is invalid'
+                        'Sorry, we were unable to register you. Please review the form errors below.'
                     ));
                 }
             }

@@ -39,7 +39,7 @@ Encore
     .addEntry('picsure', './src/AppBundle/Resources/public/rebrand/js/pages/admin/picsure.js')
 
     // Portal
-    .addEntry('portal', './src/AppBundle/Resources/public/rebrand/js/pages/portal.js')
+    .addEntry('pos', './src/AppBundle/Resources/public/rebrand/js/pages/pos.js')
 
     // allow legacy applications to use $/jQuery as a global variable
     .autoProvidejQuery()

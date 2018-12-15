@@ -6,6 +6,7 @@ use AppBundle\Document\Phone;
 use AppBundle\Repository\PhoneRepository;
 use Doctrine\Bundle\MongoDBBundle\Form\Type\DocumentType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
@@ -22,10 +23,10 @@ class LeadPosType extends AbstractType
             ->add('submittedBy', ChoiceType::class, [
                 'required' => true,
                 'choices' => array(
-                    'Customer' => 'customer',
-                    'Staff' => 'staff'
+                    'Interested in so-sure' => 'customer',
+                    'A member of Staff' => 'staff'
                 ),
-                'placeholder' => 'Choose a user to begin...',
+                'placeholder' => 'I am...',
                 'multiple' => false,
                 'mapped' => false
             ])
@@ -41,21 +42,28 @@ class LeadPosType extends AbstractType
                 'query_builder' => function (PhoneRepository $dr) {
                     return $dr->findActive();
                 },
+                'choice_label' => 'getNameFormSafe',
+                'choice_value' => 'id',
                 'preferred_choices' => function (Phone $phone) {
                     return $phone->isHighlight();
                 },
             ])
-            ->add('terms', CheckboxType::class, [
+            ->add('optin', ChoiceType::class, [
+                'choices' => [
+                    'I would like to receive emails from so-sure!' => true,
+                    'I am not interested in receiving any information' => false,
+                ],
                 'required' => true,
-                'mapped' => false
+                'expanded' => true,
             ])
+            ->add('state', HiddenType::class, ['mapped' => false])
             ->add('submit', SubmitType::class);
     }
 
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(array(
-            'data_class' => 'AppBundle\Document\Lead',
+            'data_class' => 'AppBundle\Document\Form\Lead',
         ));
     }
 }

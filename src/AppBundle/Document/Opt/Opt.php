@@ -3,6 +3,7 @@
 namespace AppBundle\Document\Opt;
 
 use AppBundle\Document\IdentityLog;
+use AppBundle\Document\Lead;
 use AppBundle\Document\User;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
@@ -27,6 +28,7 @@ abstract class Opt
     const OPT_LOCATION_PREFERNCES = 'preferences';
     const OPT_LOCATION_ADMIN = 'admin';
     const OPT_LOCATION_INTERCOM = 'intercom';
+    const OPT_LOCATION_POS = 'pos';
 
     /**
      * @MongoDB\Id
@@ -53,7 +55,7 @@ abstract class Opt
     protected $category;
 
     /**
-     * @Assert\Choice({"preferences", "admin", "intercom"}, strict=true)
+     * @Assert\Choice({"preferences", "admin", "intercom", "pos"}, strict=true)
      * @MongoDB\Field(type="string")
      */
     protected $location;
@@ -81,6 +83,13 @@ abstract class Opt
      * @var User
      */
     protected $user;
+
+    /**
+     * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\Lead", inversedBy="opts")
+     * @Gedmo\Versioned
+     * @var Lead
+     */
+    protected $lead;
 
     public function __construct()
     {
@@ -185,5 +194,18 @@ abstract class Opt
     public function setUser(User $user)
     {
         $this->user = $user;
+    }
+
+    /**
+     * @return Lead|null
+     */
+    public function getLead()
+    {
+        return $this->lead;
+    }
+
+    public function setLead(Lead $lead)
+    {
+        $this->lead = $lead;
     }
 }
