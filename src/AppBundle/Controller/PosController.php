@@ -66,7 +66,6 @@ class PosController extends BaseController
                             'Successfully added lead: %s',
                             $leadData->getName()
                         ));
-
                     } else {
                         $this->addFlash('warning', sprintf(
                             'Lead already exists'
