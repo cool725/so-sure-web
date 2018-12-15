@@ -201,7 +201,7 @@ class AdminControllerTest extends BaseControllerTest
             true
         );
 
-        $this->login('mariusz@so-sure.com', LoadUserData::DEFAULT_PASSWORD, 'admin');
+        $this->login(LoadUserData::DEFAULT_ADMIN, LoadUserData::DEFAULT_PASSWORD, 'admin');
 
         $crawler = self::$client->request('GET', '/admin/policy/' . $policy->getId());
         self::verifyResponse(200);
@@ -226,7 +226,7 @@ class AdminControllerTest extends BaseControllerTest
     {
         $user = static::createUser(
             static::$userManager,
-            static::generateEmail('testImeiFormAction', $this),
+            static::generateEmail('testImeiFormActionPhone', $this),
             'bar'
         );
 
@@ -239,7 +239,7 @@ class AdminControllerTest extends BaseControllerTest
             true
         );
 
-        $this->login('mariusz@so-sure.com', LoadUserData::DEFAULT_PASSWORD, 'admin');
+        $this->login(LoadUserData::DEFAULT_ADMIN, LoadUserData::DEFAULT_PASSWORD, 'admin');
 
         $crawler = self::$client->request('GET', '/admin/policy/' . $policy->getId());
         self::verifyResponse(200);

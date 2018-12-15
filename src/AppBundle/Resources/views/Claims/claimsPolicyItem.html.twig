@@ -1227,6 +1227,18 @@
                     </td>
                 </tr>
                 <tr>
+                    <td><i class="fa fa-shield" title="Customer Service only"></i> Phone</td>
+                    <td>
+                        <div class="form-group">
+                            {{ policy.phone }}
+                        </div>
+                        <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#imeiForm">
+                            <span class="glyphicon glyphicon-new-window" aria-hidden="true"></span>
+                            Update
+                        </button>
+                    </td>
+                </tr>
+                <tr>
                     <td><i class="fa fa-shield" title="Customer Service only"></i> Detected Imei</td>
                     <td>
                         <form class="form-inline">
@@ -1238,18 +1250,6 @@
                                 Update
                             </button>
                         </form>
-                    </td>
-                </tr>
-                <tr>
-                    <td><i class="fa fa-shield" title="Customer Service only"></i> Phone</td>
-                    <td>
-                        {{ form_start(phone_form, {'attr': {'class': 'form-inline'}}) }}
-                        <div class="form-group">
-                            {{ form_errors(phone_form.phone) }}
-                            {{ form_widget(phone_form.phone) }}
-                        </div>
-                        {{ form_widget(phone_form.next, {'label': 'Update', 'attr': {'class': 'btn btn-danger confirm-submit', 'data-confirm-msg': 'Are you sure you want to update this phone?  This should only be done if the phone was incorrectly selected or post claim if the phone make/model has changed.  This will trigger a Salva Policy Update, and possibly affect the pricing at Salva, however, it will not update the policy premium charge to the customer.'}}) }}
-                        {{ form_end(phone_form) }}
                     </td>
                 </tr>
                 {% if is_granted('ROLE_ADMIN') %}

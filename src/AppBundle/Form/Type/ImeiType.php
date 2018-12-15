@@ -29,9 +29,11 @@ class ImeiType extends AbstractType
                 'placeholder' => 'Select a device',
                 'class' => 'AppBundle:Phone',
                 'query_builder' => function (PhoneRepository $dr) {
-                    return $dr->findActive();
+                    return $dr->findActiveInactive();
                 },
-                'required' => false
+                'required' => false,
+                'choice_value' => 'id',
+                'choice_label' => 'getNameFormSafe',
             ])
             ->add('note', TextareaType::class, [
                 'trim' => true
