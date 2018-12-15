@@ -17,7 +17,9 @@ class PosIpListenerTest extends BaseControllerTest
     {
         $client = self::createClient();
 
-        $crawler = self::$client->request('GET', '/');
+        $crawler = self::$client->request('GET', '/', [], [], [
+            'REMOTE_ADDR' => '192.168.0.254'
+        ]);
         self::verifyResponse(200);
     }
 
@@ -25,7 +27,9 @@ class PosIpListenerTest extends BaseControllerTest
     {
         $client = self::createClient();
 
-        $crawler = self::$client->request('GET', '/pos/helloz');
+        $crawler = self::$client->request('GET', '/pos/helloz', [], [], [
+            'REMOTE_ADDR' => '192.168.0.254'
+        ]);
         self::verifyResponse(302);
     }
 

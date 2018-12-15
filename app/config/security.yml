@@ -89,9 +89,11 @@ security:
         - { path: ^/resetting, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/pos$, role: IS_AUTHENTICATED_ANONYMOUSLY, ips: "%pos_ips%" }
         - { path: ^/pos$, role: IS_AUTHENTICATED_ANONYMOUSLY, ips: "%sosure_ips%" }
+        - { path: ^/pos$, role: IS_AUTHENTICATED_ANONYMOUSLY, ips: [ "127.0.0.1" ] } # required for functional tests
         - { path: ^/pos$, role: ROLE_NO_ACCESS }
         - { path: ^/pos/, role: IS_AUTHENTICATED_ANONYMOUSLY, ips: "%pos_ips%" }
         - { path: ^/pos/, role: IS_AUTHENTICATED_ANONYMOUSLY, ips: "%sosure_ips%" }
+        - { path: ^/pos/, role: IS_AUTHENTICATED_ANONYMOUSLY, ips: [ "127.0.0.1" ] } # required for functional tests
         - { path: ^/pos/, role: ROLE_NO_ACCESS }
         - { path: ^/admin$, role: ROLE_EMPLOYEE }
         - { path: ^/admin/, role: ROLE_EMPLOYEE }

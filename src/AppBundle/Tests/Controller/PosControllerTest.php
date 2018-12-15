@@ -7,6 +7,7 @@ use AppBundle\Document\Lead;
 
 /**
  * @group functional-net
+ * AppBundle\\Tests\\Controller\\PosControllerTest
  */
 class PosControllerTest extends BaseControllerTest
 {
@@ -25,7 +26,7 @@ class PosControllerTest extends BaseControllerTest
 
     public function testHellozAction()
     {
-        $url = self::$router->generate('helloz');
+        $url = self::$router->generate('pos_standard', ['name' => 'helloz']);
         $crawler = self::$client->request('GET', $url);
         self::verifyResponse(200);
     }
@@ -46,14 +47,14 @@ class PosControllerTest extends BaseControllerTest
 
         $this->login($email, $password);
 
-        $url = self::$router->generate('helloz');
+        $url = self::$router->generate('pos_standard', ['name' => 'helloz']);
         $crawler = self::$client->request('GET', $url);
         self::verifyResponse(200);
     }
 
     public function testHellozSubmit()
     {
-        $url = self::$router->generate('helloz');
+        $url = self::$router->generate('pos_standard', ['name' => 'helloz']);
         $crawler = self::$client->request('GET', $url);
         self::verifyResponse(200);
 
@@ -64,22 +65,54 @@ class PosControllerTest extends BaseControllerTest
             'lead_form[submittedBy]' => 'customer',
             'lead_form[name]' => 'Helloz Test',
             'lead_form[email]' => $email,
-            'lead_form[phone]' => self::getRandomPhone(self::$dm)->getId()
+            'lead_form[phone]' => self::getRandomPhone(self::$dm)->getId(),
+            'lead_form[optin]' => true,
         ]);
 
         $crawler = self::$client->submit($form);
         self::verifyResponse(302);
 
-        $lead = self::$dm->getRepository(Lead::class)->findBy([
-            'email' => $email
+        $dm = $this->getDocumentManager(true);
+        $leadRepo = $dm->getRepository(Lead::class);
+        $updatedLeads = $leadRepo->findBy([
+            'emailCanonical' => $email
         ]);
 
-        $this->assertEquals(1, count($lead));
+        $this->assertEquals(1, count($updatedLeads));
+    }
+
+    public function testHellozNonOptIn()
+    {
+        $url = self::$router->generate('pos_standard', ['name' => 'helloz']);
+        $crawler = self::$client->request('GET', $url);
+        self::verifyResponse(200);
+
+        $form = $crawler->selectButton('lead_form_submit')->form();
+
+        $email =  self::generateEmail('testHellozNonOptIn', $this, true);
+        $form->setValues([
+            'lead_form[submittedBy]' => 'customer',
+            'lead_form[name]' => 'Helloz Test',
+            'lead_form[email]' => $email,
+            'lead_form[phone]' => self::getRandomPhone(self::$dm)->getId(),
+            'lead_form[optin]' => false,
+        ]);
+
+        $crawler = self::$client->submit($form);
+        self::verifyResponse(302);
+
+        $dm = $this->getDocumentManager(true);
+        $leadRepo = $dm->getRepository(Lead::class);
+        $updatedLeads = $leadRepo->findBy([
+            'emailCanonical' => $email
+        ]);
+
+        $this->assertEquals(0, count($updatedLeads));
     }
 
     public function testHellozSubmitDuplicate()
     {
-        $url = self::$router->generate('helloz');
+        $url = self::$router->generate('pos_standard', ['name' => 'helloz']);
         $crawler = self::$client->request('GET', $url);
         self::verifyResponse(200);
 
@@ -91,7 +124,8 @@ class PosControllerTest extends BaseControllerTest
             'lead_form[submittedBy]' => 'customer',
             'lead_form[name]' => 'Helloz Test',
             'lead_form[email]' => $email,
-            'lead_form[phone]' => $phone
+            'lead_form[phone]' => $phone,
+            'lead_form[optin]' => true,
         ]);
 
         $crawler = self::$client->submit($form);
@@ -103,17 +137,20 @@ class PosControllerTest extends BaseControllerTest
             'lead_form[submittedBy]' => 'customer',
             'lead_form[name]' => 'Helloz Test',
             'lead_form[email]' => $email,
-            'lead_form[phone]' => $phone
+            'lead_form[phone]' => $phone,
+            'lead_form[optin]' => true,
         ]);
 
         $crawler = self::$client->submit($form);
         self::verifyResponse(302);
 
-        $lead = self::$dm->getRepository(Lead::class)->findBy([
-            'email' => $email
+        $dm = $this->getDocumentManager(true);
+        $leadRepo = $dm->getRepository(Lead::class);
+        $updatedLeads = $leadRepo->findBy([
+            'emailCanonical' => $email
         ]);
 
         /* Assert 1 as duplicate leads should not be persisted onto the DB */
-        $this->assertEquals(1, count($lead));
+        $this->assertEquals(1, count($updatedLeads));
     }
 }
