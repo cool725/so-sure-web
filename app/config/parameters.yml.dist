@@ -147,4 +147,12 @@ parameters:
     accesspay_keyfile: ''
     accesspay_s3file_password: 'changeme'
 
+    sosure_sftp_server: ''
+    sosure_sftp_username: ''
+    sosure_sftp_password: ''
+    sosure_sftp_keyfile: ''
+
     expected_claim_frequency: 2
+
+    recaptcha_public_key: ""
+    recaptcha_private_key: ""

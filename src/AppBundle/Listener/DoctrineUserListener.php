@@ -9,6 +9,7 @@ use AppBundle\Document\Charge;
 use AppBundle\Document\Invitation\Invitation;
 use AppBundle\Document\PaymentMethod;
 use AppBundle\Event\BacsEvent;
+use AppBundle\Event\CardEvent;
 use Doctrine\ODM\MongoDB\Event\PreUpdateEventArgs;
 use Doctrine\ODM\MongoDB\Event\LifecycleEventArgs;
 use AppBundle\Document\User;
@@ -117,8 +118,31 @@ class DoctrineUserListener extends BaseDoctrineListener
             }
 
             $bankAccount = clone $paymentMethod->getBankAccount();
-            $event = new BacsEvent($bankAccount, $user->getId());
+            $event = new BacsEvent($user, $bankAccount);
             $this->dispatcher->dispatch(BacsEvent::EVENT_UPDATED, $event);
+        }
+
+        if ($this->hasDataChanged(
+            $eventArgs,
+            User::class,
+            ['paymentMethod'],
+            DataChange::COMPARE_JUDO
+        )) {
+            $this->triggerCardEvent($user, CardEvent::EVENT_UPDATED);
+        }
+
+        if ($this->hasDataChanged(
+            $eventArgs,
+            User::class,
+            ['paymentMethod'],
+            DataChange::COMPARE_PAYMENT_METHOD_CHANGED
+        )) {
+            /** @var PaymentMethod $oldValue */
+            $oldValue = $eventArgs->getOldValue('paymentMethod');
+
+            $event = new UserEvent($user);
+            $event->setPreviousPaymentMethod($oldValue->getType());
+            $this->dispatcher->dispatch(UserEvent::EVENT_PAYMENT_METHOD_CHANGED, $event);
         }
 
         if ($this->hasDataChangedByCategory($eventArgs, DataChange::CATEGORY_INTERCOM)) {
@@ -162,6 +186,12 @@ class DoctrineUserListener extends BaseDoctrineListener
     private function triggerEvent(User $user, $eventType)
     {
         $event = new UserEvent($user);
+        $this->dispatcher->dispatch($eventType, $event);
+    }
+
+    private function triggerCardEvent(User $user, $eventType)
+    {
+        $event = new CardEvent($user);
         $this->dispatcher->dispatch($eventType, $event);
     }
 }

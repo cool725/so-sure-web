@@ -40,8 +40,8 @@ class ApiViewController extends BaseController
 
         $dm = $this->getManager();
         $repo = $dm->getRepository(PhonePolicy::class);
-        $termsRepo = $dm->getRepository(PolicyTerms::class);
-        $terms = $termsRepo->findOneBy(['latest' => true]);
+
+        $latestTerms = $this->getLatestPolicyTerms();
 
         $tmpPolicy = new PhonePolicy();
         $prefix = $tmpPolicy->getPolicyNumberPrefix();
@@ -64,7 +64,7 @@ class ApiViewController extends BaseController
 
         $template = sprintf(
             'AppBundle:ApiView:policyTermsV%d.html.twig',
-            $terms->getVersionNumber()
+            $latestTerms->getVersionNumber()
         );
 
         $html = $this->renderView($template, $data);

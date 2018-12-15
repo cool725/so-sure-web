@@ -8,6 +8,11 @@ use AppBundle\Document\Charge;
 use AppBundle\Document\Claim;
 use AppBundle\Document\Opt\EmailOptOut;
 use AppBundle\Document\Opt\OptOut;
+use AppBundle\Document\Phone;
+use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\PhonePremium;
+use AppBundle\Document\PhonePrice;
+use AppBundle\Document\PolicyTerms;
 use AppBundle\Document\User;
 use AppBundle\Validator\Constraints\AlphanumericSpaceDotValidator;
 use Doctrine\Common\Annotations\Reader;
@@ -53,10 +58,64 @@ class TestCommand extends ContainerAwareCommand
     {
         // $this->testBirthday();
         // $this->removeOrphanUsersOnCharges($output);
+        // $this->updateNotes();
 
-        $this->updateNotes();
+        //$this->updatePhoneExcess();
+        //$this->updatePolicyExcess();
+
+        $this->updateClaimExcess();
 
         $output->writeln('Finished');
+    }
+
+    private function updateClaimExcess()
+    {
+        $repo = $this->dm->getRepository(Claim::class);
+        $claims = $repo->findAll();
+        foreach ($claims as $claim) {
+            /** @var Claim $claim */
+            if ($claim->getPolicy()) {
+                $claim->setExpectedExcess($claim->getPolicy()->getCurrentExcess());
+            }
+        }
+
+        $this->dm->flush();
+    }
+
+    private function updatePhoneExcess()
+    {
+        // technically should compare the price dates to see if pic-sure excess should be set, but it doesn't add
+        // any current value and is time consuming
+        $repo = $this->dm->getRepository(Phone::class);
+        $phones = $repo->findAll();
+        foreach ($phones as $phone) {
+            /** @var Phone $phone */
+            foreach ($phone->getPhonePrices() as $price) {
+                /** @var PhonePrice $price */
+                $price->setExcess(PolicyTerms::getHighExcess());
+                $price->setPicSureExcess(PolicyTerms::getLowExcess());
+            }
+        }
+
+        $this->dm->flush();
+    }
+
+    private function updatePolicyExcess()
+    {
+        $repo = $this->dm->getRepository(PhonePolicy::class);
+        $policies = $repo->findAll();
+        foreach ($policies as $policy) {
+            /** @var PhonePolicy $policy */
+            $terms = $policy->getPolicyTerms();
+            /** @var PhonePremium $premium */
+            $premium = $policy->getPremium();
+            if ($premium) {
+                $premium->setExcess($terms->getDefaultExcess());
+                $premium->setPicSureExcess($terms->getDefaultPicSureExcess());
+            }
+        }
+
+        $this->dm->flush();
     }
 
     private function updateNotes()

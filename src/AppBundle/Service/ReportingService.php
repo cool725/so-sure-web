@@ -3,6 +3,7 @@ namespace AppBundle\Service;
 
 use AppBundle\Document\File\SalvaPaymentFile;
 use AppBundle\Document\Payment\BacsIndemnityPayment;
+use AppBundle\Document\Stats;
 use AppBundle\Repository\CashbackRepository;
 use AppBundle\Repository\ClaimRepository;
 use AppBundle\Repository\ConnectionRepository;
@@ -12,6 +13,7 @@ use AppBundle\Repository\PaymentRepository;
 use AppBundle\Repository\PhonePolicyRepository;
 use AppBundle\Repository\PhoneRepository;
 use AppBundle\Repository\ScheduledPaymentRepository;
+use AppBundle\Repository\StatsRepository;
 use AppBundle\Repository\UserRepository;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Predis\Client;
@@ -48,10 +50,14 @@ class ReportingService
 {
     const REPORT_KEY_FORMAT = 'Report:%s:%s:%s';
     const REPORT_CACHE_TIME = 3600;
-
-    const REPORT_PERIODS = ['last 7 days' => ['start' => '7 days ago', 'end' => 'now'],
-        'month to date' => ['start' => 'first day of this month', 'end' => 'now'],
-        'last month' => ['start' => 'first day of last month', 'end' => 'first day of this month']];
+    const REPORT_PERIODS = [
+        'last 7 days' => ['start' => '7 days ago', 'end' => 'now'],
+        'current month to date' => ['start' => 'first day of this month', 'end' => 'now'],
+        'last month' => ['start' => 'first day of -1 month', 'end' => 'first day of this month', 'month' => true],
+        'two months ago' => ['start' => 'first day of -2 month', 'end' => 'first day of -1 month', 'month' => true],
+        'three months ago' => ['start' => 'first day of -3 month', 'end' => 'first day of -2 month', 'month' => true],
+        'four months ago' => ['start' => 'first day of -4 month', 'end' => 'first day of -3 month', 'month' => true]
+    ];
     const REPORT_PERIODS_DEFAULT = 'last 7 days';
 
     use DateTrait;
@@ -166,7 +172,7 @@ class ReportingService
                 $rolling12MonthClaims[] = $claim;
             }
         }
-        $data['fnol30Claims'] = 100 * $fnol30Claims / $totalClaims;
+        $data['fnol30Claims'] = $totalClaims ? 100 * $fnol30Claims / $totalClaims : "-";
 
         $data['claimAttribution'] = Claim::attributeClaims($approvedClaims);
         $data['claimAttributionText'] = $this->arrayToString($data['claimAttribution']);
@@ -896,8 +902,18 @@ class ReportingService
         return $rewardPotLiability;
     }
 
-    public function getAllPaymentTotals($isProd, \DateTime $date)
+    public function getAllPaymentTotals($isProd, \DateTime $date, $useCache = true)
     {
+        $redisKey = sprintf(
+            self::REPORT_KEY_FORMAT,
+            'allPaymentsTotal',
+            $isProd ? 'prod' : 'non-prod',
+            $date->format('Y-m-d')
+        );
+        if ($useCache === true && $this->redis->exists($redisKey)) {
+            return unserialize($this->redis->get($redisKey));
+        }
+
         $payments = $this->getPayments($date);
         $potRewardPayments = $this->getPayments($date, 'potReward');
         $potRewardPaymentsCashback = $this->getPayments($date, 'potReward', true);
@@ -910,7 +926,7 @@ class ReportingService
         $totalRunRate = $this->getTotalRunRateByDate($this->endOfMonth($date));
 
         // @codingStandardsIgnoreStart
-        return [
+        $data = [
             'all' => Payment::sumPayments($payments, $isProd),
             'judo' => Payment::sumPayments($payments, $isProd, JudoPayment::class),
             'sosure' => Payment::sumPayments($payments, $isProd, SoSurePayment::class),
@@ -930,6 +946,21 @@ class ReportingService
             'salvaPaymentFile' => $this->getSalvaPaymentFile($date),
         ];
         // @codingStandardsIgnoreEnd
+        $this->redis->setex($redisKey, self::REPORT_CACHE_TIME, serialize($data));
+
+        return $data;
+    }
+
+    public function getStats(\DateTime $date)
+    {
+        $start = $this->startOfMonth($date);
+        $end = $this->endOfMonth($date);
+        /** @var StatsRepository $repo */
+        $repo = $this->dm->getRepository(Stats::class);
+        /** @var Stats[] $stats */
+        $stats = $repo->getStatsByRange($start, $end);
+
+        return Stats::sum($stats);
     }
 
     /**
@@ -1223,12 +1254,65 @@ class ReportingService
     }
 
     /**
+     * Creates a report in the cumulative style used by dylan, and monthly values calculated in the way that we use
+     * side by side over a series of months.
+     * @param \DateTime $start    is the starting month.
+     * @param \DateTime $end      is the ending month.
+     * @param boolean   $useCache says whether we should try to load from the cache or just skip that.
+     * @return array containing the full report.
+     */
+    public function getCumulativePolicies($start, $end, $useCache = true)
+    {
+        $start = $this->startOfMonth($start);
+        $end = $this->startOfMonth($end);
+        $redisKey = sprintf(
+            self::REPORT_KEY_FORMAT,
+            $start->format('Y-m-d.hi'),
+            $end->format('Y-m-d.hi'),
+            "cumulative"
+        );
+        if ($useCache === true && $this->redis->exists($redisKey)) {
+            return unserialize($this->redis->get($redisKey));
+        }
+        /** @var PhonePolicyRepository $policyRepo */
+        $policyRepo = $this->dm->getRepository(PhonePolicy::class);
+        $report = [];
+        $runningTotal = $this->totalAtPoint($start);
+        while ($start < $end) {
+            $endOfMonth = $this->endOfMonth($start);
+            $month = [];
+            $month["open"] = $runningTotal;
+            $month["new"] = $policyRepo->countAllNewPolicies($endOfMonth, $start);
+            $month["expired"] = $policyRepo->countEndingByStatus(Policy::$expirationStatuses, $start, $endOfMonth);
+            $month["cancelled"] = $policyRepo->countEndingByStatus(Policy::STATUS_CANCELLED, $start, $endOfMonth);
+            $runningTotal += $month["new"];
+            $runningTotal -= $month["expired"];
+            $runningTotal -= $month["cancelled"];
+            $month["close"] = $runningTotal;
+            $month["upgrade"] = $policyRepo->countAllEndingPolicies(
+                Policy::CANCELLED_UPGRADE,
+                $start,
+                $endOfMonth,
+                false
+            );
+            $month["newAdjusted"] = $month["new"] - $month["upgrade"];
+            $month["cancelledAdjusted"] = $month["cancelled"] - $month["upgrade"];
+            $month["queryOpen"] = $this->totalAtPoint($start);
+            $month["queryClose"] = $this->totalAtPoint($endOfMonth);
+            $report[$start->format("F Y")] = $month;
+            $start->add(new \DateInterval("P1M"));
+        }
+        $this->redis->setex($redisKey, self::REPORT_CACHE_TIME, serialize($report));
+        return $report;
+    }
+
+    /**
      * gives you a period of time with an optional starting date and an optional
      * ending date, start date is rounded to the beginning of the given day, and
       * end date is rounded to the end of the preceding day.
      * @param string $period is the string name of a period as defined in
      *                       REPORT_PERIODS constant
-     * @return array containing the new start and end dates.
+     * @return array containing the new start and end dates and a boolean telling you if this period is a whole month.
      */
     public static function getLastPeriod($period): array
     {
@@ -1237,11 +1321,29 @@ class ReportingService
                 "{$period} is not a valid period as defined in ReportingService::REPORT_PERIODS"
             );
         }
+        $month = false;
+        if (array_key_exists('month', static::REPORT_PERIODS[$period])) {
+            $month = static::REPORT_PERIODS[$period]["month"];
+        }
         $start = new DateTime(static::REPORT_PERIODS[$period]['start'], new DateTimeZone(SoSure::TIMEZONE));
         $end = new DateTime(static::REPORT_PERIODS[$period]['end'], new DateTimeZone(SoSure::TIMEZONE));
         $start->setTime(0, 0, 0);
-        $end->setTime(0, 0, -1);
+        $end->setTime(0, 0, 0);
+        return [$start, $end, $month];
+    }
 
-        return [$start, $end];
+    /**
+     * Gives you the total number of policies that are going.
+     * @param \DateTime $date is the date to look at.
+     * @return int the number of policies.
+     */
+    private function totalAtPoint(\DateTime $date)
+    {
+        /** @var PhonePolicyRepository $policyRepo */
+        $policyRepo = $this->dm->getRepository(PhonePolicy::class);
+        return $policyRepo->countAllNewPolicies($date) - (
+            $policyRepo->countEndingByStatus(Policy::$expirationStatuses, null, $date) +
+            $policyRepo->countEndingByStatus(Policy::STATUS_CANCELLED, null, $date)
+        );
     }
 }

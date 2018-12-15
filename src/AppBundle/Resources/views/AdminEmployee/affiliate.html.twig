@@ -11,38 +11,42 @@
 
 {% block body %}
 <div class="container" style="margin-bottom: 50px">
-<div class="row">
-    <div class="col-md-8">
-        <h2>Affiliates</h2>
+    <div class="row">
+        <div class="col-md-8">
+            <h2>Affiliates</h2>
+        </div>
+        <div class="col-md-2">
+            <button type="button" class="btn btn-info" data-toggle="modal" data-target="#companyModal" style="margin-top: 20px"
+            ><i class="fa fa-plus"></i> New Affiliate</button>
+        </div>
     </div>
-    <div class="col-md-2">
-        <button type="button" class="btn btn-info" data-toggle="modal" data-target="#companyModal" style="margin-top: 20px"
-        ><i class="fa fa-plus"></i> New Affiliate</button>
-    </div>
-</div>
-<div class="row" style="margin-top: 20px">
-    <div class="col-md-12">
-    <table class="table table-stripped" width="100%">
-        <tr>
-            <th>Name</th>
-            <th>CPA</th>
-            <th>Days</th>
-            <th>Campaign Source</th>
-            <th>Lead Source</th>
-            <th>Lead Source Details</th>
-            <th>Sanctions</th>
-        </tr>
-        {% for company in companies %}
+    <div class="row" style="margin-top: 20px">
+        <div class="col-md-12">
+        <table class="table table-stripped" width="100%">
             <tr>
-                <td width="20%">
-                        <a href="{{ path('admin_affiliate_charge', {'id': company.id }) }}">{{ company.name }}</a>
-                </td>
-                <td width="10%">£{{ company.cpa|number_format(2, '.', ',') }}</td>
-                <td width="10%">{{ company.days }}</td>
-                <td width="10%">{{ company.campaignSource }}</td>
-                <td width="10%">{{ company.leadSource }}</td>
-                <td width="10%">{{ company.leadSourceDetails }}</td>
-                <td width="40%">
+                <th>Name</th>
+                <th>CPA</th>
+                <th>Days</th>
+                <th>Charge Model</th>
+                <th>Renewal Days</th>
+                <th>Campaign Source</th>
+                <th>Lead Source</th>
+                <th>Lead Source Details</th>
+                <th>Sanctions</th>
+            </tr>
+            {% for company in companies %}
+                <tr>
+                    <td width="20%">
+                            <a href="{{ path('admin_affiliate_charge', {'id': company.id }) }}">{{ company.name }}</a>
+                    </td>
+                    <td width="10%">£{{ company.cpa|number_format(2, '.', ',') }}</td>
+                    <td width="10%">{{ company.days }}</td>
+                    <td width="10%">{{ company.chargeModel }}</td>
+                    <td width="10%">{{ company.renewalDays }}</td>
+                    <td width="10%">{{ company.campaignSource }}</td>
+                    <td width="10%">{{ company.leadSource }}</td>
+                    <td width="10%">{{ company.leadSourceDetails }}</td>
+                    <td width="40%">
                         {% if company.sanctionsChecks|length == 0%}
                             No checks run
                         {% endif %}
@@ -61,85 +65,100 @@
                             {% endif %}
                             <br>
                         {% endfor %}
-                </td>
-            </tr>
-        {% endfor %}
-    </table>
-    </div>
-</div>
-
-    <div class="modal fade" id="companyModal" tabindex="-1" role="dialog">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title">Add Affiliate</h4>
-          </div>
-          <div class="modal-body">
-            {{ form_start(companyForm) }}
-                <div class="form-group">
-                    {{ form_label(companyForm.name, 'Name') }}
-                    {{ form_errors(companyForm.name) }}
-                    {{ form_widget(companyForm.name) }}
-                </div>
-                <div class="form-group">
-                    {{ form_label(companyForm.address1, 'Address Line 1') }}
-                    {{ form_errors(companyForm.address1) }}
-                    {{ form_widget(companyForm.address1) }}
-                </div>
-                <div class="form-group">
-                    {{ form_label(companyForm.address2, 'Address Line 2') }}
-                    {{ form_errors(companyForm.address2) }}
-                    {{ form_widget(companyForm.address2) }}
-                </div>
-                <div class="form-group">
-                    {{ form_label(companyForm.address3, 'Address Line 3') }}
-                    {{ form_errors(companyForm.address3) }}
-                    {{ form_widget(companyForm.address3) }}
-                </div>
-                <div class="form-group">
-                    {{ form_label(companyForm.city, 'City') }}
-                    {{ form_errors(companyForm.city) }}
-                    {{ form_widget(companyForm.city) }}
-                </div>
-                <div class="form-group">
-                    {{ form_label(companyForm.postcode, 'Postcode') }}
-                    {{ form_errors(companyForm.postcode) }}
-                    {{ form_widget(companyForm.postcode) }}
-                </div>
-              <div class="form-group">
-                  {{ form_label(companyForm.cpa, 'CPA') }}
-                  {{ form_errors(companyForm.cpa) }}
-                  {{ form_widget(companyForm.cpa) }}
-              </div>
-              <div class="form-group">
-                  {{ form_label(companyForm.days, 'Days') }}
-                  {{ form_errors(companyForm.days) }}
-                  {{ form_widget(companyForm.days) }}
-              </div>
-              <div class="form-group">
-                  {{ form_label(companyForm.campaignSource, 'Campaign Source') }}
-                  {{ form_errors(companyForm.campaignSource) }}
-                  {{ form_widget(companyForm.campaignSource) }}
-              </div>
-              <div class="form-group">
-                  {{ form_label(companyForm.leadSource, 'Lead Source') }}
-                  {{ form_errors(companyForm.leadSource) }}
-                  {{ form_widget(companyForm.leadSource) }}
-              </div>
-              <div class="form-group">
-                  {{ form_label(companyForm.leadSourceDetails, 'Lead Source Details') }}
-                  {{ form_errors(companyForm.leadSourceDetails) }}
-                  {{ form_widget(companyForm.leadSourceDetails) }}
-              </div>
-                <div class="form-group">
-                    {{ form_widget(companyForm.next, {'label': 'Create', 'attr': {'class': 'btn btn-success'}}) }}
-                </div>
-            {{ form_end(companyForm) }}
-          </div>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
         </div>
-      </div>
     </div>
+    <div class="modal fade" id="companyModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title">Add Affiliate</h4>
+                </div>
+                <div class="modal-body">
+                    {{ form_start(companyForm) }}
+                    <h2>Company Details</h2>
+                    <div class="form-group row">
+                        {{ form_label(companyForm.name, 'Name', {'label_attr': {'class': 'col-sm-2 col-form-label'}}) }}
+                        <div class="col-sm-10">{{ form_widget(companyForm.name, {'attr': {'class': 'form-control'}}) }}</div>
+                        {{ form_errors(companyForm.name) }}
+                    </div>
+                    <div class="form-group row">
+                        {{ form_label(companyForm.address1, 'Address Line1', {'label_attr': {'class': 'col-sm-2 col-form-label'}}) }}
+                        <div class="col-sm-10">{{ form_widget(companyForm.address1, {'attr': {'class': 'form-control'}}) }}</div>
+                        {{ form_errors(companyForm.address1) }}
+                    </div>
+                    <div class="form-group row">
+                        {{ form_label(companyForm.address2, 'Address Line 2', {'label_attr': {'class': 'col-sm-2 col-form-label'}}) }}
+                        <div class="col-sm-10">{{ form_widget(companyForm.address2, {'attr': {'class': 'form-control'}}) }}</div>
+                        {{ form_errors(companyForm.address2) }}
+                    </div>
+                    <div class="form-group row">
+                        {{ form_label(companyForm.address3, 'Address Line 3', {'label_attr': {'class': 'col-sm-2 col-form-label'}}) }}
+                        <div class="col-sm-10">{{ form_widget(companyForm.address3, {'attr': {'class': 'form-control'}}) }}</div>
+                        {{ form_errors(companyForm.address3) }}
+                    </div>
+                    <div class="form-group row">
+                        {{ form_label(companyForm.city, 'City', {'label_attr': {'class': 'col-sm-2 col-form-label'}}) }}
+                        <div class="col-sm-10">{{ form_widget(companyForm.city, {'attr': {'class': 'form-control'}}) }}</div>
+                        {{ form_errors(companyForm.city) }}
+                    </div>
+                    <div class="form-group row">
+                        {{ form_label(companyForm.postcode, 'Postcode', {'label_attr': {'class': 'col-sm-2 col-form-label'}}) }}
+                        <div class="col-sm-10">{{ form_widget(companyForm.postcode, {'attr': {'class': 'form-control'}}) }}</div>
+                        {{ form_errors(companyForm.postcode) }}
+                    </div>
 
+                    <h2>Financials</h2>
+                    <div class="form-group row">
+                        {{ form_label(companyForm.chargeModel, 'Charge Model', {'label_attr': {'class': 'col-sm-2 col-form-label'}}) }}
+                        <div class="col-sm-10">{{ form_widget(companyForm.chargeModel, {'attr': {'class': 'form-control', 'id': 'chargeModel'}}) }}</div>
+                        {{ form_errors(companyForm.chargeModel) }}
+                    </div>
+                    <div class="form-group row">
+                        {{ form_label(companyForm.days, 'Days', {'label_attr': {'class': 'col-sm-2 col-form-label'}}) }}
+                        <div class="col-sm-10">{{ form_widget(companyForm.days, {'attr': {'class': 'form-control'}}) }}</div>
+                        {{ form_errors(companyForm.days) }}
+                    </div>
+                    <div class="form-group row">
+                        {{ form_label(companyForm.renewalDays, 'Renewal Days', {'label_attr': {'class': 'col-sm-2 col-form-label'}}) }}
+                        <div class="col-sm-10">{{ form_widget(companyForm.renewalDays, {'attr': {'class': 'form-control', 'id': 'renewalDays'}}) }}</div>
+                        {{ form_errors(companyForm.renewalDays) }}
+                    </div>
+                    <div class="form-group row">
+                        {{ form_label(companyForm.cpa, 'Cpa', {'label_attr': {'class': 'col-sm-2 col-form-label'}}) }}
+                        <div class="col-sm-10">{{ form_widget(companyForm.cpa, {'attr': {'class': 'form-control', 'type': 'number'}}) }}</div>
+                        {{ form_errors(companyForm.cpa) }}
+                    </div>
+
+                    <h2>Tracking</h2>
+                    <div class="form-group row">
+                        {{ form_label(companyForm.leadSource, 'Lead Source', {'label_attr': {'class': 'col-sm-2 col-form-label'}}) }}
+                        <div class="col-sm-10">{{ form_widget(companyForm.leadSource, {'attr': {'class': 'form-control'}}) }}</div>
+                        {{ form_errors(companyForm.leadSource) }}
+                    </div>
+                    <div class="form-group row">
+                        {{ form_label(companyForm.leadSource, 'Lead Source Details', {'label_attr': {'class': 'col-sm-2 col-form-label'}}) }}
+                        <div class="col-sm-10">{{ form_widget(companyForm.leadSourceDetails, {'attr': {'class': 'form-control'}}) }}</div>
+                        {{ form_errors(companyForm.leadSourceDetails) }}
+                    </div>
+                    <div class="form-group row">
+                        {{ form_label(companyForm.campaignSource, 'Campaign Source', {'label_attr': {'class': 'col-sm-2 col-form-label'}}) }}
+                        <div class="col-sm-10">{{ form_widget(companyForm.campaignSource, {'attr': {'class': 'form-control'}}) }}</div>
+                        {{ form_errors(companyForm.campaignSource) }}
+                    </div>
+                    <div class="form-group row">
+                        {{ form_widget(companyForm.next, {'attr': {'class': 'btn btn-primary'}, 'label': 'Add Affiliate'}) }}
+                    </div>
+                    {{ form_end(companyForm) }}
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}

@@ -17,6 +17,10 @@
             {# TODO: Heading area #}
             <div class="d-lg-flex align-items-lg-center justify-content-lg-between mb-3">
                 <h1 class="h2">Detected IMEI</h1>
+                <form action="{{ path('admin_policies') }}" method="GET">
+                    <input type="text" name="imei" placeholder="IMEI Search">
+                    <button type="submit" class="btn btn-success">Search</button>
+                </form>
             </div>
             {% if imeis|length == 0 %}
                 <p class="mb-5">No records found</p>
@@ -25,16 +29,32 @@
                     <table class="table table-striped">
                         <thead class="thead-light">
                             <tr>
+                                <th>Policy</th>
                                 <th>Detected</th>
                                 <th>Suggested</th>
                                 <th>Link to file</th>
+                                <th>Delete from queue</th>
                             </tr>
                         </thead>
                         {% for imei in imeis %}
                             <tr>
+                                <td>
+                                    {% if imei['actualPolicy'] %}<a href="{{ path('admin_policy', {'id':imei['actualPolicy'].id}) }}">{{ imei['actualPolicy'].policyNumber }}</a> <br>actual imei: {{ imei['actualPolicy'].imei  }}<br>{% endif %}
+                                    {% if imei['detectedPolicy'] %}<a href="{{ path('admin_policy', {'id':imei['detectedPolicy'].id}) }}">{{ imei['detectedPolicy'].policyNumber }}</a> <br>detected imei: {{  imei['detectedPolicy'].detectedImei  }}<br>{% endif %}
+                                    {% if imei['suggestedPolicy'] %}<a href="{{ path('admin_policy', {'id':imei['suggestedPolicy'].id}) }}">{{ imei['suggestedPolicy'].policyNumber }}</a> <br>suggested imei: {{  imei['suggestedPolicy'].imei  }}<br>{% endif %}
+                                    {% if not imei['actualPolicy'] and not imei['detectedPolicy'] and not imei['suggestedPolicy'] %}Unable to locate{% endif %}
+                                </td>
                                 <td>{{ imei['detected_imei'] }}</td>
-                                <td>(Suggested {{ imei['suggested_imei'] }})</td>
+                                <td>{% if imei['suggested_imei']|length > 0  %} {{ imei['suggested_imei'] }}{% else %}n/a{% endif %}</td>
                                 <td><a href="{{ s3DownloadLink(imei['bucket'], imei['key']) }}" target="_blank" title="{{ imei.key }}"><i class="fal fa-link mr-2"></i> See image</a></td>
+                                <td>
+                                    <form id="delete" action="{{ path('admin_delete_detected_imei') }}" method="POST">
+                                        <input type="hidden" name="item" value="{{ imei['raw'] }}">
+                                        <button type="submit" value="Submit" class="btn btn-danger">
+                                            <i class="fa fa-trash" aria-hidden="true"></i>
+                                        </button>
+                                    </form>
+                                </td>
                             </tr>
                         {% endfor %}
                     </table>

@@ -1,6 +1,6 @@
 <?php
 
-namespace AppBundle\Tests\Document;
+namespace AppBundle\Tests\DataFixtures;
 
 use AppBundle\Classes\SoSure;
 use AppBundle\Document\DateTrait;

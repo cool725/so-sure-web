@@ -101,19 +101,20 @@ abstract class HandlerClaim
         return $this->reserved;
     }
 
-    public function getExpectedExcess($validated, $picSureEnabled, $repairDiscount = false)
+    public function getExpectedExcessValue(Claim $claim, $repairDiscount = false)
     {
-        try {
-            return Claim::getExcessValue($this->getClaimType(), $validated, $picSureEnabled, $repairDiscount);
-        } catch (\Exception $e) {
-            return null;
+        $excess = $claim->getExpectedExcessValue();
+        if ($repairDiscount) {
+            $excess -= 25;
         }
+
+        return $excess;
     }
 
-    public function isExcessValueCorrect($validated = true, $picSureEnabled = false, $negativeExcessAllowed = false)
+    public function isExcessValueCorrect(Claim $claim, $negativeExcessAllowed = false)
     {
-        $excessNoRepairDiscount = $this->getExpectedExcess($validated, $picSureEnabled);
-        $excessRepairDiscount = $this->getExpectedExcess($validated, $picSureEnabled, true);
+        $excessNoRepairDiscount = $this->getExpectedExcessValue($claim);
+        $excessRepairDiscount = $this->getExpectedExcessValue($claim, true);
 
         if ($this->excess > 0) {
             return $this->areEqualToTwoDp($this->excess, $excessNoRepairDiscount) ||

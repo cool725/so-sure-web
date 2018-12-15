@@ -5,6 +5,7 @@ namespace AppBundle\Tests\Controller;
 use AppBundle\Document\IdentityLog;
 use AppBundle\Repository\Invitation\EmailInvitationRepository;
 use AppBundle\Service\JudopayService;
+use AppBundle\Tests\UserClassTrait;
 use PhpParser\Node\Expr\AssignOp\Mul;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\User;
@@ -39,6 +40,8 @@ use Predis\Client;
  */
 class ApiAuthControllerTest extends BaseApiControllerTest
 {
+    use UserClassTrait;
+
     const VALID_IMEI = '356938035643809';
     const INVALID_IMEI = '356938035643808';
     const BLACKLISTED_IMEI = '352000067704506';
@@ -137,7 +140,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $this->assertEquals("Flat 6", $data['line1']);
         $this->assertEquals("RG4 7RG", $data['postcode']);
         */
-        $this->assertEquals("Lock Keepers Cottage", $data['line1']);
+        $this->assertEquals("Lock View", $data['line1']);
         $this->assertEquals("WR5 3DA", $data['postcode']);
     }
 
@@ -1220,7 +1223,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy', ['phone_policy' => [
             'imei' => $imei,
             'make' => 'Apple',
-            'device' => 'iPhone 6',
+            'device' => 'iPhone 8',
             'memory' => 64,
             'rooted' => false,
             'validation_data' => $this->getValidationData($cognitoIdentityId, ['imei' => $imei]),
@@ -1239,7 +1242,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy', ['phone_policy' => [
             'imei' => $imei,
             'make' => 'Apple',
-            'device' => 'iPhone 6',
+            'device' => 'iPhone 8',
             'memory' => 64,
             'rooted' => false,
             'validation_data' => $this->getValidationData($cognitoIdentityId, ['imei' => $imei]),
@@ -1259,7 +1262,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy', ['phone_policy' => [
             'imei' => $imei,
             'make' => 'Apple',
-            'device' => 'iPhone 6',
+            'device' => 'iPhone 8',
             'memory' => 64,
             'rooted' => false,
             'validation_data' => $this->getValidationData($cognitoIdentityId, ['imei' => $imei]),
@@ -1286,7 +1289,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy', ['phone_policy' => [
             'imei' => $imei,
             'make' => 'Apple',
-            'device' => 'iPhone 6',
+            'device' => 'iPhone 8',
             'memory' => 64,
             'rooted' => false,
             'validation_data' => $this->getValidationData($cognitoIdentityId, ['imei' => $imei]),
@@ -1349,8 +1352,8 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy', ['phone_policy' => [
             'imei' => $imei,
             'make' => 'Apple',
-            'device' => 'iPhone 6',
-            'memory' => 512,
+            'device' => 'iPhone 8',
+            'memory' => 1024,
             'rooted' => false,
             'validation_data' => $this->getValidationData($cognitoIdentityId, ['imei' => $imei]),
         ]]);
@@ -1365,7 +1368,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy', ['phone_policy' => [
             'imei' => $imei,
             'make' => 'Apple',
-            'device' => 'iPhone 6',
+            'device' => 'iPhone 8',
             'memory' => 60,
             'rooted' => false,
             'validation_data' => $this->getValidationData($cognitoIdentityId, ['imei' => $imei]),
@@ -1621,7 +1624,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy', ['phone_policy' => [
             'imei' => $imei,
             'make' => 'Apple',
-            'device' => 'iPhone 6',
+            'device' => 'iPhone 8',
             'memory' => 64,
             'rooted' => false,
             'validation_data' => $this->getValidationData($cognitoIdentityId, ['imei' => $imei]),
@@ -3557,6 +3560,40 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $files = $updatedPolicy->getPolicyPicSureFiles();
         $metadata = $files[0]->getMetadata();
         $this->assertTrue(isset($metadata['picsure-ml-score']), 'Check picsure ml can be run on server');
+    }
+
+    public function testPicsureWithClaim()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testPicsureWithClaim', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
+        $policyData = $this->verifyResponse(200);
+
+        $this->payPolicy($user, $policyData['id']);
+
+        $repo = static::$dm->getRepository(PhonePolicy::class);
+        /** @var PhonePolicy $policy */
+        $policy = $repo->find($policyData['id']);
+        $claim = new Claim();
+        $claim->setNumber($this->getRandomClaimNumber());
+        $claim->setType(Claim::TYPE_LOSS);
+        $claim->setStatus(Claim::STATUS_APPROVED);
+        $claim->setHandlingTeam(Claim::TEAM_DAVIES);
+        $policy->addClaim($claim);
+        static::$dm->persist($claim);
+        static::$dm->flush();
+
+        $url = sprintf("/api/v1/auth/policy/%s/picsure", $policyData['id']);
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+            'bucket' => 'policy.so-sure.com',
+            'key' => 'test/picsure-test.png',
+        ]);
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_POLICY_PICSURE_DISALLOWED);
     }
 
     // policy/{id}/reconnect

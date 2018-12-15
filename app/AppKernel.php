@@ -48,6 +48,7 @@ class AppKernel extends Kernel
             new Nelmio\SecurityBundle\NelmioSecurityBundle(),
             new Peerj\UserSecurityBundle\PeerjUserSecurityBundle(),
             new FOS\OAuthServerBundle\FOSOAuthServerBundle(),
+            new EWZ\Bundle\RecaptchaBundle\EWZRecaptchaBundle(),
         );
 
         if (in_array($this->getEnvironment(), array('dev', 'test', 'vagrant'), true)) {

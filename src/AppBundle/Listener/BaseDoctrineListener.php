@@ -6,6 +6,7 @@ use AppBundle\Annotation\DataChange;
 use AppBundle\Document\BacsPaymentMethod;
 use AppBundle\Document\BankAccount;
 use AppBundle\Document\CurrencyTrait;
+use AppBundle\Document\JudoPaymentMethod;
 use AppBundle\Interfaces\EqualsInterface;
 use Doctrine\Common\Annotations\Reader;
 use Doctrine\ODM\MongoDB\Event\PreUpdateEventArgs;
@@ -230,6 +231,26 @@ class BaseDoctrineListener
                 }
 
                 return false;
+            } elseif ($compare == DataChange::COMPARE_JUDO) {
+                if (!$oldValue instanceof JudoPaymentMethod || !$newValue instanceof JudoPaymentMethod) {
+                    return false;
+                }
+
+                $result = $oldValue->getCardTokenHash() != $newValue->getCardTokenHash();
+
+                if ($this->logger) {
+                    $this->logger->debug(sprintf('Return %s for compare %s', $result ? 'true' : 'false', $compare));
+                }
+
+                return $result;
+            } elseif ($compare == DataChange::COMPARE_PAYMENT_METHOD_CHANGED) {
+                if ($oldValue instanceof JudoPaymentMethod && $newValue instanceof BacsPaymentMethod) {
+                    return true;
+                } elseif ($oldValue instanceof BacsPaymentMethod && $newValue instanceof JudoPaymentMethod) {
+                    return true;
+                } else {
+                    return false;
+                }
             } else {
                 throw new \Exception(sprintf('Unknown comparision %s', $compare));
             }

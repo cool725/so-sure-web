@@ -47,7 +47,7 @@ class PhoneFunctionalTest extends WebTestCase
     public function testInvalidMake()
     {
         $phone = new Phone();
-        $phone->init('Apple iPhone', 'iPhone', 6.99 + 1.5);
+        $phone->init('Apple iPhone', 'iPhone', 6.99 + 1.5, self::getLatestPolicyTerms(static::$dm));
         static::$dm->persist($phone);
         static::$dm->flush();
     }
@@ -58,7 +58,7 @@ class PhoneFunctionalTest extends WebTestCase
     public function testInvalidModel()
     {
         $phone = new Phone();
-        $phone->init('Apple', 'iPhone *6', 6.99 + 1.5);
+        $phone->init('Apple', 'iPhone *6', 6.99 + 1.5, self::getLatestPolicyTerms(static::$dm));
         static::$dm->persist($phone);
         static::$dm->flush();
     }

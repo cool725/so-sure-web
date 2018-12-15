@@ -56,6 +56,7 @@ class ApiKeyControllerTest extends BaseApiControllerTest
         $data = $this->verifyResponse(200, ApiErrorCode::SUCCESS);
 
         $user = new User();
+        $user->setEmail(static::generateEmail('testMonitor', $this));
         $policy = new SalvaPhonePolicy();
         $policy->setStatus(Policy::STATUS_MULTIPAY_REQUESTED);
         $multipay = new MultiPay();

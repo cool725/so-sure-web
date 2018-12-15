@@ -11,13 +11,18 @@ use AppBundle\Validator\Constraints as AppAssert;
  */
 class Feature
 {
-    const FEATURE_QUOTE_LEAD = 'quote-lead';
+    // TODO: Remove - unused as too integrated
     const FEATURE_RENEWAL = 'renewal';
     const FEATURE_PICSURE = 'picsure';
+    const FEATURE_SALVA_POLICY_UPDATE = 'salva-policy-update';
+
+    // TODO: Verify if still used
+    const FEATURE_QUOTE_LEAD = 'quote-lead';
+    const FEATURE_STARLING = 'starling';
+
+    // Active features
     const FEATURE_PAYMENT_PROBLEM_INTERCOM = 'payment-problem-intercom';
     const FEATURE_DAVIES_IMPORT_ERROR_EMAIL = 'davies-import-error-email';
-    const FEATURE_STARLING = 'starling';
-    const FEATURE_SALVA_POLICY_UPDATE = 'salva-policy-update';
     const FEATURE_BACS = 'bacs';
     const FEATURE_CARD_OPTION_WITH_BACS = 'card-option-with-bacs';
     const FEATURE_APP_IOS_IMEI_VALIDATION_COLOUR = 'app-ios-imei-validation-colour';
@@ -26,7 +31,9 @@ class Feature
     const FEATURE_APP_FACEBOOK_USERFRIENDS_PERMISSION = 'app-facebook-userfriends-permission';
     const FEATURE_CLAIMS_DEFAULT_DIRECT_GROUP = 'claims-default-direct-group';
     const FEATURE_RATE_LIMITING = 'rate-limiting';
+    const FEATURE_PAYMENTS_BCC = 'bcc-payments';
 
+    // All Features should be here
     public static $features = [
         self::FEATURE_QUOTE_LEAD,
         self::FEATURE_RENEWAL,
@@ -43,7 +50,29 @@ class Feature
         self::FEATURE_APP_FACEBOOK_USERFRIENDS_PERMISSION,
         self::FEATURE_CLAIMS_DEFAULT_DIRECT_GROUP,
         self::FEATURE_RATE_LIMITING,
+        self::FEATURE_PAYMENTS_BCC,
     ];
+
+    // @codingStandardsIgnoreStart
+    public static $descriptions = [
+        self::FEATURE_QUOTE_LEAD => 'Display a save this quote w/email to user on quote page - unused?',
+        self::FEATURE_RENEWAL => 'Create renewal policies - too integrated to turn off',
+        self::FEATURE_PICSURE => 'pic-sure funcationlaity - too integrated to turn off',
+        self::FEATURE_PAYMENT_PROBLEM_INTERCOM => 'Use intercom campaign to send payment errors to the user (1st time payment failure only)',
+        self::FEATURE_DAVIES_IMPORT_ERROR_EMAIL => 'Notify davies of errors',
+        self::FEATURE_STARLING => 'Starling integration - unused?',
+        self::FEATURE_SALVA_POLICY_UPDATE => 'Use salva update api call instead of cancel/create',
+        self::FEATURE_BACS => 'Bacs functionality - too integrated to turn off',
+        self::FEATURE_CARD_OPTION_WITH_BACS => 'Allow users to also pay by card in web purchase flow',
+        self::FEATURE_APP_IOS_IMEI_VALIDATION_COLOUR => 'Ask Julien',
+        self::FEATURE_APP_PICSURE_ACCELEROMETER => 'Ask Julien',
+        self::FEATURE_APP_PICSURE_DOTCODE => 'Display dotcode on iOS for on the background image. Allows us to validate the imei in cases of suspected hacking.',
+        self::FEATURE_APP_FACEBOOK_USERFRIENDS_PERMISSION => 'Request user friends from Facebook. Requires permission from Facebook we lost in 2018 (but could re-request)',
+        self::FEATURE_CLAIMS_DEFAULT_DIRECT_GROUP => 'Should direct group be the default claim handler for new claims. If changing update phone system as well.',
+        self::FEATURE_RATE_LIMITING => 'Use rate limiting functionality for various items including recipero imei checks and policy creation.',
+        self::FEATURE_PAYMENTS_BCC => 'Bcc payment failure emails (and related) to bcc@so-sure.com',
+    ];
+    // @codingStandardsIgnoreEnd
 
     /**
      * @MongoDB\Id(strategy="auto")

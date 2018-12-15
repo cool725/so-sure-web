@@ -4,6 +4,7 @@ namespace AppBundle\Controller;
 
 use AppBundle\Document\Claim;
 use AppBundle\Document\File\S3File;
+use AppBundle\Document\PolicyTerms;
 use AppBundle\Form\Type\ClaimSearchType;
 use AppBundle\Repository\ClaimRepository;
 use AppBundle\Repository\File\S3FileRepository;
@@ -828,7 +829,11 @@ abstract class BaseController extends Controller
         $form = $this->createForm(PolicySearchType::class, null, ['method' => 'GET']);
         $form->handleRequest($request);
         if ($includeInvalidPolicies === null) {
-            $includeInvalidPolicies = $form->get('invalid')->getData();
+            if (!empty($form->getData('id'))) {
+                $includeInvalidPolicies = true;
+            } else {
+                $includeInvalidPolicies = $form->get('invalid')->getData();
+            }
         }
         $sosure = $form->get('sosure')->getData();
         if ($sosure) {
@@ -1295,6 +1300,19 @@ abstract class BaseController extends Controller
             'alternatives' => $data,
             'suggestedReplacement' => $suggestedReplacement ? $suggestedReplacement->toAlternativeArray() : null,
         ]);
+    }
+
+    /**
+     * @return PolicyTerms
+     */
+    protected function getLatestPolicyTerms()
+    {
+        $dm = $this->getManager();
+        $policyTermsRepo = $dm->getRepository(PolicyTerms::class);
+        /** @var PolicyTerms $latestTerms */
+        $latestTerms = $policyTermsRepo->findOneBy(['latest' => true]);
+
+        return $latestTerms;
     }
 
     protected function claimsNotes(Request $request, $id)

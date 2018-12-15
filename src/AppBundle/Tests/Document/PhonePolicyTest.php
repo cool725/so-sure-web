@@ -5,6 +5,7 @@ namespace AppBundle\Tests\Document;
 use AppBundle\Document\BankAccount;
 use AppBundle\Document\Connection\Connection;
 use AppBundle\Document\DateTrait;
+use AppBundle\Document\PhonePremium;
 use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\Claim;
 use AppBundle\Document\Connection\StandardConnection;
@@ -343,7 +344,7 @@ class PhonePolicyTest extends WebTestCase
     {
         $policy = new SalvaPhonePolicy();
         $phone = new Phone();
-        $phone->init('foo', 'bar', 7.29, 1.50);
+        $phone->init('foo', 'bar', 7.29, self::getLatestPolicyTerms(static::$dm), 1.50);
         $policy->setPhone($phone);
 
         $policyApi = $policy->toApiArray();
@@ -613,6 +614,108 @@ class PhonePolicyTest extends WebTestCase
         $policyA->addConnection($connectionA);
 
         $this->assertEquals(SalvaPhonePolicy::RISK_LEVEL_HIGH, $policyA->getRisk());
+    }
+
+    /**
+     * @expectedException \Exception
+     */
+    public function testSetPhoneDisallowedExcess()
+    {
+        $user = new User();
+        $user->setEmail(static::generateEmail('testGetRiskPolicyPendingCancellation', $this));
+        self::$dm->persist($user);
+        self::addAddress($user);
+
+        $phone = new Phone();
+        $oldTerms = new PolicyTerms();
+        $oldTerms->setVersion(PolicyTerms::VERSION_1);
+        $phone->init('foo', 'bar', 5, $oldTerms);
+
+        $policy = new SalvaPhonePolicy();
+        $policy->init($user, self::getLatestPolicyTerms(static::$dm));
+        $policy->setPhone($phone);
+    }
+
+    public function testGetCurrentExcessAndPicSureStatus()
+    {
+        $policy = static::createUserPolicy(true);
+        $claim = new Claim();
+        $claim->setType(Claim::TYPE_WARRANTY);
+        $claim->setStatus(Claim::STATUS_INREVIEW);
+        $policy->addClaim($claim);
+
+        $this->assertCount(1, $policy->getClaims());
+        $this->assertEquals(150, $policy->getCurrentExcess()->getTheft());
+        $this->assertEquals(150, $policy->getClaims()[0]->getExpectedExcess()->getTheft());
+        $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_APPROVED);
+        $this->assertEquals(70, $policy->getCurrentExcess()->getTheft());
+        $this->assertEquals(70, $policy->getClaims()[0]->getExpectedExcess()->getTheft());
+
+        $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_REJECTED);
+        $this->assertEquals(150, $policy->getCurrentExcess()->getTheft());
+        $this->assertEquals(150, $policy->getClaims()[0]->getExpectedExcess()->getTheft());
+
+        $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_MANUAL);
+        $claim->setStatus(Claim::STATUS_APPROVED);
+        $this->assertEquals(150, $policy->getClaims()[0]->getExpectedExcess()->getTheft());
+
+        $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_APPROVED);
+        $this->assertEquals(150, $policy->getClaims()[0]->getExpectedExcess()->getTheft());
+    }
+
+    /**
+     * @expectedException \Exception
+     */
+    public function testInitWithPremiumNonPicSure()
+    {
+        $terms = new PolicyTerms();
+        $terms->setVersion(PolicyTerms::VERSION_1);
+
+        $premium = new PhonePremium();
+        $premium->setExcess(PolicyTerms::getHighExcess());
+
+        $user = new User();
+        $user->setEmail(static::generateEmail('testInitWithPremiumNonPicSure', $this));
+        $policy = new PhonePolicy();
+        $policy->setPremium($premium);
+        $policy->init($user, $terms);
+        $this->assertTrue(true);
+    }
+
+    public function testInitWithPremiumAllowed()
+    {
+        $terms = new PolicyTerms();
+        $terms->setVersion(PolicyTerms::VERSION_10);
+
+        $premium = new PhonePremium();
+        $premium->setExcess(PolicyTerms::getHighExcess());
+        $premium->setPicSureExcess(PolicyTerms::getLowExcess());
+
+        $user = new User();
+        $user->setEmail(static::generateEmail('testInitWithPremiumAllowed', $this));
+        $policy = new PhonePolicy();
+        $policy->setPremium($premium);
+        $policy->init($user, $terms);
+        $this->assertTrue(true);
+    }
+
+    /**
+     * @expectedException \Exception
+     */
+    public function testInitWithPremiumException()
+    {
+        $terms = new PolicyTerms();
+        $terms->setVersion(PolicyTerms::VERSION_10);
+
+        $premium = new PhonePremium();
+        $premium->setExcess(PolicyTerms::getLowExcess());
+        $premium->setPicSureExcess(PolicyTerms::getLowExcess());
+
+        $user = new User();
+        $user->setEmail(static::generateEmail('testInitWithPremiumException', $this));
+        $policy = new PhonePolicy();
+        $policy->setPremium($premium);
+        $policy->init($user, $terms);
     }
 
     public function testGetRiskPolicyPendingCancellation()
@@ -1498,6 +1601,33 @@ class PhonePolicyTest extends WebTestCase
 
         $this->assertTrue($policyA->isCancelledWithPolicyDeclined());
         $this->assertTrue($policyB->isCancelledWithPolicyDeclined());
+    }
+
+    /**
+     * @expectedException \Exception
+     */
+    public function testCancelPolicyCooloffFullRefund()
+    {
+        $policy = static::createUserPolicy(true);
+        $policy->getUser()->setEmail(static::generateEmail('testCancelPolicyCooloffFullRefund', $this));
+        static::$dm->persist($policy);
+        static::$dm->persist($policy->getUser());
+        static::$dm->flush();
+
+        $policy->cancel(SalvaPhonePolicy::CANCELLED_COOLOFF, null, true);
+    }
+
+    public function testCancelPolicyFullRefund()
+    {
+        $policy = static::createUserPolicy(true);
+        $policy->getUser()->setEmail(static::generateEmail('testCancelPolicyFullRefund', $this));
+        static::$dm->persist($policy);
+        static::$dm->persist($policy->getUser());
+        static::$dm->flush();
+
+        $this->assertNull($policy->isCancelledFullRefund());
+        $policy->cancel(SalvaPhonePolicy::CANCELLED_UPGRADE, null, true);
+        $this->assertTrue($policy->isCancelledFullRefund());
     }
 
     public function testIsFullyPaid()
@@ -5345,9 +5475,10 @@ class PhonePolicyTest extends WebTestCase
 
     public function testSetPolicyStatusUnpaidIfActiveBacs()
     {
-        $date = \DateTime::createFromFormat('U', time());
+        // TODO: see why this fails if on the 29th
+        $now = new \DateTime('2018-11-28');
+        $date = clone $now;
         $date = $date->sub(new \DateInterval('P2M'));
-        $now = new \DateTime();
         $user = static::createUser(
             static::$userManager,
             static::generateEmail('testSetPolicyStatusUnpaidIfActiveBacs', $this),

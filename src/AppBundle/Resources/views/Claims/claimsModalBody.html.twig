@@ -1,0 +1,595 @@
+<div class="modal-content" style="border-radius: 6px;" xmlns="http://www.w3.org/1999/html">
+    <div class="modal-header" style="border-top-left-radius: 6px; border-top-right-radius: 6px;">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+
+        <h4 class="modal-title" style="padding-bottom: 0;">
+            {% if claim.finalSuspicion %}
+            <span class="text-danger">
+                Claim: {{ claim.number }}
+            </span>
+            {% elseif claim.initialSuspicion %}
+            <span class="text-warning">
+                Claim: {{ claim.number }}
+            </span>
+            {% else %}
+            <span class="text-info">
+                Claim: {{ claim.number }}
+            </span>
+            {% endif %}
+        </h4>
+    </div>
+    <div class="modal-body">
+
+        <div class="row">
+            <div class="col-xs-6">
+                <label>Policy</label>
+                <p>
+                    {{ claim.policy.policyNumber|default('N/A') }}<br/>
+                    <span class="help-block">
+                        {{ claim.policy.phone }}
+                    </span>
+                </p>
+            </div>
+
+            <div class="col-xs-6">
+                <label>Type</label>
+                <p>
+                    {{ claim.type|default('N/A') }}<br/>
+                    <span class="help-block">&nbsp;</span>
+
+                </p>
+            </div>
+
+            <div class="col-xs-6">
+                <label>Status</label>
+                {% if claim.status == 'fnol' %}
+                    <p class="text-warning" title="Claim not yet submitted to claims handler">
+                        {{ claim.status|default('N/A') }}
+                        {{ claim.daviesStatus }}
+                    </p>
+                {% else %}
+                    <p>
+                        {{ claim.status|default('N/A') }}
+                        {{ claim.daviesStatus }}
+                    </p>
+                {% endif %}
+            </div>
+
+            {% if app.user.handlingTeam != 'davies' %}
+                <div class="col-xs-6">
+                    <label>Claim Handling Team</label>
+                    <p>{{ claim.handlingTeam|default('N/A') }}</p>
+                    </div>
+            {% endif %}
+        </div>
+
+        <div class="container-fluid">
+            <ul class="nav nav-pills row" id="myTab" role="tablist">
+                <li class="nav-item active">
+                    <a class="nav-link" id="FNOL-tab" data-toggle="tab" href="#FNOL" role="tab"
+                       aria-controls="FNOL"
+                       aria-selected="true">FNOL</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" id="files-tab" data-toggle="tab" href="#files" role="tab"
+                       aria-controls="files"
+                       aria-selected="false">Files</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" id="details-tab" data-toggle="tab" href="#details" role="tab"
+                       aria-controls="details"
+                       aria-selected="false">Dates</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" id="costs-tab" data-toggle="tab" href="#costs" role="tab"
+                       aria-controls="amounts"
+                       aria-selected="false">Costs</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" id="claimNotes-tab" data-toggle="tab" href="#claimNotes" role="tab"
+                       aria-controls="claimNotes"
+                       aria-selected="false">Notes</a>
+                </li>
+
+                {% if form is defined %}
+                <li class="nav-item">
+                    <a class="nav-link" id="update-tab" data-toggle="tab" href="#update" role="tab"
+                       aria-controls="update"
+                       aria-selected="false">Update</a>
+                </li>
+                {% endif %}
+            </ul>
+
+            <br>
+
+            <div class="tab-content" id="tab-content">
+                <div class="tab-pane fade in active" id="FNOL" role="tabpanel" aria-labelledby="FNOL-tab">
+                    <div class="row">
+                        <div class="col-xs-6">
+                            <label>Number to reach</label>
+                            <p>{{ claim.phoneToReach|default('Unknown') }}</p>
+                        </div>
+
+                        <div class="col-xs-6">
+                            <label>Time to reach</label>
+                            <p>{{ claim.timeToReach|default('Unknown') }}</p>
+                        </div>
+
+                        <div class="col-xs-6">
+                            <label>Initial Suspicion</label>
+                            <p>{{ claim.initialSuspicion|default('Unknown') }}</p>
+                        </div>
+
+                        <div class="col-xs-6">
+                            <label>Final Suspicion</label>
+                            <p>{{ claim.finalSuspicion|default('Unknown') }}</p>
+                        </div>
+
+                        <div class="col-xs-6">
+                            <label>Incident Date</label>
+                            <p>
+                                {{ claim.incidentDate ? claim.incidentDate|date('d-m-Y') : 'Unknown' }}
+                                {{ claim.incidentTime }}
+                            </p>
+                        </div>
+
+                        <div class="col-xs-6">
+                            <label>Incident Location</label>
+                            <p>{{ claim.location|default('Unknown') }}</p>
+                        </div>
+
+                        {% if claim.type == 'damage' %}
+                            <div class="col-xs-6">
+                                <label>Details</label>
+                                {% if claim.typeDetails == 'other' %}
+                                    <p>{{ claim.typeDetailsOther|default('Unknown') }}</p>
+                                {% else %}
+                                    <p>{{ claim.typeDetails|default('Unknown') }}</p>
+                                {% endif %}
+                            </div>
+
+                            <div class="col-xs-6">
+                                <label>Bought on</label>
+                                <p>
+                                    {{ claim.monthOfPurchase|default('Unknown') }}
+                                    / {{ claim.yearOfPurchase|default('Unknown') }}
+                                </p>
+                            </div>
+
+                            <div class="col-xs-6">
+                                <label>Condition</label>
+                                <p>
+                                    {{ claim.condition|default('Unknown') }}
+                                </p>
+                            </div>
+                        {% elseif claim.type == 'theft' or claim.type == 'loss' %}
+                            <div class="col-xs-6">
+                                <label>Contacted</label>
+                                {% if claim.hasContacted %}
+                                    <p>{{ claim.contactedPlace }}</p>
+                                {% else %}
+                                    <p>Unknown</p>
+                                {% endif %}
+                            </div>
+
+                            <div class="col-xs-6">
+                                <label>Network</label>
+                                <p>{{ claim.network|default('Unknown') }}</p>
+                            </div>
+
+                            <div class="col-xs-6">
+                                <label>Blocked</label>
+                                <p>{{ claim.blockedDate ? claim.blockedDate|date('d-m-Y') : 'Unknown' }}</p>
+                            </div>
+
+                            <div class="col-xs-6">
+                                <label>Reported on</label>
+                                <p>{{ claim.reportedDate ? claim.reportedDate|date('d-m-Y') : 'Unknown' }}</p>
+                            </div>
+
+                            <div class="col-xs-6">
+                                <label>Reported to</label>
+                                <p>{{ claim.reportType|default('Unknown') }}</p>
+                            </div>
+
+                            {%  if claim.reportType != 'online' %}
+                            <div class="col-xs-6">
+                                <label>Crime reference number</label>
+
+                                {% if claim.validCrimeRef %}
+                                    <p>{{ claim.crimeRef|default('N/A') }} / {{ claim.force|default('N/A') }}</p>
+                                {% else %}
+                                    <p>
+                                        <i class="fa fa-warning" title="Invalid crime reference"></i>
+                                        {{ claim.crimeRef|default('N/A') }} / {{ claim.force|default('N/A') }}
+                                    </p>
+                                {% endif %}
+                            </div>
+                            {% endif %}
+
+                        {% endif %}
+
+                        <div class="col-xs-12">
+                            <label>Description</label>
+                            <p>{{ claim.description|default('Unknown') }}</p>
+                        </div>
+                    </div>
+                </div>
+                {% if claim.type == 'damage' %}
+                    {% set documents = s3DownloadLinks(claim) %}
+                {% elseif claim.type == 'theft' or claim.type == 'loss' %}
+                    {% set documents = s3DownloadLinks(claim) %}
+                {% endif %}
+
+                <div class="tab-pane fade" id="files" role="tabpanel" aria-labelledby="files-tab">
+                    <div class="row">
+                        {% set documents = s3DownloadLinks(claim) %}
+                        <div class="col-xs-12">
+                            <label>Proof of Usage</label>
+                            {% if claim.needProofOfUsage %}
+                                {% if documents %}
+                                    {% if documents.proofOfUsages|length > 0 %}
+                                        {% for document in documents.proofOfUsages %}
+                                            <p>
+                                                {{ document.filename }}
+                                                <img class="img-preview" src="{{ document.url }}"/>
+                                                <a href="{{ document.url_download }}">
+                                                    <i class="fa fa-download"></i>
+                                                </a>
+                                            </p>
+                                        {% endfor %}
+                                    {% else %}
+                                        <p>None uploaded yet</p>
+                                    {% endif %}
+                                {% endif %}
+                            {% else %}
+                                <p>Not Requested</p>
+                            {% endif %}
+                        </div>
+
+                        <div class="col-xs-12">
+                            <label>Proof of Barring</label>
+                            {% if claim.needProofOfBarring %}
+                                {% if documents %}
+                                    {% if documents.proofOfBarrings|length > 0 %}
+                                        {% for document in documents.proofOfBarrings %}
+                                            <p>
+                                                {{ document.filename }}
+                                                <img class="img-preview" src="{{ document.url }}"/>
+                                                <a href="{{ document.url_download }}">
+                                                    <i class="fa fa-download"></i>
+                                                </a>
+                                            </p>
+                                        {% endfor %}
+                                    {% else %}
+                                        <p>None uploaded yet</p>
+                                    {% endif %}
+                                {% endif %}
+                            {% else %}
+                                <p>Not Requested</p>
+                            {% endif %}
+                        </div>
+
+                        <div class="col-xs-12">
+                            <label>Proof of Purchase</label>
+                            {% if claim.needProofOfPurchase %}
+                                {% if documents %}
+                                    {% if documents.proofOfPurchases|length > 0 %}
+                                        {% for document in documents.proofOfPurchases %}
+                                            <p>
+                                                {{ document.filename }}
+                                                <img class="img-preview" src="{{ document.url }}"/>
+                                                <a href="{{ document.url_download }}">
+                                                    <i class="fa fa-download"></i>
+                                                </a>
+                                            </p>
+                                        {% endfor %}
+                                    {% else %}
+                                        <p>None uploaded yet</p>
+                                    {% endif %}
+                                {% endif %}
+                            {% else %}
+                                <p>Not Requested</p>
+                            {% endif %}
+                        </div>
+
+                        {% if claim.type == "loss" %}
+                            <div class="col-xs-12">
+                                <label>Proof of loss</label>
+                                {% if claim.needProofOfLoss %}
+                                    {% if documents %}
+                                        {% if documents.proofOfLosses|length > 0 %}
+                                            {% for document in documents.proofOfLosses %}
+                                                <p>
+                                                    {{ document.filename }}
+                                                    <img class="img-preview" src="{{ document.url }}"/>
+                                                    <a href="{{ document.url_download }}">
+                                                        <i class="fa fa-download"></i>
+                                                    </a>
+                                                </p>
+                                            {% endfor %}
+                                        {% else %}
+                                            <p>Not uploaded yet</p>
+                                        {% endif %}
+                                    {% endif %}
+                                {% else %}
+                                    <p>Not Requested</p>
+                                {% endif %}
+                            </div>
+                        {% endif %}
+
+                        {% if claim.type == 'damage' %}
+                            <div class="col-xs-12">
+                                <label>Pictures of Phone</label>
+                                {% if claim.needPictureOfPhone %}
+                                    {% if documents %}
+                                        {% if documents.damagePictures|length > 0 %}
+                                            {% for document in documents.damagePictures %}
+                                                <p>
+                                                    {{ document.filename }}
+                                                    <img class="img-preview" src="{{ document.url }}"/>
+                                                    <a href="{{ document.url_download }}">
+                                                        <i class="fa fa-download"></i>
+                                                    </a>
+                                                </p>
+                                            {% endfor %}
+                                        {% else %}
+                                            <p>None uploaded yet</p>
+                                        {% endif %}
+                                    {% endif %}
+                                {% else %}
+                                    <p>Not Requested</p>
+                                {% endif %}
+                            </div>
+                        {% endif %}
+
+                        <div class="col-xs-12">
+                            <label>Others</label>
+                            {% if documents %}
+                                {% if documents.others|length > 0 %}
+                                    {% for document in documents.others %}
+                                        <p>
+                                            {{ document.filename }}
+                                            <img class="img-preview" src="{{ document.url }}"/>
+                                            <a href="{{ document.url_download }}">
+                                                <i class="fa fa-download"></i>
+                                            </a>
+                                        </p>
+                                    {% endfor %}
+                                {% else %}
+                                    <p>None uploaded yet</p>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="details" role="tabpanel" aria-labelledby="details-tab">
+                    <div class="row">
+                        <div class="col-xs-6">
+                            <label>Loss</label>
+                            <p>{{ claim.lossDate ? claim.lossDate|date('d-m-Y') : 'N/A' }}</p>
+                        </div>
+
+                        <div class="col-xs-6">
+                            <label>Notification</label>
+                            <p>{{ claim.notificationDate ? claim.notificationDate|date('d-m-Y') : 'N/A' }}</p>
+                        </div>
+
+                        <div class="col-xs-6">
+                            <label>Recorded</label>
+                            <p>{{ claim.recordedDate ? claim.recordedDate|date('d-m-Y') : 'N/A' }}</p>
+                        </div>
+
+                        <div class="col-xs-6">
+                            <label>Submitted</label>
+                            <p>{{ claim.submissionDate ? claim.submissionDate|date('d-m-Y') : 'N/A' }}</p>
+                        </div>
+
+                        <div class="col-xs-6">
+                            <label>Approved</label>
+                            <p>{{ claim.approvedDate ? claim.approvedDate|date('d-m-Y') : 'N/A' }}</p>
+                        </div>
+
+                        <div class="col-xs-6">
+                            <label>Replacement Received</label>
+                            <p>{{ claim.replacementReceivedDate ? claim.replacementReceivedDate|date('d-m-Y') : 'N/A' }}</p>
+                        </div>
+
+                        <div class="col-xs-6">
+                            <label>Closed</label>
+                            <p>{{ claim.closedDate ? claim.closedDate|date('d-m-Y') : 'N/A' }}</p>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <div class="row">
+                        <div class="col-xs-6">
+                            <label>Replacement IMEI</label>
+                            {% if claim.isImei(claim.replacementImei) %}
+                                <p>{{ claim.replacementImei|default('N/A') }}</p>
+                            {% else %}
+                                <p>
+                                    <i class="fa fa-warning" title="Invalid IMEI Number (Luhn Failure)"></i>
+                                    <s>{{ claim.replacementImei|default('N/A') }}</s>
+                                </p>
+                            {% endif %}
+                        </div>
+
+                        <div class="col-xs-6">
+                            <label>Replacement Phone Details</label>
+                            <p>{{ claim.replacementPhoneDetails|default('N/A') }}</p>
+                        </div>
+
+                        <div class="col-xs-6">
+                            <label>Insured Phone</label>
+                            <p>{{ claim.policy.phone.__toString()|default('N/A') }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="costs" role="tabpanel" aria-labelledby="costs-tab">
+                    <table class="table .table-condensed">
+                        <tr>
+                            <td>Excess</td>
+                            <td>
+                                {% if equal_to_two_dp(claim.excess, claim.expectedExcessValue) %}
+                                    {{ claim.excess|default('-') }} <span title="Expected excess value" class="text-success"><i class="fa fa-check"></i></span>
+                                {% else %}
+                                    <span class="text-danger">
+                                        {{ claim.excess|default('-') }} <span title="Does not match Expected Excess Value" class="text-danger"><i class="fa fa-exclamation-triangle"></i></span>
+                                    </span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Expected Excess</td>
+                            <td>
+                                {% if equal_to_two_dp(claim.excess, claim.expectedExcessValue) %}
+                                    {{ claim.expectedExcessValue }}
+                                {% else %}
+                                    <span class="text-danger">
+                                        {{ claim.expectedExcessValue }}
+                                    </span>
+                                {% endif %}
+
+                                {% if not equal_to_two_dp(claim.expectedExcessValue, claim.expectedExcessValue(true)) %}
+                                    <span title="Warning excess does not matches older calculation of £{{ claim.expectedExcessValue(true)|number_format(2, '.', ',') }}">
+                                        <i class="fa fa-warning"></i>
+                                    </span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Unauthorized Calls</td>
+                            <td>{{ claim.unauthorizedCalls|default('-') }}</td>
+                        </tr>
+                        <tr>
+                            <td>Accessories</td>
+                            <td>{{ claim.accessories|default('-') }}</td>
+                        </tr>
+                        <tr>
+                            <td>Phone Replacement Cost</td>
+                            <td>{{ claim.phoneReplacementCost|default('-') }}</td>
+                        </tr>
+                        <tr>
+                            <td>Transaction Fees</td>
+                            <td>{{ claim.transactionFees|default('-') }}</td>
+                        </tr>
+                        <tr>
+                            <td>Claim Handling Fees</td>
+                            <td>{{ claim.claimHandlingFees|default('-') }}</td>
+                        </tr>
+                        <tr>
+                            <td>Reserved</td>
+                            <td>{{ claim.reservedValue|default('-') }}</td>
+                        </tr>
+                        <tr>
+                            <th>Total Incurred</th>
+                            <th>{{ claim.totalIncurred|default('-') }}</th>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="tab-pane fade" id="claimNotes" role="tabpanel" aria-labelledby="claimNotes-tab">
+                    {{ form_start(claim_note_form) }}
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <div class="form-group">
+                                <label>Notes</label>
+                                {{ form_widget(claim_note_form.notes, {'attr': {'class': 'form-control'}}) }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        {{ form_widget(claim_note_form.update, {'attr': {'class': 'btn btn-success'}}) }}
+                    </div>
+                    {{ form_end(claim_note_form) }}
+                </div>
+
+                {% if form is defined %}
+                <div class="tab-pane fade" id="update" role="tabpanel" aria-labelledby="update-tab">
+                    {{ form_start(form) }}
+                    <div class="form-group">
+                        <label><i class="fa fa-shield" title="Requires customer service role"></i> Claim Number</label>
+                            {{ form_widget(form.number, {'attr': {'class': 'form-control'}}) }}
+                    </div>
+
+                    <div class="form-group">
+                        <label><i class="fa fa-shield" title="Requires customer service role"></i> Claim Type</label>
+                            {{ form_widget(form.type, {'attr': {'class': 'form-control'}}) }}
+                    </div>
+
+                    <div class="form-group">
+                        <label><i class="fa fa-shield" title="Requires customer service role"></i> Replacement IMEI</label>
+                            {{ form_widget(form.replacementImei, {'attr': {'class': 'form-control'}}) }}
+                    </div>
+
+                    <div class="form-group">
+                        <label><i class="fa fa-shield" title="Requires customer service role"></i> Replacement Phone</label>
+                            {{ form_widget(form.replacementPhone, {'attr': {'class': 'form-control'}}) }}
+                    </div>
+
+                    <div class="help-block row">
+                        <div class="col-xs-12">
+                            Insured Phone: {{ claim.policy.phone }} <a href="#" class="set-replacement-phone" data-id="{{ claim.policy.phone.id }}">Select</a><br>
+                            Replacement Phone: {{ claim.replacementPhoneDetails }}
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label><i class="fa fa-lock" title="Admin only"></i> Approved Date</label>
+                        {% if is_granted('ROLE_ADMIN') %}
+                            {{ form_widget(form.approvedDate, {'attr': {'class': 'form-control'}}) }}
+                        {% else %}
+                            {{ claim.approvedDate|date('d-m-Y') }}
+                        {% endif %}
+                    </div>
+
+                    {#
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <div class="form-group">
+                                <label>Justification</label>
+                                {{ form_widget(form.justification, {'attr': {'class': 'form-control'}}) }}
+                            </div>
+                        </div>
+                    </div>
+                    #}
+
+                    <div class="form-group">
+                        {{ form_widget(form.update, {'attr': {'class': 'btn btn-success'}}) }}
+                    </div>
+                    {{ form_end(form) }}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        <div class="col-xs-6">
+        {% if is_granted('ROLE_ADMIN') %}
+            <button id="delete-claim" type="button" class="btn btn-danger">Delete Claim</button>
+        {% endif %}
+        </div>
+        <div class="col-xs-6">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+    </div>
+
+    {% if is_granted('ROLE_ADMIN') %}
+    <form id="delete-claim-form" method="POST" action="{{ path('admin_claims_delete_claim') }}">
+        <input type="hidden" name="id" value="{{ claim.id }}" />
+        <input type="hidden" name="token" value="{{  csrf_token('default') }}" />
+    </form>
+    {% endif %}
+
+</div>

@@ -2,6 +2,7 @@
 namespace AppBundle\Service;
 
 use AppBundle\Document\BacsPaymentMethod;
+use AppBundle\Document\BankAccount;
 use AppBundle\Document\File\DirectDebitNotificationFile;
 use AppBundle\Document\Form\Bacs;
 use AppBundle\Document\ScheduledPayment;
@@ -199,11 +200,16 @@ class PaymentService
             $policy->setPayer($policy->getUser());
         }
         $policy->setPolicyStatusActiveIfUnpaid();
+
+        if ($this->environment == 'prod' && !$policy->isValidPolicy()) {
+            $bacsPaymentMethod->getBankAccount()->setMandateStatus(BankAccount::MANDATE_FAILURE);
+        }
+
         $this->dm->flush();
 
-        $this->mailer->sendTemplate(
+        $this->mailer->sendTemplateToUser(
             sprintf('Your Direct Debit Confirmation'),
-            $policy->getUser()->getEmail(),
+            $policy->getUser(),
             'AppBundle:Email:bacs/notification.html.twig',
             ['user' => $policy->getUser(), 'policy' => $policy],
             'AppBundle:Email:bacs/notification.txt.twig',

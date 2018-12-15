@@ -2,10 +2,12 @@
 
 namespace AppBundle\DataFixtures\MongoDB\b\Phone;
 
+use AppBundle\Document\PolicyTerms;
 use AppBundle\Service\MailerService;
 use Doctrine\Common\DataFixtures\FixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 use AppBundle\Document\Phone;
+use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\RouterInterface;
@@ -40,6 +42,12 @@ abstract class LoadPhoneData implements ContainerAwareInterface
             throw new \Exception('missing container');
         }
 
+        /** @var DocumentManager $dm */
+        $dm = $this->container->get('doctrine_mongodb.odm.default_document_manager');
+        $policyTermsRepo = $dm->getRepository(PolicyTerms::class);
+        /** @var PolicyTerms $latestTerms */
+        $latestTerms = $policyTermsRepo->findOneBy(['latest' => true]);
+
         if (!$date) {
             $date = new \DateTime('2016-01-01');
         }
@@ -54,7 +62,7 @@ abstract class LoadPhoneData implements ContainerAwareInterface
         if (($handle = fopen($file, "r")) !== FALSE) {
             while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
                 if ($row > 0) {
-                    if ($phone = $this->newPhoneFromRow($manager, $data, $date)) {
+                    if ($phone = $this->newPhoneFromRow($manager, $data, $date, $latestTerms)) {
                         $newPhones[$phone->getModelMemory()] = $phone;
                     }
                 }
@@ -196,7 +204,7 @@ abstract class LoadPhoneData implements ContainerAwareInterface
         }
     }
 
-    protected function newPhoneFromRow($manager, $data, $date)
+    protected function newPhoneFromRow($manager, $data, $date, $latestTerms)
     {
         if (!$this->container) {
             throw new \Exception('missing container');
@@ -262,6 +270,7 @@ abstract class LoadPhoneData implements ContainerAwareInterface
                 $data[0], // $make
                 $data[1], // $model
                 $premium, // $premium
+                $latestTerms, // $latestTerms
                 $data[3], // $memory
                 $devices, // $devices
                 str_replace('£', '', trim($data[7])), // $initialPrice
@@ -339,7 +348,7 @@ abstract class LoadPhoneData implements ContainerAwareInterface
         return null;
     }
 
-    protected function newPhone($manager, $make, $model, $policyPrice, $memory = null, $devices = null)
+    protected function newPhone($manager, $make, $model, $policyPrice, $latestTerms, $memory = null, $devices = null)
     {
         if (!$this->container) {
             throw new \Exception('missing container');
@@ -363,7 +372,7 @@ abstract class LoadPhoneData implements ContainerAwareInterface
         }
 
         $phone = new Phone();
-        $phone->init($make, $model, $policyPrice + 1.5, $memory, $devices);
+        $phone->init($make, $model, $policyPrice + 1.5, $latestTerms, $memory, $devices);
         $manager->persist($phone);
 
         if (!$phone->getCurrentPhonePrice()) {

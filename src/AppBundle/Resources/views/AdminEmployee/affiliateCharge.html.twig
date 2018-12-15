@@ -68,12 +68,13 @@
                     <h3>Summary</h3>
                     <table class="table table-striped">
                         <thead>
-                            <tr><th>CPA</th><th>Total Charges</th><th>Total Cost</th></tr>
+                            <tr><th>CPA</th><th>Total Charges</th><th>Total Cost</th><th>Charge Model</th></tr>
                         </thead>
                         <tr>
                             <td>£{{ affiliate.cpa|number_format(2, '.', ',') }}</td>
                             <td>{{ charges|length }}</td>
                             <td>£{{ cost|number_format(2, '.', ',') }}</td>
+                            <td>{{ affiliate.chargeModel }}</td>
                         </tr>
                     </table>
                 </div>
@@ -109,17 +110,17 @@
                     <h2>Pending Aquisitions</h2>
                     <div class="table-responsive">
                         <table class="table table-striped">
-                            <thead><tr><th>CPA</th><th>Total Pending Aquisitions</th><th>Total Cost Pending</th></tr></thead>
+                            <thead><tr><th>CPA</th><th>Total Pending Aquisitions</th><th>Total Cost Pending</th><th>Charge Model</th></tr></thead>
                             <tbody>
                                 <tr>
                                     <td>£{{ affiliate.cpa|number_format(2, '.', ',') }}</td>
                                     <td>{{ pending|length }}</td>
                                     <td>£{{ pending|length * affiliate.cpa }}</td>
+                                    <td>{{ affiliate.chargeModel }}</td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
-
                     <h2>Details</h2>
                     <div class="table-responsive">
                         <table class="table table-striped">
@@ -129,7 +130,7 @@
                                     <tr>
                                         <td><a href="{{ path('admin_user', {'id': user.id }) }}">{{ user.name }}</a></td>
                                         <td>{{ user.getFirstPolicy.getStart|date }}</td>
-                                        <td>{{ user.getFirstPolicy.daysToAquisition(affiliate.days) }}</td>
+                                        <td>{{ days[user.getId] }}</td>
                                     </tr>
                                 {% endfor %}
                             </tbody>

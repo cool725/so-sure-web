@@ -60,8 +60,10 @@ $(function(){
     });
 
     clipboard.on('success', function(event) {
-        console.log(event);
         $('.btn-copy').tooltip('show');
+
+        sosure.track.byScodeCopied('user-home');
+
         setTimeout(function() { $('.btn-copy').tooltip('hide'); }, 1500);
     });
 
@@ -75,8 +77,7 @@ $(function(){
         showCount: false,
         on: {
             click: function(e) {
-                console.log(this.share);
-                sosure.track.byInvite(this.share);
+                sosure.track.byInvite(this.share, 'user-home');
             }
         }
     });

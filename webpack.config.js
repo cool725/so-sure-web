@@ -14,6 +14,7 @@ Encore
     .createSharedEntry('vendor', './web/components/vendor.js')
 
     // List all files here
+    .addEntry('fontawesome', './src/AppBundle/Resources/public/rebrand/js/fontawesome.js')
     .addEntry('global', './src/AppBundle/Resources/public/rebrand/js/global.js')
     .addEntry('cookie', './src/AppBundle/Resources/public/rebrand/js/cookie.js')
     .addEntry('dev', './src/AppBundle/Resources/public/rebrand/js/dev.js')
@@ -38,8 +39,11 @@ Encore
     .addEntry('admin', './src/AppBundle/Resources/public/rebrand/js/pages/admin/admin.js')
     .addEntry('picsure', './src/AppBundle/Resources/public/rebrand/js/pages/admin/picsure.js')
 
-    // Portal
+    // Pos
     .addEntry('pos', './src/AppBundle/Resources/public/rebrand/js/pages/pos.js')
+
+    // User area files
+    .addEntry('user-unpaid', './src/AppBundle/Resources/public/rebrand/js/pages/user/user-unpaid.js')
 
     // allow legacy applications to use $/jQuery as a global variable
     .autoProvidejQuery()

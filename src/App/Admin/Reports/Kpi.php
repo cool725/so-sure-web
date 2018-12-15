@@ -70,22 +70,7 @@ class Kpi implements KpiInterface
 
         /** @var Stats[] $stats */
         $stats = $this->statsRepo->getStatsByRange($startOfDay, $endOfDay);
-        foreach ($stats as $stat) {
-            if (!isset($week[$stat->getName()])) {
-                $week[$stat->getName()] = 0;
-            }
-            if (!$stat->isAbsolute()) {
-                $week[$stat->getName()] += $stat->getValue();
-            } else {
-                $week[$stat->getName()] = $stat->getValue();
-            }
-        }
-
-        foreach (Stats::$allStats as $stat) {
-            if (!isset($week[$stat])) {
-                $week[$stat] = '-';
-            }
-        }
+        $week = array_merge($week, Stats::sum($stats));
 
         return $week;
     }

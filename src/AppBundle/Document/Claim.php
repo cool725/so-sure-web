@@ -2,7 +2,9 @@
 
 namespace AppBundle\Document;
 
+use AppBundle\Document\Excess\Excess;
 use AppBundle\Document\File\ProofOfLossFile;
+use AppBundle\Exception\ClaimException;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -754,6 +756,13 @@ class Claim
      */
     protected $supplierStatus;
 
+    /**
+     * @MongoDB\EmbedOne(targetDocument="AppBundle\Document\Excess\Excess")
+     * @Gedmo\Versioned
+     * @var Excess|null
+     */
+    protected $expectedExcess;
+
     public function __construct()
     {
         $this->recordedDate = \DateTime::createFromFormat('U', time());
@@ -826,6 +835,10 @@ class Claim
             $phonePolicy = $policy;
             $this->setFnolPicSureValidated($phonePolicy->isPicSureValidated());
         }
+        if (!$this->getExpectedExcess() && $policy->getCurrentExcess()) {
+            $this->setExpectedExcess($policy->getCurrentExcess());
+        }
+
         $this->policy = $policy;
     }
 
@@ -966,6 +979,21 @@ class Claim
     public function isOpen()
     {
         return in_array($this->getStatus(), [Claim::STATUS_APPROVED, Claim::STATUS_SUBMITTED, Claim::STATUS_INREVIEW]);
+    }
+
+    public function isClosed($includeApproved = false)
+    {
+        $closedStatuses = [
+            Claim::STATUS_DECLINED,
+            Claim::STATUS_PENDING_CLOSED,
+            Claim::STATUS_WITHDRAWN,
+            Claim::STATUS_SETTLED,
+        ];
+        if ($includeApproved) {
+            $closedStatuses[] = Claim::STATUS_APPROVED;
+        }
+
+        return in_array($this->getStatus(), $closedStatuses);
     }
 
     public function getDaviesStatus()
@@ -1693,6 +1721,16 @@ class Claim
         return false;
     }
 
+    public function getExpectedExcess()
+    {
+        return $this->expectedExcess;
+    }
+
+    public function setExpectedExcess(Excess $excess)
+    {
+        $this->expectedExcess = $excess;
+    }
+
     public static function sumClaims($claims)
     {
         $data = [
@@ -1833,7 +1871,7 @@ class Claim
         ];
     }
 
-    public function getExpectedExcess()
+    public function getExpectedExcessValue($oldCalculation = false)
     {
         if (in_array($this->getStatus(), [
             Claim::STATUS_DECLINED,
@@ -1841,12 +1879,21 @@ class Claim
         ])) {
             return 0;
         }
-        /** @var PhonePolicy $phonePolicy */
-        $phonePolicy = $this->getPolicy();
-        $picSureEnabled = $phonePolicy->isPicSurePolicy();
-        $picSureValidated = $phonePolicy->isPicSureValidatedIncludingClaim($this);
 
-        return self::getExcessValue($this->getType(), $picSureValidated, $picSureEnabled);
+        if ($oldCalculation) {
+            /** @var PhonePolicy $phonePolicy */
+            $phonePolicy = $this->getPolicy();
+            $picSureEnabled = $phonePolicy->isPicSurePolicy();
+            $picSureValidated = $phonePolicy->isPicSureValidatedIncludingClaim($this);
+
+            return self::getExcessValue($this->getType(), $picSureValidated, $picSureEnabled);
+        }
+
+        if (!$this->getExpectedExcess()) {
+            throw new \Exception(sprintf('Missing expected excess for claim %s', $this->getId()));
+        }
+
+        return $this->getExpectedExcess()->getValue($this->getType());
     }
 
     public function getProofOfUsageFiles()

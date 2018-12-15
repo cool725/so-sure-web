@@ -38,7 +38,43 @@ class StatsCommand extends ContainerAwareCommand
     {
         $this->kpiPicsure();
         $this->cancelledAndPaymentOwed();
+        $this->salva();
         $output->writeln('Finished');
+    }
+
+    private function salva($date = null, $production = true)
+    {
+        if (!$date) {
+            $date = \DateTime::createFromFormat('U', time());
+        }
+        $lastMonth = clone $date;
+        $lastMonth = $lastMonth->sub(new \DateInterval('P1M'));
+        $date = \DateTime::createFromFormat(
+            "Y-m-d",
+            sprintf('%d-%d-01', $lastMonth->format('Y'), $lastMonth->format('m'))
+        );
+
+        $paymentTotals = $this->reportingService->getAllPaymentTotals($production, $date);
+        $activePolicies = $this->reportingService->getActivePoliciesCount($date);
+        $activePoliciesWithDiscount = $this->reportingService->getActivePoliciesWithPolicyDiscountCount($date);
+        $rewardPotLiability = $this->reportingService->getRewardPotLiability($date);
+        $rewardPromoPotLiability = $this->reportingService->getRewardPotLiability($date, true);
+        $rewardPotLiabilitySalva = $rewardPotLiability - $rewardPromoPotLiability;
+        if (isset($paymentTotals['all']['avgPayment'])) {
+            $this->statsService->set(Stats::ACCOUNTS_AVG_PAYMENTS, $date, $paymentTotals['all']['avgPayment']);
+        } else {
+            $this->statsService->set(Stats::ACCOUNTS_AVG_PAYMENTS, $date, null);
+        }
+        $this->statsService->set(Stats::ACCOUNTS_ACTIVE_POLICIES, $date, $activePolicies);
+        $this->statsService->set(Stats::ACCOUNTS_ACTIVE_POLICIES_WITH_DISCOUNTS, $date, $activePoliciesWithDiscount);
+        $this->statsService->set(Stats::ACCOUNTS_REWARD_POT_LIABILITY_SALVA, $date, $rewardPotLiabilitySalva);
+        $this->statsService->set(Stats::ACCOUNTS_REWARD_POT_LIABILITY_SOSURE, $date, $rewardPromoPotLiability);
+        if (isset($paymentTotals['totalRunRate'])) {
+            $this->statsService->set(Stats::ACCOUNTS_ANNUAL_RUN_RATE, $date, $paymentTotals['totalRunRate']);
+        } else {
+            $this->statsService->set(Stats::ACCOUNTS_ANNUAL_RUN_RATE, $date, null);
+        }
+
     }
 
     private function kpiPicsure($date = null)

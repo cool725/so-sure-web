@@ -1,0 +1,24 @@
+{% extends 'AppBundle:Email:base.html.twig' %}
+{% import "AppBundle:Email:macros.html.twig" as macros %}
+{% block title %}Your so-sure insurance is unable to be automatically renewed.{% endblock %}
+{% block body %}
+	{{ macros.start_table() }}
+		<h1>
+		   <!--?xml version="1.0" encoding="UTF-8" standalone="no"?-->
+		</h1>
+		<div style="font-size: 14px; text-align: left;">
+		   <!--?xml version="1.0" encoding="UTF-8" standalone="no"?-->
+		   <div style="font-size: 14px; text-align: center;"><span style="font-family:arial,helvetica neue,helvetica,sans-serif">
+				Dear {{ policy.user.name }},
+				<br><br>
+				We emailed you a few week ago about automatically renewing your SO-SURE policy {{ policy.policyNumber }}.
+				<br><br>
+				Unfortuantely, we were unable to automatically renew your policy as your previous policy was either cancelled or unpaid.
+				<br><br>
+               If you have any questions, please don't hesitate to
+				<a href="mailto:support@wearesosure.com?subject=I%20have%20a%20question" target="_blank"><span style="color:#3399ff">contact us</span></a>.
+				<br><br><br>
+		   </div>
+		</div>
+	{{ macros.end_table() }}
+{% endblock %}

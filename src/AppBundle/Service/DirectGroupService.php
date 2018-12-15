@@ -19,7 +19,7 @@ use AppBundle\Validator\Constraints\AlphanumericSpaceDotValidator;
 use AppBundle\Exception\ValidationException;
 use AppBundle\Repository\ClaimRepository;
 
-class DirectGroupService extends SftpService
+class DirectGroupService extends ExcelSftpService
 {
     use CurrencyTrait;
     use DateTrait;
@@ -285,7 +285,7 @@ class DirectGroupService extends SftpService
             if ($policy) {
                 foreach ($policy->getClaims() as $claim) {
                     /** @var Claim $claim */
-                    // 2 options - either db claim is closed or davies claim is closed
+                    // 3 options - either db claim is closed or dg claim is closed, or both are open
                     $logError = false;
                     $preventImeiUpdate = false;
                     if (!$claim->isOpen() &&
@@ -303,6 +303,9 @@ class DirectGroupService extends SftpService
                         if ($claim->getHandlingTeam() == Claim::TEAM_DIRECT_GROUP) {
                             $logError = true;
                         }
+                    } elseif ($claim->isOpen() && $directGroupClaim->isOpen() &&
+                        $claim->getNumber() != $directGroupClaim->claimNumber) {
+                        $preventImeiUpdate = true;
                     }
 
                     if ($preventImeiUpdate) {
@@ -619,10 +622,7 @@ class DirectGroupService extends SftpService
             }
         }
 
-        $isExcessValueCorrect = $directGroupClaim->isExcessValueCorrect(
-            $validated,
-            $phonePolicy->isPicSurePolicy()
-        );
+        $isExcessValueCorrect = $directGroupClaim->isExcessValueCorrect($claim);
 
         // if withdrawn and no actual need to validate in those cases
         if (!$isExcessValueCorrect &&
@@ -635,7 +635,7 @@ class DirectGroupService extends SftpService
             $msg = sprintf(
                 'Claim %s does not have the correct excess value. Expected %0.2f Actual %0.2f for %s/%s/%s/%s',
                 $directGroupClaim->claimNumber,
-                $directGroupClaim->getExpectedExcess($validated, $phonePolicy->isPicSurePolicy()),
+                $directGroupClaim->getExpectedExcessValue($claim),
                 $directGroupClaim->excess,
                 $directGroupClaim->getClaimType(),
                 $directGroupClaim->getClaimStatus(),

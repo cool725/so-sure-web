@@ -143,12 +143,13 @@ class EmailDebugCommand extends ContainerAwareCommand
             ],
             'policy' => [
                 'policy/new',
+                'policy/skippedRenewal',
             ],
-            'policyFailedPayment' => [
-                'policy/failedPayment',
-                'policy/failedPaymentFinal',
-                'policy/failedPaymentWithClaim',
-                'policy/failedPaymentWithClaimFinal',
+            'card' => [
+                'card/failedPayment',
+                'card/failedPaymentWithClaim',
+                'card/cardExpiring',
+                'card/cardMissing',
             ],
             'policyCancellation' => [
                 'policy-cancellation/actual-fraud',
@@ -173,6 +174,12 @@ class EmailDebugCommand extends ContainerAwareCommand
             ],
         ];
         $variations = [
+            'card' => [
+                '1',
+                '2',
+                '3',
+                '4',
+            ],
             'bacs' => [
                 'cancelledClaimed',
             ],
@@ -271,20 +278,47 @@ class EmailDebugCommand extends ContainerAwareCommand
                 throw new \Exception('Unable to find matching policy');
             }
 
-            return $this->policyService->resendPolicyEmail($policy);
-        } elseif (in_array($template, $templates['policyFailedPayment'])) {
+            if ($template != 'policy/skippedRenewal') {
+                return $this->policyService->resendPolicyEmail($policy);
+            } else {
+                return $this->policyService->skippedRenewalEmail($policy);
+            }
+        } elseif (in_array($template, $templates['card'])) {
             /** @var PolicyRepository $repo */
             $repo = $this->dm->getRepository(Policy::class);
             $policies = $repo->findBy(['status' => Policy::STATUS_ACTIVE]);
             $policy = null;
             foreach ($policies as $policy) {
-                break;
+                /** @var Policy $policy */
+                if (!$policy->getUser()->hasJudoPaymentMethod()) {
+                    continue;
+                }
+
+                if ($template == 'card/failedPaymentWithClaim' &&
+                    $policy->hasMonetaryClaimed(true, true) &&
+                    $policy->getUser()->hasValidPaymentMethod()) {
+                    break;
+                }
+
+                if ($template == 'card/cardMissing' && !$policy->getUser()->hasValidPaymentMethod()) {
+                    break;
+                }
+
+                if ($template != 'card/cardMissing' && $policy->getUser()->hasValidPaymentMethod()) {
+                    break;
+                }
             }
+
             if (!$policy) {
                 throw new \Exception('Unable to find matching policy');
             }
 
-            return $this->judopayService->failedPaymentEmail($policy);
+            if ($template != 'card/cardExpiring') {
+                $failedPayments = $variation ?: 1;
+                return $this->judopayService->failedPaymentEmail($policy, $failedPayments);
+            } else {
+                return $this->judopayService->cardExpiringEmail($policy);
+            }
         } elseif (in_array($template, $templates['policyCancellation'])) {
             /** @var PolicyRepository $repo */
             $repo = $this->dm->getRepository(Policy::class);

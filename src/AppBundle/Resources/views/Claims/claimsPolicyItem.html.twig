@@ -15,7 +15,7 @@
     <div class="tab-content">
         <div role="tabpanel" class="tab-pane" id="policy">
             <div class="row">
-                <div class="col-md-7">
+                <div class="col-md-6">
                     <h2>
                         {% if policy.company %}
                             Company Policy
@@ -23,508 +23,584 @@
                             Standard Policy
                         {% endif %}
                     </h2>
-                    <table class="table table-striped">
-                        <tr>
-                            <td>Policy Number</td>
-                            <td>
-                                {% if policy.policyNumber|length %}
-                                    {{ policy.policyNumber }}
-                                {% else %}
-                                    N/A
+                </div>
+                <div class="col-md-6">
+                    <div class="text-center" style="margin-top: 10px;">
+                        <a href="#notesList" class="btn btn-warning">Notes
+                            <span class="badge bg-white text-danger">{{ policy.notesList|length }}</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Policy</h3>
+                        </div>
+                        <div class="panel-body">
+                            <table class="table table-striped">
+                                <tr>
+                                    <td>Policy Number</td>
+                                    <td>
+                                        {% if policy.policyNumber|length %}
+                                            {{ policy.policyNumber }}
+                                        {% else %}
+                                            N/A
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% if policy.previousPolicy and policy.previousPolicy.policyNumber|length > 0 %}
+                                <tr>
+                                    <td>Previous Policy Number</td>
+                                    <td>
+                                        <a href="{{ path(policy_route, {'id': policy.previousPolicy.id}) }}">{{ policy.previousPolicy.policyNumber }}</a>
+                                    </td>
+                                </tr>
                                 {% endif %}
-                            </td>
-                        </tr>
-                        {% if policy.previousPolicy and policy.previousPolicy.policyNumber|length > 0 %}
-                        <tr>
-                            <td>Previous Policy Number</td>
-                            <td>
-                                <a href="{{ path(policy_route, {'id': policy.previousPolicy.id}) }}">{{ policy.previousPolicy.policyNumber }}</a>
-                            </td>
-                        </tr>
-                        {% endif %}
-                        {% if policy.nextPolicy and policy.nextPolicy.policyNumber|length > 0 %}
-                        <tr>
-                            <td>Next Policy Number</td>
-                            <td>
-                                    <a href="{{ path(policy_route, {'id': policy.nextPolicy.id}) }}">{{ policy.nextPolicy.policyNumber }}</a>
-                            </td>
-                        </tr>
-                        {% endif %}
-                        {% if policy.phone %}
-                        <tr>
-                            <td>Phone</td>
-                            <td>{{ policy.phone }}&nbsp;
-                                    <button type="button" class="btn btn-info" data-toggle="modal" data-target="#alternativeModal"
-                                        data-query="{% if is_granted('ROLE_EMPLOYEE') %}{{ path('admin_phone_alternatives', {'id': policy.phone.id}) }}{% else %}{{ path('claims_phone_alternatives', {'id': policy.phone.id}) }}{% endif %}"
-                                        data-phone="{{ policy.phone.toAlternativeArray()|json_encode }}"
-                                        >Show Alternatives</button>
+                                {% if policy.nextPolicy and policy.nextPolicy.policyNumber|length > 0 %}
+                                <tr>
+                                    <td>Next Policy Number</td>
+                                    <td>
+                                            <a href="{{ path(policy_route, {'id': policy.nextPolicy.id}) }}">{{ policy.nextPolicy.policyNumber }}</a>
+                                    </td>
+                                </tr>
+                                {% endif %}
+                                {% if policy.phone %}
+                                <tr>
+                                    <td>Phone</td>
+                                    <td>{{ policy.phone }}&nbsp;
+                                            <button type="button" class="btn btn-info" data-toggle="modal" data-target="#alternativeModal"
+                                                data-query="{% if is_granted('ROLE_EMPLOYEE') %}{{ path('admin_phone_alternatives', {'id': policy.phone.id}) }}{% else %}{{ path('claims_phone_alternatives', {'id': policy.phone.id}) }}{% endif %}"
+                                                data-phone="{{ policy.phone.toAlternativeArray()|json_encode }}"
+                                                >Show Alternatives</button>
 
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Phone Warranty Status</td>
-                            <td class="{% if policy.phone.underWarranty == 'likely'%}success{% elseif policy.phone.underWarranty == 'maybe'%}warning{% else %}danger{% endif %}">
-                                Phone is {{ policy.phone.underWarranty }} under warranty. Warranty likely ends between {{ policy.phone.warrantyEarlist|date('M Y') }} and {{ policy.phone.warrantyLatest|date('M Y') }}.
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>IMEI</td>
-                            <td>{{ policy.imei }}
-                            </td>
-                        </tr>
-                        {% if policy.phone.isApple %}
-                        <tr>
-                            <td>
-                                IMEI Circumvention
-                            </td>
-                            <td>
-                                {% if policy.imeiCircumvention is null %}
-                                    <span> Pre Anti-fraud check</span>
-                                {% elseif policy.imeiCircumvention == true %}
-                                    <span class="fa fa-exclamation-triangle"> Possible Fraud <span class="fa fa-exclamation-triangle"></span></span>
-                                {% elseif policy.imeiCircumvention == false %}
-                                    <span class="fa fa-thumbs-up"> No Fraud Detected <span class="fa fa-thumbs-up"></span></span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Phone Warranty Status</td>
+                                    <td class="{% if policy.phone.underWarranty == 'likely'%}success{% elseif policy.phone.underWarranty == 'maybe'%}warning{% else %}danger{% endif %}">
+                                        Phone is {{ policy.phone.underWarranty }} under warranty. Warranty likely ends between {{ policy.phone.warrantyEarlist|date('M Y') }} and {{ policy.phone.warrantyLatest|date('M Y') }}.
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>IMEI</td>
+                                    <td>{{ policy.imei }}
+                                    </td>
+                                </tr>
+                                {% if policy.phone.isApple %}
+                                <tr>
+                                    <td>
+                                        IMEI Circumvention
+                                    </td>
+                                    <td>
+                                        {% if policy.imeiCircumvention is null %}
+                                            <span> Pre Anti-fraud check</span>
+                                        {% elseif policy.imeiCircumvention == true %}
+                                            <span class="fa fa-exclamation-triangle"> Possible Fraud <span class="fa fa-exclamation-triangle"></span></span>
+                                        {% elseif policy.imeiCircumvention == false %}
+                                            <span class="fa fa-thumbs-up"> No Fraud Detected <span class="fa fa-thumbs-up"></span></span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
                                 {% endif %}
-                            </td>
-                        </tr>
-                        {% endif %}
-                        {% endif %}
-                        <tr>
-                            <td>Policy Status</td>
-                            <td>
-                                {{ policy.status }} {% if not policy.isPolicy %}Pre-pending{% endif %}
-                                {% if policy.cancelledReason %}
-                                    / {{ policy.cancelledReason }}
                                 {% endif %}
-                                {% if policy.getRequestedCancellationReason %}
-                                    / {{ policy.getRequestedCancellationReason }}
+                                <tr>
+                                    <td>Policy Status</td>
+                                    <td>
+                                        {{ policy.status }} {% if not policy.isPolicy %}Pre-pending{% endif %}
+                                        {% if policy.cancelledReason %}
+                                            / {{ policy.cancelledReason }}
+                                        {% endif %}
+                                        {% if policy.getRequestedCancellationReason %}
+                                            / {{ policy.getRequestedCancellationReason }}
+                                        {% endif %}
+                                        {% if is_granted('ROLE_CUSTOMER_SERVICES') %}
+                                        <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#policyStatusForm">
+                                            <span class="glyphicon glyphicon-new-window" aria-hidden="true"></span>
+                                            Change Status
+                                        </button>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% if policy.isPolicy %}
+                                <tr>
+                                    <td>Policy Dates</td>
+                                    <td>{{ policy.start | date('d M Y H:i', 'Europe/London') }} - {{ policy.end | date('d M Y H:i', 'Europe/London') }}</td>
+                                </tr>
                                 {% endif %}
-                                {% if is_granted('ROLE_ADMIN') %}
-                                    {% set settable_alternative_status = null %}
-                                    {% if policy.status == 'active' %}
-                                        {% set settable_alternative_status = 'unpaid' %}
-                                    {% endif %}
-                                    {% if policy.status == 'unpaid' %}
-                                        {% set settable_alternative_status = 'active' %}
-                                    {% endif %}
-                                    {% if settable_alternative_status %}
-                                        <a class="btn btn-sm btn-danger confirm-submit" data-confirm-msg="Are you sure you want to change the policy status?"
-                                            href="{{ path('admin_policy_set_status', { id: policy.id, policyNewStatus: settable_alternative_status}) }}">
-                                            set as  {{ settable_alternative_status }}</a>
-                                    {% endif %}
+                            </table>
+                        </div>
+                    </div>
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">pic-sure / Excess / Recipero</h3>
+                        </div>
+                        <div class="panel-body">
+                            <table class="table table-striped">
+                                {% if policy.isPolicy %}
+                                <tr>
+                                    <td>
+                                        Standard Policy Excess
+                                    </td>
+                                    <td>
+                                        {{ policy.premium.excess }}
+                                    </td>
+                                </tr>
+                                {% if policy.isPicSurePolicy %}
+                                    <tr>
+                                        <td>
+                                            pic-sure Approved Policy Excess
+                                        </td>
+                                        <td>
+                                            {{ policy.premium.picSureExcess }}
+                                        </td>
+                                    </tr>
                                 {% endif %}
-                            </td>
-                        </tr>
-                        {% if policy.isPolicy %}
-                        <tr>
-                            <td>Policy Dates</td>
-                            <td>{{ policy.start | date('d M Y H:i', 'Europe/London') }} - {{ policy.end | date('d M Y H:i', 'Europe/London') }}</td>
-                        </tr>
-                        {% endif %}
-                        {% if policy.isPolicy and policy.getFirstSuccessfulUserPaymentCredit %}
-                        <tr>
-                            <td>Policy Purchased via</td>
-                            <td>
-                                {{ policy.getFirstSuccessfulUserPaymentCredit.getSourceForClaims }}
-                            </td>
-                        </tr>
-                        {% endif %}
-                        {% if policy.isPolicy %}
-                            <tr>
-                                <td>Policy Installments</td>
-                                <td>
-                                    {% if policy.premiumPlan == 'monthly' %}
-                                        Bill every month on <span title="{{ policy.billing|date('d M Y H:i', 'Europe/London') }}">{{ policy.billing|date('jS','Europe/London') }} @ {{ policy.billing|date('H:m','Europe/London') }}</span>.
-                                        <br>
-                                    {% endif %}
-                                    {{ policy.premiumInstallmentCount }} installment(s) of £{{ policy.premiumInstallmentPrice| number_format(2, '.', ',') }}
-                                    {% if policy.hasPolicyDiscountPresent %}
-                                        <br>
-                                        £{{ policy.premium.annualDiscount|number_format(2, '.', ',')}} discount applied for
-                                        11 monthly payments of £{{ policy.premium.getAdjustedStandardMonthlyPremiumPrice|number_format(2, '.', ',')}}
-                                        & 1 final monthly payment of £{{ policy.premium.getAdjustedFinalMonthlyPremiumPrice|number_format(2, '.', ',')}}
-                                    {% endif %}
-                                </td>
-                            </tr>
-                        {% endif %}
-                        {% if policy.isPolicy %}
-                        <tr>
-                            <td>Policy Payments</td>
-                            <td>
-                                <div class="row">
-                                    <div class="col-sm-8">
-                                        Paid £{{ policy.premiumPaid | number_format(2, '.', ',') }} of £{{ policy.premium.yearlyPremiumPrice| number_format(2, '.', ',') }}&nbsp;
-                                        <br>
-                                        {% if policy.isPolicy and policy.start %}
-                                            {% if policy.end < now %}
-                                                Premium of £{{ policy.getProratedPremium(policy.end) | number_format(2, '.', ',') }} was due on policy
+                                {% endif %}
+                                <tr>
+                                    <td>
+                                        pic-sure Status
+                                    </td>
+                                    <td>
+                                        {% if policy.policyTerms.isPicSureEnabled %}
+                                            {% if policy.picSureStatus == 'claim-approved' and previousPicSureStatus is defined %}
+                                                pic-sure Approved due to a settled claim (previously was {% if previousPicSureStatus %}{{ previousPicSureStatus.data.picSureStatus }}{% else %}Not started{% endif %})
+                                            {% elseif policy.picSureStatus %}
+                                                {{ policy.picSureStatus }}
                                             {% else %}
-                                                Premium of £{{ policy.getProratedPremium() | number_format(2, '.', ',') }} due (daily calc)
+                                                Not started
+                                            {% endif %}
+                                            {% if policy.getPicSureApprovedDate %}<br />Approved: {{ policy.getPicSureApprovedDate|date }}{% endif %}
+                                        {% else %}
+                                            Non pic-sure policy
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% if policy.policyTerms.isPicSureEnabled %}
+                                    <tr>
+                                        <td>
+                                            pic-sure Locations
+                                        </td>
+                                        <td>
+                                            {% for location in policy.picsureLocations %}
+                                                [{{ location.coordinates[1]}},{{ location.coordinates[0]}}]
+                                            {% endfor %}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            pic-sure Circumvention
+                                        </td>
+                                        <td>
+                                            {% if policy.picSureCircumvention is null %}
+                                                <span> Pre Anti-fraud check</span>
+                                            {% elseif policy.picSureCircumvention == true and hadInvalidPicSureStatus == false %}
+                                                <span class="fa fa-exclamation-triangle"> Possible Fraud (i.e. too many attempts to do pic-sure and imei upload was too long, check events in mixpanel) <span class="fa fa-exclamation-triangle"></span></span>
+                                            {% elseif policy.picSureCircumvention == false and hadInvalidPicSureStatus == true %}
+                                                <span class="fa fa-exclamation-triangle"> Previously invalidated (check the history log and previous pic-sure images) <span class="fa fa-exclamation-triangle"></span></span>
+                                            {% elseif policy.picSureCircumvention == true and hadInvalidPicSureStatus == true %}
+                                                <span class="fa fa-exclamation-triangle"> Possible Fraud and previously invalidated (i.e. too many attempts to do pic-sure and imei upload was too long, check events in mixpanel, and check the history log and previous pic-sure images) <span class="fa fa-exclamation-triangle"></span></span>
+                                            {% elseif policy.picSureCircumvention == false %}
+                                                <span class="fa fa-thumbs-up"> No Fraud Detected <span class="fa fa-thumbs-up"></span></span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endif %}
+                                {% if is_granted('ROLE_EMPLOYEE')  %}
+                                    <tr>
+                                        <td>Policy Recipero Checks<br />
+                                            <strong>NOT CLAIMS RELATED</strong>
+                                        </td>
+                                        <td>
+                                            <ul>
+                                                {% for key, data in policy.checkmendCertsAsArray(false) if data['certId'] is defined %}
+                                                    <li>
+                                                        {% if data['certId'] == 'serial' or data['certId'] == 'register' %}
+                                                            <span title="{{ data['response']|json_encode }}" style="cursor: pointer;">{{ data['certId']|upper }}</span>
+                                                        {% else %}
+                                                            <a href="https://www.checkmend.com/uk/verify/{{ data['certId'] }}" target="_blank" title="{{ data['response']|json_encode }}">{{ data['certId'] }}</a>
+                                                        {% endif %}
+                                                        (Ran on {{ key|date("F j, Y H:i", "Europe/London") }})</li>
+                                                {% endfor %}
+                                                {% if policy.checkmendCertsAsArray(false)|length == 0 %}
+                                                    <li>Certs not present</li>
+                                                {% endif %}
+                                            </ul>
+                                        </td>
+                                    </tr>
+                                {% endif %}
+                                <tr>
+                                    <td>Recipero Checks (ClaimsCheck)
+                                        <i style="cursor: pointer" class="fa fa-clock-o" data-toggle="popover" data-placement="bottom" data-html="true"
+                                           title="Recipero Feed Timings" data-content="EE – On the hour, every hour<br />Vodafone – 9.30 am every day<br />O2 – 9.15am, 1.15pm, 5.15pm and 9.15pm<br />3 – 7.20am every day<br ><a href='https://en.wikipedia.org/wiki/List_of_United_Kingdom_mobile_virtual_network_operators' target='_blank'>MVNO's</a> should follow host network timings"></i>
+                                        <br /><strong>CLAIMS RELATED</strong>
+                                    </td>
+                                    <td>
+                                        <ul>
+                                            {% for key, data in policy.checkmendCertsAsArray(true) if data['certId'] is defined %}
+                                                <li>
+                                                    {# rnd hack to force page reload to adjust tabs #}
+                                                    Claim <a href="?rnd={{ random() }}#claim_{{ data['claimId'] }}">{{ data['claimNumber'] }}</a> against
+                                                    {% if data['certId'] == 'serial' or data['certId'] == 'register' %}
+                                                        <span title="{{ data['response']|json_encode }}" style="cursor: pointer;">{{ data['certId']|upper }}</span>
+                                                    {% else %}
+                                                        <a href="https://www.checkmend.com/uk/verify/{{ data['certId'] }}" target="_blank" title="{{ data['response']|json_encode }}">{{ data['certId'] }}</a>
+                                                    {% endif %}
+                                                    (Ran on {{ key|date("F j, Y H:i", "Europe/London") }})</li>
+                                            {% endfor %}
+                                            {% if policy.checkmendCertsAsArray(true)|length == 0 %}
+                                                <li>Certs not present</li>
+                                            {% endif %}
+                                        </ul>
+                                    </td>
+                                </tr>
+                                {% if is_granted('ROLE_EMPLOYEE')%}
+                                    <tr>
+                                        <td>
+                                            Manual Recipero Check
+                                        </td>
+                                        <td>
+                                            {{ form_start(receperio_form, {'attr': {'class': 'form-inline'}}) }}
+                                            {{ form_widget(receperio_form.rerun, {'label': 'Re-run check', 'attr': {'class': 'btn btn-danger confirm-submit', 'data-confirm-msg': 'Are you sure you want to rerun the imei/serial number checks? This costs £0.07.'}}) }}
+                                            {{ form_end(receperio_form) }}
+                                        </td>
+                                    </tr>
+                                {% endif %}
+                            </table>
+                        </div>
+                    </div>
+
+                    {% if policy.isPolicy %}
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">Pot</h3>
+                            </div>
+                            <div class="panel-body">
+                                <table class="table table-striped">
+                                    <tr>
+                                        <td>Invitations</td>
+                                        <td>{{ policy.invitations|length }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Standard Connections</td>
+                                        <td>
+                                            <strong>{{ policy.standardConnections|length }}</strong>&nbsp;:&nbsp;
+                                            {% for connection in policy.standardConnections %}
+                                                <a href="{{ path(policy_route, {'id': connection.linkedPolicy.id }) }}">{{ connection.linkedUser.name }}</a>;
+                                            {% endfor %}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Reward Connections</td>
+                                        <td>
+                                            <strong>{{ policy.rewardConnections|length }}</strong>&nbsp;:&nbsp;
+                                            {% for connection in policy.rewardConnections %}
+                                                {{ connection.linkedUser.name }};
+                                            {% endfor %}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Current Pot Value</td>
+                                        <td>£{{ policy.potValue|number_format(2, '.', ',') }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Current Pot Value</td>
+                                        <td>£{{ policy.potValue|number_format(2, '.', ',') }}</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Files</h3>
+                        </div>
+                        <div class="panel-body">
+                            <table class="table table-striped">
+                                {% for file in policy.policyFiles %}
+                                    <tr>
+                                        <td>{{ file.fileType }}</td>
+                                        <td>
+                                            {% if is_granted('ROLE_EMPLOYEE') %}
+                                                <a href="{{ path('admin_download_file_attachment', {'id': file.id}) }}">{{ file.fileName }}</a>
+                                            {% elseif is_granted('ROLE_CLAIMS') %}
+                                                <a href="{{ path('claims_download_file', {'id': file.id}) }}">{{ file.fileName }}</a>
                                             {% endif %}
                                             <br>
-                                        {% endif %}
-                                        (
-                                        <span title="Successful payments credited to account">{{ policy.successfulPaymentCredits|length }} payment credited</span>
-                                        {% if policy.failedPaymentCredits|length > 0 %}
-                                            ; <i class="fa fa-warning"></i> {{ policy.failedPaymentCredits|length }} failed charges
-                                        {% endif %}
-                                        )
-
-                                    </div>
-                                    <div class="col-sm-4">
-                                        <button type="button" class="btn btn-info" data-toggle="modal" data-target="#paymentsModal"
-                                        >Payments</button>
-                                    </div>
-                                </div>
-
-
-                            </td>
-                        </tr>
-                        {% endif %}
-                        {% if is_granted('ROLE_EMPLOYEE') and policy.isPolicy %}
-                            <tr>
-                                <td>Policy Commission</td>
-                                <td>
-                                    Received £{{ policy.getTotalCommissionPaid() | number_format(2, '.', ',') }} of £{{ policy.premium.yearlyTotalCommission| number_format(2, '.', ',') }} (coverholder + broker)
-                                    {% if policy.isPolicy and policy.start %}
-                                        <br>
-                                        {% if policy.end < now %}
-                                            Commission of £{{ policy.getProratedCommission(policy.end) | number_format(2, '.', ',') }}
-                                            (
-                                            £{{ policy.getProratedCoverholderCommission(policy.end) | number_format(2, '.', ',') }} /
-                                            £{{ policy.getProratedBrokerCommission(policy.end) | number_format(2, '.', ',') }}
-                                            )
-                                            was due on policy
-                                        {% else %}
-                                            Commission of £{{ policy.getProratedCommission() | number_format(2, '.', ',') }}
-                                            (
-                                            £{{ policy.getProratedCoverholderCommission() | number_format(2, '.', ',') }} /
-                                            £{{ policy.getProratedBrokerCommission() | number_format(2, '.', ',') }}
-                                            )
-                                            due (daily calc)
-                                        {% endif %}
-                                    {% endif %}
-                                </td>
-                            </tr>
-                        {% endif %}
-                        {% if policy.isPolicy %}
-                        <tr>
-                            <td>Policy Payment Status</td>
-                            <td>
-                                {% if policy.isPolicyPaidToDate %}
-                                    <i class="fa fa-check text-success" title="Policy is paid to date"></i> Policy is paid to date
-                                {% else %}
-                                    <i class="fa fa-warning text-danger" title="Policy is NOT paid to date"></i>
-                                    If still unpaid, policy will be cancelled on {{ policy.policyExpirationDate | date('d M Y H:i', 'Europe/London')}}
-                                {% endif %}
-                            </td>
-                        </tr>
-                        {% endif %}
-                        {% if policy.hasCashback %}
-                        <tr>
-                            <td>Cashback</td>
-                            <td>
-                                £{{ policy.cashback.getDisplayableAmount| number_format(2, '.', ',') }} ({{policy.cashback.status}})
-                            </td>
-                        </tr>
-                        {% endif %}
-                        {% if policy.isPolicy and policy.payerOrUser.paymentMethod and
-                            policy.payerOrUser.paymentMethod.getType == "judo" %}
-                            <tr>
-                                <td>Card</td>
-                                <td class="{% if policy.payerOrUser.paymentMethod.isCardExpired %}danger{% endif %}">
-                                    {{ policy.payerOrUser.paymentMethod }}
-                                    <a title="Judopay" href="https://portal.judopay.com/payments/history?SearchQuery={{ policy.payerOrUser.id }}&SearchQueryType=0&AppName=&DeviceId=&From=&To=&AppId=0" target="_blank">
-                                        <i class="fa fa-external-link"></i>
-                                    </a>
-                                </td>
-
-                            </tr>
-                        {% elseif policy.isPolicy and policy.payerOrUser.paymentMethod and
-                            policy.payerOrUser.paymentMethod.getType == "bacs" %}
-                            <tr>
-                                <td>Bacs</td>
-                                <td class="">
-                                    {% if policy.payerOrUser.paymentMethod.bankAccount.isMandateInvalid %}
-                                        <s>{{ policy.payerOrUser.paymentMethod }}</s>
-                                    {% else %}
-                                        {{ policy.payerOrUser.paymentMethod }}
-                                    {% endif %}
-                                    (Mandate: {{ policy.payerOrUser.paymentMethod.bankAccount.mandateStatus }})
-                                    <br>
-                                    Initial date: {{  policy.payerOrUser.paymentMethod.bankAccount.initialNotificationDate| date('d M Y')   }}
-                                    <br>
-                                    and then on the {{  policy.payerOrUser.paymentMethod.bankAccount.standardNotificationDate|date('jS')  }}
-                                </td>
-                            </tr>
-                        {% endif %}
-                        {% if policy.payerOrUser.id != policy.user.id %}
-                        <tr>
-                            <td>Payer</td>
-                            <td><a href="{{ path('admin_user', {'id': policy.payerOrUser.id }) }}">{{ policy.payerOrUser.name }}</a></td>
-                        </tr>
-                        {% endif %}
-                        {% if is_granted('ROLE_EMPLOYEE')  %}
-                        <tr>
-                          <td>Policy Recipero Checks<br />
-                            <strong>NOT CLAIMS RELATED</strong>
-                          </td>
-                          <td>
-                            <ul>
-                            {% for key, data in policy.checkmendCertsAsArray(false) if data['certId'] is defined %}
-                                <li>
-                                {% if data['certId'] == 'serial' or data['certId'] == 'register' %}
-                                    <span title="{{ data['response']|json_encode }}" style="cursor: pointer;">{{ data['certId']|upper }}</span>
-                                {% else %}
-                                  <a href="https://www.checkmend.com/uk/verify/{{ data['certId'] }}" target="_blank" title="{{ data['response']|json_encode }}">{{ data['certId'] }}</a>
-                                {% endif %}
-                                (Ran on {{ key|date("F j, Y H:i", "Europe/London") }})</li>
-                            {% endfor %}
-                            {% if policy.checkmendCertsAsArray(false)|length == 0 %}
-                              <li>Certs not present</li>
-                            {% endif %}
-                            </ul>
-                          </td>
-                        </tr>
-                    {% endif %}
-                        <tr>
-                          <td>Recipero Checks (ClaimsCheck)
-                            <i style="cursor: pointer" class="fa fa-clock-o" data-toggle="popover" data-placement="bottom" data-html="true"
-                               title="Recipero Feed Timings" data-content="EE – On the hour, every hour<br />Vodafone – 9.30 am every day<br />O2 – 9.15am, 1.15pm, 5.15pm and 9.15pm<br />3 – 7.20am every day<br ><a href='https://en.wikipedia.org/wiki/List_of_United_Kingdom_mobile_virtual_network_operators' target='_blank'>MVNO's</a> should follow host network timings"></i>
-                            <br /><strong>CLAIMS RELATED</strong>
-                          </td>
-                          <td>
-                            <ul>
-                            {% for key, data in policy.checkmendCertsAsArray(true) if data['certId'] is defined %}
-                                <li>
-                                    {# rnd hack to force page reload to adjust tabs #}
-                                    Claim <a href="?rnd={{ random() }}#claim_{{ data['claimId'] }}">{{ data['claimNumber'] }}</a> against
-                                {% if data['certId'] == 'serial' or data['certId'] == 'register' %}
-                                    <span title="{{ data['response']|json_encode }}" style="cursor: pointer;">{{ data['certId']|upper }}</span>
-                                {% else %}
-                                  <a href="https://www.checkmend.com/uk/verify/{{ data['certId'] }}" target="_blank" title="{{ data['response']|json_encode }}">{{ data['certId'] }}</a>
-                                {% endif %}
-                                (Ran on {{ key|date("F j, Y H:i", "Europe/London") }})</li>
-                            {% endfor %}
-                            {% if policy.checkmendCertsAsArray(true)|length == 0 %}
-                              <li>Certs not present</li>
-                            {% endif %}
-                            </ul>
-                          </td>
-                        </tr>
-                        {% if is_granted('ROLE_EMPLOYEE')%}
-                        <tr>
-                            <td>
-                                Manual Recipero Check
-                            </td>
-                            <td>
-                                {{ form_start(receperio_form, {'attr': {'class': 'form-inline'}}) }}
-                                {{ form_widget(receperio_form.rerun, {'label': 'Re-run check', 'attr': {'class': 'btn btn-danger confirm-submit', 'data-confirm-msg': 'Are you sure you want to rerun the imei/serial number checks? This costs £0.07.'}}) }}
-                                {{ form_end(receperio_form) }}
-                              </td>
-                        </tr>
-                        {% endif %}
-                        <tr>
-                            <td>
-                                pic-sure Status
-                            </td>
-                            <td>
-                                {% if policy.policyTerms.isPicSureEnabled %}
-                                    {% if policy.picSureStatus == 'claim-approved' and previousPicSureStatus is defined %}
-                                        pic-sure Approved due to a settled claim (previously was {% if previousPicSureStatus %}{{ previousPicSureStatus.data.picSureStatus }}{% else %}Not started{% endif %})
-                                    {% elseif policy.picSureStatus %}
-                                        {{ policy.picSureStatus }}
-                                    {% else %}
-                                        Not started
-                                    {% endif %}
-                                    {% if policy.getPicSureApprovedDate %}<br />Approved: {{ policy.getPicSureApprovedDate|date }}{% endif %}
-                                {% else %}
-                                    Non pic-sure policy
-                                {% endif %}
-                            </td>
-                        </tr>
-                        {% if policy.policyTerms.isPicSureEnabled %}
-                        <tr>
-                            <td>
-                                pic-sure Locations
-                            </td>
-                            <td>
-                                {% for location in policy.picsureLocations %}
-                                    [{{ location.coordinates[1]}},{{ location.coordinates[0]}}]
+                                            (Generated {{ file.created|date }})
+                                        </td>
+                                    </tr>
                                 {% endfor %}
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                pic-sure Circumvention
-                            </td>
-                            <td>
-                                {% if policy.picSureCircumvention is null %}
-                                    <span> Pre Anti-fraud check</span>
-                                {% elseif policy.picSureCircumvention == true and hadInvalidPicSureStatus == false %}
-                                    <span class="fa fa-exclamation-triangle"> Possible Fraud (i.e. too many attempts to do pic-sure and imei upload was too long, check events in mixpanel) <span class="fa fa-exclamation-triangle"></span></span>
-                                {% elseif policy.picSureCircumvention == false and hadInvalidPicSureStatus == true %}
-                                    <span class="fa fa-exclamation-triangle"> Previously invalidated (check the history log and previous pic-sure images) <span class="fa fa-exclamation-triangle"></span></span>
-                                {% elseif policy.picSureCircumvention == true and hadInvalidPicSureStatus == true %}
-                                    <span class="fa fa-exclamation-triangle"> Possible Fraud and previously invalidated (i.e. too many attempts to do pic-sure and imei upload was too long, check events in mixpanel, and check the history log and previous pic-sure images) <span class="fa fa-exclamation-triangle"></span></span>
-                                {% elseif policy.picSureCircumvention == false %}
-                                    <span class="fa fa-thumbs-up"> No Fraud Detected <span class="fa fa-thumbs-up"></span></span>
-                                {% endif %}
-                            </td>
-                        </tr>
-                        {% endif %}
-                    </table>
+                            </table>
+                        </div>
+                    </div>
                 </div>
-                <div class="col-md-5">
-                    <h2>Notes</h2>
-                    {% for note in policy.notesList %}
-                      <div class="row">
-                        <b>{{ note.date|date }} by {{ note.userName }}</b>
-                      </div>
-                      <div class="row">
-                          {% if note.type == 'call' %}
-                              Call result: <strong>{{ note.result }}</strong><br>
-                              Additional Actions: <strong>{% if note.actions|length == 0 %}n/a{% else %}{{ note.actions }}{% endif %}</strong><br>
-                              Additional Details: <strong>{% if note.notes|length == 0 %}n/a{% else %}{{ note.notes }}{% endif %}</strong>
-                          {% else %}
-                            {{ note.notes }}
-                          {% endif %}
-                      </div>
-                    {% endfor %}
-                    <hr class="strong">
-                    <div class="row">
-                    {{ form_start(note_form)}}
-                    {{ form_label(note_form.notes) }}
+                <div class="col-md-6">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Payments</h3>
+                        </div>
+                        <div class="panel-body">
+                            <table class="table table-striped">
+                                {% if policy.isPolicy and policy.getFirstSuccessfulUserPaymentCredit %}
+                                    <tr>
+                                        <td>Policy Purchased via</td>
+                                        <td>
+                                            {{ policy.getFirstSuccessfulUserPaymentCredit.getSourceForClaims }}
+                                        </td>
+                                    </tr>
+                                {% endif %}
+                                {% if policy.isPolicy %}
+                                    <tr>
+                                        <td>Policy Installments</td>
+                                        <td>
+                                            {% if policy.premiumPlan == 'monthly' %}
+                                                Bill every month on <span title="{{ policy.billing|date('d M Y H:i', 'Europe/London') }}">{{ policy.billing|date('jS','Europe/London') }} @ {{ policy.billing|date('H:m','Europe/London') }}</span>.
+                                                <br>
+                                            {% endif %}
+                                            {{ policy.premiumInstallmentCount }} installment(s) of £{{ policy.premiumInstallmentPrice| number_format(2, '.', ',') }}
+                                            {% if policy.hasPolicyDiscountPresent %}
+                                                <br>
+                                                £{{ policy.premium.annualDiscount|number_format(2, '.', ',')}} discount applied for
+                                                11 monthly payments of £{{ policy.premium.getAdjustedStandardMonthlyPremiumPrice|number_format(2, '.', ',')}}
+                                                & 1 final monthly payment of £{{ policy.premium.getAdjustedFinalMonthlyPremiumPrice|number_format(2, '.', ',')}}
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endif %}
+                                {% if policy.isPolicy %}
+                                    <tr>
+                                        <td>Policy Payments</td>
+                                        <td>
+                                            <div class="row">
+                                                <div class="col-sm-8">
+                                                    Paid £{{ policy.premiumPaid | number_format(2, '.', ',') }} of £{{ policy.premium.yearlyPremiumPrice| number_format(2, '.', ',') }}&nbsp;
+                                                    <br>
+                                                    {% if policy.isPolicy and policy.start %}
+                                                        {% if policy.end < now %}
+                                                            Premium of £{{ policy.getProratedPremium(policy.end) | number_format(2, '.', ',') }} was due on policy
+                                                        {% else %}
+                                                            Premium of £{{ policy.getProratedPremium() | number_format(2, '.', ',') }} due (daily calc)
+                                                        {% endif %}
+                                                        <br>
+                                                    {% endif %}
+                                                    (
+                                                    <span title="Successful payments credited to account">{{ policy.successfulPaymentCredits|length }} payment credited</span>
+                                                    {% if policy.failedPaymentCredits|length > 0 %}
+                                                        ; <i class="fa fa-warning"></i> {{ policy.failedPaymentCredits|length }} failed charges
+                                                    {% endif %}
+                                                    )
+
+                                                </div>
+                                                <div class="col-sm-4">
+                                                    <button type="button" class="btn btn-info" data-toggle="modal" data-target="#paymentsModal"
+                                                    >Payments</button>
+                                                </div>
+                                            </div>
+
+
+                                        </td>
+                                    </tr>
+                                {% endif %}
+                                {% if is_granted('ROLE_EMPLOYEE') and policy.isPolicy %}
+                                    <tr>
+                                        <td>Policy Commission</td>
+                                        <td>
+                                            Received £{{ policy.getTotalCommissionPaid() | number_format(2, '.', ',') }} of £{{ policy.premium.yearlyTotalCommission| number_format(2, '.', ',') }} (coverholder + broker)
+                                            {% if policy.isPolicy and policy.start %}
+                                                <br>
+                                                {% if policy.end < now %}
+                                                    Commission of £{{ policy.getProratedCommission(policy.end) | number_format(2, '.', ',') }}
+                                                    (
+                                                    £{{ policy.getProratedCoverholderCommission(policy.end) | number_format(2, '.', ',') }} /
+                                                    £{{ policy.getProratedBrokerCommission(policy.end) | number_format(2, '.', ',') }}
+                                                    )
+                                                    was due on policy
+                                                {% else %}
+                                                    Commission of £{{ policy.getProratedCommission() | number_format(2, '.', ',') }}
+                                                    (
+                                                    £{{ policy.getProratedCoverholderCommission() | number_format(2, '.', ',') }} /
+                                                    £{{ policy.getProratedBrokerCommission() | number_format(2, '.', ',') }}
+                                                    )
+                                                    due (daily calc)
+                                                {% endif %}
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endif %}
+                                {% if policy.isPolicy %}
+                                    <tr>
+                                        <td>Policy Payment Status</td>
+                                        <td>
+                                            {% if policy.isPolicyPaidToDate %}
+                                                <i class="fa fa-check text-success" title="Policy is paid to date"></i> Policy is paid to date
+                                            {% else %}
+                                                <i class="fa fa-warning text-danger" title="Policy is NOT paid to date"></i>
+                                                If still unpaid, policy will be cancelled on {{ policy.policyExpirationDate | date('d M Y H:i', 'Europe/London')}}
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endif %}
+                                {% if policy.hasCashback %}
+                                    <tr>
+                                        <td>Cashback</td>
+                                        <td>
+                                            £{{ policy.cashback.getDisplayableAmount| number_format(2, '.', ',') }} ({{policy.cashback.status}})
+                                        </td>
+                                    </tr>
+                                {% endif %}
+                                {% if policy.isPolicy and policy.payerOrUser.paymentMethod and
+                                    policy.payerOrUser.paymentMethod.getType == "judo" %}
+                                    <tr>
+                                        <td>Card</td>
+                                        <td class="{% if policy.payerOrUser.paymentMethod.isCardExpired %}danger{% endif %}">
+                                            {{ policy.payerOrUser.paymentMethod }}
+                                            <a title="Judopay" href="https://portal.judopay.com/payments/history?SearchQuery={{ policy.payerOrUser.id }}&SearchQueryType=0&AppName=&DeviceId=&From=&To=&AppId=0" target="_blank">
+                                                <i class="fa fa-external-link"></i>
+                                            </a>
+                                        </td>
+
+                                    </tr>
+                                {% elseif policy.isPolicy and policy.payerOrUser.paymentMethod and
+                                    policy.payerOrUser.paymentMethod.getType == "bacs" %}
+                                    <tr>
+                                        <td>Bacs</td>
+                                        <td class="">
+                                            {% if policy.payerOrUser.paymentMethod.bankAccount.isMandateInvalid %}
+                                                <s>{{ policy.payerOrUser.paymentMethod }}</s>
+                                            {% else %}
+                                                {{ policy.payerOrUser.paymentMethod }}
+                                            {% endif %}
+                                            (Mandate: {{ policy.payerOrUser.paymentMethod.bankAccount.mandateStatus }})
+                                            <br>
+                                            Initial date: {{  policy.payerOrUser.paymentMethod.bankAccount.initialNotificationDate| date('d M Y')   }}
+                                            <br>
+                                            and then on the {{  policy.payerOrUser.paymentMethod.bankAccount.standardNotificationDate|date('jS')  }}
+                                        </td>
+                                    </tr>
+                                {% endif %}
+                                {% if policy.payerOrUser.id != policy.user.id %}
+                                    <tr>
+                                        <td>Payer</td>
+                                        <td><a href="{{ path('admin_user', {'id': policy.payerOrUser.id }) }}">{{ policy.payerOrUser.name }}</a></td>
+                                    </tr>
+                                {% endif %}
+                            </table>
+                        </div>
                     </div>
-                    <div class="row">
-                      <div class="form-group">
-                        {{ form_widget(note_form.notes, {'attr': {'class': 'col-sm-12'}}) }}
-                      </div>
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Notes</h3>
+                        </div>
+                        <div class="panel-body" id="notesList">
+                            <div class="pull-right">
+                            <button type="button" class="btn btn-info" data-toggle="modal" data-target="#policyNotesModal"
+                            >Add Note <i class="fa fa-external-link"></i></button>
+                            </div>
+                            {% for note in policy.notesList %}
+                              <div class="row">
+                                  <div class="col-sm-12">
+                                      <b>{{ note.date|date }} by {{ note.userName }}</b>
+                                  </div>
+                              </div>
+                              <div class="row">
+                                  <div class="col-sm-12">
+                                      {% if note.type == 'call' %}
+                                          Call result: <strong>{{ note.result }}</strong><br>
+                                          Additional Actions: <strong>{% if note.actions|length == 0 %}n/a{% else %}{{ note.actions }}{% endif %}</strong><br>
+                                          Additional Details: <strong>{% if note.notes|length == 0 %}n/a{% else %}{{ note.notes }}{% endif %}</strong>
+                                      {% else %}
+                                        {{ note.notes }}
+                                      {% endif %}
+                                  </div>
+                              </div>
+                            {% endfor %}
+                        </div>
                     </div>
-                    <div class="row">
-                        {{ form_widget(note_form.add, {'label': 'Add Note', 'attr': {'class': 'btn btn-success'}}) }}
-                        {{ form_end(note_form) }}
+
+                    {% if policy.company %}
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">Company</h3>
+                            </div>
+                            <div class="panel-body">
+                                <table class="table table-striped">
+                                    <tr>
+                                        <td>Name</td>
+                                        <td>{{ policy.company.name }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Address</td>
+                                        <td>{{ policy.company.address }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Policies</td>
+                                        <td>
+                                            <strong>{{ policy.company.policies|length }}</strong>&nbsp;:&nbsp;
+                                            {% for companyPolicy in policy.company.policies %}
+                                                <a href="{{ path(policy_route, {'id': companyPolicy.id }) }}">{{ companyPolicy.policyNumber }}</a>;
+                                            {% endfor %}
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Anti Fraud Checks</h3>
+                        </div>
+                        <div class="panel-body">
+                            <table class="table table-striped">
+                                <tr>
+                                    <td>Phone verified <i class="fa fa-info" title="User has logged into their account via a mobile phone - same make/model"></i></td>
+                                    <td>{% if policy.phoneVerified %}Yes{% elseif policy.phoneVerified is null %}Unknown{% else %}No{% endif %}</td>
+                                </tr>
+                                <tr>
+                                    <td>Screen verified <i class="fa fa-info" title="User has sent in a photo which validates their screen was not damaged prior to policy taken out."></i></td>
+                                    <td>{% if policy.screenVerified %}Yes{% elseif policy.screenVerified is null %}Unknown{% else %}No{% endif %}</td>
+                                </tr>
+                                <tr>
+                                    <td>Viewed phone damaged cancellation page</td>
+                                    <td>{% if policy.hasViewedCancellationPage %}{{ policy.getViewedCancellationPage|date }}{% else %}No{% endif %}</td>
+                                </tr>
+                                <tr>
+                                    <td>User Signup - Country of Ip</td>
+                                    <td>{{ fraud.signup_country }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Other Users w/same signup ips</td>
+                                    <td>{{ fraud.duplicate_ip }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Other Users w/same postcode</td>
+                                    <td>{% if fraud.duplicate_postcode %}{{ fraud.duplicate_postcode }}{% else %}N/A{% endif %}</td>
+                                </tr>
+                                <tr>
+                                    <td>Other Users w/possibly same account details (for card: same last 4, type, exp date, for bacs: same details)</td>
+                                    <td>{{ fraud.duplicate_bank_accounts }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Other Users w/mobile numbers very close numerically to user</td>
+                                    <td>{{ fraud.near_mobile_numbers }}</td>
+                                </tr>
+                                <tr>
+                                    <td>IMEI belonged to different user</td>
+                                    <td>Not yet implemented</td>
+                                </tr>
+                                <tr>
+                                    <td>Network Cancellations</td>
+                                    <td>{{ fraud.network_cancellations }}</td>
+                                </tr>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
 
-                {% if policy.company %}
-                <h3>Company</h3>
-                <table class="table table-striped">
-                    <tr>
-                        <td>Name</td>
-                        <td>{{ policy.company.name }}</td>
-                    </tr>
-                    <tr>
-                        <td>Address</td>
-                        <td>{{ policy.company.address }}</td>
-                    </tr>
-                    <tr>
-                        <td>Policies</td>
-                        <td>
-                          <strong>{{ policy.company.policies|length }}</strong>&nbsp;:&nbsp;
-                          {% for companyPolicy in policy.company.policies %}
-                            <a href="{{ path(policy_route, {'id': companyPolicy.id }) }}">{{ companyPolicy.policyNumber }}</a>;
-                          {% endfor %}
-                        </td>
-                    </tr>
-                </table>
-                {% endif %}
-
-                {% if policy.isPolicy %}
-                <h3>Pot</h3>
-                <table class="table table-striped">
-                    <tr>
-                        <td>Invitations</td>
-                        <td>{{ policy.invitations|length }}</td>
-                    </tr>
-                    <tr>
-                        <td>Standard Connections</td>
-                        <td>
-                          <strong>{{ policy.standardConnections|length }}</strong>&nbsp;:&nbsp;
-                          {% for connection in policy.standardConnections %}
-                            <a href="{{ path(policy_route, {'id': connection.linkedPolicy.id }) }}">{{ connection.linkedUser.name }}</a>;
-                          {% endfor %}
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Reward Connections</td>
-                        <td>
-                          <strong>{{ policy.rewardConnections|length }}</strong>&nbsp;:&nbsp;
-                          {% for connection in policy.rewardConnections %}
-                            {{ connection.linkedUser.name }};
-                          {% endfor %}
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Current Pot Value</td>
-                        <td>£{{ policy.potValue|number_format(2, '.', ',') }}</td>
-                    </tr>
-                    <tr>
-                        <td>Current Pot Value</td>
-                        <td>£{{ policy.potValue|number_format(2, '.', ',') }}</td>
-                    </tr>
-                </table>
-                {% endif %}
-                <h3>Anti Fraud Checks</h3>
-                <table class="table table-striped">
-                    <tr>
-                        <td>Phone verified <i class="fa fa-info" title="User has logged into their account via a mobile phone - same make/model"></i></td>
-                        <td>{% if policy.phoneVerified %}Yes{% elseif policy.phoneVerified is null %}Unknown{% else %}No{% endif %}</td>
-                    </tr>
-                    <tr>
-                        <td>Screen verified <i class="fa fa-info" title="User has sent in a photo which validates their screen was not damaged prior to policy taken out."></i></td>
-                        <td>{% if policy.screenVerified %}Yes{% elseif policy.screenVerified is null %}Unknown{% else %}No{% endif %}</td>
-                    </tr>
-                    <tr>
-                        <td>Viewed phone damaged cancellation page</td>
-                        <td>{% if policy.hasViewedCancellationPage %}{{ policy.getViewedCancellationPage|date }}{% else %}No{% endif %}</td>
-                    </tr>
-                    <tr>
-                        <td>User Signup - Country of Ip</td>
-                        <td>{{ fraud.signup_country }}</td>
-                    </tr>
-                    <tr>
-                        <td>Other Users w/same signup ips</td>
-                        <td>{{ fraud.duplicate_ip }}</td>
-                    </tr>
-                    <tr>
-                        <td>Other Users w/same postcode</td>
-                        <td>{% if fraud.duplicate_postcode %}{{ fraud.duplicate_postcode }}{% else %}N/A{% endif %}</td>
-                    </tr>
-                    <tr>
-                        <td>Other Users w/possibly same account details (for card: same last 4, type, exp date, for bacs: same details)</td>
-                        <td>{{ fraud.duplicate_bank_accounts }}</td>
-                    </tr>
-                    <tr>
-                        <td>Other Users w/mobile numbers very close numerically to user</td>
-                        <td>{{ fraud.near_mobile_numbers }}</td>
-                    </tr>
-                    <tr>
-                        <td>IMEI belonged to different user</td>
-                        <td>Not yet implemented</td>
-                    </tr>
-                    <tr>
-                        <td>Network Cancellations</td>
-                      <td>{{ fraud.network_cancellations }}</td>
-                    </tr>
-                </table>
-                <h3>Files</h3>
-                <table class="table table-striped">
-                    {% for file in policy.policyFiles %}
-                    <tr>
-                        <td>{{ file.fileType }}</td>
-                        <td>
-                            {% if is_granted('ROLE_EMPLOYEE') %}
-                                <a href="{{ path('admin_download_file_attachment', {'id': file.id}) }}">{{ file.fileName }}</a>
-                            {% elseif is_granted('ROLE_CLAIMS') %}
-                                <a href="{{ path('claims_download_file', {'id': file.id}) }}">{{ file.fileName }}</a>
-                            {% endif %}
-                            (Generated {{ file.created|date }})
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </table>
         </div>
         <div role="tabpanel" class="tab-pane" id="claims">
             <h4>Claims</h4>
@@ -541,18 +617,37 @@
                         <th>CrimeRef</th>
                         <th>Flags</th>
                         <th>Notes</th>
+                        {% if is_granted('ROLE_CUSTOMER_SERVICES') %}
+                        <th>Admin</th>
+                        {% endif %}
                     </tr>
                     {% for claim in policy.claims %}
                     <tr>
                         <td style="width: 20%;">{{ claim.recordedDate|date }}</td>
                         <td style="width: 10%;" id="claim_{{ claim.id }}">
-                            <button type="button" class="btn btn-link" data-toggle="modal" data-target="#claimsModal"
-                            data-claim='{{ claim.toModalArray()|json_encode }}' data-documents='{{ s3DownloadLinks(claim)|json_encode }}'>
-                                {% if claim.number %}{{ claim.number }}{% else %}N/A{% endif %}</button>
+                            {% if is_granted('ROLE_EMPLOYEE') %}
+                                <button type="button" class="btn btn-link" data-route="{{ path('admin_claims_form_policy', {'id': claim.id}) }}" data-toggle="modal" data-target="#claimsModal">
+                                    {% if claim.number %}{{ claim.number }}{% else %}N/A{% endif %}
+                                </button>
+                            {% elseif is_granted('ROLE_CLAIMS') %}
+                                <button type="button" class="btn btn-link" data-route="{{ path('claims_claims_form_policy', {'id': claim.id}) }}" data-toggle="modal" data-target="#claimsModal">
+                                    {% if claim.number %}{{ claim.number }}{% else %}N/A{% endif %}
+                                </button>
+                            {% endif %}
                         </td>
                         <td style="width: 10%;">{{ claim.type }}</td>
                         <td style="width: 10%;">{{ claim.status }}</td>
-                        <td style="width: 10%;">£{{ claim.expectedExcess }}</td>
+                        <td style="width: 10%;">
+                            {% if equal_to_two_dp(claim.expectedExcessValue, claim.expectedExcessValue(true)) %}
+                                <span title="Verified excess matches older calculation of £{{ claim.expectedExcessValue(true)|number_format(2, '.', ',') }}">
+                                    £{{ claim.expectedExcessValue }}
+                                </span>
+                            {% else %}
+                                <span class="text-danger" title="Warning excess does not matches older calculation of £{{ claim.expectedExcessValue(true)|number_format(2, '.', ',') }}">
+                                    £{{ claim.expectedExcessValue }}
+                                </span>
+                            {% endif %}
+                        </td>
                         <td style="width: 10%;">£{{ claim.totalChargesWithVat|number_format(2, '.', ',') }}</td>
                         <td style="width: 10%;">{% if claim.fnolRisk %}{{ claim.fnolRisk }}{% else %}??{% endif %} / {% if claim.fnolRiskReason %}{{ claim.fnolRiskReason }}{% else %}??{% endif %}</td>
                         <td  style="width: 10%;" class="{% if claim.crimeRef|length > 0 %}{% if claim.validCrimeRef %}success{% elseif not claim.validCrimeRef %}danger{% endif %}{% endif %}">
@@ -563,12 +658,11 @@
                             {% if claim.finalSuspicion %}Final suspicion;{% endif %}
                           {% if claim.shouldCancelPolicy %}Policy should be cancelled;{% endif %}
                         </td>
-                        <td style="width: 20%;">{{ claim.notes }}
-                            <button title="Edit notes" type="button" class="btn btn-primary"
-                                    data-toggle="modal" data-target="#notesModal"
-                                data-update="{% if is_granted('ROLE_EMPLOYEE') %}{{ path('admin_claim_notes', {'id': claim.id}) }}{% else %}{{ path('claims_notes', {'id': claim.id}) }}{% endif %}"
-                                data-notes="{{ claim.notes }}"><i class="fa fa-edit"></i></button>
-                              {% if is_granted('ROLE_CUSTOMER_SERVICES') %}
+                        <td style="width: 10%;">
+                            <span title="{{ claim.notes }}">{{ claim.notes|slice(0, 20) }}{% if claim.notes|length > 20 %}...{% endif %}</span>
+                        </td>
+                        {% if is_granted('ROLE_CUSTOMER_SERVICES') %}
+                        <td style="width: 10%;">
                             <button title="Flags" type="button" class="btn btn-primary"
                                     data-toggle="modal" data-target="#flagsModal"
                                     data-flags="{{ claim.ignoreWarningFlags|json_encode }}"
@@ -578,16 +672,28 @@
                                     data-toggle="modal" data-target="#withdrawModal"
                                     data-update="{{ path('admin_claim_withdraw', {'id': claim.id}) }}"
                             ><i class="fa fa-minus"></i></button>
-                            {% endif %}
                         </td>
+                        {% endif %}
                     </tr>
+
                     {% endfor %}
                 </table>
             {% else %}
             <h4>No claims</h4>
             {% endif %}
             <hr />
-            <h4>Linked Claims (e.g. Policy Upgrade)</h4>
+            <h4>
+                {% if is_granted('ROLE_CUSTOMER_SERVICES') %}
+                <i class="fa fa-shield" title="Customer Service only"></i>
+                Linked Claims (e.g. Policy Upgrade)
+                <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#linkClaimForm">
+                    <span class="glyphicon glyphicon-new-window" aria-hidden="true"></span>
+                    Link Claim
+                </button>
+                {% else %}
+                Linked Claims (e.g. Policy Upgrade)
+                {% endif %}
+            </h4>
             {% if policy.linkedClaims|length > 0 %}
                 <table class="table table-striped">
                     <tr>
@@ -608,9 +714,15 @@
                             {{ claim.policy.policyNumber }}
                         </a></td>
                         <td style="width: 10%;" id="claim_{{ claim.id }}">
-                            <button type="button" class="btn btn-link" data-toggle="modal" data-target="#claimsModal"
-                            data-claim='{{ claim.toModalArray|json_encode }}'>
-                                {{ claim.number }}</button>
+                            {% if is_granted('ROLE_EMPLOYEE') %}
+                                <button type="button" class="btn btn-link" data-route="{{ path('admin_claims_form_policy', {'id': claim.id}) }}" data-toggle="modal" data-target="#claimsModal">
+                                    {% if claim.number %}{{ claim.number }}{% else %}N/A{% endif %}
+                                </button>
+                            {% elseif is_granted('ROLE_CLAIMS') %}
+                                <button type="button" class="btn btn-link" data-route="{{ path('claims_claims_form_policy', {'id': claim.id}) }}" data-toggle="modal" data-target="#claimsModal">
+                                    {% if claim.number %}{{ claim.number }}{% else %}N/A{% endif %}
+                                </button>
+                            {% endif %}
                         </td>
                         <td style="width: 10%;">{{ claim.type }}</td>
                         <td style="width: 10%;">{{ claim.status }}</td>
@@ -844,6 +956,23 @@
                         {{ form_end(resend_email_form) }}
                       </td>
                 </tr>
+                <tr>
+                    <td>Taste Card</td>
+                    <td>
+                        <p>
+                            {% if policy.tasteCard %}
+                                <strong>{{ policy.tasteCard }}</strong>
+                            {% else %}
+                                No TasteCard.
+                            {% endif %}
+                        </p>
+                        <p>
+                            <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#tasteCardForm">
+                                Update / Resend
+                            </button>
+                        </p>
+                    </td>
+                </tr>
             </table>
             <h3>Photos</h3>
             <table class="table table-striped">
@@ -879,17 +1008,17 @@
                         {{ form_end(screen_upload_form)}}
                     </td>
                 </tr>
-                {% if is_granted('ROLE_ADMIN') %}
+                {% if is_granted('ROLE_CUSTOMER_SERVICES') %}
                 <tr>
-                    <td>pic-sure</td>
+                    <td><i class="fa fa-shield"></i> pic-sure status</td>
                     <td>
                         {% if policy.policyTerms.isPicSureEnabled %}
                             Status: {% if policy.picSureStatus %}{{ policy.picSureStatus }}{% else %}Not started{% endif %}
                             {% if not policy.isPicSureValidated %}
-                                {{ form_start(picsure_form)}}
-                                {{ form_widget(picsure_form.approve, {'attr': {'class': 'btn btn-danger confirm-submit', 'data-confirm-msg': 'Are you sure you want to approve pic-sure?'}})}}
-                                {{ form_widget(picsure_form.preapprove, {'attr': {'class': 'btn btn-danger confirm-submit', 'data-confirm-msg': 'Are you sure you want to pre-approve pic-sure?'}})}}
-                                {{ form_end(picsure_form)}}
+                                <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#picsureForm">
+                                    <span class="glyphicon glyphicon-new-window" aria-hidden="true"></span>
+                                    Change Status
+                                </button>
                             {% endif %}
                         {% else %}
                             Non pic-sure policy
@@ -1079,9 +1208,23 @@
                             <div class="form-group">
                               {{ policy.imei }}
                             </div>
-                            <button type="button" class="btn btn-danger"
-                                    data-toggle="modal"
-                                    data-target="#imeiForm">Update
+                            <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#imeiForm">
+                                <span class="glyphicon glyphicon-new-window" aria-hidden="true"></span>
+                                Update
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Detected Imei</td>
+                    <td>
+                        <form class="form-inline">
+                            <div class="form-group">
+                                {{ policy.detectedImei }}
+                            </div>
+                            <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#detectedImeiForm">
+                                <span class="glyphicon glyphicon-new-window" aria-hidden="true"></span>
+                                Update
                             </button>
                         </form>
                     </td>
@@ -1113,8 +1256,9 @@
                 <tr>
                     <td><i class="fa fa-lock" title="Admin only"></i> Requeue Salva Policy</td>
                     <td>
-                        <button type="button" class="btn btn-danger" data-toggle="modal"
-                                data-target="#salvaRequeueForm">Requeue
+                        <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#salvaRequeueForm">
+                            <span class="glyphicon glyphicon-new-window" aria-hidden="true"></span>
+                            Requeue
                         </button>
                     </td>
                 </tr>
@@ -1123,16 +1267,23 @@
                     <td><i class="fa fa-lock" title="Admin only"></i> Salva Status</td>
                     <td>
                         {{ policy.salvaStatus }}
-                        <button type="button" class="btn btn-danger" data-toggle="modal"
-                                data-target="#salvaStatusForm">Change Status</button>
+                        <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#salvaStatusForm">
+                            <span class="glyphicon glyphicon-new-window" aria-hidden="true"></span>
+                            Change Status
+                        </button>
                     </td>
                 </tr>
                 {% endif %}
             </table>
 
             {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:AdminEmployee:imeiForm', 'policy': policy, 'id': 'imeiForm'} %}
-            {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:Admin:salvaRequeueForm', 'policy': policy, 'id': 'salvaRequeueForm'} %}
-            {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:Admin:salvaStatusForm', 'policy': policy, 'id': 'salvaStatusForm'} %}
+            {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:AdminEmployee:detectedImeiForm', 'policy': policy, 'id': 'detectedImeiForm'} %}
+            {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:AdminEmployee:picsureForm', 'policy': policy, 'id': 'picsureForm'} %}
+            {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:AdminEmployee:tasteCardForm', 'policy': policy, 'id': 'tasteCardForm', 'title': 'Taste Card Settings'} %}
+            {% if is_granted('ROLE_ADMIN') %}
+                {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:Admin:salvaRequeueForm', 'policy': policy, 'id': 'salvaRequeueForm'} %}
+                {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:Admin:salvaStatusForm', 'policy': policy, 'id': 'salvaStatusForm'} %}
+            {% endif %}
 
             {% endif %}
             {% if is_granted('ROLE_ADMIN') %}
@@ -1428,8 +1579,6 @@
         </div>
     {% endif %}
 
-    {% include 'AppBundle::Claims/claimsModal.html.twig' with {'route': 'admin_policy', 'policyId': policy.id} %}
-
     {% if is_granted('ROLE_ADMIN') %}
     <div class="modal fade" id="bacsModal" tabindex="-1" role="dialog">
       <div class="modal-dialog" role="document" style="width: 60%;">
@@ -1575,3 +1724,44 @@
             </div>
         </div>
     {% endif %}
+
+    {% if is_granted('ROLE_CUSTOMER_SERVICES') %}
+        {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:AdminEmployee:linkClaimForm', 'policy': policy, 'id': 'linkClaimForm'} %}
+    {% endif %}
+
+    {% if is_granted('ROLE_ADMIN') %}
+        {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:Admin:policyStatusForm', 'policy': policy, 'id': 'policyStatusForm'} %}
+    {% endif %}
+    {% include 'AppBundle::Claims/claimsModal.html.twig' %}
+    
+<div class="modal fade" id="policyNotesModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Add Note</h4>
+            </div>
+            <div class="modal-body">
+                {{ form_start(note_form)}}
+                <div class="row">
+                    <div class="col-sm-12">
+                    {{ form_label(note_form.notes) }}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="form-group">
+                            {{ form_widget(note_form.notes, {'attr': {'rows': 3, 'cols': '60'}}) }}
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12">
+                        {{ form_widget(note_form.add, {'label': 'Add Note', 'attr': {'class': 'btn btn-success'}}) }}
+                    </div>
+                </div>
+                {{ form_end(note_form) }}
+            </div>
+        </div>
+    </div>
+</div>

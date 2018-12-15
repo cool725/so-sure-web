@@ -1,0 +1,28 @@
+
+Payment failed: Update your payment details today to stay insured
+
+Payment failed for third third time
+
+{% if policy.user.paymentMethod.cardType is defined %}
+We tried again to take your monthly payment of£{{ policy.premium.monthlyPremiumPrice }}, but your account appears to be missing a payment method.
+{% endif %}
+
+If you fail to make payment, your policy will be cancelled in {{ policy.policyExpirationDateDays }} days
+
+To keep your {{ policy.phone }} insured against loss, damage &amp; theft you need to update your payment details.
+
+Update my payment details: {{ branch_card_url }}
+
+Have a question or issue? contact us: {{ contact_us_url }}
+
+============================================================
+** (http://www.twitter.com/wearesosure)
+** (https://www.facebook.com/wearesosure)
+** (http://wearesosure.com)
+** (http://blog.wearesosure.com)
+** (mailto:hello@wearesosure.com)
+
+Copyright {{ 'now'|date('Y') }} so-sure Limited, All rights reserved.
+
+Our mailing address is:
+so-sure, Martin House, 5 Martin Lane, London EC4R 0DP, United Kingdom

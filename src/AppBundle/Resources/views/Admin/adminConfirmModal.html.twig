@@ -1,11 +1,13 @@
 <div class="modal fade confirmModal" id="{{ id }}" tabindex="-1" role="dialog">
-  <div class="modal-dialog" role="document" style="width: 50%">
-    <div class="modal-content">
-      <div class="modal-header">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content" style="border-radius: 6px;">
+      <div class="modal-header" style="border-top-left-radius: 6px; border-top-right-radius: 6px;">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
               aria-hidden="true">&times;</span>
         </button>
-        <h4 class="modal-title">Warning</h4>
+        <h4 class="modal-title">
+            {% if title is defined %}{{ title }}{% else %}Warning{% endif %}
+        </h4>
       </div>
 
       {{ render(controller(route, {'id': policy.id})) }}

@@ -18,6 +18,8 @@ class DataChange
     const COMPARE_OBJECT_SERIALIZE = 'object-serialize';
     const COMPARE_TO_NULL = 'to-null';
     const COMPARE_BACS = 'bacs';
+    const COMPARE_JUDO = 'judo';
+    const COMPARE_PAYMENT_METHOD_CHANGED = 'payment-method';
 
     /**
      * @Required

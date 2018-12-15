@@ -1,0 +1,26 @@
+
+Action required to keep your phone insured
+
+{% if policy.user.paymentMethod.cardType is defined %}
+Your card ending {{ policy.user.paymentMethod.cardLastFour }} was declined and we we were unable to take your monthly payment of £{{ policy.premium.monthlyPremiumPrice }}
+{% endif %}
+
+If you fail to make payment, your policy will be cancelled in {{ policy.policyExpirationDateDays }} days
+
+To keep your {{ policy.phone }} insured against loss, damage & theft you need to update your payment details.
+
+Update my payment details: {{ branch_payment_details_url }}
+
+Have a question or issue? contact us: {{ contact_us_url }}
+
+============================================================
+** (http://www.twitter.com/wearesosure)
+** (https://www.facebook.com/wearesosure)
+** (http://wearesosure.com)
+** (http://blog.wearesosure.com)
+** (mailto:hello@wearesosure.com)
+
+Copyright {{ 'now'|date('Y') }} so-sure Limited, All rights reserved.
+
+Our mailing address is:
+so-sure, Martin House, 5 Martin Lane, London EC4R 0DP, United Kingdom

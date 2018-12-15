@@ -4,6 +4,7 @@ namespace AppBundle\Tests\Classes;
 
 use AppBundle\Classes\DaviesHandlerClaim;
 use AppBundle\Document\Claim;
+use AppBundle\Document\PolicyTerms;
 
 /**
  * @group unit
@@ -771,107 +772,112 @@ class DaviesHandlerClaimTest extends \PHPUnit\Framework\TestCase
         $davies = new DaviesHandlerClaim();
         $davies->lossType = "Loss - From Pocket";
         $this->assertEquals(Claim::TYPE_LOSS, $davies->getClaimType());
-        $this->assertEquals(70, $davies->getExpectedExcess(false, false));
-        $this->assertEquals(70, $davies->getExpectedExcess(true, false));
-        $this->assertEquals(70, $davies->getExpectedExcess(true, true));
-        $this->assertEquals(150, $davies->getExpectedExcess(false, true));
 
         $davies->lossType = "Warranty - Audio Fault";
         $this->assertEquals(Claim::TYPE_WARRANTY, $davies->getClaimType());
-        $this->assertEquals(50, $davies->getExpectedExcess(false, false));
-        $this->assertEquals(50, $davies->getExpectedExcess(true, false));
-        $this->assertEquals(50, $davies->getExpectedExcess(true, true));
-        $this->assertEquals(150, $davies->getExpectedExcess(false, true));
 
         $davies->lossType = "Accidental Damage - Dropped (Away From Home)   ";
         $this->assertEquals(Claim::TYPE_DAMAGE, $davies->getClaimType());
-        $this->assertEquals(50, $davies->getExpectedExcess(false, false));
-        $this->assertEquals(50, $davies->getExpectedExcess(true, false));
-        $this->assertEquals(50, $davies->getExpectedExcess(true, true));
-        $this->assertEquals(150, $davies->getExpectedExcess(false, true));
 
         $davies->lossType = "Theft - From Pocket";
         $this->assertEquals(Claim::TYPE_THEFT, $davies->getClaimType());
-        $this->assertEquals(70, $davies->getExpectedExcess(false, false));
-        $this->assertEquals(70, $davies->getExpectedExcess(true, false));
-        $this->assertEquals(70, $davies->getExpectedExcess(true, true));
-        $this->assertEquals(150, $davies->getExpectedExcess(false, true));
 
         $davies->lossType = "Extended Warranty - Audio Fault";
         $this->assertEquals(Claim::TYPE_EXTENDED_WARRANTY, $davies->getClaimType());
-        $this->assertEquals(50, $davies->getExpectedExcess(false, false));
-        $this->assertEquals(50, $davies->getExpectedExcess(true, false));
-        $this->assertEquals(50, $davies->getExpectedExcess(true, true));
-        $this->assertEquals(150, $davies->getExpectedExcess(false, true));
     }
 
     public function testClaimsExcess()
     {
+        $claim = new Claim();
+
         $davies = new DaviesHandlerClaim();
         $davies->lossType = "Loss - From Pocket";
-        $davies->excess = 70;
         $this->assertEquals(Claim::TYPE_LOSS, $davies->getClaimType());
-        $this->assertTrue($davies->isExcessValueCorrect(false, false));
-        $this->assertTrue($davies->isExcessValueCorrect(true, false));
-        $this->assertTrue($davies->isExcessValueCorrect(true, true));
-        $this->assertFalse($davies->isExcessValueCorrect(false, true));
+        $claim->setType($davies->getClaimType(), true);
+
+        $davies->excess = 70;
+        $claim->setExpectedExcess(PolicyTerms::getLowExcess());
+        $this->assertTrue($davies->isExcessValueCorrect($claim));
+
         $davies->excess = 150;
-        $this->assertTrue($davies->isExcessValueCorrect(false, true));
+        $claim->setExpectedExcess(PolicyTerms::getHighExcess());
+        $this->assertTrue($davies->isExcessValueCorrect($claim, true));
+
         $davies->excess = -150;
-        $this->assertTrue($davies->isExcessValueCorrect(false, true, true));
-        $this->assertFalse($davies->isExcessValueCorrect(false, true, false));
+        $claim->setExpectedExcess(PolicyTerms::getHighExcess());
+        $this->assertTrue($davies->isExcessValueCorrect($claim, true));
+        $this->assertFalse($davies->isExcessValueCorrect($claim, false));
 
         $davies->lossType = "Warranty - Audio Fault";
-        $davies->excess = 50;
         $this->assertEquals(Claim::TYPE_WARRANTY, $davies->getClaimType());
-        $this->assertTrue($davies->isExcessValueCorrect(false, false));
-        $this->assertTrue($davies->isExcessValueCorrect(true, false));
-        $this->assertTrue($davies->isExcessValueCorrect(true, true));
-        $this->assertFalse($davies->isExcessValueCorrect(false, true));
+        $claim->setType($davies->getClaimType(), true);
+
+        $davies->excess = 50;
+        $claim->setExpectedExcess(PolicyTerms::getLowExcess());
+        $this->assertTrue($davies->isExcessValueCorrect($claim, false));
+
         $davies->excess = 150;
-        $this->assertTrue($davies->isExcessValueCorrect(false, true));
+        $claim->setExpectedExcess(PolicyTerms::getHighExcess());
+        $this->assertTrue($davies->isExcessValueCorrect($claim, true));
+
         $davies->excess = -150;
-        $this->assertTrue($davies->isExcessValueCorrect(false, true, true));
-        $this->assertFalse($davies->isExcessValueCorrect(false, true, false));
+        $claim->setExpectedExcess(PolicyTerms::getHighExcess());
+        $this->assertTrue($davies->isExcessValueCorrect($claim, true));
+        $this->assertFalse($davies->isExcessValueCorrect($claim, false));
 
         $davies->lossType = "Accidental Damage - Dropped (Away From Home)   ";
-        $davies->excess = 50;
         $this->assertEquals(Claim::TYPE_DAMAGE, $davies->getClaimType());
-        $this->assertTrue($davies->isExcessValueCorrect(false, false));
-        $this->assertTrue($davies->isExcessValueCorrect(true, false));
-        $this->assertTrue($davies->isExcessValueCorrect(true, true));
-        $this->assertFalse($davies->isExcessValueCorrect(false, true));
+        $claim->setType($davies->getClaimType(), true);
+
+        $davies->excess = 50;
+        $claim->setExpectedExcess(PolicyTerms::getLowExcess());
+        $this->assertTrue($davies->isExcessValueCorrect($claim, false));
+
+        $claim->setExpectedExcess(PolicyTerms::getHighExcess());
+        $this->assertFalse($davies->isExcessValueCorrect($claim, false));
+
         $davies->excess = 150;
-        $this->assertTrue($davies->isExcessValueCorrect(false, true));
+        $claim->setExpectedExcess(PolicyTerms::getHighExcess());
+        $this->assertTrue($davies->isExcessValueCorrect($claim, true));
+
         $davies->excess = -150;
-        $this->assertTrue($davies->isExcessValueCorrect(false, true, true));
-        $this->assertFalse($davies->isExcessValueCorrect(false, true, false));
+        $claim->setExpectedExcess(PolicyTerms::getHighExcess());
+        $this->assertTrue($davies->isExcessValueCorrect($claim, true));
+        $this->assertFalse($davies->isExcessValueCorrect($claim, false));
 
         $davies->lossType = "Theft - From Pocket";
-        $davies->excess = 70;
         $this->assertEquals(Claim::TYPE_THEFT, $davies->getClaimType());
-        $this->assertTrue($davies->isExcessValueCorrect(false, false));
-        $this->assertTrue($davies->isExcessValueCorrect(true, false));
-        $this->assertTrue($davies->isExcessValueCorrect(true, true));
-        $this->assertFalse($davies->isExcessValueCorrect(false, true));
+        $claim->setType($davies->getClaimType(), true);
+
+        $davies->excess = 70;
+        $claim->setExpectedExcess(PolicyTerms::getLowExcess());
+        $this->assertTrue($davies->isExcessValueCorrect($claim, false));
+
         $davies->excess = 150;
-        $this->assertTrue($davies->isExcessValueCorrect(false, true));
+        $claim->setExpectedExcess(PolicyTerms::getHighExcess());
+        $this->assertTrue($davies->isExcessValueCorrect($claim, true));
+
         $davies->excess = -150;
-        $this->assertTrue($davies->isExcessValueCorrect(false, true, true));
-        $this->assertFalse($davies->isExcessValueCorrect(false, true, false));
+        $claim->setExpectedExcess(PolicyTerms::getHighExcess());
+        $this->assertTrue($davies->isExcessValueCorrect($claim, true));
+        $this->assertFalse($davies->isExcessValueCorrect($claim, false));
 
         $davies->lossType = "Extended Warranty - Audio Fault";
-        $davies->excess = 50;
         $this->assertEquals(Claim::TYPE_EXTENDED_WARRANTY, $davies->getClaimType());
-        $this->assertTrue($davies->isExcessValueCorrect(false, false));
-        $this->assertTrue($davies->isExcessValueCorrect(true, false));
-        $this->assertTrue($davies->isExcessValueCorrect(true, true));
-        $this->assertFalse($davies->isExcessValueCorrect(false, true));
+        $claim->setType($davies->getClaimType(), true);
+
+        $davies->excess = 50;
+        $claim->setExpectedExcess(PolicyTerms::getLowExcess());
+        $this->assertTrue($davies->isExcessValueCorrect($claim, false));
+
         $davies->excess = 150;
-        $this->assertTrue($davies->isExcessValueCorrect(false, true));
+        $claim->setExpectedExcess(PolicyTerms::getHighExcess());
+        $this->assertTrue($davies->isExcessValueCorrect($claim, true));
+
         $davies->excess = -150;
-        $this->assertTrue($davies->isExcessValueCorrect(false, true, true));
-        $this->assertFalse($davies->isExcessValueCorrect(false, true, false));
+        $claim->setExpectedExcess(PolicyTerms::getHighExcess());
+        $this->assertTrue($davies->isExcessValueCorrect($claim, true));
+        $this->assertFalse($davies->isExcessValueCorrect($claim, false));
     }
 
     /**

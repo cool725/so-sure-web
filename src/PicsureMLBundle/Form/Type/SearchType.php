@@ -9,6 +9,7 @@ use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use PicsureMLBundle\Document\TrainingData;
 use PicsureMLBundle\Service\PicsureMLService;
@@ -53,6 +54,7 @@ class SearchType extends BaseType
                     'Damaged' => TrainingData::LABEL_DAMAGED,
                 ]
             ])
+            ->add('forDetection', CheckboxType::class, ['required' => false])
             ->add('images_per_page', IntegerType::class, [
                 'required' => true,
                 'attr' => array('min' => 1, 'placeholder' => 32)

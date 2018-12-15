@@ -24,6 +24,7 @@ class ApiControllerTest extends BaseApiControllerTest
     public function setUp()
     {
         self::$redis->flushdb();
+        self::$phone = null;
     }
 
     public static function setUpBeforeClass()

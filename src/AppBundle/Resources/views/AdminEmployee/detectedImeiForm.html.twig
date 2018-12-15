@@ -1,0 +1,59 @@
+{% block body %}
+
+    {{ form_start(form) }}
+    <div class="modal-body">
+        <div class="container-fluid">
+            <div class="form-row">
+                <div class="col">
+                    <p>Are you sure you want to update this Detected IMEI? Common cases for this would be:</p>
+                    <div class="list-group cases">
+                        <a class="list-group-item list-group-item-action">Reported via detected page</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" required> I've read the list of common reasons above
+                    </label>
+                </div>
+
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" required> If it is not a common reason, I have verified the exception is allowed
+                    </label>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <label>Current IMEI</label>
+                <p>{{ policy.imei }}</p>
+            </div>
+
+            <div class="form-row">
+                <label>Current Detected IMEI</label>
+                <p>{{ policy.detectedImei }}</p>
+            </div>
+
+            <hr>
+
+            <div class="form-row">
+                <label>New Detected IMEI</label>
+                {{ form_widget(form.imei, {'attr': {'class': 'form-control'}}) }}
+            </div>
+
+            <div class="form-row">
+                <label>Justification</label>
+                {{ form_widget(form.note, {'attr': {'class': 'form_note form-control'}}) }}
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        {{ form_widget(form.update, { 'attr': {'class': 'btn btn-danger', 'disabled': 'true'} }) }}
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+    </div>
+    {{ form_end(form) }}
+
+{% endblock %}

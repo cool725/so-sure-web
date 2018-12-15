@@ -26,6 +26,7 @@ class ClaimRepository extends DocumentRepository
         $qb->field('notificationDate')->notEqual(null);
         $qb->field('status')->notIn([Claim::STATUS_FNOL, Claim::STATUS_SUBMITTED, null]);
         $qb->field('number')->notEqual(null);
+        $qb->sort('underwriterLastUpdated', 'desc');
 
         /*
          * Aleks requested to see all claims for the time being...
@@ -99,5 +100,24 @@ class ClaimRepository extends DocumentRepository
             ->field('status')->equals(Claim::STATUS_SETTLED)
             ->field('processed')->in([null, false])
             ->getQuery()->execute();
+    }
+
+    public function findClaimByDetails($id = null, $number = null)
+    {
+        $qb = $this->createQueryBuilder();
+
+        if ($id) {
+            $qb->addAnd($qb->expr()->field('_id')->equals($id));
+        }
+
+        if ($number) {
+            $qb->addAnd($qb->expr()->field('number')->equals($number));
+        }
+
+        if ($qb->getQuery()->count() > 1) {
+            throw new \Exception(sprintf("Query returned more than one result for claim. %s %s", $id, $number));
+        }
+
+        return $qb->getQuery()->execute()->getSingleResult();
     }
 }

@@ -11,7 +11,7 @@ We will attempt to process the payment again{% if policy.user.paymentMethod.card
 
 Your policy will be cancelled in {{ policy.policyExpirationDateDays }} days if you fail to make payment.
 
-To avoid cancellation, simply open our app and follow the steps on screen, alternatively talk to us here between 9am-5.30pm Monday to Friday.
+To avoid cancellation, simply open our app and follow the steps on screen, alternatively talk to us here Monday to Thursday 9am-5pm and Friday 9am-4pm.
 
 As you have had an approved claim, and received a replacement phone on {{ policy.getApprovedClaims(true, true)[0].replacementReceivedDate|date }}, as per the so-sure terms and conditions you are liable for the remainder of the policy year.  Should you fail to make payments on your policy, it will be cancelled and you will be billed for the remainder of your policy premium of £{{ policy.getRemainderOfPolicyPrice|number_format(2, '.', ',') }}.  In the unfortunate case that you should you fail to make this payment, we will take legal action.
 

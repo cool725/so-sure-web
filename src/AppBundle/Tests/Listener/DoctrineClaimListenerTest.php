@@ -4,12 +4,16 @@ namespace AppBundle\Tests\Listener;
 
 use AppBundle\Classes\DaviesHandlerClaim;
 use AppBundle\Classes\DirectGroupHandlerClaim;
+use AppBundle\Document\Oauth\Client;
 use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Service\DaviesService;
 use AppBundle\Service\DirectGroupService;
+use AppBundle\Service\DirectGroupServiceExcel;
 use AppBundle\Tests\Service\DaviesServiceTest;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ODM\MongoDB\DocumentManager;
+use FOS\OAuthServerBundle\Model\ClientManager;
+use SebastianBergmann\ObjectReflector\TestFixture\ClassWithIntegerAttributeName;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
@@ -140,6 +144,7 @@ class DoctrineClaimListenerTest extends WebTestCase
         $policy = static::createUserPolicy(true);
         $policy->getUser()->setEmail(static::generateEmail('testClaimsListenerActualDGDiff', $this));
         $claim = new Claim();
+        $claim->setType(Claim::TYPE_LOSS);
         $claim->setExcess(50);
         $claim->setIncurred(368.93);
         $claim->setPhoneReplacementCost(403.67);
@@ -153,7 +158,10 @@ class DoctrineClaimListenerTest extends WebTestCase
         static::$dm->persist($claim);
         static::$dm->flush();
 
-        $this->assertNull($claim->getUnderwriterLastUpdated());
+        // Change inside the Claim::setPolicy does a doctrine update as well, which triggers the last updated
+        $expectedUnderwriterUpdated = \DateTime::createFromFormat('U', time());
+        $this->assertEquals($expectedUnderwriterUpdated, $claim->getUnderwriterLastUpdated(), '', 0);
+        // $this->assertNull($claim->getUnderwriterLastUpdated());
 
         $dg = new DirectGroupHandlerClaim();
         $dg->insuredName = $policy->getUser()->getName();
@@ -164,7 +172,7 @@ class DoctrineClaimListenerTest extends WebTestCase
         $dg->phoneReplacementCost = $claim->getPhoneReplacementCost();
         $dg->handlingFees = $claim->getClaimHandlingFees();
         $dg->reserved = $claim->getReservedValue();
-        $dg->lossDescription = 'lossed phone';
+        $dg->lossType = DirectGroupHandlerClaim::TYPE_LOSS;
         $save = self::$directGroupService->saveClaim($dg, true);
         $this->assertTrue($save);
 
@@ -192,6 +200,7 @@ class DoctrineClaimListenerTest extends WebTestCase
         $policy = static::createUserPolicy(true);
         $policy->getUser()->setEmail(static::generateEmail('testClaimsListenerActualDGSame', $this));
         $claim = new Claim();
+        $claim->setType(Claim::TYPE_LOSS);
         $claim->setExcess(50);
         $claim->setIncurred(368.93);
         $claim->setPhoneReplacementCost(403.67);
@@ -205,7 +214,10 @@ class DoctrineClaimListenerTest extends WebTestCase
         static::$dm->persist($claim);
         static::$dm->flush();
 
-        $this->assertNull($claim->getUnderwriterLastUpdated());
+        // Change inside the Claim::setPolicy does a doctrine update as well, which triggers the last updated
+        $expectedUnderwriterUpdated = \DateTime::createFromFormat('U', time());
+        $this->assertEquals($expectedUnderwriterUpdated, $claim->getUnderwriterLastUpdated(), 'initial', 0);
+        // $this->assertNull($claim->getUnderwriterLastUpdated());
 
         $dg = new DirectGroupHandlerClaim();
         $dg->insuredName = $policy->getUser()->getName();
@@ -216,7 +228,7 @@ class DoctrineClaimListenerTest extends WebTestCase
         $dg->phoneReplacementCost = $claim->getPhoneReplacementCost();
         $dg->handlingFees = $claim->getClaimHandlingFees();
         $dg->reserved = $claim->getReservedValue();
-        $dg->lossDescription = 'lossed phone';
+        $dg->lossType = DirectGroupHandlerClaim::TYPE_LOSS;
         $save = self::$directGroupService->saveClaim($dg, true);
         $this->assertTrue($save);
 
@@ -236,7 +248,7 @@ class DoctrineClaimListenerTest extends WebTestCase
         $updatedClaim = $this->loadClaim($claim);
         $this->assertNotNull($updatedClaim->getUnderwriterLastUpdated());
 
-        $this->assertEquals($expectedUnderwriterUpdated, $updatedClaim->getUnderwriterLastUpdated(), '', 0);
+        $this->assertEquals($expectedUnderwriterUpdated, $updatedClaim->getUnderwriterLastUpdated(), 'final', 0);
     }
 
     public function testClaimsListenerActualDaviesDiff()
@@ -244,6 +256,7 @@ class DoctrineClaimListenerTest extends WebTestCase
         $policy = static::createUserPolicy(true);
         $policy->getUser()->setEmail(static::generateEmail('testClaimsListenerActualDaviesDiff', $this));
         $claim = new Claim();
+        $claim->setType(Claim::TYPE_LOSS);
         $claim->setExcess(50);
         $claim->setIncurred(368.93);
         $claim->setPhoneReplacementCost(403.67);
@@ -269,6 +282,7 @@ class DoctrineClaimListenerTest extends WebTestCase
         $davies->handlingFees = $claim->getClaimHandlingFees();
         $davies->reserved = $claim->getReservedValue();
         $davies->transactionFees = $claim->getTransactionFees();
+        $davies->lossType = 'loss';
         $save = self::$daviesService->saveClaim($davies, true);
         $this->assertTrue($save);
 
@@ -296,6 +310,7 @@ class DoctrineClaimListenerTest extends WebTestCase
         $policy = static::createUserPolicy(true);
         $policy->getUser()->setEmail(static::generateEmail('testClaimsListenerActualDaviesSame', $this));
         $claim = new Claim();
+        $claim->setType(Claim::TYPE_LOSS);
         $claim->setExcess(50);
         $claim->setIncurred(368.93);
         $claim->setPhoneReplacementCost(403.67);
@@ -321,6 +336,7 @@ class DoctrineClaimListenerTest extends WebTestCase
         $davies->handlingFees = $claim->getClaimHandlingFees();
         $davies->reserved = $claim->getReservedValue();
         $davies->transactionFees = $claim->getTransactionFees();
+        $davies->lossType = 'loss';
         $save = self::$daviesService->saveClaim($davies, true);
         $this->assertTrue($save);
 

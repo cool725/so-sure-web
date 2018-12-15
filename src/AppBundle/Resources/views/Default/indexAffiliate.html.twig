@@ -1,0 +1,99 @@
+{% extends 'base_rebrand.html.twig' %}
+
+{# Set vars #}
+{% set body_class = 'landing' %}
+
+{% block title %}so-sure - Welcome to Social Insurance with {{ affiliate_company }}{% endblock %}
+{% block meta %}
+    <meta name="description" content="Social mobile phone insurance that's better and up to 80% cheaper when you connect with friends and don't claim. Download our app now to see how much you could save."/>
+{% endblock %}
+
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/landing.css') }}">
+{% endblock %}
+
+{% block body %}
+
+    <section class="hero">
+        <div class="container container-xtra">
+            <div class="hero__intro">
+                <h1 class="mb-2 text-white h2">Mobile Insurance that's Simply Better</h1>
+                <p class="lead text-columbia-blue-e mb-2">affiliated with</p>
+                {% if affiliate_page == 'topcashback' %}
+                    <img src="{{ cdn_url }}/images/rebrand/partnerships/so-sure_topcashback_logo.svg" alt="TopCashback" width="220px" class="d-block mb-4 mx-auto">
+                {% elseif affiliate_page == 'vouchercodes' %}
+                    <img src="{{ cdn_url }}/images/rebrand/partnerships/so-sure_vouchercodes_logo.svg" alt="iVIP" width="280px" class="d-block mb-4 mx-auto">
+                {% elseif affiliate_page == 'quidco' %}
+                    <img src="{{ cdn_url }}/images/rebrand/partnerships/so-sure_quidco_logo.svg" alt="Quidco" width="160px" class="d-block mb-4 mx-auto">
+                {% elseif affiliate_page == 'ivip' %}
+                    <img src="{{ cdn_url }}/images/rebrand/partnerships/so-sure_ivip_logo.svg" alt="iVIP" width="200px" class="d-block mt-4 mb-5 mx-auto">
+                {% endif %}
+            </div>
+            <div class="hero__controls mb-5">
+                <a href="#" class="btn btn-success btn-block-xs get-a-quote">Get Insured <i class="far fa-arrow-right fa-sm ml-2"></i></a>
+            </div>
+            {% include 'AppBundle::Default/_comparisonTable.html.twig' with {'table_content': affiliate_page } %}
+            <p class="updated-text mt-2"><em class="text-center"><small>Information checked on  November 18 2018</small></em>
+        </div>
+        <svg class="d-none d-md-block" preserveAspectRatio="xMinYMin meet" viewBox="0 0 750 77" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+            <defs></defs>
+            <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                <g transform="translate(0.000000, -72.000000)" fill="#ffffff">
+                    <g id="---BG---" transform="translate(-4700.000000, -8443.000000)">
+                        <path d="M4700,8515 C4824,8551 4948.66667,8569 5074,8569 C5199.33333,8569 5324.66667,8551 5450,8515 L5450,8592 L4700,8592 L4700,8515 Z" id="Rectangle"></path>
+                    </g>
+                </g>
+            </g>
+        </svg>
+    </section>
+
+    <section class="comparison">
+        <div class="container container-xtra">
+        </div>
+    </section>
+
+    <section class="why py-lg-5">
+        <div class="container container-xtra py-5">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="why__container">
+                        <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_phone-smile.png" alt="so-sure - 24-72 hour replacement" width="180px">
+                        <h4 class="text-dodger-blue">24-72 hour replace or repair</h4>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="why__container">
+                        <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_wallet-cashback.png" alt="so-sure - Up to 80% money back"width="180px">
+                        <h4 class="text-dodger-blue">Up to 80% money back</h4>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="why__container">
+                        <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_phone-qr.png" alt="so-sure - Low excess from just £50" width="180px">
+                        <h4 class="text-dodger-blue">Low excess from just &pound;50</h4>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center mt-5">
+                <a href="#" class="btn btn-primary btn-block-xs get-a-quote">Get Insured in minutes</a>
+            </div>
+        </div>
+    </section>
+
+    {# Cover #}
+    {% include 'AppBundle::Default/CommonSections/_cover.html.twig' %}
+
+    {# We do things differently #}
+    {% include 'AppBundle::Default/CommonSections/_weDoThingsDifferently.html.twig' %}
+
+    {# Reviews #}
+    {% include 'AppBundle::Default/CommonSections/_reviews.html.twig' %}
+
+    {# Page Modals #}
+    {% include 'AppBundle::PhoneInsurance/_policyInfoModals.html.twig' %}
+
+{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/landing.js') }}"></script>
+{% endblock %}

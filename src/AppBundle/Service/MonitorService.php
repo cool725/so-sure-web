@@ -31,6 +31,7 @@ use AppBundle\Repository\UserRepository;
 use Doctrine\MongoDB\LoggableCollection;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use MongoDB\Collection;
+use Monolog\Handler\Mongo;
 use Psr\Log\LoggerInterface;
 
 class MonitorService
@@ -300,7 +301,7 @@ class MonitorService
     public function mixpanelUserCount()
     {
         // acutal 100,000 for plan
-        $maxUsers = 90000;
+        $maxUsers = 99000;
         $total = 0;
         $count = 0;
         while ($total == 0) {
@@ -349,6 +350,41 @@ class MonitorService
                         $policy->getId()
                     ));
                 }
+            }
+        }
+    }
+
+    public function policyImeiOnMultiplePolicies()
+    {
+        $collection = $this->dm->getDocumentCollection(Policy::class);
+        $builder = $collection->createAggregationBuilder();
+
+        $results = $builder
+            ->match()
+                ->field('policyNumber')
+                ->equals(new \MongoRegex('/Mob\/*/'))
+                ->field('status')
+                ->in([Policy::STATUS_ACTIVE, Policy::STATUS_UNPAID])
+                ->field('imei')
+                ->exists(true)
+            ->group()
+                ->field('_id')
+                ->expression(
+                    $builder->expr()
+                        ->field('imei')->expression('$imei')
+                )
+                ->field('count')->sum(1)
+            ->match()
+                ->field('count')->gt(1)
+            ->execute(['cursor' => []]);
+
+        if (count($results) > 0) {
+            /** @var Policy $result */
+            foreach ($results as $result) {
+                throw new MonitorException(sprintf(
+                    "IMEI found on more than one policy, %s",
+                    json_encode($result)
+                ));
             }
         }
     }
@@ -433,7 +469,7 @@ class MonitorService
         }
     }
 
-    public function bacsSubmitted()
+    public function accessPayNotSubmitted()
     {
         $repo = $this->dm->getRepository(AccessPayFile::class);
         /** @var AccessPayFile $unsubmitted */
@@ -928,6 +964,18 @@ class MonitorService
                 $result->getPolicy()->getPolicyNumber(),
                 $result->getDate()->format('Y-M-d H:m')
             ));
+        }
+    }
+
+    /**
+     * Checks for a detected IMEI and fires a monitor exception when one occurs.
+     */
+    public function checkDetectedImei()
+    {
+        if ($this->redis->exists("DETECTED-IMEI")) {
+            throw new MonitorException(
+                "IMEI number Incorrectly detected. https://wearesosure.com/admin/detected-imei"
+            );
         }
     }
 }

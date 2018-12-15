@@ -139,7 +139,7 @@ class ClaimFnolDamage
     }
 
     /**
-     * @Assert\IsTrue(message="At least one Proof of Usage File must be uploaded")
+     * @Assert\IsTrue(message="You must upload your Proof of Usage document")
      */
     public function hasProofOfUsage()
     {
@@ -151,7 +151,7 @@ class ClaimFnolDamage
     }
 
     /**
-     * @Assert\IsTrue(message="At least one Picture of Damage File must be uploaded")
+     * @Assert\IsTrue(message="You must upload your Proof of Damage document")
      */
     public function hasPictureOfPhone()
     {

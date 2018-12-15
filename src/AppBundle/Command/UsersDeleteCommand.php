@@ -130,9 +130,9 @@ class UsersDeleteCommand extends ContainerAwareCommand
     private function emailPendingDeletion(User $user)
     {
         $hash = SoSure::encodeCommunicationsHash($user->getEmail());
-        $this->mailerService->sendTemplate(
+        $this->mailerService->sendTemplateToUser(
             'Sorry to see you go',
-            $user->getEmail(),
+            $user,
             'AppBundle:Email:user/pendingDeletion.html.twig',
             ['user' => $user, 'hash' => $hash],
             'AppBundle:Email:user/pendingDeletion.txt.twig',

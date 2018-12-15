@@ -221,6 +221,8 @@ services:
             - ["%accesspay_server%", "%accesspay_username%", "%accesspay_password%", "%accesspay_keyfile%"]
             - "@app.mailer"
             - "@event_dispatcher"
+            - "@app.sftp.sosure"
+            - "@app.sftp.accesspay"
 
     app.push:
         alias: AppBundle\Service\PushService
@@ -364,6 +366,7 @@ services:
             - "@templating"
             - "@snc_redis.default"
             - "%kernel.environment%"
+            - "@app.mixpanel"
 
     app.branch:
         alias: AppBundle\Service\BranchService
@@ -444,6 +447,7 @@ services:
         arguments:
             - "@request_stack"
             - "@logger"
+            - "@router"
         public: false
         tags:
             - { name: twig.extension }
@@ -498,11 +502,11 @@ services:
             - [setS3, ['@aws.s3']]
             - [setEnvironment, ['%kernel.environment%']]
 
-    base.sftp:
-        alias: AppBundle\Service\SftpService
+    base.excelsftp:
+        alias: AppBundle\Service\ExcelSftpService
         public: true
 
-    AppBundle\Service\SftpService:
+    AppBundle\Service\ExcelSftpService:
         abstract: true
         public: true
         calls:
@@ -536,7 +540,7 @@ services:
         public: true
 
     AppBundle\Service\DirectGroupService:
-        parent: base.sftp
+        parent: base.excelsftp
         autowire: false
         autoconfigure: false
         public: true
@@ -553,6 +557,35 @@ services:
             - [setZipPassword, ['%directgroup_zip_password%']]
         tags:
             - { name: monolog.logger, channel: directgroup }
+
+    app.sftp.directgroup:
+        class: AppBundle\Service\SftpService
+        autowire: false
+        autoconfigure: false
+        public: true
+        arguments:
+            - "@logger"
+            - ["%directgroup_sftp_server%", "%directgroup_sftp_username%", "%directgroup_sftp_password%", "", ".", "false"]
+        tags:
+        - { name: monolog.logger, channel: directgroup }
+
+    app.sftp.sosure:
+        class: AppBundle\Service\SftpService
+        autowire: false
+        autoconfigure: false
+        public: true
+        arguments:
+        - "@logger"
+        - ["%sosure_sftp_server%", "%sosure_sftp_username%", "%sosure_sftp_password%", "%sosure_sftp_keyfile%", "sftp", "true"]
+
+    app.sftp.accesspay:
+        class: AppBundle\Service\SftpService
+        autowire: false
+        autoconfigure: false
+        public: true
+        arguments:
+        - "@logger"
+        - ["%accesspay_server%", "%accesspay_username%", "%accesspay_password%", "%accesspay_keyfile%", ".", "false"]
 
     app.brightstar:
         alias: AppBundle\Service\BrightstarService
@@ -656,6 +689,7 @@ services:
             - "@app.router"
             - "%default_sender_address%"
             - "%default_sender_name%"
+            - "@app.mixpanel"
 
     app.router:
         alias: AppBundle\Service\RouterService
@@ -1022,6 +1056,13 @@ services:
             -  { name: kernel.event_listener, event: event.user.email.changed, method: onUserEmailChangedEvent }
             -  { name: kernel.event_listener, event: event.user.password.changed, method: onUserPasswordChangedEvent }
 
+    app.listener.tasteCard:
+        class: AppBundle\Listener\TasteCardListener
+        arguments:
+            - "@app.mailer"
+        tags:
+            - { name: kernel.event_listener, event: event.policy.cancelled, method: onPolicyCancelledEvent }
+
     app.listener.bacs:
         class:   AppBundle\Listener\BacsListener
         arguments:
@@ -1094,6 +1135,10 @@ services:
             -  { name: kernel.event_listener, event: event.policy.renewed, method: onPolicyRenewedEvent }
             -  { name: kernel.event_listener, event: event.policy.cashback, method: onPolicyCashbackEvent }
             -  { name: kernel.event_listener, event: event.policy.declined-renewal, method: onPolicyDeclineRenewedEvent }
+            -  { name: kernel.event_listener, event: event.policy.updated-status, method: onPolicyStatusEvent }
+            -  { name: kernel.event_listener, event: event.card.updated, method: onCardUpdatedEvent }
+            -  { name: kernel.event_listener, event: event.bacs.updated, method: onBacsUpdatedEvent }
+            -  { name: kernel.event_listener, event: event.user.payment-method.changed, method: onUserPaymentMethodChangedEvent }
 
     app.listener.sixpack:
         class:   AppBundle\Listener\SixpackListener
@@ -1204,6 +1249,12 @@ services:
         arguments: ["@request_stack", "%kernel.environment%"]
         tags:
             - { name: form.type }
+
+    app.form.type.cancelpolicy:
+        class: AppBundle\Form\Type\CancelPolicyType
+        arguments: ["@app.request", "%kernel.environment%"]
+        tags:
+        - { name: form.type }
 
     app.form.type.policysearch:
         class: AppBundle\Form\Type\PolicySearchType
@@ -1367,6 +1418,12 @@ services:
     app.form.type.claim:
         class: AppBundle\Form\Type\ClaimType
         arguments: ["@app.imei"]
+        tags:
+            - { name: form.type }
+
+    app.form.type.claiminfo:
+        class: AppBundle\Form\Type\ClaimInfoType
+        arguments: ["@doctrine_mongodb.odm.default_document_manager", "@app.imei"]
         tags:
             - { name: form.type }
 
@@ -1545,17 +1602,12 @@ services:
         tags:
             - { name: form.type }
 
-    picsureml.form.type.annotate:
-        class: PicsureMLBundle\Form\Type\AnnotateType
-        arguments: ["@request_stack", "%form_required%"]
-        tags:
-            - { name: form.type }
-
-    picsureml.form.type.label:
-        class: PicsureMLBundle\Form\Type\LabelType
+    picsureml.form.type.edit:
+        class: PicsureMLBundle\Form\Type\EditType
         arguments: ["@picsureml.picsureml", "%form_required%"]
         tags:
             - { name: form.type }
+
     twig.extension.text:
            class: Twig_Extensions_Extension_Text
            tags:

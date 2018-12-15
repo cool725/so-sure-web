@@ -124,6 +124,14 @@ class BacsListenerTest extends WebTestCase
 
     public function testBankAccountChangedEvent()
     {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testBankAccountChangedEvent', $this),
+            'bar',
+            null,
+            static::$dm
+        );
+
         self::$redis->flushdb();
         $this->assertEquals(0, self::$redis->hlen(BacsService::KEY_BACS_CANCEL));
         $bankAccount = new BankAccount();
@@ -131,7 +139,7 @@ class BacsListenerTest extends WebTestCase
         $bankAccount->setAccountNumber('12345678');
         $bankAccount->setSortCode('000099');
         $bankAccount->setReference('123');
-        $bacsEvent = new BacsEvent($bankAccount, '9');
+        $bacsEvent = new BacsEvent($user, $bankAccount);
 
         self::$bacsListener->onBankAccountChangedEvent($bacsEvent);
 
@@ -142,7 +150,7 @@ class BacsListenerTest extends WebTestCase
         $this->assertEquals($bankAccount->getAccountName(), $data['accountName']);
         $this->assertEquals($bankAccount->getAccountNumber(), $data['accountNumber']);
         $this->assertEquals($bankAccount->getReference(), $data['reference']);
-        $this->assertEquals('9', $data['id']);
+        $this->assertEquals($user->getId(), $data['id']);
     }
 
     public function testPolicyBacsCreated()

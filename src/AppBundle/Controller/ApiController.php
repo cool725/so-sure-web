@@ -479,9 +479,7 @@ class ApiController extends BaseController
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
             }
 
-            $dm = $this->getManager();
-            $policyTermsRepo = $dm->getRepository(PolicyTerms::class);
-            $latestTerms = $policyTermsRepo->findOneBy(['latest' => true]);
+            $latestTerms = $this->getLatestPolicyTerms();
             if (!$latestTerms) {
                 return $this->getErrorJsonResponse(
                     ApiErrorCode::ERROR_NOT_FOUND,

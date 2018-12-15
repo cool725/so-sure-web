@@ -41,15 +41,17 @@ class ClaimsTwigExtension extends \Twig_Extension
 
     public function s3DownloadLinks($claim)
     {
+        $viewRoute = 'claims_download_file';
         $downloadRoute = 'claims_download_file_attachment';
         if ($this->requestService->hasEmployeeRole()) {
+            $viewRoute = 'admin_download_file';
             $downloadRoute = 'admin_download_file_attachment';
         }
         $proofOfUsages = array();
         foreach ($claim->getProofOfUsageFiles() as $file) {
             $proofOfUsages[] = array(
                 'filename' => $file->getFilename(),
-                'url' => $this->router->generateUrl('claims_download_file', ['id' => $file->getId()]),
+                'url' => $this->router->generateUrl($viewRoute, ['id' => $file->getId()]),
                 'url_download' => $this->router->generateUrl(
                     $downloadRoute,
                     ['id' => $file->getId()]
@@ -61,7 +63,7 @@ class ClaimsTwigExtension extends \Twig_Extension
         foreach ($claim->getProofOfBarringFiles() as $file) {
             $proofOfBarrings[] = array(
                 'filename' => $file->getFilename(),
-                'url' => $this->router->generateUrl('claims_download_file', ['id' => $file->getId()]),
+                'url' => $this->router->generateUrl($viewRoute, ['id' => $file->getId()]),
                 'url_download' => $this->router->generateUrl(
                     $downloadRoute,
                     ['id' => $file->getId()]
@@ -73,7 +75,7 @@ class ClaimsTwigExtension extends \Twig_Extension
         foreach ($claim->getProofOfPurchaseFiles() as $file) {
             $proofOfPurchases[] = array(
                 'filename' => $file->getFilename(),
-                'url' => $this->router->generateUrl('claims_download_file', ['id' => $file->getId()]),
+                'url' => $this->router->generateUrl($viewRoute, ['id' => $file->getId()]),
                 'url_download' => $this->router->generateUrl(
                     $downloadRoute,
                     ['id' => $file->getId()]
@@ -85,7 +87,7 @@ class ClaimsTwigExtension extends \Twig_Extension
         foreach ($claim->getDamagePictureFiles() as $file) {
             $damagePictures[] = array(
                 'filename' => $file->getFilename(),
-                'url' => $this->router->generateUrl('claims_download_file', ['id' => $file->getId()]),
+                'url' => $this->router->generateUrl($viewRoute, ['id' => $file->getId()]),
                 'url_download' => $this->router->generateUrl(
                     $downloadRoute,
                     ['id' => $file->getId()]
@@ -97,7 +99,7 @@ class ClaimsTwigExtension extends \Twig_Extension
         foreach ($claim->getProofOfLossFiles() as $file) {
             $proofOfLosses[] = array(
                 'filename' => $file->getFilename(),
-                'url' => $this->router->generateUrl('claims_download_file', ['id' => $file->getId()]),
+                'url' => $this->router->generateUrl($viewRoute, ['id' => $file->getId()]),
                 'url_download' => $this->router->generateUrl(
                     $downloadRoute,
                     ['id' => $file->getId()]
@@ -109,7 +111,7 @@ class ClaimsTwigExtension extends \Twig_Extension
         foreach ($claim->getOtherFiles() as $file) {
             $others[] = array(
                 'filename' => $file->getFilename(),
-                'url' => $this->router->generateUrl('claims_download_file', ['id' => $file->getId()]),
+                'url' => $this->router->generateUrl($viewRoute, ['id' => $file->getId()]),
                 'url_download' => $this->router->generateUrl(
                     $downloadRoute,
                     ['id' => $file->getId()]

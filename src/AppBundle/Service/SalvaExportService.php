@@ -929,12 +929,26 @@ class SalvaExportService
         );
         $root->appendChild($dom->createElement('n1:policyNo', $policyNumber));
         $root->appendChild($dom->createElement('n1:terminationReasonCode', $reason));
+
+        // Full refund logic: terminationTime = insurancePeriodStart-1 minute & usedFinalPremium=0
+        if ($phonePolicy->isCancelledFullRefund()) {
+            $date = $phonePolicy->getStart();
+            if ($reason && $reason == self::CANCELLED_REPLACE) {
+                $date = $phonePolicy->getSalvaStartDate($version);
+            }
+
+            $date = $date->sub(new \DateInterval('PT1M'));
+        }
+
         $root->appendChild($dom->createElement(
             'n1:terminationTime',
             $this->adjustDate($date)
         ));
 
-        if ($reason == self::CANCELLED_REPLACE) {
+        if ($phonePolicy->isCancelledFullRefund()) {
+            // Full refund logic: terminationTime = insurancePeriodStart-1 minute & usedFinalPremium=0
+            $usedPremium = 0;
+        } elseif ($reason == self::CANCELLED_REPLACE) {
             $usedPremium = $phonePolicy->getUsedGwp($version, true);
         } else {
             $usedPremium = $phonePolicy->getUsedGwp(null, false);

@@ -1,0 +1,37 @@
+
+Action required to keep your phone insured
+
+{% if policy.user.paymentMethod.cardType is defined %}
+We tried again to take your monthly payment of£{{ policy.premium.monthlyPremiumPrice }}, but your account appears to be missing a payment method.
+{% endif %}
+
+If you fail to make payment, your policy will be cancelled in {{ policy.policyExpirationDateDays }} days
+
+To keep your {{ policy.phone }} insured against loss, damage &amp; theft you need to update your payment details.
+
+Update my payment details: {{ branch_card_url }}
+
+IMPORTANT LEGAL INFORMATION
+
+As you have had an approved claim you are liable for the remainder of the policy year.
+
+Should you fail to make payments on your policy, it will be cancelled and you will be billed for the remainder of your policy premium of £{{ policy.getRemainderOfPolicyPrice|number_format(2, '.', ',') }}
+
+In the unfortunate case that you should you fail to make this payment, we will take legal action.
+
+Please login to your account to see your policy T&Cs and review your legal obligations:
+{{ url('user_policy_list_policy', {'id': policy.id}) }}
+
+Have a question or issue? contact us: {{ contact_us_url }}
+
+============================================================
+** (http://www.twitter.com/wearesosure)
+** (https://www.facebook.com/wearesosure)
+** (http://wearesosure.com)
+** (http://blog.wearesosure.com)
+** (mailto:hello@wearesosure.com)
+
+Copyright {{ 'now'|date('Y') }} so-sure Limited, All rights reserved.
+
+Our mailing address is:
+so-sure, Martin House, 5 Martin Lane, London EC4R 0DP, United Kingdom

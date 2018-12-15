@@ -10,13 +10,11 @@ use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Doctrine\ODM\MongoDB\DocumentRepository;
 use AppBundle\Document\Claim;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Service\ReceperioService;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormEvent;
-use Doctrine\Bundle\MongoDBBundle\Form\Type\DocumentType;
 
 class ClaimType extends AbstractType
 {

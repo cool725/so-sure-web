@@ -2,14 +2,18 @@
 
 namespace AppBundle\Document;
 
+use AppBundle\Document\Excess\PhoneExcess;
+use AppBundle\Tests\Document\PhoneExcessTest;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use AppBundle\Classes\Salva;
 use AppBundle\Classes\SoSure;
 use Symfony\Component\Validator\Constraints as Assert;
 use AppBundle\Validator\Constraints as AppAssert;
+use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
  * @MongoDB\Document(repositoryClass="AppBundle\Repository\PhoneRepository")
+ * @Gedmo\Loggable(logEntryClass="AppBundle\Document\LogEntry")
  */
 class Phone
 {
@@ -260,6 +264,7 @@ class Phone
         $make,
         $model,
         $premium,
+        PolicyTerms $policyTerms,
         $memory = null,
         $devices = null,
         $initialPrice = null,
@@ -285,6 +290,8 @@ class Phone
                 $phonePrice = new PhonePrice();
                 $phonePrice->setValidFrom($date);
                 $this->addPhonePrice($phonePrice);
+                $phonePrice->setExcess($policyTerms->getDefaultExcess());
+                $phonePrice->setPicSureExcess($policyTerms->getDefaultPicSureExcess());
             }
             $phonePrice->setMonthlyPremiumPrice($premium, $date);
         }
@@ -1220,8 +1227,15 @@ class Phone
         return $maxComparision;
     }
 
-    public function changePrice($gwp, \DateTime $from, \DateTime $to = null, $notes = null, \DateTime $date = null)
-    {
+    public function changePrice(
+        $gwp,
+        \DateTime $from,
+        PhoneExcess $excess,
+        PhoneExcess $picSureExcess,
+        \DateTime $to = null,
+        $notes = null,
+        \DateTime $date = null
+    ) {
         if (!$date) {
             $date = new \DateTime('now', new \DateTimeZone(SoSure::TIMEZONE));
         }
@@ -1290,6 +1304,9 @@ class Phone
                 $this->getCurrentPhonePrice()->setValidTo($from);
             }
         }
+
+        $price->setExcess($excess);
+        $price->setPicSureExcess($picSureExcess);
 
         $this->addPhonePrice($price);
     }

@@ -61,15 +61,20 @@ trait UserClassTrait
 
     public static function generateEmail($name, $caller, $rand = false)
     {
+        return self::generateEmailClass($name, get_class($caller), $rand);
+    }
+
+    public static function generateEmailClass($name, $className, $rand = false)
+    {
         if ($rand) {
             return sprintf(
                 '%s-%d@%s.so-sure.net',
                 $name,
                 random_int(0, 999999),
-                str_replace("\\", ".", get_class($caller))
+                str_replace("\\", ".", $className)
             );
         } else {
-            return sprintf('%s@%s.so-sure.net', $name, str_replace("\\", ".", get_class($caller)));
+            return sprintf('%s@%s.so-sure.net', $name, str_replace("\\", ".", $className));
         }
     }
 
@@ -96,7 +101,22 @@ trait UserClassTrait
                 throw new \Exception('Missing phone');
             }
             $policy->setPhone($phone, $date);
+            $policy->setImei(static::generateRandomImei());
             $policy->create(rand(1, 999999), 'TEST', $date, rand(1, 999999));
+
+            // still getting no excess on occasion. if so try resetting the phone
+            $recursionPrevention = 0;
+            while (!$policy->getCurrentExcess()) {
+                $policy->setPhone(self::getRandomPhone(self::$dm), $date);
+                $recursionPrevention++;
+                if ($recursionPrevention > 10) {
+                    break;
+                }
+            }
+
+            if (!$policy->getCurrentExcess()) {
+                throw new \Exception('Missing current policy excess');
+            }
         }
 
         return $policy;
@@ -108,7 +128,7 @@ trait UserClassTrait
      * @param string               $password
      * @param mixed                $phone
      * @param DocumentManager|null $dm
-     * @return User
+     * @return UserManagerInterface
      * @throws \Exception
      */
     public static function createUser(
@@ -157,25 +177,39 @@ trait UserClassTrait
 
         return $mobile;
     }
-    
+
     public static function getRandomPhone(\Doctrine\ODM\MongoDB\DocumentManager $dm, $make = null)
     {
         $phoneRepo = $dm->getRepository(Phone::class);
+        $query = [
+            'active' => true,
+            'devices' => ['$nin' => ['A0001', 'iPhone 6']]
+        ];
         if ($make) {
-            $phones = $phoneRepo->findBy(['active' => true, 'make' => $make, 'devices' => ['$ne' => 'A0001']]);
-        } else {
-            $phones = $phoneRepo->findBy(['active' => true, 'devices' => ['$ne' => 'A0001']]);
+            $query['make'] = $make;
         }
+        $phones = $phoneRepo->findBy($query);
         $phone = null;
         while ($phone == null) {
-            $phone = $phones[rand(0, count($phones) - 1)];
+            /** @var Phone $phone */
+            $phone = $phones[random_int(0, count($phones) - 1)];
             // Many tests rely on past dates, so ensure the date is ok for the past
             if (!$phone->getCurrentPhonePrice(new \DateTime('2016-01-01')) || $phone->getMake() == "ALL") {
                 $phone = null;
+                continue;
+            }
+            if (!$phone->getCurrentPhonePrice() || !$phone->getCurrentPhonePrice()->getExcess()) {
+                $phone = null;
+                continue;
             }
         }
 
         return $phone;
+    }
+
+    public static function getRandomClaimNumber()
+    {
+        return sprintf('%6d', random_int(1, 999999));
     }
 
     public static function transformMobile($mobile)
@@ -432,7 +466,7 @@ trait UserClassTrait
         }
         self::addSoSurePayment($policy, $premium, $commission, $date);
     }
-    
+
     public static function addSoSurePayment($policy, $amount, $commission, $date = null)
     {
         $payment = new SoSurePayment();

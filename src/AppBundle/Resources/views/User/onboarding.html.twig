@@ -10,7 +10,13 @@
 
 {% block title %}Welcome to Social Insurance{% endblock %}
 
-{% block meta %}{% endblock %}
+{# Set Meta #}
+{% set og_title = 'Sign up and save' %}
+{% set og_description = 'Hey, I just insured my mobile phone with so-sure. They give you 80% of your cashback if we are connected and don\'t claim!' %}
+{% set og_image = cdn_url ~ '/images/rebrand/og/so-sure_og-image-1.png' %}
+{% if policy.standardSCode %}
+    {% set og_url = url('scode', {'code': policy.standardSCode.code}) %}
+{% endif %}
 
 {% block cssPage %}
     <link rel="stylesheet" href="{{ asset('css-js/onboarding.css') }}">

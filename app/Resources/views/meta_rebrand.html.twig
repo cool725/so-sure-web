@@ -27,22 +27,41 @@
 <meta name="msapplication-square150x150logo" content="{{ cdn_url }}/images/rebrand/favicons/ms-icon-150x150.png" />
 <meta name="msapplication-square310x310logo" content="{{ cdn_url }}/images/rebrand/favicons/ms-icon-310x310.png" />
 
+{# Open Graph/Facebook #}
 <meta property="fb:app_id" content="{{ fb_appid }}" />
-<meta property="og:url" content="{{ app.request.uri }}" />
 <meta property="og:type" content="website" />
-<meta property="og:description" content="The future of phone insurance has arrived (and it's up to 80% cheaper when you connect with friends & don't claim)." />
+
+{% if og_url is defined %}
+    <meta property="og:url" content="{{ og_url }}" />
+{% elseif route_exists(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) %}
+    <meta property="og:url" content="{{ app.request.schemeAndHttpHost ~ path(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />
+{% endif %}
 {% if og_title is defined %}
   <meta property="og:title" content="{{ og_title }}" />
 {% else %}
   <meta property="og:title" content="Welcome to Social Insurance" />
 {% endif %}
-{% if og_image is defined %}
-  <meta property="og:image" content="{{ og_image }}" />
+{% if og_description is defined %}
+    <meta property="og:description" content="{{ og_description }}" />
 {% else %}
-  <meta property="og:image" content="{{ cdn_url }}/images/rebrand/so-sure-welcome.png" />
+    <meta property="og:description" content="The future of phone insurance has arrived (and it's up to 80% cheaper when you connect with friends & don't claim)." />
+{% endif %}
+{% if og_image_facebook is defined %}
+  <meta property="og:image" content="{{ og_image_facebook }}" />
+{% elseif og_image is defined %}
+    <meta property="og:image" content="{{ og_image }}" />
+{% else %}
+  <meta property="og:image" content="{{ cdn_url }}/images/rebrand/og/so-sure_og-image-2.png" />
 {% endif %}
 <meta property="fb:pages" content="781483845311300" />
 
+{# Twitter #}
 <meta name="twitter:card" content="summary" />
 <meta name="twitter:site" content="@wearesosure" />
-<meta name="twitter:image" content="{{ cdn_url }}/images/rebrand/so-sure-welcome.png" />
+{% if og_image_twitter is defined %}
+    <meta name="twitter:image" content="{{ og_image_twitter }}" />
+{% elseif og_image is defined %}
+    <meta property="og:image" content="{{ og_image }}" />
+{% else %}
+    <meta name="twitter:image" content="{{ cdn_url }}/images/rebrand/og/so-sure_og-image-2.png" />
+{% endif %}

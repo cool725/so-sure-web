@@ -12,6 +12,7 @@ use AppBundle\Document\SCode;
 use AppBundle\Document\User;
 use AppBundle\Exception\MonitorException;
 use AppBundle\Form\Type\UserRoleType;
+use AppBundle\Repository\ClaimRepository;
 use AppBundle\Repository\Invitation\InvitationRepository;
 use AppBundle\Service\InvitationService;
 use AppBundle\Service\MonitorService;
@@ -87,6 +88,16 @@ class MonitorServiceTest extends WebTestCase
 
     public function testClaimsSettledUnprocessedOk()
     {
+        // Ensure any existing unprocessed claims are settled
+        /** @var ClaimRepository $repo */
+        $repo = static::$dm->getRepository(Claim::class);
+        $claims = $repo->findSettledUnprocessed();
+        foreach ($claims as $claim) {
+            /** @var Claim $claim */
+            $claim->setProcessed(true);
+        }
+        static::$dm->flush();
+
         // should not be throwing an exception
         self::$monitor->claimsSettledUnprocessed();
 
@@ -298,6 +309,70 @@ class MonitorServiceTest extends WebTestCase
         self::$monitor->duplicateEmailInvites();
     }
 
+    public function testPolicyImeiOnMultiplePoliciesPending()
+    {
+        $phone = self::getRandomPhone(self::$dm);
+        $imei = self::generateRandomImei();
+
+        for ($i = 0; $i < 3; $i++) {
+            $user = self::createUser(
+                self::$userManager,
+                self::generateEmail('testPolicyImeiOnMultiplePoliciesPending', $this, true),
+                'foo'
+            );
+
+            $policy = self::initPolicy(
+                $user,
+                self::$dm,
+                $phone,
+                null,
+                true,
+                true
+            );
+            $policy->setImei($imei);
+            $policy->setPolicyNumber(self::getRandomPolicyNumber('Mob'));
+
+            self::assertEquals(Policy::STATUS_PENDING, $policy->getStatus());
+        }
+
+        self::$dm->flush();
+
+        self::$monitor->policyImeiOnMultiplePolicies();
+    }
+
+    /**
+     * @expectedException \AppBundle\Exception\MonitorException
+     */
+    public function testPolicyImeiOnMultiplePolicies()
+    {
+        $phone = self::getRandomPhone(self::$dm);
+        $imei = self::generateRandomImei();
+
+        for ($i = 0; $i < 3; $i++) {
+            $user = self::createUser(
+                self::$userManager,
+                self::generateEmail('testPolicyImeiOnMultiplePolicies', $this, true),
+                'foo'
+            );
+
+            $policy = self::initPolicy(
+                $user,
+                self::$dm,
+                $phone,
+                null,
+                true,
+                true
+            );
+            $policy->setImei($imei);
+            $policy->setStatus(Policy::STATUS_ACTIVE);
+            $policy->setPolicyNumber(self::getRandomPolicyNumber('Mob'));
+        }
+
+        self::$dm->flush();
+
+        self::$monitor->policyImeiOnMultiplePolicies();
+    }
+
     /**
      * @expectedException \AppBundle\Exception\MonitorException
      */
@@ -475,7 +550,7 @@ class MonitorServiceTest extends WebTestCase
 
         self::$monitor->checkExpiration();
     }
-  
+
     /**
      * @expectedException \AppBundle\Exception\MonitorException
      */
@@ -497,5 +572,19 @@ class MonitorServiceTest extends WebTestCase
         self::$dm->flush();
 
         self::$monitor->checkPastBacsPaymentsPending();
+    }
+
+    /**
+     * Tests that monitor service can detect when there are wrongly detected imeis recorded.
+     */
+    public function testCheckDetectedImei()
+    {
+        $redis = self::$container->get('snc_redis.default');
+        self::$monitor->checkDetectedImei();
+        $redis->lpush("DETECTED-IMEI", "a");
+        $this->expectException(MonitorException::class);
+        self::$monitor->checkDetectedImei();
+        $this->assertEquals("a", $redis->lpop("DETECTED-IMEI"));
+        self::$monitor->checkDetectedImei();
     }
 }

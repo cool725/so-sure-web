@@ -202,4 +202,22 @@ class UserRepository extends DocumentRepository
 
         return $qb;
     }
+
+    /**
+     * Finds all users who have not got the attribution field set which were created within the given dates.
+     * @param \DateTime $start is the date which none of the returned users can be older than or null for no start.
+     * @param \DateTime $end   is the date which none of the returned users can be younger than or null for no end.
+     * @return array containing all such users.
+     */
+    public function findUnattributedUsers(\DateTime $start = null, \DateTime $end = null)
+    {
+        $qb = $this->createQueryBuilder()->field("attribution")->exists(false);
+        if ($start) {
+            $qb->field("created")->gte($start);
+        }
+        if ($end) {
+            $qb->field("created")->lte($end);
+        }
+        return $qb->getQuery()->execute();
+    }
 }

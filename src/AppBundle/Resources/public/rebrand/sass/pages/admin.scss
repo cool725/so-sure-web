@@ -24,3 +24,17 @@ body {
 .card-page-filter {
     background-color: rgba(37, 147, 243, 0.03);
 }
+
+// Tables
+.table {
+
+    > tbody {
+        > tr {
+            > td {
+                vertical-align: middle;
+            }
+        }
+    }
+}
+
+// Tests

@@ -261,6 +261,67 @@ class UserControllerTest extends BaseControllerTest
         self::verifyResponse(302);
     }
 
+    public function testUserInviteClaimed()
+    {
+        $email = self::generateEmail('testUserInviteClaimed', $this);
+        $inviteeEmail = self::generateEmail('testUserInviteClaimed-claimed', $this);
+        $password = 'foo';
+        $phone = self::getRandomPhone(self::$dm);
+
+        $user = self::createUser(
+            self::$userManager,
+            $email,
+            $password,
+            $phone,
+            self::$dm
+        );
+        $policy = self::initPolicy($user, self::$dm, $phone, null, true, true);
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        self::$dm->flush();
+
+        $invitee = self::createUser(
+            self::$userManager,
+            $inviteeEmail,
+            $password,
+            $phone,
+            self::$dm
+        );
+        $inviteePolicy = self::initPolicy($invitee, self::$dm, $phone, null, true, true);
+        $inviteePolicy->setStatus(Policy::STATUS_ACTIVE);
+        $claim = new Claim();
+        $claim->setType(Claim::TYPE_LOSS);
+        $claim->setStatus(Claim::STATUS_SETTLED);
+        $inviteePolicy->addClaim($claim);
+        self::$dm->flush();
+
+        $this->assertTrue($policy->getUser()->hasActivePolicy());
+        $this->assertTrue($inviteePolicy->getUser()->hasActivePolicy());
+        $this->assertTrue($inviteePolicy->hasMonetaryClaimed());
+
+        $this->login($email, $password, 'user');
+
+        $crawler = self::$client->request('GET', sprintf('/user/%s', $policy->getId()));
+        self::verifyResponse(200);
+        $form = $crawler->selectButton('email[submit]')->form();
+        $form['email[email]'] = $inviteeEmail;
+        $crawler = self::$client->submit($form);
+        self::verifyResponse(302);
+        //print $crawler->html();
+
+        $this->logout();
+
+        $this->login($inviteeEmail, $password, 'user');
+
+        $crawler = self::$client->request('GET', sprintf('/user/%s', $inviteePolicy->getId()));
+        self::verifyResponse(200);
+        $form = $crawler->selectButton('Accept')->form();
+        $crawler = self::$client->submit($form);
+        self::verifyResponse(302);
+        $crawler = self::$client->followRedirect();
+        //print $crawler->html();
+        $this->expectFlashWarning($crawler, 'have a claim');
+    }
+
     public function testUserSCode()
     {
         $email = self::generateEmail('testUserSCode-inviter', $this);
@@ -515,7 +576,7 @@ class UserControllerTest extends BaseControllerTest
         $this->validateUnpaidRescheduleBacsForm($crawler, false);
         $this->validateUnpaidBacsSetupLink($crawler, false);
         $this->validateUnpaidBacsUpdateLink($crawler, false);
-        $this->assertContains('policy is paid to date', $crawler->html());
+        $this->assertContains('Policy paid up to date', $crawler->html());
 
         $crawler = self::$client->request('GET', '/user/invalid');
         self::verifyResponse(500);
@@ -766,7 +827,7 @@ class UserControllerTest extends BaseControllerTest
         $this->validateUnpaidJudoForm($crawler, false);
         $this->validateUnpaidRescheduleBacsForm($crawler, true);
         $this->validateUnpaidBacsSetupLink($crawler, false);
-        $this->validateUnpaidBacsUpdateLink($crawler, false);
+        $this->validateUnpaidBacsUpdateLink($crawler, true);
         $this->assertContains('Payment missing', $crawler->html());
 
         $form = $crawler->selectButton('form[reschedule]')->form();
@@ -833,7 +894,7 @@ class UserControllerTest extends BaseControllerTest
         $this->validateUnpaidJudoForm($crawler, false);
         $this->validateUnpaidRescheduleBacsForm($crawler, true);
         $this->validateUnpaidBacsSetupLink($crawler, false);
-        $this->validateUnpaidBacsUpdateLink($crawler, false);
+        $this->validateUnpaidBacsUpdateLink($crawler, true);
         $this->assertContains('Payment missing', $crawler->html());
 
         $form = $crawler->selectButton('form[reschedule]')->form();

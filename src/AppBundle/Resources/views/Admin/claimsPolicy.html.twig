@@ -60,7 +60,7 @@
 {% endif %}
         </div>
     <div class="bg-danger text-center" style="border-radius: 10px; padding: 20px; margin-bottom: 20px;">
-        {% if policy.canCancel(null) %}
+        {% if policy.isPolicy() %}
         <div class="row">
             <div class="col-md-12 text-center">
                 <h3>Policy Cancellation</h3>
@@ -239,6 +239,22 @@
                         In RARE circumstances, we may need to cancel a policy with a claim. Please check refund rules to ensure the impact of this is understood.
                     </div>
                 </div>
+                {% endif %}
+                {% if cancel_form.fullRefund is defined %}
+                    <div class="row">
+                        <div class="col-md-8 col-md-offset-2">
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <h5 class="panel-title"><span title="Admin only"><i class="fa fa-lock"></i></span> Full Refund</h5>
+                                </div>
+                                <div class="panel-body">
+                                    {{ form_label(cancel_form.fullRefund, 'Provide a full refund to the customer') }}<br>
+                                    {{ form_widget(cancel_form.fullRefund) }}<br>
+                                    <strong>RARE Circumstances ONLY</strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 {% endif %}
                 <div class="row">
                     <div class="col-md-12">

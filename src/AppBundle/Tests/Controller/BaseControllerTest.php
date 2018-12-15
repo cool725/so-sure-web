@@ -13,6 +13,8 @@ use Symfony\Component\BrowserKit\Tests\TestClient;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\Routing\Router;
+use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
+use Symfony\Component\BrowserKit\Cookie;
 
 class BaseControllerTest extends WebTestCase
 {
@@ -459,5 +461,20 @@ class BaseControllerTest extends WebTestCase
         self::verifyResponse(301);
         $crawler = self::$client->followRedirect();
         self::verifyResponse(200);
+    }
+
+    /**
+     * Log the current session in using a token instead of by manipulating forms. This login method behaves better with
+     * the CSRF service and is faster.
+     */
+    protected function tokenLogin($email, $password)
+    {
+        $session = self::$container->get("session");
+        $firewall = "main";
+        $token = new UsernamePasswordToken($email, $password, $firewall, []);
+        $session->set("_security_".$firewall, serialize($token));
+        $session->save();
+        $cookie = new Cookie($session->getName(), $session->getId());
+        self::$client->getCookieJar()->set($cookie);
     }
 }

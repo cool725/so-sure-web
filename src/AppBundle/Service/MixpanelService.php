@@ -8,6 +8,7 @@ use Predis\Client;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Psr\Log\LoggerInterface;
 use Doctrine\ODM\MongoDB\DocumentManager;
+use Doctrine\ODM\MongoDB\Id;
 use AppBundle\Document\User;
 use AppBundle\Document\Policy;
 use AppBundle\Document\Stats;
@@ -32,6 +33,7 @@ class MixpanelService
     const QUEUE_ALIAS = 'alias';
     const QUEUE_ATTRIBUTION = 'attribution';
     const QUEUE_DELETE = 'delete';
+    const QUEUE_FREEZE_ATTRIBUTION = 'freeze-attribution';
 
     const EVENT_HOME_PAGE = 'Home Page';
     const EVENT_QUOTE_PAGE = 'Quote Page';
@@ -64,6 +66,12 @@ class MixpanelService
     const EVENT_CASHBACK = 'Cashback';
     const EVENT_DECLINE_RENEW = 'Decline Renew Policy';
     const EVENT_SIXPACK = 'Sixpack Experiment';
+    const EVENT_ONBOARDING = 'Track Onboarding Interaction';
+    const EVENT_POLICY_STATUS = 'Policy Status Change';
+    const EVENT_PAYMENT_METHOD_CHANGED = 'Payment Method Changed';
+
+    const EVENT_EMAIL = 'Email Sent';
+    const EVENT_SMS = 'Sms Sent';
 
     const CUSTOM_TOTAL_SITE_VISITORS = '$custom_event:379938';
     const CUSTOM_QUOTE_PAGE_UK = '$custom_event:458980';
@@ -296,11 +304,10 @@ class MixpanelService
                     $attribution->setDeviceOS($data['Device OS']);
                     $dataPresent = true;
                 }
-
-                if ($dataPresent) {
+                // Only set the attribution if the user lacks one.
+                if (!$user->getAttribution() && $dataPresent) {
                     $user->setAttribution($attribution);
                 }
-
                 $latestAttribution = new Attribution();
                 $dataPresent = false;
                 if (isset($data['Latest Campaign Name'])) {
@@ -385,7 +392,20 @@ class MixpanelService
         }
         $data = null;
         $count = 0;
+        $count += $this->deleteOldUsersByDays($days);
+        $count += $this->deleteQuotePageMissingBotUserAgentUser();
+        $count += $this->deleteHomepagePageMissingBotUserAgentUser();
+        $count += $this->deleteNoValueUsers(14);
+        //$count += $this->deleteOldUsersByNoEvents();
+        $count += $this->deleteFacebookPreview();
+        $count += $this->deleteSixpack();
+        $count += $this->deleteHappyApp();
 
+        return ['count' => $count, 'total' => $this->getUserCount()];
+    }
+
+    private function deleteOldUsersByDays($days)
+    {
         $time = \DateTime::createFromFormat('U', time());
         $time = $time->sub(new \DateInterval(sprintf('P%dD', $days)));
         $query = [
@@ -394,8 +414,169 @@ class MixpanelService
                 $time->format('U')
             ),
         ];
-        $count += $this->runDelete($query);
 
+        return $this->runDelete($query);
+    }
+
+    private function deleteNoValueUsers($days = 14)
+    {
+        // users are primarily for attribution
+        // if there is no attribution and no name, then there is little reason to keep around so long
+        $time = \DateTime::createFromFormat('U', time());
+        $time = $time->sub(new \DateInterval(sprintf('P%dD', $days)));
+        // @codingStandardsIgnoreStart
+        $query = [
+            'selector' => sprintf(
+                '(datetime(%s) > user["$last_seen"] and not defined(user["$first_name"]) and not defined(user["$last_name"]) and not defined(user["Campaign Source"]) and not defined(user["Campaign Name"]) and not defined(user["Referer"]) and not defined(user["Attribution Invitation Method"]))',
+                $time->format('U')
+            )
+            ];
+        // @codingStandardsIgnoreEnd
+        //print_r($query);
+
+        return $this->runDelete($query);
+    }
+
+    private function deleteQuotePageMissingBotUserAgentUser()
+    {
+        $time = \DateTime::createFromFormat('U', time());
+        $time = $time->sub(new \DateInterval('P1D'));
+
+        // @codingStandardsIgnoreStart
+        $query = [
+            'selector' => sprintf(
+                '(not defined(user["$last_name"]) and behaviors["behavior_11111"] > 0 and behaviors["behavior_11112"] == 0 and behaviors["behavior_11113"] == 0 and behaviors["behavior_11114"] == 0)'
+            ),
+            'behaviors' => [[
+                "window" => "90d",
+                "name" => "behavior_11111",
+                "event_selectors" => [[
+                    "event" => "Quote Page",
+                    "selector" => "(\"Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0)\" in event[\"User Agent\"])"
+                ]]
+            ], [
+                "window" => "90d",
+                "name" => "behavior_11112",
+                "event_selectors" => [[
+                    "event" => "Home Page"
+                ]]
+            ], [
+                "window" => "90d",
+                "name" => "behavior_11113",
+                "event_selectors" => [[
+                    "event" => "Sixpack Experiment",
+                ]]
+            ], [
+                "window" => "90d",
+                "name" => "behavior_11114",
+                "event_selectors" => [[
+                    "event" => "Click on the Buy Now Button"
+                ]]
+            ]
+            ]];
+        // @codingStandardsIgnoreEnd
+
+        return $this->runDelete($query);
+    }
+
+    private function deleteHomepagePageMissingBotUserAgentUser()
+    {
+        $time = \DateTime::createFromFormat('U', time());
+        $time = $time->sub(new \DateInterval('P1D'));
+
+        // @codingStandardsIgnoreStart
+        $query = [
+            'selector' => sprintf(
+                '(not defined(user["$last_name"]) and behaviors["behavior_11111"] > 0 and behaviors["behavior_11112"] == 0 and behaviors["behavior_11113"] == 0 and behaviors["behavior_11114"] == 0)'
+            ),
+            'behaviors' => [[
+                "window" => "90d",
+                "name" => "behavior_11111",
+                "event_selectors" => [[
+                    "event" => "Home Page",
+                    "selector" => "(\"Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0)\" in event[\"User Agent\"])"
+                ]]
+            ], [
+                "window" => "90d",
+                "name" => "behavior_11112",
+                "event_selectors" => [[
+                    "event" => "Quote Page"
+                ]]
+            ], [
+                "window" => "90d",
+                "name" => "behavior_11113",
+                "event_selectors" => [[
+                    "event" => "Sixpack Experiment",
+                ]]
+            ], [
+                "window" => "90d",
+                "name" => "behavior_11114",
+                "event_selectors" => [[
+                    "event" => "Click on the Buy Now Button"
+                ]]
+            ]
+            ]];
+        // @codingStandardsIgnoreEnd
+
+        return $this->runDelete($query);
+    }
+
+    private function deleteOldUsersByNoEvents()
+    {
+        // not certain about this one...
+        $now = \DateTime::createFromFormat('U', time());
+        // @codingStandardsIgnoreStart
+        $query = [
+            'selector' => sprintf(
+                '(datetime(%s - 86400) > user["$last_seen"] and not defined(user["$last_name"]) and behaviors["behavior_11114"] == 0 and behaviors["behavior_11115"] == 0 and behaviors["behavior_11116"] == 0 and behaviors["behavior_11117"] == 0 and behaviors["behavior_11118"] == 0 and behaviors["behavior_11119"] == 0)',
+                $now->format('U')
+            ),
+            'behaviors' => [[
+                "window" => "90d",
+                "name" => "behavior_11114",
+                "event_selectors" => [[
+                    "event" => "Sixpack Experiment",
+                ]]
+            ], [
+                "window" => "90d",
+                "name" => "behavior_11115",
+                "event_selectors" => [[
+                    "event" => "Home Page"
+                ]]
+            ], [
+                "window" => "90d",
+                "name" => "behavior_11116",
+                "event_selectors" => [[
+                    "event" => "Quote Page"
+                ]]
+            ], [
+                "window" => "90d",
+                "name" => "behavior_11117",
+                "event_selectors" => [[
+                    "event" => "CPC Manufacturer Page"
+                ]]
+            ], [
+                "window" => "90d",
+                "name" => "behavior_11118",
+                "event_selectors" => [[
+                    "event" => "Invitation Page"
+                ]]
+            ], [
+                "window" => "90d",
+                "name" => "behavior_11119",
+                "event_selectors" => [[
+                    "event" => "Invite Someone"
+                ]]
+            ]
+            ]];
+        // @codingStandardsIgnoreEnd
+        //print_r($query);
+
+        return $this->runDelete($query);
+    }
+
+    private function deleteFacebookPreview()
+    {
         // Although facebook should be allowed, there seems to be a 'preview' mode which causes havoc
         // with our sixpack tests and causes a huge increase (30k+ users over a few week period)
         // so delete any users over 1 day old with a facebook brower that have just 1 sixpack experiment
@@ -426,13 +607,14 @@ class MixpanelService
                     "event" => "Click on the Buy Now Button"
                 ]]
             ]
-        ]];
+            ]];
         // @codingStandardsIgnoreEnd
-        $count += $this->runDelete($query);
 
-        // Although facebook should be allowed, there seems to be a 'preview' mode which causes havoc
-        // with our sixpack tests and causes a huge increase (30k+ users over a few week period)
-        // so delete any users over 1 day old with a facebook brower that have just 1 sixpack experiment
+        return $this->runDelete($query);
+    }
+
+    private function deleteSixpack()
+    {
         $now = \DateTime::createFromFormat('U', time());
         // @codingStandardsIgnoreStart
         $query = [
@@ -468,8 +650,12 @@ class MixpanelService
             ]];
         // @codingStandardsIgnoreEnd
         //print_r($query);
-        $count += $this->runDelete($query);
 
+        return $this->runDelete($query);
+    }
+
+    private function deleteHappyApp()
+    {
         // Change in behaviour - temporarily delete happy app user agent
         $now = \DateTime::createFromFormat('U', time());
         // @codingStandardsIgnoreStart
@@ -488,10 +674,8 @@ class MixpanelService
             ]
             ]];
         // @codingStandardsIgnoreEnd
-        $count += $this->runDelete($query);
-        //$count += $this->runCount($query);
 
-        return ['count' => $count, 'total' => $data['total']];
+        return $this->runDelete($query);
     }
 
     public function stats($start, $end)
@@ -627,6 +811,11 @@ class MixpanelService
                     }
 
                     $this->delete($data['userId']);
+                } elseif ($action == self::QUEUE_FREEZE_ATTRIBUTION) {
+                    if (!isset($data['userId'])) {
+                        throw new \InvalidArgumentException(sprintf('Unknown message in queue %s', json_encode($data)));
+                    }
+                    $this->freezeAttribution($data['userId']);
                 } else {
                     throw new \InvalidArgumentException(sprintf('Unknown message in queue %s', json_encode($data)));
                 }
@@ -987,6 +1176,36 @@ class MixpanelService
         /** @var \Producers_MixpanelPeople $people */
         $people = $this->mixpanel->people;
         $people->deleteUser($id);
+    }
+
+    /**
+     * Adds freezing user attribution to the queue of mixpanel actions.
+     * @param User $user is user whose attributes we must freeze.
+     */
+    public function queueFreezeAttribution($user)
+    {
+        $this->queue(self::QUEUE_FREEZE_ATTRIBUTION, $user->getId(), ['processTime' => new \DateTime()]);
+    }
+
+    /**
+     * If the given user's attribution is null then it gets set to an empty attribution object so it will not be
+     * edited in the future.
+     * @param String $userId is the id of the user we are freezing.
+     */
+    public function freezeAttribution($userId)
+    {
+        $userRepository = $this->dm->getRepository(User::class);
+        /** @var User $user */
+        $user = $userRepository->find($userId);
+        // If the user has gotten an attribution before this is run or if they don't exist then there is nothing to do.
+        if (!$user || $user->getAttribution()) {
+            return;
+        }
+        $attribution = new Attribution();
+        $attribution->setCampaignSource(Attribution::SOURCE_UNTRACKED);
+        $user->setAttribution($attribution);
+        $this->dm->persist($attribution);
+        $this->dm->flush();
     }
 
     private function transformUtm($setOnce = true)

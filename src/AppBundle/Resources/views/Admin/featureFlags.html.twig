@@ -29,6 +29,7 @@
                     <thead>
                     <tr>
                         <th>Name</th>
+                        <th>Description</th>
                         <th>Enabled</th>
                     </tr>
                     </thead>
@@ -36,6 +37,7 @@
                     {% for feature in features %}
                         <tr>
                             <td>{{ feature.name }}</td>
+                            <td>{{ descriptions[feature.name] }}</td>
                             <td>
                                 {% if feature.enabled %}
                                 Enabled

@@ -6,6 +6,7 @@ use AppBundle\Classes\SoSure;
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePrice;
+use AppBundle\Document\PolicyTerms;
 
 /**
  * @group unit
@@ -14,8 +15,19 @@ class PhoneTest extends \PHPUnit\Framework\TestCase
 {
     use DateTrait;
 
+    /** @var PolicyTerms */
+    protected static $policyTerms;
+
+    /** @var PolicyTerms */
+    protected static $nonPicSurePolicyTerms;
+
     public static function setUpBeforeClass()
     {
+        static::$policyTerms = new PolicyTerms();
+        static::$policyTerms->setVersion(PolicyTerms::VERSION_10);
+
+        static::$nonPicSurePolicyTerms = new PolicyTerms();
+        static::$nonPicSurePolicyTerms->setVersion(PolicyTerms::VERSION_1);
     }
 
     public function tearDown()
@@ -53,12 +65,55 @@ class PhoneTest extends \PHPUnit\Framework\TestCase
     public function testPolicy2dp()
     {
         $phone = new Phone();
-        $phone->init('Apple', 'iPhone 6', 6.990001, 1.5);
+        $phone->init('Apple', 'iPhone 6', 6.990001, static::$policyTerms, 1.5);
         /** @var PhonePrice $price */
         $price = $phone->getCurrentPhonePrice();
         $this->assertEquals(6.99, $price->getMonthlyPremiumPrice());
     }
-    
+
+    public function testPolicyTermsNoPicSure()
+    {
+        $phone = new Phone();
+        $phone->init('Apple', 'iPhone 6', 6.990001, static::$nonPicSurePolicyTerms, 1.5);
+        /** @var PhonePrice $price */
+        $price = $phone->getCurrentPhonePrice();
+        $this->assertNotNull($price->getPhoneExcess());
+        if ($price->getPhoneExcess()) {
+            $this->assertEquals(50, $price->getPhoneExcess()->getDamage());
+            $this->assertEquals(50, $price->getPhoneExcess()->getWarranty());
+            $this->assertEquals(50, $price->getPhoneExcess()->getExtendedWarranty());
+            $this->assertEquals(70, $price->getPhoneExcess()->getTheft());
+            $this->assertEquals(70, $price->getPhoneExcess()->getLoss());
+        }
+        $this->assertNull($price->getPicSureExcess());
+    }
+
+    public function testPolicyTermsPicSure()
+    {
+        $phone = new Phone();
+        $phone->init('Apple', 'iPhone 6', 6.990001, static::$policyTerms, 1.5);
+        /** @var PhonePrice $price */
+        $price = $phone->getCurrentPhonePrice();
+
+        $this->assertNotNull($price->getPicSureExcess());
+        if ($price->getPicSureExcess()) {
+            $this->assertEquals(50, $price->getPicSureExcess()->getDamage());
+            $this->assertEquals(50, $price->getPicSureExcess()->getWarranty());
+            $this->assertEquals(50, $price->getPicSureExcess()->getExtendedWarranty());
+            $this->assertEquals(70, $price->getPicSureExcess()->getTheft());
+            $this->assertEquals(70, $price->getPicSureExcess()->getLoss());
+        }
+
+        $this->assertNotNull($price->getPhoneExcess());
+        if ($price->getPhoneExcess()) {
+            $this->assertEquals(150, $price->getPhoneExcess()->getDamage());
+            $this->assertEquals(150, $price->getPhoneExcess()->getWarranty());
+            $this->assertEquals(150, $price->getPhoneExcess()->getExtendedWarranty());
+            $this->assertEquals(150, $price->getPhoneExcess()->getTheft());
+            $this->assertEquals(150, $price->getPhoneExcess()->getLoss());
+        }
+    }
+
     public function testGetCurrentPhonePrice()
     {
         $phone = new Phone();
@@ -112,22 +167,50 @@ class PhoneTest extends \PHPUnit\Framework\TestCase
     public function testChangePriceNoBinder()
     {
         $phone = new Phone();
-        $phone->init('Apple', 'Binder', 9, 32, ['binder'], 5000);
+        $phone->init('Apple', 'Binder', 9, static::$policyTerms, 32, ['binder'], 5000);
         $this->assertNull($phone->getSalvaBinderMonthlyPremium());
         $this->assertNull($phone->getSalvaMiniumumBinderMonthlyPremium());
-        $phone->changePrice(9, \DateTime::createFromFormat('U', time()));
+        $phone->changePrice(
+            9,
+            \DateTime::createFromFormat('U', time()),
+            static::$policyTerms->getDefaultExcess(),
+            static::$policyTerms->getDefaultPicSureExcess()
+        );
     }
 
     public function testChangePriceOneDay()
     {
         $phone = new Phone();
-        $phone->init('Apple', 'Price', 9, 32, ['time'], 500);
+        $phone->init('Apple', 'Price', 9, static::$nonPicSurePolicyTerms, 32, ['time'], 500);
         $this->assertNotNull($phone->getSalvaBinderMonthlyPremium());
         $this->assertNotNull($phone->getSalvaMiniumumBinderMonthlyPremium());
+        $this->assertNotNull($phone->getCurrentPhonePrice());
+        if ($phone->getCurrentPhonePrice()) {
+            $excess = $phone->getCurrentPhonePrice()->getPhoneExcess();
+            $this->assertNotNull($excess);
+            if ($excess) {
+                $this->assertTrue($excess->equal(PolicyTerms::getLowExcess()));
+            }
+        }
+
         $future = \DateTime::createFromFormat('U', time());
         // TODO: 1 day fails on 26.10.18 as BST is ending. Fix calc at somepoint in the future
         $future = $this->addBusinessDays($future, 2);
-        $phone->changePrice(9, $future);
+        $phone->changePrice(
+            9,
+            $future,
+            static::$policyTerms->getDefaultExcess(),
+            static::$policyTerms->getDefaultPicSureExcess()
+        );
+
+        $this->assertNotNull($phone->getCurrentPhonePrice($future));
+        if ($phone->getCurrentPhonePrice($future)) {
+            $excess = $phone->getCurrentPhonePrice($future)->getPhoneExcess();
+            $this->assertNotNull($excess);
+            if ($excess) {
+                $this->assertTrue($excess->equal(PolicyTerms::getHighExcess()));
+            }
+        }
     }
 
     /**
@@ -136,13 +219,18 @@ class PhoneTest extends \PHPUnit\Framework\TestCase
     public function testChangePriceOneDayBefore()
     {
         $phone = new Phone();
-        $phone->init('Apple', 'OneDayBefore', 9, 32, ['time'], 500);
+        $phone->init('Apple', 'OneDayBefore', 9, static::$policyTerms, 32, ['time'], 500);
         $this->assertNotNull($phone->getSalvaBinderMonthlyPremium());
         $this->assertNotNull($phone->getSalvaMiniumumBinderMonthlyPremium());
         $future = \DateTime::createFromFormat('U', time());
         $future = $this->addBusinessDays($future, 1);
         $future = $future->sub(new \DateInterval('PT1S'));
-        $phone->changePrice(9, $future);
+        $phone->changePrice(
+            9,
+            $future,
+            static::$policyTerms->getDefaultExcess(),
+            static::$policyTerms->getDefaultPicSureExcess()
+        );
     }
 
     /**
@@ -151,10 +239,15 @@ class PhoneTest extends \PHPUnit\Framework\TestCase
     public function testChangePriceImmediate()
     {
         $phone = new Phone();
-        $phone->init('Apple', 'Immediate', 9, 32, ['time'], 500);
+        $phone->init('Apple', 'Immediate', 9, static::$policyTerms, 32, ['time'], 500);
         $this->assertNotNull($phone->getSalvaBinderMonthlyPremium());
         $this->assertNotNull($phone->getSalvaMiniumumBinderMonthlyPremium());
-        $phone->changePrice(9, \DateTime::createFromFormat('U', time()));
+        $phone->changePrice(
+            9,
+            \DateTime::createFromFormat('U', time()),
+            static::$policyTerms->getDefaultExcess(),
+            static::$policyTerms->getDefaultPicSureExcess()
+        );
     }
 
     /**
@@ -163,12 +256,17 @@ class PhoneTest extends \PHPUnit\Framework\TestCase
     public function testChangePricePast()
     {
         $phone = new Phone();
-        $phone->init('Apple', 'Past', 9, 32, ['time'], 500);
+        $phone->init('Apple', 'Past', 9, static::$policyTerms, 32, ['time'], 500);
         $this->assertNotNull($phone->getSalvaBinderMonthlyPremium());
         $this->assertNotNull($phone->getSalvaMiniumumBinderMonthlyPremium());
         $past = \DateTime::createFromFormat('U', time());
         $past = $past->sub(new \DateInterval('P7D'));
-        $phone->changePrice(9, $past);
+        $phone->changePrice(
+            9,
+            $past,
+            static::$policyTerms->getDefaultExcess(),
+            static::$policyTerms->getDefaultPicSureExcess()
+        );
     }
 
     /**
@@ -177,9 +275,9 @@ class PhoneTest extends \PHPUnit\Framework\TestCase
     public function testBinderCurrent()
     {
         $phone1000 = new Phone();
-        $phone1000->init('Apple', '1000Binder', 9, 32, ['1000-binder'], 1000);
+        $phone1000->init('Apple', '1000Binder', 9, static::$policyTerms, 32, ['1000-binder'], 1000);
         $phone1250 = new Phone();
-        $phone1250->init('Apple', '1250Binder', 9, 32, ['1250-binder'], 1250);
+        $phone1250->init('Apple', '1250Binder', 9, static::$policyTerms, 32, ['1250-binder'], 1250);
         $this->assertEquals(10.49, $phone1000->getSalvaBinderMonthlyPremium());
         $this->assertEquals(11.49, $phone1250->getSalvaBinderMonthlyPremium());
     }
@@ -187,9 +285,9 @@ class PhoneTest extends \PHPUnit\Framework\TestCase
     public function testBinder2017()
     {
         $phone1000 = new Phone();
-        $phone1000->init('Apple', '1000Binder', 9, 32, ['1000-binder'], 1000);
+        $phone1000->init('Apple', '1000Binder', 9, static::$policyTerms, 32, ['1000-binder'], 1000);
         $phone1250 = new Phone();
-        $phone1250->init('Apple', '1250Binder', 9, 32, ['1250-binder'], 1250);
+        $phone1250->init('Apple', '1250Binder', 9, static::$policyTerms, 32, ['1250-binder'], 1250);
         $binder2017 = new \DateTime('2017-01-01 00:00:00', new \DateTimeZone(SoSure::TIMEZONE));
         $this->assertEquals(10.49, $phone1000->getSalvaBinderMonthlyPremium($binder2017));
         $this->assertEquals(null, $phone1250->getSalvaBinderMonthlyPremium($binder2017));
@@ -198,11 +296,11 @@ class PhoneTest extends \PHPUnit\Framework\TestCase
     public function testBinder2018()
     {
         $phone1000 = new Phone();
-        $phone1000->init('Apple', '1000Binder', 9, 32, ['1000-binder'], 1000);
+        $phone1000->init('Apple', '1000Binder', 9, static::$policyTerms, 32, ['1000-binder'], 1000);
         $phone1250 = new Phone();
-        $phone1250->init('Apple', '1250Binder', 9, 32, ['1250-binder'], 1250);
+        $phone1250->init('Apple', '1250Binder', 9, static::$policyTerms, 32, ['1250-binder'], 1250);
         $phone1500 = new Phone();
-        $phone1500->init('Apple', '1500Binder', 9, 32, ['1500-binder'], 1500);
+        $phone1500->init('Apple', '1500Binder', 9, static::$policyTerms, 32, ['1500-binder'], 1500);
         $binder2018 = new \DateTime('2018-01-01 00:00:00', new \DateTimeZone(SoSure::TIMEZONE));
         $this->assertEquals(10.49, $phone1000->getSalvaBinderMonthlyPremium($binder2018));
         $this->assertEquals(11.49, $phone1250->getSalvaBinderMonthlyPremium($binder2018));
@@ -215,7 +313,7 @@ class PhoneTest extends \PHPUnit\Framework\TestCase
     public function testPostBinder()
     {
         $phone = new Phone();
-        $phone->init('Apple', 'PostBinder', 9, 32, ['post-binder'], 1000);
+        $phone->init('Apple', 'PostBinder', 9, static::$policyTerms, 32, ['post-binder'], 1000);
         $binder2019 = new \DateTime('2019-01-01 00:00:00', new \DateTimeZone(SoSure::TIMEZONE));
         $phone->getSalvaBinderMonthlyPremium($binder2019);
     }
@@ -232,7 +330,7 @@ class PhoneTest extends \PHPUnit\Framework\TestCase
     private function getSamplePhoneA()
     {
         $phone = new Phone();
-        $phone->init('Apple', 'iPhone 5s', 6.49 + 1.5);
+        $phone->init('Apple', 'iPhone 5s', 6.49 + 1.5, static::$policyTerms);
 
         return $phone;
     }
@@ -240,7 +338,7 @@ class PhoneTest extends \PHPUnit\Framework\TestCase
     private function getSamplePhoneB()
     {
         $phone = new Phone();
-        $phone->init('Apple', 'iPhone 6', 6.99 + 1.5);
+        $phone->init('Apple', 'iPhone 6', 6.99 + 1.5, static::$policyTerms);
 
         return $phone;
     }

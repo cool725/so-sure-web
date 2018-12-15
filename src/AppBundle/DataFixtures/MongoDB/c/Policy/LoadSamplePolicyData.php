@@ -10,6 +10,7 @@ use AppBundle\Document\File\AccessPayFile;
 use AppBundle\Document\File\BacsReportInputFile;
 use AppBundle\Document\File\S3File;
 use AppBundle\Document\Payment\BacsPayment;
+use AppBundle\Document\PhonePremium;
 use AppBundle\Repository\PolicyRepository;
 use AppBundle\Service\PolicyService;
 use AppBundle\Service\RouterService;
@@ -76,7 +77,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
     {
         $this->faker = Faker\Factory::create('en_GB');
 
-        $users = $this->newUsers($manager, 350);
+        $users = $this->newUsers($manager, 550);
         $unpaid = $this->newUsers($manager, 10);
         $unpaidDiscount = $this->newUsers($manager, 10);
         $iosPreExpireUsers = $this->newUsers($manager, 40);
@@ -170,22 +171,35 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         foreach ($preExpireYearlyUsers as $user) {
             $phones[] = $user->getPolicies()[0]->getPhone();
         }
+        $fiveMonthsAgo = \DateTime::createFromFormat('U', time());
+        $fiveMonthsAgo = $fiveMonthsAgo->sub(new \DateInterval('P5M'));
         $sixMonthsAgo = \DateTime::createFromFormat('U', time());
         $sixMonthsAgo = $sixMonthsAgo->sub(new \DateInterval('P6M'));
         $sevenMonthsAgo = \DateTime::createFromFormat('U', time());
         $sevenMonthsAgo = $sevenMonthsAgo->sub(new \DateInterval('P7M'));
         $adjusted = [];
         for ($i = 0; $i < 5; $i++) {
+            /** @var Phone $phone */
             $phone = $phones[random_int(0, count($phones) - 1)];
             if (isset($adjusted[$phone->getId()])) {
                 continue;
             }
             $adjusted[] = $phone->getId();
-            $adjustedPrice = $phone->getCurrentPhonePrice()->getGwp() - 0.01;
-            if ($phone->getSalvaMiniumumBinderMonthlyPremium() < $phone->getCurrentPhonePrice()->getGwp() - 0.30) {
-                $adjustedPrice = $phone->getCurrentPhonePrice()->getGwp() - 0.30;
+            /** @var PhonePremium $currentPrice */
+            $currentPrice = $phone->getCurrentPhonePrice();
+            $adjustedPrice = $currentPrice->getGwp() - 0.01;
+            if ($phone->getSalvaMiniumumBinderMonthlyPremium() < $currentPrice->getGwp() - 0.30) {
+                $adjustedPrice = $currentPrice->getGwp() - 0.30;
             }
-            $phone->changePrice($adjustedPrice, $sixMonthsAgo, null, null, $sevenMonthsAgo);
+            $phone->changePrice(
+                $adjustedPrice,
+                $sixMonthsAgo, //feb feb > jan
+                PolicyTerms::getHighExcess(),
+                PolicyTerms::getLowExcess(),
+                null, // mar mar > jan feb > mar
+                null,
+                $sevenMonthsAgo // jan
+            );
         }
 
         // Sample user for apple
@@ -636,6 +650,13 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         /** @var PolicyTerms $nonPicSureTerms */
         $nonPicSureTerms = $policyTermsRepo->findOneBy(['version' => 'Version 1 June 2016']);
 
+        if (!$latestTerms || count($latestTerms->getAllowedExcesses()) == 0) {
+            throw new \Exception('Missing latest terms');
+        }
+        if (!$nonPicSureTerms || count($nonPicSureTerms->getAllowedExcesses()) == 0) {
+            throw new \Exception('Missing non pic-sure terms');
+        }
+
         $startDate = \DateTime::createFromFormat('U', time());
         if ($days === null) {
             $days = sprintf("P%dD", random_int(0, 120));
@@ -644,12 +665,12 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         }
         $startDate->sub(new \DateInterval($days));
         $policy = new SalvaPhonePolicy();
-        $policy->setPhone($phone);
+        $policy->setPhone($phone, null, false);
         $policy->setImei($this->generateRandomImei());
         if ($picSure == self::PICSURE_NON_POLICY) {
-            $policy->init($user, $nonPicSureTerms);
+            $policy->init($user, $nonPicSureTerms,false);
         } else {
-            $policy->init($user, $latestTerms);
+            $policy->init($user, $latestTerms, false);
         }
         if (!$code) {
             $policy->createAddSCode($count);

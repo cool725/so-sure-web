@@ -10,7 +10,10 @@ require('bootstrap/js/dist/carousel');
 require('jquery-validation');
 require('../../../js/Default/jqueryValidatorMethods.js');
 require('jssocials');
+
 let Clipboard = require('clipboard');
+
+import tracking from '../common/trackData.js';
 
 $(function() {
 
@@ -101,6 +104,8 @@ $(function() {
             }
         }
 
+        tracking('', 'onboarding', 'page-' + e.to);
+
         // Desktop navigation buttons.
         if (onNavDt.length) {
             // IDEA: If I were using this more I could change the data-secondary-page thing so be a maximum and allow each navigation button to represent a range of slides.
@@ -128,6 +133,8 @@ $(function() {
     clipboard.on('success', function(e) {
         $('.btn-copy').tooltip({'title':   'Copied 😀','trigger': 'manual'}).tooltip('show');
 
+        tracking('', 'scodecopied', 'onboarding');
+
         setTimeout(function() {
             $('.btn-copy').tooltip('hide');
         }, 1500);
@@ -144,12 +151,13 @@ $(function() {
         url:       $(onboardingShare).data('share-link'),
         shareIn:   'popup',
         showLabel: false,
-        showCount: false
-        // on: {
-        //     click: function(e) {
-        //         sosure.track.byInvite(this.share);
-        //     }
-        // }
+        showCount: false,
+        on: {
+            click: function(e) {
+                let location = 'onboarding';
+                tracking(this.share, 'invite', location);
+            }
+        }
     });
 
     // Email Invite code

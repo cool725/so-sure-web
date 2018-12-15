@@ -1,6 +1,9 @@
 <?php
 namespace AppBundle\Service;
 
+use AppBundle\Document\File\DirectGroupFile;
+use AppBundle\Document\File\S3File;
+use phpseclib\Crypt\RSA;
 use phpseclib\Net\SFTP;
 use Psr\Log\LoggerInterface;
 use Aws\S3\S3Client;
@@ -13,7 +16,7 @@ use AppBundle\Document\File\DaviesFile;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use VasilDakov\Postcode\Postcode;
 
-abstract class SftpService
+class SftpService
 {
     use CurrencyTrait;
     use DateTrait;
@@ -21,23 +24,12 @@ abstract class SftpService
     const PROCESSED_FOLDER = 'Processed';
     const FAILED_FOLDER = 'Failed';
 
-    /** @var DocumentManager */
-    protected $dm;
+    const LOGIN_PASSWORD = 'password';
+    const LOGIN_KEYFILE = 'keyfile';
+    const LOGIN_KEYFILE_PASSWORD = 'keyfile-password';
 
     /** @var LoggerInterface */
     protected $logger;
-
-    /** @var ExcelService */
-    protected $excel;
-
-    /** @var S3Client */
-    protected $s3;
-
-    /** @var string */
-    protected $bucket;
-
-    /** @var string */
-    protected $path;
 
     /** @var string */
     protected $server;
@@ -49,204 +41,84 @@ abstract class SftpService
     protected $password;
 
     /** @var string */
-    protected $zipPassword;
+    protected $keyFile;
 
     /** @var string */
-    protected $environment;
+    protected $baseFolder;
 
-    protected $warnings = [];
-    protected $errors = [];
-    protected $sosureActions = [];
+    /** @var boolean */
+    protected $recursive;
 
     /** @var SFTP */
     protected $sftp;
 
-    public function setDm($dm)
-    {
-        $this->dm = $dm;
-    }
-
-    public function setLogger($logger)
-    {
+    public function __construct(
+        LoggerInterface $logger,
+        array $sftpDetails
+    ) {
         $this->logger = $logger;
+        $this->server = $sftpDetails[0];
+        $this->username = $sftpDetails[1];
+        $this->password = $sftpDetails[2];
+        $this->keyFile = $sftpDetails[3];
+        $this->baseFolder = $sftpDetails[4];
+        $this->recursive = filter_var($sftpDetails[5], FILTER_VALIDATE_BOOLEAN);
     }
 
-    public function setExcel($excel)
+    private function getLoginType()
     {
-        $this->excel = $excel;
-    }
-
-    public function setS3($s3)
-    {
-        $this->s3 = $s3;
-    }
-
-    public function setEnvironment($environment)
-    {
-        $this->environment = $environment;
-    }
-
-    public function setBucket($bucket)
-    {
-        $this->bucket = $bucket;
-    }
-
-    public function setPath($pathPrefix)
-    {
-        $this->path = sprintf('%s/%s', $pathPrefix, $this->environment);
-    }
-
-    public function setUsername($username)
-    {
-        $this->username = $username;
-    }
-
-    public function setPassword($password)
-    {
-        $this->password = $password;
-    }
-
-    public function setZipPassword($zipPassword)
-    {
-        $this->zipPassword = $zipPassword;
-    }
-
-    public function setServer($server)
-    {
-        $this->server = $server;
-    }
-
-    public function getWarnings()
-    {
-        return $this->warnings;
-    }
-
-    public function clearWarnings()
-    {
-        $this->warnings = [];
-    }
-
-    public function getErrors()
-    {
-        return $this->errors;
-    }
-
-    public function clearErrors()
-    {
-        $this->errors = [];
-    }
-
-    public function getSoSureActions()
-    {
-        return $this->sosureActions;
-    }
-
-    public function clearSoSureActions()
-    {
-        $this->sosureActions = [];
-    }
-
-    abstract public function processExcelData($key, $data);
-    abstract public function postProcess();
-    abstract public function getNewS3File();
-    abstract public function getColumnsFromSheetName($sheetName);
-    abstract public function createLineObject($line, $columns);
-
-    public function import($sheetName, $useMime = true, $maxParseErrors = 0, $skipCleanup = false)
-    {
-        $lines = [];
-        $files = $this->listSftp();
-        foreach ($files as $file) {
-            $this->clearWarnings();
-            $this->clearErrors();
-            $tempFile = null;
-            $unzipTempFiles = null;
-            $lines[] = sprintf('Processing %s/%s', $this->path, $file);
-            $processed = false;
-            try {
-                $tempFile = $this->downloadFile($file);
-                $unzipTempFiles = $this->unzipFile($tempFile);
-                foreach ($unzipTempFiles as $excelFile) {
-                    $data = $this->parseExcel($excelFile, $sheetName, $useMime, $maxParseErrors);
-                    $processed = $this->processExcelData($file, $data);
-                }
-            } catch (\Exception $e) {
-                $processed = false;
-                $this->logger->error(sprintf(
-                    'Error processing %s. Moving to failed. Ex: %s',
-                    $file,
-                    $e->getMessage()
-                ));
-            }
-
-            if ($processed) {
-                $key = $this->uploadS3($tempFile, $file, self::PROCESSED_FOLDER);
-                $lines[] = sprintf('Successfully imported %s and moved to processed folder', $key);
+        if ($this->keyFile && file_exists($this->keyFile)) {
+            if (mb_strlen($this->password) > 0) {
+                return self::LOGIN_KEYFILE_PASSWORD;
             } else {
-                $key = $this->uploadS3($tempFile, $file, self::FAILED_FOLDER);
-                $lines[] = sprintf('Failed to import %s and moved to failed folder', $key);
+                return self::LOGIN_KEYFILE;
             }
-
-            $this->postProcess();
-
-            if (!$skipCleanup) {
-                if (file_exists($tempFile)) {
-                    unlink($tempFile);
-                }
-                foreach ($unzipTempFiles as $unzipTempFile) {
-                    if (file_exists($unzipTempFile)) {
-                        unlink($unzipTempFile);
-                    }
-                }
-
-                $this->moveSftp($file, self::PROCESSED_FOLDER);
-            } else {
-                if (file_exists($tempFile)) {
-                    $lines[] = sprintf('Skipping cleanup for %s', $tempFile);
-                }
-                foreach ($unzipTempFiles as $unzipTempFile) {
-                    if (file_exists($unzipTempFile)) {
-                        $lines[] = sprintf('Skipping cleanup for %s', $unzipTempFile);
-                    }
-                }
-            }
+        } elseif (mb_strlen($this->password) > 0) {
+            return self::LOGIN_PASSWORD;
         }
 
-        return $lines;
-    }
-
-    public function importFile($file, $sheetName, $useMime = true, $maxParseErrors = 0)
-    {
-        $lines = [];
-        $lines[] = sprintf('Processing %s', $file);
-        $processed = false;
-        try {
-            $data = $this->parseExcel($file, $sheetName, $useMime, $maxParseErrors);
-            $processed = $this->processExcelData($file, $data);
-        } catch (\Exception $e) {
-            $processed = false;
-            $this->logger->error(sprintf('Error processing %s. Ex: %s', $file, $e->getMessage()));
-        }
-
-        if ($processed) {
-            $lines[] = sprintf('Successfully imported %s', $file);
-        } else {
-            $lines[] = sprintf('Failed to import %s', $file);
-        }
-        $this->postProcess();
-
-        return $lines;
+        throw new \Exception('Unable to determine login method');
     }
 
     private function loginSftp()
     {
         $this->sftp = new SFTP($this->server);
         $this->sftp->enableQuietMode();
-        if (!$this->sftp->login($this->username, $this->password)) {
+
+        $loginType = $this->getLoginType();
+        $key = new RSA();
+        if (in_array($loginType, [self::LOGIN_KEYFILE_PASSWORD, self::LOGIN_KEYFILE])) {
+            $key->loadKey(file_get_contents($this->keyFile));
+        }
+
+        $loginSuccess = false;
+        if ($loginType == self::LOGIN_KEYFILE_PASSWORD) {
+            $loginSuccess = $this->sftp->login($this->username, $key) ||
+                $this->sftp->login($this->username, $this->password);
+        } elseif ($loginType == self::LOGIN_KEYFILE) {
+            $loginSuccess = $this->sftp->login($this->username, $key);
+        } elseif ($loginType == self::LOGIN_PASSWORD) {
+            $loginSuccess = $this->sftp->login($this->username, $this->password);
+        }
+
+        if (!$loginSuccess) {
             throw new \Exception(sprintf(
-                'Login Failed. Msg: %s',
+                'Login Failed for type %s. Msg: %s',
+                $loginType,
                 $this->sftp->getLastSFTPError()
             ));
+        }
+
+        if ($this->baseFolder) {
+            $this->sftp->chdir($this->baseFolder);
+        }
+
+        if (!file_exists(self::PROCESSED_FOLDER)) {
+            $this->sftp->mkdir(self::PROCESSED_FOLDER);
+        }
+
+        if (!file_exists(self::FAILED_FOLDER)) {
+            $this->sftp->mkdir(self::FAILED_FOLDER);
         }
     }
 
@@ -258,7 +130,7 @@ abstract class SftpService
         if (!$this->sftp) {
             $this->loginSftp();
         }
-        $files = $this->sftp->nlist('.', false);
+        $files = $this->sftp->nlist('.', $this->recursive);
         if ($files === false) {
             throw new \Exception(sprintf(
                 'List folder Failed. Msg: %s',
@@ -267,7 +139,11 @@ abstract class SftpService
         }
         $list = [];
         foreach ($files as $file) {
-            if (mb_stripos($file, $extension) !== false) {
+            $isProcessed = mb_stripos($file, self::PROCESSED_FOLDER) !== false;
+            $isFailed = mb_stripos($file, self::FAILED_FOLDER) !== false;
+            $hasExtension = mb_stripos($file, $extension) !== false;
+
+            if ($hasExtension && !$isProcessed && !$isFailed) {
                 $list[] = $file;
             }
         }
@@ -275,56 +151,42 @@ abstract class SftpService
         return $list;
     }
 
-    public function moveSftp($file, $folder)
+    public function moveSftp($file, $success)
+    {
+        $this->moveSftpToFolder($file, $success ? self::PROCESSED_FOLDER : self::FAILED_FOLDER);
+    }
+
+    public function moveSftpToFolder($file, $folder)
     {
         if (!$this->sftp) {
             $this->loginSftp();
         }
 
+        $newFile = sprintf('%s/%s', $folder, basename($file));
+
         // it may take too long to process the file - if it fails, try logging in again
-        if (!$this->sftp->rename($file, sprintf('%s/%s', $folder, $file))) {
+        if (!$this->sftp->rename($file, $newFile)) {
             $this->loginSftp();
-            if (!$this->sftp->rename($file, sprintf('%s/%s', $folder, $file))) {
+            $this->sftp->delete($newFile, false);
+            if (!$this->sftp->rename($file, $newFile)) {
                 throw new \Exception(sprintf(
-                    'Login Failed. Msg: %s',
+                    'Failed to move %s to %s. (Login Failed?) Msg: %s',
+                    $file,
+                    $newFile,
                     $this->sftp->getLastSFTPError()
                 ));
             }
         }
-    }
 
-    public function uploadS3($file, $name, $folder)
-    {
-        $now = \DateTime::createFromFormat('U', time());
-        $extension = sprintf('.%s', pathinfo($name, PATHINFO_EXTENSION));
-        $s3Key = sprintf(
-            '%s/%s/%d/%s-%s%s',
-            $this->path,
-            $folder,
-            $now->format('Y'),
-            basename($name, $extension),
-            $now->format('U'),
-            $extension
-        );
-        $result = $this->s3->putObject(array(
-            'Bucket' => $this->bucket,
-            'Key'    => $s3Key,
-            'SourceFile' => $file,
-        ));
-
-        $file = $this->getNewS3File();
-        $file->setBucket($this->bucket);
-        $file->setKey($s3Key);
-        $file->setSuccess($folder == self::PROCESSED_FOLDER);
-        $this->dm->persist($file);
-        $this->dm->flush();
-
-        return $s3Key;
+        $hasSubfolder = basename($file) != $file;
+        if ($hasSubfolder) {
+            $this->sftp->rmdir(pathinfo($file, PATHINFO_DIRNAME));
+        }
     }
 
     public function generateTempFile()
     {
-        $tempFile = tempnam(sys_get_temp_dir(), "s3email");
+        $tempFile = tempnam(sys_get_temp_dir(), "sftp-");
 
         return $tempFile;
     }
@@ -345,122 +207,5 @@ abstract class SftpService
         }
 
         return $tempFile;
-    }
-
-    public function unzipFile($file, $extension = '.xlsx')
-    {
-        $files = [];
-
-        $zip = new \ZipArchive();
-        if ($zip->open($file) === true) {
-            if ($zip->setPassword($this->zipPassword)) {
-                if (!$zip->extractTo(sys_get_temp_dir())) {
-                    throw new \Exception("Extraction failed (wrong password?)");
-                }
-                for ($i = 0; $i < $zip->numFiles; $i++) {
-                    if (mb_stripos($zip->getNameIndex($i), $extension) !== false) {
-                        $files[] = sprintf('%s/%s', sys_get_temp_dir(), $zip->getNameIndex($i));
-                    }
-                }
-            }
-
-            $zip->close();
-        }
-
-        return $files;
-    }
-
-    /**
-     * @param string $filename
-     *
-     * @return string Excel tmp file
-     */
-    public function extractExcelFromEmail($filename)
-    {
-        $excelFile = null;
-        $fileTxt = implode("", file($filename));
-        $mime = mailparse_msg_parse_file($filename);
-        try {
-            $structure = mailparse_msg_get_structure($mime);
-            foreach ($structure as $element) {
-                $mimePart = mailparse_msg_get_part($mime, $element);
-                $bodyParts = mailparse_msg_get_part_data($mimePart);
-                if (isset($bodyParts['content-type'])) {
-                    try {
-                        $fileExtension = $this->excel->getFileExtension($bodyParts['content-type']);
-                        $testFile = sprintf("%s.%s", $this->generateTempFile(), $fileExtension);
-                        if ($file = fopen($testFile, "wb")) {
-                            fputs($file, mailparse_msg_extract_part_file($mimePart, $filename, null));
-                            fclose($file);
-                            $excelFile = $testFile;
-                        }
-                    } catch (\Exception $e) {
-                        $this->logger->debug(
-                            sprintf('Skipping email attachment %s', $bodyParts['content-type']),
-                            ['exception' => $e]
-                        );
-                    }
-                }
-            }
-        } catch (\Exception $e) {
-            $excelFile = null;
-            $this->logger->error(sprintf("Unable to parse email. Ex: %s", $e->getMessage()));
-        }
-        mailparse_msg_free($mime);
-
-        return $excelFile;
-    }
-
-    public function parseExcel($filename, $sheetName, $useMime = true, $maxParseErrors = 0)
-    {
-        $tempFile = $this->generateTempFile();
-        $this->excel->convertToCsv($filename, $tempFile, $sheetName, $useMime);
-        $lines = array_map('str_getcsv', file($tempFile));
-        unlink($tempFile);
-
-        $data = [];
-        $row = -1;
-        $columns = -1;
-        $parseErrors = 0;
-        foreach ($lines as $line) {
-            $row++;
-            try {
-                $columns = $this->getColumnsFromSheetName($sheetName);
-                // There may be additional blank columns that need to be ignored
-                $line = array_slice($line, 0, $columns);
-
-                // If the claim doesn't have correct data, just ignore
-                if ($lineObject = $this->createLineObject($line, $columns)) {
-                    $data[] = $lineObject;
-                }
-            } catch (\Exception $e) {
-                $msg = sprintf("Unable to import claim. Error: %s, Line: %s", $e->getMessage(), json_encode($line));
-                $this->logger->info($msg);
-                $this->errors['Unknown'][] = $msg;
-                $parseErrors++;
-
-                if ($parseErrors > $maxParseErrors) {
-                    throw $e;
-                }
-            }
-        }
-
-        if (count($data) == 0) {
-            throw new \Exception(sprintf('Unable to find any data to process in file'));
-        }
-
-        return $data;
-    }
-
-    protected function postcodeCompare($postcodeA, $postcodeB)
-    {
-        $postcodeA = new Postcode($postcodeA);
-        $postcodeB = new Postcode($postcodeB);
-        /*
-        if (!$postcodeA|| !$postcodeB) {
-            return false;
-        }*/
-
-        return $postcodeA->normalise() === $postcodeB->normalise();
     }
 }

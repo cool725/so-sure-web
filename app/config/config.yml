@@ -69,7 +69,7 @@ twig:
         branch_key: "%branch_key%"
         drift_key: "%drift_key%"
         use_cdn: true
-        use_fa_cdn: false
+        use_fa_cdn: true
         #default_login_method: "accountkit"
         default_login_method: "accountkit"
         branch_pot_url: "%branch_pot_url%"
@@ -397,7 +397,17 @@ nexy_slack:
     # The Slack API Incoming WebHooks URL.
     endpoint:             "%slack_webhook%"
 
+ewz_recaptcha:
+    public_key:  "%recaptcha_public_key%"
+    private_key: "%recaptcha_private_key%"
+    enabled:     true
+
 nelmio_security:
+    referrer_policy:
+        enabled: true
+        policies:
+        - 'no-referrer'
+        - 'strict-origin-when-cross-origin'
     csp:
         report_logger_service: monolog.logger.security
         content_types: ['text/html']
@@ -409,6 +419,8 @@ nelmio_security:
             browser_adaptive:
                 enabled: true
             report-uri: "%router.request_context.base_url%/ops/csp"
+            frame-ancestors:
+                - 'none'
             default-src:
                 - 'self'
                 - https://maxcdn.bootstrapcdn.com
@@ -790,6 +802,7 @@ nelmio_security:
                 - https://track.omguk.com
                 - 'data:'
                 - https://bat.bing.com
+                - https://www.gstatic.com
                 # https://en.wikipedia.org/wiki/List_of_Google_domains
                 - https://www.google.com
                 - https://www.google.ac

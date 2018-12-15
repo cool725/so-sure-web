@@ -1,74 +1,58 @@
 {% block body %}
 
-  {{ form_start(form, {'attr': {'class': 'form-inline'}}) }}
-  <div class="modal-body">
-    <div class="container-fluid">
-      <div class="row">
-        <div class="col">
-          <p>Are you sure you want to update this IMEI? Common cases for this would be:</p>
-          <ul>
-            <li>User mistyped their IMEI during purchase</li>
-            <li>User entered the 2nd IMEI number instead of the first in the case of a dual sim card</li>
-            <li>IMEI was updated by claims team but the system could not auto-update the imei number</li>
-            <li>Voucher was issued by the claims team</li>
-            <li>User had a warrenty issue that was handled outside the claims process - same make/model, just
-              different
-              imei.
-            </li>
-          </ul>
-          <p>This will trigger a Salva Policy Update.</p>
-          <p><strong>In many cases we would want to invalidate the pic-sure on the policy (not currently available
-              yet)</strong></p>
+    {{ form_start(form) }}
+    <div class="modal-body">
+        <div class="container-fluid">
+            <div class="form-row">
+                <div class="col">
+                    <p>Are you sure you want to update this IMEI? Common cases for this would be:</p>
+                    <div class="list-group cases">
+                        <a class="list-group-item list-group-item-action">User mistyped their IMEI during purchase</a>
+                        <a class="list-group-item list-group-item-action">User entered the 2nd IMEI number instead of the first in the case of a dual sim card</a>
+                        <a class="list-group-item list-group-item-action">IMEI was updated by claims team but the system could not auto-update the IMEI number</a>
+                        <a class="list-group-item list-group-item-action">Voucher was issued by the claims team</a>
+                        <a class="list-group-item list-group-item-action">User had a warranty issue that was handled outside the claims process - same make/model, just different IMEI.</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" required> I've read the list of common reasons above
+                    </label>
+                </div>
+
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" required> If it is not a common reason, I have verified the exception is allowed
+                    </label>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <label>Current IMEI</label>
+                <p>{{ policy.imei }}</p>
+            </div>
+
+            <hr>
+
+            <div class="form-row">
+                <label>New IMEI</label>
+                {{ form_widget(form.imei, {'attr': {'class': 'form-control'}}) }}
+            </div>
+
+            <div class="form-row">
+                <label>Justification</label>
+                {{ form_widget(form.note, {'attr': {'class': 'form_note form-control'}}) }}
+            </div>
         </div>
-      </div>
-
-      <div class="row" id="checkboxes" style="margin-bottom: 20px;">
-        <div class="col">
-          <input required type="checkbox" id="checkbox1">
-          <label for="checkbox1">I've read the list of common reasons above</label>
-        </div>
-
-        <div class="col">
-          <input required type="checkbox" id="checkbox2">
-          <label for="checkbox2">If it is not a common reason, I have verified the exception is allowed</label>
-        </div>
-      </div>
-
-      <br>
-
-      <div class="row">
-        <table class="table table-striped">
-          <tbody>
-          <tr>
-            <td>Current IMEI</td>
-            <td id="imei">
-              {{ policy.imei }}
-            </td>
-          </tr>
-
-          <tr>
-            <td>New IMEI</td>
-            <td>
-              {{ form_widget(form.imei) }}
-            </td>
-          </tr>
-
-          <tr>
-            <td>Justification</td>
-            <td>
-              {{ form_widget(form.note) }}
-            </td>
-          </tr>
-          </tbody>
-        </table>
-      </div>
     </div>
-  </div>
 
-  <div class="modal-footer">
-    {{ form_widget(form.update, { 'attr': {'class': 'btn btn-danger', 'disabled': 'true'} }) }}
-    <button type="button" class="btn btn-grey" data-dismiss="modal">Close</button>
-  </div>
-  {{ form_end(form) }}
+    <div class="modal-footer">
+        {{ form_widget(form.update, { 'attr': {'class': 'btn btn-danger', 'disabled': 'true'} }) }}
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+    </div>
+    {{ form_end(form) }}
 
 {% endblock %}

@@ -22,6 +22,8 @@ class PolicyEvent extends Event
     const EVENT_UPDATED_PREMIUM = 'event.policy.updated-premium';
     const EVENT_UPDATED_BILLING = 'event.policy.updated-billing';
 
+    const EVENT_UPDATED_STATUS = 'event.policy.updated-status';
+
     // Certain changes to a policy (user) should trigger a new salva version
     const EVENT_SALVA_INCREMENT = 'event.policy.salva_increment';
 
@@ -30,6 +32,7 @@ class PolicyEvent extends Event
     /** @var Policy */
     protected $policy;
     protected $date;
+    protected $previousStatus;
 
     public function __construct(Policy $policy, \DateTime $date = null)
     {
@@ -48,5 +51,15 @@ class PolicyEvent extends Event
     public function getDate()
     {
         return $this->date;
+    }
+
+    public function setPreviousStatus($previousStatus)
+    {
+        $this->previousStatus = $previousStatus;
+    }
+
+    public function getPreviousStatus()
+    {
+        return $this->previousStatus;
     }
 }

@@ -104,11 +104,18 @@
                     </tr>
                     </thead>
                     <tbody>
-                    {% for claim in claims %}
+                    {% for claim in claims if claim.policy %}
                         <tr>
-                            <td><button type="button" class="btn btn-link" data-toggle="modal" data-target="#claimsModal"
-                            data-claim='{{ claim.toModalArray|json_encode }}' data-documents='{{ s3DownloadLinks(claim)|json_encode }}'>
-                                {% if claim.number %}{{ claim.number }}{% else %}N/A{% endif %}</button>
+                            <td>
+                                {% if is_granted('ROLE_EMPLOYEE') %}
+                                <button type="button" class="btn btn-link" data-route="{{ path('admin_claims_form_claims', {'id': claim.id}) }}" data-toggle="modal" data-target="#claimsModal">
+                                    {% if claim.number %}{{ claim.number }}{% else %}N/A{% endif %}
+                                </button>
+                                {% elseif is_granted('ROLE_CLAIMS') %}
+                                <button type="button" class="btn btn-link" data-route="{{ path('claims_claims_form_claims', {'id': claim.id}) }}" data-toggle="modal" data-target="#claimsModal">
+                                    {% if claim.number %}{{ claim.number }}{% else %}N/A{% endif %}
+                                </button>
+                                {% endif %}
                             </td>
                             <td>
                                 {% if is_granted('ROLE_EMPLOYEE') %}
@@ -163,7 +170,7 @@
 
 </div>
 
-{% include 'AppBundle::Claims/claimsModal.html.twig' with {'route': 'admin_claims' } %}
+{% include 'AppBundle::Claims/claimsModal.html.twig' %}
 
 
 {% endblock %}

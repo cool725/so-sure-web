@@ -4,6 +4,9 @@ namespace AppBundle\Tests\Command;
 
 use AppBundle\Command\OpsReportCommand;
 use AppBundle\Document\Phone;
+use AppBundle\Document\PolicyTerms;
+use Doctrine\ODM\MongoDB\DocumentManager;
+use Doctrine\ODM\MongoDB\DocumentRepository;
 use League\Flysystem\Exception;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
@@ -54,12 +57,19 @@ class RetirePhoneReportCommandTest extends KernelTestCase
 
     public function testPhoneShouldBeRetiredReportCommand()
     {
+        /** @var DocumentManager $dm */
         $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        /** @var DocumentRepository $policyTermsRepo */
+        $policyTermsRepo = $dm->getRepository(PolicyTerms::class);
+        /** @var PolicyTerms $latestTerms */
+        $latestTerms = $policyTermsRepo->findOneBy(['latest' => true]);
+
         $phone = new Phone();
         $phone->init(
             'ShouldBeRetiredMakeMake',
             'ShouldBeRetiredTestModel',
             5,
+            $latestTerms,
             64,
             ['shoudberetireddevice'],
             300,

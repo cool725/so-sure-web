@@ -15,6 +15,7 @@ use Twig\Template;
 
 class SmsService
 {
+    use RouterTrait;
 
     const VALIDATION_KEY = 'Mobile:Validation:%s:%s';
     const VALIDATION_TIMEOUT = 600; // 10 minutes
@@ -43,6 +44,19 @@ class SmsService
     /** @var string */
     protected $environment;
 
+    /** @var MixpanelService */
+    protected $mixpanelService;
+
+    /**
+     * An array of campaigns that should trigger an analytics event (e.g. Mixpanel)
+     * @var array
+     */
+    public static $analyticsCampaigns = [
+        'card/failedPayment-2',
+        'card/failedPayment-3',
+        'card/failedPayment-4',
+    ];
+
     /**
      * @param DocumentManager $dm
      * @param LoggerInterface $logger
@@ -53,6 +67,7 @@ class SmsService
      * @param EngineInterface $templating
      * @param Client          $redis
      * @param string          $environment
+     * @param MixpanelService $mixpanelService
      */
     public function __construct(
         DocumentManager $dm,
@@ -62,8 +77,9 @@ class SmsService
         $auth_token,
         $sending_number,
         EngineInterface $templating,
-        $redis,
-        $environment
+        Client $redis,
+        $environment,
+        MixpanelService $mixpanelService
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
@@ -73,6 +89,7 @@ class SmsService
         $this->templating = $templating;
         $this->redis = $redis;
         $this->environment = $environment;
+        $this->mixpanelService = $mixpanelService;
     }
 
     /**
@@ -159,10 +176,19 @@ class SmsService
         $number,
         $template,
         $data,
-        $chargePolicy = null,
+        Policy $chargePolicy = null,
         $type = Charge::TYPE_SMS_INVITATION,
         $fake = false
     ) {
+        $campaign = $this->getCampaign($template);
+        if ($chargePolicy && in_array($campaign, self::$analyticsCampaigns)) {
+            $this->mixpanelService->queueTrackWithUser(
+                $chargePolicy->getUser(),
+                MixpanelService::EVENT_SMS,
+                ['campaign' => $campaign]
+            );
+        }
+
         $message = $this->templating->render($template, $data);
         return $this->send($number, $message, $chargePolicy, $type, $fake);
     }

@@ -85,12 +85,22 @@
             {{ form_errors(form.active) }}
             {{ form_widget(form.active, {'attr': {'class': 'col-sm-6'}}) }}
         </div>
-        <div class="form-group col-sm-4">
+        <div class="form-group col-sm-3">
             {{ form_label(form.rules, 'Business rules', {'label_attr': {'class': 'col-sm-6'}}) }}
             {{ form_errors(form.rules) }}
             {{ form_widget(form.rules, {'attr': {'class': 'col-sm-6'}}) }}
         </div>
-        <div class="form-group">
+        <div class="form-group col-sm-3">
+            {{ form_label(form.make, 'Make', {'label_attr': {'class': 'col-sm-4'}}) }}
+            {{ form_errors(form.make) }}
+            {{ form_widget(form.make, {'attr': {'class': 'col-sm-8'}}) }}
+        </div>
+        <div class="form-group col-sm-3">
+            {{ form_label(form.model, 'Model', {'label_attr': {'class': 'col-sm-4'}}) }}
+            {{ form_errors(form.model) }}
+            {{ form_widget(form.model, {'attr': {'class': 'col-sm-8'}}) }}
+        </div>
+        <div class="form-group col-sm-3">
           <div class="col-sm-2 col-sm-offset-3 text-center">
             {{ form_widget(form.search, {'label': 'Search', 'attr': {'class': 'btn btn-success'}}) }}
           </div>
@@ -275,7 +285,7 @@
     <div class="modal fade" id="phoneModal" tabindex="-1" role="dialog">
       <div class="modal-dialog" role="document" style="width: 60%;">
         <div class="modal-content">
-        <form id="phone-update-form" class="form-horizontal" method="post">
+          <form id="phone-update-form" class="form-horizontal" method="post">
           <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
             <h4 class="modal-title" id="exampleModalLabel">New phone</h4>
@@ -284,86 +294,155 @@
             <table id="prices" width="100%" cellspacing="0" class="table-striped"></table>
             <hr class="strong" />
             <h4>Add new price</h4>
-            <div class="row">
-              <div class="col-sm-6">
-                <div class="form-group">
-                  <label for="phone-gwp" class="control-label col-sm-2">
-                      {# from tech perspective, 1 second, from business perspective 1 business day #}
-                    <i class="fa fa-warning" title="Must be in the future.  However, it can take up to 10 minutes after the date/time entered before policy prices will be guarenteed due to possible purchaes in progress."></i>&nbsp;
-                    From:
-                  </label>
-                  <div class="col-sm-10">
-                    <div class='input-group date' id='phone-from-group'>
-                      <input type="text" class="form-control" id="phone-from" name="from" required="required">
-                      <span class="input-group-addon">
-                        <span class="fa fa-calendar"></span>
-                      </span>
+
+              <div class="row">
+                <div class="col-sm-6">
+                  <div class="panel panel-default">
+                      <div class="panel-heading">
+                          <h3 class="panel-title">Dates</h3>
+                      </div>
+                      <div class="panel-body">
+                          <div class="row">
+                              <div class="col-sm-12">
+                                <div class="form-group">
+                                  <label for="phone-gwp" class="control-label col-sm-3">
+                                      {# from tech perspective, 1 second, from business perspective 1 business day #}
+                                    <i class="fa fa-warning" title="Must be in the future.  However, it can take up to 10 minutes after the date/time entered before policy prices will be guarenteed due to possible purchaes in progress."></i>&nbsp;
+                                    From:
+                                  </label>
+                                  <div class="col-sm-9">
+                                    <div class='input-group date' id='phone-from-group'>
+                                      <input type="text" class="form-control" id="phone-from" name="from" required="required">
+                                      <span class="input-group-addon">
+                                        <span class="fa fa-calendar"></span>
+                                      </span>
+                                    </div>
+                                      <br>
+                                      Must be <strong>{{ one_day|date("F j, Y H:i", "Europe/London") }}</strong> or later <br>
+                                      (1 business day)
+                                  </div>
+                                </div>
+                              </div>
+                          </div>
+                          <div class="row">
+                              <div class="col-sm-12">
+                                <div class="form-group">
+                                  <label for="phone-gwp" class="control-label col-sm-3">To:</label>
+                                  <div class="col-sm-9">
+                                    <div class='input-group date' id='phone-to-group'>
+                                      <input type="text" class="form-control" id="phone-to" name="to">
+                                      <span class="input-group-addon">
+                                        <span class="fa fa-calendar"></span>
+                                      </span>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="panel panel-default">
+                      <div class="panel-heading">
+                          <h3 class="panel-title">Price</h3>
+                      </div>
+                      <div class="panel-body">
+                          <div class="row">
+                              <div class="col-sm-12">
+                                  <div class="form-group">
+                                      <label for="phone-gwp" class="control-label col-sm-3">Desired Premium:</label>
+                                      <div class="col-sm-9">
+                                          <div class="input-group has-warning has-feedback">
+                                    <span class="input-group-addon">
+                                      <span>£</span>
+                                    </span>
+                                              <input title="This field does not save and will only calculate the GWP field if calculate is clicked"
+                                                     type="text" class="form-control" id="phone-desired-premium" name="desired-premium">
+                                              <span class="input-group-btn">
+                                                <button type="button" id="phone-desired-premium-btn" class="btn btn-success">Calc GWP</button>
+                                              </span>
+                                          </div>
+                                      </div>
+                                  </div>
+                              </div>
+                          </div>
+                          <div class="row">
+                            <div class="col-sm-12">
+                              <div class="form-group">
+                                <label for="phone-gwp" class="control-label col-sm-3">GWP:</label>
+                                <div class="col-sm-9">
+                                  <div class="input-group">
+                                    <span class="input-group-addon">
+                                      <span>£</span>
+                                    </span>
+                                    <input type="text" class="form-control" id="phone-gwp" name="gwp">
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="row">
+                              <div class="col-sm-12">
+                                <div class="form-group">
+                                  <label for="phone-premium" class="control-label col-sm-3">Premium:</label>
+                                  <div class="col-sm-9">
+                                    <div class="input-group">
+                                      <span class="input-group-addon">
+                                        <span>£</span>
+                                      </span>
+                                      <input type="text" class="form-control" id="phone-premium" name="premium" readonly="true" disabled="disabled">
+                                    </div>
+                                      <br>
+                                      <label for="phone-premium" class="control-label col-sm-6">Salva Std/Min:</label>
+                                      <div class="col-sm-6">
+                                          <label class="control-label" id="phone-salva" name="salva"></label>
+                                      </div>
+
+                                  </div>
+                                </div>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-sm-12">
+                      <div class="form-group">
+                        <label for="phone-notes" class="control-label col-sm-2">Notes</label>
+                        <div class="col-sm-10">
+                          <textarea class="control-label" id="phone-notes" name="notes" style="width:100%;text-align: left;"></textarea>
+                        </div>
+                      </div>
                     </div>
-                      <br>
-                      Must be <strong>{{ one_day|date("F j, Y H:i", "Europe/London") }}</strong> or later (1 business day)
                   </div>
                 </div>
-              </div>
-              <div class="col-sm-6">
-                <div class="form-group">
-                  <label for="phone-gwp" class="control-label col-sm-2">To:</label>
-                  <div class="col-sm-10">
-                    <div class='input-group date' id='phone-to-group'>
-                      <input type="text" class="form-control" id="phone-to" name="to">
-                      <span class="input-group-addon">
-                        <span class="fa fa-calendar"></span>
-                      </span>
+                <div class="col-sm-6">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Excess</h3>
+                        </div>
+                        <div class="panel-body">
+                          <div class="row">
+                              <div class="col-sm-12">
+                                  Ability to adjust excess coming in the future. For now, default excess of:
+                                  {{ policyTerms.getDefaultExcess }} will be used.
+                              </div>
+                          </div>
+                        </div>
                     </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col-sm-6">
-                <div class="form-group">
-                  <label for="phone-gwp" class="control-label col-sm-2">GWP:</label>
-                  <div class="col-sm-10">
-                    <div class="input-group">
-                      <span class="input-group-addon">
-                        <span>£</span>
-                      </span>
-                      <input type="text" class="form-control" id="phone-gwp" name="gwp">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">pic-sure Excess</h3>
+                        </div>
+                        <div class="panel-body">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    Ability to adjust excess coming in the future. For now, default pic-sure approved excess of:
+                                    {{ policyTerms.getDefaultPicSureExcess }}  will be used.
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                  </div>
                 </div>
               </div>
-              <div class="col-sm-4">
-                <div class="form-group">
-                  <label for="phone-premium" class="control-label col-sm-6">Premium:</label>
-                  <div class="col-sm-6">
-                    <div class="input-group">
-                      <span class="input-group-addon">
-                        <span>£</span>
-                      </span>
-                      <input type="text" class="form-control" id="phone-premium" name="premium" readonly="true" disabled="disabled">
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="col-sm-4">
-                <div class="form-group">
-                  <label for="phone-premium" class="control-label col-sm-6">Salva Std/Min:</label>
-                  <div class="col-sm-6">
-                    <label class="control-label" id="phone-salva" name="salva"></label>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col-sm-8 col-offset-2">
-                <div class="form-group">
-                  <label for="phone-notes" class="control-label col-sm-1">Notes</label>
-                  <div class="col-sm-11">
-                    <textarea class="control-label" id="phone-notes" name="notes" style="width:100%;text-align: left;"></textarea>
-                  </div>
-                </div>
-              </div>
-            </div>
           </div>
           <div class="modal-footer">
             <input type="hidden" name="token" value="{{ csrf_token('default') }}" />
@@ -416,7 +495,6 @@
                     </div>
                 </div>
             </div>
-        </div>
           <div class="modal-footer">
             <input type="hidden" name="token" value="{{ csrf_token('default') }}" />
             <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -549,6 +627,6 @@
         {{ form_end(additional_phones) }}
         </div>
       </div>
-    </div>  
-    {% endif %}  
+    </div>
+    {% endif %}
 {% endblock %}
