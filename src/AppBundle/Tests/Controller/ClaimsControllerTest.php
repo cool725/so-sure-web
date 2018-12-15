@@ -103,8 +103,9 @@ class ClaimsControllerTest extends BaseControllerTest
         $this->login('claims@so-sure.com', LoadUserData::DEFAULT_PASSWORD, 'claims/policies');
 
         $crawler = self::$client->request('GET', sprintf('/claims/policy/%s', $policy->getId()));
+        $this->verifyResponse(200);
         $form = $crawler->selectButton('claim[record]')->form();
-        $form['claim[number]']->setValue(rand(1, 999999));
+        $form['claim[number]']->setValue(self::getRandomClaimNumber());
         $form['claim[type]']->setValue('loss');
         self::$client->followRedirects();
         $crawler = self::$client->submit($form);
@@ -205,6 +206,7 @@ class ClaimsControllerTest extends BaseControllerTest
         $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_APPROVED);
         self::$dm->flush();
         $this->assertTrue($policy->getUser()->hasActivePolicy());
+        $this->assertNotNull($policy->getCurrentExcess());
 
         $this->login('claims@so-sure.com', LoadUserData::DEFAULT_PASSWORD, 'claims/policies');
 

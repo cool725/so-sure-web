@@ -2,6 +2,7 @@
 
 namespace AppBundle\Tests\Controller;
 
+use AppBundle\DataFixtures\MongoDB\b\User\LoadUserData;
 use AppBundle\Document\User;
 use AppBundle\Document\Policy;
 use AppBundle\Document\Phone;
@@ -75,8 +76,8 @@ class UserJsonControllerTest extends BaseControllerTest
         $user = null;
         $policy = null;
         if ($login) {
-            $this->tokenLogin("daly@so-sure.com", "w3ares0sure!");
-            $user = static::$userRepository->findBy(["email" => "daly@so-sure.com"])[0];
+            $this->tokenLogin(LoadUserData::DEFAULT_ADMIN, LoadUserData::DEFAULT_PASSWORD);
+            $user = static::$userRepository->findBy(["email" => LoadUserData::DEFAULT_ADMIN])[0];
             if ($addRole) {
                 $user->addRole($addRole);
             }
@@ -107,6 +108,7 @@ class UserJsonControllerTest extends BaseControllerTest
      */
     public function inviteEmailActionProvider()
     {
+        // @codingStandardsIgnoreStart
         return [
             [302, null, false],
             [422, ApiErrorCode::ERROR_MISSING_PARAM, true],
@@ -114,10 +116,11 @@ class UserJsonControllerTest extends BaseControllerTest
             [422, ApiErrorCode::ERROR_MISSING_PARAM, true, "dalygbarron@gmail.com", "junkCsrf"],
             [422, ApiErrorCode::ERROR_MISSING_PARAM, true, "dalygbarron@gmail.com", "csrf"],
             [422, ApiErrorCode::ERROR_POLICY_INVALID_VALIDATION, true, "dalygbarron@gmail.com", "csrf", null, "JUNK"],
-            [422, ApiErrorCode::ERROR_INVITATION_SELF_INVITATION, true, "daly@so-sure.com", "csrf", null, "TEST"],
+            [422, ApiErrorCode::ERROR_INVITATION_SELF_INVITATION, true, LoadUserData::DEFAULT_ADMIN, "csrf", null, "TEST"],
             [200, ApiErrorCode::SUCCESS, true, "successfulinvite@gmail.com", "csrf", null, "TEST"],
             [422, ApiErrorCode::ERROR_INVITATION_DUPLICATE, true, "successfulinvite@gmail.com", "csrf", null, "TEST"]
         ];
+        // @codingStandardsIgnoreEnd
     }
 
     /**
@@ -142,8 +145,8 @@ class UserJsonControllerTest extends BaseControllerTest
         $user = null;
         $charge = null;
         if ($login) {
-            $this->tokenLogin("daly@so-sure.com", "w3ares0sure!");
-            $user = static::$userRepository->findBy(["email" => "daly@so-sure.com"])[0];
+            $this->tokenLogin(LoadUserData::DEFAULT_ADMIN, LoadUserData::DEFAULT_PASSWORD);
+            $user = static::$userRepository->findBy(["email" => LoadUserData::DEFAULT_ADMIN])[0];
             if ($number) {
                 $user->setMobileNumber($number);
             }
@@ -198,13 +201,13 @@ class UserJsonControllerTest extends BaseControllerTest
         static::$client->request("GET", "/user/json/policyterms");
         $this->verifyResponse(302);
         // file not yet generated.
-        $this->tokenLogin("daly@so-sure.com", "w3ares0sure!");
+        $this->tokenLogin(LoadUserData::DEFAULT_ADMIN, LoadUserData::DEFAULT_PASSWORD);
 
         static::$client->request("GET", "/user/json/policyterms");
         $data = $this->verifyResponse(200, ApiErrorCode::SUCCESS);
         $this->assertEquals("File not yet generated.", $data["description"]);
         // file ready.
-        $user = static::$userRepository->findBy(["email" => "daly@so-sure.com"])[0];
+        $user = static::$userRepository->findBy(["email" => LoadUserData::DEFAULT_ADMIN])[0];
         $policy = $user->getLatestPolicy();
         static::$container->get("app.policy")->generatePolicyTerms($policy);
         static::$dm->flush();

@@ -103,6 +103,20 @@ trait UserClassTrait
             $policy->setPhone($phone, $date);
             $policy->setImei(static::generateRandomImei());
             $policy->create(rand(1, 999999), 'TEST', $date, rand(1, 999999));
+
+            // still getting no excess on occasion. if so try resetting the phone
+            $recursionPrevention = 0;
+            while (!$policy->getCurrentExcess()) {
+                $policy->setPhone(self::getRandomPhone(self::$dm), $date);
+                $recursionPrevention++;
+                if ($recursionPrevention > 10) {
+                    break;
+                }
+            }
+
+            if (!$policy->getCurrentExcess()) {
+                throw new \Exception('Missing current policy excess');
+            }
         }
 
         return $policy;
@@ -177,10 +191,16 @@ trait UserClassTrait
         $phones = $phoneRepo->findBy($query);
         $phone = null;
         while ($phone == null) {
-            $phone = $phones[rand(0, count($phones) - 1)];
+            /** @var Phone $phone */
+            $phone = $phones[random_int(0, count($phones) - 1)];
             // Many tests rely on past dates, so ensure the date is ok for the past
             if (!$phone->getCurrentPhonePrice(new \DateTime('2016-01-01')) || $phone->getMake() == "ALL") {
                 $phone = null;
+                continue;
+            }
+            if (!$phone->getCurrentPhonePrice() || !$phone->getCurrentPhonePrice()->getExcess()) {
+                $phone = null;
+                continue;
             }
         }
 
@@ -189,7 +209,7 @@ trait UserClassTrait
 
     public static function getRandomClaimNumber()
     {
-        return sprintf('%6d', rand(1, 999999));
+        return sprintf('%6d', random_int(1, 999999));
     }
 
     public static function transformMobile($mobile)
