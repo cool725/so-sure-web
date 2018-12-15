@@ -107,7 +107,7 @@ trait UserClassTrait
             // still getting no excess on occasion. if so try resetting the phone
             $recursionPrevention = 0;
             while (!$policy->getCurrentExcess()) {
-                $policy->setPhone($phone, $date);
+                $policy->setPhone(self::getRandomPhone(self::$dm), $date);
                 $recursionPrevention++;
                 if ($recursionPrevention > 10) {
                     break;
@@ -192,7 +192,7 @@ trait UserClassTrait
         $phone = null;
         while ($phone == null) {
             /** @var Phone $phone */
-            $phone = $phones[rand(0, count($phones) - 1)];
+            $phone = $phones[random_int(0, count($phones) - 1)];
             // Many tests rely on past dates, so ensure the date is ok for the past
             if (!$phone->getCurrentPhonePrice(new \DateTime('2016-01-01')) || $phone->getMake() == "ALL") {
                 $phone = null;
