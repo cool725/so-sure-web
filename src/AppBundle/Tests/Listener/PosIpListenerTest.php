@@ -6,6 +6,7 @@ use AppBundle\Tests\Controller\BaseControllerTest;
 
 /**
  * @group functional-net
+ * AppBundle\\Tests\\Listener\\PosIpListenerTest
  */
 class PosIpListenerTest extends BaseControllerTest
 {
