@@ -2,6 +2,7 @@
 
 namespace AppBundle\Document\Form;
 
+use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Policy;
 use Symfony\Component\Validator\Constraints as Assert;
