@@ -192,7 +192,7 @@ trait UserClassTrait
                 $phone = null;
                 continue;
             }
-            if (!$phone->getCurrentPhonePrice()->getExcess()) {
+            if (!$phone->getCurrentPhonePrice() || !$phone->getCurrentPhonePrice()->getExcess()) {
                 $phone = null;
                 continue;
             }
