@@ -71,11 +71,13 @@ class PosControllerTest extends BaseControllerTest
 
         $crawler = self::$client->submit($form);
         self::verifyResponse(302);
+        $crawler = self::$client->followRedirect();
+        $this->expectFlashSuccess($crawler, 'more information on so-sure');
 
         $dm = $this->getDocumentManager(true);
         $leadRepo = $dm->getRepository(Lead::class);
         $updatedLeads = $leadRepo->findBy([
-            'emailCanonical' => $email
+            'email' => $email
         ]);
 
         $this->assertEquals(1, count($updatedLeads));
@@ -99,12 +101,12 @@ class PosControllerTest extends BaseControllerTest
         ]);
 
         $crawler = self::$client->submit($form);
-        self::verifyResponse(302);
+        self::verifyResponse(200);
 
         $dm = $this->getDocumentManager(true);
         $leadRepo = $dm->getRepository(Lead::class);
         $updatedLeads = $leadRepo->findBy([
-            'emailCanonical' => $email
+            'email' => $email
         ]);
 
         $this->assertEquals(0, count($updatedLeads));
@@ -129,7 +131,9 @@ class PosControllerTest extends BaseControllerTest
         ]);
 
         $crawler = self::$client->submit($form);
-        self::verifyResponse(200);
+        self::verifyResponse(302);
+        $crawler = self::$client->followRedirect();
+        $this->expectFlashSuccess($crawler, 'more information on so-sure');
 
         $form = $crawler->selectButton('lead_form_submit')->form();
 
@@ -143,11 +147,13 @@ class PosControllerTest extends BaseControllerTest
 
         $crawler = self::$client->submit($form);
         self::verifyResponse(302);
+        $crawler = self::$client->followRedirect();
+        $this->expectFlashWarning($crawler, 'you already signed up');
 
         $dm = $this->getDocumentManager(true);
         $leadRepo = $dm->getRepository(Lead::class);
         $updatedLeads = $leadRepo->findBy([
-            'emailCanonical' => $email
+            'email' => $email
         ]);
 
         /* Assert 1 as duplicate leads should not be persisted onto the DB */

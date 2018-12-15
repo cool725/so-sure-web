@@ -17,6 +17,7 @@ class Lead extends \AppBundle\Document\Lead
     /**
      * @Assert\Type("bool")
      * @Assert\IsTrue(message="You must opt in to receive emails")
+     * @Assert\NotNull(message="You must opt in to receive emails")
      */
     protected $optin;
 

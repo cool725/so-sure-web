@@ -63,12 +63,11 @@ class PosController extends BaseController
                         $dm->flush();
 
                         $this->addFlash('success', sprintf(
-                            'Successfully added lead: %s',
-                            $leadData->getName()
+                            'Thanks! We will be in touch shortly with more information on so-sure.'
                         ));
                     } else {
                         $this->addFlash('warning', sprintf(
-                            'Lead already exists'
+                            'Sorry, it looks like you already signed up'
                         ));
                     }
 
