@@ -49,7 +49,7 @@
     <div class="tab-content">
         <div role="tabpanel" class="tab-pane active" id="judo">
             <div class="row">
-                <h4>Total: £{{ totalJudo|number_format(2, '.', ',') }} <i class="fa fa-question-circle" title="Total of payments that are either successful or scheduled" style="cursor: pointer"></i></h4>
+                {#<h4>Total: £{{ totalJudo|number_format(2, '.', ',') }} <i class="fa fa-question-circle" title="Total of payments that are either successful or scheduled" style="cursor: pointer"></i></h4>#}
                 <table class="table table-striped">
                     <tbody>
                         <tr>
@@ -120,7 +120,7 @@
         </div>
         <div role="tabpanel" class="tab-pane" id="bacs">
             <div class="row">
-                <h4>Total: £{{ totalBacs|number_format(2, '.', ',') }} <i class="fa fa-question-circle" title="Total of payments that are either successful or scheduled" style="cursor: pointer"></i></h4>
+                {#<h4>Total: £{{ totalBacs|number_format(2, '.', ',') }} <i class="fa fa-question-circle" title="Total of payments that are either successful or scheduled" style="cursor: pointer"></i></h4>#}
                 <table class="table table-striped">
                     <tbody>
                     <tr>
@@ -186,6 +186,12 @@
             </div>
         </div>
     </div>
+    {% if scheduledPayments.count > 0 %}
+        <div class="d-flex justify-content-center mb-5">
+            {{ pagerfanta(pager, 'twitter_bootstrap4') }}
+        </div>
+    {% endif %}
+
 </div>
 {% endblock %}
 

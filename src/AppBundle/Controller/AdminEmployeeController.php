@@ -2089,7 +2089,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
      * @Route("/scheduled-payments/{year}/{month}", name="admin_scheduled_payments_date")
      * @Template
      */
-    public function adminScheduledPaymentsAction($year = null, $month = null)
+    public function adminScheduledPaymentsAction(Request $request, $year = null, $month = null)
     {
         $now = \DateTime::createFromFormat('U', time());
         if (!$year) {
@@ -2105,11 +2105,20 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         /** @var ScheduledPaymentRepository $scheduledPaymentRepo */
         $scheduledPaymentRepo = $dm->getRepository(ScheduledPayment::class);
         $scheduledPayments = $scheduledPaymentRepo->findMonthlyScheduled($date);
+        $scheduledPaymentsMonthly = $scheduledPaymentRepo->getMonthlyValues();
         $total = 0;
+
+        foreach ($scheduledPaymentsMonthly as $scheduledPaymentsMonthlyItem) {
+            if ($scheduledPaymentsMonthlyItem["_id"]["year"] == $year &&
+                $scheduledPaymentsMonthlyItem["_id"]["month"] == $month) {
+                $total = $scheduledPaymentsMonthlyItem["total"];
+            }
+        }
+        /*
         $totalJudo = 0;
         $totalBacs = 0;
-        foreach ($scheduledPayments as $scheduledPayment) {
-            /** @var ScheduledPayment $scheduledPayment */
+        $query = $scheduledPayments->getQuery()->execute();
+        foreach ($query as $scheduledPayment) {
             if (in_array(
                 $scheduledPayment->getStatus(),
                 [ScheduledPayment::STATUS_SCHEDULED, ScheduledPayment::STATUS_SUCCESS]
@@ -2122,15 +2131,20 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                 }
             }
         }
+        */
+
+        $pager = $this->pager($request, $scheduledPayments);
 
         return [
             'year' => $year,
             'month' => $month,
             'end' => $end,
-            'scheduledPayments' => $scheduledPayments,
+            'scheduledPayments' => $pager->getCurrentPageResults(),
+            'pager' => $pager,
+            'totals' => $scheduledPaymentsMonthly,
             'total' => $total,
-            'totalJudo' => $totalJudo,
-            'totalBacs' => $totalBacs,
+            //'totalJudo' => $totalJudo,
+            //'totalBacs' => $totalBacs,
         ];
     }
 
