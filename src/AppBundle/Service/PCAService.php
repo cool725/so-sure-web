@@ -95,39 +95,43 @@ class PCAService
             return unserialize($value);
         }
 
-        // Use 00-00-99 / 87654321 for testing. as 00-00-99/12345678 is used for testing for pca-predict, should be ok
-        if ($sortCode == self::TEST_SORT_CODE && in_array($accountNumber, [
-            self::TEST_ACCOUNT_NUMBER_OK,
-            self::TEST_ACCOUNT_NUMBER_ADJUSTED
-        ])) {
-            $bankAccount = new BankAccount();
-            $bankAccount->setBankName('foo bank');
-            $bankAccount->setSortCode($sortCode);
-            $bankAccount->setAccountNumber($accountNumber);
-            if ($accountNumber == self::TEST_ACCOUNT_NUMBER_ADJUSTED) {
-                $bankAccount->setAccountNumber(sprintf("%s00", $accountNumber));
-            }
-            $address = new Address();
-            $address->setLine1('so-sure Test Address Line 1');
-            $address->setLine2('so-sure Test Address Line 2');
-            $address->setLine3('so-sure Test Address Line 3');
-            $address->setCity('so-sure Test City');
-            $address->setPostcode('BX1 1LT');
-            $bankAccount->setBankAddress($address);
-            $this->cacheBankAccountResults($sortCode, $accountNumber, $bankAccount);
+        if ($this->environment != 'prod') {
+            // Use 00-00-99 / 87654321 for testing. as 00-00-99/12345678 is used for testing for pca-predict
+            // hopefully should be ok
+            if ($sortCode == self::TEST_SORT_CODE && in_array($accountNumber, [
+                    self::TEST_ACCOUNT_NUMBER_OK,
+                    self::TEST_ACCOUNT_NUMBER_ADJUSTED
+                ])) {
+                $bankAccount = new BankAccount();
+                $bankAccount->setBankName('foo bank');
+                $bankAccount->setSortCode($sortCode);
+                $bankAccount->setAccountNumber($accountNumber);
+                if ($accountNumber == self::TEST_ACCOUNT_NUMBER_ADJUSTED) {
+                    $bankAccount->setAccountNumber(sprintf("%s00", $accountNumber));
+                }
+                $address = new Address();
+                $address->setLine1('so-sure Test Address Line 1');
+                $address->setLine2('so-sure Test Address Line 2');
+                $address->setLine3('so-sure Test Address Line 3');
+                $address->setCity('so-sure Test City');
+                $address->setPostcode('BX1 1LT');
+                $bankAccount->setBankAddress($address);
+                $this->cacheBankAccountResults($sortCode, $accountNumber, $bankAccount);
 
-            return $bankAccount;
-        } elseif ($sortCode == self::TEST_SORT_CODE && $accountNumber == self::TEST_ACCOUNT_NUMBER_INVALID_SORT_CODE) {
-            throw new DirectDebitBankException('Bad sort code', DirectDebitBankException::ERROR_SORT_CODE);
-        } elseif ($sortCode == self::TEST_SORT_CODE &&
-            $accountNumber == self::TEST_ACCOUNT_NUMBER_INVALID_ACCOUNT_NUMBER) {
-            throw new DirectDebitBankException('No direct debit', DirectDebitBankException::ERROR_ACCOUNT_NUMBER);
-        } elseif ($sortCode == self::TEST_SORT_CODE && $accountNumber == self::TEST_ACCOUNT_NUMBER_NO_DD) {
-            throw new DirectDebitBankException('No direct debit', DirectDebitBankException::ERROR_NON_DIRECT_DEBIT);
-        } elseif ($this->environment != 'prod') {
-            // 00-00-99/12345678 is a free search via pca, so can used for non production environments
-            $sortCode = self::TEST_SORT_CODE;
-            $accountNumber = self::TEST_ACCOUNT_NUMBER_PCA;
+                return $bankAccount;
+            } elseif ($sortCode == self::TEST_SORT_CODE &&
+                $accountNumber == self::TEST_ACCOUNT_NUMBER_INVALID_SORT_CODE) {
+                throw new DirectDebitBankException('Bad sort code', DirectDebitBankException::ERROR_SORT_CODE);
+            } elseif ($sortCode == self::TEST_SORT_CODE &&
+                $accountNumber == self::TEST_ACCOUNT_NUMBER_INVALID_ACCOUNT_NUMBER) {
+                throw new DirectDebitBankException('No direct debit', DirectDebitBankException::ERROR_ACCOUNT_NUMBER);
+            } elseif ($sortCode == self::TEST_SORT_CODE && $accountNumber == self::TEST_ACCOUNT_NUMBER_NO_DD) {
+                throw new DirectDebitBankException('No direct debit', DirectDebitBankException::ERROR_NON_DIRECT_DEBIT);
+            } elseif ($this->environment != 'prod') {
+                // 00-00-99/12345678 is a free search via pca, so can used for non production environments
+                $sortCode = self::TEST_SORT_CODE;
+                $accountNumber = self::TEST_ACCOUNT_NUMBER_PCA;
+            }
         }
 
         try {
