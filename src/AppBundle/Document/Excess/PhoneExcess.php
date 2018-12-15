@@ -116,7 +116,7 @@ class PhoneExcess extends Excess
             case Claim::TYPE_THEFT:
                 return $this->getTheft();
             default:
-                throw new \Exception("Unknown Claim Type");
+                throw new \Exception(sprintf("Unknown Claim Type %s", $type));
         }
     }
 

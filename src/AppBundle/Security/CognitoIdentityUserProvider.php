@@ -141,9 +141,10 @@ class CognitoIdentityUserProvider implements UserProviderInterface
             return null;
         }
     }
-    
+
     /**
-     * {@inheritDoc}
+     * @param string $username
+     * @return \FOS\UserBundle\Model\UserInterface|null|UserInterface
      */
     public function loadUserByUsername($username)
     {

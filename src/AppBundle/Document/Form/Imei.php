@@ -4,9 +4,7 @@ namespace AppBundle\Document\Form;
 
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Policy;
-use AppBundle\Document\DateTrait;
 use Symfony\Component\Validator\Constraints as Assert;
-use AppBundle\Validator\Constraints as AppAssert;
 
 class Imei
 {

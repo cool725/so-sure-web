@@ -46,7 +46,7 @@ class ImeiType extends AbstractType
                     return $note;
                 },
                 function ($noteConformAlphanumeric) {
-                    return $this->conformAlphanumericSpaceDotPipe($noteConformAlphanumeric, 2500, 1);
+                    return $this->conformAlphanumericSpaceDot($noteConformAlphanumeric, 2500, 1);
                 }
             ))
         ;
