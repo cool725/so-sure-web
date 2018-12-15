@@ -2049,16 +2049,23 @@ abstract class Policy
         $this->notesList[] = $note;
     }
 
-    public function addNoteDetails($notes, User $user = null, \DateTime $date = null)
+    public function addNoteDetails($notes, User $user = null, $action = null, \DateTime $date = null)
     {
         $note = new StandardNote();
         $note->setNotes($notes);
+
         if ($user) {
             $note->setUser($user);
         }
+
+        if ($action) {
+            $note->setAction($action);
+        }
+
         if ($date) {
             $note->setDate($date);
         }
+
         $this->addNotesList($note);
     }
 

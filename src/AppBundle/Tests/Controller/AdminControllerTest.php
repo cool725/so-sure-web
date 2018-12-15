@@ -184,6 +184,85 @@ class AdminControllerTest extends BaseControllerTest
         $this->assertTrue($link, 'Unable to locate linked claim in policy');
     }
 
+    public function testImeiFormAction()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testImeiFormAction', $this),
+            'bar'
+        );
+
+        $policy = self::initPolicy(
+            $user,
+            self::$dm,
+            static::getRandomPhone(self::$dm),
+            null,
+            true,
+            true
+        );
+
+        $this->login(LoadUserData::DEFAULT_ADMIN, LoadUserData::DEFAULT_PASSWORD, 'admin');
+
+        $crawler = self::$client->request('GET', '/admin/policy/' . $policy->getId());
+        self::verifyResponse(200);
+
+        $form = $crawler->selectButton('imei_form_update')->form();
+
+        $imei = self::generateRandomImei();
+        $form['imei_form[imei]'] = $imei;
+
+        $crawler = self::$client->submit($form);
+        self::verifyResponse(302);
+
+        $dm = $this->getDocumentManager(true);
+        $repoPolicy = $dm->getRepository(PhonePolicy::class);
+        /** @var PhonePolicy $updatedPolicy */
+        $updatedPolicy = $repoPolicy->find($policy->getId());
+
+        self::assertEquals($imei, $updatedPolicy->getImei());
+    }
+
+    public function testImeiFormActionPhone()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testImeiFormActionPhone', $this),
+            'bar'
+        );
+
+        $policy = self::initPolicy(
+            $user,
+            self::$dm,
+            static::getRandomPhone(self::$dm),
+            null,
+            true,
+            true
+        );
+
+        $this->login(LoadUserData::DEFAULT_ADMIN, LoadUserData::DEFAULT_PASSWORD, 'admin');
+
+        $crawler = self::$client->request('GET', '/admin/policy/' . $policy->getId());
+        self::verifyResponse(200);
+
+        $form = $crawler->selectButton('imei_form_update')->form();
+
+        $imei = self::generateRandomImei();
+        $phone = self::getRandomPhone(self::$dm);
+        $form['imei_form[imei]'] = $imei;
+        $form['imei_form[phone]'] = $phone->getId();
+
+        $crawler = self::$client->submit($form);
+        self::verifyResponse(302);
+
+        $dm = $this->getDocumentManager(true);
+        $repoPolicy = $dm->getRepository(PhonePolicy::class);
+        /** @var PhonePolicy $updatedPolicy */
+        $updatedPolicy = $repoPolicy->find($policy->getId());
+
+        self::assertEquals($imei, $updatedPolicy->getImei());
+        self::assertEquals($phone->getId(), $updatedPolicy->getPhone()->getId());
+    }
+
     public function testAdminClaimDelete()
     {
         // make one claim just in case no claim was created and page is empty

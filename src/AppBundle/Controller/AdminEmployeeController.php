@@ -14,6 +14,7 @@ use AppBundle\Form\Type\AdminEmailOptOutType;
 use AppBundle\Form\Type\BacsCreditType;
 use AppBundle\Form\Type\ClaimInfoType;
 use AppBundle\Form\Type\CallNoteType;
+use AppBundle\Form\Type\DetectedImeiType;
 use AppBundle\Form\Type\LinkClaimType;
 use AppBundle\Form\Type\ClaimNoteType;
 use AppBundle\Form\Type\PaymentRequestUploadFileType;
@@ -35,6 +36,7 @@ use AppBundle\Service\RouterService;
 use AppBundle\Service\SalvaExportService;
 use AppBundle\Service\AffiliateService;
 use Doctrine\ODM\MongoDB\Query\Builder;
+use Faker\Calculator\Luhn;
 use Gedmo\Loggable\Document\Repository\LogEntryRepository;
 use Grpc\Call;
 use Predis\Client;
@@ -746,21 +748,54 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             if ($request->request->has('imei_form')) {
                 $imeiForm->handleRequest($request);
                 if ($imeiForm->isValid()) {
-                    $policy->adjustImei($imei->getImei(), false);
+                    $imeiUpdated = false;
+                    $phoneUpdated = false;
+                    if ($this->isImei($imei->getImei()) && $imei->getImei() != $policy->getImei()) {
+                        $policy->adjustImei($imei->getImei(), false);
+                        $imeiUpdated = true;
+                    } elseif (!$this->isImei($imei->getImei())) {
+                        $this->addFlash(
+                            'error',
+                            sprintf('%s is not a valid IMEI number', $imei->getImei())
+                        );
+                    }
 
-                    $policy->addNoteDetails(
-                        $imei->getNote(),
-                        $this->getUser()
-                    );
+                    if ($imei->getPhone() && $imei->getPhone() != $policy->getPhone()) {
+                        $policy->setPhone($imei->getPhone());
+                        $phoneUpdated = true;
+                    }
 
-                    $dm->flush();
+                    $msg = null;
+                    if ($imeiUpdated && $phoneUpdated) {
+                        $msg = 'IMEI & Phone updated';
+                    } elseif ($imeiUpdated) {
+                        $msg = 'IMEI updated';
+                    } elseif ($phoneUpdated) {
+                        $msg = 'Phone updated';
+                    }
+
+                    if ($imeiUpdated || $phoneUpdated) {
+                        $this->addFlash(
+                            'success',
+                            sprintf('Policy %s %s', $policy->getPolicyNumber(), $msg)
+                        );
+
+                        $policy->addNoteDetails(
+                            $imei->getNote(),
+                            $this->getUser(),
+                            $msg
+                        );
+
+                        $dm->flush();
+                    }
+                } else {
                     $this->addFlash(
-                        'success',
-                        sprintf('Policy %s imei updated.', $policy->getPolicyNumber())
+                        'error',
+                        'Unable to save form'
                     );
-
-                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
                 }
+
+                return $this->redirectToRoute('admin_policy', ['id' => $id]);
             }
         }
 
@@ -769,6 +804,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             'policy' => $policy,
         ];
     }
+    
     /**
      * @Route("/detected-imei-form/{id}", name="detected_imei_form")
      * @Template
@@ -788,7 +824,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         $imei->setPolicy($policy);
         $imei->setImei($policy->getDetectedImei());
         $imeiForm = $this->get('form.factory')
-            ->createNamedBuilder('imei_form', ImeiType::class, $imei)
+            ->createNamedBuilder('imei_form', DetectedImeiType::class, $imei)
             ->setAction($this->generateUrl(
                 'detected_imei_form',
                 ['id' => $id]
@@ -802,8 +838,9 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                     $policy->setDetectedImei($imei->getImei());
 
                     $policy->addNoteDetails(
-                        sprintf('Updated detected imei. Additional notes: %s', $imei->getNote()),
-                        $this->getUser()
+                        $imei->getNote(),
+                        $this->getUser(),
+                        'Detected IMEI Update'
                     );
 
                     $dm->flush();
@@ -869,7 +906,8 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
 
                         $policy->addNoteDetails(
                             $picsureForm->getData()['note'],
-                            $this->getUser()
+                            $this->getUser(),
+                            'Changed Pic-Sure status'
                         );
 
                         $dm->flush();
@@ -941,12 +979,9 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
 
                     $policy->addLinkedClaim($claim);
                     $policy->addNoteDetails(
-                        sprintf(
-                            'Linked Claim %s. Notes: %s',
-                            $linkClaimform->get('number')->getData(),
-                            $linkClaimform->get('note')->getData()
-                        ),
-                        $this->getUser()
+                        $linkClaimform->get('note')->getData(),
+                        $this->getUser(),
+                        sprintf('Linked Claim %s', $linkClaimform->get('number')->getData())
                     );
 
                     $dm->flush();
@@ -1009,9 +1044,6 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             ->getForm();
         $receperioForm = $this->get('form.factory')
             ->createNamedBuilder('receperio_form')->add('rerun', SubmitType::class)
-            ->getForm();
-        $phoneForm = $this->get('form.factory')
-            ->createNamedBuilder('phone_form', PhoneType::class, $policy)
             ->getForm();
         $chargebacks = new Chargebacks();
         $chargebacks->setPolicy($policy);
@@ -1160,17 +1192,6 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                         );
                     }
                     $dm->flush();
-
-                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
-                }
-            } elseif ($request->request->has('phone_form')) {
-                $phoneForm->handleRequest($request);
-                if ($phoneForm->isValid()) {
-                    $dm->flush();
-                    $this->addFlash(
-                        'success',
-                        sprintf('Policy %s phone updated.', $policy->getPolicyNumber())
-                    );
 
                     return $this->redirectToRoute('admin_policy', ['id' => $id]);
                 }
@@ -1651,7 +1672,6 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             'cancel_form' => $cancelForm->createView(),
             'pending_cancel_form' => $pendingCancelForm->createView(),
             'note_form' => $noteForm->createView(),
-            'phone_form' => $phoneForm->createView(),
             'formClaimFlags' => $claimFlags->createView(),
             'facebook_form' => $facebookForm->createView(),
             'receperio_form' => $receperioForm->createView(),

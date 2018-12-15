@@ -508,9 +508,12 @@
                             </div>
                         </div>
                     </div>
-                    <div class="form-group">
+
+                    <div class="modal-footer">
                         {{ form_widget(claim_note_form.update, {'attr': {'class': 'btn btn-success'}}) }}
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                     </div>
+
                     {{ form_end(claim_note_form) }}
                 </div>
 
@@ -553,35 +556,20 @@
                         {% endif %}
                     </div>
 
-                    {#
-                    <div class="row">
-                        <div class="col-xs-12">
-                            <div class="form-group">
-                                <label>Justification</label>
-                                {{ form_widget(form.justification, {'attr': {'class': 'form-control'}}) }}
-                            </div>
-                        </div>
-                    </div>
-                    #}
-
-                    <div class="form-group">
+                    <div class="modal-footer">
+                        {% if is_granted('ROLE_ADMIN') %}
+                            <button id="delete-claim" type="button" class="btn btn-danger pull-left">
+                                <i class="fa fa-lock" title="Admin only"></i> Delete Claim
+                            </button>
+                        {% endif %}
                         {{ form_widget(form.update, {'attr': {'class': 'btn btn-success'}}) }}
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                     </div>
+
                     {{ form_end(form) }}
                 </div>
                 {% endif %}
             </div>
-        </div>
-    </div>
-
-    <div class="modal-footer">
-        <div class="col-xs-6">
-        {% if is_granted('ROLE_ADMIN') %}
-            <button id="delete-claim" type="button" class="btn btn-danger">Delete Claim</button>
-        {% endif %}
-        </div>
-        <div class="col-xs-6">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
         </div>
     </div>
 

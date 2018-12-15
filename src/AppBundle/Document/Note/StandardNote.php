@@ -15,5 +15,21 @@ use AppBundle\Validator\Constraints as AppAssert;
  */
 class StandardNote extends Note
 {
+    /**
+     * @AppAssert\AlphanumericSpaceDot()
+     * @Assert\Length(min="1", max="250")
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
+    protected $action;
 
+    public function setAction($action)
+    {
+        $this->action = $action;
+    }
+
+    public function getAction()
+    {
+        return $this->action;
+    }
 }
