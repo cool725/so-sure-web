@@ -13,7 +13,7 @@ class PosIpListenerTest extends BaseControllerTest
     use \AppBundle\Tests\PhingKernelClassTrait;
     use \AppBundle\Tests\UserClassTrait;
 
-    public function testOnKernelRequestAbstain()
+    public function testOnKernelRequestNonPosPathNonPosIp()
     {
         $client = self::createClient();
 
@@ -21,27 +21,41 @@ class PosIpListenerTest extends BaseControllerTest
         self::verifyResponse(200);
     }
 
-    public function testOnKernelRequestDenied()
+    public function testOnKernelRequestPosPathNonPosIp()
     {
         $client = self::createClient();
 
-        $posIps = $client->getContainer()->getParameter('pos_ips');
+        $crawler = self::$client->request('GET', '/pos/helloz');
+        self::verifyResponse(302);
+    }
 
-        $crawler = self::$client->request('GET', '/', [], [], [
-            'REMOTE_ADDR' => $posIps[0]
-        ]);
-        self::verifyResponse(403);
+    public function testOnKernelRequestDenied()
+    {
+        $client = self::createClient();
+        $this->assertNotNull($client->getContainer());
+
+        if ($client->getContainer()) {
+            $posIps = $client->getContainer()->getParameter('pos_ips');
+
+            $crawler = self::$client->request('GET', '/', [], [], [
+                'REMOTE_ADDR' => $posIps[0]
+            ]);
+            self::verifyResponse(403);
+        }
     }
 
     public function testOnKernelRequestHelloz()
     {
         $client = self::createClient();
+        $this->assertNotNull($client->getContainer());
 
-        $posIps = $client->getContainer()->getParameter('pos_ips');
+        if ($client->getContainer()) {
+            $posIps = $client->getContainer()->getParameter('pos_ips');
 
-        $crawler = self::$client->request('GET', '/pos/helloz', [], [], [
-            'REMOTE_ADDR' => $posIps[0]
-        ]);
-        self::verifyResponse(200);
+            $crawler = self::$client->request('GET', '/pos/helloz', [], [], [
+                'REMOTE_ADDR' => $posIps[0]
+            ]);
+            self::verifyResponse(200);
+        }
     }
 }
