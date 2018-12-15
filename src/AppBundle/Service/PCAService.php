@@ -96,7 +96,8 @@ class PCAService
         }
 
         if ($this->environment != 'prod') {
-            // Use 00-00-99 / 87654321 for testing. as 00-00-99/12345678 is used for testing for pca-predict, should be ok
+            // Use 00-00-99 / 87654321 for testing. as 00-00-99/12345678 is used for testing for pca-predict
+            // hopefully should be ok
             if ($sortCode == self::TEST_SORT_CODE && in_array($accountNumber, [
                     self::TEST_ACCOUNT_NUMBER_OK,
                     self::TEST_ACCOUNT_NUMBER_ADJUSTED
@@ -118,7 +119,8 @@ class PCAService
                 $this->cacheBankAccountResults($sortCode, $accountNumber, $bankAccount);
 
                 return $bankAccount;
-            } elseif ($sortCode == self::TEST_SORT_CODE && $accountNumber == self::TEST_ACCOUNT_NUMBER_INVALID_SORT_CODE) {
+            } elseif ($sortCode == self::TEST_SORT_CODE &&
+                $accountNumber == self::TEST_ACCOUNT_NUMBER_INVALID_SORT_CODE) {
                 throw new DirectDebitBankException('Bad sort code', DirectDebitBankException::ERROR_SORT_CODE);
             } elseif ($sortCode == self::TEST_SORT_CODE &&
                 $accountNumber == self::TEST_ACCOUNT_NUMBER_INVALID_ACCOUNT_NUMBER) {
