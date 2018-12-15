@@ -23,6 +23,7 @@ use AppBundle\Repository\ClaimRepository;
 use AppBundle\Repository\PhonePolicyRepository;
 use AppBundle\Repository\PhoneRepository;
 use AppBundle\Repository\PolicyRepository;
+use AppBundle\Repository\ScheduledPaymentRepository;
 use AppBundle\Security\FOSUBUserProvider;
 use AppBundle\Service\BacsService;
 use AppBundle\Service\FraudService;
@@ -2101,6 +2102,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         $end = $this->endOfMonth($date);
 
         $dm = $this->getManager();
+        /** @var ScheduledPaymentRepository $scheduledPaymentRepo */
         $scheduledPaymentRepo = $dm->getRepository(ScheduledPayment::class);
         $scheduledPayments = $scheduledPaymentRepo->findMonthlyScheduled($date);
         $total = 0;

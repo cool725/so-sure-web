@@ -105,11 +105,17 @@ trait UserClassTrait
             $policy->create(rand(1, 999999), 'TEST', $date, rand(1, 999999));
 
             // still getting no excess on occasion. if so try resetting the phone
-            if (!$policy->getCurrentExcess()) {
+            $recursionPrevention = 0;
+            while (!$policy->getCurrentExcess()) {
                 $policy->setPhone($phone, $date);
-                if (!$policy->getCurrentExcess()) {
-                    throw new \Exception('Missing current policy excess');
+                $recursionPrevention++;
+                if ($recursionPrevention > 10) {
+                    break;
                 }
+            }
+
+            if (!$policy->getCurrentExcess()) {
+                throw new \Exception('Missing current policy excess');
             }
         }
 
