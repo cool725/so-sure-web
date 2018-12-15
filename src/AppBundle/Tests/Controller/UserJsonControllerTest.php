@@ -2,6 +2,7 @@
 
 namespace AppBundle\Tests\Controller;
 
+use AppBundle\DataFixtures\MongoDB\b\User\LoadUserData;
 use AppBundle\Document\User;
 use AppBundle\Document\Policy;
 use AppBundle\Document\Phone;
