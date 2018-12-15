@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+        <meta name="referrer" content="origin" />
+
+        <title>{% block title %}so-sure{% endblock %}</title>
+
+        {% block meta %}{% endblock %}
+
+        {# TODO: Upate to the latest way of loading #}
+        {% if use_fa_cdn %}
+            <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.2.0/css/all.css" integrity="sha384-TXfwrfuHVznxCssTxWoPZjhcss/hp38gEOH8UPZG/JcXonvBQ6SlsIF49wUzsGno" crossorigin="anonymous">
+        {% else %}
+            <link rel="stylesheet" href="/assets/fontawesome-pro-5.5.0-web/css/all.min.css" crossorigin="anonymous">
+        {% endif %}
+
+        {% if include_emoji is defined and include_emoji == true %}
+            <script src="https://twemoji.maxcdn.com/2/twemoji.min.js?2.2.3"></script>
+        {% endif %}
+
+        <link rel="stylesheet" href="{{ asset('css-js/global.css') }}">
+
+        {% block cssPage %}{% endblock %}
+    </head>
+    <body class="d-flex flex-column {% if body_class is defined %}{{ body_class }}{% endif %}">
+
+        {% include '::flash_rebrand.html.twig' %}
+
+        <main id="content" class="w-100 flex-grow-1">
+            {% block body %}{% endblock %}
+        </main>
+
+        {% include '::footer_data.html.twig' %}
+
+        <script src="{{ asset('css-js/runtime.js') }}"></script>
+        <script src="{{ asset('css-js/vendor.js') }}"></script>
+        <script src="{{ asset('css-js/global.js') }}"></script>
+
+        {% block javascriptsPage %}{% endblock %}
+    </body>
+</html>

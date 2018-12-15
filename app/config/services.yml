@@ -1175,6 +1175,12 @@ services:
             -  { name: kernel.event_listener, event: event.policy.cancelled, method: onPolicyCancelledEvent }
             -  { name: kernel.event_listener, event: event.policy.created, method: refundFreeMonthPromo }
 
+    AppBundle\Listener\PosIpListener:
+        arguments:
+            - '%pos_ips%'
+        tags:
+            -  { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }
+
     app.listener.response:
         class:   AppBundle\Listener\KernelListener
         arguments:

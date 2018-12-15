@@ -39,6 +39,9 @@ Encore
     .addEntry('admin', './src/AppBundle/Resources/public/rebrand/js/pages/admin/admin.js')
     .addEntry('picsure', './src/AppBundle/Resources/public/rebrand/js/pages/admin/picsure.js')
 
+    // Pos
+    .addEntry('pos', './src/AppBundle/Resources/public/rebrand/js/pages/pos.js')
+
     // User area files
     .addEntry('user-unpaid', './src/AppBundle/Resources/public/rebrand/js/pages/user/user-unpaid.js')
 

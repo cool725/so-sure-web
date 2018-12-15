@@ -1,0 +1,97 @@
+// portal.scss
+
+@import "../vendor/bs4/functions";
+@import "../vendor/bs4/variables";
+@import "../vendor/bs4/mixins/breakpoints";
+@import "../abstracts/mixins";
+@import "../abstracts/palette";
+@import "../abstracts/variables";
+
+.portal {
+    width: 100vw; height: 100vh;
+    position: relative;
+    @include blue-gradient;
+    overflow-y: scroll;
+
+    &__inner {
+        width: 100%;
+        position: relative;
+        z-index: 4;
+    }
+
+    &__card {
+        max-width: 450px;
+        margin-left: auto;
+        margin-right: auto;
+        background-color: $white;
+        box-shadow: 0 15px 30px 0 rgba(8,27,154,0.08),
+                    0 5px 15px 0 rgba(8,27,154,0.08);
+        @include border-radius(15px);
+
+        &__body {
+            padding: 2rem;
+
+            form {
+                margin-bottom: 0;
+            }
+        }
+    }
+
+    &:before {
+        width: 100%; height: 100%;
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        content: '';
+        z-index: 1;
+        background-image: url('#{$cdn_url}/images/rebrand/misc/so-sure_swoosh-hero-background-mobile.svg');
+        background-size: cover;
+        opacity: 0.44;
+    }
+
+    @include media-breakpoint-up(md) {
+        overflow: hidden;
+    }
+
+    @include media-breakpoint-up(lg) {
+        &:before {
+            background-image: url('#{$cdn_url}/images/rebrand/misc/so-sure_swoosh-hero-background.svg');
+        }
+    }
+
+
+    // Backgrounds
+    &__phone__background {
+        width: 352px; height: 467px;
+        position: absolute;
+        bottom: -200px; right: -106px;
+
+        background: transparent url('#{$cdn_url}/images/rebrand/login/so-sure_login-phone-smile.png') no-repeat;
+        background-size: 352px;
+
+        @include media-breakpoint-up(lg) {
+            top: 50px; left: -106px;
+        }
+    }
+
+    &__money__background {
+        @include media-breakpoint-up(lg) {
+            width: 367px; height: 342px;
+            position: absolute;
+            left: 55%; top: 50%;
+
+            background: transparent url('#{$cdn_url}/images/rebrand/login/so-sure_login-money.png') no-repeat;
+            background-size: 367px;
+        }
+    }
+
+    // Adjustments for small phones
+    // @media (max-width: 320px) {
+    //     width: auto; height: auto;
+    //     padding-top: 3rem;
+    //     overflow: scroll;
+
+    //     &:before {
+    //         background-image: none;
+    //     }
+    // }
+}
