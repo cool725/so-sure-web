@@ -48,8 +48,11 @@ while getopts ":snpdDhcClr" opt; do
     p)
       FUNCTIONAL_TEST="test:functional:paid"
       ;;
+    m)
+      FUNCTIONAL_TEST="test:functional:picsureml"
+      ;;
     h)
-      echo "Usage: $0 [-d skip db refresh] [-D debug] [-s populate sample policy data] [-n no network test | -p run paid test | -c run coverage | -C run coverage no network] [-l keep logs (skip force:cs check)] [-r do not flush redis after running] [filter e.g. (::Method or namespace - use \\)"
+      echo "Usage: $0 [-d skip db refresh] [-D debug] [-s populate sample policy data] [-n no network test | -p run paid test | -m picsure ml test | -c run coverage | -C run coverage no network] [-l keep logs (skip force:cs check)] [-r do not flush redis after running] [filter e.g. (::Method or namespace - use \\)"
       exit 1
       ;;
   esac

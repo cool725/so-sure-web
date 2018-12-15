@@ -16,6 +16,6 @@ phases:
   build:
     commands:
       - ./build/run-test-functional.sh -l
-  artifacts:
-    files:
-      - logs/test.log
+artifacts:
+  files:
+    - logs/test.log
