@@ -107,6 +107,7 @@ class UserJsonControllerTest extends BaseControllerTest
      */
     public function inviteEmailActionProvider()
     {
+        // @codingStandardsIgnoreStart
         return [
             [302, null, false],
             [422, ApiErrorCode::ERROR_MISSING_PARAM, true],
@@ -118,6 +119,7 @@ class UserJsonControllerTest extends BaseControllerTest
             [200, ApiErrorCode::SUCCESS, true, "successfulinvite@gmail.com", "csrf", null, "TEST"],
             [422, ApiErrorCode::ERROR_INVITATION_DUPLICATE, true, "successfulinvite@gmail.com", "csrf", null, "TEST"]
         ];
+        // @codingStandardsIgnoreEnd
     }
 
     /**
