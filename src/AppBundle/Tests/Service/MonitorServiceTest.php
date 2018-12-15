@@ -220,7 +220,16 @@ class MonitorServiceTest extends WebTestCase
         self::$dm->persist($policy);
         self::$dm->flush();
 
-        self::$monitor->invalidPolicy();
+        /** @var \Symfony\Component\DependencyInjection\Container $container */
+        $container = self::$container;
+
+        if (!$container) {
+            throw new \Exception('Unable to load container');
+        }
+
+        /** @var MonitorService $monitor */
+        $monitor = $container->get('app.monitor');
+        $monitor->invalidPolicy();
     }
 
     /**
