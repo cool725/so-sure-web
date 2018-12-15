@@ -103,8 +103,13 @@ trait UserClassTrait
             $policy->setPhone($phone, $date);
             $policy->setImei(static::generateRandomImei());
             $policy->create(rand(1, 999999), 'TEST', $date, rand(1, 999999));
+
+            // still getting no excess on occasion. if so try resetting the phone
             if (!$policy->getCurrentExcess()) {
-                throw new \Exception('Missing current policy excess');
+                $policy->setPhone($phone, $date);
+                if (!$policy->getCurrentExcess()) {
+                    throw new \Exception('Missing current policy excess');
+                }
             }
         }
 
