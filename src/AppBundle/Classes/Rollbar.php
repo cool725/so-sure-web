@@ -44,6 +44,13 @@ class Rollbar
             return true;
         }
 
+        // Don't sent HWI OAuth No resource owner
+        // Verify: GET -UsEd https://wearesosure.com/login/LoginForm.jsp
+        if ($source instanceof \RuntimeException &&
+            mb_stripos($exception->getMessage(), "No resource owner") !== false) {
+            return true;
+        }
+
         return false;
     }
 }
