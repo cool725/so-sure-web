@@ -247,6 +247,13 @@ jms_di_extra:
 jms_security_extra:
     expressions: true
 
+rollbar:
+    access_token: '%rollbar_access_token%'
+    environment:  '%kernel.environment%'
+    capture_email: true
+    capture_username: true
+    check_ignore: '\AppBundle\Classes\Rollbar::shouldIgnore'
+
 snc_redis:
     clients:
         default:

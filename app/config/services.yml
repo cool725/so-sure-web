@@ -742,18 +742,6 @@ services:
         arguments:
             - "@logger"
 
-    app.logger.rollbar:
-        alias: AppBundle\Classes\Rollbar
-        public: true
-
-    AppBundle\Classes\Rollbar:
-        arguments:
-            - access_token: '%rollbar_access_token%'
-
-    app.logger.rollbar-security:
-        alias: AppBundle\Classes\Rollbar
-        public: true
-
     app.logger.lineformatter:
         alias: Monolog\Formatter\LineFormatter
         public: true
@@ -1502,29 +1490,6 @@ services:
             - "@logger"
         tags:
             - { name: validator.constraint_validator }
-
-    rollbar.voter.notfound:
-        class: AppBundle\Security\NotFoundHttpExceptionVoter
-        tags:
-            - { name: staffim_rollbar.report_voter }
-
-    rollbar.voter.untrustedhost:
-        class: AppBundle\Security\UntrustedHostUnexpectedValueExceptionVoter
-        tags:
-            - { name: staffim_rollbar.report_voter }
-
-    rollbar.voter.runtime:
-        class: AppBundle\Security\RuntimeExceptionVoter
-        tags:
-            - { name: staffim_rollbar.report_voter }
-
-    rollbar.voter.accessdenied:
-        class: AppBundle\Security\AccessDeniedHttpExceptionVoter
-        arguments:
-            - "@request_stack"
-            - "%sosure_ips%"
-        tags:
-            - { name: staffim_rollbar.report_voter }
 
     sitemap.phone:
         class: AppBundle\Service\PhoneSitemapGenerator
