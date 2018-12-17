@@ -190,8 +190,7 @@ class ApiAuthController extends BaseController
 
                 $body = sprintf(
                     '<a href="%s">Detected IMEI page</a>',
-                    $this->generateUrl('admin_detected_imei'),
-                    $policy->getPolicyNumber()
+                    $this->generateUrl('admin_detected_imei')
                 );
 
                 $this->get('app.mailer')->send(
