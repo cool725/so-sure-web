@@ -34,6 +34,14 @@ class InvitationController extends BaseController
         $invitation = $repo->find($id);
         $phoneRepo = $dm->getRepository(Phone::class);
 
+        $declineForm = $this->get('form.factory')
+            ->createNamedBuilder('decline_form')
+            ->add('decline', SubmitType::class, array(
+                'label' => "Not interested!",
+                'attr' => ['class' => 'btn-simple-link text-white'],
+            ))
+            ->getForm();
+
         if ($invitation && $invitation->isSingleUse() && $invitation->isInviteeProcessed()) {
             if ($invitation->isAccepted()) {
                 $flashType = 'success';
@@ -60,14 +68,6 @@ class InvitationController extends BaseController
             // but still try to convert user
             $invitation = null;
         }
-
-        $declineForm = $this->get('form.factory')
-            ->createNamedBuilder('decline_form')
-            ->add('decline', SubmitType::class, array(
-                'label' => "Not interested!",
-                'attr' => ['class' => 'btn-simple-link text-white'],
-            ))
-            ->getForm();
 
         if ($request->request->has('decline_form')) {
             $declineForm->handleRequest($request);
