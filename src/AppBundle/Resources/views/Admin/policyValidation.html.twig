@@ -1,8 +1,22 @@
+{% extends '::admin_claims_base_rebrand.html.twig' %}
+
 {% block body %}
 
-    {% for policy in policies %}
 
-        <p>{{ policy.policyNumber }}</p>
+    <section class="py-4 px-md-4">
+        <div class="container-fluid">
+            <div class="d-lg-flex align-items-lg-center justify-content-lg-between mb-3">
+                <h1 class="h2">Policy Validation</h1>
+            </div>
+            <div class="row">
+                <div class="col-md">
+                    {% for policy in policies %}
 
-    {% endfor %}
+                        <p>{{ policy|raw }}</p>
+
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </section>
 {% endblock %}

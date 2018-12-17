@@ -1584,8 +1584,8 @@ class AdminController extends BaseController
         $lines = [];
         /** @var Policy $policy */
         foreach ($policies as $policy) {
-            if ($repo->find($redis->get($policy->getId()))) {
-                $lines[] = $repo->find($redis->get($policy->getId()));
+            if ($redis->exists($policy->getId())) {
+                $lines[] = $redis->get($policy->getId());
             }
         }
 
