@@ -1310,14 +1310,14 @@ class PurchaseController extends BaseController
                         } else {
                             $policy->setRequestedCancellationReason($reason);
                         }
-                        $policy->cancel(Policy::CANCELLED_COOLOFF);
+                        $this->get("app.policy")->cancel($policy, Policy::CANCELLED_COOLOFF);
                         $dm->flush();
                         $flash = "You should receive an email confirming that your policy is now cancelled.";
                         $this->get("app.stats")->increment(Stats::AUTO_CANCEL_IN_COOLOFF);
                     } elseif (!$policy->hasRequestedCancellation()) {
                         // @codingStandardsIgnoreStart
                         $flash = "We have passed your request to our policy team. You should receive a cancellation email once that is processed.";
-                        $message = "This is a so-sure generated message. Policy: <a href='%s'>%s/%s</a> requested a cancellation via the site as phone was damaged (%s) prior to purchase. so-sure support team: Please contact the policy holder to get their reason(s) for cancelling before action. Additional comments: %s";
+                        $message = "This is a so-sure generated message. Policy: <a href='%s'>%s/%s</a> requested a cancellation via the site. %s was given as the reason. so-sure support team: Please contact the policy holder to get their reason(s) for cancelling before action. Additional comments: %s";
                         // @codingStandardsIgnoreEnd
                         $policy->setRequestedCancellation(\DateTime::createFromFormat('U', time()));
                         $policy->setRequestedCancellationReason($reason);
@@ -1338,8 +1338,11 @@ class PurchaseController extends BaseController
                                 $other
                             )
                         );
+                    } else {
+                        $flash = "Cancellation has already been requested and is currently processing.";
                     }
                     $this->addFlash("success", $flash);
+                    // TODO: this may or may not need to be edited to stop multiple logging but I dunno.
                     $this->get('app.mixpanel')->queueTrack(
                         MixpanelService::EVENT_REQUEST_CANCEL_POLICY,
                         [

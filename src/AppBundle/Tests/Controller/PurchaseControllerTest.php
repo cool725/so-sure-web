@@ -1438,4 +1438,23 @@ class PurchaseControllerTest extends BaseControllerTest
         $this->assertEquals(200, $this->getClientResponseStatusCode());
         self::verifySearchFormData($crawler->filter('form'), '/phone-insurance/', 1);
     }
+
+    /**
+     * Tests to make sure that you can request cancellation of your policy, and that in cooloff it will automatically
+     * action it.
+     */
+    public function testCancelPolicy()
+    {
+        $a = $this->createUserPolicy(true, new \DateTime("five months ago"));
+        $b = $this->createUserPolicy(true, new \DateTime("three days ago"));
+        // Normal cancellation.
+        $user = $a->getUser();
+        $this->login($a->getEmail(), 'foo', 'user');
+        $crawler = self::$client->request('GET', '/purchase/cancel/'.$a->getId());
+
+        // Cooloff cancellation.
+
+        // Duplicate cancellation.
+
+    }
 }
