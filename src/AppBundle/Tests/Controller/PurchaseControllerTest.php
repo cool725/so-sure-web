@@ -1445,16 +1445,77 @@ class PurchaseControllerTest extends BaseControllerTest
      */
     public function testCancelPolicy()
     {
-        $a = $this->createUserPolicy(true, new \DateTime("five months ago"));
-        $b = $this->createUserPolicy(true, new \DateTime("three days ago"));
-        // Normal cancellation.
-        $user = $a->getUser();
-        $this->login($a->getEmail(), 'foo', 'user');
-        $crawler = self::$client->request('GET', '/purchase/cancel/'.$a->getId());
-
+        $a = $this->createUserPolicy(true, new \DateTime("-5 months"));
+        $b = $this->createUserPolicy(true, new \DateTime("-1 weeks"));
+        $c = $this->createUserPolicy(true, new \DateTime("-1 weeks"));
+        $a->setStatus(Policy::STATUS_ACTIVE);
+        $b->setStatus(Policy::STATUS_ACTIVE);
+        $c->setStatus(Policy::STATUS_ACTIVE);
+        $a->getUser()->setEmail(self::generateEmailClass("aaa", "testCancelPolicy"));
+        $b->getUser()->setEmail(self::generateEmailClass("bbb", "testCancelPolicy"));
+        $c->getUser()->setEmail(self::generateEmailClass("ccc", "testCancelPolicy"));
+        self::$dm->persist($a);
+        self::$dm->persist($b);
+        self::$dm->persist($c);
+        self::$dm->persist($a->getUser());
+        self::$dm->persist($b->getUser());
+        self::$dm->persist($c->getUser());
+        self::$dm->flush();
+        // Normal cancellation request.
+        $crawler = $this->cancelForm($a, Policy::COOLOFF_REASON_EXISTING);
+        $this->assertContains(
+            "We have passed your request to our policy team.",
+            $crawler->html()
+        );
+        $this->assertEquals(Policy::COOLOFF_REASON_EXISTING, $a->getRequestedCancellationReason());
+        $this->assertEquals(Policy::STATUS_ACTIVE, $a->getStatus());
         // Cooloff cancellation.
+        $crawler = $this->cancelForm($b, Policy::COOLOFF_REASON_PICSURE);
+        $this->assertContains(
+            "You should receive an email confirming that your policy is now cancelled.",
+            $crawler->html()
+        );
+        $this->assertEquals(Policy::COOLOFF_REASON_PICSURE, $b->getRequestedCancellationReason());
+        $this->assertEquals(Policy::STATUS_CANCELLED, $b->getStatus());
+        $this->assertEquals(Policy::CANCELLED_COOLOFF, $b->getCancelledReason());
+        // Cooloff cancellation with custom reason.
+        $crawler = $this->cancelForm($c, Policy::COOLOFF_REASON_UNKNOWN, "my phone is cursed.");
+        $this->assertContains(
+            "You should receive an email confirming that your policy is now cancelled.",
+            $crawler->html()
+        );
+        $this->assertEquals("my phone is cursed.", $c->getRequestedCancellationReason());
+        $this->assertEquals(Policy::STATUS_CANCELLED, $c->getStatus());
+        $this->assertEquals(Policy::CANCELLED_COOLOFF, $c->getCancelledReason());
 
         // Duplicate cancellation.
+        $crawler = $this->cancelForm($a, Policy::COOLOFF_REASON_DAMAGED);
+        $this->assertContains(
+            "Cancellation has already been requested and is currently processing.",
+            $crawler->html()
+        );
+        $this->assertEquals(Policy::COOLOFF_REASON_EXISTING, $a->getRequestedCancellationReason());
+        $this->assertEquals(Policy::STATUS_ACTIVE, $a->getStatus());
+    }
 
+    /**
+     * logs in opens the cancellation form and submits it with given parameters.
+     * @param Policy $policy is the policy that we are logging in for.
+     * @param String $reason is the reason under Policy::COOLOFF_REASON_*.
+     * @return Crawler the web crawler for the page coming after cancellation occurs.
+     */
+    private function cancelForm($policy, $reason, $other = null)
+    {
+        $user = $policy->getUser();
+        $this->login($user->getEmail(), 'foo');
+        $crawler = self::$client->request('GET', '/purchase/cancel/'.$policy->getId());
+        $form = $crawler->selectButton('cancel_form[cancel]')->form();
+        $form['cancel_form[reason]'] = $reason;
+        if ($other) {
+            $form['cancel_form[othertxt]'] = $other;
+        }
+        self::$client->submit($form);
+        self::$dm->refresh($policy);
+        return self::$client->followRedirect();
     }
 }
