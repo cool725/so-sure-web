@@ -262,10 +262,8 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                         $this->redis->set($policy->getId(), '');
 
                         $newLines = array_diff($lines, $prevLines);
-                        foreach ($newLines as $newLine) {
-                            $newLine = str_replace(';', '<br>', $newLine);
-                            $this->redis->append($policy->getId(), $newLine);
-                        }
+
+                        $this->redis->append($policy->getId(), implode('<br>', $newLines));
                     }
 
                     $newLines = array_diff($lines, $prevLines);
