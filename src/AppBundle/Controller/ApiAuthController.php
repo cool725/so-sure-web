@@ -189,8 +189,8 @@ class ApiAuthController extends BaseController
                 ]));
 
                 $body = sprintf(
-                    '<a href="%s">%s</a>',
-                    $this->generateUrl('admin_policy', ['id' => $policy->getId()]),
+                    '<a href="%s">Detected IMEI page</a>',
+                    $this->generateUrl('admin_detected_imei'),
                     $policy->getPolicyNumber()
                 );
 
