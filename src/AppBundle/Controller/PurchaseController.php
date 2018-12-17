@@ -1305,10 +1305,9 @@ class PurchaseController extends BaseController
                     $flash = null;
                     $cooloff = $policy->isWithinCooloffPeriod(null, false);
                     if ($cooloff) {
-                        if ($reason == Policy::COOLOFF_REASON_UNKNOWN) {
-                            $policy->setRequestedCancellationReason($other ?: $reason);
-                        } else {
-                            $policy->setRequestedCancellationReason($reason);
+                        $policy->setRequestedCancellationReason($reason);
+                        if ($other) {
+                            $policy->setRequestedCancellationReasonOther($other);
                         }
                         $this->get("app.policy")->cancel($policy, Policy::CANCELLED_COOLOFF);
                         $dm->flush();
@@ -1321,6 +1320,9 @@ class PurchaseController extends BaseController
                         // @codingStandardsIgnoreEnd
                         $policy->setRequestedCancellation(\DateTime::createFromFormat('U', time()));
                         $policy->setRequestedCancellationReason($reason);
+                        if ($other) {
+                            $policy->setRequestedCancellationReasonOther($other);
+                        }
                         $dm->flush();
                         $intercom = $this->get('app.intercom');
                         $intercom->queueMessage(
@@ -1339,18 +1341,22 @@ class PurchaseController extends BaseController
                             )
                         );
                     } else {
-                        $flash = "Cancellation has already been requested and is currently processing.";
+                        $this->addFlash(
+                            "warning",
+                            "Cancellation has already been requested and is currently processing."
+                        );
                     }
-                    $this->addFlash("success", $flash);
-                    // TODO: this may or may not need to be edited to stop multiple logging but I dunno.
-                    $this->get('app.mixpanel')->queueTrack(
-                        MixpanelService::EVENT_REQUEST_CANCEL_POLICY,
-                        [
-                            'Policy Id' => $policy->getId(),
-                            'Reason' => $reason,
-                            'Auto Approved' => $cooloff
-                        ]
-                    );
+                    if ($flash) {
+                        $this->addFlash("success", $flash);
+                        $this->get('app.mixpanel')->queueTrack(
+                            MixpanelService::EVENT_REQUEST_CANCEL_POLICY,
+                            [
+                                'Policy Id' => $policy->getId(),
+                                'Reason' => $reason,
+                                'Auto Approved' => $cooloff
+                            ]
+                        );
+                    }
                     return $this->redirectToRoute('purchase_cancel_requested', ['id' => $id]);
                 }
             }

@@ -544,6 +544,14 @@ abstract class Policy
     protected $requestedCancellationReason;
 
     /**
+     * @AppAssert\AlphanumericSpaceDot()
+     * @Assert\Length(min="1", max="256")
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
+    protected $requestedCancellationReasonOther;
+
+    /**
      * @Assert\DateTime()
      * @MongoDB\Field(type="date")
      * @Gedmo\Versioned
@@ -2370,6 +2378,16 @@ abstract class Policy
     public function getRequestedCancellationReason()
     {
         return $this->requestedCancellationReason;
+    }
+
+    public function setRequestedCancellationReasonOther($requestedCancellationReasonOther)
+    {
+        $this->requestedCancellationReasonOther = $requestedCancellationReasonOther;
+    }
+
+    public function getRequestedCancellationReasonOther()
+    {
+        return $this->requestedCancellationReasonOther;
     }
 
     public function setVisitedWelcomePage(\DateTime $date)
