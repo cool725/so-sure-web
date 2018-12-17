@@ -195,6 +195,7 @@ class DefaultController extends BaseController
      * @Route("/vouchercodes", name="vouchercodes")
      * @Route("/quidco", name="quidco")
      * @Route("/ivip", name="ivip")
+     * @Route("/reward-gateway", name="reward_gateway")
      */
     public function affiliateLanding(Request $request)
     {
@@ -213,6 +214,9 @@ class DefaultController extends BaseController
         } elseif ($request->get('_route') == 'ivip') {
             $page = 'ivip';
             $affiliate = 'iVIP';
+        } elseif ($request->get('_route') == 'reward_gateway') {
+            $page = 'reward-gateway';
+            $affiliate = 'Reward Gateway';
         }
 
         $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE, [
@@ -351,7 +355,7 @@ class DefaultController extends BaseController
             if (!$phone) {
                 throw $this->createNotFoundException('Invalid id');
             }
-            
+
             $phoneMake->setMake($phone->getMake());
         }
 

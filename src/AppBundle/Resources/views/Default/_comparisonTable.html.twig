@@ -28,6 +28,13 @@
                         <span class="td-swap">
                             Endsleigh
                         </span>
+                    {% elseif table_content is defined and table_content == 'reward-gateway' %}
+                        <span class="td-swap">
+                            Endsleigh
+                        </span>
+                        <span class="td-swap">
+                            Simplesurance
+                        </span>
                     {% else %}
                         <span class="td-swap">
                             Gadget <br> Cover
@@ -81,6 +88,13 @@
                         <span class="td-swap">
                             <strong>1 - 5</strong> <div>working days</div>
                         </span>
+                    {% elseif table_content is defined and table_content == 'reward-gateway' %}
+                        <span class="td-swap">
+                            <strong>1 - 5</strong> <div>working days</div>
+                        </span>
+                        <span class="td-swap">
+                            <strong>3 - 5</strong> <div>working days</div>
+                        </span>
                     {% else %}
                         <span class="td-swap">
                             <strong>5 - 7</strong> <div>working days</div>
@@ -128,6 +142,13 @@
                             <i class="far fa-times fa-2x"></i>
                         </span>
                     {% elseif table_content is defined and table_content == 'vouchercodes' %}
+                        <span class="td-swap">
+                            <i class="far fa-times fa-2x"></i>
+                        </span>
+                    {% elseif table_content is defined and table_content == 'reward-gateway' %}
+                        <span class="td-swap">
+                            <i class="far fa-times fa-2x"></i>
+                        </span>
                         <span class="td-swap">
                             <i class="far fa-times fa-2x"></i>
                         </span>
@@ -181,6 +202,13 @@
                         <span class="td-swap">
                             <i class="far fa-check fa-2x"></i>
                         </span>
+                    {% elseif table_content is defined and table_content == 'reward-gateway' %}
+                        <span class="td-swap">
+                            <i class="far fa-check fa-2x"></i>
+                        </span>
+                        <span class="td-swap">
+                            <i class="far fa-times fa-2x"></i>
+                        </span>
                     {% else %}
                         <span class="td-swap">
                             <i class="far fa-times fa-2x"></i>
@@ -224,6 +252,13 @@
                         <span class="td-swap">
                             <i class="far fa-check fa-2x"></i>
                         </span>
+                    {% elseif table_content is defined and table_content == 'reward-gateway' %}
+                        <span class="td-swap">
+                            <i class="far fa-check fa-2x"></i>
+                        </span>
+                        <span class="td-swap">
+                            <i class="far fa-times fa-2x"></i>
+                        </span>
                     {% else %}
                         <span class="td-swap">
                             <i class="far fa-times fa-2x"></i>
@@ -266,6 +301,13 @@
                     {% elseif table_content is defined and table_content == 'vouchercodes' %}
                         <span class="td-swap">
                             <strong>3 years</strong> <div>from purchase</div>
+                        </span>
+                    {% elseif table_content is defined and table_content == 'reward-gateway' %}
+                        <span class="td-swap">
+                            <strong>3 years</strong> <div>from purchase</div>
+                        </span>
+                        <span class="td-swap">
+                            <strong>6 months</strong> <div>from purchase</div>
                         </span>
                     {% else %}
                         <span class="td-swap">
@@ -314,6 +356,13 @@
                             <i class="far fa-times fa-2x"></i>
                         </span>
                     {% elseif table_content is defined and table_content == 'vouchercodes' %}
+                        <span class="td-swap">
+                            <i class="far fa-times fa-2x"></i>
+                        </span>
+                    {% elseif table_content is defined and table_content == 'reward-gateway' %}
+                        <span class="td-swap">
+                            <i class="far fa-times fa-2x"></i>
+                        </span>
                         <span class="td-swap">
                             <i class="far fa-times fa-2x"></i>
                         </span>
@@ -370,6 +419,13 @@
                         <span class="td-swap">
                             <i class="fas fa-star"></i>
                         </span>
+                    {% elseif table_content is defined and table_content == 'reward-gateway' %}
+                        <span class="td-swap">
+                            <i class="fas fa-star"></i>
+                        </span>
+                        <span class="td-swap">
+                            <i class="fas fa-star"></i>
+                        </span>
                     {% else %}
                         <span class="td-swap">
                             <i class="fas fa-star"></i>
@@ -405,6 +461,12 @@
                 <th width="20%" class="blue-gradient"><img src="{{ cdn_url }}/images/rebrand/logo/so-sure_logo-white-dark.svg" class="img-fluid" alt="so-sure"></th>
                 <th width="20%" class="b4 bs-l">Protect Your Bubble</th>
                 <th width="20%" class="b4">Endsleigh</th>
+            {% elseif table_content is defined and table_content == 'reward-gateway' %}
+                <th width="24%" class="wh text-left"><span class="h5 text-primary">Features</span></th>
+                <th width="19%" class="blue-gradient"><img src="{{ cdn_url }}/images/rebrand/logo/so-sure_logo-white-dark.svg" class="img-fluid" alt="so-sure"></th>
+                <th width="19%" class="b4 bs-l">Protect Your Bubble</th>
+                <th width="19%" class="b4">Endsleigh</th>
+                <th width="19%" class="b4">Simplesurance</th>
             {% else %}
                 <th width="24%" class="wh text-left"><span class="h5 text-primary">Features</span></th>
                 <th width="19%" class="blue-gradient"><img src="{{ cdn_url }}/images/rebrand/logo/so-sure_logo-white-dark.svg" class="img-fluid" alt="so-sure"></th>
@@ -435,6 +497,9 @@
                 <td class="bb1"><strong>3 - 5</strong> <div>working days</div></td>
             {% elseif table_content is defined and table_content == 'vouchercodes' %}
                 <td class="bb1"><strong>1 - 5</strong> <div>working days</div></td>
+            {% elseif table_content is defined and table_content == 'reward-gateway' %}
+                <td class="bb1"><strong>1 - 5</strong> <div>working days</div></td>
+                <td class="bb1"><strong>3 - 5</strong> <div>working days</div></td>
             {% else %}
                 <td class="bb1"><strong>5 - 7</strong> <div>working days</div></td>
                 <td class="bb1"><strong>1 - 5</strong> <div>working days</div></td>
@@ -461,7 +526,10 @@
                 <td class="wh"><i class="far fa-times fa-2x"></i></td>
             {% elseif table_content is defined and table_content == 'vouchercodes' %}
                 <td class="wh"><i class="far fa-times fa-2x"></i></td>
-            {% else %}
+            {% elseif table_content is defined and table_content == 'reward-gateway' %}
+                <td class="wh"><i class="far fa-times fa-2x"></i></td>
+                <td class="wh"><i class="far fa-times fa-2x"></i></td>
+            {% else %}8
                 <td class="wh"><i class="far fa-times fa-2x"></i></td>
                 <td class="wh"><i class="far fa-times fa-2x"></i></td>
             {% endif %}
@@ -489,6 +557,9 @@
                 <td class="bb1"><i class="far fa-times fa-2x"></i></td>
             {% elseif table_content is defined and table_content == 'vouchercodes' %}
                 <td class="bb1"><i class="far fa-check fa-2x"></i></td>
+            {% elseif table_content is defined and table_content == 'reward-gateway' %}
+                <td class="bb1"><i class="far fa-check fa-2x"></i></td>
+                <td class="bb1"><i class="far fa-times fa-2x"></i></td>
             {% else %}
                 <td class="bb1"><i class="far fa-times fa-2x"></i></td>
                 <td class="bb1"><i class="far fa-times fa-2x"></i></td>
@@ -508,6 +579,9 @@
                 <td class="wh"><i class="far fa-times fa-2x"></i></td>
             {% elseif table_content is defined and table_content == 'vouchercodes' %}
                 <td class="wh"><i class="far fa-check fa-2x"></i></td>
+            {% elseif table_content is defined and table_content == 'reward-gateway' %}
+                <td class="wh"><i class="far fa-check fa-2x"></i></td>
+                <td class="wh"><i class="far fa-times fa-2x"></i></td>
             {% else %}
                 <td class="wh"><i class="far fa-times fa-2x"></i></td>
                 <td class="wh"><i class="far fa-times fa-2x"></i></td>
@@ -525,6 +599,9 @@
                 <td class="bb1"><strong>6 months</strong> <div>from purchase</div></td>
             {% elseif table_content is defined and table_content == 'vouchercodes' %}
                 <td class="bb1"><strong>3 years</strong> <div>from purchase</div></td>
+            {% elseif table_content is defined and table_content == 'reward-gateway' %}
+                <td class="bb1"><strong>3 years</strong> <div>from purchase</div></td>
+                <td class="bb1"><strong>6 months</strong> <div>from purchase</div></td>
             {% else %}
                 <td class="bb1"><strong>18 months</strong> <div>from purchase</div></td>
                 <td class="bb1"><strong>3 years</strong> <div>from purchase</div></td>
@@ -550,6 +627,9 @@
                 <td class="wh"><i class="far fa-times fa-2x"></i></td>
                 <td class="wh"><i class="far fa-times fa-2x"></i></td>
             {% elseif table_content is defined and table_content == 'vouchercodes' %}
+                <td class="wh"><i class="far fa-times fa-2x"></i></td>
+            {% elseif table_content is defined and table_content == 'reward-gateway' %}
+                <td class="wh"><i class="far fa-times fa-2x"></i></td>
                 <td class="wh"><i class="far fa-times fa-2x"></i></td>
             {% else %}
                 <td class="wh"><i class="far fa-times fa-2x"></i></td>
@@ -589,6 +669,13 @@
                     <i class="fas fa-star"></i>
                 </td>
             {% elseif table_content is defined and table_content == 'vouchercodes' %}
+                <td class="bb1">
+                    <i class="fas fa-star"></i>
+                </td>
+            {% elseif table_content is defined and table_content == 'reward-gateway' %}
+                <td class="bb1">
+                    <i class="fas fa-star"></i>
+                </td>
                 <td class="bb1">
                     <i class="fas fa-star"></i>
                 </td>
