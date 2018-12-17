@@ -238,7 +238,7 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                 $lines[] = '-------------';
                 $lines[] = '';
 
-                foreach($policies as $policy) {
+                foreach ($policies as $policy) {
                     $this->redis->del($policy->getId());
                 }
 
