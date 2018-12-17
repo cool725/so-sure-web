@@ -52,7 +52,7 @@
                             <i class="far fa-play-circle fa-lg opacity-50 mr-1"></i>
                             See how it works
                         </a>
-                        {% if invitation %}
+                        {% if invitation is defined and invitation %}
                             {{ form_start(form, { 'attr': { 'class': 'mt-3' }}) }}
                                 {{ form_widget(form) }}
                             {{ form_end(form) }}

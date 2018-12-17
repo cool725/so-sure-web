@@ -33,6 +33,34 @@ class InvitationController extends BaseController
         $repo = $dm->getRepository(Invitation::class);
         $invitation = $repo->find($id);
         $phoneRepo = $dm->getRepository(Phone::class);
+        $declined = false;
+
+        if ($invitation && $invitation->isSingleUse() && $invitation->isInviteeProcessed()) {
+            if ($invitation->isAccepted()) {
+                $flashType = 'success';
+                $flashMessage = 'This invitation to join so-sure has already been accepted already';
+            } elseif ($invitation->isRejected()) {
+                $flashType = 'error';
+                $flashMessage = 'Hmm, it looks like this invitation to join so-sure has already been declined';
+            } elseif ($invitation->isCancelled() && $declined == false) {
+                $flashType = 'error';
+                $flashMessage = 'Hmm, it looks like this invitation to join so-sure has already been cancelled';
+            } elseif ($declined == false) {
+                $flashType = 'warning';
+                $flashMessage = 'Hmm, it looks like this invitation to join so-sure has already been processed';
+            }
+            $this->addFlash(
+                $flashType,
+                $flashMessage
+            );
+            return $this->render('AppBundle:Invitation:invitation.html.twig', ['id' => $id]);
+        } elseif ($this->getUser() !== null) {
+            return $this->redirect($this->getParameter('branch_share_url'));
+        } elseif ($invitation && $invitation->isCancelled()) {
+            // If invitation was cancelled, don't mention who invited them (clear the invitation),
+            // but still try to convert user
+            $invitation = null;
+        }
 
         $declineForm = $this->get('form.factory')
             ->createNamedBuilder('decline_form')
@@ -42,44 +70,20 @@ class InvitationController extends BaseController
             ))
             ->getForm();
 
-        if ($invitation && $invitation->isSingleUse() && $invitation->isInviteeProcessed()) {
-            if ($invitation->isAccepted()) {
-                $flashType = 'success';
-                $flashMessage = 'This invitation to join so-sure has already been accepted already';
-            } elseif ($invitation->isRejected()) {
-                $flashType = 'error';
-                $flashMessage = 'Hmm, it looks like this invitation to join so-sure has already been declined';
-            } elseif ($invitation->isCancelled()) {
-                $flashType = 'error';
-                $flashMessage = 'Hmm, it looks like this invitation to join so-sure has already been cancelled';
-            } else {
-                $flashType = 'warning';
-                $flashMessage = 'Hmm, it looks like this invitation to join so-sure has already been processed';
-            }
-            $this->addFlash(
-                $flashType,
-                $flashMessage
-            );
-            return $this->redirectToRoute('invitation', ['id' => $id]);
-        } elseif ($this->getUser() !== null) {
-            return $this->redirect($this->getParameter('branch_share_url'));
-        } elseif ($invitation && $invitation->isCancelled()) {
-            // If invitation was cancelled, don't mention who invited them (clear the invitation),
-            // but still try to convert user
-            $invitation = null;
-        }
-
         if ($request->request->has('decline_form')) {
             $declineForm->handleRequest($request);
             if ($declineForm->isSubmitted() && $declineForm->isValid()) {
                 $invitationService = $this->get('app.invitation');
                 $invitationService->reject($invitation);
+                $declined = true;
                 $this->addFlash(
                     'error',
                     'You have declined this invitation.'
                 );
 
-                return $this->redirectToRoute('invitation', ['id' => $id]);
+                return $this->redirectToRoute('invitation', [
+                    'id' => $id,
+                ]);
             }
         }
 
@@ -110,6 +114,7 @@ class InvitationController extends BaseController
             'invitation' => $invitation,
             'form' => $declineForm->createView(),
             'landing_text' => $landingText,
+            'declined' => $declined,
         );
     }
 }
