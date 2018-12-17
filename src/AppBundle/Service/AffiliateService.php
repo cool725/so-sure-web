@@ -176,15 +176,17 @@ class AffiliateService
     /**
      * Get all users that correspond to a given affiliate's campaign source or lead source fields, and within a given
      * set of aquisition statuses.
-     * @param AffiliateCompany $affiliate is the affiliate company to find users for.
-     * @param \DateTime        $date      is the time and date to be considered as current.
-     * @param array            $status    is the set of aquisition statuses within which all users must fall.
+     * @param AffiliateCompany $affiliate     is the affiliate company to find users for.
+     * @param \DateTime        $date          is the time and date to be considered as current.
+     * @param array            $status        is the set of aquisition statuses within which all users must fall.
+     * @param boolean          $ignoreCharged if this is true we don't return users who have affiliate charges.
      * @return array containing the users.
      */
     public function getMatchingUsers(
         AffiliateCompany $affiliate,
         \DateTime $date = null,
-        $status = [User::AQUISITION_PENDING]
+        $status = [User::AQUISITION_PENDING],
+        $ignoreCharged = false
     ) {
         $campaignUsers = [];
         $leadUsers = [];
@@ -205,16 +207,49 @@ class AffiliateService
         }
         $users = [];
         foreach ($campaignUsers as $user) {
+            if ($ignoreCharged && $this->chargeRepository->findLastByUser($user, Charge::TYPE_AFFILIATE)) {
+                continue;
+            }
             if (in_array($user->aquisitionStatus($affiliate->getDays(), $date), $status)) {
                 $users[] = $user;
             }
         }
         foreach ($leadUsers as $user) {
+            if ($ignoreCharged && $this->chargeRepository->findLastByUser($user, Charge::TYPE_AFFILIATE)) {
+                continue;
+            }
             if (in_array($user->aquisitionStatus($affiliate->getDays(), $date), $status)) {
                 $users[] = $user;
             }
         }
         return $users;
+    }
+
+    /**
+     * Tells you how many days until affiliate charge can be paid for a given user.
+     * @param AffiliateCompany $affiliate is the affiliate company so we can get their charge model and day periods.
+     * @param User             $user      is the user for whom we are checking.
+     * @return int the number of days.
+     */
+    public function daysToAquisition($affiliate, $user, $now = null)
+    {
+        if (!$now) {
+            $now = new \DateTime();
+        }
+        $model = $affiliate->getChargeModel();
+        $charge = $this->chargeRepository->findLastByUser($user, Charge::TYPE_AFFILIATE);
+        $policy = $user->getFirstPolicy();
+        if ($model == AffiliateCompany::MODEL_ONE_OFF || !$charge) {
+            $start = clone $policy->getStart();
+            $start->add(static::intervalDays($affiliate->getDays()));
+            return static::daysFrom($start, $now);
+        } elseif ($model == AffiliateCompany::MODEL_ONGOING) {
+            $dayDifference = ($affiliate->getRenewalDays() ?: 0) - ($affiliate->getDays() ?: 0);
+            $chargeDate = clone $charge->getCreatedDate();
+            $chargeDate->add(new \DateInterval("P1Y"));
+            return static::daysFrom($chargeDate, $now) + $dayDifference;
+        }
+        return 0;
     }
 
     /**

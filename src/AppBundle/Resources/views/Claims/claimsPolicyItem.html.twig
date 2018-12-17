@@ -106,7 +106,7 @@
                                 {% endif %}
                                 {% endif %}
                                 <tr>
-                                    <td>Policy Status</td>
+                                    <td><i class="fa fa-shield" title="Customer Service only"></i> Policy Status</td>
                                     <td>
                                         {{ policy.status }} {% if not policy.isPolicy %}Pre-pending{% endif %}
                                         {% if policy.cancelledReason %}
@@ -495,28 +495,39 @@
                             <h3 class="panel-title">Notes</h3>
                         </div>
                         <div class="panel-body" id="notesList">
-                            <div class="pull-right">
-                            <button type="button" class="btn btn-info" data-toggle="modal" data-target="#policyNotesModal"
-                            >Add Note <i class="fa fa-external-link"></i></button>
-                            </div>
                             {% for note in policy.notesList %}
-                              <div class="row">
-                                  <div class="col-sm-12">
-                                      <b>{{ note.date|date }} by {{ note.userName }}</b>
-                                  </div>
-                              </div>
-                              <div class="row">
-                                  <div class="col-sm-12">
-                                      {% if note.type == 'call' %}
-                                          Call result: <strong>{{ note.result }}</strong><br>
-                                          Additional Actions: <strong>{% if note.actions|length == 0 %}n/a{% else %}{{ note.actions }}{% endif %}</strong><br>
-                                          Additional Details: <strong>{% if note.notes|length == 0 %}n/a{% else %}{{ note.notes }}{% endif %}</strong>
-                                      {% else %}
-                                        {{ note.notes }}
-                                      {% endif %}
-                                  </div>
-                              </div>
+                                <div class="row">
+                                    <div class="col-sm-8">
+                                        <b>{{ note.date|date }} by {{ note.userName }}</b>
+                                    </div>
+                                    {% if note.action is not null %}
+                                        <div class="col-sm-4">
+                                            Action: {{ note.action }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <div class="row">
+                                     <div class="col-sm-12">
+                                         {% if note.type == 'call' %}
+                                             Call result: <strong>{{ note.result }}</strong><br>
+                                             Additional Actions: <strong>{% if note.actions|length == 0 %}n/a{% else %}{{ note.actions }}{% endif %}</strong><br>
+                                             Additional Details: <strong>{% if note.notes|length == 0 %}n/a{% else %}{{ note.notes }}{% endif %}</strong>
+                                         {% else %}
+                                             {{ note.notes }}
+                                         {% endif %}
+                                     </div>
+                                </div>
+
+                                <hr>
                             {% endfor %}
+
+                            <div class="pull-right">
+                                <button type="button" class="btn btn-info"
+                                        data-toggle="modal"
+                                        data-target="#policyNotesModal">
+                                    <span class="glyphicon glyphicon-new-window" aria-hidden="true"></span> Add Note</i>
+                                </button>
+                            </div>
                         </div>
                     </div>
 
@@ -618,7 +629,7 @@
                         <th>Flags</th>
                         <th>Notes</th>
                         {% if is_granted('ROLE_CUSTOMER_SERVICES') %}
-                        <th>Admin</th>
+                        <th><i class="fa fa-shield" title="Customer Service only"></i> Admin</th>
                         {% endif %}
                     </tr>
                     {% for claim in policy.claims %}
@@ -637,7 +648,17 @@
                         </td>
                         <td style="width: 10%;">{{ claim.type }}</td>
                         <td style="width: 10%;">{{ claim.status }}</td>
-                        <td style="width: 10%;">£{{ claim.expectedExcessValue }}</td>
+                        <td style="width: 10%;">
+                            {% if equal_to_two_dp(claim.expectedExcessValue, claim.expectedExcessValue(true)) %}
+                                <span title="Verified excess matches older calculation of £{{ claim.expectedExcessValue(true)|number_format(2, '.', ',') }}">
+                                    £{{ claim.expectedExcessValue }}
+                                </span>
+                            {% else %}
+                                <span class="text-danger" title="Warning excess does not matches older calculation of £{{ claim.expectedExcessValue(true)|number_format(2, '.', ',') }}">
+                                    £{{ claim.expectedExcessValue }}
+                                </span>
+                            {% endif %}
+                        </td>
                         <td style="width: 10%;">£{{ claim.totalChargesWithVat|number_format(2, '.', ',') }}</td>
                         <td style="width: 10%;">{% if claim.fnolRisk %}{{ claim.fnolRisk }}{% else %}??{% endif %} / {% if claim.fnolRiskReason %}{{ claim.fnolRiskReason }}{% else %}??{% endif %}</td>
                         <td  style="width: 10%;" class="{% if claim.crimeRef|length > 0 %}{% if claim.validCrimeRef %}success{% elseif not claim.validCrimeRef %}danger{% endif %}{% endif %}">
@@ -1000,7 +1021,7 @@
                 </tr>
                 {% if is_granted('ROLE_CUSTOMER_SERVICES') %}
                 <tr>
-                    <td><i class="fa fa-shield"></i> pic-sure status</td>
+                    <td><i class="fa fa-shield" title="Customer Service only"></i> pic-sure status</td>
                     <td>
                         {% if policy.policyTerms.isPicSureEnabled %}
                             Status: {% if policy.picSureStatus %}{{ policy.picSureStatus }}{% else %}Not started{% endif %}
@@ -1122,7 +1143,7 @@
                 {% endif %}
                 {% if is_granted('ROLE_CUSTOMER_SERVICES') %}
                 <tr>
-                    <td>Pay Policy</td>
+                    <td><i class="fa fa-shield" title="Customer Service only"></i> Pay Policy</td>
                     <td>
                         {% if not policy.payerOrUser.paymentMethod %}
                             Missing payment method
@@ -1146,7 +1167,7 @@
                         and policy.payerOrUser.paymentMethod
                         and policy.payerOrUser.paymentMethod.getType == "bacs" %}
                         <tr>
-                            <td><i class="fa fa-lock" title="Admin only"></i> Cancel Direct Debit</td>
+                            <td><i class="fa fa-shield" title="Customer Service only"></i> Cancel Direct Debit</td>
                             <td>
                                 {{ form_start(cancel_direct_debit_form)}}
                                 {{ form_widget(cancel_direct_debit_form.cancel, {'attr': {'class': 'btn btn-danger confirm-submit', 'data-confirm-msg': 'Are you sure you want to cancel this direct debit?'}})}}
@@ -1174,7 +1195,7 @@
             <h3>Update Policy</h3>
             <table class="table table-striped">
                 <tr>
-                    <td>Recipero Make/Model Check</td>
+                    <td><i class="fa fa-shield" title="Customer Service only"></i> Recipero Make/Model Check</td>
                     <td>{{ form_start(makemodel_form)}}
                         <span class="text-danger">
                         {{ form_errors(makemodel_form) }}
@@ -1192,7 +1213,7 @@
                     </td>
                 </tr>
                 <tr>
-                    <td>Imei</td>
+                    <td><i class="fa fa-shield" title="Customer Service only"></i> Imei</td>
                     <td>
                         <form class="form-inline">
                             <div class="form-group">
@@ -1206,7 +1227,19 @@
                     </td>
                 </tr>
                 <tr>
-                    <td>Detected Imei</td>
+                    <td><i class="fa fa-shield" title="Customer Service only"></i> Phone</td>
+                    <td>
+                        <div class="form-group">
+                            {{ policy.phone }}
+                        </div>
+                        <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#imeiForm">
+                            <span class="glyphicon glyphicon-new-window" aria-hidden="true"></span>
+                            Update
+                        </button>
+                    </td>
+                </tr>
+                <tr>
+                    <td><i class="fa fa-shield" title="Customer Service only"></i> Detected Imei</td>
                     <td>
                         <form class="form-inline">
                             <div class="form-group">
@@ -1217,18 +1250,6 @@
                                 Update
                             </button>
                         </form>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Phone</td>
-                    <td>
-                        {{ form_start(phone_form, {'attr': {'class': 'form-inline'}}) }}
-                        <div class="form-group">
-                            {{ form_errors(phone_form.phone) }}
-                            {{ form_widget(phone_form.phone) }}
-                        </div>
-                        {{ form_widget(phone_form.next, {'label': 'Update', 'attr': {'class': 'btn btn-danger confirm-submit', 'data-confirm-msg': 'Are you sure you want to update this phone?  This should only be done if the phone was incorrectly selected or post claim if the phone make/model has changed.  This will trigger a Salva Policy Update, and possibly affect the pricing at Salva, however, it will not update the policy premium charge to the customer.'}}) }}
-                        {{ form_end(phone_form) }}
                     </td>
                 </tr>
                 {% if is_granted('ROLE_ADMIN') %}
@@ -1270,8 +1291,10 @@
             {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:AdminEmployee:detectedImeiForm', 'policy': policy, 'id': 'detectedImeiForm'} %}
             {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:AdminEmployee:picsureForm', 'policy': policy, 'id': 'picsureForm'} %}
             {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:AdminEmployee:tasteCardForm', 'policy': policy, 'id': 'tasteCardForm', 'title': 'Taste Card Settings'} %}
-            {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:Admin:salvaRequeueForm', 'policy': policy, 'id': 'salvaRequeueForm'} %}
-            {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:Admin:salvaStatusForm', 'policy': policy, 'id': 'salvaStatusForm'} %}
+            {% if is_granted('ROLE_ADMIN') %}
+                {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:Admin:salvaRequeueForm', 'policy': policy, 'id': 'salvaRequeueForm'} %}
+                {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:Admin:salvaStatusForm', 'policy': policy, 'id': 'salvaStatusForm'} %}
+            {% endif %}
 
             {% endif %}
             {% if is_granted('ROLE_ADMIN') %}
@@ -1715,6 +1738,9 @@
 
     {% if is_granted('ROLE_CUSTOMER_SERVICES') %}
         {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:AdminEmployee:linkClaimForm', 'policy': policy, 'id': 'linkClaimForm'} %}
+    {% endif %}
+
+    {% if is_granted('ROLE_ADMIN') %}
         {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:Admin:policyStatusForm', 'policy': policy, 'id': 'policyStatusForm'} %}
     {% endif %}
     {% include 'AppBundle::Claims/claimsModal.html.twig' %}

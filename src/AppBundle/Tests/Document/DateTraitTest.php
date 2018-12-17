@@ -284,6 +284,9 @@ class DateTraitTest extends \PHPUnit\Framework\TestCase
         );
     }
 
+    /**
+     * Tests to make sure addDays works as expected.
+     */
     public function testaddDays()
     {
         $now = new \DateTime('2018-03-28 00:00');
@@ -291,5 +294,44 @@ class DateTraitTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(new \DateTime('2018-03-29 00:00'), $now);
         $now = static::addDays($now, 32);
         $this->assertEquals(new \DateTime('2018-04-30 00:00'), $now);
+        $now = static::addDays($now, -40);
+        $this->assertEquals(new \DateTime('2018-03-21 00:00'), $now);
+        $now = static::addDays($now, -2);
+        $this->assertEquals(new \DateTime('2018-03-19 00:00'), $now);
+        $now = static::addDays($now, 3);
+        $this->assertEquals(new \DateTime('2018-03-22 00:00'), $now);
+    }
+
+    /**
+     * Makes sure daysFrom gives correct values for negative and positive intervals.
+     */
+    public function testDaysFrom()
+    {
+        $now = new \DateTime();
+        $other = static::addDays($now, -30);
+        $this->assertEquals(-30, static::daysFrom($other, $now));
+        $other = static::addDays($other, 5);
+        $this->assertEquals(-25, static::daysFrom($other, $now));
+        $other = static::addDays($other, 5);
+        $this->assertEquals(-20, static::daysFrom($other, $now));
+        $other = static::addDays($other, 20);
+        $this->assertEquals(0, static::daysFrom($other, $now));
+        $other = static::addDays($other, 10);
+        $this->assertEquals(10, static::daysFrom($other, $now));
+        $other = static::addDays($other, 50);
+        $this->assertEquals(60, static::daysFrom($other, $now));
+        $other = static::addDays($other, 100);
+        $now = static::addDays($now, 99);
+        $this->assertEquals(61, static::daysFrom($other, $now));
+        $now = static::addDays($now, 60);
+        $this->assertEquals(1, static::daysFrom($other, $now));
+        $now = static::addDays($now, 1);
+        $this->assertEquals(0, static::daysFrom($other, $now));
+        $now = static::addDays($now, 1);
+        $this->assertEquals(-1, static::daysFrom($other, $now));
+        $now = static::addDays($now, 9);
+        $this->assertEquals(-10, static::daysFrom($other, $now));
+        $now = static::addDays($now, 10);
+        $this->assertEquals(-20, static::daysFrom($other, $now));
     }
 }

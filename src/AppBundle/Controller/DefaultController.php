@@ -381,7 +381,7 @@ class DefaultController extends BaseController
                 if ($phoneId) {
                     $phone = $phoneRepo->find($phoneId);
                     if (!$phone) {
-                        throw new \Exception('unknown phone');
+                        throw $this->createNotFoundException('Invalid id');
                     }
                     if ($phone->getMemory()) {
                         return $this->redirectToRoute('quote_make_model_memory', [

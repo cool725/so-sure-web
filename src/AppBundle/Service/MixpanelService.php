@@ -393,6 +393,8 @@ class MixpanelService
         $data = null;
         $count = 0;
         $count += $this->deleteOldUsersByDays($days);
+        $count += $this->deleteQuotePageMissingBotUserAgentUser();
+        $count += $this->deleteHomepagePageMissingBotUserAgentUser();
         $count += $this->deleteNoValueUsers(14);
         //$count += $this->deleteOldUsersByNoEvents();
         $count += $this->deleteFacebookPreview();
@@ -431,6 +433,90 @@ class MixpanelService
             ];
         // @codingStandardsIgnoreEnd
         //print_r($query);
+
+        return $this->runDelete($query);
+    }
+
+    private function deleteQuotePageMissingBotUserAgentUser()
+    {
+        $time = \DateTime::createFromFormat('U', time());
+        $time = $time->sub(new \DateInterval('P1D'));
+
+        // @codingStandardsIgnoreStart
+        $query = [
+            'selector' => sprintf(
+                '(not defined(user["$last_name"]) and behaviors["behavior_11111"] > 0 and behaviors["behavior_11112"] == 0 and behaviors["behavior_11113"] == 0 and behaviors["behavior_11114"] == 0)'
+            ),
+            'behaviors' => [[
+                "window" => "90d",
+                "name" => "behavior_11111",
+                "event_selectors" => [[
+                    "event" => "Quote Page",
+                    "selector" => "(\"Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0)\" in event[\"User Agent\"])"
+                ]]
+            ], [
+                "window" => "90d",
+                "name" => "behavior_11112",
+                "event_selectors" => [[
+                    "event" => "Home Page"
+                ]]
+            ], [
+                "window" => "90d",
+                "name" => "behavior_11113",
+                "event_selectors" => [[
+                    "event" => "Sixpack Experiment",
+                ]]
+            ], [
+                "window" => "90d",
+                "name" => "behavior_11114",
+                "event_selectors" => [[
+                    "event" => "Click on the Buy Now Button"
+                ]]
+            ]
+            ]];
+        // @codingStandardsIgnoreEnd
+
+        return $this->runDelete($query);
+    }
+
+    private function deleteHomepagePageMissingBotUserAgentUser()
+    {
+        $time = \DateTime::createFromFormat('U', time());
+        $time = $time->sub(new \DateInterval('P1D'));
+
+        // @codingStandardsIgnoreStart
+        $query = [
+            'selector' => sprintf(
+                '(not defined(user["$last_name"]) and behaviors["behavior_11111"] > 0 and behaviors["behavior_11112"] == 0 and behaviors["behavior_11113"] == 0 and behaviors["behavior_11114"] == 0)'
+            ),
+            'behaviors' => [[
+                "window" => "90d",
+                "name" => "behavior_11111",
+                "event_selectors" => [[
+                    "event" => "Home Page",
+                    "selector" => "(\"Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0)\" in event[\"User Agent\"])"
+                ]]
+            ], [
+                "window" => "90d",
+                "name" => "behavior_11112",
+                "event_selectors" => [[
+                    "event" => "Quote Page"
+                ]]
+            ], [
+                "window" => "90d",
+                "name" => "behavior_11113",
+                "event_selectors" => [[
+                    "event" => "Sixpack Experiment",
+                ]]
+            ], [
+                "window" => "90d",
+                "name" => "behavior_11114",
+                "event_selectors" => [[
+                    "event" => "Click on the Buy Now Button"
+                ]]
+            ]
+            ]];
+        // @codingStandardsIgnoreEnd
 
         return $this->runDelete($query);
     }

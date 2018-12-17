@@ -968,13 +968,15 @@ class PolicyService
      *                                               we need to close out claims
      * @param \DateTime $date
      * @param boolean   $skipUnpaidMinTimeframeCheck Require at least 15 days from last unpaid status change
+     * @param boolean   $fullRefund                  Provide a full refund to the customer
      */
     public function cancel(
         Policy $policy,
         $reason,
         $closeOpenClaims = false,
         \DateTime $date = null,
-        $skipUnpaidMinTimeframeCheck = false
+        $skipUnpaidMinTimeframeCheck = false,
+        $fullRefund = false
     ) {
         if ($reason == Policy::CANCELLED_UNPAID && !$skipUnpaidMinTimeframeCheck) {
             /** @var LogEntryRepository $logRepo */
@@ -1019,7 +1021,8 @@ class PolicyService
             }
             $this->dm->flush();
         }
-        $policy->cancel($reason, $date);
+
+        $policy->cancel($reason, $date, $fullRefund);
         $this->dm->flush();
         $this->cancelledPolicyEmail($policy);
         $this->cancelledPolicySms($policy);

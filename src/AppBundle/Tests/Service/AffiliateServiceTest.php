@@ -54,6 +54,7 @@ class AffiliateServiceTest extends WebTestCase
     use \AppBundle\Document\DateTrait;
 
     protected static $container;
+    /** @var AffiliateService */
     protected static $affiliateService;
     protected static $dm;
     protected static $userRepository;
@@ -67,7 +68,11 @@ class AffiliateServiceTest extends WebTestCase
         $kernel->boot();
         self::$container = $kernel->getContainer();
         self::$userManager = self::$container->get('fos_user.user_manager');
-        self::$affiliateService = self::$container->get('app.affiliate');
+
+        /** @var AffiliateService affiliateService */
+        $affiliateService = self::$container->get('app.affiliate');
+        self::$affiliateService = $affiliateService;
+
         /** @var DocumentManager $dm */
         $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
         self::$dm = $dm;
@@ -126,15 +131,15 @@ class AffiliateServiceTest extends WebTestCase
         $this->assertEquals(3, count($charges));
         $date = static::addDays($date, 30);
         self::$dm->flush();
-        $this->assertEquals(2, count(self::$affiliateService->ongoingCharges($affiliate, $date)));
+        $this->assertCount(2, self::$affiliateService->ongoingCharges($affiliate, $date));
 
         // test for solitary policy charges a year ago.
         $date = static::addDays($date, 365);
         self::$dm->flush();
-        $this->assertEquals(3, count(self::$affiliateService->ongoingCharges($affiliate, $date)));
+        $this->assertCount(3, self::$affiliateService->ongoingCharges($affiliate, $date));
         $date = static::addDays($date, 30);
         self::$dm->flush();
-        $this->assertEquals(2, count(self::$affiliateService->ongoingCharges($affiliate, $date)));
+        $this->assertCount(2, self::$affiliateService->ongoingCharges($affiliate, $date));
         // test for renewal policy with previous having charges.
         foreach ($users as $user) {
             self::renewal($user, $date);
@@ -144,7 +149,7 @@ class AffiliateServiceTest extends WebTestCase
         $this->assertEmpty(self::$affiliateService->ongoingCharges($affiliate, $date));
         $date = static::addDays($date, 395);
         self::$dm->flush();
-        $this->assertEquals(5, count(self::$affiliateService->ongoingCharges($affiliate, $date)));
+        $this->assertCount(5, self::$affiliateService->ongoingCharges($affiliate, $date));
         $this->assertEmpty(self::$affiliateService->ongoingCharges($affiliate, $date));
         // test for renewal policy with previous having no charges but user having charges.
         foreach ($users as $user) {
@@ -285,12 +290,16 @@ class AffiliateServiceTest extends WebTestCase
                 [User::AQUISITION_NEW, User::AQUISITION_PENDING]
             )
         );
+        // Test that the remove charged users field works.
+        static::createCharge($data["affiliate"], $data["tango"], $data["tango"]->getFirstPolicy(), new \DateTime());
+        static::$dm->flush();
         $this->checkUsers(
-            [$data["bango"], $data["tango"], $data["hat"], $data["borb"], $data["tonyAbbot"]],
+            [$data["bango"], $data["hat"], $data["borb"], $data["tonyAbbot"]],
             static::$affiliateService->getMatchingUsers(
                 $data["affiliate"],
                 new \DateTime("30 days ago"),
-                [User::AQUISITION_NEW, User::AQUISITION_PENDING]
+                [User::AQUISITION_NEW, User::AQUISITION_PENDING],
+                true
             )
         );
         // Potential or Lost.
@@ -301,6 +310,125 @@ class AffiliateServiceTest extends WebTestCase
                 new \DateTime("+100 days"),
                 [User::AQUISITION_LOST, User::AQUISITION_POTENTIAL]
             )
+        );
+    }
+
+    /**
+     * Tests that the daysToAquisition function behaves as expected.
+     */
+    public function testDaysToAquisition()
+    {
+        // Set a specific time so daylight savings doesn't make things go wonky.
+        // This part tests one off / first time part of the condition.
+        $date = new \DateTime('2018-07-05 05:12');
+        $data = $this->createState($date);
+        $data["affiliate"]->setChargeModel(AffiliateCompany::MODEL_ONGOING);
+        $this->assertEquals(
+            20,
+            static::$affiliateService->daysToAquisition($data["affiliate"], $data["bango"], $date)
+        );
+        $this->assertEquals(
+            10,
+            static::$affiliateService->daysToAquisition($data["affiliate"], $data["tango"], $date)
+        );
+        $this->assertEquals(
+            0,
+            static::$affiliateService->daysToAquisition($data["affiliate"], $data["hat"], $date)
+        );
+        $this->assertEquals(
+            -10,
+            static::$affiliateService->daysToAquisition($data["affiliate"], $data["borb"], $date)
+        );
+        $this->assertEquals(
+            -20,
+            static::$affiliateService->daysToAquisition($data["affiliate"], $data["tonyAbbot"], $date)
+        );
+        // This part tests the ongoing charges.
+        $date = new \DateTime('2018-07-25 05:12');
+        $this->assertEquals(
+            0,
+            static::$affiliateService->daysToAquisition($data["affiliate"], $data["bango"], $date)
+        );
+        $this->assertEquals(
+            -10,
+            static::$affiliateService->daysToAquisition($data["affiliate"], $data["tango"], $date)
+        );
+        $this->assertEquals(
+            -20,
+            static::$affiliateService->daysToAquisition($data["affiliate"], $data["hat"], $date)
+        );
+        $this->assertEquals(
+            -30,
+            static::$affiliateService->daysToAquisition($data["affiliate"], $data["borb"], $date)
+        );
+        $this->assertEquals(
+            -40,
+            static::$affiliateService->daysToAquisition($data["affiliate"], $data["tonyAbbot"], $date)
+        );
+        $date = new \DateTime('2019-07-25 05:12');
+        $this->assertEquals(
+            -365,
+            static::$affiliateService->daysToAquisition($data["affiliate"], $data["bango"], $date)
+        );
+        $this->assertEquals(
+            -375,
+            static::$affiliateService->daysToAquisition($data["affiliate"], $data["tango"], $date)
+        );
+        $this->assertEquals(
+            -385,
+            static::$affiliateService->daysToAquisition($data["affiliate"], $data["hat"], $date)
+        );
+        $this->assertEquals(
+            -395,
+            static::$affiliateService->daysToAquisition($data["affiliate"], $data["borb"], $date)
+        );
+        $this->assertEquals(
+            -405,
+            static::$affiliateService->daysToAquisition($data["affiliate"], $data["tonyAbbot"], $date)
+        );
+        $this->assertEquals(5, count(static::$affiliateService->generate([$data["affiliate"]], $date)));
+        $date = new \DateTime('2019-08-25 05:12');
+        $this->assertEquals(
+            335,
+            static::$affiliateService->daysToAquisition($data["affiliate"], $data["bango"], $date)
+        );
+        $this->assertEquals(
+            335,
+            static::$affiliateService->daysToAquisition($data["affiliate"], $data["tango"], $date)
+        );
+        $this->assertEquals(
+            335,
+            static::$affiliateService->daysToAquisition($data["affiliate"], $data["hat"], $date)
+        );
+        $this->assertEquals(
+            335,
+            static::$affiliateService->daysToAquisition($data["affiliate"], $data["borb"], $date)
+        );
+        $this->assertEquals(
+            335,
+            static::$affiliateService->daysToAquisition($data["affiliate"], $data["tonyAbbot"], $date)
+        );
+        // adding an extra day here to the 30 because 2020 is a leap year hell yeah.
+        $date = new \DateTime('2020-08-25 05:12');
+        $this->assertEquals(
+            -31,
+            static::$affiliateService->daysToAquisition($data["affiliate"], $data["bango"], $date)
+        );
+        $this->assertEquals(
+            -31,
+            static::$affiliateService->daysToAquisition($data["affiliate"], $data["tango"], $date)
+        );
+        $this->assertEquals(
+            -31,
+            static::$affiliateService->daysToAquisition($data["affiliate"], $data["hat"], $date)
+        );
+        $this->assertEquals(
+            -31,
+            static::$affiliateService->daysToAquisition($data["affiliate"], $data["borb"], $date)
+        );
+        $this->assertEquals(
+            -31,
+            static::$affiliateService->daysToAquisition($data["affiliate"], $data["tonyAbbot"], $date)
         );
     }
 
@@ -480,5 +608,32 @@ class AffiliateServiceTest extends WebTestCase
         foreach ($got as $user) {
             $this->assertContains($user, $expected);
         }
+    }
+
+    /**
+     * Creates an affiliate charge, associates it with the given user, and confirms the given policy with the
+     * affiliate company, then persists it all in the database. The cost of the charge is set as the affiliate's CPA
+     * property.
+     * @param AffiliateCompany $affiliate is the affiliate company who the charge is being made for.
+     * @param User             $user      is the user that the charge is made regarding.
+     * @param Policy           $policy    is the policy that the charge is made regarding.
+     * @param \DateTime        $date      is the time and date to be considered as current.
+     * @return Charge the charge that has been created.
+     */
+    private function createCharge(AffiliateCompany $affiliate, User $user, Policy $policy, \DateTime $date)
+    {
+        $charge = new Charge();
+        $charge->setAmount($affiliate->getCPA());
+        $charge->setType(Charge::TYPE_AFFILIATE);
+        $charge->setCreatedDate(clone $date);
+        $charge->setUser($user);
+        $charge->setAffiliate($affiliate);
+        $charge->setPolicy($policy);
+        if ($policy->getAffiliate() === null) {
+            $affiliate->addConfirmedPolicies($policy);
+        }
+        static::$dm->persist($charge);
+        static::$dm->persist($affiliate);
+        return $charge;
     }
 }

@@ -437,7 +437,7 @@ class ValidatePolicyCommand extends ContainerAwareCommand
 
             // There are often bacs refunds on the following date; make sure to include the following day for payments
             // to pick up the refund
-            $commissionDate = clone $data['validateDate'];
+            $commissionDate = $data['validateDate'] ?: \DateTime::createFromFormat('U', time());
             $commissionDate = $this->getNextBusinessDay($commissionDate);
 
             // depending on when the chargeback occurs, we may or may not want to exclude that amount

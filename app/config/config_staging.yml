@@ -54,9 +54,8 @@ monolog:
         #    formatter:  monolog.formatter.html
         #    content_type: text/html
         rollbar:
-            id: "app.logger.rollbar"
-            formatter: "app.logger.lineformatter"
-            type: rollbar
+            type: service
+            id: Rollbar\Monolog\Handler\RollbarHandler
             level: warning
             channels: ['!event']
         salva:
@@ -87,18 +86,6 @@ swiftmailer:
     mailers:
         default:
             delivery_address: "non-prod-web@so-sure.com"
-
-staffim_rollbar:
-    # Rollbar access token
-    access_token: %rollbar_access_token%
-    # PHP error level (see http://php.net/manual/en/function.error-reporting.php)
-    error_level: -1
-    # Values from scrub.parameters are replaced by the key for specified exceptions
-    scrub:
-        exceptions:
-            - PDOException
-        parameters:
-            key: unknown
 
 services:
     staging.apierror:

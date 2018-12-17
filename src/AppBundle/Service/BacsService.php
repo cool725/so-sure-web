@@ -1568,6 +1568,16 @@ class BacsService
         /** @var BacsPaymentMethod $bacs */
         $bacs = $policy->getUser()->getPaymentMethod();
 
+        if ($this->environment == 'prod' && !$policy->isValidPolicy()) {
+            $msg = sprintf(
+                'Cancelling (scheduled) payment %s policy is not valid',
+                $id
+            );
+            $this->logger->warning($msg);
+
+            return self::VALIDATE_CANCEL;
+        }
+
         if (!$bacs || !$bacs->getBankAccount()) {
             $msg = sprintf(
                 'Skipping (scheduled) payment %s as unable to determine payment method or missing bank account',

@@ -505,31 +505,13 @@ class SalvaExportServiceTest extends WebTestCase
         $policy = $this->createPolicy('testExportPaymentMonthEdge', $date);
         //print $date->format(\DateTime::ATOM) . PHP_EOL;
 
+
         $oneMonthBefore = clone $date;
         $oneMonthBefore = $oneMonthBefore->sub(new \DateInterval('P1M'));
-        //print $oneMonthBefore->format(\DateTime::ATOM) . PHP_EOL;
 
-        $oneMonth = clone $date;
-        $oneMonth = $oneMonth->add(new \DateInterval('P1M'));
-        //print $oneMonth->format(\DateTime::ATOM) . PHP_EOL;
-        $payment = self::addPayment(
-            $policy,
-            $policy->getPremium($oneMonth)->getMonthlyPremiumPrice(),
-            Salva::MONTHLY_TOTAL_COMMISSION,
-            null,
-            $oneMonth
-        );
+        $oneMonthPayment = $this->addPaymentForMonth($policy, 1, $date);
+        $twoMonthPayment = $this->addPaymentForMonth($policy, 2, $date);
 
-        $twoMonths = clone $date;
-        $twoMonths = $twoMonths->add(new \DateInterval('P2M'));
-        //print $twoMonths->format(\DateTime::ATOM) . PHP_EOL;
-        $payment = self::addPayment(
-            $policy,
-            $policy->getPremium($twoMonths)->getMonthlyPremiumPrice(),
-            Salva::MONTHLY_TOTAL_COMMISSION,
-            null,
-            $twoMonths
-        );
         static::$dm->flush();
 
         /** @var Policy $updatedPolicy */
@@ -548,12 +530,12 @@ class SalvaExportServiceTest extends WebTestCase
         //$this->assertEquals(0, count($lines));
         //print_r($lines);
 
-        $lines = $this->exportPayments($updatedPolicy->getPolicyNumber(), $oneMonth);
+        $lines = $this->exportPayments($updatedPolicy->getPolicyNumber(), $oneMonthPayment->getDate());
         // New logic - dates are correct
         $this->assertEquals(1, count($lines));
         //print_r($lines);
 
-        $lines = $this->exportPayments($updatedPolicy->getPolicyNumber(), $twoMonths);
+        $lines = $this->exportPayments($updatedPolicy->getPolicyNumber(), $twoMonthPayment->getDate());
         // New logic - dates are correct
         $this->assertEquals(1, count($lines));
         //print_r($lines);
@@ -837,13 +819,13 @@ class SalvaExportServiceTest extends WebTestCase
         return $lines;
     }
 
-    private function cancelPolicy($policy, $reason, $date)
+    private function cancelPolicy($policy, $reason, $date, $fullRefund = false)
     {
         // Prevent refund from triggering judopay as receipt is not valid
         static::$policyService->setDispatcher(null);
 
         // finally cancel policy
-        static::$policyService->cancel($policy, $reason, false, $date);
+        static::$policyService->cancel($policy, $reason, false, $date, false, $fullRefund);
 
         // but as not using judopay, need to add a refund
         $refundAmount = $policy->getRefundAmount();
@@ -892,11 +874,48 @@ class SalvaExportServiceTest extends WebTestCase
 
     public function testBasicCooloffExportMonthlyPoliciesXml()
     {
-        $policy = $this->createPolicy('basic-export-cooloff-xml', new \DateTime('2016-01-01'));
+        $date = new \DateTime('2016-01-01');
+        $policy = $this->createPolicy('basic-export-cooloff-xml', $date);
 
         $this->cancelPolicy($policy, Policy::CANCELLED_COOLOFF, new \DateTime('2016-01-02'));
         $xml = self::$salva->cancelXml($policy, Policy::CANCELLED_COOLOFF, new \DateTime('2016-01-02'))['xml'];
         $this->assertContains('<n1:usedFinalPremium n2:currency="GBP">0.00</n1:usedFinalPremium>', $xml);
+    }
+
+    public function testCancelNoRefundXml()
+    {
+        $date = new \DateTime('2016-01-01');
+        $policy = $this->createPolicy('testCancelNoRefundXml', $date);
+        static::$dm->flush();
+
+        $this->addPaymentForMonth($policy, 0, $date);
+        $this->addPaymentForMonth($policy, 1, $date);
+        $this->addPaymentForMonth($policy, 2, $date);
+        $this->addPaymentForMonth($policy, 3, $date);
+        $this->addPaymentForMonth($policy, 4, $date);
+
+        $this->cancelPolicy($policy, Policy::CANCELLED_USER_REQUESTED, new \DateTime('2016-05-01'));
+        $xml = self::$salva->cancelXml($policy, Policy::CANCELLED_USER_REQUESTED, new \DateTime('2016-05-01'))['xml'];
+        $this->assertContains('<n1:usedFinalPremium n2:currency="GBP">25.53</n1:usedFinalPremium>', $xml);
+        $this->assertContains('<n1:terminationTime>2016-05-01T01:00:00</n1:terminationTime>', $xml);
+    }
+
+    public function testCancelFullRefundXml()
+    {
+        $date = new \DateTime('2016-01-01');
+        $policy = $this->createPolicy('testCancelFullRefundXml', $date);
+        static::$dm->flush();
+
+        $this->addPaymentForMonth($policy, 0, $date);
+        $this->addPaymentForMonth($policy, 1, $date);
+        $this->addPaymentForMonth($policy, 2, $date);
+        $this->addPaymentForMonth($policy, 3, $date);
+        $this->addPaymentForMonth($policy, 4, $date);
+
+        $this->cancelPolicy($policy, Policy::CANCELLED_USER_REQUESTED, new \DateTime('2016-05-01'), true);
+        $xml = self::$salva->cancelXml($policy, Policy::CANCELLED_USER_REQUESTED, new \DateTime('2016-05-01'))['xml'];
+        $this->assertContains('<n1:usedFinalPremium n2:currency="GBP">0</n1:usedFinalPremium>', $xml);
+        $this->assertContains('<n1:terminationTime>2015-12-31T23:59:00</n1:terminationTime>', $xml);
     }
 
     public function testBasicCooloffExportYearlyPolicies()
@@ -1074,5 +1093,21 @@ class SalvaExportServiceTest extends WebTestCase
 
         $xml = static::$salva->createXml($policy);
         $this->assertNotContains('<ns2:firstDueDate>', $xml);
+    }
+
+    private function addPaymentForMonth(Policy $policy, $month, \DateTime $date)
+    {
+        $future = clone $date;
+        $future = $future->add(new \DateInterval(sprintf('P%dM', $month)));
+            //print $oneMonth->format(\DateTime::ATOM) . PHP_EOL;
+        $payment = self::addPayment(
+            $policy,
+            $policy->getPremium()->getMonthlyPremiumPrice(),
+            Salva::MONTHLY_TOTAL_COMMISSION,
+            sprintf("%s%d", $policy->getId(), $month),
+            $future
+        );
+
+        return $payment;
     }
 }

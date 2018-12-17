@@ -1603,6 +1603,33 @@ class PhonePolicyTest extends WebTestCase
         $this->assertTrue($policyB->isCancelledWithPolicyDeclined());
     }
 
+    /**
+     * @expectedException \Exception
+     */
+    public function testCancelPolicyCooloffFullRefund()
+    {
+        $policy = static::createUserPolicy(true);
+        $policy->getUser()->setEmail(static::generateEmail('testCancelPolicyCooloffFullRefund', $this));
+        static::$dm->persist($policy);
+        static::$dm->persist($policy->getUser());
+        static::$dm->flush();
+
+        $policy->cancel(SalvaPhonePolicy::CANCELLED_COOLOFF, null, true);
+    }
+
+    public function testCancelPolicyFullRefund()
+    {
+        $policy = static::createUserPolicy(true);
+        $policy->getUser()->setEmail(static::generateEmail('testCancelPolicyFullRefund', $this));
+        static::$dm->persist($policy);
+        static::$dm->persist($policy->getUser());
+        static::$dm->flush();
+
+        $this->assertNull($policy->isCancelledFullRefund());
+        $policy->cancel(SalvaPhonePolicy::CANCELLED_UPGRADE, null, true);
+        $this->assertTrue($policy->isCancelledFullRefund());
+    }
+
     public function testIsFullyPaid()
     {
         $policyA = static::createUserPolicy(true);

@@ -35,11 +35,12 @@ class ScheduledPaymentRepository extends BaseDocumentRepository
         $end = $this->endOfMonth($date);
 
         return $this->createQueryBuilder()
+            ->eagerCursor(true)
+            ->field('policy')->prime(true)
             ->field('scheduled')->gte($start)
             ->field('scheduled')->lt($end)
             ->sort('scheduled', 'asc')
-            ->getQuery()
-            ->execute();
+            ;
     }
 
     public function countUnpaidScheduledPayments(Policy $policy)
@@ -63,12 +64,11 @@ class ScheduledPaymentRepository extends BaseDocumentRepository
     {
         $collection = $this->getDocumentManager()->getDocumentCollection($this->getClassName());
         $builder = $collection->createAggregationBuilder();
-        return $builder
-                ->match()
-                    ->field('status')
-                    ->in([ScheduledPayment::STATUS_SCHEDULED, ScheduledPayment::STATUS_SUCCESS])
-                    ->field('policy.$id')
-                    ->notIn($this->excludedPolicyIds ? $this->excludedPolicyIds : [])
+        return  $builder->match()
+                ->field('status')
+                ->in([ScheduledPayment::STATUS_SCHEDULED, ScheduledPayment::STATUS_SUCCESS])
+                ->field('policy.$id')
+                ->notIn($this->excludedPolicyIds ? $this->excludedPolicyIds : [])
                 ->group()
                     ->field('_id')
                     ->expression(

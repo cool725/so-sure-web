@@ -266,6 +266,14 @@ abstract class Policy
     protected $cancelledReason;
 
     /**
+     * @Assert\Type("bool")
+     * @MongoDB\Field(type="boolean")
+     * @Gedmo\Versioned
+     * @var boolean
+     */
+    protected $cancelledFullRefund;
+
+    /**
      * @Assert\Regex(pattern="/^[a-zA-Z]+\/\d{4,4}\/\d{5,20}$/")
      * @MongoDB\Field(type="string")
      * @MongoDB\Index(unique=true, sparse=true)
@@ -1281,6 +1289,16 @@ abstract class Policy
         $this->cancelledReason = $cancelledReason;
     }
 
+    public function isCancelledFullRefund()
+    {
+        return $this->cancelledFullRefund;
+    }
+
+    public function setCancelledFullRefund($cancelledFullRefund)
+    {
+        $this->cancelledFullRefund = $cancelledFullRefund;
+    }
+
     public function getPolicyNumber()
     {
         return $this->policyNumber;
@@ -2067,16 +2085,23 @@ abstract class Policy
         $this->notesList[] = $note;
     }
 
-    public function addNoteDetails($notes, User $user = null, \DateTime $date = null)
+    public function addNoteDetails($notes, User $user = null, $action = null, \DateTime $date = null)
     {
         $note = new StandardNote();
         $note->setNotes($notes);
+
         if ($user) {
             $note->setUser($user);
         }
+
+        if ($action) {
+            $note->setAction($action);
+        }
+
         if ($date) {
             $note->setDate($date);
         }
+
         $this->addNotesList($note);
     }
 
@@ -2953,13 +2978,6 @@ abstract class Policy
         return $this->getStart()->diff($date)->days <= 30;
     }
 
-    public function daysToAquisition($days)
-    {
-        $now = \DateTime::createFromFormat('U', time());
-        $now = $days - ($now->diff($this->getStart()))->d;
-        return ($now >= 0) ? $now : 0;
-    }
-
     public function isPolicyOldEnough($days, \DateTime $date = null)
     {
         if (!$this->getStart()) {
@@ -3655,14 +3673,19 @@ abstract class Policy
      * Update the policy itself, however, this should be done via the policy server in order to
      * send out all the emails, etc
      *
-     * @param string    $reason CANCELLED_*
+     * @param string    $reason     CANCELLED_*
      * @param \DateTime $date
+     * @param boolean   $fullRefund Should the user get a full refund
      *
      */
-    public function cancel($reason, \DateTime $date = null)
+    public function cancel($reason, \DateTime $date = null, $fullRefund = false)
     {
         if (!$this->getId()) {
             throw new \Exception('Unable to cancel a policy that is missing an id');
+        }
+
+        if ($reason == self::CANCELLED_COOLOFF && $fullRefund) {
+            throw new \Exception('Cooloff automatically provides full refund. Full Refund flag should not be set.');
         }
 
         if (!$this->canCancel($reason, $date)) {
@@ -3679,6 +3702,7 @@ abstract class Policy
         $this->setStatus(Policy::STATUS_CANCELLED);
         $this->setCancelledReason($reason);
         $this->setEnd($date);
+        $this->setCancelledFullRefund($fullRefund);
 
         $user = $this->getUser();
 

@@ -1244,6 +1244,7 @@ class AdminController extends BaseController
 
         return [
             'features' => $features,
+            'descriptions' => Feature::$descriptions,
         ];
     }
 

@@ -328,9 +328,9 @@ class SalvaPhonePolicy extends PhonePolicy
         }
     }
 
-    public function cancel($reason, \DateTime $date = null)
+    public function cancel($reason, \DateTime $date = null, $fullRefund = false)
     {
-        parent::cancel($reason, $date);
+        parent::cancel($reason, $date, $fullRefund);
 
         // Assume a wait state - the refund listener will determine if it can progress to pending
         // based on if refund is required or not
