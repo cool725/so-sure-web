@@ -14,14 +14,14 @@
 {% block body %}
     <div class="container">
 
-        <!-- Error Message -->
+        {# Error Message #}
         {% if error is defined %}
             <h3>Error: {{ error }}</h3>
         {% else %}
 
             <h1 class="row">{{ affiliate.name }}</h1>
 
-            <!-- Navigation Tabs -->
+            {# Navigation Tabs #}
             <ul id="tabs" class="nav nav-tabs nav-justified" role="tablist">
                 <li class="nav-item {% if charges is defined %}active{% endif %}">
                     <a href="{{ path('admin_affiliate_charge', {'id': affiliate.id}) }}">Monthly Charges</a>
@@ -37,14 +37,13 @@
                 </li>
             </ul>
 
-            <!-- charges tab -->
+            {# charges tab #}
             {% if charges is defined %}
                 <div class="row">
                     <h2 class="col-md-6">Charges for {{month}} / {{year}}</h2>
 
-                    <!-- configuration form -->
-                    <!-- method="POST" is actually a work around so the form does not add ? to end of url,
-                         the form does not post anything -->
+                    {# configuration form #}
+                    {# method="POST" is actually a work around so the form does not add ? to end of url, the form does not post anything #}
                     <form id="monthForm" class="month-form form-inline" style="padding-top: 15px;" method="POST">
                         <div class="form-group col-md-6">
                             Report Month:
@@ -63,7 +62,7 @@
                     </form>
                 </div>
 
-                <!-- Summary Table -->
+                {# Summary Table #}
                 <div class="row">
                     <h3>Summary</h3>
                     <table class="table table-striped">
@@ -80,7 +79,7 @@
                 </div>
 
 
-                <!-- paid charges table -->
+                {# paid charges table #}
                 <div class="row">
                     <h3>Charges</h3>
                     <div class="table-responsive">
@@ -104,7 +103,7 @@
             {% endif %}
 
 
-            <!-- pending users table -->
+            {# pending users table #}
             {% if pending is defined %}
                 <div class="row">
                     <h2>Pending Aquisitions</h2>
@@ -139,7 +138,7 @@
                 </div>
             {% endif %}
 
-            <!-- lost users table -->
+            {# lost users table #}
             {% if potential is defined %}
                 <div class="row">
                     <h2>Potential Aquisitions</h2>
@@ -165,7 +164,7 @@
                 </div>
             {% endif %}
 
-            <!-- lost users table -->
+            {# lost users table #}
             {% if lost is defined %}
                 <div class="row">
                     <h2>Lost Aquisitions</h2>
