@@ -33,6 +33,7 @@ use AppBundle\Repository\File\LloydsFileRepository;
 use AppBundle\Repository\File\ReconcilationFileRepository;
 use AppBundle\Repository\File\S3FileRepository;
 use AppBundle\Repository\PaymentRepository;
+use AppBundle\Repository\PolicyRepository;
 use AppBundle\Repository\UserRepository;
 use AppBundle\Service\BacsService;
 use AppBundle\Service\BarclaysService;
@@ -41,6 +42,7 @@ use AppBundle\Service\MailerService;
 use AppBundle\Service\ReportingService;
 use AppBundle\Service\SalvaExportService;
 use AppBundle\Service\SequenceService;
+use Predis\Client;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -1561,6 +1563,34 @@ class AdminController extends BaseController
         return [
             'form' => $policyStatusForm->createView(),
             'policy' => $policy,
+        ];
+    }
+
+    /**
+     * @Route("/policy-validation", name="policy_validation")
+     * @Template
+     */
+    public function policyValidationAction()
+    {
+        $dm = $this->getManager();
+        /** @var Client $redis */
+        $redis = $this->get("snc_redis.default");
+
+        /** @var PolicyRepository $repo */
+        $repo = $dm->getRepository(Policy::class);
+
+        $policies = $repo->findAll();
+
+        $lines = [];
+        /** @var Policy $policy */
+        foreach ($policies as $policy) {
+            if ($repo->find($redis->get($policy->getId()))) {
+                $lines[] = $repo->find($redis->get($policy->getId()));
+            }
+        }
+
+        return [
+            'policies' => $lines
         ];
     }
 }

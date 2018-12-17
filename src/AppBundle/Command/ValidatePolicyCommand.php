@@ -13,6 +13,7 @@ use AppBundle\Service\PolicyService;
 use AppBundle\Service\RouterService;
 use Aws\S3\S3Client;
 use Doctrine\ODM\MongoDB\DocumentManager;
+use Predis\Client;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
@@ -49,13 +50,17 @@ class ValidatePolicyCommand extends ContainerAwareCommand
     /** @var LoggerInterface */
     protected $logger;
 
+    /** @var Client */
+    private $redis;
+
     public function __construct(
         PolicyService $policyService,
         DocumentManager $dm,
         S3Client $s3,
         MailerService $mailerService,
         RouterService $routerService,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        Client $redis
     ) {
         parent::__construct();
         $this->policyService = $policyService;
@@ -64,6 +69,7 @@ class ValidatePolicyCommand extends ContainerAwareCommand
         $this->mailerService = $mailerService;
         $this->routerService = $routerService;
         $this->logger = $logger;
+        $this->redis = $redis;
     }
 
     protected function configure()
@@ -157,6 +163,7 @@ class ValidatePolicyCommand extends ContainerAwareCommand
         $lines = [];
         $csvData = [];
         $policies = [];
+
         $date = $input->getOption('date');
         $prefix = $input->getOption('prefix');
         $policyNumber = $input->getOption('policyNumber');
@@ -174,6 +181,7 @@ class ValidatePolicyCommand extends ContainerAwareCommand
         $resyncPicsureMetadata = true === $input->getOption('resync-picsure-s3file-metadata');
         $resyncPicsure = true === $input->getOption('resync-picsure-s3file-status');
         $validateDate = null;
+
         if ($date) {
             $validateDate = new \DateTime($date);
         }
@@ -242,7 +250,11 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                         'validateCancelled' => !$skipCancelled,
                     ];
                     $prevLines = $lines;
-                    $this->validatePolicy($policy, $policies, $lines, $data);
+
+                    if ($this->validatePolicy($policy, $policies, $lines, $data)) {
+                        $this->redis->set($policy->getId(), $lines);
+                    }
+
                     $newLines = array_diff($lines, $prevLines);
                     $adjustedNewLines = [];
                     foreach ($newLines as $item) {
@@ -334,15 +346,20 @@ class ValidatePolicyCommand extends ContainerAwareCommand
 
     private function validatePolicy(Policy $policy, &$policies, &$lines, $data)
     {
+        $policyNeedsValidation = false;
+
         if (!$data['validateCancelled'] && $policy->isCancelled()) {
             return;
         }
+
         try {
             $closeToExpiration = false;
             if ($policy->getPolicyExpirationDate()) {
                 $date = $data['validateDate'] ? $data['validateDate'] : \DateTime::createFromFormat('U', time());
                 $diff = $date->diff($policy->getPolicyExpirationDate());
                 $closeToExpiration = $diff->days < 14 && $diff->invert == 0;
+
+                $policyNeedsValidation = true;
             }
             if ($policy->isPolicyPaidToDate($data['validateDate']) === false) {
                 if ($data['unpaid'] == 'all' || ($closeToExpiration && $data['unpaid'] == 'expiry')) {
@@ -366,6 +383,8 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                         $data['validateDate']
                     );
                 }
+
+                $policyNeedsValidation = true;
             }
             if ($policy->isPotValueCorrect() === false) {
                 $this->header($policy, $policies, $lines);
@@ -375,14 +394,20 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                     $lines[] = 'Updated pot value';
                     $lines[] = $this->failurePotValueMessage($policy);
                 }
+
+                $policyNeedsValidation = true;
             }
             if ($policy->hasCorrectIptRate() === false) {
                 $this->header($policy, $policies, $lines);
                 $lines[] = $this->failureIptRateMessage($policy);
+
+                $policyNeedsValidation = true;
             }
             if ($policy->hasCorrectPolicyStatus($data['validateDate']) === false) {
                 $this->header($policy, $policies, $lines);
                 $lines[] = $this->failureStatusMessage($policy, $data['prefix'], $data['validateDate']);
+
+                $policyNeedsValidation = true;
             }
             if ($policy->arePolicyScheduledPaymentsCorrect(
                 true,
@@ -424,12 +449,16 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                     );
                     $lines[] = $this->failureScheduledPaymentsMessage($policy, $data['validateDate']);
                 }
+
+                $policyNeedsValidation = true;
             }
 
             $allowedVariance = 0;
             // allow up to 1 month difference for non-active policies
             if (!$policy->isActive(true)) {
                 $allowedVariance = Salva::MONTHLY_TOTAL_COMMISSION - 0.01;
+
+                $policyNeedsValidation = true;
             }
             // any pending payments should be excluded from calcs
             $pendingBacsTotalCommission = $policy->getPendingBacsPaymentsTotalCommission(true);
@@ -449,6 +478,8 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                     $this->header($policy, $policies, $lines);
                     $lines[] = $this->failureCommissionMessage($policy, $data['prefix'], $commissionDate);
                 }
+
+                $policyNeedsValidation = true;
             }
 
             if ($data['validate-premiums'] && (!$policy->getStatus() ||
@@ -460,6 +491,8 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                         $policy->getPolicyNumber()
                     );
                 }
+
+                $policyNeedsValidation = true;
             }
             if ($data['warnClaim'] && $policy->hasOpenClaim()) {
                 $this->header($policy, $policies, $lines);
@@ -467,6 +500,8 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                     'WARNING!! - Policy %s has an open claim that should be resolved prior to cancellation',
                     $policy->getPolicyNumber()
                 );
+
+                $policyNeedsValidation = true;
             }
             if ($data['warnClaim'] && $policy->hasMonetaryClaimed()) {
                 $this->header($policy, $policies, $lines);
@@ -474,6 +509,8 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                     'WARNING!! - Prior successful claim (care should be used to avoid cancellation) for %s',
                     $policy->getPolicyNumber()
                 );
+
+                $policyNeedsValidation = true;
             }
             $refund = $policy->getRefundAmount();
             $refundCommission = $policy->getRefundCommissionAmount();
@@ -495,6 +532,8 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                     $refundCommission,
                     $pendingBacsTotalCommission
                 );
+
+                $policyNeedsValidation = true;
             }
 
             // bacs checks are only necessary on active policies
@@ -526,7 +565,11 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                         $lines[] = 'Warning!! Missing initial notification date';
                     }
                 }
+
+                $policyNeedsValidation = true;
             }
+
+            return $policyNeedsValidation;
         } catch (\Exception $e) {
             // TODO: May want to swallow some exceptions here
             throw $e;
