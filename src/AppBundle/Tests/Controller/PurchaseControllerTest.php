@@ -1484,10 +1484,10 @@ class PurchaseControllerTest extends BaseControllerTest
             "You should receive an email confirming that your policy is now cancelled.",
             $crawler->html()
         );
-        $this->assertEquals("my phone is cursed.", $c->getRequestedCancellationReason());
+        $this->assertEquals(Policy::COOLOFF_REASON_UNKNOWN, $c->getRequestedCancellationReason());
+        $this->assertEquals("my phone is cursed", $c->getRequestedCancellationReasonOther());
         $this->assertEquals(Policy::STATUS_CANCELLED, $c->getStatus());
         $this->assertEquals(Policy::CANCELLED_COOLOFF, $c->getCancelledReason());
-
         // Duplicate cancellation.
         $crawler = $this->cancelForm($a, Policy::COOLOFF_REASON_DAMAGED);
         $this->assertContains(
