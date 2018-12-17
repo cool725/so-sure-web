@@ -66,7 +66,7 @@ class ReportingServiceTest extends WebTestCase
         self::$dm->persist($potReward);
         self::$dm->flush();
 
-        $new = self::$reporting->getAllPaymentTotals(false, $now);
+        $new = self::$reporting->getAllPaymentTotals(false, $now, false);
 
         // potreward should not affect all
         $this->assertEquals($new['all']['total'], $existing['all']['total']);
@@ -77,7 +77,7 @@ class ReportingServiceTest extends WebTestCase
     public function testGetAllPaymentTotalsAdjusted()
     {
         $now = \DateTime::createFromFormat('U', time());
-        $existing = self::$reporting->getAllPaymentTotals(false, $now);
+        $existing = self::$reporting->getAllPaymentTotals(false, $now, false);
 
         $user = static::createUser(
             static::$userManager,
@@ -101,7 +101,7 @@ class ReportingServiceTest extends WebTestCase
         self::$dm->persist($debt);
         self::$dm->flush();
 
-        $new = self::$reporting->getAllPaymentTotals(false, $now);
+        $new = self::$reporting->getAllPaymentTotals(false, $now, false);
 
         $this->assertEquals($new['all']['total'], $existing['all']['total'] - 20);
         $this->assertEquals($new['all']['fees'], $existing['all']['fees'] - 20);

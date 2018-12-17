@@ -2,6 +2,7 @@
 
 namespace AppBundle\Tests\Controller;
 
+use AppBundle\DataFixtures\MongoDB\b\User\LoadUserData;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\User;
 use Symfony\Component\HttpKernel\DataCollector\EventDataCollector;
@@ -30,7 +31,7 @@ class FOSUserResettingControllerTest extends BaseControllerTest
         $crawler = self::$client->request('GET', '/login');
         self::verifyResponse(200);
         $form = $crawler->selectButton('_submit')->form();
-        $form['_username'] = 'patrick@so-sure.com';
+        $form['_username'] = LoadUserData::DEFAULT_ADMIN;
         $form['_password'] = \AppBundle\DataFixtures\MongoDB\b\User\LoadUserData::DEFAULT_PASSWORD;
         self::$client->enableProfiler();
         $crawler = self::$client->submit($form);
@@ -52,7 +53,7 @@ class FOSUserResettingControllerTest extends BaseControllerTest
         $dm = $this->getDocumentManager(true);
         $userRepo = $dm->getRepository(User::class);
         /** @var User $user */
-        $user = $userRepo->findOneBy(['emailCanonical' => 'patrick@so-sure.com']);
+        $user = $userRepo->findOneBy(['emailCanonical' => LoadUserData::DEFAULT_ADMIN]);
         $now = \DateTime::createFromFormat('U', time());
         $this->assertNotNull($user->getLatestWebIdentityLog());
         $diff = $user->getLatestWebIdentityLog()->getDate()->diff($now);

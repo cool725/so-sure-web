@@ -2,16 +2,12 @@
 
 namespace AppBundle\Tests\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use AppBundle\Document\User;
-use AppBundle\Document\Phone;
-use AppBundle\Document\Lead;
-use AppBundle\Document\Policy;
+use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Claim;
 use AppBundle\Document\Charge;
 use AppBundle\Document\CurrencyTrait;
-use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 use AppBundle\DataFixtures\MongoDB\b\User\LoadUserData;
+use AppBundle\Document\Policy;
 
 /**
  * @group functional-net
@@ -35,7 +31,7 @@ class AdminControllerTest extends BaseControllerTest
 
     public function testAdminLoginOk()
     {
-        $this->login('patrick@so-sure.com', LoadUserData::DEFAULT_PASSWORD, 'admin');
+        $this->login(LoadUserData::DEFAULT_ADMIN, LoadUserData::DEFAULT_PASSWORD, 'admin');
     }
 
     public function testAdminPartialPolicy()
@@ -52,7 +48,7 @@ class AdminControllerTest extends BaseControllerTest
         );
         $policy = self::initPolicy($user, self::$dm, $phone);
 
-        $this->login('patrick@so-sure.com', LoadUserData::DEFAULT_PASSWORD, 'admin');
+        $this->login(LoadUserData::DEFAULT_ADMIN, LoadUserData::DEFAULT_PASSWORD, 'admin');
         $crawler = self::$client->request('GET', sprintf('/admin/policy/%s', $policy->getId()));
         self::verifyResponse(200);
     }
@@ -62,13 +58,13 @@ class AdminControllerTest extends BaseControllerTest
         // make one claim just in case no claim was created and page is empty
         $user = static::createUser(
             static::$userManager,
-            static::generateEmail('testAdminClaimUpdateForm'.rand(), $this),
+            static::generateEmail('testAdminClaimUpdateForm', $this, true),
             'bar'
         );
         $phone = static::getRandomPhone(self::$dm);
         $policy = static::initPolicy($user, self::$dm, $phone, null, true, true);
         $claim = new Claim();
-        $claim->setNumber('TEST/789');
+        $claim->setNumber(static::getRandomClaimNumber());
         $claim->setProcessed(false);
         $claim->setStatus(Claim::STATUS_APPROVED);
         $claim->setApprovedDate(new \DateTime('-2 days'));
@@ -77,7 +73,7 @@ class AdminControllerTest extends BaseControllerTest
         self::$dm->persist($claim);
         self::$dm->flush();
 
-        $this->login('patrick@so-sure.com', LoadUserData::DEFAULT_PASSWORD, 'admin');
+        $this->login(LoadUserData::DEFAULT_ADMIN, LoadUserData::DEFAULT_PASSWORD, 'admin');
         $crawler = self::$client->request('GET', '/admin/claims');
         self::verifyResponse(200);
 
@@ -89,6 +85,8 @@ class AdminControllerTest extends BaseControllerTest
             throw new \Exception('Claim route not found');
         }
 
+        $route = sprintf('/admin/claims-form/%s/policy', $claim->getId());
+
         $crawler = self::$client->request('GET', $route);
         self::verifyResponse(200);
 
@@ -98,14 +96,171 @@ class AdminControllerTest extends BaseControllerTest
             'claims_form[approvedDate]' => '2022-01-01',
         ]);
 
-        $crawler = self::$client->submit($form);
+        self::$client->submit($form);
         self::verifyResponse(302);
+        $crawler = self::$client->followRedirect();
+        self::expectFlashSuccess($crawler, 'updated');
 
         $dm = $this->getDocumentManager(true);
         $repoClaim = $dm->getRepository(Claim::class);
         /** @var Claim $newClaim */
         $newClaim = $repoClaim->find($claim->getId());
-        $this->assertEquals('2022-01-01', $newClaim->getApprovedDate()->format('Y-m-d'));
+        $this->assertEquals(
+            '2022-01-01',
+            $newClaim->getApprovedDate()->format('Y-m-d'),
+            "Failed to update claim approved date"
+        );
+    }
+
+    public function testAdminLinkClaimForm()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testAdminLinkClaimForm', $this),
+            'bar'
+        );
+
+        $oldPolicy = self::initPolicy(
+            $user,
+            self::$dm,
+            static::getRandomPhone(self::$dm),
+            null,
+            true,
+            true
+        );
+
+        $newPolicy = self::initPolicy(
+            $user,
+            self::$dm,
+            static::getRandomPhone(self::$dm),
+            null,
+            true,
+            true
+        );
+
+        $claim = new Claim();
+        $oldPolicy->addClaim($claim);
+        $claim->setNumber(static::getRandomClaimNumber());
+        $claim->setType(Claim::TYPE_THEFT);
+        self::$dm->persist($claim);
+        self::$dm->flush();
+
+        $this->login(LoadUserData::DEFAULT_ADMIN, LoadUserData::DEFAULT_PASSWORD, 'admin');
+
+        $crawler = self::$client->request('GET', '/admin/policy/' . $newPolicy->getId());
+        self::verifyResponse(200);
+
+        $form = $crawler->selectButton('link_claim_form_submit')->form();
+
+        $form['link_claim_form[id]'] = $claim->getId();
+        $form['link_claim_form[number]'] = $claim->getNumber();
+        $form['link_claim_form[note]'] = 'A test justification';
+
+        self::$client->followRedirects();
+        $crawler = self::$client->submit($form);
+        self::verifyResponse(200);
+
+        $dm = $this->getDocumentManager(true);
+        $repoPolicy = $dm->getRepository(Policy::class);
+        /** @var Policy $updatedNewPolicy */
+        $updatedNewPolicy = $repoPolicy->find($newPolicy->getId());
+
+        $repoClaim = $dm->getRepository(Claim::class);
+        /** @var Claim $updatedClaim */
+        $updatedClaim = $repoClaim->find($claim->getId());
+
+        // claim linked policy should now point to the new policy
+        $this->assertEquals($updatedNewPolicy->getId(), $updatedClaim->getLinkedPolicy()->getId());
+
+        // and policy linked claims should contain the claim
+        $link = false;
+        /** @var Claim $linkedClaim */
+        foreach ($updatedNewPolicy->getLinkedClaims() as $linkedClaim) {
+            if ($linkedClaim->getId() === $updatedClaim->getId()) {
+                $link = true;
+            }
+        }
+
+        $this->assertTrue($link, 'Unable to locate linked claim in policy');
+    }
+
+    public function testImeiFormAction()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testImeiFormAction', $this),
+            'bar'
+        );
+
+        $policy = self::initPolicy(
+            $user,
+            self::$dm,
+            static::getRandomPhone(self::$dm),
+            null,
+            true,
+            true
+        );
+
+        $this->login(LoadUserData::DEFAULT_ADMIN, LoadUserData::DEFAULT_PASSWORD, 'admin');
+
+        $crawler = self::$client->request('GET', '/admin/policy/' . $policy->getId());
+        self::verifyResponse(200);
+
+        $form = $crawler->selectButton('imei_form_update')->form();
+
+        $imei = self::generateRandomImei();
+        $form['imei_form[imei]'] = $imei;
+
+        $crawler = self::$client->submit($form);
+        self::verifyResponse(302);
+
+        $dm = $this->getDocumentManager(true);
+        $repoPolicy = $dm->getRepository(PhonePolicy::class);
+        /** @var PhonePolicy $updatedPolicy */
+        $updatedPolicy = $repoPolicy->find($policy->getId());
+
+        self::assertEquals($imei, $updatedPolicy->getImei());
+    }
+
+    public function testImeiFormActionPhone()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testImeiFormActionPhone', $this),
+            'bar'
+        );
+
+        $policy = self::initPolicy(
+            $user,
+            self::$dm,
+            static::getRandomPhone(self::$dm),
+            null,
+            true,
+            true
+        );
+
+        $this->login(LoadUserData::DEFAULT_ADMIN, LoadUserData::DEFAULT_PASSWORD, 'admin');
+
+        $crawler = self::$client->request('GET', '/admin/policy/' . $policy->getId());
+        self::verifyResponse(200);
+
+        $form = $crawler->selectButton('imei_form_update')->form();
+
+        $imei = self::generateRandomImei();
+        $phone = self::getRandomPhone(self::$dm);
+        $form['imei_form[imei]'] = $imei;
+        $form['imei_form[phone]'] = $phone->getId();
+
+        $crawler = self::$client->submit($form);
+        self::verifyResponse(302);
+
+        $dm = $this->getDocumentManager(true);
+        $repoPolicy = $dm->getRepository(PhonePolicy::class);
+        /** @var PhonePolicy $updatedPolicy */
+        $updatedPolicy = $repoPolicy->find($policy->getId());
+
+        self::assertEquals($imei, $updatedPolicy->getImei());
+        self::assertEquals($phone->getId(), $updatedPolicy->getPhone()->getId());
     }
 
     public function testAdminClaimDelete()
@@ -121,7 +276,7 @@ class AdminControllerTest extends BaseControllerTest
         $charge = new Charge();
         $charge->setAmount(0.02);
         $claim = new Claim();
-        $claim->setNumber('TEST/456');
+        $claim->setNumber(static::getRandomClaimNumber());
         $claim->setProcessed(false);
         $claim->setStatus(Claim::STATUS_APPROVED);
         $claim->setApprovedDate(new \DateTime('-2 days'));
@@ -133,7 +288,7 @@ class AdminControllerTest extends BaseControllerTest
         $claimId = $claim->getId();
         $this->assertNotNull($charge->getClaim());
 
-        $this->login('patrick@so-sure.com', LoadUserData::DEFAULT_PASSWORD, 'admin');
+        $this->login(LoadUserData::DEFAULT_ADMIN, LoadUserData::DEFAULT_PASSWORD, 'admin');
         $crawler = self::$client->request('GET', sprintf('/admin/claims-form/%s/policy', $claimId));
         self::verifyResponse(200);
         $form = $crawler->filter('form[id="delete-claim-form"]')->form();
@@ -165,7 +320,7 @@ class AdminControllerTest extends BaseControllerTest
         $phone = static::getRandomPhone(self::$dm);
         $policy = static::initPolicy($user, self::$dm, $phone, null, true, true);
         $claim = new Claim();
-        $claim->setNumber('TEST/123');
+        $claim->setNumber(static::getRandomClaimNumber());
         $claim->setProcessed(false);
         $claim->setStatus(Claim::STATUS_APPROVED);
         $claim->setApprovedDate(new \DateTime('-2 days'));

@@ -3,6 +3,8 @@
 namespace AppBundle\Controller;
 
 use AppBundle\Document\AffiliateCompany;
+use AppBundle\Document\Promotion;
+use AppBundle\Document\Participation;
 use AppBundle\Document\BacsPaymentMethod;
 use AppBundle\Document\File\PaymentRequestUploadFile;
 use AppBundle\Document\JudoPaymentMethod;
@@ -14,14 +16,18 @@ use AppBundle\Form\Type\AdminEmailOptOutType;
 use AppBundle\Form\Type\BacsCreditType;
 use AppBundle\Form\Type\ClaimInfoType;
 use AppBundle\Form\Type\CallNoteType;
+use AppBundle\Form\Type\DetectedImeiType;
+use AppBundle\Form\Type\LinkClaimType;
 use AppBundle\Form\Type\ClaimNoteType;
 use AppBundle\Form\Type\PaymentRequestUploadFileType;
 use AppBundle\Form\Type\UploadFileType;
 use AppBundle\Form\Type\UserHandlingTeamType;
+use AppBundle\Form\Type\PromotionType;
 use AppBundle\Repository\ClaimRepository;
 use AppBundle\Repository\PhonePolicyRepository;
 use AppBundle\Repository\PhoneRepository;
 use AppBundle\Repository\PolicyRepository;
+use AppBundle\Repository\ScheduledPaymentRepository;
 use AppBundle\Security\FOSUBUserProvider;
 use AppBundle\Service\BacsService;
 use AppBundle\Service\FraudService;
@@ -33,6 +39,7 @@ use AppBundle\Service\RouterService;
 use AppBundle\Service\SalvaExportService;
 use AppBundle\Service\AffiliateService;
 use Doctrine\ODM\MongoDB\Query\Builder;
+use Faker\Calculator\Luhn;
 use Gedmo\Loggable\Document\Repository\LogEntryRepository;
 use Grpc\Call;
 use Predis\Client;
@@ -254,11 +261,12 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
 
         $searchForm->handleRequest($request);
         $data = $searchForm->get('os')->getData();
-
         $phones = $phones->field('os')->in($data);
         $data = filter_var($searchForm->get('active')->getData(), FILTER_VALIDATE_BOOLEAN);
         $phones = $phones->field('active')->equals($data);
         $rules = $searchForm->get('rules')->getData();
+        $make = $searchForm->get('make')->getData();
+        $model = $searchForm->get('model')->getData();
         if ($rules == 'missing') {
             $phones = $phones->field('suggestedReplacement')->exists(false);
             $phones = $phones->field('replacementPrice')->lte(0);
@@ -304,6 +312,18 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             $phones = $replacementPhones->field('id')->in($phoneIds);
         } elseif ($rules == 'replacement') {
             $phones = $phones->field('suggestedReplacement')->exists(true);
+        }
+        if ($make) {
+            $phones->field('makeCanonical')->equals(mb_strtolower($make));
+        }
+        if ($model) {
+            // regexp to search for each word so you don't have to get the model exactly right.
+            $words = explode(' ', $model);
+            $wordString = '';
+            foreach ($words as $word) {
+                $wordString .= "(?=.*?\b{$word}\b)";
+            }
+            $phones->field('model')->equals(new MongoRegex("/^{$wordString}.*$/i"));
         }
         $phones = $phones->sort('make', 'asc');
         $phones = $phones->sort('model', 'asc');
@@ -731,21 +751,54 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             if ($request->request->has('imei_form')) {
                 $imeiForm->handleRequest($request);
                 if ($imeiForm->isValid()) {
-                    $policy->adjustImei($imei->getImei(), false);
+                    $imeiUpdated = false;
+                    $phoneUpdated = false;
+                    if ($this->isImei($imei->getImei()) && $imei->getImei() != $policy->getImei()) {
+                        $policy->adjustImei($imei->getImei(), false);
+                        $imeiUpdated = true;
+                    } elseif (!$this->isImei($imei->getImei())) {
+                        $this->addFlash(
+                            'error',
+                            sprintf('%s is not a valid IMEI number', $imei->getImei())
+                        );
+                    }
 
-                    $policy->addNoteDetails(
-                        $imei->getNote(),
-                        $this->getUser()
-                    );
+                    if ($imei->getPhone() && $imei->getPhone() != $policy->getPhone()) {
+                        $policy->setPhone($imei->getPhone());
+                        $phoneUpdated = true;
+                    }
 
-                    $dm->flush();
+                    $msg = null;
+                    if ($imeiUpdated && $phoneUpdated) {
+                        $msg = 'IMEI & Phone updated';
+                    } elseif ($imeiUpdated) {
+                        $msg = 'IMEI updated';
+                    } elseif ($phoneUpdated) {
+                        $msg = 'Phone updated';
+                    }
+
+                    if ($imeiUpdated || $phoneUpdated) {
+                        $this->addFlash(
+                            'success',
+                            sprintf('Policy %s %s', $policy->getPolicyNumber(), $msg)
+                        );
+
+                        $policy->addNoteDetails(
+                            $imei->getNote(),
+                            $this->getUser(),
+                            $msg
+                        );
+
+                        $dm->flush();
+                    }
+                } else {
                     $this->addFlash(
-                        'success',
-                        sprintf('Policy %s imei updated.', $policy->getPolicyNumber())
+                        'error',
+                        'Unable to save form'
                     );
-
-                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
                 }
+
+                return $this->redirectToRoute('admin_policy', ['id' => $id]);
             }
         }
 
@@ -754,6 +807,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             'policy' => $policy,
         ];
     }
+    
     /**
      * @Route("/detected-imei-form/{id}", name="detected_imei_form")
      * @Template
@@ -773,7 +827,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         $imei->setPolicy($policy);
         $imei->setImei($policy->getDetectedImei());
         $imeiForm = $this->get('form.factory')
-            ->createNamedBuilder('imei_form', ImeiType::class, $imei)
+            ->createNamedBuilder('imei_form', DetectedImeiType::class, $imei)
             ->setAction($this->generateUrl(
                 'detected_imei_form',
                 ['id' => $id]
@@ -787,8 +841,9 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                     $policy->setDetectedImei($imei->getImei());
 
                     $policy->addNoteDetails(
-                        sprintf('Updated detected imei. Additional notes: %s', $imei->getNote()),
-                        $this->getUser()
+                        $imei->getNote(),
+                        $this->getUser(),
+                        'Detected IMEI Update'
                     );
 
                     $dm->flush();
@@ -854,7 +909,8 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
 
                         $policy->addNoteDetails(
                             $picsureForm->getData()['note'],
-                            $this->getUser()
+                            $this->getUser(),
+                            'Changed Pic-Sure status'
                         );
 
                         $dm->flush();
@@ -877,6 +933,79 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         return [
             'form' => $picsureForm->createView(),
             'policy' => $policy
+        ];
+    }
+
+    /**
+     * @Route("/link-claim/{id}", name="link_claim_form")
+     * @Template
+     */
+    public function linkClaimFormAction(Request $request, $id = null)
+    {
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(PhonePolicy::class);
+        /** @var PhonePolicy $policy */
+        $policy = $repo->find($id);
+
+        if (!$policy) {
+            throw $this->createNotFoundException(sprintf('Policy %s not found', $id));
+        }
+
+        $linkClaimform = $this->get('form.factory')
+            ->createNamedBuilder('link_claim_form', LinkClaimType::class)
+            ->setAction($this->generateUrl(
+                'link_claim_form',
+                ['id' => $id]
+            ))
+            ->getForm();
+
+        if ('POST' === $request->getMethod()) {
+            if ($request->request->has('link_claim_form')) {
+                $linkClaimform->handleRequest($request);
+                if ($linkClaimform->isValid()) {
+                    /** @var ClaimRepository $repo */
+                    $repo = $dm->getRepository(Claim::class);
+
+                    $claim = $repo->findClaimByDetails(
+                        $linkClaimform->get('id')->getData(),
+                        $linkClaimform->get('number')->getData()
+                    );
+
+                    if (!$claim) {
+                        $this->addFlash(
+                            'error',
+                            sprintf('No claim matched')
+                        );
+
+                        return $this->redirectToRoute('admin_policy', ['id' => $id]);
+                    }
+
+                    $policy->addLinkedClaim($claim);
+                    $policy->addNoteDetails(
+                        $linkClaimform->get('note')->getData(),
+                        $this->getUser(),
+                        sprintf('Linked Claim %s', $linkClaimform->get('number')->getData())
+                    );
+
+                    $dm->flush();
+
+                    $this->addFlash(
+                        'success',
+                        sprintf(
+                            'Policy %s successfully linked with claim: %s',
+                            $policy->getPolicyNumber(),
+                            $linkClaimform->get('number')->getData()
+                        )
+                    );
+
+                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
+                }
+            }
+        }
+
+        return [
+            'form' => $linkClaimform->createView(),
+            'policy' => $policy,
         ];
     }
 
@@ -918,9 +1047,6 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             ->getForm();
         $receperioForm = $this->get('form.factory')
             ->createNamedBuilder('receperio_form')->add('rerun', SubmitType::class)
-            ->getForm();
-        $phoneForm = $this->get('form.factory')
-            ->createNamedBuilder('phone_form', PhoneType::class, $policy)
             ->getForm();
         $chargebacks = new Chargebacks();
         $chargebacks->setPolicy($policy);
@@ -1001,6 +1127,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             ->createNamedBuilder('run_scheduled_payment_form', PaymentRequestUploadFileType::class, $paymentRequestFile)
             ->getForm();
         $bacsRefund = new BacsPayment();
+        $bacsRefund->setDate($this->getNextBusinessDay($this->now()));
         $bacsRefund->setSource(Payment::SOURCE_ADMIN);
         $bacsRefund->setPolicy($policy);
         $bacsRefund->setAmount($policy->getPremiumInstallmentPrice(true));
@@ -1029,7 +1156,8 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                             $cancel->getCancellationReason(),
                             true,
                             null,
-                            true
+                            true,
+                            $cancel->getFullRefund()
                         );
                         $this->addFlash(
                             'success',
@@ -1067,17 +1195,6 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                         );
                     }
                     $dm->flush();
-
-                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
-                }
-            } elseif ($request->request->has('phone_form')) {
-                $phoneForm->handleRequest($request);
-                if ($phoneForm->isValid()) {
-                    $dm->flush();
-                    $this->addFlash(
-                        'success',
-                        sprintf('Policy %s phone updated.', $policy->getPolicyNumber())
-                    );
 
                     return $this->redirectToRoute('admin_policy', ['id' => $id]);
                 }
@@ -1459,6 +1576,10 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                         );
                         // @codingStandardsIgnoreEnd
                     } catch (PaymentDeclinedException $e) {
+                        if ($policy->getStatus() === Policy::STATUS_PENDING) {
+                            $policy->setStatus(null);
+                        }
+
                         $this->addFlash(
                             'danger',
                             'Payment was declined'
@@ -1554,7 +1675,6 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             'cancel_form' => $cancelForm->createView(),
             'pending_cancel_form' => $pendingCancelForm->createView(),
             'note_form' => $noteForm->createView(),
-            'phone_form' => $phoneForm->createView(),
             'formClaimFlags' => $claimFlags->createView(),
             'facebook_form' => $facebookForm->createView(),
             'receperio_form' => $receperioForm->createView(),
@@ -1992,7 +2112,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
      * @Route("/scheduled-payments/{year}/{month}", name="admin_scheduled_payments_date")
      * @Template
      */
-    public function adminScheduledPaymentsAction($year = null, $month = null)
+    public function adminScheduledPaymentsAction(Request $request, $year = null, $month = null)
     {
         $now = \DateTime::createFromFormat('U', time());
         if (!$year) {
@@ -2005,13 +2125,23 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         $end = $this->endOfMonth($date);
 
         $dm = $this->getManager();
+        /** @var ScheduledPaymentRepository $scheduledPaymentRepo */
         $scheduledPaymentRepo = $dm->getRepository(ScheduledPayment::class);
         $scheduledPayments = $scheduledPaymentRepo->findMonthlyScheduled($date);
+        $scheduledPaymentsMonthly = $scheduledPaymentRepo->getMonthlyValues();
         $total = 0;
+
+        foreach ($scheduledPaymentsMonthly as $scheduledPaymentsMonthlyItem) {
+            if ($scheduledPaymentsMonthlyItem["_id"]["year"] == $year &&
+                $scheduledPaymentsMonthlyItem["_id"]["month"] == $month) {
+                $total = $scheduledPaymentsMonthlyItem["total"];
+            }
+        }
+        /*
         $totalJudo = 0;
         $totalBacs = 0;
-        foreach ($scheduledPayments as $scheduledPayment) {
-            /** @var ScheduledPayment $scheduledPayment */
+        $query = $scheduledPayments->getQuery()->execute();
+        foreach ($query as $scheduledPayment) {
             if (in_array(
                 $scheduledPayment->getStatus(),
                 [ScheduledPayment::STATUS_SCHEDULED, ScheduledPayment::STATUS_SUCCESS]
@@ -2024,15 +2154,20 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                 }
             }
         }
+        */
+
+        $pager = $this->pager($request, $scheduledPayments);
 
         return [
             'year' => $year,
             'month' => $month,
             'end' => $end,
-            'scheduledPayments' => $scheduledPayments,
+            'scheduledPayments' => $pager->getCurrentPageResults(),
+            'pager' => $pager,
+            'totals' => $scheduledPaymentsMonthly,
             'total' => $total,
-            'totalJudo' => $totalJudo,
-            'totalBacs' => $totalBacs,
+            //'totalJudo' => $totalJudo,
+            //'totalBacs' => $totalBacs,
         ];
     }
 
@@ -2494,7 +2629,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                         } else {
                             $this->addFlash("error", "Tastecard number must be 10 alphanumeric characters.");
                         }
-                    } elseif ($tasteCardForm->getClickedButton()->getName() === "resend") {
+                    } elseif ($tasteCardForm->getClickedButton()->getName() === "resend" && $policy->getTasteCard()) {
                         $policyService->tasteCardEmail($policy);
                         $this->addFlash('success', 'Tastecard notification has been resent.');
                     }
@@ -2977,19 +3112,28 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
      */
     public function affiliateAction(Request $request)
     {
-
-        $time_range = [
+        $timeRanges = [
+            14 => 14,
             30 => 30,
             60 => 60,
             90 => 90
         ];
-
-        $lead_sources = [
+        $renewalTimeRanges = [
+            0 => 0,
+            14 => 14,
+            30 => 30,
+            60 => 60,
+            90 => 90
+        ];
+        $leadSources = [
             'invitation' => 'invitation',
             'scode' => 'scode',
             'affiliate' => 'affiliate'
         ];
-
+        $chargeModels = [
+            "One off Charges" => AffiliateCompany::MODEL_ONE_OFF,
+            "Ongoing Charges" => AffiliateCompany::MODEL_ONGOING
+        ];
         $companyForm = $this->get('form.factory')
             ->createNamedBuilder('companyForm')
             ->add('name', TextType::class)
@@ -2998,19 +3142,19 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             ->add('address3', TextType::class, ['required' => false])
             ->add('city', TextType::class)
             ->add('postcode', TextType::class)
+            ->add('chargeModel', ChoiceType::class, ['required' => true, 'choices' => $chargeModels])
             ->add('cpa', NumberType::class, ['constraints' => [new Assert\Range(['min' => 0, 'max' => 20])]])
-            ->add('days', ChoiceType::class, ['required' => true, 'choices' => $time_range])
+            ->add('days', ChoiceType::class, ['required' => true, 'choices' => $timeRanges])
+            ->add('renewalDays', ChoiceType::class, ['choices' => $renewalTimeRanges])
             ->add('campaignSource', TextType::class, ['required' => false])
-            ->add('leadSource', ChoiceType::class, ['required' => false, 'choices' => $lead_sources])
+            ->add('leadSource', ChoiceType::class, ['required' => false, 'choices' => $leadSources])
             ->add('leadSourceDetails', TextType::class, ['required' => false ])
             ->add('next', SubmitType::class)
             ->getForm();
-
         $dm = $this->getManager();
         $companyRepo = $dm->getRepository(AffiliateCompany::class);
         $userRepo = $dm->getRepository(User::class);
         $companies = $companyRepo->findAll();
-
         try {
             if ('POST' === $request->getMethod()) {
                 if ($request->request->has('companyForm')) {
@@ -3031,6 +3175,10 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                         }
                         $company->setAddress($address);
                         $company->setDays($this->getDataString($companyForm->getData(), 'days'));
+                        $company->setChargeModel($this->getDataString($companyForm->getData(), 'chargeModel'));
+                        if ($company->getChargeModel() == AffiliateCompany::MODEL_ONGOING) {
+                            $company->setRenewalDays($this->getDataString($companyForm->getData(), 'renewalDays'));
+                        }
                         $company->setCampaignSource($this->getDataString($companyForm->getData(), 'campaignSource'));
                         $company->setLeadSource($this->getDataString($companyForm->getData(), 'leadSource'));
                         $company->setLeadSourceDetails(
@@ -3040,7 +3188,6 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                         $dm->persist($company);
                         $dm->flush();
                         $this->addFlash('success', 'Added affiliate');
-
                         return new RedirectResponse($this->generateUrl('admin_affiliate'));
                     } else {
                         throw new \InvalidArgumentException(sprintf(
@@ -3053,7 +3200,6 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         } catch (\InvalidArgumentException $e) {
             $this->addFlash('error', $e->getMessage());
         }
-
         return [
             'companies' => $companies,
             'companyForm' => $companyForm->createView(),
@@ -3099,9 +3245,25 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         $affiliate = $affiliateRepo->find($id);
         $affiliateService = $this->get("app.affiliate");
         if ($affiliate) {
+            $pending = $affiliateService->getMatchingUsers(
+                $affiliate,
+                new \DateTime(),
+                [User::AQUISITION_NEW, User::AQUISITION_PENDING],
+                $affiliate->getChargeModel() == AffiliateCompany::MODEL_ONE_OFF
+            );
+            $days = [];
+            foreach ($pending as $user) {
+                $days[$user->getId()] = $affiliateService->daysToAquisition($affiliate, $user);
+            }
             return [
                 'affiliate' => $affiliate,
-                'pending' => $affiliateService->getMatchingUsers($affiliate, [User::AQUISITION_PENDING])
+                'pending' => $affiliateService->getMatchingUsers(
+                    $affiliate,
+                    new \DateTime(),
+                    [User::AQUISITION_NEW, User::AQUISITION_PENDING],
+                    $affiliate->getChargeModel() == AffiliateCompany::MODEL_ONE_OFF
+                ),
+                'days' => $days
             ];
         } else {
             return ['error' => 'Invalid URL, given ID does not correspond to an affiliate.'];
@@ -3121,7 +3283,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         if ($affiliate) {
             return [
                 'affiliate' => $affiliate,
-                'potential' => $affiliateService->getMatchingUsers($affiliate, [User::AQUISITION_POTENTIAL])
+                'potential' => $affiliateService->getMatchingUsers($affiliate, null, [User::AQUISITION_POTENTIAL])
             ];
         } else {
             return ['error' => 'Invalid URL, given ID does not correspond to an affiliate.'];
@@ -3141,10 +3303,48 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         if ($affiliate) {
             return [
                 'affiliate' => $affiliate,
-                'lost' => $affiliateService->getMatchingUsers($affiliate, [User::AQUISITION_LOST])
+                'lost' => $affiliateService->getMatchingUsers($affiliate, null, [User::AQUISITION_LOST])
             ];
         } else {
             return ['error' => 'Invalid URL, given ID does not correspond to an affiliate.'];
         }
+    }
+
+    /**
+     * @Route("/promotions", name="admin_promotions")
+     * @Template("AppBundle:AdminEmployee:promotions.html.twig")
+     */
+    public function promotionsAction(Request $request)
+    {
+        $dm = $this->getManager();
+        $promotionForm = $this->get('form.factory')
+            ->createNamedBuilder('promotionForm', PromotionType::class, null, ['method' => 'POST'])
+            ->getForm();
+        $promotionForm->handleRequest($request);
+        if ($promotionForm->isSubmitted() && $promotionForm->isValid()) {
+            $promotion = $promotionForm->getData();
+            $promotion->setStart(new \DateTime());
+            $promotion->setActive(true);
+            $dm->persist($promotion);
+            $dm->flush();
+            $this->addFlash('success', 'Added Promotion');
+            return new RedirectResponse($this->generateUrl('admin_promotions'));
+        }
+        // TODO: order them so that inactive come after active, but beside that it's ordered by newness.
+        $promotionRepository = $dm->getRepository(Promotion::class);
+        $promotions = $promotionRepository->findAll();
+        return ["promotions" => $promotions, "promotionForm" => $promotionForm->createView()];
+    }
+
+    /**
+     * @Route("/promotion/{id}", name="admin_promotion")
+     * @Template("AppBundle:AdminEmployee:promotion.html.twig")
+     */
+    public function promotionAction($id)
+    {
+        $dm = $this->getManager();
+        $promotionRepository = $dm->getRepository(Promotion::class);
+        $promotion = $promotionRepository->find($id);
+        return ["promotion" => $promotion];
     }
 }

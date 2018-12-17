@@ -75,6 +75,7 @@ class BacsService
     const AUDDIS_REASON_DD_NOT_ALLOWED = 'G';
     const AUDDIS_REASON_EXPIRED = 'H';
     const AUDDIS_REASON_DUPLICATE_REFERENCE = 'I';
+    const AUDDIS_REASON_INCORRECT_DETAILS = 'L';
     const AUDDIS_REASON_CODE_INCOMPATIBLE = 'M';
     const AUDDIS_REASON_NOT_ALLOWED = 'N';
     const AUDDIS_REASON_INVALID_REFERENCE = 'O';
@@ -1067,6 +1068,7 @@ class BacsService
                     self::AUDDIS_REASON_INVALID_REFERENCE,
                     self::AUDDIS_REASON_MISSING_PAYER_NAME,
                     self::AUDDIS_REASON_MISSING_SERVICE_NAME,
+                    self::AUDDIS_REASON_INCORRECT_DETAILS,
                 ])) {
                     /** @var BacsPaymentMethod $bacs */
                     $bacs = $user->getPaymentMethod();
@@ -1565,6 +1567,16 @@ class BacsService
     {
         /** @var BacsPaymentMethod $bacs */
         $bacs = $policy->getUser()->getPaymentMethod();
+
+        if ($this->environment == 'prod' && !$policy->isValidPolicy()) {
+            $msg = sprintf(
+                'Cancelling (scheduled) payment %s policy is not valid',
+                $id
+            );
+            $this->logger->warning($msg);
+
+            return self::VALIDATE_CANCEL;
+        }
 
         if (!$bacs || !$bacs->getBankAccount()) {
             $msg = sprintf(

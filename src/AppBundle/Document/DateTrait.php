@@ -40,6 +40,11 @@ trait DateTrait
         return false;
     }
 
+    public function now()
+    {
+        return \DateTime::createFromFormat('U', time());
+    }
+
     public function startOfPreviousMonth(\DateTime $date = null)
     {
         $startMonth = $this->startOfMonth($date);
@@ -339,5 +344,65 @@ trait DateTrait
         $adjustedDate->setTimezone($timezone);
 
         return $adjustedDate;
+    }
+
+    /**
+     * Returns a copy of a given date which is n days ahead of it.
+     * @param \DateTime $date is the starting date.
+     * @param int       $days is the number of days to move ahead.
+     * @return \DateTime the new date.
+     */
+    public static function addDays($date, $days)
+    {
+        $date = clone $date;
+        $date->add(static::intervalDays($days));
+
+        return $date;
+    }
+
+    /**
+     * Creates a date interval over a given number of days and takes into account negative numbers.
+     * @param int $days is the number of days to make the interval cover.
+     * @return \DateInterval given number of days as an interval.
+     */
+    public static function intervalDays($days)
+    {
+        $interval = new \DateInterval("P".abs($days)."D");
+        $interval->invert = $days < 0 ? 1 : 0;
+        return $interval;
+    }
+
+    /**
+     * Converts a date into a formatted string in a given timezone. If the date is null then an empty string is given.
+     * @param \DateTime|null $date     is the date to use. it's timezone is irrelevant as it just gets the timestamp.
+     * @param \DateTimeZone  $timezone is the timezone to write this date in.
+     * @param String         $format   is the format to write the date out with.
+     * @return String the date in the requested the format.
+     */
+    public static function timezoneFormat($date, \DateTimeZone $timezone, $format)
+    {
+        if (!$date) {
+            return "";
+        }
+        return static::convertTimezone($date, $timezone)->format($format);
+    }
+
+    /**
+     * Gives the number of days the first date is from the second, with the second defaulting as being now.
+     * @param \DateTime $a is the first date.
+     * @param \DateTime $b is the second date which defaults to being now.
+     * @return int the number of days by which the first date differs from the second, including negative numbers.
+     */
+    public static function daysFrom(\DateTime $a, \DateTime $b = null)
+    {
+        if (!$b) {
+            $b = new \DateTime();
+        }
+        $difference = $b->diff($a);
+        $days = $difference->days;
+        if ($difference->invert) {
+            $days *= -1;
+        }
+        return $days;
     }
 }

@@ -101,4 +101,23 @@ class ClaimRepository extends DocumentRepository
             ->field('processed')->in([null, false])
             ->getQuery()->execute();
     }
+
+    public function findClaimByDetails($id = null, $number = null)
+    {
+        $qb = $this->createQueryBuilder();
+
+        if ($id) {
+            $qb->addAnd($qb->expr()->field('_id')->equals($id));
+        }
+
+        if ($number) {
+            $qb->addAnd($qb->expr()->field('number')->equals($number));
+        }
+
+        if ($qb->getQuery()->count() > 1) {
+            throw new \Exception(sprintf("Query returned more than one result for claim. %s %s", $id, $number));
+        }
+
+        return $qb->getQuery()->execute()->getSingleResult();
+    }
 }

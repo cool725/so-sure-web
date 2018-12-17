@@ -2,11 +2,10 @@
 
 namespace AppBundle\Document\Form;
 
+use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Policy;
-use AppBundle\Document\DateTrait;
 use Symfony\Component\Validator\Constraints as Assert;
-use AppBundle\Validator\Constraints as AppAssert;
 
 class Imei
 {
@@ -19,6 +18,11 @@ class Imei
     protected $note;
 
     protected $imei;
+
+    /**
+     * @var Phone
+     */
+    protected $phone;
 
     public function getImei()
     {
@@ -41,6 +45,7 @@ class Imei
         $phonePolicy = $policy;
         $this->policy = $phonePolicy;
         $this->setImei($phonePolicy->getImei());
+        $this->setPhone($phonePolicy->getPhone());
     }
 
     public function getNote()
@@ -51,5 +56,15 @@ class Imei
     public function setNote($note)
     {
         $this->note = $note;
+    }
+
+    public function getPhone()
+    {
+        return $this->phone;
+    }
+
+    public function setPhone($phone)
+    {
+        $this->phone = $phone;
     }
 }

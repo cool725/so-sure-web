@@ -18,6 +18,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Helper\Table;
+use AppBundle\Document\DateTrait;
 use AppBundle\Document\User;
 use AppBundle\Document\Claim;
 use AppBundle\Document\Policy;
@@ -28,6 +29,8 @@ use AppBundle\Classes\SoSure;
 
 class BICommand extends ContainerAwareCommand
 {
+    use DateTrait;
+
     /** @var S3Client */
     protected $s3;
 
@@ -87,6 +90,12 @@ class BICommand extends ContainerAwareCommand
                 InputOption::VALUE_NONE,
                 'Skip s3 upload'
             )
+            ->addOption(
+                "timezone",
+                null,
+                InputOption::VALUE_REQUIRED,
+                "Choose a timezone to use for policies report"
+            )
         ;
     }
 
@@ -96,51 +105,52 @@ class BICommand extends ContainerAwareCommand
         $prefix = $input->getOption('prefix');
         $only = $input->getOption('only');
         $skipS3 = true === $input->getOption('skip-s3');
+        $timezone = new \DateTimeZone($input->getOption('timezone') ?: 'UTC');
 
         if (!$only || $only == 'policies') {
-            $lines = $this->exportPolicies($prefix, $skipS3);
+            $lines = $this->exportPolicies($prefix, $skipS3, $timezone);
             if ($debug) {
                 $output->write(json_encode($lines, JSON_PRETTY_PRINT));
             }
         }
 
         if (!$only || $only == 'claims') {
-            $lines = $this->exportClaims($skipS3);
+            $lines = $this->exportClaims($skipS3, $timezone);
             if ($debug) {
                 $output->write(json_encode($lines, JSON_PRETTY_PRINT));
             }
         }
 
         if (!$only || $only == 'users') {
-            $lines = $this->exportUsers($skipS3);
+            $lines = $this->exportUsers($skipS3, $timezone);
             if ($debug) {
                 $output->write(json_encode($lines, JSON_PRETTY_PRINT));
             }
         }
 
         if (!$only || $only == 'invitations') {
-            $lines = $this->exportInvitations($skipS3);
+            $lines = $this->exportInvitations($skipS3, $timezone);
             if ($debug) {
                 $output->write(json_encode($lines, JSON_PRETTY_PRINT));
             }
         }
 
         if (!$only || $only == 'connections') {
-            $lines = $this->exportConnections($skipS3);
+            $lines = $this->exportConnections($skipS3, $timezone);
             if ($debug) {
                 $output->write(json_encode($lines, JSON_PRETTY_PRINT));
             }
         }
 
         if (!$only || $only == 'phones') {
-            $lines = $this->exportPhones($skipS3);
+            $lines = $this->exportPhones($skipS3, $timezone);
             if ($debug) {
                 $output->write(json_encode($lines, JSON_PRETTY_PRINT));
             }
         }
     }
 
-    private function exportPhones($skipS3)
+    private function exportPhones($skipS3, \DateTimeZone $timezone)
     {
         /** @var PhoneRepository $repo */
         $repo = $this->dm->getRepository(Phone::class);
@@ -170,7 +180,7 @@ class BICommand extends ContainerAwareCommand
         return $lines;
     }
 
-    private function exportClaims($skipS3)
+    private function exportClaims($skipS3, \DateTimeZone $timezone)
     {
         /** @var ClaimRepository $repo */
         $repo = $this->dm->getRepository(Claim::class);
@@ -219,16 +229,19 @@ class BICommand extends ContainerAwareCommand
             $income = $this->searchService->findIncome($user->getBillingAddress()->getPostcode());
             $lines[] = implode(',', [
                 sprintf('"%s"', $policy->getPolicyNumber()),
-                sprintf('"%s"', $policy->getStart()->format('Y-m-d H:i:s')),
-                sprintf(
-                    '"%s"',
-                    $claim->getNotificationDate() ? $claim->getNotificationDate()->format('Y-m-d H:i:s') : ""
-                ),
+                sprintf('"%s"', $this->timezoneFormat($policy->getStart(), $timezone, 'Y-m-d H:i:s')),
+                sprintf('"%s"', $this->timezoneFormat($claim->getNotificationDate(), $timezone, 'Y-m-d H:i:s')),
                 sprintf('"%s"', $user->getBillingAddress()->getPostcode()),
                 sprintf('"%s"', $claim->getType()),
                 sprintf('"%s"', $claim->getStatus()),
                 sprintf('"%s"', $claim->getLocation()),
-                sprintf('"%s"', $policy->getCancelledReason() ? $policy->getEnd()->format('Y-m-d H:i:s') : ""),
+                sprintf(
+                    '"%s"',
+                    $policy->getCancelledReason() ?
+                        $this->timezoneFormat($policy->getEnd(), $timezone, 'Y-m-d H:i:s') :
+                        ""
+                ),
+
                 sprintf('"%s"', $policy->getCancelledReason() ? $policy->getCancelledReason() : ""),
                 sprintf('"%s"', count($policy->getStandardConnections())),
                 'N/A',
@@ -253,15 +266,10 @@ class BICommand extends ContainerAwareCommand
                 sprintf('"%s"', $user->getAttribution() ? $user->getAttribution()->getReferer() : ''),
                 sprintf('"%s"', $claim->getInitialSuspicion() ? 'yes' : 'no'),
                 sprintf('"%s"', $claim->getFinalSuspicion() ? 'yes' : 'no'),
-                sprintf(
-                    '"%s"',
-                    $claim->getReplacementReceivedDate() ?
-                        $claim->getReplacementReceivedDate()->format('Y-m-d') :
-                        ''
-                ),
+                sprintf('"%s"', $this->timezoneFormat($claim->getReplacementReceivedDate(), $timezone, 'Y-m-d')),
                 sprintf('"%s"', $claim->getHandlingTeam()),
                 sprintf('"%0.2f"', $claim->getTotalIncurred()),
-                sprintf('"%s"', $claim->getClosedDate() ? $claim->getClosedDate()->format('Y-m-d') : '')
+                sprintf('"%s"', $this->timezoneFormat($claim->getClosedDate(), $timezone, 'Y-m-d'))
             ]);
         }
         if (!$skipS3) {
@@ -271,7 +279,7 @@ class BICommand extends ContainerAwareCommand
         return $lines;
     }
 
-    private function exportPolicies($prefix, $skipS3)
+    private function exportPolicies($prefix, $skipS3, \DateTimeZone $timezone)
     {
         /** @var PhonePolicyRepository $repo */
         $repo = $this->dm->getRepository(PhonePolicy::class);
@@ -318,6 +326,7 @@ class BICommand extends ContainerAwareCommand
             '"Has previous policy"',
             '"Payment Method"',
             '"Expected Unpaid Cancellation Date"',
+            '"Bacs Mandate Status"'
         ]);
         foreach ($policies as $policy) {
             /** @var Policy $policy */
@@ -328,8 +337,8 @@ class BICommand extends ContainerAwareCommand
                 sprintf('"%s"', $policy->getPolicyNumber()),
                 sprintf('"%d"', $user->getAge()),
                 sprintf('"%s"', $user->getBillingAddress()->getPostcode()),
-                sprintf('"%s"', $policy->getStart()->format('Y-m-d')),
-                sprintf('"%s"', $policy->getEnd()->format('Y-m-d')),
+                sprintf('"%s"', $this->timezoneFormat($policy->getStart(), $timezone, 'Y-m-d')),
+                sprintf('"%s"', $this->timezoneFormat($policy->getEnd(), $timezone, 'Y-m-d')),
                 sprintf('"%s"', $policy->getStatus()),
                 sprintf('"%s"', $user->getId()),
                 sprintf('"%s"', $policy->getCancelledReason() ? $policy->getCancelledReason() : null),
@@ -366,7 +375,7 @@ class BICommand extends ContainerAwareCommand
                 sprintf('"%0.2f"', $policy->getPremiumPaid()),
                 sprintf('"%0.2f"', $policy->getPremium()->getYearlyPremiumPrice()),
                 sprintf('"%0.2f"', $policy->getUnderwritingOutstandingPremium()),
-                sprintf('"%s"', $policy->getStart()->format('H:i')),
+                sprintf('"%s"', $this->timezoneFormat($policy->getStart(), $timezone, 'H:i')),
                 sprintf('"%0.2f"', $policy->getBadDebtAmount()),
                 sprintf('"%s"', $policy->hasPreviousPolicy() ? 'yes' : 'no'),
                 sprintf(
@@ -376,9 +385,15 @@ class BICommand extends ContainerAwareCommand
                 sprintf(
                     '"%s"',
                     $policy->getStatus() == Policy::STATUS_UNPAID ?
-                        $policy->getPolicyExpirationDate()->format('Y-m-d') :
+                        $this->timezoneFormat($policy->getPolicyExpirationDate(), $timezone, 'Y-m-d') :
                         null
                 ),
+                sprintf(
+                    '"%s"',
+                    $policy->getUser()->hasBacsPaymentMethod() ?
+                        $policy->getUser()->getBacsPaymentMethod()->getBankAccount()->getMandateStatus() :
+                        null
+                )
             ]);
         }
         if (!$skipS3) {
@@ -388,7 +403,7 @@ class BICommand extends ContainerAwareCommand
         return $lines;
     }
 
-    private function exportUsers($skipS3)
+    private function exportUsers($skipS3, \DateTimeZone $timezone)
     {
         /** @var UserRepository $repo */
         $repo = $this->dm->getRepository(User::class);
@@ -417,7 +432,8 @@ class BICommand extends ContainerAwareCommand
                 sprintf('"%d"', $user->getAge()),
                 sprintf('"%s"', $user->getBillingAddress()->getPostcode()),
                 sprintf('"%s"', $user->getId()),
-                sprintf('"%s"', $user->getCreated()->format('Y-m-d')),
+                sprintf('"%s"', $this->timezoneFormat($user->getCreated(), $timezone, 'Y-m-d')),
+
                 sprintf('"%s"', count($user->getCreatedPolicies()) > 0 ? 'yes' : 'no'),
                 sprintf('"%s"', $census ? $census->getSubgrp() : ''),
                 sprintf('"%s"', $user->getGender() ? $user->getGender() : ''),
@@ -433,7 +449,7 @@ class BICommand extends ContainerAwareCommand
         return $lines;
     }
 
-    private function exportInvitations($skipS3)
+    private function exportInvitations($skipS3, \DateTimeZone $timezone)
     {
         $repo = $this->dm->getRepository(Invitation::class);
         $invitations = $repo->findAll();
@@ -448,9 +464,10 @@ class BICommand extends ContainerAwareCommand
             /** @var Invitation $invitation */
             $lines[] = implode(',', [
                 sprintf('"%s"', $invitation->getPolicy() ? $invitation->getPolicy()->getPolicyNumber() : ''),
-                sprintf('"%s"', $invitation->getCreated() ? $invitation->getCreated()->format('Y-m-d H:i:s') : ''),
+                sprintf('"%s"', $this->timezoneFormat($invitation->getCreated(), $timezone, 'Y-m-d H:i:s')),
                 sprintf('"%s"', $invitation->getChannel()),
-                sprintf('"%s"', $invitation->getAccepted() ? $invitation->getAccepted()->format('Y-m-d H:i:s') : ''),
+                sprintf('"%s"', $this->timezoneFormat($invitation->getAccepted(), $timezone, 'Y-m-d H:i:s')),
+
             ]);
         }
         if (!$skipS3) {
@@ -460,7 +477,7 @@ class BICommand extends ContainerAwareCommand
         return $lines;
     }
 
-    private function exportConnections($skipS3)
+    private function exportConnections($skipS3, \DateTimeZone $timezone)
     {
         $repo = $this->dm->getRepository(StandardConnection::class);
         $connections = $repo->findAll();
@@ -478,9 +495,9 @@ class BICommand extends ContainerAwareCommand
             $lines[] = implode(',', [
                 sprintf('"%s"', $connection->getSourcePolicy() ? $connection->getSourcePolicy()->getPolicyNumber() : ''),
                 sprintf('"%s"', $connection->getLinkedPolicy() ? $connection->getLinkedPolicy()->getPolicyNumber() : ''),
-                sprintf('"%s"', $connection->getInitialInvitationDate() ? $connection->getInitialInvitationDate()->format('Y-m-d H:i:s') : ''),
+                sprintf('"%s"', $this->timezoneFormat($connection->getInitialInvitationDate(), $timezone, 'Y-m-d H:i:s')),
                 sprintf('"%s"', $connection->getInvitation() ? $connection->getInvitation()->getChannel() : ''),
-                sprintf('"%s"', $connection->getDate() ? $connection->getDate()->format('Y-m-d H:i:s') : ''),
+                sprintf('"%s"', $this->timezoneFormat($connection->getDate(), $timezone, 'Y-m-d H:i:s')),
             ]);
             // @codingStandardsIgnoreEnd
         }

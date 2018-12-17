@@ -84,6 +84,7 @@ class Stats
     /**
      * @Assert\DateTime()
      * @MongoDB\Field(type="date")
+     * @MongoDB\Index(unique=false, sparse=true)
      */
     protected $date;
 

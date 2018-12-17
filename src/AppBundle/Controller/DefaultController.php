@@ -4,6 +4,7 @@ namespace AppBundle\Controller;
 
 use AppBundle\Classes\SoSure;
 use AppBundle\Document\Opt\EmailOptIn;
+use AppBundle\Form\Type\CompanyLeadType;
 use AppBundle\Form\Type\EmailOptInType;
 use AppBundle\Form\Type\EmailOptOutType;
 use AppBundle\Repository\OptOut\EmailOptOutRepository;
@@ -347,6 +348,10 @@ class DefaultController extends BaseController
         $phoneMake = new PhoneMake();
         if ($id) {
             $phone = $phoneRepo->find($id);
+            if (!$phone) {
+                throw $this->createNotFoundException('Invalid id');
+            }
+            
             $phoneMake->setMake($phone->getMake());
         }
 
@@ -376,7 +381,7 @@ class DefaultController extends BaseController
                 if ($phoneId) {
                     $phone = $phoneRepo->find($phoneId);
                     if (!$phone) {
-                        throw new \Exception('unknown phone');
+                        throw $this->createNotFoundException('Invalid id');
                     }
                     if ($phone->getMemory()) {
                         return $this->redirectToRoute('quote_make_model_memory', [
@@ -604,35 +609,7 @@ class DefaultController extends BaseController
     public function mobileInsuranceForYourCompany(Request $request)
     {
         $leadForm = $this->get('form.factory')
-            ->createNamedBuilder('lead_form')
-            ->add('email', EmailType::class)
-            ->add('name', TextType::class)
-            ->add('company', TextType::class)
-            ->add('phone', TextType::class)
-            ->add('phones', ChoiceType::class, [
-                'required' => true,
-                'placeholder' => 'No. of phones to insure...',
-                'choices' => [
-                    'less than 5' => 'less than 5',
-                    '5-10' => '5-10',
-                    '10-50' => '10-50',
-                    'more than 50' => 'more than 50',
-                    'uncertain' => 'uncertain'
-                ],
-            ])
-            ->add('timeframe', ChoiceType::class, [
-                'required' => true,
-                'placeholder' => 'Purchasing timeframe...',
-                'choices' => [
-                    'immedidate' => 'immedidate',
-                    'this quarter' => 'this quarter',
-                    'next quarter' => 'next quarter',
-                    'next year' => 'next year',
-                    'uncertain' => 'uncertain'
-                ],
-            ])
-            ->add('message', TextareaType::class)
-            ->add('submit', SubmitType::class)
+            ->createNamedBuilder('lead_form', CompanyLeadType::class)
             ->getForm();
 
         if ('POST' === $request->getMethod()) {
@@ -666,6 +643,11 @@ class DefaultController extends BaseController
                     );
 
                     return $this->redirectToRoute('mobile_phone_insurance_for_your_company_thanks');
+                } else {
+                    $this->addFlash(
+                        'error',
+                        "Sorry, there was a problem validating your request. Please check below for any errors."
+                    );
                 }
             }
         }
@@ -683,8 +665,10 @@ class DefaultController extends BaseController
     {
         /** @var User $user */
         $user = $this->getUser();
+
         // causes admin's (or claims) too much confusion to be redirected to a 404
-        if ($user && !$user->hasEmployeeRole() && !$user->hasClaimsRole()) {
+        if ($user && !$user->hasEmployeeRole() && !$user->hasClaimsRole()
+            && ($user->hasActivePolicy() || $user->hasUnpaidPolicy())) {
             return $this->redirectToRoute('user_claim');
         }
 
@@ -816,8 +800,7 @@ class DefaultController extends BaseController
                 );
             } elseif (!$this->isValidUkMobile($ukMobileNumber)) {
                 $this->addFlash('error', sprintf(
-                    '%s does not appear to be a valid UK Mobile Number',
-                    $mobileNumber
+                    'Sorry, that number does not appear to be a valid UK Mobile Number'
                 ));
             } else {
                 $sms = $this->get('app.sms');
@@ -836,10 +819,10 @@ class DefaultController extends BaseController
                         'You should receive a download link shortly'
                     );
                 } else {
-                    $this->addFlash('error', sprintf(
-                        'Sorry, we had a problem sending a link to %s',
-                        $mobileNumber
-                    ));
+                    $this->addFlash(
+                        'error',
+                        'Sorry, we had a problem sending you a sms. Please download the so-sure app from your app store.'
+                    );
                 }
             }
         }

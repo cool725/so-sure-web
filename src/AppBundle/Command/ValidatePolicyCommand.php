@@ -435,14 +435,19 @@ class ValidatePolicyCommand extends ContainerAwareCommand
             $pendingBacsTotalCommission = $policy->getPendingBacsPaymentsTotalCommission(true);
             $allowedVariance += abs($pendingBacsTotalCommission);
 
+            // There are often bacs refunds on the following date; make sure to include the following day for payments
+            // to pick up the refund
+            $commissionDate = $data['validateDate'] ?: \DateTime::createFromFormat('U', time());
+            $commissionDate = $this->getNextBusinessDay($commissionDate);
+
             // depending on when the chargeback occurs, we may or may not want to exclude that amount
             // but if they both don't match, then its likely to be a problem
-            if ($policy->hasCorrectCommissionPayments($data['validateDate'], $allowedVariance) === false &&
-                $policy->hasCorrectCommissionPayments($data['validateDate'], $allowedVariance, true) === false) {
+            if ($policy->hasCorrectCommissionPayments($commissionDate, $allowedVariance) === false &&
+                $policy->hasCorrectCommissionPayments($commissionDate, $allowedVariance, true) === false) {
                 // Ignore a couple of policies that should have been cancelled unpaid, but went to expired
                 if (!in_array($policy->getId(), Salva::$commissionValidationExclusions)) {
                     $this->header($policy, $policies, $lines);
-                    $lines[] = $this->failureCommissionMessage($policy, $data['prefix'], $data['validateDate']);
+                    $lines[] = $this->failureCommissionMessage($policy, $data['prefix'], $commissionDate);
                 }
             }
 

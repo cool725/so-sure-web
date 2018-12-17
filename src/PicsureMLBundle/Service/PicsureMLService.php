@@ -230,11 +230,15 @@ class PicsureMLService
         $csv = [];
 
         foreach ($results as $result) {
-            if ($result->hasLabel()) {
+            if ($result->hasLabel() && $result->hasAnnotation()) {
                 $csv[] = sprintf(
-                    "%s/%s,%s",
+                    "%s/%s %d %d %d %d %s",
                     $result->getBucket(),
                     $result->getImagePath(),
+                    $result->getX(),
+                    $result->getY(),
+                    $result->getWidth(),
+                    $result->getHeight(),
                     $result->getLabel()
                 );
             }
@@ -270,7 +274,7 @@ class PicsureMLService
         $results = $qb->getQuery()->execute();
 
         foreach ($results as $result) {
-            if ($result->hasAnnotation()) {
+            if ($result->getForDetection() && $result->hasAnnotation()) {
                 $annotations[] = sprintf(
                     "%s/%s %d %d %d %d",
                     $result->getBucket(),

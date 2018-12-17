@@ -106,7 +106,10 @@ class FOSUBUserProvider extends BaseClass
         $setter_token = $setter.'AccessToken';
 
         //we "disconnect" previously connected users
-        if (null != $previousUser = $this->userManager->findUserBy(array($property => $username))) {
+        /** @var \FOS\UserBundle\Model\UserInterface $previousUser */
+        $previousUser = $this->userManager->findUserBy(array($property => $username));
+        if ($previousUser) {
+            /** @var UserInterface $previousUser */
             $previousUser->$setter_id(null);
             $previousUser->$setter_token(null);
             $this->userManager->updateUser($previousUser);

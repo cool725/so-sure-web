@@ -10,6 +10,9 @@ class Search
     /** @var string */
     protected $label;
 
+    /** @var bool */
+    protected $forDetection;
+
     /** @var int */
     protected $imagesPerPage;
 
@@ -31,6 +34,16 @@ class Search
     public function setLabel(String $label)
     {
         $this->label = $label;
+    }
+
+    public function getForDetection()
+    {
+        return $this->forDetection;
+    }
+    
+    public function setForDetection(bool $forDetection)
+    {
+        $this->forDetection = $forDetection;
     }
 
     public function getImagesPerPage()

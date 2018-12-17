@@ -4,6 +4,7 @@ namespace AppBundle\Tests\Classes;
 
 use AppBundle\Classes\DirectGroupHandlerClaim;
 use AppBundle\Document\Claim;
+use AppBundle\Document\PolicyTerms;
 
 /**
  * @group unit
@@ -321,70 +322,90 @@ class DirectGroupHandlerClaimTest extends \PHPUnit\Framework\TestCase
 
     public function testClaimsExcess()
     {
+        $claim = new Claim();
+
         $directGroup = new DirectGroupHandlerClaim();
         $directGroup->lossType = "Loss - From Pocket";
-        $directGroup->excess = 70;
         $this->assertEquals(Claim::TYPE_LOSS, $directGroup->getClaimType());
-        $this->assertTrue($directGroup->isExcessValueCorrect(false, false));
-        $this->assertTrue($directGroup->isExcessValueCorrect(true, false));
-        $this->assertTrue($directGroup->isExcessValueCorrect(true, true));
-        $this->assertFalse($directGroup->isExcessValueCorrect(false, true));
+        $claim->setType($directGroup->getClaimType(), true);
+
+        $directGroup->excess = 70;
+        $claim->setExpectedExcess(PolicyTerms::getLowExcess());
+        $this->assertTrue($directGroup->isExcessValueCorrect($claim));
+
         $directGroup->excess = 150;
-        $this->assertTrue($directGroup->isExcessValueCorrect(false, true));
+        $claim->setExpectedExcess(PolicyTerms::getHighExcess());
+        $this->assertTrue($directGroup->isExcessValueCorrect($claim));
+
         $directGroup->excess = -150;
-        $this->assertTrue($directGroup->isExcessValueCorrect(false, true, true));
-        $this->assertFalse($directGroup->isExcessValueCorrect(false, true, false));
+        $claim->setExpectedExcess(PolicyTerms::getHighExcess());
+        $this->assertTrue($directGroup->isExcessValueCorrect($claim, true));
+        $this->assertFalse($directGroup->isExcessValueCorrect($claim, false));
 
         $directGroup->lossType = "Warranty - Audio Fault";
-        $directGroup->excess = 50;
         $this->assertEquals(Claim::TYPE_WARRANTY, $directGroup->getClaimType());
-        $this->assertTrue($directGroup->isExcessValueCorrect(false, false));
-        $this->assertTrue($directGroup->isExcessValueCorrect(true, false));
-        $this->assertTrue($directGroup->isExcessValueCorrect(true, true));
-        $this->assertFalse($directGroup->isExcessValueCorrect(false, true));
+        $claim->setType($directGroup->getClaimType(), true);
+
+        $directGroup->excess = 50;
+        $claim->setExpectedExcess(PolicyTerms::getLowExcess());
+        $this->assertTrue($directGroup->isExcessValueCorrect($claim));
+
         $directGroup->excess = 150;
-        $this->assertTrue($directGroup->isExcessValueCorrect(false, true));
+        $claim->setExpectedExcess(PolicyTerms::getHighExcess());
+        $this->assertTrue($directGroup->isExcessValueCorrect($claim));
+
         $directGroup->excess = -150;
-        $this->assertTrue($directGroup->isExcessValueCorrect(false, true, true));
-        $this->assertFalse($directGroup->isExcessValueCorrect(false, true, false));
+        $claim->setExpectedExcess(PolicyTerms::getHighExcess());
+        $this->assertTrue($directGroup->isExcessValueCorrect($claim, true));
+        $this->assertFalse($directGroup->isExcessValueCorrect($claim, false));
 
         $directGroup->lossType = "Accidental Damage - Dropped (Away From Home)   ";
-        $directGroup->excess = 50;
         $this->assertEquals(Claim::TYPE_DAMAGE, $directGroup->getClaimType());
-        $this->assertTrue($directGroup->isExcessValueCorrect(false, false));
-        $this->assertTrue($directGroup->isExcessValueCorrect(true, false));
-        $this->assertTrue($directGroup->isExcessValueCorrect(true, true));
-        $this->assertFalse($directGroup->isExcessValueCorrect(false, true));
+        $claim->setType($directGroup->getClaimType(), true);
+
+        $directGroup->excess = 50;
+        $claim->setExpectedExcess(PolicyTerms::getLowExcess());
+        $this->assertTrue($directGroup->isExcessValueCorrect($claim));
+
         $directGroup->excess = 150;
-        $this->assertTrue($directGroup->isExcessValueCorrect(false, true));
+        $claim->setExpectedExcess(PolicyTerms::getHighExcess());
+        $this->assertTrue($directGroup->isExcessValueCorrect($claim));
+
         $directGroup->excess = -150;
-        $this->assertTrue($directGroup->isExcessValueCorrect(false, true, true));
-        $this->assertFalse($directGroup->isExcessValueCorrect(false, true, false));
+        $claim->setExpectedExcess(PolicyTerms::getHighExcess());
+        $this->assertTrue($directGroup->isExcessValueCorrect($claim, true));
+        $this->assertFalse($directGroup->isExcessValueCorrect($claim, false));
 
         $directGroup->lossType = "Theft - From Pocket";
+        $claim->setExpectedExcess(PolicyTerms::getLowExcess());
+        $claim->setType($directGroup->getClaimType(), true);
+
         $directGroup->excess = 70;
-        $this->assertEquals(Claim::TYPE_THEFT, $directGroup->getClaimType());
-        $this->assertTrue($directGroup->isExcessValueCorrect(false, false));
-        $this->assertTrue($directGroup->isExcessValueCorrect(true, false));
-        $this->assertTrue($directGroup->isExcessValueCorrect(true, true));
-        $this->assertFalse($directGroup->isExcessValueCorrect(false, true));
+        $this->assertTrue($directGroup->isExcessValueCorrect($claim));
+
         $directGroup->excess = 150;
-        $this->assertTrue($directGroup->isExcessValueCorrect(false, true));
+        $claim->setExpectedExcess(PolicyTerms::getHighExcess());
+        $this->assertTrue($directGroup->isExcessValueCorrect($claim));
+
         $directGroup->excess = -150;
-        $this->assertTrue($directGroup->isExcessValueCorrect(false, true, true));
-        $this->assertFalse($directGroup->isExcessValueCorrect(false, true, false));
+        $claim->setExpectedExcess(PolicyTerms::getHighExcess());
+        $this->assertTrue($directGroup->isExcessValueCorrect($claim, true));
+        $this->assertFalse($directGroup->isExcessValueCorrect($claim, false));
 
         $directGroup->lossType = "Extended Warranty - Audio Fault";
+        $claim->setType($directGroup->getClaimType(), true);
+
         $directGroup->excess = 50;
-        $this->assertEquals(Claim::TYPE_EXTENDED_WARRANTY, $directGroup->getClaimType());
-        $this->assertTrue($directGroup->isExcessValueCorrect(false, false));
-        $this->assertTrue($directGroup->isExcessValueCorrect(true, false));
-        $this->assertTrue($directGroup->isExcessValueCorrect(true, true));
-        $this->assertFalse($directGroup->isExcessValueCorrect(false, true));
+        $claim->setExpectedExcess(PolicyTerms::getLowExcess());
+        $this->assertTrue($directGroup->isExcessValueCorrect($claim));
+
         $directGroup->excess = 150;
-        $this->assertTrue($directGroup->isExcessValueCorrect(false, true));
+        $claim->setExpectedExcess(PolicyTerms::getHighExcess());
+        $this->assertTrue($directGroup->isExcessValueCorrect($claim));
+
         $directGroup->excess = -150;
-        $this->assertTrue($directGroup->isExcessValueCorrect(false, true, true));
-        $this->assertFalse($directGroup->isExcessValueCorrect(false, true, false));
+        $claim->setExpectedExcess(PolicyTerms::getHighExcess());
+        $this->assertTrue($directGroup->isExcessValueCorrect($claim, true));
+        $this->assertFalse($directGroup->isExcessValueCorrect($claim, false));
     }
 }

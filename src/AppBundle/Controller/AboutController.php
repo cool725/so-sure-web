@@ -2,6 +2,7 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Form\Type\ContactUsType;
 use AppBundle\Service\IntercomService;
 use AppBundle\Service\MailerService;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -98,12 +99,7 @@ class AboutController extends BaseController
     public function howToContactSoSureAction(Request $request)
     {
         $contactForm = $this->get('form.factory')
-            ->createNamedBuilder('contact_form')
-            ->add('email', EmailType::class)
-            ->add('name', TextType::class)
-            ->add('phone', TextType::class)
-            ->add('message', TextareaType::class)
-            ->add('submit', SubmitType::class)
+            ->createNamedBuilder('contact_form', ContactUsType::class)
             ->getForm();
 
         if ('POST' === $request->getMethod()) {
@@ -142,6 +138,11 @@ class AboutController extends BaseController
                     );
 
                     return $this->redirectToRoute('about_how_to_contact_so_sure');
+                } else {
+                    $this->addFlash(
+                        'error',
+                        "Sorry, there was a problem validating your request. Please check below for any errors."
+                    );
                 }
             }
         }

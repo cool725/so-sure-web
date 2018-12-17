@@ -65,22 +65,25 @@
 
                         <div class="panel panel-info">
                             <div class="panel-heading">
-                                <h3 class="panel-title">{{ sectionCount }}. Contacting your Mobile Provider</h3>
+                                <h3 class="panel-title">{{ sectionCount }}. Contact your mobile network</h3>
                                 {% set sectionCount = sectionCount + 1 %}
                             </div>
                             <div class="panel-body">
-                                You'll need to call up your mobile phone provider and:
+                                You'll need to call or email your mobile network to:
                                 <ol>
                                     <li>
-                                        Let them know your phone has been stolen and <strong>request that your phone is blocked</strong>.
+                                        Let them know your phone has been stolen
                                     </li>
                                     <li>
-                                        Request a <strong>Proof of Barring</strong> document from them.
+                                        Request that they block your phone and IMEI
+                                    </li>
+                                    <li>
+                                        Request a <strong>Proof of Barring</strong> document from them
                                     </li>
                                     {% if claim_form.proofOfUsage is defined %}
-                                    <li>
-                                        Request a <strong>Proof of Usage</strong> report. This is a standard document and the network provider will easily able to email or post this document to you (ask for email for a quicker claim).  This document has your IMEI number and the first and last time that IMEI was used on their network.
-                                    </li>
+                                        <li>
+                                            Request a <strong>Proof of Usage</strong> report. This is a standard document and the network provider will easily able to email or post this document to you (ask for email for a quicker claim).  This document has your IMEI number and the first and last time that IMEI was used on their network.
+                                        </li>
                                     {% endif %}
                                 </ol>
                             </div>

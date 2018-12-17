@@ -968,13 +968,15 @@ class PolicyService
      *                                               we need to close out claims
      * @param \DateTime $date
      * @param boolean   $skipUnpaidMinTimeframeCheck Require at least 15 days from last unpaid status change
+     * @param boolean   $fullRefund                  Provide a full refund to the customer
      */
     public function cancel(
         Policy $policy,
         $reason,
         $closeOpenClaims = false,
         \DateTime $date = null,
-        $skipUnpaidMinTimeframeCheck = false
+        $skipUnpaidMinTimeframeCheck = false,
+        $fullRefund = false
     ) {
         if ($reason == Policy::CANCELLED_UNPAID && !$skipUnpaidMinTimeframeCheck) {
             /** @var LogEntryRepository $logRepo */
@@ -1019,7 +1021,8 @@ class PolicyService
             }
             $this->dm->flush();
         }
-        $policy->cancel($reason, $date);
+
+        $policy->cancel($reason, $date, $fullRefund);
         $this->dm->flush();
         $this->cancelledPolicyEmail($policy);
         $this->cancelledPolicySms($policy);
@@ -1149,7 +1152,10 @@ class PolicyService
      */
     public function tasteCardEmail($policy)
     {
-        if ($this->mailer) {
+        if (!$policy->getTasteCard()) {
+            $policyNumber = $policy->getPolicyNumber();
+            $this->logger->error("Trying to notify policy {$policyNumber} of nonexistent tastecard.");
+        } elseif ($this->mailer) {
             $this->mailer->sendTemplate(
                 "Your new Taste Card from So-Sure",
                 $policy->getUser()->getEmail(),

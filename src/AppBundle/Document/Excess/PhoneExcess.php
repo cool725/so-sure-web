@@ -2,6 +2,7 @@
 
 namespace AppBundle\Document\Excess;
 
+use AppBundle\Document\Claim;
 use AppBundle\Document\CurrencyTrait;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Gedmo\Mapping\Annotation as Gedmo;
@@ -99,6 +100,24 @@ class PhoneExcess extends Excess
     public function setTheft($theft)
     {
         $this->theft = $theft;
+    }
+
+    public function getValue($type)
+    {
+        switch ($type) {
+            case Claim::TYPE_DAMAGE:
+                return $this->getDamage();
+            case Claim::TYPE_WARRANTY:
+                return $this->getWarranty();
+            case Claim::TYPE_EXTENDED_WARRANTY:
+                return $this->getExtendedWarranty();
+            case Claim::TYPE_LOSS:
+                return $this->getLoss();
+            case Claim::TYPE_THEFT:
+                return $this->getTheft();
+            default:
+                throw new \Exception(sprintf("Unknown Claim Type %s", $type));
+        }
     }
 
     public function __toString()

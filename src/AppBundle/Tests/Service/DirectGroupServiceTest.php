@@ -4,6 +4,7 @@ namespace AppBundle\Tests\Service;
 
 use AppBundle\Classes\DirectGroupHandlerClaim;
 use AppBundle\Document\Policy;
+use AppBundle\Document\PolicyTerms;
 use AppBundle\Service\DaviesService;
 use AppBundle\Service\DirectGroupService;
 use AppBundle\Service\DirectGroupServiceExcel;
@@ -36,6 +37,12 @@ class DirectGroupServiceTest extends WebTestCase
     protected static $phoneA;
     protected static $phoneB;
 
+    /** @var PolicyTerms */
+    protected static $policyTerms;
+
+    /** @var PolicyTerms */
+    protected static $nonPicSurePolicyTerms;
+
     public static function setUpBeforeClass()
     {
         //start the symfony kernel
@@ -58,6 +65,12 @@ class DirectGroupServiceTest extends WebTestCase
         self::$phone = $phoneRepo->findOneBy(['devices' => 'iPhone 7', 'memory' => 64]);
         self::$phoneA = $phoneRepo->findOneBy(['devices' => 'iPhone 5', 'memory' => 64]);
         self::$phoneB = $phoneRepo->findOneBy(['devices' => 'A0001', 'memory' => 64]);
+
+        static::$policyTerms = new PolicyTerms();
+        static::$policyTerms->setVersion(PolicyTerms::VERSION_10);
+
+        static::$nonPicSurePolicyTerms = new PolicyTerms();
+        static::$nonPicSurePolicyTerms->setVersion(PolicyTerms::VERSION_1);
     }
 
     public function setUp()
@@ -323,15 +336,19 @@ class DirectGroupServiceTest extends WebTestCase
         $policyOpen->getUser()->setEmail(static::generateEmail('testSaveClaimsOpenDavies', $this));
         $initialImei = $policyOpen->getImei();
         $claimOpen = new Claim();
+        $claimOpen->setType(Claim::TYPE_LOSS);
         $claimOpen->setStatus(Claim::STATUS_APPROVED);
         $claimOpen->setNumber(self::getRandomPolicyNumber('TEST'));
         $claimOpen->setHandlingTeam(Claim::TEAM_DAVIES);
 
         if (!$verifyTest) {
             $policyOpen->addClaim($claimOpen);
+        } else {
+            $claimOpen->setExpectedExcess(PolicyTerms::getHighExcess());
         }
 
         $claimOpen2 = new Claim();
+        $claimOpen2->setType(Claim::TYPE_LOSS);
         $claimOpen2->setNumber(self::getRandomPolicyNumber('TEST'));
         $claimOpen2->setStatus(Claim::STATUS_APPROVED);
         $claimOpen2->setReplacementImei(static::generateRandomImei());
@@ -346,6 +363,10 @@ class DirectGroupServiceTest extends WebTestCase
         self::$directGroupService->clearErrors();
         self::$directGroupService->clearWarnings();
         self::$directGroupService->clearSoSureActions();
+
+        $this->assertNotNull($policyOpen->getCurrentExcess());
+        $this->assertNotNull($claimOpen->getExpectedExcess());
+        $this->assertNotNull($claimOpen2->getExpectedExcess());
 
         $now = \DateTime::createFromFormat('U', time());
         $dgOpen = new DirectGroupHandlerClaim();
@@ -363,6 +384,7 @@ class DirectGroupServiceTest extends WebTestCase
         $dgOpen->initialSuspicion = false;
         $dgOpen->finalSuspicion = false;
         $dgOpen->lossDescription = 'foo bar';
+        $dgOpen->lossType = DirectGroupHandlerClaim::TYPE_LOSS;
 
         $this->assertEquals(0, count(self::$directGroupService->getWarnings()));
         self::$directGroupService->saveClaims(1, [$dgOpen]);
@@ -411,13 +433,15 @@ class DirectGroupServiceTest extends WebTestCase
     {
         $policy = new PhonePolicy();
         $policy->setStatus(Policy::STATUS_ACTIVE);
-        $policy->setId('1');
+        $policy->setId(static::getRandomPolicyNumber('TEST'));
+        $policy->setPolicyTerms(static::$policyTerms);
         $policy->setPhone(self::getRandomPhone(self::$dm));
 
         $claim = new Claim();
-        $claim->setPolicy($policy);
+        $claim->setType(Claim::TYPE_LOSS);
         $claim->setNumber(time());
         $claim->setStatus(Claim::STATUS_SETTLED);
+        $policy->addClaim($claim);
 
         $directGroupClaim = new DirectGroupHandlerClaim();
         $directGroupClaim->claimNumber = $claim->getNumber();
@@ -441,14 +465,16 @@ class DirectGroupServiceTest extends WebTestCase
         $user->setLastName('Marulic');
         $policy = new PhonePolicy();
         $policy->setStatus(Policy::STATUS_ACTIVE);
-        $policy->setId('1');
+        $policy->setId(static::getRandomPolicyNumber('TEST'));
+        $policy->setPolicyTerms(static::$policyTerms);
         $policy->setUser($user);
         $policy->setPhone(self::getRandomPhone(self::$dm));
 
         $claim = new Claim();
-        $claim->setPolicy($policy);
+        $claim->setType(Claim::TYPE_LOSS);
         $claim->setNumber(time());
         $claim->setStatus(Claim::STATUS_INREVIEW);
+        $policy->addClaim($claim);
 
         $directGroupClaim = new DirectGroupHandlerClaim();
         $directGroupClaim->claimNumber = $claim->getNumber();
@@ -471,14 +497,16 @@ class DirectGroupServiceTest extends WebTestCase
         $user->setLastName('Marulic');
         $policy = new PhonePolicy();
         $policy->setStatus(Policy::STATUS_ACTIVE);
-        $policy->setId('1');
+        $policy->setId(static::getRandomPolicyNumber('TEST'));
+        $policy->setPolicyTerms(static::$policyTerms);
         $policy->setUser($user);
         $policy->setPhone(self::getRandomPhone(self::$dm));
 
         $claim = new Claim();
-        $claim->setPolicy($policy);
+        $claim->setType(Claim::TYPE_LOSS);
         $claim->setNumber(time());
         $claim->setStatus(Claim::STATUS_INREVIEW);
+        $policy->addClaim($claim);
 
         $directGroupClaim = new DirectGroupHandlerClaim();
         $directGroupClaim->claimNumber = $claim->getNumber();
@@ -501,14 +529,16 @@ class DirectGroupServiceTest extends WebTestCase
         $user->setLastName('Marulic');
         $policy = new PhonePolicy();
         $policy->setStatus(Policy::STATUS_ACTIVE);
-        $policy->setId('1');
+        $policy->setId(static::getRandomPolicyNumber('TEST'));
+        $policy->setPolicyTerms(static::$policyTerms);
         $policy->setUser($user);
         $policy->setPhone(self::getRandomPhone(self::$dm));
 
         $claim = new Claim();
-        $claim->setPolicy($policy);
+        $claim->setType(Claim::TYPE_LOSS);
         $claim->setNumber(time());
         $claim->setStatus(Claim::STATUS_APPROVED);
+        $policy->addClaim($claim);
 
         $directGroupClaim = new DirectGroupHandlerClaim();
         $directGroupClaim->claimNumber = $claim->getNumber();
@@ -531,14 +561,16 @@ class DirectGroupServiceTest extends WebTestCase
         $user->setLastName('Marulic');
         $policy = new PhonePolicy();
         $policy->setStatus(Policy::STATUS_ACTIVE);
-        $policy->setId('1');
+        $policy->setId(static::getRandomPolicyNumber('TEST'));
+        $policy->setPolicyTerms(static::$policyTerms);
         $policy->setUser($user);
         $policy->setPhone(self::getRandomPhone(self::$dm));
 
         $claim = new Claim();
-        $claim->setPolicy($policy);
+        $claim->setType(Claim::TYPE_LOSS);
         $claim->setNumber(time());
         $claim->setStatus(Claim::STATUS_INREVIEW);
+        $policy->addClaim($claim);
 
         $directGroupClaim = new DirectGroupHandlerClaim();
         $directGroupClaim->claimNumber = $claim->getNumber();
@@ -653,7 +685,6 @@ class DirectGroupServiceTest extends WebTestCase
         $claim1->setHandlingTeam(Claim::TEAM_DIRECT_GROUP);
         $policy1->addClaim($claim1);
         $claim1->setNumber('DG1');
-        $claim1->setType(Claim::TYPE_THEFT);
 
         $policy2 = static::createUserPolicy(true);
         $policy2->getUser()->setEmail(static::generateEmail('testSaveClaimsSaveException-2', $this));
@@ -661,6 +692,7 @@ class DirectGroupServiceTest extends WebTestCase
         $claim2->setHandlingTeam(Claim::TEAM_DIRECT_GROUP);
         $policy2->addClaim($claim2);
         $claim2->setNumber('DG2');
+        $claim2->setType(Claim::TYPE_THEFT);
 
         static::$dm->persist($policy1->getUser());
         static::$dm->persist($policy2->getUser());
@@ -673,6 +705,7 @@ class DirectGroupServiceTest extends WebTestCase
         $claim1Id = $claim1->getId();
         $claim2Id = $claim2->getId();
 
+        // expected error
         $dgOpen1 = new DirectGroupHandlerClaim();
         $dgOpen1->claimNumber = 'DG1';
         $dgOpen1->policyNumber = $policy1->getPolicyNumber();
@@ -681,8 +714,9 @@ class DirectGroupServiceTest extends WebTestCase
         $dgOpen1->reserved = 1;
         $dgOpen1->riskPostCode = 'BX1 1LT';
         $dgOpen1->insuredName = 'Foo Bar';
-        //$dgOpen1->type = DaviesClaim::TYPE_LOSS;
+        //$dgOpen1->lossType = DirectGroupHandlerClaim::TYPE_THEFT;
 
+        // should be saved
         $dgOpen2 = new DirectGroupHandlerClaim();
         $dgOpen2->claimNumber = 'DG2';
         $dgOpen2->policyNumber = $policy2->getPolicyNumber();
@@ -691,7 +725,7 @@ class DirectGroupServiceTest extends WebTestCase
         $dgOpen2->reserved = 2;
         $dgOpen2->riskPostCode = 'BX1 1LT';
         $dgOpen2->insuredName = 'Foo Bar';
-        //$dgOpen2->type = DaviesClaim::TYPE_LOSS;
+        $dgOpen2->lossType = DirectGroupHandlerClaim::TYPE_THEFT;
 
         self::$directGroupService->clearErrors();
 
@@ -701,6 +735,7 @@ class DirectGroupServiceTest extends WebTestCase
 
         // print_r(self::$directGroupService->getErrors());
 
+        // Claims type does not match for claim 1 [Record import failed]
         $this->assertEquals(1, count(self::$directGroupService->getErrors()));
 
         $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
@@ -796,6 +831,7 @@ class DirectGroupServiceTest extends WebTestCase
         $policy->setPhone(self::getRandomPhone(self::$dm));
 
         $claim = new Claim();
+        $claim->setType(Claim::TYPE_LOSS);
         $policy->addClaim($claim);
         $policy->setPolicyNumber('TEST/2017/123456');
 
@@ -850,6 +886,7 @@ class DirectGroupServiceTest extends WebTestCase
     {
         $policy = static::createUserPolicy(true);
         $claim = new Claim();
+        $claim->setType(Claim::TYPE_LOSS);
         $policy->addClaim($claim);
 
         $directGroupClaim = new DirectGroupHandlerClaim();
@@ -874,6 +911,7 @@ class DirectGroupServiceTest extends WebTestCase
     {
         $policy = static::createUserPolicy(true);
         $claim = new Claim();
+        $claim->setType(Claim::TYPE_LOSS);
         $policy->addClaim($claim);
 
         $directGroupClaim = new DirectGroupHandlerClaim();
@@ -891,6 +929,7 @@ class DirectGroupServiceTest extends WebTestCase
     {
         $policy = static::createUserPolicy(true);
         $claim = new Claim();
+        $claim->setType(Claim::TYPE_LOSS);
         $claim->setStatus(Claim::STATUS_SETTLED);
         $policy->addClaim($claim);
 
@@ -911,6 +950,7 @@ class DirectGroupServiceTest extends WebTestCase
     {
         $policy = static::createUserPolicy(true);
         $claim = new Claim();
+        $claim->setType(Claim::TYPE_LOSS);
         $claim->setStatus(Claim::STATUS_SETTLED);
         $policy->addClaim($claim);
 
@@ -931,6 +971,7 @@ class DirectGroupServiceTest extends WebTestCase
     {
         $policy = static::createUserPolicy(true);
         $claim = new Claim();
+        $claim->setType(Claim::TYPE_LOSS);
         $policy->addClaim($claim);
 
         $directGroupClaim = new DirectGroupHandlerClaim();
@@ -950,6 +991,7 @@ class DirectGroupServiceTest extends WebTestCase
     {
         $policy = static::createUserPolicy(true);
         $claim = new Claim();
+        $claim->setType(Claim::TYPE_LOSS);
         $policy->addClaim($claim);
 
         $directGroupClaim = new DirectGroupHandlerClaim();
@@ -977,6 +1019,7 @@ class DirectGroupServiceTest extends WebTestCase
         $policy = static::createUserPolicy(true);
         $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_APPROVED);
         $claim = new Claim();
+        $claim->setType(Claim::TYPE_LOSS);
         $policy->addClaim($claim);
 
         $directGroupClaim = new DirectGroupHandlerClaim();
@@ -998,6 +1041,7 @@ class DirectGroupServiceTest extends WebTestCase
         $policy = static::createUserPolicy(true);
         $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_APPROVED);
         $claim = new Claim();
+        $claim->setType(Claim::TYPE_LOSS);
         $policy->addClaim($claim);
 
         $directGroupClaim = new DirectGroupHandlerClaim();
@@ -1019,6 +1063,7 @@ class DirectGroupServiceTest extends WebTestCase
         $policy = static::createUserPolicy(true);
         $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_REJECTED);
         $claim = new Claim();
+        $claim->setType(Claim::TYPE_LOSS);
         $policy->addClaim($claim);
 
         $directGroupClaim = new DirectGroupHandlerClaim();
@@ -1039,6 +1084,7 @@ class DirectGroupServiceTest extends WebTestCase
     {
         $policy = static::createUserPolicy(true);
         $claim = new Claim();
+        $claim->setType(Claim::TYPE_LOSS);
         $policy->addClaim($claim);
 
         $directGroupClaim = new DirectGroupHandlerClaim();
@@ -1057,6 +1103,7 @@ class DirectGroupServiceTest extends WebTestCase
     {
         $policy = static::createUserPolicy(true);
         $claim = new Claim();
+        $claim->setType(Claim::TYPE_LOSS);
         $policy->addClaim($claim);
 
         $directGroupClaim = new DirectGroupHandlerClaim();
@@ -1075,6 +1122,7 @@ class DirectGroupServiceTest extends WebTestCase
     {
         $policy = static::createUserPolicy(true);
         $claim = new Claim();
+        $claim->setType(Claim::TYPE_LOSS);
         $policy->addClaim($claim);
 
         $directGroupClaim = new DirectGroupHandlerClaim();
@@ -1093,6 +1141,7 @@ class DirectGroupServiceTest extends WebTestCase
     {
         $policy = static::createUserPolicy(true);
         $claim = new Claim();
+        $claim->setType(Claim::TYPE_LOSS);
         $policy->addClaim($claim);
 
         $twelveDaysAgo = \DateTime::createFromFormat('U', time());
@@ -1125,6 +1174,7 @@ class DirectGroupServiceTest extends WebTestCase
     {
         $policy = static::createUserPolicy(true);
         $claim = new Claim();
+        $claim->setType(Claim::TYPE_LOSS);
         $policy->addClaim($claim);
 
         $fourDaysAgo = \DateTime::createFromFormat('U', time());
@@ -1153,6 +1203,7 @@ class DirectGroupServiceTest extends WebTestCase
     {
         $policy = static::createUserPolicy(true);
         $claim = new Claim();
+        $claim->setType(Claim::TYPE_LOSS);
         $policy->addClaim($claim);
 
         $directGroupClaim = new DirectGroupHandlerClaim();
@@ -1176,6 +1227,7 @@ class DirectGroupServiceTest extends WebTestCase
     {
         $policy = static::createUserPolicy(true);
         $claim = new Claim();
+        $claim->setType(Claim::TYPE_LOSS);
         $policy->addClaim($claim);
 
         $directGroupClaim = new DirectGroupHandlerClaim();
@@ -1199,6 +1251,7 @@ class DirectGroupServiceTest extends WebTestCase
     {
         $policy = static::createUserPolicy(true);
         $claim = new Claim();
+        $claim->setType(Claim::TYPE_LOSS);
         $policy->addClaim($claim);
 
         $directGroupClaim = new DirectGroupHandlerClaim();
@@ -1225,6 +1278,7 @@ class DirectGroupServiceTest extends WebTestCase
     {
         $policy = static::createUserPolicy(true);
         $claim = new Claim();
+        $claim->setType(Claim::TYPE_LOSS);
         $claim->setApprovedDate(new \DateTime('2016-01-02'));
         $policy->addClaim($claim);
 
@@ -1258,6 +1312,7 @@ class DirectGroupServiceTest extends WebTestCase
     {
         $policy = static::createUserPolicy(true);
         $claim = new Claim();
+        $claim->setType(Claim::TYPE_LOSS);
         $claim->setApprovedDate(new \DateTime('2016-01-02'));
         $policy->addClaim($claim);
 
@@ -1295,6 +1350,7 @@ class DirectGroupServiceTest extends WebTestCase
     {
         $policy = static::createUserPolicy(true);
         $claim = new Claim();
+        $claim->setType(Claim::TYPE_LOSS);
         $claim->setApprovedDate(new \DateTime('2016-01-02'));
         $policy->addClaim($claim);
 
@@ -1327,6 +1383,7 @@ class DirectGroupServiceTest extends WebTestCase
     {
         $policy = static::createUserPolicy(true);
         $claim = new Claim();
+        $claim->setType(Claim::TYPE_LOSS);
         $claim->setApprovedDate(new \DateTime('2016-01-04'));
         $policy->addClaim($claim);
 
@@ -1354,6 +1411,7 @@ class DirectGroupServiceTest extends WebTestCase
     {
         $policy = static::createUserPolicy(true);
         $claim = new Claim();
+        $claim->setType(Claim::TYPE_LOSS);
         // 3 months!
         $claim->setApprovedDate(new \DateTime('2016-04-01'));
         $policy->addClaim($claim);
@@ -1388,6 +1446,7 @@ class DirectGroupServiceTest extends WebTestCase
     {
         $policy = static::createUserPolicy(true);
         $claim = new Claim();
+        $claim->setType(Claim::TYPE_LOSS);
         // 2 weeks
         $twoWeekAgo = \DateTime::createFromFormat('U', time());
         $twoWeekAgo = $twoWeekAgo->sub(new \DateInterval('P14D'));

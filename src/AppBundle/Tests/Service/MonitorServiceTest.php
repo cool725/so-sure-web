@@ -12,6 +12,7 @@ use AppBundle\Document\SCode;
 use AppBundle\Document\User;
 use AppBundle\Exception\MonitorException;
 use AppBundle\Form\Type\UserRoleType;
+use AppBundle\Repository\ClaimRepository;
 use AppBundle\Repository\Invitation\InvitationRepository;
 use AppBundle\Service\InvitationService;
 use AppBundle\Service\MonitorService;
@@ -87,6 +88,16 @@ class MonitorServiceTest extends WebTestCase
 
     public function testClaimsSettledUnprocessedOk()
     {
+        // Ensure any existing unprocessed claims are settled
+        /** @var ClaimRepository $repo */
+        $repo = static::$dm->getRepository(Claim::class);
+        $claims = $repo->findSettledUnprocessed();
+        foreach ($claims as $claim) {
+            /** @var Claim $claim */
+            $claim->setProcessed(true);
+        }
+        static::$dm->flush();
+
         // should not be throwing an exception
         self::$monitor->claimsSettledUnprocessed();
 
@@ -209,7 +220,16 @@ class MonitorServiceTest extends WebTestCase
         self::$dm->persist($policy);
         self::$dm->flush();
 
-        self::$monitor->invalidPolicy();
+        /** @var \Symfony\Component\DependencyInjection\Container $container */
+        $container = self::$container;
+
+        if (!$container) {
+            throw new \Exception('Unable to load container');
+        }
+
+        /** @var MonitorService $monitor */
+        $monitor = $container->get('app.monitor');
+        $monitor->invalidPolicy();
     }
 
     /**
@@ -296,6 +316,70 @@ class MonitorServiceTest extends WebTestCase
         self::$dm->flush();
 
         self::$monitor->duplicateEmailInvites();
+    }
+
+    public function testPolicyImeiOnMultiplePoliciesPending()
+    {
+        $phone = self::getRandomPhone(self::$dm);
+        $imei = self::generateRandomImei();
+
+        for ($i = 0; $i < 3; $i++) {
+            $user = self::createUser(
+                self::$userManager,
+                self::generateEmail('testPolicyImeiOnMultiplePoliciesPending', $this, true),
+                'foo'
+            );
+
+            $policy = self::initPolicy(
+                $user,
+                self::$dm,
+                $phone,
+                null,
+                true,
+                true
+            );
+            $policy->setImei($imei);
+            $policy->setPolicyNumber(self::getRandomPolicyNumber('Mob'));
+
+            self::assertEquals(Policy::STATUS_PENDING, $policy->getStatus());
+        }
+
+        self::$dm->flush();
+
+        self::$monitor->policyImeiOnMultiplePolicies();
+    }
+
+    /**
+     * @expectedException \AppBundle\Exception\MonitorException
+     */
+    public function testPolicyImeiOnMultiplePolicies()
+    {
+        $phone = self::getRandomPhone(self::$dm);
+        $imei = self::generateRandomImei();
+
+        for ($i = 0; $i < 3; $i++) {
+            $user = self::createUser(
+                self::$userManager,
+                self::generateEmail('testPolicyImeiOnMultiplePolicies', $this, true),
+                'foo'
+            );
+
+            $policy = self::initPolicy(
+                $user,
+                self::$dm,
+                $phone,
+                null,
+                true,
+                true
+            );
+            $policy->setImei($imei);
+            $policy->setStatus(Policy::STATUS_ACTIVE);
+            $policy->setPolicyNumber(self::getRandomPolicyNumber('Mob'));
+        }
+
+        self::$dm->flush();
+
+        self::$monitor->policyImeiOnMultiplePolicies();
     }
 
     /**

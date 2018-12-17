@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d09dbcbed57a0979d80a28f82a6f9228",
+    "content-hash": "8cc31c66497d69869474fb34a41a987a",
     "packages": [
         {
             "name": "alcaeus/mongo-php-adapter",
@@ -1535,6 +1535,60 @@
             "time": "2018-08-16T20:49:45+00:00"
         },
         {
+            "name": "excelwebzone/recaptcha-bundle",
+            "version": "v1.5.12",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/excelwebzone/EWZRecaptchaBundle.git",
+                "reference": "110f85ad9c843d1b1bb51e90777b28b2034c7c17"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/excelwebzone/EWZRecaptchaBundle/zipball/110f85ad9c843d1b1bb51e90777b28b2034c7c17",
+                "reference": "110f85ad9c843d1b1bb51e90777b28b2034c7c17",
+                "shasum": ""
+            },
+            "require": {
+                "google/recaptcha": "^1.1",
+                "php": ">=5.6 || ^7.0",
+                "symfony/form": "^2.8 || ^3.0 || ^4.0",
+                "symfony/framework-bundle": "^2.8 || ^3.0 || ^4.0",
+                "symfony/security-bundle": "^2.8 || ^3.0 || ^4.0",
+                "symfony/validator": "^2.8 || ^3.0 || ^4.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^5 || ^6 || ^7"
+            },
+            "type": "symfony-bundle",
+            "extra": {
+                "symfony": {
+                    "allow-contrib": "true"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "EWZ\\Bundle\\RecaptchaBundle\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Michael H. Arieli",
+                    "email": "excelwebzone@gmail.com",
+                    "homepage": "http://excelwebzone.com/"
+                }
+            ],
+            "description": "This bundle provides easy reCAPTCHA form field integration",
+            "homepage": "https://github.com/excelwebzone/EWZRecaptchaBundle",
+            "keywords": [
+                "recaptcha"
+            ],
+            "time": "2018-11-30T20:00:00+00:00"
+        },
+        {
             "name": "facebook/graph-sdk",
             "version": "5.6.3",
             "source": {
@@ -2228,6 +2282,53 @@
                 "oauth2"
             ],
             "time": "2018-04-06T19:26:30+00:00"
+        },
+        {
+            "name": "google/recaptcha",
+            "version": "1.2.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/google/recaptcha.git",
+                "reference": "e7add3be59211482ecdb942288f52da64a35f61a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/google/recaptcha/zipball/e7add3be59211482ecdb942288f52da64a35f61a",
+                "reference": "e7add3be59211482ecdb942288f52da64a35f61a",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.5"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^2.2.20|^2.12",
+                "php-coveralls/php-coveralls": "^2.1",
+                "phpunit/phpunit": "^4.8.36|^5.7.27|^6.59|^7"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.2.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "ReCaptcha\\": "src/ReCaptcha"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "description": "Client library for reCAPTCHA, a free service that protects websites from spam and abuse.",
+            "homepage": "https://www.google.com/recaptcha/",
+            "keywords": [
+                "Abuse",
+                "captcha",
+                "recaptcha",
+                "spam"
+            ],
+            "time": "2018-08-05T09:31:53+00:00"
         },
         {
             "name": "guzzle/guzzle",
@@ -3304,16 +3405,16 @@
         },
         {
             "name": "judopay/judopay-sdk",
-            "version": "2.0.1.2",
+            "version": "2.0.1.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/so-sure/Judo-PHP.git",
-                "reference": "ef7769e4295eb62e0ac3abafaa85f558e0186ac6"
+                "reference": "040344788e721476ad7dff1e4eb579e222c3dec9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/so-sure/Judo-PHP/zipball/ef7769e4295eb62e0ac3abafaa85f558e0186ac6",
-                "reference": "ef7769e4295eb62e0ac3abafaa85f558e0186ac6",
+                "url": "https://api.github.com/repos/so-sure/Judo-PHP/zipball/040344788e721476ad7dff1e4eb579e222c3dec9",
+                "reference": "040344788e721476ad7dff1e4eb579e222c3dec9",
                 "shasum": ""
             },
             "require": {
@@ -3363,9 +3464,9 @@
                 "payment"
             ],
             "support": {
-                "source": "https://github.com/so-sure/Judo-PHP/tree/2.0.1.2"
+                "source": "https://github.com/so-sure/Judo-PHP/tree/2.0.1.5"
             },
-            "time": "2016-10-17T16:39:52+00:00"
+            "time": "2018-12-12T17:22:28+00:00"
         },
         {
             "name": "knplabs/knp-snappy",
@@ -5472,31 +5573,41 @@
         },
         {
             "name": "rollbar/rollbar",
-            "version": "v0.18.2",
+            "version": "v1.7.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/rollbar/rollbar-php.git",
-                "reference": "fafe13f8beb669d6bba0137f3703fa808d50cbb7"
+                "reference": "c2f8be87983ecdd3c46ceb3c459de02376af4707"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/rollbar/rollbar-php/zipball/fafe13f8beb669d6bba0137f3703fa808d50cbb7",
-                "reference": "fafe13f8beb669d6bba0137f3703fa808d50cbb7",
+                "url": "https://api.github.com/repos/rollbar/rollbar-php/zipball/c2f8be87983ecdd3c46ceb3c459de02376af4707",
+                "reference": "c2f8be87983ecdd3c46ceb3c459de02376af4707",
                 "shasum": ""
             },
             "require": {
-                "ext-curl": "*"
+                "ext-curl": "*",
+                "monolog/monolog": "^1.23",
+                "psr/log": "^1.0.1"
             },
             "require-dev": {
+                "codeclimate/php-test-reporter": "dev-master",
                 "mockery/mockery": "0.9.*",
-                "phpunit/phpunit": "4.5.*"
+                "monolog/monolog": "^1.23",
+                "packfire/php5.3-compat": "*",
+                "phpmd/phpmd": "@stable",
+                "phpunit/phpunit": "4.8.*",
+                "squizlabs/php_codesniffer": "2.*"
+            },
+            "suggest": {
+                "fluent/logger": "Needed to use the 'fluent' handler for fluentd support",
+                "packfire/php5.3-compat": "for backward compatibility with PHP 5.3"
             },
             "type": "library",
             "autoload": {
-                "classmap": [
-                    "src/Level.php",
-                    "src/rollbar.php"
-                ]
+                "psr-4": {
+                    "Rollbar\\": "src/"
+                }
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
@@ -5518,7 +5629,61 @@
                 "logging",
                 "monitoring"
             ],
-            "time": "2016-07-05T15:50:29+00:00"
+            "time": "2018-11-12T12:03:55+00:00"
+        },
+        {
+            "name": "rollbar/rollbar-php-symfony-bundle",
+            "version": "v3.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/rollbar/rollbar-php-symfony-bundle.git",
+                "reference": "9cfa9e079f4106cf2995f3deb393613ab6b527fe"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/rollbar/rollbar-php-symfony-bundle/zipball/9cfa9e079f4106cf2995f3deb393613ab6b527fe",
+                "reference": "9cfa9e079f4106cf2995f3deb393613ab6b527fe",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.6",
+                "rollbar/rollbar": "^1",
+                "symfony/config": "^3.4 | ^4.0",
+                "symfony/dependency-injection": "^3.4 | ^4.0",
+                "symfony/http-kernel": "^3.4 | ^4.0",
+                "symfony/monolog-bundle": "*"
+            },
+            "require-dev": {
+                "matthiasnoback/symfony-dependency-injection-test": "^1.1",
+                "phpunit/phpunit": "^5.7",
+                "squizlabs/php_codesniffer": "^2.7",
+                "symfony/framework-bundle": "^3.4 | ^4.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Rollbar\\Symfony\\RollbarBundle\\": ""
+                },
+                "exclude-from-classmap": [
+                    "/Tests/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "OxCom",
+                    "email": "lancer.oxcom@gmail.com"
+                },
+                {
+                    "name": "Artur Moczulski",
+                    "email": "artur.moczulski@gmail.com"
+                }
+            ],
+            "description": "Bundle for Symfony that integrates Rollbar tracker",
+            "time": "2018-10-13T23:00:43+00:00"
         },
         {
             "name": "rollerworks/password-strength-bundle",
@@ -6008,55 +6173,6 @@
                 "google authenticator"
             ],
             "time": "2017-04-19T14:00:07+00:00"
-        },
-        {
-            "name": "staffim/rollbar-bundle",
-            "version": "v1.3.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/staffim/StaffimRollbarBundle.git",
-                "reference": "499933c81509d71ab866a1b8a2e9ad5cbc0c72eb"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/staffim/StaffimRollbarBundle/zipball/499933c81509d71ab866a1b8a2e9ad5cbc0c72eb",
-                "reference": "499933c81509d71ab866a1b8a2e9ad5cbc0c72eb",
-                "shasum": ""
-            },
-            "require": {
-                "rollbar/rollbar": "~0.15",
-                "symfony/debug": "~2.6|~3.0",
-                "symfony/event-dispatcher": "~2.6|~3.0",
-                "symfony/http-kernel": "~2.6|~3.0",
-                "symfony/security-core": "~2.6|~3.0"
-            },
-            "require-dev": {
-                "phpspec/phpspec": "~2.3",
-                "phpunit/phpunit": "~4.8",
-                "symfony/framework-bundle": "~2.6|~3.0",
-                "symfony/security-bundle": "~2.6|~3.0"
-            },
-            "type": "bundle",
-            "autoload": {
-                "psr-4": {
-                    "Staffim\\RollbarBundle\\": ""
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Vyacheslav Salakhutdinov",
-                    "email": "megazoll@gmail.com"
-                }
-            ],
-            "description": "Bundle for Symfony2 that reports errors to Rollbar",
-            "keywords": [
-                "rollbar"
-            ],
-            "time": "2016-04-12T10:12:15+00:00"
         },
         {
             "name": "stof/doctrine-extensions-bundle",
@@ -10172,7 +10288,8 @@
     "prefer-lowest": false,
     "platform": {
         "php": ">=7.0",
-        "ext-json": "*"
+        "ext-json": "*",
+        "ext-zip": "*"
     },
     "platform-dev": [],
     "platform-overrides": {

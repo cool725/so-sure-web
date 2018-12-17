@@ -240,6 +240,22 @@
                     </div>
                 </div>
                 {% endif %}
+                {% if cancel_form.fullRefund is defined %}
+                    <div class="row">
+                        <div class="col-md-8 col-md-offset-2">
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <h5 class="panel-title"><span title="Admin only"><i class="fa fa-lock"></i></span> Full Refund</h5>
+                                </div>
+                                <div class="panel-body">
+                                    {{ form_label(cancel_form.fullRefund, 'Provide a full refund to the customer') }}<br>
+                                    {{ form_widget(cancel_form.fullRefund) }}<br>
+                                    <strong>RARE Circumstances ONLY</strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
                 <div class="row">
                     <div class="col-md-12">
                         {{ form_widget(cancel_form.cancel, {'label': 'Cancel policy', 'attr': {'class': 'btn btn-danger confirm-cancel'}}) }}
