@@ -28,6 +28,7 @@ use AppBundle\Repository\PaymentRepository;
 use AppBundle\Repository\PhonePolicyRepository;
 use AppBundle\Repository\PolicyRepository;
 use AppBundle\Repository\UserRepository;
+use Doctrine\Bundle\MongoDBBundle\Form\Type\DocumentType;
 use Doctrine\MongoDB\LoggableCollection;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use MongoDB\Collection;
@@ -78,6 +79,11 @@ class MonitorService
         $this->intercom = $intercom;
         $this->mixpanel = $mixpanel;
         $this->judopay = $judopay;
+    }
+
+    public function setDm(DocumentManager $dm)
+    {
+        $this->dm = $dm;
     }
 
     public function run($name, $details = null)
