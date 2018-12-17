@@ -12,7 +12,7 @@ $(function() {
     $('.mailto').on('click', function(e) {
         let href = $(this).attr('href');
 
-        $(this).attr('href', href.replace('notouremail', 'wearesosure'));
+        $(this).attr('href', href.replace('spam.so-sure.net', domain));
     });
 
 });
