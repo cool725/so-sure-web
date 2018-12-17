@@ -201,6 +201,13 @@ services:
             - "@doctrine_mongodb.odm.default_document_manager"
             - "@logger"
 
+    app.promotion:
+        class: AppBundle\Service\PromotionService
+        arguments:
+            - "@doctrine_mongodb.odm.default_document_manager"
+            - "@app.mailer"
+            - "@logger"
+
     app.bacs:
         alias: AppBundle\Service\BacsService
         public: true
@@ -447,6 +454,7 @@ services:
         arguments:
             - "@request_stack"
             - "@logger"
+            - "@router"
         public: false
         tags:
             - { name: twig.extension }
@@ -740,18 +748,6 @@ services:
     AppBundle\Service\PhoneService:
         arguments:
             - "@logger"
-
-    app.logger.rollbar:
-        alias: AppBundle\Classes\Rollbar
-        public: true
-
-    AppBundle\Classes\Rollbar:
-        arguments:
-            - access_token: '%rollbar_access_token%'
-
-    app.logger.rollbar-security:
-        alias: AppBundle\Classes\Rollbar
-        public: true
 
     app.logger.lineformatter:
         alias: Monolog\Formatter\LineFormatter
@@ -1174,6 +1170,12 @@ services:
             -  { name: kernel.event_listener, event: event.policy.cancelled, method: onPolicyCancelledEvent }
             -  { name: kernel.event_listener, event: event.policy.created, method: refundFreeMonthPromo }
 
+    AppBundle\Listener\PosIpListener:
+        arguments:
+            - '%pos_ips%'
+        tags:
+            -  { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }
+
     app.listener.response:
         class:   AppBundle\Listener\KernelListener
         arguments:
@@ -1242,6 +1244,12 @@ services:
         arguments: ["@request_stack", "%kernel.environment%"]
         tags:
             - { name: form.type }
+
+    app.form.type.cancelpolicy:
+        class: AppBundle\Form\Type\CancelPolicyType
+        arguments: ["@app.request", "%kernel.environment%"]
+        tags:
+        - { name: form.type }
 
     app.form.type.policysearch:
         class: AppBundle\Form\Type\PolicySearchType
@@ -1490,29 +1498,6 @@ services:
         tags:
             - { name: validator.constraint_validator }
 
-    rollbar.voter.notfound:
-        class: AppBundle\Security\NotFoundHttpExceptionVoter
-        tags:
-            - { name: staffim_rollbar.report_voter }
-
-    rollbar.voter.untrustedhost:
-        class: AppBundle\Security\UntrustedHostUnexpectedValueExceptionVoter
-        tags:
-            - { name: staffim_rollbar.report_voter }
-
-    rollbar.voter.runtime:
-        class: AppBundle\Security\RuntimeExceptionVoter
-        tags:
-            - { name: staffim_rollbar.report_voter }
-
-    rollbar.voter.accessdenied:
-        class: AppBundle\Security\AccessDeniedHttpExceptionVoter
-        arguments:
-            - "@request_stack"
-            - "%sosure_ips%"
-        tags:
-            - { name: staffim_rollbar.report_voter }
-
     sitemap.phone:
         class: AppBundle\Service\PhoneSitemapGenerator
         arguments:
@@ -1589,17 +1574,12 @@ services:
         tags:
             - { name: form.type }
 
-    picsureml.form.type.annotate:
-        class: PicsureMLBundle\Form\Type\AnnotateType
-        arguments: ["@request_stack", "%form_required%"]
-        tags:
-            - { name: form.type }
-
-    picsureml.form.type.label:
-        class: PicsureMLBundle\Form\Type\LabelType
+    picsureml.form.type.edit:
+        class: PicsureMLBundle\Form\Type\EditType
         arguments: ["@picsureml.picsureml", "%form_required%"]
         tags:
             - { name: form.type }
+
     twig.extension.text:
            class: Twig_Extensions_Extension_Text
            tags:

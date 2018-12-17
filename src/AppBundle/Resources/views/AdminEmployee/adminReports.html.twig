@@ -12,11 +12,11 @@
 {% block body %}
     <div class='container'>
         <h2>so-sure Reports</h2>
-        <!-- Error Message -->
+        {# Error Message #}
         {% if error is defined %}
             <h3>Error: {{ error }}</h3>
         {% else %}
-            <!-- Navigation Tabs -->
+            {# Navigation Tabs #}
             <ul id="tabs" class="nav nav-tabs nav-justified" role="tablist">
                 <li class="nav-item {% if claims is defined %}active{% endif %}">
                     <a href="{{ path('admin_reports_claims') }}">General report</a>
@@ -31,7 +31,7 @@
                     <a href="{{ path('admin_reports_cumulative') }}">Cumulative Policies Report</a>
                 </li>
             </ul>
-            <!-- claims report tab -->
+            {# claims report tab #}
             {% if claims is defined %}
                 <div class="row">
                     <h1 title="{% if claims.dataFetchedAt is defined %}Generated at {{ claims.dataFetchedAt|date }}{% endif %}">General</h1>
@@ -442,7 +442,7 @@
                     </div>
                 </div>
             {% endif %}
-            <!-- connections report tab -->
+            {# connections report tab #}
             {% if connections is defined %}
                 <div class="row">
                     <h1 title="{% if connections.dataFetchedAt is defined %}Generated at {{ connections.dataFetchedAt|date }}{% endif %}">Connections</h1>
@@ -489,7 +489,7 @@
                     </div>
                 </div>
             {% endif %}
-            <!-- scheduled payments report tab -->
+            {# scheduled payments report tab #}
             {% if scheduledPayments is defined %}
                 <div class="row">
                     <h1>Monthly Billing</h1>

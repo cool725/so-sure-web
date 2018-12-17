@@ -75,6 +75,7 @@ class BacsService
     const AUDDIS_REASON_DD_NOT_ALLOWED = 'G';
     const AUDDIS_REASON_EXPIRED = 'H';
     const AUDDIS_REASON_DUPLICATE_REFERENCE = 'I';
+    const AUDDIS_REASON_INCORRECT_DETAILS = 'L';
     const AUDDIS_REASON_CODE_INCOMPATIBLE = 'M';
     const AUDDIS_REASON_NOT_ALLOWED = 'N';
     const AUDDIS_REASON_INVALID_REFERENCE = 'O';
@@ -262,15 +263,14 @@ class BacsService
                 $unzippedFiles = $this->unzipFile($zip);
                 // print_r($unzippedFiles);
                 foreach ($unzippedFiles as $unzippedFile) {
-                    $results[$file][$unzippedFile] = $this->input($unzippedFile);
+                    $results[$file][$unzippedFile] = $this->processFile($unzippedFile);
                 }
             } catch (\Exception $e) {
                 $error = true;
-                $this->logger->error(sprintf(
-                    'Failed processing file %s in %s',
-                    $unzippedFile,
-                    $file
-                ));
+                $this->logger->error(
+                    sprintf('Failed processing file %s in %s', $unzippedFile, $file),
+                    ['exception' => $e]
+                );
             }
 
             $this->sosureSftpService->moveSftp($file, !$error);
@@ -303,43 +303,53 @@ class BacsService
     public function processUpload(UploadedFile $file)
     {
         $tmpFile = $file->move(sys_get_temp_dir());
+
+        return $this->processFile($tmpFile, $file->getClientOriginalName());
+    }
+
+    public function processFile($file, $originalName = null)
+    {
+        if (!$originalName) {
+            $originalName = basename($file);
+        }
+
         $uploadFile = null;
         $metadata = null;
         $date = null;
 
-        if ($this->isS3FilePresent($file->getClientOriginalName())) {
+        if ($this->isS3FilePresent($originalName)) {
             return false;
         }
 
-        if (mb_stripos($file->getClientOriginalName(), "ADDACS") !== false) {
-            $metadata = $this->addacs($tmpFile);
+        if (mb_stripos($originalName, "ADDACS") !== false) {
+            $metadata = $this->addacs($file);
             $uploadFile = new BacsReportAddacsFile();
-        } elseif (mb_stripos($file->getClientOriginalName(), "AUDDIS") !== false) {
-            $metadata = $this->auddis($tmpFile);
+        } elseif (mb_stripos($originalName, "AUDDIS") !== false) {
+            $metadata = $this->auddis($file);
             $uploadFile = new BacsReportAuddisFile();
             if (isset($metadata['serial-number'])) {
                 $date = $this->getAccessPayFileDate(AccessPayFile::formatSerialNumber($metadata['serial-number']));
             }
-        } elseif (mb_stripos($file->getClientOriginalName(), "INPUT") !== false) {
-            $metadata = $this->input($tmpFile);
+        } elseif (mb_stripos($originalName, "INPUT") !== false) {
+            $metadata = $this->input($file);
             $uploadFile = new BacsReportInputFile();
             if (isset($metadata['serial-number'])) {
                 $date = $this->getAccessPayFileDate(AccessPayFile::formatSerialNumber($metadata['serial-number']));
             }
-        } elseif (mb_stripos($file->getClientOriginalName(), "ARUDD") !== false) {
-            $metadata = $this->arudd($tmpFile);
+        } elseif (mb_stripos($originalName, "ARUDD") !== false) {
+            $metadata = $this->arudd($file);
             $uploadFile = new BacsReportAruddFile();
-        } elseif (mb_stripos($file->getClientOriginalName(), "DDIC") !== false) {
-            $metadata = $this->ddic($tmpFile);
+        } elseif (mb_stripos($originalName, "DDIC") !== false) {
+            $metadata = $this->ddic($file);
             $uploadFile = new BacsReportDdicFile();
         } else {
-            $this->logger->error(sprintf('Unknown bacs report file %s', $file->getClientOriginalName()));
+            $this->logger->error(sprintf('Unknown bacs report file %s', $originalName));
 
             return false;
         }
 
         if ($uploadFile) {
-            $this->uploadS3($tmpFile, $file->getClientOriginalName(), $uploadFile, $date, $metadata);
+            $this->uploadS3($file, $originalName, $uploadFile, $date, $metadata);
         }
 
         return true;
@@ -1058,6 +1068,7 @@ class BacsService
                     self::AUDDIS_REASON_INVALID_REFERENCE,
                     self::AUDDIS_REASON_MISSING_PAYER_NAME,
                     self::AUDDIS_REASON_MISSING_SERVICE_NAME,
+                    self::AUDDIS_REASON_INCORRECT_DETAILS,
                 ])) {
                     /** @var BacsPaymentMethod $bacs */
                     $bacs = $user->getPaymentMethod();
@@ -1556,6 +1567,16 @@ class BacsService
     {
         /** @var BacsPaymentMethod $bacs */
         $bacs = $policy->getUser()->getPaymentMethod();
+
+        if ($this->environment == 'prod' && !$policy->isValidPolicy()) {
+            $msg = sprintf(
+                'Cancelling (scheduled) payment %s policy is not valid',
+                $id
+            );
+            $this->logger->warning($msg);
+
+            return self::VALIDATE_CANCEL;
+        }
 
         if (!$bacs || !$bacs->getBankAccount()) {
             $msg = sprintf(

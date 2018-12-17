@@ -27,8 +27,7 @@
         "symfony/assetic-bundle": "^2.7",
         "drewm/mailchimp-api": "dev-api-v3",
         "google/apiclient": "^2.2",
-        "staffim/rollbar-bundle": "*",
-        "judopay/judopay-sdk": "2.0.1.2",
+        "judopay/judopay-sdk": "2.0.1.5",
         "aws/aws-sdk-php": "^3.15",
         "jms/security-extra-bundle": "^1.6",
         "white-october/pagerfanta-bundle": "^1.2",
@@ -70,7 +69,10 @@
         "peerj/peerj-user-security-bundle": "^0.2",
         "phpseclib/phpseclib": "^2.0",
         "defuse/php-encryption": "^2.1",
-        "friendsofsymfony/oauth-server-bundle": "^1.6"
+        "friendsofsymfony/oauth-server-bundle": "^1.6",
+        "excelwebzone/recaptcha-bundle": "^1.5",
+        "rollbar/rollbar": "^1.7",
+        "rollbar/rollbar-php-symfony-bundle": "^3.1"
     },
     "require-dev": {
         "sensio/generator-bundle": "~3.0",

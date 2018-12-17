@@ -2,12 +2,15 @@
 
 namespace AppBundle\Document;
 
+use AppBundle\Document\Opt\Opt;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Symfony\Component\Validator\Constraints as Assert;
 use AppBundle\Validator\Constraints as AppAssert;
+use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
  * @MongoDB\Document
+ * @Gedmo\Loggable(logEntryClass="AppBundle\Document\LogEntry")
  */
 class Lead
 {
@@ -25,6 +28,9 @@ class Lead
     const LEAD_SOURCE_INVITATION = 'invitation';
     const LEAD_SOURCE_SCODE = 'scode';
     const LEAD_SOURCE_AFFILIATE = 'affiliate';
+
+    // POS affiliate sources
+    const SOURCE_POS_HELLOZ = 'HelloZ Pos';
 
     /**
      * @MongoDB\Id(strategy="auto")
@@ -50,6 +56,12 @@ class Lead
     protected $email;
 
     /**
+     * @Assert\Email()
+     * @MongoDB\Field(type="string")
+     */
+    protected $emailCanonical;
+
+    /**
      * @var string
      * @AppAssert\FullName()
      * @Assert\Length(min="1", max="100")
@@ -58,10 +70,26 @@ class Lead
     protected $name;
 
     /**
-     * @Assert\Choice({"text-me", "launch-usa", "buy", "save-quote", "purchase-flow", "contact-us"}, strict=true)
+     * @MongoDB\ReferenceOne(targetDocument="Phone")
+     * @Gedmo\Versioned
+     * @var Phone
+     */
+    protected $phone;
+
+    /**
+     * @Assert\Choice({"text-me", "launch-usa", "buy", "save-quote", "purchase-flow",
+     *                 "contact-us", "affiliate"}, strict=true)
      * @MongoDB\Field(type="string")
      */
     protected $source;
+
+    /**
+     * @AppAssert\AlphanumericSpaceDot()
+     * @Assert\Length(min="1", max="250")
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
+    protected $sourceDetails;
 
     /**
      * @AppAssert\Token()
@@ -70,9 +98,24 @@ class Lead
      */
     protected $intercomId;
 
+    /**
+     * @MongoDB\ReferenceMany(targetDocument="AppBundle\Document\Opt\Opt", mappedBy="lead", cascade={"persist"})
+     */
+    protected $opts = array();
+
     public function __construct()
     {
         $this->created = \DateTime::createFromFormat('U', time());
+    }
+
+    public function getPhone()
+    {
+        return $this->phone;
+    }
+
+    public function setPhone(Phone $phone)
+    {
+        $this->phone = $phone;
     }
 
     public function getId()
@@ -102,7 +145,18 @@ class Lead
 
     public function setEmail($email)
     {
-        $this->email = mb_strtolower($email);
+        $this->emailCanonical = mb_convert_case($email, MB_CASE_LOWER);
+        $this->email = $email;
+    }
+
+    public function getEmailCanonical()
+    {
+        return $this->emailCanonical;
+    }
+
+    public function setEmailCanonical($emailCanonical)
+    {
+        $this->emailCanonical = $emailCanonical;
     }
 
     public function hasEmail()
@@ -130,6 +184,17 @@ class Lead
         $this->source = $source;
     }
 
+    public function setSourceDetails($details)
+    {
+        $validator = new AppAssert\AlphanumericSpaceDotValidator();
+        $this->sourceDetails = $validator->conform($details);
+    }
+
+    public function getSourceDetails()
+    {
+        return $this->sourceDetails;
+    }
+
     public function getIntercomId()
     {
         return $this->intercomId;
@@ -140,9 +205,23 @@ class Lead
         $this->intercomId = $intercomId;
     }
 
+    public function addOpt(Opt $opt)
+    {
+        $opt->setLead($this);
+        $this->opts[] = $opt;
+    }
+
+    public function getOpts()
+    {
+        return $this->opts;
+    }
+
     public function populateUser(User $user)
     {
         $user->setEmail($this->getEmail());
+        $user->setEmailCanonical($this->getEmailCanonical());
+        $user->setLeadSource($this->getSource());
+        $user->setLeadSourceDetails($this->getSourceDetails());
         $user->setCreated($this->getCreated());
         $user->setIntercomId($this->getIntercomId());
         // Commenting out as could cause duplicate mobile numbers, which could cause login issues

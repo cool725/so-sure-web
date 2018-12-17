@@ -2,6 +2,7 @@
 
 namespace AppBundle\Repository;
 
+use AppBundle\Document\AffiliateCompany;
 use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\User;
@@ -9,11 +10,20 @@ use AppBundle\Document\Charge;
 use AppBundle\Document\Policy;
 use AppBundle\Document\PhoneTrait;
 use Doctrine\ODM\MongoDB\DocumentRepository;
+use Doctrine\ODM\MongoDB\Cursor;
 
 class ChargeRepository extends DocumentRepository
 {
     use DateTrait;
 
+    /**
+     * Gives you a list of charges matching the following conditions within the given month.
+     * @param \DateTime        $date            is a date falling within the chosen month and defaults to now.
+     * @param string|array     $type            is the type or types of charges to look for, and defaults to all.
+     * @param boolean          $excludeInvoiced says whether or not charges with an invoice should be excluded.
+     * @param AffiliateCompany $affiliate       is an optional affiliate company that all charges must have if present.
+     * @return Cursor the result set of all the matching charges.
+     */
     public function findMonthly(
         \DateTime $date = null,
         $type = null,

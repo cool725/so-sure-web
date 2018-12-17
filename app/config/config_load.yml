@@ -18,12 +18,6 @@ framework:
 monolog:
     channels: ['receperio']
     handlers:
-        rollbar:
-            id: "app.logger.rollbar"
-            formatter: "app.logger.lineformatter"
-            type: rollbar
-            level: warning
-            channels: ['!event']
         salva:
             type:   stream
             path:   "%kernel.logs_dir%/salva.log"
@@ -56,18 +50,6 @@ swiftmailer:
 assetic:
     workers:
         cache_busting: ~
-
-staffim_rollbar:
-    # Rollbar access token
-    access_token: %rollbar_access_token%
-    # PHP error level (see http://php.net/manual/en/function.error-reporting.php)
-    error_level: -1
-    # Values from scrub.parameters are replaced by the key for specified exceptions
-    scrub:
-        exceptions:
-            - PDOException
-        parameters:
-            key: unknown
 
 services:
     staging.apierror:

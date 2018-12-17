@@ -24,6 +24,9 @@ parameters:
         - '82.16.104.75' # patrick
         - '82.163.118.154' # so-sure ip @ frameworks
         - '82.163.117.184' # frameworks ip
+        - '10.0.2.2'
+    pos_ips:
+        - '172.16.0.0' # Temp. HelloZ should go here
 
 framework:
     #esi:             ~
@@ -244,6 +247,13 @@ jms_di_extra:
 jms_security_extra:
     expressions: true
 
+rollbar:
+    access_token: '%rollbar_access_token%'
+    environment:  '%kernel.environment%'
+    capture_email: true
+    capture_username: true
+    check_ignore: '\AppBundle\Classes\Rollbar::shouldIgnore'
+
 snc_redis:
     clients:
         default:
@@ -394,7 +404,17 @@ nexy_slack:
     # The Slack API Incoming WebHooks URL.
     endpoint:             "%slack_webhook%"
 
+ewz_recaptcha:
+    public_key:  "%recaptcha_public_key%"
+    private_key: "%recaptcha_private_key%"
+    enabled:     true
+
 nelmio_security:
+    referrer_policy:
+        enabled: true
+        policies:
+        - 'no-referrer'
+        - 'strict-origin-when-cross-origin'
     csp:
         report_logger_service: monolog.logger.security
         content_types: ['text/html']
@@ -406,6 +426,8 @@ nelmio_security:
             browser_adaptive:
                 enabled: true
             report-uri: "%router.request_context.base_url%/ops/csp"
+            frame-ancestors:
+                - 'none'
             default-src:
                 - 'self'
                 - https://maxcdn.bootstrapcdn.com
@@ -787,6 +809,7 @@ nelmio_security:
                 - https://track.omguk.com
                 - 'data:'
                 - https://bat.bing.com
+                - https://www.gstatic.com
                 # https://en.wikipedia.org/wiki/List_of_Google_domains
                 - https://www.google.com
                 - https://www.google.ac

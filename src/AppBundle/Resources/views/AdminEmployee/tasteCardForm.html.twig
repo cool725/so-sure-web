@@ -6,7 +6,10 @@
                     <div class="col-sm-8">{{ form_widget(form.number, {'attr': {'class': 'form-control', 'placeholder': 'New TasteCard Number'}}) }}</div>
                     {{ form_widget(form.update, {'attr': {'class': 'btn btn-danger col-sm-4'}, 'label': 'Update TasteCard'}) }}
                     {{ form_errors(form.number) }}
-                    <div class="row">{{ form_widget(form.resend, {'attr': {'class': 'btn btn-danger'}, 'label': 'Resend TasteCard Notification Email'}) }}</div>
+
+                    <div class="row" {% if policy.tasteCard == null %}hidden="hidden"{% endif %}>
+                        {{ form_widget(form.resend, {'attr': {'class': 'btn btn-danger'}, 'label': 'Resend TasteCard Notification Email'}) }}
+                    </div>
                 </div>
             </div>
         </div>

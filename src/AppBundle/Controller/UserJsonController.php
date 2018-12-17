@@ -124,6 +124,7 @@ class UserJsonController extends BaseController
     public function inviteEmailAction(Request $request)
     {
         $user = $this->getUser();
+        $this->denyAccessUnlessGranted(UserVoter::VIEW, $user);
         $policy = $user->getLatestPolicy();
         $email = $request->get("email");
         if (!$email) {
@@ -135,7 +136,6 @@ class UserJsonController extends BaseController
         } elseif ($user->getEmail() == $email) {
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVITATION_SELF_INVITATION, "Self invitation.");
         }
-        $this->denyAccessUnlessGranted(UserVoter::VIEW, $user);
         try {
             /** @var InvitationService $invitationService */
             $invitationService = $this->get("app.invitation");
@@ -160,11 +160,12 @@ class UserJsonController extends BaseController
      */
     public function appSmsAction()
     {
+        $user = $this->getUser();
+        $this->denyAccessUnlessGranted(UserVoter::VIEW, $user);
         $dm = $this->getManager();
         $chargeRepository = $dm->getRepository(Charge::class);
         /** @var SmsService $smsService */
         $smsService = $this->get('app.sms');
-        $user = $this->getUser();
         $mobileNumber = $user->getMobileNumber();
         if (!$mobileNumber) {
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, "User lacks phone number.");
@@ -201,6 +202,7 @@ class UserJsonController extends BaseController
     public function policyTermsAction()
     {
         $user = $this->getUser();
+        $this->denyAccessUnlessGranted(UserVoter::VIEW, $user);
         $s3 = $this->get("app.twig.s3");
         $policy = $user->getLatestPolicy();
         if (!$policy) {

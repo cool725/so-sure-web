@@ -35,7 +35,6 @@ class AppKernel extends Kernel
             new AppBundle\AppBundle(),
             new CensusBundle\CensusBundle(),
             new PicsureMLBundle\PicsureMLBundle(),
-            new Staffim\RollbarBundle\StaffimRollbarBundle(),
             new Snc\RedisBundle\SncRedisBundle(),
             new Stof\DoctrineExtensionsBundle\StofDoctrineExtensionsBundle(),
             new Vich\UploaderBundle\VichUploaderBundle(),
@@ -48,6 +47,8 @@ class AppKernel extends Kernel
             new Nelmio\SecurityBundle\NelmioSecurityBundle(),
             new Peerj\UserSecurityBundle\PeerjUserSecurityBundle(),
             new FOS\OAuthServerBundle\FOSOAuthServerBundle(),
+            new EWZ\Bundle\RecaptchaBundle\EWZRecaptchaBundle(),
+            new Rollbar\Symfony\RollbarBundle\RollbarBundle(),
         );
 
         if (in_array($this->getEnvironment(), array('dev', 'test', 'vagrant'), true)) {

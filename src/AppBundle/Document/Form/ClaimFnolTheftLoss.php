@@ -185,7 +185,7 @@ class ClaimFnolTheftLoss
     }
 
     /**
-     * @Assert\IsTrue(message="At least one Proof of Usage File must be uploaded")
+     * @Assert\IsTrue(message="You must upload your Proof of Usage document")
      */
     public function hasProofOfUsage()
     {
@@ -197,7 +197,7 @@ class ClaimFnolTheftLoss
     }
 
     /**
-     * @Assert\IsTrue(message="At least one Proof of Barring File must be uploaded")
+     * @Assert\IsTrue(message="You must upload your Proof of Barring document")
      */
     public function hasProofOfBarring()
     {
@@ -209,7 +209,7 @@ class ClaimFnolTheftLoss
     }
 
     /**
-     * @Assert\IsTrue(message="At least one Proof of Purchase File must be uploaded")
+     * @Assert\IsTrue(message="You must upload your Proof of Purchase document")
      */
     public function hasProofOfPurchase()
     {
@@ -221,7 +221,7 @@ class ClaimFnolTheftLoss
     }
 
     /**
-     * @Assert\IsTrue(message="At least one Proof of Loss File must be uploaded")
+     * @Assert\IsTrue(message="You must upload your Proof of Loss document")
      */
     public function hasProofOfLoss()
     {

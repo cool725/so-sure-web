@@ -4,8 +4,11 @@ namespace AppBundle\Tests\Service;
 
 use AppBundle\Classes\DirectGroupHandlerClaim;
 use AppBundle\Document\Policy;
+use AppBundle\Document\PolicyTerms;
 use AppBundle\Service\DaviesService;
+use AppBundle\Tests\Form\Type\ClaimTypeTest;
 use Doctrine\ODM\MongoDB\DocumentManager;
+use SebastianBergmann\ObjectReflector\TestFixture\ClassWithIntegerAttributeName;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use AppBundle\Document\Claim;
@@ -36,6 +39,12 @@ class DaviesServiceTest extends WebTestCase
     protected static $phoneA;
     protected static $phoneB;
 
+    /** @var PolicyTerms */
+    protected static $policyTerms;
+
+    /** @var PolicyTerms */
+    protected static $nonPicSurePolicyTerms;
+
     public static function setUpBeforeClass()
     {
          //start the symfony kernel
@@ -58,6 +67,12 @@ class DaviesServiceTest extends WebTestCase
         self::$phone = $phoneRepo->findOneBy(['devices' => 'iPhone 6', 'memory' => 64]);
         self::$phoneA = $phoneRepo->findOneBy(['devices' => 'iPhone 5', 'memory' => 64]);
         self::$phoneB = $phoneRepo->findOneBy(['devices' => 'A0001', 'memory' => 64]);
+
+        static::$policyTerms = new PolicyTerms();
+        static::$policyTerms->setVersion(PolicyTerms::VERSION_10);
+
+        static::$nonPicSurePolicyTerms = new PolicyTerms();
+        static::$nonPicSurePolicyTerms->setVersion(PolicyTerms::VERSION_1);
     }
 
     public function setUp()
@@ -321,12 +336,14 @@ class DaviesServiceTest extends WebTestCase
         $policyOpen->getUser()->setEmail(static::generateEmail('testSaveClaimsOpenDG', $this));
         $initialImei = $policyOpen->getImei();
         $claimOpen = new Claim();
+        $claimOpen->setType(Claim::TYPE_LOSS);
         $claimOpen->setStatus(Claim::STATUS_APPROVED);
         $claimOpen->setNumber(self::getRandomPolicyNumber('TEST'));
         $claimOpen->setHandlingTeam(Claim::TEAM_DAVIES);
         $policyOpen->addClaim($claimOpen);
 
         $claimOpen2 = new Claim();
+        $claimOpen2->setType(Claim::TYPE_LOSS);
         $claimOpen2->setNumber(self::getRandomPolicyNumber('TEST'));
         $claimOpen2->setStatus(Claim::STATUS_APPROVED);
         $claimOpen2->setReplacementImei(static::generateRandomImei());
@@ -361,7 +378,9 @@ class DaviesServiceTest extends WebTestCase
         $daviesOpen->initialSuspicion = false;
         $daviesOpen->finalSuspicion = false;
         $daviesOpen->lossDescription = 'foo bar';
+        $daviesOpen->lossType = DaviesHandlerClaim::TYPE_LOSS;
 
+        $this->assertEquals(0, count(self::$daviesService->getErrors()));
         $this->assertEquals(0, count(self::$daviesService->getWarnings()));
         self::$daviesService->saveClaims(1, [$daviesOpen]);
         //print_r(self::$daviesService->getErrors());
@@ -384,13 +403,15 @@ class DaviesServiceTest extends WebTestCase
 
         $policy = new PhonePolicy();
         $policy->setStatus(Policy::STATUS_ACTIVE);
-        $policy->setId('1');
+        $policy->setId(static::getRandomPolicyNumber('TEST'));
+        $policy->setPolicyTerms(static::$policyTerms);
         $policy->setPhone(self::getRandomPhone(self::$dm));
 
         $claim = new Claim();
         $claim->setPolicy($policy);
         $claim->setNumber(time());
         $claim->setStatus(Claim::STATUS_SETTLED);
+        $claim->setType(Claim::TYPE_LOSS);
 
         $daviesClaim = new DaviesHandlerClaim();
         $daviesClaim->claimNumber = $claim->getNumber();
@@ -413,7 +434,8 @@ class DaviesServiceTest extends WebTestCase
     {
         $policy = new PhonePolicy();
         $policy->setStatus(Policy::STATUS_ACTIVE);
-        $policy->setId('1');
+        $policy->setId(static::getRandomPolicyNumber('TEST'));
+        $policy->setPolicyTerms(static::$policyTerms);
         $policy->setPhone(self::getRandomPhone(self::$dm));
 
         $claim = new Claim();
@@ -435,13 +457,15 @@ class DaviesServiceTest extends WebTestCase
     {
         $policy = new PhonePolicy();
         $policy->setStatus(Policy::STATUS_ACTIVE);
-        $policy->setId('1');
+        $policy->setId(static::getRandomPolicyNumber('TEST'));
+        $policy->setPolicyTerms(static::$policyTerms);
         $policy->setPhone(self::getRandomPhone(self::$dm));
 
         $claim = new Claim();
         $claim->setPolicy($policy);
         $claim->setNumber(time());
         $claim->setStatus(Claim::STATUS_SETTLED);
+        $claim->setType(Claim::TYPE_LOSS);
 
         $daviesClaim = new DaviesHandlerClaim();
         $daviesClaim->claimNumber = $claim->getNumber();
@@ -465,14 +489,16 @@ class DaviesServiceTest extends WebTestCase
         $user->setLastName('Marulic');
         $policy = new PhonePolicy();
         $policy->setStatus(Policy::STATUS_ACTIVE);
-        $policy->setId('1');
+        $policy->setId(static::getRandomPolicyNumber('TEST'));
+        $policy->setPolicyTerms(static::$policyTerms);
         $policy->setUser($user);
         $policy->setPhone(self::getRandomPhone(self::$dm));
 
         $claim = new Claim();
-        $claim->setPolicy($policy);
         $claim->setNumber(time());
         $claim->setStatus(Claim::STATUS_INREVIEW);
+        $claim->setType(Claim::TYPE_LOSS);
+        $policy->addClaim($claim);
 
         $daviesClaim = new DaviesHandlerClaim();
         $daviesClaim->claimNumber = $claim->getNumber();
@@ -495,14 +521,16 @@ class DaviesServiceTest extends WebTestCase
         $user->setLastName('Marulic');
         $policy = new PhonePolicy();
         $policy->setStatus(Policy::STATUS_ACTIVE);
-        $policy->setId('1');
+        $policy->setId(static::getRandomPolicyNumber('TEST'));
+        $policy->setPolicyTerms(static::$policyTerms);
         $policy->setUser($user);
         $policy->setPhone(self::getRandomPhone(self::$dm));
 
         $claim = new Claim();
-        $claim->setPolicy($policy);
         $claim->setNumber(time());
         $claim->setStatus(Claim::STATUS_INREVIEW);
+        $claim->setType(Claim::TYPE_LOSS);
+        $policy->addClaim($claim);
 
         $daviesClaim = new DaviesHandlerClaim();
         $daviesClaim->claimNumber = $claim->getNumber();
@@ -525,14 +553,16 @@ class DaviesServiceTest extends WebTestCase
         $user->setLastName('Marulic');
         $policy = new PhonePolicy();
         $policy->setStatus(Policy::STATUS_ACTIVE);
-        $policy->setId('1');
+        $policy->setId(static::getRandomPolicyNumber('TEST'));
+        $policy->setPolicyTerms(static::$policyTerms);
         $policy->setUser($user);
         $policy->setPhone(self::getRandomPhone(self::$dm));
 
         $claim = new Claim();
-        $claim->setPolicy($policy);
         $claim->setNumber(time());
         $claim->setStatus(Claim::STATUS_APPROVED);
+        $claim->setType(Claim::TYPE_LOSS);
+        $policy->addClaim($claim);
 
         $daviesClaim = new DaviesHandlerClaim();
         $daviesClaim->claimNumber = $claim->getNumber();
@@ -555,14 +585,16 @@ class DaviesServiceTest extends WebTestCase
         $user->setLastName('Marulic');
         $policy = new PhonePolicy();
         $policy->setStatus(Policy::STATUS_ACTIVE);
-        $policy->setId('1');
+        $policy->setId(static::getRandomPolicyNumber('TEST'));
+        $policy->setPolicyTerms(static::$policyTerms);
         $policy->setUser($user);
         $policy->setPhone(self::getRandomPhone(self::$dm));
 
         $claim = new Claim();
-        $claim->setPolicy($policy);
         $claim->setNumber(time());
         $claim->setStatus(Claim::STATUS_INREVIEW);
+        $claim->setType(Claim::TYPE_LOSS);
+        $policy->addClaim($claim);
 
         $daviesClaim = new DaviesHandlerClaim();
         $daviesClaim->claimNumber = $claim->getNumber();
@@ -585,14 +617,16 @@ class DaviesServiceTest extends WebTestCase
         $user->setLastName('Marulic');
         $policy = new PhonePolicy();
         $policy->setStatus(Policy::STATUS_ACTIVE);
-        $policy->setId('1');
+        $policy->setId(static::getRandomPolicyNumber('TEST'));
+        $policy->setPolicyTerms(static::$policyTerms);
         $policy->setUser($user);
         $policy->setPhone(self::getRandomPhone(self::$dm));
 
         $claim = new Claim();
-        $claim->setPolicy($policy);
         $claim->setNumber(time());
         $claim->setStatus(Claim::STATUS_APPROVED);
+        $claim->setType(Claim::TYPE_LOSS);
+        $policy->addClaim($claim);
 
         $daviesClaim = new DaviesHandlerClaim();
         $daviesClaim->claimNumber = $claim->getNumber();
@@ -606,11 +640,6 @@ class DaviesServiceTest extends WebTestCase
         self::$daviesService->validateClaimDetails($claim, $daviesClaim);
         $this->assertEquals(1, count(self::$daviesService->getWarnings()));
         $this->insureWarningExists('/finalSuspicion/');
-    }
-
-    private function getRandomClaimNumber()
-    {
-        return sprintf('%6d', rand(1, 999999));
     }
 
     public function testSaveClaimsOpenClosed()
@@ -707,11 +736,12 @@ class DaviesServiceTest extends WebTestCase
         $claim1->setHandlingTeam(Claim::TEAM_DAVIES);
         $policy1->addClaim($claim1);
         $claim1->setNumber('1');
-        $claim1->setType(Claim::TYPE_THEFT);
+        //$claim1->setType(Claim::TYPE_THEFT);
 
         $policy2 = static::createUserPolicy(true);
         $policy2->getUser()->setEmail(static::generateEmail('testSaveClaimsSaveException-2', $this));
         $claim2 = new Claim();
+        $claim2->setType(Claim::TYPE_THEFT);
         $claim2->setHandlingTeam(Claim::TEAM_DAVIES);
         $policy2->addClaim($claim2);
         $claim2->setNumber('2');
@@ -727,6 +757,7 @@ class DaviesServiceTest extends WebTestCase
         $claim1Id = $claim1->getId();
         $claim2Id = $claim2->getId();
 
+        // expected error
         $daviesOpen1 = new DaviesHandlerClaim();
         $daviesOpen1->claimNumber = '1';
         $daviesOpen1->policyNumber = $policy1->getPolicyNumber();
@@ -735,8 +766,9 @@ class DaviesServiceTest extends WebTestCase
         $daviesOpen1->reserved = 1;
         $daviesOpen1->riskPostCode = 'BX1 1LT';
         $daviesOpen1->insuredName = 'Foo Bar';
-        //$daviesOpen1->type = DaviesClaim::TYPE_LOSS;
+        //$daviesOpen1->lossType = DaviesHandlerClaim::TYPE_THEFT;
 
+        // should be saved
         $daviesOpen2 = new DaviesHandlerClaim();
         $daviesOpen2->claimNumber = '2';
         $daviesOpen2->policyNumber = $policy2->getPolicyNumber();
@@ -745,7 +777,7 @@ class DaviesServiceTest extends WebTestCase
         $daviesOpen2->reserved = 2;
         $daviesOpen2->riskPostCode = 'BX1 1LT';
         $daviesOpen2->insuredName = 'Foo Bar';
-        //$daviesOpen2->type = DaviesClaim::TYPE_LOSS;
+        $daviesOpen2->lossType = DaviesHandlerClaim::TYPE_THEFT;
 
         self::$daviesService->clearErrors();
 
@@ -755,6 +787,7 @@ class DaviesServiceTest extends WebTestCase
 
         // print_r(self::$daviesService->getErrors());
 
+        // Claims type does not match for claim 1 [Record import failed]
         $this->assertEquals(1, count(self::$daviesService->getErrors()));
 
         $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
@@ -796,6 +829,7 @@ class DaviesServiceTest extends WebTestCase
         $policy = new PhonePolicy();
         $user->addPolicy($policy);
         $claim = new Claim();
+        $claim->setType(Claim::TYPE_LOSS);
         $policy->addClaim($claim);
         $policy->setPolicyNumber('TEST/2017/123456');
 
@@ -882,6 +916,7 @@ class DaviesServiceTest extends WebTestCase
         $claim = new Claim();
         $policy->addClaim($claim);
         $policy->setPolicyNumber('TEST/2017/123456');
+        $claim->setType(Claim::TYPE_LOSS);
 
         $daviesClaim = new DaviesHandlerClaim();
         $daviesClaim->policyNumber = 'TEST/2017/123456';
@@ -958,6 +993,7 @@ class DaviesServiceTest extends WebTestCase
     {
         $policy = static::createUserPolicy(true);
         $claim = new Claim();
+        $claim->setType(Claim::TYPE_LOSS);
         $policy->addClaim($claim);
 
         $daviesClaim = new DaviesHandlerClaim();
@@ -976,6 +1012,7 @@ class DaviesServiceTest extends WebTestCase
         $policy = static::createUserPolicy(true);
         $claim = new Claim();
         $claim->setStatus(Claim::STATUS_SETTLED);
+        $claim->setType(Claim::TYPE_LOSS);
         $policy->addClaim($claim);
 
         $daviesClaim = new DaviesHandlerClaim();
@@ -995,6 +1032,7 @@ class DaviesServiceTest extends WebTestCase
     {
         $policy = static::createUserPolicy(true);
         $claim = new Claim();
+        $claim->setType(Claim::TYPE_LOSS);
         $claim->setStatus(Claim::STATUS_SETTLED);
         $policy->addClaim($claim);
 
@@ -1015,6 +1053,7 @@ class DaviesServiceTest extends WebTestCase
     {
         $policy = static::createUserPolicy(true);
         $claim = new Claim();
+        $claim->setType(Claim::TYPE_LOSS);
         $policy->addClaim($claim);
 
         $daviesClaim = new DaviesHandlerClaim();
@@ -1034,6 +1073,7 @@ class DaviesServiceTest extends WebTestCase
     {
         $policy = static::createUserPolicy(true);
         $claim = new Claim();
+        $claim->setType(Claim::TYPE_LOSS);
         $policy->addClaim($claim);
 
         $daviesClaim = new DaviesHandlerClaim();
@@ -1060,6 +1100,7 @@ class DaviesServiceTest extends WebTestCase
     {
         $policy = static::createUserPolicy(true);
         $claim = new Claim();
+        $claim->setType(Claim::TYPE_LOSS);
         $policy->addClaim($claim);
 
         $daviesClaim = new DaviesHandlerClaim();
@@ -1085,6 +1126,7 @@ class DaviesServiceTest extends WebTestCase
         $policy = static::createUserPolicy(true);
         $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_APPROVED);
         $claim = new Claim();
+        $claim->setType(Claim::TYPE_LOSS);
         $policy->addClaim($claim);
 
         $daviesClaim = new DaviesHandlerClaim();
@@ -1106,6 +1148,7 @@ class DaviesServiceTest extends WebTestCase
         $policy = static::createUserPolicy(true);
         $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_APPROVED);
         $claim = new Claim();
+        $claim->setType(Claim::TYPE_LOSS);
         $policy->addClaim($claim);
 
         $daviesClaim = new DaviesHandlerClaim();
@@ -1127,6 +1170,7 @@ class DaviesServiceTest extends WebTestCase
         $policy = static::createUserPolicy(true);
         $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_REJECTED);
         $claim = new Claim();
+        $claim->setType(Claim::TYPE_LOSS);
         $policy->addClaim($claim);
 
         $daviesClaim = new DaviesHandlerClaim();
@@ -1147,6 +1191,7 @@ class DaviesServiceTest extends WebTestCase
     {
         $policy = static::createUserPolicy(true);
         $claim = new Claim();
+        $claim->setType(Claim::TYPE_LOSS);
         $policy->addClaim($claim);
 
         $daviesClaim = new DaviesHandlerClaim();
@@ -1165,6 +1210,7 @@ class DaviesServiceTest extends WebTestCase
     {
         $policy = static::createUserPolicy(true);
         $claim = new Claim();
+        $claim->setType(Claim::TYPE_LOSS);
         $policy->addClaim($claim);
 
         $daviesClaim = new DaviesHandlerClaim();
@@ -1183,6 +1229,7 @@ class DaviesServiceTest extends WebTestCase
     {
         $policy = static::createUserPolicy(true);
         $claim = new Claim();
+        $claim->setType(Claim::TYPE_LOSS);
         $policy->addClaim($claim);
 
         $daviesClaim = new DaviesHandlerClaim();
@@ -1201,6 +1248,7 @@ class DaviesServiceTest extends WebTestCase
     {
         $policy = static::createUserPolicy(true);
         $claim = new Claim();
+        $claim->setType(Claim::TYPE_LOSS);
         $policy->addClaim($claim);
 
         $twelveDaysAgo = \DateTime::createFromFormat('U', time());
@@ -1231,6 +1279,7 @@ class DaviesServiceTest extends WebTestCase
     {
         $policy = static::createUserPolicy(true);
         $claim = new Claim();
+        $claim->setType(Claim::TYPE_LOSS);
         $policy->addClaim($claim);
 
         $fourDaysAgo = \DateTime::createFromFormat('U', time());
@@ -1261,6 +1310,7 @@ class DaviesServiceTest extends WebTestCase
     {
         $policy = static::createUserPolicy(true);
         $claim = new Claim();
+        $claim->setType(Claim::TYPE_LOSS);
         $policy->addClaim($claim);
 
         $daviesClaim = new DaviesHandlerClaim();
@@ -1286,6 +1336,7 @@ class DaviesServiceTest extends WebTestCase
     {
         $policy = static::createUserPolicy(true);
         $claim = new Claim();
+        $claim->setType(Claim::TYPE_LOSS);
         $policy->addClaim($claim);
 
         $daviesClaim = new DaviesHandlerClaim();
@@ -1311,6 +1362,7 @@ class DaviesServiceTest extends WebTestCase
     {
         $policy = static::createUserPolicy(true);
         $claim = new Claim();
+        $claim->setType(Claim::TYPE_LOSS);
         $policy->addClaim($claim);
 
         $daviesClaim = new DaviesHandlerClaim();
@@ -1336,6 +1388,7 @@ class DaviesServiceTest extends WebTestCase
     {
         $policy = static::createUserPolicy(true);
         $claim = new Claim();
+        $claim->setType(Claim::TYPE_LOSS);
         $policy->addClaim($claim);
         $charge = new Charge();
         $charge->setAmount(0.90);
@@ -1363,6 +1416,7 @@ class DaviesServiceTest extends WebTestCase
     {
         $policy = static::createUserPolicy(true);
         $claim = new Claim();
+        $claim->setType(Claim::TYPE_LOSS);
         $claim->setApprovedDate(new \DateTime('2016-01-02'));
         $policy->addClaim($claim);
 
@@ -1398,6 +1452,7 @@ class DaviesServiceTest extends WebTestCase
     {
         $policy = static::createUserPolicy(true);
         $claim = new Claim();
+        $claim->setType(Claim::TYPE_LOSS);
         $claim->setApprovedDate(new \DateTime('2016-01-02'));
         $policy->addClaim($claim);
 
@@ -1437,6 +1492,7 @@ class DaviesServiceTest extends WebTestCase
     {
         $policy = static::createUserPolicy(true);
         $claim = new Claim();
+        $claim->setType(Claim::TYPE_LOSS);
         $claim->setApprovedDate(new \DateTime('2016-01-02'));
         $policy->addClaim($claim);
 
@@ -1471,6 +1527,7 @@ class DaviesServiceTest extends WebTestCase
     {
         $policy = static::createUserPolicy(true);
         $claim = new Claim();
+        $claim->setType(Claim::TYPE_LOSS);
         $claim->setApprovedDate(new \DateTime('2016-01-02'));
         $policy->addClaim($claim);
 
@@ -1500,6 +1557,7 @@ class DaviesServiceTest extends WebTestCase
     {
         $policy = static::createUserPolicy(true);
         $claim = new Claim();
+        $claim->setType(Claim::TYPE_LOSS);
         // 3 months!
         $claim->setApprovedDate(new \DateTime('2016-04-01'));
         $policy->addClaim($claim);
@@ -1536,6 +1594,7 @@ class DaviesServiceTest extends WebTestCase
     {
         $policy = static::createUserPolicy(true);
         $claim = new Claim();
+        $claim->setType(Claim::TYPE_LOSS);
         // 2 weeks
         $twoWeekAgo = \DateTime::createFromFormat('U', time());
         $twoWeekAgo = $twoWeekAgo->sub(new \DateInterval('P14D'));

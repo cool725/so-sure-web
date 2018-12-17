@@ -30,16 +30,32 @@
                 </div>
             </div>
 
-            <div class="form-row">
-                <label>Current IMEI</label>
-                <p>{{ policy.imei }}</p>
-            </div>
-
             <hr>
 
-            <div class="form-row">
-                <label>New IMEI</label>
-                {{ form_widget(form.imei, {'attr': {'class': 'form-control'}}) }}
+            <div class="row">
+                <div class="col-xs-6">
+                    <label>Current IMEI</label>
+                    <p>{{ policy.imei }}</p>
+                </div>
+                <div class="col-xs-6">
+                    <label>Current Phone</label>
+                    <p>{{ policy.phone }}</p>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-xs-6">
+                    <label>New IMEI</label>
+                    {{ form_widget(form.imei, {'attr': {'class': 'form-control'}}) }}
+                </div>
+
+                <div class="col-xs-6">
+                    <label>Insured Phone</label>
+                    {{ form_widget(form.phone, {'attr': {'class': 'form-control'}}) }}
+                </div>
+
+                <p class="col-xs-12 help-block">Ok to update only 1 field whilst keeping the other field at the default (same) value</p>
+                <p class="col-xs-12 help-block">Changing the Imei or phone will trigger a salva policy update</p>
             </div>
 
             <div class="form-row">

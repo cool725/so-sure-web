@@ -5,6 +5,8 @@ use AppBundle\Document\ImeiTrait;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Psr\Log\LoggerInterface;
 use AppBundle\Document\CurrencyTrait;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
+use Symfony\Component\Routing\Router;
 
 class MiscTwigExtension extends \Twig_Extension
 {
@@ -17,16 +19,22 @@ class MiscTwigExtension extends \Twig_Extension
     /** @var LoggerInterface */
     protected $logger;
 
+    /** @var Router */
+    protected $router;
+
     /**
      * @param RequestStack    $requestStack
      * @param LoggerInterface $logger
+     * @param Router          $router
      */
     public function __construct(
         RequestStack $requestStack,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        Router $router
     ) {
         $this->requestStack = $requestStack;
         $this->logger = $logger;
+        $this->router = $router;
     }
 
     public function getFilters()
@@ -43,6 +51,7 @@ class MiscTwigExtension extends \Twig_Extension
             new \Twig_SimpleFunction('path_info', [$this, 'pathInfo']),
             new \Twig_SimpleFunction('random_imei', [$this, 'generateRandomImei']),
             new \Twig_SimpleFunction('random_serial', [$this, 'generateRandomAppleSerialNumber']),
+            new \Twig_SimpleFunction('route_exists', [$this, 'routeExists']),
         );
     }
 
@@ -54,6 +63,17 @@ class MiscTwigExtension extends \Twig_Extension
     public function pathInfo($path)
     {
         return pathinfo($path);
+    }
+
+    public function routeExists($route, $params)
+    {
+        try {
+            $this->router->generate($route, $params);
+
+            return true;
+        } catch (RouteNotFoundException $e) {
+            return false;
+        }
     }
 
     public function getName()

@@ -1360,6 +1360,116 @@ class JudopayServiceTest extends WebTestCase
         $this->assertTrue(self::$judopay->cardExpiringEmail($policy, new \DateTime('2020-12-15')));
     }
 
+    public function testFailedPaymentEmail()
+    {
+        $this->clearEmail(static::$container);
+        $user = $this->createValidUser(static::generateEmail('testFailedPaymentEmail', $this, true));
+        $phone = static::getRandomPhone(static::$dm);
+        $policy = static::initPolicy($user, static::$dm, $phone);
+        static::$dm->persist($policy);
+
+        $details = self::$judopay->testPayDetails(
+            $user,
+            $policy->getId(),
+            $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
+            self::$JUDO_TEST_CARD_NUM,
+            self::$JUDO_TEST_CARD_EXP,
+            self::$JUDO_TEST_CARD_PIN
+        );
+
+        if (!isset($details['cardDetails']) || !isset($details['cardDetails']['cardToken'])) {
+            throw new \Exception('Payment failed');
+        }
+
+        // @codingStandardsIgnoreStart
+        self::$judopay->add(
+            $policy,
+            $details['receiptId'],
+            $details['consumer']['consumerToken'],
+            $details['cardDetails']['cardToken'],
+            Payment::SOURCE_WEB_API,
+            "{\"clientDetails\":{\"OS\":\"Android OS 6.0.1\",\"kDeviceID\":\"da471ee402afeb24\",\"vDeviceID\":\"03bd3e3c-66d0-4e46-9369-cc45bb078f5f\",\"culture_locale\":\"en_GB\",\"deviceModel\":\"Nexus 5\",\"countryCode\":\"826\"}}"
+        );
+        // @codingStandardsIgnoreEnd
+
+        for ($i = 1; $i < 4; $i++) {
+            $scheduledPayment = $policy->getNextScheduledPayment();
+            $payment = new JudoPayment();
+            $payment->setResult(JudoPayment::RESULT_DECLINED);
+            $payment->setPolicy($policy);
+            $policy->addPayment($payment);
+
+            self::$judopay->processScheduledPaymentResult(
+                $scheduledPayment,
+                $payment,
+                clone $scheduledPayment->getScheduled()
+            );
+
+            self::assertEquals(count($policy->getFailedPayments()), $i);
+
+            $this->assertEquals(
+                'AppBundle:Email:card/failedPayment',
+                self::$judopay->failedPaymentEmail($policy, count($policy->getFailedPayments()))
+            );
+        }
+    }
+
+    public function testFailedPaymentEmailMissing()
+    {
+        $this->clearEmail(static::$container);
+        $user = $this->createValidUser(static::generateEmail('testFailedPaymentEmail', $this, true));
+        $phone = static::getRandomPhone(static::$dm);
+        $policy = static::initPolicy($user, static::$dm, $phone);
+        static::$dm->persist($policy);
+
+        $details = self::$judopay->testPayDetails(
+            $user,
+            $policy->getId(),
+            $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
+            self::$JUDO_TEST_CARD_NUM,
+            self::$JUDO_TEST_CARD_EXP,
+            self::$JUDO_TEST_CARD_PIN
+        );
+
+        if (!isset($details['cardDetails']) || !isset($details['cardDetails']['cardToken'])) {
+            throw new \Exception('Payment failed');
+        }
+
+        // @codingStandardsIgnoreStart
+        self::$judopay->add(
+            $policy,
+            $details['receiptId'],
+            $details['consumer']['consumerToken'],
+            $details['cardDetails']['cardToken'],
+            Payment::SOURCE_WEB_API,
+            "{\"clientDetails\":{\"OS\":\"Android OS 6.0.1\",\"kDeviceID\":\"da471ee402afeb24\",\"vDeviceID\":\"03bd3e3c-66d0-4e46-9369-cc45bb078f5f\",\"culture_locale\":\"en_GB\",\"deviceModel\":\"Nexus 5\",\"countryCode\":\"826\"}}"
+        );
+        // @codingStandardsIgnoreEnd
+
+        $user->setPaymentMethod(new JudoPaymentMethod());
+
+        for ($i = 1; $i < 4; $i++) {
+            $scheduledPayment = $policy->getNextScheduledPayment();
+            $payment = new JudoPayment();
+            $payment->setResult(JudoPayment::RESULT_DECLINED);
+            $payment->setPolicy($policy);
+            $policy->addPayment($payment);
+
+            self::$judopay->processScheduledPaymentResult(
+                $scheduledPayment,
+                $payment,
+                clone $scheduledPayment->getScheduled()
+            );
+
+            self::assertEquals(count($policy->getFailedPayments()), $i);
+
+            $this->assertEquals(
+                'AppBundle:Email:card/cardMissing',
+                self::$judopay->failedPaymentEmail($policy, count($policy->getFailedPayments()))
+            );
+        }
+    }
+
     public function testJudoExisting()
     {
         $user = $this->createValidUser(static::generateEmail('testJudoMultiPolicy', $this));

@@ -28,4 +28,17 @@ class AttributionTest extends \PHPUnit\Framework\TestCase
         );
         // @codingStandardsIgnoreEnd
     }
+
+    /**
+     * Make sure attribution can be created with only campaign source set.
+     */
+    public function testEmptyAttribution()
+    {
+        $attribution = new Attribution();
+        $attribution->setCampaignSource(Attribution::SOURCE_UNTRACKED);
+        $this->assertNull($attribution->getCampaignName());
+        $this->assertEquals(Attribution::SOURCE_UNTRACKED, $attribution->getCampaignSource());
+        $this->assertNull($attribution->getCampaignTerm());
+        $this->assertNull($attribution->getCampaignMedium());
+    }
 }

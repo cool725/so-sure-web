@@ -130,7 +130,7 @@ abstract class Invitation
     {
         return $this->id;
     }
-    
+
     public function getStatus()
     {
         return $this->status;
@@ -144,6 +144,11 @@ abstract class Invitation
     public function getCreated()
     {
         return $this->created;
+    }
+
+    public function setCreated(\DateTime $created)
+    {
+        $this->created = $created;
     }
 
     public function getAccepted()

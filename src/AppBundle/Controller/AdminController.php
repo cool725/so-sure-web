@@ -404,6 +404,9 @@ class AdminController extends BaseController
      */
     public function adminAccountsPrintAction($year, $month)
     {
+        // default 30s for prod is no longer enough
+        set_time_limit(600);
+
         $date = \DateTime::createFromFormat("Y-m-d", sprintf('%d-%d-01', $year, $month));
 
         $templating = $this->get('templating');
@@ -444,7 +447,7 @@ class AdminController extends BaseController
     public function adminAccountsAction(Request $request, $year = null, $month = null)
     {
         // default 30s for prod is no longer enough
-        set_time_limit(180);
+        set_time_limit(600);
 
         $now = \DateTime::createFromFormat('U', time());
         if (!$year) {
@@ -463,9 +466,6 @@ class AdminController extends BaseController
             if ($request->request->has('salva_form')) {
                 $salvaForm->handleRequest($request);
                 if ($salvaForm->isValid()) {
-                    // default 30s for prod is no longer enough
-                    set_time_limit(300);
-
                     /** @var SalvaExportService $salva */
                     $salva = $this->get('app.salva');
                     $salva->exportPayments(true);
@@ -1244,6 +1244,7 @@ class AdminController extends BaseController
 
         return [
             'features' => $features,
+            'descriptions' => Feature::$descriptions,
         ];
     }
 

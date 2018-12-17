@@ -63,7 +63,7 @@ Vagrant.configure("2") do |config|
   # there may be an additional error about unable to read from remote git repo
   # copy your ssh id_rsa key to source folder; then vagrant ssh; cp /vagrant/id_rsa ~/.ssh/id_rsa
   # exit; vagrant halt; vagrant up --provision
-  config.vm.define "dev1804", primary: false, autostart: false do |dev1804_config|
+  config.vm.define "dev1804", primary: true, autostart: true do |dev1804_config|
     dev1804_config.vm.box = "geerlingguy/ubuntu1804"
     dev1804_config.vm.box_check_update = false
     dev1804_config.vm.network "forwarded_port", guest: 80, host: 40080 # apache sosure website
@@ -166,7 +166,7 @@ Vagrant.configure("2") do |config|
     end
   end
 
-  config.vm.define "dev1604", primary: true, autostart: true do |dev1604_config|
+  config.vm.define "dev1604", primary: false, autostart: false do |dev1604_config|
 	# https://github.com/geerlingguy/packer-ubuntu-1604/issues/1
 	# edit /etc/network/interfaces and remove
 	#   auto eth1

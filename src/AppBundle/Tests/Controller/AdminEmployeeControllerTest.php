@@ -83,7 +83,7 @@ class AdminEmployeeControllerTest extends BaseControllerTest
 
 
         $url = sprintf('/admin/policy/%s', $policy->getId());
-        $this->login('patrick@so-sure.com', LoadUserData::DEFAULT_PASSWORD, 'admin');
+        $this->login(LoadUserData::DEFAULT_ADMIN, LoadUserData::DEFAULT_PASSWORD, 'admin');
         $crawler = self::$client->request('GET', $url);
         $form = $crawler->selectButton('Debt')->form();
         self::$client->enableProfiler();

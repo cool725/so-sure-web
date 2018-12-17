@@ -439,7 +439,33 @@
                     <table class="table .table-condensed">
                         <tr>
                             <td>Excess</td>
-                            <td>{{ claim.excess|default('-') }}</td>
+                            <td>
+                                {% if equal_to_two_dp(claim.excess, claim.expectedExcessValue) %}
+                                    {{ claim.excess|default('-') }} <span title="Expected excess value" class="text-success"><i class="fa fa-check"></i></span>
+                                {% else %}
+                                    <span class="text-danger">
+                                        {{ claim.excess|default('-') }} <span title="Does not match Expected Excess Value" class="text-danger"><i class="fa fa-exclamation-triangle"></i></span>
+                                    </span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Expected Excess</td>
+                            <td>
+                                {% if equal_to_two_dp(claim.excess, claim.expectedExcessValue) %}
+                                    {{ claim.expectedExcessValue }}
+                                {% else %}
+                                    <span class="text-danger">
+                                        {{ claim.expectedExcessValue }}
+                                    </span>
+                                {% endif %}
+
+                                {% if not equal_to_two_dp(claim.expectedExcessValue, claim.expectedExcessValue(true)) %}
+                                    <span title="Warning excess does not matches older calculation of £{{ claim.expectedExcessValue(true)|number_format(2, '.', ',') }}">
+                                        <i class="fa fa-warning"></i>
+                                    </span>
+                                {% endif %}
+                            </td>
                         </tr>
                         <tr>
                             <td>Unauthorized Calls</td>
@@ -482,9 +508,12 @@
                             </div>
                         </div>
                     </div>
-                    <div class="form-group">
+
+                    <div class="modal-footer">
                         {{ form_widget(claim_note_form.update, {'attr': {'class': 'btn btn-success'}}) }}
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                     </div>
+
                     {{ form_end(claim_note_form) }}
                 </div>
 
@@ -523,39 +552,24 @@
                         {% if is_granted('ROLE_ADMIN') %}
                             {{ form_widget(form.approvedDate, {'attr': {'class': 'form-control'}}) }}
                         {% else %}
-                            {{ claim.approvedDate }}
+                            {{ claim.approvedDate|date('d-m-Y') }}
                         {% endif %}
                     </div>
 
-                    {#
-                    <div class="row">
-                        <div class="col-xs-12">
-                            <div class="form-group">
-                                <label>Justification</label>
-                                {{ form_widget(form.justification, {'attr': {'class': 'form-control'}}) }}
-                            </div>
-                        </div>
-                    </div>
-                    #}
-
-                    <div class="form-group">
+                    <div class="modal-footer">
+                        {% if is_granted('ROLE_ADMIN') %}
+                            <button id="delete-claim" type="button" class="btn btn-danger pull-left">
+                                <i class="fa fa-lock" title="Admin only"></i> Delete Claim
+                            </button>
+                        {% endif %}
                         {{ form_widget(form.update, {'attr': {'class': 'btn btn-success'}}) }}
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                     </div>
+
                     {{ form_end(form) }}
                 </div>
                 {% endif %}
             </div>
-        </div>
-    </div>
-
-    <div class="modal-footer">
-        <div class="col-xs-6">
-        {% if is_granted('ROLE_ADMIN') %}
-            <button id="delete-claim" type="button" class="btn btn-danger">Delete Claim</button>
-        {% endif %}
-        </div>
-        <div class="col-xs-6">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
         </div>
     </div>
 
