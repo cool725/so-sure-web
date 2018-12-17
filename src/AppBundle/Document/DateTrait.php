@@ -356,6 +356,7 @@ trait DateTrait
     {
         $date = clone $date;
         $date->add(static::intervalDays($days));
+
         return $date;
     }
 

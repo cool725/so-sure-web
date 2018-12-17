@@ -3,6 +3,8 @@
 namespace AppBundle\Controller;
 
 use AppBundle\Document\AffiliateCompany;
+use AppBundle\Document\Promotion;
+use AppBundle\Document\Participation;
 use AppBundle\Document\BacsPaymentMethod;
 use AppBundle\Document\File\PaymentRequestUploadFile;
 use AppBundle\Document\JudoPaymentMethod;
@@ -20,6 +22,7 @@ use AppBundle\Form\Type\ClaimNoteType;
 use AppBundle\Form\Type\PaymentRequestUploadFileType;
 use AppBundle\Form\Type\UploadFileType;
 use AppBundle\Form\Type\UserHandlingTeamType;
+use AppBundle\Form\Type\PromotionType;
 use AppBundle\Repository\ClaimRepository;
 use AppBundle\Repository\PhonePolicyRepository;
 use AppBundle\Repository\PhoneRepository;
@@ -3305,5 +3308,43 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         } else {
             return ['error' => 'Invalid URL, given ID does not correspond to an affiliate.'];
         }
+    }
+
+    /**
+     * @Route("/promotions", name="admin_promotions")
+     * @Template("AppBundle:AdminEmployee:promotions.html.twig")
+     */
+    public function promotionsAction(Request $request)
+    {
+        $dm = $this->getManager();
+        $promotionForm = $this->get('form.factory')
+            ->createNamedBuilder('promotionForm', PromotionType::class, null, ['method' => 'POST'])
+            ->getForm();
+        $promotionForm->handleRequest($request);
+        if ($promotionForm->isSubmitted() && $promotionForm->isValid()) {
+            $promotion = $promotionForm->getData();
+            $promotion->setStart(new \DateTime());
+            $promotion->setActive(true);
+            $dm->persist($promotion);
+            $dm->flush();
+            $this->addFlash('success', 'Added Promotion');
+            return new RedirectResponse($this->generateUrl('admin_promotions'));
+        }
+        // TODO: order them so that inactive come after active, but beside that it's ordered by newness.
+        $promotionRepository = $dm->getRepository(Promotion::class);
+        $promotions = $promotionRepository->findAll();
+        return ["promotions" => $promotions, "promotionForm" => $promotionForm->createView()];
+    }
+
+    /**
+     * @Route("/promotion/{id}", name="admin_promotion")
+     * @Template("AppBundle:AdminEmployee:promotion.html.twig")
+     */
+    public function promotionAction($id)
+    {
+        $dm = $this->getManager();
+        $promotionRepository = $dm->getRepository(Promotion::class);
+        $promotion = $promotionRepository->find($id);
+        return ["promotion" => $promotion];
     }
 }

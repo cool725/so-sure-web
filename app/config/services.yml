@@ -201,6 +201,13 @@ services:
             - "@doctrine_mongodb.odm.default_document_manager"
             - "@logger"
 
+    app.promotion:
+        class: AppBundle\Service\PromotionService
+        arguments:
+            - "@doctrine_mongodb.odm.default_document_manager"
+            - "@app.mailer"
+            - "@logger"
+
     app.bacs:
         alias: AppBundle\Service\BacsService
         public: true

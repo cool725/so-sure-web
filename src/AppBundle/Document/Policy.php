@@ -565,6 +565,11 @@ abstract class Policy
      */
     protected $tasteCard;
 
+    /**
+     * @MongoDB\EmbedMany(targetDocument="Participation")
+     */
+    protected $participations;
+
     public function __construct()
     {
         $this->created = \DateTime::createFromFormat('U', time());
@@ -576,6 +581,7 @@ abstract class Policy
         $this->acceptedConnectionsRenewal = new \Doctrine\Common\Collections\ArrayCollection();
         $this->scheduledPayments = new \Doctrine\Common\Collections\ArrayCollection();
         $this->notesList = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->participations = new \Doctrine\Common\Collections\ArrayCollection();
         $this->potValue = 0;
     }
 
@@ -1380,6 +1386,17 @@ abstract class Policy
         $this->tasteCard = $tasteCard;
     }
 
+    public function getParticipations()
+    {
+        return $this->participations;
+    }
+
+    public function addParticipation($participation)
+    {
+        $participation->setPolicy($this);
+        $this->participations[] = $participation;
+    }
+
     public function getStandardConnections()
     {
         $connections = [];
@@ -1503,6 +1520,25 @@ abstract class Policy
         });
 
         return $claims[0];
+    }
+
+    /**
+     * Gives you a list of all of the policy's claims that fall within a given period.
+     * @param \DateTime $start is the start of the interval.
+     * @param \DateTime $end   is the end of the interval.
+     * @return array containing all of the claims that happened in this period.
+     */
+    public function getClaimsInPeriod(\DateTime $start, \DateTime $end)
+    {
+        $claims = $this->getClaims();
+        $periodClaims = [];
+        foreach ($claims as $claim) {
+            $date = $claim->getRecordedDate();
+            if ($date < $start || $date > $end) {
+                $periodClaims[] = $claim;
+            }
+        }
+        return $periodClaims;
     }
 
     public function getLatestFnolClaim()
