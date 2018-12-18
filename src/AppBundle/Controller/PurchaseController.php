@@ -1305,8 +1305,8 @@ class PurchaseController extends BaseController
                     $reason = $cancelForm->getData()['reason'];
                     $other = $this->conformAlphanumericSpaceDot($cancelForm->getData()['othertxt'], 256);
                     $flash = null;
-                    $cooloff = $policy->isWithinCooloffPeriod(null, false);
-                    if ($cooloff) {
+                    $canCancelCooloff = $policy->canCancel(Policy::CANCELLED_COOLOFF);
+                    if ($canCancelCooloff) {
                         $policy->setRequestedCancellation(\DateTime::createFromFormat('U', time()));
                         $policy->setRequestedCancellationReason($reason);
                         if ($other) {
@@ -1356,7 +1356,7 @@ class PurchaseController extends BaseController
                             [
                                 'Policy Id' => $policy->getId(),
                                 'Reason' => $reason,
-                                'Auto Approved' => $cooloff
+                                'Auto Approved' => $canCancelCooloff
                             ]
                         );
                     }
