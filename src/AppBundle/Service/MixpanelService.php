@@ -241,7 +241,7 @@ class MixpanelService
             if ($data["action"] == $type) {
                 $count++;
             } else {
-                $this->redis->rpush(self::KEY_MIXPANEL_QUEUE, $item);
+                $this->redis->rpush(self::KEY_MIXPANEL_QUEUE, [$item]);
             }
             $this->redis->lpop(self::KEY_MIXPANEL_QUEUE);
         }
