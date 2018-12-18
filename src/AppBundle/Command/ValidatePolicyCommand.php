@@ -271,6 +271,10 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                             continue;
                         }
 
+                        if ($line == '' || $line == ' ') {
+                            continue;
+                        }
+
                         $this->redis->append($policy->getId(), $line . ";");
                     }
 

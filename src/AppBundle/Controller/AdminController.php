@@ -1571,7 +1571,7 @@ class AdminController extends BaseController
      * @Route("/policy-validation", name="policy_validation")
      * @Template
      */
-    public function policyValidationAction()
+    public function policyValidationAction(Request $request)
     {
         $dm = $this->getManager();
         /** @var Client $redis */
@@ -1579,6 +1579,28 @@ class AdminController extends BaseController
 
         /** @var PolicyRepository $repo */
         $repo = $dm->getRepository(Policy::class);
+
+        if ('POST' === $request->getMethod()) {
+            if (!$this->isCsrfTokenValid('default', $request->get('token'))) {
+                throw new \InvalidArgumentException('Invalid csrf token');
+            }
+
+            /** @var Policy $policy */
+            $policy = $repo->find($request->get('id'));
+
+            if (!$policy) {
+                throw $this->createNotFoundException(sprintf('Policy %s not found', $request->get('id')));
+            }
+
+            $this->addFlash('success', sprintf(
+                'Policy %s successfully removed',
+                $policy->getPolicyNumber()
+            ));
+
+            $redis->del($policy->getId());
+
+            return $this->redirectToRoute('policy_validation');
+        }
 
         $policies = $repo->findAll();
 
@@ -1589,6 +1611,8 @@ class AdminController extends BaseController
             if ($redis->exists($policy->getId())) {
                 $policiesForValidation[$policy->getId()] = $policy;
                 $validationErrors[$policy->getId()] = explode(';', $redis->get($policy->getId()));
+
+                array_pop($validationErrors[$policy->getId()]);
             }
         }
 
@@ -1597,42 +1621,38 @@ class AdminController extends BaseController
             'policyValidationErrors' => $validationErrors
         ];
     }
-
-    /**
-     * @Route("/policy-validation-validate", name="policy_validate")
-     * @Method({"POST"})
-     */
-    public function policyValidationValidateAction(Request $request)
-    {
-        if (!$this->isCsrfTokenValid('default', $request->get('token'))) {
-            throw new \InvalidArgumentException('Invalid csrf token');
-        }
-
-        $dm = $this->getManager();
-        /** @var Client $redis */
-        $redis = $this->get("snc_redis.default");
-
-        /** @var PolicyRepository $repo */
-        $repo = $dm->getRepository(Policy::class);
-
-        /** @var Policy $policy */
-        $policy = $repo->find($request->get('id'));
-
-        if (!$policy) {
-            throw $this->createNotFoundException(sprintf('Policy %s not found', $request->get('id')));
-        }
-
-        $this->addFlash('success', sprintf(
-            'Policy %s successfully removed',
-            $policy->getPolicyNumber()
-        ));
-
-        $redis->del($policy->getId());
-
-        if (!$policy) {
-            throw $this->createNotFoundException('Policy not found');
-        }
-
-        return $this->redirectToRoute('policy_validation');
-    }
+//
+//    /**
+//     * @Route("/policy-validation-validate", name="policy_validate")
+//     * @Method({"POST"})
+//     */
+//    public function policyValidationValidateAction(Request $request)
+//    {
+//        if (!$this->isCsrfTokenValid('default', $request->get('token'))) {
+//            throw new \InvalidArgumentException('Invalid csrf token');
+//        }
+//
+//        $dm = $this->getManager();
+//        /** @var Client $redis */
+//        $redis = $this->get("snc_redis.default");
+//
+//        /** @var PolicyRepository $repo */
+//        $repo = $dm->getRepository(Policy::class);
+//
+//        /** @var Policy $policy */
+//        $policy = $repo->find($request->get('id'));
+//
+//        if (!$policy) {
+//            throw $this->createNotFoundException(sprintf('Policy %s not found', $request->get('id')));
+//        }
+//
+//        $this->addFlash('success', sprintf(
+//            'Policy %s successfully removed',
+//            $policy->getPolicyNumber()
+//        ));
+//
+//        $redis->del($policy->getId());
+//
+//        return $this->redirectToRoute('policy_validation');
+//    }
 }
