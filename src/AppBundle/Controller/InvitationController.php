@@ -33,6 +33,7 @@ class InvitationController extends BaseController
         $repo = $dm->getRepository(Invitation::class);
         $invitation = $repo->find($id);
         $phoneRepo = $dm->getRepository(Phone::class);
+        $userDeclined = false;
 
         if ($invitation && $invitation->isSingleUse() && $invitation->isInviteeProcessed()) {
             $flashType = 'warning';
@@ -41,7 +42,7 @@ class InvitationController extends BaseController
             if ($invitation->isAccepted()) {
                 $flashType = 'success';
                 $flashMessage = 'This invitation to join so-sure has already been accepted already';
-            } elseif ($invitation->isRejected()) {
+            } elseif ($invitation->isRejected() && $userDeclined == false) {
                 $flashType = 'error';
                 $flashMessage = 'Hmm, it looks like this invitation to join so-sure has already been declined';
             } elseif ($invitation->isCancelled()) {
@@ -75,7 +76,7 @@ class InvitationController extends BaseController
             if ($declineForm->isSubmitted() && $declineForm->isValid()) {
                 $invitationService = $this->get('app.invitation');
                 $invitationService->reject($invitation);
-                $declined = true;
+                $userDeclined = true;
                 $this->addFlash(
                     'error',
                     'You have declined this invitation.'
@@ -114,7 +115,6 @@ class InvitationController extends BaseController
             'invitation' => $invitation,
             'form' => $declineForm->createView(),
             'landing_text' => $landingText,
-            'declined' => $declined,
         );
     }
 }
