@@ -77,8 +77,6 @@ class Lead
     protected $phone;
 
     /**
-     * @Assert\Choice({"text-me", "launch-usa", "buy", "save-quote", "purchase-flow",
-     *                 "contact-us", "affiliate"}, strict=true)
      * @MongoDB\Field(type="string")
      */
     protected $source;
