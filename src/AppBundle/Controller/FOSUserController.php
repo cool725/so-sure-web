@@ -163,6 +163,9 @@ class FOSUserController extends ResettingController
             }
         }
 
-        return new RedirectResponse($this->generateUrl('fos_user_resetting_check_email', array('username' => $username)));
+        return new RedirectResponse($this->generateUrl(
+            'fos_user_resetting_check_email',
+            array('username' => $username))
+        );
     }
 }
