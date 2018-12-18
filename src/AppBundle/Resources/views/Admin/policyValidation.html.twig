@@ -35,7 +35,7 @@
 
                         <div class="d-flex flex-wrap">
                             {% for validationError in policyValidationErrors[policy.id] %}
-                                <span class="mr-auto w-50">{{ validationError|trim }}</span>
+                                <p class="mr-auto w-50">{{ validationError|trim }}</p>
                             {% endfor %}
                         </div>
                     </div>

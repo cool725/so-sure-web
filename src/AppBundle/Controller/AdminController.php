@@ -1613,10 +1613,10 @@ class AdminController extends BaseController
         foreach ($policies as $policy) {
             if ($redis->exists($policy->getId())) {
                 $policiesForValidation[$policy->getId()] = $policy;
-                $validationErrors[$policy->getId()] = explode(';', $redis->get($policy->getId()));
 
-                /* Last item in exploded array is always empty */
-                array_pop($validationErrors[$policy->getId()]);
+                foreach ($redis->lrange($policy->getId(), 0, -1) as $issue) {
+                    $validationErrors[$policy->getId()][] = $issue;
+                }
             }
         }
 

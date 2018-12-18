@@ -234,11 +234,6 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                 $lines[] = '-------------';
                 $lines[] = '';
 
-                /* Clear redis policies before adding again */
-                foreach ($policies as $policy) {
-                    $this->redis->del($policy->getId());
-                }
-
                 foreach ($policies as $policy) {
                     if ($prefix && !$policy->hasPolicyPrefix($prefix)) {
                         continue;
@@ -259,8 +254,20 @@ class ValidatePolicyCommand extends ContainerAwareCommand
 
                     $newLines = array_diff($lines, $prevLines);
 
-                    foreach ($newLines as $line) {
-                        if (mb_stripos($line, 'http://localhost/admin/policy') !== false) {
+                    $adjustedNewLines = [];
+                    foreach ($newLines as $item) {
+                        if (mb_stripos($item, '<a ') === false) {
+                            $adjustedNewLines[] = $item;
+                        }
+                    }
+                    $csvData[$policy->getPolicyNumber()] = $adjustedNewLines;
+
+                    if ($this->redis->exists($policy->getId())) {
+                        continue;
+                    }
+
+                    foreach ($adjustedNewLines as $line) {
+                        if (mb_stripos($line, '<a href=') !== false) {
                             continue;
                         }
 
@@ -272,16 +279,8 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                             continue;
                         }
 
-                        $this->redis->append($policy->getId(), $line . ";");
+                        $this->redis->lpush($policy->getId(), $line);
                     }
-
-                    $adjustedNewLines = [];
-                    foreach ($newLines as $item) {
-                        if (mb_stripos($item, '<a ') === false) {
-                            $adjustedNewLines[] = $item;
-                        }
-                    }
-                    $csvData[$policy->getPolicyNumber()] = $adjustedNewLines;
                 }
 
                 $lines[] = '';
