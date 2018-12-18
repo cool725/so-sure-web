@@ -41,7 +41,7 @@ class InvitationController extends BaseController
             if ($invitation->isAccepted()) {
                 $flashType = 'success';
                 $flashMessage = 'The invitation to join so-sure has been accpeted';
-            } elseif ($invitation->isRejected() && $userDeclined == false) {
+            } elseif ($invitation->isRejected()) {
                 $flashType = 'error';
                 $flashMessage = 'This invitation to join so-sure was declined';
             } elseif ($invitation->isCancelled()) {
@@ -75,7 +75,6 @@ class InvitationController extends BaseController
             if ($declineForm->isSubmitted() && $declineForm->isValid()) {
                 $invitationService = $this->get('app.invitation');
                 $invitationService->reject($invitation);
-                $userDeclined = true;
 
                 return $this->redirectToRoute('invitation', [
                     'id' => $id,
