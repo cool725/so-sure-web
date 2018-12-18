@@ -76,6 +76,12 @@ class AffiliateCompany extends Company
      */
     protected $chargeModel;
 
+    /**
+     * @MongoDB\ReferenceOne(targetDocument="Promotion", inversedBy="affiliates")
+     * @Gedmo\Versioned
+     */
+    protected $promotion;
+
     public function __construct()
     {
         parent::__construct();

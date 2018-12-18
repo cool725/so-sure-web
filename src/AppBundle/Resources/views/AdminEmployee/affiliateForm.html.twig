@@ -1,0 +1,77 @@
+{% block body %}
+{{ form_start(form) }}
+    <h2>Company Details</h2>
+    <div class="form-group row">
+        {{ form_label(form.name, 'Name', {'label_attr': {'class': 'col-sm-2 col-form-label'}}) }}
+        <div class="col-sm-10">{{ form_widget(form.name, {'attr': {'class': 'form-control'}}) }}</div>
+        {{ form_errors(form.name) }}
+    </div>
+    <div class="form-group row">
+        {{ form_label(form.address1, 'Address Line1', {'label_attr': {'class': 'col-sm-2 col-form-label'}}) }}
+        <div class="col-sm-10">{{ form_widget(form.address1, {'attr': {'class': 'form-control'}}) }}</div>
+        {{ form_errors(form.address1) }}
+    </div>
+    <div class="form-group row">
+        {{ form_label(form.address2, 'Address Line 2', {'label_attr': {'class': 'col-sm-2 col-form-label'}}) }}
+        <div class="col-sm-10">{{ form_widget(form.address2, {'attr': {'class': 'form-control'}}) }}</div>
+        {{ form_errors(form.address2) }}
+    </div>
+    <div class="form-group row">
+        {{ form_label(form.address3, 'Address Line 3', {'label_attr': {'class': 'col-sm-2 col-form-label'}}) }}
+        <div class="col-sm-10">{{ form_widget(form.address3, {'attr': {'class': 'form-control'}}) }}</div>
+        {{ form_errors(form.address3) }}
+    </div>
+    <div class="form-group row">
+        {{ form_label(form.city, 'City', {'label_attr': {'class': 'col-sm-2 col-form-label'}}) }}
+        <div class="col-sm-10">{{ form_widget(form.city, {'attr': {'class': 'form-control'}}) }}</div>
+        {{ form_errors(form.city) }}
+    </div>
+    <div class="form-group row">
+        {{ form_label(form.postcode, 'Postcode', {'label_attr': {'class': 'col-sm-2 col-form-label'}}) }}
+        <div class="col-sm-10">{{ form_widget(form.postcode, {'attr': {'class': 'form-control'}}) }}</div>
+        {{ form_errors(form.postcode) }}
+    </div>
+
+    <h2>Financials</h2>
+    <div class="form-group row">
+        {{ form_label(form.chargeModel, 'Charge Model', {'label_attr': {'class': 'col-sm-2 col-form-label'}}) }}
+        <div class="col-sm-10">{{ form_widget(form.chargeModel, {'attr': {'class': 'form-control', 'id': 'chargeModel'}}) }}</div>
+        {{ form_errors(form.chargeModel) }}
+    </div>
+    <div class="form-group row">
+        {{ form_label(form.days, 'Days', {'label_attr': {'class': 'col-sm-2 col-form-label'}}) }}
+        <div class="col-sm-10">{{ form_widget(form.days, {'attr': {'class': 'form-control'}}) }}</div>
+        {{ form_errors(form.days) }}
+    </div>
+    <div class="form-group row">
+        {{ form_label(form.renewalDays, 'Renewal Days', {'label_attr': {'class': 'col-sm-2 col-form-label'}}) }}
+        <div class="col-sm-10">{{ form_widget(form.renewalDays, {'attr': {'class': 'form-control', 'id': 'renewalDays'}}) }}</div>
+        {{ form_errors(form.renewalDays) }}
+    </div>
+    <div class="form-group row">
+        {{ form_label(form.cpa, 'Cpa', {'label_attr': {'class': 'col-sm-2 col-form-label'}}) }}
+        <div class="col-sm-10">{{ form_widget(form.cpa, {'attr': {'class': 'form-control', 'type': 'number'}}) }}</div>
+        {{ form_errors(form.cpa) }}
+    </div>
+
+    <h2>Tracking</h2>
+    <div class="form-group row">
+        {{ form_label(form.leadSource, 'Lead Source', {'label_attr': {'class': 'col-sm-2 col-form-label'}}) }}
+        <div class="col-sm-10">{{ form_widget(form.leadSource, {'attr': {'class': 'form-control'}}) }}</div>
+        {{ form_errors(form.leadSource) }}
+    </div>
+    <div class="form-group row">
+        {{ form_label(form.leadSource, 'Lead Source Details', {'label_attr': {'class': 'col-sm-2 col-form-label'}}) }}
+        <div class="col-sm-10">{{ form_widget(form.leadSourceDetails, {'attr': {'class': 'form-control'}}) }}</div>
+        {{ form_errors(form.leadSourceDetails) }}
+    </div>
+    <div class="form-group row">
+        {{ form_label(form.campaignSource, 'Campaign Source', {'label_attr': {'class': 'col-sm-2 col-form-label'}}) }}
+        <div class="col-sm-10">{{ form_widget(form.campaignSource, {'attr': {'class': 'form-control'}}) }}</div>
+        {{ form_errors(form.campaignSource) }}
+    </div>
+    <div class="form-group row">
+        {{ form_widget(form.next, {'attr': {'class': 'btn btn-primary'}, 'label': 'Add Affiliate'}) }}
+    </div>
+    {{ form_end(form) }}
+{% endblock %}

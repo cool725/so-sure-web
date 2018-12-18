@@ -100,11 +100,9 @@
                         </table>
                     </div>
                 </div>
-            {% endif %}
-
 
             {# pending users table #}
-            {% if pending is defined %}
+            {% elseif pending is defined %}
                 <div class="row">
                     <h2>Pending Aquisitions</h2>
                     <div class="table-responsive">
@@ -136,10 +134,9 @@
                         </table>
                     </div>
                 </div>
-            {% endif %}
 
-            {# lost users table #}
-            {% if potential is defined %}
+            {# potential users table #}
+            {% elseif potential is defined %}
                 <div class="row">
                     <h2>Potential Aquisitions</h2>
                     <div class="table-responsive">
@@ -162,10 +159,9 @@
                         </table>
                     </div>
                 </div>
-            {% endif %}
 
             {# lost users table #}
-            {% if lost is defined %}
+            {% elseif lost is defined %}
                 <div class="row">
                     <h2>Lost Aquisitions</h2>
                     <div class="table-responsive">
@@ -187,6 +183,9 @@
                         </table>
                     </div>
                 </div>
+            {% else %}
+                {# properties tab #}
+                <h1>This is the properties tab hell yeah enjoy</h1>
             {% endif %}
         {% endif %}
     </div>

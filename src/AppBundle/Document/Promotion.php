@@ -2,6 +2,7 @@
 
 namespace AppBundle\Document;
 
+use AppBundle\Document\Note\Note;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -101,11 +102,24 @@ class Promotion
     protected $rewardAmount;
 
     /**
+     * Stores list of all affiliates currently linked to this promotion.
+     * @MongoDB\ReferenceMany(targetDocument="AffiliateCompany", mappedBy="promotion")
+     */
+    protected $affiliates;
+
+    /**
+     * @MongoDB\EmbedMany(targetDocument="AppBundle\Document\Note\Note")
+     */
+    protected $notesList;
+
+    /**
      * Builds the promotion's participation list.
      */
     public function __construct()
     {
         $this->participating = new ArrayCollection();
+        $this->affiliates = new ArrayCollection();
+        $this->notesList = new ArrayCollection();
     }
 
     public function getId()
@@ -175,6 +189,17 @@ class Promotion
         $participation->setPromotion($this);
     }
 
+    public function getAffiliates()
+    {
+        return $this->affiliates;
+    }
+
+    public function addAffiliates($affiliate)
+    {
+        $this->affiliates[] = $affiliate;
+        $affiliate->setPromotion($this);
+    }
+
     public function getConditionPeriod()
     {
         return $this->conditionPeriod;
@@ -213,5 +238,15 @@ class Promotion
     public function setRewardAmount($rewardAmount)
     {
         $this->rewardAmount = $rewardAmount;
+    }
+
+    public function getNotesList()
+    {
+        return $this->notesList;
+    }
+
+    public function addNotesList(Note $note)
+    {
+        $this->notesList[] = $note;
     }
 }
