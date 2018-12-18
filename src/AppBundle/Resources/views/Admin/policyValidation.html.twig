@@ -1,6 +1,5 @@
 {% extends 'admin_claims_base_rebrand.html.twig' %}
 
-{# Set vars #}
 {% set body_class = 'admin-policy-validation' %}
 
 {% block title %}so-sure - Policy Validation{% endblock %}
@@ -13,30 +12,35 @@
                 <h1 class="h2">Policy Validation</h1>
             </div>
 
-            {% for policy in policies %}
-                <div class="card">
-                    <div class="card-header d-flex flex-row">
-                        <a class="mr-auto align-self-center" href="{{ path('admin_policy', {'id': policy.id}) }}">{{ policy.policyNumber }}</a>
+            <div class="list-group">
+                {% for policy in policies %}
+                    <div class="list-group-item">
+                        <div class="d-flex">
+                            <a class="mr-auto align-self-center"
+                               href="{{ path('admin_policy', {'id': policy.id}) }}">
+                                {{ policy.policyNumber }}
+                            </a>
 
-                        <form class="align-self-center" id="delete-claim-form" method="POST">
-                            <button id="delete-claim" type="submit" class="btn btn-primary">
-                                Remove from Redis
-                            </button>
+                            <form id="delete-claim-form" method="POST">
+                                <button name="delete-redis-policy"
+                                        type="submit"
+                                        class="btn btn-success delete-redis-policy">
+                                    Remove from list
+                                </button>
 
-                            <input type="hidden" name="id" value="{{ policy.id }}"/>
-                            <input type="hidden" name="token" value="{{ csrf_token('default') }}"/>
-                        </form>
+                                <input type="hidden" name="id" value="{{ policy.id }}"/>
+                                <input type="hidden" name="token" value="{{ csrf_token('default') }}"/>
+                            </form>
+                        </div>
+
+                        <div class="d-flex flex-wrap">
+                            {% for validationError in policyValidationErrors[policy.id] %}
+                                <p class="mr-auto w-50">{{ validationError|trim }}</p>
+                            {% endfor %}
+                        </div>
                     </div>
-
-                    <div class="list-group">
-                        {% for validationError in policyValidationErrors[policy.id] %}
-                            <p class="list-group-item">{{ validationError|trim }}</p>
-                        {% endfor %}
-                    </div>
-                </div>
-
-                <hr>
-            {% endfor %}
+                {% endfor %}
+            </div>
         </div>
     </section>
 {% endblock %}
