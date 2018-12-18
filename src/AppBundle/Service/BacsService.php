@@ -277,7 +277,7 @@ class BacsService
             $this->sosureSftpService->moveSftp($file, !$error);
         }
         $date = new \DateTime(SoSure::TIMEZONE);
-        if (static::addDays($date, -14, "H") < $this->startOfDay($date)) {
+        if (static::addTime($date, -14, "H") < $this->startOfDay($date)) {
             $this->approvePayments($date);
         }
         return $results;

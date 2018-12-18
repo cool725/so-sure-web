@@ -347,28 +347,41 @@ trait DateTrait
     }
 
     /**
+     * Adds a period of time to a given date.
+     * @param \DateTime $date  is the date to add onto.
+     * @param int       $units is the quantity of time units to add to the date.
+     * @param String    $type  is the type of time unit to add.
+     * @return \DateTime the given date with the extra units added to it.
+     */
+    public static function addTime($date, $units, $type)
+    {
+        $interval = new \DateInterval("PT".abs($units).$type);
+        $interval->invert = $units < 0 ? 1 : 0;
+        $date = clone $date;
+        return $date->add($interval);
+    }
+
+    /**
      * Returns a copy of a given date which is n days or other unit ahead of it, taking negative numbers into account.
      * @param \DateTime $date is the starting date.
      * @param int       $days is the number of days or other units to move ahead.
-     * @param String    $unit defaults to days but is the kind of unit to add.
      * @return \DateTime the new date.
      */
-    public static function addDays($date, $days, $unit = "D")
+    public static function addDays($date, $days)
     {
         $date = clone $date;
-        $date->add(static::intervalDays($days, $unit));
+        $date->add(static::intervalDays($days));
         return $date;
     }
 
     /**
      * Creates a date interval over a given number of days or other and takes into account negative numbers.
-     * @param int    $days is the number of days to make the interval cover.
-     * @param String $unit defaults to days, but the function can also be used for other things like hours or minutes.
+     * @param int $days is the number of days to make the interval cover.
      * @return \DateInterval given number of units as an interval.
      */
-    public static function intervalDays($days, $unit = "D")
+    public static function intervalDays($days)
     {
-        $interval = new \DateInterval("P".abs($days).$unit);
+        $interval = new \DateInterval("P".abs($days)."D");
         $interval->invert = $days < 0 ? 1 : 0;
         return $interval;
     }
