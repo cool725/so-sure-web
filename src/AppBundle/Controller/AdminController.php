@@ -1617,6 +1617,10 @@ class AdminController extends BaseController
 
         $policy = $repo->find($request->get('id'));
 
+        if (!$policy) {
+            throw $this->createNotFoundException(sprintf('Policy %s not found', $request->get('id')));
+        }
+
         $this->addFlash('success', sprintf(
             'Policy %s successfully removed',
             $policy->getPolicyNumber()
