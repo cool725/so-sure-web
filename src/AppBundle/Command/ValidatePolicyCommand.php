@@ -414,7 +414,9 @@ class ValidatePolicyCommand extends ContainerAwareCommand
             if ($policy->hasCorrectPolicyStatus($data['validateDate']) === false) {
                 $this->header($policy, $policies, $lines);
                 $lines[] = $data[$policy->getId()]['issues'][] = $this->failureStatusMessage(
-                    $policy, $data['prefix'], $data['validateDate']
+                    $policy,
+                    $data['prefix'],
+                    $data['validateDate']
                 );
             }
             if ($policy->arePolicyScheduledPaymentsCorrect(
@@ -455,8 +457,10 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                         'WARNING!! Incorrect scheduled payments for policy %s',
                         $policy->getPolicyNumber()
                     );
+
                     $lines[] = $data[$policy->getId()]['issues'][] = $this->failureScheduledPaymentsMessage(
-                        $policy, $data['validateDate']
+                        $policy,
+                        $data['validateDate']
                     );
                 }
             }
@@ -483,7 +487,9 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                 if (!in_array($policy->getId(), Salva::$commissionValidationExclusions)) {
                     $this->header($policy, $policies, $lines);
                     $lines[] = $data[$policy->getId()]['issues'][] = $this->failureCommissionMessage(
-                        $policy, $data['prefix'], $commissionDate
+                        $policy,
+                        $data['prefix'],
+                        $commissionDate
                     );
                 }
             }
