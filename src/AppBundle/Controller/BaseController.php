@@ -1001,12 +1001,11 @@ abstract class BaseController extends Controller
             });
             $pager = $this->arrayPager($request, $policies);
         } else {
-            $policiesQb = $policiesQb->sort('start', 'asc');
-            //$pager = $this->arrayPager($request, $policiesQb->getQuery()->execute()->toArray());
             $pager = $this->pager($request, $policiesQb);
         }
 
         return [
+
             'policies' => $pager->getCurrentPageResults(),
             'pager' => $pager,
             'form' => $form->createView(),
