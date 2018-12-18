@@ -1,31 +1,35 @@
-{% extends '::admin_claims_base_rebrand.html.twig' %}
+{% extends 'admin_claims_base_rebrand.html.twig' %}
+
+{# Set vars #}
+{% set body_class = 'admin-policy-validation' %}
+
+{% block title %}so-sure - Policy Validation{% endblock %}
+{% block meta %}{% endblock %}
 
 {% block body %}
-
-
     <section class="py-4 px-md-4">
         <div class="container-fluid">
             <div class="d-lg-flex align-items-lg-center justify-content-lg-between mb-3">
                 <h1 class="h2">Policy Validation</h1>
             </div>
+
             {% for policy in policies %}
                 <div class="row">
-                    <div class="col-8">
+                    <div class="col-md-8 col-xs-12">
                         <h4>
                             {{ policy.policyNumber }}
                         </h4>
 
-                        {% for validationError in validation[policy.id] %}
+                        {% for validationError in policyValidationErrors[policy.id] %}
                             <p>{{ validationError }}</p>
                         {% endfor %}
 
-
                     </div>
 
-                    <div class="col-4">
+                    <div class="col-md-4 col-xs-12">
                         <form id="delete-claim-form" method="POST" action="{{ path('policy_validate') }}">
                             <button id="delete-claim" type="submit" class="btn btn-success">
-                                Valid
+                                Remove from Redis
                             </button>
 
                             <input type="hidden" name="id" value="{{ policy.id }}"/>

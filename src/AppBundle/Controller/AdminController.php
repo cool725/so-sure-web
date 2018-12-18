@@ -1582,19 +1582,19 @@ class AdminController extends BaseController
 
         $policies = $repo->findAll();
 
-        $policyValidation = [];
-        $lines = [];
+        $policiesForValidation = [];
+        $validationErrors = [];
         /** @var Policy $policy */
         foreach ($policies as $policy) {
             if ($redis->exists($policy->getId())) {
-                $policyValidation[$policy->getId()] = $policy;
-                $lines[$policy->getId()] = explode(';', $redis->get($policy->getId()));
+                $policiesForValidation[$policy->getId()] = $policy;
+                $validationErrors[$policy->getId()] = explode(';', $redis->get($policy->getId()));
             }
         }
 
         return [
-            'policies' => $policyValidation,
-            'validation' => $lines
+            'policies' => $policiesForValidation,
+            'policyValidationErrors' => $validationErrors
         ];
     }
 
@@ -1615,6 +1615,7 @@ class AdminController extends BaseController
         /** @var PolicyRepository $repo */
         $repo = $dm->getRepository(Policy::class);
 
+        /** @var Policy $policy */
         $policy = $repo->find($request->get('id'));
 
         if (!$policy) {
