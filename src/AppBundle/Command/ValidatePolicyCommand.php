@@ -258,13 +258,7 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                     ];
                     $prevLines = $lines;
 
-                    if ($this->validatePolicy($policy, $policies, $lines, $data)) {
-                        $this->redis->set($policy->getId(), '');
-
-                        $newLines = array_diff($lines, $prevLines);
-
-                        $this->redis->append($policy->getId(), implode('<br>', $newLines));
-                    }
+                    $this->validatePolicy($policy, $policies, $lines, $data);
 
                     $newLines = array_diff($lines, $prevLines);
                     $adjustedNewLines = [];
@@ -357,8 +351,6 @@ class ValidatePolicyCommand extends ContainerAwareCommand
 
     private function validatePolicy(Policy $policy, &$policies, &$lines, $data)
     {
-        $policyNeedsValidation = false;
-
         if (!$data['validateCancelled'] && $policy->isCancelled()) {
             return;
         }
@@ -392,7 +384,7 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                         $data['validateDate']
                     );
 
-                    $policyNeedsValidation = true;
+                    $this->redis->append($policy->getId(), 'notPaidToDate;');
                 }
             }
             if ($policy->isPotValueCorrect() === false) {
@@ -404,19 +396,19 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                     $lines[] = $this->failurePotValueMessage($policy);
                 }
 
-                $policyNeedsValidation = true;
+                $this->redis->append($policy->getId(), 'updatedPotValue;');
             }
             if ($policy->hasCorrectIptRate() === false) {
                 $this->header($policy, $policies, $lines);
                 $lines[] = $this->failureIptRateMessage($policy);
 
-                $policyNeedsValidation = true;
+                $this->redis->append($policy->getId(), 'iptRateInvalid;');
             }
             if ($policy->hasCorrectPolicyStatus($data['validateDate']) === false) {
                 $this->header($policy, $policies, $lines);
                 $lines[] = $this->failureStatusMessage($policy, $data['prefix'], $data['validateDate']);
 
-                $policyNeedsValidation = true;
+                $this->redis->append($policy->getId(), 'statusIncorrect;');
             }
             if ($policy->arePolicyScheduledPaymentsCorrect(
                 true,
@@ -431,7 +423,7 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                             $policy->getPolicyNumber()
                         );
 
-                        $policyNeedsValidation = true;
+                        $this->redis->append($policy->getId(), 'incorrectPayments;');
                     } else {
                         /** @var Policy $policy */
                         $policy = $this->dm->merge($policy);
@@ -440,7 +432,7 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                             $policy->getPolicyNumber()
                         );
 
-                        $policyNeedsValidation = true;
+                        $this->redis->append($policy->getId(), 'paymentAdjustmentFailed;');
                     }
                 } elseif ($policy->getUser()->hasBacsPaymentMethod() &&
                     $policy->getUser()->getBacsPaymentMethod() &&
@@ -462,7 +454,7 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                     );
                     $lines[] = $this->failureScheduledPaymentsMessage($policy, $data['validateDate']);
 
-                    $policyNeedsValidation = true;
+                    $this->redis->append($policy->getId(), 'scheduledPaymentsInvalid;');
                 }
             }
 
@@ -489,7 +481,7 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                     $this->header($policy, $policies, $lines);
                     $lines[] = $this->failureCommissionMessage($policy, $data['prefix'], $commissionDate);
 
-                    $policyNeedsValidation = true;
+                    $this->redis->append($policy->getId(), 'failedCommission;');
                 }
             }
 
@@ -502,7 +494,7 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                         $policy->getPolicyNumber()
                     );
 
-                    $policyNeedsValidation = true;
+                    $this->redis->append($policy->getId(), 'premiumUpdated;');
                 }
             }
             if ($data['warnClaim'] && $policy->hasOpenClaim()) {
@@ -512,7 +504,7 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                     $policy->getPolicyNumber()
                 );
 
-                $policyNeedsValidation = true;
+                $this->redis->append($policy->getId(), 'openClaim;');
             }
             if ($data['warnClaim'] && $policy->hasMonetaryClaimed()) {
                 $this->header($policy, $policies, $lines);
@@ -521,7 +513,7 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                     $policy->getPolicyNumber()
                 );
 
-                $policyNeedsValidation = true;
+                $this->redis->append($policy->getId(), 'successfulClaim;');
             }
             $refund = $policy->getRefundAmount();
             $refundCommission = $policy->getRefundCommissionAmount();
@@ -544,7 +536,7 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                     $pendingBacsTotalCommission
                 );
 
-                $policyNeedsValidation = true;
+                $this->redis->append($policy->getId(), 'refundDue;');
             }
 
             // bacs checks are only necessary on active policies
@@ -561,12 +553,12 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                         $this->header($policy, $policies, $lines);
                         $lines[] = 'Warning!! 1 or more bacs payments, yet bank has first payment flag set';
 
-                        $policyNeedsValidation = true;
+                        $this->redis->append($policy->getId(), 'oneBacsPaymentFirstFlag;');
                     } elseif ($bacsPayments == 0 && !$isFirstPayment) {
                         $this->header($policy, $policies, $lines);
                         $lines[] = 'Warning!! No bacs payments, yet bank does not have first payment flag set';
 
-                        $policyNeedsValidation = true;
+                        $this->redis->append($policy->getId(), 'noBacsPaymentNoFlag;');
                     }
                     $now = \DateTime::createFromFormat('U', time());
 
@@ -575,18 +567,16 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                             $this->header($policy, $policies, $lines);
                             $lines[] = 'Warning!! There are no bacs payments, yet past the initial notification date';
 
-                            $policyNeedsValidation = true;
+                            $this->redis->append($policy->getId(), 'noBacsPaymentPastDate;');
                         }
                     } elseif ($bankAccount->isAfterInitialNotificationDate() === null) {
                         $this->header($policy, $policies, $lines);
                         $lines[] = 'Warning!! Missing initial notification date';
 
-                        $policyNeedsValidation = true;
+                        $this->redis->append($policy->getId(), 'noInitialNotification;');
                     }
                 }
             }
-
-            return $policyNeedsValidation;
         } catch (\Exception $e) {
             // TODO: May want to swallow some exceptions here
             throw $e;

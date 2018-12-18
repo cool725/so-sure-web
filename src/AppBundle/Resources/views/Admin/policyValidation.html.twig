@@ -8,15 +8,34 @@
             <div class="d-lg-flex align-items-lg-center justify-content-lg-between mb-3">
                 <h1 class="h2">Policy Validation</h1>
             </div>
-            <div class="row">
-                <div class="col-md">
-                    {% for policy in policies %}
+            {% for policy in policies %}
+                <div class="row">
+                    <div class="col-8">
+                        <h4>
+                            {{ policy.policyNumber }}
+                        </h4>
 
-                        <p>{{ policy|raw }}</p>
+                        {% for validationError in validation[policy.id] %}
+                            <p>{{ validationError }}</p>
+                        {% endfor %}
 
-                    {% endfor %}
+
+                    </div>
+
+                    <div class="col-4">
+                        <form id="delete-claim-form" method="POST" action="{{ path('policy_validate') }}">
+                            <button id="delete-claim" type="submit" class="btn btn-success">
+                                Valid
+                            </button>
+
+                            <input type="hidden" name="id" value="{{ policy.id }}"/>
+                            <input type="hidden" name="token" value="{{ csrf_token('default') }}"/>
+                        </form>
+                    </div>
                 </div>
-            </div>
+
+                <hr>
+            {% endfor %}
         </div>
     </section>
 {% endblock %}

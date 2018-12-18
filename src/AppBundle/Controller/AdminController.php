@@ -46,6 +46,7 @@ use Predis\Client;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\Form\Extension\Core\Type\ButtonType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
@@ -1570,7 +1571,7 @@ class AdminController extends BaseController
      * @Route("/policy-validation", name="policy_validation")
      * @Template
      */
-    public function policyValidationAction()
+    public function policyValidationAction(Request $request)
     {
         $dm = $this->getManager();
         /** @var Client $redis */
@@ -1581,16 +1582,52 @@ class AdminController extends BaseController
 
         $policies = $repo->findAll();
 
+        $policyValidation = [];
         $lines = [];
         /** @var Policy $policy */
         foreach ($policies as $policy) {
             if ($redis->exists($policy->getId())) {
-                $lines[] = $redis->get($policy->getId());
+                $policyValidation[$policy->getId()] = $policy;
+                $lines[$policy->getId()] = explode(';', $redis->get($policy->getId()));
             }
         }
 
         return [
-            'policies' => $lines
+            'policies' => $policyValidation,
+            'validation' => $lines
         ];
+    }
+
+    /**
+     * @Route("/policy-validation-validate", name="policy_validate")
+     * @Method({"POST"})
+     */
+    public function policyValidationValidateAction(Request $request)
+    {
+        if (!$this->isCsrfTokenValid('default', $request->get('token'))) {
+            throw new \InvalidArgumentException('Invalid csrf token');
+        }
+
+        $dm = $this->getManager();
+        /** @var Client $redis */
+        $redis = $this->get("snc_redis.default");
+
+        /** @var PolicyRepository $repo */
+        $repo = $dm->getRepository(Policy::class);
+
+        $policy = $repo->find($request->get('id'));
+
+        $this->addFlash('success', sprintf(
+            'Policy %s successfully removed',
+            $policy->getPolicyNumber()
+        ));
+
+        $redis->del($policy->getId());
+
+        if (!$policy) {
+            throw $this->createNotFoundException('Policy not found');
+        }
+
+        return $this->redirectToRoute('policy_validation');
     }
 }
