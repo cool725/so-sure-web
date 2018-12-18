@@ -807,7 +807,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             'policy' => $policy,
         ];
     }
-    
+
     /**
      * @Route("/detected-imei-form/{id}", name="detected_imei_form")
      * @Template
