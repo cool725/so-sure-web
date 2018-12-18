@@ -1594,12 +1594,12 @@ class AdminController extends BaseController
                 throw $this->createNotFoundException(sprintf('Policy %s not found', $request->get('id')));
             }
 
+            $redis->del($policy->getId());
+
             $this->addFlash('success', sprintf(
-                'Policy %s successfully removed',
+                'Policy %s removed from redis',
                 $policy->getPolicyNumber()
             ));
-
-            $redis->del($policy->getId());
 
             return $this->redirectToRoute('policy_validation');
         }
