@@ -130,7 +130,7 @@ class FOSUserController extends ResettingController
 
         $ttl = $this->container->getParameter('fos_user.resetting.retry_ttl');
 
-        if (null !== $user && !$user->isPasswordRequestNonExpired($ttl)) {
+        if (null != $user && !$user->isPasswordRequestNonExpired($ttl)) {
             $event = new GetResponseUserEvent($user, $request);
             $dispatcher->dispatch(FOSUserEvents::RESETTING_RESET_REQUEST, $event);
 
@@ -138,7 +138,7 @@ class FOSUserController extends ResettingController
                 return $event->getResponse();
             }
 
-            if (null === $user->getConfirmationToken()) {
+            if (null == $user->getConfirmationToken()) {
                 /** @var TokenGeneratorInterface $tokenGenerator */
                 $tokenGenerator = $this->get('fos_user.util.token_generator');
                 $user->setConfirmationToken($tokenGenerator->generateToken());
