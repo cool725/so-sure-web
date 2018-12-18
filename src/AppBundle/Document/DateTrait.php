@@ -362,9 +362,9 @@ trait DateTrait
     }
 
     /**
-     * Returns a copy of a given date which is n days or other unit ahead of it, taking negative numbers into account.
+     * Returns a copy of a given date which is n days ahead of it, taking negative numbers into account.
      * @param \DateTime $date is the starting date.
-     * @param int       $days is the number of days or other units to move ahead.
+     * @param int       $days is the number of days to move ahead.
      * @return \DateTime the new date.
      */
     public static function addDays($date, $days)
@@ -375,9 +375,9 @@ trait DateTrait
     }
 
     /**
-     * Creates a date interval over a given number of days or other and takes into account negative numbers.
+     * Creates a date interval over a given number of days and takes into account negative numbers.
      * @param int $days is the number of days to make the interval cover.
-     * @return \DateInterval given number of units as an interval.
+     * @return \DateInterval given number of days as an interval.
      */
     public static function intervalDays($days)
     {
