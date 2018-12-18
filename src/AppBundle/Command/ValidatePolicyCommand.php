@@ -413,7 +413,9 @@ class ValidatePolicyCommand extends ContainerAwareCommand
             }
             if ($policy->hasCorrectPolicyStatus($data['validateDate']) === false) {
                 $this->header($policy, $policies, $lines);
-                $lines[] = $data[$policy->getId()]['issues'][] = $this->failureStatusMessage($policy, $data['prefix'], $data['validateDate']);
+                $lines[] = $data[$policy->getId()]['issues'][] = $this->failureStatusMessage(
+                    $policy, $data['prefix'], $data['validateDate']
+                );
             }
             if ($policy->arePolicyScheduledPaymentsCorrect(
                 true,
@@ -453,7 +455,9 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                         'WARNING!! Incorrect scheduled payments for policy %s',
                         $policy->getPolicyNumber()
                     );
-                    $lines[] = $data[$policy->getId()]['issues'][] = $this->failureScheduledPaymentsMessage($policy, $data['validateDate']);
+                    $lines[] = $data[$policy->getId()]['issues'][] = $this->failureScheduledPaymentsMessage(
+                        $policy, $data['validateDate']
+                    );
                 }
             }
 
@@ -478,7 +482,9 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                 // Ignore a couple of policies that should have been cancelled unpaid, but went to expired
                 if (!in_array($policy->getId(), Salva::$commissionValidationExclusions)) {
                     $this->header($policy, $policies, $lines);
-                    $lines[] = $data[$policy->getId()]['issues'][] = $this->failureCommissionMessage($policy, $data['prefix'], $commissionDate);
+                    $lines[] = $data[$policy->getId()]['issues'][] = $this->failureCommissionMessage(
+                        $policy, $data['prefix'], $commissionDate
+                    );
                 }
             }
 
@@ -540,17 +546,23 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                     $isFirstPayment = $bankAccount->isFirstPayment();
                     if ($bacsPayments >= 1 && $isFirstPayment) {
                         $this->header($policy, $policies, $lines);
-                        $lines[] = $data[$policy->getId()]['issues'][] = 'Warning!! 1 or more bacs payments, yet bank has first payment flag set';
+                        $lines[] = $data[$policy->getId()]['issues'][] = sprintf(
+                            'Warning!! 1 or more bacs payments, yet bank has first payment flag set'
+                        );
                     } elseif ($bacsPayments == 0 && !$isFirstPayment) {
                         $this->header($policy, $policies, $lines);
-                        $lines[] = $data[$policy->getId()]['issues'][] = 'Warning!! No bacs payments, yet bank does not have first payment flag set';
+                        $lines[] = $data[$policy->getId()]['issues'][] = sprintf(
+                            'Warning!! No bacs payments, yet bank does not have first payment flag set'
+                        );
                     }
                     $now = \DateTime::createFromFormat('U', time());
 
                     if ($bankAccount->isAfterInitialNotificationDate()) {
                         if ($bacsPayments == 0) {
                             $this->header($policy, $policies, $lines);
-                            $lines[] = $data[$policy->getId()]['issues'][] = 'Warning!! There are no bacs payments, yet past the initial notification date';
+                            $lines[] = $data[$policy->getId()]['issues'][] = sprintf(
+                                'Warning!! There are no bacs payments, yet past the initial notification date'
+                            );
                         }
                     } elseif ($bankAccount->isAfterInitialNotificationDate() === null) {
                         $this->header($policy, $policies, $lines);
