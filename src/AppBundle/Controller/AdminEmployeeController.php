@@ -572,7 +572,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                     $user->setEmail($email);
                     $dm->persist($user);
                     $dm->flush();
-                    $this->addFlash('success', sprintf(
+                    $this->addFlash('success-raw', sprintf(
                         'Created User. <a href="%s">%s</a>',
                         $this->generateUrl('admin_user', ['id' => $user->getId()]),
                         $email

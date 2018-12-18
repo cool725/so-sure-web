@@ -16,6 +16,23 @@
                     <h4>{{ flash_message }}</h4>
                 </div>
             {% endfor %}
+
+            {# Needed for occasions where we need to display a hyperlink #}
+            {% for flash_message in app.session.flashBag.get('success-raw') %}
+                <div class="bg-success flash-success flash">
+                    <h4>{{ flash_message|raw }}</h4>
+                </div>
+            {% endfor %}
+            {% for flash_message in app.session.flashBag.get('warning-raw') %}
+                <div class="bg-warning flash-warning flash">
+                    <h4>{{ flash_message|raw }}</h4>
+                </div>
+            {% endfor %}
+            {% for flash_message in app.session.flashBag.get('error-raw') %}
+                <div class="bg-danger flash-danger flash">
+                    <h4>{{ flash_message|raw }}</h4>
+                </div>
+            {% endfor %}
         </div>
     {% endif %}
 {% endif %}
