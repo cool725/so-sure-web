@@ -1571,7 +1571,7 @@ class AdminController extends BaseController
      * @Route("/policy-validation", name="policy_validation")
      * @Template
      */
-    public function policyValidationAction(Request $request)
+    public function policyValidationAction()
     {
         $dm = $this->getManager();
         /** @var Client $redis */
