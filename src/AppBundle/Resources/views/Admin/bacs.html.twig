@@ -115,7 +115,7 @@
                             <tr>
                                 <td width="30%">
                                     {{ file.key }}
-                                    <a href="{{ path('admin_bacs_file', {'id': file.id }) }}" target="_blank"><i class="fa fa-download"></i></a>
+                                    <a href="{{ path('admin_bacs_file', {'id': file.id }) }}" target="_blank" rel="noopener noreferrer"><i class="fa fa-download"></i></a>
                                     <br>
                                     <a href="#" data-toggle="modal" data-target="#serialNumberModal" data-serial="{{ file.serialNumber }}"
                                        data-details-url="{{ path('admin_bacs_serial_number_details', {'serial': file.serialNumber} ) }}">
@@ -168,7 +168,7 @@
                             <tr>
                                 <td width="50%">
                                     {{ file.key }}
-                                    <a href="{{ path('admin_bacs_file', {'id': file.id }) }}" target="_blank"><i class="fa fa-download"></i></a>
+                                    <a href="{{ path('admin_bacs_file', {'id': file.id }) }}" target="_blank" rel="noopener noreferrer"><i class="fa fa-download"></i></a>
                                 </td>
                                 <td width="50%">
                                     {{ file.metadata|json_encode }}
@@ -190,7 +190,7 @@
                             <tr>
                                 <td width="50%">
                                     {{ file.key }}
-                                    <a href="{{ path('admin_bacs_file', {'id': file.id }) }}" target="_blank"><i class="fa fa-download"></i></a>
+                                    <a href="{{ path('admin_bacs_file', {'id': file.id }) }}" target="_blank" rel="noopener noreferrer"><i class="fa fa-download"></i></a>
                                 </td>
                                 <td width="50%">
                                     {{ file.metadata|json_encode }}
@@ -212,7 +212,7 @@
                             <tr>
                                 <td width="50%">
                                     {{ file.key }}
-                                    <a href="{{ path('admin_bacs_file', {'id': file.id }) }}" target="_blank"><i class="fa fa-download"></i></a>
+                                    <a href="{{ path('admin_bacs_file', {'id': file.id }) }}" target="_blank" rel="noopener noreferrer"><i class="fa fa-download"></i></a>
                                 </td>
                                 <td width="50%">
                                     {{ file.metadata|json_encode }}
@@ -234,7 +234,7 @@
                             <tr>
                                 <td width="50%">
                                     {{ file.key }}
-                                    <a href="{{ path('admin_bacs_file', {'id': file.id }) }}" target="_blank"><i class="fa fa-download"></i></a>
+                                    <a href="{{ path('admin_bacs_file', {'id': file.id }) }}" target="_blank" rel="noopener noreferrer"><i class="fa fa-download"></i></a>
                                 </td>
                                 <td width="50%">
                                     {{ file.metadata|json_encode }}
@@ -256,7 +256,7 @@
                             <tr>
                                 <td width="50%">
                                     {{ file.key }}
-                                    <a href="{{ path('admin_bacs_file', {'id': file.id }) }}" target="_blank"><i class="fa fa-download"></i></a>
+                                    <a href="{{ path('admin_bacs_file', {'id': file.id }) }}" target="_blank" rel="noopener noreferrer"><i class="fa fa-download"></i></a>
                                 </td>
                                 <td width="50%">
                                     {{ file.metadata|json_encode }}
@@ -556,7 +556,7 @@
                             {% endfor %}
                         </table>
                     {% endif %}
-                </div>                
+                </div>
             </div>
         </div>
     </div>

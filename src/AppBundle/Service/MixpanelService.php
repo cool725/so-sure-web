@@ -35,6 +35,18 @@ class MixpanelService
     const QUEUE_DELETE = 'delete';
     const QUEUE_FREEZE_ATTRIBUTION = 'freeze-attribution';
 
+    const QUEUE_TYPES = [
+        self::QUEUE_PERSON_PROPERTIES,
+        self::QUEUE_PERSON_PROPERTIES_ONCE,
+        self::QUEUE_PERSON_PROPERTIES_UNION,
+        self::QUEUE_PERSON_INCREMENT,
+        self::QUEUE_TRACK,
+        self::QUEUE_ALIAS,
+        self::QUEUE_ATTRIBUTION,
+        self::QUEUE_DELETE,
+        self::QUEUE_FREEZE_ATTRIBUTION
+    ];
+
     const EVENT_HOME_PAGE = 'Home Page';
     const EVENT_QUOTE_PAGE = 'Quote Page';
     // Unused, but reserved
@@ -212,6 +224,28 @@ class MixpanelService
     public function clearQueue()
     {
         $this->redis->del([self::KEY_MIXPANEL_QUEUE]);
+    }
+
+    /**
+     * Removes all items of a given type from the mixpanel queue.
+     * @param String $type is the type of items to remove and should be QUEUE_*.
+     * @return int the number of items removed.
+     */
+    public function clearQueuedType($type)
+    {
+        $count = 0;
+        $size = $this->redis->llen(self::KEY_MIXPANEL_QUEUE);
+        for ($i = 0; $i < $size; $i++) {
+            $item = $this->redis->lindex(self::KEY_MIXPANEL_QUEUE, 0);
+            $data = unserialize($item);
+            if ($data["action"] == $type) {
+                $count++;
+            } else {
+                $this->redis->rpush(self::KEY_MIXPANEL_QUEUE, [$item]);
+            }
+            $this->redis->lpop(self::KEY_MIXPANEL_QUEUE);
+        }
+        return $count;
     }
 
     public function getQueueData($max)
@@ -1184,7 +1218,7 @@ class MixpanelService
      */
     public function queueFreezeAttribution($user)
     {
-        $this->queue(self::QUEUE_FREEZE_ATTRIBUTION, $user->getId(), ['processTime' => new \DateTime()]);
+        $this->queue(self::QUEUE_FREEZE_ATTRIBUTION, $user->getId(), []);
     }
 
     /**
