@@ -46,7 +46,7 @@
                                 </td>
                                 <td>{{ imei['detected_imei'] }}</td>
                                 <td>{% if imei['suggested_imei']|length > 0  %} {{ imei['suggested_imei'] }}{% else %}n/a{% endif %}</td>
-                                <td><a href="{{ s3DownloadLink(imei['bucket'], imei['key']) }}" target="_blank" title="{{ imei.key }}"><i class="fal fa-link mr-2"></i> See image</a></td>
+                                <td><a href="{{ s3DownloadLink(imei['bucket'], imei['key']) }}" target="_blank" rel="noopener noreferrer" title="{{ imei.key }}"><i class="fal fa-link mr-2"></i> See image</a></td>
                                 <td>
                                     <form id="delete" action="{{ path('admin_delete_detected_imei') }}" method="POST">
                                         <input type="hidden" name="item" value="{{ imei['raw'] }}">
