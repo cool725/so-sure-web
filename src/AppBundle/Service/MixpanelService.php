@@ -1184,7 +1184,7 @@ class MixpanelService
      */
     public function queueFreezeAttribution($user)
     {
-        $this->queue(self::QUEUE_FREEZE_ATTRIBUTION, $user->getId(), ['processTime' => new \DateTime()]);
+        $this->queue(self::QUEUE_FREEZE_ATTRIBUTION, $user->getId(), []);
     }
 
     /**
