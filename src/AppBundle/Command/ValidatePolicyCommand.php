@@ -163,7 +163,6 @@ class ValidatePolicyCommand extends ContainerAwareCommand
         $lines = [];
         $csvData = [];
         $policies = [];
-
         $date = $input->getOption('date');
         $prefix = $input->getOption('prefix');
         $policyNumber = $input->getOption('policyNumber');
@@ -181,9 +180,6 @@ class ValidatePolicyCommand extends ContainerAwareCommand
         $resyncPicsureMetadata = true === $input->getOption('resync-picsure-s3file-metadata');
         $resyncPicsure = true === $input->getOption('resync-picsure-s3file-status');
         $validateDate = null;
-
-
-
         if ($date) {
             $validateDate = new \DateTime($date);
         }
@@ -238,6 +234,7 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                 $lines[] = '-------------';
                 $lines[] = '';
 
+                /* Clear redis policies before adding again */
                 foreach ($policies as $policy) {
                     $this->redis->del($policy->getId());
                 }
@@ -371,7 +368,6 @@ class ValidatePolicyCommand extends ContainerAwareCommand
         if (!$data['validateCancelled'] && $policy->isCancelled()) {
             return;
         }
-
         try {
             $closeToExpiration = false;
             if ($policy->getPolicyExpirationDate()) {
