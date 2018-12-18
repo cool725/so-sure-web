@@ -21,6 +21,7 @@ use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Policy;
 use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\User;
+use AppBundle\Classes\SoSure;
 use AppBundle\Event\PolicyEvent;
 use AppBundle\Repository\BacsPaymentRepository;
 use AppBundle\Repository\PaymentRepository;
