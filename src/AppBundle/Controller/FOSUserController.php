@@ -107,15 +107,17 @@ class FOSUserController extends ResettingController
      */
     public function sendEmailAction(Request $request)
     {
+        \AppBundle\Classes\NoOp::ignore([$request]);
+
         if (!$this->isCsrfTokenValid('default', $request->get('token'))) {
             throw new \InvalidArgumentException('Invalid csrf token');
         }
 
         $username = $request->request->get('username');
 
-        /** @var $user UserInterface */
+        /** @var UserInterface $user */
         $user = $this->get('fos_user.user_manager')->findUserByUsernameOrEmail($username);
-        /** @var $dispatcher EventDispatcherInterface */
+        /** @var EventDispatcherInterface $dispatcher */
         $dispatcher = $this->get('event_dispatcher');
 
         /* Dispatch init event */
@@ -137,7 +139,7 @@ class FOSUserController extends ResettingController
             }
 
             if (null === $user->getConfirmationToken()) {
-                /** @var $tokenGenerator TokenGeneratorInterface */
+                /** @var TokenGeneratorInterface $tokenGenerator */
                 $tokenGenerator = $this->get('fos_user.util.token_generator');
                 $user->setConfirmationToken($tokenGenerator->generateToken());
             }
