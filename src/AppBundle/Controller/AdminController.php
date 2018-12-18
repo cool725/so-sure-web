@@ -1615,6 +1615,7 @@ class AdminController extends BaseController
                 $policiesForValidation[$policy->getId()] = $policy;
                 $validationErrors[$policy->getId()] = explode(';', $redis->get($policy->getId()));
 
+                /* Last item in exploded array is always empty */
                 array_pop($validationErrors[$policy->getId()]);
             }
         }
