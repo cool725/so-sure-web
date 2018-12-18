@@ -49,6 +49,7 @@ use AppBundle\Classes\ApiErrorCode;
 
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\CurrencyTrait;
+use AppBundle\Document\ValidatorTrait;
 
 use AppBundle\Document\Phone;
 use AppBundle\Document\Policy;
@@ -99,6 +100,7 @@ class PurchaseController extends BaseController
 {
     use CurrencyTrait;
     use DateTrait;
+    use ValidatorTrait;
 
     /**
      * Note that any changes to actual path routes need to be reflected in the Google Analytics Goals
@@ -1301,10 +1303,11 @@ class PurchaseController extends BaseController
                 $cancelForm->handleRequest($request);
                 if ($cancelForm->isValid()) {
                     $reason = $cancelForm->getData()['reason'];
-                    $other = $cancelForm->getData()['othertxt'];
+                    $other = $this->conformAlphanumericSpaceDot($cancelForm->getData()['othertxt'], 256);
                     $flash = null;
                     $cooloff = $policy->isWithinCooloffPeriod(null, false);
                     if ($cooloff) {
+                        $policy->setRequestedCancellation(\DateTime::createFromFormat('U', time()));
                         $policy->setRequestedCancellationReason($reason);
                         if ($other) {
                             $policy->setRequestedCancellationReasonOther($other);

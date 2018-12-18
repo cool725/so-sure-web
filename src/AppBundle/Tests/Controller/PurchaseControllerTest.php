@@ -1463,37 +1463,25 @@ class PurchaseControllerTest extends BaseControllerTest
         self::$dm->flush();
         // Normal cancellation request.
         $crawler = $this->cancelForm($a, Policy::COOLOFF_REASON_EXISTING);
-        $this->assertContains(
-            "We have passed your request to our policy team.",
-            $crawler->html()
-        );
+        $this->expectFlashSuccess($crawler, "We have passed your request to our policy team.");
         $this->assertEquals(Policy::COOLOFF_REASON_EXISTING, $a->getRequestedCancellationReason());
         $this->assertEquals(Policy::STATUS_ACTIVE, $a->getStatus());
         // Cooloff cancellation.
         $crawler = $this->cancelForm($b, Policy::COOLOFF_REASON_PICSURE);
-        $this->assertContains(
-            "You should receive an email confirming that your policy is now cancelled.",
-            $crawler->html()
-        );
+        $this->expectFlashSuccess($crawler, "You should receive an email confirming that your policy is now cancelled");
         $this->assertEquals(Policy::COOLOFF_REASON_PICSURE, $b->getRequestedCancellationReason());
         $this->assertEquals(Policy::STATUS_CANCELLED, $b->getStatus());
         $this->assertEquals(Policy::CANCELLED_COOLOFF, $b->getCancelledReason());
         // Cooloff cancellation with custom reason.
         $crawler = $this->cancelForm($c, Policy::COOLOFF_REASON_UNKNOWN, "my phone is cursed.");
-        $this->assertContains(
-            "You should receive an email confirming that your policy is now cancelled.",
-            $crawler->html()
-        );
+        $this->expectFlashSuccess($crawler, "You should receive an email confirming that your policy is now cancelled");
         $this->assertEquals(Policy::COOLOFF_REASON_UNKNOWN, $c->getRequestedCancellationReason());
-        $this->assertEquals("my phone is cursed", $c->getRequestedCancellationReasonOther());
+        $this->assertEquals("my phone is cursed.", $c->getRequestedCancellationReasonOther());
         $this->assertEquals(Policy::STATUS_CANCELLED, $c->getStatus());
         $this->assertEquals(Policy::CANCELLED_COOLOFF, $c->getCancelledReason());
         // Duplicate cancellation.
         $crawler = $this->cancelForm($a, Policy::COOLOFF_REASON_DAMAGED);
-        $this->assertContains(
-            "Cancellation has already been requested and is currently processing.",
-            $crawler->html()
-        );
+        $this->expectFlashWarning($crawler, "Cancellation has already been requested and is currently processing.");
         $this->assertEquals(Policy::COOLOFF_REASON_EXISTING, $a->getRequestedCancellationReason());
         $this->assertEquals(Policy::STATUS_ACTIVE, $a->getStatus());
     }
@@ -1516,6 +1504,9 @@ class PurchaseControllerTest extends BaseControllerTest
         }
         self::$client->submit($form);
         self::$dm->refresh($policy);
-        return self::$client->followRedirect();
+        $this->verifyResponse(302);
+        $crawler = self::$client->followRedirect();
+        $this->verifyResponse(200);
+        return $crawler;
     }
 }
