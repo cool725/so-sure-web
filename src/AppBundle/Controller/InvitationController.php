@@ -33,21 +33,20 @@ class InvitationController extends BaseController
         $repo = $dm->getRepository(Invitation::class);
         $invitation = $repo->find($id);
         $phoneRepo = $dm->getRepository(Phone::class);
-        $userDeclined = false;
 
         if ($invitation && $invitation->isSingleUse() && $invitation->isInviteeProcessed()) {
             $flashType = 'warning';
-            $flashMessage = 'Hmm, it looks like this invitation to join so-sure has already been processed';
+            $flashMessage = 'This invitation to join so-sure is being processed';
 
             if ($invitation->isAccepted()) {
                 $flashType = 'success';
-                $flashMessage = 'This invitation to join so-sure has already been accepted already';
+                $flashMessage = 'The invitation to join so-sure has been accpeted';
             } elseif ($invitation->isRejected() && $userDeclined == false) {
                 $flashType = 'error';
-                $flashMessage = 'Hmm, it looks like this invitation to join so-sure has already been declined';
+                $flashMessage = 'This invitation to join so-sure was declined';
             } elseif ($invitation->isCancelled()) {
                 $flashType = 'error';
-                $flashMessage = 'Hmm, it looks like this invitation to join so-sure has already been cancelled';
+                $flashMessage = 'This invitation to join so-sure has already been cancelled';
             }
 
             $this->addFlash(
@@ -77,10 +76,6 @@ class InvitationController extends BaseController
                 $invitationService = $this->get('app.invitation');
                 $invitationService->reject($invitation);
                 $userDeclined = true;
-                $this->addFlash(
-                    'error',
-                    'You have declined this invitation.'
-                );
 
                 return $this->redirectToRoute('invitation', [
                     'id' => $id,
