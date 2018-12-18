@@ -34,9 +34,9 @@ class SixpackService
     const EXPERIMENT_SOCIAL_AD_LANDING = 'ad-landing-quotepage';
     const EXPERIMENT_APP_LINK_SMS = 'app-link-sms';
     // Exp 1
-    const EXPERIMENT_SCODE_LANDING_TEXT = 'scode-landing-text-a';
+    const EXPERIMENT_SCODE_LANDING_TEXT = 'scode-landing-text';
     // Exp 2
-    const EXPERIMENT_EMAIL_LANDING_TEXT = 'email-landing-text-a';
+    const EXPERIMENT_EMAIL_LANDING_TEXT = 'email-landing-text';
     // Exp 3
     //
     // Exp 4

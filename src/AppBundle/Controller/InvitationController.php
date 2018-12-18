@@ -33,22 +33,22 @@ class InvitationController extends BaseController
         $repo = $dm->getRepository(Invitation::class);
         $invitation = $repo->find($id);
         $phoneRepo = $dm->getRepository(Phone::class);
-        $declined = false;
 
         if ($invitation && $invitation->isSingleUse() && $invitation->isInviteeProcessed()) {
+            $flashType = 'warning';
+            $flashMessage = 'Hmm, it looks like this invitation to join so-sure has already been processed';
+
             if ($invitation->isAccepted()) {
                 $flashType = 'success';
                 $flashMessage = 'This invitation to join so-sure has already been accepted already';
             } elseif ($invitation->isRejected()) {
                 $flashType = 'error';
                 $flashMessage = 'Hmm, it looks like this invitation to join so-sure has already been declined';
-            } elseif ($invitation->isCancelled() && $declined == false) {
+            } elseif ($invitation->isCancelled()) {
                 $flashType = 'error';
                 $flashMessage = 'Hmm, it looks like this invitation to join so-sure has already been cancelled';
-            } elseif ($declined == false) {
-                $flashType = 'warning';
-                $flashMessage = 'Hmm, it looks like this invitation to join so-sure has already been processed';
             }
+
             $this->addFlash(
                 $flashType,
                 $flashMessage
@@ -106,7 +106,7 @@ class InvitationController extends BaseController
 
         $landingText = $this->sixpack(
             $request,
-            SixpackService::EXPERIMENT_SCODE_LANDING_TEXT,
+            SixpackService::EXPERIMENT_EMAIL_LANDING_TEXT,
             ['email-landing-text-a', 'email-landing-text-b']
         );
 
