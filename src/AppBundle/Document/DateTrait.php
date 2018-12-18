@@ -347,27 +347,28 @@ trait DateTrait
     }
 
     /**
-     * Returns a copy of a given date which is n days ahead of it.
+     * Returns a copy of a given date which is n days or other unit ahead of it, taking negative numbers into account.
      * @param \DateTime $date is the starting date.
-     * @param int       $days is the number of days to move ahead.
+     * @param int       $days is the number of days or other units to move ahead.
+     * @param String    $unit defaults to days but is the kind of unit to add.
      * @return \DateTime the new date.
      */
-    public static function addDays($date, $days)
+    public static function addDays($date, $days, $unit = "D")
     {
         $date = clone $date;
-        $date->add(static::intervalDays($days));
-
+        $date->add(static::intervalDays($days, $unit));
         return $date;
     }
 
     /**
-     * Creates a date interval over a given number of days and takes into account negative numbers.
-     * @param int $days is the number of days to make the interval cover.
-     * @return \DateInterval given number of days as an interval.
+     * Creates a date interval over a given number of days or other and takes into account negative numbers.
+     * @param int    $days is the number of days to make the interval cover.
+     * @param String $unit defaults to days, but the function can also be used for other things like hours or minutes.
+     * @return \DateInterval given number of units as an interval.
      */
-    public static function intervalDays($days)
+    public static function intervalDays($days, $unit = "D")
     {
-        $interval = new \DateInterval("P".abs($days)."D");
+        $interval = new \DateInterval("P".abs($days).$unit);
         $interval->invert = $days < 0 ? 1 : 0;
         return $interval;
     }

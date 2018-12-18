@@ -88,7 +88,7 @@ class BacsService
     const VALIDATE_SKIP = 'skip';
     const VALIDATE_CANCEL = 'cancel';
     const VALIDATE_RESCHEDULE = 'reschedule';
-    
+
     /** @var LoggerInterface */
     protected $logger;
 
@@ -275,7 +275,10 @@ class BacsService
 
             $this->sosureSftpService->moveSftp($file, !$error);
         }
-
+        $date = new \DateTime(SoSure::TIMEZONE);
+        if (static::addDays($date, -14, "H") < $this->startOfDay($date)) {
+            $this->approvePayments($date);
+        }
         return $results;
     }
 
@@ -718,9 +721,6 @@ class BacsService
                 $this->logger->error(sprintf('Failed %d payments for user %s', $foundPayments, $user->getId()));
             }
         }
-
-        $this->approvePayments($currentProcessingDate);
-
         return $results;
     }
 
