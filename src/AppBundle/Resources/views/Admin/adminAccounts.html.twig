@@ -34,7 +34,7 @@
             <div class="input-group" style="margin-left: 10px;">
                 <div class="input-group-btn">
                     {{ form_start(salvaForm) }}
-                    <a class="btn btn-info" target="_blank" href="{{ path('admin_accounts_print', {'year': year, 'month': month}) }}">
+                    <a class="btn btn-info" target="_blank" href="{{ path('admin_accounts_print', {'year': year, 'month': month}) }}" rel="noopener noreferrer">
                         &nbsp;<i class="fa fa-print"></i>&nbsp;
                     </a>
                     {{ form_widget(salvaForm.export, {'label': 'Salva', 'title': 'Re-export to Salva', 'attr': {'class': "btn btn-warning salva-export"}}) }}

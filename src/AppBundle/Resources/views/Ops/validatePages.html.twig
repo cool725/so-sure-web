@@ -280,7 +280,7 @@
                 <a href="{{ url('launch_usa') }}">USA Page</a>
             </li>
             <li>
-                <a href="{{ cdn_url }}/files/so-sure_sample_policy_doc_v10.pdf" target="_blank">Sample policy terms</a>
+                <a href="{{ cdn_url }}/files/so-sure_sample_policy_doc_v10.pdf" target="_blank" rel="noopener noreferrer">Sample policy terms</a>
             </li>
         </ul>
 
@@ -330,7 +330,7 @@
         </ul>
         <h4>External</h4>
         <ul>
-            <li><a href="http://test.protectyourgadget.com/quote/" target="_blank">GoCompare / Protect your gadget</a>
+            <li><a href="http://test.protectyourgadget.com/quote/" target="_blank" rel="noopener noreferrer">GoCompare / Protect your gadget</a>
                 <form method="POST" action="{{ path('api_external_gocompare_deeplink') }}">
                     <input type="hidden" name="reference" value="{{ active_phone.id }}">
                     <input type="text" name="first_name" placeholder="First Name" value="{{ fake.first }}">

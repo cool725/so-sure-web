@@ -221,7 +221,7 @@
                                             <h4 class="media-heading">
                                                 {{ friend['name'] }}
                                                 <small>
-                                                    <a href="https://www.facebook.com/search/people/?q={{ friend['name'] }}" target="_blank"><span class="fa fa-search"></span></a>
+                                                    <a href="https://www.facebook.com/search/people/?q={{ friend['name'] }}" target="_blank" rel="noopener noreferrer"><span class="fa fa-search"></span></a>
                                                 </small>
                                             </h4>
                                             <a href="{{ path('user_invite', {policyId: policy.id, facebookId: friend['id']}) }}" class="btn btn-green">Invite this friend</a>

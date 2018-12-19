@@ -429,7 +429,7 @@ class UserController extends BaseController
         } elseif ($scode) {
             if ($scode->isStandard()) {
                 $this->addFlash(
-                    'success',
+                    'success-raw',
                     sprintf(
                         '%s has invited you to connect. <a href="#" id="scode-link">Connect here!</a>',
                         $scode->getUser()->getName()
@@ -437,7 +437,7 @@ class UserController extends BaseController
                 );
             } elseif ($scode->isReward()) {
                 $this->addFlash(
-                    'success',
+                    'success-raw',
                     sprintf(
                         'Get your £%0.2f reward bonus from %s. <a href="#" id="scode-link">Connect here!</a>',
                         $scode->getReward()->getDefaultValue(),
@@ -451,7 +451,7 @@ class UserController extends BaseController
         foreach ($user->getValidPolicies(true) as $checkPolicy) {
             if ($checkPolicy->notifyRenewal() && !$checkPolicy->isRenewed() && !$checkPolicy->hasCashback()) {
                 $this->addFlash(
-                    'success',
+                    'success-raw',
                     sprintf(
                         '%s is ready for <a href="%s">renewal</a>',
                         $checkPolicy->getPolicyNumber(),
@@ -471,7 +471,7 @@ class UserController extends BaseController
                 }
                 if ($url) {
                     $this->addFlash(
-                        'warning',
+                        'warning-raw',
                         sprintf(
                             'Your excess for policy %s is £150. <a href="%s">Reduce</a> it with pic-sure',
                             $checkPolicy->getPolicyNumber(),
@@ -481,7 +481,7 @@ class UserController extends BaseController
                 } else {
                     // @codingStandardsIgnoreStart
                     $this->addFlash(
-                        'warning',
+                        'warning-raw',
                         sprintf(
                             'Your excess for policy %s is £150. <a href="#" class="open-intercom">Reduce</a> it by sending us a photo of your screen.',
                             $checkPolicy->getPolicyNumber()
@@ -1060,7 +1060,7 @@ class UserController extends BaseController
                     $this->generateUrl('user_repurchase_policy', ['id' => $policy->getId()]),
                     $policy->getPhone()->__toString()
                 );
-                $this->addFlash('success', $message);
+                $this->addFlash('success-raw', $message);
             }
         }
     }
@@ -1074,7 +1074,7 @@ class UserController extends BaseController
                 $this->generateUrl('purchase_step_phone_id', ['id' => $partialPolicy->getId()]),
                 $partialPolicy->getPhone()->__toString()
             );
-            $this->addFlash('success', $message);
+            $this->addFlash('success-raw', $message);
         }
     }
 
@@ -1088,7 +1088,7 @@ class UserController extends BaseController
                     $cashback->getAmount(),
                     $this->generateUrl('user_cashback', ['id' => $cashback->getId()])
                 );
-                $this->addFlash('success', $message);
+                $this->addFlash('success-raw', $message);
             }
         }
     }
@@ -1279,7 +1279,7 @@ class UserController extends BaseController
                 $countUnprocessedInvitations,
                 $countUnprocessedInvitations > 1 ? 's' : ''
             );
-            $this->addFlash('success', $message);
+            $this->addFlash('success-raw', $message);
         }
 
         $oauth2FlowParams = null;

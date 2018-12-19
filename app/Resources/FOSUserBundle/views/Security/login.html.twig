@@ -63,7 +63,10 @@
                             <button id="sms-login-btn" class="btn btn-block btn-icon btn-success arrow-right">Login via SMS</button>
                         </div>
                     </form>
-                    <form id="accountkit-form" method="post" action="{{ path('accountkit_login') }}">
+                    <form id="accountkit-form"
+                          method="post"
+                          action="{{ path('accountkit_login') }}"
+                          autocomplete="off">
                         <input type="hidden" id="accountkit-code" name="code">
                         <input type="hidden" id="accountkit-csrf" name="csrf">
                     </form>
