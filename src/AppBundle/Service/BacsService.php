@@ -289,6 +289,7 @@ class BacsService
      */
     public function autoApprovePaymentsAndMandates($date)
     {
+        /** @var UserRepository $userRepository */
         $userRepository = $this->dm->getRepository(User::class);
         $this->approvePayments($date);
         $users = $userRepository->findPendingMandates()->getQuery()->execute();
