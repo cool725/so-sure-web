@@ -44,6 +44,8 @@ use AppBundle\Service\SalvaExportService;
 use AppBundle\Service\SequenceService;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Predis\Client;
+use Predis\Collection\Iterator\Keyspace;
+use Predis\Collection\Iterator\SetKey;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -1594,29 +1596,28 @@ class AdminController extends BaseController
                 throw $this->createNotFoundException(sprintf('Policy %s not found', $request->get('id')));
             }
 
-            $redis->del($policy->getId());
+            $pattern = '*' . $policy->getId() . '*';
+
+            foreach (new SetKey($redis,'VALIDATION_POLICIES', $pattern) as $key) {
+                $redis->srem('VALIDATION_POLICIES', $key);
+            }
 
             $this->addFlash('success', sprintf(
                 'Policy %s removed from redis',
                 $policy->getPolicyNumber()
             ));
-
-            return $this->redirectToRoute('policy_validation');
         }
-
-        $policies = $repo->findAll();
 
         $policiesForValidation = [];
         $validationErrors = [];
 
-        /** @var Policy $policy */
-        foreach ($policies as $policy) {
-            if ($redis->exists($policy->getId())) {
-                $policiesForValidation[$policy->getId()] = $policy;
+        foreach ($redis->smembers('VALIDATION_POLICIES') as $policyData) {
+            $policyData = unserialize($policyData);
 
-                foreach ($redis->lrange($policy->getId(), 0, -1) as $issue) {
-                    $validationErrors[$policy->getId()][] = $issue;
-                }
+            $policiesForValidation[$policyData['id']] = $repo->find($policyData['id']);
+
+            foreach ($policyData['issues'] as $issue) {
+                $validationErrors[$policyData['id']][] = $issue;
             }
         }
 

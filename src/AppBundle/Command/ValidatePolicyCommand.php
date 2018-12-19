@@ -219,7 +219,7 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                 }
 
                 $blank = [];
-                $this->header($policy, $blank, $lines);
+                $this->header($policy, $blank, $lines, $data);
 
                 $data = [
                     'warnClaim' => true,
@@ -241,6 +241,10 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                 $lines[] = '-------------';
                 $lines[] = '';
 
+                if ($flushPolicyRedis) {
+                    $this->redis->del(['VALIDATION_POLICIES']);
+                }
+
                 foreach ($policies as $policy) {
                     if ($prefix && !$policy->hasPolicyPrefix($prefix)) {
                         continue;
@@ -257,12 +261,6 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                     ];
                     $prevLines = $lines;
 
-                    if ($flushPolicyRedis) {
-                        foreach ($policies as $policy) {
-                            $this->redis->del($policy->getId());
-                        }
-                    }
-
                     $this->validatePolicy($policy, $policies, $lines, $data);
 
                     $newLines = array_diff($lines, $prevLines);
@@ -276,11 +274,7 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                     $csvData[$policy->getPolicyNumber()] = $adjustedNewLines;
 
                     if (array_key_exists($policy->getId(), $data)) {
-                        foreach ($data[$policy->getId()]['issues'] as $issue) {
-                            if (!$this->redis->get($policy->getId())) {
-                                $this->redis->lpush($policy->getId(), $issue);
-                            }
-                        }
+                        $this->redis->sadd('VALIDATION_POLICIES', serialize($data[$policy->getId()]));
                     }
                 }
 
@@ -363,7 +357,7 @@ class ValidatePolicyCommand extends ContainerAwareCommand
         );
     }
 
-    private function validatePolicy(Policy $policy, &$policies, &$lines, $data)
+    private function validatePolicy(Policy $policy, &$policies, &$lines, &$data)
     {
         if (!$data['validateCancelled'] && $policy->isCancelled()) {
             return;
@@ -377,7 +371,7 @@ class ValidatePolicyCommand extends ContainerAwareCommand
             }
             if ($policy->isPolicyPaidToDate($data['validateDate']) === false) {
                 if ($data['unpaid'] == 'all' || ($closeToExpiration && $data['unpaid'] == 'expiry')) {
-                    $this->header($policy, $policies, $lines);
+                    $this->header($policy, $policies, $lines, $data);
                     $lines[] = $data[$policy->getId()]['issues'][] = "Not Paid To Date";
                     $lines[] = $data[$policy->getId()]['issues'][] = sprintf(
                         'Next attempt: %s.',
@@ -399,7 +393,7 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                 }
             }
             if ($policy->isPotValueCorrect() === false) {
-                $this->header($policy, $policies, $lines);
+                $this->header($policy, $policies, $lines, $data);
                 $lines[] = $this->failurePotValueMessage($policy);
                 if ($data['updatePotValue']) {
                     $policy->updatePotValue();
@@ -408,11 +402,11 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                 }
             }
             if ($policy->hasCorrectIptRate() === false) {
-                $this->header($policy, $policies, $lines);
+                $this->header($policy, $policies, $lines, $data);
                 $lines[] = $data[$policy->getId()]['issues'][] = $this->failureIptRateMessage($policy);
             }
             if ($policy->hasCorrectPolicyStatus($data['validateDate']) === false) {
-                $this->header($policy, $policies, $lines);
+                $this->header($policy, $policies, $lines, $data);
                 $lines[] = $data[$policy->getId()]['issues'][] = $this->failureStatusMessage(
                     $policy,
                     $data['prefix'],
@@ -425,7 +419,7 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                 true
             ) === false) {
                 if ($data['adjustScheduledPayments']) {
-                    $this->header($policy, $policies, $lines);
+                    $this->header($policy, $policies, $lines, $data);
                     if ($this->policyService->adjustScheduledPayments($policy)) {
                         $lines[] = $data[$policy->getId()]['issues'][] = sprintf(
                             'Adjusted Incorrect scheduled payments for policy %s',
@@ -452,7 +446,7 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                     $lines[] = $this->failureScheduledPaymentsMessage($policy, $data['validateDate']);
                     */
                 } else {
-                    $this->header($policy, $policies, $lines);
+                    $this->header($policy, $policies, $lines, $data);
                     $lines[] = $data[$policy->getId()]['issues'][] = sprintf(
                         'WARNING!! Incorrect scheduled payments for policy %s',
                         $policy->getPolicyNumber()
@@ -485,7 +479,7 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                 $policy->hasCorrectCommissionPayments($commissionDate, $allowedVariance, true) === false) {
                 // Ignore a couple of policies that should have been cancelled unpaid, but went to expired
                 if (!in_array($policy->getId(), Salva::$commissionValidationExclusions)) {
-                    $this->header($policy, $policies, $lines);
+                    $this->header($policy, $policies, $lines, $data);
                     $lines[] = $data[$policy->getId()]['issues'][] = $this->failureCommissionMessage(
                         $policy,
                         $data['prefix'],
@@ -497,7 +491,7 @@ class ValidatePolicyCommand extends ContainerAwareCommand
             if ($data['validate-premiums'] && (!$policy->getStatus() ||
                 in_array($policy->getStatus(), [Policy::STATUS_PENDING, Policy::STATUS_MULTIPAY_REJECTED]))) {
                 if ($this->policyService->validatePremium($policy)) {
-                    $this->header($policy, $policies, $lines);
+                    $this->header($policy, $policies, $lines, $data);
                     $lines[] = $data[$policy->getId()]['issues'][] = sprintf(
                         'WARNING!! - Policy %s has its premium updated',
                         $policy->getPolicyNumber()
@@ -505,14 +499,14 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                 }
             }
             if ($data['warnClaim'] && $policy->hasOpenClaim()) {
-                $this->header($policy, $policies, $lines);
+                $this->header($policy, $policies, $lines, $data);
                 $lines[] = $data[$policy->getId()]['issues'][] = sprintf(
                     'WARNING!! - Policy %s has an open claim that should be resolved prior to cancellation',
                     $policy->getPolicyNumber()
                 );
             }
             if ($data['warnClaim'] && $policy->hasMonetaryClaimed()) {
-                $this->header($policy, $policies, $lines);
+                $this->header($policy, $policies, $lines, $data);
                 $lines[] = $data[$policy->getId()]['issues'][] = sprintf(
                     'WARNING!! - Prior successful claim (care should be used to avoid cancellation) for %s',
                     $policy->getPolicyNumber()
@@ -530,7 +524,7 @@ class ValidatePolicyCommand extends ContainerAwareCommand
 
             if (!in_array($policy->getId(), Salva::$refundValidationExclusions) &&
                 ($refundMismatch ||$refundCommissionMismatch )) {
-                $this->header($policy, $policies, $lines);
+                $this->header($policy, $policies, $lines, $data);
                 $lines[] = $data[$policy->getId()]['issues'][] = sprintf(
                     'Warning!! Refund Due. Refund %0.2f [Pending %0.2f] / Commission %0.2f [Pending %0.2f]',
                     $refund,
@@ -551,12 +545,12 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                 if ($bankAccount && $bankAccount->getMandateStatus() == BankAccount::MANDATE_SUCCESS) {
                     $isFirstPayment = $bankAccount->isFirstPayment();
                     if ($bacsPayments >= 1 && $isFirstPayment) {
-                        $this->header($policy, $policies, $lines);
+                        $this->header($policy, $policies, $lines, $data);
                         $lines[] = $data[$policy->getId()]['issues'][] = sprintf(
                             'Warning!! 1 or more bacs payments, yet bank has first payment flag set'
                         );
                     } elseif ($bacsPayments == 0 && !$isFirstPayment) {
-                        $this->header($policy, $policies, $lines);
+                        $this->header($policy, $policies, $lines, $data);
                         $lines[] = $data[$policy->getId()]['issues'][] = sprintf(
                             'Warning!! No bacs payments, yet bank does not have first payment flag set'
                         );
@@ -565,13 +559,13 @@ class ValidatePolicyCommand extends ContainerAwareCommand
 
                     if ($bankAccount->isAfterInitialNotificationDate()) {
                         if ($bacsPayments == 0) {
-                            $this->header($policy, $policies, $lines);
+                            $this->header($policy, $policies, $lines, $data);
                             $lines[] = $data[$policy->getId()]['issues'][] = sprintf(
                                 'Warning!! There are no bacs payments, yet past the initial notification date'
                             );
                         }
                     } elseif ($bankAccount->isAfterInitialNotificationDate() === null) {
-                        $this->header($policy, $policies, $lines);
+                        $this->header($policy, $policies, $lines, $data);
                         $lines[] = $data[$policy->getId()]['issues'][] = 'Warning!! Missing initial notification date';
                     }
                 }
@@ -582,9 +576,10 @@ class ValidatePolicyCommand extends ContainerAwareCommand
         }
     }
 
-    private function header(Policy $policy, &$policies, &$lines)
+    private function header(Policy $policy, &$policies, &$lines, &$data)
     {
         if (!isset($policies[$policy->getId()])) {
+            $data[$policy->getId()]['id'] = $policy->getId();
             $lines[] = '';
             $lines[] = sprintf(
                 '%s (<a href="%s">Admin</a>)',
