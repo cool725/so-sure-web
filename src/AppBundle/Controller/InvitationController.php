@@ -76,7 +76,8 @@ class InvitationController extends BaseController
                 $invitationService = $this->get('app.invitation');
                 $invitationService->reject($invitation);
                 $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_INVITATION_PAGE, [
-                     'Invitation Action' => 'declined'
+                     'Invitation Method' => $invitation->getChannel(),
+                     'Invitation Action' => 'declined',
                 ]);
                 return $this->redirectToRoute('invitation', [
                     'id' => $id,
