@@ -79,6 +79,7 @@ class InvitationController extends BaseController
                      'Invitation Method' => $invitation->getChannel(),
                      'Invitation Action' => 'declined',
                 ]);
+                $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_EMAIL_LANDING_TEXT);
                 return $this->redirectToRoute('invitation', [
                     'id' => $id,
                 ]);
