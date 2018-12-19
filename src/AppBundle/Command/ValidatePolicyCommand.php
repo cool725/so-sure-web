@@ -548,7 +548,9 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                     if ($bankAccount->isAfterInitialNotificationDate()) {
                         if ($bacsPayments == 0) {
                             $this->header($policy, $policies, $lines);
-                            $lines[] = sprintf('Warning!! There are no bacs payments, yet past the initial notification date');
+                            $lines[] = sprintf(
+                                'Warning!! There are no bacs payments, yet past the initial notification date'
+                            );
                         }
                     } elseif ($bankAccount->isAfterInitialNotificationDate() === null) {
                         $this->header($policy, $policies, $lines);
