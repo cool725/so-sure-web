@@ -277,10 +277,25 @@ class BacsService
             $this->sosureSftpService->moveSftp($file, !$error);
         }
         $date = new \DateTime(SoSure::TIMEZONE);
-        if (static::addTime($date, -14, "H") < $this->startOfDay($date)) {
-            $this->approvePayments($date);
+        $hour = $date->format("H");
+        if ($hour >= 8 && $hour <= 13) {
+            $this->autoApprovePaymentsAndMandates($date);
         }
         return $results;
+    }
+
+    /**
+     * Automatically approves all pending mandates and payments up to the current date and time.
+     */
+    public function autoApprovePaymentsAndMandates($date)
+    {
+        $userRepository = $this->dm->getRepository(User::class);
+        $this->approvePayments($date);
+        $users = $userRepository->findPendingMandates()->getQuery()->execute();
+        foreach ($users as $user) {
+            $serialNumber = $user->getPaymentMethod()->getBankAccount()->getMandateSerialNumber();
+            $this->approveMandates($serialNumber);
+        }
     }
 
     public function unzipFile($file, $extension = '.xml')
