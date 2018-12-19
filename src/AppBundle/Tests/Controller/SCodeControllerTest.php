@@ -109,13 +109,13 @@ class SCodeControllerTest extends BaseControllerTest
         //print_r($url);
         $crawler = self::$client->request('GET', $url);
         self::verifyResponse(200, null, $crawler);
-        $this->assertContains(sprintf("Insure your phone with %s", $user->getName()), $crawler->html());
+        $this->assertContains(sprintf("%s", $user->getName()), $crawler->html());
 
         $url = sprintf('/scode/%s', urlencode($scode->getCode()));
         //print_r($url);
         $crawler = self::$client->request('GET', $url);
         self::verifyResponse(200, null, $crawler);
-        $this->assertContains(sprintf("Insure your phone with %s", $user->getName()), $crawler->html());
+        $this->assertContains(sprintf("%s", $user->getName()), $crawler->html());
     }
 
     private function createSCode($emailBase)
