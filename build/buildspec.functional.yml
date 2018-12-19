@@ -4,6 +4,7 @@ run-as: root
 phases:
   install:
     commands:
+      - cat /etc/security/limits.conf
       - ulimit -a
       - cd /var/ops; git pull origin master; cd $CODEBUILD_SRC_DIR
       - /usr/bin/redis-server --port 6379 &
