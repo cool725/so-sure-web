@@ -39,7 +39,7 @@
             {% for company in companies %}
                 <tr>
                     <td width="20%">
-                            <a href="{{ path('admin_affiliate_charge', {'id': company.id }) }}">{{ company.name }}</a>
+                        <a href="{{ path('admin_affiliate_charge', {'id': company.id }) }}">{{ company.name }}</a>
                     </td>
                     <td width="10%">£{{ company.cpa|number_format(2, '.', ',') }}</td>
                     <td width="10%">{{ company.days }}</td>
@@ -73,6 +73,6 @@
         </table>
         </div>
     </div>
-    {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:AdminEmployee:affiliateForm', 'policy': company, 'id': 'affiliateForm', 'title': 'Create New Affiliate'} %}
+    {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:AdminEmployee:affiliateForm', 'id': 'affiliateForm', 'title': 'Create New Affiliate'} %}
 </div>
 {% endblock %}

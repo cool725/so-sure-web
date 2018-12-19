@@ -3112,6 +3112,18 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
      */
     public function affiliateAction(Request $request)
     {
+        $dm = $this->getManager();
+        $companyRepo = $dm->getRepository(AffiliateCompany::class);
+        return ['companies' => $companyRepo->findAll()];
+    }
+
+    /**
+     * @Route("/affiliate/create", name="admin_affiliate_create")
+     * @Template
+     * @
+     */
+    public function affiliateFormAction(Request $request)
+    {
         $timeRanges = [
             14 => 14,
             30 => 30,
@@ -3135,7 +3147,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             "Ongoing Charges" => AffiliateCompany::MODEL_ONGOING
         ];
         $companyForm = $this->get('form.factory')
-            ->createNamedBuilder('companyForm')
+            ->createNamedBuilder('affiliate_form')
             ->add('name', TextType::class)
             ->add('address1', TextType::class)
             ->add('address2', TextType::class, ['required' => false])
@@ -3151,59 +3163,45 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             ->add('leadSourceDetails', TextType::class, ['required' => false ])
             ->add('next', SubmitType::class)
             ->getForm();
-        $dm = $this->getManager();
-        $companyRepo = $dm->getRepository(AffiliateCompany::class);
-        $userRepo = $dm->getRepository(User::class);
-        $companies = $companyRepo->findAll();
-        try {
-            if ('POST' === $request->getMethod()) {
-                if ($request->request->has('companyForm')) {
-                    $companyForm->handleRequest($request);
-                    if ($companyForm->isValid()) {
-                        $company = new AffiliateCompany();
-                        $company->setName($this->getDataString($companyForm->getData(), 'name'));
-                        $address = new Address();
-                        $address->setLine1($this->getDataString($companyForm->getData(), 'address1'));
-                        $address->setLine2($this->getDataString($companyForm->getData(), 'address2'));
-                        $address->setLine3($this->getDataString($companyForm->getData(), 'address3'));
-                        $address->setCity($this->getDataString($companyForm->getData(), 'city'));
-                        $postcode = $this->getDataString($companyForm->getData(), 'postcode');
-                        try {
-                            $address->setPostcode($postcode);
-                        } catch (\InvalidArgumentException $e) {
-                            throw new \InvalidArgumentException("{$postcode} is not a valid post code.");
-                        }
-                        $company->setAddress($address);
-                        $company->setDays($this->getDataString($companyForm->getData(), 'days'));
-                        $company->setChargeModel($this->getDataString($companyForm->getData(), 'chargeModel'));
-                        if ($company->getChargeModel() == AffiliateCompany::MODEL_ONGOING) {
-                            $company->setRenewalDays($this->getDataString($companyForm->getData(), 'renewalDays'));
-                        }
-                        $company->setCampaignSource($this->getDataString($companyForm->getData(), 'campaignSource'));
-                        $company->setLeadSource($this->getDataString($companyForm->getData(), 'leadSource'));
-                        $company->setLeadSourceDetails(
-                            $this->getDataString($companyForm->getData(), 'leadSourceDetails')
-                        );
-                        $company->setCPA($this->getDataString($companyForm->getData(), 'cpa'));
-                        $dm->persist($company);
-                        $dm->flush();
-                        $this->addFlash('success', 'Added affiliate');
-                        return new RedirectResponse($this->generateUrl('admin_affiliate'));
-                    } else {
-                        throw new \InvalidArgumentException(sprintf(
-                            'Unable to add company. %s',
-                            (string) $companyForm->getErrors()
-                        ));
+        if ('POST' === $request->getMethod()) {
+            if ($request->request->has('affiliate_form')) {
+                $companyForm->handleRequest($request);
+                if ($companyForm->isValid()) {
+                    $company = new AffiliateCompany();
+                    $company->setName($this->getDataString($companyForm->getData(), 'name'));
+                    $address = new Address();
+                    $address->setLine1($this->getDataString($companyForm->getData(), 'address1'));
+                    $address->setLine2($this->getDataString($companyForm->getData(), 'address2'));
+                    $address->setLine3($this->getDataString($companyForm->getData(), 'address3'));
+                    $address->setCity($this->getDataString($companyForm->getData(), 'city'));
+                    $postcode = $this->getDataString($companyForm->getData(), 'postcode');
+                    try {
+                        $address->setPostcode($postcode);
+                    } catch (\InvalidArgumentException $e) {
+                        $this->addFlash('error', "{$postcode} is not a valid post code.");
                     }
+                    $company->setAddress($address);
+                    $company->setDays($this->getDataString($companyForm->getData(), 'days'));
+                    $company->setChargeModel($this->getDataString($companyForm->getData(), 'chargeModel'));
+                    if ($company->getChargeModel() == AffiliateCompany::MODEL_ONGOING) {
+                        $company->setRenewalDays($this->getDataString($companyForm->getData(), 'renewalDays'));
+                    }
+                    $company->setCampaignSource($this->getDataString($companyForm->getData(), 'campaignSource'));
+                    $company->setLeadSource($this->getDataString($companyForm->getData(), 'leadSource'));
+                    $company->setLeadSourceDetails(
+                        $this->getDataString($companyForm->getData(), 'leadSourceDetails')
+                    );
+                    $company->setCPA($this->getDataString($companyForm->getData(), 'cpa'));
+                    $dm->persist($company);
+                    $dm->flush();
+                    $this->addFlash('success', 'Added affiliate');
+                } else {
+                    $this->addFlash('error', sprintf('Unable to add company. %s', (string) $companyForm->getErrors()));
                 }
             }
-        } catch (\InvalidArgumentException $e) {
-            $this->addFlash('error', $e->getMessage());
+            return new RedirectResponse($this->generateUrl('admin_affiliate'));
         }
-        return [
-            'companies' => $companies,
-            'companyForm' => $companyForm->createView(),
-        ];
+        return ['form' => $companyForm->createView()];
     }
 
     /**
