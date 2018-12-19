@@ -187,9 +187,9 @@ class SixpackService
         self::EXPERIMENT_EBAY_LANDING_2,
         self::EXPERIMENT_SOCIAL_AD_LANDING,
         // Exp 1
-        self::EXPERIMENT_SCODE_LANDING_TEXT,
+
         // Exp 2
-        self::EXPERIMENT_EMAIL_LANDING_TEXT,
+
         // Exp 3
         //
         // Exp 4
@@ -216,9 +216,9 @@ class SixpackService
      */
     public static $purchaseConversionKpi = [
         // Exp 1
-        //
+        self::EXPERIMENT_SCODE_LANDING_TEXT,
         // Exp 2
-        //
+        self::EXPERIMENT_EMAIL_LANDING_TEXT,
         // Exp 3
         //
         // Exp 4

@@ -75,11 +75,9 @@ class InvitationController extends BaseController
             if ($declineForm->isSubmitted() && $declineForm->isValid()) {
                 $invitationService = $this->get('app.invitation');
                 $invitationService->reject($invitation);
-
                 $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_INVITATION_PAGE, [
                      'Invitation Action' => 'declined'
                 ]);
-
                 return $this->redirectToRoute('invitation', [
                     'id' => $id,
                 ]);
