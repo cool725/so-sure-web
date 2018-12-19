@@ -6,6 +6,8 @@ phases:
     commands:
       - cat /etc/security/limits.conf
       - ulimit -a
+      - ulimit -n 64000
+      - ulimit -a
       - cd /var/ops; git pull origin master; cd $CODEBUILD_SRC_DIR
       - /usr/bin/redis-server --port 6379 &
       - /usr/bin/mongod --dbpath /tmp --fork --logpath /tmp/mongo.log --logappend
