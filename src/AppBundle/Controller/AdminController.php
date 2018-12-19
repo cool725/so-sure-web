@@ -1598,7 +1598,7 @@ class AdminController extends BaseController
 
             $pattern = '*' . $policy->getId() . '*';
 
-            foreach (new SetKey($redis,'VALIDATION_POLICIES', $pattern) as $key) {
+            foreach (new SetKey($redis, 'VALIDATION_POLICIES', $pattern) as $key) {
                 $redis->srem('VALIDATION_POLICIES', $key);
             }
 

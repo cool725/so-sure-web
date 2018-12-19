@@ -275,6 +275,7 @@ class ValidatePolicyCommand extends ContainerAwareCommand
 
                     if (array_key_exists($policy->getId(), $data)) {
                         $this->redis->sadd('VALIDATION_POLICIES', serialize($data[$policy->getId()]));
+                        $this->redis->expireat()
                     }
                 }
 
