@@ -4,18 +4,13 @@ run-as: root
 phases:
   install:
     commands:
-      - ulimit -a
-      - cd /var/ops; git pull origin master; cd $CODEBUILD_SRC_DIR
-      - /usr/bin/redis-server --port 6379 &
-      - /usr/bin/mongod --dbpath /tmp --fork --logpath /tmp/mongo.log --logappend
-      - /var/ops/ansible/create-parameters.sh build
-      - /var/ops/scripts/install-vendors.sh -n -u jenkins $CODEBUILD_SRC_DIR test
-      - /var/ops/scripts/create-folders.sh -n -u jenkins $CODEBUILD_SRC_DIR test
-      - /var/ops/scripts/clear-cache.sh $CODEBUILD_SRC_DIR test
-      - /var/ops/scripts/run-encore.sh $CODEBUILD_SRC_DIR test
+      - nohup /usr/local/bin/dockerd --host=unix:///var/run/docker.sock --host=tcp://127.0.0.1:2375 --storage-driver=overlay&
+      - timeout -t 15 sh -c "until docker info; do echo .; sleep 1; done"
+  pre_build:
+    commands:
+      - echo Logging in to Amazon ECR...
+      - $(aws ecr get-login --no-include-email --region $AWS_DEFAULT_REGION)
+      - docker build -t test .
   build:
     commands:
-      - ./build/run-test-functional.sh -l
-artifacts:
-  files:
-    - logs/test.log
+      - docker run --privileged --ulimit nofile=100000:100000 -t test

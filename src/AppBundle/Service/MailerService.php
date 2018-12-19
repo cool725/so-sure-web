@@ -2,6 +2,7 @@
 namespace AppBundle\Service;
 
 use AppBundle\Document\Opt\OptOut;
+use AppBundle\Document\Policy;
 use AppBundle\Document\User;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Templating\EngineInterface;
@@ -9,6 +10,8 @@ use Symfony\Component\Templating\EngineInterface;
 class MailerService
 {
     use RouterTrait;
+
+    const TRUSTPILOT_PURCHASE = '529c0abfefb96008b894ad02';
 
     const EMAIL_WEEKLY = 'weekly';
 
@@ -232,5 +235,19 @@ class MailerService
                 unlink($attachmentFile);
             }
         }
+    }
+
+    public function trustpilot(Policy $policy, $template)
+    {
+        $body = $this->templating->render(
+            'AppBundle:Email:trustpilot.html.twig',
+            ['policy' => $policy, 'template_id' => $template]
+        );
+
+        return $this->send(
+            'Data Export',
+            'f9e2e9f7ce@invite.trustpilot.com',
+            $body
+        );
     }
 }

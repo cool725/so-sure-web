@@ -125,8 +125,8 @@ class PaymentServiceTest extends WebTestCase
         /** @var BankAccount $bankAcccount */
         $bankAcccount = $updatedPolicy->getUser()->getPaymentMethod()->getBankAccount();
         $this->assertNotNull($bankAcccount->getInitialNotificationDate());
-        // should be 3 business days + 4 max holidays/weekends
-        $this->assertLessThan(10, $bankAcccount->getInitialNotificationDate()->diff(new \DateTime)->days);
+        // should be 3 business days + 4 max holidays/weekends (except for xmas - around 14 days)
+        $this->assertLessThan(15, $bankAcccount->getInitialNotificationDate()->diff(new \DateTime)->days);
         $this->assertEquals($policy->getBilling(), $bankAcccount->getStandardNotificationDate());
         $this->assertTrue($bankAcccount->isFirstPayment());
     }
@@ -237,8 +237,8 @@ class PaymentServiceTest extends WebTestCase
         /** @var BankAccount $bankAcccount */
         $bankAcccount = $updatedPolicy->getUser()->getPaymentMethod()->getBankAccount();
         $this->assertNotNull($bankAcccount->getInitialNotificationDate());
-        // should be 3 business days + 4 max holidays/weekends
-        $this->assertLessThan(10, $bankAcccount->getInitialNotificationDate()->diff(new \DateTime)->days);
+        // should be 3 business days + 4 max holidays/weekends (except for xmas - around 14 days)
+        $this->assertLessThan(15, $bankAcccount->getInitialNotificationDate()->diff(new \DateTime)->days);
         $this->assertEquals($policy->getBilling(), $bankAcccount->getStandardNotificationDate());
         $this->assertTrue($bankAcccount->isFirstPayment());
         $this->assertEquals(Policy::STATUS_ACTIVE, $updatedPolicy->getStatus());
