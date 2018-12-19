@@ -450,7 +450,6 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                         'WARNING!! Incorrect scheduled payments for policy %s',
                         $policy->getPolicyNumber()
                     );
-
                     $lines[] = $this->failureScheduledPaymentsMessage($policy, $data['validateDate']);
                 }
             }
