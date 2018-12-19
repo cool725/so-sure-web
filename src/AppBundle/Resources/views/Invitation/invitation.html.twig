@@ -25,12 +25,12 @@
                         {% if invitation.inviter is defined %}
                             {% if landing_text is defined and landing_text == 'email-landing-text-a' %}
                                 <h1 class="mb-4 text-white">Protect your phone<br><span class="sub">with {{invitation.inviter.name}}</span></h1>
-                                <h4 class="text-zaffre h5">Connect with {{invitation.inviter.firstname}} &amp; get up to 80% of your money back.</h4>
-                                <p class="mb-4 text-white">By joining forces with your most careful friends and family, you could see up to 80% of your insurance premium reimbursed to you every year. Yes, really!</p>
+                                <h4 class="text-zaffre h5">Connect with {{invitation.inviter.firstname}} to get money back.</h4>
+                                <p class="mb-4 text-white">By joining forces with your most careful friends and family, you could see up to 80% of your insurance premium reimbursed every year if none of you claim. Yes, really!</p>
                             {% else %}
                                 <h1 class="mb-4 text-white">Friends like {{invitation.inviter.name}}<br><span class="sub">are the best</span></h1>
-                                <h4 class="text-zaffre h5">{{invitation.inviter.firstname}} has invited you to get insured and connect.</h4>
-                                <p class="mb-4 text-white">We're rewarding our careful customers.  If you and Joanne are careful and don’t claim all year, we’ll give you up to 80% of your money back.  Yes really!</p>
+                                <h4 class="text-zaffre h5">Join forces with your friends and family to save big on your phone insurance.</h4>
+                                <p class="mb-4 text-white">We're rewarding our careful customers. If you, Joanna and your connections are careful and don't claim all year, you can get up to 80% of your money back. Yes really!</p>
                             {% endif %}
                         {% else %}
                             <h1 class="mb-4 text-white">Mobile Insurance <br><span class="sub">that's Simply Better</span></h1>
@@ -53,7 +53,7 @@
                             See how it works
                         </a>
                         {% if invitation is defined and invitation %}
-                            {{ form_start(form, { 'attr': { 'class': 'mt-3' }}) }}
+                            {{ form_start(form, { 'attr': { 'class': 'mt-4' }}) }}
                                 {{ form_widget(form) }}
                             {{ form_end(form) }}
                         {% endif %}
