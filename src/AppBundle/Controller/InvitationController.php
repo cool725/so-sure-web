@@ -10,6 +10,7 @@ use AppBundle\Document\Invitation\Invitation;
 use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Service\MixpanelService;
+use AppBundle\Service\SixpackService;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -34,9 +35,25 @@ class InvitationController extends BaseController
         $phoneRepo = $dm->getRepository(Phone::class);
 
         if ($invitation && $invitation->isSingleUse() && $invitation->isInviteeProcessed()) {
-            return $this->render('AppBundle:Invitation:processed.html.twig', [
-                'invitation' => $invitation,
-            ]);
+            $flashType = 'warning';
+            $flashMessage = 'This invitation to join so-sure is being processed';
+
+            if ($invitation->isAccepted()) {
+                $flashType = 'success';
+                $flashMessage = 'The invitation to join so-sure has been accepted';
+            } elseif ($invitation->isRejected()) {
+                $flashType = 'error';
+                $flashMessage = 'This invitation to join so-sure was declined';
+            } elseif ($invitation->isCancelled()) {
+                $flashType = 'error';
+                $flashMessage = 'This invitation to join so-sure has already been cancelled';
+            }
+
+            $this->addFlash(
+                $flashType,
+                $flashMessage
+            );
+            // return $this->render('AppBundle:Invitation:invitation.html.twig', ['id' => $id]);
         } elseif ($this->getUser() !== null) {
             return $this->redirect($this->getParameter('branch_share_url'));
         } elseif ($invitation && $invitation->isCancelled()) {
@@ -48,8 +65,8 @@ class InvitationController extends BaseController
         $declineForm = $this->get('form.factory')
             ->createNamedBuilder('decline_form')
             ->add('decline', SubmitType::class, array(
-                'label' => "No thanks!",
-                'attr' => ['class' => 'btn btn-danger btn-rounded'],
+                'label' => "Not interested!",
+                'attr' => ['class' => 'btn-simple-link text-white'],
             ))
             ->getForm();
 
@@ -58,12 +75,14 @@ class InvitationController extends BaseController
             if ($declineForm->isSubmitted() && $declineForm->isValid()) {
                 $invitationService = $this->get('app.invitation');
                 $invitationService->reject($invitation);
-                $this->addFlash(
-                    'error',
-                    'You have declined this invitation.'
-                );
-
-                return $this->redirectToRoute('invitation', ['id' => $id]);
+                $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_INVITATION_PAGE, [
+                     'Invitation Method' => $invitation->getChannel(),
+                     'Invitation Action' => 'declined',
+                ]);
+                $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_EMAIL_LANDING_TEXT);
+                return $this->redirectToRoute('invitation', [
+                    'id' => $id,
+                ]);
             }
         }
 
@@ -78,15 +97,22 @@ class InvitationController extends BaseController
 
         if ($invitation && !$isUK) {
             // @codingStandardsIgnoreStart
-            $this->addFlash('error', sprintf(
+            $this->addFlash('error-raw', sprintf(
                 '<i class="fa fa-warning"></i> Sorry, we currently only offer policies to UK residents. If you are a UK resident, you may continue below.'
             ));
             // @codingStandardsIgnoreEnd
         }
 
+        $landingText = $this->sixpack(
+            $request,
+            SixpackService::EXPERIMENT_EMAIL_LANDING_TEXT,
+            ['email-landing-text-a', 'email-landing-text-b']
+        );
+
         return array(
             'invitation' => $invitation,
             'form' => $declineForm->createView(),
+            'landing_text' => $landingText,
         );
     }
 }

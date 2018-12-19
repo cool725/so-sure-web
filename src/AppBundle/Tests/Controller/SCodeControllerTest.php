@@ -31,10 +31,9 @@ class SCodeControllerTest extends BaseControllerTest
         $url = sprintf('/scode/%s', $scode->getCode());
         $crawler = self::$client->request('GET', $url);
         self::verifyResponse(200);
-        $this->assertContains(sprintf("Insure your phone with %s", $scode->getUser()->getName()), $crawler->html());
+        $this->assertContains(sprintf("%s", $scode->getUser()->getName()), $crawler->html());
         // check if phone forms are pointing to the right location
-        self::verifySearchFormData($crawler->filter('form'), '/phone-insurance/', 1);
-
+        $this->assertHasFormAction($crawler, '/select-phone-dropdown');
     }
 
     public function testSCodeUser()
@@ -110,13 +109,13 @@ class SCodeControllerTest extends BaseControllerTest
         //print_r($url);
         $crawler = self::$client->request('GET', $url);
         self::verifyResponse(200, null, $crawler);
-        $this->assertContains(sprintf("Insure your phone with %s", $user->getName()), $crawler->html());
+        $this->assertContains(sprintf("%s", $user->getName()), $crawler->html());
 
         $url = sprintf('/scode/%s', urlencode($scode->getCode()));
         //print_r($url);
         $crawler = self::$client->request('GET', $url);
         self::verifyResponse(200, null, $crawler);
-        $this->assertContains(sprintf("Insure your phone with %s", $user->getName()), $crawler->html());
+        $this->assertContains(sprintf("%s", $user->getName()), $crawler->html());
     }
 
     private function createSCode($emailBase)

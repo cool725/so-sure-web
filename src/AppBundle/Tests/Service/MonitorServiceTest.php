@@ -16,6 +16,7 @@ use AppBundle\Repository\ClaimRepository;
 use AppBundle\Repository\Invitation\InvitationRepository;
 use AppBundle\Service\InvitationService;
 use AppBundle\Service\MonitorService;
+use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\Tests\Common\DataFixtures\ContactFixture;
 use Doctrine\Tests\Common\DataFixtures\TestDocument\Role;
 use Exception;
@@ -220,16 +221,10 @@ class MonitorServiceTest extends WebTestCase
         self::$dm->persist($policy);
         self::$dm->flush();
 
-        /** @var \Symfony\Component\DependencyInjection\Container $container */
-        $container = self::$container;
-
-        if (!$container) {
-            throw new \Exception('Unable to load container');
-        }
-
-        /** @var MonitorService $monitor */
-        $monitor = $container->get('app.monitor');
-        $monitor->invalidPolicy();
+        /** @var DocumentManager $dm */
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        self::$monitor->setDm($dm);
+        self::$monitor->invalidPolicy();
     }
 
     /**
