@@ -40,7 +40,7 @@ class InvitationController extends BaseController
 
             if ($invitation->isAccepted()) {
                 $flashType = 'success';
-                $flashMessage = 'The invitation to join so-sure has been accpeted';
+                $flashMessage = 'The invitation to join so-sure has been accepted';
             } elseif ($invitation->isRejected()) {
                 $flashType = 'error';
                 $flashMessage = 'This invitation to join so-sure was declined';
@@ -53,7 +53,7 @@ class InvitationController extends BaseController
                 $flashType,
                 $flashMessage
             );
-            return $this->render('AppBundle:Invitation:invitation.html.twig', ['id' => $id]);
+            // return $this->render('AppBundle:Invitation:invitation.html.twig', ['id' => $id]);
         } elseif ($this->getUser() !== null) {
             return $this->redirect($this->getParameter('branch_share_url'));
         } elseif ($invitation && $invitation->isCancelled()) {
@@ -75,6 +75,10 @@ class InvitationController extends BaseController
             if ($declineForm->isSubmitted() && $declineForm->isValid()) {
                 $invitationService = $this->get('app.invitation');
                 $invitationService->reject($invitation);
+
+                $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_INVITATION_PAGE, [
+                     'Invitation Action' => 'declined'
+                ]);
 
                 return $this->redirectToRoute('invitation', [
                     'id' => $id,
