@@ -572,7 +572,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                     $user->setEmail($email);
                     $dm->persist($user);
                     $dm->flush();
-                    $this->addFlash('success', sprintf(
+                    $this->addFlash('success-raw', sprintf(
                         'Created User. <a href="%s">%s</a>',
                         $this->generateUrl('admin_user', ['id' => $user->getId()]),
                         $email
@@ -3001,7 +3001,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                     'AppBundle:Email:picsure/adminRejected.html.twig',
                     ['policy' => $policy]
                 );
-                $this->addFlash('error', sprintf(
+                $this->addFlash('error-raw', sprintf(
                     'Policy <a href="%s">%s</a> should be cancelled (intercom support message also sent).',
                     $this->get('app.router')->generateUrl('admin_policy', ['id' => $policy->getId()]),
                     $policy->getPolicyNumber()
