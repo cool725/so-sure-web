@@ -242,7 +242,7 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                 $lines[] = '';
 
                 if ($flushPolicyRedis) {
-                    $this->redis->del(['VALIDATION_POLICIES']);
+                    $this->redis->del(['policy:validation']);
                 }
 
                 foreach ($policies as $policy) {
