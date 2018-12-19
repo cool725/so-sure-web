@@ -156,7 +156,7 @@ class OpsController extends BaseController
                 'code' => $request->get('code')
             ]);
             $this->addFlash(
-                'success',
+                'success-raw',
                 sprintf(
                     'OAuth Code Added: %s <a href="%s" target="_blank">Exchange for bearer token</a>',
                     $request->get('code'),

@@ -410,8 +410,8 @@ class MonitorService
         if (isset($results['missing']) && count($results['missing']) > 0) {
             // @codingStandardsIgnoreStart
             throw new MonitorException(sprintf(
-                'Judopay is missing database payment records that indices a mobile payment was received, but not recorded. %s',
-                json_encode($results['missing'])
+                'Judopay is missing database payment records which indicates a mobile payment was received, but not recorded. %s',
+                str_replace("\"", "'", json_encode($results['missing']))
             ));
             // @codingStandardsIgnoreEnd
         }

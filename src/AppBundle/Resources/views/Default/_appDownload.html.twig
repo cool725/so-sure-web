@@ -25,13 +25,13 @@
         <br>
         {% if show_itunes %}
         <li>
-            <a class="ga-outbound-click" data-clicklabel="iTunes" href="{{ apple_download(location) }}" target="_blank"><img src="{{ cdn_url }}/images/icons/app-store-original.svg" alt="Download so-sure on the App Store" />
+            <a class="ga-outbound-click" data-clicklabel="iTunes" href="{{ apple_download(location) }}" target="_blank" rel="noopener noreferrer"><img src="{{ cdn_url }}/images/icons/app-store-original.svg" alt="Download so-sure on the App Store" />
             </a>
         </li>
         {% endif %}
         {% if show_google_play %}
         <li>
-            <a class="ga-outbound-click" data-clicklabel="PlayStore" href="{{ google_download(location) }}" target="_blank"><img src="{{ cdn_url }}/images/icons/google-play-original.svg" alt="Get so-sure on Google Play" />
+            <a class="ga-outbound-click" data-clicklabel="PlayStore" href="{{ google_download(location) }}" target="_blank" rel="noopener noreferrer"><img src="{{ cdn_url }}/images/icons/google-play-original.svg" alt="Get so-sure on Google Play" />
             </a>
         </li>
         {% endif %}

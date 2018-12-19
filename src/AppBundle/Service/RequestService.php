@@ -421,6 +421,9 @@ class RequestService
         if (mb_stripos($userAgent, 'HappyApps') !== false) {
             return true;
         }
+        if (mb_stripos($userAgent, 'Branch Metrics') !== false) {
+            return true;
+        }
 
         return false;
     }

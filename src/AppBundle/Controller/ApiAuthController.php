@@ -188,10 +188,15 @@ class ApiAuthController extends BaseController
                     'key' => $key
                 ]));
 
+                $body = sprintf(
+                    '<a href="%s">Detected IMEI page</a>',
+                    $this->generateUrl('admin_detected_imei')
+                );
+
                 $this->get('app.mailer')->send(
                     'Unknown App IMEI - Process on admin site',
                     'tech+ops@so-sure.com',
-                    'Unknown App IMEI - Process on admin site'
+                    $body
                 );
 
                 return $this->getErrorJsonResponse(
