@@ -538,19 +538,17 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                     $isFirstPayment = $bankAccount->isFirstPayment();
                     if ($bacsPayments >= 1 && $isFirstPayment) {
                         $this->header($policy, $policies, $lines);
-                        $lines[] = sprintf('Warning!! 1 or more bacs payments, yet bank has first payment flag set');
+                        $lines[] = 'Warning!! 1 or more bacs payments, yet bank has first payment flag set';
                     } elseif ($bacsPayments == 0 && !$isFirstPayment) {
                         $this->header($policy, $policies, $lines);
-                        $lines[] = sprintf('Warning!! No bacs payments, yet bank does not have first payment flag set');
+                        $lines[] = 'Warning!! No bacs payments, yet bank does not have first payment flag set';
                     }
                     $now = \DateTime::createFromFormat('U', time());
 
                     if ($bankAccount->isAfterInitialNotificationDate()) {
                         if ($bacsPayments == 0) {
                             $this->header($policy, $policies, $lines);
-                            $lines[] = sprintf(
-                                'Warning!! There are no bacs payments, yet past the initial notification date'
-                            );
+                            $lines[] = 'Warning!! There are no bacs payments, yet past the initial notification date';
                         }
                     } elseif ($bankAccount->isAfterInitialNotificationDate() === null) {
                         $this->header($policy, $policies, $lines);
