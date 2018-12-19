@@ -1597,8 +1597,8 @@ class AdminController extends BaseController
 
             $pattern = '*' . $policy->getId() . '*';
 
-            foreach (new SetKey($redis, 'VALIDATION_POLICIES', $pattern) as $key) {
-                $redis->srem('VALIDATION_POLICIES', $key);
+            foreach (new SetKey($redis, 'policy:validation', $pattern) as $key) {
+                $redis->srem('policy:validation', $key);
             }
 
             $this->addFlash('success', sprintf(
@@ -1610,7 +1610,7 @@ class AdminController extends BaseController
         $policiesForValidation = [];
         $validationErrors = [];
 
-        foreach ($redis->smembers('VALIDATION_POLICIES') as $policyData) {
+        foreach ($redis->smembers('policy:validation') as $policyData) {
             $policyData = unserialize($policyData);
 
             $policiesForValidation[$policyData['id']] = $repo->find($policyData['id']);

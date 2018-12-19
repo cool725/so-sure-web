@@ -274,7 +274,7 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                     $csvData[$policy->getPolicyNumber()] = $adjustedNewLines;
 
                     if (array_key_exists($policy->getId(), $data)) {
-                        $this->redis->sadd('VALIDATION_POLICIES', serialize($data[$policy->getId()]));
+                        $this->redis->sadd('policy:validation', serialize($data[$policy->getId()]));
                     }
                 }
 
