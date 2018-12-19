@@ -10,6 +10,7 @@ require('bootstrap/js/dist/alert');
 require('./common/trackData.js');
 require('./common/fbLogin.js');
 require('./common/toggleText.js');
+require('./common/appendEmail.js');
 require('./components/nav.js');
 require('./components/getQuote.js');
 require('./components/phoneSearchDropdown.js');
