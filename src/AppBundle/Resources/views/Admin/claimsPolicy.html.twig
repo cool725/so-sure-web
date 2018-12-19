@@ -82,7 +82,7 @@
                 </div>
                 <div class="form-group">
                 30 days from now is <strong>{{ suggested_cancellation_date|date('d M Y') }}</strong>
-                or use <a href="https://www.timeanddate.com/date/dateadded.html?ad=30" target="_blank">online calculator</a>.
+                or use <a href="https://www.timeanddate.com/date/dateadded.html?ad=30" target="_blank" rel="noopener noreferrer">online calculator</a>.
                 </div>
                 {{ form_widget(pending_cancel_form.clear, {'label': 'Abort cancellation', 'attr': {'class': 'btn btn-warning' }}) }}
                 {{ form_widget(pending_cancel_form.cancel, {'label': 'Schedule cancellation', 'attr': {'class': 'btn btn-danger', 'placeholder': '30 days after notice' }}) }}

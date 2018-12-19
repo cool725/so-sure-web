@@ -47,12 +47,6 @@ monolog:
         #    channels: ['!event']
         #    formatter:  monolog.formatter.html
         #    content_type: text/html
-        rollbar:
-            id: "app.logger.rollbar"
-            formatter: "app.logger.lineformatter"
-            type: rollbar
-            level: warning
-            channels: ['!event']
         salva:
             type:   stream
             path:   "%kernel.logs_dir%/salva.log"

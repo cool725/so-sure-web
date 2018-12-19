@@ -552,7 +552,7 @@
                         {% if is_granted('ROLE_ADMIN') %}
                             {{ form_widget(form.approvedDate, {'attr': {'class': 'form-control'}}) }}
                         {% else %}
-                            {{ claim.approvedDate|date('d-m-Y') }}
+                            {{ form_widget(form.approvedDate, {'attr': {'class': 'form-control', 'disabled': 'disabled'}}) }}
                         {% endif %}
                     </div>
 
@@ -576,7 +576,7 @@
     {% if is_granted('ROLE_ADMIN') %}
     <form id="delete-claim-form" method="POST" action="{{ path('admin_claims_delete_claim') }}">
         <input type="hidden" name="id" value="{{ claim.id }}" />
-        <input type="hidden" name="token" value="{{  csrf_token('default') }}" />
+        <input type="hidden" name="token" value="{{ csrf_token('default') }}" />
     </form>
     {% endif %}
 

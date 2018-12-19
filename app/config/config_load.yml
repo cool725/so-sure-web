@@ -18,12 +18,6 @@ framework:
 monolog:
     channels: ['receperio']
     handlers:
-        rollbar:
-            id: "app.logger.rollbar"
-            formatter: "app.logger.lineformatter"
-            type: rollbar
-            level: warning
-            channels: ['!event']
         salva:
             type:   stream
             path:   "%kernel.logs_dir%/salva.log"

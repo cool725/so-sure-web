@@ -17,7 +17,13 @@
         <div class="container">
             <div class="panel login__panel">
                 <div class="panel-body">
-                    {{ form_start(form, {'method': 'POST', 'action': path('fos_oauth_server_authorize'), 'label_attr': {'class': 'fos_oauth_server_authorize'} }) }}
+                    {{ form_start(form, {
+                        'method': 'POST',
+                        'action': path('fos_oauth_server_authorize'),
+                        'label_attr': {
+                            'autocomplete': 'off',
+                            'class': 'fos_oauth_server_authorize'}
+                    }) }}
                         <p class="lead">{{ form.vars.value.scope|oauth2ScopeDescription }}</p>
                         <hr>
                         <input class="btn btn-success" type="submit" name="accepted" value="{{ 'authorize.accept'|trans({}, 'FOSOAuthServerBundle') }}" />

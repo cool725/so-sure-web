@@ -67,7 +67,6 @@ class PolicySearchType extends BaseType
             ->add('imei', TextType::class, ['required' => false])
             ->add('facebookId', TextType::class, ['required' => false])
             ->add('status', ChoiceType::class, [
-                'required' => false,
                 'data' => 'current',
                 'choices' => $statuses,
             ])
