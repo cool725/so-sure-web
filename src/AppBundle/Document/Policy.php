@@ -3247,7 +3247,7 @@ abstract class Policy
         return $this->isCancelled() && $this->getCancelledReason() == $reason;
     }
 
-    public function canCancel($reason, $date = null, $ignoreClaims = false)
+    public function canCancel($reason, $date = null, $ignoreClaims = false, $extendedCooloff = true)
     {
         // Doesn't make sense to cancel
         if (in_array($this->getStatus(), [
@@ -3269,7 +3269,7 @@ abstract class Policy
         }
 
         if ($reason == Policy::CANCELLED_COOLOFF) {
-            return $this->isWithinCooloffPeriod($date) && !$this->hasMonetaryClaimed(true);
+            return $this->isWithinCooloffPeriod($date, $extendedCooloff) && !$this->hasMonetaryClaimed(true);
         }
 
         if ($reason == Policy::CANCELLED_UNPAID) {
