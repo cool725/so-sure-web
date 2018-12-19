@@ -8,6 +8,8 @@ phases:
       - timeout -t 15 sh -c "until docker info; do echo .; sleep 1; done"
   pre_build:
     commands:
+      - echo Logging in to Amazon ECR...
+      - $(aws ecr get-login --no-include-email --region $AWS_DEFAULT_REGION)
       - docker build -t test .
   build:
     commands:
