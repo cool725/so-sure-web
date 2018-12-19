@@ -44,7 +44,6 @@ use AppBundle\Service\SalvaExportService;
 use AppBundle\Service\SequenceService;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Predis\Client;
-use Predis\Collection\Iterator\Keyspace;
 use Predis\Collection\Iterator\SetKey;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
