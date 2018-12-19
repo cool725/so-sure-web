@@ -2,7 +2,9 @@
 
 namespace AppBundle\Form\Type;
 
+use AppBundle\Document\ValidatorTrait;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -18,6 +20,8 @@ use Symfony\Component\Form\FormEvent;
 
 class ClaimType extends AbstractType
 {
+    use ValidatorTrait;
+
     /**
      * @var ReceperioService
      */
@@ -38,6 +42,18 @@ class ClaimType extends AbstractType
             ->add('shouldCancelPolicy', CheckboxType::class, ['required' => false])
             ->add('notes', TextareaType::class, ['required' => false])
             ->add('record', SubmitType::class)
+        ;
+
+        $builder
+            ->get('notes')
+            ->addModelTransformer(new CallbackTransformer(
+                function ($note) {
+                    return $note;
+                },
+                function ($noteConformAlphanumeric) {
+                    return $this->conformAlphanumericSpaceDot($noteConformAlphanumeric, 2500, 1);
+                }
+            ))
         ;
 
         $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {

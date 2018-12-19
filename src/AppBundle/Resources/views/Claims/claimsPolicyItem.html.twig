@@ -219,7 +219,7 @@
                                                         {% if data['certId'] == 'serial' or data['certId'] == 'register' %}
                                                             <span title="{{ data['response']|json_encode }}" style="cursor: pointer;">{{ data['certId']|upper }}</span>
                                                         {% else %}
-                                                            <a href="https://www.checkmend.com/uk/verify/{{ data['certId'] }}" target="_blank" title="{{ data['response']|json_encode }}">{{ data['certId'] }}</a>
+                                                            <a href="https://www.checkmend.com/uk/verify/{{ data['certId'] }}" target="_blank" rel="noopener noreferrer" title="{{ data['response']|json_encode }}">{{ data['certId'] }}</a>
                                                         {% endif %}
                                                         (Ran on {{ key|date("F j, Y H:i", "Europe/London") }})</li>
                                                 {% endfor %}
@@ -245,7 +245,7 @@
                                                     {% if data['certId'] == 'serial' or data['certId'] == 'register' %}
                                                         <span title="{{ data['response']|json_encode }}" style="cursor: pointer;">{{ data['certId']|upper }}</span>
                                                     {% else %}
-                                                        <a href="https://www.checkmend.com/uk/verify/{{ data['certId'] }}" target="_blank" title="{{ data['response']|json_encode }}">{{ data['certId'] }}</a>
+                                                        <a href="https://www.checkmend.com/uk/verify/{{ data['certId'] }}" target="_blank" rel="noopener noreferrer" title="{{ data['response']|json_encode }}">{{ data['certId'] }}</a>
                                                     {% endif %}
                                                     (Ran on {{ key|date("F j, Y H:i", "Europe/London") }})</li>
                                             {% endfor %}
@@ -457,7 +457,7 @@
                                         <td>Card</td>
                                         <td class="{% if policy.payerOrUser.paymentMethod.isCardExpired %}danger{% endif %}">
                                             {{ policy.payerOrUser.paymentMethod }}
-                                            <a title="Judopay" href="https://portal.judopay.com/payments/history?SearchQuery={{ policy.payerOrUser.id }}&SearchQueryType=0&AppName=&DeviceId=&From=&To=&AppId=0" target="_blank">
+                                            <a title="Judopay" href="https://portal.judopay.com/payments/history?SearchQuery={{ policy.payerOrUser.id }}&SearchQueryType=0&AppName=&DeviceId=&From=&To=&AppId=0" target="_blank" rel="noopener noreferrer">
                                                 <i class="fa fa-external-link"></i>
                                             </a>
                                         </td>
@@ -801,7 +801,7 @@
                     <td>
                         {{ policy.user.id }}
                         {% if is_granted('ROLE_EMPLOYEE') and policy.user.intercomId %}
-                            <a target="_blank" title="Intercom" href="https://app.intercom.io/a/apps/bjo63djg/users/{{ policy.user.intercomId }}/all-conversations"><i class="fa fa-external-link"></i></a>
+                            <a target="_blank" rel="noopener noreferrer" title="Intercom" href="https://app.intercom.io/a/apps/bjo63djg/users/{{ policy.user.intercomId }}/all-conversations"><i class="fa fa-external-link"></i></a>
                         {% endif %}
                     </td>
                 </tr>
@@ -1744,7 +1744,7 @@
         {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:Admin:policyStatusForm', 'policy': policy, 'id': 'policyStatusForm'} %}
     {% endif %}
     {% include 'AppBundle::Claims/claimsModal.html.twig' %}
-    
+
 <div class="modal fade" id="policyNotesModal" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
