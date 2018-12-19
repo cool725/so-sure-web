@@ -219,7 +219,7 @@ class ClaimsController extends BaseController
                             $claimscheck->getClaim(),
                             $this->getUser()
                         );
-                        $this->addFlash('success', sprintf(
+                        $this->addFlash('success-raw', sprintf(
                             '%s £%0.2f <a href="%s" target="_blank">%s</a> (Phone is %s)',
                             ucfirst($claimscheck->getType()),
                             $claimscheck->getClaim()->getLastChargeAmountWithVat(),

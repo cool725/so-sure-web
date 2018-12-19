@@ -19,7 +19,7 @@
                 {% for friend in friends %}
                     <div class="col-xs-12 col-md-3">
                         <div class="trust">
-                        <p>{{ friend['name'] }} <a href="https://www.facebook.com/search/people/?q={{ friend['name'] }}" target="_blank"><span class="fa fa-search"></span></a></p>
+                        <p>{{ friend['name'] }} <a href="https://www.facebook.com/search/people/?q={{ friend['name'] }}" target="_blank" rel="noopener noreferrer"><span class="fa fa-search"></span></a></p>
                         <p><img class="trust-photo" src="{{ friend['picture']['url']|replace({'http:': 'https:' }) }}" /></p>
                         <p><a href="{{ path('user_post', {id: friend['id']}) }}" class="btn btn-success">Trust this friend</a></p>
                         </div>

@@ -69,6 +69,12 @@ class MixpanelCommand extends ContainerAwareCommand
                 'Number of days to keep users',
                 90
             )
+            ->addOption(
+                'type',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Type of mixpanel queue item to clear'
+            )
         ;
     }
 
@@ -79,6 +85,7 @@ class MixpanelCommand extends ContainerAwareCommand
         $id = $input->getOption('id');
         $process = $input->getOption('process');
         $days = $input->getOption('days');
+        $type = $input->getOption('type');
         $user = null;
         if ($email) {
             if ($user = $this->getUser($email)) {
@@ -141,8 +148,17 @@ class MixpanelCommand extends ContainerAwareCommand
             $total = $this->mixpanelService->countQueue();
             $output->writeln(sprintf("%d in queue", $total));
         } elseif ($action == 'clear') {
-            $this->mixpanelService->clearQueue();
-            $output->writeln(sprintf("Queue is cleared"));
+            if ($type) {
+                if (in_array($type, MixpanelService::QUEUE_TYPES)) {
+                    $count = $this->mixpanelService->clearQueuedType($type);
+                    $output->writeln("Removed {$count} queued {$type} items.");
+                } else {
+                    $output->writeln(sprintf("{$type} is not a valid queue item type."));
+                }
+            } else {
+                $this->mixpanelService->clearQueue();
+                $output->writeln(sprintf("Queue is cleared"));
+            }
         } elseif ($action == 'show') {
             $data = $this->mixpanelService->getQueueData($process);
             $output->writeln(sprintf("Queue Size: %d", count($data)));
