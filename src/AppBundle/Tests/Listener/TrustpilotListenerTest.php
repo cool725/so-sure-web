@@ -64,7 +64,6 @@ class TrustpilotListenerTest extends WebTestCase
         /** @var DocumentManager */
         $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
         self::$dm = $dm;
-        self::$userRepo = self::$dm->getRepository(User::class);
         self::$mailerService = self::$container->get('app.mailer');
     }
 
