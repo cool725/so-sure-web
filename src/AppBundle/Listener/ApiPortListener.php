@@ -29,7 +29,7 @@ class ApiPortListener
         // Requires UseCanonicalName On & UseCanonicalPhysicalPort On in apache in order to be trusted
         $defaultPort = $this->environment == 'test' ? 8080 : 80;
         $serverPort = isset($_SERVER['SERVER_PORT']) ? $_SERVER['SERVER_PORT'] : $defaultPort;
-        $this->logger->debug(sprintf("SERVER PORT: %s Expected: %s", $serverPort, $apiPort));
+        $this->logger->debug(sprintf("SERVER PORT for %s: %s Expected: %s", $this->environment, $serverPort, $apiPort));
 
         if (mb_strpos($request->getRequestUri(), '/api/') === 0 && intval($serverPort) != intval($apiPort)) {
             $event->setResponse(new Response('', 403));
