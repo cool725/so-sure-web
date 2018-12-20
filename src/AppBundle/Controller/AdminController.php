@@ -1569,7 +1569,7 @@ class AdminController extends BaseController
     }
 
     /**
-     * @Route("/policy-validation", name="policy_validation")
+     * @Route("/policy-validation", name="admin_policy_validation")
      * @Template
      */
     public function policyValidationAction(Request $request)
@@ -1606,25 +1606,11 @@ class AdminController extends BaseController
                 $policy->getPolicyNumber()
             ));
             
-            return $this->redirectToRoute('policy_validation');
-        }
-
-        $policiesForValidation = [];
-        $validationErrors = [];
-
-        foreach ($redis->smembers('policy:validation') as $policyData) {
-            $policyData = unserialize($policyData);
-
-            $policiesForValidation[$policyData['id']] = $repo->find($policyData['id']);
-
-            foreach ($policyData['issues'] as $issue) {
-                $validationErrors[$policyData['id']][] = $issue;
-            }
+            return $this->redirectToRoute('admin_policy_validation');
         }
 
         return [
-            'policies' => $policiesForValidation,
-            'policyValidationErrors' => $validationErrors
+            'validation' => $redis->smembers('policy:validation'),
         ];
     }
 }

@@ -12,15 +12,33 @@
                 <h1 class="h2">Policy Validation</h1>
             </div>
 
-            <div class="list-group">
-                {% for policy in policies %}
-                    <div class="list-group-item">
-                        <div class="d-flex">
+            <div class="table-responsive-sm mb-12">
+                <table class="table table-striped">
+                    <thead class="thead-light">
+                    <tr>
+                        <th>Policy</th>
+                        <th>Validation</th>
+                        <th>Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for item in validation %}
+                    {% set validate = unserialise(item) %}
+                    <tr>
+                        <td>
                             <a class="mr-auto align-self-center"
-                               href="{{ path('admin_policy', {'id': policy.id}) }}">
-                                {{ policy.policyNumber }}
+                               href="{{ path('admin_policy', {'id': validate.id}) }}">
+                                {{ validate.policyNumber }}
                             </a>
-
+                        </td>
+                        <td>
+                            <ul>
+                            {% for issue in validate.issues %}
+                                <li>{{ issue|trim }}</li>
+                            {% endfor %}
+                            </ul>
+                        </td>
+                        <td>
                             <form method="POST">
                                 <button name="delete-redis-policy"
                                         type="submit"
@@ -28,19 +46,16 @@
                                     Remove from list
                                 </button>
 
-                                <input type="hidden" name="id" value="{{ policy.id }}"/>
+                                <input type="hidden" name="id" value="{{ validate.id }}"/>
                                 <input type="hidden" name="token" value="{{ csrf_token('default') }}"/>
                             </form>
-                        </div>
-
-                        <div class="d-flex flex-wrap">
-                            {% for validationError in policyValidationErrors[policy.id] %}
-                                <p class="mr-auto w-50">{{ validationError|trim }}</p>
-                            {% endfor %}
-                        </div>
-                    </div>
-                {% endfor %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
             </div>
+
         </div>
     </section>
 {% endblock %}
