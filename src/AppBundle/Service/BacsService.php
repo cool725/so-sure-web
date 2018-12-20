@@ -1173,6 +1173,7 @@ class BacsService
     public function bacsFileSubmittedBySerialNumber($serialNumber)
     {
         $repo = $this->dm->getRepository(AccessPayFile::class);
+        /** @var AccessPayFile $file */
         $file = $repo->findOneBy(['serialNumber' => $serialNumber, 'status' => AccessPayFile::STATUS_PENDING]);
         if (!$file) {
             return false;
