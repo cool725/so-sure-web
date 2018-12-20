@@ -1706,7 +1706,7 @@
                     </div>
                     <div class="modal-body">
                         <div class="row">
-                            <div class="col-md-12">
+                            <div class="col-md-6">
                                 <div class="form-group">
                                     {{ form_label(bacs_refund_form.amount) }}
                                     {{ form_errors(bacs_refund_form.amount) }}
@@ -1724,6 +1724,46 @@
                                     {{ form_errors(bacs_refund_form.notes) }}
                                     {{ form_widget(bacs_refund_form.notes, {'attr': {'placeholder': 'Notes regarding credit'}}) }}
                                 </div>
+                            </div>
+                            <div class="col-md-6">
+                                {% if policy.isPolicy %}
+                                    Policy Payments: Paid £{{ policy.premiumPaid | number_format(2, '.', ',') }} of £{{ policy.premium.yearlyPremiumPrice| number_format(2, '.', ',') }}&nbsp;
+                                    <br>
+                                    {% if policy.isPolicy and policy.start %}
+                                        {% if policy.end < now %}
+                                            Premium of £{{ policy.getProratedPremium(policy.end) | number_format(2, '.', ',') }} was due on policy
+                                            {% if policy.premiumPaid > policy.getProratedPremium(policy.end) %}
+                                                <br>Refund of <strong>£{{ (policy.premiumPaid - policy.getProratedPremium(policy.end)) | number_format(2, '.', ',')  }}</strong>
+                                            {% endif %}
+                                        {% else %}
+                                            Premium of £{{ policy.getProratedPremium() | number_format(2, '.', ',') }} due (daily calc)
+                                        {% endif %}
+
+                                        <hr>
+                                        Policy Commission: Received £{{ policy.getTotalCommissionPaid() | number_format(2, '.', ',') }} of £{{ policy.premium.yearlyTotalCommission| number_format(2, '.', ',') }} (coverholder + broker)
+                                        {% if policy.isPolicy and policy.start %}
+                                            <br>
+                                            {% if policy.end < now %}
+                                                Commission of £{{ policy.getProratedCommission(policy.end) | number_format(2, '.', ',') }}
+                                                (
+                                                £{{ policy.getProratedCoverholderCommission(policy.end) | number_format(2, '.', ',') }} /
+                                                £{{ policy.getProratedBrokerCommission(policy.end) | number_format(2, '.', ',') }}
+                                                )
+                                                was due on policy
+                                                {% if policy.getTotalCommissionPaid() > policy.getProratedCommission(policy.end) %}
+                                                    <br>Refund of <strong>£{{ (policy.getTotalCommissionPaid() - policy.getProratedCommission(policy.end)) | number_format(2, '.', ',')  }}</strong>
+                                                {% endif %}
+                                            {% else %}
+                                                Commission of £{{ policy.getProratedCommission() | number_format(2, '.', ',') }}
+                                                (
+                                                £{{ policy.getProratedCoverholderCommission() | number_format(2, '.', ',') }} /
+                                                £{{ policy.getProratedBrokerCommission() | number_format(2, '.', ',') }}
+                                                )
+                                                due (daily calc)
+                                            {% endif %}
+                                        {% endif %}
+                                    {% endif %}
+                                {% endif %}
                             </div>
                         </div>
                     </div>
