@@ -880,6 +880,8 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim->insuredName = 'Mr Foo Bar';
         $daviesClaim->lossDate = new \DateTime('2017-06-01');
         $daviesClaim->replacementReceivedDate = new \DateTime('2017-07-01');
+        $daviesClaim->replacementMake = 'foo';
+        $daviesClaim->replacementModel = 'bar';
 
         self::$daviesService->saveClaim($daviesClaim, false);
         //print_r(self::$directGroupService->getErrors());
