@@ -649,12 +649,12 @@
                         <td style="width: 10%;">{{ claim.type }}</td>
                         <td style="width: 10%;">{{ claim.status }}</td>
                         <td style="width: 10%;">
-                            {% if equal_to_two_dp(claim.expectedExcessValue, claim.expectedExcessValue(true)) %}
-                                <span title="Verified excess matches older calculation of £{{ claim.expectedExcessValue(true)|number_format(2, '.', ',') }}">
+                            {% if equal_to_two_dp(claim.expectedExcessValue, claim.expectedExcessValue(null, true)) %}
+                                <span title="Verified excess matches older calculation of £{{ claim.expectedExcessValue(null, true)|number_format(2, '.', ',') }}">
                                     £{{ claim.expectedExcessValue }}
                                 </span>
                             {% else %}
-                                <span class="text-danger" title="Warning excess does not matches older calculation of £{{ claim.expectedExcessValue(true)|number_format(2, '.', ',') }}">
+                                <span class="text-danger" title="Warning excess does not matches older calculation of £{{ claim.expectedExcessValue(null, true)|number_format(2, '.', ',') }}">
                                     £{{ claim.expectedExcessValue }}
                                 </span>
                             {% endif %}
