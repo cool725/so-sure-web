@@ -831,6 +831,7 @@
                             <th>Expected Received Date</th>
                             <th>Lloyds</th>
                         </tr>
+                        {% set inputTotal = 0 %}
                         {% for file in bacsInputFiles if file.metadata['serial-number'] is defined and file.metadata['processing-date']  is defined %}
                             {% set received_date = next_business_day_historical(file.metadata['processing-date']) %}
                             {% set amount = null %}
@@ -857,6 +858,9 @@
                             {% if amount is null or received_date|date('m') != month %}
                                 {% set skip = true %}
                             {% endif %}
+                            {% if not skip and foundFileInDate %}
+                                {% set inputTotal = inputTotal + amount %}
+                            {% endif %}
                             <tr class="{% if skip %}hidden{% elseif foundFileInDate %}bg-success{% else %}bg-danger{% endif %}">
                                 <td><span title="{{ file.key }}">{{ file.metadata['serial-number'] }}</span></td>
                                 <td>{{ amount|default('-') }}</td>
@@ -874,23 +878,44 @@
                     <table class="table table-striped">
                         <tr>
                             <th></th>
-                            <th>Amount</th>
+                            <th>Bacs Reporting</th>
+                            <th>Lloyds</th>
                         </tr>
                         <tr>
                             <td>Input</td>
+                            <td>{{ inputTotal }}</td>
                             <td></td>
                         </tr>
                         <tr>
                             <td>Arudd</td>
                             <td></td>
+                            <td></td>
                         </tr>
                         <tr>
                             <td>DDIC</td>
+                            <td></td>
                             <td></td>
                         </tr>
                         <tr>
                             <td>Total</td>
                             <td></td>
+                            <td>
+                                {% if month < 10 %}
+                                    {% set ym = year ~ "0" ~ month %}
+                                {% else %}
+                                    {% set ym = year ~ month %}
+                                {% endif %}
+
+                                {% set total = 0 %}
+                                {% for file in lloydsFiles %}
+                                    {% for date,amount in file.dailyBacs %}
+                                        {% if date[:6] == ym %}
+                                          {% set total = total + amount %}
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endfor %}
+                                {{ total }}
+                            </td>
                         </tr>
                     </table>
 
