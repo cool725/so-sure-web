@@ -623,7 +623,7 @@ class BacsService
         return $results;
     }
 
-    public function arudd($file)
+    public function arudd($file, $reprocess = false)
     {
         $results = [
             'records' => 0,
@@ -673,6 +673,11 @@ class BacsService
             $amount = $this->getNodeValue($element, 'valueOf');
             $results['value'] += $amount;
             $results['amounts'][$reference] = $amount;
+
+            if ($reprocess) {
+                continue;
+            }
+
             $originalProcessingDate = $this->getOriginalProcessingDate($element);
             /** @var User $user */
             $user = $repo->findOneBy(['paymentMethod.bankAccount.reference' => $reference]);
@@ -761,6 +766,7 @@ class BacsService
                 $this->logger->error(sprintf('Failed %d payments for user %s', $foundPayments, $user->getId()));
             }
         }
+
         return $results;
     }
 

@@ -874,6 +874,26 @@
                     </table>
                 </div>
                 <div class="col-md-6">
+                    {% set aruddTotal = 0 %}
+                    {% for file in bacsAruddFiles if file.metadata['processing-date'] is defined and file.metadata['amounts'] is defined %}
+                        {% set received_date = next_business_day_historical(file.metadata['processing-date']) %}
+
+                        {% for ref,amount in file.metadata['amounts'] %}
+                            {% set amount = 0 - amount %}
+                            {% set foundFileInDate = false %}
+                            {% for lloydsFile in lloydsFiles %}
+                                {% for item in lloydsFile.getBacsTransactionsByType('bacs-arudd', received_date) %}
+                                    {% if equal_to_two_dp(amount, item) %}
+                                        {% set foundFileInDate = true %}
+                                    {% endif %}
+                                {% endfor %}
+                                {% if foundFileInDate %}
+                                    {% set aruddTotal = aruddTotal + amount %}
+                                {% endif %}
+                            {% endfor %}
+                        {% endfor %}
+                    {% endfor %}
+
                     <h3>Overview</h3>
                     <table class="table table-striped">
                         <tr>
@@ -883,12 +903,12 @@
                         </tr>
                         <tr>
                             <td>Input</td>
-                            <td>{{ inputTotal }}</td>
+                            <td>{{ inputTotal|number_format(2, '.', ',') }}</td>
                             <td></td>
                         </tr>
                         <tr>
                             <td>Arudd</td>
-                            <td></td>
+                            <td>{{ aruddTotal|number_format(2, '.', ',') }}</td>
                             <td></td>
                         </tr>
                         <tr>
@@ -898,7 +918,7 @@
                         </tr>
                         <tr>
                             <td>Total</td>
-                            <td></td>
+                            <td>{{ (inputTotal + aruddTotal)|number_format(2, '.', ',') }}</td>
                             <td>
                                 {% if month < 10 %}
                                     {% set ym = year ~ "0" ~ month %}
@@ -914,7 +934,7 @@
                                         {% endif %}
                                     {% endfor %}
                                 {% endfor %}
-                                {{ total }}
+                                {{ total|number_format(2, '.', ',') }}
                             </td>
                         </tr>
                     </table>
