@@ -6,6 +6,7 @@ use AppBundle\Document\BacsPaymentMethod;
 use AppBundle\Document\BankAccount;
 use AppBundle\Document\Claim;
 use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\PhonePremium;
 use AppBundle\Document\Policy;
 use AppBundle\Document\PolicyTerms;
 use AppBundle\Event\BacsEvent;
@@ -60,6 +61,9 @@ class ClaimTypeTest extends FormTypeTest
         $terms = new PolicyTerms();
         $terms->setVersion(PolicyTerms::VERSION_3);
         $policy->setPolicyTerms($terms);
+        $premium = new PhonePremium();
+        $premium->setExcess(PolicyTerms::getLowExcess());
+        $policy->setPremium($premium);
         $claim = new Claim();
         $claim->setPolicy($policy);
 
@@ -97,6 +101,10 @@ class ClaimTypeTest extends FormTypeTest
         $terms = new PolicyTerms();
         $terms->setVersion(PolicyTerms::VERSION_4);
         $policy->setPolicyTerms($terms);
+        $premium = new PhonePremium();
+        $premium->setExcess(PolicyTerms::getHighExcess());
+        $premium->setPicSureExcess(PolicyTerms::getLowExcess());
+        $policy->setPremium($premium);
         $claim = new Claim();
         $claim->setPolicy($policy);
 
@@ -134,6 +142,10 @@ class ClaimTypeTest extends FormTypeTest
         $terms = new PolicyTerms();
         $terms->setVersion(PolicyTerms::VERSION_4);
         $policy->setPolicyTerms($terms);
+        $premium = new PhonePremium();
+        $premium->setExcess(PolicyTerms::getHighExcess());
+        $premium->setPicSureExcess(PolicyTerms::getLowExcess());
+        $policy->setPremium($premium);
         $claim = new Claim();
         $claim->setPolicy($policy);
 
