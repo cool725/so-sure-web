@@ -1,4 +1,7 @@
 #!/bin/bash
+ulimits -a
+cat /etc/security/limits.conf
+
 cd /var/ops
 git pull origin master
 cd /var/sosure
