@@ -38,36 +38,38 @@
             </tr>
             {% for company in companies %}
                 <tr>
-                    <td width="20%">
+                    <td width="15%">
                         <a href="{{ path('admin_affiliate_overview', {'id': company.id }) }}">{{ company.name }}</a>
                     </td>
-                    <td width="10%">£{{ company.cpa|number_format(2, '.', ',') }}</td>
-                    <td width="10%">{{ company.days }}</td>
+                    <td width="5%">£{{ company.cpa|number_format(2, '.', ',') }}</td>
+                    <td width="5%">{{ company.days }}</td>
                     <td width="10%">{{ company.chargeModel }}</td>
-                    <td width="10%">{{ company.renewalDays }}</td>
+                    <td width="5%">{{ company.renewalDays }}</td>
                     <td width="10%">{{ company.campaignSource }}</td>
                     <td width="10%">{{ company.leadSource }}</td>
                     <td width="10%">{{ company.leadSourceDetails }}</td>
-                    <td width="40%">
-                        {% if company.sanctionsChecks|length == 0%}
-                            No checks run
-                        {% endif %}
-                        {% for check in company.sanctionsChecks %}
-                            Ran: {{ check|date }}
-                        {% endfor %}
-                        <br />
-                        {% if company.sanctionsMatches|length == 0%}
-                            No matches
-                        {% endif %}
-                        {% for match in company.sanctionsMatches %}
-                        {# TODO: tidy up this sanctions stuff and hide it somehow because it's not pretty #}
-                            {% if match.manuallyVerified %}
-                            Confirmed not match: <del>{{ match.sanctions.company }} ({{ match.distance }})</del>
-                            {% else %}
-                            Possible match: {{ match.sanctions.company }}  ({{ match.distance }})
+                    <td width="30%">
+                        <div class="sanctionData" hidden="hidden">
+                            {% if company.sanctionsChecks|length == 0%}
+                                No checks run
                             {% endif %}
-                            <br>
-                        {% endfor %}
+                            {% for check in company.sanctionsChecks %}
+                                Ran: {{ check|date }}
+                            {% endfor %}
+                            <br />
+                            {% if company.sanctionsMatches|length == 0%}
+                                No matches
+                            {% endif %}
+                            {% for match in company.sanctionsMatches %}
+                            {# TODO: tidy up this sanctions stuff and hide it somehow because it's not pretty #}
+                                {% if match.manuallyVerified %}
+                                Confirmed not match: <del>{{ match.sanctions.company }} ({{ match.distance }})</del>
+                                {% else %}
+                                Possible match: {{ match.sanctions.company }}  ({{ match.distance }})
+                                {% endif %}
+                                <br>
+                            {% endfor %}
+                        </div>
                     </td>
                 </tr>
             {% endfor %}
