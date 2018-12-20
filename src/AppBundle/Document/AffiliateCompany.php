@@ -168,4 +168,14 @@ class AffiliateCompany extends Company
     {
         $this->chargeModel = $chargeModel;
     }
+
+    public function getPromotion()
+    {
+        return $this->promotion;
+    }
+
+    public function setPromotion($promotion)
+    {
+        $this->promotion = $promotion;
+    }
 }

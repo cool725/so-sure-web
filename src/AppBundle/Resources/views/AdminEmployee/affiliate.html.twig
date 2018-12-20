@@ -39,7 +39,7 @@
             {% for company in companies %}
                 <tr>
                     <td width="20%">
-                        <a href="{{ path('admin_affiliate_charge', {'id': company.id }) }}">{{ company.name }}</a>
+                        <a href="{{ path('admin_affiliate_overview', {'id': company.id }) }}">{{ company.name }}</a>
                     </td>
                     <td width="10%">£{{ company.cpa|number_format(2, '.', ',') }}</td>
                     <td width="10%">{{ company.days }}</td>
@@ -60,6 +60,7 @@
                             No matches
                         {% endif %}
                         {% for match in company.sanctionsMatches %}
+                        {# TODO: tidy up this sanctions stuff and hide it somehow because it's not pretty #}
                             {% if match.manuallyVerified %}
                             Confirmed not match: <del>{{ match.sanctions.company }} ({{ match.distance }})</del>
                             {% else %}

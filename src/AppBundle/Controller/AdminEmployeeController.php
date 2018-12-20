@@ -3206,60 +3206,63 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         return ['form' => $companyForm->createView()];
     }
 
+    /**
+     * @Route("/affiliate/{id}", name="admin_affiliate_overview")
+     * @Template("AppBundle:AdminEmployee:affiliateCharge.html.twig")
+     */
     public function affiliateOverviewController($id)
     {
-        // this page basically just needs the affiliate itself and pretty much nothing else.
+        $dm = $this->getManager();
+        $affiliateRepository = $dm->getRepository(AffiliateCompany::class);
+        $affiliate = $affiliateRepository->find($id);
+        return [
+            "affiliate" => $affiliate,
+            "overview" => true
+        ];
     }
 
-    public function affiliateAddPromotionFormAction(Request $request, $id)
+    /**
+     * @Route("/affiliate/promotion/{id}", name="admin_affiliate_add_promotion")
+     * @Template
+     */
+    public function affiliatePromotionFormAction(Request $request, $id)
     {
         $dm = $this->getManager();
+        $affiliateRepository = $dm->getRepository(AffiliateCompany::class);
         $promotionRepository = $dm->getRepository(Promotion::class);
-
-        $promotionForm = $this->get('form.factory')
-            ->createNamedBuilder('promotion_form')
-            ->add('renewalDays', ChoiceType::class, ['choices' => $renewalTimeRanges])
-            ->add('next', SubmitType::class)
-            ->setAction($this->generateUrl('admin_affiliate_add_promotion'))
+        $affiliate = $affiliateRepository->find($id);
+        $promotions = $promotionRepository->findBy(["active" => true]);
+        $promotionList = [];
+        foreach ($promotions as $promotion) {
+            $promotionList[$promotion->getName()] = $promotion->getId();
+        }
+        $choiceParams = ["choices" => $promotionList];
+        if ($affiliate->getPromotion()) {
+            $choiceParams["data"] = $affiliate->getPromotion()->getId();
+        }
+        $promotionForm = $this->get("form.factory")
+            ->createNamedBuilder("promotion_form")
+            ->add("promotion", ChoiceType::class, $choiceParams)
+            ->add("next", SubmitType::class)
+            ->setAction($this->generateUrl("admin_affiliate_add_promotion", ["id" => $id]))
             ->getForm();
-        if ('POST' === $request->getMethod()) {
-            if ($request->request->has('affiliate_form')) {
-                $companyForm->handleRequest($request);
-                if ($companyForm->isValid()) {
-                    $company = new AffiliateCompany();
-                    $company->setName($this->getDataString($companyForm->getData(), 'name'));
-                    $address = new Address();
-                    $address->setLine1($this->getDataString($companyForm->getData(), 'address1'));
-                    $address->setLine2($this->getDataString($companyForm->getData(), 'address2'));
-                    $address->setLine3($this->getDataString($companyForm->getData(), 'address3'));
-                    $address->setCity($this->getDataString($companyForm->getData(), 'city'));
-                    $postcode = $this->getDataString($companyForm->getData(), 'postcode');
-                    try {
-                        $address->setPostcode($postcode);
-                    } catch (\InvalidArgumentException $e) {
-                        $this->addFlash('error', "{$postcode} is not a valid post code.");
+        if ("POST" === $request->getMethod()) {
+            if (!$affiliate) {
+                $this->addFlash("error", "{$id} is not the id of an affiliate company.");
+            } elseif ($request->request->has("promotion_form")) {
+                $promotionForm->handleRequest($request);
+                if ($promotionForm->isValid()) {
+                    $promotion = $promotionRepository->find($this->getDataString($promotionForm->getData(), "promotion"));
+                    if ($affiliate->getPromotion() != $promotion) {
+                        $affiliate->setPromotion($promotion);
+                        // TODO: add note to affiliate so that we can see the promotion history on it.
+                        $dm = $this->getManager();
+                        $dm->flush();
+                        $this->addFlash("success", "Added promotion to affiliate.");
                     }
-                    $company->setAddress($address);
-                    $company->setDays($this->getDataString($companyForm->getData(), 'days'));
-                    $company->setChargeModel($this->getDataString($companyForm->getData(), 'chargeModel'));
-                    if ($company->getChargeModel() == AffiliateCompany::MODEL_ONGOING) {
-                        $company->setRenewalDays($this->getDataString($companyForm->getData(), 'renewalDays'));
-                    }
-                    $company->setCampaignSource($this->getDataString($companyForm->getData(), 'campaignSource'));
-                    $company->setLeadSource($this->getDataString($companyForm->getData(), 'leadSource'));
-                    $company->setLeadSourceDetails(
-                        $this->getDataString($companyForm->getData(), 'leadSourceDetails')
-                    );
-                    $company->setCPA($this->getDataString($companyForm->getData(), 'cpa'));
-                    $dm = $this->getManager();
-                    $dm->persist($company);
-                    $dm->flush();
-                    $this->addFlash('success', 'Added affiliate');
-                } else {
-                    $this->addFlash('error', sprintf('Unable to add company. %s', (string) $companyForm->getErrors()));
                 }
-                return new RedirectResponse($this->generateUrl('admin_affiliate'));
             }
+            return new RedirectResponse($this->generateUrl("admin_affiliate_overview", ["id" => $id]));
         }
         return ['form' => $promotionForm->createView()];
     }

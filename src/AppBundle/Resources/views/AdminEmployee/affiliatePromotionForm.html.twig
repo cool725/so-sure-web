@@ -1,0 +1,16 @@
+{% block body %}
+    {{ form_start(form) }}
+        <div class="modal-body">
+            <div class="container-fluid">
+                <div class="form-group row">
+                    {{ form_label(form.promotion, 'Promotion', {'label_attr': {'class': 'col-sm-2 col-form-label'}}) }}
+                    <div class="col-sm-10">{{ form_widget(form.promotion, {'attr': {'class': 'form-control'}}) }}</div>
+                    {{ form_errors(form.promotion) }}
+                </div>
+                <div class="form-group row">
+                    {{ form_widget(form.next, {'attr': {'class': 'btn btn-primary'}, 'label': 'Update Promotion'}) }}
+                </div>
+            </div>
+        </div>
+    {{ form_end(form) }}
+{% endblock %}

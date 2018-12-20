@@ -433,6 +433,15 @@ class AffiliateServiceTest extends WebTestCase
     }
 
     /**
+     * Tests the integration of the promotion and affiliate systems and that policies can be made to participate in a
+     * given promotion when they are charged for.
+     */
+    public function testAffiliatePromotion()
+    {
+        // TODO: the test.
+    }
+
+    /**
      * Every time you call this function it generates a bunch of unique but also predictable data and puts it into the
      * database.
      * @param \DateTime $date is the date to set everything as having been made at.

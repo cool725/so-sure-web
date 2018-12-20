@@ -5,7 +5,7 @@
     {% javascripts
         '@AppBundle/Resources/public/js/Admin/month.js'
         '@AppBundle/Resources/public/js/staticTabs.js'
-
+        '@AppBundle/Resources/public/js/Admin/confirmModal.js'
     %}
     <script src="{{ asset_url }}"></script>
     {% endjavascripts %}
@@ -23,6 +23,9 @@
 
             {# Navigation Tabs #}
             <ul id="tabs" class="nav nav-tabs nav-justified" role="tablist">
+                <li class="nav-item {% if overview is defined %}active{% endif %}">
+                    <a href="{{ path('admin_affiliate_overview', {'id': affiliate.id}) }}">Overview</a>
+                </li>
                 <li class="nav-item {% if charges is defined %}active{% endif %}">
                     <a href="{{ path('admin_affiliate_charge', {'id': affiliate.id}) }}">Monthly Charges</a>
                 </li>
@@ -37,13 +40,46 @@
                 </li>
             </ul>
 
+            {# overview tab #}
+            {% if overview is defined %}
+                <div class="col-md-6">
+                    <h2>Affiliate Parameters</h2>
+                    <table class="table table-striped">
+                        <tr><td>CPA</td><td>{{ affiliate.cpa }}</td></tr>
+                        <tr><td>Charge Model</td><td>{{ affiliate.chargeModel }}</td></tr>
+                        <tr><td>Days</td><td>{{ affiliate.days }}</td></tr>
+                        <tr><td>Renewal Days</td><td>{{ affiliate.renewalDays }}</td></tr>
+                        <tr><td>Campaign Source</td><td>{{ affiliate.campaignSource }}</td></tr>
+                        <tr><td>Lead Source</td><td>{{ affiliate.leadSource }}</td></tr>
+                        <tr><td>Lead Source Details</td><td>{{ affiliate.leadSourceDetails }}</td></tr>
+                        <tr>
+                            <td>Promotion</td>
+                            <td>
+                                {% if affiliate.promotion %}
+                                    <a href="{{ path('admin_promotion', {'id': affiliate.promotion.id }) }}">{{ affiliate.promotion.name }}</a>
+                                {% else %}
+                                    <p>No Promotion</p>
+                                {% endif %}
+                                <button type="button" class="btn btn-info" data-toggle="modal" data-target="#promotionForm"><i class="fa fa-plus"></i> Update Promotion</button>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="col-md-6">
+                    <h2>Revision History</h2>
+                    <table class="table table-striped">
+                    </table>
+                </div>
+                {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:AdminEmployee:affiliatePromotionForm', 'policy': affiliate, 'id': 'promotionForm', 'title': 'Set Promotion'} %}
+                {# TODO: refactor admin confirm modal to make it not have a variable called policy. #}
+
+
             {# charges tab #}
-            {% if charges is defined %}
+            {% elseif charges is defined %}
                 <div class="row">
                     <h2 class="col-md-6">Charges for {{month}} / {{year}}</h2>
 
-                    {# configuration form #}
-                    {# method="POST" is actually a work around so the form does not add ? to end of url, the form does not post anything #}
+                    {# month form #}
                     <form id="monthForm" class="month-form form-inline" style="padding-top: 15px;" method="POST">
                         <div class="form-group col-md-6">
                             Report Month:
