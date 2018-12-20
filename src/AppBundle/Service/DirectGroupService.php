@@ -858,7 +858,7 @@ class DirectGroupService extends ExcelSftpService
 
         if (count($directGroupClaim->unobtainableFields) > 0) {
             $msg = sprintf(
-                'The following fields are noted as unobtainable',
+                'The following fields are noted as unobtainable: %s',
                 json_encode($directGroupClaim->unobtainableFields)
             );
             $this->warnings[$directGroupClaim->claimNumber][] = $msg;
