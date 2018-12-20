@@ -107,8 +107,6 @@ class FOSUserController extends ResettingController
      */
     public function sendEmailAction(Request $request)
     {
-        \AppBundle\Classes\NoOp::ignore([$request]);
-
         if (!$this->isCsrfTokenValid('default', $request->get('token'))) {
             throw new \InvalidArgumentException('Invalid csrf token');
         }
