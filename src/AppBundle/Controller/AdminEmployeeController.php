@@ -3222,11 +3222,12 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
     }
 
     /**
-     * @Route("/affiliate/promotion/{id}", name="admin_affiliate_add_promotion")
+     * @Route("/affiliate/{id}/promotion", name="admin_affiliate_add_promotion")
      * @Template
      */
     public function affiliatePromotionFormAction(Request $request, $id)
     {
+        $user = $this->getUser();
         $dm = $this->getManager();
         $affiliateRepository = $dm->getRepository(AffiliateCompany::class);
         $promotionRepository = $dm->getRepository(Promotion::class);
@@ -3254,10 +3255,15 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                 if ($promotionForm->isValid()) {
                     $promotion = $promotionRepository->find($promotionForm->getData()["promotion"]);
                     if ($affiliate->getPromotion() != $promotion) {
+                        $oldPromotion = $affiliate->getPromotion();
                         $affiliate->setPromotion($promotion);
-                        // TODO: add note to affiliate so that we can see the promotion history on it.
-                        $dm = $this->getManager();
-                        $dm->flush();
+                        // History Information.
+                        if ($oldPromotion) {
+                            $affiliate->createNote($user, "Promotion Removed: ".$oldPromotion->getName());
+                        }
+                        $affiliate->createNote($user, "Promotion Added: ".$promotion->getName());
+                        // Finalise.
+                        $this->getManager()->flush();
                         $this->addFlash("success", "Added promotion to affiliate.");
                     }
                 }

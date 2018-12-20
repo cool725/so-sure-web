@@ -2,7 +2,6 @@
 
 namespace AppBundle\Document;
 
-use AppBundle\Document\Note\Note;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -106,11 +105,6 @@ class Promotion
      * @MongoDB\ReferenceMany(targetDocument="AffiliateCompany", mappedBy="promotion")
      */
     protected $affiliates;
-
-    /**
-     * @MongoDB\EmbedMany(targetDocument="AppBundle\Document\Note\Note")
-     */
-    protected $notesList;
 
     /**
      * Builds the promotion's participation list.
@@ -238,15 +232,5 @@ class Promotion
     public function setRewardAmount($rewardAmount)
     {
         $this->rewardAmount = $rewardAmount;
-    }
-
-    public function getNotesList()
-    {
-        return $this->notesList;
-    }
-
-    public function addNotesList(Note $note)
-    {
-        $this->notesList[] = $note;
     }
 }

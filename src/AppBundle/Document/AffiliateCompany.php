@@ -8,6 +8,8 @@
 
 namespace AppBundle\Document;
 
+use AppBundle\Document\Note\Note;
+use AppBundle\Document\Note\StandardNote;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -82,10 +84,16 @@ class AffiliateCompany extends Company
      */
     protected $promotion;
 
+    /**
+     * @MongoDB\EmbedMany(targetDocument="AppBundle\Document\Note\Note")
+     */
+    protected $notesList;
+
     public function __construct()
     {
         parent::__construct();
         $this->confirmedPolicies = new ArrayCollection();
+        $this->notesList = new ArrayCollection();
     }
 
     public function getConfirmedPolicies()
@@ -177,5 +185,29 @@ class AffiliateCompany extends Company
     public function setPromotion($promotion)
     {
         $this->promotion = $promotion;
+    }
+
+    public function getNotesList()
+    {
+        return $this->notesList;
+    }
+
+    public function addNotesList($note)
+    {
+        $this->notesList[] = $note;
+    }
+
+    /**
+     * Takes in a piece of text and a user and turns it into a note and adds it to the notes list.
+     * @param User   $user is the progenitor of the note.
+     * @param String $text is the content of the note.
+     */
+    public function createNote($user, $text)
+    {
+        $note = new StandardNote();
+        $note->setDate(new \DateTime());
+        $note->setUser($user);
+        $note->setNotes($text);
+        $this->addNotesList($note);
     }
 }

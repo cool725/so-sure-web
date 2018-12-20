@@ -68,6 +68,13 @@
                 <div class="col-md-6">
                     <h2>Revision History</h2>
                     <table class="table table-striped">
+                        {% for note in affiliate.notesList|reverse %}
+                            <tr>
+                                <td>{{ note.notes }}</td>
+                                <td>{{ note.userName }}</td>
+                                <td>{{ note.date|date('d/m/Y H:i') }}</td>
+                            </tr>
+                        {% endfor %}
                     </table>
                 </div>
                 {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:AdminEmployee:affiliatePromotionForm', 'policy': affiliate, 'id': 'promotionForm', 'title': 'Set Promotion'} %}
