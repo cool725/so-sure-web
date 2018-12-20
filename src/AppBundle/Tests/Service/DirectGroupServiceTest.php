@@ -611,7 +611,7 @@ class DirectGroupServiceTest extends WebTestCase
         self::$directGroupService->saveClaims(1, [$dgOpen, $dgClosed]);
         $this->assertEquals(1, count(self::$directGroupService->getErrors()));
 
-        $this->insureErrorExists('/older then the closed claim/');
+        $this->insureErrorExists('/[R1]/');
     }
 
     public function testSaveClaimsOpenClosedDb()
@@ -651,7 +651,7 @@ class DirectGroupServiceTest extends WebTestCase
         // also missing claim number
         $this->assertEquals(2, count(self::$directGroupService->getErrors()));
 
-        $this->insureErrorExists('/older then the closed claim/');
+        $this->insureErrorExists('/[R3]/');
     }
 
     public function testSaveClaimsClosedOpen()
