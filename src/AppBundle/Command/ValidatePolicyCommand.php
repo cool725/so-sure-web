@@ -232,7 +232,7 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                     'unpaid' => 'all',
                     'validateCancelled' => !$skipCancelled,
                 ];
-                $this->validatePolicy($policy, $policies, $lines, $data);
+                $lines = array_merge($lines, $this->validatePolicy($policy, $policies, $data));
                 if ($updatePotValue || $adjustScheduledPayments) {
                     $this->dm->flush();
                 }
