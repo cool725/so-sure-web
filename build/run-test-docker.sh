@@ -1,5 +1,5 @@
 #!/bin/bash
-ulimits -a
+ulimit -a
 cat /etc/security/limits.conf
 
 cd /var/ops
