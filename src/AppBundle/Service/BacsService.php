@@ -1170,6 +1170,20 @@ class BacsService
         $this->dm->flush();
     }
 
+    public function bacsFileSubmittedBySerialNumber($serialNumber)
+    {
+        $repo = $this->dm->getRepository(AccessPayFile::class);
+        /** @var AccessPayFile $file */
+        $file = $repo->findOneBy(['serialNumber' => $serialNumber, 'status' => AccessPayFile::STATUS_PENDING]);
+        if (!$file) {
+            return false;
+        }
+
+        $this->bacsFileSubmitted($file);
+
+        return true;
+    }
+
     /**
      * Mark file as cancelled
      * @param AccessPayFile $file
@@ -1283,6 +1297,10 @@ class BacsService
         foreach ($elementList as $element) {
             $results['debit-rejected-records'] = $element->attributes->getNamedItem('numberOf')->nodeValue;
             $results['debit-rejected-value'] = $element->attributes->getNamedItem('valueOf')->nodeValue;
+        }
+
+        if (isset($results['serial-number']) && mb_strlen($results['serial-number']) > 0) {
+            $results['autoBasFileSubmit'] = $this->bacsFileSubmittedBySerialNumber($results['serial-number']);
         }
 
         return $results;
