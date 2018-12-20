@@ -3252,7 +3252,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             } elseif ($request->request->has("promotion_form")) {
                 $promotionForm->handleRequest($request);
                 if ($promotionForm->isValid()) {
-                    $promotion = $promotionRepository->find($this->getDataString($promotionForm->getData(), "promotion"));
+                    $promotion = $promotionRepository->find($promotionForm->getData()["promotion"]);
                     if ($affiliate->getPromotion() != $promotion) {
                         $affiliate->setPromotion($promotion);
                         // TODO: add note to affiliate so that we can see the promotion history on it.
