@@ -239,7 +239,11 @@ class ValidatePolicyCommand extends ContainerAwareCommand
             } else {
                 $validations = [];
                 $policies = $policyRepo->findAll();
-                $lines[] = 'Policy Validation';
+                $lines[] = sprintf(
+                    'Policy Validation (<a href="%s">Admin</a>)',
+                    $this->routerService->generateUrl('admin_policy_validation', [])
+                );
+                $lines[] = '';
                 $lines[] = '-------------';
                 $lines[] = '';
 
