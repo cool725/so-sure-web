@@ -1605,6 +1605,8 @@ class AdminController extends BaseController
                 'Policy %s removed from redis',
                 $policy->getPolicyNumber()
             ));
+            
+            return $this->redirectToRoute('policy_validation');
         }
 
         $policiesForValidation = [];
