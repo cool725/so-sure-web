@@ -880,17 +880,17 @@
 
                         {% for ref,amount in file.metadata['amounts'] %}
                             {% set amount = 0 - amount %}
+                            {% set foundFileInDate = false %}
                             {% for lloydsFile in lloydsFiles %}
-                                {% set foundFileInDate = false %}
                                 {% for item in lloydsFile.getBacsTransactionsByType('bacs-arudd', received_date) %}
                                     {% if equal_to_two_dp(amount, item) %}
                                         {% set foundFileInDate = true %}
                                     {% endif %}
                                 {% endfor %}
-                                {% if foundFileInDate %}
-                                    {% set aruddTotal = aruddTotal + amount %}
-                                {% endif %}
                             {% endfor %}
+                            {% if foundFileInDate %}
+                                {% set aruddTotal = aruddTotal + amount %}
+                            {% endif %}
                         {% endfor %}
                     {% endfor %}
 
@@ -955,7 +955,6 @@
                                 {% set amount = 0 - amount %}
                                 {% set foundFileInDate = false %}
                                 {% for lloydsFile in lloydsFiles %}
-                                    {% set foundFileInDate = false %}
                                     {% for item in lloydsFile.getBacsTransactionsByType('bacs-arudd', received_date) %}
                                         {% if equal_to_two_dp(amount, item) %}
                                             {% set foundFileInDate = true %}
