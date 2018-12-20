@@ -86,6 +86,15 @@ class LloydsService
                     unset($row[count($row) - 1]);
                     $header = $row;
                 } else {
+                    if (count($header) != count($row)) {
+                        throw new \Exception(sprintf(
+                            '%s has incorrect number of cols (%d vs %d). Header: %s',
+                            json_encode($row),
+                            count($row),
+                            count($header),
+                            json_encode($header)
+                        ));
+                    }
                     $line = array_combine($header, $row);
                     // Exclude lines like this:
                     // 10/10/2016,,'XX-XX-XX,XXXXXXXX,INTEREST (GROSS) ,,0.03,609.61
