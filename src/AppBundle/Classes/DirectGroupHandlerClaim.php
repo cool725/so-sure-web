@@ -324,7 +324,10 @@ class DirectGroupHandlerClaim extends HandlerClaim
     {
         // possible values that Direct Group might use as placeholders
         // when a field is required by their system, but data will never be provided
-        // return in_array(trim(mb_strtolower($value)), ['unable to obtain']);
+        if (mb_stripos($value, 'unable to obtain') !== false) {
+            return true;
+        }
+
         return false;
     }
 
