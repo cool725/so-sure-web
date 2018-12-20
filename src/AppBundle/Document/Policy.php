@@ -580,6 +580,7 @@ abstract class Policy
         $this->acceptedConnections = new \Doctrine\Common\Collections\ArrayCollection();
         $this->acceptedConnectionsRenewal = new \Doctrine\Common\Collections\ArrayCollection();
         $this->scheduledPayments = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->notesList = new \Doctrine\Common\Collections\ArrayCollection();
         $this->participations = new \Doctrine\Common\Collections\ArrayCollection();
         $this->potValue = 0;
     }

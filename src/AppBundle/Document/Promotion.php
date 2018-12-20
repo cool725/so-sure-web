@@ -113,7 +113,6 @@ class Promotion
     {
         $this->participating = new ArrayCollection();
         $this->affiliates = new ArrayCollection();
-        $this->notesList = new ArrayCollection();
     }
 
     public function getId()
