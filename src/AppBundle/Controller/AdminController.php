@@ -6,6 +6,9 @@ use AppBundle\Document\AffiliateCompany;
 use AppBundle\Document\ArrayToApiArrayTrait;
 use AppBundle\Document\BacsPaymentMethod;
 use AppBundle\Document\File\AccessPayFile;
+use AppBundle\Document\File\BacsReportAruddFile;
+use AppBundle\Document\File\BacsReportDdicFile;
+use AppBundle\Document\File\BacsReportInputFile;
 use AppBundle\Document\File\ReconciliationFile;
 use AppBundle\Document\File\SalvaPaymentFile;
 use AppBundle\Document\Payment\BacsIndemnityPayment;
@@ -21,6 +24,8 @@ use AppBundle\Form\Type\ReconciliationFileType;
 use AppBundle\Form\Type\SequenceType;
 use AppBundle\Repository\BacsIndemnityPaymentRepository;
 use AppBundle\Repository\BacsPaymentRepository;
+use AppBundle\Repository\File\BacsReportAruddFileRepository;
+use AppBundle\Repository\File\BacsReportInputFileRepository;
 use AppBundle\Repository\File\BarclaysFileRepository;
 use AppBundle\Repository\File\BarclaysStatementFileRepository;
 use AppBundle\Repository\File\JudoFileRepository;
@@ -905,6 +910,12 @@ class AdminController extends BaseController
         $lloydsFileRepo = $dm->getRepository(LloydsFile::class);
         /** @var ReconcilationFileRepository $reconcilationFileRepo */
         $reconcilationFileRepo = $dm->getRepository(ReconciliationFile::class);
+        /** @var BacsReportInputFileRepository $inputRepo */
+        $inputRepo = $dm->getRepository(BacsReportInputFile::class);
+        /** @var BacsReportAruddFileRepository $aruddRepo */
+        $aruddRepo = $dm->getRepository(BacsReportAruddFile::class);
+        /** @var BacsReportDdicFileRepository $aruddRepo */
+        $ddicRepo = $dm->getRepository(BacsReportDdicFile::class);
 
         $payments = $paymentRepo->getAllPaymentsForExport($date);
         $extraPayments = $paymentRepo->getAllPaymentsForExport($date, true);
@@ -1166,6 +1177,9 @@ class AdminController extends BaseController
             'barclaysFiles' => $monthlyBarclaysFiles,
             'barclaysStatementFiles' => $barclaysStatementFileRepo->getMonthlyFiles($date),
             'lloydsFiles' => $monthlyLloydsFiles,
+            'bacsInputFiles' => $inputRepo->getMonthlyFiles($date),
+            'bacsAruddFiles' => $aruddRepo->getMonthlyFiles($date),
+            'bacsDdicFiles' => $ddicRepo->getMonthlyFiles($date),
             'reconcilationFiles' => $reconcilationFileRepo->getMonthlyFiles($date),
             'payments' => $payments,
         ];
