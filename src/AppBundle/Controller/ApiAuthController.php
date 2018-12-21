@@ -136,9 +136,6 @@ class ApiAuthController extends BaseController
     public function detectedImeiAction(Request $request)
     {
         try {
-            /** @var RouterService $router */
-            $router = $this->get('app.router');
-
             $data = json_decode($request->getContent(), true)['body'];
             if (!$this->validateFields($data, ['detected_imei', 'bucket', 'key'])) {
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
