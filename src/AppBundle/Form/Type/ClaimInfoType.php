@@ -46,7 +46,7 @@ class ClaimInfoType extends AbstractType
                 'mapped' => false,
                 'trim' => true
             ])
-            ->add('replacementImei', NumberType::class, [
+            ->add('imei', NumberType::class, [
                 'attr' => [
                     'pattern' => '[0-9]{15}',
                     'title' => '15 digit number'
@@ -62,6 +62,12 @@ class ClaimInfoType extends AbstractType
                 'query_builder' => function (PhoneRepository $dr) {
                     return $dr->findActiveInactive();
                 }
+            ])
+            ->add('status', ChoiceType::class, [
+                'required' => true,
+                'choices' => [
+                    Claim::STATUS_FNOL => Claim::STATUS_FNOL,
+                ]
             ])
             /*
             ->add('replacementPhone', ChoiceType::class, [
