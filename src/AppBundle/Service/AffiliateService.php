@@ -43,6 +43,7 @@ use AppBundle\Document\Payment\PolicyDiscountPayment;
 use AppBundle\Document\Payment\PolicyDiscountRefundPayment;
 use AppBundle\Document\Payment\ChargebackPayment;
 use AppBundle\Document\Payment\DebtCollectionPayment;
+use AppBundle\Exception\PromotionInactiveException;
 use DateInterval;
 use DateTime;
 use DateTimeZone;
