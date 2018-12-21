@@ -4,7 +4,7 @@
     </div>
     <ul class="nav nav-tabs nav-justified">
       <li role="presentation" class="active"><a href="#user">User</a></li>
-      <li role="presentation"><a href="#policy">Policy</a></li>
+        <li role="presentation"><a href="#policy">Policy <span class="badge" title="Notes">{{ policy.notesList|length }} Notes</span></a></li>
       <li role="presentation"><a href="#claims">Claims <span class="badge" title="Number of claims">{{ (policy.claims|length + policy.linkedClaims|length) }}</span></a></li>
       <li role="presentation"><a href="#network">Network Claims <span class="badge" title="Number of network claims">{{ policy.networkClaims|length }}</span></a></li>
       <li role="presentation"><a href="#history">History</a></li>
@@ -25,9 +25,9 @@
                     </h2>
                 </div>
                 <div class="col-md-6">
-                    <div class="text-center" style="margin-top: 10px;">
-                        <a href="#notesList" class="btn btn-warning">Notes
-                            <span class="badge bg-white text-danger">{{ policy.notesList|length }}</span>
+                    <div class="text-center bg-warning" style="margin-top: 15px; padding: 10px;">
+                        <a href="#notesList">Notes
+                            <span class="badge bg-primary text-danger">{{ policy.notesList|length }}</span>
                         </a>
                     </div>
                 </div>
@@ -1025,12 +1025,10 @@
                     <td>
                         {% if policy.policyTerms.isPicSureEnabled %}
                             Status: {% if policy.picSureStatus %}{{ policy.picSureStatus }}{% else %}Not started{% endif %}
-                            {% if not policy.isPicSureValidated %}
                                 <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#picsureForm">
                                     <span class="glyphicon glyphicon-new-window" aria-hidden="true"></span>
                                     Change Status
                                 </button>
-                            {% endif %}
                         {% else %}
                             Non pic-sure policy
                         {% endif %}
