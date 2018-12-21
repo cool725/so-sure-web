@@ -55,7 +55,13 @@ class MiscTwigExtension extends \Twig_Extension
             new \Twig_SimpleFunction('random_serial', [$this, 'generateRandomAppleSerialNumber']),
             new \Twig_SimpleFunction('route_exists', [$this, 'routeExists']),
             new \Twig_SimpleFunction('next_business_day_historical', [$this, 'getNextBusinessDayByString']),
+            new \Twig_SimpleFunction('unserialise', [$this, 'unserialise']),
         );
+    }
+
+    public function unserialise($data)
+    {
+        return unserialize($data);
     }
 
     public function jsonDecode($json)

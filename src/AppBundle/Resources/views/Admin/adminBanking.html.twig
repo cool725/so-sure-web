@@ -831,6 +831,7 @@
                             <th>Expected Received Date</th>
                             <th>Lloyds</th>
                         </tr>
+                        {% set inputTotal = 0 %}
                         {% for file in bacsInputFiles if file.metadata['serial-number'] is defined and file.metadata['processing-date']  is defined %}
                             {% set received_date = next_business_day_historical(file.metadata['processing-date']) %}
                             {% set amount = null %}
@@ -857,6 +858,9 @@
                             {% if amount is null or received_date|date('m') != month %}
                                 {% set skip = true %}
                             {% endif %}
+                            {% if not skip and foundFileInDate %}
+                                {% set inputTotal = inputTotal + amount %}
+                            {% endif %}
                             <tr class="{% if skip %}hidden{% elseif foundFileInDate %}bg-success{% else %}bg-danger{% endif %}">
                                 <td><span title="{{ file.key }}">{{ file.metadata['serial-number'] }}</span></td>
                                 <td>{{ amount|default('-') }}</td>
@@ -870,27 +874,68 @@
                     </table>
                 </div>
                 <div class="col-md-6">
+                    {% set aruddTotal = 0 %}
+                    {% for file in bacsAruddFiles if file.metadata['processing-date'] is defined and file.metadata['amounts'] is defined %}
+                        {% set received_date = next_business_day_historical(file.metadata['processing-date']) %}
+
+                        {% for ref,amount in file.metadata['amounts'] %}
+                            {% set amount = 0 - amount %}
+                            {% set foundFileInDate = false %}
+                            {% for lloydsFile in lloydsFiles %}
+                                {% for item in lloydsFile.getBacsTransactionsByType('bacs-arudd', received_date) %}
+                                    {% if equal_to_two_dp(amount, item) %}
+                                        {% set foundFileInDate = true %}
+                                    {% endif %}
+                                {% endfor %}
+                            {% endfor %}
+                            {% if foundFileInDate %}
+                                {% set aruddTotal = aruddTotal + amount %}
+                            {% endif %}
+                        {% endfor %}
+                    {% endfor %}
+
                     <h3>Overview</h3>
                     <table class="table table-striped">
                         <tr>
                             <th></th>
-                            <th>Amount</th>
+                            <th>Bacs Reporting</th>
+                            <th>Lloyds</th>
                         </tr>
                         <tr>
                             <td>Input</td>
+                            <td>{{ inputTotal|number_format(2, '.', ',') }}</td>
                             <td></td>
                         </tr>
                         <tr>
                             <td>Arudd</td>
+                            <td>{{ aruddTotal|number_format(2, '.', ',') }}</td>
                             <td></td>
                         </tr>
                         <tr>
                             <td>DDIC</td>
                             <td></td>
+                            <td></td>
                         </tr>
                         <tr>
                             <td>Total</td>
-                            <td></td>
+                            <td>{{ (inputTotal + aruddTotal)|number_format(2, '.', ',') }}</td>
+                            <td>
+                                {% if month < 10 %}
+                                    {% set ym = year ~ "0" ~ month %}
+                                {% else %}
+                                    {% set ym = year ~ month %}
+                                {% endif %}
+
+                                {% set total = 0 %}
+                                {% for file in lloydsFiles %}
+                                    {% for date,amount in file.dailyBacs %}
+                                        {% if date[:6] == ym %}
+                                          {% set total = total + amount %}
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endfor %}
+                                {{ total|number_format(2, '.', ',') }}
+                            </td>
                         </tr>
                     </table>
 
