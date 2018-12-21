@@ -181,6 +181,9 @@ class EmailDebugCommand extends ContainerAwareCommand
                 '3',
                 '4',
             ],
+            'policy' => [
+                'preapproved',
+            ],
             'bacs' => [
                 'cancelledClaimed',
             ],
@@ -273,7 +276,16 @@ class EmailDebugCommand extends ContainerAwareCommand
             $policies = $repo->findBy(['status' => Policy::STATUS_ACTIVE]);
             $policy = null;
             foreach ($policies as $policy) {
-                break;
+                /** @var PhonePolicy $policy */
+                if ($variation == 'preapproved' &&
+                    $policy->getPicSureStatus() == PhonePolicy::PICSURE_STATUS_PREAPPROVED) {
+                    break;
+                } elseif ($variation != 'preapproved' &&
+                    $policy->getPicSureStatus() != PhonePolicy::PICSURE_STATUS_PREAPPROVED) {
+                    break;
+                }
+
+                $policy = null;
             }
             if (!$policy) {
                 throw new \Exception('Unable to find matching policy');
@@ -291,7 +303,7 @@ class EmailDebugCommand extends ContainerAwareCommand
             } elseif ($template == 'policy/skippedRenewal') {
                 return $this->policyService->skippedRenewalEmail($policy);
             } else {
-                return $this->policyService->resendPolicyEmail($policy);
+                return $this->policyService->generatePolicyFiles($policy, true);
             }
         } elseif (in_array($template, $templates['card'])) {
             /** @var PolicyRepository $repo */
