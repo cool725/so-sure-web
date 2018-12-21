@@ -176,7 +176,7 @@ class Promotion
     public function addParticipating($participation)
     {
         if (!$this->active) {
-            throw new \Exception("Attempted to add participation to inactive promotion.");
+            throw new PromotionInactiveException();
         }
         $this->participating[] = $participation;
         $participation->setPromotion($this);

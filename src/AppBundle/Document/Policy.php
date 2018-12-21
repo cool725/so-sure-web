@@ -6,6 +6,7 @@ use AppBundle\Document\Invitation\AppNativeShareInvitation;
 use AppBundle\Document\Invitation\Invitation;
 use AppBundle\Document\Note\CallNote;
 use AppBundle\Document\Note\Note;
+use AppBundle\Document\Participation;
 use AppBundle\Document\Note\StandardNote;
 use AppBundle\Document\Payment\BacsIndemnityPayment;
 use AppBundle\Document\Payment\BacsPayment;
@@ -568,7 +569,7 @@ abstract class Policy
     /**
      * @MongoDB\EmbedMany(targetDocument="Participation")
      */
-    protected $participations;
+    protected $participations = array();
 
     public function __construct()
     {
@@ -1391,7 +1392,7 @@ abstract class Policy
         return $this->participations;
     }
 
-    public function addParticipation($participation)
+    public function addParticipation(Participation $participation)
     {
         $participation->setPolicy($this);
         $this->participations[] = $participation;

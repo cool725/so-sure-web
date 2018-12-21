@@ -200,6 +200,7 @@ services:
         arguments:
             - "@doctrine_mongodb.odm.default_document_manager"
             - "@logger"
+            - "@app.policy"
 
     app.promotion:
         class: AppBundle\Service\PromotionService

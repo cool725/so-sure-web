@@ -52,20 +52,24 @@ class AffiliateService
     use DateTrait;
     protected $dm;
     protected $logger;
+    protected $policyService;
     protected $chargeRepository;
     protected $affiliateRepository;
 
     /**
      * Builds the affiliate service and sends in it's dependencies as arguments.
-     * @param DocumentManager $dm     is the document manager.
-     * @param LoggerInterface $logger is the logger.
+     * @param DocumentManager $dm            is the document manager.
+     * @param LoggerInterface $logger        is the logger.
+     * @param PolicyService   $policyService is the policy service.
      */
     public function __construct(
         DocumentManager $dm,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        PolicyService $policyService
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
+        $this->policyService = $policyService;
         /** @var ChargeRepository $chargeRepository */
         $this->chargeRepository = $dm->getRepository(Charge::class);
         /** @var affiliateRepository $affiliateRepository */
@@ -274,8 +278,17 @@ class AffiliateService
         if ($policy->getAffiliate() === null) {
             $affiliate->addConfirmedPolicies($policy);
         }
+        $promotion = $affiliate->getPromotion();
+        if ($promotion) {
+            try {
+                $this->policyService->enterPromotion($policy, $promotion, $date);
+            } catch (PromotionInactiveException $e) {
+                // TODO: in future add front end ability to make promotions active/inactive and when they are made
+                //       inactive automatically remove from all affiliates.
+                $this->logger->error("Affiliate ".$affiliate->getName()." is still trying to use inactive promotion.");
+            }
+        }
         $this->dm->persist($charge);
-        $this->dm->persist($affiliate);
         return $charge;
     }
 }

@@ -2,6 +2,7 @@
 
 namespace AppBundle\Tests\Service;
 
+use AppBundle\Document\Promotion;
 use AppBundle\Document\AffiliateCompany;
 use AppBundle\Document\Attribution;
 use AppBundle\Repository\PhoneRepository;
@@ -438,7 +439,36 @@ class AffiliateServiceTest extends WebTestCase
      */
     public function testAffiliatePromotion()
     {
-        // TODO: the test.
+        $date = new \DateTime('2018-12-20 15:59');
+        $otherDate = new \DateTime('2018-12-31 23:59');
+        $data = $this->createState($date);
+        $promotion = new Promotion();
+        $promotion->setName("Free camel when you claim.");
+        $promotion->setActive(true);
+        $data["affiliate"]->setPromotion($promotion);
+        static::$dm->persist($promotion);
+        static::$dm->flush();
+        // first generate.
+        self::$affiliateService->generate([$data["affiliate"]], $date);
+        $this->assertEquals(0, count($data["bango"]->getFirstPolicy()->getParticipations()));
+        $this->assertEquals(0, count($data["tango"]->getFirstPolicy()->getParticipations()));
+        $this->assertEquals(1, count($data["hat"]->getFirstPolicy()->getParticipations()));
+        $this->assertEquals(1, count($data["borb"]->getFirstPolicy()->getParticipations()));
+        $this->assertEquals(1, count($data["tonyAbbot"]->getFirstPolicy()->getParticipations()));
+        $participation = $data["tonyAbbot"]->getFirstPolicy()->getParticipations()[0];
+        $this->assertEquals($date, $participation->getStart());
+        // make sure it doesn't do something funny when you run it again later.
+        self::$affiliateService->generate([$data["affiliate"]], $otherDate);
+        $this->assertEquals(0, count($data["bango"]->getFirstPolicy()->getParticipations()));
+        $this->assertEquals(1, count($data["tango"]->getFirstPolicy()->getParticipations()));
+        $this->assertEquals(1, count($data["hat"]->getFirstPolicy()->getParticipations()));
+        $this->assertEquals(1, count($data["borb"]->getFirstPolicy()->getParticipations()));
+        $this->assertEquals(1, count($data["tonyAbbot"]->getFirstPolicy()->getParticipations()));
+        $participation = $data["tango"]->getFirstPolicy()->getParticipations()[0];
+        $this->assertEquals($otherDate, $participation->getStart());
+        $participation = $data["tonyAbbot"]->getFirstPolicy()->getParticipations()[0];
+        $this->assertEquals($date, $participation->getStart());
+
     }
 
     /**
@@ -529,7 +559,7 @@ class AffiliateServiceTest extends WebTestCase
         $attribution = new Attribution();
         $attribution->setCampaignSource($source);
         $user->setAttribution($attribution);
-        $user->setLeadSource("scode");
+        $user->setLeadSource("affiliate");
         $user->setLeadSourceDetails($lead);
         $user->setFirstName($name);
         $user->setLastName($name);
@@ -554,7 +584,7 @@ class AffiliateServiceTest extends WebTestCase
         $user->setLastName($name);
         $attribution = new Attribution();
         $attribution->setCampaignSource($source);
-        $user->setLeadSource("scode");
+        $user->setLeadSource("affiliate");
         $user->setLeadSourceDetails($lead);
         $user->setAttribution($attribution);
         self::$dm->persist($user);

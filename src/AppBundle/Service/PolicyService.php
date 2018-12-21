@@ -4,6 +4,8 @@ namespace AppBundle\Service;
 use AppBundle\Classes\SoSure;
 use AppBundle\Document\Address;
 use AppBundle\Document\Feature;
+use AppBundle\Document\Promotion;
+use AppBundle\Document\Participation;
 use AppBundle\Repository\CashbackRepository;
 use AppBundle\Repository\OptOut\EmailOptOutRepository;
 use AppBundle\Repository\PhonePolicyRepository;
@@ -2320,5 +2322,31 @@ class PolicyService
             }
         }
         return $hasUpdatedPremium;
+    }
+
+    /**
+     * Enters a policy into a promotion if they are not already participating in it. If they are already participating
+     * then it does nothing. It persists the new participation but it does not flush the database.
+     * @param Policy         $policy    is the policy to enter in the promotion.
+     * @param Promotion      $promotion is the promotion to enter the policy into.
+     * @param \DateTime|null $date      is the date to set the participation as having started at.
+     */
+    public function enterPromotion(Policy $policy, Promotion $promotion, $date = null)
+    {
+        $participationRepository = $this->dm->getRepository(Participation::class);
+        // NOTE: according to this logic if a policy is entered into a promotion it can never be entered into it again.
+        //       if that changes then a check for active participations only can be added here.
+        $participation = $participationRepository->findOneBy(["policy" => $policy, "promotion" => $promotion]);
+        if (!$participation) {
+            $date = $date ? clone $date : new \DateTime();
+            $participation = new Participation();
+            $promotion->addParticipating($participation);
+            $policy->addParticipation($participation);
+            $participation->setStart($date);
+            $participation->setStatus(Participation::STATUS_ACTIVE);
+            $this->dm->persist($participation);
+            $this->dm->persist($promotion);
+            $this->dm->persist($policy);
+        }
     }
 }
