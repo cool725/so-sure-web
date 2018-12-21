@@ -277,9 +277,11 @@ class EmailDebugCommand extends ContainerAwareCommand
             $policy = null;
             foreach ($policies as $policy) {
                 /** @var PhonePolicy $policy */
-                if ($variation == 'preapproved' && $policy->getPicSureStatus() == PhonePolicy::PICSURE_STATUS_PREAPPROVED) {
+                if ($variation == 'preapproved' &&
+                    $policy->getPicSureStatus() == PhonePolicy::PICSURE_STATUS_PREAPPROVED) {
                     break;
-                } elseif ($variation != 'preapproved' && $policy->getPicSureStatus() != PhonePolicy::PICSURE_STATUS_PREAPPROVED) {
+                } elseif ($variation != 'preapproved' &&
+                    $policy->getPicSureStatus() != PhonePolicy::PICSURE_STATUS_PREAPPROVED) {
                     break;
                 }
 
