@@ -326,7 +326,8 @@ class BICommand extends ContainerAwareCommand
             '"Has previous policy"',
             '"Payment Method"',
             '"Expected Unpaid Cancellation Date"',
-            '"Bacs Mandate Status"'
+            '"Bacs Mandate Status"',
+            "'Risk Rating'"
         ]);
         foreach ($policies as $policy) {
             /** @var Policy $policy */
@@ -393,6 +394,10 @@ class BICommand extends ContainerAwareCommand
                     $policy->getUser()->hasBacsPaymentMethod() ?
                         $policy->getUser()->getBacsPaymentMethod()->getBankAccount()->getMandateStatus() :
                         null
+                ),
+                sprintf(
+                    '"%s"',
+                    $policy->getRiskColourText() ? $policy->getRiskColourText() : null
                 )
             ]);
         }
