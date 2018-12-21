@@ -3,6 +3,7 @@
 namespace AppBundle\Controller;
 
 use AppBundle\Document\AffiliateCompany;
+use AppBundle\Document\Form\PicSureStatus;
 use AppBundle\Document\Promotion;
 use AppBundle\Document\Participation;
 use AppBundle\Document\BacsPaymentMethod;
@@ -20,6 +21,7 @@ use AppBundle\Form\Type\DetectedImeiType;
 use AppBundle\Form\Type\LinkClaimType;
 use AppBundle\Form\Type\ClaimNoteType;
 use AppBundle\Form\Type\PaymentRequestUploadFileType;
+use AppBundle\Form\Type\PicSureStatusType;
 use AppBundle\Form\Type\UploadFileType;
 use AppBundle\Form\Type\UserHandlingTeamType;
 use AppBundle\Form\Type\PromotionType;
@@ -47,6 +49,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -878,12 +881,11 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             throw $this->createNotFoundException(sprintf('Policy %s not found', $id));
         }
 
+        $picSure = new PicSureStatus();
+        $picSure->setPolicy($policy);
+        /** @var Form $picsureForm */
         $picsureForm = $this->get('form.factory')
-            ->createNamedBuilder('picsure_form')
-            ->add('approve', SubmitType::class)
-            ->add('preapprove', SubmitType::class)
-            ->add('invalidate', SubmitType::class)
-            ->add('note', TextareaType::class)
+            ->createNamedBuilder('picsure_form', PicSureStatusType::class, $picSure)
             ->setAction($this->generateUrl(
                 'picsure_form',
                 ['id' => $id]
@@ -894,21 +896,10 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             if ($request->request->has('picsure_form')) {
                 $picsureForm->handleRequest($request);
                 if ($picsureForm->isValid()) {
-                    if ($policy->getPolicyTerms()->isPicSureEnabled() && !$policy->isPicSureValidated()) {
-                        if ($picsureForm->get('approve')->isClicked()) {
-                            $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_APPROVED, $this->getUser());
-                            $policy->setPicSureApprovedDate(\DateTime::createFromFormat('U', time()));
-                        } elseif ($picsureForm->get('preapprove')->isClicked()) {
-                            $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_PREAPPROVED, $this->getUser());
-                            $policy->setPicSureApprovedDate(\DateTime::createFromFormat('U', time()));
-                        } elseif ($picsureForm->get('invalidate')->isClicked()) {
-                            $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_INVALID, $this->getUser());
-                        } else {
-                            throw new \Exception('Unknown button click');
-                        }
-
+                    if ($policy->getPolicyTerms()->isPicSureEnabled()) {
+                        $policy->setPicSureStatus($picSure->getPicSureStatus(), $this->getUser());
                         $policy->addNoteDetails(
-                            $picsureForm->getData()['note'],
+                            $picSure->getNote(),
                             $this->getUser(),
                             'Changed Pic-Sure status'
                         );
@@ -921,12 +912,17 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                     } else {
                         $this->addFlash(
                             'error',
-                            'Policy is not a pic-sure policy or policy is already pic-sure (pre)approved'
+                            'Policy is not a pic-sure policy'
                         );
                     }
-
-                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
+                } else {
+                    $this->addFlash(
+                        'error',
+                        sprintf('Unable to update. Errror: %s', (string) $picsureForm->getErrors())
+                    );
                 }
+
+                return $this->redirectToRoute('admin_policy', ['id' => $id]);
             }
         }
 
