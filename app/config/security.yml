@@ -111,4 +111,3 @@ security:
         - { path: ^/user$, role: ROLE_USER }
         - { path: ^/user/, role: ROLE_USER }
         - { path: ^/bearer-api, roles: [ IS_AUTHENTICATED_FULLY ] }
-        - { path: ^/api, access: "isApiPort(8080)" }

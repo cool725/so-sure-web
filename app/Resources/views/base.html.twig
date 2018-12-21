@@ -31,9 +31,6 @@
             {% endif %}
         {% endblock %}
 
-        {# Trustpilot #}
-        <script type="text/javascript" src="https://widget.trustpilot.com/bootstrap/v5/tp.widget.bootstrap.min.js" async></script>
-
         {% block remotestylesheets %}{% endblock %}
         {% block metaend %}{% endblock %}
     </head>
@@ -156,7 +153,7 @@
 
         {# If using CDN else load locally #}
         {% if use_cdn %}
-            <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+            <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js" integrity="sha384-rY/jv8mMhqDabXSo+UCggqKtdmBfd3qC2/KvyTDNQ6PcUJXaxK1tMepoQda4g5vB" crossorigin="anonymous"></script>
             <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
         {% else %}
             <script src="/components/jquery/jquery.min.js"></script>

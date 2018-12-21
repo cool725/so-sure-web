@@ -611,7 +611,7 @@ class DirectGroupServiceTest extends WebTestCase
         self::$directGroupService->saveClaims(1, [$dgOpen, $dgClosed]);
         $this->assertEquals(1, count(self::$directGroupService->getErrors()));
 
-        $this->insureErrorExists('/older then the closed claim/');
+        $this->insureErrorExists('/[R1]/');
     }
 
     public function testSaveClaimsOpenClosedDb()
@@ -651,7 +651,7 @@ class DirectGroupServiceTest extends WebTestCase
         // also missing claim number
         $this->assertEquals(2, count(self::$directGroupService->getErrors()));
 
-        $this->insureErrorExists('/older then the closed claim/');
+        $this->insureErrorExists('/[R3]/');
     }
 
     public function testSaveClaimsClosedOpen()
@@ -792,6 +792,51 @@ class DirectGroupServiceTest extends WebTestCase
             $directGroupClaim,
             'replacement IMEI Number, yet has a withdrawn/declined status'
         );
+    }
+
+    public function testDeclinedToApproved()
+    {
+        $address = new Address();
+        $address->setType(Address::TYPE_BILLING);
+        $address->setPostcode('BX11LT');
+        $user = new User();
+        $user->setEmail(static::generateEmail('testDeclinedToApproved', $this));
+        $user->setBillingAddress($address);
+        $user->setFirstName('foo');
+        $user->setLastName('bar');
+        $policy = new PhonePolicy();
+        $policy->setPhone(self::getRandomPhone(self::$dm));
+        $user->addPolicy($policy);
+        $claim = new Claim();
+        $claim->setNumber(self::getRandomClaimNumber());
+        $claim->setStatus(Claim::STATUS_DECLINED);
+        $claim->setHandlingTeam(Claim::TEAM_DIRECT_GROUP);
+        $policy->addClaim($claim);
+        $policy->setPolicyNumber(self::getRandomPolicyNumber('TEST'));
+
+        static::$dm->persist($policy);
+        static::$dm->persist($policy->getUser());
+        static::$dm->persist($claim);
+        static::$dm->flush();
+
+        $directGroupClaim = new DirectGroupHandlerClaim();
+        $directGroupClaim->policyNumber = $policy->getPolicyNumber();
+        $directGroupClaim->claimNumber = $claim->getNumber();
+        $directGroupClaim->replacementImei = $this->generateRandomImei();
+        $directGroupClaim->status = DirectGroupHandlerClaim::STATUS_CLOSED;
+        $directGroupClaim->insuredName = 'Mr Foo Bar';
+        $directGroupClaim->lossDate = new \DateTime('2017-06-01');
+        $directGroupClaim->replacementReceivedDate = new \DateTime('2017-07-01');
+
+        self::$directGroupService->saveClaim($directGroupClaim, false);
+        //print_r(self::$directGroupService->getErrors());
+        //print_r(self::$directGroupService->getWarnings());
+        //print_r(self::$directGroupService->getSoSureActions());
+
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        $repo = $dm->getRepository(Claim::class);
+        $updatedClaim = $repo->find($claim->getId());
+        $this->insureSoSureActionExists('/was previously closed/');
     }
 
     public function testValidateClaimDetailsName()

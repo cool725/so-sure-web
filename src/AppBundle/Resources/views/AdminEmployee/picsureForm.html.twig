@@ -9,6 +9,7 @@
                     <div class="list-group cases">
                         <a class="list-group-item list-group-item-action">pic-sure was correctly done on a different policy and this policy is a continuation of the older policy</a>
                         <a class="list-group-item list-group-item-action">We rejected pic-sure, either incorrectly, or the user had a screen protector</a>
+                        <a class="list-group-item list-group-item-action">There was a sucessful claim with a voucher and pic-sure needs to be re-done</a>
                     </div>
                 </div>
             </div>
@@ -22,12 +23,27 @@
 
                 <div class="checkbox">
                     <label>
+                        <input type="checkbox" required> I understand I should not update pic-sure based on a standard claim as this will be done automatically
+                    </label>
+                </div>
+
+                <div class="checkbox">
+                    <label>
                         <input type="checkbox" required> If it is not a common reason, I have verified the exception is allowed
                     </label>
                 </div>
             </div>
 
             <hr>
+            <div class="form-row">
+                <label>Current Status</label>
+                {{ policy.picSureStatus }}
+            </div>
+
+            <div class="form-row">
+                <label>Status</label>
+                {{ form_widget(form.picSureStatus, {'attr': {'class': 'form-control'}}) }}
+            </div>
 
             <div class="form-row">
                 <label>Justification</label>
@@ -37,9 +53,7 @@
     </div>
 
     <div class="modal-footer">
-        {{ form_widget(form.approve, {'attr': {'class': 'btn btn-danger', 'disabled': 'true'}}) }}
-        {{ form_widget(form.preapprove, {'attr': {'class': 'btn btn-danger', 'disabled': 'true'}}) }}
-        {{ form_widget(form.invalidate, {'attr': {'class': 'btn btn-warning', 'disabled': 'true'}}) }}
+        {{ form_widget(form.update, {'attr': {'class': 'btn btn-warning', 'disabled': 'true'}}) }}
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
     </div>
     {{ form_end(form) }}

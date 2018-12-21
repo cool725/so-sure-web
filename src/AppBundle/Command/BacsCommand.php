@@ -6,9 +6,13 @@ use AppBundle\Document\BacsPaymentMethod;
 use AppBundle\Document\BankAccount;
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\File\AccessPayFile;
+use AppBundle\Document\File\BacsReportAruddFile;
+use AppBundle\Document\File\BacsReportDdicFile;
 use AppBundle\Document\Form\Bacs;
 use AppBundle\Document\Payment\BacsPayment;
 use AppBundle\Document\ScheduledPayment;
+use AppBundle\Repository\File\BacsReportAruddFileRepository;
+use AppBundle\Repository\File\BacsReportDdicFileRepository;
 use AppBundle\Repository\PaymentRepository;
 use AppBundle\Repository\UserRepository;
 use AppBundle\Service\BacsService;
@@ -20,6 +24,7 @@ use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Output\Output;
 use Symfony\Component\Console\Output\OutputInterface;
 use AppBundle\Document\User;
 use phpseclib\Net\SFTP;
@@ -69,7 +74,7 @@ class BacsCommand extends ContainerAwareCommand
             ->addOption(
                 'date',
                 null,
-                InputOption::VALUE_NONE,
+                InputOption::VALUE_REQUIRED,
                 'Processing date'
             )
             ->addOption(
@@ -102,6 +107,12 @@ class BacsCommand extends ContainerAwareCommand
                 InputOption::VALUE_NONE,
                 'Only run debits (and mandates)'
             )
+            ->addOption(
+                'metadata',
+                null,
+                InputOption::VALUE_NONE,
+                'Only Reprocess metadata'
+            )
             ->addArgument(
                 'prefix',
                 InputArgument::REQUIRED,
@@ -123,6 +134,7 @@ class BacsCommand extends ContainerAwareCommand
         $debug = $input->getOption('debug');
         $onlyCredits = true === $input->getOption('only-credits');
         $onlyDebits = true === $input->getOption('only-debits');
+        $metadata = true === $input->getOption('metadata');
         $prefix = $input->getArgument('prefix');
         $processingDate = null;
         if ($date) {
@@ -132,6 +144,10 @@ class BacsCommand extends ContainerAwareCommand
             $processingDate = $this->addBusinessDays($processingDate, 1);
         }
         $output->writeln(sprintf('Using processing date %s', $processingDate->format('d/M/Y')));
+
+        if ($metadata) {
+            return $this->metadata($processingDate, $output);
+        }
 
         if ($debug) {
             $output->writeln($this->bacsService->getHeader());
@@ -354,5 +370,41 @@ class BacsCommand extends ContainerAwareCommand
         $s3Key = $this->bacsService->uploadS3($tmpFile, $filename, $uploadFile, $date, $metadata, 'bacs');
 
         return $s3Key;
+    }
+
+    public function metadata($processingDate, OutputInterface $output)
+    {
+        /** @var BacsReportAruddFileRepository $aruddRepo */
+        $aruddRepo = $this->dm->getRepository(BacsReportAruddFile::class);
+        /** @var BacsReportDdicFileRepository $aruddRepo */
+        $ddicRepo = $this->dm->getRepository(BacsReportDdicFile::class);
+
+        $files = $aruddRepo->getMonthlyFiles($processingDate);
+        foreach ($files as $file) {
+            /** @var BacsReportAruddFile $file */
+
+            try {
+                $output->writeln(sprintf('Downloading %s', $file->getKey()));
+                $tmpFile = $this->bacsService->downloadS3($file);
+                $metadata = $this->bacsService->arudd($tmpFile, true);
+                if ($metadata) {
+                    unset($metadata['success']);
+                    unset($metadata['failed-payments']);
+                    unset($metadata['failed-value']);
+                    unset($metadata['details']);
+                    $metadata = array_merge($file->getMetadata(), $metadata);
+
+                    $file->clearMetadata();
+                    foreach ($metadata as $key => $value) {
+                        $file->addMetadata($key, $value);
+                    }
+                }
+            } catch (\Exception $e) {
+                $output->writeln(sprintf('Failed to process'));
+            }
+        }
+        $this->dm->flush();
+
+        return;
     }
 }

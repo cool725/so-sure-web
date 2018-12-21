@@ -847,6 +847,53 @@ class DaviesServiceTest extends WebTestCase
         );
     }
 
+    public function testDeclinedToApproved()
+    {
+        $address = new Address();
+        $address->setType(Address::TYPE_BILLING);
+        $address->setPostcode('BX11LT');
+        $user = new User();
+        $user->setEmail(static::generateEmail('testDeclinedToApproved', $this));
+        $user->setBillingAddress($address);
+        $user->setFirstName('foo');
+        $user->setLastName('bar');
+        $policy = new PhonePolicy();
+        $policy->setPhone(self::getRandomPhone(self::$dm));
+        $user->addPolicy($policy);
+        $claim = new Claim();
+        $claim->setNumber(self::getRandomClaimNumber());
+        $claim->setStatus(Claim::STATUS_DECLINED);
+        $claim->setHandlingTeam(Claim::TEAM_DAVIES);
+        $policy->addClaim($claim);
+        $policy->setPolicyNumber(self::getRandomPolicyNumber('TEST'));
+
+        static::$dm->persist($policy);
+        static::$dm->persist($policy->getUser());
+        static::$dm->persist($claim);
+        static::$dm->flush();
+
+        $daviesClaim = new DaviesHandlerClaim();
+        $daviesClaim->policyNumber = $policy->getPolicyNumber();
+        $daviesClaim->claimNumber = $claim->getNumber();
+        $daviesClaim->replacementImei = $this->generateRandomImei();
+        $daviesClaim->status = DirectGroupHandlerClaim::STATUS_CLOSED;
+        $daviesClaim->insuredName = 'Mr Foo Bar';
+        $daviesClaim->lossDate = new \DateTime('2017-06-01');
+        $daviesClaim->replacementReceivedDate = new \DateTime('2017-07-01');
+        $daviesClaim->replacementMake = 'foo';
+        $daviesClaim->replacementModel = 'bar';
+
+        self::$daviesService->saveClaim($daviesClaim, false);
+        //print_r(self::$directGroupService->getErrors());
+        //print_r(self::$directGroupService->getWarnings());
+        //print_r(self::$directGroupService->getSoSureActions());
+
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        $repo = $dm->getRepository(Claim::class);
+        $updatedClaim = $repo->find($claim->getId());
+        $this->insureSoSureActionExists('/was previously closed/');
+    }
+
     public function testValidateClaimDetailsMissingPhone()
     {
         $address = new Address();
