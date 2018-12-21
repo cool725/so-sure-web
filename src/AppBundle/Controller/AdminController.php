@@ -6,6 +6,9 @@ use AppBundle\Document\AffiliateCompany;
 use AppBundle\Document\ArrayToApiArrayTrait;
 use AppBundle\Document\BacsPaymentMethod;
 use AppBundle\Document\File\AccessPayFile;
+use AppBundle\Document\File\BacsReportAruddFile;
+use AppBundle\Document\File\BacsReportDdicFile;
+use AppBundle\Document\File\BacsReportInputFile;
 use AppBundle\Document\File\ReconciliationFile;
 use AppBundle\Document\File\SalvaPaymentFile;
 use AppBundle\Document\Payment\BacsIndemnityPayment;
@@ -21,6 +24,8 @@ use AppBundle\Form\Type\ReconciliationFileType;
 use AppBundle\Form\Type\SequenceType;
 use AppBundle\Repository\BacsIndemnityPaymentRepository;
 use AppBundle\Repository\BacsPaymentRepository;
+use AppBundle\Repository\File\BacsReportAruddFileRepository;
+use AppBundle\Repository\File\BacsReportInputFileRepository;
 use AppBundle\Repository\File\BarclaysFileRepository;
 use AppBundle\Repository\File\BarclaysStatementFileRepository;
 use AppBundle\Repository\File\JudoFileRepository;
@@ -28,6 +33,7 @@ use AppBundle\Repository\File\LloydsFileRepository;
 use AppBundle\Repository\File\ReconcilationFileRepository;
 use AppBundle\Repository\File\S3FileRepository;
 use AppBundle\Repository\PaymentRepository;
+use AppBundle\Repository\PolicyRepository;
 use AppBundle\Repository\UserRepository;
 use AppBundle\Service\BacsService;
 use AppBundle\Service\BarclaysService;
@@ -36,6 +42,9 @@ use AppBundle\Service\MailerService;
 use AppBundle\Service\ReportingService;
 use AppBundle\Service\SalvaExportService;
 use AppBundle\Service\SequenceService;
+use Doctrine\ODM\MongoDB\DocumentManager;
+use Predis\Client;
+use Predis\Collection\Iterator\SetKey;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -905,6 +914,12 @@ class AdminController extends BaseController
         $lloydsFileRepo = $dm->getRepository(LloydsFile::class);
         /** @var ReconcilationFileRepository $reconcilationFileRepo */
         $reconcilationFileRepo = $dm->getRepository(ReconciliationFile::class);
+        /** @var BacsReportInputFileRepository $inputRepo */
+        $inputRepo = $dm->getRepository(BacsReportInputFile::class);
+        /** @var BacsReportAruddFileRepository $aruddRepo */
+        $aruddRepo = $dm->getRepository(BacsReportAruddFile::class);
+        /** @var BacsReportDdicFileRepository $aruddRepo */
+        $ddicRepo = $dm->getRepository(BacsReportDdicFile::class);
 
         $payments = $paymentRepo->getAllPaymentsForExport($date);
         $extraPayments = $paymentRepo->getAllPaymentsForExport($date, true);
@@ -1166,6 +1181,9 @@ class AdminController extends BaseController
             'barclaysFiles' => $monthlyBarclaysFiles,
             'barclaysStatementFiles' => $barclaysStatementFileRepo->getMonthlyFiles($date),
             'lloydsFiles' => $monthlyLloydsFiles,
+            'bacsInputFiles' => $inputRepo->getMonthlyFiles($date),
+            'bacsAruddFiles' => $aruddRepo->getMonthlyFiles($date),
+            'bacsDdicFiles' => $ddicRepo->getMonthlyFiles($date),
             'reconcilationFiles' => $reconcilationFileRepo->getMonthlyFiles($date),
             'payments' => $payments,
         ];
@@ -1547,6 +1565,52 @@ class AdminController extends BaseController
         return [
             'form' => $policyStatusForm->createView(),
             'policy' => $policy,
+        ];
+    }
+
+    /**
+     * @Route("/policy-validation", name="admin_policy_validation")
+     * @Template
+     */
+    public function policyValidationAction(Request $request)
+    {
+        /** @var DocumentManager $dm */
+        $dm = $this->getManager();
+
+        /** @var Client $redis */
+        $redis = $this->get("snc_redis.default");
+
+        /** @var PolicyRepository $repo */
+        $repo = $dm->getRepository(Policy::class);
+
+        if ('POST' === $request->getMethod()) {
+            if (!$this->isCsrfTokenValid('default', $request->get('token'))) {
+                throw new \InvalidArgumentException('Invalid csrf token');
+            }
+
+            /** @var Policy $policy */
+            $policy = $repo->find($request->get('id'));
+
+            if (!$policy) {
+                throw $this->createNotFoundException(sprintf('Policy %s not found', $request->get('id')));
+            }
+
+            $pattern = '*' . $policy->getId() . '*';
+
+            foreach (new SetKey($redis, 'policy:validation', $pattern) as $key) {
+                $redis->srem('policy:validation', $key);
+            }
+
+            $this->addFlash('success', sprintf(
+                'Policy %s removed from redis',
+                $policy->getPolicyNumber()
+            ));
+            
+            return $this->redirectToRoute('admin_policy_validation');
+        }
+
+        return [
+            'validation' => $redis->smembers('policy:validation'),
         ];
     }
 }

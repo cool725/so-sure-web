@@ -19,6 +19,8 @@ class LloydsService
     const PAYMENT_TYPE_BARCLAYS_STANDARD = 'barclays';
     const PAYMENT_TYPE_BARCLAYS_FPI = 'barclays-fpi';
     const PAYMENT_TYPE_BACS = 'bacs';
+    const PAYMENT_TYPE_BACS_DDIC = 'bacs-ddic';
+    const PAYMENT_TYPE_BACS_ARUDD = 'bacs-arudd';
 
     /** @var LoggerInterface */
     protected $logger;
@@ -59,6 +61,7 @@ class LloydsService
         $lloydsFile->setSalvaPayment($data['salvaPayment']);
         $lloydsFile->setSoSurePayment($data['soSurePayment']);
         $lloydsFile->setAflPayment($data['aflPayment']);
+        $lloydsFile->setBacsTransactions($data['bacsTransactions']);
 
         return $data;
     }
@@ -72,6 +75,7 @@ class LloydsService
         $dailyBacs = array();
         $dailyCreditBacs = array();
         $dailyDebitBacs = array();
+        $bacsTransactions = array();
 
         $total = 0;
         $maxDate = null;
@@ -86,6 +90,15 @@ class LloydsService
                     unset($row[count($row) - 1]);
                     $header = $row;
                 } else {
+                    if (count($header) != count($row)) {
+                        throw new \Exception(sprintf(
+                            '%s has incorrect number of cols (%d vs %d). Header: %s',
+                            json_encode($row),
+                            count($row),
+                            count($header),
+                            json_encode($header)
+                        ));
+                    }
                     $line = array_combine($header, $row);
                     // Exclude lines like this:
                     // 10/10/2016,,'XX-XX-XX,XXXXXXXX,INTEREST (GROSS) ,,0.03,609.61
@@ -154,7 +167,7 @@ class LloydsService
                         } elseif (mb_stripos($line['Transaction Description'], 'DDICA') !== false) {
                             $processedDate = \DateTime::createFromFormat("d/m/Y", $line['Transaction Date']);
                             $processedDate = $this->startOfDay($processedDate);
-                            $paymentType = self::PAYMENT_TYPE_BACS;
+                            $paymentType = self::PAYMENT_TYPE_BACS_DDIC;
                             if (preg_match('/DDIC[0-9]{3,20}/', $line['Transaction Description'], $matches)) {
                                 $bacsIndemnityRepo = $this->dm->getRepository(BacsIndemnityPayment::class);
                                 /** @var BacsIndemnityPayment $bacsIndemnity */
@@ -179,7 +192,7 @@ class LloydsService
                         } elseif (mb_stripos($line['Transaction Description'], 'BACS AUTOSETT DDIC') !== false) {
                             $processedDate = \DateTime::createFromFormat("d/m/Y", $line['Transaction Date']);
                             $processedDate = $this->startOfDay($processedDate);
-                            $paymentType = self::PAYMENT_TYPE_BACS;
+                            $paymentType = self::PAYMENT_TYPE_BACS_DDIC;
                             if (preg_match('/DDIC[0-9A-Z]{3,20}/', $line['Transaction Description'], $matches)) {
                                 $bacsIndemnityRepo = $this->dm->getRepository(BacsIndemnityPayment::class);
                                 /** @var BacsIndemnityPayment $bacsIndemnity */
@@ -206,7 +219,7 @@ class LloydsService
                         // can be interest or Unpaid DD
                         if (mb_stripos($line['Transaction Description'], 'Unpaid D/D') !== false) {
                             $processedDate = \DateTime::createFromFormat("d/m/Y", $line['Transaction Date']);
-                            $paymentType = self::PAYMENT_TYPE_BACS;
+                            $paymentType = self::PAYMENT_TYPE_BACS_ARUDD;
                         } elseif (mb_stripos($line['Transaction Description'], 'INTEREST') !== false) {
                             $this->logger->info(sprintf(
                                 'Skipping line as payment/interest. %s',
@@ -257,10 +270,15 @@ class LloydsService
                             $dailyBarclaysProcessing[$processedDate->format('Ymd')] = 0;
                         }
                         $dailyBarclaysProcessing[$processedDate->format('Ymd')] += $amount;
-                    } elseif ($paymentType == self::PAYMENT_TYPE_BACS) {
+                    } elseif (in_array($paymentType, [
+                        self::PAYMENT_TYPE_BACS,
+                        self::PAYMENT_TYPE_BACS_ARUDD,
+                        self::PAYMENT_TYPE_BACS_DDIC,
+                    ])) {
                         if (!isset($dailyBacs[$receivedDate->format('Ymd')])) {
                             $dailyBacs[$receivedDate->format('Ymd')] = 0;
                         }
+                        $bacsTransactions[$paymentType][$receivedDate->format('Ymd')][] = $amount;
                         $dailyBacs[$receivedDate->format('Ymd')] += $amount;
                         if ($amount < 0.0) {
                             if (!isset($dailyDebitBacs[$receivedDate->format('Ymd')])) {
@@ -293,6 +311,7 @@ class LloydsService
             'salvaPayment' => $salvaPayment,
             'soSurePayment' => $soSurePayment,
             'aflPayment' => $aflPayment,
+            'bacsTransactions' => $bacsTransactions,
         ];
 
         return $data;

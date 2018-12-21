@@ -238,15 +238,6 @@ hwi_oauth:
                 appsecret_proof: true
                 csrf: true
 
-jms_di_extra:
-    locations:
-        all_bundles: false
-        bundles: [AppBundle]
-        directories: ["%kernel.root_dir%/../src"]
-
-jms_security_extra:
-    expressions: true
-
 rollbar:
     access_token: '%rollbar_access_token%'
     environment:  '%kernel.environment%'
