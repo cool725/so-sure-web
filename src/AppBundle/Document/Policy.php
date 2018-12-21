@@ -568,8 +568,9 @@ abstract class Policy
 
     /**
      * @MongoDB\EmbedMany(targetDocument="Participation")
+     * @var ArrayCollection
      */
-    protected $participations = array();
+    protected $participations;
 
     public function __construct()
     {

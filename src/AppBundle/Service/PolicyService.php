@@ -2336,7 +2336,7 @@ class PolicyService
         $participationRepository = $this->dm->getRepository(Participation::class);
         // NOTE: according to this logic if a policy is entered into a promotion it can never be entered into it again.
         //       if that changes then a check for active participations only can be added here.
-        $participation = $participationRepository->findOneBy(["policy" => $policy, "promotion" => $promotion]);
+        $participation = $participationRepository->findOneBy(["policy.\$id" => $policy->getId(), "promotion" => $promotion]);
         if (!$participation) {
             $date = $date ? clone $date : new \DateTime();
             $participation = new Participation();
