@@ -64,6 +64,9 @@ class ClaimTypeTest extends FormTypeTest
         $premium = new PhonePremium();
         $premium->setExcess(PolicyTerms::getLowExcess());
         $policy->setPremium($premium);
+
+        $this->assertNotNull($policy->getCurrentExcess());
+
         $claim = new Claim();
         $claim->setPolicy($policy);
 
@@ -105,6 +108,9 @@ class ClaimTypeTest extends FormTypeTest
         $premium->setExcess(PolicyTerms::getHighExcess());
         $premium->setPicSureExcess(PolicyTerms::getLowExcess());
         $policy->setPremium($premium);
+
+        $this->assertNotNull($policy->getCurrentExcess());
+
         $claim = new Claim();
         $claim->setPolicy($policy);
 
@@ -146,6 +152,9 @@ class ClaimTypeTest extends FormTypeTest
         $premium->setExcess(PolicyTerms::getHighExcess());
         $premium->setPicSureExcess(PolicyTerms::getLowExcess());
         $policy->setPremium($premium);
+
+        $this->assertNotNull($policy->getCurrentExcess());
+
         $claim = new Claim();
         $claim->setPolicy($policy);
 
