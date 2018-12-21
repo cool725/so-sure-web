@@ -127,7 +127,11 @@
                     <h3>Charges</h3>
                     <div class="table-responsive">
                         <table class="table table-striped">
-                            <thead><tr><th>Date</th><th>User</th></tr></thead>
+                            <thead><tr>
+                                <th>Date</th>
+                                <th>User</th>
+                                <th>Promotion</th>
+                            </tr></thead>
                             <tbody>
                                 {% for charge in charges %}
                                     <tr>
@@ -135,6 +139,26 @@
                                         <td>
                                             {% if charge.user %}
                                                 <a href="{{ path('admin_user', {'id': charge.user.id }) }}">{{ charge.user.name }}</a>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if charge.participation %}
+                                                <strong>{{ charge.participation.status }}</strong> in
+                                                <a href="{{ path('admin_promotion', {'id': affiliate.promotion.id }) }}">{{ affiliate.promotion.name }}</a> -
+                                                <strong>{{ charge.participation.promotion.reward }}</strong>
+                                                {% if charge.participation.status == 'completed' %}
+                                                    {% if charge.participation.promotion.reward == 'taste-card'%}
+                                                        {% if charge.policy.tasteCard %}
+                                                            - {{ charge.policy.tasteCard }}
+                                                        {% else %}
+                                                            - tastecard not yet set.
+                                                        {% endif %}
+                                                    {% elseif charge.participation.promotion.reward == 'pot' %}
+                                                        £{{ charge.participation.promotion.rewardAmount }}
+                                                    {% endif %}
+                                                {% endif %}
+                                            {% else %}
+                                                N/A
                                             {% endif %}
                                         </td>
                                     </tr>

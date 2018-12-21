@@ -74,6 +74,12 @@ class Charge
     protected $affiliate;
 
     /**
+     * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\Participation")
+     * @Gedmo\Versioned
+     */
+    protected $participation;
+
+    /**
      * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\Policy")
      * @Gedmo\Versioned
      */
@@ -150,6 +156,16 @@ class Charge
     public function setAffiliate($affiliate)
     {
         $this->affiliate = $affiliate;
+    }
+
+    public function getParticipation()
+    {
+        return $this->participation;
+    }
+
+    public function setParticipation(Participation $participation)
+    {
+        $this->participation = $participation;
     }
 
     public function getPolicy()

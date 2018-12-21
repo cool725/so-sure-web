@@ -282,11 +282,14 @@ class AffiliateService
         $promotion = $affiliate->getPromotion();
         if ($promotion) {
             try {
-                $this->policyService->enterPromotion($policy, $promotion, $date);
+                $participation = $this->policyService->enterPromotion($policy, $promotion, $date);
+                $charge->setParticipation($participation);
             } catch (PromotionInactiveException $e) {
                 // TODO: in future add front end ability to make promotions active/inactive and when they are made
                 //       inactive automatically remove from all affiliates.
                 $this->logger->error("Affiliate ".$affiliate->getName()." is still trying to use inactive promotion.");
+            } catch (AlreadyParticipatingException $e) {
+                $this->logger->error($e->getMessage());
             }
         }
         $this->dm->persist($charge);

@@ -457,6 +457,9 @@ class AffiliateServiceTest extends WebTestCase
         $this->assertEquals(1, count($data["tonyAbbot"]->getFirstPolicy()->getParticipations()));
         $participation = $data["tonyAbbot"]->getFirstPolicy()->getParticipations()[0];
         $this->assertEquals($date, $participation->getStart());
+        $charge = static::$chargeRepository->findLastByUser($data["borb"], Charge::TYPE_AFFILIATE);
+        $this->assertEquals($promotion, $charge->getParticipation()->getPromotion());
+
         // make sure it doesn't do something funny when you run it again later.
         self::$affiliateService->generate([$data["affiliate"]], $otherDate);
         $this->assertEquals(0, count($data["bango"]->getFirstPolicy()->getParticipations()));
