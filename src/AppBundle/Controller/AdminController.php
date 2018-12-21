@@ -33,6 +33,7 @@ use AppBundle\Repository\File\LloydsFileRepository;
 use AppBundle\Repository\File\ReconcilationFileRepository;
 use AppBundle\Repository\File\S3FileRepository;
 use AppBundle\Repository\PaymentRepository;
+use AppBundle\Repository\PolicyRepository;
 use AppBundle\Repository\UserRepository;
 use AppBundle\Service\BacsService;
 use AppBundle\Service\BarclaysService;
@@ -41,6 +42,9 @@ use AppBundle\Service\MailerService;
 use AppBundle\Service\ReportingService;
 use AppBundle\Service\SalvaExportService;
 use AppBundle\Service\SequenceService;
+use Doctrine\ODM\MongoDB\DocumentManager;
+use Predis\Client;
+use Predis\Collection\Iterator\SetKey;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -1561,6 +1565,52 @@ class AdminController extends BaseController
         return [
             'form' => $policyStatusForm->createView(),
             'policy' => $policy,
+        ];
+    }
+
+    /**
+     * @Route("/policy-validation", name="admin_policy_validation")
+     * @Template
+     */
+    public function policyValidationAction(Request $request)
+    {
+        /** @var DocumentManager $dm */
+        $dm = $this->getManager();
+
+        /** @var Client $redis */
+        $redis = $this->get("snc_redis.default");
+
+        /** @var PolicyRepository $repo */
+        $repo = $dm->getRepository(Policy::class);
+
+        if ('POST' === $request->getMethod()) {
+            if (!$this->isCsrfTokenValid('default', $request->get('token'))) {
+                throw new \InvalidArgumentException('Invalid csrf token');
+            }
+
+            /** @var Policy $policy */
+            $policy = $repo->find($request->get('id'));
+
+            if (!$policy) {
+                throw $this->createNotFoundException(sprintf('Policy %s not found', $request->get('id')));
+            }
+
+            $pattern = '*' . $policy->getId() . '*';
+
+            foreach (new SetKey($redis, 'policy:validation', $pattern) as $key) {
+                $redis->srem('policy:validation', $key);
+            }
+
+            $this->addFlash('success', sprintf(
+                'Policy %s removed from redis',
+                $policy->getPolicyNumber()
+            ));
+            
+            return $this->redirectToRoute('admin_policy_validation');
+        }
+
+        return [
+            'validation' => $redis->smembers('policy:validation'),
         ];
     }
 }
