@@ -531,7 +531,7 @@ class AffiliateServiceTest extends WebTestCase
         $affiliate->setDays($days);
         $affiliate->setRenewalDays($days);
         $affiliate->setCampaignSource($source);
-        $affiliate->setLeadSource("scode");
+        $affiliate->setLeadSource("affiliate");
         $affiliate->setLeadSourceDetails($lead);
         $affiliate->setChargeModel(AffiliateCompany::MODEL_ONE_OFF);
         self::$dm->persist($affiliate);

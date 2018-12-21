@@ -179,8 +179,8 @@ class Promotion
         if (!$this->active) {
             throw new PromotionInactiveException();
         }
-        $this->participating[] = $participation;
         $participation->setPromotion($this);
+        $this->participating[] = $participation;
     }
 
     public function getAffiliates()

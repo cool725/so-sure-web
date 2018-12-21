@@ -567,10 +567,9 @@ abstract class Policy
     protected $tasteCard;
 
     /**
-     * @MongoDB\EmbedMany(targetDocument="Participation")
-     * @var ArrayCollection
+     * @MongoDB\ReferenceMany(targetDocument="AppBundle\Document\Participation")
      */
-    protected $participations;
+    protected $participations = array();
 
     public function __construct()
     {
