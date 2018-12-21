@@ -218,6 +218,11 @@ trait DateTrait
         return $this->addBusinessDays($businessDays, 1);
     }
 
+    public function getNextBusinessDayHistorical(\DateTime $date)
+    {
+        return $this->getNextBusinessDay($date, $date);
+    }
+
     /**
      * @param \DateTime $date
      * @param integer   $days

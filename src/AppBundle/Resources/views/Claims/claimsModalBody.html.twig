@@ -460,8 +460,8 @@
                                     </span>
                                 {% endif %}
 
-                                {% if not equal_to_two_dp(claim.expectedExcessValue, claim.expectedExcessValue(true)) %}
-                                    <span title="Warning excess does not matches older calculation of £{{ claim.expectedExcessValue(true)|number_format(2, '.', ',') }}">
+                                {% if not equal_to_two_dp(claim.expectedExcessValue, claim.expectedExcessValue(null, true)) %}
+                                    <span title="Warning excess does not matches older calculation of £{{ claim.expectedExcessValue(null, true)|number_format(2, '.', ',') }}">
                                         <i class="fa fa-warning"></i>
                                     </span>
                                 {% endif %}

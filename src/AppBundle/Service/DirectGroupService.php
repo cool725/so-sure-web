@@ -234,6 +234,7 @@ class DirectGroupService extends ExcelSftpService
         $success = true;
         $claims = [];
         $openClaims = [];
+        $openClaimsNumber = [];
         $multiple = [];
 
         $this->reportMissingClaims($directGroupClaims);
@@ -244,6 +245,7 @@ class DirectGroupService extends ExcelSftpService
                 if (!isset($openClaims[$directGroupClaim->getPolicyNumber()]) ||
                     $directGroupClaim->lossDate > $openClaims[$directGroupClaim->getPolicyNumber()]) {
                     $openClaims[$directGroupClaim->getPolicyNumber()] = $directGroupClaim->lossDate;
+                    $openClaimsNumber[$directGroupClaim->getPolicyNumber()] = $directGroupClaim->claimNumber;
                 }
             }
             if (isset($claims[$directGroupClaim->getPolicyNumber()]) &&
@@ -267,9 +269,15 @@ class DirectGroupService extends ExcelSftpService
                 $directGroupClaim->lossDate > $openClaims[$directGroupClaim->getPolicyNumber()]) {
                     // @codingStandardsIgnoreStart
                     $msg = sprintf(
-                        'There is open claim against policy %s that is older then the closed claim of %s and needs to be closed. Unable to determine imei',
+                        'There is open claim %s against policy %s that is older (%s) then the closed claim (%s) of %s and needs to be closed. Unable to determine imei. [%s]',
+                        $openClaimsNumber[$directGroupClaim->getPolicyNumber()],
                         $directGroupClaim->getPolicyNumber(),
-                        $directGroupClaim->claimNumber
+                        $openClaims[$directGroupClaim->getPolicyNumber()] ?
+                            $openClaims[$directGroupClaim->getPolicyNumber()]->format('Y-m-d') :
+                            '?',
+                        $directGroupClaim->lossDate ? $directGroupClaim->lossDate->format('Y-m-d') : '?',
+                        $directGroupClaim->claimNumber,
+                        'R1'
                     );
                     // @codingStandardsIgnoreEnd
                     $this->errors[$directGroupClaim->claimNumber][] = $msg;
@@ -294,14 +302,38 @@ class DirectGroupService extends ExcelSftpService
                         $claim->getNumber() != $directGroupClaim->claimNumber) {
                         $preventImeiUpdate = true;
                         if ($claim->getHandlingTeam() == Claim::TEAM_DIRECT_GROUP) {
-                            $logError = true;
+                            // @codingStandardsIgnoreStart
+                            $msg = sprintf(
+                                'There is open claim %s against policy %s that is older (%s) then the closed claim (%s) of %s and needs to be closed. Unable to determine imei. [%s]',
+                                $openClaimsNumber[$directGroupClaim->getPolicyNumber()],
+                                $claim->getPolicyNumber(),
+                                $openClaims[$directGroupClaim->getPolicyNumber()] ?
+                                    $openClaims[$directGroupClaim->getPolicyNumber()]->format('Y-m-d') :
+                                    '?',
+                                $claim->getLossDate() ? $claim->getLossDate()->format('Y-m-d') : '?',
+                                $claim->getNumber(),
+                                'R2'
+                            );
+                            // @codingStandardsIgnoreEnd
+                            $this->errors[$claim->getNumber()][] = $msg;
                         }
                     } elseif (!$directGroupClaim->isOpen() &&
                         $directGroupClaim->lossDate > $claim->getLossDate() &&
                         $claim->getNumber() != $directGroupClaim->claimNumber) {
                         $preventImeiUpdate = true;
                         if ($claim->getHandlingTeam() == Claim::TEAM_DIRECT_GROUP) {
-                            $logError = true;
+                            // @codingStandardsIgnoreStart
+                            $msg = sprintf(
+                                'There is open claim %s against policy %s that is older (%s) then the closed claim (%s) of %s and needs to be closed. Unable to determine imei. [%s]',
+                                $claim->getNumber(),
+                                $directGroupClaim->getPolicyNumber(),
+                                $claim->getLossDate() ? $claim->getLossDate()->format('Y-m-d') : '?',
+                                $directGroupClaim->lossDate ? $directGroupClaim->lossDate->format('Y-m-d') : '?',
+                                $directGroupClaim->claimNumber,
+                                'R3'
+                            );
+                            // @codingStandardsIgnoreEnd
+                            $this->errors[$claim->getNumber()][] = $msg;
                         }
                     } elseif ($claim->isOpen() && $directGroupClaim->isOpen() &&
                         $claim->getNumber() != $directGroupClaim->claimNumber) {
@@ -310,17 +342,6 @@ class DirectGroupService extends ExcelSftpService
 
                     if ($preventImeiUpdate) {
                         $multiple[] = $policy->getPolicyNumber();
-                    }
-
-                    if ($logError) {
-                        // @codingStandardsIgnoreStart
-                        $msg = sprintf(
-                            'There is open claim against policy %s that is older then the closed claim of %s and needs to be closed. Unable to determine imei',
-                            $policy->getPolicyNumber(),
-                            $claim->getNumber()
-                        );
-                        // @codingStandardsIgnoreEnd
-                        $this->errors[$claim->getNumber()][] = $msg;
                     }
                 }
             }
@@ -742,6 +763,14 @@ class DirectGroupService extends ExcelSftpService
                 );
                 $this->errors[$directGroupClaim->claimNumber][] = $msg;
             }
+        } elseif ($claim->isClosed() && $claim->getStatus() != $directGroupClaim->getClaimStatus()) {
+            $msg = sprintf(
+                'Claim %s was previously closed (%s), however status is now %s. SO-SURE to investigate',
+                $directGroupClaim->claimNumber,
+                $claim->getStatus(),
+                $directGroupClaim->getClaimStatus()
+            );
+            $this->sosureActions[$directGroupClaim->claimNumber][] = $msg;
         }
 
         if (!$directGroupClaim->replacementImei && !$directGroupClaim->isReplacementRepaired() &&
@@ -825,6 +854,14 @@ class DirectGroupService extends ExcelSftpService
                 $directGroupClaim->claimNumber
             );
             $this->sosureActions[$directGroupClaim->claimNumber][] = $msg;
+        }
+
+        if (count($directGroupClaim->unobtainableFields) > 0) {
+            $msg = sprintf(
+                'The following fields are noted as unobtainable: %s',
+                json_encode($directGroupClaim->unobtainableFields)
+            );
+            $this->warnings[$directGroupClaim->claimNumber][] = $msg;
         }
     }
 

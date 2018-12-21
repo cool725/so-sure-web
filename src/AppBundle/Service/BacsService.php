@@ -623,12 +623,14 @@ class BacsService
         return $results;
     }
 
-    public function arudd($file)
+    public function arudd($file, $reprocess = false)
     {
         $results = [
             'records' => 0,
+            'value' => 0,
             'success' => true,
             'failed-payments' => 0,
+            'failed-value' => 0,
             'details' => [],
         ];
 
@@ -657,6 +659,8 @@ class BacsService
             $currentProcessingDate = $this->getCurrentProcessingDate($element);
         }
 
+        $results['processing-date'] = $currentProcessingDate->format('Y-m-d');
+
         $elementList = $xpath->query(
             '//BACSDocument/Data/ARUDD/Advice/OriginatingAccountRecords/OriginatingAccountRecord/ReturnedDebitItem'
         );
@@ -666,6 +670,14 @@ class BacsService
             $returnCode = $this->getReturnCode($element);
             $reference = $this->getReference($element, 'ref');
             $returnDescription = $this->getNodeValue($element, 'returnDescription');
+            $amount = $this->getNodeValue($element, 'valueOf');
+            $results['value'] += $amount;
+            $results['amounts'][$reference] = $amount;
+
+            if ($reprocess) {
+                continue;
+            }
+
             $originalProcessingDate = $this->getOriginalProcessingDate($element);
             /** @var User $user */
             $user = $repo->findOneBy(['paymentMethod.bankAccount.reference' => $reference]);
@@ -731,6 +743,7 @@ class BacsService
                     $this->failedPaymentEmail($policy);
 
                     $results['failed-payments']++;
+                    $results['failed-value'] += $amount;
                     $days = $submittedPayment->getDate()->diff($originalProcessingDate);
                     $results['details'][$reference] = [$submittedPayment->getId() => $days->days];
                     if ($days->days > 5) {
@@ -753,6 +766,7 @@ class BacsService
                 $this->logger->error(sprintf('Failed %d payments for user %s', $foundPayments, $user->getId()));
             }
         }
+
         return $results;
     }
 
@@ -1170,6 +1184,20 @@ class BacsService
         $this->dm->flush();
     }
 
+    public function bacsFileSubmittedBySerialNumber($serialNumber)
+    {
+        $repo = $this->dm->getRepository(AccessPayFile::class);
+        /** @var AccessPayFile $file */
+        $file = $repo->findOneBy(['serialNumber' => $serialNumber, 'status' => AccessPayFile::STATUS_PENDING]);
+        if (!$file) {
+            return false;
+        }
+
+        $this->bacsFileSubmitted($file);
+
+        return true;
+    }
+
     /**
      * Mark file as cancelled
      * @param AccessPayFile $file
@@ -1283,6 +1311,10 @@ class BacsService
         foreach ($elementList as $element) {
             $results['debit-rejected-records'] = $element->attributes->getNamedItem('numberOf')->nodeValue;
             $results['debit-rejected-value'] = $element->attributes->getNamedItem('valueOf')->nodeValue;
+        }
+
+        if (isset($results['serial-number']) && mb_strlen($results['serial-number']) > 0) {
+            $results['autoBasFileSubmit'] = $this->bacsFileSubmittedBySerialNumber($results['serial-number']);
         }
 
         return $results;
