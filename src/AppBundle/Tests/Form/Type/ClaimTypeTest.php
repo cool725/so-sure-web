@@ -70,6 +70,8 @@ class ClaimTypeTest extends FormTypeTest
         $claim = new Claim();
         $claim->setPolicy($policy);
 
+        $this->assertNotNull($claim->getExpectedExcess());
+
         $form = $this->factory->create(ClaimType::class, $claim);
         $view = $form->createView();
         $children = $view->children;
@@ -114,6 +116,8 @@ class ClaimTypeTest extends FormTypeTest
         $claim = new Claim();
         $claim->setPolicy($policy);
 
+        $this->assertNotNull($claim->getExpectedExcess());
+
         $form = $this->factory->create(ClaimType::class, $claim);
         $view = $form->createView();
         $children = $view->children;
@@ -157,6 +161,8 @@ class ClaimTypeTest extends FormTypeTest
 
         $claim = new Claim();
         $claim->setPolicy($policy);
+
+        $this->assertNotNull($claim->getExpectedExcess());
 
         $form = $this->factory->create(ClaimType::class, $claim);
         $view = $form->createView();
