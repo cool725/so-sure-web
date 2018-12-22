@@ -2,7 +2,9 @@
 
 namespace AppBundle\Form\Type;
 
+use AppBundle\Document\ValidatorTrait;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -18,6 +20,8 @@ use Symfony\Component\Form\FormEvent;
 
 class ClaimType extends AbstractType
 {
+    use ValidatorTrait;
+
     /**
      * @var ReceperioService
      */
@@ -40,6 +44,18 @@ class ClaimType extends AbstractType
             ->add('record', SubmitType::class)
         ;
 
+        $builder
+            ->get('notes')
+            ->addModelTransformer(new CallbackTransformer(
+                function ($note) {
+                    return $note;
+                },
+                function ($noteConformAlphanumeric) {
+                    return $this->conformAlphanumericSpaceDot($noteConformAlphanumeric, 2500, 1);
+                }
+            ))
+        ;
+
         $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
             /** @var Claim $claim */
             $claim = $event->getData();
@@ -51,14 +67,14 @@ class ClaimType extends AbstractType
             $choices = [];
             if ($policy && $policy->isAdditionalClaimLostTheftApprovedAllowed()) {
                 $choices = [
-                    $this->getClaimTypeCopy(Claim::TYPE_LOSS, $validated, $picSureEnabled) => Claim::TYPE_LOSS,
-                    $this->getClaimTypeCopy(Claim::TYPE_THEFT, $validated, $picSureEnabled) => Claim::TYPE_THEFT,
+                    $this->getClaimTypeCopy($claim, Claim::TYPE_LOSS) => Claim::TYPE_LOSS,
+                    $this->getClaimTypeCopy($claim, Claim::TYPE_THEFT) => Claim::TYPE_THEFT,
                 ];
             }
             $choices = array_merge($choices, [
-                $this->getClaimTypeCopy(Claim::TYPE_DAMAGE, $validated, $picSureEnabled) => Claim::TYPE_DAMAGE,
-                $this->getClaimTypeCopy(Claim::TYPE_WARRANTY, $validated, $picSureEnabled) => Claim::TYPE_WARRANTY,
-                $this->getClaimTypeCopy(Claim::TYPE_EXTENDED_WARRANTY, $validated, $picSureEnabled) =>
+                $this->getClaimTypeCopy($claim, Claim::TYPE_DAMAGE) => Claim::TYPE_DAMAGE,
+                $this->getClaimTypeCopy($claim, Claim::TYPE_WARRANTY) => Claim::TYPE_WARRANTY,
+                $this->getClaimTypeCopy($claim, Claim::TYPE_EXTENDED_WARRANTY) =>
                     Claim::TYPE_EXTENDED_WARRANTY,
             ]);
             $form->add('type', ChoiceType::class, [
@@ -69,12 +85,12 @@ class ClaimType extends AbstractType
         });
     }
 
-    private function getClaimTypeCopy($claimType, $picSureValidated, $picSureEnabled)
+    private function getClaimTypeCopy(Claim $claim, $claimType)
     {
         return sprintf(
             '%s - £%d excess',
             $claimType,
-            Claim::getExcessValue($claimType, $picSureValidated, $picSureEnabled)
+            $claim->getExpectedExcessValue($claimType)
         );
     }
 

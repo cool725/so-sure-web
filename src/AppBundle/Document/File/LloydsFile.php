@@ -54,6 +54,12 @@ class LloydsFile extends UploadFile
     protected $dailyDebitBacs = array();
 
     /**
+     * @MongoDB\Field(type="hash")
+     * @Gedmo\Versioned
+     */
+    protected $bacsTransactions = array();
+
+    /**
      * @MongoDB\Field(type="float")
      * @Gedmo\Versioned
      */
@@ -154,6 +160,35 @@ class LloydsFile extends UploadFile
     public function setAflPayment($aflPayment)
     {
         $this->aflPayment = $aflPayment;
+    }
+
+    public function getBacsTransactions()
+    {
+        return $this->bacsTransactions;
+    }
+
+    public function setBacsTransactions($bacsTransactions)
+    {
+        $this->bacsTransactions = $bacsTransactions;
+    }
+
+    public function getBacsTransactionsByType($type, $date = null)
+    {
+        if (!isset($this->getBacsTransactions()[$type])) {
+            return null;
+        }
+
+        $transactions = $this->getBacsTransactions()[$type];
+
+        if (!$date) {
+            return $transactions;
+        }
+
+        if (!isset($transactions[$date->format('Ymd')])) {
+            return null;
+        }
+
+        return $transactions[$date->format('Ymd')];
     }
 
     public function getSalvaPayment()

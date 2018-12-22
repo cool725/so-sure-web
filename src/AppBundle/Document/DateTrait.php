@@ -218,6 +218,11 @@ trait DateTrait
         return $this->addBusinessDays($businessDays, 1);
     }
 
+    public function getNextBusinessDayHistorical(\DateTime $date)
+    {
+        return $this->getNextBusinessDay($date, $date);
+    }
+
     /**
      * @param \DateTime $date
      * @param integer   $days
@@ -347,7 +352,22 @@ trait DateTrait
     }
 
     /**
-     * Returns a copy of a given date which is n days ahead of it.
+     * Adds a period of time to a given date.
+     * @param \DateTime $date  is the date to add onto.
+     * @param int       $units is the quantity of time units to add to the date.
+     * @param String    $type  is the type of time unit to add.
+     * @return \DateTime the given date with the extra units added to it.
+     */
+    public static function addTime($date, $units, $type)
+    {
+        $interval = new \DateInterval("PT".abs($units).$type);
+        $interval->invert = $units < 0 ? 1 : 0;
+        $date = clone $date;
+        return $date->add($interval);
+    }
+
+    /**
+     * Returns a copy of a given date which is n days ahead of it, taking negative numbers into account.
      * @param \DateTime $date is the starting date.
      * @param int       $days is the number of days to move ahead.
      * @return \DateTime the new date.
@@ -356,7 +376,6 @@ trait DateTrait
     {
         $date = clone $date;
         $date->add(static::intervalDays($days));
-
         return $date;
     }
 

@@ -21,6 +21,7 @@ use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Policy;
 use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\User;
+use AppBundle\Classes\SoSure;
 use AppBundle\Event\PolicyEvent;
 use AppBundle\Repository\BacsPaymentRepository;
 use AppBundle\Repository\PaymentRepository;
@@ -88,7 +89,7 @@ class BacsService
     const VALIDATE_SKIP = 'skip';
     const VALIDATE_CANCEL = 'cancel';
     const VALIDATE_RESCHEDULE = 'reschedule';
-    
+
     /** @var LoggerInterface */
     protected $logger;
 
@@ -254,6 +255,7 @@ class BacsService
     public function sftp()
     {
         $results = [];
+        $errorCount = 0;
         $files = $this->sosureSftpService->listSftp();
         foreach ($files as $file) {
             $error = false;
@@ -267,6 +269,7 @@ class BacsService
                 }
             } catch (\Exception $e) {
                 $error = true;
+                $errorCount++;
                 $this->logger->error(
                     sprintf('Failed processing file %s in %s', $unzippedFile, $file),
                     ['exception' => $e]
@@ -276,7 +279,39 @@ class BacsService
             $this->sosureSftpService->moveSftp($file, !$error);
         }
 
+        // if files were present and no errors, the we should approve mandates and payments
+        // assuming during the time when we should have done the morning file import
+        if (count($files) > 0 && $errorCount == 0) {
+            $date = new \DateTime(SoSure::TIMEZONE);
+            $hour = $date->format("H");
+            if ($hour >= 8 && $hour <= 13) {
+                $results['autoApprove'] = $this->autoApprovePaymentsAndMandates($date);
+            }
+        }
+
         return $results;
+    }
+
+    /**
+     * Automatically approves all pending mandates and payments up to the current date and time.
+     */
+    public function autoApprovePaymentsAndMandates($date)
+    {
+        /** @var UserRepository $userRepository */
+        $userRepository = $this->dm->getRepository(User::class);
+        $payments = $this->approvePayments($date);
+
+        $users = $userRepository->findPendingMandates()->getQuery()->execute();
+        $serialNumbers = [];
+        foreach ($users as $user) {
+            $serialNumber = $user->getPaymentMethod()->getBankAccount()->getMandateSerialNumber();
+            if (!in_array($serialNumber, $serialNumbers)) {
+                $this->approveMandates($serialNumber);
+                $serialNumbers[] = $serialNumber;
+            }
+        }
+
+        return ['payments' => $payments, 'mandates' => count($serialNumbers)];
     }
 
     public function unzipFile($file, $extension = '.xml')
@@ -588,12 +623,14 @@ class BacsService
         return $results;
     }
 
-    public function arudd($file)
+    public function arudd($file, $reprocess = false)
     {
         $results = [
             'records' => 0,
+            'value' => 0,
             'success' => true,
             'failed-payments' => 0,
+            'failed-value' => 0,
             'details' => [],
         ];
 
@@ -622,6 +659,8 @@ class BacsService
             $currentProcessingDate = $this->getCurrentProcessingDate($element);
         }
 
+        $results['processing-date'] = $currentProcessingDate->format('Y-m-d');
+
         $elementList = $xpath->query(
             '//BACSDocument/Data/ARUDD/Advice/OriginatingAccountRecords/OriginatingAccountRecord/ReturnedDebitItem'
         );
@@ -631,6 +670,14 @@ class BacsService
             $returnCode = $this->getReturnCode($element);
             $reference = $this->getReference($element, 'ref');
             $returnDescription = $this->getNodeValue($element, 'returnDescription');
+            $amount = $this->getNodeValue($element, 'valueOf');
+            $results['value'] += $amount;
+            $results['amounts'][$reference] = $amount;
+
+            if ($reprocess) {
+                continue;
+            }
+
             $originalProcessingDate = $this->getOriginalProcessingDate($element);
             /** @var User $user */
             $user = $repo->findOneBy(['paymentMethod.bankAccount.reference' => $reference]);
@@ -696,6 +743,7 @@ class BacsService
                     $this->failedPaymentEmail($policy);
 
                     $results['failed-payments']++;
+                    $results['failed-value'] += $amount;
                     $days = $submittedPayment->getDate()->diff($originalProcessingDate);
                     $results['details'][$reference] = [$submittedPayment->getId() => $days->days];
                     if ($days->days > 5) {
@@ -718,8 +766,6 @@ class BacsService
                 $this->logger->error(sprintf('Failed %d payments for user %s', $foundPayments, $user->getId()));
             }
         }
-
-        $this->approvePayments($currentProcessingDate);
 
         return $results;
     }
@@ -756,6 +802,8 @@ class BacsService
             }
         }
         $this->dm->flush();
+
+        return count($payments);
     }
 
     public function ddic($file)
@@ -1136,6 +1184,20 @@ class BacsService
         $this->dm->flush();
     }
 
+    public function bacsFileSubmittedBySerialNumber($serialNumber)
+    {
+        $repo = $this->dm->getRepository(AccessPayFile::class);
+        /** @var AccessPayFile $file */
+        $file = $repo->findOneBy(['serialNumber' => $serialNumber, 'status' => AccessPayFile::STATUS_PENDING]);
+        if (!$file) {
+            return false;
+        }
+
+        $this->bacsFileSubmitted($file);
+
+        return true;
+    }
+
     /**
      * Mark file as cancelled
      * @param AccessPayFile $file
@@ -1249,6 +1311,10 @@ class BacsService
         foreach ($elementList as $element) {
             $results['debit-rejected-records'] = $element->attributes->getNamedItem('numberOf')->nodeValue;
             $results['debit-rejected-value'] = $element->attributes->getNamedItem('valueOf')->nodeValue;
+        }
+
+        if (isset($results['serial-number']) && mb_strlen($results['serial-number']) > 0) {
+            $results['autoBasFileSubmit'] = $this->bacsFileSubmittedBySerialNumber($results['serial-number']);
         }
 
         return $results;

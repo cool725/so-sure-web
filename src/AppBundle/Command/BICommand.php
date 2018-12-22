@@ -214,7 +214,8 @@ class BICommand extends ContainerAwareCommand
             '"Claim Replacement Received Date"',
             '"Claim handling team"',
             '"Total cost of claim"',
-            '"Claim Closed Date"'
+            '"Claim Closed Date"',
+            "'Risk Rating'",
         ]);
         foreach ($claims as $claim) {
             /** @var Claim $claim */
@@ -269,7 +270,11 @@ class BICommand extends ContainerAwareCommand
                 sprintf('"%s"', $this->timezoneFormat($claim->getReplacementReceivedDate(), $timezone, 'Y-m-d')),
                 sprintf('"%s"', $claim->getHandlingTeam()),
                 sprintf('"%0.2f"', $claim->getTotalIncurred()),
-                sprintf('"%s"', $this->timezoneFormat($claim->getClosedDate(), $timezone, 'Y-m-d'))
+                sprintf('"%s"', $this->timezoneFormat($claim->getClosedDate(), $timezone, 'Y-m-d')),
+                sprintf(
+                    '"%s"',
+                    $claim->getFnolRisk() ? $claim->getFnolRisk() : null
+                ),
             ]);
         }
         if (!$skipS3) {
@@ -326,7 +331,7 @@ class BICommand extends ContainerAwareCommand
             '"Has previous policy"',
             '"Payment Method"',
             '"Expected Unpaid Cancellation Date"',
-            '"Bacs Mandate Status"'
+            '"Bacs Mandate Status"',
         ]);
         foreach ($policies as $policy) {
             /** @var Policy $policy */
@@ -393,7 +398,7 @@ class BICommand extends ContainerAwareCommand
                     $policy->getUser()->hasBacsPaymentMethod() ?
                         $policy->getUser()->getBacsPaymentMethod()->getBankAccount()->getMandateStatus() :
                         null
-                )
+                ),
             ]);
         }
         if (!$skipS3) {

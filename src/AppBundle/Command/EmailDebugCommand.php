@@ -144,6 +144,7 @@ class EmailDebugCommand extends ContainerAwareCommand
             'policy' => [
                 'policy/new',
                 'policy/skippedRenewal',
+                'policy/trustpilot',
             ],
             'card' => [
                 'card/failedPayment',
@@ -179,6 +180,9 @@ class EmailDebugCommand extends ContainerAwareCommand
                 '2',
                 '3',
                 '4',
+            ],
+            'policy' => [
+                'preapproved',
             ],
             'bacs' => [
                 'cancelledClaimed',
@@ -272,16 +276,34 @@ class EmailDebugCommand extends ContainerAwareCommand
             $policies = $repo->findBy(['status' => Policy::STATUS_ACTIVE]);
             $policy = null;
             foreach ($policies as $policy) {
-                break;
+                /** @var PhonePolicy $policy */
+                if ($variation == 'preapproved' &&
+                    $policy->getPicSureStatus() == PhonePolicy::PICSURE_STATUS_PREAPPROVED) {
+                    break;
+                } elseif ($variation != 'preapproved' &&
+                    $policy->getPicSureStatus() != PhonePolicy::PICSURE_STATUS_PREAPPROVED) {
+                    break;
+                }
+
+                $policy = null;
             }
             if (!$policy) {
                 throw new \Exception('Unable to find matching policy');
             }
 
-            if ($template != 'policy/skippedRenewal') {
-                return $this->policyService->resendPolicyEmail($policy);
-            } else {
+            if ($template == 'policy/trustpilot') {
+                $policy = new PhonePolicy();
+                $policy->setPolicyNumber('Invalid/123');
+                $user = new User();
+                $user->setEmail('patrick@so-sure.com');
+                $user->setFirstName('Patrick');
+                $user->setLastName('McAndrew');
+                $policy->setUser($user);
+                return $this->mailerService->trustpilot($policy, MailerService::TRUSTPILOT_PURCHASE);
+            } elseif ($template == 'policy/skippedRenewal') {
                 return $this->policyService->skippedRenewalEmail($policy);
+            } else {
+                return $this->policyService->generatePolicyFiles($policy, true);
             }
         } elseif (in_array($template, $templates['card'])) {
             /** @var PolicyRepository $repo */

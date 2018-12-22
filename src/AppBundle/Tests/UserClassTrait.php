@@ -227,12 +227,13 @@ trait UserClassTrait
         $date = null,
         $addPayment = false,
         $createPolicy = false,
-        $monthly = true
+        $monthly = true,
+        $imei = null
     ) {
         self::addAddress($user);
 
         $policy = new SalvaPhonePolicy();
-        $policy->setImei(self::generateRandomImei());
+        $policy->setImei($imei ?: self::generateRandomImei());
         $policy->init($user, self::getLatestPolicyTerms($dm));
 
         if ($phone) {

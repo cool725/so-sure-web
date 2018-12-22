@@ -1080,6 +1080,13 @@ services:
         tags:
             -  { name: kernel.event_listener, event: event.payment.success, method: onPaymentSuccessEvent }
 
+    app.listener.trustpilot:
+        class:   AppBundle\Listener\TrustpilotListener
+        arguments:
+        - "@app.mailer"
+        tags:
+        -  { name: kernel.event_listener, event: event.policy.created, method: onPolicyCreatedEvent }
+
     app.listener.intercom:
         class:   AppBundle\Listener\IntercomListener
         arguments:
@@ -1175,6 +1182,13 @@ services:
             - '%pos_ips%'
         tags:
             -  { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }
+
+    AppBundle\Listener\ApiPortListener:
+        arguments:
+        - "@logger"
+        - "%kernel.environment%"
+        tags:
+        -  { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }
 
     app.listener.response:
         class:   AppBundle\Listener\KernelListener

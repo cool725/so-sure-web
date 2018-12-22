@@ -23,7 +23,7 @@
                     <h1>My Policies</h1>
                 </div>
                 <div class="col-md-6">
-                    <a href="{{ path('user_data_portability') }}" target="_blank" style="margin-top: 30px;"
+                    <a href="{{ path('user_data_portability') }}" target="_blank" style="margin-top: 30px;" rel="noopener noreferrer"
                        class="btn btn-success" title="This will download your policy data in a portable csv format"><i class="fa fa-download"></i> Download my policy data</a>
                 </div>
             </div>
@@ -184,13 +184,15 @@
                         <a class="ga-outbound-click"
                            data-clicklabel="iTunes"
                            href="{{ apple_download('my-policies-modal') }}"
-                           target="_blank">
+                           target="_blank"
+                           rel="noopener noreferrer">
                             <img src="{{ cdn_url }}/images/icons/app-store-original.svg" alt="Download so-sure on the App Store" /><span class="sr-only">so-sure app - Apple App Store</span>
                         </a>
                         <a class="ga-outbound-click"
                            data-clicklabel="PlayStore"
                            href="{{ google_download('my-policies-modal') }}"
-                           target="_blank">
+                           target="_blank"
+                           rel="noopener noreferrer">
                             <img src="{{ cdn_url }}/images/icons/google-play-original.svg" alt="Get so-sure on Google Play" /><span class="sr-only">so-sure app - Google Play</span>
                         </a>
                     </div>

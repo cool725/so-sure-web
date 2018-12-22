@@ -1,93 +1,246 @@
-{% extends 'base.html.twig' %}
+{% extends 'base_rebrand.html.twig' %}
 
 {# Set vars #}
-{% set new_stylesheet = 1 %}
-{% set new_footer = 1 %}
+{% set body_class = 'home' %}
 
-{% block title %}so-sure - Join today and we'll reward you!{% endblock %}
-
-{% block stylesheets %}
-    {{ parent() }}
-    {% stylesheets output='css/*.css'
-    '@AppBundle/Resources/public/sass/page/homepage.scss'
- %}<link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
-{% endblock %}
+{% block title %}so-sure - Welcome to Social Insurance{% endblock %}
 
 {# Set Meta #}
 {% set og_title = 'Sign up and save' %}
 {% set og_description = 'Hey, I just insured my mobile phone with so-sure. They give you 80% of your cashback if we are connected and don\'t claim!' %}
 {% set og_image = cdn_url ~ '/images/rebrand/og/so-sure_og-image-1.png' %}
 
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/homepage.css') }}">
+    <link rel="stylesheet" href="{{ asset('css-js/social-insurance.css') }}">
+{% endblock %}
+
 {% block body %}
 
-    <section class="invitation section--pad">
-        <div class="container">
+    <section class="hero">
+        <div class="container container-xtra">
             <div class="row">
-                <div class="col-md-12">
-                    <h1 class="text-center">
+                <div class="col-lg-6">
+                    <div class="hero__intro">
                         {% if invitation.inviter is defined %}
-                            Insure your phone with {{invitation.inviter.name}}.
+                            {% if landing_text is defined and landing_text == 'email-landing-text-a' %}
+                                <h1 class="mb-4 text-white">Protect your phone<br><span class="sub">with {{invitation.inviter.name}}</span></h1>
+                                <h4 class="text-zaffre h5">Connect with {{invitation.inviter.firstname}} to get money back.</h4>
+                                <p class="mb-4 text-white">By joining forces with your most careful friends and family, you could see up to 80% of your insurance premium reimbursed every year if none of you claim. Yes, really!</p>
+                            {% else %}
+                                <h1 class="mb-4 text-white">Friends like {{invitation.inviter.name}}<br><span class="sub">are the best</span></h1>
+                                <h4 class="text-zaffre h5">Join forces with your friends and family to save big on your phone insurance.</h4>
+                                <p class="mb-4 text-white">We're rewarding our careful customers. If you, Joanna and your connections are careful and don't claim all year, you can get up to 80% of your money back. Yes really!</p>
+                            {% endif %}
                         {% else %}
-                            Insure your phone.
+                            <h1 class="mb-4 text-white">Mobile Insurance <br><span class="sub">that's Simply Better</span></h1>
+                            <h4 class="text-zaffre">Simple terms, pain-free claims, premium cover</h4>
+                            <p class="mb-4 text-white">By joining forces with your most careful friends and family, you could see up to 80% of your insurance premium reimbursed to you every year. Yes, really!</p>
                         {% endif %}
-                        <br>
-                        <span class="h2">Get up to 80% of your money back.</span>
-                    </h1>
-                    <div class="text-center">
-                        {# Phone Search #}
-                        {% if device_category() == 'Mobile' %}
-                            {{ render(controller('AppBundle:Default:selectPhoneMakeDropdown', app.request.query.all)) }}
-                        {% else %}
-                            {{ render(controller('AppBundle:Default:selectPhoneMakeSearch')) }}
-                        {% endif %}
-                        {# End Phone Search #}
                     </div>
-                    {% if invitation %}
-                        <br>
-                        <div class="text-center">
-                            {{ form_start(form) }}
+                    <div class="hero__controls pb-3">
+                        <a href="#"
+                           class="btn btn-white btn-block-xs mr-sm-2 track-data get-a-quote"
+                           data-event-name="{% if landing_text is defined and landing_text == 'email-landing-text-a' %}get-a-quote-email-invite-a{% elseif landing_text is defined and landing_text == 'email-landing-text-b' %}get-a-quote-email-invite-b{% else %}get-a-quote-email-invite{% endif %}">
+                           Get a Quote</a>
+                        <a href="#"
+                           class="btn btn-outline-white watch-video btn-block-xs"
+                           data-event="watch-video-invitation-hero"
+                           data-toggle="modal"
+                           data-target="#sosure-video-modal"
+                           data-src="https://www.youtube.com/embed/2AjD09ZQhQ4">
+                            <i class="far fa-play-circle fa-lg opacity-50 mr-1"></i>
+                            See how it works
+                        </a>
+                        {% if invitation is defined and invitation %}
+                            {{ form_start(form, { 'attr': { 'class': 'mt-4' }}) }}
                                 {{ form_widget(form) }}
                             {{ form_end(form) }}
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-lg-6 d-none d-lg-block">
+                    <div class="hero__illustration">
+                        <img src="{{ cdn_url }}/images/rebrand/homepage/so-sure_hero-illustration-with-no-shadow.png" alt="so-sure - social insurance" class="img-fluid animated jackInTheBox">
+                    </div>
+                </div>
+            </div>
+            <div class="hero__illustration  d-block d-lg-none">
+                <img src="{{ cdn_url }}/images/rebrand/homepage/so-sure_hero-illustration-with-no-shadow.png" alt="so-sure - social insurance" class="img-fluid animated jackInTheBox">
+            </div>
+        </div>
+    </section>
+
+    <section class="cred">
+        <div class="container container-xtra py-4 d-lg-flex align-items-center justify-content-between">
+            <img src="{{ cdn_url }}/images/rebrand/credbar/so-sure_credbar-trustpilot.png" alt="Trustpilot">
+            <img src="{{ cdn_url }}/images/rebrand/credbar/so-sure_credbar-money.png" alt="Money">
+            <img src="{{ cdn_url }}/images/rebrand/credbar/so-sure_credbar-gocompare.png" alt="GoCompare">
+            <img src="{{ cdn_url }}/images/rebrand/credbar/so-sure_credbar-theguardian.png" alt="The Guardian">
+            <img src="{{ cdn_url }}/images/rebrand/credbar/so-sure_credbar-ft.png" alt="The Financial Times">
+        </div>
+    </section>
+
+    <section class="intro py-lg-5">
+        <div class="container container-xtra py-5">
+            <h2 class="h3 mb-5 text-primary">Here’s how it works</h2>
+            <div class="row">
+                <div class="col-lg-4">
+                    <div class="intro__step">
+                        <div class="intro__number d-flex justify-content-center align-items-center h4 text-primary">1</div>
+                        <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_connect.png" alt="so-sure - Start Connecting" width="180px">
+                    </div>
+                    <h5 class="text-primary">Start Connecting</h5>
+                    <p class="mb-5 text-zaffre">Invite as many people as you want. Your mum, dad, grandparents, or your mate Bob. You then decide who you want to connect to. Do you know who's really careful 😉?</p>
+                </div>
+                <div class="col-lg-4">
+                    <div class="intro__step">
+                        <div class="intro__number d-flex justify-content-center align-items-center h4 text-primary">2</div>
+                        <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_holding-phone.png" alt="so-sure - Be careful" width="180px">
+                    </div>
+                    <h5 class="text-primary">Be Careful</h5>
+                    <p class="mb-5 text-zaffre">Easy as that, don't break or lose your phone, or make any claims throughout the policy year. Oh, and make sure your connections do the same</p>
+                </div>
+                <div class="col-lg-4">
+                    <div class="intro__step">
+                        <div class="intro__number d-flex justify-content-center align-items-center h4 text-primary">3</div>
+                        <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_reward-pot.png" alt="so-sure - Get Rewarded" width="180px">
+                    </div>
+                    <h5 class="text-primary">Get Rewarded</h5>
+                    <p class="mb-2 text-zaffre">At the end of the year, when you and your connections haven’t claimed, your Reward Pot is paid out to you</p>
+                </div>
+            </div>
+            <a href="#" class="btn btn-primary btn-block-xs mt-3 get-a-quote">Get Insured in minutes</a>
+        </div>
+        <div class="intro__background d-none d-lg-block">
+            <img src="{{ cdn_url }}/images/rebrand/misc/so-sure_money-right-cut.png" alt="so-sure - Money Back" width="180px" class="d-fk-none">
+            <img src="{{ cdn_url }}/images/rebrand/misc/so-sure_money-right.png" alt="so-sure - Money Back" width="250px" class="d-none d-fk-inline">
+        </div>
+    </section>
+
+    {# Cover #}
+    {% include 'AppBundle::Default/CommonSections/_cover.html.twig' %}
+
+    {# We do things differently #}
+    {% include 'AppBundle::Default/CommonSections/_weDoThingsDifferently.html.twig' %}
+
+    {# Claims Process #}
+    {# {% include 'AppBundle::Default/CommonSections/_claimsProcess.html.twig' %} #}
+
+    <section class="reviews py-lg-5">
+        <div class="container container-xtra py-5">
+            <div class="row">
+                <div class="col-lg-6">
+                    <h2 class="h3 mb-4 text-zaffre text-center text-lg-left">Don't just take our <br class="d-inline d-sm-none"> word for it!</h2>
+                    <div id="reviews_carousel"
+                         class="carousel slide carousel-fade"
+                         data-ride="carousel"
+                         data-interval="false">
+                        <div class="carousel-inner">
+                            <div class="carousel-item active">
+                                <div class="reviews__item text-center text-lg-left">
+                                    <span class="mt-2">
+                                        <i class="fas fa-star fa-lg text-primary"></i>
+                                        <i class="fas fa-star fa-lg text-primary"></i>
+                                        <i class="fas fa-star fa-lg text-primary"></i>
+                                        <i class="fas fa-star fa-lg text-primary"></i>
+                                        <i class="fas fa-star fa-lg text-primary"></i>
+                                    </span>
+                                    <p class="lead py-4">"I got &pound;80 quid back at the end of the year! I used it to reduce my monthly payments to almost nothing!"</p>
+                                    <div class="reviews__footer mb-4">
+                                        <span class="h5 text-zaffre mr-2">Mark</span> <strong class="text-primary">|</strong> <span class="ml-2">so-sure customer</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="carousel-item">
+                                <div class="reviews__item text-center text-lg-left">
+                                    <span class="mt-2">
+                                        <i class="fas fa-star fa-lg text-primary"></i>
+                                        <i class="fas fa-star fa-lg text-primary"></i>
+                                        <i class="fas fa-star fa-lg text-primary"></i>
+                                        <i class="fas fa-star fa-lg text-primary"></i>
+                                        <i class="fas fa-star fa-lg text-primary"></i>
+                                    </span>
+                                    <p class="lead py-4">"Thanks so sure, me and my husband didnt claim and we both got &pound;40 back, we totally forgot about it so it was a really nice surprise"</p>
+                                    <div class="reviews__footer mb-4">
+                                        <span class="h5 text-zaffre mr-2">Fiona</span> <strong class="text-primary">|</strong> <span class="ml-2">so-sure customer</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="carousel-item">
+                                <div class="reviews__item text-center text-lg-left">
+                                    <span class="mt-2">
+                                        <i class="fas fa-star fa-lg text-primary"></i>
+                                        <i class="fas fa-star fa-lg text-primary"></i>
+                                        <i class="fas fa-star fa-lg text-primary"></i>
+                                        <i class="fas fa-star fa-lg text-primary"></i>
+                                        <i class="fas fa-star fa-lg text-primary"></i>
+                                    </span>
+                                    <p class="lead py-4">"Great to get some money back, nice one - highly recommend"</p>
+                                    <div class="reviews__footer mb-4">
+                                        <span class="h5 text-zaffre mr-2">Roddy</span> <strong class="text-primary">|</strong> <span class="ml-2">so-sure customer</span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                    {% endif %}
+                    </div>
+                    <div class="reviews__controls text-center text-lg-left">
+                        <ul class="list-inline">
+                            <li class="list-inline-item">
+                                <a href="#reviews_carousel"
+                                   class="reviews__controls__prev pr-1"
+                                   role="button"
+                                   data-slide="prev">
+                                   <i class="far fa-long-arrow-alt-left fa-2x"></i>
+                                   <span class="sr-only">prev</span>
+                                </a>
+                            </li>
+                            <li class="list-inline-item">
+                                <a href="#reviews_carousel"
+                                   class="reviews__controls__next pl-1"
+                                   role="button"
+                                   data-slide="next">
+                                    <i class="far fa-long-arrow-alt-right fa-2x"></i>
+                                    <span class="sr-only">next</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
 
-    {% include 'AppBundle::Default/_sectionComparison.html.twig' %}
-
-    {% include 'AppBundle::Default/_sectionRewardPot.html.twig' %}
-
-    <div class="curved-background hidden-xs">
-        <svg preserveAspectRatio="xMinYMin meet" viewBox="0 0 2000 200" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-            <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-                <g id="Artboard" fill="#d6ebff">
-                    <path d="M0,0 L2000,0 L2000,139.921588 C1890.08746,181.703317 1753.08746,201.692115 1589,199.887983 C1424.91254,198.083852 1258.91254,174.763587 1091,129.927189 C918.666667,89.9495926 740,69.9607942 555,69.9607942 C370,69.9607942 185,113.269857 0,199.887983 L0,0 Z" id="Rectangle" transform="translate(1000.000000, 100.000000) scale(-1, 1) translate(-1000.000000, -100.000000) "></path>
-                </g>
-            </g>
-        </svg>
-    </div>
-
-    {% include 'AppBundle::Default/_sectionFeedback.html.twig' %}
+    <section class="banner py-5">
+        <div class="container container-xtra">
+            <div class="d-lg-flex justify-content-lg-between align-items-lg-center">
+                <div class="mb-4 mb-lg-0 d-lg-flex align-items-lg-center">
+                    <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_app-icn.svg" class="d-none d-lg-inline">
+                    <div class="banner__text text-center text-lg-left ml-lg-4">
+                        <h4 class="text-white">Mobile insurance designed for you</h4>
+                        <p class="lead text-white">Cover your phone in minutes </p>
+                    </div>
+                </div>
+                <div class="banner__controls text-center text-lg-left">
+                    <a href="#"
+                       class="btn btn-outline-white watch-video btn-block-xs mr-sm-2"
+                       data-event="watch-video-index-bottom-banner"
+                       data-toggle="modal"
+                       data-target="#sosure-video-modal"
+                       data-src="https://www.youtube.com/embed/QEskwqsNgrQ">
+                        <i class="far fa-play-circle fa-lg opacity-50 mr-1"></i>
+                        Watch our Video
+                    </a>
+                    <a href="#" class="btn btn-white btn-block-xs get-a-quote">Get a Quote</a>
+                </div>
+            </div>
+        </div>
+    </section>
 
     {# Page Modals #}
 
-    {% include 'AppBundle::Default/modalVideoOld.html.twig' %}
-
 {% endblock %}
 
-{% block javascripts %}
-    {{ parent() }}
-    {% javascripts
-    'components/lozad/lozad.min.js'
-    'components/dot/doT.min.js'
-    '@AppBundle/Resources/public/js/Default/images.js'
-    'components/vimeo-player-js/player.min.js'
-    'components/corejs-typeahead/typeahead.bundle.min.js'
-    'components/fuse.js/fuse.min.js'
-    '@AppBundle/Resources/public/js/Default/selectPhoneMakeSearch.js'
-    '@AppBundle/Resources/public/js/Default/selectPhoneMakeDropdown.js'
- %}
-    <script src="{{ asset_url }}"></script>{% endjavascripts %}
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/homepage.js') }}"></script>
 {% endblock %}

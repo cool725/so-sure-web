@@ -285,6 +285,20 @@ class DateTraitTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * Tests to make sure that addTime works as expected.
+     */
+    public function testAddTime()
+    {
+        $now = new \DateTime('2018-03-28 00:00');
+        $now = static::addTime($now, 3, "H");
+        $this->assertEquals(new \DateTime('2018-03-28 03:00'), $now);
+        $now = static::addTime($now, -12, "M");
+        $this->assertEquals(new \DateTime('2018-03-28 02:48'), $now);
+        $now = static::addTime($now, 48, "H");
+        $this->assertEquals(new \DateTime('2018-03-30 02:48'), $now);
+    }
+
+    /**
      * Tests to make sure addDays works as expected.
      */
     public function testaddDays()

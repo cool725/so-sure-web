@@ -822,149 +822,190 @@
         <div role="tabpanel" class="tab-pane" id="bacs">
             <div class="row">
                 <div class="col-md-6">
-                    <h3>Lloyds Date</h3>
-                    <table class="table table-striped">
+                    <h2>Bacs Input Files</h2>
+                    <table class="table">
                         <tr>
-                            <th></th>
-                            <th>so-sure</th>
+                            <th>Serial Number</th>
+                            <th>Amount</th>
+                            <th>Processing Date</th>
+                            <th>Expected Received Date</th>
                             <th>Lloyds</th>
                         </tr>
-                        <tr>
-                            <td>Month</td>
-                            <td>£{{ sosure['monthlyBacsTransaction'].total|number_format(2, '.', ',') }}</td>
-                            <td>£{{ lloyds['monthlyBacs']|number_format(2, '.', ',') }}</td>
-                        </tr>
-                        <tr>
-                            <td>Year</td>
-                            <td></td>
-                            <td>£{{ lloyds['yearlyBacs']|number_format(2, '.', ',') }}</td>
-                        </tr>
-                        <tr>
-                            <td>All time</td>
-                            <td></td>
-                            <td>£{{ lloyds['allBacs']|number_format(2, '.', ',') }}</td>
-                        </tr>
-                    </table>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-6">
-                    <h2>Bacs Credit Date / Lloyds Date</h2>
-                    <table class="table table-striped">
-                        <tr>
-                            <th>Day of Month</th>
-                            <th>so-sure Credit</th>
-                            <th>Lloyds</th>
-                            <th>Diff</th>
-                            <th>Cumulative Diff</th>
-                        </tr>
-                        {% set cumulative = 0 %}
-                        {% for day in 1..days_in_month %}
-                            {% if month < 10 and day < 10 %}
-                                {% set ymd = year ~ "0" ~ month ~ "0" ~ day %}
-                            {% elseif day < 10 %}
-                                {% set ymd = year ~ month ~ "0" ~ day %}
-                            {% elseif month < 10 %}
-                                {% set ymd = year ~ "0" ~ month ~ day %}
-                            {% else %}
-                                {% set ymd = year ~ month ~ day %}
+                        {% set inputTotal = 0 %}
+                        {% for file in bacsInputFiles if file.metadata['serial-number'] is defined and file.metadata['processing-date']  is defined %}
+                            {% set received_date = next_business_day_historical(file.metadata['processing-date']) %}
+                            {% set amount = null %}
+                            {% if file.metadata['debit-accepted-value'] is defined and file.metadata['debit-accepted-value'] > 0 %}
+                                {% set amount = file.metadata['debit-accepted-value'] %}
+                            {% elseif file.metadata['credit-accepted-value'] is defined and file.metadata['credit-accepted-value'] > 0 %}
+                                {% set amount = 0 - file.metadata['credit-accepted-value'] %}
                             {% endif %}
-                            {% set color = '' %}
-                            {% if sosure['dailyCreditBacsTransaction'][day] is defined and lloyds['dailyCreditBacs'][ymd] is defined  %}
-                                {% if equal_to_two_dp(sosure['dailyCreditBacsTransaction'][day], lloyds['dailyCreditBacs'][ymd]) %}
-                                    {% set color = 'success' %}
-                                {% else %}
-                                    {% set color = 'danger' %}
-                                {% endif %}
+                            {% if file.metadata['debit-rejected-value'] is defined and file.metadata['debit-rejected-value'] > 0 %}
+                                {% set amount = amount + file.metadata['debit-rejected-value'] %}
+                            {% elseif file.metadata['credit-rejected-value'] is defined and file.metadata['credit-rejected-value'] > 0 %}
+                                {% set amount = amount - file.metadata['credit-rejected-value'] %}
                             {% endif %}
-                            <tr class='{{ color }}'>
-                                <td>{{ day }}</td>
-                                <td>{% if sosure['dailyCreditBacsTransaction'][day] is defined %}£{{ sosure['dailyCreditBacsTransaction'][day]|number_format(2, '.', ',') }}{% else %}-{% endif %}</td>
-                                <td>{% if lloyds['dailyCreditBacs'][ymd] is defined %}£{{ lloyds['dailyCreditBacs'][ymd]|number_format(2, '.', ',') }}{% else %}-{% endif %}</td>
-                                <td>{% if sosure['dailyCreditBacsTransaction'][day] is defined and lloyds['dailyCreditBacs'][ymd] is defined %}
-                                        {% set diff = sosure['dailyCreditBacsTransaction'][day] - lloyds['dailyCreditBacs'][ymd] %}
-                                        {% set cumulative = cumulative + diff %}
-                                        £{{ diff|number_format(2, '.', ',') }}
-                                    {% elseif sosure['dailyCreditBacsTransaction'][day] is defined %}
-                                        {% set diff = sosure['dailyCreditBacsTransaction'][day] %}
-                                        {% set cumulative = cumulative + diff %}
-                                        £{{ diff|number_format(2, '.', ',') }}
-                                    {% elseif lloyds['dailyCreditBacs'][ymd] is defined %}
-                                        {% set diff = 0 - lloyds['dailyCreditBacs'][ymd] %}
-                                        {% set cumulative = cumulative + diff %}
-                                        £{{ diff|number_format(2, '.', ',') }}
-                                    {% else %}
-                                        -
+
+                            {% set foundFileInDate = false %}
+                            {% for lloydsFile in lloydsFiles %}
+                                {% for item in lloydsFile.getBacsTransactionsByType('bacs', received_date) %}
+                                    {% if equal_to_two_dp(amount, item) %}
+                                        {% set foundFileInDate = true %}
                                     {% endif %}
-                                </td>
-                                <td>{% if sosure['dailyCreditBacsTransaction'][day] is defined or lloyds['dailyCreditBacs'][ymd] is defined %}
-                                        £{{ cumulative|number_format(2, '.', ',') }}
-                                    {% else %}
-                                        -
-                                    {% endif %}
+                                {% endfor %}
+                            {% endfor %}
+                            {% set skip = false %}
+                            {% if amount is null or received_date|date('m') != month %}
+                                {% set skip = true %}
+                            {% endif %}
+                            {% if not skip and foundFileInDate %}
+                                {% set inputTotal = inputTotal + amount %}
+                            {% endif %}
+                            <tr class="{% if skip %}hidden{% elseif foundFileInDate %}bg-success{% else %}bg-danger{% endif %}">
+                                <td><span title="{{ file.key }}">{{ file.metadata['serial-number'] }}</span></td>
+                                <td>{{ amount|default('-') }}</td>
+                                <td>{{ file.metadata['processing-date'] }}</td>
+                                <td>{{ received_date|date('Y-m-d') }}</td>
+                                <td>
+                                    {% if foundFileInDate %}<i class="fa fa-check"></i>{% else %}-{% endif %}
                                 </td>
                             </tr>
                         {% endfor %}
                     </table>
                 </div>
-            </div>
-            <div class="row">
                 <div class="col-md-6">
-                    <h2>Bacs Debit Date / Lloyds Date</h2>
+                    {% set aruddTotal = 0 %}
+                    {% for file in bacsAruddFiles if file.metadata['processing-date'] is defined and file.metadata['amounts'] is defined %}
+                        {% set received_date = next_business_day_historical(file.metadata['processing-date']) %}
+
+                        {% for ref,amount in file.metadata['amounts'] %}
+                            {% set amount = 0 - amount %}
+                            {% set foundFileInDate = false %}
+                            {% for lloydsFile in lloydsFiles %}
+                                {% for item in lloydsFile.getBacsTransactionsByType('bacs-arudd', received_date) %}
+                                    {% if equal_to_two_dp(amount, item) %}
+                                        {% set foundFileInDate = true %}
+                                    {% endif %}
+                                {% endfor %}
+                            {% endfor %}
+                            {% if foundFileInDate %}
+                                {% set aruddTotal = aruddTotal + amount %}
+                            {% endif %}
+                        {% endfor %}
+                    {% endfor %}
+
+                    <h3>Overview</h3>
                     <table class="table table-striped">
                         <tr>
-                            <th>Day of Month</th>
-                            <th>so-sure Debit</th>
+                            <th></th>
+                            <th>Bacs Reporting</th>
                             <th>Lloyds</th>
-                            <th>Diff</th>
-                            <th>Cumulative Diff</th>
                         </tr>
-                        {% set cumulative = 0 %}
-                        {% for day in 1..days_in_month %}
-                            {% if month < 10 and day < 10 %}
-                                {% set ymd = year ~ "0" ~ month ~ "0" ~ day %}
-                            {% elseif day < 10 %}
-                                {% set ymd = year ~ month ~ "0" ~ day %}
-                            {% elseif month < 10 %}
-                                {% set ymd = year ~ "0" ~ month ~ day %}
-                            {% else %}
-                                {% set ymd = year ~ month ~ day %}
-                            {% endif %}
-                            {% set color = '' %}
-                            {% if sosure['dailyDebitBacsTransaction'][day] is defined and lloyds['dailyDebitBacs'][ymd] is defined  %}
-                                {% if equal_to_two_dp(sosure['dailyDebitBacsTransaction'][day], lloyds['dailyDebitBacs'][ymd]) %}
-                                    {% set color = 'success' %}
+                        <tr>
+                            <td>Input</td>
+                            <td>{{ inputTotal|number_format(2, '.', ',') }}</td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>Arudd</td>
+                            <td>{{ aruddTotal|number_format(2, '.', ',') }}</td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>DDIC</td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>Total</td>
+                            <td>{{ (inputTotal + aruddTotal)|number_format(2, '.', ',') }}</td>
+                            <td>
+                                {% if month < 10 %}
+                                    {% set ym = year ~ "0" ~ month %}
                                 {% else %}
-                                    {% set color = 'danger' %}
+                                    {% set ym = year ~ month %}
                                 {% endif %}
-                            {% endif %}
-                            <tr class='{{ color }}'>
-                                <td>{{ day }}</td>
-                                <td>{% if sosure['dailyDebitBacsTransaction'][day] is defined %}£{{ sosure['dailyDebitBacsTransaction'][day]|number_format(2, '.', ',') }}{% else %}-{% endif %}</td>
-                                <td>{% if lloyds['dailyDebitBacs'][ymd] is defined %}£{{ lloyds['dailyDebitBacs'][ymd]|number_format(2, '.', ',') }}{% else %}-{% endif %}</td>
-                                <td>{% if sosure['dailyDebitBacsTransaction'][day] is defined and lloyds['dailyDebitBacs'][ymd] is defined %}
-                                        {% set diff = sosure['dailyDebitBacsTransaction'][day] - lloyds['dailyDebitBacs'][ymd] %}
-                                        {% set cumulative = cumulative + diff %}
-                                        £{{ diff|number_format(2, '.', ',') }}
-                                    {% elseif sosure['dailyDebitBacsTransaction'][day] is defined %}
-                                        {% set diff = sosure['dailyDebitBacsTransaction'][day] %}
-                                        {% set cumulative = cumulative + diff %}
-                                        £{{ diff|number_format(2, '.', ',') }}
-                                    {% elseif lloyds['dailyDebitBacs'][ymd] is defined %}
-                                        {% set diff = 0 - lloyds['dailyDebitBacs'][ymd] %}
-                                        {% set cumulative = cumulative + diff %}
-                                        £{{ diff|number_format(2, '.', ',') }}
-                                    {% else %}
-                                        -
-                                    {% endif %}
-                                </td>
-                                <td>{% if sosure['dailyDebitBacsTransaction'][day] is defined or lloyds['dailyDebitBacs'][ymd] is defined %}
-                                        £{{ cumulative|number_format(2, '.', ',') }}
-                                    {% else %}
-                                        -
-                                    {% endif %}
-                                </td>
-                            </tr>
+
+                                {% set total = 0 %}
+                                {% for file in lloydsFiles %}
+                                    {% for date,amount in file.dailyBacs %}
+                                        {% if date[:6] == ym %}
+                                          {% set total = total + amount %}
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endfor %}
+                                {{ total|number_format(2, '.', ',') }}
+                            </td>
+                        </tr>
+                    </table>
+
+                    <h2>Bacs Arudd Files</h2>
+                    <table class="table">
+                        <tr>
+                            <th>Reference</th>
+                            <th>Amount</th>
+                            <th>Processing Date</th>
+                            <th>Expected Return Date</th>
+                            <th>Lloyds</th>
+                        </tr>
+                        {% for file in bacsAruddFiles if file.metadata['processing-date'] is defined and file.metadata['amounts'] is defined %}
+                            {% set received_date = next_business_day_historical(file.metadata['processing-date']) %}
+
+                            {% for ref,amount in file.metadata['amounts'] %}
+                                {% set amount = 0 - amount %}
+                                {% set foundFileInDate = false %}
+                                {% for lloydsFile in lloydsFiles %}
+                                    {% for item in lloydsFile.getBacsTransactionsByType('bacs-arudd', received_date) %}
+                                        {% if equal_to_two_dp(amount, item) %}
+                                            {% set foundFileInDate = true %}
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endfor %}
+                                <tr class="{% if amount is null or received_date|date('m') != month %}hidden{% elseif foundFileInDate %}bg-success{% else %}bg-danger{% endif %}">
+                                    <td><span title="{{ file.key }}">{{ ref }}</span></td>
+                                    <td>{{ amount|default('-') }}</td>
+                                    <td>{{ file.metadata['processing-date'] }}</td>
+                                    <td>{{ received_date|date('Y-m-d') }}</td>
+                                    <td>
+                                        {% if foundFileInDate %}<i class="fa fa-check"></i>{% else %}-{% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        {% endfor %}
+                    </table>
+
+                    <h2>Bacs DDIC Files</h2>
+                    <table class="table">
+                        <tr>
+                            <th>Reference</th>
+                            <th>Amount</th>
+                            <th>Processing Date</th>
+                            <th>Expected Return Date</th>
+                            <th>Lloyds</th>
+                        </tr>
+                        {% for file in bacsDdicFiles if file.metadata['processing-date'] is defined and file.metadata['amounts'] is defined %}
+                            {% set received_date = next_business_day_historical(file.metadata['processing-date']) %}
+
+                            {% for ref,amount in file.metadata['amounts'] %}
+                                {% set amount = 0 - amount %}
+                                {% set foundFileInDate = false %}
+                                {% for lloydsFile in lloydsFiles %}
+                                    {% for item in lloydsFile.getBacsTransactionsByType('bacs-arudd', received_date) %}
+                                        {% if equal_to_two_dp(amount, item) %}
+                                            {% set foundFileInDate = true %}
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endfor %}
+                                <tr class="{% if amount is null or received_date|date('m') != month %}hidden{% elseif foundFileInDate %}bg-success{% else %}bg-danger{% endif %}">
+                                    <td><span title="{{ file.key }}">{{ ref }}</span></td>
+                                    <td>{{ amount|default('-') }}</td>
+                                    <td>{{ file.metadata['processing-date'] }}</td>
+                                    <td>{{ received_date|date('Y-m-d') }}</td>
+                                    <td>
+                                        {% if foundFileInDate %}<i class="fa fa-check"></i>{% else %}-{% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
                         {% endfor %}
                     </table>
                 </div>

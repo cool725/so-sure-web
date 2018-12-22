@@ -1871,7 +1871,7 @@ class Claim
         ];
     }
 
-    public function getExpectedExcessValue($oldCalculation = false)
+    public function getExpectedExcessValue($type = null, $oldCalculation = false)
     {
         if (in_array($this->getStatus(), [
             Claim::STATUS_DECLINED,
@@ -1880,20 +1880,24 @@ class Claim
             return 0;
         }
 
+        if (!$type) {
+            $type = $this->getType();
+        }
+
         if ($oldCalculation) {
             /** @var PhonePolicy $phonePolicy */
             $phonePolicy = $this->getPolicy();
             $picSureEnabled = $phonePolicy->isPicSurePolicy();
             $picSureValidated = $phonePolicy->isPicSureValidatedIncludingClaim($this);
 
-            return self::getExcessValue($this->getType(), $picSureValidated, $picSureEnabled);
+            return self::getExcessValue($type, $picSureValidated, $picSureEnabled);
         }
 
         if (!$this->getExpectedExcess()) {
             throw new \Exception(sprintf('Missing expected excess for claim %s', $this->getId()));
         }
 
-        return $this->getExpectedExcess()->getValue($this->getType());
+        return $this->getExpectedExcess()->getValue($type);
     }
 
     public function getProofOfUsageFiles()

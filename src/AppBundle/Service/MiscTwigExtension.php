@@ -1,6 +1,7 @@
 <?php
 namespace AppBundle\Service;
 
+use AppBundle\Document\DateTrait;
 use AppBundle\Document\ImeiTrait;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Psr\Log\LoggerInterface;
@@ -12,6 +13,7 @@ class MiscTwigExtension extends \Twig_Extension
 {
     use CurrencyTrait;
     use ImeiTrait;
+    use DateTrait;
 
     /** @var RequestStack */
     protected $requestStack;
@@ -52,7 +54,14 @@ class MiscTwigExtension extends \Twig_Extension
             new \Twig_SimpleFunction('random_imei', [$this, 'generateRandomImei']),
             new \Twig_SimpleFunction('random_serial', [$this, 'generateRandomAppleSerialNumber']),
             new \Twig_SimpleFunction('route_exists', [$this, 'routeExists']),
+            new \Twig_SimpleFunction('next_business_day_historical', [$this, 'getNextBusinessDayByString']),
+            new \Twig_SimpleFunction('unserialise', [$this, 'unserialise']),
         );
+    }
+
+    public function unserialise($data)
+    {
+        return unserialize($data);
     }
 
     public function jsonDecode($json)
@@ -74,6 +83,11 @@ class MiscTwigExtension extends \Twig_Extension
         } catch (RouteNotFoundException $e) {
             return false;
         }
+    }
+
+    public function getNextBusinessDayByString($date)
+    {
+        return $this->getNextBusinessDayHistorical(\DateTime::createFromFormat('Y-m-d', $date));
     }
 
     public function getName()
