@@ -967,7 +967,7 @@ class UserControllerTest extends BaseControllerTest
         );
         self::setPaymentMethod($user);
         $oneMonthTwoWeeksAgo = \DateTime::createFromFormat('U', time());
-        $oneMonthTwoWeeksAgo = $oneMonthTwoWeeksAgo->sub(new \DateInterval('P45D'));
+        $oneMonthTwoWeeksAgo = $oneMonthTwoWeeksAgo->sub(new \DateInterval('P40D'));
         $policy = self::initPolicy($user, self::$dm, $phone, $oneMonthTwoWeeksAgo, true, true);
         $policy->setStatus(Policy::STATUS_UNPAID);
         self::$dm->flush();
@@ -981,6 +981,8 @@ class UserControllerTest extends BaseControllerTest
         /** @var FeatureService $featureService */
         $featureService = $this->getContainer(true)->get('app.feature');
         $this->assertTrue($featureService->isEnabled(Feature::FEATURE_BACS));
+
+        $this->assertTrue($policy->canBacsPaymentBeMadeInTime());
 
         $crawler = $this->login($email, $password, 'user/unpaid');
 
@@ -1048,7 +1050,7 @@ class UserControllerTest extends BaseControllerTest
         $oneMonthAgo = \DateTime::createFromFormat('U', time());
         $oneMonthAgo = $oneMonthAgo->sub(new \DateInterval('P1M'));
         $oneMonthTwoWeeksAgo = \DateTime::createFromFormat('U', time());
-        $oneMonthTwoWeeksAgo = $oneMonthTwoWeeksAgo->sub(new \DateInterval('P45D'));
+        $oneMonthTwoWeeksAgo = $oneMonthTwoWeeksAgo->sub(new \DateInterval('P40D'));
         $policy = self::initPolicy($user, self::$dm, $phone, $oneMonthTwoWeeksAgo, true, true);
         $policy->setStatus(Policy::STATUS_UNPAID);
         static::addPayment(
@@ -1070,6 +1072,8 @@ class UserControllerTest extends BaseControllerTest
         /** @var FeatureService $featureService */
         $featureService = $this->getContainer(true)->get('app.feature');
         $this->assertTrue($featureService->isEnabled(Feature::FEATURE_BACS));
+
+        $this->assertTrue($policy->canBacsPaymentBeMadeInTime());
 
         $crawler = $this->login($email, $password, 'user/unpaid');
 
@@ -1127,7 +1131,7 @@ class UserControllerTest extends BaseControllerTest
         );
         self::setPaymentMethod($user, '0116');
         $oneMonthTwoWeeksAgo = \DateTime::createFromFormat('U', time());
-        $oneMonthTwoWeeksAgo = $oneMonthTwoWeeksAgo->sub(new \DateInterval('P45D'));
+        $oneMonthTwoWeeksAgo = $oneMonthTwoWeeksAgo->sub(new \DateInterval('P40D'));
         $policy = self::initPolicy($user, self::$dm, $phone, $oneMonthTwoWeeksAgo, true, true);
         $policy->setStatus(Policy::STATUS_UNPAID);
         self::$dm->flush();
@@ -1141,6 +1145,8 @@ class UserControllerTest extends BaseControllerTest
         /** @var FeatureService $featureService */
         $featureService = $this->getContainer(true)->get('app.feature');
         $this->assertTrue($featureService->isEnabled(Feature::FEATURE_BACS));
+
+        $this->assertTrue($policy->canBacsPaymentBeMadeInTime());
 
         $crawler = $this->login($email, $password, 'user/unpaid');
 
