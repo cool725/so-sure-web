@@ -170,7 +170,7 @@ trait UserClassTrait
 
     public static function generateRandomMobile()
     {
-        $mobile = sprintf('+4477009%05d', rand(1, 99999));
+        $mobile = sprintf('+4477009%05d', random_int(1, 99999));
         if (mb_strlen($mobile) != 13) {
             throw new \Exception('Random mobile is not the right length');
         }

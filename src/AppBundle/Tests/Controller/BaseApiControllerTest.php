@@ -62,9 +62,8 @@ class BaseApiControllerTest extends BaseControllerTest
         if ($clearRateLimit) {
             $this->clearRateLimit();
         }
-        $imei = self::generateRandomImei();
         $phonePolicy = [
-            'imei' => $imei,
+            'imei' => self::generateRandomImei(),
             'make' => 'OnePlus',
             'device' => 'A0001',
             'serial_number' => 'foo',
@@ -84,6 +83,15 @@ class BaseApiControllerTest extends BaseControllerTest
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy', [
             'phone_policy' => $phonePolicy
         ]);
+
+        // retry with a new imei if failing
+        if ($this->getClientResponseStatusCode() != 200) {
+            $phonePolicy['imei'] = self::generateRandomImei();
+            $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy', [
+                'phone_policy' => $phonePolicy
+            ]);
+        }
+
         $this->verifyResponse(200);
 
         return $crawler;
@@ -99,6 +107,16 @@ class BaseApiControllerTest extends BaseControllerTest
             'mobile_number' => static::generateRandomMobile(),
             'birthday' => $birthday->format(\DateTime::ATOM),
         ]);
+
+        // retry with a new mobile number if failing
+        if ($this->getClientResponseStatusCode() != 200) {
+            static::putRequest(self::$client, $cognitoIdentityId, $userUpdateUrl, [
+                'first_name' => 'foo',
+                'last_name' => 'bar',
+                'mobile_number' => static::generateRandomMobile(),
+                'birthday' => $birthday->format(\DateTime::ATOM),
+            ]);
+        }
         $this->verifyResponse(200);
 
         $url = sprintf('/api/v1/auth/user/%s/address', $user->getId());
