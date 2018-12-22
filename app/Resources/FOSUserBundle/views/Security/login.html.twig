@@ -38,7 +38,7 @@
                      data-csrf="{{ csrf_token('account-kit') }}"
                      data-toggle="{% if app.request.clientIp == davies_ip %}1{% else %}0{% endif %}">
                     <form id="login-account-kit-form"
-                          method="get"
+                          method="post"
                           action="https://www.accountkit.com/v1.0/basic/dialog/sms_login/" autocomplete="off"
                           data-client-validation="{{ form_client_validation }}">
                         <input type="hidden" value="+44" id="country_code" class="form-control" />
