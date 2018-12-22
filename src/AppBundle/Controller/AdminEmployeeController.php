@@ -829,7 +829,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         $imei = new Imei();
         $imei->setPolicy($policy);
         if ($policy->getDetectedImei()) {
-           $imei->setImei($policy->getDetectedImei());
+            $imei->setImei($policy->getDetectedImei());
         } else {
             $imei->setImei($request->get('detected-imei'));
         }
