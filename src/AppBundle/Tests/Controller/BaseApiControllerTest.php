@@ -69,8 +69,10 @@ class BaseApiControllerTest extends BaseControllerTest
             'serial_number' => 'foo',
             'memory' => 63,
             'rooted' => false,
-            'validation_data' => $this->getValidationData($cognitoIdentityId, ['imei' => $imei]),
         ];
+        $phonePolicy['validation_data'] = $this->getValidationData($cognitoIdentityId, [
+            'imei' => $phonePolicy['imei']
+        ]);
         if ($phone) {
             $phonePolicy['make'] = $phone->getMake();
             $phonePolicy['device'] = $phone->getDevices()[0];
@@ -87,6 +89,9 @@ class BaseApiControllerTest extends BaseControllerTest
         // retry with a new imei if failing
         if ($this->getClientResponseStatusCode() != 200) {
             $phonePolicy['imei'] = self::generateRandomImei();
+            $phonePolicy['validation_data'] = $this->getValidationData($cognitoIdentityId, [
+                'imei' => $phonePolicy['imei']
+            ]);
             $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy', [
                 'phone_policy' => $phonePolicy
             ]);
