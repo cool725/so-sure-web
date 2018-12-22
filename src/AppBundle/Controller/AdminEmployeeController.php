@@ -828,7 +828,11 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
 
         $imei = new Imei();
         $imei->setPolicy($policy);
-        $imei->setImei($policy->getDetectedImei());
+        if ($policy->getDetectedImei()) {
+           $imei->setImei($policy->getDetectedImei());
+        } else {
+            $imei->setImei($request->get('detected-imei'));
+        }
         $imeiForm = $this->get('form.factory')
             ->createNamedBuilder('imei_form', DetectedImeiType::class, $imei)
             ->setAction($this->generateUrl(
@@ -2372,6 +2376,31 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             'charges' => $charges,
             'form' => $form->createView(),
         ];
+    }
+
+    /**
+     * @Route("/detected-imei-search", name="admin_detected_imei_search")
+     * @Template
+     */
+    public function detectedImeiSearchAction(Request $request)
+    {
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(PhonePolicy::class);
+        $imei = $request->get('imei');
+        $detectedImei = $request->get('detected-imei');
+        if (!$imei) {
+            throw $this->createNotFoundException('Missing imei');
+        }
+
+        $policy = $repo->findOneBy(['imei' => $imei]);
+        if ($policy) {
+            return new RedirectResponse($this->generateUrl('admin_policy', [
+                'id' => $policy->getId(),
+                'detected-imei' => $detectedImei,
+            ]));
+        } else {
+            throw $this->createNotFoundException('Not found imei');
+        }
     }
 
     /**

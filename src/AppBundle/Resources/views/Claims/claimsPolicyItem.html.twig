@@ -1286,7 +1286,7 @@
             </table>
 
             {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:AdminEmployee:imeiForm', 'policy': policy, 'id': 'imeiForm'} %}
-            {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:AdminEmployee:detectedImeiForm', 'policy': policy, 'id': 'detectedImeiForm'} %}
+            {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:AdminEmployee:detectedImeiForm', 'params': {'id': policy.id, 'detected-imei': app.request.get('detected-imei')}, 'id': 'detectedImeiForm'} %}
             {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:AdminEmployee:picsureForm', 'policy': policy, 'id': 'picsureForm'} %}
             {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:AdminEmployee:tasteCardForm', 'policy': policy, 'id': 'tasteCardForm', 'title': 'Taste Card Settings'} %}
             {% if is_granted('ROLE_ADMIN') %}
