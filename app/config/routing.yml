@@ -49,7 +49,8 @@ fos_user_resetting_request:
 fos_user_resetting_send_email:
     path: /resetting/send-email
     defaults:
-        _controller: FOSUserBundle:Resetting:sendEmail
+        _controller: AppBundle:FOSUser:sendEmail
+#        _controller: FOSUserBundle:Resetting:sendEmail
         path: /send-email
         method: POST
 

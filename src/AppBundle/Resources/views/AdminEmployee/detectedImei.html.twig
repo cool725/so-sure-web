@@ -17,8 +17,9 @@
             {# TODO: Heading area #}
             <div class="d-lg-flex align-items-lg-center justify-content-lg-between mb-3">
                 <h1 class="h2">Detected IMEI</h1>
-                <form action="{{ path('admin_policies') }}" method="GET">
+                <form id="search-form" action="{{ path('admin_detected_imei_search') }}" method="GET" target="_blank">
                     <input type="text" name="imei" placeholder="IMEI Search">
+                    <input type="text" name="detected-imei" placeholder="Detected IMEI" class="search-detected-imei">
                     <button type="submit" class="btn btn-success">Search</button>
                 </form>
             </div>
@@ -48,11 +49,12 @@
                                 <td>{% if imei['suggested_imei']|length > 0  %} {{ imei['suggested_imei'] }}{% else %}n/a{% endif %}</td>
                                 <td><a href="{{ s3DownloadLink(imei['bucket'], imei['key']) }}" target="_blank" rel="noopener noreferrer" title="{{ imei.key }}"><i class="fal fa-link mr-2"></i> See image</a></td>
                                 <td>
-                                    <form id="delete" action="{{ path('admin_delete_detected_imei') }}" method="POST">
+                                    <form id="delete-{{ imei['detected_imei']  }}" action="{{ path('admin_delete_detected_imei') }}" method="POST">
                                         <input type="hidden" name="item" value="{{ imei['raw'] }}">
                                         <button type="submit" value="Submit" class="btn btn-danger">
                                             <i class="fa fa-trash" aria-hidden="true"></i>
                                         </button>
+                                        <button type="button" name="select" value="{{ imei['detected_imei'] }}" class="btn btn-success btn-detected-imei">Use <i class="fa fa-arrow-up"></i> </button>
                                     </form>
                                 </td>
                             </tr>
@@ -68,5 +70,5 @@
 {% endblock %}
 
 {% block javascriptsPage %}
-    {# <script src="{{ asset('css-js/homepage.js') }}"></script> #}
+    <script src="{{ asset('css-js/detected-imei.js') }}"></script>
 {% endblock %}

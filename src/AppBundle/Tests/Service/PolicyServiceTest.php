@@ -2240,7 +2240,7 @@ class PolicyServiceTest extends WebTestCase
         $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyA->getStatus());
         $this->assertNotNull($policyA->getCashback());
         $this->assertEquals(Cashback::STATUS_PENDING_CLAIMABLE, $policyA->getCashback()->getStatus());
-        
+
         static::$policyService->expire($policyA, new \DateTime('2017-01-01'));
         $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $policyA->getStatus());
         $this->assertEquals(Cashback::STATUS_PENDING_CLAIMABLE, $policyA->getCashback()->getStatus());
@@ -2440,7 +2440,7 @@ class PolicyServiceTest extends WebTestCase
         }
         $this->assertTrue($exception);
     }
-    
+
     public function testCancelPolicyUnpaidAfter15()
     {
         $user = static::createUser(

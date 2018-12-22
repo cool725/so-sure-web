@@ -49,6 +49,7 @@ use AppBundle\Classes\ApiErrorCode;
 
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\CurrencyTrait;
+use AppBundle\Document\ValidatorTrait;
 
 use AppBundle\Document\Phone;
 use AppBundle\Document\Policy;
@@ -99,6 +100,7 @@ class PurchaseController extends BaseController
 {
     use CurrencyTrait;
     use DateTrait;
+    use ValidatorTrait;
 
     /**
      * Note that any changes to actual path routes need to be reflected in the Google Analytics Goals
@@ -1301,42 +1303,63 @@ class PurchaseController extends BaseController
                 $cancelForm->handleRequest($request);
                 if ($cancelForm->isValid()) {
                     $reason = $cancelForm->getData()['reason'];
-                    $other = $cancelForm->getData()['othertxt'];
-
-                    // @codingStandardsIgnoreStart
-                    $body = sprintf(
-                        "This is a so-sure generated message. Policy: <a href='%s'>%s/%s</a> requested a cancellation via the site as phone was damaged (%s) prior to purchase. so-sure support team: Please contact the policy holder to get their reason(s) for cancelling before action. Additional comments: %s",
-                        $this->generateUrl(
-                            'admin_policy',
-                            ['id' => $policy->getId()],
-                            UrlGeneratorInterface::ABSOLUTE_URL
-                        ),
-                        $policy->getPolicyNumber(),
-                        $policy->getId(),
-                        $reason,
-                        $other
-                    );
-                    // @codingStandardsIgnoreEnd
-
-                    if (!$policy->hasRequestedCancellation()) {
+                    $other = $this->conformAlphanumericSpaceDot($cancelForm->getData()['othertxt'], 256);
+                    $flash = null;
+                    $canCancelCooloff = $policy->canCancel(Policy::CANCELLED_COOLOFF, null, false, false);
+                    if ($canCancelCooloff) {
                         $policy->setRequestedCancellation(\DateTime::createFromFormat('U', time()));
                         $policy->setRequestedCancellationReason($reason);
+                        if ($other) {
+                            $policy->setRequestedCancellationReasonOther($other);
+                        }
+                        $this->get("app.policy")->cancel($policy, Policy::CANCELLED_COOLOFF);
+                        $dm->flush();
+                        $flash = "You should receive an email confirming that your policy is now cancelled.";
+                        $this->get("app.stats")->increment(Stats::AUTO_CANCEL_IN_COOLOFF);
+                    } elseif (!$policy->hasRequestedCancellation()) {
+                        // @codingStandardsIgnoreStart
+                        $flash = "We have passed your request to our policy team. You should receive a cancellation email once that is processed.";
+                        $message = "This is a so-sure generated message. Policy: <a href='%s'>%s/%s</a> requested a cancellation via the site. %s was given as the reason. so-sure support team: Please contact the policy holder to get their reason(s) for cancelling before action. Additional comments: %s";
+                        // @codingStandardsIgnoreEnd
+                        $policy->setRequestedCancellation(\DateTime::createFromFormat('U', time()));
+                        $policy->setRequestedCancellationReason($reason);
+                        if ($other) {
+                            $policy->setRequestedCancellationReasonOther($other);
+                        }
                         $dm->flush();
                         $intercom = $this->get('app.intercom');
-                        $intercom->queueMessage($policy->getUser()->getEmail(), $body);
+                        $intercom->queueMessage(
+                            $policy->getUser()->getEmail(),
+                            sprintf(
+                                $message,
+                                $this->generateUrl(
+                                    'admin_policy',
+                                    ['id' => $policy->getId()],
+                                    UrlGeneratorInterface::ABSOLUTE_URL
+                                ),
+                                $policy->getPolicyNumber(),
+                                $policy->getId(),
+                                $reason,
+                                $other
+                            )
+                        );
+                    } else {
+                        $this->addFlash(
+                            "warning",
+                            "Cancellation has already been requested and is currently processing."
+                        );
                     }
-
-                    $this->get('app.mixpanel')->queueTrack(
-                        MixpanelService::EVENT_REQUEST_CANCEL_POLICY,
-                        ['Policy Id' => $policy->getId(), 'Reason' => $reason]
-                    );
-
-                    // @codingStandardsIgnoreStart
-                    $this->addFlash(
-                        'success',
-                        'We have passed your request to our policy team. You should receive a cancellation email once that is processed.'
-                    );
-                    // @codingStandardsIgnoreEnd
+                    if ($flash) {
+                        $this->addFlash("success", $flash);
+                        $this->get('app.mixpanel')->queueTrack(
+                            MixpanelService::EVENT_REQUEST_CANCEL_POLICY,
+                            [
+                                'Policy Id' => $policy->getId(),
+                                'Reason' => $reason,
+                                'Auto Approved' => $canCancelCooloff
+                            ]
+                        );
+                    }
                     return $this->redirectToRoute('purchase_cancel_requested', ['id' => $id]);
                 }
             }

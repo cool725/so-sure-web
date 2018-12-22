@@ -25,7 +25,7 @@ trait ImeiTrait
     {
         $imei = [];
         for ($i = 0; $i < 14; $i++) {
-            $imei[$i] = rand(0, 9);
+            $imei[$i] = random_int(0, 9);
         }
 
         $result = self::luhnGenerate(implode($imei));

@@ -545,6 +545,14 @@ abstract class Policy
     protected $requestedCancellationReason;
 
     /**
+     * @AppAssert\AlphanumericSpaceDot()
+     * @Assert\Length(min="1", max="256")
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
+    protected $requestedCancellationReasonOther;
+
+    /**
      * @Assert\DateTime()
      * @MongoDB\Field(type="date")
      * @Gedmo\Versioned
@@ -2373,6 +2381,16 @@ abstract class Policy
         return $this->requestedCancellationReason;
     }
 
+    public function setRequestedCancellationReasonOther($requestedCancellationReasonOther)
+    {
+        $this->requestedCancellationReasonOther = $requestedCancellationReasonOther;
+    }
+
+    public function getRequestedCancellationReasonOther()
+    {
+        return $this->requestedCancellationReasonOther;
+    }
+
     public function setVisitedWelcomePage(\DateTime $date)
     {
         $this->visitedWelcomePage = $date;
@@ -3230,7 +3248,7 @@ abstract class Policy
         return $this->isCancelled() && $this->getCancelledReason() == $reason;
     }
 
-    public function canCancel($reason, $date = null, $ignoreClaims = false)
+    public function canCancel($reason, $date = null, $ignoreClaims = false, $extendedCooloff = true)
     {
         // Doesn't make sense to cancel
         if (in_array($this->getStatus(), [
@@ -3252,7 +3270,7 @@ abstract class Policy
         }
 
         if ($reason == Policy::CANCELLED_COOLOFF) {
-            return $this->isWithinCooloffPeriod($date) && !$this->hasMonetaryClaimed(true);
+            return $this->isWithinCooloffPeriod($date, $extendedCooloff) && !$this->hasMonetaryClaimed(true);
         }
 
         if ($reason == Policy::CANCELLED_UNPAID) {
@@ -5040,17 +5058,25 @@ abstract class Policy
         $premium = $this->getPremium();
 
         $expectedCommission = null;
+        $totalPayments = $this->getTotalSuccessfulStandardPayments(false, $date);
+        $numPayments = $premium->getNumberOfMonthlyPayments($totalPayments);
+        if ($numPayments > 12 || $numPayments < 0) {
+            throw new \Exception(sprintf('Unable to calculate expected broker fees for policy %s', $this->getId()));
+        }
+
         // active/unpaid should be on a cash received based
         // also if a policy has been cancelled and there is no refund allowed, then should be based on cash recevied
         if ($this->isCooloffCancelled()) {
             return 0;
         } elseif (in_array($this->getStatus(), [self::STATUS_ACTIVE, self::STATUS_UNPAID]) ||
             ($this->isCancelled() && !$this->isRefundAllowed())) {
-            $totalPayments = $this->getTotalSuccessfulStandardPayments(false, $date);
-            $numPayments = $premium->getNumberOfMonthlyPayments($totalPayments);
-            if ($numPayments > 12 || $numPayments < 0) {
-                throw new \Exception(sprintf('Unable to calculate expected broker fees for policy %s', $this->getId()));
-            }
+            $expectedCommission = $salva->sumBrokerFee($numPayments, $numPayments == 12);
+        } elseif (in_array($this->getStatus(), [
+            self::STATUS_EXPIRED,
+            self::STATUS_EXPIRED_CLAIMABLE,
+            self::STATUS_EXPIRED_WAIT_CLAIM]) && $numPayments == 11) {
+            // we've had a historical issue where if a policy has had 11 payments, and the cancellation date is at the
+            // same day as the expiration date, we dont' quite cancel in time.
             $expectedCommission = $salva->sumBrokerFee($numPayments, $numPayments == 12);
         } else {
             if (!$date) {

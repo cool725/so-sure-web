@@ -1,19 +1,19 @@
 <div class="modal fade confirmModal" id="{{ id }}" tabindex="-1" role="dialog">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content" style="border-radius: 6px;">
-            <div class="modal-header" style="border-top-left-radius: 6px; border-top-right-radius: 6px;">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-                <h4 class="modal-title">
-                    {% if title is defined %}{{ title }}{% else %}Warning{% endif %}
-                </h4>
-            </div>
-            {% if policy is defined %}
-                {{ render(controller(route, {'id': policy.id})) }}
-            {% else %}
-                {{ render(controller(route)) }}
-            {% endif %}
-        </div>
+  <div class="modal-dialog" role="document">
+    <div class="modal-content" style="border-radius: 6px;">
+      <div class="modal-header" style="border-top-left-radius: 6px; border-top-right-radius: 6px;">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+              aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title">
+            {% if title is defined %}{{ title }}{% else %}Warning{% endif %}
+        </h4>
+      </div>
+
+      {% if params is defined %}
+        {{ render(controller(route, params)) }}
+      {% else %}
+        {{ render(controller(route, {'id': policy.id})) }}
+      {% endif %}
     </div>
 </div>

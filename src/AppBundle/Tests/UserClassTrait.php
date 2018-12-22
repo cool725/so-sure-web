@@ -170,7 +170,7 @@ trait UserClassTrait
 
     public static function generateRandomMobile()
     {
-        $mobile = sprintf('+4477009%05d', rand(1, 99999));
+        $mobile = sprintf('+4477009%05d', random_int(1, 99999));
         if (mb_strlen($mobile) != 13) {
             throw new \Exception('Random mobile is not the right length');
         }
@@ -227,12 +227,13 @@ trait UserClassTrait
         $date = null,
         $addPayment = false,
         $createPolicy = false,
-        $monthly = true
+        $monthly = true,
+        $imei = null
     ) {
         self::addAddress($user);
 
         $policy = new SalvaPhonePolicy();
-        $policy->setImei(self::generateRandomImei());
+        $policy->setImei($imei ?: self::generateRandomImei());
         $policy->init($user, self::getLatestPolicyTerms($dm));
 
         if ($phone) {
