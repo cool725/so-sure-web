@@ -15,6 +15,8 @@ class Stats
     const INSTALL_GOOGLE = 'install-google';
     const MIXPANEL_TOTAL_SITE_VISITORS = 'mixpanel-total-site-visitors';
 
+    const AUTO_CANCEL_IN_COOLOFF = 'auto-cancel-in-cooloff';
+
     // Moved to MIXPANEL_CPC_QUOTES_UK mid June 2017
     const MIXPANEL_LANDING_UK = 'mixpanel-landing-uk';
     const MIXPANEL_CPC_QUOTES_UK = 'mixpanel-cpc-quotes-uk';
@@ -107,7 +109,7 @@ class Stats
     {
         return $this->id;
     }
-    
+
     public function getDate()
     {
         return $this->date;
@@ -117,7 +119,7 @@ class Stats
     {
         $this->date = $date;
     }
-    
+
     public function getName()
     {
         return $this->name;

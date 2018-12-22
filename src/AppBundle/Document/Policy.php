@@ -544,6 +544,14 @@ abstract class Policy
     protected $requestedCancellationReason;
 
     /**
+     * @AppAssert\AlphanumericSpaceDot()
+     * @Assert\Length(min="1", max="256")
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
+    protected $requestedCancellationReasonOther;
+
+    /**
      * @Assert\DateTime()
      * @MongoDB\Field(type="date")
      * @Gedmo\Versioned
@@ -2372,6 +2380,16 @@ abstract class Policy
         return $this->requestedCancellationReason;
     }
 
+    public function setRequestedCancellationReasonOther($requestedCancellationReasonOther)
+    {
+        $this->requestedCancellationReasonOther = $requestedCancellationReasonOther;
+    }
+
+    public function getRequestedCancellationReasonOther()
+    {
+        return $this->requestedCancellationReasonOther;
+    }
+
     public function setVisitedWelcomePage(\DateTime $date)
     {
         $this->visitedWelcomePage = $date;
@@ -3229,7 +3247,7 @@ abstract class Policy
         return $this->isCancelled() && $this->getCancelledReason() == $reason;
     }
 
-    public function canCancel($reason, $date = null, $ignoreClaims = false)
+    public function canCancel($reason, $date = null, $ignoreClaims = false, $extendedCooloff = true)
     {
         // Doesn't make sense to cancel
         if (in_array($this->getStatus(), [
@@ -3251,7 +3269,7 @@ abstract class Policy
         }
 
         if ($reason == Policy::CANCELLED_COOLOFF) {
-            return $this->isWithinCooloffPeriod($date) && !$this->hasMonetaryClaimed(true);
+            return $this->isWithinCooloffPeriod($date, $extendedCooloff) && !$this->hasMonetaryClaimed(true);
         }
 
         if ($reason == Policy::CANCELLED_UNPAID) {
