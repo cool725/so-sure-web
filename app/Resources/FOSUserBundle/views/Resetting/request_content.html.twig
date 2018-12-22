@@ -22,6 +22,8 @@
             <div class="form-group">
                 <a href="{{ path('fos_user_security_login') }}" class="btn btn-link btn-block"><i class="far fa-arrow-left"></i> back to login</a>
             </div>
+
+            <input type="hidden" name="token" value="{{ csrf_token('default') }}" />
         </form>
     </div>
 </div>

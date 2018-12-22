@@ -101,4 +101,16 @@ class FOSUserController extends ResettingController
             'form' => $form->createView(),
         ));
     }
+
+    /**
+     * check for valid csrf and send reset email
+     */
+    public function sendEmailAction(Request $request)
+    {
+        if (!$this->isCsrfTokenValid('default', $request->get('token'))) {
+            throw new \InvalidArgumentException('Invalid csrf token');
+        }
+
+        return parent::sendEmailAction($request);
+    }
 }
