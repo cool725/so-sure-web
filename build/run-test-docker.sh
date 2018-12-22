@@ -15,4 +15,4 @@ cd /var/sosure
 /var/ops/scripts/run-encore.sh /var/sosure test
 
 cd /var/sosure
-./build/run-test-functional.sh
+./build/run-test-functional.sh -l
