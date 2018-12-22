@@ -401,6 +401,9 @@ ewz_recaptcha:
     enabled:     true
 
 nelmio_security:
+    xss_protection:
+        enabled: true
+        mode_block: true
     content_type:
         nosniff: true
     referrer_policy:
