@@ -63,6 +63,19 @@ class ClaimInfoType extends AbstractType
                     return $dr->findActiveInactive();
                 }
             ])
+            ->add('status', ChoiceType::class, [
+                'required' => true,
+                'choices' => [
+                    Claim::STATUS_FNOL => Claim::STATUS_FNOL,
+                    Claim::STATUS_SUBMITTED => Claim::STATUS_SUBMITTED,
+                    Claim::STATUS_INREVIEW => Claim::STATUS_INREVIEW,
+                    Claim::STATUS_APPROVED => Claim::STATUS_APPROVED,
+                    Claim::STATUS_SETTLED => Claim::STATUS_SETTLED,
+                    Claim::STATUS_DECLINED => Claim::STATUS_DECLINED,
+                    Claim::STATUS_WITHDRAWN => Claim::STATUS_WITHDRAWN,
+                    Claim::STATUS_PENDING_CLOSED => Claim::STATUS_PENDING_CLOSED,
+                ]
+            ])
             /*
             ->add('replacementPhone', ChoiceType::class, [
                 'choices' => $this->dm->getRepository(Phone::class)->findActiveInactive()->getQuery()->execute(),

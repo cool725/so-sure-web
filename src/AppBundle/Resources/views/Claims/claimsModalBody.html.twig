@@ -547,15 +547,25 @@
                         </div>
                     </div>
 
-                    <div class="form-group">
-                        <label><i class="fa fa-lock" title="Admin only"></i> Approved Date</label>
-                        {% if is_granted('ROLE_ADMIN') %}
-                            {{ form_widget(form.approvedDate, {'attr': {'class': 'form-control'}}) }}
-                        {% else %}
-                            {{ form_widget(form.approvedDate, {'attr': {'class': 'form-control', 'disabled': 'disabled'}}) }}
-                        {% endif %}
-                    </div>
+                    {% if is_granted('ROLE_ADMIN') %}
+                        <div class="form-group">
+                            <label><i class="fa fa-lock" title="Admin only"></i> Claim Status</label>
+                            {{ form_widget(form.status, {'attr': {'class': 'form-control'}}) }}
+                        </div>
 
+                        <div class="form-group">
+                            <label><i class="fa fa-lock" title="Admin only"></i> Approved Date</label>
+                                {{ form_widget(form.approvedDate, {'attr': {'class': 'form-control'}}) }}
+                        </div>
+                        <div class="help-block row">
+                            <div class="col-xs-12">
+                                Replacement Received Date: {{ claim.replacementReceivedDate|date('Y-m-d') }}
+                            </div>
+                        </div>
+                    {% else %}
+                        {% do form.status.setRendered %}
+                        {% do form.approvedDate.setRendered %}
+                    {% endif %}
                     <div class="modal-footer">
                         {% if is_granted('ROLE_ADMIN') %}
                             <button id="delete-claim" type="button" class="btn btn-danger pull-left">
