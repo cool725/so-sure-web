@@ -765,10 +765,11 @@ class DirectGroupService extends ExcelSftpService
             }
         } elseif ($claim->isClosed() && $claim->getStatus() != $directGroupClaim->getClaimStatus()) {
             $msg = sprintf(
-                'Claim %s was previously closed (%s), however status is now %s. SO-SURE to investigate',
+                'Claim %s was previously closed (%s), however status is now %s (%s). SO-SURE to investigate',
                 $directGroupClaim->claimNumber,
                 $claim->getStatus(),
-                $directGroupClaim->getClaimStatus()
+                $directGroupClaim->getClaimStatus() ?: 'open',
+                $directGroupClaim->status
             );
             $this->sosureActions[$directGroupClaim->claimNumber][] = $msg;
         }

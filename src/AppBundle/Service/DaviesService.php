@@ -678,10 +678,11 @@ class DaviesService extends S3EmailService
             }
         } elseif ($claim->isClosed() && $claim->getStatus() != $daviesClaim->getClaimStatus()) {
             $msg = sprintf(
-                'Claim %s was previously closed (%s), however status is now %s. SO-SURE to investigate',
+                'Claim %s was previously closed (%s), however status is now %s (%s). SO-SURE to investigate',
                 $daviesClaim->claimNumber,
                 $claim->getStatus(),
-                $daviesClaim->getClaimStatus()
+                $daviesClaim->getClaimStatus() ?: 'open',
+                $daviesClaim->miStatus
             );
             $this->sosureActions[$daviesClaim->claimNumber][] = $msg;
         }
