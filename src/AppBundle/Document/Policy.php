@@ -3442,6 +3442,14 @@ abstract class Policy
         $billingDate->add(new \DateInterval('P30D'));
         $billingDate = $this->startOfDay($billingDate);
 
+        // Unpaid policies with a cancellation date after the end of policy, should be adjusted to cancel
+        // 1 day prior to end date
+        if ($this->getStatus() == self::STATUS_UNPAID && $billingDate > $this->getEnd()) {
+            $billingDate = clone $this->getEnd();
+            $billingDate->sub(new \DateInterval('P1D'));
+            $billingDate = $this->startOfDay($billingDate);
+        }
+
         return $billingDate;
     }
 
