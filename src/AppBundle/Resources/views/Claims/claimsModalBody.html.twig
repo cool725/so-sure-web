@@ -532,7 +532,13 @@
 
                     <div class="form-group">
                         <label><i class="fa fa-shield" title="Requires customer service role"></i> Replacement IMEI</label>
-                            {{ form_widget(form.replacementImei, {'attr': {'class': 'form-control'}}) }}
+                            {{ form_widget(form.replacementImei, {'attr': {'id': 'replacement-imei', 'class': 'form-control'}}) }}
+                    </div>
+                    <div class="help-block row">
+                        <div class="col-xs-12">
+                            Current IMEI: {{ claim.policy.imei }}
+                            <a href="#" class="set-imei">Update Policy IMEI</a>
+                        </div>
                     </div>
 
                     <div class="form-group">
