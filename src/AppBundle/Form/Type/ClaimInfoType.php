@@ -46,7 +46,7 @@ class ClaimInfoType extends AbstractType
                 'mapped' => false,
                 'trim' => true
             ])
-            ->add('imei', NumberType::class, [
+            ->add('replacementImei', NumberType::class, [
                 'attr' => [
                     'pattern' => '[0-9]{15}',
                     'title' => '15 digit number'
@@ -67,6 +67,13 @@ class ClaimInfoType extends AbstractType
                 'required' => true,
                 'choices' => [
                     Claim::STATUS_FNOL => Claim::STATUS_FNOL,
+                    Claim::STATUS_SUBMITTED => Claim::STATUS_SUBMITTED,
+                    Claim::STATUS_INREVIEW => Claim::STATUS_INREVIEW,
+                    Claim::STATUS_APPROVED => Claim::STATUS_APPROVED,
+                    Claim::STATUS_SETTLED => Claim::STATUS_SETTLED,
+                    Claim::STATUS_DECLINED => Claim::STATUS_DECLINED,
+                    Claim::STATUS_WITHDRAWN => Claim::STATUS_WITHDRAWN,
+                    Claim::STATUS_PENDING_CLOSED => Claim::STATUS_PENDING_CLOSED,
                 ]
             ])
             /*

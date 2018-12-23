@@ -557,7 +557,13 @@
                             <label><i class="fa fa-lock" title="Admin only"></i> Approved Date</label>
                                 {{ form_widget(form.approvedDate, {'attr': {'class': 'form-control'}}) }}
                         </div>
+                        <div class="help-block row">
+                            <div class="col-xs-12">
+                                Replacement Received Date: {{ claim.replacementReceivedDate|date('Y-m-d') }}
+                            </div>
+                        </div>
                     {% else %}
+                        {% do form.status.setRendered %}
                         {% do form.approvedDate.setRendered %}
                     {% endif %}
                     <div class="modal-footer">
