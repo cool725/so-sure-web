@@ -480,6 +480,12 @@ class BankAccount
         }
 
         $maxAllowedDate = $this->setDayOfMonth($processingDate, $this->getNotificationDay());
+
+        // if we're processing for the previous month, we should be using the previous month's date (e.g feb)
+        if ($processingDate->format('j') < $this->getNotificationDay()) {
+            $maxAllowedDate = $maxAllowedDate->sub(new \DateInterval('P1M'));
+        }
+        
         $maxAllowedDate = $this->addBusinessDays($maxAllowedDate, 3);
         $maxAllowedDate = $this->startOfDay($maxAllowedDate);
         $maxAllowedDay = $maxAllowedDate->format('j');
