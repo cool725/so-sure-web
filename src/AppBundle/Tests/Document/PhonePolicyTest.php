@@ -5311,8 +5311,8 @@ class PhonePolicyTest extends WebTestCase
             $policy,
             $policy->getPremium()->getMonthlyPremiumPrice(),
             Salva::MONTHLY_TOTAL_COMMISSION,
+            null,
             new \DateTime('2016-02-28 15:00'),
-            false,
             BacsPayment::STATUS_GENERATED
         );
         $this->assertEquals(
