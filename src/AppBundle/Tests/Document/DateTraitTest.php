@@ -182,6 +182,11 @@ class DateTraitTest extends \PHPUnit\Framework\TestCase
             new \DateTime('2018-01-02 00:00'),
             $this->addBusinessDays(new \DateTime('2017-12-29 00:00'), 1)
         );
+
+        $this->assertEquals(
+            new \DateTime('2018-12-28 01:00'),
+            $this->addBusinessDays(new \DateTime('2018-12-21 01:00'), 3)
+        );
     }
 
     public function testSubBusinessDays()

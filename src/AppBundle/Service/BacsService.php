@@ -1724,9 +1724,11 @@ class BacsService
         if (!$ignoreNotEnoughTime) {
             if (!$bankAccount->allowedProcessing($scheduledDate)) {
                 $msg = sprintf(
-                    'Skipping (scheduled) payment %s as processing date is not allowed (%s / initial: %s)',
+                    'Skipping (scheduled) payment %s on %s as processing day is too early/late (expected: %d max: %d initial: %s)',
                     $id,
                     $scheduledDate->format('d/m/y'),
+                    $bankAccount->getNotificationDay(),
+                    $bankAccount->getMaxAllowedProcessingDay(),
                     $bankAccount->isFirstPayment() ? 'yes' : 'no'
                 );
                 $this->logger->error($msg);

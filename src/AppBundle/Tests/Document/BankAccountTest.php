@@ -230,6 +230,16 @@ class BankAccountTest extends \PHPUnit\Framework\TestCase
         );
     }
 
+    public function testAllowedStandardProcessingXmas()
+    {
+        $bankAccount = new BankAccount();
+        $bankAccount->setStandardNotificationDate(new \DateTime('2018-12-21'));
+        $this->assertTrue(
+            $bankAccount->allowedStandardProcessing(new \DateTime('2018-12-28'))
+        );
+        $this->assertEquals(28, $bankAccount->getMaxAllowedStandardProcessingDay(new \DateTime('2018-12-28')));
+    }
+
     public function testAllowedStandardProcessingBeginningOfMonthAllowed()
     {
         $bankAccount = new BankAccount();
