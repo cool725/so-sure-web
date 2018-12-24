@@ -1723,6 +1723,7 @@ class BacsService
         // processing date
         if (!$ignoreNotEnoughTime) {
             if (!$bankAccount->allowedProcessing($scheduledDate)) {
+                // @codingStandardsIgnoreStart
                 $msg = sprintf(
                     'Skipping (scheduled) payment %s on %s as processing day is too early/late (expected: %d max: %d initial: %s)',
                     $id,
@@ -1731,6 +1732,7 @@ class BacsService
                     $bankAccount->getMaxAllowedProcessingDay(),
                     $bankAccount->isFirstPayment() ? 'yes' : 'no'
                 );
+                // @codingStandardsIgnoreEnd
                 $this->logger->error($msg);
 
                 return self::VALIDATE_SKIP;
