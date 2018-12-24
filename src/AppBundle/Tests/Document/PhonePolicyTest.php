@@ -5454,6 +5454,7 @@ class PhonePolicyTest extends WebTestCase
         $diff = $expiration->diff($policy->getEnd());
         $this->assertEquals(334, $diff->days);
 
+        $month = clone $policy->getStart();
         for ($i = 0; $i <= 10; $i++) {
             $month = clone $policy->getStart();
             $month = $month->add(new \DateInterval(sprintf('P%dM', $i)));
