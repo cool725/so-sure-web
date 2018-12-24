@@ -161,27 +161,30 @@ class BankAccountTest extends \PHPUnit\Framework\TestCase
     public function testAllowedInitialProcessingSameDay()
     {
         $bankAccount = new BankAccount();
+        $bankAccount->setFirstPayment(true);
         $bankAccount->setInitialNotificationDate(new \DateTime('2018-03-05'));
         $this->assertTrue(
-            $bankAccount->allowedInitialProcessing(new \DateTime('2018-03-05'))
+            $bankAccount->allowedProcessing(new \DateTime('2018-03-05'))
         );
     }
 
     public function testAllowedInitialProcessingAllowed()
     {
         $bankAccount = new BankAccount();
+        $bankAccount->setFirstPayment(true);
         $bankAccount->setInitialNotificationDate(new \DateTime('2018-03-05'));
         $this->assertTrue(
-            $bankAccount->allowedInitialProcessing(new \DateTime('2018-03-08'))
+            $bankAccount->allowedProcessing(new \DateTime('2018-03-08'))
         );
     }
 
     public function testAllowedInitialProcessingNotAllowed()
     {
         $bankAccount = new BankAccount();
+        $bankAccount->setFirstPayment(true);
         $bankAccount->setInitialNotificationDate(new \DateTime('2018-03-05'));
         $this->assertFalse(
-            $bankAccount->allowedInitialProcessing(new \DateTime('2018-03-09'))
+            $bankAccount->allowedProcessing(new \DateTime('2018-03-09'))
         );
     }
 
@@ -190,7 +193,7 @@ class BankAccountTest extends \PHPUnit\Framework\TestCase
         $bankAccount = new BankAccount();
         $bankAccount->setStandardNotificationDate(new \DateTime('2018-03-05'));
         $this->assertTrue(
-            $bankAccount->allowedStandardProcessing(new \DateTime('2018-03-05'))
+            $bankAccount->allowedProcessing(new \DateTime('2018-03-05'))
         );
     }
 
@@ -199,7 +202,7 @@ class BankAccountTest extends \PHPUnit\Framework\TestCase
         $bankAccount = new BankAccount();
         $bankAccount->setStandardNotificationDate(new \DateTime('2018-03-05'));
         $this->assertTrue(
-            $bankAccount->allowedStandardProcessing(new \DateTime('2018-03-08'))
+            $bankAccount->allowedProcessing(new \DateTime('2018-03-08'))
         );
     }
 
@@ -208,7 +211,7 @@ class BankAccountTest extends \PHPUnit\Framework\TestCase
         $bankAccount = new BankAccount();
         $bankAccount->setStandardNotificationDate(new \DateTime('2018-03-05'));
         $this->assertFalse(
-            $bankAccount->allowedStandardProcessing(new \DateTime('2018-03-09'))
+            $bankAccount->allowedProcessing(new \DateTime('2018-03-09'))
         );
     }
 
@@ -217,7 +220,7 @@ class BankAccountTest extends \PHPUnit\Framework\TestCase
         $bankAccount = new BankAccount();
         $bankAccount->setStandardNotificationDate(new \DateTime('2018-02-28'));
         $this->assertTrue(
-            $bankAccount->allowedStandardProcessing(new \DateTime('2018-02-28'))
+            $bankAccount->allowedProcessing(new \DateTime('2018-02-28'))
         );
     }
 
@@ -226,8 +229,18 @@ class BankAccountTest extends \PHPUnit\Framework\TestCase
         $bankAccount = new BankAccount();
         $bankAccount->setStandardNotificationDate(new \DateTime('2018-02-26'));
         $this->assertTrue(
-            $bankAccount->allowedStandardProcessing(new \DateTime('2018-02-28'))
+            $bankAccount->allowedProcessing(new \DateTime('2018-02-28'))
         );
+    }
+
+    public function testAllowedStandardProcessingXmas()
+    {
+        $bankAccount = new BankAccount();
+        $bankAccount->setStandardNotificationDate(new \DateTime('2018-12-21'));
+        $this->assertTrue(
+            $bankAccount->allowedProcessing(new \DateTime('2018-12-28'))
+        );
+        $this->assertEquals(28, $bankAccount->getMaxAllowedProcessingDay(new \DateTime('2018-12-28')));
     }
 
     public function testAllowedStandardProcessingBeginningOfMonthAllowed()
@@ -235,7 +248,7 @@ class BankAccountTest extends \PHPUnit\Framework\TestCase
         $bankAccount = new BankAccount();
         $bankAccount->setStandardNotificationDate(new \DateTime('2018-02-26'));
         $this->assertTrue(
-            $bankAccount->allowedStandardProcessing(new \DateTime('2018-03-01'))
+            $bankAccount->allowedProcessing(new \DateTime('2018-03-01'))
         );
     }
 
@@ -244,7 +257,7 @@ class BankAccountTest extends \PHPUnit\Framework\TestCase
         $bankAccount = new BankAccount();
         $bankAccount->setStandardNotificationDate(new \DateTime('2018-02-28'));
         $this->assertFalse(
-            $bankAccount->allowedStandardProcessing(new \DateTime('2018-03-06'))
+            $bankAccount->allowedProcessing(new \DateTime('2018-03-06'))
         );
     }
 
