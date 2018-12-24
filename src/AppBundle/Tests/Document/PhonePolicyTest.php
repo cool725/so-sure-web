@@ -5435,6 +5435,57 @@ class PhonePolicyTest extends WebTestCase
         $this->assertTrue($policy->isUnpaidCloseToExpirationDate($expirationTen));
     }
 
+    public function testIsUnpaidPastExpiration()
+    {
+        $user = new User();
+        $user->setEmail(static::generateEmail('testIsUnpaidPastExpiration', $this));
+        self::$dm->persist($user);
+        self::addAddress($user);
+        $policy = new SalvaPhonePolicy();
+        $policy->init($user, self::getLatestPolicyTerms(static::$dm));
+        $policy->setPhone(self::$phone);
+        $policy->create(rand(1, 999999), null, null, rand(1, 9999));
+        $policy->setImei(rand(1, 999999));
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        $policy->setId(rand(1, 999999));
+        $policy->setPremiumInstallments(12);
+
+        $expiration = $policy->getPolicyExpirationDate();
+        $diff = $expiration->diff($policy->getEnd());
+        $this->assertEquals(334, $diff->days);
+
+        $month = clone $policy->getStart();
+        for ($i = 0; $i <= 10; $i++) {
+            $month = clone $policy->getStart();
+            $month = $month->add(new \DateInterval(sprintf('P%dM', $i)));
+
+            /*
+            print $policy->getNextBillingDate($month)->format(\DateTime::ATOM) . PHP_EOL;
+            print $policy->getPolicyExpirationDate($month)->format(\DateTime::ATOM) . PHP_EOL;
+            */
+
+            // add an ontime payment
+            $payment = self::addBacsPayment(
+                $policy,
+                $policy->getPremium()->getMonthlyPremiumPrice(),
+                Salva::MONTHLY_TOTAL_COMMISSION,
+                $month
+            );
+        }
+
+        /*
+        print $policy->getPremium()->getMonthlyPremiumPrice() * 12 . PHP_EOL;
+        print $policy->getPremiumPaid();
+        */
+
+        $policy->setStatus(Policy::STATUS_UNPAID);
+        $expiration = $policy->getPolicyExpirationDate($month);
+        $diff = $expiration->diff($policy->getEnd());
+
+        $this->assertEquals(1, $diff->days);
+        $this->assertTrue($expiration < $policy->getEnd());
+    }
+
     public function testSetPolicyStatusActiveIfUnpaid()
     {
         $policy = new SalvaPhonePolicy();
