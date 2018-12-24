@@ -213,9 +213,12 @@ class ScheduledPayment
     {
         if (!$date) {
             $date = \DateTime::createFromFormat('U', time());
-            $date = $this->addBusinessDays($date, 1);
         } else {
             $date = clone $date;
+        }
+
+        if ($date->format('H') >= 14) {
+            $date = $this->addBusinessDays($date, 1);
         }
 
         $this->setScheduled($date);
