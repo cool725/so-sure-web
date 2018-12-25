@@ -3,6 +3,7 @@ namespace AppBundle\Service;
 
 use AppBundle\Document\BacsPaymentMethod;
 use AppBundle\Document\BankAccount;
+use AppBundle\Document\CurrencyTrait;
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\File\AccessPayFile;
 use AppBundle\Document\File\BacsReportAddacsFile;
@@ -44,6 +45,7 @@ use Symfony\Component\Templating\EngineInterface;
 class BacsService
 {
     use DateTrait;
+    use CurrencyTrait;
 
     const S3_POLICY_BUCKET = 'policy.so-sure.com';
     const S3_ADMIN_BUCKET = 'admin.so-sure.com';
@@ -89,6 +91,12 @@ class BacsService
     const VALIDATE_SKIP = 'skip';
     const VALIDATE_CANCEL = 'cancel';
     const VALIDATE_RESCHEDULE = 'reschedule';
+
+    const INPUT_ERROR_TYPE_REJECTED = 'REJECTED';
+    // assumed type based on <TotalNumberOfErrors amendedRecords="0" returnedRecords="0" rejectedRecords="1"/>
+    const INPUT_ERROR_TYPE_AMENDED = 'AMENDED';
+    // assumed type based on <TotalNumberOfErrors amendedRecords="0" returnedRecords="0" rejectedRecords="1"/>
+    const INPUT_ERROR_TYPE_RETURNED = 'RETURNED';
 
     /** @var LoggerInterface */
     protected $logger;
@@ -999,11 +1007,15 @@ class BacsService
     }
 
 
-    private function getChildNodeValue(\DOMElement $element, $name)
+    private function getChildNodeValue(\DOMElement $element, $name, $attributeName = null)
     {
         foreach ($element->childNodes as $childNode) {
             /** @var \DOMElement $childNode */
             if ($childNode->nodeName == $name) {
+                if ($attributeName) {
+                    return $this->getNodeValue($childNode, $attributeName);
+                }
+
                 return trim($childNode->nodeValue);
             }
         }
@@ -1241,7 +1253,7 @@ class BacsService
     private function getNodeValue(\DOMElement $element, $name, $missingValue = null)
     {
         if ($element->attributes->getNamedItem($name)) {
-            return $element->attributes->getNamedItem($name)->nodeValue;
+            return trim($element->attributes->getNamedItem($name)->nodeValue);
         }
 
         return $missingValue;
@@ -1275,6 +1287,66 @@ class BacsService
         foreach ($elementList as $element) {
             $this->validateSun($element, 'userNumber');
             $results['file-numbers'][] = $element->attributes->getNamedItem('userFileNumber')->nodeValue;
+        }
+
+        // @codingStandardsIgnoreStart
+        $elementList = $xpath->query('//BACSDocument/Data/InputReport/Submission/UserFile/InputUserFile/Errors/Error');
+        // @codingStandardsIgnoreEnd
+        /** @var \DOMElement $element */
+        foreach ($elementList as $element) {
+            $reference = $this->getChildNodeValue($element, 'ErrorItem', 'reference');
+            $valueOf = $this->getChildNodeValue($element, 'ErrorItem', 'valueOf');
+            $type = $this->getChildNodeValue($element, 'ErrorMessage', 'type');
+
+            if ($type == self::INPUT_ERROR_TYPE_REJECTED) {
+                $userRepo = $this->dm->getRepository(User::class);
+                /** @var User $user */
+                $user = $userRepo->findOneBy(['paymentMethod.bankAccount.reference' => $reference]);
+                if (!$user) {
+                    $this->logger->error(sprintf(
+                        'Unable to locate bacs reference %s for rejected input record',
+                        $reference
+                    ));
+
+                    continue;
+                }
+
+                $foundPayment = false;
+                foreach ($user->getValidPolicies(true) as $policy) {
+                    /** @var Policy $policy */
+                    foreach ($policy->getPaymentsByType(BacsPayment::class) as $payment) {
+                        /** @var BacsPayment $payment */
+                        if (in_array($payment->getStatus(), [
+                            BacsPayment::STATUS_GENERATED,
+                            BacsPayment::STATUS_SUBMITTED
+                        ]) && $this->areEqualToTwoDp($valueOf, $payment->getAmount())) {
+                            $payment->setStatus(BacsPayment::STATUS_FAILURE);
+                            $payment->setSuccess(false);
+                            $payment->setNotes('Input file rejected');
+                            $foundPayment = true;
+                            if (!isset($results['auto-rejected-payment-records'])) {
+                                $results['auto-rejected-payment-records'] = 0;
+                            }
+                            $results['auto-rejected-payment-records']++;
+                        }
+                    }
+                }
+
+                if (!$foundPayment) {
+                    $this->logger->error(sprintf(
+                        'Unable to locate payment for %0.2f for bacs reference %s for rejected input record',
+                        $valueOf,
+                        $reference
+                    ));
+                }
+            } else {
+                $this->logger->error(sprintf(
+                    'Unhandled error type %s for %0.2f for bacs reference %s for input record',
+                    $type,
+                    $valueOf,
+                    $reference
+                ));
+            }
         }
 
         // @codingStandardsIgnoreStart
