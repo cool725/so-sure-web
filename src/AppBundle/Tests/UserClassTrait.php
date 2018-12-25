@@ -421,7 +421,9 @@ trait UserClassTrait
         $payment = new BacsPayment();
         $payment->setManual($manual);
         $payment->setStatus($status);
-        $payment->setSuccess(true);
+        if ($status == BacsPayment::STATUS_SUCCESS) {
+            $payment->setSuccess(true);
+        }
         $payment->setAmount($amount);
         $payment->setTotalCommission($commission);
         if ($date) {
