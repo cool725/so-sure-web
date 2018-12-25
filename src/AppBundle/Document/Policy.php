@@ -5123,7 +5123,7 @@ abstract class Policy
 
         $diff = abs($this->getTotalCommissionPaid(null, true) - $expectedCommission);
 
-        return $diff <= $allowedVariance;
+        return $this->areEqualToTwoDp($diff, $allowedVariance) ||  $diff < $allowedVariance;
     }
 
     public function getPremiumPayments()
