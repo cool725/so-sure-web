@@ -4,6 +4,7 @@
     {{ parent() }}
     {% javascripts
         '@AppBundle/Resources/public/js/Admin/month.js'
+        '@AppBundle/Resources/public/js/Admin/banking.js'
     %}
     <script src="{{ asset_url }}"></script>
     {% endjavascripts %}
@@ -1146,8 +1147,16 @@
                     <table width="100%" class="table table-striped">
                         {% for judoFile in judoFiles %}
                             <tr>
-                                <td><a href="{{ s3DownloadLink(judoFile.bucket, judoFile.key) }}">{{ judoFile.fileName }}</a></td>
+                                <td>
+                                    <a href="{{ s3DownloadLink(judoFile.bucket, judoFile.key) }}">{{ judoFile.fileName }}</a>
+                                    <br><i class="fa fa-plus-circle" title="Created"></i> {{ judoFile.created|date() }}
+                                    <br><i class="fa fa-pencil" title="Date"></i> {{ judoFile.date|date() }}
+                                </td>
                                 <td style="word-break:break-all;">{{ judoFile.metadata|json_encode }}</td>
+                                <td><button class="delete-file" data-delete-url="{{ path('admin_file_delete', {'id': judoFile.id }) }}">
+                                        <i class="fa fa-trash text-danger"></i>
+                                    </button>
+                                </td>
                             </tr>
                         {% endfor %}
                     </table>
@@ -1179,8 +1188,15 @@
               <table width="100%" class="table table-striped">
                   {% for barclaysFile in barclaysFiles %}
                       <tr>
-                          <td><a href="{{ s3DownloadLink(barclaysFile.bucket, barclaysFile.key) }}">{{ barclaysFile.fileName }}</a></td>
+                          <td><a href="{{ s3DownloadLink(barclaysFile.bucket, barclaysFile.key) }}">{{ barclaysFile.fileName }}</a>
+                              <br><i class="fa fa-plus-circle" title="Created"></i> {{ barclaysFile.created|date() }}
+                              <br><i class="fa fa-pencil" title="Date"></i> {{ barclaysFile.date|date() }}
+                          </td>
                           <td style="word-break:break-all;">{{ barclaysFile.metadata|json_encode }}</td>
+                          <td><button class="delete-file" data-delete-url="{{ path('admin_file_delete', {'id': barclaysFile.id }) }}">
+                                  <i class="fa fa-trash text-danger"></i>
+                              </button>
+                          </td>
                       </tr>
                   {% endfor %}
               </table>
@@ -1212,8 +1228,15 @@
               <table width="100%" class="table table-striped">
                   {% for barclaysStatementFile in barclaysStatementFiles %}
                       <tr>
-                          <td><a href="{{ s3DownloadLink(barclaysStatementFile.bucket, barclaysStatementFile.key) }}">{{ barclaysStatementFile.fileName }}</a></td>
+                          <td><a href="{{ s3DownloadLink(barclaysStatementFile.bucket, barclaysStatementFile.key) }}">{{ barclaysStatementFile.fileName }}</a>
+                              <br><i class="fa fa-plus-circle" title="Created"></i> {{ barclaysStatementFile.created|date() }}
+                              <br><i class="fa fa-pencil" title="Date"></i> {{ barclaysStatementFile.date|date() }}
+                          </td>
                           <td style="word-break:break-all;">{{ barclaysStatementFile.metadata|json_encode }}</td>
+                          <td><button class="delete-file" data-delete-url="{{ path('admin_file_delete', {'id': barclaysStatementFile.id }) }}">
+                                  <i class="fa fa-trash text-danger"></i>
+                              </button>
+                          </td>
                       </tr>
                   {% endfor %}
               </table>
@@ -1245,8 +1268,15 @@
               <table width="100%" class="table table-striped">
                   {% for lloydsFile in lloydsFiles %}
                   <tr>
-                      <td><a href="{{ s3DownloadLink(lloydsFile.bucket, lloydsFile.key) }}">{{ lloydsFile.fileName }}</a></td>
+                      <td><a href="{{ s3DownloadLink(lloydsFile.bucket, lloydsFile.key) }}">{{ lloydsFile.fileName }}</a>
+                          <br><i class="fa fa-plus-circle" title="Created"></i> {{ lloydsFile.created|date() }}
+                          <br><i class="fa fa-pencil" title="Date"></i> {{ lloydsFile.date|date() }}
+                      </td>
                       <td style="word-break:break-all;">{{ lloydsFile.metadata|json_encode }}</td>
+                      <td><button class="delete-file" data-delete-url="{{ path('admin_file_delete', {'id': lloydsFile.id }) }}">
+                              <i class="fa fa-trash text-danger"></i>
+                          </button>
+                      </td>
                   </tr>
                   {% endfor %}
               </table>

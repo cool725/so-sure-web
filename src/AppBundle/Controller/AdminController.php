@@ -731,6 +731,28 @@ class AdminController extends BaseController
     }
 
     /**
+     * @Route("/file/delete/{id}", name="admin_file_delete")
+     */
+    public function deleteFileAction(Request $request, $id)
+    {
+        $referer = $request->headers->get('referer');
+
+        $dm = $this->getManager();
+        /** @var S3FileRepository $repo */
+        $repo = $dm->getRepository(S3File::class);
+        /** @var S3File $s3File */
+        $s3File = $repo->find($id);
+        if (!$s3File) {
+            throw new NotFoundHttpException();
+        }
+
+        $dm->remove($s3File);
+        $dm->flush();
+
+        return $this->getSuccessJsonResponse("Deleted file");
+    }
+
+    /**
      * @Route("/bacs/file/download/{id}", name="admin_bacs_file")
      */
     public function bacsDownloadFileAction($id)
