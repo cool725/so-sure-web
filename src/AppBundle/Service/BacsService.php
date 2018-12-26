@@ -869,6 +869,7 @@ class BacsService
             $amount = $this->getChildNodeValue($element, 'TotalAmount');
             $results['indemnity-amount'] += $amount;
             $results['details'][] = [$reference => [$reasonCode => $reasonCodeMeaning]];
+            $results['refund-details'][$reference] = $amount;
 
             /** @var User $user */
             $user = $repo->findOneBy(['paymentMethod.bankAccount.reference' => $reference]);
