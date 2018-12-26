@@ -926,8 +926,8 @@ class AdminController extends BaseController
 
         $bacsPayments = $bacsPaymentRepo->findPayments($date)->toArray();
         $manualBacsPayments = array_filter($bacsPayments, function ($payment) {
-           /** @var BacsPayment $payment */
-           return $payment->isManual();
+            /** @var BacsPayment $payment */
+            return $payment->isManual();
         });
 
         $payments = $paymentRepo->getAllPaymentsForExport($date);
