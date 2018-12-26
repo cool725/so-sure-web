@@ -882,53 +882,63 @@
                     {% endfor %}
 
                     <h3>Overview</h3>
-                    <table class="table table-striped">
-                        <tr>
-                            <th colspan="2">Bacs Reporting</th>
-                            <th></th>
-                            <th colspan="2">Lloyds</th>
-                            <th>Diff</th>
-                        </tr>
-                        <tr>
-                            <td>Input</td>
-                            <td>{{ inputTotal|number_format(2, '.', ',') }}</td>
-                            <td>|</td>
-                            <td>Month</td>
-                            <td>{{ lloyds_total|number_format(2, '.', ',') }}</td>
-                            <td></td>
-                        </tr>
-                        <tr>
-                            <td>Arudd</td>
-                            <td>{{ aruddTotal|number_format(2, '.', ',') }}</td>
-                            <td>|</td>
-                            <td>Manual Bacs Payments</td>
-                            <td>{{ (0 - manualBacsPayments.total)|number_format(2, '.', ',') }}</td>
-                            <td></td>
-                        </tr>
-                        <tr>
-                            <td>DDIC</td>
-                            <td>{{ ddicTotal|number_format(2, '.', ',') }}</td>
-                            <td>|</td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                        {%  set reporting_net = inputTotal + aruddTotal + ddicTotal %}
-                        {%  set lloyds_net = lloyds_total - manualBacsPayments.total %}
-                        {% if equal_to_two_dp(reporting_net, lloyds_net) %}
-                            {% set color = 'success' %}
-                        {% else %}
-                            {% set color = 'danger' %}
-                        {% endif %}
-                        <tr class="{{ color }}">
-                            <td>Total</td>
-                            <td>{{ reporting_net|number_format(2, '.', ',') }}</td>
-                            <td></td>
-                            <td></td>
-                            <td>{{ lloyds_net|number_format(2, '.', ',')  }}</td>
-                            <td>{{ (reporting_net -  lloyds_net)|number_format(2, '.', ',')  }}</td>
-                        </tr>
-                    </table>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <table class="table table-striped">
+                                <tr>
+                                    <th colspan="2">Bacs Reporting</th>
+                                </tr>
+                                <tr>
+                                    <td>Input</td>
+                                    <td>{{ inputTotal|number_format(2, '.', ',') }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Arudd</td>
+                                    <td>{{ aruddTotal|number_format(2, '.', ',') }}</td>
+                                </tr>
+                                <tr>
+                                    <td>DDIC</td>
+                                    <td>{{ ddicTotal|number_format(2, '.', ',') }}</td>
+                                </tr>
+                                {%  set reporting_net = inputTotal + aruddTotal + ddicTotal %}
+                                {%  set lloyds_net = lloyds_total %}
+                                {% if equal_to_two_dp(reporting_net, lloyds_net) %}
+                                    {% set color = 'success' %}
+                                {% else %}
+                                    {% set color = 'danger' %}
+                                {% endif %}
+                                <tr class="{{ color }}">
+                                    <td>Total</td>
+                                    <td>{{ reporting_net|number_format(2, '.', ',') }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-md-4">
+                            <table class="table table-striped">
+                                <tr>
+                                    <th colspan="2">Lloyds Export</th>
+                                    <th>Diff</th>
+                                </tr>
+                                <tr>
+                                    <td>Total</td>
+                                    <td>{{ lloyds_total|number_format(2, '.', ',')  }}</td>
+                                    <td>{{ (reporting_net -  lloyds_net)|number_format(2, '.', ',')  }}</td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <div class="col-md-4">
+                            <table class="table table-striped">
+                                <tr>
+                                    <th colspan="2">Manual Bacs Payments Expected</th>
+                                </tr>
+                                <tr>
+                                    <td>Total</td>
+                                    <td>{{ manualBacsPayments.total|number_format(2, '.', ',') }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="row">
