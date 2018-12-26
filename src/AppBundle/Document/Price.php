@@ -207,8 +207,8 @@ abstract class Price
         return array_merge($this->toApiArray($date), [
             'initial_premium' => $this->getMonthlyPremiumPrice(null, $this->getValidFrom()),
             'final_premium' => $this->getValidTo() ? $this->getMonthlyPremiumPrice(null, $this->getValidTo()) : null,
-            'excess' => $this->getExcess() ? $this->getExcess()->toApiArray() : null,
-            'excess_detail' => $this->getExcess() ? $this->getExcess()->toApiArray()['detail'] : '??',
+            'excess' => $this->getExcess() ? $this->getExcess()->toPriceArray() : null,
+            'excess_detail' => $this->getExcess() ? $this->getExcess()->toPriceArray()['detail'] : '??',
         ]);
     }
 }

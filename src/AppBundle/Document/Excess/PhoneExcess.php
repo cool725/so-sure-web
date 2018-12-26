@@ -142,6 +142,32 @@ class PhoneExcess extends Excess
     public function toApiArray()
     {
         return [
+            [
+                'type' => Claim::TYPE_LOSS,
+                'display' => 'Loss',
+                'amount' => $this->toTwoDp($this->getLoss()),
+            ],
+            [
+                'type' => Claim::TYPE_THEFT,
+                'display' => 'Theft',
+                'amount' => $this->toTwoDp($this->getTheft()),
+            ],
+            [
+                'type' => Claim::TYPE_DAMAGE,
+                'display' => 'Accidental Damage',
+                'amount' => $this->toTwoDp($this->getDamage()),
+            ],
+            [
+                'type' => Claim::TYPE_EXTENDED_WARRANTY,
+                'display' => 'Breakdown',
+                'amount' => $this->toTwoDp($this->getExtendedWarranty()),
+            ],
+        ];
+    }
+
+    public function toPriceArray()
+    {
+        return [
             'loss' => $this->toTwoDp($this->getLoss()),
             'theft' => $this->toTwoDp($this->getTheft()),
             'warranty' => $this->toTwoDp($this->getWarranty()),
