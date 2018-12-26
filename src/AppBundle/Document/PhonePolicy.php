@@ -909,7 +909,7 @@ class PhonePolicy extends Policy
                     $this->getName() :
                     $this->getDefaultName(),
                 'picsure_status' => $this->getPicSureStatusForApi(),
-                'excesses' => $this->getCurrentExcess()->toApiArray(),
+                'excesses' => $this->getCurrentExcess() ? $this->getCurrentExcess()->toApiArray() : [],
                 'detected_imei' => $this->getDetectedImei(),
             ],
         ]);
