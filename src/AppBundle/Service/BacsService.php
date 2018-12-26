@@ -53,6 +53,9 @@ class BacsService
     const KEY_BACS_CANCEL = 'bacs:cancel';
     const KEY_BACS_QUEUE = 'bacs:queue';
 
+    // special key to use to adjust file date instead of storing in metadata
+    const SPECIAL_METADATA_FILE_DATE = 'file-date';
+
     const QUEUE_EVENT_CREATED = 'created';
 
     const BACS_COMMAND_CREATE_MANDATE = '0N';
@@ -522,7 +525,11 @@ class BacsService
 
         if ($metadata) {
             foreach ($metadata as $key => $value) {
-                $uploadFile->addMetadata($key, $value);
+                if ($key == self::SPECIAL_METADATA_FILE_DATE) {
+                    $uploadFile->setDate($value);
+                } else {
+                    $uploadFile->addMetadata($key, $value);
+                }
             }
         }
 
@@ -836,6 +843,18 @@ class BacsService
         $this->validateServiceUserNumber($xpath);
 
         $submittedPayments = $paymentRepo->findBy(['status' => BacsPayment::STATUS_SUBMITTED]);
+        $elementList = $xpath->query(
+            '//VocaDocument/Data/Document/NewAdvices'
+        );
+        /** @var \DOMElement $element */
+        foreach ($elementList as $element) {
+            $ddDate = $this->getChildNodeValueDate($element, 'DateOfDebit');
+            $results['refund-date'] = $ddDate->format('Y-m-d');
+            $results['refund-amount'] = $this->getChildNodeValue($element, 'TotalValueOfDebits');
+
+            // file date should be set to the refund date to appear in the correct reconcilation month
+            $results[self::SPECIAL_METADATA_FILE_DATE] = $ddDate;
+        }
 
         $elementList = $xpath->query(
             '//VocaDocument/Data/Document/NewAdvices/DDICAdvice'
@@ -850,6 +869,7 @@ class BacsService
             $amount = $this->getChildNodeValue($element, 'TotalAmount');
             $results['indemnity-amount'] += $amount;
             $results['details'][] = [$reference => [$reasonCode => $reasonCodeMeaning]];
+
             /** @var User $user */
             $user = $repo->findOneBy(['paymentMethod.bankAccount.reference' => $reference]);
             if (!$user) {
@@ -1023,6 +1043,13 @@ class BacsService
         return null;
     }
 
+    private function getChildNodeValueDate(\DOMElement $element, $name)
+    {
+        $date = $this->getChildNodeValue($element, $name);
+
+        return \DateTime::createFromFormat('Y-m-d', $date);
+    }
+
     private function getReason(\DOMElement $element)
     {
         return $element->attributes->getNamedItem('reason-code')->nodeValue;
@@ -1044,11 +1071,16 @@ class BacsService
 
     private function getCurrentProcessingDate(\DOMElement $element)
     {
-        $currentProcessingDate = $element->attributes->getNamedItem('currentProcessingDate')->nodeValue;
+        return $this->getNodeDate($element, 'currentProcessingDate');
+    }
 
-        $currentProcessingDate = \DateTime::createFromFormat('Y-m-d', $currentProcessingDate);
+    private function getNodeDate(\DOMElement $element, $name)
+    {
+        $date = $element->attributes->getNamedItem($name)->nodeValue;
 
-        return $currentProcessingDate;
+        $date = \DateTime::createFromFormat('Y-m-d', $date);
+
+        return $date;
     }
 
     private function validateRecordType(\DOMElement $element, $expectedRecordType)
