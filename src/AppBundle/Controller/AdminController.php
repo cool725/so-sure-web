@@ -25,6 +25,7 @@ use AppBundle\Form\Type\SequenceType;
 use AppBundle\Repository\BacsIndemnityPaymentRepository;
 use AppBundle\Repository\BacsPaymentRepository;
 use AppBundle\Repository\File\BacsReportAruddFileRepository;
+use AppBundle\Repository\File\BacsReportDdicFileRepository;
 use AppBundle\Repository\File\BacsReportInputFileRepository;
 use AppBundle\Repository\File\BarclaysFileRepository;
 use AppBundle\Repository\File\BarclaysStatementFileRepository;
@@ -920,6 +921,14 @@ class AdminController extends BaseController
         $aruddRepo = $dm->getRepository(BacsReportAruddFile::class);
         /** @var BacsReportDdicFileRepository $aruddRepo */
         $ddicRepo = $dm->getRepository(BacsReportDdicFile::class);
+        /** @var BacsPaymentRepository $bacsPaymentRepo */
+        $bacsPaymentRepo = $dm->getRepository(BacsPayment::class);
+
+        $bacsPayments = $bacsPaymentRepo->findPayments($date)->toArray();
+        $manualBacsPayments = array_filter($bacsPayments, function ($payment) {
+            /** @var BacsPayment $payment */
+            return $payment->isManual();
+        });
 
         $payments = $paymentRepo->getAllPaymentsForExport($date);
         $extraPayments = $paymentRepo->getAllPaymentsForExport($date, true);
@@ -1186,6 +1195,7 @@ class AdminController extends BaseController
             'bacsDdicFiles' => $ddicRepo->getMonthlyFiles($date),
             'reconcilationFiles' => $reconcilationFileRepo->getMonthlyFiles($date),
             'payments' => $payments,
+            'manualBacsPayments' => Payment::sumPayments($manualBacsPayments, false),
         ];
     }
 

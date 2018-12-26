@@ -54,6 +54,7 @@ class MiscTwigExtension extends \Twig_Extension
             new \Twig_SimpleFunction('random_imei', [$this, 'generateRandomImei']),
             new \Twig_SimpleFunction('random_serial', [$this, 'generateRandomAppleSerialNumber']),
             new \Twig_SimpleFunction('route_exists', [$this, 'routeExists']),
+            new \Twig_SimpleFunction('day', [$this, 'getDayByString']),
             new \Twig_SimpleFunction('next_business_day_historical', [$this, 'getNextBusinessDayByString']),
             new \Twig_SimpleFunction('unserialise', [$this, 'unserialise']),
         );
@@ -83,6 +84,11 @@ class MiscTwigExtension extends \Twig_Extension
         } catch (RouteNotFoundException $e) {
             return false;
         }
+    }
+
+    public function getDayByString($date)
+    {
+        return \DateTime::createFromFormat('Y-m-d', $date);
     }
 
     public function getNextBusinessDayByString($date)
