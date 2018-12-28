@@ -2,6 +2,7 @@
 
 namespace AppBundle\Document;
 
+use AppBundle\Classes\NoOp;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -485,6 +486,11 @@ class PhonePolicy extends Policy
         return $this->getConnectionValue($date) + $this->getPromoConnectionValue($date);
     }
 
+    public function getTotalConnectionValueLimit()
+    {
+        return self::STANDARD_VALUE;
+    }
+
     public function getConnectionValue(\DateTime $date = null)
     {
         if (!$this->isPolicy()) {
@@ -606,11 +612,12 @@ class PhonePolicy extends Policy
 
     public function getMaxConnectionsLimit(\DateTime $date = null)
     {
+        NoOp::ignore([$date]);
         if (!$this->getUser()) {
             throw new \Exception('Policy is missing a user');
         }
 
-        return (int) ceil($this->getMaxPot() / $this->getTotalConnectionValue($date));
+        return (int) ceil($this->getMaxPot() / $this->getTotalConnectionValueLimit());
     }
 
     private function isPreLaunchPolicy()
