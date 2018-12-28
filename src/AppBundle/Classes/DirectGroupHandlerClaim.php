@@ -169,11 +169,26 @@ class DirectGroupHandlerClaim extends HandlerClaim
         return null;
     }
 
+    public function getStatus()
+    {
+        if (mb_stripos($this->status, self::STATUS_OPEN) !== false) {
+            return self::STATUS_OPEN;
+        } elseif (mb_stripos($this->status, self::STATUS_CLOSED) !== false) {
+            return self::STATUS_CLOSED;
+        } elseif (mb_stripos($this->status, self::STATUS_WITHDRAWN) !== false) {
+            return self::STATUS_WITHDRAWN;
+        } elseif (mb_stripos($this->status, self::STATUS_REJECTED) !== false) {
+            return self::STATUS_REJECTED;
+        }
+
+        return null;
+    }
+
     public function isOpen($includeReOpened = false)
     {
         \AppBundle\Classes\NoOp::ignore([$includeReOpened]);
 
-        return in_array(mb_strtolower($this->status), [
+        return in_array(mb_strtolower($this->getStatus()), [
             mb_strtolower(self::STATUS_OPEN)
         ]);
     }
@@ -182,7 +197,7 @@ class DirectGroupHandlerClaim extends HandlerClaim
     {
         \AppBundle\Classes\NoOp::ignore([$includeReClosed]);
 
-        return in_array(mb_strtolower($this->status), [
+        return in_array(mb_strtolower($this->getStatus()), [
             mb_strtolower(self::STATUS_CLOSED),
             mb_strtolower(self::STATUS_WITHDRAWN),
             mb_strtolower(self::STATUS_REJECTED)
@@ -195,11 +210,11 @@ class DirectGroupHandlerClaim extends HandlerClaim
         if ($this->isOpen()) {
             return null;
         } elseif ($this->isClosed()) {
-            if (in_array(mb_strtolower($this->status), [mb_strtolower(self::STATUS_CLOSED)])) {
+            if (in_array(mb_strtolower($this->getStatus()), [mb_strtolower(self::STATUS_CLOSED)])) {
                 return Claim::STATUS_SETTLED;
-            } elseif (in_array(mb_strtolower($this->status), [mb_strtolower(self::STATUS_REJECTED)])) {
+            } elseif (in_array(mb_strtolower($this->getStatus()), [mb_strtolower(self::STATUS_REJECTED)])) {
                 return Claim::STATUS_DECLINED;
-            } elseif (in_array(mb_strtolower($this->status), [mb_strtolower(self::STATUS_WITHDRAWN)])) {
+            } elseif (in_array(mb_strtolower($this->getStatus()), [mb_strtolower(self::STATUS_WITHDRAWN)])) {
                 return Claim::STATUS_WITHDRAWN;
             }
         }
