@@ -164,10 +164,13 @@ class AdminControllerTest extends BaseControllerTest
         $repoPolicy = $dm->getRepository(Policy::class);
         /** @var Policy $updatedNewPolicy */
         $updatedNewPolicy = $repoPolicy->find($newPolicy->getId());
+        $this->assertNotNull($updatedNewPolicy);
 
         $repoClaim = $dm->getRepository(Claim::class);
         /** @var Claim $updatedClaim */
         $updatedClaim = $repoClaim->find($claim->getId());
+        $this->assertNotNull($updatedClaim);
+        $this->assertNotNull($updatedClaim->getLinkedPolicy());
 
         // claim linked policy should now point to the new policy
         $this->assertEquals($updatedNewPolicy->getId(), $updatedClaim->getLinkedPolicy()->getId());

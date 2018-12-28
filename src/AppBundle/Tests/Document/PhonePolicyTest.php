@@ -5122,9 +5122,18 @@ class PhonePolicyTest extends WebTestCase
 
     public function testCorrectFiguresAfterPotReward()
     {
-        $policyA = $this->getPolicy(static::generateEmail('testCorrectFiguresAfterPotRewardA', $this));
-        $policyB = $this->getPolicy(static::generateEmail('testCorrectFiguresAfterPotRewardB', $this));
+        $policyA = $this->getPolicy(
+            static::generateEmail('testCorrectFiguresAfterPotRewardA', $this),
+            null,
+            static::getRandomPhone(static::$dm)
+        );
+        $policyB = $this->getPolicy(
+            static::generateEmail('testCorrectFiguresAfterPotRewardB', $this),
+            null,
+            static::getRandomPhone(static::$dm)
+        );
         $policyA->setStatus(Policy::STATUS_ACTIVE);
+        $policyA->setPremiumInstallments(12);
         $policyB->setStatus(Policy::STATUS_ACTIVE);
         $this->createLinkedConnections($policyA, $policyB, 10, 10);
 
