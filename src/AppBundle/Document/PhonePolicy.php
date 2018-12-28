@@ -2,6 +2,7 @@
 
 namespace AppBundle\Document;
 
+use AppBundle\Classes\NoOp;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -611,6 +612,7 @@ class PhonePolicy extends Policy
 
     public function getMaxConnectionsLimit(\DateTime $date = null)
     {
+        NoOp::ignore([$date]);
         if (!$this->getUser()) {
             throw new \Exception('Policy is missing a user');
         }
