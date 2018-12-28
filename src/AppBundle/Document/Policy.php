@@ -119,7 +119,7 @@ abstract class Policy
     const UNPAID_JUDO_CARD_EXPIRED = 'unpaid_judo_card_expired';
     const UNPAID_JUDO_PAYMENT_FAILED = 'unpaid_judo_payment_failed';
     const UNPAID_JUDO_PAYMENT_MISSING = 'unpaid_judo_payment_missing';
-    const UNPAID_JUDO_UNKNOWN = 'unpaid_bacs_unknown';
+    const UNPAID_JUDO_UNKNOWN = 'unpaid_judo_unknown';
     const UNPAID_PAYMENT_METHOD_MISSING = 'unpaid_payment_method_missing';
     const UNPAID_UNKNOWN = 'unpaid_unknown';
     const UNPAID_PAID = 'unpaid_paid';

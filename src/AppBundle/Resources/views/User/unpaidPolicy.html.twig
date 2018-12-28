@@ -153,6 +153,19 @@
                     <p>To avoid your policy being cancelled update your card details and pay the outstanding balance now.</p>
                     {# END - PAYMENT MISSING #}
 
+                {% elseif unpaid_reason == 'unpaid_payment_method_missing' %}
+
+                    {# PAYMENT MISSING #}
+                    {% set show_judo = true %}
+                    {% if policy.canBacsPaymentBeMadeInTime and bacs_feature %}
+                        {% set show_bacs_setup = true %}
+                    {% endif %}
+
+                    <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_card-reader.png" alt="so-sure" width="180px">
+                    <h1 class="h2 mb-4">Payment missing</h1>
+                    <p class="lead">Your account has not been paid up to date and your policy is in danger of being cancelled.</p>
+                    {# END - PAYMENT MISSING #}
+
                 {% else %}
 
                     {# UNPAID_BACS_UNKNOWN, UNPAID_JUDO_UNKNOWN, UNPAID_UNKNOWN #}
