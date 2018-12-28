@@ -833,10 +833,11 @@ class DirectGroupServiceTest extends WebTestCase
         //print_r(self::$directGroupService->getWarnings());
         //print_r(self::$directGroupService->getSoSureActions());
 
+        $this->insureSoSureActionExists('/was previously closed/');
         $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
         $repo = $dm->getRepository(Claim::class);
         $updatedClaim = $repo->find($claim->getId());
-        $this->insureSoSureActionExists('/was previously closed/');
+        $this->assertEquals(Claim::STATUS_SETTLED, $updatedClaim->getStatus());
     }
 
     public function testValidateClaimDetailsName()
