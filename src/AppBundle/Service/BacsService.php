@@ -1892,9 +1892,14 @@ class BacsService
                 continue;
             }
 
+            // we're unable to process for the current date, so ensure its at least tomorrow
+            $processingDate = $payment->getDate();
+            if ($processingDate < $date) {
+                $processingDate = $date;
+            }
 
             $lines[] = implode(',', [
-                sprintf('"%s"', $payment->getDate()->format('d/m/y')),
+                sprintf('"%s"', $processingDate->format('d/m/y')),
                 '"Scheduled Payment"',
                 $bankAccount->isFirstPayment() ?
                     sprintf('"%s"', self::BACS_COMMAND_FIRST_DIRECT_DEBIT) :
@@ -1908,7 +1913,7 @@ class BacsService
                 sprintf('"%s"', $policy->getId()),
                 sprintf('"P-%s"', $payment->getId()),
             ]);
-            $payment->setSubmittedDate($payment->getDate());
+            $payment->setSubmittedDate($processingDate);
             $payment->setStatus(BacsPayment::STATUS_GENERATED);
             $payment->setSerialNumber($serialNumber);
             if ($payment->getScheduledPayment()) {
