@@ -4249,8 +4249,20 @@ abstract class Policy
         }
     }
 
-    abstract public function getMaxConnections();
+    /**
+     * Get the current max connection for this policy
+     * @return mixed
+     */
+    abstract public function getMaxConnections(\DateTime $date = null);
+
+    /**
+     * Get the absolute limit of the max connections based on premium (ignoring claims, etc)
+     * @return mixed
+     */
+    abstract public function getMaxConnectionsLimit(\DateTime $date = null);
+
     abstract public function getMaxPot();
+
     abstract public function getConnectionValue();
     abstract public function getPolicyNumberPrefix();
     abstract public function getAllowedConnectionValue(\DateTime $date = null);
