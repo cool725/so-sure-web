@@ -5176,6 +5176,40 @@ class PhonePolicyTest extends WebTestCase
         $this->assertTrue($policyA->hasCorrectCommissionPayments(new \DateTime('2017-01-01')));
     }
 
+    public function testHasCorrectCommissionPaymentsUnpaid()
+    {
+        $date = new \DateTime('2018-03-19');
+        $policy = $this->getPolicy(
+            static::generateEmail('testHasCorrectCommissionPaymentsUnpaid', $this),
+            $date,
+            self::getRandomPhone(static::$dm)
+        );
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        $policy->setId(rand(1, 999999));
+        $policy->setPremiumInstallments(12);
+        for ($i = 0; $i < 8; $i++) {
+            $month = clone $date;
+            $month = $month->add(new \DateInterval(sprintf('P%dM', $i)));
+            $payment = self::addPayment(
+                $policy,
+                $policy->getPremium()->getMonthlyPremiumPrice(),
+                Salva::MONTHLY_TOTAL_COMMISSION,
+                null,
+                $month
+            );
+        }
+        $policy->cancel(Policy::CANCELLED_UPGRADE, new \DateTime('2018-12-17'));
+
+        $validationDate = new \DateTime('2018-12-27');
+        $totalPayments = $policy->getTotalSuccessfulStandardPayments(false, $validationDate);
+        $numPayments = $policy->getPremium()->getNumberOfMonthlyPayments($totalPayments);
+        $this->assertEquals(8, $numPayments);
+
+
+        $this->assertEquals(7.12, $policy->getExpectedCommission($validationDate));
+        $this->assertTrue($policy->hasCorrectCommissionPayments($validationDate));
+    }
+
     public function testRenewTooMany()
     {
         $policy = $this->getPolicy(static::generateEmail('testRenewTooMany', $this));
@@ -5332,18 +5366,23 @@ class PhonePolicyTest extends WebTestCase
         );
     }
 
-    private function getPolicy($email, \DateTime $date = null)
+    private function getPolicy($email, \DateTime $date = null, $phone = null)
     {
         if (!$date) {
             $date = new \DateTime("2016-01-01");
         }
         $policy = new SalvaPhonePolicy();
-        $policy->setPhone(static::$phone);
 
         $user = new User();
         $user->setEmail($email);
         $user->setEnabled(true);
         self::addAddress($user);
+
+        if (!$phone) {
+            $policy->setPhone(static::$phone);
+        } else {
+            $policy->setPhone($phone, $date);
+        }
 
         $policy->init($user, static::getLatestPolicyTerms(self::$dm));
 
