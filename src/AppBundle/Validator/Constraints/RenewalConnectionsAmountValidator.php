@@ -30,7 +30,7 @@ class RenewalConnectionsAmountValidator extends ConstraintValidator
         }
 
         if ($policy) {
-            $maxConnections = $policy->getMaxConnections();
+            $maxConnections = $policy->getMaxConnectionsLimit();
             $policyNumber = $policy->getPolicyNumber();
         }
 

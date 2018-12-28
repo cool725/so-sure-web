@@ -601,6 +601,11 @@ class PhonePolicy extends Policy
         if (!$this->isPolicy() || $this->areEqualToFourDp($this->getConnectionValue($date), 0)) {
             return 0;
         }
+        return $this->getMaxConnectionsLimit($date);
+    }
+
+    public function getMaxConnectionsLimit(\DateTime $date = null)
+    {
         if (!$this->getUser()) {
             throw new \Exception('Policy is missing a user');
         }
