@@ -485,6 +485,11 @@ class PhonePolicy extends Policy
         return $this->getConnectionValue($date) + $this->getPromoConnectionValue($date);
     }
 
+    public function getTotalConnectionValueLimit()
+    {
+        return self::STANDARD_VALUE;
+    }
+
     public function getConnectionValue(\DateTime $date = null)
     {
         if (!$this->isPolicy()) {
@@ -610,7 +615,7 @@ class PhonePolicy extends Policy
             throw new \Exception('Policy is missing a user');
         }
 
-        return (int) ceil($this->getMaxPot() / $this->getTotalConnectionValue($date));
+        return (int) ceil($this->getMaxPot() / $this->getTotalConnectionValueLimit());
     }
 
     private function isPreLaunchPolicy()
