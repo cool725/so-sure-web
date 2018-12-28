@@ -5066,18 +5066,25 @@ abstract class Policy
 
         $expectedCommission = null;
         $totalPayments = $this->getTotalSuccessfulStandardPayments(false, $date);
+        // TODO: do we need to see if cancelled and if so use policy end date?
+        $expectedPayments = $this->getTotalExpectedPaidToDate($date);
+        $isMoneyOwed = !$this->areEqualToTwoDp($totalPayments, $expectedPayments) && $totalPayments < $expectedPayments;
+
         $numPayments = $premium->getNumberOfMonthlyPayments($totalPayments);
         if ($numPayments > 12 || $numPayments < 0) {
             throw new \Exception(sprintf('Unable to calculate expected broker fees for policy %s', $this->getId()));
         }
+        $commissionReceived = $salva->sumBrokerFee($numPayments, $numPayments == 12);
 
         // active/unpaid should be on a cash received based
         // also if a policy has been cancelled and there is no refund allowed, then should be based on cash recevied
+        // also if a policy has been cancelled and there is money owed
         if ($this->isCooloffCancelled()) {
             return 0;
-        } elseif (in_array($this->getStatus(), [self::STATUS_ACTIVE, self::STATUS_UNPAID]) ||
-            ($this->isCancelled() && !$this->isRefundAllowed())) {
-            $expectedCommission = $salva->sumBrokerFee($numPayments, $numPayments == 12);
+        } elseif (in_array($this->getStatus(), [self::STATUS_ACTIVE, self::STATUS_UNPAID])) {
+            $expectedCommission = $commissionReceived;
+        } elseif ($this->isCancelled() && (!$this->isRefundAllowed() || $isMoneyOwed)) {
+            $expectedCommission = $commissionReceived;
         } elseif (in_array($this->getStatus(), [
             self::STATUS_EXPIRED,
             self::STATUS_EXPIRED_CLAIMABLE,
