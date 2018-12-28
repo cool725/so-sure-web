@@ -9,5 +9,5 @@ use Symfony\Component\Validator\Constraint;
  */
 class RenewalConnectionsAmount extends Constraint
 {
-    public $message = 'You have too many connections selected and have exceeded the maximum reward pot.';
+    public $message = 'You have too many connections selected for your policy "%string%" and have exceeded the maximum reward pot.';
 }
