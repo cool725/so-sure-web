@@ -7,6 +7,7 @@ use AppBundle\Document\BankAccount;
 use AppBundle\Document\Cashback;
 use AppBundle\Document\IdentityLog;
 use AppBundle\Document\JudoPaymentMethod;
+use AppBundle\Document\PhonePremium;
 use AppBundle\Document\User;
 use AppBundle\Document\Phone;
 use AppBundle\Document\SalvaPhonePolicy;
@@ -78,11 +79,14 @@ trait UserClassTrait
         }
     }
 
-    public static function createUserPolicy($init = false, $date = null, $setId = false)
+    public static function createUserPolicy($init = false, $date = null, $setId = false, $email = null)
     {
         $user = new User();
         $user->setFirstName('foo');
         $user->setLastName('bar');
+        if ($email) {
+            $user->setEmail($email);
+        }
         self::addAddress($user);
         if ($setId) {
             $user->setId(rand(1, 999999));
@@ -107,15 +111,22 @@ trait UserClassTrait
             // still getting no excess on occasion. if so try resetting the phone
             $recursionPrevention = 0;
             while (!$policy->getCurrentExcess()) {
+                /** @var PhonePremium $premium */
+                $premium = $policy->getPremium();
+                $premium->clearExcess();
+                if ($premium instanceof PhonePremium) {
+                    $premium->clearPicSureExcess();
+                }
+
                 $policy->setPhone(self::getRandomPhone(self::$dm), $date);
                 $recursionPrevention++;
-                if ($recursionPrevention > 10) {
-                    break;
+                if ($recursionPrevention > 15) {
+                    throw new \Exception(sprintf('Excess recursion (%s)', $user->getEmail()));
                 }
             }
 
             if (!$policy->getCurrentExcess()) {
-                throw new \Exception('Missing current policy excess');
+                throw new \Exception(sprintf('Missing current policy excess (%s)', $user->getEmail()));
             }
         }
 

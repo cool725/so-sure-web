@@ -5264,7 +5264,7 @@ class PhonePolicyTest extends WebTestCase
     {
         $policy = $this->getPolicy(static::generateEmail('testRenewTooMany', $this));
         $policy->setStatus(Policy::STATUS_ACTIVE);
-        for ($i = 1; $i < $policy->getMaxConnections() + 3; $i++) {
+        for ($i = 1; $i <= $policy->getMaxConnectionsLimit() + 3; $i++) {
             $policyConnect = $this->getPolicy(static::generateEmail(sprintf('policyConnect%d', $i), $this));
             $policyConnect->setStatus(Policy::STATUS_ACTIVE);
             $this->createLinkedConnections($policy, $policyConnect, 2, 2);
@@ -5272,10 +5272,11 @@ class PhonePolicyTest extends WebTestCase
 
         $renewalPolicy = $policy->createPendingRenewal($policy->getPolicyTerms(), new \DateTime('2016-12-15'));
         $this->assertEquals(Policy::STATUS_PENDING_RENEWAL, $renewalPolicy->getStatus());
-        //\Doctrine\Common\Util\Debug::dump($policyA);
+        //\Doctrine\Common\Util\Debug::dump($renewalPolicy);
         $renewalPolicy->renew(0, false, new \DateTime('2016-12-16'));
         $renewed = 0;
         $unrenewed = 0;
+        //\Doctrine\Common\Util\Debug::dump($renewalPolicy->getRenewalConnections());
         foreach ($renewalPolicy->getRenewalConnections() as $connection) {
             if ($connection->getRenew()) {
                 $renewed++;

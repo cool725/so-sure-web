@@ -3870,7 +3870,8 @@ abstract class Policy
         }
 
         foreach ($this->getPreviousPolicy()->getStandardConnections() as $connection) {
-            $renew = count($this->getRenewalConnections()) < $this->getMaxConnections();
+            /** @var Connection $connection */
+            $renew = count($this->getRenewalConnections()) < $this->getMaxConnectionsLimit();
             if ($connection->getLinkedPolicy()->isActive(true) &&
                 $connection->getLinkedPolicy()->isConnected($this->getPreviousPolicy())) {
                 $this->addRenewalConnection($connection->createRenewal($renew));
