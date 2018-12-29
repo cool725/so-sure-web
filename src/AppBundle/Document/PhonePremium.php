@@ -26,6 +26,11 @@ class PhonePremium extends Premium
         $this->picSureExcess = $phoneExcess;
     }
 
+    public function clearPicSureExcess()
+    {
+        $this->picSureExcess = null;
+    }
+
     public function getPicSureExcess()
     {
         return $this->picSureExcess;

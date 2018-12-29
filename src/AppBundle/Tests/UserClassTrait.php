@@ -113,8 +113,8 @@ trait UserClassTrait
             while (!$policy->getCurrentExcess()) {
                 /** @var PhonePremium $premium */
                 $premium = $policy->getPremium();
-                $premium->setExcess(null);
-                $premium->setPicSureExcess(null);
+                $premium->clearExcess();
+                $premium->clearPicSureExcess();
 
                 $policy->setPhone(self::getRandomPhone(self::$dm), $date);
                 $recursionPrevention++;

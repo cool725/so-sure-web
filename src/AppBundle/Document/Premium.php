@@ -192,6 +192,11 @@ abstract class Premium implements EqualsInterface
         $this->excess = $excess;
     }
 
+    public function clearExcess()
+    {
+        $this->excess = null;
+    }
+
     public function isEvenlyDivisible($amount, $accountInitial = false)
     {
         if (!$accountInitial) {
