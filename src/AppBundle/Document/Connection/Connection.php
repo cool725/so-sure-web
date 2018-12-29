@@ -78,6 +78,7 @@ class Connection
     /**
      * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\Policy", inversedBy="acceptedConnectionsRenewal")
      * @Gedmo\Versioned
+     * @var Policy
      */
     protected $linkedPolicyRenewal;
 
