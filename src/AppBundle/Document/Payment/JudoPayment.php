@@ -16,6 +16,7 @@ class JudoPayment extends Payment
     const RESULT_SUCCESS = "Success";
     const RESULT_DECLINED = "Declined";
     const RESULT_SKIPPED = "Skipped";
+    const RESULT_ERROR = "Error";
 
     /**
      * @AppAssert\Alphanumeric()
@@ -73,7 +74,7 @@ class JudoPayment extends Payment
         $this->result = $result;
         if ($result == self::RESULT_SUCCESS) {
             $this->setSuccess(true);
-        } elseif (in_array($result, [self::RESULT_DECLINED, self::RESULT_SKIPPED])) {
+        } elseif (in_array($result, [self::RESULT_DECLINED, self::RESULT_SKIPPED, self::RESULT_ERROR])) {
             $this->setSuccess(false);
         } else {
             throw new \Exception(sprintf('Unknown result %s', $result));
