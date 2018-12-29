@@ -114,7 +114,9 @@ trait UserClassTrait
                 /** @var PhonePremium $premium */
                 $premium = $policy->getPremium();
                 $premium->clearExcess();
-                $premium->clearPicSureExcess();
+                if ($premium instanceof PhonePremium) {
+                    $premium->clearPicSureExcess();
+                }
 
                 $policy->setPhone(self::getRandomPhone(self::$dm), $date);
                 $recursionPrevention++;
