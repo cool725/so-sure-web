@@ -118,6 +118,6 @@ class AccessPayFile extends UploadFile
 
     public static function unformatSerialNumber($serialNumber)
     {
-        return mb_str_replace("S-", "", $serialNumber);
+        return str_replace("S-", "", $serialNumber);
     }
 }
