@@ -319,6 +319,7 @@ class DirectGroupService extends ExcelSftpService
                         }
                     } elseif (!$directGroupClaim->isOpen() &&
                         $directGroupClaim->lossDate > $claim->getLossDate() &&
+                        $claim->isOpen() &&
                         $claim->getNumber() != $directGroupClaim->claimNumber) {
                         $preventImeiUpdate = true;
                         if ($claim->getHandlingTeam() == Claim::TEAM_DIRECT_GROUP) {
