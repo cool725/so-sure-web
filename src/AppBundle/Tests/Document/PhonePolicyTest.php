@@ -5219,6 +5219,47 @@ class PhonePolicyTest extends WebTestCase
         $this->assertTrue($policy->hasCorrectCommissionPayments($validationDate));
     }
 
+    public function testHasCorrectCommissionPaymentsCancelledRefund()
+    {
+        $date = new \DateTime('2018-02-10');
+        $policy = $this->getPolicy(
+            static::generateEmail('testHasCorrectCommissionPaymentsCancelledRefund', $this),
+            $date,
+            self::getRandomPhone(static::$dm)
+        );
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        $policy->setId(rand(1, 999999));
+        $policy->setPremiumInstallments(12);
+        for ($i = 0; $i < 2; $i++) {
+            $month = clone $date;
+            $month = $month->add(new \DateInterval(sprintf('P%dM', $i)));
+            $payment = self::addPayment(
+                $policy,
+                $policy->getPremium()->getMonthlyPremiumPrice(),
+                Salva::MONTHLY_TOTAL_COMMISSION,
+                null,
+                $month
+            );
+        }
+        $payment = self::addPayment(
+            $policy,
+            -4.32,
+            -0.40,
+            null,
+            new \DateTime('2018-03-28')
+        );
+        $policy->cancel(Policy::CANCELLED_UPGRADE, new \DateTime('2018-03-28'));
+
+        $validationDate = new \DateTime('2018-12-27');
+        $totalPayments = $policy->getTotalSuccessfulStandardPayments(false, $validationDate);
+        $numPayments = $policy->getPremium()->getNumberOfMonthlyPayments($totalPayments);
+        $this->assertEquals(null, $numPayments);
+
+
+        $this->assertEquals(1.38, $policy->getExpectedCommission($validationDate));
+        $this->assertTrue($policy->hasCorrectCommissionPayments($validationDate));
+    }
+
     public function testRenewTooMany()
     {
         $policy = $this->getPolicy(static::generateEmail('testRenewTooMany', $this));

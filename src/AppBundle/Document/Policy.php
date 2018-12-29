@@ -5086,7 +5086,8 @@ abstract class Policy
         if ($numPayments > 12 || $numPayments < 0) {
             throw new \Exception(sprintf('Unable to calculate expected broker fees for policy %s', $this->getId()));
         }
-        $commissionReceived = $salva->sumBrokerFee($numPayments, $numPayments == 12);
+        $expectedMonthlyCommission = $salva->sumBrokerFee($numPayments, $numPayments == 12);
+        $commissionReceived = Payment::sumPayments($this->getSuccessfulPayments(), true)['totalCommission'];
 
         // active/unpaid should be on a cash received based
         // also if a policy has been cancelled and there is no refund allowed, then should be based on cash recevied
@@ -5094,16 +5095,22 @@ abstract class Policy
         if ($this->isCooloffCancelled()) {
             return 0;
         } elseif (in_array($this->getStatus(), [self::STATUS_ACTIVE, self::STATUS_UNPAID])) {
-            $expectedCommission = $commissionReceived;
+            $expectedCommission = $expectedMonthlyCommission;
         } elseif ($this->isCancelled() && (!$this->isRefundAllowed() || $isMoneyOwed)) {
-            $expectedCommission = $commissionReceived;
+            // if there's a refund, the number of payments won't be equal and so we need to calculate based on received
+            // funds, rather than monthly
+            if ($numPayments) {
+                $expectedCommission = $expectedMonthlyCommission;
+            } else {
+                $expectedCommission = $commissionReceived;
+            }
         } elseif (in_array($this->getStatus(), [
             self::STATUS_EXPIRED,
             self::STATUS_EXPIRED_CLAIMABLE,
             self::STATUS_EXPIRED_WAIT_CLAIM]) && $numPayments == 11) {
             // we've had a historical issue where if a policy has had 11 payments, and the cancellation date is at the
             // same day as the expiration date, we dont' quite cancel in time.
-            $expectedCommission = $salva->sumBrokerFee($numPayments, $numPayments == 12);
+            $expectedCommission = $expectedMonthlyCommission;
         } else {
             if (!$date) {
                 $date = \DateTime::createFromFormat('U', time());
