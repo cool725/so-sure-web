@@ -10,7 +10,6 @@ use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
  * Represents a policy's participation in a promotion.
- * @MongoDB\EmbeddedDocument
  * @MongoDB\Document(repositoryClass="AppBundle\Repository\ParticipationRepository")
  * @Gedmo\Loggable(logEntryClass="AppBundle\Document\LogEntry")
  */

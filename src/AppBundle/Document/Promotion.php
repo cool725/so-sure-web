@@ -7,6 +7,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Symfony\Component\Validator\Constraints as Assert;
 use AppBundle\Validator\Constraints as AppAssert;
 use Gedmo\Mapping\Annotation as Gedmo;
+use AppBundle\Exception\PromotionInactiveException;
 
 /**
  * Represents a promotion which allows selected policies to earn a reward under some condition.
@@ -101,11 +102,18 @@ class Promotion
     protected $rewardAmount;
 
     /**
+     * Stores list of all affiliates currently linked to this promotion.
+     * @MongoDB\ReferenceMany(targetDocument="AffiliateCompany", mappedBy="promotion")
+     */
+    protected $affiliates;
+
+    /**
      * Builds the promotion's participation list.
      */
     public function __construct()
     {
         $this->participating = new ArrayCollection();
+        $this->affiliates = new ArrayCollection();
     }
 
     public function getId()
@@ -169,10 +177,21 @@ class Promotion
     public function addParticipating($participation)
     {
         if (!$this->active) {
-            throw new \Exception("Attempted to add participation to inactive promotion.");
+            throw new PromotionInactiveException();
         }
-        $this->participating[] = $participation;
         $participation->setPromotion($this);
+        $this->participating[] = $participation;
+    }
+
+    public function getAffiliates()
+    {
+        return $this->affiliates;
+    }
+
+    public function addAffiliates($affiliate)
+    {
+        $this->affiliates[] = $affiliate;
+        $affiliate->setPromotion($this);
     }
 
     public function getConditionPeriod()

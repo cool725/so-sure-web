@@ -2,6 +2,7 @@
 
 namespace AppBundle\Tests\Service;
 
+use AppBundle\Document\Promotion;
 use AppBundle\Document\AffiliateCompany;
 use AppBundle\Document\Attribution;
 use AppBundle\Repository\PhoneRepository;
@@ -433,6 +434,47 @@ class AffiliateServiceTest extends WebTestCase
     }
 
     /**
+     * Tests the integration of the promotion and affiliate systems and that policies can be made to participate in a
+     * given promotion when they are charged for.
+     */
+    public function testAffiliatePromotion()
+    {
+        $date = new \DateTime('2018-12-20 15:59');
+        $otherDate = new \DateTime('2018-12-31 23:59');
+        $data = $this->createState($date);
+        $promotion = new Promotion();
+        $promotion->setName("Free camel when you claim.");
+        $promotion->setActive(true);
+        $data["affiliate"]->setPromotion($promotion);
+        static::$dm->persist($promotion);
+        static::$dm->flush();
+        // first generate.
+        self::$affiliateService->generate([$data["affiliate"]], $date);
+        $this->assertEquals(0, count($data["bango"]->getFirstPolicy()->getParticipations()));
+        $this->assertEquals(0, count($data["tango"]->getFirstPolicy()->getParticipations()));
+        $this->assertEquals(1, count($data["hat"]->getFirstPolicy()->getParticipations()));
+        $this->assertEquals(1, count($data["borb"]->getFirstPolicy()->getParticipations()));
+        $this->assertEquals(1, count($data["tonyAbbot"]->getFirstPolicy()->getParticipations()));
+        $participation = $data["tonyAbbot"]->getFirstPolicy()->getParticipations()[0];
+        $this->assertEquals($date, $participation->getStart());
+        $charge = static::$chargeRepository->findLastByUser($data["borb"], Charge::TYPE_AFFILIATE);
+        $this->assertEquals($promotion, $charge->getParticipation()->getPromotion());
+
+        // make sure it doesn't do something funny when you run it again later.
+        self::$affiliateService->generate([$data["affiliate"]], $otherDate);
+        $this->assertEquals(0, count($data["bango"]->getFirstPolicy()->getParticipations()));
+        $this->assertEquals(1, count($data["tango"]->getFirstPolicy()->getParticipations()));
+        $this->assertEquals(1, count($data["hat"]->getFirstPolicy()->getParticipations()));
+        $this->assertEquals(1, count($data["borb"]->getFirstPolicy()->getParticipations()));
+        $this->assertEquals(1, count($data["tonyAbbot"]->getFirstPolicy()->getParticipations()));
+        $participation = $data["tango"]->getFirstPolicy()->getParticipations()[0];
+        $this->assertEquals($otherDate, $participation->getStart());
+        $participation = $data["tonyAbbot"]->getFirstPolicy()->getParticipations()[0];
+        $this->assertEquals($date, $participation->getStart());
+
+    }
+
+    /**
      * Every time you call this function it generates a bunch of unique but also predictable data and puts it into the
      * database.
      * @param \DateTime $date is the date to set everything as having been made at.
@@ -492,7 +534,7 @@ class AffiliateServiceTest extends WebTestCase
         $affiliate->setDays($days);
         $affiliate->setRenewalDays($days);
         $affiliate->setCampaignSource($source);
-        $affiliate->setLeadSource("scode");
+        $affiliate->setLeadSource("affiliate");
         $affiliate->setLeadSourceDetails($lead);
         $affiliate->setChargeModel(AffiliateCompany::MODEL_ONE_OFF);
         self::$dm->persist($affiliate);
@@ -524,7 +566,7 @@ class AffiliateServiceTest extends WebTestCase
         $attribution = new Attribution();
         $attribution->setCampaignSource($source);
         $user->setAttribution($attribution);
-        $user->setLeadSource("scode");
+        $user->setLeadSource("affiliate");
         $user->setLeadSourceDetails($lead);
         $user->setFirstName($name);
         $user->setLastName($name);
@@ -550,7 +592,7 @@ class AffiliateServiceTest extends WebTestCase
         $user->setLastName($name);
         $attribution = new Attribution();
         $attribution->setCampaignSource($source);
-        $user->setLeadSource("scode");
+        $user->setLeadSource("affiliate");
         $user->setLeadSourceDetails($lead);
         $user->setAttribution($attribution);
         self::$dm->persist($user);
