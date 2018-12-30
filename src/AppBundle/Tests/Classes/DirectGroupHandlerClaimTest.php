@@ -408,4 +408,19 @@ class DirectGroupHandlerClaimTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($directGroup->isExcessValueCorrect($claim, true));
         $this->assertFalse($directGroup->isExcessValueCorrect($claim, false));
     }
+
+    public function testGetStatus()
+    {
+        $directGroup = new DirectGroupHandlerClaim();
+        $directGroup->status = 'Open';
+        $this->assertEquals(DirectGroupHandlerClaim::STATUS_OPEN, $directGroup->getStatus());
+        $directGroup->status = 'Paid Closed';
+        $this->assertEquals(DirectGroupHandlerClaim::STATUS_CLOSED, $directGroup->getStatus());
+        $directGroup->status = 'Paid Closed - Replaced';
+        $this->assertEquals(DirectGroupHandlerClaim::STATUS_CLOSED, $directGroup->getStatus());
+        $directGroup->status = 'Withdrawn';
+        $this->assertEquals(DirectGroupHandlerClaim::STATUS_WITHDRAWN, $directGroup->getStatus());
+        $directGroup->status = 'Rejected';
+        $this->assertEquals(DirectGroupHandlerClaim::STATUS_REJECTED, $directGroup->getStatus());
+    }
 }

@@ -25,6 +25,7 @@ use AppBundle\Form\Type\SequenceType;
 use AppBundle\Repository\BacsIndemnityPaymentRepository;
 use AppBundle\Repository\BacsPaymentRepository;
 use AppBundle\Repository\File\BacsReportAruddFileRepository;
+use AppBundle\Repository\File\BacsReportDdicFileRepository;
 use AppBundle\Repository\File\BacsReportInputFileRepository;
 use AppBundle\Repository\File\BarclaysFileRepository;
 use AppBundle\Repository\File\BarclaysStatementFileRepository;
@@ -730,6 +731,28 @@ class AdminController extends BaseController
     }
 
     /**
+     * @Route("/file/delete/{id}", name="admin_file_delete")
+     */
+    public function deleteFileAction(Request $request, $id)
+    {
+        $referer = $request->headers->get('referer');
+
+        $dm = $this->getManager();
+        /** @var S3FileRepository $repo */
+        $repo = $dm->getRepository(S3File::class);
+        /** @var S3File $s3File */
+        $s3File = $repo->find($id);
+        if (!$s3File) {
+            throw new NotFoundHttpException();
+        }
+
+        $dm->remove($s3File);
+        $dm->flush();
+
+        return $this->getSuccessJsonResponse("Deleted file");
+    }
+
+    /**
      * @Route("/bacs/file/download/{id}", name="admin_bacs_file")
      */
     public function bacsDownloadFileAction($id)
@@ -920,6 +943,14 @@ class AdminController extends BaseController
         $aruddRepo = $dm->getRepository(BacsReportAruddFile::class);
         /** @var BacsReportDdicFileRepository $aruddRepo */
         $ddicRepo = $dm->getRepository(BacsReportDdicFile::class);
+        /** @var BacsPaymentRepository $bacsPaymentRepo */
+        $bacsPaymentRepo = $dm->getRepository(BacsPayment::class);
+
+        $bacsPayments = $bacsPaymentRepo->findPayments($date)->toArray();
+        $manualBacsPayments = array_filter($bacsPayments, function ($payment) {
+            /** @var BacsPayment $payment */
+            return $payment->isManual();
+        });
 
         $payments = $paymentRepo->getAllPaymentsForExport($date);
         $extraPayments = $paymentRepo->getAllPaymentsForExport($date, true);
@@ -1186,6 +1217,7 @@ class AdminController extends BaseController
             'bacsDdicFiles' => $ddicRepo->getMonthlyFiles($date),
             'reconcilationFiles' => $reconcilationFileRepo->getMonthlyFiles($date),
             'payments' => $payments,
+            'manualBacsPayments' => Payment::sumPayments($manualBacsPayments, false),
         ];
     }
 

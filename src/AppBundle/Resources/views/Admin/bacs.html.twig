@@ -400,7 +400,7 @@
                                 {% set paymentAmount = 0 %}
                                 {% set lastSubmittedPayment = {} %}
                                 {% for payment in paymentsIncPrevNextMonth if payment.serialNumber and payment.submittedDate %}
-                                    {% if payment.serialNumber == file.serialNumber and payment.amount >= 0.0 %}
+                                    {% if payment.serialNumber == file.serialNumber and payment.amount >= 0.0 and payment.status != 'failure' %}
                                         {% if lastSubmittedPayment[file.serialNumber] is not defined or lastSubmittedPayment[file.serialNumber] < payment.submittedDate %}
                                             {% set lastSubmittedPayment = lastSubmittedPayment|merge({ (file.serialNumber): payment.submittedDate}) %}
                                         {% endif %}
@@ -425,6 +425,9 @@
                                         <span title="{{ file.metadata|json_encode }}">
                                         {% if file.metadata %}
                                             {{ debitAmount|number_format(2, '.', ',') }}
+                                            {% if file.metadata['debit-amount-notes'] is defined %}
+                                                <i class="fa fa-warning" title="{{ file.metadata['debit-amount-notes'] }}"></i>
+                                            {% endif %}
                                         {% else %}
                                             -
                                         {% endif %}

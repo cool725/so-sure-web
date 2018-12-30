@@ -300,7 +300,7 @@ class MonitorService
         }
 
         if ($errors) {
-            throw new MonitorException(json_encode($errors));
+            throw new MonitorException($this->quoteSafeArrayToString($errors));
         }
     }
 
@@ -389,7 +389,7 @@ class MonitorService
             foreach ($results as $result) {
                 throw new MonitorException(sprintf(
                     "IMEI found on more than one policy, %s",
-                    json_encode($result)
+                    $this->quoteSafeArrayToString($result)
                 ));
             }
         }
@@ -402,7 +402,7 @@ class MonitorService
             // @codingStandardsIgnoreStart
             throw new MonitorException(sprintf(
                 'Judopay is recording more than 1 payment against a policy that indicates a scheduled payment issue. %s',
-                json_encode($results['additional-payments'])
+                $this->quoteSafeArrayToString($results['additional-payments'])
             ));
             // @codingStandardsIgnoreEnd
         }
@@ -411,7 +411,7 @@ class MonitorService
             // @codingStandardsIgnoreStart
             throw new MonitorException(sprintf(
                 'Judopay is missing database payment records which indicates a mobile payment was received, but not recorded. %s',
-                str_replace("\"", "'", json_encode($results['missing']))
+                $this->quoteSafeArrayToString($results['missing'])
             ));
             // @codingStandardsIgnoreEnd
         }
@@ -420,7 +420,7 @@ class MonitorService
             // @codingStandardsIgnoreStart
             throw new MonitorException(sprintf(
                 'Judopay has invalid database payment records. %s',
-                json_encode($results['invalid'])
+                $this->quoteSafeArrayToString($results['invalid'])
             ));
             // @codingStandardsIgnoreEnd
         }
@@ -553,7 +553,7 @@ class MonitorService
         }
 
         if (count($errors) > 0) {
-            throw new MonitorException(json_encode($errors, JSON_PRETTY_PRINT));
+            throw new MonitorException($this->quoteSafeArrayToString($errors));
         }
     }
 
@@ -791,7 +791,7 @@ class MonitorService
             foreach ($results as $result) {
                 throw new MonitorException(sprintf(
                     "Found duplicate invites on email, %s",
-                    json_encode($result)
+                    $this->quoteSafeArrayToString($result)
                 ));
             }
         }
@@ -805,7 +805,7 @@ class MonitorService
             foreach ($results as $result) {
                 throw new MonitorException(sprintf(
                     "Found duplicate invites on sms, %s",
-                    json_encode($result)
+                    $this->quoteSafeArrayToString($result)
                 ));
             }
         }
@@ -819,7 +819,7 @@ class MonitorService
             foreach ($results as $result) {
                 throw new MonitorException(sprintf(
                     "Found duplicate invites on scode, %s",
-                    json_encode($result)
+                    $this->quoteSafeArrayToString($result)
                 ));
             }
         }
@@ -833,7 +833,7 @@ class MonitorService
             foreach ($results as $result) {
                 throw new MonitorException(sprintf(
                     "Found duplicate invites on facebook, %s",
-                    json_encode($result)
+                    $this->quoteSafeArrayToString($result)
                 ));
             }
         }
@@ -983,5 +983,10 @@ class MonitorService
                 "IMEI number Incorrectly detected. https://wearesosure.com/admin/detected-imei"
             );
         }
+    }
+
+    private function quoteSafeArrayToString($data, $options = JSON_PRETTY_PRINT)
+    {
+        return str_replace("\"", "'", json_encode($data, $options));
     }
 }

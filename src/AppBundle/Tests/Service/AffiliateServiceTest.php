@@ -88,7 +88,7 @@ class AffiliateServiceTest extends WebTestCase
      * This test has gotta run first, because it runs before the database has been messed with.
      * @group time-sensitive
      */
-    public function testGenerate()
+    public function testGenerateAffiliate()
     {
         $date = new \DateTime();
         // test on nothing.
@@ -554,8 +554,12 @@ class AffiliateServiceTest extends WebTestCase
     private static function createTestUser($policyAge, $name, $date, $source = "", $lead = "")
     {
         $time = clone $date;
-        $policy = self::createUserPolicy(true, $time->sub(new \DateInterval($policyAge)));
-        $policy->getUser()->setEmail(self::generateEmailClass($name, "affiliateServiceTest"));
+        $policy = self::createUserPolicy(
+            true,
+            $time->sub(new \DateInterval($policyAge)),
+            false,
+            self::generateEmailClass($name, "affiliateServiceTest")
+        );
         $policy->setStatus(Policy::STATUS_ACTIVE);
         $policy->setImei(self::generateRandomImei());
         $user = $policy->getUser();
@@ -569,6 +573,7 @@ class AffiliateServiceTest extends WebTestCase
         self::$dm->persist($policy);
         self::$dm->persist($user);
         self::$dm->flush();
+
         return $user;
     }
 

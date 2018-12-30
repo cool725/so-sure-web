@@ -3,6 +3,7 @@ namespace AppBundle\Service;
 
 use AppBundle\Document\BacsPaymentMethod;
 use AppBundle\Document\BankAccount;
+use AppBundle\Document\CurrencyTrait;
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\File\AccessPayFile;
 use AppBundle\Document\File\BacsReportAddacsFile;
@@ -44,12 +45,16 @@ use Symfony\Component\Templating\EngineInterface;
 class BacsService
 {
     use DateTrait;
+    use CurrencyTrait;
 
     const S3_POLICY_BUCKET = 'policy.so-sure.com';
     const S3_ADMIN_BUCKET = 'admin.so-sure.com';
     const SUN = '176198';
     const KEY_BACS_CANCEL = 'bacs:cancel';
     const KEY_BACS_QUEUE = 'bacs:queue';
+
+    // special key to use to adjust file date instead of storing in metadata
+    const SPECIAL_METADATA_FILE_DATE = 'file-date';
 
     const QUEUE_EVENT_CREATED = 'created';
 
@@ -89,6 +94,12 @@ class BacsService
     const VALIDATE_SKIP = 'skip';
     const VALIDATE_CANCEL = 'cancel';
     const VALIDATE_RESCHEDULE = 'reschedule';
+
+    const INPUT_ERROR_TYPE_REJECTED = 'REJECTED';
+    // assumed type based on <TotalNumberOfErrors amendedRecords="0" returnedRecords="0" rejectedRecords="1"/>
+    const INPUT_ERROR_TYPE_AMENDED = 'AMENDED';
+    // assumed type based on <TotalNumberOfErrors amendedRecords="0" returnedRecords="0" rejectedRecords="1"/>
+    const INPUT_ERROR_TYPE_RETURNED = 'RETURNED';
 
     /** @var LoggerInterface */
     protected $logger;
@@ -514,7 +525,11 @@ class BacsService
 
         if ($metadata) {
             foreach ($metadata as $key => $value) {
-                $uploadFile->addMetadata($key, $value);
+                if ($key == self::SPECIAL_METADATA_FILE_DATE) {
+                    $uploadFile->setDate($value);
+                } else {
+                    $uploadFile->addMetadata($key, $value);
+                }
             }
         }
 
@@ -828,6 +843,18 @@ class BacsService
         $this->validateServiceUserNumber($xpath);
 
         $submittedPayments = $paymentRepo->findBy(['status' => BacsPayment::STATUS_SUBMITTED]);
+        $elementList = $xpath->query(
+            '//VocaDocument/Data/Document/NewAdvices'
+        );
+        /** @var \DOMElement $element */
+        foreach ($elementList as $element) {
+            $ddDate = $this->getChildNodeValueDate($element, 'DateOfDebit');
+            $results['refund-date'] = $ddDate->format('Y-m-d');
+            $results['refund-amount'] = $this->getChildNodeValue($element, 'TotalValueOfDebits');
+
+            // file date should be set to the refund date to appear in the correct reconcilation month
+            $results[self::SPECIAL_METADATA_FILE_DATE] = $ddDate;
+        }
 
         $elementList = $xpath->query(
             '//VocaDocument/Data/Document/NewAdvices/DDICAdvice'
@@ -842,6 +869,8 @@ class BacsService
             $amount = $this->getChildNodeValue($element, 'TotalAmount');
             $results['indemnity-amount'] += $amount;
             $results['details'][] = [$reference => [$reasonCode => $reasonCodeMeaning]];
+            $results['refund-details'][$reference] = $amount;
+
             /** @var User $user */
             $user = $repo->findOneBy(['paymentMethod.bankAccount.reference' => $reference]);
             if (!$user) {
@@ -999,16 +1028,27 @@ class BacsService
     }
 
 
-    private function getChildNodeValue(\DOMElement $element, $name)
+    private function getChildNodeValue(\DOMElement $element, $name, $attributeName = null)
     {
         foreach ($element->childNodes as $childNode) {
             /** @var \DOMElement $childNode */
             if ($childNode->nodeName == $name) {
+                if ($attributeName) {
+                    return $this->getNodeValue($childNode, $attributeName);
+                }
+
                 return trim($childNode->nodeValue);
             }
         }
 
         return null;
+    }
+
+    private function getChildNodeValueDate(\DOMElement $element, $name)
+    {
+        $date = $this->getChildNodeValue($element, $name);
+
+        return \DateTime::createFromFormat('Y-m-d', $date);
     }
 
     private function getReason(\DOMElement $element)
@@ -1032,11 +1072,16 @@ class BacsService
 
     private function getCurrentProcessingDate(\DOMElement $element)
     {
-        $currentProcessingDate = $element->attributes->getNamedItem('currentProcessingDate')->nodeValue;
+        return $this->getNodeDate($element, 'currentProcessingDate');
+    }
 
-        $currentProcessingDate = \DateTime::createFromFormat('Y-m-d', $currentProcessingDate);
+    private function getNodeDate(\DOMElement $element, $name)
+    {
+        $date = $element->attributes->getNamedItem($name)->nodeValue;
 
-        return $currentProcessingDate;
+        $date = \DateTime::createFromFormat('Y-m-d', $date);
+
+        return $date;
     }
 
     private function validateRecordType(\DOMElement $element, $expectedRecordType)
@@ -1188,7 +1233,11 @@ class BacsService
     {
         $repo = $this->dm->getRepository(AccessPayFile::class);
         /** @var AccessPayFile $file */
-        $file = $repo->findOneBy(['serialNumber' => $serialNumber, 'status' => AccessPayFile::STATUS_PENDING]);
+        $file = $repo->findOneBy([
+            'serialNumber' => AccessPayFile::unformatSerialNumber($serialNumber),
+            'status' => AccessPayFile::STATUS_PENDING
+        ]);
+
         if (!$file) {
             return false;
         }
@@ -1241,7 +1290,7 @@ class BacsService
     private function getNodeValue(\DOMElement $element, $name, $missingValue = null)
     {
         if ($element->attributes->getNamedItem($name)) {
-            return $element->attributes->getNamedItem($name)->nodeValue;
+            return trim($element->attributes->getNamedItem($name)->nodeValue);
         }
 
         return $missingValue;
@@ -1275,6 +1324,66 @@ class BacsService
         foreach ($elementList as $element) {
             $this->validateSun($element, 'userNumber');
             $results['file-numbers'][] = $element->attributes->getNamedItem('userFileNumber')->nodeValue;
+        }
+
+        // @codingStandardsIgnoreStart
+        $elementList = $xpath->query('//BACSDocument/Data/InputReport/Submission/UserFile/InputUserFile/Errors/Error');
+        // @codingStandardsIgnoreEnd
+        /** @var \DOMElement $element */
+        foreach ($elementList as $element) {
+            $reference = $this->getChildNodeValue($element, 'ErrorItem', 'reference');
+            $valueOf = $this->getChildNodeValue($element, 'ErrorItem', 'valueOf');
+            $type = $this->getChildNodeValue($element, 'ErrorMessage', 'type');
+
+            if ($type == self::INPUT_ERROR_TYPE_REJECTED) {
+                $userRepo = $this->dm->getRepository(User::class);
+                /** @var User $user */
+                $user = $userRepo->findOneBy(['paymentMethod.bankAccount.reference' => $reference]);
+                if (!$user) {
+                    $this->logger->error(sprintf(
+                        'Unable to locate bacs reference %s for rejected input record',
+                        $reference
+                    ));
+
+                    continue;
+                }
+
+                $foundPayment = false;
+                foreach ($user->getValidPolicies(true) as $policy) {
+                    /** @var Policy $policy */
+                    foreach ($policy->getPaymentsByType(BacsPayment::class) as $payment) {
+                        /** @var BacsPayment $payment */
+                        if (in_array($payment->getStatus(), [
+                            BacsPayment::STATUS_GENERATED,
+                            BacsPayment::STATUS_SUBMITTED
+                        ]) && $this->areEqualToTwoDp($valueOf, $payment->getAmount())) {
+                            $payment->setStatus(BacsPayment::STATUS_FAILURE);
+                            $payment->setSuccess(false);
+                            $payment->setNotes('Input file rejected');
+                            $foundPayment = true;
+                            if (!isset($results['auto-rejected-payment-records'])) {
+                                $results['auto-rejected-payment-records'] = 0;
+                            }
+                            $results['auto-rejected-payment-records']++;
+                        }
+                    }
+                }
+
+                if (!$foundPayment) {
+                    $this->logger->error(sprintf(
+                        'Unable to locate payment for %0.2f for bacs reference %s for rejected input record',
+                        $valueOf,
+                        $reference
+                    ));
+                }
+            } else {
+                $this->logger->error(sprintf(
+                    'Unhandled error type %s for %0.2f for bacs reference %s for input record',
+                    $type,
+                    $valueOf,
+                    $reference
+                ));
+            }
         }
 
         // @codingStandardsIgnoreStart
@@ -1723,12 +1832,16 @@ class BacsService
         // processing date
         if (!$ignoreNotEnoughTime) {
             if (!$bankAccount->allowedProcessing($scheduledDate)) {
+                // @codingStandardsIgnoreStart
                 $msg = sprintf(
-                    'Skipping (scheduled) payment %s as processing date is not allowed (%s / initial: %s)',
+                    'Skipping (scheduled) payment %s on %s as processing day is too early/late (expected: %d max: %d initial: %s)',
                     $id,
                     $scheduledDate->format('d/m/y'),
+                    $bankAccount->getNotificationDay(),
+                    $bankAccount->getMaxAllowedProcessingDay(),
                     $bankAccount->isFirstPayment() ? 'yes' : 'no'
                 );
+                // @codingStandardsIgnoreEnd
                 $this->logger->error($msg);
 
                 return self::VALIDATE_SKIP;
@@ -1783,9 +1896,14 @@ class BacsService
                 continue;
             }
 
+            // we're unable to process for the current date, so ensure its at least tomorrow
+            $processingDate = $payment->getDate();
+            if ($processingDate < $date) {
+                $processingDate = $date;
+            }
 
             $lines[] = implode(',', [
-                sprintf('"%s"', $payment->getDate()->format('d/m/y')),
+                sprintf('"%s"', $processingDate->format('d/m/y')),
                 '"Scheduled Payment"',
                 $bankAccount->isFirstPayment() ?
                     sprintf('"%s"', self::BACS_COMMAND_FIRST_DIRECT_DEBIT) :
@@ -1799,7 +1917,7 @@ class BacsService
                 sprintf('"%s"', $policy->getId()),
                 sprintf('"P-%s"', $payment->getId()),
             ]);
-            $payment->setSubmittedDate($payment->getDate());
+            $payment->setSubmittedDate($processingDate);
             $payment->setStatus(BacsPayment::STATUS_GENERATED);
             $payment->setSerialNumber($serialNumber);
             if ($payment->getScheduledPayment()) {

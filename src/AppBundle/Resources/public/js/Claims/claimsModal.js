@@ -90,6 +90,16 @@ $('#claimsModal').on('show.bs.modal', function (event) {
             inline: false,
             navbar: false
         });
+
+        modal.find('.set-imei').click(function() {
+            var imei = $('#claims_form_replacementImei').val();
+            //console.log(imei);
+            $('#imei_form_imei').val(imei);
+            $('#claimsModal').modal('hide');
+            setTimeout(function() {
+                $('#imeiForm').modal('show');
+            }, 500);
+        });
     });
 });
 

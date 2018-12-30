@@ -46,6 +46,7 @@ class DaviesHandlerClaim extends HandlerClaim
     const MISTATUS_DMS_ERROR = "DMS Error";
     const MISTATUS_COMPLAINT = "Complaint";
     const MISTATUS_INSURER = "Contact from insurer";
+    const MISTATUS_UNDERWRITER = "Contact From Underwriter";
 
     const TYPE_LOSS = 'Loss';
     const TYPE_THEFT = 'Theft';
@@ -338,6 +339,7 @@ class DaviesHandlerClaim extends HandlerClaim
                 mb_strtolower(self::MISTATUS_DMS_ERROR),
                 mb_strtolower(self::MISTATUS_COMPLAINT),
                 mb_strtolower(self::MISTATUS_INSURER),
+                mb_strtolower(self::MISTATUS_UNDERWRITER),
             ])) {
                 throw new \Exception('Unknown claim detail status');
             }

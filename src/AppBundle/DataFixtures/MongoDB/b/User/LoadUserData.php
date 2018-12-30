@@ -15,6 +15,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class LoadUserData implements FixtureInterface, ContainerAwareInterface
 {
     const DEFAULT_ADMIN = 'admin@so-sure.com';
+    const DEFAULT_CLAIMS_DAVIES = 'claims-davies@so-sure.com';
+    const DEFAULT_CLAIMS_DIRECTGROUP = 'claims-directgroup@so-sure.com';
     const DEFAULT_PASSWORD = 'w3ares0sure!';
 
     /**
@@ -31,8 +33,8 @@ class LoadUserData implements FixtureInterface, ContainerAwareInterface
     {
         $this->newUser(self::DEFAULT_ADMIN, self::DEFAULT_PASSWORD, 'so-sure', 'Admin', [User::ROLE_ADMIN]);
         $this->newUser('claims@so-sure.com', self::DEFAULT_PASSWORD, 'so-sure', 'Claims', [User::ROLE_CLAIMS]);
-        $this->newUser('claims-davies@so-sure.com', self::DEFAULT_PASSWORD, 'Davies', 'Claims', [User::ROLE_CLAIMS], Claim::TEAM_DAVIES);
-        $this->newUser('claims-directgroup@so-sure.com', self::DEFAULT_PASSWORD, 'DirectGroup', 'Claims', [User::ROLE_CLAIMS], Claim::TEAM_DIRECT_GROUP);
+        $this->newUser(self::DEFAULT_CLAIMS_DAVIES, self::DEFAULT_PASSWORD, 'Davies', 'Claims', [User::ROLE_CLAIMS], Claim::TEAM_DAVIES);
+        $this->newUser(self::DEFAULT_CLAIMS_DIRECTGROUP, self::DEFAULT_PASSWORD, 'DirectGroup', 'Claims', [User::ROLE_CLAIMS], Claim::TEAM_DIRECT_GROUP);
         $this->newUser('employee@so-sure.com', self::DEFAULT_PASSWORD, 'so-sure', 'Employee', [User::ROLE_EMPLOYEE]);
         $this->newUser('customer-services@so-sure.com', self::DEFAULT_PASSWORD, 'so-sure', 'CustomerServices', [User::ROLE_CUSTOMER_SERVICES]);
 

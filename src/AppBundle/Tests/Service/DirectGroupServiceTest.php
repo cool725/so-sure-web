@@ -611,7 +611,7 @@ class DirectGroupServiceTest extends WebTestCase
         self::$directGroupService->saveClaims(1, [$dgOpen, $dgClosed]);
         $this->assertEquals(1, count(self::$directGroupService->getErrors()));
 
-        $this->insureErrorExists('/[R1]/');
+        $this->insureErrorExists('/\[R1\]/');
     }
 
     public function testSaveClaimsOpenClosedDb()
@@ -648,10 +648,12 @@ class DirectGroupServiceTest extends WebTestCase
 
         $this->assertEquals(0, count(self::$directGroupService->getErrors()));
         self::$directGroupService->saveClaims(1, [$dgClosed]);
-        // also missing claim number
-        $this->assertEquals(2, count(self::$directGroupService->getErrors()));
 
-        $this->insureErrorExists('/[R3]/');
+        // missing claim number
+        //print_r(self::$directGroupService->getErrors());
+        $this->assertEquals(1, count(self::$directGroupService->getErrors()));
+
+        $this->insureErrorDoesNotExist('/\[R3\]/');
     }
 
     public function testSaveClaimsClosedOpen()
@@ -833,10 +835,11 @@ class DirectGroupServiceTest extends WebTestCase
         //print_r(self::$directGroupService->getWarnings());
         //print_r(self::$directGroupService->getSoSureActions());
 
+        $this->insureSoSureActionExists('/was previously closed/');
         $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
         $repo = $dm->getRepository(Claim::class);
         $updatedClaim = $repo->find($claim->getId());
-        $this->insureSoSureActionExists('/was previously closed/');
+        $this->assertEquals(Claim::STATUS_SETTLED, $updatedClaim->getStatus());
     }
 
     public function testValidateClaimDetailsName()

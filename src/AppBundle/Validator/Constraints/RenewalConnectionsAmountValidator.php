@@ -20,15 +20,23 @@ class RenewalConnectionsAmountValidator extends ConstraintValidator
 
         $count = 0;
         $maxConnections = 0;
+        $policy = null;
+        $policyNumber = 'Unknown';
         foreach ($value as $connection) {
             if ($connection instanceof RenewalConnection && $connection->getRenew()) {
+                $policy = $connection->getSourcePolicy();
                 $count++;
-                $maxConnections = $connection->getSourcePolicy()->getMaxConnections();
             }
+        }
+
+        if ($policy) {
+            $maxConnections = $policy->getMaxConnectionsLimit();
+            $policyNumber = $policy->getPolicyNumber();
         }
 
         if ($count > $maxConnections) {
             $this->context->buildViolation($renewalConnectionsAmountConstraint->message)
+                ->setParameter('%string%', $policyNumber)
                 ->addViolation();
         }
     }

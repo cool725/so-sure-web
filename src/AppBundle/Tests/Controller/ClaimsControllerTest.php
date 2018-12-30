@@ -49,7 +49,7 @@ class ClaimsControllerTest extends BaseControllerTest
         $policy = self::initPolicy($user, self::$dm, $phone, null, true, true);
         self::$dm->flush();
 
-        $this->login('claims@so-sure.com', LoadUserData::DEFAULT_PASSWORD, 'claims/policies');
+        $this->login(LoadUserData::DEFAULT_CLAIMS_DIRECTGROUP, LoadUserData::DEFAULT_PASSWORD, 'claims/policies');
 
         $crawler = self::$client->request('GET', sprintf('/claims/policy/%s', $policy->getId()));
         $this->verifyResponse(200);
@@ -74,7 +74,7 @@ class ClaimsControllerTest extends BaseControllerTest
         self::$dm->flush();
         $this->assertTrue($policy->getUser()->hasActivePolicy());
 
-        $this->login('claims@so-sure.com', LoadUserData::DEFAULT_PASSWORD, 'claims/policies');
+        $this->login(LoadUserData::DEFAULT_CLAIMS_DIRECTGROUP, LoadUserData::DEFAULT_PASSWORD, 'claims/policies');
 
         $crawler = self::$client->request('GET', sprintf('/claims/policy/%s', $policy->getId()));
         $this->verifyResponse(200);
@@ -100,7 +100,7 @@ class ClaimsControllerTest extends BaseControllerTest
         self::$dm->flush();
         $this->assertTrue($policy->getUser()->hasActivePolicy());
 
-        $this->login('claims@so-sure.com', LoadUserData::DEFAULT_PASSWORD, 'claims/policies');
+        $this->login(LoadUserData::DEFAULT_CLAIMS_DIRECTGROUP, LoadUserData::DEFAULT_PASSWORD, 'claims/policies');
 
         $crawler = self::$client->request('GET', sprintf('/claims/policy/%s', $policy->getId()));
         $this->verifyResponse(200);
@@ -137,7 +137,7 @@ class ClaimsControllerTest extends BaseControllerTest
         self::$dm->flush();
         $this->assertTrue($policy->getUser()->hasActivePolicy());
 
-        $this->login('claims@so-sure.com', LoadUserData::DEFAULT_PASSWORD, 'claims/policies');
+        $this->login(LoadUserData::DEFAULT_CLAIMS_DIRECTGROUP, LoadUserData::DEFAULT_PASSWORD, 'claims/policies');
 
         $crawler = self::$client->request('GET', sprintf('/claims/policy/%s', $policy->getId()));
         $form = $crawler->selectButton('claim[record]')->form();
@@ -172,7 +172,7 @@ class ClaimsControllerTest extends BaseControllerTest
         self::$dm->flush();
         $this->assertTrue($policy->getUser()->hasActivePolicy());
 
-        $this->login('claims@so-sure.com', LoadUserData::DEFAULT_PASSWORD, 'claims/policies');
+        $this->login(LoadUserData::DEFAULT_CLAIMS_DIRECTGROUP, LoadUserData::DEFAULT_PASSWORD, 'claims/policies');
 
         $crawler = self::$client->request('GET', sprintf('/claims/policy/%s', $policy->getId()));
         $form = $crawler->selectButton('claim[record]')->form();
@@ -208,7 +208,7 @@ class ClaimsControllerTest extends BaseControllerTest
         $this->assertTrue($policy->getUser()->hasActivePolicy());
         $this->assertNotNull($policy->getCurrentExcess());
 
-        $this->login('claims@so-sure.com', LoadUserData::DEFAULT_PASSWORD, 'claims/policies');
+        $this->login(LoadUserData::DEFAULT_CLAIMS_DIRECTGROUP, LoadUserData::DEFAULT_PASSWORD, 'claims/policies');
 
         $crawler = self::$client->request('GET', sprintf('/claims/policy/%s', $policy->getId()));
         $form = $crawler->selectButton('claim[record]')->form();

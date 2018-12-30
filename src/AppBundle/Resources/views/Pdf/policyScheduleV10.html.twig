@@ -41,24 +41,34 @@
             {% if policy.picSureStatus == 'preapproved' %}
                 <p>Excess to be paid at point of claim:</p>
                 <ul>
-                    <li>Accidental Damage: £50</li>
-                    <li>Breakdown: £50</li>
-                    <li>Theft: £70</li>
-                    <li>Loss: £70</li>
+                    <li>Accidental Damage: £{{ policy.premium.picSureExcess.damage|number_format(0, '.', ',') }}</li>
+                    <li>Breakdown: £{{ policy.premium.picSureExcess.extendedWarranty|number_format(0, '.', ',') }}</li>
+                    <li>Theft: £{{ policy.premium.picSureExcess.theft|number_format(0, '.', ',') }}</li>
+                    <li>Loss: £{{ policy.premium.picSureExcess.loss|number_format(0, '.', ',') }}</li>
                 </ul>
                 <p>If you upgrade or change phone, you must validate your new phone using the so-sure app, prior to making a claim, to continue paying the Excess stated above. If, however, before claiming you have not validated your phone using the so-sure app, then the Excess is:</p>
                 <ul>
-                    <li>£150 for any type of claim</li>
+                    <li>Accidental Damage: £{{ policy.premium.excess.damage|number_format(0, '.', ',') }}</li>
+                    <li>Breakdown: £{{ policy.premium.excess.extendedWarranty|number_format(0, '.', ',') }}</li>
+                    <li>Theft: £{{ policy.premium.excess.theft|number_format(0, '.', ',') }}</li>
+                    <li>Loss: £{{ policy.premium.excess.loss|number_format(0, '.', ',') }}</li>
                 </ul>
             {% else %}
                 <p>If, prior to your claim, you validated via the so-sure app that your phone is in good working condition with no cracked screen, the Excess is:</p>
                 <ul>
-                    <li>Accidental Damage: £50</li>
-                    <li>Breakdown: £50</li>
-                    <li>Theft: £70</li>
-                    <li>Loss: £70</li>
+                    <li>Accidental Damage: £{{ policy.premium.picSureExcess.damage|number_format(0, '.', ',') }}</li>
+                    <li>Breakdown: £{{ policy.premium.picSureExcess.extendedWarranty|number_format(0, '.', ',') }}</li>
+                    <li>Theft: £{{ policy.premium.picSureExcess.theft|number_format(0, '.', ',') }}</li>
+                    <li>Loss: £{{ policy.premium.picSureExcess.loss|number_format(0, '.', ',') }}</li>
                 </ul>
-                <p>If, before claiming, you have not validated your phone using the so-sure app, then the Excess is £150. Validation is only done through the so-sure app, unless requested otherwise in writing by the so-sure team.</p>
+                <p>If, before claiming, you have not validated your phone using the so-sure app, then the Excess is:</p>
+                <ul>
+                    <li>Accidental Damage: £{{ policy.premium.excess.damage|number_format(0, '.', ',') }}</li>
+                    <li>Breakdown: £{{ policy.premium.excess.extendedWarranty|number_format(0, '.', ',') }}</li>
+                    <li>Theft: £{{ policy.premium.excess.theft|number_format(0, '.', ',') }}</li>
+                    <li>Loss: £{{ policy.premium.excess.loss|number_format(0, '.', ',') }}</li>
+                </ul>
+                <p>Validation is only done through the so-sure app, unless requested otherwise in writing by the so-sure team.</p>
             {% endif %}
         </div>
         <div style="position: absolute; float: left; bottom: 50px; font-size: 12px; margin-right: 25mm;">

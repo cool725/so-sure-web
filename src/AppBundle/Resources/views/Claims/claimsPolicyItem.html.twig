@@ -1285,15 +1285,6 @@
                 {% endif %}
             </table>
 
-            {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:AdminEmployee:imeiForm', 'policy': policy, 'id': 'imeiForm'} %}
-            {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:AdminEmployee:detectedImeiForm', 'params': {'id': policy.id, 'detected-imei': app.request.get('detected-imei')}, 'id': 'detectedImeiForm'} %}
-            {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:AdminEmployee:picsureForm', 'policy': policy, 'id': 'picsureForm'} %}
-            {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:AdminEmployee:tasteCardForm', 'policy': policy, 'id': 'tasteCardForm', 'title': 'Taste Card Settings'} %}
-            {% if is_granted('ROLE_ADMIN') %}
-                {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:Admin:salvaRequeueForm', 'policy': policy, 'id': 'salvaRequeueForm'} %}
-                {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:Admin:salvaStatusForm', 'policy': policy, 'id': 'salvaStatusForm'} %}
-            {% endif %}
-
             {% endif %}
             {% if is_granted('ROLE_ADMIN') %}
             <h3>Company</h3>
@@ -1566,7 +1557,7 @@
                     <div class="modal-body">
                         <div class="row">
                             <div class="col-md-12">
-                                <h4>This will reschedule the payment for the next working day</h4>
+                                <h4>This will reschedule the payment for now, unless its 2pm or later, in which case the next working day</h4>
                             </div>
                         </div>
                         <div class="row">
@@ -1772,6 +1763,17 @@
                 </div>
             </div>
         </div>
+    {% endif %}
+
+    {% if is_granted('ROLE_EMPLOYEE') %}
+        {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:AdminEmployee:imeiForm', 'policy': policy, 'id': 'imeiForm'} %}
+        {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:AdminEmployee:detectedImeiForm', 'params': {'id': policy.id, 'detected-imei': app.request.get('detected-imei')}, 'id': 'detectedImeiForm'} %}
+        {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:AdminEmployee:picsureForm', 'policy': policy, 'id': 'picsureForm'} %}
+        {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:AdminEmployee:tasteCardForm', 'policy': policy, 'id': 'tasteCardForm', 'title': 'Taste Card Settings'} %}
+    {% endif %}
+    {% if is_granted('ROLE_ADMIN') %}
+        {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:Admin:salvaRequeueForm', 'policy': policy, 'id': 'salvaRequeueForm'} %}
+        {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:Admin:salvaStatusForm', 'policy': policy, 'id': 'salvaStatusForm'} %}
     {% endif %}
 
     {% if is_granted('ROLE_CUSTOMER_SERVICES') %}

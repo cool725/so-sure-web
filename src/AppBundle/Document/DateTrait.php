@@ -32,7 +32,7 @@ trait DateTrait
     public static function isBankHoliday(\DateTime $date)
     {
         foreach (static::getBankHolidays() as $bankHoliday) {
-            if ($bankHoliday->diff($date)->days == 0) {
+            if ($bankHoliday->format('Ymd') == $date->format('Ymd')) {
                 return true;
             }
         }
@@ -234,12 +234,18 @@ trait DateTrait
         $businessDays = clone $date;
         while ($days > 0) {
             $isBusinessDay = true;
-            $businessDays->add(new \DateInterval('P1D'));
+            $businessDays = $businessDays->add(new \DateInterval('P1D'));
+            //print PHP_EOL;
+            //print PHP_EOL;
+            //print $days . PHP_EOL;
+            //print $businessDays->format('w') . PHP_EOL;
+            //print $businessDays->format(\DateTime::ATOM) . PHP_EOL;
             if (!static::isWeekDay($businessDays)) {
                 $isBusinessDay = false;
             } elseif (static::isBankHoliday(($businessDays))) {
                 $isBusinessDay = false;
             }
+            //print $isBusinessDay ? 'true' : 'false' . PHP_EOL;
 
             if ($isBusinessDay) {
                 $days--;

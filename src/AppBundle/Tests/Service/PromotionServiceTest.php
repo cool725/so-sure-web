@@ -59,7 +59,7 @@ class PromotionServiceTest extends WebTestCase
     /**
      * Tests the promotion service generate method.
      */
-    public function testGenerate()
+    public function testGeneratePromotion()
     {
         $promotion = $this->createTestPromotion(
             "free!!! phone case!!!!!!!!!",

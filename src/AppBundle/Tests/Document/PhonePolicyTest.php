@@ -5122,9 +5122,18 @@ class PhonePolicyTest extends WebTestCase
 
     public function testCorrectFiguresAfterPotReward()
     {
-        $policyA = $this->getPolicy(static::generateEmail('testCorrectFiguresAfterPotRewardA', $this));
-        $policyB = $this->getPolicy(static::generateEmail('testCorrectFiguresAfterPotRewardB', $this));
+        $policyA = $this->getPolicy(
+            static::generateEmail('testCorrectFiguresAfterPotRewardA', $this),
+            null,
+            static::getRandomPhone(static::$dm)
+        );
+        $policyB = $this->getPolicy(
+            static::generateEmail('testCorrectFiguresAfterPotRewardB', $this),
+            null,
+            static::getRandomPhone(static::$dm)
+        );
         $policyA->setStatus(Policy::STATUS_ACTIVE);
+        $policyA->setPremiumInstallments(12);
         $policyB->setStatus(Policy::STATUS_ACTIVE);
         $this->createLinkedConnections($policyA, $policyB, 10, 10);
 
@@ -5176,11 +5185,86 @@ class PhonePolicyTest extends WebTestCase
         $this->assertTrue($policyA->hasCorrectCommissionPayments(new \DateTime('2017-01-01')));
     }
 
+    public function testHasCorrectCommissionPaymentsUnpaid()
+    {
+        $date = new \DateTime('2018-03-19');
+        $policy = $this->getPolicy(
+            static::generateEmail('testHasCorrectCommissionPaymentsUnpaid', $this),
+            $date,
+            self::getRandomPhone(static::$dm)
+        );
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        $policy->setId(rand(1, 999999));
+        $policy->setPremiumInstallments(12);
+        for ($i = 0; $i < 8; $i++) {
+            $month = clone $date;
+            $month = $month->add(new \DateInterval(sprintf('P%dM', $i)));
+            $payment = self::addPayment(
+                $policy,
+                $policy->getPremium()->getMonthlyPremiumPrice(),
+                Salva::MONTHLY_TOTAL_COMMISSION,
+                null,
+                $month
+            );
+        }
+        $policy->cancel(Policy::CANCELLED_UPGRADE, new \DateTime('2018-12-17'));
+
+        $validationDate = new \DateTime('2018-12-27');
+        $totalPayments = $policy->getTotalSuccessfulStandardPayments(false, $validationDate);
+        $numPayments = $policy->getPremium()->getNumberOfMonthlyPayments($totalPayments);
+        $this->assertEquals(8, $numPayments);
+
+
+        $this->assertEquals(7.12, $policy->getExpectedCommission($validationDate));
+        $this->assertTrue($policy->hasCorrectCommissionPayments($validationDate));
+    }
+
+    public function testHasCorrectCommissionPaymentsCancelledRefund()
+    {
+        $date = new \DateTime('2018-02-10');
+        $policy = $this->getPolicy(
+            static::generateEmail('testHasCorrectCommissionPaymentsCancelledRefund', $this),
+            $date,
+            self::getRandomPhone(static::$dm)
+        );
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        $policy->setId(rand(1, 999999));
+        $policy->setPremiumInstallments(12);
+        for ($i = 0; $i < 2; $i++) {
+            $month = clone $date;
+            $month = $month->add(new \DateInterval(sprintf('P%dM', $i)));
+            $payment = self::addPayment(
+                $policy,
+                $policy->getPremium()->getMonthlyPremiumPrice(),
+                Salva::MONTHLY_TOTAL_COMMISSION,
+                null,
+                $month
+            );
+        }
+        $payment = self::addPayment(
+            $policy,
+            -4.32,
+            -0.40,
+            null,
+            new \DateTime('2018-03-28')
+        );
+        $policy->cancel(Policy::CANCELLED_UPGRADE, new \DateTime('2018-03-28'));
+
+        $validationDate = new \DateTime('2018-12-27');
+        $totalPayments = $policy->getTotalSuccessfulStandardPayments(false, $validationDate);
+        $numPayments = $policy->getPremium()->getNumberOfMonthlyPayments($totalPayments);
+        $this->assertEquals(null, $numPayments);
+
+
+        $this->assertEquals(1.38, $policy->getExpectedCommission($validationDate));
+        $this->assertTrue($policy->hasCorrectCommissionPayments($validationDate));
+    }
+
     public function testRenewTooMany()
     {
         $policy = $this->getPolicy(static::generateEmail('testRenewTooMany', $this));
         $policy->setStatus(Policy::STATUS_ACTIVE);
-        for ($i = 1; $i < $policy->getMaxConnections() + 3; $i++) {
+        for ($i = 1; $i <= $policy->getMaxConnectionsLimit() + 3; $i++) {
             $policyConnect = $this->getPolicy(static::generateEmail(sprintf('policyConnect%d', $i), $this));
             $policyConnect->setStatus(Policy::STATUS_ACTIVE);
             $this->createLinkedConnections($policy, $policyConnect, 2, 2);
@@ -5188,10 +5272,11 @@ class PhonePolicyTest extends WebTestCase
 
         $renewalPolicy = $policy->createPendingRenewal($policy->getPolicyTerms(), new \DateTime('2016-12-15'));
         $this->assertEquals(Policy::STATUS_PENDING_RENEWAL, $renewalPolicy->getStatus());
-        //\Doctrine\Common\Util\Debug::dump($policyA);
+        //\Doctrine\Common\Util\Debug::dump($renewalPolicy);
         $renewalPolicy->renew(0, false, new \DateTime('2016-12-16'));
         $renewed = 0;
         $unrenewed = 0;
+        //\Doctrine\Common\Util\Debug::dump($renewalPolicy->getRenewalConnections());
         foreach ($renewalPolicy->getRenewalConnections() as $connection) {
             if ($connection->getRenew()) {
                 $renewed++;
@@ -5311,8 +5396,8 @@ class PhonePolicyTest extends WebTestCase
             $policy,
             $policy->getPremium()->getMonthlyPremiumPrice(),
             Salva::MONTHLY_TOTAL_COMMISSION,
-            null,
             new \DateTime('2016-02-28 15:00'),
+            true,
             BacsPayment::STATUS_GENERATED
         );
         $this->assertEquals(
@@ -5332,18 +5417,23 @@ class PhonePolicyTest extends WebTestCase
         );
     }
 
-    private function getPolicy($email, \DateTime $date = null)
+    private function getPolicy($email, \DateTime $date = null, $phone = null)
     {
         if (!$date) {
             $date = new \DateTime("2016-01-01");
         }
         $policy = new SalvaPhonePolicy();
-        $policy->setPhone(static::$phone);
 
         $user = new User();
         $user->setEmail($email);
         $user->setEnabled(true);
         self::addAddress($user);
+
+        if (!$phone) {
+            $policy->setPhone(static::$phone);
+        } else {
+            $policy->setPhone($phone, $date);
+        }
 
         $policy->init($user, static::getLatestPolicyTerms(self::$dm));
 
@@ -5433,6 +5523,61 @@ class PhonePolicyTest extends WebTestCase
         $policy->setStatus(Policy::STATUS_UNPAID);
         $this->assertFalse($policy->isUnpaidCloseToExpirationDate($expirationTwelve));
         $this->assertTrue($policy->isUnpaidCloseToExpirationDate($expirationTen));
+    }
+
+    public function testIsUnpaidPastExpiration()
+    {
+        $user = new User();
+        $user->setEmail(static::generateEmail('testIsUnpaidPastExpiration', $this));
+        self::$dm->persist($user);
+        self::addAddress($user);
+        $policy = new SalvaPhonePolicy();
+        $policy->init($user, self::getLatestPolicyTerms(static::$dm));
+        $policy->setPhone(self::$phone);
+        $policy->create(rand(1, 999999), null, null, rand(1, 9999));
+        $policy->setImei(rand(1, 999999));
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        $policy->setId(rand(1, 999999));
+        $policy->setPremiumInstallments(12);
+
+        $expiration = $policy->getPolicyExpirationDate();
+        $diff = $expiration->diff($policy->getEnd());
+        //print_r($diff);
+        // normally 334, but if current date is 29th, then 335 (likewise, 30th => 336, 31st => 337)
+        $this->assertTrue(in_array($diff->days, [334, 335, 336, 337]));
+
+        $month = clone $policy->getStart();
+        for ($i = 0; $i <= 10; $i++) {
+            $month = clone $policy->getStart();
+            $month = $month->add(new \DateInterval(sprintf('P%dM', $i)));
+
+            /*
+            print $policy->getNextBillingDate($month)->format(\DateTime::ATOM) . PHP_EOL;
+            print $policy->getPolicyExpirationDate($month)->format(\DateTime::ATOM) . PHP_EOL;
+            */
+
+            // add an ontime payment
+            $payment = self::addBacsPayment(
+                $policy,
+                $policy->getPremium()->getMonthlyPremiumPrice(),
+                Salva::MONTHLY_TOTAL_COMMISSION,
+                $month
+            );
+        }
+
+        /*
+        print $policy->getPremium()->getMonthlyPremiumPrice() * 12 . PHP_EOL;
+        print $policy->getPremiumPaid();
+        */
+
+        $policy->setStatus(Policy::STATUS_UNPAID);
+        $expiration = $policy->getPolicyExpirationDate($month);
+        $diff = $expiration->diff($policy->getEnd());
+
+        // print_r($diff);
+        // Normally 0, but 1 for 29th
+        $this->assertTrue(in_array($diff->days, [1, 0]));
+        $this->assertTrue($expiration < $policy->getEnd());
     }
 
     public function testSetPolicyStatusActiveIfUnpaid()
