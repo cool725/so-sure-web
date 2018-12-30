@@ -1001,8 +1001,9 @@ class MonitorService
 
             $bacs = $block->getPolicy()->getUser()->getBacsPaymentMethod();
             if ($bacs) {
+                // ignore initial first payments if we haven't reached the initial notification date
                 if ($bacs->getBankAccount()->isFirstPayment() &&
-                    $block->getScheduled() >= $bacs->getBankAccount()->getInitialNotificationDate()) {
+                    $this->now() < $bacs->getBankAccount()->getInitialNotificationDate()) {
                     continue;
                 }
             }
