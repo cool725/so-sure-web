@@ -19,6 +19,7 @@ use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Policy;
 use AppBundle\Document\PolicyTerms;
 use AppBundle\Document\SalvaPhonePolicy;
+use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\User;
 use AppBundle\Exception\MonitorException;
 use AppBundle\Repository\BacsPaymentRepository;
@@ -982,6 +983,20 @@ class MonitorService
             throw new MonitorException(
                 "IMEI number Incorrectly detected. https://wearesosure.com/admin/detected-imei"
             );
+        }
+    }
+
+    public function blockedScheduledPayments()
+    {
+        $repo = $this->dm->getRepository(ScheduledPayment::class);
+        $twoDays = $this->subBusinessDays($this->now(), 2);
+        $blocked = $repo->findBy(['status' => ScheduledPayment::STATUS_SCHEDULED, 'scheduled' => ['$lt' => $twoDays]]);
+
+        if (count($blocked) > 0) {
+            throw new MonitorException(sprintf(
+                "Found blcoked scheduled payments. %s",
+                $this->quoteSafeArrayToString($blocked)
+            ));
         }
     }
 
