@@ -50,6 +50,9 @@ class SalvaExportService
     const QUEUE_UPDATED = 'updated';
     const QUEUE_CANCELLED = 'cancelled';
 
+    // Policy status is Terminated policy. Only issued policy can be terminated.
+    const ERROR_POLICY_TERMINATED = 'webservice.constraint.C1406-05';
+
     /** @var DocumentManager */
     protected $dm;
 
@@ -627,7 +630,10 @@ class SalvaExportService
         }
         $response = $this->send($xml, self::SCHEMA_POLICY_TERMINATE);
         $this->logger->info($response);
-        $responseId = $this->getResponseId($response);
+
+        // occasionally it seems like a terminate response is lost. When we then try to re-terminate
+        // there is an already terminated response, which we can safely ignore
+        $responseId = $this->getResponseId($response, [self::ERROR_POLICY_TERMINATED]);
         $phonePolicy->addSalvaPolicyResults($responseId, SalvaPhonePolicy::RESULT_TYPE_CANCEL, [
             'usedFinalPremium' => $cancelXml['usedFinalPremium'],
         ]);
@@ -850,7 +856,7 @@ class SalvaExportService
         return $this->redis->lrange(self::KEY_POLICY_ACTION, 0, $max);
     }
 
-    protected function getResponseId($xml)
+    protected function getResponseId($xml, $allowedErrors = [])
     {
         $dom = new DOMDocument();
         $dom->loadXML($xml, LIBXML_NOBLANKS);
@@ -865,6 +871,10 @@ class SalvaExportService
 
         $elementList = $xpath->query('//ns1:errorResponse/ns1:errorList/ns1:constraint');
         foreach ($elementList as $element) {
+            if (in_array($element->getAttribute('ns1:code'), $allowedErrors)) {
+                return $element->nodeValue;
+            }
+
             $errMsg = sprintf(
                 "Error sending policy. Response: %s : %s",
                 $element->getAttribute('ns1:code'),

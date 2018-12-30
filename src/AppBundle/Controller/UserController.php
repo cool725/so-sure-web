@@ -1186,6 +1186,7 @@ class UserController extends BaseController
             Policy::UNPAID_JUDO_CARD_EXPIRED,
             Policy::UNPAID_JUDO_PAYMENT_FAILED,
             Policy::UNPAID_JUDO_PAYMENT_MISSING,
+            Policy::UNPAID_PAYMENT_METHOD_MISSING,
         ])) {
             $includeJudoWebpay = true;
         } elseif (!$policy->canBacsPaymentBeMadeInTime() && in_array($unpaidReason, [

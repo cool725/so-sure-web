@@ -115,4 +115,9 @@ class AccessPayFile extends UploadFile
     {
         return sprintf("S-%06d", $serialNumber);
     }
+
+    public static function unformatSerialNumber($serialNumber)
+    {
+        return str_replace("S-", "", $serialNumber);
+    }
 }

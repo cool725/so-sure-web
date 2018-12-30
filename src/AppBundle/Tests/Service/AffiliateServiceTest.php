@@ -2,6 +2,7 @@
 
 namespace AppBundle\Tests\Service;
 
+use AppBundle\Document\Promotion;
 use AppBundle\Document\AffiliateCompany;
 use AppBundle\Document\Attribution;
 use AppBundle\Repository\PhoneRepository;
@@ -87,7 +88,7 @@ class AffiliateServiceTest extends WebTestCase
      * This test has gotta run first, because it runs before the database has been messed with.
      * @group time-sensitive
      */
-    public function testGenerate()
+    public function testGenerateAffiliate()
     {
         $date = new \DateTime();
         // test on nothing.
@@ -433,6 +434,77 @@ class AffiliateServiceTest extends WebTestCase
     }
 
     /**
+     * Tests the integration of the promotion and affiliate systems and that policies can be made to participate in a
+     * given promotion when they are charged for.
+     */
+    public function testAffiliatePromotion()
+    {
+        $date = new \DateTime('2018-12-20 15:59');
+        $otherDate = new \DateTime('2018-12-31 23:59');
+        $data = $this->createState($date);
+        $promotion = new Promotion();
+        $promotion->setName("Free camel when you claim.");
+        $promotion->setActive(true);
+        $data["affiliate"]->setPromotion($promotion);
+        static::$dm->persist($promotion);
+        static::$dm->flush();
+        // first generate.
+        self::$affiliateService->generate([$data["affiliate"]], $date);
+        $this->assertEquals(0, count($data["bango"]->getFirstPolicy()->getParticipations()));
+        $this->assertEquals(0, count($data["tango"]->getFirstPolicy()->getParticipations()));
+        $this->assertEquals(1, count($data["hat"]->getFirstPolicy()->getParticipations()));
+        $this->assertEquals(1, count($data["borb"]->getFirstPolicy()->getParticipations()));
+        $this->assertEquals(1, count($data["tonyAbbot"]->getFirstPolicy()->getParticipations()));
+        $participation = $data["tonyAbbot"]->getFirstPolicy()->getParticipations()[0];
+        $this->assertEquals($date, $participation->getStart());
+        $charge = static::$chargeRepository->findLastByUser($data["borb"], Charge::TYPE_AFFILIATE);
+        $this->assertEquals($promotion, $charge->getParticipation()->getPromotion());
+
+        // make sure it doesn't do something funny when you run it again later.
+        self::$affiliateService->generate([$data["affiliate"]], $otherDate);
+        $this->assertEquals(0, count($data["bango"]->getFirstPolicy()->getParticipations()));
+        $this->assertEquals(1, count($data["tango"]->getFirstPolicy()->getParticipations()));
+        $this->assertEquals(1, count($data["hat"]->getFirstPolicy()->getParticipations()));
+        $this->assertEquals(1, count($data["borb"]->getFirstPolicy()->getParticipations()));
+        $this->assertEquals(1, count($data["tonyAbbot"]->getFirstPolicy()->getParticipations()));
+        $participation = $data["tango"]->getFirstPolicy()->getParticipations()[0];
+        $this->assertEquals($otherDate, $participation->getStart());
+        $participation = $data["tonyAbbot"]->getFirstPolicy()->getParticipations()[0];
+        $this->assertEquals($date, $participation->getStart());
+
+    }
+
+    public function testAffliateCampaignSourceName()
+    {
+        $date = new \DateTime('2018-11-20 15:59');
+        $otherDate = new \DateTime('2018-12-31 23:59');
+        $prefix = uniqid();
+        $affiliate = self::createTestAffiliate(
+            "{$prefix}campaign",
+            1.2,
+            30,
+            "line 1",
+            "london",
+            "{$prefix}campaign",
+            "{$prefix}lead",
+            "{$prefix}campaignName"
+        );
+
+        $userBoth = self::createTestUser(
+            "P40D",
+            "{$prefix}userBoth",
+            $date,
+            "{$prefix}campaign",
+            '',
+            "{$prefix}campaignName"
+        );
+        $userSource = self::createTestUser("P40D", "{$prefix}userSource", $date, "{$prefix}campaign", '', '');
+        $userName = self::createTestUser("P40D", "{$prefix}userName", $date, '', '', "{$prefix}campaignName");
+        $this->assertCount(1, self::$affiliateService->getMatchingUsers($affiliate, $otherDate));
+        self::$affiliateService->generate([$affiliate], $otherDate);
+    }
+
+    /**
      * Every time you call this function it generates a bunch of unique but also predictable data and puts it into the
      * database.
      * @param \DateTime $date is the date to set everything as having been made at.
@@ -470,17 +542,26 @@ class AffiliateServiceTest extends WebTestCase
 
     /**
      * Creates an affiliate company.
-     * @param string $name   is the name of the affiliate.
-     * @param float  $cpa    is the cost per aquisition on this affiliate.
-     * @param int    $days   is the number of days it takes before a user from this affiliate is considered aquired.
-     * @param string $line1  is the first line of their address.
-     * @param string $city   is the city that the affiliate company is based in.
-     * @param string $source is the name of the affiliate company's campaign source if they have one.
-     * @param string $lead   is the name of the affiliate company's lead source.
+     * @param string $name         is the name of the affiliate.
+     * @param float  $cpa          is the cost per aquisition on this affiliate.
+     * @param int    $days         number of days it takes before a user from this affiliate is considered aquired
+     * @param string $line1        is the first line of their address.
+     * @param string $city         is the city that the affiliate company is based in.
+     * @param string $source       is the name of the affiliate company's campaign source if they have one.
+     * @param string $lead         is the name of the affiliate company's lead source.
+     * @param string $campaignName is the name of the affiliate company's campaign name if they have one
      * @return AffiliateCompany the new company.
      */
-    private static function createTestAffiliate($name, $cpa, $days, $line1, $city, $source = '', $lead = '')
-    {
+    private static function createTestAffiliate(
+        $name,
+        $cpa,
+        $days,
+        $line1,
+        $city,
+        $source = '',
+        $lead = '',
+        $campaignName = ''
+    ) {
         $affiliate = new AffiliateCompany();
         $address = new Address();
         $address->setLine1($line1);
@@ -492,7 +573,8 @@ class AffiliateServiceTest extends WebTestCase
         $affiliate->setDays($days);
         $affiliate->setRenewalDays($days);
         $affiliate->setCampaignSource($source);
-        $affiliate->setLeadSource("scode");
+        $affiliate->setCampaignName($campaignName);
+        $affiliate->setLeadSource("affiliate");
         $affiliate->setLeadSourceDetails($lead);
         $affiliate->setChargeModel(AffiliateCompany::MODEL_ONE_OFF);
         self::$dm->persist($affiliate);
@@ -502,31 +584,38 @@ class AffiliateServiceTest extends WebTestCase
 
     /**
      * Creates a test user with a policy.
-     * @param string    $policyAge is the start date of the policy.
-     * @param string    $name      is the first and last names and email address of the user.
-     * @param \DateTime $date      is the date which the user was created policyAge days before.
-     * @param string    $source    is the campaign source of the user.
-     * @param string    $lead      is the lead source of the user.
+     * @param string    $policyAge    is the start date of the policy.
+     * @param string    $name         is the first and last names and email address of the user.
+     * @param \DateTime $date         is the date which the user was created policyAge days before.
+     * @param string    $source       is the campaign source of the user.
+     * @param string    $lead         is the lead source of the user.
+     * @param string    $campaignName is the campaign name of the user.
      * @return User the user that has now been created.
      */
-    private static function createTestUser($policyAge, $name, $date, $source = "", $lead = "")
+    private static function createTestUser($policyAge, $name, $date, $source = "", $lead = "", $campaignName = "")
     {
         $time = clone $date;
-        $policy = self::createUserPolicy(true, $time->sub(new \DateInterval($policyAge)));
-        $policy->getUser()->setEmail(self::generateEmailClass($name, "affiliateServiceTest"));
+        $policy = self::createUserPolicy(
+            true,
+            $time->sub(new \DateInterval($policyAge)),
+            false,
+            self::generateEmailClass($name, "affiliateServiceTest")
+        );
         $policy->setStatus(Policy::STATUS_ACTIVE);
         $policy->setImei(self::generateRandomImei());
         $user = $policy->getUser();
         $attribution = new Attribution();
         $attribution->setCampaignSource($source);
+        $attribution->setCampaignName($campaignName);
         $user->setAttribution($attribution);
-        $user->setLeadSource("scode");
+        $user->setLeadSource("affiliate");
         $user->setLeadSourceDetails($lead);
         $user->setFirstName($name);
         $user->setLastName($name);
         self::$dm->persist($policy);
         self::$dm->persist($user);
         self::$dm->flush();
+
         return $user;
     }
 
@@ -545,7 +634,7 @@ class AffiliateServiceTest extends WebTestCase
         $user->setLastName($name);
         $attribution = new Attribution();
         $attribution->setCampaignSource($source);
-        $user->setLeadSource("scode");
+        $user->setLeadSource("affiliate");
         $user->setLeadSourceDetails($lead);
         $user->setAttribution($attribution);
         self::$dm->persist($user);

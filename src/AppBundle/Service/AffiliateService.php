@@ -43,6 +43,8 @@ use AppBundle\Document\Payment\PolicyDiscountPayment;
 use AppBundle\Document\Payment\PolicyDiscountRefundPayment;
 use AppBundle\Document\Payment\ChargebackPayment;
 use AppBundle\Document\Payment\DebtCollectionPayment;
+use AppBundle\Exception\PromotionInactiveException;
+use AppBundle\Exception\AlreadyParticipatingException;
 use DateInterval;
 use DateTime;
 use DateTimeZone;
@@ -52,20 +54,24 @@ class AffiliateService
     use DateTrait;
     protected $dm;
     protected $logger;
+    protected $policyService;
     protected $chargeRepository;
     protected $affiliateRepository;
 
     /**
      * Builds the affiliate service and sends in it's dependencies as arguments.
-     * @param DocumentManager $dm     is the document manager.
-     * @param LoggerInterface $logger is the logger.
+     * @param DocumentManager $dm            is the document manager.
+     * @param LoggerInterface $logger        is the logger.
+     * @param PolicyService   $policyService is the policy service.
      */
     public function __construct(
         DocumentManager $dm,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        PolicyService $policyService
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
+        $this->policyService = $policyService;
         /** @var ChargeRepository $chargeRepository */
         $this->chargeRepository = $dm->getRepository(Charge::class);
         /** @var affiliateRepository $affiliateRepository */
@@ -194,17 +200,28 @@ class AffiliateService
         if (!$date) {
             $date = new \DateTime();
         }
-        if (mb_strlen($affiliate->getCampaignSource()) > 0) {
+        if (mb_strlen($affiliate->getCampaignSource()) > 0 && mb_strlen($affiliate->getCampaignName()) > 0) {
             $campaignUsers = $userRepo->findBy([
-                'attribution.campaignSource' => $affiliate->getCampaignSource()
+                'attribution.campaignSource' => $affiliate->getCampaignSource(),
+                'attribution.campaignName' => $affiliate->getCampaignName(),
+            ]);
+        } elseif (mb_strlen($affiliate->getCampaignSource()) > 0) {
+            $campaignUsers = $userRepo->findBy([
+                'attribution.campaignSource' => $affiliate->getCampaignSource(),
+            ]);
+        } elseif (mb_strlen($affiliate->getCampaignName()) > 0) {
+            $campaignUsers = $userRepo->findBy([
+                'attribution.campaignName' => $affiliate->getCampaignName(),
             ]);
         }
+
         if (mb_strlen($affiliate->getLeadSource()) > 0 && mb_strlen($affiliate->getLeadSourceDetails()) > 0) {
             $leadUsers = $userRepo->findBy([
                 'leadSource' => $affiliate->getLeadSource(),
                 'leadSourceDetails' => $affiliate->getLeadSourceDetails()
             ]);
         }
+
         $users = [];
         foreach ($campaignUsers as $user) {
             if ($ignoreCharged && $this->chargeRepository->findLastByUser($user, Charge::TYPE_AFFILIATE)) {
@@ -274,8 +291,20 @@ class AffiliateService
         if ($policy->getAffiliate() === null) {
             $affiliate->addConfirmedPolicies($policy);
         }
+        $promotion = $affiliate->getPromotion();
+        if ($promotion) {
+            try {
+                $participation = $this->policyService->enterPromotion($policy, $promotion, $date);
+                $charge->setParticipation($participation);
+            } catch (PromotionInactiveException $e) {
+                // TODO: in future add front end ability to make promotions active/inactive and when they are made
+                //       inactive automatically remove from all affiliates.
+                $this->logger->error("Affiliate ".$affiliate->getName()." is still trying to use inactive promotion.");
+            } catch (AlreadyParticipatingException $e) {
+                $this->logger->error($e->getMessage());
+            }
+        }
         $this->dm->persist($charge);
-        $this->dm->persist($affiliate);
         return $charge;
     }
 }
