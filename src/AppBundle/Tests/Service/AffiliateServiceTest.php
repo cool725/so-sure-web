@@ -490,7 +490,14 @@ class AffiliateServiceTest extends WebTestCase
             "{$prefix}campaignName"
         );
 
-        $userBoth = self::createTestUser("P40D", "{$prefix}userBoth", $date, "{$prefix}campaign", '', "{$prefix}campaignName");
+        $userBoth = self::createTestUser(
+            "P40D",
+            "{$prefix}userBoth",
+            $date,
+            "{$prefix}campaign",
+            '',
+            "{$prefix}campaignName"
+        );
         $userSource = self::createTestUser("P40D", "{$prefix}userSource", $date, "{$prefix}campaign", '', '');
         $userName = self::createTestUser("P40D", "{$prefix}userName", $date, '', '', "{$prefix}campaignName");
         $this->assertCount(1, self::$affiliateService->getMatchingUsers($affiliate, $otherDate));
