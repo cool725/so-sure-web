@@ -57,6 +57,14 @@ class AffiliateCompany extends Company
     protected $campaignSource;
 
     /**
+     * @AppAssert\AlphanumericSpaceDot()
+     * @Assert\Length(min="1", max="250")
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
+    protected $campaignName;
+
+    /**
      * @Assert\Choice({"invitation", "scode", "affiliate"}, strict=true)
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
@@ -145,6 +153,16 @@ class AffiliateCompany extends Company
     public function setCampaignSource($campaignSource)
     {
         $this->campaignSource = $campaignSource;
+    }
+
+    public function getCampaignName()
+    {
+        return $this->campaignName;
+    }
+
+    public function setCampaignName($campaignName)
+    {
+        $this->campaignName = $campaignName;
     }
 
     public function getLeadSource()

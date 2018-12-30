@@ -14,6 +14,7 @@ use AppBundle\Document\Note\Note;
 use AppBundle\Document\ValidatorTrait;
 use AppBundle\Exception\PaymentDeclinedException;
 use AppBundle\Form\Type\AdminEmailOptOutType;
+use AppBundle\Form\Type\AffiliateType;
 use AppBundle\Form\Type\BacsCreditType;
 use AppBundle\Form\Type\ClaimInfoType;
 use AppBundle\Form\Type\CallNoteType;
@@ -3148,45 +3149,8 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
      */
     public function affiliateFormAction(Request $request)
     {
-
-        $timeRanges = [
-            14 => 14,
-            30 => 30,
-            60 => 60,
-            90 => 90
-        ];
-        $renewalTimeRanges = [
-            0 => 0,
-            14 => 14,
-            30 => 30,
-            60 => 60,
-            90 => 90
-        ];
-        $leadSources = [
-            'invitation' => 'invitation',
-            'scode' => 'scode',
-            'affiliate' => 'affiliate'
-        ];
-        $chargeModels = [
-            "One off Charges" => AffiliateCompany::MODEL_ONE_OFF,
-            "Ongoing Charges" => AffiliateCompany::MODEL_ONGOING
-        ];
         $companyForm = $this->get('form.factory')
-            ->createNamedBuilder('affiliate_form')
-            ->add('name', TextType::class)
-            ->add('address1', TextType::class)
-            ->add('address2', TextType::class, ['required' => false])
-            ->add('address3', TextType::class, ['required' => false])
-            ->add('city', TextType::class)
-            ->add('postcode', TextType::class)
-            ->add('chargeModel', ChoiceType::class, ['required' => true, 'choices' => $chargeModels])
-            ->add('cpa', NumberType::class, ['constraints' => [new Assert\Range(['min' => 0, 'max' => 20])]])
-            ->add('days', ChoiceType::class, ['required' => true, 'choices' => $timeRanges])
-            ->add('renewalDays', ChoiceType::class, ['choices' => $renewalTimeRanges])
-            ->add('campaignSource', TextType::class, ['required' => false])
-            ->add('leadSource', ChoiceType::class, ['required' => false, 'choices' => $leadSources])
-            ->add('leadSourceDetails', TextType::class, ['required' => false ])
-            ->add('next', SubmitType::class)
+            ->createNamedBuilder('affiliate_form', AffiliateType::class)
             ->setAction($this->generateUrl('admin_affiliate_create'))
             ->getForm();
         if ('POST' === $request->getMethod()) {
@@ -3213,6 +3177,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                         $company->setRenewalDays($this->getDataString($companyForm->getData(), 'renewalDays'));
                     }
                     $company->setCampaignSource($this->getDataString($companyForm->getData(), 'campaignSource'));
+                    $company->setCampaignName($this->getDataString($companyForm->getData(), 'campaignName'));
                     $company->setLeadSource($this->getDataString($companyForm->getData(), 'leadSource'));
                     $company->setLeadSourceDetails(
                         $this->getDataString($companyForm->getData(), 'leadSourceDetails')

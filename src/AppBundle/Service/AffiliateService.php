@@ -200,17 +200,28 @@ class AffiliateService
         if (!$date) {
             $date = new \DateTime();
         }
-        if (mb_strlen($affiliate->getCampaignSource()) > 0) {
+        if (mb_strlen($affiliate->getCampaignSource()) > 0 && mb_strlen($affiliate->getCampaignName()) > 0) {
             $campaignUsers = $userRepo->findBy([
-                'attribution.campaignSource' => $affiliate->getCampaignSource()
+                'attribution.campaignSource' => $affiliate->getCampaignSource(),
+                'attribution.campaignName' => $affiliate->getCampaignName(),
+            ]);
+        } elseif (mb_strlen($affiliate->getCampaignSource()) > 0) {
+            $campaignUsers = $userRepo->findBy([
+                'attribution.campaignSource' => $affiliate->getCampaignSource(),
+            ]);
+        } elseif (mb_strlen($affiliate->getCampaignName()) > 0) {
+            $campaignUsers = $userRepo->findBy([
+                'attribution.campaignName' => $affiliate->getCampaignName(),
             ]);
         }
+
         if (mb_strlen($affiliate->getLeadSource()) > 0 && mb_strlen($affiliate->getLeadSourceDetails()) > 0) {
             $leadUsers = $userRepo->findBy([
                 'leadSource' => $affiliate->getLeadSource(),
                 'leadSourceDetails' => $affiliate->getLeadSourceDetails()
             ]);
         }
+
         $users = [];
         foreach ($campaignUsers as $user) {
             if ($ignoreCharged && $this->chargeRepository->findLastByUser($user, Charge::TYPE_AFFILIATE)) {
