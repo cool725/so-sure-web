@@ -992,11 +992,29 @@ class MonitorService
         $twoDays = $this->subBusinessDays($this->now(), 2);
         $blocked = $repo->findBy(['status' => ScheduledPayment::STATUS_SCHEDULED, 'scheduled' => ['$lt' => $twoDays]]);
 
-        if (count($blocked) > 0) {
+        $blockedItems = [];
+        foreach ($blocked as $block) {
+            /** @var ScheduledPayment $block */
+            if (!$block->getPolicy()->isValidPolicy()) {
+                continue;
+            }
+
+            $bacs = $block->getPolicy()->getUser()->getBacsPaymentMethod();
+            if ($bacs) {
+                if ($bacs->getBankAccount()->isFirstPayment() &&
+                    $block->getScheduled() >= $bacs->getBankAccount()->getInitialNotificationDate()) {
+                    continue;
+                }
+            }
+
+            $blockedItems[] = $block->getId();
+        }
+
+        if (count($blockedItems) > 0) {
             throw new MonitorException(sprintf(
                 "Found %d blocked scheduled payments. First id: %s",
-                count($blocked),
-                $this->quoteSafeArrayToString($blocked[0]->getId())
+                count($blockedItems),
+                $this->quoteSafeArrayToString($blockedItems)
             ));
         }
     }
