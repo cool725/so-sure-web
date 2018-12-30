@@ -474,6 +474,36 @@ class AffiliateServiceTest extends WebTestCase
 
     }
 
+    public function testAffliateCampaignSourceName()
+    {
+        $date = new \DateTime('2018-11-20 15:59');
+        $otherDate = new \DateTime('2018-12-31 23:59');
+        $prefix = uniqid();
+        $affiliate = self::createTestAffiliate(
+            "{$prefix}campaign",
+            1.2,
+            30,
+            "line 1",
+            "london",
+            "{$prefix}campaign",
+            "{$prefix}lead",
+            "{$prefix}campaignName"
+        );
+
+        $userBoth = self::createTestUser(
+            "P40D",
+            "{$prefix}userBoth",
+            $date,
+            "{$prefix}campaign",
+            '',
+            "{$prefix}campaignName"
+        );
+        $userSource = self::createTestUser("P40D", "{$prefix}userSource", $date, "{$prefix}campaign", '', '');
+        $userName = self::createTestUser("P40D", "{$prefix}userName", $date, '', '', "{$prefix}campaignName");
+        $this->assertCount(1, self::$affiliateService->getMatchingUsers($affiliate, $otherDate));
+        self::$affiliateService->generate([$affiliate], $otherDate);
+    }
+
     /**
      * Every time you call this function it generates a bunch of unique but also predictable data and puts it into the
      * database.
@@ -512,17 +542,26 @@ class AffiliateServiceTest extends WebTestCase
 
     /**
      * Creates an affiliate company.
-     * @param string $name   is the name of the affiliate.
-     * @param float  $cpa    is the cost per aquisition on this affiliate.
-     * @param int    $days   is the number of days it takes before a user from this affiliate is considered aquired.
-     * @param string $line1  is the first line of their address.
-     * @param string $city   is the city that the affiliate company is based in.
-     * @param string $source is the name of the affiliate company's campaign source if they have one.
-     * @param string $lead   is the name of the affiliate company's lead source.
+     * @param string $name         is the name of the affiliate.
+     * @param float  $cpa          is the cost per aquisition on this affiliate.
+     * @param int    $days         number of days it takes before a user from this affiliate is considered aquired
+     * @param string $line1        is the first line of their address.
+     * @param string $city         is the city that the affiliate company is based in.
+     * @param string $source       is the name of the affiliate company's campaign source if they have one.
+     * @param string $lead         is the name of the affiliate company's lead source.
+     * @param string $campaignName is the name of the affiliate company's campaign name if they have one
      * @return AffiliateCompany the new company.
      */
-    private static function createTestAffiliate($name, $cpa, $days, $line1, $city, $source = '', $lead = '')
-    {
+    private static function createTestAffiliate(
+        $name,
+        $cpa,
+        $days,
+        $line1,
+        $city,
+        $source = '',
+        $lead = '',
+        $campaignName = ''
+    ) {
         $affiliate = new AffiliateCompany();
         $address = new Address();
         $address->setLine1($line1);
@@ -534,6 +573,7 @@ class AffiliateServiceTest extends WebTestCase
         $affiliate->setDays($days);
         $affiliate->setRenewalDays($days);
         $affiliate->setCampaignSource($source);
+        $affiliate->setCampaignName($campaignName);
         $affiliate->setLeadSource("affiliate");
         $affiliate->setLeadSourceDetails($lead);
         $affiliate->setChargeModel(AffiliateCompany::MODEL_ONE_OFF);
@@ -544,14 +584,15 @@ class AffiliateServiceTest extends WebTestCase
 
     /**
      * Creates a test user with a policy.
-     * @param string    $policyAge is the start date of the policy.
-     * @param string    $name      is the first and last names and email address of the user.
-     * @param \DateTime $date      is the date which the user was created policyAge days before.
-     * @param string    $source    is the campaign source of the user.
-     * @param string    $lead      is the lead source of the user.
+     * @param string    $policyAge    is the start date of the policy.
+     * @param string    $name         is the first and last names and email address of the user.
+     * @param \DateTime $date         is the date which the user was created policyAge days before.
+     * @param string    $source       is the campaign source of the user.
+     * @param string    $lead         is the lead source of the user.
+     * @param string    $campaignName is the campaign name of the user.
      * @return User the user that has now been created.
      */
-    private static function createTestUser($policyAge, $name, $date, $source = "", $lead = "")
+    private static function createTestUser($policyAge, $name, $date, $source = "", $lead = "", $campaignName = "")
     {
         $time = clone $date;
         $policy = self::createUserPolicy(
@@ -565,6 +606,7 @@ class AffiliateServiceTest extends WebTestCase
         $user = $policy->getUser();
         $attribution = new Attribution();
         $attribution->setCampaignSource($source);
+        $attribution->setCampaignName($campaignName);
         $user->setAttribution($attribution);
         $user->setLeadSource("affiliate");
         $user->setLeadSourceDetails($lead);
