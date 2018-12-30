@@ -1612,6 +1612,88 @@ class DirectGroupServiceTest extends WebTestCase
         $this->assertEquals(new \DateTime('2016-01-01'), $claim->getApprovedDate());
     }
 
+    public function testSaveClaimsRepairImei()
+    {
+        $policy = static::createUserPolicy(true);
+        $policy->getUser()->setEmail(static::generateEmail('testSaveClaimsRepairImei', $this));
+        $claim = new Claim();
+        $claim->setNumber(rand(1, 999999));
+        $claim->setType(Claim::TYPE_LOSS);
+        $claim->setStatus(Claim::STATUS_INREVIEW);
+        $claim->setHandlingTeam(Claim::TEAM_DIRECT_GROUP);
+        $policy->addClaim($claim);
+        static::$dm->persist($policy->getUser());
+        static::$dm->persist($policy);
+        static::$dm->persist($claim);
+        static::$dm->flush();
+
+        $directGroupClaim = new DirectGroupHandlerClaim();
+        $directGroupClaim->claimNumber = (string) $claim->getNumber();
+        $directGroupClaim->excess = 150;
+        $directGroupClaim->phoneReplacementCost = 300;
+        $directGroupClaim->totalIncurred = 150;
+        $directGroupClaim->reserved = 0;
+        $directGroupClaim->policyNumber = $policy->getPolicyNumber();
+        $directGroupClaim->insuredName = 'Mr foo bar';
+        $directGroupClaim->status = DirectGroupHandlerClaim::STATUS_CLOSED_REPAIRED;
+        $directGroupClaim->lossType = DirectGroupHandlerClaim::TYPE_LOSS;
+        $directGroupClaim->replacementReceivedDate = new \DateTime('2016-01-02');
+        $directGroupClaim->replacementMake = 'Apple';
+        $directGroupClaim->replacementModel = 'iPhone 4';
+        $directGroupClaim->replacementImei = static::generateRandomImei();
+
+        static::$directGroupService->saveClaim($directGroupClaim, false);
+        //print_r(static::$directGroupService->getErrors());
+        $this->assertEquals(
+            1,
+            count(self::$directGroupService->getErrors()[$claim->getNumber()]),
+            json_encode(self::$directGroupService->getErrors())
+        );
+        $this->insureErrorExists('/repaired claim, but replacement imei is present/');
+    }
+
+    public function testSaveClaimsRepairNoSupplier()
+    {
+        $policy = static::createUserPolicy(true);
+        $policy->getUser()->setEmail(static::generateEmail('testSaveClaimsRepairNoSupplier', $this));
+        $claim = new Claim();
+        $claim->setNumber(rand(1, 999999));
+        $claim->setType(Claim::TYPE_LOSS);
+        $claim->setStatus(Claim::STATUS_INREVIEW);
+        $claim->setHandlingTeam(Claim::TEAM_DIRECT_GROUP);
+        $policy->addClaim($claim);
+        static::$dm->persist($policy->getUser());
+        static::$dm->persist($policy);
+        static::$dm->persist($claim);
+        static::$dm->flush();
+
+        $directGroupClaim = new DirectGroupHandlerClaim();
+        $directGroupClaim->claimNumber = (string) $claim->getNumber();
+        $directGroupClaim->excess = 300;
+        $directGroupClaim->phoneReplacementCost = 150;
+        $directGroupClaim->totalIncurred = 150;
+        $directGroupClaim->reserved = 0;
+        $directGroupClaim->policyNumber = $policy->getPolicyNumber();
+        $directGroupClaim->insuredName = 'Mr foo bar';
+        $directGroupClaim->status = DirectGroupHandlerClaim::STATUS_CLOSED_REPAIRED;
+        $directGroupClaim->lossType = DirectGroupHandlerClaim::TYPE_LOSS;
+        $directGroupClaim->replacementReceivedDate = new \DateTime('2016-01-02');
+        $directGroupClaim->replacementMake = 'Apple';
+        $directGroupClaim->replacementModel = 'iPhone 4';
+        $directGroupClaim->replacementImei = static::generateRandomImei();
+        $directGroupClaim->lossDescription = 'I lost my phone.';
+        $directGroupClaim->initialSuspicion = true;
+
+        static::$directGroupService->saveClaim($directGroupClaim, false);
+        //print_r(static::$directGroupService->getWarnings());
+        $this->assertEquals(
+            2,
+            count(self::$directGroupService->getWarnings()[$claim->getNumber()]),
+            json_encode(self::$directGroupService->getWarnings())
+        );
+        $this->insureWarningExists('/repaired claim, but no supplier set/');
+    }
+
     public function testSaveClaimValidationError()
     {
         $policy = static::createUserPolicy(true);

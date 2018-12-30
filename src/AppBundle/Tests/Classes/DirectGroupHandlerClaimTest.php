@@ -423,4 +423,21 @@ class DirectGroupHandlerClaimTest extends \PHPUnit\Framework\TestCase
         $directGroup->status = 'Rejected';
         $this->assertEquals(DirectGroupHandlerClaim::STATUS_REJECTED, $directGroup->getStatus());
     }
+
+    public function testIsReplacementRepaired()
+    {
+        $directGroup = new DirectGroupHandlerClaim();
+        $this->assertFalse($directGroup->isReplacementRepaired());
+
+        $directGroup->repairSupplier = 'foo';
+        $this->assertTrue($directGroup->isReplacementRepaired());
+
+        $directGroup->repairSupplier = null;
+        $directGroup->status = DirectGroupHandlerClaim::STATUS_CLOSED_REPAIRED;
+        $this->assertTrue($directGroup->isReplacementRepaired());
+
+        $directGroup->repairSupplier = null;
+        $directGroup->status = DirectGroupHandlerClaim::STATUS_CLOSED_REPLACED;
+        $this->assertFalse($directGroup->isReplacementRepaired());
+    }
 }

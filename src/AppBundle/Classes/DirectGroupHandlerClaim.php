@@ -19,6 +19,12 @@ class DirectGroupHandlerClaim extends HandlerClaim
 
     const STATUS_OPEN = 'Open';
     const STATUS_CLOSED = 'Paid Closed';
+
+    // Not used much, but will be present in the file (will be wrapped into the closed status)
+    const STATUS_CLOSED_REPAIRED = 'Paid Closed - Repaired';
+    // Not used much, but will be present in the file (will be wrapped into the closed status)
+    const STATUS_CLOSED_REPLACED = 'Paid Closed - Replaced';
+
     const STATUS_WITHDRAWN = 'Withdrawn';
     const STATUS_REJECTED = 'Rejected';
 
@@ -173,6 +179,8 @@ class DirectGroupHandlerClaim extends HandlerClaim
     {
         if (mb_stripos($this->status, self::STATUS_OPEN) !== false) {
             return self::STATUS_OPEN;
+        } elseif (mb_stripos($this->status, self::STATUS_CLOSED) !== false) {
+            return self::STATUS_CLOSED;
         } elseif (mb_stripos($this->status, self::STATUS_CLOSED) !== false) {
             return self::STATUS_CLOSED;
         } elseif (mb_stripos($this->status, self::STATUS_WITHDRAWN) !== false) {
@@ -349,7 +357,7 @@ class DirectGroupHandlerClaim extends HandlerClaim
     public function isReplacementRepaired()
     {
         // if repair supplier is present, then its a repair and imei will not be present
-        return mb_strlen($this->repairSupplier) > 0;
+        return mb_strlen($this->repairSupplier) > 0 || $this->status == self::STATUS_CLOSED_REPAIRED;
     }
 
 
