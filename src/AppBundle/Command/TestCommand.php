@@ -63,9 +63,28 @@ class TestCommand extends ContainerAwareCommand
         //$this->updatePhoneExcess();
         //$this->updatePolicyExcess();
 
-        $this->updateClaimExcess();
+        //$this->updateClaimExcess();
+        $this->cancelScheduledPayments($output);
 
         $output->writeln('Finished');
+    }
+
+    private function cancelScheduledPayments(OutputInterface $output)
+    {
+        $count = 0;
+        $repo = $this->dm->getRepository(ScheduledPayment::class);
+        $twoDays = $this->subBusinessDays($this->now(), 2);
+        $blocked = $repo->findBy(['status' => ScheduledPayment::STATUS_SCHEDULED, 'scheduled' => ['$lt' => $twoDays]]);
+        foreach ($blocked as $block) {
+            /** @var ScheduledPayment $block */
+            if ($block->getPolicy()->isCancelled() || $block->getPolicy()->isExpired()) {
+                $block->setStatus(ScheduledPayment::STATUS_CANCELLED);
+                $count++;
+            }
+        }
+
+        $this->dm->flush();
+        $output->writeln($count);
     }
 
     private function updateClaimExcess()

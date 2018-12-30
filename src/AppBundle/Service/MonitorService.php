@@ -994,8 +994,9 @@ class MonitorService
 
         if (count($blocked) > 0) {
             throw new MonitorException(sprintf(
-                "Found blcoked scheduled payments. %s",
-                $this->quoteSafeArrayToString($blocked)
+                "Found %d blocked scheduled payments. First id: %s",
+                count($blocked),
+                $this->quoteSafeArrayToString($blocked[0]->getId())
             ));
         }
     }
