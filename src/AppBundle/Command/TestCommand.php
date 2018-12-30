@@ -84,7 +84,7 @@ class TestCommand extends ContainerAwareCommand
         }
 
         $this->dm->flush();
-        $output->writeln($count);
+        $output->writeln(sprintf("%d updated", $count));
     }
 
     private function updateClaimExcess()
