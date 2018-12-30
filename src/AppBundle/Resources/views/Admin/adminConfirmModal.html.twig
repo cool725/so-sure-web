@@ -12,8 +12,10 @@
 
       {% if params is defined %}
         {{ render(controller(route, params)) }}
-      {% else %}
+      {% elseif policy is defined %}
         {{ render(controller(route, {'id': policy.id})) }}
+      {% else %}
+          {{ render(controller(route)) }}
       {% endif %}
     </div>
 </div>
