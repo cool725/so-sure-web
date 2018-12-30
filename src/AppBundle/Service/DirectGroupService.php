@@ -833,6 +833,22 @@ class DirectGroupService extends ExcelSftpService
             );
             $this->warnings[$directGroupClaim->claimNumber][] = $msg;
         }
+
+        if ($directGroupClaim->isReplacementRepaired() && mb_strlen($directGroupClaim->repairSupplier) == 0) {
+            $msg = sprintf(
+                'Claim %s is a repaired claim, but no supplier set',
+                $directGroupClaim->claimNumber
+            );
+            $this->warnings[$directGroupClaim->claimNumber][] = $msg;
+        }
+
+        if ($directGroupClaim->isReplacementRepaired() && mb_strlen($directGroupClaim->replacementImei) > 0) {
+            $msg = sprintf(
+                'Claim %s is a repaired claim, but replacement imei is present',
+                $directGroupClaim->claimNumber
+            );
+            $this->errors[$directGroupClaim->claimNumber][] = $msg;
+        }
     }
 
     public function postValidateClaimDetails(Claim $claim, DirectGroupHandlerClaim $directGroupClaim)
