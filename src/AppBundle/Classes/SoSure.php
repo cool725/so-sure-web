@@ -19,6 +19,11 @@ class SoSure
     const S3_BUCKET_ADMIN = 'admin.so-sure.com';
     const S3_BUCKET_POLICY = 'policy.so-sure.com';
 
+    public static function getSoSureTimezone()
+    {
+        return new \DateTimeZone(self::TIMEZONE);
+    }
+
     public static function hasSoSureEmail($email)
     {
         return mb_stripos($email, '@so-sure.com') !== false;

@@ -1112,11 +1112,11 @@ class ReportingService
         if (in_array($month, [9, 10, 11])) {
             $start = new \DateTime(
                 sprintf('%d-09-01 00:00:00', $date->format('Y')),
-                new \DateTimeZone(SoSure::TIMEZONE)
+                SoSure::getSoSureTimezone()
             );
             $end = new \DateTime(
                 sprintf('%d-12-01 00:00:00', $date->format('Y')),
-                new \DateTimeZone(SoSure::TIMEZONE)
+                SoSure::getSoSureTimezone()
             );
         } elseif (in_array($month, [12, 1, 2])) {
             $year = $date->format('Y');
@@ -1126,29 +1126,29 @@ class ReportingService
             }
             $start = new \DateTime(
                 sprintf('%d-12-01 00:00:00', $year),
-                new \DateTimeZone(SoSure::TIMEZONE)
+                SoSure::getSoSureTimezone()
             );
             $end = new \DateTime(
                 sprintf('%d-03-01 00:00:00', $date->format('Y')),
-                new \DateTimeZone(SoSure::TIMEZONE)
+                SoSure::getSoSureTimezone()
             );
         } elseif (in_array($month, [3, 4, 5])) {
             $start = new \DateTime(
                 sprintf('%d-03-01 00:00:00', $date->format('Y')),
-                new \DateTimeZone(SoSure::TIMEZONE)
+                SoSure::getSoSureTimezone()
             );
             $end = new \DateTime(
                 sprintf('%d-06-01 00:00:00', $date->format('Y')),
-                new \DateTimeZone(SoSure::TIMEZONE)
+                SoSure::getSoSureTimezone()
             );
         } elseif (in_array($month, [6, 7, 8])) {
             $start = new \DateTime(
                 sprintf('%d-06-01 00:00:00', $date->format('Y')),
-                new \DateTimeZone(SoSure::TIMEZONE)
+                SoSure::getSoSureTimezone()
             );
             $end = new \DateTime(
                 sprintf('%d-09-01 00:00:00', $date->format('Y')),
-                new \DateTimeZone(SoSure::TIMEZONE)
+                SoSure::getSoSureTimezone()
             );
         }
         if ($end) {

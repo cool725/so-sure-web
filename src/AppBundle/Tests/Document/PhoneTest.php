@@ -288,7 +288,7 @@ class PhoneTest extends \PHPUnit\Framework\TestCase
         $phone1000->init('Apple', '1000Binder', 9, static::$policyTerms, 32, ['1000-binder'], 1000);
         $phone1250 = new Phone();
         $phone1250->init('Apple', '1250Binder', 9, static::$policyTerms, 32, ['1250-binder'], 1250);
-        $binder2017 = new \DateTime('2017-01-01 00:00:00', new \DateTimeZone(SoSure::TIMEZONE));
+        $binder2017 = new \DateTime('2017-01-01 00:00:00', SoSure::getSoSureTimezone());
         $this->assertEquals(10.49, $phone1000->getSalvaBinderMonthlyPremium($binder2017));
         $this->assertEquals(null, $phone1250->getSalvaBinderMonthlyPremium($binder2017));
     }
@@ -301,7 +301,7 @@ class PhoneTest extends \PHPUnit\Framework\TestCase
         $phone1250->init('Apple', '1250Binder', 9, static::$policyTerms, 32, ['1250-binder'], 1250);
         $phone1500 = new Phone();
         $phone1500->init('Apple', '1500Binder', 9, static::$policyTerms, 32, ['1500-binder'], 1500);
-        $binder2018 = new \DateTime('2018-01-01 00:00:00', new \DateTimeZone(SoSure::TIMEZONE));
+        $binder2018 = new \DateTime('2018-01-01 00:00:00', SoSure::getSoSureTimezone());
         $this->assertEquals(10.49, $phone1000->getSalvaBinderMonthlyPremium($binder2018));
         $this->assertEquals(11.49, $phone1250->getSalvaBinderMonthlyPremium($binder2018));
         $this->assertEquals(12.49, $phone1500->getSalvaBinderMonthlyPremium($binder2018));
@@ -314,7 +314,7 @@ class PhoneTest extends \PHPUnit\Framework\TestCase
     {
         $phone = new Phone();
         $phone->init('Apple', 'PostBinder', 9, static::$policyTerms, 32, ['post-binder'], 1000);
-        $binder2019 = new \DateTime('2019-01-01 00:00:00', new \DateTimeZone(SoSure::TIMEZONE));
+        $binder2019 = new \DateTime('2019-01-01 00:00:00', SoSure::getSoSureTimezone());
         $phone->getSalvaBinderMonthlyPremium($binder2019);
     }
 

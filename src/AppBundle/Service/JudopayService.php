@@ -1439,7 +1439,7 @@ class JudopayService
                     $transactionDate = \DateTime::createFromFormat(
                         'd F Y H:i',
                         $line['Date'],
-                        new \DateTimeZone(SoSure::TIMEZONE)
+                        SoSure::getSoSureTimezone()
                     );
                     if (!$transactionDate) {
                         throw new \Exception(sprintf('Unable to parse date %s', $line['Date']));
