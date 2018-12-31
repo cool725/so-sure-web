@@ -5576,7 +5576,12 @@ class PhonePolicyTest extends WebTestCase
 
         // print_r($diff);
         // Normally 0, but 1 for 29th
-        $this->assertTrue(in_array($diff->days, [1, 0]));
+        $expectedDaysDiff = 0;
+        $now = $this->now();
+        if ($now->format('d') > 28) {
+            $expectedDaysDiff = $now->format('d') - 28;
+        }
+        $this->assertTrue(in_array($diff->days, [$expectedDaysDiff, $expectedDaysDiff - 1]), json_encode($diff));
         $this->assertTrue($expiration < $policy->getEnd());
     }
 

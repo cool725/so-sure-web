@@ -118,9 +118,10 @@ trait UserClassTrait
                     $premium->clearPicSureExcess();
                 }
 
+                usleep(100);
                 $policy->setPhone(self::getRandomPhone(self::$dm), $date);
                 $recursionPrevention++;
-                if ($recursionPrevention > 15) {
+                if ($recursionPrevention > 25) {
                     throw new \Exception(sprintf('Excess recursion (%s)', $user->getEmail()));
                 }
             }
