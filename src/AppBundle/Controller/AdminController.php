@@ -221,10 +221,10 @@ class AdminController extends BaseController
         $phone = $repo->find($id);
         if ($phone) {
             $gwp = $request->get('gwp');
-            $from = new \DateTime($request->get('from'), new \DateTimeZone(SoSure::TIMEZONE));
+            $from = new \DateTime($request->get('from'), SoSure::getSoSureTimezone());
             $to = null;
             if ($request->get('to')) {
-                $to = new \DateTime($request->get('to'), new \DateTimeZone(SoSure::TIMEZONE));
+                $to = new \DateTime($request->get('to'), SoSure::getSoSureTimezone());
             }
             $notes = $this->conformAlphanumericSpaceDot($this->getRequestString($request, 'notes'), 1500);
             try {
@@ -961,7 +961,7 @@ class AdminController extends BaseController
             return $v->getAmount() < 0.0;
         });
         $isProd = $this->isProduction();
-        $tz = new \DateTimeZone(SoSure::TIMEZONE);
+        $tz = SoSure::getSoSureTimezone();
         $sosure = [
             'dailyTransaction' => Payment::dailyPayments($payments, $isProd),
             'monthlyTransaction' => Payment::sumPayments($payments, $isProd),

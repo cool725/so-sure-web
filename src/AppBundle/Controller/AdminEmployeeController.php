@@ -2190,7 +2190,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         $date = \DateTime::createFromFormat(
             "Y-m-d",
             sprintf('%d-%d-01', $year, $month),
-            new \DateTimeZone(SoSure::TIMEZONE)
+            SoSure::getSoSureTimezone()
         );
 
         $data = [];
@@ -2219,7 +2219,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         $date = \DateTime::createFromFormat(
             "Y-m-d",
             sprintf('%d-%d-01', $year, $month),
-            new \DateTimeZone(SoSure::TIMEZONE)
+            SoSure::getSoSureTimezone()
         );
 
         $data = [];
@@ -2239,7 +2239,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         $date = \DateTime::createFromFormat(
             "Y-m-d",
             sprintf('%d-%d-01', $year, $month),
-            new \DateTimeZone(SoSure::TIMEZONE)
+            SoSure::getSoSureTimezone()
         );
 
         $templating = $this->get('templating');

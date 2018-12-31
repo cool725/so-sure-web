@@ -57,13 +57,13 @@ trait DateTrait
     public function startOfMonth(\DateTime $date = null)
     {
         if (!$date) {
-            $date = new \DateTime('now', new \DateTimeZone(SoSure::TIMEZONE));
+            $date = new \DateTime('now', SoSure::getSoSureTimezone());
         }
 
         // We want to change reporting to use Europe/London rather than UTC
         // in order to keep historic data accurate, only adjust data going forwards from Apr 2018
         $tz = 'UTC';
-        if ($date >= new \DateTime('2018-04-01 00:00:00', new \DateTimeZone(SoSure::TIMEZONE))) {
+        if ($date >= new \DateTime('2018-04-01 00:00:00', SoSure::getSoSureTimezone())) {
             $tz = SoSure::TIMEZONE;
         }
 
@@ -74,12 +74,12 @@ trait DateTrait
 
         // due to change from UTC to Europe/London reporting in Apr 2018, we have an overlap for this particular month
         // avoid double counting by incrementing 1 hour
-        if ($startMonth == new \DateTime('2018-04-01 00:00:00', new \DateTimeZone(SoSure::TIMEZONE))) {
-            $startMonth = new \DateTime('2018-04-01 01:00:00', new \DateTimeZone(SoSure::TIMEZONE));
+        if ($startMonth == new \DateTime('2018-04-01 00:00:00', SoSure::getSoSureTimezone())) {
+            $startMonth = new \DateTime('2018-04-01 01:00:00', SoSure::getSoSureTimezone());
         }
         /*
-        if ($startMonth == new \DateTime('2018-05-01 00:00:00', new \DateTimeZone(SoSure::TIMEZONE))) {
-            $startMonth = new \DateTime('2018-05-01 01:00:00', new \DateTimeZone(SoSure::TIMEZONE));
+        if ($startMonth == new \DateTime('2018-05-01 00:00:00', SoSure::getSoSureTimezone())) {
+            $startMonth = new \DateTime('2018-05-01 01:00:00', SoSure::getSoSureTimezone());
         }
         */
 
@@ -99,13 +99,13 @@ trait DateTrait
     public function endOfMonth(\DateTime $date = null)
     {
         if (!$date) {
-            $date = new \DateTime('now', new \DateTimeZone(SoSure::TIMEZONE));
+            $date = new \DateTime('now', SoSure::getSoSureTimezone());
         }
 
         // We want to change reporting to use Europe/London rather than UTC
         // in order to keep historic data accurate, only adjust data going forwards from Apr 2018
         $tz = 'UTC';
-        if ($date >= new \DateTime('2018-04-01 00:00:00', new \DateTimeZone(SoSure::TIMEZONE))) {
+        if ($date >= new \DateTime('2018-04-01 00:00:00', SoSure::getSoSureTimezone())) {
             $tz = SoSure::TIMEZONE;
         }
 
@@ -297,7 +297,7 @@ trait DateTrait
     public function adjustDayForBilling($date, $adjustTimeIfAdjusted = false)
     {
         $billingDate = clone $date;
-        $billingDate = self::convertTimezone($billingDate, new \DateTimeZone(SoSure::TIMEZONE));
+        $billingDate = self::convertTimezone($billingDate, SoSure::getSoSureTimezone());
         if ($billingDate->format('d') > 28) {
             $billingDate->sub(new \DateInterval(sprintf('P%dD', $billingDate->format('d') - 28)));
             if ($adjustTimeIfAdjusted) {
@@ -324,7 +324,7 @@ trait DateTrait
     public function getClaimResponseTime(\DateTime $date = null)
     {
         if (!$date) {
-            $date = new \DateTime('now', new \DateTimeZone(SoSure::TIMEZONE));
+            $date = new \DateTime('now', SoSure::getSoSureTimezone());
         }
         $time = 'in the next 3 hours';
         if (!static::isWeekDay($date) || static::isBankHoliday($date)) {

@@ -19,6 +19,7 @@ use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Policy;
 use AppBundle\Document\PolicyTerms;
 use AppBundle\Document\SalvaPhonePolicy;
+use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\User;
 use AppBundle\Exception\MonitorException;
 use AppBundle\Repository\BacsPaymentRepository;
@@ -982,6 +983,40 @@ class MonitorService
             throw new MonitorException(
                 "IMEI number Incorrectly detected. https://wearesosure.com/admin/detected-imei"
             );
+        }
+    }
+
+    public function blockedScheduledPayments()
+    {
+        $repo = $this->dm->getRepository(ScheduledPayment::class);
+        $twoDays = $this->subBusinessDays($this->now(), 2);
+        $blocked = $repo->findBy(['status' => ScheduledPayment::STATUS_SCHEDULED, 'scheduled' => ['$lt' => $twoDays]]);
+
+        $blockedItems = [];
+        foreach ($blocked as $block) {
+            /** @var ScheduledPayment $block */
+            if (!$block->getPolicy()->isValidPolicy()) {
+                continue;
+            }
+
+            $bacs = $block->getPolicy()->getUser()->getBacsPaymentMethod();
+            if ($bacs) {
+                // ignore initial first payments if we haven't reached the initial notification date
+                if ($bacs->getBankAccount()->isFirstPayment() &&
+                    $this->now() < $bacs->getBankAccount()->getInitialNotificationDate()) {
+                    continue;
+                }
+            }
+
+            $blockedItems[] = $block->getId();
+        }
+
+        if (count($blockedItems) > 0) {
+            throw new MonitorException(sprintf(
+                "Found %d blocked scheduled payments. First id: %s",
+                count($blockedItems),
+                $this->quoteSafeArrayToString($blockedItems)
+            ));
         }
     }
 

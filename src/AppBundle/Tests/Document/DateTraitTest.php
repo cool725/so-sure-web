@@ -57,17 +57,17 @@ class DateTraitTest extends \PHPUnit\Framework\TestCase
         );
 
         $this->assertEquals(
-            new \DateTime('2018-04-01 01:00', new \DateTimeZone(SoSure::TIMEZONE)),
+            new \DateTime('2018-04-01 01:00', SoSure::getSoSureTimezone()),
             $this->startOfMonth(new \DateTime('2018-04-12 15:00'))
         );
 
         $this->assertEquals(
-            new \DateTime('2018-05-01 00:00', new \DateTimeZone(SoSure::TIMEZONE)),
+            new \DateTime('2018-05-01 00:00', SoSure::getSoSureTimezone()),
             $this->startOfMonth(new \DateTime('2018-05-12 15:00'))
         );
 
         $this->assertEquals(
-            new \DateTime('2018-06-01 00:00', new \DateTimeZone(SoSure::TIMEZONE)),
+            new \DateTime('2018-06-01 00:00', SoSure::getSoSureTimezone()),
             $this->startOfMonth(new \DateTime('2018-06-12 15:00'))
         );
     }
@@ -115,17 +115,17 @@ class DateTraitTest extends \PHPUnit\Framework\TestCase
         );
 
         $this->assertEquals(
-            new \DateTime('2018-05-01 00:00', new \DateTimeZone(SoSure::TIMEZONE)),
+            new \DateTime('2018-05-01 00:00', SoSure::getSoSureTimezone()),
             $this->endOfMonth(new \DateTime('2018-04-12 15:00'))
         );
 
         $this->assertEquals(
-            new \DateTime('2018-06-01 00:00', new \DateTimeZone(SoSure::TIMEZONE)),
+            new \DateTime('2018-06-01 00:00', SoSure::getSoSureTimezone()),
             $this->endOfMonth(new \DateTime('2018-05-12 15:00'))
         );
 
         $this->assertEquals(
-            new \DateTime('2018-07-01 00:00', new \DateTimeZone(SoSure::TIMEZONE)),
+            new \DateTime('2018-07-01 00:00', SoSure::getSoSureTimezone()),
             $this->endOfMonth(new \DateTime('2018-06-12 15:00'))
         );
     }
