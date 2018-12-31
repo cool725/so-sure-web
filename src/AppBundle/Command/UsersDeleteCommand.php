@@ -3,12 +3,14 @@
 namespace AppBundle\Command;
 
 use AppBundle\Classes\SoSure;
+use AppBundle\Document\Lead;
 use AppBundle\Repository\UserRepository;
 use AppBundle\Security\FOSUBUserProvider;
 use AppBundle\Service\JudopayService;
 use AppBundle\Service\MailerService;
 use AppBundle\Service\PolicyService;
 use Doctrine\ODM\MongoDB\DocumentManager;
+use Doctrine\ODM\MongoDB\DocumentRepository;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -45,7 +47,7 @@ class UsersDeleteCommand extends ContainerAwareCommand
     {
         $this
             ->setName('sosure:users:delete')
-            ->setDescription('Delete old users')
+            ->setDescription('Delete old users & leads')
             ->addOption(
                 'skip-email',
                 null,
@@ -122,6 +124,22 @@ class UsersDeleteCommand extends ContainerAwareCommand
             }
         }
 
+        $this->dm->flush();
+
+        /** @var DocumentRepository $repo */
+        $repo = $this->dm->getRepository(Lead::class);
+        $leads = $repo->findBy(['created' => ['$lte' => $seventeenMonths]]);
+        $output->writeln(sprintf('%d leads are 17 months after creation', count($leads)));
+        foreach ($leads as $lead) {
+            if (!$skipDelete) {
+                $this->userService->deleteLead($lead);
+                $output->writeln(sprintf(
+                    'Deleted lead %s (%s)',
+                    $lead->getEmail(),
+                    $lead->getId()
+                ));
+            }
+        }
         $this->dm->flush();
 
         $output->writeln('Finished');
