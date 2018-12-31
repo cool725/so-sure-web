@@ -199,8 +199,11 @@ class TestCommand extends ContainerAwareCommand
         foreach ($repo->findAll() as $user) {
             /** @var User $user */
             if ($user->getBirthday()) {
-                if (($user->getBirthday()->format('H') == 0 && $user->getBirthday()->format('i') == 0 && $user->getBirthday()->format('P') == "+01:00") ||
-                    $user->getBirthday()->format('H') == 23 && $user->getBirthday()->format('i') == 0 && $user->getBirthday()->format('P') == "+00:00") {
+                $midnight = $user->getBirthday()->format('H') == 0 && $user->getBirthday()->format('i') == 0 &&
+                    $user->getBirthday()->format('P') == "+01:00";
+                $eleven = $user->getBirthday()->format('H') == 23 && $user->getBirthday()->format('i') == 0 &&
+                    $user->getBirthday()->format('P') == "+00:00";
+                if ($midnight || $eleven) {
                     $convertedDate = clone $user->getBirthday();
                     $convertedDate = $convertedDate->add(new \DateInterval('PT1H'));
                     if (count($user->getValidPolicies(true)) > 0) {
