@@ -2,6 +2,7 @@
 namespace AppBundle\Security;
 
 use AppBundle\Document\Invitation\Invitation;
+use AppBundle\Document\Lead;
 use AppBundle\Document\Opt\EmailOptIn;
 use AppBundle\Document\Opt\EmailOptOut;
 use AppBundle\Document\Opt\Opt;
@@ -462,11 +463,8 @@ class FOSUBUserProvider extends BaseClass
             $user->setReceivedInvitations(null);
         }
 
-        $opt = $this->dm->getRepository(Opt::class);
-        $opts = $opt->findBy(['email' => $user->getEmailCanonical()]);
-        foreach ($opts as $opt) {
-            $this->dm->remove($opt);
-        }
+        $this->deleteOpts($user->getEmailCanonical());
+
         if ($flush) {
             $this->dm->flush();
         }
@@ -483,6 +481,38 @@ class FOSUBUserProvider extends BaseClass
         }
 
         $this->dm->remove($user);
+
+        if ($flush) {
+            $this->dm->flush();
+        }
+    }
+
+    private function deleteOpts($email)
+    {
+        $opt = $this->dm->getRepository(Opt::class);
+        $opts = $opt->findBy(['email' => mb_strtolower($email)]);
+        foreach ($opts as $opt) {
+            $this->dm->remove($opt);
+        }
+    }
+
+    public function deleteLead(Lead $lead, $flush = false)
+    {
+        if ($lead->getIntercomId()) {
+            $this->intercom->queueLead($lead, IntercomService::QUEUE_LEAD_DELETE, [
+                'intercomId' => $lead->getIntercomId()
+            ]);
+        }
+
+        if ($lead->getEmailCanonical()) {
+            $userRepo = $this->dm->getRepository(User::class);
+            $user = $userRepo->findOneBy(['emailCanonical' => $lead->getEmailCanonical()]);
+            if (!$user) {
+                $this->deleteOpts($lead->getEmailCanonical());
+            }
+        }
+
+        $this->dm->remove($lead);
 
         if ($flush) {
             $this->dm->flush();
