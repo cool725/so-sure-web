@@ -229,7 +229,7 @@ class SlackCommand extends ContainerAwareCommand
 
         $weekText = '';
         $start = new \DateTime('2016-12-05');
-        $targetEnd = new \DateTime('2018-06-30');
+        $targetEnd = new \DateTime('2019-09-01');
         $dowOffset = 0;
 
         $now = \DateTime::createFromFormat('U', time());
@@ -248,7 +248,7 @@ class SlackCommand extends ContainerAwareCommand
             $end->format('d/m/Y'),
             $weeksRemaining
         );
-        $growthTarget = 3750;
+        $growthTarget = 10000;
 
         $yesterday = \DateTime::createFromFormat('U', time());
         $yesterday->sub(new \DateInterval('P1D'));
